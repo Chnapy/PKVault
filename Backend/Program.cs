@@ -1,56 +1,49 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
-using PKHeX.Core;
+﻿using PKHeX.Core;
 
 namespace Backend;
 
 public static class Program
 {
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(PkCommand))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, "Spectre.Console.Cli.ExplainCommand", "Spectre.Console.Cli")]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, "Spectre.Console.Cli.VersionCommand", "Spectre.Console.Cli")]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, "Spectre.Console.Cli.XmlDocCommand", "Spectre.Console.Cli")]
     public static void Main(string[] args)
     {
-        var app = new CommandApp<PkCommand>();
-        app.Run(args);
-    }
+        var app = WebApplication.Create();
 
-}
+        app.MapGet("/", () => "Hello, world!");
 
-public sealed class PkCommand : Command
-{
-    public override int Execute(CommandContext context)
-    {
-        return Run();
-    }
-
-    private int Run()
-    {
-        var path = "./data/savedata.bin";
-
-        var sav = SaveUtil.GetVariantSAV(path) ?? throw new System.Exception("Save parse error");
-
-        AnsiConsole.MarkupLine(string.Empty);
-        AnsiConsole.MarkupLine($"Successfully loaded the save state at: [blue]{path}[/]");
-        AnsiConsole.MarkupLine(string.Empty);
-
-        var sf = (SAV7b)sav;
-
-        var pokedex = new List<DexItem>();
-
-        for (ushort i = 1; i < sf.MaxSpeciesID + 1; i++)
+        app.MapGet("/get-all-save-infos", () =>
         {
-            var item = DexItem.fromSaveFile7b(sf, i);
-            if (item.IsAnySeen)
+            var list = SaveInfosService.GetAllSaveInfos();
+
+            return Results.Json(list);
+        });
+
+        app.MapPost("/upload-new-save", async (HttpRequest request) =>
+        {
+            var form = await request.ReadFormAsync();
+            var file = form.Files["saveFile"];
+
+            if (file == null || file.Length == 0)
+                return Results.BadRequest("No file received");
+
+            byte[] fileBytes;
+            using (var ms = new MemoryStream())
             {
-                pokedex.Add(item);
+                await file.CopyToAsync(ms);
+                fileBytes = ms.ToArray();
             }
-        }
 
-        Console.WriteLine(JsonSerializer.Serialize(pokedex, DexItemContext.Default.ListDexItem));
+            var saveInfos = SaveInfosService.UploadNewSave(fileBytes, file.FileName);
 
-        return 0;
+            return Results.Json(saveInfos);
+        });
+
+        app.MapGet("/get-full-dex", () =>
+        {
+            var dex = DexService.GetPersistedDex();
+
+            return Results.Json(dex);
+        });
+
+        app.Run();
     }
 }
