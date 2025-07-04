@@ -6,6 +6,8 @@ public static class Program
 {
     public static void Main(string[] args)
     {
+        SaveInfosService.LoadLastSaves();
+
         var app = WebApplication.Create();
 
         app.MapGet("/", () => "Hello, world!");
@@ -45,5 +47,7 @@ public static class Program
         });
 
         app.Run();
+
+        Console.WriteLine("App is running.");
     }
 }

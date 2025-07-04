@@ -9,6 +9,7 @@ public class SaveInfosEntity
     {
         if (!File.Exists(filePath))
         {
+            Console.WriteLine("SaveInfos DB file not existing: creating.");
             string emptyJson = JsonSerializer.Serialize(new List<SaveInfosEntity>());
 
             string? directory = Path.GetDirectoryName(filePath);
@@ -24,8 +25,26 @@ public class SaveInfosEntity
         return JsonSerializer.Deserialize<List<SaveInfosEntity>>(json) ?? new List<SaveInfosEntity>();
     }
 
+    public static List<SaveInfosEntity> GetLastSaveInfosEntity()
+    {
+        var allEntities = GetAllSaveInfosEntity().OrderByDescending(entity => entity.Timestamp).ToList();
+        var saveIds = new List<uint>();
+
+        return allEntities.FindAll(entity =>
+        {
+            if (saveIds.Contains(entity.SaveId))
+            {
+                return false;
+            }
+            saveIds.Add(entity.SaveId);
+            return true;
+        });
+    }
+
     public static List<SaveInfosEntity> WriteEntity(SaveInfosEntity entity)
     {
+        Console.WriteLine("Write new save-infos entity.");
+
         var samePartialIdMaxSaves = 2;
 
         var initialList = GetAllSaveInfosEntity();

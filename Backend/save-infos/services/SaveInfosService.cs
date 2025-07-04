@@ -11,6 +11,18 @@ public class SaveInfosService
 
         return list;
     }
+    public static void LoadLastSaves()
+    {
+        Console.WriteLine("Loading last saves.");
+
+        var lastSavesInfos = SaveInfosEntity.GetLastSaveInfosEntity();
+        lastSavesInfos.ForEach(entity =>
+        {
+
+            var save = SaveUtil.GetVariantSAV(entity.Filepath)!;
+            DexService.UpdateDexWithSave(save, entity);
+        });
+    }
 
     public static SaveInfosDTO UploadNewSave(byte[] fileBytes, string formFilename)
     {
@@ -28,6 +40,8 @@ public class SaveInfosService
         var filename = $"{SaveId}_{timestamp}{save.Extension}";
         var filepath = $"{filesDirectory}/{filename}";
 
+        Console.WriteLine("Write save file to " + filepath);
+
         Directory.CreateDirectory(filesDirectory);
 
         File.WriteAllBytes(filepath, fileBytes);
@@ -43,6 +57,7 @@ public class SaveInfosService
 
         savesToRemove.ForEach(toRemove =>
         {
+            Console.WriteLine("Delete extra save file: " + toRemove.Filepath);
             File.Delete(toRemove.Filepath);
         });
 

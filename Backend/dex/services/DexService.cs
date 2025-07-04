@@ -11,8 +11,6 @@ public class DexService
 
     public static void UpdateDexWithSave(SaveFile save, SaveInfosEntity saveEntity)
     {
-        Console.WriteLine("Save ID32: " + save.ID32 + " / " + saveEntity.SaveId);
-
         var notHandled = (SaveFile save) =>
         {
             Console.WriteLine("Save version/gen not handled: " + save.Version + "/" + save.Generation);
