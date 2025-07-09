@@ -14,4 +14,8 @@
   <ItemGroup>
     <ProjectReference Include="..\external\PKHeX.Everywhere\external\PKHeX\PKHeX.Core\PKHeX.Core.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="NSwag.AspNetCore" Version="14.4.0" />
+  </ItemGroup>
 </Project>

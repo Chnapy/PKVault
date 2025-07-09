@@ -2,9 +2,9 @@ using PKHeX.Core;
 
 public class DexService
 {
-    static Dictionary<int, Dictionary<uint, DexItem>> persistedDex = new Dictionary<int, Dictionary<uint, DexItem>>();
+    static Dictionary<int, Dictionary<uint, DexItemDTO>> persistedDex = new Dictionary<int, Dictionary<uint, DexItemDTO>>();
 
-    public static Dictionary<int, Dictionary<uint, DexItem>> GetPersistedDex()
+    public static Dictionary<int, Dictionary<uint, DexItemDTO>> GetPersistedDex()
     {
         return persistedDex;
     }

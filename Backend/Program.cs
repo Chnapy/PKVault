@@ -1,4 +1,4 @@
-﻿using PKHeX.Core;
+﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Backend;
 
@@ -8,45 +8,40 @@ public static class Program
     {
         SaveInfosService.LoadLastSaves();
 
-        var app = WebApplication.Create();
-
-        app.MapGet("/", () => "Hello, world!");
-
-        app.MapGet("/get-all-save-infos", () =>
+        var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddCors(options =>
         {
-            var list = SaveInfosService.GetAllSaveInfos();
-
-            return Results.Json(list);
-        });
-
-        app.MapPost("/upload-new-save", async (HttpRequest request) =>
-        {
-            var form = await request.ReadFormAsync();
-            var file = form.Files["saveFile"];
-
-            if (file == null || file.Length == 0)
-                return Results.BadRequest("No file received");
-
-            byte[] fileBytes;
-            using (var ms = new MemoryStream())
+            options.AddDefaultPolicy(policy =>
             {
-                await file.CopyToAsync(ms);
-                fileBytes = ms.ToArray();
-            }
-
-            var saveInfos = SaveInfosService.UploadNewSave(fileBytes, file.FileName);
-
-            return Results.Json(saveInfos);
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
         });
 
-        app.MapGet("/get-full-dex", () =>
+        builder.Services.AddControllers(options =>
         {
-            var dex = DexService.GetPersistedDex();
-
-            return Results.Json(dex);
+            options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
         });
 
-        app.Run();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerDocument(document =>
+        {
+            document.PostProcess = doc =>
+            {
+                doc.Info.Title = "PKVault API";
+            };
+        });
+
+        var app = builder.Build();
+
+        app.UseCors();
+        app.UseOpenApi();
+        app.UseSwaggerUi();
+
+        app.MapControllers();
+
+        app.Run("http://0.0.0.0:5000");
 
         Console.WriteLine("App is running.");
     }

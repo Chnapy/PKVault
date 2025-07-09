@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class Dex123Service : DexGenService<SaveFile>
 {
-    protected override DexItem CreateDexItem(ushort species, SaveFile save, uint saveId)
+    protected override DexItemDTO CreateDexItem(ushort species, SaveFile save, uint saveId)
     {
 
         var allPkms = save.GetAllPKM();
@@ -10,7 +10,7 @@ public class Dex123Service : DexGenService<SaveFile>
 
         var pi = save.Personal[species];
 
-        return new DexItem
+        return new DexItemDTO
         {
             Id = $"{species}_{saveId}",
             Species = species,

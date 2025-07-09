@@ -4,12 +4,22 @@ using PKHeX.Core;
 public class SaveInfosService
 {
 
-    public static List<SaveInfosDTO> GetAllSaveInfos()
+    public static Dictionary<uint, List<SaveInfosDTO>> GetAllSaveInfos()
     {
         var dbData = SaveInfosEntity.GetAllSaveInfosEntity();
         var list = dbData.Select(SaveInfosDTO.FromEntity).ToList();
 
-        return list;
+        var record = new Dictionary<uint, List<SaveInfosDTO>>();
+        list.ForEach(saveInfos =>
+        {
+            if (!record.ContainsKey(saveInfos.Id))
+            {
+                record.Add(saveInfos.Id, new List<SaveInfosDTO>());
+            }
+            record[saveInfos.Id].Add(saveInfos);
+        });
+
+        return record;
     }
     public static void LoadLastSaves()
     {

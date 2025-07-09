@@ -1,5 +1,5 @@
 
-public class DexItem
+public class DexItemDTO
 {
     public string Id { get; set; }
     public ushort Species { get; set; }

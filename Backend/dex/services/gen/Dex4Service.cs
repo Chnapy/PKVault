@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class Dex4Service : DexGenService<SAV4>
 {
-    protected override DexItem CreateDexItem(ushort species, SAV4 save, uint saveId)
+    protected override DexItemDTO CreateDexItem(ushort species, SAV4 save, uint saveId)
     {
 
         var allPkms = save.GetAllPKM();
@@ -10,7 +10,7 @@ public class Dex4Service : DexGenService<SAV4>
 
         var pi = save.Personal[species];
 
-        return new DexItem
+        return new DexItemDTO
         {
             Id = $"{species}_{saveId}",
             Species = species,

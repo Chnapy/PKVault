@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class Dex5Service : DexGenService<SAV5>
 {
-    protected override DexItem CreateDexItem(ushort species, SAV5 save, uint saveId)
+    protected override DexItemDTO CreateDexItem(ushort species, SAV5 save, uint saveId)
     {
 
         var allPkms = save.GetAllPKM();
@@ -10,7 +10,13 @@ public class Dex5Service : DexGenService<SAV5>
 
         var pi = save.Personal[species];
 
-        return new DexItem
+        var isSeenM = save.Zukan.GetSeen(species, 0);
+        var isSeenF = save.Zukan.GetSeen(species, 1);
+        var isSeenMS = save.Zukan.GetSeen(species, 2);
+        var isSeenFS = save.Zukan.GetSeen(species, 3);
+        var isAnySeen = isSeenM || isSeenF || isSeenMS || isSeenFS;
+
+        return new DexItemDTO
         {
             Id = $"{species}_{saveId}",
             Species = species,
@@ -21,10 +27,11 @@ public class Dex5Service : DexGenService<SAV5>
             IsOnlyMale = pi.OnlyMale,
             IsOnlyFemale = pi.OnlyFemale,
             IsGenderless = pi.Genderless,
-            IsSeenM = save.Zukan.GetSeen(species, 0),
-            IsSeenF = save.Zukan.GetSeen(species, 1),
-            IsSeenMS = save.Zukan.GetSeen(species, 2),
-            IsSeenFS = save.Zukan.GetSeen(species, 3),
+            IsSeenM = isSeenM,
+            IsSeenF = isSeenF,
+            IsSeenMS = isSeenMS,
+            IsSeenFS = isSeenFS,
+            IsAnySeen = isAnySeen,
             IsCaught = save.GetCaught(species),
             IsOwned = ownedPkm != null,
             IsLangJa = species <= 493 && save.Zukan.GetLanguageFlag(species - 1, 0),
