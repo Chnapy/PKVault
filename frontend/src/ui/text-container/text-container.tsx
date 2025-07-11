@@ -10,6 +10,7 @@ export const TextContainer: React.FC<React.PropsWithChildren> = ({
         padding: "4px 8px",
         backgroundColor: theme.bg.default,
         borderRadius: 4,
+        width: "100%",
       }}
     >
       <div

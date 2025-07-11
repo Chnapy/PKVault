@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "gen:sdk": "rm -rf src/data/sdk/* && orval && prettier -w src/data/sdk/**/*.ts"
+    "gen:sdk": "rm -rf src/data/sdk* && orval && prettier -w src/data/sdk*/**/*.ts",
+    "prepare:assets": "cp -r ../external/PKHeX.Everywhere/external/PKHeX/PKHeX.Drawing.PokeSprite/Resources/img/ src/assets/pkhex/img"
   },
   "dependencies": {
     "@emotion/css": "^11.13.5",

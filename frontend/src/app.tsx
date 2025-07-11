@@ -11,7 +11,14 @@ function App() {
   >("pokedex");
 
   return (
-    <>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "stretch",
+        height: "100vh",
+      }}
+    >
       <Header>
         <HeaderItem
           selected={currentPage === "save"}
@@ -33,12 +40,18 @@ function App() {
         </HeaderItem>
       </Header>
 
-      <div>
+      <div
+        style={{
+          position: "relative",
+          overflow: "auto",
+          padding: 16,
+        }}
+      >
         {currentPage === "save" && <SavePage />}
         {currentPage === "storage" && <StoragePage />}
         {currentPage === "pokedex" && <PokedexPage />}
       </div>
-    </>
+    </div>
   );
 }
 

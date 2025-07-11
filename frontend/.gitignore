@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 *.gen.*
-src/data/sdk
+src/data/sdk*

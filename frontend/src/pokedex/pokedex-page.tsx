@@ -10,8 +10,10 @@ export const PokedexPage: React.FC = () => {
   return (
     <PokedexContext.Provider value={selectedPkm}>
       <div>
-        <div style={{ padding: 16 }}>
-          <FiltersCard />
+        <div>
+          <div style={{ paddingBottom: 8 }}>
+            <FiltersCard />
+          </div>
 
           <PokedexList setSelectedPkm={setSelectedPkm} />
         </div>
@@ -19,8 +21,9 @@ export const PokedexPage: React.FC = () => {
         <div
           style={{
             position: "fixed",
-            bottom: 8,
-            right: 8,
+            bottom: 24,
+            right: 24,
+            width: 350,
           }}
         >
           <PokedexDetails />

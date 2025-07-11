@@ -7,12 +7,14 @@ export type ButtonProps = React.PropsWithChildren<{
   className?: string;
   onClick: () => void;
   bgColor?: string;
+  selected?: boolean;
 }>;
 
 export const Button: React.FC<ButtonProps> = ({
   className,
   onClick,
   bgColor = theme.bg.dark,
+  selected,
   children,
 }) => {
   return (
@@ -20,6 +22,7 @@ export const Button: React.FC<ButtonProps> = ({
       as="button"
       className={className}
       onClick={onClick}
+      selected={selected}
       // padding="small"
       // borderRadius="small"
     >

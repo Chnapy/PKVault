@@ -1,12 +1,10 @@
 import type React from "react";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
-import { DexItem } from "../../ui/dex-item/dex-item";
-import { PokedexContext } from "../context/pokedex-context";
+import { PokedexItem } from "./pokedex-item";
 
 export const PokedexList: React.FC<{
   setSelectedPkm: (species: number) => void;
 }> = ({ setSelectedPkm }) => {
-  const selectedPkm = PokedexContext.useValue();
   const { data } = useDexGetAll();
 
   const speciesRecord = data?.data ?? {};
@@ -26,19 +24,18 @@ export const PokedexList: React.FC<{
     const caught = speciesValues.some((spec) => spec.isCaught);
     const speciesName = speciesValues[0].speciesName;
 
-    const onClick = seen
-      ? () => setSelectedPkm(selectedPkm === species ? NaN : species)
-      : undefined;
+    if ([151, 251, 306, 494, 649, 721, 809].includes(species - 1)) {
+      items.push(<hr key={species + "-hr"} style={{ width: "100%" }} />);
+    }
 
     items.push(
-      <DexItem
+      <PokedexItem
         key={species}
         species={species}
         speciesName={speciesName}
         seen={seen}
         caught={caught}
-        selected={species === selectedPkm}
-        onClick={onClick}
+        onClick={setSelectedPkm}
       />
     );
   }
@@ -47,6 +44,7 @@ export const PokedexList: React.FC<{
     <div
       style={{
         display: "flex",
+        justifyContent: "center",
         gap: 8,
         overflow: "auto",
         //   maxHeight: "100%",

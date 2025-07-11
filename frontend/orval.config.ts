@@ -1,6 +1,6 @@
 import { defineConfig, Options } from "orval";
 
-const commonConfig = {
+const backendCommonConfig = {
   output: {
     mode: "tags-split",
     target: "src/data/sdk/sdk.ts",
@@ -28,11 +28,37 @@ const commonConfig = {
   },
 } satisfies Options;
 
+const pokeapiCommonConfig = {
+  output: {
+    mode: "tags-split",
+    target: "src/data/sdk-pokeapi/sdk-pokeapi.ts",
+    schemas: "src/data/sdk-pokeapi/model",
+    httpClient: "fetch",
+    baseUrl: "https://pokeapi.co",
+    override: {
+      useTypeOverInterfaces: true,
+      //   paramsSerializerOptions: {
+      //     qs: {
+      //       arrayFormat: "repeat",
+      //     },
+      //   },
+    },
+  },
+  input: {
+    target:
+      "https://raw.githubusercontent.com/PokeAPI/pokeapi/refs/heads/master/openapi.yml",
+
+    parserOptions: {
+      validate: false,
+    },
+  },
+} satisfies Options;
+
 export default defineConfig({
-  "react-query": {
-    ...commonConfig,
+  backend: {
+    ...backendCommonConfig,
     output: {
-      ...commonConfig.output,
+      ...backendCommonConfig.output,
       client: "react-query",
       fileExtension: ".gen.ts",
     },
@@ -40,12 +66,23 @@ export default defineConfig({
       afterAllFilesWrite: "prettier -w",
     },
   },
-  zod: {
-    ...commonConfig,
+  // "backend-zod": {
+  //   ...commonConfig,
+  //   output: {
+  //     ...commonConfig.output,
+  //     client: "zod",
+  //     fileExtension: ".zod.gen.ts",
+  //   },
+  //   hooks: {
+  //     afterAllFilesWrite: "prettier -w",
+  //   },
+  // },
+  pokeapi: {
+    ...pokeapiCommonConfig,
     output: {
-      ...commonConfig.output,
-      client: "zod",
-      fileExtension: ".zod.gen.ts",
+      ...pokeapiCommonConfig.output,
+      client: "react-query",
+      fileExtension: ".gen.ts",
     },
     hooks: {
       afterAllFilesWrite: "prettier -w",

@@ -12,31 +12,26 @@ import { TitleContainer } from "../title-container/title-container";
 export type DetailsCardProps = {
   species: number;
   speciesName: string;
+  speciesNameTranslated?: string;
+  description?: string;
   caught: boolean;
-  fromGames: React.ReactNode;
+  fromSaves: React.ReactNode;
   compatibleGames: React.ReactNode;
 };
 
 export const DetailsCard: React.FC<DetailsCardProps> = ({
   species,
   speciesName,
+  speciesNameTranslated,
+  description,
   caught,
-  fromGames,
+  fromSaves,
   compatibleGames,
 }) => {
   return (
-    <Container padding="big" borderRadius="big">
+    <Container padding="big" borderRadius="big" style={{ display: "block" }}>
       <div style={{ marginBottom: 2, display: "flex", gap: 4 }}>
-        {/* <Button bgColor={theme.game.blue} onClick={console.log}>
-          Blue
-        </Button>
-        <Button bgColor={theme.game.crystal} onClick={console.log}>
-          Crystal
-        </Button>
-        <Button bgColor={theme.game.saphir} onClick={console.log}>
-          Saphir
-        </Button> */}
-        {fromGames}
+        {fromSaves}
       </div>
 
       <div
@@ -60,7 +55,7 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
           >
             <img
               src={getSpeciesImg(species, speciesName)}
-              alt={speciesName}
+              alt={speciesNameTranslated ?? speciesName}
               style={{
                 width: 96,
                 display: "block",
@@ -82,22 +77,22 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
                 }}
               />
             )}
-            N°{getSpeciesNO(species)} - {speciesName}
+            N°{getSpeciesNO(species)} - {speciesNameTranslated}
           </TextContainer>
         </div>
 
-        <div style={{ marginTop: 4, marginBottom: 4 }}>
-          <TextContainer>
-            Description
-            <br />
-            foobar
-          </TextContainer>
-        </div>
+        {description && (
+          <div style={{ display: "flex", marginTop: 4 }}>
+            <TextContainer>{description}</TextContainer>
+          </div>
+        )}
 
-        <TitleContainer title="Owned in games">
-          <img src={pkm73Img} alt="From Blue" style={{ width: 32 }} />
-          <img src={pkm73sImg} alt="From Crystal" style={{ width: 32 }} />
-        </TitleContainer>
+        <div style={{ marginTop: 4 }}>
+          <TitleContainer title="Owned in games">
+            <img src={pkm73Img} alt="From Blue" style={{ width: 32 }} />
+            <img src={pkm73sImg} alt="From Crystal" style={{ width: 32 }} />
+          </TitleContainer>
+        </div>
       </div>
       <div
         style={{

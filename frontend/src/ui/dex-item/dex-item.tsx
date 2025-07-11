@@ -1,5 +1,5 @@
 import { css } from "@emotion/css";
-import type React from "react";
+import React from "react";
 import pkballImg from "../../assets/pkhex/img/ball/_ball4.png";
 import { Container } from "../container/container";
 import { theme } from "../theme";
@@ -27,63 +27,58 @@ export type DexItemProps = {
   onClick?: () => void;
 };
 
-export const DexItem: React.FC<DexItemProps> = ({
-  species,
-  speciesName,
-  seen,
-  caught,
-  selected,
-  onClick,
-}) => {
-  return (
-    <Container
-      as={onClick ? "button" : undefined}
-      // borderRadius="small"
-      onClick={onClick}
-      selected={selected}
-      noDropshadow={!onClick}
-    >
-      <div className={styles.content}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: 2,
-          }}
-        >
-          <span>{getSpeciesNO(species)}</span>
+export const DexItem: React.FC<DexItemProps> = React.memo(
+  ({ species, speciesName, seen, caught, selected, onClick }) => {
+    return (
+      <Container
+        as={onClick ? "button" : undefined}
+        // borderRadius="small"
+        onClick={onClick}
+        selected={selected}
+        noDropshadow={!onClick}
+      >
+        <div className={styles.content}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: 2,
+            }}
+          >
+            <span>{getSpeciesNO(species)}</span>
 
-          {caught && (
+            {caught && (
+              <img
+                src={pkballImg}
+                loading="lazy"
+                style={{
+                  height: 12,
+                }}
+              />
+            )}
+          </div>
+
+          <div
+            style={{
+              background: theme.bg.default,
+              borderRadius: 2,
+            }}
+          >
             <img
-              src={pkballImg}
+              src={getSpeciesImg(species, speciesName)}
+              alt={speciesName}
               loading="lazy"
               style={{
-                height: 12,
+                width: 96,
+                height: 96,
+                filter: seen ? undefined : "brightness(0) opacity(0.5)",
+                display: "block",
               }}
             />
-          )}
+          </div>
         </div>
-
-        <div
-          style={{
-            background: theme.bg.default,
-            borderRadius: 2,
-          }}
-        >
-          <img
-            src={getSpeciesImg(species, speciesName)}
-            alt={speciesName}
-            loading="lazy"
-            style={{
-              width: 96,
-              height: 96,
-              filter: seen ? undefined : "brightness(0) opacity(0.5)",
-              display: "block",
-            }}
-          />
-        </div>
-      </div>
-    </Container>
-  );
-};
+      </Container>
+    );
+  }
+);
