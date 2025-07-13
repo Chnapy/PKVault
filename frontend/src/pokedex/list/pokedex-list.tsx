@@ -9,16 +9,19 @@ import { Route } from "../../routes/pokedex";
 import { arrayToRecord } from "../../util/array-to-record";
 import { PokedexItem } from "./pokedex-item";
 
-const useStaticPkmSpeciesRecord = prepareStaticData(async () => {
-  const allPkms = await getOrFetchPokemonSpeciesDataAll(db);
+const useStaticPkmSpeciesRecord = prepareStaticData(
+  "pokedex-list-pkm-species",
+  async () => {
+    const allPkms = await getOrFetchPokemonSpeciesDataAll(db);
 
-  return arrayToRecord(
-    allPkms.map((data) => pick(data, ["id", "names", "generation"])),
-    "id"
-  );
-});
+    return arrayToRecord(
+      allPkms.map((data) => pick(data, ["id", "names", "generation"])),
+      "id"
+    );
+  }
+);
 
-const useStaticPkmRecord = prepareStaticData(async () => {
+const useStaticPkmRecord = prepareStaticData("pokedex-list-pkm", async () => {
   const allData = await getOrFetchPokemonDataAll(db);
 
   return arrayToRecord(

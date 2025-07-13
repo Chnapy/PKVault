@@ -21,7 +21,7 @@ export type DetailsCardProps = {
   compatibleGames: React.ReactNode;
 };
 
-const useStaticPkmRecord = prepareStaticData(async () => {
+const useStaticPkmRecord = prepareStaticData("details-card-pkm", async () => {
   const allData = await getOrFetchPokemonDataAll(db);
 
   return arrayToRecord(
@@ -30,7 +30,7 @@ const useStaticPkmRecord = prepareStaticData(async () => {
   );
 });
 
-const useStaticPkball = prepareStaticData(async () => {
+const useStaticPkball = prepareStaticData("pkball", async () => {
   return await getOrFetchItemDataItem(db, 4);
 });
 

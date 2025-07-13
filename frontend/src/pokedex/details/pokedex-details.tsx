@@ -11,16 +11,19 @@ import { arrayToRecord } from "../../util/array-to-record";
 import { GameButton } from "./game-button";
 import { getGameInfos } from "./util/get-game-infos";
 
-const useStaticPkmSpeciesRecord = prepareStaticData(async () => {
-  const allSpecies = await getOrFetchPokemonSpeciesDataAll(db);
+const useStaticPkmSpeciesRecord = prepareStaticData(
+  "pokedex-details-pkm-species",
+  async () => {
+    const allSpecies = await getOrFetchPokemonSpeciesDataAll(db);
 
-  return arrayToRecord(
-    allSpecies.map((data) =>
-      pick(data, ["id", "names", "flavor_text_entries"])
-    ),
-    "id"
-  );
-});
+    return arrayToRecord(
+      allSpecies.map((data) =>
+        pick(data, ["id", "names", "flavor_text_entries"])
+      ),
+      "id"
+    );
+  }
+);
 
 export const PokedexDetails: React.FC = () => {
   console.time("pokedex-details");

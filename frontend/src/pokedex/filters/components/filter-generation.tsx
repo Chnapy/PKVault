@@ -6,11 +6,16 @@ import { Route } from "../../../routes/pokedex";
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
 import { pick } from "../../../util/pick";
 
-const useStaticGenerations = prepareStaticData(async () => {
-  const allData = await getOrFetchGenerationDataAll(db);
+const useStaticGenerations = prepareStaticData(
+  "filter-generation",
+  async () => {
+    const allData = await getOrFetchGenerationDataAll(db);
 
-  return allData.map((generation) => pick(generation, ["id", "name", "names"]));
-});
+    return allData.map((generation) =>
+      pick(generation, ["id", "name", "names"])
+    );
+  }
+);
 
 export const FilterGeneration: React.FC = () => {
   const navigate = Route.useNavigate();

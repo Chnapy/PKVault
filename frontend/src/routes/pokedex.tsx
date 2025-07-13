@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import React from "react";
-import { FiltersCard } from "../components/filters/filters-card";
+import { FiltersCard } from "../pokedex/filters/filters-card";
 import { PokedexDetails } from "../pokedex/details/pokedex-details";
 import { FilterContext } from "../pokedex/filters/filter-context";
 import { PokedexList } from "../pokedex/list/pokedex-list";
@@ -12,7 +12,13 @@ export const PokedexPage: React.FC = () => {
     <FilterContext.Provider>
       <div>
         <div>
-          <div style={{ paddingBottom: 8 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              paddingBottom: 8,
+            }}
+          >
             <FiltersCard />
           </div>
 

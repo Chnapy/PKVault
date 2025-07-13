@@ -1,18 +1,17 @@
-/* eslint-disable react-refresh/only-export-components */
 import React from "react";
 import { StaticDataLoading } from "./static-data-loading";
 
-const staticDataFns: (() => Promise<unknown>)[] = [];
+const staticDataFns: Record<string, () => Promise<unknown>> = {};
 
-const staticDataContext = React.createContext<unknown[]>([]);
+const staticDataContext = React.createContext<Record<string, unknown>>({});
 
 export const StaticDataProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const loadingRef = React.useRef(false);
-  const [staticDataResults, setStaticDataResults] = React.useState<unknown[]>(
-    []
-  );
+  const [staticDataResults, setStaticDataResults] = React.useState<
+    Record<string, unknown>
+  >({});
 
   React.useEffect(() => {
     if (loadingRef.current) {
@@ -22,15 +21,16 @@ export const StaticDataProvider: React.FC<React.PropsWithChildren> = ({
     const asyncFn = async () => {
       loadingRef.current = true;
 
-      console.log(
-        "Loading static data: " + staticDataFns.length + " fns to load"
-      );
+      const keys = Object.keys(staticDataFns);
 
-      const dataResults: unknown[] = [];
-      for (let i = 0; i < staticDataFns.length; i++) {
+      console.log("Loading static data: " + keys.length + " fns to load");
+
+      const dataResults: Record<string, unknown> = {};
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
         console.time("Fn " + i);
-        dataResults.push(await staticDataFns[i]());
-        setStaticDataResults([...dataResults]);
+        dataResults[key] = await staticDataFns[key]();
+        setStaticDataResults({ ...dataResults });
         console.timeEnd("Fn " + i);
       }
       // setStaticDataResults(dataResults);
@@ -40,20 +40,17 @@ export const StaticDataProvider: React.FC<React.PropsWithChildren> = ({
       console.log("Loading finished");
     };
 
-    if (staticDataResults.length === 0 && staticDataFns.length > 0) {
+    if (Object.keys(staticDataResults).length === 0) {
       asyncFn();
     }
   }, [staticDataResults]);
 
-  if (
-    staticDataFns.length > 0 &&
-    staticDataResults.length < staticDataFns.length
-  ) {
+  const fnKeys = Object.keys(staticDataFns);
+  const resultKeys = Object.keys(staticDataResults);
+
+  if (fnKeys.length === 0 || resultKeys.length < fnKeys.length) {
     return (
-      <StaticDataLoading
-        step={staticDataResults.length}
-        maxStep={staticDataFns.length}
-      />
+      <StaticDataLoading step={resultKeys.length} maxStep={fnKeys.length} />
     );
   }
 
@@ -64,9 +61,27 @@ export const StaticDataProvider: React.FC<React.PropsWithChildren> = ({
   );
 };
 
-export const prepareStaticData = function <D>(fn: () => Promise<D>): () => D {
-  const dataIndex = staticDataFns.length;
-  staticDataFns.push(fn);
+// eslint-disable-next-line react-refresh/only-export-components
+export const prepareStaticData = function <D>(
+  key: string,
+  fn: () => Promise<D>
+): () => D {
+  staticDataFns[key] = fn;
 
-  return () => React.useContext(staticDataContext)[dataIndex] as D;
+  return () => {
+    const allDatas = React.useContext(staticDataContext);
+    const value = allDatas[key] as D;
+
+    if (!value) {
+      console.log(
+        staticDataFns.length,
+        allDatas.length,
+        staticDataFns,
+        allDatas
+      );
+      throw new Error("Static data not available, key=" + key);
+    }
+
+    return value;
+  };
 };
