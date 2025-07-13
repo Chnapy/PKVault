@@ -1,4 +1,4 @@
-import "./style/global-style";
+import "./ui/global-style.ts";
 
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";

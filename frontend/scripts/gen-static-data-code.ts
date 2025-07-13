@@ -11,7 +11,7 @@ const rootDataDir = path.join(rootDir, "pokeapi/data");
 
 const schemaDir = path.join(rootDataDir, "schema/v2");
 const dataDir = path.join(rootDataDir, "api/v2");
-const modulesDir = path.join("src/pokeapi/modules/v2");
+const modulesDir = path.join("src/data/static-data/pokeapi");
 
 type ProcessItem = {
   type: "list" | "item" | "item-child" | "config" | "unknown";

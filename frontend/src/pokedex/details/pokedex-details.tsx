@@ -1,11 +1,13 @@
+import { pick } from "@tanstack/react-router";
 import React from "react";
+import { db } from "../../data/db/db";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
 import { useSaveInfosGetAll } from "../../data/sdk/save-infos/save-infos.gen";
-import { arrayToRecord, db, pick } from "../../db/db";
-import { getOrFetchPokemonSpeciesDataAll } from "../../pokeapi/modules/v2/pokemon-species";
-import { prepareStaticData } from "../../pokeapi/pokeapi-data";
+import { getOrFetchPokemonSpeciesDataAll } from "../../data/static-data/pokeapi/pokemon-species";
+import { prepareStaticData } from "../../data/static-data/prepare-static-data";
 import { Route } from "../../routes/pokedex";
 import { DetailsCard } from "../../ui/details-card/details-card";
+import { arrayToRecord } from "../../util/array-to-record";
 import { GameButton } from "./game-button";
 import { getGameInfos } from "./util/get-game-infos";
 

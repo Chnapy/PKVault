@@ -1,8 +1,10 @@
+import { pick } from "@tanstack/react-router";
 import type React from "react";
-import { arrayToRecord, db, pick } from "../../db/db";
-import { getOrFetchItemDataItem } from "../../pokeapi/modules/v2/item";
-import { getOrFetchPokemonDataAll } from "../../pokeapi/modules/v2/pokemon";
-import { prepareStaticData } from "../../pokeapi/pokeapi-data";
+import { db } from "../../data/db/db";
+import { getOrFetchItemDataItem } from "../../data/static-data/pokeapi/item";
+import { getOrFetchPokemonDataAll } from "../../data/static-data/pokeapi/pokemon";
+import { prepareStaticData } from "../../data/static-data/prepare-static-data";
+import { arrayToRecord } from "../../util/array-to-record";
 import { Container } from "../container/container";
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
 import { TextContainer } from "../text-container/text-container";

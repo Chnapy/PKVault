@@ -1,10 +1,12 @@
+import { pick } from "@tanstack/react-router";
 import React from "react";
+import { db } from "../../data/db/db";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
-import { arrayToRecord, db, pick } from "../../db/db";
-import { getOrFetchPokemonDataAll } from "../../pokeapi/modules/v2/pokemon";
-import { getOrFetchPokemonSpeciesDataAll } from "../../pokeapi/modules/v2/pokemon-species";
-import { prepareStaticData } from "../../pokeapi/pokeapi-data";
+import { getOrFetchPokemonDataAll } from "../../data/static-data/pokeapi/pokemon";
+import { getOrFetchPokemonSpeciesDataAll } from "../../data/static-data/pokeapi/pokemon-species";
+import { prepareStaticData } from "../../data/static-data/prepare-static-data";
 import { Route } from "../../routes/pokedex";
+import { arrayToRecord } from "../../util/array-to-record";
 import { PokedexItem } from "./pokedex-item";
 
 const getStaticPokemonSpeciesData = prepareStaticData(async () => {
@@ -51,7 +53,20 @@ export const PokedexList: React.FC = () => {
   const speciesList = new Array(lastKey).fill(0).map((_, i) => i + 1);
 
   const items: React.ReactNode[] = speciesList.map((species) => {
-    const speciesValues = Object.values(speciesRecord[species + ""] ?? {});
+    const speciesValues = Object.values(
+      speciesRecord[species + ""] ?? {}
+    ).filter((value) => {
+      if (!filters.fromGames?.length) {
+        return true;
+      }
+
+      return filters.fromGames.includes(value.saveId);
+    });
+
+    if (speciesValues.length === 0) {
+      return null;
+    }
+
     // console.log(species, speciesRecord);
     const seen = speciesValues.some((spec) => spec.isAnySeen);
     const caught = speciesValues.some((spec) => spec.isCaught);
@@ -117,6 +132,7 @@ export const PokedexList: React.FC = () => {
     return (
       <React.Fragment key={species}>
         {divider}
+
         <PokedexItem
           species={species}
           speciesName={speciesName}

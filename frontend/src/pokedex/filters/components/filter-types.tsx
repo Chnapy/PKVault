@@ -1,7 +1,8 @@
+import { pick } from "@tanstack/react-router";
 import React from "react";
-import { db, pick } from "../../../db/db";
-import { getOrFetchTypeDataAll } from "../../../pokeapi/modules/v2/type";
-import { prepareStaticData } from "../../../pokeapi/pokeapi-data";
+import { db } from "../../../data/db/db";
+import { getOrFetchTypeDataAll } from "../../../data/static-data/pokeapi/type";
+import { prepareStaticData } from "../../../data/static-data/prepare-static-data";
 import { Route } from "../../../routes/pokedex";
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
 

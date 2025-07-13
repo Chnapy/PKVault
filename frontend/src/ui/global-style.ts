@@ -1,5 +1,5 @@
 import { injectGlobal } from "@emotion/css";
-import { theme } from "../ui/theme";
+import { theme } from "./theme";
 
 import "normalize.css";
 

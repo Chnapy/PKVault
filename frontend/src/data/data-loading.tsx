@@ -2,7 +2,7 @@ import React from "react";
 import {
   initializePokeapiData,
   isPokeapiDataLoaded,
-} from "../pokeapi/pokeapi-data";
+} from "./static-data/prepare-static-data";
 
 export const DataLoading: React.FC<React.PropsWithChildren> = ({
   children,

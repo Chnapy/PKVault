@@ -1,17 +1,5 @@
-import { createDB, db } from "../db/db";
-import { loadPokemonData } from "./modules/v2/pokemon";
-import { loadPokemonSpeciesData } from "./modules/v2/pokemon-species";
-
 const staticDataFns: (() => Promise<unknown>)[] = [];
-const staticDataResults: unknown[] =
-  import.meta.hot?.data?.staticDataResults ?? [];
-
-// HMR: sauvegarde la data avant le remplacement du module
-// if (import.meta.hot) {
-//   import.meta.hot.dispose((data) => {
-//     data.staticDataResults = staticDataResults;
-//   });
-// }
+const staticDataResults: unknown[] = [];
 
 export const prepareStaticData = <D>(fn: () => Promise<D>): (() => D) => {
   const dataIndex = staticDataFns.length;
@@ -34,12 +22,7 @@ export const initializePokeapiData = async (): Promise<boolean> => {
 
   console.log("Start loading data...");
 
-  // await loadPokemonSpeciesData(db);
-  // await loadPokemonData(db);
-  // await loadTypeData(db);
-  // await loadItemData(db);
-
-  const cachedDb = createDB({}); // temp DB with cache
+  // const cachedDb = createDB({}); // temp DB with cache
 
   console.log("Loading static data: " + staticDataFns.length + " fns to load");
   console.log("Initial data length:", staticDataResults.length);
@@ -52,7 +35,7 @@ export const initializePokeapiData = async (): Promise<boolean> => {
 
   console.log("Loading finished");
 
-  cachedDb.close();
+  // cachedDb.close();
 
   isLoading = false;
 

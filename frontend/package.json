@@ -11,7 +11,7 @@
     "c:lint": "eslint .",
     "gen:sdk": "rm -rf src/data/sdk* && NODE_TLS_REJECT_UNAUTHORIZED=0 orval && prettier -w src/data/sdk*/**/*.ts",
     "prepare:assets": "cp -r ../external/PKHeX.Everywhere/external/PKHeX/PKHeX.Drawing.PokeSprite/Resources/img/ src/assets/pkhex/img",
-    "gen:pokeapi": "node --experimental-strip-types src/pokeapi/gen-script.ts"
+    "gen:static": "node --experimental-strip-types scripts/gen-static-data-code.ts"
   },
   "dependencies": {
     "@emotion/css": "^11.13.5",

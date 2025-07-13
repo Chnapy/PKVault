@@ -1,3 +1,6 @@
 [submodule "external/PKHeX.Everywhere"]
 	path = external/PKHeX.Everywhere
 	url = https://github.com/arleypadua/PKHeX.Everywhere.git
+[submodule "frontend/public/pokeapi"]
+	path = frontend/public/pokeapi
+	url = https://github.com/PokeAPI/api-data.git
