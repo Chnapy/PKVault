@@ -4,7 +4,7 @@ import React from "react";
 import { db } from "../../data/db/db";
 import { getOrFetchItemDataItem } from "../../data/static-data/pokeapi/item";
 import { getOrFetchPokemonDataAll } from "../../data/static-data/pokeapi/pokemon";
-import { prepareStaticData } from "../../data/static-data/prepare-static-data";
+import { prepareStaticData } from "../../data/static-data/static-data";
 import { arrayToRecord } from "../../util/array-to-record";
 import { Container } from "../container/container";
 import { theme } from "../theme";
@@ -22,7 +22,7 @@ const styles = {
   }),
 };
 
-const getStaticData = prepareStaticData(async () => {
+const useStaticPkmRecord = prepareStaticData(async () => {
   const allData = await getOrFetchPokemonDataAll(db);
 
   return arrayToRecord(
@@ -31,7 +31,7 @@ const getStaticData = prepareStaticData(async () => {
   );
 });
 
-const getStaticPokeballData = prepareStaticData(async () => {
+const useStaticPkball = prepareStaticData(async () => {
   return await getOrFetchItemDataItem(db, 4);
 });
 
@@ -46,9 +46,9 @@ export type DexItemProps = {
 
 export const DexItem: React.FC<DexItemProps> = React.memo(
   ({ species, speciesName, seen, caught, selected, onClick }) => {
-    const staticData = getStaticData()[species];
+    const staticData = useStaticPkmRecord()[species];
 
-    const pokeballSprite = getStaticPokeballData()!.sprites.default;
+    const pokeballSprite = useStaticPkball()!.sprites.default;
 
     return (
       <Container

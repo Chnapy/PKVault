@@ -43,6 +43,7 @@ const searchSchema = z.object({
       seen: z.boolean().optional(),
       caught: z.boolean().optional(),
       fromGames: z.array(z.number()).optional(), // saveIDs
+      generations: z.array(z.string()).optional(), // generation.name
     })
     .default({}),
   // sort: z.enum(['newest', 'oldest', 'price']).default('newest'),

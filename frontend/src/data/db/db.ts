@@ -1,4 +1,8 @@
 import Dexie, { type DexieOptions, type EntityTable } from "dexie";
+import {
+  type GenerationDb,
+  generationStore,
+} from "../static-data/pokeapi/generation";
 import { type ItemDb, itemStore } from "../static-data/pokeapi/item";
 import { type PokemonDb, pokemonStore } from "../static-data/pokeapi/pokemon";
 import {
@@ -13,9 +17,9 @@ export const createDB = (options: DexieOptions) => {
   } & PokemonSpeciesDb &
     PokemonDb &
     TypeDb &
-    ItemDb;
+    ItemDb &
+    GenerationDb;
 
-  // Schema declaration:
   db.version(1).stores({
     _table_full: "++tableName",
 
@@ -23,6 +27,7 @@ export const createDB = (options: DexieOptions) => {
     ...pokemonStore,
     ...typeStore,
     ...itemStore,
+    ...generationStore,
   });
 
   return db;

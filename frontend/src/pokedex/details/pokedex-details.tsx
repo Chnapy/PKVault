@@ -4,14 +4,14 @@ import { db } from "../../data/db/db";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
 import { useSaveInfosGetAll } from "../../data/sdk/save-infos/save-infos.gen";
 import { getOrFetchPokemonSpeciesDataAll } from "../../data/static-data/pokeapi/pokemon-species";
-import { prepareStaticData } from "../../data/static-data/prepare-static-data";
+import { prepareStaticData } from "../../data/static-data/static-data";
 import { Route } from "../../routes/pokedex";
 import { DetailsCard } from "../../ui/details-card/details-card";
 import { arrayToRecord } from "../../util/array-to-record";
 import { GameButton } from "./game-button";
 import { getGameInfos } from "./util/get-game-infos";
 
-const getStaticData = prepareStaticData(async () => {
+const useStaticPkmSpeciesRecord = prepareStaticData(async () => {
   const allSpecies = await getOrFetchPokemonSpeciesDataAll(db);
 
   return arrayToRecord(
@@ -27,10 +27,11 @@ export const PokedexDetails: React.FC = () => {
   const selectedSpecies = Route.useSearch({
     select: (search) => search.selected,
   });
+  const pkmSpeciesRecord = useStaticPkmSpeciesRecord();
   const dexGetAllQuery = useDexGetAll();
   const saveInfosGetAllQuery = useSaveInfosGetAll();
   const pokemonSpeciesInfos = selectedSpecies
-    ? getStaticData()[selectedSpecies]
+    ? pkmSpeciesRecord[selectedSpecies]
     : undefined;
 
   const [selectedSaveIndex, setSelectedSaveIndex] = React.useState(0);

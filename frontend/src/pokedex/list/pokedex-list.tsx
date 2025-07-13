@@ -4,21 +4,21 @@ import { db } from "../../data/db/db";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
 import { getOrFetchPokemonDataAll } from "../../data/static-data/pokeapi/pokemon";
 import { getOrFetchPokemonSpeciesDataAll } from "../../data/static-data/pokeapi/pokemon-species";
-import { prepareStaticData } from "../../data/static-data/prepare-static-data";
+import { prepareStaticData } from "../../data/static-data/static-data";
 import { Route } from "../../routes/pokedex";
 import { arrayToRecord } from "../../util/array-to-record";
 import { PokedexItem } from "./pokedex-item";
 
-const getStaticPokemonSpeciesData = prepareStaticData(async () => {
+const useStaticPkmSpeciesRecord = prepareStaticData(async () => {
   const allPkms = await getOrFetchPokemonSpeciesDataAll(db);
 
   return arrayToRecord(
-    allPkms.map((data) => pick(data, ["id", "names"])),
+    allPkms.map((data) => pick(data, ["id", "names", "generation"])),
     "id"
   );
 });
 
-const getStaticPokemonData = prepareStaticData(async () => {
+const useStaticPkmRecord = prepareStaticData(async () => {
   const allData = await getOrFetchPokemonDataAll(db);
 
   return arrayToRecord(
@@ -33,8 +33,8 @@ export const PokedexList: React.FC = () => {
 
   const { data } = useDexGetAll();
 
-  const speciesNames = getStaticPokemonSpeciesData();
-  const speciesTypes = getStaticPokemonData();
+  const pkmSpeciesInfosRecord = useStaticPkmSpeciesRecord();
+  const pkmInfosRecord = useStaticPkmRecord();
 
   if (!data) {
     return null;
@@ -53,6 +53,9 @@ export const PokedexList: React.FC = () => {
   const speciesList = new Array(lastKey).fill(0).map((_, i) => i + 1);
 
   const items: React.ReactNode[] = speciesList.map((species) => {
+    const pkmSpeciesInfos = pkmSpeciesInfosRecord[species];
+    const pkmInfos = pkmInfosRecord[species];
+
     const speciesValues = Object.values(
       speciesRecord[species + ""] ?? {}
     ).filter((value) => {
@@ -80,7 +83,7 @@ export const PokedexList: React.FC = () => {
 
     const isFiltered = (): boolean => {
       if (filters.speciesName) {
-        const name = speciesNames[species].names.find(
+        const name = pkmSpeciesInfos.names.find(
           (n) => n.language.name === "fr"
         )!.name;
 
@@ -90,7 +93,7 @@ export const PokedexList: React.FC = () => {
       }
 
       if (filters.types?.length) {
-        const pkmTypes = speciesTypes[species];
+        const pkmTypes = pkmInfos;
         if (
           filters.types.some((type) =>
             pkmTypes.types.every((t) => t.type.name !== type)
@@ -116,6 +119,16 @@ export const PokedexList: React.FC = () => {
         if (
           speciesValues.every(
             (spec) => !filters.fromGames!.includes(spec.saveId)
+          )
+        ) {
+          return true;
+        }
+      }
+
+      if (filters.generations?.length) {
+        if (
+          filters.generations.every(
+            (generation) => generation !== pkmSpeciesInfos.generation.name
           )
         ) {
           return true;

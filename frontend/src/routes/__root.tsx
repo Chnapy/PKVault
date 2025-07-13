@@ -18,13 +18,31 @@ const Root: React.FC = () => {
       }}
     >
       <Header>
-        <HeaderItem selected={!!matchRoute({ to: "/saves" })} to={"/saves"}>
+        <HeaderItem
+          selected={Boolean(
+            matchRoute({ to: "/saves" }) ||
+              matchRoute({ to: "/saves", pending: true })
+          )}
+          to={"/saves"}
+        >
           Saves
         </HeaderItem>
-        <HeaderItem selected={!!matchRoute({ to: "/storage" })} to={"/storage"}>
+        <HeaderItem
+          selected={Boolean(
+            matchRoute({ to: "/storage" }) ||
+              matchRoute({ to: "/storage", pending: true })
+          )}
+          to={"/storage"}
+        >
           Storage
         </HeaderItem>
-        <HeaderItem selected={!!matchRoute({ to: "/pokedex" })} to={"/pokedex"}>
+        <HeaderItem
+          selected={Boolean(
+            matchRoute({ to: "/pokedex" }) ||
+              matchRoute({ to: "/pokedex", pending: true })
+          )}
+          to={"/pokedex"}
+        >
           Pokedex
         </HeaderItem>
       </Header>

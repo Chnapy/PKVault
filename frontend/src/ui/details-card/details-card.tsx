@@ -3,7 +3,7 @@ import type React from "react";
 import { db } from "../../data/db/db";
 import { getOrFetchItemDataItem } from "../../data/static-data/pokeapi/item";
 import { getOrFetchPokemonDataAll } from "../../data/static-data/pokeapi/pokemon";
-import { prepareStaticData } from "../../data/static-data/prepare-static-data";
+import { prepareStaticData } from "../../data/static-data/static-data";
 import { arrayToRecord } from "../../util/array-to-record";
 import { Container } from "../container/container";
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
@@ -21,7 +21,7 @@ export type DetailsCardProps = {
   compatibleGames: React.ReactNode;
 };
 
-const getStaticPokemonData = prepareStaticData(async () => {
+const useStaticPkmRecord = prepareStaticData(async () => {
   const allData = await getOrFetchPokemonDataAll(db);
 
   return arrayToRecord(
@@ -30,7 +30,7 @@ const getStaticPokemonData = prepareStaticData(async () => {
   );
 });
 
-const getStaticPokeballData = prepareStaticData(async () => {
+const useStaticPkball = prepareStaticData(async () => {
   return await getOrFetchItemDataItem(db, 4);
 });
 
@@ -43,9 +43,9 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
   fromSaves,
   compatibleGames,
 }) => {
-  const pokemonDataItem = getStaticPokemonData()[species];
+  const pokemonDataItem = useStaticPkmRecord()[species];
 
-  const pokeballSprite = getStaticPokeballData()!.sprites.default;
+  const pokeballSprite = useStaticPkball()!.sprites.default;
   const defaultSprite = pokemonDataItem.sprites.front_default;
   const shinySprite = pokemonDataItem.sprites.front_shiny;
 

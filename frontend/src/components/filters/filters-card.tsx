@@ -2,6 +2,7 @@ import { css } from "@emotion/css";
 import type React from "react";
 import { FilterCaught } from "../../pokedex/filters/components/filter-caught";
 import { FilterFromGames } from "../../pokedex/filters/components/filter-from-games";
+import { FilterGeneration } from "../../pokedex/filters/components/filter-generation";
 import { FilterSeen } from "../../pokedex/filters/components/filter-seen";
 import { FilterSpecies } from "../../pokedex/filters/components/filter-species";
 import { FilterTypes } from "../../pokedex/filters/components/filter-types";
@@ -28,6 +29,8 @@ export const FiltersCard: React.FC = () => {
       <FilterCaught />
 
       <FilterFromGames />
+
+      <FilterGeneration />
     </Container>
   );
 };
