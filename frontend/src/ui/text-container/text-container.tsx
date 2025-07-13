@@ -7,10 +7,11 @@ export const TextContainer: React.FC<React.PropsWithChildren> = ({
   return (
     <div
       style={{
-        padding: "4px 8px",
+        padding: "3px 8px",
         backgroundColor: theme.bg.default,
         borderRadius: 4,
-        width: "100%",
+        flexGrow: 1,
+        // width: "100%",
       }}
     >
       <div
@@ -21,6 +22,7 @@ export const TextContainer: React.FC<React.PropsWithChildren> = ({
           backgroundSize: "8px 19px",
           lineHeight: "19px",
           minHeight: "100%",
+          position: "relative",
         }}
       >
         <div

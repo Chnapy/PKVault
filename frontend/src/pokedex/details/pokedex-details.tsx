@@ -1,28 +1,44 @@
 import React from "react";
-import { useApiV2PokemonSpeciesRetrieve } from "../../data/sdk-pokeapi/pokemon/pokemon.gen";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
 import { useSaveInfosGetAll } from "../../data/sdk/save-infos/save-infos.gen";
+import { arrayToRecord, db, pick } from "../../db/db";
+import { getOrFetchPokemonSpeciesDataAll } from "../../pokeapi/modules/v2/pokemon-species";
+import { prepareStaticData } from "../../pokeapi/pokeapi-data";
+import { Route } from "../../routes/pokedex";
 import { DetailsCard } from "../../ui/details-card/details-card";
-import { PokedexContext } from "../context/pokedex-context";
 import { GameButton } from "./game-button";
 import { getGameInfos } from "./util/get-game-infos";
 
+const getStaticData = prepareStaticData(async () => {
+  const allSpecies = await getOrFetchPokemonSpeciesDataAll(db);
+
+  return arrayToRecord(
+    allSpecies.map((data) =>
+      pick(data, ["id", "names", "flavor_text_entries"])
+    ),
+    "id"
+  );
+});
+
 export const PokedexDetails: React.FC = () => {
-  const species = PokedexContext.useValue();
+  console.time("pokedex-details");
+  const selectedSpecies = Route.useSearch({
+    select: (search) => search.selected,
+  });
   const dexGetAllQuery = useDexGetAll();
   const saveInfosGetAllQuery = useSaveInfosGetAll();
-  const pokemonQuery = useApiV2PokemonSpeciesRetrieve(species + "", {
-    query: {
-      enabled: !Number.isNaN(species),
-    },
-  });
+  const pokemonSpeciesInfos = selectedSpecies
+    ? getStaticData()[selectedSpecies]
+    : undefined;
 
   const [selectedSaveIndex, setSelectedSaveIndex] = React.useState(0);
 
   const savesRecord = saveInfosGetAllQuery.data?.data ?? {};
   const speciesRecord = dexGetAllQuery.data?.data ?? {};
 
-  const speciesValues = Object.values(speciesRecord[species + ""] ?? {});
+  const speciesValues = Object.values(
+    speciesRecord[selectedSpecies + ""] ?? {}
+  );
 
   const gameSaves = speciesValues
     .filter((spec) => spec.isAnySeen)
@@ -35,7 +51,8 @@ export const PokedexDetails: React.FC = () => {
     }
   }, [gameSaves, selectedSaveIndex]);
 
-  if (!gameSaves.length || !pokemonQuery.data) {
+  if (!selectedSpecies || !gameSaves.length || !pokemonSpeciesInfos) {
+    console.timeEnd("pokedex-details");
     return null;
   }
 
@@ -49,18 +66,20 @@ export const PokedexDetails: React.FC = () => {
 
   const gameInfos = getGameInfos(selectedSave.version);
 
-  const speciesNameTranslated = pokemonQuery.data.data.names.find(
+  const speciesNameTranslated = pokemonSpeciesInfos.names.find(
     (name) => name.language.name === "fr"
   )?.name;
-  const description = pokemonQuery.data.data.flavor_text_entries.find(
+  const description = pokemonSpeciesInfos.flavor_text_entries.find(
     (entry) =>
       entry.language.name === "fr" &&
       entry.version.name === gameInfos.pokeapiName
   )?.flavor_text;
 
+  console.timeEnd("pokedex-details");
+
   return (
     <DetailsCard
-      species={species}
+      species={selectedSpecies}
       speciesName={speciesName}
       speciesNameTranslated={speciesNameTranslated}
       description={description}

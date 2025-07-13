@@ -7,7 +7,7 @@ import { Input } from "@headlessui/react";
 import { css } from "@emotion/css";
 
 export type FilterInputProps = FilterLabelProps &
-  React.InputHTMLAttributes<never>;
+  React.InputHTMLAttributes<HTMLInputElement>;
 
 export const FilterInput: React.FC<FilterInputProps> = ({
   enabled,

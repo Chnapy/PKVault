@@ -5,22 +5,32 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "build": "vite build",
     "preview": "vite preview",
-    "gen:sdk": "rm -rf src/data/sdk* && orval && prettier -w src/data/sdk*/**/*.ts",
-    "prepare:assets": "cp -r ../external/PKHeX.Everywhere/external/PKHeX/PKHeX.Drawing.PokeSprite/Resources/img/ src/assets/pkhex/img"
+    "c:type": "tsc -b",
+    "c:lint": "eslint .",
+    "gen:sdk": "rm -rf src/data/sdk* && NODE_TLS_REJECT_UNAUTHORIZED=0 orval && prettier -w src/data/sdk*/**/*.ts",
+    "prepare:assets": "cp -r ../external/PKHeX.Everywhere/external/PKHeX/PKHeX.Drawing.PokeSprite/Resources/img/ src/assets/pkhex/img",
+    "gen:pokeapi": "node --experimental-strip-types src/pokeapi/gen-script.ts"
   },
   "dependencies": {
     "@emotion/css": "^11.13.5",
     "@headlessui/react": "^2.2.4",
     "@tanstack/react-query": "^5.81.5",
+    "@tanstack/react-router": "^1.127.1",
+    "@tanstack/react-router-devtools": "^1.127.1",
+    "@tanstack/zod-adapter": "^1.127.3",
+    "dexie": "^4.0.11",
+    "dexie-react-hooks": "^1.1.7",
+    "js-convert-case": "^4.2.0",
     "normalize.css": "^8.0.1",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
+    "@tanstack/router-plugin": "^1.127.1",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react-swc": "^3.10.2",
@@ -28,6 +38,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.2.0",
+    "json-schema-to-typescript": "^15.0.4",
     "orval": "^7.10.0",
     "prettier": "^3.6.2",
     "typescript": "~5.8.3",

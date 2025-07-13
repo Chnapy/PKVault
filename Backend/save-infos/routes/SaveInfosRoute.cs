@@ -13,23 +13,27 @@ public class SaveInfosController : ControllerBase
     }
 
     [HttpPost()]
-    public async Task<ActionResult<SaveInfosDTO>> Upload()
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult<SaveInfosDTO>> Upload(IFormFile saveFile)
     {
-        var form = await HttpContext.Request.ReadFormAsync();
-        var file = form.Files["saveFile"];
-
-        if (file == null || file.Length == 0)
+        if (saveFile == null || saveFile.Length == 0)
             return BadRequest("No file received");
 
         byte[] fileBytes;
         using (var ms = new MemoryStream())
         {
-            await file.CopyToAsync(ms);
+            await saveFile.CopyToAsync(ms);
             fileBytes = ms.ToArray();
         }
 
-        var saveInfos = SaveInfosService.UploadNewSave(fileBytes, file.FileName);
+        var saveInfos = SaveInfosService.UploadNewSave(fileBytes, saveFile.FileName);
 
         return saveInfos;
+    }
+
+    [HttpDelete()]
+    public void Delete(uint saveId, long timestamp)
+    {
+        SaveInfosService.DeleteSave(saveId, timestamp);
     }
 }

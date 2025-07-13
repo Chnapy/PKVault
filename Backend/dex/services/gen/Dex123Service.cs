@@ -21,8 +21,8 @@ public class Dex123Service : DexGenService<SaveFile>
             IsOnlyMale = pi.OnlyMale,
             IsOnlyFemale = pi.OnlyFemale,
             IsGenderless = pi.Genderless,
-            IsAnySeen = save.GetSeen(species),
-            IsCaught = save.GetCaught(species),
+            IsAnySeen = ownedPkm != null || save.GetSeen(species),
+            IsCaught = ownedPkm != null || save.GetCaught(species),
             IsOwned = ownedPkm != null,
         };
     }

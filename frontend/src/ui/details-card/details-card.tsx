@@ -1,9 +1,9 @@
 import type React from "react";
-import pkballImg from "../../assets/pkhex/img/ball/_ball4.png";
-import pkm73Img from "../../assets/pkhex/img/Big Pokemon Sprites/b_73.png";
-import pkm73sImg from "../../assets/pkhex/img/Big Shiny Sprites/b_73s.png";
+import { arrayToRecord, db, pick } from "../../db/db";
+import { getOrFetchItemDataItem } from "../../pokeapi/modules/v2/item";
+import { getOrFetchPokemonDataAll } from "../../pokeapi/modules/v2/pokemon";
+import { prepareStaticData } from "../../pokeapi/pokeapi-data";
 import { Container } from "../container/container";
-import { getSpeciesImg } from "../dex-item/util/get-species-img";
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
@@ -19,6 +19,19 @@ export type DetailsCardProps = {
   compatibleGames: React.ReactNode;
 };
 
+const getStaticPokemonData = prepareStaticData(async () => {
+  const allData = await getOrFetchPokemonDataAll(db);
+
+  return arrayToRecord(
+    allData.map((data) => pick(data, ["id", "sprites"])),
+    "id"
+  );
+});
+
+const getStaticPokeballData = prepareStaticData(async () => {
+  return await getOrFetchItemDataItem(db, 4);
+});
+
 export const DetailsCard: React.FC<DetailsCardProps> = ({
   species,
   speciesName,
@@ -28,6 +41,12 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
   fromSaves,
   compatibleGames,
 }) => {
+  const pokemonDataItem = getStaticPokemonData()[species];
+
+  const pokeballSprite = getStaticPokeballData()!.sprites.default;
+  const defaultSprite = pokemonDataItem.sprites.front_default;
+  const shinySprite = pokemonDataItem.sprites.front_shiny;
+
   return (
     <Container padding="big" borderRadius="big" style={{ display: "block" }}>
       <div style={{ marginBottom: 2, display: "flex", gap: 4 }}>
@@ -54,9 +73,10 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
             }}
           >
             <img
-              src={getSpeciesImg(species, speciesName)}
+              src={defaultSprite!}
               alt={speciesNameTranslated ?? speciesName}
               style={{
+                imageRendering: "pixelated",
                 width: 96,
                 display: "block",
                 background: theme.bg.default,
@@ -68,9 +88,11 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
           <TextContainer>
             {caught && (
               <img
-                src={pkballImg}
+                src={pokeballSprite!}
                 style={{
-                  height: 12,
+                  // imageRendering: "pixelated",
+                  height: 20,
+                  margin: -4,
                   marginRight: 2,
                   paddingBottom: 1,
                   verticalAlign: "text-bottom",
@@ -89,8 +111,8 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
 
         <div style={{ marginTop: 4 }}>
           <TitleContainer title="Owned in games">
-            <img src={pkm73Img} alt="From Blue" style={{ width: 32 }} />
-            <img src={pkm73sImg} alt="From Crystal" style={{ width: 32 }} />
+            <img src={defaultSprite!} alt="From Blue" style={{ width: 32 }} />
+            <img src={shinySprite!} alt="From Crystal" style={{ width: 32 }} />
           </TitleContainer>
         </div>
       </div>

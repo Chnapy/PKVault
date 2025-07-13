@@ -1,30 +1,35 @@
 import { css } from "@emotion/css";
 import type React from "react";
-import { Container } from "../container/container";
+import { Container, type ContainerProps } from "../container/container";
 import { theme } from "../theme";
 
-export type ButtonProps = React.PropsWithChildren<{
-  className?: string;
-  onClick: () => void;
+export type ButtonProps<
+  AS extends React.HTMLElementType | React.ComponentType =
+    | React.HTMLElementType
+    | React.ComponentType,
+> = React.PropsWithChildren<{
+  onClick?: () => void;
   bgColor?: string;
-  selected?: boolean;
-}>;
+}> &
+  ContainerProps<AS>;
 
-export const Button: React.FC<ButtonProps> = ({
+export function Button<
+  AS extends React.HTMLElementType | React.ComponentType = "button",
+>({
+  as = "button" as AS,
   className,
   onClick,
   bgColor = theme.bg.dark,
-  selected,
   children,
-}) => {
+  ...restProps
+}: ButtonProps<AS>) {
   return (
-    <Container
-      as="button"
+    // @ts-expect-error typing complexity due to 'as' concept
+    <Container<AS>
+      as={as}
       className={className}
       onClick={onClick}
-      selected={selected}
-      // padding="small"
-      // borderRadius="small"
+      {...restProps}
     >
       <div
         className={css({
@@ -39,4 +44,4 @@ export const Button: React.FC<ButtonProps> = ({
       </div>
     </Container>
   );
-};
+}

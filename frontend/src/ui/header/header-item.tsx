@@ -1,20 +1,24 @@
-import type React from "react";
-import { theme } from "../theme";
 import { css } from "@emotion/css";
 import { Button } from "@headlessui/react";
+import { Link } from "@tanstack/react-router";
+import type React from "react";
+import { type FileRouteTypes } from "../../routeTree.gen";
+import { theme } from "../theme";
 
 export type HeaderItemProps = {
   selected?: boolean;
-  onClick: () => void;
+  to: FileRouteTypes["to"];
 };
 
 export const HeaderItem: React.FC<React.PropsWithChildren<HeaderItemProps>> = ({
   selected,
-  onClick,
+  to,
   children,
 }) => {
   return (
     <Button
+      as={Link}
+      to={to}
       className={css({
         flexGrow: 1,
         fontWeight: "bold",
@@ -41,7 +45,6 @@ export const HeaderItem: React.FC<React.PropsWithChildren<HeaderItemProps>> = ({
           opacity: 1,
         },
       })}
-      onClick={onClick}
     >
       <div
         className={css({

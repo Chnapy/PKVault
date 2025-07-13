@@ -9,7 +9,12 @@ public class DexService
         return persistedDex;
     }
 
-    public static void UpdateDexWithSave(SaveFile save, SaveInfosEntity saveEntity)
+    public static void ClearDex()
+    {
+        persistedDex.Clear();
+    }
+
+    public static bool UpdateDexWithSave(SaveFile save, SaveInfosEntity saveEntity)
     {
         var notHandled = (SaveFile save) =>
         {
@@ -22,6 +27,7 @@ public class DexService
             SAV1 sav1 => new Dex123Service().UpdateDexWithSave(persistedDex, sav1, saveEntity.SaveId),
             SAV2 sav2 => new Dex123Service().UpdateDexWithSave(persistedDex, sav2, saveEntity.SaveId),
             SAV3 sav3 => new Dex123Service().UpdateDexWithSave(persistedDex, sav3, saveEntity.SaveId),
+            SAV3XD sav3XD => new Dex3XDService().UpdateDexWithSave(persistedDex, sav3XD, saveEntity.SaveId),
             SAV4 sav4 => new Dex4Service().UpdateDexWithSave(persistedDex, sav4, saveEntity.SaveId),
             SAV5 sav5 => new Dex5Service().UpdateDexWithSave(persistedDex, sav5, saveEntity.SaveId),
             SAV6XY xy => notHandled(xy),
@@ -35,5 +41,6 @@ public class DexService
             _ => notHandled(save),
         };
 
+        return success;
     }
 }

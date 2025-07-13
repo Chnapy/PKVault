@@ -1,11 +1,23 @@
-import { defineConfig } from "vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react-swc";
+import fs from "node:fs";
+import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    tanstackRouter({
+      target: "react",
+      autoCodeSplitting: true,
+    }),
+    react(),
+  ],
   server: {
     host: "0.0.0.0",
     allowedHosts: true,
+    https: {
+      key: fs.readFileSync("../.devcontainer/.cert/code.lan+3-key.pem"),
+      cert: fs.readFileSync("../.devcontainer/.cert/code.lan+3.pem"),
+    },
   },
 });

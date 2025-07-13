@@ -1,13 +1,44 @@
-import type React from "react";
+import React from "react";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
+import { arrayToRecord, db, pick } from "../../db/db";
+import { getOrFetchPokemonDataAll } from "../../pokeapi/modules/v2/pokemon";
+import { getOrFetchPokemonSpeciesDataAll } from "../../pokeapi/modules/v2/pokemon-species";
+import { prepareStaticData } from "../../pokeapi/pokeapi-data";
+import { Route } from "../../routes/pokedex";
 import { PokedexItem } from "./pokedex-item";
 
-export const PokedexList: React.FC<{
-  setSelectedPkm: (species: number) => void;
-}> = ({ setSelectedPkm }) => {
+const getStaticPokemonSpeciesData = prepareStaticData(async () => {
+  const allPkms = await getOrFetchPokemonSpeciesDataAll(db);
+
+  return arrayToRecord(
+    allPkms.map((data) => pick(data, ["id", "names"])),
+    "id"
+  );
+});
+
+const getStaticPokemonData = prepareStaticData(async () => {
+  const allData = await getOrFetchPokemonDataAll(db);
+
+  return arrayToRecord(
+    allData.map((data) => pick(data, ["id", "types"])),
+    "id"
+  );
+});
+
+export const PokedexList: React.FC = () => {
+  console.time("pokedex-list");
+  const filters = Route.useSearch({ select: (search) => search.filters });
+
   const { data } = useDexGetAll();
 
-  const speciesRecord = data?.data ?? {};
+  const speciesNames = getStaticPokemonSpeciesData();
+  const speciesTypes = getStaticPokemonData();
+
+  if (!data) {
+    return null;
+  }
+
+  const speciesRecord = data.data;
 
   const keys = Object.keys(speciesRecord)
     .map(Number)
@@ -17,28 +48,86 @@ export const PokedexList: React.FC<{
 
   const lastKey = keys[keys.length - 1];
 
-  const items: React.ReactNode[] = [];
-  for (let species = 1; species <= lastKey; species++) {
+  const speciesList = new Array(lastKey).fill(0).map((_, i) => i + 1);
+
+  const items: React.ReactNode[] = speciesList.map((species) => {
     const speciesValues = Object.values(speciesRecord[species + ""] ?? {});
+    // console.log(species, speciesRecord);
     const seen = speciesValues.some((spec) => spec.isAnySeen);
     const caught = speciesValues.some((spec) => spec.isCaught);
     const speciesName = speciesValues[0].speciesName;
 
-    if ([151, 251, 306, 494, 649, 721, 809].includes(species - 1)) {
-      items.push(<hr key={species + "-hr"} style={{ width: "100%" }} />);
+    let divider: React.ReactNode = null;
+
+    if ([151, 251, 386, 494, 649, 721, 809].includes(species - 1)) {
+      divider = <hr key={species + "-hr"} style={{ width: "100%" }} />;
     }
 
-    items.push(
-      <PokedexItem
-        key={species}
-        species={species}
-        speciesName={speciesName}
-        seen={seen}
-        caught={caught}
-        onClick={setSelectedPkm}
-      />
+    const isFiltered = (): boolean => {
+      if (filters.speciesName) {
+        const name = speciesNames[species].names.find(
+          (n) => n.language.name === "fr"
+        )!.name;
+
+        if (!name.includes(filters.speciesName)) {
+          return true;
+        }
+      }
+
+      if (filters.types?.length) {
+        const pkmTypes = speciesTypes[species];
+        if (
+          filters.types.some((type) =>
+            pkmTypes.types.every((t) => t.type.name !== type)
+          )
+        ) {
+          return true;
+        }
+      }
+
+      if (filters.seen !== undefined) {
+        if ((filters.seen && !seen) || (!filters.seen && seen)) {
+          return true;
+        }
+      }
+
+      if (filters.caught !== undefined) {
+        if ((filters.caught && !caught) || (!filters.caught && caught)) {
+          return true;
+        }
+      }
+
+      if (filters.fromGames?.length) {
+        if (
+          speciesValues.every(
+            (spec) => !filters.fromGames!.includes(spec.saveId)
+          )
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+    if (isFiltered()) {
+      return divider;
+    }
+
+    return (
+      <React.Fragment key={species}>
+        {divider}
+        <PokedexItem
+          species={species}
+          speciesName={speciesName}
+          seen={seen}
+          caught={caught}
+        />
+      </React.Fragment>
     );
-  }
+  });
+
+  console.timeEnd("pokedex-list");
 
   return (
     <div

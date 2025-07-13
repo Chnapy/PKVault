@@ -1,6 +1,6 @@
 import { css } from "@emotion/css";
 import { Checkbox, type CheckboxProps } from "@headlessui/react";
-import type React from "react";
+import React from "react";
 import {
   FilterLabel,
   type FilterLabelProps,
@@ -13,6 +13,8 @@ export const FilterCheckbox: React.FC<FilterCheckboxProps> = ({
   children,
   ...props
 }) => {
+  // const [state, setState] = React.useState<'checked' | 'unchecked' | 'indeterminate'>('indeterminate');
+
   return (
     <FilterLabel enabled={enabled}>
       <Checkbox

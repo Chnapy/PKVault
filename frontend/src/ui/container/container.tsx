@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { css, cx } from "@emotion/css";
 import type React from "react";
 import { switchUtil } from "../../util/switch-util";
@@ -20,19 +21,25 @@ const root = (props: ContainerProps) =>
     }),
     filter: props.noDropshadow
       ? undefined
-      : "drop-shadow(1px 1px 0 rgba(0,0,0,.2))",
-    transition: ".2s transform",
-    cursor: props.as === "button" && !props.selected ? "pointer" : undefined,
+      : `drop-shadow(${props.padding === "big" ? 2 : 1}px ${props.padding === "big" ? 2 : 1}px 0 rgba(0,0,0,.2))`,
+    // transition: ".2s outline-width",
+    cursor:
+      (props.componentDescriptor ?? props.as) === "button" && !props.selected
+        ? "pointer"
+        : undefined,
     "&:hover:not(:active)":
-      props.as === "button" && !props.selected
+      (props.componentDescriptor ?? props.as) === "button" && !props.selected
         ? {
-            transform: "scale(1.05)",
+            // outline: `2px dashed ${theme.border.contrast}`,
+            outlineWidth: 1,
           }
         : undefined,
-    outline: props.selected ? `2px solid ${theme.border.contrast}` : undefined,
+    outline: `0 solid ${theme.border.contrast}`,
+    outlineWidth: props.selected ? 2 : undefined,
   });
 
 export type ContainerOwnProps = {
+  componentDescriptor?: React.HTMLElementType;
   className?: string;
   padding?: "small" | "default" | "big";
   borderRadius?: "small" | "default" | "big";
@@ -41,19 +48,32 @@ export type ContainerOwnProps = {
 };
 
 export type ContainerProps<
-  AS extends React.HTMLElementType = React.HTMLElementType,
+  AS extends React.HTMLElementType | React.ComponentType =
+    | React.HTMLElementType
+    | React.ComponentType,
 > = ContainerOwnProps & {
   as?: AS;
-} & React.JSX.IntrinsicElements[AS];
+} & (AS extends React.HTMLElementType
+    ? React.JSX.IntrinsicElements[AS]
+    : React.ComponentProps<AS>);
 
-export function Container<AS extends React.HTMLElementType = "div">({
+export function Container<
+  AS extends React.HTMLElementType | React.ComponentType = "div",
+>({
   className,
   children,
   ...props
 }: React.PropsWithChildren<ContainerProps<AS>>) {
-  const Component: React.HTMLElementType = props.as ?? "div";
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { padding, borderRadius, noDropshadow, ...componentProps } = props;
+  const Component: React.HTMLElementType | React.ComponentType =
+    props.as ?? "div";
+
+  const {
+    padding,
+    borderRadius,
+    noDropshadow,
+    componentDescriptor,
+    ...componentProps
+  } = props;
 
   return (
     <Component

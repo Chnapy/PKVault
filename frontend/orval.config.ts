@@ -1,66 +1,25 @@
-import { defineConfig, Options } from "orval";
-
-const backendCommonConfig = {
-  output: {
-    mode: "tags-split",
-    target: "src/data/sdk/sdk.ts",
-    schemas: "src/data/sdk/model",
-    httpClient: "fetch",
-    baseUrl: "http://code.lan:5000",
-    override: {
-      useTypeOverInterfaces: true,
-      //   paramsSerializerOptions: {
-      //     qs: {
-      //       arrayFormat: "repeat",
-      //     },
-      //   },
-    },
-  },
-  input: {
-    target: "http://code.lan:5000/swagger/v1/swagger.json",
-
-    parserOptions: {
-      validate: false,
-    },
-  },
-  hooks: {
-    afterAllFilesWrite: "prettier -w",
-  },
-} satisfies Options;
-
-const pokeapiCommonConfig = {
-  output: {
-    mode: "tags-split",
-    target: "src/data/sdk-pokeapi/sdk-pokeapi.ts",
-    schemas: "src/data/sdk-pokeapi/model",
-    httpClient: "fetch",
-    baseUrl: "https://pokeapi.co",
-    override: {
-      useTypeOverInterfaces: true,
-      //   paramsSerializerOptions: {
-      //     qs: {
-      //       arrayFormat: "repeat",
-      //     },
-      //   },
-    },
-  },
-  input: {
-    target:
-      "https://raw.githubusercontent.com/PokeAPI/pokeapi/refs/heads/master/openapi.yml",
-
-    parserOptions: {
-      validate: false,
-    },
-  },
-} satisfies Options;
+import { defineConfig } from "orval";
 
 export default defineConfig({
   backend: {
-    ...backendCommonConfig,
+    input: {
+      target: "https://code.lan:5000/swagger/v1/swagger.json",
+
+      parserOptions: {
+        validate: false,
+      },
+    },
     output: {
-      ...backendCommonConfig.output,
       client: "react-query",
       fileExtension: ".gen.ts",
+      mode: "tags-split",
+      target: "src/data/sdk/sdk.ts",
+      schemas: "src/data/sdk/model",
+      httpClient: "fetch",
+      baseUrl: "https://code.lan:5000",
+      override: {
+        useTypeOverInterfaces: true,
+      },
     },
     hooks: {
       afterAllFilesWrite: "prettier -w",
@@ -77,15 +36,4 @@ export default defineConfig({
   //     afterAllFilesWrite: "prettier -w",
   //   },
   // },
-  pokeapi: {
-    ...pokeapiCommonConfig,
-    output: {
-      ...pokeapiCommonConfig.output,
-      client: "react-query",
-      fileExtension: ".gen.ts",
-    },
-    hooks: {
-      afterAllFilesWrite: "prettier -w",
-    },
-  },
 });

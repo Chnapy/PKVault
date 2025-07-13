@@ -14,8 +14,8 @@ import {
 } from "../filter-label/filter-label";
 
 export type FilterSelectProps = FilterLabelProps &
-  ListboxProps<React.ElementType, unknown> & {
-    options: { value: string | number; label: React.ReactNode }[];
+  ListboxProps<React.ElementType, string[]> & {
+    options: { value: string; label: React.ReactNode }[];
   };
 
 export const FilterSelect: React.FC<FilterSelectProps> = ({
@@ -26,8 +26,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
 }) => {
   const rootRef = React.useRef<HTMLDivElement>(null);
 
-  const hasValue = (value: string | number) =>
-    (Array.isArray(props.value) ? props.value : [props.value]).includes(value);
+  const hasValue = (value: string) => (props.value ?? []).includes(value);
 
   return (
     <div ref={rootRef}>

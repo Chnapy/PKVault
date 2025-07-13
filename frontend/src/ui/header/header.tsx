@@ -8,9 +8,14 @@ export const Header: React.FC<React.PropsWithChildren> = ({ children }) => {
         display: "flex",
         width: "100%",
         justifyContent: "stretch",
-        backgroundImage: `linear-gradient(0deg, transparent 5px, #96979B 5px, #96979B 6px, ${theme.bg.dark} 6px)`,
-        overflow: "hidden",
+        backgroundImage: `linear-gradient(0deg, transparent 5px, #96979B 5px, #96979B 7px, ${theme.bg.dark} 7px)`,
+        // backgroundColor: "rgba(0,0,0,0.05)",
+        filter: `drop-shadow(3px 3px 0 rgba(0,0,0,0.1))`,
+        overflow: "auto",
         flexShrink: 0,
+        position: "sticky",
+        top: 0,
+        zIndex: 10,
       }}
     >
       {children}

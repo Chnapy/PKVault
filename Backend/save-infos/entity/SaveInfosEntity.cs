@@ -41,6 +41,24 @@ public class SaveInfosEntity
         });
     }
 
+    public static SaveInfosEntity? DeleteEntity(uint saveId, long timestamp)
+    {
+        Console.WriteLine("Delete save-infos entity " + saveId);
+
+        var initialList = GetAllSaveInfosEntity();
+        var removedEntity = initialList.Find(entity => entity.SaveId == saveId && entity.Timestamp == timestamp);
+        if (removedEntity == null)
+        {
+            return null;
+        }
+
+        var finalList = initialList.FindAll(entity => entity.SaveId != saveId || entity.Timestamp != timestamp);
+
+        File.WriteAllText(filePath, JsonSerializer.Serialize(finalList));
+
+        return removedEntity;
+    }
+
     public static List<SaveInfosEntity> WriteEntity(SaveInfosEntity entity)
     {
         Console.WriteLine("Write new save-infos entity.");

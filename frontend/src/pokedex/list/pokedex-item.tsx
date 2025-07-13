@@ -1,13 +1,12 @@
 import React from "react";
+import { Route } from "../../routes/pokedex";
 import { DexItem } from "../../ui/dex-item/dex-item";
-import { PokedexContext } from "../context/pokedex-context";
 
 export type PokedexItemProps = {
   species: number;
   speciesName: string;
   seen: boolean;
   caught: boolean;
-  onClick: (species: number) => void;
 };
 
 export const PokedexItem: React.FC<PokedexItemProps> = ({
@@ -15,15 +14,22 @@ export const PokedexItem: React.FC<PokedexItemProps> = ({
   speciesName,
   seen,
   caught,
-  onClick: onClickFn,
 }) => {
-  const selectedPkm = PokedexContext.useValue();
-  //   console.log(species);
+  const selectedPkm = Route.useSearch({ select: (search) => search.selected });
+  const navigate = Route.useNavigate();
 
   const selected = species === selectedPkm;
   const onClick = React.useMemo(
-    () => (seen ? () => onClickFn(selected ? NaN : species) : undefined),
-    [onClickFn, seen, selected, species]
+    () =>
+      seen
+        ? () =>
+            navigate({
+              search: {
+                selected: selected ? undefined : species,
+              },
+            })
+        : undefined,
+    [navigate, seen, selected, species]
   );
 
   return (

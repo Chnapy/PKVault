@@ -14,7 +14,7 @@ export const FilterLabel: React.FC<FilterLabelProps> = ({
   children,
 }) => {
   return (
-    <Container as="label" className={className}>
+    <Container as="label" componentDescriptor="button" className={className}>
       <div
         className={css({
           backgroundColor: theme.bg.filter,

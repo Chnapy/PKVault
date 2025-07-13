@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
+﻿using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Backend;
 
@@ -33,7 +34,21 @@ public static class Program
             };
         });
 
+        var certPem = File.ReadAllText("../.devcontainer/.cert/code.lan+3.pem");
+        var keyPem = File.ReadAllText("../.devcontainer/.cert/code.lan+3-key.pem");
+        var certificate = X509Certificate2.CreateFromPem(certPem, keyPem);
+
+        builder.WebHost.ConfigureKestrel(serverOptions =>
+        {
+            serverOptions.ListenAnyIP(5000, listenOptions =>
+            {
+                listenOptions.UseHttps(certificate);
+            });
+        });
+
         var app = builder.Build();
+
+        app.UseHttpsRedirection();
 
         app.UseCors();
         app.UseOpenApi();
@@ -41,7 +56,7 @@ public static class Program
 
         app.MapControllers();
 
-        app.Run("http://0.0.0.0:5000");
+        app.Run();
 
         Console.WriteLine("App is running.");
     }

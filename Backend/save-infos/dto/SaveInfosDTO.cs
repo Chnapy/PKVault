@@ -15,6 +15,7 @@ public class SaveInfosDTO
             Generation = save.Generation,
             TID = save.DisplayTID,
             SID = save.DisplaySID,
+            TrainerGender = save.Gender,
             TrainerName = save.OT,
         };
     }
@@ -30,6 +31,8 @@ public class SaveInfosDTO
     public uint TID { get; set; }
 
     public uint SID { get; set; }
+
+    public byte TrainerGender { get; set; }
 
     public string TrainerName { get; set; }
 }

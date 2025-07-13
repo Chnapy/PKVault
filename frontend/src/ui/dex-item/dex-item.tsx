@@ -1,9 +1,11 @@
 import { css } from "@emotion/css";
 import React from "react";
-import pkballImg from "../../assets/pkhex/img/ball/_ball4.png";
+import { arrayToRecord, db, pick } from "../../db/db";
+import { getOrFetchItemDataItem } from "../../pokeapi/modules/v2/item";
+import { getOrFetchPokemonDataAll } from "../../pokeapi/modules/v2/pokemon";
+import { prepareStaticData } from "../../pokeapi/pokeapi-data";
 import { Container } from "../container/container";
 import { theme } from "../theme";
-import { getSpeciesImg } from "./util/get-species-img";
 import { getSpeciesNO } from "./util/get-species-no";
 
 const styles = {
@@ -18,6 +20,19 @@ const styles = {
   }),
 };
 
+const getStaticData = prepareStaticData(async () => {
+  const allData = await getOrFetchPokemonDataAll(db);
+
+  return arrayToRecord(
+    allData.map((data) => pick(data, ["id", "sprites"])),
+    "id"
+  );
+});
+
+const getStaticPokeballData = prepareStaticData(async () => {
+  return await getOrFetchItemDataItem(db, 4);
+});
+
 export type DexItemProps = {
   species: number;
   speciesName: string;
@@ -29,6 +44,10 @@ export type DexItemProps = {
 
 export const DexItem: React.FC<DexItemProps> = React.memo(
   ({ species, speciesName, seen, caught, selected, onClick }) => {
+    const staticData = getStaticData()[species];
+
+    const pokeballSprite = getStaticPokeballData()!.sprites.default;
+
     return (
       <Container
         as={onClick ? "button" : undefined}
@@ -50,10 +69,12 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
 
             {caught && (
               <img
-                src={pkballImg}
+                src={pokeballSprite!}
                 loading="lazy"
                 style={{
-                  height: 12,
+                  height: 20,
+                  margin: -4,
+                  imageRendering: "pixelated",
                 }}
               />
             )}
@@ -66,10 +87,11 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
             }}
           >
             <img
-              src={getSpeciesImg(species, speciesName)}
+              src={staticData.sprites.front_default!}
               alt={speciesName}
               loading="lazy"
               style={{
+                imageRendering: "pixelated",
                 width: 96,
                 height: 96,
                 filter: seen ? undefined : "brightness(0) opacity(0.5)",
