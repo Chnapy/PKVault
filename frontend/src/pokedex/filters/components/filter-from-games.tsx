@@ -20,7 +20,7 @@ export const FilterFromGames: React.FC = () => {
 
       return {
         value: save.id + "",
-        label: `${infos.text}`,
+        label: `${infos.text} - ${save.trainerName}`,
       };
     });
 

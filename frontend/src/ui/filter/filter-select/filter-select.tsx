@@ -41,6 +41,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
               borderRadius: 4,
               border: "none",
               padding: "2px 4px",
+              cursor: "pointer",
             })}
           >
             {children}

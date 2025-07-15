@@ -169,7 +169,7 @@ const promises = listWithItems.map(async (list) => {
   const listName = path.basename(listModulePath);
 
   const listNameCamel = convertCase.toCamelCase(listName);
-  const listNameLoad = convertCase.toCamelCase("load-" + listName + "-data");
+  // const listNameLoad = convertCase.toCamelCase("load-" + listName + "-data");
   // const listNameCamelData = convertCase.toCamelCase(
   //   "get-" + listName + "-data"
   // );
@@ -246,9 +246,9 @@ const promises = listWithItems.map(async (list) => {
       .map(${listNameCamelFetchItem})
     );
 
-  export type ${listNamePascalDB} = {
+  export type ${listNamePascalDB}<D extends { id: number }> = {
     ${listNameCamel}: EntityTable<
-      ${listNamePascal},
+      D,
       "id" // primary key
     >;
   };
@@ -257,50 +257,61 @@ const promises = listWithItems.map(async (list) => {
     ${listNameCamel}: "++id",
   };
 
-  export const ${listNameLoad} = async (db: {
-    ${listNameCamel}: EntityTable<${listNamePascal}, "id">;
-  }) => {
-    const count = await db.${listNameCamel}.count();
-    if (count === 0) {
-      console.log('Loading "${listNameCamel}" table');
-      await db.${listNameCamel}.bulkAdd(await ${listNameCamelFetchAll}());
+  export const ${listNameCamelGetOrFetchItem} = async <D extends { id: number }>(
+    id: D['id'],
+    { db, pickFn }: {
+      db: {
+        ${listNameCamel}: EntityTable<D, "id">;
+      };
+      pickFn: (data: ${listNamePascal}) => D;
     }
-  };
-
-  export const ${listNameCamelGetOrFetchItem} = async (
-    db: {
-      ${listNameCamel}: EntityTable<${listNamePascal}, "id">;
-    },
-    id: number
   ) => {
-    const value = await db.${listNameCamel}.get(id);
+    console.log('Loading static-data "${listName}" item...');
+    console.time('Loading static-data "${listName}" item');
+
+    const value = await db.${listNameCamel}.get(id as never);
     if (value) {
-      console.log('From table ${listNameCamel}:', id);
+      console.timeEnd('Loading static-data "${listName}" item');
+      console.log("Last loading was done from client DB table");
       return value;
     }
   
-    const fetchedValue = await ${listNameCamelFetchItem}(id);
+    const fetchedValue = await ${listNameCamelFetchItem}(id).then(pickFn);
     await db.${listNameCamel}.add(fetchedValue);
-    console.log('From fetch ${listNameCamel}:', id);
+    
+    console.timeEnd('Loading static-data "${listName}" item');
+    console.log("Last loading was done from network");
   
     return fetchedValue;
   };
   
-  export const ${listNameCamelGetOrFetchAll} = async (db: {
-    _table_full: EntityTable<{ tableName: string }, "tableName">;
-    ${listNameCamel}: EntityTable<${listNamePascal}, "id">;
+  export const ${listNameCamelGetOrFetchAll} = async <D extends { id: number }>({
+    db, pickFn, filterFn = () => true
+  }: {
+    db: {
+      ${listNameCamel}: EntityTable<D, "id">;
+    };
+    pickFn: (data: ${listNamePascal}) => D;
+    filterFn?: (data: ${listNamePascal}) => boolean;
   }) => {
-  const isTableFull = await db._table_full.get("${listNameCamel}");
-  if (isTableFull) {
-      console.log('From table ${listNameCamel}: all');
-      return await db.${listNameCamel}.toArray();
+    console.log('Loading static-data "${listName}" list...');
+    console.time('Loading static-data "${listName}" list');
+
+    const dbData = await db.${listNameCamel}.toArray();
+    if (dbData.length > 0) {
+      console.timeEnd('Loading static-data "${listName}" list');
+      console.log("Last loading was done from client DB table, list length:", dbData.length);
+      return dbData;
     }
-  
-    const fetchedValues = await ${listNameCamelFetchAll}();
+
+    const fetchedValues = await ${listNameCamelFetchAll}().then((data) =>
+      data.filter(filterFn).map(pickFn)
+    );
     await db.${listNameCamel}.clear();
     await db.${listNameCamel}.bulkAdd(fetchedValues);
-    await db._table_full.add({ tableName: "${listNameCamel}" });
-    console.log('From fetch ${listNameCamel}: all');
+    
+    console.timeEnd('Loading static-data "${listName}" list');
+    console.log("Last loading was done from network, list length:", dbData.length);
   
     return fetchedValues;
   };

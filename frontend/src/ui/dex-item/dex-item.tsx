@@ -1,11 +1,6 @@
 import { css } from "@emotion/css";
-import { pick } from "@tanstack/react-router";
 import React from "react";
-import { db } from "../../data/db/db";
-import { getOrFetchItemDataItem } from "../../data/static-data/pokeapi/item";
-import { getOrFetchPokemonDataAll } from "../../data/static-data/pokeapi/pokemon";
-import { prepareStaticData } from "../../data/static-data/static-data";
-import { arrayToRecord } from "../../util/array-to-record";
+import { useStaticData } from "../../data/static-data/static-data";
 import { Container } from "../container/container";
 import { theme } from "../theme";
 import { getSpeciesNO } from "./util/get-species-no";
@@ -22,19 +17,6 @@ const styles = {
   }),
 };
 
-const useStaticPkmRecord = prepareStaticData("dex-item-pkm", async () => {
-  const allData = await getOrFetchPokemonDataAll(db);
-
-  return arrayToRecord(
-    allData.map((data) => pick(data, ["id", "sprites"])),
-    "id"
-  );
-});
-
-const useStaticPkball = prepareStaticData("pkball", async () => {
-  return await getOrFetchItemDataItem(db, 4);
-});
-
 export type DexItemProps = {
   species: number;
   speciesName: string;
@@ -46,9 +28,10 @@ export type DexItemProps = {
 
 export const DexItem: React.FC<DexItemProps> = React.memo(
   ({ species, speciesName, seen, caught, selected, onClick }) => {
-    const staticData = useStaticPkmRecord()[species];
+    const staticData = useStaticData();
+    const pokemonDataItem = staticData.pokemon[species];
 
-    const pokeballSprite = useStaticPkball()!.sprites.default;
+    const pokeballSprite = staticData.item.pkball.sprites.default;
 
     return (
       <Container
@@ -89,7 +72,7 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
             }}
           >
             <img
-              src={staticData.sprites.front_default!}
+              src={pokemonDataItem.sprites.front_default!}
               alt={speciesName}
               loading="lazy"
               style={{

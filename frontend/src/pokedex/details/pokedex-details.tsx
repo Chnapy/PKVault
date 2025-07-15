@@ -1,36 +1,18 @@
-import { pick } from "@tanstack/react-router";
 import React from "react";
-import { db } from "../../data/db/db";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
 import { useSaveInfosGetAll } from "../../data/sdk/save-infos/save-infos.gen";
-import { getOrFetchPokemonSpeciesDataAll } from "../../data/static-data/pokeapi/pokemon-species";
-import { prepareStaticData } from "../../data/static-data/static-data";
+import { useStaticData } from "../../data/static-data/static-data";
 import { Route } from "../../routes/pokedex";
 import { DetailsCard } from "../../ui/details-card/details-card";
-import { arrayToRecord } from "../../util/array-to-record";
 import { GameButton } from "./game-button";
 import { getGameInfos } from "./util/get-game-infos";
-
-const useStaticPkmSpeciesRecord = prepareStaticData(
-  "pokedex-details-pkm-species",
-  async () => {
-    const allSpecies = await getOrFetchPokemonSpeciesDataAll(db);
-
-    return arrayToRecord(
-      allSpecies.map((data) =>
-        pick(data, ["id", "names", "flavor_text_entries"])
-      ),
-      "id"
-    );
-  }
-);
 
 export const PokedexDetails: React.FC = () => {
   console.time("pokedex-details");
   const selectedSpecies = Route.useSearch({
     select: (search) => search.selected,
   });
-  const pkmSpeciesRecord = useStaticPkmSpeciesRecord();
+  const pkmSpeciesRecord = useStaticData().pokemonSpecies;
   const dexGetAllQuery = useDexGetAll();
   const saveInfosGetAllQuery = useSaveInfosGetAll();
   const pokemonSpeciesInfos = selectedSpecies
@@ -92,10 +74,15 @@ export const PokedexDetails: React.FC = () => {
       caught={caught}
       fromSaves={
         <>
-          {gameSaves.map(({ version }, i) => (
+          {gameSaves.map(({ id, version, trainerName }, i) => (
             <GameButton
-              key={version}
+              key={id}
               version={version}
+              trainerName={
+                gameSaves.filter((save) => save.version === version).length > 1
+                  ? trainerName
+                  : undefined
+              }
               onClick={() => setSelectedSaveIndex(i)}
               selected={i === selectedSaveIndex}
             />

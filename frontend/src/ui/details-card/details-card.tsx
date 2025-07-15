@@ -1,10 +1,5 @@
-import { pick } from "@tanstack/react-router";
 import type React from "react";
-import { db } from "../../data/db/db";
-import { getOrFetchItemDataItem } from "../../data/static-data/pokeapi/item";
-import { getOrFetchPokemonDataAll } from "../../data/static-data/pokeapi/pokemon";
-import { prepareStaticData } from "../../data/static-data/static-data";
-import { arrayToRecord } from "../../util/array-to-record";
+import { useStaticData } from "../../data/static-data/static-data";
 import { Container } from "../container/container";
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
 import { TextContainer } from "../text-container/text-container";
@@ -21,19 +16,6 @@ export type DetailsCardProps = {
   compatibleGames: React.ReactNode;
 };
 
-const useStaticPkmRecord = prepareStaticData("details-card-pkm", async () => {
-  const allData = await getOrFetchPokemonDataAll(db);
-
-  return arrayToRecord(
-    allData.map((data) => pick(data, ["id", "sprites"])),
-    "id"
-  );
-});
-
-const useStaticPkball = prepareStaticData("pkball", async () => {
-  return await getOrFetchItemDataItem(db, 4);
-});
-
 export const DetailsCard: React.FC<DetailsCardProps> = ({
   species,
   speciesName,
@@ -43,9 +25,10 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
   fromSaves,
   compatibleGames,
 }) => {
-  const pokemonDataItem = useStaticPkmRecord()[species];
+  const staticData = useStaticData();
+  const pokemonDataItem = staticData.pokemon[species];
 
-  const pokeballSprite = useStaticPkball()!.sprites.default;
+  const pokeballSprite = staticData.item.pkball.sprites.default;
   const defaultSprite = pokemonDataItem.sprites.front_default;
   const shinySprite = pokemonDataItem.sprites.front_shiny;
 

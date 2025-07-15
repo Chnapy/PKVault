@@ -4,7 +4,7 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { DataProvider } from "./data/data-provider.tsx";
-import { StaticDataProvider } from "./data/static-data/static-data.tsx";
+import { StaticDataGate } from "./data/static-data/static-data.tsx";
 import { routeTree } from "./routeTree.gen";
 
 // Create a new router instance
@@ -20,9 +20,9 @@ declare module "@tanstack/react-router" {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <DataProvider>
-      <StaticDataProvider>
+      <StaticDataGate>
         <RouterProvider router={router} />
-      </StaticDataProvider>
+      </StaticDataGate>
     </DataProvider>
   </StrictMode>
 );

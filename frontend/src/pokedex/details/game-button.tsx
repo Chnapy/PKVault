@@ -6,14 +6,16 @@ import { getGameInfos } from "./util/get-game-infos";
 export const GameButton: React.FC<
   Omit<ButtonProps, "bgColor" | "children"> & {
     version: GameVersion;
+    trainerName?: string;
     selected?: boolean;
   }
-> = ({ version, ...rest }) => {
+> = ({ version, trainerName, ...rest }) => {
   const { bgColor, text } = getGameInfos(version);
 
   return (
     <Button bgColor={bgColor} {...rest}>
       {text}
+      {trainerName && " - " + trainerName}
     </Button>
   );
 };

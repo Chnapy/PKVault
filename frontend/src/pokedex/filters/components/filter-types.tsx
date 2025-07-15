@@ -1,23 +1,14 @@
-import { pick } from "@tanstack/react-router";
 import React from "react";
-import { db } from "../../../data/db/db";
-import { getOrFetchTypeDataAll } from "../../../data/static-data/pokeapi/type";
-import { prepareStaticData } from "../../../data/static-data/static-data";
+import { useStaticData } from "../../../data/static-data/static-data";
 import { Route } from "../../../routes/pokedex";
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
-
-const useStaticTypes = prepareStaticData("filter-types", async () => {
-  const allTypes = await getOrFetchTypeDataAll(db);
-
-  return allTypes.map((data) => pick(data, ["id", "name", "names"]));
-});
 
 export const FilterTypes: React.FC = () => {
   const navigate = Route.useNavigate();
   const searchValue =
     Route.useSearch({ select: (search) => search.filters.types }) ?? [];
 
-  const allTypes = useStaticTypes();
+  const allTypes = useStaticData().type;
 
   return (
     <FilterSelect
