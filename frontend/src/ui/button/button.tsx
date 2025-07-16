@@ -1,4 +1,4 @@
-import { css } from "@emotion/css";
+import { css, cx } from "@emotion/css";
 import type React from "react";
 import { Container, type ContainerProps } from "../container/container";
 import { theme } from "../theme";
@@ -27,12 +27,22 @@ export function Button<
     // @ts-expect-error typing complexity due to 'as' concept
     <Container<AS>
       as={as}
-      className={className}
+      className={cx(
+        css({
+          display: "flex",
+          alignItems: "stretch",
+        }),
+        className
+      )}
       onClick={onClick}
       {...restProps}
     >
       <div
         className={css({
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexGrow: 1,
           backgroundColor: bgColor,
           borderRadius: 4,
           color: theme.text.light,

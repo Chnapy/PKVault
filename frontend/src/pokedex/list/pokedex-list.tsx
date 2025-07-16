@@ -1,10 +1,13 @@
 import React from "react";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
+import { useStaticData } from "../../data/static-data/static-data";
 import { usePokedexFilters } from "./hooks/use-pokedex-filters";
 import { PokedexItem } from "./pokedex-item";
 
 export const PokedexList: React.FC = () => {
   console.time("pokedex-list");
+
+  const staticData = useStaticData();
 
   const { data } = useDexGetAll();
 
@@ -18,15 +21,16 @@ export const PokedexList: React.FC = () => {
 
   const keys = Object.keys(speciesRecord)
     .map(Number)
-    .sort(function (a, b) {
-      return a - b;
-    });
+    .sort((a, b) => a - b);
 
   const lastKey = keys[keys.length - 1];
 
   const speciesList = new Array(lastKey).fill(0).map((_, i) => i + 1);
 
+  let currentGenerationName: string = "";
+
   const items: React.ReactNode[] = speciesList.map((species) => {
+    const staticPkm = staticData.pokemonSpecies[species];
     const speciesValues = Object.values(
       speciesRecord[species + ""] ?? {}
     ).filter(filterSpeciesValues);
@@ -39,14 +43,30 @@ export const PokedexList: React.FC = () => {
     const caught = speciesValues.some((spec) => spec.isCaught);
     const speciesName = speciesValues[0].speciesName;
 
-    let divider: React.ReactNode = null;
-
-    if ([151, 251, 386, 494, 649, 721, 809].includes(species - 1)) {
-      divider = <hr key={species + "-hr"} style={{ width: "100%" }} />;
+    if (isPkmFiltered(species, speciesValues)) {
+      return null;
     }
 
-    if (isPkmFiltered(species, speciesValues)) {
-      return divider;
+    let divider: React.ReactNode = null;
+
+    if (staticPkm.generation.name !== currentGenerationName) {
+      currentGenerationName = staticPkm.generation.name;
+      divider = (
+        <div
+          key={currentGenerationName}
+          style={{
+            width: "100%",
+            padding: "40px 40px 10px",
+          }}
+        >
+          {
+            staticData.generation
+              .find((gen) => gen.name === currentGenerationName)
+              ?.names.find((name) => name.language.name === "fr")?.name
+          }
+          <hr />
+        </div>
+      );
     }
 
     return (

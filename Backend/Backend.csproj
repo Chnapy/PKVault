@@ -9,10 +9,10 @@
     <!-- <IsAotCompatible>true</IsAotCompatible> -->
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\external\PKHeX.Everywhere\src\PKHeX.Facade\PKHeX.Facade.csproj" />
+    <PackageReference Include="PKHeX.Facade" Version="1.2.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\external\PKHeX.Everywhere\external\PKHeX\PKHeX.Core\PKHeX.Core.csproj" />
+    <PackageReference Include="PKHeX.Core" Version="25.6.9" />
   </ItemGroup>
   
   <ItemGroup>

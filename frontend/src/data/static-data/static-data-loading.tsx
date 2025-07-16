@@ -1,15 +1,11 @@
 import React from "react";
-import { theme } from "../../ui/theme";
 
 type StaticDataLoadingProps = {
   step: number;
   maxStep: number;
 };
 
-export const StaticDataLoading: React.FC<StaticDataLoadingProps> = ({
-  step,
-  maxStep,
-}) => {
+export const StaticDataLoading: React.FC<StaticDataLoadingProps> = () => {
   return (
     <div
       style={{
@@ -22,18 +18,7 @@ export const StaticDataLoading: React.FC<StaticDataLoadingProps> = ({
         flexDirection: "column",
       }}
     >
-      <div>
-        Loading static data... {step}/{maxStep}
-      </div>
-      <div
-        style={{
-          width: 300 * (1 - step / maxStep),
-          height: 4,
-          background: theme.text.primary,
-          borderRadius: 8,
-          transition: ".4s width",
-        }}
-      ></div>
+      <div>Loading static data...</div>
     </div>
   );
 };
