@@ -25,6 +25,11 @@ public class SaveInfosEntity
         return JsonSerializer.Deserialize<List<SaveInfosEntity>>(json) ?? new List<SaveInfosEntity>();
     }
 
+    public static SaveInfosEntity? GetSaveInfosEntity(uint saveId)
+    {
+        return GetAllSaveInfosEntity().Find(entity => entity.SaveId == saveId);
+    }
+
     public static List<SaveInfosEntity> GetLastSaveInfosEntity()
     {
         var allEntities = GetAllSaveInfosEntity().OrderByDescending(entity => entity.Timestamp).ToList();

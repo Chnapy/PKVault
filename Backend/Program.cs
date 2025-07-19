@@ -7,6 +7,13 @@ public static class Program
 {
     public static void Main(string[] args)
     {
+        // StorageService.Test();
+
+        // if (1 == 1)
+        // {
+        //     return;
+        // }
+
         SaveInfosService.LoadLastSaves();
 
         var builder = WebApplication.CreateBuilder(args);
