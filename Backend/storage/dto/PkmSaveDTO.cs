@@ -14,6 +14,8 @@ public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
         {
             Id = id,
             SaveId = save.ID32,
+            Species = pkm.Species,
+            IsShiny = pkm.IsShiny,
             Box = box,
             BoxSlot = boxSlot,
             Pkm = pkm
@@ -25,6 +27,10 @@ public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
     }
 
     public uint SaveId { get; set; }
+
+    public ushort Species { get; set; }
+
+    public bool IsShiny { get; set; }
 
     public int Box { get; set; }
 

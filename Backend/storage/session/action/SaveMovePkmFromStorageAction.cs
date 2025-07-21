@@ -1,15 +1,18 @@
 using PKHeX.Core;
 
-public class MovePkmStorageToSaveAction
+public class SaveMovePkmFromStorageAction : IWithSaveId
 {
-    long pkmVersionId;
-    int saveBoxId;
-    int saveSlot;
+    public uint saveId { get; }
+    readonly long pkmVersionId;
+    readonly int saveBoxId;
+    readonly int saveSlot;
 
-    public MovePkmStorageToSaveAction(
+    public SaveMovePkmFromStorageAction(
+        uint _saveId,
         long _pkmVersionId, int _saveBoxId, int _saveSlot
     )
     {
+        saveId = _saveId;
         pkmVersionId = _pkmVersionId;
         saveBoxId = _saveBoxId;
         saveSlot = _saveSlot;
@@ -19,8 +22,8 @@ public class MovePkmStorageToSaveAction
         SaveFile save,
         EntityLoader<PkmEntity> pkmLoader,
         EntityLoader<PkmVersionEntity> pkmVersionLoader,
-        EntityLoader<PkmSaveDTO> savePkmLoader,
-        Func<string, PKM> storagePkmByPaths
+        PKMMemoryLoader pkmFileLoader,
+        EntityLoader<PkmSaveDTO> savePkmLoader
         )
     {
         var pkmVersionEntity = pkmVersionLoader.GetEntity(pkmVersionId);
@@ -49,7 +52,7 @@ public class MovePkmStorageToSaveAction
             throw new Exception($"PkmEntity already in save, id={pkmEntity.Id}, saveId={pkmEntity.SaveId}");
         }
 
-        var pkm = storagePkmByPaths(pkmVersionEntity.Filepath);
+        var pkm = pkmFileLoader.GetEntity(pkmVersionEntity)!;
 
         var pkmSaveDTO = PkmSaveDTO.FromPkm(save, pkm, saveBoxId, saveSlot);
 

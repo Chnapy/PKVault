@@ -4,61 +4,81 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 public class StorageController : ControllerBase
 {
-    [HttpGet("session/create/{saveId}")]
-    public void CreateSession(uint saveId)
-    {
-        StorageService.CreateSession(saveId);
-    }
+    // [HttpGet("session/create/{saveId}")]
+    // public void CreateSession(uint saveId)
+    // {
+    //     StorageService.CreateSession(saveId);
+    // }
 
-    [HttpGet("box")]
-    public ActionResult<List<BoxDTO>> GetAllBoxes()
+    [HttpGet("main/box")]
+    public ActionResult<List<BoxDTO>> GetMainBoxes()
     {
-        var list = StorageService.GetAllBoxes();
+        var list = StorageService.GetMainBoxes();
 
         return list;
     }
 
-    [HttpGet("pkm")]
-    public ActionResult<List<PkmDTO>> GetPkms()
+    [HttpGet("main/pkm")]
+    public ActionResult<List<PkmDTO>> GetMainPkms()
     {
-        var list = StorageService.GetPkms();
+        var list = StorageService.GetMainPkms();
 
         return list;
     }
 
-    [HttpGet("pkm/{pkmId}/pkm-version")]
-    public ActionResult<List<PkmVersionDTO>> GetPkmVersions(uint pkmId)
+    [HttpGet("main/pkm-version")]
+    public ActionResult<List<PkmVersionDTO>> GetMainPkmVersions()
     {
-        var list = StorageService.GetPkmVersions(pkmId);
+        var list = StorageService.GetMainPkmVersions(null);
 
         return list;
     }
 
-    [HttpGet("save/pkm")]
-    public ActionResult<List<PkmSaveDTO>> GetSaveBox()
+    // [HttpGet("main/pkm/{pkmId}/pkm-version")]
+    // public ActionResult<List<PkmVersionDTO>> GetMainPkmVersions(uint pkmId)
+    // {
+    //     var list = StorageService.GetPkmVersions(pkmId);
+
+    //     return list;
+    // }
+
+    [HttpGet("save/{saveId}/box")]
+    public ActionResult<List<BoxDTO>> GetSaveBoxes(uint saveId)
     {
-        var savePkms = StorageService.GetSavePkms();
+        var saveBoxes = StorageService.GetSaveBoxes(saveId);
+
+        return saveBoxes;
+    }
+
+    [HttpGet("save/{saveId}/pkm")]
+    public ActionResult<List<PkmSaveDTO>> GetSavePkms(uint saveId)
+    {
+        var savePkms = StorageService.GetSavePkms(saveId);
 
         return savePkms;
     }
 
-    [HttpPut("pkm")]
-    public ActionResult<PkmDTO> UpdatePkm(PkmDTO pkm)
+    [HttpPut("main/move-pkm")]
+    public void MainMovePkm(long pkmId, uint boxId, uint boxSlot)
     {
-        var value = StorageService.UpdatePkm(pkm);
-
-        return value;
+        StorageService.MainMovePkm(pkmId, boxId, boxSlot);
     }
 
-    [HttpPut("move/save-storage")]
-    public void MovePkmFromSaveToStorage(long savePkmId, uint storageBoxId, uint storageSlot)
+    [HttpPut("save/{saveId}/move-pkm")]
+    public void SaveMovePkm(uint saveId, long pkmId, int boxId, int boxSlot)
     {
-        StorageService.MovePkmFromSaveToStorage(savePkmId, storageBoxId, storageSlot);
+        StorageService.SaveMovePkm(saveId, pkmId, boxId, boxSlot);
     }
 
-    [HttpPut("move/storage-save")]
-    public void MovePkmFromStorageToSave(long pkmVersionId, int saveBoxId, int saveSlot)
+    [HttpPut("save/{saveId}/move-pkm-to-storage")]
+    public void SaveMovePkmToStorage(uint saveId, long savePkmId, uint storageBoxId, uint storageSlot)
     {
-        StorageService.MovePkmFromStorageToSave(pkmVersionId, saveBoxId, saveSlot);
+        StorageService.SaveMovePkmToStorage(saveId, savePkmId, storageBoxId, storageSlot);
+    }
+
+    [HttpPut("save/{saveId}/move-pkm-from-storage")]
+    public void SaveMovePkmFromStorage(uint saveId, long pkmVersionId, int saveBoxId, int saveSlot)
+    {
+        StorageService.SaveMovePkmFromStorage(saveId, pkmVersionId, saveBoxId, saveSlot);
     }
 }

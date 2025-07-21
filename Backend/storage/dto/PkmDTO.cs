@@ -8,17 +8,23 @@ public class PkmDTO
         return new PkmDTO
         {
             Id = entity.Id,
+            Species = entity.Species,
+            IsShiny = entity.IsShiny,
             BoxId = entity.BoxId,
-            BoxIndex = entity.BoxIndex,
+            BoxSlot = entity.BoxSlot,
             SaveId = entity.SaveId
         };
     }
 
     public long Id { get; set; }
 
+    public ushort Species { get; set; }
+
+    public bool IsShiny { get; set; }
+
     public uint BoxId { get; set; }
 
-    public uint BoxIndex { get; set; }
+    public uint BoxSlot { get; set; }
 
     public uint? SaveId { get; set; }
 }

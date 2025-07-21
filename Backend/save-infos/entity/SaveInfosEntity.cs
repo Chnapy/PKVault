@@ -1,9 +1,22 @@
 
 using System.Text.Json;
+using PKHeX.Core;
 
 public class SaveInfosEntity
 {
     static readonly string filePath = "db/saveInfos.json";
+
+    public static SaveInfosEntity FromSave(SaveFile save, string filepath, long timestamp)
+    {
+        var saveId = save.ID32;
+
+        return new SaveInfosEntity
+        {
+            SaveId = saveId,
+            Filepath = filepath,
+            Timestamp = timestamp,
+        };
+    }
 
     public static List<SaveInfosEntity> GetAllSaveInfosEntity()
     {

@@ -63,8 +63,6 @@ public class BoxEntity : IWithId, ICloneable<BoxEntity>
 
     public string Name { get; set; }
 
-    public uint Order { get; set; }
-
     public BoxEntity Clone()
     {
         return JsonSerializer.Deserialize<BoxEntity>(

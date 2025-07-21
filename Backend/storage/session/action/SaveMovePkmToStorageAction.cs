@@ -1,21 +1,24 @@
 using PKHeX.Core;
 
-public class MovePkmSaveToStorageAction
+public class SaveMovePkmToStorageAction : IWithSaveId
 {
-    long savePkmId;
-    uint storageBoxId;
-    uint storageSlot;
+    public uint saveId { get; }
+    readonly long savePkmId;
+    readonly uint storageBoxId;
+    readonly uint storageSlot;
 
-    public MovePkmSaveToStorageAction(
+    public SaveMovePkmToStorageAction(
+        uint _saveId,
         long _savePkmId, uint _storageBoxId, uint _storageSlot
     )
     {
+        saveId = _saveId;
         savePkmId = _savePkmId;
         storageBoxId = _storageBoxId;
         storageSlot = _storageSlot;
     }
 
-    public void Execute(EntityLoader<PkmEntity> pkmLoader, EntityLoader<PkmVersionEntity> pkmVersionLoader, EntityLoader<PkmSaveDTO> savePkmLoader)
+    public void Execute(EntityLoader<PkmEntity> pkmLoader, EntityLoader<PkmVersionEntity> pkmVersionLoader, PKMMemoryLoader pkmFileLoader, EntityLoader<PkmSaveDTO> savePkmLoader)
     {
 
 
@@ -34,8 +37,10 @@ public class MovePkmSaveToStorageAction
             var pkmEntityToCreate = new PkmEntity
             {
                 Id = savePkm.Id,
+                Species = savePkm.Species,
+                IsShiny = savePkm.IsShiny,
                 BoxId = storageBoxId,
-                BoxIndex = storageSlot,
+                BoxSlot = storageSlot,
             };
 
             pkmVersionEntity = new PkmVersionEntity
@@ -43,17 +48,18 @@ public class MovePkmSaveToStorageAction
                 Id = savePkm.Id,
                 PkmId = pkmEntityToCreate.Id,
                 Generation = savePkm.Generation,
-                Filepath = $"pkm/{savePkm.Pkm.Generation}/{savePkm.Pkm.FileName}",
+                Filepath = pkmFileLoader.GetPKMFilepath(savePkm.Pkm),
             };
 
             pkmLoader.WriteEntity(pkmEntityToCreate);
             pkmVersionLoader.WriteEntity(pkmVersionEntity);
+            pkmFileLoader.WriteEntity(savePkm.Pkm, null);
         }
 
         var pkmEntity = pkmLoader.GetEntity(pkmVersionEntity.PkmId)!;
 
-        pkmEntity.BoxId = storageBoxId;
-        pkmEntity.BoxIndex = storageSlot;
+        // pkmEntity.BoxId = storageBoxId;
+        // pkmEntity.BoxSlot = storageSlot;
         pkmEntity.SaveId = default;
 
         pkmLoader.WriteEntity(pkmEntity);

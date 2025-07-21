@@ -3,17 +3,17 @@ using PKHeX.Core;
 
 public class StorageService
 {
-    private static DataLoader dataLoader = new DataFileLoader(null);
+    private static DataLoader dataLoader = new DataMemoryLoader();
 
-    public static void CreateSession(uint saveId)
-    {
-        var saveInfos = SaveInfosEntity.GetSaveInfosEntity(saveId)!;
-        var save = SaveUtil.GetVariantSAV(saveInfos.Filepath)!;
+    // public static void CreateSession(uint saveId)
+    // {
+    //     var saveInfos = SaveInfosEntity.GetSaveInfosEntity(saveId)!;
+    //     var save = SaveUtil.GetVariantSAV(saveInfos.Filepath)!;
 
-        dataLoader = new DataMemoryLoader(save);
-    }
+    //     dataLoader = new DataMemoryLoader(save);
+    // }
 
-    public static List<BoxDTO> GetAllBoxes()
+    public static List<BoxDTO> GetMainBoxes()
     {
         var boxLoader = dataLoader.GetUpdatedData().boxLoader;
         var entities = boxLoader.GetAllEntities();
@@ -24,7 +24,7 @@ public class StorageService
         return list;
     }
 
-    public static List<PkmDTO> GetPkms()
+    public static List<PkmDTO> GetMainPkms()
     {
         var pkmLoader = dataLoader.GetUpdatedData().pkmLoader;
         var entities = pkmLoader.GetAllEntities();
@@ -35,15 +35,24 @@ public class StorageService
         return list;
     }
 
-    public static List<PkmVersionDTO> GetPkmVersions(uint pkmId)
+    public static List<PkmVersionDTO> GetMainPkmVersions(uint? pkmId)
     {
         var loaders = dataLoader.GetUpdatedData();
-        var entities = loaders.pkmVersionLoader.GetAllEntities().FindAll(pkmVersion => pkmVersion.PkmId == pkmId);
+        var entities = loaders.pkmVersionLoader.GetAllEntities();
+
+        if (pkmId != null)
+        {
+            entities = entities.FindAll(pkmVersion => pkmVersion.PkmId == pkmId);
+        }
 
         var list = new List<PkmVersionDTO>();
         entities.ForEach((entity) =>
         {
-            var pkm = loaders.storagePkmByPaths.Invoke(entity.Filepath);
+            var pkm = loaders.pkmFileLoader.GetEntity(entity);
+            if (pkm == default)
+            {
+                throw new Exception($"PKM is null, from entity Id={entity.Id} Filepath={entity.Filepath}");
+            }
             var dto = PkmVersionDTO.FromEntity(entity, pkm);
             list.Add(dto);
         });
@@ -51,24 +60,37 @@ public class StorageService
         return list;
     }
 
-    public static List<PkmSaveDTO> GetSavePkms()
+    public static List<BoxDTO> GetSaveBoxes(uint saveId)
     {
-        return dataLoader.GetUpdatedData().pkmSaveLoader.GetAllEntities();
+        dataLoader.LoadSave(saveId);
+        return dataLoader.GetUpdatedData().getSaveLoaders(saveId).Boxes.GetAllEntities();
     }
 
-    public static PkmDTO UpdatePkm(PkmDTO pkm)
+    public static List<PkmSaveDTO> GetSavePkms(uint saveId)
+    {
+        dataLoader.LoadSave(saveId);
+        return dataLoader.GetUpdatedData().getSaveLoaders(saveId).Pkms.GetAllEntities();
+    }
+
+    public static void MainMovePkm(long pkmId, uint boxId, uint boxSlot)
     {
         dataLoader.AddAction(
-            new PkmUpdateAction(PkmEntity.FromDTO(pkm))
+            new MainMovePkmAction(pkmId, boxId, boxSlot)
         );
-
-        return pkm;
     }
 
-    public static void MovePkmFromSaveToStorage(long savePkmId, uint storageBoxId, uint storageSlot)
+    public static void SaveMovePkm(uint saveId, long pkmId, int boxId, int boxSlot)
     {
         dataLoader.AddAction(
-            new MovePkmSaveToStorageAction(
+            new SaveMovePkmAction(saveId, pkmId, boxId, boxSlot)
+        );
+    }
+
+    public static void SaveMovePkmToStorage(uint saveId, long savePkmId, uint storageBoxId, uint storageSlot)
+    {
+        dataLoader.AddAction(
+            new SaveMovePkmToStorageAction(
+                saveId,
                 savePkmId,
                 storageBoxId,
                 storageSlot
@@ -76,10 +98,11 @@ public class StorageService
         );
     }
 
-    public static void MovePkmFromStorageToSave(long pkmVersionId, int saveBoxId, int saveSlot)
+    public static void SaveMovePkmFromStorage(uint saveId, long pkmVersionId, int saveBoxId, int saveSlot)
     {
         dataLoader.AddAction(
-            new MovePkmStorageToSaveAction(
+            new SaveMovePkmFromStorageAction(
+                saveId,
                 pkmVersionId,
                 saveBoxId,
                 saveSlot

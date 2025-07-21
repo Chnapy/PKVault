@@ -14,7 +14,7 @@ public class SaveInfosService
         {
             if (!record.ContainsKey(saveInfos.Id))
             {
-                record.Add(saveInfos.Id, new List<SaveInfosDTO>());
+                record.Add(saveInfos.Id, new());
             }
             record[saveInfos.Id].Add(saveInfos);
         });
@@ -42,22 +42,14 @@ public class SaveInfosService
 
         var save = SaveUtil.GetVariantSAV(fileBytes, formFilename)!;
 
-        var TID = save.DisplayTID;
-        var SID = save.DisplaySID;
-
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-        var SaveId = save.ID32;
+        var saveId = save.ID32;
 
-        var filename = $"{SaveId}_{timestamp}{save.Extension}";
+        var filename = $"{saveId}_{timestamp}{save.Extension}";
         var filepath = $"{filesDirectory}/{filename}";
 
-        var entity = new SaveInfosEntity
-        {
-            SaveId = SaveId,
-            Filepath = filepath,
-            Timestamp = timestamp,
-        };
+        var entity = SaveInfosEntity.FromSave(save, filepath, timestamp);
 
         var success = DexService.UpdateDexWithSave(save, entity);
         if (!success)

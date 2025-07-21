@@ -1,15 +1,15 @@
 
+using System.Text.Json;
 using PKHeX.Core;
 
-public class BoxDTO
+public class BoxDTO : IWithId, ICloneable<BoxDTO>
 {
     public static BoxDTO FromEntity(BoxEntity entity)
     {
         return new BoxDTO
         {
             Id = entity.Id,
-            Name = entity.Name,
-            Order = entity.Order
+            Name = entity.Name
         };
     }
 
@@ -17,5 +17,10 @@ public class BoxDTO
 
     public string Name { get; set; }
 
-    public uint Order { get; set; }
+    public BoxDTO Clone()
+    {
+        return JsonSerializer.Deserialize<BoxDTO>(
+            JsonSerializer.Serialize(this)
+        )!;
+    }
 }

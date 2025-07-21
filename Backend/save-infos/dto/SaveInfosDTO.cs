@@ -15,8 +15,14 @@ public class SaveInfosDTO
             Generation = save.Generation,
             TID = save.DisplayTID,
             SID = save.DisplaySID,
+            Language = save.Language,
+            PlayTime = save.PlayTimeString,
             TrainerGender = save.Gender,
             TrainerName = save.OT,
+            BoxCount = save.BoxCount,
+            BoxSlotCount = save.BoxSlotCount,
+            MaxSpeciesId = save.MaxSpeciesID,
+            MaxIV = save.MaxIV,
         };
     }
 
@@ -32,7 +38,19 @@ public class SaveInfosDTO
 
     public uint SID { get; set; }
 
+    public int Language { get; set; }
+
+    public string PlayTime { get; set; }
+
     public byte TrainerGender { get; set; }
 
     public string TrainerName { get; set; }
+
+    public int BoxCount { get; set; }
+
+    public int BoxSlotCount { get; set; }
+
+    public int MaxSpeciesId { get; set; }
+
+    public int MaxIV { get; set; }
 }

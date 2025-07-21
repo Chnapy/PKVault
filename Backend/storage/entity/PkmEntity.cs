@@ -8,8 +8,10 @@ public class PkmEntity : IWithId, ICloneable<PkmEntity>
         return new PkmEntity
         {
             Id = dto.Id,
+            Species = dto.Species,
+            IsShiny = dto.IsShiny,
             BoxId = dto.BoxId,
-            BoxIndex = dto.BoxIndex,
+            BoxSlot = dto.BoxSlot,
             SaveId = dto.SaveId
         };
     }
@@ -79,9 +81,13 @@ public class PkmEntity : IWithId, ICloneable<PkmEntity>
 
     public long Id { get; set; }
 
+    public ushort Species { get; set; }
+
+    public bool IsShiny { get; set; }
+
     public uint BoxId { get; set; }
 
-    public uint BoxIndex { get; set; }
+    public uint BoxSlot { get; set; }
 
     public uint? SaveId { get; set; }
 
