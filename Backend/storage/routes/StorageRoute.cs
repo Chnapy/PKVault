@@ -58,10 +58,22 @@ public class StorageController : ControllerBase
         return savePkms;
     }
 
+    [HttpPost("save")]
+    public void Save()
+    {
+        StorageService.Save();
+    }
+
     [HttpPut("main/move-pkm")]
     public void MainMovePkm(long pkmId, uint boxId, uint boxSlot)
     {
         StorageService.MainMovePkm(pkmId, boxId, boxSlot);
+    }
+
+    [HttpPost("main/create-pkm-version")]
+    public void MainCreatePkmVersion(long pkmId, uint generation)
+    {
+        StorageService.MainCreatePkmVersion(pkmId, generation);
     }
 
     [HttpPut("save/{saveId}/move-pkm")]

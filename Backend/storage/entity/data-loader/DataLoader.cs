@@ -2,22 +2,18 @@ using PKHeX.Core;
 
 public abstract class DataLoader
 {
-    // public List<BoxEntity> boxEntities;
-    // public EntityLoader<PkmEntity> pkmLoader;
-    // public EntityLoader<PkmVersionEntity> pkmVersionLoader;
-    // public EntityLoader<PkmSaveDTO> savePkmLoader;
-    // protected SaveFile? save;
+    public DataEntityLoaders loaders;
 
     protected Dictionary<uint, SaveFile> saveDict = new();
 
-    protected List<object> actions = new();
+    public DataLoader()
+    {
+        loaders = CreateLoaders();
+    }
 
-    // public DataLoader(SaveFile? _save)
-    // {
-    //     save = _save;
-    // }
+    protected abstract DataEntityLoaders CreateLoaders();
 
-    public SaveFile LoadSave(uint saveId)
+    protected SaveFile LoadSave(uint saveId)
     {
         if (saveDict.TryGetValue(saveId, out var save))
         {
@@ -38,35 +34,70 @@ public abstract class DataLoader
         return save;
     }
 
-    public void AddAction(object action)
+    public void ApplyAction(object action)
     {
-        actions.Add(action);
-
-        try
+        if (action is IWithSaveId actionWithSaveId)
         {
-            GetUpdatedData();
+            LoadSave(actionWithSaveId.saveId);
         }
-        catch
+
+        if (action is MainMovePkmAction mainMovePkmAction)
         {
-            actions.Remove(action);
-            throw;
+            mainMovePkmAction.Execute(loaders.pkmLoader);
+        }
+        else if (action is SaveMovePkmAction saveMovePkmAction)
+        {
+            var saveLoader = loaders.getSaveLoaders(saveMovePkmAction.saveId);
+
+            saveMovePkmAction.Execute(saveLoader);
+        }
+        else if (action is SaveMovePkmToStorageAction movePkmSaveStorAction)
+        {
+            var savePkmLoader = loaders.getSaveLoaders(movePkmSaveStorAction.saveId).Pkms;
+
+            movePkmSaveStorAction.Execute(
+                loaders.pkmLoader,
+                loaders.pkmVersionLoader,
+                loaders.pkmFileLoader,
+                savePkmLoader
+            );
+        }
+        else if (action is SaveMovePkmFromStorageAction movePkmStorSaveAction)
+        {
+            var save = LoadSave(movePkmStorSaveAction.saveId);
+
+            var savePkmLoader = loaders.getSaveLoaders(movePkmStorSaveAction.saveId).Pkms;
+
+            movePkmStorSaveAction.Execute(
+                save,
+                loaders.pkmLoader,
+                loaders.pkmVersionLoader,
+                loaders.pkmFileLoader,
+                savePkmLoader
+            );
+        }
+        else if (action is MainCreatePkmVersionAction mainCreatePkmVersionAction)
+        {
+            mainCreatePkmVersionAction.Execute(
+                loaders.pkmLoader,
+                loaders.pkmVersionLoader,
+                loaders.pkmFileLoader
+            );
         }
     }
-
-    public abstract UpdatedData GetUpdatedData();
 }
 
-public struct UpdatedData
+public struct DataEntityLoaders
 {
     public EntityLoader<BoxEntity> boxLoader { get; set; }
     public EntityLoader<PkmEntity> pkmLoader { get; set; }
     public EntityLoader<PkmVersionEntity> pkmVersionLoader { get; set; }
-    public PKMMemoryLoader pkmFileLoader;
+    public PKMLoader pkmFileLoader;
     public Func<uint, SaveLoaders> getSaveLoaders { get; set; }
 }
 
 public struct SaveLoaders
 {
-    public EntityMemoryLoader<BoxDTO> Boxes { get; set; }
-    public EntityMemoryLoader<PkmSaveDTO> Pkms { get; set; }
+    public EntityLoader<BoxDTO> Boxes { get; set; }
+    public EntityLoader<PkmSaveDTO> Pkms { get; set; }
 };

@@ -19,6 +19,7 @@ public abstract class BasePkmVersionDTO : IWithId
         dto.Generation = pkm.Generation;
         dto.PID = pkm.PID;
         // dto.Species = pkm.Species;
+        dto.Nickname = pkm.IsNicknamed ? pkm.Nickname : "";
         dto.IsEgg = pkm.IsEgg;
         // dto.IsShiny = pkm.IsShiny;
         dto.Level = pkm.CurrentLevel;
@@ -41,6 +42,8 @@ public abstract class BasePkmVersionDTO : IWithId
     public uint Generation { get; set; }
 
     public uint PID { get; set; }
+
+    public string Nickname { get; set; }
 
     // public ushort Species { get; set; }
 

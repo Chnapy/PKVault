@@ -18,10 +18,8 @@ public class SaveMovePkmToStorageAction : IWithSaveId
         storageSlot = _storageSlot;
     }
 
-    public void Execute(EntityLoader<PkmEntity> pkmLoader, EntityLoader<PkmVersionEntity> pkmVersionLoader, PKMMemoryLoader pkmFileLoader, EntityLoader<PkmSaveDTO> savePkmLoader)
+    public void Execute(EntityLoader<PkmEntity> pkmLoader, EntityLoader<PkmVersionEntity> pkmVersionLoader, PKMLoader pkmFileLoader, EntityLoader<PkmSaveDTO> savePkmLoader)
     {
-
-
         var savePkm = savePkmLoader.GetEntity(savePkmId);
 
         if (savePkm == default)

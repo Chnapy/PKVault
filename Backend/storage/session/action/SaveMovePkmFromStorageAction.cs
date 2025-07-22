@@ -22,7 +22,7 @@ public class SaveMovePkmFromStorageAction : IWithSaveId
         SaveFile save,
         EntityLoader<PkmEntity> pkmLoader,
         EntityLoader<PkmVersionEntity> pkmVersionLoader,
-        PKMMemoryLoader pkmFileLoader,
+        PKMLoader pkmFileLoader,
         EntityLoader<PkmSaveDTO> savePkmLoader
         )
     {
@@ -31,6 +31,11 @@ public class SaveMovePkmFromStorageAction : IWithSaveId
         if (pkmVersionEntity == default)
         {
             throw new Exception($"PkmVersionEntity not found for id={pkmVersionId}");
+        }
+
+        if (pkmVersionEntity.Generation != save.Generation)
+        {
+            throw new Exception($"PkmVersionEntity Generation not compatible with save for id={pkmVersionId}, generation={pkmVersionEntity.Generation}, save.generation={save.Generation}");
         }
 
         // get save-pkm
@@ -52,7 +57,11 @@ public class SaveMovePkmFromStorageAction : IWithSaveId
             throw new Exception($"PkmEntity already in save, id={pkmEntity.Id}, saveId={pkmEntity.SaveId}");
         }
 
-        var pkm = pkmFileLoader.GetEntity(pkmVersionEntity)!;
+        var pkm = pkmFileLoader.GetEntity(pkmVersionEntity);
+        if (pkm == default)
+        {
+            throw new Exception($"PKM not defined, pkm-version={pkmVersionEntity.Id}");
+        }
 
         var pkmSaveDTO = PkmSaveDTO.FromPkm(save, pkm, saveBoxId, saveSlot);
 

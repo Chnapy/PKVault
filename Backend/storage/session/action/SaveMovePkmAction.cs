@@ -31,6 +31,8 @@ public class SaveMovePkmAction : IWithSaveId
             throw new Exception($"Save Pkm already present in slot, boxId={boxId}, boxSlot={boxSlot}");
         }
 
+        saveLoaders.Pkms.DeleteEntity(dto.Id);
+
         dto.Box = boxId;
         dto.BoxSlot = boxSlot;
 

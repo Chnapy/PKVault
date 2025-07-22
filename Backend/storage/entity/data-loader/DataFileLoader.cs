@@ -2,81 +2,44 @@ using PKHeX.Core;
 
 public class DataFileLoader : DataLoader
 {
-    public DataFileLoader()
-    {
-        // boxLoader = new EntityJSONLoader<BoxEntity>("db/box.json");
-        // pkmLoader = new EntityJSONLoader<PkmEntity>("db/pkm.json");
-        // pkmVersionLoader = new EntityJSONLoader<PkmVersionEntity>("db/pkm-version.json");
-
-        // var savePkmList = new List<PkmSaveDTO>();
-
-        // if (save != default)
-        // {
-        //     for (var i = 0; i < save.BoxCount; i++)
-        //     {
-        //         var pkms = save.GetBoxData(i).ToList();
-        //         var j = 0;
-        //         pkms.ForEach(pkm =>
-        //         {
-        //             if (pkm.Species != 0)
-        //             {
-        //                 var dto = PkmSaveDTO.FromPkm(save, pkm, i, j);
-        //                 savePkmList.Add(dto);
-        //             }
-        //             j++;
-        //         });
-        //     }
-        // }
-
-        // savePkmLoader = new EntityMemoryLoader<PkmSaveDTO>(
-        //     savePkmList
-        // );
-    }
-
-    public override UpdatedData GetUpdatedData()
+    protected override DataEntityLoaders CreateLoaders()
     {
         var boxLoader = new EntityJSONLoader<BoxEntity>("db/box.json");
         var pkmLoader = new EntityJSONLoader<PkmEntity>("db/pkm.json");
         var pkmVersionLoader = new EntityJSONLoader<PkmVersionEntity>("db/pkm-version.json");
 
-        var savePkmList = new List<PkmSaveDTO>();
-
-        // if (save != default)
-        // {
-        //     for (var i = 0; i < save.BoxCount; i++)
-        //     {
-        //         var pkms = save.GetBoxData(i).ToList();
-        //         var j = 0;
-        //         pkms.ForEach(pkm =>
-        //         {
-        //             if (pkm.Species != 0)
-        //             {
-        //                 var dto = PkmSaveDTO.FromPkm(save, pkm, i, j);
-        //                 savePkmList.Add(dto);
-        //             }
-        //             j++;
-        //         });
-        //     }
-        // }
-
         var getSaveLoaders = (uint saveId) =>
         {
+            var save = LoadSave(saveId);
 
             return new SaveLoaders
             {
-                Boxes = new EntityMemoryLoader<BoxDTO>(new()),
-                Pkms = new EntityMemoryLoader<PkmSaveDTO>(savePkmList)
+                Boxes = new SaveBoxLoader(save),
+                Pkms = new SavePkmLoader(save)
             };
         };
 
-
-        return new UpdatedData
+        return new DataEntityLoaders
         {
             boxLoader = boxLoader,
             pkmLoader = pkmLoader,
             pkmVersionLoader = pkmVersionLoader,
-            pkmFileLoader = new PKMMemoryLoader(),
+            pkmFileLoader = new PKMFileLoader(),
             getSaveLoaders = getSaveLoaders,
         };
+    }
+
+    public void WriteSaves()
+    {
+        saveDict.Values.ToList()
+        .ForEach(save =>
+        {
+            var saveInfos = SaveInfosEntity.GetSaveInfosEntity(save.ID32)!;
+
+            Console.WriteLine($"BOX 2 AFTER box.16={save.GetBoxData(1)[16].Species}");
+
+            File.WriteAllBytes(saveInfos.Filepath, save.Write());
+            Console.WriteLine($"Writed {save.ID32} to {saveInfos.Filepath}");
+        });
     }
 }

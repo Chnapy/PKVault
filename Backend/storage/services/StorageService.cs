@@ -1,21 +1,12 @@
-using System.Text;
 using PKHeX.Core;
 
 public class StorageService
 {
-    private static DataLoader dataLoader = new DataMemoryLoader();
-
-    // public static void CreateSession(uint saveId)
-    // {
-    //     var saveInfos = SaveInfosEntity.GetSaveInfosEntity(saveId)!;
-    //     var save = SaveUtil.GetVariantSAV(saveInfos.Filepath)!;
-
-    //     dataLoader = new DataMemoryLoader(save);
-    // }
+    private static DataMemoryLoader memoryLoader = new();
 
     public static List<BoxDTO> GetMainBoxes()
     {
-        var boxLoader = dataLoader.GetUpdatedData().boxLoader;
+        var boxLoader = memoryLoader.loaders.boxLoader;
         var entities = boxLoader.GetAllEntities();
 
         var list = new List<BoxDTO>();
@@ -26,7 +17,7 @@ public class StorageService
 
     public static List<PkmDTO> GetMainPkms()
     {
-        var pkmLoader = dataLoader.GetUpdatedData().pkmLoader;
+        var pkmLoader = memoryLoader.loaders.pkmLoader;
         var entities = pkmLoader.GetAllEntities();
 
         var list = new List<PkmDTO>();
@@ -37,7 +28,7 @@ public class StorageService
 
     public static List<PkmVersionDTO> GetMainPkmVersions(uint? pkmId)
     {
-        var loaders = dataLoader.GetUpdatedData();
+        var loaders = memoryLoader.loaders;
         var entities = loaders.pkmVersionLoader.GetAllEntities();
 
         if (pkmId != null)
@@ -62,33 +53,38 @@ public class StorageService
 
     public static List<BoxDTO> GetSaveBoxes(uint saveId)
     {
-        dataLoader.LoadSave(saveId);
-        return dataLoader.GetUpdatedData().getSaveLoaders(saveId).Boxes.GetAllEntities();
+        return memoryLoader.loaders.getSaveLoaders(saveId).Boxes.GetAllEntities();
     }
 
     public static List<PkmSaveDTO> GetSavePkms(uint saveId)
     {
-        dataLoader.LoadSave(saveId);
-        return dataLoader.GetUpdatedData().getSaveLoaders(saveId).Pkms.GetAllEntities();
+        return memoryLoader.loaders.getSaveLoaders(saveId).Pkms.GetAllEntities();
     }
 
     public static void MainMovePkm(long pkmId, uint boxId, uint boxSlot)
     {
-        dataLoader.AddAction(
+        memoryLoader.AddAction(
             new MainMovePkmAction(pkmId, boxId, boxSlot)
+        );
+    }
+
+    public static void MainCreatePkmVersion(long pkmId, uint generation)
+    {
+        memoryLoader.AddAction(
+            new MainCreatePkmVersionAction(pkmId, generation)
         );
     }
 
     public static void SaveMovePkm(uint saveId, long pkmId, int boxId, int boxSlot)
     {
-        dataLoader.AddAction(
+        memoryLoader.AddAction(
             new SaveMovePkmAction(saveId, pkmId, boxId, boxSlot)
         );
     }
 
     public static void SaveMovePkmToStorage(uint saveId, long savePkmId, uint storageBoxId, uint storageSlot)
     {
-        dataLoader.AddAction(
+        memoryLoader.AddAction(
             new SaveMovePkmToStorageAction(
                 saveId,
                 savePkmId,
@@ -100,7 +96,7 @@ public class StorageService
 
     public static void SaveMovePkmFromStorage(uint saveId, long pkmVersionId, int saveBoxId, int saveSlot)
     {
-        dataLoader.AddAction(
+        memoryLoader.AddAction(
             new SaveMovePkmFromStorageAction(
                 saveId,
                 pkmVersionId,
@@ -110,102 +106,22 @@ public class StorageService
         );
     }
 
-    public static void Test()
+    public static void Save()
     {
-        // DexService.ClearDex();
-
-        Console.WriteLine("TEST");
-
-        var lastSavesInfos = SaveInfosEntity.GetLastSaveInfosEntity();
-        // lastSavesInfos.ForEach(entity =>
-        // {
-
-        //     var save = SaveUtil.GetVariantSAV(entity.Filepath)!;
-        //     DexService.UpdateDexWithSave(save, entity);
-
-
-        // });
-
-        var saveInfos = lastSavesInfos[5];
-        var save = SaveUtil.GetVariantSAV(saveInfos.Filepath)!;
-
-        Console.WriteLine($"SAVE GEN {save.Generation} VERSION {save.Version}");
-
-        var pkms = save.GetAllPKM();
-
-        var pkm = pkms.Find(pk => pk.Species < 150)!;
-        pkm.RefreshChecksum();
-        var binaries = pkm.DecryptedBoxData;
-        var filename = $"pkm/{pkm.Generation}/{pkm.FileName}";
-
-        Console.WriteLine($"{pkm.Generation} - {pkm.Species} - {GameInfo.Strings.Species[pkm.Species]} - valid:{pkm.Valid}");
-
-        // ReportPKM(pkm);
-
-        // File.WriteAllBytes("foo.txt", binaries, Encoding.UTF8);
-        // var bytes = File.ReadAllBytes("foo.txt");
-        // var pkmTest = save.GetDecryptedPKM(bytes);
-        // Console.WriteLine($"TEST decrypt: {pkmTest.Generation} - {pkmTest.Species} - {GameInfo.Strings.Species[pkmTest.Species]} - valid:{pkmTest.Valid}");
-
-        var pkm2tmp = new PK1();
-        // save.GetDecryptedPKM()
-        EntityConverter.AllowIncompatibleConversion = EntityCompatibilitySetting.AllowIncompatibleSane;
-        var converted = EntityConverter.TryMakePKMCompatible(
-            pkm,
-            pkm2tmp,
-            out var result,
-            out var pkm2
-        );
-
-        // ReportPKM(pkm2);
-
-        // pkm2.RefreshChecksum();
-        // var binaries2 = pkm2.DecryptedPartyData;
-        // var filename2 = $"pkm/{pkm2.Generation}/{pkm2.FileName}";
-
-        // Console.WriteLine($"convert:{converted} - result:{result}");
-        // Console.WriteLine($"{pkm2.Generation} - {pkm2.Species} - {GameInfo.Strings.Species[pkm2.Species]} - valid:{pkm2.Valid}");
-
-        // File.WriteAllBytes(filename, binaries);
-        // File.WriteAllBytes(filename2, binaries2);
-
-    }
-
-    private static void ReportPKM(PKM pkm)
-    {
-
-        var la = new LegalityAnalysis(pkm);
-
-        Console.WriteLine();
-        Console.WriteLine($"ANALYZE PKM FROM GEN {pkm.Generation}");
-
-        if (pkm.Species == 0)
+        var actions = memoryLoader.actions;
+        if (actions.Count == 0)
         {
-            Console.WriteLine("Given PKM is fully broken");
-        }
-        else
-        {
-            pkm.RefreshChecksum();
-            var stats = pkm.GetStats(pkm.PersonalInfo);
-
-            Console.WriteLine($"{pkm.Species}-{GameInfo.Strings.Species[pkm.Species]}");
-            Console.WriteLine($"EGG: {pkm.IsEgg}");
-            Console.WriteLine($"LVL {pkm.CurrentLevel} - XP {pkm.EXP} - STATS: {stats[0]}/{stats[1]}/{stats[2]}/{stats[3]}/{stats[4]}/{stats[5]}");
-            Console.WriteLine($"IVs: {pkm.IV_HP}/{pkm.IV_ATK}/{pkm.IV_DEF}/{pkm.IV_SPA}/{pkm.IV_SPD}/{pkm.IV_SPE} - EVs: {pkm.EV_HP}/{pkm.EV_ATK}/{pkm.EV_DEF}/{pkm.EV_SPA}/{pkm.EV_SPD}/{pkm.EV_SPE}");
-            Console.WriteLine($"NATURE {pkm.Nature} - ABILITY {(pkm.Ability == -1 ? "NONE" : GameInfo.Strings.Ability[pkm.Ability])}");
-            Console.WriteLine($"MOVES: {GameInfo.Strings.Move[pkm.Move1]}/{GameInfo.Strings.Move[pkm.Move2]}/{GameInfo.Strings.Move[pkm.Move3]}/{GameInfo.Strings.Move[pkm.Move4]}");
-            Console.WriteLine($"ORIGIN {pkm.OriginalTrainerName} {pkm.MetDate} LVL{pkm.MetLevel} {GameInfo.Strings.GetLocationName(
-                pkm.WasEgg,
-                pkm.MetLocation,
-                pkm.Format,
-                pkm.Generation,
-                pkm.Version
-            )}");
-            Console.WriteLine($"LEGALITY: {la.Report(true)}");
-
+            return;
         }
 
-        Console.WriteLine($"ANALYZE FINISHED");
-        Console.WriteLine();
+        Console.WriteLine("SAVING IN PROGRESS");
+
+        var fileLoader = new DataFileLoader();
+
+        actions.ForEach(fileLoader.ApplyAction);
+
+        fileLoader.WriteSaves();
+
+        memoryLoader = new DataMemoryLoader();
     }
 }

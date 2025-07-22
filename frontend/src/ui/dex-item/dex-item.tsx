@@ -10,7 +10,7 @@ const styles = {
     backgroundColor: theme.bg.dark,
     color: theme.text.light,
     textShadow: "1px 1px 0px rgba(255,255,255,0.2)",
-    padding: 2,
+    // padding: 2,
     paddingTop: 0,
     borderRadius: 4,
     fontSize: 14,
@@ -40,9 +40,12 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
         onClick={onClick}
         selected={selected}
         noDropshadow={!onClick}
+        style={{
+          alignSelf: "flex-start",
+        }}
       >
         <div className={styles.content}>
-          <div
+          {/* <div
             style={{
               display: "flex",
               alignItems: "center",
@@ -63,7 +66,7 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
                 }}
               />
             )}
-          </div>
+          </div> */}
 
           <div
             style={{

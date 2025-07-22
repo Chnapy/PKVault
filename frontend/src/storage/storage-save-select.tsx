@@ -1,11 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
 import type React from "react";
 import { useSaveInfosGetAll } from "../data/sdk/save-infos/save-infos.gen";
 import { SaveItem } from "../saves/save-item/save-item";
-import { SaveUpload } from "../saves/save-upload/save-upload";
+import { Route } from "../routes/storage";
 
-const Saves: React.FC = () => {
+export const StorageSaveSelect: React.FC = () => {
   const saveInfosQuery = useSaveInfosGetAll();
+
+  const navigate = Route.useNavigate();
 
   if (!saveInfosQuery.data) {
     return null;
@@ -19,21 +20,28 @@ const Saves: React.FC = () => {
     <div
       style={{
         display: "flex",
-        alignItems: "flex-start",
-        justifyContent: "center",
-        flexWrap: "wrap",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-start",
         gap: 8,
+        padding: 4,
+        height: 550,
+        overflowY: "auto",
       }}
     >
-      <SaveUpload />
-
       {saveInfos.map((saveList, i) => (
-        <SaveItem key={i} saveId={saveList[0].id} showDelete showOldSaves />
+        <SaveItem
+          key={i}
+          saveId={saveList[0].id}
+          onClick={() => {
+            navigate({
+              search: {
+                save: saveList[0].id,
+              },
+            });
+          }}
+        />
       ))}
     </div>
   );
 };
-
-export const Route = createFileRoute("/saves")({
-  component: Saves,
-});

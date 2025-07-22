@@ -10,7 +10,7 @@ public abstract class EntityLoader<D> where D : IWithId
         return GetAllEntities().Find(entity => entity.Id == id);
     }
 
-    public D? DeleteEntity(long id)
+    public virtual D? DeleteEntity(long id)
     {
         Console.WriteLine($"Delete entity id={id}");
 
@@ -28,7 +28,7 @@ public abstract class EntityLoader<D> where D : IWithId
         return removedEntity;
     }
 
-    public D WriteEntity(D entity)
+    public virtual D WriteEntity(D entity)
     {
         Console.WriteLine($"Write new entity {entity.GetType().Name} id={entity.Id}");
 

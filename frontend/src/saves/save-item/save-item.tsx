@@ -12,9 +12,17 @@ import { SaveCardContent } from "../../ui/save-card/save-card-content";
 
 export type SaveItemProps = {
   saveId: number;
+  onClick?: () => void;
+  showDelete?: boolean;
+  showOldSaves?: boolean;
 };
 
-export const SaveItem: React.FC<SaveItemProps> = ({ saveId }) => {
+export const SaveItem: React.FC<SaveItemProps> = ({
+  saveId,
+  onClick,
+  showDelete,
+  showOldSaves,
+}) => {
   const queryClient = useQueryClient();
   const saveInfosQuery = useSaveInfosGetAll();
   const saveInfosDeleteMutation = useSaveInfosDelete({
@@ -44,8 +52,10 @@ export const SaveItem: React.FC<SaveItemProps> = ({ saveId }) => {
 
   return (
     <Container
+      as={onClick ? "button" : "div"}
       padding="big"
       style={{ display: "flex", flexDirection: "column", gap: 4, width: 350 }}
+      onClick={onClick}
     >
       <SaveCardContent
         generation={firstItem.generation}
@@ -54,17 +64,20 @@ export const SaveItem: React.FC<SaveItemProps> = ({ saveId }) => {
         trainerGenderMale={firstItem.trainerGender === 0}
         tid={firstItem.tid}
         timestamp={firstItem.timestamp}
-        onDelete={() =>
-          saveInfosDeleteMutation.mutateAsync({
-            params: {
-              saveId: firstItem.id,
-              timestamp: firstItem.timestamp,
-            },
-          })
+        onDelete={
+          showDelete
+            ? () =>
+                saveInfosDeleteMutation.mutateAsync({
+                  params: {
+                    saveId: firstItem.id,
+                    timestamp: firstItem.timestamp,
+                  },
+                })
+            : undefined
         }
       />
 
-      {nextItems.length > 0 && (
+      {showOldSaves && nextItems.length > 0 && (
         <>
           <Button onClick={() => setShowOlders(!showOlders)}>
             {showOlders ? "Hide" : "Show"} older saves with same OT (

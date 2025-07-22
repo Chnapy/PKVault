@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { css, cx } from "@emotion/css";
-import type React from "react";
+import React from "react";
 import { switchUtil } from "../../util/switch-util";
 import { theme } from "../theme";
 
@@ -23,22 +23,28 @@ const root = (props: ContainerProps) =>
       ? undefined
       : `drop-shadow(${props.padding === "big" ? 2 : 1}px ${props.padding === "big" ? 2 : 1}px 0 rgba(0,0,0,.2))`,
     // transition: ".2s outline-width",
-    cursor:
-      (props.componentDescriptor ?? props.as) === "button" && !props.selected
-        ? "pointer"
-        : undefined,
-    "&:hover:not(:active)":
-      (props.componentDescriptor ?? props.as) === "button" && !props.selected
-        ? {
-            // outline: `2px dashed ${theme.border.contrast}`,
-            outlineWidth: 1,
-          }
-        : undefined,
+    "&:not(:disabled)": {
+      cursor:
+        (props.componentDescriptor ?? props.as) === "button" && !props.selected
+          ? "pointer"
+          : undefined,
+      "&:hover:not(:active)":
+        (props.componentDescriptor ?? props.as) === "button" && !props.selected
+          ? {
+              // outline: `2px dashed ${theme.border.contrast}`,
+              outlineWidth: 1,
+            }
+          : undefined,
+    },
     outline: `0 solid ${theme.border.contrast}`,
     outlineWidth: props.selected ? 2 : undefined,
+    "&:disabled": {
+      opacity: 0.5,
+    },
   });
 
 export type ContainerOwnProps = {
+  ref?: React.Ref<never>;
   componentDescriptor?: React.HTMLElementType;
   className?: string;
   padding?: "small" | "default" | "big";

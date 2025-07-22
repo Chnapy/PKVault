@@ -18,7 +18,7 @@ export type SaveCardContentProps = {
   // sid: number;
   trainerName: string;
   trainerGenderMale: boolean;
-  onDelete: () => Promise<unknown>;
+  onDelete?: () => Promise<unknown>;
 };
 
 export const SaveCardContent: React.FC<SaveCardContentProps> = ({
@@ -99,20 +99,22 @@ export const SaveCardContent: React.FC<SaveCardContentProps> = ({
           {Date.now() - timestamp < 3_600_000 && (
             <span style={{ color: theme.text.contrast }}>NEW !</span>
           )}
-          <span style={{ position: "absolute", right: 0, bottom: 0 }}>
-            <Popover className="relative">
-              {/* <Button>X</Button> */}
-              <Button as={PopoverButton} componentDescriptor="button">
-                X
-              </Button>
-              <PopoverPanel
-                anchor="bottom"
-                className={css({ overflow: "unset !important" })}
-              >
-                <Button onClick={onDelete}>Confirm ?</Button>
-              </PopoverPanel>
-            </Popover>
-          </span>
+          {onDelete && (
+            <span style={{ position: "absolute", right: 0, bottom: 0 }}>
+              <Popover className="relative">
+                {/* <Button>X</Button> */}
+                <Button as={PopoverButton} componentDescriptor="button">
+                  X
+                </Button>
+                <PopoverPanel
+                  anchor="bottom"
+                  className={css({ overflow: "unset !important" })}
+                >
+                  <Button onClick={onDelete}>Confirm ?</Button>
+                </PopoverPanel>
+              </Popover>
+            </span>
+          )}
           {/* N°{getSpeciesNO(species)} - {speciesNameTranslated} */}
         </TextContainer>
       </div>
