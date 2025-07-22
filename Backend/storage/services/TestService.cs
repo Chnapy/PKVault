@@ -34,7 +34,7 @@ public class TestService
 
         // Write & read G4-PK4 to file
         var binariesG4 = pkmG4.Data;
-        var filenameG4 = $"pkm/{pkmG4.Generation}/{pkmG4.FileName}";
+        var filenameG4 = $"files/pkm/{pkmG4.Generation}/{pkmG4.FileName}";
         File.WriteAllBytes(filenameG4, binariesG4);
         var checkFileBytesG4 = File.ReadAllBytes(filenameG4);
         var pkmG4FromFile = new PK4(checkFileBytesG4);
@@ -52,7 +52,7 @@ public class TestService
 
         // Write & read G1-PK1 to file
         var binariesG1 = pkmG1.Data;
-        var filenameG1 = $"pkm/{pkmG1.Generation}/{pkmG1.FileName}";
+        var filenameG1 = $"files/pkm/{pkmG1.Generation}/{pkmG1.FileName}";
         File.WriteAllBytes(filenameG1, binariesG1);
         var checkFileBytesG1 = File.ReadAllBytes(filenameG1);
         var pkmG1FromFile = new PK1(checkFileBytesG1);
@@ -62,7 +62,7 @@ public class TestService
 
         // pkm2.RefreshChecksum();
         // var binaries2 = pkm2.DecryptedPartyData;
-        // var filename2 = $"pkm/{pkm2.Generation}/{pkm2.FileName}";
+        // var filename2 = $"files/pkm/{pkm2.Generation}/{pkm2.FileName}";
 
         // Console.WriteLine($"convert:{converted} - result:{result}");
         // Console.WriteLine($"{pkm2.Generation} - {pkm2.Species} - {GameInfo.Strings.Species[pkm2.Species]} - valid:{pkm2.Valid}");

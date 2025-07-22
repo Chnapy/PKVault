@@ -1,6 +1,6 @@
 using PKHeX.Core;
 
-public class SaveMovePkmAction : IWithSaveId
+public class SaveMovePkmAction : DataAction
 {
     public uint saveId { get; }
     private readonly long id;
@@ -15,8 +15,10 @@ public class SaveMovePkmAction : IWithSaveId
         boxSlot = _boxSlot;
     }
 
-    public void Execute(SaveLoaders saveLoaders)
+    public override void Execute(DataEntityLoaders loaders)
     {
+        var saveLoaders = loaders.getSaveLoaders(saveId);
+
         var dto = saveLoaders.Pkms.GetEntity(id);
         if (dto == default)
         {

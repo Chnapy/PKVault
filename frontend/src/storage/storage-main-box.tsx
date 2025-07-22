@@ -1,5 +1,5 @@
 import React from "react";
-import type { PkmDTO } from "../data/sdk/model";
+import type { PkmDTO, SaveInfosDTO } from "../data/sdk/model";
 import {
   useStorageGetMainBoxes,
   useStorageGetMainPkms,
@@ -11,11 +11,18 @@ import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageItem } from "../ui/storage-item/storage-item";
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
 import { Route } from "../routes/storage";
+import { useSaveInfosGetAll } from "../data/sdk/save-infos/save-infos.gen";
 
 export const StorageMainBox: React.FC = () => {
   const mainBoxId = Route.useSearch({ select: (search) => search.mainBoxId });
   const selected = Route.useSearch({ select: (search) => search.selected });
+  const saveId = Route.useSearch({ select: (search) => search.save });
   const navigate = Route.useNavigate();
+
+  const saveInfosRecord = useSaveInfosGetAll().data?.data ?? {};
+  const saveInfos = saveInfosRecord[saveId ?? -1]?.[0] as
+    | SaveInfosDTO
+    | undefined;
 
   const boxesQuery = useStorageGetMainBoxes();
   const pkmsQuery = useStorageGetMainPkms();
@@ -134,7 +141,13 @@ export const StorageMainBox: React.FC = () => {
             pkmId={pkm.id}
             species={pkm.species}
             warning={versions.some((value) => !value.isValid)}
-            disabled={Boolean(pkm.saveId)}
+            disabled={
+              Boolean(pkm.saveId) ||
+              !versions.some(
+                (version) =>
+                  !saveInfos || version.generation === saveInfos?.generation
+              )
+            }
             boxSlot={i}
             selected={selected?.type === "main" && selected.id === pkm.id}
             onClick={() =>

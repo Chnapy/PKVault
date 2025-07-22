@@ -11,6 +11,6 @@ public abstract class PKMLoader
 
     public string GetPKMFilepath(PKM pkm)
     {
-        return $"pkm/{pkm.Generation}/{pkm.FileName}";
+        return $"files/pkm/{pkm.Generation}/{pkm.FileName}";
     }
 }

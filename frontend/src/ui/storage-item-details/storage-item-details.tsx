@@ -116,43 +116,53 @@ export const StorageItemDetails: React.FC<StorageItemDetailsProps> = ({
 
         <div style={{ display: "flex", marginTop: 4 }}>
           <TextContainer>
-            <div>
-              <Button>Delete version</Button>
-            </div>
-            <div>
-              Generation: {generation}
-              <br />
-              From game: Pokemon {version &&
-                getGameInfos(version).text} (save {saveId})
-              <br />
-              <br />
-              Is egg: {isEgg ? "true" : "false"}
-              <br />
-              <br />
-              Origin: {originStr} <Button>Edit</Button>
-              <br />
-              Nickname: {nickname} <Button>Edit</Button>
-              <br />
-              Stats: {stats.join("/")}
-              <br />
-              EVs: {evs.join("/")}
-              <br />
-              IVs: {ivs.join("/")}
-              <br />
-              <br />
-              Nature: {nature}
-              <br />
-              Ability: {ability}
-              <br />
-              <br />
-              LVL {level} - EXP {exp}
-              <br />
-              <br />
-              Moves: {moves.join("/")} <Button>Edit</Button>
-              <br />
-              Status: {isValid ? "true" : "false"}
-              <br />
-              Status message: {validityReport}
+            <div
+              style={{
+                height: 400,
+                overflowY: "auto",
+              }}
+            >
+              <div>
+                <Button>Delete version</Button>
+              </div>
+              <div>
+                Generation: {generation}
+                <br />
+                From game: Pokemon {version &&
+                  getGameInfos(version).text} (save {saveId})
+                <br />
+                <br />
+                Is egg: {isEgg ? "true" : "false"}
+                <br />
+                <br />
+                Origin: {originStr}{" "}
+                <Button style={{ display: "inline" }}>Edit</Button>
+                <br />
+                Nickname: {nickname}{" "}
+                <Button style={{ display: "inline" }}>Edit</Button>
+                <br />
+                Stats: {stats.join("/")}
+                <br />
+                EVs: {evs.join("/")}
+                <br />
+                IVs: {ivs.join("/")}
+                <br />
+                <br />
+                Nature: {nature}
+                <br />
+                Ability: {ability}
+                <br />
+                <br />
+                LVL {level} - EXP {exp}
+                <br />
+                <br />
+                Moves: {moves.join("/")}{" "}
+                <Button style={{ display: "inline" }}>Edit</Button>
+                <br />
+                Status: {isValid ? "true" : "false"}
+                <br />
+                Status message: {validityReport}
+              </div>
             </div>
           </TextContainer>
         </div>

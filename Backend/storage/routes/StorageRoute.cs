@@ -34,14 +34,6 @@ public class StorageController : ControllerBase
         return list;
     }
 
-    // [HttpGet("main/pkm/{pkmId}/pkm-version")]
-    // public ActionResult<List<PkmVersionDTO>> GetMainPkmVersions(uint pkmId)
-    // {
-    //     var list = StorageService.GetPkmVersions(pkmId);
-
-    //     return list;
-    // }
-
     [HttpGet("save/{saveId}/box")]
     public ActionResult<List<BoxDTO>> GetSaveBoxes(uint saveId)
     {

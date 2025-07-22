@@ -2,9 +2,9 @@ using PKHeX.Core;
 
 public class DataMemoryLoader : DataLoader
 {
-    public List<object> actions = new();
+    public List<DataAction> actions = new();
 
-    public void AddAction(object action)
+    public void AddAction(DataAction action)
     {
         actions.Add(action);
 
@@ -37,20 +37,19 @@ public class DataMemoryLoader : DataLoader
 
             return new SaveLoaders
             {
+                Save = save,
                 Boxes = new SaveBoxLoader(save),
                 Pkms = new SavePkmLoader(save)
             };
         };
 
         var pkmFileLoader = new PKMMemoryLoader();
+        var pkmRealFileLoader = new PKMFileLoader();
 
         pkmVersionEntities
         .ForEach(entity =>
         {
-            var bytes = File.ReadAllBytes(entity.Filepath);
-
-            // TODO EntityFormat.GetFromBytes not working, use mapping
-            var pkm = entity.Generation == 2 ? new PK2(bytes) : EntityFormat.GetFromBytes(bytes);
+            var pkm = pkmRealFileLoader.GetEntity(entity);
 
             if (pkm == default)
             {

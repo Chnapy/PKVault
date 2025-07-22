@@ -1,6 +1,6 @@
 using PKHeX.Core;
 
-public class MainMovePkmAction
+public class MainMovePkmAction : DataAction
 {
     private readonly long id;
     private readonly uint boxId;
@@ -13,15 +13,15 @@ public class MainMovePkmAction
         boxSlot = _boxSlot;
     }
 
-    public void Execute(EntityLoader<PkmEntity> pkmLoader)
+    public override void Execute(DataEntityLoaders loaders)
     {
-        var entity = pkmLoader.GetEntity(id);
+        var entity = loaders.pkmLoader.GetEntity(id);
         if (entity == default)
         {
             throw new Exception("Pkm not found");
         }
 
-        var entityAlreadyPresent = pkmLoader.GetAllEntities().Find(entity => entity.Id != id &&
+        var entityAlreadyPresent = loaders.pkmLoader.GetAllEntities().Find(entity => entity.Id != id &&
         entity.BoxId == boxId && entity.BoxSlot == boxSlot
         );
         if (entityAlreadyPresent != null)
@@ -32,6 +32,6 @@ public class MainMovePkmAction
         entity.BoxId = boxId;
         entity.BoxSlot = boxSlot;
 
-        pkmLoader.WriteEntity(entity);
+        loaders.pkmLoader.WriteEntity(entity);
     }
 }

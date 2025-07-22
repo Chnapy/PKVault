@@ -1,6 +1,6 @@
 using PKHeX.Core;
 
-public class SaveMovePkmToStorageAction : IWithSaveId
+public class SaveMovePkmToStorageAction : DataAction
 {
     public uint saveId { get; }
     readonly long savePkmId;
@@ -18,9 +18,11 @@ public class SaveMovePkmToStorageAction : IWithSaveId
         storageSlot = _storageSlot;
     }
 
-    public void Execute(EntityLoader<PkmEntity> pkmLoader, EntityLoader<PkmVersionEntity> pkmVersionLoader, PKMLoader pkmFileLoader, EntityLoader<PkmSaveDTO> savePkmLoader)
+    public override void Execute(DataEntityLoaders loaders)
     {
-        var savePkm = savePkmLoader.GetEntity(savePkmId);
+        var saveLoaders = loaders.getSaveLoaders(saveId);
+
+        var savePkm = saveLoaders.Pkms.GetEntity(savePkmId);
 
         if (savePkm == default)
         {
@@ -28,7 +30,7 @@ public class SaveMovePkmToStorageAction : IWithSaveId
         }
 
         // get pkm-version
-        var pkmVersionEntity = pkmVersionLoader.GetEntity(savePkm.Id);
+        var pkmVersionEntity = loaders.pkmVersionLoader.GetEntity(savePkm.Id);
         if (pkmVersionEntity == null)
         {
             // create pkm & pkm-version
@@ -46,23 +48,23 @@ public class SaveMovePkmToStorageAction : IWithSaveId
                 Id = savePkm.Id,
                 PkmId = pkmEntityToCreate.Id,
                 Generation = savePkm.Generation,
-                Filepath = pkmFileLoader.GetPKMFilepath(savePkm.Pkm),
+                Filepath = loaders.pkmFileLoader.GetPKMFilepath(savePkm.Pkm),
             };
 
-            pkmLoader.WriteEntity(pkmEntityToCreate);
-            pkmVersionLoader.WriteEntity(pkmVersionEntity);
-            pkmFileLoader.WriteEntity(savePkm.Pkm, null);
+            loaders.pkmLoader.WriteEntity(pkmEntityToCreate);
+            loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity);
+            loaders.pkmFileLoader.WriteEntity(savePkm.Pkm, null);
         }
 
-        var pkmEntity = pkmLoader.GetEntity(pkmVersionEntity.PkmId)!;
+        var pkmEntity = loaders.pkmLoader.GetEntity(pkmVersionEntity.PkmId)!;
 
         // pkmEntity.BoxId = storageBoxId;
         // pkmEntity.BoxSlot = storageSlot;
         pkmEntity.SaveId = default;
 
-        pkmLoader.WriteEntity(pkmEntity);
+        loaders.pkmLoader.WriteEntity(pkmEntity);
 
         // remove pkm from save
-        savePkmLoader.DeleteEntity(savePkm.Id);
+        saveLoaders.Pkms.DeleteEntity(savePkm.Id);
     }
 }

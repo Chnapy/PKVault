@@ -11,6 +11,7 @@ import {
   getStorageGetSavePkmsQueryKey,
   useStorageGetMainPkmVersions,
   useStorageMainMovePkm,
+  useStorageSave,
   useStorageSaveMovePkm,
   useStorageSaveMovePkmFromStorage,
   useStorageSaveMovePkmToStorage,
@@ -19,6 +20,7 @@ import { StorageMainBox } from "../storage/storage-main-box";
 import { StorageSaveBox } from "../storage/storage-save-box";
 import { StorageSaveSelect } from "../storage/storage-save-select";
 import { StorageDetails } from "../storage/storage-details";
+import { Button } from "../ui/button/button";
 
 export const Storage: React.FC = () => {
   const selected = Route.useSearch({ select: (search) => search.selected });
@@ -38,6 +40,24 @@ export const Storage: React.FC = () => {
         (pkmVersion) => pkmVersion.generation === saveInfos.generation
       )
     : [];
+
+  const saveMutation = useStorageSave({
+    mutation: {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: getStorageGetMainPkmsQueryKey(),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: getStorageGetMainPkmVersionsQueryKey(),
+        });
+        if (saveId) {
+          await queryClient.invalidateQueries({
+            queryKey: getStorageGetSavePkmsQueryKey(saveId),
+          });
+        }
+      },
+    },
+  });
 
   const mainMovePkmMutation = useStorageMainMovePkm({
     mutation: {
@@ -213,6 +233,18 @@ export const Storage: React.FC = () => {
 
         {saveId ? <StorageSaveBox saveId={saveId} /> : <StorageSaveSelect />}
       </DndContext>
+
+      <div
+        style={{
+          position: "fixed",
+          bottom: 24,
+          left: "25%",
+        }}
+      >
+        <Button onClick={() => saveMutation.mutateAsync()} padding="big">
+          Save all changes
+        </Button>
+      </div>
 
       {selected && (
         <div

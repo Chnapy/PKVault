@@ -7,8 +7,17 @@ public class PKMFileLoader : PKMLoader
     {
         var bytes = File.ReadAllBytes(pkmVersion.Filepath);
 
-        // TODO EntityFormat.GetFromBytes not working, use mapping
-        return pkmVersion.Generation == 2 ? new PK2(bytes) : EntityFormat.GetFromBytes(bytes);
+        PKM? pkm = pkmVersion.Generation switch
+        {
+            1 => new PK1(bytes),
+            2 => new PK2(bytes),
+            3 => new PK3(bytes),
+            4 => new PK4(bytes),
+            5 => new PK5(bytes),
+            _ => EntityFormat.GetFromBytes(bytes)
+        };
+
+        return pkm;
     }
 
     public override void DeleteEntity(PkmVersionEntity pkmVersion)

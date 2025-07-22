@@ -46,7 +46,10 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
     public override PkmSaveDTO? DeleteEntity(long id)
     {
         var entity = GetEntity(id);
-        save.SetBoxSlotAtIndex(save.BlankPKM, entity.Box, entity.BoxSlot);
+        if (entity != default)
+        {
+            save.SetBoxSlotAtIndex(save.BlankPKM, entity.Box, entity.BoxSlot);
+        }
         return entity;
     }
 

@@ -1,7 +1,7 @@
 
 using PKHeX.Core;
 
-public class MainCreatePkmVersionAction
+public class MainCreatePkmVersionAction : DataAction
 {
     private readonly long pkmId;
     private readonly uint generation;
@@ -12,19 +12,15 @@ public class MainCreatePkmVersionAction
         generation = _generation;
     }
 
-    public void Execute(
-        EntityLoader<PkmEntity> pkmLoader,
-        EntityLoader<PkmVersionEntity> pkmVersionLoader,
-        PKMLoader pkmFileLoader
-        )
+    public override void Execute(DataEntityLoaders loaders)
     {
-        var pkmEntity = pkmLoader.GetEntity(pkmId);
+        var pkmEntity = loaders.pkmLoader.GetEntity(pkmId);
         if (pkmEntity == default)
         {
             throw new Exception($"Pkm entity not found, id={pkmId}");
         }
 
-        var pkmVersions = pkmVersionLoader.GetAllEntities().FindAll(pkmVersion => pkmVersion.PkmId == pkmId);
+        var pkmVersions = loaders.pkmVersionLoader.GetAllEntities().FindAll(pkmVersion => pkmVersion.PkmId == pkmId);
 
         var pkmVersionEntity = pkmVersions.Find(pkmVersion => pkmVersion.Generation == generation);
         if (pkmVersionEntity != default)
@@ -38,7 +34,7 @@ public class MainCreatePkmVersionAction
             throw new Exception($"Pkm-version original not found, pkm.id={pkmId} generation={generation}");
         }
 
-        var pkmOrigin = pkmFileLoader.GetEntity(pkmVersionOrigin)!;
+        var pkmOrigin = loaders.pkmFileLoader.GetEntity(pkmVersionOrigin)!;
 
         PKM? target = generation switch
         {
@@ -75,7 +71,7 @@ public class MainCreatePkmVersionAction
         pkmConverted.OriginalTrainerName = pkmOrigin.OriginalTrainerName;
         pkmConverted.OriginalTrainerGender = pkmOrigin.OriginalTrainerGender;
 
-        var filepath = pkmFileLoader.WriteEntity(pkmConverted, null);
+        var filepath = loaders.pkmFileLoader.WriteEntity(pkmConverted, null);
 
         var pkmVersionCreated = new PkmVersionEntity
         {
@@ -85,6 +81,6 @@ public class MainCreatePkmVersionAction
             Filepath = filepath,
         };
 
-        pkmVersionLoader.WriteEntity(pkmVersionCreated);
+        loaders.pkmVersionLoader.WriteEntity(pkmVersionCreated);
     }
 }

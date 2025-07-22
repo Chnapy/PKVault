@@ -14,6 +14,7 @@ public class DataFileLoader : DataLoader
 
             return new SaveLoaders
             {
+                Save = save,
                 Boxes = new SaveBoxLoader(save),
                 Pkms = new SavePkmLoader(save)
             };

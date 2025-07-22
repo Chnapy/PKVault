@@ -38,7 +38,7 @@ public class SaveInfosService
 
     public static SaveInfosDTO UploadNewSave(byte[] fileBytes, string formFilename)
     {
-        var filesDirectory = "saves";
+        var filesDirectory = "files/saves";
 
         var save = SaveUtil.GetVariantSAV(fileBytes, formFilename)!;
 
