@@ -1,11 +1,11 @@
 
 using System.Text.Json;
 
-public class PkmVersionEntity : IWithId, ICloneable<PkmVersionEntity>
+public class PkmVersionEntity : IWithId<string>, ICloneable<PkmVersionEntity>
 {
     static readonly string filePath = "db/pkm-version.json";
 
-    public static List<PkmVersionEntity> GetAllEntities(uint? pkmId)
+    public static List<PkmVersionEntity> GetAllEntities(string? pkmId)
     {
         if (!File.Exists(filePath))
         {
@@ -32,12 +32,12 @@ public class PkmVersionEntity : IWithId, ICloneable<PkmVersionEntity>
         return list;
     }
 
-    public static PkmVersionEntity? GetEntity(uint id)
+    public static PkmVersionEntity? GetEntity(string id)
     {
         return GetAllEntities(null).Find(entity => entity.Id == id);
     }
 
-    public static PkmVersionEntity? DeleteEntity(uint id)
+    public static PkmVersionEntity? DeleteEntity(string id)
     {
         Console.WriteLine("Delete pkm-version entity " + id);
 
@@ -66,9 +66,9 @@ public class PkmVersionEntity : IWithId, ICloneable<PkmVersionEntity>
         File.WriteAllText(filePath, JsonSerializer.Serialize(list));
     }
 
-    public long Id { get; set; }
+    public string Id { get; set; }
 
-    public long PkmId { get; set; }
+    public string PkmId { get; set; }
 
     public uint Generation { get; set; }
 

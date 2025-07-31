@@ -1,7 +1,7 @@
 
 using PKHeX.Core;
 
-public abstract class BasePkmVersionDTO : IWithId
+public abstract class BasePkmVersionDTO : IWithId<string>
 {
     public static void FillDTO(BasePkmVersionDTO dto, PKM pkm)
     {
@@ -16,10 +16,9 @@ public abstract class BasePkmVersionDTO : IWithId
 
         var la = new LegalityAnalysis(pkm);
 
-        dto.Generation = pkm.Generation;
         dto.PID = pkm.PID;
         // dto.Species = pkm.Species;
-        dto.Nickname = pkm.IsNicknamed ? pkm.Nickname : "";
+        dto.Nickname = pkm.Nickname;
         dto.IsEgg = pkm.IsEgg;
         // dto.IsShiny = pkm.IsShiny;
         dto.Level = pkm.CurrentLevel;
@@ -37,7 +36,7 @@ public abstract class BasePkmVersionDTO : IWithId
         dto.ValidityReport = la.Report();
     }
 
-    public long Id { get; set; }
+    public string Id { get; set; }
 
     public uint Generation { get; set; }
 

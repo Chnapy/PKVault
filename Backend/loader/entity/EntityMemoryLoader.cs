@@ -1,5 +1,5 @@
 
-public class EntityMemoryLoader<D> : EntityLoader<D> where D : IWithId, ICloneable<D>
+public class EntityMemoryLoader<D> : EntityLoader<D> where D : IWithId<string>, ICloneable<D>
 {
     private List<D> entities;
 

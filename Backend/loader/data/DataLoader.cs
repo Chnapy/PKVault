@@ -29,7 +29,7 @@ public abstract class DataLoader
             throw new Exception("Save is null");
         }
 
-        saveDict.Add(saveId, save);
+        saveDict.TryAdd(saveId, save);
 
         return save;
     }

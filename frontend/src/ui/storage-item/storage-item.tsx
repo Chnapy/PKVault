@@ -5,7 +5,7 @@ import { useDraggable } from "@dnd-kit/core";
 
 export type StorageItemProps = {
   storageType: "main" | "save";
-  pkmId: number;
+  pkmId: string;
   species: number;
   selected?: boolean;
   onClick?: () => void;

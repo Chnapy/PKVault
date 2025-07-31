@@ -1,16 +1,16 @@
 
-public abstract class EntityLoader<D> where D : IWithId
+public abstract class EntityLoader<D> where D : IWithId<string>
 {
     public abstract List<D> GetAllEntities();
 
     public abstract void SetAllEntities(List<D> entities);
 
-    public D? GetEntity(long id)
+    public D? GetEntity(string id)
     {
         return GetAllEntities().Find(entity => entity.Id == id);
     }
 
-    public virtual D? DeleteEntity(long id)
+    public virtual D? DeleteEntity(string id)
     {
         Console.WriteLine($"Delete entity id={id}");
 

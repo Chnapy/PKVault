@@ -49,14 +49,18 @@ public class DataMemoryLoader : DataLoader
         pkmVersionEntities
         .ForEach(entity =>
         {
-            var pkm = pkmRealFileLoader.GetEntity(entity);
+            var pkmBytes = pkmRealFileLoader.GetEntity(entity);
 
-            if (pkm == default)
+            if (pkmBytes == default)
             {
                 throw new Exception($"PKM is null, Gen={entity.Generation} Filepath={entity.Filepath}");
             }
 
-            pkmFileLoader.WriteEntity(pkm, entity.Filepath);
+            var pkmEntity = pkmLoader.GetEntity(entity.PkmId);
+
+            var pkm = PKMLoader.CreatePKM(pkmBytes, entity, pkmEntity);
+
+            pkmFileLoader.WriteEntity(pkmBytes, pkm, entity.Generation, entity.Filepath);
         });
 
         return new DataEntityLoaders

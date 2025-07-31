@@ -2,11 +2,11 @@ using PKHeX.Core;
 
 public class MainMovePkmAction : DataAction
 {
-    private readonly long id;
+    private readonly string id;
     private readonly uint boxId;
     private readonly uint boxSlot;
 
-    public MainMovePkmAction(long _id, uint _boxId, uint _boxSlot)
+    public MainMovePkmAction(string _id, uint _boxId, uint _boxSlot)
     {
         id = _id;
         boxId = _boxId;

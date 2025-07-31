@@ -18,7 +18,7 @@ public class SaveBoxLoader : EntityLoader<BoxDTO>
         {
             boxes.Add(new BoxDTO
             {
-                Id = i,
+                Id = i.ToString(),
                 Name = boxesNames[i]
             });
         }
@@ -28,11 +28,11 @@ public class SaveBoxLoader : EntityLoader<BoxDTO>
 
     public override BoxDTO WriteEntity(BoxDTO entity)
     {
-        (save as IBoxDetailName)?.SetBoxName((int)entity.Id, entity.Name);
+        (save as IBoxDetailName)?.SetBoxName(entity.IdInt, entity.Name);
         return entity;
     }
 
-    public override BoxDTO? DeleteEntity(long id)
+    public override BoxDTO? DeleteEntity(string id)
     {
         throw new Exception($"Not implemented");
     }

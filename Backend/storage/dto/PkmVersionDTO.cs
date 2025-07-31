@@ -9,6 +9,7 @@ public class PkmVersionDTO : BasePkmVersionDTO
         {
             Id = entity.Id,
             PkmId = entity.PkmId,
+            Generation = entity.Generation,
         };
 
         FillDTO(dto, pkm);
@@ -16,5 +17,5 @@ public class PkmVersionDTO : BasePkmVersionDTO
         return dto;
     }
 
-    public long PkmId { get; set; }
+    public string PkmId { get; set; }
 }

@@ -36,7 +36,7 @@ export const StorageMainBox: React.FC = () => {
 
   const selectedBoxIndex =
     typeof mainBoxId === "number"
-      ? boxes.findIndex((box) => box.id === mainBoxId)
+      ? boxes.findIndex((box) => box.idInt === mainBoxId)
       : 0;
   const selectedBox = boxes[selectedBoxIndex];
 
@@ -53,7 +53,7 @@ export const StorageMainBox: React.FC = () => {
 
   const boxPkms = Object.fromEntries(
     pkms
-      .filter((pkm) => pkm.boxId === selectedBox.id)
+      .filter((pkm) => pkm.boxId === selectedBox.idInt)
       .map((pkm) => [pkm.boxSlot, pkm])
   );
 
@@ -69,7 +69,7 @@ export const StorageMainBox: React.FC = () => {
             onClick={() =>
               navigate({
                 search: {
-                  mainBoxId: previousBox.id,
+                  mainBoxId: previousBox.idInt,
                 },
               })
             }
@@ -106,7 +106,7 @@ export const StorageMainBox: React.FC = () => {
             onClick={() =>
               navigate({
                 search: {
-                  mainBoxId: nextBox.id,
+                  mainBoxId: nextBox.idInt,
                 },
               })
             }
@@ -123,7 +123,7 @@ export const StorageMainBox: React.FC = () => {
             <StorageItemPlaceholder
               key={i}
               storageType="main"
-              boxId={selectedBox.id}
+              boxId={selectedBox.idInt}
               boxSlot={i}
             />
           );

@@ -33,7 +33,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
 
   const selectedBoxIndex =
     typeof saveBoxId === "number"
-      ? saveBoxes.findIndex((box) => box.id === saveBoxId)
+      ? saveBoxes.findIndex((box) => box.idInt === saveBoxId)
       : 0;
   const selectedBox = saveBoxes[selectedBoxIndex];
 
@@ -46,7 +46,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
 
   const boxPkms = Object.fromEntries(
     savePkms
-      .filter((pkm) => pkm.box === selectedBox.id)
+      .filter((pkm) => pkm.box === selectedBox.idInt)
       .map((pkm) => [pkm.boxSlot, pkm])
   );
 
@@ -73,7 +73,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               onClick={() =>
                 navigate({
                   search: {
-                    saveBoxId: previousBox.id,
+                    saveBoxId: previousBox.idInt,
                   },
                 })
               }
@@ -86,7 +86,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               enabled={false}
               options={[
                 ...saveBoxes.map((box) => ({
-                  value: box.id + "",
+                  value: box.id,
                   label: box.name,
                 })),
                 {
@@ -94,7 +94,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
                   label: "Create new box",
                 },
               ]}
-              value={[selectedBox.id + ""]}
+              value={[selectedBox.id]}
               onChange={([value]) => {
                 navigate({
                   search: {
@@ -110,7 +110,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               onClick={() =>
                 navigate({
                   search: {
-                    saveBoxId: nextBox.id,
+                    saveBoxId: nextBox.idInt,
                   },
                 })
               }
@@ -127,7 +127,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               <StorageItemPlaceholder
                 key={i}
                 storageType="save"
-                boxId={selectedBox.id}
+                boxId={selectedBox.idInt}
                 boxSlot={i}
               />
             );

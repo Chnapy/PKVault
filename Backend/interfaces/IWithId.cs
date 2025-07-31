@@ -1,4 +1,4 @@
-public interface IWithId
+public interface IWithId<T>
 {
-    long Id { get; set; }
+    T Id { get; set; }
 }

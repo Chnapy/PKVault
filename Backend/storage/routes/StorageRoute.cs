@@ -57,31 +57,31 @@ public class StorageController : ControllerBase
     }
 
     [HttpPut("main/move-pkm")]
-    public void MainMovePkm(long pkmId, uint boxId, uint boxSlot)
+    public void MainMovePkm(string pkmId, uint boxId, uint boxSlot)
     {
         StorageService.MainMovePkm(pkmId, boxId, boxSlot);
     }
 
     [HttpPost("main/create-pkm-version")]
-    public void MainCreatePkmVersion(long pkmId, uint generation)
+    public void MainCreatePkmVersion(string pkmId, uint generation)
     {
         StorageService.MainCreatePkmVersion(pkmId, generation);
     }
 
     [HttpPut("save/{saveId}/move-pkm")]
-    public void SaveMovePkm(uint saveId, long pkmId, int boxId, int boxSlot)
+    public void SaveMovePkm(uint saveId, string pkmId, int boxId, int boxSlot)
     {
         StorageService.SaveMovePkm(saveId, pkmId, boxId, boxSlot);
     }
 
     [HttpPut("save/{saveId}/move-pkm-to-storage")]
-    public void SaveMovePkmToStorage(uint saveId, long savePkmId, uint storageBoxId, uint storageSlot)
+    public void SaveMovePkmToStorage(uint saveId, string savePkmId, uint storageBoxId, uint storageSlot)
     {
         StorageService.SaveMovePkmToStorage(saveId, savePkmId, storageBoxId, storageSlot);
     }
 
     [HttpPut("save/{saveId}/move-pkm-from-storage")]
-    public void SaveMovePkmFromStorage(uint saveId, long pkmVersionId, int saveBoxId, int saveSlot)
+    public void SaveMovePkmFromStorage(uint saveId, string pkmVersionId, int saveBoxId, int saveSlot)
     {
         StorageService.SaveMovePkmFromStorage(saveId, pkmVersionId, saveBoxId, saveSlot);
     }

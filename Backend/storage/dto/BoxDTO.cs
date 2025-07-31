@@ -2,7 +2,7 @@
 using System.Text.Json;
 using PKHeX.Core;
 
-public class BoxDTO : IWithId, ICloneable<BoxDTO>
+public class BoxDTO : IWithId<string>, ICloneable<BoxDTO>
 {
     public static BoxDTO FromEntity(BoxEntity entity)
     {
@@ -13,7 +13,12 @@ public class BoxDTO : IWithId, ICloneable<BoxDTO>
         };
     }
 
-    public long Id { get; set; }
+    public string Id { get; set; }
+
+    public int IdInt
+    {
+        get { return Int32.Parse(Id); }
+    }
 
     public string Name { get; set; }
 

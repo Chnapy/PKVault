@@ -3,13 +3,13 @@ using PKHeX.Core;
 public class SaveMovePkmFromStorageAction : DataAction
 {
     public uint saveId { get; }
-    readonly long pkmVersionId;
+    readonly string pkmVersionId;
     readonly int saveBoxId;
     readonly int saveSlot;
 
     public SaveMovePkmFromStorageAction(
         uint _saveId,
-        long _pkmVersionId, int _saveBoxId, int _saveSlot
+        string _pkmVersionId, int _saveBoxId, int _saveSlot
     )
     {
         saveId = _saveId;
@@ -53,7 +53,8 @@ public class SaveMovePkmFromStorageAction : DataAction
             throw new Exception($"PkmEntity already in save, id={pkmEntity.Id}, saveId={pkmEntity.SaveId}");
         }
 
-        var pkm = loaders.pkmFileLoader.GetEntity(pkmVersionEntity);
+        var pkmBytes = loaders.pkmFileLoader.GetEntity(pkmVersionEntity);
+        var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity, pkmEntity);
         if (pkm == default)
         {
             throw new Exception($"PKM not defined, pkm-version={pkmVersionEntity.Id}");

@@ -3,21 +3,11 @@ using PKHeX.Core;
 
 public class PKMFileLoader : PKMLoader
 {
-    public override PKM? GetEntity(PkmVersionEntity pkmVersion)
+    public override byte[]? GetEntity(PkmVersionEntity pkmVersion)
     {
         var bytes = File.ReadAllBytes(pkmVersion.Filepath);
 
-        PKM? pkm = pkmVersion.Generation switch
-        {
-            1 => new PK1(bytes),
-            2 => new PK2(bytes),
-            3 => new PK3(bytes),
-            4 => new PK4(bytes),
-            5 => new PK5(bytes),
-            _ => EntityFormat.GetFromBytes(bytes)
-        };
-
-        return pkm;
+        return bytes;
     }
 
     public override void DeleteEntity(PkmVersionEntity pkmVersion)
@@ -27,9 +17,9 @@ public class PKMFileLoader : PKMLoader
         File.Delete(pkmVersion.Filepath);
     }
 
-    public override string WriteEntity(PKM pkm, string? expectedFilepath)
+    public override string WriteEntity(byte[] bytes, PKM pkm, uint generation, string? expectedFilepath)
     {
-        var filepath = GetPKMFilepath(pkm);
+        var filepath = GetPKMFilepath(pkm, generation);
 
         if (expectedFilepath != null && expectedFilepath != filepath)
         {
@@ -39,9 +29,12 @@ public class PKMFileLoader : PKMLoader
 
         Console.WriteLine($"Write new PKM filepath={filepath}");
 
-        Console.WriteLine($"PKM id={pkm.ID32} / {PkmSaveDTO.GetPKMId(pkm)}");
+        Console.WriteLine($"PKM id={pkm.ID32} / {PkmSaveDTO.GetPKMId(pkm, generation)}");
 
-        File.WriteAllBytes(filepath, pkm.Data);
+        MainCreatePkmVersionAction.DebugOT(pkm);
+
+        Directory.CreateDirectory(Path.GetDirectoryName(filepath)!);
+        File.WriteAllBytes(filepath, bytes);
 
         return filepath;
     }

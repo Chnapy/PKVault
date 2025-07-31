@@ -3,35 +3,35 @@ using PKHeX.Core;
 
 public class PKMMemoryLoader : PKMLoader
 {
-    private Dictionary<string, PKM> pkmDict = new();
+    private Dictionary<string, byte[]> bytesDict = new();
 
-    public override PKM? GetEntity(PkmVersionEntity pkmVersion)
+    public override byte[]? GetEntity(PkmVersionEntity pkmVersion)
     {
-        return pkmDict.GetValueOrDefault(pkmVersion.Filepath);
+        var bytes = bytesDict.GetValueOrDefault(pkmVersion.Filepath);
+
+        return bytes;
     }
 
     public override void DeleteEntity(PkmVersionEntity pkmVersion)
     {
-        Console.WriteLine($"Delete PKM filepath={pkmVersion.Filepath}");
+        Console.WriteLine($"(M) Delete PKM filepath={pkmVersion.Filepath}");
 
-        pkmDict.Remove(pkmVersion.Filepath);
+        bytesDict.Remove(pkmVersion.Filepath);
     }
 
-    public override string WriteEntity(PKM pkm, string? expectedFilepath)
+    public override string WriteEntity(byte[] bytes, PKM pkm, uint generation, string? expectedFilepath)
     {
-        var filepath = GetPKMFilepath(pkm);
+        var filepath = GetPKMFilepath(pkm, generation);
 
         if (expectedFilepath != null && expectedFilepath != filepath)
         {
-            Console.WriteLine($"PKM filepath inconsistency. Expected={expectedFilepath} Obtained={filepath}");
+            Console.WriteLine($"(M) PKM filepath inconsistency. Expected={expectedFilepath} Obtained={filepath}");
             filepath = expectedFilepath;
         }
 
-        Console.WriteLine($"Write new PKM filepath={filepath}");
+        Console.WriteLine($"(M) Write new PKM filepath={filepath}, id={pkm.ID32} / {PkmSaveDTO.GetPKMId(pkm, generation)}");
 
-        Console.WriteLine($"PKM id={pkm.ID32} / {PkmSaveDTO.GetPKMId(pkm)}");
-
-        pkmDict.Add(filepath, pkm);
+        bytesDict.Add(filepath, bytes);
 
         return filepath;
     }

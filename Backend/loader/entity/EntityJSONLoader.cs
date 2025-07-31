@@ -1,7 +1,7 @@
 
 using System.Text.Json;
 
-public class EntityJSONLoader<D> : EntityLoader<D> where D : IWithId
+public class EntityJSONLoader<D> : EntityLoader<D> where D : IWithId<string>
 {
     private string filePath;
 

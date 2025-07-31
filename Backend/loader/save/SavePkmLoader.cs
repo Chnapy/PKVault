@@ -33,17 +33,26 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
 
     public override PkmSaveDTO WriteEntity(PkmSaveDTO entity)
     {
+        var savePkmType = save.BlankPKM.GetType();
+
+        var pkm = EntityConverter.ConvertToType(entity.Pkm, savePkmType, out var result);
+        if (pkm == default)
+        {
+            throw new Exception($"PkmSaveDTO.Pkm convert failed, id={entity.Id} from.type={entity.Pkm.GetType()} to.type={savePkmType} result={result}");
+        }
+
         var oldEntity = GetEntity(entity.Id);
         if (oldEntity != null)
         {
             save.SetBoxSlotAtIndex(save.BlankPKM, oldEntity.Box, oldEntity.BoxSlot);
         }
 
-        save.SetBoxSlotAtIndex(entity.Pkm, entity.Box, entity.BoxSlot);
+        save.SetBoxSlotAtIndex(pkm, entity.Box, entity.BoxSlot);
+
         return entity;
     }
 
-    public override PkmSaveDTO? DeleteEntity(long id)
+    public override PkmSaveDTO? DeleteEntity(string id)
     {
         var entity = GetEntity(id);
         if (entity != default)

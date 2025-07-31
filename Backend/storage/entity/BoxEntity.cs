@@ -1,7 +1,7 @@
 
 using System.Text.Json;
 
-public class BoxEntity : IWithId, ICloneable<BoxEntity>
+public class BoxEntity : IWithId<string>, ICloneable<BoxEntity>
 {
     static readonly string filePath = "db/box.json";
 
@@ -25,12 +25,12 @@ public class BoxEntity : IWithId, ICloneable<BoxEntity>
         return JsonSerializer.Deserialize<List<BoxEntity>>(json) ?? new List<BoxEntity>();
     }
 
-    public static BoxEntity? GetEntity(uint id)
+    public static BoxEntity? GetEntity(string id)
     {
         return GetAllBoxEntities().Find(entity => entity.Id == id);
     }
 
-    public static BoxEntity? DeleteEntity(uint id)
+    public static BoxEntity? DeleteEntity(string id)
     {
         Console.WriteLine("Delete box entity " + id);
 
@@ -59,7 +59,12 @@ public class BoxEntity : IWithId, ICloneable<BoxEntity>
         File.WriteAllText(filePath, JsonSerializer.Serialize(list));
     }
 
-    public long Id { get; set; }
+    public string Id { get; set; }
+
+    public int IdInt
+    {
+        get { return Int32.Parse(Id); }
+    }
 
     public string Name { get; set; }
 

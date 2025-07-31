@@ -28,6 +28,7 @@ public class DexService
             SAV2 sav2 => new Dex123Service().UpdateDexWithSave(persistedDex, sav2, saveEntity.SaveId),
             SAV3 sav3 => new Dex123Service().UpdateDexWithSave(persistedDex, sav3, saveEntity.SaveId),
             SAV3XD sav3XD => new Dex3XDService().UpdateDexWithSave(persistedDex, sav3XD, saveEntity.SaveId),
+            SAV3Colosseum sav3Colo => new Dex3ColoService().UpdateDexWithSave(persistedDex, sav3Colo, saveEntity.SaveId),
             SAV4 sav4 => new Dex4Service().UpdateDexWithSave(persistedDex, sav4, saveEntity.SaveId),
             SAV5 sav5 => new Dex5Service().UpdateDexWithSave(persistedDex, sav5, saveEntity.SaveId),
             SAV6XY xy => notHandled(xy),

@@ -1,19 +1,22 @@
 
 using System.Text.Json;
 using PKHeX.Core;
+using PKHeX.Core.Searching;
 
 public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
 {
     public static PkmSaveDTO FromPkm(SaveFile save, PKM pkm, int box, int boxSlot)
     {
-        var id = GetPKMId(pkm);
+        var id = GetPKMId(pkm, save.Generation);
 
         var dto = new PkmSaveDTO
         {
             Id = id,
             SaveId = save.ID32,
+            Generation = save.Generation,
             Species = pkm.Species,
             IsShiny = pkm.IsShiny,
+            IsShadow = pkm is IShadowCapture pkmShadow ? pkmShadow.IsShadow : false,
             Box = box,
             BoxSlot = boxSlot,
             Pkm = pkm
@@ -24,22 +27,25 @@ public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
         return dto;
     }
 
-    public static long GetPKMId(PKM pkm)
+    public static string GetPKMId(PKM pkm, uint generation)
     {
-        return pkm is PK2 || pkm is PK1
-            ? pkm.TrainerTID7 + pkm.IV_HP + pkm.IV_ATK * 10 + pkm.IV_DEF * 100 + pkm.IV_SPA * 1000 + pkm.IV_SPD * 10_000 + pkm.IV_SPE * 100_000 + pkm.Generation * 1_000_000
-            : pkm.TrainerTID7 + pkm.PID + pkm.Generation * 1_000_000;
+        var hash = SearchUtil.HashByDetails(pkm);
+        var id = $"G{generation}{hash}";
+
+        return id;
     }
 
     public uint SaveId { get; set; }
+
+    public int Box { get; set; }
+
+    public int BoxSlot { get; set; }
 
     public ushort Species { get; set; }
 
     public bool IsShiny { get; set; }
 
-    public int Box { get; set; }
-
-    public int BoxSlot { get; set; }
+    public bool IsShadow { get; set; }
 
     public PKM Pkm;
 

@@ -147,7 +147,7 @@ export const Storage: React.FC = () => {
           const activeData = z
             .object({
               storageType: z.enum(["main", "save"]),
-              pkmId: z.number(),
+              pkmId: z.string(),
             })
             .parse(ev.active.data.current);
 
@@ -270,7 +270,7 @@ const searchSchema = z.object({
   selected: z
     .object({
       type: z.enum(["main", "save"]),
-      id: z.number(),
+      id: z.string(),
     })
     .optional(),
   save: z.number().optional(),

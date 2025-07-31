@@ -17,7 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export type StorageDetailsProps = {
   type: "main" | "save";
-  id: number;
+  id: string;
   saveId?: number;
 };
 
@@ -110,17 +110,20 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
         <>
           <div>id={id}</div>
           {!!mainPkm &&
-            pkmList.map((pkm, i) => (
-              <Button
-                key={pkm.id}
-                onClick={() => setSelectedIndex(i)}
-                disabled={selectedIndex === i}
-              >
-                G{pkm.generation}
-                {pkm.id === mainPkm?.id && " (original)"}
-                {/* {pkm.id} */}
-              </Button>
-            ))}
+            pkmList.map((pkm, i) =>
+              pkmList.filter((p) => p.id === pkm.id).length > 1 ? null : (
+                <Button
+                  key={pkm.id}
+                  onClick={() => setSelectedIndex(i)}
+                  disabled={selectedIndex === i}
+                >
+                  G{pkm.generation}
+                  {pkm.id === mainPkm?.id && " (original)"}
+                  {/* {pkm.id} */}
+                </Button>
+              )
+            )}
+
           {saveInfos &&
             !pkmList.some((pkm) => pkm.generation === saveInfos.generation) && (
               <Button

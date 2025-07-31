@@ -3,11 +3,11 @@ using PKHeX.Core;
 public class SaveMovePkmAction : DataAction
 {
     public uint saveId { get; }
-    private readonly long id;
+    private readonly string id;
     private readonly int boxId;
     private readonly int boxSlot;
 
-    public SaveMovePkmAction(uint _saveId, long _id, int _boxId, int _boxSlot)
+    public SaveMovePkmAction(uint _saveId, string _id, int _boxId, int _boxSlot)
     {
         saveId = _saveId;
         id = _id;
