@@ -11,19 +11,19 @@ public class Dex3ColoService : DexGenService<SAV3Colosseum>
 
         var pi = save.Personal[species];
 
-        Span<ushort> subLength = stackalloc ushort[16];
-        int[] subOffsets = new int[16];
-        for (int i = 0; i < 16; i++)
-        {
-            subLength[i] = BinaryPrimitives.ReadUInt16BigEndian(save.Data.AsSpan(0x20 + (2 * i)));
-            subOffsets[i] = BinaryPrimitives.ReadUInt16BigEndian(save.Data.AsSpan(0x40 + (4 * i))) | (BinaryPrimitives.ReadUInt16BigEndian(save.Data.AsSpan(0x40 + (4 * i) + 2)) << 16);
-        }
+        // Span<ushort> subLength = stackalloc ushort[16];
+        // int[] subOffsets = new int[16];
+        // for (int i = 0; i < 16; i++)
+        // {
+        //     subLength[i] = BinaryPrimitives.ReadUInt16BigEndian(save.Data.AsSpan(0x20 + (2 * i)));
+        //     subOffsets[i] = BinaryPrimitives.ReadUInt16BigEndian(save.Data.AsSpan(0x40 + (4 * i))) | (BinaryPrimitives.ReadUInt16BigEndian(save.Data.AsSpan(0x40 + (4 * i) + 2)) << 16);
+        // }
 
-        var Memo = subOffsets[5] + 0xA8;
+        // var Memo = subOffsets[5] + 0xA8;
 
-        var memo = new StrategyMemo(save.Data.AsSpan(Memo, subLength[5]), xd: false);
+        // var memo = new StrategyMemo(save.Data.AsSpan(Memo, subLength[5]), xd: false);
 
-        var entry = memo.GetEntry(species);
+        // var entry = memo.GetEntry(species);
 
         return new DexItemDTO
         {
@@ -36,9 +36,9 @@ public class Dex3ColoService : DexGenService<SAV3Colosseum>
             IsOnlyMale = pi.OnlyMale,
             IsOnlyFemale = pi.OnlyFemale,
             IsGenderless = pi.Genderless,
-            IsAnySeen = entry.Seen || ownedPkm != null,
-            IsCaught = entry.Owned || ownedPkm != null,
-            IsOwned = entry.Owned || ownedPkm != null,
+            IsAnySeen = ownedPkm != null,
+            IsCaught = ownedPkm != null,
+            IsOwned = ownedPkm != null,
         };
     }
 

@@ -34,6 +34,11 @@ public class SaveMovePkmToStorageAction : DataAction
             throw new Exception($"Action forbidden for PkmSave shadow for id={savePkmId}");
         }
 
+        if (savePkm.Pkm.IsEgg)
+        {
+            throw new Exception($"Action forbidden for PkmSave egg for id={savePkmId}");
+        }
+
         // get pkm-version
         var pkmVersionEntity = loaders.pkmVersionLoader.GetEntity(savePkm.Id);
         if (pkmVersionEntity == null)

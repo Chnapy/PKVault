@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -57,32 +58,32 @@ public class StorageController : ControllerBase
     }
 
     [HttpPut("main/move-pkm")]
-    public void MainMovePkm(string pkmId, uint boxId, uint boxSlot)
+    public void MainMovePkm([BindRequired] string pkmId, [BindRequired] uint boxId, [BindRequired] uint boxSlot)
     {
         StorageService.MainMovePkm(pkmId, boxId, boxSlot);
     }
 
     [HttpPost("main/create-pkm-version")]
-    public void MainCreatePkmVersion(string pkmId, uint generation)
+    public void MainCreatePkmVersion([BindRequired] string pkmId, [BindRequired] uint generation)
     {
         StorageService.MainCreatePkmVersion(pkmId, generation);
     }
 
     [HttpPut("save/{saveId}/move-pkm")]
-    public void SaveMovePkm(uint saveId, string pkmId, int boxId, int boxSlot)
+    public void SaveMovePkm(uint saveId, [BindRequired] string pkmId, [BindRequired] BoxType boxType, [BindRequired] int boxId, [BindRequired] int boxSlot)
     {
-        StorageService.SaveMovePkm(saveId, pkmId, boxId, boxSlot);
+        StorageService.SaveMovePkm(saveId, pkmId, boxType, boxId, boxSlot);
     }
 
     [HttpPut("save/{saveId}/move-pkm-to-storage")]
-    public void SaveMovePkmToStorage(uint saveId, string savePkmId, uint storageBoxId, uint storageSlot)
+    public void SaveMovePkmToStorage(uint saveId, [BindRequired] string savePkmId, [BindRequired] uint storageBoxId, [BindRequired] uint storageSlot)
     {
         StorageService.SaveMovePkmToStorage(saveId, savePkmId, storageBoxId, storageSlot);
     }
 
     [HttpPut("save/{saveId}/move-pkm-from-storage")]
-    public void SaveMovePkmFromStorage(uint saveId, string pkmVersionId, int saveBoxId, int saveSlot)
+    public void SaveMovePkmFromStorage(uint saveId, [BindRequired] string pkmVersionId, [BindRequired] BoxType saveBoxType, [BindRequired] int saveBoxId, [BindRequired] int saveSlot)
     {
-        StorageService.SaveMovePkmFromStorage(saveId, pkmVersionId, saveBoxId, saveSlot);
+        StorageService.SaveMovePkmFromStorage(saveId, pkmVersionId, saveBoxType, saveBoxId, saveSlot);
     }
 }

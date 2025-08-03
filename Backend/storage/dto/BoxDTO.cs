@@ -9,6 +9,7 @@ public class BoxDTO : IWithId<string>, ICloneable<BoxDTO>
         return new BoxDTO
         {
             Id = entity.Id,
+            Type = BoxType.Default,
             Name = entity.Name
         };
     }
@@ -20,7 +21,9 @@ public class BoxDTO : IWithId<string>, ICloneable<BoxDTO>
         get { return Int32.Parse(Id); }
     }
 
-    public string Name { get; set; }
+    public BoxType Type { get; set; }
+
+    public string? Name { get; set; }
 
     public BoxDTO Clone()
     {
@@ -28,4 +31,11 @@ public class BoxDTO : IWithId<string>, ICloneable<BoxDTO>
             JsonSerializer.Serialize(this)
         )!;
     }
+}
+
+public enum BoxType
+{
+    Default,
+    Party,
+    Daycare
 }

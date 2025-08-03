@@ -11,19 +11,21 @@ public class Dex3XDService : DexGenService<SAV3XD>
 
         var pi = save.Personal[species];
 
-        Span<ushort> subLength = stackalloc ushort[16];
-        int[] subOffsets = new int[16];
-        for (int i = 0; i < 16; i++)
-        {
-            subLength[i] = BinaryPrimitives.ReadUInt16BigEndian(save.Data.AsSpan(0x20 + (2 * i)));
-            subOffsets[i] = BinaryPrimitives.ReadUInt16BigEndian(save.Data.AsSpan(0x40 + (4 * i))) | (BinaryPrimitives.ReadUInt16BigEndian(save.Data.AsSpan(0x40 + (4 * i) + 2)) << 16);
-        }
+        // TODO all memo part dont work (wrong values)
 
-        var Memo = subOffsets[5] + 0xA8;
+        // Span<ushort> subLength = stackalloc ushort[16];
+        // int[] subOffsets = new int[16];
+        // for (int i = 0; i < 16; i++)
+        // {
+        //     subLength[i] = BinaryPrimitives.ReadUInt16BigEndian(save.Data.AsSpan(0x20 + (2 * i)));
+        //     subOffsets[i] = BinaryPrimitives.ReadUInt16BigEndian(save.Data.AsSpan(0x40 + (4 * i))) | (BinaryPrimitives.ReadUInt16BigEndian(save.Data.AsSpan(0x40 + (4 * i) + 2)) << 16);
+        // }
 
-        var memo = new StrategyMemo(save.Data.AsSpan(Memo, subLength[5]), xd: true);
+        // var Memo = subOffsets[5] + 0xA8;
 
-        var entry = memo.GetEntry(species);
+        // var memo = new StrategyMemo(save.Data.AsSpan(Memo, subLength[5]), xd: true);
+
+        // var entry = memo.GetEntry(species);
 
         return new DexItemDTO
         {
@@ -36,9 +38,9 @@ public class Dex3XDService : DexGenService<SAV3XD>
             IsOnlyMale = pi.OnlyMale,
             IsOnlyFemale = pi.OnlyFemale,
             IsGenderless = pi.Genderless,
-            IsAnySeen = entry.Seen || ownedPkm != null,
-            IsCaught = entry.Owned || ownedPkm != null,
-            IsOwned = entry.Owned || ownedPkm != null,
+            IsAnySeen = ownedPkm != null,
+            IsCaught = ownedPkm != null,
+            IsOwned = ownedPkm != null,
         };
     }
 

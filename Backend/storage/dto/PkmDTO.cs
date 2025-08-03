@@ -15,6 +15,7 @@ public class PkmDTO
             IsShiny = entity.IsShiny,
             Nickname = entity.Nickname,
             OTName = entity.OTName,
+            CanDelete = entity.SaveId == default,
         };
     }
 
@@ -28,9 +29,15 @@ public class PkmDTO
 
     public ushort Species { get; set; }
 
-    public bool IsShiny { get; set; }
-
     public string Nickname { get; set; }
 
+    public bool IsShiny { get; set; }
+
     public string OTName { get; set; }
+
+    // public List<uint> CompatibleGenerations { get; set; }
+
+    public bool CanDelete { get; set; }
+
+    // public bool CanEvolve { get; set; }
 }

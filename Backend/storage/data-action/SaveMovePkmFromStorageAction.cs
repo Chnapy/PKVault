@@ -4,16 +4,19 @@ public class SaveMovePkmFromStorageAction : DataAction
 {
     public uint saveId { get; }
     readonly string pkmVersionId;
+    readonly BoxType saveBoxType;
     readonly int saveBoxId;
     readonly int saveSlot;
 
     public SaveMovePkmFromStorageAction(
         uint _saveId,
-        string _pkmVersionId, int _saveBoxId, int _saveSlot
+        string _pkmVersionId,
+        BoxType _saveBoxType, int _saveBoxId, int _saveSlot
     )
     {
         saveId = _saveId;
         pkmVersionId = _pkmVersionId;
+        saveBoxType = _saveBoxType;
         saveBoxId = _saveBoxId;
         saveSlot = _saveSlot;
     }
@@ -41,10 +44,10 @@ public class SaveMovePkmFromStorageAction : DataAction
             throw new Exception($"SavePkm already exists, id={savePkm.Id}");
         }
 
-        var existingSlot = saveLoaders.Pkms.GetAllEntities().Find(entity => entity.Box == saveBoxId && entity.BoxSlot == saveSlot);
+        var existingSlot = saveLoaders.Pkms.GetAllEntities().Find(entity => entity.BoxType == saveBoxType && entity.Box == saveBoxId && entity.BoxSlot == saveSlot);
         if (existingSlot != default)
         {
-            throw new Exception($"SavePkm already exists in given box slot, box={saveBoxId}, slot={saveSlot}");
+            throw new Exception($"SavePkm already exists in given box slot, boxType={saveBoxType}, box={saveBoxId}, slot={saveSlot}");
         }
 
         var pkmEntity = loaders.pkmLoader.GetEntity(pkmVersionEntity.PkmId)!;
@@ -60,7 +63,7 @@ public class SaveMovePkmFromStorageAction : DataAction
             throw new Exception($"PKM not defined, pkm-version={pkmVersionEntity.Id}");
         }
 
-        var pkmSaveDTO = PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxId, saveSlot);
+        var pkmSaveDTO = PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxType, saveBoxId, saveSlot, [pkmEntity]);
 
         saveLoaders.Pkms.WriteEntity(pkmSaveDTO);
 

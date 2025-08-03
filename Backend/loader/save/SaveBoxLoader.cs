@@ -11,14 +11,35 @@ public class SaveBoxLoader : EntityLoader<BoxDTO>
 
     public override List<BoxDTO> GetAllEntities()
     {
-        var boxesNames = BoxUtil.GetBoxNames(save).ToList();
-
         var boxes = new List<BoxDTO>();
+
+        if (save.HasParty)
+        {
+            boxes.Add(new BoxDTO
+            {
+                Id = "party",
+                Type = BoxType.Party,
+                Name = null
+            });
+        }
+
+        if (save is IDaycareStorage)
+        {
+            boxes.Add(new BoxDTO
+            {
+                Id = "daycare",
+                Type = BoxType.Daycare,
+                Name = null
+            });
+        }
+
+        var boxesNames = BoxUtil.GetBoxNames(save).ToList();
         for (int i = 0; i < boxesNames.Count; i++)
         {
             boxes.Add(new BoxDTO
             {
                 Id = i.ToString(),
+                Type = BoxType.Default,
                 Name = boxesNames[i]
             });
         }
@@ -28,7 +49,16 @@ public class SaveBoxLoader : EntityLoader<BoxDTO>
 
     public override BoxDTO WriteEntity(BoxDTO entity)
     {
-        (save as IBoxDetailName)?.SetBoxName(entity.IdInt, entity.Name);
+        if (entity.Type != BoxType.Default)
+        {
+            throw new Exception("Not allowed for box type not default");
+        }
+
+        if (save is IBoxDetailName saveBoxName)
+        {
+            saveBoxName.SetBoxName(entity.IdInt, entity.Name);
+        }
+
         return entity;
     }
 

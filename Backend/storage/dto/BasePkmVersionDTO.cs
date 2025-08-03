@@ -16,20 +16,26 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
         var la = new LegalityAnalysis(pkm);
 
+        dto.Version = pkm.Version;
         dto.PID = pkm.PID;
         // dto.Species = pkm.Species;
-        dto.Nickname = pkm.Nickname;
+        // dto.Nickname = pkm.Nickname;
         dto.IsEgg = pkm.IsEgg;
         // dto.IsShiny = pkm.IsShiny;
+        dto.Ball = pkm.Ball;
         dto.Level = pkm.CurrentLevel;
         dto.Exp = pkm.EXP;
         dto.IVs = ivs.ToArray();
         dto.EVs = evs.ToArray();
         dto.Stats = pkm.GetStats(pkm.PersonalInfo);
+        dto.HiddenPowerType = pkm.HPType;
+        dto.HiddenPowerPower = pkm.HPPower;
         dto.Nature = pkm.Nature;
         dto.Ability = pkm.Ability;
         dto.Moves = moves.ToArray();
+        dto.TID = pkm.TID16;
         dto.OriginTrainerName = pkm.OriginalTrainerName;
+        dto.OriginTrainerGender = pkm.OriginalTrainerGender;
         dto.OriginMetDate = pkm.MetDate;
         dto.OriginMetLocation = pkm.MetLocation;
         dto.IsValid = pkm.Valid;
@@ -40,15 +46,19 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public uint Generation { get; set; }
 
+    public GameVersion Version { get; set; }
+
     public uint PID { get; set; }
 
-    public string Nickname { get; set; }
+    // public string Nickname { get; set; }
 
     // public ushort Species { get; set; }
 
     public bool IsEgg { get; set; }
 
     // public bool IsShiny { get; set; }
+
+    public byte Ball { get; set; }
 
     public byte Level { get; set; }
 
@@ -60,13 +70,21 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public ushort[] Stats { get; set; }
 
+    public int HiddenPowerType { get; set; }
+
+    public int HiddenPowerPower { get; set; }
+
     public Nature Nature { get; set; }
 
     public int Ability { get; set; }
 
     public ushort[] Moves { get; set; }
 
+    public ushort TID { get; set; }
+
     public string OriginTrainerName { get; set; }
+
+    public byte OriginTrainerGender { get; set; }
 
     public DateOnly? OriginMetDate { get; set; }
 

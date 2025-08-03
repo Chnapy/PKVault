@@ -274,7 +274,7 @@ export const getGameInfos = (version: GameVersion) => {
       60: () => ({
         pokeapiName: "colosseum",
         // bgColor: theme.game.,
-        text: "COLO",
+        text: "Colosseum",
       }),
       61: () => ({
         pokeapiName: "xd",

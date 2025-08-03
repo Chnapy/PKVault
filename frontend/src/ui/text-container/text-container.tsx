@@ -1,7 +1,12 @@
 import type React from "react";
 import { theme } from "../theme";
 
-export const TextContainer: React.FC<React.PropsWithChildren> = ({
+export type TextContainerProps = {
+  noWrap?: boolean;
+};
+
+export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>> = ({
+  noWrap,
   children,
 }) => {
   return (
@@ -23,6 +28,10 @@ export const TextContainer: React.FC<React.PropsWithChildren> = ({
           lineHeight: "19px",
           minHeight: "100%",
           position: "relative",
+          ...noWrap ? {
+            whiteSpace: 'nowrap',
+            overflowX: 'auto',
+          } : null
         }}
       >
         <div

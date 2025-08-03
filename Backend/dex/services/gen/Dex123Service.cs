@@ -6,7 +6,7 @@ public class Dex123Service : DexGenService<SaveFile>
     {
 
         var allPkms = save.GetAllPKM();
-        var ownedPkm = allPkms.Find(pkm => pkm.Species == species);
+        var ownedPkm = allPkms.Find(pkm => pkm.Species == species && !pkm.IsEgg);
 
         var pi = save.Personal[species];
 

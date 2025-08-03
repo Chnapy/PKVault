@@ -7,7 +7,7 @@ import { theme } from "../theme";
 
 export type HeaderItemProps = {
   selected?: boolean;
-  to: FileRouteTypes["to"];
+  to: FileRouteTypes[ "to" ];
 };
 
 export const HeaderItem: React.FC<React.PropsWithChildren<HeaderItemProps>> = ({
@@ -19,6 +19,7 @@ export const HeaderItem: React.FC<React.PropsWithChildren<HeaderItemProps>> = ({
     <Button
       as={Link}
       to={to}
+      search={() => ({} as never)}
       className={css({
         flexGrow: 1,
         fontWeight: "bold",

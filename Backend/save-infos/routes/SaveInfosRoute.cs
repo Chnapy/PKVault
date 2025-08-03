@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -14,7 +15,7 @@ public class SaveInfosController : ControllerBase
 
     [HttpPost()]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<SaveInfosDTO>> Upload(IFormFile saveFile)
+    public async Task<ActionResult<SaveInfosDTO>> Upload([BindRequired] IFormFile saveFile)
     {
         if (saveFile == null || saveFile.Length == 0)
             return BadRequest("No file received");
@@ -32,7 +33,7 @@ public class SaveInfosController : ControllerBase
     }
 
     [HttpDelete()]
-    public void Delete(uint saveId, long timestamp)
+    public void Delete([BindRequired] uint saveId, [BindRequired] long timestamp)
     {
         SaveInfosService.DeleteSave(saveId, timestamp);
     }

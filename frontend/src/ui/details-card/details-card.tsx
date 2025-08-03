@@ -1,5 +1,7 @@
-import type React from "react";
+import React from "react";
+import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png';
 import { useStaticData } from "../../data/static-data/static-data";
+import { Button } from '../button/button';
 import { Container } from "../container/container";
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
 import { TextContainer } from "../text-container/text-container";
@@ -9,8 +11,14 @@ import { TitleContainer } from "../title-container/title-container";
 export type DetailsCardProps = {
   species: number;
   speciesName: string;
-  speciesNameTranslated?: string;
+  // hasShiny: boolean;
+  localSpecies: number;
+  genders: ('male' | 'female')[];
+  types: string[];
   description?: string;
+  abilities: string[];
+  abilitiesHidden: string[];
+  stats: number[];
   caught: boolean;
   fromSaves: React.ReactNode;
   compatibleGames: React.ReactNode;
@@ -19,14 +27,23 @@ export type DetailsCardProps = {
 export const DetailsCard: React.FC<DetailsCardProps> = ({
   species,
   speciesName,
-  speciesNameTranslated,
+  // hasShiny,
+  localSpecies,
+  genders,
+  types,
   description,
+  abilities,
+  abilitiesHidden,
+  stats,
   caught,
   fromSaves,
   compatibleGames,
 }) => {
+  const [ showDetails, setShowDetails ] = React.useState(false);
+  const [ showShiny, setShowShiny ] = React.useState(false);
+
   const staticData = useStaticData();
-  const pokemonDataItem = staticData.pokemon[species];
+  const pokemonDataItem = staticData.pokemon[ species ];
 
   const pokeballSprite = staticData.item.pkball.sprites.default;
   const defaultSprite = pokemonDataItem.sprites.front_default;
@@ -34,12 +51,15 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
 
   return (
     <Container padding="big" borderRadius="big" style={{ display: "block" }}>
-      <div style={{ marginBottom: 2, display: "flex", gap: 4 }}>
+      <div style={{ marginBottom: 2, display: "flex", gap: 4, overflowX: 'auto', padding: 2 }}>
         {fromSaves}
       </div>
 
       <div
         style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
           borderRadius: 8,
           padding: 4,
           background: theme.bg.info,
@@ -49,6 +69,7 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
         <div style={{ display: "flex" }}>
           <div
             style={{
+              position: 'relative',
               marginLeft: -4,
               marginTop: -4,
               marginRight: 4,
@@ -58,8 +79,8 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
             }}
           >
             <img
-              src={defaultSprite!}
-              alt={speciesNameTranslated ?? speciesName}
+              src={showShiny ? shinySprite! : defaultSprite!}
+              alt={speciesName}
               style={{
                 imageRendering: "pixelated",
                 width: 96,
@@ -68,38 +89,103 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
                 borderRadius: 8,
               }}
             />
-          </div>
 
-          <TextContainer>
             {caught && (
               <img
                 src={pokeballSprite!}
                 style={{
-                  // imageRendering: "pixelated",
-                  height: 20,
-                  margin: -4,
-                  marginRight: 2,
-                  paddingBottom: 1,
-                  verticalAlign: "text-bottom",
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
                 }}
               />
             )}
-            N°{getSpeciesNO(species)} - {speciesNameTranslated}
+
+            <Button onClick={() => setShowShiny(!showShiny)} selected={showShiny} style={{
+              position: 'absolute',
+              top: 6,
+              right: 6,
+            }}>
+              <img
+                src={shinyIconImg}
+                alt='shiny-icon'
+                style={{
+                  width: 12,
+                  margin: '0 -2px',
+                }}
+              />
+            </Button>
+          </div>
+
+          <TextContainer noWrap>
+            N°{getSpeciesNO(species)} - <span style={{ color: theme.text.primary }}>{speciesName}</span>
+            <span
+              style={{
+                float: 'right',
+                fontFamily: theme.font.special,
+              }}
+            >
+              {genders.map(gender => <span key={gender} style={{
+                color: gender === 'male' ? '#00C6AD' : '#FF4273'
+              }}>{gender === 'male' ? '♂' : '♀'}</span>)}
+            </span>
+            <br />
+            {types.join(' - ')}
+            <br />
+            Dex local N°<span style={{ color: theme.text.primary }}>{getSpeciesNO(localSpecies)}</span>
           </TextContainer>
         </div>
 
-        {description && (
-          <div style={{ display: "flex", marginTop: 4 }}>
-            <TextContainer>{description}</TextContainer>
-          </div>
-        )}
+        <Button onClick={() => setShowDetails(!showDetails)}>
+          {showDetails ? "Hide" : "Show"} details
+        </Button>
 
-        <div style={{ marginTop: 4 }}>
-          <TitleContainer title="Owned in games">
-            <img src={defaultSprite!} alt="From Blue" style={{ width: 32 }} />
-            <img src={shinySprite!} alt="From Crystal" style={{ width: 32 }} />
-          </TitleContainer>
-        </div>
+        {showDetails && <>
+          {description && (
+            <div style={{ display: "flex" }}>
+              <TextContainer>{description}</TextContainer>
+            </div>
+          )}
+
+          <div style={{ display: "flex" }}>
+            <TextContainer>
+              <span style={{ color: theme.text.primary }}>Abilities</span><br />
+              {abilities.map(ability => <div key={ability}>{ability}</div>)}
+              {abilitiesHidden.map(ability => <div key={ability}>{ability} (caché)</div>)}
+            </TextContainer>
+          </div>
+
+          <div style={{ display: "flex" }}>
+            <TextContainer>
+              <table>
+                <thead>
+                  <tr>
+                    <td style={{ paddingTop: 0, paddingBottom: 0 }}></td>
+                    <td style={{ paddingTop: 0, paddingBottom: 0 }}>HP.</td>
+                    <td style={{ paddingTop: 0, paddingBottom: 0 }}>Atk</td>
+                    <td style={{ paddingTop: 0, paddingBottom: 0 }}>Def</td>
+                    <td style={{ paddingTop: 0, paddingBottom: 0 }}>SpA</td>
+                    <td style={{ paddingTop: 0, paddingBottom: 0 }}>SpD</td>
+                    <td style={{ paddingTop: 0, paddingBottom: 0 }}>Spe</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ padding: 0 }}>
+                      <span style={{ color: theme.text.primary }}>Stats</span>
+                    </td>
+                    {stats.map((stat, i) => <td key={i} style={{ padding: 0, textAlign: 'center' }}>{stat}</td>)}
+                  </tr>
+                </tbody>
+              </table>
+            </TextContainer>
+          </div>
+        </>}
+
+        <TitleContainer title="Owned in games">
+          <img src={defaultSprite!} alt="From Blue" style={{ width: 32 }} />
+          <img src={shinySprite!} alt="From Crystal" style={{ width: 32 }} />
+        </TitleContainer>
       </div>
       <div
         style={{

@@ -51,7 +51,7 @@ public class StorageService
             {
                 throw new Exception($"PKM is null, from entity Id={entity.Id} Filepath={entity.Filepath} bytes.length={pkmBytes.Length}");
             }
-            var dto = PkmVersionDTO.FromEntity(entity, pkm);
+            var dto = PkmVersionDTO.FromEntity(entity, pkm, pkmEntity);
             list.Add(dto);
         });
 
@@ -82,10 +82,10 @@ public class StorageService
         );
     }
 
-    public static void SaveMovePkm(uint saveId, string pkmId, int boxId, int boxSlot)
+    public static void SaveMovePkm(uint saveId, string pkmId, BoxType boxType, int boxId, int boxSlot)
     {
         memoryLoader.AddAction(
-            new SaveMovePkmAction(saveId, pkmId, boxId, boxSlot)
+            new SaveMovePkmAction(saveId, pkmId, boxType, boxId, boxSlot)
         );
     }
 
@@ -101,12 +101,13 @@ public class StorageService
         );
     }
 
-    public static void SaveMovePkmFromStorage(uint saveId, string pkmVersionId, int saveBoxId, int saveSlot)
+    public static void SaveMovePkmFromStorage(uint saveId, string pkmVersionId, BoxType saveBoxType, int saveBoxId, int saveSlot)
     {
         memoryLoader.AddAction(
             new SaveMovePkmFromStorageAction(
                 saveId,
                 pkmVersionId,
+                saveBoxType,
                 saveBoxId,
                 saveSlot
             )

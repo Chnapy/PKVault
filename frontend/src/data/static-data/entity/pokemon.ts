@@ -7,7 +7,7 @@ import {
   type PokemonDb,
 } from "../pokeapi/pokemon";
 
-export type PokemonStatic = Pick<Pokemon, "id" | "types" | "sprites">;
+export type PokemonStatic = Pick<Pokemon, "id" | "types" | "sprites" | "abilities" | "stats">;
 
 export type PokemonDbStatic = PokemonDb<PokemonStatic>;
 
@@ -17,7 +17,7 @@ export const loadPokemonData = async (db: {
   const data = await getOrFetchPokemonDataAll({
     db,
     pickFn: (data) =>
-      pick(data, ["id", "types", "sprites"]) satisfies PokemonStatic,
+      pick(data, [ "id", "types", "sprites", "abilities", "stats" ]) satisfies PokemonStatic,
   });
 
   return arrayToRecord(data, "id");

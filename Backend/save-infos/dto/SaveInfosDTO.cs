@@ -7,6 +7,25 @@ public class SaveInfosDTO
     {
         var save = SaveUtil.GetVariantSAV(entity.Filepath)!;
 
+        var seenCount = save.SeenCount;
+        var caughtCount = save.CaughtCount;
+
+        var allPkms = save.GetAllPKM();
+
+        var ownedCount = allPkms.Count;
+
+        var shinyCount = allPkms.FindAll(pkm => pkm.IsShiny).Count;
+
+        if (caughtCount == 0)
+        {
+            caughtCount = allPkms.Count;
+        }
+
+        if (seenCount == 0)
+        {
+            seenCount = caughtCount;
+        }
+
         return new SaveInfosDTO
         {
             Id = entity.SaveId,
@@ -19,10 +38,15 @@ public class SaveInfosDTO
             PlayTime = save.PlayTimeString,
             TrainerGender = save.Gender,
             TrainerName = save.OT,
+            DexSeenCount = seenCount,
+            DexCaughtCount = caughtCount,
+            OwnedCount = ownedCount,
+            ShinyCount = shinyCount,
             BoxCount = save.BoxCount,
             BoxSlotCount = save.BoxSlotCount,
             MaxSpeciesId = save.MaxSpeciesID,
             MaxIV = save.MaxIV,
+            CanDelete = true,
         };
     }
 
@@ -46,6 +70,14 @@ public class SaveInfosDTO
 
     public string TrainerName { get; set; }
 
+    public int DexSeenCount { get; set; }
+
+    public int DexCaughtCount { get; set; }
+
+    public int OwnedCount { get; set; }
+
+    public int ShinyCount { get; set; }
+
     public int BoxCount { get; set; }
 
     public int BoxSlotCount { get; set; }
@@ -53,4 +85,6 @@ public class SaveInfosDTO
     public int MaxSpeciesId { get; set; }
 
     public int MaxIV { get; set; }
+
+    public bool CanDelete { get; set; }
 }

@@ -8,7 +8,7 @@ import {
 } from "../../data/sdk/save-infos/save-infos.gen";
 import { Button } from "../../ui/button/button";
 import { Container } from "../../ui/container/container";
-import { SaveCardContent } from "../../ui/save-card/save-card-content";
+import { SaveCardContentFull } from '../../ui/save-card/save-card-content-full';
 
 export type SaveItemProps = {
   saveId: number;
@@ -38,7 +38,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
     },
   });
 
-  const [showOlders, setShowOlders] = React.useState(false);
+  const [ showOlders, setShowOlders ] = React.useState(false);
 
   if (!saveInfosQuery.data) {
     return null;
@@ -46,8 +46,8 @@ export const SaveItem: React.FC<SaveItemProps> = ({
 
   const saveInfos = Object.values(saveInfosQuery.data.data);
 
-  const [firstItem, ...nextItems] = saveInfos.find(
-    (saveList) => saveList[0].id === saveId
+  const [ firstItem, ...nextItems ] = saveInfos.find(
+    (saveList) => saveList[ 0 ].id === saveId
   )!;
 
   return (
@@ -57,22 +57,28 @@ export const SaveItem: React.FC<SaveItemProps> = ({
       style={{ display: "flex", flexDirection: "column", gap: 4, width: 350 }}
       onClick={onClick}
     >
-      <SaveCardContent
+      <SaveCardContentFull
+        id={firstItem.id}
         generation={firstItem.generation}
         version={firstItem.version}
         trainerName={firstItem.trainerName}
         trainerGenderMale={firstItem.trainerGender === 0}
         tid={firstItem.tid}
         timestamp={firstItem.timestamp}
+        playTime={firstItem.playTime}
+        dexSeenCount={firstItem.dexSeenCount}
+        dexCaughtCount={firstItem.dexCaughtCount}
+        ownedCount={firstItem.ownedCount}
+        shinyCount={firstItem.shinyCount}
         onDelete={
-          showDelete
+          firstItem.canDelete && showDelete
             ? () =>
-                saveInfosDeleteMutation.mutateAsync({
-                  params: {
-                    saveId: firstItem.id,
-                    timestamp: firstItem.timestamp,
-                  },
-                })
+              saveInfosDeleteMutation.mutateAsync({
+                params: {
+                  saveId: firstItem.id,
+                  timestamp: firstItem.timestamp,
+                },
+              })
             : undefined
         }
       />
@@ -86,14 +92,20 @@ export const SaveItem: React.FC<SaveItemProps> = ({
 
           {showOlders &&
             nextItems.map((item) => (
-              <SaveCardContent
+              <SaveCardContentFull
                 key={item.timestamp}
+                id={item.id}
                 generation={item.generation}
                 version={item.version}
                 trainerName={item.trainerName}
                 trainerGenderMale={item.trainerGender === 0}
                 tid={item.tid}
                 timestamp={item.timestamp}
+                playTime={item.playTime}
+                dexSeenCount={item.dexSeenCount}
+                dexCaughtCount={item.dexCaughtCount}
+                ownedCount={item.ownedCount}
+                shinyCount={item.shinyCount}
                 onDelete={() =>
                   saveInfosDeleteMutation.mutateAsync({
                     params: {

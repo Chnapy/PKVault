@@ -9,7 +9,7 @@ import {
 
 export type PokemonSpeciesStatic = Pick<
   PokemonSpecies,
-  "id" | "name" | "names" | "flavor_text_entries" | "generation"
+  "id" | "name" | "names" | "flavor_text_entries" | "generation" | "pokedex_numbers" | "gender_rate"
 >;
 
 export type PokemonSpeciesDbStatic = PokemonSpeciesDb<PokemonSpeciesStatic>;
@@ -26,6 +26,8 @@ export const loadPokemonSpeciesData = async (db: {
         "names",
         "flavor_text_entries",
         "generation",
+        "pokedex_numbers",
+        "gender_rate"
       ]) satisfies PokemonSpeciesStatic,
   });
 

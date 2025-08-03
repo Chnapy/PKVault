@@ -13,7 +13,7 @@ export const GameButton: React.FC<
   const { bgColor, text } = getGameInfos(version);
 
   return (
-    <Button bgColor={bgColor} {...rest}>
+    <Button bgColor={bgColor} style={{ whiteSpace: 'nowrap' }} {...rest}>
       {text}
       {trainerName && " - " + trainerName}
     </Button>

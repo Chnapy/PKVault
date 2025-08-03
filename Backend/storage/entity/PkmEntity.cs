@@ -18,69 +18,6 @@ public class PkmEntity : IWithId<string>, ICloneable<PkmEntity>
         };
     }
 
-    // public static List<PkmEntity> GetAllEntities(long? boxId)
-    // {
-    //     if (!File.Exists(filePath))
-    //     {
-    //         Console.WriteLine("Pkm DB file not existing: creating.");
-    //         string emptyJson = JsonSerializer.Serialize(new List<PkmEntity>());
-
-    //         string? directory = Path.GetDirectoryName(filePath);
-    //         if (!string.IsNullOrEmpty(directory))
-    //         {
-    //             Directory.CreateDirectory(directory);
-    //         }
-
-    //         File.WriteAllText(filePath, emptyJson);
-    //     }
-
-    //     string json = File.ReadAllText(filePath);
-    //     var list = JsonSerializer.Deserialize<List<PkmEntity>>(json) ?? new List<PkmEntity>();
-
-    //     if (boxId != null)
-    //     {
-    //         return list.FindAll(item => item.BoxId == boxId);
-    //     }
-
-    //     return list;
-    // }
-
-    // public static PkmEntity? GetEntity(long id)
-    // {
-    //     return GetAllEntities(null).Find(entity => entity.Id == id);
-    // }
-
-    // public static PkmEntity? DeleteEntity(long id)
-    // {
-    //     Console.WriteLine("Delete pkm entity " + id);
-
-    //     var initialList = GetAllEntities(null);
-    //     var removedEntity = initialList.Find(entity => entity.Id == id);
-    //     if (removedEntity == null)
-    //     {
-    //         return null;
-    //     }
-
-    //     var finalList = initialList.FindAll(entity => entity.Id != id);
-
-    //     File.WriteAllText(filePath, JsonSerializer.Serialize(finalList));
-
-    //     return removedEntity;
-    // }
-
-    // public static PkmEntity WriteEntity(PkmEntity entity)
-    // {
-    //     Console.WriteLine("Write new pkm entity.");
-
-    //     var list = GetAllEntities(null)
-    //     .FindAll(entity => entity.Id != entity.Id);
-    //     list.Add(entity);
-
-    //     File.WriteAllText(filePath, JsonSerializer.Serialize(list));
-
-    //     return entity;
-    // }
-
     public string Id { get; set; }
 
     public uint BoxId { get; set; }
@@ -91,9 +28,9 @@ public class PkmEntity : IWithId<string>, ICloneable<PkmEntity>
 
     public ushort Species { get; set; }
 
-    public bool IsShiny { get; set; }
-
     public string Nickname { get; set; }
+
+    public bool IsShiny { get; set; }
 
     public string OTName { get; set; }
 

@@ -6,7 +6,7 @@ import {
   type GenerationDb,
 } from "../pokeapi/generation";
 
-export type GenerationStatic = Pick<Generation, "id" | "name" | "names">;
+export type GenerationStatic = Pick<Generation, "id" | "name" | "names" | "main_region">;
 
 export type GenerationDbStatic = GenerationDb<GenerationStatic>;
 
@@ -16,7 +16,7 @@ export const loadGenerationData = async (db: {
   const data = await getOrFetchGenerationDataAll({
     db,
     pickFn: (data) =>
-      pick(data, ["id", "name", "names"]) satisfies GenerationStatic,
+      pick(data, [ "id", "name", "names", "main_region" ]) satisfies GenerationStatic,
   });
 
   return data;

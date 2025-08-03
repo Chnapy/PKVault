@@ -1,4 +1,5 @@
 import Dexie, { type DexieOptions } from "dexie";
+import { loadAbilityData, type AbilityDbStatic } from './entity/ability';
 import {
   loadGenerationData,
   type GenerationDbStatic,
@@ -10,6 +11,7 @@ import {
   type PokemonSpeciesDbStatic,
 } from "./entity/pokemon-species";
 import { loadTypeData, type TypeDbStatic } from "./entity/type";
+import { abilityStore } from './pokeapi/ability';
 import { generationStore } from "./pokeapi/generation";
 import { itemStore } from "./pokeapi/item";
 import { pokemonStore } from "./pokeapi/pokemon";
@@ -22,7 +24,8 @@ export const createDB = (options: DexieOptions) => {
     PokemonDbStatic &
     TypeDbStatic &
     ItemDbStatic &
-    GenerationDbStatic;
+    GenerationDbStatic &
+    AbilityDbStatic;
 
   db.version(1).stores({
     ...pokemonSpeciesStore,
@@ -30,6 +33,7 @@ export const createDB = (options: DexieOptions) => {
     ...typeStore,
     ...itemStore,
     ...generationStore,
+    ...abilityStore,
   });
 
   return db;
@@ -44,5 +48,6 @@ export const loadStaticData = async () => {
     type: await loadTypeData(db),
     item: await loadItemData(db),
     generation: await loadGenerationData(db),
+    ability: await loadAbilityData(db),
   } satisfies Record<keyof Omit<typeof db, keyof Dexie>, unknown>;
 };

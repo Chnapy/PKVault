@@ -1,9 +1,10 @@
 import { css } from "@emotion/css";
 import React from "react";
+import type { GameVersion } from '../../data/sdk/model';
 import { useStaticData } from "../../data/static-data/static-data";
+import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Container } from "../container/container";
 import { theme } from "../theme";
-import { getSpeciesNO } from "./util/get-species-no";
 
 const styles = {
   content: css({
@@ -22,16 +23,21 @@ export type DexItemProps = {
   speciesName: string;
   seen: boolean;
   caught: boolean;
+  caughtVersions: GameVersion[];
+  seenOnlyVersions: GameVersion[];
   selected?: boolean;
   onClick?: () => void;
 };
 
 export const DexItem: React.FC<DexItemProps> = React.memo(
-  ({ species, speciesName, seen, caught, selected, onClick }) => {
+  ({ species, speciesName, seen, caught, caughtVersions, seenOnlyVersions, selected, onClick }) => {
     const staticData = useStaticData();
-    const pokemonDataItem = staticData.pokemon[species];
+    const pokemonDataItem = staticData.pokemon[ species ];
 
-    const pokeballSprite = staticData.item.pkball.sprites.default;
+    // const pokeballSprite = staticData.item.pkball.sprites.default;
+
+    const caughtGamesColors = caughtVersions.map(getGameInfos).map(infos => infos.bgColor ?? theme.bg.dark);
+    const seenOnlyGamesColors = seenOnlyVersions.map(getGameInfos).map(infos => infos.bgColor ?? theme.bg.dark);
 
     return (
       <Container
@@ -86,6 +92,36 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
                 display: "block",
               }}
             />
+
+            <div
+              style={{
+                position: 'absolute',
+                left: 4,
+                bottom: 4,
+                display: 'flex',
+                gap: 4,
+              }}>
+              {caughtGamesColors.map((color, i) => <div
+                key={i}
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 99,
+                  backgroundColor: color,
+                }}
+              />)}
+
+              {seenOnlyGamesColors.map((color, i) => <div
+                key={i}
+                style={{
+                  width: 4,
+                  height: 4,
+                  margin: 2,
+                  borderRadius: 99,
+                  backgroundColor: color,
+                }}
+              />)}
+            </div>
           </div>
         </div>
       </Container>

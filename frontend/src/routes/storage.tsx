@@ -21,6 +21,7 @@ import { StorageSaveBox } from "../storage/storage-save-box";
 import { StorageSaveSelect } from "../storage/storage-save-select";
 import { StorageDetails } from "../storage/storage-details";
 import { Button } from "../ui/button/button";
+import { BoxType } from '../data/sdk/model';
 
 export const Storage: React.FC = () => {
   const selected = Route.useSearch({ select: (search) => search.selected });
@@ -30,15 +31,15 @@ export const Storage: React.FC = () => {
 
   const saveInfosRecord = useSaveInfosGetAll().data?.data;
   const saveInfos =
-    saveId && saveInfosRecord ? saveInfosRecord[saveId][0] : undefined;
+    saveId && saveInfosRecord ? saveInfosRecord[ saveId ][ 0 ] : undefined;
 
   const pkmVersionsQuery = useStorageGetMainPkmVersions();
   const pkmVersions = pkmVersionsQuery.data?.data ?? [];
 
   const pkmVersionsForSave = saveInfos
     ? pkmVersions.filter(
-        (pkmVersion) => pkmVersion.generation === saveInfos.generation
-      )
+      (pkmVersion) => pkmVersion.generation === saveInfos.generation
+    )
     : [];
 
   const saveMutation = useStorageSave({
@@ -146,14 +147,14 @@ export const Storage: React.FC = () => {
 
           const activeData = z
             .object({
-              storageType: z.enum(["main", "save"]),
+              storageType: z.enum([ "main", "save" ]),
               pkmId: z.string(),
             })
             .parse(ev.active.data.current);
 
           const overData = z
             .object({
-              storageType: z.enum(["main", "save"]),
+              storageType: z.enum([ "main", "save" ]),
               boxId: z.number(),
               boxSlot: z.number(),
             })
@@ -181,6 +182,7 @@ export const Storage: React.FC = () => {
               saveId,
               params: {
                 pkmId: activeData.pkmId,
+                boxType: BoxType.Default,
                 boxId: overData.boxId,
                 boxSlot: overData.boxSlot,
               },
@@ -205,6 +207,7 @@ export const Storage: React.FC = () => {
               saveId,
               params: {
                 pkmVersionId: savePkmVersion.id,
+                saveBoxType: BoxType.Default,
                 saveBoxId: overData.boxId,
                 saveSlot: overData.boxSlot,
               },
@@ -269,7 +272,7 @@ export const Storage: React.FC = () => {
 const searchSchema = z.object({
   selected: z
     .object({
-      type: z.enum(["main", "save"]),
+      type: z.enum([ "main", "save" ]),
       id: z.string(),
     })
     .optional(),

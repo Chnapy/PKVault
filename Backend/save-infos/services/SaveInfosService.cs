@@ -21,6 +21,7 @@ public class SaveInfosService
 
         return record;
     }
+
     public static void LoadLastSaves()
     {
         DexService.ClearDex();

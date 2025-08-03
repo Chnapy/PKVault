@@ -131,7 +131,9 @@ export const StorageMainBox: React.FC = () => {
         const versions = pkmVersions.filter((value) => value.pkmId === pkm.id);
 
         if (versions.length === 0) {
-          return <div>Error versions are empty for Pkm.Id={pkm.id}</div>;
+          return (
+            <div key={i}>Error versions are empty for Pkm.Id={pkm.id}</div>
+          );
         }
 
         return (
@@ -142,11 +144,11 @@ export const StorageMainBox: React.FC = () => {
             species={pkm.species}
             warning={versions.some((value) => !value.isValid)}
             disabled={
-              Boolean(pkm.saveId) ||
-              !versions.some(
-                (version) =>
-                  !saveInfos || version.generation === saveInfos?.generation
-              )
+              Boolean(pkm.saveId)
+              // || !versions.some(
+              //   (version) =>
+              //     !saveInfos || version.generation === saveInfos?.generation
+              // )
             }
             boxSlot={i}
             selected={selected?.type === "main" && selected.id === pkm.id}
