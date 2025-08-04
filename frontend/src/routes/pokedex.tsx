@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import React from "react";
 import { FiltersCard } from "../pokedex/filters/filters-card";
 import { PokedexDetails } from "../pokedex/details/pokedex-details";
@@ -42,16 +42,12 @@ export const PokedexPage: React.FC = () => {
 
 const searchSchema = z.object({
   selected: z.number().optional(),
-  filters: z
-    .object({
-      speciesName: z.string().optional(),
-      types: z.array(z.string()).optional(),
-      seen: z.boolean().optional(),
-      caught: z.boolean().optional(),
-      fromGames: z.array(z.number()).optional(), // saveIDs
-      generations: z.array(z.string()).optional(), // generation.name
-    })
-    .default({}),
+  filterSpeciesName: z.string().optional(),
+  filterTypes: z.array(z.string()).optional(),
+  filterSeen: z.boolean().optional(),
+  filterCaught: z.boolean().optional(),
+  filterFromGames: z.array(z.number()).optional(), // saveIDs
+  filterGenerations: z.array(z.string()).optional(), // generation.name
   // sort: z.enum(['newest', 'oldest', 'price']).default('newest'),
 });
 
@@ -59,19 +55,6 @@ export const Route = createFileRoute("/pokedex")({
   component: PokedexPage,
   validateSearch: zodValidator(searchSchema),
   search: {
-    middlewares: [
-      ({ search, next }) => {
-        const result = next(search);
-
-        return {
-          ...search,
-          ...result,
-          filters: {
-            ...search.filters,
-            ...result.filters,
-          },
-        };
-      },
-    ],
-  },
+    middlewares: [ retainSearchParams(true) ],
+  }
 });

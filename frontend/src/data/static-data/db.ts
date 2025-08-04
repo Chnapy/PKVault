@@ -4,7 +4,9 @@ import {
   loadGenerationData,
   type GenerationDbStatic,
 } from "./entity/generation";
-import { loadItemData, type ItemDbStatic } from "./entity/item";
+import { loadItemData, type ItemCategoryDbStatic, type ItemDbStatic } from "./entity/item";
+import { loadMoveData, type MoveDbStatic } from './entity/move';
+import { loadNatureData, type NatureDbStatic } from './entity/nature';
 import { loadPokemonData, type PokemonDbStatic } from "./entity/pokemon";
 import {
   loadPokemonSpeciesData,
@@ -14,6 +16,9 @@ import { loadTypeData, type TypeDbStatic } from "./entity/type";
 import { abilityStore } from './pokeapi/ability';
 import { generationStore } from "./pokeapi/generation";
 import { itemStore } from "./pokeapi/item";
+import { itemCategoryStore } from './pokeapi/item-category';
+import { moveStore } from './pokeapi/move';
+import { natureStore } from './pokeapi/nature';
 import { pokemonStore } from "./pokeapi/pokemon";
 import { pokemonSpeciesStore } from "./pokeapi/pokemon-species";
 import { typeStore } from "./pokeapi/type";
@@ -24,16 +29,22 @@ export const createDB = (options: DexieOptions) => {
     PokemonDbStatic &
     TypeDbStatic &
     ItemDbStatic &
+    ItemCategoryDbStatic &
     GenerationDbStatic &
-    AbilityDbStatic;
+    AbilityDbStatic &
+    MoveDbStatic &
+    NatureDbStatic;
 
   db.version(1).stores({
     ...pokemonSpeciesStore,
     ...pokemonStore,
     ...typeStore,
     ...itemStore,
+    ...itemCategoryStore,
     ...generationStore,
     ...abilityStore,
+    ...moveStore,
+    ...natureStore,
   });
 
   return db;
@@ -49,5 +60,7 @@ export const loadStaticData = async () => {
     item: await loadItemData(db),
     generation: await loadGenerationData(db),
     ability: await loadAbilityData(db),
-  } satisfies Record<keyof Omit<typeof db, keyof Dexie>, unknown>;
+    move: await loadMoveData(db),
+    nature: await loadNatureData(db),
+  };
 };

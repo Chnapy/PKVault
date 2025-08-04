@@ -24,7 +24,7 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
             {
                 if (pkm.Species != 0)
                 {
-                    var dto = PkmSaveDTO.FromPkm(save, pkm, BoxType.Party, 0, i, allPkmEntities);
+                    var dto = PkmSaveDTO.FromPkm(save, pkm, BoxDTO.PARTY_ID, i, allPkmEntities);
                     pkmList.Add(dto);
                 }
                 i++;
@@ -39,7 +39,7 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
                 var pkm = slot.Read(save);
                 if (pkm != default && pkm.Species != 0)
                 {
-                    var dto = PkmSaveDTO.FromPkm(save, pkm, BoxType.Daycare, 0, i, allPkmEntities);
+                    var dto = PkmSaveDTO.FromPkm(save, pkm, BoxDTO.DAYCARE_ID, i, allPkmEntities);
                     pkmList.Add(dto);
                 }
             }
@@ -53,7 +53,7 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
             {
                 if (pkm.Species != 0)
                 {
-                    var dto = PkmSaveDTO.FromPkm(save, pkm, BoxType.Default, i, j, allPkmEntities);
+                    var dto = PkmSaveDTO.FromPkm(save, pkm, i, j, allPkmEntities);
                     pkmList.Add(dto);
                 }
                 j++;
@@ -65,7 +65,7 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
 
     public override PkmSaveDTO WriteEntity(PkmSaveDTO entity)
     {
-        if (entity.BoxType == BoxType.Daycare)
+        if (entity.Box == BoxDTO.DAYCARE_ID)
         {
             throw new Exception("Not allowed for pkm in daycare");
         }
@@ -82,29 +82,29 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
 
         if (oldEntity != null)
         {
-            if (oldEntity.BoxType == BoxType.Daycare)
+            if (oldEntity.Box == BoxDTO.DAYCARE_ID)
             {
                 throw new Exception("Not allowed for pkm in daycare");
             }
 
-            switch (oldEntity.BoxType)
+            switch (oldEntity.Box)
             {
-                case BoxType.Default:
-                    save.SetBoxSlotAtIndex(save.BlankPKM, oldEntity.Box, oldEntity.BoxSlot);
-                    break;
-                case BoxType.Party:
+                case BoxDTO.PARTY_ID:
                     save.SetPartySlotAtIndex(save.BlankPKM, oldEntity.BoxSlot);
+                    break;
+                default:
+                    save.SetBoxSlotAtIndex(save.BlankPKM, oldEntity.Box, oldEntity.BoxSlot);
                     break;
             }
         }
 
-        switch (entity.BoxType)
+        switch (entity.Box)
         {
-            case BoxType.Default:
-                save.SetBoxSlotAtIndex(pkm, entity.Box, entity.BoxSlot);
-                break;
-            case BoxType.Party:
+            case BoxDTO.PARTY_ID:
                 save.SetPartySlotAtIndex(pkm, entity.BoxSlot);
+                break;
+            default:
+                save.SetBoxSlotAtIndex(pkm, entity.Box, entity.BoxSlot);
                 break;
         }
 
@@ -116,13 +116,15 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
         var entity = GetEntity(id);
         if (entity != default)
         {
-            switch (entity.BoxType)
+            switch (entity.Box)
             {
-                case BoxType.Default:
-                    save.SetBoxSlotAtIndex(save.BlankPKM, entity.Box, entity.BoxSlot);
-                    break;
-                case BoxType.Party:
+                case BoxDTO.DAYCARE_ID:
+                    throw new Exception("Not allowed for pkm in daycare");
+                case BoxDTO.PARTY_ID:
                     save.SetPartySlotAtIndex(save.BlankPKM, entity.BoxSlot);
+                    break;
+                default:
+                    save.SetBoxSlotAtIndex(save.BlankPKM, entity.Box, entity.BoxSlot);
                     break;
             }
         }

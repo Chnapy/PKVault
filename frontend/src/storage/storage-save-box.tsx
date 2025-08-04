@@ -1,5 +1,5 @@
 import React from "react";
-import type { PkmSaveDTO, SaveInfosDTO } from "../data/sdk/model";
+import { BoxType, type PkmSaveDTO, type SaveInfosDTO } from "../data/sdk/model";
 import { useSaveInfosGetAll } from "../data/sdk/save-infos/save-infos.gen";
 import {
   useStorageGetSaveBoxes,
@@ -12,6 +12,7 @@ import { FilterSelect } from "../ui/filter/filter-select/filter-select";
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageItem } from "../ui/storage-item/storage-item";
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
+import { switchUtil } from '../util/switch-util';
 
 export type StorageSaveBoxProps = {
   saveId: number;
@@ -23,7 +24,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
   const navigate = Route.useNavigate();
 
   const saveInfosRecord = useSaveInfosGetAll().data?.data ?? {};
-  const saveInfos = saveInfosRecord[saveId]?.[0] as SaveInfosDTO | undefined;
+  const saveInfos = saveInfosRecord[ saveId ]?.[ 0 ] as SaveInfosDTO | undefined;
 
   const saveBoxesQuery = useStorageGetSaveBoxes(saveId);
   const savePkmsQuery = useStorageGetSavePkms(saveId);
@@ -31,28 +32,37 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
   const saveBoxes = saveBoxesQuery.data?.data ?? [];
   const savePkms = savePkmsQuery.data?.data ?? [];
 
+  // const defaultBoxes = saveBoxes.filter(box => box.type === BoxType.Default);
+  // const partyBox = saveBoxes.find(box => box.type === BoxType.Party);
+  // const daycareBox = saveBoxes.find(box => box.type === BoxType.Daycare);
+
   const selectedBoxIndex =
-    typeof saveBoxId === "number"
-      ? saveBoxes.findIndex((box) => box.idInt === saveBoxId)
+    saveBoxId
+      ? saveBoxes.findIndex((box) => box.id === saveBoxId)
       : 0;
-  const selectedBox = saveBoxes[selectedBoxIndex];
+  const selectedBox = saveBoxes[ selectedBoxIndex ];
 
   if (!selectedBox || !saveInfos) {
     return null;
   }
 
-  const previousBox = saveBoxes[selectedBoxIndex - 1];
-  const nextBox = saveBoxes[selectedBoxIndex + 1];
+  const previousBox = saveBoxes[ selectedBoxIndex - 1 ];
+  const nextBox = saveBoxes[ selectedBoxIndex + 1 ];
 
   const boxPkms = Object.fromEntries(
     savePkms
       .filter((pkm) => pkm.box === selectedBox.idInt)
-      .map((pkm) => [pkm.boxSlot, pkm])
+      .map((pkm) => [ pkm.boxSlot, pkm ])
   );
 
-  const allItems = new Array(saveInfos.boxSlotCount)
+  const itemsCount = switchUtil(selectedBox.idInt, {
+    [ -1 ]: saveInfos.partyCount,
+    [ -2 ]: saveInfos.daycareCount,
+  }) as number | undefined ?? saveInfos.boxSlotCount;
+
+  const allItems = new Array(itemsCount)
     .fill(null)
-    .map((_, i): PkmSaveDTO | null => boxPkms[i] ?? null);
+    .map((_, i): PkmSaveDTO | null => boxPkms[ i ] ?? null);
 
   return (
     <div
@@ -64,20 +74,43 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
         gap: 8,
       }}
     >
-      <SaveItem saveId={saveId} />
+      <div style={{
+        display: 'flex',
+        gap: 8,
+      }}>
+        <SaveItem saveId={saveId} />
+
+        <Button as={Route.Link} to={Route.to} search={{
+          save: undefined,
+          saveBoxId: undefined,
+          selected: undefined,
+        }}>Back</Button>
+      </div>
 
       <StorageBox
         header={
           <>
+            {/* {partyBox && <Button
+              onClick={() =>
+                navigate({
+                  search: {
+                    saveBoxId: partyBox.id,
+                  },
+                })
+              }
+            >
+              {partyBox.name ?? 'Party'}
+            </Button>} */}
+
             <Button
               onClick={() =>
                 navigate({
                   search: {
-                    saveBoxId: previousBox.idInt,
+                    saveBoxId: previousBox.id,
                   },
                 })
               }
-              disabled={!previousBox}
+              disabled={!previousBox || previousBox.type !== BoxType.Default}
             >
               {"<"}
             </Button>
@@ -89,16 +122,12 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
                   value: box.id,
                   label: box.name,
                 })),
-                {
-                  value: "",
-                  label: "Create new box",
-                },
               ]}
-              value={[selectedBox.id]}
-              onChange={([value]) => {
+              value={[ selectedBox.id ]}
+              onChange={([ value ]) => {
                 navigate({
                   search: {
-                    saveBoxId: Number(value),
+                    saveBoxId: value,
                   },
                 });
               }}
@@ -110,14 +139,26 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               onClick={() =>
                 navigate({
                   search: {
-                    saveBoxId: nextBox.idInt,
+                    saveBoxId: nextBox.id,
                   },
                 })
               }
-              disabled={!nextBox}
+              disabled={!nextBox || nextBox.type !== BoxType.Default}
             >
               {">"}
             </Button>
+
+            {/* {daycareBox && <Button
+              onClick={() =>
+                navigate({
+                  search: {
+                    saveBoxId: daycareBox.id,
+                  },
+                })
+              }
+            >
+              {daycareBox.name ?? 'Daycare'}
+            </Button>} */}
           </>
         }
       >

@@ -1,12 +1,11 @@
 
 using System.Text.Json;
 using PKHeX.Core;
-using PKHeX.Core.AutoMod;
 using PKHeX.Core.Searching;
 
 public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
 {
-    public static PkmSaveDTO FromPkm(SaveFile save, PKM pkm, BoxType boxType, int box, int boxSlot, List<PkmEntity> pkmEntities)
+    public static PkmSaveDTO FromPkm(SaveFile save, PKM pkm, int box, int boxSlot, List<PkmEntity> pkmEntities)
     {
         var id = GetPKMId(pkm, save.Generation);
 
@@ -20,7 +19,7 @@ public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
             Gender = pkm.Gender,
             IsShiny = pkm.IsShiny,
             IsShadow = pkm is IShadowCapture pkmShadow ? pkmShadow.IsShadow : false,
-            BoxType = boxType,
+            // BoxType = boxType,
             Box = box,
             BoxSlot = boxSlot,
             Pkm = pkm
@@ -44,7 +43,7 @@ public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
 
     public uint SaveId { get; set; }
 
-    public BoxType BoxType { get; set; }
+    // public BoxType BoxType { get; set; }
 
     public int Box { get; set; }
 

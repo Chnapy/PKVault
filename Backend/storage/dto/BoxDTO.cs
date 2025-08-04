@@ -4,13 +4,17 @@ using PKHeX.Core;
 
 public class BoxDTO : IWithId<string>, ICloneable<BoxDTO>
 {
+    public const int PARTY_ID = -1;
+    public const int DAYCARE_ID = -2;
+
     public static BoxDTO FromEntity(BoxEntity entity)
     {
         return new BoxDTO
         {
             Id = entity.Id,
             Type = BoxType.Default,
-            Name = entity.Name
+            Name = entity.Name,
+            CanReceivePkm = true,
         };
     }
 
@@ -23,7 +27,9 @@ public class BoxDTO : IWithId<string>, ICloneable<BoxDTO>
 
     public BoxType Type { get; set; }
 
-    public string? Name { get; set; }
+    public string Name { get; set; }
+
+    public bool CanReceivePkm { get; set; }
 
     public BoxDTO Clone()
     {

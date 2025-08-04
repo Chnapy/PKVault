@@ -26,6 +26,8 @@ public class SaveInfosDTO
             seenCount = caughtCount;
         }
 
+        var DaycareCount = save is IDaycareStorage daycareSave ? daycareSave.DaycareSlotCount : 0;
+
         return new SaveInfosDTO
         {
             Id = entity.SaveId,
@@ -42,6 +44,8 @@ public class SaveInfosDTO
             DexCaughtCount = caughtCount,
             OwnedCount = ownedCount,
             ShinyCount = shinyCount,
+            PartyCount = save.PartyCount,
+            DaycareCount = DaycareCount,
             BoxCount = save.BoxCount,
             BoxSlotCount = save.BoxSlotCount,
             MaxSpeciesId = save.MaxSpeciesID,
@@ -77,6 +81,10 @@ public class SaveInfosDTO
     public int OwnedCount { get; set; }
 
     public int ShinyCount { get; set; }
+
+    public int PartyCount { get; set; }
+
+    public int DaycareCount { get; set; }
 
     public int BoxCount { get; set; }
 

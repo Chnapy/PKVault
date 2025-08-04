@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using PKHeX.Core;
 
 namespace Backend;
 
@@ -13,6 +14,8 @@ public static class Program
         // {
         //     return;
         // }
+
+        // GameInfo.CurrentLanguage = "fr";
 
         SaveInfosService.LoadLastSaves();
 

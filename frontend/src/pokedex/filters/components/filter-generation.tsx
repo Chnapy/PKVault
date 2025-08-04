@@ -2,15 +2,18 @@ import React from "react";
 import { useStaticData } from "../../../data/static-data/static-data";
 import { Route } from "../../../routes/pokedex";
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
+import { useCurrentLanguageName } from '../../../data/hooks/use-current-language-name';
 
 export const FilterGeneration: React.FC = () => {
   const navigate = Route.useNavigate();
   const searchValue =
-    Route.useSearch({ select: (search) => search.filters.generations }) ?? [];
+    Route.useSearch({ select: (search) => search.filterGenerations }) ?? [];
+
+  const getCurrentLanguageName = useCurrentLanguageName();
 
   const options = useStaticData().generation.map((generation) => ({
     value: generation.name,
-    label: generation.names.find((name) => name.language.name === "fr")!.name,
+    label: getCurrentLanguageName(generation.names),
   }));
 
   return (
@@ -21,9 +24,7 @@ export const FilterGeneration: React.FC = () => {
       onChange={(values) => {
         navigate({
           search: {
-            filters: {
-              generations: values,
-            },
+            filterGenerations: values,
           },
         });
       }}

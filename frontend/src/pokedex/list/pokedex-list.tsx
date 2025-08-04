@@ -5,9 +5,12 @@ import { usePokedexFilters } from "./hooks/use-pokedex-filters";
 import { PokedexItem } from "./pokedex-item";
 import { theme } from '../../ui/theme';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import { useCurrentLanguageName } from '../../data/hooks/use-current-language-name';
 
 export const PokedexList: React.FC = () => {
   console.time("pokedex-list");
+
+  const getCurrentLanguageName = useCurrentLanguageName();
 
   const staticData = useStaticData();
 
@@ -86,9 +89,9 @@ export const PokedexList: React.FC = () => {
             padding: "40px 40px 10px",
           }}
         >
-          {staticData.generation
-            .find((gen) => gen.name === currentGenerationName)
-            ?.names.find((name) => name.language.name === "fr")?.name}
+          {getCurrentLanguageName(
+            staticData.generation
+              .find((gen) => gen.name === currentGenerationName)!.names)}
 
           <div
             style={{

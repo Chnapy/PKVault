@@ -1,12 +1,10 @@
 import { css, cx } from "@emotion/css";
 import type React from "react";
-import { Container, type ContainerProps } from "../container/container";
+import { Container, type ContainerProps, type ReactTag } from "../container/container";
 import { theme } from "../theme";
 
 export type ButtonProps<
-  AS extends React.HTMLElementType | React.ComponentType =
-    | React.HTMLElementType
-    | React.ComponentType,
+  AS extends ReactTag = ReactTag,
 > = React.PropsWithChildren<{
   onClick?: () => void;
   bgColor?: string;
@@ -14,7 +12,7 @@ export type ButtonProps<
   ContainerProps<AS>;
 
 export function Button<
-  AS extends React.HTMLElementType | React.ComponentType = "button",
+  AS extends ReactTag = "button",
 >({
   as = "button" as AS,
   className,

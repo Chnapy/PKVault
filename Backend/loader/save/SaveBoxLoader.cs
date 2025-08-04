@@ -17,9 +17,10 @@ public class SaveBoxLoader : EntityLoader<BoxDTO>
         {
             boxes.Add(new BoxDTO
             {
-                Id = "party",
+                Id = BoxDTO.PARTY_ID.ToString(),
                 Type = BoxType.Party,
-                Name = null
+                Name = "Party",
+                CanReceivePkm = true,
             });
         }
 
@@ -27,9 +28,10 @@ public class SaveBoxLoader : EntityLoader<BoxDTO>
         {
             boxes.Add(new BoxDTO
             {
-                Id = "daycare",
+                Id = BoxDTO.DAYCARE_ID.ToString(),
                 Type = BoxType.Daycare,
-                Name = null
+                Name = "Daycare",
+                CanReceivePkm = false,
             });
         }
 

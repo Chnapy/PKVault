@@ -1,4 +1,10 @@
+import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import { useAbilityByIdOrName } from '../data/hooks/use-ability-by-id-or-name';
+import { useCurrentLanguageName } from '../data/hooks/use-current-language-name';
+import { useMoveByIdOrName } from '../data/hooks/use-move-by-id-or-name';
+import { useNatureByIdOrName } from '../data/hooks/use-nature-by-id-or-name';
+import { useTypeByIdOrName } from '../data/hooks/use-type-by-id-or-name';
 import type { SaveInfosDTO } from "../data/sdk/model";
 import { useSaveInfosGetAll } from "../data/sdk/save-infos/save-infos.gen";
 import {
@@ -10,10 +16,12 @@ import {
   useStorageGetSavePkms,
   useStorageMainCreatePkmVersion,
 } from "../data/sdk/storage/storage.gen";
+import { useStaticData } from "../data/static-data/static-data";
+import { getGender } from '../data/utils/get-gender';
 import { Button } from "../ui/button/button";
 import { StorageItemDetails } from "../ui/storage-item-details/storage-item-details";
-import { useStaticData } from "../data/static-data/static-data";
-import { useQueryClient } from "@tanstack/react-query";
+import { StorageSaveDetails } from '../ui/storage-item-details/storage-save-details';
+import { Route } from '../routes/storage';
 
 export type StorageDetailsProps = {
   type: "main" | "save";
@@ -26,12 +34,21 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
   id,
   saveId,
 }) => {
-  const staticData = useStaticData();
+  const navigate = Route.useNavigate();
+
+  const pkmSpeciesRecord = useStaticData().pokemonSpecies;
+  const pkmRecord = useStaticData().pokemon;
+
+  const getTypeByIdOrName = useTypeByIdOrName();
+  const getMoveByIdOrName = useMoveByIdOrName();
+  const getAbilityByIdOrName = useAbilityByIdOrName();
+  const getNatureByIdOrName = useNatureByIdOrName();
+  const getCurrentLanguageName = useCurrentLanguageName();
 
   const queryClient = useQueryClient();
 
   const saveInfosRecord = useSaveInfosGetAll().data?.data ?? {};
-  const saveInfos = saveInfosRecord[saveId ?? -1]?.[0] as
+  const saveInfos = saveInfosRecord[ saveId ?? -1 ]?.[ 0 ] as
     | SaveInfosDTO
     | undefined;
 
@@ -78,7 +95,7 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
 
   if (mainPkmVersions.length && !mainPkm) {
     mainPkm = mainPkmQuery.data?.data.find(
-      (pkm) => pkm.id === mainPkmVersions[0].pkmId
+      (pkm) => pkm.id === mainPkmVersions[ 0 ].pkmId
     );
     mainPkmVersions =
       mainPkmVersionsQuery.data?.data.filter(
@@ -87,11 +104,11 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
     savePkm = undefined;
   }
 
-  const pkmList = [savePkm!, ...mainPkmVersions].filter(Boolean);
+  const pkmList = [ savePkm!, ...mainPkmVersions ].filter(Boolean);
 
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [ selectedIndex, setSelectedIndex ] = React.useState(0);
 
-  const selectedPkm = pkmList[selectedIndex] ?? pkmList[0];
+  const selectedPkm = pkmList[ selectedIndex ] ?? pkmList[ 0 ];
   if (!selectedPkm) {
     return null;
   }
@@ -99,10 +116,75 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
   const species =
     "species" in selectedPkm ? selectedPkm.species : mainPkm!.species;
 
-  const speciesName =
-    staticData.pokemonSpecies[species].names.find(
-      (name) => name.language.name === "fr"
-    )?.name ?? staticData.pokemonSpecies[species].name;
+  const speciesName = getCurrentLanguageName(pkmSpeciesRecord[ species ].names);
+
+  if (type === 'save') {
+    const savePkm = savePkmQuery.data?.data.find((pkm) => pkm.id === id);
+    if (!savePkm)
+      return null;
+
+    const gender = getGender(savePkm.gender);
+
+    const originTrainerGender = getGender(savePkm.originTrainerGender);
+
+    const types = pkmRecord[ species ].types.map(type =>
+      getCurrentLanguageName(getTypeByIdOrName(type.type.name).names)
+    );
+
+    const moves = savePkm.moves.map(id => {
+      const move = getMoveByIdOrName(id);
+
+      return move ? getCurrentLanguageName(move.names) : '-';
+    });
+
+    const ability = typeof savePkm.ability === 'number' ? getAbilityByIdOrName(savePkm.ability) : undefined;
+    const abilityStr = ability && getCurrentLanguageName(ability.names);
+
+    const nature = typeof savePkm.nature === 'number' ? getNatureByIdOrName(savePkm.nature) : undefined;
+    const natureStr = nature && getCurrentLanguageName(nature.names);
+
+    return <StorageSaveDetails
+      id={savePkm.id}
+      saveId={savePkm.saveId}
+      generation={savePkm.generation}
+      version={savePkm.version}
+      pid={savePkm.pid}
+      species={savePkm.species}
+      isShiny={savePkm.isShiny}
+      isEgg={savePkm.isEgg}
+      isShadow={savePkm.isShadow}
+      ball={savePkm.ball}
+      gender={gender}
+      nickname={savePkm.nickname}
+      types={types}
+      stats={savePkm.stats}
+      ivs={savePkm.iVs}
+      evs={savePkm.eVs}
+      hiddenPowerType={getCurrentLanguageName(getTypeByIdOrName(savePkm.hiddenPowerType).names)}
+      hiddenPowerPower={savePkm.hiddenPowerPower}
+      nature={natureStr}
+      ability={abilityStr}
+      level={savePkm.level}
+      exp={savePkm.exp}
+      moves={moves}
+      tid={savePkm.tid}
+      originTrainerName={savePkm.originTrainerName}
+      originTrainerGender={originTrainerGender}
+      originMetDate={savePkm.originMetDate}
+      originMetLocation={savePkm.originMetLocation}
+      isValid={savePkm.isValid}
+      validityReport={savePkm.validityReport}
+      box={savePkm.box}
+      boxSlot={savePkm.boxSlot}
+      canMoveToMainStorage={savePkm.canMoveToMainStorage}
+      onDelete={console.log}
+      onClose={() => navigate({
+        search: {
+          selected: undefined,
+        }
+      })}
+    />
+  }
 
   return (
     <StorageItemDetails
@@ -141,14 +223,14 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
             )}
         </>
       }
-      saveId={type === "save" ? saveId : undefined}
+      saveId={undefined}
       species={species}
       speciesName={speciesName}
-      version={type === "save" ? saveInfos?.version : undefined}
+      version={undefined}
       generation={selectedPkm.generation}
       isEgg={selectedPkm.isEgg}
-      originStr={`${selectedPkm.originMetDate} ${selectedPkm.originMetLocation} ${selectedPkm.originTrainerName}`}
-      nickname={selectedPkm.nickname}
+      originStr={`${selectedPkm.originMetDate} ${selectedPkm.originMetLocation} originTrainerName=${selectedPkm.originTrainerName}`}
+      // nickname={selectedPkm.nickname}
       stats={selectedPkm.stats}
       ivs={selectedPkm.iVs}
       evs={selectedPkm.eVs}

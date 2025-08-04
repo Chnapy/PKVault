@@ -17,6 +17,7 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
         borderRadius: 4,
         flexGrow: 1,
         // width: "100%",
+        overflow: 'hidden'
       }}
     >
       <div

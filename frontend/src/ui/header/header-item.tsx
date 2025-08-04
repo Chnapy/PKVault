@@ -19,7 +19,10 @@ export const HeaderItem: React.FC<React.PropsWithChildren<HeaderItemProps>> = ({
     <Button
       as={Link}
       to={to}
-      search={() => ({} as never)}
+      search={(search) => {
+        // remove all search params
+        return Object.fromEntries(Object.keys(search).map(key => [ key, undefined ])) as never;
+      }}
       className={css({
         flexGrow: 1,
         fontWeight: "bold",

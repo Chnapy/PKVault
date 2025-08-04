@@ -70,9 +70,9 @@ public class StorageController : ControllerBase
     }
 
     [HttpPut("save/{saveId}/move-pkm")]
-    public void SaveMovePkm(uint saveId, [BindRequired] string pkmId, [BindRequired] BoxType boxType, [BindRequired] int boxId, [BindRequired] int boxSlot)
+    public void SaveMovePkm(uint saveId, [BindRequired] string pkmId, [BindRequired] int boxId, [BindRequired] int boxSlot)
     {
-        StorageService.SaveMovePkm(saveId, pkmId, boxType, boxId, boxSlot);
+        StorageService.SaveMovePkm(saveId, pkmId, boxId, boxSlot);
     }
 
     [HttpPut("save/{saveId}/move-pkm-to-storage")]
@@ -82,8 +82,8 @@ public class StorageController : ControllerBase
     }
 
     [HttpPut("save/{saveId}/move-pkm-from-storage")]
-    public void SaveMovePkmFromStorage(uint saveId, [BindRequired] string pkmVersionId, [BindRequired] BoxType saveBoxType, [BindRequired] int saveBoxId, [BindRequired] int saveSlot)
+    public void SaveMovePkmFromStorage(uint saveId, [BindRequired] string pkmVersionId, [BindRequired] int saveBoxId, [BindRequired] int saveSlot)
     {
-        StorageService.SaveMovePkmFromStorage(saveId, pkmVersionId, saveBoxType, saveBoxId, saveSlot);
+        StorageService.SaveMovePkmFromStorage(saveId, pkmVersionId, saveBoxId, saveSlot);
     }
 }

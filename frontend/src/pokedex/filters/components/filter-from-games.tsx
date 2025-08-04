@@ -7,14 +7,14 @@ import { getGameInfos } from "../../details/util/get-game-infos";
 export const FilterFromGames: React.FC = () => {
   const navigate = Route.useNavigate();
   const searchValue =
-    Route.useSearch({ select: (search) => search.filters.fromGames })?.map(
+    Route.useSearch({ select: (search) => search.filterFromGames })?.map(
       String
     ) ?? [];
 
   const saveInfosQuery = useSaveInfosGetAll();
 
   const options = Object.values(saveInfosQuery.data?.data ?? {})
-    .map((saves) => saves[0])
+    .map((saves) => saves[ 0 ])
     .map((save) => {
       const infos = getGameInfos(save.version);
 
@@ -32,9 +32,7 @@ export const FilterFromGames: React.FC = () => {
       onChange={(fromGames) => {
         navigate({
           search: {
-            filters: {
-              fromGames: fromGames.map(Number),
-            },
+            filterFromGames: fromGames.map(Number),
           },
         });
       }}

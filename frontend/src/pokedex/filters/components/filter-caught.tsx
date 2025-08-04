@@ -5,7 +5,7 @@ import { FilterCheckbox } from "../../../ui/filter/filter-checkbox/filter-checkb
 export const FilterCaught: React.FC = () => {
   const navigate = Route.useNavigate();
   const searchValue = Route.useSearch({
-    select: (search) => search.filters.caught,
+    select: (search) => search.filterCaught,
   });
 
   return (
@@ -15,13 +15,11 @@ export const FilterCaught: React.FC = () => {
       onClick={() =>
         navigate({
           search: {
-            filters: {
-              caught: searchValue
-                ? false
-                : searchValue === false
-                  ? undefined
-                  : true,
-            },
+            filterCaught: searchValue
+              ? false
+              : searchValue === false
+                ? undefined
+                : true,
           },
         })
       }

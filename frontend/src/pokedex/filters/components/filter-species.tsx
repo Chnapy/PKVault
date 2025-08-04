@@ -5,11 +5,11 @@ import { FilterInput } from "../../../ui/filter/filter-input/filter-input";
 export const FilterSpecies: React.FC = () => {
   const navigate = Route.useNavigate();
   const searchValue = Route.useSearch({
-    select: (search) => search.filters.speciesName ?? "",
+    select: (search) => search.filterSpeciesName ?? "",
   });
   const timeoutRef = React.useRef<NodeJS.Timeout>(null);
 
-  const [value, setValue] = React.useState(searchValue);
+  const [ value, setValue ] = React.useState(searchValue);
 
   return (
     <FilterInput
@@ -24,9 +24,7 @@ export const FilterSpecies: React.FC = () => {
         timeoutRef.current = setTimeout(() => {
           navigate({
             search: {
-              filters: {
-                speciesName: e.target.value,
-              },
+              filterSpeciesName: e.target.value,
             },
           });
         }, 500);

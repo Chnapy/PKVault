@@ -31,9 +31,9 @@ const root = (props: ContainerProps) =>
       "&:hover:not(:active)":
         (props.componentDescriptor ?? props.as) === "button" && !props.selected
           ? {
-              // outline: `2px dashed ${theme.border.contrast}`,
-              outlineWidth: 1,
-            }
+            // outline: `2px dashed ${theme.border.contrast}`,
+            outlineWidth: 1,
+          }
           : undefined,
     },
     outline: `0 solid ${theme.border.contrast}`,
@@ -53,24 +53,22 @@ export type ContainerOwnProps = {
   selected?: boolean;
 };
 
+export type ReactTag = keyof React.JSX.IntrinsicElements | React.JSXElementConstructor<any>;
+
 export type ContainerProps<
-  AS extends React.HTMLElementType | React.ComponentType =
-    | React.HTMLElementType
-    | React.ComponentType,
+  AS extends ReactTag = ReactTag,
 > = ContainerOwnProps & {
   as?: AS;
-} & (AS extends React.HTMLElementType
-    ? React.JSX.IntrinsicElements[AS]
-    : React.ComponentProps<AS>);
+} & React.ComponentProps<AS>;
 
 export function Container<
-  AS extends React.HTMLElementType | React.ComponentType = "div",
+  AS extends ReactTag = "div",
 >({
   className,
   children,
   ...props
 }: React.PropsWithChildren<ContainerProps<AS>>) {
-  const Component: React.HTMLElementType | React.ComponentType =
+  const Component: ReactTag =
     props.as ?? "div";
 
   const {

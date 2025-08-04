@@ -16,6 +16,8 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
         var la = new LegalityAnalysis(pkm);
 
+        HiddenPower.TryGetTypeIndex(pkm.HPType, out var hptype);
+
         dto.Version = pkm.Version;
         dto.PID = pkm.PID;
         // dto.Species = pkm.Species;
@@ -28,16 +30,16 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         dto.IVs = ivs.ToArray();
         dto.EVs = evs.ToArray();
         dto.Stats = pkm.GetStats(pkm.PersonalInfo);
-        dto.HiddenPowerType = pkm.HPType;
+        dto.HiddenPowerType = hptype + 1;
         dto.HiddenPowerPower = pkm.HPPower;
-        dto.Nature = pkm.Nature;
-        dto.Ability = pkm.Ability;
+        dto.Nature = pkm.Generation > 2 ? pkm.Nature : null;
+        dto.Ability = pkm.Ability == -1 ? null : pkm.Ability;
         dto.Moves = moves.ToArray();
         dto.TID = pkm.TID16;
         dto.OriginTrainerName = pkm.OriginalTrainerName;
         dto.OriginTrainerGender = pkm.OriginalTrainerGender;
         dto.OriginMetDate = pkm.MetDate;
-        dto.OriginMetLocation = pkm.MetLocation;
+        dto.OriginMetLocation = GameInfo.GetStrings("fr").GetLocationName(pkm.WasEgg, pkm.MetLocation, pkm.Format, pkm.Generation, pkm.Version);
         dto.IsValid = pkm.Valid;
         dto.ValidityReport = la.Report();
     }
@@ -74,9 +76,9 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public int HiddenPowerPower { get; set; }
 
-    public Nature Nature { get; set; }
+    public Nature? Nature { get; set; }
 
-    public int Ability { get; set; }
+    public int? Ability { get; set; }
 
     public ushort[] Moves { get; set; }
 
@@ -88,7 +90,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public DateOnly? OriginMetDate { get; set; }
 
-    public ushort OriginMetLocation { get; set; }
+    public string OriginMetLocation { get; set; }
 
     public bool IsValid { get; set; }
 

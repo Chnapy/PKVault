@@ -1,9 +1,18 @@
+import { useCurrentLanguageName } from '../../../data/hooks/use-current-language-name';
 import type { DexItemDTO } from "../../../data/sdk/model";
 import { useStaticData } from "../../../data/static-data/static-data";
 import { Route } from "../../../routes/pokedex";
 
 export const usePokedexFilters = () => {
-  const filters = Route.useSearch({ select: (search) => search.filters });
+
+  const getCurrentLanguageName = useCurrentLanguageName();
+
+  const filterSpeciesName = Route.useSearch({ select: (search) => search.filterSpeciesName });
+  const filterTypes = Route.useSearch({ select: (search) => search.filterTypes });
+  const filterSeen = Route.useSearch({ select: (search) => search.filterSeen });
+  const filterCaught = Route.useSearch({ select: (search) => search.filterCaught });
+  const filterFromGames = Route.useSearch({ select: (search) => search.filterFromGames });
+  const filterGenerations = Route.useSearch({ select: (search) => search.filterGenerations });
 
   const staticData = useStaticData();
 
@@ -11,25 +20,23 @@ export const usePokedexFilters = () => {
     species: number,
     speciesValues: DexItemDTO[]
   ): boolean => {
-    const pkmSpeciesInfos = staticData.pokemonSpecies[species];
-    const pkmInfos = staticData.pokemon[species];
+    const pkmSpeciesInfos = staticData.pokemonSpecies[ species ];
+    const pkmInfos = staticData.pokemon[ species ];
 
     const seen = speciesValues.some((spec) => spec.isAnySeen);
     const caught = speciesValues.some((spec) => spec.isCaught);
 
-    if (filters.speciesName) {
-      const name = pkmSpeciesInfos.names.find(
-        (n) => n.language.name === "fr"
-      )!.name;
+    if (filterSpeciesName) {
+      const name = getCurrentLanguageName(pkmSpeciesInfos.names);
 
-      if (!name.toLowerCase().includes(filters.speciesName.toLowerCase())) {
+      if (!name.toLowerCase().includes(filterSpeciesName.toLowerCase())) {
         return true;
       }
     }
 
-    if (filters.types?.length) {
+    if (filterTypes?.length) {
       if (
-        filters.types.some((type) =>
+        filterTypes.some((type) =>
           pkmInfos.types.every((t) => t.type.name !== type)
         )
       ) {
@@ -37,29 +44,29 @@ export const usePokedexFilters = () => {
       }
     }
 
-    if (filters.seen !== undefined) {
-      if ((filters.seen && !seen) || (!filters.seen && seen)) {
+    if (filterSeen !== undefined) {
+      if ((filterSeen && !seen) || (!filterSeen && seen)) {
         return true;
       }
     }
 
-    if (filters.caught !== undefined) {
-      if ((filters.caught && !caught) || (!filters.caught && caught)) {
+    if (filterCaught !== undefined) {
+      if ((filterCaught && !caught) || (!filterCaught && caught)) {
         return true;
       }
     }
 
-    if (filters.fromGames?.length) {
+    if (filterFromGames?.length) {
       if (
-        speciesValues.every((spec) => !filters.fromGames!.includes(spec.saveId))
+        speciesValues.every((spec) => !filterFromGames!.includes(spec.saveId))
       ) {
         return true;
       }
     }
 
-    if (filters.generations?.length) {
+    if (filterGenerations?.length) {
       if (
-        filters.generations.every(
+        filterGenerations.every(
           (generation) => generation !== pkmSpeciesInfos.generation.name
         )
       ) {
@@ -71,11 +78,11 @@ export const usePokedexFilters = () => {
   };
 
   const filterSpeciesValues = (value: DexItemDTO) => {
-    if (!filters.fromGames?.length) {
+    if (!filterFromGames?.length) {
       return true;
     }
 
-    return filters.fromGames.includes(value.saveId);
+    return filterFromGames.includes(value.saveId);
   };
 
   return {

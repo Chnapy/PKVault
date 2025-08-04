@@ -1,6 +1,6 @@
 import { DndContext } from "@dnd-kit/core";
 import { useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import type React from "react";
 import z from "zod";
@@ -182,7 +182,6 @@ export const Storage: React.FC = () => {
               saveId,
               params: {
                 pkmId: activeData.pkmId,
-                boxType: BoxType.Default,
                 boxId: overData.boxId,
                 boxSlot: overData.boxSlot,
               },
@@ -207,7 +206,6 @@ export const Storage: React.FC = () => {
               saveId,
               params: {
                 pkmVersionId: savePkmVersion.id,
-                saveBoxType: BoxType.Default,
                 saveBoxId: overData.boxId,
                 saveSlot: overData.boxSlot,
               },
@@ -278,22 +276,13 @@ const searchSchema = z.object({
     .optional(),
   save: z.number().optional(),
   mainBoxId: z.number().optional(),
-  saveBoxId: z.number().optional(),
+  saveBoxId: z.string().optional(),
 });
 
 export const Route = createFileRoute("/storage")({
   component: Storage,
   validateSearch: zodValidator(searchSchema),
   search: {
-    middlewares: [
-      ({ search, next }) => {
-        const result = next(search);
-
-        return {
-          ...search,
-          ...result,
-        };
-      },
-    ],
-  },
+    middlewares: [ retainSearchParams(true) ],
+  }
 });

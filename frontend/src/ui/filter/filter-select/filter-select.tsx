@@ -31,7 +31,10 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
   return (
     <div ref={rootRef}>
       <FilterLabel enabled={enabled}>
-        <Listbox {...props}>
+        <Listbox {...props} onChange={props.onChange && ((value: string[] | string) => {
+          const values = typeof value === 'string' ? [ value ] : value;
+          props.onChange?.(values);
+        })}>
           <ListboxButton
             className={css({
               color: "inherit",
