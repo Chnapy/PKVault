@@ -1,0 +1,100 @@
+import React from 'react';
+import { useAbilityByIdOrName } from '../../data/hooks/use-ability-by-id-or-name';
+import { useCurrentLanguageName } from '../../data/hooks/use-current-language-name';
+import { useMoveByIdOrName } from '../../data/hooks/use-move-by-id-or-name';
+import { useNatureByIdOrName } from '../../data/hooks/use-nature-by-id-or-name';
+import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
+import { useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
+import { useStaticData } from '../../data/static-data/static-data';
+import { getGender } from '../../data/utils/get-gender';
+import { Route } from '../../routes/storage';
+import { StorageSaveDetails } from '../../ui/storage-item-details/storage-save-details';
+
+export type StorageDetailsSaveProps = {
+    selectedId: string;
+    saveId: number;
+};
+
+export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
+    selectedId,
+    saveId,
+}) => {
+    const navigate = Route.useNavigate();
+
+    // const pkmSpeciesRecord = useStaticData().pokemonSpecies;
+    const pkmRecord = useStaticData().pokemon;
+
+    const getTypeByIdOrName = useTypeByIdOrName();
+    const getMoveByIdOrName = useMoveByIdOrName();
+    const getAbilityByIdOrName = useAbilityByIdOrName();
+    const getNatureByIdOrName = useNatureByIdOrName();
+    const getCurrentLanguageName = useCurrentLanguageName();
+
+    const savePkmQuery = useStorageGetSavePkms(saveId);
+
+    const savePkm = savePkmQuery.data?.data.find((pkm) => pkm.id === selectedId);
+    if (!savePkm)
+        return null;
+
+    const gender = getGender(savePkm.gender);
+
+    const originTrainerGender = getGender(savePkm.originTrainerGender);
+
+    const types = pkmRecord[ savePkm.species ].types.map(type =>
+        getCurrentLanguageName(getTypeByIdOrName(type.type.name).names)
+    );
+
+    const moves = savePkm.moves.map(id => {
+        const move = getMoveByIdOrName(id);
+
+        return move ? getCurrentLanguageName(move.names) : '-';
+    });
+
+    const ability = typeof savePkm.ability === 'number' ? getAbilityByIdOrName(savePkm.ability) : undefined;
+    const abilityStr = ability && getCurrentLanguageName(ability.names);
+
+    const nature = typeof savePkm.nature === 'number' ? getNatureByIdOrName(savePkm.nature) : undefined;
+    const natureStr = nature && getCurrentLanguageName(nature.names);
+
+    return <StorageSaveDetails
+        id={savePkm.id}
+        generation={savePkm.generation}
+        version={savePkm.version}
+        pid={savePkm.pid}
+        species={savePkm.species}
+        isShiny={savePkm.isShiny}
+        isEgg={savePkm.isEgg}
+        isShadow={savePkm.isShadow}
+        ball={savePkm.ball}
+        gender={gender}
+        nickname={savePkm.nickname}
+        types={types}
+        stats={savePkm.stats}
+        ivs={savePkm.iVs}
+        evs={savePkm.eVs}
+        hiddenPowerType={getCurrentLanguageName(getTypeByIdOrName(savePkm.hiddenPowerType).names)}
+        hiddenPowerPower={savePkm.hiddenPowerPower}
+        nature={natureStr}
+        ability={abilityStr}
+        level={savePkm.level}
+        exp={savePkm.exp}
+        moves={moves}
+        tid={savePkm.tid}
+        originTrainerName={savePkm.originTrainerName}
+        originTrainerGender={originTrainerGender}
+        originMetDate={savePkm.originMetDate}
+        originMetLocation={savePkm.originMetLocation}
+        originMetLevel={savePkm.originMetLevel}
+        isValid={savePkm.isValid}
+        validityReport={savePkm.validityReport}
+        box={savePkm.box}
+        boxSlot={savePkm.boxSlot}
+        canMoveToMainStorage={savePkm.canMoveToMainStorage}
+        onRelease={console.log}
+        onClose={() => navigate({
+            search: {
+                selected: undefined,
+            }
+        })}
+    />;
+};
