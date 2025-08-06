@@ -1,18 +1,18 @@
-import React from 'react';
-import { Route } from '../../routes/storage';
-import { useStaticData } from '../../data/static-data/static-data';
-import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
-import { useMoveByIdOrName } from '../../data/hooks/use-move-by-id-or-name';
 import { useQueryClient } from '@tanstack/react-query';
+import React from 'react';
 import { useAbilityByIdOrName } from '../../data/hooks/use-ability-by-id-or-name';
 import { useCurrentLanguageName } from '../../data/hooks/use-current-language-name';
+import { useMoveByIdOrName } from '../../data/hooks/use-move-by-id-or-name';
 import { useNatureByIdOrName } from '../../data/hooks/use-nature-by-id-or-name';
+import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
-import { useStorageMainCreatePkmVersion, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetSavePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../../data/sdk/storage/storage.gen';
+import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion } from '../../data/sdk/storage/storage.gen';
+import { useStaticData } from '../../data/static-data/static-data';
 import { getGender } from '../../data/utils/get-gender';
+import { Route } from '../../routes/storage';
+import { Button } from '../../ui/button/button';
 import { StorageMainDetails } from '../../ui/storage-item-details/storage-main-details';
 import { theme } from '../../ui/theme';
-import { Button } from '../../ui/button/button';
 
 export type StorageDetailsMainProps = {
     selectedId: string;
@@ -41,6 +41,10 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
     const mainCreatePkmVersionMutation = useStorageMainCreatePkmVersion({
         mutation: {
             onSuccess: async () => {
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetActionsQueryKey(),
+                });
+
                 await queryClient.invalidateQueries({
                     queryKey: getStorageGetMainPkmsQueryKey(),
                 });

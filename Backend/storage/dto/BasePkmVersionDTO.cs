@@ -5,14 +5,30 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 {
     public static void FillDTO(BasePkmVersionDTO dto, PKM pkm)
     {
-        Span<int> ivs = stackalloc int[6];
-        pkm.GetIVs(ivs);
+        Span<int> ivs = [
+            pkm.IV_HP,
+            pkm.IV_ATK,
+            pkm.IV_DEF,
+            pkm.IV_SPA,
+            pkm.IV_SPD,
+            pkm.IV_SPE,
+        ];
 
-        Span<int> evs = stackalloc int[6];
-        pkm.GetEVs(evs);
+        Span<int> evs = [
+            pkm.EV_HP,
+            pkm.EV_ATK,
+            pkm.EV_DEF,
+            pkm.EV_SPA,
+            pkm.EV_SPD,
+            pkm.EV_SPE,
+        ];
 
-        Span<ushort> moves = stackalloc ushort[4];
-        pkm.GetMoves(moves);
+        Span<ushort> moves = [
+            pkm.Move1,
+            pkm.Move2,
+            pkm.Move3,
+            pkm.Move4
+        ];
 
         var la = new LegalityAnalysis(pkm);
 

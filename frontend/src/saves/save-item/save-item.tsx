@@ -9,6 +9,7 @@ import {
 import { Button } from "../../ui/button/button";
 import { Container } from "../../ui/container/container";
 import { SaveCardContentFull } from '../../ui/save-card/save-card-content-full';
+import { useStorageGetActions } from '../../data/sdk/storage/storage.gen';
 
 export type SaveItemProps = {
   saveId: number;
@@ -25,6 +26,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
 }) => {
   const queryClient = useQueryClient();
   const saveInfosQuery = useSaveInfosGetAll();
+  const stockageActionsQuery = useStorageGetActions();
   const saveInfosDeleteMutation = useSaveInfosDelete({
     mutation: {
       onSuccess: async () => {
@@ -43,6 +45,8 @@ export const SaveItem: React.FC<SaveItemProps> = ({
   if (!saveInfosQuery.data) {
     return null;
   }
+
+  const hasStockageActions = stockageActionsQuery.data?.data.length !== 0;
 
   const saveInfos = Object.values(saveInfosQuery.data.data);
 
@@ -71,7 +75,8 @@ export const SaveItem: React.FC<SaveItemProps> = ({
         ownedCount={firstItem.ownedCount}
         shinyCount={firstItem.shinyCount}
         onDelete={
-          firstItem.canDelete && showDelete
+          !hasStockageActions &&
+            firstItem.canDelete && showDelete
             ? () =>
               saveInfosDeleteMutation.mutateAsync({
                 params: {

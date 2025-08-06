@@ -18,6 +18,15 @@ public class SaveMovePkmToStorageAction : DataAction
         storageSlot = _storageSlot;
     }
 
+    public override DataActionPayload GetPayload()
+    {
+        return new DataActionPayload
+        {
+            type = DataActionType.SAVE_MOVE_PKM_TO_STORAGE,
+            parameters = [saveId, savePkmId, storageBoxId, storageSlot]
+        };
+    }
+
     public override void Execute(DataEntityLoaders loaders)
     {
         var saveLoaders = loaders.getSaveLoaders(saveId);

@@ -12,6 +12,15 @@ public class MainCreatePkmVersionAction : DataAction
         generation = _generation;
     }
 
+    public override DataActionPayload GetPayload()
+    {
+        return new DataActionPayload
+        {
+            type = DataActionType.MAIN_CREATE_PKM_VERSION,
+            parameters = [pkmId, generation]
+        };
+    }
+
     public override void Execute(DataEntityLoaders loaders)
     {
         Console.WriteLine($"Create PKM version, pkmId={pkmId}, generation={generation}");

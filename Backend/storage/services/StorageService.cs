@@ -130,7 +130,14 @@ public class StorageService
 
         fileLoader.WriteSaves();
 
-        memoryLoader = new DataMemoryLoader();
+        ResetDataLoader();
+    }
+
+    public static List<DataActionPayload> GetActionPayloadList()
+    {
+        var actionPayloadList = new List<DataActionPayload>();
+        memoryLoader.actions.ForEach(action => actionPayloadList.Add(action.GetPayload()));
+        return actionPayloadList;
     }
 
     public static bool HasEmptyActionList()
@@ -141,5 +148,20 @@ public class StorageService
     public static void ResetDataLoader()
     {
         memoryLoader = new();
+    }
+
+    public static void RemoveDataActions(int actionIndexToRemoveFrom)
+    {
+        var previousActions = memoryLoader.actions;
+
+        ResetDataLoader();
+
+        for (var i = 0; i < previousActions.Count; i++)
+        {
+            if (actionIndexToRemoveFrom > i)
+            {
+                memoryLoader.AddAction(previousActions[i]);
+            }
+        }
     }
 }

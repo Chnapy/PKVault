@@ -17,6 +17,15 @@ public class SaveMovePkmAction : DataAction
         boxSlot = _boxSlot;
     }
 
+    public override DataActionPayload GetPayload()
+    {
+        return new DataActionPayload
+        {
+            type = DataActionType.SAVE_MOVE_PKM,
+            parameters = [saveId, id, boxId, boxSlot]
+        };
+    }
+
     public override void Execute(DataEntityLoaders loaders)
     {
         var saveLoaders = loaders.getSaveLoaders(saveId);

@@ -13,6 +13,15 @@ public class MainMovePkmAction : DataAction
         boxSlot = _boxSlot;
     }
 
+    public override DataActionPayload GetPayload()
+    {
+        return new DataActionPayload
+        {
+            type = DataActionType.MAIN_MOVE_PKM,
+            parameters = [id, boxId, boxSlot]
+        };
+    }
+
     public override void Execute(DataEntityLoaders loaders)
     {
         var entity = loaders.pkmLoader.GetEntity(id);

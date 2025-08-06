@@ -6,22 +6,21 @@ import type React from "react";
 import z from "zod";
 import { useSaveInfosGetAll } from "../data/sdk/save-infos/save-infos.gen";
 import {
+  getStorageGetActionsQueryKey,
   getStorageGetMainPkmsQueryKey,
   getStorageGetMainPkmVersionsQueryKey,
   getStorageGetSavePkmsQueryKey,
   useStorageGetMainPkmVersions,
   useStorageMainMovePkm,
-  useStorageSave,
   useStorageSaveMovePkm,
   useStorageSaveMovePkmFromStorage,
-  useStorageSaveMovePkmToStorage,
+  useStorageSaveMovePkmToStorage
 } from "../data/sdk/storage/storage.gen";
+import { ActionsPanel } from '../storage/actions/actions-panel';
+import { StorageDetails } from "../storage/storage-details";
 import { StorageMainBox } from "../storage/storage-main-box";
 import { StorageSaveBox } from "../storage/storage-save-box";
 import { StorageSaveSelect } from "../storage/storage-save-select";
-import { StorageDetails } from "../storage/storage-details";
-import { Button } from "../ui/button/button";
-import { BoxType } from '../data/sdk/model';
 
 export const Storage: React.FC = () => {
   const selected = Route.useSearch({ select: (search) => search.selected });
@@ -42,22 +41,8 @@ export const Storage: React.FC = () => {
     )
     : [];
 
-  const saveMutation = useStorageSave({
-    mutation: {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetMainPkmsQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetMainPkmVersionsQueryKey(),
-        });
-        if (saveId) {
-          await queryClient.invalidateQueries({
-            queryKey: getStorageGetSavePkmsQueryKey(saveId),
-          });
-        }
-      },
-    },
+  const invalidateActions = () => queryClient.invalidateQueries({
+    queryKey: getStorageGetActionsQueryKey(),
   });
 
   const mainMovePkmMutation = useStorageMainMovePkm({
@@ -66,6 +51,7 @@ export const Storage: React.FC = () => {
         await queryClient.invalidateQueries({
           queryKey: getStorageGetMainPkmsQueryKey(),
         });
+        await invalidateActions();
       },
     },
   });
@@ -73,6 +59,8 @@ export const Storage: React.FC = () => {
   const saveMovePkmMutation = useStorageSaveMovePkm({
     mutation: {
       onSuccess: async () => {
+        await invalidateActions();
+
         if (!saveId) {
           return;
         }
@@ -87,6 +75,8 @@ export const Storage: React.FC = () => {
   const saveMovePkmFromStorageMutation = useStorageSaveMovePkmFromStorage({
     mutation: {
       onSuccess: async () => {
+        await invalidateActions();
+
         if (!saveId) {
           return;
         }
@@ -107,6 +97,8 @@ export const Storage: React.FC = () => {
   const saveMovePkmToStorageMutation = useStorageSaveMovePkmToStorage({
     mutation: {
       onSuccess: async () => {
+        await invalidateActions();
+
         if (!saveId) {
           return;
         }
@@ -238,13 +230,13 @@ export const Storage: React.FC = () => {
       <div
         style={{
           position: "fixed",
-          bottom: 24,
-          left: "25%",
+          bottom: 0,
+          left: "50%",
+          transform: 'translateX(-50%)',
+          width: 400,
         }}
       >
-        <Button onClick={() => saveMutation.mutateAsync()} padding="big">
-          Save all changes
-        </Button>
+        <ActionsPanel />
       </div>
 
       {selected && (
