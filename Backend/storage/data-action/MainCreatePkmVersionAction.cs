@@ -14,6 +14,8 @@ public class MainCreatePkmVersionAction : DataAction
 
     public override void Execute(DataEntityLoaders loaders)
     {
+        Console.WriteLine($"Create PKM version, pkmId={pkmId}, generation={generation}");
+
         var pkmEntity = loaders.pkmLoader.GetEntity(pkmId);
         if (pkmEntity == default)
         {
@@ -44,6 +46,7 @@ public class MainCreatePkmVersionAction : DataAction
             3 => new PK3(),
             4 => new PK4(),
             5 => new PK5(),
+            7 => new PK7(),
             _ => default
         };
         if (target == default)
@@ -68,8 +71,17 @@ public class MainCreatePkmVersionAction : DataAction
         //     throw new Exception($"2.PKM target generation inconsistency, expected generation={generation} pkm.generation={target.Generation}");
         // }
 
+        var pkmIntermediate = pkmOrigin.Generation <= 2 && generation > 2
+        ? IntermediateConvertFromGB(pkmOrigin)
+        : pkmOrigin;
+        // if (pkmOrigin.Generation <= 2 && generation > 2)
+        // {
+        //     pkmIntermediate = EntityConverter.ConvertToType(pkmOrigin, new PK3().GetType(), out var intermediateResult);
+        //     Console.WriteLine($"Convert-intermediate result={intermediateResult}");
+        // }
+        // var pkmConverted = pkmIntermediate;
         var converted = EntityConverter.TryMakePKMCompatible(
-            pkmOrigin,
+            pkmIntermediate,
             target,
             out var result,
             out var pkmConverted
@@ -79,6 +91,8 @@ public class MainCreatePkmVersionAction : DataAction
         {
             throw new Exception($"PKM converted broken, species={pkmConverted.Species} original.species={pkmOrigin.Species}");
         }
+
+        Console.WriteLine($"Convert result={result}");
 
         // if (pkmConverted.Generation != generation)
         // {
@@ -95,6 +109,8 @@ public class MainCreatePkmVersionAction : DataAction
         //     StringConverterOption.None
         // );
 
+        // pkmConverted.Language = (int)LanguageID.French;
+
         pkmConverted.OriginalTrainerName = pkmEntity.OTName;
         pkmConverted.IsNicknamed = pkmOrigin.IsNicknamed;
         pkmConverted.Nickname = pkmEntity.Nickname;
@@ -109,7 +125,7 @@ public class MainCreatePkmVersionAction : DataAction
                 (byte)generation,
                 false,
                 false,
-                pkmOrigin.Language
+                (int)LanguageID.French
             );
 
             StringConverter.SetString(
@@ -120,11 +136,23 @@ public class MainCreatePkmVersionAction : DataAction
                 (byte)generation,
                 false,
                 false,
-                pkmOrigin.Language
+                (int)LanguageID.French
             );
 
             DebugOT(pkmConverted);
         }
+
+        // if (pkmConverted.PID == 0)
+        // {
+        //     if (pkmOrigin.IsShiny)
+        //     {
+        //         CommonEdits.SetShiny(pkmConverted, Shiny.Random);
+        //     }
+        //     else
+        //     {
+        //         pkmConverted.SetPIDGender(pkmOrigin.Gender);
+        //     }
+        // }
 
         // pkmConverted.SetTrainerData()
         // pkmConverted.SetNickname(pkmOrigin.Nickname);
@@ -160,14 +188,14 @@ public class MainCreatePkmVersionAction : DataAction
         // .CopyTo(pkmConverted.NicknameTrash);
 
         pkmConverted.MetDate = pkmOrigin.MetDate;
-        pkmConverted.MetLocation = pkmOrigin.MetLocation;
+        // pkmConverted.MetLocation = pkmOrigin.MetLocation;
         if (pkmConverted is PK2 pkmConvertedPK2)
         {
             pkmConvertedPK2.MetTimeOfDay = EncounterSuggestion.GetSuggestedMetInfo(pkmConvertedPK2)?.GetSuggestedMetTimeOfDay() ?? 1;
         }
-        pkmConverted.Language = pkmOrigin.Language;
+        // pkmConverted.Language = pkmOrigin.Language;
         // if location is wrong only
-        pkmConverted.MetLevel = 1;
+        // pkmConverted.MetLevel = 1;
 
         pkmConverted.RefreshChecksum();
 
@@ -190,6 +218,68 @@ public class MainCreatePkmVersionAction : DataAction
         };
 
         loaders.pkmVersionLoader.WriteEntity(pkmVersionCreated);
+    }
+
+    private static PKM IntermediateConvertFromGB(PKM pkmOrigin)
+    {
+        var pkmIntermediate = EntityConverter.ConvertToType(pkmOrigin, new PK3().GetType(), out var intermediateResult);
+        Console.WriteLine($"Convert-intermediate result={intermediateResult}");
+
+        if (pkmIntermediate == default)
+        {
+            throw new Exception($"Convert-intermediate failed, result={intermediateResult}");
+        }
+
+        pkmIntermediate.Language = (int)LanguageID.French; //pkmOrigin.Language;
+        if (pkmIntermediate is IHandlerLanguage pkmIntermediateHLang)
+        {
+            pkmIntermediateHLang.HandlingTrainerLanguage = (byte)LanguageID.French;
+        }
+
+        if (pkmOrigin.IsShiny)
+        {
+            CommonEdits.SetShiny(pkmIntermediate, Shiny.Random);
+        }
+        else
+        {
+            pkmIntermediate.SetPIDGender(pkmOrigin.Gender);
+        }
+
+        var convertIV = (int ivValue) => ivValue * 2 + (ivValue % 2);
+        Span<int> ivs = [
+            convertIV(pkmOrigin.IV_HP),
+            convertIV(pkmOrigin.IV_ATK),
+            convertIV(pkmOrigin.IV_DEF),
+            convertIV(pkmOrigin.IV_SPA),
+            convertIV(pkmOrigin.IV_SPD),
+            convertIV(pkmOrigin.IV_SPE),
+        ];
+        pkmIntermediate.SetIVs(ivs);
+
+        var convertEV = (float evValue) => (int)(evValue / 65535 * 255);
+        Span<int> evs = [
+            convertEV(pkmOrigin.EV_HP),
+            convertEV(pkmOrigin.EV_ATK),
+            convertEV(pkmOrigin.EV_DEF),
+            convertEV(pkmOrigin.EV_SPA),
+            convertEV(pkmOrigin.EV_SPD),
+            convertEV(pkmOrigin.EV_SPE),
+        ];
+        pkmIntermediate.SetEVs(evs);
+
+        // pkmIntermediate.Origin
+        pkmIntermediate.Version = GameVersion.E;
+        pkmIntermediate.FatefulEncounter = false;
+        pkmIntermediate.MetLocation = 0;
+        pkmIntermediate.MetLevel = 0;
+        pkmIntermediate.Ball = (byte)Ball.Poke; //pkmOrigin.Ball;
+
+        pkmIntermediate.RefreshChecksum();
+
+        Console.WriteLine($"[convert] pkm-intermediate G3, PID={pkmIntermediate.PID} Gender={pkmIntermediate.Gender} IsShiny={pkmIntermediate.IsShiny} Language={pkmIntermediate.Language} ");
+        Console.WriteLine($"\tVersion={pkmIntermediate.Version} MetLocation={pkmIntermediate.MetLocation} MetLevel={pkmIntermediate.MetLevel} Ball={pkmIntermediate.Ball} FatefulEncounter={pkmIntermediate.FatefulEncounter}");
+
+        return pkmIntermediate;
     }
 
     public static void DebugOT(PKM pkm)

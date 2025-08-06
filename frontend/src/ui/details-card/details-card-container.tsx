@@ -5,6 +5,7 @@ import { theme } from '../theme';
 import { TextContainer } from '../text-container/text-container';
 
 export type DetailsCardContainerProps = {
+    header: React.ReactNode;
     mainImg: React.ReactNode;
     mainInfos: React.ReactNode;
     preContent: React.ReactNode;
@@ -14,6 +15,7 @@ export type DetailsCardContainerProps = {
 };
 
 export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
+    header,
     mainImg,
     mainInfos,
     preContent,
@@ -32,6 +34,10 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                     marginTop: -33
                 }}
             >Close</Button>
+
+            {header && <div style={{ marginBottom: 2, display: "flex", gap: 4, flexWrap: 'wrap' }}>
+                {header}
+            </div>}
 
             <div
                 style={{

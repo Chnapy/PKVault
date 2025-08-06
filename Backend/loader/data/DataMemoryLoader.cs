@@ -39,7 +39,7 @@ public class DataMemoryLoader : DataLoader
             {
                 Save = save,
                 Boxes = new SaveBoxLoader(save),
-                Pkms = new SavePkmLoader(save, pkmLoader)
+                Pkms = new SavePkmLoader(save, pkmVersionLoader)
             };
         };
 

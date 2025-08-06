@@ -1,5 +1,5 @@
 import React from "react";
-import type { PkmDTO, SaveInfosDTO } from "../data/sdk/model";
+import type { PkmDTO } from "../data/sdk/model";
 import {
   useStorageGetMainBoxes,
   useStorageGetMainPkms,
@@ -11,22 +11,20 @@ import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageItem } from "../ui/storage-item/storage-item";
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
 import { Route } from "../routes/storage";
-import { useSaveInfosGetAll } from "../data/sdk/save-infos/save-infos.gen";
+import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 
 export const StorageMainBox: React.FC = () => {
   const mainBoxId = Route.useSearch({ select: (search) => search.mainBoxId });
-  const selected = Route.useSearch({ select: (search) => search.selected });
   const saveId = Route.useSearch({ select: (search) => search.save });
+  const selected = Route.useSearch({ select: (search) => search.selected });
   const navigate = Route.useNavigate();
 
-  const saveInfosRecord = useSaveInfosGetAll().data?.data ?? {};
-  const saveInfos = saveInfosRecord[saveId ?? -1]?.[0] as
-    | SaveInfosDTO
-    | undefined;
-
+  const saveInfosQuery = useSaveInfosGetAll();
   const boxesQuery = useStorageGetMainBoxes();
   const pkmsQuery = useStorageGetMainPkms();
   const pkmVersionsQuery = useStorageGetMainPkmVersions();
+
+  const save = saveId ? saveInfosQuery.data?.data?.[ saveId ][ 0 ] : undefined;
 
   const boxes = boxesQuery.data?.data ?? [];
   const pkms = pkmsQuery.data?.data ?? [];
@@ -38,14 +36,14 @@ export const StorageMainBox: React.FC = () => {
     typeof mainBoxId === "number"
       ? boxes.findIndex((box) => box.idInt === mainBoxId)
       : 0;
-  const selectedBox = boxes[selectedBoxIndex];
+  const selectedBox = boxes[ selectedBoxIndex ];
 
   if (!selectedBox) {
     return null;
   }
 
-  const previousBox = boxes[selectedBoxIndex - 1];
-  const nextBox = boxes[selectedBoxIndex + 1];
+  const previousBox = boxes[ selectedBoxIndex - 1 ];
+  const nextBox = boxes[ selectedBoxIndex + 1 ];
 
   if (!selectedBox) {
     return null;
@@ -54,12 +52,12 @@ export const StorageMainBox: React.FC = () => {
   const boxPkms = Object.fromEntries(
     pkms
       .filter((pkm) => pkm.boxId === selectedBox.idInt)
-      .map((pkm) => [pkm.boxSlot, pkm])
+      .map((pkm) => [ pkm.boxSlot, pkm ])
   );
 
   const allItems = new Array(6 * 5)
     .fill(null)
-    .map((_, i): PkmDTO | null => boxPkms[i] ?? null);
+    .map((_, i): PkmDTO | null => boxPkms[ i ] ?? null);
 
   return (
     <StorageBox
@@ -90,8 +88,8 @@ export const StorageMainBox: React.FC = () => {
                 label: "Create new box",
               },
             ]}
-            value={[selectedBox.id + ""]}
-            onChange={([value]) => {
+            value={[ selectedBox.id + "" ]}
+            onChange={([ value ]) => {
               navigate({
                 search: {
                   mainBoxId: Number(value),
@@ -142,13 +140,20 @@ export const StorageMainBox: React.FC = () => {
             storageType="main"
             pkmId={pkm.id}
             species={pkm.species}
+            isEgg={false}
+            isShiny={pkm.isShiny}
+            isShadow={false}
             warning={versions.some((value) => !value.isValid)}
             disabled={
               Boolean(pkm.saveId)
+              || (!!save && pkm.species > save.maxSpeciesId)
               // || !versions.some(
               //   (version) =>
               //     !saveInfos || version.generation === saveInfos?.generation
               // )
+            }
+            shouldCreateVersion={
+              !!save && !versions.some(version => version.generation === save.generation)
             }
             boxSlot={i}
             selected={selected?.type === "main" && selected.id === pkm.id}

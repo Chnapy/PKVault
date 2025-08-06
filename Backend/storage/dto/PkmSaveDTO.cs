@@ -5,7 +5,12 @@ using PKHeX.Core.Searching;
 
 public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
 {
-    public static PkmSaveDTO FromPkm(SaveFile save, PKM pkm, int box, int boxSlot, List<PkmEntity> pkmEntities)
+    public static PkmSaveDTO FromPkm(SaveFile save, PKM pkm, int box, int boxSlot,
+    // List<PkmVersionEntity> pkmVersionEntities,
+    EntityLoader<PkmVersionEntity> pkmVersionLoader
+    // EntityLoader<PkmEntity> pkmLoader,
+    // PKMFileLoader pkmFileLoader
+    )
     {
         var id = GetPKMId(pkm, save.Generation);
 
@@ -14,10 +19,6 @@ public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
             Id = id,
             SaveId = save.ID32,
             Generation = save.Generation,
-            Species = pkm.Species,
-            Nickname = pkm.Nickname,
-            Gender = pkm.Gender,
-            IsShiny = pkm.IsShiny,
             IsShadow = pkm is IShadowCapture pkmShadow ? pkmShadow.IsShadow : false,
             // BoxType = boxType,
             Box = box,
@@ -27,7 +28,26 @@ public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
 
         FillDTO(dto, pkm);
 
-        dto.PkmId = pkmEntities.Find(entity => entity.Id == id)?.Id;
+        var pkmVersionEntity = pkmVersionLoader.GetEntity(id);
+        // pkmVersionEntities.Find(entity => entity.Id == id);
+        dto.PkmVersionId = pkmVersionEntity?.Id;
+        // if (pkmVersionEntity != default)
+        // {
+        //     var pkmEntity = pkmLoader.GetEntity(pkmVersionEntity.PkmId);
+
+        //     var pkmBytes = pkmFileLoader.GetEntity(pkmVersionEntity);
+        //     if (pkmBytes == default)
+        //     {
+        //         throw new Exception($"PKM-bytes is null, from entity Id={pkmVersionEntity.Id} Filepath={pkmVersionEntity.Filepath}");
+        //     }
+        //     var versionPkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity, pkmEntity);
+        //     if (versionPkm == default)
+        //     {
+        //         throw new Exception($"PKM is null, from entity Id={pkmVersionEntity.Id} Filepath={pkmVersionEntity.Filepath} bytes.length={pkmBytes.Length}");
+        //     }
+        //     // var pkmVersion = PkmVersionDTO.FromEntity(pkmVersionEntity);
+        // }
+
         dto.CanMoveToMainStorage = !dto.IsShadow && !dto.IsEgg;
 
         return dto;
@@ -49,17 +69,9 @@ public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
 
     public int BoxSlot { get; set; }
 
-    public ushort Species { get; set; }
-
-    public string Nickname { get; set; }
-
-    public byte Gender { get; set; }
-
-    public bool IsShiny { get; set; }
-
     public bool IsShadow { get; set; }
 
-    public string? PkmId { get; set; }
+    public string? PkmVersionId { get; set; }
 
     // -- actions
 

@@ -63,21 +63,7 @@ public class SaveMovePkmFromStorageAction : DataAction
             throw new Exception($"PKM not defined, pkm-version={pkmVersionEntity.Id}");
         }
 
-        // int boxId;
-        // switch (saveBoxType)
-        // {
-        //     case BoxType.Default:
-        //         boxId = saveBoxId;
-        //         break;
-        //     case BoxType.Party:
-        //         boxId = -1;
-        //         break;
-        //     case BoxType.Daycare:
-        //         boxId = -2;
-        //         break;
-        // }
-
-        var pkmSaveDTO = PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxId, saveSlot, [pkmEntity]);
+        var pkmSaveDTO = PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxId, saveSlot, loaders.pkmVersionLoader);
 
         saveLoaders.Pkms.WriteEntity(pkmSaveDTO);
 

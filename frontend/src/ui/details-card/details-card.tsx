@@ -4,6 +4,7 @@ import { useStaticData } from "../../data/static-data/static-data";
 import type { GenderType } from '../../data/utils/get-gender';
 import { Button } from '../button/button';
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
+import { Gender } from '../gender/gender';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
 import { DetailsCardContainer } from './details-card-container';
@@ -51,6 +52,7 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
   const shinySprite = pokemonDataItem.sprites.front_shiny;
 
   return <DetailsCardContainer
+    header={null}
     mainImg={<>
       <img
         src={showShiny ? shinySprite! : defaultSprite!}
@@ -98,9 +100,7 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
           fontFamily: theme.font.special,
         }}
       >
-        {genders.map(gender => <span key={gender} style={{
-          color: gender === 'male' ? '#00C6AD' : '#FF4273'
-        }}>{gender === 'male' ? '♂' : '♀'}</span>)}
+        {genders.map(gender => <Gender key={gender} gender={gender} />)}
       </span>
       <br />
       {types.join(' - ')}

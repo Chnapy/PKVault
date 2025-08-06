@@ -5,19 +5,22 @@ import { useCurrentLanguageName } from '../../data/hooks/use-current-language-na
 import { type GameVersion } from "../../data/sdk/model";
 import { useStaticData } from "../../data/static-data/static-data";
 import type { GenderType } from '../../data/utils/get-gender';
+import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
 import { Button } from "../button/button";
 import { DetailsCardContainer } from '../details-card/details-card-container';
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
 import { Gender } from '../gender/gender';
+import { SaveCardContentSmall } from '../save-card/save-card-content-small';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
 
-export type StorageSaveDetailsProps = {
+export type StorageMainDetailsProps = {
+  header: React.ReactNode;
   id: string;
-  // saveId: number;
+  saveId?: number;
   generation: number;
   version: GameVersion;
 
@@ -25,7 +28,7 @@ export type StorageSaveDetailsProps = {
   species: number;
   isShiny: boolean;
   isEgg: boolean;
-  isShadow: boolean;
+  // isShadow: boolean;
   ball: number;
   gender: GenderType;
   nickname: string;
@@ -55,17 +58,23 @@ export type StorageSaveDetailsProps = {
   box: number;
   boxSlot: number;
 
-  canMoveToMainStorage: boolean;
+  saveBoxId?: number;
+  saveBoxSlot?: number;
+  saveSynchronized?: boolean;
 
-  // pkmId?: string;
+  // canMoveToMainStorage: boolean;
+
+  goToSavePkm?: () => void;
+
   onRelease: () => void;
 
   onClose: () => void;
 };
 
-export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
+export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
+  header,
   id,
-  // saveId,
+  saveId,
   generation,
   version,
 
@@ -73,7 +82,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
   species,
   isShiny,
   isEgg,
-  isShadow,
+  // isShadow,
   ball,
   gender,
   nickname,
@@ -103,7 +112,13 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
   box,
   boxSlot,
 
-  canMoveToMainStorage,
+  saveBoxId,
+  saveBoxSlot,
+  saveSynchronized,
+
+  goToSavePkm,
+
+  // canMoveToMainStorage,
 
   onRelease,
   onClose,
@@ -113,7 +128,8 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
 
   const getCurrentLanguageName = useCurrentLanguageName();
 
-  // const saveCardProps = useSaveItemProps()(saveId);
+  const getSaveItemProps = useSaveItemProps();
+  const saveCardProps = saveId ? getSaveItemProps(saveId) : undefined;
 
   const speciesName = getCurrentLanguageName(staticData.pokemonSpecies[ species ].names) ?? staticData.pokemonSpecies[ species ].name;
 
@@ -132,7 +148,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
 
   return (
     <DetailsCardContainer
-      header={null}
+      header={header}
       mainImg={
         <>
           <div
@@ -148,7 +164,6 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
                 imageRendering: "pixelated",
                 width: 96,
                 display: "block",
-                filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
               }}
             />
           </div>
@@ -203,9 +218,23 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
           ID <span style={{ color: theme.text.primary }}>{id}</span> {pid > 0 && <>PID <span style={{ color: theme.text.primary }}>{pid}</span></>}
         </>
       }
-      preContent={validityReport && <TextContainer>
-        {validityReport}
-      </TextContainer>}
+      preContent={<>
+        {validityReport && <TextContainer>
+          {validityReport}
+        </TextContainer>}
+
+        {saveId && <Button onClick={goToSavePkm} disabled={!goToSavePkm}>
+          <div style={{ width: '100%' }}>
+            Go to save-pkm
+          </div>
+          <div style={{ width: '100%' }}>
+            Box {saveBoxId} slot {saveBoxSlot}
+          </div>
+          <div style={{ width: '100%', color: !saveSynchronized ? theme.text.contrast : undefined }}>
+            {saveSynchronized ? 'synchronized' : 'unsynchronized'}
+          </div>
+        </Button>}
+      </>}
       content={
         <>
           <TextContainer>
@@ -238,7 +267,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
             />
           </TextContainer>
 
-          {/* {saveCardProps && <SaveCardContentSmall {...saveCardProps} />} */}
+          {saveCardProps && <SaveCardContentSmall {...saveCardProps} />}
         </>
       }
       actions={<>

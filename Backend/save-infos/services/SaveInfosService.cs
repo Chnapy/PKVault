@@ -39,6 +39,11 @@ public class SaveInfosService
 
     public static SaveInfosDTO UploadNewSave(byte[] fileBytes, string formFilename)
     {
+        if (!StorageService.HasEmptyActionList())
+        {
+            throw new Exception("Storage has waiting actions");
+        }
+
         var filesDirectory = "files/saves";
 
         var save = SaveUtil.GetVariantSAV(fileBytes, formFilename)!;
@@ -72,11 +77,18 @@ public class SaveInfosService
             File.Delete(toRemove.Filepath);
         });
 
+        StorageService.ResetDataLoader();
+
         return SaveInfosDTO.FromEntity(entity);
     }
 
     public static void DeleteSave(uint saveId, long timestamp)
     {
+        if (!StorageService.HasEmptyActionList())
+        {
+            throw new Exception("Storage has waiting actions");
+        }
+
         var removedEntity = SaveInfosEntity.DeleteEntity(saveId, timestamp);
         if (removedEntity == null)
         {
@@ -86,5 +98,7 @@ public class SaveInfosService
         File.Delete(removedEntity.Filepath);
 
         LoadLastSaves();
+
+        StorageService.ResetDataLoader();
     }
 }

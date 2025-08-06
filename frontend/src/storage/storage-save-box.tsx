@@ -185,8 +185,12 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               storageType="save"
               pkmId={pkm.id}
               species={pkm.species}
-              warning={pkm.isValid}
+              isEgg={pkm.isEgg}
+              isShiny={pkm.isShiny}
+              isShadow={pkm.isShadow}
+              warning={!pkm.isValid}
               // disabled={Boolean(pkm.saveId)}
+              shouldCreateVersion={false}
               boxSlot={i}
               selected={selected?.type === "save" && selected.id === pkm.id}
               onClick={() =>

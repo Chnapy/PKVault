@@ -132,4 +132,14 @@ public class StorageService
 
         memoryLoader = new DataMemoryLoader();
     }
+
+    public static bool HasEmptyActionList()
+    {
+        return memoryLoader.actions.Count == 0;
+    }
+
+    public static void ResetDataLoader()
+    {
+        memoryLoader = new();
+    }
 }

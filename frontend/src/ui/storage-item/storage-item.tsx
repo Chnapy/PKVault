@@ -2,15 +2,21 @@ import type React from "react";
 import { useStaticData } from "../../data/static-data/static-data";
 import { Container } from "../container/container";
 import { useDraggable } from "@dnd-kit/core";
+import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png';
+import { theme } from '../theme';
 
 export type StorageItemProps = {
   storageType: "main" | "save";
   pkmId: string;
   species: number;
+  isEgg: boolean;
+  isShiny: boolean;
+  isShadow: boolean;
   selected?: boolean;
   onClick?: () => void;
   warning?: boolean;
   disabled?: boolean;
+  shouldCreateVersion?: boolean;
   boxSlot: number;
 };
 
@@ -18,14 +24,25 @@ export const StorageItem: React.FC<StorageItemProps> = ({
   storageType,
   pkmId,
   species,
+  isEgg,
+  isShiny,
+  isShadow,
   selected,
   onClick,
   warning,
   disabled,
+  shouldCreateVersion,
   boxSlot,
 }) => {
   const staticData = useStaticData();
-  const pokemonDataItem = staticData.pokemon[species];
+  const pokemonDataItem = staticData.pokemon[ species ];
+
+  // const mainPkmQuery = useStorageGetMainPkms({
+  //   query: {
+  //     // enabled: type === "main",
+  //   },
+  // });
+  // const pkm = mainPkmQuery.data?.data.find(pkm => pkm.id === pkmId);
 
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -36,6 +53,17 @@ export const StorageItem: React.FC<StorageItemProps> = ({
       },
       disabled,
     });
+
+  const defaultSprite = pokemonDataItem.sprites.front_default;
+  const shinySprite = pokemonDataItem.sprites.front_shiny;
+
+  const getSprite = () => {
+    if (isEgg) {
+      return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png';
+    }
+
+    return isShiny ? shinySprite! : defaultSprite!
+  }
 
   return (
     <Container
@@ -48,6 +76,7 @@ export const StorageItem: React.FC<StorageItemProps> = ({
       selected={selected}
       noDropshadow={!onClick}
       style={{
+        position: 'relative',
         alignSelf: "flex-start",
         padding: 0,
         order: boxSlot,
@@ -56,16 +85,68 @@ export const StorageItem: React.FC<StorageItemProps> = ({
       }}
     >
       <img
-        src={pokemonDataItem?.sprites.front_default ?? ""}
+        src={getSprite()}
         alt={species + ""}
         style={{
           imageRendering: "pixelated",
           width: 96,
           height: 96,
           display: "block",
-          opacity: disabled ? 0.5 : 1,
+          filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
+          opacity: disabled || shouldCreateVersion ? 0.5 : 1,
         }}
       />
+
+      {isShiny && <img
+        src={shinyIconImg}
+        alt='shiny-icon'
+        style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          // width: 12,
+          margin: '0 -2px',
+        }}
+      />}
+
+      <div style={{
+        position: 'absolute',
+        top: 4,
+        left: 4,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+      }}>
+        {disabled && <div style={{
+          width: 20,
+          height: 20,
+          borderRadius: 99,
+          color: theme.text.light,
+          backgroundColor: theme.text.contrast,
+        }}>
+          -
+        </div>}
+
+        {shouldCreateVersion && !disabled && <div style={{
+          width: 20,
+          height: 20,
+          borderRadius: 99,
+          color: theme.text.light,
+          backgroundColor: theme.text.primary,
+        }}>
+          +
+        </div>}
+
+        {warning && <div style={{
+          width: 20,
+          height: 20,
+          borderRadius: 99,
+          color: theme.text.light,
+          backgroundColor: theme.bg.filter,
+        }}>
+          !
+        </div>}
+      </div>
     </Container>
   );
 };

@@ -1,27 +1,17 @@
-import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useAbilityByIdOrName } from '../data/hooks/use-ability-by-id-or-name';
 import { useCurrentLanguageName } from '../data/hooks/use-current-language-name';
 import { useMoveByIdOrName } from '../data/hooks/use-move-by-id-or-name';
 import { useNatureByIdOrName } from '../data/hooks/use-nature-by-id-or-name';
 import { useTypeByIdOrName } from '../data/hooks/use-type-by-id-or-name';
-import type { SaveInfosDTO } from "../data/sdk/model";
-import { useSaveInfosGetAll } from "../data/sdk/save-infos/save-infos.gen";
 import {
-  getStorageGetMainPkmsQueryKey,
-  getStorageGetMainPkmVersionsQueryKey,
-  getStorageGetSavePkmsQueryKey,
-  useStorageGetMainPkms,
-  useStorageGetMainPkmVersions,
-  useStorageGetSavePkms,
-  useStorageMainCreatePkmVersion,
+  useStorageGetSavePkms
 } from "../data/sdk/storage/storage.gen";
 import { useStaticData } from "../data/static-data/static-data";
 import { getGender } from '../data/utils/get-gender';
-import { Button } from "../ui/button/button";
-import { StorageItemDetails } from "../ui/storage-item-details/storage-item-details";
-import { StorageSaveDetails } from '../ui/storage-item-details/storage-save-details';
 import { Route } from '../routes/storage';
+import { StorageSaveDetails } from '../ui/storage-item-details/storage-save-details';
+import { StorageDetailsMain } from './details/storage-details-main';
 
 export type StorageDetailsProps = {
   type: "main" | "save";
@@ -36,7 +26,7 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
 }) => {
   const navigate = Route.useNavigate();
 
-  const pkmSpeciesRecord = useStaticData().pokemonSpecies;
+  // const pkmSpeciesRecord = useStaticData().pokemonSpecies;
   const pkmRecord = useStaticData().pokemon;
 
   const getTypeByIdOrName = useTypeByIdOrName();
@@ -45,78 +35,51 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
   const getNatureByIdOrName = useNatureByIdOrName();
   const getCurrentLanguageName = useCurrentLanguageName();
 
-  const queryClient = useQueryClient();
-
-  const saveInfosRecord = useSaveInfosGetAll().data?.data ?? {};
-  const saveInfos = saveInfosRecord[ saveId ?? -1 ]?.[ 0 ] as
-    | SaveInfosDTO
-    | undefined;
-
-  const mainCreatePkmVersionMutation = useStorageMainCreatePkmVersion({
-    mutation: {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetMainPkmsQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetMainPkmVersionsQueryKey(),
-        });
-
-        if (saveId)
-          await queryClient.invalidateQueries({
-            queryKey: getStorageGetSavePkmsQueryKey(saveId),
-          });
-      },
-    },
-  });
+  // const saveInfosRecord = useSaveInfosGetAll().data?.data ?? {};
+  // const saveInfos = saveInfosRecord[ saveId ?? -1 ]?.[ 0 ] as
+  //   | SaveInfosDTO
+  //   | undefined;
 
   const savePkmQuery = useStorageGetSavePkms(saveId!, {
     query: {
       enabled: !!saveId && type === "save",
     },
   });
-  let savePkm = savePkmQuery.data?.data.find((pkm) => pkm.id === id);
 
-  const mainPkmQuery = useStorageGetMainPkms({
-    query: {
-      // enabled: type === "main",
-    },
-  });
-  const mainPkmVersionsQuery = useStorageGetMainPkmVersions({
-    query: {
-      // enabled: type === "main",
-    },
-  });
-  let mainPkm = mainPkmQuery.data?.data.find((pkm) => pkm.id === id);
-  let mainPkmVersions =
-    mainPkmVersionsQuery.data?.data.filter(
-      (pkm) => pkm.id === id || pkm.pkmId === id
-    ) ?? [];
+  // let mainPkm = mainPkmQuery.data?.data.find((pkm) => pkm.id === id);
+  // let mainPkmVersions =
+  //   mainPkmVersionsQuery.data?.data.filter(
+  //     (pkm) => pkm.id === id || pkm.pkmId === id
+  //   ) ?? [];
 
-  if (mainPkmVersions.length && !mainPkm) {
-    mainPkm = mainPkmQuery.data?.data.find(
-      (pkm) => pkm.id === mainPkmVersions[ 0 ].pkmId
-    );
-    mainPkmVersions =
-      mainPkmVersionsQuery.data?.data.filter(
-        (pkm) => pkm.id === id || pkm.pkmId === mainPkm!.id
-      ) ?? [];
-    savePkm = undefined;
+  // if (mainPkmVersions.length && !mainPkm) {
+  //   mainPkm = mainPkmQuery.data?.data.find(
+  //     (pkm) => pkm.id === mainPkmVersions[ 0 ].pkmId
+  //   );
+  //   mainPkmVersions =
+  //     mainPkmVersionsQuery.data?.data.filter(
+  //       (pkm) => pkm.id === id || pkm.pkmId === mainPkm!.id
+  //     ) ?? [];
+  // }
+
+  // const pkmList = [ ...mainPkmVersions ].filter(Boolean);
+
+  // const selectedPkm = pkmList[ selectedIndex ] ?? pkmList[ 0 ];
+  // if (!selectedPkm) {
+  //   return null;
+  // }
+
+  // const species =
+  //   "species" in selectedPkm ? selectedPkm.species : mainPkm!.species;
+
+  // const speciesName = getCurrentLanguageName(pkmSpeciesRecord[ species ].names);
+
+  if (type === 'main') {
+    return <StorageDetailsMain
+      selectedId={id}
+      saveId={saveId}
+    />;
   }
-
-  const pkmList = [ savePkm!, ...mainPkmVersions ].filter(Boolean);
-
-  const [ selectedIndex, setSelectedIndex ] = React.useState(0);
-
-  const selectedPkm = pkmList[ selectedIndex ] ?? pkmList[ 0 ];
-  if (!selectedPkm) {
-    return null;
-  }
-
-  const species =
-    "species" in selectedPkm ? selectedPkm.species : mainPkm!.species;
-
-  const speciesName = getCurrentLanguageName(pkmSpeciesRecord[ species ].names);
 
   if (type === 'save') {
     const savePkm = savePkmQuery.data?.data.find((pkm) => pkm.id === id);
@@ -127,7 +90,7 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
 
     const originTrainerGender = getGender(savePkm.originTrainerGender);
 
-    const types = pkmRecord[ species ].types.map(type =>
+    const types = pkmRecord[ savePkm.species ].types.map(type =>
       getCurrentLanguageName(getTypeByIdOrName(type.type.name).names)
     );
 
@@ -145,7 +108,6 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
 
     return <StorageSaveDetails
       id={savePkm.id}
-      saveId={savePkm.saveId}
       generation={savePkm.generation}
       version={savePkm.version}
       pid={savePkm.pid}
@@ -172,75 +134,76 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
       originTrainerGender={originTrainerGender}
       originMetDate={savePkm.originMetDate}
       originMetLocation={savePkm.originMetLocation}
+      originMetLevel={savePkm.originMetLevel}
       isValid={savePkm.isValid}
       validityReport={savePkm.validityReport}
       box={savePkm.box}
       boxSlot={savePkm.boxSlot}
       canMoveToMainStorage={savePkm.canMoveToMainStorage}
-      onDelete={console.log}
+      onRelease={console.log}
       onClose={() => navigate({
         search: {
           selected: undefined,
         }
       })}
-    />
+    />;
   }
 
-  return (
-    <StorageItemDetails
-      header={
-        <>
-          <div>id={id}</div>
-          {!!mainPkm &&
-            pkmList.map((pkm, i) =>
-              pkmList.filter((p) => p.id === pkm.id).length > 1 ? null : (
-                <Button
-                  key={pkm.id}
-                  onClick={() => setSelectedIndex(i)}
-                  disabled={selectedIndex === i}
-                >
-                  G{pkm.generation}
-                  {pkm.id === mainPkm?.id && " (original)"}
-                  {/* {pkm.id} */}
-                </Button>
-              )
-            )}
+  // return (
+  //   <StorageItemDetails
+  //     header={
+  //       <>
+  //         <div>id={id}</div>
+  //         {!!mainPkm &&
+  //           pkmList.map((pkm, i) =>
+  //             pkmList.filter((p) => p.id === pkm.id).length > 1 ? null : (
+  //               <Button
+  //                 key={pkm.id}
+  //                 onClick={() => setSelectedIndex(i)}
+  //                 disabled={selectedIndex === i}
+  //               >
+  //                 G{pkm.generation}
+  //                 {pkm.id === mainPkm?.id && " (original)"}
+  //                 {/* {pkm.id} */}
+  //               </Button>
+  //             )
+  //           )}
 
-          {saveInfos &&
-            !pkmList.some((pkm) => pkm.generation === saveInfos.generation) && (
-              <Button
-                onClick={() =>
-                  mainCreatePkmVersionMutation.mutateAsync({
-                    params: {
-                      generation: saveInfos.generation,
-                      pkmId: mainPkm!.id,
-                    },
-                  })
-                }
-              >
-                Create for G{saveInfos.generation}
-              </Button>
-            )}
-        </>
-      }
-      saveId={undefined}
-      species={species}
-      speciesName={speciesName}
-      version={undefined}
-      generation={selectedPkm.generation}
-      isEgg={selectedPkm.isEgg}
-      originStr={`${selectedPkm.originMetDate} ${selectedPkm.originMetLocation} originTrainerName=${selectedPkm.originTrainerName}`}
-      // nickname={selectedPkm.nickname}
-      stats={selectedPkm.stats}
-      ivs={selectedPkm.iVs}
-      evs={selectedPkm.eVs}
-      nature={selectedPkm.nature}
-      ability={selectedPkm.ability}
-      level={selectedPkm.level}
-      exp={selectedPkm.exp}
-      moves={selectedPkm.moves}
-      isValid={selectedPkm.isValid}
-      validityReport={selectedPkm.validityReport}
-    />
-  );
+  //         {saveInfos &&
+  //           !pkmList.some((pkm) => pkm.generation === saveInfos.generation) && (
+  //             <Button
+  //               onClick={() =>
+  //                 mainCreatePkmVersionMutation.mutateAsync({
+  //                   params: {
+  //                     generation: saveInfos.generation,
+  //                     pkmId: mainPkm!.id,
+  //                   },
+  //                 })
+  //               }
+  //             >
+  //               Create for G{saveInfos.generation}
+  //             </Button>
+  //           )}
+  //       </>
+  //     }
+  //     saveId={undefined}
+  //     species={species}
+  //     speciesName={speciesName}
+  //     version={undefined}
+  //     generation={selectedPkm.generation}
+  //     isEgg={selectedPkm.isEgg}
+  //     originStr={`${selectedPkm.originMetDate} ${selectedPkm.originMetLocation} originTrainerName=${selectedPkm.originTrainerName}`}
+  //     // nickname={selectedPkm.nickname}
+  //     stats={selectedPkm.stats}
+  //     ivs={selectedPkm.iVs}
+  //     evs={selectedPkm.eVs}
+  //     nature={selectedPkm.nature}
+  //     ability={selectedPkm.ability}
+  //     level={selectedPkm.level}
+  //     exp={selectedPkm.exp}
+  //     moves={selectedPkm.moves}
+  //     isValid={selectedPkm.isValid}
+  //     validityReport={selectedPkm.validityReport}
+  //   />
+  // );
 };

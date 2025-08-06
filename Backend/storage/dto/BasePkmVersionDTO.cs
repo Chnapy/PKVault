@@ -20,11 +20,12 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
         dto.Version = pkm.Version;
         dto.PID = pkm.PID;
-        // dto.Species = pkm.Species;
-        // dto.Nickname = pkm.Nickname;
+        dto.Species = pkm.Species;
+        dto.Nickname = pkm.Nickname;
         dto.IsEgg = pkm.IsEgg;
-        // dto.IsShiny = pkm.IsShiny;
+        dto.IsShiny = pkm.IsShiny;
         dto.Ball = pkm.Ball;
+        dto.Gender = pkm.Gender;
         dto.Level = pkm.CurrentLevel;
         dto.Exp = pkm.EXP;
         dto.IVs = ivs.ToArray();
@@ -40,7 +41,9 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         dto.OriginTrainerGender = pkm.OriginalTrainerGender;
         dto.OriginMetDate = pkm.MetDate;
         dto.OriginMetLocation = GameInfo.GetStrings("fr").GetLocationName(pkm.WasEgg, pkm.MetLocation, pkm.Format, pkm.Generation, pkm.Version);
-        dto.IsValid = pkm.Valid;
+        dto.OriginMetLevel = pkm.MetLevel == 0 ? null : pkm.MetLevel;
+        dto.PkmData = pkm.Data;
+        dto.IsValid = la.Parsed && pkm.Valid;
         dto.ValidityReport = la.Report();
     }
 
@@ -52,15 +55,17 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public uint PID { get; set; }
 
-    // public string Nickname { get; set; }
+    public string Nickname { get; set; }
 
-    // public ushort Species { get; set; }
+    public ushort Species { get; set; }
 
     public bool IsEgg { get; set; }
 
-    // public bool IsShiny { get; set; }
+    public bool IsShiny { get; set; }
 
     public byte Ball { get; set; }
+
+    public byte Gender { get; set; }
 
     public byte Level { get; set; }
 
@@ -91,6 +96,10 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     public DateOnly? OriginMetDate { get; set; }
 
     public string OriginMetLocation { get; set; }
+
+    public byte? OriginMetLevel { get; set; }
+
+    public byte[] PkmData { get; set; }
 
     public bool IsValid { get; set; }
 

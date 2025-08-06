@@ -417,9 +417,9 @@ export const getGameInfos = (version: GameVersion) => {
         text: "EFL",
       }),
     }) ??
-    (() => {
-      throw new Error("Version not handled " + version);
-    });
+    (() => ({
+      text: "Version not handled " + version,
+    }));
 
   return data();
 };
