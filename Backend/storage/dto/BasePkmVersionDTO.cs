@@ -5,7 +5,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 {
     public static void FillDTO(BasePkmVersionDTO dto, PKM pkm)
     {
-        Span<int> ivs = [
+        int[] ivs = [
             pkm.IV_HP,
             pkm.IV_ATK,
             pkm.IV_DEF,
@@ -14,7 +14,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
             pkm.IV_SPE,
         ];
 
-        Span<int> evs = [
+        int[] evs = [
             pkm.EV_HP,
             pkm.EV_ATK,
             pkm.EV_DEF,
@@ -23,7 +23,17 @@ public abstract class BasePkmVersionDTO : IWithId<string>
             pkm.EV_SPE,
         ];
 
-        Span<ushort> moves = [
+        pkm.SetStats(pkm.GetStats(pkm.PersonalInfo));
+        int[] stats = [
+            pkm.Stat_HPMax,
+            pkm.Stat_ATK,
+            pkm.Stat_DEF,
+            pkm.Stat_SPA,
+            pkm.Stat_SPD,
+            pkm.Stat_SPE,
+        ];
+
+        ushort[] moves = [
             pkm.Move1,
             pkm.Move2,
             pkm.Move3,
@@ -33,6 +43,21 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         var la = new LegalityAnalysis(pkm);
 
         HiddenPower.TryGetTypeIndex(pkm.HPType, out var hptype);
+
+        if (pkm.HeldItem != 0)
+        {
+            var stringsFr = GameInfo.GetStrings("fr");
+            var heldItemText = stringsFr.GetItemStrings(pkm.Context, pkm.Version)[pkm.HeldItem];
+
+            // var bar = GameInfo.Sources.GetItemDataSource(pkm.Version, pkm.Context, [], true);
+            // var item = bar.Find(item => item.Value == pkm.HeldItem);
+
+            // Console.WriteLine($"Item {pkm.Nickname} {pkm.Version} {pkm.Context} {pkm.HeldItem} {pkm.SpriteItem} {heldItemText}");
+
+            dto.HeldItem = pkm.HeldItem;
+            dto.SpriteItem = pkm.SpriteItem;
+            dto.HeldItemText = heldItemText;
+        }
 
         dto.Version = pkm.Version;
         dto.PID = pkm.PID;
@@ -44,14 +69,14 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         dto.Gender = pkm.Gender;
         dto.Level = pkm.CurrentLevel;
         dto.Exp = pkm.EXP;
-        dto.IVs = ivs.ToArray();
-        dto.EVs = evs.ToArray();
-        dto.Stats = pkm.GetStats(pkm.PersonalInfo);
+        dto.IVs = ivs;
+        dto.EVs = evs;
+        dto.Stats = stats;//pkm.GetStats(pkm.PersonalInfo); ;
         dto.HiddenPowerType = hptype + 1;
         dto.HiddenPowerPower = pkm.HPPower;
         dto.Nature = pkm.Generation > 2 ? pkm.Nature : null;
         dto.Ability = pkm.Ability == -1 ? null : pkm.Ability;
-        dto.Moves = moves.ToArray();
+        dto.Moves = moves;
         dto.TID = pkm.TID16;
         dto.OriginTrainerName = pkm.OriginalTrainerName;
         dto.OriginTrainerGender = pkm.OriginalTrainerGender;
@@ -91,7 +116,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public int[] EVs { get; set; }
 
-    public ushort[] Stats { get; set; }
+    public int[] Stats { get; set; }
 
     public int HiddenPowerType { get; set; }
 
@@ -114,6 +139,12 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     public string OriginMetLocation { get; set; }
 
     public byte? OriginMetLevel { get; set; }
+
+    public int? HeldItem { get; set; }
+
+    public int? SpriteItem { get; set; }
+
+    public string? HeldItemText { get; set; }
 
     public byte[] PkmData { get; set; }
 

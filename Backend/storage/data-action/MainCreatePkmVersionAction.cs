@@ -103,112 +103,118 @@ public class MainCreatePkmVersionAction : DataAction
 
         Console.WriteLine($"Convert result={result}");
 
-        // if (pkmConverted.Generation != generation)
-        // {
-        //     throw new Exception($"PKM converted generation inconsistency, expected generation={generation} pkm.generation={pkmConverted.Generation}");
-        // }
-
-        // Console.WriteLine($"OT TRASH length: origin={pkmOrigin.OriginalTrainerTrash.Length}/{pkmOrigin.TrashCharCountTrainer} converted={pkmConverted.OriginalTrainerTrash.Length}/{pkmConverted.TrashCharCountTrainer}");
-
-        // Span<char> trainer = stackalloc char[pkmOrigin.TrashCharCountTrainer];
-        // pkmOrigin.SetString(
-        //     pkmOrigin.OriginalTrainerTrash,
-        //     trainer[..pkmConverted.MaxStringLengthTrainer],
-        //     pkmConverted.MaxStringLengthTrainer,
-        //     StringConverterOption.None
-        // );
-
-        // pkmConverted.Language = (int)LanguageID.French;
-
-        pkmConverted.OriginalTrainerName = pkmEntity.OTName;
-        pkmConverted.IsNicknamed = pkmOrigin.IsNicknamed;
-        pkmConverted.Nickname = pkmEntity.Nickname;
-
-        if (generation <= 2)
+        if (result != EntityConverterResult.None)
         {
-            StringConverter.SetString(
-                pkmConverted.OriginalTrainerTrash,
-                (ReadOnlySpan<char>)pkmEntity.OTName,
-                pkmConverted.TrashCharCountTrainer,
-                StringConverterOption.None,
-                (byte)generation,
-                false,
-                false,
-                (int)LanguageID.French
-            );
 
-            StringConverter.SetString(
-                pkmConverted.NicknameTrash,
-                (ReadOnlySpan<char>)pkmEntity.Nickname,
-                pkmConverted.TrashCharCountNickname,
-                StringConverterOption.None,
-                (byte)generation,
-                false,
-                false,
-                (int)LanguageID.French
-            );
+            // if (pkmConverted.Generation != generation)
+            // {
+            //     throw new Exception($"PKM converted generation inconsistency, expected generation={generation} pkm.generation={pkmConverted.Generation}");
+            // }
 
-            DebugOT(pkmConverted);
+            // Console.WriteLine($"OT TRASH length: origin={pkmOrigin.OriginalTrainerTrash.Length}/{pkmOrigin.TrashCharCountTrainer} converted={pkmConverted.OriginalTrainerTrash.Length}/{pkmConverted.TrashCharCountTrainer}");
+
+            // Span<char> trainer = stackalloc char[pkmOrigin.TrashCharCountTrainer];
+            // pkmOrigin.SetString(
+            //     pkmOrigin.OriginalTrainerTrash,
+            //     trainer[..pkmConverted.MaxStringLengthTrainer],
+            //     pkmConverted.MaxStringLengthTrainer,
+            //     StringConverterOption.None
+            // );
+
+            // pkmConverted.Language = (int)LanguageID.French;
+
+            pkmConverted.OriginalTrainerName = pkmEntity.OTName;
+            pkmConverted.IsNicknamed = pkmOrigin.IsNicknamed;
+            pkmConverted.Nickname = pkmEntity.Nickname;
+
+            if (generation <= 2)
+            {
+                StringConverter.SetString(
+                    pkmConverted.OriginalTrainerTrash,
+                    (ReadOnlySpan<char>)pkmEntity.OTName,
+                    pkmConverted.TrashCharCountTrainer,
+                    StringConverterOption.None,
+                    (byte)generation,
+                    false,
+                    false,
+                    (int)LanguageID.French
+                );
+
+                StringConverter.SetString(
+                    pkmConverted.NicknameTrash,
+                    (ReadOnlySpan<char>)pkmEntity.Nickname,
+                    pkmConverted.TrashCharCountNickname,
+                    StringConverterOption.None,
+                    (byte)generation,
+                    false,
+                    false,
+                    (int)LanguageID.French
+                );
+
+                DebugOT(pkmConverted);
+            }
+
+            // if (pkmConverted.PID == 0)
+            // {
+            //     if (pkmOrigin.IsShiny)
+            //     {
+            //         CommonEdits.SetShiny(pkmConverted, Shiny.Random);
+            //     }
+            //     else
+            //     {
+            //         pkmConverted.SetPIDGender(pkmOrigin.Gender);
+            //     }
+            // }
+
+            // pkmConverted.SetTrainerData()
+            // pkmConverted.SetNickname(pkmOrigin.Nickname);
+            // pkmConverted.PersonalInfo.Write();
+            // var pk2 = (PK2)pkmConverted;
+            // pk2
+
+            // pkmOrigin.OriginalTrainerTrash
+            // .Slice(0, pkmConverted.OriginalTrainerTrash.Length)
+            // foobar
+            // .CopyTo(pkmConverted.OriginalTrainerTrash);
+            // pkmConverted.HandlingTrainerName = pkmOrigin.HandlingTrainerName;
+            // pkmConverted.OriginalTrainerGender = pkmOrigin.OriginalTrainerGender;
+
+            // Span<char> trainer2 = stackalloc char[pkmConverted.TrashCharCountTrainer];
+            // int len = pkmConverted.LoadString(pkmConverted.OriginalTrainerTrash, trainer2);
+            // if (len == 0)
+            // {
+            //     throw new Exception("OT NAME EMPTY 0/" + pkmConverted.TrashCharCountTrainer);
+            // }
+            // trainer2 = trainer2[..len];
+
+            // Span<char> trainer3 = stackalloc char[pkmConverted.TrashCharCountNickname];
+            // int len2 = pkmConverted.LoadString(pkmConverted.NicknameTrash, trainer3);
+            // if (len2 == 0)
+            // {
+            //     throw new Exception("NICKNAME EMPTY 0/" + pkmConverted.TrashCharCountNickname);
+            // }
+            // trainer3 = trainer3[..len2];
+
+            // pkmOrigin.NicknameTrash
+            // .Slice(0, pkmConverted.NicknameTrash.Length)
+            // .CopyTo(pkmConverted.NicknameTrash);
+
+            pkmConverted.MetDate = pkmOrigin.MetDate;
+            // pkmConverted.MetLocation = pkmOrigin.MetLocation;
+            if (pkmConverted is PK2 pkmConvertedPK2)
+            {
+                pkmConvertedPK2.MetTimeOfDay = EncounterSuggestion.GetSuggestedMetInfo(pkmConvertedPK2)?.GetSuggestedMetTimeOfDay() ?? 1;
+            }
+            // pkmConverted.Language = pkmOrigin.Language;
+            // if location is wrong only
+            // pkmConverted.MetLevel = 1;
+
+            ConvertHeldItem(pkmOrigin, pkmConverted);
+
+            pkmConverted.RefreshChecksum();
+
+            // DebugOT(pkmConverted);
         }
-
-        // if (pkmConverted.PID == 0)
-        // {
-        //     if (pkmOrigin.IsShiny)
-        //     {
-        //         CommonEdits.SetShiny(pkmConverted, Shiny.Random);
-        //     }
-        //     else
-        //     {
-        //         pkmConverted.SetPIDGender(pkmOrigin.Gender);
-        //     }
-        // }
-
-        // pkmConverted.SetTrainerData()
-        // pkmConverted.SetNickname(pkmOrigin.Nickname);
-        // pkmConverted.PersonalInfo.Write();
-        // var pk2 = (PK2)pkmConverted;
-        // pk2
-
-        // pkmOrigin.OriginalTrainerTrash
-        // .Slice(0, pkmConverted.OriginalTrainerTrash.Length)
-        // foobar
-        // .CopyTo(pkmConverted.OriginalTrainerTrash);
-        // pkmConverted.HandlingTrainerName = pkmOrigin.HandlingTrainerName;
-        // pkmConverted.OriginalTrainerGender = pkmOrigin.OriginalTrainerGender;
-
-        // Span<char> trainer2 = stackalloc char[pkmConverted.TrashCharCountTrainer];
-        // int len = pkmConverted.LoadString(pkmConverted.OriginalTrainerTrash, trainer2);
-        // if (len == 0)
-        // {
-        //     throw new Exception("OT NAME EMPTY 0/" + pkmConverted.TrashCharCountTrainer);
-        // }
-        // trainer2 = trainer2[..len];
-
-        // Span<char> trainer3 = stackalloc char[pkmConverted.TrashCharCountNickname];
-        // int len2 = pkmConverted.LoadString(pkmConverted.NicknameTrash, trainer3);
-        // if (len2 == 0)
-        // {
-        //     throw new Exception("NICKNAME EMPTY 0/" + pkmConverted.TrashCharCountNickname);
-        // }
-        // trainer3 = trainer3[..len2];
-
-        // pkmOrigin.NicknameTrash
-        // .Slice(0, pkmConverted.NicknameTrash.Length)
-        // .CopyTo(pkmConverted.NicknameTrash);
-
-        pkmConverted.MetDate = pkmOrigin.MetDate;
-        // pkmConverted.MetLocation = pkmOrigin.MetLocation;
-        if (pkmConverted is PK2 pkmConvertedPK2)
-        {
-            pkmConvertedPK2.MetTimeOfDay = EncounterSuggestion.GetSuggestedMetInfo(pkmConvertedPK2)?.GetSuggestedMetTimeOfDay() ?? 1;
-        }
-        // pkmConverted.Language = pkmOrigin.Language;
-        // if location is wrong only
-        // pkmConverted.MetLevel = 1;
-
-        pkmConverted.RefreshChecksum();
-
-        // DebugOT(pkmConverted);
 
         Console.WriteLine($"CONVERT: OriginalTrainerName={pkmConverted.OriginalTrainerName} HandlingTrainerName={pkmConverted.HandlingTrainerName}");
         Console.WriteLine($" IsNicknamed={pkmConverted.IsNicknamed} Nickname={pkmConverted.Nickname} MetLocation={pkmConverted.MetLocation}");
@@ -283,12 +289,44 @@ public class MainCreatePkmVersionAction : DataAction
         pkmIntermediate.MetLevel = 0;
         pkmIntermediate.Ball = (byte)Ball.Poke; //pkmOrigin.Ball;
 
+        ConvertHeldItem(pkmOrigin, pkmIntermediate);
+
         pkmIntermediate.RefreshChecksum();
 
         Console.WriteLine($"[convert] pkm-intermediate G3, PID={pkmIntermediate.PID} Gender={pkmIntermediate.Gender} IsShiny={pkmIntermediate.IsShiny} Language={pkmIntermediate.Language} ");
         Console.WriteLine($"\tVersion={pkmIntermediate.Version} MetLocation={pkmIntermediate.MetLocation} MetLevel={pkmIntermediate.MetLevel} Ball={pkmIntermediate.Ball} FatefulEncounter={pkmIntermediate.FatefulEncounter}");
 
         return pkmIntermediate;
+    }
+
+    private static void ConvertHeldItem(PKM pkmOrigin, PKM pkmConverted)
+    {
+        if (pkmOrigin.HeldItem == 0)
+        {
+            return;
+        }
+
+        pkmConverted.HeldItem = ItemConverter.GetItemForFormat(pkmOrigin.HeldItem, pkmOrigin.Context, pkmConverted.Context);
+        if (pkmConverted.HeldItem > 0)
+        {
+            return;
+        }
+
+        var originSrc = GameInfo.Sources.GetItemDataSource(pkmOrigin.Version, pkmOrigin.Context, [], true)
+        .Find(item => item.Value == pkmOrigin.HeldItem);
+        if (originSrc == default)
+        {
+            return;
+        }
+
+        var intermediateSrc = GameInfo.Sources.GetItemDataSource(pkmConverted.Version, pkmConverted.Context, [], true)
+        .Find(item => item.Text == originSrc.Text);
+        if (intermediateSrc == default)
+        {
+            return;
+        }
+
+        pkmConverted.HeldItem = intermediateSrc.Value;
     }
 
     public static void DebugOT(PKM pkm)

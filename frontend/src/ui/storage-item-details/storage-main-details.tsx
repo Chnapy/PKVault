@@ -16,6 +16,7 @@ import { theme } from "../theme";
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
+import { ItemImg } from '../item-img/item-img';
 
 export type StorageMainDetailsProps = {
   header: React.ReactNode;
@@ -51,6 +52,9 @@ export type StorageMainDetailsProps = {
   originMetDate?: string;
   originMetLocation: string;
   originMetLevel?: number;
+
+  heldItemSprite?: number;
+  heldItemText?: string;
 
   isValid: boolean;
   validityReport: string;
@@ -105,6 +109,9 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
   originMetDate,
   originMetLocation,
   originMetLevel,
+
+  heldItemSprite,
+  heldItemText,
 
   isValid,
   validityReport,
@@ -221,6 +228,13 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
       preContent={<>
         {validityReport && <TextContainer>
           {validityReport}
+        </TextContainer>}
+
+        {heldItemSprite && <TextContainer>
+          Held item <span style={{ color: theme.text.primary }}>{heldItemText}</span> <ItemImg spriteItem={heldItemSprite} alt={heldItemText} style={{
+            height: 24,
+            verticalAlign: 'middle'
+          }} />
         </TextContainer>}
 
         {saveId && <Button onClick={goToSavePkm} disabled={!goToSavePkm}>

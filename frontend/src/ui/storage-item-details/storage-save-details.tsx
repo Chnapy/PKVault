@@ -14,6 +14,7 @@ import { theme } from "../theme";
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
+import { ItemImg } from '../item-img/item-img';
 
 export type StorageSaveDetailsProps = {
   id: string;
@@ -48,6 +49,9 @@ export type StorageSaveDetailsProps = {
   originMetDate?: string;
   originMetLocation: string;
   originMetLevel?: number;
+
+  heldItemSprite?: number;
+  heldItemText?: string;
 
   isValid: boolean;
   validityReport: string;
@@ -96,6 +100,9 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
   originMetDate,
   originMetLocation,
   originMetLevel,
+
+  heldItemSprite,
+  heldItemText,
 
   isValid,
   validityReport,
@@ -203,9 +210,18 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
           ID <span style={{ color: theme.text.primary }}>{id}</span> {pid > 0 && <>PID <span style={{ color: theme.text.primary }}>{pid}</span></>}
         </>
       }
-      preContent={validityReport && <TextContainer>
-        {validityReport}
-      </TextContainer>}
+      preContent={<>
+        {heldItemSprite && <TextContainer>
+          Held item <span style={{ color: theme.text.primary }}>{heldItemText}</span> <ItemImg spriteItem={heldItemSprite} alt={heldItemText} style={{
+            height: 24,
+            verticalAlign: 'middle'
+          }} />
+        </TextContainer>}
+
+        <TextContainer>
+          {validityReport}
+        </TextContainer>
+      </>}
       content={
         <>
           <TextContainer>

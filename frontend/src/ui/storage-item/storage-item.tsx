@@ -1,9 +1,10 @@
-import type React from "react";
+import React from "react";
 import { useStaticData } from "../../data/static-data/static-data";
 import { Container } from "../container/container";
 import { useDraggable } from "@dnd-kit/core";
 import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png';
 import { theme } from '../theme';
+import { ItemImg } from '../item-img/item-img';
 
 export type StorageItemProps = {
   storageType: "main" | "save";
@@ -12,6 +13,7 @@ export type StorageItemProps = {
   isEgg: boolean;
   isShiny: boolean;
   isShadow: boolean;
+  heldItemSprite?: number;
   selected?: boolean;
   onClick?: () => void;
   warning?: boolean;
@@ -27,6 +29,7 @@ export const StorageItem: React.FC<StorageItemProps> = ({
   isEgg,
   isShiny,
   isShadow,
+  heldItemSprite,
   selected,
   onClick,
   warning,
@@ -96,6 +99,15 @@ export const StorageItem: React.FC<StorageItemProps> = ({
           opacity: disabled || shouldCreateVersion ? 0.5 : 1,
         }}
       />
+
+      {heldItemSprite && <ItemImg
+        spriteItem={heldItemSprite}
+        style={{
+          position: 'absolute',
+          bottom: 4,
+          left: 4,
+        }}
+      />}
 
       {isShiny && <img
         src={shinyIconImg}

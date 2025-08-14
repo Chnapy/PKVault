@@ -56,7 +56,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
   );
 
   const itemsCount = switchUtil(selectedBox.idInt, {
-    [ -1 ]: saveInfos.partyCount,
+    [ -1 ]: 6,
     [ -2 ]: saveInfos.daycareCount,
   }) as number | undefined ?? saveInfos.boxSlotCount;
 
@@ -188,6 +188,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               isEgg={pkm.isEgg}
               isShiny={pkm.isShiny}
               isShadow={pkm.isShadow}
+              heldItemSprite={pkm.spriteItem}
               warning={!pkm.isValid}
               // disabled={Boolean(pkm.saveId)}
               shouldCreateVersion={false}

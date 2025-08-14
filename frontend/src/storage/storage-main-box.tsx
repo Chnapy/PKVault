@@ -134,6 +134,9 @@ export const StorageMainBox: React.FC = () => {
           );
         }
 
+        const saveHeldItemSprite = save && versions.find((version) => version.generation === save.generation)?.spriteItem;
+        const heldItemSprite = saveHeldItemSprite ?? versions.find((version) => version.id === pkm.id)?.spriteItem;
+
         return (
           <StorageItem
             key={"pkm-" + pkm.id}
@@ -143,6 +146,7 @@ export const StorageMainBox: React.FC = () => {
             isEgg={false}
             isShiny={pkm.isShiny}
             isShadow={false}
+            heldItemSprite={heldItemSprite}
             warning={versions.some((value) => !value.isValid)}
             disabled={
               Boolean(pkm.saveId)
