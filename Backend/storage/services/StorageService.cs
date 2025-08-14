@@ -68,30 +68,30 @@ public class StorageService
         return memoryLoader.loaders.getSaveLoaders(saveId).Pkms.GetAllEntities();
     }
 
-    public static void MainMovePkm(string pkmId, uint boxId, uint boxSlot)
+    public static async Task MainMovePkm(string pkmId, uint boxId, uint boxSlot)
     {
-        memoryLoader.AddAction(
+        await memoryLoader.AddAction(
             new MainMovePkmAction(pkmId, boxId, boxSlot)
         );
     }
 
-    public static void MainCreatePkmVersion(string pkmId, uint generation)
+    public static async Task MainCreatePkmVersion(string pkmId, uint generation)
     {
-        memoryLoader.AddAction(
+        await memoryLoader.AddAction(
             new MainCreatePkmVersionAction(pkmId, generation)
         );
     }
 
-    public static void SaveMovePkm(uint saveId, string pkmId, int boxId, int boxSlot)
+    public static async Task SaveMovePkm(uint saveId, string pkmId, int boxId, int boxSlot)
     {
-        memoryLoader.AddAction(
+        await memoryLoader.AddAction(
             new SaveMovePkmAction(saveId, pkmId, boxId, boxSlot)
         );
     }
 
-    public static void SaveMovePkmToStorage(uint saveId, string savePkmId, uint storageBoxId, uint storageSlot)
+    public static async Task SaveMovePkmToStorage(uint saveId, string savePkmId, uint storageBoxId, uint storageSlot)
     {
-        memoryLoader.AddAction(
+        await memoryLoader.AddAction(
             new SaveMovePkmToStorageAction(
                 saveId,
                 savePkmId,
@@ -101,9 +101,18 @@ public class StorageService
         );
     }
 
-    public static void SaveMovePkmFromStorage(uint saveId, string pkmVersionId, int saveBoxId, int saveSlot)
+    public static async Task SaveMovePkmFromStorage(uint saveId, string pkmVersionId, int saveBoxId, int saveSlot)
     {
-        memoryLoader.AddAction(
+
+        // var saveLoaders = memoryLoader.loaders.getSaveLoaders(saveId);
+
+        // if (saveLoaders.Save is SAV3 saveG3)
+        // {
+        //     var pkmVersion = memoryLoader.loaders.pkmVersionLoader.GetEntity(pkmVersionId);
+        //     pkmVersion.
+        // }
+
+        await memoryLoader.AddAction(
             new SaveMovePkmFromStorageAction(
                 saveId,
                 pkmVersionId,
@@ -114,7 +123,7 @@ public class StorageService
         );
     }
 
-    public static void Save()
+    public static async Task Save()
     {
         var actions = memoryLoader.actions;
         if (actions.Count == 0)
@@ -126,7 +135,10 @@ public class StorageService
 
         var fileLoader = new DataFileLoader();
 
-        actions.ForEach(fileLoader.ApplyAction);
+        for (var i = 0; i < actions.Count; i++)
+        {
+            await fileLoader.ApplyAction(actions[i]);
+        }
 
         fileLoader.WriteSaves();
 
@@ -150,7 +162,7 @@ public class StorageService
         memoryLoader = new();
     }
 
-    public static void RemoveDataActions(int actionIndexToRemoveFrom)
+    public static async Task RemoveDataActions(int actionIndexToRemoveFrom)
     {
         var previousActions = memoryLoader.actions;
 
@@ -160,7 +172,7 @@ public class StorageService
         {
             if (actionIndexToRemoveFrom > i)
             {
-                memoryLoader.AddAction(previousActions[i]);
+                await memoryLoader.AddAction(previousActions[i]);
             }
         }
     }

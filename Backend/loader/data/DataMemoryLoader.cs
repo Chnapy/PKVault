@@ -4,13 +4,13 @@ public class DataMemoryLoader : DataLoader
 {
     public List<DataAction> actions = new();
 
-    public void AddAction(DataAction action)
+    public async Task AddAction(DataAction action)
     {
         actions.Add(action);
 
         try
         {
-            ApplyAction(action);
+            await ApplyAction(action);
         }
         catch
         {

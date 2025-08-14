@@ -52,49 +52,49 @@ public class StorageController : ControllerBase
     }
 
     [HttpPost("save")]
-    public ActionResult<List<DataActionPayload>> Save()
+    public async Task<ActionResult<List<DataActionPayload>>> Save()
     {
-        StorageService.Save();
+        await StorageService.Save();
 
         return StorageService.GetActionPayloadList();
     }
 
     [HttpPut("main/move-pkm")]
-    public ActionResult<List<DataActionPayload>> MainMovePkm([BindRequired] string pkmId, [BindRequired] uint boxId, [BindRequired] uint boxSlot)
+    public async Task<ActionResult<List<DataActionPayload>>> MainMovePkm([BindRequired] string pkmId, [BindRequired] uint boxId, [BindRequired] uint boxSlot)
     {
-        StorageService.MainMovePkm(pkmId, boxId, boxSlot);
+        await StorageService.MainMovePkm(pkmId, boxId, boxSlot);
 
         return StorageService.GetActionPayloadList();
     }
 
     [HttpPost("main/create-pkm-version")]
-    public ActionResult<List<DataActionPayload>> MainCreatePkmVersion([BindRequired] string pkmId, [BindRequired] uint generation)
+    public async Task<ActionResult<List<DataActionPayload>>> MainCreatePkmVersion([BindRequired] string pkmId, [BindRequired] uint generation)
     {
-        StorageService.MainCreatePkmVersion(pkmId, generation);
+        await StorageService.MainCreatePkmVersion(pkmId, generation);
 
         return StorageService.GetActionPayloadList();
     }
 
     [HttpPut("save/{saveId}/move-pkm")]
-    public ActionResult<List<DataActionPayload>> SaveMovePkm(uint saveId, [BindRequired] string pkmId, [BindRequired] int boxId, [BindRequired] int boxSlot)
+    public async Task<ActionResult<List<DataActionPayload>>> SaveMovePkm(uint saveId, [BindRequired] string pkmId, [BindRequired] int boxId, [BindRequired] int boxSlot)
     {
-        StorageService.SaveMovePkm(saveId, pkmId, boxId, boxSlot);
+        await StorageService.SaveMovePkm(saveId, pkmId, boxId, boxSlot);
 
         return StorageService.GetActionPayloadList();
     }
 
     [HttpPut("save/{saveId}/move-pkm-to-storage")]
-    public ActionResult<List<DataActionPayload>> SaveMovePkmToStorage(uint saveId, [BindRequired] string savePkmId, [BindRequired] uint storageBoxId, [BindRequired] uint storageSlot)
+    public async Task<ActionResult<List<DataActionPayload>>> SaveMovePkmToStorage(uint saveId, [BindRequired] string savePkmId, [BindRequired] uint storageBoxId, [BindRequired] uint storageSlot)
     {
-        StorageService.SaveMovePkmToStorage(saveId, savePkmId, storageBoxId, storageSlot);
+        await StorageService.SaveMovePkmToStorage(saveId, savePkmId, storageBoxId, storageSlot);
 
         return StorageService.GetActionPayloadList();
     }
 
     [HttpPut("save/{saveId}/move-pkm-from-storage")]
-    public ActionResult<List<DataActionPayload>> SaveMovePkmFromStorage(uint saveId, [BindRequired] string pkmVersionId, [BindRequired] int saveBoxId, [BindRequired] int saveSlot)
+    public async Task<ActionResult<List<DataActionPayload>>> SaveMovePkmFromStorage(uint saveId, [BindRequired] string pkmVersionId, [BindRequired] int saveBoxId, [BindRequired] int saveSlot)
     {
-        StorageService.SaveMovePkmFromStorage(saveId, pkmVersionId, saveBoxId, saveSlot);
+        await StorageService.SaveMovePkmFromStorage(saveId, pkmVersionId, saveBoxId, saveSlot);
 
         return StorageService.GetActionPayloadList();
     }
@@ -106,9 +106,9 @@ public class StorageController : ControllerBase
     }
 
     [HttpDelete("action")]
-    public ActionResult<List<DataActionPayload>> DeleteActions(int actionIndexToRemoveFrom)
+    public async Task<ActionResult<List<DataActionPayload>>> DeleteActions(int actionIndexToRemoveFrom)
     {
-        StorageService.RemoveDataActions(actionIndexToRemoveFrom);
+        await StorageService.RemoveDataActions(actionIndexToRemoveFrom);
 
         return StorageService.GetActionPayloadList();
     }

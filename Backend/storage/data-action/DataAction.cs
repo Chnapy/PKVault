@@ -4,7 +4,7 @@ public abstract class DataAction
 {
     public abstract DataActionPayload GetPayload();
 
-    public abstract void Execute(DataEntityLoaders loaders);
+    public abstract Task Execute(DataEntityLoaders loaders);
 }
 
 public struct DataActionPayload

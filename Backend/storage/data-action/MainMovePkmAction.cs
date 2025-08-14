@@ -22,7 +22,7 @@ public class MainMovePkmAction : DataAction
         };
     }
 
-    public override void Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders)
     {
         var entity = loaders.pkmLoader.GetEntity(id);
         if (entity == default)

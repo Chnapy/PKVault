@@ -30,7 +30,7 @@ public class SaveMovePkmFromStorageAction : DataAction
         };
     }
 
-    public override void Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders)
     {
         var saveLoaders = loaders.getSaveLoaders(saveId);
 
@@ -73,6 +73,25 @@ public class SaveMovePkmFromStorageAction : DataAction
         }
 
         var pkmSaveDTO = PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxId, saveSlot, loaders.pkmVersionLoader);
+
+        // enable national-dex in G3 if pkm outside of regional-dex
+        if (saveLoaders.Save is SAV3 saveG3 && !saveG3.NationalDex)
+        {
+            var hoennDex = await PokeApi.GetPokedex(PokeApiPokedexEnum.HOENN);
+            // Console.WriteLine(hoennDex.name);
+            var isInDex = hoennDex.pokemon_entries.Any(entry =>
+            {
+                var url = entry.pokemon_species.url;
+                var id = int.Parse(url.TrimEnd('/').Split('/')[^1]);
+
+                return id == pkm.Species;
+            });
+
+            if (!isInDex)
+            {
+                saveG3.NationalDex = true;
+            }
+        }
 
         saveLoaders.Pkms.WriteEntity(pkmSaveDTO);
 

@@ -13,5 +13,9 @@ export const ItemImg: React.FC<ItemImgProps> = ({ spriteItem, ...rest }) => {
             .catch(() => setHeldItemImg(''))
     }, [ spriteItem ]);
 
+    if (!heldItemImg) {
+        return null;
+    }
+
     return <img src={heldItemImg} {...rest} />;
 };

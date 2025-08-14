@@ -34,9 +34,9 @@ public abstract class DataLoader
         return save;
     }
 
-    public void ApplyAction(DataAction action)
+    public async Task ApplyAction(DataAction action)
     {
-        action.Execute(loaders);
+        await action.Execute(loaders);
     }
 }
 

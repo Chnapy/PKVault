@@ -21,7 +21,7 @@ public class MainCreatePkmVersionAction : DataAction
         };
     }
 
-    public override void Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders)
     {
         Console.WriteLine($"Create PKM version, pkmId={pkmId}, generation={generation}");
 
