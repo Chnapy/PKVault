@@ -7,8 +7,8 @@ public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
 {
     public static PkmSaveDTO FromPkm(SaveFile save, PKM pkm, int box, int boxSlot,
     // List<PkmVersionEntity> pkmVersionEntities,
+    EntityLoader<PkmEntity> pkmLoader,
     EntityLoader<PkmVersionEntity> pkmVersionLoader
-    // EntityLoader<PkmEntity> pkmLoader,
     // PKMFileLoader pkmFileLoader
     )
     {
@@ -28,25 +28,16 @@ public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
 
         FillDTO(dto, pkm);
 
-        var pkmVersionEntity = pkmVersionLoader.GetEntity(id);
-        // pkmVersionEntities.Find(entity => entity.Id == id);
-        dto.PkmVersionId = pkmVersionEntity?.Id;
-        // if (pkmVersionEntity != default)
-        // {
-        //     var pkmEntity = pkmLoader.GetEntity(pkmVersionEntity.PkmId);
+        var pkmVersion = pkmVersionLoader.GetEntity(id);
+        if (pkmVersion != default)
+        {
+            var mainPkm = pkmLoader.GetAllEntities().Find(pkm => pkm.Id == pkmVersion.PkmId);
 
-        //     var pkmBytes = pkmFileLoader.GetEntity(pkmVersionEntity);
-        //     if (pkmBytes == default)
-        //     {
-        //         throw new Exception($"PKM-bytes is null, from entity Id={pkmVersionEntity.Id} Filepath={pkmVersionEntity.Filepath}");
-        //     }
-        //     var versionPkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity, pkmEntity);
-        //     if (versionPkm == default)
-        //     {
-        //         throw new Exception($"PKM is null, from entity Id={pkmVersionEntity.Id} Filepath={pkmVersionEntity.Filepath} bytes.length={pkmBytes.Length}");
-        //     }
-        //     // var pkmVersion = PkmVersionDTO.FromEntity(pkmVersionEntity);
-        // }
+            if (mainPkm.SaveId == save.ID32)
+            {
+                dto.PkmVersionId = pkmVersion.Id;
+            }
+        }
 
         dto.CanMoveToMainStorage = !dto.IsShadow && !dto.IsEgg;
 

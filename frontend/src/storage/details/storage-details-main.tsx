@@ -5,7 +5,7 @@ import { useCurrentLanguageName } from '../../data/hooks/use-current-language-na
 import { useMoveByIdOrName } from '../../data/hooks/use-move-by-id-or-name';
 import { useNatureByIdOrName } from '../../data/hooks/use-nature-by-id-or-name';
 import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
-import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
+import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainDeletePkmVersion, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../data/static-data/static-data';
 import { getGender } from '../../data/utils/get-gender';
 import { Route } from '../../routes/storage';
@@ -26,6 +26,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
     const [ selectedIndex, setSelectedIndex ] = React.useState(0);
 
     const navigate = Route.useNavigate();
+    const navigateToSave = Route.useNavigate();
 
     // const pkmSpeciesRecord = useStaticData().pokemonSpecies;
     const pkmRecord = useStaticData().pokemon;
@@ -70,6 +71,30 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
 
                 await queryClient.invalidateQueries({
                     queryKey: getStorageGetMainPkmsQueryKey(),
+                });
+
+                if (saveId) {
+                    await queryClient.invalidateQueries({
+                        queryKey: getStorageGetSavePkmsQueryKey(saveId),
+                    });
+                }
+            },
+        },
+    });
+
+    const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion({
+        mutation: {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetActionsQueryKey(),
+                });
+
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetMainPkmsQueryKey(),
+                });
+
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetMainPkmVersionsQueryKey(),
                 });
             },
         },
@@ -223,13 +248,21 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
             }
         }))}
         attachedSavePkmNotFound={attachedSavePkmNotFound}
-        onSaveCheck={console.log}
+        onSaveCheck={() => navigateToSave({
+            to: '/saves'
+        })}
         onDetach={() => mainPkmDetachSaveMutation.mutateAsync({
             params: {
                 pkmId: pkm.id,
             }
         })}
-        onRelease={console.log}
+        onRelease={attachedSavePkm
+            ? undefined
+            : (() => mainPkmVersionDeleteMutation.mutateAsync({
+                params: {
+                    pkmVersionId: pkmVersion.id,
+                }
+            }))}
         onClose={() => navigate({
             search: {
                 selected: undefined,

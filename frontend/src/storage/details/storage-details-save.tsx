@@ -1,10 +1,11 @@
+import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { useAbilityByIdOrName } from '../../data/hooks/use-ability-by-id-or-name';
 import { useCurrentLanguageName } from '../../data/hooks/use-current-language-name';
 import { useMoveByIdOrName } from '../../data/hooks/use-move-by-id-or-name';
 import { useNatureByIdOrName } from '../../data/hooks/use-nature-by-id-or-name';
 import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
-import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
+import { getStorageGetActionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageSaveDeletePkm } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../data/static-data/static-data';
 import { getGender } from '../../data/utils/get-gender';
 import { Route } from '../../routes/storage';
@@ -29,6 +30,22 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
     const getAbilityByIdOrName = useAbilityByIdOrName();
     const getNatureByIdOrName = useNatureByIdOrName();
     const getCurrentLanguageName = useCurrentLanguageName();
+
+    const queryClient = useQueryClient();
+
+    const savePkmDeleteMutation = useStorageSaveDeletePkm({
+        mutation: {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetActionsQueryKey(),
+                });
+
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetSavePkmsQueryKey(saveId),
+                });
+            },
+        },
+    });
 
     const savePkmQuery = useStorageGetSavePkms(saveId);
     const pkmsQuery = useStorageGetMainPkms();
@@ -108,7 +125,14 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
             }
         }))}
         canMoveToMainStorage={savePkm.canMoveToMainStorage}
-        onRelease={console.log}
+        onRelease={pkm
+            ? undefined
+            : (() => savePkmDeleteMutation.mutateAsync({
+                saveId,
+                params: {
+                    pkmId: savePkm.id,
+                }
+            }))}
         onClose={() => navigate({
             search: {
                 selected: undefined,

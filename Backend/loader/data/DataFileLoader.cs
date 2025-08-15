@@ -16,7 +16,7 @@ public class DataFileLoader : DataLoader
             {
                 Save = save,
                 Boxes = new SaveBoxLoader(save),
-                Pkms = new SavePkmLoader(save, pkmVersionLoader)
+                Pkms = new SavePkmLoader(save, pkmLoader, pkmVersionLoader)
             };
         };
 

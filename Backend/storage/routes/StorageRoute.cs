@@ -83,6 +83,22 @@ public class StorageController : ControllerBase
         return StorageService.GetActionPayloadList();
     }
 
+    [HttpDelete("main/pkm-version")]
+    public async Task<ActionResult<List<DataActionPayload>>> MainDeletePkmVersion([BindRequired] string pkmVersionId)
+    {
+        await StorageService.MainPkmVersionDelete(pkmVersionId);
+
+        return StorageService.GetActionPayloadList();
+    }
+
+    [HttpDelete("save/{saveId}/pkm")]
+    public async Task<ActionResult<List<DataActionPayload>>> SaveDeletePkm(uint saveId, [BindRequired] string pkmId)
+    {
+        await StorageService.SaveDeletePkm(saveId, pkmId);
+
+        return StorageService.GetActionPayloadList();
+    }
+
     [HttpPut("save/{saveId}/pkm/move")]
     public async Task<ActionResult<List<DataActionPayload>>> SaveMovePkm(uint saveId, [BindRequired] string pkmId, [BindRequired] int boxId, [BindRequired] int boxSlot)
     {

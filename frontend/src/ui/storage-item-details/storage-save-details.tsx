@@ -68,7 +68,7 @@ export type StorageSaveDetailsProps = {
 
   goToMainPkm?: () => void;
 
-  onRelease: () => void;
+  onRelease?: () => void;
 
   onClose: () => void;
 };
@@ -283,7 +283,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
         </>
       }
       actions={<>
-        <ButtonWithConfirm onClick={onRelease}>Release</ButtonWithConfirm>
+        {onRelease && <ButtonWithConfirm onClick={onRelease}>Release</ButtonWithConfirm>}
         {/* <Button disabled>Evolve</Button> */}
         {/* <Button disabled>Delete full PKM</Button> */}
       </>}

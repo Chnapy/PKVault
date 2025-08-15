@@ -120,6 +120,20 @@ public class StorageService
         );
     }
 
+    public static async Task MainPkmVersionDelete(string pkmVersionId)
+    {
+        await memoryLoader.AddAction(
+            new DeletePkmVersionAction(pkmVersionId)
+        );
+    }
+
+    public static async Task SaveDeletePkm(uint saveId, string pkmId)
+    {
+        await memoryLoader.AddAction(
+            new SaveDeletePkmAction(saveId, pkmId)
+        );
+    }
+
     public static async Task Save()
     {
         var actions = memoryLoader.actions;

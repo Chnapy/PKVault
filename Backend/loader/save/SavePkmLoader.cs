@@ -3,11 +3,13 @@ using PKHeX.Core;
 public class SavePkmLoader : EntityLoader<PkmSaveDTO>
 {
     private SaveFile save;
+    private EntityLoader<PkmEntity> pkmEntityloader;
     private EntityLoader<PkmVersionEntity> pkmVersionEntityloader;
 
-    public SavePkmLoader(SaveFile _save, EntityLoader<PkmVersionEntity> _pkmVersionEntityloader)
+    public SavePkmLoader(SaveFile _save, EntityLoader<PkmEntity> _pkmEntityloader, EntityLoader<PkmVersionEntity> _pkmVersionEntityloader)
     {
         save = _save;
+        pkmEntityloader = _pkmEntityloader;
         pkmVersionEntityloader = _pkmVersionEntityloader;
     }
 
@@ -22,7 +24,7 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
                 var pkm = save.GetPartySlotAtIndex(i);
                 if (pkm.Species != 0)
                 {
-                    var dto = PkmSaveDTO.FromPkm(save, pkm, BoxDTO.PARTY_ID, i, pkmVersionEntityloader);
+                    var dto = PkmSaveDTO.FromPkm(save, pkm, BoxDTO.PARTY_ID, i, pkmEntityloader, pkmVersionEntityloader);
                     pkmList.Add(dto);
                 }
             }
@@ -36,7 +38,7 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
                 var pkm = slot.Read(save);
                 if (pkm != default && pkm.Species != 0)
                 {
-                    var dto = PkmSaveDTO.FromPkm(save, pkm, BoxDTO.DAYCARE_ID, i, pkmVersionEntityloader);
+                    var dto = PkmSaveDTO.FromPkm(save, pkm, BoxDTO.DAYCARE_ID, i, pkmEntityloader, pkmVersionEntityloader);
                     pkmList.Add(dto);
                 }
             }
@@ -50,7 +52,7 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
             {
                 if (pkm.Species != 0)
                 {
-                    var dto = PkmSaveDTO.FromPkm(save, pkm, i, j, pkmVersionEntityloader);
+                    var dto = PkmSaveDTO.FromPkm(save, pkm, i, j, pkmEntityloader, pkmVersionEntityloader);
                     pkmList.Add(dto);
                 }
                 j++;

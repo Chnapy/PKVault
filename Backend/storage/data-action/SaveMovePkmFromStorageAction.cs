@@ -72,7 +72,7 @@ public class SaveMovePkmFromStorageAction : DataAction
             throw new Exception($"PKM not defined, pkm-version={pkmVersionEntity.Id}");
         }
 
-        var pkmSaveDTO = PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxId, saveSlot, loaders.pkmVersionLoader);
+        var pkmSaveDTO = PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxId, saveSlot, loaders.pkmLoader, loaders.pkmVersionLoader);
 
         // enable national-dex in G3 if pkm outside of regional-dex
         if (saveLoaders.Save is SAV3 saveG3 && !saveG3.NationalDex)
