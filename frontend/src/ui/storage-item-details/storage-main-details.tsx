@@ -7,16 +7,17 @@ import { useStaticData } from "../../data/static-data/static-data";
 import type { GenderType } from '../../data/utils/get-gender';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
 import { Button } from "../button/button";
+import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { DetailsCardContainer } from '../details-card/details-card-container';
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
 import { Gender } from '../gender/gender';
+import { ItemImg } from '../item-img/item-img';
 import { SaveCardContentSmall } from '../save-card/save-card-content-small';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
-import { ItemImg } from '../item-img/item-img';
 
 export type StorageMainDetailsProps = {
   header: React.ReactNode;
@@ -299,11 +300,10 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
         </>
       }
       actions={<>
-        {onDetach && <Button onClick={onDetach}>Detach from save</Button>}
+        {onDetach && <ButtonWithConfirm onClick={onDetach}>Detach from save</ButtonWithConfirm>}
         {onSaveCheck && <Button onClick={onSaveCheck}>Check save</Button>}
-        {onRelease && <Button onClick={onRelease}>Release</Button>}
-        {/* <Button disabled>Evolve</Button> */}
-        {/* <Button disabled>Delete full PKM</Button> */}
+        {onRelease && <ButtonWithConfirm onClick={onRelease}>Release</ButtonWithConfirm>}
+        {/* <ButtonWithConfirm disabled>Evolve</ButtonWithConfirm> */}
       </>}
       onClose={onClose}
     />

@@ -17,16 +17,15 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
 
         if (save.HasParty)
         {
-            var i = 0;
-            save.PartyData.ToList().ForEach(pkm =>
+            for (var i = 0; i < 6; i++)
             {
+                var pkm = save.GetPartySlotAtIndex(i);
                 if (pkm.Species != 0)
                 {
                     var dto = PkmSaveDTO.FromPkm(save, pkm, BoxDTO.PARTY_ID, i, pkmVersionEntityloader);
                     pkmList.Add(dto);
                 }
-                i++;
-            });
+            }
         }
 
         if (save is IDaycareStorage saveDaycare)

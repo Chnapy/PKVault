@@ -5,11 +5,12 @@ import {
   getSaveInfosGetAllQueryKey,
   useSaveInfosDelete,
   useSaveInfosGetAll,
+  useSaveInfosRestoreBackup,
 } from "../../data/sdk/save-infos/save-infos.gen";
 import { Button } from "../../ui/button/button";
 import { Container } from "../../ui/container/container";
 import { SaveCardContentFull } from '../../ui/save-card/save-card-content-full';
-import { useStorageGetActions } from '../../data/sdk/storage/storage.gen';
+import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetActions } from '../../data/sdk/storage/storage.gen';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { getWarningsGetWarningsQueryKey } from '../../data/sdk/warnings/warnings.gen';
 
@@ -38,6 +39,34 @@ export const SaveItem: React.FC<SaveItemProps> = ({
         await queryClient.invalidateQueries({
           queryKey: getDexGetAllQueryKey(),
         });
+        await queryClient.invalidateQueries({
+          queryKey: getWarningsGetWarningsQueryKey(),
+        });
+      },
+    },
+  });
+  const saveInfosRestoreBackupMutation = useSaveInfosRestoreBackup({
+    mutation: {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: getSaveInfosGetAllQueryKey(),
+        });
+
+        await queryClient.invalidateQueries({
+          queryKey: getStorageGetActionsQueryKey(),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: getStorageGetMainPkmsQueryKey(),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: getStorageGetMainPkmVersionsQueryKey(),
+        });
+        if (saveId) {
+          await queryClient.invalidateQueries({
+            queryKey: getStorageGetSavePkmsQueryKey(saveId),
+          });
+        }
+
         await queryClient.invalidateQueries({
           queryKey: getWarningsGetWarningsQueryKey(),
         });
@@ -121,11 +150,16 @@ export const SaveItem: React.FC<SaveItemProps> = ({
                 ownedCount={item.ownedCount}
                 shinyCount={item.shinyCount}
                 actions={<>
-                  {/* <ButtonWithConfirm onClick={() =>
-              
-            }>
+                  <ButtonWithConfirm onClick={() =>
+                    saveInfosRestoreBackupMutation.mutateAsync({
+                      params: {
+                        saveId: item.id,
+                        backupTime: item.backupTime!,
+                      },
+                    })
+                  }>
                     Restore
-                  </ButtonWithConfirm> */}
+                  </ButtonWithConfirm>
 
                   <ButtonWithConfirm onClick={() =>
                     saveInfosDeleteMutation.mutateAsync({

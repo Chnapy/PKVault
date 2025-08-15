@@ -20,4 +20,5 @@ public enum DataActionType
     SAVE_MOVE_PKM,
     SAVE_MOVE_PKM_FROM_STORAGE,
     SAVE_MOVE_PKM_TO_STORAGE,
+    DETACH_PKM_SAVE,
 }

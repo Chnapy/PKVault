@@ -5,7 +5,7 @@ import { useCurrentLanguageName } from '../../data/hooks/use-current-language-na
 import { useMoveByIdOrName } from '../../data/hooks/use-move-by-id-or-name';
 import { useNatureByIdOrName } from '../../data/hooks/use-nature-by-id-or-name';
 import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
-import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion } from '../../data/sdk/storage/storage.gen';
+import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../data/static-data/static-data';
 import { getGender } from '../../data/utils/get-gender';
 import { Route } from '../../routes/storage';
@@ -57,6 +57,20 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
                         queryKey: getStorageGetSavePkmsQueryKey(saveId),
                     });
                 }
+            },
+        },
+    });
+
+    const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave({
+        mutation: {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetActionsQueryKey(),
+                });
+
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetMainPkmsQueryKey(),
+                });
             },
         },
     });
@@ -210,7 +224,11 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
         }))}
         attachedSavePkmNotFound={attachedSavePkmNotFound}
         onSaveCheck={console.log}
-        onDetach={console.log}
+        onDetach={() => mainPkmDetachSaveMutation.mutateAsync({
+            params: {
+                pkmId: pkm.id,
+            }
+        })}
         onRelease={console.log}
         onClose={() => navigate({
             search: {

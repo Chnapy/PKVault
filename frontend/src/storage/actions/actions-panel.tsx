@@ -113,6 +113,7 @@ export const ActionsPanel: React.FC = () => {
                                     [ DataActionType.SAVE_MOVE_PKM ]: 'Move pkm in save',
                                     [ DataActionType.SAVE_MOVE_PKM_FROM_STORAGE ]: 'Move pkm from storage to save',
                                     [ DataActionType.SAVE_MOVE_PKM_TO_STORAGE ]: 'Move pkm from save to storage',
+                                    [ DataActionType.DETACH_PKM_SAVE ]: 'Detach save from pkm',
                                 })} - {action.parameters.join(', ')}
                             </td>
                             <td>

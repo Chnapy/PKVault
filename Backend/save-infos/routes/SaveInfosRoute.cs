@@ -37,4 +37,10 @@ public class SaveInfosController : ControllerBase
     {
         LocalSaveService.DeleteSaveFromId(saveId, backupTime);
     }
+
+    [HttpPost("restore")]
+    public void RestoreBackup([BindRequired] uint saveId, [BindRequired] DateTime backupTime)
+    {
+        LocalSaveService.RestoreBackup(saveId, backupTime);
+    }
 }

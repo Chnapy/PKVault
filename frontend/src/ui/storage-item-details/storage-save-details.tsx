@@ -6,15 +6,16 @@ import { type GameVersion } from "../../data/sdk/model";
 import { useStaticData } from "../../data/static-data/static-data";
 import type { GenderType } from '../../data/utils/get-gender';
 import { Button } from "../button/button";
+import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { DetailsCardContainer } from '../details-card/details-card-container';
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
 import { Gender } from '../gender/gender';
+import { ItemImg } from '../item-img/item-img';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
-import { ItemImg } from '../item-img/item-img';
 
 export type StorageSaveDetailsProps = {
   id: string;
@@ -282,7 +283,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
         </>
       }
       actions={<>
-        <Button onClick={onRelease}>Release</Button>
+        <ButtonWithConfirm onClick={onRelease}>Release</ButtonWithConfirm>
         {/* <Button disabled>Evolve</Button> */}
         {/* <Button disabled>Delete full PKM</Button> */}
       </>}
