@@ -17,7 +17,7 @@ public static class Program
 
         // GameInfo.CurrentLanguage = "fr";
 
-        SaveInfosService.LoadLastSaves();
+        LocalSaveService.PrepareTimer();
 
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddCors(options =>

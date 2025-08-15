@@ -1,11 +1,11 @@
 import React from "react";
 import { BoxType, type PkmSaveDTO, type SaveInfosDTO } from "../data/sdk/model";
-import { useSaveInfosGetAll } from "../data/sdk/save-infos/save-infos.gen";
 import {
   useStorageGetSaveBoxes,
   useStorageGetSavePkms,
 } from "../data/sdk/storage/storage.gen";
 import { Route } from "../routes/storage";
+import { useSaveInfosMain } from '../saves/hooks/use-save-infos-main';
 import { SaveItem } from "../saves/save-item/save-item";
 import { Button } from "../ui/button/button";
 import { FilterSelect } from "../ui/filter/filter-select/filter-select";
@@ -23,8 +23,8 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
   const selected = Route.useSearch({ select: (search) => search.selected });
   const navigate = Route.useNavigate();
 
-  const saveInfosRecord = useSaveInfosGetAll().data?.data ?? {};
-  const saveInfos = saveInfosRecord[ saveId ]?.[ 0 ] as SaveInfosDTO | undefined;
+  const saveInfosRecord = useSaveInfosMain().data?.data ?? {};
+  const saveInfos = saveInfosRecord[ saveId ] as SaveInfosDTO | undefined;
 
   const saveBoxesQuery = useStorageGetSaveBoxes(saveId);
   const savePkmsQuery = useStorageGetSavePkms(saveId);

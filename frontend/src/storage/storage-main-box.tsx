@@ -5,13 +5,13 @@ import {
   useStorageGetMainPkms,
   useStorageGetMainPkmVersions,
 } from "../data/sdk/storage/storage.gen";
+import { Route } from "../routes/storage";
+import { useSaveInfosMain } from '../saves/hooks/use-save-infos-main';
 import { Button } from "../ui/button/button";
 import { FilterSelect } from "../ui/filter/filter-select/filter-select";
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageItem } from "../ui/storage-item/storage-item";
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
-import { Route } from "../routes/storage";
-import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 
 export const StorageMainBox: React.FC = () => {
   const mainBoxId = Route.useSearch({ select: (search) => search.mainBoxId });
@@ -19,12 +19,12 @@ export const StorageMainBox: React.FC = () => {
   const selected = Route.useSearch({ select: (search) => search.selected });
   const navigate = Route.useNavigate();
 
-  const saveInfosQuery = useSaveInfosGetAll();
+  const saveInfosQuery = useSaveInfosMain();
   const boxesQuery = useStorageGetMainBoxes();
   const pkmsQuery = useStorageGetMainPkms();
   const pkmVersionsQuery = useStorageGetMainPkmVersions();
 
-  const save = saveId ? saveInfosQuery.data?.data?.[ saveId ][ 0 ] : undefined;
+  const save = saveId ? saveInfosQuery.data?.data?.[ saveId ] : undefined;
 
   const boxes = boxesQuery.data?.data ?? [];
   const pkms = pkmsQuery.data?.data ?? [];

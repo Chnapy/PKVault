@@ -8,7 +8,7 @@ public class SaveInfosController : ControllerBase
     [HttpGet()]
     public ActionResult<Dictionary<uint, List<SaveInfosDTO>>> GetAll()
     {
-        var record = SaveInfosService.GetAllSaveInfos();
+        var record = LocalSaveService.GetAllSaveInfos();
 
         return record;
     }
@@ -27,14 +27,14 @@ public class SaveInfosController : ControllerBase
             fileBytes = ms.ToArray();
         }
 
-        var saveInfos = SaveInfosService.UploadNewSave(fileBytes, saveFile.FileName);
+        var saveInfos = LocalSaveService.UploadNewSave(fileBytes, saveFile.FileName);
 
         return saveInfos;
     }
 
     [HttpDelete()]
-    public void Delete([BindRequired] uint saveId, [BindRequired] long timestamp)
+    public void Delete([BindRequired] uint saveId, DateTime? backupTime)
     {
-        SaveInfosService.DeleteSave(saveId, timestamp);
+        LocalSaveService.DeleteSaveFromId(saveId, backupTime);
     }
 }

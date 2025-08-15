@@ -59,9 +59,14 @@ export type StorageSaveDetailsProps = {
   box: number;
   boxSlot: number;
 
+  mainBoxId?: number;
+  mainBoxSlot?: number;
+  saveSynchronized: boolean;
+
   canMoveToMainStorage: boolean;
 
-  // pkmId?: string;
+  goToMainPkm?: () => void;
+
   onRelease: () => void;
 
   onClose: () => void;
@@ -110,8 +115,13 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
   box,
   boxSlot,
 
+  mainBoxId,
+  mainBoxSlot,
+  saveSynchronized,
+
   canMoveToMainStorage,
 
+  goToMainPkm,
   onRelease,
   onClose,
 }) => {
@@ -211,6 +221,10 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
         </>
       }
       preContent={<>
+        <TextContainer>
+          {validityReport}
+        </TextContainer>
+
         {heldItemSprite && <TextContainer>
           Held item <span style={{ color: theme.text.primary }}>{heldItemText}</span> <ItemImg spriteItem={heldItemSprite} alt={heldItemText} style={{
             height: 24,
@@ -218,9 +232,19 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
           }} />
         </TextContainer>}
 
-        <TextContainer>
-          {validityReport}
-        </TextContainer>
+        {mainBoxId && mainBoxSlot && goToMainPkm && <>
+          <Button onClick={goToMainPkm}>
+            <div style={{ width: '100%' }}>
+              Go to main-pkm
+            </div>
+            <div style={{ width: '100%' }}>
+              Box {mainBoxId} slot {mainBoxSlot}
+            </div>
+            <div style={{ width: '100%', color: !saveSynchronized ? theme.text.contrast : undefined }}>
+              {saveSynchronized ? 'synchronized' : 'unsynchronized'}
+            </div>
+          </Button>
+        </>}
       </>}
       content={
         <>

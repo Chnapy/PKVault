@@ -35,12 +35,9 @@ public class DataFileLoader : DataLoader
         saveDict.Values.ToList()
         .ForEach(save =>
         {
-            var saveInfos = SaveInfosEntity.GetSaveInfosEntity(save.ID32)!;
-
             Console.WriteLine($"BOX 2 AFTER box.16={save.GetBoxData(1)[16].Species}");
 
-            File.WriteAllBytes(saveInfos.Filepath, save.Write());
-            Console.WriteLine($"Writed {save.ID32} to {saveInfos.Filepath}");
+            LocalSaveService.WriteSaveWithBackup(save);
         });
     }
 }

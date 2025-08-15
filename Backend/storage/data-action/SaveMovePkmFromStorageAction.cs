@@ -50,7 +50,7 @@ public class SaveMovePkmFromStorageAction : DataAction
         var savePkm = saveLoaders.Pkms.GetEntity(pkmVersionEntity.Id);
         if (savePkm != default)
         {
-            throw new Exception($"SavePkm already exists, id={savePkm.Id}");
+            throw new Exception($"SavePkm already exists, id={savePkm.Id} {savePkm.Nickname}");
         }
 
         var existingSlot = saveLoaders.Pkms.GetAllEntities().Find(entity => entity.Box == saveBoxId && entity.BoxSlot == saveSlot);

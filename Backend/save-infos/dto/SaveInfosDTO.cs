@@ -3,10 +3,8 @@ using PKHeX.Core;
 
 public class SaveInfosDTO
 {
-    public static SaveInfosDTO FromEntity(SaveInfosEntity entity)
+    public static SaveInfosDTO FromSave(SaveFile save, bool isBackup, DateTime? backupTime, DateTime lastWriteTime)
     {
-        var save = SaveUtil.GetVariantSAV(entity.Filepath)!;
-
         var seenCount = save.SeenCount;
         var caughtCount = save.CaughtCount;
 
@@ -30,8 +28,10 @@ public class SaveInfosDTO
 
         return new SaveInfosDTO
         {
-            Id = entity.SaveId,
-            Timestamp = entity.Timestamp,
+            Id = save.ID32,
+            IsBackup = isBackup,
+            BackupTime = backupTime,
+            LastWriteTime = lastWriteTime,
             Version = save.Version,
             Generation = save.Generation,
             TID = save.DisplayTID,
@@ -56,7 +56,11 @@ public class SaveInfosDTO
 
     public uint Id { get; set; }
 
-    public long Timestamp { get; set; }
+    public bool IsBackup { get; set; }
+
+    public DateTime? BackupTime { get; set; }
+
+    public DateTime LastWriteTime { get; set; }
 
     public GameVersion Version { get; set; }
 

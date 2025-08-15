@@ -4,7 +4,6 @@ import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import type React from "react";
 import z from "zod";
-import { useSaveInfosGetAll } from "../data/sdk/save-infos/save-infos.gen";
 import {
   getStorageGetActionsQueryKey,
   getStorageGetMainPkmsQueryKey,
@@ -16,6 +15,7 @@ import {
   useStorageSaveMovePkmFromStorage,
   useStorageSaveMovePkmToStorage
 } from "../data/sdk/storage/storage.gen";
+import { useSaveInfosMain } from '../saves/hooks/use-save-infos-main';
 import { ActionsPanel } from '../storage/actions/actions-panel';
 import { StorageDetails } from "../storage/storage-details";
 import { StorageMainBox } from "../storage/storage-main-box";
@@ -28,9 +28,9 @@ export const Storage: React.FC = () => {
 
   const queryClient = useQueryClient();
 
-  const saveInfosRecord = useSaveInfosGetAll().data?.data;
+  const saveInfosRecord = useSaveInfosMain().data?.data;
   const saveInfos =
-    saveId && saveInfosRecord ? saveInfosRecord[ saveId ][ 0 ] : undefined;
+    saveId && saveInfosRecord ? saveInfosRecord[ saveId ] : undefined;
 
   const pkmVersionsQuery = useStorageGetMainPkmVersions();
   const pkmVersions = pkmVersionsQuery.data?.data ?? [];

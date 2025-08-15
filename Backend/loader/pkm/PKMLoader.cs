@@ -64,7 +64,7 @@ public abstract class PKMLoader
 
     public static string GetPKMFilepath(PKM pkm, uint generation)
     {
-        return $"files/pkm/{generation}/{pkm.FileName}";
+        return Path.Combine(Settings.mainPkmStoragePath, generation.ToString(), pkm.FileName);
     }
 
     public abstract byte[]? GetEntity(PkmVersionEntity pkmVersion);

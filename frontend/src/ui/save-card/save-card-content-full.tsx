@@ -1,10 +1,8 @@
 import type React from 'react';
+import { ButtonWithConfirm } from '../button/button-with-confirm';
+import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
 import { SaveCardContentSmall, type SaveCardContentSmallProps } from './save-card-content-small';
-import { TextContainer } from '../text-container/text-container';
-import { css } from '@emotion/css';
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
-import { Button } from '../button/button';
 
 export type SaveCardContentFullProps = SaveCardContentSmallProps & {
     playTime: string;
@@ -12,14 +10,14 @@ export type SaveCardContentFullProps = SaveCardContentSmallProps & {
     dexCaughtCount: number;
     ownedCount: number;
     shinyCount: number;
-    onDelete?: () => void;
+    actions?: React.ReactNode;
 };
 
 export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
     id,
     generation,
     version,
-    timestamp,
+    lastWriteTime,
     tid,
     trainerName,
     trainerGenderMale,
@@ -28,7 +26,7 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
     dexCaughtCount,
     ownedCount,
     shinyCount,
-    onDelete,
+    actions,
 }) => {
 
     return (
@@ -47,7 +45,7 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                 id={id}
                 generation={generation}
                 version={version}
-                timestamp={timestamp}
+                lastWriteTime={lastWriteTime}
                 tid={tid}
                 trainerName={trainerName}
                 trainerGenderMale={trainerGenderMale}
@@ -69,19 +67,9 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                         {' '}(<span style={{ color: theme.text.contrast }}>{shinyCount}</span>)
                     </>}
 
-                    {onDelete && (
+                    {actions && (
                         <span style={{ position: "absolute", right: 0, bottom: 0 }}>
-                            <Popover className="relative">
-                                <Button as={PopoverButton} componentDescriptor="button">
-                                    Delete
-                                </Button>
-                                <PopoverPanel
-                                    anchor="bottom"
-                                    className={css({ overflow: "unset !important" })}
-                                >
-                                    <Button onClick={onDelete}>Confirm ?</Button>
-                                </PopoverPanel>
-                            </Popover>
+                            {actions}
                         </span>
                     )}
                 </TextContainer>

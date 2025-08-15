@@ -1,15 +1,15 @@
 import React from "react";
 import { useCurrentLanguageName } from '../../data/hooks/use-current-language-name';
+import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
-import { useSaveInfosGetAll } from "../../data/sdk/save-infos/save-infos.gen";
 import { useStaticData } from "../../data/static-data/static-data";
 import type { GenderType } from '../../data/utils/get-gender';
 import { Route } from "../../routes/pokedex";
+import { useSaveInfosMain } from '../../saves/hooks/use-save-infos-main';
 import { DetailsCard } from "../../ui/details-card/details-card";
 import { switchUtil } from '../../util/switch-util';
 import { GameButton } from "./game-button";
 import { getGameInfos } from "./util/get-game-infos";
-import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
 
 export const PokedexDetails: React.FC = () => {
   console.time("pokedex-details");
@@ -27,7 +27,7 @@ export const PokedexDetails: React.FC = () => {
   const abilityList = useStaticData().ability;
 
   const dexGetAllQuery = useDexGetAll();
-  const saveInfosGetAllQuery = useSaveInfosGetAll();
+  const saveInfosMainQuery = useSaveInfosMain();
   const pokemonSpeciesInfos = selectedSpecies
     ? pkmSpeciesRecord[ selectedSpecies ]
     : undefined;
@@ -37,7 +37,7 @@ export const PokedexDetails: React.FC = () => {
 
   const [ selectedSaveIndex, setSelectedSaveIndex ] = React.useState(0);
 
-  const savesRecord = saveInfosGetAllQuery.data?.data ?? {};
+  const savesRecord = saveInfosMainQuery.data?.data ?? {};
   const speciesRecord = dexGetAllQuery.data?.data ?? {};
 
   const speciesValues = Object.values(
@@ -46,7 +46,7 @@ export const PokedexDetails: React.FC = () => {
 
   const gameSaves = speciesValues
     .filter((spec) => spec.isAnySeen)
-    .map((spec) => (savesRecord[ spec.saveId ] ?? [])[ 0 ])
+    .map((spec) => savesRecord[ spec.saveId ])
     .filter(Boolean);
 
   React.useEffect(() => {

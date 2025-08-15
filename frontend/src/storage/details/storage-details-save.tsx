@@ -4,7 +4,7 @@ import { useCurrentLanguageName } from '../../data/hooks/use-current-language-na
 import { useMoveByIdOrName } from '../../data/hooks/use-move-by-id-or-name';
 import { useNatureByIdOrName } from '../../data/hooks/use-nature-by-id-or-name';
 import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
-import { useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
+import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../data/static-data/static-data';
 import { getGender } from '../../data/utils/get-gender';
 import { Route } from '../../routes/storage';
@@ -31,10 +31,15 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
     const getCurrentLanguageName = useCurrentLanguageName();
 
     const savePkmQuery = useStorageGetSavePkms(saveId);
+    const pkmsQuery = useStorageGetMainPkms();
+    const pkmVersionsQuery = useStorageGetMainPkmVersions();
 
     const savePkm = savePkmQuery.data?.data.find((pkm) => pkm.id === selectedId);
     if (!savePkm)
         return null;
+
+    const pkmVersion = savePkm.pkmVersionId ? pkmVersionsQuery.data?.data.find(pkmVersion => pkmVersion.id === savePkm.pkmVersionId) : undefined;
+    const pkm = pkmVersion ? pkmsQuery.data?.data.find(pkm => pkm.id === pkmVersion.pkmId) : undefined;
 
     const gender = getGender(savePkm.gender);
 
@@ -91,6 +96,17 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
         validityReport={savePkm.validityReport}
         box={savePkm.box}
         boxSlot={savePkm.boxSlot}
+        mainBoxId={pkm?.boxId}
+        mainBoxSlot={pkm?.boxSlot}
+        saveSynchronized={savePkm.pkmData === pkmVersion?.pkmData}
+        goToMainPkm={pkm && (() => navigate({
+            search: {
+                selected: {
+                    type: 'main',
+                    id: pkm.id,
+                },
+            }
+        }))}
         canMoveToMainStorage={savePkm.canMoveToMainStorage}
         onRelease={console.log}
         onClose={() => navigate({

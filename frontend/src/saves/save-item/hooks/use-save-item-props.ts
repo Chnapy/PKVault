@@ -1,15 +1,15 @@
-import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import type { SaveCardContentFullProps } from '../../../ui/save-card/save-card-content-full';
+import { useSaveInfosMain } from '../../hooks/use-save-infos-main';
 
 export const useSaveItemProps = () => {
-    const saveInfosQuery = useSaveInfosGetAll();
+    const saveInfosQuery = useSaveInfosMain();
 
     return (saveId: number): SaveCardContentFullProps | null => {
         if (!saveInfosQuery.data) {
             return null;
         }
 
-        const item = saveInfosQuery.data.data[ saveId ][ 0 ];
+        const item = saveInfosQuery.data.data[ saveId ];
 
         return {
             id: item.id,
@@ -18,7 +18,7 @@ export const useSaveItemProps = () => {
             trainerName: item.trainerName,
             trainerGenderMale: item.trainerGender === 0,
             tid: item.tid,
-            timestamp: item.timestamp,
+            lastWriteTime: item.lastWriteTime,
             playTime: item.playTime,
             dexSeenCount: item.dexSeenCount,
             dexCaughtCount: item.dexCaughtCount,

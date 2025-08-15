@@ -3,74 +3,74 @@ using PKHeX.Core;
 
 public class TestService
 {
-    public static void Test()
-    {
-        // DexService.ClearDex();
+    // public static void Test()
+    // {
+    //     // DexService.ClearDex();
 
-        Console.WriteLine("TEST");
+    //     Console.WriteLine("TEST");
 
-        var lastSavesInfos = SaveInfosEntity.GetLastSaveInfosEntity();
-        // lastSavesInfos.ForEach(entity =>
-        // {
+    //     var lastSavesInfos = SaveInfosEntity.GetLastSaveInfosEntity();
+    //     // lastSavesInfos.ForEach(entity =>
+    //     // {
 
-        //     var save = SaveUtil.GetVariantSAV(entity.Filepath)!;
-        //     DexService.UpdateDexWithSave(save, entity);
+    //     //     var save = SaveUtil.GetVariantSAV(entity.Filepath)!;
+    //     //     DexService.UpdateDexWithSave(save, entity);
 
 
-        // });
+    //     // });
 
-        var saveInfos = lastSavesInfos[5];
-        var save = SaveUtil.GetVariantSAV(saveInfos.Filepath)!;
-        Console.WriteLine($"SAVE GEN {save.Generation} VERSION {save.Version}");
+    //     var saveInfos = lastSavesInfos[5];
+    //     var save = SaveUtil.GetVariantSAV(saveInfos.Filepath)!;
+    //     Console.WriteLine($"SAVE GEN {save.Generation} VERSION {save.Version}");
 
-        var pkms = save.GetAllPKM();
+    //     var pkms = save.GetAllPKM();
 
-        // onix G4 - PK4
-        var pkmG4 = pkms.Find(pk => pk.Species < 150)!;
-        pkmG4.RefreshChecksum();
-        ReportLinePKM(pkmG4, "memory");
+    //     // onix G4 - PK4
+    //     var pkmG4 = pkms.Find(pk => pk.Species < 150)!;
+    //     pkmG4.RefreshChecksum();
+    //     ReportLinePKM(pkmG4, "memory");
 
-        // ReportPKM(pkm);
+    //     // ReportPKM(pkm);
 
-        // Write & read G4-PK4 to file
-        var binariesG4 = pkmG4.Data;
-        var filenameG4 = $"files/pkm/{pkmG4.Generation}/{pkmG4.FileName}";
-        File.WriteAllBytes(filenameG4, binariesG4);
-        var checkFileBytesG4 = File.ReadAllBytes(filenameG4);
-        var pkmG4FromFile = new PK4(checkFileBytesG4);
-        ReportLinePKM(pkmG4FromFile, "file");
+    //     // Write & read G4-PK4 to file
+    //     var binariesG4 = pkmG4.Data;
+    //     var filenameG4 = $"files/pkm/{pkmG4.Generation}/{pkmG4.FileName}";
+    //     File.WriteAllBytes(filenameG4, binariesG4);
+    //     var checkFileBytesG4 = File.ReadAllBytes(filenameG4);
+    //     var pkmG4FromFile = new PK4(checkFileBytesG4);
+    //     ReportLinePKM(pkmG4FromFile, "file");
 
-        // Convert G4-PK4 to G1-PK1
-        EntityConverter.AllowIncompatibleConversion = EntityCompatibilitySetting.AllowIncompatibleSane;
-        var converted = EntityConverter.TryMakePKMCompatible(
-            pkmG4,
-            new PK1(),
-            out var result,
-            out var pkmG1
-        );
-        ReportLinePKM(pkmG1, "memory-converted");
+    //     // Convert G4-PK4 to G1-PK1
+    //     EntityConverter.AllowIncompatibleConversion = EntityCompatibilitySetting.AllowIncompatibleSane;
+    //     var converted = EntityConverter.TryMakePKMCompatible(
+    //         pkmG4,
+    //         new PK1(),
+    //         out var result,
+    //         out var pkmG1
+    //     );
+    //     ReportLinePKM(pkmG1, "memory-converted");
 
-        // Write & read G1-PK1 to file
-        var binariesG1 = pkmG1.Data;
-        var filenameG1 = $"files/pkm/{pkmG1.Generation}/{pkmG1.FileName}";
-        File.WriteAllBytes(filenameG1, binariesG1);
-        var checkFileBytesG1 = File.ReadAllBytes(filenameG1);
-        var pkmG1FromFile = new PK1(checkFileBytesG1);
-        ReportLinePKM(pkmG1FromFile, "file-converted");
+    //     // Write & read G1-PK1 to file
+    //     var binariesG1 = pkmG1.Data;
+    //     var filenameG1 = $"files/pkm/{pkmG1.Generation}/{pkmG1.FileName}";
+    //     File.WriteAllBytes(filenameG1, binariesG1);
+    //     var checkFileBytesG1 = File.ReadAllBytes(filenameG1);
+    //     var pkmG1FromFile = new PK1(checkFileBytesG1);
+    //     ReportLinePKM(pkmG1FromFile, "file-converted");
 
-        // ReportPKM(pkm2);
+    //     // ReportPKM(pkm2);
 
-        // pkm2.RefreshChecksum();
-        // var binaries2 = pkm2.DecryptedPartyData;
-        // var filename2 = $"files/pkm/{pkm2.Generation}/{pkm2.FileName}";
+    //     // pkm2.RefreshChecksum();
+    //     // var binaries2 = pkm2.DecryptedPartyData;
+    //     // var filename2 = $"files/pkm/{pkm2.Generation}/{pkm2.FileName}";
 
-        // Console.WriteLine($"convert:{converted} - result:{result}");
-        // Console.WriteLine($"{pkm2.Generation} - {pkm2.Species} - {GameInfo.Strings.Species[pkm2.Species]} - valid:{pkm2.Valid}");
+    //     // Console.WriteLine($"convert:{converted} - result:{result}");
+    //     // Console.WriteLine($"{pkm2.Generation} - {pkm2.Species} - {GameInfo.Strings.Species[pkm2.Species]} - valid:{pkm2.Valid}");
 
-        // File.WriteAllBytes(filename, binaries);
-        // File.WriteAllBytes(filename2, binaries2);
+    //     // File.WriteAllBytes(filename, binaries);
+    //     // File.WriteAllBytes(filename2, binaries2);
 
-    }
+    // }
 
     private static void ReportLinePKM(PKM pkm, string type)
     {

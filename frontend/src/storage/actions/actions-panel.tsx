@@ -7,6 +7,7 @@ import { Container } from '../../ui/container/container';
 import { theme } from '../../ui/theme';
 import { switchUtil } from '../../util/switch-util';
 import { DataActionType } from '../../data/sdk/model';
+import { getWarningsGetWarningsQueryKey } from '../../data/sdk/warnings/warnings.gen';
 
 export const ActionsPanel: React.FC = () => {
     const saveId = Route.useSearch({ select: (search) => search.save });
@@ -39,7 +40,13 @@ export const ActionsPanel: React.FC = () => {
 
     const saveMutation = useStorageSave({
         mutation: {
-            onSuccess: queriesInvalidate,
+            onSuccess: async () => {
+                await queriesInvalidate();
+
+                await queryClient.invalidateQueries({
+                    queryKey: getWarningsGetWarningsQueryKey(),
+                });
+            },
         },
     });
 

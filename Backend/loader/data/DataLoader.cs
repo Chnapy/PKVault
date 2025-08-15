@@ -22,8 +22,7 @@ public abstract class DataLoader
 
         Console.WriteLine($"Load save id={saveId}");
 
-        var entity = SaveInfosEntity.GetSaveInfosEntity(saveId)!;
-        save = SaveUtil.GetVariantSAV(entity.Filepath);
+        save = LocalSaveService.GetSaveFromId(saveId);
         if (save == null)
         {
             throw new Exception("Save is null");

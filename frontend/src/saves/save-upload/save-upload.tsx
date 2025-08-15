@@ -7,6 +7,7 @@ import {
   useSaveInfosUpload,
 } from "../../data/sdk/save-infos/save-infos.gen";
 import { Container } from "../../ui/container/container";
+import { getWarningsGetWarningsQueryKey } from '../../data/sdk/warnings/warnings.gen';
 
 export const SaveUpload: React.FC = () => {
   const queryClient = useQueryClient();
@@ -18,6 +19,9 @@ export const SaveUpload: React.FC = () => {
         });
         await queryClient.invalidateQueries({
           queryKey: getDexGetAllQueryKey(),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: getWarningsGetWarningsQueryKey(),
         });
       },
     },
@@ -55,7 +59,7 @@ export const SaveUpload: React.FC = () => {
 
           mutateAsync({
             data: {
-              saveFile: files[0],
+              saveFile: files[ 0 ],
             },
           });
         }}

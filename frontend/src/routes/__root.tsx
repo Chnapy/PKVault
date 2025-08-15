@@ -3,6 +3,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type React from "react";
 import { Header } from "../ui/header/header";
 import { HeaderItem } from "../ui/header/header-item";
+import { Warnings } from '../warnings/warnings';
 
 const Root: React.FC = () => {
   const matchRoute = useMatchRoute();
@@ -13,6 +14,7 @@ const Root: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "stretch",
+        gap: 16,
         height: "100vh",
         overflowY: "scroll",
       }}
@@ -21,7 +23,7 @@ const Root: React.FC = () => {
         <HeaderItem
           selected={Boolean(
             matchRoute({ to: "/saves" }) ||
-              matchRoute({ to: "/saves", pending: true })
+            matchRoute({ to: "/saves", pending: true })
           )}
           to={"/saves"}
         >
@@ -30,7 +32,7 @@ const Root: React.FC = () => {
         <HeaderItem
           selected={Boolean(
             matchRoute({ to: "/storage" }) ||
-              matchRoute({ to: "/storage", pending: true })
+            matchRoute({ to: "/storage", pending: true })
           )}
           to={"/storage"}
         >
@@ -39,7 +41,7 @@ const Root: React.FC = () => {
         <HeaderItem
           selected={Boolean(
             matchRoute({ to: "/pokedex" }) ||
-              matchRoute({ to: "/pokedex", pending: true })
+            matchRoute({ to: "/pokedex", pending: true })
           )}
           to={"/pokedex"}
         >
@@ -49,8 +51,18 @@ const Root: React.FC = () => {
 
       <div
         style={{
+          alignSelf: 'center',
+          justifySelf: 'center',
+        }}
+      >
+        <Warnings />
+      </div>
+
+      <div
+        style={{
           position: "relative",
           padding: 16,
+          paddingTop: 0,
         }}
       >
         <Outlet />

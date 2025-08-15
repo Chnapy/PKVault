@@ -1,7 +1,7 @@
 import React from "react";
 import { Route } from "../../../routes/pokedex";
+import { useSaveInfosMain } from '../../../saves/hooks/use-save-infos-main';
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
-import { useSaveInfosGetAll } from "../../../data/sdk/save-infos/save-infos.gen";
 import { getGameInfos } from "../../details/util/get-game-infos";
 
 export const FilterFromGames: React.FC = () => {
@@ -11,10 +11,9 @@ export const FilterFromGames: React.FC = () => {
       String
     ) ?? [];
 
-  const saveInfosQuery = useSaveInfosGetAll();
+  const saveInfosQuery = useSaveInfosMain();
 
   const options = Object.values(saveInfosQuery.data?.data ?? {})
-    .map((saves) => saves[ 0 ])
     .map((save) => {
       const infos = getGameInfos(save.version);
 

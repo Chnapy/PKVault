@@ -8,7 +8,7 @@ import { theme } from "../theme";
 
 export type SaveCardContentSmallProps = {
   id: number;
-  timestamp: number;
+  lastWriteTime: string;
   version: GameVersion;
   generation: number;
   tid: number;
@@ -21,12 +21,12 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
   id,
   generation,
   tid,
-  timestamp,
+  lastWriteTime,
   trainerName,
   trainerGenderMale,
   version,
 }) => {
-  const date = new Date(timestamp);
+  const date = new Date(lastWriteTime);
 
   const normTo2 = (value: number) => `${value < 10 ? "0" : ""}${value}`;
 
@@ -97,8 +97,8 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
             }}
           />
           <br />
-          Sync <span style={{ color: theme.text.primary }}>{renderTimestamp()}</span>{" "}
-          {Date.now() - timestamp < 3_600_000 && (
+          Last sync <span style={{ color: theme.text.primary }}>{renderTimestamp()}</span>{" "}
+          {Date.now() - date.getMilliseconds() < 3_600_000 && (
             <span style={{ color: theme.text.contrast }}>NEW !</span>
           )}
         </TextContainer>

@@ -5,11 +5,11 @@ import { useCurrentLanguageName } from '../../data/hooks/use-current-language-na
 import { useMoveByIdOrName } from '../../data/hooks/use-move-by-id-or-name';
 import { useNatureByIdOrName } from '../../data/hooks/use-nature-by-id-or-name';
 import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
-import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../data/static-data/static-data';
 import { getGender } from '../../data/utils/get-gender';
 import { Route } from '../../routes/storage';
+import { useSaveInfosMain } from '../../saves/hooks/use-save-infos-main';
 import { Button } from '../../ui/button/button';
 import { StorageMainDetails } from '../../ui/storage-item-details/storage-main-details';
 import { theme } from '../../ui/theme';
@@ -61,7 +61,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
         },
     });
 
-    const saveInfosQuery = useSaveInfosGetAll();
+    const saveInfosQuery = useSaveInfosMain();
     const mainPkmQuery = useStorageGetMainPkms();
     const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
 
@@ -74,20 +74,21 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
         },
     });
 
-    const save = saveId ? saveInfosQuery.data?.data[ saveId ]?.[ 0 ] : undefined;
+    const save = saveId ? saveInfosQuery.data?.data[ saveId ] : undefined;
     if (save) {
         pkmVersionList.sort((a) => a.generation === save.generation ? -1 : 0);
     }
 
     const pkmVersion = pkmVersionList[ selectedIndex ] ?? pkmVersionList[ 0 ];
 
-    const relatedSavePkm = pkm?.saveId ? savePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId === pkmVersion.id) : undefined;
+    const attachedSavePkm = pkm?.saveId ? savePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId === pkmVersion.id) : undefined;
+    const attachedSavePkmNotFound = !!pkm?.saveId && !attachedSavePkm;
 
     if (!pkm || pkmVersionList.length === 0) {
         return null;
     }
 
-    const pkmSaveRaw = pkm.saveId ? saveInfosQuery.data?.data[ pkm.saveId ]?.[ 0 ] : undefined;
+    const pkmSaveRaw = pkm.saveId ? saveInfosQuery.data?.data[ pkm.saveId ] : undefined;
     const pkmSave = pkmSaveRaw && pkmVersion.generation === pkmSaveRaw.generation ? pkmSaveRaw : undefined;
 
     const hasPkmForSaveGeneration = !!save && pkmVersionList.some(pkmVersion => pkmVersion.generation === save.generation);
@@ -194,19 +195,22 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
         validityReport={pkmVersion.validityReport}
         box={pkm.boxId}
         boxSlot={pkm.boxSlot}
-        saveBoxId={relatedSavePkm?.box}
-        saveBoxSlot={relatedSavePkm?.boxSlot}
-        saveSynchronized={relatedSavePkm?.pkmData === pkmVersion.pkmData}
-        goToSavePkm={relatedSavePkm && (() => navigate({
+        saveBoxId={attachedSavePkm?.box}
+        saveBoxSlot={attachedSavePkm?.boxSlot}
+        saveSynchronized={attachedSavePkm?.pkmData === pkmVersion.pkmData}
+        goToSavePkm={attachedSavePkm && (() => navigate({
             search: {
-                save: relatedSavePkm.saveId,
-                saveBoxId: relatedSavePkm.box.toString(),
+                save: attachedSavePkm.saveId,
+                saveBoxId: attachedSavePkm.box.toString(),
                 selected: {
                     type: 'save',
-                    id: relatedSavePkm.id,
+                    id: attachedSavePkm.id,
                 },
             }
         }))}
+        attachedSavePkmNotFound={attachedSavePkmNotFound}
+        onSaveCheck={console.log}
+        onDetach={console.log}
         onRelease={console.log}
         onClose={() => navigate({
             search: {

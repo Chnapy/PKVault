@@ -65,12 +65,15 @@ export type StorageMainDetailsProps = {
   saveBoxId?: number;
   saveBoxSlot?: number;
   saveSynchronized?: boolean;
+  attachedSavePkmNotFound?: boolean;
 
   // canMoveToMainStorage: boolean;
 
   goToSavePkm?: () => void;
 
-  onRelease: () => void;
+  onSaveCheck?: () => void;
+  onDetach?: () => void;
+  onRelease?: () => void;
 
   onClose: () => void;
 };
@@ -122,11 +125,14 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
   saveBoxId,
   saveBoxSlot,
   saveSynchronized,
+  attachedSavePkmNotFound,
 
   goToSavePkm,
 
   // canMoveToMainStorage,
 
+  onSaveCheck,
+  onDetach,
   onRelease,
   onClose,
 }) => {
@@ -237,17 +243,25 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
           }} />
         </TextContainer>}
 
-        {saveId && <Button onClick={goToSavePkm} disabled={!goToSavePkm}>
-          <div style={{ width: '100%' }}>
-            Go to save-pkm
-          </div>
-          <div style={{ width: '100%' }}>
-            Box {saveBoxId} slot {saveBoxSlot}
-          </div>
-          <div style={{ width: '100%', color: !saveSynchronized ? theme.text.contrast : undefined }}>
-            {saveSynchronized ? 'synchronized' : 'unsynchronized'}
-          </div>
-        </Button>}
+        {saveId && <>
+          {attachedSavePkmNotFound
+            ? <TextContainer>
+              Pkm not found in attached save.
+              <br />If expected consider detach from save.
+              <br />Otherwise check the save integrity.
+            </TextContainer>
+            : <Button onClick={goToSavePkm} disabled={!goToSavePkm}>
+              <div style={{ width: '100%' }}>
+                Go to save-pkm
+              </div>
+              <div style={{ width: '100%' }}>
+                Box {saveBoxId} slot {saveBoxSlot}
+              </div>
+              <div style={{ width: '100%', color: !saveSynchronized ? theme.text.contrast : undefined }}>
+                {saveSynchronized ? 'synchronized' : 'unsynchronized'}
+              </div>
+            </Button>}
+        </>}
       </>}
       content={
         <>
@@ -285,7 +299,9 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
         </>
       }
       actions={<>
-        <Button onClick={onRelease}>Release</Button>
+        {onDetach && <Button onClick={onDetach}>Detach from save</Button>}
+        {onSaveCheck && <Button onClick={onSaveCheck}>Check save</Button>}
+        {onRelease && <Button onClick={onRelease}>Release</Button>}
         {/* <Button disabled>Evolve</Button> */}
         {/* <Button disabled>Delete full PKM</Button> */}
       </>}

@@ -1,10 +1,10 @@
 import type React from "react";
-import { useSaveInfosGetAll } from "../data/sdk/save-infos/save-infos.gen";
-import { SaveItem } from "../saves/save-item/save-item";
 import { Route } from "../routes/storage";
+import { useSaveInfosMain } from '../saves/hooks/use-save-infos-main';
+import { SaveItem } from "../saves/save-item/save-item";
 
 export const StorageSaveSelect: React.FC = () => {
-  const saveInfosQuery = useSaveInfosGetAll();
+  const saveInfosQuery = useSaveInfosMain();
 
   const navigate = Route.useNavigate();
 
@@ -13,7 +13,7 @@ export const StorageSaveSelect: React.FC = () => {
   }
 
   const saveInfos = Object.values(saveInfosQuery.data.data).sort((a, b) => {
-    return a[0].timestamp > b[0].timestamp ? -1 : 1;
+    return a.lastWriteTime > b.lastWriteTime ? -1 : 1;
   });
 
   return (
@@ -29,14 +29,14 @@ export const StorageSaveSelect: React.FC = () => {
         overflowY: "auto",
       }}
     >
-      {saveInfos.map((saveList, i) => (
+      {saveInfos.map((save, i) => (
         <SaveItem
           key={i}
-          saveId={saveList[0].id}
+          saveId={save.id}
           onClick={() => {
             navigate({
               search: {
-                save: saveList[0].id,
+                save: save.id,
               },
             });
           }}

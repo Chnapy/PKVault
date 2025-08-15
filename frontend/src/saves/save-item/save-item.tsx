@@ -10,6 +10,8 @@ import { Button } from "../../ui/button/button";
 import { Container } from "../../ui/container/container";
 import { SaveCardContentFull } from '../../ui/save-card/save-card-content-full';
 import { useStorageGetActions } from '../../data/sdk/storage/storage.gen';
+import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
+import { getWarningsGetWarningsQueryKey } from '../../data/sdk/warnings/warnings.gen';
 
 export type SaveItemProps = {
   saveId: number;
@@ -36,11 +38,14 @@ export const SaveItem: React.FC<SaveItemProps> = ({
         await queryClient.invalidateQueries({
           queryKey: getDexGetAllQueryKey(),
         });
+        await queryClient.invalidateQueries({
+          queryKey: getWarningsGetWarningsQueryKey(),
+        });
       },
     },
   });
 
-  const [ showOlders, setShowOlders ] = React.useState(false);
+  const [ showBackups, setShowBackups ] = React.useState(false);
 
   if (!saveInfosQuery.data) {
     return null;
@@ -50,9 +55,12 @@ export const SaveItem: React.FC<SaveItemProps> = ({
 
   const saveInfos = Object.values(saveInfosQuery.data.data);
 
-  const [ firstItem, ...nextItems ] = saveInfos.find(
+  const saves = saveInfos.find(
     (saveList) => saveList[ 0 ].id === saveId
   )!;
+
+  const mainSave = saves.find(save => !save.isBackup);
+  const backupSaves = saves.filter(save => save.isBackup);
 
   return (
     <Container
@@ -61,64 +69,74 @@ export const SaveItem: React.FC<SaveItemProps> = ({
       style={{ display: "flex", flexDirection: "column", gap: 4, width: 350 }}
       onClick={onClick}
     >
-      <SaveCardContentFull
-        id={firstItem.id}
-        generation={firstItem.generation}
-        version={firstItem.version}
-        trainerName={firstItem.trainerName}
-        trainerGenderMale={firstItem.trainerGender === 0}
-        tid={firstItem.tid}
-        timestamp={firstItem.timestamp}
-        playTime={firstItem.playTime}
-        dexSeenCount={firstItem.dexSeenCount}
-        dexCaughtCount={firstItem.dexCaughtCount}
-        ownedCount={firstItem.ownedCount}
-        shinyCount={firstItem.shinyCount}
-        onDelete={
-          !hasStockageActions &&
-            firstItem.canDelete && showDelete
-            ? () =>
+      {mainSave && <SaveCardContentFull
+        id={mainSave.id}
+        generation={mainSave.generation}
+        version={mainSave.version}
+        trainerName={mainSave.trainerName}
+        trainerGenderMale={mainSave.trainerGender === 0}
+        tid={mainSave.tid}
+        lastWriteTime={mainSave.lastWriteTime}
+        playTime={mainSave.playTime}
+        dexSeenCount={mainSave.dexSeenCount}
+        dexCaughtCount={mainSave.dexCaughtCount}
+        ownedCount={mainSave.ownedCount}
+        shinyCount={mainSave.shinyCount}
+        actions={!hasStockageActions &&
+          backupSaves.length === 0 &&
+          mainSave.canDelete &&
+          showDelete && <>
+            <ButtonWithConfirm onClick={() =>
               saveInfosDeleteMutation.mutateAsync({
                 params: {
-                  saveId: firstItem.id,
-                  timestamp: firstItem.timestamp,
+                  saveId: mainSave.id,
                 },
-              })
-            : undefined
-        }
-      />
+              })}>
+              Delete
+            </ButtonWithConfirm>
+          </>}
+      />}
 
-      {showOldSaves && nextItems.length > 0 && (
+      {showOldSaves && backupSaves.length > 0 && (
         <>
-          <Button onClick={() => setShowOlders(!showOlders)}>
-            {showOlders ? "Hide" : "Show"} older saves with same OT (
-            {nextItems.length})
+          <Button onClick={() => setShowBackups(!showBackups)}>
+            {showBackups ? "Hide" : "Show"} backups (
+            {backupSaves.length})
           </Button>
 
-          {showOlders &&
-            nextItems.map((item) => (
+          {showBackups &&
+            backupSaves.map((item) => (
               <SaveCardContentFull
-                key={item.timestamp}
+                key={item.lastWriteTime}
                 id={item.id}
                 generation={item.generation}
                 version={item.version}
                 trainerName={item.trainerName}
                 trainerGenderMale={item.trainerGender === 0}
                 tid={item.tid}
-                timestamp={item.timestamp}
+                lastWriteTime={item.lastWriteTime}
                 playTime={item.playTime}
                 dexSeenCount={item.dexSeenCount}
                 dexCaughtCount={item.dexCaughtCount}
                 ownedCount={item.ownedCount}
                 shinyCount={item.shinyCount}
-                onDelete={() =>
-                  saveInfosDeleteMutation.mutateAsync({
-                    params: {
-                      saveId: item.id,
-                      timestamp: item.timestamp,
-                    },
-                  })
-                }
+                actions={<>
+                  {/* <ButtonWithConfirm onClick={() =>
+              
+            }>
+                    Restore
+                  </ButtonWithConfirm> */}
+
+                  <ButtonWithConfirm onClick={() =>
+                    saveInfosDeleteMutation.mutateAsync({
+                      params: {
+                        saveId: item.id,
+                        backupTime: item.backupTime,
+                      },
+                    })}>
+                    Delete
+                  </ButtonWithConfirm>
+                </>}
               />
             ))}
         </>
