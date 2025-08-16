@@ -24,46 +24,47 @@ public class WarningsService
         };
     }
 
+    // TODO
     private static List<PlayTimeWarning> CheckPlayTimeWarning()
     {
         var warns = new List<PlayTimeWarning>();
 
-        LocalSaveService.SaveByPath.Keys.ToList().ForEach(path =>
-        {
-            var save = LocalSaveService.SaveByPath[path];
+        // LocalSaveService.SaveByPath.Keys.ToList().ForEach(path =>
+        // {
+        //     var save = LocalSaveService.SaveByPath[path];
 
-            var fileName = Path.GetFileNameWithoutExtension(path);
-            var ext = Path.GetExtension(path);
+        //     var fileName = Path.GetFileNameWithoutExtension(path);
+        //     var ext = Path.GetExtension(path);
 
-            var dirPath = Path.GetDirectoryName(path)!;
+        //     var dirPath = Path.GetDirectoryName(path)!;
 
-            var bkpDirPath = Path.Combine(dirPath, Settings.backupDir);
-            var bkpFileName = $"{fileName}_*{ext}";
-            var bkpFilePath = Path.Combine(bkpDirPath, bkpFileName);
+        //     var bkpDirPath = Path.Combine(dirPath, Settings.backupDir);
+        //     var bkpFileName = $"{fileName}_*{ext}";
+        //     var bkpFilePath = Path.Combine(bkpDirPath, bkpFileName);
 
-            var matcher = new Matcher();
-            matcher.AddInclude(bkpFilePath);
-            var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(Settings.rootDir)));
+        //     var matcher = new Matcher();
+        //     matcher.AddInclude(bkpFilePath);
+        //     var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(Settings.rootDir)));
 
-            var bkpPaths = matches.Files.Select(file => Path.Combine(Settings.rootDir, file.Path)).ToList();
-            bkpPaths.Sort();
-            bkpPaths.Reverse();
+        //     var bkpPaths = matches.Files.Select(file => Path.Combine(Settings.rootDir, file.Path)).ToList();
+        //     bkpPaths.Sort();
+        //     bkpPaths.Reverse();
 
-            if (bkpPaths.Count > 0)
-            {
-                var previousSave = SaveUtil.GetVariantSAV(bkpPaths[0]);
+        //     if (bkpPaths.Count > 0)
+        //     {
+        //         var previousSave = SaveUtil.GetVariantSAV(bkpPaths[0]);
 
-                if (GetSavePlayTimeS(save) < GetSavePlayTimeS(previousSave!))
-                {
-                    Console.WriteLine($"Play-time warning");
+        //         if (GetSavePlayTimeS(save) < GetSavePlayTimeS(previousSave!))
+        //         {
+        //             Console.WriteLine($"Play-time warning");
 
-                    warns.Add(new PlayTimeWarning()
-                    {
-                        SaveId = save.ID32,
-                    });
-                }
-            }
-        });
+        //             warns.Add(new PlayTimeWarning()
+        //             {
+        //                 SaveId = save.ID32,
+        //             });
+        //         }
+        //     }
+        // });
 
         return warns;
     }

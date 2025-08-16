@@ -79,7 +79,12 @@ public class SaveMovePkmToStorageAction : DataAction
 
         var pkmEntity = loaders.pkmLoader.GetEntity(pkmVersionEntity.PkmId)!;
 
-        pkmEntity.SaveId = default;
+        if (pkmEntity.SaveId != default)
+        {
+            await new SynchronizePkmAction(saveId, pkmVersionEntity.Id).Execute(loaders);
+
+            pkmEntity.SaveId = default;
+        }
 
         loaders.pkmLoader.WriteEntity(pkmEntity);
 

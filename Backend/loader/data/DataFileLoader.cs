@@ -4,9 +4,9 @@ public class DataFileLoader : DataLoader
 {
     protected override DataEntityLoaders CreateLoaders()
     {
-        var boxLoader = new EntityJSONLoader<BoxEntity>("db/box.json");
-        var pkmLoader = new EntityJSONLoader<PkmEntity>("db/pkm.json");
-        var pkmVersionLoader = new EntityJSONLoader<PkmVersionEntity>("db/pkm-version.json");
+        var boxLoader = new EntityJSONLoader<BoxEntity>(Path.Combine(Settings.dbDir, "box.json"));
+        var pkmLoader = new EntityJSONLoader<PkmEntity>(Path.Combine(Settings.dbDir, "pkm.json"));
+        var pkmVersionLoader = new EntityJSONLoader<PkmVersionEntity>(Path.Combine(Settings.dbDir, "pkm-version.json"));
 
         var getSaveLoaders = (uint saveId) =>
         {
@@ -35,9 +35,9 @@ public class DataFileLoader : DataLoader
         saveDict.Values.ToList()
         .ForEach(save =>
         {
-            Console.WriteLine($"BOX 2 AFTER box.16={save.GetBoxData(1)[16].Species}");
+            // Console.WriteLine($"BOX 2 AFTER box.16={save.GetBoxData(1)[16].Species}");
 
-            LocalSaveService.WriteSaveWithBackup(save);
+            LocalSaveService.WriteSave(save);
         });
     }
 }

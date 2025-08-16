@@ -2,10 +2,10 @@ import React from "react";
 import { useCurrentLanguageName } from '../../data/hooks/use-current-language-name';
 import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
+import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from "../../data/static-data/static-data";
 import type { GenderType } from '../../data/utils/get-gender';
 import { Route } from "../../routes/pokedex";
-import { useSaveInfosMain } from '../../saves/hooks/use-save-infos-main';
 import { DetailsCard } from "../../ui/details-card/details-card";
 import { switchUtil } from '../../util/switch-util';
 import { GameButton } from "./game-button";
@@ -27,7 +27,7 @@ export const PokedexDetails: React.FC = () => {
   const abilityList = useStaticData().ability;
 
   const dexGetAllQuery = useDexGetAll();
-  const saveInfosMainQuery = useSaveInfosMain();
+  const saveInfosMainQuery = useSaveInfosGetAll();
   const pokemonSpeciesInfos = selectedSpecies
     ? pkmSpeciesRecord[ selectedSpecies ]
     : undefined;

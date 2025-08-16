@@ -1,12 +1,12 @@
 import React from "react";
 import type { PkmDTO } from "../data/sdk/model";
+import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import {
   useStorageGetMainBoxes,
   useStorageGetMainPkms,
   useStorageGetMainPkmVersions,
 } from "../data/sdk/storage/storage.gen";
 import { Route } from "../routes/storage";
-import { useSaveInfosMain } from '../saves/hooks/use-save-infos-main';
 import { Button } from "../ui/button/button";
 import { FilterSelect } from "../ui/filter/filter-select/filter-select";
 import { StorageBox } from "../ui/storage-box/storage-box";
@@ -19,7 +19,7 @@ export const StorageMainBox: React.FC = () => {
   const selected = Route.useSearch({ select: (search) => search.selected });
   const navigate = Route.useNavigate();
 
-  const saveInfosQuery = useSaveInfosMain();
+  const saveInfosQuery = useSaveInfosGetAll();
   const boxesQuery = useStorageGetMainBoxes();
   const pkmsQuery = useStorageGetMainPkms();
   const pkmVersionsQuery = useStorageGetMainPkmVersions();

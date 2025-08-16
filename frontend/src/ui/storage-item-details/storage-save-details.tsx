@@ -68,6 +68,7 @@ export type StorageSaveDetailsProps = {
 
   goToMainPkm?: () => void;
 
+  onSynchronize?: () => void;
   onRelease?: () => void;
 
   onClose: () => void;
@@ -123,6 +124,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
   canMoveToMainStorage,
 
   goToMainPkm,
+  onSynchronize,
   onRelease,
   onClose,
 }) => {
@@ -246,6 +248,10 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
             </div>
           </Button>
         </>}
+
+        {!saveSynchronized && onSynchronize && <Button onClick={onSynchronize}>
+          Synchronize
+        </Button>}
       </>}
       content={
         <>

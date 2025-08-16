@@ -134,6 +134,13 @@ public class StorageService
         );
     }
 
+    public static async Task SaveSynchronizePkm(uint saveId, string pkmVersionId)
+    {
+        await memoryLoader.AddAction(
+            new SynchronizePkmAction(saveId, pkmVersionId)
+        );
+    }
+
     public static async Task Save()
     {
         var actions = memoryLoader.actions;
@@ -144,18 +151,17 @@ public class StorageService
 
         Console.WriteLine("SAVING IN PROGRESS");
 
-        var fileLoader = new DataFileLoader();
-
-        for (var i = 0; i < actions.Count; i++)
+        await BackupService.PrepareBackupThenRun(async () =>
         {
-            await fileLoader.ApplyAction(actions[i]);
-        }
+            var fileLoader = new DataFileLoader();
 
-        fileLoader.WriteSaves();
+            for (var i = 0; i < actions.Count; i++)
+            {
+                await fileLoader.ApplyAction(actions[i]);
+            }
 
-        ResetDataLoader();
-
-        WarningsService.CheckWarnings();
+            fileLoader.WriteSaves();
+        });
     }
 
     public static List<DataActionPayload> GetActionPayloadList()

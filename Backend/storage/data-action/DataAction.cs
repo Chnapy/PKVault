@@ -23,4 +23,5 @@ public enum DataActionType
     DETACH_PKM_SAVE,
     DELETE_PKM_VERSION,
     SAVE_DELETE_PKM,
+    PKM_SYNCHRONIZE,
 }

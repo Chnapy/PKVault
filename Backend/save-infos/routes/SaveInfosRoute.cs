@@ -6,16 +6,14 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 public class SaveInfosController : ControllerBase
 {
     [HttpGet()]
-    public ActionResult<Dictionary<uint, List<SaveInfosDTO>>> GetAll()
+    public ActionResult<Dictionary<uint, SaveInfosDTO>> GetAll()
     {
-        var record = LocalSaveService.GetAllSaveInfos();
-
-        return record;
+        return LocalSaveService.GetAllSaveInfos();
     }
 
     [HttpPost()]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<SaveInfosDTO>> Upload([BindRequired] IFormFile saveFile)
+    public async Task<ActionResult?> Upload([BindRequired] IFormFile saveFile)
     {
         if (saveFile == null || saveFile.Length == 0)
             return BadRequest("No file received");
@@ -27,20 +25,14 @@ public class SaveInfosController : ControllerBase
             fileBytes = ms.ToArray();
         }
 
-        var saveInfos = LocalSaveService.UploadNewSave(fileBytes, saveFile.FileName);
+        await LocalSaveService.UploadNewSave(fileBytes, saveFile.FileName);
 
-        return saveInfos;
+        return null;
     }
 
     [HttpDelete()]
-    public void Delete([BindRequired] uint saveId, DateTime? backupTime)
+    public async void Delete([BindRequired] uint saveId)
     {
-        LocalSaveService.DeleteSaveFromId(saveId, backupTime);
-    }
-
-    [HttpPost("restore")]
-    public void RestoreBackup([BindRequired] uint saveId, [BindRequired] DateTime backupTime)
-    {
-        LocalSaveService.RestoreBackup(saveId, backupTime);
+        await LocalSaveService.DeleteSaveFromId(saveId);
     }
 }

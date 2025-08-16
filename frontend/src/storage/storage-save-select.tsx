@@ -1,10 +1,10 @@
 import type React from "react";
+import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { Route } from "../routes/storage";
-import { useSaveInfosMain } from '../saves/hooks/use-save-infos-main';
 import { SaveItem } from "../saves/save-item/save-item";
 
 export const StorageSaveSelect: React.FC = () => {
-  const saveInfosQuery = useSaveInfosMain();
+  const saveInfosQuery = useSaveInfosGetAll();
 
   const navigate = Route.useNavigate();
 

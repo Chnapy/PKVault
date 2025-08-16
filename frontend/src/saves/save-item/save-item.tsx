@@ -5,27 +5,25 @@ import {
   getSaveInfosGetAllQueryKey,
   useSaveInfosDelete,
   useSaveInfosGetAll,
-  useSaveInfosRestoreBackup,
 } from "../../data/sdk/save-infos/save-infos.gen";
-import { Button } from "../../ui/button/button";
+import { useStorageGetActions } from '../../data/sdk/storage/storage.gen';
+import { getWarningsGetWarningsQueryKey } from '../../data/sdk/warnings/warnings.gen';
+import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { Container } from "../../ui/container/container";
 import { SaveCardContentFull } from '../../ui/save-card/save-card-content-full';
-import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetActions } from '../../data/sdk/storage/storage.gen';
-import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
-import { getWarningsGetWarningsQueryKey } from '../../data/sdk/warnings/warnings.gen';
 
 export type SaveItemProps = {
   saveId: number;
   onClick?: () => void;
   showDelete?: boolean;
-  showOldSaves?: boolean;
+  // showOldSaves?: boolean;
 };
 
 export const SaveItem: React.FC<SaveItemProps> = ({
   saveId,
   onClick,
   showDelete,
-  showOldSaves,
+  // showOldSaves,
 }) => {
   const queryClient = useQueryClient();
   const saveInfosQuery = useSaveInfosGetAll();
@@ -45,36 +43,36 @@ export const SaveItem: React.FC<SaveItemProps> = ({
       },
     },
   });
-  const saveInfosRestoreBackupMutation = useSaveInfosRestoreBackup({
-    mutation: {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: getSaveInfosGetAllQueryKey(),
-        });
+  // const saveInfosRestoreBackupMutation = useSaveInfosRestoreBackup({
+  //   mutation: {
+  //     onSuccess: async () => {
+  //       await queryClient.invalidateQueries({
+  //         queryKey: getSaveInfosGetAllQueryKey(),
+  //       });
 
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetActionsQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetMainPkmsQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetMainPkmVersionsQueryKey(),
-        });
-        if (saveId) {
-          await queryClient.invalidateQueries({
-            queryKey: getStorageGetSavePkmsQueryKey(saveId),
-          });
-        }
+  //       await queryClient.invalidateQueries({
+  //         queryKey: getStorageGetActionsQueryKey(),
+  //       });
+  //       await queryClient.invalidateQueries({
+  //         queryKey: getStorageGetMainPkmsQueryKey(),
+  //       });
+  //       await queryClient.invalidateQueries({
+  //         queryKey: getStorageGetMainPkmVersionsQueryKey(),
+  //       });
+  //       if (saveId) {
+  //         await queryClient.invalidateQueries({
+  //           queryKey: getStorageGetSavePkmsQueryKey(saveId),
+  //         });
+  //       }
 
-        await queryClient.invalidateQueries({
-          queryKey: getWarningsGetWarningsQueryKey(),
-        });
-      },
-    },
-  });
+  //       await queryClient.invalidateQueries({
+  //         queryKey: getWarningsGetWarningsQueryKey(),
+  //       });
+  //     },
+  //   },
+  // });
 
-  const [ showBackups, setShowBackups ] = React.useState(false);
+  // const [ showBackups, setShowBackups ] = React.useState(false);
 
   if (!saveInfosQuery.data) {
     return null;
@@ -82,14 +80,12 @@ export const SaveItem: React.FC<SaveItemProps> = ({
 
   const hasStockageActions = stockageActionsQuery.data?.data.length !== 0;
 
-  const saveInfos = Object.values(saveInfosQuery.data.data);
+  // const saveInfos = Object.values(saveInfosQuery.data.data);
 
-  const saves = saveInfos.find(
-    (saveList) => saveList[ 0 ].id === saveId
-  )!;
+  // const saves = saveInfos.find((save) => save.id === saveId)!;
 
-  const mainSave = saves.find(save => !save.isBackup);
-  const backupSaves = saves.filter(save => save.isBackup);
+  const mainSave = saveInfosQuery.data.data[ saveId ];
+  // const backupSaves = saves.filter(save => save.isBackup);
 
   return (
     <Container
@@ -112,7 +108,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
         ownedCount={mainSave.ownedCount}
         shinyCount={mainSave.shinyCount}
         actions={!hasStockageActions &&
-          backupSaves.length === 0 &&
+          // backupSaves.length === 0 &&
           mainSave.canDelete &&
           showDelete && <>
             <ButtonWithConfirm onClick={() =>
@@ -126,7 +122,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
           </>}
       />}
 
-      {showOldSaves && backupSaves.length > 0 && (
+      {/* {showOldSaves && backupSaves.length > 0 && (
         <>
           <Button onClick={() => setShowBackups(!showBackups)}>
             {showBackups ? "Hide" : "Show"} backups (
@@ -174,7 +170,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
               />
             ))}
         </>
-      )}
+      )} */}
     </Container>
   );
 };

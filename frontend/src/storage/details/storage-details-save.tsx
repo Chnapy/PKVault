@@ -5,7 +5,7 @@ import { useCurrentLanguageName } from '../../data/hooks/use-current-language-na
 import { useMoveByIdOrName } from '../../data/hooks/use-move-by-id-or-name';
 import { useNatureByIdOrName } from '../../data/hooks/use-nature-by-id-or-name';
 import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
-import { getStorageGetActionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageSaveDeletePkm } from '../../data/sdk/storage/storage.gen';
+import { getStorageGetActionsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageSaveDeletePkm, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../data/static-data/static-data';
 import { getGender } from '../../data/utils/get-gender';
 import { Route } from '../../routes/storage';
@@ -32,6 +32,24 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
     const getCurrentLanguageName = useCurrentLanguageName();
 
     const queryClient = useQueryClient();
+
+    const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm({
+        mutation: {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetActionsQueryKey(),
+                });
+
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetMainPkmVersionsQueryKey(),
+                });
+
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetSavePkmsQueryKey(saveId),
+                });
+            },
+        },
+    });
 
     const savePkmDeleteMutation = useStorageSaveDeletePkm({
         mutation: {
@@ -115,7 +133,7 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
         boxSlot={savePkm.boxSlot}
         mainBoxId={pkm?.boxId}
         mainBoxSlot={pkm?.boxSlot}
-        saveSynchronized={savePkm.pkmData === pkmVersion?.pkmData}
+        saveSynchronized={savePkm.dynamicChecksum === pkmVersion?.dynamicChecksum}
         goToMainPkm={pkm && (() => navigate({
             search: {
                 selected: {
@@ -125,6 +143,12 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
             }
         }))}
         canMoveToMainStorage={savePkm.canMoveToMainStorage}
+        onSynchronize={pkmVersion ? (() => savePkmSynchronizeMutation.mutateAsync({
+            saveId,
+            params: {
+                pkmVersionId: pkmVersion.id,
+            }
+        })) : undefined}
         onRelease={pkm
             ? undefined
             : (() => savePkmDeleteMutation.mutateAsync({

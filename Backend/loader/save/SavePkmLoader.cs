@@ -19,21 +19,27 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
 
         if (save.HasParty)
         {
-            for (var i = 0; i < 6; i++)
+            var i = 0;
+            save.PartyData.ToList().ForEach(pkm =>
             {
-                var pkm = save.GetPartySlotAtIndex(i);
                 if (pkm.Species != 0)
                 {
                     var dto = PkmSaveDTO.FromPkm(save, pkm, BoxDTO.PARTY_ID, i, pkmEntityloader, pkmVersionEntityloader);
                     pkmList.Add(dto);
                 }
-            }
+                i++;
+            });
         }
 
         if (save is IDaycareStorage saveDaycare)
         {
             for (var i = 0; i < saveDaycare.DaycareSlotCount; i++)
             {
+                if (!saveDaycare.IsDaycareOccupied(i))
+                {
+                    continue;
+                }
+
                 var slot = new SlotInfoMisc(saveDaycare.GetDaycareSlot(i), i) { Type = StorageSlotType.Daycare };
                 var pkm = slot.Read(save);
                 if (pkm != default && pkm.Species != 0)
@@ -77,6 +83,8 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
             throw new Exception($"PkmSaveDTO.Pkm convert failed, id={entity.Id} from.type={entity.Pkm.GetType()} to.type={savePkmType} result={result}");
         }
 
+        var party = save.PartyData.ToList().FindAll(pkm => pkm.Species != 0);
+
         var oldEntity = GetEntity(entity.Id);
 
         if (oldEntity != null)
@@ -89,7 +97,7 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
             switch (oldEntity.Box)
             {
                 case BoxDTO.PARTY_ID:
-                    save.SetPartySlotAtIndex(save.BlankPKM, oldEntity.BoxSlot);
+                    party = party.FindAll(pkm => PkmSaveDTO.GetPKMId(pkm, save.Generation) != entity.Id);
                     break;
                 default:
                     save.SetBoxSlotAtIndex(save.BlankPKM, oldEntity.Box, oldEntity.BoxSlot);
@@ -100,11 +108,16 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
         switch (entity.Box)
         {
             case BoxDTO.PARTY_ID:
-                save.SetPartySlotAtIndex(pkm, entity.BoxSlot);
+                party.Add(pkm);
                 break;
             default:
                 save.SetBoxSlotAtIndex(pkm, entity.Box, entity.BoxSlot);
                 break;
+        }
+
+        if ((oldEntity != default && oldEntity.Box == BoxDTO.PARTY_ID) || entity.Box == BoxDTO.PARTY_ID)
+        {
+            SetParty(party);
         }
 
         return entity;
@@ -120,7 +133,11 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
                 case BoxDTO.DAYCARE_ID:
                     throw new Exception("Not allowed for pkm in daycare");
                 case BoxDTO.PARTY_ID:
-                    save.SetPartySlotAtIndex(save.BlankPKM, entity.BoxSlot);
+                    var party = save.PartyData.ToList()
+                        .FindAll(pkm => pkm.Species != 0)
+                        .FindAll(pkm => PkmSaveDTO.GetPKMId(pkm, save.Generation) != entity.Id);
+
+                    SetParty(party);
                     break;
                 default:
                     save.SetBoxSlotAtIndex(save.BlankPKM, entity.Box, entity.BoxSlot);
@@ -133,5 +150,20 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO>
     public override void SetAllEntities(List<PkmSaveDTO> entities)
     {
         throw new Exception($"Not implemented");
+    }
+
+    private void SetParty(List<PKM> party)
+    {
+        for (var i = 0; i < 6; i++)
+        {
+            if (i < party.Count)
+            {
+                save.SetPartySlotAtIndex(party[i], i);
+            }
+            else
+            {
+                save.DeletePartySlot(i);
+            }
+        }
     }
 }

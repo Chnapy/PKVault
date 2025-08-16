@@ -50,8 +50,6 @@ public abstract class PKMLoader
                 false,
                 pkm.Language
             );
-
-            MainCreatePkmVersionAction.DebugOT(pkm);
         }
 
         return pkm;

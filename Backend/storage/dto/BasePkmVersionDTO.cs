@@ -83,7 +83,6 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         dto.OriginMetDate = pkm.MetDate;
         dto.OriginMetLocation = GameInfo.GetStrings("fr").GetLocationName(pkm.WasEgg, pkm.MetLocation, pkm.Format, pkm.Generation, pkm.Version);
         dto.OriginMetLevel = pkm.MetLevel == 0 ? null : pkm.MetLevel;
-        dto.PkmData = pkm.Data;
         dto.IsValid = la.Parsed && pkm.Valid;
         dto.ValidityReport = la.Report();
     }
@@ -146,7 +145,13 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public string? HeldItemText { get; set; }
 
-    public byte[] PkmData { get; set; }
+    public string DynamicChecksum
+    {
+        get
+        {
+            return $"{Nickname}.{Level}.{Exp}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}";
+        }
+    }
 
     public bool IsValid { get; set; }
 

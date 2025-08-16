@@ -1,8 +1,8 @@
+import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import type { SaveCardContentFullProps } from '../../../ui/save-card/save-card-content-full';
-import { useSaveInfosMain } from '../../hooks/use-save-infos-main';
 
 export const useSaveItemProps = () => {
-    const saveInfosQuery = useSaveInfosMain();
+    const saveInfosQuery = useSaveInfosGetAll();
 
     return (saveId: number): SaveCardContentFullProps | null => {
         if (!saveInfosQuery.data) {

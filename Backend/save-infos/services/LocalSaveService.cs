@@ -16,6 +16,17 @@ public class LocalSaveService
         Timer = new Timer(ReadLocalSaves, null, TimeSpan.Zero, TimeSpan.FromSeconds(TIMER_INTERVAL));
     }
 
+    public static void ResetTimerAndData()
+    {
+        Timer?.Dispose();
+        SaveById.Clear();
+        SaveByPath.Clear();
+
+        ReadLocalSaves(null);
+
+        PrepareTimer();
+    }
+
     public static void ReadLocalSaves(object? state)
     {
         var rootDir = Settings.rootDir;
@@ -23,7 +34,6 @@ public class LocalSaveService
 
         var matcher = new Matcher();
         globs.ForEach(glob => matcher.AddInclude(glob));
-        matcher.AddExclude(Path.Combine("**", Settings.backupDir));
         var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
 
         var hasBeenUpdated = false;
@@ -129,103 +139,25 @@ public class LocalSaveService
         SaveByPath.Remove(path);
     }
 
-    private static void DeleteBackup(uint saveId, DateTime backupTime)
+    public static async Task DeleteSaveFromId(uint saveId)
     {
-        var bkpFilePath = GetBackupPath(saveId, backupTime);
-
-        Console.WriteLine($"DELETE BACKUP {bkpFilePath}");
-
-        if (!File.Exists(bkpFilePath))
-        {
-            throw new Exception($"Backup does not exist: {bkpFilePath}");
-        }
-
-        File.Delete(bkpFilePath);
-    }
-
-    public static void DeleteSaveFromId(uint saveId, DateTime? backupTime)
-    {
-        if (backupTime != default)
-        {
-            DeleteBackup(saveId, (DateTime)backupTime!);
-        }
-        else
+        await BackupService.PrepareBackupThenRun(async () =>
         {
             var path = SaveByPath.Keys.ToList().Find(key => SaveByPath[key].ID32 == saveId);
             DeleteSaveFromPath(path!);
-
-            StorageService.ResetDataLoader();
-        }
-
-        WarningsService.CheckWarnings();
+        });
     }
 
-    private static string GetBackupPath(uint saveId, DateTime backupTime)
+    public static Dictionary<uint, SaveInfosDTO> GetAllSaveInfos()
     {
-        var mainSavePath = SaveByPath.Keys.ToList().Find(key => SaveByPath[key].ID32 == saveId);
-
-        var fileName = Path.GetFileNameWithoutExtension(mainSavePath);
-        var ext = Path.GetExtension(mainSavePath);
-
-        var dirPath = Path.GetDirectoryName(mainSavePath)!;
-
-        var backupTimeStr = backupTime.ToString("o");
-
-        var bkpDirPath = Path.Combine(dirPath, Settings.backupDir);
-        var bkpFileName = $"{fileName}_{backupTimeStr}{ext}";
-        var bkpFilePath = Path.Combine(bkpDirPath, bkpFileName);
-
-        return bkpFilePath;
-    }
-
-    public static Dictionary<uint, List<SaveInfosDTO>> GetAllSaveInfos()
-    {
-        var record = new Dictionary<uint, List<SaveInfosDTO>>();
+        var record = new Dictionary<uint, SaveInfosDTO>();
 
         SaveByPath.Keys.ToList().ForEach(mainPath =>
         {
             var mainSave = SaveByPath[mainPath];
             var mainSaveLastWriteTime = File.GetLastWriteTime(mainPath);
 
-            var dtoList = new List<SaveInfosDTO>()
-            {
-                SaveInfosDTO.FromSave(mainSave, false, null, mainSaveLastWriteTime)
-            };
-
-            var fileName = Path.GetFileNameWithoutExtension(mainPath);
-            var ext = Path.GetExtension(mainPath);
-
-            var dirPath = Path.GetDirectoryName(mainPath)!;
-
-            var bkpDirPath = Path.Combine(dirPath, Settings.backupDir);
-            var bkpFileName = $"{fileName}_*{ext}";
-            var bkpFilePath = Path.Combine(bkpDirPath, bkpFileName);
-
-            var matcher = new Matcher();
-            matcher.AddInclude(bkpFilePath);
-            var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(Settings.rootDir)));
-
-            var bkpPaths = matches.Files.Select(file => Path.Combine(Settings.rootDir, file.Path)).ToList();
-            bkpPaths.Sort();
-            bkpPaths.Reverse();
-
-            bkpPaths.ForEach(path =>
-            {
-                var save = SaveUtil.GetVariantSAV(path);
-                var saveLastWriteTime = File.GetLastWriteTime(path);
-
-                var backupTimeStr = Path.GetFileNameWithoutExtension(path).Split("_").Last();
-                // Console.WriteLine(backupTimeStr);
-                var backupTime = DateTime.Parse(backupTimeStr);
-
-                // Console.WriteLine(backupTime);
-
-                dtoList.Add(
-                    SaveInfosDTO.FromSave(save, true, backupTime, saveLastWriteTime)
-                );
-            });
-
-            record.Add(mainSave.ID32, dtoList);
+            record.Add(mainSave.ID32, SaveInfosDTO.FromSave(mainSave, false, null, mainSaveLastWriteTime));
         });
 
         return record;
@@ -234,10 +166,10 @@ public class LocalSaveService
     public static SaveFile GetSaveFromId(uint saveId)
     {
         var path = SaveByPath.Keys.ToList().Find(path => SaveByPath[path].ID32 == saveId);
-        return SaveUtil.GetVariantSAV(path);
+        return SaveUtil.GetVariantSAV(path)!;
     }
 
-    public static DateTime WriteSaveWithBackup(SaveFile save)
+    public static DateTime WriteSave(SaveFile save)
     {
         var path = SaveByPath.Keys.ToList().Find(path => SaveByPath[path].ID32 == save.ID32);
         if (path == default)
@@ -250,20 +182,6 @@ public class LocalSaveService
 
         var dirPath = Path.GetDirectoryName(path)!;
 
-        var bkpDirPath = Path.Combine(dirPath, Settings.backupDir);
-
-        if (!Directory.Exists(bkpDirPath))
-        {
-            Directory.CreateDirectory(bkpDirPath);
-        }
-
-        var backupTimeStr = DateTime.UtcNow.ToString("o");
-
-        var bkpFileName = $"{fileName}_{backupTimeStr}{ext}";
-        var bkpFilePath = Path.Combine(bkpDirPath, bkpFileName);
-
-        File.Copy(path, bkpFilePath);
-
         File.WriteAllBytes(path, save.Write());
 
         UpdateGlobalsWithSave(save, path);
@@ -275,7 +193,7 @@ public class LocalSaveService
         return lastWriteTime;
     }
 
-    public static SaveInfosDTO UploadNewSave(byte[] fileBytes, string formFilename)
+    public static async Task UploadNewSave(byte[] fileBytes, string formFilename)
     {
         if (!StorageService.HasEmptyActionList())
         {
@@ -284,24 +202,9 @@ public class LocalSaveService
 
         var save = SaveUtil.GetVariantSAV(fileBytes, formFilename)!;
 
-        var lastWriteTime = WriteSaveWithBackup(save);
-
-        StorageService.ResetDataLoader();
-
-        WarningsService.CheckWarnings();
-
-        return SaveInfosDTO.FromSave(save, false, null, lastWriteTime);
-    }
-
-    public static void RestoreBackup(uint saveId, DateTime backupTime)
-    {
-        var bkpPath = GetBackupPath(saveId, backupTime);
-        var bkpSave = SaveUtil.GetVariantSAV(bkpPath);
-
-        WriteSaveWithBackup(bkpSave);
-
-        StorageService.ResetDataLoader();
-
-        WarningsService.CheckWarnings();
+        await BackupService.PrepareBackupThenRun(async () =>
+        {
+            WriteSave(save);
+        });
     }
 }

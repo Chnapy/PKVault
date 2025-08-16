@@ -3,7 +3,7 @@ public class Settings
 {
     public static string rootDir = "/";
 
-    public static string backupDir = "bkp";
+    public static string dbDir = "/root/projects/pkvault/Backend/db";
 
     public static string[] savesGlobs = [
         "/root/projects/pkvault/tmp/saves/**/*.srm",

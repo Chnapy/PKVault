@@ -123,6 +123,14 @@ public class StorageController : ControllerBase
         return StorageService.GetActionPayloadList();
     }
 
+    [HttpPut("save/{saveId}/pkm/synchronize")]
+    public async Task<ActionResult<List<DataActionPayload>>> SaveSynchronizePkm(uint saveId, [BindRequired] string pkmVersionId)
+    {
+        await StorageService.SaveSynchronizePkm(saveId, pkmVersionId);
+
+        return StorageService.GetActionPayloadList();
+    }
+
     [HttpGet("action")]
     public ActionResult<List<DataActionPayload>> GetActions()
     {

@@ -8,13 +8,20 @@ export type ButtonWithConfirmProps = Omit<ButtonProps<typeof PopoverButton>, 'as
 export const ButtonWithConfirm: React.FC<ButtonWithConfirmProps> = ({ onClick, ...btnProps }) => {
 
     return <Popover className="relative">
-        <Button as={PopoverButton} componentDescriptor="button" {...btnProps} />
+        {({ open, close }) => <>
+            <Button as={PopoverButton} componentDescriptor="button" {...btnProps} />
 
-        <PopoverPanel
-            anchor="bottom"
-            className={css({ overflow: "unset !important" })}
-        >
-            <Button onClick={onClick}>Confirm ?</Button>
-        </PopoverPanel>
+            {open && <PopoverPanel
+                static
+                anchor="bottom"
+                className={css({ overflow: "unset !important" })}
+            >
+                <Button onClick={async () => {
+                    await onClick();
+
+                    close();
+                }}>Confirm ?</Button>
+            </PopoverPanel>}
+        </>}
     </Popover>;
 };

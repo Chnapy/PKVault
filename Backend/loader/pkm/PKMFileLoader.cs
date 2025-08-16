@@ -31,8 +31,6 @@ public class PKMFileLoader : PKMLoader
 
         Console.WriteLine($"PKM id={pkm.ID32} / {PkmSaveDTO.GetPKMId(pkm, generation)}");
 
-        MainCreatePkmVersionAction.DebugOT(pkm);
-
         Directory.CreateDirectory(Path.GetDirectoryName(filepath)!);
         File.WriteAllBytes(filepath, bytes);
 

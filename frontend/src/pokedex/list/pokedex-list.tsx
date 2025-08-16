@@ -1,8 +1,8 @@
 import React from "react";
 import { useCurrentLanguageName } from '../../data/hooks/use-current-language-name';
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
+import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from "../../data/static-data/static-data";
-import { useSaveInfosMain } from '../../saves/hooks/use-save-infos-main';
 import { theme } from '../../ui/theme';
 import { usePokedexFilters } from "./hooks/use-pokedex-filters";
 import { PokedexItem } from "./pokedex-item";
@@ -14,7 +14,7 @@ export const PokedexList: React.FC = () => {
 
   const staticData = useStaticData();
 
-  const saveInfosData = useSaveInfosMain().data?.data;
+  const saveInfosData = useSaveInfosGetAll().data?.data;
 
   const { data } = useDexGetAll();
 

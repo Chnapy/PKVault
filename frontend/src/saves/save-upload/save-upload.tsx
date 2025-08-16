@@ -33,7 +33,7 @@ export const SaveUpload: React.FC = () => {
         position: "relative",
         height: 100,
         width: "100%",
-        marginBottom: 16,
+        // marginBottom: 16,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

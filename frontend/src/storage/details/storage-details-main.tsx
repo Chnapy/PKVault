@@ -5,11 +5,11 @@ import { useCurrentLanguageName } from '../../data/hooks/use-current-language-na
 import { useMoveByIdOrName } from '../../data/hooks/use-move-by-id-or-name';
 import { useNatureByIdOrName } from '../../data/hooks/use-nature-by-id-or-name';
 import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
-import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainDeletePkmVersion, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
+import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainDeletePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../data/static-data/static-data';
 import { getGender } from '../../data/utils/get-gender';
 import { Route } from '../../routes/storage';
-import { useSaveInfosMain } from '../../saves/hooks/use-save-infos-main';
 import { Button } from '../../ui/button/button';
 import { StorageMainDetails } from '../../ui/storage-item-details/storage-main-details';
 import { theme } from '../../ui/theme';
@@ -62,6 +62,26 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
         },
     });
 
+    const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm({
+        mutation: {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetActionsQueryKey(),
+                });
+
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetMainPkmVersionsQueryKey(),
+                });
+
+                if (saveId) {
+                    await queryClient.invalidateQueries({
+                        queryKey: getStorageGetSavePkmsQueryKey(saveId),
+                    });
+                }
+            },
+        },
+    });
+
     const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave({
         mutation: {
             onSuccess: async () => {
@@ -100,7 +120,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
         },
     });
 
-    const saveInfosQuery = useSaveInfosMain();
+    const saveInfosQuery = useSaveInfosGetAll();
     const mainPkmQuery = useStorageGetMainPkms();
     const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
 
@@ -236,7 +256,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
         boxSlot={pkm.boxSlot}
         saveBoxId={attachedSavePkm?.box}
         saveBoxSlot={attachedSavePkm?.boxSlot}
-        saveSynchronized={attachedSavePkm?.pkmData === pkmVersion.pkmData}
+        saveSynchronized={attachedSavePkm?.dynamicChecksum === pkmVersion.dynamicChecksum}
         goToSavePkm={attachedSavePkm && (() => navigate({
             search: {
                 save: attachedSavePkm.saveId,
@@ -248,14 +268,20 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
             }
         }))}
         attachedSavePkmNotFound={attachedSavePkmNotFound}
-        onSaveCheck={() => navigateToSave({
+        onSynchronize={saveId && pkmVersion ? (() => savePkmSynchronizeMutation.mutateAsync({
+            saveId,
+            params: {
+                pkmVersionId: pkmVersion.id,
+            }
+        })) : undefined}
+        onSaveCheck={attachedSavePkm ? (() => navigateToSave({
             to: '/saves'
-        })}
-        onDetach={() => mainPkmDetachSaveMutation.mutateAsync({
+        })) : undefined}
+        onDetach={attachedSavePkm ? (() => mainPkmDetachSaveMutation.mutateAsync({
             params: {
                 pkmId: pkm.id,
             }
-        })}
+        })) : undefined}
         onRelease={attachedSavePkm
             ? undefined
             : (() => mainPkmVersionDeleteMutation.mutateAsync({
