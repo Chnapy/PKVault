@@ -43,7 +43,8 @@ export const Backup: React.FC = () => {
 
         <div style={{
             display: 'flex',
-            gap: 8
+            gap: 8,
+            flexWrap: 'wrap',
         }}>
             {backupQuery.data.data.map(backup => {
 

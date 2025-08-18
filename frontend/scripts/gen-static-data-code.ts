@@ -51,7 +51,7 @@ const process = (schemaPath: string, dataPath: string): ProcessItem[] => {
       }
     });
   } else {
-    const getType = (): ProcessItem["type"] => {
+    const getType = (): ProcessItem[ "type" ] => {
       if (path.basename(schemaPath) !== "index.json") {
         return "unknown";
       }
@@ -109,19 +109,19 @@ const listWithItems = lists.map((list, l): ProcessItemWithChildren => {
       const children =
         i === 0 || childrenFound
           ? items
-              .filter(
-                (child) =>
-                  child.type === "item-child" &&
-                  child.dataPath.startsWith(baseItem + "/")
-              )
-              .map(
-                (child, i): ProcessItemWithChildren => ({
-                  ...child,
-                  id: readJSON(child.dataPath).id,
-                  i,
-                  children: [],
-                })
-              )
+            .filter(
+              (child) =>
+                child.type === "item-child" &&
+                child.dataPath.startsWith(baseItem + "/")
+            )
+            .map(
+              (child, i): ProcessItemWithChildren => ({
+                ...child,
+                id: readJSON(child.dataPath).id,
+                i,
+                children: [],
+              })
+            )
           : [];
 
       if (children.length > 0) {
@@ -164,7 +164,7 @@ const promises = listWithItems.map(async (list) => {
     .join(path.parse(list.dataPath).dir, "${id}", "index.json")
     .slice(rootDir.length + 1);
 
-  const listChildrenSchemaPath = list.children[0].schemaPath;
+  const listChildrenSchemaPath = list.children[ 0 ].schemaPath;
 
   const listName = path.basename(listModulePath);
 
@@ -267,11 +267,11 @@ const promises = listWithItems.map(async (list) => {
     }
   ) => {
     console.log('Loading static-data "${listName}" item...');
-    console.time('Loading static-data "${listName}" item');
+    // console.time('Loading static-data "${listName}" item');
 
     const value = await db.${listNameCamel}.get(id as never);
     if (value) {
-      console.timeEnd('Loading static-data "${listName}" item');
+      // console.timeEnd('Loading static-data "${listName}" item');
       console.log("Last loading was done from client DB table");
       return value;
     }
@@ -279,7 +279,7 @@ const promises = listWithItems.map(async (list) => {
     const fetchedValue = await ${listNameCamelFetchItem}(id).then(pickFn);
     await db.${listNameCamel}.add(fetchedValue);
     
-    console.timeEnd('Loading static-data "${listName}" item');
+    // console.timeEnd('Loading static-data "${listName}" item');
     console.log("Last loading was done from network");
   
     return fetchedValue;
@@ -295,11 +295,11 @@ const promises = listWithItems.map(async (list) => {
     filterFn?: (data: ${listNamePascal}) => boolean;
   }) => {
     console.log('Loading static-data "${listName}" list...');
-    console.time('Loading static-data "${listName}" list');
+    // console.time('Loading static-data "${listName}" list');
 
     const dbData = await db.${listNameCamel}.toArray();
     if (dbData.length > 0) {
-      console.timeEnd('Loading static-data "${listName}" list');
+      // console.timeEnd('Loading static-data "${listName}" list');
       console.log("Last loading was done from client DB table, list length:", dbData.length);
       return dbData;
     }
@@ -310,7 +310,7 @@ const promises = listWithItems.map(async (list) => {
     await db.${listNameCamel}.clear();
     await db.${listNameCamel}.bulkAdd(fetchedValues);
     
-    console.timeEnd('Loading static-data "${listName}" list');
+    // console.timeEnd('Loading static-data "${listName}" list');
     console.log("Last loading was done from network, list length:", dbData.length);
   
     return fetchedValues;

@@ -9,7 +9,7 @@ export const ButtonWithConfirm: React.FC<ButtonWithConfirmProps> = ({ onClick, .
 
     return <Popover className="relative">
         {({ open, close }) => <>
-            <Button as={PopoverButton} componentDescriptor="button" {...btnProps} />
+            <PopoverButton as={Button} {...btnProps} />
 
             {open && <PopoverPanel
                 static

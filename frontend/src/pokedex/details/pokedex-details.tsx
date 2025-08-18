@@ -12,7 +12,7 @@ import { GameButton } from "./game-button";
 import { getGameInfos } from "./util/get-game-infos";
 
 export const PokedexDetails: React.FC = () => {
-  console.time("pokedex-details");
+  // console.time("pokedex-details");
   const selectedSpecies = Route.useSearch({
     select: (search) => search.selected,
   });
@@ -56,7 +56,7 @@ export const PokedexDetails: React.FC = () => {
   }, [ gameSaves, selectedSaveIndex ]);
 
   if (!selectedSpecies || !gameSaves.length || !pokemonSpeciesInfos || !pokemonInfos) {
-    console.timeEnd("pokedex-details");
+    // console.timeEnd("pokedex-details");
     return null;
   }
 
@@ -101,7 +101,7 @@ export const PokedexDetails: React.FC = () => {
 
   const stats = pokemonInfos.stats.map(stat => stat.base_stat);
 
-  console.timeEnd("pokedex-details");
+  // console.timeEnd("pokedex-details");
 
   return (
     <DetailsCard

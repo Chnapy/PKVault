@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { getDexGetAllQueryKey } from "../../data/sdk/dex/dex.gen";
 import {
+  getSaveInfosDownloadUrl,
   getSaveInfosGetAllQueryKey,
   useSaveInfosDelete,
   useSaveInfosGetAll,
@@ -11,6 +12,7 @@ import { getWarningsGetWarningsQueryKey } from '../../data/sdk/warnings/warnings
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { Container } from "../../ui/container/container";
 import { SaveCardContentFull } from '../../ui/save-card/save-card-content-full';
+import { Button } from '../../ui/button/button';
 
 export type SaveItemProps = {
   saveId: number;
@@ -43,6 +45,9 @@ export const SaveItem: React.FC<SaveItemProps> = ({
       },
     },
   });
+
+  const downloadUrl = getSaveInfosDownloadUrl(saveId);
+
   // const saveInfosRestoreBackupMutation = useSaveInfosRestoreBackup({
   //   mutation: {
   //     onSuccess: async () => {
@@ -108,17 +113,22 @@ export const SaveItem: React.FC<SaveItemProps> = ({
         ownedCount={mainSave.ownedCount}
         shinyCount={mainSave.shinyCount}
         actions={!hasStockageActions &&
-          // backupSaves.length === 0 &&
-          mainSave.canDelete &&
-          showDelete && <>
-            <ButtonWithConfirm onClick={() =>
-              saveInfosDeleteMutation.mutateAsync({
-                params: {
-                  saveId: mainSave.id,
-                },
-              })}>
-              Delete
-            </ButtonWithConfirm>
+          <>
+            <Button as='a' href={downloadUrl}>
+              Download
+            </Button>
+
+            {mainSave.canDelete &&
+              showDelete && <>
+                <ButtonWithConfirm onClick={() =>
+                  saveInfosDeleteMutation.mutateAsync({
+                    params: {
+                      saveId: mainSave.id,
+                    },
+                  })}>
+                  Delete
+                </ButtonWithConfirm>
+              </>}
           </>}
       />}
 

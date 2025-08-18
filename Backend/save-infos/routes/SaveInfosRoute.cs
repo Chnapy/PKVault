@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -34,5 +35,22 @@ public class SaveInfosController : ControllerBase
     public async void Delete([BindRequired] uint saveId)
     {
         await LocalSaveService.DeleteSaveFromId(saveId);
+    }
+
+    [HttpGet("{saveId}/download")]
+    public ActionResult Download(uint saveId)
+    {
+        if (!StorageService.HasEmptyActionList())
+        {
+            throw new Exception($"Empty action list is required");
+        }
+
+        var save = LocalSaveService.SaveById[saveId];
+        // var path = LocalSaveService.SaveByPath.Keys.ToList().Find(key => LocalSaveService.SaveByPath[key].ID32 == saveId);
+
+        var filename = save.Metadata.FileName;
+
+        byte[] fileBytes = save.Write();
+        return File(fileBytes, MediaTypeNames.Application.Octet, filename);
     }
 }

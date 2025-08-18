@@ -8,7 +8,7 @@ import { usePokedexFilters } from "./hooks/use-pokedex-filters";
 import { PokedexItem } from "./pokedex-item";
 
 export const PokedexList: React.FC = () => {
-  console.time("pokedex-list");
+  // console.time("pokedex-list");
 
   const getCurrentLanguageName = useCurrentLanguageName();
 
@@ -149,7 +149,7 @@ export const PokedexList: React.FC = () => {
   }).length;
 
 
-  console.timeEnd("pokedex-list");
+  // console.timeEnd("pokedex-list");
 
   return (
     <div
