@@ -114,6 +114,8 @@ export const ActionsPanel: React.FC = () => {
                                     [ DataActionType.SAVE_MOVE_PKM_FROM_STORAGE ]: 'Move pkm from storage to save',
                                     [ DataActionType.SAVE_MOVE_PKM_TO_STORAGE ]: 'Move pkm from save to storage',
                                     [ DataActionType.DETACH_PKM_SAVE ]: 'Detach save from pkm',
+                                    [ DataActionType.EDIT_PKM_VERSION ]: 'Edit pkm-version',
+                                    [ DataActionType.EDIT_PKM_SAVE ]: 'Edit pkm-save',
                                     [ DataActionType.DELETE_PKM_VERSION ]: 'Delete pkm-version',
                                     [ DataActionType.SAVE_DELETE_PKM ]: 'Delete save pkm',
                                     [ DataActionType.PKM_SYNCHRONIZE ]: 'Synchronize pkm',

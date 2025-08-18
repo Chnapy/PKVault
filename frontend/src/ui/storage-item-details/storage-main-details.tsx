@@ -2,7 +2,7 @@ import React from "react";
 import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png';
 import { useBallByIdOrName } from '../../data/hooks/use-ball-by-id-or-name';
 import { useCurrentLanguageName } from '../../data/hooks/use-current-language-name';
-import { type GameVersion } from "../../data/sdk/model";
+import { type GameVersion, type MoveItem } from "../../data/sdk/model";
 import { useStaticData } from "../../data/static-data/static-data";
 import type { GenderType } from '../../data/utils/get-gender';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
@@ -15,6 +15,7 @@ import { ItemImg } from '../item-img/item-img';
 import { SaveCardContentSmall } from '../save-card/save-card-content-small';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
+import { StorageDetailsForm } from './storage-details-form';
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
@@ -34,6 +35,7 @@ export type StorageMainDetailsProps = {
   ball: number;
   gender: GenderType;
   nickname: string;
+  nicknameMaxLength: number;
 
   types: string[];
   stats: number[];
@@ -45,7 +47,8 @@ export type StorageMainDetailsProps = {
   ability?: string;
   level: number;
   exp: number;
-  moves: string[];
+  moves: MoveItem[];
+  availableMoves: MoveItem[];
 
   tid: number;
   originTrainerName: string;
@@ -95,6 +98,7 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
   ball,
   gender,
   nickname,
+  nicknameMaxLength,
 
   types,
   stats,
@@ -107,6 +111,7 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
   level,
   exp,
   moves,
+  availableMoves,
 
   tid,
   originTrainerName,
@@ -142,6 +147,8 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
   const staticData = useStaticData();
   const pokemonDataItem = staticData.pokemon[ species ];
 
+  const formContext = StorageDetailsForm.useContext();
+
   const getCurrentLanguageName = useCurrentLanguageName();
 
   const getSaveItemProps = useSaveItemProps();
@@ -160,7 +167,7 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
     }
 
     return isShiny ? shinySprite! : defaultSprite!
-  }
+  };
 
   return (
     <DetailsCardContainer
@@ -209,7 +216,17 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
       mainInfos={
         <>
 
-          {nickname && `${nickname} - `}<span style={{ color: theme.text.primary }}>{speciesName}</span>
+          {formContext.editMode
+            ? <input
+              {...formContext.register('nickname', { maxLength: nicknameMaxLength })}
+              maxLength={nicknameMaxLength}
+              style={{ width: 8 * nicknameMaxLength, padding: 0, textAlign: 'center' }}
+            />
+            : <>
+              {nickname}
+              <Button onClick={() => formContext.setValue('editMode', true)} style={{ display: 'inline' }}>E</Button>
+            </>}
+          {' - '}<span style={{ color: theme.text.primary }}>{speciesName}</span>
 
           {gender && <span
             style={{
@@ -266,13 +283,13 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
             </Button>}
         </>}
 
-        {!saveSynchronized && onSynchronize && <Button onClick={onSynchronize}>
+        {!saveSynchronized && !!saveId && onSynchronize && <Button onClick={onSynchronize}>
           Synchronize
         </Button>}
       </>}
       content={
         <>
-          <TextContainer>
+          <TextContainer noWrap>
             <TextStats
               nature={nature}
               ivs={ivs}
@@ -287,8 +304,28 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
             <TextMoves
               ability={ability}
               moves={moves}
+              availableMoves={availableMoves}
             />
           </TextContainer>
+
+          {formContext.editMode && <div style={{
+            display: 'flex',
+            gap: 4
+          }}>
+            <Button
+              onClick={() => formContext.cancel()}
+              style={{ flexGrow: 1 }}
+            >
+              Cancel
+            </Button>
+
+            <ButtonWithConfirm
+              onClick={() => formContext.submitForPkmVersion(id)}
+              style={{ flexGrow: 1 }}
+            >
+              Submit changes
+            </ButtonWithConfirm>
+          </div>}
 
           <TextContainer>
             <TextOrigin

@@ -29,9 +29,12 @@ public class PKMMemoryLoader : PKMLoader
             filepath = expectedFilepath;
         }
 
-        Console.WriteLine($"(M) Write new PKM filepath={filepath}, id={pkm.ID32} / {PkmSaveDTO.GetPKMId(pkm, generation)}");
+        Console.WriteLine($"(M) Write new PKM filepath={filepath}, id={PkmSaveDTO.GetPKMId(pkm, generation)}");
 
+        bytesDict.Remove(filepath);
         bytesDict.Add(filepath, bytes);
+
+        // Console.WriteLine($"{string.Join('\n', bytesDict.Keys)}");
 
         return filepath;
     }

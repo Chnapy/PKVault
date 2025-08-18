@@ -33,19 +33,17 @@ public abstract class BasePkmVersionDTO : IWithId<string>
             pkm.Stat_SPE,
         ];
 
-        ushort[] moves = [
-            pkm.Move1,
-            pkm.Move2,
-            pkm.Move3,
-            pkm.Move4
-        ];
-
-        var la = new LegalityAnalysis(pkm);
-
         HiddenPower.TryGetTypeIndex(pkm.HPType, out var hptype);
 
         if (pkm.HeldItem != 0)
         {
+            // if (pkm.Nickname == "RAGEUX")
+            // {
+            //     Console.WriteLine($"TOTO");
+            //     Console.WriteLine($"TOTO {pkm.Context.Generation()} {pkm.Version} {pkm.HeldItem}");
+            //     Console.WriteLine($"TOTO");
+            // }
+
             var stringsFr = GameInfo.GetStrings("fr");
             var heldItemText = stringsFr.GetItemStrings(pkm.Context, pkm.Version)[pkm.HeldItem];
 
@@ -58,6 +56,69 @@ public abstract class BasePkmVersionDTO : IWithId<string>
             dto.SpriteItem = pkm.SpriteItem;
             dto.HeldItemText = heldItemText;
         }
+
+        var legality = new LegalityAnalysis(pkm);
+
+        var moveComboSource = new LegalMoveComboSource();
+        var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
+
+        moveSource.ChangeMoveSource(GameInfo.MoveDataSource);
+        moveSource.ReloadMoves(legality);
+
+        List<MoveSourceType> moveSourceTypes = [
+            MoveSourceType.LevelUp,
+            MoveSourceType.RelearnMoves,
+            MoveSourceType.Machine,
+            MoveSourceType.TypeTutor,
+            MoveSourceType.SpecialTutor,
+            MoveSourceType.EnhancedTutor,
+            MoveSourceType.SharedEggMove,
+            MoveSourceType.TechnicalRecord,
+            MoveSourceType.Evolve,
+        ];
+
+        var moveSourceTypesRecord = new Dictionary<MoveSourceType, bool[]>();
+        moveSourceTypes.ForEach(type =>
+        {
+            moveSourceTypesRecord.Add(type, LearnPossible.Get(pkm, legality.EncounterOriginal, legality.Info.EvoChainsAllGens, type));
+        });
+
+        var movesStr = GameInfo.GetStrings("fr").movelist;
+
+        var rawMoves = new List<ushort>(){
+            pkm.Move1,
+            pkm.Move2,
+            pkm.Move3,
+            pkm.Move4
+        };
+        var moves = rawMoves.Select(id => new MoveItem
+        {
+            Id = id,
+            Type = MoveInfo.GetType(id, pkm.Context),
+            Text = movesStr[id],
+            SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Count() > id && moveSourceTypesRecord[type][id]),
+        }).ToList();
+
+        var availableMoves = new List<MoveItem>();
+
+        moveComboSource.DataSource.ToList().ForEach(data =>
+        {
+            var types = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Count() > data.Value && moveSourceTypesRecord[type][data.Value]);
+
+            if (moveSource.Info.CanLearn((ushort)data.Value))
+            {
+                var item = new MoveItem
+                {
+                    Id = data.Value,
+                    Type = MoveInfo.GetType((ushort)data.Value, pkm.Context),
+                    Text = movesStr[data.Value],
+                    SourceTypes = types,
+                };
+                availableMoves.Add(item);
+
+                // Console.WriteLine($"{data.Value} - {data.Text} / {movesStr[data.Value]} - {eggMoves.ToList().FindAll(v => v).Count()} - {string.Join(',', types)}");
+            }
+        });
 
         dto.Version = pkm.Version;
         dto.PID = pkm.PID;
@@ -83,8 +144,10 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         dto.OriginMetDate = pkm.MetDate;
         dto.OriginMetLocation = GameInfo.GetStrings("fr").GetLocationName(pkm.WasEgg, pkm.MetLocation, pkm.Format, pkm.Generation, pkm.Version);
         dto.OriginMetLevel = pkm.MetLevel == 0 ? null : pkm.MetLevel;
-        dto.IsValid = la.Parsed && pkm.Valid;
-        dto.ValidityReport = la.Report();
+        dto.NicknameMaxLength = pkm.MaxStringLengthNickname;
+        dto.AvailableMoves = availableMoves;
+        dto.IsValid = legality.Parsed && pkm.Valid;
+        dto.ValidityReport = legality.Report();
     }
 
     public string Id { get; set; }
@@ -125,7 +188,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public int? Ability { get; set; }
 
-    public ushort[] Moves { get; set; }
+    public List<MoveItem> Moves { get; set; }
 
     public ushort TID { get; set; }
 
@@ -153,7 +216,19 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         }
     }
 
+    public int NicknameMaxLength { get; set; }
+
+    public List<MoveItem> AvailableMoves { get; set; }
+
     public bool IsValid { get; set; }
 
     public string ValidityReport { get; set; }
 }
+
+public struct MoveItem
+{
+    public int Id { get; set; }
+    public byte Type { get; set; }
+    public string Text { get; set; }
+    public List<MoveSourceType> SourceTypes { get; set; }
+};

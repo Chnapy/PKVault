@@ -1,5 +1,8 @@
-import type React from 'react';
+import React from 'react';
+import { useWatch } from 'react-hook-form';
+import { Button } from '../button/button';
 import { theme } from '../theme';
+import { StorageDetailsForm } from './storage-details-form';
 
 export type TextStatsProps = {
     nature?: string;
@@ -18,6 +21,10 @@ export const TextStats: React.FC<TextStatsProps> = ({
     hiddenPowerType,
     hiddenPowerPower,
 }) => {
+    const { editMode, setValue, register, control } = StorageDetailsForm.useContext();
+
+    const totalEVs = evs.reduce((acc, ev) => acc + ev, 0);
+    const totalFormEVs = useWatch({ name: 'eVs', control }).reduce((acc, ev) => acc + ev, 0);
 
     return <>
         {nature && <>
@@ -48,14 +55,33 @@ export const TextStats: React.FC<TextStatsProps> = ({
                     <td style={{ padding: 0 }}>
                         <span style={{ color: theme.text.primary }}>EVs</span>
                     </td>
-                    {evs.map((ev, i) => <td key={i} style={{ padding: 0, textAlign: 'center' }}>{ev}</td>)}
+                    {editMode
+                        ? <>
+                            {evs.map((ev, i) => <td key={i} style={{ padding: 0, textAlign: 'center' }}>
+                                <input
+                                    type='number'
+                                    {...register(`eVs.${i}`, { valueAsNumber: true })}
+                                    style={{ width: 50, padding: 0, textAlign: 'center' }}
+                                />
+                            </td>)}
+
+                            <td style={{ padding: 0, textAlign: 'center', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                {totalFormEVs}/{totalEVs}
+                            </td>
+                        </>
+                        : <>
+                            {evs.map((ev, i) => <td key={i} style={{ padding: 0, textAlign: 'center' }}>{ev}</td>)}
+                            <td style={{ padding: 0, textAlign: 'center' }}>
+                                <Button onClick={() => setValue('editMode', true)}>Edit</Button>
+                            </td>
+                        </>}
                 </tr>
-                <tr>
+                {!editMode && <tr>
                     <td style={{ padding: 0 }}>
                         <span style={{ color: theme.text.primary }}>Stats</span>
                     </td>
                     {stats.map((stat, i) => <td key={i} style={{ padding: 0, textAlign: 'center' }}>{stat}</td>)}
-                </tr>
+                </tr>}
             </tbody>
         </table>
         <br />

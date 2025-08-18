@@ -53,7 +53,9 @@ public class SynchronizePkmAction : DataAction
             PkmConvertService.PassDynamicsToPkm(savePkm.Pkm, pkm, pkmEntity, pkmVersionEntity.Generation);
             PkmConvertService.PassHeldItemToPkm(savePkm.Pkm, pkm);
 
-            var dto = PkmVersionDTO.FromEntity(version, pkm, pkmEntity);
+            pkm.RefreshChecksum();
+
+            // var dto = PkmVersionDTO.FromEntity(version, pkm, pkmEntity);
 
             loaders.pkmFileLoader.WriteEntity(PKMLoader.GetPKMBytes(pkm), pkm, version.Generation, null);
         });

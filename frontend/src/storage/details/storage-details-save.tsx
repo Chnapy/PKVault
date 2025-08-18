@@ -10,6 +10,7 @@ import { useStaticData } from '../../data/static-data/static-data';
 import { getGender } from '../../data/utils/get-gender';
 import { Route } from '../../routes/storage';
 import { StorageSaveDetails } from '../../ui/storage-item-details/storage-save-details';
+import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
 
 export type StorageDetailsSaveProps = {
     selectedId: string;
@@ -84,83 +85,85 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
         getCurrentLanguageName(getTypeByIdOrName(type.type.name).names)
     );
 
-    const moves = savePkm.moves.map(id => {
-        const move = getMoveByIdOrName(id);
-
-        return move ? getCurrentLanguageName(move.names) : '-';
-    });
-
     const ability = typeof savePkm.ability === 'number' ? getAbilityByIdOrName(savePkm.ability) : undefined;
     const abilityStr = ability && getCurrentLanguageName(ability.names);
 
     const nature = typeof savePkm.nature === 'number' ? getNatureByIdOrName(savePkm.nature) : undefined;
     const natureStr = nature && getCurrentLanguageName(nature.names);
 
-    return <StorageSaveDetails
-        id={savePkm.id}
-        generation={savePkm.generation}
-        version={savePkm.version}
-        pid={savePkm.pid}
-        species={savePkm.species}
-        isShiny={savePkm.isShiny}
-        isEgg={savePkm.isEgg}
-        isShadow={savePkm.isShadow}
-        ball={savePkm.ball}
-        gender={gender}
+    return <StorageDetailsForm.Provider
+        key={savePkm.id}
         nickname={savePkm.nickname}
-        types={types}
-        stats={savePkm.stats}
-        ivs={savePkm.iVs}
-        evs={savePkm.eVs}
-        hiddenPowerType={getCurrentLanguageName(getTypeByIdOrName(savePkm.hiddenPowerType).names)}
-        hiddenPowerPower={savePkm.hiddenPowerPower}
-        nature={natureStr}
-        ability={abilityStr}
-        level={savePkm.level}
-        exp={savePkm.exp}
-        moves={moves}
-        tid={savePkm.tid}
-        originTrainerName={savePkm.originTrainerName}
-        originTrainerGender={originTrainerGender}
-        originMetDate={savePkm.originMetDate}
-        originMetLocation={savePkm.originMetLocation}
-        originMetLevel={savePkm.originMetLevel}
-        heldItemSprite={savePkm.spriteItem}
-        heldItemText={savePkm.heldItemText}
-        isValid={savePkm.isValid}
-        validityReport={savePkm.validityReport}
-        box={savePkm.box}
-        boxSlot={savePkm.boxSlot}
-        mainBoxId={pkm?.boxId}
-        mainBoxSlot={pkm?.boxSlot}
-        saveSynchronized={savePkm.dynamicChecksum === pkmVersion?.dynamicChecksum}
-        goToMainPkm={pkm && (() => navigate({
-            search: {
-                selected: {
-                    type: 'main',
-                    id: pkm.id,
-                },
-            }
-        }))}
-        canMoveToMainStorage={savePkm.canMoveToMainStorage}
-        onSynchronize={pkmVersion ? (() => savePkmSynchronizeMutation.mutateAsync({
-            saveId,
-            params: {
-                pkmVersionId: pkmVersion.id,
-            }
-        })) : undefined}
-        onRelease={pkm
-            ? undefined
-            : (() => savePkmDeleteMutation.mutateAsync({
-                saveId,
-                params: {
-                    pkmId: savePkm.id,
+        eVs={savePkm.eVs}
+        moves={savePkm.moves.map(move => move.id)}
+    >
+        <StorageSaveDetails
+            id={savePkm.id}
+            saveId={saveId}
+            generation={savePkm.generation}
+            version={savePkm.version}
+            pid={savePkm.pid}
+            species={savePkm.species}
+            isShiny={savePkm.isShiny}
+            isEgg={savePkm.isEgg}
+            isShadow={savePkm.isShadow}
+            ball={savePkm.ball}
+            gender={gender}
+            nickname={savePkm.nickname}
+            nicknameMaxLength={savePkm.nicknameMaxLength}
+            types={types}
+            stats={savePkm.stats}
+            ivs={savePkm.iVs}
+            evs={savePkm.eVs}
+            hiddenPowerType={getCurrentLanguageName(getTypeByIdOrName(savePkm.hiddenPowerType).names)}
+            hiddenPowerPower={savePkm.hiddenPowerPower}
+            nature={natureStr}
+            ability={abilityStr}
+            level={savePkm.level}
+            exp={savePkm.exp}
+            moves={savePkm.moves}
+            availableMoves={savePkm.availableMoves}
+            tid={savePkm.tid}
+            originTrainerName={savePkm.originTrainerName}
+            originTrainerGender={originTrainerGender}
+            originMetDate={savePkm.originMetDate}
+            originMetLocation={savePkm.originMetLocation}
+            originMetLevel={savePkm.originMetLevel}
+            heldItemSprite={savePkm.spriteItem}
+            heldItemText={savePkm.heldItemText}
+            isValid={savePkm.isValid}
+            validityReport={savePkm.validityReport}
+            box={savePkm.box}
+            boxSlot={savePkm.boxSlot}
+            mainBoxId={pkm?.boxId}
+            mainBoxSlot={pkm?.boxSlot}
+            saveSynchronized={savePkm.dynamicChecksum === pkmVersion?.dynamicChecksum}
+            goToMainPkm={pkm && (() => navigate({
+                search: {
+                    selected: {
+                        type: 'main',
+                        id: pkm.id,
+                    },
                 }
             }))}
-        onClose={() => navigate({
-            search: {
-                selected: undefined,
-            }
-        })}
-    />;
+            canMoveToMainStorage={savePkm.canMoveToMainStorage}
+            onSynchronize={pkmVersion ? (() => savePkmSynchronizeMutation.mutateAsync({
+                saveId,
+                params: {
+                    pkmVersionId: pkmVersion.id,
+                }
+            })) : undefined}
+            onRelease={pkm
+                ? undefined
+                : (() => savePkmDeleteMutation.mutateAsync({
+                    saveId,
+                    pkmId: savePkm.id,
+                }))}
+            onClose={() => navigate({
+                search: {
+                    selected: undefined,
+                }
+            })}
+        />
+    </StorageDetailsForm.Provider>;
 };

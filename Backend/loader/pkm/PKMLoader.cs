@@ -5,6 +5,9 @@ public abstract class PKMLoader
 {
     public static PKM CreatePKM(byte[] bytes, PkmVersionEntity pkmVersionEntity, PkmEntity pkmEntity)
     {
+        // required !
+        bytes = (byte[])bytes.Clone();
+
         var format = EntityFileExtension.GetContextFromExtension(pkmVersionEntity.Filepath, (EntityContext)pkmVersionEntity.Generation);
         var pkm = EntityFormat.GetFromBytes(bytes, prefer: format);
 
@@ -62,7 +65,15 @@ public abstract class PKMLoader
 
     public static string GetPKMFilepath(PKM pkm, uint generation)
     {
-        return Path.Combine(Settings.mainPkmStoragePath, generation.ToString(), pkm.FileName);
+        return Path.Combine(Settings.mainPkmStoragePath, generation.ToString(), GetPKMFilename(pkm, generation));
+    }
+
+    private static string GetPKMFilename(PKM pkm, uint generation)
+    {
+        var star = pkm.IsShiny ? " ★" : string.Empty;
+        var speciesName = GameInfo.Strings.Species[pkm.Species].ToUpperInvariant();
+        var id = PkmSaveDTO.GetPKMId(pkm, generation);
+        return $"{pkm.Species:0000}{star} - {speciesName} - {id}.{pkm.Extension}";
     }
 
     public abstract byte[]? GetEntity(PkmVersionEntity pkmVersion);

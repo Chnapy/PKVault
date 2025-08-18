@@ -30,7 +30,7 @@ public class StorageController : ControllerBase
     [HttpGet("main/pkm-version")]
     public ActionResult<List<PkmVersionDTO>> GetMainPkmVersions()
     {
-        var list = StorageService.GetMainPkmVersions(null);
+        var list = StorageService.GetMainPkmVersions();
 
         return list;
     }
@@ -51,24 +51,16 @@ public class StorageController : ControllerBase
         return savePkms;
     }
 
-    [HttpPost("save")]
-    public async Task<ActionResult<List<DataActionPayload>>> Save()
-    {
-        await StorageService.Save();
-
-        return StorageService.GetActionPayloadList();
-    }
-
-    [HttpPut("main/pkm/move")]
-    public async Task<ActionResult<List<DataActionPayload>>> MainMovePkm([BindRequired] string pkmId, [BindRequired] uint boxId, [BindRequired] uint boxSlot)
+    [HttpPut("main/pkm/{pkmId}/move")]
+    public async Task<ActionResult<List<DataActionPayload>>> MainMovePkm(string pkmId, [BindRequired] uint boxId, [BindRequired] uint boxSlot)
     {
         await StorageService.MainMovePkm(pkmId, boxId, boxSlot);
 
         return StorageService.GetActionPayloadList();
     }
 
-    [HttpPut("main/pkm/detach-save")]
-    public async Task<ActionResult<List<DataActionPayload>>> MainPkmDetachSave([BindRequired] string pkmId)
+    [HttpPut("main/pkm/{pkmId}/detach-save")]
+    public async Task<ActionResult<List<DataActionPayload>>> MainPkmDetachSave(string pkmId)
     {
         await StorageService.MainPkmDetachSave(pkmId);
 
@@ -83,24 +75,40 @@ public class StorageController : ControllerBase
         return StorageService.GetActionPayloadList();
     }
 
-    [HttpDelete("main/pkm-version")]
-    public async Task<ActionResult<List<DataActionPayload>>> MainDeletePkmVersion([BindRequired] string pkmVersionId)
+    [HttpPut("main/pkm-version/{pkmVersionId}")]
+    public async Task<ActionResult<List<DataActionPayload>>> MainEditPkmVersion(string pkmVersionId, [BindRequired] EditPkmVersionPayload payload)
+    {
+        await StorageService.MainEditPkmVersion(pkmVersionId, payload);
+
+        return StorageService.GetActionPayloadList();
+    }
+
+    [HttpDelete("main/pkm-version/{pkmVersionId}")]
+    public async Task<ActionResult<List<DataActionPayload>>> MainDeletePkmVersion(string pkmVersionId)
     {
         await StorageService.MainPkmVersionDelete(pkmVersionId);
 
         return StorageService.GetActionPayloadList();
     }
 
-    [HttpDelete("save/{saveId}/pkm")]
-    public async Task<ActionResult<List<DataActionPayload>>> SaveDeletePkm(uint saveId, [BindRequired] string pkmId)
+    [HttpDelete("save/{saveId}/pkm/{pkmId}")]
+    public async Task<ActionResult<List<DataActionPayload>>> SaveDeletePkm(uint saveId, string pkmId)
     {
         await StorageService.SaveDeletePkm(saveId, pkmId);
 
         return StorageService.GetActionPayloadList();
     }
 
-    [HttpPut("save/{saveId}/pkm/move")]
-    public async Task<ActionResult<List<DataActionPayload>>> SaveMovePkm(uint saveId, [BindRequired] string pkmId, [BindRequired] int boxId, [BindRequired] int boxSlot)
+    [HttpPut("save/{saveId}/pkm/{pkmId}")]
+    public async Task<ActionResult<List<DataActionPayload>>> SaveEditPkm(uint saveId, string pkmId, [BindRequired] EditPkmVersionPayload payload)
+    {
+        await StorageService.SaveEditPkm(saveId, pkmId, payload);
+
+        return StorageService.GetActionPayloadList();
+    }
+
+    [HttpPut("save/{saveId}/pkm/{pkmId}/move")]
+    public async Task<ActionResult<List<DataActionPayload>>> SaveMovePkm(uint saveId, string pkmId, [BindRequired] int boxId, [BindRequired] int boxSlot)
     {
         await StorageService.SaveMovePkm(saveId, pkmId, boxId, boxSlot);
 
@@ -138,9 +146,17 @@ public class StorageController : ControllerBase
     }
 
     [HttpDelete("action")]
-    public async Task<ActionResult<List<DataActionPayload>>> DeleteActions(int actionIndexToRemoveFrom)
+    public async Task<ActionResult<List<DataActionPayload>>> DeleteActions([BindRequired] int actionIndexToRemoveFrom)
     {
         await StorageService.RemoveDataActions(actionIndexToRemoveFrom);
+
+        return StorageService.GetActionPayloadList();
+    }
+
+    [HttpPost("action/save")]
+    public async Task<ActionResult<List<DataActionPayload>>> Save()
+    {
+        await StorageService.Save();
 
         return StorageService.GetActionPayloadList();
     }

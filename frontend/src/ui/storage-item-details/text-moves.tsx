@@ -1,15 +1,21 @@
 import type React from 'react';
 import { theme } from '../theme';
+import { StorageDetailsForm } from './storage-details-form';
+import { Button } from '../button/button';
+import type { MoveItem } from '../../data/sdk/model';
 
 export type TextMovesProps = {
     ability?: string;
-    moves: string[];
+    moves: MoveItem[];
+    availableMoves: MoveItem[];
 };
 
 export const TextMoves: React.FC<TextMovesProps> = ({
     ability,
-    moves
+    moves,
+    availableMoves,
 }) => {
+    const { editMode, setValue, register } = StorageDetailsForm.useContext();
 
     return <>
         {ability && <>
@@ -18,8 +24,14 @@ export const TextMoves: React.FC<TextMovesProps> = ({
         </>}
         <span style={{ color: theme.text.primary }}>Moves</span>
         <br />
-        {moves.map((move, i) => <div key={i}>
-            {i + 1}. {move}
-        </div>)}
+        {editMode
+            ? moves.map((move, i) => <select key={i} {...register(`moves.${i}`, { valueAsNumber: true })}>
+                {availableMoves.map((item) => <option key={item.id} value={item.id}>{item.id} - {item.text}</option>)}
+            </select>)
+            : <>{moves.map((move, i) => <div key={i}>
+                {i + 1}. {move.text}
+            </div>)}
+                <Button onClick={() => setValue('editMode', true)}>Edit</Button>
+            </>}
     </>;
 };

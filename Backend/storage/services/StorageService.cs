@@ -26,15 +26,10 @@ public class StorageService
         return list;
     }
 
-    public static List<PkmVersionDTO> GetMainPkmVersions(string? pkmId)
+    public static List<PkmVersionDTO> GetMainPkmVersions()
     {
         var loaders = memoryLoader.loaders;
         var entities = loaders.pkmVersionLoader.GetAllEntities();
-
-        if (pkmId != null)
-        {
-            entities = entities.FindAll(pkmVersion => pkmVersion.PkmId == pkmId);
-        }
 
         var list = new List<PkmVersionDTO>();
         entities.ForEach((entity) =>
@@ -79,6 +74,20 @@ public class StorageService
     {
         await memoryLoader.AddAction(
             new MainCreatePkmVersionAction(pkmId, generation)
+        );
+    }
+
+    public static async Task MainEditPkmVersion(string pkmVersionId, EditPkmVersionPayload payload)
+    {
+        await memoryLoader.AddAction(
+            new EditPkmVersionAction(pkmVersionId, payload)
+        );
+    }
+
+    public static async Task SaveEditPkm(uint saveId, string pkmId, EditPkmVersionPayload payload)
+    {
+        await memoryLoader.AddAction(
+            new EditPkmSaveAction(saveId, pkmId, payload)
         );
     }
 

@@ -11,6 +11,9 @@ public static class Program
         // TestService.Test();
 
         // BackupService.CreateBackup();
+
+        // LocalSaveService.ReadLocalSaves(null);
+
         // if (1 == 1)
         // {
         //     return;

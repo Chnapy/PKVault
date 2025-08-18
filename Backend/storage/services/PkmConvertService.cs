@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public class PkmConvertService
 {
-    public static PKM GetConvertedPkm(PKM sourcePkm, PkmEntity pkmEntity, uint generation)
+    public static PKM GetConvertedPkm(PKM sourcePkm, PkmEntity pkmEntity, uint generation, uint? intermediatePid)
     {
         EntityConverter.AllowIncompatibleConversion = EntityCompatibilitySetting.AllowIncompatibleSane;
 
@@ -32,7 +32,7 @@ public class PkmConvertService
         //     throw new Exception($"2.PKM target generation inconsistency, expected generation={generation} pkm.generation={target.Generation}");
         // }
 
-        var intermediatePkm = GetIntermediatePkmConvert(sourcePkm, pkmEntity, generation);
+        var intermediatePkm = GetIntermediatePkmConvert(sourcePkm, pkmEntity, generation, intermediatePid);
 
         // if (pkmOrigin.Generation <= 2 && generation > 2)
         // {
@@ -169,18 +169,18 @@ public class PkmConvertService
         return destPkm;
     }
 
-    private static PKM GetIntermediatePkmConvert(PKM sourcePkm, PkmEntity pkmEntity, uint generation)
+    private static PKM GetIntermediatePkmConvert(PKM sourcePkm, PkmEntity pkmEntity, uint generation, uint? intermediatePid)
     {
         // G1-2 to G3+
         if (sourcePkm.Generation <= 2 && generation > 2)
         {
-            return GetIntermediateConvertG2ToG3(sourcePkm, pkmEntity, generation);
+            return GetIntermediateConvertG2ToG3(sourcePkm, pkmEntity, generation, intermediatePid);
         }
 
         return sourcePkm;
     }
 
-    private static PKM GetIntermediateConvertG2ToG3(PKM sourcePkm, PkmEntity pkmEntity, uint generation)
+    private static PKM GetIntermediateConvertG2ToG3(PKM sourcePkm, PkmEntity pkmEntity, uint generation, uint? intermediatePid)
     {
         var pkmIntermediate = EntityConverter.ConvertToType(sourcePkm, new PK3().GetType(), out var intermediateResult);
         Console.WriteLine($"Convert-intermediate result={intermediateResult}");
@@ -196,13 +196,22 @@ public class PkmConvertService
         //     pkmIntermediateHLang.HandlingTrainerLanguage = (byte)LanguageID.French;
         // }
 
-        if (sourcePkm.IsShiny)
+        // allow to keep same generated PID between memory => file loaders
+        // because PID is randomly generated
+        if (intermediatePid != null)
         {
-            CommonEdits.SetShiny(pkmIntermediate, Shiny.Random);
+            pkmIntermediate.PID = (uint)intermediatePid;
         }
         else
         {
-            pkmIntermediate.SetPIDGender(sourcePkm.Gender);
+            if (sourcePkm.IsShiny)
+            {
+                CommonEdits.SetShiny(pkmIntermediate, Shiny.Random);
+            }
+            else
+            {
+                pkmIntermediate.SetPIDGender(sourcePkm.Gender);
+            }
         }
 
         // var convertIV = (int ivValue) => ivValue * 2 + (ivValue % 2);
@@ -346,22 +355,7 @@ public class PkmConvertService
 
     public static void PassDynamicsToPkm(PKM sourcePkm, PKM destPkm, PkmEntity pkmEntity, uint generation)
     {
-        destPkm.IsNicknamed = sourcePkm.IsNicknamed;
-        destPkm.Nickname = pkmEntity.Nickname;
-
-        if (generation <= 2)
-        {
-            StringConverter.SetString(
-                destPkm.NicknameTrash,
-                (ReadOnlySpan<char>)pkmEntity.Nickname,
-                destPkm.TrashCharCountNickname,
-                StringConverterOption.None,
-                (byte)generation,
-                false,
-                false,
-                (int)LanguageID.French
-            );
-        }
+        ApplyNicknameToPkm(destPkm, generation, pkmEntity.Nickname);
 
         destPkm.CurrentLevel = sourcePkm.CurrentLevel;
         destPkm.EXP = sourcePkm.EXP;
@@ -384,37 +378,90 @@ public class PkmConvertService
             convertEVFn(sourcePkm.EV_SPA),
             convertEVFn(sourcePkm.EV_SPD),
         ];
-        destPkm.SetEVs(evs);
+
+        ApplyEVsToPkm(destPkm, evs);
     }
 
     public static void PassHeldItemToPkm(PKM sourcePkm, PKM destPkm)
     {
-        if (sourcePkm.HeldItem == 0)
+        // if (sourcePkm.HeldItem == 0)
+        // {
+        //     return;
+        // }
+
+        // int GetHeldItem()
+        // {
+        //     var item = ItemConverter.GetItemForFormat(sourcePkm.HeldItem, sourcePkm.Context, destPkm.Context);
+        //     if (item > 0)
+        //     {
+        //         return item;
+        //     }
+
+        //     var originSrc = GameInfo.Sources.GetItemDataSource(sourcePkm.Version, sourcePkm.Context, [], true)
+        //     .Find(item => item.Value == sourcePkm.HeldItem);
+        //     if (originSrc == default)
+        //     {
+        //         return 0;
+        //     }
+
+        //     var intermediateSrc = GameInfo.Sources.GetItemDataSource(destPkm.Version, destPkm.Context, [], true)
+        //     .Find(item => item.Text == originSrc.Text);
+        //     if (intermediateSrc == default)
+        //     {
+        //         return 0;
+        //     }
+
+        //     return intermediateSrc.Value;
+        // }
+
+        // var heldItem = GetHeldItem();
+
+        // var stringsFr = GameInfo.GetStrings("fr");
+        // var txtExists = stringsFr.GetItemStrings(destPkm.Context, destPkm.Version).Length > heldItem;
+
+        destPkm.ApplyHeldItem(sourcePkm.HeldItem, sourcePkm.Context);
+
+        // destPkm.HeldItem = txtExists ? heldItem : 0;
+
+        Console.WriteLine($"HELD-ITEM = {destPkm.HeldItem}");
+    }
+
+    public static void ApplyNicknameToPkm(PKM pkm, uint generation, string nickname)
+    {
+        if (nickname.Length > pkm.MaxStringLengthNickname)
         {
-            return;
+            nickname = nickname[..pkm.MaxStringLengthNickname];
         }
 
-        destPkm.HeldItem = ItemConverter.GetItemForFormat(sourcePkm.HeldItem, sourcePkm.Context, destPkm.Context);
-        if (destPkm.HeldItem > 0)
+        pkm.IsNicknamed = SpeciesName.IsNicknamed(pkm.Species, nickname, pkm.Language, (byte)generation);
+        pkm.Nickname = nickname;
+
+        if (generation <= 2)
         {
-            return;
+            // TODO nickname update not working for G2
+            StringConverter.SetString(
+                pkm.NicknameTrash,
+                (ReadOnlySpan<char>)nickname,
+                pkm.TrashCharCountNickname,
+                StringConverterOption.None,
+                (byte)generation,
+                false,
+                false,
+                (int)LanguageID.French
+            );
         }
 
-        var originSrc = GameInfo.Sources.GetItemDataSource(sourcePkm.Version, sourcePkm.Context, [], true)
-        .Find(item => item.Value == sourcePkm.HeldItem);
-        if (originSrc == default)
-        {
-            return;
-        }
+        Console.WriteLine($"NICKNAME: {pkm.Nickname}");
+    }
 
-        var intermediateSrc = GameInfo.Sources.GetItemDataSource(destPkm.Version, destPkm.Context, [], true)
-        .Find(item => item.Text == originSrc.Text);
-        if (intermediateSrc == default)
-        {
-            return;
-        }
+    public static void ApplyEVsToPkm(PKM pkm, Span<int> evs)
+    {
+        pkm.SetEVs(evs);
+    }
 
-        destPkm.HeldItem = intermediateSrc.Value;
+    public static void ApplyMovesToPkm(PKM pkm, Span<ushort> moves)
+    {
+        pkm.SetMoves(moves);
     }
 
     private static int ConvertEVG2ToG3(float evValue)

@@ -157,8 +157,8 @@ export const Storage: React.FC = () => {
             overData.storageType === "main"
           ) {
             const result = await mainMovePkmMutation.mutateAsync({
+              pkmId: activeData.pkmId,
               params: {
-                pkmId: activeData.pkmId,
                 boxId: overData.boxId,
                 boxSlot: overData.boxSlot,
               },
@@ -172,8 +172,8 @@ export const Storage: React.FC = () => {
           ) {
             const result = await saveMovePkmMutation.mutateAsync({
               saveId,
+              pkmId: activeData.pkmId,
               params: {
-                pkmId: activeData.pkmId,
                 boxId: overData.boxId,
                 boxSlot: overData.boxSlot,
               },
@@ -249,6 +249,7 @@ export const Storage: React.FC = () => {
           }}
         >
           <StorageDetails
+            key={selected.id}
             type={selected.type}
             id={selected.id}
             saveId={saveId}
