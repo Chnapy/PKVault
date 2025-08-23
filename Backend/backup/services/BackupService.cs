@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.IO.Compression;
 using System.Text.Json;
@@ -11,13 +12,29 @@ public class BackupService
 
     private static string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
 
-    public static DateTime CreateBackup()
+    public static async Task<DateTime> CreateBackup()
     {
+        Stopwatch sw = new();
+
+        sw.Start();
+
+        Console.WriteLine($"Create backup - start");
+
+        var loaders = (await DataFileLoader.Create()).loaders;
+
         PrepareBkpDir();
 
-        var dbPaths = CreateDbBackup();
+        Console.WriteLine($"Create backup - DB");
+
+        var dbPaths = CreateDbBackup(loaders);
+
+        Console.WriteLine($"Create backup - Saves");
+
         var savesPaths = CreateSavesBackup();
-        var mainPaths = CreateMainBackup();
+
+        Console.WriteLine($"Create backup - Storage");
+
+        var mainPaths = CreateMainBackup(loaders);
 
         var paths = new Dictionary<string, string>()
             .Concat(dbPaths)
@@ -31,7 +48,15 @@ public class BackupService
             JsonSerializer.Serialize(paths)
         );
 
-        return Compress();
+        Console.WriteLine($"Create backup - Compress");
+
+        var dateTime = Compress();
+
+        sw.Stop();
+
+        Console.WriteLine($"Create backup - Done in {sw.Elapsed} !");
+
+        return dateTime;
     }
 
     private static void PrepareBkpDir()
@@ -52,14 +77,13 @@ public class BackupService
         Directory.CreateDirectory(bkpMainDirPath);
     }
 
-    private static Dictionary<string, string> CreateDbBackup()
+    private static Dictionary<string, string> CreateDbBackup(DataEntityLoaders loaders)
     {
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
 
-        var loaders = new DataFileLoader().loaders;
-        var boxes = loaders.boxLoader.GetAllEntities();
-        var pkms = loaders.pkmLoader.GetAllEntities();
-        var pkmVersions = loaders.pkmVersionLoader.GetAllEntities();
+        var boxEntities = loaders.boxLoader.GetAllEntities();
+        var pkmEntities = loaders.pkmLoader.GetAllEntities();
+        var pkmVersionEntities = loaders.pkmVersionLoader.GetAllEntities();
 
         var boxPath = Path.Combine(Settings.dbDir, "box.json");
         var pkmPath = Path.Combine(Settings.dbDir, "pkm.json");
@@ -69,17 +93,18 @@ public class BackupService
         var relativePkmPath = Path.Combine("db", "pkm.json");
         var relativePkmVersionPath = Path.Combine("db", "pkm-version.json");
 
+        // TODO part not safe, if data written is wrong, restore can break up whole app
         File.WriteAllText(
             Path.Combine(bkpTmpDirPath, relativeBoxPath),
-            JsonSerializer.Serialize(boxes)
+            JsonSerializer.Serialize(boxEntities)
         );
         File.WriteAllText(
             Path.Combine(bkpTmpDirPath, relativePkmPath),
-            JsonSerializer.Serialize(pkms)
+            JsonSerializer.Serialize(pkmEntities)
         );
         File.WriteAllText(
             Path.Combine(bkpTmpDirPath, relativePkmVersionPath),
-            JsonSerializer.Serialize(pkmVersions)
+            JsonSerializer.Serialize(pkmVersionEntities)
         );
 
         return new()
@@ -125,20 +150,19 @@ public class BackupService
         return paths;
     }
 
-    private static Dictionary<string, string> CreateMainBackup()
+    private static Dictionary<string, string> CreateMainBackup(DataEntityLoaders loaders)
     {
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
         var bkpMainDirPath = Path.Combine(bkpTmpDirPath, "main");
 
-        var loaders = new DataFileLoader().loaders;
-        var pkmVersions = loaders.pkmVersionLoader.GetAllEntities();
+        var pkmVersions = loaders.pkmVersionLoader.GetAllDtos();
 
         var paths = new Dictionary<string, string>();
 
         pkmVersions.ForEach(pkmVersion =>
         {
-            var filename = Path.GetFileName(pkmVersion.Filepath);
-            var dirname = new DirectoryInfo(Path.GetDirectoryName(pkmVersion.Filepath)!).Name;
+            var filename = Path.GetFileName(pkmVersion.PkmVersionEntity.Filepath);
+            var dirname = new DirectoryInfo(Path.GetDirectoryName(pkmVersion.PkmVersionEntity.Filepath)!).Name;
             var relativeDirPath = Path.Combine("main", dirname);
             var dirPath = Path.Combine(bkpTmpDirPath, relativeDirPath);
 
@@ -146,11 +170,11 @@ public class BackupService
 
             var newPath = Path.Combine(dirPath, filename);
 
-            Console.WriteLine(newPath);
+            // Console.WriteLine(newPath);
 
-            File.Copy(pkmVersion.Filepath, newPath);
+            File.Copy(pkmVersion.PkmVersionEntity.Filepath, newPath);
 
-            paths.Add(Path.Combine(relativeDirPath, filename), pkmVersion.Filepath);
+            paths.Add(Path.Combine(relativeDirPath, filename), pkmVersion.PkmVersionEntity.Filepath);
         });
 
         return paths;
@@ -234,17 +258,21 @@ public class BackupService
         File.Delete(bkpZipPath);
     }
 
-    public static void RestoreBackup(DateTime createdAt)
+    public static async Task RestoreBackup(DateTime createdAt)
     {
         var fileName = GetBackupFilename(createdAt);
 
-        Console.WriteLine($"Restore backup {fileName}");
+        Console.WriteLine($"Backup restore {fileName}");
 
         var bkpZipPath = Path.Combine(bkpPath, fileName);
         if (!File.Exists(bkpZipPath))
         {
             throw new Exception($"File does not exist: {bkpZipPath}");
         }
+
+        Stopwatch sw = new();
+
+        sw.Start();
 
         using var archive = ZipFile.OpenRead(bkpZipPath);
 
@@ -262,8 +290,8 @@ public class BackupService
             File.ReadAllText(bkpTmpPathsPath)
         );
 
-        // manual backup, no use or PrepareBackupThenRun to avoid infinite loop
-        CreateBackup();
+        // manual backup, no use of PrepareBackupThenRun to avoid infinite loop
+        await CreateBackup();
 
         foreach (var entry in archive.Entries)
         {
@@ -277,28 +305,42 @@ public class BackupService
             }
         }
 
-        LocalSaveService.ResetTimerAndData();
-
-        StorageService.ResetDataLoader();
-
         File.Delete(bkpTmpPathsPath);
+
+        sw.Stop();
+
+        Console.WriteLine($"Backup restore finished in {sw.Elapsed}");
+
+        await LocalSaveService.ResetTimerAndData();
+
+        await StorageService.ResetDataLoader();
     }
 
     public static async Task PrepareBackupThenRun(Func<Task> action)
     {
-        var bkpDateTime = CreateBackup();
+        var bkpDateTime = await CreateBackup();
 
         try
         {
+            Stopwatch sw = new();
+
+            Console.WriteLine($"Action run with backup fallback");
+
+            sw.Start();
+
             await action();
 
-            StorageService.ResetDataLoader();
+            sw.Stop();
 
-            WarningsService.CheckWarnings();
+            Console.WriteLine($"Action finished in {sw.Elapsed}");
+
+            await StorageService.ResetDataLoader();
+
+            await WarningsService.CheckWarnings();
         }
         catch
         {
-            RestoreBackup(bkpDateTime);
+            await RestoreBackup(bkpDateTime);
 
             throw;
         }

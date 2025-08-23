@@ -1,15 +1,15 @@
 using PKHeX.Core;
 
-public class SaveBoxLoader : EntityLoader<BoxDTO>
+public class SaveBoxLoader : EntityLoader<BoxDTO, object>
 {
-    private SaveFile save;
+    private readonly SaveFile save;
 
     public SaveBoxLoader(SaveFile _save)
     {
         save = _save;
     }
 
-    public override List<BoxDTO> GetAllEntities()
+    public override List<BoxDTO> GetAllDtos()
     {
         var boxes = new List<BoxDTO>();
 
@@ -17,10 +17,12 @@ public class SaveBoxLoader : EntityLoader<BoxDTO>
         {
             boxes.Add(new BoxDTO
             {
-                Id = BoxDTO.PARTY_ID.ToString(),
                 Type = BoxType.Party,
-                Name = "Party",
-                CanReceivePkm = true,
+                BoxEntity = new()
+                {
+                    Id = BoxDTO.PARTY_ID.ToString(),
+                    Name = "Party",
+                }
             });
         }
 
@@ -28,10 +30,12 @@ public class SaveBoxLoader : EntityLoader<BoxDTO>
         {
             boxes.Add(new BoxDTO
             {
-                Id = BoxDTO.DAYCARE_ID.ToString(),
                 Type = BoxType.Daycare,
-                Name = "Daycare",
-                CanReceivePkm = false,
+                BoxEntity = new()
+                {
+                    Id = BoxDTO.DAYCARE_ID.ToString(),
+                    Name = "Daycare",
+                }
             });
         }
 
@@ -40,16 +44,19 @@ public class SaveBoxLoader : EntityLoader<BoxDTO>
         {
             boxes.Add(new BoxDTO
             {
-                Id = i.ToString(),
                 Type = BoxType.Default,
-                Name = boxesNames[i]
+                BoxEntity = new()
+                {
+                    Id = i.ToString(),
+                    Name = boxesNames[i],
+                }
             });
         }
 
         return boxes;
     }
 
-    public override BoxDTO WriteEntity(BoxDTO entity)
+    public override async Task<BoxDTO> WriteDto(BoxDTO entity)
     {
         if (entity.Type != BoxType.Default)
         {
@@ -59,17 +66,18 @@ public class SaveBoxLoader : EntityLoader<BoxDTO>
         if (save is IBoxDetailName saveBoxName)
         {
             saveBoxName.SetBoxName(entity.IdInt, entity.Name);
+            HasWritten = true;
         }
 
         return entity;
     }
 
-    public override BoxDTO? DeleteEntity(string id)
+    public override void DeleteDto(string id)
     {
         throw new Exception($"Not implemented");
     }
 
-    public override void SetAllEntities(List<BoxDTO> entities)
+    public override Task SetAllDtos(List<BoxDTO> entities)
     {
         throw new Exception($"Not implemented");
     }

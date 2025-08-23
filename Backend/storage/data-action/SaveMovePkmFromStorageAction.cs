@@ -32,56 +32,51 @@ public class SaveMovePkmFromStorageAction : DataAction
 
     public override async Task Execute(DataEntityLoaders loaders)
     {
-        var saveLoaders = loaders.getSaveLoaders(saveId);
+        var saveLoaders = loaders.saveLoadersDict[saveId];
 
-        var pkmVersionEntity = loaders.pkmVersionLoader.GetEntity(pkmVersionId);
+        var pkmVersionDto = loaders.pkmVersionLoader.GetDto(pkmVersionId);
 
-        if (pkmVersionEntity == default)
+        if (pkmVersionDto == default)
         {
             throw new Exception($"PkmVersionEntity not found for id={pkmVersionId}");
         }
 
-        if (pkmVersionEntity.Generation != saveLoaders.Save.Generation)
+        if (pkmVersionDto.Generation != saveLoaders.Save.Generation)
         {
-            throw new Exception($"PkmVersionEntity Generation not compatible with save for id={pkmVersionId}, generation={pkmVersionEntity.Generation}, save.generation={saveLoaders.Save.Generation}");
+            throw new Exception($"PkmVersionEntity Generation not compatible with save for id={pkmVersionId}, generation={pkmVersionDto.Generation}, save.generation={saveLoaders.Save.Generation}");
         }
 
         // get save-pkm
-        var savePkm = saveLoaders.Pkms.GetEntity(pkmVersionEntity.Id);
+        var savePkm = saveLoaders.Pkms.GetDto(pkmVersionDto.Id);
         if (savePkm != default)
         {
             throw new Exception($"SavePkm already exists, id={savePkm.Id} {savePkm.Nickname}");
         }
 
-        var existingSlot = saveLoaders.Pkms.GetAllEntities().Find(entity => entity.Box == saveBoxId && entity.BoxSlot == saveSlot);
+        var existingSlot = saveLoaders.Pkms.GetAllDtos().Find(entity => entity.Box == saveBoxId && entity.BoxSlot == saveSlot);
         if (existingSlot != default)
         {
             throw new Exception($"SavePkm already exists in given box slot, box={saveBoxId}, slot={saveSlot}");
         }
 
-        var pkmEntity = loaders.pkmLoader.GetEntity(pkmVersionEntity.PkmId)!;
-        if (pkmEntity.SaveId != default)
+        var pkmDto = pkmVersionDto.PkmDto;
+        if (pkmDto.SaveId != default)
         {
-            throw new Exception($"PkmEntity already in save, id={pkmEntity.Id}, saveId={pkmEntity.SaveId}");
+            throw new Exception($"PkmEntity already in save, id={pkmDto.Id}, saveId={pkmDto.SaveId}");
         }
 
-        var pkmBytes = loaders.pkmFileLoader.GetEntity(pkmVersionEntity);
-        var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity, pkmEntity);
-        if (pkm == default)
-        {
-            throw new Exception($"PKM not defined, pkm-version={pkmVersionEntity.Id}");
-        }
+        var pkm = pkmVersionDto.Pkm;
 
-        var pkmSaveDTO = PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxId, saveSlot, loaders.pkmLoader, loaders.pkmVersionLoader);
+        var pkmSaveDTO = await PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxId, saveSlot, loaders.pkmLoader, loaders.pkmVersionLoader);
 
         // enable national-dex in G3 if pkm outside of regional-dex
         if (saveLoaders.Save is SAV3 saveG3 && !saveG3.NationalDex)
         {
             var hoennDex = await PokeApi.GetPokedex(PokeApiPokedexEnum.HOENN);
             // Console.WriteLine(hoennDex.name);
-            var isInDex = hoennDex.pokemon_entries.Any(entry =>
+            var isInDex = hoennDex.PokemonEntries.Any(entry =>
             {
-                var url = entry.pokemon_species.url;
+                var url = entry.PokemonSpecies.Url;
                 var id = int.Parse(url.TrimEnd('/').Split('/')[^1]);
 
                 return id == pkm.Species;
@@ -93,9 +88,14 @@ public class SaveMovePkmFromStorageAction : DataAction
             }
         }
 
-        saveLoaders.Pkms.WriteEntity(pkmSaveDTO);
+        await saveLoaders.Pkms.WriteDto(pkmSaveDTO);
 
-        pkmEntity.SaveId = saveLoaders.Save.ID32;
-        loaders.pkmLoader.WriteEntity(pkmEntity);
+        pkmDto.Save = saveLoaders.Save;
+        await loaders.pkmLoader.WriteDto(pkmDto);
+
+        if (pkmSaveDTO.GetAttachedPkmVersion() == null)
+        {
+            throw new Exception($"pkmSaveDTO.PkmVersionId is null, should be {pkmSaveDTO.Id}");
+        }
     }
 }

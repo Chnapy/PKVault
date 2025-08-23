@@ -1,228 +1,385 @@
 
 using PKHeX.Core;
+using PKHeX.Core.Searching;
+using PokeApiNet;
 
 public abstract class BasePkmVersionDTO : IWithId<string>
 {
-    public static void FillDTO(BasePkmVersionDTO dto, PKM pkm)
+    public string Id { get { return GetPKMId(Pkm); } }
+
+    public uint Generation { get { return GetGeneration(); } }
+
+    public GameVersion Version
     {
-        int[] ivs = [
-            pkm.IV_HP,
-            pkm.IV_ATK,
-            pkm.IV_DEF,
-            pkm.IV_SPA,
-            pkm.IV_SPD,
-            pkm.IV_SPE,
-        ];
-
-        int[] evs = [
-            pkm.EV_HP,
-            pkm.EV_ATK,
-            pkm.EV_DEF,
-            pkm.EV_SPA,
-            pkm.EV_SPD,
-            pkm.EV_SPE,
-        ];
-
-        pkm.SetStats(pkm.GetStats(pkm.PersonalInfo));
-        int[] stats = [
-            pkm.Stat_HPMax,
-            pkm.Stat_ATK,
-            pkm.Stat_DEF,
-            pkm.Stat_SPA,
-            pkm.Stat_SPD,
-            pkm.Stat_SPE,
-        ];
-
-        HiddenPower.TryGetTypeIndex(pkm.HPType, out var hptype);
-
-        if (pkm.HeldItem != 0)
-        {
-            // if (pkm.Nickname == "RAGEUX")
-            // {
-            //     Console.WriteLine($"TOTO");
-            //     Console.WriteLine($"TOTO {pkm.Context.Generation()} {pkm.Version} {pkm.HeldItem}");
-            //     Console.WriteLine($"TOTO");
-            // }
-
-            var stringsFr = GameInfo.GetStrings("fr");
-            var heldItemText = stringsFr.GetItemStrings(pkm.Context, pkm.Version)[pkm.HeldItem];
-
-            // var bar = GameInfo.Sources.GetItemDataSource(pkm.Version, pkm.Context, [], true);
-            // var item = bar.Find(item => item.Value == pkm.HeldItem);
-
-            // Console.WriteLine($"Item {pkm.Nickname} {pkm.Version} {pkm.Context} {pkm.HeldItem} {pkm.SpriteItem} {heldItemText}");
-
-            dto.HeldItem = pkm.HeldItem;
-            dto.SpriteItem = pkm.SpriteItem;
-            dto.HeldItemText = heldItemText;
-        }
-
-        var legality = new LegalityAnalysis(pkm);
-
-        var moveComboSource = new LegalMoveComboSource();
-        var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
-
-        moveSource.ChangeMoveSource(GameInfo.MoveDataSource);
-        moveSource.ReloadMoves(legality);
-
-        List<MoveSourceType> moveSourceTypes = [
-            MoveSourceType.LevelUp,
-            MoveSourceType.RelearnMoves,
-            MoveSourceType.Machine,
-            MoveSourceType.TypeTutor,
-            MoveSourceType.SpecialTutor,
-            MoveSourceType.EnhancedTutor,
-            MoveSourceType.SharedEggMove,
-            MoveSourceType.TechnicalRecord,
-            MoveSourceType.Evolve,
-        ];
-
-        var moveSourceTypesRecord = new Dictionary<MoveSourceType, bool[]>();
-        moveSourceTypes.ForEach(type =>
-        {
-            moveSourceTypesRecord.Add(type, LearnPossible.Get(pkm, legality.EncounterOriginal, legality.Info.EvoChainsAllGens, type));
-        });
-
-        var movesStr = GameInfo.GetStrings("fr").movelist;
-
-        var rawMoves = new List<ushort>(){
-            pkm.Move1,
-            pkm.Move2,
-            pkm.Move3,
-            pkm.Move4
-        };
-        var moves = rawMoves.Select(id => new MoveItem
-        {
-            Id = id,
-            Type = MoveInfo.GetType(id, pkm.Context),
-            Text = movesStr[id],
-            SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Count() > id && moveSourceTypesRecord[type][id]),
-        }).ToList();
-
-        var availableMoves = new List<MoveItem>();
-
-        moveComboSource.DataSource.ToList().ForEach(data =>
-        {
-            var types = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Count() > data.Value && moveSourceTypesRecord[type][data.Value]);
-
-            if (moveSource.Info.CanLearn((ushort)data.Value))
-            {
-                var item = new MoveItem
-                {
-                    Id = data.Value,
-                    Type = MoveInfo.GetType((ushort)data.Value, pkm.Context),
-                    Text = movesStr[data.Value],
-                    SourceTypes = types,
-                };
-                availableMoves.Add(item);
-
-                // Console.WriteLine($"{data.Value} - {data.Text} / {movesStr[data.Value]} - {eggMoves.ToList().FindAll(v => v).Count()} - {string.Join(',', types)}");
-            }
-        });
-
-        dto.Version = pkm.Version;
-        dto.PID = pkm.PID;
-        dto.Species = pkm.Species;
-        dto.Nickname = pkm.Nickname;
-        dto.IsEgg = pkm.IsEgg;
-        dto.IsShiny = pkm.IsShiny;
-        dto.Ball = pkm.Ball;
-        dto.Gender = pkm.Gender;
-        dto.Level = pkm.CurrentLevel;
-        dto.Exp = pkm.EXP;
-        dto.IVs = ivs;
-        dto.EVs = evs;
-        dto.Stats = stats;//pkm.GetStats(pkm.PersonalInfo); ;
-        dto.HiddenPowerType = hptype + 1;
-        dto.HiddenPowerPower = pkm.HPPower;
-        dto.Nature = pkm.Generation > 2 ? pkm.Nature : null;
-        dto.Ability = pkm.Ability == -1 ? null : pkm.Ability;
-        dto.Moves = moves;
-        dto.TID = pkm.TID16;
-        dto.OriginTrainerName = pkm.OriginalTrainerName;
-        dto.OriginTrainerGender = pkm.OriginalTrainerGender;
-        dto.OriginMetDate = pkm.MetDate;
-        dto.OriginMetLocation = GameInfo.GetStrings("fr").GetLocationName(pkm.WasEgg, pkm.MetLocation, pkm.Format, pkm.Generation, pkm.Version);
-        dto.OriginMetLevel = pkm.MetLevel == 0 ? null : pkm.MetLevel;
-        dto.NicknameMaxLength = pkm.MaxStringLengthNickname;
-        dto.AvailableMoves = availableMoves;
-        dto.IsValid = legality.Parsed && pkm.Valid;
-        dto.ValidityReport = legality.Report();
+        get { return Pkm.Version; }
     }
 
-    public string Id { get; set; }
+    public EntityContext Context
+    {
+        get { return Pkm.Context; }
+    }
 
-    public uint Generation { get; set; }
+    public uint PID
+    {
+        get { return Pkm.PID; }
+    }
 
-    public GameVersion Version { get; set; }
+    public bool IsNicknamed { get => Pkm.IsNicknamed; }
 
-    public uint PID { get; set; }
+    public string Nickname
+    {
+        get { return Pkm.Nickname; }
+    }
 
-    public string Nickname { get; set; }
+    public ushort Species
+    {
+        get { return Pkm.Species; }
+    }
 
-    public ushort Species { get; set; }
+    public bool IsEgg
+    {
+        get { return Pkm.IsEgg; }
+    }
 
-    public bool IsEgg { get; set; }
+    public bool IsShiny
+    {
+        get { return Pkm.IsShiny; }
+    }
 
-    public bool IsShiny { get; set; }
+    public byte Ball
+    {
+        get { return Pkm.Ball; }
+    }
 
-    public byte Ball { get; set; }
+    public byte Gender
+    {
+        get { return Pkm.Gender; }
+    }
 
-    public byte Gender { get; set; }
+    public byte Level
+    {
+        get { return Pkm.CurrentLevel; }
+    }
 
-    public byte Level { get; set; }
+    public uint Exp
+    {
+        get { return Pkm.EXP; }
+    }
 
-    public uint Exp { get; set; }
-
-    public int[] IVs { get; set; }
-
-    public int[] EVs { get; set; }
-
-    public int[] Stats { get; set; }
-
-    public int HiddenPowerType { get; set; }
-
-    public int HiddenPowerPower { get; set; }
-
-    public Nature? Nature { get; set; }
-
-    public int? Ability { get; set; }
-
-    public List<MoveItem> Moves { get; set; }
-
-    public ushort TID { get; set; }
-
-    public string OriginTrainerName { get; set; }
-
-    public byte OriginTrainerGender { get; set; }
-
-    public DateOnly? OriginMetDate { get; set; }
-
-    public string OriginMetLocation { get; set; }
-
-    public byte? OriginMetLevel { get; set; }
-
-    public int? HeldItem { get; set; }
-
-    public int? SpriteItem { get; set; }
-
-    public string? HeldItemText { get; set; }
-
-    public string DynamicChecksum
+    public int[] IVs
     {
         get
         {
-            return $"{Nickname}.{Level}.{Exp}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}";
+            return [
+                Pkm.IV_HP,
+                Pkm.IV_ATK,
+                Pkm.IV_DEF,
+                Pkm.IV_SPA,
+                Pkm.IV_SPD,
+                Pkm.IV_SPE,
+            ];
         }
     }
 
-    public int NicknameMaxLength { get; set; }
+    public int[] EVs
+    {
+        get
+        {
+            return [
+                Pkm.EV_HP,
+                Pkm.EV_ATK,
+                Pkm.EV_DEF,
+                Pkm.EV_SPA,
+                Pkm.EV_SPD,
+                Pkm.EV_SPE,
+            ];
+        }
+    }
 
-    public List<MoveItem> AvailableMoves { get; set; }
+    public int[] Stats
+    {
+        get
+        {
+            Pkm.SetStats(Pkm.GetStats(Pkm.PersonalInfo));
 
-    public bool IsValid { get; set; }
+            return [
+                Pkm.Stat_HPMax,
+                Pkm.Stat_ATK,
+                Pkm.Stat_DEF,
+                Pkm.Stat_SPA,
+                Pkm.Stat_SPD,
+                Pkm.Stat_SPE,
+            ];
+        }
+    }
 
-    public string ValidityReport { get; set; }
+    public int HiddenPowerType
+    {
+        get
+        {
+            HiddenPower.TryGetTypeIndex(Pkm.HPType, out var hptype);
+            return hptype + 1;
+        }
+    }
+
+    public int HiddenPowerPower
+    {
+        get { return Pkm.HPPower; }
+    }
+
+    // TODO use pokeapi nature ?
+    public PKHeX.Core.Nature? Nature
+    {
+        get { return Pkm.Format > 2 ? Pkm.Nature : null; }
+    }
+
+    public int? Ability
+    {
+        get { return Pkm.Ability == -1 ? null : Pkm.Ability; }
+    }
+
+    public List<MoveItem> Moves
+    {
+        get
+        {
+            var legality = new LegalityAnalysis(Pkm);
+
+            List<MoveSourceType> moveSourceTypes = [
+                MoveSourceType.LevelUp,
+                MoveSourceType.RelearnMoves,
+                MoveSourceType.Machine,
+                MoveSourceType.TypeTutor,
+                MoveSourceType.SpecialTutor,
+                MoveSourceType.EnhancedTutor,
+                MoveSourceType.SharedEggMove,
+                MoveSourceType.TechnicalRecord,
+                MoveSourceType.Evolve,
+            ];
+
+            var moveSourceTypesRecord = new Dictionary<MoveSourceType, bool[]>();
+            moveSourceTypes.ForEach(type =>
+            {
+                moveSourceTypesRecord.Add(type, LearnPossible.Get(Pkm, legality.EncounterOriginal, legality.Info.EvoChainsAllGens, type));
+            });
+
+            var movesStr = GameInfo.GetStrings("fr").movelist;
+
+            var rawMoves = new List<ushort>{
+                Pkm.Move1,
+                Pkm.Move2,
+                Pkm.Move3,
+                Pkm.Move4
+            };
+
+            return [.. rawMoves.Select(id => new MoveItem
+            {
+                Id = id,
+                Type = MoveInfo.GetType(id, Pkm.Context),
+                Text = movesStr[id],
+                SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Count() > id && moveSourceTypesRecord[type][id]),
+            })];
+        }
+    }
+
+    public ushort TID
+    {
+        get { return Pkm.TID16; }
+    }
+
+    public string OriginTrainerName
+    {
+        get { return Pkm.OriginalTrainerName; }
+    }
+
+    public byte OriginTrainerGender
+    {
+        get { return Pkm.OriginalTrainerGender; }
+    }
+
+    public DateOnly? OriginMetDate
+    {
+        get { return Pkm.MetDate; }
+    }
+
+    public string OriginMetLocation
+    {
+        get { return GameInfo.GetStrings("fr").GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version); }
+    }
+
+    public byte? OriginMetLevel { get { return Pkm.MetLevel == 0 ? null : Pkm.MetLevel; } }
+
+    public int HeldItem
+    {
+        get { return ItemConverter.GetItemForFormat(Pkm.HeldItem, Pkm.Context, EntityContext.Gen9); }
+    }
+
+    public int? SpriteItem
+    {
+        get
+        {
+            if (Pkm.HeldItem == 0)
+            {
+                return null;
+            }
+            return Pkm.SpriteItem;
+        }
+    }
+
+    public string? HeldItemText
+    {
+        get
+        {
+            if (Pkm.HeldItem == 0)
+            {
+                return null;
+            }
+            var stringsFr = GameInfo.GetStrings("fr");
+            return stringsFr.GetItemStrings(Pkm.Context, Pkm.Version)[Pkm.HeldItem];
+        }
+    }
+
+    public string DynamicChecksum
+    {
+        get { return $"{Nickname}.{Level}.{Exp}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}"; }
+    }
+
+    public int NicknameMaxLength
+    {
+        get { return Pkm.MaxStringLengthNickname; }
+    }
+
+    public List<MoveItem> AvailableMoves
+    {
+        get
+        {
+            var legality = new LegalityAnalysis(Pkm);
+
+            var moveComboSource = new LegalMoveComboSource();
+            var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
+
+            moveSource.ChangeMoveSource(GameInfo.MoveDataSource);
+            moveSource.ReloadMoves(legality);
+
+            List<MoveSourceType> moveSourceTypes = [
+                MoveSourceType.LevelUp,
+                MoveSourceType.RelearnMoves,
+                MoveSourceType.Machine,
+                MoveSourceType.TypeTutor,
+                MoveSourceType.SpecialTutor,
+                MoveSourceType.EnhancedTutor,
+                MoveSourceType.SharedEggMove,
+                MoveSourceType.TechnicalRecord,
+                MoveSourceType.Evolve,
+            ];
+
+            var moveSourceTypesRecord = new Dictionary<MoveSourceType, bool[]>();
+            moveSourceTypes.ForEach(type =>
+            {
+                moveSourceTypesRecord.Add(type, LearnPossible.Get(Pkm, legality.EncounterOriginal, legality.Info.EvoChainsAllGens, type));
+            });
+
+            var movesStr = GameInfo.GetStrings("fr").movelist;
+
+            var availableMoves = new List<MoveItem>();
+
+            moveComboSource.DataSource.ToList().ForEach(data =>
+            {
+                var types = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Count() > data.Value && moveSourceTypesRecord[type][data.Value]);
+
+                if (moveSource.Info.CanLearn((ushort)data.Value))
+                {
+                    var item = new MoveItem
+                    {
+                        Id = data.Value,
+                        Type = MoveInfo.GetType((ushort)data.Value, Pkm.Context),
+                        Text = movesStr[data.Value],
+                        SourceTypes = types,
+                    };
+                    availableMoves.Add(item);
+                }
+            });
+
+            return availableMoves;
+        }
+    }
+
+    public bool IsValid
+    {
+        get
+        {
+            var legality = new LegalityAnalysis(Pkm);
+            return legality.Parsed && Pkm.Valid;
+        }
+    }
+
+    public string ValidityReport { get { return new LegalityAnalysis(Pkm).Report(); } }
+
+    public abstract bool CanEvolve { get; }
+
+    public required PKM Pkm;
+
+    protected bool HasTradeEvolve;
+
+    protected abstract uint GetGeneration();
+
+    public static string GetPKMId(PKM pkm)
+    {
+        var hash = SearchUtil.HashByDetails(pkm);
+        var id = $"G{pkm.Format}{hash}";
+
+        return id;
+    }
+
+    public async Task RefreshHasTradeEvolve()
+    {
+        var evolvesByTrade = await GetTradeEvolveChains();
+
+        HasTradeEvolve = evolvesByTrade.Count > 0;
+    }
+
+    public async Task<List<ChainLink>> GetTradeEvolveChains()
+    {
+        var pokeapiSpeciesName = PokeApi.PokeApiNameFromPKHexName(GameInfo.Strings.Species[Species]);
+        var evolutionChain = await PokeApi.GetPokemonSpeciesEvolutionChain(
+            GameInfo.Strings.Species[Species]
+        );
+
+        ChainLink? getSpeciesEvolutionChain(ChainLink currentChain)
+        {
+            if (currentChain.Species.Name == pokeapiSpeciesName)
+            {
+                return currentChain;
+            }
+
+            foreach (var chain in currentChain.EvolvesTo)
+            {
+                var result = getSpeciesEvolutionChain(chain);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        var speciesChain = getSpeciesEvolutionChain(evolutionChain.Chain);
+
+        if (speciesChain == null)
+        {
+            return [];
+        }
+
+        var heldItemName = GameInfo.Strings.Item[HeldItem];
+        var heldItemPokeapiName = PokeApi.PokeApiNameFromPKHexName(heldItemName);
+
+        return speciesChain.EvolvesTo.FindAll(chain =>
+            chain.EvolutionDetails.Any(details =>
+                details.Trigger.Name == "trade"
+                && (details.HeldItem == null || details.HeldItem.Name == heldItemPokeapiName)
+            )
+        );
+    }
 }
 
 public struct MoveItem

@@ -1,85 +1,68 @@
-
-using System.Text.Json;
 using PKHeX.Core;
-using PKHeX.Core.Searching;
 
-public class PkmSaveDTO : BasePkmVersionDTO, ICloneable<PkmSaveDTO>
+public class PkmSaveDTO : BasePkmVersionDTO
 {
-    public static PkmSaveDTO FromPkm(SaveFile save, PKM pkm, int box, int boxSlot,
-    // List<PkmVersionEntity> pkmVersionEntities,
-    EntityLoader<PkmEntity> pkmLoader,
-    EntityLoader<PkmVersionEntity> pkmVersionLoader
-    // PKMFileLoader pkmFileLoader
+    public static async Task<PkmSaveDTO> FromPkm(SaveFile save, PKM pkm, int box, int boxSlot,
+        EntityLoader<PkmDTO, PkmEntity> pkmLoader,
+        EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionLoader
     )
     {
-        var id = GetPKMId(pkm, save.Generation);
-
         var dto = new PkmSaveDTO
         {
-            Id = id,
-            SaveId = save.ID32,
-            Generation = save.Generation,
-            IsShadow = pkm is IShadowCapture pkmShadow ? pkmShadow.IsShadow : false,
-            // BoxType = boxType,
+            Pkm = pkm,
+            Save = save,
             Box = box,
             BoxSlot = boxSlot,
-            Pkm = pkm
+            GetAttachedPkmVersion = () => null,
         };
 
-        FillDTO(dto, pkm);
-
-        var pkmVersion = pkmVersionLoader.GetEntity(id);
-        if (pkmVersion != default)
-        {
-            var mainPkm = pkmLoader.GetAllEntities().Find(pkm => pkm.Id == pkmVersion.PkmId);
-
-            if (mainPkm.SaveId == save.ID32)
+        dto.GetAttachedPkmVersion = () =>
             {
-                dto.PkmVersionId = pkmVersion.Id;
-            }
-        }
+                var pkmVersion = pkmVersionLoader.GetDto(dto.Id);
+                if (pkmVersion != null)
+                {
+                    var mainPkm = pkmLoader.GetDto(pkmVersion.PkmDto.Id);
 
-        dto.CanMoveToMainStorage = !dto.IsShadow && !dto.IsEgg;
+                    if (mainPkm.SaveId == save.ID32)
+                    {
+                        return pkmVersion;
+                    }
+                }
+                return null;
+            };
+
+        await dto.RefreshHasTradeEvolve();
 
         return dto;
     }
 
-    public static string GetPKMId(PKM pkm, uint generation)
-    {
-        var hash = SearchUtil.HashByDetails(pkm);
-        var id = $"G{generation}{hash}";
+    public uint SaveId { get { return Save.ID32; } }
 
-        return id;
+    public required int Box { get; set; }
+
+    public required int BoxSlot { get; set; }
+
+    public bool IsShadow { get { return Pkm is IShadowCapture pkmShadow && pkmShadow.IsShadow; } }
+
+    public string? PkmVersionId
+    {
+        get { return GetAttachedPkmVersion()?.Id; }
     }
 
-    public uint SaveId { get; set; }
-
-    // public BoxType BoxType { get; set; }
-
-    public int Box { get; set; }
-
-    public int BoxSlot { get; set; }
-
-    public bool IsShadow { get; set; }
-
-    public string? PkmVersionId { get; set; }
+    public required Func<PkmVersionDTO?> GetAttachedPkmVersion;
 
     // -- actions
 
     // public bool CanMoveInBox { get; set; }
 
-    public bool CanMoveToMainStorage { get; set; }
+    public bool CanMoveToMainStorage { get { return !IsShadow && !IsEgg; } }
 
-    public PKM Pkm;
+    public override bool CanEvolve { get => HasTradeEvolve && PkmVersionId == null; }
 
-    public PkmSaveDTO Clone()
+    public required SaveFile Save;
+
+    protected override uint GetGeneration()
     {
-        var clone = JsonSerializer.Deserialize<PkmSaveDTO>(
-            JsonSerializer.Serialize(this)
-        )!;
-
-        clone.Pkm = Pkm;
-
-        return clone;
+        return Save.Generation;
     }
 }

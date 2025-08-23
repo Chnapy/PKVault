@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public abstract class PKMLoader
 {
-    public static PKM CreatePKM(byte[] bytes, PkmVersionEntity pkmVersionEntity, PkmEntity pkmEntity)
+    public static PKM CreatePKM(byte[] bytes, PkmVersionEntity pkmVersionEntity)
     {
         // required !
         bytes = (byte[])bytes.Clone();
@@ -24,61 +24,30 @@ public abstract class PKMLoader
             };
         }
 
-        // TODO code duplication with MainCreatePkmVersionAction
-        if (pkmVersionEntity.Generation <= 2)
-        {
-            Console.WriteLine($"PKM G2 trash-bytes workaround");
-
-            pkm.OriginalTrainerName = pkmEntity.OTName;
-            pkm.Nickname = pkmEntity.Nickname;
-
-            StringConverter.SetString(
-                pkm.OriginalTrainerTrash,
-                (ReadOnlySpan<char>)pkmEntity.OTName,
-                pkm.TrashCharCountTrainer,
-                StringConverterOption.None,
-                (byte)pkmVersionEntity.Generation,
-                false,
-                false,
-                pkm.Language
-            );
-
-            StringConverter.SetString(
-                pkm.NicknameTrash,
-                (ReadOnlySpan<char>)pkmEntity.Nickname,
-                pkm.TrashCharCountNickname,
-                StringConverterOption.None,
-                (byte)pkmVersionEntity.Generation,
-                false,
-                false,
-                pkm.Language
-            );
-        }
-
         return pkm;
     }
 
     public static byte[] GetPKMBytes(PKM pkm)
     {
-        return pkm.Data;
+        return [.. pkm.DecryptedPartyData];
     }
 
-    public static string GetPKMFilepath(PKM pkm, uint generation)
+    public static string GetPKMFilepath(PKM pkm)
     {
-        return Path.Combine(Settings.mainPkmStoragePath, generation.ToString(), GetPKMFilename(pkm, generation));
+        return Path.Combine(Settings.mainPkmStoragePath, pkm.Format.ToString(), GetPKMFilename(pkm));
     }
 
-    private static string GetPKMFilename(PKM pkm, uint generation)
+    private static string GetPKMFilename(PKM pkm)
     {
         var star = pkm.IsShiny ? " ★" : string.Empty;
         var speciesName = GameInfo.Strings.Species[pkm.Species].ToUpperInvariant();
-        var id = PkmSaveDTO.GetPKMId(pkm, generation);
+        var id = BasePkmVersionDTO.GetPKMId(pkm);
         return $"{pkm.Species:0000}{star} - {speciesName} - {id}.{pkm.Extension}";
     }
 
-    public abstract byte[]? GetEntity(PkmVersionEntity pkmVersion);
+    public abstract byte[]? GetEntity(string filepath);
 
-    public abstract void DeleteEntity(PkmVersionEntity pkmVersion);
+    public abstract void DeleteEntity(string filepath);
 
-    public abstract string WriteEntity(byte[] bytes, PKM pkm, uint generation, string? expectedFilepath);
+    public abstract string WriteEntity(byte[] bytes, PKM pkm, string? expectedFilepath);
 }

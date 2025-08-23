@@ -75,6 +75,7 @@ export type StorageMainDetailsProps = {
 
   goToSavePkm?: () => void;
 
+  onEvolve?: () => void;
   onSynchronize?: () => void;
   onSaveCheck?: () => void;
   onDetach?: () => void;
@@ -138,6 +139,7 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
 
   // canMoveToMainStorage,
 
+  onEvolve,
   onSynchronize,
   onSaveCheck,
   onDetach,
@@ -344,6 +346,7 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
       }
       actions={<>
         {onDetach && <ButtonWithConfirm onClick={onDetach}>Detach from save</ButtonWithConfirm>}
+        {onEvolve && <ButtonWithConfirm onClick={onEvolve}>Evolve</ButtonWithConfirm>}
         {onSaveCheck && <Button onClick={onSaveCheck}>Check save</Button>}
         {onRelease && <ButtonWithConfirm onClick={onRelease}>Release</ButtonWithConfirm>}
         {/* <ButtonWithConfirm disabled>Evolve</ButtonWithConfirm> */}

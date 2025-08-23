@@ -119,6 +119,7 @@ export const ActionsPanel: React.FC = () => {
                                     [ DataActionType.DELETE_PKM_VERSION ]: 'Delete pkm-version',
                                     [ DataActionType.SAVE_DELETE_PKM ]: 'Delete save pkm',
                                     [ DataActionType.PKM_SYNCHRONIZE ]: 'Synchronize pkm',
+                                    [ DataActionType.EVOLVE_PKM ]: 'Evolve pkm',
                                 })} - {action.parameters.join(', ')}
                             </td>
                             <td>

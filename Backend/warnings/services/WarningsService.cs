@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using PKHeX.Core;
@@ -15,13 +16,22 @@ public class WarningsService
         return WarningsDTO;
     }
 
-    public static void CheckWarnings()
+    // TODO huge perf issues
+    public static async Task CheckWarnings()
     {
-        WarningsDTO = new()
-        {
-            playTimeWarnings = CheckPlayTimeWarning(),
-            pkmVersionWarnings = CheckPkmVersionWarnings(),
-        };
+        Stopwatch sw = new();
+
+        Console.WriteLine($"Warnings check");
+
+        sw.Start();
+        // WarningsDTO = new()
+        // {
+        //     playTimeWarnings = CheckPlayTimeWarning(),
+        //     pkmVersionWarnings = await CheckPkmVersionWarnings(),
+        // };
+        sw.Stop();
+
+        Console.WriteLine($"Warnings checked in {sw.Elapsed}");
     }
 
     // TODO
@@ -69,26 +79,26 @@ public class WarningsService
         return warns;
     }
 
-    private static List<PkmVersionWarning> CheckPkmVersionWarnings()
+    private static async Task<List<PkmVersionWarning>> CheckPkmVersionWarnings()
     {
         var warns = new List<PkmVersionWarning>();
 
-        var fileLoader = new DataFileLoader();
+        var fileLoader = await DataFileLoader.Create();
 
-        var pkms = fileLoader.loaders.pkmLoader.GetAllEntities();
-        var pkmVersions = fileLoader.loaders.pkmVersionLoader.GetAllEntities();
+        var pkms = fileLoader.loaders.pkmLoader.GetAllDtos();
+        var pkmVersions = fileLoader.loaders.pkmVersionLoader.GetAllDtos();
 
         pkms.ForEach(pkm =>
         {
             if (pkm.SaveId != default)
             {
-                var saveLoader = fileLoader.loaders.getSaveLoaders(pkm.SaveId ?? 0);
+                var saveLoader = fileLoader.loaders.saveLoadersDict[(uint)pkm.SaveId];
                 var save = saveLoader.Save;
                 var generation = save.Generation;
 
-                var pkmVersion = pkmVersions.Find(pkmVersion => pkmVersion.PkmId == pkm.Id && pkmVersion.Generation == generation);
+                var pkmVersion = pkmVersions.Find(pkmVersion => pkmVersion.PkmDto.Id == pkm.Id && pkmVersion.Generation == generation);
 
-                var savePkm = saveLoader.Pkms.GetEntity(pkmVersion.Id);
+                var savePkm = saveLoader.Pkms.GetDto(pkmVersion.Id);
 
                 if (savePkm == default)
                 {

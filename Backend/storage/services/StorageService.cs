@@ -1,66 +1,40 @@
+using System.Diagnostics;
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using PKHeX.Core;
 
 public class StorageService
 {
-    private static DataMemoryLoader memoryLoader = new();
+    private static DataMemoryLoader? memoryLoader;
+
+    public static async Task Initialize()
+    {
+        await ResetDataLoader();
+    }
 
     public static List<BoxDTO> GetMainBoxes()
     {
-        var boxLoader = memoryLoader.loaders.boxLoader;
-        var entities = boxLoader.GetAllEntities();
-
-        var list = new List<BoxDTO>();
-        entities.ForEach((entity) => list.Add(BoxDTO.FromEntity(entity)));
-
-        return list;
+        return memoryLoader.loaders.boxLoader.GetAllDtos();
     }
 
     public static List<PkmDTO> GetMainPkms()
     {
-        var pkmLoader = memoryLoader.loaders.pkmLoader;
-        var entities = pkmLoader.GetAllEntities();
-
-        var list = new List<PkmDTO>();
-        entities.ForEach((entity) => list.Add(PkmDTO.FromEntity(entity)));
-
-        return list;
+        return memoryLoader.loaders.pkmLoader.GetAllDtos();
     }
 
     public static List<PkmVersionDTO> GetMainPkmVersions()
     {
-        var loaders = memoryLoader.loaders;
-        var entities = loaders.pkmVersionLoader.GetAllEntities();
-
-        var list = new List<PkmVersionDTO>();
-        entities.ForEach((entity) =>
-        {
-            var pkmEntity = loaders.pkmLoader.GetEntity(entity.PkmId);
-
-            var pkmBytes = loaders.pkmFileLoader.GetEntity(entity);
-            if (pkmBytes == default)
-            {
-                throw new Exception($"PKM-bytes is null, from entity Id={entity.Id} Filepath={entity.Filepath}");
-            }
-            var pkm = PKMLoader.CreatePKM(pkmBytes, entity, pkmEntity);
-            if (pkm == default)
-            {
-                throw new Exception($"PKM is null, from entity Id={entity.Id} Filepath={entity.Filepath} bytes.length={pkmBytes.Length}");
-            }
-            var dto = PkmVersionDTO.FromEntity(entity, pkm, pkmEntity);
-            list.Add(dto);
-        });
-
-        return list;
+        return memoryLoader.loaders.pkmVersionLoader.GetAllDtos();
     }
 
     public static List<BoxDTO> GetSaveBoxes(uint saveId)
     {
-        return memoryLoader.loaders.getSaveLoaders(saveId).Boxes.GetAllEntities();
+        return memoryLoader.loaders.saveLoadersDict[saveId].Boxes.GetAllDtos();
     }
 
     public static List<PkmSaveDTO> GetSavePkms(uint saveId)
     {
-        return memoryLoader.loaders.getSaveLoaders(saveId).Pkms.GetAllEntities();
+        return memoryLoader.loaders.saveLoadersDict[saveId].Pkms.GetAllDtos();
     }
 
     public static async Task MainMovePkm(string pkmId, uint boxId, uint boxSlot)
@@ -150,6 +124,13 @@ public class StorageService
         );
     }
 
+    public static async Task EvolvePkm(uint? saveId, string id)
+    {
+        await memoryLoader.AddAction(
+            new EvolvePkmAction(saveId, id)
+        );
+    }
+
     public static async Task Save()
     {
         var actions = memoryLoader.actions;
@@ -162,7 +143,7 @@ public class StorageService
 
         await BackupService.PrepareBackupThenRun(async () =>
         {
-            var fileLoader = new DataFileLoader();
+            var fileLoader = await DataFileLoader.Create();
 
             for (var i = 0; i < actions.Count; i++)
             {
@@ -185,16 +166,24 @@ public class StorageService
         return memoryLoader.actions.Count == 0;
     }
 
-    public static void ResetDataLoader()
+    public static async Task ResetDataLoader()
     {
-        memoryLoader = new();
+        Stopwatch sw = new();
+
+        Console.WriteLine($"Data-loader reset");
+
+        sw.Start();
+        memoryLoader = await DataMemoryLoader.Create();
+        sw.Stop();
+
+        Console.WriteLine($"Data-loader reseted in {sw.Elapsed}");
     }
 
     public static async Task RemoveDataActions(int actionIndexToRemoveFrom)
     {
         var previousActions = memoryLoader.actions;
 
-        ResetDataLoader();
+        await ResetDataLoader();
 
         for (var i = 0; i < previousActions.Count; i++)
         {
@@ -203,5 +192,36 @@ public class StorageService
                 await memoryLoader.AddAction(previousActions[i]);
             }
         }
+    }
+
+    public static void CleanMainStorageFiles()
+    {
+        Stopwatch sw = new();
+
+        Console.WriteLine($"Storage files clean up");
+
+        sw.Start();
+
+        var pkmVersionsFilepaths = memoryLoader.loaders.pkmVersionLoader.GetAllDtos().Select(dto => dto.PkmVersionEntity.Filepath).ToList();
+
+        var rootDir = Settings.rootDir;
+
+        var matcher = new Matcher();
+        matcher.AddInclude(Path.Combine(Settings.mainPkmStoragePath, "**/*"));
+        var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
+
+        foreach (var file in matches.Files)
+        {
+            var path = Path.Combine(rootDir, file.Path);
+
+            if (!pkmVersionsFilepaths.Contains(path))
+            {
+                Console.WriteLine($"Clean storage file {path}");
+                File.Delete(path);
+            }
+        }
+        sw.Stop();
+
+        Console.WriteLine($"Storage files cleaned up in {sw.Elapsed}");
     }
 }

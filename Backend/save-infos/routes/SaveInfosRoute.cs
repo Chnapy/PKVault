@@ -14,7 +14,7 @@ public class SaveInfosController : ControllerBase
 
     [HttpPost()]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult?> Upload([BindRequired] IFormFile saveFile)
+    public async Task<ActionResult> Upload([BindRequired] IFormFile saveFile)
     {
         if (saveFile == null || saveFile.Length == 0)
             return BadRequest("No file received");
@@ -28,7 +28,7 @@ public class SaveInfosController : ControllerBase
 
         await LocalSaveService.UploadNewSave(fileBytes, saveFile.FileName);
 
-        return null;
+        return NoContent();
     }
 
     [HttpDelete()]
@@ -45,7 +45,7 @@ public class SaveInfosController : ControllerBase
             throw new Exception($"Empty action list is required");
         }
 
-        var save = LocalSaveService.SaveById[saveId];
+        var save = LocalSaveService.SaveById[saveId].Clone();
         // var path = LocalSaveService.SaveByPath.Keys.ToList().Find(key => LocalSaveService.SaveByPath[key].ID32 == saveId);
 
         var filename = save.Metadata.FileName;

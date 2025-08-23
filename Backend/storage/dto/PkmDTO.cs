@@ -1,43 +1,28 @@
 
 using PKHeX.Core;
 
-public class PkmDTO
+public class PkmDTO : IWithId<string>
 {
-    public static PkmDTO FromEntity(PkmEntity entity)
+    public static PkmDTO FromEntity(PkmEntity entity, SaveFile? save)
     {
         return new PkmDTO
         {
-            Id = entity.Id,
-            BoxId = entity.BoxId,
-            BoxSlot = entity.BoxSlot,
-            SaveId = entity.SaveId,
-            Species = entity.Species,
-            IsShiny = entity.IsShiny,
-            Nickname = entity.Nickname,
-            OTName = entity.OTName,
-            CanDelete = entity.SaveId == default,
+            PkmEntity = entity,
+            Save = save,
         };
     }
 
-    public string Id { get; set; }
+    public string Id { get { return PkmEntity.Id; } }
 
-    public uint BoxId { get; set; }
+    public uint BoxId { get { return PkmEntity.BoxId; } }
 
-    public uint BoxSlot { get; set; }
+    public uint BoxSlot { get { return PkmEntity.BoxSlot; } }
 
-    public uint? SaveId { get; set; }
-
-    public ushort Species { get; set; }
-
-    public string Nickname { get; set; }
-
-    public bool IsShiny { get; set; }
-
-    public string OTName { get; set; }
+    public uint? SaveId { get { return Save?.ID32; } }
 
     // public List<uint> CompatibleGenerations { get; set; }
 
-    public bool CanDelete { get; set; }
+    public required PkmEntity PkmEntity;
 
-    // public bool CanEvolve { get; set; }
+    public required SaveFile? Save;
 }

@@ -3,26 +3,43 @@ using PKHeX.Core;
 
 public class PkmVersionDTO : BasePkmVersionDTO
 {
-    public static PkmVersionDTO FromEntity(PkmVersionEntity entity, PKM pkm, PkmEntity pkmEntity)
+    public static async Task<PkmVersionDTO> FromEntity(PkmVersionEntity entity, PKM pkm, PkmDTO pkmDto)
     {
         var dto = new PkmVersionDTO
         {
-            Id = entity.Id,
-            PkmId = entity.PkmId,
-            Generation = entity.Generation,
+            Pkm = pkm,
+            PkmVersionEntity = entity,
+            PkmDto = pkmDto,
         };
 
-        FillDTO(dto, pkm);
+        await dto.RefreshHasTradeEvolve();
 
-        dto.CanMoveToSaveStorage = pkmEntity.SaveId == default;
-        dto.CanDelete = entity.Id != pkmEntity.Id;
+        if (dto.Id != entity.Id)
+        {
+            throw new Exception($"Id mismatch dto.id={dto.Id} entity.id={entity.Id}");
+        }
 
         return dto;
     }
 
-    public string PkmId { get; set; }
+    public string PkmId { get { return PkmVersionEntity.PkmId; } }
 
-    public bool CanMoveToSaveStorage { get; set; }
+    public bool IsMain { get { return Id == PkmId; } }
 
-    public bool CanDelete { get; set; }
+    public bool CanMoveToSaveStorage { get { return PkmDto.SaveId == default; } }
+
+    public bool CanDelete { get { return PkmVersionEntity.Id != PkmDto.Id; } }
+
+    public override bool CanEvolve { get => HasTradeEvolve && PkmDto.Save == null; }
+
+    public required PkmVersionEntity PkmVersionEntity;
+
+    public required PkmDTO PkmDto;
+
+    private PkmVersionDTO() { }
+
+    protected override uint GetGeneration()
+    {
+        return PkmVersionEntity.Generation;
+    }
 }

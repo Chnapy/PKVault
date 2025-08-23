@@ -13,21 +13,21 @@ public class LocalSaveService
 
     public static void PrepareTimer()
     {
-        Timer = new Timer(ReadLocalSaves, null, TimeSpan.Zero, TimeSpan.FromSeconds(TIMER_INTERVAL));
+        Timer = new Timer((object? _) => ReadLocalSaves(), null, TimeSpan.Zero, TimeSpan.FromSeconds(TIMER_INTERVAL));
     }
 
-    public static void ResetTimerAndData()
+    public static async Task ResetTimerAndData()
     {
         Timer?.Dispose();
         SaveById.Clear();
         SaveByPath.Clear();
 
-        ReadLocalSaves(null);
+        await ReadLocalSaves();
 
         PrepareTimer();
     }
 
-    public static void ReadLocalSaves(object? state)
+    public static async Task ReadLocalSaves()
     {
         var rootDir = Settings.rootDir;
         var globs = Settings.savesGlobs.ToList();
@@ -51,7 +51,7 @@ public class LocalSaveService
 
         if (hasBeenUpdated)
         {
-            WarningsService.CheckWarnings();
+            await WarningsService.CheckWarnings();
         }
 
         // alerts.ForEach(alert => Console.WriteLine($"Alert: {alert}"));
@@ -74,7 +74,9 @@ public class LocalSaveService
         //     watchers.Add(watcher);
         // });
 
-        Console.WriteLine("Read local save ended");
+        var memoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
+
+        Console.WriteLine($"(timed check done - memory used: {memoryUsedMB} MB)");
     }
 
     private static bool UpdateSaveFromPath(string path)
@@ -186,7 +188,7 @@ public class LocalSaveService
 
         UpdateGlobalsWithSave(save, path);
 
-        Console.WriteLine($"Writed {save.ID32} to {path}");
+        Console.WriteLine($"Writed save {save.ID32} to {path}");
 
         var lastWriteTime = File.GetLastWriteTime(path);
 

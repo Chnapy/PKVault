@@ -1,4 +1,4 @@
 public interface IWithId<T>
 {
-    T Id { get; set; }
+    T Id { get; }
 }

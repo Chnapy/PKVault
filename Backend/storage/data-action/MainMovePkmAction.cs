@@ -24,23 +24,25 @@ public class MainMovePkmAction : DataAction
 
     public override async Task Execute(DataEntityLoaders loaders)
     {
-        var entity = loaders.pkmLoader.GetEntity(id);
-        if (entity == default)
+        var dto = loaders.pkmLoader.GetDto(id);
+        if (dto == default)
         {
             throw new Exception("Pkm not found");
         }
 
-        var entityAlreadyPresent = loaders.pkmLoader.GetAllEntities().Find(entity => entity.Id != id &&
-        entity.BoxId == boxId && entity.BoxSlot == boxSlot
+        var pkmAlreadyPresent = loaders.pkmLoader.GetAllDtos().Find(pkm =>
+            pkm.Id != id
+            && pkm.BoxId == boxId
+            && pkm.BoxSlot == boxSlot
         );
-        if (entityAlreadyPresent != null)
+        if (pkmAlreadyPresent != null)
         {
             throw new Exception($"Pkm already present in slot, boxId={boxId}, boxSlot={boxSlot}");
         }
 
-        entity.BoxId = boxId;
-        entity.BoxSlot = boxSlot;
+        dto.PkmEntity.BoxId = boxId;
+        dto.PkmEntity.BoxSlot = boxSlot;
 
-        loaders.pkmLoader.WriteEntity(entity);
+        await loaders.pkmLoader.WriteDto(dto);
     }
 }

@@ -139,6 +139,14 @@ public class StorageController : ControllerBase
         return StorageService.GetActionPayloadList();
     }
 
+    [HttpPut("pkm/{id}/evolve")]
+    public async Task<ActionResult<List<DataActionPayload>>> EvolvePkm(string id, uint? saveId)
+    {
+        await StorageService.EvolvePkm(saveId, id);
+
+        return StorageService.GetActionPayloadList();
+    }
+
     [HttpGet("action")]
     public ActionResult<List<DataActionPayload>> GetActions()
     {

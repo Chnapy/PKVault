@@ -22,14 +22,14 @@ public class SaveDeletePkmAction : DataAction
 
     public override async Task Execute(DataEntityLoaders loaders)
     {
-        var saveLoaders = loaders.getSaveLoaders(saveId);
+        var saveLoaders = loaders.saveLoadersDict[saveId];
 
-        var dto = saveLoaders.Pkms.GetEntity(pkmId);
+        var dto = saveLoaders.Pkms.GetDto(pkmId);
         if (dto == default)
         {
             throw new Exception("Save Pkm not found");
         }
 
-        saveLoaders.Pkms.DeleteEntity(pkmId);
+        saveLoaders.Pkms.DeleteDto(pkmId);
     }
 }

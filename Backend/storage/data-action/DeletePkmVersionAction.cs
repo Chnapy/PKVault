@@ -19,20 +19,20 @@ public class DeletePkmVersionAction : DataAction
 
     public override async Task Execute(DataEntityLoaders loaders)
     {
-        var pkmVersion = loaders.pkmVersionLoader.GetEntity(pkmVersionId);
-        var pkm = loaders.pkmLoader.GetEntity(pkmVersion.PkmId);
+        var pkmVersion = loaders.pkmVersionLoader.GetDto(pkmVersionId);
+        var pkm = pkmVersion.PkmDto;
 
         if (pkm.SaveId != null)
         {
             throw new Exception($"Cannot delete pkm-version attached in save, pkm-version.id={pkmVersionId}");
         }
 
-        loaders.pkmVersionLoader.DeleteEntity(pkmVersionId);
+        loaders.pkmVersionLoader.DeleteDto(pkmVersionId);
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetAllEntities().FindAll(value => value.PkmId == pkm.Id);
+        var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos().FindAll(value => value.PkmDto.Id == pkm.Id);
         if (relatedPkmVersions.Count == 0)
         {
-            loaders.pkmLoader.DeleteEntity(pkm.Id);
+            loaders.pkmLoader.DeleteDto(pkm.Id);
         }
     }
 }

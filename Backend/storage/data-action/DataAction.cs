@@ -26,4 +26,5 @@ public enum DataActionType
     EDIT_PKM_SAVE,
     SAVE_DELETE_PKM,
     PKM_SYNCHRONIZE,
+    EVOLVE_PKM,
 }

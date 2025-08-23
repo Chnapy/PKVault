@@ -1,24 +1,22 @@
 
-public class EntityMemoryLoader<D> : EntityLoader<D> where D : IWithId<string>, ICloneable<D>
+public class EntityMemoryLoader<DTO, E> : EntityLoader<DTO, E> where DTO : IWithId<string>
 {
-    private List<D> entities;
+    private List<DTO> dtoList;
 
-    public EntityMemoryLoader(List<D> _entities)
+    public EntityMemoryLoader(List<DTO> _dtoList)
     {
-        // var cloneList = new List<D>();
-        // _entities.ForEach(entity => cloneList.Add(entity.Clone()));
-        entities = _entities;//.ToImmutableList();
+        dtoList = _dtoList;
     }
 
-    public override List<D> GetAllEntities()
+    public override List<DTO> GetAllDtos()
     {
-        return entities.ToList();
+        return [.. dtoList];
     }
 
-    public override void SetAllEntities(List<D> nextEntities)
+    public override async Task SetAllDtos(List<DTO> nextEntities)
     {
-        entities = nextEntities;
+        dtoList = nextEntities;
+
+        HasWritten = true;
     }
-
-
 }

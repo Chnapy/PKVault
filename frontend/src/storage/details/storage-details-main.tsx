@@ -6,7 +6,7 @@ import { useMoveByIdOrName } from '../../data/hooks/use-move-by-id-or-name';
 import { useNatureByIdOrName } from '../../data/hooks/use-nature-by-id-or-name';
 import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
-import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainDeletePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
+import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainDeletePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../data/static-data/static-data';
 import { getGender } from '../../data/utils/get-gender';
 import { Route } from '../../routes/storage';
@@ -94,6 +94,10 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
                     queryKey: getStorageGetMainPkmsQueryKey(),
                 });
 
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetMainPkmVersionsQueryKey(),
+                });
+
                 if (saveId) {
                     await queryClient.invalidateQueries({
                         queryKey: getStorageGetSavePkmsQueryKey(saveId),
@@ -104,6 +108,24 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
     });
 
     const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion({
+        mutation: {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetActionsQueryKey(),
+                });
+
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetMainPkmsQueryKey(),
+                });
+
+                await queryClient.invalidateQueries({
+                    queryKey: getStorageGetMainPkmVersionsQueryKey(),
+                });
+            },
+        },
+    });
+
+    const evolvePkmMutation = useStorageEvolvePkm({
         mutation: {
             onSuccess: async () => {
                 await queryClient.invalidateQueries({
@@ -271,7 +293,14 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
                 }
             }))}
             attachedSavePkmNotFound={attachedSavePkmNotFound}
-            onSynchronize={saveId && pkmVersion ? (() => savePkmSynchronizeMutation.mutateAsync({
+            onEvolve={pkmVersion.canEvolve && !attachedSavePkm
+                ? (() => evolvePkmMutation.mutateAsync({
+                    id: pkmVersion.id,
+                    params: {},
+                }))
+                : undefined
+            }
+            onSynchronize={saveId ? (() => savePkmSynchronizeMutation.mutateAsync({
                 saveId,
                 params: {
                     pkmVersionId: pkmVersion.id,

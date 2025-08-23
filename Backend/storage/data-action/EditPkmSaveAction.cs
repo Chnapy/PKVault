@@ -25,17 +25,17 @@ public class EditPkmSaveAction : DataAction
 
     public override async Task Execute(DataEntityLoaders loaders)
     {
-        var saveLoaders = loaders.getSaveLoaders(saveId);
-        var pkmSave = saveLoaders.Pkms.GetEntity(pkmSaveId);
+        var saveLoaders = loaders.saveLoadersDict[saveId];
+        var pkmSave = saveLoaders.Pkms.GetDto(pkmSaveId);
 
-        if (pkmSave.PkmVersionId != default)
+        if (pkmSave.GetAttachedPkmVersion() != default)
         {
             throw new Exception("Edit not possible for pkm attached with save");
         }
 
         var pkm = pkmSave.Pkm;
 
-        EditPkmVersionAction.EditPkmNickname(pkm, pkmSave.Generation, payload.Nickname);
+        EditPkmVersionAction.EditPkmNickname(pkm, payload.Nickname);
         EditPkmVersionAction.EditPkmEVs(pkm, payload.EVs);
         EditPkmVersionAction.EditPkmMoves(pkm, pkmSave.AvailableMoves, payload.Moves);
 
@@ -43,11 +43,6 @@ public class EditPkmSaveAction : DataAction
         // TODO make a using write pkm to ensure use of this call
         pkm.RefreshChecksum();
 
-        saveLoaders.Pkms.WriteEntity(pkmSave);
-
-        // var testBytes = loaders.pkmFileLoader.GetEntity(pkmVersionEntity);
-        // var testPkm = PKMLoader.CreatePKM(testBytes, pkmVersionEntity, pkmEntity);
-
-        // Console.WriteLine($"PKM EV-HP = {pkm.EV_HP} - {testPkm.EV_HP} - {string.Join('.', pkm.Data) == string.Join('.', testPkm.Data)}");
+        await saveLoaders.Pkms.WriteDto(pkmSave);
     }
 }

@@ -1,6 +1,3 @@
-
-using PKHeX.Core;
-
 public class MainCreatePkmVersionAction : DataAction
 {
     private readonly string pkmId;
@@ -29,13 +26,13 @@ public class MainCreatePkmVersionAction : DataAction
     {
         Console.WriteLine($"Create PKM version, pkmId={pkmId}, generation={generation}");
 
-        var pkmEntity = loaders.pkmLoader.GetEntity(pkmId);
+        var pkmEntity = loaders.pkmLoader.GetDto(pkmId);
         if (pkmEntity == default)
         {
             throw new Exception($"Pkm entity not found, id={pkmId}");
         }
 
-        var pkmVersions = loaders.pkmVersionLoader.GetAllEntities().FindAll(pkmVersion => pkmVersion.PkmId == pkmId);
+        var pkmVersions = loaders.pkmVersionLoader.GetAllDtos().FindAll(pkmVersion => pkmVersion.PkmDto.Id == pkmId);
 
         var pkmVersionEntity = pkmVersions.Find(pkmVersion => pkmVersion.Generation == generation);
         if (pkmVersionEntity != default)
@@ -49,23 +46,21 @@ public class MainCreatePkmVersionAction : DataAction
             throw new Exception($"Pkm-version original not found, pkm.id={pkmId} generation={generation}");
         }
 
-        var pkmOriginBytes = loaders.pkmFileLoader.GetEntity(pkmVersionOrigin);
-        var pkmOrigin = PKMLoader.CreatePKM(pkmOriginBytes, pkmVersionOrigin, pkmEntity);
+        var pkmOrigin = pkmVersionOrigin.Pkm;
 
-        var pkmConverted = PkmConvertService.GetConvertedPkm(pkmOrigin, pkmEntity, generation, createdPid);
+        var pkmConverted = PkmConvertService.GetConvertedPkm(pkmOrigin, generation, createdPid);
         createdPid = pkmConverted.PID;
 
-        var filepath = loaders.pkmFileLoader.WriteEntity(
-            PKMLoader.GetPKMBytes(pkmConverted), pkmConverted, generation, null);
-
-        var pkmVersionCreated = new PkmVersionEntity
+        var pkmVersionEntityCreated = new PkmVersionEntity
         {
-            Id = PkmSaveDTO.GetPKMId(pkmConverted, generation),
+            Id = BasePkmVersionDTO.GetPKMId(pkmConverted),
             PkmId = pkmId,
             Generation = generation,
-            Filepath = filepath,
+            Filepath = PKMLoader.GetPKMFilepath(pkmConverted),
         };
 
-        loaders.pkmVersionLoader.WriteEntity(pkmVersionCreated);
+        var pkmVersionCreated = await PkmVersionDTO.FromEntity(pkmVersionEntityCreated, pkmConverted, pkmEntity);
+
+        await loaders.pkmVersionLoader.WriteDto(pkmVersionCreated);
     }
 }

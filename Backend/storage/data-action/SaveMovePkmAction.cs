@@ -28,15 +28,15 @@ public class SaveMovePkmAction : DataAction
 
     public override async Task Execute(DataEntityLoaders loaders)
     {
-        var saveLoaders = loaders.getSaveLoaders(saveId);
+        var saveLoaders = loaders.saveLoadersDict[saveId];
 
-        var dto = saveLoaders.Pkms.GetEntity(id);
+        var dto = saveLoaders.Pkms.GetDto(id);
         if (dto == default)
         {
             throw new Exception("Save Pkm not found");
         }
 
-        var entityAlreadyPresent = saveLoaders.Pkms.GetAllEntities().Find(entity => entity.Id != id &&
+        var entityAlreadyPresent = saveLoaders.Pkms.GetAllDtos().Find(entity => entity.Id != id &&
             entity.Box == boxId && entity.BoxSlot == boxSlot
         );
         if (entityAlreadyPresent != null)
@@ -44,12 +44,12 @@ public class SaveMovePkmAction : DataAction
             throw new Exception($"Save Pkm already present in slot, boxId={boxId}, boxSlot={boxSlot}");
         }
 
-        saveLoaders.Pkms.DeleteEntity(dto.Id);
+        saveLoaders.Pkms.DeleteDto(dto.Id);
 
         // dto.BoxType = boxType;
         dto.Box = boxId;
         dto.BoxSlot = boxSlot;
 
-        saveLoaders.Pkms.WriteEntity(dto);
+        await saveLoaders.Pkms.WriteDto(dto);
     }
 }

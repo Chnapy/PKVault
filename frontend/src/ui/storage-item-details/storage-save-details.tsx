@@ -71,6 +71,7 @@ export type StorageSaveDetailsProps = {
 
   goToMainPkm?: () => void;
 
+  onEvolve?: () => void;
   onSynchronize?: () => void;
   onRelease?: () => void;
 
@@ -129,6 +130,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
   canMoveToMainStorage,
 
   goToMainPkm,
+  onEvolve,
   onSynchronize,
   onRelease,
   onClose,
@@ -136,7 +138,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
   const staticData = useStaticData();
   const pokemonDataItem = staticData.pokemon[ species ];
 
-  const formContext = StorageDetailsForm.useContext();
+  const formContext = StorageDetailsForm.useContext(saveId);
 
   const getCurrentLanguageName = useCurrentLanguageName();
 
@@ -326,8 +328,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
       }
       actions={<>
         {onRelease && <ButtonWithConfirm onClick={onRelease}>Release</ButtonWithConfirm>}
-        {/* <Button disabled>Evolve</Button> */}
-        {/* <Button disabled>Delete full PKM</Button> */}
+        {onEvolve && <ButtonWithConfirm onClick={onEvolve}>Evolve</ButtonWithConfirm>}
       </>}
       onClose={onClose}
     />

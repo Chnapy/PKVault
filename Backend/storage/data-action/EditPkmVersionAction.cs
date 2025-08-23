@@ -23,20 +23,18 @@ public class EditPkmVersionAction : DataAction
 
     public override async Task Execute(DataEntityLoaders loaders)
     {
-        var pkmVersionEntity = loaders.pkmVersionLoader.GetEntity(pkmVersionId);
-        var pkmEntity = loaders.pkmLoader.GetEntity(pkmVersionEntity.PkmId);
+        var pkmVersionDto = loaders.pkmVersionLoader.GetDto(pkmVersionId);
+        var pkmDto = pkmVersionDto.PkmDto;
 
-        if (pkmEntity.SaveId != default)
+        if (pkmDto.SaveId != default)
         {
             throw new Exception("Edit not possible for pkm attached with save");
         }
 
-        var pkmBytes = loaders.pkmFileLoader.GetEntity(pkmVersionEntity);
-        var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity, pkmEntity);
+        var pkm = pkmVersionDto.Pkm;
 
-        var pkmVersionDto = PkmVersionDTO.FromEntity(pkmVersionEntity, pkm, pkmEntity);
-
-        EditPkmNickname(pkm, pkmVersionEntity.Generation, payload.Nickname);
+        // TODO PkmEntity nickname should also change
+        EditPkmNickname(pkm, payload.Nickname);
         EditPkmEVs(pkm, payload.EVs);
         EditPkmMoves(pkm, pkmVersionDto.AvailableMoves, payload.Moves);
 
@@ -44,41 +42,38 @@ public class EditPkmVersionAction : DataAction
         // TODO make a using write pkm to ensure use of this call
         pkm.RefreshChecksum();
 
-        loaders.pkmFileLoader.WriteEntity(
-            PKMLoader.GetPKMBytes(pkm), pkm, pkmVersionEntity.Generation, null
+        pkmVersionDto = await PkmVersionDTO.FromEntity(
+            new()
+            {
+                Id = pkmVersionDto.Id,
+                Filepath = pkmVersionDto.PkmVersionEntity.Filepath,
+                PkmId = pkmVersionDto.PkmDto.Id,
+                Generation = pkmVersionDto.Generation
+            },
+            pkm,
+            pkmDto
         );
 
-        // var testBytes = loaders.pkmFileLoader.GetEntity(pkmVersionEntity);
-        // var testPkm = PKMLoader.CreatePKM(testBytes, pkmVersionEntity, pkmEntity);
+        await loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
 
-        // Console.WriteLine($"PKM EV-HP = {pkm.EV_HP} - {testPkm.EV_HP} - {string.Join('.', pkm.Data) == string.Join('.', testPkm.Data)}");
+        var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos()
+        .FindAll(value => value.PkmDto.Id == pkmDto.Id && value.Id != pkmVersionId);
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetAllEntities()
-        .FindAll(value => value.PkmId == pkmEntity.Id && value.Id != pkmVersionId);
-
-        relatedPkmVersions.ForEach(version =>
-        {
-            var pkmBytes = loaders.pkmFileLoader.GetEntity(version);
-            if (pkmBytes == default)
+        await Task.WhenAll(
+            relatedPkmVersions.Select(async (versionDto) =>
             {
-                throw new Exception($"PKM-bytes is null, from entity Id={version.Id} Filepath={version.Filepath}");
-            }
+                var relatedPkm = versionDto.Pkm;
 
-            var relatedPkm = PKMLoader.CreatePKM(pkmBytes, version, pkmEntity);
-            if (relatedPkm == default)
-            {
-                throw new Exception($"PKM is null, from entity Id={version.Id} Filepath={version.Filepath} bytes.length={pkmBytes.Length}");
-            }
+                PkmConvertService.PassDynamicsToPkm(pkm, relatedPkm);
 
-            PkmConvertService.PassDynamicsToPkm(pkm, relatedPkm, pkmEntity, version.Generation);
+                relatedPkm.RefreshChecksum();
 
-            relatedPkm.RefreshChecksum();
-
-            loaders.pkmFileLoader.WriteEntity(PKMLoader.GetPKMBytes(relatedPkm), relatedPkm, version.Generation, null);
-        });
+                await loaders.pkmVersionLoader.WriteDto(versionDto);
+            })
+        );
     }
 
-    public static void EditPkmNickname(PKM pkm, uint generation, string nickname)
+    public static void EditPkmNickname(PKM pkm, string nickname)
     {
         if (pkm.Nickname == nickname)
         {
@@ -90,7 +85,7 @@ public class EditPkmVersionAction : DataAction
             throw new Exception($"Nickname should be <= {pkm.MaxStringLengthNickname} for this generation & language");
         }
 
-        PkmConvertService.ApplyNicknameToPkm(pkm, generation, nickname);
+        PkmConvertService.ApplyNicknameToPkm(pkm, nickname);
     }
 
     public static void EditPkmEVs(PKM pkm, int[] evs)
@@ -132,17 +127,17 @@ public class EditPkmVersionAction : DataAction
                 throw new Exception($"EV value should be positive");
             }
 
-            if (pkm.Generation <= 2 && ev > 65535)
+            if (pkm.Format <= 2 && ev > 65535)
             {
                 throw new Exception($"G1-2 EV cannot be > 65535");
             }
 
-            if (pkm.Generation > 2 && pkm.Generation <= 5 && ev > 255)
+            if (pkm.Format > 2 && pkm.Format <= 5 && ev > 255)
             {
                 throw new Exception($"G3-5 EV cannot be > 255");
             }
 
-            if (pkm.Generation > 5 && ev > 252)
+            if (pkm.Format > 5 && ev > 252)
             {
                 throw new Exception($"G6+ EV cannot be > 252");
             }

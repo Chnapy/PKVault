@@ -3,23 +3,23 @@ using PKHeX.Core;
 
 public class PKMFileLoader : PKMLoader
 {
-    public override byte[]? GetEntity(PkmVersionEntity pkmVersion)
+    public override byte[]? GetEntity(string filepath)
     {
-        var bytes = File.ReadAllBytes(pkmVersion.Filepath);
+        var bytes = File.ReadAllBytes(filepath);
 
         return bytes;
     }
 
-    public override void DeleteEntity(PkmVersionEntity pkmVersion)
+    public override void DeleteEntity(string filepath)
     {
-        Console.WriteLine($"Delete PKM filepath={pkmVersion.Filepath}");
+        Console.WriteLine($"Delete PKM filepath={filepath}");
 
-        File.Delete(pkmVersion.Filepath);
+        File.Delete(filepath);
     }
 
-    public override string WriteEntity(byte[] bytes, PKM pkm, uint generation, string? expectedFilepath)
+    public override string WriteEntity(byte[] bytes, PKM pkm, string? expectedFilepath)
     {
-        var filepath = GetPKMFilepath(pkm, generation);
+        var filepath = GetPKMFilepath(pkm);
 
         if (expectedFilepath != null && expectedFilepath != filepath)
         {
@@ -27,9 +27,7 @@ public class PKMFileLoader : PKMLoader
             filepath = expectedFilepath;
         }
 
-        Console.WriteLine($"Write new PKM filepath={filepath}");
-
-        Console.WriteLine($"PKM id={PkmSaveDTO.GetPKMId(pkm, generation)}");
+        Console.WriteLine($"PKM-file Write id={BasePkmVersionDTO.GetPKMId(pkm)} filepath={filepath}");
 
         Directory.CreateDirectory(Path.GetDirectoryName(filepath)!);
         File.WriteAllBytes(filepath, bytes);

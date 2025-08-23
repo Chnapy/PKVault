@@ -1,47 +1,49 @@
 
-public abstract class EntityLoader<D> where D : IWithId<string>
+public abstract class EntityLoader<DTO, E> where DTO : IWithId<string>
 {
-    public abstract List<D> GetAllEntities();
+    public Action<DTO>? OnWrite;
+    public bool HasWritten = false;
 
-    public abstract void SetAllEntities(List<D> entities);
+    public abstract List<DTO> GetAllDtos();
 
-    public D? GetEntity(string id)
+    public virtual List<E> GetAllEntities()
     {
-        return GetAllEntities().Find(entity => entity.Id == id);
+        throw new Exception("Not implemented");
     }
 
-    public virtual D? DeleteEntity(string id)
+    public abstract Task SetAllDtos(List<DTO> dtos);
+
+    public DTO? GetDto(string id)
+    {
+        return GetAllDtos().Find(entity => entity.Id == id);
+    }
+
+    public virtual void DeleteDto(string id)
     {
         Console.WriteLine($"Delete entity id={id}");
 
-        var initialList = GetAllEntities();
+        var initialList = GetAllDtos();
         var removedEntity = initialList.Find(entity => entity.Id == id);
         if (removedEntity == null)
         {
-            return default;
+            return;
         }
 
         var finalList = initialList.FindAll(entity => entity.Id != id);
 
-        SetAllEntities(finalList);
-
-        return removedEntity;
+        SetAllDtos(finalList);
     }
 
-    public virtual D WriteEntity(D entity)
+    public virtual async Task WriteDto(DTO dto)
     {
-        Console.WriteLine($"Write new entity {entity.GetType().Name} id={entity.Id}");
+        Console.WriteLine($"{dto.GetType().Name} - Write id={dto.Id}");
 
-        // Console.WriteLine($"old-list count={GetAllEntities().Count}");
+        var list = GetAllDtos()
+        .FindAll(item => item.Id != dto.Id);
+        list.Add(dto);
 
-        var list = GetAllEntities()
-        .FindAll(item => item.Id != entity.Id);
-        list.Add(entity);
+        await SetAllDtos(list);
 
-        SetAllEntities(list);
-
-        // Console.WriteLine($"new-list count={GetAllEntities().Count}");
-
-        return entity;
+        OnWrite?.Invoke(dto);
     }
 }

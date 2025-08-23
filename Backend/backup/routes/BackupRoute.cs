@@ -18,8 +18,8 @@ public class BackupController : ControllerBase
     }
 
     [HttpPost("restore")]
-    public void Restore([BindRequired] DateTime createdAt)
+    public async Task Restore([BindRequired] DateTime createdAt)
     {
-        BackupService.RestoreBackup(createdAt);
+        await BackupService.RestoreBackup(createdAt);
     }
 }

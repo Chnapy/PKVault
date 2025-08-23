@@ -1,42 +1,22 @@
-
-using System.Text.Json;
-using PKHeX.Core;
-
-public class BoxDTO : IWithId<string>, ICloneable<BoxDTO>
+public class BoxDTO : IWithId<string>
 {
     public const int PARTY_ID = -1;
     public const int DAYCARE_ID = -2;
 
-    public static BoxDTO FromEntity(BoxEntity entity)
-    {
-        return new BoxDTO
-        {
-            Id = entity.Id,
-            Type = BoxType.Default,
-            Name = entity.Name,
-            CanReceivePkm = true,
-        };
-    }
-
-    public string Id { get; set; }
+    public string Id { get { return BoxEntity.Id; } }
 
     public int IdInt
     {
-        get { return Int32.Parse(Id); }
+        get { return int.Parse(Id); }
     }
 
     public BoxType Type { get; set; }
 
-    public string Name { get; set; }
+    public string Name { get { return BoxEntity.Name; } }
 
-    public bool CanReceivePkm { get; set; }
+    public bool CanReceivePkm { get { return Type != BoxType.Daycare; } }
 
-    public BoxDTO Clone()
-    {
-        return JsonSerializer.Deserialize<BoxDTO>(
-            JsonSerializer.Serialize(this)
-        )!;
-    }
+    public required BoxEntity BoxEntity;
 }
 
 public enum BoxType
