@@ -6,5 +6,5 @@ public class PkmEntity : IWithId<string>
 
     public required uint BoxSlot { get; set; }
 
-    public uint? SaveId { get; set; }
+    public required uint? SaveId { get; set; }
 }

@@ -20,7 +20,7 @@ public class DetachPkmSaveAction : DataAction
     public override async Task Execute(DataEntityLoaders loaders)
     {
         var pkm = loaders.pkmLoader.GetDto(pkmId);
-        pkm.Save = default;
+        pkm.PkmEntity.SaveId = default;
         await loaders.pkmLoader.WriteDto(pkm);
     }
 }

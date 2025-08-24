@@ -14,6 +14,7 @@ public class PkmConvertService
             3 => new PK3(),
             4 => new PK4(),
             5 => new PK5(),
+            6 => new PK6(),
             7 => new PK7(),
             _ => default
         };

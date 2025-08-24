@@ -1,5 +1,3 @@
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using PKHeX.Core;
 
 public class LocalSaveService
@@ -11,9 +9,11 @@ public class LocalSaveService
     private const int TIMER_INTERVAL = 30;
     private static Timer? Timer;
 
-    public static void PrepareTimer()
+    public static async Task PrepareTimerAndRun()
     {
-        Timer = new Timer((object? _) => ReadLocalSaves(), null, TimeSpan.Zero, TimeSpan.FromSeconds(TIMER_INTERVAL));
+        await ReadLocalSaves();
+
+        Timer = new Timer((object? _) => ReadLocalSaves(), null, TimeSpan.FromSeconds(TIMER_INTERVAL), TimeSpan.FromSeconds(TIMER_INTERVAL));
     }
 
     public static async Task ResetTimerAndData()
@@ -22,26 +22,18 @@ public class LocalSaveService
         SaveById.Clear();
         SaveByPath.Clear();
 
-        await ReadLocalSaves();
-
-        PrepareTimer();
+        await PrepareTimerAndRun();
     }
 
     public static async Task ReadLocalSaves()
     {
-        var rootDir = Settings.rootDir;
-        var globs = Settings.savesGlobs.ToList();
-
-        var matcher = new Matcher();
-        globs.ForEach(glob => matcher.AddInclude(glob));
-        var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
+        var globs = SettingsService.AppSettings.SAVE_GLOBS;
+        var searchPaths = MatcherUtil.SearchPaths(globs);
 
         var hasBeenUpdated = false;
 
-        foreach (var file in matches.Files)
+        foreach (var path in searchPaths)
         {
-            var path = Path.Combine(rootDir, file.Path);
-
             var updated = UpdateSaveFromPath(path);
             if (updated)
             {
@@ -89,8 +81,7 @@ public class LocalSaveService
 
         if (save == null)
         {
-            DeleteSaveFromPath(path);
-            return true;
+            return false;
         }
 
         SaveById.TryGetValue(save.ID32, out var existingSave);

@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { getDexGetAllQueryKey } from "../../data/sdk/dex/dex.gen";
 import {
   getSaveInfosDownloadUrl,
@@ -9,10 +10,10 @@ import {
 } from "../../data/sdk/save-infos/save-infos.gen";
 import { useStorageGetActions } from '../../data/sdk/storage/storage.gen';
 import { getWarningsGetWarningsQueryKey } from '../../data/sdk/warnings/warnings.gen';
+import { Button } from '../../ui/button/button';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { Container } from "../../ui/container/container";
 import { SaveCardContentFull } from '../../ui/save-card/save-card-content-full';
-import { Button } from '../../ui/button/button';
 
 export type SaveItemProps = {
   saveId: number;
@@ -46,7 +47,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
     },
   });
 
-  const downloadUrl = getSaveInfosDownloadUrl(saveId);
+  const downloadUrl = getApiFullUrl(getSaveInfosDownloadUrl(saveId));
 
   // const saveInfosRestoreBackupMutation = useSaveInfosRestoreBackup({
   //   mutation: {

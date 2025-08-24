@@ -27,12 +27,12 @@ public class DeletePkmVersionAction : DataAction
             throw new Exception($"Cannot delete pkm-version attached in save, pkm-version.id={pkmVersionId}");
         }
 
-        loaders.pkmVersionLoader.DeleteDto(pkmVersionId);
+        await loaders.pkmVersionLoader.DeleteDto(pkmVersionId);
 
         var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos().FindAll(value => value.PkmDto.Id == pkm.Id);
         if (relatedPkmVersions.Count == 0)
         {
-            loaders.pkmLoader.DeleteDto(pkm.Id);
+            await loaders.pkmLoader.DeleteDto(pkm.Id);
         }
     }
 }

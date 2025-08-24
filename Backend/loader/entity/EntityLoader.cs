@@ -2,6 +2,7 @@
 public abstract class EntityLoader<DTO, E> where DTO : IWithId<string>
 {
     public Action<DTO>? OnWrite;
+    public Action<DTO>? OnDelete;
     public bool HasWritten = false;
 
     public abstract List<DTO> GetAllDtos();
@@ -18,7 +19,7 @@ public abstract class EntityLoader<DTO, E> where DTO : IWithId<string>
         return GetAllDtos().Find(entity => entity.Id == id);
     }
 
-    public virtual void DeleteDto(string id)
+    public virtual async Task DeleteDto(string id)
     {
         Console.WriteLine($"Delete entity id={id}");
 
@@ -31,7 +32,9 @@ public abstract class EntityLoader<DTO, E> where DTO : IWithId<string>
 
         var finalList = initialList.FindAll(entity => entity.Id != id);
 
-        SetAllDtos(finalList);
+        await SetAllDtos(finalList);
+
+        OnDelete?.Invoke(removedEntity);
     }
 
     public virtual async Task WriteDto(DTO dto)

@@ -72,7 +72,7 @@ public class SaveBoxLoader : EntityLoader<BoxDTO, object>
         return entity;
     }
 
-    public override void DeleteDto(string id)
+    public override Task DeleteDto(string id)
     {
         throw new Exception($"Not implemented");
     }

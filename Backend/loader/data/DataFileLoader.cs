@@ -15,8 +15,10 @@ public class DataFileLoader : DataLoader
             saveDict.Add(save.ID32, save.Clone());
         });
 
+        var dbDir = SettingsService.AppSettings.DB_PATH;
+
         var boxLoader = await EntityJSONLoader<BoxDTO, BoxEntity>.Create(
-            filePath: Path.Combine(Settings.dbDir, "box.json"),
+            filePath: Path.Combine(dbDir, "box.json"),
             entityToDto: async (BoxEntity entity) =>
             {
                 return new BoxDTO
@@ -27,19 +29,28 @@ public class DataFileLoader : DataLoader
             },
             dtoToEntity: dto => dto.BoxEntity
         );
+        var boxes = boxLoader.GetAllDtos();
+        if (boxes.Count == 0)
+        {
+            await boxLoader.WriteDto(new BoxDTO
+            {
+                Type = BoxType.Default,
+                BoxEntity = new()
+                {
+                    Id = "0",
+                    Name = "Box 1"
+                }
+            });
+        }
 
         var pkmLoader = await EntityJSONLoader<PkmDTO, PkmEntity>.Create(
-           filePath: Path.Combine(Settings.dbDir, "pkm.json"),
-            entityToDto: async (PkmEntity entity) =>
-            {
-                var save = entity.SaveId != null ? saveDict[(uint)entity.SaveId] : null;
-                return PkmDTO.FromEntity(entity, save);
-            },
+           filePath: Path.Combine(dbDir, "pkm.json"),
+            entityToDto: async (PkmEntity entity) => PkmDTO.FromEntity(entity),
             dtoToEntity: dto => dto.PkmEntity
         );
 
         var pkmVersionLoader = await EntityJSONLoader<PkmVersionDTO, PkmVersionEntity>.Create(
-           filePath: Path.Combine(Settings.dbDir, "pkm-version.json"),
+           filePath: Path.Combine(dbDir, "pkm-version.json"),
             entityToDto: async (PkmVersionEntity entity) =>
             {
                 var pkmDto = pkmLoader.GetDto(entity.PkmId);
@@ -65,6 +76,10 @@ public class DataFileLoader : DataLoader
             pkmFileLoader.WriteEntity(
                 PKMLoader.GetPKMBytes(pkm), pkm, dto.PkmVersionEntity.Filepath
             );
+        };
+        pkmVersionLoader.OnDelete = (dto) =>
+        {
+            pkmFileLoader.DeleteEntity(dto.PkmVersionEntity.Filepath);
         };
 
         Console.WriteLine($"File-loader save-loaders loading");

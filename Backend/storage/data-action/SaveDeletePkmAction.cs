@@ -30,6 +30,6 @@ public class SaveDeletePkmAction : DataAction
             throw new Exception("Save Pkm not found");
         }
 
-        saveLoaders.Pkms.DeleteDto(pkmId);
+        await saveLoaders.Pkms.DeleteDto(pkmId);
     }
 }

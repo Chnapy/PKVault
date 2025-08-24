@@ -58,8 +58,8 @@ public class SaveMovePkmToStorageAction : DataAction
                 Id = savePkm.Id,
                 BoxId = storageBoxId,
                 BoxSlot = storageSlot,
-            },
-            saveLoaders.Save);
+                SaveId = saveLoaders.Save.ID32,
+            });
 
             pkmVersionDto = await PkmVersionDTO.FromEntity(
                 new PkmVersionEntity
@@ -83,12 +83,12 @@ public class SaveMovePkmToStorageAction : DataAction
         {
             await new SynchronizePkmAction(saveId, pkmVersionDto.Id).Execute(loaders);
 
-            pkmEntity.Save = default;
+            pkmEntity.PkmEntity.SaveId = default;
         }
 
         await loaders.pkmLoader.WriteDto(pkmEntity);
 
         // remove pkm from save
-        saveLoaders.Pkms.DeleteDto(savePkm.Id);
+        await saveLoaders.Pkms.DeleteDto(savePkm.Id);
     }
 }

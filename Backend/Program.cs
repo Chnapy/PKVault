@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using PKHeX.Core;
 
 namespace Backend;
 
@@ -18,18 +17,19 @@ public static class Program
 
         var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
-        LocalSaveService.PrepareTimer();
+        await LocalSaveService.PrepareTimerAndRun();
+
+        // Console.WriteLine($"Save loaded by ID:\n{string.Join('\n', LocalSaveService.SaveById.Keys)}");
+        // Console.WriteLine($"Save loaded by path:\n{string.Join('\n', LocalSaveService.SaveByPath.Keys)}");
+
+        // if (1 == 1)
+        // {
+        //     return;
+        // }
 
         await StorageService.Initialize();
 
-        StorageService.CleanMainStorageFiles();
-
-        Console.WriteLine($"Save loaded: {string.Join(',', LocalSaveService.SaveById.Keys)}");
-
-        PokeApi.ClearCache();
-
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
+        // StorageService.CleanMainStorageFiles();
 
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
@@ -57,6 +57,11 @@ public static class Program
         //     return;
         // }
 
+        SetupWebApp(args);
+    }
+
+    private static void SetupWebApp(string[] args)
+    {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddCors(options =>
         {
@@ -82,8 +87,9 @@ public static class Program
             };
         });
 
-        var certPem = File.ReadAllText("../.devcontainer/.cert/code.lan+3.pem");
-        var keyPem = File.ReadAllText("../.devcontainer/.cert/code.lan+3-key.pem");
+        // TDOO should be removed
+        var certPem = File.ReadAllText(SettingsService.AppSettings.HTTPS_CERT_PEM_PATH);
+        var keyPem = File.ReadAllText(SettingsService.AppSettings.HTTPS_KEY_PEM_PATH);
         var certificate = X509Certificate2.CreateFromPem(certPem, keyPem);
 
         builder.WebHost.ConfigureKestrel(serverOptions =>

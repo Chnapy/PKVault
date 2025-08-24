@@ -134,6 +134,9 @@ export const StorageMainBox: React.FC = () => {
           );
         }
 
+        const species = versions[ 0 ].species;
+        const isShiny = versions[ 0 ].isShiny;
+
         const saveHeldItemSprite = save && versions.find((version) => version.generation === save.generation)?.spriteItem;
         const heldItemSprite = saveHeldItemSprite ?? versions.find((version) => version.id === pkm.id)?.spriteItem;
 
@@ -142,15 +145,15 @@ export const StorageMainBox: React.FC = () => {
             key={"pkm-" + pkm.id}
             storageType="main"
             pkmId={pkm.id}
-            species={pkm.species}
+            species={species}
             isEgg={false}
-            isShiny={pkm.isShiny}
+            isShiny={isShiny}
             isShadow={false}
             heldItemSprite={heldItemSprite}
             warning={versions.some((value) => !value.isValid)}
             disabled={
               Boolean(pkm.saveId)
-              || (!!save && pkm.species > save.maxSpeciesId)
+              || (!!save && species > save.maxSpeciesId)
               // || !versions.some(
               //   (version) =>
               //     !saveInfos || version.generation === saveInfos?.generation

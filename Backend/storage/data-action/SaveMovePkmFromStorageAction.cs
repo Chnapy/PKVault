@@ -90,7 +90,7 @@ public class SaveMovePkmFromStorageAction : DataAction
 
         await saveLoaders.Pkms.WriteDto(pkmSaveDTO);
 
-        pkmDto.Save = saveLoaders.Save;
+        pkmDto.PkmEntity.SaveId = saveLoaders.Save.ID32;
         await loaders.pkmLoader.WriteDto(pkmDto);
 
         if (pkmSaveDTO.GetAttachedPkmVersion() == null)

@@ -44,7 +44,7 @@ public class SaveMovePkmAction : DataAction
             throw new Exception($"Save Pkm already present in slot, boxId={boxId}, boxSlot={boxSlot}");
         }
 
-        saveLoaders.Pkms.DeleteDto(dto.Id);
+        await saveLoaders.Pkms.DeleteDto(dto.Id);
 
         // dto.BoxType = boxType;
         dto.Box = boxId;

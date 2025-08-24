@@ -33,7 +33,6 @@ public class EditPkmVersionAction : DataAction
 
         var pkm = pkmVersionDto.Pkm;
 
-        // TODO PkmEntity nickname should also change
         EditPkmNickname(pkm, payload.Nickname);
         EditPkmEVs(pkm, payload.EVs);
         EditPkmMoves(pkm, pkmVersionDto.AvailableMoves, payload.Moves);

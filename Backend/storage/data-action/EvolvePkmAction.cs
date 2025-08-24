@@ -72,17 +72,21 @@ public class EvolvePkmAction : DataAction
         var mainDto = dto.IsMain ? dto : relatedPkmVersions.Find(version => version.IsMain);
 
         // update dto 1/2
+        await loaders.pkmVersionLoader.DeleteDto(dto.Id);
         UpdatePkm(dto.Pkm, evolveSpecies, evolveByItem);
         dto.PkmVersionEntity.Id = dto.Id;
         dto.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(dto.Pkm);
 
         // update related dto 1/2
-        relatedPkmVersions.ForEach((versionDto) =>
-        {
-            UpdatePkm(versionDto.Pkm, evolveSpecies, false);
-            versionDto.PkmVersionEntity.Id = versionDto.Id;
-            versionDto.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(versionDto.Pkm);
-        });
+        await Task.WhenAll(
+            relatedPkmVersions.Select(async (versionDto) =>
+            {
+                await loaders.pkmVersionLoader.DeleteDto(versionDto.Id);
+                UpdatePkm(versionDto.Pkm, evolveSpecies, false);
+                versionDto.PkmVersionEntity.Id = versionDto.Id;
+                versionDto.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(versionDto.Pkm);
+            })
+        );
 
         // pkmId to assign to every pkm-version here
         var pkmId = mainDto.Id;
@@ -164,7 +168,12 @@ public class EvolvePkmAction : DataAction
 
         PkmConvertService.ApplyNicknameToPkm(pkm, pkm.Nickname);
 
-        pkm.RefreshAbility(0);
+        bool hasPidIssue() => new LegalityAnalysis(pkm).Results.Any(result => !result.Valid && result.Identifier == CheckIdentifier.PID);
+
+        for (var i = 0; i < pkm.PersonalInfo.AbilityCount && hasPidIssue(); i++)
+        {
+            pkm.RefreshAbility(i);
+        }
 
         pkm.RefreshChecksum();
     }

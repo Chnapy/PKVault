@@ -23,6 +23,10 @@ public class DataMemoryLoader : DataLoader
                 PKMLoader.GetPKMBytes(pkm), pkm, dto.PkmVersionEntity.Filepath
             );
         };
+        pkmVersionLoader.OnDelete = (dto) =>
+        {
+            pkmMemoryLoader.DeleteEntity(dto.PkmVersionEntity.Filepath);
+        };
 
         pkmVersionDtos
         .ForEach(pkmVersionDto =>

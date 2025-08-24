@@ -25,7 +25,7 @@ export const PkmVersionWarning: React.FC<PkmVersionWarningProps> = ({ pkmVersion
         return null;
     }
 
-    const pokemonSpeciesInfos = pkmSpeciesRecord[ pkm.species ];
+    const pokemonSpeciesInfos = pkmSpeciesRecord[ pkmVersion.species ];
     const speciesName = getCurrentLanguageName(pokemonSpeciesInfos.names);
 
     return <div style={{

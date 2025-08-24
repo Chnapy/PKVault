@@ -146,7 +146,7 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO, object>
         dtoList = await PrepareDtoList(save, pkmDtoLoader, pkmVersionDtoLoader);
     }
 
-    public override void DeleteDto(string id)
+    public override async Task DeleteDto(string id)
     {
         var entity = GetDto(id);
         if (entity != default)

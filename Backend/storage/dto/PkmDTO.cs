@@ -1,14 +1,10 @@
-
-using PKHeX.Core;
-
 public class PkmDTO : IWithId<string>
 {
-    public static PkmDTO FromEntity(PkmEntity entity, SaveFile? save)
+    public static PkmDTO FromEntity(PkmEntity entity)
     {
         return new PkmDTO
         {
             PkmEntity = entity,
-            Save = save,
         };
     }
 
@@ -18,11 +14,9 @@ public class PkmDTO : IWithId<string>
 
     public uint BoxSlot { get { return PkmEntity.BoxSlot; } }
 
-    public uint? SaveId { get { return Save?.ID32; } }
+    public uint? SaveId { get { return PkmEntity.SaveId; } }
 
     // public List<uint> CompatibleGenerations { get; set; }
 
     public required PkmEntity PkmEntity;
-
-    public required SaveFile? Save;
 }

@@ -2,18 +2,17 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO.Compression;
 using System.Text.Json;
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
 public class BackupService
 {
-    private static string bkpPath = "/root/projects/pkvault/tmp/bkp";
     private static string bkpTempDir = ".bkp";
 
     private static string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
 
     public static async Task<DateTime> CreateBackup()
     {
+        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+
         Stopwatch sw = new();
 
         sw.Start();
@@ -61,6 +60,8 @@ public class BackupService
 
     private static void PrepareBkpDir()
     {
+        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
         var bkpDbDirPath = Path.Combine(bkpTmpDirPath, "db");
         var bkpSavesDirPath = Path.Combine(bkpTmpDirPath, "saves");
@@ -79,15 +80,19 @@ public class BackupService
 
     private static Dictionary<string, string> CreateDbBackup(DataEntityLoaders loaders)
     {
+        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
 
         var boxEntities = loaders.boxLoader.GetAllEntities();
         var pkmEntities = loaders.pkmLoader.GetAllEntities();
         var pkmVersionEntities = loaders.pkmVersionLoader.GetAllEntities();
 
-        var boxPath = Path.Combine(Settings.dbDir, "box.json");
-        var pkmPath = Path.Combine(Settings.dbDir, "pkm.json");
-        var pkmVersionPath = Path.Combine(Settings.dbDir, "pkm-version.json");
+        var dbDir = SettingsService.AppSettings.DB_PATH;
+
+        var boxPath = Path.Combine(dbDir, "box.json");
+        var pkmPath = Path.Combine(dbDir, "pkm.json");
+        var pkmVersionPath = Path.Combine(dbDir, "pkm-version.json");
 
         var relativeBoxPath = Path.Combine("db", "box.json");
         var relativePkmPath = Path.Combine("db", "pkm.json");
@@ -117,20 +122,16 @@ public class BackupService
 
     private static Dictionary<string, string> CreateSavesBackup()
     {
-        var rootDir = Settings.rootDir;
-        var globs = Settings.savesGlobs.ToList();
-
-        var matcher = new Matcher();
-        globs.ForEach(glob => matcher.AddInclude(glob));
-        var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
+        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+        var globs = SettingsService.AppSettings.SAVE_GLOBS;
+        var searchPaths = MatcherUtil.SearchPaths(globs);
 
         var paths = new Dictionary<string, string>();
 
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
 
-        foreach (var file in matches.Files)
+        foreach (var path in searchPaths)
         {
-            var path = Path.Combine(rootDir, file.Path);
             var filename = Path.GetFileNameWithoutExtension(path);
             var ext = Path.GetExtension(path);
 
@@ -152,6 +153,8 @@ public class BackupService
 
     private static Dictionary<string, string> CreateMainBackup(DataEntityLoaders loaders)
     {
+        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
         var bkpMainDirPath = Path.Combine(bkpTmpDirPath, "main");
 
@@ -197,6 +200,8 @@ public class BackupService
 
     private static DateTime Compress()
     {
+        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+
         var dateTime = DateTime.UtcNow;
 
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
@@ -205,6 +210,8 @@ public class BackupService
 
         ZipFile.CreateFromDirectory(bkpTmpDirPath, bkpZipPath);
 
+        Console.WriteLine($"Create backup - Zip in {bkpZipPath}");
+
         Directory.Delete(bkpTmpDirPath, true);
 
         return dateTime;
@@ -212,19 +219,15 @@ public class BackupService
 
     public static List<BackupDTO> GetBackupList()
     {
+        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
         var glob = Path.Combine(bkpPath, "*.zip");
+        var searchPaths = MatcherUtil.SearchPaths([glob]);
 
-        var matcher = new Matcher();
-        matcher.AddInclude(glob);
-        var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(Settings.rootDir)));
-
-        var result = matches.Files.Select(file =>
+        var result = searchPaths.Select(path =>
         {
             try
             {
-                var path = Path.Combine(Settings.rootDir, file.Path);
-
-                var filename = Path.GetFileNameWithoutExtension(file.Path);
+                var filename = Path.GetFileNameWithoutExtension(path);
                 var dateTimeStr = filename.Split('_').Last();
 
                 var dateTime = DeserializeDateTime(dateTimeStr);
@@ -247,6 +250,8 @@ public class BackupService
 
     public static void DeleteBackup(DateTime createdAt)
     {
+        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+
         var fileName = GetBackupFilename(createdAt);
         var bkpZipPath = Path.Combine(bkpPath, fileName);
 
@@ -260,6 +265,8 @@ public class BackupService
 
     public static async Task RestoreBackup(DateTime createdAt)
     {
+        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+
         var fileName = GetBackupFilename(createdAt);
 
         Console.WriteLine($"Backup restore {fileName}");

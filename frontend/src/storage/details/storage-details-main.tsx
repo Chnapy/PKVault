@@ -170,6 +170,8 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
         return null;
     }
 
+    const species = pkmVersionList[ 0 ].species;
+
     const pkmSaveRaw = pkm.saveId ? saveInfosQuery.data?.data[ pkm.saveId ] : undefined;
     const pkmSave = pkmSaveRaw && pkmVersion.generation === pkmSaveRaw.generation ? pkmSaveRaw : undefined;
 
@@ -179,7 +181,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
 
     const originTrainerGender = getGender(pkmVersion.originTrainerGender);
 
-    const types = pkmRecord[ pkm.species ].types.map(type =>
+    const types = pkmRecord[ species ].types.map(type =>
         getCurrentLanguageName(getTypeByIdOrName(type.type.name).names)
     );
 
@@ -189,7 +191,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
     const nature = typeof pkmVersion.nature === 'number' ? getNatureByIdOrName(pkmVersion.nature) : undefined;
     const natureStr = nature && getCurrentLanguageName(nature.names);
 
-    const isCompatibleWithSave = !save || pkm.species <= save.maxSpeciesId;
+    const isCompatibleWithSave = !save || species <= save.maxSpeciesId;
 
     return <StorageDetailsForm.Provider
         key={pkmVersion.id}

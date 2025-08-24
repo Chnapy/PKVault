@@ -1,7 +1,4 @@
 using System.Diagnostics;
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
-using PKHeX.Core;
 
 public class StorageService
 {
@@ -194,34 +191,35 @@ public class StorageService
         }
     }
 
-    public static void CleanMainStorageFiles()
-    {
-        Stopwatch sw = new();
+    // public static void CleanMainStorageFiles()
+    // {
+    //     Stopwatch sw = new();
 
-        Console.WriteLine($"Storage files clean up");
+    //     Console.WriteLine($"Storage files clean up");
 
-        sw.Start();
+    //     sw.Start();
 
-        var pkmVersionsFilepaths = memoryLoader.loaders.pkmVersionLoader.GetAllDtos().Select(dto => dto.PkmVersionEntity.Filepath).ToList();
+    //     var pkmVersionsFilepaths = memoryLoader.loaders.pkmVersionLoader.GetAllDtos().Select(dto => dto.PkmVersionEntity.Filepath).ToList();
 
-        var rootDir = Settings.rootDir;
+    //     var rootDir = ".";
+    //     var storagePath = SettingsService.AppSettings.STORAGE_PATH;
 
-        var matcher = new Matcher();
-        matcher.AddInclude(Path.Combine(Settings.mainPkmStoragePath, "**/*"));
-        var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
+    //     var matcher = new Matcher();
+    //     matcher.AddInclude(Path.Combine(storagePath, "**/*"));
+    //     var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
 
-        foreach (var file in matches.Files)
-        {
-            var path = Path.Combine(rootDir, file.Path);
+    //     foreach (var file in matches.Files)
+    //     {
+    //         var path = Path.Combine(rootDir, file.Path);
 
-            if (!pkmVersionsFilepaths.Contains(path))
-            {
-                Console.WriteLine($"Clean storage file {path}");
-                File.Delete(path);
-            }
-        }
-        sw.Stop();
+    //         if (!pkmVersionsFilepaths.Contains(path))
+    //         {
+    //             Console.WriteLine($"Clean storage file {path}");
+    //             File.Delete(path);
+    //         }
+    //     }
+    //     sw.Stop();
 
-        Console.WriteLine($"Storage files cleaned up in {sw.Elapsed}");
-    }
+    //     Console.WriteLine($"Storage files cleaned up in {sw.Elapsed}");
+    // }
 }

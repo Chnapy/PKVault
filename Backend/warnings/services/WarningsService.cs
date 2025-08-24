@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using PKHeX.Core;
 
 public class WarningsService
