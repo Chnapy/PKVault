@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "VITE_SERVER_URL=https://code.lan:5000 vite",
+    "dev": "VITE_SERVER_URL=http://code.lan:5000 vite",
     "build": "vite build",
     "preview": "vite preview",
     "c:type": "tsc -b",

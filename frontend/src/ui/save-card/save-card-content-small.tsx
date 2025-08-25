@@ -1,6 +1,6 @@
 import type React from "react";
-import brendanBigImg from "../../assets/trainer/big/Spr_RS_Brendan.png";
-import brendanSmallImg from "../../assets/trainer/small/Brendan_RS_OD.png";
+import brendanBigImg from "../../assets/trainer/big/Spr_RS_Brendan.png?url";
+import brendanSmallImg from "../../assets/trainer/small/Brendan_RS_OD.png?url";
 import type { GameVersion } from "../../data/sdk/model";
 import { getGameInfos } from "../../pokedex/details/util/get-game-infos";
 import { TextContainer } from "../text-container/text-container";

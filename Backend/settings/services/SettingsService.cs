@@ -34,8 +34,6 @@ public class SettingsService
             SAVE_GLOBS = ["./tmp/saves/**/*.sav"],
             STORAGE_PATH = "./tmp/storage",
             BACKUP_PATH = "./tmp/backup",
-            HTTPS_CERT_PEM_PATH = "../.devcontainer/.cert/code.lan+3.pem",  // TODO should be removed
-            HTTPS_KEY_PEM_PATH = "../.devcontainer/.cert/code.lan+3-key.pem",
         };
     }
 }
@@ -46,6 +44,6 @@ public struct AppSettings
     public required string[] SAVE_GLOBS { get; set; }
     public required string STORAGE_PATH { get; set; }
     public required string BACKUP_PATH { get; set; }
-    public required string HTTPS_CERT_PEM_PATH { get; set; }
-    public required string HTTPS_KEY_PEM_PATH { get; set; }
+    public string? HTTPS_CERT_PEM_PATH { get; set; }
+    public string? HTTPS_KEY_PEM_PATH { get; set; }
 }

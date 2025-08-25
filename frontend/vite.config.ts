@@ -15,9 +15,11 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     allowedHosts: true,
-    https: {
-      key: fs.readFileSync("../.devcontainer/.cert/code.lan+3-key.pem"),
-      cert: fs.readFileSync("../.devcontainer/.cert/code.lan+3.pem"),
-    },
+    https: process.env.VITE_SERVER_URL?.startsWith('https')
+      ? {
+        key: fs.readFileSync("../.devcontainer/.cert/code.lan+3-key.pem"),
+        cert: fs.readFileSync("../.devcontainer/.cert/code.lan+3.pem"),
+      }
+      : undefined,
   },
 });

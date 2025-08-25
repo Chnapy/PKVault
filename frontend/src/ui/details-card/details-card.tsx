@@ -1,5 +1,5 @@
 import React from "react";
-import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png';
+import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png?url';
 import type { GenderType } from '../../data/sdk/model';
 import { Button } from '../button/button';
 import { getSpeciesNO } from "../dex-item/util/get-species-no";

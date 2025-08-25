@@ -1,5 +1,5 @@
 import React from "react";
-import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png';
+import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png?url';
 import { GenderType, type GameVersion, type MoveItem } from "../../data/sdk/model";
 import { Button } from "../button/button";
 import { ButtonWithConfirm } from '../button/button-with-confirm';

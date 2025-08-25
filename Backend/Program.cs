@@ -87,16 +87,21 @@ public static class Program
             };
         });
 
-        // TDOO should be removed
-        var certPem = File.ReadAllText(SettingsService.AppSettings.HTTPS_CERT_PEM_PATH);
-        var keyPem = File.ReadAllText(SettingsService.AppSettings.HTTPS_KEY_PEM_PATH);
-        var certificate = X509Certificate2.CreateFromPem(certPem, keyPem);
+        var certificate = SettingsService.AppSettings.HTTPS_CERT_PEM_PATH != default && SettingsService.AppSettings.HTTPS_KEY_PEM_PATH != default
+            ? X509Certificate2.CreateFromPem(
+                File.ReadAllText(SettingsService.AppSettings.HTTPS_CERT_PEM_PATH),
+                File.ReadAllText(SettingsService.AppSettings.HTTPS_KEY_PEM_PATH)
+                )
+            : null;
 
         builder.WebHost.ConfigureKestrel(serverOptions =>
         {
             serverOptions.ListenAnyIP(5000, listenOptions =>
             {
-                listenOptions.UseHttps(certificate);
+                if (certificate != default)
+                {
+                    listenOptions.UseHttps(certificate);
+                }
             });
         });
 
