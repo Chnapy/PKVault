@@ -36,6 +36,15 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return Pkm.Species; }
     }
 
+    public string SpeciesName
+    {
+        get
+        {
+            var stringsFr = GameInfo.GetStrings("fr");
+            return stringsFr.Species[Pkm.Species];
+        }
+    }
+
     public bool IsEgg
     {
         get { return Pkm.IsEgg; }
@@ -46,14 +55,32 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return Pkm.IsShiny; }
     }
 
-    public byte Ball
+    public string? Sprite { get; set; }
+
+    public string? BallSprite { get; set; }
+
+    public GenderType? Gender
     {
-        get { return Pkm.Ball; }
+        get
+        {
+            return Pkm.Gender switch
+            {
+                0 => GenderType.MALE,
+                1 => GenderType.FEMALE,
+                _ => null,
+            };
+        }
     }
 
-    public byte Gender
+    public List<string> Types
     {
-        get { return Pkm.Gender; }
+        get
+        {
+            var stringsFr = GameInfo.GetStrings("fr");
+            var type1 = stringsFr.Types[Pkm.PersonalInfo.Type1];
+            var type2 = stringsFr.Types[Pkm.PersonalInfo.Type2];
+            return [type1, type2];
+        }
     }
 
     public byte Level
@@ -113,12 +140,31 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         }
     }
 
-    public int HiddenPowerType
+    public int[] BaseStats
+    {
+        get
+        {
+            return [
+                Pkm.PersonalInfo.GetBaseStatValue(0),
+                Pkm.PersonalInfo.GetBaseStatValue(1),
+                Pkm.PersonalInfo.GetBaseStatValue(2),
+                Pkm.PersonalInfo.GetBaseStatValue(4),
+                Pkm.PersonalInfo.GetBaseStatValue(5),
+                Pkm.PersonalInfo.GetBaseStatValue(3),
+            ];
+        }
+    }
+
+    public string HiddenPowerType
     {
         get
         {
             HiddenPower.TryGetTypeIndex(Pkm.HPType, out var hptype);
-            return hptype + 1;
+
+            var stringsFr = GameInfo.GetStrings("fr");
+            var type = stringsFr.Types[hptype];
+
+            return type;
         }
     }
 
@@ -127,15 +173,17 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return Pkm.HPPower; }
     }
 
-    // TODO use pokeapi nature ?
-    public PKHeX.Core.Nature? Nature
-    {
-        get { return Pkm.Format > 2 ? Pkm.Nature : null; }
-    }
+    public string? Nature { get; set; }
 
-    public int? Ability
+    public string? Ability
     {
-        get { return Pkm.Ability == -1 ? null : Pkm.Ability; }
+        get
+        {
+            var stringsFr = GameInfo.GetStrings("fr");
+            return Pkm.Ability == -1
+                ? null
+                : stringsFr.Ability[Pkm.Ability];
+        }
     }
 
     public List<MoveItem> Moves
@@ -191,9 +239,17 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return Pkm.OriginalTrainerName; }
     }
 
-    public byte OriginTrainerGender
+    public GenderType OriginTrainerGender
     {
-        get { return Pkm.OriginalTrainerGender; }
+        get
+        {
+            return Pkm.OriginalTrainerGender switch
+            {
+                0 => GenderType.MALE,
+                1 => GenderType.FEMALE,
+                _ => throw new Exception("Pkm.OriginalTrainerGender unexpected value"),
+            };
+        }
     }
 
     public DateOnly? OriginMetDate
@@ -330,7 +386,53 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         return id;
     }
 
-    public async Task RefreshHasTradeEvolve()
+    public async Task RefreshAsyncData()
+    {
+        await RefreshSprite();
+        await RefreshBallSprite();
+        await RefreshNature();
+        await RefreshHasTradeEvolve();
+    }
+
+    private async Task RefreshSprite()
+    {
+        var pkmObj = await PokeApi.GetPokemon(Species);
+
+        Sprite = IsEgg
+            ? "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png"
+            : (
+                IsShiny
+                    ? pkmObj.Sprites.FrontShiny
+                    : pkmObj.Sprites.FrontDefault
+            );
+    }
+
+    private async Task RefreshBallSprite()
+    {
+        var ballItem = await PokeApi.GetItem(Pkm.Ball);
+
+        BallSprite = ballItem?.Sprites.Default;
+    }
+
+    private async Task RefreshNature()
+    {
+        if (Pkm.Format <= 2)
+        {
+            Nature = null;
+        }
+        else
+        {
+            var natureName = GameInfo.Strings.natures[(int)Pkm.Nature];
+
+            var nature = await PokeApi.GetNature(natureName);
+
+            var natureText = nature?.Names.Find(name => name.Language.Name == "fr")?.Name;
+
+            Nature = natureText;
+        }
+    }
+
+    private async Task RefreshHasTradeEvolve()
     {
         var evolvesByTrade = await GetTradeEvolveChains();
 

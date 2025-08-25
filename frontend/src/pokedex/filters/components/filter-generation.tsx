@@ -1,30 +1,32 @@
 import React from "react";
-import { useStaticData } from "../../../data/static-data/static-data";
+import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
 import { Route } from "../../../routes/pokedex";
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
-import { useCurrentLanguageName } from '../../../data/hooks/use-current-language-name';
 
 export const FilterGeneration: React.FC = () => {
   const navigate = Route.useNavigate();
   const searchValue =
     Route.useSearch({ select: (search) => search.filterGenerations }) ?? [];
 
-  const getCurrentLanguageName = useCurrentLanguageName();
+  const dexAll = useDexGetAll().data?.data ?? {};
+  const allGenerations = [ ...new Set(
+    Object.values(dexAll).flatMap(value => Object.values(value)).flatMap(value => value.generation)
+  ) ];
 
-  const options = useStaticData().generation.map((generation) => ({
-    value: generation.name,
-    label: getCurrentLanguageName(generation.names),
+  const options = allGenerations.map((generation) => ({
+    value: generation.toString(),
+    label: `Generation ${generation}`,
   }));
 
   return (
     <FilterSelect
       enabled={searchValue.length > 0}
       multiple
-      value={searchValue}
+      value={searchValue.map(String)}
       onChange={(values) => {
         navigate({
           search: {
-            filterGenerations: values,
+            filterGenerations: values.map(Number),
           },
         });
       }}

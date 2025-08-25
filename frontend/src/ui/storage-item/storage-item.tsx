@@ -1,5 +1,4 @@
 import React from "react";
-import { useStaticData } from "../../data/static-data/static-data";
 import { Container } from "../container/container";
 import { useDraggable } from "@dnd-kit/core";
 import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png';
@@ -13,6 +12,7 @@ export type StorageItemProps = {
   isEgg: boolean;
   isShiny: boolean;
   isShadow: boolean;
+  sprite: string;
   heldItemSprite?: number;
   selected?: boolean;
   onClick?: () => void;
@@ -29,6 +29,7 @@ export const StorageItem: React.FC<StorageItemProps> = ({
   isEgg,
   isShiny,
   isShadow,
+  sprite,
   heldItemSprite,
   selected,
   onClick,
@@ -37,16 +38,6 @@ export const StorageItem: React.FC<StorageItemProps> = ({
   shouldCreateVersion,
   boxSlot,
 }) => {
-  const staticData = useStaticData();
-  const pokemonDataItem = staticData.pokemon[ species ];
-
-  // const mainPkmQuery = useStorageGetMainPkms({
-  //   query: {
-  //     // enabled: type === "main",
-  //   },
-  // });
-  // const pkm = mainPkmQuery.data?.data.find(pkm => pkm.id === pkmId);
-
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: "storage-" + storageType + "-item-" + boxSlot,
@@ -56,17 +47,6 @@ export const StorageItem: React.FC<StorageItemProps> = ({
       },
       disabled,
     });
-
-  const defaultSprite = pokemonDataItem.sprites.front_default;
-  const shinySprite = pokemonDataItem.sprites.front_shiny;
-
-  const getSprite = () => {
-    if (isEgg) {
-      return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png';
-    }
-
-    return isShiny ? shinySprite! : defaultSprite!
-  }
 
   return (
     <Container
@@ -88,7 +68,7 @@ export const StorageItem: React.FC<StorageItemProps> = ({
       }}
     >
       <img
-        src={getSprite()}
+        src={sprite}
         alt={species + ""}
         style={{
           imageRendering: "pixelated",

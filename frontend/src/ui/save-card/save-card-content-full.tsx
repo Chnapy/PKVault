@@ -1,5 +1,4 @@
 import type React from 'react';
-import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
 import { SaveCardContentSmall, type SaveCardContentSmallProps } from './save-card-content-small';

@@ -2,8 +2,7 @@ import type React from 'react';
 import { theme } from '../theme';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Gender } from '../gender/gender';
-import type { GenderType } from '../../data/utils/get-gender';
-import type { GameVersion } from '../../data/sdk/model';
+import type { GameVersion, GenderType } from '../../data/sdk/model';
 
 export type TextOriginProps = {
     version: GameVersion;

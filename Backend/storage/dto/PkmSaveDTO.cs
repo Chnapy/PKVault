@@ -31,7 +31,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
                 return null;
             };
 
-        await dto.RefreshHasTradeEvolve();
+        await dto.RefreshAsyncData();
 
         return dto;
     }

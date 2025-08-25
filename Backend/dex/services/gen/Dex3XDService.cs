@@ -11,6 +11,18 @@ public class Dex3XDService : DexGenService<SAV3XD>
 
         var pi = save.Personal[species];
 
+        Span<int> abilities = stackalloc int[pi.AbilityCount];
+        pi.GetAbilities(abilities);
+
+        int[] baseStats = [
+            pi.GetBaseStatValue(0),
+            pi.GetBaseStatValue(1),
+            pi.GetBaseStatValue(2),
+            pi.GetBaseStatValue(4),
+            pi.GetBaseStatValue(5),
+            pi.GetBaseStatValue(3),
+        ];
+
         // TODO all memo part dont work (wrong values)
 
         // Span<ushort> subLength = stackalloc ushort[16];
@@ -35,6 +47,8 @@ public class Dex3XDService : DexGenService<SAV3XD>
             SpeciesName = GameInfo.Strings.Species[species],
             Type1 = pi.Type1,
             Type2 = pi.Type2,
+            Abilities = [.. abilities.ToArray().Distinct()],
+            BaseStats = baseStats,
             IsOnlyMale = pi.OnlyMale,
             IsOnlyFemale = pi.OnlyFemale,
             IsGenderless = pi.Genderless,

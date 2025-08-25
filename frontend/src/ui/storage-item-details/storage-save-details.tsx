@@ -1,10 +1,6 @@
 import React from "react";
 import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png';
-import { useBallByIdOrName } from '../../data/hooks/use-ball-by-id-or-name';
-import { useCurrentLanguageName } from '../../data/hooks/use-current-language-name';
-import { type GameVersion, type MoveItem } from "../../data/sdk/model";
-import { useStaticData } from "../../data/static-data/static-data";
-import type { GenderType } from '../../data/utils/get-gender';
+import { GenderType, type GameVersion, type MoveItem } from "../../data/sdk/model";
 import { Button } from "../button/button";
 import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { DetailsCardContainer } from '../details-card/details-card-container';
@@ -26,11 +22,13 @@ export type StorageSaveDetailsProps = {
 
   pid: number;
   species: number;
+  speciesName: string;
   isShiny: boolean;
   isEgg: boolean;
   isShadow: boolean;
-  ball: number;
-  gender: GenderType;
+  sprite?: string;
+  ballSprite?: string;
+  gender?: GenderType;
   nickname: string;
   nicknameMaxLength: number;
 
@@ -86,10 +84,12 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
 
   pid,
   species,
+  speciesName,
   isShiny,
   isEgg,
   isShadow,
-  ball,
+  sprite,
+  ballSprite,
   gender,
   nickname,
   nicknameMaxLength,
@@ -135,29 +135,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
   onRelease,
   onClose,
 }) => {
-  const staticData = useStaticData();
-  const pokemonDataItem = staticData.pokemon[ species ];
-
   const formContext = StorageDetailsForm.useContext(saveId);
-
-  const getCurrentLanguageName = useCurrentLanguageName();
-
-  // const saveCardProps = useSaveItemProps()(saveId);
-
-  const speciesName = getCurrentLanguageName(staticData.pokemonSpecies[ species ].names) ?? staticData.pokemonSpecies[ species ].name;
-
-  const ballSprite = useBallByIdOrName()(ball)?.sprites.default;
-
-  const defaultSprite = pokemonDataItem.sprites.front_default;
-  const shinySprite = pokemonDataItem.sprites.front_shiny;
-
-  const getSprite = () => {
-    if (isEgg) {
-      return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png';
-    }
-
-    return isShiny ? shinySprite! : defaultSprite!
-  }
 
   return (
     <DetailsCardContainer
@@ -171,7 +149,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
             }}
           >
             <img
-              src={getSprite()}
+              src={sprite}
               alt={speciesName}
               style={{
                 imageRendering: "pixelated",

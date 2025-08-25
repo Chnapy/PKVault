@@ -149,6 +149,7 @@ export const StorageMainBox: React.FC = () => {
             isEgg={false}
             isShiny={isShiny}
             isShadow={false}
+            sprite={versions[ 0 ].sprite!}
             heldItemSprite={heldItemSprite}
             warning={versions.some((value) => !value.isValid)}
             disabled={

@@ -188,6 +188,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               isEgg={pkm.isEgg}
               isShiny={pkm.isShiny}
               isShadow={pkm.isShadow}
+              sprite={pkm.sprite!}
               heldItemSprite={pkm.spriteItem}
               warning={!pkm.isValid}
               // disabled={Boolean(pkm.saveId)}

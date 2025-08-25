@@ -34,7 +34,7 @@ public class LocalSaveService
 
         foreach (var path in searchPaths)
         {
-            var updated = UpdateSaveFromPath(path);
+            var updated = await UpdateSaveFromPath(path);
             if (updated)
             {
                 hasBeenUpdated = true;
@@ -71,7 +71,7 @@ public class LocalSaveService
         Console.WriteLine($"(timed check done - memory used: {memoryUsedMB} MB)");
     }
 
-    private static bool UpdateSaveFromPath(string path)
+    private static async Task<bool> UpdateSaveFromPath(string path)
     {
         // Console.WriteLine($"UPDATE SAVE {path}");
 
@@ -96,19 +96,19 @@ public class LocalSaveService
             }
         }
 
-        UpdateGlobalsWithSave(save, path);
+        await UpdateGlobalsWithSave(save, path);
 
         Console.WriteLine($"Save {save.ID32} - G{save.Generation} - Version {save.Version} - play-time {save.PlayTimeString}");
 
         return true;
     }
 
-    private static void UpdateGlobalsWithSave(SaveFile save, string path)
+    private static async Task UpdateGlobalsWithSave(SaveFile save, string path)
     {
         SaveByPath[path] = save;
         SaveById[save.ID32] = save;
 
-        DexService.UpdateDexWithSave(save);
+        await DexService.UpdateDexWithSave(save);
     }
 
     private static void DeleteSaveFromPath(string path)
@@ -162,7 +162,7 @@ public class LocalSaveService
         return SaveUtil.GetVariantSAV(path)!;
     }
 
-    public static DateTime WriteSave(SaveFile save)
+    public static async Task<DateTime> WriteSave(SaveFile save)
     {
         var path = SaveByPath.Keys.ToList().Find(path => SaveByPath[path].ID32 == save.ID32);
         if (path == default)
@@ -177,7 +177,7 @@ public class LocalSaveService
 
         File.WriteAllBytes(path, save.Write());
 
-        UpdateGlobalsWithSave(save, path);
+        await UpdateGlobalsWithSave(save, path);
 
         Console.WriteLine($"Writed save {save.ID32} to {path}");
 
@@ -197,7 +197,7 @@ public class LocalSaveService
 
         await BackupService.PrepareBackupThenRun(async () =>
         {
-            WriteSave(save);
+            await WriteSave(save);
         });
     }
 }

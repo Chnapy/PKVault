@@ -47,7 +47,7 @@ const searchSchema = z.object({
   filterSeen: z.boolean().optional(),
   filterCaught: z.boolean().optional(),
   filterFromGames: z.array(z.number()).optional(), // saveIDs
-  filterGenerations: z.array(z.string()).optional(), // generation.name
+  filterGenerations: z.array(z.number()).optional(), // generation.name
   // sort: z.enum(['newest', 'oldest', 'price']).default('newest'),
 });
 

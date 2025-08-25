@@ -11,6 +11,18 @@ public class Dex3ColoService : DexGenService<SAV3Colosseum>
 
         var pi = save.Personal[species];
 
+        Span<int> abilities = stackalloc int[pi.AbilityCount];
+        pi.GetAbilities(abilities);
+
+        int[] baseStats = [
+            pi.GetBaseStatValue(0),
+            pi.GetBaseStatValue(1),
+            pi.GetBaseStatValue(2),
+            pi.GetBaseStatValue(4),
+            pi.GetBaseStatValue(5),
+            pi.GetBaseStatValue(3),
+        ];
+
         // Span<ushort> subLength = stackalloc ushort[16];
         // int[] subOffsets = new int[16];
         // for (int i = 0; i < 16; i++)
@@ -33,6 +45,8 @@ public class Dex3ColoService : DexGenService<SAV3Colosseum>
             SpeciesName = GameInfo.Strings.Species[species],
             Type1 = pi.Type1,
             Type2 = pi.Type2,
+            Abilities = [.. abilities.ToArray().Distinct()],
+            BaseStats = baseStats,
             IsOnlyMale = pi.OnlyMale,
             IsOnlyFemale = pi.OnlyFemale,
             IsGenderless = pi.Genderless,

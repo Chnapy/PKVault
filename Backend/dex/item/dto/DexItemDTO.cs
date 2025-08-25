@@ -1,16 +1,23 @@
 
 public class DexItemDTO
 {
-    public string Id { get; set; }
-    public ushort Species { get; set; }
-    public uint SaveId { get; set; }
-    public string SpeciesName { get; set; }
-    public byte Type1 { get; set; }
-    public byte Type2 { get; set; }
-    public bool IsOnlyMale { get; set; }
-    public bool IsOnlyFemale { get; set; }
-    public bool IsGenderless { get; set; }
-    public bool IsAnySeen { get; set; }
+    public required string Id { get; set; }
+    public required ushort Species { get; set; }
+    public required uint SaveId { get; set; }
+    public uint Generation { get; set; }
+    public required string SpeciesName { get; set; }
+    public string? Description { get; set; }
+    public GenderType[] Genders { get; set; }
+    public required byte Type1 { get; set; }
+    public required byte Type2 { get; set; }
+    public List<string> Types { get; set; }
+    public required int[] Abilities { get; set; }
+    public string[] AbilitiesLabel { get; set; }
+    public int[] BaseStats { get; set; }
+    public required bool IsOnlyMale { get; set; }
+    public required bool IsOnlyFemale { get; set; }
+    public required bool IsGenderless { get; set; }
+    public required bool IsAnySeen { get; set; }
     public bool IsSeenM { get; set; }
     public bool IsSeenF { get; set; }
     public bool IsSeenMS { get; set; }
@@ -32,4 +39,14 @@ public class DexItemDTO
     public bool IsLangKo { get; set; }
     public bool IsLangCh { get; set; }
     public bool IsLangCh2 { get; set; }
+
+    public string? DefaultSprite { get; set; }
+    public string? ShinySprite { get; set; }
+    public string? BallSprite { get; set; }
+}
+
+public enum GenderType
+{
+    MALE,
+    FEMALE,
 }

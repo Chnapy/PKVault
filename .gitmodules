@@ -1,3 +1,0 @@
-[submodule "frontend/public/pokeapi"]
-	path = frontend/public/pokeapi
-	url = https://github.com/PokeAPI/api-data.git

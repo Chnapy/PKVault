@@ -1,7 +1,6 @@
 import React from "react";
 import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png';
-import { useStaticData } from "../../data/static-data/static-data";
-import type { GenderType } from '../../data/utils/get-gender';
+import type { GenderType } from '../../data/sdk/model';
 import { Button } from '../button/button';
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
 import { Gender } from '../gender/gender';
@@ -21,6 +20,9 @@ export type DetailsCardProps = {
   abilitiesHidden: string[];
   stats: number[];
   caught: boolean;
+  defaultSprite?: string;
+  shinySprite?: string;
+  ballSprite?: string;
   fromSaves: React.ReactNode;
   compatibleGames: React.ReactNode;
   onClose: () => void;
@@ -38,18 +40,14 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
   abilitiesHidden,
   stats,
   caught,
+  defaultSprite,
+  shinySprite,
+  ballSprite,
   fromSaves,
   compatibleGames,
   onClose
 }) => {
   const [ showShiny, setShowShiny ] = React.useState(false);
-
-  const staticData = useStaticData();
-  const pokemonDataItem = staticData.pokemon[ species ];
-
-  const pokeballSprite = staticData.item.pkball.sprites.default;
-  const defaultSprite = pokemonDataItem.sprites.front_default;
-  const shinySprite = pokemonDataItem.sprites.front_shiny;
 
   return <DetailsCardContainer
     header={null}
@@ -68,7 +66,7 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
 
       {caught && (
         <img
-          src={pokeballSprite!}
+          src={ballSprite!}
           style={{
             position: 'absolute',
             bottom: 0,

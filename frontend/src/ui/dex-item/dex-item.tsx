@@ -1,7 +1,6 @@
 import { css } from "@emotion/css";
 import React from "react";
 import type { GameVersion } from '../../data/sdk/model';
-import { useStaticData } from "../../data/static-data/static-data";
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Container } from "../container/container";
 import { theme } from "../theme";
@@ -21,6 +20,7 @@ const styles = {
 export type DexItemProps = {
   species: number;
   speciesName: string;
+  sprite: string;
   seen: boolean;
   caught: boolean;
   caughtVersions: GameVersion[];
@@ -30,10 +30,7 @@ export type DexItemProps = {
 };
 
 export const DexItem: React.FC<DexItemProps> = React.memo(
-  ({ species, speciesName, seen, caught, caughtVersions, seenOnlyVersions, selected, onClick }) => {
-    const staticData = useStaticData();
-    const pokemonDataItem = staticData.pokemon[ species ];
-
+  ({ species, speciesName, sprite, seen, caught, caughtVersions, seenOnlyVersions, selected, onClick }) => {
     // const pokeballSprite = staticData.item.pkball.sprites.default;
 
     const caughtGamesColors = caughtVersions.map(getGameInfos).map(infos => infos.bgColor ?? theme.bg.dark);
@@ -81,7 +78,7 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
             }}
           >
             <img
-              src={pokemonDataItem.sprites.front_default!}
+              src={sprite}
               alt={speciesName}
               loading="lazy"
               style={{

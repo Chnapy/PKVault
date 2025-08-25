@@ -1,7 +1,5 @@
 import type React from 'react';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../data/sdk/storage/storage.gen';
-import { useStaticData } from '../data/static-data/static-data';
-import { useCurrentLanguageName } from '../data/hooks/use-current-language-name';
 import { Button } from '../ui/button/button';
 import { Route } from '../routes/storage';
 
@@ -10,9 +8,6 @@ export type PkmVersionWarningProps = {
 };
 
 export const PkmVersionWarning: React.FC<PkmVersionWarningProps> = ({ pkmVersionId }) => {
-    const getCurrentLanguageName = useCurrentLanguageName();
-    const pkmSpeciesRecord = useStaticData().pokemonSpecies;
-
     const navigate = Route.useNavigate();
 
     const pkmsQuery = useStorageGetMainPkms();
@@ -25,15 +20,12 @@ export const PkmVersionWarning: React.FC<PkmVersionWarningProps> = ({ pkmVersion
         return null;
     }
 
-    const pokemonSpeciesInfos = pkmSpeciesRecord[ pkmVersion.species ];
-    const speciesName = getCurrentLanguageName(pokemonSpeciesInfos.names);
-
     return <div style={{
         display: 'flex',
         alignItems: 'center',
         gap: 4,
     }}>
-        Issue with pkm {speciesName} in box {pkm.boxId} slot {pkm.boxSlot}, not found in attached save <Button onClick={() => navigate({
+        Issue with pkm {pkmVersion.speciesName} in box {pkm.boxId} slot {pkm.boxSlot}, not found in attached save <Button onClick={() => navigate({
             to: '/storage',
             search: {
                 mainBoxId: pkm.boxId,

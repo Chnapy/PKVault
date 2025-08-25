@@ -12,7 +12,7 @@ public class PkmVersionDTO : BasePkmVersionDTO
             PkmDto = pkmDto,
         };
 
-        await dto.RefreshHasTradeEvolve();
+        await dto.RefreshAsyncData();
 
         if (dto.Id != entity.Id)
         {

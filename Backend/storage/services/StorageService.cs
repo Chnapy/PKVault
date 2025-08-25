@@ -147,7 +147,7 @@ public class StorageService
                 await fileLoader.ApplyAction(actions[i]);
             }
 
-            fileLoader.WriteSaves();
+            await fileLoader.WriteSaves();
         });
     }
 

@@ -1,14 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
-import { useAbilityByIdOrName } from '../../data/hooks/use-ability-by-id-or-name';
-import { useCurrentLanguageName } from '../../data/hooks/use-current-language-name';
-import { useMoveByIdOrName } from '../../data/hooks/use-move-by-id-or-name';
-import { useNatureByIdOrName } from '../../data/hooks/use-nature-by-id-or-name';
-import { useTypeByIdOrName } from '../../data/hooks/use-type-by-id-or-name';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainDeletePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
-import { useStaticData } from '../../data/static-data/static-data';
-import { getGender } from '../../data/utils/get-gender';
 import { Route } from '../../routes/storage';
 import { Button } from '../../ui/button/button';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
@@ -28,15 +21,6 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
 
     const navigate = Route.useNavigate();
     const navigateToSave = Route.useNavigate();
-
-    // const pkmSpeciesRecord = useStaticData().pokemonSpecies;
-    const pkmRecord = useStaticData().pokemon;
-
-    const getTypeByIdOrName = useTypeByIdOrName();
-    const getMoveByIdOrName = useMoveByIdOrName();
-    const getAbilityByIdOrName = useAbilityByIdOrName();
-    const getNatureByIdOrName = useNatureByIdOrName();
-    const getCurrentLanguageName = useCurrentLanguageName();
 
     const queryClient = useQueryClient();
 
@@ -177,20 +161,6 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
 
     const hasPkmForSaveGeneration = !!save && pkmVersionList.some(pkmVersion => pkmVersion.generation === save.generation);
 
-    const gender = getGender(pkmVersion.gender);
-
-    const originTrainerGender = getGender(pkmVersion.originTrainerGender);
-
-    const types = pkmRecord[ species ].types.map(type =>
-        getCurrentLanguageName(getTypeByIdOrName(type.type.name).names)
-    );
-
-    const ability = typeof pkmVersion.ability === 'number' ? getAbilityByIdOrName(pkmVersion.ability) : undefined;
-    const abilityStr = ability && getCurrentLanguageName(ability.names);
-
-    const nature = typeof pkmVersion.nature === 'number' ? getNatureByIdOrName(pkmVersion.nature) : undefined;
-    const natureStr = nature && getCurrentLanguageName(nature.names);
-
     const isCompatibleWithSave = !save || species <= save.maxSpeciesId;
 
     return <StorageDetailsForm.Provider
@@ -251,27 +221,29 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
             version={pkmVersion.version}
             pid={pkmVersion.pid}
             species={pkmVersion.species}
+            speciesName={pkmVersion.speciesName}
             isShiny={pkmVersion.isShiny}
             isEgg={pkmVersion.isEgg}
-            ball={pkmVersion.ball}
-            gender={gender}
+            sprite={pkmVersion.sprite}
+            ballSprite={pkmVersion.ballSprite}
+            gender={pkmVersion.gender}
             nickname={pkmVersion.nickname}
             nicknameMaxLength={pkmVersion.nicknameMaxLength}
-            types={types}
+            types={pkmVersion.types}
             stats={pkmVersion.stats}
             ivs={pkmVersion.iVs}
             evs={pkmVersion.eVs}
-            hiddenPowerType={getCurrentLanguageName(getTypeByIdOrName(pkmVersion.hiddenPowerType).names)}
+            hiddenPowerType={pkmVersion.hiddenPowerType}
             hiddenPowerPower={pkmVersion.hiddenPowerPower}
-            nature={natureStr}
-            ability={abilityStr}
+            nature={pkmVersion.nature}
+            ability={pkmVersion.ability}
             level={pkmVersion.level}
             exp={pkmVersion.exp}
             moves={pkmVersion.moves}
             availableMoves={pkmVersion.availableMoves}
             tid={pkmVersion.tid}
             originTrainerName={pkmVersion.originTrainerName}
-            originTrainerGender={originTrainerGender}
+            originTrainerGender={pkmVersion.originTrainerGender}
             originMetDate={pkmVersion.originMetDate}
             originMetLocation={pkmVersion.originMetLocation}
             originMetLevel={pkmVersion.originMetLevel}

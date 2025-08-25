@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class DexService
 {
-    static Dictionary<int, Dictionary<uint, DexItemDTO>> persistedDex = new Dictionary<int, Dictionary<uint, DexItemDTO>>();
+    static Dictionary<int, Dictionary<uint, DexItemDTO>> persistedDex = [];
 
     public static Dictionary<int, Dictionary<uint, DexItemDTO>> GetPersistedDex()
     {
@@ -14,7 +14,7 @@ public class DexService
         persistedDex.Clear();
     }
 
-    public static bool UpdateDexWithSave(SaveFile save)
+    public static async Task<bool> UpdateDexWithSave(SaveFile save)
     {
         var notHandled = (SaveFile save) =>
         {
@@ -24,17 +24,17 @@ public class DexService
 
         var success = save switch
         {
-            SAV1 sav1 => new Dex123Service().UpdateDexWithSave(persistedDex, sav1),
-            SAV2 sav2 => new Dex123Service().UpdateDexWithSave(persistedDex, sav2),
-            SAV3 sav3 => new Dex123Service().UpdateDexWithSave(persistedDex, sav3),
-            SAV3XD sav3XD => new Dex3XDService().UpdateDexWithSave(persistedDex, sav3XD),
-            SAV3Colosseum sav3Colo => new Dex3ColoService().UpdateDexWithSave(persistedDex, sav3Colo),
-            SAV4 sav4 => new Dex4Service().UpdateDexWithSave(persistedDex, sav4),
-            SAV5 sav5 => new Dex5Service().UpdateDexWithSave(persistedDex, sav5),
+            SAV1 sav1 => await new Dex123Service().UpdateDexWithSave(persistedDex, sav1),
+            SAV2 sav2 => await new Dex123Service().UpdateDexWithSave(persistedDex, sav2),
+            SAV3 sav3 => await new Dex123Service().UpdateDexWithSave(persistedDex, sav3),
+            SAV3XD sav3XD => await new Dex3XDService().UpdateDexWithSave(persistedDex, sav3XD),
+            SAV3Colosseum sav3Colo => await new Dex3ColoService().UpdateDexWithSave(persistedDex, sav3Colo),
+            SAV4 sav4 => await new Dex4Service().UpdateDexWithSave(persistedDex, sav4),
+            SAV5 sav5 => await new Dex5Service().UpdateDexWithSave(persistedDex, sav5),
             SAV6XY xy => notHandled(xy),
             SAV6AO xy => notHandled(xy),
             SAV7 sav7 => notHandled(sav7),
-            SAV7b lgpe => new Dex7bService().UpdateDexWithSave(persistedDex, lgpe),
+            SAV7b lgpe => await new Dex7bService().UpdateDexWithSave(persistedDex, lgpe),
             SAV8SWSH ss => notHandled(ss),
             SAV8BS bs => notHandled(bs),
             SAV8LA la => notHandled(la),

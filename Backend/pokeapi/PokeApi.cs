@@ -33,9 +33,44 @@ public partial class PokeApi
         return await pokeClient.GetResourceAsync(pokemonSpecies.EvolutionChain);
     }
 
+    public static async Task<Pokemon?> GetPokemon(int species)
+    {
+        try
+        {
+            return await pokeClient.GetResourceAsync<Pokemon>(species);
+        }
+        catch
+        {
+            Console.WriteLine($"THROW ERROR for param= {species}");
+            return null;
+            // throw;
+        }
+    }
+
+    public static async Task<Nature?> GetNature(string natureNameRaw)
+    {
+        var natureName = PokeApiNameFromPKHexName(natureNameRaw);
+
+        try
+        {
+            return await pokeClient.GetResourceAsync<Nature>(natureName);
+        }
+        catch
+        {
+            Console.WriteLine($"THROW ERROR for param= {natureName} / {natureNameRaw}");
+            return null;
+            // throw;
+        }
+    }
+
     public static async Task<Pokedex> GetPokedex(PokeApiPokedexEnum pokedex)
     {
         return await pokeClient.GetResourceAsync<Pokedex>((int)pokedex);
+    }
+
+    public static async Task<Item> GetItem(int id)
+    {
+        return await pokeClient.GetResourceAsync<Item>(id);
     }
 
     public static string PokeApiNameFromPKHexName(string pkhexName)
@@ -71,6 +106,23 @@ public partial class PokeApi
         result = PonctuRegex().Replace(result, "");
 
         return result;
+    }
+
+    public static uint GetGenerationValue(NamedApiResource<Generation> generationResource)
+    {
+        return generationResource.Name switch
+        {
+            "generation-i" => 1,
+            "generation-ii" => 2,
+            "generation-iii" => 3,
+            "generation-iv" => 4,
+            "generation-v" => 5,
+            "generation-vi" => 6,
+            "generation-vii" => 7,
+            "generation-viii" => 8,
+            "generation-ix" => 9,
+            _ => throw new Exception("Generation name not handled")
+        };
     }
 
     public static void ClearCache()

@@ -97,7 +97,7 @@ public class EvolvePkmAction : DataAction
 
         // update dto 2/2
         dto.PkmVersionEntity.PkmId = pkmId;
-        await dto.RefreshHasTradeEvolve();
+        await dto.RefreshAsyncData();
         await loaders.pkmVersionLoader.WriteDto(dto);
 
         // update related dto 2/2
@@ -105,7 +105,7 @@ public class EvolvePkmAction : DataAction
             relatedPkmVersions.Select(async (versionDto) =>
             {
                 versionDto.PkmVersionEntity.PkmId = pkmId;
-                await versionDto.RefreshHasTradeEvolve();
+                await versionDto.RefreshAsyncData();
                 await loaders.pkmVersionLoader.WriteDto(versionDto);
             })
         );

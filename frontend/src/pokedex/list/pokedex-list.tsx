@@ -1,18 +1,12 @@
 import React from "react";
-import { useCurrentLanguageName } from '../../data/hooks/use-current-language-name';
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
-import { useStaticData } from "../../data/static-data/static-data";
 import { theme } from '../../ui/theme';
 import { usePokedexFilters } from "./hooks/use-pokedex-filters";
 import { PokedexItem } from "./pokedex-item";
 
 export const PokedexList: React.FC = () => {
   // console.time("pokedex-list");
-
-  const getCurrentLanguageName = useCurrentLanguageName();
-
-  const staticData = useStaticData();
 
   const saveInfosData = useSaveInfosGetAll().data?.data;
 
@@ -34,7 +28,7 @@ export const PokedexList: React.FC = () => {
 
   const speciesList = new Array(lastKey).fill(0).map((_, i) => i + 1);
 
-  let currentGenerationName: string = "";
+  let currentGeneration: number;
 
   const filteredSpeciesList = speciesList.filter(species => {
     const speciesValues = Object.values(
@@ -42,11 +36,10 @@ export const PokedexList: React.FC = () => {
     ).filter(filterSpeciesValues);
 
     return speciesValues.length > 0
-      && !isPkmFiltered(species, speciesValues);
+      && !isPkmFiltered(speciesValues);
   });
 
   const items: React.ReactNode[] = filteredSpeciesList.map((species) => {
-    const staticPkm = staticData.pokemonSpecies[ species ];
     const speciesValues = Object.values(
       speciesRecord[ species + "" ] ?? {}
     ).filter(filterSpeciesValues);
@@ -57,12 +50,14 @@ export const PokedexList: React.FC = () => {
 
     let divider: React.ReactNode = null;
 
-    if (staticPkm.generation.name !== currentGenerationName) {
-      currentGenerationName = staticPkm.generation.name;
+    if (speciesValues[ 0 ].generation !== currentGeneration) {
+      currentGeneration = speciesValues[ 0 ].generation;
 
       const allGenSpecies = filteredSpeciesList.filter(species => {
-        const staticPkm = staticData.pokemonSpecies[ species ];
-        return staticPkm.generation.name === currentGenerationName;
+        const firstSpeciesValue = Object.values(
+          speciesRecord[ species + "" ] ?? {}
+        ).filter(filterSpeciesValues)[ 0 ];
+        return firstSpeciesValue.generation === currentGeneration;
       });
 
       const seenGenCount = allGenSpecies.filter(species => {
@@ -83,15 +78,13 @@ export const PokedexList: React.FC = () => {
 
       divider = (
         <div
-          key={currentGenerationName}
+          key={currentGeneration}
           style={{
             width: "100%",
             padding: "40px 40px 10px",
           }}
         >
-          {getCurrentLanguageName(
-            staticData.generation
-              .find((gen) => gen.name === currentGenerationName)!.names)}
+          Generation {currentGeneration}
 
           <div
             style={{
@@ -115,6 +108,7 @@ export const PokedexList: React.FC = () => {
         <PokedexItem
           species={species}
           speciesName={speciesName}
+          sprite={speciesValues[ 0 ].defaultSprite!}
           seen={seen}
           caught={caught}
           caughtVersions={

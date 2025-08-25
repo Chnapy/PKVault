@@ -6,6 +6,7 @@ import type { GameVersion } from '../../data/sdk/model';
 export type PokedexItemProps = {
   species: number;
   speciesName: string;
+  sprite: string;
   seen: boolean;
   caught: boolean;
   caughtVersions: GameVersion[];
@@ -15,6 +16,7 @@ export type PokedexItemProps = {
 export const PokedexItem: React.FC<PokedexItemProps> = ({
   species,
   speciesName,
+  sprite,
   seen,
   caught,
   caughtVersions,
@@ -41,6 +43,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = ({
     <DexItem
       species={species}
       speciesName={speciesName}
+      sprite={sprite}
       seen={seen}
       caught={caught}
       caughtVersions={caughtVersions}

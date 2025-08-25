@@ -119,15 +119,14 @@ public class DataFileLoader : DataLoader
     {
     }
 
-    public void WriteSaves()
+    public async Task WriteSaves()
     {
-        loaders.saveLoadersDict.Values.ToList()
-        .ForEach(saveLoaders =>
+        foreach (var saveLoaders in loaders.saveLoadersDict.Values.ToList())
         {
             if (saveLoaders.Pkms.HasWritten || saveLoaders.Boxes.HasWritten)
             {
-                LocalSaveService.WriteSave(saveLoaders.Save);
+                await LocalSaveService.WriteSave(saveLoaders.Save);
             }
-        });
+        }
     }
 }

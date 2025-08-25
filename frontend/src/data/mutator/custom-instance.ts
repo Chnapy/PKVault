@@ -8,7 +8,7 @@ if (!baseURL) {
 export const getApiFullUrl = (url: string) => `${baseURL}${url}`;
 
 export const customInstance = async <T>(url: string, init?: RequestInit): Promise<T> => {
-    let targetUrl = getApiFullUrl(url);
+    const targetUrl = getApiFullUrl(url);
 
     const res = await fetch(targetUrl, init);
 

@@ -1,17 +1,17 @@
 import React from "react";
-import { useStaticData } from "../../../data/static-data/static-data";
 import { Route } from "../../../routes/pokedex";
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
-import { useCurrentLanguageName } from '../../../data/hooks/use-current-language-name';
+import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
 
 export const FilterTypes: React.FC = () => {
   const navigate = Route.useNavigate();
   const searchValue =
     Route.useSearch({ select: (search) => search.filterTypes }) ?? [];
 
-  const getCurrentLanguageName = useCurrentLanguageName();
-
-  const allTypes = useStaticData().type;
+  const dexAll = useDexGetAll().data?.data ?? {};
+  const allTypes = [ ...new Set(
+    Object.values(dexAll).flatMap(value => Object.values(value)).flatMap(value => value.types)
+  ) ];
 
   return (
     <FilterSelect
@@ -26,8 +26,8 @@ export const FilterTypes: React.FC = () => {
         });
       }}
       options={allTypes.map((type) => ({
-        value: type.name,
-        label: getCurrentLanguageName(type.names),
+        value: type,
+        label: type,
       }))}
     >
       Types
