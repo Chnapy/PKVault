@@ -4,11 +4,12 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>Backend</RootNamespace>
+    <RootNamespace>PKVault.Backend</RootNamespace>
     <!-- <PublishAot>true</PublishAot> -->
     <!-- <IsAotCompatible>true</IsAotCompatible> -->
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.8" />
     <PackageReference Include="PKHeX.Core" Version="25.6.9" />
     <PackageReference Include="PokeApiNet" Version="4.0.0" />
   </ItemGroup>

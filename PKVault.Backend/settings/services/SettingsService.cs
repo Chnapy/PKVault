@@ -44,6 +44,7 @@ public struct AppSettings
     public required string[] SAVE_GLOBS { get; set; }
     public required string STORAGE_PATH { get; set; }
     public required string BACKUP_PATH { get; set; }
+    public bool? HTTPS_NOCERT { get; set; }
     public string? HTTPS_CERT_PEM_PATH { get; set; }
     public string? HTTPS_KEY_PEM_PATH { get; set; }
 }

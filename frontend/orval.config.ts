@@ -1,9 +1,15 @@
 import { defineConfig } from "orval";
 
+const VITE_SERVER_URL: string | undefined = globalThis[ 'process' ]?.env?.VITE_SERVER_URL;
+
+if (!VITE_SERVER_URL) {
+  throw new Error("VITE_SERVER_URL env variable not defined");
+}
+
 export default defineConfig({
   backend: {
     input: {
-      target: "https://code.lan:5000/swagger/v1/swagger.json",
+      target: `${VITE_SERVER_URL}/swagger/v1/swagger.json`,
 
       parserOptions: {
         validate: false,

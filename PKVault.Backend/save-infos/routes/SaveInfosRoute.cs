@@ -2,6 +2,8 @@ using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
+namespace PKVault.Backend.saveinfos.routes;
+
 [ApiController]
 [Route("api/[controller]")]
 public class SaveInfosController : ControllerBase

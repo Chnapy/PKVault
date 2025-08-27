@@ -1,13 +1,17 @@
 import "./ui/global-style.ts";
 
-import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { createRouter, RouterProvider, createHashHistory } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { DataProvider } from "./data/data-provider.tsx";
 import { routeTree } from "./routeTree.gen";
 
 // Create a new router instance
-const router = createRouter({ routeTree });
+const router = createRouter({
+  routeTree,
+  // required for WinForm
+  history: createHashHistory()
+});
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {

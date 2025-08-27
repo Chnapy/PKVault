@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
+namespace PKVault.Backend.backup.routes;
+
 [ApiController]
 [Route("api/[controller]")]
 public class BackupController : ControllerBase

@@ -1,16 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
+namespace PKVault.Backend.storage.routes;
+
 [ApiController]
 [Route("api/[controller]")]
 public class StorageController : ControllerBase
 {
-    // [HttpGet("session/create/{saveId}")]
-    // public void CreateSession(uint saveId)
-    // {
-    //     StorageService.CreateSession(saveId);
-    // }
-
     [HttpGet("main/box")]
     public ActionResult<List<BoxDTO>> GetMainBoxes()
     {

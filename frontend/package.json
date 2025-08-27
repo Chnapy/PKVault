@@ -4,13 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "VITE_SERVER_URL=http://code.lan:5000 vite",
+    "dev": "cross-env VITE_SERVER_URL=https://localhost:5000 vite",
     "build": "vite build",
-    "preview": "vite preview",
     "c:type": "tsc -b",
     "c:lint": "eslint .",
-    "gen:sdk": "rm -rf src/data/sdk* && NODE_TLS_REJECT_UNAUTHORIZED=0 orval && prettier -w src/data/sdk*/**/*.ts",
-    "prepare:assets": "cp -r ../external/PKHeX.Everywhere/external/PKHeX/PKHeX.Drawing.PokeSprite/Resources/img/ src/assets/pkhex/img"
+    "gen:sdk": "rm -rf src/data/sdk* && cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 VITE_SERVER_URL=https://localhost:5000 orval && prettier -w src/data/sdk*/**/*.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -33,6 +31,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react-swc": "^3.10.2",
+    "cross-env": "^10.0.0",
     "eslint": "^9.29.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",

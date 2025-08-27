@@ -24,6 +24,10 @@ injectGlobal(`
     background-size: 40px 40px;
   }
 
+  body {
+    margin: 0;
+  }
+
   a {
     text-decoration: none;
   }
