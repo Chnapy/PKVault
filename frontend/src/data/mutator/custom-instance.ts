@@ -1,9 +1,13 @@
 
-const baseURL = import.meta.env.VITE_SERVER_URL;
+const baseURLEnv: string | undefined = import.meta.env.VITE_SERVER_URL;
 
-if (!baseURL) {
+if (!baseURLEnv) {
     throw new Error("VITE_SERVER_URL env not defined");
 }
+
+const baseURL = new URL(window.location.href).searchParams.get('server') || baseURLEnv;
+
+console.log('Server url =>', baseURL);
 
 export const getApiFullUrl = (url: string) => `${baseURL}${url}`;
 

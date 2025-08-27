@@ -1,15 +1,17 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Net;
+using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace PKVault.Backend;
 
 public class Program
 {
-    public static async Task Main(string[] args)
+    public static async Task Main(string[] _)
     {
         await SetupData();
-        await SetupWebApp(args);
+        var app = PrepareWebApp(5000);
+        await app.RunAsync();
     }
 
     public static async Task SetupData()
@@ -66,32 +68,11 @@ public class Program
 
     }
 
-    private static WebApplication PrepareWebApp(string[] args)
+    public static WebApplication PrepareWebApp(int port)
     {
-        var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddCors(options =>
-        {
-            options.AddDefaultPolicy(policy =>
-            {
-                policy.AllowAnyOrigin()
-                      .AllowAnyMethod()
-                      .AllowAnyHeader();
-            });
-        });
+        var builder = WebApplication.CreateBuilder([]);
 
-        builder.Services.AddControllers(options =>
-        {
-            options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
-        });
-
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerDocument(document =>
-        {
-            document.PostProcess = doc =>
-            {
-                doc.Info.Title = "PKVault API";
-            };
-        });
+        ConfigureServices(builder.Services);
 
         var certificate = SettingsService.AppSettings.HTTPS_CERT_PEM_PATH != default && SettingsService.AppSettings.HTTPS_KEY_PEM_PATH != default
             ? X509Certificate2.CreateFromPem(
@@ -102,7 +83,7 @@ public class Program
 
         builder.WebHost.ConfigureKestrel(serverOptions =>
         {
-            serverOptions.ListenAnyIP(5000, listenOptions =>
+            serverOptions.ListenAnyIP(port, listenOptions =>
             {
                 if (certificate != default)
                 {
@@ -118,76 +99,63 @@ public class Program
 
         var app = builder.Build();
 
-        if (certificate != default || SettingsService.AppSettings.HTTPS_NOCERT == true)
-        {
-            app.UseHttpsRedirection();
-        }
-
-        app.UseCors();
-        app.UseOpenApi();
-        app.UseSwaggerUi();
-
-        app.MapControllers();
+        ConfigureAppBuilder(app, certificate != default || SettingsService.AppSettings.HTTPS_NOCERT == true);
 
         return app;
     }
 
-    private static async Task SetupWebApp(string[] args)
+    public static void ConfigureServices(IServiceCollection services)
     {
-        var app = PrepareWebApp(args);
-        await app.RunAsync();
+        services.AddControllers(options =>
+        {
+            options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
+        });
+
+#if DEBUG
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerDocument(document =>
+        {
+            document.PostProcess = doc =>
+            {
+                doc.Info.Title = "PKVault API";
+            };
+        });
+#endif
     }
 
-    public static HttpClient SetupFakeClient()
+    public static void ConfigureAppBuilder(IApplicationBuilder app, bool useHttps)
     {
-        return new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureServices(services =>
-                {
-                    services.AddCors(options =>
-                    {
-                        options.AddDefaultPolicy(policy =>
-                        {
-                            policy.AllowAnyOrigin()
-                                .AllowAnyMethod()
-                                .AllowAnyHeader();
-                        });
-                    });
-                });
+        if (useHttps)
+        {
+            app.UseHttpsRedirection();
+        }
 
-                var certificate = SettingsService.AppSettings.HTTPS_CERT_PEM_PATH != default && SettingsService.AppSettings.HTTPS_KEY_PEM_PATH != default
-                    ? X509Certificate2.CreateFromPem(
-                        File.ReadAllText(SettingsService.AppSettings.HTTPS_CERT_PEM_PATH),
-                        File.ReadAllText(SettingsService.AppSettings.HTTPS_KEY_PEM_PATH)
-                        )
-                    : null;
+        app.UseRouting();
+        app.UseCors(policy => policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
 
-                builder.ConfigureKestrel(serverOptions =>
-                {
-                    serverOptions.ListenAnyIP(5000, listenOptions =>
-                    {
-                        if (certificate != default)
-                        {
-                            listenOptions.UseHttps(certificate);
-                        }
-                        else if (SettingsService.AppSettings.HTTPS_NOCERT == true)
-                        {
-                            listenOptions.UseHttps();
-                        }
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
 
-                    });
-                });
+#if DEBUG
+        app.UseOpenApi();
+        app.UseSwaggerUi();
+#endif
+    }
 
-                builder.Configure(app =>
-                {
-                    app.UseRouting();
-                    app.UseCors();
-                    app.UseEndpoints(endpoints =>
-                    {
-                        endpoints.MapControllers();
-                    });
-                });
-            }).CreateClient();
+    public static int GetAvailablePort()
+    {
+        var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start(); // Demande au système d’attribuer un port libre
+
+        int port = ((IPEndPoint)listener.LocalEndpoint).Port; // Récupère le port attribué
+
+        listener.Stop(); // Libère le port
+
+        return port;
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 
@@ -15,7 +14,7 @@ partial class MainForm
     private System.ComponentModel.IContainer components = null;
 
     private WebView2 webView;
-    private HttpClient backendClient;
+    private HttpClient backendClient = new();
 
     /// <summary>
     /// Clean up any resources being used.
@@ -63,6 +62,7 @@ partial class MainForm
         Controls.Add(webView);
         Name = "MainForm";
         Text = "PKVault";
+        // Icon = ;
         ((System.ComponentModel.ISupportInitialize)webView).EndInit();
         ResumeLayout(false);
     }
@@ -71,8 +71,6 @@ partial class MainForm
 
     private async void WebView_Load(object sender, EventArgs e)
     {
-        backendClient = Backend.Program.SetupFakeClient();
-
         await webView.EnsureCoreWebView2Async(null);
 
         string tempFolder = Path.Combine(Path.GetTempPath(), "pkvault");
@@ -168,7 +166,11 @@ partial class MainForm
             deferral.Complete();
         };
 
-        webView.CoreWebView2.Navigate("https://pkvault/index.html");
+        var navigateTo = $"https://pkvault/index.html?server={LocalWebServer.HOST_URL}";
+
+        Console.WriteLine($"Navigate WebView to {navigateTo}");
+
+        webView.CoreWebView2.Navigate(navigateTo);
     }
 
     private async Task<CoreWebView2WebResourceResponse> ConvertHttpResponseMessageToWebResourceResponse(
