@@ -1,13 +1,8 @@
 using PKHeX.Core;
 
-public abstract class DataLoader
+public abstract class DataLoader(DataEntityLoaders loaders)
 {
-    public readonly DataEntityLoaders loaders;
-
-    protected DataLoader(DataEntityLoaders _loaders)
-    {
-        loaders = _loaders;
-    }
+    public readonly DataEntityLoaders loaders = loaders;
 
     public async Task ApplyAction(DataAction action)
     {
@@ -27,6 +22,6 @@ public struct DataEntityLoaders
 public struct SaveLoaders
 {
     public SaveFile Save { get; set; }
-    public EntityLoader<BoxDTO, object> Boxes { get; set; }
-    public EntityLoader<PkmSaveDTO, object> Pkms { get; set; }
+    public SaveBoxLoader Boxes { get; set; }
+    public SavePkmLoader Pkms { get; set; }
 };

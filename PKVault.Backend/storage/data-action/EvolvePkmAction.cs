@@ -35,7 +35,7 @@ public class EvolvePkmAction : DataAction
     private async Task ExecuteForSave(DataEntityLoaders loaders, uint saveId)
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
-        var dto = saveLoaders.Pkms.GetDto(id);
+        var dto = await saveLoaders.Pkms.GetDto(id);
         if (dto == default)
         {
             throw new Exception("Save Pkm not found");
@@ -50,13 +50,13 @@ public class EvolvePkmAction : DataAction
 
     private async Task ExecuteForMain(DataEntityLoaders loaders)
     {
-        var dto = loaders.pkmVersionLoader.GetDto(id);
+        var dto = await loaders.pkmVersionLoader.GetDto(id);
         if (dto == default)
         {
             throw new Exception("Pkm-version not found");
         }
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos()
+        var relatedPkmVersions = (await loaders.pkmVersionLoader.GetAllDtos())
         .FindAll(value => value.PkmDto.Id == dto.PkmDto.Id && value.Id != dto.Id);
 
         if (
@@ -72,43 +72,37 @@ public class EvolvePkmAction : DataAction
         var mainDto = dto.IsMain ? dto : relatedPkmVersions.Find(version => version.IsMain);
 
         // update dto 1/2
-        await loaders.pkmVersionLoader.DeleteDto(dto.Id);
+        loaders.pkmVersionLoader.DeleteEntity(dto.Id);
         UpdatePkm(dto.Pkm, evolveSpecies, evolveByItem);
         dto.PkmVersionEntity.Id = dto.Id;
         dto.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(dto.Pkm);
 
         // update related dto 1/2
-        await Task.WhenAll(
-            relatedPkmVersions.Select(async (versionDto) =>
-            {
-                await loaders.pkmVersionLoader.DeleteDto(versionDto.Id);
-                UpdatePkm(versionDto.Pkm, evolveSpecies, false);
-                versionDto.PkmVersionEntity.Id = versionDto.Id;
-                versionDto.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(versionDto.Pkm);
-            })
-        );
+        relatedPkmVersions.ForEach((versionDto) =>
+        {
+            loaders.pkmVersionLoader.DeleteEntity(versionDto.Id);
+            UpdatePkm(versionDto.Pkm, evolveSpecies, false);
+            versionDto.PkmVersionEntity.Id = versionDto.Id;
+            versionDto.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(versionDto.Pkm);
+        });
 
         // pkmId to assign to every pkm-version here
         var pkmId = mainDto.Id;
 
         // update pkm-entity
         mainDto.PkmDto.PkmEntity.Id = pkmId;
-        await loaders.pkmLoader.WriteDto(mainDto.PkmDto);
+        loaders.pkmLoader.WriteDto(mainDto.PkmDto);
 
         // update dto 2/2
         dto.PkmVersionEntity.PkmId = pkmId;
-        await dto.RefreshAsyncData();
-        await loaders.pkmVersionLoader.WriteDto(dto);
+        loaders.pkmVersionLoader.WriteDto(dto);
 
         // update related dto 2/2
-        await Task.WhenAll(
-            relatedPkmVersions.Select(async (versionDto) =>
-            {
-                versionDto.PkmVersionEntity.PkmId = pkmId;
-                await versionDto.RefreshAsyncData();
-                await loaders.pkmVersionLoader.WriteDto(versionDto);
-            })
-        );
+        relatedPkmVersions.ForEach((versionDto) =>
+        {
+            versionDto.PkmVersionEntity.PkmId = pkmId;
+            loaders.pkmVersionLoader.WriteDto(versionDto);
+        });
     }
 
     private static async Task<(ushort evolveSpecies, bool evolveByItem)> GetEvolve(BasePkmVersionDTO dto)

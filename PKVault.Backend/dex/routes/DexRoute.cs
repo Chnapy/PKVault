@@ -7,9 +7,9 @@ namespace PKVault.Backend.dex.routes;
 public class DexController : ControllerBase
 {
     [HttpGet()]
-    public ActionResult<Dictionary<int, Dictionary<uint, DexItemDTO>>> GetAll()
+    public async Task<ActionResult<Dictionary<int, Dictionary<uint, DexItemDTO>>>> GetAll()
     {
-        var record = DexService.GetPersistedDex();
+        var record = await DexService.GetDex();
 
         return record;
     }

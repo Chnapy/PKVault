@@ -24,7 +24,7 @@ public class SaveDeletePkmAction : DataAction
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
 
-        var dto = saveLoaders.Pkms.GetDto(pkmId);
+        var dto = await saveLoaders.Pkms.GetDto(pkmId);
         if (dto == default)
         {
             throw new Exception("Save Pkm not found");

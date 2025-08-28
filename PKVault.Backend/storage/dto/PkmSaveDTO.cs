@@ -13,23 +13,18 @@ public class PkmSaveDTO : BasePkmVersionDTO
             Save = save,
             Box = box,
             BoxSlot = boxSlot,
-            GetAttachedPkmVersion = () => null,
         };
 
-        dto.GetAttachedPkmVersion = () =>
-            {
-                var pkmVersion = pkmVersionLoader.GetDto(dto.Id);
-                if (pkmVersion != null)
-                {
-                    var mainPkm = pkmLoader.GetDto(pkmVersion.PkmDto.Id);
+        var pkmVersion = await pkmVersionLoader.GetDto(dto.Id);
+        if (pkmVersion != null)
+        {
+            var mainPkm = await pkmLoader.GetDto(pkmVersion.PkmDto.Id);
 
-                    if (mainPkm.SaveId == save.ID32)
-                    {
-                        return pkmVersion;
-                    }
-                }
-                return null;
-            };
+            if (mainPkm.SaveId == save.ID32)
+            {
+                dto.PkmVersionId = pkmVersion.Id;
+            }
+        }
 
         await dto.RefreshAsyncData();
 
@@ -44,12 +39,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     public bool IsShadow { get { return Pkm is IShadowCapture pkmShadow && pkmShadow.IsShadow; } }
 
-    public string? PkmVersionId
-    {
-        get { return GetAttachedPkmVersion()?.Id; }
-    }
-
-    public required Func<PkmVersionDTO?> GetAttachedPkmVersion;
+    public string? PkmVersionId { get; set; }
 
     // -- actions
 

@@ -1,15 +1,11 @@
 using PKHeX.Core;
 
-public class SaveBoxLoader : EntityLoader<BoxDTO, object>
+public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
+    dtoToEntity: item => item,
+    entityToDto: async item => item
+)
 {
-    private readonly SaveFile save;
-
-    public SaveBoxLoader(SaveFile _save)
-    {
-        save = _save;
-    }
-
-    public override List<BoxDTO> GetAllDtos()
+    public override List<BoxDTO> GetAllEntities()
     {
         var boxes = new List<BoxDTO>();
 
@@ -56,28 +52,26 @@ public class SaveBoxLoader : EntityLoader<BoxDTO, object>
         return boxes;
     }
 
-    public override async Task<BoxDTO> WriteDto(BoxDTO entity)
+    public override void WriteDto(BoxDTO dto)
     {
-        if (entity.Type != BoxType.Default)
+        if (dto.Type != BoxType.Default)
         {
             throw new Exception("Not allowed for box type not default");
         }
 
         if (save is IBoxDetailName saveBoxName)
         {
-            saveBoxName.SetBoxName(entity.IdInt, entity.Name);
+            saveBoxName.SetBoxName(dto.IdInt, dto.Name);
             HasWritten = true;
         }
-
-        return entity;
     }
 
-    public override Task DeleteDto(string id)
+    public override void DeleteEntity(string id)
     {
         throw new Exception($"Not implemented");
     }
 
-    public override Task SetAllDtos(List<BoxDTO> entities)
+    public override void SetAllEntities(List<BoxDTO> entities)
     {
         throw new Exception($"Not implemented");
     }

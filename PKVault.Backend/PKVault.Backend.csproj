@@ -19,4 +19,12 @@
   <ItemGroup>
     <PackageReference Include="NSwag.AspNetCore" Version="14.4.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="pokeapi/**/*.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+    <None Update="pokeapi/api-data/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+    <Content Remove="pokeapi/api-data/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never"/>
+    <!-- <EmbeddedResource Remove="pokeapi/api-data/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never"/> -->
+    <!-- <Compile Remove="pokeapi/api-data/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never"/> -->
+  </ItemGroup>
 </Project>

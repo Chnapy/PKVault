@@ -7,8 +7,16 @@ namespace PKVault.Backend;
 
 public class Program
 {
-    public static async Task Main(string[] _)
+    public static async Task Main(string[] args)
     {
+#if DEBUG
+        if (args.Length > 0 && args[0] == "gen-pokeapi")
+        {
+            GenApiData.GenerateFiles();
+            return;
+        }
+#endif
+
         await SetupData();
         var app = PrepareWebApp(5000);
         await app.RunAsync();
@@ -37,6 +45,8 @@ public class Program
         // }
 
         await StorageService.Initialize();
+
+        PokeApi.ClearCache();
 
         // StorageService.CleanMainStorageFiles();
 

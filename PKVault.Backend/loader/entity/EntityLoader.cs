@@ -1,29 +1,41 @@
 
-public abstract class EntityLoader<DTO, E> where DTO : IWithId<string>
+public abstract class EntityLoader<DTO, E>(
+    Func<DTO, E> dtoToEntity,
+    Func<E, Task<DTO>> entityToDto
+) where DTO : IWithId<string> where E : IWithId<string>
 {
+    public readonly Func<E, Task<DTO>> entityToDto = entityToDto;
+
     public Action<DTO>? OnWrite;
-    public Action<DTO>? OnDelete;
+    public Action<E>? OnDelete;
+
     public bool HasWritten = false;
 
-    public abstract List<DTO> GetAllDtos();
-
-    public virtual List<E> GetAllEntities()
+    public async Task<List<DTO>> GetAllDtos()
     {
-        throw new Exception("Not implemented");
+        return [.. await Task.WhenAll(GetAllEntities().Select(entityToDto))];
     }
 
-    public abstract Task SetAllDtos(List<DTO> dtos);
+    public abstract List<E> GetAllEntities();
 
-    public DTO? GetDto(string id)
+    public abstract void SetAllEntities(List<E> entities);
+
+    public async Task<DTO?> GetDto(string id)
     {
-        return GetAllDtos().Find(entity => entity.Id == id);
+        var entity = GetEntity(id);
+        return entity == null ? default : await entityToDto(entity);
     }
 
-    public virtual async Task DeleteDto(string id)
+    public E? GetEntity(string id)
+    {
+        return GetAllEntities().Find(entity => entity.Id == id);
+    }
+
+    public virtual void DeleteEntity(string id)
     {
         Console.WriteLine($"Delete entity id={id}");
 
-        var initialList = GetAllDtos();
+        var initialList = GetAllEntities();
         var removedEntity = initialList.Find(entity => entity.Id == id);
         if (removedEntity == null)
         {
@@ -32,20 +44,20 @@ public abstract class EntityLoader<DTO, E> where DTO : IWithId<string>
 
         var finalList = initialList.FindAll(entity => entity.Id != id);
 
-        await SetAllDtos(finalList);
+        SetAllEntities(finalList);
 
         OnDelete?.Invoke(removedEntity);
     }
 
-    public virtual async Task WriteDto(DTO dto)
+    public virtual void WriteDto(DTO dto)
     {
         Console.WriteLine($"{dto.GetType().Name} - Write id={dto.Id}");
 
-        var list = GetAllDtos()
+        var list = GetAllEntities()
         .FindAll(item => item.Id != dto.Id);
-        list.Add(dto);
+        list.Add(dtoToEntity(dto));
 
-        await SetAllDtos(list);
+        SetAllEntities(list);
 
         OnWrite?.Invoke(dto);
     }

@@ -26,9 +26,9 @@ public class EditPkmSaveAction : DataAction
     public override async Task Execute(DataEntityLoaders loaders)
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
-        var pkmSave = saveLoaders.Pkms.GetDto(pkmSaveId);
+        var pkmSave = await saveLoaders.Pkms.GetDto(pkmSaveId);
 
-        if (pkmSave.GetAttachedPkmVersion() != default)
+        if (pkmSave.PkmVersionId != default)
         {
             throw new Exception("Edit not possible for pkm attached with save");
         }

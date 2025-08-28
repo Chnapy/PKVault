@@ -210,7 +210,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
                             style={{ width: save?.generation === pkmVersion.generation ? '100%' : undefined }}
                         >
                             G{pkmVersion.generation}
-                            {pkmVersion.id === pkm.id && " (original)"}
+                            {pkmVersion.isMain && " (original)"}
                         </Button>
                     ))}
                 </>

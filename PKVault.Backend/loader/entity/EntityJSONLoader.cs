@@ -1,13 +1,12 @@
-
 using System.Text.Json;
 
-public class EntityJSONLoader<DTO, E> : EntityLoader<DTO, E> where DTO : IWithId<string> where E : IWithId<string>
+public class EntityJSONLoader<DTO, E>(
+    string filePath,
+    Func<DTO, E> dtoToEntity,
+    Func<E, Task<DTO>> entityToDto
+    ) : EntityLoader<DTO, E>(dtoToEntity, entityToDto) where DTO : IWithId<string> where E : IWithId<string>
 {
-    public static async Task<EntityJSONLoader<DTO, E>> Create(
-        string filePath,
-        Func<E, Task<DTO>> entityToDto,
-        Func<DTO, E> dtoToEntity
-    )
+    public override List<E> GetAllEntities()
     {
         if (!File.Exists(filePath))
         {
@@ -24,44 +23,14 @@ public class EntityJSONLoader<DTO, E> : EntityLoader<DTO, E> where DTO : IWithId
         }
 
         string json = File.ReadAllText(filePath);
-        var entityList = JsonSerializer.Deserialize<List<E>>(json) ?? [];
-        var dtoList = (await Task.WhenAll(entityList.Select(entityToDto))).ToList();
-
-        return new EntityJSONLoader<DTO, E>(filePath, dtoToEntity, dtoList);
+        return JsonSerializer.Deserialize<List<E>>(json) ?? [];
     }
 
-    private string filePath;
-    private Func<DTO, E> dtoToEntity;
-    protected List<DTO> dtoList;
-
-    private EntityJSONLoader(
-        string _filePath, Func<DTO, E> _dtoToEntity, List<DTO> _dtoList
-    )
+    public override void SetAllEntities(List<E> entities)
     {
-        filePath = _filePath;
-        dtoToEntity = _dtoToEntity;
-        dtoList = _dtoList;
-    }
-
-    public override List<DTO> GetAllDtos()
-    {
-        return [.. dtoList];
-    }
-
-    public override List<E> GetAllEntities()
-    {
-        return dtoList.Select(dtoToEntity).ToList();
-    }
-
-    public override async Task SetAllDtos(List<DTO> dtos)
-    {
-        dtoList = [.. dtos];
-
-        var entityList = dtos.Select(dtoToEntity).ToList();
-
         Console.WriteLine($"Write entities to {filePath}");
 
-        File.WriteAllText(filePath, JsonSerializer.Serialize(entityList));
+        File.WriteAllText(filePath, JsonSerializer.Serialize(entities));
 
         HasWritten = true;
     }

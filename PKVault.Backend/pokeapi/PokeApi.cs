@@ -1,26 +1,48 @@
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using PokeApiNet;
 
+// TODO remove cache
 public partial class PokeApi
 {
-    private static readonly PokeApiClient pokeClient = new();
+    public static readonly List<string?> endpointNames = [
+        GetApiEndpointString<Pokemon>(),
+        GetApiEndpointString<PokemonSpecies>(),
+        GetApiEndpointString<EvolutionChain>(),
+        GetApiEndpointString<Pokedex>(),
+        GetApiEndpointString<Nature>(),
+        GetApiEndpointString<Item>(),
+    ];
+
+    private static readonly PokeApiClient pokeClient = new(new MessageHandler());
 
     public static async Task<PokemonSpecies?> GetPokemonSpecies(string speciesNameRaw)
     {
         var speciesName = PokeApiNameFromPKHexName(speciesNameRaw);
 
-        try
+        // try
+        // {
+        var resources = pokeClient.GetAllNamedResourcesAsync<PokemonSpecies>();
+        await foreach (var item in resources)
         {
-            return await pokeClient.GetResourceAsync<PokemonSpecies>(speciesName);
+            if (speciesName == item.Name)
+            {
+                return await pokeClient.GetResourceAsync(item);
+            }
         }
-        catch
-        {
-            Console.WriteLine($"THROW ERROR for param= {speciesName} / {speciesNameRaw}");
-            return null;
-            // throw;
-        }
+        throw new Exception($"pkm-species null: {speciesName} / {speciesNameRaw}");
+        // return null;
+        // return await pokeClient.GetResourceAsync<PokemonSpecies>(speciesName);
+        // }
+        // catch (Exception error)
+        // {
+        //     Console.WriteLine($"THROW ERROR for param= {speciesName} / {speciesNameRaw}");
+        //     Console.WriteLine(error);
+        //     return null;
+        //     // throw;
+        // }
     }
 
     public static async Task<EvolutionChain?> GetPokemonSpeciesEvolutionChain(string speciesNameRaw)
@@ -35,32 +57,41 @@ public partial class PokeApi
 
     public static async Task<Pokemon?> GetPokemon(int species)
     {
-        try
-        {
-            return await pokeClient.GetResourceAsync<Pokemon>(species);
-        }
-        catch
-        {
-            Console.WriteLine($"THROW ERROR for param= {species}");
-            return null;
-            // throw;
-        }
+        // try
+        // {
+        return await pokeClient.GetResourceAsync<Pokemon>(species);
+        // }
+        // catch
+        // {
+        //     Console.WriteLine($"THROW ERROR for param= {species}");
+        //     return null;
+        //     // throw;
+        // }
     }
 
     public static async Task<Nature?> GetNature(string natureNameRaw)
     {
         var natureName = PokeApiNameFromPKHexName(natureNameRaw);
 
-        try
+        // try
+        // {
+        var resources = pokeClient.GetAllNamedResourcesAsync<Nature>();
+        await foreach (var item in resources)
         {
-            return await pokeClient.GetResourceAsync<Nature>(natureName);
+            if (natureName == item.Name)
+            {
+                return await pokeClient.GetResourceAsync(item);
+            }
         }
-        catch
-        {
-            Console.WriteLine($"THROW ERROR for param= {natureName} / {natureNameRaw}");
-            return null;
-            // throw;
-        }
+        throw new Exception($"nature null: {natureName} / {natureNameRaw}");
+        // return null;
+        // }
+        // catch
+        // {
+        //     Console.WriteLine($"THROW ERROR for param= {natureName} / {natureNameRaw}");
+        //     return null;
+        //     // throw;
+        // }
     }
 
     public static async Task<Pokedex> GetPokedex(PokeApiPokedexEnum pokedex)
@@ -131,13 +162,18 @@ public partial class PokeApi
         pokeClient.ClearCache();
     }
 
+    private static string? GetApiEndpointString<T>()
+    {
+        return typeof(T).GetProperty("ApiEndpoint", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null)?.ToString();
+    }
+
     [GeneratedRegex("([a-z])([A-Z])")]
     private static partial Regex PascalCaseRegex();
 
     [GeneratedRegex(@"\s+")]
     private static partial Regex SpaceRegex();
 
-    [GeneratedRegex(@"[’'`´]+")]
+    [GeneratedRegex(@"[\.’'`´]+")]
     private static partial Regex PonctuRegex();
 }
 

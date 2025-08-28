@@ -81,10 +81,10 @@ public class WarningsService
     {
         var warns = new List<PkmVersionWarning>();
 
-        var fileLoader = await DataFileLoader.Create();
+        var fileLoader = DataFileLoader.Create();
 
-        var pkms = fileLoader.loaders.pkmLoader.GetAllDtos();
-        var pkmVersions = fileLoader.loaders.pkmVersionLoader.GetAllDtos();
+        var pkms = await fileLoader.loaders.pkmLoader.GetAllDtos();
+        var pkmVersions = await fileLoader.loaders.pkmVersionLoader.GetAllDtos();
 
         pkms.ForEach(pkm =>
         {

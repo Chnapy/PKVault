@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -8,41 +9,41 @@ namespace PKVault.Backend.storage.routes;
 public class StorageController : ControllerBase
 {
     [HttpGet("main/box")]
-    public ActionResult<List<BoxDTO>> GetMainBoxes()
+    public async Task<ActionResult<List<BoxDTO>>> GetMainBoxes()
     {
-        var list = StorageService.GetMainBoxes();
+        var list = await StorageService.GetMainBoxes();
 
         return list;
     }
 
     [HttpGet("main/pkm")]
-    public ActionResult<List<PkmDTO>> GetMainPkms()
+    public async Task<ActionResult<List<PkmDTO>>> GetMainPkms()
     {
-        var list = StorageService.GetMainPkms();
+        var list = await StorageService.GetMainPkms();
 
         return list;
     }
 
     [HttpGet("main/pkm-version")]
-    public ActionResult<List<PkmVersionDTO>> GetMainPkmVersions()
+    public async Task<ActionResult<List<PkmVersionDTO>>> GetMainPkmVersions()
     {
-        var list = StorageService.GetMainPkmVersions();
+        var list = await StorageService.GetMainPkmVersions();
 
         return list;
     }
 
     [HttpGet("save/{saveId}/box")]
-    public ActionResult<List<BoxDTO>> GetSaveBoxes(uint saveId)
+    public async Task<ActionResult<List<BoxDTO>>> GetSaveBoxes(uint saveId)
     {
-        var saveBoxes = StorageService.GetSaveBoxes(saveId);
+        var saveBoxes = await StorageService.GetSaveBoxes(saveId);
 
         return saveBoxes;
     }
 
     [HttpGet("save/{saveId}/pkm")]
-    public ActionResult<List<PkmSaveDTO>> GetSavePkms(uint saveId)
+    public async Task<ActionResult<List<PkmSaveDTO>>> GetSavePkms(uint saveId)
     {
-        var savePkms = StorageService.GetSavePkms(saveId);
+        var savePkms = await StorageService.GetSavePkms(saveId);
 
         return savePkms;
     }

@@ -31,11 +31,11 @@ public class SaveMovePkmToStorageAction : DataAction
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
 
-        var savePkm = saveLoaders.Pkms.GetDto(savePkmId);
+        var savePkm = await saveLoaders.Pkms.GetDto(savePkmId);
 
         if (savePkm == default)
         {
-            throw new Exception($"PkmSaveDTO not found for id={savePkmId}, count={saveLoaders.Pkms.GetAllDtos().Count}");
+            throw new Exception($"PkmSaveDTO not found for id={savePkmId}, count={(await saveLoaders.Pkms.GetAllDtos()).Count}");
         }
 
         if (savePkm.Pkm is IShadowCapture savePkmShadow && savePkmShadow.IsShadow)
@@ -49,44 +49,42 @@ public class SaveMovePkmToStorageAction : DataAction
         }
 
         // get pkm-version
-        var pkmVersionDto = loaders.pkmVersionLoader.GetDto(savePkm.Id);
-        if (pkmVersionDto == null)
+        var pkmVersionEntity = loaders.pkmVersionLoader.GetEntity(savePkm.Id);
+        if (pkmVersionEntity == null)
         {
             // create pkm & pkm-version
-            var pkmDtoToCreate = PkmDTO.FromEntity(new PkmEntity
+            var pkmEntityToCreate = new PkmEntity
             {
                 Id = savePkm.Id,
                 BoxId = storageBoxId,
                 BoxSlot = storageSlot,
-                SaveId = saveLoaders.Save.ID32,
-            });
+                SaveId = null // saveLoaders.Save.ID32,
+            };
+            var pkmDtoToCreate = PkmDTO.FromEntity(pkmEntityToCreate);
 
-            pkmVersionDto = await PkmVersionDTO.FromEntity(
-                new PkmVersionEntity
-                {
-                    Id = savePkm.Id,
-                    PkmId = pkmDtoToCreate.Id,
-                    Generation = savePkm.Generation,
-                    Filepath = PKMLoader.GetPKMFilepath(savePkm.Pkm),
-                },
-                savePkm.Pkm,
-                pkmDtoToCreate
-            );
+            pkmVersionEntity = new PkmVersionEntity
+            {
+                Id = savePkm.Id,
+                PkmId = pkmEntityToCreate.Id,
+                Generation = savePkm.Generation,
+                Filepath = PKMLoader.GetPKMFilepath(savePkm.Pkm),
+            };
+            var pkmVersionDto = await PkmVersionDTO.FromEntity(pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
 
-            await loaders.pkmLoader.WriteDto(pkmDtoToCreate);
-            await loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
+            loaders.pkmLoader.WriteDto(pkmDtoToCreate);
+            loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
         }
 
-        var pkmEntity = loaders.pkmLoader.GetDto(pkmVersionDto.PkmDto.Id)!;
+        var pkmDto = await loaders.pkmLoader.GetDto(pkmVersionEntity.PkmId);
 
-        if (pkmEntity.SaveId != default)
+        if (pkmDto.SaveId != default)
         {
-            await new SynchronizePkmAction(saveId, pkmVersionDto.Id).Execute(loaders);
+            await new SynchronizePkmAction(saveId, pkmVersionEntity.Id).Execute(loaders);
 
-            pkmEntity.PkmEntity.SaveId = default;
+            pkmDto.PkmEntity.SaveId = default;
         }
 
-        await loaders.pkmLoader.WriteDto(pkmEntity);
+        loaders.pkmLoader.WriteDto(pkmDto);
 
         // remove pkm from save
         await saveLoaders.Pkms.DeleteDto(savePkm.Id);

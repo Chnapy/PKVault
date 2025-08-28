@@ -1,21 +1,18 @@
 
-public class EntityMemoryLoader<DTO, E> : EntityLoader<DTO, E> where DTO : IWithId<string>
+public class EntityMemoryLoader<DTO, E>(
+    List<E> entityList,
+    Func<E, Task<DTO>> entityToDto,
+    Func<DTO, E> dtoToEntity
+) : EntityLoader<DTO, E>(dtoToEntity, entityToDto) where DTO : IWithId<string> where E : IWithId<string>
 {
-    private List<DTO> dtoList;
-
-    public EntityMemoryLoader(List<DTO> _dtoList)
+    public override List<E> GetAllEntities()
     {
-        dtoList = _dtoList;
+        return [.. entityList];
     }
 
-    public override List<DTO> GetAllDtos()
+    public override void SetAllEntities(List<E> nextEntities)
     {
-        return [.. dtoList];
-    }
-
-    public override async Task SetAllDtos(List<DTO> nextEntities)
-    {
-        dtoList = nextEntities;
+        entityList = [.. nextEntities];
 
         HasWritten = true;
     }

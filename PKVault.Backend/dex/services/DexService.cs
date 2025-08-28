@@ -2,19 +2,18 @@ using PKHeX.Core;
 
 public class DexService
 {
-    static Dictionary<int, Dictionary<uint, DexItemDTO>> persistedDex = [];
-
-    public static Dictionary<int, Dictionary<uint, DexItemDTO>> GetPersistedDex()
+    public static async Task<Dictionary<int, Dictionary<uint, DexItemDTO>>> GetDex()
     {
-        return persistedDex;
+        Dictionary<int, Dictionary<uint, DexItemDTO>> dex = [];
+
+        await Task.WhenAll(
+            LocalSaveService.SaveById.Values.ToList().Select(save => UpdateDexWithSave(dex, save))
+        );
+
+        return dex;
     }
 
-    public static void ClearDex()
-    {
-        persistedDex.Clear();
-    }
-
-    public static async Task<bool> UpdateDexWithSave(SaveFile save)
+    private static async Task<bool> UpdateDexWithSave(Dictionary<int, Dictionary<uint, DexItemDTO>> dex, SaveFile save)
     {
         var notHandled = (SaveFile save) =>
         {
@@ -24,17 +23,17 @@ public class DexService
 
         var success = save switch
         {
-            SAV1 sav1 => await new Dex123Service().UpdateDexWithSave(persistedDex, sav1),
-            SAV2 sav2 => await new Dex123Service().UpdateDexWithSave(persistedDex, sav2),
-            SAV3 sav3 => await new Dex123Service().UpdateDexWithSave(persistedDex, sav3),
-            SAV3XD sav3XD => await new Dex3XDService().UpdateDexWithSave(persistedDex, sav3XD),
-            SAV3Colosseum sav3Colo => await new Dex3ColoService().UpdateDexWithSave(persistedDex, sav3Colo),
-            SAV4 sav4 => await new Dex4Service().UpdateDexWithSave(persistedDex, sav4),
-            SAV5 sav5 => await new Dex5Service().UpdateDexWithSave(persistedDex, sav5),
+            SAV1 sav1 => await new Dex123Service().UpdateDexWithSave(dex, sav1),
+            SAV2 sav2 => await new Dex123Service().UpdateDexWithSave(dex, sav2),
+            SAV3 sav3 => await new Dex123Service().UpdateDexWithSave(dex, sav3),
+            SAV3XD sav3XD => await new Dex3XDService().UpdateDexWithSave(dex, sav3XD),
+            SAV3Colosseum sav3Colo => await new Dex3ColoService().UpdateDexWithSave(dex, sav3Colo),
+            SAV4 sav4 => await new Dex4Service().UpdateDexWithSave(dex, sav4),
+            SAV5 sav5 => await new Dex5Service().UpdateDexWithSave(dex, sav5),
             SAV6XY xy => notHandled(xy),
             SAV6AO xy => notHandled(xy),
             SAV7 sav7 => notHandled(sav7),
-            SAV7b lgpe => await new Dex7bService().UpdateDexWithSave(persistedDex, lgpe),
+            SAV7b lgpe => await new Dex7bService().UpdateDexWithSave(dex, lgpe),
             SAV8SWSH ss => notHandled(ss),
             SAV8BS bs => notHandled(bs),
             SAV8LA la => notHandled(la),
@@ -43,10 +42,5 @@ public class DexService
         };
 
         return success;
-    }
-
-    public static void DeleteDexWithSave(SaveFile save)
-    {
-        DexGenService<SaveFile>.DeleteDexWithSave(persistedDex, save);
     }
 }

@@ -1,42 +1,29 @@
 using PKHeX.Core;
 
-public class SaveMovePkmAction : DataAction
+public class SaveMovePkmAction(uint saveId, string id, int boxId, int boxSlot) : DataAction
 {
-    public uint saveId { get; }
-    private readonly string id;
-    // private readonly BoxType boxType;
-    private readonly int boxId;
-    private readonly int boxSlot;
-
-    public SaveMovePkmAction(uint _saveId, string _id, int _boxId, int _boxSlot)
-    {
-        saveId = _saveId;
-        id = _id;
-        // boxType = _boxType;
-        boxId = _boxId;
-        boxSlot = _boxSlot;
-    }
+    public uint SaveId { get; } = saveId;
 
     public override DataActionPayload GetPayload()
     {
         return new DataActionPayload
         {
             type = DataActionType.SAVE_MOVE_PKM,
-            parameters = [saveId, id, boxId, boxSlot]
+            parameters = [SaveId, id, boxId, boxSlot]
         };
     }
 
     public override async Task Execute(DataEntityLoaders loaders)
     {
-        var saveLoaders = loaders.saveLoadersDict[saveId];
+        var saveLoaders = loaders.saveLoadersDict[SaveId];
 
-        var dto = saveLoaders.Pkms.GetDto(id);
+        var dto = await saveLoaders.Pkms.GetDto(id);
         if (dto == default)
         {
             throw new Exception("Save Pkm not found");
         }
 
-        var entityAlreadyPresent = saveLoaders.Pkms.GetAllDtos().Find(entity => entity.Id != id &&
+        var entityAlreadyPresent = (await saveLoaders.Pkms.GetAllDtos()).Find(entity => entity.Id != id &&
             entity.Box == boxId && entity.BoxSlot == boxSlot
         );
         if (entityAlreadyPresent != null)
@@ -46,7 +33,6 @@ public class SaveMovePkmAction : DataAction
 
         await saveLoaders.Pkms.DeleteDto(dto.Id);
 
-        // dto.BoxType = boxType;
         dto.Box = boxId;
         dto.BoxSlot = boxSlot;
 

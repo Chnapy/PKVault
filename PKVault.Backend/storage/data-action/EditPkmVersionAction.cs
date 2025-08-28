@@ -23,7 +23,7 @@ public class EditPkmVersionAction : DataAction
 
     public override async Task Execute(DataEntityLoaders loaders)
     {
-        var pkmVersionDto = loaders.pkmVersionLoader.GetDto(pkmVersionId);
+        var pkmVersionDto = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkmDto = pkmVersionDto.PkmDto;
 
         if (pkmDto.SaveId != default)
@@ -41,35 +41,21 @@ public class EditPkmVersionAction : DataAction
         // TODO make a using write pkm to ensure use of this call
         pkm.RefreshChecksum();
 
-        pkmVersionDto = await PkmVersionDTO.FromEntity(
-            new()
-            {
-                Id = pkmVersionDto.Id,
-                Filepath = pkmVersionDto.PkmVersionEntity.Filepath,
-                PkmId = pkmVersionDto.PkmDto.Id,
-                Generation = pkmVersionDto.Generation
-            },
-            pkm,
-            pkmDto
-        );
+        loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
 
-        await loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
-
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos()
+        var relatedPkmVersions = (await loaders.pkmVersionLoader.GetAllDtos())
         .FindAll(value => value.PkmDto.Id == pkmDto.Id && value.Id != pkmVersionId);
 
-        await Task.WhenAll(
-            relatedPkmVersions.Select(async (versionDto) =>
-            {
-                var relatedPkm = versionDto.Pkm;
+        relatedPkmVersions.ForEach((versionDto) =>
+        {
+            var relatedPkm = versionDto.Pkm;
 
-                PkmConvertService.PassDynamicsToPkm(pkm, relatedPkm);
+            PkmConvertService.PassDynamicsToPkm(pkm, relatedPkm);
 
-                relatedPkm.RefreshChecksum();
+            relatedPkm.RefreshChecksum();
 
-                await loaders.pkmVersionLoader.WriteDto(versionDto);
-            })
-        );
+            loaders.pkmVersionLoader.WriteDto(versionDto);
+        });
     }
 
     public static void EditPkmNickname(PKM pkm, string nickname)

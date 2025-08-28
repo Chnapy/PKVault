@@ -23,7 +23,7 @@ public class SynchronizePkmAction : DataAction
 
     public override async Task Execute(DataEntityLoaders loaders)
     {
-        var pkmVersionDto = loaders.pkmVersionLoader.GetDto(pkmVersionId);
+        var pkmVersionDto = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkmDto = pkmVersionDto.PkmDto;
 
         if (pkmDto.SaveId == default)
@@ -32,22 +32,20 @@ public class SynchronizePkmAction : DataAction
         }
 
         var saveLoaders = loaders.saveLoadersDict[saveId];
-        var savePkm = saveLoaders.Pkms.GetDto(pkmVersionId);
+        var savePkm = await saveLoaders.Pkms.GetDto(pkmVersionId);
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos().FindAll(value => value.PkmDto.Id == pkmDto.Id);
+        var relatedPkmVersions = (await loaders.pkmVersionLoader.GetAllDtos()).FindAll(value => value.PkmDto.Id == pkmDto.Id);
 
-        await Task.WhenAll(
-            relatedPkmVersions.Select(async (version) =>
-            {
-                var pkm = version.Pkm;
+        relatedPkmVersions.ForEach((version) =>
+        {
+            var pkm = version.Pkm;
 
-                PkmConvertService.PassDynamicsToPkm(savePkm.Pkm, pkm);
-                PkmConvertService.PassHeldItemToPkm(savePkm.Pkm, pkm);
+            PkmConvertService.PassDynamicsToPkm(savePkm.Pkm, pkm);
+            PkmConvertService.PassHeldItemToPkm(savePkm.Pkm, pkm);
 
-                pkm.RefreshChecksum();
+            pkm.RefreshChecksum();
 
-                await loaders.pkmVersionLoader.WriteDto(version);
-            })
-        );
+            loaders.pkmVersionLoader.WriteDto(version);
+        });
     }
 }

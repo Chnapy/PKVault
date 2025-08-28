@@ -34,7 +34,7 @@ public class SaveMovePkmFromStorageAction : DataAction
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
 
-        var pkmVersionDto = loaders.pkmVersionLoader.GetDto(pkmVersionId);
+        var pkmVersionDto = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
 
         if (pkmVersionDto == default)
         {
@@ -47,13 +47,13 @@ public class SaveMovePkmFromStorageAction : DataAction
         }
 
         // get save-pkm
-        var savePkm = saveLoaders.Pkms.GetDto(pkmVersionDto.Id);
+        var savePkm = await saveLoaders.Pkms.GetDto(pkmVersionDto.Id);
         if (savePkm != default)
         {
             throw new Exception($"SavePkm already exists, id={savePkm.Id} {savePkm.Nickname}");
         }
 
-        var existingSlot = saveLoaders.Pkms.GetAllDtos().Find(entity => entity.Box == saveBoxId && entity.BoxSlot == saveSlot);
+        var existingSlot = (await saveLoaders.Pkms.GetAllDtos()).Find(entity => entity.Box == saveBoxId && entity.BoxSlot == saveSlot);
         if (existingSlot != default)
         {
             throw new Exception($"SavePkm already exists in given box slot, box={saveBoxId}, slot={saveSlot}");
@@ -66,8 +66,6 @@ public class SaveMovePkmFromStorageAction : DataAction
         }
 
         var pkm = pkmVersionDto.Pkm;
-
-        var pkmSaveDTO = await PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxId, saveSlot, loaders.pkmLoader, loaders.pkmVersionLoader);
 
         // enable national-dex in G3 if pkm outside of regional-dex
         if (saveLoaders.Save is SAV3 saveG3 && !saveG3.NationalDex)
@@ -88,12 +86,13 @@ public class SaveMovePkmFromStorageAction : DataAction
             }
         }
 
+        pkmDto.PkmEntity.SaveId = saveLoaders.Save.ID32;
+        loaders.pkmLoader.WriteDto(pkmDto);
+
+        var pkmSaveDTO = await PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxId, saveSlot, loaders.pkmLoader, loaders.pkmVersionLoader);
         await saveLoaders.Pkms.WriteDto(pkmSaveDTO);
 
-        pkmDto.PkmEntity.SaveId = saveLoaders.Save.ID32;
-        await loaders.pkmLoader.WriteDto(pkmDto);
-
-        if (pkmSaveDTO.GetAttachedPkmVersion() == null)
+        if (pkmSaveDTO.PkmVersionId == null)
         {
             throw new Exception($"pkmSaveDTO.PkmVersionId is null, should be {pkmSaveDTO.Id}");
         }

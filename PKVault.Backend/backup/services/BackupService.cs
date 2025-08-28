@@ -19,7 +19,7 @@ public class BackupService
 
         Console.WriteLine($"Create backup - start");
 
-        var loaders = (await DataFileLoader.Create()).loaders;
+        var loaders = DataFileLoader.Create().loaders;
 
         PrepareBkpDir();
 
@@ -33,7 +33,7 @@ public class BackupService
 
         Console.WriteLine($"Create backup - Storage");
 
-        var mainPaths = CreateMainBackup(loaders);
+        var mainPaths = await CreateMainBackup(loaders);
 
         var paths = new Dictionary<string, string>()
             .Concat(dbPaths)
@@ -151,14 +151,14 @@ public class BackupService
         return paths;
     }
 
-    private static Dictionary<string, string> CreateMainBackup(DataEntityLoaders loaders)
+    private static async Task<Dictionary<string, string>> CreateMainBackup(DataEntityLoaders loaders)
     {
         var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
 
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
         var bkpMainDirPath = Path.Combine(bkpTmpDirPath, "main");
 
-        var pkmVersions = loaders.pkmVersionLoader.GetAllDtos();
+        var pkmVersions = await loaders.pkmVersionLoader.GetAllDtos();
 
         var paths = new Dictionary<string, string>();
 

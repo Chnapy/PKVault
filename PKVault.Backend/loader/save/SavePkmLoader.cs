@@ -1,20 +1,14 @@
 using PKHeX.Core;
 
-public class SavePkmLoader : EntityLoader<PkmSaveDTO, object>
+public class SavePkmLoader(
+    SaveFile save,
+    EntityLoader<PkmDTO, PkmEntity> pkmDtoLoader,
+    EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionDtoLoader
+)
 {
-    public static async Task<SavePkmLoader> Create(SaveFile save, EntityLoader<PkmDTO, PkmEntity> pkmDtoLoader, EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionDtoLoader)
-    {
-        var dtoList = await PrepareDtoList(save, pkmDtoLoader, pkmVersionDtoLoader);
+    public bool HasWritten = false;
 
-        return new(
-            save,
-            pkmDtoLoader,
-            pkmVersionDtoLoader,
-            dtoList
-        );
-    }
-
-    private static async Task<List<PkmSaveDTO>> PrepareDtoList(SaveFile save, EntityLoader<PkmDTO, PkmEntity> pkmDtoLoader, EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionDtoLoader)
+    public async Task<List<PkmSaveDTO>> GetAllDtos()
     {
         var taskList = new List<Task<PkmSaveDTO>>();
 
@@ -69,27 +63,12 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO, object>
         return [.. await Task.WhenAll(taskList)];
     }
 
-    private SaveFile save;
-    private EntityLoader<PkmDTO, PkmEntity> pkmDtoLoader;
-    private EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionDtoLoader;
-
-    private List<PkmSaveDTO> dtoList;
-
-    private SavePkmLoader(SaveFile _save, EntityLoader<PkmDTO, PkmEntity> _pkmDtoLoader, EntityLoader<PkmVersionDTO, PkmVersionEntity> _pkmVersionDtoLoader, List<PkmSaveDTO> _dtoList)
+    public async Task<PkmSaveDTO?> GetDto(string id)
     {
-        save = _save;
-        pkmDtoLoader = _pkmDtoLoader;
-        pkmVersionDtoLoader = _pkmVersionDtoLoader;
-
-        dtoList = _dtoList;
+        return (await GetAllDtos()).Find(entity => entity.Id == id);
     }
 
-    public override List<PkmSaveDTO> GetAllDtos()
-    {
-        return [.. dtoList];
-    }
-
-    public override async Task WriteDto(PkmSaveDTO dto)
+    public async Task WriteDto(PkmSaveDTO dto)
     {
         if (dto.Box == BoxDTO.DAYCARE_ID)
         {
@@ -106,7 +85,7 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO, object>
 
         var party = save.PartyData.ToList().FindAll(pkm => pkm.Species != 0);
 
-        var oldEntity = GetDto(dto.Id);
+        var oldEntity = await GetDto(dto.Id);
 
         if (oldEntity != null)
         {
@@ -142,13 +121,11 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO, object>
         {
             SetParty(party);
         }
-
-        dtoList = await PrepareDtoList(save, pkmDtoLoader, pkmVersionDtoLoader);
     }
 
-    public override async Task DeleteDto(string id)
+    public async Task DeleteDto(string id)
     {
-        var entity = GetDto(id);
+        var entity = await GetDto(id);
         if (entity != default)
         {
             switch (entity.Box)
@@ -168,14 +145,7 @@ public class SavePkmLoader : EntityLoader<PkmSaveDTO, object>
             }
 
             HasWritten = true;
-
-            dtoList = dtoList.FindAll(dto => dto.Id != id);
         }
-    }
-
-    public override Task SetAllDtos(List<PkmSaveDTO> entities)
-    {
-        throw new Exception($"Not implemented");
     }
 
     private void SetParty(List<PKM> party)

@@ -40,8 +40,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     {
         get
         {
-            var stringsFr = GameInfo.GetStrings("fr");
-            return stringsFr.Species[Pkm.Species];
+            return PKHexUtils.StringsFR.Species[Pkm.Species];
         }
     }
 
@@ -76,9 +75,8 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     {
         get
         {
-            var stringsFr = GameInfo.GetStrings("fr");
-            var type1 = stringsFr.Types[Pkm.PersonalInfo.Type1];
-            var type2 = stringsFr.Types[Pkm.PersonalInfo.Type2];
+            var type1 = PKHexUtils.StringsFR.Types[Pkm.PersonalInfo.Type1];
+            var type2 = PKHexUtils.StringsFR.Types[Pkm.PersonalInfo.Type2];
             return [type1, type2];
         }
     }
@@ -161,8 +159,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         {
             HiddenPower.TryGetTypeIndex(Pkm.HPType, out var hptype);
 
-            var stringsFr = GameInfo.GetStrings("fr");
-            var type = stringsFr.Types[hptype];
+            var type = PKHexUtils.StringsFR.Types[hptype];
 
             return type;
         }
@@ -179,10 +176,9 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     {
         get
         {
-            var stringsFr = GameInfo.GetStrings("fr");
             return Pkm.Ability == -1
                 ? null
-                : stringsFr.Ability[Pkm.Ability];
+                : PKHexUtils.StringsFR.Ability[Pkm.Ability];
         }
     }
 
@@ -210,7 +206,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
                 moveSourceTypesRecord.Add(type, LearnPossible.Get(Pkm, legality.EncounterOriginal, legality.Info.EvoChainsAllGens, type));
             });
 
-            var movesStr = GameInfo.GetStrings("fr").movelist;
+            var movesStr = PKHexUtils.StringsFR.movelist;
 
             var rawMoves = new List<ushort>{
                 Pkm.Move1,
@@ -259,7 +255,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public string OriginMetLocation
     {
-        get { return GameInfo.GetStrings("fr").GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version); }
+        get { return PKHexUtils.StringsFR.GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version); }
     }
 
     public byte? OriginMetLevel { get { return Pkm.MetLevel == 0 ? null : Pkm.MetLevel; } }
@@ -289,8 +285,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
             {
                 return null;
             }
-            var stringsFr = GameInfo.GetStrings("fr");
-            return stringsFr.GetItemStrings(Pkm.Context, Pkm.Version)[Pkm.HeldItem];
+            return PKHexUtils.StringsFR.GetItemStrings(Pkm.Context, Pkm.Version)[Pkm.HeldItem];
         }
     }
 
@@ -334,7 +329,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
                 moveSourceTypesRecord.Add(type, LearnPossible.Get(Pkm, legality.EncounterOriginal, legality.Info.EvoChainsAllGens, type));
             });
 
-            var movesStr = GameInfo.GetStrings("fr").movelist;
+            var movesStr = PKHexUtils.StringsFR.movelist;
 
             var availableMoves = new List<MoveItem>();
 

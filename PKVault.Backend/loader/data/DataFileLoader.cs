@@ -5,7 +5,7 @@ public class DataFileLoader : DataLoader
 {
     // TOTO most of these loads are way too slow
     // Data (pkm & box) should be stored in json-files then loaded sync
-    public static async Task<DataFileLoader> Create()
+    public static DataFileLoader Create()
     {
         var pkmFileLoader = new PKMFileLoader();
 
@@ -17,9 +17,9 @@ public class DataFileLoader : DataLoader
 
         var dbDir = SettingsService.AppSettings.DB_PATH;
 
-        var boxLoader = await EntityJSONLoader<BoxDTO, BoxEntity>.Create(
+        var boxLoader = new EntityJSONLoader<BoxDTO, BoxEntity>(
             filePath: Path.Combine(dbDir, "box.json"),
-            entityToDto: async (BoxEntity entity) =>
+            entityToDto: async entity =>
             {
                 return new BoxDTO
                 {
@@ -29,10 +29,9 @@ public class DataFileLoader : DataLoader
             },
             dtoToEntity: dto => dto.BoxEntity
         );
-        var boxes = boxLoader.GetAllDtos();
-        if (boxes.Count == 0)
+        if (boxLoader.GetAllEntities().Count == 0)
         {
-            await boxLoader.WriteDto(new BoxDTO
+            boxLoader.WriteDto(new()
             {
                 Type = BoxType.Default,
                 BoxEntity = new()
@@ -43,43 +42,51 @@ public class DataFileLoader : DataLoader
             });
         }
 
-        var pkmLoader = await EntityJSONLoader<PkmDTO, PkmEntity>.Create(
+        var pkmLoader = new EntityJSONLoader<PkmDTO, PkmEntity>(
            filePath: Path.Combine(dbDir, "pkm.json"),
-            entityToDto: async (PkmEntity entity) => PkmDTO.FromEntity(entity),
+            entityToDto: async entity => PkmDTO.FromEntity(entity),
             dtoToEntity: dto => dto.PkmEntity
         );
 
-        var pkmVersionLoader = await EntityJSONLoader<PkmVersionDTO, PkmVersionEntity>.Create(
-           filePath: Path.Combine(dbDir, "pkm-version.json"),
-            entityToDto: async (PkmVersionEntity entity) =>
+        PKM getPkmVersionEntityPkm(PkmVersionEntity entity)
+        {
+            var pkmBytes = pkmFileLoader.GetEntity(entity.Filepath);
+            if (pkmBytes == default)
             {
-                var pkmDto = pkmLoader.GetDto(entity.PkmId);
+                throw new Exception($"PKM-bytes is null, from entity Id={entity.Id} Filepath={entity.Filepath}");
+            }
+            var pkm = PKMLoader.CreatePKM(pkmBytes, entity);
+            if (pkm == default)
+            {
+                throw new Exception($"PKM is null, from entity Id={entity.Id} Filepath={entity.Filepath} bytes.length={pkmBytes.Length}");
+            }
 
-                var pkmBytes = pkmFileLoader.GetEntity(entity.Filepath);
-                if (pkmBytes == default)
-                {
-                    throw new Exception($"PKM-bytes is null, from entity Id={entity.Id} Filepath={entity.Filepath}");
-                }
-                var pkm = PKMLoader.CreatePKM(pkmBytes, entity);
-                if (pkm == default)
-                {
-                    throw new Exception($"PKM is null, from entity Id={entity.Id} Filepath={entity.Filepath} bytes.length={pkmBytes.Length}");
-                }
+            return pkm;
+        }
+
+        var pkmVersionLoader = new EntityJSONLoader<PkmVersionDTO, PkmVersionEntity>(
+           filePath: Path.Combine(dbDir, "pkm-version.json"),
+            entityToDto: async entity =>
+            {
+                var pkmDto = await pkmLoader.GetDto(entity.PkmId);
+                var pkm = getPkmVersionEntityPkm(entity);
 
                 return await PkmVersionDTO.FromEntity(entity, pkm, pkmDto);
             },
             dtoToEntity: dto => dto.PkmVersionEntity
-        );
-        pkmVersionLoader.OnWrite = (dto) =>
+        )
         {
-            var pkm = dto.Pkm;
-            pkmFileLoader.WriteEntity(
-                PKMLoader.GetPKMBytes(pkm), pkm, dto.PkmVersionEntity.Filepath
-            );
-        };
-        pkmVersionLoader.OnDelete = (dto) =>
-        {
-            pkmFileLoader.DeleteEntity(dto.PkmVersionEntity.Filepath);
+            OnWrite = (dto) =>
+            {
+                var pkm = dto.Pkm;
+                pkmFileLoader.WriteEntity(
+                    PKMLoader.GetPKMBytes(pkm), pkm, dto.PkmVersionEntity.Filepath
+                );
+            },
+            OnDelete = (entity) =>
+            {
+                pkmFileLoader.DeleteEntity(entity.Filepath);
+            }
         };
 
         Console.WriteLine($"File-loader save-loaders loading");
@@ -88,17 +95,15 @@ public class DataFileLoader : DataLoader
         sw.Start();
 
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
-        await Task.WhenAll(
-                saveDict.Values.ToList().Select(async (save) =>
-                {
-                    saveLoadersDict.Add(save.ID32, new()
-                    {
-                        Save = save,
-                        Boxes = new SaveBoxLoader(save),
-                        Pkms = await SavePkmLoader.Create(save, pkmLoader, pkmVersionLoader)
-                    });
-                })
-        );
+        saveDict.Values.ToList().ForEach((save) =>
+        {
+            saveLoadersDict.Add(save.ID32, new()
+            {
+                Save = save,
+                Boxes = new SaveBoxLoader(save),
+                Pkms = new SavePkmLoader(save, pkmLoader, pkmVersionLoader)
+            });
+        });
 
         sw.Stop();
 
@@ -119,13 +124,13 @@ public class DataFileLoader : DataLoader
     {
     }
 
-    public async Task WriteSaves()
+    public void WriteSaves()
     {
         foreach (var saveLoaders in loaders.saveLoadersDict.Values.ToList())
         {
             if (saveLoaders.Pkms.HasWritten || saveLoaders.Boxes.HasWritten)
             {
-                await LocalSaveService.WriteSave(saveLoaders.Save);
+                LocalSaveService.WriteSave(saveLoaders.Save);
             }
         }
     }

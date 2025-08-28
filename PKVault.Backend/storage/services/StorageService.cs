@@ -9,29 +9,29 @@ public class StorageService
         await ResetDataLoader();
     }
 
-    public static List<BoxDTO> GetMainBoxes()
+    public static async Task<List<BoxDTO>> GetMainBoxes()
     {
-        return memoryLoader.loaders.boxLoader.GetAllDtos();
+        return await memoryLoader.loaders.boxLoader.GetAllDtos();
     }
 
-    public static List<PkmDTO> GetMainPkms()
+    public static async Task<List<PkmDTO>> GetMainPkms()
     {
-        return memoryLoader.loaders.pkmLoader.GetAllDtos();
+        return await memoryLoader.loaders.pkmLoader.GetAllDtos();
     }
 
-    public static List<PkmVersionDTO> GetMainPkmVersions()
+    public static async Task<List<PkmVersionDTO>> GetMainPkmVersions()
     {
-        return memoryLoader.loaders.pkmVersionLoader.GetAllDtos();
+        return await memoryLoader.loaders.pkmVersionLoader.GetAllDtos();
     }
 
-    public static List<BoxDTO> GetSaveBoxes(uint saveId)
+    public static async Task<List<BoxDTO>> GetSaveBoxes(uint saveId)
     {
-        return memoryLoader.loaders.saveLoadersDict[saveId].Boxes.GetAllDtos();
+        return await memoryLoader.loaders.saveLoadersDict[saveId].Boxes.GetAllDtos();
     }
 
-    public static List<PkmSaveDTO> GetSavePkms(uint saveId)
+    public static async Task<List<PkmSaveDTO>> GetSavePkms(uint saveId)
     {
-        return memoryLoader.loaders.saveLoadersDict[saveId].Pkms.GetAllDtos();
+        return await memoryLoader.loaders.saveLoadersDict[saveId].Pkms.GetAllDtos();
     }
 
     public static async Task MainMovePkm(string pkmId, uint boxId, uint boxSlot)
@@ -140,14 +140,14 @@ public class StorageService
 
         await BackupService.PrepareBackupThenRun(async () =>
         {
-            var fileLoader = await DataFileLoader.Create();
+            var fileLoader = DataFileLoader.Create();
 
             for (var i = 0; i < actions.Count; i++)
             {
                 await fileLoader.ApplyAction(actions[i]);
             }
 
-            await fileLoader.WriteSaves();
+            fileLoader.WriteSaves();
         });
     }
 

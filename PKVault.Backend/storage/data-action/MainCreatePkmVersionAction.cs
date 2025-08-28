@@ -26,13 +26,13 @@ public class MainCreatePkmVersionAction : DataAction
     {
         Console.WriteLine($"Create PKM version, pkmId={pkmId}, generation={generation}");
 
-        var pkmEntity = loaders.pkmLoader.GetDto(pkmId);
-        if (pkmEntity == default)
+        var pkmDto = await loaders.pkmLoader.GetDto(pkmId);
+        if (pkmDto == default)
         {
             throw new Exception($"Pkm entity not found, id={pkmId}");
         }
 
-        var pkmVersions = loaders.pkmVersionLoader.GetAllDtos().FindAll(pkmVersion => pkmVersion.PkmDto.Id == pkmId);
+        var pkmVersions = (await loaders.pkmVersionLoader.GetAllDtos()).FindAll(pkmVersion => pkmVersion.PkmDto.Id == pkmId);
 
         var pkmVersionEntity = pkmVersions.Find(pkmVersion => pkmVersion.Generation == generation);
         if (pkmVersionEntity != default)
@@ -40,7 +40,7 @@ public class MainCreatePkmVersionAction : DataAction
             throw new Exception($"Pkm-version already exists, pkm.id={pkmId} generation={generation}");
         }
 
-        var pkmVersionOrigin = pkmVersions.Find(pkmVersion => pkmVersion.Id == pkmId);
+        var pkmVersionOrigin = pkmVersions.Find(pkmVersion => pkmVersion.IsMain);
         if (pkmVersionOrigin == default)
         {
             throw new Exception($"Pkm-version original not found, pkm.id={pkmId} generation={generation}");
@@ -59,8 +59,8 @@ public class MainCreatePkmVersionAction : DataAction
             Filepath = PKMLoader.GetPKMFilepath(pkmConverted),
         };
 
-        var pkmVersionCreated = await PkmVersionDTO.FromEntity(pkmVersionEntityCreated, pkmConverted, pkmEntity);
+        var pkmVersionCreated = await PkmVersionDTO.FromEntity(pkmVersionEntityCreated, pkmConverted, pkmDto);
 
-        await loaders.pkmVersionLoader.WriteDto(pkmVersionCreated);
+        loaders.pkmVersionLoader.WriteDto(pkmVersionCreated);
     }
 }
