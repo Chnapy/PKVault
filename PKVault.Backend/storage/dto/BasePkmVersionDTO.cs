@@ -436,7 +436,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public async Task<List<ChainLink>> GetTradeEvolveChains()
     {
-        var pokeapiSpeciesName = PokeApi.PokeApiNameFromPKHexName(GameInfo.Strings.Species[Species]);
+        var pokeapiSpeciesName = PokeApiFileClient.PokeApiNameFromPKHexName(GameInfo.Strings.Species[Species]);
         var evolutionChain = await PokeApi.GetPokemonSpeciesEvolutionChain(
             GameInfo.Strings.Species[Species]
         );
@@ -468,7 +468,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         }
 
         var heldItemName = GameInfo.Strings.Item[HeldItem];
-        var heldItemPokeapiName = PokeApi.PokeApiNameFromPKHexName(heldItemName);
+        var heldItemPokeapiName = PokeApiFileClient.PokeApiNameFromPKHexName(heldItemName);
 
         return speciesChain.EvolvesTo.FindAll(chain =>
             chain.EvolutionDetails.Any(details =>

@@ -46,8 +46,6 @@ public class Program
 
         await StorageService.Initialize();
 
-        PokeApi.ClearCache();
-
         // StorageService.CleanMainStorageFiles();
 
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;

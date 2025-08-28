@@ -115,7 +115,7 @@ public class EvolvePkmAction : DataAction
         var evolveChains = await dto.GetTradeEvolveChains();
 
         var heldItemName = GameInfo.Strings.Item[dto.HeldItem];
-        var heldItemPokeapiName = PokeApi.PokeApiNameFromPKHexName(heldItemName);
+        var heldItemPokeapiName = PokeApiFileClient.PokeApiNameFromPKHexName(heldItemName);
 
         var itemEvolveChain = evolveChains.Find(chain => chain.EvolutionDetails.Any(details =>
             details.Trigger.Name == "trade"

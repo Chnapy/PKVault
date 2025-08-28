@@ -7,8 +7,6 @@ public class GenApiData
     {
         Console.WriteLine("-- Generate pokeapi files --");
 
-        var endpointNames = PokeApi.endpointNames;
-
         Directory.CreateDirectory("pokeapi/api-data/data/api/v2");
 
         Process(
