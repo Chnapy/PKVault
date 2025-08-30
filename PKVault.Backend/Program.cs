@@ -9,12 +9,16 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        await SetupData(args);
-        var app = PrepareWebApp(5000);
-        await app.RunAsync();
+        var setupDone = await SetupData(args);
+
+        if (setupDone)
+        {
+            var app = PrepareWebApp(5000);
+            await app.RunAsync();
+        }
     }
 
-    public static async Task SetupData(string[] args)
+    public static async Task<bool> SetupData(string[] args)
     {
         LogUtil.Initialize();
 
@@ -28,14 +32,42 @@ public class Program
             // expected: ~10s
             var timePkm = (double)logtimePkm();
             Console.WriteLine($"Call pokemon av. time = {timePkm / 10_000}ms");
-            return;
+            return false;
+        }
+
+        if (args.Length > 0 && args[0] == "bench-save-pkm")
+        {
+            await LocalSaveService.ReadLocalSaves();
+            await StorageService.ResetDataLoader();
+
+            var logtimeSavePkmAll = LogUtil.Time("Benchmark Save Pkms (all) perfs with 10 sequential calls");
+            List<PkmSaveDTO> savePkms = [];
+            for (var i = 0; i < 10; i++)
+            {
+                savePkms = await StorageService.GetSavePkms(3809447156);
+                // savePkms.ForEach(pkm => Console.WriteLine($"{pkm.Id} - {pkm.Box}/{pkm.BoxSlot}"));
+            }
+            // expected: ~0.5s
+            logtimeSavePkmAll();
+            Console.WriteLine($"count={savePkms.Count} last_id={savePkms.Last().Id}");
+
+            var logtimeSavePkmGet = LogUtil.Time("Benchmark Save Pkms (get) perfs with 2000 sequential calls");
+            for (var i = 0; i < 2000; i++)
+            {
+                var result = await StorageService.memoryLoader!.loaders.saveLoadersDict[3809447156].Pkms.GetDto("G30366FC1CF2B528 17 20 21 30 600")
+                    ?? throw new Exception();
+            }
+            // expected: ~0s
+            logtimeSavePkmGet();
+
+            return false;
         }
 
 #if DEBUG
         if (args.Length > 0 && args[0] == "gen-pokeapi")
         {
             GenApiData.GenerateFiles();
-            return;
+            return false;
         }
 #endif
 
@@ -50,6 +82,8 @@ public class Program
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
         Console.WriteLine($"Memory checks: initial={initialMemoryUsedMB} MB setuped={setupedMemoryUsedMB} MB diff={setupedMemoryUsedMB - initialMemoryUsedMB} MB");
+
+        return true;
     }
 
     public static WebApplication PrepareWebApp(int port)

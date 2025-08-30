@@ -54,7 +54,7 @@ public abstract class DexGenService<Save> where Save : SaveFile
 
         var type1 = stringsFr.Types[dto.Type1];
         var type2 = stringsFr.Types[dto.Type2];
-        dto.Types = [type1, type2];
+        dto.Types = [.. new List<string>([type1, type2]).Distinct()];
 
         dto.AbilitiesLabel = [.. dto.Abilities.Select(ability => stringsFr.Ability[ability])];
 

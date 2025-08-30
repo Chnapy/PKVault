@@ -53,7 +53,7 @@ public class SaveMovePkmFromStorageAction : DataAction
             throw new Exception($"SavePkm already exists, id={savePkm.Id} {savePkm.Nickname}");
         }
 
-        var existingSlot = (await saveLoaders.Pkms.GetAllDtos()).Find(entity => entity.Box == saveBoxId && entity.BoxSlot == saveSlot);
+        var existingSlot = await saveLoaders.Pkms.GetDto(saveBoxId, saveSlot);
         if (existingSlot != default)
         {
             throw new Exception($"SavePkm already exists in given box slot, box={saveBoxId}, slot={saveSlot}");

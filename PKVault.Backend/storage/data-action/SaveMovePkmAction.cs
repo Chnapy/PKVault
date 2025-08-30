@@ -23,15 +23,13 @@ public class SaveMovePkmAction(uint saveId, string id, int boxId, int boxSlot) :
             throw new Exception("Save Pkm not found");
         }
 
-        var entityAlreadyPresent = (await saveLoaders.Pkms.GetAllDtos()).Find(entity => entity.Id != id &&
-            entity.Box == boxId && entity.BoxSlot == boxSlot
-        );
+        var entityAlreadyPresent = await saveLoaders.Pkms.GetDto(boxId, boxSlot);
         if (entityAlreadyPresent != null)
         {
             throw new Exception($"Save Pkm already present in slot, boxId={boxId}, boxSlot={boxSlot}");
         }
 
-        await saveLoaders.Pkms.DeleteDto(dto.Id);
+        // await saveLoaders.Pkms.DeleteDto(dto.Id);
 
         dto.Box = boxId;
         dto.BoxSlot = boxSlot;
