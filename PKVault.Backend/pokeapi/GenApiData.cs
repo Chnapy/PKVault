@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 
@@ -7,6 +8,7 @@ public class GenApiData
     {
         Console.WriteLine("-- Generate pokeapi files --");
 
+        Directory.Delete("pokeapi/api-data/data/api/v2", true);
         Directory.CreateDirectory("pokeapi/api-data/data/api/v2");
 
         Process(
@@ -34,7 +36,7 @@ public class GenApiData
                 return;
             }
 
-            var filename = Path.GetFileName(sourcePath);
+            var filename = Path.GetFileName(sourcePath) + ".gz";
             var targetPath = NormalizePath(Path.Combine(targetDir, filename));
 
             Directory.CreateDirectory(targetDir);
@@ -43,8 +45,15 @@ public class GenApiData
             var minified = JsonSerializer.Serialize(
                 JsonSerializer.Deserialize<object>(sourceData)
             );
+
+            using var originalFileStream = new MemoryStream(Encoding.UTF8.GetBytes(minified));
+            using var compressedFileStream = File.Create(targetPath);
+            using var compressionStream = new GZipStream(compressedFileStream, CompressionLevel.Optimal);
+
+            originalFileStream.CopyTo(compressionStream);
+
             // Console.WriteLine(targetPath);
-            File.WriteAllText(targetPath, minified, Encoding.UTF8);
+            // File.WriteAllText(targetPath, minified, Encoding.UTF8);
         });
 
         directories.ForEach(sourcePath =>

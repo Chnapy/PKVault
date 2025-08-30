@@ -1,8 +1,7 @@
-using System.Diagnostics;
 
 public class StorageService
 {
-    private static DataMemoryLoader? memoryLoader;
+    public static DataMemoryLoader? memoryLoader;
 
     public static async Task Initialize()
     {
@@ -11,26 +10,51 @@ public class StorageService
 
     public static async Task<List<BoxDTO>> GetMainBoxes()
     {
+        if (memoryLoader == null)
+        {
+            return [];
+        }
+
         return await memoryLoader.loaders.boxLoader.GetAllDtos();
     }
 
     public static async Task<List<PkmDTO>> GetMainPkms()
     {
+        if (memoryLoader == null)
+        {
+            return [];
+        }
+
         return await memoryLoader.loaders.pkmLoader.GetAllDtos();
     }
 
     public static async Task<List<PkmVersionDTO>> GetMainPkmVersions()
     {
+        if (memoryLoader == null)
+        {
+            return [];
+        }
+
         return await memoryLoader.loaders.pkmVersionLoader.GetAllDtos();
     }
 
     public static async Task<List<BoxDTO>> GetSaveBoxes(uint saveId)
     {
+        if (memoryLoader == null)
+        {
+            return [];
+        }
+
         return await memoryLoader.loaders.saveLoadersDict[saveId].Boxes.GetAllDtos();
     }
 
     public static async Task<List<PkmSaveDTO>> GetSavePkms(uint saveId)
     {
+        if (memoryLoader == null)
+        {
+            return [];
+        }
+
         return await memoryLoader.loaders.saveLoadersDict[saveId].Pkms.GetAllDtos();
     }
 
@@ -153,6 +177,11 @@ public class StorageService
 
     public static List<DataActionPayload> GetActionPayloadList()
     {
+        if (memoryLoader == null)
+        {
+            return [];
+        }
+
         var actionPayloadList = new List<DataActionPayload>();
         memoryLoader.actions.ForEach(action => actionPayloadList.Add(action.GetPayload()));
         return actionPayloadList;
@@ -165,15 +194,11 @@ public class StorageService
 
     public static async Task ResetDataLoader()
     {
-        Stopwatch sw = new();
+        var logtime = LogUtil.Time($"Data-loader reset");
 
-        Console.WriteLine($"Data-loader reset");
-
-        sw.Start();
         memoryLoader = await DataMemoryLoader.Create();
-        sw.Stop();
 
-        Console.WriteLine($"Data-loader reseted in {sw.Elapsed}");
+        logtime();
     }
 
     public static async Task RemoveDataActions(int actionIndexToRemoveFrom)

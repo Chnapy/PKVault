@@ -11,7 +11,10 @@ public class SettingsService
         if (!File.Exists(filePath))
         {
             Console.WriteLine($"Config file not existing: creating {filePath}");
-            string defaultJson = JsonSerializer.Serialize(GetDefaultSettings());
+            string defaultJson = JsonSerializer.Serialize(GetDefaultSettings(), new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
 
             string? directory = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrEmpty(directory))
@@ -28,13 +31,32 @@ public class SettingsService
 
     private static AppSettings GetDefaultSettings()
     {
-        return new()
+        AppSettings settings;
+
+#if DEBUG
+        settings = new()
         {
             DB_PATH = "./tmp/db",
-            SAVE_GLOBS = ["./tmp/saves/**/*.sav"],
+            SAVE_GLOBS = ["./tmp/saves/**/*.sav", "./tmp/saves/**/*.srm", "./tmp/saves/**/*.gci", "./tmp/saves/**/*.dsv"],
             STORAGE_PATH = "./tmp/storage",
             BACKUP_PATH = "./tmp/backup",
         };
+#else
+        settings = new()
+        {
+            DB_PATH = "./db",
+            SAVE_GLOBS = [
+                "./saves/**/*.sav",
+                "./saves/**/*.srm",
+                "./saves/**/*.gci",
+                "./saves/**/*.dsv"
+            ],
+            STORAGE_PATH = "./storage",
+            BACKUP_PATH = "./backup",
+        };
+#endif
+
+        return settings;
     }
 }
 

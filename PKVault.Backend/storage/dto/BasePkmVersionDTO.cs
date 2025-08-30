@@ -381,12 +381,15 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         return id;
     }
 
+    // TODO perf issues
     public async Task RefreshAsyncData()
     {
-        await RefreshSprite();
-        await RefreshBallSprite();
-        await RefreshNature();
-        await RefreshHasTradeEvolve();
+        await Task.WhenAll(
+            RefreshSprite(),
+            RefreshBallSprite(),
+            RefreshNature(),
+            RefreshHasTradeEvolve()
+        );
     }
 
     private async Task RefreshSprite()

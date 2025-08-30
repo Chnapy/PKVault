@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using PKHeX.Core;
 
 public class DataFileLoader : DataLoader
@@ -89,10 +88,7 @@ public class DataFileLoader : DataLoader
             }
         };
 
-        Console.WriteLine($"File-loader save-loaders loading");
-
-        Stopwatch sw = new();
-        sw.Start();
+        var logtime = LogUtil.Time($"File-loader save-loaders loading");
 
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
         saveDict.Values.ToList().ForEach((save) =>
@@ -105,9 +101,7 @@ public class DataFileLoader : DataLoader
             });
         });
 
-        sw.Stop();
-
-        Console.WriteLine($"File-loader save-loaders loading finished in {sw.Elapsed}");
+        logtime();
 
         var loaders = new DataEntityLoaders
         {

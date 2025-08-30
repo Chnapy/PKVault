@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Globalization;
 using System.IO.Compression;
 using System.Text.Json;
@@ -13,11 +12,7 @@ public class BackupService
     {
         var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
 
-        Stopwatch sw = new();
-
-        sw.Start();
-
-        Console.WriteLine($"Create backup - start");
+        var logtime = LogUtil.Time("Create backup");
 
         var loaders = DataFileLoader.Create().loaders;
 
@@ -51,9 +46,7 @@ public class BackupService
 
         var dateTime = Compress();
 
-        sw.Stop();
-
-        Console.WriteLine($"Create backup - Done in {sw.Elapsed} !");
+        logtime();
 
         return dateTime;
     }
@@ -277,9 +270,7 @@ public class BackupService
             throw new Exception($"File does not exist: {bkpZipPath}");
         }
 
-        Stopwatch sw = new();
-
-        sw.Start();
+        var logtime = LogUtil.Time("Backup restore");
 
         using var archive = ZipFile.OpenRead(bkpZipPath);
 
@@ -314,13 +305,13 @@ public class BackupService
 
         File.Delete(bkpTmpPathsPath);
 
-        sw.Stop();
-
-        Console.WriteLine($"Backup restore finished in {sw.Elapsed}");
+        logtime();
 
         await LocalSaveService.ResetTimerAndData();
 
         await StorageService.ResetDataLoader();
+
+        await WarningsService.CheckWarnings();
     }
 
     public static async Task PrepareBackupThenRun(Func<Task> action)
@@ -329,17 +320,13 @@ public class BackupService
 
         try
         {
-            Stopwatch sw = new();
-
-            Console.WriteLine($"Action run with backup fallback");
-
-            sw.Start();
+            var logtime = LogUtil.Time("Action run with backup fallback");
 
             await action();
 
-            sw.Stop();
+            logtime();
 
-            Console.WriteLine($"Action finished in {sw.Elapsed}");
+            await LocalSaveService.PrepareTimerAndRun();
 
             await StorageService.ResetDataLoader();
 

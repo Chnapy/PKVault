@@ -9,6 +9,28 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
+        await SetupData(args);
+        var app = PrepareWebApp(5000);
+        await app.RunAsync();
+    }
+
+    public static async Task SetupData(string[] args)
+    {
+        LogUtil.Initialize();
+
+        if (args.Length > 0 && args[0] == "bench-pokeapi")
+        {
+            var logtimePkm = LogUtil.Time("Benchmark PokeApi perfs with 10.000 sequential calls pokemon");
+            for (var species = 1; species < 10_000; species++)
+            {
+                await PokeApi.GetPokemon((species % 900) + 1);
+            }
+            // expected: ~10s
+            var timePkm = (double)logtimePkm();
+            Console.WriteLine($"Call pokemon av. time = {timePkm / 10_000}ms");
+            return;
+        }
+
 #if DEBUG
         if (args.Length > 0 && args[0] == "gen-pokeapi")
         {
@@ -17,63 +39,17 @@ public class Program
         }
 #endif
 
-        await SetupData();
-        var app = PrepareWebApp(5000);
-        await app.RunAsync();
-    }
-
-    public static async Task SetupData()
-    {
-        // TestService.Test();
-
-        // BackupService.CreateBackup();
-
-        // LocalSaveService.ReadLocalSaves(null);
-
-        // var pkm = new DataFileLoader().loaders.getSaveLoaders(3809447156).Pkms.GetDto("G30366F877008013 18 15 30 25 2500").Pkm;
-
         var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
         await LocalSaveService.PrepareTimerAndRun();
 
-        // Console.WriteLine($"Save loaded by ID:\n{string.Join('\n', LocalSaveService.SaveById.Keys)}");
-        // Console.WriteLine($"Save loaded by path:\n{string.Join('\n', LocalSaveService.SaveByPath.Keys)}");
+        await StorageService.ResetDataLoader();
 
-        // if (1 == 1)
-        // {
-        //     return;
-        // }
-
-        await StorageService.Initialize();
-
-        // StorageService.CleanMainStorageFiles();
+        await WarningsService.CheckWarnings();
 
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
         Console.WriteLine($"Memory checks: initial={initialMemoryUsedMB} MB setuped={setupedMemoryUsedMB} MB diff={setupedMemoryUsedMB - initialMemoryUsedMB} MB");
-
-        // var saveId = 3809447156;
-        // var pkmId = "G30366F877008013 18 15 30 25 2500";
-
-        // await StorageService.EvolvePkm(saveId, pkmId);
-
-        // var name = "gorebyss";
-
-        // var mainBoxes = StorageService.GetMainBoxes();
-        // var mainPkms = StorageService.GetMainPkms();
-        // var mainPkmVersions = StorageService.GetMainPkmVersions();
-        // var xdBoxes = StorageService.GetSaveBoxes(3344585478);
-        // var xdPkms = StorageService.GetSavePkms(3344585478);
-
-        // Console.WriteLine($"Done");
-        // Console.WriteLine($"Main - Boxes={mainBoxes.Count} Pkms={mainPkms.Count} PkmVersions={mainPkmVersions.Count}");
-        // Console.WriteLine($"PkmXD - Boxes={xdBoxes.Count} Pkms={xdPkms.Count}");
-
-        // if (1 == 1)
-        // {
-        //     return;
-        // }
-
     }
 
     public static WebApplication PrepareWebApp(int port)

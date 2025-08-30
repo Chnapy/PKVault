@@ -1,19 +1,14 @@
-using System.Diagnostics;
 using PKHeX.Core;
 
 public abstract class DexGenService<Save> where Save : SaveFile
 {
     public async Task<bool> UpdateDexWithSave(Dictionary<int, Dictionary<uint, DexItemDTO>> dex, Save save)
     {
-        Stopwatch sw = new();
-        sw.Start();
-
-        Console.WriteLine($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
+        var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
 
         List<Task> tasks = [];
         for (ushort i = 1; i < save.MaxSpeciesID + 1; i++)
         {
-            dex[i] = dex.GetValueOrDefault(i, []);
             var item = CreateDexItem(i, save, save.ID32);
             dex[i][save.ID32] = item;
 
@@ -27,8 +22,7 @@ public abstract class DexGenService<Save> where Save : SaveFile
         }
         await Task.WhenAll(tasks);
 
-        sw.Stop();
-        Console.WriteLine($"Update Dex with save {save.ID32} finished in {sw.Elapsed}");
+        logtime();
 
         return true;
     }
@@ -37,9 +31,9 @@ public abstract class DexGenService<Save> where Save : SaveFile
 
     public static async Task FillDexItem(DexItemDTO dto)
     {
-        var speciesNameRaw = GameInfo.Strings.Species[dto.Species];
+        var speciesName = GameInfo.Strings.Species[dto.Species];
 
-        var pkmSpecies = await PokeApi.GetPokemonSpecies(speciesNameRaw);
+        var pkmSpecies = await PokeApi.GetPokemonSpecies(dto.Species);
         var pkmObj = await PokeApi.GetPokemon(dto.Species);
 
         var stringsFr = PKHexUtils.StringsFR;

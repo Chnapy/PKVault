@@ -4,14 +4,14 @@ public partial class MainForm : Form
 {
     private readonly LocalWebServer server;
 
-    public MainForm()
+    public MainForm(string[] args)
     {
         InitializeComponent();
         Resize += new EventHandler(Form_Resize);
         Load += new EventHandler(WebView_Load);
 
         server = new LocalWebServer();
-        server.Start();
+        server.Start(args);
     }
 
     protected override async void OnFormClosing(FormClosingEventArgs e)

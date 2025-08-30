@@ -15,7 +15,8 @@ public class SavePkmLoader(
         if (save.HasParty)
         {
             var i = 0;
-            save.PartyData.ToList().ForEach((pkm) =>
+            var partyList = save.PartyData.ToList();
+            partyList.ForEach((pkm) =>
             {
                 if (pkm.Species != 0)
                 {
@@ -60,7 +61,13 @@ public class SavePkmLoader(
             }
         }
 
-        return [.. await Task.WhenAll(taskList)];
+        var logtimeAsync = LogUtil.Time($"SavePkmLoader.GetAllDtos [{save.ID32}] [async]");
+
+        var dtos = await Task.WhenAll(taskList);
+
+        logtimeAsync();
+
+        return [.. dtos];
     }
 
     public async Task<PkmSaveDTO?> GetDto(string id)

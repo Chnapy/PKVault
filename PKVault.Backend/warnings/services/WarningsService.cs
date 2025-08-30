@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using PKHeX.Core;
 
 public class WarningsService
@@ -14,22 +13,18 @@ public class WarningsService
         return WarningsDTO;
     }
 
-    // TODO huge perf issues
+    // TODO perf issues
     public static async Task CheckWarnings()
     {
-        Stopwatch sw = new();
+        var logtime = LogUtil.Time($"Warnings check");
 
-        Console.WriteLine($"Warnings check");
+        WarningsDTO = new()
+        {
+            playTimeWarnings = CheckPlayTimeWarning(),
+            pkmVersionWarnings = await CheckPkmVersionWarnings(),
+        };
 
-        sw.Start();
-        // WarningsDTO = new()
-        // {
-        //     playTimeWarnings = CheckPlayTimeWarning(),
-        //     pkmVersionWarnings = await CheckPkmVersionWarnings(),
-        // };
-        sw.Stop();
-
-        Console.WriteLine($"Warnings checked in {sw.Elapsed}");
+        logtime();
     }
 
     // TODO
@@ -81,20 +76,20 @@ public class WarningsService
     {
         var warns = new List<PkmVersionWarning>();
 
-        var fileLoader = DataFileLoader.Create();
+        var loader = StorageService.memoryLoader;
 
-        var pkms = await fileLoader.loaders.pkmLoader.GetAllDtos();
-        var pkmVersions = await fileLoader.loaders.pkmVersionLoader.GetAllDtos();
+        var pkms = await loader.loaders.pkmLoader.GetAllDtos();
+        var pkmVersionsTask = loader.loaders.pkmVersionLoader.GetAllDtos();
 
-        pkms.ForEach(pkm =>
+        var tasks = pkms.Select<PkmDTO, Task<PkmVersionWarning?>>(async pkm =>
         {
             if (pkm.SaveId != default)
             {
-                var saveLoader = fileLoader.loaders.saveLoadersDict[(uint)pkm.SaveId];
+                var saveLoader = loader.loaders.saveLoadersDict[(uint)pkm.SaveId];
                 var save = saveLoader.Save;
                 var generation = save.Generation;
 
-                var pkmVersion = pkmVersions.Find(pkmVersion => pkmVersion.PkmDto.Id == pkm.Id && pkmVersion.Generation == generation);
+                var pkmVersion = (await pkmVersionsTask).Find(pkmVersion => pkmVersion.PkmDto.Id == pkm.Id && pkmVersion.Generation == generation);
 
                 var savePkm = saveLoader.Pkms.GetDto(pkmVersion.Id);
 
@@ -102,15 +97,18 @@ public class WarningsService
                 {
                     Console.WriteLine($"Pkm-version warning");
 
-                    warns.Add(new PkmVersionWarning()
+                    return new PkmVersionWarning()
                     {
                         PkmVersionId = pkmVersion.Id,
-                    });
+                    };
                 }
             }
+            return null;
         });
 
-        return warns;
+        return [.. (await Task.WhenAll(tasks))
+            .Where(value => value != null)
+            .OfType<PkmVersionWarning>()];
     }
 
     private static int GetSavePlayTimeS(SaveFile save)

@@ -16,8 +16,9 @@ public class LocalWebServer
             webHost = Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseUrls(HOST_URL);
-                    webBuilder.UseStartup<PKVault.Backend.Startup>();
+                    webBuilder
+                        .UseUrls(HOST_URL)
+                        .UseStartup<PKVault.Backend.Startup>();
                 })
                 .Build();
         }
@@ -27,7 +28,7 @@ public class LocalWebServer
         }
     }
 
-    public void Start()
+    public void Start(string[] args)
     {
         if (webHost == null) return;
 
@@ -36,7 +37,7 @@ public class LocalWebServer
         Task.Run(() => webHost.Run());
 
         // TODO
-        PKVault.Backend.Program.SetupData();
+        PKVault.Backend.Program.SetupData(args);
     }
 
     public async Task Stop()

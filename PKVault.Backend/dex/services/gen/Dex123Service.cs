@@ -28,8 +28,8 @@ public class Dex123Service : DexGenService<SaveFile>
             Species = species,
             SaveId = saveId,
             SpeciesName = GameInfo.Strings.Species[species],
-            Type1 = pi.Type1,
-            Type2 = pi.Type2,
+            Type1 = save.Generation <= 2 ? GetG12Type(pi.Type1) : pi.Type1,
+            Type2 = save.Generation <= 2 ? GetG12Type(pi.Type2) : pi.Type2,
             Abilities = [.. abilities.ToArray().Distinct()],
             BaseStats = baseStats,
             IsOnlyMale = pi.OnlyMale,
@@ -38,6 +38,25 @@ public class Dex123Service : DexGenService<SaveFile>
             IsAnySeen = ownedPkm != null || save.GetSeen(species),
             IsCaught = ownedPkm != null || save.GetCaught(species),
             IsOwned = ownedPkm != null,
+        };
+    }
+
+    private static byte GetG12Type(byte type)
+    {
+        return type switch
+        {
+            7 => 6,
+            8 => 7,
+            9 => 8,
+            20 => 9,
+            21 => 10,
+            22 => 11,
+            23 => 12,
+            24 => 13,
+            25 => 14,
+            26 => 15,
+            27 => 16,
+            _ => type,
         };
     }
 }

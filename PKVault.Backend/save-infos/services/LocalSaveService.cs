@@ -11,21 +11,32 @@ public class LocalSaveService
 
     public static async Task PrepareTimerAndRun()
     {
-        await ReadLocalSaves();
+        Timer?.Dispose();
 
-        Timer = new Timer((object? _) => ReadLocalSaves(), null, TimeSpan.FromSeconds(TIMER_INTERVAL), TimeSpan.FromSeconds(TIMER_INTERVAL));
+        var updated = await ReadLocalSaves();
+
+        Timer = new Timer(async (object? _) =>
+        {
+            if (StorageService.HasEmptyActionList())
+            {
+                updated = await ReadLocalSaves();
+                if (updated)
+                {
+                    await WarningsService.CheckWarnings();
+                }
+            }
+        }, null, TimeSpan.FromSeconds(TIMER_INTERVAL), TimeSpan.FromSeconds(TIMER_INTERVAL));
     }
 
     public static async Task ResetTimerAndData()
     {
-        Timer?.Dispose();
         SaveById.Clear();
         SaveByPath.Clear();
 
         await PrepareTimerAndRun();
     }
 
-    public static async Task ReadLocalSaves()
+    public static async Task<bool> ReadLocalSaves()
     {
         var globs = SettingsService.AppSettings.SAVE_GLOBS;
         var searchPaths = MatcherUtil.SearchPaths(globs);
@@ -41,34 +52,11 @@ public class LocalSaveService
             }
         }
 
-        if (hasBeenUpdated)
-        {
-            await WarningsService.CheckWarnings();
-        }
-
-        // alerts.ForEach(alert => Console.WriteLine($"Alert: {alert}"));
-
-        // watchers = [];
-        // globs.ForEach(glob =>
-        // {
-        //     var watcher = new FileSystemWatcher(rootDir, glob)
-        //     {
-        //         IncludeSubdirectories = true,
-        //         EnableRaisingEvents = true,
-        //         // NotifyFilter = NotifyFilters.LastWrite
-        //     };
-
-        //     watcher.Created += (s, e) => UpdateSaveFromPath(e.FullPath);
-        //     watcher.Changed += (s, e) => UpdateSaveFromPath(e.FullPath);
-        //     watcher.Deleted += (s, e) => DeleteSaveFromPath(e.FullPath);
-        //     watcher.Renamed += (s, e) => UpdateSaveFromPath(e.FullPath);
-
-        //     watchers.Add(watcher);
-        // });
-
         var memoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
         Console.WriteLine($"(timed check done - memory used: {memoryUsedMB} MB)");
+
+        return hasBeenUpdated;
     }
 
     private static bool UpdateSaveFromPath(string path)
@@ -130,6 +118,11 @@ public class LocalSaveService
 
     public static async Task DeleteSaveFromId(uint saveId)
     {
+        if (!StorageService.HasEmptyActionList())
+        {
+            throw new Exception("Storage has waiting actions");
+        }
+
         await BackupService.PrepareBackupThenRun(async () =>
         {
             var path = SaveByPath.Keys.ToList().Find(key => SaveByPath[key].ID32 == saveId);

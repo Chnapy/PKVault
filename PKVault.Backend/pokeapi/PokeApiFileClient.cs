@@ -1,4 +1,6 @@
+using System.Buffers;
 using System.Globalization;
+using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -7,7 +9,15 @@ using PokeApiNet;
 
 public partial class PokeApiFileClient
 {
-    public async Task<T> GetAsync<T>(UrlNavigation<T> urlResource) where T : ResourceBase
+    private static readonly Assembly assembly = Assembly.GetExecutingAssembly();
+    private static readonly JsonSerializerOptions jsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+        PropertyNameCaseInsensitive = true,
+        DefaultBufferSize = 16 * 1024, // buffer 16 Ko
+    };
+
+    public async Task<T?> GetAsync<T>(UrlNavigation<T> urlResource) where T : ResourceBase
     {
         return await GetAsyncByUrl<T>(urlResource.Url);
     }
@@ -18,7 +28,7 @@ public partial class PokeApiFileClient
 
         string url = GetApiEndpointString<T>();
 
-        NamedApiResourceList<T> page = await GetAsyncByPathname<NamedApiResourceList<T>>(url);
+        NamedApiResourceList<T>? page = await GetAsyncByPathname<NamedApiResourceList<T>>(url);
 
         var namedApi = page?.Results.Find(resource => resource.Name.ToLower() == formattedName);
         if (namedApi == null)
@@ -46,27 +56,35 @@ public partial class PokeApiFileClient
     {
         // Console.WriteLine($"POKEAPI = {url}");
 
-        var jsonContent = GetResourceFromAssembly(url);
+        byte[] rentedBuffer = ArrayPool<byte>.Shared.Rent(jsonOptions.DefaultBufferSize);
 
-        return DeserializeResource<T>(jsonContent);
-    }
-
-    private static T? DeserializeResource<T>(string jsonContent)
-    {
-        return JsonSerializer.Deserialize<T>(jsonContent, new JsonSerializerOptions
+        try
         {
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
-        });
+            using var jsonStream = GetResourceFromAssembly(url);
+
+            return await DeserializeResource<T>(jsonStream);
+        }
+        finally
+        {
+            // return buffer to pool
+            ArrayPool<byte>.Shared.Return(rentedBuffer);
+        }
     }
 
-    public static string? GetApiEndpointString<T>()
+    private static async Task<T?> DeserializeResource<T>(Stream jsonStream)
     {
-        return typeof(T).GetProperty("ApiEndpoint", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null)?.ToString();
+        return await JsonSerializer.DeserializeAsync<T>(jsonStream, jsonOptions);
+    }
+
+    public static string GetApiEndpointString<T>()
+    {
+        return typeof(T).GetProperty("ApiEndpoint", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null)?.ToString()
+            ?? throw new Exception($"ApiEndpoint not found for type {nameof(T)}");
     }
 
     private static bool IsApiEndpointCaseSensitive<T>()
     {
-        PropertyInfo property = typeof(T).GetProperty("IsApiEndpointCaseSensitive", BindingFlags.Static | BindingFlags.NonPublic);
+        PropertyInfo? property = typeof(T).GetProperty("IsApiEndpointCaseSensitive", BindingFlags.Static | BindingFlags.NonPublic);
         if (!(property == null))
         {
             return (bool)property.GetValue(null);
@@ -75,7 +93,7 @@ public partial class PokeApiFileClient
         return false;
     }
 
-    private static string GetResourceFromAssembly(string uri)
+    private static GZipStream GetResourceFromAssembly(string uri)
     {
         var uriParts = uri
             .Split('/').ToList()
@@ -84,7 +102,7 @@ public partial class PokeApiFileClient
         List<string> fileParts = [
             "pokeapi", "api-data","data",
             ..uriParts,
-            "index.json"
+            "index.json.gz"
         ];
 
         List<string> assemblyParts = [
@@ -105,13 +123,11 @@ public partial class PokeApiFileClient
             return part;
         }));
 
-        var assembly = Assembly.GetExecutingAssembly();
-
         var stream = assembly.GetManifestResourceStream(assemblyName) ?? throw new Exception($"RESOURCE NOT FOUND: {assemblyName}");
-        using StreamReader reader = new(stream);
-        string jsonContent = reader.ReadToEnd();
 
-        return jsonContent;
+        var gzipStream = new GZipStream(stream, CompressionMode.Decompress);
+
+        return gzipStream;
     }
 
     public static string PokeApiNameFromPKHexName(string pkhexName)

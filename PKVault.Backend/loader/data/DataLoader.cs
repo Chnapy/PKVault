@@ -6,8 +6,11 @@ public abstract class DataLoader(DataEntityLoaders loaders)
 
     public async Task ApplyAction(DataAction action)
     {
-        Console.WriteLine($"Apply action - {action.GetType()}");
+        var logtime = LogUtil.Time($"Apply action - {action.GetType()}");
+
         await action.Execute(loaders);
+
+        logtime();
     }
 }
 

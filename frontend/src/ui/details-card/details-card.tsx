@@ -50,7 +50,7 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
   const [ showShiny, setShowShiny ] = React.useState(false);
 
   return <DetailsCardContainer
-    header={null}
+    header={fromSaves}
     mainImg={<>
       <img
         src={showShiny ? shinySprite! : defaultSprite!}
@@ -113,13 +113,13 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
         </div>
       )}
 
-      <div style={{ display: "flex" }}>
+      {abilities.length > 0 && <div style={{ display: "flex" }}>
         <TextContainer>
           <span style={{ color: theme.text.primary }}>Abilities</span><br />
           {abilities.map(ability => <div key={ability}>{ability}</div>)}
           {abilitiesHidden.map(ability => <div key={ability}>{ability} (caché)</div>)}
         </TextContainer>
-      </div>
+      </div>}
 
       <div style={{ display: "flex" }}>
         <TextContainer>

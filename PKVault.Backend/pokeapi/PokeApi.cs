@@ -13,14 +13,19 @@ public class PokeApi
 
     private static readonly PokeApiFileClient client = new();
 
-    public static async Task<PokemonSpecies?> GetPokemonSpecies(string speciesNameRaw)
+    public static async Task<PokemonSpecies?> GetPokemonSpecies(string speciesName)
     {
-        return await client.GetAsync<PokemonSpecies>(speciesNameRaw);
+        return await client.GetAsync<PokemonSpecies>(speciesName);
     }
 
-    public static async Task<EvolutionChain?> GetPokemonSpeciesEvolutionChain(string speciesNameRaw)
+    public static async Task<PokemonSpecies?> GetPokemonSpecies(int species)
     {
-        var pokemonSpecies = await GetPokemonSpecies(speciesNameRaw);
+        return await client.GetAsync<PokemonSpecies>(species);
+    }
+
+    public static async Task<EvolutionChain?> GetPokemonSpeciesEvolutionChain(string speciesName)
+    {
+        var pokemonSpecies = await GetPokemonSpecies(speciesName);
         if (pokemonSpecies == null)
         {
             return null;
@@ -33,9 +38,9 @@ public class PokeApi
         return await client.GetAsync<Pokemon>(species);
     }
 
-    public static async Task<Nature?> GetNature(string natureNameRaw)
+    public static async Task<Nature?> GetNature(string natureName)
     {
-        return await client.GetAsync<Nature>(natureNameRaw);
+        return await client.GetAsync<Nature>(natureName);
     }
 
     public static async Task<Pokedex> GetPokedex(PokeApiPokedexEnum pokedex)

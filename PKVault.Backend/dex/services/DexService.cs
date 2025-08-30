@@ -6,9 +6,22 @@ public class DexService
     {
         Dictionary<int, Dictionary<uint, DexItemDTO>> dex = [];
 
+        var maxSpecies = LocalSaveService.SaveById.Values.Select(save => save.MaxSpeciesID).Max();
+
+        // Console.WriteLine(string.Join(',', PKHexUtils.StringsFR.Types));
+
+        // var logtime = LogUtil.Time($"Get full dex for {LocalSaveService.SaveById.Count} saves (max-species={maxSpecies})");
+
+        for (var i = 0; i < maxSpecies; i++)
+        {
+            dex.Add(i + 1, []);
+        }
+
         await Task.WhenAll(
             LocalSaveService.SaveById.Values.ToList().Select(save => UpdateDexWithSave(dex, save))
         );
+
+        // logtime();
 
         return dex;
     }
