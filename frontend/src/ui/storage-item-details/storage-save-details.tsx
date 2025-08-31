@@ -224,14 +224,14 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
           {validityReport}
         </TextContainer>
 
-        {heldItemSprite && <TextContainer>
+        {!!heldItemSprite && <TextContainer>
           Held item <span style={{ color: theme.text.primary }}>{heldItemText}</span> <ItemImg spriteItem={heldItemSprite} alt={heldItemText} style={{
             height: 24,
             verticalAlign: 'middle'
           }} />
         </TextContainer>}
 
-        {mainBoxId && mainBoxSlot && goToMainPkm && <>
+        {!!mainBoxId && !!mainBoxSlot && goToMainPkm && <>
           <Button onClick={goToMainPkm}>
             <div style={{ width: '100%' }}>
               Go to main-pkm

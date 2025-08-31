@@ -5,8 +5,6 @@ public class PkmConvertService
 {
     public static PKM GetConvertedPkm(PKM sourcePkm, uint generation, uint? intermediatePid)
     {
-        EntityConverter.AllowIncompatibleConversion = EntityCompatibilitySetting.AllowIncompatibleSane;
-
         PKM? blankPkm = generation switch
         {
             1 => new PK1(),
@@ -23,12 +21,19 @@ public class PkmConvertService
             throw new Exception($"PKM case not found for generation={generation}");
         }
 
+        return GetConvertedPkm(sourcePkm, blankPkm, intermediatePid);
+    }
+
+    public static PKM GetConvertedPkm(PKM sourcePkm, PKM blankPkm, uint? intermediatePid)
+    {
+        EntityConverter.AllowIncompatibleConversion = EntityCompatibilitySetting.AllowIncompatibleSane;
+
         if (!EntityConverter.IsCompatibleWithModifications(sourcePkm, blankPkm))
         {
-            throw new Exception($"PKM conversion not possible, origin PKM not compatible with generation={generation}");
+            throw new Exception($"PKM conversion not possible, origin PKM not compatible with generation={blankPkm.Generation}");
         }
 
-        var intermediatePkm = GetIntermediatePkmConvert(sourcePkm, generation, intermediatePid);
+        var intermediatePkm = GetIntermediatePkmConvert(sourcePkm, blankPkm.Generation, intermediatePid);
 
         var converted = EntityConverter.TryMakePKMCompatible(
             intermediatePkm,
@@ -37,12 +42,12 @@ public class PkmConvertService
             out var destPkm
         );
 
+        Console.WriteLine($"Convert result={result}");
+
         if (destPkm.Species != sourcePkm.Species)
         {
             throw new Exception($"PKM converted broken, species={destPkm.Species} original.species={sourcePkm.Species}");
         }
-
-        Console.WriteLine($"Convert result={result}");
 
         if (result == EntityConverterResult.None)
         {

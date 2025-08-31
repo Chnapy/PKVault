@@ -134,6 +134,12 @@ public class SavePkmLoader(
         var pkm = EntityConverter.ConvertToType(dto.Pkm, savePkmType, out var result);
         if (pkm == default)
         {
+            var blankPKM = save.BlankPKM.Clone();
+            blankPKM.Species = dto.Pkm.Species;
+            pkm = PkmConvertService.GetConvertedPkm(dto.Pkm, blankPKM, null);
+        }
+        if (pkm == default)
+        {
             throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetType()} to.type={savePkmType} result={result}");
         }
 

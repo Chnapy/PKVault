@@ -238,7 +238,7 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
           {validityReport}
         </TextContainer>}
 
-        {heldItemSprite && <TextContainer>
+        {!!heldItemSprite && <TextContainer>
           Held item <span style={{ color: theme.text.primary }}>{heldItemText}</span> <ItemImg spriteItem={heldItemSprite} alt={heldItemText} style={{
             height: 24,
             verticalAlign: 'middle'
