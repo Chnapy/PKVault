@@ -20,19 +20,19 @@ public class EvolvePkmAction : DataAction
         };
     }
 
-    public override async Task Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         if (saveId == null)
         {
-            await ExecuteForMain(loaders);
+            await ExecuteForMain(loaders, flags);
         }
         else
         {
-            await ExecuteForSave(loaders, (uint)saveId);
+            await ExecuteForSave(loaders, flags, (uint)saveId);
         }
     }
 
-    private async Task ExecuteForSave(DataEntityLoaders loaders, uint saveId)
+    private async Task ExecuteForSave(DataEntityLoaders loaders, DataUpdateFlags flags, uint saveId)
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
         var dto = await saveLoaders.Pkms.GetDto(id);
@@ -46,9 +46,15 @@ public class EvolvePkmAction : DataAction
         UpdatePkm(dto.Pkm, evolveSpecies, evolveByItem);
 
         await saveLoaders.Pkms.WriteDto(dto);
+
+        flags.Saves.Add(new()
+        {
+            SaveId = saveId,
+            SavePkms = true
+        });
     }
 
-    private async Task ExecuteForMain(DataEntityLoaders loaders)
+    private async Task ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var dto = await loaders.pkmVersionLoader.GetDto(id);
         if (dto == default)
@@ -103,6 +109,9 @@ public class EvolvePkmAction : DataAction
             versionDto.PkmVersionEntity.PkmId = pkmId;
             loaders.pkmVersionLoader.WriteDto(versionDto);
         });
+
+        flags.MainPkms = true;
+        flags.MainPkmVersions = true;
     }
 
     private static async Task<(ushort evolveSpecies, bool evolveByItem)> GetEvolve(BasePkmVersionDTO dto)

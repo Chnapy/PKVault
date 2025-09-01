@@ -4,11 +4,11 @@ public abstract class DataLoader(DataEntityLoaders loaders)
 {
     public readonly DataEntityLoaders loaders = loaders;
 
-    public async Task ApplyAction(DataAction action)
+    public async Task ApplyAction(DataAction action, DataUpdateFlags flags)
     {
         var logtime = LogUtil.Time($"Apply action - {action.GetType()}");
 
-        await action.Execute(loaders);
+        await action.Execute(loaders, flags);
 
         logtime();
     }

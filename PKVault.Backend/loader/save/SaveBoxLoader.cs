@@ -69,7 +69,7 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
         }
     }
 
-    public override void DeleteEntity(string id)
+    public override bool DeleteEntity(string id)
     {
         throw new Exception($"Not implemented");
     }

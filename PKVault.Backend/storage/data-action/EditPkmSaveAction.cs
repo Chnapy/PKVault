@@ -23,7 +23,7 @@ public class EditPkmSaveAction : DataAction
         };
     }
 
-    public override async Task Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
         var pkmSave = await saveLoaders.Pkms.GetDto(pkmSaveId);
@@ -44,5 +44,11 @@ public class EditPkmSaveAction : DataAction
         pkm.RefreshChecksum();
 
         await saveLoaders.Pkms.WriteDto(pkmSave);
+
+        flags.Saves.Add(new()
+        {
+            SaveId = saveId,
+            SavePkms = true,
+        });
     }
 }

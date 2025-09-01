@@ -22,7 +22,7 @@ public class MainCreatePkmVersionAction : DataAction
         };
     }
 
-    public override async Task Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         Console.WriteLine($"Create PKM version, pkmId={pkmId}, generation={generation}");
 
@@ -62,5 +62,7 @@ public class MainCreatePkmVersionAction : DataAction
         var pkmVersionCreated = await PkmVersionDTO.FromEntity(pkmVersionEntityCreated, pkmConverted, pkmDto);
 
         loaders.pkmVersionLoader.WriteDto(pkmVersionCreated);
+
+        flags.MainPkmVersions = true;
     }
 }

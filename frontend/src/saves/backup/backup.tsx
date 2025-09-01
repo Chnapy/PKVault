@@ -1,34 +1,15 @@
 import type React from 'react';
+import { useBackupDelete, useBackupGetAll, useBackupRestore } from '../../data/sdk/backup/backup.gen';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { Container } from '../../ui/container/container';
-import { getBackupGetAllQueryKey, useBackupDelete, useBackupGetAll, useBackupRestore } from '../../data/sdk/backup/backup.gen';
 import { TextContainer } from '../../ui/text-container/text-container';
-import { useQueryClient } from '@tanstack/react-query';
 
 export const Backup: React.FC = () => {
     const backupQuery = useBackupGetAll();
 
-    const queryClient = useQueryClient();
+    const backupDeleteMutation = useBackupDelete();
 
-    const backupDeleteMutation = useBackupDelete({
-        mutation: {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: getBackupGetAllQueryKey(),
-                });
-            },
-        },
-    });
-
-    const backupRestoreMutation = useBackupRestore({
-        mutation: {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: getBackupGetAllQueryKey(),
-                });
-            },
-        },
-    });
+    const backupRestoreMutation = useBackupRestore();
 
     if (!backupQuery.data) {
         return null;

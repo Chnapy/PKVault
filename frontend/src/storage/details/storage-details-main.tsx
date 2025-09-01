@@ -1,7 +1,6 @@
-import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
-import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainDeletePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
+import { useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainDeletePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import { Button } from '../../ui/button/button';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
@@ -22,110 +21,15 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
     const navigate = Route.useNavigate();
     const navigateToSave = Route.useNavigate();
 
-    const queryClient = useQueryClient();
+    const mainCreatePkmVersionMutation = useStorageMainCreatePkmVersion();
 
-    const mainCreatePkmVersionMutation = useStorageMainCreatePkmVersion({
-        mutation: {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetActionsQueryKey(),
-                });
+    const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm();
 
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetMainPkmsQueryKey(),
-                });
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetMainPkmVersionsQueryKey(),
-                });
+    const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
 
-                if (saveId) {
-                    await queryClient.invalidateQueries({
-                        queryKey: getStorageGetSavePkmsQueryKey(saveId),
-                    });
-                }
-            },
-        },
-    });
+    const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
 
-    const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm({
-        mutation: {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetActionsQueryKey(),
-                });
-
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetMainPkmVersionsQueryKey(),
-                });
-
-                if (saveId) {
-                    await queryClient.invalidateQueries({
-                        queryKey: getStorageGetSavePkmsQueryKey(saveId),
-                    });
-                }
-            },
-        },
-    });
-
-    const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave({
-        mutation: {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetActionsQueryKey(),
-                });
-
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetMainPkmsQueryKey(),
-                });
-
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetMainPkmVersionsQueryKey(),
-                });
-
-                if (saveId) {
-                    await queryClient.invalidateQueries({
-                        queryKey: getStorageGetSavePkmsQueryKey(saveId),
-                    });
-                }
-            },
-        },
-    });
-
-    const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion({
-        mutation: {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetActionsQueryKey(),
-                });
-
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetMainPkmsQueryKey(),
-                });
-
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetMainPkmVersionsQueryKey(),
-                });
-            },
-        },
-    });
-
-    const evolvePkmMutation = useStorageEvolvePkm({
-        mutation: {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetActionsQueryKey(),
-                });
-
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetMainPkmsQueryKey(),
-                });
-
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetMainPkmVersionsQueryKey(),
-                });
-            },
-        },
-    });
+    const evolvePkmMutation = useStorageEvolvePkm();
 
     const saveInfosQuery = useSaveInfosGetAll();
     const mainPkmQuery = useStorageGetMainPkms();

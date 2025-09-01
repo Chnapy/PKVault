@@ -17,7 +17,7 @@ public class DeletePkmVersionAction : DataAction
         };
     }
 
-    public override async Task Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var pkmVersion = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkm = pkmVersion.PkmDto;
@@ -27,12 +27,12 @@ public class DeletePkmVersionAction : DataAction
             throw new Exception($"Cannot delete pkm-version attached in save, pkm-version.id={pkmVersionId}");
         }
 
-        loaders.pkmVersionLoader.DeleteEntity(pkmVersionId);
+        flags.MainPkmVersions |= loaders.pkmVersionLoader.DeleteEntity(pkmVersionId);
 
         var relatedPkmVersions = (await loaders.pkmVersionLoader.GetAllDtos()).FindAll(value => value.PkmDto.Id == pkm.Id);
         if (relatedPkmVersions.Count == 0)
         {
-            loaders.pkmLoader.DeleteEntity(pkm.Id);
+            flags.MainPkms |= loaders.pkmLoader.DeleteEntity(pkm.Id);
         }
     }
 }

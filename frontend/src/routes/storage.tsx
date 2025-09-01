@@ -1,15 +1,10 @@
 import { DndContext } from "@dnd-kit/core";
-import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import type React from "react";
 import z from "zod";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import {
-  getStorageGetActionsQueryKey,
-  getStorageGetMainPkmsQueryKey,
-  getStorageGetMainPkmVersionsQueryKey,
-  getStorageGetSavePkmsQueryKey,
   useStorageGetMainPkmVersions,
   useStorageMainMovePkm,
   useStorageSaveMovePkm,
@@ -26,8 +21,6 @@ export const Storage: React.FC = () => {
   const selected = Route.useSearch({ select: (search) => search.selected });
   const saveId = Route.useSearch({ select: (search) => search.save });
 
-  const queryClient = useQueryClient();
-
   const saveInfosRecord = useSaveInfosGetAll().data?.data;
   const saveInfos =
     saveId && saveInfosRecord ? saveInfosRecord[ saveId ] : undefined;
@@ -41,80 +34,13 @@ export const Storage: React.FC = () => {
     )
     : [];
 
-  const invalidateActions = () => queryClient.invalidateQueries({
-    queryKey: getStorageGetActionsQueryKey(),
-  });
+  const mainMovePkmMutation = useStorageMainMovePkm();
 
-  const mainMovePkmMutation = useStorageMainMovePkm({
-    mutation: {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetMainPkmsQueryKey(),
-        });
-        await invalidateActions();
-      },
-    },
-  });
+  const saveMovePkmMutation = useStorageSaveMovePkm();
 
-  const saveMovePkmMutation = useStorageSaveMovePkm({
-    mutation: {
-      onSuccess: async () => {
-        await invalidateActions();
+  const saveMovePkmFromStorageMutation = useStorageSaveMovePkmFromStorage();
 
-        if (!saveId) {
-          return;
-        }
-
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetSavePkmsQueryKey(saveId),
-        });
-      },
-    },
-  });
-
-  const saveMovePkmFromStorageMutation = useStorageSaveMovePkmFromStorage({
-    mutation: {
-      onSuccess: async () => {
-        await invalidateActions();
-
-        if (!saveId) {
-          return;
-        }
-
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetMainPkmsQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetMainPkmVersionsQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetSavePkmsQueryKey(saveId),
-        });
-      },
-    },
-  });
-
-  const saveMovePkmToStorageMutation = useStorageSaveMovePkmToStorage({
-    mutation: {
-      onSuccess: async () => {
-        await invalidateActions();
-
-        if (!saveId) {
-          return;
-        }
-
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetMainPkmsQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetMainPkmVersionsQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getStorageGetSavePkmsQueryKey(saveId),
-        });
-      },
-    },
-  });
+  const saveMovePkmToStorageMutation = useStorageSaveMovePkmToStorage();
 
   return (
     <div

@@ -27,7 +27,7 @@ public class SaveMovePkmToStorageAction : DataAction
         };
     }
 
-    public override async Task Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
 
@@ -73,20 +73,31 @@ public class SaveMovePkmToStorageAction : DataAction
 
             loaders.pkmLoader.WriteDto(pkmDtoToCreate);
             loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
+
+            flags.MainPkms = true;
+            flags.MainPkmVersions = true;
         }
 
         var pkmDto = await loaders.pkmLoader.GetDto(pkmVersionEntity.PkmId);
 
         if (pkmDto.SaveId != default)
         {
-            await new SynchronizePkmAction(saveId, pkmVersionEntity.Id).Execute(loaders);
+            await new SynchronizePkmAction(saveId, pkmVersionEntity.Id).Execute(loaders, flags);
 
             pkmDto.PkmEntity.SaveId = default;
         }
 
         loaders.pkmLoader.WriteDto(pkmDto);
 
+        flags.MainPkms = true;
+
         // remove pkm from save
         await saveLoaders.Pkms.DeleteDto(savePkm.Id);
+
+        flags.Saves.Add(new()
+        {
+            SaveId = saveId,
+            SavePkms = true,
+        });
     }
 }

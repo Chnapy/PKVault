@@ -22,7 +22,7 @@ public class MainMovePkmAction : DataAction
         };
     }
 
-    public override async Task Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var dto = await loaders.pkmLoader.GetDto(id);
         if (dto == default)
@@ -44,5 +44,8 @@ public class MainMovePkmAction : DataAction
         dto.PkmEntity.BoxSlot = boxSlot;
 
         loaders.pkmLoader.WriteDto(dto);
+
+        flags.MainPkms = true;
+        Console.WriteLine($"FF: {flags.MainPkms}");
     }
 }

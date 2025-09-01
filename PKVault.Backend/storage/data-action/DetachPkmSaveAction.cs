@@ -17,10 +17,24 @@ public class DetachPkmSaveAction : DataAction
         };
     }
 
-    public override async Task Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var pkm = await loaders.pkmLoader.GetDto(pkmId);
+        if (pkm.SaveId == null)
+        {
+            return;
+        }
+        var oldSaveId = pkm.SaveId;
+
         pkm.PkmEntity.SaveId = default;
         loaders.pkmLoader.WriteDto(pkm);
+
+        flags.MainPkms = true;
+
+        flags.Saves.Add(new()
+        {
+            SaveId = (uint)oldSaveId,
+            SavePkms = true,
+        });
     }
 }

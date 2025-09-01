@@ -1,15 +1,11 @@
-import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { getApiFullUrl } from '../../data/mutator/custom-instance';
-import { getDexGetAllQueryKey } from "../../data/sdk/dex/dex.gen";
 import {
   getSaveInfosDownloadUrl,
-  getSaveInfosGetAllQueryKey,
   useSaveInfosDelete,
-  useSaveInfosGetAll,
+  useSaveInfosGetAll
 } from "../../data/sdk/save-infos/save-infos.gen";
 import { useStorageGetActions } from '../../data/sdk/storage/storage.gen';
-import { getWarningsGetWarningsQueryKey } from '../../data/sdk/warnings/warnings.gen';
 import { Button } from '../../ui/button/button';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { Container } from "../../ui/container/container";
@@ -28,55 +24,13 @@ export const SaveItem: React.FC<SaveItemProps> = ({
   showDelete,
   // showOldSaves,
 }) => {
-  const queryClient = useQueryClient();
   const saveInfosQuery = useSaveInfosGetAll();
   const stockageActionsQuery = useStorageGetActions();
-  const saveInfosDeleteMutation = useSaveInfosDelete({
-    mutation: {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: getSaveInfosGetAllQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getDexGetAllQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getWarningsGetWarningsQueryKey(),
-        });
-      },
-    },
-  });
+  const saveInfosDeleteMutation = useSaveInfosDelete();
 
   const downloadUrl = getApiFullUrl(getSaveInfosDownloadUrl(saveId));
 
-  // const saveInfosRestoreBackupMutation = useSaveInfosRestoreBackup({
-  //   mutation: {
-  //     onSuccess: async () => {
-  //       await queryClient.invalidateQueries({
-  //         queryKey: getSaveInfosGetAllQueryKey(),
-  //       });
-
-  //       await queryClient.invalidateQueries({
-  //         queryKey: getStorageGetActionsQueryKey(),
-  //       });
-  //       await queryClient.invalidateQueries({
-  //         queryKey: getStorageGetMainPkmsQueryKey(),
-  //       });
-  //       await queryClient.invalidateQueries({
-  //         queryKey: getStorageGetMainPkmVersionsQueryKey(),
-  //       });
-  //       if (saveId) {
-  //         await queryClient.invalidateQueries({
-  //           queryKey: getStorageGetSavePkmsQueryKey(saveId),
-  //         });
-  //       }
-
-  //       await queryClient.invalidateQueries({
-  //         queryKey: getWarningsGetWarningsQueryKey(),
-  //       });
-  //     },
-  //   },
-  // });
+  // const saveInfosRestoreBackupMutation = useSaveInfosRestoreBackup();
 
   // const [ showBackups, setShowBackups ] = React.useState(false);
 

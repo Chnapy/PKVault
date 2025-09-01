@@ -36,14 +36,14 @@ public abstract class EntityLoader<DTO, E>(
         return default;
     }
 
-    public virtual void DeleteEntity(string id)
+    public virtual bool DeleteEntity(string id)
     {
         Console.WriteLine($"Delete entity id={id}");
 
         var entityToRemove = GetEntity(id);
         if (entityToRemove == null)
         {
-            return;
+            return false;
         }
 
         var entities = GetAllEntities();
@@ -51,6 +51,8 @@ public abstract class EntityLoader<DTO, E>(
         SetAllEntities(entities);
 
         OnDelete?.Invoke(entityToRemove);
+
+        return true;
     }
 
     public virtual void WriteDto(DTO dto)

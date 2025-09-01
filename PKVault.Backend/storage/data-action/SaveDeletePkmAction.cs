@@ -20,7 +20,7 @@ public class SaveDeletePkmAction : DataAction
         };
     }
 
-    public override async Task Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
 
@@ -31,5 +31,11 @@ public class SaveDeletePkmAction : DataAction
         }
 
         await saveLoaders.Pkms.DeleteDto(pkmId);
+
+        flags.Saves.Add(new()
+        {
+            SaveId = saveId,
+            SavePkms = true,
+        });
     }
 }

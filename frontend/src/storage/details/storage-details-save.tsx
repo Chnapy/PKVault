@@ -1,9 +1,8 @@
-import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
-import { getStorageGetActionsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageSaveDeletePkm, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
+import { useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageSaveDeletePkm, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
-import { StorageSaveDetails } from '../../ui/storage-item-details/storage-save-details';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
+import { StorageSaveDetails } from '../../ui/storage-item-details/storage-save-details';
 
 export type StorageDetailsSaveProps = {
     selectedId: string;
@@ -16,53 +15,11 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
 }) => {
     const navigate = Route.useNavigate();
 
-    const queryClient = useQueryClient();
+    const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm();
 
-    const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm({
-        mutation: {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetActionsQueryKey(),
-                });
+    const savePkmDeleteMutation = useStorageSaveDeletePkm();
 
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetMainPkmVersionsQueryKey(),
-                });
-
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetSavePkmsQueryKey(saveId),
-                });
-            },
-        },
-    });
-
-    const savePkmDeleteMutation = useStorageSaveDeletePkm({
-        mutation: {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetActionsQueryKey(),
-                });
-
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetSavePkmsQueryKey(saveId),
-                });
-            },
-        },
-    });
-
-    const evolvePkmMutation = useStorageEvolvePkm({
-        mutation: {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetActionsQueryKey(),
-                });
-
-                await queryClient.invalidateQueries({
-                    queryKey: getStorageGetSavePkmsQueryKey(saveId),
-                });
-            },
-        },
-    });
+    const evolvePkmMutation = useStorageEvolvePkm();
 
     const savePkmQuery = useStorageGetSavePkms(saveId);
     const pkmsQuery = useStorageGetMainPkms();

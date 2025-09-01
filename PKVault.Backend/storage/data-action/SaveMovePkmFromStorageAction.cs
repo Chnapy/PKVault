@@ -28,7 +28,7 @@ public class SaveMovePkmFromStorageAction : DataAction
         };
     }
 
-    public override async Task Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
 
@@ -100,5 +100,12 @@ public class SaveMovePkmFromStorageAction : DataAction
         {
             throw new Exception($"pkmSaveDTO.PkmVersionId is null, should be {pkmSaveDTO.Id}");
         }
+
+        flags.MainPkms = true;
+        flags.Saves.Add(new()
+        {
+            SaveId = saveId,
+            SavePkms = true
+        });
     }
 }

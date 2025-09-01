@@ -13,7 +13,7 @@ public class SaveMovePkmAction(uint saveId, string id, int boxId, int boxSlot) :
         };
     }
 
-    public override async Task Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var saveLoaders = loaders.saveLoadersDict[SaveId];
 
@@ -35,5 +35,11 @@ public class SaveMovePkmAction(uint saveId, string id, int boxId, int boxSlot) :
         dto.BoxSlot = boxSlot;
 
         await saveLoaders.Pkms.WriteDto(dto);
+
+        flags.Saves.Add(new()
+        {
+            SaveId = SaveId,
+            SavePkms = true
+        });
     }
 }

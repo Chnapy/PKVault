@@ -1,10 +1,8 @@
-using PKHeX.Core;
-
 public abstract class DataAction
 {
     public abstract DataActionPayload GetPayload();
 
-    public abstract Task Execute(DataEntityLoaders loaders);
+    public abstract Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags);
 }
 
 public struct DataActionPayload

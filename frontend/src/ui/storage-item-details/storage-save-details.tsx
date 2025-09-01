@@ -135,7 +135,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
   onRelease,
   onClose,
 }) => {
-  const formContext = StorageDetailsForm.useContext(saveId);
+  const formContext = StorageDetailsForm.useContext();
 
   return (
     <DetailsCardContainer

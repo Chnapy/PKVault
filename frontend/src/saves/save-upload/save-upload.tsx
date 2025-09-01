@@ -1,31 +1,12 @@
 import { css } from "@emotion/css";
-import { useQueryClient } from "@tanstack/react-query";
 import type React from "react";
-import { getDexGetAllQueryKey } from "../../data/sdk/dex/dex.gen";
 import {
-  getSaveInfosGetAllQueryKey,
-  useSaveInfosUpload,
+  useSaveInfosUpload
 } from "../../data/sdk/save-infos/save-infos.gen";
 import { Container } from "../../ui/container/container";
-import { getWarningsGetWarningsQueryKey } from '../../data/sdk/warnings/warnings.gen';
 
 export const SaveUpload: React.FC = () => {
-  const queryClient = useQueryClient();
-  const { mutateAsync, isPending } = useSaveInfosUpload({
-    mutation: {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: getSaveInfosGetAllQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getDexGetAllQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getWarningsGetWarningsQueryKey(),
-        });
-      },
-    },
-  });
+  const { mutateAsync, isPending } = useSaveInfosUpload();
 
   return (
     <Container

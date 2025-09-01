@@ -116,18 +116,31 @@ public class LocalSaveService
         SaveByPath.Remove(path);
     }
 
-    public static async Task DeleteSaveFromId(uint saveId)
+    public static async Task<DataUpdateFlags> DeleteSaveFromId(uint saveId)
     {
         if (!StorageService.HasEmptyActionList())
         {
             throw new Exception("Storage has waiting actions");
         }
 
+        var flags = new DataUpdateFlags();
+
         await BackupService.PrepareBackupThenRun(async () =>
         {
             var path = SaveByPath.Keys.ToList().Find(key => SaveByPath[key].ID32 == saveId);
             DeleteSaveFromPath(path!);
         });
+
+        flags.Saves.Add(new()
+        {
+            SaveId = saveId,
+            SaveBoxes = true,
+            SavePkms = true
+        });
+        flags.SaveInfos = true;
+        flags.Backups = true;
+
+        return flags;
     }
 
     public static Dictionary<uint, SaveInfosDTO> GetAllSaveInfos()
@@ -175,12 +188,14 @@ public class LocalSaveService
         return lastWriteTime;
     }
 
-    public static async Task UploadNewSave(byte[] fileBytes, string formFilename)
+    public static async Task<DataUpdateFlags> UploadNewSave(byte[] fileBytes, string formFilename)
     {
         if (!StorageService.HasEmptyActionList())
         {
             throw new Exception("Storage has waiting actions");
         }
+
+        var flags = new DataUpdateFlags();
 
         var save = SaveUtil.GetVariantSAV(fileBytes, formFilename)!;
 
@@ -188,5 +203,16 @@ public class LocalSaveService
         {
             WriteSave(save);
         });
+
+        flags.Saves.Add(new()
+        {
+            SaveId = save.ID32,
+            SaveBoxes = true,
+            SavePkms = true
+        });
+        flags.SaveInfos = true;
+        flags.Backups = true;
+
+        return flags;
     }
 }

@@ -16,7 +16,7 @@ public class SaveInfosController : ControllerBase
 
     [HttpPost()]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult> Upload([BindRequired] IFormFile saveFile)
+    public async Task<ActionResult<DataDTO>> Upload([BindRequired] IFormFile saveFile)
     {
         if (saveFile == null || saveFile.Length == 0)
             return BadRequest("No file received");
@@ -28,15 +28,16 @@ public class SaveInfosController : ControllerBase
             fileBytes = ms.ToArray();
         }
 
-        await LocalSaveService.UploadNewSave(fileBytes, saveFile.FileName);
+        var flags = await LocalSaveService.UploadNewSave(fileBytes, saveFile.FileName);
 
-        return NoContent();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpDelete()]
-    public async void Delete([BindRequired] uint saveId)
+    public async Task<ActionResult<DataDTO>> Delete([BindRequired] uint saveId)
     {
-        await LocalSaveService.DeleteSaveFromId(saveId);
+        var flags = await LocalSaveService.DeleteSaveFromId(saveId);
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpGet("{saveId}/download")]

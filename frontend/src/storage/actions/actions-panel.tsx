@@ -1,60 +1,20 @@
-import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
-import { getStorageGetActionsQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageDeleteActions, useStorageGetActions, useStorageSave } from '../../data/sdk/storage/storage.gen';
-import { Route } from '../../routes/storage';
+import { DataActionType } from '../../data/sdk/model';
+import { useStorageDeleteActions, useStorageGetActions, useStorageSave } from '../../data/sdk/storage/storage.gen';
 import { Button } from '../../ui/button/button';
 import { Container } from '../../ui/container/container';
 import { theme } from '../../ui/theme';
 import { switchUtil } from '../../util/switch-util';
-import { DataActionType } from '../../data/sdk/model';
-import { getWarningsGetWarningsQueryKey } from '../../data/sdk/warnings/warnings.gen';
 
 export const ActionsPanel: React.FC = () => {
-    const saveId = Route.useSearch({ select: (search) => search.save });
-
-    const queryClient = useQueryClient();
-
     const actionsQuery = useStorageGetActions();
 
     const [ showPanel, setShowPanel ] = React.useState<boolean>(false);
     const [ actionIndexToRemoveFrom, setActionIndexToRemoveFrom ] = React.useState<number>();
 
-    const queriesInvalidate = async () => {
-        await queryClient.invalidateQueries({
-            queryKey: getStorageGetActionsQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-            queryKey: getStorageGetMainPkmsQueryKey(),
-        });
-        await queryClient.invalidateQueries({
-            queryKey: getStorageGetMainPkmVersionsQueryKey(),
-        });
-        if (saveId) {
-            await queryClient.invalidateQueries({
-                queryKey: getStorageGetSavePkmsQueryKey(saveId),
-            });
-        }
+    const saveMutation = useStorageSave();
 
-        setActionIndexToRemoveFrom(undefined);
-    };
-
-    const saveMutation = useStorageSave({
-        mutation: {
-            onSuccess: async () => {
-                await queriesInvalidate();
-
-                await queryClient.invalidateQueries({
-                    queryKey: getWarningsGetWarningsQueryKey(),
-                });
-            },
-        },
-    });
-
-    const actionsDeleteMutation = useStorageDeleteActions({
-        mutation: {
-            onSuccess: queriesInvalidate,
-        },
-    });
+    const actionsDeleteMutation = useStorageDeleteActions();
 
     const actions = actionsQuery.data?.data ?? [];
 

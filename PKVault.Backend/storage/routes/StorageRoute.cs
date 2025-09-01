@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -49,99 +48,99 @@ public class StorageController : ControllerBase
     }
 
     [HttpPut("main/pkm/{pkmId}/move")]
-    public async Task<ActionResult<List<DataActionPayload>>> MainMovePkm(string pkmId, [BindRequired] uint boxId, [BindRequired] uint boxSlot)
+    public async Task<ActionResult<DataDTO>> MainMovePkm(string pkmId, [BindRequired] uint boxId, [BindRequired] uint boxSlot)
     {
-        await StorageService.MainMovePkm(pkmId, boxId, boxSlot);
+        var flags = await StorageService.MainMovePkm(pkmId, boxId, boxSlot);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpPut("main/pkm/{pkmId}/detach-save")]
-    public async Task<ActionResult<List<DataActionPayload>>> MainPkmDetachSave(string pkmId)
+    public async Task<ActionResult<DataDTO>> MainPkmDetachSave(string pkmId)
     {
-        await StorageService.MainPkmDetachSave(pkmId);
+        var flags = await StorageService.MainPkmDetachSave(pkmId);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpPost("main/pkm-version")]
-    public async Task<ActionResult<List<DataActionPayload>>> MainCreatePkmVersion([BindRequired] string pkmId, [BindRequired] uint generation)
+    public async Task<ActionResult<DataDTO>> MainCreatePkmVersion([BindRequired] string pkmId, [BindRequired] uint generation)
     {
-        await StorageService.MainCreatePkmVersion(pkmId, generation);
+        var flags = await StorageService.MainCreatePkmVersion(pkmId, generation);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpPut("main/pkm-version/{pkmVersionId}")]
-    public async Task<ActionResult<List<DataActionPayload>>> MainEditPkmVersion(string pkmVersionId, [BindRequired] EditPkmVersionPayload payload)
+    public async Task<ActionResult<DataDTO>> MainEditPkmVersion(string pkmVersionId, [BindRequired] EditPkmVersionPayload payload)
     {
-        await StorageService.MainEditPkmVersion(pkmVersionId, payload);
+        var flags = await StorageService.MainEditPkmVersion(pkmVersionId, payload);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpDelete("main/pkm-version/{pkmVersionId}")]
-    public async Task<ActionResult<List<DataActionPayload>>> MainDeletePkmVersion(string pkmVersionId)
+    public async Task<ActionResult<DataDTO>> MainDeletePkmVersion(string pkmVersionId)
     {
-        await StorageService.MainPkmVersionDelete(pkmVersionId);
+        var flags = await StorageService.MainPkmVersionDelete(pkmVersionId);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpDelete("save/{saveId}/pkm/{pkmId}")]
-    public async Task<ActionResult<List<DataActionPayload>>> SaveDeletePkm(uint saveId, string pkmId)
+    public async Task<ActionResult<DataDTO>> SaveDeletePkm(uint saveId, string pkmId)
     {
-        await StorageService.SaveDeletePkm(saveId, pkmId);
+        var flags = await StorageService.SaveDeletePkm(saveId, pkmId);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpPut("save/{saveId}/pkm/{pkmId}")]
-    public async Task<ActionResult<List<DataActionPayload>>> SaveEditPkm(uint saveId, string pkmId, [BindRequired] EditPkmVersionPayload payload)
+    public async Task<ActionResult<DataDTO>> SaveEditPkm(uint saveId, string pkmId, [BindRequired] EditPkmVersionPayload payload)
     {
-        await StorageService.SaveEditPkm(saveId, pkmId, payload);
+        var flags = await StorageService.SaveEditPkm(saveId, pkmId, payload);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpPut("save/{saveId}/pkm/{pkmId}/move")]
-    public async Task<ActionResult<List<DataActionPayload>>> SaveMovePkm(uint saveId, string pkmId, [BindRequired] int boxId, [BindRequired] int boxSlot)
+    public async Task<ActionResult<DataDTO>> SaveMovePkm(uint saveId, string pkmId, [BindRequired] int boxId, [BindRequired] int boxSlot)
     {
-        await StorageService.SaveMovePkm(saveId, pkmId, boxId, boxSlot);
+        var flags = await StorageService.SaveMovePkm(saveId, pkmId, boxId, boxSlot);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpPut("save/{saveId}/pkm/move-to-storage")]
-    public async Task<ActionResult<List<DataActionPayload>>> SaveMovePkmToStorage(uint saveId, [BindRequired] string savePkmId, [BindRequired] uint storageBoxId, [BindRequired] uint storageSlot)
+    public async Task<ActionResult<DataDTO>> SaveMovePkmToStorage(uint saveId, [BindRequired] string savePkmId, [BindRequired] uint storageBoxId, [BindRequired] uint storageSlot)
     {
-        await StorageService.SaveMovePkmToStorage(saveId, savePkmId, storageBoxId, storageSlot);
+        var flags = await StorageService.SaveMovePkmToStorage(saveId, savePkmId, storageBoxId, storageSlot);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpPut("save/{saveId}/pkm/move-from-storage")]
-    public async Task<ActionResult<List<DataActionPayload>>> SaveMovePkmFromStorage(uint saveId, [BindRequired] string pkmVersionId, [BindRequired] int saveBoxId, [BindRequired] int saveSlot)
+    public async Task<ActionResult<DataDTO>> SaveMovePkmFromStorage(uint saveId, [BindRequired] string pkmVersionId, [BindRequired] int saveBoxId, [BindRequired] int saveSlot)
     {
-        await StorageService.SaveMovePkmFromStorage(saveId, pkmVersionId, saveBoxId, saveSlot);
+        var flags = await StorageService.SaveMovePkmFromStorage(saveId, pkmVersionId, saveBoxId, saveSlot);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpPut("save/{saveId}/pkm/synchronize")]
-    public async Task<ActionResult<List<DataActionPayload>>> SaveSynchronizePkm(uint saveId, [BindRequired] string pkmVersionId)
+    public async Task<ActionResult<DataDTO>> SaveSynchronizePkm(uint saveId, [BindRequired] string pkmVersionId)
     {
-        await StorageService.SaveSynchronizePkm(saveId, pkmVersionId);
+        var flags = await StorageService.SaveSynchronizePkm(saveId, pkmVersionId);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpPut("pkm/{id}/evolve")]
-    public async Task<ActionResult<List<DataActionPayload>>> EvolvePkm(string id, uint? saveId)
+    public async Task<ActionResult<DataDTO>> EvolvePkm(string id, uint? saveId)
     {
-        await StorageService.EvolvePkm(saveId, id);
+        var flags = await StorageService.EvolvePkm(saveId, id);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpGet("action")]
@@ -151,18 +150,18 @@ public class StorageController : ControllerBase
     }
 
     [HttpDelete("action")]
-    public async Task<ActionResult<List<DataActionPayload>>> DeleteActions([BindRequired] int actionIndexToRemoveFrom)
+    public async Task<ActionResult<DataDTO>> DeleteActions([BindRequired] int actionIndexToRemoveFrom)
     {
-        await StorageService.RemoveDataActions(actionIndexToRemoveFrom);
+        var flags = await StorageService.RemoveDataActions(actionIndexToRemoveFrom);
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpPost("action/save")]
-    public async Task<ActionResult<List<DataActionPayload>>> Save()
+    public async Task<ActionResult<DataDTO>> Save()
     {
-        await StorageService.Save();
+        var flags = await StorageService.Save();
 
-        return StorageService.GetActionPayloadList();
+        return await DataDTO.FromDataUpdateFlags(flags);
     }
 }

@@ -21,7 +21,7 @@ public class SynchronizePkmAction : DataAction
         };
     }
 
-    public override async Task Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var pkmVersionDto = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkmDto = pkmVersionDto.PkmDto;
@@ -43,6 +43,8 @@ public class SynchronizePkmAction : DataAction
             PkmConvertService.PassAllToPkm(savePkm.Pkm, pkm);
 
             loaders.pkmVersionLoader.WriteDto(version);
+
+            flags.MainPkmVersions = true;
         });
     }
 }

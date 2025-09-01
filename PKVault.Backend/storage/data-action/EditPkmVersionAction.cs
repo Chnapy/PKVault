@@ -21,7 +21,7 @@ public class EditPkmVersionAction : DataAction
         };
     }
 
-    public override async Task Execute(DataEntityLoaders loaders)
+    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var pkmVersionDto = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkmDto = pkmVersionDto.PkmDto;
@@ -56,6 +56,8 @@ public class EditPkmVersionAction : DataAction
 
             loaders.pkmVersionLoader.WriteDto(versionDto);
         });
+
+        flags.MainPkmVersions = true;
     }
 
     public static void EditPkmNickname(PKM pkm, string nickname)

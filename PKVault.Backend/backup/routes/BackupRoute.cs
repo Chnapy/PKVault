@@ -14,14 +14,34 @@ public class BackupController : ControllerBase
     }
 
     [HttpDelete()]
-    public void Delete([BindRequired] DateTime createdAt)
+    public async Task<ActionResult<DataDTO>> Delete([BindRequired] DateTime createdAt)
     {
         BackupService.DeleteBackup(createdAt);
+
+        return await DataDTO.FromDataUpdateFlags(new() { Backups = true });
     }
 
     [HttpPost("restore")]
-    public async Task Restore([BindRequired] DateTime createdAt)
+    public async Task<ActionResult<DataDTO>> Restore([BindRequired] DateTime createdAt)
     {
         await BackupService.RestoreBackup(createdAt);
+
+        return await DataDTO.FromDataUpdateFlags(new()
+        {
+            MainBoxes = true,
+            MainPkms = true,
+            MainPkmVersions = true,
+            // Saves = [
+            //     new (){
+            //         SaveId = 0,
+            //         SaveBoxes = true,
+            //         SavePkms = true
+            //     }
+            // ],
+            // Actions = true,
+            // Warnings = true,
+            SaveInfos = true,
+            Backups = true,
+        });
     }
 }

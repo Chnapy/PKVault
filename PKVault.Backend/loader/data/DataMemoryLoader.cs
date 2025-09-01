@@ -110,13 +110,15 @@ public class DataMemoryLoader(DataEntityLoaders _loaders) : DataLoader(_loaders)
 
     public List<DataAction> actions = [];
 
-    public async Task AddAction(DataAction action)
+    public async Task<DataUpdateFlags> AddAction(DataAction action, DataUpdateFlags? flags)
     {
         actions.Add(action);
 
         try
         {
-            await ApplyAction(action);
+            var flags2 = flags ?? new();
+            await ApplyAction(action, flags2);
+            return flags2;
         }
         catch
         {

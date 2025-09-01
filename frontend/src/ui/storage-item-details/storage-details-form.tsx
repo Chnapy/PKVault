@@ -1,8 +1,7 @@
 import type React from 'react';
 import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form';
 import type { EditPkmVersionPayload } from '../../data/sdk/model';
-import { useQueryClient } from '@tanstack/react-query';
-import { getStorageGetActionsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSavePkmsQueryKey, useStorageMainEditPkmVersion, useStorageSaveEditPkm } from '../../data/sdk/storage/storage.gen';
+import { useStorageMainEditPkmVersion, useStorageSaveEditPkm } from '../../data/sdk/storage/storage.gen';
 
 type FormData = { editMode: boolean } & EditPkmVersionPayload;
 
@@ -20,45 +19,13 @@ export const StorageDetailsForm = {
             {children}
         </FormProvider>
     },
-    useContext: (saveId?: number) => {
+    useContext: () => {
         const methods = useFormContext<FormData>();
         const editMode = useWatch<FormData>({ name: 'editMode' });
 
-        const queryClient = useQueryClient();
+        const mainEditPkmVersionMutation = useStorageMainEditPkmVersion();
 
-        const mainEditPkmVersionMutation = useStorageMainEditPkmVersion({
-            mutation: {
-                onSuccess: async () => {
-                    await queryClient.invalidateQueries({
-                        queryKey: getStorageGetActionsQueryKey(),
-                    });
-
-                    await queryClient.invalidateQueries({
-                        queryKey: getStorageGetMainPkmVersionsQueryKey(),
-                    });
-
-                    methods.setValue('editMode', false);
-                },
-            },
-        });
-
-        const saveEditPkmMutation = useStorageSaveEditPkm({
-            mutation: {
-                onSuccess: async () => {
-                    await queryClient.invalidateQueries({
-                        queryKey: getStorageGetActionsQueryKey(),
-                    });
-
-                    if (saveId) {
-                        await queryClient.invalidateQueries({
-                            queryKey: getStorageGetSavePkmsQueryKey(saveId),
-                        });
-                    }
-
-                    methods.setValue('editMode', false);
-                },
-            },
-        });
+        const saveEditPkmMutation = useStorageSaveEditPkm();
 
         return {
             ...methods,
