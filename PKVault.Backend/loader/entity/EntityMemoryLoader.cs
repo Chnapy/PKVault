@@ -1,18 +1,18 @@
 
 public class EntityMemoryLoader<DTO, E>(
-    List<E> entityList,
+    Dictionary<string, E> entities,
     Func<E, Task<DTO>> entityToDto,
     Func<DTO, E> dtoToEntity
 ) : EntityLoader<DTO, E>(dtoToEntity, entityToDto) where DTO : IWithId<string> where E : IWithId<string>
 {
-    public override List<E> GetAllEntities()
+    public override Dictionary<string, E> GetAllEntities()
     {
-        return [.. entityList];
+        return entities.ToDictionary();
     }
 
-    public override void SetAllEntities(List<E> nextEntities)
+    public override void SetAllEntities(Dictionary<string, E> nextEntities)
     {
-        entityList = [.. nextEntities];
+        entities = nextEntities.ToDictionary();
 
         HasWritten = true;
     }

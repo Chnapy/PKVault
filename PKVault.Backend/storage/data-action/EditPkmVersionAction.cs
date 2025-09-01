@@ -112,6 +112,11 @@ public class EditPkmVersionAction : DataAction
                 throw new Exception($"EV value should be positive");
             }
 
+            if (pkm is PB7 && ev > 200)
+            {
+                throw new Exception($"G7 GG EV cannot be > 200");
+            }
+
             if (pkm.Format <= 2 && ev > 65535)
             {
                 throw new Exception($"G1-2 EV cannot be > 65535");
@@ -141,7 +146,7 @@ public class EditPkmVersionAction : DataAction
             return;
         }
 
-        PkmConvertService.ApplyEVsToPkm(pkm, newEVs);
+        PkmConvertService.ApplyEVsAVsToPkm(pkm, newEVs);
     }
 
     public static void EditPkmMoves(PKM pkm, List<MoveItem> availableMoves, Span<ushort> moves)

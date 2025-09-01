@@ -40,10 +40,7 @@ public class SynchronizePkmAction : DataAction
         {
             var pkm = version.Pkm;
 
-            PkmConvertService.PassDynamicsToPkm(savePkm.Pkm, pkm);
-            PkmConvertService.PassHeldItemToPkm(savePkm.Pkm, pkm);
-
-            pkm.RefreshChecksum();
+            PkmConvertService.PassAllToPkm(savePkm.Pkm, pkm);
 
             loaders.pkmVersionLoader.WriteDto(version);
         });

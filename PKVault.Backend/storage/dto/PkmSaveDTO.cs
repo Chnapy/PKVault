@@ -2,10 +2,7 @@ using PKHeX.Core;
 
 public class PkmSaveDTO : BasePkmVersionDTO
 {
-    public static async Task<PkmSaveDTO> FromPkm(SaveFile save, PKM pkm, int box, int boxSlot,
-        EntityLoader<PkmDTO, PkmEntity> pkmLoader,
-        EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionLoader
-    )
+    public static async Task<PkmSaveDTO> FromPkm(SaveFile save, PKM pkm, int box, int boxSlot)
     {
         var dto = new PkmSaveDTO
         {
@@ -15,20 +12,25 @@ public class PkmSaveDTO : BasePkmVersionDTO
             BoxSlot = boxSlot,
         };
 
-        var pkmVersion = await pkmVersionLoader.GetDto(dto.Id);
-        if (pkmVersion != null)
-        {
-            var mainPkm = await pkmLoader.GetDto(pkmVersion.PkmDto.Id);
-
-            if (mainPkm.SaveId == save.ID32)
-            {
-                dto.PkmVersionId = pkmVersion.Id;
-            }
-        }
-
-        await dto.RefreshAsyncData();
+        await dto.RefreshAsyncData(save);
 
         return dto;
+    }
+
+    public PkmSaveDTO Clone()
+    {
+        return new()
+        {
+            Pkm = Pkm,
+            Save = Save,
+            Box = Box,
+            BoxSlot = BoxSlot,
+            PkmVersionId = PkmVersionId,
+            Sprite = Sprite,
+            BallSprite = BallSprite,
+            Nature = Nature,
+            HasTradeEvolve = HasTradeEvolve
+        };
     }
 
     public uint SaveId { get { return Save.ID32; } }
@@ -50,6 +52,21 @@ public class PkmSaveDTO : BasePkmVersionDTO
     public override bool CanEvolve { get => HasTradeEvolve && PkmVersionId == null; }
 
     public required SaveFile Save;
+
+    public async Task RefreshPkmVersionId(EntityLoader<PkmDTO, PkmEntity> pkmLoader, EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionLoader)
+    {
+        PkmVersionId = null;
+        var pkmVersion = await pkmVersionLoader.GetDto(Id);
+        if (pkmVersion != null)
+        {
+            var mainPkm = await pkmLoader.GetDto(pkmVersion.PkmDto.Id);
+
+            if (mainPkm.SaveId == Save.ID32)
+            {
+                PkmVersionId = pkmVersion.Id;
+            }
+        }
+    }
 
     protected override uint GetGeneration()
     {

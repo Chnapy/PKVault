@@ -29,6 +29,7 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
           lineHeight: "19px",
           minHeight: "100%",
           position: "relative",
+          whiteSpace: 'break-spaces',
           ...noWrap ? {
             whiteSpace: 'nowrap',
             overflowX: 'auto',

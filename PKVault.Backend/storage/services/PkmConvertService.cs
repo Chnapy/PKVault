@@ -54,11 +54,7 @@ public class PkmConvertService
             return destPkm;
         }
 
-        PassStaticsToPkm(sourcePkm, destPkm);
-        PassDynamicsToPkm(sourcePkm, destPkm);
-        PassHeldItemToPkm(sourcePkm, destPkm);
-
-        destPkm.RefreshChecksum();
+        PassAllToPkm(sourcePkm, destPkm);
 
         return destPkm;
     }
@@ -127,6 +123,19 @@ public class PkmConvertService
         return pkmIntermediate;
     }
 
+    public static void PassAllToPkm(PKM sourcePkm, PKM destPkm)
+    {
+        PassStaticsToPkm(sourcePkm, destPkm);
+        PassDynamicsToPkm(sourcePkm, destPkm);
+        PassHeldItemToPkm(sourcePkm, destPkm);
+
+        Span<ushort> moves = stackalloc ushort[4];
+        sourcePkm.GetMoves(moves);
+        ApplyMovesToPkm(destPkm, moves);
+
+        destPkm.RefreshChecksum();
+    }
+
     private static void PassStaticsToPkm(PKM sourcePkm, PKM destPkm)
     {
         destPkm.Language = (int)LanguageID.French; //pkmOrigin.Language;
@@ -134,6 +143,8 @@ public class PkmConvertService
         {
             pkmIntermediateHLang.HandlingTrainerLanguage = (byte)LanguageID.French;
         }
+
+        destPkm.Gender = sourcePkm.Gender;
 
         destPkm.OriginalTrainerName = sourcePkm.OriginalTrainerName;
 
@@ -157,26 +168,44 @@ public class PkmConvertService
         ];
         destPkm.SetIVs(ivs);
 
+        ApplyAbilityToPkm(destPkm);
+
         destPkm.MetDate = sourcePkm.MetDate;
         // pkmConverted.MetLocation = pkmOrigin.MetLocation;
 
-        if (destPkm.Format == 3)
+        if (sourcePkm.Format == destPkm.Format)
         {
-            // pkmIntermediate.Origin
-            destPkm.Version = GameVersion.E;
-            destPkm.FatefulEncounter = false;
-            destPkm.MetLocation = 0;
-            destPkm.MetLevel = 0;
-            destPkm.Ball = (byte)Ball.Poke; //pkmOrigin.Ball;
+            destPkm.Version = sourcePkm.Version;
+            destPkm.FatefulEncounter = sourcePkm.FatefulEncounter;
+            destPkm.MetLocation = sourcePkm.MetLocation;
+            destPkm.MetLevel = sourcePkm.MetLevel;
+            destPkm.Ball = sourcePkm.Ball;
         }
-        else if (destPkm.Format <= 2)
+        else
         {
-            destPkm.MetLocation = 0;
-            destPkm.MetLevel = 0;
-
-            if (destPkm is ICaughtData2 destPkmG2)
+            if (destPkm is PB7 pb7)
             {
-                destPkmG2.MetTimeOfDay = 0;
+                pb7.Version = GameVersion.GO;
+                pb7.MetLocation = 0;
+            }
+            else if (destPkm.Format == 3)
+            {
+                // pkmIntermediate.Origin
+                destPkm.Version = GameVersion.E;
+                destPkm.FatefulEncounter = false;
+                destPkm.MetLocation = 0;
+                destPkm.MetLevel = 0;
+                destPkm.Ball = (byte)Ball.Poke; //pkmOrigin.Ball;
+            }
+            else if (destPkm.Format <= 2)
+            {
+                destPkm.MetLocation = 0;
+                destPkm.MetLevel = 0;
+
+                if (destPkm is ICaughtData2 destPkmG2)
+                {
+                    destPkmG2.MetTimeOfDay = 0;
+                }
             }
         }
     }
@@ -188,8 +217,17 @@ public class PkmConvertService
         destPkm.CurrentLevel = sourcePkm.CurrentLevel;
         destPkm.EXP = sourcePkm.EXP;
 
-        Func<float, int> convertEVFn = (float value) => (int)value;
-        if (sourcePkm.Format <= 2 && destPkm.Format > 2)
+        Func<float, int> convertEVFn = value => (int)value;
+
+        if (destPkm is PB7)
+        {
+            convertEVFn = value => (int)(value / sourcePkm.MaxEV * 200);
+        }
+        else if (sourcePkm is PB7)
+        {
+            convertEVFn = value => (int)(value / 200 * destPkm.MaxEV);
+        }
+        else if (sourcePkm.Format <= 2 && destPkm.Format > 2)
         {
             convertEVFn = ConvertEVG2ToG3;
         }
@@ -207,14 +245,20 @@ public class PkmConvertService
             convertEVFn(sourcePkm.EV_SPD),
         ];
 
-        ApplyEVsToPkm(destPkm, evs);
+        ApplyEVsAVsToPkm(destPkm, evs);
     }
 
-    public static void PassHeldItemToPkm(PKM sourcePkm, PKM destPkm)
+    private static void PassHeldItemToPkm(PKM sourcePkm, PKM destPkm)
     {
-        destPkm.ApplyHeldItem(sourcePkm.HeldItem, sourcePkm.Context);
-
-        Console.WriteLine($"HELD-ITEM = {destPkm.HeldItem}");
+        if (destPkm is PB7 pb7)
+        {
+            pb7.ApplyHeldItem(0, destPkm.Context);
+        }
+        else
+        {
+            destPkm.ApplyHeldItem(sourcePkm.HeldItem, sourcePkm.Context);
+        }
+        // Console.WriteLine($"HELD-ITEM = {destPkm.HeldItem}");
     }
 
     public static void ApplyNicknameToPkm(PKM pkm, string nickname)
@@ -240,14 +284,34 @@ public class PkmConvertService
         // Console.WriteLine($"NICKNAME: {isNicknamed} {pkm.Nickname} expected={nickname} default={defaultNickname}");
     }
 
-    public static void ApplyEVsToPkm(PKM pkm, Span<int> evs)
+    public static void ApplyEVsAVsToPkm(PKM pkm, Span<int> evs)
     {
-        pkm.SetEVs(evs);
+        if (pkm is PB7 pb7)
+        {
+            for (var i = 0; i < evs.Length; i++)
+            {
+                pb7.SetAV(i, (byte)evs.ToArray()[i]);
+            }
+        }
+        else
+        {
+            pkm.SetEVs(evs);
+        }
+    }
+
+    public static void ApplyAbilityToPkm(PKM pkm)
+    {
+        bool hasPidIssue() => new LegalityAnalysis(pkm).Results.Any(result => !result.Valid && result.Identifier == CheckIdentifier.PID);
+        for (var i = 0; i < pkm.PersonalInfo.AbilityCount && hasPidIssue(); i++)
+        {
+            pkm.RefreshAbility(i);
+        }
     }
 
     public static void ApplyMovesToPkm(PKM pkm, Span<ushort> moves)
     {
         pkm.SetMoves(moves);
+        pkm.FixMoves();
     }
 
     private static int ConvertEVG2ToG3(float evValue)

@@ -12,7 +12,9 @@ public class PkmVersionDTO : BasePkmVersionDTO
             PkmDto = pkmDto,
         };
 
-        await dto.RefreshAsyncData();
+        await dto.RefreshAsyncData(
+            SaveUtil.GetBlankSAV(pkm.Context, "")
+        );
 
         if (dto.Id != entity.Id)
         {

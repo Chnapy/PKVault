@@ -99,4 +99,16 @@ public class SaveInfosDTO
     public int MaxIV { get; set; }
 
     public bool CanDelete { get; set; }
+
+    public static bool IsSpeciesAllowed(int species, SaveFile save)
+    {
+        if (save is SAV7b)
+        {
+            return species <= 151
+                || species == 808
+                || species == 809;
+        }
+
+        return species <= save.MaxSpeciesID;
+    }
 }

@@ -13,12 +13,12 @@ public abstract class EntityLoader<DTO, E>(
 
     public async Task<List<DTO>> GetAllDtos()
     {
-        return [.. await Task.WhenAll(GetAllEntities().Select(entityToDto))];
+        return [.. await Task.WhenAll(GetAllEntities().Values.Select(entityToDto))];
     }
 
-    public abstract List<E> GetAllEntities();
+    public abstract Dictionary<string, E> GetAllEntities();
 
-    public abstract void SetAllEntities(List<E> entities);
+    public abstract void SetAllEntities(Dictionary<string, E> entities);
 
     public async Task<DTO?> GetDto(string id)
     {
@@ -28,36 +28,38 @@ public abstract class EntityLoader<DTO, E>(
 
     public E? GetEntity(string id)
     {
-        return GetAllEntities().Find(entity => entity.Id == id);
+        var entities = GetAllEntities();
+        if (entities.TryGetValue(id, out var value))
+        {
+            return value;
+        }
+        return default;
     }
 
     public virtual void DeleteEntity(string id)
     {
         Console.WriteLine($"Delete entity id={id}");
 
-        var initialList = GetAllEntities();
-        var removedEntity = initialList.Find(entity => entity.Id == id);
-        if (removedEntity == null)
+        var entityToRemove = GetEntity(id);
+        if (entityToRemove == null)
         {
             return;
         }
 
-        var finalList = initialList.FindAll(entity => entity.Id != id);
+        var entities = GetAllEntities();
+        entities.Remove(id);
+        SetAllEntities(entities);
 
-        SetAllEntities(finalList);
-
-        OnDelete?.Invoke(removedEntity);
+        OnDelete?.Invoke(entityToRemove);
     }
 
     public virtual void WriteDto(DTO dto)
     {
         Console.WriteLine($"{dto.GetType().Name} - Write id={dto.Id}");
 
-        var list = GetAllEntities()
-        .FindAll(item => item.Id != dto.Id);
-        list.Add(dtoToEntity(dto));
-
-        SetAllEntities(list);
+        var entities = GetAllEntities();
+        entities[dto.Id] = dtoToEntity(dto);
+        SetAllEntities(entities);
 
         OnWrite?.Invoke(dto);
     }

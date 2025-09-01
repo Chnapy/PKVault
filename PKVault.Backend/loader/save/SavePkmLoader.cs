@@ -2,8 +2,8 @@ using PKHeX.Core;
 
 public class SavePkmLoader(
     SaveFile save,
-    EntityLoader<PkmDTO, PkmEntity> pkmDtoLoader,
-    EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionDtoLoader
+    EntityLoader<PkmDTO, PkmEntity> pkmLoader,
+    EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionLoader
 )
 {
     public bool HasWritten = false;
@@ -26,7 +26,7 @@ public class SavePkmLoader(
                 if (pkm.Species != 0)
                 {
                     var boxSlot = i;
-                    taskList.Add(Task.Run(() => PkmSaveDTO.FromPkm(save, pkm, BoxDTO.PARTY_ID, boxSlot, pkmDtoLoader, pkmVersionDtoLoader)));
+                    taskList.Add(Task.Run(() => PkmSaveDTO.FromPkm(save, pkm, BoxDTO.PARTY_ID, boxSlot)));
                 }
                 i++;
             });
@@ -46,7 +46,7 @@ public class SavePkmLoader(
                 if (pkm != default && pkm.Species != 0)
                 {
                     var boxSlot = i;
-                    taskList.Add(Task.Run(() => PkmSaveDTO.FromPkm(save, pkm, BoxDTO.DAYCARE_ID, boxSlot, pkmDtoLoader, pkmVersionDtoLoader)));
+                    taskList.Add(Task.Run(() => PkmSaveDTO.FromPkm(save, pkm, BoxDTO.DAYCARE_ID, boxSlot)));
                 }
             }
         }
@@ -61,7 +61,7 @@ public class SavePkmLoader(
                 {
                     var box = i;
                     var boxSlot = j;
-                    taskList.Add(Task.Run(() => PkmSaveDTO.FromPkm(save, pkm, box, boxSlot, pkmDtoLoader, pkmVersionDtoLoader)));
+                    taskList.Add(Task.Run(() => PkmSaveDTO.FromPkm(save, pkm, box, boxSlot)));
                 }
                 j++;
             }
@@ -73,8 +73,16 @@ public class SavePkmLoader(
         foreach (var dto in await Task.WhenAll(taskList))
         {
             // Console.WriteLine($"{dto.Id} - {dto.Box}/{dto.BoxSlot}");
-            dictById.Add(dto.Id, dto);
-            dictByBox.Add(dto.Box + "." + dto.BoxSlot, dto);
+            try
+            {
+                dictById.Add(dto.Id, dto);
+                dictByBox.Add(dto.Box + "." + dto.BoxSlot, dto);
+            }
+            catch
+            {
+                // possible with gen without PID
+                Console.Error.WriteLine($"Cannot add dto.id={dto.Id} box={dto.Box} boxSlot={dto.BoxSlot}");
+            }
         }
 
         dtoById = dictById;
@@ -89,7 +97,13 @@ public class SavePkmLoader(
             await UpdateDtos();
         }
 
-        return [.. dtoById.Values];
+        return [.. await Task.WhenAll(dtoById.Values.Select(async dto => {
+            dto = dto.Clone();
+
+            await dto.RefreshPkmVersionId(pkmLoader, pkmVersionLoader);
+
+            return dto;
+        }))];
     }
 
     public async Task<PkmSaveDTO?> GetDto(string id)
@@ -101,6 +115,10 @@ public class SavePkmLoader(
 
         if (dtoById.TryGetValue(id, out var dto))
         {
+            dto = dto.Clone();
+
+            await dto.RefreshPkmVersionId(pkmLoader, pkmVersionLoader);
+
             return dto;
         }
 
@@ -116,6 +134,10 @@ public class SavePkmLoader(
 
         if (dtoByBox.TryGetValue(box + "." + boxSlot, out var dto))
         {
+            dto = dto.Clone();
+
+            await dto.RefreshPkmVersionId(pkmLoader, pkmVersionLoader);
+
             return dto;
         }
 
@@ -131,91 +153,55 @@ public class SavePkmLoader(
 
         var savePkmType = save.BlankPKM.GetType();
 
-        var pkm = EntityConverter.ConvertToType(dto.Pkm, savePkmType, out var result);
+        var pkm = PkmConvertService.GetConvertedPkm(dto.Pkm, save.BlankPKM, null);
         if (pkm == default)
         {
-            var blankPKM = save.BlankPKM.Clone();
-            blankPKM.Species = dto.Pkm.Species;
-            pkm = PkmConvertService.GetConvertedPkm(dto.Pkm, blankPKM, null);
-        }
-        if (pkm == default)
-        {
-            throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetType()} to.type={savePkmType} result={result}");
+            throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetType()} to.type={savePkmType}");
         }
 
         await DeleteDto(dto.Id);
 
-        List<PKM>? party = null;
-
-        // var oldEntity = await GetDto(dto.Id);
-
-        // if (oldEntity != null)
-        // {
-        //     if (oldEntity.Box == BoxDTO.DAYCARE_ID)
-        //     {
-        //         throw new Exception("Not allowed for pkm in daycare");
-        //     }
-
-        //     switch (oldEntity.Box)
-        //     {
-        //         case BoxDTO.PARTY_ID:
-        //             party = save.PartyData.ToList().FindAll(pkm => pkm.Species != 0)
-        //                 .FindAll(pkm => BasePkmVersionDTO.GetPKMId(pkm) != dto.Id);
-        //             break;
-        //         default:
-        //             save.SetBoxSlotAtIndex(save.BlankPKM, oldEntity.Box, oldEntity.BoxSlot);
-        //             break;
-        //     }
-
-        //     dtoById.Remove(oldEntity.Id, out _);
-        //     dtoByBox.Remove(oldEntity.Box + "." + oldEntity.BoxSlot, out _);
-        // }
-
         switch (dto.Box)
         {
             case BoxDTO.PARTY_ID:
-                party ??= save.PartyData.ToList().FindAll(pkm => pkm.Species != 0);
+                var party = save.PartyData.ToList().FindAll(pkm => pkm.Species != 0);
                 party.Add(pkm);
+                SetParty(party);
                 break;
             default:
                 save.SetBoxSlotAtIndex(pkm, dto.Box, dto.BoxSlot);
                 break;
         }
 
-        if (party != null)
-        {
-            SetParty(party);
-        }
-
-        dtoById.TryAdd(dto.Id, dto);
-        dtoByBox.TryAdd(dto.Box + "." + dto.BoxSlot, dto);
+        needUpdate = true;
+        // Console.WriteLine($"ADD {dto.Id} / {dto.Box} / {dto.BoxSlot}");
 
         HasWritten = true;
     }
 
     public async Task DeleteDto(string id)
     {
-        var entity = await GetDto(id);
-        if (entity != default)
+        var dto = await GetDto(id);
+        if (dto != default)
         {
-            switch (entity.Box)
+            switch (dto.Box)
             {
                 case BoxDTO.DAYCARE_ID:
                     throw new Exception("Not allowed for pkm in daycare");
                 case BoxDTO.PARTY_ID:
                     var party = save.PartyData.ToList().FindAll(pkm => pkm.Species != 0)
-                        .FindAll(pkm => BasePkmVersionDTO.GetPKMId(pkm) != entity.Id);
+                        .FindAll(pkm => BasePkmVersionDTO.GetPKMId(pkm) != dto.Id);
 
                     SetParty(party);
                     break;
                 default:
-                    save.SetBoxSlotAtIndex(save.BlankPKM, entity.Box, entity.BoxSlot);
+                    save.SetBoxSlotAtIndex(save.BlankPKM, dto.Box, dto.BoxSlot);
                     break;
             }
 
-            dtoById.Remove(id, out _);
-            dtoByBox.Remove(entity.Box + "." + entity.BoxSlot, out _);
+            // Console.WriteLine($"REMOVE {id} / {dto.Box} / {dto.BoxSlot}");
 
+            needUpdate = true;
             HasWritten = true;
         }
     }

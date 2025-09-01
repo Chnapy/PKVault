@@ -41,7 +41,7 @@ public class Dex123Service : DexGenService<SaveFile>
         };
     }
 
-    private static byte GetG12Type(byte type)
+    public static byte GetG12Type(byte type)
     {
         return type switch
         {

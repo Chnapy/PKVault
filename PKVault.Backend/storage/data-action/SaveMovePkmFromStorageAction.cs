@@ -4,7 +4,6 @@ public class SaveMovePkmFromStorageAction : DataAction
 {
     public uint saveId { get; }
     readonly string pkmVersionId;
-    // readonly BoxType saveBoxType;
     readonly int saveBoxId;
     readonly int saveSlot;
 
@@ -16,7 +15,6 @@ public class SaveMovePkmFromStorageAction : DataAction
     {
         saveId = _saveId;
         pkmVersionId = _pkmVersionId;
-        // saveBoxType = _saveBoxType;
         saveBoxId = _saveBoxId;
         saveSlot = _saveSlot;
     }
@@ -44,6 +42,11 @@ public class SaveMovePkmFromStorageAction : DataAction
         if (pkmVersionDto.Generation != saveLoaders.Save.Generation)
         {
             throw new Exception($"PkmVersionEntity Generation not compatible with save for id={pkmVersionId}, generation={pkmVersionDto.Generation}, save.generation={saveLoaders.Save.Generation}");
+        }
+
+        if (!SaveInfosDTO.IsSpeciesAllowed(pkmVersionDto.Pkm.Species, saveLoaders.Save))
+        {
+            throw new Exception($"PkmVersionEntity Species not compatible with save for id={pkmVersionId}, species={pkmVersionDto.Species}, save.maxSpecies={saveLoaders.Save.MaxSpeciesID}");
         }
 
         // get save-pkm
@@ -89,7 +92,8 @@ public class SaveMovePkmFromStorageAction : DataAction
         pkmDto.PkmEntity.SaveId = saveLoaders.Save.ID32;
         loaders.pkmLoader.WriteDto(pkmDto);
 
-        var pkmSaveDTO = await PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxId, saveSlot, loaders.pkmLoader, loaders.pkmVersionLoader);
+        var pkmSaveDTO = await PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, saveBoxId, saveSlot);
+        await pkmSaveDTO.RefreshPkmVersionId(loaders.pkmLoader, loaders.pkmVersionLoader);
         await saveLoaders.Pkms.WriteDto(pkmSaveDTO);
 
         if (pkmSaveDTO.PkmVersionId == null)

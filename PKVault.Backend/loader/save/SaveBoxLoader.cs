@@ -5,18 +5,19 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
     entityToDto: async item => item
 )
 {
-    public override List<BoxDTO> GetAllEntities()
+    public override Dictionary<string, BoxDTO> GetAllEntities()
     {
-        var boxes = new List<BoxDTO>();
+        var boxes = new Dictionary<string, BoxDTO>();
 
         if (save.HasParty)
         {
-            boxes.Add(new BoxDTO
+            var id = BoxDTO.PARTY_ID.ToString();
+            boxes.Add(id, new BoxDTO
             {
                 Type = BoxType.Party,
                 BoxEntity = new()
                 {
-                    Id = BoxDTO.PARTY_ID.ToString(),
+                    Id = id,
                     Name = "Party",
                 }
             });
@@ -24,12 +25,13 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
 
         if (save is IDaycareStorage)
         {
-            boxes.Add(new BoxDTO
+            var id = BoxDTO.DAYCARE_ID.ToString();
+            boxes.Add(id, new BoxDTO
             {
                 Type = BoxType.Daycare,
                 BoxEntity = new()
                 {
-                    Id = BoxDTO.DAYCARE_ID.ToString(),
+                    Id = id,
                     Name = "Daycare",
                 }
             });
@@ -38,12 +40,13 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
         var boxesNames = BoxUtil.GetBoxNames(save).ToList();
         for (int i = 0; i < boxesNames.Count; i++)
         {
-            boxes.Add(new BoxDTO
+            var id = i.ToString();
+            boxes.Add(id, new BoxDTO
             {
                 Type = BoxType.Default,
                 BoxEntity = new()
                 {
-                    Id = i.ToString(),
+                    Id = id,
                     Name = boxesNames[i],
                 }
             });
@@ -71,7 +74,7 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
         throw new Exception($"Not implemented");
     }
 
-    public override void SetAllEntities(List<BoxDTO> entities)
+    public override void SetAllEntities(Dictionary<string, BoxDTO> entities)
     {
         throw new Exception($"Not implemented");
     }

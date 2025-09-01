@@ -88,8 +88,6 @@ public class DataFileLoader : DataLoader
             }
         };
 
-        var logtime = LogUtil.Time($"File-loader save-loaders loading");
-
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
         saveDict.Values.ToList().ForEach((save) =>
         {
@@ -100,8 +98,6 @@ public class DataFileLoader : DataLoader
                 Pkms = new SavePkmLoader(save, pkmLoader, pkmVersionLoader)
             });
         });
-
-        logtime();
 
         var loaders = new DataEntityLoaders
         {

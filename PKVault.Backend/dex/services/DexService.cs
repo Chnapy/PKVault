@@ -6,6 +6,11 @@ public class DexService
     {
         Dictionary<int, Dictionary<uint, DexItemDTO>> dex = [];
 
+        if (LocalSaveService.SaveById.Count == 0)
+        {
+            return dex;
+        }
+
         var maxSpecies = LocalSaveService.SaveById.Values.Select(save => save.MaxSpeciesID).Max();
 
         // Console.WriteLine(string.Join(',', PKHexUtils.StringsFR.Types));

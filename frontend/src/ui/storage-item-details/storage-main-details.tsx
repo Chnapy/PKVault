@@ -210,7 +210,7 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
             </>}
           {' - '}<span style={{ color: theme.text.primary }}>{speciesName}</span>
 
-          {gender && <span
+          {gender !== undefined && <span
             style={{
               float: 'right',
             }}

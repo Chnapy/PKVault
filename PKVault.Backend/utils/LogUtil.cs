@@ -38,6 +38,10 @@ public class LogUtil
             {
                 Console.BackgroundColor = ConsoleColor.DarkYellow;
             }
+            else
+            {
+                Console.BackgroundColor = ConsoleColor.DarkGreen;
+            }
             Console.Write(sw.Elapsed);
             Console.ResetColor();
             Console.WriteLine();

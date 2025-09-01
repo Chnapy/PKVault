@@ -75,8 +75,16 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     {
         get
         {
-            var type1 = PKHexUtils.StringsFR.Types[Pkm.PersonalInfo.Type1];
-            var type2 = PKHexUtils.StringsFR.Types[Pkm.PersonalInfo.Type2];
+            var type1 = PKHexUtils.StringsFR.Types[
+                Generation <= 2
+                ? Dex123Service.GetG12Type(Pkm.PersonalInfo.Type1)
+                : Pkm.PersonalInfo.Type1
+            ];
+            var type2 = PKHexUtils.StringsFR.Types[
+                Generation <= 2
+                ? Dex123Service.GetG12Type(Pkm.PersonalInfo.Type2)
+                : Pkm.PersonalInfo.Type2
+            ];
             return [type1, type2];
         }
     }
@@ -110,14 +118,28 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     {
         get
         {
-            return [
-                Pkm.EV_HP,
-                Pkm.EV_ATK,
-                Pkm.EV_DEF,
-                Pkm.EV_SPA,
-                Pkm.EV_SPD,
-                Pkm.EV_SPE,
-            ];
+            if (Pkm is PB7 pb7)
+            {
+                return [
+                    pb7.AV_HP,
+                    pb7.AV_ATK,
+                    pb7.AV_DEF,
+                    pb7.AV_SPA,
+                    pb7.AV_SPD,
+                    pb7.AV_SPE,
+                ];
+            }
+            else
+            {
+                return [
+                    Pkm.EV_HP,
+                    Pkm.EV_ATK,
+                    Pkm.EV_DEF,
+                    Pkm.EV_SPA,
+                    Pkm.EV_SPD,
+                    Pkm.EV_SPE,
+                ];
+            }
         }
     }
 
@@ -335,10 +357,9 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
             moveComboSource.DataSource.ToList().ForEach(data =>
             {
-                var types = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Count() > data.Value && moveSourceTypesRecord[type][data.Value]);
-
                 if (moveSource.Info.CanLearn((ushort)data.Value))
                 {
+                    var types = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Length > data.Value && moveSourceTypesRecord[type][data.Value]);
                     var item = new MoveItem
                     {
                         Id = data.Value,
@@ -382,13 +403,13 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     }
 
     // TODO perf issues
-    public async Task RefreshAsyncData()
+    public async Task RefreshAsyncData(SaveFile save)
     {
         await Task.WhenAll(
             RefreshSprite(),
             RefreshBallSprite(),
             RefreshNature(),
-            RefreshHasTradeEvolve()
+            RefreshHasTradeEvolve(save)
         );
     }
 
@@ -407,9 +428,9 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     private async Task RefreshBallSprite()
     {
-        var ballItem = await PokeApi.GetItem(Pkm.Ball);
-
-        BallSprite = ballItem?.Sprites.Default;
+        BallSprite = Pkm.Ball > 0
+            ? (await PokeApi.GetItem(Pkm.Ball))?.Sprites.Default
+            : null;
     }
 
     private async Task RefreshNature()
@@ -430,14 +451,14 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         }
     }
 
-    private async Task RefreshHasTradeEvolve()
+    private async Task RefreshHasTradeEvolve(SaveFile save)
     {
-        var evolvesByTrade = await GetTradeEvolveChains();
+        var evolvesByTrade = await GetTradeEvolveChains(save);
 
         HasTradeEvolve = evolvesByTrade.Count > 0;
     }
 
-    public async Task<List<ChainLink>> GetTradeEvolveChains()
+    public async Task<List<ChainLink>> GetTradeEvolveChains(SaveFile save)
     {
         var pokeapiSpeciesName = PokeApiFileClient.PokeApiNameFromPKHexName(GameInfo.Strings.Species[Species]);
         var evolutionChain = await PokeApi.GetPokemonSpeciesEvolutionChain(
@@ -464,7 +485,6 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         }
 
         var speciesChain = getSpeciesEvolutionChain(evolutionChain.Chain);
-
         if (speciesChain == null)
         {
             return [];
@@ -473,10 +493,19 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         var heldItemName = GameInfo.Strings.Item[HeldItem];
         var heldItemPokeapiName = PokeApiFileClient.PokeApiNameFromPKHexName(heldItemName);
 
+        bool checkSpecies(NamedApiResource<PokemonSpecies> speciesObj)
+        {
+            var species = int.Parse(speciesObj.Url.TrimEnd('/').Split('/')[^1]);
+
+            return SaveInfosDTO.IsSpeciesAllowed(species, save);
+        }
+
         return speciesChain.EvolvesTo.FindAll(chain =>
-            chain.EvolutionDetails.Any(details =>
+            checkSpecies(chain.Species)
+            && chain.EvolutionDetails.Any(details =>
                 details.Trigger.Name == "trade"
                 && (details.HeldItem == null || details.HeldItem.Name == heldItemPokeapiName)
+
             )
         );
     }

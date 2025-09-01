@@ -62,7 +62,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders) : DataLoader(_loaders)
         };
 
         await Task.WhenAll(
-            pkmVersionEntities.Select(async pkmVersionEntity =>
+            pkmVersionEntities.Values.Select(async pkmVersionEntity =>
             {
                 var pkmBytes = pkmRealFileLoader.GetEntity(pkmVersionEntity.Filepath);
                 if (pkmBytes == default)

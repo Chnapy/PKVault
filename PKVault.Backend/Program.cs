@@ -20,11 +20,34 @@ public class Program
 
     public static async Task<bool> SetupData(string[] args)
     {
+        var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
+
         LogUtil.Initialize();
+
+        if (args.Length > 0 && args[0] == "test-PB7")
+        {
+            await LocalSaveService.ReadLocalSaves();
+            await StorageService.ResetDataLoader();
+            await StorageService.SaveMovePkmFromStorage(
+                4106192122,
+                "G700754A1E359E2 5 5 14 11 1200",
+                3, 3
+            );
+            var list = await StorageService.GetSavePkms(4106192122);
+            var lastDto = list.Last();
+
+            Console.WriteLine($"Id={lastDto.Id}\nPID={lastDto.PID}\nNickname={lastDto.Nickname}"
+                + $"\nGender={lastDto.Gender}\nAV_ATK={lastDto.EVs[1]}\nAbility={lastDto.Ability}"
+                + $"\nMoves.1={lastDto.Moves[0].Text}\nMoves.2={lastDto.Moves[1].Text}\nMoves.3={lastDto.Moves[2].Text}\nMoves.4={lastDto.Moves[3].Text}"
+                + $"\nBallSprite={lastDto.BallSprite}");
+            Console.WriteLine(lastDto.ValidityReport);
+
+            return false;
+        }
 
         if (args.Length > 0 && args[0] == "bench-pokeapi")
         {
-            var logtimePkm = LogUtil.Time("Benchmark PokeApi perfs with 10.000 sequential calls pokemon");
+            var logtimePkm = LogUtil.Time("Benchmark PokeApi perfs with 10.000 sequential calls pokemon", (10_500, 11_500));
             for (var species = 1; species < 10_000; species++)
             {
                 await PokeApi.GetPokemon((species % 900) + 1);
@@ -40,25 +63,31 @@ public class Program
             await LocalSaveService.ReadLocalSaves();
             await StorageService.ResetDataLoader();
 
-            var logtimeSavePkmAll = LogUtil.Time("Benchmark Save Pkms (all) perfs with 10 sequential calls");
-            List<PkmSaveDTO> savePkms = [];
+            var logtimeSavePkmAll = LogUtil.Time("Benchmark Save Pkms (all) perfs with 10 sequential calls", (550, 800));
+            // List<PkmSaveDTO> savePkms = [];
             for (var i = 0; i < 10; i++)
             {
-                savePkms = await StorageService.GetSavePkms(3809447156);
+                await StorageService.GetSavePkms(3809447156);
                 // savePkms.ForEach(pkm => Console.WriteLine($"{pkm.Id} - {pkm.Box}/{pkm.BoxSlot}"));
             }
             // expected: ~0.5s
             logtimeSavePkmAll();
-            Console.WriteLine($"count={savePkms.Count} last_id={savePkms.Last().Id}");
+            // Console.WriteLine($"count={savePkms.Count} last_id={savePkms.Last().Id}");
 
-            var logtimeSavePkmGet = LogUtil.Time("Benchmark Save Pkms (get) perfs with 2000 sequential calls");
+            var logtimeSavePkmGet = LogUtil.Time("Benchmark Save Pkms (get) perfs with 2000 sequential calls", (10, 30));
             for (var i = 0; i < 2000; i++)
             {
                 var result = await StorageService.memoryLoader!.loaders.saveLoadersDict[3809447156].Pkms.GetDto("G30366FC1CF2B528 17 20 21 30 600")
                     ?? throw new Exception();
             }
-            // expected: ~0s
+            // expected: ~0.001s
             logtimeSavePkmGet();
+
+            // diff=110
+
+            var setupedMemoryUsedMB1 = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
+
+            Console.WriteLine($"Memory checks: initial={initialMemoryUsedMB} MB setuped={setupedMemoryUsedMB1} MB diff={setupedMemoryUsedMB1 - initialMemoryUsedMB} MB");
 
             return false;
         }
@@ -70,8 +99,6 @@ public class Program
             return false;
         }
 #endif
-
-        var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
         await LocalSaveService.PrepareTimerAndRun();
 

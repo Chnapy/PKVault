@@ -112,7 +112,9 @@ public class EvolvePkmAction : DataAction
             throw new Exception("Pkm cannot evolve");
         }
 
-        var evolveChains = await dto.GetTradeEvolveChains();
+        var evolveChains = await dto.GetTradeEvolveChains(
+            SaveUtil.GetBlankSAV(dto.Pkm.Context, "")
+        );
 
         var heldItemName = GameInfo.Strings.Item[dto.HeldItem];
         var heldItemPokeapiName = PokeApiFileClient.PokeApiNameFromPKHexName(heldItemName);
@@ -140,11 +142,6 @@ public class EvolvePkmAction : DataAction
     {
         // Console.WriteLine($"EVOLVE TO {evolveSpecies}");
 
-        if (evolveSpecies > pkm.MaxSpeciesID)
-        {
-            throw new Exception($"Evolve species {evolveSpecies} > pkm.MaxSpecies {pkm.MaxSpeciesID}");
-        }
-
         var currentNickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, pkm.Language, pkm.Format);
         var isNicknamed = pkm.IsNicknamed && !pkm.Nickname.Equals(currentNickname, StringComparison.InvariantCultureIgnoreCase);
 
@@ -162,12 +159,7 @@ public class EvolvePkmAction : DataAction
 
         PkmConvertService.ApplyNicknameToPkm(pkm, pkm.Nickname);
 
-        bool hasPidIssue() => new LegalityAnalysis(pkm).Results.Any(result => !result.Valid && result.Identifier == CheckIdentifier.PID);
-
-        for (var i = 0; i < pkm.PersonalInfo.AbilityCount && hasPidIssue(); i++)
-        {
-            pkm.RefreshAbility(i);
-        }
+        PkmConvertService.ApplyAbilityToPkm(pkm);
 
         pkm.RefreshChecksum();
     }
