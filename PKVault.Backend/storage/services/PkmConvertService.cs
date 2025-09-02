@@ -14,6 +14,8 @@ public class PkmConvertService
             5 => new PK5(),
             6 => new PK6(),
             7 => new PK7(),
+            8 => new PK8(),
+            9 => new PK9(),
             _ => default
         };
         if (blankPkm == default)
@@ -30,10 +32,10 @@ public class PkmConvertService
 
         if (!EntityConverter.IsCompatibleWithModifications(sourcePkm, blankPkm))
         {
-            throw new Exception($"PKM conversion not possible, origin PKM not compatible with generation={blankPkm.Generation}");
+            throw new Exception($"PKM conversion not possible, origin PKM not compatible with generation={blankPkm.Format}");
         }
 
-        var intermediatePkm = GetIntermediatePkmConvert(sourcePkm, blankPkm.Generation, intermediatePid);
+        var intermediatePkm = GetIntermediatePkmConvert(sourcePkm, blankPkm.Format, intermediatePid);
 
         var converted = EntityConverter.TryMakePKMCompatible(
             intermediatePkm,
@@ -62,7 +64,7 @@ public class PkmConvertService
     private static PKM GetIntermediatePkmConvert(PKM sourcePkm, uint generation, uint? intermediatePid)
     {
         // G1-2 to G3+
-        if (sourcePkm.Generation <= 2 && generation > 2)
+        if (sourcePkm.Format <= 2 && generation > 2)
         {
             return GetIntermediateConvertG2ToG3(sourcePkm, intermediatePid);
         }

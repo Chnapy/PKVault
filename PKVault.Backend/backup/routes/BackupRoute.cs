@@ -31,13 +31,11 @@ public class BackupController : ControllerBase
             MainBoxes = true,
             MainPkms = true,
             MainPkmVersions = true,
-            // Saves = [
-            //     new (){
-            //         SaveId = 0,
-            //         SaveBoxes = true,
-            //         SavePkms = true
-            //     }
-            // ],
+            Saves = [
+                new (){
+                    SaveId = 0
+                }
+            ],
             // Actions = true,
             // Warnings = true,
             SaveInfos = true,

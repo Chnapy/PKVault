@@ -225,7 +225,17 @@ public class StorageService
 
         await ResetDataLoader();
 
-        var flags = new DataUpdateFlags();
+        var flags = new DataUpdateFlags
+        {
+            MainBoxes = true,
+            MainPkms = true,
+            MainPkmVersions = true,
+            Saves = [
+                new() {
+                    SaveId = 0
+                }
+            ]
+        };
 
         for (var i = 0; i < previousActions.Count; i++)
         {

@@ -27,7 +27,6 @@ public class WarningsService
         logtime();
     }
 
-    // TODO
     private static List<PlayTimeWarning> CheckPlayTimeWarning()
     {
         var warns = new List<PlayTimeWarning>();

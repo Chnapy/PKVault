@@ -62,6 +62,31 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
 
           if (saves) {
             saves.forEach(saveData => {
+              if (saveData.saveId === 0) {
+                const [ saveBoxStart, saveBoxEnd ] = getStorageGetSaveBoxesQueryKey(-999)[ 0 ].split('-999');
+                const [ savePkmStart, savePkmEnd ] = getStorageGetSavePkmsQueryKey(-999)[ 0 ].split('-999');
+
+                const saveQueries = client.getQueryCache().findAll({
+                  predicate: query => {
+                    if (!Array.isArray(query.queryKey) || typeof query.queryKey[ 0 ] !== 'string') {
+                      return false;
+                    }
+
+                    const queryKeyValue = query.queryKey[ 0 ];
+
+                    const isSaveBoxQuery = queryKeyValue.startsWith(saveBoxStart) && queryKeyValue.endsWith(saveBoxEnd);
+                    const isSavePkmQuery = queryKeyValue.startsWith(savePkmStart) && queryKeyValue.endsWith(savePkmEnd);
+
+                    return isSaveBoxQuery || isSavePkmQuery;
+                  },
+                });
+
+                saveQueries.forEach(query => {
+                  client.invalidateQueries(query);
+                });
+                return;
+              }
+
               if (saveData.saveBoxes) {
                 client.setQueryData(
                   getStorageGetSaveBoxesQueryKey(saveData.saveId),
