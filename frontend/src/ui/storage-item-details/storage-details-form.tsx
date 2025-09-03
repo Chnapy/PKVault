@@ -31,23 +31,29 @@ export const StorageDetailsForm = {
             ...methods,
             editMode,
             cancel: () => methods.reset(),
-            submitForPkmVersion: (pkmVersionId: string) => mainEditPkmVersionMutation.mutateAsync({
-                pkmVersionId,
-                data: {
-                    nickname: methods.getValues('nickname'),
-                    eVs: methods.getValues('eVs'),
-                    moves: methods.getValues('moves'),
-                }
-            }),
-            submitForPkmSave: (saveId: number, pkmId: string) => saveEditPkmMutation.mutateAsync({
-                saveId,
-                pkmId,
-                data: {
-                    nickname: methods.getValues('nickname'),
-                    eVs: methods.getValues('eVs'),
-                    moves: methods.getValues('moves'),
-                }
-            }),
+            submitForPkmVersion: async (pkmVersionId: string) => {
+                await mainEditPkmVersionMutation.mutateAsync({
+                    pkmVersionId,
+                    data: {
+                        nickname: methods.getValues('nickname'),
+                        eVs: methods.getValues('eVs'),
+                        moves: methods.getValues('moves'),
+                    }
+                });
+                methods.setValue('editMode', false);
+            },
+            submitForPkmSave: async (saveId: number, pkmId: string) => {
+                await saveEditPkmMutation.mutateAsync({
+                    saveId,
+                    pkmId,
+                    data: {
+                        nickname: methods.getValues('nickname'),
+                        eVs: methods.getValues('eVs'),
+                        moves: methods.getValues('moves'),
+                    }
+                });
+                methods.setValue('editMode', false);
+            },
         }
     },
 };

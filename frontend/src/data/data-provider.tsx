@@ -26,7 +26,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
             return;
           }
 
-          console.log('stockage-dto', data);
+          // console.log('stockage-dto', data);
 
           const { mainBoxes, mainPkms, mainPkmVersions, saves, actions, warnings, saveInfos, backups } = data.data;
 

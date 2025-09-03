@@ -133,17 +133,20 @@ partial class MainForm
                 return httpContent;
             }
 
-            async Task<HttpResponseMessage> GetOptionsResponse()
+            HttpResponseMessage GetOptionsResponse()
             {
-                var res = await backendClient.GetAsync(uri);
+                var requestMethod = args.Request.Headers.GetHeader("access-control-request-method");
 
-                res.StatusCode = System.Net.HttpStatusCode.NoContent;
-                res.ReasonPhrase = "OK";
-                res.Content = new StringContent("");
+                var res = new HttpResponseMessage()
+                {
+                    StatusCode = System.Net.HttpStatusCode.NoContent,
+                    ReasonPhrase = "No Content",
+                    RequestMessage = new HttpRequestMessage(new HttpMethod(requestMethod), uri)
+                };
 
-                res.Headers.Add("Access-Control-Allow-Methods",
-                    args.Request.Headers.GetHeader("access-control-request-method")
-                );
+                res.Headers.Add("Access-Control-Allow-Methods", requestMethod);
+                res.Headers.Add("Access-Control-Allow-Headers", "content-type");
+                res.Headers.Add("Access-Control-Allow-Origin", "*");
 
                 return res;
             }
@@ -155,13 +158,16 @@ partial class MainForm
                 "POST" => await backendClient.PostAsync(uri, GetRequestContent()),
                 "PATCH" => await backendClient.PatchAsync(uri, GetRequestContent()),
                 "DELETE" => await backendClient.DeleteAsync(uri),
-                "OPTIONS" => await GetOptionsResponse(),
+                "OPTIONS" => GetOptionsResponse(),
                 _ => throw new Exception("Not handled")
             };
 
-            args.Response = await ConvertHttpResponseMessageToWebResourceResponse(response);
+            if (!response.Headers.Contains("Access-Control-Allow-Origin"))
+            {
+                response.Headers.Add("Access-Control-Allow-Origin", "*");
+            }
 
-            args.Response.Headers.AppendHeader("Access-Control-Allow-Origin", "*");
+            args.Response = await ConvertHttpResponseMessageToWebResourceResponse(response);
 
             deferral.Complete();
         };
