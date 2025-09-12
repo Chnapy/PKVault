@@ -307,7 +307,7 @@ public class BackupService
 
         logtime();
 
-        await LocalSaveService.ResetTimerAndData();
+        await LocalSaveService.ReadLocalSaves();
 
         await StorageService.ResetDataLoader();
 
@@ -326,7 +326,7 @@ public class BackupService
 
             logtime();
 
-            await LocalSaveService.PrepareTimerAndRun();
+            await LocalSaveService.ReadLocalSaves();
 
             await StorageService.ResetDataLoader();
 

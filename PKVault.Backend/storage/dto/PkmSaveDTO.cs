@@ -26,9 +26,6 @@ public class PkmSaveDTO : BasePkmVersionDTO
             Box = Box,
             BoxSlot = BoxSlot,
             PkmVersionId = PkmVersionId,
-            Sprite = Sprite,
-            BallSprite = BallSprite,
-            Nature = Nature,
             HasTradeEvolve = HasTradeEvolve
         };
     }

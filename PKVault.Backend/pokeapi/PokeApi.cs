@@ -9,6 +9,10 @@ public class PokeApi
         PokeApiFileClient.GetApiEndpointString<Pokedex>(),
         PokeApiFileClient.GetApiEndpointString<Nature>(),
         PokeApiFileClient.GetApiEndpointString<Item>(),
+        PokeApiFileClient.GetApiEndpointString<Move>(),
+        PokeApiFileClient.GetApiEndpointString<Stat>(),
+        PokeApiFileClient.GetApiEndpointString<PokeApiNet.Version>(),
+        PokeApiFileClient.GetApiEndpointString<VersionGroup>(),
     ];
 
     private static readonly PokeApiFileClient client = new();
@@ -53,9 +57,34 @@ public class PokeApi
         return await client.GetAsync<Item>(id);
     }
 
-    public static uint GetGenerationValue(NamedApiResource<Generation> generationResource)
+    public static async Task<Item> GetItem(string name)
     {
-        return generationResource.Name switch
+        return await client.GetAsync<Item>(name);
+    }
+
+    public static async Task<Move> GetMove(int id)
+    {
+        return await client.GetAsync<Move>(id);
+    }
+
+    public static async Task<Stat> GetStat(int id)
+    {
+        return await client.GetAsync<Stat>(id);
+    }
+
+    public static async Task<VersionGroup> GetVersionGroup(NamedApiResource<VersionGroup> namedVersionGroup)
+    {
+        return await client.GetAsync(namedVersionGroup);
+    }
+
+    public static async Task<PokeApiNet.Version> GetVersion(int id)
+    {
+        return await client.GetAsync<PokeApiNet.Version>(id);
+    }
+
+    public static uint GetGenerationValue(string resourceName)
+    {
+        return resourceName switch
         {
             "generation-i" => 1,
             "generation-ii" => 2,
@@ -68,5 +97,10 @@ public class PokeApi
             "generation-ix" => 9,
             _ => throw new Exception("Generation name not handled")
         };
+    }
+
+    public static int GetIdFromUrl(string url)
+    {
+        return int.Parse(url.TrimEnd('/').Split('/')[^1]);
     }
 }

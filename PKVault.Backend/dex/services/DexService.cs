@@ -33,11 +33,11 @@ public class DexService
 
     private static async Task<bool> UpdateDexWithSave(Dictionary<int, Dictionary<uint, DexItemDTO>> dex, SaveFile save)
     {
-        var notHandled = (SaveFile save) =>
+        static bool notHandled(SaveFile save)
         {
             Console.WriteLine("Save version/gen not handled: " + save.Version + "/" + save.Generation);
             return false;
-        };
+        }
 
         var success = save switch
         {

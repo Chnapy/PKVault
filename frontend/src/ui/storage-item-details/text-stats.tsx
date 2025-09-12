@@ -36,6 +36,7 @@ export const TextStats: React.FC<TextStatsProps> = ({
             <thead>
                 <tr>
                     <td style={{ paddingTop: 0, paddingBottom: 0 }}></td>
+                    {/* {staticStats.map(stat => <td key={stat.id} style={{ paddingTop: 0, paddingBottom: 0 }}>{stat.name}</td>)} */}
                     <td style={{ paddingTop: 0, paddingBottom: 0 }}>HP.</td>
                     <td style={{ paddingTop: 0, paddingBottom: 0 }}>Atk</td>
                     <td style={{ paddingTop: 0, paddingBottom: 0 }}>Def</td>

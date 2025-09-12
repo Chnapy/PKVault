@@ -45,7 +45,13 @@ public class StorageService
             return [];
         }
 
-        return await memoryLoader.loaders.saveLoadersDict[saveId].Boxes.GetAllDtos();
+        var saveExists = memoryLoader.loaders.saveLoadersDict.TryGetValue(saveId, out var saveLoaders);
+        if (!saveExists)
+        {
+            return [];
+        }
+
+        return await saveLoaders.Boxes.GetAllDtos();
     }
 
     public static async Task<List<PkmSaveDTO>> GetSavePkms(uint saveId)
@@ -55,7 +61,13 @@ public class StorageService
             return [];
         }
 
-        return await memoryLoader.loaders.saveLoadersDict[saveId].Pkms.GetAllDtos();
+        var saveExists = memoryLoader.loaders.saveLoadersDict.TryGetValue(saveId, out var saveLoaders);
+        if (!saveExists)
+        {
+            return [];
+        }
+
+        return await saveLoaders.Pkms.GetAllDtos();
     }
 
     public static async Task<DataUpdateFlags> MainMovePkm(string pkmId, uint boxId, uint boxSlot)

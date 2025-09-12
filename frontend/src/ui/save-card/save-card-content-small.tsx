@@ -1,8 +1,7 @@
 import type React from "react";
-import brendanBigImg from "../../assets/trainer/big/Spr_RS_Brendan.png?url";
-import brendanSmallImg from "../../assets/trainer/small/Brendan_RS_OD.png?url";
-import type { GameVersion } from "../../data/sdk/model";
-import { getGameInfos } from "../../pokedex/details/util/get-game-infos";
+import type { GameVersion } from '../../data/sdk/model';
+import { useStaticData } from '../../hooks/use-static-data';
+import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
 
@@ -26,6 +25,10 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
   trainerGenderMale,
   version,
 }) => {
+  const staticData = useStaticData();
+
+  const gameInfos = getGameInfos(version);
+
   const date = new Date(lastWriteTime);
 
   const normTo2 = (value: number) => `${value < 10 ? "0" : ""}${value}`;
@@ -40,7 +43,6 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
       style={{
         display: "flex",
         borderRadius: 8,
-        // padding: 4,
         background: theme.bg.info,
         alignItems: "flex-start",
         textAlign: 'left',
@@ -48,9 +50,6 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
     >
       <div
         style={{
-          // marginLeft: -4,
-          // marginTop: -4,
-          // marginRight: 4,
           padding: 4,
           borderRadius: 8,
           borderBottomLeftRadius: 0,
@@ -58,7 +57,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
         }}
       >
         <img
-          src={brendanBigImg}
+          src={gameInfos.img}
           alt={generation + ""}
           style={{
             imageRendering: "pixelated",
@@ -81,7 +80,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
           <span style={{ color: theme.text.contrast }}>Gen {generation}</span>
           {" - "}
           <span style={{ color: theme.text.primary }}>
-            Pokemon {getGameInfos(version).text}
+            Pokemon {staticData.versions[ version ].name}
           </span>
           {" - "}
           <span style={{ color: theme.text.primary }}>{id}</span>
@@ -89,13 +88,6 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
           <br />
           OT {tid} -{" "}
           <span style={{ color: theme.text.primary }}>{trainerName}</span>
-          <img
-            src={brendanSmallImg}
-            style={{
-              margin: -10,
-              marginLeft: 0,
-            }}
-          />
           <br />
           Last sync <span style={{ color: theme.text.primary }}>{renderTimestamp()}</span>{" "}
           {Date.now() - date.getMilliseconds() < 3_600_000 && (

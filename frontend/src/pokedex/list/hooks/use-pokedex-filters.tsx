@@ -1,4 +1,5 @@
 import type { DexItemDTO } from "../../../data/sdk/model";
+import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 
 export const usePokedexFilters = () => {
@@ -9,6 +10,8 @@ export const usePokedexFilters = () => {
   const filterFromGames = Route.useSearch({ select: (search) => search.filterFromGames });
   const filterGenerations = Route.useSearch({ select: (search) => search.filterGenerations });
 
+  const staticData = useStaticData();
+
   const isPkmFiltered = (
     speciesValues: DexItemDTO[]
   ): boolean => {
@@ -16,7 +19,7 @@ export const usePokedexFilters = () => {
     const caught = speciesValues.some((spec) => spec.isCaught);
 
     if (filterSpeciesName) {
-      const name = speciesValues[ 0 ].speciesName;
+      const name = staticData.species[ speciesValues[ 0 ].species ].name;
 
       if (!name.toLowerCase().includes(filterSpeciesName.toLowerCase())) {
         return true;
@@ -56,7 +59,7 @@ export const usePokedexFilters = () => {
     if (filterGenerations?.length) {
       if (
         filterGenerations.every(
-          (generation) => generation !== speciesValues[ 0 ].generation
+          (generation) => generation !== staticData.species[ speciesValues[ 0 ].species ].generation
         )
       ) {
         return true;

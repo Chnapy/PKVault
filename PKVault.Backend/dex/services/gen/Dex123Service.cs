@@ -27,9 +27,10 @@ public class Dex123Service : DexGenService<SaveFile>
             Id = $"{species}_{saveId}",
             Species = species,
             SaveId = saveId,
-            SpeciesName = GameInfo.Strings.Species[species],
-            Type1 = save.Generation <= 2 ? GetG12Type(pi.Type1) : pi.Type1,
-            Type2 = save.Generation <= 2 ? GetG12Type(pi.Type2) : pi.Type2,
+            Types = [
+                save.Generation <= 2 ? GetG12Type(pi.Type1) : pi.Type1,
+                save.Generation <= 2 ? GetG12Type(pi.Type2) : pi.Type2
+            ],
             Abilities = [.. abilities.ToArray().Distinct()],
             BaseStats = baseStats,
             IsOnlyMale = pi.OnlyMale,

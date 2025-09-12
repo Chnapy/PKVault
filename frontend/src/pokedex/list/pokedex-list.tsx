@@ -1,12 +1,15 @@
 import React from "react";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import { useStaticData } from '../../hooks/use-static-data';
 import { theme } from '../../ui/theme';
 import { usePokedexFilters } from "./hooks/use-pokedex-filters";
 import { PokedexItem } from "./pokedex-item";
 
 export const PokedexList: React.FC = () => {
   // console.time("pokedex-list");
+
+  const staticData = useStaticData();
 
   const saveInfosData = useSaveInfosGetAll().data?.data;
 
@@ -40,24 +43,26 @@ export const PokedexList: React.FC = () => {
   });
 
   const items: React.ReactNode[] = filteredSpeciesList.map((species) => {
+    const statics = staticData.species[ species ];
+
     const speciesValues = Object.values(
       speciesRecord[ species + "" ] ?? {}
     ).filter(filterSpeciesValues);
 
     const seen = speciesValues.some((spec) => spec.isAnySeen);
     const caught = speciesValues.some((spec) => spec.isCaught);
-    const speciesName = speciesValues[ 0 ].speciesName;
+    const speciesName = statics.name;
 
     let divider: React.ReactNode = null;
 
-    if (speciesValues[ 0 ].generation !== currentGeneration) {
-      currentGeneration = speciesValues[ 0 ].generation;
+    if (statics.generation !== currentGeneration) {
+      currentGeneration = statics.generation;
 
       const allGenSpecies = filteredSpeciesList.filter(species => {
         const firstSpeciesValue = Object.values(
           speciesRecord[ species + "" ] ?? {}
         ).filter(filterSpeciesValues)[ 0 ];
-        return firstSpeciesValue.generation === currentGeneration;
+        return staticData.species[ firstSpeciesValue.species ].generation === currentGeneration;
       });
 
       const seenGenCount = allGenSpecies.filter(species => {
@@ -108,7 +113,7 @@ export const PokedexList: React.FC = () => {
         <PokedexItem
           species={species}
           speciesName={speciesName}
-          sprite={speciesValues[ 0 ].defaultSprite!}
+          sprite={statics.spriteDefault}
           seen={seen}
           caught={caught}
           caughtVersions={

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainDeletePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
+import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
 import { Button } from '../../ui/button/button';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
@@ -20,6 +21,8 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
 
     const navigate = Route.useNavigate();
     const navigateToSave = Route.useNavigate();
+
+    const staticData = useStaticData();
 
     const mainCreatePkmVersionMutation = useStorageMainCreatePkmVersion();
 
@@ -67,11 +70,19 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
 
     const isCompatibleWithSave = !save || species <= save.maxSpeciesId;
 
+    const sprite = pkmVersion.isShiny
+        ? staticData.species[ pkmVersion.species ].spriteShiny
+        : (pkmVersion.isEgg
+            ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png'
+            : staticData.species[ pkmVersion.species ].spriteDefault);
+
+    const ballSprite = staticData.items[ pkmVersion.ball ].sprite;
+
     return <StorageDetailsForm.Provider
         key={pkmVersion.id}
         nickname={pkmVersion.nickname}
         eVs={pkmVersion.eVs}
-        moves={pkmVersion.moves.map(move => move.id)}
+        moves={pkmVersion.moves}
     >
         <StorageMainDetails
             header={
@@ -128,8 +139,8 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
             speciesName={pkmVersion.speciesName}
             isShiny={pkmVersion.isShiny}
             isEgg={pkmVersion.isEgg}
-            sprite={pkmVersion.sprite}
-            ballSprite={pkmVersion.ballSprite}
+            sprite={sprite}
+            ballSprite={ballSprite}
             gender={pkmVersion.gender}
             nickname={pkmVersion.nickname}
             nicknameMaxLength={pkmVersion.nicknameMaxLength}
@@ -137,13 +148,13 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
             stats={pkmVersion.stats}
             ivs={pkmVersion.iVs}
             evs={pkmVersion.eVs}
-            hiddenPowerType={pkmVersion.hiddenPowerType}
+            hiddenPowerType={staticData.types[ pkmVersion.hiddenPowerType ].name}
             hiddenPowerPower={pkmVersion.hiddenPowerPower}
-            nature={pkmVersion.nature}
-            ability={pkmVersion.ability}
+            nature={staticData.natures[ pkmVersion.nature ].name}
+            ability={staticData.abilities[ pkmVersion.ability ].name}
             level={pkmVersion.level}
             exp={pkmVersion.exp}
-            moves={pkmVersion.moves}
+            moves={pkmVersion.moves.map(move => ({ id: move, text: staticData.moves[ move ].name, sourceTypes: [], type: -1 }))}
             availableMoves={pkmVersion.availableMoves}
             tid={pkmVersion.tid}
             originTrainerName={pkmVersion.originTrainerName}
@@ -151,8 +162,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
             originMetDate={pkmVersion.originMetDate}
             originMetLocation={pkmVersion.originMetLocation}
             originMetLevel={pkmVersion.originMetLevel}
-            heldItemSprite={pkmVersion.spriteItem}
-            heldItemText={pkmVersion.heldItemText}
+            heldItem={pkmVersion.heldItem}
             isValid={pkmVersion.isValid}
             validityReport={pkmVersion.validityReport}
             box={pkm.boxId}

@@ -38,8 +38,9 @@ public class Program
 
             Console.WriteLine($"Id={lastDto.Id}\nPID={lastDto.PID}\nNickname={lastDto.Nickname}"
                 + $"\nGender={lastDto.Gender}\nAV_ATK={lastDto.EVs[1]}\nAbility={lastDto.Ability}"
-                + $"\nMoves.1={lastDto.Moves[0].Text}\nMoves.2={lastDto.Moves[1].Text}\nMoves.3={lastDto.Moves[2].Text}\nMoves.4={lastDto.Moves[3].Text}"
-                + $"\nBallSprite={lastDto.BallSprite}");
+                + $"\nMoves.1={lastDto.Moves[0]}\nMoves.2={lastDto.Moves[1]}\nMoves.3={lastDto.Moves[2]}\nMoves.4={lastDto.Moves[3]}"
+                + $"\nBall={lastDto.Ball}"
+            );
             Console.WriteLine(lastDto.ValidityReport);
 
             return false;
@@ -100,7 +101,7 @@ public class Program
         }
 #endif
 
-        await LocalSaveService.PrepareTimerAndRun();
+        await LocalSaveService.ReadLocalSaves();
 
         await StorageService.ResetDataLoader();
 

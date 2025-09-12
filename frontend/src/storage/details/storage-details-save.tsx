@@ -1,5 +1,6 @@
 import React from 'react';
 import { useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageSaveDeletePkm, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
+import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
 import { StorageSaveDetails } from '../../ui/storage-item-details/storage-save-details';
@@ -14,6 +15,8 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
     saveId,
 }) => {
     const navigate = Route.useNavigate();
+
+    const staticData = useStaticData();
 
     const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm();
 
@@ -32,11 +35,19 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
     const pkmVersion = savePkm.pkmVersionId ? pkmVersionsQuery.data?.data.find(pkmVersion => pkmVersion.id === savePkm.pkmVersionId) : undefined;
     const pkm = pkmVersion ? pkmsQuery.data?.data.find(pkm => pkm.id === pkmVersion.pkmId) : undefined;
 
+    const sprite = savePkm.isShiny
+        ? staticData.species[ savePkm.species ].spriteShiny
+        : (savePkm.isEgg
+            ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png'
+            : staticData.species[ savePkm.species ].spriteDefault);
+
+    const ballSprite = staticData.items[ savePkm.ball ].sprite;
+
     return <StorageDetailsForm.Provider
         key={savePkm.id}
         nickname={savePkm.nickname}
         eVs={savePkm.eVs}
-        moves={savePkm.moves.map(move => move.id)}
+        moves={savePkm.moves}
     >
         <StorageSaveDetails
             id={savePkm.id}
@@ -49,8 +60,8 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
             isShiny={savePkm.isShiny}
             isEgg={savePkm.isEgg}
             isShadow={savePkm.isShadow}
-            sprite={savePkm.sprite}
-            ballSprite={savePkm.ballSprite}
+            sprite={sprite}
+            ballSprite={ballSprite}
             gender={savePkm.gender}
             nickname={savePkm.nickname}
             nicknameMaxLength={savePkm.nicknameMaxLength}
@@ -58,13 +69,13 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
             stats={savePkm.stats}
             ivs={savePkm.iVs}
             evs={savePkm.eVs}
-            hiddenPowerType={savePkm.hiddenPowerType}
+            hiddenPowerType={staticData.types[ savePkm.hiddenPowerType ].name}
             hiddenPowerPower={savePkm.hiddenPowerPower}
-            nature={savePkm.nature}
-            ability={savePkm.ability}
+            nature={staticData.natures[ savePkm.nature ].name}
+            ability={staticData.abilities[ savePkm.ability ].name}
             level={savePkm.level}
             exp={savePkm.exp}
-            moves={savePkm.moves}
+            moves={savePkm.moves.map(move => ({ id: move, text: staticData.moves[ move ].name, sourceTypes: [], type: -1 }))}
             availableMoves={savePkm.availableMoves}
             tid={savePkm.tid}
             originTrainerName={savePkm.originTrainerName}
@@ -72,8 +83,7 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
             originMetDate={savePkm.originMetDate}
             originMetLocation={savePkm.originMetLocation}
             originMetLevel={savePkm.originMetLevel}
-            heldItemSprite={savePkm.spriteItem}
-            heldItemText={savePkm.heldItemText}
+            heldItem={savePkm.heldItem}
             isValid={savePkm.isValid}
             validityReport={savePkm.validityReport}
             box={savePkm.box}

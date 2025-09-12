@@ -7,7 +7,6 @@ import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { DetailsCardContainer } from '../details-card/details-card-container';
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
 import { Gender } from '../gender/gender';
-import { ItemImg } from '../item-img/item-img';
 import { SaveCardContentSmall } from '../save-card/save-card-content-small';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
@@ -15,6 +14,7 @@ import { StorageDetailsForm } from './storage-details-form';
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
+import { useStaticData } from '../../hooks/use-static-data';
 
 export type StorageMainDetailsProps = {
   header: React.ReactNode;
@@ -55,8 +55,7 @@ export type StorageMainDetailsProps = {
   originMetLocation: string;
   originMetLevel?: number;
 
-  heldItemSprite?: number;
-  heldItemText?: string;
+  heldItem: number;
 
   isValid: boolean;
   validityReport: string;
@@ -121,8 +120,7 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
   originMetLocation,
   originMetLevel,
 
-  heldItemSprite,
-  heldItemText,
+  heldItem,
 
   isValid,
   validityReport,
@@ -147,6 +145,8 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
   onClose,
 }) => {
   const formContext = StorageDetailsForm.useContext();
+
+  const staticData = useStaticData();
 
   const getSaveItemProps = useSaveItemProps();
   const saveCardProps = saveId ? getSaveItemProps(saveId) : undefined;
@@ -238,11 +238,14 @@ export const StorageMainDetails: React.FC<StorageMainDetailsProps> = ({
           {validityReport}
         </TextContainer>}
 
-        {!!heldItemSprite && <TextContainer>
-          Held item <span style={{ color: theme.text.primary }}>{heldItemText}</span> <ItemImg spriteItem={heldItemSprite} alt={heldItemText} style={{
-            height: 24,
-            verticalAlign: 'middle'
-          }} />
+        {!!heldItem && <TextContainer>
+          Held item <span style={{ color: theme.text.primary }}>{staticData.items[ heldItem ].name}</span> <img
+            src={staticData.items[ heldItem ].sprite}
+            alt={staticData.items[ heldItem ].name}
+            style={{
+              height: 24,
+              verticalAlign: 'middle'
+            }} />
         </TextContainer>}
 
         {saveId && <>

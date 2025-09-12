@@ -187,12 +187,14 @@ public class PkmConvertService
         {
             if (destPkm is PB7 pb7)
             {
+                // TODO use EntityContext.GetSingleGameVersion()
                 pb7.Version = GameVersion.GO;
                 pb7.MetLocation = 0;
             }
             else if (destPkm.Format == 3)
             {
                 // pkmIntermediate.Origin
+                // TODO use EntityContext.GetSingleGameVersion()
                 destPkm.Version = GameVersion.E;
                 destPkm.FatefulEncounter = false;
                 destPkm.MetLocation = 0;

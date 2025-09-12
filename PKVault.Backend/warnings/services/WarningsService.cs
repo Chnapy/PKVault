@@ -84,7 +84,12 @@ public class WarningsService
         {
             if (pkm.SaveId != default)
             {
-                var saveLoader = loader.loaders.saveLoadersDict[(uint)pkm.SaveId];
+                var exists = loader.loaders.saveLoadersDict.TryGetValue((uint)pkm.SaveId, out var saveLoader);
+                if (!exists)
+                {
+                    return null;
+                }
+
                 var save = saveLoader.Save;
                 var generation = save.Generation;
 

@@ -29,8 +29,6 @@ public class SaveInfosDTO
         return new SaveInfosDTO
         {
             Id = save.ID32,
-            IsBackup = isBackup,
-            BackupTime = backupTime,
             LastWriteTime = lastWriteTime,
             Version = save.Version,
             Generation = save.Generation,
@@ -55,10 +53,6 @@ public class SaveInfosDTO
     }
 
     public uint Id { get; set; }
-
-    public bool IsBackup { get; set; }
-
-    public DateTime? BackupTime { get; set; }
 
     public DateTime LastWriteTime { get; set; }
 

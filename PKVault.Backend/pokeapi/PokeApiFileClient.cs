@@ -10,12 +10,7 @@ using PokeApiNet;
 public partial class PokeApiFileClient
 {
     private static readonly Assembly assembly = Assembly.GetExecutingAssembly();
-    private static readonly JsonSerializerOptions jsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-        PropertyNameCaseInsensitive = true,
-        DefaultBufferSize = 16 * 1024, // buffer 16 Ko
-    };
+    private static readonly JsonSerializerOptions jsonOptions = GetJsonOptions();
 
     public async Task<T?> GetAsync<T>(UrlNavigation<T> urlResource) where T : ResourceBase
     {
@@ -24,13 +19,18 @@ public partial class PokeApiFileClient
 
     public async Task<T?> GetAsync<T>(string name) where T : NamedApiResource
     {
+        if (name.Contains('★'))
+        {
+            return null;
+        }
+
         var formattedName = PokeApiNameFromPKHexName(name).ToLower();
 
         string url = GetApiEndpointString<T>();
 
         NamedApiResourceList<T>? page = await GetAsyncByPathname<NamedApiResourceList<T>>(url);
 
-        var namedApi = page?.Results.Find(resource => resource.Name.ToLower() == formattedName);
+        var namedApi = page!.Results.Find(resource => resource.Name.Equals(formattedName, StringComparison.CurrentCultureIgnoreCase));
         if (namedApi == null)
         {
             return null;
@@ -64,6 +64,11 @@ public partial class PokeApiFileClient
 
             return await DeserializeResource<T>(jsonStream);
         }
+        // catch
+        // {
+        //     Console.WriteLine($"Error with URL={url}");
+        //     throw;
+        // }
         finally
         {
             // return buffer to pool
@@ -130,6 +135,23 @@ public partial class PokeApiFileClient
         return gzipStream;
     }
 
+    private static JsonSerializerOptions GetJsonOptions()
+    {
+        var options = new JsonSerializerOptions()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            PropertyNameCaseInsensitive = true,
+            DefaultBufferSize = 16 * 1024, // buffer 16 Ko
+        };
+
+        // required for pokeapi deserialize (types are wrong sometimes)
+        options.Converters.Add(
+            new NumberToStringConverter()
+        );
+
+        return options;
+    }
+
     public static string PokeApiNameFromPKHexName(string pkhexName)
     {
         static string RemoveDiacritics(string text)
@@ -150,11 +172,10 @@ public partial class PokeApiFileClient
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
 
-        if (pkhexName.Contains('('))
-        {
-            return pkhexName;
-            // throw new Exception($"PKHex string not handled: {pkhexName}");
-        }
+        // if (pkhexName.Contains('('))
+        // {
+        //     return pkhexName;
+        // }
 
         var result = PascalCaseRegex().Replace(pkhexName, "$1-$2");
         result = SpaceRegex().Replace(result, "-").ToLower();

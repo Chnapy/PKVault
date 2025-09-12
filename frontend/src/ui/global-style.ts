@@ -12,16 +12,21 @@ injectGlobal(`
     // line-height: 1.5;
 
     color: ${theme.text.default};
-    text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+    text-shadow: ${theme.shadow.text};
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    background-color: #F3F4F4;
-    background-image: radial-gradient(#C4C6C8 2px, #F3F4F4 2px);
+    background-color: ${theme.bg.app};
+    background-image: radial-gradient(${theme.bg.appdark} 4px, ${theme.bg.app} 4px);
     background-size: 40px 40px;
+  }
+
+  * {
+    box-sizing: border-box;
+    scrollbar-width: thin;
   }
 
   body {

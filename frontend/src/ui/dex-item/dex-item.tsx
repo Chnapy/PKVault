@@ -33,8 +33,8 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
   ({ species, speciesName, sprite, seen, caught, caughtVersions, seenOnlyVersions, selected, onClick }) => {
     // const pokeballSprite = staticData.item.pkball.sprites.default;
 
-    const caughtGamesColors = caughtVersions.map(getGameInfos).map(infos => infos.bgColor ?? theme.bg.dark);
-    const seenOnlyGamesColors = seenOnlyVersions.map(getGameInfos).map(infos => infos.bgColor ?? theme.bg.dark);
+    const caughtGamesColors = caughtVersions.map(getGameInfos).map(infos => infos.color);
+    const seenOnlyGamesColors = seenOnlyVersions.map(getGameInfos).map(infos => infos.color);
 
     return (
       <Container

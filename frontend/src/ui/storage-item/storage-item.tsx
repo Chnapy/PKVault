@@ -3,7 +3,6 @@ import { Container } from "../container/container";
 import { useDraggable } from "@dnd-kit/core";
 import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png?url';
 import { theme } from '../theme';
-import { ItemImg } from '../item-img/item-img';
 
 export type StorageItemProps = {
   storageType: "main" | "save";
@@ -13,7 +12,7 @@ export type StorageItemProps = {
   isShiny: boolean;
   isShadow: boolean;
   sprite: string;
-  heldItemSprite?: number;
+  heldItemSprite?: string;
   selected?: boolean;
   onClick?: () => void;
   warning?: boolean;
@@ -80,12 +79,12 @@ export const StorageItem: React.FC<StorageItemProps> = ({
         }}
       />
 
-      {heldItemSprite && <ItemImg
-        spriteItem={heldItemSprite}
+      {heldItemSprite && <img
+        src={heldItemSprite}
         style={{
           position: 'absolute',
-          bottom: 4,
-          left: 4,
+          bottom: 0,
+          left: 0,
         }}
       />}
 

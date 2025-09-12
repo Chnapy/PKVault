@@ -14,6 +14,22 @@ public class SaveInfosController : ControllerBase
         return LocalSaveService.GetAllSaveInfos();
     }
 
+    [HttpPut()]
+    public async Task<ActionResult<DataDTO>> Scan()
+    {
+        await LocalSaveService.ReadLocalSaves();
+
+        return await DataDTO.FromDataUpdateFlags(new()
+        {
+            Saves = [
+                new (){
+                    SaveId = 0
+                }
+            ],
+            SaveInfos = true,
+        });
+    }
+
     [HttpPost()]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<DataDTO>> Upload([BindRequired] IFormFile saveFile)

@@ -54,9 +54,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return Pkm.IsShiny; }
     }
 
-    public string? Sprite { get; set; }
-
-    public string? BallSprite { get; set; }
+    public byte Ball { get => Pkm.Ball; }
 
     public GenderType? Gender
     {
@@ -175,15 +173,13 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         }
     }
 
-    public string HiddenPowerType
+    public byte HiddenPowerType
     {
         get
         {
             HiddenPower.TryGetTypeIndex(Pkm.HPType, out var hptype);
 
-            var type = PKHexUtils.StringsFR.Types[hptype];
-
-            return type;
+            return hptype;
         }
     }
 
@@ -192,58 +188,28 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return Pkm.HPPower; }
     }
 
-    public string? Nature { get; set; }
+    public PKHeX.Core.Nature Nature { get => Pkm.Nature; }
 
-    public string? Ability
+    public int Ability
     {
         get
         {
             return Pkm.Ability == -1
-                ? null
-                : PKHexUtils.StringsFR.Ability[Pkm.Ability];
+                ? 0
+                : Pkm.Ability;
         }
     }
 
-    public List<MoveItem> Moves
+    public List<ushort> Moves
     {
         get
         {
-            var legality = new LegalityAnalysis(Pkm);
-
-            List<MoveSourceType> moveSourceTypes = [
-                MoveSourceType.LevelUp,
-                MoveSourceType.RelearnMoves,
-                MoveSourceType.Machine,
-                MoveSourceType.TypeTutor,
-                MoveSourceType.SpecialTutor,
-                MoveSourceType.EnhancedTutor,
-                MoveSourceType.SharedEggMove,
-                MoveSourceType.TechnicalRecord,
-                MoveSourceType.Evolve,
-            ];
-
-            var moveSourceTypesRecord = new Dictionary<MoveSourceType, bool[]>();
-            moveSourceTypes.ForEach(type =>
-            {
-                moveSourceTypesRecord.Add(type, LearnPossible.Get(Pkm, legality.EncounterOriginal, legality.Info.EvoChainsAllGens, type));
-            });
-
-            var movesStr = PKHexUtils.StringsFR.movelist;
-
-            var rawMoves = new List<ushort>{
+            return [
                 Pkm.Move1,
                 Pkm.Move2,
                 Pkm.Move3,
                 Pkm.Move4
-            };
-
-            return [.. rawMoves.Select(id => new MoveItem
-            {
-                Id = id,
-                Type = MoveInfo.GetType(id, Pkm.Context),
-                Text = movesStr[id],
-                SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Count() > id && moveSourceTypesRecord[type][id]),
-            })];
+            ];
         }
     }
 
@@ -287,30 +253,6 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return ItemConverter.GetItemForFormat(Pkm.HeldItem, Pkm.Context, EntityContext.Gen9); }
     }
 
-    public int? SpriteItem
-    {
-        get
-        {
-            if (Pkm.HeldItem == 0)
-            {
-                return null;
-            }
-            return Pkm.SpriteItem;
-        }
-    }
-
-    public string? HeldItemText
-    {
-        get
-        {
-            if (Pkm.HeldItem == 0)
-            {
-                return null;
-            }
-            return PKHexUtils.StringsFR.GetItemStrings(Pkm.Context, Pkm.Version)[Pkm.HeldItem];
-        }
-    }
-
     public string DynamicChecksum
     {
         get { return $"{Nickname}.{Level}.{Exp}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}"; }
@@ -330,26 +272,12 @@ public abstract class BasePkmVersionDTO : IWithId<string>
             var moveComboSource = new LegalMoveComboSource();
             var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
 
-            moveSource.ChangeMoveSource(GameInfo.MoveDataSource);
+            var blankSav = SaveUtil.GetBlankSAV(Pkm.Version, Pkm.OriginalTrainerName, (LanguageID)Pkm.Language);
+
+            // TODO perf issue ? should be done once for each save type
+            var filteredSources = new FilteredGameDataSource(blankSav, GameInfo.Sources);
+            moveSource.ChangeMoveSource(filteredSources.Moves);
             moveSource.ReloadMoves(legality);
-
-            List<MoveSourceType> moveSourceTypes = [
-                MoveSourceType.LevelUp,
-                MoveSourceType.RelearnMoves,
-                MoveSourceType.Machine,
-                MoveSourceType.TypeTutor,
-                MoveSourceType.SpecialTutor,
-                MoveSourceType.EnhancedTutor,
-                MoveSourceType.SharedEggMove,
-                MoveSourceType.TechnicalRecord,
-                MoveSourceType.Evolve,
-            ];
-
-            var moveSourceTypesRecord = new Dictionary<MoveSourceType, bool[]>();
-            moveSourceTypes.ForEach(type =>
-            {
-                moveSourceTypesRecord.Add(type, LearnPossible.Get(Pkm, legality.EncounterOriginal, legality.Info.EvoChainsAllGens, type));
-            });
 
             var movesStr = PKHexUtils.StringsFR.movelist;
 
@@ -359,13 +287,12 @@ public abstract class BasePkmVersionDTO : IWithId<string>
             {
                 if (moveSource.Info.CanLearn((ushort)data.Value))
                 {
-                    var types = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Length > data.Value && moveSourceTypesRecord[type][data.Value]);
                     var item = new MoveItem
                     {
                         Id = data.Value,
-                        Type = MoveInfo.GetType((ushort)data.Value, Pkm.Context),
-                        Text = movesStr[data.Value],
-                        SourceTypes = types,
+                        // Type = MoveInfo.GetType((ushort)data.Value, Pkm.Context),
+                        // Text = movesStr[data.Value],
+                        // SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Length > data.Value && moveSourceTypesRecord[type][data.Value]),
                     };
                     availableMoves.Add(item);
                 }
@@ -406,49 +333,8 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     public async Task RefreshAsyncData(SaveFile save)
     {
         await Task.WhenAll(
-            RefreshSprite(),
-            RefreshBallSprite(),
-            RefreshNature(),
             RefreshHasTradeEvolve(save)
         );
-    }
-
-    private async Task RefreshSprite()
-    {
-        var pkmObj = await PokeApi.GetPokemon(Species);
-
-        Sprite = IsEgg
-            ? "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png"
-            : (
-                IsShiny
-                    ? pkmObj.Sprites.FrontShiny
-                    : pkmObj.Sprites.FrontDefault
-            );
-    }
-
-    private async Task RefreshBallSprite()
-    {
-        BallSprite = Pkm.Ball > 0
-            ? (await PokeApi.GetItem(Pkm.Ball))?.Sprites.Default
-            : null;
-    }
-
-    private async Task RefreshNature()
-    {
-        if (Pkm.Format <= 2)
-        {
-            Nature = null;
-        }
-        else
-        {
-            var natureName = GameInfo.Strings.natures[(int)Pkm.Nature];
-
-            var nature = await PokeApi.GetNature(natureName);
-
-            var natureText = nature?.Names.Find(name => name.Language.Name == "fr")?.Name;
-
-            Nature = natureText;
-        }
     }
 
     private async Task RefreshHasTradeEvolve(SaveFile save)

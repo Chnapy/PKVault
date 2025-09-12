@@ -8,7 +8,7 @@ const root = (props: ContainerProps) =>
   css({
     display: "inline-block",
     backgroundColor: theme.bg.default,
-    border: theme.border.default,
+    border: `1px solid ${theme.border.default}`,
     padding: switchUtil(props.padding ?? "default", {
       small: 1,
       default: 2,
@@ -36,7 +36,7 @@ const root = (props: ContainerProps) =>
           }
           : undefined,
     },
-    outline: `0 solid ${theme.border.contrast}`,
+    outline: `0 solid ${theme.border.focus}`,
     outlineWidth: props.selected ? 2 : undefined,
     "&:disabled": {
       opacity: 0.5,

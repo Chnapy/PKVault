@@ -1,6 +1,7 @@
 import React from "react";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from "../../routes/pokedex";
 import { DetailsCard } from "../../ui/details-card/details-card";
 import { GameButton } from "./game-button";
@@ -11,6 +12,8 @@ export const PokedexDetails: React.FC = () => {
     select: (search) => search.selected,
   });
   const navigate = Route.useNavigate();
+
+  const staticData = useStaticData();
 
   const dexGetAllQuery = useDexGetAll();
   const saveInfosMainQuery = useSaveInfosGetAll();
@@ -48,9 +51,10 @@ export const PokedexDetails: React.FC = () => {
   )!;
 
   const caught = selectedSpeciesValue.isCaught;
-  const speciesName = selectedSpeciesValue.speciesName;
 
-  const genders = selectedSpeciesValue.genders;
+  const { name: speciesName, genders, spriteDefault, spriteShiny } = staticData.species[ selectedSpecies ];
+  const typeNames = selectedSpeciesValue.types.map(type => staticData.types[ type ].name);
+  const abilityNames = selectedSpeciesValue.abilities.map(ability => staticData.abilities[ ability ].name);
 
   const stats = selectedSpeciesValue.baseStats;
 
@@ -63,15 +67,15 @@ export const PokedexDetails: React.FC = () => {
       // hasShiny={false} // TODO
       localSpecies={localSpecies}
       genders={genders}
-      types={selectedSpeciesValue.types}
-      description={selectedSpeciesValue.description}
-      abilities={selectedSpeciesValue.abilitiesLabel}
+      types={typeNames}
+      // description={selectedSpeciesValue.description}
+      abilities={abilityNames}
       abilitiesHidden={[]}
       stats={stats}
       caught={caught}
-      defaultSprite={selectedSpeciesValue.defaultSprite}
-      shinySprite={selectedSpeciesValue.shinySprite}
-      ballSprite={selectedSpeciesValue.ballSprite}
+      defaultSprite={spriteDefault}
+      shinySprite={spriteShiny}
+      ballSprite={staticData.itemPokeball.sprite}
       fromSaves={
         <>
           {gameSaves.map(({ id, version, trainerName }, i) => (

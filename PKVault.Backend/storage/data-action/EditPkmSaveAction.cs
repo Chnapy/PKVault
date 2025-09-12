@@ -28,10 +28,10 @@ public class EditPkmSaveAction : DataAction
         var saveLoaders = loaders.saveLoadersDict[saveId];
         var pkmSave = await saveLoaders.Pkms.GetDto(pkmSaveId);
 
-        if (pkmSave.PkmVersionId != default)
-        {
-            throw new Exception("Edit not possible for pkm attached with save");
-        }
+        // if (pkmSave.PkmVersionId != default)
+        // {
+        //     throw new Exception("Edit not possible for pkm attached with save");
+        // }
 
         var pkm = pkmSave.Pkm;
 

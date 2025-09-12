@@ -9,7 +9,9 @@ import { useStorageGetActions } from '../../data/sdk/storage/storage.gen';
 import { Button } from '../../ui/button/button';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { Container } from "../../ui/container/container";
+import { Icon } from '../../ui/icon/icon';
 import { SaveCardContentFull } from '../../ui/save-card/save-card-content-full';
+import { theme } from '../../ui/theme';
 
 export type SaveItemProps = {
   saveId: number;
@@ -51,7 +53,15 @@ export const SaveItem: React.FC<SaveItemProps> = ({
     <Container
       as={onClick ? "button" : "div"}
       padding="big"
-      style={{ display: "flex", flexDirection: "column", gap: 4, width: 350 }}
+      style={{
+        backgroundColor: onClick
+          ? theme.bg.light
+          : theme.bg.panel,
+        display: "flex",
+        flexDirection: "column",
+        gap: 4,
+        width: 350
+      }}
       onClick={onClick}
     >
       {mainSave && <SaveCardContentFull
@@ -67,75 +77,24 @@ export const SaveItem: React.FC<SaveItemProps> = ({
         dexCaughtCount={mainSave.dexCaughtCount}
         ownedCount={mainSave.ownedCount}
         shinyCount={mainSave.shinyCount}
-        actions={!hasStockageActions &&
+        actions={showDelete && !hasStockageActions &&
           <>
-            <Button as='a' href={downloadUrl}>
-              Download
+            <Button<'a'> as='a' href={downloadUrl}>
+              <Icon name='download' forButton />
             </Button>
 
-            {mainSave.canDelete &&
-              showDelete && <>
-                <ButtonWithConfirm onClick={() =>
-                  saveInfosDeleteMutation.mutateAsync({
-                    params: {
-                      saveId: mainSave.id,
-                    },
-                  })}>
-                  Delete
-                </ButtonWithConfirm>
-              </>}
+            {mainSave.canDelete && <>
+              <ButtonWithConfirm onClick={() =>
+                saveInfosDeleteMutation.mutateAsync({
+                  params: {
+                    saveId: mainSave.id,
+                  },
+                })} bgColor={theme.bg.red}>
+                <Icon name='trash' solid forButton />
+              </ButtonWithConfirm>
+            </>}
           </>}
       />}
-
-      {/* {showOldSaves && backupSaves.length > 0 && (
-        <>
-          <Button onClick={() => setShowBackups(!showBackups)}>
-            {showBackups ? "Hide" : "Show"} backups (
-            {backupSaves.length})
-          </Button>
-
-          {showBackups &&
-            backupSaves.map((item) => (
-              <SaveCardContentFull
-                key={item.lastWriteTime}
-                id={item.id}
-                generation={item.generation}
-                version={item.version}
-                trainerName={item.trainerName}
-                trainerGenderMale={item.trainerGender === 0}
-                tid={item.tid}
-                lastWriteTime={item.lastWriteTime}
-                playTime={item.playTime}
-                dexSeenCount={item.dexSeenCount}
-                dexCaughtCount={item.dexCaughtCount}
-                ownedCount={item.ownedCount}
-                shinyCount={item.shinyCount}
-                actions={<>
-                  <ButtonWithConfirm onClick={() =>
-                    saveInfosRestoreBackupMutation.mutateAsync({
-                      params: {
-                        saveId: item.id,
-                        backupTime: item.backupTime!,
-                      },
-                    })
-                  }>
-                    Restore
-                  </ButtonWithConfirm>
-
-                  <ButtonWithConfirm onClick={() =>
-                    saveInfosDeleteMutation.mutateAsync({
-                      params: {
-                        saveId: item.id,
-                        backupTime: item.backupTime,
-                      },
-                    })}>
-                    Delete
-                  </ButtonWithConfirm>
-                </>}
-              />
-            ))}
-        </>
-      )} */}
     </Container>
   );
 };

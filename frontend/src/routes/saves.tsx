@@ -1,16 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type React from "react";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
-import { Backup } from '../saves/backup/backup';
+import { useStaticData } from '../hooks/use-static-data';
 import { SaveItem } from "../saves/save-item/save-item";
-import { SaveUpload } from "../saves/save-upload/save-upload";
+import { TitledContainer } from '../ui/container/titled-container';
 
 const Saves: React.FC = () => {
+  const staticData = useStaticData();
   const saveInfosQuery = useSaveInfosGetAll();
 
   if (!saveInfosQuery.data) {
     return null;
   }
+
+  const generations = [ ...new Set(Object.values(staticData.versions).map(version => version.generation)) ].sort();
 
   const saveInfos = Object.values(saveInfosQuery.data.data).sort((a, b) => {
     return a.lastWriteTime > b.lastWriteTime ? -1 : 1;
@@ -27,22 +30,36 @@ const Saves: React.FC = () => {
         gap: 16,
       }}
     >
-      <SaveUpload />
+      <div
+        style={{
+          display: 'flex',
+          gap: 16,
+          alignItems: 'flex-start',
+          flexWrap: 'wrap'
+        }}
+      >
+        {generations.map(generation => {
+          const saves = saveInfos.filter(save => save.generation === generation);
+          if (saves.length === 0) {
+            return null;
+          }
 
-      <div style={{
-        width: '100%',
-        display: "flex",
-        alignItems: "flex-start",
-        justifyContent: "center",
-        flexWrap: "wrap",
-        gap: 8,
-      }}>
-        {saveInfos.map((save, i) => (
-          <SaveItem key={i} saveId={save.id} showDelete />
-        ))}
+          const maxSpecies = Math.max(...saves.map(save => save.maxSpeciesId));
+
+          return <TitledContainer key={generation} title={`Generation ${generation} / ${maxSpecies} species`}>
+            <div
+              style={{
+                display: 'flex',
+                gap: 8,
+                alignItems: 'flex-start',
+                flexWrap: 'wrap'
+              }}
+            >
+              {saves.map(save => <SaveItem key={save.id} saveId={save.id} showDelete />)}
+            </div>
+          </TitledContainer>;
+        })}
       </div>
-
-      <Backup />
     </div>
   );
 };

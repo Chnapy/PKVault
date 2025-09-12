@@ -1,5 +1,6 @@
 import React from "react";
 import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
+import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
 
@@ -8,9 +9,11 @@ export const FilterGeneration: React.FC = () => {
   const searchValue =
     Route.useSearch({ select: (search) => search.filterGenerations }) ?? [];
 
+  const staticData = useStaticData();
+
   const dexAll = useDexGetAll().data?.data ?? {};
   const allGenerations = [ ...new Set(
-    Object.values(dexAll).flatMap(value => Object.values(value)).flatMap(value => value.generation)
+    Object.values(dexAll).flatMap(value => Object.values(value)).flatMap(value => staticData.species[ value.species ].generation)
   ) ];
 
   const options = allGenerations.map((generation) => ({

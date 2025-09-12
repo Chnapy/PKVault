@@ -1,25 +1,20 @@
 import { createRootRoute, Outlet, useMatchRoute } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type React from "react";
-import { Header } from "../ui/header/header";
+import { useSaveInfosScan } from '../data/sdk/save-infos/save-infos.gen';
+import { Button } from '../ui/button/button';
+import { Frame } from '../ui/header/frame';
 import { HeaderItem } from "../ui/header/header-item";
+import { Icon } from '../ui/icon/icon';
 import { Warnings } from '../warnings/warnings';
 
 const Root: React.FC = () => {
   const matchRoute = useMatchRoute();
 
+  const savesScanMutation = useSaveInfosScan();
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-        gap: 16,
-        height: "100vh",
-        overflowY: "scroll",
-      }}
-    >
-      <Header>
+    <Frame
+      headerItems={<>
         <HeaderItem
           selected={Boolean(
             matchRoute({ to: "/saves" }) ||
@@ -47,8 +42,29 @@ const Root: React.FC = () => {
         >
           Pokedex
         </HeaderItem>
-      </Header>
 
+        <Button
+          onClick={() => savesScanMutation.mutateAsync()}
+        >
+          <Icon
+            name='refresh'
+            forButton
+          />
+          Scan saves
+        </Button>
+
+        <HeaderItem
+          selected={Boolean(
+            matchRoute({ to: "/settings" }) ||
+            matchRoute({ to: "/settings", pending: true })
+          )}
+          to={"/settings"}
+          endPosition
+        >
+          Backups & settings
+        </HeaderItem>
+      </>}
+    >
       <div
         style={{
           alignSelf: 'center',
@@ -67,9 +83,7 @@ const Root: React.FC = () => {
       >
         <Outlet />
       </div>
-
-      <TanStackRouterDevtools />
-    </div>
+    </Frame>
   );
 };
 

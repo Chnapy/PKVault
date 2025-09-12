@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
+using Svg;
 
 namespace PKVault.WinForm;
 
@@ -37,9 +38,16 @@ partial class MainForm
     /// </summary>
     private void InitializeComponent()
     {
+        var assembly = Assembly.GetExecutingAssembly();
+        using Stream iconStream = assembly.GetManifestResourceStream("PKVault.WinForm.wwwroot.icon.ico");
+        using Stream logoStream = assembly.GetManifestResourceStream("PKVault.WinForm.wwwroot.logo.svg");
+
         webView = new Microsoft.Web.WebView2.WinForms.WebView2();
         ((System.ComponentModel.ISupportInitialize)webView).BeginInit();
         SuspendLayout();
+
+        var clientSize = new Size(1360, 800);
+
         // 
         // webView21
         // 
@@ -49,20 +57,34 @@ partial class MainForm
         webView.Location = new Point(0, 0);
         webView.Margin = new Padding(0);
         webView.Name = "webView";
-        webView.Size = new Size(800, 450);
+        webView.Size = clientSize;
         // webView.Source = new Uri("", UriKind.Relative);
         webView.TabIndex = 0;
         webView.ZoomFactor = 1D;
+        webView.DefaultBackgroundColor = Color.Transparent;
+        // 
+        // Logo
+        // 
+        var pictureBox = new PictureBox
+        {
+            Image = SvgDocument.Open<SvgDocument>(logoStream).Draw(128, 128),
+            SizeMode = PictureBoxSizeMode.CenterImage,
+            Dock = DockStyle.Fill,
+            BackColor = Color.Transparent
+        };
         // 
         // MainForm
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(800, 450);
+        ClientSize = clientSize;
         Controls.Add(webView);
+        Controls.Add(pictureBox);
         Name = "MainForm";
         Text = "PKVault";
-        // Icon = ;
+        BackColor = Color.FromArgb(182, 99, 78);
+        Icon = new Icon(iconStream);
+
         ((System.ComponentModel.ISupportInitialize)webView).EndInit();
         ResumeLayout(false);
     }

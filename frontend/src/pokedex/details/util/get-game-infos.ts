@@ -2,6 +2,49 @@ import type { GameVersion } from "../../../data/sdk/model";
 import { theme } from "../../../ui/theme";
 import { switchUtil } from "../../../util/switch-util";
 
+import alphaSapphireImg from '../../../assets/game_icons/alpha-sapphire.png';
+import blackImg from '../../../assets/game_icons/black.png';
+import black2Img from '../../../assets/game_icons/black2.png';
+import blueImg from '../../../assets/game_icons/blue.png';
+import boxRSImg from '../../../assets/game_icons/box-rs.png';
+import brillantDiamondImg from '../../../assets/game_icons/brillant-diamond.png';
+import colosseumImg from '../../../assets/game_icons/colosseum.png';
+import crystalImg from '../../../assets/game_icons/crystal.png';
+import defaultImg from '../../../assets/game_icons/default.png';
+import diamondImg from '../../../assets/game_icons/diamond.png';
+import emeraldImg from '../../../assets/game_icons/emerald.png';
+import fireredImg from '../../../assets/game_icons/firered.png';
+import goImg from '../../../assets/game_icons/go.png';
+import goldImg from '../../../assets/game_icons/gold.png';
+import heartgoldImg from '../../../assets/game_icons/heartgold.png';
+import leafgreenImg from '../../../assets/game_icons/leafgreen.png';
+import legendImg from '../../../assets/game_icons/legend-arceus.png';
+import letsgoevoliImg from '../../../assets/game_icons/letsgoevoli.png';
+import letsgopikachuImg from '../../../assets/game_icons/letsgopikachu.png';
+import moonImg from '../../../assets/game_icons/moon.png';
+import omegaRubyImg from '../../../assets/game_icons/omega-ruby.png';
+import pearlImg from '../../../assets/game_icons/pearl.png';
+import platinumImg from '../../../assets/game_icons/platinum.png';
+import redImg from '../../../assets/game_icons/red.png';
+import rubyImg from '../../../assets/game_icons/ruby.png';
+import sapphireImg from '../../../assets/game_icons/sapphire.png';
+import scarletImg from '../../../assets/game_icons/scarlet.png';
+import shieldImg from '../../../assets/game_icons/shield.png';
+import shiningPearlImg from '../../../assets/game_icons/shining-pearl.png';
+import silverImg from '../../../assets/game_icons/silver.png';
+import soulsilverImg from '../../../assets/game_icons/soulsilver.png';
+import sunImg from '../../../assets/game_icons/sun.png';
+import swordImg from '../../../assets/game_icons/sword.png';
+import ultraMoonImg from '../../../assets/game_icons/ultra-moon.png';
+import ultraSunImg from '../../../assets/game_icons/ultra-sun.png';
+import violetImg from '../../../assets/game_icons/violet.png';
+import whiteImg from '../../../assets/game_icons/white.png';
+import white2Img from '../../../assets/game_icons/white2.png';
+import xImg from '../../../assets/game_icons/x.png';
+import xdImg from '../../../assets/game_icons/xd.png';
+import yImg from '../../../assets/game_icons/y.png';
+import yellowImg from '../../../assets/game_icons/yellow.png';
+
 export const getGameInfos = (version: GameVersion) => {
   /**
    * Specs from GameVersion.cs & pokeapi.co
@@ -12,414 +55,348 @@ export const getGameInfos = (version: GameVersion) => {
       Record<
         number,
         () => {
-          pokeapiName?: string;
-          bgColor?: string;
-          text: string;
+          img?: string;
+          color?: string;
         }
       >
     >(version, {
       1: () => ({
-        pokeapiName: "sapphire",
-        bgColor: theme.game.saphir,
-        text: "Sapphire",
+        img: sapphireImg,
+        color: theme.game.saphir,
       }),
       2: () => ({
-        pokeapiName: "ruby",
-        bgColor: theme.game.ruby,
-        text: "Ruby",
+        img: rubyImg,
+        color: theme.game.ruby,
       }),
       3: () => ({
-        pokeapiName: "emerald",
-        bgColor: theme.game.emerald,
-        text: "Emerald",
+        img: emeraldImg,
+        color: theme.game.emerald,
       }),
       4: () => ({
-        pokeapiName: "firered",
-        bgColor: theme.game.red,
-        text: "FireRed",
+        img: fireredImg,
+        color: theme.game.red,
       }),
       5: () => ({
-        pokeapiName: "leafgreen",
-        // bgColor: theme.game.,
-        text: "LeafGreen",
+        img: leafgreenImg,
+        // color: theme.game.,
       }),
 
       7: () => ({
-        pokeapiName: "heartgold",
-        bgColor: theme.game.gold,
-        text: "HeartGold",
+        img: heartgoldImg,
+        color: theme.game.gold,
       }),
       8: () => ({
-        pokeapiName: "soulsilver",
-        bgColor: theme.game.silver,
-        text: "SoulSilver",
+        img: soulsilverImg,
+        color: theme.game.silver,
       }),
 
       10: () => ({
-        pokeapiName: "diamond",
-        // bgColor: theme.game.,
-        text: "Diamond",
+        img: diamondImg,
+        // color: theme.game.,
       }),
       11: () => ({
-        pokeapiName: "pearl",
-        // bgColor: theme.game.,
-        text: "Pearl",
+        img: pearlImg,
+        // color: theme.game.,
       }),
       12: () => ({
-        pokeapiName: "platinium",
-        // bgColor: theme.game.,
-        text: "Platinum",
+        img: platinumImg,
+        // color: theme.game.,
       }),
 
       15: () => ({
-        pokeapiName: "colosseum",
-        // bgColor: theme.game.,
-        text: "ColosseumXD",
+        img: colosseumImg,
+        // color: theme.game.,
       }),
 
       20: () => ({
-        pokeapiName: "white",
-        // bgColor: theme.game.,
-        text: "White",
+        img: whiteImg,
+        // color: theme.game.,
       }),
       21: () => ({
-        pokeapiName: "black",
-        // bgColor: theme.game.,
-        text: "Black",
+        img: blackImg,
+        // color: theme.game.,
       }),
       22: () => ({
-        pokeapiName: "white-2",
-        // bgColor: theme.game.,
-        text: "White2",
+        img: white2Img,
+        // color: theme.game.,
       }),
       23: () => ({
-        pokeapiName: "black-2",
-        // bgColor: theme.game.,
-        text: "Black2",
+        img: black2Img,
+        // color: theme.game.,
       }),
 
       24: () => ({
-        pokeapiName: "x",
-        // bgColor: theme.game.,
-        text: "X",
+        img: xImg,
+        // color: theme.game.,
       }),
       25: () => ({
-        pokeapiName: "y",
-        // bgColor: theme.game.,
-        text: "Y",
+        img: yImg,
+        // color: theme.game.,
       }),
       26: () => ({
-        pokeapiName: "alpha-sapphire",
-        // bgColor: theme.game.,
-        text: "Alpha Sapphire",
+        img: alphaSapphireImg,
+        // color: theme.game.,
       }),
       27: () => ({
-        pokeapiName: "omega-ruby",
-        // bgColor: theme.game.,
-        text: "Omega Ruby",
+        img: omegaRubyImg,
+        // color: theme.game.,
       }),
 
       30: () => ({
-        pokeapiName: "sun",
-        // bgColor: theme.game.,
-        text: "Sun",
+        img: sunImg,
+        // color: theme.game.,
       }),
       31: () => ({
-        pokeapiName: "moon",
-        // bgColor: theme.game.,
-        text: "Moon",
+        img: moonImg,
+        // color: theme.game.,
       }),
       32: () => ({
-        pokeapiName: "ultra-sun",
-        // bgColor: theme.game.,
-        text: "UltraSun",
+        img: ultraSunImg,
+        // color: theme.game.,
       }),
       33: () => ({
-        pokeapiName: "ultra-moon",
-        // bgColor: theme.game.,
-        text: "UltraMoon",
+        img: ultraMoonImg,
+        // color: theme.game.,
       }),
 
       34: () => ({
-        // bgColor: theme.game.,
-        text: "GO",
+        img: goImg,
+        // color: theme.game.,
       }),
 
       35: () => ({
-        pokeapiName: "red",
-        bgColor: theme.game.red,
-        text: "Red",
+        img: redImg,
+        color: theme.game.red,
       }),
       36: () => ({
-        pokeapiName: "blue",
-        bgColor: theme.game.blue,
-        text: "Blue",
+        img: blueImg,
+        color: theme.game.blue,
       }),
       37: () => ({
-        pokeapiName: "blue",
-        bgColor: theme.game.blue,
-        text: "Blue",
+        img: blueImg,
+        color: theme.game.blue,
       }),
       38: () => ({
-        pokeapiName: "yellow",
-        bgColor: theme.game.yellow,
-        text: "Yellow",
+        img: yellowImg,
+        color: theme.game.yellow,
       }),
       39: () => ({
-        pokeapiName: "gold",
-        bgColor: theme.game.gold,
-        text: "Gold",
+        img: goldImg,
+        color: theme.game.gold,
       }),
       40: () => ({
-        pokeapiName: "silver",
-        bgColor: theme.game.silver,
-        text: "Silver",
+        img: silverImg,
+        color: theme.game.silver,
       }),
       41: () => ({
-        pokeapiName: "crystal",
-        bgColor: theme.game.crystal,
-        text: "Crystal",
+        img: crystalImg,
+        color: theme.game.crystal,
       }),
 
       42: () => ({
-        pokeapiName: "lets-go-pikachu",
-        // bgColor: theme.game.,
-        text: "Let's Go, Pikachu!",
+        img: letsgopikachuImg,
+        // color: theme.game.,
       }),
       43: () => ({
-        pokeapiName: "lets-go-eevee",
-        // bgColor: theme.game.,
-        text: "Let's Go, Eevee!",
+        img: letsgoevoliImg,
+        // color: theme.game.,
       }),
       44: () => ({
-        pokeapiName: "sword",
-        // bgColor: theme.game.,
-        text: "Sword",
+        img: swordImg,
+        // color: theme.game.,
       }),
       45: () => ({
-        pokeapiName: "shield",
-        // bgColor: theme.game.,
-        text: "Shield",
+        img: shieldImg,
+        // color: theme.game.,
       }),
       47: () => ({
-        pokeapiName: "legends-arceus",
-        // bgColor: theme.game.,
-        text: "Arceus",
+        img: legendImg,
+        // color: theme.game.,
       }),
       48: () => ({
-        pokeapiName: "brillant-diamond",
-        // bgColor: theme.game.,
-        text: "Br. Diamond",
+        img: brillantDiamondImg,
+        // color: theme.game.,
       }),
       49: () => ({
-        pokeapiName: "brillant-pearl",
-        // bgColor: theme.game.,
-        text: "Sh. Pearl",
+        img: shiningPearlImg,
+        // color: theme.game.,
       }),
       50: () => ({
-        pokeapiName: "scarlet",
-        // bgColor: theme.game.,
-        text: "Scarlet",
+        img: scarletImg,
+        // color: theme.game.,
       }),
       51: () => ({
-        pokeapiName: "violet",
-        // bgColor: theme.game.,
-        text: "Violet",
+        img: violetImg,
+        // color: theme.game.,
       }),
 
       // Game groupings
 
       52: () => ({
-        pokeapiName: "blue",
-        bgColor: theme.game.blue,
-        text: "RB",
+        img: blueImg,
+        color: theme.game.blue,
       }),
       53: () => ({
-        pokeapiName: "yellow",
-        bgColor: theme.game.yellow,
-        text: "RBY",
+        img: yellowImg,
+        color: theme.game.yellow,
       }),
 
       54: () => ({
-        pokeapiName: "silver",
-        bgColor: theme.game.silver,
-        text: "GS",
+        img: silverImg,
+        color: theme.game.silver,
       }),
       55: () => ({
-        pokeapiName: "crystal",
-        bgColor: theme.game.crystal,
-        text: "GSC",
+        img: crystalImg,
+        color: theme.game.crystal,
       }),
 
       56: () => ({
-        pokeapiName: "sapphire",
-        bgColor: theme.game.saphir,
-        text: "RS",
+        img: sapphireImg,
+        color: theme.game.saphir,
       }),
       57: () => ({
-        pokeapiName: "emerald",
-        bgColor: theme.game.emerald,
-        text: "RSE",
+        img: emeraldImg,
+        color: theme.game.emerald,
       }),
 
       58: () => ({
-        pokeapiName: "firered",
-        bgColor: theme.game.red,
-        text: "FRLG",
+        img: fireredImg,
+        color: theme.game.red,
       }),
       59: () => ({
-        // bgColor: theme.game.,
-        text: "RSBOX",
+        img: boxRSImg,
+        // color: theme.game.,
       }),
       60: () => ({
-        pokeapiName: "colosseum",
-        // bgColor: theme.game.,
-        text: "Colosseum",
+        img: colosseumImg,
+        // color: theme.game.,
       }),
       61: () => ({
-        pokeapiName: "xd",
-        // bgColor: theme.game.,
-        text: "XD",
+        img: xdImg,
+        // color: theme.game.,
       }),
       62: () => ({
-        pokeapiName: "diamond",
-        // bgColor: theme.game.,
-        text: "DP",
+        img: diamondImg,
+        // color: theme.game.,
       }),
       63: () => ({
-        pokeapiName: "platinum",
-        // bgColor: theme.game.,
-        text: "DPPt",
+        img: platinumImg,
+        // color: theme.game.,
       }),
       64: () => ({
-        pokeapiName: "heartgold",
-        // bgColor: theme.game.,
-        text: "HGSS",
+        img: soulsilverImg,
+        // color: theme.game.,
       }),
       65: () => ({
-        // bgColor: theme.game.,
-        text: "BATREV",
+        // color: theme.game.,
       }),
       66: () => ({
-        pokeapiName: "black",
-        // bgColor: theme.game.,
-        text: "BW",
+        img: blackImg,
+        // color: theme.game.,
       }),
       67: () => ({
-        pokeapiName: "black-2",
-        // bgColor: theme.game.,
-        text: "B2W2",
+        img: black2Img,
+        // color: theme.game.,
       }),
       68: () => ({
-        pokeapiName: "x",
-        // bgColor: theme.game.,
-        text: "XY",
+        img: xImg,
+        // color: theme.game.,
       }),
       69: () => ({
-        pokeapiName: "omega-ruby",
-        // bgColor: theme.game.,
-        text: "ORASDEMO",
+        img: omegaRubyImg,
+        // color: theme.game.,
       }),
       70: () => ({
-        pokeapiName: "omega-ruby",
-        // bgColor: theme.game.,
-        text: "ORAS",
+        img: omegaRubyImg,
+        // color: theme.game.,
       }),
       71: () => ({
-        pokeapiName: "sun",
-        // bgColor: theme.game.,
-        text: "SM",
+        img: sunImg,
+        // color: theme.game.,
       }),
       72: () => ({
-        pokeapiName: "ultra-sun",
-        // bgColor: theme.game.,
-        text: "USUM",
+        img: ultraSunImg,
+        // color: theme.game.,
       }),
       73: () => ({
-        // bgColor: theme.game.,
-        text: "GG",
+        img: letsgopikachuImg,
+        // color: theme.game.,
       }),
       74: () => ({
-        pokeapiName: "sword",
-        // bgColor: theme.game.,
-        text: "SWSH",
+        img: swordImg,
+        // color: theme.game.,
       }),
       75: () => ({
-        pokeapiName: "brillant-diamond",
-        // bgColor: theme.game.,
-        text: "BDSP",
+        img: brillantDiamondImg,
+        // color: theme.game.,
       }),
       76: () => ({
-        pokeapiName: "scarlet",
-        // bgColor: theme.game.,
-        text: "SV",
+        img: scarletImg,
+        // color: theme.game.,
       }),
       77: () => ({
-        pokeapiName: "yellow",
-        // bgColor: theme.game.,
-        text: "Gen1",
+        img: yellowImg,
+        // color: theme.game.,
       }),
       78: () => ({
-        pokeapiName: "crystal",
-        // bgColor: theme.game.,
-        text: "Gen2",
+        img: crystalImg,
+        // color: theme.game.,
       }),
       79: () => ({
-        pokeapiName: "emerald",
-        // bgColor: theme.game.,
-        text: "Gen3",
+        img: emeraldImg,
+        // color: theme.game.,
       }),
       80: () => ({
-        pokeapiName: "platinum",
-        // bgColor: theme.game.,
-        text: "Gen4",
+        img: platinumImg,
+        // color: theme.game.,
       }),
       81: () => ({
-        pokeapiName: "black",
-        // bgColor: theme.game.,
-        text: "Gen5",
+        img: blackImg,
+        // color: theme.game.,
       }),
       82: () => ({
-        pokeapiName: "x",
-        // bgColor: theme.game.,
-        text: "Gen6",
+        img: xImg,
+        // color: theme.game.,
       }),
       83: () => ({
-        // bgColor: theme.game.,
-        text: "Gen7",
+        img: sunImg,
+        // color: theme.game.,
       }),
       84: () => ({
-        // bgColor: theme.game.,
-        text: "Gen7b",
+        img: letsgopikachuImg,
+        // color: theme.game.,
       }),
       85: () => ({
-        // bgColor: theme.game.,
-        text: "Gen8",
+        img: swordImg,
+        // color: theme.game.,
       }),
       86: () => ({
-        // bgColor: theme.game.,
-        text: "Gen9",
+        img: scarletImg,
+        // color: theme.game.,
       }),
       87: () => ({
-        // bgColor: theme.game.,
-        text: "StadiumJ",
+        // color: theme.game.,
       }),
       88: () => ({
-        // bgColor: theme.game.,
-        text: "Stadium",
+        // color: theme.game.,
       }),
       89: () => ({
-        // bgColor: theme.game.,
-        text: "Stadium2",
+        // color: theme.game.,
       }),
       90: () => ({
-        // bgColor: theme.game.,
-        text: "EFL",
+        img: emeraldImg,
+        // color: theme.game.,
       }),
     }) ??
     (() => ({
-      text: "Version not handled " + version,
+
     }));
 
-  return data();
+  const gameData = data();
+
+  return {
+    ...gameData,
+    img: gameData.img ?? defaultImg,
+    color: gameData.color ?? theme.bg.dark,
+  } satisfies typeof gameData;
 };

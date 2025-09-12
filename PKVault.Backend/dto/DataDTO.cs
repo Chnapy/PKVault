@@ -86,6 +86,7 @@ public struct DataDTO
 
         dto.Actions = StorageService.GetActionPayloadList();
         dto.Warnings = WarningsService.GetWarningsDTO();
+        dto.Settings = SettingsService.AppSettings;
 
         return dto;
     }
@@ -100,6 +101,7 @@ public struct DataDTO
     public WarningsDTO? Warnings { get; set; }
     public Dictionary<uint, SaveInfosDTO>? SaveInfos { get; set; }
     public List<BackupDTO>? Backups { get; set; }
+    public SettingsDTO? Settings { get; set; }
 
     public DataDTO()
     {
@@ -128,6 +130,7 @@ public class DataUpdateFlags
     // public bool Warnings;
     public bool SaveInfos;
     public bool Backups;
+    public bool Settings;
 
     public DataUpdateFlags()
     {

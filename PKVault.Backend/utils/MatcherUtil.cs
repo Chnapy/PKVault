@@ -8,7 +8,7 @@ public class MatcherUtil
     {
         if (globs.Length == 0)
         {
-            throw new Exception("Globs list should not be empty");
+            return [];
         }
 
         var isAbsolute = globs[0][0] == '/';

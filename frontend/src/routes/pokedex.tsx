@@ -43,7 +43,7 @@ export const PokedexPage: React.FC = () => {
 const searchSchema = z.object({
   selected: z.number().optional(),
   filterSpeciesName: z.string().optional(),
-  filterTypes: z.array(z.string()).optional(),
+  filterTypes: z.array(z.number()).optional(),
   filterSeen: z.boolean().optional(),
   filterCaught: z.boolean().optional(),
   filterFromGames: z.array(z.number()).optional(), // saveIDs

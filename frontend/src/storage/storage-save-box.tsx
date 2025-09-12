@@ -5,6 +5,7 @@ import {
   useStorageGetSaveBoxes,
   useStorageGetSavePkms,
 } from "../data/sdk/storage/storage.gen";
+import { useStaticData } from '../hooks/use-static-data';
 import { Route } from "../routes/storage";
 import { SaveItem } from "../saves/save-item/save-item";
 import { Button } from "../ui/button/button";
@@ -22,6 +23,8 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
   const saveBoxId = Route.useSearch({ select: (search) => search.saveBoxId });
   const selected = Route.useSearch({ select: (search) => search.selected });
   const navigate = Route.useNavigate();
+
+  const staticData = useStaticData();
 
   const saveInfosRecord = useSaveInfosGetAll().data?.data ?? {};
   const saveInfos = saveInfosRecord[ saveId ] as SaveInfosDTO | undefined;
@@ -80,7 +83,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
       }}>
         <SaveItem saveId={saveId} />
 
-        <Button as={Route.Link} to={Route.to} search={{
+        <Button<typeof Route.Link> as={Route.Link} to={Route.to} search={{
           save: undefined,
           saveBoxId: undefined,
           selected: undefined,
@@ -179,6 +182,12 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
           //   return <div>Error versions are empty for Pkm.Id={pkm.id}</div>;
           // }
 
+          const sprite = pkm.isShiny
+            ? staticData.species[ pkm.species ].spriteShiny
+            : (pkm.isEgg
+              ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png'
+              : staticData.species[ pkm.species ].spriteDefault);
+
           return (
             <StorageItem
               key={"pkm-" + pkm.id}
@@ -188,8 +197,8 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               isEgg={pkm.isEgg}
               isShiny={pkm.isShiny}
               isShadow={pkm.isShadow}
-              sprite={pkm.sprite!}
-              heldItemSprite={pkm.spriteItem}
+              sprite={sprite}
+              heldItemSprite={pkm.heldItem ? staticData.items[ pkm.heldItem ].sprite : undefined}
               warning={!pkm.isValid}
               // disabled={Boolean(pkm.saveId)}
               shouldCreateVersion={false}

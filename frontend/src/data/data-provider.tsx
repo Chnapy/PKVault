@@ -3,6 +3,7 @@ import React from "react";
 import { getBackupGetAllQueryKey, type backupGetAllResponse } from './sdk/backup/backup.gen';
 import { DataDTOType, type DataDTO } from './sdk/model';
 import { getSaveInfosGetAllQueryKey, type saveInfosGetAllResponse } from './sdk/save-infos/save-infos.gen';
+import { getSettingsGetQueryKey, type settingsGetResponse } from './sdk/settings/settings.gen';
 import { getStorageGetActionsQueryKey, getStorageGetMainBoxesQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSaveBoxesQueryKey, getStorageGetSavePkmsQueryKey, type storageGetActionsResponse, type storageGetMainBoxesResponse, type storageGetMainPkmsResponse, type storageGetMainPkmVersionsResponse, type storageGetSaveBoxesResponse, type storageGetSavePkmsResponse } from './sdk/storage/storage.gen';
 import { getWarningsGetWarningsQueryKey, type warningsGetWarningsResponse } from './sdk/warnings/warnings.gen';
 
@@ -28,7 +29,17 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
 
           // console.log('stockage-dto', data);
 
-          const { mainBoxes, mainPkms, mainPkmVersions, saves, actions, warnings, saveInfos, backups } = data.data;
+          const { settings, mainBoxes, mainPkms, mainPkmVersions, saves, actions, warnings, saveInfos, backups } = data.data;
+
+          if (settings) {
+            client.setQueryData(
+              getSettingsGetQueryKey(),
+              {
+                ...data,
+                data: settings,
+              } satisfies settingsGetResponse
+            );
+          }
 
           if (mainBoxes) {
             client.setQueryData(

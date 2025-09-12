@@ -5,39 +5,11 @@ public class LocalSaveService
     public static Dictionary<uint, SaveFile> SaveById { get; } = [];
     public static Dictionary<string, SaveFile> SaveByPath { get; } = [];
 
-    // private static List<FileSystemWatcher> watchers = [];
-    private const int TIMER_INTERVAL = 30;
-    private static Timer? Timer;
-
-    public static async Task PrepareTimerAndRun()
-    {
-        Timer?.Dispose();
-
-        var updated = await ReadLocalSaves();
-
-        Timer = new Timer(async (object? _) =>
-        {
-            if (StorageService.HasEmptyActionList())
-            {
-                updated = await ReadLocalSaves();
-                if (updated)
-                {
-                    await WarningsService.CheckWarnings();
-                }
-            }
-        }, null, TimeSpan.FromSeconds(TIMER_INTERVAL), TimeSpan.FromSeconds(TIMER_INTERVAL));
-    }
-
-    public static async Task ResetTimerAndData()
+    public static async Task<bool> ReadLocalSaves()
     {
         SaveById.Clear();
         SaveByPath.Clear();
 
-        await PrepareTimerAndRun();
-    }
-
-    public static async Task<bool> ReadLocalSaves()
-    {
         var globs = SettingsService.AppSettings.SAVE_GLOBS;
         var searchPaths = MatcherUtil.SearchPaths(globs);
 
@@ -76,12 +48,12 @@ public class LocalSaveService
         if (existingSave != default)
         {
             // Console.WriteLine($"Multiple existing saves with ID {save.ID32}");
-            var lastWriteTime = File.GetLastWriteTime(path);
-            bool modifiedRecently = (DateTime.Now - lastWriteTime).TotalSeconds <= TIMER_INTERVAL;
-            if (!modifiedRecently)
-            {
-                return false;
-            }
+            // var lastWriteTime = File.GetLastWriteTime(path);
+            // bool modifiedRecently = (DateTime.Now - lastWriteTime).TotalSeconds <= TIMER_INTERVAL;
+            // if (!modifiedRecently)
+            // {
+            //     return false;
+            // }
         }
 
         UpdateGlobalsWithSave(save, path);

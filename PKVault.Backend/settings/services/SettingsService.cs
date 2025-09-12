@@ -2,40 +2,58 @@ using System.Text.Json;
 
 public class SettingsService
 {
-    public static readonly AppSettings AppSettings = GetAppSettings();
-
-    private static AppSettings GetAppSettings()
+    private static readonly JsonSerializerOptions jsonOptions = new()
     {
-        var filePath = "./config/pkvault.json";
+        WriteIndented = true
+    };
+    public static SettingsDTO AppSettings = GetSettings();
 
-        if (!File.Exists(filePath))
+    public static async Task UpdateSettings(SettingsDTO settings)
+    {
+        settings.SETTINGS_PATH = default;
+        var text = JsonSerializer.Serialize(settings, jsonOptions);
+        Console.WriteLine(text);
+        File.WriteAllText(SettingsDTO.filePath, text);
+
+        AppSettings = GetSettings();
+
+        await LocalSaveService.ReadLocalSaves();
+
+        await StorageService.ResetDataLoader();
+
+        await WarningsService.CheckWarnings();
+    }
+
+    private static SettingsDTO GetSettings()
+    {
+        if (!File.Exists(SettingsDTO.filePath))
         {
-            Console.WriteLine($"Config file not existing: creating {filePath}");
-            string defaultJson = JsonSerializer.Serialize(GetDefaultSettings(), new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+            Console.WriteLine($"Config file not existing: creating {SettingsDTO.filePath}");
+            string defaultJson = JsonSerializer.Serialize(GetDefaultSettings(), jsonOptions);
 
-            string? directory = Path.GetDirectoryName(filePath);
+            string? directory = Path.GetDirectoryName(SettingsDTO.filePath);
             if (!string.IsNullOrEmpty(directory))
             {
                 Directory.CreateDirectory(directory);
             }
 
-            File.WriteAllText(filePath, defaultJson);
+            File.WriteAllText(SettingsDTO.filePath, defaultJson);
         }
 
-        string json = File.ReadAllText(filePath);
-        return JsonSerializer.Deserialize<AppSettings>(json);
+        string json = File.ReadAllText(SettingsDTO.filePath);
+        var dto = JsonSerializer.Deserialize<SettingsDTO>(json)!;
+        dto.SETTINGS_PATH = SettingsDTO.filePath;
+        return dto;
     }
 
-    private static AppSettings GetDefaultSettings()
+    private static SettingsDTO GetDefaultSettings()
     {
-        AppSettings settings;
+        SettingsDTO settings;
 
 #if DEBUG
         settings = new()
         {
+            SETTINGS_PATH = SettingsDTO.filePath,
             DB_PATH = "./tmp/db",
             SAVE_GLOBS = ["./tmp/saves/**/*.sav", "./tmp/saves/**/*.srm", "./tmp/saves/**/*.gci", "./tmp/saves/**/*.dsv"],
             STORAGE_PATH = "./tmp/storage",
@@ -44,6 +62,7 @@ public class SettingsService
 #else
         settings = new()
         {
+            SETTINGS_PATH = SettingsDTO.filePath,
             DB_PATH = "./db",
             SAVE_GLOBS = [
                 "./saves/**/*.sav",
@@ -58,15 +77,4 @@ public class SettingsService
 
         return settings;
     }
-}
-
-public struct AppSettings
-{
-    public required string DB_PATH { get; set; }
-    public required string[] SAVE_GLOBS { get; set; }
-    public required string STORAGE_PATH { get; set; }
-    public required string BACKUP_PATH { get; set; }
-    public bool? HTTPS_NOCERT { get; set; }
-    public string? HTTPS_CERT_PEM_PATH { get; set; }
-    public string? HTTPS_KEY_PEM_PATH { get; set; }
 }

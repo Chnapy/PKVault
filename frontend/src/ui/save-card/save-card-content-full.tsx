@@ -1,4 +1,7 @@
 import type React from 'react';
+import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png';
+import { useStaticData } from '../../hooks/use-static-data';
+import { Icon } from '../icon/icon';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
 import { SaveCardContentSmall, type SaveCardContentSmallProps } from './save-card-content-small';
@@ -27,6 +30,7 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
     shinyCount,
     actions,
 }) => {
+    const staticData = useStaticData();
 
     return (
         <div
@@ -54,20 +58,22 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                 style={{
                     flexGrow: 1,
                     padding: 4,
+                    paddingTop: 0
                 }}
             >
                 <TextContainer>
-                    Time played <span style={{ color: theme.text.primary }}>{playTime}</span>
+                    Time played <Icon name='clock' solid forButton /> <span style={{ color: theme.text.primary }}>{playTime}</span>
                     <br />
-                    Pokedex seen <span style={{ color: theme.text.primary }}>{dexSeenCount}</span> caught <span style={{ color: theme.text.primary }}>{dexCaughtCount}</span>
+                    Pokedex seen <Icon name='eye' solid forButton /> <span style={{ color: theme.text.primary }}>{dexSeenCount}</span>{' '}
+                    caught <img src={staticData.itemPokeball.sprite} style={{ height: '1lh', margin: -4 }} /> <span style={{ color: theme.text.primary }}>{dexCaughtCount}</span>
                     <br />
-                    Storage <span style={{ color: theme.text.primary }}>{ownedCount}</span>
+                    Storage <Icon name='folder' solid forButton /> <span style={{ color: theme.text.primary }}>{ownedCount}</span>
                     {shinyCount > 0 && <>
-                        {' '}(<span style={{ color: theme.text.contrast }}>{shinyCount}</span>)
+                        {' '} <img src={shinyIconImg} style={{ height: 16, margin: -4 }} /> <span style={{ color: theme.text.primary }}>{shinyCount}</span>
                     </>}
 
                     {actions && (
-                        <span style={{ position: "absolute", right: 0, bottom: 0 }}>
+                        <span style={{ position: "absolute", right: -5, bottom: 0, display: 'flex', gap: 4 }}>
                             {actions}
                         </span>
                     )}

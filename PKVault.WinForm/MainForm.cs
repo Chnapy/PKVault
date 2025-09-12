@@ -2,13 +2,29 @@
 
 public partial class MainForm : Form
 {
-    private readonly LocalWebServer server;
+    private readonly string[] args;
+    private LocalWebServer? server;
 
-    public MainForm(string[] args)
+    public MainForm(string[] _args)
     {
-        InitializeComponent();
+        args = _args;
+
+        try
+        {
+            InitializeComponent();
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error);
+        }
+
         Resize += new EventHandler(Form_Resize);
-        Load += new EventHandler(WebView_Load);
+        Load += new EventHandler(OnFormLoad);
+    }
+
+    private void OnFormLoad(object? sender, EventArgs e)
+    {
+        WebView_Load(sender, e);
 
         server = new LocalWebServer();
         server.Start(args);
@@ -16,7 +32,8 @@ public partial class MainForm : Form
 
     protected override async void OnFormClosing(FormClosingEventArgs e)
     {
-        await server.Stop();
+        if (server != null)
+            await server.Stop();
         base.OnFormClosing(e);
     }
 }

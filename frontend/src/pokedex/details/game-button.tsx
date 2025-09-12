@@ -2,6 +2,7 @@ import type React from "react";
 import type { GameVersion } from "../../data/sdk/model";
 import { Button, type ButtonProps } from "../../ui/button/button";
 import { getGameInfos } from "./util/get-game-infos";
+import { useStaticData } from '../../hooks/use-static-data';
 
 export const GameButton: React.FC<
   Omit<ButtonProps, "bgColor" | "children"> & {
@@ -10,10 +11,13 @@ export const GameButton: React.FC<
     selected?: boolean;
   }
 > = ({ version, trainerName, ...rest }) => {
-  const { bgColor, text } = getGameInfos(version);
+  const { versions } = useStaticData();
+  const { color } = getGameInfos(version);
+
+  const text = versions[ version ].name;
 
   return (
-    <Button bgColor={bgColor} style={{ whiteSpace: 'nowrap' }} {...rest}>
+    <Button bgColor={color} style={{ whiteSpace: 'nowrap' }} {...rest}>
       {text}
       {trainerName && " - " + trainerName}
     </Button>

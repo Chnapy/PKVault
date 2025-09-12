@@ -1,8 +1,8 @@
 import React from "react";
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
+import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
-import { getGameInfos } from "../../details/util/get-game-infos";
 
 export const FilterFromGames: React.FC = () => {
   const navigate = Route.useNavigate();
@@ -11,15 +11,17 @@ export const FilterFromGames: React.FC = () => {
       String
     ) ?? [];
 
+  const { versions } = useStaticData();
+
   const saveInfosQuery = useSaveInfosGetAll();
 
   const options = Object.values(saveInfosQuery.data?.data ?? {})
     .map((save) => {
-      const infos = getGameInfos(save.version);
+      const name = versions[ save.version ].name;
 
       return {
         value: save.id + "",
-        label: `${infos.text} - ${save.trainerName}`,
+        label: `${name} - ${save.trainerName}`,
       };
     });
 

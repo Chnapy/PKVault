@@ -6,13 +6,13 @@ import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { DetailsCardContainer } from '../details-card/details-card-container';
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
 import { Gender } from '../gender/gender';
-import { ItemImg } from '../item-img/item-img';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
 import { StorageDetailsForm } from './storage-details-form';
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
+import { useStaticData } from '../../hooks/use-static-data';
 
 export type StorageSaveDetailsProps = {
   id: string;
@@ -52,8 +52,7 @@ export type StorageSaveDetailsProps = {
   originMetLocation: string;
   originMetLevel?: number;
 
-  heldItemSprite?: number;
-  heldItemText?: string;
+  heldItem: number;
 
   isValid: boolean;
   validityReport: string;
@@ -114,8 +113,7 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
   originMetLocation,
   originMetLevel,
 
-  heldItemSprite,
-  heldItemText,
+  heldItem,
 
   isValid,
   validityReport,
@@ -136,6 +134,8 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
   onClose,
 }) => {
   const formContext = StorageDetailsForm.useContext();
+
+  const staticData = useStaticData();
 
   return (
     <DetailsCardContainer
@@ -224,11 +224,14 @@ export const StorageSaveDetails: React.FC<StorageSaveDetailsProps> = ({
           {validityReport}
         </TextContainer>
 
-        {!!heldItemSprite && <TextContainer>
-          Held item <span style={{ color: theme.text.primary }}>{heldItemText}</span> <ItemImg spriteItem={heldItemSprite} alt={heldItemText} style={{
-            height: 24,
-            verticalAlign: 'middle'
-          }} />
+        {!!heldItem && <TextContainer>
+          Held item <span style={{ color: theme.text.primary }}>{staticData.items[ heldItem ].name}</span> <img
+            src={staticData.items[ heldItem ].sprite}
+            alt={staticData.items[ heldItem ].name}
+            style={{
+              height: 24,
+              verticalAlign: 'middle'
+            }} />
         </TextContainer>}
 
         {!!mainBoxId && !!mainBoxSlot && goToMainPkm && <>
