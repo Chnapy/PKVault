@@ -56,6 +56,12 @@ public class PkmConvertService
             return destPkm;
         }
 
+        if (destPkm.Generation != blankPkm.Format)
+        {
+            destPkm.Version = GameUtil.GetVersion(blankPkm.Format);
+            // Console.WriteLine($"Error convert gen - {destPkm.Species} / {destPkm.Version} / {destPkm.Generation}-{blankPkm.Format} / {result}");
+        }
+
         PassAllToPkm(sourcePkm, destPkm);
 
         return destPkm;

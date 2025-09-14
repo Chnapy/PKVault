@@ -3,32 +3,34 @@ import { theme } from '../theme';
 import { css } from '@emotion/css';
 
 export type NumberInputProps = {
-    value: number;
-    onChange: React.ChangeEventHandler<HTMLInputElement>;
+    value?: number;
+    // onChange: React.ChangeEventHandler<HTMLInputElement>;
     rangeMin?: number;
     rangeMax?: number;
-};
+}
+    & React.HTMLAttributes<HTMLInputElement>;
 
-export const NumberInput: React.FC<NumberInputProps> = ({ value, onChange, rangeMin, rangeMax }) => {
-
+export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, rangeMax, ...rest }) => {
     return <div
         style={{
             color: theme.text.light,
             backgroundColor: theme.bg.darker,
             borderRadius: 4,
-            display: 'flex',
+            display: 'inline-flex',
             filter: theme.shadow.filter,
-            overflow: 'hidden'
+            overflow: 'hidden',
+            verticalAlign: 'middle',
+            ...rest.style,
         }}
     >
         <input
             type="text"
             value={value}
-            onChange={onChange}
+            {...rest}
             style={{
                 width: '100%',
                 color: theme.text.default,
-                backgroundColor: theme.bg.light,
+                backgroundColor: theme.bg.default,
                 borderWidth: 1,
                 borderStyle: 'solid',
                 borderColor: theme.bg.darker,
@@ -42,9 +44,9 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, onChange, range
             <input
                 type='range'
                 value={value}
-                onChange={onChange}
                 min={rangeMin}
                 max={rangeMax}
+                {...rest}
                 className={css({
                     appearance: 'none',
                     background: 'transparent',

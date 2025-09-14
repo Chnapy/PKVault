@@ -51,9 +51,12 @@ export function Button<
           display: "flex",
           alignItems: "stretch",
           borderColor: bgColor,
+          color: theme.text.light,
+          textShadow: theme.shadow.textlight,
           fontSize: '1rem',
           opacity: disabled ? 0.5 : undefined,
           pointerEvents: disabled ? 'none' : undefined,
+          cursor: 'pointer',
         }),
         className
       )}
@@ -66,15 +69,16 @@ export function Button<
           flexGrow: 1,
           backgroundColor: bgColor,
           borderRadius: 4,
-          color: theme.text.light,
-          textShadow: theme.shadow.textlight,
           padding: big ? "8px 16px" : `2px 4px`,
           minWidth: 'calc(1lh - 4px)',
+          overflow: 'hidden'
         })}
       >
         <div
           className={css({
             display: "flex",
+            flexGrow: 1,
+            maxWidth: '100%',
             alignItems: "center",
             justifyContent: "center",
             gap: 4,

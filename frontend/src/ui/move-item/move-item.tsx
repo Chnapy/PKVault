@@ -1,28 +1,26 @@
 import type React from 'react';
 import type { MoveCategory } from '../../data/sdk/model';
-import { TypeItemBase } from '../type-item/type-item-base';
+import { theme } from '../theme';
+import { TypeItemBase, type TypeItemBaseProps } from '../type-item/type-item-base';
 import { getMoveCategoryImg } from './util/get-move-category-img';
 
-export type MoveItemProps = {
-    name: string;
-    type: number;
+export type MoveItemProps = TypeItemBaseProps & {
     category: MoveCategory;
     damage?: number;
 };
 
-export const MoveItem: React.FC<MoveItemProps> = ({ name, type, category, damage }) => {
+export const MoveItem: React.FC<MoveItemProps> = ({ category, damage, ...rest }) => {
     const categoryImg = getMoveCategoryImg(category);
 
-    return <TypeItemBase
-        type={type}
-        name={name}
-    >
+    return <TypeItemBase {...rest}>
         <div
             style={{
                 width: 25,
+                color: theme.text.default,
                 backgroundImage: `url("${categoryImg}")`,
                 backgroundSize: 'cover',
-                textAlign: 'center'
+                textAlign: 'center',
+                flexShrink: 0,
             }}
         >
             {damage}

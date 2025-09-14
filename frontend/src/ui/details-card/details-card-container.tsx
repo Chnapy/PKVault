@@ -3,90 +3,105 @@ import { Container } from '../container/container';
 import { Button } from '../button/button';
 import { theme } from '../theme';
 import { TextContainer } from '../text-container/text-container';
+import { Icon } from '../icon/icon';
 
 export type DetailsCardContainerProps = {
     header: React.ReactNode;
+    title: React.ReactNode;
     mainImg: React.ReactNode;
     mainInfos: React.ReactNode;
     preContent: React.ReactNode;
     content: React.ReactNode;
-    actions: React.ReactNode;
     onClose: () => void;
 };
 
 export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
     header,
+    title,
     mainImg,
     mainInfos,
     preContent,
     content,
-    actions,
     onClose
 }) => {
     const [ showDetails, setShowDetails ] = React.useState(false);
 
     return (
-        <Container padding="big" borderRadius="big" style={{ display: "block" }}>
-            <Button
-                onClick={onClose}
-                style={{
-                    float: 'right',
-                    marginTop: -33
-                }}
-            >Close</Button>
-
-            {header && <div style={{ marginBottom: 2, display: "flex", gap: 4, flexWrap: 'wrap' }}>
-                {header}
-            </div>}
-
+        <div>
             <div
                 style={{
                     display: 'flex',
-                    flexDirection: 'column',
                     gap: 4,
-                    borderRadius: 8,
-                    padding: 4,
-                    background: theme.bg.info,
+                    padding: '0 8px',
                 }}
             >
-                <div style={{ display: "flex" }}>
-                    <div
-                        style={{
-                            position: 'relative',
-                            marginLeft: -4,
-                            marginTop: -4,
-                            marginRight: 4,
-                            padding: 4,
-                            borderRadius: 8,
-                            background: theme.bg.dark,
-                        }}
-                    >
-                        {mainImg}
-                    </div>
-
-                    <TextContainer noWrap>
-                        {mainInfos}
-                    </TextContainer>
-                </div>
-
-                {preContent}
-
-                <Button onClick={() => setShowDetails(!showDetails)}>
-                    {showDetails ? "Hide" : "Show"} details
-                </Button>
-
-                {showDetails && content}
+                {header}
             </div>
 
-            {actions && <div
-                style={{
-                    display: "flex",
-                    gap: 4,
-                    padding: 4,
-                }}
-            >
-                {actions}
-            </div>}
-        </Container>
+            <Container padding="big" borderRadius="big" style={{
+                display: "flex",
+                flexDirection: 'column',
+                gap: 4,
+                backgroundColor: theme.bg.contrast,
+                color: theme.text.light
+            }}>
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        paddingLeft: 4,
+                    }}
+                >
+                    {title}
+
+                    <Button onClick={() => setShowDetails(value => !value)}>
+                        <Icon name={showDetails ? 'angle-down' : 'angle-up'} forButton />
+                    </Button>
+
+                    <Button onClick={onClose}>
+                        <Icon name='times' forButton />
+                    </Button>
+                </div>
+
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 4,
+                        borderRadius: 8,
+                        padding: 4,
+                        background: theme.bg.info,
+                    }}
+                >
+                    <div style={{
+                        display: "flex",
+                        alignItems: 'flex-start'
+                    }}>
+                        <div
+                            style={{
+                                position: 'relative',
+                                marginLeft: -4,
+                                marginTop: -4,
+                                marginRight: 4,
+                                padding: 4,
+                                borderRadius: 8,
+                                background: theme.bg.dark,
+                            }}
+                        >
+                            {mainImg}
+                        </div>
+
+                        <TextContainer noWrap>
+                            {mainInfos}
+                        </TextContainer>
+                    </div>
+
+                    {preContent}
+
+                    {showDetails && content}
+                </div>
+            </Container>
+        </div>
     );
 };

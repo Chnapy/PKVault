@@ -46,8 +46,6 @@ public class SaveInfosDTO
             DaycareCount = DaycareCount,
             BoxCount = save.BoxCount,
             BoxSlotCount = save.BoxSlotCount,
-            MaxSpeciesId = save.MaxSpeciesID,
-            MaxIV = save.MaxIV,
             CanDelete = true,
         };
     }
@@ -87,10 +85,6 @@ public class SaveInfosDTO
     public int BoxCount { get; set; }
 
     public int BoxSlotCount { get; set; }
-
-    public int MaxSpeciesId { get; set; }
-
-    public int MaxIV { get; set; }
 
     public bool CanDelete { get; set; }
 

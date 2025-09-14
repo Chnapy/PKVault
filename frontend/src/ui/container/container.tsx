@@ -6,7 +6,7 @@ import { theme } from "../theme";
 
 const root = (props: ContainerProps) =>
   css({
-    display: "inline-block",
+    // display: "inline-block",
     backgroundColor: theme.bg.default,
     border: `1px solid ${theme.border.default}`,
     padding: switchUtil(props.padding ?? "default", {

@@ -51,6 +51,7 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
 
   return <DetailsCardContainer
     header={fromSaves}
+    title={null}
     mainImg={<>
       <img
         src={showShiny ? shinySprite! : defaultSprite!}
@@ -147,7 +148,6 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
         </TextContainer>
       </div>
     </>}
-    actions={null}
     onClose={onClose}
   />;
 

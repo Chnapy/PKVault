@@ -3,6 +3,7 @@ import type { GameVersion, GenderType } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Gender } from '../gender/gender';
 import { theme } from '../theme';
+import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 
 export type TextOriginProps = {
     version: GameVersion;
@@ -25,10 +26,18 @@ export const TextOrigin: React.FC<TextOriginProps> = ({
 }) => {
     const { versions } = useStaticData();
 
+    const gameinfos = getGameInfos(version);
+
     return <>
         <span style={{ color: theme.text.primary }}>Origin</span>
         <br />
-        Game <span style={{ color: theme.text.primary }}>Pokemon {versions[ version ].name}</span>
+        <img
+            src={gameinfos.img}
+            style={{
+                height: '1lh',
+                verticalAlign: 'middle'
+            }}
+        /> <span style={{ color: theme.text.primary }}>Pokemon {versions[ version ].name}</span>
         <br />
         OT <span style={{ color: theme.text.primary }}>{originTrainerName}</span> <Gender gender={originTrainerGender} /> - TID <span style={{ color: theme.text.primary }}>{tid}</span>
         <br />

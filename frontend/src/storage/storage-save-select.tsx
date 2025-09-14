@@ -2,6 +2,7 @@ import type React from "react";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { Route } from "../routes/storage";
 import { SaveItem } from "../saves/save-item/save-item";
+import { TitledContainer } from '../ui/container/titled-container';
 
 export const StorageSaveSelect: React.FC = () => {
   const saveInfosQuery = useSaveInfosGetAll();
@@ -17,31 +18,32 @@ export const StorageSaveSelect: React.FC = () => {
   });
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        gap: 8,
-        padding: 4,
-        height: 550,
-        overflowY: "auto",
-      }}
+    <TitledContainer
+      title={'Save selection'}
     >
-      {saveInfos.map((save, i) => (
-        <SaveItem
-          key={i}
-          saveId={save.id}
-          onClick={() => {
-            navigate({
-              search: {
-                save: save.id,
-              },
-            });
-          }}
-        />
-      ))}
-    </div>
+      <div
+        style={{
+          maxHeight: 528,
+          overflowY: "auto",
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8
+        }}
+      >
+        {saveInfos.map((save, i) => (
+          <SaveItem
+            key={i}
+            saveId={save.id}
+            onClick={() => {
+              navigate({
+                search: {
+                  save: save.id,
+                },
+              });
+            }}
+          />
+        ))}
+      </div>
+    </TitledContainer>
   );
 };

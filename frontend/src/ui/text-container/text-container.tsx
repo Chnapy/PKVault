@@ -3,21 +3,26 @@ import { theme } from "../theme";
 
 export type TextContainerProps = {
   noWrap?: boolean;
-};
+}
+  & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
 export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>> = ({
   noWrap,
   children,
+  ...rest
 }) => {
   return (
     <div
+      {...rest}
       style={{
         padding: "3px 8px",
         backgroundColor: theme.bg.default,
         borderRadius: 4,
         flexGrow: 1,
         // width: "100%",
-        overflow: 'hidden'
+        overflow: 'hidden',
+        color: theme.text.default,
+        ...rest.style,
       }}
     >
       <div

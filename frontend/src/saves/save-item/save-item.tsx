@@ -16,6 +16,7 @@ import { theme } from '../../ui/theme';
 export type SaveItemProps = {
   saveId: number;
   onClick?: () => void;
+  onClose?: () => void;
   showDelete?: boolean;
   // showOldSaves?: boolean;
 };
@@ -23,6 +24,7 @@ export type SaveItemProps = {
 export const SaveItem: React.FC<SaveItemProps> = ({
   saveId,
   onClick,
+  onClose,
   showDelete,
   // showOldSaves,
 }) => {
@@ -94,6 +96,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
               </ButtonWithConfirm>
             </>}
           </>}
+        onClose={onClose}
       />}
     </Container>
   );

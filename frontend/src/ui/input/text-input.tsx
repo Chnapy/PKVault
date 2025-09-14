@@ -11,6 +11,7 @@ export type TextInputProps = {
 export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onChange, label, area, ...rest }, ref) => {
     const inputStyle: React.CSSProperties = {
         flexGrow: 1,
+        height: '100%',
         width: '100%',
         color: theme.text.default,
         backgroundColor: theme.bg.default,
@@ -24,13 +25,14 @@ export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onCha
 
     return <label
         style={{
-            display: 'flex',
+            display: 'inline-flex',
             flexDirection: 'column',
             color: theme.text.light,
             backgroundColor: theme.bg.darker,
             borderRadius: 4,
             filter: theme.shadow.filter,
             overflow: 'hidden',
+            verticalAlign: 'middle',
             ...rest.style,
         }}
     >

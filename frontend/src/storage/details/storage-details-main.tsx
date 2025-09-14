@@ -1,12 +1,12 @@
 import React from 'react';
+import { GameVersion } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
-import { useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainDeletePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
+import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
-import { Button } from '../../ui/button/button';
+import { DetailsTab } from '../../ui/details-card/details-tab';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
 import { StorageMainDetails } from '../../ui/storage-item-details/storage-main-details';
-import { theme } from '../../ui/theme';
 
 export type StorageDetailsMainProps = {
     selectedId: string;
@@ -20,19 +20,10 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
     const [ selectedIndex, setSelectedIndex ] = React.useState(0);
 
     const navigate = Route.useNavigate();
-    const navigateToSave = Route.useNavigate();
 
     const staticData = useStaticData();
 
-    const mainCreatePkmVersionMutation = useStorageMainCreatePkmVersion();
-
-    const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm();
-
-    const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
-
     const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
-
-    const evolvePkmMutation = useStorageEvolvePkm();
 
     const saveInfosQuery = useSaveInfosGetAll();
     const mainPkmQuery = useStorageGetMainPkms();
@@ -61,14 +52,12 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
         return null;
     }
 
-    const species = pkmVersionList[ 0 ].species;
+    // const species = pkmVersionList[ 0 ].species;
 
     const pkmSaveRaw = pkm.saveId ? saveInfosQuery.data?.data[ pkm.saveId ] : undefined;
     const pkmSave = pkmSaveRaw && pkmVersion.generation === pkmSaveRaw.generation ? pkmSaveRaw : undefined;
 
-    const hasPkmForSaveGeneration = !!save && pkmVersionList.some(pkmVersion => pkmVersion.generation === save.generation);
-
-    const isCompatibleWithSave = !save || species <= save.maxSpeciesId;
+    // const isCompatibleWithSave = !save || species <= staticData.versions[ save.version ].maxSpeciesId;
 
     const sprite = pkmVersion.isShiny
         ? staticData.species[ pkmVersion.species ].spriteShiny
@@ -87,7 +76,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
         <StorageMainDetails
             header={
                 <>
-                    {!isCompatibleWithSave && <Button
+                    {/* {!isCompatibleWithSave && <Button
                         disabled
                         bgColor={theme.text.contrast}
                         style={{ width: '100%' }}
@@ -101,32 +90,17 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
                         style={{ width: '100%' }}
                     >
                         Already present in another save ({pkm.saveId})
-                    </Button>}
-
-                    {!pkm.saveId && save && isCompatibleWithSave && !hasPkmForSaveGeneration && <Button
-                        onClick={() =>
-                            mainCreatePkmVersionMutation.mutateAsync({
-                                params: {
-                                    generation: save.generation,
-                                    pkmId: pkm.id,
-                                },
-                            })
-                        }
-                        style={{ width: '100%' }}
-                    >
-                        Create version for G{save.generation}
-                    </Button>}
+                    </Button>} */}
 
                     {pkmVersionList.map((pkmVersion, i) => (
-                        <Button
+                        <DetailsTab
                             key={pkmVersion.id}
+                            version={GameVersion[ `Gen${pkmVersion.generation as 1}` ]}
+                            otName={`G${pkmVersion.generation}`}
+                            original={pkmVersion.isMain}
                             onClick={() => setSelectedIndex(i)}
                             disabled={selectedIndex === i}
-                            style={{ width: save?.generation === pkmVersion.generation ? '100%' : undefined }}
-                        >
-                            G{pkmVersion.generation}
-                            {pkmVersion.isMain && " (original)"}
-                        </Button>
+                        />
                     ))}
                 </>
             }
@@ -138,7 +112,6 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
             species={pkmVersion.species}
             speciesName={pkmVersion.speciesName}
             isShiny={pkmVersion.isShiny}
-            isEgg={pkmVersion.isEgg}
             sprite={sprite}
             ballSprite={ballSprite}
             gender={pkmVersion.gender}
@@ -148,14 +121,15 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
             stats={pkmVersion.stats}
             ivs={pkmVersion.iVs}
             evs={pkmVersion.eVs}
-            hiddenPowerType={staticData.types[ pkmVersion.hiddenPowerType ].name}
+            hiddenPowerType={pkmVersion.hiddenPowerType}
             hiddenPowerPower={pkmVersion.hiddenPowerPower}
-            nature={staticData.natures[ pkmVersion.nature ].name}
-            ability={staticData.abilities[ pkmVersion.ability ].name}
+            hiddenPowerCategory={pkmVersion.hiddenPowerCategory}
+            nature={pkmVersion.nature}
+            ability={pkmVersion.ability}
             level={pkmVersion.level}
             exp={pkmVersion.exp}
-            moves={pkmVersion.moves.map(move => ({ id: move, text: staticData.moves[ move ].name, sourceTypes: [], type: -1 }))}
-            availableMoves={pkmVersion.availableMoves}
+            moves={pkmVersion.moves}
+            availableMoves={pkmVersion.availableMoves.map(move => move.id)}
             tid={pkmVersion.tid}
             originTrainerName={pkmVersion.originTrainerName}
             originTrainerGender={pkmVersion.originTrainerGender}
@@ -170,37 +144,8 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
             saveBoxId={attachedSavePkm?.box}
             saveBoxSlot={attachedSavePkm?.boxSlot}
             saveSynchronized={attachedSavePkm?.dynamicChecksum === pkmVersion.dynamicChecksum}
-            goToSavePkm={attachedSavePkm && (() => navigate({
-                search: {
-                    save: attachedSavePkm.saveId,
-                    saveBoxId: attachedSavePkm.box.toString(),
-                    selected: {
-                        type: 'save',
-                        id: attachedSavePkm.id,
-                    },
-                }
-            }))}
             attachedSavePkmNotFound={attachedSavePkmNotFound}
-            onEvolve={pkmVersion.canEvolve && !attachedSavePkm
-                ? (() => evolvePkmMutation.mutateAsync({
-                    id: pkmVersion.id,
-                    params: {},
-                }))
-                : undefined
-            }
-            onSynchronize={saveId ? (() => savePkmSynchronizeMutation.mutateAsync({
-                saveId,
-                params: {
-                    pkmVersionId: pkmVersion.id,
-                }
-            })) : undefined}
-            onSaveCheck={attachedSavePkm ? (() => navigateToSave({
-                to: '/saves'
-            })) : undefined}
-            onDetach={attachedSavePkm ? (() => mainPkmDetachSaveMutation.mutateAsync({
-                pkmId: pkm.id,
-            })) : undefined}
-            onRelease={attachedSavePkm
+            onRelease={pkm?.saveId
                 ? undefined
                 : (() => mainPkmVersionDeleteMutation.mutateAsync({
                     pkmVersionId: pkmVersion.id,

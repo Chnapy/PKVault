@@ -1,6 +1,7 @@
 import type React from 'react';
 import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png';
 import { useStaticData } from '../../hooks/use-static-data';
+import { Button } from '../button/button';
 import { Icon } from '../icon/icon';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
@@ -13,6 +14,7 @@ export type SaveCardContentFullProps = SaveCardContentSmallProps & {
     ownedCount: number;
     shinyCount: number;
     actions?: React.ReactNode;
+    onClose?: () => void;
 };
 
 export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
@@ -29,12 +31,14 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
     ownedCount,
     shinyCount,
     actions,
+    onClose,
 }) => {
     const staticData = useStaticData();
 
     return (
         <div
             style={{
+                position: 'relative',
                 display: "flex",
                 flexDirection: 'column',
                 borderRadius: 8,
@@ -79,6 +83,14 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                     )}
                 </TextContainer>
             </div>
+
+            {onClose && <Button style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+            }}>
+                <Icon name='times' forButton onClick={onClose} />
+            </Button>}
         </div>
     );
 };

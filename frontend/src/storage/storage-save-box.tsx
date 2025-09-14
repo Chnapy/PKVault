@@ -7,9 +7,9 @@ import {
 } from "../data/sdk/storage/storage.gen";
 import { useStaticData } from '../hooks/use-static-data';
 import { Route } from "../routes/storage";
-import { SaveItem } from "../saves/save-item/save-item";
 import { Button } from "../ui/button/button";
 import { FilterSelect } from "../ui/filter/filter-select/filter-select";
+import { Icon } from '../ui/icon/icon';
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageItem } from "../ui/storage-item/storage-item";
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
@@ -68,32 +68,10 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
     .map((_, i): PkmSaveDTO | null => boxPkms[ i ] ?? null);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        gap: 8,
-      }}
-    >
-      <div style={{
-        display: 'flex',
-        gap: 8,
-      }}>
-        <SaveItem saveId={saveId} />
-
-        <Button<typeof Route.Link> as={Route.Link} to={Route.to} search={{
-          save: undefined,
-          saveBoxId: undefined,
-          selected: undefined,
-        }}>Back</Button>
-      </div>
-
-      <StorageBox
-        header={
-          <>
-            {/* {partyBox && <Button
+    <StorageBox
+      header={
+        <>
+          {/* {partyBox && <Button
               onClick={() =>
                 navigate({
                   search: {
@@ -105,53 +83,53 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               {partyBox.name ?? 'Party'}
             </Button>} */}
 
-            <Button
-              onClick={() =>
-                navigate({
-                  search: {
-                    saveBoxId: previousBox.id,
-                  },
-                })
-              }
-              disabled={!previousBox || previousBox.type !== BoxType.Default}
-            >
-              {"<"}
-            </Button>
+          <Button
+            onClick={() =>
+              navigate({
+                search: {
+                  saveBoxId: previousBox.id,
+                },
+              })
+            }
+            disabled={!previousBox || previousBox.type !== BoxType.Default}
+          >
+            <Icon name='angle-left' forButton />
+          </Button>
 
-            <FilterSelect
-              enabled={false}
-              options={[
-                ...saveBoxes.map((box) => ({
-                  value: box.id,
-                  label: box.name,
-                })),
-              ]}
-              value={[ selectedBox.id ]}
-              onChange={([ value ]) => {
-                navigate({
-                  search: {
-                    saveBoxId: value,
-                  },
-                });
-              }}
-            >
-              {selectedBox.name}
-            </FilterSelect>
+          <FilterSelect
+            enabled={false}
+            options={[
+              ...saveBoxes.map((box) => ({
+                value: box.id,
+                label: box.name,
+              })),
+            ]}
+            value={[ selectedBox.id ]}
+            onChange={([ value ]) => {
+              navigate({
+                search: {
+                  saveBoxId: value,
+                },
+              });
+            }}
+          >
+            {selectedBox.name}
+          </FilterSelect>
 
-            <Button
-              onClick={() =>
-                navigate({
-                  search: {
-                    saveBoxId: nextBox.id,
-                  },
-                })
-              }
-              disabled={!nextBox || nextBox.type !== BoxType.Default}
-            >
-              {">"}
-            </Button>
+          <Button
+            onClick={() =>
+              navigate({
+                search: {
+                  saveBoxId: nextBox.id,
+                },
+              })
+            }
+            disabled={!nextBox || nextBox.type !== BoxType.Default}
+          >
+            <Icon name='angle-right' forButton />
+          </Button>
 
-            {/* {daycareBox && <Button
+          {/* {daycareBox && <Button
               onClick={() =>
                 navigate({
                   search: {
@@ -162,62 +140,61 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
             >
               {daycareBox.name ?? 'Daycare'}
             </Button>} */}
-          </>
-        }
-      >
-        {allItems.map((pkm, i) => {
-          if (!pkm) {
-            return (
-              <StorageItemPlaceholder
-                key={i}
-                storageType="save"
-                boxId={selectedBox.idInt}
-                boxSlot={i}
-              />
-            );
-          }
-          // const versions = pkmSaves.filter((value) => value.pkmId === pkm.id);
-
-          // if (versions.length === 0) {
-          //   return <div>Error versions are empty for Pkm.Id={pkm.id}</div>;
-          // }
-
-          const sprite = pkm.isShiny
-            ? staticData.species[ pkm.species ].spriteShiny
-            : (pkm.isEgg
-              ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png'
-              : staticData.species[ pkm.species ].spriteDefault);
-
+        </>
+      }
+    >
+      {allItems.map((pkm, i) => {
+        if (!pkm) {
           return (
-            <StorageItem
-              key={"pkm-" + pkm.id}
+            <StorageItemPlaceholder
+              key={i}
               storageType="save"
-              pkmId={pkm.id}
-              species={pkm.species}
-              isEgg={pkm.isEgg}
-              isShiny={pkm.isShiny}
-              isShadow={pkm.isShadow}
-              sprite={sprite}
-              heldItemSprite={pkm.heldItem ? staticData.items[ pkm.heldItem ].sprite : undefined}
-              warning={!pkm.isValid}
-              // disabled={Boolean(pkm.saveId)}
-              shouldCreateVersion={false}
+              boxId={selectedBox.idInt}
               boxSlot={i}
-              selected={selected?.type === "save" && selected.id === pkm.id}
-              onClick={() =>
-                navigate({
-                  search: {
-                    selected: {
-                      type: "save",
-                      id: pkm.id,
-                    },
-                  },
-                })
-              }
             />
           );
-        })}
-      </StorageBox>
-    </div>
+        }
+        // const versions = pkmSaves.filter((value) => value.pkmId === pkm.id);
+
+        // if (versions.length === 0) {
+        //   return <div>Error versions are empty for Pkm.Id={pkm.id}</div>;
+        // }
+
+        const sprite = pkm.isShiny
+          ? staticData.species[ pkm.species ].spriteShiny
+          : (pkm.isEgg
+            ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png'
+            : staticData.species[ pkm.species ].spriteDefault);
+
+        return (
+          <StorageItem
+            key={"pkm-" + pkm.id}
+            storageType="save"
+            pkmId={pkm.id}
+            species={pkm.species}
+            isEgg={pkm.isEgg}
+            isShiny={pkm.isShiny}
+            isShadow={pkm.isShadow}
+            sprite={sprite}
+            heldItemSprite={pkm.heldItem ? staticData.items[ pkm.heldItem ].sprite : undefined}
+            warning={!pkm.isValid}
+            // disabled={Boolean(pkm.saveId)}
+            shouldCreateVersion={false}
+            boxSlot={i}
+            selected={selected?.type === "save" && selected.id === pkm.id}
+            onClick={() =>
+              navigate({
+                search: {
+                  selected: {
+                    type: "save",
+                    id: pkm.id,
+                  },
+                },
+              })
+            }
+          />
+        );
+      })}
+    </StorageBox>
   );
 };

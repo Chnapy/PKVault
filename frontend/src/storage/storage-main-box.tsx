@@ -10,6 +10,7 @@ import { useStaticData } from '../hooks/use-static-data';
 import { Route } from "../routes/storage";
 import { Button } from "../ui/button/button";
 import { FilterSelect } from "../ui/filter/filter-select/filter-select";
+import { Icon } from '../ui/icon/icon';
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageItem } from "../ui/storage-item/storage-item";
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
@@ -76,7 +77,7 @@ export const StorageMainBox: React.FC = () => {
             }
             disabled={!previousBox}
           >
-            {"<"}
+            <Icon name='angle-left' forButton />
           </Button>
 
           <FilterSelect
@@ -113,7 +114,7 @@ export const StorageMainBox: React.FC = () => {
             }
             disabled={!nextBox}
           >
-            {">"}
+            <Icon name='angle-right' forButton />
           </Button>
         </>
       }
@@ -163,7 +164,7 @@ export const StorageMainBox: React.FC = () => {
             warning={versions.some((value) => !value.isValid)}
             disabled={
               Boolean(pkm.saveId)
-              || (!!save && species > save.maxSpeciesId)
+              || (!!save && species > staticData.versions[ save.version ].maxSpeciesId)
               // || !versions.some(
               //   (version) =>
               //     !saveInfos || version.generation === saveInfos?.generation

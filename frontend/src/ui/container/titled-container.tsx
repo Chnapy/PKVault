@@ -1,13 +1,18 @@
-import type React from 'react';
+import React from 'react';
 import { Container } from './container';
 import { theme } from '../theme';
 
 export type TitledContainerProps = {
     title: React.ReactNode;
     contrasted?: boolean;
+    enableExpand?: boolean;
+    initialExpanded?: boolean;
 };
 
-export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerProps>> = ({ title, contrasted, children }) => {
+export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerProps>> = ({
+    title, contrasted, enableExpand, initialExpanded = true, children
+}) => {
+    const [ expanded, setExpanded ] = React.useState(initialExpanded);
 
     return <Container
         style={{
@@ -23,18 +28,24 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
         }}
     >
         <div
+            role={enableExpand ? 'button' : undefined}
+            onClick={enableExpand ? (() => setExpanded(!expanded)) : undefined}
             style={{
                 backgroundColor: contrasted
                     ? theme.bg.contrastdark
                     : theme.bg.light,
                 padding: 4,
                 borderRadius: 2,
+                cursor: enableExpand ? 'pointer' : undefined,
+                userSelect: enableExpand ? 'none' : undefined,
             }}
         >{title}</div>
 
         <div
             style={{
-                padding: 4,
+                padding: expanded ? 4 : 0,
+                height: expanded ? undefined : 0,
+                overflow: expanded ? undefined : 'hidden',
             }}
         >
             {children}

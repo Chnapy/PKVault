@@ -3,6 +3,7 @@ import type React from "react";
 import { useSaveInfosScan } from '../data/sdk/save-infos/save-infos.gen';
 import { Button } from '../ui/button/button';
 import { Frame } from '../ui/header/frame';
+import { Header } from '../ui/header/header';
 import { HeaderItem } from "../ui/header/header-item";
 import { Icon } from '../ui/icon/icon';
 import { Warnings } from '../warnings/warnings';
@@ -13,8 +14,8 @@ const Root: React.FC = () => {
   const savesScanMutation = useSaveInfosScan();
 
   return (
-    <Frame
-      headerItems={<>
+    <Frame>
+      <Header>
         <HeaderItem
           selected={Boolean(
             matchRoute({ to: "/saves" }) ||
@@ -63,8 +64,8 @@ const Root: React.FC = () => {
         >
           Backups & settings
         </HeaderItem>
-      </>}
-    >
+      </Header>
+
       <div
         style={{
           alignSelf: 'center',

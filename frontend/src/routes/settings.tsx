@@ -10,8 +10,11 @@ const SettingsPage: React.FC = () => {
       style={{
         display: "flex",
         flexDirection: 'column',
-        alignItems: "center",
+        alignItems: "stretch",
         gap: 16,
+        maxWidth: 900,
+        marginLeft: 'auto',
+        marginRight: 'auto',
       }}
     >
       <Settings />

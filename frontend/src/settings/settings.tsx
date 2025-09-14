@@ -30,7 +30,7 @@ export const Settings: React.FC = () => {
         await settingsMutation.mutateAsync({
             data: {
                 ...data,
-                savE_GLOBS: data.savE_GLOBS.split('\n').filter(Boolean)
+                savE_GLOBS: data.savE_GLOBS.split('\n').map(value => value.trim()).filter(Boolean)
             },
         });
     });
@@ -38,7 +38,6 @@ export const Settings: React.FC = () => {
     return <TitledContainer title={`Settings`}>
         <form
             style={{
-                minWidth: 500,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 8,
@@ -46,9 +45,9 @@ export const Settings: React.FC = () => {
         >
             <div
                 style={{
-                    minWidth: 500,
                     display: 'flex',
                     gap: 8,
+                    flexWrap: 'wrap'
                 }}
             >
                 <div
@@ -66,30 +65,33 @@ export const Settings: React.FC = () => {
 
                     <TextInput
                         label='DB path'
-                        {...register('dB_PATH')}
+                        {...register('dB_PATH', { setValueAs: (value) => value.trim() })}
                     />
 
                     <TextInput
                         label='Storage path'
-                        {...register('storagE_PATH')}
+                        {...register('storagE_PATH', { setValueAs: (value) => value.trim() })}
                     />
 
                     <TextInput
                         label='Backups path'
-                        {...register('backuP_PATH')}
+                        {...register('backuP_PATH', { setValueAs: (value) => value.trim() })}
                     />
                 </div>
 
                 <div
                     style={{
                         flexGrow: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
                     }}
                 >
                     <TextInput
                         label='Saves globs'
                         area
                         style={{
-                            minHeight: '100%'
+                            minHeight: 200,
+                            height: '100%',
                         }}
                         {...register('savE_GLOBS')}
                     />

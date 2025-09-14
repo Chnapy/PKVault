@@ -7,11 +7,11 @@ import {
   type ListboxProps,
 } from "@headlessui/react";
 import React from "react";
-import { Container } from "../../container/container";
 import {
   FilterLabel,
   type FilterLabelProps,
 } from "../filter-label/filter-label";
+import { TitledContainer } from '../../container/titled-container';
 
 export type FilterSelectProps = FilterLabelProps &
   ListboxProps<React.ElementType, string[]> & {
@@ -57,7 +57,11 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
           </ListboxButton>
 
           <ListboxOptions anchor="bottom">
-            <Container style={{ margin: 2, marginTop: 6 }}>
+            <TitledContainer
+              contrasted
+              title={'Box selection'}
+            // style={{ margin: 2, marginTop: 6 }}
+            >
               {options.map(({ value, label }, i) => (
                 <ListboxOption
                   key={value}
@@ -67,14 +71,14 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
                   <FilterLabel
                     enabled={hasValue(value)}
                     className={css({
-                      display: "block",
+                      // display: "block",
                     })}
                   >
                     {label}
                   </FilterLabel>
                 </ListboxOption>
               ))}
-            </Container>
+            </TitledContainer>
           </ListboxOptions>
         </Listbox>
       </FilterLabel>

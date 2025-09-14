@@ -10,11 +10,21 @@ public class StaticDataService
 
         foreach (var version in Enum.GetValues<GameVersion>())
         {
-            tasks.Add(Task.Run(async () => new StaticVersion
+            tasks.Add(Task.Run(async () =>
             {
-                Id = version,
-                Name = await GetVersionName(version),
-                Generation = version.GetGeneration(),
+                var blankSave = version.GetContext() == EntityContext.None
+                ? null
+                : SaveUtil.GetBlankSAV(version.GetContext(), "");
+
+                return new StaticVersion
+                {
+                    Id = version,
+                    Name = await GetVersionName(version),
+                    Generation = version.GetGeneration(),
+                    MaxSpeciesId = blankSave?.MaxSpeciesID ?? 0,
+                    MaxIV = blankSave?.MaxIV ?? 0,
+                    MaxEV = blankSave?.MaxEV ?? 0,
+                };
             }));
         }
 
@@ -124,8 +134,8 @@ public class StaticDataService
 
         for (var i = 0; i < typeNames.Count; i++)
         {
-            var typeId = i;
-            var typeName = typeNames[typeId];
+            var typeName = typeNames[i];
+            var typeId = i + 1;
             dict.Add(typeId, new()
             {
                 Id = typeId,
@@ -147,7 +157,23 @@ public class StaticDataService
             var moveName = moveNames[moveId];
             tasks.Add(Task.Run(async () =>
             {
-                var moveObj = await PokeApi.GetMove(moveId + 1);
+                if (moveId == 0)
+                {
+                    return new StaticMove()
+                    {
+                        Id = moveId,
+                        Name = moveName,
+                        DataUntilGeneration = [new()
+                        {
+                            UntilGeneration = 99,
+                            Type = 1,   // normal
+                            Category = MoveCategory.STATUS,
+                            Power = null,
+                        }],
+                    };
+                }
+
+                var moveObj = await PokeApi.GetMove(moveId);
 
                 var type = PokeApi.GetIdFromUrl(moveObj.Type.Url);
 
@@ -193,6 +219,8 @@ public class StaticDataService
                         Power = dataPostG3.Power,
                     });
                 }
+
+                dataUntilGeneration.Sort((a, b) => a.UntilGeneration < b.UntilGeneration ? -1 : 1);
 
                 return new StaticMove
                 {

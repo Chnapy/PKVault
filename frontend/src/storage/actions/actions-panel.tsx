@@ -2,60 +2,46 @@ import React from 'react';
 import { DataActionType } from '../../data/sdk/model';
 import { useStorageDeleteActions, useStorageGetActions, useStorageSave } from '../../data/sdk/storage/storage.gen';
 import { Button } from '../../ui/button/button';
-import { Container } from '../../ui/container/container';
+import { TitledContainer } from '../../ui/container/titled-container';
+import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
 import { switchUtil } from '../../util/switch-util';
 
 export const ActionsPanel: React.FC = () => {
     const actionsQuery = useStorageGetActions();
-
-    const [ showPanel, setShowPanel ] = React.useState<boolean>(false);
-    const [ actionIndexToRemoveFrom, setActionIndexToRemoveFrom ] = React.useState<number>();
-
+    const actionsDeleteMutation = useStorageDeleteActions();
     const saveMutation = useStorageSave();
 
-    const actionsDeleteMutation = useStorageDeleteActions();
+    const [ actionIndexToRemoveFrom, setActionIndexToRemoveFrom ] = React.useState<number>();
 
     const actions = actionsQuery.data?.data ?? [];
 
-    return <div
-        style={{
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            paddingLeft: 2,
-            paddingRight: 2,
-        }}
-    >
-        <Button
-            onClick={() => setShowPanel(!showPanel)}
+    const nbrSelectedActions = actionIndexToRemoveFrom === undefined ? 0 : (actions.length - actionIndexToRemoveFrom);
+
+    return <TitledContainer
+        contrasted
+        enableExpand
+        title={<div
             style={{
-                borderBottomWidth: 0,
-                borderBottomLeftRadius: 0,
-                borderBottomRightRadius: 0,
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 4,
             }}
         >
-            Actions history & save
-        </Button>
-
-        {showPanel && <Container style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            padding: 8,
-        }}>
-            <table
-                style={{
-                    width: '100%'
-                }}
-            >
+            <Icon name='angle-down' forButton />
+            {actions.length} actions to save
+            <Icon name='angle-down' forButton />
+        </div>}
+    >
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+            }}
+        >
+            <table>
                 <tbody>
-                    {actions.length === 0 && <tr>
-                        <td>
-                            (no actions)
-                        </td>
-                    </tr>}
-
                     {actions.map((action, i) => {
                         const selected = actionIndexToRemoveFrom === i;
                         const isToRemove = typeof actionIndexToRemoveFrom === 'number' && actionIndexToRemoveFrom <= i;
@@ -63,7 +49,7 @@ export const ActionsPanel: React.FC = () => {
                         return <tr key={i}>
                             <td
                                 style={isToRemove ? {
-                                    color: theme.text.contrast,
+                                    // color: theme.text.contrast,
                                     textDecoration: 'line-through'
                                 } : undefined}
                             >
@@ -90,7 +76,7 @@ export const ActionsPanel: React.FC = () => {
                                     }
                                     selected={selected}
                                 >
-                                    X
+                                    <Icon name='times' forButton />
                                 </Button>
                             </td>
                         </tr>;
@@ -99,19 +85,33 @@ export const ActionsPanel: React.FC = () => {
             </table>
 
             {typeof actionIndexToRemoveFrom === 'number'
-                ? <Button
-                    onClick={() => actionsDeleteMutation.mutateAsync({
-                        params: {
-                            actionIndexToRemoveFrom,
-                        }
-                    })}
+                && <Button
+                    onClick={async () => {
+                        await actionsDeleteMutation.mutateAsync({
+                            params: {
+                                actionIndexToRemoveFrom,
+                            }
+                        });
+                        setActionIndexToRemoveFrom(undefined);
+                    }}
+                    bgColor={theme.bg.red}
+                    style={{
+                        alignSelf: 'flex-end'
+                    }}
                 >
-                    Remove actions from [{actionIndexToRemoveFrom}]
-                </Button>
-                : <Button onClick={() => saveMutation.mutateAsync()}>
-                    Apply all actions & save
+                    <Icon name='times' forButton />
+                    Delete {nbrSelectedActions} selected actions
                 </Button>}
 
-        </Container>}
-    </div>;
+            <Button
+                big
+                bgColor={theme.bg.primary}
+                onClick={() => saveMutation.mutateAsync()}
+                disabled={actions.length === 0 || typeof actionIndexToRemoveFrom === 'number'}
+            >
+                <Icon name='save' solid forButton />
+                Save
+            </Button>
+        </div>
+    </TitledContainer>;
 };

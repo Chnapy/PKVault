@@ -69,21 +69,17 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         }
     }
 
-    public List<string> Types
+    public List<byte> Types
     {
         get
         {
-            var type1 = PKHexUtils.StringsFR.Types[
-                Generation <= 2
+            var type1 = Generation <= 2
                 ? Dex123Service.GetG12Type(Pkm.PersonalInfo.Type1)
-                : Pkm.PersonalInfo.Type1
-            ];
-            var type2 = PKHexUtils.StringsFR.Types[
-                Generation <= 2
+                : Pkm.PersonalInfo.Type1;
+            var type2 = Generation <= 2
                 ? Dex123Service.GetG12Type(Pkm.PersonalInfo.Type2)
-                : Pkm.PersonalInfo.Type2
-            ];
-            return [type1, type2];
+                : Pkm.PersonalInfo.Type2;
+            return [(byte)(type1 + 1), (byte)(type2 + 1)];
         }
     }
 
@@ -179,13 +175,20 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         {
             HiddenPower.TryGetTypeIndex(Pkm.HPType, out var hptype);
 
-            return hptype;
+            return (byte)(hptype + 1);
         }
     }
 
     public int HiddenPowerPower
     {
         get { return Pkm.HPPower; }
+    }
+
+    public MoveCategory HiddenPowerCategory
+    {
+        get => Generation <= 3
+            ? (HiddenPowerType < 10 ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL) // TODO duplicate with static-data
+            : MoveCategory.SPECIAL;
     }
 
     public PKHeX.Core.Nature Nature { get => Pkm.Nature; }
@@ -285,7 +288,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
             moveComboSource.DataSource.ToList().ForEach(data =>
             {
-                if (moveSource.Info.CanLearn((ushort)data.Value))
+                if (data.Value > 0 && moveSource.Info.CanLearn((ushort)data.Value))
                 {
                     var item = new MoveItem
                     {
@@ -302,6 +305,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         }
     }
 
+    // TODO handle when not present in attached save
     public bool IsValid
     {
         get

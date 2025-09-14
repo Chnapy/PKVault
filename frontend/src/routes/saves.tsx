@@ -28,6 +28,9 @@ const Saves: React.FC = () => {
         alignItems: "center",
         // flexWrap: "wrap",
         gap: 16,
+        maxWidth: 900,
+        marginLeft: 'auto',
+        marginRight: 'auto',
       }}
     >
       <div
@@ -44,7 +47,7 @@ const Saves: React.FC = () => {
             return null;
           }
 
-          const maxSpecies = Math.max(...saves.map(save => save.maxSpeciesId));
+          const maxSpecies = Math.max(...saves.map(save => staticData.versions[ save.version ].maxSpeciesId));
 
           return <TitledContainer key={generation} title={`Generation ${generation} / ${maxSpecies} species`}>
             <div

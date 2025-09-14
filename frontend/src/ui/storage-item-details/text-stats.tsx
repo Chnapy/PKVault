@@ -1,16 +1,22 @@
 import React from 'react';
 import { useWatch } from 'react-hook-form';
-import { Button } from '../button/button';
+import type { MoveCategory } from '../../data/sdk/model';
+import { useStaticData } from '../../hooks/use-static-data';
+import { Icon } from '../icon/icon';
+import { NumberInput } from '../input/number-input';
+import { MoveItem } from '../move-item/move-item';
 import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
 
 export type TextStatsProps = {
-    nature?: string;
+    nature?: number;
     stats: number[];
     ivs: number[];
     evs: number[];
-    hiddenPowerType: string;
+    maxEv: number;
+    hiddenPowerType: number;
     hiddenPowerPower: number;
+    hiddenPowerCategory: MoveCategory;
 };
 
 export const TextStats: React.FC<TextStatsProps> = ({
@@ -18,74 +24,95 @@ export const TextStats: React.FC<TextStatsProps> = ({
     stats,
     ivs,
     evs,
+    maxEv,
     hiddenPowerType,
     hiddenPowerPower,
+    hiddenPowerCategory,
 }) => {
-    const { editMode, setValue, register, control } = StorageDetailsForm.useContext();
+    const staticData = useStaticData();
 
+    const { editMode, getValues, register, control } = StorageDetailsForm.useContext();
+
+    const natureObj = nature === undefined ? undefined : staticData.natures[ nature ];
+
+    const totalIVs = ivs.reduce((acc, iv) => acc + iv, 0);
     const totalEVs = evs.reduce((acc, ev) => acc + ev, 0);
+    const totalStats = stats.reduce((acc, stat) => acc + stat, 0);
     const totalFormEVs = useWatch({ name: 'eVs', control }).reduce((acc, ev) => acc + ev, 0);
+    const remainingEVs = Math.max(totalEVs - totalFormEVs, 0);
+    const formMaxValues = getValues('eVs').map(ev => Math.min(ev + remainingEVs, maxEv));
+
+    const cellBaseStyle: React.CSSProperties = { padding: 0, textAlign: 'center' };
+
+    const renderStatNameCell = (statName: string, i: number) => <td style={{ ...cellBaseStyle, textAlign: 'left' }}>
+        {statName}{' '}
+        {(i + 1) === natureObj?.decreasedStatIndex && <Icon name='angle-down' style={{ color: theme.text.red }} />}
+        {(i + 1) === natureObj?.increasedStatIndex && <Icon name='angle-up' style={{ color: theme.text.primary }} />}
+    </td>;
 
     return <>
-        {nature && <>
-            Nature <span style={{ color: theme.text.primary }}>{nature}</span>
+        {natureObj && <>
+            Nature <span style={{ color: theme.text.primary }}>{natureObj.name}</span>
+            <br />
             <br />
         </>}
 
-        <table>
+        <table
+            style={{
+                borderSpacing: '8px 0'
+            }}
+        >
             <thead>
                 <tr>
-                    <td style={{ paddingTop: 0, paddingBottom: 0 }}></td>
-                    {/* {staticStats.map(stat => <td key={stat.id} style={{ paddingTop: 0, paddingBottom: 0 }}>{stat.name}</td>)} */}
-                    <td style={{ paddingTop: 0, paddingBottom: 0 }}>HP.</td>
-                    <td style={{ paddingTop: 0, paddingBottom: 0 }}>Atk</td>
-                    <td style={{ paddingTop: 0, paddingBottom: 0 }}>Def</td>
-                    <td style={{ paddingTop: 0, paddingBottom: 0 }}>SpA</td>
-                    <td style={{ paddingTop: 0, paddingBottom: 0 }}>SpD</td>
-                    <td style={{ paddingTop: 0, paddingBottom: 0 }}>Spe</td>
+                    <td style={cellBaseStyle}></td>
+                    {!editMode && <td style={cellBaseStyle}>IVs</td>}
+                    <td style={cellBaseStyle}>EVs</td>
+                    {!editMode && <td style={cellBaseStyle}>Stats</td>}
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td style={{ padding: 0 }}>
-                        <span style={{ color: theme.text.primary }}>IVs</span>
-                    </td>
-                    {ivs.map((iv, i) => <td key={i} style={{ padding: 0, textAlign: 'center' }}>{iv}</td>)}
-                </tr>
-                <tr>
-                    <td style={{ padding: 0 }}>
-                        <span style={{ color: theme.text.primary }}>EVs</span>
-                    </td>
-                    {editMode
-                        ? <>
-                            {evs.map((ev, i) => <td key={i} style={{ padding: 0, textAlign: 'center' }}>
-                                <input
-                                    type='number'
-                                    {...register(`eVs.${i}`, { valueAsNumber: true })}
-                                    style={{ width: 50, padding: 0, textAlign: 'center' }}
-                                />
-                            </td>)}
+                {[ 'HP', 'Atk', 'Def', 'SpA', 'SpD', 'Spe' ]
+                    .map((statName, i) => editMode
+                        ? <tr key={statName}>
+                            {renderStatNameCell(statName, i)}
+                            <td style={cellBaseStyle}>
+                                <NumberInput {...register(`eVs.${i}`, {
+                                    valueAsNumber: true,
+                                    min: 0,
+                                    max: formMaxValues[ i ]
+                                })} rangeMin={0} rangeMax={formMaxValues[ i ]} style={{ display: 'flex', height: '1lh' }} />
+                            </td>
+                        </tr>
+                        : <tr key={statName}>
+                            {renderStatNameCell(statName, i)}
+                            <td style={cellBaseStyle}>{ivs[ i ]}</td>
+                            <td style={cellBaseStyle}>{evs[ i ]}</td>
+                            <td style={cellBaseStyle}>{stats[ i ]}</td>
+                        </tr>)}
 
-                            <td style={{ padding: 0, textAlign: 'center', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                {totalFormEVs}/{totalEVs}
-                            </td>
-                        </>
-                        : <>
-                            {evs.map((ev, i) => <td key={i} style={{ padding: 0, textAlign: 'center' }}>{ev}</td>)}
-                            <td style={{ padding: 0, textAlign: 'center' }}>
-                                <Button onClick={() => setValue('editMode', true)}>Edit</Button>
-                            </td>
-                        </>}
-                </tr>
-                {!editMode && <tr>
-                    <td style={{ padding: 0 }}>
-                        <span style={{ color: theme.text.primary }}>Stats</span>
-                    </td>
-                    {stats.map((stat, i) => <td key={i} style={{ padding: 0, textAlign: 'center' }}>{stat}</td>)}
-                </tr>}
+                {editMode
+                    ? <tr>
+                        <td style={{ ...cellBaseStyle, textAlign: 'left' }}>Total</td>
+                        <td style={cellBaseStyle}>{totalFormEVs} / {totalEVs}</td>
+                    </tr>
+                    : <tr>
+                        <td style={{ ...cellBaseStyle, textAlign: 'left' }}>Total</td>
+                        <td style={cellBaseStyle}>{totalIVs}</td>
+                        <td style={cellBaseStyle}>{totalEVs}</td>
+                        <td style={cellBaseStyle}>{totalStats}</td>
+                    </tr>}
             </tbody>
         </table>
         <br />
-        Hidden power <span style={{ color: theme.text.primary }}>{hiddenPowerType}</span> - <span style={{ color: theme.text.primary }}>{hiddenPowerPower}</span>
+        <MoveItem
+            name={staticData.moves[ 237 ].name}
+            type={hiddenPowerType}
+            damage={hiddenPowerPower}
+            category={hiddenPowerCategory}
+            style={{
+                display: 'inline-block',
+                verticalAlign: 'bottom'
+            }}
+        />
     </>;
 };

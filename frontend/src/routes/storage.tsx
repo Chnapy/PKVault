@@ -11,6 +11,7 @@ import {
   useStorageSaveMovePkmFromStorage,
   useStorageSaveMovePkmToStorage
 } from "../data/sdk/storage/storage.gen";
+import { SaveItem } from '../saves/save-item/save-item';
 import { ActionsPanel } from '../storage/actions/actions-panel';
 import { StorageDetails } from "../storage/storage-details";
 import { StorageMainBox } from "../storage/storage-main-box";
@@ -20,6 +21,8 @@ import { StorageSaveSelect } from "../storage/storage-save-select";
 export const Storage: React.FC = () => {
   const selected = Route.useSearch({ select: (search) => search.selected });
   const saveId = Route.useSearch({ select: (search) => search.save });
+
+  const navigate = Route.useNavigate();
 
   const saveInfosRecord = useSaveInfosGetAll().data?.data;
   const saveInfos =
@@ -45,11 +48,12 @@ export const Storage: React.FC = () => {
   return (
     <div
       style={{
-        display: "flex",
+        display: "table",
         justifyContent: "center",
-        alignItems: "flex-end",
+        alignItems: "flex-start",
         flexWrap: "wrap",
-        gap: 16,
+        borderSpacing: 16,
+        margin: 'auto',
       }}
     >
       <DndContext
@@ -148,15 +152,112 @@ export const Storage: React.FC = () => {
           }
         }}
       >
-        <StorageMainBox />
+        <div
+          style={{
+            display: 'table-row'
+          }}
+        >
 
-        {saveId ? <StorageSaveBox saveId={saveId} /> : <StorageSaveSelect />}
+          <div
+            style={{
+              display: 'table-cell',
+              verticalAlign: 'top',
+              // height: 1,
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'stretch',
+                justifyContent: 'center',
+                // height: '100%',
+              }}
+            >
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: 'table-cell',
+              verticalAlign: 'top',
+              // height: 1,
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'stretch',
+                justifyContent: 'center',
+                // height: '100%',
+              }}
+            >
+              {saveId ? <SaveItem
+                saveId={saveId}
+                onClose={() => navigate({
+                  search: {
+                    save: undefined,
+                    saveBoxId: undefined,
+                    selected: undefined,
+                  }
+                })}
+              /> : null}
+            </div>
+          </div>
+
+        </div>
+
+        <div
+          style={{
+            display: 'table-row'
+          }}
+        >
+
+          <div
+            style={{
+              display: 'table-cell',
+              verticalAlign: 'top',
+              // height: 1,
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'stretch',
+                justifyContent: 'center',
+                // height: '100%',
+              }}
+            >
+              <StorageMainBox />
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: 'table-cell',
+              verticalAlign: 'top',
+              // height: 1,
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'stretch',
+                justifyContent: 'center',
+                // height: '100%',
+              }}
+            >
+              {saveId ? <StorageSaveBox saveId={saveId} /> : <StorageSaveSelect />}
+            </div>
+          </div>
+
+        </div>
+
       </DndContext>
 
       <div
         style={{
           position: "fixed",
-          bottom: 0,
+          bottom: 14,
           left: "50%",
           transform: 'translateX(-50%)',
           width: 400,
@@ -191,6 +292,7 @@ const searchSchema = z.object({
     .object({
       type: z.enum([ "main", "save" ]),
       id: z.string(),
+      editMode: z.boolean().optional(),
     })
     .optional(),
   save: z.number().optional(),

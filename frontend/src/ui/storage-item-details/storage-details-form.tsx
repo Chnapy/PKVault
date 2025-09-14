@@ -1,16 +1,15 @@
 import type React from 'react';
-import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import type { EditPkmVersionPayload } from '../../data/sdk/model';
 import { useStorageMainEditPkmVersion, useStorageSaveEditPkm } from '../../data/sdk/storage/storage.gen';
+import { Route } from '../../routes/storage';
 
-type FormData = { editMode: boolean } & EditPkmVersionPayload;
+type FormData = EditPkmVersionPayload;
 
 export const StorageDetailsForm = {
     Provider: ({ children, ...initialPayload }: React.PropsWithChildren<EditPkmVersionPayload>) => {
-
         const methods = useForm<FormData>({
             defaultValues: {
-                editMode: false,
                 ...initialPayload
             }
         });
@@ -19,18 +18,50 @@ export const StorageDetailsForm = {
             {children}
         </FormProvider>
     },
+    useEditMode: () => {
+        const navigate = Route.useNavigate();
+        const selected = Route.useSearch({ select: (search) => search.selected });
+
+        const startEdit = () => selected && navigate({
+            search: {
+                selected: {
+                    ...selected,
+                    editMode: true
+                }
+            }
+        });
+        const stopEdit = () => selected && navigate({
+            search: {
+                selected: {
+                    ...selected,
+                    editMode: undefined
+                }
+            }
+        });
+
+        return {
+            editMode: selected?.editMode ?? false,
+            startEdit,
+            stopEdit,
+        };
+    },
     useContext: () => {
         const methods = useFormContext<FormData>();
-        const editMode = useWatch<FormData>({ name: 'editMode' });
+
+        const { editMode, startEdit, stopEdit } = StorageDetailsForm.useEditMode();
 
         const mainEditPkmVersionMutation = useStorageMainEditPkmVersion();
-
         const saveEditPkmMutation = useStorageSaveEditPkm();
 
         return {
             ...methods,
             editMode,
-            cancel: () => methods.reset(),
+            startEdit,
+            stopEdit,
+            cancel: () => {
+                methods.reset();
+                stopEdit();
+            },
             submitForPkmVersion: async (pkmVersionId: string) => {
                 await mainEditPkmVersionMutation.mutateAsync({
                     pkmVersionId,
@@ -40,7 +71,7 @@ export const StorageDetailsForm = {
                         moves: methods.getValues('moves'),
                     }
                 });
-                methods.setValue('editMode', false);
+                stopEdit();
             },
             submitForPkmSave: async (saveId: number, pkmId: string) => {
                 await saveEditPkmMutation.mutateAsync({
@@ -52,8 +83,8 @@ export const StorageDetailsForm = {
                         moves: methods.getValues('moves'),
                     }
                 });
-                methods.setValue('editMode', false);
+                stopEdit();
             },
-        }
+        };
     },
 };

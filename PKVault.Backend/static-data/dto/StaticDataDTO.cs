@@ -15,68 +15,71 @@ public class StaticDataDTO
 
 public struct StaticVersion
 {
-    public GameVersion Id { get; set; }
-    public string Name { get; set; }
-    public byte Generation { get; set; }
+    public required GameVersion Id { get; set; }
+    public required string Name { get; set; }
+    public required byte Generation { get; set; }
+    public required int MaxSpeciesId { get; set; }
+    public required int MaxIV { get; set; }
+    public required int MaxEV { get; set; }
 }
 
 public struct StaticSpecies
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public uint Generation { get; set; }
-    public GenderType[] Genders { get; set; }
-    public string SpriteDefault { get; set; }
-    public string SpriteShiny { get; set; }
+    public required int Id { get; set; }
+    public required string Name { get; set; }
+    public required uint Generation { get; set; }
+    public required GenderType[] Genders { get; set; }
+    public required string SpriteDefault { get; set; }
+    public required string SpriteShiny { get; set; }
     // public int[] AvailableMoves { get; set; }
 }
 
 public struct StaticStat
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
+    public required int Id { get; set; }
+    public required string Name { get; set; }
 }
 
 public struct StaticType
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
+    public required int Id { get; set; }
+    public required string Name { get; set; }
 }
 
 public struct StaticMove
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public StaticMoveGeneration[] DataUntilGeneration { get; set; }
+    public required int Id { get; set; }
+    public required string Name { get; set; }
+    public required StaticMoveGeneration[] DataUntilGeneration { get; set; }
 }
 
 public struct StaticMoveGeneration
 {
-    public uint UntilGeneration { get; set; }
-    public int Type { get; set; }
-    public MoveCategory Category { get; set; }
-    public int? Power { get; set; }
+    public required uint UntilGeneration { get; set; }
+    public required int Type { get; set; }
+    public required MoveCategory Category { get; set; }
+    public required int? Power { get; set; }
 }
 
 public struct StaticNature
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public int? IncreasedStatIndex { get; set; }
-    public int? DecreasedStatIndex { get; set; }
+    public required int Id { get; set; }
+    public required string Name { get; set; }
+    public required int? IncreasedStatIndex { get; set; }
+    public required int? DecreasedStatIndex { get; set; }
 }
 
 public struct StaticAbility
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
+    public required int Id { get; set; }
+    public required string Name { get; set; }
 }
 
 public struct StaticItem
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string Sprite { get; set; }
+    public required int Id { get; set; }
+    public required string Name { get; set; }
+    public required string Sprite { get; set; }
 }
 
 public enum MoveCategory

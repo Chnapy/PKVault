@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageSaveDeletePkm, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
+import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageSaveDeletePkm } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
@@ -18,11 +18,7 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
 
     const staticData = useStaticData();
 
-    const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm();
-
     const savePkmDeleteMutation = useStorageSaveDeletePkm();
-
-    const evolvePkmMutation = useStorageEvolvePkm();
 
     const savePkmQuery = useStorageGetSavePkms(saveId);
     const pkmsQuery = useStorageGetMainPkms();
@@ -69,14 +65,15 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
             stats={savePkm.stats}
             ivs={savePkm.iVs}
             evs={savePkm.eVs}
-            hiddenPowerType={staticData.types[ savePkm.hiddenPowerType ].name}
+            hiddenPowerType={savePkm.hiddenPowerType}
             hiddenPowerPower={savePkm.hiddenPowerPower}
-            nature={staticData.natures[ savePkm.nature ].name}
-            ability={staticData.abilities[ savePkm.ability ].name}
+            hiddenPowerCategory={savePkm.hiddenPowerCategory}
+            nature={savePkm.nature}
+            ability={savePkm.ability}
             level={savePkm.level}
             exp={savePkm.exp}
-            moves={savePkm.moves.map(move => ({ id: move, text: staticData.moves[ move ].name, sourceTypes: [], type: -1 }))}
-            availableMoves={savePkm.availableMoves}
+            moves={savePkm.moves}
+            availableMoves={savePkm.availableMoves.map(move => move.id)}
             tid={savePkm.tid}
             originTrainerName={savePkm.originTrainerName}
             originTrainerGender={savePkm.originTrainerGender}
@@ -100,21 +97,6 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({
                 }
             }))}
             canMoveToMainStorage={savePkm.canMoveToMainStorage}
-            onEvolve={savePkm.canEvolve && !pkmVersion
-                ? (() => evolvePkmMutation.mutateAsync({
-                    id: savePkm.id,
-                    params: {
-                        saveId,
-                    },
-                }))
-                : undefined
-            }
-            onSynchronize={pkmVersion ? (() => savePkmSynchronizeMutation.mutateAsync({
-                saveId,
-                params: {
-                    pkmVersionId: pkmVersion.id,
-                }
-            })) : undefined}
             onRelease={pkm
                 ? undefined
                 : (() => savePkmDeleteMutation.mutateAsync({

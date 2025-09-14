@@ -29,14 +29,15 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
       // // borderRadius="small"
       // onClick={onClick}
       selected={isOver}
-      // noDropshadow={!onClick}
+      noDropshadow
       style={{
+        backgroundColor: 'transparent',//theme.bg.light,
         alignSelf: "flex-start",
         padding: 0,
         width: 96,
         height: 96,
         order: boxSlot,
       }}
-    ></Container>
+    />
   );
 };
