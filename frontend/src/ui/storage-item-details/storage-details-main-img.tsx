@@ -21,8 +21,6 @@ export const StorageDetailsMainImg: React.FC<StorageDetailsMainImgProps> = ({ sp
             ? staticData.species[ species ].spriteShiny
             : staticData.species[ species ].spriteDefault);
 
-    const ballSprite = staticData.items[ ball ].sprite;
-
     return <>
         <div
             style={{
@@ -42,14 +40,14 @@ export const StorageDetailsMainImg: React.FC<StorageDetailsMainImgProps> = ({ sp
             />
         </div>
 
-        <img
-            src={ballSprite!}
+        {ball > 0 && <img
+            src={staticData.items[ ball ].sprite}
             style={{
                 position: 'absolute',
                 bottom: 0,
                 right: 0,
             }}
-        />
+        />}
 
         {isShiny && <img
             src={shinyIconImg}

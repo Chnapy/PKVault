@@ -1,16 +1,18 @@
 import { css, cx } from '@emotion/css';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import React from "react";
+import { createPortal } from 'react-dom';
 import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png?url';
 import { useStaticData } from '../../hooks/use-static-data';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
-import { Container } from "../container/container";
+import { ButtonLike } from '../button/button-like';
 import { Icon } from '../icon/icon';
 import { theme } from '../theme';
 import { StorageItemMainActions } from './storage-item-main-actions';
 import { StorageItemMainActionsContainer } from './storage-item-main-actions-container';
 import { StorageItemSaveActions } from './storage-item-save-actions';
 import { StorageItemSaveActionsContainer } from './storage-item-save-actions-container';
+import { StorageItemPlaceholder } from './storage-item-placeholder';
 
 export type StorageItemProps = {
   storageType: "main" | "save";
@@ -23,6 +25,7 @@ export type StorageItemProps = {
   selected?: boolean;
   onClick?: () => void;
   warning?: boolean;
+  boxId: number;
   boxSlot: number;
 
   // actions
@@ -44,6 +47,7 @@ export const StorageItem: React.FC<StorageItemProps> = ({
   selected,
   onClick,
   warning,
+  boxId,
   boxSlot,
 
   canCreateVersion,
@@ -54,9 +58,25 @@ export const StorageItem: React.FC<StorageItemProps> = ({
 }) => {
   const [ hover, setHover ] = React.useState(false);
 
+  const moveContext = StorageMoveContext.useValue();
+  const moveDroppable = StorageMoveContext.useDroppable(storageType, boxId, boxSlot);
   const moveDraggable = StorageMoveContext.useDraggable(pkmId, storageType);
+  const moveLoading = StorageMoveContext.useLoading(storageType, boxId, boxSlot, pkmId);
 
   const staticData = useStaticData();
+
+  if (moveLoading) {
+    return <StorageItemPlaceholder
+      storageType={storageType}
+      boxId={boxId}
+      boxSlot={boxSlot}
+      pkmId={pkmId}
+    />;
+  }
+
+  if (pkmId === 'G20931725') {
+    console.log('PKM SLOT', boxSlot)
+  }
 
   const sprite = isEgg
     ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png'
@@ -64,31 +84,34 @@ export const StorageItem: React.FC<StorageItemProps> = ({
       ? staticData.species[ species ].spriteShiny
       : staticData.species[ species ].spriteDefault);
 
-  return (
+  const element = (
     <Popover
       ref={moveDraggable.ref}
       draggable={true}
       className={css({
-        position: 'relative',
-        alignSelf: "flex-start",
         order: boxSlot,
+        position: 'relative',
+        display: 'inline-flex',
+        alignSelf: "flex-start",
         // transform: `translate(${transform?.x ?? 0}px, ${transform?.y ?? 0}px)`,
         // zIndex: isDragging ? 1 : undefined,
       })}
     >
       <PopoverButton
-        as={Container}
+        as={ButtonLike}
         componentDescriptor='button'
         // ref={setNodeRef}
         // {...listeners}
         // {...attributes}
         // as={onClick ? "button" : undefined}
         // borderRadius="small"
-        onClick={onClick}
+        onClick={moveDroppable.onClick ?? onClick}
         onPointerMove={moveDraggable.onPointerMove}
+        onPointerUp={moveDroppable.onPointerUp}
         onPointerEnter={() => setHover(true)}
         onPointerLeave={() => setHover(false)}
         selected={selected}
+        loading={moveLoading}
         noDropshadow={!onClick}
         style={{
           backgroundColor: theme.bg.light,
@@ -196,7 +219,7 @@ export const StorageItem: React.FC<StorageItemProps> = ({
           }
         })}
       >
-        {selected
+        {!moveLoading && selected
           ? <>
             {storageType === 'main'
               ? <StorageItemMainActions />
@@ -217,4 +240,16 @@ export const StorageItem: React.FC<StorageItemProps> = ({
       </PopoverPanel>}
     </Popover>
   );
+
+  return <div
+    className={css({
+      display: 'flex',
+      alignSelf: "flex-start",
+      order: boxSlot,
+    })}
+  >
+    {!moveLoading && moveContext.selected?.id === pkmId && moveContext.selected?.storageType === storageType
+      ? createPortal(element, document.body)
+      : element}
+  </div>;
 };

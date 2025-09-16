@@ -8,6 +8,11 @@ type Context = {
         id: string;
         storageType: 'main' | 'save';
         // slot: number;
+        target?: {
+            storageType: 'main' | 'save';
+            boxId: number;
+            boxSlot: number;
+        };
     };
     setSelected: (selected: Context[ 'selected' ]) => void;
 };
@@ -25,21 +30,35 @@ export const StorageMoveContext = {
             })),
         });
 
+        // console.log('state', value.selected)
+
         return <context.Provider value={value}>
             {children}
         </context.Provider>
     },
     useValue: () => React.useContext(context),
+    useLoading: (storageType: 'main' | 'save', boxId: number, boxSlot: number, pkmId?: string) => {
+        const { selected } = StorageMoveContext.useValue();
+
+        const moveTarget = selected?.target;
+
+        return !!moveTarget && (
+            (moveTarget.storageType === storageType && moveTarget.boxId === boxId && moveTarget.boxSlot === boxSlot)
+            || (selected.storageType === storageType && selected.id === pkmId)
+        );
+    },
     useClickable: (pkmId: string, storageType: 'main' | 'save') => {
         const moveContext = StorageMoveContext.useValue();
 
         return {
-            onClick: () => {
-                moveContext.setSelected({
-                    id: pkmId,
-                    storageType,
-                });
-            },
+            onClick: !moveContext.selected
+                ? (() => {
+                    moveContext.setSelected({
+                        id: pkmId,
+                        storageType,
+                    });
+                })
+                : undefined,
         };
     },
     useDraggable: (pkmId: string, storageType: 'main' | 'save') => {
@@ -49,6 +68,7 @@ export const StorageMoveContext = {
         React.useEffect(() => {
             if (
                 ref.current
+                && !moveContext.selected?.target
                 && moveContext.selected?.id === pkmId
                 && moveContext.selected?.storageType === storageType
             ) {
@@ -125,6 +145,17 @@ export const StorageMoveContext = {
                 return;
             }
 
+            setSelected({
+                ...selected,
+                target: {
+                    storageType: dropStorageType,
+                    boxId: dropBoxId,
+                    boxSlot: dropBoxSlot,
+                },
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
             if (
                 selected.storageType === "main" &&
                 dropStorageType === "main"
@@ -185,17 +216,18 @@ export const StorageMoveContext = {
                     },
                 });
             }
+
+            // TODO should be done in mutation onSuccess to stay sync with cache update
+            setSelected(undefined);
         };
 
         return {
-            onClick: selected && (async () => {
+            onClick: selected && !selected.target ? (async () => {
                 await onDrop();
-                setSelected(undefined);
-            }),
-            onPointerUp: selected && (async () => {
+            }) : undefined,
+            onPointerUp: selected && !selected.target ? (async () => {
                 await onDrop();
-                setSelected(undefined);
-            }),
+            }) : undefined,
         };
     },
 };

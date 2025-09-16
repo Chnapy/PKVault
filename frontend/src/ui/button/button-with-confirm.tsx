@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import { Popover, PopoverButton, PopoverPanel, type PopoverPanelProps } from '@headlessui/react';
-import type React from 'react';
+import React from 'react';
 import { Button, type ButtonProps } from './button';
 import { TitledContainer } from '../container/titled-container';
 
@@ -16,7 +16,7 @@ export const ButtonWithConfirm: React.FC<ButtonWithConfirmProps> = ({ onClick, a
         }}
     >
         {({ open, close }) => <>
-            <PopoverButton as={Button} {...btnProps} />
+            <PopoverButton as={Button} disabled={open} {...btnProps} />
 
             {open && <PopoverPanel
                 static

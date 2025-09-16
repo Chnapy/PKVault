@@ -1,5 +1,6 @@
 import React from 'react';
 import { GameVersion } from '../../data/sdk/model';
+import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
 import { DetailsTab } from '../../ui/details-card/details-tab';
@@ -82,12 +83,13 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
 
     const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
 
-    // const saveInfosQuery = useSaveInfosGetAll();
+    const saveInfosQuery = useSaveInfosGetAll();
     const mainPkmQuery = useStorageGetMainPkms();
     const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
 
     const pkmVersion = mainPkmVersionsQuery.data?.data.find(version => version.id === id);
     const pkm = pkmVersion && mainPkmQuery.data?.data.find(value => value.id === pkmVersion.pkmId);
+    const nbrRelatedPkmVersion = mainPkmVersionsQuery.data?.data.filter(version => version.pkmId === pkm?.id).length;
     const saveCardProps = pkm?.saveId ? getSaveItemProps(pkm.saveId) : undefined;
 
     const savePkmQuery = useStorageGetSavePkms(pkm?.saveId ?? 0, {
@@ -100,10 +102,10 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
         return null;
     }
 
-    // const save = pkm.saveId ? saveInfosQuery.data?.data[ pkm.saveId ] : undefined;
+    const save = pkm.saveId ? saveInfosQuery.data?.data[ pkm.saveId ] : undefined;
 
     const attachedSavePkm = pkm.saveId ? savePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId === pkmVersion.id) : undefined;
-    const attachedSavePkmNotFound = !!pkm.saveId && !attachedSavePkm;
+    const attachedSavePkmNotFound = save && save.generation === pkmVersion.generation && !attachedSavePkm;
 
     // const species = pkmVersionList[ 0 ].species;
 
@@ -122,7 +124,7 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
                 }`
             }
             isShadow={false}
-            onRelease={!pkm?.saveId
+            onRelease={!pkm?.saveId && (!pkmVersion.isMain || nbrRelatedPkmVersion === 1)
                 ? (() => mainPkmVersionDeleteMutation.mutateAsync({
                     pkmVersionId: pkmVersion.id,
                 }))

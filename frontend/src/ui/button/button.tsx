@@ -1,8 +1,8 @@
 import { css, cx } from "@emotion/css";
 import React from "react";
-import { Container, type ContainerProps, type ReactTag } from "../container/container";
+import { type ContainerProps, type ReactTag } from "../container/container";
 import { theme } from "../theme";
-import { Icon } from '../icon/icon';
+import { ButtonLike } from './button-like';
 
 export type ButtonProps<
   AS extends ReactTag = ReactTag,
@@ -10,6 +10,7 @@ export type ButtonProps<
   onClick?: React.MouseEventHandler;
   bgColor?: string;
   big?: boolean;
+  loading?: boolean;
   disabled?: boolean;
 }> &
   Omit<ContainerProps<AS>, 'disabled'>;
@@ -19,33 +20,17 @@ export function Button<
 >({
   as = "button" as AS,
   className,
-  onClick,
   bgColor = theme.bg.darker,
   big,
-  disabled,
   children,
   ...restProps
 }: ButtonProps<AS>) {
-  const [ loading, setLoading ] = React.useState(false);
-
-  disabled = disabled || loading;
-
-  const finalOnClick: React.MouseEventHandler | undefined = !disabled && onClick
-    ? ((e) => {
-      const result: unknown = onClick(e);
-      if (result instanceof Promise) {
-        setLoading(true);
-        result.finally(() => {
-          setLoading(false);
-        });
-      }
-    })
-    : undefined;
-
   return (
     // @ts-expect-error typing complexity due to 'as' concept
-    <Container<AS>
+    <ButtonLike<AS>
       as={as}
+      // loading
+      {...restProps}
       className={cx(
         css({
           display: "flex",
@@ -54,14 +39,10 @@ export function Button<
           color: theme.text.light,
           textShadow: theme.shadow.textlight,
           fontSize: '1rem',
-          opacity: disabled ? 0.5 : undefined,
-          pointerEvents: disabled ? 'none' : undefined,
-          cursor: 'pointer',
         }),
         className
       )}
-      onClick={finalOnClick}
-      {...restProps}
+      spinColor={bgColor}
     >
       <div
         className={css({
@@ -82,31 +63,11 @@ export function Button<
             alignItems: "center",
             justifyContent: "center",
             gap: 4,
-            opacity: loading ? 0 : undefined,
           })}
         >
           {children}
         </div>
-
-        {loading && <Icon
-          name='spinner-third'
-          className={css({
-            position: 'absolute',
-            left: 'calc(50% - 1lh / 2)',
-            top: 'calc(50% - 1lh / 2)',
-            animation: 'spin 1s linear infinite',
-
-            '@keyframes spin': {
-              '0%': {
-                transform: 'rotate(0deg)'
-              },
-              '100%': {
-                transform: 'rotate(360deg)'
-              },
-            }
-          })}
-        />}
       </div>
-    </Container>
+    </ButtonLike>
   );
 }

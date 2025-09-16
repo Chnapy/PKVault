@@ -53,6 +53,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = ({ saveId, pkmId 
             canEvolve={canEvolve}
             attached={canDetach}
             needSynchronize={canSynchronize}
+            boxId={savePkm.box}
             boxSlot={savePkm.boxSlot}
             selected={selected?.type === "save" && selected.id === pkmId}
             onClick={() =>

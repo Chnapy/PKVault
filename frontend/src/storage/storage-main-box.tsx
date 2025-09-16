@@ -18,7 +18,7 @@ export const StorageMainBox: React.FC = () => {
 
   const boxesQuery = useStorageGetMainBoxes();
   const pkmsQuery = useStorageGetMainPkms();
-
+  console.log('LIST')
   const boxes = boxesQuery.data?.data ?? [];
   const pkms = pkmsQuery.data?.data ?? [];
 
