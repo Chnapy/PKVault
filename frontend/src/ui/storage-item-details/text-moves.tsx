@@ -72,6 +72,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
             }</span>
             <br /><br />
         </>}
+
         <span style={{ color: theme.text.primary }}>Moves</span>
         <br />
         <div
@@ -90,7 +91,6 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                             {...register(`moves.${i}`, { valueAsNumber: true })}
                             value={move}
                             onChange={value => {
-                                console.log(value);
                                 setValue(`moves.${i}`, value)
                             }}
                             data={

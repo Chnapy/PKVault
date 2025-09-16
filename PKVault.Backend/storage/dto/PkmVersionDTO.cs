@@ -24,11 +24,37 @@ public class PkmVersionDTO : BasePkmVersionDTO
         return dto;
     }
 
+    private static readonly List<SaveFile> allVersionBlankSaves = [..Enum.GetValues<GameVersion>().ToList()
+        .Select(version => {
+            try {
+                return SaveUtil.GetBlankSAV(version, "BLANK");
+            } catch (ArgumentOutOfRangeException)
+            {
+                return null;
+            }
+        }).OfType<SaveFile>()];
+
     public string PkmId { get { return PkmVersionEntity.PkmId; } }
 
     public bool IsMain { get { return Id == PkmId; } }
 
-    public bool CanMoveToSaveStorage { get { return PkmDto.SaveId == default; } }
+    // public bool CanMoveToSaveStorage { get { return PkmDto.SaveId == default; } }
+
+    public List<GameVersion> CompatibleWithVersions
+    {
+        get
+        {
+            // if (!IsMain)
+            // {
+            //     return [];
+            // }
+
+            return [..allVersionBlankSaves.FindAll(blankSav =>
+            {
+                    return SaveInfosDTO.IsSpeciesAllowed(Species, blankSav);
+            }).Select(blankSav => blankSav.Version)];
+        }
+    }
 
     public bool CanDelete { get { return PkmVersionEntity.Id != PkmDto.Id; } }
 

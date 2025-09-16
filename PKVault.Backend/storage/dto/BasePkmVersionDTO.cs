@@ -79,7 +79,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
             var type2 = Generation <= 2
                 ? Dex123Service.GetG12Type(Pkm.PersonalInfo.Type2)
                 : Pkm.PersonalInfo.Type2;
-            return [(byte)(type1 + 1), (byte)(type2 + 1)];
+            return [.. new List<byte>() { (byte)(type1 + 1), (byte)(type2 + 1) }.Distinct()];
         }
     }
 

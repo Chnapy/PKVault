@@ -66,14 +66,14 @@ const Root: React.FC = () => {
         </HeaderItem>
       </Header>
 
-      <div
+      {/* <div
         style={{
           alignSelf: 'center',
           justifySelf: 'center',
         }}
       >
         <Warnings />
-      </div>
+      </div> */}
 
       <div
         style={{

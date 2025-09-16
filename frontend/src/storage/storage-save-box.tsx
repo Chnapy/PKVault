@@ -5,15 +5,14 @@ import {
   useStorageGetSaveBoxes,
   useStorageGetSavePkms,
 } from "../data/sdk/storage/storage.gen";
-import { useStaticData } from '../hooks/use-static-data';
 import { Route } from "../routes/storage";
 import { Button } from "../ui/button/button";
 import { FilterSelect } from "../ui/filter/filter-select/filter-select";
 import { Icon } from '../ui/icon/icon';
 import { StorageBox } from "../ui/storage-box/storage-box";
-import { StorageItem } from "../ui/storage-item/storage-item";
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
 import { switchUtil } from '../util/switch-util';
+import { StorageSaveItem } from './storage-save-item';
 
 export type StorageSaveBoxProps = {
   saveId: number;
@@ -21,10 +20,7 @@ export type StorageSaveBoxProps = {
 
 export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
   const saveBoxId = Route.useSearch({ select: (search) => search.saveBoxId });
-  const selected = Route.useSearch({ select: (search) => search.selected });
   const navigate = Route.useNavigate();
-
-  const staticData = useStaticData();
 
   const saveInfosRecord = useSaveInfosGetAll().data?.data ?? {};
   const saveInfos = saveInfosRecord[ saveId ] as SaveInfosDTO | undefined;
@@ -154,46 +150,8 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
             />
           );
         }
-        // const versions = pkmSaves.filter((value) => value.pkmId === pkm.id);
 
-        // if (versions.length === 0) {
-        //   return <div>Error versions are empty for Pkm.Id={pkm.id}</div>;
-        // }
-
-        const sprite = pkm.isShiny
-          ? staticData.species[ pkm.species ].spriteShiny
-          : (pkm.isEgg
-            ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png'
-            : staticData.species[ pkm.species ].spriteDefault);
-
-        return (
-          <StorageItem
-            key={"pkm-" + pkm.id}
-            storageType="save"
-            pkmId={pkm.id}
-            species={pkm.species}
-            isEgg={pkm.isEgg}
-            isShiny={pkm.isShiny}
-            isShadow={pkm.isShadow}
-            sprite={sprite}
-            heldItemSprite={pkm.heldItem ? staticData.items[ pkm.heldItem ].sprite : undefined}
-            warning={!pkm.isValid}
-            // disabled={Boolean(pkm.saveId)}
-            shouldCreateVersion={false}
-            boxSlot={i}
-            selected={selected?.type === "save" && selected.id === pkm.id}
-            onClick={() =>
-              navigate({
-                search: {
-                  selected: {
-                    type: "save",
-                    id: pkm.id,
-                  },
-                },
-              })
-            }
-          />
-        );
+        return <StorageSaveItem key={pkm.id} saveId={saveId} pkmId={pkm.id} />;
       })}
     </StorageBox>
   );

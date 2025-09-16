@@ -17,7 +17,6 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
     case 'main':
       return <StorageDetailsMain
         selectedId={id}
-        saveId={saveId}
       />;
     case 'save':
       return <StorageDetailsSave

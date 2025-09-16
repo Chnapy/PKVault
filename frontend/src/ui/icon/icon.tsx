@@ -22,6 +22,7 @@ export const Icon: React.FC<IconProps> = ({ name, solid, alt, forButton, ...rest
                 ? {
                     fontSize: '75%',
                     lineHeight: '1lh',
+                    verticalAlign: 'middle',
                     // width: 'calc(1lh - 4px)',
                 }
                 : {})

@@ -50,7 +50,7 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
   const [ showShiny, setShowShiny ] = React.useState(false);
 
   return <DetailsCardContainer
-    header={fromSaves}
+    // header={fromSaves}
     title={null}
     mainImg={<>
       <img
@@ -148,6 +148,7 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
         </TextContainer>
       </div>
     </>}
+    actions={null}
     onClose={onClose}
   />;
 

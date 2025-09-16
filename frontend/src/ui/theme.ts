@@ -72,5 +72,7 @@ export const theme = {
     dragon: '#5060E1',
     dark: '#50413F',
     fairy: '#EF70EF',
+    stellar: '#F6A516',
+    unknown: '#64A894',
   }
 };

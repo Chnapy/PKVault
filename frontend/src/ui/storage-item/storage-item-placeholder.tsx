@@ -1,6 +1,8 @@
+import { css } from '@emotion/css';
 import type React from "react";
+import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { Container } from "../container/container";
-import { useDroppable } from "@dnd-kit/core";
+import { theme } from '../theme';
 
 export type StorageItemPlaceholderProps = {
   storageType: "main" | "save";
@@ -13,31 +15,33 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
   boxId,
   boxSlot,
 }) => {
-  const { isOver, setNodeRef } = useDroppable({
-    id: "storage-" + storageType + "-placeholder-" + boxSlot,
-    data: {
-      storageType,
-      boxId,
-      boxSlot,
-    },
-  });
+  const moveAttributes = StorageMoveContext.useDroppable(storageType, boxId, boxSlot);
 
   return (
     <Container
-      ref={setNodeRef}
+      className={css(
+        {
+          backgroundColor: 'transparent',//theme.bg.light,
+          alignSelf: "flex-start",
+          padding: 0,
+          width: 96,
+          height: 96,
+          order: boxSlot,
+          boxSizing: 'content-box',
+        },
+        moveAttributes.onClick && {
+          backgroundColor: theme.bg.light,
+          '&:hover': {
+            outlineWidth: 2,
+          }
+        }
+      )}
       // as={onClick ? "button" : undefined}
       // // borderRadius="small"
-      // onClick={onClick}
-      selected={isOver}
+      onClick={moveAttributes.onClick}
+      onPointerUp={moveAttributes.onPointerUp}
+      // selected={isOver}
       noDropshadow
-      style={{
-        backgroundColor: 'transparent',//theme.bg.light,
-        alignSelf: "flex-start",
-        padding: 0,
-        width: 96,
-        height: 96,
-        order: boxSlot,
-      }}
     />
   );
 };

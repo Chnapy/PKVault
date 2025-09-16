@@ -46,6 +46,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
         background: theme.bg.info,
         alignItems: "flex-start",
         textAlign: 'left',
+        overflow: 'hidden',
       }}
     >
       <div
@@ -72,7 +73,6 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
       <div
         style={{
           flexGrow: 1,
-          padding: 4,
           overflow: 'hidden'
         }}
       >

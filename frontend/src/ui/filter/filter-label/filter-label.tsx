@@ -25,7 +25,7 @@ export const FilterLabel: React.FC<FilterLabelProps> = ({
       >
         <div
           style={{
-            backgroundColor: theme.bg.dark,
+            backgroundColor: theme.bg.darker,
             borderRadius: 4,
             color: theme.text.light,
             textShadow: "1px 1px 0px rgba(255,255,255,0.2)",

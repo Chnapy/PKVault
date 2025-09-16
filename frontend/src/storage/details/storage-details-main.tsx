@@ -1,82 +1,40 @@
 import React from 'react';
 import { GameVersion } from '../../data/sdk/model';
-import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
-import { useStaticData } from '../../hooks/use-static-data';
-import { Route } from '../../routes/storage';
+import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
 import { DetailsTab } from '../../ui/details-card/details-tab';
+import { SaveCardContentSmall } from '../../ui/save-card/save-card-content-small';
+import { StorageDetailsBase } from '../../ui/storage-item-details/storage-details-base';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
-import { StorageMainDetails } from '../../ui/storage-item-details/storage-main-details';
 
 export type StorageDetailsMainProps = {
     selectedId: string;
-    saveId?: number;
 };
 
 export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
     selectedId,
-    saveId,
 }) => {
     const [ selectedIndex, setSelectedIndex ] = React.useState(0);
 
-    const navigate = Route.useNavigate();
-
-    const staticData = useStaticData();
-
-    const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
-
-    const saveInfosQuery = useSaveInfosGetAll();
-    const mainPkmQuery = useStorageGetMainPkms();
     const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
 
-    const pkm = mainPkmQuery.data?.data.find(value => value.id === selectedId);
     const pkmVersionList = mainPkmVersionsQuery.data?.data.filter(value => value.pkmId === selectedId) ?? [];
-
-    const savePkmQuery = useStorageGetSavePkms(pkm?.saveId!, {
-        query: {
-            enabled: !!pkm?.saveId,
-        },
-    });
-
-    const save = saveId ? saveInfosQuery.data?.data[ saveId ] : undefined;
-    if (save) {
-        pkmVersionList.sort((a) => a.generation === save.generation ? -1 : 0);
+    if (pkmVersionList.length === 0) {
+        return null;
     }
 
     const pkmVersion = pkmVersionList[ selectedIndex ] ?? pkmVersionList[ 0 ];
 
-    const attachedSavePkm = pkm?.saveId ? savePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId === pkmVersion.id) : undefined;
-    const attachedSavePkmNotFound = !!pkm?.saveId && !attachedSavePkm;
-
-    if (!pkm || pkmVersionList.length === 0) {
-        return null;
-    }
-
-    // const species = pkmVersionList[ 0 ].species;
-
-    const pkmSaveRaw = pkm.saveId ? saveInfosQuery.data?.data[ pkm.saveId ] : undefined;
-    const pkmSave = pkmSaveRaw && pkmVersion.generation === pkmSaveRaw.generation ? pkmSaveRaw : undefined;
-
-    // const isCompatibleWithSave = !save || species <= staticData.versions[ save.version ].maxSpeciesId;
-
-    const sprite = pkmVersion.isShiny
-        ? staticData.species[ pkmVersion.species ].spriteShiny
-        : (pkmVersion.isEgg
-            ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png'
-            : staticData.species[ pkmVersion.species ].spriteDefault);
-
-    const ballSprite = staticData.items[ pkmVersion.ball ].sprite;
-
-    return <StorageDetailsForm.Provider
-        key={pkmVersion.id}
-        nickname={pkmVersion.nickname}
-        eVs={pkmVersion.eVs}
-        moves={pkmVersion.moves}
-    >
-        <StorageMainDetails
-            header={
-                <>
-                    {/* {!isCompatibleWithSave && <Button
+    return <div>
+        <div
+            style={{
+                display: 'flex',
+                gap: '0 4px',
+                padding: '0 8px',
+                flexWrap: 'wrap-reverse',
+            }}
+        >
+            {/* {!isCompatibleWithSave && <Button
                         disabled
                         bgColor={theme.text.contrast}
                         style={{ width: '100%' }}
@@ -92,69 +50,86 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
                         Already present in another save ({pkm.saveId})
                     </Button>} */}
 
-                    {pkmVersionList.map((pkmVersion, i) => (
-                        <DetailsTab
-                            key={pkmVersion.id}
-                            version={GameVersion[ `Gen${pkmVersion.generation as 1}` ]}
-                            otName={`G${pkmVersion.generation}`}
-                            original={pkmVersion.isMain}
-                            onClick={() => setSelectedIndex(i)}
-                            disabled={selectedIndex === i}
-                        />
-                    ))}
-                </>
-            }
-            id={pkmVersion.id}
-            saveId={pkmSave?.id}
-            generation={pkmVersion.generation}
-            version={pkmVersion.version}
-            pid={pkmVersion.pid}
-            species={pkmVersion.species}
-            speciesName={pkmVersion.speciesName}
-            isShiny={pkmVersion.isShiny}
-            sprite={sprite}
-            ballSprite={ballSprite}
-            gender={pkmVersion.gender}
+            {pkmVersionList.map((pkmVersion, i) => (
+                <DetailsTab
+                    key={pkmVersion.id}
+                    version={GameVersion[ `Gen${pkmVersion.generation as 1}` ]}
+                    otName={`G${pkmVersion.generation}`}
+                    original={pkmVersion.isMain}
+                    onClick={() => setSelectedIndex(i)}
+                    disabled={selectedIndex === i}
+                />
+            ))}
+        </div>
+
+        <StorageDetailsForm.Provider
+            key={pkmVersion.id}
             nickname={pkmVersion.nickname}
-            nicknameMaxLength={pkmVersion.nicknameMaxLength}
-            types={pkmVersion.types}
-            stats={pkmVersion.stats}
-            ivs={pkmVersion.iVs}
-            evs={pkmVersion.eVs}
-            hiddenPowerType={pkmVersion.hiddenPowerType}
-            hiddenPowerPower={pkmVersion.hiddenPowerPower}
-            hiddenPowerCategory={pkmVersion.hiddenPowerCategory}
-            nature={pkmVersion.nature}
-            ability={pkmVersion.ability}
-            level={pkmVersion.level}
-            exp={pkmVersion.exp}
+            eVs={pkmVersion.eVs}
             moves={pkmVersion.moves}
-            availableMoves={pkmVersion.availableMoves.map(move => move.id)}
-            tid={pkmVersion.tid}
-            originTrainerName={pkmVersion.originTrainerName}
-            originTrainerGender={pkmVersion.originTrainerGender}
-            originMetDate={pkmVersion.originMetDate}
-            originMetLocation={pkmVersion.originMetLocation}
-            originMetLevel={pkmVersion.originMetLevel}
-            heldItem={pkmVersion.heldItem}
-            isValid={pkmVersion.isValid}
-            validityReport={pkmVersion.validityReport}
-            box={pkm.boxId}
-            boxSlot={pkm.boxSlot}
-            saveBoxId={attachedSavePkm?.box}
-            saveBoxSlot={attachedSavePkm?.boxSlot}
-            saveSynchronized={attachedSavePkm?.dynamicChecksum === pkmVersion.dynamicChecksum}
-            attachedSavePkmNotFound={attachedSavePkmNotFound}
-            onRelease={pkm?.saveId
-                ? undefined
-                : (() => mainPkmVersionDeleteMutation.mutateAsync({
+        >
+            <InnerStorageDetailsMain
+                id={pkmVersion.id}
+            />
+        </StorageDetailsForm.Provider>
+    </div>;
+};
+
+const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
+    const formContext = StorageDetailsForm.useContext();
+
+    const getSaveItemProps = useSaveItemProps();
+
+    const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
+
+    // const saveInfosQuery = useSaveInfosGetAll();
+    const mainPkmQuery = useStorageGetMainPkms();
+    const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
+
+    const pkmVersion = mainPkmVersionsQuery.data?.data.find(version => version.id === id);
+    const pkm = pkmVersion && mainPkmQuery.data?.data.find(value => value.id === pkmVersion.pkmId);
+    const saveCardProps = pkm?.saveId ? getSaveItemProps(pkm.saveId) : undefined;
+
+    const savePkmQuery = useStorageGetSavePkms(pkm?.saveId ?? 0, {
+        query: {
+            enabled: !!pkm?.saveId,
+        },
+    });
+
+    if (!pkm || !pkmVersion) {
+        return null;
+    }
+
+    // const save = pkm.saveId ? saveInfosQuery.data?.data[ pkm.saveId ] : undefined;
+
+    const attachedSavePkm = pkm.saveId ? savePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId === pkmVersion.id) : undefined;
+    const attachedSavePkmNotFound = !!pkm.saveId && !attachedSavePkm;
+
+    // const species = pkmVersionList[ 0 ].species;
+
+    // const pkmSaveRaw = pkm.saveId ? saveInfosQuery.data?.data[ pkm.saveId ] : undefined;
+    // const pkmSave = pkmSaveRaw && pkmVersion.generation === pkmSaveRaw.generation ? pkmSaveRaw : undefined;
+
+    return (
+        <StorageDetailsBase
+            {...pkmVersion}
+            isValid={pkmVersion.isValid && !attachedSavePkmNotFound}
+            validityReport={
+                `${attachedSavePkmNotFound ? 'Pkm not found in attached save.'
+                    + '\nIf expected consider detach from save.'
+                    + '\nOtherwise check the save integrity.' : ''
+                }${!pkmVersion.isValid ? pkmVersion.validityReport : ''
+                }`
+            }
+            isShadow={false}
+            onRelease={!pkm?.saveId
+                ? (() => mainPkmVersionDeleteMutation.mutateAsync({
                     pkmVersionId: pkmVersion.id,
-                }))}
-            onClose={() => navigate({
-                search: {
-                    selected: undefined,
-                }
-            })}
+                }))
+                : undefined
+            }
+            onSubmit={() => formContext.submitForPkmVersion(id)}
+            extraContent={saveCardProps && <SaveCardContentSmall {...saveCardProps} />}
         />
-    </StorageDetailsForm.Provider>;
+    );
 };

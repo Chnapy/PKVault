@@ -1,10 +1,16 @@
-import React from "react";
-import { Container } from "../container/container";
-import { useDraggable } from "@dnd-kit/core";
-import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png?url';
-import { theme } from '../theme';
+import { css, cx } from '@emotion/css';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
-import { StorageItemActions } from './storage-item-actions';
+import React from "react";
+import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png?url';
+import { useStaticData } from '../../hooks/use-static-data';
+import { StorageMoveContext } from '../../storage/actions/storage-move-context';
+import { Container } from "../container/container";
+import { Icon } from '../icon/icon';
+import { theme } from '../theme';
+import { StorageItemMainActions } from './storage-item-main-actions';
+import { StorageItemMainActionsContainer } from './storage-item-main-actions-container';
+import { StorageItemSaveActions } from './storage-item-save-actions';
+import { StorageItemSaveActionsContainer } from './storage-item-save-actions-container';
 
 export type StorageItemProps = {
   storageType: "main" | "save";
@@ -13,14 +19,18 @@ export type StorageItemProps = {
   isEgg: boolean;
   isShiny: boolean;
   isShadow: boolean;
-  sprite: string;
-  heldItemSprite?: string;
+  heldItem?: number;
   selected?: boolean;
   onClick?: () => void;
   warning?: boolean;
-  disabled?: boolean;
-  shouldCreateVersion?: boolean;
   boxSlot: number;
+
+  // actions
+  canCreateVersion?: boolean;
+  canMoveOutside?: boolean;
+  canEvolve?: boolean;
+  attached?: boolean;
+  needSynchronize?: boolean;
 };
 
 export const StorageItem: React.FC<StorageItemProps> = ({
@@ -30,44 +40,54 @@ export const StorageItem: React.FC<StorageItemProps> = ({
   isEgg,
   isShiny,
   isShadow,
-  sprite,
-  heldItemSprite,
+  heldItem = 0,
   selected,
   onClick,
   warning,
-  disabled,
-  shouldCreateVersion,
   boxSlot,
+
+  canCreateVersion,
+  canMoveOutside,
+  canEvolve,
+  attached,
+  needSynchronize,
 }) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: "storage-" + storageType + "-item-" + boxSlot,
-      data: {
-        storageType,
-        pkmId,
-      },
-      // disabled,
-    });
+  const [ hover, setHover ] = React.useState(false);
+
+  const moveDraggable = StorageMoveContext.useDraggable(pkmId, storageType);
+
+  const staticData = useStaticData();
+
+  const sprite = isEgg
+    ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png'
+    : (isShiny
+      ? staticData.species[ species ].spriteShiny
+      : staticData.species[ species ].spriteDefault);
 
   return (
     <Popover
-      style={{
+      ref={moveDraggable.ref}
+      draggable={true}
+      className={css({
         position: 'relative',
         alignSelf: "flex-start",
         order: boxSlot,
-        transform: `translate(${transform?.x ?? 0}px, ${transform?.y ?? 0}px)`,
-        zIndex: isDragging ? 1 : undefined,
-      }}
+        // transform: `translate(${transform?.x ?? 0}px, ${transform?.y ?? 0}px)`,
+        // zIndex: isDragging ? 1 : undefined,
+      })}
     >
       <PopoverButton
         as={Container}
         componentDescriptor='button'
-        ref={setNodeRef}
+        // ref={setNodeRef}
+        // {...listeners}
+        // {...attributes}
         // as={onClick ? "button" : undefined}
-        {...listeners}
-        {...attributes}
         // borderRadius="small"
-        onPointerUp={onClick}
+        onClick={onClick}
+        onPointerMove={moveDraggable.onPointerMove}
+        onPointerEnter={() => setHover(true)}
+        onPointerLeave={() => setHover(false)}
         selected={selected}
         noDropshadow={!onClick}
         style={{
@@ -86,12 +106,11 @@ export const StorageItem: React.FC<StorageItemProps> = ({
             height: 96,
             display: "block",
             filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
-            opacity: disabled || shouldCreateVersion ? 0.5 : 1,
           }}
         />
 
-        {heldItemSprite && <img
-          src={heldItemSprite}
+        {heldItem > 0 && <img
+          src={staticData.items[ heldItem ].sprite}
           style={{
             position: 'absolute',
             bottom: 0,
@@ -106,36 +125,53 @@ export const StorageItem: React.FC<StorageItemProps> = ({
             right: 2,
             display: 'flex',
             alignItems: 'center',
-            gap: 4,
+            gap: 2,
             textAlign: 'center',
           }}
         >
           {isShiny && <img
             src={shinyIconImg}
             alt='shiny-icon'
-            style={{
-              margin: '0 -2px',
-            }}
           />}
 
-          {disabled && <div style={{
+          {!canMoveOutside && <div style={{
             width: 20,
             height: 20,
             borderRadius: 99,
             color: theme.text.light,
-            backgroundColor: theme.text.contrast,
+            backgroundColor: theme.bg.red,
           }}>
-            -
+            <Icon name='logout' forButton />
           </div>}
 
-          {shouldCreateVersion && !disabled && <div style={{
+          {canEvolve && <div style={{
             width: 20,
             height: 20,
             borderRadius: 99,
             color: theme.text.light,
-            backgroundColor: theme.text.primary,
+            backgroundColor: theme.bg.primary,
           }}>
-            +
+            <Icon name='sparkles' solid forButton />
+          </div>}
+
+          {attached && <div style={{
+            width: 20,
+            height: 20,
+            borderRadius: 99,
+            color: needSynchronize ? theme.text.light : undefined,
+            backgroundColor: needSynchronize ? theme.bg.yellow : undefined,
+          }}>
+            <Icon name='link' forButton />
+          </div>}
+
+          {canCreateVersion && <div style={{
+            width: 20,
+            height: 20,
+            borderRadius: 99,
+            color: theme.text.light,
+            backgroundColor: theme.bg.primary,
+          }}>
+            <Icon name='plus' solid forButton />
           </div>}
 
           {warning && <div style={{
@@ -143,15 +179,41 @@ export const StorageItem: React.FC<StorageItemProps> = ({
             height: 20,
             borderRadius: 99,
             color: theme.text.light,
-            backgroundColor: theme.bg.filter,
+            backgroundColor: theme.bg.yellow,
           }}>
-            !
+            <Icon name='exclaimation' forButton />
           </div>}
         </div>
       </PopoverButton>
 
-      {selected && <PopoverPanel static anchor="right start">
-        <StorageItemActions />
+      {(selected || hover) && <PopoverPanel
+        static
+        anchor="right start"
+        className={css({
+          zIndex: 20,
+          '&:hover': {
+            zIndex: 25,
+          }
+        })}
+      >
+        {selected
+          ? <>
+            {storageType === 'main'
+              ? <StorageItemMainActions />
+              : <StorageItemSaveActions />}
+          </>
+          : <>
+            {hover && <div
+              className={cx('storage-item-title', css({
+                // opacity: 0,
+                pointerEvents: 'none',
+              }))}
+            >
+              {storageType === 'main'
+                ? <StorageItemMainActionsContainer pkmId={pkmId} />
+                : <StorageItemSaveActionsContainer pkmId={pkmId} />}
+            </div>}
+          </>}
       </PopoverPanel>}
     </Popover>
   );

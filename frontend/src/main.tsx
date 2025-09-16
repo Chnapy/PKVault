@@ -110,6 +110,31 @@ createRoot(document.getElementById("root")!).render(
             type={3}
             category={MoveCategory.STATUS}
           />
+
+          <TitledContainer
+            contrasted
+            title={
+              <div>
+                8 actions to save
+              </div>
+            }
+            enableExpand
+          >
+            toto content
+          </TitledContainer>
+
+          <TitledContainer
+            contrasted
+            title={
+              <div>
+                8 actions to save
+              </div>
+            }
+            enableExpand
+            initialExpanded={false}
+          >
+            toto content
+          </TitledContainer>
         </div> */}
 
         <RouterProvider router={router} />

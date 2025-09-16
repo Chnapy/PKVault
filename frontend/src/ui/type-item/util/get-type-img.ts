@@ -1,4 +1,5 @@
-import { switchUtilRequired } from '../../../util/switch-util';
+import { switchUtil } from '../../../util/switch-util';
+import { theme } from '../../theme';
 
 import bugImg from '../../../assets/type_icons/bug.png';
 import darkImg from '../../../assets/type_icons/dark.png';
@@ -17,10 +18,11 @@ import poisonImg from '../../../assets/type_icons/poison.png';
 import psychicImg from '../../../assets/type_icons/psychic.png';
 import rockImg from '../../../assets/type_icons/rock.png';
 import steelImg from '../../../assets/type_icons/steel.png';
+import stellarImg from '../../../assets/type_icons/stellar.png';
+import unknownImg from '../../../assets/type_icons/unknown.png';
 import waterImg from '../../../assets/type_icons/water.png';
-import { theme } from '../../theme';
 
-export const getTypeImg = (type: number) => switchUtilRequired(type, {
+export const getTypeImg = (type: number) => switchUtil(type, {
     1: () => ({ img: normalImg, color: theme.type.normal }),
     2: () => ({ img: fightingImg, color: theme.type.fighting }),
     3: () => ({ img: flyingImg, color: theme.type.fly }),
@@ -39,4 +41,8 @@ export const getTypeImg = (type: number) => switchUtilRequired(type, {
     16: () => ({ img: dragonImg, color: theme.type.dragon }),
     17: () => ({ img: darkImg, color: theme.type.dark }),
     18: () => ({ img: fairyImg, color: theme.type.fairy }),
-})();
+    19: () => ({ img: stellarImg, color: theme.type.stellar }),
+})?.() ?? {
+    img: unknownImg,
+    color: theme.type.unknown
+};

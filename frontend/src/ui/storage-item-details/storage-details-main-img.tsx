@@ -1,0 +1,66 @@
+import type React from 'react';
+import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png?url';
+import { useStaticData } from '../../hooks/use-static-data';
+import { theme } from '../theme';
+
+export type StorageDetailsMainImgProps = {
+    species: number;
+    speciesName: string;
+    isShiny: boolean;
+    isEgg: boolean;
+    isShadow?: boolean;
+    ball: number;
+};
+
+export const StorageDetailsMainImg: React.FC<StorageDetailsMainImgProps> = ({ species, speciesName, isShiny, isEgg, isShadow, ball }) => {
+    const staticData = useStaticData();
+
+    const sprite = isEgg
+        ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png'
+        : (isShiny
+            ? staticData.species[ species ].spriteShiny
+            : staticData.species[ species ].spriteDefault);
+
+    const ballSprite = staticData.items[ ball ].sprite;
+
+    return <>
+        <div
+            style={{
+                background: theme.bg.default,
+                borderRadius: 8,
+            }}
+        >
+            <img
+                src={sprite}
+                alt={speciesName}
+                style={{
+                    imageRendering: "pixelated",
+                    width: 96,
+                    display: "block",
+                    filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
+                }}
+            />
+        </div>
+
+        <img
+            src={ballSprite!}
+            style={{
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+            }}
+        />
+
+        {isShiny && <img
+            src={shinyIconImg}
+            alt='shiny-icon'
+            style={{
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                // width: 12,
+                margin: '0 -2px',
+            }}
+        />}
+    </>;
+};

@@ -26,7 +26,7 @@ export const SelectInput = React.forwardRef<HTMLButtonElement, React.PropsWithCh
                 <Icon name='angle-down' solid />
             </ListboxButton>
 
-            <ListboxOptions anchor={anchor}>
+            <ListboxOptions anchor={anchor} style={{ zIndex: 30 }}>
                 <TitledContainer
                     contrasted
                     title={null}

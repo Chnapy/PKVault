@@ -21,13 +21,11 @@ export const ButtonWithConfirm: React.FC<ButtonWithConfirmProps> = ({ onClick, a
             {open && <PopoverPanel
                 static
                 anchor={anchor}
-                className={css({ overflow: "unset !important" })}
+                className={css({ zIndex: 30 })}
             >
                 <TitledContainer
                     contrasted
-                    title={<div style={{ display: 'flex', gap: 4 }}>
-                        {btnProps.children}
-                    </div>}
+                    title={null}
                 >
                     <Button onClick={async () => {
                         await onClick();

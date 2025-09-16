@@ -56,7 +56,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
             .join(", ")} */}
           </ListboxButton>
 
-          <ListboxOptions anchor="bottom">
+          <ListboxOptions anchor="bottom" style={{ zIndex: 30 }}>
             <TitledContainer
               contrasted
               title={'Box selection'}

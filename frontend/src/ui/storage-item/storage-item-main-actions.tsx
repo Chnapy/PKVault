@@ -1,23 +1,23 @@
 import type React from 'react';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
-import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
+import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { Button } from '../button/button';
-import { TitledContainer } from '../container/titled-container';
+import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { Icon } from '../icon/icon';
 import { StorageDetailsForm } from '../storage-item-details/storage-details-form';
 import { theme } from '../theme';
-import { ButtonWithConfirm } from '../button/button-with-confirm';
+import { StorageItemMainActionsContainer } from './storage-item-main-actions-container';
 
-export const StorageItemActions: React.FC = () => {
+export const StorageItemMainActions: React.FC = () => {
     const navigate = Route.useNavigate();
     const saveId = Route.useSearch({ select: (search) => search.save });
     const selected = Route.useSearch({ select: (search) => search.selected });
 
     const formEditMode = StorageDetailsForm.useEditMode();
 
-    const staticData = useStaticData();
+    const moveClickable = StorageMoveContext.useClickable(selected?.id ?? '', 'main');
 
     const saveInfosQuery = useSaveInfosGetAll();
     const mainPkmQuery = useStorageGetMainPkms();
@@ -40,7 +40,7 @@ export const StorageItemActions: React.FC = () => {
     }
     const pkmVersionsIds = pkmVersions.map(version => version.id);
 
-    const { species, nickname, level } = pkmVersions[ 0 ];
+    const { compatibleWithVersions } = pkmVersions[ 0 ];
 
     const pageSave = saveId ? saveInfosQuery.data?.data[ saveId ] : undefined;
     const attachedSavePkm = selectedPkm.saveId ? pkmSavePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId && pkmVersionsIds.includes(savePkm.pkmVersionId)) : undefined;
@@ -48,28 +48,17 @@ export const StorageItemActions: React.FC = () => {
     const saveSynchronized = attachedSavePkm?.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
     const hasPkmForPageSaveGeneration = !!pageSave && pkmVersions.some(pkmVersion => pkmVersion.generation === pageSave.generation);
-    const isCompatibleWithPageSave = !pageSave || species <= staticData.versions[ pageSave.version ].maxSpeciesId;
+    const isCompatibleWithPageSave = !pageSave || compatibleWithVersions.includes(pageSave.version);
     const pkmVersionCanEvolve = pkmVersions.find(version => version.canEvolve);
 
     const canCreateVersion = !selectedPkm.saveId && !!pageSave && isCompatibleWithPageSave && !hasPkmForPageSaveGeneration;
-    const canMoveAttached = !selectedPkm.saveId;
+    const canMoveAttached = !selectedPkm.saveId && hasPkmForPageSaveGeneration;
     const canEvolve = pkmVersionCanEvolve && !selectedPkm.saveId;
     const canDetach = !!selectedPkm.saveId;
     const canGoToSave = !!selectedPkm.saveId;
     const canSynchronize = !!selectedPkm.saveId && !!attachedPkmVersion && !saveSynchronized;
 
-    return <TitledContainer
-        contrasted
-        enableExpand
-        title={<div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-        }}>
-            <Icon name='angle-left' solid forButton />
-            {nickname}{' Lv.'}{level}
-        </div>}
-    >
+    return <StorageItemMainActionsContainer pkmId={selectedPkm.id}>
         <div
             style={{
                 display: 'flex',
@@ -77,7 +66,9 @@ export const StorageItemActions: React.FC = () => {
                 gap: 4,
             }}
         >
-            <Button>
+            <Button
+                onClick={moveClickable.onClick}
+            >
                 <Icon name='logout' solid forButton />
                 Move
             </Button>
@@ -160,5 +151,5 @@ export const StorageItemActions: React.FC = () => {
                 Detach from save
             </ButtonWithConfirm>}
         </div>
-    </TitledContainer>;
+    </StorageItemMainActionsContainer>;
 };

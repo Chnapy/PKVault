@@ -61,8 +61,6 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
             <div
                 style={{
                     flexGrow: 1,
-                    padding: 4,
-                    paddingTop: 0
                 }}
             >
                 <TextContainer>

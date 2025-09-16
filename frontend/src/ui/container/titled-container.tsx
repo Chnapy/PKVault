@@ -27,7 +27,7 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
                 : theme.text.default,
         }}
     >
-        <div
+        {title && <div
             role={enableExpand ? 'button' : undefined}
             onClick={enableExpand ? (() => setExpanded(!expanded)) : undefined}
             style={{
@@ -39,9 +39,9 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
                 cursor: enableExpand ? 'pointer' : undefined,
                 userSelect: enableExpand ? 'none' : undefined,
             }}
-        >{title}</div>
+        >{title}</div>}
 
-        <div
+        {children && <div
             style={{
                 padding: expanded ? 4 : 0,
                 height: expanded ? undefined : 0,
@@ -49,6 +49,6 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
             }}
         >
             {children}
-        </div>
+        </div>}
     </Container>;
 };
