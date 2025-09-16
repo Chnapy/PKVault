@@ -1,8 +1,8 @@
 import type React from 'react';
-import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Button } from '../button/button';
 import { Icon } from '../icon/icon';
+import { ShinyIcon } from '../icon/shiny-icon';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
 import { SaveCardContentSmall, type SaveCardContentSmallProps } from './save-card-content-small';
@@ -71,7 +71,7 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                     <br />
                     Storage <Icon name='folder' solid forButton /> <span style={{ color: theme.text.primary }}>{ownedCount}</span>
                     {shinyCount > 0 && <>
-                        {' '} <img src={shinyIconImg} style={{ height: 16, margin: -4 }} /> <span style={{ color: theme.text.primary }}>{shinyCount}</span>
+                        {' '} <ShinyIcon style={{ height: 16, margin: -4 }} /> <span style={{ color: theme.text.primary }}>{shinyCount}</span>
                     </>}
 
                     {actions && (

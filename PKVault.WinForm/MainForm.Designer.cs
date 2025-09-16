@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using Svg;
@@ -95,103 +96,48 @@ partial class MainForm
     {
         await webView.EnsureCoreWebView2Async(null);
 
-        string tempFolder = Path.Combine(Path.GetTempPath(), "pkvault");
-        Directory.Delete(tempFolder, true);
-        Directory.CreateDirectory(tempFolder);
-
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceNames = assembly.GetManifestResourceNames();
         var expectedPrefix = "PKVault.WinForm.wwwroot.";
 
-        foreach (var resourceName in resourceNames)
-        {
-            using Stream stream = assembly.GetManifestResourceStream(resourceName);
-            if (stream == null || !resourceName.Contains(expectedPrefix))
-                continue;
+        var contentTypeProvider = new FileExtensionContentTypeProvider();
 
-            var relativeResourceName = resourceName.Substring(expectedPrefix.Length);
-            var partsRaw = relativeResourceName.Split('.');
-            var filename = string.Join('.', partsRaw.Take(new Range(partsRaw.Length - 2, partsRaw.Length)));
-
-            string folderPath = Path.Combine(tempFolder, Path.Combine(partsRaw.Take(partsRaw.Length - 2).ToArray()));
-
-            Directory.CreateDirectory(folderPath);
-
-            string fullPath = Path.Combine(folderPath, filename);
-
-            using FileStream fileStream = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
-            stream.CopyTo(fileStream);
-        }
-
-        webView.CoreWebView2.SetVirtualHostNameToFolderMapping(
-            "pkvault",
-            tempFolder,
-            CoreWebView2HostResourceAccessKind.Allow);
-
-        webView.CoreWebView2.AddWebResourceRequestedFilter("*/api/*", CoreWebView2WebResourceContext.All);
-
+        webView.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
         webView.CoreWebView2.WebResourceRequested += async (sender, args) =>
         {
+            // https://localhost:57135/api/storage/main/pkm-version
+            // https://pkvault/index.html?server=https://localhost:57471
             var uri = args.Request.Uri;
-            if (!uri.Contains("/api/"))
+            // Console.WriteLine($"DEBUG {uri}");
+
+            var uriParts = uri.Split('?')[0].Split('/');
+
+            var uriActionAndRest = uriParts.Skip(3);
+            var uriAction = uriActionAndRest.First();
+            var uriDirectories = uriActionAndRest.SkipLast(1);
+            var uriFilename = uriActionAndRest.Last();
+            var uriFilenameExt = Path.GetExtension(uriFilename);
+            var assemblyActionAndRest = string.Join('.', [
+                ..uriDirectories.Select(part => part.Replace('-', '_')),
+                uriFilename
+            ]);
+
+            switch (uriAction)
             {
-                return;
+                case "api":
+                    await HandleApiRequest(args);
+                    break;
+                default:
+                    var streamKey = $"{expectedPrefix}{assemblyActionAndRest}";
+                    Stream stream = assembly.GetManifestResourceStream(streamKey)
+                        ?? throw new Exception($"Stream not found for key {streamKey}");
+
+                    contentTypeProvider.Mappings.TryGetValue(uriFilenameExt, out var contentType);
+
+                    args.Response = webView.CoreWebView2.Environment.CreateWebResourceResponse(stream, 200, "OK",
+                        contentType == null ? "" : $"Content-Type: {contentType};"
+                    );
+                    break;
             }
-
-            var deferral = args.GetDeferral();
-
-            HttpContent GetRequestContent()
-            {
-                if (args.Request.Content == null)
-                {
-                    return null;
-                }
-
-                HttpContent httpContent = new StreamContent(args.Request.Content);
-                foreach (var header in args.Request.Headers)
-                {
-                    httpContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
-                }
-                return httpContent;
-            }
-
-            HttpResponseMessage GetOptionsResponse()
-            {
-                var requestMethod = args.Request.Headers.GetHeader("access-control-request-method");
-
-                var res = new HttpResponseMessage()
-                {
-                    StatusCode = System.Net.HttpStatusCode.NoContent,
-                    ReasonPhrase = "No Content",
-                    RequestMessage = new HttpRequestMessage(new HttpMethod(requestMethod), uri)
-                };
-
-                res.Headers.Add("Access-Control-Allow-Methods", requestMethod);
-                res.Headers.Add("Access-Control-Allow-Headers", "content-type");
-                res.Headers.Add("Access-Control-Allow-Origin", "*");
-
-                return res;
-            }
-
-            var response = args.Request.Method switch
-            {
-                "GET" => await backendClient.GetAsync(uri),
-                "PUT" => await backendClient.PutAsync(uri, GetRequestContent()),
-                "POST" => await backendClient.PostAsync(uri, GetRequestContent()),
-                "PATCH" => await backendClient.PatchAsync(uri, GetRequestContent()),
-                "DELETE" => await backendClient.DeleteAsync(uri),
-                "OPTIONS" => GetOptionsResponse(),
-                _ => throw new Exception("Not handled")
-            };
-
-            if (!response.Headers.Contains("Access-Control-Allow-Origin"))
-            {
-                response.Headers.Add("Access-Control-Allow-Origin", "*");
-            }
-
-            args.Response = await ConvertHttpResponseMessageToWebResourceResponse(response);
-
-            deferral.Complete();
         };
 
         var navigateTo = $"https://pkvault/index.html?server={LocalWebServer.HOST_URL}";
@@ -201,16 +147,70 @@ partial class MainForm
         webView.CoreWebView2.Navigate(navigateTo);
     }
 
-    private async Task<CoreWebView2WebResourceResponse> ConvertHttpResponseMessageToWebResourceResponse(
+    private async Task HandleApiRequest(CoreWebView2WebResourceRequestedEventArgs args)
+    {
+        var uri = args.Request.Uri;
+
+        var deferral = args.GetDeferral();
+
+        HttpContent GetRequestContent()
+        {
+            if (args.Request.Content == null)
+            {
+                return null;
+            }
+
+            HttpContent httpContent = new StreamContent(args.Request.Content);
+            foreach (var header in args.Request.Headers)
+            {
+                httpContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            }
+            return httpContent;
+        }
+
+        HttpResponseMessage GetOptionsResponse()
+        {
+            var requestMethod = args.Request.Headers.GetHeader("access-control-request-method");
+
+            var res = new HttpResponseMessage()
+            {
+                StatusCode = System.Net.HttpStatusCode.NoContent,
+                ReasonPhrase = "No Content",
+                RequestMessage = new HttpRequestMessage(new HttpMethod(requestMethod), uri)
+            };
+
+            res.Headers.Add("Access-Control-Allow-Methods", requestMethod);
+            res.Headers.Add("Access-Control-Allow-Headers", "content-type");
+            res.Headers.Add("Access-Control-Allow-Origin", "*");
+
+            return res;
+        }
+
+        var response = args.Request.Method switch
+        {
+            "GET" => await backendClient.GetAsync(uri),
+            "PUT" => await backendClient.PutAsync(uri, GetRequestContent()),
+            "POST" => await backendClient.PostAsync(uri, GetRequestContent()),
+            "PATCH" => await backendClient.PatchAsync(uri, GetRequestContent()),
+            "DELETE" => await backendClient.DeleteAsync(uri),
+            "OPTIONS" => GetOptionsResponse(),
+            _ => throw new Exception("Not handled")
+        };
+
+        if (!response.Headers.Contains("Access-Control-Allow-Origin"))
+        {
+            response.Headers.Add("Access-Control-Allow-Origin", "*");
+        }
+
+        args.Response = GetWebResourceResponse(response);
+
+        deferral.Complete();
+    }
+
+    private CoreWebView2WebResourceResponse GetWebResourceResponse(
         HttpResponseMessage httpResponse
     )
     {
-        Stream contentStream = await httpResponse.Content.ReadAsStreamAsync();
-
-        var memoryStream = new MemoryStream();
-        await contentStream.CopyToAsync(memoryStream);
-        memoryStream.Position = 0;
-
         var headersBuilder = new System.Text.StringBuilder();
         foreach (var header in httpResponse.Headers)
         {
@@ -222,11 +222,12 @@ partial class MainForm
         }
         string headers = headersBuilder.ToString();
 
-        CoreWebView2WebResourceResponse webResourceResponse =
-            webView.CoreWebView2.Environment.CreateWebResourceResponse(memoryStream,
-                                         (int)httpResponse.StatusCode,
-                                         httpResponse.ReasonPhrase,
-                                         headers);
+        var webResourceResponse = webView.CoreWebView2.Environment.CreateWebResourceResponse(
+            httpResponse.Content.ReadAsStream(),
+            (int)httpResponse.StatusCode,
+            httpResponse.ReasonPhrase,
+            headers
+        );
 
         return webResourceResponse;
     }

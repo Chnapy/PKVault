@@ -8,7 +8,10 @@ public class GenApiData
     {
         Console.WriteLine("-- Generate pokeapi files --");
 
-        Directory.Delete("pokeapi/api-data/data/api/v2", true);
+        if (Directory.Exists("pokeapi/api-data/data/api/v2"))
+        {
+            Directory.Delete("pokeapi/api-data/data/api/v2", true);
+        }
         Directory.CreateDirectory("pokeapi/api-data/data/api/v2");
 
         Process(

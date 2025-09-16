@@ -58,6 +58,7 @@ public class SettingsService
             SAVE_GLOBS = ["./tmp/saves/**/*.sav", "./tmp/saves/**/*.srm", "./tmp/saves/**/*.gci", "./tmp/saves/**/*.dsv"],
             STORAGE_PATH = "./tmp/storage",
             BACKUP_PATH = "./tmp/backup",
+            HTTPS_NOCERT = true,
         };
 #else
         settings = new()

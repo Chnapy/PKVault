@@ -1,9 +1,9 @@
 import React from "react";
-import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png?url';
 import type { GenderType } from '../../data/sdk/model';
 import { Button } from '../button/button';
 import { getSpeciesNO } from "../dex-item/util/get-species-no";
 import { Gender } from '../gender/gender';
+import { ShinyIcon } from '../icon/shiny-icon';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
 import { DetailsCardContainer } from './details-card-container';
@@ -81,9 +81,7 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
         top: 6,
         right: 6,
       }}>
-        <img
-          src={shinyIconImg}
-          alt='shiny-icon'
+        <ShinyIcon
           style={{
             width: 12,
             margin: '0 -2px',

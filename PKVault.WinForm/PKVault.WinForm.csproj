@@ -29,8 +29,7 @@
     <!-- <Content Include="wwwroot/*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content> -->
-    <EmbeddedResource Include="wwwroot/*" />
-    <EmbeddedResource Include="wwwroot/assets/*" />
+    <EmbeddedResource Include="wwwroot/**/*" />
   </ItemGroup>
 
   <ItemGroup>

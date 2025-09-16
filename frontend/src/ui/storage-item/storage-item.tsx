@@ -2,17 +2,17 @@ import { css, cx } from '@emotion/css';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import React from "react";
 import { createPortal } from 'react-dom';
-import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png?url';
 import { useStaticData } from '../../hooks/use-static-data';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { ButtonLike } from '../button/button-like';
 import { Icon } from '../icon/icon';
+import { ShinyIcon } from '../icon/shiny-icon';
 import { theme } from '../theme';
 import { StorageItemMainActions } from './storage-item-main-actions';
 import { StorageItemMainActionsContainer } from './storage-item-main-actions-container';
+import { StorageItemPlaceholder } from './storage-item-placeholder';
 import { StorageItemSaveActions } from './storage-item-save-actions';
 import { StorageItemSaveActionsContainer } from './storage-item-save-actions-container';
-import { StorageItemPlaceholder } from './storage-item-placeholder';
 
 export type StorageItemProps = {
   storageType: "main" | "save";
@@ -152,10 +152,7 @@ export const StorageItem: React.FC<StorageItemProps> = ({
             textAlign: 'center',
           }}
         >
-          {isShiny && <img
-            src={shinyIconImg}
-            alt='shiny-icon'
-          />}
+          {isShiny && <ShinyIcon />}
 
           {!canMoveOutside && <div style={{
             width: 20,

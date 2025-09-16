@@ -4,8 +4,6 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKVault.Backend", "PKVault.Backend\PKVault.Backend.csproj", "{B5CEE1AB-68C5-FCEC-EA61-653FFB609ED2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKVault.Desktop", "PKVault.Desktop\PKVault.Desktop.csproj", "{DAB71D88-C735-4558-8C3F-6375D55E9B77}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKVault.WinForm", "PKVault.WinForm\PKVault.WinForm.csproj", "{077DE631-2972-4BDF-A561-895CD6FBD118}"
 EndProject
 Global

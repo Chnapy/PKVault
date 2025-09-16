@@ -1,6 +1,6 @@
 import type React from 'react';
-import shinyIconImg from '../../assets/pkhex/img/Pokemon Sprite Overlays/rare_icon.png?url';
 import { useStaticData } from '../../hooks/use-static-data';
+import { ShinyIcon } from '../icon/shiny-icon';
 import { theme } from '../theme';
 
 export type StorageDetailsMainImgProps = {
@@ -49,9 +49,7 @@ export const StorageDetailsMainImg: React.FC<StorageDetailsMainImgProps> = ({ sp
             }}
         />}
 
-        {isShiny && <img
-            src={shinyIconImg}
-            alt='shiny-icon'
+        {isShiny && <ShinyIcon
             style={{
                 position: 'absolute',
                 top: 8,

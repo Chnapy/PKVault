@@ -1,8 +1,5 @@
 {
-    "files.exclude": {
-        "**/pokeapi/api-data": true
-    },
-    "search.exclude": {
-        "**/pokeapi/api-data": true
-    }
+  "search.exclude": {
+    "**/pokeapi/api-data": true
+  }
 }
