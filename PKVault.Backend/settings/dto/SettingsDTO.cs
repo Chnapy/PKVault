@@ -1,12 +1,18 @@
-using System.Text.Json.Serialization;
-
 public class SettingsDTO
 {
     public const string filePath = "./config/pkvault.json";
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string? SETTINGS_PATH { get; set; } = default;
+    public string SettingsPath { get => filePath; }
 
+    public bool CanUpdateSettings { get => StorageService.HasEmptyActionList(); }
+
+    public bool CanScanSaves { get => StorageService.HasEmptyActionList(); }
+
+    public required SettingsMutableDTO SettingsMutable { get; set; }
+}
+
+public class SettingsMutableDTO
+{
     public required string DB_PATH { get; set; }
 
     public required string[] SAVE_GLOBS { get; set; }

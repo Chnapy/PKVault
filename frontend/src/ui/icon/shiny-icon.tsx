@@ -6,5 +6,10 @@ export const ShinyIcon: React.FC<React.DetailedHTMLProps<React.ImgHTMLAttributes
         src={shinyIconImg}
         alt='shiny-icon'
         {...props}
+        style={{
+            width: 20,
+            height: 20,
+            ...props.style,
+        }}
     />;
 };

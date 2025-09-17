@@ -361,7 +361,7 @@ public class StaticDataService
         return string.Join('/', pokeapiVersions.Select(ver =>
         {
             return ver.Names.Find(name => name.Language.Name == "fr").Name;
-        }));
+        }).Distinct());
     }
 
     // private static List<GameVersion> GetAliasedVersions(GameVersion version)

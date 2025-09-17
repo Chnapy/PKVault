@@ -5,6 +5,7 @@ export type TextInputProps = {
     value?: string;
     label?: string;
     area?: boolean;
+    disabled?: boolean;
 }
     & React.HTMLAttributes<HTMLInputElement | HTMLTextAreaElement>;
 
@@ -21,6 +22,7 @@ export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onCha
         borderRadius: 4,
         padding: '2px 4px',
         textShadow: theme.shadow.text,
+        opacity: rest.disabled ? 0.8 : undefined,
     };
 
     return <label

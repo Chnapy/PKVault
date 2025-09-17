@@ -54,6 +54,7 @@ export const TypeItemBase: React.FC<TypeItemBaseProps> = ({ type, name, clickabl
                 src={typeImg.img}
                 style={{
                     height: 20,
+                    width: 20,
                     backgroundColor: typeImg.color
                 }}
             />

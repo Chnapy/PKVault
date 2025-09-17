@@ -6,15 +6,20 @@ import {
 } from "../data/sdk/storage/storage.gen";
 import { Route } from "../routes/storage";
 import { Button } from "../ui/button/button";
-import { FilterSelect } from "../ui/filter/filter-select/filter-select";
+import { FilterSelect, type FilterSelectProps } from "../ui/filter/filter-select/filter-select";
 import { Icon } from '../ui/icon/icon';
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
+import { theme } from '../ui/theme';
+import { StorageMoveContext } from './actions/storage-move-context';
 import { StorageMainItem } from './storage-main-item';
 
 export const StorageMainBox: React.FC = () => {
   const mainBoxId = Route.useSearch({ select: (search) => search.mainBoxId });
   const navigate = Route.useNavigate();
+
+  const moveContext = StorageMoveContext.useValue();
+  const isMoveDragging = !!moveContext.selected && !moveContext.selected.target;
 
   const boxesQuery = useStorageGetMainBoxes();
   const pkmsQuery = useStorageGetMainPkms();
@@ -34,20 +39,29 @@ export const StorageMainBox: React.FC = () => {
     return null;
   }
 
-  const previousBox = boxes[ selectedBoxIndex - 1 ];
-  const nextBox = boxes[ selectedBoxIndex + 1 ];
+  const previousBox = boxes[ selectedBoxIndex - 1 ] ?? boxes[ boxes.length - 1 ];
+  const nextBox = boxes[ selectedBoxIndex + 1 ] ?? boxes[ 0 ];
 
-  if (!selectedBox) {
-    return null;
-  }
+  const boxesOptions = [
+    ...boxes.map((box): FilterSelectProps[ 'options' ][ number ] => ({
+      value: box.id + "",
+      label: box.name,
+    })),
+    !isMoveDragging && {
+      value: "",
+      label: "Create new box",
+    },
+  ].filter((opt): opt is FilterSelectProps[ 'options' ][ number ] => !!opt);
+
+  const boxPkmsList = pkms.filter((pkm) => pkm.boxId === selectedBox.idInt);
 
   const boxPkms = Object.fromEntries(
-    pkms
-      .filter((pkm) => pkm.boxId === selectedBox.idInt)
-      .map((pkm) => [ pkm.boxSlot, pkm ])
+    boxPkmsList.map((pkm) => [ pkm.boxSlot, pkm ])
   );
 
-  const allItems = new Array(6 * 5)
+  const boxMaxItems = 6 * 5;
+
+  const allItems = new Array(boxMaxItems)
     .fill(null)
     .map((_, i): PkmDTO | null => boxPkms[ i ] ?? null);
 
@@ -55,55 +69,78 @@ export const StorageMainBox: React.FC = () => {
     <StorageBox
       header={
         <>
-          <Button
-            onClick={() =>
-              navigate({
-                search: {
-                  mainBoxId: previousBox.idInt,
-                },
-              })
-            }
-            disabled={!previousBox}
-          >
-            <Icon name='angle-left' forButton />
-          </Button>
-
-          <FilterSelect
-            enabled={false}
-            options={[
-              ...boxes.map((box) => ({
-                value: box.id + "",
-                label: box.name,
-              })),
-              {
-                value: "",
-                label: "Create new box",
-              },
-            ]}
-            value={[ selectedBox.id + "" ]}
-            onChange={([ value ]) => {
-              navigate({
-                search: {
-                  mainBoxId: Number(value),
-                },
-              });
+          <div
+            style={{
+              flex: 1,
             }}
           >
-            {selectedBox.name}
-          </FilterSelect>
+          </div>
 
-          <Button
-            onClick={() =>
-              navigate({
-                search: {
-                  mainBoxId: nextBox.idInt,
-                },
-              })
-            }
-            disabled={!nextBox}
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 4,
+            }}
           >
-            <Icon name='angle-right' forButton />
-          </Button>
+            <Button
+              triggerOnHover={isMoveDragging}
+              onClick={() =>
+                navigate({
+                  search: {
+                    mainBoxId: previousBox.idInt,
+                  },
+                })
+              }
+              disabled={previousBox.id === selectedBox.id}
+            >
+              <Icon name='angle-left' forButton />
+            </Button>
+
+            <FilterSelect
+              triggerOnHover={isMoveDragging}
+              enabled={false}
+              options={boxesOptions}
+              value={[ selectedBox.id + "" ]}
+              onChange={([ value ]) => {
+                navigate({
+                  search: {
+                    mainBoxId: Number(value),
+                  },
+                });
+              }}
+            >
+              {selectedBox.name}
+            </FilterSelect>
+
+            <Button
+              triggerOnHover={isMoveDragging}
+              onClick={() =>
+                navigate({
+                  search: {
+                    mainBoxId: nextBox.idInt,
+                  },
+                })
+              }
+              disabled={nextBox.id === selectedBox.id}
+            >
+              <Icon name='angle-right' forButton />
+            </Button>
+          </div>
+
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 2
+            }}
+          >
+            <Icon name='folder' solid forButton />
+            <span style={{ color: theme.text.primary }}>{boxPkmsList.length}</span>
+            /{boxMaxItems} - Total.<span style={{ color: theme.text.primary }}>{pkms.length}</span>
+          </div>
         </>
       }
     >

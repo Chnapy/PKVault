@@ -7,10 +7,12 @@ import { Header } from '../ui/header/header';
 import { HeaderItem } from "../ui/header/header-item";
 import { Icon } from '../ui/icon/icon';
 import { Warnings } from '../warnings/warnings';
+import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 
 const Root: React.FC = () => {
   const matchRoute = useMatchRoute();
 
+  const settings = useSettingsGet().data?.data;
   const savesScanMutation = useSaveInfosScan();
 
   return (
@@ -46,6 +48,7 @@ const Root: React.FC = () => {
 
         <Button
           onClick={() => savesScanMutation.mutateAsync()}
+          disabled={!settings?.canScanSaves}
         >
           <Icon
             name='refresh'

@@ -8,10 +8,11 @@ export const Frame: React.FC<React.PropsWithChildren> = ({ children }) => {
         className={css({
             position: 'relative',
             height: "100vh",
-            overflowY: 'scroll',
+            overflow: 'scroll',
             scrollbarColor: `${theme.bg.contrastdark} ${theme.bg.contrast}`,
             border: `10px solid ${theme.bg.contrast}`,
             borderRight: 'none',
+            borderBottom: 'none',
             backgroundColor: theme.bg.app,
             backgroundImage: `radial-gradient(${theme.bg.appdark} 4px, ${theme.bg.app} 4px)`,
             backgroundSize: '40px 40px',

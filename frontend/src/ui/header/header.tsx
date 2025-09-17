@@ -29,7 +29,8 @@ export const Header: React.FC<React.PropsWithChildren> = ({ children }) => {
                 <img
                     src="/logo.svg"
                     style={{
-                        height: 48
+                        height: 48,
+                        width: 48,
                     }}
                 />
 

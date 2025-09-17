@@ -1,19 +1,14 @@
 import { css, cx } from "@emotion/css";
-import React from "react";
-import { type ContainerProps, type ReactTag } from "../container/container";
+import { type ReactTag } from "../container/container";
 import { theme } from "../theme";
-import { ButtonLike } from './button-like';
+import { ButtonLike, type ButtonLikeProps } from './button-like';
 
 export type ButtonProps<
   AS extends ReactTag = ReactTag,
-> = React.PropsWithChildren<{
-  onClick?: React.MouseEventHandler;
+> = {
   bgColor?: string;
   big?: boolean;
-  loading?: boolean;
-  disabled?: boolean;
-}> &
-  Omit<ContainerProps<AS>, 'disabled'>;
+} & ButtonLikeProps<AS>;
 
 export function Button<
   AS extends ReactTag = "button",

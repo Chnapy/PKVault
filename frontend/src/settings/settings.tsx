@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import type { SettingsDTO } from '../data/sdk/model';
+import type { SettingsMutableDTO } from '../data/sdk/model/settingsMutableDTO';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { Button } from '../ui/button/button';
 import { TitledContainer } from '../ui/container/titled-container';
@@ -12,17 +12,18 @@ export const Settings: React.FC = () => {
     const settingsMutation = useSettingsEdit();
 
     const settings = settingsQuery.data?.data;
+    const settingsMutable = settings?.settingsMutable;
 
-    const defaultValue = React.useMemo(() => settings && ({
-        ...settings,
-        savE_GLOBS: settings.savE_GLOBS.join('\n'),
-    }), [ settings ]);
+    const defaultValue = React.useMemo(() => settingsMutable && ({
+        ...settingsMutable,
+        savE_GLOBS: settingsMutable.savE_GLOBS.join('\n'),
+    }), [ settingsMutable ]);
 
-    const { register, reset, handleSubmit } = useForm<Omit<SettingsDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
+    const { register, reset, handleSubmit } = useForm<Omit<SettingsMutableDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
         defaultValues: defaultValue
     });
 
-    if (!settings) {
+    if (!settingsMutable) {
         return null;
     }
 
@@ -60,7 +61,8 @@ export const Settings: React.FC = () => {
                 >
                     <TextInput
                         label='Config path'
-                        {...register('settingS_PATH', { disabled: true })}
+                        value={settings.settingsPath}
+                        disabled
                     />
 
                     <TextInput
@@ -111,6 +113,7 @@ export const Settings: React.FC = () => {
                 >Cancel</Button>
                 <Button
                     onClick={submit}
+                    disabled={!settings.canUpdateSettings}
                     big
                     bgColor={theme.bg.primary}
                 >Submit</Button>

@@ -101,7 +101,9 @@ partial class MainForm
 
         var contentTypeProvider = new FileExtensionContentTypeProvider();
 
-        webView.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
+        webView.CoreWebView2.AddWebResourceRequestedFilter("https://pkvault/*", CoreWebView2WebResourceContext.All);
+        webView.CoreWebView2.AddWebResourceRequestedFilter("https://localhost:*", CoreWebView2WebResourceContext.All);
+
         webView.CoreWebView2.WebResourceRequested += async (sender, args) =>
         {
             // https://localhost:57135/api/storage/main/pkm-version

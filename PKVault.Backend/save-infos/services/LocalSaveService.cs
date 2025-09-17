@@ -10,7 +10,7 @@ public class LocalSaveService
         SaveById.Clear();
         SaveByPath.Clear();
 
-        var globs = SettingsService.AppSettings.SAVE_GLOBS;
+        var globs = SettingsService.AppSettings.SettingsMutable.SAVE_GLOBS;
         var searchPaths = MatcherUtil.SearchPaths(globs);
 
         var hasBeenUpdated = false;

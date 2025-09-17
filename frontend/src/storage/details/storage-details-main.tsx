@@ -1,5 +1,4 @@
 import React from 'react';
-import { GameVersion } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
@@ -54,7 +53,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
             {pkmVersionList.map((pkmVersion, i) => (
                 <DetailsTab
                     key={pkmVersion.id}
-                    version={GameVersion[ `Gen${pkmVersion.generation as 1}` ]}
+                    version={pkmVersion.version}
                     otName={`G${pkmVersion.generation}`}
                     original={pkmVersion.isMain}
                     onClick={() => setSelectedIndex(i)}

@@ -35,6 +35,7 @@ export const TextOrigin: React.FC<TextOriginProps> = ({
             src={gameinfos.img}
             style={{
                 height: '1lh',
+                width: '1lh',
                 verticalAlign: 'middle'
             }}
         /> <span style={{ color: theme.text.primary }}>Pokemon {versions[ version ].name}</span>

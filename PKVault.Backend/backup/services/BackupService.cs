@@ -10,7 +10,7 @@ public class BackupService
 
     public static async Task<DateTime> CreateBackup()
     {
-        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+        var bkpPath = GetBackupsPath();
 
         var logtime = LogUtil.Time("Create backup");
 
@@ -53,7 +53,7 @@ public class BackupService
 
     private static void PrepareBkpDir()
     {
-        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+        var bkpPath = GetBackupsPath();
 
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
         var bkpDbDirPath = Path.Combine(bkpTmpDirPath, "db");
@@ -73,7 +73,7 @@ public class BackupService
 
     private static Dictionary<string, string> CreateDbBackup(DataEntityLoaders loaders)
     {
-        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+        var bkpPath = GetBackupsPath();
 
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
 
@@ -81,7 +81,7 @@ public class BackupService
         var pkmEntities = loaders.pkmLoader.GetAllEntities();
         var pkmVersionEntities = loaders.pkmVersionLoader.GetAllEntities();
 
-        var dbDir = SettingsService.AppSettings.DB_PATH;
+        var dbDir = SettingsService.AppSettings.SettingsMutable.DB_PATH;
 
         var boxPath = Path.Combine(dbDir, "box.json");
         var pkmPath = Path.Combine(dbDir, "pkm.json");
@@ -115,8 +115,8 @@ public class BackupService
 
     private static Dictionary<string, string> CreateSavesBackup()
     {
-        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
-        var globs = SettingsService.AppSettings.SAVE_GLOBS;
+        var bkpPath = GetBackupsPath();
+        var globs = SettingsService.AppSettings.SettingsMutable.SAVE_GLOBS;
         var searchPaths = MatcherUtil.SearchPaths(globs);
 
         var paths = new Dictionary<string, string>();
@@ -146,7 +146,7 @@ public class BackupService
 
     private static async Task<Dictionary<string, string>> CreateMainBackup(DataEntityLoaders loaders)
     {
-        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+        var bkpPath = GetBackupsPath();
 
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
         var bkpMainDirPath = Path.Combine(bkpTmpDirPath, "main");
@@ -193,7 +193,7 @@ public class BackupService
 
     private static DateTime Compress()
     {
-        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+        var bkpPath = GetBackupsPath();
 
         var dateTime = DateTime.UtcNow;
 
@@ -212,7 +212,7 @@ public class BackupService
 
     public static List<BackupDTO> GetBackupList()
     {
-        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+        var bkpPath = GetBackupsPath();
         var glob = Path.Combine(bkpPath, "*.zip");
         var searchPaths = MatcherUtil.SearchPaths([glob]);
 
@@ -243,7 +243,7 @@ public class BackupService
 
     public static void DeleteBackup(DateTime createdAt)
     {
-        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+        var bkpPath = GetBackupsPath();
 
         var fileName = GetBackupFilename(createdAt);
         var bkpZipPath = Path.Combine(bkpPath, fileName);
@@ -258,7 +258,7 @@ public class BackupService
 
     public static async Task RestoreBackup(DateTime createdAt)
     {
-        var bkpPath = SettingsService.AppSettings.BACKUP_PATH;
+        var bkpPath = GetBackupsPath();
 
         var fileName = GetBackupFilename(createdAt);
 
@@ -338,5 +338,10 @@ public class BackupService
 
             throw;
         }
+    }
+
+    private static string GetBackupsPath()
+    {
+        return SettingsService.AppSettings.SettingsMutable.BACKUP_PATH;
     }
 }

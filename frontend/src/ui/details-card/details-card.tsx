@@ -59,6 +59,7 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
         style={{
           imageRendering: "pixelated",
           width: 96,
+          height: 96,
           display: "block",
           background: theme.bg.default,
           borderRadius: 8,
@@ -72,6 +73,8 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
             position: 'absolute',
             bottom: 0,
             right: 0,
+            width: 30,
+            height: 30,
           }}
         />
       )}

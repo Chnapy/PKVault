@@ -120,10 +120,10 @@ public class Program
 
         ConfigureServices(builder.Services);
 
-        var certificate = SettingsService.AppSettings.HTTPS_CERT_PEM_PATH != default && SettingsService.AppSettings.HTTPS_KEY_PEM_PATH != default
+        var certificate = SettingsService.AppSettings.SettingsMutable.HTTPS_CERT_PEM_PATH != default && SettingsService.AppSettings.SettingsMutable.HTTPS_KEY_PEM_PATH != default
             ? X509Certificate2.CreateFromPem(
-                File.ReadAllText(SettingsService.AppSettings.HTTPS_CERT_PEM_PATH),
-                File.ReadAllText(SettingsService.AppSettings.HTTPS_KEY_PEM_PATH)
+                File.ReadAllText(SettingsService.AppSettings.SettingsMutable.HTTPS_CERT_PEM_PATH),
+                File.ReadAllText(SettingsService.AppSettings.SettingsMutable.HTTPS_KEY_PEM_PATH)
                 )
             : null;
 
@@ -135,7 +135,7 @@ public class Program
                 {
                     listenOptions.UseHttps(certificate);
                 }
-                else if (SettingsService.AppSettings.HTTPS_NOCERT == true)
+                else if (SettingsService.AppSettings.SettingsMutable.HTTPS_NOCERT == true)
                 {
                     listenOptions.UseHttps();
                 }
@@ -145,7 +145,7 @@ public class Program
 
         var app = builder.Build();
 
-        ConfigureAppBuilder(app, certificate != default || SettingsService.AppSettings.HTTPS_NOCERT == true);
+        ConfigureAppBuilder(app, certificate != default || SettingsService.AppSettings.SettingsMutable.HTTPS_NOCERT == true);
 
         return app;
     }

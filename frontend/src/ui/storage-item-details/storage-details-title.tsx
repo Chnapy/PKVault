@@ -23,7 +23,7 @@ export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ versio
     return <>
         <img
             src={getGameInfos(version).img}
-            style={{ height: 28 }}
+            style={{ height: 28, width: 28 }}
         />
 
         <div style={{ flexGrow: 1 }}>

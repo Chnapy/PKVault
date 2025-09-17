@@ -27,7 +27,8 @@ export const StorageSaveSelect: React.FC = () => {
           overflowY: "auto",
           display: 'flex',
           flexDirection: 'column',
-          gap: 8
+          gap: 8,
+          padding: 2,
         }}
       >
         {saveInfos.map((save, i) => (

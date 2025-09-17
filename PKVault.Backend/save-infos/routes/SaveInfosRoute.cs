@@ -17,6 +17,11 @@ public class SaveInfosController : ControllerBase
     [HttpPut()]
     public async Task<ActionResult<DataDTO>> Scan()
     {
+        if (!StorageService.HasEmptyActionList())
+        {
+            throw new Exception($"Empty action list is required");
+        }
+
         await LocalSaveService.ReadLocalSaves();
 
         await StorageService.ResetDataLoader();

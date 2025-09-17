@@ -28,7 +28,10 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ version, otName, origina
     >
         <img
             src={gameInfos.img}
-            style={{ height: '1lh' }}
+            style={{
+                height: '1lh',
+                width: '1lh',
+            }}
         />
         {otName} {original && " (original)"}
     </Button>;

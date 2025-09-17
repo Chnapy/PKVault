@@ -34,6 +34,7 @@ export const StorageDetailsMainImg: React.FC<StorageDetailsMainImgProps> = ({ sp
                 style={{
                     imageRendering: "pixelated",
                     width: 96,
+                    height: 96,
                     display: "block",
                     filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
                 }}
@@ -46,6 +47,8 @@ export const StorageDetailsMainImg: React.FC<StorageDetailsMainImgProps> = ({ sp
                 position: 'absolute',
                 bottom: 0,
                 right: 0,
+                width: 30,
+                height: 30,
             }}
         />}
 

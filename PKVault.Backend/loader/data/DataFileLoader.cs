@@ -14,7 +14,7 @@ public class DataFileLoader : DataLoader
             saveDict.Add(save.ID32, save.Clone());
         });
 
-        var dbDir = SettingsService.AppSettings.DB_PATH;
+        var dbDir = SettingsService.AppSettings.SettingsMutable.DB_PATH;
 
         var boxLoader = new EntityJSONLoader<BoxDTO, BoxEntity>(
             filePath: Path.Combine(dbDir, "box.json"),

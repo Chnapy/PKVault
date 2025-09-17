@@ -67,7 +67,7 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                     Time played <Icon name='clock' solid forButton /> <span style={{ color: theme.text.primary }}>{playTime}</span>
                     <br />
                     Pokedex seen <Icon name='eye' solid forButton /> <span style={{ color: theme.text.primary }}>{dexSeenCount}</span>{' '}
-                    caught <img src={staticData.itemPokeball.sprite} style={{ height: '1lh', margin: -4 }} /> <span style={{ color: theme.text.primary }}>{dexCaughtCount}</span>
+                    caught <img src={staticData.itemPokeball.sprite} style={{ height: '1lh', width: '1lh', margin: -4 }} /> <span style={{ color: theme.text.primary }}>{dexCaughtCount}</span>
                     <br />
                     Storage <Icon name='folder' solid forButton /> <span style={{ color: theme.text.primary }}>{ownedCount}</span>
                     {shinyCount > 0 && <>

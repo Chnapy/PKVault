@@ -14,13 +14,14 @@ public class SettingsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<DataDTO>> Edit([BindRequired] SettingsDTO settings)
+    public async Task<ActionResult<DataDTO>> Edit([BindRequired] SettingsMutableDTO settingsMutable)
     {
-        await SettingsService.UpdateSettings(settings);
+        if (!StorageService.HasEmptyActionList())
+        {
+            throw new Exception($"Empty action list is required");
+        }
 
-        await StorageService.ResetDataLoader();
-
-        await WarningsService.CheckWarnings();
+        await SettingsService.UpdateSettings(settingsMutable);
 
         return await DataDTO.FromDataUpdateFlags(new()
         {

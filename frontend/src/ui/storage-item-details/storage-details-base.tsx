@@ -1,7 +1,9 @@
 import type React from 'react';
 import type { PkmSaveDTO } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
+import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Route } from '../../routes/storage';
+import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { DetailsCardContainer } from '../details-card/details-card-container';
@@ -14,7 +16,6 @@ import { StorageDetailsTitle } from './storage-details-title';
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
-import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'pid' | 'species' | 'speciesName' | 'version' | 'generation' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
@@ -28,7 +29,7 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     extraContent?: React.ReactNode;
 };
 
-export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onRelease, onSubmit, extraContent, ...savePkm }) => {
+export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onRelease, onSubmit, extraContent, ...pkm }) => {
     const formContext = StorageDetailsForm.useContext();
     const moveContext = StorageMoveContext.useValue();
 
@@ -37,41 +38,42 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
     const navigate = Route.useNavigate();
 
     return <DetailsCardContainer
+        bgColor={getGameInfos(pkm.version).color}
         title={<StorageDetailsTitle
-            version={savePkm.version}
-            generation={savePkm.generation}
+            version={pkm.version}
+            generation={pkm.generation}
             showVersionName
             onRelease={onRelease}
         />}
         mainImg={
             <StorageDetailsMainImg
-                species={savePkm.species}
-                speciesName={savePkm.speciesName}
-                isShiny={savePkm.isShiny}
-                isEgg={savePkm.isEgg}
-                isShadow={savePkm.isShadow}
-                ball={savePkm.ball}
+                species={pkm.species}
+                speciesName={pkm.speciesName}
+                isShiny={pkm.isShiny}
+                isEgg={pkm.isEgg}
+                isShadow={pkm.isShadow}
+                ball={pkm.ball}
             />
         }
         mainInfos={
             <StorageDetailsMainInfos
-                id={savePkm.id}
-                pid={savePkm.pid}
-                species={savePkm.species}
-                speciesName={savePkm.speciesName}
-                nickname={savePkm.nickname}
-                nicknameMaxLength={savePkm.nicknameMaxLength}
-                gender={savePkm.gender}
-                level={savePkm.level}
-                types={savePkm.types}
+                id={pkm.id}
+                pid={pkm.pid}
+                species={pkm.species}
+                speciesName={pkm.speciesName}
+                nickname={pkm.nickname}
+                nicknameMaxLength={pkm.nicknameMaxLength}
+                gender={pkm.gender}
+                level={pkm.level}
+                types={pkm.types}
             />
         }
         preContent={<>
-            {!savePkm.isValid && <TextContainer
+            {!pkm.isValid && <TextContainer
                 bgColor={theme.bg.yellow}
                 maxHeight={200}
             >
-                {savePkm.validityReport}
+                {pkm.validityReport}
             </TextContainer>}
 
             {/* {!!mainBoxId && !!mainBoxSlot && goToMainPkm && <>
@@ -90,50 +92,51 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
         </>}
         content={
             <>
-                {!!savePkm.heldItem && <TextContainer>
-                    Held item <span style={{ color: theme.text.primary }}>{staticData.items[ savePkm.heldItem ].name}</span> <img
-                        src={staticData.items[ savePkm.heldItem ].sprite}
-                        alt={staticData.items[ savePkm.heldItem ].name}
+                {!!pkm.heldItem && <TextContainer>
+                    Held item <span style={{ color: theme.text.primary }}>{staticData.items[ pkm.heldItem ].name}</span> <img
+                        src={staticData.items[ pkm.heldItem ].sprite}
+                        alt={staticData.items[ pkm.heldItem ].name}
                         style={{
                             height: 24,
+                            width: 24,
                             verticalAlign: 'middle'
                         }} />
                 </TextContainer>}
 
                 <TextContainer noWrap>
                     <TextStats
-                        nature={savePkm.nature}
-                        ivs={savePkm.iVs}
-                        evs={savePkm.eVs}
-                        maxEv={staticData.versions[ savePkm.version ].maxEV}
-                        stats={savePkm.stats}
-                        hiddenPowerType={savePkm.hiddenPowerType}
-                        hiddenPowerPower={savePkm.hiddenPowerPower}
-                        hiddenPowerCategory={savePkm.hiddenPowerCategory}
+                        nature={pkm.nature}
+                        ivs={pkm.iVs}
+                        evs={pkm.eVs}
+                        maxEv={staticData.versions[ pkm.version ].maxEV}
+                        stats={pkm.stats}
+                        hiddenPowerType={pkm.hiddenPowerType}
+                        hiddenPowerPower={pkm.hiddenPowerPower}
+                        hiddenPowerCategory={pkm.hiddenPowerCategory}
                     />
                 </TextContainer>
 
                 <TextContainer>
                     <TextMoves
-                        ability={savePkm.ability}
-                        moves={savePkm.moves}
-                        availableMoves={savePkm.availableMoves.map(am => am.id)}
-                        generation={savePkm.generation}
-                        hiddenPowerType={savePkm.hiddenPowerType}
-                        hiddenPowerPower={savePkm.hiddenPowerPower}
-                        hiddenPowerCategory={savePkm.hiddenPowerCategory}
+                        ability={pkm.ability}
+                        moves={pkm.moves}
+                        availableMoves={pkm.availableMoves.map(am => am.id)}
+                        generation={pkm.generation}
+                        hiddenPowerType={pkm.hiddenPowerType}
+                        hiddenPowerPower={pkm.hiddenPowerPower}
+                        hiddenPowerCategory={pkm.hiddenPowerCategory}
                     />
                 </TextContainer>
 
                 <TextContainer>
                     <TextOrigin
-                        version={savePkm.version}
-                        tid={savePkm.tid}
-                        originTrainerName={savePkm.originTrainerName}
-                        originTrainerGender={savePkm.originTrainerGender}
-                        originMetDate={savePkm.originMetDate}
-                        originMetLocation={savePkm.originMetLocation}
-                        originMetLevel={savePkm.originMetLevel}
+                        version={pkm.version}
+                        tid={pkm.tid}
+                        originTrainerName={pkm.originTrainerName}
+                        originTrainerGender={pkm.originTrainerGender}
+                        originMetDate={pkm.originMetDate}
+                        originMetLocation={pkm.originMetLocation}
+                        originMetLevel={pkm.originMetLevel}
                     />
                 </TextContainer>
             </>

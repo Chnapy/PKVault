@@ -36,7 +36,7 @@ export const theme = {
   game: {
     blue: "#2446A1",
     red: "#A14624",
-    yellow: "#FFBD58",
+    yellow: "#EAB000",
     gold: "#9C8B65",
     silver: "#747A78",
     crystal: "#6B4777",

@@ -1,5 +1,5 @@
 import React from "react";
-import { BoxType, type PkmSaveDTO, type SaveInfosDTO } from "../data/sdk/model";
+import { type PkmSaveDTO, type SaveInfosDTO } from "../data/sdk/model";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import {
   useStorageGetSaveBoxes,
@@ -11,7 +11,9 @@ import { FilterSelect } from "../ui/filter/filter-select/filter-select";
 import { Icon } from '../ui/icon/icon';
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
+import { theme } from '../ui/theme';
 import { switchUtil } from '../util/switch-util';
+import { StorageMoveContext } from './actions/storage-move-context';
 import { StorageSaveItem } from './storage-save-item';
 
 export type StorageSaveBoxProps = {
@@ -21,6 +23,9 @@ export type StorageSaveBoxProps = {
 export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
   const saveBoxId = Route.useSearch({ select: (search) => search.saveBoxId });
   const navigate = Route.useNavigate();
+
+  const moveContext = StorageMoveContext.useValue();
+  const isMoveDragging = !!moveContext.selected && !moveContext.selected.target;
 
   const saveInfosRecord = useSaveInfosGetAll().data?.data ?? {};
   const saveInfos = saveInfosRecord[ saveId ] as SaveInfosDTO | undefined;
@@ -45,13 +50,13 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
     return null;
   }
 
-  const previousBox = saveBoxes[ selectedBoxIndex - 1 ];
-  const nextBox = saveBoxes[ selectedBoxIndex + 1 ];
+  const previousBox = saveBoxes[ selectedBoxIndex - 1 ] ?? saveBoxes[ saveBoxes.length - 1 ];
+  const nextBox = saveBoxes[ selectedBoxIndex + 1 ] ?? saveBoxes[ 0 ];
+
+  const boxPkmsList = savePkms.filter((pkm) => pkm.box === selectedBox.idInt);
 
   const boxPkms = Object.fromEntries(
-    savePkms
-      .filter((pkm) => pkm.box === selectedBox.idInt)
-      .map((pkm) => [ pkm.boxSlot, pkm ])
+    boxPkmsList.map((pkm) => [ pkm.boxSlot, pkm ])
   );
 
   const itemsCount = switchUtil(selectedBox.idInt, {
@@ -67,75 +72,83 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
     <StorageBox
       header={
         <>
-          {/* {partyBox && <Button
-              onClick={() =>
-                navigate({
-                  search: {
-                    saveBoxId: partyBox.id,
-                  },
-                })
-              }
-            >
-              {partyBox.name ?? 'Party'}
-            </Button>} */}
-
-          <Button
-            onClick={() =>
-              navigate({
-                search: {
-                  saveBoxId: previousBox.id,
-                },
-              })
-            }
-            disabled={!previousBox || previousBox.type !== BoxType.Default}
-          >
-            <Icon name='angle-left' forButton />
-          </Button>
-
-          <FilterSelect
-            enabled={false}
-            options={[
-              ...saveBoxes.map((box) => ({
-                value: box.id,
-                label: box.name,
-              })),
-            ]}
-            value={[ selectedBox.id ]}
-            onChange={([ value ]) => {
-              navigate({
-                search: {
-                  saveBoxId: value,
-                },
-              });
+          <div
+            style={{
+              flex: 1,
             }}
           >
-            {selectedBox.name}
-          </FilterSelect>
+          </div>
 
-          <Button
-            onClick={() =>
-              navigate({
-                search: {
-                  saveBoxId: nextBox.id,
-                },
-              })
-            }
-            disabled={!nextBox || nextBox.type !== BoxType.Default}
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 4,
+            }}
           >
-            <Icon name='angle-right' forButton />
-          </Button>
-
-          {/* {daycareBox && <Button
+            <Button
+              triggerOnHover={isMoveDragging}
               onClick={() =>
                 navigate({
                   search: {
-                    saveBoxId: daycareBox.id,
+                    saveBoxId: previousBox.id,
                   },
                 })
               }
+              disabled={previousBox.id === selectedBox.id}
             >
-              {daycareBox.name ?? 'Daycare'}
-            </Button>} */}
+              <Icon name='angle-left' forButton />
+            </Button>
+
+            <FilterSelect
+              triggerOnHover={isMoveDragging}
+              enabled={false}
+              options={[
+                ...saveBoxes.map((box) => ({
+                  value: box.id,
+                  label: box.name,
+                })),
+              ]}
+              value={[ selectedBox.id ]}
+              onChange={([ value ]) => {
+                navigate({
+                  search: {
+                    saveBoxId: value,
+                  },
+                });
+              }}
+            >
+              {selectedBox.name}
+            </FilterSelect>
+
+            <Button
+              triggerOnHover={isMoveDragging}
+              onClick={() =>
+                navigate({
+                  search: {
+                    saveBoxId: nextBox.id,
+                  },
+                })
+              }
+              disabled={nextBox.id === selectedBox.id}
+            >
+              <Icon name='angle-right' forButton />
+            </Button>
+          </div>
+
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 2
+            }}
+          >
+            <Icon name='folder' solid forButton />
+            <span style={{ color: theme.text.primary }}>{boxPkmsList.length}</span>
+            /{itemsCount} - Total.<span style={{ color: theme.text.primary }}>{savePkms.length}</span>
+          </div>
         </>
       }
     >

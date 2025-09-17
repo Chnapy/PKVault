@@ -7,6 +7,7 @@ import { Icon } from '../icon/icon';
 import { css } from '@emotion/css';
 
 export type DetailsCardContainerProps = {
+    bgColor?: string;
     title: React.ReactNode;
     mainImg: React.ReactNode;
     mainInfos: React.ReactNode;
@@ -19,6 +20,7 @@ export type DetailsCardContainerProps = {
 };
 
 export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
+    bgColor,
     title,
     mainImg,
     mainInfos,
@@ -38,8 +40,8 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
             display: "flex",
             flexDirection: 'column',
             gap: 4,
-            backgroundColor: theme.bg.contrast,
-            borderColor: theme.border.contrast,
+            backgroundColor: bgColor ?? theme.bg.contrast,
+            borderColor: bgColor ?? theme.border.contrast,
             color: theme.text.light,
         }}>
             <div

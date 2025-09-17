@@ -63,6 +63,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
           style={{
             imageRendering: "pixelated",
             width: 64,
+            height: 64,
             display: "block",
             background: theme.bg.default,
             borderRadius: 8,

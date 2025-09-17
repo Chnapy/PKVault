@@ -8,10 +8,9 @@ public class SettingsService
     };
     public static SettingsDTO AppSettings = GetSettings();
 
-    public static async Task UpdateSettings(SettingsDTO settings)
+    public static async Task UpdateSettings(SettingsMutableDTO settingsMutable)
     {
-        settings.SETTINGS_PATH = default;
-        var text = JsonSerializer.Serialize(settings, jsonOptions);
+        var text = JsonSerializer.Serialize(settingsMutable, jsonOptions);
         Console.WriteLine(text);
         File.WriteAllText(SettingsDTO.filePath, text);
 
@@ -29,7 +28,7 @@ public class SettingsService
         if (!File.Exists(SettingsDTO.filePath))
         {
             Console.WriteLine($"Config file not existing: creating {SettingsDTO.filePath}");
-            string defaultJson = JsonSerializer.Serialize(GetDefaultSettings(), jsonOptions);
+            string defaultJson = JsonSerializer.Serialize(GetDefaultSettingsMutable(), jsonOptions);
 
             string? directory = Path.GetDirectoryName(SettingsDTO.filePath);
             if (!string.IsNullOrEmpty(directory))
@@ -41,19 +40,20 @@ public class SettingsService
         }
 
         string json = File.ReadAllText(SettingsDTO.filePath);
-        var dto = JsonSerializer.Deserialize<SettingsDTO>(json)!;
-        dto.SETTINGS_PATH = SettingsDTO.filePath;
-        return dto;
+        var mutableDto = JsonSerializer.Deserialize<SettingsMutableDTO>(json)!;
+        return new()
+        {
+            SettingsMutable = mutableDto,
+        };
     }
 
-    private static SettingsDTO GetDefaultSettings()
+    private static SettingsMutableDTO GetDefaultSettingsMutable()
     {
-        SettingsDTO settings;
+        SettingsMutableDTO settings;
 
 #if DEBUG
         settings = new()
         {
-            SETTINGS_PATH = SettingsDTO.filePath,
             DB_PATH = "./tmp/db",
             SAVE_GLOBS = ["./tmp/saves/**/*.sav", "./tmp/saves/**/*.srm", "./tmp/saves/**/*.gci", "./tmp/saves/**/*.dsv"],
             STORAGE_PATH = "./tmp/storage",
@@ -63,7 +63,6 @@ public class SettingsService
 #else
         settings = new()
         {
-            SETTINGS_PATH = SettingsDTO.filePath,
             DB_PATH = "./db",
             SAVE_GLOBS = [
                 "./saves/**/*.sav",

@@ -30,13 +30,15 @@ export const Splash: React.FC<React.PropsWithChildren> = ({ children }) => {
             backgroundColor: theme.bg.contrast,
             height: '100vh',
             display: 'flex',
+            alignItems: 'center',
             justifyContent: 'center',
         }}
     >
         <img
             src='/logo.svg'
             style={{
-                width: 128
+                width: 128,
+                height: 128,
             }}
         />
     </div>;
