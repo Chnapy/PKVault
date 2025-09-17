@@ -1,7 +1,8 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
+import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetMainPkmVersions, useStorageMainMovePkm, useStorageSaveMovePkm, useStorageSaveMovePkmFromStorage, useStorageSaveMovePkmToStorage } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
-import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 
 type Context = {
     selected?: {
@@ -22,6 +23,7 @@ const context = React.createContext<Context>({
 });
 
 export const StorageMoveContext = {
+    containerId: 'storage-move-container',
     Provider: ({ children }: React.PropsWithChildren) => {
         const [ value, setValue ] = React.useState<Context>({
             setSelected: (selected) => setValue((context) => ({
@@ -29,8 +31,6 @@ export const StorageMoveContext = {
                 selected,
             })),
         });
-
-        // console.log('state', value.selected)
 
         return <context.Provider value={value}>
             {children}
@@ -123,10 +123,13 @@ export const StorageMoveContext = {
                         enablePointerMove = false;
                     }
                 })
-                : undefined
+                : undefined,
+            renderItem: (element: React.ReactNode) => moveContext.selected?.id === pkmId && moveContext.selected?.storageType === storageType
+                ? createPortal(element, document.body.querySelector(`#${StorageMoveContext.containerId}`)!)
+                : element,
         };
     },
-    useDroppable: (dropStorageType: 'main' | 'save', dropBoxId: number, dropBoxSlot: number) => {
+    useDroppable: (dropStorageType: 'main' | 'save', dropBoxId: number, dropBoxSlot: number, pkmId?: string) => {
         const { selected, setSelected } = StorageMoveContext.useValue();
 
         const saveId = Route.useSearch({ select: (search) => search.save });
@@ -139,6 +142,16 @@ export const StorageMoveContext = {
         const saveMovePkmMutation = useStorageSaveMovePkm();
         const saveMovePkmFromStorageMutation = useStorageSaveMovePkmFromStorage();
         const saveMovePkmToStorageMutation = useStorageSaveMovePkmToStorage();
+
+        React.useEffect(() => {
+            if (pkmId
+                && selected?.id === pkmId
+                && selected.target?.storageType === dropStorageType
+                && selected.target.boxId === dropBoxId
+                && selected.target.boxSlot === dropBoxSlot) {
+                setSelected(undefined);
+            }
+        }, [ dropBoxId, dropBoxSlot, dropStorageType, pkmId, selected, setSelected ]);
 
         const onDrop = async () => {
             if (!selected) {
@@ -154,7 +167,7 @@ export const StorageMoveContext = {
                 },
             });
 
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            // await new Promise(resolve => setTimeout(resolve, 3000));
 
             if (
                 selected.storageType === "main" &&
@@ -217,15 +230,15 @@ export const StorageMoveContext = {
                 });
             }
 
-            // TODO should be done in mutation onSuccess to stay sync with cache update
-            setSelected(undefined);
+            // fallback if useEffect is not triggered for some reason
+            setTimeout(() => setSelected(undefined), 100);
         };
 
         return {
-            onClick: selected && !selected.target ? (async () => {
+            onClick: (selected && !selected.target) ? (async () => {
                 await onDrop();
             }) : undefined,
-            onPointerUp: selected && !selected.target ? (async () => {
+            onPointerUp: (selected && !selected.target) ? (async () => {
                 await onDrop();
             }) : undefined,
         };

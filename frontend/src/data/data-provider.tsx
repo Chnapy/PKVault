@@ -59,7 +59,6 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 data: mainPkms,
               } satisfies storageGetMainPkmsResponse
             );
-            console.log('UPDATED PKMS');
           }
 
           if (mainPkmVersions) {

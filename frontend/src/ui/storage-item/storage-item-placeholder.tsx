@@ -40,6 +40,7 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
           }
         }
       )}
+      disabled={!moveAttributes.onClick}
       loading={moveLoading}
       onClick={moveAttributes.onClick}
       onPointerUp={moveAttributes.onPointerUp}

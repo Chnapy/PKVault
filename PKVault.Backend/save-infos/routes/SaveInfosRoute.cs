@@ -19,6 +19,10 @@ public class SaveInfosController : ControllerBase
     {
         await LocalSaveService.ReadLocalSaves();
 
+        await StorageService.ResetDataLoader();
+
+        await WarningsService.CheckWarnings();
+
         return await DataDTO.FromDataUpdateFlags(new()
         {
             Saves = [

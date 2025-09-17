@@ -21,8 +21,8 @@ export default defineConfig({
     allowedHosts: true,
     https: process.env.VITE_SERVER_URL.startsWith('https')
       ? {
-        key: fs.readFileSync("../.devcontainer/.cert/code.lan+3-key.pem"),
-        cert: fs.readFileSync("../.devcontainer/.cert/code.lan+3.pem"),
+        key: fs.readFileSync("../.devcontainer/.cert/localhost+2.key"),
+        cert: fs.readFileSync("../.devcontainer/.cert/localhost+2.crt"),
       }
       : undefined,
   },

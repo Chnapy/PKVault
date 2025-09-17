@@ -18,18 +18,19 @@ export const Storage: React.FC = () => {
   const navigate = Route.useNavigate();
 
   return (
-    <div
-      style={{
-        display: "table",
-        justifyContent: "center",
-        alignItems: "flex-start",
-        flexWrap: "wrap",
-        borderSpacing: 16,
-        margin: 'auto',
-        marginTop: -16,
-      }}
-    >
-      <StorageMoveContext.Provider>
+    <StorageMoveContext.Provider>
+      <div
+        id={StorageMoveContext.containerId}
+        style={{
+          display: "table",
+          justifyContent: "center",
+          alignItems: "flex-start",
+          flexWrap: "wrap",
+          borderSpacing: 16,
+          margin: 'auto',
+          marginTop: -16,
+        }}
+      >
         <div
           style={{
             display: 'table-row'
@@ -167,8 +168,8 @@ export const Storage: React.FC = () => {
             />
           </div>
         )}
-      </StorageMoveContext.Provider>
-    </div>
+      </div>
+    </StorageMoveContext.Provider>
   );
 };
 

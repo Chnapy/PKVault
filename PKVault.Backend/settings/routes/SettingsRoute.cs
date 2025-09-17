@@ -18,6 +18,10 @@ public class SettingsController : ControllerBase
     {
         await SettingsService.UpdateSettings(settings);
 
+        await StorageService.ResetDataLoader();
+
+        await WarningsService.CheckWarnings();
+
         return await DataDTO.FromDataUpdateFlags(new()
         {
             MainBoxes = true,

@@ -1,7 +1,6 @@
 import { css, cx } from '@emotion/css';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import React from "react";
-import { createPortal } from 'react-dom';
 import { useStaticData } from '../../hooks/use-static-data';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { ButtonLike } from '../button/button-like';
@@ -59,7 +58,7 @@ export const StorageItem: React.FC<StorageItemProps> = ({
   const [ hover, setHover ] = React.useState(false);
 
   const moveContext = StorageMoveContext.useValue();
-  const moveDroppable = StorageMoveContext.useDroppable(storageType, boxId, boxSlot);
+  const moveDroppable = StorageMoveContext.useDroppable(storageType, boxId, boxSlot, pkmId);
   const moveDraggable = StorageMoveContext.useDraggable(pkmId, storageType);
   const moveLoading = StorageMoveContext.useLoading(storageType, boxId, boxSlot, pkmId);
 
@@ -72,10 +71,6 @@ export const StorageItem: React.FC<StorageItemProps> = ({
       boxSlot={boxSlot}
       pkmId={pkmId}
     />;
-  }
-
-  if (pkmId === 'G20931725') {
-    console.log('PKM SLOT', boxSlot)
   }
 
   const sprite = isEgg
@@ -216,7 +211,7 @@ export const StorageItem: React.FC<StorageItemProps> = ({
           }
         })}
       >
-        {!moveLoading && selected
+        {!moveLoading && !moveContext.selected && selected
           ? <>
             {storageType === 'main'
               ? <StorageItemMainActions />
@@ -245,8 +240,6 @@ export const StorageItem: React.FC<StorageItemProps> = ({
       order: boxSlot,
     })}
   >
-    {!moveLoading && moveContext.selected?.id === pkmId && moveContext.selected?.storageType === storageType
-      ? createPortal(element, document.body)
-      : element}
+    {!moveLoading && moveDraggable.renderItem(element)}
   </div>;
 };
