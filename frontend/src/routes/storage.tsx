@@ -152,11 +152,21 @@ export const Storage: React.FC = () => {
             className={css({
               position: "fixed",
               bottom: 14,
+              top: 14,
               right: 14,
               width: 350,
+              pointerEvents: 'none',
               zIndex: 20,
+              display: 'flex',
+              alignItems: 'flex-end',
               '&:hover': {
                 zIndex: 25,
+              },
+              '& > *': {
+                maxWidth: '100%',
+                maxHeight: '100%',
+                overflowY: 'auto',
+                pointerEvents: 'initial',
               }
             })}
           >

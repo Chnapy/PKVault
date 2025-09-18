@@ -214,6 +214,10 @@ export const StorageMoveContext = {
                 return false;
             }
 
+            if (selected.attached && pkmId) {
+                return false;
+            }
+
             const save = saveId ? saveInfosQuery.data?.data[ saveId ] : undefined;
 
             const targetBoxMain = dropStorageType === 'main' ? mainBoxesQuery.data?.data.find(box => box.idInt === dropBoxId) : undefined;

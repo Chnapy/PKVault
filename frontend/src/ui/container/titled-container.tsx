@@ -8,10 +8,11 @@ export type TitledContainerProps = {
     contrasted?: boolean;
     enableExpand?: boolean;
     initialExpanded?: boolean;
+    maxHeight?: number;
 };
 
 export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerProps>> = ({
-    title, contrasted, enableExpand, initialExpanded = true, children
+    title, contrasted, enableExpand, initialExpanded = true, maxHeight, children
 }) => {
     const moveContext = StorageMoveContext.useValue();
     const isDragging = !!moveContext.selected && !moveContext.selected.target;
@@ -31,6 +32,9 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
             color: contrasted
                 ? theme.text.light
                 : theme.text.default,
+            scrollbarColor: contrasted
+                ? `${theme.bg.contrastdark} ${theme.bg.contrast}`
+                : undefined,
         }}
     >
         {title && <div
@@ -47,11 +51,11 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
             }}
         >{title}</div>}
 
-        {children && <div
+        {children && expanded && <div
             style={{
-                padding: expanded ? 4 : 0,
-                height: expanded ? undefined : 0,
-                overflow: expanded ? undefined : 'hidden',
+                padding: 4,
+                overflowY: 'auto',
+                maxHeight,
             }}
         >
             {children}

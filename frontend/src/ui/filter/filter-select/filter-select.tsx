@@ -72,6 +72,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
             <TitledContainer
               contrasted
               title={'Box selection'}
+              maxHeight={300}
             // style={{ margin: 2, marginTop: 6 }}
             >
               {options.map(({ value, label }, i) => (

@@ -21,6 +21,7 @@ export const ActionsPanel: React.FC = () => {
     return <TitledContainer
         contrasted
         enableExpand
+        maxHeight={400}
         title={<div
             style={{
                 display: 'flex',

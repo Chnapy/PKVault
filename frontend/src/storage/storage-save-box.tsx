@@ -170,7 +170,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
           );
         }
 
-        return <StorageSaveItem key={pkm.id} saveId={saveId} pkmId={pkm.id} />;
+        return <StorageSaveItem key={i} saveId={saveId} pkmId={pkm.id} />;
       })}
 
       {moveContext.selected?.storageType === 'save' && !moveContext.selected.target && (

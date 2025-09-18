@@ -20,15 +20,13 @@ export const StorageSaveSelect: React.FC = () => {
   return (
     <TitledContainer
       title={'Save selection'}
+      maxHeight={536}
     >
       <div
         style={{
-          maxHeight: 528,
-          overflowY: "auto",
           display: 'flex',
           flexDirection: 'column',
           gap: 8,
-          padding: 2,
         }}
       >
         {saveInfos.map((save, i) => (

@@ -30,13 +30,12 @@ export const SelectInput = React.forwardRef<HTMLButtonElement, React.PropsWithCh
                 <TitledContainer
                     contrasted
                     title={null}
+                    maxHeight={500}
                 >
                     <div
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            maxHeight: 500,
-                            overflowY: 'auto',
                         }}
                     >
                         {data.map(item => (

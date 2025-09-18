@@ -162,7 +162,7 @@ export const StorageMainBox: React.FC = () => {
           );
         }
 
-        return <StorageMainItem key={pkm.id} pkmId={pkm.id} />;
+        return <StorageMainItem key={i} pkmId={pkm.id} />;
       })}
 
       {moveContext.selected?.storageType === 'main' && !moveContext.selected.target && (
