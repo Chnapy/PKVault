@@ -83,7 +83,6 @@ export const StorageItem: React.FC<StorageItemProps> = ({
 
   const element = (
     <Popover
-      ref={moveDraggable.ref}
       draggable={true}
       className={css({
         order: boxSlot,
@@ -238,13 +237,5 @@ export const StorageItem: React.FC<StorageItemProps> = ({
     </Popover>
   );
 
-  return <div
-    className={css({
-      display: 'flex',
-      alignSelf: "flex-start",
-      order: boxSlot,
-    })}
-  >
-    {!moveLoading && moveDraggable.renderItem(element)}
-  </div>;
+  return !moveLoading && moveDraggable.renderItem(element);
 };

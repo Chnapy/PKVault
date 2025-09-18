@@ -317,6 +317,8 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public string ValidityReport { get { return new LegalityAnalysis(Pkm).Report(); } }
 
+    public bool CanEdit { get => !IsEgg; }
+
     public abstract bool CanEvolve { get; }
 
     public required PKM Pkm;

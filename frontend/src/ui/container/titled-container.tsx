@@ -1,6 +1,7 @@
 import React from 'react';
-import { Container } from './container';
+import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { theme } from '../theme';
+import { Container } from './container';
 
 export type TitledContainerProps = {
     title: React.ReactNode;
@@ -12,7 +13,12 @@ export type TitledContainerProps = {
 export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerProps>> = ({
     title, contrasted, enableExpand, initialExpanded = true, children
 }) => {
-    const [ expanded, setExpanded ] = React.useState(initialExpanded);
+    const moveContext = StorageMoveContext.useValue();
+    const isDragging = !!moveContext.selected && !moveContext.selected.target;
+    const [ expandedRaw, setExpanded ] = React.useState(initialExpanded);
+
+    const expanded = (!isDragging || !enableExpand)
+        && expandedRaw;
 
     return <Container
         style={{

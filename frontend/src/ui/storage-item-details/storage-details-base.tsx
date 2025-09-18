@@ -22,10 +22,10 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'gender' | 'level' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
     | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves' | 'availableMoves'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
-    | 'heldItem' | 'isValid' | 'validityReport'
+    | 'heldItem' | 'isValid' | 'validityReport' | 'canEdit'
 > & {
     onRelease?: () => unknown;
-    onSubmit?: () => unknown;
+    onSubmit: () => unknown;
     extraContent?: React.ReactNode;
 };
 
@@ -43,6 +43,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
             version={pkm.version}
             generation={pkm.generation}
             showVersionName
+            canEdit={pkm.canEdit}
             onRelease={onRelease}
         />}
         mainImg={

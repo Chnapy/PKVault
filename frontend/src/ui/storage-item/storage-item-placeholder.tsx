@@ -17,7 +17,7 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
   boxSlot,
   pkmId,
 }) => {
-  const moveDroppable = StorageMoveContext.useDroppable(storageType, boxId, boxSlot);
+  const moveDroppable = StorageMoveContext.useDroppable(storageType, boxId, boxSlot, pkmId);
 
   const moveLoading = StorageMoveContext.useLoading(storageType, boxId, boxSlot, pkmId);
 

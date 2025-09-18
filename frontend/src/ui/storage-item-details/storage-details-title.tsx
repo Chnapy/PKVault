@@ -12,10 +12,11 @@ export type StorageDetailsTitleProps = {
     version: GameVersion;
     generation: number;
     showVersionName?: boolean;
+    canEdit: boolean;
     onRelease?: () => unknown;
 };
 
-export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ version, generation, showVersionName, onRelease }) => {
+export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ version, generation, showVersionName, canEdit, onRelease }) => {
     const formContext = StorageDetailsForm.useContext();
 
     const staticData = useStaticData();
@@ -41,7 +42,7 @@ export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ versio
         <Button
             onClick={formContext.startEdit}
             bgColor={theme.bg.primary}
-            disabled={formContext.editMode}
+            disabled={!canEdit || formContext.editMode}
         >
             <Icon name='pen' solid forButton />
         </Button>

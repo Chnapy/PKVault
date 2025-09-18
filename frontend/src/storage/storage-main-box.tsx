@@ -145,19 +145,29 @@ export const StorageMainBox: React.FC = () => {
       }
     >
       {allItems.map((pkm, i) => {
-        if (!pkm) {
+        if (!pkm
+          || (moveContext.selected?.storageType === 'main'
+            && !moveContext.selected.target
+            && moveContext.selected.id === pkm.id
+          )
+        ) {
           return (
             <StorageItemPlaceholder
               key={i}
               storageType="main"
               boxId={selectedBox.idInt}
               boxSlot={i}
+              pkmId={pkm?.id}
             />
           );
         }
 
         return <StorageMainItem key={pkm.id} pkmId={pkm.id} />;
       })}
+
+      {moveContext.selected?.storageType === 'main' && !moveContext.selected.target && (
+        <StorageMainItem pkmId={moveContext.selected.id} />
+      )}
     </StorageBox>
   );
 };

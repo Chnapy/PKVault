@@ -153,19 +153,29 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
       }
     >
       {allItems.map((pkm, i) => {
-        if (!pkm) {
+        if (!pkm
+          || (moveContext.selected?.storageType === 'save'
+            && !moveContext.selected.target
+            && moveContext.selected.id === pkm.id
+          )
+        ) {
           return (
             <StorageItemPlaceholder
               key={i}
               storageType="save"
               boxId={selectedBox.idInt}
               boxSlot={i}
+              pkmId={pkm?.id}
             />
           );
         }
 
         return <StorageSaveItem key={pkm.id} saveId={saveId} pkmId={pkm.id} />;
       })}
+
+      {moveContext.selected?.storageType === 'save' && !moveContext.selected.target && (
+        <StorageSaveItem saveId={saveId} pkmId={moveContext.selected.id} />
+      )}
     </StorageBox>
   );
 };

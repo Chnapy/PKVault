@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useStorageGetMainBoxes, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSaveBoxes, useStorageGetSavePkms, useStorageMovePkm } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import type { BoxDTO, PkmDTO, PkmSaveDTO } from '../../data/sdk/model';
 
 type Context = {
     selected?: {
@@ -93,7 +94,7 @@ export const StorageMoveContext = {
         };
     },
     useDraggable: (pkmId: string, storageType: 'main' | 'save') => {
-        const ref = React.useRef<HTMLElement>(null);
+        const ref = React.useRef<HTMLDivElement>(null);
         const moveContext = StorageMoveContext.useValue();
 
         const saveId = Route.useSearch({ select: (search) => search.save });
@@ -109,21 +110,23 @@ export const StorageMoveContext = {
             : (pkmSave?.canMove || pkmSave?.canMoveToMain);
 
         React.useEffect(() => {
+            const containerEl = document.body.querySelector(`#${StorageMoveContext.containerId}`) as HTMLDivElement;
+
             if (
                 ref.current
                 && !moveContext.selected?.target
                 && moveContext.selected?.id === pkmId
                 && moveContext.selected?.storageType === storageType
             ) {
-                const rect = ref.current.getBoundingClientRect();
-                const { transform, pointerEvents } = ref.current.style;
+                const rect = ref.current.parentElement!.getBoundingClientRect();
+                const { transform } = ref.current.style;
 
                 const moveHandler = (ev: Pick<MouseEvent, 'clientX' | 'clientY'>) => {
                     if (ref.current) {
                         const x = ev.clientX - rect.x;
                         const y = ev.clientY - rect.y;
                         ref.current.style.transform = `translate(${x}px, ${y}px)`;
-                        ref.current.style.pointerEvents = 'none';
+                        // ref.current.style.pointerEvents = 'none';
                     }
                 };
 
@@ -131,7 +134,7 @@ export const StorageMoveContext = {
                     moveContext.setSelected(undefined);
                 };
 
-                document.addEventListener('pointermove', moveHandler);
+                containerEl.addEventListener('pointermove', moveHandler);
                 document.addEventListener('pointerup', upHandler);
 
                 if (window.event instanceof PointerEvent
@@ -141,12 +144,12 @@ export const StorageMoveContext = {
                 }
 
                 return () => {
-                    document.removeEventListener('pointermove', moveHandler);
+                    containerEl.removeEventListener('pointermove', moveHandler);
                     document.removeEventListener('pointerup', upHandler);
 
                     if (ref.current) {
                         ref.current.style.transform = transform;
-                        ref.current.style.pointerEvents = pointerEvents;
+                        // ref.current.style.pointerEvents = pointerEvents;
                     }
                 };
             }
@@ -155,7 +158,6 @@ export const StorageMoveContext = {
         let enablePointerMove = true;
 
         return {
-            ref,
             onPointerMove: canClick
                 ? ((e: React.PointerEvent) => {
                     if (enablePointerMove && e.buttons === 1) {
@@ -168,7 +170,16 @@ export const StorageMoveContext = {
                 })
                 : undefined,
             renderItem: (element: React.ReactNode) => moveContext.selected?.id === pkmId && moveContext.selected?.storageType === storageType
-                ? createPortal(element, document.body.querySelector(`#${StorageMoveContext.containerId}`)!)
+                ? createPortal(<div
+                    ref={ref}
+                    style={{
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        pointerEvents: 'none',
+                    }}>
+                    {element}
+                </div>, document.body.querySelector(`#${StorageMoveContext.containerId}`)!)
                 : element,
         };
     },
@@ -190,8 +201,16 @@ export const StorageMoveContext = {
         const isDragging = !!selected && !selected.target;
         const isCurrentItemDragging = selected?.id === pkmId && selected?.storageType === dropStorageType;
 
+        // if (pkmId === 'G404509FE887AD2 10 14 21 12 1200') {
+        //     console.log(pkmId, selected, selected?.id === pkmId, dropStorageType, dropBoxId, dropBoxSlot)
+        // }
+
         const getCanClick = (): boolean => {
             if (!isDragging) {
+                return false;
+            }
+
+            if (selected.id === pkmId) {
                 return false;
             }
 
@@ -206,52 +225,97 @@ export const StorageMoveContext = {
             const sourcePkmMain = selected?.storageType === 'main' ? mainPkmsQuery.data?.data.find(pkm => pkm.id === selected.id) : undefined;
             const sourcePkmSave = selected?.storageType === 'save' ? savePkmsQuery.data?.data.find(pkm => pkm.id === selected.id) : undefined;
 
-            const sourcePkmVersionMain = save && sourcePkmMain && mainPkmVersionsQuery.data?.data
-                .find(version => version.pkmId === sourcePkmMain.id && version.generation === save.generation);
-            // const targetPkmVersionMain = save && targetPkmMain && mainPkmVersionsQuery.data?.data
-            //     .find(version => version.pkmId === targetPkmMain.id && version.generation === save.generation);
-
             // if (pkmId === "G30132C33359DD17 25 28 27 11 1200") {
             //     console.log('TEST', { targetBoxMain, targetBoxSave, targetPkmMain, targetPkmSave, sourcePkmMain, sourcePkmSave })
             // }
 
-            if (
-                (targetPkmMain && sourcePkmSave)
-                || (targetPkmSave && sourcePkmMain)
-                || (targetPkmMain && sourcePkmMain)
-                || (targetPkmSave && sourcePkmSave)
-            ) {
-                return false;
-            }
+            const checkBetweenSlot = (
+                targetBoxMain?: BoxDTO, targetBoxSave?: BoxDTO,
+                targetPkmMain?: PkmDTO, targetPkmSave?: PkmSaveDTO,
+                sourcePkmMain?: PkmDTO, sourcePkmSave?: PkmSaveDTO,
+            ): boolean => {
+                let canClick = true;
 
-            let canClick = true;
+                // * -> box save
+                if (targetBoxSave) {
+                    canClick &&= targetBoxSave.canReceivePkm;
+                }
 
-            if (targetBoxSave) {
-                canClick &&= targetBoxSave.canReceivePkm;
-            }
+                // * -> box main
+                if (targetBoxMain) {
+                    canClick &&= targetBoxMain.canReceivePkm;
+                }
 
-            if (targetBoxMain) {
-                canClick &&= targetBoxMain.canReceivePkm;
-            }
+                // pkm main -> main
+                if (sourcePkmMain && (targetBoxMain || targetPkmMain)) {
+                    canClick &&= !selected.attached;
+                }
 
-            if (targetPkmMain && sourcePkmMain) {
-                // canClick &&= boxMain.canReceivePkm;
-            } else if (targetPkmSave && sourcePkmSave) {
-                canClick &&= targetPkmSave.generation === sourcePkmSave.generation;
-                canClick &&= targetPkmSave.canMove;
-                // console.log(targetPkmSave.generation, sourcePkmSave.generation, targetPkmSave.canMove)
-            }
+                // pkm save -> save
+                else if (sourcePkmSave && (targetBoxSave || targetPkmSave)) {
+                    canClick &&= !selected.attached;
+                    if (targetPkmSave) {
+                        canClick &&= targetPkmSave.generation === sourcePkmSave.generation;
+                        canClick &&= targetPkmSave.canMove;
+                    }
+                    // console.log(targetPkmSave.generation, sourcePkmSave.generation, targetPkmSave.canMove)
+                }
 
-            // if (selected.attached) {
-            if (sourcePkmMain && targetBoxSave) {
-                canClick &&= !!sourcePkmVersionMain;
-            }
-            if (sourcePkmSave && targetBoxMain) {
-                // canClick &&= !!sourcePkmVersionMain;
-            }
-            // }
+                // pkm main -> save
+                else if (sourcePkmMain && (targetBoxSave || targetPkmSave)) {
+                    canClick &&= selected.attached ? sourcePkmMain.canMoveToSave : sourcePkmMain.canMoveAttachedToSave;
 
-            return canClick;
+                    canClick &&= !!save && !!mainPkmVersionsQuery.data?.data
+                        .some(version => version.pkmId === sourcePkmMain.id && version.generation === save.generation);
+                }
+
+                // pkm save -> main
+                else if (sourcePkmSave && (targetBoxMain || targetPkmMain)) {
+                    canClick &&= selected.attached ? sourcePkmSave.canMoveToMain : sourcePkmSave.canMoveAttachedToMain;
+                }
+
+                if (targetBoxMain || targetBoxSave) {
+                    if (targetPkmMain && sourcePkmMain) {
+                        canClick &&= checkBetweenSlot(
+                            undefined, undefined,
+                            sourcePkmMain, undefined,
+                            targetPkmMain, undefined,
+                        );
+                    }
+
+                    else if (targetPkmSave && sourcePkmSave) {
+                        canClick &&= checkBetweenSlot(
+                            undefined, undefined,
+                            undefined, sourcePkmSave,
+                            undefined, targetPkmSave,
+                        );
+                    }
+
+                    else if (targetPkmMain && sourcePkmSave) {
+                        canClick &&= checkBetweenSlot(
+                            undefined, undefined,
+                            undefined, sourcePkmSave,
+                            targetPkmMain, undefined,
+                        );
+                    }
+
+                    else if (targetPkmSave && sourcePkmMain) {
+                        canClick &&= checkBetweenSlot(
+                            undefined, undefined,
+                            sourcePkmMain, undefined,
+                            undefined, targetPkmSave,
+                        );
+                    }
+                }
+
+                return canClick;
+            };
+
+            return checkBetweenSlot(
+                targetBoxMain, targetBoxSave,
+                targetPkmMain, targetPkmSave,
+                sourcePkmMain, sourcePkmSave
+            );
         };
 
         const canClick = getCanClick();
