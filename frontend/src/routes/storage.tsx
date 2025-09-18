@@ -151,8 +151,8 @@ export const Storage: React.FC = () => {
           <div
             className={css({
               position: "fixed",
-              bottom: 24,
-              right: 24,
+              bottom: 14,
+              right: 14,
               width: 350,
               zIndex: 20,
               '&:hover': {

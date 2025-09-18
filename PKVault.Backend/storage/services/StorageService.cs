@@ -70,13 +70,25 @@ public class StorageService
         return await saveLoaders.Pkms.GetAllDtos();
     }
 
-    public static async Task<DataUpdateFlags> MainMovePkm(string pkmId, uint boxId, uint boxSlot)
+    public static async Task<DataUpdateFlags> MovePkm(
+        string pkmId, uint? sourceSaveId,
+        uint? targetSaveId, int targetBoxId, int targetBoxSlot,
+        bool attached
+    )
     {
         return await memoryLoader.AddAction(
-            new MainMovePkmAction(pkmId, boxId, boxSlot),
+            new MovePkmAction(pkmId, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlot, attached),
             null
         );
     }
+
+    // public static async Task<DataUpdateFlags> MainMovePkm(string pkmId, uint boxId, uint boxSlot)
+    // {
+    //     return await memoryLoader.AddAction(
+    //         new MainMovePkmAction(pkmId, boxId, boxSlot),
+    //         null
+    //     );
+    // }
 
     public static async Task<DataUpdateFlags> MainCreatePkmVersion(string pkmId, uint generation)
     {
@@ -102,39 +114,39 @@ public class StorageService
         );
     }
 
-    public static async Task<DataUpdateFlags> SaveMovePkm(uint saveId, string pkmId, int boxId, int boxSlot)
-    {
-        return await memoryLoader.AddAction(
-            new SaveMovePkmAction(saveId, pkmId, boxId, boxSlot),
-            null
-        );
-    }
+    // public static async Task<DataUpdateFlags> SaveMovePkm(uint saveId, string pkmId, int boxId, int boxSlot)
+    // {
+    //     return await memoryLoader.AddAction(
+    //         new SaveMovePkmAction(saveId, pkmId, boxId, boxSlot),
+    //         null
+    //     );
+    // }
 
-    public static async Task<DataUpdateFlags> SaveMovePkmToStorage(uint saveId, string savePkmId, uint storageBoxId, uint storageSlot)
-    {
-        return await memoryLoader.AddAction(
-            new SaveMovePkmToStorageAction(
-                saveId,
-                savePkmId,
-                storageBoxId,
-                storageSlot
-            ),
-            null
-        );
-    }
+    // public static async Task<DataUpdateFlags> SaveMovePkmToStorage(uint saveId, string savePkmId, uint storageBoxId, uint storageSlot)
+    // {
+    //     return await memoryLoader.AddAction(
+    //         new SaveMovePkmToStorageAction(
+    //             saveId,
+    //             savePkmId,
+    //             storageBoxId,
+    //             storageSlot
+    //         ),
+    //         null
+    //     );
+    // }
 
-    public static async Task<DataUpdateFlags> SaveMovePkmFromStorage(uint saveId, string pkmVersionId, int saveBoxId, int saveSlot)
-    {
-        return await memoryLoader.AddAction(
-            new SaveMovePkmFromStorageAction(
-                saveId,
-                pkmVersionId,
-                saveBoxId,
-                saveSlot
-            ),
-            null
-        );
-    }
+    // public static async Task<DataUpdateFlags> SaveMovePkmFromStorage(uint saveId, string pkmVersionId, int saveBoxId, int saveSlot)
+    // {
+    //     return await memoryLoader.AddAction(
+    //         new SaveMovePkmFromStorageAction(
+    //             saveId,
+    //             pkmVersionId,
+    //             saveBoxId,
+    //             saveSlot
+    //         ),
+    //         null
+    //     );
+    // }
 
     public static async Task<DataUpdateFlags> MainPkmDetachSave(string pkmId)
     {

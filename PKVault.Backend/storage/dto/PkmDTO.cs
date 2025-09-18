@@ -16,7 +16,11 @@ public class PkmDTO : IWithId<string>
 
     public uint? SaveId { get { return PkmEntity.SaveId; } }
 
-    // public List<uint> CompatibleGenerations { get; set; }
+    public bool CanMoveToSave { get => SaveId == null; }
+
+    public bool CanMoveAttachedToSave { get => SaveId == null; }
+
+    public bool CanDelete { get => SaveId == null; }
 
     public required PkmEntity PkmEntity;
 }

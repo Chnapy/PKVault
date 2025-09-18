@@ -56,7 +56,7 @@ public class PkmVersionDTO : BasePkmVersionDTO
         }
     }
 
-    public bool CanDelete { get { return PkmVersionEntity.Id != PkmDto.Id; } }
+    public bool CanDelete { get { return !IsMain; } }
 
     public override bool CanEvolve { get => HasTradeEvolve && PkmDto.SaveId == null; }
 

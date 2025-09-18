@@ -52,7 +52,6 @@ export const StorageItemMainActions: React.FC = () => {
     const pkmVersionCanEvolve = pkmVersions.find(version => version.canEvolve);
 
     const canCreateVersion = !selectedPkm.saveId && !!pageSave && isCompatibleWithPageSave && !hasPkmForPageSaveGeneration;
-    const canMoveAttached = !selectedPkm.saveId && hasPkmForPageSaveGeneration;
     const canEvolve = pkmVersionCanEvolve && !selectedPkm.saveId;
     const canDetach = !!selectedPkm.saveId;
     const canGoToSave = !!selectedPkm.saveId;
@@ -66,14 +65,16 @@ export const StorageItemMainActions: React.FC = () => {
                 gap: 4,
             }}
         >
-            <Button
+            {moveClickable.onClick && <Button
                 onClick={moveClickable.onClick}
             >
                 <Icon name='logout' solid forButton />
                 Move
-            </Button>
+            </Button>}
 
-            {canMoveAttached && <Button>
+            {moveClickable.onClickAttached && <Button
+                onClick={moveClickable.onClickAttached}
+            >
                 <Icon name='link' solid forButton />
                 <Icon name='logout' solid forButton />
                 Move attached

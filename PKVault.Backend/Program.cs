@@ -28,11 +28,11 @@ public class Program
         {
             await LocalSaveService.ReadLocalSaves();
             await StorageService.ResetDataLoader();
-            await StorageService.SaveMovePkmFromStorage(
-                4106192122,
-                "G700754A1E359E2 5 5 14 11 1200",
-                3, 3
-            );
+            // await StorageService.SaveMovePkmFromStorage(
+            //     4106192122,
+            //     "G700754A1E359E2 5 5 14 11 1200",
+            //     3, 3
+            // );
             var list = await StorageService.GetSavePkms(4106192122);
             var lastDto = list.Last();
 

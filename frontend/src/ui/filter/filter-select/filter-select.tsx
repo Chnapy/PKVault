@@ -13,6 +13,7 @@ import {
 } from "../filter-label/filter-label";
 import { TitledContainer } from '../../container/titled-container';
 import { useTriggerOnHover } from '../../button/hooks/use-trigger-on-hover';
+import { Icon } from '../../icon/icon';
 
 export type FilterSelectProps = FilterLabelProps &
   ListboxProps<React.ElementType, string[]> & {
@@ -50,11 +51,12 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
             className={css({
               color: "inherit",
               background: "inherit",
-              display: "block",
+              display: "flex",
               margin: "-2px -4px",
               borderRadius: 4,
               border: "none",
               padding: "2px 4px",
+              gap: 2,
               cursor: "pointer",
             })}
             onPointerEnter={getHoverEventHandler((ev) => {
@@ -63,6 +65,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
             onPointerLeave={getHoverEventHandler(() => null)}
           >
             {children}
+            <Icon name='angle-down' forButton />
           </ListboxButton>
 
           <ListboxOptions anchor="bottom" style={{ zIndex: 30 }}>

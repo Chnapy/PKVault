@@ -123,7 +123,7 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
                 }`
             }
             isShadow={false}
-            onRelease={!pkm?.saveId && (!pkmVersion.isMain || nbrRelatedPkmVersion === 1)
+            onRelease={pkm?.canDelete && (pkmVersion.canDelete || nbrRelatedPkmVersion === 1)
                 ? (() => mainPkmVersionDeleteMutation.mutateAsync({
                     pkmVersionId: pkmVersion.id,
                 }))

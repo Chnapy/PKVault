@@ -14,10 +14,7 @@ public struct DataActionPayload
 public enum DataActionType
 {
     MAIN_CREATE_PKM_VERSION,
-    MAIN_MOVE_PKM,
-    SAVE_MOVE_PKM,
-    SAVE_MOVE_PKM_FROM_STORAGE,
-    SAVE_MOVE_PKM_TO_STORAGE,
+    MOVE_PKM,
     DETACH_PKM_SAVE,
     DELETE_PKM_VERSION,
     EDIT_PKM_VERSION,

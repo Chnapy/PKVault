@@ -61,7 +61,7 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({
     return (
         <StorageDetailsBase
             {...savePkm}
-            onRelease={!savePkm.pkmVersionId
+            onRelease={savePkm.canDelete
                 ? (() => savePkmDeleteMutation.mutateAsync({
                     saveId,
                     pkmId: savePkm.id,

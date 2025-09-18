@@ -38,13 +38,25 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     public bool IsShadow { get { return Pkm is IShadowCapture pkmShadow && pkmShadow.IsShadow; } }
 
+    public int Team { get => Save.GetBoxSlotFlags(Box, BoxSlot).IsBattleTeam(); }
+
+    public bool IsLocked { get => Save.GetBoxSlotFlags(Box, BoxSlot).HasFlag(StorageSlotSource.Locked); }
+
+    public int Party { get => Save.GetBoxSlotFlags(Box, BoxSlot).IsParty(); }
+
+    public bool IsStarter { get => Save.GetBoxSlotFlags(Box, BoxSlot).HasFlag(StorageSlotSource.Starter); }
+
     public string? PkmVersionId { get; set; }
 
     // -- actions
 
-    // public bool CanMoveInBox { get; set; }
+    public bool CanMove { get => Box != BoxDTO.DAYCARE_ID; }
 
-    public bool CanMoveToMainStorage { get { return !IsShadow && !IsEgg; } }
+    public bool CanDelete { get => CanMove && PkmVersionId == null; }
+
+    public bool CanMoveToMain { get => CanDelete && !IsShadow && !IsEgg; }
+
+    public bool CanMoveAttachedToMain { get => CanMoveToMain; }
 
     public override bool CanEvolve { get => HasTradeEvolve && PkmVersionId == null; }
 

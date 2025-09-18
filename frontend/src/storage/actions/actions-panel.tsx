@@ -55,10 +55,7 @@ export const ActionsPanel: React.FC = () => {
                             >
                                 {switchUtil(action.type, {
                                     [ DataActionType.MAIN_CREATE_PKM_VERSION ]: 'Create pkm-version',
-                                    [ DataActionType.MAIN_MOVE_PKM ]: 'Move pkm in main',
-                                    [ DataActionType.SAVE_MOVE_PKM ]: 'Move pkm in save',
-                                    [ DataActionType.SAVE_MOVE_PKM_FROM_STORAGE ]: 'Move pkm from storage to save',
-                                    [ DataActionType.SAVE_MOVE_PKM_TO_STORAGE ]: 'Move pkm from save to storage',
+                                    [ DataActionType.MOVE_PKM ]: 'Move pkm',
                                     [ DataActionType.DETACH_PKM_SAVE ]: 'Detach save from pkm',
                                     [ DataActionType.EDIT_PKM_VERSION ]: 'Edit pkm-version',
                                     [ DataActionType.EDIT_PKM_SAVE ]: 'Edit pkm-save',

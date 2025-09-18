@@ -64,6 +64,8 @@ export const StorageItem: React.FC<StorageItemProps> = ({
 
   const staticData = useStaticData();
 
+  const disabled = !moveDroppable.isCurrentItemDragging && moveDroppable.isDragging && !moveDroppable.onClick;
+
   if (moveLoading) {
     return <StorageItemPlaceholder
       storageType={storageType}
@@ -107,9 +109,10 @@ export const StorageItem: React.FC<StorageItemProps> = ({
         onPointerLeave={() => setHover(false)}
         selected={selected}
         loading={moveLoading}
+        disabled={disabled}
         noDropshadow={!onClick}
         style={{
-          backgroundColor: theme.bg.light,
+          backgroundColor: disabled ? 'transparent' : theme.bg.light,
           position: 'relative',
           alignSelf: "flex-start",
           padding: 0,

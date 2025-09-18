@@ -47,13 +47,25 @@ public class StorageController : ControllerBase
         return savePkms;
     }
 
-    [HttpPut("main/pkm/{pkmId}/move")]
-    public async Task<ActionResult<DataDTO>> MainMovePkm(string pkmId, [BindRequired] uint boxId, [BindRequired] uint boxSlot)
+    [HttpPut("move/pkm/{pkmId}")]
+    public async Task<ActionResult<DataDTO>> MovePkm(
+        string pkmId, uint? sourceSaveId,
+        uint? targetSaveId, [BindRequired] int targetBoxId, [BindRequired] int targetBoxSlot,
+        bool attached
+    )
     {
-        var flags = await StorageService.MainMovePkm(pkmId, boxId, boxSlot);
+        var flags = await StorageService.MovePkm(pkmId, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlot, attached);
 
         return await DataDTO.FromDataUpdateFlags(flags);
     }
+
+    // [HttpPut("main/pkm/{pkmId}/move")]
+    // public async Task<ActionResult<DataDTO>> MainMovePkm(string pkmId, [BindRequired] uint boxId, [BindRequired] uint boxSlot)
+    // {
+    //     var flags = await StorageService.MainMovePkm(pkmId, boxId, boxSlot);
+
+    //     return await DataDTO.FromDataUpdateFlags(flags);
+    // }
 
     [HttpPut("main/pkm/{pkmId}/detach-save")]
     public async Task<ActionResult<DataDTO>> MainPkmDetachSave(string pkmId)
@@ -103,29 +115,29 @@ public class StorageController : ControllerBase
         return await DataDTO.FromDataUpdateFlags(flags);
     }
 
-    [HttpPut("save/{saveId}/pkm/{pkmId}/move")]
-    public async Task<ActionResult<DataDTO>> SaveMovePkm(uint saveId, string pkmId, [BindRequired] int boxId, [BindRequired] int boxSlot)
-    {
-        var flags = await StorageService.SaveMovePkm(saveId, pkmId, boxId, boxSlot);
+    // [HttpPut("save/{saveId}/pkm/{pkmId}/move")]
+    // public async Task<ActionResult<DataDTO>> SaveMovePkm(uint saveId, string pkmId, [BindRequired] int boxId, [BindRequired] int boxSlot)
+    // {
+    //     var flags = await StorageService.SaveMovePkm(saveId, pkmId, boxId, boxSlot);
 
-        return await DataDTO.FromDataUpdateFlags(flags);
-    }
+    //     return await DataDTO.FromDataUpdateFlags(flags);
+    // }
 
-    [HttpPut("save/{saveId}/pkm/move-to-storage")]
-    public async Task<ActionResult<DataDTO>> SaveMovePkmToStorage(uint saveId, [BindRequired] string savePkmId, [BindRequired] uint storageBoxId, [BindRequired] uint storageSlot)
-    {
-        var flags = await StorageService.SaveMovePkmToStorage(saveId, savePkmId, storageBoxId, storageSlot);
+    // [HttpPut("save/{saveId}/pkm/move-to-storage")]
+    // public async Task<ActionResult<DataDTO>> SaveMovePkmToStorage(uint saveId, [BindRequired] string savePkmId, [BindRequired] uint storageBoxId, [BindRequired] uint storageSlot)
+    // {
+    //     var flags = await StorageService.SaveMovePkmToStorage(saveId, savePkmId, storageBoxId, storageSlot);
 
-        return await DataDTO.FromDataUpdateFlags(flags);
-    }
+    //     return await DataDTO.FromDataUpdateFlags(flags);
+    // }
 
-    [HttpPut("save/{saveId}/pkm/move-from-storage")]
-    public async Task<ActionResult<DataDTO>> SaveMovePkmFromStorage(uint saveId, [BindRequired] string pkmVersionId, [BindRequired] int saveBoxId, [BindRequired] int saveSlot)
-    {
-        var flags = await StorageService.SaveMovePkmFromStorage(saveId, pkmVersionId, saveBoxId, saveSlot);
+    // [HttpPut("save/{saveId}/pkm/move-from-storage")]
+    // public async Task<ActionResult<DataDTO>> SaveMovePkmFromStorage(uint saveId, [BindRequired] string pkmVersionId, [BindRequired] int saveBoxId, [BindRequired] int saveSlot)
+    // {
+    //     var flags = await StorageService.SaveMovePkmFromStorage(saveId, pkmVersionId, saveBoxId, saveSlot);
 
-        return await DataDTO.FromDataUpdateFlags(flags);
-    }
+    //     return await DataDTO.FromDataUpdateFlags(flags);
+    // }
 
     [HttpPut("save/{saveId}/pkm/synchronize")]
     public async Task<ActionResult<DataDTO>> SaveSynchronizePkm(uint saveId, [BindRequired] string pkmVersionId)

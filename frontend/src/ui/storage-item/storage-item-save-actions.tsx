@@ -36,7 +36,6 @@ export const StorageItemSaveActions: React.FC = () => {
 
     const saveSynchronized = selectedPkm.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
-    const canMoveAttached = !selectedPkm.pkmVersionId;
     const canEvolve = selectedPkm.canEvolve && !selectedPkm.pkmVersionId;
     const canDetach = !!selectedPkm.pkmVersionId;
     const canGoToMain = !!selectedPkm.pkmVersionId;
@@ -50,12 +49,12 @@ export const StorageItemSaveActions: React.FC = () => {
                 gap: 4,
             }}
         >
-            <Button onClick={moveClickable.onClick}>
+            {moveClickable.onClick && <Button onClick={moveClickable.onClick}>
                 <Icon name='logout' solid forButton />
                 Move
-            </Button>
+            </Button>}
 
-            {canMoveAttached && <Button>
+            {moveClickable.onClickAttached && <Button onClick={moveClickable.onClickAttached}>
                 <Icon name='link' solid forButton />
                 <Icon name='logout' solid forButton />
                 Move attached

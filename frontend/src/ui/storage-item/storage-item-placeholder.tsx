@@ -17,7 +17,7 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
   boxSlot,
   pkmId,
 }) => {
-  const moveAttributes = StorageMoveContext.useDroppable(storageType, boxId, boxSlot);
+  const moveDroppable = StorageMoveContext.useDroppable(storageType, boxId, boxSlot);
 
   const moveLoading = StorageMoveContext.useLoading(storageType, boxId, boxSlot, pkmId);
 
@@ -33,17 +33,17 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
           order: boxSlot,
           boxSizing: 'content-box',
         },
-        moveAttributes.onClick && {
+        moveDroppable.onClick && {
           backgroundColor: theme.bg.light,
           '&:hover': {
             outlineWidth: 2,
           }
         }
       )}
-      disabled={!moveAttributes.onClick}
+      disabled={!moveDroppable.onClick}
       loading={moveLoading}
-      onClick={moveAttributes.onClick}
-      onPointerUp={moveAttributes.onPointerUp}
+      onClick={moveDroppable.onClick}
+      onPointerUp={moveDroppable.onPointerUp}
       // selected={isOver}
       noDropshadow
     />
