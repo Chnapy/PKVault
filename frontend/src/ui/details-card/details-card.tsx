@@ -1,3 +1,4 @@
+import { css } from '@emotion/css';
 import React from "react";
 import type { GenderType } from '../../data/sdk/model';
 import { Button } from '../button/button';
@@ -56,14 +57,14 @@ export const DetailsCard: React.FC<DetailsCardProps> = ({
       <img
         src={showShiny ? shinySprite! : defaultSprite!}
         alt={speciesName}
-        style={{
+        className={css({
           imageRendering: "pixelated",
           width: 96,
           height: 96,
           display: "block",
           background: theme.bg.default,
           borderRadius: 8,
-        }}
+        })}
       />
 
       {caught && (

@@ -269,8 +269,12 @@ export const StorageMoveContext = {
                 else if (sourcePkmMain && (targetBoxSave || targetPkmSave)) {
                     canClick &&= selected.attached ? sourcePkmMain.canMoveToSave : sourcePkmMain.canMoveAttachedToSave;
 
-                    canClick &&= !!save && !!mainPkmVersionsQuery.data?.data
-                        .some(version => version.pkmId === sourcePkmMain.id && version.generation === save.generation);
+                    const relatedPkmVersions = mainPkmVersionsQuery.data?.data.filter(version => version.pkmId === sourcePkmMain.id) ?? [];
+                    canClick &&= !!save && relatedPkmVersions.some(version => version.generation === save.generation);
+
+                    if (!selected.attached) {
+                        canClick &&= relatedPkmVersions.length === 1;
+                    }
                 }
 
                 // pkm save -> main

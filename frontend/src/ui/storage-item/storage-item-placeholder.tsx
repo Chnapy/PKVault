@@ -1,4 +1,4 @@
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 import type React from "react";
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { ButtonLike } from '../button/button-like';
@@ -23,23 +23,25 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
 
   return (
     <ButtonLike
-      className={css(
-        {
+      className={cx(
+        css({
           backgroundColor: 'transparent',//theme.bg.light,
           alignSelf: "flex-start",
           padding: 0,
           width: 96,
           height: 96,
-          order: boxSlot,
           boxSizing: 'content-box',
-        },
-        moveDroppable.onClick && {
+        }),
+        moveDroppable.onClick && css({
           backgroundColor: theme.bg.light,
           '&:hover': {
             outlineWidth: 2,
           }
-        }
+        })
       )}
+      style={{
+        order: boxSlot,
+      }}
       disabled={!moveDroppable.onClick}
       loading={moveLoading}
       onClick={moveDroppable.onClick}

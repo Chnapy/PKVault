@@ -26,6 +26,7 @@ export type StorageItemProps = {
   warning?: boolean;
   boxId: number;
   boxSlot: number;
+  nbrVersions?: number;
 
   // actions
   canCreateVersion?: boolean;
@@ -48,6 +49,7 @@ export const StorageItem: React.FC<StorageItemProps> = ({
   warning,
   boxId,
   boxSlot,
+  nbrVersions = 1,
 
   canCreateVersion,
   canMoveOutside,
@@ -120,13 +122,13 @@ export const StorageItem: React.FC<StorageItemProps> = ({
         <img
           src={sprite}
           alt={species + ""}
-          style={{
+          className={css({
             imageRendering: "pixelated",
             width: 96,
             height: 96,
             display: "block",
             filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
-          }}
+          })}
         />
 
         {heldItem > 0 && <img
@@ -139,6 +141,20 @@ export const StorageItem: React.FC<StorageItemProps> = ({
             height: 30,
           }}
         />}
+
+        {nbrVersions > 1 && <div style={{
+          position: 'absolute',
+          bottom: 2,
+          right: 2,
+          textAlign: 'center',
+          width: 20,
+          height: 20,
+          borderRadius: 99,
+          color: theme.text.light,
+          backgroundColor: theme.bg.dark,
+        }}>
+          {nbrVersions}
+        </div>}
 
         <div
           style={{
@@ -209,7 +225,7 @@ export const StorageItem: React.FC<StorageItemProps> = ({
         static
         anchor="right start"
         className={css({
-          zIndex: 20,
+          zIndex: 18,
           '&:hover': {
             zIndex: 25,
           }

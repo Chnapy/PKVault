@@ -2,6 +2,7 @@ import type React from 'react';
 import { useStaticData } from '../../hooks/use-static-data';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { theme } from '../theme';
+import { css } from '@emotion/css';
 
 export type StorageDetailsMainImgProps = {
     species: number;
@@ -31,13 +32,13 @@ export const StorageDetailsMainImg: React.FC<StorageDetailsMainImgProps> = ({ sp
             <img
                 src={sprite}
                 alt={speciesName}
-                style={{
+                className={css({
                     imageRendering: "pixelated",
                     width: 96,
                     height: 96,
                     display: "block",
                     filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
-                }}
+                })}
             />
         </div>
 

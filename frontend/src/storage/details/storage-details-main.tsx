@@ -23,7 +23,8 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
         return null;
     }
 
-    const pkmVersion = pkmVersionList[ selectedIndex ] ?? pkmVersionList[ 0 ];
+    const finalIndex = pkmVersionList[ selectedIndex ] ? selectedIndex : 0;
+    const pkmVersion = pkmVersionList[ finalIndex ];
 
     return <div>
         <div
@@ -34,22 +35,6 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
                 flexWrap: 'wrap-reverse',
             }}
         >
-            {/* {!isCompatibleWithSave && <Button
-                        disabled
-                        bgColor={theme.text.contrast}
-                        style={{ width: '100%' }}
-                    >
-                        Not compatible with save G{save.generation}
-                    </Button>}
-
-                    {isCompatibleWithSave && pkm.saveId && save && pkm.saveId !== save.id && <Button
-                        disabled
-                        bgColor={theme.text.contrast}
-                        style={{ width: '100%' }}
-                    >
-                        Already present in another save ({pkm.saveId})
-                    </Button>} */}
-
             {pkmVersionList.map((pkmVersion, i) => (
                 <DetailsTab
                     key={pkmVersion.id}
@@ -57,7 +42,8 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
                     otName={`G${pkmVersion.generation}`}
                     original={pkmVersion.isMain}
                     onClick={() => setSelectedIndex(i)}
-                    disabled={selectedIndex === i}
+                    disabled={finalIndex === i}
+                    warning={!pkmVersion.isValid}
                 />
             ))}
         </div>

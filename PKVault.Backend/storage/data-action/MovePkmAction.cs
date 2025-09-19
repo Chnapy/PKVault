@@ -306,22 +306,8 @@ public class MovePkmAction(
             throw new Exception($"Action forbidden for PkmSave egg for id={savePkm.Id}");
         }
 
-        var existingMainPkm = (await loaders.pkmLoader.GetAllDtos()).Find(dto => dto.BoxId == targetBoxId && dto.BoxSlot == targetBoxSlot);
-
         // get pkm-version
         var pkmVersionEntity = loaders.pkmVersionLoader.GetEntity(savePkm.Id);
-
-        if (existingMainPkm != null && existingMainPkm.Id != pkmVersionEntity?.PkmId)
-        {
-            // TODO run symetric action
-
-            // if (attached)
-            // {
-            //     throw new Exception($"Existing pkm in target box slot, switch not possible attached");
-            // }
-
-            // loaders.pkmLoader.DeleteEntity(existingMainPkm.Id);
-        }
 
         if (pkmVersionEntity == null)
         {

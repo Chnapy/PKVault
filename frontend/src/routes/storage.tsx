@@ -29,6 +29,7 @@ export const Storage: React.FC = () => {
           borderSpacing: 16,
           margin: 'auto',
           marginTop: -16,
+          marginBottom: selected ? 150 : undefined,
         }}
       >
         <div

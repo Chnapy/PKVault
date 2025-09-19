@@ -36,7 +36,7 @@ public class LocalWebServer
 
         Task.Run(() => webHost.Run());
 
-        // TODO
+        // TODO PRIOR first render slowed down
         PKVault.Backend.Program.SetupData(args);
     }
 

@@ -69,6 +69,7 @@ const Root: React.FC = () => {
         </HeaderItem>
       </Header>
 
+      {/* TODO PRIOR */}
       {/* <div
         style={{
           alignSelf: 'center',

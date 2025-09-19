@@ -1,15 +1,18 @@
 import type React from 'react';
 import { GameVersion } from '../../data/sdk/model';
-import { Button, type ButtonProps } from '../button/button';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
+import { Button, type ButtonProps } from '../button/button';
+import { Icon } from '../icon/icon';
+import { theme } from '../theme';
 
 export type DetailsTabProps = {
     version: GameVersion;
     otName: string;
     original?: boolean;
+    warning?: boolean;
 } & ButtonProps;
 
-export const DetailsTab: React.FC<DetailsTabProps> = ({ version, otName, original, disabled, ...rest }) => {
+export const DetailsTab: React.FC<DetailsTabProps> = ({ version, otName, original, warning, disabled, ...rest }) => {
     const gameInfos = getGameInfos(version);
 
     return <Button
@@ -33,6 +36,14 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ version, otName, origina
                 width: '1lh',
             }}
         />
-        {otName} {original && " (original)"}
+        {otName} {original && " (original)"} {
+            warning && <div style={{
+                width: '1lh',
+                borderRadius: 99,
+                color: theme.text.light,
+                backgroundColor: theme.bg.yellow,
+            }}>
+                <Icon name='exclaimation' forButton />
+            </div>}
     </Button>;
 };

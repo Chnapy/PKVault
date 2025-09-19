@@ -81,13 +81,13 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
               src={sprite}
               alt={speciesName}
               loading="lazy"
-              style={{
+              className={css({
                 imageRendering: "pixelated",
                 width: 96,
                 height: 96,
                 filter: seen ? undefined : "brightness(0) opacity(0.5)",
                 display: "block",
-              }}
+              })}
             />
 
             <div

@@ -28,7 +28,7 @@ export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(6, 1fr)",
-          gap: 8,
+          gap: 4,
         }}
       >
         {children}

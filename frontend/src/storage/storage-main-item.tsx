@@ -62,6 +62,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = ({ pkmId }) => {
             warning={pkmVersions.some((value) => !value.isValid)}
             boxId={pkm.boxId}
             boxSlot={pkm.boxSlot}
+            nbrVersions={pkmVersions.length}
             selected={selected?.type === "main" && selected.id === pkm.id}
             canCreateVersion={canCreateVersion}
             canMoveOutside={canMoveAttached}
