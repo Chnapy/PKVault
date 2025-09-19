@@ -4,6 +4,7 @@ import type { SettingsMutableDTO } from '../data/sdk/model/settingsMutableDTO';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { Button } from '../ui/button/button';
 import { TitledContainer } from '../ui/container/titled-container';
+import { SelectInput } from '../ui/input/select-input';
 import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
 
@@ -19,7 +20,7 @@ export const Settings: React.FC = () => {
         savE_GLOBS: settingsMutable.savE_GLOBS.join('\n'),
     }), [ settingsMutable ]);
 
-    const { register, reset, handleSubmit } = useForm<Omit<SettingsMutableDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
+    const { register, watch, setValue, reset, handleSubmit } = useForm<Omit<SettingsMutableDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
         defaultValues: defaultValue
     });
 
@@ -78,6 +79,16 @@ export const Settings: React.FC = () => {
                     <TextInput
                         label='Backups path'
                         {...register('backuP_PATH', { setValueAs: (value) => value.trim() })}
+                    />
+
+                    <SelectInput
+                        data={[ 'en', 'fr' ].map(value => ({
+                            value,
+                            option: value,
+                        }))}
+                        {...register('language')}
+                        value={watch('language')}
+                        onChange={value => setValue('language', value)}
                     />
                 </div>
 

@@ -11,7 +11,7 @@ public abstract class DexGenService<Save> where Save : SaveFile
             var item = CreateDexItem(i, save, save.ID32);
             dex[i][save.ID32] = item;
 
-            item.Types = [.. item.Types.Distinct()];
+            item.Types = [.. item.Types.Distinct().Select(type => (byte)(type + 1))];
         }
 
         logtime();

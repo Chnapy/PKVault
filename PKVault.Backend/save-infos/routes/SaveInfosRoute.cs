@@ -39,24 +39,24 @@ public class SaveInfosController : ControllerBase
         });
     }
 
-    [HttpPost()]
-    [Consumes("multipart/form-data")]
-    public async Task<ActionResult<DataDTO>> Upload([BindRequired] IFormFile saveFile)
-    {
-        if (saveFile == null || saveFile.Length == 0)
-            return BadRequest("No file received");
+    // [HttpPost()]
+    // [Consumes("multipart/form-data")]
+    // public async Task<ActionResult<DataDTO>> Upload([BindRequired] IFormFile saveFile)
+    // {
+    //     if (saveFile == null || saveFile.Length == 0)
+    //         return BadRequest("No file received");
 
-        byte[] fileBytes;
-        using (var ms = new MemoryStream())
-        {
-            await saveFile.CopyToAsync(ms);
-            fileBytes = ms.ToArray();
-        }
+    //     byte[] fileBytes;
+    //     using (var ms = new MemoryStream())
+    //     {
+    //         await saveFile.CopyToAsync(ms);
+    //         fileBytes = ms.ToArray();
+    //     }
 
-        var flags = await LocalSaveService.UploadNewSave(fileBytes, saveFile.FileName);
+    //     var flags = await LocalSaveService.UploadNewSave(fileBytes, saveFile.FileName);
 
-        return await DataDTO.FromDataUpdateFlags(flags);
-    }
+    //     return await DataDTO.FromDataUpdateFlags(flags);
+    // }
 
     [HttpDelete()]
     public async Task<ActionResult<DataDTO>> Delete([BindRequired] uint saveId)

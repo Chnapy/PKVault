@@ -160,31 +160,31 @@ public class LocalSaveService
         return lastWriteTime;
     }
 
-    public static async Task<DataUpdateFlags> UploadNewSave(byte[] fileBytes, string formFilename)
-    {
-        if (!StorageService.HasEmptyActionList())
-        {
-            throw new Exception("Storage has waiting actions");
-        }
+    // public static async Task<DataUpdateFlags> UploadNewSave(byte[] fileBytes, string formFilename)
+    // {
+    //     if (!StorageService.HasEmptyActionList())
+    //     {
+    //         throw new Exception("Storage has waiting actions");
+    //     }
 
-        var flags = new DataUpdateFlags();
+    //     var flags = new DataUpdateFlags();
 
-        var save = SaveUtil.GetVariantSAV(fileBytes, formFilename)!;
+    //     var save = SaveUtil.GetVariantSAV(fileBytes, formFilename)!;
 
-        await BackupService.PrepareBackupThenRun(async () =>
-        {
-            WriteSave(save);
-        });
+    //     await BackupService.PrepareBackupThenRun(async () =>
+    //     {
+    //         WriteSave(save);
+    //     });
 
-        flags.Saves.Add(new()
-        {
-            SaveId = save.ID32,
-            SaveBoxes = true,
-            SavePkms = true
-        });
-        flags.SaveInfos = true;
-        flags.Backups = true;
+    //     flags.Saves.Add(new()
+    //     {
+    //         SaveId = save.ID32,
+    //         SaveBoxes = true,
+    //         SavePkms = true
+    //     });
+    //     flags.SaveInfos = true;
+    //     flags.Backups = true;
 
-        return flags;
-    }
+    //     return flags;
+    // }
 }

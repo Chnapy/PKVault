@@ -4,10 +4,10 @@ import { Button, type ButtonProps } from '../button/button';
 import { TitledContainer } from '../container/titled-container';
 import { Icon } from '../icon/icon';
 
-export type SelectInputProps = {
-    value: number;
-    onChange: (value: number) => void;
-    data: { value: number; option: React.ReactNode; disabled?: boolean }[];
+export type SelectInputProps<K extends string | number = string | number> = {
+    value?: K;
+    onChange: (value: K) => void;
+    data: { value: K; option: React.ReactNode; disabled?: boolean }[];
     anchor?: ListboxOptionsProps[ 'anchor' ];
 }
     & Omit<ButtonProps<'button'>, 'onChange'>;

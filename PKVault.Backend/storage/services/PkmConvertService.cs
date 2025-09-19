@@ -146,10 +146,10 @@ public class PkmConvertService
 
     private static void PassStaticsToPkm(PKM sourcePkm, PKM destPkm)
     {
-        destPkm.Language = (int)LanguageID.French; //pkmOrigin.Language;
+        destPkm.Language = (int)SettingsService.AppSettings.GetSafeLanguageID(); //pkmOrigin.Language;
         if (destPkm is IHandlerLanguage pkmIntermediateHLang)
         {
-            pkmIntermediateHLang.HandlingTrainerLanguage = (byte)LanguageID.French;
+            pkmIntermediateHLang.HandlingTrainerLanguage = (byte)SettingsService.AppSettings.GetSafeLanguageID();
         }
 
         destPkm.Gender = sourcePkm.Gender;
@@ -275,7 +275,7 @@ public class PkmConvertService
     {
         var generation = pkm.Format;
 
-        var defaultNickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, (int)LanguageID.French, pkm.Format);
+        var defaultNickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, (int)SettingsService.AppSettings.GetSafeLanguageID(), pkm.Format);
         if (nickname.Length == 0)
         {
             nickname = defaultNickname;
@@ -286,7 +286,7 @@ public class PkmConvertService
             nickname = nickname[..pkm.MaxStringLengthNickname];
         }
 
-        var isNicknamed = SpeciesName.IsNicknamed(pkm.Species, nickname, (int)LanguageID.French, generation) && !nickname.Equals(defaultNickname, StringComparison.InvariantCultureIgnoreCase);
+        var isNicknamed = SpeciesName.IsNicknamed(pkm.Species, nickname, (int)SettingsService.AppSettings.GetSafeLanguageID(), generation) && !nickname.Equals(defaultNickname, StringComparison.InvariantCultureIgnoreCase);
 
         pkm.IsNicknamed = isNicknamed;
         pkm.Nickname = isNicknamed ? nickname : defaultNickname;

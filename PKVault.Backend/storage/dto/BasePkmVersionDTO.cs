@@ -40,7 +40,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     {
         get
         {
-            return PKHexUtils.StringsFR.Species[Pkm.Species];
+            return GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Species[Pkm.Species];
         }
     }
 
@@ -246,7 +246,11 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public string OriginMetLocation
     {
-        get { return PKHexUtils.StringsFR.GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version); }
+        get
+        {
+            return GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage())
+        .GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version);
+        }
     }
 
     public byte? OriginMetLevel { get { return Pkm.MetLevel == 0 ? null : Pkm.MetLevel; } }
@@ -282,7 +286,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
             moveSource.ChangeMoveSource(filteredSources.Moves);
             moveSource.ReloadMoves(legality);
 
-            var movesStr = PKHexUtils.StringsFR.movelist;
+            var movesStr = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).movelist;
 
             var availableMoves = new List<MoveItem>();
 

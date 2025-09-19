@@ -7,6 +7,7 @@ namespace PKVault.Backend;
 
 public class Program
 {
+    // TODO PRIOR handle exceptions with http codes & messages, should work with winform
     public static async Task Main(string[] args)
     {
         var setupDone = await SetupData(args);

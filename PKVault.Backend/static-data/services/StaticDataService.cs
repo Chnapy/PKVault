@@ -40,7 +40,7 @@ public class StaticDataService
 
     public static async Task<Dictionary<int, StaticSpecies>> GetStaticSpecies()
     {
-        var speciesNames = PKHexUtils.StringsFR.Species;
+        var speciesNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Species;
         List<Task<StaticSpecies>> tasks = [];
 
         for (var i = 1; i <= 1025; i++)  // TODO
@@ -112,7 +112,7 @@ public class StaticDataService
                 return new StaticStat
                 {
                     Id = statIndex,
-                    Name = statObj.Names.Find(name => name.Language.Name == "fr").Name,
+                    Name = PokeApi.GetNameForCurrentLanguage(statObj.Names),
                 };
             }));
         }
@@ -129,7 +129,7 @@ public class StaticDataService
 
     public static Dictionary<int, StaticType> GetStaticTypes()
     {
-        var typeNames = PKHexUtils.StringsFR.Types;
+        var typeNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Types;
         var dict = new Dictionary<int, StaticType>();
 
         for (var i = 0; i < typeNames.Count; i++)
@@ -148,7 +148,7 @@ public class StaticDataService
 
     public static async Task<Dictionary<int, StaticMove>> GetStaticMoves()
     {
-        var moveNames = PKHexUtils.StringsFR.Move;
+        var moveNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Move;
         List<Task<StaticMove>> tasks = [];
 
         for (var i = 0; i < 919; i++)  // TODO
@@ -243,7 +243,7 @@ public class StaticDataService
 
     public static async Task<Dictionary<int, StaticNature>> GetStaticNatures()
     {
-        var naturesNames = PKHexUtils.StringsFR.Natures;
+        var naturesNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Natures;
         List<Task<StaticNature>> tasks = [];
 
         for (var i = 0; i < naturesNames.Count; i++)
@@ -281,7 +281,7 @@ public class StaticDataService
 
     public static Dictionary<int, StaticAbility> GetStaticAbilities()
     {
-        var abilitiesNames = PKHexUtils.StringsFR.abilitylist;
+        var abilitiesNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).abilitylist;
         var dict = new Dictionary<int, StaticAbility>();
 
         for (var i = 0; i < abilitiesNames.Length; i++)
@@ -300,7 +300,7 @@ public class StaticDataService
 
     public static async Task<Dictionary<int, StaticItem>> GetStaticItems()
     {
-        var itemNames = PKHexUtils.StringsFR.itemlist;
+        var itemNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).itemlist;
         List<Task<StaticItem>> tasks = [];
 
         for (var i = 0; i < itemNames.Length; i++)
@@ -356,11 +356,9 @@ public class StaticDataService
     {
         var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
 
-        var strings = PKHexUtils.StringsFR;
-
         return string.Join('/', pokeapiVersions.Select(ver =>
         {
-            return ver.Names.Find(name => name.Language.Name == "fr").Name;
+            return PokeApi.GetNameForCurrentLanguage(ver.Names);
         }).Distinct());
     }
 
