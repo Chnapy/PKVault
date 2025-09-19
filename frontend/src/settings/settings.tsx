@@ -4,7 +4,7 @@ import type { SettingsMutableDTO } from '../data/sdk/model/settingsMutableDTO';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { Button } from '../ui/button/button';
 import { TitledContainer } from '../ui/container/titled-container';
-import { SelectInput } from '../ui/input/select-input';
+import { SelectStringInput } from '../ui/input/select-input';
 import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
 
@@ -81,11 +81,12 @@ export const Settings: React.FC = () => {
                         {...register('backuP_PATH', { setValueAs: (value) => value.trim() })}
                     />
 
-                    <SelectInput
-                        data={[ 'en', 'fr' ].map(value => ({
-                            value,
-                            option: value,
-                        }))}
+                    <SelectStringInput
+                        label='Language'
+                        data={[
+                            { value: 'en', option: 'English', disabled: watch('language') === 'en' },
+                            { value: 'fr', option: 'Français', disabled: watch('language') === 'fr' },
+                        ]}
                         {...register('language')}
                         value={watch('language')}
                         onChange={value => setValue('language', value)}

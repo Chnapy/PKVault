@@ -5,9 +5,9 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { DataProvider } from "./data/data-provider.tsx";
 import { routeTree } from "./routeTree.gen";
+import { SplashMain } from './splash/splash-main.tsx';
 import { Icon } from './ui/icon/icon.tsx';
 import { Button } from './ui/button/button.tsx';
-import { Splash } from './ui/splash/splash.tsx';
 import { TitledContainer } from './ui/container/titled-container.tsx';
 import { TextInput } from './ui/input/text-input.tsx';
 import { NumberInput } from './ui/input/number-input.tsx';
@@ -34,7 +34,7 @@ const timedFn = () => new Promise(resolve => setTimeout(resolve, 5000));
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <DataProvider>
-      <Splash>
+      <SplashMain>
         {/* <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 16, alignItems: 'flex-start' }}>
           <Icon name='folder' solid />
           <Icon name='angle-left' />
@@ -138,7 +138,7 @@ createRoot(document.getElementById("root")!).render(
         </div> */}
 
         <RouterProvider router={router} />
-      </Splash>
+      </SplashMain>
     </DataProvider>
   </StrictMode>
 );

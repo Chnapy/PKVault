@@ -1,12 +1,9 @@
 import { css } from "@emotion/css";
 import type React from "react";
-import {
-  useSaveInfosUpload
-} from "../../data/sdk/save-infos/save-infos.gen";
 import { Container } from "../../ui/container/container";
 
 export const SaveUpload: React.FC = () => {
-  const { mutateAsync, isPending } = useSaveInfosUpload();
+  // const { mutateAsync, isPending } = useSaveInfosUpload();
 
   return (
     <Container
@@ -20,7 +17,7 @@ export const SaveUpload: React.FC = () => {
         justifyContent: "center",
       })}
     >
-      <div>{isPending ? "Uploading..." : "Upload save here"}</div>
+      {/* <div>{isPending ? "Uploading..." : "Upload save here"}</div>
       <input
         type="file"
         className={css({
@@ -44,7 +41,7 @@ export const SaveUpload: React.FC = () => {
             },
           });
         }}
-      />
+      /> */}
     </Container>
   );
 };

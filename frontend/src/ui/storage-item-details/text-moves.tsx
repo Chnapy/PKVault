@@ -3,8 +3,9 @@ import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
 import { useStaticData } from '../../hooks/use-static-data';
 import { MoveItem } from '../move-item/move-item';
-import { SelectInput } from '../input/select-input';
+import { SelectNumberInput } from '../input/select-input';
 import { MoveCategory, type StaticMove } from '../../data/sdk/model';
+import { ListboxOption } from '@headlessui/react';
 
 export type TextMovesProps = {
     ability: number;
@@ -86,7 +87,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                 ? <>
                     {formMoves.map((move, i) => {
 
-                        return <SelectInput
+                        return <SelectNumberInput
                             key={i}
                             {...register(`moves.${i}`, { valueAsNumber: true })}
                             value={move}
@@ -115,6 +116,20 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                                         };
                                     })
                             }
+                            renderOption={item => <ListboxOption
+                                key={item.value}
+                                value={item.value}
+                                disabled={item.disabled}
+                                style={item.disabled
+                                    ? {
+                                        opacity: 0.5,
+                                        cursor: 'not-allowed'
+                                    }
+                                    : undefined
+                                }
+                            >
+                                {item.option}
+                            </ListboxOption>}
                             anchor='left'
                             bgColor='transparent'
                             style={{
