@@ -1,14 +1,16 @@
-import type React from 'react';
+import { PopoverButton } from '@headlessui/react';
+import React from 'react';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
 import { Route } from '../routes/storage';
 import { StorageItem } from '../ui/storage-item/storage-item';
+import { StorageItemPopover } from '../ui/storage-item/storage-item-popover';
 
 type StorageMainItemProps = {
     pkmId: string;
 };
 
-export const StorageMainItem: React.FC<StorageMainItemProps> = ({ pkmId }) => {
+export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkmId }) => {
     const selected = Route.useSearch({ select: (search) => search.selected });
     const saveId = Route.useSearch({ select: (search) => search.save });
     const navigate = Route.useNavigate();
@@ -51,36 +53,41 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = ({ pkmId }) => {
     const canSynchronize = !!pkm.saveId && !!attachedPkmVersion && !saveSynchronized;
 
     return (
-        <StorageItem
+        <StorageItemPopover
             storageType="main"
             pkmId={pkmId}
-            species={species}
-            isEgg={false}
-            isShiny={isShiny}
-            isShadow={false}
-            heldItem={heldItem}
-            warning={pkmVersions.some((value) => !value.isValid)}
             boxId={pkm.boxId}
             boxSlot={pkm.boxSlot}
-            nbrVersions={pkmVersions.length}
             selected={selected?.type === "main" && selected.id === pkm.id}
-            canCreateVersion={canCreateVersion}
-            canMoveOutside={canMoveAttached}
-            canEvolve={canEvolve}
-            attached={canDetach}
-            needSynchronize={canSynchronize}
-            onClick={() =>
-                navigate({
-                    search: {
-                        selected: selected?.type === 'main' && selected.id === pkmId
-                            ? undefined
-                            : {
-                                type: "main",
-                                id: pkmId,
-                            },
-                    },
-                })
-            }
-        />
+        >
+            {props => <PopoverButton
+                as={StorageItem}
+                {...props}
+                species={species}
+                isEgg={false}
+                isShiny={isShiny}
+                isShadow={false}
+                heldItem={heldItem}
+                warning={pkmVersions.some((value) => !value.isValid)}
+                nbrVersions={pkmVersions.length}
+                canCreateVersion={canCreateVersion}
+                canMoveOutside={canMoveAttached}
+                canEvolve={canEvolve}
+                attached={canDetach}
+                needSynchronize={canSynchronize}
+                onClick={props.onClick ?? (() =>
+                    navigate({
+                        search: {
+                            selected: selected?.type === 'main' && selected.id === pkmId
+                                ? undefined
+                                : {
+                                    type: "main",
+                                    id: pkmId,
+                                },
+                        },
+                    })
+                )}
+            />}
+        </StorageItemPopover>
     );
-};
+});

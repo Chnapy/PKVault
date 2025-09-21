@@ -3,11 +3,9 @@ using PKHeX.Core;
 
 public class Dex3ColoService : DexGenService<SAV3Colosseum>
 {
-    protected override DexItemDTO CreateDexItem(ushort species, SAV3Colosseum save, uint saveId)
+    protected override DexItemDTO CreateDexItem(ushort species, SAV3Colosseum save, List<PKM> ownedPkms)
     {
-
-        var allPkms = save.GetAllPKM();
-        var ownedPkm = allPkms.Find(pkm => pkm.Species == species);
+        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
 
         var pi = save.Personal[species];
 
@@ -39,18 +37,19 @@ public class Dex3ColoService : DexGenService<SAV3Colosseum>
 
         return new DexItemDTO
         {
-            Id = $"{species}_{saveId}",
+            Id = $"{species}_{save.ID32}",
             Species = species,
-            SaveId = saveId,
+            SaveId = save.ID32,
             Types = [pi.Type1, pi.Type2],
             Abilities = [.. abilities.ToArray().Distinct()],
             BaseStats = baseStats,
             IsOnlyMale = pi.OnlyMale,
             IsOnlyFemale = pi.OnlyFemale,
             IsGenderless = pi.Genderless,
-            IsAnySeen = ownedPkm != null,
-            IsCaught = ownedPkm != null,
-            IsOwned = ownedPkm != null,
+            IsAnySeen = ownedPkms.Count > 0 || save.GetSeen(species),
+            IsCaught = ownedPkms.Count > 0 || save.GetCaught(species),
+            IsOwned = ownedPkms.Count > 0,
+            IsOwnedShiny = isOwnedShiny,
         };
     }
 

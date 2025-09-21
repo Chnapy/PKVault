@@ -2,11 +2,9 @@ using PKHeX.Core;
 
 public class Dex5Service : DexGenService<SAV5>
 {
-    protected override DexItemDTO CreateDexItem(ushort species, SAV5 save, uint saveId)
+    protected override DexItemDTO CreateDexItem(ushort species, SAV5 save, List<PKM> ownedPkms)
     {
-
-        var allPkms = save.GetAllPKM();
-        var ownedPkm = allPkms.Find(pkm => pkm.Species == species && !pkm.IsEgg);
+        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
 
         var pi = save.Personal[species];
 
@@ -30,9 +28,9 @@ public class Dex5Service : DexGenService<SAV5>
 
         return new DexItemDTO
         {
-            Id = $"{species}_{saveId}",
+            Id = $"{species}_{save.ID32}",
             Species = species,
-            SaveId = saveId,
+            SaveId = save.ID32,
             Types = [pi.Type1, pi.Type2],
             Abilities = [.. abilities.ToArray().Distinct()],
             BaseStats = baseStats,
@@ -45,7 +43,8 @@ public class Dex5Service : DexGenService<SAV5>
             IsSeenFS = isSeenFS,
             IsAnySeen = isAnySeen,
             IsCaught = save.GetCaught(species),
-            IsOwned = ownedPkm != null,
+            IsOwned = ownedPkms.Count > 0,
+            IsOwnedShiny = isOwnedShiny,
             IsLangJa = species <= 493 && save.Zukan.GetLanguageFlag(species - 1, 0),
             IsLangEn = species <= 493 && save.Zukan.GetLanguageFlag(species - 1, 1),
             IsLangFr = species <= 493 && save.Zukan.GetLanguageFlag(species - 1, 2),

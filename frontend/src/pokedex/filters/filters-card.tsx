@@ -1,12 +1,14 @@
 import { css } from "@emotion/css";
 import type React from "react";
+import { Container } from "../../ui/container/container";
 import { FilterCaught } from "./components/filter-caught";
 import { FilterFromGames } from "./components/filter-from-games";
 import { FilterGeneration } from "./components/filter-generation";
+import { FilterOwned } from './components/filter-owned';
+import { FilterOwnedShiny } from './components/filter-owned-shiny';
 import { FilterSeen } from "./components/filter-seen";
 import { FilterSpecies } from "./components/filter-species";
 import { FilterTypes } from "./components/filter-types";
-import { Container } from "../../ui/container/container";
 
 export const FiltersCard: React.FC = () => {
   return (
@@ -39,6 +41,10 @@ export const FiltersCard: React.FC = () => {
           <FilterSeen />
 
           <FilterCaught />
+
+          <FilterOwned />
+
+          <FilterOwnedShiny />
 
           <FilterTypes />
         </div>

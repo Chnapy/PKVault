@@ -1,26 +1,15 @@
 import React from "react";
 import { Route } from "../../routes/pokedex";
-import { DexItem } from "../../ui/dex-item/dex-item";
-import type { GameVersion } from '../../data/sdk/model';
+import { DexItem, type DexItemProps } from "../../ui/dex-item/dex-item";
 
-export type PokedexItemProps = {
-  species: number;
-  speciesName: string;
-  sprite: string;
-  seen: boolean;
-  caught: boolean;
-  caughtVersions: GameVersion[];
-  seenOnlyVersions: GameVersion[];
-};
+export type PokedexItemProps = Pick<DexItemProps, 'species' | 'seen' | 'caught' | 'owned' | 'ownedShiny'>;
 
-export const PokedexItem: React.FC<PokedexItemProps> = ({
+export const PokedexItem: React.FC<PokedexItemProps> = React.memo(({
   species,
-  speciesName,
-  sprite,
   seen,
   caught,
-  caughtVersions,
-  seenOnlyVersions,
+  owned,
+  ownedShiny,
 }) => {
   const selectedPkm = Route.useSearch({ select: (search) => search.selected });
   const navigate = Route.useNavigate();
@@ -42,14 +31,12 @@ export const PokedexItem: React.FC<PokedexItemProps> = ({
   return (
     <DexItem
       species={species}
-      speciesName={speciesName}
-      sprite={sprite}
       seen={seen}
       caught={caught}
-      caughtVersions={caughtVersions}
-      seenOnlyVersions={seenOnlyVersions}
+      owned={owned}
+      ownedShiny={ownedShiny}
       selected={selected}
       onClick={onClick}
     />
   );
-};
+});

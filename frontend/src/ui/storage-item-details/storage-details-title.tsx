@@ -1,36 +1,23 @@
 import type React from 'react';
 import type { GameVersion } from '../../data/sdk/model';
-import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
-import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { Button } from '../button/button';
+import { ButtonWithConfirm } from '../button/button-with-confirm';
+import { DetailsTitle } from '../details-card/details-title';
 import { Icon } from '../icon/icon';
-import { StorageDetailsForm } from './storage-details-form';
-import { useStaticData } from '../../hooks/use-static-data';
 import { theme } from '../theme';
+import { StorageDetailsForm } from './storage-details-form';
 
 export type StorageDetailsTitleProps = {
     version: GameVersion;
-    generation: number;
     showVersionName?: boolean;
     canEdit: boolean;
     onRelease?: () => unknown;
 };
 
-export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ version, generation, showVersionName, canEdit, onRelease }) => {
+export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ version, showVersionName, canEdit, onRelease }) => {
     const formContext = StorageDetailsForm.useContext();
 
-    const staticData = useStaticData();
-
-    return <>
-        <img
-            src={getGameInfos(version).img}
-            style={{ height: 28, width: 28 }}
-        />
-
-        <div style={{ flexGrow: 1 }}>
-            G{generation}{showVersionName && ` / ${staticData.versions[ version ].name}`}
-        </div>
-
+    return <DetailsTitle version={version} showVersionName={showVersionName}>
         <ButtonWithConfirm
             onClick={onRelease}
             disabled={!onRelease}
@@ -46,5 +33,5 @@ export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ versio
         >
             <Icon name='pen' solid forButton />
         </Button>
-    </>;
+    </DetailsTitle>;
 };

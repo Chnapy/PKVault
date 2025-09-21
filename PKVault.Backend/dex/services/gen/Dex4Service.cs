@@ -2,11 +2,9 @@ using PKHeX.Core;
 
 public class Dex4Service : DexGenService<SAV4>
 {
-    protected override DexItemDTO CreateDexItem(ushort species, SAV4 save, uint saveId)
+    protected override DexItemDTO CreateDexItem(ushort species, SAV4 save, List<PKM> ownedPkms)
     {
-
-        var allPkms = save.GetAllPKM();
-        var ownedPkm = allPkms.Find(pkm => pkm.Species == species && !pkm.IsEgg);
+        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
 
         var pi = save.Personal[species];
 
@@ -24,9 +22,9 @@ public class Dex4Service : DexGenService<SAV4>
 
         return new DexItemDTO
         {
-            Id = $"{species}_{saveId}",
+            Id = $"{species}_{save.ID32}",
             Species = species,
-            SaveId = saveId,
+            SaveId = save.ID32,
             Types = [pi.Type1, pi.Type2],
             Abilities = [.. abilities.ToArray().Distinct()],
             BaseStats = baseStats,
@@ -35,7 +33,8 @@ public class Dex4Service : DexGenService<SAV4>
             IsGenderless = pi.Genderless,
             IsAnySeen = save.Dex.GetSeen(species),
             IsCaught = save.Dex.GetCaught(species),
-            IsOwned = ownedPkm != null,
+            IsOwned = ownedPkms.Count > 0,
+            IsOwnedShiny = isOwnedShiny,
             IsLangJa = save.Dex.HasLanguage(species) && save.Dex.GetLanguageBitIndex(species, 0),
             IsLangEn = save.Dex.HasLanguage(species) && save.Dex.GetLanguageBitIndex(species, 1),
             IsLangFr = save.Dex.HasLanguage(species) && save.Dex.GetLanguageBitIndex(species, 2),

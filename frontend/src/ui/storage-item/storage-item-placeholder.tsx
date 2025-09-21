@@ -34,6 +34,7 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
         }),
         moveDroppable.onClick && css({
           backgroundColor: theme.bg.light,
+          borderColor: theme.text.default,
           '&:hover': {
             outlineWidth: 2,
           }

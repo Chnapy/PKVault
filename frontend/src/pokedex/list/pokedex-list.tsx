@@ -1,9 +1,9 @@
 import React from "react";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
-import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../hooks/use-static-data';
-import { theme } from '../../ui/theme';
+import { TitledContainer } from '../../ui/container/titled-container';
 import { usePokedexFilters } from "./hooks/use-pokedex-filters";
+import { PokedexCount } from './pokedex-count';
 import { PokedexItem } from "./pokedex-item";
 
 export const PokedexList: React.FC = () => {
@@ -11,13 +11,11 @@ export const PokedexList: React.FC = () => {
 
   const staticData = useStaticData();
 
-  const saveInfosData = useSaveInfosGetAll().data?.data;
-
   const { data } = useDexGetAll();
 
   const { isPkmFiltered, filterSpeciesValues } = usePokedexFilters();
 
-  if (!data || !saveInfosData) {
+  if (!data) {
     return null;
   }
 
@@ -31,122 +29,46 @@ export const PokedexList: React.FC = () => {
 
   const speciesList = new Array(lastKey).fill(0).map((_, i) => i + 1);
 
-  let currentGeneration: number;
-
-  const filteredSpeciesList = speciesList.filter(species => {
-    const speciesValues = Object.values(
+  const filteredSpeciesList = speciesList
+    .map(species => Object.values(
       speciesRecord[ species + "" ] ?? {}
-    ).filter(filterSpeciesValues);
+    ).filter(filterSpeciesValues))
+    .filter(speciesValues => !isPkmFiltered(speciesValues));
 
-    return speciesValues.length > 0
-      && !isPkmFiltered(speciesValues);
-  });
-
-  const items: React.ReactNode[] = filteredSpeciesList.map((species) => {
+  const itemsByGen: React.ReactNode[][] = filteredSpeciesList.reduce((acc, speciesValues) => {
+    const species = speciesValues[ 0 ].species;
     const statics = staticData.species[ species ];
-
-    const speciesValues = Object.values(
-      speciesRecord[ species + "" ] ?? {}
-    ).filter(filterSpeciesValues);
 
     const seen = speciesValues.some((spec) => spec.isAnySeen);
     const caught = speciesValues.some((spec) => spec.isCaught);
-    const speciesName = statics.name;
+    const owned = speciesValues.some((spec) => spec.isOwned);
+    const ownedShiny = speciesValues.some((spec) => spec.isOwnedShiny);
 
-    let divider: React.ReactNode = null;
-
-    if (statics.generation !== currentGeneration) {
-      currentGeneration = statics.generation;
-
-      const allGenSpecies = filteredSpeciesList.filter(species => {
-        const firstSpeciesValue = Object.values(
-          speciesRecord[ species + "" ] ?? {}
-        ).filter(filterSpeciesValues)[ 0 ];
-        return staticData.species[ firstSpeciesValue.species ].generation === currentGeneration;
-      });
-
-      const seenGenCount = allGenSpecies.filter(species => {
-        const speciesValues = Object.values(
-          speciesRecord[ species + "" ] ?? {}
-        ).filter(filterSpeciesValues);
-
-        return speciesValues.some((spec) => spec.isAnySeen);
-      }).length;
-
-      const caughtGenCount = allGenSpecies.filter(species => {
-        const speciesValues = Object.values(
-          speciesRecord[ species + "" ] ?? {}
-        ).filter(filterSpeciesValues);
-
-        return speciesValues.some((spec) => spec.isCaught);
-      }).length;
-
-      divider = (
-        <div
-          key={currentGeneration}
-          style={{
-            width: "100%",
-            padding: "40px 40px 10px",
-          }}
-        >
-          Generation {currentGeneration}
-
-          <div
-            style={{
-              float: 'right'
-            }}
-          >
-            seen.<span style={{ color: theme.text.primary }}>{seenGenCount}</span> caught.
-            <span style={{ color: theme.text.primary }}>{caughtGenCount}</span> total.
-            <span style={{ color: theme.text.primary }}>{allGenSpecies.length}</span>
-          </div>
-
-          <hr />
-        </div>
-      );
-    }
-
-    return (
-      <React.Fragment key={species}>
-        {divider}
-
-        <PokedexItem
-          species={species}
-          speciesName={speciesName}
-          sprite={statics.spriteDefault}
-          seen={seen}
-          caught={caught}
-          caughtVersions={
-            speciesValues
-              .filter((spec) => spec.isCaught)
-              .map(val => saveInfosData[ val.saveId ].version)
-          }
-          seenOnlyVersions={
-            speciesValues
-              .filter((spec) => spec.isAnySeen && !spec.isCaught)
-              .map(val => saveInfosData[ val.saveId ].version)
-          }
-        />
-      </React.Fragment>
+    const genAcc = acc[ statics.generation - 1 ] ?? [];
+    acc[ statics.generation - 1 ] = genAcc;
+    genAcc.push(
+      <PokedexItem
+        key={species}
+        species={species}
+        seen={seen}
+        caught={caught}
+        owned={owned}
+        ownedShiny={ownedShiny}
+      // caughtVersions={
+      //   speciesValues
+      //     .filter((spec) => spec.isCaught)
+      //     .map(val => saveInfosData[ val.saveId ].version)
+      // }
+      // seenOnlyVersions={
+      //   speciesValues
+      //     .filter((spec) => spec.isAnySeen && !spec.isCaught)
+      //     .map(val => saveInfosData[ val.saveId ].version)
+      // }
+      />
     );
-  });
 
-  const seenGenCount = filteredSpeciesList.filter(species => {
-    const speciesValues = Object.values(
-      speciesRecord[ species + "" ] ?? {}
-    ).filter(filterSpeciesValues);
-
-    return speciesValues.some((spec) => spec.isAnySeen);
-  }).length;
-
-  const caughtGenCount = filteredSpeciesList.filter(species => {
-    const speciesValues = Object.values(
-      speciesRecord[ species + "" ] ?? {}
-    ).filter(filterSpeciesValues);
-
-    return speciesValues.some((spec) => spec.isCaught);
-  }).length;
-
+    return acc;
+  }, [] as React.ReactNode[][]);
 
   // console.timeEnd("pokedex-list");
 
@@ -154,6 +76,7 @@ export const PokedexList: React.FC = () => {
     <div
       style={{
         display: "flex",
+        flexDirection: 'column',
         justifyContent: "center",
         gap: 8,
         overflow: "auto",
@@ -162,12 +85,35 @@ export const PokedexList: React.FC = () => {
         padding: 4,
       }}
     >
-      <div>
-        seen.<span style={{ color: theme.text.primary }}>{seenGenCount}</span> caught.
-        <span style={{ color: theme.text.primary }}>{caughtGenCount}</span> total.
-        <span style={{ color: theme.text.primary }}>{filteredSpeciesList.length}</span>
-      </div>
-      {items}
+      <PokedexCount
+        data={filteredSpeciesList}
+      />
+
+      {itemsByGen.map((genItems, i) => <TitledContainer
+        key={i}
+        enableExpand
+        title={
+          <>
+            Generation {i + 1}
+
+            <div style={{ float: 'right' }}>
+              <PokedexCount
+                data={filteredSpeciesList.filter(speciesValues => staticData.species[ speciesValues[ 0 ].species ].generation === i + 1)}
+              />
+            </div>
+          </>
+        }
+      >
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          gap: 8,
+        }}
+        >
+          {genItems}
+        </div>
+      </TitledContainer>)}
     </div>
   );
 };

@@ -120,6 +120,7 @@ export const Settings: React.FC = () => {
                 }}
             >
                 <Button
+                    // TODO PRIOR strange behavior + broken in winform
                     onClick={() => reset(defaultValue)}
                     big
                 >Cancel</Button>

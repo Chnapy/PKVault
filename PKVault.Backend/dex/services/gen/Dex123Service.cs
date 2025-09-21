@@ -2,11 +2,9 @@ using PKHeX.Core;
 
 public class Dex123Service : DexGenService<SaveFile>
 {
-    protected override DexItemDTO CreateDexItem(ushort species, SaveFile save, uint saveId)
+    protected override DexItemDTO CreateDexItem(ushort species, SaveFile save, List<PKM> ownedPkms)
     {
-
-        var allPkms = save.GetAllPKM();
-        var ownedPkm = allPkms.Find(pkm => pkm.Species == species && !pkm.IsEgg);
+        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
 
         var pi = save.Personal[species];
 
@@ -24,9 +22,9 @@ public class Dex123Service : DexGenService<SaveFile>
 
         return new DexItemDTO
         {
-            Id = $"{species}_{saveId}",
+            Id = $"{species}_{save.ID32}",
             Species = species,
-            SaveId = saveId,
+            SaveId = save.ID32,
             Types = [
                 save.Generation <= 2 ? GetG12Type(pi.Type1) : pi.Type1,
                 save.Generation <= 2 ? GetG12Type(pi.Type2) : pi.Type2
@@ -36,9 +34,10 @@ public class Dex123Service : DexGenService<SaveFile>
             IsOnlyMale = pi.OnlyMale,
             IsOnlyFemale = pi.OnlyFemale,
             IsGenderless = pi.Genderless,
-            IsAnySeen = ownedPkm != null || save.GetSeen(species),
-            IsCaught = ownedPkm != null || save.GetCaught(species),
-            IsOwned = ownedPkm != null,
+            IsAnySeen = ownedPkms.Count > 0 || save.GetSeen(species),
+            IsCaught = ownedPkms.Count > 0 || save.GetCaught(species),
+            IsOwned = ownedPkms.Count > 0,
+            IsOwnedShiny = isOwnedShiny,
         };
     }
 

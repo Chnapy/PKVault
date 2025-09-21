@@ -184,6 +184,7 @@ export const Storage: React.FC = () => {
   );
 };
 
+// TODO PRIOR break app if wrong value
 const searchSchema = z.object({
   selected: z
     .object({
@@ -192,7 +193,7 @@ const searchSchema = z.object({
       editMode: z.boolean().optional(),
     })
     .optional(),
-  save: z.number().optional(),
+  save: z.number().optional(),  // TODO PRIOR break view if wrong value
   mainBoxId: z.number().optional(),
   saveBoxId: z.string().optional(),
 });

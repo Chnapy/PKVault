@@ -59,6 +59,9 @@ export const SaveItem: React.FC<SaveItemProps> = ({
         backgroundColor: onClick
           ? theme.bg.light
           : theme.bg.panel,
+        borderColor: onClick
+          ? theme.text.default
+          : undefined,
         display: "flex",
         flexDirection: "column",
         gap: 4,

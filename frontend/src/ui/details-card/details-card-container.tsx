@@ -77,7 +77,7 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
             >
                 <div style={{
                     display: "flex",
-                    alignItems: 'flex-start',
+                    alignItems: 'stretch',
                 }}>
                     <div
                         style={{
@@ -85,6 +85,7 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                             padding: 4,
                             borderRadius: 8,
                             background: theme.bg.dark,
+                            alignSelf: 'flex-start',
                         }}
                     >
                         {mainImg}
@@ -101,7 +102,7 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
             {finalShowDetails && <>
                 <div
                     className={css({
-                        '& > .text-container:first-child': {
+                        '& > .text-container:first-child:not(:last-child)': {
                             borderBottomLeftRadius: 0,
                             borderBottomRightRadius: 0,
                         },
@@ -109,7 +110,7 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                             paddingTop: 0,
                             borderRadius: 0,
                         },
-                        '& > .text-container:last-child': {
+                        '& > .text-container:last-child:not(:first-child)': {
                             paddingTop: 0,
                             borderTopLeftRadius: 0,
                             borderTopRightRadius: 0,

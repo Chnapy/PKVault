@@ -7,10 +7,10 @@ import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { DetailsCardContainer } from '../details-card/details-card-container';
+import { DetailsMainImg } from '../details-card/details-main-img';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
-import { StorageDetailsMainImg } from './storage-details-main-img';
 import { StorageDetailsMainInfos } from './storage-details-main-infos';
 import { StorageDetailsTitle } from './storage-details-title';
 import { TextMoves } from './text-moves';
@@ -41,15 +41,13 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
         bgColor={getGameInfos(pkm.version).color}
         title={<StorageDetailsTitle
             version={pkm.version}
-            generation={pkm.generation}
             showVersionName
             canEdit={pkm.canEdit}
             onRelease={onRelease}
         />}
         mainImg={
-            <StorageDetailsMainImg
+            <DetailsMainImg
                 species={pkm.species}
-                speciesName={pkm.speciesName}
                 isShiny={pkm.isShiny}
                 isEgg={pkm.isEgg}
                 isShadow={pkm.isShadow}

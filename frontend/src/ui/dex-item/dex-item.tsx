@@ -1,127 +1,143 @@
 import { css } from "@emotion/css";
 import React from "react";
-import type { GameVersion } from '../../data/sdk/model';
-import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
-import { Container } from "../container/container";
+import { useStaticData } from '../../hooks/use-static-data';
+import { ButtonLike } from '../button/button-like';
+import { Icon } from '../icon/icon';
+import { ShinyIcon } from '../icon/shiny-icon';
 import { theme } from "../theme";
-
-const styles = {
-  content: css({
-    backgroundColor: theme.bg.dark,
-    color: theme.text.light,
-    textShadow: "1px 1px 0px rgba(255,255,255,0.2)",
-    // padding: 2,
-    paddingTop: 0,
-    borderRadius: 4,
-    fontSize: 14,
-  }),
-};
+import { getSpeciesNO } from './util/get-species-no';
 
 export type DexItemProps = {
   species: number;
-  speciesName: string;
-  sprite: string;
   seen: boolean;
   caught: boolean;
-  caughtVersions: GameVersion[];
-  seenOnlyVersions: GameVersion[];
+  owned: boolean;
+  ownedShiny: boolean;
+  // caughtVersions: GameVersion[];
+  // seenOnlyVersions: GameVersion[];
   selected?: boolean;
   onClick?: () => void;
 };
 
 export const DexItem: React.FC<DexItemProps> = React.memo(
-  ({ species, speciesName, sprite, seen, caught, caughtVersions, seenOnlyVersions, selected, onClick }) => {
-    // const pokeballSprite = staticData.item.pkball.sprites.default;
+  ({ species, seen, caught, owned, ownedShiny, selected, onClick }) => {
+    const staticData = useStaticData();
+    const { name, spriteDefault, spriteShiny } = staticData.species[ species ];
 
-    const caughtGamesColors = caughtVersions.map(getGameInfos).map(infos => infos.color);
-    const seenOnlyGamesColors = seenOnlyVersions.map(getGameInfos).map(infos => infos.color);
+    const pokeballSprite = staticData.itemPokeball.sprite;
+
+    const sprite = ownedShiny ? spriteShiny : spriteDefault;
+
+    // const caughtGamesColors = [ ...new Set(caughtVersions.map(getGameInfos).map(infos => infos.img)) ];
+    // const seenOnlyGamesColors = [ ...new Set(seenOnlyVersions.map(getGameInfos).map(infos => infos.img)) ];
 
     return (
-      <Container
-        as={onClick ? "button" : undefined}
-        // borderRadius="small"
+      <ButtonLike
         onClick={onClick}
         selected={selected}
         noDropshadow={!onClick}
+        disabled={!onClick}
         style={{
+          position: 'relative',
           alignSelf: "flex-start",
+          padding: 0,
+          borderColor: seen ? theme.text.default : undefined,
         }}
       >
-        <div className={styles.content}>
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: '0 2px',
+            backgroundColor: theme.bg.darker,
+            color: theme.text.light,
+            borderBottomRightRadius: 4,
+          }}
+        >
+          <span>{getSpeciesNO(species)}</span>
+        </div>
+
+        <div
+          style={{
+            position: 'absolute',
+            right: 2,
+            top: 0,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          {ownedShiny && <ShinyIcon style={{ height: '0.8lh' }} />}
+
+          {owned && <Icon name='folder' solid forButton />}
+
+          {caught && (
+            <img
+              src={pokeballSprite!}
+              loading="lazy"
+              style={{
+                height: '1lh',
+                margin: '0 -2px',
+                // imageRendering: "pixelated",
+              }}
+            />
+          )}
+        </div>
+
+        <div
+          style={{
+            background: theme.bg.default,
+            borderRadius: 2,
+          }}
+        >
+          <img
+            src={sprite}
+            alt={name}
+            loading="lazy"
+            className={css({
+              imageRendering: "pixelated",
+              width: 96,
+              height: 96,
+              filter: seen ? undefined : "brightness(0) opacity(0.5)",
+              display: "block",
+            })}
+          />
+
           {/* <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: 2,
-            }}
-          >
-            <span>{getSpeciesNO(species)}</span>
-
-            {caught && (
-              <img
-                src={pokeballSprite!}
-                loading="lazy"
-                style={{
-                  height: 20,
-                  margin: -4,
-                  imageRendering: "pixelated",
-                }}
-              />
-            )}
-          </div> */}
-
-          <div
-            style={{
-              background: theme.bg.default,
-              borderRadius: 2,
-            }}
-          >
-            <img
-              src={sprite}
-              alt={speciesName}
-              loading="lazy"
-              className={css({
-                imageRendering: "pixelated",
-                width: 96,
-                height: 96,
-                filter: seen ? undefined : "brightness(0) opacity(0.5)",
-                display: "block",
-              })}
-            />
-
-            <div
+              position: 'absolute',
+              left: 4,
+              right: 4,
+              bottom: 4,
+              overflow: 'hidden',
+              display: 'flex',
+              gap: 2,
+            }}>
+            {caughtGamesColors.map((img) => <img
+              key={img}
+              src={img}
               style={{
-                position: 'absolute',
-                left: 4,
-                bottom: 4,
-                display: 'flex',
-                gap: 4,
-              }}>
-              {caughtGamesColors.map((color, i) => <div
-                key={i}
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: 99,
-                  backgroundColor: color,
-                }}
-              />)}
+                width: 12,
+                height: 12,
+              }}
+            />)}
 
-              {seenOnlyGamesColors.map((color, i) => <div
-                key={i}
-                style={{
-                  width: 4,
-                  height: 4,
-                  margin: 2,
-                  borderRadius: 99,
-                  backgroundColor: color,
-                }}
-              />)}
-            </div>
-          </div>
+            {seenOnlyGamesColors.map((img) => <img
+              key={img}
+              src={img}
+              style={{
+                width: 8,
+                height: 8,
+                margin: 2,
+              }}
+            />)}
+          </div> */}
         </div>
-      </Container>
+      </ButtonLike>
     );
   }
 );

@@ -1,19 +1,20 @@
+import { css } from '@emotion/css';
 import type React from 'react';
 import { useStaticData } from '../../hooks/use-static-data';
+import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { theme } from '../theme';
-import { css } from '@emotion/css';
 
-export type StorageDetailsMainImgProps = {
+export type DetailsMainImgProps = {
     species: number;
-    speciesName: string;
-    isShiny: boolean;
-    isEgg: boolean;
+    isShiny?: boolean;
+    isEgg?: boolean;
     isShadow?: boolean;
-    ball: number;
+    isOwned?: boolean;
+    ball?: number;
 };
 
-export const StorageDetailsMainImg: React.FC<StorageDetailsMainImgProps> = ({ species, speciesName, isShiny, isEgg, isShadow, ball }) => {
+export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, isShiny, isEgg, isShadow, isOwned, ball = 0 }) => {
     const staticData = useStaticData();
 
     const sprite = isEgg
@@ -31,7 +32,7 @@ export const StorageDetailsMainImg: React.FC<StorageDetailsMainImgProps> = ({ sp
         >
             <img
                 src={sprite}
-                alt={speciesName}
+                alt={staticData.species[ species ].name}
                 className={css({
                     imageRendering: "pixelated",
                     width: 96,
@@ -42,16 +43,27 @@ export const StorageDetailsMainImg: React.FC<StorageDetailsMainImgProps> = ({ sp
             />
         </div>
 
-        {ball > 0 && <img
-            src={staticData.items[ ball ].sprite}
+        <div
             style={{
                 position: 'absolute',
                 bottom: 0,
                 right: 0,
-                width: 30,
-                height: 30,
+                display: 'flex',
+                alignItems: 'center',
+                // gap: 4,
+                color: theme.text.default
             }}
-        />}
+        >
+            {isOwned && <Icon name='folder' solid />}
+
+            {ball > 0 && <img
+                src={staticData.items[ ball ].sprite}
+                style={{
+                    width: 30,
+                    height: 30,
+                }}
+            />}
+        </div>
 
         {isShiny && <ShinyIcon
             style={{

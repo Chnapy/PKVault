@@ -7,6 +7,8 @@ export const usePokedexFilters = () => {
   const filterTypes = Route.useSearch({ select: (search) => search.filterTypes });
   const filterSeen = Route.useSearch({ select: (search) => search.filterSeen });
   const filterCaught = Route.useSearch({ select: (search) => search.filterCaught });
+  const filterOwned = Route.useSearch({ select: (search) => search.filterOwned });
+  const filterOwnedShiny = Route.useSearch({ select: (search) => search.filterOwnedShiny });
   const filterFromGames = Route.useSearch({ select: (search) => search.filterFromGames });
   const filterGenerations = Route.useSearch({ select: (search) => search.filterGenerations });
 
@@ -15,8 +17,14 @@ export const usePokedexFilters = () => {
   const isPkmFiltered = (
     speciesValues: DexItemDTO[]
   ): boolean => {
+    if (speciesValues.length === 0) {
+      return true;
+    }
+
     const seen = speciesValues.some((spec) => spec.isAnySeen);
     const caught = speciesValues.some((spec) => spec.isCaught);
+    const owned = speciesValues.some((spec) => spec.isOwned);
+    const ownedShiny = speciesValues.some((spec) => spec.isOwnedShiny);
 
     if (filterSpeciesName) {
       const name = staticData.species[ speciesValues[ 0 ].species ].name;
@@ -44,6 +52,18 @@ export const usePokedexFilters = () => {
 
     if (filterCaught !== undefined) {
       if ((filterCaught && !caught) || (!filterCaught && caught)) {
+        return true;
+      }
+    }
+
+    if (filterOwned !== undefined) {
+      if ((filterOwned && !owned) || (!filterOwned && owned)) {
+        return true;
+      }
+    }
+
+    if (filterOwnedShiny !== undefined) {
+      if ((filterOwnedShiny && !ownedShiny) || (!filterOwnedShiny && ownedShiny)) {
         return true;
       }
     }

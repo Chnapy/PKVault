@@ -27,6 +27,7 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
           background: bgColor,
           overflow: 'hidden',
           flexGrow: 1,
+          display: 'flex',
           ...rest.style,
         })
       )}

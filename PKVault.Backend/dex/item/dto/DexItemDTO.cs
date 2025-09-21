@@ -17,6 +17,7 @@ public class DexItemDTO
     public bool IsSeenFS { get; set; }
     public bool IsCaught { get; set; }
     public bool IsOwned { get; set; }
+    public bool IsOwnedShiny { get; set; }
     public bool IsLangJa { get; set; }
     public bool IsLangEn { get; set; }
     public bool IsLangFr { get; set; }

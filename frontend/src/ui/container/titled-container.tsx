@@ -53,7 +53,7 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
 
         {children && expanded && <div
             style={{
-                padding: 4,
+                padding: 8,
                 overflowY: 'auto',
                 maxHeight,
             }}
