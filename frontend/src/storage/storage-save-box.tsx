@@ -27,18 +27,14 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
   const moveContext = StorageMoveContext.useValue();
   const isMoveDragging = !!moveContext.selected && !moveContext.selected.target;
 
-  const saveInfosRecord = useSaveInfosGetAll().data?.data ?? {};
-  const saveInfos = saveInfosRecord[ saveId ] as SaveInfosDTO | undefined;
+  const saveInfosQuery = useSaveInfosGetAll();
+  const saveInfos = saveInfosQuery.data?.data[ saveId ] as SaveInfosDTO | undefined;
 
   const saveBoxesQuery = useStorageGetSaveBoxes(saveId);
   const savePkmsQuery = useStorageGetSavePkms(saveId);
 
   const saveBoxes = saveBoxesQuery.data?.data ?? [];
   const savePkms = savePkmsQuery.data?.data ?? [];
-
-  // const defaultBoxes = saveBoxes.filter(box => box.type === BoxType.Default);
-  // const partyBox = saveBoxes.find(box => box.type === BoxType.Party);
-  // const daycareBox = saveBoxes.find(box => box.type === BoxType.Daycare);
 
   const selectedBoxIndex =
     saveBoxId

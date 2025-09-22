@@ -38,7 +38,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticSpecies>> GetStaticSpecies()
+    public static async Task<Dictionary<int, StaticSpecies>> GetStaticSpecies(string serverUrl)
     {
         var speciesNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Species;
         List<Task<StaticSpecies>> tasks = [];
@@ -81,8 +81,8 @@ public class StaticDataService
                     Name = speciesName,
                     Generation = generation,
                     Genders = genders,
-                    SpriteDefault = pkmObj.Sprites.FrontDefault,
-                    SpriteShiny = pkmObj.Sprites.FrontShiny,
+                    SpriteDefault = GetGHProxyUrl(pkmObj.Sprites.FrontDefault, serverUrl),
+                    SpriteShiny = GetGHProxyUrl(pkmObj.Sprites.FrontShiny, serverUrl),
                 };
             }));
             // }
@@ -182,22 +182,32 @@ public class StaticDataService
                     type < 10 ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL
                 );
 
-                List<StaticMoveGeneration> dataUntilGeneration = [.. await Task.WhenAll(
-                    moveObj.PastValues.Select(async pastValue =>
-                    {
-                        var versionGroup = await PokeApi.GetVersionGroup(pastValue.VersionGroup);
-                        var untilGeneration = PokeApi.GetGenerationValue(versionGroup.Generation.Name);
+                var tmpTypeUrl = moveObj.Type.Url;
+                var tmpPowerUrl = moveObj.Power;
 
-                        return new StaticMoveGeneration()
+                List<StaticMoveGeneration> dataUntilGeneration = [.. await Task.WhenAll(
+                    moveObj.PastValues
+                        .Reverse<PokeApiNet.PastMoveStatValues>()
+                        .Select(async pastValue =>
                         {
-                            UntilGeneration = untilGeneration,
-                            Type = PokeApi.GetIdFromUrl(pastValue.Type != null
-                                ? pastValue.Type.Url
-                                : moveObj.Type.Url),
-                            Category = untilGeneration <= 3 ? oldCategory : category,
-                            Power = pastValue.Power ?? moveObj.Power,
-                        };
-                    })
+                            var typeUrl = pastValue.Type?.Url ?? tmpTypeUrl;
+                            var power = pastValue.Power ?? tmpPowerUrl;
+
+                            tmpTypeUrl = typeUrl;
+                            tmpPowerUrl = power;
+
+                            var versionGroup = await PokeApi.GetVersionGroup(pastValue.VersionGroup);
+                            var untilGeneration = PokeApi.GetGenerationValue(versionGroup.Generation.Name);
+
+                            return new StaticMoveGeneration()
+                            {
+                                UntilGeneration = untilGeneration,
+                                Type = PokeApi.GetIdFromUrl(typeUrl),
+                                Category = untilGeneration <= 3 ? oldCategory : category,
+                                Power = power,
+                            };
+                        })
+                        .Reverse()
                 )];
 
                 dataUntilGeneration.Add(new()
@@ -298,7 +308,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticItem>> GetStaticItems()
+    public static async Task<Dictionary<int, StaticItem>> GetStaticItems(string serverUrl)
     {
         var itemNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).itemlist;
         List<Task<StaticItem>> tasks = [];
@@ -326,7 +336,7 @@ public class StaticDataService
                 {
                     Id = itemId,
                     Name = itemName,
-                    Sprite = sprite,
+                    Sprite = GetGHProxyUrl(sprite, serverUrl),
                 };
             }));
         }
@@ -361,47 +371,6 @@ public class StaticDataService
             return PokeApi.GetNameForCurrentLanguage(ver.Names);
         }).Distinct());
     }
-
-    // private static List<GameVersion> GetAliasedVersions(GameVersion version)
-    // {
-    //     return version switch
-    //     {
-    //         GameVersion.RB => [GameVersion.RD, GameVersion.GN, GameVersion.BU],
-    //         GameVersion.RBY => [.. GetAliasedVersions(GameVersion.RB), GameVersion.YW],
-    //         GameVersion.GS => [GameVersion.GD, GameVersion.SI],
-    //         GameVersion.GSC => [.. GetAliasedVersions(GameVersion.GS), GameVersion.C],
-    //         GameVersion.RS => [GameVersion.R, GameVersion.S],
-    //         GameVersion.RSE => [.. GetAliasedVersions(GameVersion.RS), GameVersion.E],
-    //         GameVersion.FRLG => [GameVersion.FR, GameVersion.LG],
-    //         GameVersion.COLO => [GameVersion.CXD],
-    //         GameVersion.XD => [GameVersion.CXD],
-    //         GameVersion.DP => [GameVersion.D, GameVersion.P],
-    //         GameVersion.DPPt => [.. GetAliasedVersions(GameVersion.DP), GameVersion.Pt],
-    //         GameVersion.HGSS => [GameVersion.HG, GameVersion.SS],
-    //         GameVersion.BW => [GameVersion.B, GameVersion.W],
-    //         GameVersion.B2W2 => [GameVersion.B2, GameVersion.W2],
-    //         GameVersion.XY => [GameVersion.X, GameVersion.Y],
-    //         GameVersion.ORASDEMO => [GameVersion.OR, GameVersion.AS],
-    //         GameVersion.ORAS => [GameVersion.OR, GameVersion.AS],
-    //         GameVersion.SM => [GameVersion.SN, GameVersion.MN],
-    //         GameVersion.USUM => [GameVersion.US, GameVersion.UM],
-    //         GameVersion.GG => [GameVersion.GP, GameVersion.GE],
-    //         GameVersion.SWSH => [GameVersion.SW, GameVersion.SH],
-    //         GameVersion.BDSP => [GameVersion.BD, GameVersion.SP],
-    //         GameVersion.SV => [GameVersion.SL, GameVersion.VL],
-    //         GameVersion.Gen1 => GetAliasedVersions(GameVersion.RBY),
-    //         GameVersion.Gen2 => GetAliasedVersions(GameVersion.GSC),
-    //         GameVersion.Gen3 => [.. GetAliasedVersions(GameVersion.RSE), .. GetAliasedVersions(GameVersion.FRLG)],
-    //         GameVersion.Gen4 => [.. GetAliasedVersions(GameVersion.DPPt), .. GetAliasedVersions(GameVersion.HGSS)],
-    //         GameVersion.Gen5 => [.. GetAliasedVersions(GameVersion.BW), .. GetAliasedVersions(GameVersion.B2W2)],
-    //         GameVersion.Gen6 => [.. GetAliasedVersions(GameVersion.XY), .. GetAliasedVersions(GameVersion.ORAS)],
-    //         GameVersion.Gen7 => [.. GetAliasedVersions(GameVersion.SM), .. GetAliasedVersions(GameVersion.USUM)],
-    //         GameVersion.Gen7b => [.. GetAliasedVersions(GameVersion.GG), .. GetAliasedVersions(GameVersion.GO)],
-    //         GameVersion.Gen8 => [.. GetAliasedVersions(GameVersion.SWSH), .. GetAliasedVersions(GameVersion.BDSP), .. GetAliasedVersions(GameVersion.PLA)],
-    //         GameVersion.Gen9 => GetAliasedVersions(GameVersion.SV),
-    //         _ => [version],
-    //     };
-    // }
 
     private static Task<PokeApiNet.Version>[] GetPokeApiVersion(GameVersion version)
     {
@@ -522,5 +491,33 @@ public class StaticDataService
             GameVersion.EFL => [.. GetPokeApiVersion(GameVersion.E), .. GetPokeApiVersion(GameVersion.FRLG)],
             #endregion
         };
+    }
+
+    private const string GH_PREFIX = "https://raw.githubusercontent.com/";
+
+    private static string GetGHProxyUrl(string url, string serverUrl)
+    {
+        var path = GetGHPath(url);
+        if (path == "")
+        {
+            return "";
+        }
+
+        return $"{serverUrl}/api/static-data/gh-proxy/{path}";
+    }
+
+    private static string GetGHPath(string url)
+    {
+        if (url.Length < GH_PREFIX.Length)
+        {
+            return "";
+        }
+
+        return url[GH_PREFIX.Length..];
+    }
+
+    public static string GetGHUrl(string path)
+    {
+        return $"{GH_PREFIX}{path}";
     }
 }

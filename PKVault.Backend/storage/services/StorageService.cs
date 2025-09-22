@@ -76,73 +76,64 @@ public class StorageService
         bool attached
     )
     {
-        return await memoryLoader.AddAction(
-            new MovePkmAction(pkmId, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlot, attached),
-            null
+        return await AddAction(
+            new MovePkmAction(pkmId, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlot, attached)
         );
     }
 
     public static async Task<DataUpdateFlags> MainCreatePkmVersion(string pkmId, uint generation)
     {
-        return await memoryLoader.AddAction(
-            new MainCreatePkmVersionAction(pkmId, generation),
-            null
+        return await AddAction(
+            new MainCreatePkmVersionAction(pkmId, generation)
         );
     }
 
     public static async Task<DataUpdateFlags> MainEditPkmVersion(string pkmVersionId, EditPkmVersionPayload payload)
     {
-        return await memoryLoader.AddAction(
-            new EditPkmVersionAction(pkmVersionId, payload),
-            null
+        return await AddAction(
+            new EditPkmVersionAction(pkmVersionId, payload)
         );
     }
 
     public static async Task<DataUpdateFlags> SaveEditPkm(uint saveId, string pkmId, EditPkmVersionPayload payload)
     {
-        return await memoryLoader.AddAction(
-            new EditPkmSaveAction(saveId, pkmId, payload),
-            null
+        return await AddAction(
+            new EditPkmSaveAction(saveId, pkmId, payload)
         );
     }
 
     public static async Task<DataUpdateFlags> MainPkmDetachSave(string pkmId)
     {
-        return await memoryLoader.AddAction(
-            new DetachPkmSaveAction(pkmId),
-            null
+        return await AddAction(
+            new DetachPkmSaveAction(pkmId)
         );
     }
 
     public static async Task<DataUpdateFlags> MainPkmVersionDelete(string pkmVersionId)
     {
-        return await memoryLoader.AddAction(
-            new DeletePkmVersionAction(pkmVersionId),
-            null
+        return await AddAction(
+            new DeletePkmVersionAction(pkmVersionId)
         );
     }
 
     public static async Task<DataUpdateFlags> SaveDeletePkm(uint saveId, string pkmId)
     {
-        return await memoryLoader.AddAction(
-            new SaveDeletePkmAction(saveId, pkmId),
-            null
+        return await AddAction(
+            new SaveDeletePkmAction(saveId, pkmId)
         );
     }
 
     public static async Task<DataUpdateFlags> SaveSynchronizePkm(uint saveId, string pkmVersionId)
     {
-        return await memoryLoader.AddAction(
-            new SynchronizePkmAction(saveId, pkmVersionId),
-            null
+        return await AddAction(
+            new SynchronizePkmAction(saveId, pkmVersionId)
         );
     }
 
     public static async Task<DataUpdateFlags> EvolvePkm(uint? saveId, string id)
     {
-        return await memoryLoader.AddAction(
-            new EvolvePkmAction(saveId, id),
-            null
+        return await AddAction(
+            new EvolvePkmAction(saveId, id)
         );
     }
 
@@ -175,6 +166,20 @@ public class StorageService
         return flags;
     }
 
+    private static async Task<DataUpdateFlags> AddAction(DataAction action)
+    {
+        try
+        {
+            return await memoryLoader.AddAction(action, null);
+        }
+        catch
+        {
+            // re-run actions to avoid persisted side-effects, no removal here
+            return await RemoveDataActionsAndReset(int.MaxValue);
+            throw;
+        }
+    }
+
     public static List<DataActionPayload> GetActionPayloadList()
     {
         if (memoryLoader == null)
@@ -201,7 +206,7 @@ public class StorageService
         logtime();
     }
 
-    public static async Task<DataUpdateFlags> RemoveDataActions(int actionIndexToRemoveFrom)
+    public static async Task<DataUpdateFlags> RemoveDataActionsAndReset(int actionIndexToRemoveFrom)
     {
         var previousActions = memoryLoader.actions;
 

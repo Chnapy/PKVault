@@ -43,6 +43,8 @@ public class EvolvePkmAction : DataAction
 
         var (evolveSpecies, evolveByItem) = await GetEvolve(dto);
 
+        await saveLoaders.Pkms.DeleteDto(dto.Id);
+
         UpdatePkm(dto.Pkm, evolveSpecies, evolveByItem);
 
         await saveLoaders.Pkms.WriteDto(dto);
@@ -153,6 +155,11 @@ public class EvolvePkmAction : DataAction
 
         var currentNickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, pkm.Language, pkm.Format);
         var isNicknamed = pkm.IsNicknamed && !pkm.Nickname.Equals(currentNickname, StringComparison.InvariantCultureIgnoreCase);
+
+        if (pkm.Species == evolveSpecies)
+        {
+            throw new Exception($"Same species: {evolveSpecies}");
+        }
 
         pkm.Species = evolveSpecies;
 

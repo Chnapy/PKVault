@@ -1,10 +1,10 @@
 import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
+import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import React from "react";
-import { FiltersCard } from "../pokedex/filters/filters-card";
-import { PokedexDetails } from "../pokedex/details/pokedex-details";
-import { PokedexList } from "../pokedex/list/pokedex-list";
 import z from "zod";
-import { zodValidator } from "@tanstack/zod-adapter";
+import { PokedexDetails } from "../pokedex/details/pokedex-details";
+import { FiltersCard } from "../pokedex/filters/filters-card";
+import { PokedexList } from "../pokedex/list/pokedex-list";
 
 export const PokedexPage: React.FC = () => {
   return (
@@ -52,7 +52,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/pokedex")({
   component: PokedexPage,
-  validateSearch: zodValidator(searchSchema),
+  validateSearch: zodValidator(fallback(searchSchema, {})),
   search: {
     middlewares: [ retainSearchParams(true) ],
   }

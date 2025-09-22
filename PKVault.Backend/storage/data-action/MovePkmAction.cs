@@ -90,6 +90,20 @@ public class MovePkmAction(
             throw new Exception($"Save Pkm Species not compatible with save for id={sourcePkmDto.Id}, species={sourcePkmDto.Species}, save.maxSpecies={targetSaveLoaders.Save.MaxSpeciesID}");
         }
 
+        var targetPkmDto = await targetSaveLoaders.Pkms.GetDto(targetBoxId, targetBoxSlot);
+        if (targetPkmDto != null && !targetPkmDto.CanMove)
+        {
+            throw new Exception("Save Pkm cannot move");
+        }
+
+        // target should be moved before source delete
+        // because of Party specific behavior
+        if (targetPkmDto != null)
+        {
+            var switchedSourcePkmDto = await PkmSaveDTO.FromPkm(sourceSaveLoaders.Save, targetPkmDto.Pkm, sourcePkmDto.Box, sourcePkmDto.BoxSlot);
+            await sourceSaveLoaders.Pkms.WriteDto(switchedSourcePkmDto);
+        }
+
         await sourceSaveLoaders.Pkms.DeleteDto(sourcePkmDto.Id);
 
         flags.Saves.Add(new()
@@ -97,18 +111,6 @@ public class MovePkmAction(
             SaveId = sourceSaveLoaders.Save.ID32,
             SavePkms = true
         });
-
-        var targetPkmDto = await targetSaveLoaders.Pkms.GetDto(targetBoxId, targetBoxSlot);
-        if (targetPkmDto != null)
-        {
-            if (!targetPkmDto.CanMove)
-            {
-                throw new Exception("Save Pkm cannot move");
-            }
-
-            var switchedSourcePkmDto = await PkmSaveDTO.FromPkm(sourceSaveLoaders.Save, targetPkmDto.Pkm, sourcePkmDto.Box, sourcePkmDto.BoxSlot);
-            await sourceSaveLoaders.Pkms.WriteDto(switchedSourcePkmDto);
-        }
 
         sourcePkmDto.Box = targetBoxId;
         sourcePkmDto.BoxSlot = targetBoxSlot;

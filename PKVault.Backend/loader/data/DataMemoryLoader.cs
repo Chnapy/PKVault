@@ -123,7 +123,6 @@ public class DataMemoryLoader(DataEntityLoaders _loaders) : DataLoader(_loaders)
         catch
         {
             actions.Remove(action);
-            // TODO PRIOR here data may be broken, re-apply every actions is required
             throw;
         }
     }

@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public class SaveInfosDTO
 {
-    public static SaveInfosDTO FromSave(SaveFile save, bool isBackup, DateTime? backupTime, DateTime lastWriteTime)
+    public static SaveInfosDTO FromSave(SaveFile save, DateTime lastWriteTime)
     {
         var seenCount = save.SeenCount;
         var caughtCount = save.CaughtCount;
@@ -47,6 +47,7 @@ public class SaveInfosDTO
             BoxCount = save.BoxCount,
             BoxSlotCount = save.BoxSlotCount,
             CanDelete = true,
+            // DownloadUrl = $"{serverUrl}/api/save-infos/{save.ID32}/download",
         };
     }
 
@@ -87,6 +88,8 @@ public class SaveInfosDTO
     public int BoxSlotCount { get; set; }
 
     public bool CanDelete { get; set; }
+
+    // public string DownloadUrl { get; set; }
 
     public static bool IsSpeciesAllowed(int species, SaveFile save)
     {

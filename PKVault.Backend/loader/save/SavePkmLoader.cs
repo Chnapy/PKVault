@@ -163,10 +163,16 @@ public class SavePkmLoader(
 
         switch (dto.Box)
         {
-            // TODO PRIOR edited pkm is always set last
             case BoxDTO.PARTY_ID:
                 var party = save.PartyData.ToList().FindAll(pkm => pkm.Species != 0);
-                party.Add(pkm);
+                if (dto.BoxSlot >= party.Count)
+                {
+                    party.Add(pkm);
+                }
+                else
+                {
+                    party.Insert(dto.BoxSlot, pkm);
+                }
                 SetParty(party);
                 break;
             default:

@@ -133,7 +133,7 @@ public class StorageController : ControllerBase
     [HttpDelete("action")]
     public async Task<ActionResult<DataDTO>> DeleteActions([BindRequired] int actionIndexToRemoveFrom)
     {
-        var flags = await StorageService.RemoveDataActions(actionIndexToRemoveFrom);
+        var flags = await StorageService.RemoveDataActionsAndReset(actionIndexToRemoveFrom);
 
         return await DataDTO.FromDataUpdateFlags(flags);
     }
