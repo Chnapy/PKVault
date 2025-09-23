@@ -1,19 +1,39 @@
+import { css } from '@emotion/css';
 import { createRootRoute, Outlet, useMatchRoute } from "@tanstack/react-router";
-import type React from "react";
+import React from "react";
+import { BackendErrorsContext } from '../data/backend-errors-context';
 import { useSaveInfosScan } from '../data/sdk/save-infos/save-infos.gen';
+import { useSettingsGet } from '../data/sdk/settings/settings.gen';
+import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
 import { Button } from '../ui/button/button';
 import { Frame } from '../ui/header/frame';
 import { Header } from '../ui/header/header';
 import { HeaderItem } from "../ui/header/header-item";
 import { Icon } from '../ui/icon/icon';
-import { Warnings } from '../warnings/warnings';
-import { useSettingsGet } from '../data/sdk/settings/settings.gen';
+import { NotificationCard } from '../ui/notification-card/notification-card';
 
 const Root: React.FC = () => {
   const matchRoute = useMatchRoute();
 
   const settings = useSettingsGet().data?.data;
+  const warnings = useWarningsGetWarnings().data?.data;
   const savesScanMutation = useSaveInfosScan();
+
+  const [ openNotif, setOpenNotif ] = React.useState(false);
+  const hasWarnings = !!warnings && (warnings.pkmVersionWarnings.length + warnings.playTimeWarnings.length) > 0;
+  const hasErrors = BackendErrorsContext.useValue().errors.length > 0 || hasWarnings;
+
+  React.useEffect(() => {
+    if (openNotif && !hasErrors) {
+      setOpenNotif(false);
+    }
+  }, [ hasErrors, openNotif ]);
+
+  React.useEffect(() => {
+    if (hasErrors) {
+      setOpenNotif(true);
+    }
+  }, [ hasErrors ]);
 
   return (
     <Frame>
@@ -67,17 +87,15 @@ const Root: React.FC = () => {
         >
           Backups & settings
         </HeaderItem>
-      </Header>
 
-      {/* TODO PRIOR */}
-      {/* <div
-        style={{
-          alignSelf: 'center',
-          justifySelf: 'center',
-        }}
-      >
-        <Warnings />
-      </div> */}
+        <Button
+          onClick={() => setOpenNotif(value => !value)}
+          selected={openNotif}
+          disabled={!hasErrors}
+        >
+          <Icon name='bell' solid forButton />
+        </Button>
+      </Header>
 
       <div
         style={{
@@ -87,6 +105,21 @@ const Root: React.FC = () => {
         }}
       >
         <Outlet />
+
+        {openNotif && <div
+          className={css({
+            position: "fixed",
+            top: 47,
+            right: 14,
+            width: 400,
+            zIndex: 20,
+            '&:hover': {
+              zIndex: 25,
+            }
+          })}
+        >
+          <NotificationCard />
+        </div>}
       </div>
     </Frame>
   );

@@ -28,7 +28,7 @@ public class EditPkmVersionAction : DataAction
 
         if (pkmDto.SaveId != default)
         {
-            throw new Exception("Edit not possible for pkm attached with save");
+            throw new ArgumentException("Edit not possible for pkm attached with save");
         }
 
         var pkm = pkmVersionDto.Pkm;
@@ -69,7 +69,7 @@ public class EditPkmVersionAction : DataAction
 
         if (nickname.Length > pkm.MaxStringLengthNickname)
         {
-            throw new Exception($"Nickname should be <= {pkm.MaxStringLengthNickname} for this generation & language");
+            throw new ArgumentException($"Nickname should be <= {pkm.MaxStringLengthNickname} for this generation & language");
         }
 
         PkmConvertService.ApplyNicknameToPkm(pkm, nickname);
@@ -79,7 +79,7 @@ public class EditPkmVersionAction : DataAction
     {
         if (evs.Count() != 6)
         {
-            throw new Exception("EVs should be length 6");
+            throw new ArgumentException("EVs should be length 6");
         }
 
         var evHP = evs[0];
@@ -111,27 +111,27 @@ public class EditPkmVersionAction : DataAction
         {
             if (ev < 0)
             {
-                throw new Exception($"EV value should be positive");
+                throw new ArgumentException($"EV value should be positive");
             }
 
             if (pkm is PB7 && ev > 200)
             {
-                throw new Exception($"G7 GG EV cannot be > 200");
+                throw new ArgumentException($"G7 GG EV cannot be > 200");
             }
 
             if (pkm.Format <= 2 && ev > 65535)
             {
-                throw new Exception($"G1-2 EV cannot be > 65535");
+                throw new ArgumentException($"G1-2 EV cannot be > 65535");
             }
 
             if (pkm.Format > 2 && pkm.Format <= 5 && ev > 255)
             {
-                throw new Exception($"G3-5 EV cannot be > 255");
+                throw new ArgumentException($"G3-5 EV cannot be > 255");
             }
 
             if (pkm.Format > 5 && ev > 252)
             {
-                throw new Exception($"G6+ EV cannot be > 252");
+                throw new ArgumentException($"G6+ EV cannot be > 252");
             }
         });
 
@@ -140,7 +140,7 @@ public class EditPkmVersionAction : DataAction
 
         if (newSum != existingSum)
         {
-            throw new Exception("EVs total sum should not change");
+            throw new ArgumentException("EVs total sum should not change");
         }
 
         if (string.Join('.', newEVs.ToArray()) == string.Join('.', existingEVs))
@@ -163,19 +163,19 @@ public class EditPkmVersionAction : DataAction
 
         if (newMoves.Count == 0 || newMoves.Count > 4)
         {
-            throw new Exception($"Moves length should be > 0 & <= 4");
+            throw new ArgumentException($"Moves length should be > 0 & <= 4");
         }
 
         if (newMoves.Count != newMoves.Distinct().Count())
         {
-            throw new Exception($"Moves contains duplicates");
+            throw new ArgumentException($"Moves contains duplicates");
         }
 
         newMoves.ForEach(moveId =>
         {
             if (availableMoves.FindAll(move => move.Id == moveId).Count() == 0)
             {
-                throw new Exception($"Move not available for this pkm-version: {moveId}");
+                throw new ArgumentException($"Move not available for this pkm-version: {moveId}");
             }
         });
 

@@ -1,19 +1,12 @@
 import "./ui/global-style.ts";
 
-import { createRouter, RouterProvider, createHashHistory } from "@tanstack/react-router";
+import { createHashHistory, createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BackendErrorsContext } from './data/backend-errors-context.tsx';
 import { DataProvider } from "./data/data-provider.tsx";
 import { routeTree } from "./routeTree.gen";
 import { SplashMain } from './splash/splash-main.tsx';
-import { Icon } from './ui/icon/icon.tsx';
-import { Button } from './ui/button/button.tsx';
-import { TitledContainer } from './ui/container/titled-container.tsx';
-import { TextInput } from './ui/input/text-input.tsx';
-import { NumberInput } from './ui/input/number-input.tsx';
-import { TypeItem } from './ui/type-item/type-item.tsx';
-import { MoveItem } from './ui/move-item/move-item.tsx';
-import { MoveCategory } from './data/sdk/model/moveCategory.ts';
 
 // Create a new router instance
 const router = createRouter({
@@ -29,13 +22,14 @@ declare module "@tanstack/react-router" {
   }
 }
 
-const timedFn = () => new Promise(resolve => setTimeout(resolve, 5000));
+// const timedFn = () => new Promise(resolve => setTimeout(resolve, 5000));
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <DataProvider>
-      <SplashMain>
-        {/* <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 16, alignItems: 'flex-start' }}>
+    <BackendErrorsContext.Provider>
+      <DataProvider>
+        <SplashMain>
+          {/* <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 16, alignItems: 'flex-start' }}>
           <Icon name='folder' solid />
           <Icon name='angle-left' />
           <Icon name='download' />
@@ -137,8 +131,9 @@ createRoot(document.getElementById("root")!).render(
           </TitledContainer>
         </div> */}
 
-        <RouterProvider router={router} />
-      </SplashMain>
-    </DataProvider>
+          <RouterProvider router={router} />
+        </SplashMain>
+      </DataProvider>
+    </BackendErrorsContext.Provider>
   </StrictMode>
 );

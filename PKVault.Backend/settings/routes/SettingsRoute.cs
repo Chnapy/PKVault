@@ -18,12 +18,12 @@ public class SettingsController : ControllerBase
     {
         if (!StorageService.HasEmptyActionList())
         {
-            throw new Exception($"Empty action list is required");
+            throw new InvalidOperationException($"Empty action list is required");
         }
 
         if (settingsMutable.LANGUAGE == null || !SettingsDTO.AllowedLanguages.Contains(settingsMutable.LANGUAGE))
         {
-            throw new Exception($"Language value not allowed: {settingsMutable.LANGUAGE}");
+            throw new ArgumentException($"Language value not allowed: {settingsMutable.LANGUAGE}");
         }
 
         await SettingsService.UpdateSettings(settingsMutable);
@@ -43,6 +43,7 @@ public class SettingsController : ControllerBase
             SaveInfos = true,
             Backups = true,
             Settings = true,
+            Warnings = true,
         });
     }
 }

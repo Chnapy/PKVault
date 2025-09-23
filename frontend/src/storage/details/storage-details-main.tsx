@@ -1,6 +1,5 @@
 import React from 'react';
-import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
-import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
+import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
 import { DetailsTab } from '../../ui/details-card/details-tab';
 import { SaveCardContentSmall } from '../../ui/save-card/save-card-content-small';
@@ -68,7 +67,6 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
 
     const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
 
-    const saveInfosQuery = useSaveInfosGetAll();
     const mainPkmQuery = useStorageGetMainPkms();
     const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
 
@@ -77,37 +75,15 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
     const nbrRelatedPkmVersion = mainPkmVersionsQuery.data?.data.filter(version => version.pkmId === pkm?.id).length;
     const saveCardProps = pkm?.saveId ? getSaveItemProps(pkm.saveId) : undefined;
 
-    const savePkmQuery = useStorageGetSavePkms(pkm?.saveId ?? 0, {
-        query: {
-            enabled: !!pkm?.saveId,
-        },
-    });
-
     if (!pkm || !pkmVersion) {
         return null;
     }
 
-    const save = pkm.saveId ? saveInfosQuery.data?.data[ pkm.saveId ] : undefined;
-
-    const attachedSavePkm = pkm.saveId ? savePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId === pkmVersion.id) : undefined;
-    const attachedSavePkmNotFound = save && save.generation === pkmVersion.generation && !attachedSavePkm;
-
-    // const species = pkmVersionList[ 0 ].species;
-
-    // const pkmSaveRaw = pkm.saveId ? saveInfosQuery.data?.data[ pkm.saveId ] : undefined;
-    // const pkmSave = pkmSaveRaw && pkmVersion.generation === pkmSaveRaw.generation ? pkmSaveRaw : undefined;
-
     return (
         <StorageDetailsBase
             {...pkmVersion}
-            isValid={pkmVersion.isValid && !attachedSavePkmNotFound}
-            validityReport={
-                `${attachedSavePkmNotFound ? 'Pkm not found in attached save.'
-                    + '\nIf expected consider detach from save.'
-                    + '\nOtherwise check the save integrity.' : ''
-                }${!pkmVersion.isValid ? pkmVersion.validityReport : ''
-                }`
-            }
+            isValid={pkmVersion.isValid}
+            validityReport={!pkmVersion.isValid ? pkmVersion.validityReport : ''}
             isShadow={false}
             onRelease={pkm?.canDelete && (pkmVersion.canDelete || nbrRelatedPkmVersion === 1)
                 ? (() => mainPkmVersionDeleteMutation.mutateAsync({

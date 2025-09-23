@@ -8,18 +8,23 @@ export type TitledContainerProps = {
     contrasted?: boolean;
     enableExpand?: boolean;
     initialExpanded?: boolean;
+    expanded?: boolean;
     maxHeight?: number;
 };
 
 export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerProps>> = ({
-    title, contrasted, enableExpand, initialExpanded = true, maxHeight, children
+    title, contrasted, enableExpand, initialExpanded = true, expanded: rawExpanded, maxHeight, children
 }) => {
     const moveContext = StorageMoveContext.useValue();
     const isDragging = !!moveContext.selected && !moveContext.selected.target;
     const [ expandedRaw, setExpanded ] = React.useState(initialExpanded);
 
-    const expanded = (!isDragging || !enableExpand)
+    let expanded = (!isDragging || !enableExpand)
         && expandedRaw;
+
+    if (rawExpanded !== undefined) {
+        expanded = rawExpanded;
+    }
 
     return <Container
         style={{

@@ -28,16 +28,15 @@ public class LocalWebServer
         }
     }
 
-    public void Start(string[] args)
+    public async Task Start(string[] args)
     {
         if (webHost == null) return;
 
         Console.WriteLine($"LocalWebServer start for {HOST_URL}");
 
-        Task.Run(() => webHost.Run());
+        _ = Task.Run(() => webHost.Run());
 
-        // TODO PRIOR first render slowed down
-        PKVault.Backend.Program.SetupData(args);
+        await PKVault.Backend.Program.SetupData(args);
     }
 
     public async Task Stop()

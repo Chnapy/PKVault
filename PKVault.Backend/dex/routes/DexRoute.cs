@@ -9,6 +9,8 @@ public class DexController : ControllerBase
     [HttpGet()]
     public async Task<ActionResult<Dictionary<int, Dictionary<uint, DexItemDTO>>>> GetAll()
     {
+        await Program.WaitForSetup();
+
         var record = await DexService.GetDex();
 
         return record;

@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import React from "react";
 import z from "zod";
 import { SaveItem } from '../saves/save-item/save-item';

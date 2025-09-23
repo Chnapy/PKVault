@@ -22,12 +22,12 @@ public partial class MainForm : Form
         Load += new EventHandler(OnFormLoad);
     }
 
-    private void OnFormLoad(object? sender, EventArgs e)
+    private async void OnFormLoad(object? sender, EventArgs e)
     {
-        WebView_Load(sender, e);
-
+        await WebView_Load();
         server = new LocalWebServer();
-        server.Start(args);
+        await server.Start(args);
+        WebView_Navigate();
     }
 
     protected override async void OnFormClosing(FormClosingEventArgs e)

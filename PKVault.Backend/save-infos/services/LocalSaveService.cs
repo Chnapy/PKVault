@@ -92,7 +92,7 @@ public class LocalSaveService
     {
         if (!StorageService.HasEmptyActionList())
         {
-            throw new Exception("Storage has waiting actions");
+            throw new InvalidOperationException("Storage has waiting actions");
         }
 
         var flags = new DataUpdateFlags();
@@ -111,6 +111,7 @@ public class LocalSaveService
         });
         flags.SaveInfos = true;
         flags.Backups = true;
+        flags.Warnings = true;
 
         return flags;
     }
@@ -141,7 +142,7 @@ public class LocalSaveService
         var path = SaveByPath.Keys.ToList().Find(path => SaveByPath[path].ID32 == save.ID32);
         if (path == default)
         {
-            throw new Exception($"Path not found for given save {save.ID32}");
+            throw new KeyNotFoundException($"Path not found for given save {save.ID32}");
         }
 
         var fileName = Path.GetFileNameWithoutExtension(path);

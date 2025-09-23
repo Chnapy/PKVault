@@ -92,7 +92,7 @@ partial class MainForm
 
     #endregion
 
-    private async void WebView_Load(object sender, EventArgs e)
+    private async Task WebView_Load()
     {
         await webView.EnsureCoreWebView2Async(null);
 
@@ -141,7 +141,10 @@ partial class MainForm
                     break;
             }
         };
+    }
 
+    private void WebView_Navigate()
+    {
         var navigateTo = $"https://pkvault/index.html?server={LocalWebServer.HOST_URL}";
 
         Console.WriteLine($"Navigate WebView to {navigateTo}");

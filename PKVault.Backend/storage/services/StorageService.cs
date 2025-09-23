@@ -1,7 +1,8 @@
+using PKVault.Backend;
 
 public class StorageService
 {
-    public static DataMemoryLoader? memoryLoader;
+    private static DataMemoryLoader? _memoryLoader;
 
     public static async Task Initialize()
     {
@@ -10,40 +11,28 @@ public class StorageService
 
     public static async Task<List<BoxDTO>> GetMainBoxes()
     {
-        if (memoryLoader == null)
-        {
-            return [];
-        }
+        var memoryLoader = await GetLoader();
 
         return await memoryLoader.loaders.boxLoader.GetAllDtos();
     }
 
     public static async Task<List<PkmDTO>> GetMainPkms()
     {
-        if (memoryLoader == null)
-        {
-            return [];
-        }
+        var memoryLoader = await GetLoader();
 
         return await memoryLoader.loaders.pkmLoader.GetAllDtos();
     }
 
     public static async Task<List<PkmVersionDTO>> GetMainPkmVersions()
     {
-        if (memoryLoader == null)
-        {
-            return [];
-        }
+        var memoryLoader = await GetLoader();
 
         return await memoryLoader.loaders.pkmVersionLoader.GetAllDtos();
     }
 
     public static async Task<List<BoxDTO>> GetSaveBoxes(uint saveId)
     {
-        if (memoryLoader == null)
-        {
-            return [];
-        }
+        var memoryLoader = await GetLoader();
 
         var saveExists = memoryLoader.loaders.saveLoadersDict.TryGetValue(saveId, out var saveLoaders);
         if (!saveExists)
@@ -56,10 +45,7 @@ public class StorageService
 
     public static async Task<List<PkmSaveDTO>> GetSavePkms(uint saveId)
     {
-        if (memoryLoader == null)
-        {
-            return [];
-        }
+        var memoryLoader = await GetLoader();
 
         var saveExists = memoryLoader.loaders.saveLoadersDict.TryGetValue(saveId, out var saveLoaders);
         if (!saveExists)
@@ -139,6 +125,7 @@ public class StorageService
 
     public static async Task<DataUpdateFlags> Save()
     {
+        var memoryLoader = await GetLoader();
         var flags = new DataUpdateFlags();
 
         var actions = memoryLoader.actions;
@@ -162,52 +149,56 @@ public class StorageService
         });
 
         flags.Backups = true;
+        flags.Warnings = true;
 
         return flags;
     }
 
     private static async Task<DataUpdateFlags> AddAction(DataAction action)
     {
+        var memoryLoader = await GetLoader();
+
         try
         {
-            return await memoryLoader.AddAction(action, null);
+            var flags = await memoryLoader.AddAction(action, null);
+            flags.Warnings = true;
+            return flags;
         }
-        catch
+        catch (Exception ex)
         {
             // re-run actions to avoid persisted side-effects, no removal here
-            return await RemoveDataActionsAndReset(int.MaxValue);
-            throw;
+            var flags = await RemoveDataActionsAndReset(int.MaxValue);
+            throw new DataActionException(ex, flags);
         }
     }
 
     public static List<DataActionPayload> GetActionPayloadList()
     {
-        if (memoryLoader == null)
-        {
-            return [];
-        }
-
         var actionPayloadList = new List<DataActionPayload>();
-        memoryLoader.actions.ForEach(action => actionPayloadList.Add(action.GetPayload()));
+        _memoryLoader?.actions.ForEach(action => actionPayloadList.Add(action.GetPayload()));
         return actionPayloadList;
     }
 
     public static bool HasEmptyActionList()
     {
-        return memoryLoader.actions.Count == 0;
+        return _memoryLoader == null || _memoryLoader.actions.Count == 0;
     }
 
-    public static async Task ResetDataLoader()
+    public static async Task<DataMemoryLoader> ResetDataLoader()
     {
         var logtime = LogUtil.Time($"Data-loader reset");
 
-        memoryLoader = await DataMemoryLoader.Create();
+        _memoryLoader = await DataMemoryLoader.Create();
 
         logtime();
+
+        return _memoryLoader;
     }
 
     public static async Task<DataUpdateFlags> RemoveDataActionsAndReset(int actionIndexToRemoveFrom)
     {
+        var memoryLoader = await GetLoader();
+
         var previousActions = memoryLoader.actions;
 
         await ResetDataLoader();
@@ -221,7 +212,8 @@ public class StorageService
                 new() {
                     SaveId = 0
                 }
-            ]
+            ],
+            Warnings = true,
         };
 
         for (var i = 0; i < previousActions.Count; i++)
@@ -233,6 +225,16 @@ public class StorageService
         }
 
         return flags;
+    }
+
+    public static async Task<DataMemoryLoader> GetLoader()
+    {
+        if (_memoryLoader == null)
+        {
+            await Program.WaitForSetup();
+        }
+
+        return _memoryLoader;
     }
 
     // public static void CleanMainStorageFiles()

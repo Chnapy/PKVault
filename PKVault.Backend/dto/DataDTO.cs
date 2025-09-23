@@ -6,6 +6,8 @@ public struct DataDTO
 
         var dto = new DataDTO();
 
+        var memoryLoader = await StorageService.GetLoader();
+
         if (flags.MainBoxes)
         {
             tasks.Add(Task.Run(async () =>
@@ -42,7 +44,7 @@ public struct DataDTO
                 {
                     tasks.Add(Task.Run(async () =>
                     {
-                        if (StorageService.memoryLoader.loaders.saveLoadersDict.ContainsKey(saveData.SaveId))
+                        if (memoryLoader.loaders.saveLoadersDict.ContainsKey(saveData.SaveId))
                         {
                             saveDto.SaveBoxes ??= await StorageService.GetSaveBoxes(saveData.SaveId);
                         }
@@ -57,7 +59,7 @@ public struct DataDTO
                 {
                     tasks.Add(Task.Run(async () =>
                     {
-                        if (StorageService.memoryLoader.loaders.saveLoadersDict.ContainsKey(saveData.SaveId))
+                        if (memoryLoader.loaders.saveLoadersDict.ContainsKey(saveData.SaveId))
                         {
                             saveDto.SavePkms ??= await StorageService.GetSavePkms(saveData.SaveId);
                         }
@@ -78,6 +80,11 @@ public struct DataDTO
         if (flags.Backups)
         {
             dto.Backups = BackupService.GetBackupList();
+        }
+
+        if (flags.Warnings)
+        {
+            tasks.Add(WarningsService.CheckWarnings());
         }
 
         await Task.WhenAll(tasks);
@@ -127,7 +134,7 @@ public class DataUpdateFlags
     public bool MainPkmVersions;
     public List<DataUpdateSaveFlags> Saves = [];
     // public bool Actions;
-    // public bool Warnings;
+    public bool Warnings;
     public bool SaveInfos;
     public bool Backups;
     public bool Settings;

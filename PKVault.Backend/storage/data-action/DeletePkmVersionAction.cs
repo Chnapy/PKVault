@@ -24,7 +24,7 @@ public class DeletePkmVersionAction : DataAction
 
         if (pkm.SaveId != null)
         {
-            throw new Exception($"Cannot delete pkm-version attached in save, pkm-version.id={pkmVersionId}");
+            throw new ArgumentException($"Cannot delete pkm-version attached in save, pkm-version.id={pkmVersionId}");
         }
 
         flags.MainPkmVersions |= loaders.pkmVersionLoader.DeleteEntity(pkmVersionId);

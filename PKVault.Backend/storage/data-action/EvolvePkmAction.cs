@@ -38,7 +38,7 @@ public class EvolvePkmAction : DataAction
         var dto = await saveLoaders.Pkms.GetDto(id);
         if (dto == default)
         {
-            throw new Exception("Save Pkm not found");
+            throw new ArgumentException("Save Pkm not found");
         }
 
         var (evolveSpecies, evolveByItem) = await GetEvolve(dto);
@@ -61,7 +61,7 @@ public class EvolvePkmAction : DataAction
         var dto = await loaders.pkmVersionLoader.GetDto(id);
         if (dto == default)
         {
-            throw new Exception("Pkm-version not found");
+            throw new KeyNotFoundException("Pkm-version not found");
         }
 
         var relatedPkmVersions = (await loaders.pkmVersionLoader.GetAllDtos())
@@ -71,7 +71,7 @@ public class EvolvePkmAction : DataAction
             relatedPkmVersions.Any(version => dto.Species > version.Pkm.MaxSpeciesID)
         )
         {
-            throw new Exception($"One of pkm-version cannot evolve, species not compatible with its generation");
+            throw new ArgumentException($"One of pkm-version cannot evolve, species not compatible with its generation");
         }
 
         var (evolveSpecies, evolveByItem) = await GetEvolve(dto);
@@ -120,7 +120,7 @@ public class EvolvePkmAction : DataAction
     {
         if (!dto.CanEvolve)
         {
-            throw new Exception("Pkm cannot evolve");
+            throw new ArgumentException("Pkm cannot evolve");
         }
 
         var evolveChains = await dto.GetTradeEvolveChains(

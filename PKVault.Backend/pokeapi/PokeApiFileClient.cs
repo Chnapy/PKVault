@@ -128,7 +128,7 @@ public partial class PokeApiFileClient
             return part;
         }));
 
-        var stream = assembly.GetManifestResourceStream(assemblyName) ?? throw new Exception($"RESOURCE NOT FOUND: {assemblyName}");
+        var stream = assembly.GetManifestResourceStream(assemblyName) ?? throw new KeyNotFoundException($"RESOURCE NOT FOUND: {assemblyName}");
 
         var gzipStream = new GZipStream(stream, CompressionMode.Decompress);
 

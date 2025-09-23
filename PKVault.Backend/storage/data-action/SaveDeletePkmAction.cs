@@ -27,7 +27,7 @@ public class SaveDeletePkmAction : DataAction
         var dto = await saveLoaders.Pkms.GetDto(pkmId);
         if (dto == default)
         {
-            throw new Exception("Save Pkm not found");
+            throw new KeyNotFoundException("Save Pkm not found");
         }
 
         await saveLoaders.Pkms.DeleteDto(pkmId);

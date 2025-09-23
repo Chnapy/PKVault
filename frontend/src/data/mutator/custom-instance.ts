@@ -1,3 +1,4 @@
+import z from 'zod';
 
 const baseURLEnv: string | undefined = import.meta.env.VITE_SERVER_URL;
 
@@ -11,15 +12,22 @@ console.log('Server url =>', baseURL);
 
 export const getApiFullUrl = (url: string) => `${baseURL}${url}`;
 
-export const customInstance = async <T>(url: string, init?: RequestInit): Promise<T> => {
+export type ResponseBack<D = unknown> = z.infer<typeof responseBackSchema> & { data: D }
+export const responseBackSchema = z.object({
+    // data: z.unknown(),
+    headers: z.instanceof(Headers),
+    status: z.number().int(),
+});
+
+export const customInstance = async <T extends ResponseBack>(url: string, init?: RequestInit): Promise<T> => {
     const targetUrl = getApiFullUrl(url);
 
     const res = await fetch(targetUrl, init);
 
-    const body = [ 204, 205, 304 ].includes(res.status) ? null : await res.text()
-    const data = body ? JSON.parse(body) : {}
+    const body = [ 204, 205, 304 ].includes(res.status) ? null : await res.text();
+    const data = body ? JSON.parse(body) : {};
 
-    return { data, status: res.status, headers: res.headers } as T;
+    return { data, status: res.status, headers: res.headers } satisfies ResponseBack as T;
 };
 
 export default customInstance;

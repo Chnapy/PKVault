@@ -40,7 +40,7 @@ public class MovePkmAction(
         var dto = await loaders.pkmLoader.GetDto(pkmId);
         if (dto == default)
         {
-            throw new Exception("Pkm not found");
+            throw new KeyNotFoundException("Pkm not found");
         }
 
         var pkmAlreadyPresent = (await loaders.pkmLoader.GetAllDtos()).Find(pkm =>
@@ -72,28 +72,28 @@ public class MovePkmAction(
         var sourcePkmDto = await sourceSaveLoaders.Pkms.GetDto(pkmId);
         if (sourcePkmDto == default)
         {
-            throw new Exception("Save Pkm not found");
+            throw new KeyNotFoundException("Save Pkm not found");
         }
 
         if (!sourcePkmDto.CanMove)
         {
-            throw new Exception("Save Pkm cannot move");
+            throw new ArgumentException("Save Pkm cannot move");
         }
 
         if (sourcePkmDto.Generation != targetSaveLoaders.Save.Generation)
         {
-            throw new Exception($"Save Pkm not compatible with save for id={sourcePkmDto.Id}, generation={sourcePkmDto.Generation}, save.generation={targetSaveLoaders.Save.Generation}");
+            throw new ArgumentException($"Save Pkm not compatible with save for id={sourcePkmDto.Id}, generation={sourcePkmDto.Generation}, save.generation={targetSaveLoaders.Save.Generation}");
         }
 
         if (!SaveInfosDTO.IsSpeciesAllowed(sourcePkmDto.Pkm.Species, targetSaveLoaders.Save))
         {
-            throw new Exception($"Save Pkm Species not compatible with save for id={sourcePkmDto.Id}, species={sourcePkmDto.Species}, save.maxSpecies={targetSaveLoaders.Save.MaxSpeciesID}");
+            throw new ArgumentException($"Save Pkm Species not compatible with save for id={sourcePkmDto.Id}, species={sourcePkmDto.Species}, save.maxSpecies={targetSaveLoaders.Save.MaxSpeciesID}");
         }
 
         var targetPkmDto = await targetSaveLoaders.Pkms.GetDto(targetBoxId, targetBoxSlot);
         if (targetPkmDto != null && !targetPkmDto.CanMove)
         {
-            throw new Exception("Save Pkm cannot move");
+            throw new ArgumentException("Save Pkm cannot move");
         }
 
         // target should be moved before source delete
@@ -144,7 +144,7 @@ public class MovePkmAction(
         var existingSlot = await saveLoaders.Pkms.GetDto(targetBoxId, targetBoxSlot);
         if (attached && existingSlot != null)
         {
-            throw new Exception("Switch not possible with attached move");
+            throw new ArgumentException("Switch not possible with attached move");
         }
 
         await MainToSaveWithoutCheckTarget(loaders, flags, (uint)targetSaveId, targetBoxId, targetBoxSlot, relatedPkmVersionDtos);
@@ -165,7 +165,7 @@ public class MovePkmAction(
         var existingSlot = (await loaders.pkmLoader.GetAllDtos()).Find(dto => dto.BoxId == targetBoxId && dto.BoxSlot == targetBoxSlot);
         if (attached && existingSlot != null)
         {
-            throw new Exception("Switch not possible with attached move");
+            throw new ArgumentException("Switch not possible with attached move");
         }
         var relatedPkmVersionDtos = existingSlot != null
             ? (await loaders.pkmVersionLoader.GetAllDtos()).FindAll(version => version.PkmId == existingSlot.Id)
@@ -193,31 +193,31 @@ public class MovePkmAction(
 
         if (!attached && relatedPkmVersionDtos.Count > 1)
         {
-            throw new Exception($"Not-attached move from main to save requires a single version");
+            throw new ArgumentException($"Not-attached move from main to save requires a single version");
         }
 
         var pkmVersionDto = relatedPkmVersionDtos.Find(version => version.Generation == saveLoaders.Save.Generation);
 
         if (pkmVersionDto == default)
         {
-            throw new Exception($"PkmVersionEntity not found for generation={saveLoaders.Save.Generation}");
+            throw new ArgumentException($"PkmVersionEntity not found for generation={saveLoaders.Save.Generation}");
         }
 
         var pkmDto = pkmVersionDto.PkmDto;
 
         if (pkmDto.SaveId != default)
         {
-            throw new Exception($"PkmEntity already in save, id={pkmDto.Id}, saveId={pkmDto.SaveId}");
+            throw new ArgumentException($"PkmEntity already in save, id={pkmDto.Id}, saveId={pkmDto.SaveId}");
         }
 
         if (pkmVersionDto.Generation != saveLoaders.Save.Generation)
         {
-            throw new Exception($"PkmVersionEntity Generation not compatible with save for id={pkmVersionDto.Id}, generation={pkmVersionDto.Generation}, save.generation={saveLoaders.Save.Generation}");
+            throw new ArgumentException($"PkmVersionEntity Generation not compatible with save for id={pkmVersionDto.Id}, generation={pkmVersionDto.Generation}, save.generation={saveLoaders.Save.Generation}");
         }
 
         if (!SaveInfosDTO.IsSpeciesAllowed(pkmVersionDto.Pkm.Species, saveLoaders.Save))
         {
-            throw new Exception($"PkmVersionEntity Species not compatible with save for id={pkmVersionDto.Id}, species={pkmVersionDto.Species}, save.maxSpecies={saveLoaders.Save.MaxSpeciesID}");
+            throw new ArgumentException($"PkmVersionEntity Species not compatible with save for id={pkmVersionDto.Id}, species={pkmVersionDto.Species}, save.maxSpecies={saveLoaders.Save.MaxSpeciesID}");
         }
 
         // get save-pkm
@@ -271,7 +271,7 @@ public class MovePkmAction(
 
         if (attached && pkmSaveDTO.PkmVersionId == null)
         {
-            throw new Exception($"pkmSaveDTO.PkmVersionId is null, should be {pkmSaveDTO.Id}");
+            throw new ArgumentException($"pkmSaveDTO.PkmVersionId is null, should be {pkmSaveDTO.Id}");
         }
 
         flags.MainPkms = true;
@@ -300,12 +300,12 @@ public class MovePkmAction(
 
         if (savePkm.Pkm is IShadowCapture savePkmShadow && savePkmShadow.IsShadow)
         {
-            throw new Exception($"Action forbidden for PkmSave shadow for id={savePkm.Id}");
+            throw new ArgumentException($"Action forbidden for PkmSave shadow for id={savePkm.Id}");
         }
 
         if (savePkm.Pkm.IsEgg)
         {
-            throw new Exception($"Action forbidden for PkmSave egg for id={savePkm.Id}");
+            throw new ArgumentException($"Action forbidden for PkmSave egg for id={savePkm.Id}");
         }
 
         // get pkm-version

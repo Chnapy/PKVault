@@ -22,7 +22,7 @@ public class SettingsDTO
     public string GetSafeLanguage()
     {
         return SettingsMutable.LANGUAGE
-            ?? throw new Exception($"Language not defined");
+            ?? throw new InvalidOperationException($"Language not defined");
     }
 }
 

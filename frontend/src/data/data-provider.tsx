@@ -1,5 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
+import { BackendErrorsContext } from './backend-errors-context';
+import { responseBackSchema, type ResponseBack } from './mutator/custom-instance';
 import { getBackupGetAllQueryKey, type backupGetAllResponse } from './sdk/backup/backup.gen';
 import { DataDTOType, type DataDTO } from './sdk/model';
 import { getSaveInfosGetAllQueryKey, type saveInfosGetAllResponse } from './sdk/save-infos/save-infos.gen';
@@ -7,23 +9,38 @@ import { getSettingsGetQueryKey, type settingsGetResponse } from './sdk/settings
 import { getStorageGetActionsQueryKey, getStorageGetMainBoxesQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSaveBoxesQueryKey, getStorageGetSavePkmsQueryKey, type storageGetActionsResponse, type storageGetMainBoxesResponse, type storageGetMainPkmsResponse, type storageGetMainPkmVersionsResponse, type storageGetSaveBoxesResponse, type storageGetSavePkmsResponse } from './sdk/storage/storage.gen';
 import { getWarningsGetWarningsQueryKey, type warningsGetWarningsResponse } from './sdk/warnings/warnings.gen';
 
-const hasStockageDTO = (obj: unknown): obj is { data: DataDTO; headers: Headers; status: 200; } =>
-  typeof obj === 'object' && obj !== null && 'data' in obj
-  && typeof obj.data === 'object' && obj.data !== null && 'type' in obj.data
-  && obj.data.type === DataDTOType.DATA_DTO;
+const isResponse = (obj: unknown): obj is ResponseBack => responseBackSchema.safeParse(obj).success;
+
+const hasDataDTO = (obj: ResponseBack): obj is ResponseBack<DataDTO> =>
+  typeof obj.data === 'object' && obj.data !== null && 'type' in obj.data && obj.data.type === DataDTOType.DATA_DTO;
 
 export const DataProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
+  const backendErrors = BackendErrorsContext.useValue();
   const [ client ] = React.useState(() => new QueryClient({
     defaultOptions: {
       queries: {
         refetchOnMount: false,
       },
       mutations: {
-        onSuccess: async (data) => {
-          if (!hasStockageDTO(data)) {
-            // console.log('NOT stockage-dto', data);
+        onSettled: async (data) => {
+          if (!isResponse(data)) {
+            return;
+          }
+
+          const errorMessage = data.headers.get('error-message');
+          const errorStack = data.headers.get('error-stack');
+          if (errorMessage) {
+            backendErrors.addError({
+              message: errorMessage,
+              stack: errorStack!,
+              status: data.status,
+            });
+          }
+
+          if (!hasDataDTO(data)) {
+            // console.log('NOT stockage-dto', data, error);
             return;
           }
 
@@ -37,7 +54,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
               {
                 ...data,
                 data: settings,
-              } satisfies settingsGetResponse
+              } satisfies Omit<settingsGetResponse, 'status'>
             );
           }
 
@@ -47,7 +64,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
               {
                 ...data,
                 data: mainBoxes,
-              } satisfies storageGetMainBoxesResponse
+              } satisfies Omit<storageGetMainBoxesResponse, 'status'>
             );
           }
 
@@ -57,7 +74,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
               {
                 ...data,
                 data: mainPkms,
-              } satisfies storageGetMainPkmsResponse
+              } satisfies Omit<storageGetMainPkmsResponse, 'status'>
             );
           }
 
@@ -67,7 +84,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
               {
                 ...data,
                 data: mainPkmVersions,
-              } satisfies storageGetMainPkmVersionsResponse
+              } satisfies Omit<storageGetMainPkmVersionsResponse, 'status'>
             );
           }
 
@@ -104,7 +121,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                   {
                     ...data,
                     data: saveData.saveBoxes,
-                  } satisfies storageGetSaveBoxesResponse
+                  } satisfies Omit<storageGetSaveBoxesResponse, 'status'>
                 );
               }
 
@@ -114,7 +131,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                   {
                     ...data,
                     data: saveData.savePkms,
-                  } satisfies storageGetSavePkmsResponse
+                  } satisfies Omit<storageGetSavePkmsResponse, 'status'>
                 );
               }
             });
@@ -126,7 +143,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
               {
                 ...data,
                 data: actions,
-              } satisfies storageGetActionsResponse
+              } satisfies Omit<storageGetActionsResponse, 'status'>
             );
           }
 
@@ -136,7 +153,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
               {
                 ...data,
                 data: warnings,
-              } satisfies warningsGetWarningsResponse
+              } satisfies Omit<warningsGetWarningsResponse, 'status'>
             );
           }
 
@@ -146,7 +163,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
               {
                 ...data,
                 data: saveInfos,
-              } satisfies saveInfosGetAllResponse
+              } satisfies Omit<saveInfosGetAllResponse, 'status'>
             );
           }
 
@@ -156,7 +173,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
               {
                 ...data,
                 data: backups,
-              } satisfies backupGetAllResponse
+              } satisfies Omit<backupGetAllResponse, 'status'>
             );
           }
         }
@@ -164,5 +181,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
     }
   }));
 
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+  return <QueryClientProvider client={client}>
+    {children}
+  </QueryClientProvider>;
 };

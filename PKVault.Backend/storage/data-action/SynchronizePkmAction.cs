@@ -28,7 +28,7 @@ public class SynchronizePkmAction : DataAction
 
         if (pkmDto.SaveId == default)
         {
-            throw new Exception($"Cannot synchronize pkm-version detached from save, pkm-version.id={pkmVersionId}");
+            throw new ArgumentException($"Cannot synchronize pkm-version detached from save, pkm-version.id={pkmVersionId}");
         }
 
         var saveLoaders = loaders.saveLoadersDict[saveId];

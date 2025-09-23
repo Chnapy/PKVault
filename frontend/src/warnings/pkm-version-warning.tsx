@@ -1,41 +1,42 @@
 import type React from 'react';
+import type { PkmVersionWarning as PkmVersionWarningModel } from '../data/sdk/model';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../data/sdk/storage/storage.gen';
-import { Button } from '../ui/button/button';
 import { Route } from '../routes/storage';
+import { Button } from '../ui/button/button';
+import { Icon } from '../ui/icon/icon';
 
-export type PkmVersionWarningProps = {
-    pkmVersionId: string;
-};
-
-export const PkmVersionWarning: React.FC<PkmVersionWarningProps> = ({ pkmVersionId }) => {
+export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({ pkmId }) => {
     const navigate = Route.useNavigate();
 
     const pkmsQuery = useStorageGetMainPkms();
     const pkmVersionsQuery = useStorageGetMainPkmVersions();
 
-    const pkmVersion = pkmVersionsQuery.data?.data.find(pkmVersion => pkmVersion.id === pkmVersionId);
-    const pkm = pkmVersion && pkmsQuery.data?.data.find(pkm => pkm.id == pkmVersion.pkmId);
+    const pkm = pkmsQuery.data?.data.find(pkm => pkm.id == pkmId);
+    const pkmVersion = pkmVersionsQuery.data?.data.find(pkmVersion => pkmVersion.pkmId === pkmId);
 
-    if (!pkmVersion || !pkm) {
+    if (!pkm) {
         return null;
     }
 
-    return <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-    }}>
-        Issue with pkm {pkmVersion.speciesName} in box {pkm.boxId} slot {pkm.boxSlot}, not found in attached save <Button onClick={() => navigate({
-            to: '/storage',
-            search: {
-                mainBoxId: pkm.boxId,
-                save: pkm.saveId,
-                saveBoxId: undefined,
-                selected: {
-                    type: 'main',
-                    id: pkm.id,
-                },
-            }
-        })}>Check</Button>
-    </div>;
+    return <tr>
+        <td>
+            Pkm {pkmVersion?.speciesName} in box {pkm.boxId} slot {pkm.boxSlot} not found in attached save.
+        </td>
+        <td style={{ verticalAlign: 'top' }}>
+            <Button onClick={() => navigate({
+                to: '/storage',
+                search: {
+                    mainBoxId: pkm.boxId,
+                    save: pkm.saveId,
+                    saveBoxId: undefined,
+                    selected: {
+                        type: 'main',
+                        id: pkm.id,
+                    },
+                }
+            })}>
+                <Icon name='eye' forButton />
+            </Button>
+        </td>
+    </tr>;
 };

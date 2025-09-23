@@ -250,7 +250,7 @@ public class BackupService
 
         if (!File.Exists(bkpZipPath))
         {
-            throw new Exception($"File does not exist: {bkpZipPath}");
+            throw new KeyNotFoundException($"File does not exist: {bkpZipPath}");
         }
 
         File.Delete(bkpZipPath);
@@ -310,8 +310,6 @@ public class BackupService
         await LocalSaveService.ReadLocalSaves();
 
         await StorageService.ResetDataLoader();
-
-        await WarningsService.CheckWarnings();
     }
 
     public static async Task PrepareBackupThenRun(Func<Task> action)
@@ -329,8 +327,6 @@ public class BackupService
             await LocalSaveService.ReadLocalSaves();
 
             await StorageService.ResetDataLoader();
-
-            await WarningsService.CheckWarnings();
         }
         catch
         {

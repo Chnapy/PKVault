@@ -40,6 +40,7 @@ public class BackupController : ControllerBase
             // Warnings = true,
             SaveInfos = true,
             Backups = true,
+            Warnings = true,
         });
     }
 }

@@ -75,7 +75,7 @@ public class WarningsService
     {
         var warns = new List<PkmVersionWarning>();
 
-        var loader = StorageService.memoryLoader;
+        var loader = await StorageService.GetLoader();
 
         var pkms = await loader.loaders.pkmLoader.GetAllDtos();
         var pkmVersionsTask = loader.loaders.pkmVersionLoader.GetAllDtos();
@@ -87,7 +87,10 @@ public class WarningsService
                 var exists = loader.loaders.saveLoadersDict.TryGetValue((uint)pkm.SaveId, out var saveLoader);
                 if (!exists)
                 {
-                    return null;
+                    return new PkmVersionWarning()
+                    {
+                        PkmId = pkm.Id,
+                    };
                 }
 
                 var save = saveLoader.Save;
@@ -95,7 +98,7 @@ public class WarningsService
 
                 var pkmVersion = (await pkmVersionsTask).Find(pkmVersion => pkmVersion.PkmDto.Id == pkm.Id && pkmVersion.Generation == generation);
 
-                var savePkm = saveLoader.Pkms.GetDto(pkmVersion.Id);
+                var savePkm = await saveLoader.Pkms.GetDto(pkmVersion.Id);
 
                 if (savePkm == default)
                 {
@@ -103,6 +106,7 @@ public class WarningsService
 
                     return new PkmVersionWarning()
                     {
+                        PkmId = pkm.Id,
                         PkmVersionId = pkmVersion.Id,
                     };
                 }

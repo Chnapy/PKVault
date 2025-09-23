@@ -12,5 +12,6 @@ public struct PlayTimeWarning
 
 public struct PkmVersionWarning
 {
-    public string PkmVersionId { get; set; }
+    public required string PkmId { get; set; }
+    public string? PkmVersionId { get; set; }
 }

@@ -29,7 +29,7 @@ public class MainCreatePkmVersionAction : DataAction
         var pkmDto = await loaders.pkmLoader.GetDto(pkmId);
         if (pkmDto == default)
         {
-            throw new Exception($"Pkm entity not found, id={pkmId}");
+            throw new KeyNotFoundException($"Pkm entity not found, id={pkmId}");
         }
 
         var pkmVersions = (await loaders.pkmVersionLoader.GetAllDtos()).FindAll(pkmVersion => pkmVersion.PkmDto.Id == pkmId);
@@ -37,13 +37,13 @@ public class MainCreatePkmVersionAction : DataAction
         var pkmVersionEntity = pkmVersions.Find(pkmVersion => pkmVersion.Generation == generation);
         if (pkmVersionEntity != default)
         {
-            throw new Exception($"Pkm-version already exists, pkm.id={pkmId} generation={generation}");
+            throw new ArgumentException($"Pkm-version already exists, pkm.id={pkmId} generation={generation}");
         }
 
         var pkmVersionOrigin = pkmVersions.Find(pkmVersion => pkmVersion.IsMain);
         if (pkmVersionOrigin == default)
         {
-            throw new Exception($"Pkm-version original not found, pkm.id={pkmId} generation={generation}");
+            throw new ArgumentException($"Pkm-version original not found, pkm.id={pkmId} generation={generation}");
         }
 
         var pkmOrigin = pkmVersionOrigin.Pkm;

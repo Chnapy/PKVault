@@ -7,7 +7,20 @@ namespace PKVault.Backend;
 
 public class Program
 {
-    // TODO PRIOR handle exceptions with http codes & messages, should work with winform
+    private static Task? SetupTask;
+
+    public static async Task WaitForSetup()
+    {
+        SetupTask ??= Task.Run(async () =>
+            {
+                await LocalSaveService.ReadLocalSaves();
+                await StorageService.ResetDataLoader();
+                await WarningsService.CheckWarnings();
+            });
+
+        await SetupTask;
+    }
+
     public static async Task Main(string[] args)
     {
         var setupDone = await SetupData(args);
@@ -79,7 +92,7 @@ public class Program
             var logtimeSavePkmGet = LogUtil.Time("Benchmark Save Pkms (get) perfs with 2000 sequential calls", (10, 30));
             for (var i = 0; i < 2000; i++)
             {
-                var result = await StorageService.memoryLoader!.loaders.saveLoadersDict[3809447156].Pkms.GetDto("G30366FC1CF2B528 17 20 21 30 600")
+                var result = await (await StorageService.GetLoader()).loaders.saveLoadersDict[3809447156].Pkms.GetDto("G30366FC1CF2B528 17 20 21 30 600")
                     ?? throw new Exception();
             }
             // expected: ~0.001s
@@ -102,11 +115,7 @@ public class Program
         }
 #endif
 
-        await LocalSaveService.ReadLocalSaves();
-
-        await StorageService.ResetDataLoader();
-
-        await WarningsService.CheckWarnings();
+        await WaitForSetup();
 
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
@@ -183,6 +192,7 @@ public class Program
             .AllowAnyMethod()
             .AllowAnyHeader());
 
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();

@@ -309,17 +309,40 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         }
     }
 
-    // TODO handle when not present in attached save
     public bool IsValid
     {
         get
         {
             var legality = new LegalityAnalysis(Pkm);
-            return legality.Parsed && Pkm.Valid && legality.Valid;
+            var isLegal = legality.Parsed && Pkm.Valid && legality.Valid;
+
+            var isNotWarn = !WarningsService.GetWarningsDTO().pkmVersionWarnings.Any(warn => warn.PkmVersionId == null
+            ? warn.PkmId == Id
+            : warn.PkmVersionId == Id);
+
+            return isLegal && isNotWarn;
         }
     }
 
-    public string ValidityReport { get { return new LegalityAnalysis(Pkm).Report(); } }
+    public string ValidityReport
+    {
+        get
+        {
+            List<string> reports = [new LegalityAnalysis(Pkm).Report()];
+
+            PkmVersionWarning? warning = WarningsService.GetWarningsDTO().pkmVersionWarnings.Find(warn => warn.PkmVersionId == null
+                ? warn.PkmId == Id
+                : warn.PkmVersionId == Id);
+            if (warning != null)
+            {
+                reports.Insert(0, $"Pkm not found in attached save."
+                    + "\nIf expected consider detach from save."
+                    + "\nOtherwise check the save integrity.");
+            }
+
+            return string.Join('\n', reports);
+        }
+    }
 
     public bool CanEdit { get => !IsEgg; }
 

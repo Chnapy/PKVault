@@ -9,8 +9,10 @@ namespace PKVault.Backend.saveinfos.routes;
 public class SaveInfosController : ControllerBase
 {
     [HttpGet()]
-    public ActionResult<Dictionary<uint, SaveInfosDTO>> GetAll()
+    public async Task<ActionResult<Dictionary<uint, SaveInfosDTO>>> GetAll()
     {
+        await Program.WaitForSetup();
+
         return LocalSaveService.GetAllSaveInfos();
     }
 
@@ -19,14 +21,12 @@ public class SaveInfosController : ControllerBase
     {
         if (!StorageService.HasEmptyActionList())
         {
-            throw new Exception($"Empty action list is required");
+            throw new InvalidOperationException($"Empty action list is required");
         }
 
         await LocalSaveService.ReadLocalSaves();
 
         await StorageService.ResetDataLoader();
-
-        await WarningsService.CheckWarnings();
 
         return await DataDTO.FromDataUpdateFlags(new()
         {
@@ -36,6 +36,7 @@ public class SaveInfosController : ControllerBase
                 }
             ],
             SaveInfos = true,
+            Warnings = true,
         });
     }
 
@@ -61,6 +62,8 @@ public class SaveInfosController : ControllerBase
     [HttpDelete()]
     public async Task<ActionResult<DataDTO>> Delete([BindRequired] uint saveId)
     {
+        await Program.WaitForSetup();
+
         var flags = await LocalSaveService.DeleteSaveFromId(saveId);
         return await DataDTO.FromDataUpdateFlags(flags);
     }
@@ -70,7 +73,7 @@ public class SaveInfosController : ControllerBase
     {
         if (!StorageService.HasEmptyActionList())
         {
-            throw new Exception($"Empty action list is required");
+            throw new InvalidOperationException($"Empty action list is required");
         }
 
         var save = LocalSaveService.SaveById[saveId].Clone();
