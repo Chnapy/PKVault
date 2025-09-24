@@ -8,6 +8,12 @@ public struct DataDTO
 
         var memoryLoader = await StorageService.GetLoader();
 
+        // Note: should be done first since it may be used by pkm-version
+        if (flags.Warnings)
+        {
+            tasks.Add(WarningsService.CheckWarnings());
+        }
+
         if (flags.MainBoxes)
         {
             tasks.Add(Task.Run(async () =>
@@ -80,11 +86,6 @@ public struct DataDTO
         if (flags.Backups)
         {
             dto.Backups = BackupService.GetBackupList();
-        }
-
-        if (flags.Warnings)
-        {
-            tasks.Add(WarningsService.CheckWarnings());
         }
 
         await Task.WhenAll(tasks);

@@ -5,7 +5,7 @@ import { TitledContainer } from '../container/titled-container';
 import { Icon } from '../icon/icon';
 import { theme } from '../theme';
 
-type DataOption<K extends string | number> = { value: K; option: React.ReactNode; disabled?: boolean };
+export type DataOption<K extends string | number> = { value: K; option: React.ReactNode; disabled?: boolean };
 
 export type SelectInputProps<K extends string | number = string | number> = {
     label?: string;
@@ -46,7 +46,7 @@ const SelectInput = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<
             filter: theme.shadow.filter,
             overflow: 'hidden',
             verticalAlign: 'middle',
-            padding: 2,
+            // padding: 2,
             ...rest.style,
         }}
     >
@@ -66,7 +66,7 @@ const SelectInput = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<
                     {data.find(item => item.value === value)?.option}
                 </div>
 
-                <Icon name='angle-down' solid />
+                <Icon name='angle-down' solid forButton />
             </ListboxButton>
 
             <ListboxOptions anchor={anchor} style={{ zIndex: 30 }}>

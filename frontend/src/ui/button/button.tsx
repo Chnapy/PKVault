@@ -1,4 +1,5 @@
 import { css, cx } from "@emotion/css";
+import { createLink } from '@tanstack/react-router';
 import { type ReactTag } from "../container/container";
 import { theme } from "../theme";
 import { ButtonLike, type ButtonLikeProps } from './button-like';
@@ -66,3 +67,6 @@ export function Button<
     </ButtonLike>
   );
 }
+
+const ButtonForLink: typeof Button = props => <Button<'a'> {...props} as='a' />;
+export const ButtonLink = createLink(ButtonForLink);

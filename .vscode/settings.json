@@ -1,5 +1,9 @@
 {
   "search.exclude": {
-    "**/pokeapi/api-data": true
+    "**/pokeapi/api-data": true,
+    "**/dist": true,
+    "**/bin": true,
+    "**/obj": true,
+    "**/wwwroot": true
   }
 }

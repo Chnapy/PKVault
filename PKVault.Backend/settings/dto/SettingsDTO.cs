@@ -12,6 +12,8 @@ public class SettingsDTO
 
     public bool CanScanSaves { get => StorageService.HasEmptyActionList(); }
 
+    public bool CanDeleteSaves { get => StorageService.HasEmptyActionList(); }
+
     public required SettingsMutableDTO SettingsMutable { get; set; }
 
     public LanguageID GetSafeLanguageID()

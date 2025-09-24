@@ -91,7 +91,6 @@ public class BackupService
         var relativePkmPath = Path.Combine("db", "pkm.json");
         var relativePkmVersionPath = Path.Combine("db", "pkm-version.json");
 
-        // TODO PRIOR part not safe, if data written is wrong, restore can break up whole app
         File.WriteAllText(
             Path.Combine(bkpTmpDirPath, relativeBoxPath),
             JsonSerializer.Serialize(boxEntities)

@@ -6,12 +6,15 @@ import {
 } from "../data/sdk/storage/storage.gen";
 import { Route } from "../routes/storage";
 import { Button } from "../ui/button/button";
-import { FilterSelect, type FilterSelectProps } from "../ui/filter/filter-select/filter-select";
+import { ButtonWithPopover } from '../ui/button/button-with-popover';
 import { Icon } from '../ui/icon/icon';
+import { SelectStringInput, type DataOption } from '../ui/input/select-input';
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
 import { theme } from '../ui/theme';
 import { StorageMoveContext } from './actions/storage-move-context';
+import { StorageBoxCreate } from './box/storage-box-create';
+import { StorageBoxEdit } from './box/storage-box-edit';
 import { StorageMainItem } from './storage-main-item';
 
 export const StorageMainBox: React.FC = () => {
@@ -42,16 +45,13 @@ export const StorageMainBox: React.FC = () => {
   const previousBox = boxes[ selectedBoxIndex - 1 ] ?? boxes[ boxes.length - 1 ];
   const nextBox = boxes[ selectedBoxIndex + 1 ] ?? boxes[ 0 ];
 
-  const boxesOptions = [
-    ...boxes.map((box): FilterSelectProps[ 'options' ][ number ] => ({
-      value: box.id + "",
-      label: box.name,
-    })),
-    !isMoveDragging && {
-      value: "",
-      label: "Create new box",
-    },
-  ].filter((opt): opt is FilterSelectProps[ 'options' ][ number ] => !!opt);
+  const boxesOptions = boxes.map((box): DataOption<string> => ({
+    value: box.id,
+    option: <div style={{ margin: '2px 4px' }}>
+      {box.name}
+    </div>,
+    disabled: selectedBox.id === box.id,
+  }));
 
   const boxPkmsList = pkms.filter((pkm) => pkm.boxId === selectedBox.idInt);
 
@@ -98,21 +98,28 @@ export const StorageMainBox: React.FC = () => {
               <Icon name='angle-left' forButton />
             </Button>
 
-            <FilterSelect
+            <SelectStringInput
               triggerOnHover={isMoveDragging}
-              enabled={false}
-              options={boxesOptions}
-              value={[ selectedBox.id + "" ]}
-              onChange={([ value ]) => {
-                navigate({
-                  search: {
-                    mainBoxId: Number(value),
-                  },
-                });
-              }}
+              data={boxesOptions}
+              value={selectedBox.id}
+              onChange={value => navigate({
+                search: {
+                  mainBoxId: Number(value),
+                },
+              })}
+            />
+
+            <ButtonWithPopover
+              panelContent={close => <StorageBoxEdit boxId={selectedBox.id} close={close} />}
             >
-              {selectedBox.name}
-            </FilterSelect>
+              <Icon name='pen' forButton />
+            </ButtonWithPopover>
+
+            <ButtonWithPopover
+              panelContent={close => <StorageBoxCreate close={close} />}
+            >
+              <Icon name='plus' forButton />
+            </ButtonWithPopover>
 
             <Button
               triggerOnHover={isMoveDragging}

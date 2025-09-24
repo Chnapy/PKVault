@@ -11,6 +11,7 @@ public class StaticDataDTO
     public required Dictionary<int, StaticNature> Natures { get; set; }
     public required Dictionary<int, StaticAbility> Abilities { get; set; }
     public required Dictionary<int, StaticItem> Items { get; set; }
+    public required string EggSprite { get; set; }
 }
 
 public struct StaticVersion

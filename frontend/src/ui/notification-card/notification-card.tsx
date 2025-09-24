@@ -16,6 +16,11 @@ export const NotificationCard: React.FC = () => {
 
     const hasErrorsAndWarnings = errors.length > 0 && nbrWarnings > 0;
 
+    const title = [
+        errors.length > 0 && `${errors.length} errors`,
+        nbrWarnings > 0 && `${nbrWarnings} warnings`,
+    ].filter(Boolean).join(' / ');
+
     return <TitledContainer
         contrasted
         maxHeight={300}
@@ -27,7 +32,7 @@ export const NotificationCard: React.FC = () => {
             }}
         >
             <Icon name='angle-down' forButton />
-            {errors.length} errors / {nbrWarnings} warnings
+            {title}
             <Icon name='angle-down' forButton />
         </div>}
     >
@@ -37,7 +42,7 @@ export const NotificationCard: React.FC = () => {
                             Issue with save {warn.saveId}, current save seems to have less play-time than previous one
                         </div>)} */}
 
-                {warnings?.pkmVersionWarnings.map(warn => <PkmVersionWarning key={warn.pkmVersionId} {...warn} />)}
+                {warnings?.pkmVersionWarnings.map((warn, i) => <PkmVersionWarning key={i} {...warn} />)}
 
                 {hasErrorsAndWarnings && <tr><td><hr /></td></tr>}
 

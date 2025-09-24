@@ -13,6 +13,9 @@ public struct DataActionPayload
 
 public enum DataActionType
 {
+    MAIN_CREATE_BOX,
+    MAIN_UPDATE_BOX,
+    MAIN_DELETE_BOX,
     MAIN_CREATE_PKM_VERSION,
     MOVE_PKM,
     DETACH_PKM_SAVE,

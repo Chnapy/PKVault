@@ -5,9 +5,10 @@ import {
   useSaveInfosDelete,
   useSaveInfosGetAll
 } from "../../data/sdk/save-infos/save-infos.gen";
-import { useStorageGetActions } from '../../data/sdk/storage/storage.gen';
-import { Button } from '../../ui/button/button';
+import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
+import { ButtonLink } from '../../ui/button/button';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
+import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../../ui/button/button-with-disabled-popover';
 import { Container } from "../../ui/container/container";
 import { Icon } from '../../ui/icon/icon';
 import { SaveCardContentFull } from '../../ui/save-card/save-card-content-full';
@@ -28,9 +29,12 @@ export const SaveItem: React.FC<SaveItemProps> = ({
   showDelete,
   // showOldSaves,
 }) => {
+  const settingsQuery = useSettingsGet();
   const saveInfosQuery = useSaveInfosGetAll();
-  const stockageActionsQuery = useStorageGetActions();
+  // const stockageActionsQuery = useStorageGetActions();
   const saveInfosDeleteMutation = useSaveInfosDelete();
+
+  const settings = settingsQuery.data?.data;
 
   const downloadUrl = getApiFullUrl(getSaveInfosDownloadUrl(saveId));
 
@@ -42,7 +46,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
     return null;
   }
 
-  const hasStockageActions = stockageActionsQuery.data?.data.length !== 0;
+  // const hasStockageActions = stockageActionsQuery.data?.data.length !== 0;
 
   // const saveInfos = Object.values(saveInfosQuery.data.data);
 
@@ -50,6 +54,13 @@ export const SaveItem: React.FC<SaveItemProps> = ({
 
   const mainSave = saveInfosQuery.data.data[ saveId ];
   // const backupSaves = saves.filter(save => save.isBackup);
+
+  const commonBtnProps: Omit<ButtonWithDisabledPopoverProps<'button'>, 'as'> = {
+    disabled: !settings?.canDeleteSaves,
+    showHelp: !settings?.canDeleteSaves,
+    anchor: 'right start',
+    helpTitle: 'Action not possible with waiting storage actions',
+  };
 
   return (
     <Container
@@ -82,22 +93,20 @@ export const SaveItem: React.FC<SaveItemProps> = ({
         dexCaughtCount={mainSave.dexCaughtCount}
         ownedCount={mainSave.ownedCount}
         shinyCount={mainSave.shinyCount}
-        actions={showDelete && !hasStockageActions &&
+        actions={showDelete &&
           <>
-            <Button<'a'> as='a' href={downloadUrl}>
+            <ButtonWithDisabledPopover as={ButtonLink} to={downloadUrl} {...commonBtnProps}>
               <Icon name='download' forButton />
-            </Button>
+            </ButtonWithDisabledPopover>
 
-            {mainSave.canDelete && <>
-              <ButtonWithConfirm onClick={() =>
-                saveInfosDeleteMutation.mutateAsync({
-                  params: {
-                    saveId: mainSave.id,
-                  },
-                })} bgColor={theme.bg.red}>
-                <Icon name='trash' solid forButton />
-              </ButtonWithConfirm>
-            </>}
+            <ButtonWithDisabledPopover as={ButtonWithConfirm} onClick={() =>
+              saveInfosDeleteMutation.mutateAsync({
+                params: {
+                  saveId: mainSave.id,
+                },
+              })} bgColor={theme.bg.red} {...commonBtnProps}>
+              <Icon name='trash' solid forButton />
+            </ButtonWithDisabledPopover>
           </>}
         onClose={onClose}
       />}

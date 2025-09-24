@@ -26,6 +26,17 @@ export const Backup: React.FC = () => {
 
     return <TitledContainer title={`${backupQuery.data.data.length} backups`}>
 
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 4,
+            marginBottom: 4,
+        }}>
+            <Icon name='info-circle' solid forButton />
+            Each backup contains saves & stored pkms.
+        </div>
+
         <div
             style={{
                 display: 'flex',

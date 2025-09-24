@@ -53,6 +53,7 @@ export type ContainerOwnProps = {
   selected?: boolean;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReactTag = keyof React.JSX.IntrinsicElements | React.JSXElementConstructor<any>;
 
 export type ContainerProps<
@@ -68,16 +69,16 @@ export function Container<
   children,
   ...props
 }: React.PropsWithChildren<ContainerProps<AS>>) {
-  const Component: ReactTag =
-    props.as ?? "div";
-
   const {
+    as,
     padding,
     borderRadius,
     noDropshadow,
     componentDescriptor,
     ...componentProps
   } = props;
+
+  const Component: ReactTag = as ?? "div";
 
   return (
     <Component

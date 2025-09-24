@@ -30,6 +30,7 @@ public class DetachPkmSaveAction : DataAction
         loaders.pkmLoader.WriteDto(pkm);
 
         flags.MainPkms = true;
+        flags.MainPkmVersions = true;   // when there is warnings
 
         flags.Saves.Add(new()
         {

@@ -4,8 +4,9 @@ import React from "react";
 import { BackendErrorsContext } from '../data/backend-errors-context';
 import { useSaveInfosScan } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
+import { useStorageGetActions } from '../data/sdk/storage/storage.gen';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
-import { Button } from '../ui/button/button';
+import { ButtonWithDisabledPopover } from '../ui/button/button-with-disabled-popover';
 import { Frame } from '../ui/header/frame';
 import { Header } from '../ui/header/header';
 import { HeaderItem } from "../ui/header/header-item";
@@ -17,6 +18,7 @@ const Root: React.FC = () => {
 
   const settings = useSettingsGet().data?.data;
   const warnings = useWarningsGetWarnings().data?.data;
+  const hasStorageActions = !!useStorageGetActions().data?.data.length;
   const savesScanMutation = useSaveInfosScan();
 
   const [ openNotif, setOpenNotif ] = React.useState(false);
@@ -54,7 +56,7 @@ const Root: React.FC = () => {
           )}
           to={"/storage"}
         >
-          Storage
+          Storage{hasStorageActions && '*'}
         </HeaderItem>
         <HeaderItem
           selected={Boolean(
@@ -66,16 +68,18 @@ const Root: React.FC = () => {
           Pokedex
         </HeaderItem>
 
-        <Button
+        <ButtonWithDisabledPopover
           onClick={() => savesScanMutation.mutateAsync()}
           disabled={!settings?.canScanSaves}
+          showHelp={!settings?.canScanSaves}
+          helpTitle='Action not possible with waiting storage actions'
         >
           <Icon
             name='refresh'
             forButton
           />
           Scan saves
-        </Button>
+        </ButtonWithDisabledPopover>
 
         <HeaderItem
           selected={Boolean(
@@ -88,13 +92,15 @@ const Root: React.FC = () => {
           Backups & settings
         </HeaderItem>
 
-        <Button
+        <ButtonWithDisabledPopover
           onClick={() => setOpenNotif(value => !value)}
           selected={openNotif}
           disabled={!hasErrors}
+          showHelp={!hasErrors}
+          helpTitle='No notifications'
         >
           <Icon name='bell' solid forButton />
-        </Button>
+        </ButtonWithDisabledPopover>
       </Header>
 
       <div

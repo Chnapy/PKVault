@@ -31,6 +31,7 @@ public class StaticDataController : ControllerBase
             Natures = natures,
             Abilities = abilities,
             Items = items,
+            EggSprite = StaticDataService.GetEggSprite(serverUrl)
         };
     }
 

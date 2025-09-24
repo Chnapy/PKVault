@@ -1,7 +1,7 @@
-import { css } from "@emotion/css";
 import React from "react";
 import { useStaticData } from '../../hooks/use-static-data';
 import { ButtonLike } from '../button/button-like';
+import { SpeciesImg } from '../details-card/species-img';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { theme } from "../theme";
@@ -22,11 +22,8 @@ export type DexItemProps = {
 export const DexItem: React.FC<DexItemProps> = React.memo(
   ({ species, seen, caught, owned, ownedShiny, selected, onClick }) => {
     const staticData = useStaticData();
-    const { name, spriteDefault, spriteShiny } = staticData.species[ species ];
 
     const pokeballSprite = staticData.itemPokeball.sprite;
-
-    const sprite = ownedShiny ? spriteShiny : spriteDefault;
 
     // const caughtGamesColors = [ ...new Set(caughtVersions.map(getGameInfos).map(infos => infos.img)) ];
     // const seenOnlyGamesColors = [ ...new Set(seenOnlyVersions.map(getGameInfos).map(infos => infos.img)) ];
@@ -94,18 +91,9 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
             borderRadius: 2,
           }}
         >
-          <img
-            src={sprite}
-            alt={name}
-            loading="lazy"
-            className={css({
-              imageRendering: "pixelated",
-              width: 96,
-              height: 96,
-              filter: seen ? undefined : "brightness(0) opacity(0.5)",
-              display: "block",
-            })}
-          />
+          <SpeciesImg species={species} isShiny={ownedShiny} style={{
+            filter: seen ? undefined : "brightness(0) opacity(0.5)",
+          }} />
 
           {/* <div
             style={{

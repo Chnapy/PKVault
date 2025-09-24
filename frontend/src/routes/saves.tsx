@@ -3,7 +3,11 @@ import type React from "react";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../hooks/use-static-data';
 import { SaveItem } from "../saves/save-item/save-item";
+import { ButtonLink } from '../ui/button/button';
+import { Container } from '../ui/container/container';
 import { TitledContainer } from '../ui/container/titled-container';
+import { Icon } from '../ui/icon/icon';
+import { theme } from '../ui/theme';
 
 const Saves: React.FC = () => {
   const staticData = useStaticData();
@@ -63,6 +67,18 @@ const Saves: React.FC = () => {
           </TitledContainer>;
         })}
       </div>
+
+      <Container style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+        backgroundColor: theme.bg.panel,
+        padding: '8px 16px',
+      }}>
+        <Icon name='info-circle' solid forButton />
+        Not seeing your save ?
+        <ButtonLink to={'/settings'}>Check settings</ButtonLink>
+      </Container>
     </div>
   );
 };

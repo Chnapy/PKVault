@@ -1,7 +1,7 @@
-import { css } from '@emotion/css';
 import React from "react";
 import { useStaticData } from '../../hooks/use-static-data';
 import { ButtonLike, type ButtonLikeProps } from '../button/button-like';
+import { SpeciesImg } from '../details-card/species-img';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { theme } from '../theme';
@@ -46,12 +46,6 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
 }) => {
   const staticData = useStaticData();
 
-  const sprite = isEgg
-    ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png'
-    : (isShiny
-      ? staticData.species[ species ].spriteShiny
-      : staticData.species[ species ].spriteDefault);
-
   return (
     <ButtonLike
       componentDescriptor='button'
@@ -67,17 +61,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
         ...rest.style,
       }}
     >
-      <img
-        src={sprite}
-        alt={species + ""}
-        className={css({
-          imageRendering: small ? undefined : "pixelated",
-          height: small ? 48 : 96,
-          width: small ? 48 : 96,
-          display: "block",
-          filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
-        })}
-      />
+      <SpeciesImg species={species} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} small={small} />
 
       {heldItem > 0 && <img
         src={staticData.items[ heldItem ].sprite}

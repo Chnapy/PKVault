@@ -46,7 +46,7 @@ public class SaveInfosDTO
             DaycareCount = DaycareCount,
             BoxCount = save.BoxCount,
             BoxSlotCount = save.BoxSlotCount,
-            CanDelete = true,
+            // CanDelete = true,
             // DownloadUrl = $"{serverUrl}/api/save-infos/{save.ID32}/download",
         };
     }
@@ -87,7 +87,7 @@ public class SaveInfosDTO
 
     public int BoxSlotCount { get; set; }
 
-    public bool CanDelete { get; set; }
+    // public bool CanDelete { get; set; }
 
     // public string DownloadUrl { get; set; }
 

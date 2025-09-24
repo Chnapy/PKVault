@@ -86,7 +86,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders) : DataLoader(_loaders)
         await Task.WhenAll(
                 LocalSaveService.SaveById.Values.ToList().Select(async (save) =>
                 {
-                    // TODO cleaner way
+                    // TODO find a cleaner way
                     save = save.Clone();
                     saveLoadersDict.Add(save.ID32, new()
                     {

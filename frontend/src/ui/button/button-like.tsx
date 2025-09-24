@@ -51,6 +51,7 @@ export function ButtonLike<
   return (
     <Container<'button'>
       as={as}
+      type='button'
       className={cx(
         css({
           position: 'relative',

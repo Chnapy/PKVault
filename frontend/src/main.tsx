@@ -24,6 +24,9 @@ declare module "@tanstack/react-router" {
 
 // const timedFn = () => new Promise(resolve => setTimeout(resolve, 5000));
 
+// TODO PRIOR translations en
+// TODO PRIOR loading & empty states
+// TODO PRIOR add helps & dedicated modal for help
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BackendErrorsContext.Provider>

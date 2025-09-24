@@ -60,6 +60,30 @@ public class StorageController : ControllerBase
         return await DataDTO.FromDataUpdateFlags(flags);
     }
 
+    [HttpPost("main/box")]
+    public async Task<ActionResult<DataDTO>> CreateMainBox([BindRequired] string boxName)
+    {
+        var flags = await StorageService.MainCreateBox(boxName);
+
+        return await DataDTO.FromDataUpdateFlags(flags);
+    }
+
+    [HttpPut("main/box/{boxId}")]
+    public async Task<ActionResult<DataDTO>> UpdateMainBox(string boxId, [BindRequired] string boxName)
+    {
+        var flags = await StorageService.MainUpdateBox(boxId, boxName);
+
+        return await DataDTO.FromDataUpdateFlags(flags);
+    }
+
+    [HttpDelete("main/box/{boxId}")]
+    public async Task<ActionResult<DataDTO>> DeleteMainBox(string boxId)
+    {
+        var flags = await StorageService.MainDeleteBox(boxId);
+
+        return await DataDTO.FromDataUpdateFlags(flags);
+    }
+
     [HttpPut("main/pkm/{pkmId}/detach-save")]
     public async Task<ActionResult<DataDTO>> MainPkmDetachSave(string pkmId)
     {

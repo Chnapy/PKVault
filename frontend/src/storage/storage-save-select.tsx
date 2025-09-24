@@ -3,6 +3,10 @@ import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { Route } from "../routes/storage";
 import { SaveItem } from "../saves/save-item/save-item";
 import { TitledContainer } from '../ui/container/titled-container';
+import { ButtonLink } from '../ui/button/button';
+import { Container } from '../ui/container/container';
+import { Icon } from '../ui/icon/icon';
+import { theme } from '../ui/theme';
 
 export const StorageSaveSelect: React.FC = () => {
   const saveInfosQuery = useSaveInfosGetAll();
@@ -42,6 +46,19 @@ export const StorageSaveSelect: React.FC = () => {
             }}
           />
         ))}
+
+        <Container style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 4,
+          backgroundColor: theme.bg.panel,
+          padding: '8px 16px',
+        }}>
+          <Icon name='info-circle' solid forButton />
+          Not seeing your save ?
+          <ButtonLink to={'/settings'}>Check settings</ButtonLink>
+        </Container>
       </div>
     </TitledContainer>
   );

@@ -56,6 +56,27 @@ public class StorageService
         return await saveLoaders.Pkms.GetAllDtos();
     }
 
+    public static async Task<DataUpdateFlags> MainCreateBox(string boxName)
+    {
+        return await AddAction(
+            new MainCreateBoxAction(boxName)
+        );
+    }
+
+    public static async Task<DataUpdateFlags> MainUpdateBox(string boxId, string boxName)
+    {
+        return await AddAction(
+            new MainUpdateBoxAction(boxId, boxName)
+        );
+    }
+
+    public static async Task<DataUpdateFlags> MainDeleteBox(string boxId)
+    {
+        return await AddAction(
+            new MainDeleteBoxAction(boxId)
+        );
+    }
+
     public static async Task<DataUpdateFlags> MovePkm(
         string pkmId, uint? sourceSaveId,
         uint? targetSaveId, int targetBoxId, int targetBoxSlot,
@@ -197,11 +218,11 @@ public class StorageService
 
     public static async Task<DataUpdateFlags> RemoveDataActionsAndReset(int actionIndexToRemoveFrom)
     {
-        var memoryLoader = await GetLoader();
-
-        var previousActions = memoryLoader.actions;
+        var previousActions = (await GetLoader()).actions;
 
         await ResetDataLoader();
+
+        var memoryLoader = await GetLoader();
 
         var flags = new DataUpdateFlags
         {

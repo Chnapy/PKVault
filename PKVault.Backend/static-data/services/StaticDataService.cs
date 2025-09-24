@@ -351,6 +351,11 @@ public class StaticDataService
         return dict;
     }
 
+    public static string GetEggSprite(string serverUrl)
+    {
+        return GetGHProxyUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png", serverUrl);
+    }
+
     private static MoveCategory GetMoveCategory(string damageClassName)
     {
         return damageClassName switch

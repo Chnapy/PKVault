@@ -2,8 +2,9 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import type { SettingsMutableDTO } from '../data/sdk/model/settingsMutableDTO';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
-import { Button } from '../ui/button/button';
+import { Button, ButtonLink } from '../ui/button/button';
 import { TitledContainer } from '../ui/container/titled-container';
+import { Icon } from '../ui/icon/icon';
 import { SelectStringInput } from '../ui/input/select-input';
 import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
@@ -20,7 +21,7 @@ export const Settings: React.FC = () => {
         savE_GLOBS: settingsMutable.savE_GLOBS.join('\n'),
     }), [ settingsMutable ]);
 
-    const { register, watch, setValue, reset, handleSubmit } = useForm<Omit<SettingsMutableDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
+    const { register, watch, reset, setValue, handleSubmit } = useForm<Omit<SettingsMutableDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
         defaultValues: defaultValue
     });
 
@@ -39,12 +40,23 @@ export const Settings: React.FC = () => {
 
     return <TitledContainer title={`Settings`}>
         <form
+            onSubmit={submit}
             style={{
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 8,
             }}
         >
+            {!settings.canUpdateSettings && <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+            }}>
+                <Icon name='info-circle' solid forButton />
+                You cannot change settings with waiting storage actions
+                <ButtonLink to='/storage'>Check storage</ButtonLink>
+            </div>}
             <div
                 style={{
                     display: 'flex',
@@ -60,27 +72,6 @@ export const Settings: React.FC = () => {
                         gap: 8,
                     }}
                 >
-                    <TextInput
-                        label='Config path'
-                        value={settings.settingsPath}
-                        disabled
-                    />
-
-                    <TextInput
-                        label='DB path'
-                        {...register('dB_PATH', { setValueAs: (value) => value.trim() })}
-                    />
-
-                    <TextInput
-                        label='Storage path'
-                        {...register('storagE_PATH', { setValueAs: (value) => value.trim() })}
-                    />
-
-                    <TextInput
-                        label='Backups path'
-                        {...register('backuP_PATH', { setValueAs: (value) => value.trim() })}
-                    />
-
                     <SelectStringInput
                         label='Language'
                         data={[
@@ -90,6 +81,19 @@ export const Settings: React.FC = () => {
                         {...register('language')}
                         value={watch('language')}
                         onChange={value => setValue('language', value)}
+                        disabled={!settings.canUpdateSettings}
+                    />
+
+                    <TextInput
+                        label='Database path'
+                        {...register('dB_PATH', { setValueAs: (value) => value.trim() })}
+                        disabled={!settings.canUpdateSettings}
+                    />
+
+                    <TextInput
+                        label='Backups path'
+                        {...register('backuP_PATH', { setValueAs: (value) => value.trim() })}
+                        disabled={!settings.canUpdateSettings}
                     />
                 </div>
 
@@ -98,17 +102,46 @@ export const Settings: React.FC = () => {
                         flexGrow: 1,
                         display: 'flex',
                         flexDirection: 'column',
+                        gap: 8,
                     }}
                 >
                     <TextInput
-                        label='Saves globs'
-                        area
-                        style={{
-                            minHeight: 200,
-                            height: '100%',
-                        }}
-                        {...register('savE_GLOBS')}
+                        label='Config path'
+                        value={settings.settingsPath}
+                        disabled
                     />
+
+                    <TextInput
+                        label='Storage path (PKM files)'
+                        {...register('storagE_PATH', { setValueAs: (value) => value.trim() })}
+                        disabled={!settings.canUpdateSettings}
+                    />
+                </div>
+            </div>
+
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}
+            >
+                <TextInput
+                    label='Saves files & globs'
+                    area
+                    style={{
+                        minHeight: 200,
+                        height: '100%',
+                    }}
+                    {...register('savE_GLOBS')}
+                    disabled={!settings.canUpdateSettings}
+                />
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: 4
+                }}>
+                    <Icon name='info-circle' solid forButton />
+                    List all your saves files paths, you can also use globs.
                 </div>
             </div>
 
@@ -120,12 +153,12 @@ export const Settings: React.FC = () => {
                 }}
             >
                 <Button
-                    // TODO PRIOR strange behavior + broken in winform
                     onClick={() => reset(defaultValue)}
+                    disabled={!settings.canUpdateSettings}
                     big
                 >Cancel</Button>
                 <Button
-                    onClick={submit}
+                    type='submit'
                     disabled={!settings.canUpdateSettings}
                     big
                     bgColor={theme.bg.primary}

@@ -1,9 +1,9 @@
-import { css } from '@emotion/css';
 import type React from 'react';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { theme } from '../theme';
+import { SpeciesImg } from './species-img';
 
 export type DetailsMainImgProps = {
     species: number;
@@ -17,12 +17,6 @@ export type DetailsMainImgProps = {
 export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, isShiny, isEgg, isShadow, isOwned, ball = 0 }) => {
     const staticData = useStaticData();
 
-    const sprite = isEgg
-        ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png'
-        : (isShiny
-            ? staticData.species[ species ].spriteShiny
-            : staticData.species[ species ].spriteDefault);
-
     return <>
         <div
             style={{
@@ -30,17 +24,7 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, isShiny
                 borderRadius: 8,
             }}
         >
-            <img
-                src={sprite}
-                alt={staticData.species[ species ].name}
-                className={css({
-                    imageRendering: "pixelated",
-                    width: 96,
-                    height: 96,
-                    display: "block",
-                    filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
-                })}
-            />
+            <SpeciesImg species={species} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} />
         </div>
 
         <div

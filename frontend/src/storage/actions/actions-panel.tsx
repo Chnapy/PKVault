@@ -18,9 +18,12 @@ export const ActionsPanel: React.FC = () => {
 
     const nbrSelectedActions = actionIndexToRemoveFrom === undefined ? 0 : (actions.length - actionIndexToRemoveFrom);
 
+    const expanded = actions.length > 0 ? undefined : false;
+
     return <TitledContainer
         contrasted
         enableExpand
+        expanded={expanded}
         maxHeight={400}
         title={<div
             style={{
@@ -41,6 +44,14 @@ export const ActionsPanel: React.FC = () => {
                 gap: 8,
             }}
         >
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 4
+            }}>
+                <Icon name='info-circle' solid forButton />
+                Don't forget to save your changes !
+            </div>
             <table>
                 <tbody>
                     {actions.map((action, i) => {
@@ -55,6 +66,9 @@ export const ActionsPanel: React.FC = () => {
                                 } : undefined}
                             >
                                 {switchUtil(action.type, {
+                                    [ DataActionType.MAIN_CREATE_BOX ]: 'Create box',
+                                    [ DataActionType.MAIN_UPDATE_BOX ]: 'Update box',
+                                    [ DataActionType.MAIN_DELETE_BOX ]: 'Delete box',
                                     [ DataActionType.MAIN_CREATE_PKM_VERSION ]: 'Create pkm-version',
                                     [ DataActionType.MOVE_PKM ]: 'Move pkm',
                                     [ DataActionType.DETACH_PKM_SAVE ]: 'Detach save from pkm',

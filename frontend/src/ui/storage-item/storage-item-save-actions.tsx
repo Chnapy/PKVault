@@ -8,6 +8,7 @@ import { Icon } from '../icon/icon';
 import { StorageDetailsForm } from '../storage-item-details/storage-details-form';
 import { theme } from '../theme';
 import { StorageItemSaveActionsContainer } from './storage-item-save-actions-container';
+import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popover';
 
 export const StorageItemSaveActions: React.FC = () => {
     const navigate = Route.useNavigate();
@@ -54,13 +55,23 @@ export const StorageItemSaveActions: React.FC = () => {
                 Move
             </Button>}
 
-            {moveClickable.onClickAttached && <Button onClick={moveClickable.onClickAttached}>
+            {moveClickable.onClickAttached && <ButtonWithDisabledPopover
+                onClick={moveClickable.onClickAttached}
+                showHelp
+                anchor='right start'
+                helpTitle='Move a linked copy of this pkm to the storage'
+                helpContent={
+                    'Move a copy to storage, attached to save pkm.'
+                    + '\nAn attached pkm synchronizes its data from save with stored pkm: exp, level, EVs, moves, nickname.'
+                    + '\nThis allows to use the same pkm later in another save even if it\'s not the same generation'
+                }
+            >
                 <Icon name='link' solid forButton />
                 <Icon name='logout' solid forButton />
                 Move attached
-            </Button>}
+            </ButtonWithDisabledPopover>}
 
-            {canGoToMain && attachedPkmVersion && <Button
+            {canGoToMain && attachedPkmVersion && <ButtonWithDisabledPopover
                 onClick={() => navigate({
                     search: {
                         save: selectedPkm.saveId,
@@ -72,10 +83,13 @@ export const StorageItemSaveActions: React.FC = () => {
                         },
                     }
                 })}
+                showHelp
+                anchor='right start'
+                helpTitle='An attached pkm is present in storage'
             >
                 <Icon name='link' solid forButton />
                 Go to attached pkm
-            </Button>}
+            </ButtonWithDisabledPopover>}
 
             {canSynchronize && <Button
                 bgColor={theme.bg.primary}
@@ -112,15 +126,21 @@ export const StorageItemSaveActions: React.FC = () => {
                 Evolve
             </ButtonWithConfirm>}
 
-            {canDetach && attachedPkmVersion && <ButtonWithConfirm
-                anchor='right'
+            {canDetach && attachedPkmVersion && <ButtonWithDisabledPopover
                 onClick={() => mainPkmDetachSaveMutation.mutateAsync({
                     pkmId: attachedPkmVersion.pkmId,
                 })}
+                showHelp
+                anchor='right start'
+                helpTitle='Detach save pkm from attached one in storage'
+                helpContent={
+                    'Break link between this pkm and the one in storage.'
+                    + '\nAllows to use pkm in another save, and create new versions.'
+                }
             >
                 <Icon name='link' solid forButton />
                 Detach from pkm
-            </ButtonWithConfirm>}
+            </ButtonWithDisabledPopover>}
         </div>
     </StorageItemSaveActionsContainer>;
 };

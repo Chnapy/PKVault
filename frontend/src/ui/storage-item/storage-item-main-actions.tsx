@@ -5,6 +5,7 @@ import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
+import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popover';
 import { Icon } from '../icon/icon';
 import { StorageDetailsForm } from '../storage-item-details/storage-details-form';
 import { theme } from '../theme';
@@ -72,15 +73,23 @@ export const StorageItemMainActions: React.FC = () => {
                 Move
             </Button>}
 
-            {moveClickable.onClickAttached && <Button
+            {moveClickable.onClickAttached && <ButtonWithDisabledPopover
                 onClick={moveClickable.onClickAttached}
+                showHelp
+                anchor='right start'
+                helpTitle='Move a linked copy of this pkm to the save'
+                helpContent={
+                    'Move a copy to save, attached to stored pkm.'
+                    + '\nAn attached pkm synchronizes its data from save with source stored pkm: exp, level, EVs, moves, nickname.'
+                    + '\nThis allows to use the same pkm later in another save even if it\'s not the same generation'
+                }
             >
                 <Icon name='link' solid forButton />
                 <Icon name='logout' solid forButton />
                 Move attached
-            </Button>}
+            </ButtonWithDisabledPopover>}
 
-            {canCreateVersion && <Button
+            {canCreateVersion && <ButtonWithDisabledPopover
                 bgColor={theme.bg.primary}
                 onClick={() => mainCreatePkmVersionMutation.mutateAsync({
                     params: {
@@ -88,12 +97,20 @@ export const StorageItemMainActions: React.FC = () => {
                         pkmId: selectedPkm.id,
                     },
                 })}
+                showHelp
+                anchor='right start'
+                helpTitle='Create a version of this pkm for the generation'
+                helpContent={
+                    'Create a copy compatible with save.'
+                    + '\nIt allows to use pkm which may be not-compatible with any generation.'
+                    + '\nAll versions shares same exp, level, EVs, but each one handles its own moves.'
+                }
             >
                 <Icon name='plus' solid forButton />
                 Create version for gen.{pageSave?.generation}
-            </Button>}
+            </ButtonWithDisabledPopover>}
 
-            {canGoToSave && <Button
+            {canGoToSave && <ButtonWithDisabledPopover
                 onClick={() => navigate({
                     search: {
                         save: selectedPkm.saveId,
@@ -104,10 +121,13 @@ export const StorageItemMainActions: React.FC = () => {
                         },
                     }
                 })}
+                showHelp
+                anchor='right start'
+                helpTitle='An attached version is present in a save'
             >
                 <Icon name='link' solid forButton />
                 Go to attached save
-            </Button>}
+            </ButtonWithDisabledPopover>}
 
             {canSynchronize && <Button
                 bgColor={theme.bg.primary}
@@ -142,15 +162,22 @@ export const StorageItemMainActions: React.FC = () => {
                 Evolve
             </ButtonWithConfirm>}
 
-            {canDetach && <ButtonWithConfirm
-                anchor='right'
+            {canDetach && <ButtonWithDisabledPopover
+                as={ButtonWithConfirm}
                 onClick={() => mainPkmDetachSaveMutation.mutateAsync({
                     pkmId: selectedPkm.id,
                 })}
+                showHelp
+                anchor='right start'
+                helpTitle='Detach pkm from attached one in save'
+                helpContent={
+                    'Break link between this pkm and the one in save (if exists).'
+                    + '\nAllows to use pkm in another save, and create new versions.'
+                }
             >
                 <Icon name='link' solid forButton />
                 Detach from save
-            </ButtonWithConfirm>}
+            </ButtonWithDisabledPopover>}
         </div>
     </StorageItemMainActionsContainer>;
 };
