@@ -1,4 +1,5 @@
 import React from "react";
+import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { useStaticData } from '../../hooks/use-static-data';
 import { ButtonLike, type ButtonLikeProps } from '../button/button-like';
 import { SpeciesImg } from '../details-card/species-img';
@@ -64,7 +65,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
       <SpeciesImg species={species} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} small={small} />
 
       {heldItem > 0 && <img
-        src={staticData.items[ heldItem ].sprite}
+        src={getApiFullUrl(staticData.items[ heldItem ].sprite)}
         style={{
           position: 'absolute',
           bottom: 0,

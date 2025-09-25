@@ -14,6 +14,7 @@ export const useStaticData = () => {
     };
 };
 
+// TODO cache should be removed after new release
 export const useStaticDataPersisted = () => {
     const queryKey = getStaticDataGetQueryKey();
     const query = useQuery({

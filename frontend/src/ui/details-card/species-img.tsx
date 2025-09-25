@@ -1,6 +1,7 @@
-import type React from 'react';
-import { useStaticData } from '../../hooks/use-static-data';
 import { css, cx } from '@emotion/css';
+import type React from 'react';
+import { getApiFullUrl } from '../../data/mutator/custom-instance';
+import { useStaticData } from '../../hooks/use-static-data';
 
 type SpeciesImgProps = {
     species: number;
@@ -13,11 +14,11 @@ type SpeciesImgProps = {
 export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, isShiny, isEgg, isShadow, small, ...imgProps }) => {
     const staticData = useStaticData();
 
-    const sprite = isEgg
+    const sprite = getApiFullUrl(isEgg
         ? staticData.eggSprite
         : (isShiny
             ? staticData.species[ species ].spriteShiny
-            : staticData.species[ species ].spriteDefault);
+            : staticData.species[ species ].spriteDefault));
 
     return <img
         src={sprite}

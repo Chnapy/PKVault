@@ -1,4 +1,5 @@
 import React from "react";
+import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { useStaticData } from '../../hooks/use-static-data';
 import { ButtonLike } from '../button/button-like';
 import { SpeciesImg } from '../details-card/species-img';
@@ -23,7 +24,7 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
   ({ species, seen, caught, owned, ownedShiny, selected, onClick }) => {
     const staticData = useStaticData();
 
-    const pokeballSprite = staticData.itemPokeball.sprite;
+    const pokeballSprite = getApiFullUrl(staticData.itemPokeball.sprite);
 
     // const caughtGamesColors = [ ...new Set(caughtVersions.map(getGameInfos).map(infos => infos.img)) ];
     // const seenOnlyGamesColors = [ ...new Set(seenOnlyVersions.map(getGameInfos).map(infos => infos.img)) ];
@@ -74,7 +75,7 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
 
           {caught && (
             <img
-              src={pokeballSprite!}
+              src={pokeballSprite}
               loading="lazy"
               style={{
                 height: '1lh',

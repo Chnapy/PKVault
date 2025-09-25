@@ -1,4 +1,5 @@
 import type React from 'react';
+import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import type { DexItemDTO } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Icon } from '../../ui/icon/icon';
@@ -23,7 +24,7 @@ export const PokedexCount: React.FC<PokedexCountProps> = ({ data }) => {
         gap: 4
     }}>
         <Icon name='eye' solid forButton /> <span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.isAnySeen)}</span>
-        <img src={staticData.itemPokeball.sprite} style={{
+        <img src={getApiFullUrl(staticData.itemPokeball.sprite)} style={{
             height: '1lh',
             verticalAlign: 'middle'
         }} /><span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.isCaught)}</span>

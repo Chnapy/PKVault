@@ -1,4 +1,5 @@
 import type React from 'react';
+import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
@@ -41,7 +42,7 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, isShiny
             {isOwned && <Icon name='folder' solid />}
 
             {ball > 0 && <img
-                src={staticData.items[ ball ].sprite}
+                src={getApiFullUrl(staticData.items[ ball ].sprite)}
                 style={{
                     width: 30,
                     height: 30,

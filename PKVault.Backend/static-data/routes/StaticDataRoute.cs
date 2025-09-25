@@ -9,19 +9,16 @@ public class StaticDataController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<StaticDataDTO>> Get()
     {
-        var request = HttpContext.Request;
-        var serverUrl = $"{request.Scheme}://{request.Host}";
-
         var time = LogUtil.Time("static-data process");
 
         var versions = StaticDataService.GetStaticVersions();
-        var species = StaticDataService.GetStaticSpecies(serverUrl);
+        var species = StaticDataService.GetStaticSpecies();
         var stats = StaticDataService.GetStaticStats();
         var types = StaticDataService.GetStaticTypes();
         var moves = StaticDataService.GetStaticMoves();
         var natures = StaticDataService.GetStaticNatures();
         var abilities = StaticDataService.GetStaticAbilities();
-        var items = StaticDataService.GetStaticItems(serverUrl);
+        var items = StaticDataService.GetStaticItems();
 
         var dto = new StaticDataDTO
         {
@@ -33,7 +30,7 @@ public class StaticDataController : ControllerBase
             Natures = await natures,
             Abilities = abilities,
             Items = await items,
-            EggSprite = StaticDataService.GetEggSprite(serverUrl)
+            EggSprite = StaticDataService.GetEggSprite()
         };
 
         time();

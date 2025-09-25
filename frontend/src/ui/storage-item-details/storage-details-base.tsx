@@ -1,4 +1,5 @@
 import type React from 'react';
+import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import type { PkmSaveDTO } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
@@ -93,7 +94,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
             <>
                 {!!pkm.heldItem && <TextContainer>
                     Held item <span style={{ color: theme.text.primary }}>{staticData.items[ pkm.heldItem ].name}</span> <img
-                        src={staticData.items[ pkm.heldItem ].sprite}
+                        src={getApiFullUrl(staticData.items[ pkm.heldItem ].sprite)}
                         alt={staticData.items[ pkm.heldItem ].name}
                         style={{
                             height: 24,

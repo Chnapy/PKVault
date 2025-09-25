@@ -38,7 +38,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticSpecies>> GetStaticSpecies(string serverUrl)
+    public static async Task<Dictionary<int, StaticSpecies>> GetStaticSpecies()
     {
         var time = LogUtil.Time("static-data process species");
         var speciesNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Species;
@@ -82,8 +82,8 @@ public class StaticDataService
                     Name = speciesName,
                     Generation = generation,
                     Genders = genders,
-                    SpriteDefault = GetGHProxyUrl((await pkmObjTask).Sprites.FrontDefault, serverUrl),
-                    SpriteShiny = GetGHProxyUrl((await pkmObjTask).Sprites.FrontShiny, serverUrl),
+                    SpriteDefault = GetGHProxyUrl((await pkmObjTask).Sprites.FrontDefault),
+                    SpriteShiny = GetGHProxyUrl((await pkmObjTask).Sprites.FrontShiny),
                 };
             }));
             // }
@@ -308,7 +308,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticItem>> GetStaticItems(string serverUrl)
+    public static async Task<Dictionary<int, StaticItem>> GetStaticItems()
     {
         var time = LogUtil.Time("static-data process items");
         var itemNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).itemlist;
@@ -337,7 +337,7 @@ public class StaticDataService
                 {
                     Id = itemId,
                     Name = itemName,
-                    Sprite = GetGHProxyUrl(sprite, serverUrl),
+                    Sprite = GetGHProxyUrl(sprite),
                 };
             }));
         }
@@ -351,9 +351,9 @@ public class StaticDataService
         return dict;
     }
 
-    public static string GetEggSprite(string serverUrl)
+    public static string GetEggSprite()
     {
-        return GetGHProxyUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png", serverUrl);
+        return GetGHProxyUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png");
     }
 
     private static MoveCategory GetMoveCategory(string damageClassName)
@@ -500,7 +500,7 @@ public class StaticDataService
 
     private const string GH_PREFIX = "https://raw.githubusercontent.com/";
 
-    private static string GetGHProxyUrl(string url, string serverUrl)
+    private static string GetGHProxyUrl(string url)
     {
         var path = GetGHPath(url);
         if (path == "")
@@ -508,7 +508,7 @@ public class StaticDataService
             return "";
         }
 
-        return $"{serverUrl}/api/static-data/gh-proxy/{path}";
+        return $"/api/static-data/gh-proxy/{path}";
     }
 
     private static string GetGHPath(string url)
