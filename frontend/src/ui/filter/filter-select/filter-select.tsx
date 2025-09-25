@@ -71,7 +71,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
           <ListboxOptions anchor="bottom" style={{ zIndex: 30 }}>
             <TitledContainer
               contrasted
-              title={'Box selection'}
+              title={null}
               maxHeight={300}
             // style={{ margin: 2, marginTop: 6 }}
             >

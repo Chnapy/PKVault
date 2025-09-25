@@ -22,6 +22,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
     defaultOptions: {
       queries: {
         gcTime: Infinity,
+        staleTime: Infinity,
         refetchOnMount: false,
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,

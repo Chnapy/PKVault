@@ -1,3 +1,6 @@
+using System.IO.Compression;
+using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PKVault.Backend.storage.routes;
@@ -9,6 +12,31 @@ public class StaticDataController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<StaticDataDTO>> Get()
     {
+        var tmpPath = Path.Combine(StaticDataService.TmpDirectory, "StaticData.json.gz");
+        var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+        if (System.IO.File.Exists(tmpPath))
+        {
+            try
+            {
+                using var fileStream = System.IO.File.Open(tmpPath, FileMode.Open);
+                using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
+
+                return JsonSerializer.Deserialize<StaticDataDTO>(gzipStream, jsonOptions)!;
+            }
+            // file is wrong
+            catch (JsonException)
+            {
+                System.IO.File.Delete(tmpPath);
+            }
+            // file locked by previous request
+            catch (IOException)
+            {
+                Thread.Sleep(100);
+                return await Get();
+            }
+        }
+
         var time = LogUtil.Time("static-data process");
 
         var versions = StaticDataService.GetStaticVersions();
@@ -34,6 +62,13 @@ public class StaticDataController : ControllerBase
         };
 
         time();
+
+        var jsonContent = JsonSerializer.Serialize(dto, jsonOptions);
+        using var originalFileStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonContent));
+        using var compressedFileStream = System.IO.File.Create(tmpPath);
+        using var compressionStream = new GZipStream(compressedFileStream, CompressionLevel.Optimal);
+
+        originalFileStream.CopyTo(compressionStream);
 
         return dto;
     }

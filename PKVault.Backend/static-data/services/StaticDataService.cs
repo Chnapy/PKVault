@@ -3,6 +3,8 @@ using PKHeX.Core;
 
 public class StaticDataService
 {
+    public static readonly string TmpDirectory = PrepareTmpDirectory();
+
     public static async Task<Dictionary<int, StaticVersion>> GetStaticVersions()
     {
         var time = LogUtil.Time("static-data process versions");
@@ -524,5 +526,18 @@ public class StaticDataService
     public static string GetGHUrl(string path)
     {
         return $"{GH_PREFIX}{path}";
+    }
+
+    private static string PrepareTmpDirectory()
+    {
+        var tmpRootFolder = Path.Combine(Path.GetTempPath(), "pkvault");
+        var tmpFolder = Path.Combine(tmpRootFolder, SettingsService.AppSettings.BuildID.ToString());
+
+        if (!Directory.Exists(tmpFolder))
+        {
+            Directory.CreateDirectory(tmpFolder);
+        }
+
+        return tmpFolder;
     }
 }

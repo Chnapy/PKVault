@@ -1,3 +1,4 @@
+using System.Reflection;
 using PKHeX.Core;
 
 public class SettingsDTO
@@ -5,6 +6,8 @@ public class SettingsDTO
     public const string filePath = "./config/pkvault.json";
 
     public static readonly string[] AllowedLanguages = GameLanguage.AllSupportedLanguages.ToArray();
+
+    public Guid BuildID { get => Assembly.GetExecutingAssembly().ManifestModule.ModuleVersionId; }
 
     public string SettingsPath { get => filePath; }
 
