@@ -12,27 +12,33 @@ public class StaticDataController : ControllerBase
         var request = HttpContext.Request;
         var serverUrl = $"{request.Scheme}://{request.Host}";
 
-        var versions = await StaticDataService.GetStaticVersions();
-        var species = await StaticDataService.GetStaticSpecies(serverUrl);
-        var stats = await StaticDataService.GetStaticStats();
-        var types = StaticDataService.GetStaticTypes();
-        var moves = await StaticDataService.GetStaticMoves();
-        var natures = await StaticDataService.GetStaticNatures();
-        var abilities = StaticDataService.GetStaticAbilities();
-        var items = await StaticDataService.GetStaticItems(serverUrl);
+        var time = LogUtil.Time("static-data process");
 
-        return new StaticDataDTO
+        var versions = StaticDataService.GetStaticVersions();
+        var species = StaticDataService.GetStaticSpecies(serverUrl);
+        var stats = StaticDataService.GetStaticStats();
+        var types = StaticDataService.GetStaticTypes();
+        var moves = StaticDataService.GetStaticMoves();
+        var natures = StaticDataService.GetStaticNatures();
+        var abilities = StaticDataService.GetStaticAbilities();
+        var items = StaticDataService.GetStaticItems(serverUrl);
+
+        var dto = new StaticDataDTO
         {
-            Versions = versions,
-            Species = species,
-            Stats = stats,
+            Versions = await versions,
+            Species = await species,
+            Stats = await stats,
             Types = types,
-            Moves = moves,
-            Natures = natures,
+            Moves = await moves,
+            Natures = await natures,
             Abilities = abilities,
-            Items = items,
+            Items = await items,
             EggSprite = StaticDataService.GetEggSprite(serverUrl)
         };
+
+        time();
+
+        return dto;
     }
 
     [HttpGet("gh-proxy/{*path}")]

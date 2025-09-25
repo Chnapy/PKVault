@@ -5,6 +5,7 @@ public class StaticDataService
 {
     public static async Task<Dictionary<int, StaticVersion>> GetStaticVersions()
     {
+        var time = LogUtil.Time("static-data process versions");
         List<Task<StaticVersion>> tasks = [];
         var staticVersions = new Dictionary<int, StaticVersion>();
 
@@ -28,18 +29,18 @@ public class StaticDataService
             }));
         }
 
-        var values = await Task.WhenAll(tasks);
-
         var dict = new Dictionary<int, StaticVersion>();
-        foreach (var value in values)
+        foreach (var value in await Task.WhenAll(tasks))
         {
             dict.Add((int)value.Id, value);
         }
+        time();
         return dict;
     }
 
     public static async Task<Dictionary<int, StaticSpecies>> GetStaticSpecies(string serverUrl)
     {
+        var time = LogUtil.Time("static-data process species");
         var speciesNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Species;
         List<Task<StaticSpecies>> tasks = [];
 
@@ -62,12 +63,12 @@ public class StaticDataService
             // {
             tasks.Add(Task.Run(async () =>
             {
-                var pkmObj = await PokeApi.GetPokemon(species);
-                var pkmSpeciesObj = await PokeApi.GetPokemonSpecies(species);
+                var pkmObjTask = PokeApi.GetPokemon(species);
+                var pkmSpeciesObjTask = PokeApi.GetPokemonSpecies(species);
 
-                var generation = PokeApi.GetGenerationValue(pkmSpeciesObj.Generation.Name);
+                var generation = PokeApi.GetGenerationValue((await pkmSpeciesObjTask).Generation.Name);
 
-                GenderType[] genders = pkmSpeciesObj?.GenderRate switch
+                GenderType[] genders = (await pkmSpeciesObjTask)?.GenderRate switch
                 {
                     -1 => [],
                     0 => [GenderType.MALE],
@@ -81,25 +82,25 @@ public class StaticDataService
                     Name = speciesName,
                     Generation = generation,
                     Genders = genders,
-                    SpriteDefault = GetGHProxyUrl(pkmObj.Sprites.FrontDefault, serverUrl),
-                    SpriteShiny = GetGHProxyUrl(pkmObj.Sprites.FrontShiny, serverUrl),
+                    SpriteDefault = GetGHProxyUrl((await pkmObjTask).Sprites.FrontDefault, serverUrl),
+                    SpriteShiny = GetGHProxyUrl((await pkmObjTask).Sprites.FrontShiny, serverUrl),
                 };
             }));
             // }
         }
 
-        var values = await Task.WhenAll(tasks);
-
         var dict = new Dictionary<int, StaticSpecies>();
-        foreach (var value in values)
+        foreach (var value in await Task.WhenAll(tasks))
         {
             dict.Add(value.Id, value);
         }
+        time();
         return dict;
     }
 
     public static async Task<Dictionary<int, StaticStat>> GetStaticStats()
     {
+        var time = LogUtil.Time("static-data process stats");
         List<Task<StaticStat>> tasks = [];
 
         for (var i = 1; i <= 6; i++)
@@ -117,13 +118,12 @@ public class StaticDataService
             }));
         }
 
-        var values = await Task.WhenAll(tasks);
-
         var dict = new Dictionary<int, StaticStat>();
-        foreach (var value in values)
+        foreach (var value in await Task.WhenAll(tasks))
         {
             dict.Add(value.Id, value);
         }
+        time();
         return dict;
     }
 
@@ -148,6 +148,7 @@ public class StaticDataService
 
     public static async Task<Dictionary<int, StaticMove>> GetStaticMoves()
     {
+        var time = LogUtil.Time("static-data process moves");
         var moveNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Move;
         List<Task<StaticMove>> tasks = [];
 
@@ -241,18 +242,18 @@ public class StaticDataService
             }));
         }
 
-        var values = await Task.WhenAll(tasks);
-
         var dict = new Dictionary<int, StaticMove>();
-        foreach (var value in values)
+        foreach (var value in await Task.WhenAll(tasks))
         {
             dict.Add(value.Id, value);
         }
+        time();
         return dict;
     }
 
     public static async Task<Dictionary<int, StaticNature>> GetStaticNatures()
     {
+        var time = LogUtil.Time("static-data process natures");
         var naturesNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Natures;
         List<Task<StaticNature>> tasks = [];
 
@@ -279,13 +280,12 @@ public class StaticDataService
             }));
         }
 
-        var values = await Task.WhenAll(tasks);
-
         var dict = new Dictionary<int, StaticNature>();
-        foreach (var value in values)
+        foreach (var value in await Task.WhenAll(tasks))
         {
             dict.Add(value.Id, value);
         }
+        time();
         return dict;
     }
 
@@ -310,6 +310,7 @@ public class StaticDataService
 
     public static async Task<Dictionary<int, StaticItem>> GetStaticItems(string serverUrl)
     {
+        var time = LogUtil.Time("static-data process items");
         var itemNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).itemlist;
         List<Task<StaticItem>> tasks = [];
 
@@ -341,13 +342,12 @@ public class StaticDataService
             }));
         }
 
-        var values = await Task.WhenAll(tasks);
-
         var dict = new Dictionary<int, StaticItem>();
-        foreach (var value in values)
+        foreach (var value in await Task.WhenAll(tasks))
         {
             dict.Add(value.Id, value);
         }
+        time();
         return dict;
     }
 

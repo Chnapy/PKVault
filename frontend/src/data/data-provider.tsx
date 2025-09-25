@@ -21,7 +21,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
   const [ client ] = React.useState(() => new QueryClient({
     defaultOptions: {
       queries: {
+        gcTime: Infinity,
         refetchOnMount: false,
+        refetchOnReconnect: false,
+        refetchOnWindowFocus: false,
       },
       mutations: {
         onSettled: async (data) => {

@@ -1,14 +1,14 @@
 import { useBackupGetAll } from '../data/sdk/backup/backup.gen';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
-import { useStaticDataGet } from '../data/sdk/static-data/static-data.gen';
 import { useStorageGetMainBoxes, useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../data/sdk/storage/storage.gen';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
+import { useStaticDataPersisted } from '../hooks/use-static-data';
 import { Splash } from '../ui/splash/splash';
 
 export const SplashData: React.FC<React.PropsWithChildren> = ({ children }) => {
     const queries = [
-        useStaticDataGet(),
+        useStaticDataPersisted(),
         useSettingsGet(),
         useWarningsGetWarnings(),
         useBackupGetAll(),
@@ -16,7 +16,7 @@ export const SplashData: React.FC<React.PropsWithChildren> = ({ children }) => {
         useStorageGetMainBoxes(),
         useStorageGetMainPkms(),
         useStorageGetMainPkmVersions(),
-    ];
+    ] as const;
 
     const isLoading = queries.some(query => query.isLoading || !query.data);
 
