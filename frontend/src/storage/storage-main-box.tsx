@@ -1,11 +1,14 @@
 import React from "react";
 import type { PkmDTO } from "../data/sdk/model";
 import {
+  useStorageDeleteMainBox,
   useStorageGetMainBoxes,
   useStorageGetMainPkms
 } from "../data/sdk/storage/storage.gen";
 import { Route } from "../routes/storage";
 import { Button } from "../ui/button/button";
+import { ButtonWithConfirm } from '../ui/button/button-with-confirm';
+import { ButtonWithDisabledPopover } from '../ui/button/button-with-disabled-popover';
 import { ButtonWithPopover } from '../ui/button/button-with-popover';
 import { Icon } from '../ui/icon/icon';
 import { SelectStringInput, type DataOption } from '../ui/input/select-input';
@@ -26,6 +29,8 @@ export const StorageMainBox: React.FC = () => {
 
   const boxesQuery = useStorageGetMainBoxes();
   const pkmsQuery = useStorageGetMainPkms();
+
+  const boxDeleteMutation = useStorageDeleteMainBox();
 
   const boxes = boxesQuery.data?.data ?? [];
   const pkms = pkmsQuery.data?.data ?? [];
@@ -79,6 +84,7 @@ export const StorageMainBox: React.FC = () => {
           <div
             style={{
               flex: 1,
+              flexGrow: 2,
               display: 'flex',
               justifyContent: 'center',
               gap: 4,
@@ -120,6 +126,16 @@ export const StorageMainBox: React.FC = () => {
             >
               <Icon name='plus' forButton />
             </ButtonWithPopover>
+
+            <ButtonWithDisabledPopover
+              as={ButtonWithConfirm}
+              onClick={() => boxDeleteMutation.mutateAsync({ boxId: selectedBox.id })}
+              disabled={boxes.length <= 1 || boxPkmsList.length > 0}
+              showHelp={boxPkmsList.length > 0}
+              helpTitle='Box should be empty before delete it'
+            >
+              <Icon name='trash' solid forButton />
+            </ButtonWithDisabledPopover>
 
             <Button
               triggerOnHover={isMoveDragging}

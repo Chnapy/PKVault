@@ -77,8 +77,8 @@ public class WarningsService
 
         var loader = await StorageService.GetLoader();
 
-        var pkms = await loader.loaders.pkmLoader.GetAllDtos();
         var pkmVersionsTask = loader.loaders.pkmVersionLoader.GetAllDtos();
+        var pkms = await loader.loaders.pkmLoader.GetAllDtos();
 
         var tasks = pkms.Select<PkmDTO, Task<PkmVersionWarning?>>(async pkm =>
         {

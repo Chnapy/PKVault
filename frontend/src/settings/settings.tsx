@@ -38,7 +38,13 @@ export const Settings: React.FC = () => {
         });
     });
 
-    return <TitledContainer title={`Settings`}>
+    return <TitledContainer title={<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        Settings
+
+        <div style={{ marginLeft: 'auto' }}>
+            Build ID = {settings?.buildID}
+        </div>
+    </div>}>
         <form
             onSubmit={submit}
             style={{
@@ -47,6 +53,16 @@ export const Settings: React.FC = () => {
                 gap: 8,
             }}
         >
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 4
+            }}>
+                <Icon name='info-circle' solid forButton />
+                All relative paths are based from app directory:
+                <br />{settings.appDirectory}
+            </div>
+
             {!settings.canUpdateSettings && <div style={{
                 display: 'flex',
                 alignItems: 'center',

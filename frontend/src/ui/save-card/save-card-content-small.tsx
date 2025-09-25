@@ -43,7 +43,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
       style={{
         display: "flex",
         borderRadius: 8,
-        background: theme.bg.info,
+        background: theme.bg.blue,
         alignItems: "flex-start",
         textAlign: 'left',
         overflow: 'hidden',
@@ -78,7 +78,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
         }}
       >
         <TextContainer noWrap>
-          <span style={{ color: theme.text.contrast }}>Gen {generation}</span>
+          <span style={{ color: theme.text.red }}>Gen {generation}</span>
           {" - "}
           <span style={{ color: theme.text.primary }}>
             Pokemon {staticData.versions[ version ].name}
@@ -92,7 +92,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
           <br />
           Last sync <span style={{ color: theme.text.primary }}>{renderTimestamp()}</span>{" "}
           {Date.now() - date.getMilliseconds() < 3_600_000 && (
-            <span style={{ color: theme.text.contrast }}>NEW !</span>
+            <span style={{ color: theme.text.red }}>NEW !</span>
           )}
         </TextContainer>
       </div>

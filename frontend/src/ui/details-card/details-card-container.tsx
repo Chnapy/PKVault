@@ -72,7 +72,7 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                     flexDirection: 'column',
                     gap: 4,
                     borderRadius: 8,
-                    background: theme.bg.info,
+                    background: theme.bg.blue,
                 }}
             >
                 <div style={{

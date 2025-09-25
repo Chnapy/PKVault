@@ -2,7 +2,6 @@ export const theme = {
   bg: {
     default: "#FFFFFF",
     dark: "#393B43",
-    info: "#418EC0",  // TODO remove, use blue instead
     filter: "#FFBD18",
 
     darker: "#101821",
@@ -22,8 +21,6 @@ export const theme = {
     default: "#101821",
     light: "#FFFFFF",
     primary: "#3050C8",
-    contrast: "#F43F46",  // TODO use red instead
-    heading: "#F8F0E0", // TODO remove
 
     red: "#F43F46",
   },
@@ -31,7 +28,7 @@ export const theme = {
     default: "#96979B",
     contrast: "#934E3D",
     focus: "#F43F46",
-    lines: "#E5E6E7", // TODO not really a border
+    lines: "#E5E6E7",
   },
   game: {
     blue: "#2446A1",

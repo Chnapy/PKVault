@@ -183,6 +183,7 @@ export const StorageMoveContext = {
                 : element,
         };
     },
+    // TODO display message when a move is not possible
     useDroppable: (dropStorageType: 'main' | 'save', dropBoxId: number, dropBoxSlot: number, pkmId?: string) => {
         const { selected, setSelected } = StorageMoveContext.useValue();
 

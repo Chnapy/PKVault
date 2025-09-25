@@ -11,7 +11,7 @@ export type TextContainerProps = {
 
 export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>> = ({
   noWrap,
-  bgColor = theme.bg.info,
+  bgColor = theme.bg.blue,
   maxHeight,
   children,
   ...rest

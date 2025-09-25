@@ -38,6 +38,8 @@ public class Program
 
         LogUtil.Initialize();
 
+        Console.WriteLine($"PKVault start, buildID = {SettingsService.AppSettings.BuildID}");
+
         if (args.Length > 0 && args[0] == "test-PB7")
         {
             await LocalSaveService.ReadLocalSaves();
