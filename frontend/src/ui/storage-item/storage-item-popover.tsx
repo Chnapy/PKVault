@@ -8,6 +8,7 @@ import { StorageItemMainActionsContainer } from './storage-item-main-actions-con
 import { StorageItemPlaceholder } from './storage-item-placeholder';
 import { StorageItemSaveActions } from './storage-item-save-actions';
 import { StorageItemSaveActionsContainer } from './storage-item-save-actions-container';
+import type { ButtonWithDisabledPopoverProps } from '../button/button-with-disabled-popover';
 
 export type StorageItemPopoverProps = {
     storageType: "main" | "save";
@@ -16,7 +17,7 @@ export type StorageItemPopoverProps = {
     boxId: number;
     boxSlot: number;
 
-    children: (props: ButtonLikeProps) => React.ReactNode;
+    children: (props: ButtonLikeProps & Pick<ButtonWithDisabledPopoverProps<never>, 'anchor' | 'helpTitle'>) => React.ReactNode;
 };
 
 export const StorageItemPopover: React.FC<StorageItemPopoverProps> = ({
@@ -67,6 +68,8 @@ export const StorageItemPopover: React.FC<StorageItemPopoverProps> = ({
                 selected,
                 loading: moveLoading,
                 disabled,
+                anchor: 'top',
+                helpTitle: moveDroppable.helpText,
             })}
 
             {(selected || hover) && <PopoverPanel

@@ -56,6 +56,7 @@ export const StorageItemSaveActions: React.FC = () => {
             </Button>}
 
             {moveClickable.onClickAttached && <ButtonWithDisabledPopover
+                as={Button}
                 onClick={moveClickable.onClickAttached}
                 showHelp
                 anchor='right start'
@@ -72,6 +73,7 @@ export const StorageItemSaveActions: React.FC = () => {
             </ButtonWithDisabledPopover>}
 
             {canGoToMain && attachedPkmVersion && <ButtonWithDisabledPopover
+                as={Button}
                 onClick={() => navigate({
                     search: {
                         save: selectedPkm.saveId,
@@ -115,18 +117,34 @@ export const StorageItemSaveActions: React.FC = () => {
             {canEvolve && <ButtonWithConfirm
                 anchor='right'
                 bgColor={theme.bg.primary}
-                onClick={() => evolvePkmMutation.mutateAsync({
-                    id: selectedPkm.id,
-                    params: {
-                        saveId: selectedPkm.saveId,
-                    },
-                })}
+                onClick={async () => {
+                    const mutateResult = await evolvePkmMutation.mutateAsync({
+                        id: selectedPkm.id,
+                        params: {
+                            saveId: selectedPkm.saveId,
+                        },
+                    });
+                    const newId = mutateResult.data.saves
+                        ?.find(save => save.saveId === saveId)?.savePkms
+                        ?.find(pkm => pkm.box === selectedPkm.box && pkm.boxSlot === selectedPkm.boxSlot)?.id;
+                    if (newId) {
+                        navigate({
+                            search: {
+                                selected: {
+                                    id: newId,
+                                    type: 'save',
+                                }
+                            }
+                        });
+                    }
+                }}
             >
                 <Icon name='sparkles' solid forButton />
                 Evolve
             </ButtonWithConfirm>}
 
             {canDetach && attachedPkmVersion && <ButtonWithDisabledPopover
+                as={Button}
                 onClick={() => mainPkmDetachSaveMutation.mutateAsync({
                     pkmId: attachedPkmVersion.pkmId,
                 })}

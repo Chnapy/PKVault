@@ -3,15 +3,17 @@ import { Popover, PopoverButton, PopoverPanel, type PopoverButtonProps, type Pop
 import React from 'react';
 import type { ReactTag } from '../container/container';
 import { TitledContainer } from '../container/titled-container';
-import { Button, type ButtonProps } from './button';
+import { type ButtonProps } from './button';
+import { ButtonLike } from './button-like';
 
 export type ButtonWithDisabledPopoverProps<AS extends ReactTag> = ButtonProps<AS> & Pick<PopoverPanelProps, 'anchor'> & {
+    rootStyle?: React.CSSProperties;
     showHelp: boolean;
     helpTitle: React.ReactNode;
     helpContent?: React.ReactNode;
 };
 
-export const ButtonWithDisabledPopover = <AS extends ReactTag>({ anchor = 'bottom', showHelp, helpTitle, helpContent, ...btnProps }: ButtonWithDisabledPopoverProps<AS>) => {
+export const ButtonWithDisabledPopover = <AS extends ReactTag>({ rootStyle, anchor = 'bottom', showHelp, helpTitle, helpContent, ...btnProps }: ButtonWithDisabledPopoverProps<AS>) => {
     const [ hover, setHover ] = React.useState(false);
 
     return <Popover
@@ -19,10 +21,11 @@ export const ButtonWithDisabledPopover = <AS extends ReactTag>({ anchor = 'botto
             display: 'flex',
             flexDirection: 'column',
         })}
+        style={rootStyle}
         onPointerEnter={() => setHover(true)}
         onPointerLeave={() => setHover(false)}
     >
-        <PopoverButton {...btnProps as PopoverButtonProps} as={btnProps.as as PopoverButtonProps[ 'as' ] ?? Button} />
+        <PopoverButton {...btnProps as PopoverButtonProps} as={btnProps.as as PopoverButtonProps[ 'as' ] ?? ButtonLike} />
 
         {showHelp && hover && <PopoverPanel
             static

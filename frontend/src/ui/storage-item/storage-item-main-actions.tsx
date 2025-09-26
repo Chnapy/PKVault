@@ -74,6 +74,7 @@ export const StorageItemMainActions: React.FC = () => {
             </Button>}
 
             {moveClickable.onClickAttached && <ButtonWithDisabledPopover
+                as={Button}
                 onClick={moveClickable.onClickAttached}
                 showHelp
                 anchor='right start'
@@ -90,6 +91,7 @@ export const StorageItemMainActions: React.FC = () => {
             </ButtonWithDisabledPopover>}
 
             {canCreateVersion && <ButtonWithDisabledPopover
+                as={Button}
                 bgColor={theme.bg.primary}
                 onClick={() => mainCreatePkmVersionMutation.mutateAsync({
                     params: {
@@ -111,6 +113,7 @@ export const StorageItemMainActions: React.FC = () => {
             </ButtonWithDisabledPopover>}
 
             {canGoToSave && <ButtonWithDisabledPopover
+                as={Button}
                 onClick={() => navigate({
                     search: {
                         save: selectedPkm.saveId,
@@ -153,10 +156,24 @@ export const StorageItemMainActions: React.FC = () => {
             {canEvolve && <ButtonWithConfirm
                 anchor='right'
                 bgColor={theme.bg.primary}
-                onClick={() => evolvePkmMutation.mutateAsync({
-                    id: pkmVersionCanEvolve.id,
-                    params: {},
-                })}
+                onClick={async () => {
+                    const mutateResult = await evolvePkmMutation.mutateAsync({
+                        id: pkmVersionCanEvolve.id,
+                        params: {},
+                    });
+                    const newId = mutateResult.data.mainPkms
+                        ?.find(pkm => pkm.boxId === selectedPkm.boxId && pkm.boxSlot === selectedPkm.boxSlot)?.id;
+                    if (newId) {
+                        navigate({
+                            search: {
+                                selected: {
+                                    id: newId,
+                                    type: 'main',
+                                }
+                            }
+                        });
+                    }
+                }}
             >
                 <Icon name='sparkles' solid forButton />
                 Evolve

@@ -63,16 +63,6 @@ export const Settings: React.FC = () => {
                 <br />{settings.appDirectory}
             </div>
 
-            {!settings.canUpdateSettings && <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 4,
-            }}>
-                <Icon name='info-circle' solid forButton />
-                You cannot change settings with waiting storage actions
-                <ButtonLink to='/storage'>Check storage</ButtonLink>
-            </div>}
             <div
                 style={{
                     display: 'flex',
@@ -180,6 +170,17 @@ export const Settings: React.FC = () => {
                     bgColor={theme.bg.primary}
                 >Submit</Button>
             </div>
+
+            {!settings.canUpdateSettings && <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+            }}>
+                <Icon name='info-circle' solid forButton />
+                You cannot change settings with waiting storage actions
+                <ButtonLink to='/storage'>Check storage</ButtonLink>
+            </div>}
         </form>
     </TitledContainer>;
 };

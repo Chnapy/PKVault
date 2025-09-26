@@ -5,7 +5,7 @@ import { Route } from '../routes/storage';
 import type { ButtonLikeProps } from '../ui/button/button-like';
 import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
 
-type StorageSaveItemBaseProps = ButtonLikeProps & Pick<StorageItemProps, 'small'> & {
+type StorageSaveItemBaseProps = ButtonLikeProps & Pick<StorageItemProps, 'anchor' | 'helpTitle' | 'small'> & {
     saveId: number;
     pkmId: string;
 };

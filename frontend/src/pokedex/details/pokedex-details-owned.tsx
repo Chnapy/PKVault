@@ -26,6 +26,7 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
                         key={pkm.id}
                         saveId={pkm.saveId}
                         pkmId={pkm.id}
+                        helpTitle={null}
                         small
                     />
                 )}

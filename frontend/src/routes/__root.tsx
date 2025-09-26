@@ -12,6 +12,7 @@ import { Header } from '../ui/header/header';
 import { HeaderItem } from "../ui/header/header-item";
 import { Icon } from '../ui/icon/icon';
 import { NotificationCard } from '../ui/notification-card/notification-card';
+import { Button } from '../ui/button/button';
 
 const Root: React.FC = () => {
   const matchRoute = useMatchRoute();
@@ -69,6 +70,7 @@ const Root: React.FC = () => {
         </HeaderItem>
 
         <ButtonWithDisabledPopover
+          as={Button}
           onClick={() => savesScanMutation.mutateAsync()}
           disabled={!settings?.canScanSaves}
           showHelp={!settings?.canScanSaves}
@@ -93,6 +95,7 @@ const Root: React.FC = () => {
         </HeaderItem>
 
         <ButtonWithDisabledPopover
+          as={Button}
           onClick={() => setOpenNotif(value => !value)}
           selected={openNotif}
           disabled={!hasErrors}

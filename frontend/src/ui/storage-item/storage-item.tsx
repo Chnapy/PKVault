@@ -1,30 +1,34 @@
 import React from "react";
 import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { useStaticData } from '../../hooks/use-static-data';
-import { ButtonLike, type ButtonLikeProps } from '../button/button-like';
+import { type ButtonLikeProps } from '../button/button-like';
+import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../button/button-with-disabled-popover';
 import { SpeciesImg } from '../details-card/species-img';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { theme } from '../theme';
 
-export type StorageItemProps = ButtonLikeProps & {
-  species: number;
-  isEgg: boolean;
-  isShiny: boolean;
-  isShadow: boolean;
-  heldItem?: number;
-  warning?: boolean;
-  level?: number;
-  nbrVersions?: number;
-  small?: boolean;
+export type StorageItemProps =
+  & ButtonLikeProps
+  & Pick<ButtonWithDisabledPopoverProps<never>, 'anchor' | 'helpTitle'>
+  & {
+    species: number;
+    isEgg: boolean;
+    isShiny: boolean;
+    isShadow: boolean;
+    heldItem?: number;
+    warning?: boolean;
+    level?: number;
+    nbrVersions?: number;
+    small?: boolean;
 
-  // actions
-  canCreateVersion?: boolean;
-  canMoveOutside?: boolean;
-  canEvolve?: boolean;
-  attached?: boolean;
-  needSynchronize?: boolean;
-};
+    // actions
+    canCreateVersion?: boolean;
+    canMoveOutside?: boolean;
+    canEvolve?: boolean;
+    attached?: boolean;
+    needSynchronize?: boolean;
+  };
 
 export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   species,
@@ -35,6 +39,8 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   warning,
   level,
   nbrVersions = 1,
+  anchor,
+  helpTitle,
   small,
 
   canCreateVersion,
@@ -48,7 +54,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   const staticData = useStaticData();
 
   return (
-    <ButtonLike
+    <ButtonWithDisabledPopover
       componentDescriptor='button'
       {...rest}
       noDropshadow={!rest.onClick}
@@ -61,6 +67,9 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
         overflow: 'hidden',
         ...rest.style,
       }}
+      anchor={anchor}
+      showHelp={!!helpTitle}
+      helpTitle={helpTitle}
     >
       <SpeciesImg species={species} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} small={small} />
 
@@ -165,6 +174,6 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
           <Icon name='exclaimation' forButton />
         </div>}
       </div>
-    </ButtonLike>
+    </ButtonWithDisabledPopover>
   );
 });

@@ -183,7 +183,6 @@ export const StorageMoveContext = {
                 : element,
         };
     },
-    // TODO display message when a move is not possible
     useDroppable: (dropStorageType: 'main' | 'save', dropBoxId: number, dropBoxSlot: number, pkmId?: string) => {
         const { selected, setSelected } = StorageMoveContext.useValue();
 
@@ -206,17 +205,22 @@ export const StorageMoveContext = {
         //     console.log(pkmId, selected, selected?.id === pkmId, dropStorageType, dropBoxId, dropBoxSlot)
         // }
 
-        const getCanClick = (): boolean => {
+        type ClickInfos = {
+            enable: boolean;
+            helpText?: string;
+        };
+
+        const getCanClick = (): ClickInfos => {
             if (!isDragging) {
-                return false;
+                return { enable: false };
             }
 
             if (selected.id === pkmId) {
-                return false;
+                return { enable: false };
             }
 
             if (selected.attached && pkmId) {
-                return false;
+                return { enable: false, helpText: 'Move attached should target empty slot' };
             }
 
             const save = saveId ? saveInfosQuery.data?.data[ saveId ] : undefined;
@@ -230,6 +234,8 @@ export const StorageMoveContext = {
             const sourcePkmMain = selected?.storageType === 'main' ? mainPkmsQuery.data?.data.find(pkm => pkm.id === selected.id) : undefined;
             const sourcePkmSave = selected?.storageType === 'save' ? savePkmsQuery.data?.data.find(pkm => pkm.id === selected.id) : undefined;
 
+            const getPkmNickname = (id: string) => mainPkmVersionsQuery.data?.data.find(pkm => pkm.pkmId === id)?.nickname;
+
             // if (pkmId === "G30132C33359DD17 25 28 27 11 1200") {
             //     console.log('TEST', { targetBoxMain, targetBoxSave, targetPkmMain, targetPkmSave, sourcePkmMain, sourcePkmSave })
             // }
@@ -238,78 +244,108 @@ export const StorageMoveContext = {
                 targetBoxMain?: BoxDTO, targetBoxSave?: BoxDTO,
                 targetPkmMain?: PkmDTO, targetPkmSave?: PkmSaveDTO,
                 sourcePkmMain?: PkmDTO, sourcePkmSave?: PkmSaveDTO,
-            ): boolean => {
-                let canClick = true;
+            ): ClickInfos => {
 
                 // * -> box save
                 if (targetBoxSave) {
-                    canClick &&= targetBoxSave.canReceivePkm;
+                    // canClick &&= targetBoxSave.canReceivePkm;
+                    if (!targetBoxSave.canReceivePkm) {
+                        return { enable: false, helpText: `Box ${targetBoxSave.name} cannot receive pkm` };
+                    }
                 }
 
                 // * -> box main
                 if (targetBoxMain) {
-                    canClick &&= targetBoxMain.canReceivePkm;
+                    // canClick &&= targetBoxMain.canReceivePkm;
+                    if (!targetBoxMain.canReceivePkm) {
+                        return { enable: false, helpText: `Box ${targetBoxMain.name} cannot receive pkm` };
+                    }
                 }
 
                 // pkm main -> main
                 if (sourcePkmMain && (targetBoxMain || targetPkmMain)) {
-                    canClick &&= !selected.attached;
+                    // canClick &&= !selected.attached;
+                    if (selected.attached) {
+                        return { enable: false, helpText: 'Move attached should target a save' };
+                    }
                 }
 
                 // pkm save -> save
                 else if (sourcePkmSave && (targetBoxSave || targetPkmSave)) {
-                    canClick &&= !selected.attached;
+                    // canClick &&= !selected.attached;
+                    if (selected.attached) {
+                        return { enable: false, helpText: 'Move attached should target main storage' };
+                    }
+
                     if (targetPkmSave) {
-                        canClick &&= targetPkmSave.generation === sourcePkmSave.generation;
-                        canClick &&= targetPkmSave.canMove;
+                        // canClick &&= targetPkmSave.generation === sourcePkmSave.generation;
+                        // canClick &&= targetPkmSave.canMove;
+                        if (targetPkmSave.generation !== sourcePkmSave.generation) {
+                            return { enable: false, helpText: `Move should target saves with same generation ${sourcePkmSave.generation}` };
+                        }
+                        if (!targetPkmSave.canMove) {
+                            return { enable: false, helpText: `Pkm ${targetPkmSave.nickname} cannot be moved` };
+                        }
                     }
                     // console.log(targetPkmSave.generation, sourcePkmSave.generation, targetPkmSave.canMove)
                 }
 
                 // pkm main -> save
                 else if (sourcePkmMain && (targetBoxSave || targetPkmSave)) {
-                    canClick &&= selected.attached ? sourcePkmMain.canMoveToSave : sourcePkmMain.canMoveAttachedToSave;
+                    // canClick &&= selected.attached ? sourcePkmMain.canMoveToSave : sourcePkmMain.canMoveAttachedToSave;
+                    if (!(selected.attached ? sourcePkmMain.canMoveToSave : sourcePkmMain.canMoveAttachedToSave)) {
+                        return { enable: false, helpText: `Pkm ${getPkmNickname(sourcePkmMain.id)} cannot be ${selected.attached ? 'moved' : 'moved attached'} to save${sourcePkmMain.saveId ? ", he's already attached !" : ''}` };
+                    }
 
                     const relatedPkmVersions = mainPkmVersionsQuery.data?.data.filter(version => version.pkmId === sourcePkmMain.id) ?? [];
-                    canClick &&= !!save && relatedPkmVersions.some(version => version.generation === save.generation);
+                    // canClick &&= !!save && relatedPkmVersions.some(version => version.generation === save.generation);
+                    if (!save || !relatedPkmVersions.some(version => version.generation === save.generation)) {
+                        return { enable: false, helpText: `Pkm ${getPkmNickname(sourcePkmMain.id)} does not have pkm version for generation ${save?.generation}, create one before moving to save` };
+                    }
 
                     if (!selected.attached) {
-                        canClick &&= relatedPkmVersions.length === 1;
+                        // canClick &&= relatedPkmVersions.length === 1;
+                        if (relatedPkmVersions.length > 1) {
+                            return { enable: false, helpText: `Pkm ${getPkmNickname(sourcePkmMain.id)} cannot be moved with multiple versions to a save. Use "move attached", or remove all versions except one` };
+                        }
                     }
                 }
 
                 // pkm save -> main
                 else if (sourcePkmSave && (targetBoxMain || targetPkmMain)) {
-                    canClick &&= selected.attached ? sourcePkmSave.canMoveToMain : sourcePkmSave.canMoveAttachedToMain;
+                    // canClick &&= selected.attached ? sourcePkmSave.canMoveToMain : sourcePkmSave.canMoveAttachedToMain;
+                    if (!(selected.attached ? sourcePkmSave.canMoveToMain : sourcePkmSave.canMoveAttachedToMain)) {
+                        return { enable: false, helpText: `Pkm ${getPkmNickname(sourcePkmSave.id)} cannot be ${selected.attached ? 'moved' : 'moved attached'} from save` };
+                    }
                 }
 
                 if (targetBoxMain || targetBoxSave) {
                     if (targetPkmMain && sourcePkmMain) {
-                        canClick &&= checkBetweenSlot(
+                        return checkBetweenSlot(
                             undefined, undefined,
                             sourcePkmMain, undefined,
                             targetPkmMain, undefined,
                         );
                     }
 
-                    else if (targetPkmSave && sourcePkmSave) {
-                        canClick &&= checkBetweenSlot(
+                    if (targetPkmSave && sourcePkmSave) {
+                        return checkBetweenSlot(
                             undefined, undefined,
                             undefined, sourcePkmSave,
                             undefined, targetPkmSave,
                         );
                     }
 
-                    else if (targetPkmMain && sourcePkmSave) {
-                        canClick &&= checkBetweenSlot(
+                    if (targetPkmMain && sourcePkmSave) {
+                        return checkBetweenSlot(
                             undefined, undefined,
                             undefined, sourcePkmSave,
                             targetPkmMain, undefined,
                         );
                     }
 
-                    else if (targetPkmSave && sourcePkmMain) {
-                        canClick &&= checkBetweenSlot(
+                    if (targetPkmSave && sourcePkmMain) {
+                        return checkBetweenSlot(
                             undefined, undefined,
                             sourcePkmMain, undefined,
                             undefined, targetPkmSave,
@@ -317,7 +353,7 @@ export const StorageMoveContext = {
                     }
                 }
 
-                return canClick;
+                return { enable: true };
             };
 
             return checkBetweenSlot(
@@ -327,7 +363,7 @@ export const StorageMoveContext = {
             );
         };
 
-        const canClick = getCanClick();
+        const clickInfos = getCanClick();
 
         React.useEffect(() => {
             if (pkmId
@@ -377,12 +413,13 @@ export const StorageMoveContext = {
         return {
             isDragging,
             isCurrentItemDragging,
-            onClick: canClick ? (async () => {
+            onClick: clickInfos.enable ? (async () => {
                 await onDrop();
             }) : undefined,
-            onPointerUp: canClick ? (async () => {
+            onPointerUp: clickInfos.enable ? (async () => {
                 await onDrop();
             }) : undefined,
+            helpText: clickInfos.helpText,
         };
     },
 };

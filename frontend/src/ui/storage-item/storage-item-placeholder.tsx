@@ -1,14 +1,14 @@
 import { css, cx } from '@emotion/css';
 import type React from "react";
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
-import { ButtonLike } from '../button/button-like';
 import { theme } from '../theme';
+import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popover';
 
 export type StorageItemPlaceholderProps = {
   storageType: "main" | "save";
   boxId: number;
   boxSlot: number;
-  pkmId?: string; // for move loading only
+  pkmId?: string; // for move drop/loading only
 };
 
 export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
@@ -22,7 +22,7 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
   const moveLoading = StorageMoveContext.useLoading(storageType, boxId, boxSlot, pkmId);
 
   return (
-    <ButtonLike
+    <ButtonWithDisabledPopover
       className={cx(
         css({
           backgroundColor: 'transparent',//theme.bg.light,
@@ -40,7 +40,7 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
           }
         })
       )}
-      style={{
+      rootStyle={{
         order: boxSlot,
       }}
       disabled={!moveDroppable.onClick}
@@ -49,6 +49,9 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
       onPointerUp={moveDroppable.onPointerUp}
       // selected={isOver}
       noDropshadow
+      anchor='top'
+      showHelp={!!moveDroppable.helpText}
+      helpTitle={moveDroppable.helpText}
     />
   );
 };
