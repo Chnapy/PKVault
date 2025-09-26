@@ -314,6 +314,14 @@ export const StorageMoveContext = {
                 // pkm save -> main
                 else if (sourcePkmSave && (targetBoxMain || targetPkmMain)) {
                     // canClick &&= selected.attached ? sourcePkmSave.canMoveToMain : sourcePkmSave.canMoveAttachedToMain;
+                    if (sourcePkmSave.isEgg) {
+                        return { enable: false, helpText: `Eggs cannot be moved outside save` };
+                    }
+
+                    if (sourcePkmSave.isShadow) {
+                        return { enable: false, helpText: `Shadow pkm cannot be moved outside save` };
+                    }
+
                     if (!(selected.attached ? sourcePkmSave.canMoveToMain : sourcePkmSave.canMoveAttachedToMain)) {
                         return { enable: false, helpText: `Pkm ${getPkmNickname(sourcePkmSave.id)} cannot be ${selected.attached ? 'moved' : 'moved attached'} from save` };
                     }

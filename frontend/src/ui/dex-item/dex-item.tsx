@@ -92,7 +92,7 @@ export const DexItem: React.FC<DexItemProps> = React.memo(
             borderRadius: 2,
           }}
         >
-          <SpeciesImg species={species} isShiny={ownedShiny} style={{
+          <SpeciesImg species={species} form={0} isShiny={ownedShiny} style={{
             filter: seen ? undefined : "brightness(0) opacity(0.5)",
           }} />
 

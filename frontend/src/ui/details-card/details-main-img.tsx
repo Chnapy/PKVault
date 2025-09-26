@@ -8,6 +8,7 @@ import { SpeciesImg } from './species-img';
 
 export type DetailsMainImgProps = {
     species: number;
+    form: number;
     isShiny?: boolean;
     isEgg?: boolean;
     isShadow?: boolean;
@@ -15,7 +16,7 @@ export type DetailsMainImgProps = {
     ball?: number;
 };
 
-export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, isShiny, isEgg, isShadow, isOwned, ball = 0 }) => {
+export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, form, isShiny, isEgg, isShadow, isOwned, ball = 0 }) => {
     const staticData = useStaticData();
 
     return <>
@@ -25,7 +26,7 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, isShiny
                 borderRadius: 8,
             }}
         >
-            <SpeciesImg species={species} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} />
+            <SpeciesImg species={species} form={form} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} />
         </div>
 
         <div

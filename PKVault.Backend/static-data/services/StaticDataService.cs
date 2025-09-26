@@ -1,9 +1,78 @@
 
+using System.IO.Compression;
+using System.Text;
+using System.Text.Json;
 using PKHeX.Core;
 
 public class StaticDataService
 {
-    public static readonly string TmpDirectory = PrepareTmpDirectory();
+    private static readonly string TmpDirectory = PrepareTmpDirectory();
+    private static readonly string TmpStaticDataPath = Path.Combine(TmpDirectory, "StaticData.json.gz");
+    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+    public static async Task<StaticDataDTO> PrepareStaticData()
+    {
+        if (File.Exists(TmpStaticDataPath))
+        {
+            try
+            {
+                using var fileStream = File.Open(TmpStaticDataPath, FileMode.Open);
+                using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
+
+                return JsonSerializer.Deserialize<StaticDataDTO>(gzipStream, JsonOptions)!;
+            }
+            // file is wrong
+            catch (JsonException)
+            {
+                File.Delete(TmpStaticDataPath);
+            }
+            // file locked by previous request
+            catch (IOException)
+            {
+                Thread.Sleep(100);
+                return await PrepareStaticData();
+            }
+        }
+
+        var time = LogUtil.Time("static-data process");
+
+        var versions = GetStaticVersions();
+        var species = GetStaticSpecies();
+        var stats = GetStaticStats();
+        var types = GetStaticTypes();
+        var moves = GetStaticMoves();
+        var natures = GetStaticNatures();
+        var abilities = GetStaticAbilities();
+        var items = GetStaticItems();
+
+        var dto = new StaticDataDTO
+        {
+            Versions = await versions,
+            Species = await species,
+            Stats = await stats,
+            Types = types,
+            Moves = await moves,
+            Natures = await natures,
+            Abilities = abilities,
+            Items = await items,
+            EggSprite = GetEggSprite()
+        };
+
+        time();
+
+        time = LogUtil.Time($"Write cached static-data in {TmpStaticDataPath}");
+
+        var jsonContent = JsonSerializer.Serialize(dto, JsonOptions);
+        using var originalFileStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonContent));
+        using var compressedFileStream = File.Create(TmpStaticDataPath);
+        using var compressionStream = new GZipStream(compressedFileStream, CompressionLevel.Optimal);
+
+        originalFileStream.CopyTo(compressionStream);
+
+        time();
+
+        return dto;
+    }
 
     public static async Task<Dictionary<int, StaticVersion>> GetStaticVersions()
     {
@@ -78,14 +147,78 @@ public class StaticDataService
                     _ => [GenderType.MALE, GenderType.FEMALE],
                 };
 
+                // var str = GameInfo.Strings;
+                // var gendersymbols = GameInfo.GenderSymbolUnicode;
+                // var forms = FormConverter.GetFormList((ushort)species, str.types, str.forms, gendersymbols, EntityContext.Gen9);
+
+                var pkmObj = await pkmObjTask;
+
+                var forms = Task.WhenAll(pkmObj.Forms.Select(async (formUrl) =>
+                {
+                    var formObj = await PokeApi.GetPokemonForms(formUrl);
+
+                    var name = speciesName;
+
+                    try
+                    {
+                        if (formObj.Names.Count > 0)
+                        {
+                            name = PokeApi.GetNameForCurrentLanguage(formObj.Names);
+                        }
+                    }
+                    catch
+                    {
+                        // Console.WriteLine($"{formUrl.Url} - ERROR NAMES {ex}");
+                    }
+
+                    try
+                    {
+                        if (
+                            name == speciesName
+                            && formObj.FormNames.Count > 0)
+                        {
+                            name = $"{speciesName} {PokeApi.GetNameForCurrentLanguage(formObj.FormNames)}";
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"{formUrl.Url} - ERROR FORM-NAMES {ex}");
+                    }
+
+                    // if (formObj.Sprites.FrontDefault == null)
+                    // {
+                    //     Console.WriteLine($"{formUrl.Url} - SPRITE-DEFAULT NULL");
+                    // }
+
+                    // if (formObj.Sprites.FrontShiny == null)
+                    // {
+                    //     Console.WriteLine($"{formUrl.Url} - SPRITE-SHINY NULL");
+                    // }
+
+                    return new StaticSpeciesForm
+                    {
+                        Id = formObj.Id,
+                        Name = name,
+                        SpriteDefault = GetGHProxyUrl(
+                            formObj.Sprites.FrontDefault ?? pkmObj.Sprites.FrontDefault
+                        ),
+                        SpriteShiny = GetGHProxyUrl(
+                            formObj.Sprites.FrontShiny ?? pkmObj.Sprites.FrontShiny
+                        ),
+                    };
+                }));
+
+                // Console.WriteLine($"{species} - {string.Join(',', forms)}");
+
                 return new StaticSpecies
                 {
                     Id = species,
-                    Name = speciesName,
+                    // Name = speciesName,
                     Generation = generation,
                     Genders = genders,
-                    SpriteDefault = GetGHProxyUrl((await pkmObjTask).Sprites.FrontDefault),
-                    SpriteShiny = GetGHProxyUrl((await pkmObjTask).Sprites.FrontShiny),
+                    Forms = await forms,
+                    // SpriteDefault = GetGHProxyUrl((await pkmObjTask).Sprites.FrontDefault),
+                    // SpriteShiny = GetGHProxyUrl((await pkmObjTask).Sprites.FrontShiny),
                 };
             }));
             // }

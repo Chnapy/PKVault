@@ -25,7 +25,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
         return null;
     }
 
-    const { species, isShiny, isEgg, isShadow } = savePkm;
+    const { species, form, isShiny, isEgg, isShadow } = savePkm;
 
     // const attachedVersionPkm = savePkm.pkmVersionId ? allPkmVersions.find(savePkm => savePkm.pkmVersionId && pkmVersionsIds.includes(savePkm.pkmVersionId)) : undefined;
     const attachedPkmVersion = savePkm.pkmVersionId ? allPkmVersions.find(version => version.id === savePkm.pkmVersionId) : undefined;
@@ -40,6 +40,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
         <StorageItem
             {...rest}
             species={species}
+            form={form}
             isEgg={isEgg}
             isShiny={isShiny}
             isShadow={isShadow}

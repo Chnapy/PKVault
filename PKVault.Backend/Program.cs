@@ -13,9 +13,11 @@ public class Program
     {
         SetupTask ??= Task.Run(async () =>
             {
+                var staticDataTask = StaticDataService.PrepareStaticData();
                 await LocalSaveService.ReadLocalSaves();
                 await StorageService.ResetDataLoader();
                 await WarningsService.CheckWarnings();
+                await staticDataTask;
             });
 
         await SetupTask;

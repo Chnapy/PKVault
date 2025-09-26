@@ -5,6 +5,7 @@ public class PokeApi
     public static readonly List<string?> endpointNames = [
         PokeApiFileClient.GetApiEndpointString<Pokemon>(),
         PokeApiFileClient.GetApiEndpointString<PokemonSpecies>(),
+        PokeApiFileClient.GetApiEndpointString<PokemonForm>(),
         PokeApiFileClient.GetApiEndpointString<EvolutionChain>(),
         PokeApiFileClient.GetApiEndpointString<Pokedex>(),
         PokeApiFileClient.GetApiEndpointString<Nature>(),
@@ -35,6 +36,11 @@ public class PokeApi
             return null;
         }
         return await client.GetAsync(pokemonSpecies.EvolutionChain);
+    }
+
+    public static async Task<PokemonForm?> GetPokemonForms(NamedApiResource<PokemonForm> namedPokemonForm)
+    {
+        return await client.GetAsync(namedPokemonForm);
     }
 
     public static async Task<Pokemon?> GetPokemon(int species)

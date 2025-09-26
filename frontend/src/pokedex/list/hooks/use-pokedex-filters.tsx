@@ -27,7 +27,7 @@ export const usePokedexFilters = () => {
     const ownedShiny = speciesValues.some((spec) => spec.isOwnedShiny);
 
     if (filterSpeciesName) {
-      const name = staticData.species[ speciesValues[ 0 ].species ].name;
+      const name = staticData.species[ speciesValues[ 0 ].species ].forms[ 0 ].name;
 
       if (!name.toLowerCase().includes(filterSpeciesName.toLowerCase())) {
         return true;

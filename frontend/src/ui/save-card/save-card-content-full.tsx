@@ -83,12 +83,14 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                 </TextContainer>
             </div>
 
-            {onClose && <Button style={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-            }}>
-                <Icon name='times' forButton onClick={onClose} />
+            {onClose && <Button
+                onClick={onClose}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                }}>
+                <Icon name='times' forButton />
             </Button>}
         </div>
     );

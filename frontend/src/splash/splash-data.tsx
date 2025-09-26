@@ -18,7 +18,7 @@ export const SplashData: React.FC<React.PropsWithChildren> = ({ children }) => {
         useStorageGetMainPkmVersions(),
     ] as const;
 
-    const isLoading = queries.some(query => query.isLoading || !query.data);
+    const isLoading = queries.some(query => query.isLoading || query.data?.status !== 200);
 
     if (!isLoading) {
         return children;

@@ -19,7 +19,7 @@ import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
-    | 'id' | 'pid' | 'species' | 'speciesName' | 'version' | 'generation' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
+    | 'id' | 'pid' | 'species' | 'version' | 'generation' | 'form' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
     | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves' | 'availableMoves'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
@@ -38,6 +38,10 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
 
     const navigate = Route.useNavigate();
 
+    const formObj = staticData.species[ pkm.species ].forms[ pkm.form ] ?? staticData.species[ pkm.form ].forms[ 0 ];
+
+    const speciesName = formObj.name;
+
     return <DetailsCardContainer
         bgColor={getGameInfos(pkm.version).color}
         title={<StorageDetailsTitle
@@ -49,6 +53,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
         mainImg={
             <DetailsMainImg
                 species={pkm.species}
+                form={pkm.form}
                 isShiny={pkm.isShiny}
                 isEgg={pkm.isEgg}
                 isShadow={pkm.isShadow}
@@ -60,7 +65,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
                 id={pkm.id}
                 pid={pkm.pid}
                 species={pkm.species}
-                speciesName={pkm.speciesName}
+                speciesName={speciesName}
                 nickname={pkm.nickname}
                 nicknameMaxLength={pkm.nicknameMaxLength}
                 gender={pkm.gender}

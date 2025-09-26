@@ -5,20 +5,21 @@ import { useStaticData } from '../../hooks/use-static-data';
 
 type SpeciesImgProps = {
     species: number;
+    form: number;
     isShiny?: boolean;
     isEgg?: boolean;
     isShadow?: boolean;
     small?: boolean;
 } & React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
 
-export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, isShiny, isEgg, isShadow, small, ...imgProps }) => {
+export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, form, isShiny, isEgg, isShadow, small, ...imgProps }) => {
     const staticData = useStaticData();
+
+    const { spriteDefault, spriteShiny } = staticData.species[ species ].forms[ form ] ?? staticData.species[ species ].forms[ 0 ];
 
     const sprite = getApiFullUrl(isEgg
         ? staticData.eggSprite
-        : (isShiny
-            ? staticData.species[ species ].spriteShiny
-            : staticData.species[ species ].spriteDefault));
+        : (isShiny ? spriteShiny : spriteDefault));
 
     return <img
         src={sprite}

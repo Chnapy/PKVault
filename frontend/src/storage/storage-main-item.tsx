@@ -33,7 +33,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
         return null;
     }
 
-    const { species, isShiny, compatibleWithVersions } = pkmVersions[ 0 ];
+    const { species, form, isShiny, compatibleWithVersions } = pkmVersions[ 0 ];
 
     const saveHeldItem = pageSave && pkmVersions.find((version) => version.generation === pageSave.generation)?.heldItem;
     const heldItem = saveHeldItem ?? pkmVersions.find((version) => version.id === pkmId)?.heldItem;
@@ -64,6 +64,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
                 as={StorageItem}
                 {...props}
                 species={species}
+                form={form}
                 isEgg={false}
                 isShiny={isShiny}
                 isShadow={false}

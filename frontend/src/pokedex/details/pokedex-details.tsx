@@ -59,7 +59,10 @@ export const PokedexDetails: React.FC = () => {
   const owned = selectedSpeciesValue.isOwned;
   const ownedShiny = selectedSpeciesValue.isOwnedShiny;
 
-  const { name: speciesName, genders } = staticData.species[ selectedSpecies ];
+  const formObj = staticData.species[ selectedSpecies ].forms[ 0 ];
+
+  const { genders } = staticData.species[ selectedSpecies ];
+  const speciesName = formObj.name;
 
   const baseStats = selectedSpeciesValue.baseStats;
   const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);
@@ -97,6 +100,7 @@ export const PokedexDetails: React.FC = () => {
         mainImg={
           <DetailsMainImg
             species={selectedSpecies}
+            form={0}
             isOwned={owned}
             isShiny={ownedShiny}
             ball={caught ? staticData.itemPokeball.id : undefined}

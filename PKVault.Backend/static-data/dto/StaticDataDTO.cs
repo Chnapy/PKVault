@@ -27,12 +27,21 @@ public struct StaticVersion
 public struct StaticSpecies
 {
     public required int Id { get; set; }
-    public required string Name { get; set; }
+    // public required string Name { get; set; }
     public required uint Generation { get; set; }
     public required GenderType[] Genders { get; set; }
+    public required StaticSpeciesForm[] Forms { get; set; }
+    // public required string SpriteDefault { get; set; }
+    // public required string SpriteShiny { get; set; }
+    // public int[] AvailableMoves { get; set; }
+}
+
+public struct StaticSpeciesForm
+{
+    public required int Id { get; set; }
+    public required string Name { get; set; }
     public required string SpriteDefault { get; set; }
     public required string SpriteShiny { get; set; }
-    // public int[] AvailableMoves { get; set; }
 }
 
 public struct StaticStat

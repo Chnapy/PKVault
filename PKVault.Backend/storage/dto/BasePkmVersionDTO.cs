@@ -36,13 +36,21 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return Pkm.Species; }
     }
 
-    public string SpeciesName
+    public byte Form
     {
         get
         {
-            return GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Species[Pkm.Species];
+            return Pkm.Form;
         }
     }
+
+    // public string SpeciesName
+    // {
+    //     get
+    //     {
+    //         return GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Species[Pkm.Species];
+    //     }
+    // }
 
     public bool IsEgg
     {

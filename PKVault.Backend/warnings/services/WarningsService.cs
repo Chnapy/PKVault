@@ -13,7 +13,6 @@ public class WarningsService
         return WarningsDTO;
     }
 
-    // TODO perf issues
     public static async Task CheckWarnings()
     {
         var logtime = LogUtil.Time($"Warnings check");
