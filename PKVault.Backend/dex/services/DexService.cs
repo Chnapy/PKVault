@@ -12,9 +12,7 @@ public class DexService
 
         var maxSpecies = saveDict.Values.Select(save => save.Save.MaxSpeciesID).Max();
 
-        // Console.WriteLine(string.Join(',', PKHexUtils.StringsFR.Types));
-
-        // var logtime = LogUtil.Time($"Get full dex for {LocalSaveService.SaveById.Count} saves (max-species={maxSpecies})");
+        var time = LogUtil.Time($"Update Dex with {saveDict.Count} saves (max-species={maxSpecies})");
 
         Dictionary<int, Dictionary<uint, DexItemDTO>> dex = [];
         for (var i = 0; i < maxSpecies; i++)
@@ -26,7 +24,7 @@ public class DexService
             saveDict.Values.ToList().Select(save => UpdateDexWithSave(dex, save.Save))
         );
 
-        // logtime();
+        time();
 
         return dex;
     }

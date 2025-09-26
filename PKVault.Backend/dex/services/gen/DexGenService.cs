@@ -4,7 +4,7 @@ public abstract class DexGenService<Save> where Save : SaveFile
 {
     public async Task<bool> UpdateDexWithSave(Dictionary<int, Dictionary<uint, DexItemDTO>> dex, Save save)
     {
-        var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
+        // var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
 
         var pkmBySpecies = new Dictionary<ushort, List<PKM>>();
 
@@ -45,7 +45,7 @@ public abstract class DexGenService<Save> where Save : SaveFile
 
         // await Task.WhenAll(tasks);
 
-        logtime();
+        // logtime();
 
         return true;
     }

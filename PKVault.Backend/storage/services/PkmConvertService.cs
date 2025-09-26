@@ -311,8 +311,11 @@ public class PkmConvertService
 
     public static void ApplyAbilityToPkm(PKM pkm)
     {
-        bool hasPidIssue() => new LegalityAnalysis(pkm).Results.Any(result => !result.Valid && result.Identifier == CheckIdentifier.PID);
-        for (var i = 0; i < pkm.PersonalInfo.AbilityCount && hasPidIssue(); i++)
+        bool hasAbilityOrPidIssue() => new LegalityAnalysis(pkm).Results.Any(result =>
+            !result.Valid
+            && (result.Identifier == CheckIdentifier.Ability || result.Identifier == CheckIdentifier.PID)
+        );
+        for (var i = 0; i < pkm.PersonalInfo.AbilityCount && hasAbilityOrPidIssue(); i++)
         {
             pkm.RefreshAbility(i);
         }
