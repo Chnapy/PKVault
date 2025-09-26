@@ -38,6 +38,7 @@ public class SettingsController : ControllerBase
                     SaveId = 0
                 }
             ],
+            Dex = true,
             // Actions = true,
             // Warnings = true,
             SaveInfos = true,

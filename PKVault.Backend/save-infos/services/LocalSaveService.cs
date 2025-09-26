@@ -109,6 +109,7 @@ public class LocalSaveService
             SaveBoxes = true,
             SavePkms = true
         });
+        flags.Dex = true;
         flags.SaveInfos = true;
         flags.Backups = true;
         flags.Warnings = true;

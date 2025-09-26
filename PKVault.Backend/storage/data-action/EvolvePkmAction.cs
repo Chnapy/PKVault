@@ -54,6 +54,7 @@ public class EvolvePkmAction : DataAction
             SaveId = saveId,
             SavePkms = true
         });
+        flags.Dex = true;
     }
 
     private async Task ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags)

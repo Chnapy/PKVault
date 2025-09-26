@@ -63,12 +63,16 @@ public class StaticDataController : ControllerBase
 
         time();
 
+        time = LogUtil.Time($"Write cached static-data in {tmpPath}");
+
         var jsonContent = JsonSerializer.Serialize(dto, jsonOptions);
         using var originalFileStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonContent));
         using var compressedFileStream = System.IO.File.Create(tmpPath);
         using var compressionStream = new GZipStream(compressedFileStream, CompressionLevel.Optimal);
 
         originalFileStream.CopyTo(compressionStream);
+
+        time();
 
         return dto;
     }

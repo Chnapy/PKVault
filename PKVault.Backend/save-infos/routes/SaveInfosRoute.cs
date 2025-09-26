@@ -35,6 +35,7 @@ public class SaveInfosController : ControllerBase
                     SaveId = 0
                 }
             ],
+            Dex = true,
             SaveInfos = true,
             Warnings = true,
         });

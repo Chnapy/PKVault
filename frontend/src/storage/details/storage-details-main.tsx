@@ -82,8 +82,13 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
     return (
         <StorageDetailsBase
             {...pkmVersion}
-            isValid={pkmVersion.isValid}
-            validityReport={!pkmVersion.isValid ? pkmVersion.validityReport : ''}
+            isValid={pkmVersion.isValid && pkmVersion.isAttachedValid}
+            validityReport={[
+                !pkmVersion.isAttachedValid && "Pkm not found in attached save."
+                + "\nIf expected consider detach from save."
+                + "\nOtherwise check the save integrity.",
+                pkmVersion.validityReport ].filter(Boolean).join('\n---\n')
+            }
             isShadow={false}
             onRelease={pkm?.canDelete && (pkmVersion.canDelete || nbrRelatedPkmVersion === 1)
                 ? (() => mainPkmVersionDeleteMutation.mutateAsync({

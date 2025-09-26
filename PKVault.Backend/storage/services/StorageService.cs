@@ -234,6 +234,7 @@ public class StorageService
                     SaveId = 0
                 }
             ],
+            Dex = true,
             Warnings = true,
         };
 

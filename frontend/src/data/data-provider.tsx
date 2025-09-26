@@ -8,6 +8,7 @@ import { getSaveInfosGetAllQueryKey, type saveInfosGetAllResponse } from './sdk/
 import { getSettingsGetQueryKey, type settingsGetResponse } from './sdk/settings/settings.gen';
 import { getStorageGetActionsQueryKey, getStorageGetMainBoxesQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSaveBoxesQueryKey, getStorageGetSavePkmsQueryKey, type storageGetActionsResponse, type storageGetMainBoxesResponse, type storageGetMainPkmsResponse, type storageGetMainPkmVersionsResponse, type storageGetSaveBoxesResponse, type storageGetSavePkmsResponse } from './sdk/storage/storage.gen';
 import { getWarningsGetWarningsQueryKey, type warningsGetWarningsResponse } from './sdk/warnings/warnings.gen';
+import { getDexGetAllQueryKey, type dexGetAllResponse } from './sdk/dex/dex.gen';
 
 const isResponse = (obj: unknown): obj is ResponseBack => responseBackSchema.safeParse(obj).success;
 
@@ -50,7 +51,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
 
           // console.log('stockage-dto', data);
 
-          const { settings, mainBoxes, mainPkms, mainPkmVersions, saves, actions, warnings, saveInfos, backups } = data.data;
+          const { settings, mainBoxes, mainPkms, mainPkmVersions, saves, dex, actions, warnings, saveInfos, backups } = data.data;
 
           if (settings) {
             client.setQueryData(
@@ -139,6 +140,16 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 );
               }
             });
+          }
+
+          if (dex) {
+            client.setQueryData(
+              getDexGetAllQueryKey(),
+              {
+                ...data,
+                data: dex,
+              } satisfies Omit<dexGetAllResponse, 'status'>
+            );
           }
 
           if (actions) {

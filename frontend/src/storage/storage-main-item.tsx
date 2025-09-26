@@ -68,7 +68,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
                 isShiny={isShiny}
                 isShadow={false}
                 heldItem={heldItem}
-                warning={pkmVersions.some((value) => !value.isValid)}
+                warning={pkmVersions.some((value) => !value.isValid || !value.isAttachedValid)}
                 nbrVersions={pkmVersions.length}
                 canCreateVersion={canCreateVersion}
                 canMoveOutside={canMoveAttached}

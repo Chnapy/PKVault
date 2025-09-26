@@ -38,6 +38,17 @@ public class PkmVersionDTO : BasePkmVersionDTO
 
     public bool IsMain { get { return Id == PkmId; } }
 
+    public bool IsAttachedValid
+    {
+        get
+        {
+            return PkmDto.SaveId == null
+                || !WarningsService.GetWarningsDTO().PkmVersionWarnings.Any(warn => warn.PkmVersionId == null
+                    ? warn.PkmId == Id
+                    : warn.PkmVersionId == Id);
+        }
+    }
+
     // public bool CanMoveToSaveStorage { get { return PkmDto.SaveId == default; } }
 
     public List<GameVersion> CompatibleWithVersions

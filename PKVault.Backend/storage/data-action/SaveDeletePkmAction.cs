@@ -37,5 +37,6 @@ public class SaveDeletePkmAction : DataAction
             SaveId = saveId,
             SavePkms = true,
         });
+        flags.Dex = true;
     }
 }

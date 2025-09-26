@@ -281,6 +281,7 @@ public class MovePkmAction(
             SaveId = targetSaveId,
             SavePkms = true,
         });
+        flags.Dex = true;
     }
 
     private async Task SaveToMainWithoutCheckTarget(
@@ -366,5 +367,6 @@ public class MovePkmAction(
             SaveId = sourceSaveId,
             SavePkms = true,
         });
+        flags.Dex = true;
     }
 }

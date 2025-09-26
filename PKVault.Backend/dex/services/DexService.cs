@@ -4,26 +4,26 @@ public class DexService
 {
     public static async Task<Dictionary<int, Dictionary<uint, DexItemDTO>>> GetDex()
     {
-        Dictionary<int, Dictionary<uint, DexItemDTO>> dex = [];
-
-        if (LocalSaveService.SaveById.Count == 0)
+        var saveDict = (await StorageService.GetLoader()).loaders.saveLoadersDict;
+        if (saveDict.Count == 0)
         {
-            return dex;
+            return [];
         }
 
-        var maxSpecies = LocalSaveService.SaveById.Values.Select(save => save.MaxSpeciesID).Max();
+        var maxSpecies = saveDict.Values.Select(save => save.Save.MaxSpeciesID).Max();
 
         // Console.WriteLine(string.Join(',', PKHexUtils.StringsFR.Types));
 
         // var logtime = LogUtil.Time($"Get full dex for {LocalSaveService.SaveById.Count} saves (max-species={maxSpecies})");
 
+        Dictionary<int, Dictionary<uint, DexItemDTO>> dex = [];
         for (var i = 0; i < maxSpecies; i++)
         {
             dex.Add(i + 1, []);
         }
 
         await Task.WhenAll(
-            LocalSaveService.SaveById.Values.ToList().Select(save => UpdateDexWithSave(dex, save))
+            saveDict.Values.ToList().Select(save => UpdateDexWithSave(dex, save.Save))
         );
 
         // logtime();

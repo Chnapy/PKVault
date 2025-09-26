@@ -314,13 +314,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get
         {
             var legality = new LegalityAnalysis(Pkm);
-            var isLegal = legality.Parsed && Pkm.Valid && legality.Valid;
-
-            var isNotWarn = !WarningsService.GetWarningsDTO().pkmVersionWarnings.Any(warn => warn.PkmVersionId == null
-            ? warn.PkmId == Id
-            : warn.PkmVersionId == Id);
-
-            return isLegal && isNotWarn;
+            return legality.Parsed && Pkm.Valid && legality.Valid;
         }
     }
 
@@ -328,19 +322,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     {
         get
         {
-            List<string> reports = [new LegalityAnalysis(Pkm).Report()];
-
-            PkmVersionWarning? warning = WarningsService.GetWarningsDTO().pkmVersionWarnings.Find(warn => warn.PkmVersionId == null
-                ? warn.PkmId == Id
-                : warn.PkmVersionId == Id);
-            if (warning != null)
-            {
-                reports.Insert(0, $"Pkm not found in attached save."
-                    + "\nIf expected consider detach from save."
-                    + "\nOtherwise check the save integrity.");
-            }
-
-            return string.Join('\n', reports);
+            return new LegalityAnalysis(Pkm).Report();
         }
     }
 

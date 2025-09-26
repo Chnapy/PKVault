@@ -130,8 +130,13 @@ partial class MainForm
                     break;
                 default:
                     var streamKey = $"{expectedPrefix}{assemblyActionAndRest}";
-                    Stream stream = assembly.GetManifestResourceStream(streamKey)
-                        ?? throw new Exception($"Stream not found for key {streamKey}");
+                    var stream = assembly.GetManifestResourceStream(streamKey);
+                    if (stream == null)
+                    {
+                        Console.Error.WriteLine($"Stream not found for key {streamKey}");
+                        args.Response = webView.CoreWebView2.Environment.CreateWebResourceResponse(stream, 404, "Not Found", "");
+                        break;
+                    }
 
                     contentTypeProvider.Mappings.TryGetValue(uriFilenameExt, out var contentType);
 

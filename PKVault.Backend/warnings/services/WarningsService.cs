@@ -4,8 +4,8 @@ public class WarningsService
 {
     private static WarningsDTO WarningsDTO = new()
     {
-        playTimeWarnings = [],
-        pkmVersionWarnings = [],
+        PlayTimeWarnings = [],
+        PkmVersionWarnings = [],
     };
 
     public static WarningsDTO GetWarningsDTO()
@@ -20,8 +20,8 @@ public class WarningsService
 
         WarningsDTO = new()
         {
-            playTimeWarnings = CheckPlayTimeWarning(),
-            pkmVersionWarnings = await CheckPkmVersionWarnings(),
+            PlayTimeWarnings = CheckPlayTimeWarning(),
+            PkmVersionWarnings = await CheckPkmVersionWarnings(),
         };
 
         logtime();

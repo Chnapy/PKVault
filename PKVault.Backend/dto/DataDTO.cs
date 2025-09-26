@@ -14,6 +14,14 @@ public struct DataDTO
             tasks.Add(WarningsService.CheckWarnings());
         }
 
+        if (flags.Dex)
+        {
+            tasks.Add(Task.Run(async () =>
+            {
+                dto.Dex = await DexService.GetDex();
+            }));
+        }
+
         if (flags.MainBoxes)
         {
             tasks.Add(Task.Run(async () =>
@@ -105,6 +113,7 @@ public struct DataDTO
     public List<PkmDTO>? MainPkms { get; set; }
     public List<PkmVersionDTO>? MainPkmVersions { get; set; }
     public List<DataSaveDTO>? Saves { get; set; }
+    public Dictionary<int, Dictionary<uint, DexItemDTO>>? Dex { get; set; }
     public List<DataActionPayload>? Actions { get; set; }
     public WarningsDTO? Warnings { get; set; }
     public Dictionary<uint, SaveInfosDTO>? SaveInfos { get; set; }
@@ -134,6 +143,7 @@ public class DataUpdateFlags
     public bool MainPkms;
     public bool MainPkmVersions;
     public List<DataUpdateSaveFlags> Saves = [];
+    public bool Dex;
     // public bool Actions;
     public bool Warnings;
     public bool SaveInfos;
