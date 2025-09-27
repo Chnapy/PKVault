@@ -35,6 +35,7 @@ export function Button<
           color: theme.text.light,
           textShadow: theme.shadow.textlight,
           fontSize: '1rem',
+          whiteSpace: 'nowrap'
         }),
         className
       )}

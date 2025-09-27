@@ -57,9 +57,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
             client.setQueryData(
               getSettingsGetQueryKey(),
               {
-                ...data,
+                status: 200,
+                headers: new Headers(),
                 data: settings,
-              } satisfies Omit<settingsGetResponse, 'status'>
+              } satisfies settingsGetResponse
             );
           }
 
@@ -67,9 +68,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
             client.setQueryData(
               getStorageGetMainBoxesQueryKey(),
               {
-                ...data,
+                status: 200,
+                headers: new Headers(),
                 data: mainBoxes,
-              } satisfies Omit<storageGetMainBoxesResponse, 'status'>
+              } satisfies storageGetMainBoxesResponse
             );
           }
 
@@ -77,9 +79,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
             client.setQueryData(
               getStorageGetMainPkmsQueryKey(),
               {
-                ...data,
+                status: 200,
+                headers: new Headers(),
                 data: mainPkms,
-              } satisfies Omit<storageGetMainPkmsResponse, 'status'>
+              } satisfies storageGetMainPkmsResponse
             );
           }
 
@@ -87,9 +90,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
             client.setQueryData(
               getStorageGetMainPkmVersionsQueryKey(),
               {
-                ...data,
+                status: 200,
+                headers: new Headers(),
                 data: mainPkmVersions,
-              } satisfies Omit<storageGetMainPkmVersionsResponse, 'status'>
+              } satisfies storageGetMainPkmVersionsResponse
             );
           }
 
@@ -124,9 +128,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 client.setQueryData(
                   getStorageGetSaveBoxesQueryKey(saveData.saveId),
                   {
-                    ...data,
+                    status: 200,
+                    headers: new Headers(),
                     data: saveData.saveBoxes,
-                  } satisfies Omit<storageGetSaveBoxesResponse, 'status'>
+                  } satisfies storageGetSaveBoxesResponse
                 );
               }
 
@@ -134,9 +139,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 client.setQueryData(
                   getStorageGetSavePkmsQueryKey(saveData.saveId),
                   {
-                    ...data,
+                    status: 200,
+                    headers: new Headers(),
                     data: saveData.savePkms,
-                  } satisfies Omit<storageGetSavePkmsResponse, 'status'>
+                  } satisfies storageGetSavePkmsResponse
                 );
               }
             });
@@ -146,9 +152,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
             client.setQueryData(
               getDexGetAllQueryKey(),
               {
-                ...data,
+                status: 200,
+                headers: new Headers(),
                 data: dex,
-              } satisfies Omit<dexGetAllResponse, 'status'>
+              } satisfies dexGetAllResponse
             );
           }
 
@@ -156,9 +163,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
             client.setQueryData(
               getStorageGetActionsQueryKey(),
               {
-                ...data,
+                status: 200,
+                headers: new Headers(),
                 data: actions,
-              } satisfies Omit<storageGetActionsResponse, 'status'>
+              } satisfies storageGetActionsResponse
             );
           }
 
@@ -166,9 +174,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
             client.setQueryData(
               getWarningsGetWarningsQueryKey(),
               {
-                ...data,
+                status: 200,
+                headers: new Headers(),
                 data: warnings,
-              } satisfies Omit<warningsGetWarningsResponse, 'status'>
+              } satisfies warningsGetWarningsResponse
             );
           }
 
@@ -176,9 +185,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
             client.setQueryData(
               getSaveInfosGetAllQueryKey(),
               {
-                ...data,
+                status: 200,
+                headers: new Headers(),
                 data: saveInfos,
-              } satisfies Omit<saveInfosGetAllResponse, 'status'>
+              } satisfies saveInfosGetAllResponse
             );
           }
 
@@ -186,9 +196,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
             client.setQueryData(
               getBackupGetAllQueryKey(),
               {
-                ...data,
+                status: 200,
+                headers: new Headers(),
                 data: backups,
-              } satisfies Omit<backupGetAllResponse, 'status'>
+              } satisfies backupGetAllResponse
             );
           }
         }

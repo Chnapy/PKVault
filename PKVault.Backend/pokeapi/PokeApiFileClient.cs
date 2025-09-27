@@ -24,7 +24,7 @@ public partial class PokeApiFileClient
             return null;
         }
 
-        var formattedName = PokeApiNameFromPKHexName(name).ToLower();
+        var formattedName = PokeApiNameFromPKHexName(name);
 
         string url = GetApiEndpointString<T>();
 

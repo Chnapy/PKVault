@@ -449,21 +449,30 @@ public class StaticDataService
         var itemNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).itemlist;
         List<Task<StaticItem>> tasks = [];
 
+        // var notFound = new List<string>();
+
         for (var i = 0; i < itemNames.Length; i++)
         {
             var itemId = i;
             var itemName = itemNames[itemId];
-            var itemNameEn = GameInfo.Strings.itemlist[itemId];
+            var itemNamePokeapi = GetPokeapiItemName(
+                GameInfo.Strings.itemlist[itemId]
+            );
 
-            if (itemNameEn.Trim().Length == 0 || itemNameEn == "???")
+            if (itemNamePokeapi.Trim().Length == 0 || itemNamePokeapi == "???")
             {
                 continue;
             }
 
             tasks.Add(Task.Run(async () =>
             {
-                var itemObj = await PokeApi.GetItem(itemNameEn);
+                var itemObj = await PokeApi.GetItem(itemNamePokeapi);
                 var sprite = itemObj?.Sprites.Default ?? "";
+
+                // if (itemObj == null)
+                // {
+                //     notFound.Add($"{itemId}\t{itemNamePokeapi}");
+                // }
 
                 // if (itemNameEn.ToLower().Contains("belt"))
                 // Console.WriteLine($"Error with item {itemId} - {itemNameEn} / {PokeApiFileClient.PokeApiNameFromPKHexName(itemNameEn)} / {itemName}");
@@ -483,12 +492,29 @@ public class StaticDataService
             dict.Add(value.Id, value);
         }
         time();
+
+        // File.WriteAllText("./item-not-found.md", string.Join('\n', notFound));
         return dict;
     }
 
     public static string GetEggSprite()
     {
         return GetGHProxyUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png");
+    }
+
+    public static string GetPokeapiItemName(string pkhexItemName)
+    {
+        var pokeapiName = PokeApiFileClient.PokeApiNameFromPKHexName(pkhexItemName);
+
+        return pokeapiName switch
+        {
+            "leek" => "stick",
+            "upgrade" => "up-grade",
+            var _ when pokeapiName.EndsWith("-feather") => $"{pokeapiName[..^8]}-wing",
+            var _ when pokeapiName.EndsWith("ium-z") => $"{pokeapiName}--held",
+            var _ when pokeapiName.EndsWith("ium-z-[z]") => $"{pokeapiName[..^4]}--bag",
+            _ => pokeapiName
+        };
     }
 
     private static MoveCategory GetMoveCategory(string damageClassName)

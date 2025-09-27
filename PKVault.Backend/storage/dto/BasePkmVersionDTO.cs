@@ -373,6 +373,10 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         var evolutionChain = await PokeApi.GetPokemonSpeciesEvolutionChain(
             GameInfo.Strings.Species[Species]
         );
+        if (evolutionChain == null)
+        {
+            return [];
+        }
 
         ChainLink? getSpeciesEvolutionChain(ChainLink currentChain)
         {
@@ -400,7 +404,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         }
 
         var heldItemName = GameInfo.Strings.Item[HeldItem];
-        var heldItemPokeapiName = PokeApiFileClient.PokeApiNameFromPKHexName(heldItemName);
+        var heldItemPokeapiName = StaticDataService.GetPokeapiItemName(heldItemName);
 
         bool checkSpecies(NamedApiResource<PokemonSpecies> speciesObj)
         {
