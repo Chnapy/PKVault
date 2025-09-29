@@ -196,7 +196,7 @@ public class StorageService
     public static List<DataActionPayload> GetActionPayloadList()
     {
         var actionPayloadList = new List<DataActionPayload>();
-        _memoryLoader?.actions.ForEach(action => actionPayloadList.Add(action.GetPayload()));
+        _memoryLoader?.actions.ForEach(action => actionPayloadList.Add(action.payload));
         return actionPayloadList;
     }
 

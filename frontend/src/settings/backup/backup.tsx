@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useBackupDelete, useBackupGetAll, useBackupRestore } from '../../data/sdk/backup/backup.gen';
+import { useTranslate } from '../../translate/i18n';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { Container } from '../../ui/container/container';
 import { TitledContainer } from '../../ui/container/titled-container';
@@ -7,6 +8,8 @@ import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
 
 export const Backup: React.FC = () => {
+    const { t } = useTranslate();
+
     const backupQuery = useBackupGetAll();
     const backupDeleteMutation = useBackupDelete();
     const backupRestoreMutation = useBackupRestore();
@@ -24,7 +27,7 @@ export const Backup: React.FC = () => {
 
     const days = [ ...new Set(sortedBackups.map(backup => new Date(backup.createdAt)).map(renderDate)) ];
 
-    return <TitledContainer title={`${backupQuery.data.data.length} backups`}>
+    return <TitledContainer title={t('settings.backups.title', { count: backupQuery.data.data.length })}>
 
         <div style={{
             display: 'flex',
@@ -34,7 +37,7 @@ export const Backup: React.FC = () => {
             marginBottom: 4,
         }}>
             <Icon name='info-circle' solid forButton />
-            Each backup contains saves & stored pkms.
+            {t('settings.backups.help')}
         </div>
 
         <div

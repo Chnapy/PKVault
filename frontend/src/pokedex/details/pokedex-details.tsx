@@ -12,9 +12,12 @@ import { TextContainer } from '../../ui/text-container/text-container';
 import { theme } from '../../ui/theme';
 import { PokedexDetailsOwned } from './pokedex-details-owned';
 import { getGameInfos } from './util/get-game-infos';
+import { useTranslate } from '../../translate/i18n';
 
 export const PokedexDetails: React.FC = () => {
   // console.time("pokedex-details");
+  const { t } = useTranslate();
+
   const selectedSpecies = Route.useSearch({
     select: (search) => search.selected,
   });
@@ -123,7 +126,7 @@ export const PokedexDetails: React.FC = () => {
         )} */}
 
           {selectedSpeciesValue.abilities.length > 0 && <TextContainer>
-            <span style={{ color: theme.text.primary }}>Abilities</span><br />
+            <span style={{ color: theme.text.primary }}>{t('details.abilities')}</span><br />
             {selectedSpeciesValue.abilities.map(ability => <div key={ability}>{
               staticData.abilities[ ability ].name
             }</div>)}
@@ -139,18 +142,18 @@ export const PokedexDetails: React.FC = () => {
               <thead>
                 <tr>
                   <td style={cellBaseStyle}></td>
-                  <td style={cellBaseStyle}>Base stats</td>
+                  <td style={cellBaseStyle}>{t('details.stats.base')}</td>
                 </tr>
               </thead>
               <tbody>
-                {[ 'HP', 'Atk', 'Def', 'SpA', 'SpD', 'Spe' ]
+                {[ t('details.stats.hp'), t('details.stats.atk'), t('details.stats.def'), t('details.stats.spa'), t('details.stats.spd'), t('details.stats.spe') ]
                   .map((statName, i) => <tr key={statName}>
                     <td style={{ ...cellBaseStyle, textAlign: 'left' }}>{statName}</td>
                     <td style={cellBaseStyle}>{baseStats[ i ]}</td>
                   </tr>)}
 
                 <tr>
-                  <td style={{ ...cellBaseStyle, textAlign: 'left' }}>Total</td>
+                  <td style={{ ...cellBaseStyle, textAlign: 'left', textTransform: 'capitalize' }}>{t('total')}</td>
                   <td style={cellBaseStyle}>{totalBaseStats}</td>
                 </tr>
               </tbody>

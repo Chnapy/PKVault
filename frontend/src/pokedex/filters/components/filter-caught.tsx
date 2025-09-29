@@ -1,8 +1,11 @@
 import React from "react";
 import { Route } from "../../../routes/pokedex";
 import { FilterCheckbox } from "../../../ui/filter/filter-checkbox/filter-checkbox";
+import { useTranslate } from '../../../translate/i18n';
 
 export const FilterCaught: React.FC = () => {
+  const { t } = useTranslate();
+
   const navigate = Route.useNavigate();
   const searchValue = Route.useSearch({
     select: (search) => search.filterCaught,
@@ -25,10 +28,10 @@ export const FilterCaught: React.FC = () => {
       }
     >
       {searchValue === undefined
-        ? "Caught ?"
+        ? t('dex.filters.caught.unselect')
         : searchValue
-          ? "Caught only"
-          : "Not caught only"}
+          ? t('dex.filters.caught.yes')
+          : t('dex.filters.caught.no')}
     </FilterCheckbox>
   );
 };

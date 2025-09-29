@@ -4,6 +4,7 @@ import { useStorageGetMainBoxes, useStorageGetMainPkms, useStorageGetMainPkmVers
 import { Route } from '../../routes/storage';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import type { BoxDTO, PkmDTO, PkmSaveDTO } from '../../data/sdk/model';
+import { useTranslate } from '../../translate/i18n';
 
 type Context = {
     selected?: {
@@ -184,6 +185,7 @@ export const StorageMoveContext = {
         };
     },
     useDroppable: (dropStorageType: 'main' | 'save', dropBoxId: number, dropBoxSlot: number, pkmId?: string) => {
+        const { t } = useTranslate();
         const { selected, setSelected } = StorageMoveContext.useValue();
 
         const saveId = Route.useSearch({ select: (search) => search.save });
@@ -220,7 +222,7 @@ export const StorageMoveContext = {
             }
 
             if (selected.attached && pkmId) {
-                return { enable: false, helpText: 'Move attached should target empty slot' };
+                return { enable: false, helpText: t('storage.move.attached-pkm') };
             }
 
             const save = saveId ? saveInfosQuery.data?.data[ saveId ] : undefined;
@@ -250,7 +252,7 @@ export const StorageMoveContext = {
                 if (targetBoxSave) {
                     // canClick &&= targetBoxSave.canReceivePkm;
                     if (!targetBoxSave.canReceivePkm) {
-                        return { enable: false, helpText: `Box ${targetBoxSave.name} cannot receive pkm` };
+                        return { enable: false, helpText: t('storage.move.box-cannot', { name: targetBoxSave.name }) };
                     }
                 }
 
@@ -258,7 +260,7 @@ export const StorageMoveContext = {
                 if (targetBoxMain) {
                     // canClick &&= targetBoxMain.canReceivePkm;
                     if (!targetBoxMain.canReceivePkm) {
-                        return { enable: false, helpText: `Box ${targetBoxMain.name} cannot receive pkm` };
+                        return { enable: false, helpText: t('storage.move.box-cannot', { name: targetBoxMain.name }) };
                     }
                 }
 
@@ -266,7 +268,7 @@ export const StorageMoveContext = {
                 if (sourcePkmMain && (targetBoxMain || targetPkmMain)) {
                     // canClick &&= !selected.attached;
                     if (selected.attached) {
-                        return { enable: false, helpText: 'Move attached should target a save' };
+                        return { enable: false, helpText: t('storage.move.attached-main-self') };
                     }
                 }
 
@@ -274,17 +276,17 @@ export const StorageMoveContext = {
                 else if (sourcePkmSave && (targetBoxSave || targetPkmSave)) {
                     // canClick &&= !selected.attached;
                     if (selected.attached) {
-                        return { enable: false, helpText: 'Move attached should target main storage' };
+                        return { enable: false, helpText: t('storage.move.attached-save-self') };
                     }
 
                     if (targetPkmSave) {
                         // canClick &&= targetPkmSave.generation === sourcePkmSave.generation;
                         // canClick &&= targetPkmSave.canMove;
                         if (targetPkmSave.generation !== sourcePkmSave.generation) {
-                            return { enable: false, helpText: `Move should target saves with same generation ${sourcePkmSave.generation}` };
+                            return { enable: false, helpText: t('storage.move.save-same-gen', { generation: sourcePkmSave.generation }) };
                         }
                         if (!targetPkmSave.canMove) {
-                            return { enable: false, helpText: `Pkm ${targetPkmSave.nickname} cannot be moved` };
+                            return { enable: false, helpText: t('storage.move.pkm-cannot', { name: targetPkmSave.nickname }) };
                         }
                     }
                     // console.log(targetPkmSave.generation, sourcePkmSave.generation, targetPkmSave.canMove)
@@ -294,19 +296,24 @@ export const StorageMoveContext = {
                 else if (sourcePkmMain && (targetBoxSave || targetPkmSave)) {
                     // canClick &&= selected.attached ? sourcePkmMain.canMoveToSave : sourcePkmMain.canMoveAttachedToSave;
                     if (!(selected.attached ? sourcePkmMain.canMoveToSave : sourcePkmMain.canMoveAttachedToSave)) {
-                        return { enable: false, helpText: `Pkm ${getPkmNickname(sourcePkmMain.id)} cannot be ${selected.attached ? 'moved' : 'moved attached'} to save${sourcePkmMain.saveId ? ", he's already attached !" : ''}` };
+                        return {
+                            enable: false,
+                            helpText: sourcePkmMain.saveId
+                                ? t('storage.move.pkm-cannot-attached-already', { name: getPkmNickname(sourcePkmMain.id) })
+                                : (selected.attached ? t('storage.move.pkm-cannot-attached', { name: getPkmNickname(sourcePkmMain.id) }) : t('storage.move.pkm-cannot', { name: getPkmNickname(sourcePkmMain.id) })),
+                        };
                     }
 
                     const relatedPkmVersions = mainPkmVersionsQuery.data?.data.filter(version => version.pkmId === sourcePkmMain.id) ?? [];
                     // canClick &&= !!save && relatedPkmVersions.some(version => version.generation === save.generation);
                     if (!save || !relatedPkmVersions.some(version => version.generation === save.generation)) {
-                        return { enable: false, helpText: `Pkm ${getPkmNickname(sourcePkmMain.id)} does not have pkm version for generation ${save?.generation}, create one before moving to save` };
+                        return { enable: false, helpText: t('storage.move.main-need-gen', { name: getPkmNickname(sourcePkmMain.id), generation: save?.generation }) };
                     }
 
                     if (!selected.attached) {
                         // canClick &&= relatedPkmVersions.length === 1;
                         if (relatedPkmVersions.length > 1) {
-                            return { enable: false, helpText: `Pkm ${getPkmNickname(sourcePkmMain.id)} cannot be moved with multiple versions to a save. Use "move attached", or remove all versions except one` };
+                            return { enable: false, helpText: t('storage.move.attached-multiple-versions', { name: getPkmNickname(sourcePkmMain.id) }) };
                         }
                     }
                 }
@@ -315,15 +322,19 @@ export const StorageMoveContext = {
                 else if (sourcePkmSave && (targetBoxMain || targetPkmMain)) {
                     // canClick &&= selected.attached ? sourcePkmSave.canMoveToMain : sourcePkmSave.canMoveAttachedToMain;
                     if (sourcePkmSave.isEgg) {
-                        return { enable: false, helpText: `Eggs cannot be moved outside save` };
+                        return { enable: false, helpText: t('storage.move.save-egg') };
                     }
 
                     if (sourcePkmSave.isShadow) {
-                        return { enable: false, helpText: `Shadow pkm cannot be moved outside save` };
+                        return { enable: false, helpText: t('storage.move.save-shadow') };
                     }
 
                     if (!(selected.attached ? sourcePkmSave.canMoveToMain : sourcePkmSave.canMoveAttachedToMain)) {
-                        return { enable: false, helpText: `Pkm ${getPkmNickname(sourcePkmSave.id)} cannot be ${selected.attached ? 'moved' : 'moved attached'} from save` };
+                        return {
+                            enable: false, helpText: selected.attached
+                                ? t('storage.move.pkm-cannot-attached', { name: getPkmNickname(sourcePkmSave.id) })
+                                : t('storage.move.pkm-cannot', { name: getPkmNickname(sourcePkmSave.id) })
+                        };
                     }
                 }
 

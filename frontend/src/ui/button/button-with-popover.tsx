@@ -19,7 +19,7 @@ export const ButtonWithPopover: React.FC<ButtonWithPopoverProps> = ({ anchor = '
         }}
     >
         {({ open, close }) => <>
-            <PopoverButton as={Button} disabled={open} {...btnProps} />
+            <PopoverButton as={Button} {...btnProps} disabled={open || btnProps.disabled} />
 
             {open && <PopoverPanel
                 static

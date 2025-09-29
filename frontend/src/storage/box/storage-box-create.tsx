@@ -1,12 +1,15 @@
 import type React from 'react';
 import { useForm } from 'react-hook-form';
 import { useStorageCreateMainBox } from '../../data/sdk/storage/storage.gen';
+import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
 import { TextInput } from '../../ui/input/text-input';
 import { theme } from '../../ui/theme';
 
 export const StorageBoxCreate: React.FC<{ close: () => void; }> = ({ close }) => {
+    const { t } = useTranslate();
+
     const boxCreateMutation = useStorageCreateMainBox();
 
     const { register, handleSubmit, formState, watch } = useForm<{ name: string }>({
@@ -29,7 +32,7 @@ export const StorageBoxCreate: React.FC<{ close: () => void; }> = ({ close }) =>
 
         <Button type='submit' bgColor={theme.bg.primary} disabled={watch('name').length === 0 || !formState.isValid}>
             <Icon name='plus' forButton />
-            Submit
+            {t('action.submit')}
         </Button>
     </form>;
 };

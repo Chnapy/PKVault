@@ -1,4 +1,6 @@
+import React from 'react';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
+import { useTranslate } from '../translate/i18n';
 import { Button } from '../ui/button/button';
 import { Splash } from '../ui/splash/splash';
 import { SplashData } from './splash-data';
@@ -8,12 +10,23 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
     const settingsEditMutation = useSettingsEdit();
 
     const settingsMutable = settingsQuery.data?.data.settingsMutable;
+    const language = settingsMutable?.language;
+
+    const { i18n } = useTranslate();
+
+    const shouldUpdateLanguage = !!language && language !== i18n.language;
+
+    React.useEffect(() => {
+        if (shouldUpdateLanguage) {
+            i18n.changeLanguage(language);
+        }
+    }, [ shouldUpdateLanguage, i18n, language ]);
 
     if (settingsQuery.isLoading || !settingsMutable) {
         return <Splash />;
     }
 
-    if (settingsMutable.language) {
+    if (language) {
         return <SplashData>{children}</SplashData>;
     }
 

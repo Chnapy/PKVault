@@ -5,6 +5,7 @@ import { DetailsTab } from '../../ui/details-card/details-tab';
 import { SaveCardContentSmall } from '../../ui/save-card/save-card-content-small';
 import { StorageDetailsBase } from '../../ui/storage-item-details/storage-details-base';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
+import { useTranslate } from '../../translate/i18n';
 
 export type StorageDetailsMainProps = {
     selectedId: string;
@@ -61,6 +62,8 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
 };
 
 const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
+    const { t } = useTranslate();
+
     const formContext = StorageDetailsForm.useContext();
 
     const getSaveItemProps = useSaveItemProps();
@@ -84,9 +87,7 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
             {...pkmVersion}
             isValid={pkmVersion.isValid && pkmVersion.isAttachedValid}
             validityReport={[
-                !pkmVersion.isAttachedValid && "Pkm not found in attached save."
-                + "\nIf expected consider detach from save."
-                + "\nOtherwise check the save integrity.",
+                !pkmVersion.isAttachedValid && t('details.attached-pkm-not-found'),
                 pkmVersion.validityReport ].filter(Boolean).join('\n---\n')
             }
             isShadow={false}

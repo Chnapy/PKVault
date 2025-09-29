@@ -1,31 +1,20 @@
-public class MainUpdateBoxAction : DataAction
+public class MainUpdateBoxAction(string boxId, string boxName) : DataAction
 {
-    private readonly string boxId;
-    private readonly string boxName;
-
-    public MainUpdateBoxAction(string _boxId, string _boxName)
-    {
-        boxId = _boxId;
-        boxName = _boxName;
-    }
-
-    public override DataActionPayload GetPayload()
-    {
-        return new DataActionPayload
-        {
-            type = DataActionType.MAIN_UPDATE_BOX,
-            parameters = [boxId, boxName]
-        };
-    }
-
-    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var box = await loaders.boxLoader.GetDto(boxId);
 
+        var boxOldName = box.Name;
         box.BoxEntity.Name = boxName;
 
         loaders.boxLoader.WriteDto(box);
 
         flags.MainBoxes = true;
+
+        return new()
+        {
+            type = DataActionType.MAIN_UPDATE_BOX,
+            parameters = [boxOldName, boxName]
+        };
     }
 }

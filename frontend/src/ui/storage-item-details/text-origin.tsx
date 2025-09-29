@@ -4,6 +4,8 @@ import { useStaticData } from '../../hooks/use-static-data';
 import { Gender } from '../gender/gender';
 import { theme } from '../theme';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
+import { useTranslate } from '../../translate/i18n';
+import { DetailsLevel } from '../details-card/details-level';
 
 export type TextOriginProps = {
     version: GameVersion;
@@ -24,12 +26,14 @@ export const TextOrigin: React.FC<TextOriginProps> = ({
     originMetLocation,
     originMetLevel,
 }) => {
+    const { t } = useTranslate();
+
     const { versions } = useStaticData();
 
     const gameinfos = getGameInfos(version);
 
     return <>
-        <span style={{ color: theme.text.primary }}>Origin</span>
+        <span style={{ color: theme.text.primary }}>{t('details.origin')}</span>
         <br />
         <img
             src={gameinfos.img}
@@ -38,10 +42,10 @@ export const TextOrigin: React.FC<TextOriginProps> = ({
                 width: '1lh',
                 verticalAlign: 'middle'
             }}
-        /> <span style={{ color: theme.text.primary }}>Pokemon {versions[ version ].name}</span>
+        /> <span style={{ color: theme.text.primary }}>{t('save.pkm')} {versions[ version ].name}</span>
         <br />
-        OT <span style={{ color: theme.text.primary }}>{originTrainerName}</span> <Gender gender={originTrainerGender} /> - TID <span style={{ color: theme.text.primary }}>{tid}</span>
+        {t('save.ot')} <span style={{ color: theme.text.primary }}>{originTrainerName}</span> <Gender gender={originTrainerGender} /> - {t('details.tid')} <span style={{ color: theme.text.primary }}>{tid}</span>
         <br />
-        {originMetLocation}{originMetLevel ? <> - Lv.{originMetLevel}</> : null}
+        {originMetLocation}{originMetLevel ? <> - <DetailsLevel level={originMetLevel} /></> : null}
     </>;
 };

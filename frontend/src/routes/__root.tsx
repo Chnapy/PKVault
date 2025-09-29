@@ -6,16 +6,19 @@ import { useSaveInfosScan } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { useStorageGetActions } from '../data/sdk/storage/storage.gen';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
+import { useTranslate } from '../translate/i18n';
+import { Button } from '../ui/button/button';
 import { ButtonWithDisabledPopover } from '../ui/button/button-with-disabled-popover';
 import { Frame } from '../ui/header/frame';
 import { Header } from '../ui/header/header';
 import { HeaderItem } from "../ui/header/header-item";
 import { Icon } from '../ui/icon/icon';
 import { NotificationCard } from '../ui/notification-card/notification-card';
-import { Button } from '../ui/button/button';
 
 const Root: React.FC = () => {
   const matchRoute = useMatchRoute();
+
+  const { t } = useTranslate();
 
   const settings = useSettingsGet().data?.data;
   const warnings = useWarningsGetWarnings().data?.data;
@@ -48,7 +51,7 @@ const Root: React.FC = () => {
           )}
           to={"/saves"}
         >
-          Saves
+          {t('header.saves')}
         </HeaderItem>
         <HeaderItem
           selected={Boolean(
@@ -57,7 +60,8 @@ const Root: React.FC = () => {
           )}
           to={"/storage"}
         >
-          Storage{hasStorageActions && '*'}
+          {t('header.storage')}
+          {hasStorageActions && '*'}
         </HeaderItem>
         <HeaderItem
           selected={Boolean(
@@ -66,7 +70,7 @@ const Root: React.FC = () => {
           )}
           to={"/pokedex"}
         >
-          Pokedex
+          {t('header.dex')}
         </HeaderItem>
 
         <ButtonWithDisabledPopover
@@ -74,13 +78,13 @@ const Root: React.FC = () => {
           onClick={() => savesScanMutation.mutateAsync()}
           disabled={!settings?.canScanSaves}
           showHelp={!settings?.canScanSaves}
-          helpTitle='Action not possible with waiting storage actions'
+          helpTitle={t('action.not-possible')}
         >
           <Icon
             name='refresh'
             forButton
           />
-          Scan saves
+          {t('header.scan-saves')}
         </ButtonWithDisabledPopover>
 
         <HeaderItem
@@ -91,7 +95,7 @@ const Root: React.FC = () => {
           to={"/settings"}
           endPosition
         >
-          Backups & settings
+          {t('header.settings')}
         </HeaderItem>
 
         <ButtonWithDisabledPopover
@@ -100,7 +104,7 @@ const Root: React.FC = () => {
           selected={openNotif}
           disabled={!hasErrors}
           showHelp={!hasErrors}
-          helpTitle='No notifications'
+          helpTitle={t('header.notifications.help')}
         >
           <Icon name='bell' solid forButton />
         </ButtonWithDisabledPopover>

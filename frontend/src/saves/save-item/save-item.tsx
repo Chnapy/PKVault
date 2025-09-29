@@ -6,6 +6,7 @@ import {
   useSaveInfosGetAll
 } from "../../data/sdk/save-infos/save-infos.gen";
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
+import { useTranslate } from '../../translate/i18n';
 import { ButtonLink } from '../../ui/button/button';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../../ui/button/button-with-disabled-popover';
@@ -29,6 +30,8 @@ export const SaveItem: React.FC<SaveItemProps> = ({
   showDelete,
   // showOldSaves,
 }) => {
+  const { t } = useTranslate();
+
   const settingsQuery = useSettingsGet();
   const saveInfosQuery = useSaveInfosGetAll();
   // const stockageActionsQuery = useStorageGetActions();
@@ -59,7 +62,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
     disabled: !settings?.canDeleteSaves,
     showHelp: !settings?.canDeleteSaves,
     anchor: 'right start',
-    helpTitle: 'Action not possible with waiting storage actions',
+    helpTitle: t('action.not-possible'),
   };
 
   return (

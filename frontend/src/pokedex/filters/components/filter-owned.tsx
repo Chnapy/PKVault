@@ -1,8 +1,11 @@
 import React from "react";
 import { Route } from "../../../routes/pokedex";
 import { FilterCheckbox } from "../../../ui/filter/filter-checkbox/filter-checkbox";
+import { useTranslate } from '../../../translate/i18n';
 
 export const FilterOwned: React.FC = () => {
+  const { t } = useTranslate();
+
   const navigate = Route.useNavigate();
   const searchValue = Route.useSearch({
     select: (search) => search.filterOwned,
@@ -25,10 +28,10 @@ export const FilterOwned: React.FC = () => {
       }
     >
       {searchValue === undefined
-        ? "Owned ?"
+        ? t('dex.filters.owned.unselect')
         : searchValue
-          ? "Owned only"
-          : "Not owned only"}
+          ? t('dex.filters.owned.yes')
+          : t('dex.filters.owned.no')}
     </FilterCheckbox>
   );
 };

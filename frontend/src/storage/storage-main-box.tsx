@@ -19,8 +19,11 @@ import { StorageMoveContext } from './actions/storage-move-context';
 import { StorageBoxCreate } from './box/storage-box-create';
 import { StorageBoxEdit } from './box/storage-box-edit';
 import { StorageMainItem } from './storage-main-item';
+import { useTranslate } from '../translate/i18n';
 
 export const StorageMainBox: React.FC = () => {
+  const { t } = useTranslate();
+
   const mainBoxId = Route.useSearch({ select: (search) => search.mainBoxId });
   const navigate = Route.useNavigate();
 
@@ -132,7 +135,7 @@ export const StorageMainBox: React.FC = () => {
               onClick={() => boxDeleteMutation.mutateAsync({ boxId: selectedBox.id })}
               disabled={boxes.length <= 1 || boxPkmsList.length > 0}
               showHelp={boxPkmsList.length > 0}
-              helpTitle='Box should be empty before delete it'
+              helpTitle={t('storage.box.delete.help')}
             >
               <Icon name='trash' solid forButton />
             </ButtonWithDisabledPopover>
@@ -162,7 +165,7 @@ export const StorageMainBox: React.FC = () => {
           >
             <Icon name='folder' solid forButton />
             <span style={{ color: theme.text.primary }}>{boxPkmsList.length}</span>
-            /{boxMaxItems} - Total.<span style={{ color: theme.text.primary }}>{pkms.length}</span>
+            /{boxMaxItems} - {t('total')}.<span style={{ color: theme.text.primary }}>{pkms.length}</span>
           </div>
         </>
       }

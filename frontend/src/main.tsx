@@ -22,8 +22,7 @@ declare module "@tanstack/react-router" {
   }
 }
 
-// TODO PRIOR translations en
-// TODO PRIOR add dedicated modal for help
+// TODO add dedicated modal for help
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BackendErrorsContext.Provider>

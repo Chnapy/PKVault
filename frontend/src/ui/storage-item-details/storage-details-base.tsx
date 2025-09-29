@@ -17,6 +17,7 @@ import { StorageDetailsTitle } from './storage-details-title';
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
+import { useTranslate } from '../../translate/i18n';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'pid' | 'species' | 'version' | 'generation' | 'form' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
@@ -31,6 +32,8 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
 };
 
 export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onRelease, onSubmit, extraContent, ...pkm }) => {
+    const { t } = useTranslate();
+
     const formContext = StorageDetailsForm.useContext();
     const moveContext = StorageMoveContext.useValue();
 
@@ -98,7 +101,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
         content={
             <>
                 {!!pkm.heldItem && <TextContainer>
-                    Held item <span style={{ color: theme.text.primary }}>{staticData.items[ pkm.heldItem ].name}</span> <img
+                    {t('details.held-item')} <span style={{ color: theme.text.primary }}>{staticData.items[ pkm.heldItem ].name}</span> <img
                         src={getApiFullUrl(staticData.items[ pkm.heldItem ].sprite)}
                         alt={staticData.items[ pkm.heldItem ].name}
                         style={{
@@ -163,7 +166,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
                 onClick={() => formContext.cancel()}
                 style={{ flexGrow: 1 }}
             >
-                Cancel
+                {t('action.cancel')}
             </Button>
 
             <div style={{ flexGrow: 1 }}>
@@ -172,7 +175,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
                     onClick={onSubmit}
                     style={{ flexGrow: 1 }}
                 >
-                    Submit
+                    {t('action.submit')}
                 </ButtonWithConfirm>
             </div>
         </div>}

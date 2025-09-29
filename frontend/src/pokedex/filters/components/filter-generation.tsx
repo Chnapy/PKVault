@@ -2,9 +2,12 @@ import React from "react";
 import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
+import { useTranslate } from '../../../translate/i18n';
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
 
 export const FilterGeneration: React.FC = () => {
+  const { t } = useTranslate();
+
   const navigate = Route.useNavigate();
   const searchValue =
     Route.useSearch({ select: (search) => search.filterGenerations }) ?? [];
@@ -18,7 +21,7 @@ export const FilterGeneration: React.FC = () => {
 
   const options = allGenerations.map((generation) => ({
     value: generation.toString(),
-    label: `Generation ${generation}`,
+    label: t('dex.filters.generations.option', { generation }),
   }));
 
   return (
@@ -35,7 +38,7 @@ export const FilterGeneration: React.FC = () => {
       }}
       options={options}
     >
-      Generations
+      {t('dex.filters.generations')}
     </FilterSelect>
   );
 };

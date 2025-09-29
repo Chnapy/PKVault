@@ -2,9 +2,12 @@ import React from "react";
 import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
+import { useTranslate } from '../../../translate/i18n';
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
 
 export const FilterTypes: React.FC = () => {
+  const { t } = useTranslate();
+
   const navigate = Route.useNavigate();
   const searchValue =
     Route.useSearch({ select: (search) => search.filterTypes }) ?? [];
@@ -33,7 +36,7 @@ export const FilterTypes: React.FC = () => {
         label: type.name,
       }))}
     >
-      Types
+      {t('dex.filters.types')}
     </FilterSelect>
   );
 };

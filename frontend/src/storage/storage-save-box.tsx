@@ -6,6 +6,7 @@ import {
   useStorageGetSavePkms,
 } from "../data/sdk/storage/storage.gen";
 import { Route } from "../routes/storage";
+import { useTranslate } from '../translate/i18n';
 import { Button } from "../ui/button/button";
 import { FilterSelect } from "../ui/filter/filter-select/filter-select";
 import { Icon } from '../ui/icon/icon';
@@ -21,6 +22,8 @@ export type StorageSaveBoxProps = {
 };
 
 export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
+  const { t } = useTranslate();
+
   const saveBoxId = Route.useSearch({ select: (search) => search.saveBoxId });
   const navigate = Route.useNavigate();
 
@@ -143,7 +146,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
           >
             <Icon name='folder' solid forButton />
             <span style={{ color: theme.text.primary }}>{boxPkmsList.length}</span>
-            /{itemsCount} - Total.<span style={{ color: theme.text.primary }}>{savePkms.length}</span>
+            /{itemsCount} - {t('total')}.<span style={{ color: theme.text.primary }}>{savePkms.length}</span>
           </div>
         </>
       }

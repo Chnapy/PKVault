@@ -1,11 +1,12 @@
+import { ListboxOption } from '@headlessui/react';
 import React from 'react';
+import { MoveCategory, type StaticMove } from '../../data/sdk/model';
+import { useStaticData } from '../../hooks/use-static-data';
+import { useTranslate } from '../../translate/i18n';
+import { SelectNumberInput } from '../input/select-input';
+import { MoveItem } from '../move-item/move-item';
 import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
-import { useStaticData } from '../../hooks/use-static-data';
-import { MoveItem } from '../move-item/move-item';
-import { SelectNumberInput } from '../input/select-input';
-import { MoveCategory, type StaticMove } from '../../data/sdk/model';
-import { ListboxOption } from '@headlessui/react';
 
 export type TextMovesProps = {
     ability: number;
@@ -26,6 +27,8 @@ export const TextMoves: React.FC<TextMovesProps> = ({
     hiddenPowerPower,
     hiddenPowerCategory,
 }) => {
+    const { t } = useTranslate();
+
     const { editMode, register, setValue, watch } = StorageDetailsForm.useContext();
 
     const staticData = useStaticData();
@@ -68,13 +71,13 @@ export const TextMoves: React.FC<TextMovesProps> = ({
 
     return <>
         {ability > 0 && <>
-            Ability <span style={{ color: theme.text.primary }}>{
+            {t('details.ability')} <span style={{ color: theme.text.primary }}>{
                 staticData.abilities[ ability ].name
             }</span>
             <br /><br />
         </>}
 
-        <span style={{ color: theme.text.primary }}>Moves</span>
+        <span style={{ color: theme.text.primary }}>{t('details.moves')}</span>
         <br />
         <div
             style={{

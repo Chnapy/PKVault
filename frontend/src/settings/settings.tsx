@@ -8,8 +8,11 @@ import { Icon } from '../ui/icon/icon';
 import { SelectStringInput } from '../ui/input/select-input';
 import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
+import { useTranslate } from '../translate/i18n';
 
 export const Settings: React.FC = () => {
+    const { t } = useTranslate();
+
     const settingsQuery = useSettingsGet();
     const settingsMutation = useSettingsEdit();
 
@@ -21,7 +24,7 @@ export const Settings: React.FC = () => {
         savE_GLOBS: settingsMutable.savE_GLOBS.join('\n'),
     }), [ settingsMutable ]);
 
-    const { register, watch, reset, setValue, handleSubmit } = useForm<Omit<SettingsMutableDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
+    const { register, watch, reset, setValue, handleSubmit, formState } = useForm<Omit<SettingsMutableDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
         defaultValues: defaultValue
     });
 
@@ -39,7 +42,7 @@ export const Settings: React.FC = () => {
     });
 
     return <TitledContainer title={<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        Settings
+        {t('settings.title')}
 
         <div style={{ marginLeft: 'auto' }}>
             Build ID = {settings?.buildID}
@@ -59,7 +62,7 @@ export const Settings: React.FC = () => {
                 gap: 4
             }}>
                 <Icon name='info-circle' solid forButton />
-                All relative paths are based from app directory:
+                {t('settings.relative-paths')}
                 <br />{settings.appDirectory}
             </div>
 
@@ -79,7 +82,7 @@ export const Settings: React.FC = () => {
                     }}
                 >
                     <SelectStringInput
-                        label='Language'
+                        label={t('settings.form.language')}
                         data={[
                             { value: 'en', option: 'English', disabled: watch('language') === 'en' },
                             { value: 'fr', option: 'Français', disabled: watch('language') === 'fr' },
@@ -91,13 +94,13 @@ export const Settings: React.FC = () => {
                     />
 
                     <TextInput
-                        label='Database path'
+                        label={t('settings.form.db')}
                         {...register('dB_PATH', { setValueAs: (value) => value.trim() })}
                         disabled={!settings.canUpdateSettings}
                     />
 
                     <TextInput
-                        label='Backups path'
+                        label={t('settings.form.backups')}
                         {...register('backuP_PATH', { setValueAs: (value) => value.trim() })}
                         disabled={!settings.canUpdateSettings}
                     />
@@ -112,13 +115,13 @@ export const Settings: React.FC = () => {
                     }}
                 >
                     <TextInput
-                        label='Config path'
+                        label={t('settings.form.config')}
                         value={settings.settingsPath}
                         disabled
                     />
 
                     <TextInput
-                        label='Storage path (PKM files)'
+                        label={t('settings.form.storage')}
                         {...register('storagE_PATH', { setValueAs: (value) => value.trim() })}
                         disabled={!settings.canUpdateSettings}
                     />
@@ -132,7 +135,7 @@ export const Settings: React.FC = () => {
                 }}
             >
                 <TextInput
-                    label='Saves files & globs'
+                    label={t('settings.form.saves')}
                     area
                     style={{
                         minHeight: 200,
@@ -147,7 +150,7 @@ export const Settings: React.FC = () => {
                     gap: 4
                 }}>
                     <Icon name='info-circle' solid forButton />
-                    List all your saves files paths, you can also use globs.
+                    {t('settings.form.saves.help')}
                 </div>
             </div>
 
@@ -162,13 +165,14 @@ export const Settings: React.FC = () => {
                     onClick={() => reset(defaultValue)}
                     disabled={!settings.canUpdateSettings}
                     big
-                >Cancel</Button>
+                >{t('action.cancel')}</Button>
                 <Button
                     type='submit'
+                    loading={formState.isSubmitting}
                     disabled={!settings.canUpdateSettings}
                     big
                     bgColor={theme.bg.primary}
-                >Submit</Button>
+                >{t('action.submit')}</Button>
             </div>
 
             {!settings.canUpdateSettings && <div style={{
@@ -178,8 +182,8 @@ export const Settings: React.FC = () => {
                 gap: 4,
             }}>
                 <Icon name='info-circle' solid forButton />
-                You cannot change settings with waiting storage actions
-                <ButtonLink to='/storage'>Check storage</ButtonLink>
+                {t('action.not-possible')}
+                <ButtonLink to='/storage'>{t('action.check-storage')}</ButtonLink>
             </div>}
         </form>
     </TitledContainer>;

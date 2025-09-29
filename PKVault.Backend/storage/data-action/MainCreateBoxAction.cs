@@ -1,22 +1,6 @@
-public class MainCreateBoxAction : DataAction
+public class MainCreateBoxAction(string boxName) : DataAction
 {
-    private readonly string boxName;
-
-    public MainCreateBoxAction(string _boxName)
-    {
-        boxName = _boxName;
-    }
-
-    public override DataActionPayload GetPayload()
-    {
-        return new DataActionPayload
-        {
-            type = DataActionType.MAIN_CREATE_BOX,
-            parameters = [boxName]
-        };
-    }
-
-    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var boxes = await loaders.boxLoader.GetAllDtos();
         var maxId = boxes.Select(box => box.IdInt).Max();
@@ -33,5 +17,11 @@ public class MainCreateBoxAction : DataAction
         });
 
         flags.MainBoxes = true;
+
+        return new()
+        {
+            type = DataActionType.MAIN_CREATE_BOX,
+            parameters = [boxName]
+        };
     }
 }

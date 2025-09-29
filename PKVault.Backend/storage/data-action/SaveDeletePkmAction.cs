@@ -1,26 +1,6 @@
-using PKHeX.Core;
-
-public class SaveDeletePkmAction : DataAction
+public class SaveDeletePkmAction(uint saveId, string pkmId) : DataAction
 {
-    public uint saveId { get; }
-    private readonly string pkmId;
-
-    public SaveDeletePkmAction(uint _saveId, string _pkmId)
-    {
-        saveId = _saveId;
-        pkmId = _pkmId;
-    }
-
-    public override DataActionPayload GetPayload()
-    {
-        return new DataActionPayload
-        {
-            type = DataActionType.SAVE_DELETE_PKM,
-            parameters = [saveId, pkmId]
-        };
-    }
-
-    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
 
@@ -38,5 +18,11 @@ public class SaveDeletePkmAction : DataAction
             SavePkms = true,
         });
         flags.Dex = true;
+
+        return new()
+        {
+            type = DataActionType.SAVE_DELETE_PKM,
+            parameters = [saveLoaders.Save.Version, dto.Nickname]
+        };
     }
 }

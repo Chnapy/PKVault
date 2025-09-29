@@ -1,41 +1,32 @@
 
-public class DetachPkmSaveAction : DataAction
+public class DetachPkmSaveAction(string pkmId) : DataAction
 {
-    private readonly string pkmId;
-
-    public DetachPkmSaveAction(string _pkmId)
-    {
-        pkmId = _pkmId;
-    }
-
-    public override DataActionPayload GetPayload()
-    {
-        return new DataActionPayload
-        {
-            type = DataActionType.DETACH_PKM_SAVE,
-            parameters = [pkmId]
-        };
-    }
-
-    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var pkm = await loaders.pkmLoader.GetDto(pkmId);
-        if (pkm.SaveId == null)
-        {
-            return;
-        }
         var oldSaveId = pkm.SaveId;
-
-        pkm.PkmEntity.SaveId = default;
-        loaders.pkmLoader.WriteDto(pkm);
-
-        flags.MainPkms = true;
-        flags.MainPkmVersions = true;   // when there is warnings
-
-        flags.Saves.Add(new()
+        if (pkm.SaveId != null)
         {
-            SaveId = (uint)oldSaveId,
-            SavePkms = true,
-        });
+            pkm.PkmEntity.SaveId = default;
+            loaders.pkmLoader.WriteDto(pkm);
+
+            flags.MainPkms = true;
+            flags.MainPkmVersions = true;   // when there is warnings
+
+            flags.Saves.Add(new()
+            {
+                SaveId = (uint)oldSaveId,
+                SavePkms = true,
+            });
+        }
+
+        var pkmNickname = (await loaders.pkmVersionLoader.GetDto(pkmId))?.Nickname;
+        var saveExists = loaders.saveLoadersDict.TryGetValue(oldSaveId ?? 0, out var saveLoaders);
+
+        return new()
+        {
+            type = DataActionType.DETACH_PKM_SAVE,
+            parameters = [saveExists ? saveLoaders.Save.Version : null, pkmNickname]
+        };
     }
 }

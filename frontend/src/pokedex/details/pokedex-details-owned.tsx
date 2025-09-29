@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
 import { StorageSaveItemBase } from '../../storage/storage-save-item-base';
+import { useTranslate } from '../../translate/i18n';
 import { TextContainer } from '../../ui/text-container/text-container';
 
 export type PokedexDetailsOwnedProps = {
@@ -9,10 +10,12 @@ export type PokedexDetailsOwnedProps = {
 }
 
 export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId, species }) => {
+    const { t } = useTranslate();
+
     const savePkmsQuery = useStorageGetSavePkms(saveId);
 
     return <TextContainer maxHeight={300}>
-        <div>Owned in save</div>
+        <div>{t('details.owned-save')}</div>
 
         <div style={{
             display: 'flex',

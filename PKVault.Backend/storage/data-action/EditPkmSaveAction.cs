@@ -1,29 +1,6 @@
-
-using PKHeX.Core;
-
-public class EditPkmSaveAction : DataAction
+public class EditPkmSaveAction(uint saveId, string pkmSaveId, EditPkmVersionPayload editPayload) : DataAction
 {
-    private readonly uint saveId;
-    private readonly string pkmSaveId;
-    private readonly EditPkmVersionPayload payload;
-
-    public EditPkmSaveAction(uint _saveId, string _pkmSaveId, EditPkmVersionPayload _payload)
-    {
-        saveId = _saveId;
-        pkmSaveId = _pkmSaveId;
-        payload = _payload;
-    }
-
-    public override DataActionPayload GetPayload()
-    {
-        return new DataActionPayload
-        {
-            type = DataActionType.EDIT_PKM_SAVE,
-            parameters = [saveId, pkmSaveId]
-        };
-    }
-
-    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
         var pkmSave = await saveLoaders.Pkms.GetDto(pkmSaveId);
@@ -35,9 +12,9 @@ public class EditPkmSaveAction : DataAction
 
         var pkm = pkmSave.Pkm;
 
-        EditPkmVersionAction.EditPkmNickname(pkm, payload.Nickname);
-        EditPkmVersionAction.EditPkmEVs(pkm, payload.EVs);
-        EditPkmVersionAction.EditPkmMoves(pkm, pkmSave.AvailableMoves, payload.Moves);
+        EditPkmVersionAction.EditPkmNickname(pkm, editPayload.Nickname);
+        EditPkmVersionAction.EditPkmEVs(pkm, editPayload.EVs);
+        EditPkmVersionAction.EditPkmMoves(pkm, pkmSave.AvailableMoves, editPayload.Moves);
 
         // absolutly required before each write
         // TODO make a using write pkm to ensure use of this call
@@ -50,5 +27,11 @@ public class EditPkmSaveAction : DataAction
             SaveId = saveId,
             SavePkms = true,
         });
+
+        return new()
+        {
+            type = DataActionType.EDIT_PKM_SAVE,
+            parameters = [saveLoaders.Save.Version, pkmSave.Nickname]
+        };
     }
 }

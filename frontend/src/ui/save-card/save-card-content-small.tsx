@@ -2,6 +2,7 @@ import type React from "react";
 import type { GameVersion } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
+import { useTranslate } from '../../translate/i18n';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
 
@@ -25,6 +26,8 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
   trainerGenderMale,
   version,
 }) => {
+  const { t } = useTranslate();
+
   const staticData = useStaticData();
 
   const gameInfos = getGameInfos(version);
@@ -78,22 +81,22 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
         }}
       >
         <TextContainer noWrap>
-          <span style={{ color: theme.text.red }}>Gen {generation}</span>
+          <span style={{ color: theme.text.red }}>{t('save.gen')} {generation}</span>
           {" - "}
           <span style={{ color: theme.text.primary }}>
-            Pokemon {staticData.versions[ version ].name}
+            {t('save.pkm')} {staticData.versions[ version ].name}
           </span>
           {" - "}
           <span style={{ color: theme.text.primary }}>{id}</span>
 
           <br />
-          OT {tid} -{" "}
+          {t('save.ot')} {tid} -{" "}
           <span style={{ color: theme.text.primary }}>{trainerName}</span>
           <br />
-          Last sync <span style={{ color: theme.text.primary }}>{renderTimestamp()}</span>{" "}
-          {Date.now() - date.getMilliseconds() < 3_600_000 && (
+          {t('save.sync')} <span style={{ color: theme.text.primary }}>{renderTimestamp()}</span>{" "}
+          {/* {Date.now() - date.getMilliseconds() < 3_600_000 && (
             <span style={{ color: theme.text.red }}>NEW !</span>
-          )}
+          )} */}
         </TextContainer>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
+import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popover';
@@ -12,6 +13,8 @@ import { theme } from '../theme';
 import { StorageItemMainActionsContainer } from './storage-item-main-actions-container';
 
 export const StorageItemMainActions: React.FC = () => {
+    const { t } = useTranslate();
+
     const navigate = Route.useNavigate();
     const saveId = Route.useSearch({ select: (search) => search.save });
     const selected = Route.useSearch({ select: (search) => search.selected });
@@ -64,30 +67,27 @@ export const StorageItemMainActions: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 4,
+                maxWidth: 170,
             }}
         >
             {moveClickable.onClick && <Button
                 onClick={moveClickable.onClick}
             >
                 <Icon name='logout' solid forButton />
-                Move
+                {t('storage.actions.move')}
             </Button>}
 
-            {moveClickable.onClickAttached && <ButtonWithDisabledPopover
+            {moveClickable.onClickAttached && pageSave && <ButtonWithDisabledPopover
                 as={Button}
                 onClick={moveClickable.onClickAttached}
                 showHelp
                 anchor='right start'
-                helpTitle='Move a linked copy of this pkm to the save'
-                helpContent={
-                    'Move a copy to save, attached to stored pkm.'
-                    + '\nAn attached pkm synchronizes its data from save with source stored pkm: exp, level, EVs, moves, nickname.'
-                    + '\nThis allows to use the same pkm later in another save even if it\'s not the same generation'
-                }
+                helpTitle={t('storage.actions.move-attached-main.helpTitle')}
+                helpContent={t('storage.actions.move-attached-main.helpContent')}
             >
                 <Icon name='link' solid forButton />
                 <Icon name='logout' solid forButton />
-                Move attached
+                {t('storage.actions.move-attached-main')}
             </ButtonWithDisabledPopover>}
 
             {canCreateVersion && <ButtonWithDisabledPopover
@@ -101,15 +101,11 @@ export const StorageItemMainActions: React.FC = () => {
                 })}
                 showHelp
                 anchor='right start'
-                helpTitle='Create a version of this pkm for the generation'
-                helpContent={
-                    'Create a copy compatible with save.'
-                    + '\nIt allows to use pkm which may be not-compatible with any generation.'
-                    + '\nAll versions shares same exp, level, EVs, but each one handles its own moves.'
-                }
+                helpTitle={t('storage.actions.create-version.helpTitle', { generation: pageSave?.generation })}
+                helpContent={t('storage.actions.create-version.helpContent')}
             >
                 <Icon name='plus' solid forButton />
-                Create version for gen.{pageSave?.generation}
+                {t('storage.actions.create-version', { generation: pageSave?.generation })}
             </ButtonWithDisabledPopover>}
 
             {canGoToSave && <ButtonWithDisabledPopover
@@ -126,10 +122,10 @@ export const StorageItemMainActions: React.FC = () => {
                 })}
                 showHelp
                 anchor='right start'
-                helpTitle='An attached version is present in a save'
+                helpTitle={t('storage.actions.go-main.helpTitle')}
             >
                 <Icon name='link' solid forButton />
-                Go to attached save
+                {t('storage.actions.go-main')}
             </ButtonWithDisabledPopover>}
 
             {canSynchronize && <Button
@@ -142,7 +138,7 @@ export const StorageItemMainActions: React.FC = () => {
                 })}
             >
                 <Icon name='link' solid forButton />
-                Synchronize
+                {t('storage.actions.synchro')}
             </Button>}
 
             <Button
@@ -150,7 +146,7 @@ export const StorageItemMainActions: React.FC = () => {
                 disabled={formEditMode.editMode}
             >
                 <Icon name='pen' solid forButton />
-                Edit
+                {t('storage.actions.edit')}
             </Button>
 
             {canEvolve && <ButtonWithConfirm
@@ -176,7 +172,7 @@ export const StorageItemMainActions: React.FC = () => {
                 }}
             >
                 <Icon name='sparkles' solid forButton />
-                Evolve
+                {t('storage.actions.evolve')}
             </ButtonWithConfirm>}
 
             {canDetach && <ButtonWithDisabledPopover
@@ -186,14 +182,11 @@ export const StorageItemMainActions: React.FC = () => {
                 })}
                 showHelp
                 anchor='right start'
-                helpTitle='Detach pkm from attached one in save'
-                helpContent={
-                    'Break link between this pkm and the one in save (if exists).'
-                    + '\nAllows to use pkm in another save, and create new versions.'
-                }
+                helpTitle={t('storage.actions.detach-main.helpTitle')}
+                helpContent={t('storage.actions.detach-main.helpContent')}
             >
                 <Icon name='link' solid forButton />
-                Detach from save
+                {t('storage.actions.detach-main')}
             </ButtonWithDisabledPopover>}
         </div>
     </StorageItemMainActionsContainer>;

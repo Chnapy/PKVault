@@ -4,6 +4,8 @@ import { getSpeciesNO } from '../dex-item/util/get-species-no';
 import { Gender } from '../gender/gender';
 import { theme } from '../theme';
 import { TypeItem } from '../type-item/type-item';
+import { useTranslate } from '../../translate/i18n';
+import { DetailsLevel } from './details-level';
 
 export type DetailsMainInfosProps = {
     id?: string;
@@ -17,6 +19,7 @@ export type DetailsMainInfosProps = {
 };
 
 export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ id, pid = 0, species, speciesName, nickname, genders, types, level }) => {
+    const { t } = useTranslate();
 
     return <>
         {nickname && <>{nickname}{' - '}</>}
@@ -33,20 +36,16 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ id, pid = 0,
         <br />
         <div style={{ display: 'flex', gap: 4, height: '1lh' }}>
             {types.map(type => <TypeItem key={type} type={type} />)}
-            {level !== undefined && <span
-                style={{
-                    marginLeft: 'auto',
-                }}
-            >
-                Lv.<span style={{ color: theme.text.primary }}>{level}</span>
+            {level !== undefined && <span style={{ marginLeft: 'auto', color: theme.text.primary }}>
+                <DetailsLevel level={level} />
             </span>}
         </div>
         <br />
-        Dex local N°<span style={{ color: theme.text.primary }}>TODO</span>{' '}
-        Dex natio. N°<span style={{ color: theme.text.primary }}>{getSpeciesNO(species)}</span>
+        {t('details.dex.local')}<span style={{ color: theme.text.primary }}>TODO</span>{' '}
+        {t('details.dex.natio')}<span style={{ color: theme.text.primary }}>{getSpeciesNO(species)}</span>
         <br />
         {id !== undefined ? <>
-            ID <span style={{ color: theme.text.primary }}>{id}</span> {pid > 0 && <>PID <span style={{ color: theme.text.primary }}>{pid}</span></>}
+            {t('details.id')} <span style={{ color: theme.text.primary }}>{id}</span> {pid > 0 && <>{t('details.pid')} <span style={{ color: theme.text.primary }}>{pid}</span></>}
         </> : ' '}
     </>;
 };

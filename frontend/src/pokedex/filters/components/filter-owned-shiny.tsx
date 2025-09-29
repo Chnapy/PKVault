@@ -1,8 +1,11 @@
 import React from "react";
 import { Route } from "../../../routes/pokedex";
+import { useTranslate } from '../../../translate/i18n';
 import { FilterCheckbox } from "../../../ui/filter/filter-checkbox/filter-checkbox";
 
 export const FilterOwnedShiny: React.FC = () => {
+  const { t } = useTranslate();
+
   const navigate = Route.useNavigate();
   const searchValue = Route.useSearch({
     select: (search) => search.filterOwnedShiny,
@@ -25,10 +28,10 @@ export const FilterOwnedShiny: React.FC = () => {
       }
     >
       {searchValue === undefined
-        ? "Owned shiny ?"
+        ? t('dex.filters.owned-shiny.unselect')
         : searchValue
-          ? "Owned shiny only"
-          : "Not owned shiny only"}
+          ? t('dex.filters.owned-shiny.yes')
+          : t('dex.filters.owned-shiny.no')}
     </FilterCheckbox>
   );
 };

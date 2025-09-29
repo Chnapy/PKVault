@@ -1,8 +1,11 @@
 import React from "react";
 import { Route } from "../../../routes/pokedex";
 import { FilterInput } from "../../../ui/filter/filter-input/filter-input";
+import { useTranslate } from '../../../translate/i18n';
 
 export const FilterSpecies: React.FC = () => {
+  const { t } = useTranslate();
+
   const navigate = Route.useNavigate();
   const searchValue = Route.useSearch({
     select: (search) => search.filterSpeciesName ?? "",
@@ -31,7 +34,7 @@ export const FilterSpecies: React.FC = () => {
       }}
       enabled={value.length > 0}
     >
-      Name
+      {t('dex.filters.name')}
     </FilterInput>
   );
 };

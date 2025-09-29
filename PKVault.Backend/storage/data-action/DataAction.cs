@@ -1,14 +1,20 @@
 public abstract class DataAction
 {
-    public abstract DataActionPayload GetPayload();
+    public DataActionPayload payload;
+    // public abstract DataActionPayload GetPayload();
 
-    public abstract Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags);
+    protected abstract Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags);
+
+    public async Task ExecuteWithPayload(DataEntityLoaders loaders, DataUpdateFlags flags)
+    {
+        payload = await Execute(loaders, flags);
+    }
 }
 
 public struct DataActionPayload
 {
     public DataActionType type { get; set; }
-    public object[] parameters { get; set; }
+    public object?[] parameters { get; set; }
 }
 
 public enum DataActionType

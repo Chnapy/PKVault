@@ -1,38 +1,20 @@
 using PKHeX.Core;
 
-public class EvolvePkmAction : DataAction
+public class EvolvePkmAction(uint? saveId, string id) : DataAction
 {
-    public uint? saveId { get; }
-    private readonly string id;
-
-    public EvolvePkmAction(uint? _saveId, string _id)
-    {
-        saveId = _saveId;
-        id = _id;
-    }
-
-    public override DataActionPayload GetPayload()
-    {
-        return new DataActionPayload
-        {
-            type = DataActionType.EVOLVE_PKM,
-            parameters = [saveId, id]
-        };
-    }
-
-    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         if (saveId == null)
         {
-            await ExecuteForMain(loaders, flags);
+            return await ExecuteForMain(loaders, flags);
         }
         else
         {
-            await ExecuteForSave(loaders, flags, (uint)saveId);
+            return await ExecuteForSave(loaders, flags, (uint)saveId);
         }
     }
 
-    private async Task ExecuteForSave(DataEntityLoaders loaders, DataUpdateFlags flags, uint saveId)
+    private async Task<DataActionPayload> ExecuteForSave(DataEntityLoaders loaders, DataUpdateFlags flags, uint saveId)
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
         var dto = await saveLoaders.Pkms.GetDto(id);
@@ -40,6 +22,9 @@ public class EvolvePkmAction : DataAction
         {
             throw new ArgumentException("Save Pkm not found");
         }
+
+        var oldName = dto.Nickname;
+        var oldSpecies = dto.Species;
 
         var (evolveSpecies, evolveByItem) = await GetEvolve(dto);
 
@@ -55,9 +40,15 @@ public class EvolvePkmAction : DataAction
             SavePkms = true
         });
         flags.Dex = true;
+
+        return new()
+        {
+            type = DataActionType.EVOLVE_PKM,
+            parameters = [saveLoaders.Save.Version, oldName, oldSpecies, dto.Species]
+        };
     }
 
-    private async Task ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags)
+    private async Task<DataActionPayload> ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var dto = await loaders.pkmVersionLoader.GetDto(id);
         if (dto == default)
@@ -74,6 +65,9 @@ public class EvolvePkmAction : DataAction
         {
             throw new ArgumentException($"One of pkm-version cannot evolve, species not compatible with its generation");
         }
+
+        var oldName = dto.Nickname;
+        var oldSpecies = dto.Species;
 
         var (evolveSpecies, evolveByItem) = await GetEvolve(dto);
 
@@ -115,6 +109,12 @@ public class EvolvePkmAction : DataAction
 
         flags.MainPkms = true;
         flags.MainPkmVersions = true;
+
+        return new DataActionPayload
+        {
+            type = DataActionType.EVOLVE_PKM,
+            parameters = [null, oldName, oldSpecies, dto.Species]
+        };
     }
 
     private static async Task<(ushort evolveSpecies, bool evolveByItem)> GetEvolve(BasePkmVersionDTO dto)

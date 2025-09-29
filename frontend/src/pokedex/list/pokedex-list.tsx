@@ -5,9 +5,11 @@ import { TitledContainer } from '../../ui/container/titled-container';
 import { usePokedexFilters } from "./hooks/use-pokedex-filters";
 import { PokedexCount } from './pokedex-count';
 import { PokedexItem } from "./pokedex-item";
+import { useTranslate } from '../../translate/i18n';
 
 export const PokedexList: React.FC = () => {
   // console.time("pokedex-list");
+  const { t } = useTranslate();
 
   const staticData = useStaticData();
 
@@ -94,7 +96,7 @@ export const PokedexList: React.FC = () => {
         enableExpand
         title={
           <>
-            Generation {i + 1}
+            {t('dex.list.title', { generation: i + 1 })}
 
             <div style={{ float: 'right' }}>
               <PokedexCount

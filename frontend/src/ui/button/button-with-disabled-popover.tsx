@@ -13,8 +13,32 @@ export type ButtonWithDisabledPopoverProps<AS extends ReactTag> = ButtonProps<AS
     helpContent?: React.ReactNode;
 };
 
-export const ButtonWithDisabledPopover = <AS extends ReactTag>({ rootStyle, anchor = 'bottom', showHelp, helpTitle, helpContent, ...btnProps }: ButtonWithDisabledPopoverProps<AS>) => {
+export const ButtonWithDisabledPopover = <AS extends ReactTag>({ loading, disabled, rootStyle, anchor = 'bottom', showHelp, helpTitle, helpContent, ...btnProps }: ButtonWithDisabledPopoverProps<AS>) => {
     const [ hover, setHover ] = React.useState(false);
+    const [ loadingState, setLoadingState ] = React.useState(false);
+
+    loading = loading || loadingState || undefined;
+
+    disabled = disabled || loading || undefined;
+
+    const finalOnClick: React.MouseEventHandler | undefined = !disabled && btnProps.onClick
+        ? ((e) => {
+            const result: unknown = btnProps.onClick?.(e);
+            if (result instanceof Promise) {
+                setLoadingState(true);
+                result.finally(() => {
+                    setLoadingState(false);
+                });
+            }
+        })
+        : undefined;
+
+    const finalBtnProps = {
+        ...btnProps,
+        onClick: finalOnClick,
+        loading,
+        disabled,
+    } as PopoverButtonProps;
 
     return <Popover
         className={css({
@@ -25,7 +49,10 @@ export const ButtonWithDisabledPopover = <AS extends ReactTag>({ rootStyle, anch
         onPointerEnter={() => setHover(true)}
         onPointerLeave={() => setHover(false)}
     >
-        <PopoverButton {...btnProps as PopoverButtonProps} as={btnProps.as as PopoverButtonProps[ 'as' ] ?? ButtonLike} />
+        <PopoverButton
+            {...finalBtnProps as PopoverButtonProps}
+            as={btnProps.as as PopoverButtonProps[ 'as' ] ?? ButtonLike}
+        />
 
         {showHelp && hover && <PopoverPanel
             static

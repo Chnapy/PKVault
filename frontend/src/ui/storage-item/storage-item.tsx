@@ -3,6 +3,7 @@ import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { useStaticData } from '../../hooks/use-static-data';
 import { type ButtonLikeProps } from '../button/button-like';
 import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../button/button-with-disabled-popover';
+import { DetailsLevel } from '../details-card/details-level';
 import { SpeciesImg } from '../details-card/species-img';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
@@ -99,7 +100,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
           backgroundColor: 'rgba(255,255,255,0.4)',
           marginBottom: -4
         }}>
-          {small ? level : `Lv.${level}`}
+          {small ? level : <DetailsLevel level={level} />}
         </div>}
 
         {nbrVersions > 1 && <div style={{

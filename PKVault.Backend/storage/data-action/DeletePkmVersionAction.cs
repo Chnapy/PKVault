@@ -1,23 +1,6 @@
-
-public class DeletePkmVersionAction : DataAction
+public class DeletePkmVersionAction(string pkmVersionId) : DataAction
 {
-    private readonly string pkmVersionId;
-
-    public DeletePkmVersionAction(string _pkmVersionId)
-    {
-        pkmVersionId = _pkmVersionId;
-    }
-
-    public override DataActionPayload GetPayload()
-    {
-        return new DataActionPayload
-        {
-            type = DataActionType.DELETE_PKM_VERSION,
-            parameters = [pkmVersionId]
-        };
-    }
-
-    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var pkmVersion = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkm = pkmVersion.PkmDto;
@@ -34,5 +17,11 @@ public class DeletePkmVersionAction : DataAction
         {
             flags.MainPkms |= loaders.pkmLoader.DeleteEntity(pkm.Id);
         }
+
+        return new()
+        {
+            type = DataActionType.DELETE_PKM_VERSION,
+            parameters = [pkmVersion.Nickname, pkmVersion.Generation]
+        };
     }
 }

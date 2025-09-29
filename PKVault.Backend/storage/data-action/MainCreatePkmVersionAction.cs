@@ -1,28 +1,10 @@
-public class MainCreatePkmVersionAction : DataAction
+public class MainCreatePkmVersionAction(string pkmId, uint generation) : DataAction
 {
-    private readonly string pkmId;
-    private readonly uint generation;
-
     // required to keep same generated PID between memory => file loaders
     // because PID is randomly generated
     private uint? createdPid;
 
-    public MainCreatePkmVersionAction(string _pkmId, uint _generation)
-    {
-        pkmId = _pkmId;
-        generation = _generation;
-    }
-
-    public override DataActionPayload GetPayload()
-    {
-        return new DataActionPayload
-        {
-            type = DataActionType.MAIN_CREATE_PKM_VERSION,
-            parameters = [pkmId, generation]
-        };
-    }
-
-    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         Console.WriteLine($"Create PKM version, pkmId={pkmId}, generation={generation}");
 
@@ -64,5 +46,11 @@ public class MainCreatePkmVersionAction : DataAction
         loaders.pkmVersionLoader.WriteDto(pkmVersionCreated);
 
         flags.MainPkmVersions = true;
+
+        return new()
+        {
+            type = DataActionType.MAIN_CREATE_PKM_VERSION,
+            parameters = [pkmVersionOrigin.Nickname, generation]
+        };
     }
 }

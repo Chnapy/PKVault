@@ -8,7 +8,7 @@ public abstract class DataLoader(DataEntityLoaders loaders)
     {
         var logtime = LogUtil.Time($"Apply action - {action.GetType()}");
 
-        await action.Execute(loaders, flags);
+        await action.ExecuteWithPayload(loaders, flags);
 
         logtime();
     }

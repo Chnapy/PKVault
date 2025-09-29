@@ -2,6 +2,7 @@ import React from 'react';
 import { useWatch } from 'react-hook-form';
 import type { MoveCategory } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
+import { useTranslate } from '../../translate/i18n';
 import { Icon } from '../icon/icon';
 import { NumberInput } from '../input/number-input';
 import { MoveItem } from '../move-item/move-item';
@@ -29,6 +30,8 @@ export const TextStats: React.FC<TextStatsProps> = ({
     hiddenPowerPower,
     hiddenPowerCategory,
 }) => {
+    const { t } = useTranslate();
+
     const staticData = useStaticData();
 
     const { editMode, getValues, register, control } = StorageDetailsForm.useContext();
@@ -52,7 +55,7 @@ export const TextStats: React.FC<TextStatsProps> = ({
 
     return <>
         {natureObj && <>
-            Nature <span style={{ color: theme.text.primary }}>{natureObj.name}</span>
+            {t('details.nature')} <span style={{ color: theme.text.primary }}>{natureObj.name}</span>
             <br />
             <br />
         </>}
@@ -65,13 +68,13 @@ export const TextStats: React.FC<TextStatsProps> = ({
             <thead>
                 <tr>
                     <td style={cellBaseStyle}></td>
-                    {!editMode && <td style={cellBaseStyle}>IVs</td>}
-                    <td style={cellBaseStyle}>EVs</td>
-                    {!editMode && <td style={cellBaseStyle}>Stats</td>}
+                    {!editMode && <td style={cellBaseStyle}>{t('details.stats.ivs')}</td>}
+                    <td style={cellBaseStyle}>{t('details.stats.evs')}</td>
+                    {!editMode && <td style={cellBaseStyle}>{t('details.stats.name')}</td>}
                 </tr>
             </thead>
             <tbody>
-                {[ 'HP', 'Atk', 'Def', 'SpA', 'SpD', 'Spe' ]
+                {[ t('details.stats.hp'), t('details.stats.atk'), t('details.stats.def'), t('details.stats.spa'), t('details.stats.spd'), t('details.stats.spe') ]
                     .map((statName, i) => editMode
                         ? <tr key={statName}>
                             {renderStatNameCell(statName, i)}
@@ -92,11 +95,11 @@ export const TextStats: React.FC<TextStatsProps> = ({
 
                 {editMode
                     ? <tr>
-                        <td style={{ ...cellBaseStyle, textAlign: 'left' }}>Total</td>
+                        <td style={{ ...cellBaseStyle, textAlign: 'left', textTransform: 'capitalize' }}>{t('total')}</td>
                         <td style={cellBaseStyle}>{totalFormEVs} / {totalEVs}</td>
                     </tr>
                     : <tr>
-                        <td style={{ ...cellBaseStyle, textAlign: 'left' }}>Total</td>
+                        <td style={{ ...cellBaseStyle, textAlign: 'left', textTransform: 'capitalize' }}>{t('total')}</td>
                         <td style={cellBaseStyle}>{totalIVs}</td>
                         <td style={cellBaseStyle}>{totalEVs}</td>
                         <td style={cellBaseStyle}>{totalStats}</td>

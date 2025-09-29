@@ -1,27 +1,8 @@
-
 using PKHeX.Core;
 
-public class EditPkmVersionAction : DataAction
+public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload editPayload) : DataAction
 {
-    private readonly string pkmVersionId;
-    private readonly EditPkmVersionPayload payload;
-
-    public EditPkmVersionAction(string _pkmVersionId, EditPkmVersionPayload _payload)
-    {
-        pkmVersionId = _pkmVersionId;
-        payload = _payload;
-    }
-
-    public override DataActionPayload GetPayload()
-    {
-        return new DataActionPayload
-        {
-            type = DataActionType.EDIT_PKM_VERSION,
-            parameters = [pkmVersionId]
-        };
-    }
-
-    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var pkmVersionDto = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkmDto = pkmVersionDto.PkmDto;
@@ -33,9 +14,9 @@ public class EditPkmVersionAction : DataAction
 
         var pkm = pkmVersionDto.Pkm;
 
-        EditPkmNickname(pkm, payload.Nickname);
-        EditPkmEVs(pkm, payload.EVs);
-        EditPkmMoves(pkm, pkmVersionDto.AvailableMoves, payload.Moves);
+        EditPkmNickname(pkm, editPayload.Nickname);
+        EditPkmEVs(pkm, editPayload.EVs);
+        EditPkmMoves(pkm, pkmVersionDto.AvailableMoves, editPayload.Moves);
 
         // absolutly required before each write
         // TODO make a using write pkm to ensure use of this call
@@ -58,6 +39,12 @@ public class EditPkmVersionAction : DataAction
         });
 
         flags.MainPkmVersions = true;
+
+        return new()
+        {
+            type = DataActionType.EDIT_PKM_VERSION,
+            parameters = [pkmVersionDto.Nickname, pkmVersionDto.Generation]
+        };
     }
 
     public static void EditPkmNickname(PKM pkm, string nickname)

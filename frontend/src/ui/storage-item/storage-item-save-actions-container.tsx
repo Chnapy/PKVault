@@ -1,8 +1,9 @@
 import type React from 'react';
 import { useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
-import { TitledContainer } from '../container/titled-container';
-import { Icon } from '../icon/icon';
 import { Route } from '../../routes/storage';
+import { TitledContainer } from '../container/titled-container';
+import { DetailsLevel } from '../details-card/details-level';
+import { Icon } from '../icon/icon';
 
 export const StorageItemSaveActionsContainer: React.FC<React.PropsWithChildren<{
     pkmId: string;
@@ -27,7 +28,8 @@ export const StorageItemSaveActionsContainer: React.FC<React.PropsWithChildren<{
             gap: 4,
         }}>
             <Icon name='angle-left' solid forButton />
-            {nickname}{' Lv.'}{level}
+            {nickname}{' '}
+            <DetailsLevel level={level} />
         </div>}
     >
         {children}

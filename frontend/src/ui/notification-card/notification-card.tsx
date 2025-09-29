@@ -1,13 +1,15 @@
 import React from 'react';
+import { BackendErrorsContext } from '../../data/backend-errors-context';
+import { useWarningsGetWarnings } from '../../data/sdk/warnings/warnings.gen';
+import { useTranslate } from '../../translate/i18n';
+import { PkmVersionWarning } from '../../warnings/pkm-version-warning';
+import { Button } from '../button/button';
 import { TitledContainer } from '../container/titled-container';
 import { Icon } from '../icon/icon';
-import { BackendErrorsContext } from '../../data/backend-errors-context';
-import { Button } from '../button/button';
 import { theme } from '../theme';
-import { useWarningsGetWarnings } from '../../data/sdk/warnings/warnings.gen';
-import { PkmVersionWarning } from '../../warnings/pkm-version-warning';
 
 export const NotificationCard: React.FC = () => {
+    const { t } = useTranslate();
     const { errors, removeIndex } = BackendErrorsContext.useValue();
 
     const warnings = useWarningsGetWarnings().data?.data;
@@ -17,8 +19,8 @@ export const NotificationCard: React.FC = () => {
     const hasErrorsAndWarnings = errors.length > 0 && nbrWarnings > 0;
 
     const title = [
-        errors.length > 0 && `${errors.length} errors`,
-        nbrWarnings > 0 && `${nbrWarnings} warnings`,
+        nbrWarnings > 0 && t('notifications.warnings', { count: nbrWarnings }),
+        errors.length > 0 && t('notifications.errors', { count: errors.length }),
     ].filter(Boolean).join(' / ');
 
     return <TitledContainer

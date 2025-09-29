@@ -3,8 +3,11 @@ import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen'
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
+import { useTranslate } from '../../../translate/i18n';
 
 export const FilterFromGames: React.FC = () => {
+  const { t } = useTranslate();
+
   const navigate = Route.useNavigate();
   const searchValue =
     Route.useSearch({ select: (search) => search.filterFromGames })?.map(
@@ -39,7 +42,7 @@ export const FilterFromGames: React.FC = () => {
       }}
       options={options}
     >
-      From games
+      {t('dex.filters.games')}
     </FilterSelect>
   );
 };

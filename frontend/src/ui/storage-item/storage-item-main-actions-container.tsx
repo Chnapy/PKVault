@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../../data/sdk/storage/storage.gen';
 import { TitledContainer } from '../container/titled-container';
+import { DetailsLevel } from '../details-card/details-level';
 import { Icon } from '../icon/icon';
 
 export const StorageItemMainActionsContainer: React.FC<React.PropsWithChildren<{
@@ -29,7 +30,8 @@ export const StorageItemMainActionsContainer: React.FC<React.PropsWithChildren<{
             gap: 4,
         }}>
             <Icon name='angle-left' solid forButton />
-            {nickname}{' Lv.'}{level}
+            {nickname}{' '}
+            <DetailsLevel level={level} />
         </div>}
     >
         {children}

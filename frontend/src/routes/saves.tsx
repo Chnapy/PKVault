@@ -3,6 +3,7 @@ import type React from "react";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../hooks/use-static-data';
 import { SaveItem } from "../saves/save-item/save-item";
+import { useTranslate } from '../translate/i18n';
 import { ButtonLink } from '../ui/button/button';
 import { Container } from '../ui/container/container';
 import { TitledContainer } from '../ui/container/titled-container';
@@ -10,6 +11,8 @@ import { Icon } from '../ui/icon/icon';
 import { theme } from '../ui/theme';
 
 const Saves: React.FC = () => {
+  const { t } = useTranslate();
+
   const staticData = useStaticData();
   const saveInfosQuery = useSaveInfosGetAll();
 
@@ -53,7 +56,7 @@ const Saves: React.FC = () => {
 
           const maxSpecies = Math.max(...saves.map(save => staticData.versions[ save.version ].maxSpeciesId));
 
-          return <TitledContainer key={generation} title={`Generation ${generation} / ${maxSpecies} species`}>
+          return <TitledContainer key={generation} title={t('saves.title', { generation, maxSpecies })}>
             <div
               style={{
                 display: 'flex',
@@ -76,8 +79,10 @@ const Saves: React.FC = () => {
         padding: '8px 16px',
       }}>
         <Icon name='info-circle' solid forButton />
-        Not seeing your save ?
-        <ButtonLink to={'/settings'}>Check settings</ButtonLink>
+        {t('saves.not-see')}
+        <ButtonLink to={'/settings'}>
+          {t('action.check-settings')}
+        </ButtonLink>
       </Container>
     </div>
   );

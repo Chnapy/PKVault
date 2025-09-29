@@ -1,12 +1,15 @@
 import type React from 'react';
 import { useForm } from 'react-hook-form';
 import { useStorageGetMainBoxes, useStorageUpdateMainBox } from '../../data/sdk/storage/storage.gen';
+import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
 import { TextInput } from '../../ui/input/text-input';
 import { theme } from '../../ui/theme';
 
 export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void; }> = ({ boxId, close }) => {
+    const { t } = useTranslate();
+
     const box = useStorageGetMainBoxes().data?.data.find(box => box.id === boxId);
     const boxUpdateMutation = useStorageUpdateMainBox();
 
@@ -31,7 +34,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void; }> = (
 
         <Button type='submit' bgColor={theme.bg.primary} disabled={watch('name').length === 0 || !formState.isValid}>
             <Icon name='pen' forButton />
-            Submit
+            {t('action.submit')}
         </Button>
     </form>;
 };

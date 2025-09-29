@@ -1,27 +1,9 @@
 
 using PKHeX.Core;
 
-public class SynchronizePkmAction : DataAction
+public class SynchronizePkmAction(uint saveId, string pkmVersionId) : DataAction
 {
-    public uint saveId { get; }
-    private readonly string pkmVersionId;
-
-    public SynchronizePkmAction(uint _saveId, string _pkmVersionId)
-    {
-        saveId = _saveId;
-        pkmVersionId = _pkmVersionId;
-    }
-
-    public override DataActionPayload GetPayload()
-    {
-        return new DataActionPayload
-        {
-            type = DataActionType.PKM_SYNCHRONIZE,
-            parameters = [pkmVersionId]
-        };
-    }
-
-    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var pkmVersionDto = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkmDto = pkmVersionDto.PkmDto;
@@ -46,5 +28,11 @@ public class SynchronizePkmAction : DataAction
 
             flags.MainPkmVersions = true;
         });
+
+        return new()
+        {
+            type = DataActionType.PKM_SYNCHRONIZE,
+            parameters = [pkmVersionDto.Nickname]
+        };
     }
 }

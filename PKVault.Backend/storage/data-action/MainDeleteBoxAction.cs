@@ -1,22 +1,6 @@
-public class MainDeleteBoxAction : DataAction
+public class MainDeleteBoxAction(string boxId) : DataAction
 {
-    private readonly string boxId;
-
-    public MainDeleteBoxAction(string _boxId)
-    {
-        boxId = _boxId;
-    }
-
-    public override DataActionPayload GetPayload()
-    {
-        return new DataActionPayload
-        {
-            type = DataActionType.MAIN_DELETE_BOX,
-            parameters = [boxId]
-        };
-    }
-
-    public override async Task Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var box = await loaders.boxLoader.GetDto(boxId);
         var allPkms = await loaders.pkmLoader.GetAllDtos();
@@ -29,5 +13,11 @@ public class MainDeleteBoxAction : DataAction
         loaders.boxLoader.DeleteEntity(boxId);
 
         flags.MainBoxes = true;
+
+        return new()
+        {
+            type = DataActionType.MAIN_DELETE_BOX,
+            parameters = [box.Name]
+        };
     }
 }
