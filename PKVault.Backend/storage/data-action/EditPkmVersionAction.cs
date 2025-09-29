@@ -5,7 +5,7 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var pkmVersionDto = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
-        var pkmDto = pkmVersionDto.PkmDto;
+        var pkmDto = pkmVersionDto!.PkmDto;
 
         if (pkmDto.SaveId != default)
         {

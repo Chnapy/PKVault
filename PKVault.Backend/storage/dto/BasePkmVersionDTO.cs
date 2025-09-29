@@ -282,38 +282,47 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     {
         get
         {
-            var legality = new LegalityAnalysis(Pkm);
-
-            var moveComboSource = new LegalMoveComboSource();
-            var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
-
-            var blankSav = SaveUtil.GetBlankSAV(Pkm.Version, Pkm.OriginalTrainerName, (LanguageID)Pkm.Language);
-
-            // TODO perf issue ? should be done once for each save type
-            var filteredSources = new FilteredGameDataSource(blankSav, GameInfo.Sources);
-            moveSource.ChangeMoveSource(filteredSources.Moves);
-            moveSource.ReloadMoves(legality);
-
-            var movesStr = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).movelist;
-
-            var availableMoves = new List<MoveItem>();
-
-            moveComboSource.DataSource.ToList().ForEach(data =>
+            try
             {
-                if (data.Value > 0 && moveSource.Info.CanLearn((ushort)data.Value))
-                {
-                    var item = new MoveItem
-                    {
-                        Id = data.Value,
-                        // Type = MoveInfo.GetType((ushort)data.Value, Pkm.Context),
-                        // Text = movesStr[data.Value],
-                        // SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Length > data.Value && moveSourceTypesRecord[type][data.Value]),
-                    };
-                    availableMoves.Add(item);
-                }
-            });
+                var legality = new LegalityAnalysis(Pkm);
 
-            return availableMoves;
+                var moveComboSource = new LegalMoveComboSource();
+                var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
+
+                var version = Version.IsValidSavedVersion() ? Version : Version.GetSingleVersion();
+                var blankSav = BlankSaveFile.Get(version, Pkm.OriginalTrainerName, (LanguageID)Pkm.Language);
+
+                // TODO perf issue ? should be done once for each save type
+                var filteredSources = new FilteredGameDataSource(blankSav, GameInfo.Sources);
+                moveSource.ChangeMoveSource(filteredSources.Moves);
+                moveSource.ReloadMoves(legality);
+
+                var movesStr = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).movelist;
+
+                var availableMoves = new List<MoveItem>();
+
+                moveComboSource.DataSource.ToList().ForEach(data =>
+                {
+                    if (data.Value > 0 && moveSource.Info.CanLearn((ushort)data.Value))
+                    {
+                        var item = new MoveItem
+                        {
+                            Id = data.Value,
+                            // Type = MoveInfo.GetType((ushort)data.Value, Pkm.Context),
+                            // Text = movesStr[data.Value],
+                            // SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Length > data.Value && moveSourceTypesRecord[type][data.Value]),
+                        };
+                        availableMoves.Add(item);
+                    }
+                });
+
+                return availableMoves;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+                return [];
+            }
         }
     }
 

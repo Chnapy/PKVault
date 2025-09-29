@@ -70,7 +70,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
         {
             var mainPkm = await pkmLoader.GetDto(pkmVersion.PkmDto.Id);
 
-            if (mainPkm.SaveId == Save.ID32)
+            if (mainPkm?.SaveId == Save.ID32)
             {
                 PkmVersionId = pkmVersion.Id;
             }

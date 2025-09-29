@@ -4,7 +4,7 @@ public class MainUpdateBoxAction(string boxId, string boxName) : DataAction
     {
         var box = await loaders.boxLoader.GetDto(boxId);
 
-        var boxOldName = box.Name;
+        var boxOldName = box!.Name;
         box.BoxEntity.Name = boxName;
 
         loaders.boxLoader.WriteDto(box);

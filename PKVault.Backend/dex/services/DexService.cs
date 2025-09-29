@@ -20,16 +20,14 @@ public class DexService
             dex.Add(i + 1, []);
         }
 
-        await Task.WhenAll(
-            saveDict.Values.ToList().Select(save => UpdateDexWithSave(dex, save.Save))
-        );
+        saveDict.Values.ToList().ForEach(save => UpdateDexWithSave(dex, save.Save));
 
         time();
 
         return dex;
     }
 
-    private static async Task<bool> UpdateDexWithSave(Dictionary<int, Dictionary<uint, DexItemDTO>> dex, SaveFile save)
+    private static bool UpdateDexWithSave(Dictionary<int, Dictionary<uint, DexItemDTO>> dex, SaveFile save)
     {
         static bool notHandled(SaveFile save)
         {
@@ -39,21 +37,21 @@ public class DexService
 
         var success = save switch
         {
-            SAV1 sav1 => await new Dex123Service().UpdateDexWithSave(dex, sav1),
-            SAV2 sav2 => await new Dex123Service().UpdateDexWithSave(dex, sav2),
-            SAV3 sav3 => await new Dex123Service().UpdateDexWithSave(dex, sav3),
-            SAV3XD sav3XD => await new Dex3XDService().UpdateDexWithSave(dex, sav3XD),
-            SAV3Colosseum sav3Colo => await new Dex3ColoService().UpdateDexWithSave(dex, sav3Colo),
-            SAV4 sav4 => await new Dex4Service().UpdateDexWithSave(dex, sav4),
-            SAV5 sav5 => await new Dex5Service().UpdateDexWithSave(dex, sav5),
-            SAV6XY xy => await new Dex6XYService().UpdateDexWithSave(dex, xy),
-            SAV6AO ao => await new Dex6AOService().UpdateDexWithSave(dex, ao),
-            SAV7b lgpe => await new Dex7bService().UpdateDexWithSave(dex, lgpe),
-            SAV7 sav7 => await new Dex7Service().UpdateDexWithSave(dex, sav7),
-            SAV8SWSH ss => await new Dex8SWSHService().UpdateDexWithSave(dex, ss),
-            SAV8BS bs => await new Dex8BSService().UpdateDexWithSave(dex, bs),
-            SAV8LA la => await new Dex8LAService().UpdateDexWithSave(dex, la),
-            SAV9SV sv => await new Dex9SVService().UpdateDexWithSave(dex, sv),
+            SAV1 sav1 => new Dex123Service().UpdateDexWithSave(dex, sav1),
+            SAV2 sav2 => new Dex123Service().UpdateDexWithSave(dex, sav2),
+            SAV3 sav3 => new Dex123Service().UpdateDexWithSave(dex, sav3),
+            SAV3XD sav3XD => new Dex3XDService().UpdateDexWithSave(dex, sav3XD),
+            SAV3Colosseum sav3Colo => new Dex3ColoService().UpdateDexWithSave(dex, sav3Colo),
+            SAV4 sav4 => new Dex4Service().UpdateDexWithSave(dex, sav4),
+            SAV5 sav5 => new Dex5Service().UpdateDexWithSave(dex, sav5),
+            SAV6XY xy => new Dex6XYService().UpdateDexWithSave(dex, xy),
+            SAV6AO ao => new Dex6AOService().UpdateDexWithSave(dex, ao),
+            SAV7b lgpe => new Dex7bService().UpdateDexWithSave(dex, lgpe),
+            SAV7 sav7 => new Dex7Service().UpdateDexWithSave(dex, sav7),
+            SAV8SWSH ss => new Dex8SWSHService().UpdateDexWithSave(dex, ss),
+            SAV8BS bs => new Dex8BSService().UpdateDexWithSave(dex, bs),
+            SAV8LA la => new Dex8LAService().UpdateDexWithSave(dex, la),
+            SAV9SV sv => new Dex9SVService().UpdateDexWithSave(dex, sv),
             _ => notHandled(save),
         };
 

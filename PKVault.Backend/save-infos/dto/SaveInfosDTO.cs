@@ -51,41 +51,41 @@ public class SaveInfosDTO
         };
     }
 
-    public uint Id { get; set; }
+    public required uint Id { get; set; }
 
-    public DateTime LastWriteTime { get; set; }
+    public required DateTime LastWriteTime { get; set; }
 
-    public GameVersion Version { get; set; }
+    public required GameVersion Version { get; set; }
 
-    public byte Generation { get; set; }
+    public required byte Generation { get; set; }
 
-    public uint TID { get; set; }
+    public required uint TID { get; set; }
 
-    public uint SID { get; set; }
+    public required uint SID { get; set; }
 
-    public int Language { get; set; }
+    public required int Language { get; set; }
 
-    public string PlayTime { get; set; }
+    public required string PlayTime { get; set; }
 
-    public byte TrainerGender { get; set; }
+    public required byte TrainerGender { get; set; }
 
-    public string TrainerName { get; set; }
+    public required string TrainerName { get; set; }
 
-    public int DexSeenCount { get; set; }
+    public required int DexSeenCount { get; set; }
 
-    public int DexCaughtCount { get; set; }
+    public required int DexCaughtCount { get; set; }
 
-    public int OwnedCount { get; set; }
+    public required int OwnedCount { get; set; }
 
-    public int ShinyCount { get; set; }
+    public required int ShinyCount { get; set; }
 
-    public int PartyCount { get; set; }
+    public required int PartyCount { get; set; }
 
-    public int DaycareCount { get; set; }
+    public required int DaycareCount { get; set; }
 
-    public int BoxCount { get; set; }
+    public required int BoxCount { get; set; }
 
-    public int BoxSlotCount { get; set; }
+    public required int BoxSlotCount { get; set; }
 
     // public bool CanDelete { get; set; }
 

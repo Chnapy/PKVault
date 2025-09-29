@@ -1,12 +1,9 @@
-
-using PKHeX.Core;
-
 public class SynchronizePkmAction(uint saveId, string pkmVersionId) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var pkmVersionDto = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
-        var pkmDto = pkmVersionDto.PkmDto;
+        var pkmDto = pkmVersionDto!.PkmDto;
 
         if (pkmDto.SaveId == default)
         {
@@ -22,7 +19,7 @@ public class SynchronizePkmAction(uint saveId, string pkmVersionId) : DataAction
         {
             var pkm = version.Pkm;
 
-            PkmConvertService.PassAllToPkm(savePkm.Pkm, pkm);
+            PkmConvertService.PassAllToPkm(savePkm!.Pkm, pkm);
 
             loaders.pkmVersionLoader.WriteDto(version);
 

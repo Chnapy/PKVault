@@ -70,7 +70,7 @@ public class DataFileLoader : DataLoader
                 var pkmDto = await pkmLoader.GetDto(entity.PkmId);
                 var pkm = getPkmVersionEntityPkm(entity);
 
-                return await PkmVersionDTO.FromEntity(entity, pkm, pkmDto);
+                return await PkmVersionDTO.FromEntity(entity, pkm, pkmDto!);
             },
             dtoToEntity: dto => dto.PkmVersionEntity
         )

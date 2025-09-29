@@ -43,7 +43,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders) : DataLoader(_loaders)
                     throw new Exception($"PKM is null, from entity Id={entity.Id} Filepath={entity.Filepath} bytes.length={pkmBytes.Length}");
                 }
 
-                return await PkmVersionDTO.FromEntity(entity, pkm, pkmDto);
+                return await PkmVersionDTO.FromEntity(entity, pkm, pkmDto!);
             },
             dtoToEntity: dto => dto.PkmVersionEntity
         )

@@ -12,12 +12,12 @@
     <SelfContained>true</SelfContained>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="PKHeX.Core" Version="25.6.9" />
-    <PackageReference Include="PokeApiNet" Version="4.0.0" />
+    <PackageReference Include="PKHeX.Core" Version="25.9.25" />
+    <PackageReference Include="PokeApiNet" Version="4.1.0" />
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="NSwag.AspNetCore" Version="14.4.0" />
+    <PackageReference Include="NSwag.AspNetCore" Version="14.6.0" />
   </ItemGroup>
 
   <ItemGroup>

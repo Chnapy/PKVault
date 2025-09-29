@@ -10,7 +10,7 @@ public class EditPkmSaveAction(uint saveId, string pkmSaveId, EditPkmVersionPayl
         //     throw new Exception("Edit not possible for pkm attached with save");
         // }
 
-        var pkm = pkmSave.Pkm;
+        var pkm = pkmSave!.Pkm;
 
         EditPkmVersionAction.EditPkmNickname(pkm, editPayload.Nickname);
         EditPkmVersionAction.EditPkmEVs(pkm, editPayload.EVs);

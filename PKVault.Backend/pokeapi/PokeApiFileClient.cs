@@ -92,7 +92,7 @@ public partial class PokeApiFileClient
         PropertyInfo? property = typeof(T).GetProperty("IsApiEndpointCaseSensitive", BindingFlags.Static | BindingFlags.NonPublic);
         if (!(property == null))
         {
-            return (bool)property.GetValue(null);
+            return (bool)property.GetValue(null)!;
         }
 
         return false;

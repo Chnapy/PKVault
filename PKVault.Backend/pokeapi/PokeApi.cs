@@ -53,37 +53,37 @@ public class PokeApi
         return await client.GetAsync<Nature>(natureName);
     }
 
-    public static async Task<Pokedex> GetPokedex(PokeApiPokedexEnum pokedex)
+    public static async Task<Pokedex?> GetPokedex(PokeApiPokedexEnum pokedex)
     {
         return await client.GetAsync<Pokedex>((int)pokedex);
     }
 
-    public static async Task<Item> GetItem(int id)
+    public static async Task<Item?> GetItem(int id)
     {
         return await client.GetAsync<Item>(id);
     }
 
-    public static async Task<Item> GetItem(string name)
+    public static async Task<Item?> GetItem(string name)
     {
         return await client.GetAsync<Item>(name);
     }
 
-    public static async Task<Move> GetMove(int id)
+    public static async Task<Move?> GetMove(int id)
     {
         return await client.GetAsync<Move>(id);
     }
 
-    public static async Task<Stat> GetStat(int id)
+    public static async Task<Stat?> GetStat(int id)
     {
         return await client.GetAsync<Stat>(id);
     }
 
-    public static async Task<VersionGroup> GetVersionGroup(NamedApiResource<VersionGroup> namedVersionGroup)
+    public static async Task<VersionGroup?> GetVersionGroup(NamedApiResource<VersionGroup> namedVersionGroup)
     {
         return await client.GetAsync(namedVersionGroup);
     }
 
-    public static async Task<PokeApiNet.Version> GetVersion(int id)
+    public static async Task<PokeApiNet.Version?> GetVersion(int id)
     {
         return await client.GetAsync<PokeApiNet.Version>(id);
     }

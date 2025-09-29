@@ -2,6 +2,7 @@ import type React from 'react';
 import { useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
 import { StorageSaveItemBase } from '../../storage/storage-save-item-base';
 import { useTranslate } from '../../translate/i18n';
+import { StorageItem } from '../../ui/storage-item/storage-item';
 import { TextContainer } from '../../ui/text-container/text-container';
 
 export type PokedexDetailsOwnedProps = {
@@ -22,6 +23,14 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
             flexWrap: 'wrap',
             gap: 4,
         }}>
+            {savePkmsQuery.isLoading && !savePkmsQuery.data && <StorageItem
+                small
+                species={species}
+                form={0}
+                helpTitle={null}
+                loading
+            />}
+
             {savePkmsQuery.data?.data
                 .filter(pkm => pkm.species === species)
                 .map(pkm =>

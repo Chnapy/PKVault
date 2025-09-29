@@ -52,7 +52,7 @@ public struct DataDTO
             saveDict.TryAdd(saveData.SaveId, new() { SaveId = saveData.SaveId });
             saveDict.TryGetValue(saveData.SaveId, out var saveDto);
 
-            if (saveData.SaveId > 0)
+            if (saveDto != null && saveData.SaveId > 0)
             {
                 if (saveData.SaveBoxes)
                 {

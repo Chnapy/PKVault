@@ -37,6 +37,11 @@ public partial class ExceptionHandlingMiddleware
     {
         Console.Error.WriteLine(ex);
 
+        if (context.Response.HasStarted)
+        {
+            return;
+        }
+
         context.Response.StatusCode = GetStatusCode(ex);
         context.Response.ContentType = "application/json";
 

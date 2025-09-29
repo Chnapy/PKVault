@@ -90,7 +90,7 @@ public class EvolvePkmAction(uint? saveId, string id) : DataAction
         });
 
         // pkmId to assign to every pkm-version here
-        var pkmId = mainDto.Id;
+        var pkmId = mainDto!.Id;
 
         // update pkm-entity
         mainDto.PkmDto.PkmEntity.Id = pkmId;
@@ -125,7 +125,7 @@ public class EvolvePkmAction(uint? saveId, string id) : DataAction
         }
 
         var evolveChains = await dto.GetTradeEvolveChains(
-            SaveUtil.GetBlankSAV(dto.Pkm.Context, "")
+            BlankSaveFile.Get(dto.Pkm.Context)
         );
 
         var heldItemName = GameInfo.Strings.Item[dto.HeldItem];
@@ -139,10 +139,10 @@ public class EvolvePkmAction(uint? saveId, string id) : DataAction
             details.Trigger.Name == "trade" && details.HeldItem == null
         ));
 
-        var evolveName = choosenChain.Species.Name;
+        var evolveName = choosenChain!.Species.Name;
 
         var evolvePkmSpecies = await PokeApi.GetPokemonSpecies(evolveName);
-        var evolveSpecies = (ushort)evolvePkmSpecies.Id;
+        var evolveSpecies = (ushort)evolvePkmSpecies!.Id;
 
         return (
             evolveSpecies,

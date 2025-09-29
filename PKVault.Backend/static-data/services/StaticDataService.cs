@@ -86,7 +86,7 @@ public class StaticDataService
             {
                 var blankSave = version.GetContext() == EntityContext.None
                 ? null
-                : SaveUtil.GetBlankSAV(version.GetContext(), "");
+                : BlankSaveFile.Get(version.GetContext());
 
                 return new StaticVersion
                 {

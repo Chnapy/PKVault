@@ -82,7 +82,7 @@ public class SaveInfosController : ControllerBase
 
         var filename = save.Metadata.FileName;
 
-        byte[] fileBytes = save.Write();
+        byte[] fileBytes = save.Write().ToArray();
         return File(fileBytes, MediaTypeNames.Application.Octet, filename);
     }
 }

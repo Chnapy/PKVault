@@ -65,8 +65,8 @@ public class MovePkmAction(
 
     private async Task<DataActionPayload> SaveToSave(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        var sourceSaveLoaders = loaders.saveLoadersDict[(uint)sourceSaveId];
-        var targetSaveLoaders = loaders.saveLoadersDict[(uint)targetSaveId];
+        var sourceSaveLoaders = loaders.saveLoadersDict[(uint)sourceSaveId!];
+        var targetSaveLoaders = loaders.saveLoadersDict[(uint)targetSaveId!];
         var notSameSave = sourceSaveId != targetSaveId;
 
         var sourcePkmDto = await sourceSaveLoaders.Pkms.GetDto(pkmId);
@@ -143,7 +143,7 @@ public class MovePkmAction(
 
     private async Task<DataActionPayload> MainToSave(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        var saveLoaders = loaders.saveLoadersDict[(uint)targetSaveId];
+        var saveLoaders = loaders.saveLoadersDict[(uint)targetSaveId!];
 
         var relatedPkmVersionDtos = (await loaders.pkmVersionLoader.GetAllDtos())
             .FindAll(version => version.PkmId == pkmId);
@@ -159,7 +159,7 @@ public class MovePkmAction(
 
         if (existingSlot != null)
         {
-            await SaveToMainWithoutCheckTarget(loaders, flags, (uint)targetSaveId, pkmDto.BoxId, pkmDto.BoxSlot, existingSlot);
+            await SaveToMainWithoutCheckTarget(loaders, flags, (uint)targetSaveId, pkmDto!.BoxId, pkmDto.BoxSlot, existingSlot);
         }
 
         var boxName = (await saveLoaders.Boxes.GetDto(targetBoxId.ToString()))?.Name;
@@ -173,7 +173,7 @@ public class MovePkmAction(
 
     private async Task<DataActionPayload> SaveToMain(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        var saveLoaders = loaders.saveLoadersDict[(uint)sourceSaveId];
+        var saveLoaders = loaders.saveLoadersDict[(uint)sourceSaveId!];
         var savePkm = await saveLoaders.Pkms.GetDto(pkmId);
 
         var pkmDto = await loaders.pkmLoader.GetDto(pkmId);
@@ -188,13 +188,13 @@ public class MovePkmAction(
             : [];
 
         await SaveToMainWithoutCheckTarget(
-                loaders, flags, (uint)sourceSaveId, (uint)targetBoxId, (uint)targetBoxSlot, savePkm
+                loaders, flags, (uint)sourceSaveId, (uint)targetBoxId, (uint)targetBoxSlot, savePkm!
             );
 
         if (existingSlot != null)
         {
             await MainToSaveWithoutCheckTarget(
-                loaders, flags, (uint)sourceSaveId, savePkm.Box, savePkm.BoxSlot, relatedPkmVersionDtos
+                loaders, flags, (uint)sourceSaveId, savePkm!.Box, savePkm.BoxSlot, relatedPkmVersionDtos
             );
         }
 
@@ -203,7 +203,7 @@ public class MovePkmAction(
         return new()
         {
             type = DataActionType.MOVE_PKM,
-            parameters = [savePkm.Nickname, saveLoaders.Save.Version, null, boxName, targetBoxSlot, attached]
+            parameters = [savePkm?.Nickname, saveLoaders.Save.Version, null, boxName, targetBoxSlot, attached]
         };
     }
 
@@ -264,7 +264,7 @@ public class MovePkmAction(
         {
             var hoennDex = await PokeApi.GetPokedex(PokeApiPokedexEnum.HOENN);
             // Console.WriteLine(hoennDex.name);
-            var isInDex = hoennDex.PokemonEntries.Any(entry =>
+            var isInDex = hoennDex!.PokemonEntries.Any(entry =>
             {
                 var url = entry.PokemonSpecies.Url;
                 var id = int.Parse(url.TrimEnd('/').Split('/')[^1]);
@@ -366,7 +366,7 @@ public class MovePkmAction(
 
         var pkmDto = await loaders.pkmLoader.GetDto(pkmVersionEntity.PkmId);
 
-        if (pkmDto.SaveId != default)
+        if (pkmDto!.SaveId != default)
         {
             await new SynchronizePkmAction(sourceSaveId, pkmVersionEntity.Id).ExecuteWithPayload(loaders, flags);
 

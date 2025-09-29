@@ -11,18 +11,15 @@ public abstract class PKMLoader
         var format = EntityFileExtension.GetContextFromExtension(pkmVersionEntity.Filepath, (EntityContext)pkmVersionEntity.Generation);
         var pkm = EntityFormat.GetFromBytes(bytes, prefer: format);
 
-        if (pkm == default)
+        pkm ??= pkmVersionEntity.Generation switch
         {
-            pkm = pkmVersionEntity.Generation switch
-            {
-                1 => new PK1(bytes),
-                2 => new PK2(bytes),
-                3 => new PK3(bytes),
-                4 => new PK4(bytes),
-                5 => new PK5(bytes),
-                _ => EntityFormat.GetFromBytes(bytes)
-            };
-        }
+            1 => new PK1(bytes),
+            2 => new PK2(bytes),
+            3 => new PK3(bytes),
+            4 => new PK4(bytes),
+            5 => new PK5(bytes),
+            _ => EntityFormat.GetFromBytes(bytes)!
+        };
 
         return pkm;
     }

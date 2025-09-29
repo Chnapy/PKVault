@@ -5,7 +5,7 @@ public class MainDeleteBoxAction(string boxId) : DataAction
         var box = await loaders.boxLoader.GetDto(boxId);
         var allPkms = await loaders.pkmLoader.GetAllDtos();
 
-        if (allPkms.Any(pkm => pkm.BoxId == box.IdInt))
+        if (allPkms.Any(pkm => pkm.BoxId == box!.IdInt))
         {
             throw new ArgumentException($"Cannot delete box with pkm inside");
         }
@@ -17,7 +17,7 @@ public class MainDeleteBoxAction(string boxId) : DataAction
         return new()
         {
             type = DataActionType.MAIN_DELETE_BOX,
-            parameters = [box.Name]
+            parameters = [box!.Name]
         };
     }
 }

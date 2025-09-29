@@ -13,7 +13,7 @@ public class PkmVersionDTO : BasePkmVersionDTO
         };
 
         await dto.RefreshAsyncData(
-            SaveUtil.GetBlankSAV(pkm.Context, "")
+            BlankSaveFile.Get(pkm.Context)
         );
 
         if (dto.Id != entity.Id)
@@ -27,7 +27,7 @@ public class PkmVersionDTO : BasePkmVersionDTO
     private static readonly List<SaveFile> allVersionBlankSaves = [..Enum.GetValues<GameVersion>().ToList()
         .Select(version => {
             try {
-                return SaveUtil.GetBlankSAV(version, "BLANK");
+                return BlankSaveFile.Get(version);
             } catch (ArgumentOutOfRangeException)
             {
                 return null;

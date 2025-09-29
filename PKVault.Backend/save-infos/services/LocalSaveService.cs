@@ -35,9 +35,8 @@ public class LocalSaveService
     {
         // Console.WriteLine($"UPDATE SAVE {path}");
 
-        var save = SaveByPath.ContainsKey(path)
-            ? SaveByPath[path]
-            : SaveUtil.GetVariantSAV(path);
+        var save = SaveByPath.TryGetValue(path, out var value) ? value
+        : (SaveUtil.TryGetSaveFile(path, out var result) ? result : null);
 
         if (save == null)
         {
@@ -132,12 +131,6 @@ public class LocalSaveService
         return record;
     }
 
-    public static SaveFile GetSaveFromId(uint saveId)
-    {
-        var path = SaveByPath.Keys.ToList().Find(path => SaveByPath[path].ID32 == saveId);
-        return SaveUtil.GetVariantSAV(path)!;
-    }
-
     public static DateTime WriteSave(SaveFile save)
     {
         var path = SaveByPath.Keys.ToList().Find(path => SaveByPath[path].ID32 == save.ID32);
@@ -151,7 +144,7 @@ public class LocalSaveService
 
         var dirPath = Path.GetDirectoryName(path)!;
 
-        File.WriteAllBytes(path, save.Write());
+        File.WriteAllBytes(path, save.Write().ToArray());
 
         UpdateGlobalsWithSave(save, path);
 

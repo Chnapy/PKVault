@@ -45,15 +45,15 @@ public class Dex6XYService : DexGenService<SAV6XY>
             IsCaught = save.GetCaught(species),
             IsOwned = ownedPkms.Count > 0,
             IsOwnedShiny = isOwnedShiny,
-            IsLangJa = save.Zukan.GetLanguageFlag(species - 1, 0),
-            IsLangEn = save.Zukan.GetLanguageFlag(species - 1, 1),
-            IsLangFr = save.Zukan.GetLanguageFlag(species - 1, 2),
-            IsLangIt = save.Zukan.GetLanguageFlag(species - 1, 3),
-            IsLangDe = save.Zukan.GetLanguageFlag(species - 1, 4),
-            IsLangEs = save.Zukan.GetLanguageFlag(species - 1, 5),
-            IsLangKo = save.Zukan.GetLanguageFlag(species - 1, 6),
-            IsLangCh = save.Zukan.GetLanguageFlag(species - 1, 7),
-            IsLangCh2 = save.Zukan.GetLanguageFlag(species - 1, 8)
+            // IsLangJa = save.Zukan.GetLanguageFlag(species - 1, 0),
+            // IsLangEn = save.Zukan.GetLanguageFlag(species - 1, 1),
+            // IsLangFr = save.Zukan.GetLanguageFlag(species - 1, 2),
+            // IsLangIt = save.Zukan.GetLanguageFlag(species - 1, 3),
+            // IsLangDe = save.Zukan.GetLanguageFlag(species - 1, 4),
+            // IsLangEs = save.Zukan.GetLanguageFlag(species - 1, 5),
+            // IsLangKo = save.Zukan.GetLanguageFlag(species - 1, 6),
+            // IsLangCh = save.Zukan.GetLanguageFlag(species - 1, 7),
+            // IsLangCh2 = save.Zukan.GetLanguageFlag(species - 1, 8)
         };
     }
 }

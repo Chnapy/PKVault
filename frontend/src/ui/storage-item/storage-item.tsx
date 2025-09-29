@@ -15,9 +15,9 @@ export type StorageItemProps =
   & {
     species: number;
     form: number;
-    isEgg: boolean;
-    isShiny: boolean;
-    isShadow: boolean;
+    isEgg?: boolean;
+    isShiny?: boolean;
+    isShadow?: boolean;
     heldItem?: number;
     warning?: boolean;
     level?: number;
@@ -47,7 +47,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   small,
 
   canCreateVersion,
-  canMoveOutside,
+  canMoveOutside = true,
   canEvolve,
   attached,
   needSynchronize,

@@ -256,7 +256,7 @@ public class StorageService
             await Program.WaitForSetup();
         }
 
-        return _memoryLoader;
+        return _memoryLoader!;
     }
 
     // public static void CleanMainStorageFiles()

@@ -79,11 +79,11 @@ public class WarningsService
         var pkmVersionsTask = loader.loaders.pkmVersionLoader.GetAllDtos();
         var pkms = await loader.loaders.pkmLoader.GetAllDtos();
 
-        var tasks = pkms.Select<PkmDTO, Task<PkmVersionWarning?>>(async pkm =>
+        var tasks = pkms.Select(async pkm =>
         {
             if (pkm.SaveId != default)
             {
-                var exists = loader.loaders.saveLoadersDict.TryGetValue((uint)pkm.SaveId, out var saveLoader);
+                var exists = loader.loaders.saveLoadersDict.TryGetValue((uint)pkm.SaveId!, out var saveLoader);
                 if (!exists)
                 {
                     return new PkmVersionWarning()
@@ -97,16 +97,16 @@ public class WarningsService
 
                 var pkmVersion = (await pkmVersionsTask).Find(pkmVersion => pkmVersion.PkmDto.Id == pkm.Id && pkmVersion.Generation == generation);
 
-                var savePkm = await saveLoader.Pkms.GetDto(pkmVersion.Id);
+                var savePkm = pkmVersion == null ? null : await saveLoader.Pkms.GetDto(pkmVersion.Id);
 
-                if (savePkm == default)
+                if (savePkm == null)
                 {
                     Console.WriteLine($"Pkm-version warning");
 
                     return new PkmVersionWarning()
                     {
                         PkmId = pkm.Id,
-                        PkmVersionId = pkmVersion.Id,
+                        PkmVersionId = pkmVersion?.Id,
                     };
                 }
             }

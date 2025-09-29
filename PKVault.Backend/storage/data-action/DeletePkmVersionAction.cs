@@ -3,7 +3,7 @@ public class DeletePkmVersionAction(string pkmVersionId) : DataAction
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var pkmVersion = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
-        var pkm = pkmVersion.PkmDto;
+        var pkm = pkmVersion!.PkmDto;
 
         if (pkm.SaveId != null)
         {

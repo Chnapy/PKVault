@@ -1,11 +1,14 @@
 using System.Text.RegularExpressions;
 
-public class SlugifyParameterTransformer : IOutboundParameterTransformer
+public partial class SlugifyParameterTransformer : IOutboundParameterTransformer
 {
-    public string? TransformOutbound(object value)
+    public string? TransformOutbound(object? value)
     {
         // Convertit "UserRegistration" en "user-registration"
         return value == null ? null :
-            Regex.Replace(value.ToString(), "([a-z])([A-Z])", "$1-$2").ToLower();
+            MyRegex().Replace(value.ToString()!, "$1-$2").ToLower();
     }
+
+    [GeneratedRegex("([a-z])([A-Z])")]
+    private static partial Regex MyRegex();
 }
