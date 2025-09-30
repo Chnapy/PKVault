@@ -1,0 +1,19 @@
+{
+  "search.exclude": {
+    "**/pokeapi/api-data": true,
+    "**/dist": true,
+    "**/bin": true,
+    "**/obj": true,
+    "**/wwwroot": true
+  },
+  "i18n-ally.localesPaths": [
+    "frontend/src/translate/locales"
+  ],
+  "i18n-ally.enabledFrameworks": [
+    "react-i18next"
+  ],
+  "i18n-ally.enabledParsers": [
+    "json"
+  ],
+  "i18n-ally.keystyle": "flat"
+}

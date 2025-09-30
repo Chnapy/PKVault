@@ -1,0 +1,27 @@
+@font-face {
+  font-family: "Pixel Operator";
+  src: url("regular/pixel-operator-regular.eot");
+  src:
+    url("regular/pixel-operator-regular.eot?#iefix") format("embedded-opentype"),
+    url("regular/pixel-operator-regular.woff") format("woff"),
+    url("regular/pixel-operator-regular.woff2") format("woff2"),
+    url("regular/pixel-operator-regular.ttf") format("truetype"),
+    url("regular/pixel-operator-regular.svg#Pixel Operator") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pixel Operator";
+  src: url("bold/pixel-operator-bold.eot");
+  src:
+    url("bold/pixel-operator-bold.eot?#iefix") format("embedded-opentype"),
+    url("bold/pixel-operator-bold.woff") format("woff"),
+    url("bold/pixel-operator-bold.woff2") format("woff2"),
+    url("bold/pixel-operator-bold.ttf") format("truetype"),
+    url("bold/pixel-operator-bold.svg#Pixel Operator") format("svg");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
