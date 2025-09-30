@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="200" src="frontend\public\logo.svg" alt="PKVault logo" />
+    <img height="200" src="frontend\public\logo.svg" alt="PKVault logo" />
 </p>
 
 <h1 align="center">PKVault</h1>
@@ -20,7 +20,11 @@ Executables can be found in releases.
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
 <p align="center">
-    <img src="img/snap_1.png" alt="PKVault snapshot" />
+    <img src="img/snap_1.png" alt="PKVault snapshot 1" />
+    <img src="img/snap_2.png" alt="PKVault snapshot 2" style="display: inline-block; width: 24%" />
+    <img src="img/snap_3.png" alt="PKVault snapshot 3" style="display: inline-block; width: 24%" />
+    <img src="img/snap_4.png" alt="PKVault snapshot 4" style="display: inline-block; width: 24%" />
+    <img src="img/snap_5.png" alt="PKVault snapshot 5" style="display: inline-block; width: 24%" />
 </p>
 
 ## Bulk features
