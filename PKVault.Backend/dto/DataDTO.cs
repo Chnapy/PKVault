@@ -8,6 +8,14 @@ public struct DataDTO
 
         var memoryLoader = await StorageService.GetLoader();
 
+        if (flags.StaticData)
+        {
+            tasks.Add(Task.Run(async () =>
+            {
+                dto.StaticData = await StaticDataService.PrepareStaticData();
+            }));
+        }
+
         // Note: should be done first since it may be used by pkm-version
         if (flags.Warnings)
         {
@@ -109,6 +117,7 @@ public struct DataDTO
 
     public DataDTOType Type { get; set; } = DataDTOType.DATA_DTO;
 
+    public StaticDataDTO? StaticData { get; set; }
     public List<BoxDTO>? MainBoxes { get; set; }
     public List<PkmDTO>? MainPkms { get; set; }
     public List<PkmVersionDTO>? MainPkmVersions { get; set; }
@@ -139,6 +148,7 @@ public enum DataDTOType : uint
 
 public class DataUpdateFlags
 {
+    public bool StaticData;
     public bool MainBoxes;
     public bool MainPkms;
     public bool MainPkmVersions;

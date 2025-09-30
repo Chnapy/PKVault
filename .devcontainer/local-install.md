@@ -15,5 +15,3 @@ cp .devcontainer/.cert/localhost+2.crt /usr/local/share/ca-certificates/localhos
 
 update-ca-certificates
 ```
-
-Note that these certificates are given for reference, you may have to use your own certs.

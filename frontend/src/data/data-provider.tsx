@@ -3,12 +3,13 @@ import React from "react";
 import { BackendErrorsContext } from './backend-errors-context';
 import { responseBackSchema, type ResponseBack } from './mutator/custom-instance';
 import { getBackupGetAllQueryKey, type backupGetAllResponse } from './sdk/backup/backup.gen';
+import { getDexGetAllQueryKey, type dexGetAllResponse } from './sdk/dex/dex.gen';
 import { DataDTOType, type DataDTO } from './sdk/model';
 import { getSaveInfosGetAllQueryKey, type saveInfosGetAllResponse } from './sdk/save-infos/save-infos.gen';
 import { getSettingsGetQueryKey, type settingsGetResponse } from './sdk/settings/settings.gen';
+import { getStaticDataGetQueryKey, type staticDataGetResponse } from './sdk/static-data/static-data.gen';
 import { getStorageGetActionsQueryKey, getStorageGetMainBoxesQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSaveBoxesQueryKey, getStorageGetSavePkmsQueryKey, type storageGetActionsResponse, type storageGetMainBoxesResponse, type storageGetMainPkmsResponse, type storageGetMainPkmVersionsResponse, type storageGetSaveBoxesResponse, type storageGetSavePkmsResponse } from './sdk/storage/storage.gen';
 import { getWarningsGetWarningsQueryKey, type warningsGetWarningsResponse } from './sdk/warnings/warnings.gen';
-import { getDexGetAllQueryKey, type dexGetAllResponse } from './sdk/dex/dex.gen';
 
 const isResponse = (obj: unknown): obj is ResponseBack => responseBackSchema.safeParse(obj).success;
 
@@ -51,7 +52,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
 
           // console.log('stockage-dto', data);
 
-          const { settings, mainBoxes, mainPkms, mainPkmVersions, saves, dex, actions, warnings, saveInfos, backups } = data.data;
+          const { settings, staticData, mainBoxes, mainPkms, mainPkmVersions, saves, dex, actions, warnings, saveInfos, backups } = data.data;
 
           if (settings) {
             client.setQueryData(
@@ -61,6 +62,17 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 headers: new Headers(),
                 data: settings,
               } satisfies settingsGetResponse
+            );
+          }
+
+          if (staticData) {
+            client.setQueryData(
+              getStaticDataGetQueryKey(),
+              {
+                status: 200,
+                headers: new Headers(),
+                data: staticData,
+              } satisfies staticDataGetResponse
             );
           }
 

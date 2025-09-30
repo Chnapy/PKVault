@@ -19,6 +19,7 @@ public static class Program
                 Console.WriteLine("Debug Console");
 #endif
 
+                Backend.Program.Copyright();
                 Application.Run(new MainForm(args));
 
 #if DEBUG

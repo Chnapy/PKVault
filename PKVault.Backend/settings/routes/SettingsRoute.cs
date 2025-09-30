@@ -26,10 +26,13 @@ public class SettingsController : ControllerBase
             throw new ArgumentException($"Language value not allowed: {settingsMutable.LANGUAGE}");
         }
 
+        var languageChanged = SettingsService.AppSettings.SettingsMutable.LANGUAGE != settingsMutable.LANGUAGE;
+
         await SettingsService.UpdateSettings(settingsMutable);
 
         return await DataDTO.FromDataUpdateFlags(new()
         {
+            StaticData = languageChanged,
             MainBoxes = true,
             MainPkms = true,
             MainPkmVersions = true,

@@ -25,6 +25,7 @@ public class Program
 
     public static async Task Main(string[] args)
     {
+        Copyright();
         var setupDone = await SetupData(args);
 
         if (setupDone)
@@ -34,13 +35,20 @@ public class Program
         }
     }
 
+    public static void Copyright()
+    {
+        Console.WriteLine("PKVault Copyright (C) 2025  Richard Haddad"
+        + "\nThis program comes with ABSOLUTELY NO WARRANTY."
+        + "\nThis is free software, and you are welcome to redistribute it under certain conditions."
+        + "\nFull license can be accessed here: https://github.com/Chnapy/PKVault/blob/main/LICENSE"
+        + $"\nPKVault BuildID = {SettingsService.AppSettings.BuildID}\n");
+    }
+
     public static async Task<bool> SetupData(string[] args)
     {
         var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
         LogUtil.Initialize();
-
-        Console.WriteLine($"PKVault start, buildID = {SettingsService.AppSettings.BuildID}");
 
         if (args.Length > 0 && args[0] == "test-PB7")
         {

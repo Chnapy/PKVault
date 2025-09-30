@@ -7,16 +7,31 @@ using PKHeX.Core;
 public class StaticDataService
 {
     private static readonly string TmpDirectory = PrepareTmpDirectory();
-    private static readonly string TmpStaticDataPath = Path.Combine(TmpDirectory, "StaticData.json.gz");
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
-    public static async Task<StaticDataDTO> PrepareStaticData()
+    private static string? GetTmpStaticDataPath()
     {
-        if (File.Exists(TmpStaticDataPath))
+        if (SettingsService.AppSettings.SettingsMutable.LANGUAGE == null)
+        {
+            return null;
+        }
+
+        return Path.Combine(TmpDirectory, $"StaticData-{SettingsService.AppSettings.GetSafeLanguage()}.json.gz");
+    }
+
+    public static async Task<StaticDataDTO?> PrepareStaticData()
+    {
+        var tmpStaticDataPath = GetTmpStaticDataPath();
+        if (tmpStaticDataPath == null)
+        {
+            return null;
+        }
+
+        if (File.Exists(tmpStaticDataPath))
         {
             try
             {
-                using var fileStream = File.Open(TmpStaticDataPath, FileMode.Open);
+                using var fileStream = File.Open(tmpStaticDataPath, FileMode.Open);
                 using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
 
                 return JsonSerializer.Deserialize<StaticDataDTO>(gzipStream, JsonOptions)!;
@@ -24,7 +39,7 @@ public class StaticDataService
             // file is wrong
             catch (JsonException)
             {
-                File.Delete(TmpStaticDataPath);
+                File.Delete(tmpStaticDataPath);
             }
             // file locked by previous request
             catch (IOException)
@@ -60,11 +75,11 @@ public class StaticDataService
 
         time();
 
-        time = LogUtil.Time($"Write cached static-data in {TmpStaticDataPath}");
+        time = LogUtil.Time($"Write cached static-data in {tmpStaticDataPath}");
 
         var jsonContent = JsonSerializer.Serialize(dto, JsonOptions);
         using var originalFileStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonContent));
-        using var compressedFileStream = File.Create(TmpStaticDataPath);
+        using var compressedFileStream = File.Create(tmpStaticDataPath);
         using var compressionStream = new GZipStream(compressedFileStream, CompressionLevel.Optimal);
 
         originalFileStream.CopyTo(compressionStream);
