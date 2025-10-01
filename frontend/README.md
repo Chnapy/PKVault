@@ -6,8 +6,6 @@ Dependencies & versions can be found in [package.json](./package.json).
 
 ## Setup
 
-> SSL certificate related setup is described in root README.
-
 Basic dependencies install.
 
 ```

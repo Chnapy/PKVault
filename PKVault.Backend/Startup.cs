@@ -6,7 +6,7 @@ public class Startup
     {
         Console.WriteLine($"LocalWebServer Startup - Configure app builder");
 
-        Program.ConfigureAppBuilder(app, true);
+        Program.ConfigureAppBuilder(app, false);
     }
 
     public void ConfigureServices(IServiceCollection services)

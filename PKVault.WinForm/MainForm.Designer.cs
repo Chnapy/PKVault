@@ -101,13 +101,13 @@ partial class MainForm
 
         var contentTypeProvider = new FileExtensionContentTypeProvider();
 
-        webView.CoreWebView2.AddWebResourceRequestedFilter("https://pkvault/*", CoreWebView2WebResourceContext.All);
-        webView.CoreWebView2.AddWebResourceRequestedFilter("https://localhost:*", CoreWebView2WebResourceContext.All);
+        webView.CoreWebView2.AddWebResourceRequestedFilter("http://pkvault/*", CoreWebView2WebResourceContext.All);
+        webView.CoreWebView2.AddWebResourceRequestedFilter("http://localhost:*", CoreWebView2WebResourceContext.All);
 
         webView.CoreWebView2.WebResourceRequested += async (sender, args) =>
         {
-            // https://localhost:57135/api/storage/main/pkm-version
-            // https://pkvault/index.html?server=https://localhost:57471
+            // http://localhost:57135/api/storage/main/pkm-version
+            // http://pkvault/index.html?server=http://localhost:57471
             var uri = args.Request.Uri;
             // Console.WriteLine($"DEBUG {uri}");
 
@@ -150,7 +150,7 @@ partial class MainForm
 
     private void WebView_Navigate()
     {
-        var navigateTo = $"https://pkvault/index.html?server={LocalWebServer.HOST_URL}";
+        var navigateTo = $"http://pkvault/index.html?server={LocalWebServer.HOST_URL}";
 
         Console.WriteLine($"Navigate WebView to {navigateTo}");
 

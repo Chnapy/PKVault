@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "cross-env VITE_SERVER_URL=https://localhost:5000 vite",
+    "dev": "cross-env VITE_SERVER_URL=http://localhost:5000 vite",
     "build": "vite build",
     "c:type": "tsc -b",
     "c:lint": "eslint .",
-    "gen:sdk": "rm -rf src/data/sdk* && cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 VITE_SERVER_URL=https://localhost:5000 orval && prettier -w src/data/sdk*/**/*.ts"
+    "gen:sdk": "rm -rf src/data/sdk* && cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 VITE_SERVER_URL=http://localhost:5000 orval && prettier -w src/data/sdk*/**/*.ts"
   },
   "dependencies": {
     "@emotion/css": "^11.13.5",

@@ -22,7 +22,6 @@ export default defineConfig({
       target: "src/data/sdk/sdk.ts",
       schemas: "src/data/sdk/model",
       httpClient: "fetch",
-      // baseUrl: "https://code.lan:5000",
       override: {
         mutator: {
           path: './src/data/mutator/custom-instance.ts',

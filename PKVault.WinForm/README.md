@@ -7,12 +7,6 @@ cp -r ../frontend/dist ./wwwroot
 
 ## Setup
 
-Setup local SSL certificate.
-
-```
-dotnet dev-certs https --trust
-```
-
 This app requires builded frontend. You have 2 options:
 
 Use a make command from project root (requires `make`).

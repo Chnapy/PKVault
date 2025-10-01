@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 
 public class LocalWebServer
 {
-    public static readonly string HOST_URL = $"https://localhost:{PKVault.Backend.Program.GetAvailablePort()}";
+    public static readonly string HOST_URL = $"http://localhost:{PKVault.Backend.Program.GetAvailablePort()}";
 
     private readonly IHost? webHost;
 

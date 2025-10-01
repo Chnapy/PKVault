@@ -58,8 +58,6 @@ You can target dev & build for desktop Windows app or web app.
 - Clone this repository including submodules (pokeapi)
 - Run the setup part in [PKVault.Backend/README.md](./PKVault.Backend/README.md#setup)
 - Same with setup part in [frontend/README.md](./frontend/README.md#setup)
-- Optional: consider preparing self-signed SSL certificate for localhost and put it into `.devcontainer/.cert/` named as `localhost+2.crt` & `localhost+2.key`
-  - you can use a tool like `mkcert`
 
 ### 2a - Web app (backend + frontend)
 
