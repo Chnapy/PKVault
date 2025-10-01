@@ -162,6 +162,8 @@ public class MovePkmAction(
             await SaveToMainWithoutCheckTarget(loaders, flags, (uint)targetSaveId, pkmDto!.BoxId, pkmDto.BoxSlot, existingSlot);
         }
 
+        CheckG3PkmTradeRecord(saveLoaders.Save);
+
         var boxName = (await saveLoaders.Boxes.GetDto(targetBoxId.ToString()))?.Name;
 
         return new()
@@ -197,6 +199,8 @@ public class MovePkmAction(
                 loaders, flags, (uint)sourceSaveId, savePkm!.Box, savePkm.BoxSlot, relatedPkmVersionDtos
             );
         }
+
+        CheckG3PkmTradeRecord(saveLoaders.Save);
 
         var boxName = (await loaders.boxLoader.GetDto(targetBoxId.ToString()))?.Name;
 
@@ -259,24 +263,7 @@ public class MovePkmAction(
 
         var pkm = pkmVersionDto.Pkm;
 
-        // enable national-dex in G3 if pkm outside of regional-dex
-        if (saveLoaders.Save is SAV3 saveG3 && !saveG3.NationalDex)
-        {
-            var hoennDex = await PokeApi.GetPokedex(PokeApiPokedexEnum.HOENN);
-            // Console.WriteLine(hoennDex.name);
-            var isInDex = hoennDex!.PokemonEntries.Any(entry =>
-            {
-                var url = entry.PokemonSpecies.Url;
-                var id = int.Parse(url.TrimEnd('/').Split('/')[^1]);
-
-                return id == pkm.Species;
-            });
-
-            if (!isInDex)
-            {
-                saveG3.NationalDex = true;
-            }
-        }
+        await CheckG3NationalDex(saveLoaders.Save, pkm.Species);
 
         if (attached)
         {
@@ -392,5 +379,40 @@ public class MovePkmAction(
             SavePkms = true,
         });
         flags.Dex = true;
+    }
+
+    private static async Task CheckG3NationalDex(SaveFile save, int species)
+    {
+        // enable national-dex in G3 RSE if pkm outside of regional-dex
+        if (save is SAV3 saveG3RSE && saveG3RSE is IGen3Hoenn && !saveG3RSE.NationalDex)
+        {
+            var hoennDex = await PokeApi.GetPokedex(PokeApiPokedexEnum.HOENN);
+            // Console.WriteLine(hoennDex.name);
+            var isInDex = hoennDex!.PokemonEntries.Any(entry =>
+            {
+                var url = entry.PokemonSpecies.Url;
+                var id = int.Parse(url.TrimEnd('/').Split('/')[^1]);
+
+                return id == species;
+            });
+
+            if (!isInDex)
+            {
+                saveG3RSE.NationalDex = true;
+            }
+        }
+    }
+
+    private static void CheckG3PkmTradeRecord(SaveFile save)
+    {
+        if (save is SAV3FRLG saveG3FRLG)
+        {
+            var records = new Record3(saveG3FRLG);
+
+            var pkmTradeIndex = 21;
+
+            var pkmTradeCount = records.GetRecord(pkmTradeIndex);
+            records.SetRecord(pkmTradeIndex, pkmTradeCount + 1);
+        }
     }
 }
