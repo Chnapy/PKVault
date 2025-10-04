@@ -1,9 +1,9 @@
 import React from 'react';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { theme } from '../theme';
-import { Container } from './container';
+import { Container, type ContainerProps } from './container';
 
-export type TitledContainerProps = {
+export type TitledContainerProps = Omit<ContainerProps<'div'>, 'title'> & {
     title: React.ReactNode;
     contrasted?: boolean;
     enableExpand?: boolean;
@@ -13,7 +13,7 @@ export type TitledContainerProps = {
 };
 
 export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerProps>> = ({
-    title, contrasted, enableExpand, initialExpanded = true, expanded: rawExpanded, maxHeight, children
+    title, contrasted, enableExpand, initialExpanded = true, expanded: rawExpanded, maxHeight, children, ...containerProps
 }) => {
     const moveContext = StorageMoveContext.useValue();
     const isDragging = !!moveContext.selected && !moveContext.selected.target;
@@ -27,6 +27,7 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
     }
 
     return <Container
+        {...containerProps}
         style={{
             backgroundColor: contrasted
                 ? theme.bg.contrast
@@ -40,6 +41,9 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
             scrollbarColor: contrasted
                 ? `${theme.bg.contrastdark} ${theme.bg.contrast}`
                 : undefined,
+            display: 'flex',
+            flexDirection: 'column',
+            ...containerProps.style,
         }}
     >
         {title && <div
@@ -58,6 +62,7 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
 
         {children && expanded && <div
             style={{
+                flexGrow: 1,
                 padding: 8,
                 overflowY: 'auto',
                 maxHeight,

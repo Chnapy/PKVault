@@ -3,7 +3,7 @@ import { theme } from '../theme';
 
 export type TextInputProps = {
     value?: string;
-    label?: string;
+    label?: React.ReactNode;
     area?: boolean;
     disabled?: boolean;
 }

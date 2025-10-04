@@ -1,6 +1,7 @@
 import type React from 'react';
 import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { useStaticData } from '../../hooks/use-static-data';
+import { PathLine } from '../../settings/path-line';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
 import { Icon } from '../icon/icon';
@@ -10,6 +11,7 @@ import { theme } from '../theme';
 import { SaveCardContentSmall, type SaveCardContentSmallProps } from './save-card-content-small';
 
 export type SaveCardContentFullProps = SaveCardContentSmallProps & {
+    path: string;
     playTime: string;
     dexSeenCount: number;
     dexCaughtCount: number;
@@ -27,6 +29,7 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
     tid,
     trainerName,
     trainerGenderMale,
+    path,
     playTime,
     dexSeenCount,
     dexCaughtCount,
@@ -68,6 +71,7 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                 }}
             >
                 <TextContainer>
+                    <PathLine>{path}</PathLine>
                     {t('save.time')} <Icon name='clock' solid forButton /> <span style={{ color: theme.text.primary }}>{playTime}</span>
                     <br />
                     {t('save.dex')} <Icon name='eye' solid forButton /> <span style={{ color: theme.text.primary }}>{dexSeenCount}</span>{' '}

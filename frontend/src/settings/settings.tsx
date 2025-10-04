@@ -2,13 +2,14 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import type { SettingsMutableDTO } from '../data/sdk/model/settingsMutableDTO';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
+import { useTranslate } from '../translate/i18n';
 import { Button, ButtonLink } from '../ui/button/button';
 import { TitledContainer } from '../ui/container/titled-container';
 import { Icon } from '../ui/icon/icon';
 import { SelectStringInput } from '../ui/input/select-input';
 import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
-import { useTranslate } from '../translate/i18n';
+import { SaveGlobsInput } from './save-globs-input';
 
 export const Settings: React.FC = () => {
     const { t } = useTranslate();
@@ -134,14 +135,9 @@ export const Settings: React.FC = () => {
                     flexDirection: 'column',
                 }}
             >
-                <TextInput
-                    label={t('settings.form.saves')}
-                    area
-                    style={{
-                        minHeight: 200,
-                        height: '100%',
-                    }}
+                <SaveGlobsInput
                     {...register('savE_GLOBS')}
+                    value={watch('savE_GLOBS')}
                     disabled={!settings.canUpdateSettings}
                 />
                 <div style={{

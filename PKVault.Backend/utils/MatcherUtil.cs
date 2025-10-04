@@ -18,6 +18,9 @@ public class MatcherUtil
         globs.ToList().ForEach(glob => matcher.AddInclude(glob));
         var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
 
-        return [.. matches.Files.Select(file => Path.Combine(rootDir, file.Path))];
+        return [.. matches.Files
+            .Select(file => Path.Combine(rootDir, file.Path))
+            .Select(path => path.Replace('\\', '/'))
+        ];
     }
 }

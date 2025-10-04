@@ -48,6 +48,7 @@ public class SaveInfosDTO
             BoxSlotCount = save.BoxSlotCount,
             // CanDelete = true,
             // DownloadUrl = $"{serverUrl}/api/save-infos/{save.ID32}/download",
+            Path = save.Metadata.FilePath!
         };
     }
 
@@ -86,6 +87,8 @@ public class SaveInfosDTO
     public required int BoxCount { get; set; }
 
     public required int BoxSlotCount { get; set; }
+
+    public required string Path { get; set; }
 
     // public bool CanDelete { get; set; }
 
