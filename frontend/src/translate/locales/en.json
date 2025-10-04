@@ -68,6 +68,7 @@
   "details.abilities": "Abilities",
   "details.owned-save": "Owned in save",
   "details.attached-pkm-not-found": "Pkm not found in attached save.\nIf expected consider detach from save.\nOtherwise check the save integrity.",
+  "details.is-duplicate": "Copies of this pkm exists in save, \"move attached\" action won't be available.",
   "storage.move.attached-pkm": "Move attached should target empty slot",
   "storage.move.box-cannot": "Box {{name}} cannot receive pkm",
   "storage.move.pkm-cannot": "Pkm {{name}} cannot be moved",

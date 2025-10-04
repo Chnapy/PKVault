@@ -49,6 +49,8 @@ public class PkmVersionDTO : BasePkmVersionDTO
         }
     }
 
+    public new bool IsValid { get => base.IsValid && IsAttachedValid; }
+
     // public bool CanMoveToSaveStorage { get { return PkmDto.SaveId == default; } }
 
     public List<GameVersion> CompatibleWithVersions

@@ -30,6 +30,10 @@ public class PkmSaveDTO : BasePkmVersionDTO
         };
     }
 
+    public new string Id { get => GetPKMId(Pkm, Box, BoxSlot); }
+
+    public string IdBase { get => base.Id; }
+
     public uint SaveId { get { return Save.ID32; } }
 
     public required int Box { get; set; }
@@ -46,6 +50,10 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     public bool IsStarter { get => Save.GetBoxSlotFlags(Box, BoxSlot).HasFlag(StorageSlotSource.Starter); }
 
+    public bool IsDuplicate { get => WarningsService.GetWarningsDTO().PkmDuplicateWarnings.Any(warn => warn.SaveId == SaveId && warn.DuplicateIdBases.Contains(IdBase)); }
+
+    public new bool IsValid { get => base.IsValid && !IsDuplicate; }
+
     public string? PkmVersionId { get; set; }
 
     // -- actions
@@ -56,7 +64,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     public bool CanMoveToMain { get => CanDelete && !IsShadow && !IsEgg; }
 
-    public bool CanMoveAttachedToMain { get => CanMoveToMain; }
+    public bool CanMoveAttachedToMain { get => CanMoveToMain && !IsDuplicate; }
 
     public override bool CanEvolve { get => HasTradeEvolve && PkmVersionId == null; }
 
@@ -65,7 +73,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
     public async Task RefreshPkmVersionId(EntityLoader<PkmDTO, PkmEntity> pkmLoader, EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionLoader)
     {
         PkmVersionId = null;
-        var pkmVersion = await pkmVersionLoader.GetDto(Id);
+        var pkmVersion = await pkmVersionLoader.GetDto(IdBase);
         if (pkmVersion != null)
         {
             var mainPkm = await pkmLoader.GetDto(pkmVersion.PkmDto.Id);
@@ -80,5 +88,10 @@ public class PkmSaveDTO : BasePkmVersionDTO
     protected override uint GetGeneration()
     {
         return Save.Generation;
+    }
+
+    public static string GetPKMId(PKM pkm, int box, int slot)
+    {
+        return $"{GetPKMIdBase(pkm)}B{box}S{slot}"; ;
     }
 }

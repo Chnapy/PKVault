@@ -29,7 +29,7 @@ public class PKMMemoryLoader : PKMLoader
             filepath = expectedFilepath;
         }
 
-        Console.WriteLine($"(M) PKM-file Write id={BasePkmVersionDTO.GetPKMId(pkm)} filepath={filepath}");
+        Console.WriteLine($"(M) PKM-file Write idBase={BasePkmVersionDTO.GetPKMIdBase(pkm)} filepath={filepath}");
 
         bytesDict.Remove(filepath);
         bytesDict.Add(filepath, bytes);

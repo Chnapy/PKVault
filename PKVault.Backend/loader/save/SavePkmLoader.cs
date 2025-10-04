@@ -73,16 +73,8 @@ public class SavePkmLoader(
         foreach (var dto in await Task.WhenAll(taskList))
         {
             // Console.WriteLine($"{dto.Id} - {dto.Box}/{dto.BoxSlot}");
-            try
-            {
-                dictById.Add(dto.Id, dto);
-                dictByBox.Add(dto.Box + "." + dto.BoxSlot, dto);
-            }
-            catch
-            {
-                // possible with gen without PID
-                Console.Error.WriteLine($"Cannot add dto.id={dto.Id} box={dto.Box} boxSlot={dto.BoxSlot}");
-            }
+            dictById.Add(dto.Id, dto);
+            dictByBox.Add(dto.Box + "." + dto.BoxSlot, dto);
         }
 
         dtoById = dictById;
@@ -121,6 +113,11 @@ public class SavePkmLoader(
 
             return dto;
         }
+
+        // if (!id.Substring(id.Length - 3, 3).Contains('S'))
+        // {
+        //     throw new Exception($"Not using save ID with box slot: {id}");
+        // }
 
         return null;
     }
@@ -164,16 +161,7 @@ public class SavePkmLoader(
         switch (dto.Box)
         {
             case BoxDTO.PARTY_ID:
-                var party = save.PartyData.ToList().FindAll(pkm => pkm.Species != 0);
-                if (dto.BoxSlot >= party.Count)
-                {
-                    party.Add(pkm);
-                }
-                else
-                {
-                    party.Insert(dto.BoxSlot, pkm);
-                }
-                SetParty(party);
+                WriteParty(dto.Pkm, dto.BoxSlot);
                 break;
             default:
                 save.SetBoxSlotAtIndex(pkm, dto.Box, dto.BoxSlot);
@@ -196,10 +184,7 @@ public class SavePkmLoader(
                 case BoxDTO.DAYCARE_ID:
                     throw new Exception("Not allowed for pkm in daycare");
                 case BoxDTO.PARTY_ID:
-                    var party = save.PartyData.ToList().FindAll(pkm => pkm.Species != 0)
-                        .FindAll(pkm => BasePkmVersionDTO.GetPKMId(pkm) != dto.Id);
-
-                    SetParty(party);
+                    WriteParty(null, dto.BoxSlot);
                     break;
                 default:
                     save.SetBoxSlotAtIndex(save.BlankPKM, dto.Box, dto.BoxSlot);
@@ -213,6 +198,28 @@ public class SavePkmLoader(
         }
     }
 
+    private void WriteParty(PKM? pkm, int slot)
+    {
+        var party = save.PartyData.ToList();
+        while (party.Count < 6)
+        {
+            party.Add(save.BlankPKM);
+        }
+        party[slot] = pkm ?? save.BlankPKM;
+        SetParty(party);
+    }
+
+    public void FlushParty()
+    {
+        var party = save.PartyData.ToList()
+        .FindAll(pkm => pkm.Species != 0);
+
+        SetParty(party);
+
+        needUpdate = true;
+        HasWritten = true;
+    }
+
     private void SetParty(List<PKM> party)
     {
         for (var i = 0; i < 6; i++)
@@ -223,8 +230,9 @@ public class SavePkmLoader(
             }
             else
             {
-                save.DeletePartySlot(i);
+                save.SetPartySlotAtIndex(save.BlankPKM, i);
             }
         }
+        // Console.WriteLine($"PARTY = {string.Join(',', party.Select(pk => pk.Nickname))}\n{string.Join(',', save.PartyData.ToList().Select(pk => pk.Nickname))}");
     }
 }

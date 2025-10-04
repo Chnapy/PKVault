@@ -35,7 +35,7 @@ public class MainCreatePkmVersionAction(string pkmId, uint generation) : DataAct
 
         var pkmVersionEntityCreated = new PkmVersionEntity
         {
-            Id = BasePkmVersionDTO.GetPKMId(pkmConverted),
+            Id = BasePkmVersionDTO.GetPKMIdBase(pkmConverted),
             PkmId = pkmId,
             Generation = generation,
             Filepath = PKMLoader.GetPKMFilepath(pkmConverted),

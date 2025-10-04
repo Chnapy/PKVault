@@ -1,5 +1,6 @@
 import React from 'react';
 import { useStorageGetSavePkms, useStorageSaveDeletePkm } from '../../data/sdk/storage/storage.gen';
+import { useTranslate } from '../../translate/i18n';
 import { StorageDetailsBase } from '../../ui/storage-item-details/storage-details-base';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
 
@@ -43,6 +44,7 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({
     id,
     saveId,
 }) => {
+    const { t } = useTranslate();
     const formContext = StorageDetailsForm.useContext();
 
     const savePkmDeleteMutation = useStorageSaveDeletePkm();
@@ -61,6 +63,11 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({
     return (
         <StorageDetailsBase
             {...savePkm}
+            id={savePkm.idBase}
+            validityReport={[
+                savePkm.isDuplicate && t('details.is-duplicate'),
+                savePkm.validityReport ].filter(Boolean).join('\n---\n')
+            }
             onRelease={savePkm.canDelete
                 ? (() => savePkmDeleteMutation.mutateAsync({
                     saveId,

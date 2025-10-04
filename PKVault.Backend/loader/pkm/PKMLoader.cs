@@ -39,7 +39,7 @@ public abstract class PKMLoader
     {
         var star = pkm.IsShiny ? " ★" : string.Empty;
         var speciesName = GameInfo.Strings.Species[pkm.Species].ToUpperInvariant();
-        var id = BasePkmVersionDTO.GetPKMId(pkm);
+        var id = BasePkmVersionDTO.GetPKMIdBase(pkm);
         return $"{pkm.Species:0000}{star} - {speciesName} - {id}.{pkm.Extension}";
     }
 

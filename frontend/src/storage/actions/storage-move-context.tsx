@@ -295,7 +295,7 @@ export const StorageMoveContext = {
                 // pkm main -> save
                 else if (sourcePkmMain && (targetBoxSave || targetPkmSave)) {
                     // canClick &&= selected.attached ? sourcePkmMain.canMoveToSave : sourcePkmMain.canMoveAttachedToSave;
-                    if (!(selected.attached ? sourcePkmMain.canMoveToSave : sourcePkmMain.canMoveAttachedToSave)) {
+                    if (!(selected.attached ? sourcePkmMain.canMoveAttachedToSave : sourcePkmMain.canMoveToSave)) {
                         return {
                             enable: false,
                             helpText: sourcePkmMain.saveId
@@ -329,7 +329,7 @@ export const StorageMoveContext = {
                         return { enable: false, helpText: t('storage.move.save-shadow') };
                     }
 
-                    if (!(selected.attached ? sourcePkmSave.canMoveToMain : sourcePkmSave.canMoveAttachedToMain)) {
+                    if (!(selected.attached ? sourcePkmSave.canMoveAttachedToMain : sourcePkmSave.canMoveToMain)) {
                         return {
                             enable: false, helpText: selected.attached
                                 ? t('storage.move.pkm-cannot-attached', { name: getPkmNickname(sourcePkmSave.id) })

@@ -27,7 +27,7 @@ public class PKMFileLoader : PKMLoader
             filepath = expectedFilepath;
         }
 
-        Console.WriteLine($"PKM-file Write id={BasePkmVersionDTO.GetPKMId(pkm)} filepath={filepath}");
+        Console.WriteLine($"PKM-file Write idBase={BasePkmVersionDTO.GetPKMIdBase(pkm)} filepath={filepath}");
 
         Directory.CreateDirectory(Path.GetDirectoryName(filepath)!);
         File.WriteAllBytes(filepath, bytes);
