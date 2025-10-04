@@ -34,7 +34,7 @@ export const SaveGlobsInput: React.FC<SaveGlobsInputProps> = ({ ...inputProps })
                     loading={isLoading}
                     disabled={values.join('\n') === prepareValues().join('\n')}
                     onClick={() => setValues(prepareValues())}
-                >Test</Button>
+                >{t('settings.form.saves.test')}</Button>
             </div>}
             area
             style={{
@@ -48,10 +48,10 @@ export const SaveGlobsInput: React.FC<SaveGlobsInputProps> = ({ ...inputProps })
         />
 
         <TitledContainer
-            title={isLoading
-                ? 'Searching for paths...'
-                : '-> ' + data.length + ' files found from given paths & globs'
-            }
+            title={<>{'-> '}{isLoading
+                ? t('settings.form.saves.test.title.loading')
+                : t('settings.form.saves.test.title', { count: data.length })}
+            </>}
             style={{
                 height: 200,
                 flex: 1,
@@ -61,7 +61,7 @@ export const SaveGlobsInput: React.FC<SaveGlobsInputProps> = ({ ...inputProps })
                 overflowX: 'auto',
             }}
         >
-            {!isLoading && data.length === 0 && 'No files found'}
+            {!isLoading && data.length === 0 && t('settings.form.saves.test.empty')}
             {!isLoading && data.map(path => <PathLine key={path}>{path}</PathLine>)}
         </TitledContainer>
     </div>;
