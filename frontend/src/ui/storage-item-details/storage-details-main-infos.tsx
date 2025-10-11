@@ -31,7 +31,7 @@ export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = (
                 style={{ display: 'inline-block', height: '1lh', width: 8 * nicknameMaxLength, padding: 0, textAlign: 'center' }}
             />
             : nickname}
-        genders={gender ? [ gender ] : []}
+        genders={gender !== undefined ? [ gender ] : []}
         types={types}
         level={level}
     />;
