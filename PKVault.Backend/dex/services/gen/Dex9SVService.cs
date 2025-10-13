@@ -4,7 +4,7 @@ public class Dex9SVService : DexGenService<SAV9SV>
 {
     protected override DexItemForm GetDexItemForm(ushort species, SAV9SV save, List<PKM> ownedPkms, byte form, Gender gender)
     {
-        var pi = save.Personal[species];
+        var pi = save.Personal.GetFormEntry(species, form);
 
         var kitamakiEntry = save.Zukan.DexKitakami.Get(species);
         var paldeaEntry = save.Zukan.DexPaldea.Get(species);

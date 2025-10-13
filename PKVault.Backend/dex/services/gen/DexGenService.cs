@@ -50,30 +50,6 @@ public abstract class DexGenService<Save> where Save : SaveFile
 
     private DexItemDTO CreateDexItem(ushort species, Save save, List<PKM> pkmList, StaticDataDTO staticData)
     {
-        var pi = save.Personal[species];
-
-        List<Gender> getGenders()
-        {
-            if (pi.OnlyMale)
-            {
-                return [Gender.Male];
-            }
-
-            if (pi.OnlyFemale)
-            {
-                return [Gender.Female];
-            }
-
-            if (pi.Genderless)
-            {
-                return [Gender.Genderless];
-            }
-
-            return [Gender.Male, Gender.Female];
-        }
-
-        var genders = getGenders();
-
         var forms = new List<DexItemForm>();
 
         // if (species == 201)
@@ -88,7 +64,29 @@ public abstract class DexGenService<Save> where Save : SaveFile
 
         for (byte form = 0; form < staticForms.Length; form++)
         {
-            genders.ForEach(gender =>
+            var pi = save.Personal.GetFormEntry(species, form);
+
+            List<Gender> getGenders()
+            {
+                if (pi.OnlyMale)
+                {
+                    return [Gender.Male];
+                }
+
+                if (pi.OnlyFemale)
+                {
+                    return [Gender.Female];
+                }
+
+                if (pi.Genderless)
+                {
+                    return [Gender.Genderless];
+                }
+
+                return [Gender.Male, Gender.Female];
+            }
+
+            getGenders().ForEach(gender =>
             {
                 var ownedPkms = pkmList.FindAll(pkm => pkm.Form == form && pkm.Gender == (byte)gender);
                 var itemForm = GetDexItemForm(species, save, ownedPkms, form, gender);

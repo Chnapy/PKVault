@@ -4,7 +4,7 @@ public class Dex4Service : DexGenService<SAV4>
 {
     protected override DexItemForm GetDexItemForm(ushort species, SAV4 save, List<PKM> ownedPkms, byte form, Gender gender)
     {
-        var pi = save.Personal[species];
+        var pi = save.Personal.GetFormEntry(species, form);
 
         Span<int> abilities = stackalloc int[pi.AbilityCount];
         pi.GetAbilities(abilities);

@@ -4,7 +4,7 @@ public class Dex8BSService : DexGenService<SAV8BS>
 {
     protected override DexItemForm GetDexItemForm(ushort species, SAV8BS save, List<PKM> ownedPkms, byte form, Gender gender)
     {
-        var pi = save.Personal[species];
+        var pi = save.Personal.GetFormEntry(species, form);
 
         save.Zukan.GetGenderFlags(species, out var isSeenM, out var isSeenF, out var isSeenMS, out var isSeenFS);
 

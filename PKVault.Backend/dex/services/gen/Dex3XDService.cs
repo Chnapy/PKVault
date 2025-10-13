@@ -5,7 +5,7 @@ public class Dex3XDService : DexGenService<SAV3XD>
 {
     protected override DexItemForm GetDexItemForm(ushort species, SAV3XD save, List<PKM> ownedPkms, byte form, Gender gender)
     {
-        var pi = save.Personal[species];
+        var pi = save.Personal.GetFormEntry(species, form);
 
         Span<int> abilities = stackalloc int[pi.AbilityCount];
         pi.GetAbilities(abilities);

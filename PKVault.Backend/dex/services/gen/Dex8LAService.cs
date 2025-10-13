@@ -4,7 +4,7 @@ public class Dex8LAService : DexGenService<SAV8LA>
 {
     protected override DexItemForm GetDexItemForm(ushort species, SAV8LA save, List<PKM> ownedPkms, byte form, Gender gender)
     {
-        var pi = save.Personal[species];
+        var pi = save.Personal.GetFormEntry(species, form);
 
         var Dex = save.Blocks.PokedexSave;
         var seenWild = Dex.GetPokeSeenInWildFlags(species, form);

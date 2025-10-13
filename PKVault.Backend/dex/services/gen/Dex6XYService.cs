@@ -4,7 +4,7 @@ public class Dex6XYService : DexGenService<SAV6XY>
 {
     protected override DexItemForm GetDexItemForm(ushort species, SAV6XY save, List<PKM> ownedPkms, byte form, Gender gender)
     {
-        var pi = save.Personal[species];
+        var pi = save.Personal.GetFormEntry(species, form);
 
         var isOwned = ownedPkms.Count > 0;
         var isSeen = isOwned || save.Zukan.GetSeen(species, gender == Gender.Female ? 1 : 0);

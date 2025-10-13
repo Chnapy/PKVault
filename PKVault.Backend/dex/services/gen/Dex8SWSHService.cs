@@ -6,7 +6,7 @@ public class Dex8SWSHService : DexGenService<SAV8SWSH>
     {
         var Dex = save.Blocks.Zukan;
 
-        var pi = save.Personal[species];
+        var pi = save.Personal.GetFormEntry(species, form);
 
         var isOwned = ownedPkms.Count > 0;
         var isSeen = isOwned || Dex.GetSeen(species);
