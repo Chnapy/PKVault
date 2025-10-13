@@ -23,18 +23,15 @@ export const PokedexItem: React.FC<PokedexItemProps> = React.memo(({
 
   const selected = species === selectedPkm;
   const onClick = React.useMemo(
-    () =>
-      // seen
-      //   ? 
-      () =>
+    () => seen
+      ? () =>
         navigate({
           search: {
             selected: selected ? undefined : species,
           },
         })
-    // : undefined
-    ,
-    [ navigate, selected, species ]
+      : undefined,
+    [ navigate, seen, selected, species ]
   );
 
   let content: React.ReactNode = null;
