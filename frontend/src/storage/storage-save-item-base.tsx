@@ -4,6 +4,7 @@ import { useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk
 import { Route } from '../routes/storage';
 import type { ButtonLikeProps } from '../ui/button/button-like';
 import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
+import { GenderType } from '../data/sdk/model';
 
 type StorageSaveItemBaseProps = ButtonLikeProps & Pick<StorageItemProps, 'anchor' | 'helpTitle' | 'small'> & {
     saveId: number;
@@ -25,7 +26,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
         return null;
     }
 
-    const { species, form, isShiny, isEgg, isShadow } = savePkm;
+    const { species, form, gender, isShiny, isEgg, isShadow } = savePkm;
 
     // const attachedVersionPkm = savePkm.pkmVersionId ? allPkmVersions.find(savePkm => savePkm.pkmVersionId && pkmVersionsIds.includes(savePkm.pkmVersionId)) : undefined;
     const attachedPkmVersion = savePkm.pkmVersionId ? allPkmVersions.find(version => version.id === savePkm.pkmVersionId) : undefined;
@@ -40,7 +41,9 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
         <StorageItem
             {...rest}
             species={species}
+            generation={savePkm.generation}
             form={form}
+            isFemale={gender == GenderType.FEMALE}
             isEgg={isEgg}
             isShiny={isShiny}
             isShadow={isShadow}

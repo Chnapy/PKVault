@@ -2,17 +2,16 @@ using PKHeX.Core;
 
 public class Dex8SWSHService : DexGenService<SAV8SWSH>
 {
-    protected override DexItemDTO CreateDexItem(ushort species, SAV8SWSH save, List<PKM> ownedPkms)
+    protected override DexItemForm GetDexItemForm(ushort species, SAV8SWSH save, List<PKM> ownedPkms, byte form, Gender gender)
     {
-        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
+        var Dex = save.Blocks.Zukan;
 
         var pi = save.Personal[species];
 
-        var isSeenM = save.Zukan.GetSeen(species);
-        var isSeenF = save.Zukan.GetSeen(species);
-        var isSeenMS = save.Zukan.GetSeen(species);
-        var isSeenFS = save.Zukan.GetSeen(species);
-        var isAnySeen = isSeenM || isSeenF || isSeenMS || isSeenFS;
+        var isOwned = ownedPkms.Count > 0;
+        var isSeen = isOwned || Dex.GetSeen(species);
+        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
+        var isSeenShiny = isOwnedShiny;
 
         Span<int> abilities = stackalloc int[pi.AbilityCount];
         pi.GetAbilities(abilities);
@@ -26,25 +25,18 @@ public class Dex8SWSHService : DexGenService<SAV8SWSH>
             pi.GetBaseStatValue(3),
         ];
 
-        return new DexItemDTO
+        return new DexItemForm
         {
-            Id = $"{species}_{save.ID32}",
-            Species = species,
-            SaveId = save.ID32,
+            Form = form,
+            Gender = gender,
             Types = [pi.Type1, pi.Type2],
             Abilities = [.. abilities.ToArray().Distinct()],
             BaseStats = baseStats,
-            IsOnlyMale = pi.OnlyMale,
-            IsOnlyFemale = pi.OnlyFemale,
-            IsGenderless = pi.Genderless,
-            IsSeenM = isSeenM,
-            IsSeenF = isSeenF,
-            IsSeenMS = isSeenMS,
-            IsSeenFS = isSeenFS,
-            IsAnySeen = isAnySeen,
-            IsCaught = save.GetCaught(species),
-            IsOwned = ownedPkms.Count > 0,
-            IsOwnedShiny = isOwnedShiny
+            IsSeen = isSeen,
+            IsSeenShiny = isSeenShiny,
+            IsCaught = ownedPkms.Count > 0 || Dex.GetCaught(species),
+            IsOwned = isOwned,
+            IsOwnedShiny = isOwnedShiny,
         };
     }
 }

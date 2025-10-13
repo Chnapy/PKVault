@@ -26,6 +26,7 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
             {savePkmsQuery.isLoading && !savePkmsQuery.data && <StorageItem
                 small
                 species={species}
+                generation={9}
                 form={0}
                 helpTitle={null}
                 loading

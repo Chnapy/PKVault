@@ -58,8 +58,8 @@ export const useActionDescription = () => {
             [ DataActionType.EVOLVE_PKM ]: () => t('storage.save-actions.type.evolve-pkm', {
                 save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ].name : t('storage.save-actions.part.storage'),
                 name: parameters[ 1 ],
-                oldSpecies: staticData.species[ Number(parameters[ 2 ]) ].forms[ 0 ].name,
-                newSpecies: staticData.species[ Number(parameters[ 3 ]) ].forms[ 0 ].name,
+                oldSpecies: staticData.species[ Number(parameters[ 2 ]) ].forms[ 9 ][ 0 ].name,
+                newSpecies: staticData.species[ Number(parameters[ 3 ]) ].forms[ 9 ][ 0 ].name,
             }),
         })()
     };

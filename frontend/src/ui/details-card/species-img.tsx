@@ -5,25 +5,48 @@ import { useStaticData } from '../../hooks/use-static-data';
 
 type SpeciesImgProps = {
     species: number;
+    generation: number;
     form: number;
+    isFemale?: boolean;
     isShiny?: boolean;
     isEgg?: boolean;
     isShadow?: boolean;
     small?: boolean;
 } & React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
 
-export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, form, isShiny, isEgg, isShadow, small, ...imgProps }) => {
+export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, generation, form, isFemale, isShiny, isEgg, isShadow, small, ...imgProps }) => {
     const staticData = useStaticData();
 
-    const { spriteDefault, spriteShiny } = staticData.species[ species ].forms[ form ] ?? staticData.species[ species ].forms[ 0 ];
+    const staticForms = staticData.species[ species ].forms[ generation ];
 
-    const sprite = getApiFullUrl(isEgg
-        ? staticData.eggSprite
-        : (isShiny ? spriteShiny : spriteDefault));
+    if (!staticForms?.[ form ]) {
+        console.log('UNKNOWN FORM -', species, generation, form);
+    }
+
+    const { name, spriteDefault, spriteFemale, spriteShiny, spriteShinyFemale } = staticForms[ form ] ?? staticForms[ 0 ];
+
+    const getSpriteUrl = (): string => {
+        if (isEgg) {
+            return staticData.eggSprite;
+        }
+
+        if (isShiny) {
+            return isFemale ? spriteShinyFemale ?? spriteShiny : spriteShiny;
+        }
+
+        return isFemale ? spriteFemale ?? spriteDefault : spriteDefault;
+    };
+
+    const spriteUrl = getSpriteUrl();
+    const sprite = getApiFullUrl(getSpriteUrl());
+
+    if (!spriteUrl) {
+        console.log('No sprite -', name, species, generation, form, staticForms);
+    }
 
     return <img
         src={sprite}
-        alt={'species-' + species}
+        alt={`S-${species}-${generation}-${form}`}
         loading='lazy'
         {...imgProps}
         className={cx(css({

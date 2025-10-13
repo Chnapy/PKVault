@@ -5,6 +5,7 @@ import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSaveP
 import { Route } from '../routes/storage';
 import { StorageItem } from '../ui/storage-item/storage-item';
 import { StorageItemPopover } from '../ui/storage-item/storage-item-popover';
+import { GenderType } from '../data/sdk/model';
 
 type StorageMainItemProps = {
     pkmId: string;
@@ -33,7 +34,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
         return null;
     }
 
-    const { species, form, isShiny, compatibleWithVersions } = pkmVersions[ 0 ];
+    const { species, generation, form, gender, isShiny, compatibleWithVersions } = pkmVersions[ 0 ];
 
     const saveHeldItem = pageSave && pkmVersions.find((version) => version.generation === pageSave.generation)?.heldItem;
     const heldItem = saveHeldItem ?? pkmVersions.find((version) => version.id === pkmId)?.heldItem;
@@ -64,7 +65,9 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
                 as={StorageItem}
                 {...props}
                 species={species}
+                generation={generation}
                 form={form}
+                isFemale={gender == GenderType.FEMALE}
                 isEgg={false}
                 isShiny={isShiny}
                 isShadow={false}

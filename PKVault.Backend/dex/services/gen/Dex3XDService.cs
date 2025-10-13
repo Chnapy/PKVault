@@ -3,10 +3,8 @@ using PKHeX.Core;
 
 public class Dex3XDService : DexGenService<SAV3XD>
 {
-    protected override DexItemDTO CreateDexItem(ushort species, SAV3XD save, List<PKM> ownedPkms)
+    protected override DexItemForm GetDexItemForm(ushort species, SAV3XD save, List<PKM> ownedPkms, byte form, Gender gender)
     {
-        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
-
         var pi = save.Personal[species];
 
         Span<int> abilities = stackalloc int[pi.AbilityCount];
@@ -37,20 +35,21 @@ public class Dex3XDService : DexGenService<SAV3XD>
 
         // var entry = memo.GetEntry(species);
 
-        return new DexItemDTO
+        var isOwned = ownedPkms.Count > 0;
+        var isSeen = isOwned || save.GetSeen(species);
+        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
+
+        return new DexItemForm
         {
-            Id = $"{species}_{save.ID32}",
-            Species = species,
-            SaveId = save.ID32,
+            Form = form,
+            Gender = gender,
             Types = [pi.Type1, pi.Type2],
             Abilities = [.. abilities.ToArray().Distinct()],
             BaseStats = baseStats,
-            IsOnlyMale = pi.OnlyMale,
-            IsOnlyFemale = pi.OnlyFemale,
-            IsGenderless = pi.Genderless,
-            IsAnySeen = ownedPkms.Count > 0 || save.GetSeen(species),
+            IsSeen = isSeen,
+            IsSeenShiny = false,
             IsCaught = ownedPkms.Count > 0 || save.GetCaught(species),
-            IsOwned = ownedPkms.Count > 0,
+            IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
         };
     }

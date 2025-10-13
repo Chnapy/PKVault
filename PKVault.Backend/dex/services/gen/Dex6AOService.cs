@@ -2,17 +2,14 @@ using PKHeX.Core;
 
 public class Dex6AOService : DexGenService<SAV6AO>
 {
-    protected override DexItemDTO CreateDexItem(ushort species, SAV6AO save, List<PKM> ownedPkms)
+    protected override DexItemForm GetDexItemForm(ushort species, SAV6AO save, List<PKM> ownedPkms, byte form, Gender gender)
     {
-        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
-
         var pi = save.Personal[species];
 
-        var isSeenM = save.Zukan.GetSeen(species, 0);
-        var isSeenF = save.Zukan.GetSeen(species, 1);
-        var isSeenMS = save.Zukan.GetSeen(species, 2);
-        var isSeenFS = save.Zukan.GetSeen(species, 3);
-        var isAnySeen = isSeenM || isSeenF || isSeenMS || isSeenFS;
+        var isOwned = ownedPkms.Count > 0;
+        var isSeen = isOwned || save.Zukan.GetSeen(species, gender == Gender.Female ? 1 : 0);
+        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
+        var isSeenShiny = isOwnedShiny || save.Zukan.GetSeen(species, gender == Gender.Female ? 3 : 2);
 
         Span<int> abilities = stackalloc int[pi.AbilityCount];
         pi.GetAbilities(abilities);
@@ -26,24 +23,17 @@ public class Dex6AOService : DexGenService<SAV6AO>
             pi.GetBaseStatValue(3),
         ];
 
-        return new DexItemDTO
+        return new DexItemForm
         {
-            Id = $"{species}_{save.ID32}",
-            Species = species,
-            SaveId = save.ID32,
+            Form = form,
+            Gender = gender,
             Types = [pi.Type1, pi.Type2],
             Abilities = [.. abilities.ToArray().Distinct()],
             BaseStats = baseStats,
-            IsOnlyMale = pi.OnlyMale,
-            IsOnlyFemale = pi.OnlyFemale,
-            IsGenderless = pi.Genderless,
-            IsSeenM = isSeenM,
-            IsSeenF = isSeenF,
-            IsSeenMS = isSeenMS,
-            IsSeenFS = isSeenFS,
-            IsAnySeen = isAnySeen,
+            IsSeen = isSeen,
+            IsSeenShiny = isSeenShiny,
             IsCaught = save.GetCaught(species),
-            IsOwned = ownedPkms.Count > 0,
+            IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
             // IsLangJa = save.Zukan.GetLanguageFlag(species - 1, 0),
             // IsLangEn = save.Zukan.GetLanguageFlag(species - 1, 1),

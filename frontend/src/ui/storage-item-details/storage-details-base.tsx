@@ -1,6 +1,6 @@
 import type React from 'react';
 import { getApiFullUrl } from '../../data/mutator/custom-instance';
-import type { PkmSaveDTO } from '../../data/sdk/model';
+import { GenderType, type PkmSaveDTO } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Route } from '../../routes/storage';
@@ -38,10 +38,11 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
     const moveContext = StorageMoveContext.useValue();
 
     const staticData = useStaticData();
+    const staticForms = staticData.species[ pkm.species ].forms[ pkm.generation ];
 
     const navigate = Route.useNavigate();
 
-    const formObj = staticData.species[ pkm.species ].forms[ pkm.form ] ?? staticData.species[ pkm.form ].forms[ 0 ];
+    const formObj = staticForms[ pkm.form ] ?? staticForms[ 0 ];
 
     const speciesName = formObj.name;
 
@@ -56,7 +57,9 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
         mainImg={
             <DetailsMainImg
                 species={pkm.species}
+                generation={pkm.generation}
                 form={pkm.form}
+                isFemale={pkm.gender == GenderType.FEMALE}
                 isShiny={pkm.isShiny}
                 isEgg={pkm.isEgg}
                 isShadow={pkm.isShadow}

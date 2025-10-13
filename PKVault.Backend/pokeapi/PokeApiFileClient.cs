@@ -26,17 +26,24 @@ public partial class PokeApiFileClient
 
         var formattedName = PokeApiNameFromPKHexName(name);
 
-        string url = GetApiEndpointString<T>();
+        var results = await GetAsyncList<T>();
 
-        NamedApiResourceList<T>? page = await GetAsyncByPathname<NamedApiResourceList<T>>(url);
-
-        var namedApi = page!.Results.Find(resource => resource.Name.Equals(formattedName, StringComparison.CurrentCultureIgnoreCase));
+        var namedApi = results.Find(resource => resource.Name.Equals(formattedName, StringComparison.CurrentCultureIgnoreCase));
         if (namedApi == null)
         {
             return null;
         }
 
         return await GetAsync(namedApi);
+    }
+
+    public async Task<List<NamedApiResource<T>>> GetAsyncList<T>() where T : NamedApiResource
+    {
+        string url = GetApiEndpointString<T>();
+
+        NamedApiResourceList<T>? page = await GetAsyncByPathname<NamedApiResourceList<T>>(url);
+
+        return page!.Results;
     }
 
     public async Task<T?> GetAsync<T>(int apiParam)

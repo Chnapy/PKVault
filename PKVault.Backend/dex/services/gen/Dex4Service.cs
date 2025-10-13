@@ -2,10 +2,8 @@ using PKHeX.Core;
 
 public class Dex4Service : DexGenService<SAV4>
 {
-    protected override DexItemDTO CreateDexItem(ushort species, SAV4 save, List<PKM> ownedPkms)
+    protected override DexItemForm GetDexItemForm(ushort species, SAV4 save, List<PKM> ownedPkms, byte form, Gender gender)
     {
-        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
-
         var pi = save.Personal[species];
 
         Span<int> abilities = stackalloc int[pi.AbilityCount];
@@ -20,20 +18,21 @@ public class Dex4Service : DexGenService<SAV4>
             pi.GetBaseStatValue(3),
         ];
 
-        return new DexItemDTO
+        var isOwned = ownedPkms.Count > 0;
+        var isSeen = isOwned || save.GetSeen(species);
+        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
+
+        return new DexItemForm
         {
-            Id = $"{species}_{save.ID32}",
-            Species = species,
-            SaveId = save.ID32,
+            Form = form,
+            Gender = gender,
             Types = [pi.Type1, pi.Type2],
             Abilities = [.. abilities.ToArray().Distinct()],
             BaseStats = baseStats,
-            IsOnlyMale = pi.OnlyMale,
-            IsOnlyFemale = pi.OnlyFemale,
-            IsGenderless = pi.Genderless,
-            IsAnySeen = save.Dex.GetSeen(species),
-            IsCaught = save.Dex.GetCaught(species),
-            IsOwned = ownedPkms.Count > 0,
+            IsSeen = isSeen,
+            IsSeenShiny = false,
+            IsCaught = ownedPkms.Count > 0 || save.GetCaught(species),
+            IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
             // IsLangJa = save.Dex.HasLanguage(species) && save.Dex.GetLanguageBitIndex(species, 0),
             // IsLangEn = save.Dex.HasLanguage(species) && save.Dex.GetLanguageBitIndex(species, 1),

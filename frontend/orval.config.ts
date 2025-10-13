@@ -30,9 +30,9 @@ export default defineConfig({
         useTypeOverInterfaces: true,
       },
     },
-    hooks: {
-      afterAllFilesWrite: "prettier -w",
-    },
+    // hooks: {
+    //   afterAllFilesWrite: "prettier -w",
+    // },
   },
   // "backend-zod": {
   //   ...commonConfig,

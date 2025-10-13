@@ -16,7 +16,7 @@ export const FilterTypes: React.FC = () => {
 
   const dexAll = useDexGetAll().data?.data ?? {};
   const allTypes = [ ...new Set(
-    Object.values(dexAll).flatMap(value => Object.values(value)).flatMap(value => value.types)
+    Object.values(dexAll).flatMap(value => Object.values(value)).flatMap(value => value.forms).flatMap(value => value.types)
   ) ].map(type => staticData.types[ type ]);
 
   return (

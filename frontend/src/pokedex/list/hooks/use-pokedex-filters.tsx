@@ -21,13 +21,13 @@ export const usePokedexFilters = () => {
       return true;
     }
 
-    const seen = speciesValues.some((spec) => spec.isAnySeen);
-    const caught = speciesValues.some((spec) => spec.isCaught);
-    const owned = speciesValues.some((spec) => spec.isOwned);
-    const ownedShiny = speciesValues.some((spec) => spec.isOwnedShiny);
+    const seen = speciesValues.some((spec) => spec.forms.some(form => form.isSeen));
+    const caught = speciesValues.some((spec) => spec.forms.some(form => form.isCaught));
+    const owned = speciesValues.some((spec) => spec.forms.some(form => form.isOwned));
+    const ownedShiny = speciesValues.some((spec) => spec.forms.some(form => form.isOwnedShiny));
 
     if (filterSpeciesName) {
-      const name = staticData.species[ speciesValues[ 0 ].species ].forms[ 0 ].name;
+      const name = staticData.species[ speciesValues[ 0 ].species ].forms[ 9 ][ 0 ].name;
 
       if (!name.toLowerCase().includes(filterSpeciesName.toLowerCase())) {
         return true;
@@ -37,7 +37,7 @@ export const usePokedexFilters = () => {
     if (filterTypes?.length) {
       if (
         filterTypes.some((type) =>
-          speciesValues[ 0 ].types.every((t) => t !== type)
+          speciesValues[ 0 ].forms.every(form => form.types.every((t) => t !== type))
         )
       ) {
         return true;

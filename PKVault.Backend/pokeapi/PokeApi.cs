@@ -43,9 +43,23 @@ public class PokeApi
         return await client.GetAsync(namedPokemonForm);
     }
 
+    // public static async Task<List<PokemonForm>> GetPokemonFormsStartingWith(string prefix)
+    // {
+    //     var results = await client.GetAsyncList<PokemonForm>();
+    //     return [.. (await Task.WhenAll(results
+    //         .FindAll(apiResource => apiResource.Name.StartsWith(prefix))
+    //         .Select(apiResource => client.GetAsync(apiResource))))
+    //         .OfType<PokemonForm>()];
+    // }
+
     public static async Task<Pokemon?> GetPokemon(int species)
     {
         return await client.GetAsync<Pokemon>(species);
+    }
+
+    public static async Task<Pokemon?> GetPokemon(NamedApiResource<Pokemon> namedPokemon)
+    {
+        return await client.GetAsync(namedPokemon);
     }
 
     public static async Task<Nature?> GetNature(string natureName)

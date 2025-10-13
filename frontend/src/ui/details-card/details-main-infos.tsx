@@ -11,7 +11,7 @@ export type DetailsMainInfosProps = {
     id?: string;
     pid?: number;
     species: number;
-    speciesName: string;
+    speciesName: React.ReactNode;
     nickname?: React.ReactNode;
     genders: GenderType[];
     types: number[];

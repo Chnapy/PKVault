@@ -1,12 +1,12 @@
 import React from "react";
 import { getApiFullUrl } from '../../data/mutator/custom-instance';
+import { GenderType } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
-import { ButtonLike } from '../button/button-like';
 import { SpeciesImg } from '../details-card/species-img';
+import { Gender } from '../gender/gender';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { theme } from "../theme";
-import { getSpeciesNO } from './util/get-species-no';
 
 export type DexItemProps = {
   species: number;
@@ -20,113 +20,85 @@ export type DexItemProps = {
   onClick?: () => void;
 };
 
-export const DexItem: React.FC<DexItemProps> = React.memo(
-  ({ species, seen, caught, owned, ownedShiny, selected, onClick }) => {
-    const staticData = useStaticData();
+export const DexFormItem: React.FC<{
+  species: number;
+  generation: number;
+  form: number;
+  gender?: GenderType;
+  seen: boolean;
+  seenShiny: boolean;
+  caught: boolean;
+  owned: boolean;
+  ownedShiny: boolean;
+}> = ({ species, generation, form, gender, seen, caught, owned, ownedShiny }) => {
+  const staticData = useStaticData();
 
-    const pokeballSprite = getApiFullUrl(staticData.itemPokeball.sprite);
+  const pokeballSprite = getApiFullUrl(staticData.itemPokeball.sprite);
 
-    // const caughtGamesColors = [ ...new Set(caughtVersions.map(getGameInfos).map(infos => infos.img)) ];
-    // const seenOnlyGamesColors = [ ...new Set(seenOnlyVersions.map(getGameInfos).map(infos => infos.img)) ];
+  // const caughtGamesColors = [ ...new Set(caughtVersions.map(getGameInfos).map(infos => infos.img)) ];
+  // const seenOnlyGamesColors = [ ...new Set(seenOnlyVersions.map(getGameInfos).map(infos => infos.img)) ];
 
-    return (
-      <ButtonLike
-        onClick={onClick}
-        selected={selected}
-        noDropshadow={!onClick}
-        disabled={!onClick}
+  return (
+    <div
+      style={{
+        position: 'relative',
+        alignSelf: "flex-start",
+        padding: 0,
+        borderColor: seen ? theme.text.default : undefined,
+      }}
+    >
+      <div
         style={{
-          position: 'relative',
-          alignSelf: "flex-start",
-          padding: 0,
-          borderColor: seen ? theme.text.default : undefined,
+          position: 'absolute',
+          right: 2,
+          top: 0,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 1,
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: '0 2px',
-            backgroundColor: theme.bg.darker,
-            color: theme.text.light,
-            borderBottomRightRadius: 4,
-          }}
-        >
-          <span>{getSpeciesNO(species)}</span>
-        </div>
+        {ownedShiny && <ShinyIcon style={{ height: '0.8lh' }} />}
 
-        <div
-          style={{
-            position: 'absolute',
-            right: 2,
-            top: 0,
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          {ownedShiny && <ShinyIcon style={{ height: '0.8lh' }} />}
+        {owned && <Icon name='folder' solid forButton />}
 
-          {owned && <Icon name='folder' solid forButton />}
-
-          {caught && (
-            <img
-              src={pokeballSprite}
-              loading="lazy"
-              style={{
-                height: '1lh',
-                margin: '0 -2px',
-                // imageRendering: "pixelated",
-              }}
-            />
-          )}
-        </div>
-
-        <div
-          style={{
-            background: theme.bg.default,
-            borderRadius: 2,
-          }}
-        >
-          <SpeciesImg species={species} form={0} isShiny={ownedShiny} style={{
-            filter: seen ? undefined : "brightness(0) opacity(0.5)",
-          }} />
-
-          {/* <div
+        {caught && (
+          <img
+            src={pokeballSprite}
+            loading="lazy"
             style={{
-              position: 'absolute',
-              left: 4,
-              right: 4,
-              bottom: 4,
-              overflow: 'hidden',
-              display: 'flex',
-              gap: 2,
-            }}>
-            {caughtGamesColors.map((img) => <img
-              key={img}
-              src={img}
-              style={{
-                width: 12,
-                height: 12,
-              }}
-            />)}
+              height: '1lh',
+              margin: '0 -2px',
+              // imageRendering: "pixelated",
+            }}
+          />
+        )}
+      </div>
 
-            {seenOnlyGamesColors.map((img) => <img
-              key={img}
-              src={img}
-              style={{
-                width: 8,
-                height: 8,
-                margin: 2,
-              }}
-            />)}
-          </div> */}
-        </div>
-      </ButtonLike>
-    );
-  }
-);
+      <div
+        style={{
+          position: 'absolute',
+          right: 2,
+          // left: '50%',
+          bottom: 0,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        {gender !== undefined && <Gender gender={gender} />}
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          background: theme.bg.default,
+          borderRadius: 2,
+        }}
+      >
+        <SpeciesImg species={species} generation={generation} form={form} isFemale={gender == GenderType.FEMALE} isShiny={ownedShiny} style={{
+          filter: seen ? undefined : "brightness(0) opacity(0.5)",
+        }} />
+      </div>
+    </div>
+  );
+};

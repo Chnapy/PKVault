@@ -2,13 +2,16 @@ using PKHeX.Core;
 
 public class Dex8BSService : DexGenService<SAV8BS>
 {
-    protected override DexItemDTO CreateDexItem(ushort species, SAV8BS save, List<PKM> ownedPkms)
+    protected override DexItemForm GetDexItemForm(ushort species, SAV8BS save, List<PKM> ownedPkms, byte form, Gender gender)
     {
-        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
-
         var pi = save.Personal[species];
 
-        var isAnySeen = save.Zukan.GetSeen(species);
+        save.Zukan.GetGenderFlags(species, out var isSeenM, out var isSeenF, out var isSeenMS, out var isSeenFS);
+
+        var isOwned = ownedPkms.Count > 0;
+        var isSeen = isOwned || (gender == Gender.Female ? isSeenF : isSeenM);
+        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
+        var isSeenShiny = isOwnedShiny || (gender == Gender.Female ? isSeenFS : isSeenMS);
 
         Span<int> abilities = stackalloc int[pi.AbilityCount];
         pi.GetAbilities(abilities);
@@ -22,21 +25,18 @@ public class Dex8BSService : DexGenService<SAV8BS>
             pi.GetBaseStatValue(3),
         ];
 
-        return new DexItemDTO
+        return new DexItemForm
         {
-            Id = $"{species}_{save.ID32}",
-            Species = species,
-            SaveId = save.ID32,
+            Form = form,
+            Gender = gender,
             Types = [pi.Type1, pi.Type2],
             Abilities = [.. abilities.ToArray().Distinct()],
             BaseStats = baseStats,
-            IsOnlyMale = pi.OnlyMale,
-            IsOnlyFemale = pi.OnlyFemale,
-            IsGenderless = pi.Genderless,
-            IsAnySeen = isAnySeen,
+            IsSeen = isSeen,
+            IsSeenShiny = isSeenShiny,
             IsCaught = save.GetCaught(species),
-            IsOwned = ownedPkms.Count > 0,
-            IsOwnedShiny = isOwnedShiny
+            IsOwned = isOwned,
+            IsOwnedShiny = isOwnedShiny,
         };
     }
 }

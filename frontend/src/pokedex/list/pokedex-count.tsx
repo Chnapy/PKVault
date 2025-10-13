@@ -26,13 +26,13 @@ export const PokedexCount: React.FC<PokedexCountProps> = ({ data }) => {
         justifyContent: 'center',
         gap: 4
     }}>
-        <Icon name='eye' solid forButton /> <span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.isAnySeen)}</span>
+        <Icon name='eye' solid forButton /> <span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.forms.some(form => form.isSeen))}</span>
         <img src={getApiFullUrl(staticData.itemPokeball.sprite)} style={{
             height: '1lh',
             verticalAlign: 'middle'
-        }} /><span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.isCaught)}</span>
-        <Icon name='folder' solid forButton /> <span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.isOwned)}</span>
-        <ShinyIcon /><span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.isOwnedShiny)}</span> {t('total')}.
+        }} /><span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.forms.some(form => form.isCaught))}</span>
+        <Icon name='folder' solid forButton /> <span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.forms.some(form => form.isOwned))}</span>
+        <ShinyIcon /><span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.forms.some(form => form.isOwnedShiny))}</span> {t('total')}.
         <span style={{ color: theme.text.primary }}>{data.length}</span>
     </div>;
 };

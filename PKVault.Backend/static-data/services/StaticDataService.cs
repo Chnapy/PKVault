@@ -3,6 +3,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using PKHeX.Core;
+using PokeApiNet;
 
 public class StaticDataService
 {
@@ -130,31 +131,19 @@ public class StaticDataService
         var speciesNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Species;
         List<Task<StaticSpecies>> tasks = [];
 
+        // List<string> notFound = [];
+
         for (var i = 1; i <= 1025; i++)  // TODO
         {
             var species = i;
             var speciesName = speciesNames[species];
 
-            // if (i == 0)
-            // {
-            //     tasks.Add(Task.Run(() => new StaticSpecies()
-            //     {
-            //         Id = species,
-            //         Name = speciesName,
-            //         SpriteDefault = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png",
-            //         SpriteShiny = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png",
-            //     }));
-            // }
-            // else
-            // {
             tasks.Add(Task.Run(async () =>
             {
-                var pkmObjTask = PokeApi.GetPokemon(species);
-                var pkmSpeciesObjTask = PokeApi.GetPokemonSpecies(species);
+                var pkmSpeciesObj = await PokeApi.GetPokemonSpecies(species);
+                var generation = PokeApi.GetGenerationValue(pkmSpeciesObj.Generation.Name);
 
-                var generation = PokeApi.GetGenerationValue((await pkmSpeciesObjTask).Generation.Name);
-
-                GenderType[] genders = (await pkmSpeciesObjTask)?.GenderRate switch
+                GenderType[] genders = pkmSpeciesObj.GenderRate switch
                 {
                     -1 => [],
                     0 => [GenderType.MALE],
@@ -162,16 +151,21 @@ public class StaticDataService
                     _ => [GenderType.MALE, GenderType.FEMALE],
                 };
 
-                // var str = GameInfo.Strings;
-                // var gendersymbols = GameInfo.GenderSymbolUnicode;
-                // var forms = FormConverter.GetFormList((ushort)species, str.types, str.forms, gendersymbols, EntityContext.Gen9);
+                var contexts = Enum.GetValues<EntityContext>().ToList().FindAll(context => context.IsValid());
 
-                var pkmObj = await pkmObjTask;
+                var forms = new Dictionary<byte, StaticSpeciesForm[]>();
 
-                var forms = Task.WhenAll(pkmObj.Forms.Select(async (formUrl) =>
+                async Task<(Pokemon, PokemonForm[])> getVarietyFormsData(PokemonSpeciesVariety pkmVariety)
                 {
-                    var formObj = await PokeApi.GetPokemonForms(formUrl);
+                    var pkmObj = await PokeApi.GetPokemon(pkmVariety.Pokemon);
+                    var apiForms = await Task.WhenAll(pkmObj.Forms.Select((formUrl) => PokeApi.GetPokemonForms(formUrl)));
+                    // .ToList().FindAll(form => !form.IsBattleOnly).ToArray();
 
+                    return (pkmObj, apiForms);
+                }
+
+                StaticSpeciesForm getVarietyForm(Pokemon pkmObj, PokemonForm formObj, StaticSpeciesForm? defaultForm)
+                {
                     var name = speciesName;
 
                     try
@@ -192,38 +186,226 @@ public class StaticDataService
                             name == speciesName
                             && formObj.FormNames.Count > 0)
                         {
-                            name = $"{speciesName} {PokeApi.GetNameForCurrentLanguage(formObj.FormNames)}";
+                            var apiName = PokeApi.GetNameForCurrentLanguage(formObj.FormNames);
+                            if (apiName != speciesName)
+                            {
+                                name = $"{speciesName} {apiName}";
+                            }
                         }
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"{formUrl.Url} - ERROR FORM-NAMES {ex}");
+                        Console.WriteLine($"{formObj.Name} - ERROR FORM-NAMES {ex}");
                     }
 
-                    // if (formObj.Sprites.FrontDefault == null)
-                    // {
-                    //     Console.WriteLine($"{formUrl.Url} - SPRITE-DEFAULT NULL");
-                    // }
+                    var femaleOnly = formObj.FormName.Contains("female");
+                    var maleOnly = !femaleOnly && formObj.FormName.Contains("male");
 
-                    // if (formObj.Sprites.FrontShiny == null)
-                    // {
-                    //     Console.WriteLine($"{formUrl.Url} - SPRITE-SHINY NULL");
-                    // }
+                    var frontDefaultUrl = formObj.Sprites.FrontDefault ?? pkmObj.Sprites.FrontDefault;
+                    var frontShinyUrl = formObj.Sprites.FrontShiny ?? pkmObj.Sprites.FrontShiny;
+
+                    string? spriteFemale;
+                    // = (maleOnly || !formObj.IsDefault || formObj.IsMega) ? null : (
+                    //     pkmObj.Sprites.FrontFemale != null ? GetGHProxyUrl(pkmObj.Sprites.FrontFemale) : defaultForm?.SpriteFemale
+                    // );
+                    string? spriteShinyFemale;
+                    // = (maleOnly || !formObj.IsDefault || formObj.IsMega) ? null : (
+                    //     pkmObj.Sprites.FrontShinyFemale != null ? GetGHProxyUrl(pkmObj.Sprites.FrontShinyFemale) : defaultForm?.SpriteShinyFemale
+                    // );
+                    var spriteDefault = (
+                        frontDefaultUrl != null ? GetGHProxyUrl(frontDefaultUrl) : defaultForm?.SpriteDefault
+                    );
+                    var spriteShiny = (
+                        frontShinyUrl != null ? GetGHProxyUrl(frontShinyUrl) : defaultForm?.SpriteShiny
+                    );
+
+                    if (formObj.FormName == "")
+                    {
+                        spriteFemale = pkmObj.Sprites.FrontFemale != null ? GetGHProxyUrl(pkmObj.Sprites.FrontFemale) : defaultForm?.SpriteFemale;
+                        spriteShinyFemale = pkmObj.Sprites.FrontShinyFemale != null ? GetGHProxyUrl(pkmObj.Sprites.FrontShinyFemale) : defaultForm?.SpriteShinyFemale;
+                    }
+                    else
+                    {
+                        spriteFemale = spriteDefault;
+                        spriteShinyFemale = spriteShiny;
+                    }
+
+                    if (maleOnly)
+                    {
+                        spriteFemale = null;
+                        spriteShinyFemale = null;
+                    }
+                    else if (femaleOnly)
+                    {
+                        spriteDefault = spriteFemale;
+                        spriteShiny = spriteShinyFemale;
+                    }
+
+                    if (spriteDefault == null)
+                    {
+                        spriteDefault = frontDefaultUrl != null ? GetGHProxyUrl(frontDefaultUrl) : defaultForm?.SpriteDefault;
+                    }
+                    if (spriteShiny == null)
+                    {
+                        spriteShiny = frontShinyUrl != null ? GetGHProxyUrl(frontShinyUrl) : defaultForm?.SpriteShiny;
+                    }
 
                     return new StaticSpeciesForm
                     {
                         Id = formObj.Id,
                         Name = name,
-                        SpriteDefault = GetGHProxyUrl(
-                            formObj.Sprites.FrontDefault ?? pkmObj.Sprites.FrontDefault
-                        ),
-                        SpriteShiny = GetGHProxyUrl(
-                            formObj.Sprites.FrontShiny ?? pkmObj.Sprites.FrontShiny
-                        ),
+                        SpriteDefault = spriteDefault,
+                        SpriteFemale = spriteFemale,
+                        SpriteShiny = spriteShiny,
+                        SpriteShinyFemale = spriteShinyFemale,
                     };
-                }));
+                }
 
-                // Console.WriteLine($"{species} - {string.Join(',', forms)}");
+                var defaultVariety = pkmSpeciesObj.Varieties.Find(variety => variety.IsDefault);
+                var otherVarieties = pkmSpeciesObj.Varieties.FindAll(variety => !variety.IsDefault);
+
+                var defaultDataTask = getVarietyFormsData(defaultVariety);
+                var otherDatasTask = otherVarieties.Select(variety => getVarietyFormsData(variety));
+
+                var defaultData = await defaultDataTask;
+                var otherDatas = (await Task.WhenAll(otherDatasTask))
+                .ToList().FindAll(entry => entry.Item2.Length > 0);
+                List<(Pokemon, PokemonForm[])> allDatas = [defaultData, .. otherDatas];
+
+                var defaultForm = getVarietyForm(defaultData.Item1, defaultData.Item2[0], null);
+
+                var speciesNameEn = defaultData.Item1.Name;
+
+                contexts.ForEach(context =>
+                {
+                    if (generation > context.Generation())
+                    {
+                        return;
+                    }
+
+                    var formListEn = FormConverter.GetFormList((ushort)species, GameInfo.Strings.types, GameInfo.Strings.forms, GameInfo.GenderSymbolUnicode, context);
+
+                    (Pokemon, PokemonForm)?[] formListData = [.. formListEn.Select(formNameEn =>
+                    {
+                        var formApiName = PokeApiFileClient.PokeApiNameFromPKHexName(formNameEn);
+
+                        (Pokemon, PokemonForm)? searchFor (string name, bool intern) {
+                            if(speciesNameEn == "arceus" && name == "legend") {
+                                return null;
+                            }
+
+                            if(name.StartsWith("*")) {
+                                return null;    // terra
+                            }
+
+                            if (speciesNameEn == "greninja" && name == "active") {
+                                return searchFor("battle-bond", true);
+                            }
+
+                            if (speciesNameEn == "rockruff" && name == "dusk") {
+                                return searchFor("own-tempo", true);
+                            }
+
+                            if (speciesNameEn == "kleavor" && name == "lord") {
+                                return searchFor("", true);
+                            }
+
+                            if (formApiName == "" || formApiName == "normal")
+                            {
+                                return (defaultData.Item1, defaultData.Item2[0]);
+                            }
+
+                            var result = searchByPredicate(form => form.FormName == name, intern);
+
+                            if (result != null || intern)
+                            {
+                                return result;
+                            }
+
+                            result = name switch
+                            {
+                                "!" => searchFor("exclamation", true),
+                                "?" => searchFor("question", true),
+                                "???" => searchFor("unknown", true),
+                                "-m" => searchFor("male", true),
+                                "-f" => searchFor("female", true),
+                                "50%" => searchFor("50", true),
+                                "50%-c" => searchFor("50-power-construct", true),
+                                "10%" => searchFor("10", true),
+                                "10%-c" => searchFor("10-power-construct", true),
+                                "lord" or "lady" => searchFor("hisui", true),
+                                "large" => searchByPredicate(form => form.FormName.StartsWith("totem"), true),
+                                "*busted" => searchFor("totem-busted",true),
+                                "water" => searchFor("douse",true),
+                                "electric" => searchFor("shock",true),
+                                "fire" => searchFor("burn",true),
+                                "ice" => searchFor("chill",true),
+                                "amped-form" => searchFor("amped",true),
+                                "ice-face" => searchFor("ice",true),
+                                "noice-face" => searchFor("noice",true),
+                                "c-red" => searchFor("red", true),
+                                "c-orange" => searchFor("orange", true),
+                                "c-yellow" => searchFor("yellow", true),
+                                "c-green" => searchFor("green", true),
+                                "c-blue" => searchFor("blue", true),
+                                "c-indigo" => searchFor("indigo", true),
+                                "c-violet" => searchFor("violet", true),
+                                "m-red" => searchFor("red-meteor", true),
+                                "m-orange" => searchFor("orange-meteor", true),
+                                "m-yellow" => searchFor("yellow-meteor", true),
+                                "m-green" => searchFor("green-meteor", true),
+                                "m-blue" => searchFor("blue-meteor", true),
+                                "m-indigo" => searchFor("indigo-meteor", true),
+                                "m-violet" => searchFor("violet-meteor", true),
+                                "hero" => searchFor("crowned", true),
+                                "teal" => searchFor("", true),
+                                _ => searchFor($"{name}-cap", true)
+                                    ?? searchFor($"{name}-breed", true)
+                                    ?? searchFor($"{name}-striped", true)
+                                    ?? searchFor($"{name}-standard", true)
+                                    ?? searchFor($"{name}-mask", true)
+                                    ?? searchFor($"{name}-strawberry-sweet", true)
+                                    ?? searchFor($"{name}-plumage", true)
+                                    ?? searchFor($"{name}-build", true)
+                                    ?? searchFor($"{name}-mode", true)
+                                    ?? searchFor($"{name}-eared", true),
+                            };
+
+                            if (result == null)
+                            {
+                                Console.WriteLine($"FORM NOT FOUND for {defaultData.Item1.Name} // {context} // {formApiName} -> {string.Join(',', allDatas
+                                    .Select(data => data.Item2.Select(form => form.FormName))
+                                    .SelectMany(list => list).Distinct()
+                                )}");
+                                    // notFound.Add($"{defaultData.Item1.Name} // {context} // {formApiName} -> {string.Join(',', allDatas
+                                    //     .Select(data => data.Item2.Select(form => form.FormName))
+                                    //     .SelectMany(list => list).Distinct()
+                                    // )}");
+                            }
+
+                            return result;
+                        }
+
+                        (Pokemon, PokemonForm)? searchByPredicate(Func<PokemonForm, bool> predicate, bool intern) {
+                            var data = allDatas.Find(data => data.Item2.Any(predicate));
+                            (Pokemon, PokemonForm)? result = data == default ? null : (
+                                data.Item1,
+                                data.Item2.ToList().Find(form => predicate(form))!
+                            );
+
+                            return result;
+                        }
+
+                        return searchFor(formApiName, false);
+                    })];
+
+                    var varietyForms = formListData.ToList()
+                        .OfType<(Pokemon, PokemonForm)>().ToList()
+                        .FindAll(entry => !entry.Item2.IsBattleOnly)
+                        .Select((data) => getVarietyForm(data.Item1, data.Item2, defaultForm));
+
+                    forms.Add((byte)context, [.. varietyForms]);
+                });
 
                 return new StaticSpecies
                 {
@@ -231,12 +413,9 @@ public class StaticDataService
                     // Name = speciesName,
                     Generation = generation,
                     Genders = genders,
-                    Forms = await forms,
-                    // SpriteDefault = GetGHProxyUrl((await pkmObjTask).Sprites.FrontDefault),
-                    // SpriteShiny = GetGHProxyUrl((await pkmObjTask).Sprites.FrontShiny),
+                    Forms = forms,
                 };
             }));
-            // }
         }
 
         var dict = new Dictionary<int, StaticSpecies>();
@@ -245,6 +424,7 @@ public class StaticDataService
             dict.Add(value.Id, value);
         }
         time();
+        // File.WriteAllText("toto.txt", string.Join('\n', notFound));
         return dict;
     }
 

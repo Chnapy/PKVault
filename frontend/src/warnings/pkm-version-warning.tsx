@@ -23,7 +23,9 @@ export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({ pkmId }) =
         return null;
     }
 
-    const formObj = staticData.species[ pkmVersion.species ].forms[ pkmVersion.form ] ?? staticData.species[ pkmVersion.form ].forms[ 0 ];
+    const staticForms = staticData.species[ pkmVersion.species ].forms[ pkmVersion.generation ];
+
+    const formObj = staticForms[ pkmVersion.form ] ?? staticForms[ 0 ];
 
     const speciesName = formObj.name;
 

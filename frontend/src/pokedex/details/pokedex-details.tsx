@@ -1,18 +1,20 @@
 import React from "react";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
+import type { DexItemForm, SaveInfosDTO } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from "../../routes/pokedex";
+import { useTranslate } from '../../translate/i18n';
 import { DetailsCardContainer } from '../../ui/details-card/details-card-container';
 import { DetailsMainImg } from '../../ui/details-card/details-main-img';
 import { DetailsMainInfos } from '../../ui/details-card/details-main-infos';
 import { DetailsTab } from '../../ui/details-card/details-tab';
 import { DetailsTitle } from '../../ui/details-card/details-title';
+import { SelectNumberInput } from '../../ui/input/select-input';
 import { TextContainer } from '../../ui/text-container/text-container';
 import { theme } from '../../ui/theme';
 import { PokedexDetailsOwned } from './pokedex-details-owned';
 import { getGameInfos } from './util/get-game-infos';
-import { useTranslate } from '../../translate/i18n';
 
 export const PokedexDetails: React.FC = () => {
   // console.time("pokedex-details");
@@ -29,6 +31,7 @@ export const PokedexDetails: React.FC = () => {
   const saveInfosMainQuery = useSaveInfosGetAll();
 
   const [ selectedSaveIndex, setSelectedSaveIndex ] = React.useState(0);
+  const [ selectedFormIndex, setSelectedFormIndex ] = React.useState(0);
 
   const savesRecord = saveInfosMainQuery.data?.data ?? {};
   const speciesRecord = dexGetAllQuery.data?.data ?? {};
@@ -38,36 +41,60 @@ export const PokedexDetails: React.FC = () => {
   );
 
   const gameSaves = speciesValues
-    .filter((spec) => spec.isAnySeen)
+    .filter((spec) => spec.forms.some(form => form.isSeen))
     .map((spec) => savesRecord[ spec.saveId ])
     .filter(Boolean);
+
+  const selectedSave = (gameSaves[ selectedSaveIndex ] ?? gameSaves[ 0 ]) as SaveInfosDTO | undefined;
+  const selectedSpeciesValue = selectedSave && speciesValues.find(
+    (value) => value.saveId === selectedSave.id
+  )!;
+  const dexFormsOnly = selectedSpeciesValue && selectedSpeciesValue.forms.reduce<DexItemForm[]>((acc, item) => {
+    if (acc.some(it => it.form === item.form)) {
+      return acc;
+    }
+    return [ ...acc, item ];
+  }, []);
 
   React.useEffect(() => {
     if (selectedSaveIndex > 0 && !gameSaves[ selectedSaveIndex ]) {
       setSelectedSaveIndex(0);
+      setSelectedFormIndex(0);
     }
   }, [ gameSaves, selectedSaveIndex ]);
 
-  if (!selectedSpecies || !gameSaves.length) {
+  React.useEffect(() => {
+    setSelectedFormIndex(0);
+  }, [ selectedSpecies ]);
+
+  React.useEffect(() => {
+    if (selectedFormIndex > 0 && dexFormsOnly && !dexFormsOnly[ selectedFormIndex ]) {
+      setSelectedFormIndex(0);
+    }
+  }, [ selectedFormIndex, dexFormsOnly ]);
+
+  if (!selectedSpecies || !gameSaves.length || !dexFormsOnly) {
     // console.timeEnd("pokedex-details");
     return null;
   }
 
-  const selectedSave = gameSaves[ selectedSaveIndex ] ?? gameSaves[ 0 ];
-  const selectedSpeciesValue = speciesValues.find(
-    (value) => value.saveId === selectedSave.id
-  )!;
+  const { genders, forms } = staticData.species[ selectedSpecies ];
+  const staticForms = forms[ selectedSave.generation ];
 
-  const caught = selectedSpeciesValue.isCaught;
-  const owned = selectedSpeciesValue.isOwned;
-  const ownedShiny = selectedSpeciesValue.isOwnedShiny;
+  const selectedForm = dexFormsOnly[ selectedFormIndex ] ?? dexFormsOnly[ 0 ];
+  const formObj = staticForms[ selectedFormIndex ] ?? staticForms[ 0 ];
 
-  const formObj = staticData.species[ selectedSpecies ].forms[ 0 ];
+  if (!selectedForm || !formObj) {
+    return null;
+  }
 
-  const { genders } = staticData.species[ selectedSpecies ];
+  const caught = selectedForm.isCaught;
+  const owned = selectedForm.isOwned;
+  const ownedShiny = selectedForm.isOwnedShiny;
+
   const speciesName = formObj.name;
 
-  const baseStats = selectedSpeciesValue.baseStats;
+  const baseStats = selectedForm.baseStats;
   const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);
   const cellBaseStyle: React.CSSProperties = { padding: 0, textAlign: 'center' };
 
@@ -103,7 +130,8 @@ export const PokedexDetails: React.FC = () => {
         mainImg={
           <DetailsMainImg
             species={selectedSpecies}
-            form={0}
+            generation={selectedSave.generation}
+            form={selectedFormIndex}
             isOwned={owned}
             isShiny={ownedShiny}
             ball={caught ? staticData.itemPokeball.id : undefined}
@@ -112,9 +140,32 @@ export const PokedexDetails: React.FC = () => {
         mainInfos={
           <DetailsMainInfos
             species={selectedSpecies}
-            speciesName={speciesName}
+            speciesName={<div style={{ display: 'inline-flex', gap: 4 }}>
+              {staticForms.length <= 1 && speciesName}
+              {staticForms.length > 1 && <span style={{
+                display: 'inline-flex',
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                marginTop: -3
+              }}>
+                <SelectNumberInput
+                  data={staticForms.map((form, i) => ({
+                    value: i,
+                    option: form.name,
+                  }))}
+                  onChange={setSelectedFormIndex}
+                  value={selectedFormIndex}
+                  bgColor='transparent'
+                  style={{
+                    height: '1lh',
+                    color: 'inherit',
+                    borderColor: 'currentcolor',
+                  }}
+                />
+              </span>}
+            </div>}
             genders={genders}
-            types={selectedSpeciesValue.types}
+            types={selectedForm.types}
           />
         }
         preContent={null}
@@ -125,9 +176,9 @@ export const PokedexDetails: React.FC = () => {
           </div>
         )} */}
 
-          {selectedSpeciesValue.abilities.length > 0 && <TextContainer>
+          {selectedForm.abilities.length > 0 && <TextContainer>
             <span style={{ color: theme.text.primary }}>{t('details.abilities')}</span><br />
-            {selectedSpeciesValue.abilities.map(ability => <div key={ability}>{
+            {selectedForm.abilities.map(ability => <div key={ability}>{
               staticData.abilities[ ability ].name
             }</div>)}
             {/* {abilitiesHidden.map(ability => <div key={ability}>{ability} (caché)</div>)} */}
@@ -160,7 +211,7 @@ export const PokedexDetails: React.FC = () => {
             </table>
           </TextContainer>
 
-          {selectedSpeciesValue.isOwned && (
+          {owned && (
             <PokedexDetailsOwned saveId={selectedSpeciesValue.saveId} species={selectedSpeciesValue.species} />
           )}
         </>}

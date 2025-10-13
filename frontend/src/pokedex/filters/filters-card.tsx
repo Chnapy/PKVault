@@ -9,6 +9,8 @@ import { FilterOwnedShiny } from './components/filter-owned-shiny';
 import { FilterSeen } from "./components/filter-seen";
 import { FilterSpecies } from "./components/filter-species";
 import { FilterTypes } from "./components/filter-types";
+import { ShowForms } from './components/show-forms';
+import { ShowGenders } from './components/show-genders';
 
 export const FiltersCard: React.FC = () => {
   return (
@@ -60,6 +62,20 @@ export const FiltersCard: React.FC = () => {
 
           <FilterGeneration />
         </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+        }}
+      >
+
+        <ShowForms />
+
+        <ShowGenders />
+
       </div>
     </Container>
   );

@@ -14,7 +14,9 @@ export type StorageItemProps =
   & Pick<ButtonWithDisabledPopoverProps<never>, 'anchor' | 'helpTitle'>
   & {
     species: number;
+    generation: number;
     form: number;
+    isFemale?: boolean;
     isEgg?: boolean;
     isShiny?: boolean;
     isShadow?: boolean;
@@ -34,7 +36,9 @@ export type StorageItemProps =
 
 export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   species,
+  generation,
   form,
+  isFemale,
   isEgg,
   isShiny,
   isShadow,
@@ -74,7 +78,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
       showHelp={!!helpTitle}
       helpTitle={helpTitle}
     >
-      <SpeciesImg species={species} form={form} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} small={small} />
+      <SpeciesImg species={species} generation={generation} form={form} isFemale={isFemale} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} small={small} />
 
       {heldItem > 0 && <img
         src={getApiFullUrl(staticData.items[ heldItem ].sprite)}

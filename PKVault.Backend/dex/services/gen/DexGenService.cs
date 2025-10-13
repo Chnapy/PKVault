@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public abstract class DexGenService<Save> where Save : SaveFile
 {
-    public bool UpdateDexWithSave(Dictionary<int, Dictionary<uint, DexItemDTO>> dex, Save save)
+    public bool UpdateDexWithSave(Dictionary<int, Dictionary<uint, DexItemDTO>> dex, Save save, StaticDataDTO staticData)
     {
         // var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
 
@@ -32,10 +32,8 @@ public abstract class DexGenService<Save> where Save : SaveFile
         for (ushort species = 1; species < save.MaxSpeciesID + 1; species++)
         {
             pkmBySpecies.TryGetValue(species, out var pkmList);
-            var item = CreateDexItem(species, save, pkmList ?? []);
+            var item = CreateDexItem(species, save, pkmList ?? [], staticData);
             dex[species][save.ID32] = item;
-
-            item.Types = [.. item.Types.Distinct().Select(type => (byte)(type + 1))];
 
             // tasks.Add(Task.Run(async () =>
             // {
@@ -50,5 +48,65 @@ public abstract class DexGenService<Save> where Save : SaveFile
         return true;
     }
 
-    protected abstract DexItemDTO CreateDexItem(ushort species, Save save, List<PKM> pkmList);
+    private DexItemDTO CreateDexItem(ushort species, Save save, List<PKM> pkmList, StaticDataDTO staticData)
+    {
+        var pi = save.Personal[species];
+
+        List<Gender> getGenders()
+        {
+            if (pi.OnlyMale)
+            {
+                return [Gender.Male];
+            }
+
+            if (pi.OnlyFemale)
+            {
+                return [Gender.Female];
+            }
+
+            if (pi.Genderless)
+            {
+                return [Gender.Genderless];
+            }
+
+            return [Gender.Male, Gender.Female];
+        }
+
+        var genders = getGenders();
+
+        var forms = new List<DexItemForm>();
+
+        // if (species == 201)
+        // {
+        //     Console.WriteLine($"FOOOOOOOOOO {pi.FormCount} {save.ID32} {save.Generation} {foo.Length}");
+        // }
+        // var strings = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage());
+        // var formList = FormConverter.GetFormList(species, strings.types, strings.forms, GameInfo.GenderSymbolUnicode, save.Context);
+
+        var staticSpecies = staticData.Species[species];
+        var staticForms = staticSpecies.Forms[save.Generation];
+
+        for (byte form = 0; form < staticForms.Length; form++)
+        {
+            genders.ForEach(gender =>
+            {
+                var ownedPkms = pkmList.FindAll(pkm => pkm.Form == form && pkm.Gender == (byte)gender);
+                var itemForm = GetDexItemForm(species, save, ownedPkms, form, gender);
+                // itemForm.FormName = formList[form];
+                itemForm.Generation = save.Generation;
+                itemForm.Types = [.. itemForm.Types.Distinct().Select(type => (byte)(type + 1))];
+                forms.Add(itemForm);
+            });
+        }
+
+        return new DexItemDTO
+        {
+            Id = $"{species}_{save.ID32}",
+            Species = species,
+            SaveId = save.ID32,
+            Forms = forms,
+        };
+    }
+
+    protected abstract DexItemForm GetDexItemForm(ushort species, Save save, List<PKM> pkmList, byte form, Gender gender);
 }

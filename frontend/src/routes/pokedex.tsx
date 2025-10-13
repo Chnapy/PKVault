@@ -47,6 +47,8 @@ const searchSchema = z.object({
   filterOwnedShiny: z.boolean().optional(),
   filterFromGames: z.array(z.number()).optional(), // saveIDs
   filterGenerations: z.array(z.number()).optional(), // generation.name
+  showForms: z.boolean().optional(),
+  showGenders: z.boolean().optional(),
   // sort: z.enum(['newest', 'oldest', 'price']).default('newest'),
 });
 

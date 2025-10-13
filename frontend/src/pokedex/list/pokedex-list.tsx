@@ -4,7 +4,7 @@ import { useStaticData } from '../../hooks/use-static-data';
 import { TitledContainer } from '../../ui/container/titled-container';
 import { usePokedexFilters } from "./hooks/use-pokedex-filters";
 import { PokedexCount } from './pokedex-count';
-import { PokedexItem } from "./pokedex-item";
+import { PokedexItem, type PokedexItemProps } from "./pokedex-item";
 import { useTranslate } from '../../translate/i18n';
 
 export const PokedexList: React.FC = () => {
@@ -41,10 +41,23 @@ export const PokedexList: React.FC = () => {
     const species = speciesValues[ 0 ].species;
     const statics = staticData.species[ species ];
 
-    const seen = speciesValues.some((spec) => spec.isAnySeen);
-    const caught = speciesValues.some((spec) => spec.isCaught);
-    const owned = speciesValues.some((spec) => spec.isOwned);
-    const ownedShiny = speciesValues.some((spec) => spec.isOwnedShiny);
+    const nbrForms = Math.max(...speciesValues.map(value => value.forms.length));
+    const forms: PokedexItemProps[ 'forms' ] = [];
+    for (let i = 0; i < nbrForms; i++) {
+      const currentForms = speciesValues.map(value => value.forms[ i ]).filter(Boolean);
+      forms.push({
+        form: currentForms[ 0 ].form,
+        generation: currentForms[ 0 ].generation,
+        gender: currentForms[ 0 ].gender,
+        isSeen: currentForms.some(form => form.isSeen),
+        isSeenShiny: currentForms.some(form => form.isSeenShiny),
+        isCaught: currentForms.some(form => form.isCaught),
+        isOwned: currentForms.some(form => form.isOwned),
+        isOwnedShiny: currentForms.some(form => form.isOwnedShiny),
+      });
+    }
+
+    // if (new Set(forms.map(f => f.form)).size === 1) return acc;
 
     const genAcc = acc[ statics.generation - 1 ] ?? [];
     acc[ statics.generation - 1 ] = genAcc;
@@ -52,20 +65,7 @@ export const PokedexList: React.FC = () => {
       <PokedexItem
         key={species}
         species={species}
-        seen={seen}
-        caught={caught}
-        owned={owned}
-        ownedShiny={ownedShiny}
-      // caughtVersions={
-      //   speciesValues
-      //     .filter((spec) => spec.isCaught)
-      //     .map(val => saveInfosData[ val.saveId ].version)
-      // }
-      // seenOnlyVersions={
-      //   speciesValues
-      //     .filter((spec) => spec.isAnySeen && !spec.isCaught)
-      //     .map(val => saveInfosData[ val.saveId ].version)
-      // }
+        forms={forms}
       />
     );
 

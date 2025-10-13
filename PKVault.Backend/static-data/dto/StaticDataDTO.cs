@@ -30,7 +30,8 @@ public struct StaticSpecies
     // public required string Name { get; set; }
     public required uint Generation { get; set; }
     public required GenderType[] Genders { get; set; }
-    public required StaticSpeciesForm[] Forms { get; set; }
+    // key is EntityContext
+    public required Dictionary<byte, StaticSpeciesForm[]> Forms { get; set; }
     // public required string SpriteDefault { get; set; }
     // public required string SpriteShiny { get; set; }
     // public int[] AvailableMoves { get; set; }
@@ -41,7 +42,9 @@ public struct StaticSpeciesForm
     public required int Id { get; set; }
     public required string Name { get; set; }
     public required string SpriteDefault { get; set; }
+    public required string? SpriteFemale { get; set; }
     public required string SpriteShiny { get; set; }
+    public required string? SpriteShinyFemale { get; set; }
 }
 
 public struct StaticStat
