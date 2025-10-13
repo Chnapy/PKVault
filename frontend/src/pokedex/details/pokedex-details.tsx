@@ -53,7 +53,20 @@ export const PokedexDetails: React.FC = () => {
     if (acc.some(it => it.form === item.form)) {
       return acc;
     }
-    return [ ...acc, item ];
+
+    const allSameForms = selectedSpeciesValue.forms.filter(form => form.form === item.form);
+
+    return [
+      ...acc,
+      {
+        ...item,
+        isSeen: allSameForms.some(form => form.isSeen),
+        isSeenShiny: allSameForms.some(form => form.isSeenShiny),
+        isCaught: allSameForms.some(form => form.isCaught),
+        isOwned: allSameForms.some(form => form.isOwned),
+        isOwnedShiny: allSameForms.some(form => form.isOwnedShiny),
+      }
+    ];
   }, []);
 
   React.useEffect(() => {
