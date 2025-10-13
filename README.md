@@ -42,6 +42,7 @@ Executables can be found in releases.
     - backups listing
     - backups restore always possible
 - Centralized Pokedex based on all listed saves
+  - views with forms & genders
   - multiple filters: species name, seen/caught/owned, types, ...
     - possible living dex
     - possible shiny dex
