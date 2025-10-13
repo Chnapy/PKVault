@@ -119,6 +119,7 @@ public class PkmConvertService
         // pkmIntermediate.MetLevel = 0;
         // pkmIntermediate.Ball = (byte)Ball.Poke; //pkmOrigin.Ball;
 
+        PassIDBreakableToPkm(sourcePkm, pkmIntermediate);
         PassStaticsToPkm(sourcePkm, pkmIntermediate);
         PassDynamicsToPkm(sourcePkm, pkmIntermediate);
         PassHeldItemToPkm(sourcePkm, pkmIntermediate);
@@ -133,6 +134,12 @@ public class PkmConvertService
 
     public static void PassAllToPkm(PKM sourcePkm, PKM destPkm)
     {
+        PassIDBreakableToPkm(sourcePkm, destPkm);
+        PassAllToPkmSafe(sourcePkm, destPkm);
+    }
+
+    public static void PassAllToPkmSafe(PKM sourcePkm, PKM destPkm)
+    {
         PassStaticsToPkm(sourcePkm, destPkm);
         PassDynamicsToPkm(sourcePkm, destPkm);
         PassHeldItemToPkm(sourcePkm, destPkm);
@@ -144,19 +151,9 @@ public class PkmConvertService
         destPkm.RefreshChecksum();
     }
 
-    private static void PassStaticsToPkm(PKM sourcePkm, PKM destPkm)
+    private static void PassIDBreakableToPkm(PKM sourcePkm, PKM destPkm)
     {
-        destPkm.Language = (int)SettingsService.AppSettings.GetSafeLanguageID(); //pkmOrigin.Language;
-        if (destPkm is IHandlerLanguage pkmIntermediateHLang)
-        {
-            pkmIntermediateHLang.HandlingTrainerLanguage = (byte)SettingsService.AppSettings.GetSafeLanguageID();
-        }
-
-        destPkm.Gender = sourcePkm.Gender;
-
-        destPkm.OriginalTrainerName = sourcePkm.OriginalTrainerName;
-
-        Func<int, int> convertIVFn = (int value) => value;
+        Func<int, int> convertIVFn = value => value;
         if (sourcePkm.Format <= 2 && destPkm.Format > 2)
         {
             convertIVFn = ConvertIVG2ToG3;
@@ -175,6 +172,19 @@ public class PkmConvertService
             convertIVFn(sourcePkm.IV_SPD),
         ];
         destPkm.SetIVs(ivs);
+    }
+
+    private static void PassStaticsToPkm(PKM sourcePkm, PKM destPkm)
+    {
+        destPkm.Language = (int)SettingsService.AppSettings.GetSafeLanguageID(); //pkmOrigin.Language;
+        if (destPkm is IHandlerLanguage pkmIntermediateHLang)
+        {
+            pkmIntermediateHLang.HandlingTrainerLanguage = (byte)SettingsService.AppSettings.GetSafeLanguageID();
+        }
+
+        destPkm.Gender = sourcePkm.Gender;
+
+        destPkm.OriginalTrainerName = sourcePkm.OriginalTrainerName;
 
         ApplyAbilityToPkm(destPkm);
 

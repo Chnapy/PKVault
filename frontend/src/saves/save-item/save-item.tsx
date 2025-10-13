@@ -90,6 +90,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
         trainerName={mainSave.trainerName}
         trainerGenderMale={mainSave.trainerGender === 0}
         tid={mainSave.tid}
+        path={mainSave.path}
         lastWriteTime={mainSave.lastWriteTime}
         playTime={mainSave.playTime}
         dexSeenCount={mainSave.dexSeenCount}

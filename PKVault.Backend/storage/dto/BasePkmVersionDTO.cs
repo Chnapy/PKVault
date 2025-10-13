@@ -5,7 +5,7 @@ using PokeApiNet;
 
 public abstract class BasePkmVersionDTO : IWithId<string>
 {
-    public string Id { get { return GetPKMId(Pkm); } }
+    public string Id { get { return GetPKMIdBase(Pkm); } }
 
     public uint Generation { get { return GetGeneration(); } }
 
@@ -353,7 +353,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     protected abstract uint GetGeneration();
 
-    public static string GetPKMId(PKM pkm)
+    public static string GetPKMIdBase(PKM pkm)
     {
         var hash = SearchUtil.HashByDetails(pkm);
         var id = $"G{pkm.Format}{hash}";

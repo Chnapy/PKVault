@@ -3,6 +3,7 @@ public class WarningsDTO
 {
     public required List<PlayTimeWarning> PlayTimeWarnings { get; set; }
     public required List<PkmVersionWarning> PkmVersionWarnings { get; set; }
+    public required List<PkmDuplicateWarning> PkmDuplicateWarnings { get; set; }
 }
 
 public class PlayTimeWarning
@@ -14,4 +15,10 @@ public class PkmVersionWarning
 {
     public required string PkmId { get; set; }
     public string? PkmVersionId { get; set; }
+}
+
+public class PkmDuplicateWarning
+{
+    public required uint SaveId { get; set; }
+    public required string[] DuplicateIdBases { get; set; }
 }

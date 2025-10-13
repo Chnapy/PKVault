@@ -13,6 +13,12 @@ public class SettingsController : ControllerBase
         return SettingsService.AppSettings;
     }
 
+    [HttpGet("test-save-globs")]
+    public ActionResult<List<string>> GetSaveGlobsResults([FromQuery] string[] globs)
+    {
+        return MatcherUtil.SearchPaths(globs);
+    }
+
     [HttpPost]
     public async Task<ActionResult<DataDTO>> Edit([BindRequired] SettingsMutableDTO settingsMutable)
     {
@@ -28,6 +34,7 @@ public class SettingsController : ControllerBase
 
         var languageChanged = SettingsService.AppSettings.SettingsMutable.LANGUAGE != settingsMutable.LANGUAGE;
 
+        settingsMutable.SAVE_GLOBS = [.. settingsMutable.SAVE_GLOBS.Select(glob => glob.Trim())];
         await SettingsService.UpdateSettings(settingsMutable);
 
         return await DataDTO.FromDataUpdateFlags(new()

@@ -11,7 +11,19 @@ public class SynchronizePkmAction(uint saveId, string pkmVersionId) : DataAction
         }
 
         var saveLoaders = loaders.saveLoadersDict[saveId];
-        var savePkm = await saveLoaders.Pkms.GetDto(pkmVersionId);
+        var savePkms = (await saveLoaders.Pkms.GetAllDtos()).FindAll(pkm => pkm.PkmVersionId == pkmVersionId);
+
+        if (savePkms.Count == 0)
+        {
+            Console.WriteLine($"Attached save pkm not found for pkmVersion.Id={pkmVersionId}");
+        }
+
+        if (savePkms.Count > 1)
+        {
+            Console.WriteLine($"Multiple save pkms with same ID for pkmVersion.Id={pkmVersionId}");
+        }
+
+        var savePkm = savePkms[0];
 
         var relatedPkmVersions = (await loaders.pkmVersionLoader.GetAllDtos()).FindAll(value => value.PkmDto.Id == pkmDto.Id);
 
@@ -19,7 +31,7 @@ public class SynchronizePkmAction(uint saveId, string pkmVersionId) : DataAction
         {
             var pkm = version.Pkm;
 
-            PkmConvertService.PassAllToPkm(savePkm!.Pkm, pkm);
+            PkmConvertService.PassAllToPkmSafe(savePkm!.Pkm, pkm);
 
             loaders.pkmVersionLoader.WriteDto(version);
 

@@ -6,6 +6,7 @@ public class WarningsService
     {
         PlayTimeWarnings = [],
         PkmVersionWarnings = [],
+        PkmDuplicateWarnings = [],
     };
 
     public static WarningsDTO GetWarningsDTO()
@@ -17,10 +18,14 @@ public class WarningsService
     {
         var logtime = LogUtil.Time($"Warnings check");
 
+        var pkmVersionWarnings = CheckPkmVersionWarnings();
+        var pkmDuplicateWarnings = CheckSavePkmDuplicates();
+
         WarningsDTO = new()
         {
             PlayTimeWarnings = CheckPlayTimeWarning(),
-            PkmVersionWarnings = await CheckPkmVersionWarnings(),
+            PkmVersionWarnings = await pkmVersionWarnings,
+            PkmDuplicateWarnings = await pkmDuplicateWarnings,
         };
 
         logtime();
@@ -97,7 +102,7 @@ public class WarningsService
 
                 var pkmVersion = (await pkmVersionsTask).Find(pkmVersion => pkmVersion.PkmDto.Id == pkm.Id && pkmVersion.Generation == generation);
 
-                var savePkm = pkmVersion == null ? null : await saveLoader.Pkms.GetDto(pkmVersion.Id);
+                var savePkm = pkmVersion == null ? null : (await saveLoader.Pkms.GetAllDtos()).Find(pkm => pkm.PkmVersionId == pkmVersion.Id);
 
                 if (savePkm == null)
                 {
@@ -116,6 +121,40 @@ public class WarningsService
         return [.. (await Task.WhenAll(tasks))
             .Where(value => value != null)
             .OfType<PkmVersionWarning>()];
+    }
+
+    private static async Task<List<PkmDuplicateWarning>> CheckSavePkmDuplicates()
+    {
+        var loader = await StorageService.GetLoader();
+
+        if (loader.loaders.saveLoadersDict.Count == 0)
+        {
+            return [];
+        }
+
+        var tasks = loader.loaders.saveLoadersDict.Values.Select(async (saveLoader) =>
+        {
+            var pkmCountByIdBase = new Dictionary<string, int>();
+
+            var pkms = await saveLoader.Pkms.GetAllDtos();
+            pkms.ForEach(pkm =>
+            {
+                var count = pkmCountByIdBase.TryGetValue(pkm.IdBase, out var _count) ? _count : 0;
+                pkmCountByIdBase[pkm.IdBase] = count + 1;
+            });
+
+            var duplicateIdBases = pkmCountByIdBase.Count > 0
+                ? pkmCountByIdBase.ToList().FindAll(entry => entry.Value > 1).Select(entry => entry.Key).ToArray()
+                : [];
+
+            return new PkmDuplicateWarning()
+            {
+                SaveId = saveLoader.Save.ID32,
+                DuplicateIdBases = duplicateIdBases,
+            };
+        });
+
+        return (await Task.WhenAll(tasks)).ToList().FindAll(warn => warn.DuplicateIdBases.Length > 0);
     }
 
     private static int GetSavePlayTimeS(SaveFile save)

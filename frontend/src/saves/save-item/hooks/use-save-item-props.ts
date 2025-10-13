@@ -18,6 +18,7 @@ export const useSaveItemProps = () => {
             trainerName: item.trainerName,
             trainerGenderMale: item.trainerGender === 0,
             tid: item.tid,
+            path: item.path,
             lastWriteTime: item.lastWriteTime,
             playTime: item.playTime,
             dexSeenCount: item.dexSeenCount,

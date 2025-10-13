@@ -57,7 +57,7 @@ public abstract class EntityLoader<DTO, E>(
 
     public virtual void WriteDto(DTO dto)
     {
-        Console.WriteLine($"{dto.GetType().Name} - Write id={dto.Id}");
+        Console.WriteLine($"{dto.GetType().Name} - Write id={dto.Id} - Entity id={dtoToEntity(dto).Id}");
 
         var entities = GetAllEntities();
         entities[dto.Id] = dtoToEntity(dto);

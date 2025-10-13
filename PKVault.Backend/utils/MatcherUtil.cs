@@ -11,13 +11,26 @@ public class MatcherUtil
             return [];
         }
 
-        var isAbsolute = globs[0][0] == '/';
-        var rootDir = isAbsolute ? "/" : ".";
+        // starts with / or \
+        static bool isAbsolute(string glob) => glob.Length > 0 && (glob[0] == '/' || glob[0] == '\\');
 
-        var matcher = new Matcher();
-        globs.ToList().ForEach(glob => matcher.AddInclude(glob));
-        var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
+        var absoluteGlobs = globs.ToList().FindAll(isAbsolute);
+        var relativeGlobs = globs.ToList().FindAll(glob => !isAbsolute(glob));
 
-        return [.. matches.Files.Select(file => Path.Combine(rootDir, file.Path))];
+        var absoluteMatcher = new Matcher();
+        absoluteGlobs.ToList().ForEach(glob => absoluteMatcher.AddInclude(glob));
+        var absoluteMatches = absoluteMatcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo("/")));
+        var absoluteResults = absoluteMatches.Files.Select(file => Path.Combine("/", file.Path));
+
+        // Console.WriteLine($"ABSOLUTE:\n{string.Join('\n', absoluteGlobs)}---Results:\n{string.Join('\n', absoluteResults)}");
+
+        var relativeMatcher = new Matcher();
+        relativeGlobs.ToList().ForEach(glob => relativeMatcher.AddInclude(glob));
+        var relativeMatches = relativeMatcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(".")));
+        var relativeResults = relativeMatches.Files.Select(file => Path.Combine(".", file.Path));
+
+        string[] results = [.. absoluteResults, .. relativeResults];
+
+        return [.. results.Select(path => path.Replace('\\', '/'))];
     }
 }
