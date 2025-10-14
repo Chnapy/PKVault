@@ -17,7 +17,7 @@ export const SaveGlobsInput: React.FC<SaveGlobsInputProps> = ({ ...inputProps })
     const globResultsQuery = useSettingsGetSaveGlobsResults({ globs: values });
 
     const { isLoading } = globResultsQuery;
-    const data = globResultsQuery.data?.data ?? [];
+    const data = Array.isArray(globResultsQuery.data?.data) ? globResultsQuery.data.data : [];
 
     return <div
         style={{

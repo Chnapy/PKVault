@@ -4,9 +4,14 @@ using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
 public class MatcherUtil
 {
-    public static List<string> SearchPaths(string[] globs)
+    public static List<string> SearchPaths(string?[] globsNullable)
     {
-        if (globs.Length == 0)
+        List<string> globs = [.. globsNullable
+            .OfType<string>()
+            .Select(glob => glob.Trim()).ToList()
+            .FindAll(glob => glob.Length > 0)];
+
+        if (globs.Count == 0)
         {
             return [];
         }
@@ -14,8 +19,8 @@ public class MatcherUtil
         // starts with / or \
         static bool isAbsolute(string glob) => glob.Length > 0 && (glob[0] == '/' || glob[0] == '\\');
 
-        var absoluteGlobs = globs.ToList().FindAll(isAbsolute);
-        var relativeGlobs = globs.ToList().FindAll(glob => !isAbsolute(glob));
+        var absoluteGlobs = globs.FindAll(isAbsolute);
+        var relativeGlobs = globs.FindAll(glob => !isAbsolute(glob));
 
         var absoluteMatcher = new Matcher();
         absoluteGlobs.ToList().ForEach(glob => absoluteMatcher.AddInclude(glob));
