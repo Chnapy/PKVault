@@ -331,7 +331,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get
         {
             var legality = new LegalityAnalysis(Pkm);
-            return legality.Parsed && Pkm.Valid && legality.Valid;
+            return legality.Parsed && legality.Valid;
         }
     }
 
