@@ -285,6 +285,11 @@ public class StaticDataService
 
                     var formListEn = FormConverter.GetFormList((ushort)species, GameInfo.Strings.types, GameInfo.Strings.forms, GameInfo.GenderSymbolUnicode, context);
 
+                    if (formListEn.Length == 0)
+                    {
+                        formListEn = [""];
+                    }
+
                     (Pokemon, PokemonForm)?[] formListData = [.. formListEn.Select(formNameEn =>
                     {
                         var formApiName = PokeApiFileClient.PokeApiNameFromPKHexName(formNameEn);
@@ -310,7 +315,7 @@ public class StaticDataService
                                 return searchFor("", true);
                             }
 
-                            if (formApiName == "" || formApiName == "normal")
+                            if (name == "" || name == "normal")
                             {
                                 return (defaultData.Item1, defaultData.Item2[0]);
                             }
@@ -357,7 +362,7 @@ public class StaticDataService
                                 "m-blue" => searchFor("blue-meteor", true),
                                 "m-indigo" => searchFor("indigo-meteor", true),
                                 "m-violet" => searchFor("violet-meteor", true),
-                                "hero" => searchFor("crowned", true),
+                                "hero" => searchFor("", true),
                                 "teal" => searchFor("", true),
                                 _ => searchFor($"{name}-cap", true)
                                     ?? searchFor($"{name}-breed", true)
