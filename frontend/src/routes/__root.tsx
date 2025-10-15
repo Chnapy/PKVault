@@ -26,7 +26,7 @@ const Root: React.FC = () => {
   const savesScanMutation = useSaveInfosScan();
 
   const [ openNotif, setOpenNotif ] = React.useState(false);
-  const hasWarnings = !!warnings && (warnings.pkmVersionWarnings.length + warnings.playTimeWarnings.length) > 0;
+  const hasWarnings = !!warnings && warnings.warningsCount > 0;
   const hasErrors = BackendErrorsContext.useValue().errors.length > 0 || hasWarnings;
 
   React.useEffect(() => {

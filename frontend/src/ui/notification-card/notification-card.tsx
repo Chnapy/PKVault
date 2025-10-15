@@ -3,6 +3,7 @@ import { BackendErrorsContext } from '../../data/backend-errors-context';
 import { useWarningsGetWarnings } from '../../data/sdk/warnings/warnings.gen';
 import { useTranslate } from '../../translate/i18n';
 import { PkmVersionWarning } from '../../warnings/pkm-version-warning';
+import { SaveChangedWarning } from '../../warnings/save-changed-warning';
 import { Button } from '../button/button';
 import { TitledContainer } from '../container/titled-container';
 import { Icon } from '../icon/icon';
@@ -14,7 +15,7 @@ export const NotificationCard: React.FC = () => {
 
     const warnings = useWarningsGetWarnings().data?.data;
 
-    const nbrWarnings = warnings ? (warnings.pkmVersionWarnings.length + warnings.playTimeWarnings.length) : 0;
+    const nbrWarnings = warnings?.warningsCount ?? 0;
 
     const hasErrorsAndWarnings = errors.length > 0 && nbrWarnings > 0;
 
@@ -45,6 +46,8 @@ export const NotificationCard: React.FC = () => {
                         </div>)} */}
 
                 {warnings?.pkmVersionWarnings.map((warn, i) => <PkmVersionWarning key={i} {...warn} />)}
+
+                {warnings?.saveChangedWarnings.map((warn, i) => <SaveChangedWarning key={i} {...warn} />)}
 
                 {hasErrorsAndWarnings && <tr><td><hr /></td></tr>}
 

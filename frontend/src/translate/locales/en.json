@@ -7,6 +7,7 @@
   "header.notifications.help": "No notifications",
   "notifications.errors": "{{count}} errors",
   "notifications.warnings": "{{count}} warnings",
+  "notifications.warnings.save-changed": "Careful, save file {{saveName}} was updated by another program.\nSaving your changes may erase these external changes.\nFile: {{path}}",
   "notifications.warnings.pkm-version": "Pkm {{speciesName}} in box {{boxId}} slot {{boxSlot}} not found in attached save.",
   "action.confirm": "Confirm ?",
   "saves.not-see": "Not seeing your save ?",

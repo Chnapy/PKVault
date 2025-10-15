@@ -4,6 +4,7 @@ public class WarningsService
 {
     private static WarningsDTO WarningsDTO = new()
     {
+        SaveChangedWarnings = [],
         PlayTimeWarnings = [],
         PkmVersionWarnings = [],
         PkmDuplicateWarnings = [],
@@ -18,17 +19,49 @@ public class WarningsService
     {
         var logtime = LogUtil.Time($"Warnings check");
 
+        var saveChangedWarnings = CheckSaveChangedWarnings();
         var pkmVersionWarnings = CheckPkmVersionWarnings();
         var pkmDuplicateWarnings = CheckSavePkmDuplicates();
 
         WarningsDTO = new()
         {
+            SaveChangedWarnings = await saveChangedWarnings,
             PlayTimeWarnings = CheckPlayTimeWarning(),
             PkmVersionWarnings = await pkmVersionWarnings,
             PkmDuplicateWarnings = await pkmDuplicateWarnings,
         };
 
         logtime();
+    }
+
+    private static async Task<List<SaveChangedWarning>> CheckSaveChangedWarnings()
+    {
+        var warns = new List<SaveChangedWarning>();
+
+        var loader = await StorageService.GetLoader();
+
+        var startTime = loader.startTime;
+
+        if (loader.loaders.saveLoadersDict.Count == 0)
+        {
+            return [];
+        }
+
+        return [.. loader.loaders.saveLoadersDict.Values
+            .Where(saveLoaders => saveLoaders.Boxes.HasWritten || saveLoaders.Pkms.HasWritten)
+            .Where(saveLoaders =>
+            {
+                var path = LocalSaveService.SaveByPath.Keys.ToList().Find(path => LocalSaveService.SaveByPath[path].ID32 == saveLoaders.Save.ID32);
+                if (path == default)
+                {
+                    throw new KeyNotFoundException($"Path not found for given save {saveLoaders.Save.ID32}");
+                }
+
+                var lastWriteTime = File.GetLastWriteTimeUtc(path);
+                // Console.WriteLine($"Check save {saveLoaders.Save.ID32} to {path}.\nWrite-time from {lastWriteTime} to {startTime}.");
+                return lastWriteTime > startTime;
+            })
+            .Select(saveLoaders => new SaveChangedWarning() { SaveId = saveLoaders.Save.ID32 })];
     }
 
     private static List<PlayTimeWarning> CheckPlayTimeWarning()

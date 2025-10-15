@@ -1,4 +1,4 @@
-public class DataMemoryLoader(DataEntityLoaders _loaders) : DataLoader(_loaders)
+public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : DataLoader(_loaders)
 {
     public static async Task<DataMemoryLoader> Create()
     {
@@ -82,6 +82,8 @@ public class DataMemoryLoader(DataEntityLoaders _loaders) : DataLoader(_loaders)
             })
         );
 
+        var startTime = DateTime.UtcNow;
+
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
         await Task.WhenAll(
                 LocalSaveService.SaveById.Values.ToList().Select(async (save) =>
@@ -105,9 +107,10 @@ public class DataMemoryLoader(DataEntityLoaders _loaders) : DataLoader(_loaders)
             saveLoadersDict = saveLoadersDict,
         };
 
-        return new(loaders);
+        return new(loaders, startTime);
     }
 
+    public readonly DateTime startTime = startTime;
     public List<DataAction> actions = [];
 
     public async Task<DataUpdateFlags> AddAction(DataAction action, DataUpdateFlags? flags)

@@ -7,6 +7,7 @@
   "header.notifications.help": "Pas de notifications",
   "notifications.errors": "{{count}} erreurs",
   "notifications.warnings": "{{count}} warnings",
+  "notifications.warnings.save-changed": "Attention, le fichier de sauvegarde {{saveName}} a été modifié par un autre programme.\nSauvegarder vos changements pourraient effacer les modifications exterieurs à PKVault.\nFichier: {{path}}",
   "notifications.warnings.pkm-version": "Pkm {{speciesName}} dans la boîte {{boxId}} emplacement {{boxSlot}} introuvable dans la sauvegarde attachée.",
   "action.confirm": "Confirmer ?",
   "saves.not-see": "Vous ne voyez pas votre sauvegarde ?",

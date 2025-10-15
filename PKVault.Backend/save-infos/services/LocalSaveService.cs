@@ -131,7 +131,7 @@ public class LocalSaveService
         return record;
     }
 
-    public static DateTime WriteSave(SaveFile save)
+    public static void WriteSave(SaveFile save)
     {
         var path = SaveByPath.Keys.ToList().Find(path => SaveByPath[path].ID32 == save.ID32);
         if (path == default)
@@ -149,10 +149,6 @@ public class LocalSaveService
         UpdateGlobalsWithSave(save, path);
 
         Console.WriteLine($"Writed save {save.ID32} to {path}");
-
-        var lastWriteTime = File.GetLastWriteTime(path);
-
-        return lastWriteTime;
     }
 
     // public static async Task<DataUpdateFlags> UploadNewSave(byte[] fileBytes, string formFilename)
