@@ -283,7 +283,9 @@ public class StaticDataService
                         return;
                     }
 
-                    var formListEn = FormConverter.GetFormList((ushort)species, GameInfo.Strings.types, GameInfo.Strings.forms, GameInfo.GenderSymbolUnicode, context);
+                    var formListEn = species == (int)Species.Alcremie
+                        ? FormConverter.GetAlcremieFormList(GameInfo.Strings.forms)
+                        : FormConverter.GetFormList((ushort)species, GameInfo.Strings.Types, GameInfo.Strings.forms, GameInfo.GenderSymbolASCII, context);
 
                     if (formListEn.Length == 0)
                     {
@@ -297,6 +299,11 @@ public class StaticDataService
                         (Pokemon, PokemonForm)? searchFor (string name, bool intern) {
                             if(speciesNameEn == "arceus" && name == "legend") {
                                 return null;
+                            }
+
+                            if(speciesNameEn == "alcremie" && name.Contains('('))
+                            {
+                                return searchFor($"{name.Replace("(", "").Replace(")", "")}-sweet", true);
                             }
 
                             if(name.StartsWith("*")) {
@@ -332,8 +339,8 @@ public class StaticDataService
                                 "!" => searchFor("exclamation", true),
                                 "?" => searchFor("question", true),
                                 "???" => searchFor("unknown", true),
-                                "-m" => searchFor("male", true),
-                                "-f" => searchFor("female", true),
+                                "m" or "-m" => searchFor("male", true),
+                                "f" or "-f" => searchFor("female", true),
                                 "50%" => searchFor("50", true),
                                 "50%-c" => searchFor("50-power-construct", true),
                                 "10%" => searchFor("10", true),
