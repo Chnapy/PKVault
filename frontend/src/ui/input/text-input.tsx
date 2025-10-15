@@ -54,6 +54,7 @@ export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onCha
                 value={value}
                 onChange={onChange}
                 readOnly={!onChange}
+                spellCheck={false}
                 {...rest}
                 style={inputStyle}
             />
@@ -63,6 +64,7 @@ export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onCha
                 value={value}
                 onChange={onChange}
                 readOnly={!onChange}
+                spellCheck={false}
                 {...rest}
                 style={inputStyle}
             />
