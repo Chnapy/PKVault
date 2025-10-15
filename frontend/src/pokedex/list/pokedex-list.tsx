@@ -45,9 +45,11 @@ export const PokedexList: React.FC = () => {
     const forms: PokedexItemProps[ 'forms' ] = [];
     for (let i = 0; i < nbrForms; i++) {
       const currentForms = speciesValues.map(value => value.forms[ i ]).filter(Boolean);
+      const maxGeneration = Math.max(...currentForms.map(value => value.generation));
+
       forms.push({
         form: currentForms[ 0 ].form,
-        generation: currentForms[ 0 ].generation,
+        generation: maxGeneration,
         gender: currentForms[ 0 ].gender,
         isSeen: currentForms.some(form => form.isSeen),
         isSeenShiny: currentForms.some(form => form.isSeenShiny),

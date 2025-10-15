@@ -415,7 +415,15 @@ public class StaticDataService
                     var varietyForms = formListData.ToList()
                         .OfType<(Pokemon, PokemonForm)>().ToList()
                         .FindAll(entry => !entry.Item2.IsBattleOnly)
-                        .Select((data) => getVarietyForm(data.Item1, data.Item2, defaultForm));
+                        .Select((data) => getVarietyForm(data.Item1, data.Item2, defaultForm))
+                        .Select((data) =>
+                        {
+                            if (context.Generation() < 4)
+                            {
+                                data.HasGenderDifferences = false;
+                            }
+                            return data;
+                        });
 
                     // if (!varietyForms.Any())
                     // {
