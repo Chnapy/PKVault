@@ -143,12 +143,12 @@ public class StaticDataService
                 var pkmSpeciesObj = await PokeApi.GetPokemonSpecies(species);
                 var generation = PokeApi.GetGenerationValue(pkmSpeciesObj.Generation.Name);
 
-                GenderType[] genders = pkmSpeciesObj.GenderRate switch
+                PKHeX.Core.Gender[] genders = pkmSpeciesObj.GenderRate switch
                 {
-                    -1 => [],
-                    0 => [GenderType.MALE],
-                    8 => [GenderType.FEMALE],
-                    _ => [GenderType.MALE, GenderType.FEMALE],
+                    -1 => [PKHeX.Core.Gender.Genderless],
+                    0 => [PKHeX.Core.Gender.Male],
+                    8 => [PKHeX.Core.Gender.Female],
+                    _ => [PKHeX.Core.Gender.Male, PKHeX.Core.Gender.Female],
                 };
 
                 var contexts = Enum.GetValues<EntityContext>().ToList().FindAll(context => context.IsValid());
@@ -258,6 +258,7 @@ public class StaticDataService
                         SpriteFemale = spriteFemale,
                         SpriteShiny = spriteShiny,
                         SpriteShinyFemale = spriteShinyFemale,
+                        HasGenderDifferences = formObj.FormName == "" && pkmSpeciesObj.HasGenderDifferences,
                     };
                 }
 
@@ -415,6 +416,13 @@ public class StaticDataService
                         .OfType<(Pokemon, PokemonForm)>().ToList()
                         .FindAll(entry => !entry.Item2.IsBattleOnly)
                         .Select((data) => getVarietyForm(data.Item1, data.Item2, defaultForm));
+
+                    // if (!varietyForms.Any())
+                    // {
+                    //     Console.WriteLine($"FORMS EMTY FOR {species}-{defaultData.Item1.Name} // {context} // formListEn={string.Join(',', formListEn)} -> {string.Join(',', formListData
+                    //     .OfType<(Pokemon, PokemonForm)>().ToList()
+                    //     .Select(entry => $"form.{entry.Item2.Id}-{entry.Item2.Name}"))}");
+                    // }
 
                     forms.Add((byte)context, [.. varietyForms]);
                 });

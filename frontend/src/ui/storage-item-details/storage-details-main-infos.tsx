@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { GenderType } from '../../data/sdk/model';
+import type { Gender as GenderType } from '../../data/sdk/model';
 import { DetailsMainInfos } from '../details-card/details-main-infos';
 import { TextInput } from '../input/text-input';
 import { StorageDetailsForm } from './storage-details-form';

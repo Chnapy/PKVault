@@ -1,10 +1,10 @@
 import { useSearch } from '@tanstack/react-router';
 import React from 'react';
+import { Gender as GenderType } from '../data/sdk/model';
 import { useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
 import { Route } from '../routes/storage';
 import type { ButtonLikeProps } from '../ui/button/button-like';
 import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
-import { GenderType } from '../data/sdk/model';
 
 type StorageSaveItemBaseProps = ButtonLikeProps & Pick<StorageItemProps, 'anchor' | 'helpTitle' | 'small'> & {
     saveId: number;
@@ -43,7 +43,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
             species={species}
             generation={savePkm.generation}
             form={form}
-            isFemale={gender == GenderType.FEMALE}
+            isFemale={gender == GenderType.Female}
             isEgg={isEgg}
             isShiny={isShiny}
             isShadow={isShadow}

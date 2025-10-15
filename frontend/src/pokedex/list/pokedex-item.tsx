@@ -1,5 +1,6 @@
 import React from "react";
-import { Gender, GenderType, type DexItemForm } from '../../data/sdk/model';
+import { type DexItemForm } from '../../data/sdk/model';
+import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from "../../routes/pokedex";
 import { ButtonLike } from '../../ui/button/button-like';
 import { DexFormItem, type DexItemProps } from "../../ui/dex-item/dex-item";
@@ -16,8 +17,11 @@ export const PokedexItem: React.FC<PokedexItemProps> = React.memo(({
 }) => {
   const selectedPkm = Route.useSearch({ select: (search) => search.selected });
   const showForms = Route.useSearch({ select: (search) => search.showForms ?? false });
-  const showGenders = Route.useSearch({ select: (search) => search.showGenders ?? false });
+  const showGendersRaw = Route.useSearch({ select: (search) => search.showGenders ?? false });
   const navigate = Route.useNavigate();
+
+  const staticData = useStaticData();
+  const staticForms = staticData.species[ species ].forms;
 
   const seen = forms.some((spec) => spec.isSeen);
 
@@ -34,73 +38,82 @@ export const PokedexItem: React.FC<PokedexItemProps> = React.memo(({
     [ navigate, seen, selected, species ]
   );
 
-  let content: React.ReactNode = null;
+  const groupsByForm = forms.reduce<(typeof forms)[]>((acc, form) => {
+    acc[ form.form ] = [
+      ...(acc[ form.form ] ?? []),
+      form,
+    ];
+    return acc;
+  }, []);
 
-  if (!showForms && !showGenders) {
-    content = <DexFormItem
-      species={species}
-      generation={forms[ 0 ].generation}
-      form={forms[ 0 ].form}
-      seen={forms.some(form => form.isSeen)}
-      seenShiny={forms.some(form => form.isSeenShiny)}
-      caught={forms.some(form => form.isCaught)}
-      owned={forms.some(form => form.isOwned)}
-      ownedShiny={forms.some(form => form.isOwnedShiny)}
-    />;
-  }
-  else if (showForms && !showGenders) {
-    content = forms
-      .reduce<typeof forms>((acc, form) => {
-        if (acc.some(item => item.form === form.form)) {
-          return acc;
-        }
-        return [ ...acc, form ];
-      }, [])
-      .map(formItem => <DexFormItem
-        key={`${formItem.form}-${formItem.gender}`}
+  const content: React.ReactNode = groupsByForm.map((formGroup, i) => {
+    const hasGenderDifferences = staticForms[ formGroup[ 0 ].generation ][ formGroup[ 0 ].form ].hasGenderDifferences;
+    const showGenders = showGendersRaw && hasGenderDifferences;
+
+    if (!showForms && !showGenders) {
+      if (i > 0) return null;
+
+      return <DexFormItem
+        key={formGroup[ 0 ].form}
+        species={species}
+        generation={formGroup[ 0 ].generation}
+        form={formGroup[ 0 ].form}
+        genders={[ ...new Set(formGroup.map(form => form.gender)) ].sort()}
+        seen={forms.some(form => form.isSeen)}
+        seenShiny={forms.some(form => form.isSeenShiny)}
+        caught={forms.some(form => form.isCaught)}
+        owned={forms.some(form => form.isOwned)}
+        ownedShiny={forms.some(form => form.isOwnedShiny)}
+      />;
+    }
+
+    if (!showForms && showGenders) {
+      if (i > 0) return null;
+
+      return formGroup.map(formItem => <DexFormItem
+        key={formItem.gender}
         species={species}
         generation={formItem.generation}
         form={formItem.form}
-        seen={forms.some(form => form.form === formItem.form && form.isSeen)}
-        seenShiny={forms.some(form => form.form === formItem.form && form.isSeenShiny)}
-        caught={forms.some(form => form.form === formItem.form && form.isCaught)}
-        owned={forms.some(form => form.form === formItem.form && form.isOwned)}
-        ownedShiny={forms.some(form => form.form === formItem.form && form.isOwnedShiny)}
-      />);
-  }
-  else if (!showForms && showGenders) {
-    content = forms
-      .filter(form => form.form === 0)
-      .map(formItem => <DexFormItem
-        key={`${formItem.form}-${formItem.gender}`}
-        species={species}
-        generation={formItem.generation}
-        form={formItem.form}
-        gender={formItem.gender === Gender.Male ? GenderType.MALE : (
-          formItem.gender === Gender.Female ? GenderType.FEMALE : undefined
-        )}
+        genders={[ formItem.gender ]}
         seen={forms.some(form => form.gender === formItem.gender && form.isSeen)}
         seenShiny={forms.some(form => form.gender === formItem.gender && form.isSeenShiny)}
         caught={forms.some(form => form.gender === formItem.gender && form.isCaught)}
         owned={forms.some(form => form.gender === formItem.gender && form.isOwned)}
         ownedShiny={forms.some(form => form.gender === formItem.gender && form.isOwnedShiny)}
       />);
-  } else {
-    content = forms.map(formItem => <DexFormItem
+    }
+
+    if (showForms && !showGenders) {
+      const formItem = formGroup[ 0 ];
+
+      return <DexFormItem
+        key={formItem.form}
+        species={species}
+        generation={formItem.generation}
+        form={formItem.form}
+        genders={[ ...new Set(formGroup.map(form => form.gender)) ].sort()}
+        seen={formGroup.some(form => form.isSeen)}
+        seenShiny={formGroup.some(form => form.isSeenShiny)}
+        caught={formGroup.some(form => form.isCaught)}
+        owned={formGroup.some(form => form.isOwned)}
+        ownedShiny={formGroup.some(form => form.isOwnedShiny)}
+      />;
+    }
+
+    return formGroup.map(formItem => <DexFormItem
       key={`${formItem.form}-${formItem.gender}`}
       species={species}
       generation={formItem.generation}
       form={formItem.form}
-      gender={formItem.gender === Gender.Male ? GenderType.MALE : (
-        formItem.gender === Gender.Female ? GenderType.FEMALE : undefined
-      )}
+      genders={[ formItem.gender ]}
       seen={formItem.isSeen}
       seenShiny={formItem.isSeenShiny}
       caught={formItem.isCaught}
       owned={formItem.isOwned}
       ownedShiny={formItem.isOwnedShiny}
     />);
-  }
+  });
 
   return (
     <ButtonLike

@@ -1,11 +1,11 @@
 import { PopoverButton } from '@headlessui/react';
 import React from 'react';
+import { Gender as GenderType } from '../data/sdk/model';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
 import { Route } from '../routes/storage';
 import { StorageItem } from '../ui/storage-item/storage-item';
 import { StorageItemPopover } from '../ui/storage-item/storage-item-popover';
-import { GenderType } from '../data/sdk/model';
 
 type StorageMainItemProps = {
     pkmId: string;
@@ -67,7 +67,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
                 species={species}
                 generation={generation}
                 form={form}
-                isFemale={gender == GenderType.FEMALE}
+                isFemale={gender == GenderType.Female}
                 isEgg={false}
                 isShiny={isShiny}
                 isShadow={false}

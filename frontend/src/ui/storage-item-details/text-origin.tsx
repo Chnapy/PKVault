@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { GameVersion, GenderType } from '../../data/sdk/model';
+import type { GameVersion, Gender as GenderType } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Gender } from '../gender/gender';
 import { theme } from '../theme';

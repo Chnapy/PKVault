@@ -1,6 +1,6 @@
 import React from "react";
 import { getApiFullUrl } from '../../data/mutator/custom-instance';
-import { GenderType } from '../../data/sdk/model';
+import { Gender as GenderType } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { SpeciesImg } from '../details-card/species-img';
 import { Gender } from '../gender/gender';
@@ -24,13 +24,13 @@ export const DexFormItem: React.FC<{
   species: number;
   generation: number;
   form: number;
-  gender?: GenderType;
+  genders: GenderType[];
   seen: boolean;
   seenShiny: boolean;
   caught: boolean;
   owned: boolean;
   ownedShiny: boolean;
-}> = ({ species, generation, form, gender, seen, caught, owned, ownedShiny }) => {
+}> = ({ species, generation, form, genders, seen, caught, owned, ownedShiny }) => {
   const staticData = useStaticData();
 
   const pokeballSprite = getApiFullUrl(staticData.itemPokeball.sprite);
@@ -85,7 +85,7 @@ export const DexFormItem: React.FC<{
           gap: 1,
         }}
       >
-        {gender !== undefined && <Gender gender={gender} />}
+        {genders.map(gender => <Gender key={gender} gender={gender} />)}
       </div>
 
       <div
@@ -95,7 +95,7 @@ export const DexFormItem: React.FC<{
           borderRadius: 2,
         }}
       >
-        <SpeciesImg species={species} generation={generation} form={form} isFemale={gender == GenderType.FEMALE} isShiny={ownedShiny} style={{
+        <SpeciesImg species={species} generation={generation} form={form} isFemale={genders[ 0 ] == GenderType.Female} isShiny={ownedShiny} style={{
           filter: seen ? undefined : "brightness(0) opacity(0.5)",
         }} />
       </div>

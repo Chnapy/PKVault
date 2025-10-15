@@ -1,5 +1,5 @@
 import type React from 'react';
-import { GenderType } from '../../data/sdk/model';
+import { Gender as GenderType } from '../../data/sdk/model';
 import { theme } from '../theme';
 
 export type GenderProps = {
@@ -7,8 +7,12 @@ export type GenderProps = {
 };
 
 export const Gender: React.FC<GenderProps> = ({ gender }) => {
+    if (gender === GenderType.Genderless) {
+        return null;
+    }
+
     return <span style={{
         fontFamily: theme.font.special,
-        color: gender === GenderType.MALE ? '#00C6AD' : '#FF4273'
-    }}>{gender === GenderType.MALE ? '♂' : '♀'}</span>;
+        color: gender === GenderType.Male ? '#00C6AD' : '#FF4273',
+    }}>{gender === GenderType.Male ? '♂' : '♀'}</span>;
 };

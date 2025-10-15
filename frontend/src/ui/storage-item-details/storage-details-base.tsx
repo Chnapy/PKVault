@@ -1,6 +1,6 @@
 import type React from 'react';
 import { getApiFullUrl } from '../../data/mutator/custom-instance';
-import { GenderType, type PkmSaveDTO } from '../../data/sdk/model';
+import { Gender as GenderType, type PkmSaveDTO } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Route } from '../../routes/storage';
@@ -59,7 +59,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
                 species={pkm.species}
                 generation={pkm.generation}
                 form={pkm.form}
-                isFemale={pkm.gender == GenderType.FEMALE}
+                isFemale={pkm.gender == GenderType.Female}
                 isShiny={pkm.isShiny}
                 isEgg={pkm.isEgg}
                 isShadow={pkm.isShadow}

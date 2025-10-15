@@ -29,7 +29,7 @@ public struct StaticSpecies
     public required int Id { get; set; }
     // public required string Name { get; set; }
     public required uint Generation { get; set; }
-    public required GenderType[] Genders { get; set; }
+    public required Gender[] Genders { get; set; }
     // key is EntityContext
     public required Dictionary<byte, StaticSpeciesForm[]> Forms { get; set; }
     // public required string SpriteDefault { get; set; }
@@ -45,6 +45,7 @@ public struct StaticSpeciesForm
     public required string? SpriteFemale { get; set; }
     public required string SpriteShiny { get; set; }
     public required string? SpriteShinyFemale { get; set; }
+    public required bool HasGenderDifferences { get; set; }
 }
 
 public struct StaticStat
@@ -100,10 +101,4 @@ public enum MoveCategory
     PHYSICAL,
     SPECIAL,
     STATUS
-}
-
-public enum GenderType
-{
-    MALE,
-    FEMALE,
 }

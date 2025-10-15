@@ -64,18 +64,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public byte Ball { get => Pkm.Ball; }
 
-    public GenderType? Gender
-    {
-        get
-        {
-            return Pkm.Gender switch
-            {
-                0 => GenderType.MALE,
-                1 => GenderType.FEMALE,
-                _ => null,
-            };
-        }
-    }
+    public PKHeX.Core.Gender Gender { get => (PKHeX.Core.Gender)Pkm.Gender; }
 
     public List<byte> Types
     {
@@ -234,18 +223,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return Pkm.OriginalTrainerName; }
     }
 
-    public GenderType OriginTrainerGender
-    {
-        get
-        {
-            return Pkm.OriginalTrainerGender switch
-            {
-                0 => GenderType.MALE,
-                1 => GenderType.FEMALE,
-                _ => throw new Exception("Pkm.OriginalTrainerGender unexpected value"),
-            };
-        }
-    }
+    public PKHeX.Core.Gender OriginTrainerGender { get => (PKHeX.Core.Gender)Pkm.OriginalTrainerGender; }
 
     public DateOnly? OriginMetDate
     {
@@ -331,6 +309,10 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get
         {
             var legality = new LegalityAnalysis(Pkm);
+            // if (Id == "G91020AC14A4E820 20 20 20 20 2000")
+            // {
+            //     Console.WriteLine($"TEST {Species} parsed={legality.Parsed} pkmValid={Pkm.Valid} legality={legality.Valid}");
+            // }
             return legality.Parsed && legality.Valid;
         }
     }

@@ -1,10 +1,10 @@
 import type React from 'react';
-import type { GenderType } from '../../data/sdk/model';
+import type { Gender as GenderType } from '../../data/sdk/model';
+import { useTranslate } from '../../translate/i18n';
 import { getSpeciesNO } from '../dex-item/util/get-species-no';
 import { Gender } from '../gender/gender';
 import { theme } from '../theme';
 import { TypeItem } from '../type-item/type-item';
-import { useTranslate } from '../../translate/i18n';
 import { DetailsLevel } from './details-level';
 
 export type DetailsMainInfosProps = {
