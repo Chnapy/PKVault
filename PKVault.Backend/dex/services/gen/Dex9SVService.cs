@@ -6,16 +6,44 @@ public class Dex9SVService : DexGenService<SAV9SV>
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
-        var kitamakiEntry = save.Zukan.DexKitakami.Get(species);
-        var paldeaEntry = save.Zukan.DexPaldea.Get(species);
-
-        var isSeenM = kitamakiEntry.GetIsGenderSeen(0) || kitamakiEntry.GetIsGenderSeen(2) || paldeaEntry.GetIsGenderSeen(0) || paldeaEntry.GetIsGenderSeen(2);
-        var isSeenF = kitamakiEntry.GetIsGenderSeen(1) || paldeaEntry.GetIsGenderSeen(1);
-
         var isOwned = ownedPkms.Count > 0;
-        var isSeen = isOwned || (gender == Gender.Female ? isSeenF : isSeenM);
         var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
-        var isSeenShiny = isOwnedShiny || paldeaEntry.GetSeenIsShiny();
+
+        bool isSeen;
+        bool isSeenShiny;
+        bool isCaught;
+
+        if (save.SaveRevision == 0)
+        // paldea
+        {
+            var dex = save.Zukan.DexPaldea;
+            var entry = dex.Get(species);
+
+            var isFormSeen = entry.GetIsFormSeen(form);
+
+            var isSeenM = entry.GetIsGenderSeen(0) || entry.GetIsGenderSeen(2);
+            var isSeenF = entry.GetIsGenderSeen(1);
+
+            isSeenShiny = isOwnedShiny || entry.GetSeenIsShiny();
+            isSeen = isOwned || isSeenShiny || (isFormSeen && (gender == Gender.Female ? isSeenF : isSeenM));
+            isCaught = isSeen && (isOwned || save.GetCaught(species));
+        }
+        // kitami
+        else
+        {
+            var dex = save.Zukan.DexKitakami;
+            var entry = dex.Get(species);
+
+            var isFormSeen = entry.GetSeenForm(form);
+            var isFormCaught = entry.GetObtainedForm(form);
+
+            var isSeenM = entry.GetIsGenderSeen(0) || entry.GetIsGenderSeen(2);
+            var isSeenF = entry.GetIsGenderSeen(1);
+
+            isSeenShiny = isOwnedShiny || entry.GetIsModelSeen(true);
+            isSeen = isOwned || isSeenShiny || (isFormSeen && (gender == Gender.Female ? isSeenF : isSeenM));
+            isCaught = isSeen && (isOwned || isFormCaught);
+        }
 
         Span<int> abilities = stackalloc int[pi.AbilityCount];
         pi.GetAbilities(abilities);
@@ -38,7 +66,7 @@ public class Dex9SVService : DexGenService<SAV9SV>
             BaseStats = baseStats,
             IsSeen = isSeen,
             IsSeenShiny = isSeenShiny,
-            IsCaught = ownedPkms.Count > 0 || save.GetCaught(species),
+            IsCaught = isCaught,
             IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
         };

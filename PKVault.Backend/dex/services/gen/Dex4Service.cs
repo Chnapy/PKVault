@@ -18,8 +18,13 @@ public class Dex4Service : DexGenService<SAV4>
             pi.GetBaseStatValue(3),
         ];
 
+        var forms = save.Dex.GetForms(species);
+
+        var speciesSeen = save.Dex.GetSeen(species);
+        var formSeen = forms.Where(f => speciesSeen && f != byte.MaxValue && f < forms.Length).Distinct().ToArray();
+
         var isOwned = ownedPkms.Count > 0;
-        var isSeen = isOwned || save.GetSeen(species);
+        var isSeen = isOwned || (forms.Length > 0 ? formSeen.Contains(form) : speciesSeen);
         var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
 
         return new DexItemForm
@@ -31,7 +36,7 @@ public class Dex4Service : DexGenService<SAV4>
             BaseStats = baseStats,
             IsSeen = isSeen,
             IsSeenShiny = false,
-            IsCaught = ownedPkms.Count > 0 || save.GetCaught(species),
+            IsCaught = isSeen && (isOwned || save.GetCaught(species)),
             IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
             // IsLangJa = save.Dex.HasLanguage(species) && save.Dex.GetLanguageBitIndex(species, 0),

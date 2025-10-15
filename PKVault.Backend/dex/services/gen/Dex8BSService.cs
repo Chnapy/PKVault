@@ -6,12 +6,27 @@ public class Dex8BSService : DexGenService<SAV8BS>
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
-        save.Zukan.GetGenderFlags(species, out var isSeenM, out var isSeenF, out var isSeenMS, out var isSeenFS);
+        var dex = save.Zukan;
+
+        var state = dex.GetState(species);
+
+        var formCount = Zukan8b.GetFormCount(species);
+
+        dex.GetGenderFlags(species, out var isSeenM, out var isSeenF, out var isSeenMS, out var isSeenFS);
 
         var isOwned = ownedPkms.Count > 0;
-        var isSeen = isOwned || (gender == Gender.Female ? isSeenF : isSeenM);
         var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
-        var isSeenShiny = isOwnedShiny || (gender == Gender.Female ? isSeenFS : isSeenMS);
+
+        var isSeenBase = gender == Gender.Female ? isSeenF : isSeenM;
+        var isSeenShinyBase = gender == Gender.Female ? isSeenFS : isSeenMS;
+
+        var isSeenForm = formCount > 0 && dex.GetHasFormFlag(species, form, false);
+        var isSeenShinyForm = formCount > 0 && dex.GetHasFormFlag(species, form, true);
+
+        var isSeenShiny = isOwnedShiny || (formCount > 0 ? isSeenShinyForm : isSeenShinyBase);
+        var isSeen = isSeenShiny || isOwned || (formCount > 0 ? isSeenForm : isSeenBase);
+
+        var isCaught = isSeen && state == ZukanState8b.Caught;
 
         Span<int> abilities = stackalloc int[pi.AbilityCount];
         pi.GetAbilities(abilities);
@@ -34,7 +49,7 @@ public class Dex8BSService : DexGenService<SAV8BS>
             BaseStats = baseStats,
             IsSeen = isSeen,
             IsSeenShiny = isSeenShiny,
-            IsCaught = save.GetCaught(species),
+            IsCaught = isCaught,
             IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
         };

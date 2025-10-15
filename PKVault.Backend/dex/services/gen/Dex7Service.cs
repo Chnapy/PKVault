@@ -7,9 +7,9 @@ public class Dex7Service : DexGenService<SAV7>
         var pi = save.Personal.GetFormEntry(species, form);
 
         var isOwned = ownedPkms.Count > 0;
-        var isSeen = isOwned || save.Zukan.GetSeen(species, gender == Gender.Female ? 1 : 0);
         var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
         var isSeenShiny = isOwnedShiny || save.Zukan.GetSeen(species, gender == Gender.Female ? 3 : 2);
+        var isSeen = isSeenShiny || isOwned || save.Zukan.GetSeen(species, gender == Gender.Female ? 1 : 0);
 
         Span<int> abilities = stackalloc int[pi.AbilityCount];
         pi.GetAbilities(abilities);
@@ -32,7 +32,7 @@ public class Dex7Service : DexGenService<SAV7>
             BaseStats = baseStats,
             IsSeen = isSeen,
             IsSeenShiny = isSeenShiny,
-            IsCaught = save.GetCaught(species),
+            IsCaught = isSeen && save.GetCaught(species),
             IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
             // IsLangJa = save.Zukan.GetLanguageFlag(species - 1, 0),

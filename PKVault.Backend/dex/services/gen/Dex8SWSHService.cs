@@ -9,9 +9,13 @@ public class Dex8SWSHService : DexGenService<SAV8SWSH>
         var pi = save.Personal.GetFormEntry(species, form);
 
         var isOwned = ownedPkms.Count > 0;
-        var isSeen = isOwned || Dex.GetSeen(species);
         var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
-        var isSeenShiny = isOwnedShiny;
+
+        var isSeenForm = Dex.GetSeenRegion(species, form, gender == Gender.Female ? 1 : 0);
+        var isSeenShinyForm = Dex.GetSeenRegion(species, form, gender == Gender.Female ? 3 : 2);
+
+        var isSeenShiny = isOwnedShiny || isSeenShinyForm;
+        var isSeen = isOwned || isSeenShiny || isSeenForm;
 
         Span<int> abilities = stackalloc int[pi.AbilityCount];
         pi.GetAbilities(abilities);
@@ -34,7 +38,7 @@ public class Dex8SWSHService : DexGenService<SAV8SWSH>
             BaseStats = baseStats,
             IsSeen = isSeen,
             IsSeenShiny = isSeenShiny,
-            IsCaught = ownedPkms.Count > 0 || Dex.GetCaught(species),
+            IsCaught = isSeen && (ownedPkms.Count > 0 || Dex.GetCaught(species)),
             IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
         };
