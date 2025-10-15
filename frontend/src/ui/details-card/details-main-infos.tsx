@@ -1,8 +1,6 @@
 import type React from 'react';
-import type { Gender as GenderType } from '../../data/sdk/model';
 import { useTranslate } from '../../translate/i18n';
 import { getSpeciesNO } from '../dex-item/util/get-species-no';
-import { Gender } from '../gender/gender';
 import { theme } from '../theme';
 import { TypeItem } from '../type-item/type-item';
 import { DetailsLevel } from './details-level';
@@ -13,26 +11,26 @@ export type DetailsMainInfosProps = {
     species: number;
     speciesName: React.ReactNode;
     nickname?: React.ReactNode;
-    genders: GenderType[];
+    // genders: GenderType[];
     types: number[];
     level?: number;
 };
 
-export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ id, pid = 0, species, speciesName, nickname, genders, types, level }) => {
+export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ id, pid = 0, species, speciesName, nickname, types, level }) => {
     const { t } = useTranslate();
 
     return <>
         {nickname && <>{nickname}{' - '}</>}
         <span style={{ color: theme.text.primary }}>{speciesName}</span>
 
-        {genders.map(gender => <span
+        {/* {genders.map(gender => <span
             key={gender}
             style={{
                 float: 'right',
             }}
         >
             <Gender gender={gender} />
-        </span>)}
+        </span>)} */}
         <br />
         <div style={{ display: 'flex', gap: 4, height: '1lh' }}>
             {types.map(type => <TypeItem key={type} type={type} />)}

@@ -5,10 +5,12 @@ import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
+import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { DetailsCardContainer } from '../details-card/details-card-container';
 import { DetailsMainImg } from '../details-card/details-main-img';
+import { ShinyIcon } from '../icon/shiny-icon';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
@@ -17,7 +19,7 @@ import { StorageDetailsTitle } from './storage-details-title';
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
-import { useTranslate } from '../../translate/i18n';
+import { Gender } from '../gender/gender';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'pid' | 'species' | 'version' | 'generation' | 'form' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
@@ -64,6 +66,13 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
                 isEgg={pkm.isEgg}
                 isShadow={pkm.isShadow}
                 ball={pkm.ball}
+                shinyPart={pkm.isShiny && <ShinyIcon
+                    style={{
+                        // width: 12,
+                        margin: '0 -2px',
+                    }}
+                />}
+                genderPart={<Gender gender={pkm.gender} />}
             />
         }
         mainInfos={
@@ -74,7 +83,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
                 speciesName={speciesName}
                 nickname={pkm.nickname}
                 nicknameMaxLength={pkm.nicknameMaxLength}
-                gender={pkm.gender}
+                // gender={pkm.gender}
                 level={pkm.level}
                 types={pkm.types}
             />

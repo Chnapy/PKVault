@@ -6,6 +6,11 @@ public class Dex8LAService : DexGenService<SAV8LA>
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
+        // if (species == 76)
+        // {
+        //     Console.WriteLine($"GROLEM {species}/{form}/{gender} types={pi.Type1}/{pi.Type2} forms.count={save.Personal[species].FormCount}");
+        // }
+
         var dex = save.Blocks.PokedexSave;
         var seenWild = dex.GetPokeSeenInWildFlags(species, form);
         var obtain = dex.GetPokeObtainFlags(species, form);

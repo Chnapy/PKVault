@@ -1,5 +1,4 @@
 import type React from 'react';
-import type { Gender as GenderType } from '../../data/sdk/model';
 import { DetailsMainInfos } from '../details-card/details-main-infos';
 import { TextInput } from '../input/text-input';
 import { StorageDetailsForm } from './storage-details-form';
@@ -11,12 +10,12 @@ export type StorageDetailsMainInfosProps = {
     speciesName: string;
     nickname: string;
     nicknameMaxLength: number;
-    gender?: GenderType;
+    // gender?: GenderType;
     types: number[];
     level: number;
 };
 
-export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = ({ id, pid, species, speciesName, nickname, nicknameMaxLength, gender, types, level }) => {
+export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = ({ id, pid, species, speciesName, nickname, nicknameMaxLength, types, level }) => {
     const formContext = StorageDetailsForm.useContext();
 
     return <DetailsMainInfos
@@ -31,7 +30,7 @@ export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = (
                 style={{ display: 'inline-block', height: '1lh', width: 8 * nicknameMaxLength, padding: 0, textAlign: 'center' }}
             />
             : nickname}
-        genders={gender !== undefined ? [ gender ] : []}
+        // genders={gender !== undefined ? [ gender ] : []}
         types={types}
         level={level}
     />;
