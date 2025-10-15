@@ -95,7 +95,7 @@ export const DexFormItem: React.FC<{
           borderRadius: 2,
         }}
       >
-        <SpeciesImg species={species} generation={generation} form={form} isFemale={genders[ 0 ] == GenderType.Female} isShiny={ownedShiny} style={{
+        <SpeciesImg species={species} generation={generation} form={form} isFemale={genders[ 0 ] == GenderType.Female} style={{
           filter: seen ? undefined : "brightness(0) opacity(0.5)",
         }} />
       </div>
