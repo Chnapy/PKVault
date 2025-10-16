@@ -1,16 +1,14 @@
 import type React from 'react';
 import { useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
-import { Route } from '../../routes/storage';
 import { TitledContainer } from '../container/titled-container';
 import { DetailsLevel } from '../details-card/details-level';
 import { Icon } from '../icon/icon';
 
 export const StorageItemSaveActionsContainer: React.FC<React.PropsWithChildren<{
+    saveId: number;
     pkmId: string;
-}>> = ({ pkmId, children }) => {
-    const saveId = Route.useSearch({ select: (search) => search.save });
-
-    const pkmSavePkmQuery = useStorageGetSavePkms(saveId ?? 0);
+}>> = ({ saveId, pkmId, children }) => {
+    const pkmSavePkmQuery = useStorageGetSavePkms(saveId);
 
     const selectedPkm = pkmSavePkmQuery.data?.data.find(pkm => pkm.id === pkmId);
     if (!selectedPkm) {

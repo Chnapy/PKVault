@@ -1,7 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { useStorageGetMainBoxes, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSaveBoxes, useStorageGetSavePkms, useStorageMovePkm } from '../../data/sdk/storage/storage.gen';
-import { Route } from '../../routes/storage';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import type { BoxDTO, PkmDTO, PkmSaveDTO } from '../../data/sdk/model';
 import { useTranslate } from '../../translate/i18n';
@@ -9,10 +8,10 @@ import { useTranslate } from '../../translate/i18n';
 type Context = {
     selected?: {
         id: string;
-        storageType: 'main' | 'save';
+        saveId?: number;
         attached?: boolean;
         target?: {
-            storageType: 'main' | 'save';
+            saveId?: number;
             boxId: number;
             boxSlot: number;
         };
@@ -39,20 +38,18 @@ export const StorageMoveContext = {
         </context.Provider>
     },
     useValue: () => React.useContext(context),
-    useLoading: (storageType: 'main' | 'save', boxId: number, boxSlot: number, pkmId?: string) => {
+    useLoading: (saveId: number | undefined, boxId: number, boxSlot: number, pkmId?: string) => {
         const { selected } = StorageMoveContext.useValue();
 
         const moveTarget = selected?.target;
 
         return !!moveTarget && (
-            (moveTarget.storageType === storageType && moveTarget.boxId === boxId && moveTarget.boxSlot === boxSlot)
-            || (selected.storageType === storageType && selected.id === pkmId)
+            (moveTarget.saveId === saveId && moveTarget.boxId === boxId && moveTarget.boxSlot === boxSlot)
+            || (selected.saveId === saveId && selected.id === pkmId)
         );
     },
-    useClickable: (pkmId: string, storageType: 'main' | 'save') => {
+    useClickable: (pkmId: string, saveId: number | undefined) => {
         const moveContext = StorageMoveContext.useValue();
-
-        const saveId = Route.useSearch({ select: (search) => search.save });
 
         const mainPkmsQuery = useStorageGetMainPkms();
         const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
@@ -60,17 +57,17 @@ export const StorageMoveContext = {
         // const mainBoxesQuery = useStorageGetMainBoxes();
         // const saveBoxesQuery = useStorageGetSaveBoxes(saveId ?? 0);
 
-        const pkmMain = !moveContext.selected && storageType === 'main' ? mainPkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
-        const pkmSave = !moveContext.selected && storageType === 'save' ? savePkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
+        const pkmMain = !moveContext.selected && !saveId ? mainPkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
+        const pkmSave = !moveContext.selected && !!saveId ? savePkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
 
         // const boxMain = !moveContext.selected && storageType === 'main' ? mainBoxesQuery.data?.data.find(box => box.idInt === pkmMain?.boxId) : undefined;
         // const boxSave = !moveContext.selected && storageType === 'save' ? saveBoxesQuery.data?.data.find(box => box.idInt === pkmSave?.box) : undefined;
 
-        const canClick = storageType === 'main'
+        const canClick = !saveId
             ? !!pkmMain
             : (pkmSave?.canMove || pkmSave?.canMoveToMain);
 
-        const canClickAttached = storageType === 'main'
+        const canClickAttached = !saveId
             ? pkmMain?.canMoveAttachedToSave
             : pkmSave?.canMoveAttachedToMain;
 
@@ -79,7 +76,7 @@ export const StorageMoveContext = {
                 ? (() => {
                     moveContext.setSelected({
                         id: pkmId,
-                        storageType,
+                        saveId,
                     });
                 })
                 : undefined,
@@ -87,26 +84,24 @@ export const StorageMoveContext = {
                 ? (() => {
                     moveContext.setSelected({
                         id: pkmId,
-                        storageType,
+                        saveId,
                         attached: true,
                     });
                 })
                 : undefined,
         };
     },
-    useDraggable: (pkmId: string, storageType: 'main' | 'save') => {
+    useDraggable: (pkmId: string, saveId: number | undefined) => {
         const ref = React.useRef<HTMLDivElement>(null);
         const moveContext = StorageMoveContext.useValue();
-
-        const saveId = Route.useSearch({ select: (search) => search.save });
 
         const mainPkmsQuery = useStorageGetMainPkms();
         const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
 
-        const pkmMain = !moveContext.selected && storageType === 'main' ? mainPkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
-        const pkmSave = !moveContext.selected && storageType === 'save' ? savePkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
+        const pkmMain = !moveContext.selected && !saveId ? mainPkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
+        const pkmSave = !moveContext.selected && !!saveId ? savePkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
 
-        const canClick = storageType === 'main'
+        const canClick = !saveId
             ? !!pkmMain
             : (pkmSave?.canMove || pkmSave?.canMoveToMain);
 
@@ -117,7 +112,7 @@ export const StorageMoveContext = {
                 ref.current
                 && !moveContext.selected?.target
                 && moveContext.selected?.id === pkmId
-                && moveContext.selected?.storageType === storageType
+                && moveContext.selected.saveId === saveId
             ) {
                 const rect = ref.current.parentElement!.getBoundingClientRect();
                 const { transform } = ref.current.style;
@@ -154,7 +149,7 @@ export const StorageMoveContext = {
                     }
                 };
             }
-        }, [ moveContext, moveContext.selected, pkmId, storageType ]);
+        }, [ moveContext, moveContext.selected, pkmId, saveId ]);
 
         let enablePointerMove = true;
 
@@ -164,13 +159,13 @@ export const StorageMoveContext = {
                     if (enablePointerMove && e.buttons === 1) {
                         moveContext.setSelected({
                             id: pkmId,
-                            storageType,
+                            saveId,
                         });
                         enablePointerMove = false;
                     }
                 })
                 : undefined,
-            renderItem: (element: React.ReactNode) => moveContext.selected?.id === pkmId && moveContext.selected?.storageType === storageType
+            renderItem: (element: React.ReactNode) => moveContext.selected?.id === pkmId && moveContext.selected.saveId === saveId
                 ? createPortal(<div
                     ref={ref}
                     style={{
@@ -184,28 +179,24 @@ export const StorageMoveContext = {
                 : element,
         };
     },
-    useDroppable: (dropStorageType: 'main' | 'save', dropBoxId: number, dropBoxSlot: number, pkmId?: string) => {
+    useDroppable: (saveId: number | undefined, dropBoxId: number, dropBoxSlot: number, pkmId?: string) => {
         const { t } = useTranslate();
         const { selected, setSelected } = StorageMoveContext.useValue();
 
-        const saveId = Route.useSearch({ select: (search) => search.save });
         const saveInfosQuery = useSaveInfosGetAll();
 
         const movePkmMutation = useStorageMovePkm();
 
         const mainBoxesQuery = useStorageGetMainBoxes();
-        const saveBoxesQuery = useStorageGetSaveBoxes(saveId ?? 0);
+        const targetSaveBoxesQuery = useStorageGetSaveBoxes(saveId ?? 0);
 
         const mainPkmsQuery = useStorageGetMainPkms();
         const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
-        const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
+        const sourceSavePkmsQuery = useStorageGetSavePkms(selected?.saveId ?? 0);
+        const targetSavePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
 
         const isDragging = !!selected && !selected.target;
-        const isCurrentItemDragging = selected?.id === pkmId && selected?.storageType === dropStorageType;
-
-        // if (pkmId === 'G404509FE887AD2 10 14 21 12 1200') {
-        //     console.log(pkmId, selected, selected?.id === pkmId, dropStorageType, dropBoxId, dropBoxSlot)
-        // }
+        const isCurrentItemDragging = selected?.id === pkmId && selected && selected.saveId === saveId;
 
         type ClickInfos = {
             enable: boolean;
@@ -225,32 +216,27 @@ export const StorageMoveContext = {
                 return { enable: false, helpText: t('storage.move.attached-pkm') };
             }
 
-            const save = saveId ? saveInfosQuery.data?.data[ saveId ] : undefined;
+            const sourceSave = selected?.saveId ? saveInfosQuery.data?.data[ selected.saveId ] : undefined;
+            const targetSave = saveId ? saveInfosQuery.data?.data[ saveId ] : undefined;
 
-            const targetBoxMain = dropStorageType === 'main' ? mainBoxesQuery.data?.data.find(box => box.idInt === dropBoxId) : undefined;
-            const targetBoxSave = dropStorageType === 'save' ? saveBoxesQuery.data?.data.find(box => box.idInt === dropBoxId) : undefined;
+            const targetBoxMain = !saveId ? mainBoxesQuery.data?.data.find(box => box.idInt === dropBoxId) : undefined;
+            const targetBoxSave = saveId ? targetSaveBoxesQuery.data?.data.find(box => box.idInt === dropBoxId) : undefined;
 
             const targetPkmMain = targetBoxMain && pkmId ? mainPkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
-            const targetPkmSave = targetBoxSave && pkmId ? savePkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
+            const targetPkmSave = targetBoxSave && pkmId ? targetSavePkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
 
-            const sourcePkmMain = selected?.storageType === 'main' ? mainPkmsQuery.data?.data.find(pkm => pkm.id === selected.id) : undefined;
-            const sourcePkmSave = selected?.storageType === 'save' ? savePkmsQuery.data?.data.find(pkm => pkm.id === selected.id) : undefined;
+            const sourcePkmMain = !selected?.saveId ? mainPkmsQuery.data?.data.find(pkm => pkm.id === selected.id) : undefined;
+            const sourcePkmSave = selected?.saveId ? sourceSavePkmsQuery.data?.data.find(pkm => pkm.id === selected.id) : undefined;
 
             const getPkmNickname = (id: string) => mainPkmVersionsQuery.data?.data.find(pkm => pkm.pkmId === id)?.nickname;
-
-            // if (pkmId === "G30132C33359DD17 25 28 27 11 1200") {
-            //     console.log('TEST', { targetBoxMain, targetBoxSave, targetPkmMain, targetPkmSave, sourcePkmMain, sourcePkmSave })
-            // }
 
             const checkBetweenSlot = (
                 targetBoxMain?: BoxDTO, targetBoxSave?: BoxDTO,
                 targetPkmMain?: PkmDTO, targetPkmSave?: PkmSaveDTO,
                 sourcePkmMain?: PkmDTO, sourcePkmSave?: PkmSaveDTO,
             ): ClickInfos => {
-
                 // * -> box save
                 if (targetBoxSave) {
-                    // canClick &&= targetBoxSave.canReceivePkm;
                     if (!targetBoxSave.canReceivePkm) {
                         return { enable: false, helpText: t('storage.move.box-cannot', { name: targetBoxSave.name }) };
                     }
@@ -258,7 +244,6 @@ export const StorageMoveContext = {
 
                 // * -> box main
                 if (targetBoxMain) {
-                    // canClick &&= targetBoxMain.canReceivePkm;
                     if (!targetBoxMain.canReceivePkm) {
                         return { enable: false, helpText: t('storage.move.box-cannot', { name: targetBoxMain.name }) };
                     }
@@ -266,7 +251,6 @@ export const StorageMoveContext = {
 
                 // pkm main -> main
                 if (sourcePkmMain && (targetBoxMain || targetPkmMain)) {
-                    // canClick &&= !selected.attached;
                     if (selected.attached) {
                         return { enable: false, helpText: t('storage.move.attached-main-self') };
                     }
@@ -274,17 +258,15 @@ export const StorageMoveContext = {
 
                 // pkm save -> save
                 else if (sourcePkmSave && (targetBoxSave || targetPkmSave)) {
-                    // canClick &&= !selected.attached;
                     if (selected.attached) {
                         return { enable: false, helpText: t('storage.move.attached-save-self') };
                     }
 
+                    if (sourceSave && targetSave && sourceSave.generation !== targetSave.generation) {
+                        return { enable: false, helpText: t('storage.move.save-same-gen', { generation: sourceSave.generation }) };
+                    }
+
                     if (targetPkmSave) {
-                        // canClick &&= targetPkmSave.generation === sourcePkmSave.generation;
-                        // canClick &&= targetPkmSave.canMove;
-                        if (targetPkmSave.generation !== sourcePkmSave.generation) {
-                            return { enable: false, helpText: t('storage.move.save-same-gen', { generation: sourcePkmSave.generation }) };
-                        }
                         if (!targetPkmSave.canMove) {
                             return { enable: false, helpText: t('storage.move.pkm-cannot', { name: targetPkmSave.nickname }) };
                         }
@@ -294,7 +276,6 @@ export const StorageMoveContext = {
 
                 // pkm main -> save
                 else if (sourcePkmMain && (targetBoxSave || targetPkmSave)) {
-                    // canClick &&= selected.attached ? sourcePkmMain.canMoveToSave : sourcePkmMain.canMoveAttachedToSave;
                     if (!(selected.attached ? sourcePkmMain.canMoveAttachedToSave : sourcePkmMain.canMoveToSave)) {
                         return {
                             enable: false,
@@ -305,13 +286,12 @@ export const StorageMoveContext = {
                     }
 
                     const relatedPkmVersions = mainPkmVersionsQuery.data?.data.filter(version => version.pkmId === sourcePkmMain.id) ?? [];
-                    // canClick &&= !!save && relatedPkmVersions.some(version => version.generation === save.generation);
-                    if (!save || !relatedPkmVersions.some(version => version.generation === save.generation)) {
-                        return { enable: false, helpText: t('storage.move.main-need-gen', { name: getPkmNickname(sourcePkmMain.id), generation: save?.generation }) };
+
+                    if (!targetSave || !relatedPkmVersions.some(version => version.generation === targetSave.generation)) {
+                        return { enable: false, helpText: t('storage.move.main-need-gen', { name: getPkmNickname(sourcePkmMain.id), generation: targetSave?.generation }) };
                     }
 
                     if (!selected.attached) {
-                        // canClick &&= relatedPkmVersions.length === 1;
                         if (relatedPkmVersions.length > 1) {
                             return { enable: false, helpText: t('storage.move.attached-multiple-versions', { name: getPkmNickname(sourcePkmMain.id) }) };
                         }
@@ -320,7 +300,6 @@ export const StorageMoveContext = {
 
                 // pkm save -> main
                 else if (sourcePkmSave && (targetBoxMain || targetPkmMain)) {
-                    // canClick &&= selected.attached ? sourcePkmSave.canMoveToMain : sourcePkmSave.canMoveAttachedToMain;
                     if (sourcePkmSave.isEgg) {
                         return { enable: false, helpText: t('storage.move.save-egg') };
                     }
@@ -387,12 +366,13 @@ export const StorageMoveContext = {
         React.useEffect(() => {
             if (pkmId
                 && selected?.id === pkmId
-                && selected.target?.storageType === dropStorageType
+                && selected.target
+                && selected.target.saveId === saveId
                 && selected.target.boxId === dropBoxId
                 && selected.target.boxSlot === dropBoxSlot) {
                 setSelected(undefined);
             }
-        }, [ dropBoxId, dropBoxSlot, dropStorageType, pkmId, selected, setSelected ]);
+        }, [ dropBoxId, dropBoxSlot, saveId, pkmId, selected, setSelected ]);
 
         const onDrop = async () => {
             if (!selected) {
@@ -402,7 +382,7 @@ export const StorageMoveContext = {
             setSelected({
                 ...selected,
                 target: {
-                    storageType: dropStorageType,
+                    saveId,
                     boxId: dropBoxId,
                     boxSlot: dropBoxSlot,
                 },
@@ -413,8 +393,8 @@ export const StorageMoveContext = {
             await movePkmMutation.mutateAsync({
                 pkmId: selected.id,
                 params: {
-                    sourceSaveId: selected.storageType === 'save' ? saveId : undefined,
-                    targetSaveId: dropStorageType === 'save' ? saveId : undefined,
+                    sourceSaveId: selected.saveId,
+                    targetSaveId: saveId,
                     targetBoxId: dropBoxId,
                     targetBoxSlot: dropBoxSlot,
                     attached: selected.attached,
@@ -424,10 +404,6 @@ export const StorageMoveContext = {
                 setTimeout(() => setSelected(undefined), 150);
             });
         };
-
-        // if (pkmId === "G3031079C7163A8 23 2 14 27 900") {
-        //     console.log('TEST', isDragging, isCurrentItemDragging, canClick);
-        // }
 
         return {
             isDragging,

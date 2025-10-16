@@ -10,17 +10,17 @@ import { Icon } from '../icon/icon';
 import { StorageDetailsForm } from '../storage-item-details/storage-details-form';
 import { theme } from '../theme';
 import { StorageItemSaveActionsContainer } from './storage-item-save-actions-container';
+import { getSaveOrder } from '../../storage/util/get-save-order';
 
-export const StorageItemSaveActions: React.FC = () => {
+export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId }) => {
     const { t } = useTranslate();
 
     const navigate = Route.useNavigate();
-    const saveId = Route.useSearch({ select: (search) => search.save });
     const selected = Route.useSearch({ select: (search) => search.selected });
 
     const formEditMode = StorageDetailsForm.useEditMode();
 
-    const moveClickable = StorageMoveContext.useClickable(selected?.id ?? '', 'save');
+    const moveClickable = StorageMoveContext.useClickable(selected?.id ?? '', saveId);
 
     const mainPkmQuery = useStorageGetMainPkms();
     const mainPkmVersionQuery = useStorageGetMainPkmVersions();
@@ -45,7 +45,7 @@ export const StorageItemSaveActions: React.FC = () => {
     const canGoToMain = !!selectedPkm.pkmVersionId;
     const canSynchronize = !!selectedPkm.pkmVersionId && !!attachedPkmVersion && !saveSynchronized;
 
-    return <StorageItemSaveActionsContainer pkmId={selectedPkm.id}>
+    return <StorageItemSaveActionsContainer saveId={saveId} pkmId={selectedPkm.id}>
         <div
             style={{
                 display: 'flex',
@@ -77,15 +77,20 @@ export const StorageItemSaveActions: React.FC = () => {
             {canGoToMain && attachedPkmVersion && <ButtonWithDisabledPopover
                 as={Button}
                 onClick={() => navigate({
-                    search: {
-                        save: selectedPkm.saveId,
-                        saveBoxId: selectedPkm.box.toString(),
+                    search: ({ saves }) => ({
                         mainBoxId: attachedPkm?.boxId,
                         selected: {
-                            type: 'main',
                             id: attachedPkmVersion.pkmId,
                         },
-                    }
+                        saves: {
+                            ...saves,
+                            [ selectedPkm.saveId ]: {
+                                saveId: selectedPkm.saveId,
+                                saveBoxId: selectedPkm.box,
+                                order: getSaveOrder(saves, selectedPkm.saveId),
+                            }
+                        },
+                    })
                 })}
                 showHelp
                 anchor='right start'
@@ -134,7 +139,7 @@ export const StorageItemSaveActions: React.FC = () => {
                             search: {
                                 selected: {
                                     id: newId,
-                                    type: 'save',
+                                    saveId,
                                 }
                             }
                         });

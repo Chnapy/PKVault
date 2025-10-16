@@ -3,15 +3,15 @@ import { Popover, PopoverPanel } from '@headlessui/react';
 import React from 'react';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import type { ButtonLikeProps } from '../button/button-like';
+import type { ButtonWithDisabledPopoverProps } from '../button/button-with-disabled-popover';
 import { StorageItemMainActions } from './storage-item-main-actions';
 import { StorageItemMainActionsContainer } from './storage-item-main-actions-container';
 import { StorageItemPlaceholder } from './storage-item-placeholder';
 import { StorageItemSaveActions } from './storage-item-save-actions';
 import { StorageItemSaveActionsContainer } from './storage-item-save-actions-container';
-import type { ButtonWithDisabledPopoverProps } from '../button/button-with-disabled-popover';
 
 export type StorageItemPopoverProps = {
-    storageType: "main" | "save";
+    saveId?: number;
     pkmId: string;
     selected?: boolean;
     boxId: number;
@@ -21,7 +21,7 @@ export type StorageItemPopoverProps = {
 };
 
 export const StorageItemPopover: React.FC<StorageItemPopoverProps> = ({
-    storageType,
+    saveId,
     pkmId,
     selected,
     boxId,
@@ -31,23 +31,20 @@ export const StorageItemPopover: React.FC<StorageItemPopoverProps> = ({
     const [ hover, setHover ] = React.useState(false);
 
     const moveContext = StorageMoveContext.useValue();
-    const moveDroppable = StorageMoveContext.useDroppable(storageType, boxId, boxSlot, pkmId);
-    const moveDraggable = StorageMoveContext.useDraggable(pkmId, storageType);
-    const moveLoading = StorageMoveContext.useLoading(storageType, boxId, boxSlot, pkmId);
+    const moveDroppable = StorageMoveContext.useDroppable(saveId, boxId, boxSlot, pkmId);
+    const moveDraggable = StorageMoveContext.useDraggable(pkmId, saveId);
+    const moveLoading = StorageMoveContext.useLoading(saveId, boxId, boxSlot, pkmId);
 
     const disabled = !moveDroppable.isCurrentItemDragging && moveDroppable.isDragging && !moveDroppable.onClick;
 
     if (moveLoading) {
         return <StorageItemPlaceholder
-            storageType={storageType}
+            saveId={saveId}
             boxId={boxId}
             boxSlot={boxSlot}
             pkmId={pkmId}
         />;
     }
-
-    const ActionsComp = storageType === 'main' ? StorageItemMainActions : StorageItemSaveActions;
-    const ActionsContainerComp = storageType === 'main' ? StorageItemMainActionsContainer : StorageItemSaveActionsContainer;
 
     const element = (
         <Popover
@@ -83,7 +80,7 @@ export const StorageItemPopover: React.FC<StorageItemPopoverProps> = ({
                 })}
             >
                 {!moveLoading && !moveContext.selected && selected
-                    ? <ActionsComp />
+                    ? (saveId ? <StorageItemSaveActions saveId={saveId} /> : <StorageItemMainActions />)
                     : <>
                         {hover && <div
                             className={cx('storage-item-title', css({
@@ -91,7 +88,9 @@ export const StorageItemPopover: React.FC<StorageItemPopoverProps> = ({
                                 pointerEvents: 'none',
                             }))}
                         >
-                            <ActionsContainerComp pkmId={pkmId} />
+                            {saveId
+                                ? <StorageItemSaveActionsContainer saveId={saveId} pkmId={pkmId} />
+                                : <StorageItemMainActionsContainer pkmId={pkmId} />}
                         </div>}
                     </>}
             </PopoverPanel>}

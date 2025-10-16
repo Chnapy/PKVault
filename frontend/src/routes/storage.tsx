@@ -3,7 +3,6 @@ import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import React from "react";
 import z from "zod";
-import { SaveItem } from '../saves/save-item/save-item';
 import { ActionsPanel } from '../storage/actions/actions-panel';
 import { StorageMoveContext } from '../storage/actions/storage-move-context';
 import { StorageDetails } from "../storage/storage-details";
@@ -11,193 +10,120 @@ import { StorageMainBox } from "../storage/storage-main-box";
 import { StorageSaveBox } from "../storage/storage-save-box";
 import { StorageSaveSelect } from "../storage/storage-save-select";
 import { StorageSearchCheck } from '../storage/storage-search-check';
+import { filterIsDefined } from '../util/filter-is-defined';
 
 export const Storage: React.FC = () => {
   const selected = Route.useSearch({ select: (search) => search.selected });
-  const saveId = Route.useSearch({ select: (search) => search.save });
-
-  const navigate = Route.useNavigate();
+  const saves = Route.useSearch({ select: (search) => search.saves }) ?? {};
 
   return (
     <StorageSearchCheck>
       <StorageMoveContext.Provider>
-        <div
-          id={StorageMoveContext.containerId}
-          style={{
-            display: "table",
-            justifyContent: "center",
-            alignItems: "flex-start",
-            flexWrap: "wrap",
-            borderSpacing: 16,
-            margin: 'auto',
-            marginTop: -16,
-            marginBottom: selected ? 150 : undefined,
-          }}
-        >
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}>
           <div
+            id={StorageMoveContext.containerId}
             style={{
-              display: 'table-row'
+              // display: "table",
+              display: 'flex',
+              justifyContent: "center",
+              alignItems: "flex-start",
+              flexWrap: "wrap",
+              gap: 16,
+              // borderSpacing: 16,
+              margin: 'auto',
+              marginBottom: 150,
             }}
           >
+            <StorageMainBox />
 
-            <div
-              style={{
-                display: 'table-cell',
-                verticalAlign: 'top',
-                // height: 1,
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'stretch',
-                  justifyContent: 'center',
-                  // height: '100%',
-                }}
-              >
-              </div>
+            {Object.values(saves)
+              .filter(filterIsDefined)
+              .sort((a, b) => a.order < b.order ? -1 : 1)
+              .map(save => <StorageSaveBox key={save.saveId} saveId={save.saveId} />)}
+
+            <div style={{
+              display: 'flex',
+              width: 740,
+              height: 564
+            }}>
+              <StorageSaveSelect />
             </div>
 
-            <div
-              style={{
-                display: 'table-cell',
-                verticalAlign: 'top',
-                // height: 1,
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'stretch',
-                  justifyContent: 'center',
-                  // height: '100%',
-                }}
-              >
-                {saveId ? <SaveItem
-                  saveId={saveId}
-                  onClose={() => navigate({
-                    search: {
-                      save: undefined,
-                      saveBoxId: undefined,
-                      selected: undefined,
-                    }
-                  })}
-                /> : null}
-              </div>
-            </div>
-
-          </div>
-
-          <div
-            style={{
-              display: 'table-row'
-            }}
-          >
-
-            <div
-              style={{
-                display: 'table-cell',
-                verticalAlign: 'top',
-                // height: 1,
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'stretch',
-                  justifyContent: 'center',
-                  // height: '100%',
-                }}
-              >
-                <StorageMainBox />
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: 'table-cell',
-                verticalAlign: 'top',
-                // height: 1,
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'stretch',
-                  justifyContent: 'center',
-                  // height: '100%',
-                }}
-              >
-                {saveId ? <StorageSaveBox saveId={saveId} /> : <StorageSaveSelect />}
-              </div>
-            </div>
-
-          </div>
-
-          <div
-            className={css({
-              position: "fixed",
-              bottom: 14,
-              left: "50%",
-              transform: 'translateX(-50%)',
-              width: 400,
-              zIndex: 20,
-              '&:hover': {
-                zIndex: 25,
-              }
-            })}
-          >
-            <ActionsPanel />
-          </div>
-
-          {selected && (
             <div
               className={css({
                 position: "fixed",
                 bottom: 14,
-                top: 14,
-                right: 14,
-                width: 350,
-                pointerEvents: 'none',
+                left: "50%",
+                transform: 'translateX(-50%)',
+                width: 400,
                 zIndex: 20,
-                display: 'flex',
-                alignItems: 'flex-end',
                 '&:hover': {
                   zIndex: 25,
-                },
-                '& > *': {
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  overflowY: 'auto',
-                  pointerEvents: 'initial',
                 }
               })}
             >
-              <StorageDetails
-                key={selected.id}
-                type={selected.type}
-                id={selected.id}
-                saveId={saveId}
-              />
+              <ActionsPanel />
             </div>
-          )}
+
+            {selected && (
+              <div
+                className={css({
+                  position: "fixed",
+                  bottom: 14,
+                  top: 14,
+                  right: 14,
+                  width: 350,
+                  pointerEvents: 'none',
+                  zIndex: 20,
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  '&:hover': {
+                    zIndex: 25,
+                  },
+                  '& > *': {
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    overflowY: 'auto',
+                    pointerEvents: 'initial',
+                  }
+                })}
+              >
+                <StorageDetails
+                  key={selected.id}
+                  id={selected.id}
+                  saveId={selected.saveId}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </StorageMoveContext.Provider>
     </StorageSearchCheck>
   );
 };
 
+export type StorageSearchSchema = z.infer<typeof searchSchema>;
+
 const searchSchema = z.object({
   selected: z
     .object({
-      type: z.enum([ "main", "save" ]),
+      saveId: z.number().int().optional(),
       id: z.string(),
       editMode: z.boolean().optional(),
     })
     .optional(),
-  save: z.number().optional(),
-  mainBoxId: z.number().optional(),
-  saveBoxId: z.string().optional(),
+  saves: z.record(
+    z.number().int(),
+    z.object({
+      saveId: z.number().int(),
+      saveBoxId: z.number().int().optional(),
+      order: z.number().int(),
+    }).optional()
+  ).optional(),
+  mainBoxId: z.number().int().optional(),
 });
 
 export const Route = createFileRoute("/storage")({

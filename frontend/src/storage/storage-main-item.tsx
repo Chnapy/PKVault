@@ -6,6 +6,7 @@ import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSaveP
 import { Route } from '../routes/storage';
 import { StorageItem } from '../ui/storage-item/storage-item';
 import { StorageItemPopover } from '../ui/storage-item/storage-item-popover';
+import { filterIsDefined } from '../util/filter-is-defined';
 
 type StorageMainItemProps = {
     pkmId: string;
@@ -13,14 +14,14 @@ type StorageMainItemProps = {
 
 export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkmId }) => {
     const selected = Route.useSearch({ select: (search) => search.selected });
-    const saveId = Route.useSearch({ select: (search) => search.save });
+    const saves = Route.useSearch({ select: (search) => search.saves }) ?? {};
     const navigate = Route.useNavigate();
 
     const saveInfosQuery = useSaveInfosGetAll();
     const pkmsQuery = useStorageGetMainPkms();
     const pkmVersionsQuery = useStorageGetMainPkmVersions();
 
-    const pageSave = saveId ? saveInfosQuery.data?.data?.[ saveId ] : undefined;
+    const pageSaves = Object.values(saves).map(save => save && saveInfosQuery.data?.data?.[ save.saveId ]).filter(filterIsDefined);
 
     const pkm = pkmsQuery.data?.data.find(pkm => pkm.id === pkmId);
 
@@ -36,30 +37,36 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
 
     const { species, generation, form, gender, isShiny, compatibleWithVersions } = pkmVersions[ 0 ];
 
-    const saveHeldItem = pageSave && pkmVersions.find((version) => version.generation === pageSave.generation)?.heldItem;
-    const heldItem = saveHeldItem ?? pkmVersions.find((version) => version.id === pkmId)?.heldItem;
+    const hasSaveHeldItems = pageSaves.some(pageSave => pkmVersions.find((version) => version.generation === pageSave.generation)?.heldItem);
+    const heldItem = hasSaveHeldItems ? pkmVersions.find((version) => version.id === pkmId)?.heldItem : undefined;
 
     const attachedSavePkm = pkm.saveId ? pkmSavePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId && pkmVersionsIds.includes(savePkm.pkmVersionId)) : undefined;
     const attachedPkmVersion = attachedSavePkm && allPkmVersions.find(version => version.id === attachedSavePkm.pkmVersionId);
     const saveSynchronized = attachedSavePkm?.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
-    const hasPkmForPageSaveGeneration = !!pageSave && pkmVersions.some(pkmVersion => pkmVersion.generation === pageSave.generation);
-    const isCompatibleWithPageSave = !pageSave || compatibleWithVersions.includes(pageSave.version);
-    const pkmVersionCanEvolve = pkmVersions.find(version => version.canEvolve);
+    const canCreateVersions = pkm.saveId
+        ? []
+        : [ ... new Set(pageSaves
+            .filter(pageSave => {
+                const hasPkmForPageSaveGeneration = pkmVersions.some(pkmVersion => pkmVersion.generation === pageSave.generation);
+                const isCompatibleWithPageSave = compatibleWithVersions.includes(pageSave.version);
 
-    const canCreateVersion = !pkm.saveId && !!pageSave && isCompatibleWithPageSave && !hasPkmForPageSaveGeneration;
-    const canMoveAttached = !pkm.saveId && hasPkmForPageSaveGeneration;
-    const canEvolve = pkmVersionCanEvolve && !pkm.saveId;
+                return isCompatibleWithPageSave && !hasPkmForPageSaveGeneration;
+            })
+            .map(pageSave => pageSave.generation)) ].sort();
+
+
+    const canMoveAttached = !pkm.saveId && pageSaves.some(pageSave => pkmVersions.some(pkmVersion => pkmVersion.generation === pageSave.generation));
+    const canEvolve = !pkm.saveId && pkmVersions.find(version => version.canEvolve);
     const canDetach = !!pkm.saveId;
     const canSynchronize = !!pkm.saveId && !!attachedPkmVersion && !saveSynchronized;
 
     return (
         <StorageItemPopover
-            storageType="main"
             pkmId={pkmId}
             boxId={pkm.boxId}
             boxSlot={pkm.boxSlot}
-            selected={selected?.type === "main" && selected.id === pkm.id}
+            selected={selected && !selected.saveId && selected.id === pkm.id}
         >
             {props => <PopoverButton
                 as={StorageItem}
@@ -74,7 +81,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
                 heldItem={heldItem}
                 warning={pkmVersions.some((value) => !value.isValid)}
                 nbrVersions={pkmVersions.length}
-                canCreateVersion={canCreateVersion}
+                canCreateVersion={canCreateVersions.length > 0}
                 canMoveOutside={canMoveAttached}
                 canEvolve={canEvolve}
                 attached={canDetach}
@@ -82,10 +89,10 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
                 onClick={props.onClick ?? (() =>
                     navigate({
                         search: {
-                            selected: selected?.type === 'main' && selected.id === pkmId
+                            selected: selected && !selected.saveId && selected.id === pkmId
                                 ? undefined
                                 : {
-                                    type: "main",
+                                    saveId: undefined,
                                     id: pkmId,
                                 },
                         },

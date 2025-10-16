@@ -8,31 +8,32 @@ import { Container } from '../ui/container/container';
 import { TitledContainer } from '../ui/container/titled-container';
 import { Icon } from '../ui/icon/icon';
 import { theme } from '../ui/theme';
+import { getSaveOrder } from './util/get-save-order';
 
 export const StorageSaveSelect: React.FC = () => {
   const { t } = useTranslate();
 
-  const saveInfosQuery = useSaveInfosGetAll();
-
+  const saves = Route.useSearch({ select: (search) => search.saves }) ?? {};
   const navigate = Route.useNavigate();
+
+  const saveInfosQuery = useSaveInfosGetAll();
 
   if (!saveInfosQuery.data) {
     return null;
   }
 
-  const saveInfos = Object.values(saveInfosQuery.data.data).sort((a, b) => {
-    return a.lastWriteTime > b.lastWriteTime ? -1 : 1;
-  });
+  const saveInfos = Object.values(saveInfosQuery.data.data)
+    .filter(saveInfos => !saves[ saveInfos.id ])
+    .sort((a, b) => a.lastWriteTime > b.lastWriteTime ? -1 : 1);
 
   return (
     <TitledContainer
       title={t('storage.save-select')}
-      maxHeight={536}
     >
       <div
         style={{
           display: 'flex',
-          flexDirection: 'column',
+          flexWrap: 'wrap',
           gap: 8,
         }}
       >
@@ -42,9 +43,16 @@ export const StorageSaveSelect: React.FC = () => {
             saveId={save.id}
             onClick={() => {
               navigate({
-                search: {
-                  save: save.id,
-                },
+                search: ({ saves }) => ({
+                  saves: {
+                    ...saves,
+                    [ save.id ]: {
+                      saveId: save.id,
+                      saveBoxId: undefined,
+                      order: getSaveOrder(saves, save.id),
+                    }
+                  },
+                }),
               });
             }}
           />

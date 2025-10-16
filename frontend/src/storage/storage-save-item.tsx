@@ -24,11 +24,11 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = React.memo(({ sav
 
     return (
         <StorageItemPopover
-            storageType="save"
+            saveId={saveId}
             pkmId={pkmId}
             boxId={savePkm.box}
             boxSlot={savePkm.boxSlot}
-            selected={selected?.type === "save" && selected.id === pkmId}
+            selected={!!selected?.saveId && selected.id === pkmId}
         >
             {props => <PopoverButton
                 as={StorageSaveItemBase}
@@ -39,10 +39,10 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = React.memo(({ sav
                 onClick={props.onClick ?? (() =>
                     navigate({
                         search: {
-                            selected: selected?.type === 'save' && selected.id === pkmId
+                            selected: !!selected?.saveId && selected.id === pkmId
                                 ? undefined
                                 : {
-                                    type: "save",
+                                    saveId,
                                     id: pkmId,
                                 },
                         },

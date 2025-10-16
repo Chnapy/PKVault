@@ -1,3 +1,4 @@
+import { css } from '@emotion/css';
 import React from "react";
 import { type PkmSaveDTO, type SaveInfosDTO } from "../data/sdk/model";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
@@ -6,16 +7,19 @@ import {
   useStorageGetSavePkms,
 } from "../data/sdk/storage/storage.gen";
 import { Route } from "../routes/storage";
+import { SaveItem } from '../saves/save-item/save-item';
 import { useTranslate } from '../translate/i18n';
 import { Button } from "../ui/button/button";
 import { FilterSelect } from "../ui/filter/filter-select/filter-select";
 import { Icon } from '../ui/icon/icon';
+import { SaveCardImg } from '../ui/save-card/save-card-img';
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
 import { theme } from '../ui/theme';
 import { switchUtil } from '../util/switch-util';
 import { StorageMoveContext } from './actions/storage-move-context';
 import { StorageSaveItem } from './storage-save-item';
+import { getSaveOrder } from './util/get-save-order';
 
 export type StorageSaveBoxProps = {
   saveId: number;
@@ -24,7 +28,7 @@ export type StorageSaveBoxProps = {
 export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
   const { t } = useTranslate();
 
-  const saveBoxId = Route.useSearch({ select: (search) => search.saveBoxId });
+  const saveBoxId = Route.useSearch({ select: (search) => search.saves?.[ saveId ]?.saveBoxId });
   const navigate = Route.useNavigate();
 
   const moveContext = StorageMoveContext.useValue();
@@ -40,9 +44,9 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
   const savePkms = savePkmsQuery.data?.data ?? [];
 
   const selectedBoxIndex =
-    saveBoxId
-      ? saveBoxes.findIndex((box) => box.id === saveBoxId)
-      : 0;
+    saveBoxId !== undefined
+      ? saveBoxes.findIndex((box) => box.idInt === saveBoxId)
+      : (saveBoxes.findIndex((box) => box.idInt === 0) ?? 0);
   const selectedBox = saveBoxes[ selectedBoxIndex ];
 
   if (!selectedBox || !saveInfos) {
@@ -72,10 +76,32 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
       header={
         <>
           <div
-            style={{
+            className={css({
               flex: 1,
-            }}
+              '&:hover .save-item': {
+                opacity: '1 !important',
+              },
+            })}
           >
+            <SaveCardImg
+              version={saveInfos.version}
+              size={24}
+              borderWidth={2}
+            />
+
+            <div
+              className='save-item'
+              style={{
+                position: 'absolute',
+                top: 38,
+                left: 6,
+                zIndex: 5,
+                opacity: 0,
+                pointerEvents: 'none'
+              }}
+            >
+              <SaveItem saveId={saveId} />
+            </div>
           </div>
 
           <div
@@ -90,9 +116,16 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               triggerOnHover={isMoveDragging}
               onClick={() =>
                 navigate({
-                  search: {
-                    saveBoxId: previousBox.id,
-                  },
+                  search: ({ saves }) => ({
+                    saves: {
+                      ...saves,
+                      [ saveId ]: {
+                        saveId,
+                        saveBoxId: previousBox.idInt,
+                        order: getSaveOrder(saves, saveId),
+                      }
+                    }
+                  }),
                 })
               }
               disabled={previousBox.id === selectedBox.id}
@@ -112,9 +145,16 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               value={[ selectedBox.id ]}
               onChange={([ value ]) => {
                 navigate({
-                  search: {
-                    saveBoxId: value,
-                  },
+                  search: ({ saves }) => ({
+                    saves: {
+                      ...saves,
+                      [ saveId ]: {
+                        saveId,
+                        saveBoxId: +value,
+                        order: getSaveOrder(saves, saveId),
+                      }
+                    }
+                  }),
                 });
               }}
             >
@@ -125,9 +165,16 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
               triggerOnHover={isMoveDragging}
               onClick={() =>
                 navigate({
-                  search: {
-                    saveBoxId: nextBox.id,
-                  },
+                  search: ({ saves }) => ({
+                    saves: {
+                      ...saves,
+                      [ saveId ]: {
+                        saveId,
+                        saveBoxId: nextBox.idInt,
+                        order: getSaveOrder(saves, saveId),
+                      }
+                    }
+                  }),
                 })
               }
               disabled={nextBox.id === selectedBox.id}
@@ -140,6 +187,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
             style={{
               flex: 1,
               display: 'flex',
+              alignItems: 'center',
               justifyContent: 'flex-end',
               gap: 2
             }}
@@ -147,13 +195,28 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
             <Icon name='folder' solid forButton />
             <span style={{ color: theme.text.primary }}>{boxPkmsList.length}</span>
             /{itemsCount} - {t('total')}.<span style={{ color: theme.text.primary }}>{savePkms.length}</span>
+
+            <Button
+              style={{ marginLeft: 8 }}
+              onClick={() => navigate({
+                search: ({ saves }) => ({
+                  selected: undefined,
+                  saves: {
+                    ...saves,
+                    [ saveId ]: undefined,
+                  },
+                })
+              })}
+            >
+              <Icon name='times' forButton />
+            </Button>
           </div>
         </>
       }
     >
       {allItems.map((pkm, i) => {
         if (!pkm
-          || (moveContext.selected?.storageType === 'save'
+          || (moveContext.selected?.saveId === saveId
             && !moveContext.selected.target
             && moveContext.selected.id === pkm.id
           )
@@ -161,7 +224,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
           return (
             <StorageItemPlaceholder
               key={i}
-              storageType="save"
+              saveId={saveId}
               boxId={selectedBox.idInt}
               boxSlot={i}
               pkmId={pkm?.id}
@@ -172,7 +235,7 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
         return <StorageSaveItem key={i} saveId={saveId} pkmId={pkm.id} />;
       })}
 
-      {moveContext.selected?.storageType === 'save' && !moveContext.selected.target && (
+      {moveContext.selected?.saveId === saveId && !moveContext.selected.target && (
         <StorageSaveItem saveId={saveId} pkmId={moveContext.selected.id} />
       )}
     </StorageBox>

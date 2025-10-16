@@ -5,21 +5,21 @@ import { theme } from '../theme';
 import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popover';
 
 export type StorageItemPlaceholderProps = {
-  storageType: "main" | "save";
+  saveId?: number;
   boxId: number;
   boxSlot: number;
   pkmId?: string; // for move drop/loading only
 };
 
 export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
-  storageType,
+  saveId,
   boxId,
   boxSlot,
   pkmId,
 }) => {
-  const moveDroppable = StorageMoveContext.useDroppable(storageType, boxId, boxSlot, pkmId);
+  const moveDroppable = StorageMoveContext.useDroppable(saveId, boxId, boxSlot, pkmId);
 
-  const moveLoading = StorageMoveContext.useLoading(storageType, boxId, boxSlot, pkmId);
+  const moveLoading = StorageMoveContext.useLoading(saveId, boxId, boxSlot, pkmId);
 
   return (
     <ButtonWithDisabledPopover

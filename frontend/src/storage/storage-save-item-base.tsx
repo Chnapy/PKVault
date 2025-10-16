@@ -5,6 +5,7 @@ import { useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk
 import { Route } from '../routes/storage';
 import type { ButtonLikeProps } from '../ui/button/button-like';
 import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
+import { getSaveOrder } from './util/get-save-order';
 
 type StorageSaveItemBaseProps = ButtonLikeProps & Pick<StorageItemProps, 'anchor' | 'helpTitle' | 'small'> & {
     saveId: number;
@@ -57,16 +58,22 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
             needSynchronize={canSynchronize}
             onClick={rest.onClick ?? (() => navigate({
                 to: '/storage',
-                search: {
-                    save: saveId,
-                    saveBoxId: savePkm.box.toString(),
-                    selected: selected?.type === 'save' && selected.id === pkmId
+                search: ({ saves }) => ({
+                    selected: selected?.saveId && selected.id === pkmId
                         ? undefined
                         : {
-                            type: "save",
+                            saveId,
                             id: pkmId,
                         },
-                },
+                    saves: {
+                        ...saves,
+                        [ saveId ]: {
+                            saveId,
+                            saveBoxId: savePkm.box,
+                            order: getSaveOrder(saves, saveId),
+                        }
+                    }
+                }),
             }))}
         />
     );

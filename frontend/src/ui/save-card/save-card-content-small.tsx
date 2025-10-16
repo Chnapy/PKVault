@@ -1,10 +1,10 @@
 import type React from "react";
 import type { GameVersion } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
-import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { useTranslate } from '../../translate/i18n';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
+import { SaveCardImg } from './save-card-img';
 
 export type SaveCardContentSmallProps = {
   id: number;
@@ -30,8 +30,6 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
 
   const staticData = useStaticData();
 
-  const gameInfos = getGameInfos(version);
-
   const date = new Date(lastWriteTime);
 
   const normTo2 = (value: number) => `${value < 10 ? "0" : ""}${value}`;
@@ -52,27 +50,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
         overflow: 'hidden',
       }}
     >
-      <div
-        style={{
-          padding: 4,
-          borderRadius: 8,
-          borderBottomLeftRadius: 0,
-          background: theme.bg.dark,
-        }}
-      >
-        <img
-          src={gameInfos.img}
-          alt={generation + ""}
-          style={{
-            imageRendering: "pixelated",
-            width: 64,
-            height: 64,
-            display: "block",
-            background: theme.bg.default,
-            borderRadius: 8,
-          }}
-        />
-      </div>
+      <SaveCardImg version={version} />
 
       <div
         style={{
@@ -80,7 +58,9 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
           overflow: 'hidden'
         }}
       >
-        <TextContainer noWrap>
+        <TextContainer noWrap forceScroll style={{
+          paddingBottom: 0,
+        }}>
           <span style={{ color: theme.text.red }}>{t('save.gen')} {generation}</span>
           {" - "}
           <span style={{ color: theme.text.primary }}>

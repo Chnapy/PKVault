@@ -80,8 +80,17 @@ export const StorageMainBox: React.FC = () => {
           <div
             style={{
               flex: 1,
+              alignItems: 'center',
             }}
           >
+            <img
+              src="/logo.svg"
+              style={{
+                display: 'block',
+                height: 24,
+                width: 24,
+              }}
+            />
           </div>
 
           <div
@@ -172,7 +181,8 @@ export const StorageMainBox: React.FC = () => {
     >
       {allItems.map((pkm, i) => {
         if (!pkm
-          || (moveContext.selected?.storageType === 'main'
+          || (moveContext.selected
+            && !moveContext.selected.saveId
             && !moveContext.selected.target
             && moveContext.selected.id === pkm.id
           )
@@ -180,7 +190,6 @@ export const StorageMainBox: React.FC = () => {
           return (
             <StorageItemPlaceholder
               key={i}
-              storageType="main"
               boxId={selectedBox.idInt}
               boxSlot={i}
               pkmId={pkm?.id}
@@ -191,7 +200,7 @@ export const StorageMainBox: React.FC = () => {
         return <StorageMainItem key={i} pkmId={pkm.id} />;
       })}
 
-      {moveContext.selected?.storageType === 'main' && !moveContext.selected.target && (
+      {moveContext.selected && !moveContext.selected.saveId && !moveContext.selected.target && (
         <StorageMainItem pkmId={moveContext.selected.id} />
       )}
     </StorageBox>

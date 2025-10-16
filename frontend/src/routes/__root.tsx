@@ -115,6 +115,10 @@ const Root: React.FC = () => {
           position: "relative",
           padding: 16,
           paddingTop: 0,
+          flexGrow: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}
       >
         <Outlet />

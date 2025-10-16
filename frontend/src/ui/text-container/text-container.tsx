@@ -4,6 +4,7 @@ import { theme } from "../theme";
 
 export type TextContainerProps = {
   noWrap?: boolean;
+  forceScroll?: boolean;
   bgColor?: string;
   maxHeight?: number;
 }
@@ -11,6 +12,7 @@ export type TextContainerProps = {
 
 export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>> = ({
   noWrap,
+  forceScroll,
   bgColor = theme.bg.blue,
   maxHeight,
   children,
@@ -34,7 +36,7 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
     >
       <div
         style={{
-          padding: "3px 8px",
+          padding: forceScroll ? "0px 8px" : "3px 8px",
           backgroundColor: theme.bg.default,
           borderRadius: 4,
           flexGrow: 1,
@@ -57,7 +59,7 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
             whiteSpace: 'break-spaces',
             ...noWrap ? {
               whiteSpace: 'nowrap',
-              overflowX: 'auto',
+              overflowX: forceScroll ? 'scroll' : 'auto',
             } : null
           }}
         >

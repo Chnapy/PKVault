@@ -3,6 +3,7 @@ import type { PkmVersionWarning as PkmVersionWarningModel } from '../data/sdk/mo
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../data/sdk/storage/storage.gen';
 import { useStaticData } from '../hooks/use-static-data';
 import { Route } from '../routes/storage';
+import { getSaveOrder } from '../storage/util/get-save-order';
 import { useTranslate } from '../translate/i18n';
 import { Button } from '../ui/button/button';
 import { Icon } from '../ui/icon/icon';
@@ -36,15 +37,20 @@ export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({ pkmId }) =
         <td style={{ verticalAlign: 'top' }}>
             <Button onClick={() => navigate({
                 to: '/storage',
-                search: {
+                search: ({ saves }) => ({
                     mainBoxId: pkm.boxId,
-                    save: pkm.saveId,
-                    saveBoxId: undefined,
                     selected: {
-                        type: 'main',
                         id: pkm.id,
                     },
-                }
+                    saves: pkm.saveId ? {
+                        ...saves,
+                        [ pkm.saveId ]: {
+                            saveId: pkm.saveId,
+                            saveBoxId: undefined,
+                            order: getSaveOrder(saves, pkm.saveId),
+                        }
+                    } : saves,
+                })
             })}>
                 <Icon name='eye' forButton />
             </Button>
