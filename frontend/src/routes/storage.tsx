@@ -46,7 +46,7 @@ export const Storage: React.FC = () => {
 
             <div style={{
               display: 'flex',
-              width: 740,
+              width: 630,
               height: 564
             }}>
               <StorageSaveSelect />

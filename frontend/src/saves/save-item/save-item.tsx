@@ -4,10 +4,12 @@ import { theme } from '../../ui/theme';
 import { SaveItemContent, type SaveItemContentProps } from './save-item-content';
 
 export type SaveItemProps = SaveItemContentProps & {
+  width?: number | string;
   onClick?: () => void;
 };
 
 export const SaveItem: React.FC<SaveItemProps> = ({
+  width = 350,
   onClick,
   ...saveItemContentProps
 }) => {
@@ -25,7 +27,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
         display: "flex",
         flexDirection: "column",
         gap: 4,
-        width: 350
+        width
       }}
       onClick={onClick}
     >

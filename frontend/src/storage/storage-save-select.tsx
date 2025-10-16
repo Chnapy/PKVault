@@ -29,18 +29,23 @@ export const StorageSaveSelect: React.FC = () => {
   return (
     <TitledContainer
       title={t('storage.save-select')}
+      style={{
+        width: '100%'
+      }}
     >
       <div
         style={{
-          display: 'flex',
-          flexWrap: 'wrap',
+          display: 'grid',
+          gridTemplateColumns: '50% 50%',
           gap: 8,
+          paddingRight: 8,
         }}
       >
         {saveInfos.map((save, i) => (
           <SaveItem
             key={i}
             saveId={save.id}
+            width='auto'
             onClick={() => {
               navigate({
                 search: ({ saves }) => ({
@@ -59,7 +64,7 @@ export const StorageSaveSelect: React.FC = () => {
         ))}
 
         <Container style={{
-          maxWidth: 350,
+          alignSelf: 'center',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
