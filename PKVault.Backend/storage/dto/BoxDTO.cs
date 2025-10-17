@@ -14,6 +14,20 @@ public class BoxDTO : IWithId<string>
 
     public string Name { get { return BoxEntity.Name; } }
 
+    public int SlotCount
+    {
+        get => SlotCountVariable == -1
+            ? Type switch
+            {
+                BoxType.Default => 30,
+                BoxType.Party => 6,
+                _ => throw new NotImplementedException(),
+            }
+            : SlotCountVariable;
+    }
+
+    public int SlotCountVariable = -1;
+
     public bool CanReceivePkm { get { return Type != BoxType.Daycare; } }
 
     public required BoxEntity BoxEntity;

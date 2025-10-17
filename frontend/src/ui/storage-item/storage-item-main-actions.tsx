@@ -23,7 +23,7 @@ export const StorageItemMainActions: React.FC = () => {
 
     const formEditMode = StorageDetailsForm.useEditMode();
 
-    const moveClickable = StorageMoveContext.useClickable(selected?.id ?? '', undefined);
+    const moveClickable = StorageMoveContext.useClickable(selected?.id ? [ selected.id ] : [], undefined);
 
     const saveInfosQuery = useSaveInfosGetAll();
     const mainPkmQuery = useStorageGetMainPkms();
@@ -132,7 +132,7 @@ export const StorageItemMainActions: React.FC = () => {
                             ...saves,
                             [ selectedPkm.saveId ]: {
                                 saveId: selectedPkm.saveId,
-                                saveBoxId: attachedSavePkm?.box,
+                                saveBoxId: attachedSavePkm?.boxId ?? 0,
                                 order: getSaveOrder(saves, selectedPkm.saveId),
                             }
                         } : saves,

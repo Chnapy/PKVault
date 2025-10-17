@@ -1,4 +1,4 @@
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 import { Popover, PopoverButton, PopoverPanel, type PopoverButtonProps, type PopoverPanelProps } from '@headlessui/react';
 import React from 'react';
 import type { ReactTag } from '../container/container';
@@ -7,13 +7,14 @@ import { type ButtonProps } from './button';
 import { ButtonLike } from './button-like';
 
 export type ButtonWithDisabledPopoverProps<AS extends ReactTag> = ButtonProps<AS> & Pick<PopoverPanelProps, 'anchor'> & {
-    rootStyle?: React.CSSProperties;
+    rootClassName?: string;
     showHelp: boolean;
     helpTitle: React.ReactNode;
     helpContent?: React.ReactNode;
+    extraContent?: React.ReactNode;
 };
 
-export const ButtonWithDisabledPopover = <AS extends ReactTag>({ loading, disabled, rootStyle, anchor = 'bottom', showHelp, helpTitle, helpContent, ...btnProps }: ButtonWithDisabledPopoverProps<AS>) => {
+export const ButtonWithDisabledPopover = <AS extends ReactTag>({ loading, disabled, rootClassName, anchor = 'bottom', showHelp, helpTitle, helpContent, extraContent, ...btnProps }: ButtonWithDisabledPopoverProps<AS>) => {
     const [ hover, setHover ] = React.useState(false);
     const [ loadingState, setLoadingState ] = React.useState(false);
 
@@ -41,11 +42,13 @@ export const ButtonWithDisabledPopover = <AS extends ReactTag>({ loading, disabl
     } as PopoverButtonProps;
 
     return <Popover
-        className={css({
-            display: 'flex',
-            flexDirection: 'column',
-        })}
-        style={rootStyle}
+        className={cx(
+            css({
+                display: 'flex',
+                flexDirection: 'column',
+            }),
+            rootClassName
+        )}
         onPointerEnter={() => setHover(true)}
         onPointerLeave={() => setHover(false)}
     >
@@ -53,6 +56,8 @@ export const ButtonWithDisabledPopover = <AS extends ReactTag>({ loading, disabl
             {...finalBtnProps as PopoverButtonProps}
             as={btnProps.as as PopoverButtonProps[ 'as' ] ?? ButtonLike}
         />
+
+        {extraContent}
 
         {showHelp && hover && <PopoverPanel
             static

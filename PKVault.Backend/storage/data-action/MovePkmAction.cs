@@ -1,32 +1,81 @@
 using PKHeX.Core;
 
 public class MovePkmAction(
-    string pkmId, uint? sourceSaveId,
-    uint? targetSaveId, int targetBoxId, int targetBoxSlot,
+    string[] pkmIds, uint? sourceSaveId,
+    uint? targetSaveId, int targetBoxId, int[] targetBoxSlots,
     bool attached
 ) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        if (sourceSaveId == null && targetSaveId == null)
+        if (pkmIds.Length == 0 || targetBoxSlots.Length == 0)
         {
-            return await MainToMain(loaders, flags);
+            throw new ArgumentException($"Pkm ids and box slots cannot be empty");
         }
 
-        if (sourceSaveId == null && targetSaveId != null)
+        if (pkmIds.Length != targetBoxSlots.Length)
         {
-            return await MainToSave(loaders, flags);
+            throw new ArgumentException($"Pkm ids and box slots should have same length");
         }
 
-        if (sourceSaveId != null && targetSaveId == null)
+        async Task<DataActionPayload> act(int i)
         {
-            return await SaveToMain(loaders, flags);
+            var pkmId = pkmIds[i];
+            var targetBoxSlot = targetBoxSlots[i];
+
+            if (sourceSaveId == null && targetSaveId == null)
+            {
+                return await MainToMain(loaders, flags, pkmId, targetBoxSlot);
+            }
+
+            if (sourceSaveId == null && targetSaveId != null)
+            {
+                return await MainToSave(loaders, flags, pkmId, targetBoxSlot);
+            }
+
+            if (sourceSaveId != null && targetSaveId == null)
+            {
+                return await SaveToMain(loaders, flags, pkmId, targetBoxSlot);
+            }
+
+            return await SaveToSave(loaders, flags, pkmId, targetBoxSlot);
         }
 
-        return await SaveToSave(loaders, flags);
+        List<DataActionPayload> payloads = [];
+        for (var i = 0; i < pkmIds.Length; i++)
+        {
+            payloads.Add(await act(i));
+        }
+
+        // var i = -1;
+        // var payloads = await Task.WhenAll(pkmIds.Select(async pkmId =>
+        // {
+        //     i++;
+
+        //     var targetBoxSlot = targetBoxSlots[i];
+
+        //     if (sourceSaveId == null && targetSaveId == null)
+        //     {
+        //         return await MainToMain(loaders, flags, pkmId, targetBoxSlot);
+        //     }
+
+        //     if (sourceSaveId == null && targetSaveId != null)
+        //     {
+        //         return await MainToSave(loaders, flags, pkmId, targetBoxSlot);
+        //     }
+
+        //     if (sourceSaveId != null && targetSaveId == null)
+        //     {
+        //         return await SaveToMain(loaders, flags, pkmId, targetBoxSlot);
+        //     }
+
+        //     return await SaveToSave(loaders, flags, pkmId, targetBoxSlot);
+        // }));
+
+        return payloads[0];
     }
 
-    private async Task<DataActionPayload> MainToMain(DataEntityLoaders loaders, DataUpdateFlags flags)
+    private async Task<DataActionPayload> MainToMain(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
     {
         var dto = await loaders.pkmLoader.GetDto(pkmId);
         if (dto == default)
@@ -63,7 +112,7 @@ public class MovePkmAction(
         };
     }
 
-    private async Task<DataActionPayload> SaveToSave(DataEntityLoaders loaders, DataUpdateFlags flags)
+    private async Task<DataActionPayload> SaveToSave(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
     {
         var sourceSaveLoaders = loaders.saveLoadersDict[(uint)sourceSaveId!];
         var targetSaveLoaders = loaders.saveLoadersDict[(uint)targetSaveId!];
@@ -100,11 +149,11 @@ public class MovePkmAction(
 
         if (targetPkmDto != null)
         {
-            var switchedSourcePkmDto = await PkmSaveDTO.FromPkm(sourceSaveLoaders.Save, targetPkmDto.Pkm, sourcePkmDto.Box, sourcePkmDto.BoxSlot);
+            var switchedSourcePkmDto = await PkmSaveDTO.FromPkm(sourceSaveLoaders.Save, targetPkmDto.Pkm, sourcePkmDto.BoxId, sourcePkmDto.BoxSlot);
             await sourceSaveLoaders.Pkms.WriteDto(switchedSourcePkmDto);
         }
 
-        sourcePkmDto.Box = targetBoxId;
+        sourcePkmDto.BoxId = targetBoxId;
         sourcePkmDto.BoxSlot = targetBoxSlot;
 
         await targetSaveLoaders.Pkms.WriteDto(sourcePkmDto);
@@ -136,7 +185,7 @@ public class MovePkmAction(
         };
     }
 
-    private async Task<DataActionPayload> MainToSave(DataEntityLoaders loaders, DataUpdateFlags flags)
+    private async Task<DataActionPayload> MainToSave(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
     {
         var saveLoaders = loaders.saveLoadersDict[(uint)targetSaveId!];
 
@@ -179,7 +228,7 @@ public class MovePkmAction(
         };
     }
 
-    private async Task<DataActionPayload> SaveToMain(DataEntityLoaders loaders, DataUpdateFlags flags)
+    private async Task<DataActionPayload> SaveToMain(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
     {
         var saveLoaders = loaders.saveLoadersDict[(uint)sourceSaveId!];
 
@@ -212,7 +261,7 @@ public class MovePkmAction(
         if (existingSlot != null)
         {
             await MainToSaveWithoutCheckTarget(
-                loaders, flags, (uint)sourceSaveId, savePkm!.Box, savePkm.BoxSlot, relatedPkmVersionDtos
+                loaders, flags, (uint)sourceSaveId, savePkm!.BoxId, savePkm.BoxSlot, relatedPkmVersionDtos
             );
         }
 
@@ -366,9 +415,9 @@ public class MovePkmAction(
             {
                 pkmDto.PkmEntity.SaveId = default;
             }
-        }
 
-        loaders.pkmLoader.WriteDto(pkmDto);
+            loaders.pkmLoader.WriteDto(pkmDto);
+        }
 
         flags.MainPkms = true;
 

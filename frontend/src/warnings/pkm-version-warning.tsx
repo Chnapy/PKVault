@@ -46,7 +46,7 @@ export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({ pkmId }) =
                         ...saves,
                         [ pkm.saveId ]: {
                             saveId: pkm.saveId,
-                            saveBoxId: undefined,
+                            saveBoxId: 0,
                             order: getSaveOrder(saves, pkm.saveId),
                         }
                     } : saves,

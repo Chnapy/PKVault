@@ -23,12 +23,13 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
             });
         }
 
-        if (save is IDaycareStorage)
+        if (save is IDaycareStorage saveDaycare)
         {
             var id = BoxDTO.DAYCARE_ID.ToString();
             boxes.Add(id, new BoxDTO
             {
                 Type = BoxType.Daycare,
+                SlotCountVariable = saveDaycare.DaycareSlotCount,
                 BoxEntity = new()
                 {
                     Id = id,
@@ -44,6 +45,7 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
             boxes.Add(id, new BoxDTO
             {
                 Type = BoxType.Default,
+                SlotCountVariable = save.BoxSlotCount,
                 BoxEntity = new()
                 {
                     Id = id,

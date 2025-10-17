@@ -5,6 +5,7 @@ import React from "react";
 import z from "zod";
 import { ActionsPanel } from '../storage/actions/actions-panel';
 import { StorageMoveContext } from '../storage/actions/storage-move-context';
+import { StorageSelectContext } from '../storage/actions/storage-select-context';
 import { StorageDetails } from "../storage/storage-details";
 import { StorageMainBox } from "../storage/storage-main-box";
 import { StorageSaveBox } from "../storage/storage-save-box";
@@ -17,91 +18,91 @@ export const Storage: React.FC = () => {
   const saves = Route.useSearch({ select: (search) => search.saves }) ?? {};
 
   return (
-    <StorageSearchCheck>
-      <StorageMoveContext.Provider>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}>
-          <div
-            id={StorageMoveContext.containerId}
-            style={{
-              // display: "table",
-              display: 'flex',
-              justifyContent: "center",
-              alignItems: "flex-start",
-              flexWrap: "wrap",
-              gap: 16,
-              // borderSpacing: 16,
-              margin: 'auto',
-              marginBottom: 150,
-            }}
-          >
-            <StorageMainBox />
-
-            {Object.values(saves)
-              .filter(filterIsDefined)
-              .sort((a, b) => a.order < b.order ? -1 : 1)
-              .map(save => <StorageSaveBox key={save.saveId} saveId={save.saveId} />)}
-
-            <div style={{
-              display: 'flex',
-              width: 630,
-              height: 564
-            }}>
-              <StorageSaveSelect />
-            </div>
-
+    <StorageSelectContext.Provider>
+      <StorageSearchCheck>
+        <StorageMoveContext.Provider>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}>
             <div
-              className={css({
-                position: "fixed",
-                bottom: 14,
-                left: "50%",
-                transform: 'translateX(-50%)',
-                width: 400,
-                zIndex: 20,
-                '&:hover': {
-                  zIndex: 25,
-                }
-              })}
+              id={StorageMoveContext.containerId}
+              style={{
+                display: 'flex',
+                justifyContent: "center",
+                alignItems: "flex-start",
+                flexWrap: "wrap",
+                gap: 16,
+                margin: 'auto',
+                marginBottom: 150,
+              }}
             >
-              <ActionsPanel />
-            </div>
+              <StorageMainBox />
 
-            {selected && (
+              {Object.values(saves)
+                .filter(filterIsDefined)
+                .sort((a, b) => a.order < b.order ? -1 : 1)
+                .map(save => <StorageSaveBox key={save.saveId} saveId={save.saveId} />)}
+
+              <div style={{
+                display: 'flex',
+                width: 630,
+                height: 564
+              }}>
+                <StorageSaveSelect />
+              </div>
+
               <div
                 className={css({
                   position: "fixed",
                   bottom: 14,
-                  top: 14,
-                  right: 14,
-                  width: 350,
-                  pointerEvents: 'none',
+                  left: "50%",
+                  transform: 'translateX(-50%)',
+                  width: 400,
                   zIndex: 20,
-                  display: 'flex',
-                  alignItems: 'flex-end',
                   '&:hover': {
                     zIndex: 25,
-                  },
-                  '& > *': {
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    overflowY: 'auto',
-                    pointerEvents: 'initial',
                   }
                 })}
               >
-                <StorageDetails
-                  key={selected.id}
-                  id={selected.id}
-                  saveId={selected.saveId}
-                />
+                <ActionsPanel />
               </div>
-            )}
+
+              {selected && (
+                <div
+                  className={css({
+                    position: "fixed",
+                    bottom: 14,
+                    top: 14,
+                    right: 14,
+                    width: 350,
+                    pointerEvents: 'none',
+                    zIndex: 20,
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    '&:hover': {
+                      zIndex: 25,
+                    },
+                    '& > *': {
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      overflowY: 'auto',
+                      pointerEvents: 'initial',
+                    }
+                  })}
+                >
+                  <StorageDetails
+                    key={selected.id}
+                    id={selected.id}
+                    saveId={selected.saveId}
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </StorageMoveContext.Provider>
-    </StorageSearchCheck>
+        </StorageMoveContext.Provider>
+      </StorageSearchCheck>
+    </StorageSelectContext.Provider>
   );
 };
 
@@ -119,7 +120,7 @@ const searchSchema = z.object({
     z.number().int(),
     z.object({
       saveId: z.number().int(),
-      saveBoxId: z.number().int().optional(),
+      saveBoxId: z.number().int(),
       order: z.number().int(),
     }).optional()
   ).optional(),

@@ -115,6 +115,7 @@
   "storage.actions.detach-save": "Detach from storage",
   "storage.actions.detach-save.helpTitle": "Detach pkm from attached one in storage",
   "storage.actions.detach-save.helpContent": "Break link between this pkm and the one in storage.\nAllows to use pkm in another save, and create new versions.",
+  "storage.actions.select-title": "{{count}} selected pkms",
   "details.held-item": "Held item",
   "details.stats.name": "Stats",
   "details.stats.ivs": "IVs",

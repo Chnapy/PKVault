@@ -115,6 +115,7 @@
   "storage.actions.detach-save": "Détacher du stockage principal",
   "storage.actions.detach-save.helpTitle": "Détacher le pkm de sa copie rattachée dans le stockage principal",
   "storage.actions.detach-save.helpContent": "Casse le lien entre le pkm et sa copie rattachée.\nPermet d'utiliser le pkm dans d'autres sauvegardes, et de créer de nouvelles versions.",
+  "storage.actions.select-title": "{{count}} pkms sélectionnés",
   "details.held-item": "Object tenu",
   "details.stats.name": "Stats",
   "details.stats.ivs": "IVs",

@@ -74,7 +74,7 @@ public class SavePkmLoader(
         {
             // Console.WriteLine($"{dto.Id} - {dto.Box}/{dto.BoxSlot}");
             dictById.Add(dto.Id, dto);
-            dictByBox.Add(dto.Box + "." + dto.BoxSlot, dto);
+            dictByBox.Add(dto.BoxId + "." + dto.BoxSlot, dto);
         }
 
         dtoById = dictById;
@@ -143,7 +143,7 @@ public class SavePkmLoader(
 
     public async Task WriteDto(PkmSaveDTO dto)
     {
-        if (dto.Box == BoxDTO.DAYCARE_ID)
+        if (dto.BoxId == BoxDTO.DAYCARE_ID)
         {
             throw new Exception("Not allowed for pkm in daycare");
         }
@@ -158,13 +158,13 @@ public class SavePkmLoader(
 
         await DeleteDto(dto.Id);
 
-        switch (dto.Box)
+        switch (dto.BoxId)
         {
             case BoxDTO.PARTY_ID:
                 WriteParty(dto.Pkm, dto.BoxSlot);
                 break;
             default:
-                save.SetBoxSlotAtIndex(pkm, dto.Box, dto.BoxSlot);
+                save.SetBoxSlotAtIndex(pkm, dto.BoxId, dto.BoxSlot);
                 break;
         }
 
@@ -179,7 +179,7 @@ public class SavePkmLoader(
         var dto = await GetDto(id);
         if (dto != default)
         {
-            switch (dto.Box)
+            switch (dto.BoxId)
             {
                 case BoxDTO.DAYCARE_ID:
                     throw new Exception("Not allowed for pkm in daycare");
@@ -187,7 +187,7 @@ public class SavePkmLoader(
                     WriteParty(null, dto.BoxSlot);
                     break;
                 default:
-                    save.SetBoxSlotAtIndex(save.BlankPKM, dto.Box, dto.BoxSlot);
+                    save.SetBoxSlotAtIndex(save.BlankPKM, dto.BoxId, dto.BoxSlot);
                     break;
             }
 

@@ -20,7 +20,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
 
     const formEditMode = StorageDetailsForm.useEditMode();
 
-    const moveClickable = StorageMoveContext.useClickable(selected?.id ?? '', saveId);
+    const moveClickable = StorageMoveContext.useClickable(selected?.id ? [ selected.id ] : [], saveId);
 
     const mainPkmQuery = useStorageGetMainPkms();
     const mainPkmVersionQuery = useStorageGetMainPkmVersions();
@@ -86,7 +86,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
                             ...saves,
                             [ selectedPkm.saveId ]: {
                                 saveId: selectedPkm.saveId,
-                                saveBoxId: selectedPkm.box,
+                                saveBoxId: selectedPkm.boxId,
                                 order: getSaveOrder(saves, selectedPkm.saveId),
                             }
                         },
@@ -133,7 +133,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
                     });
                     const newId = mutateResult.data.saves
                         ?.find(save => save.saveId === saveId)?.savePkms
-                        ?.find(pkm => pkm.box === selectedPkm.box && pkm.boxSlot === selectedPkm.boxSlot)?.id;
+                        ?.find(pkm => pkm.boxId === selectedPkm.boxId && pkm.boxSlot === selectedPkm.boxSlot)?.id;
                     if (newId) {
                         navigate({
                             search: {

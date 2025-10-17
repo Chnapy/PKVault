@@ -78,13 +78,13 @@ public class StorageService
     }
 
     public static async Task<DataUpdateFlags> MovePkm(
-        string pkmId, uint? sourceSaveId,
-        uint? targetSaveId, int targetBoxId, int targetBoxSlot,
+        string[] pkmIds, uint? sourceSaveId,
+        uint? targetSaveId, int targetBoxId, int[] targetBoxSlots,
         bool attached
     )
     {
         return await AddAction(
-            new MovePkmAction(pkmId, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlot, attached)
+            new MovePkmAction(pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached)
         );
     }
 

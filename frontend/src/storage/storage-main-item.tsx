@@ -4,9 +4,10 @@ import { Gender as GenderType } from '../data/sdk/model';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
 import { Route } from '../routes/storage';
-import { StorageItem } from '../ui/storage-item/storage-item';
+import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
 import { StorageItemPopover } from '../ui/storage-item/storage-item-popover';
 import { filterIsDefined } from '../util/filter-is-defined';
+import { StorageSelectContext } from './actions/storage-select-context';
 
 type StorageMainItemProps = {
     pkmId: string;
@@ -17,6 +18,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
     const saves = Route.useSearch({ select: (search) => search.saves }) ?? {};
     const navigate = Route.useNavigate();
 
+    const { checked, onCheck } = StorageSelectContext.useCheck(undefined, pkmId);
     const saveInfosQuery = useSaveInfosGetAll();
     const pkmsQuery = useStorageGetMainPkms();
     const pkmVersionsQuery = useStorageGetMainPkmVersions();
@@ -57,7 +59,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
 
 
     const canMoveAttached = !pkm.saveId && pageSaves.some(pageSave => pkmVersions.some(pkmVersion => pkmVersion.generation === pageSave.generation));
-    const canEvolve = !pkm.saveId && pkmVersions.find(version => version.canEvolve);
+    const canEvolve = !pkm.saveId && pkmVersions.some(version => version.canEvolve);
     const canDetach = !!pkm.saveId;
     const canSynchronize = !!pkm.saveId && !!attachedPkmVersion && !saveSynchronized;
 
@@ -70,24 +72,24 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
         >
             {props => <PopoverButton
                 as={StorageItem}
-                {...props}
-                species={species}
-                generation={generation}
-                form={form}
-                isFemale={gender == GenderType.Female}
-                isEgg={false}
-                isShiny={isShiny}
-                isShadow={false}
-                heldItem={heldItem}
-                warning={pkmVersions.some((value) => !value.isValid)}
-                nbrVersions={pkmVersions.length}
-                canCreateVersion={canCreateVersions.length > 0}
-                canMoveOutside={canMoveAttached}
-                canEvolve={canEvolve}
-                attached={canDetach}
-                needSynchronize={canSynchronize}
-                onClick={props.onClick ?? (() =>
-                    navigate({
+                {...{
+                    ...props,
+                    species,
+                    generation,
+                    form,
+                    isFemale: gender == GenderType.Female,
+                    isEgg: false,
+                    isShiny,
+                    isShadow: false,
+                    heldItem,
+                    warning: pkmVersions.some((value) => !value.isValid),
+                    nbrVersions: pkmVersions.length,
+                    canCreateVersion: canCreateVersions.length > 0,
+                    canMoveOutside: canMoveAttached,
+                    canEvolve,
+                    attached: canDetach,
+                    needSynchronize: canSynchronize,
+                    onClick: props.onClick ?? (() => navigate({
                         search: {
                             selected: selected && !selected.saveId && selected.id === pkmId
                                 ? undefined
@@ -96,8 +98,10 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
                                     id: pkmId,
                                 },
                         },
-                    })
-                )}
+                    })),
+                    checked,
+                    onCheck,
+                } satisfies StorageItemProps}
             />}
         </StorageItemPopover>
     );

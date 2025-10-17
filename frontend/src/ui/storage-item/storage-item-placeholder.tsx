@@ -1,8 +1,8 @@
 import { css, cx } from '@emotion/css';
 import type React from "react";
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
-import { theme } from '../theme';
 import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popover';
+import { theme } from '../theme';
 
 export type StorageItemPlaceholderProps = {
   saveId?: number;
@@ -40,9 +40,9 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
           }
         })
       )}
-      rootStyle={{
+      rootClassName={css({
         order: boxSlot,
-      }}
+      })}
       disabled={!moveDroppable.onClick}
       loading={moveLoading}
       onClick={moveDroppable.onClick}

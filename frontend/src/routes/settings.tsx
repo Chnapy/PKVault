@@ -12,6 +12,7 @@ const SettingsPage: React.FC = () => {
         flexDirection: 'column',
         alignItems: "stretch",
         gap: 16,
+        width: '100%',
         maxWidth: 900,
         marginLeft: 'auto',
         marginRight: 'auto',

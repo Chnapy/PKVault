@@ -2,13 +2,13 @@ using PKHeX.Core;
 
 public class PkmSaveDTO : BasePkmVersionDTO
 {
-    public static async Task<PkmSaveDTO> FromPkm(SaveFile save, PKM pkm, int box, int boxSlot)
+    public static async Task<PkmSaveDTO> FromPkm(SaveFile save, PKM pkm, int boxId, int boxSlot)
     {
         var dto = new PkmSaveDTO
         {
             Pkm = pkm,
             Save = save,
-            Box = box,
+            BoxId = boxId,
             BoxSlot = boxSlot,
         };
 
@@ -23,32 +23,32 @@ public class PkmSaveDTO : BasePkmVersionDTO
         {
             Pkm = Pkm,
             Save = Save,
-            Box = Box,
+            BoxId = BoxId,
             BoxSlot = BoxSlot,
             PkmVersionId = PkmVersionId,
             HasTradeEvolve = HasTradeEvolve
         };
     }
 
-    public new string Id { get => GetPKMId(Pkm, Box, BoxSlot); }
+    public new string Id { get => GetPKMId(Pkm, BoxId, BoxSlot); }
 
     public string IdBase { get => base.Id; }
 
     public uint SaveId { get { return Save.ID32; } }
 
-    public required int Box { get; set; }
+    public required int BoxId { get; set; }
 
     public required int BoxSlot { get; set; }
 
     public bool IsShadow { get { return Pkm is IShadowCapture pkmShadow && pkmShadow.IsShadow; } }
 
-    public int Team { get => Save.GetBoxSlotFlags(Box, BoxSlot).IsBattleTeam(); }
+    public int Team { get => Save.GetBoxSlotFlags(BoxId, BoxSlot).IsBattleTeam(); }
 
-    public bool IsLocked { get => Save.GetBoxSlotFlags(Box, BoxSlot).HasFlag(StorageSlotSource.Locked); }
+    public bool IsLocked { get => Save.GetBoxSlotFlags(BoxId, BoxSlot).HasFlag(StorageSlotSource.Locked); }
 
-    public int Party { get => Save.GetBoxSlotFlags(Box, BoxSlot).IsParty(); }
+    public int Party { get => Save.GetBoxSlotFlags(BoxId, BoxSlot).IsParty(); }
 
-    public bool IsStarter { get => Save.GetBoxSlotFlags(Box, BoxSlot).HasFlag(StorageSlotSource.Starter); }
+    public bool IsStarter { get => Save.GetBoxSlotFlags(BoxId, BoxSlot).HasFlag(StorageSlotSource.Starter); }
 
     public bool IsDuplicate { get => WarningsService.GetWarningsDTO().PkmDuplicateWarnings.Any(warn => warn.SaveId == SaveId && warn.DuplicateIdBases.Contains(IdBase)); }
 
@@ -58,7 +58,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     // -- actions
 
-    public bool CanMove { get => Box != BoxDTO.DAYCARE_ID; }
+    public bool CanMove { get => BoxId != BoxDTO.DAYCARE_ID; }
 
     public bool CanDelete { get => CanMove && PkmVersionId == null; }
 

@@ -21,7 +21,7 @@ export const SaveCardImg: React.FC<{
             borderColor: theme.bg.dark,
             borderStyle: 'solid',
             borderWidth: borderWidth,
-            borderRadius: typeof size === 'number' ? +Number.parseInt((size / 8) + '') : 8,
+            borderRadius: typeof size === 'number' ? ~~(size / 8) : 8,
             boxSizing: 'content-box',
         }}
     />;

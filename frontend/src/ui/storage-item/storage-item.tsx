@@ -1,3 +1,4 @@
+import { css, cx } from '@emotion/css';
 import React from "react";
 import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { useStaticData } from '../../hooks/use-static-data';
@@ -8,6 +9,7 @@ import { SpeciesImg } from '../details-card/species-img';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { theme } from '../theme';
+import { CheckboxInput, type CheckboxInputProps } from '../input/checkbox-input';
 
 export type StorageItemProps =
   & ButtonLikeProps
@@ -25,6 +27,8 @@ export type StorageItemProps =
     level?: number;
     nbrVersions?: number;
     small?: boolean;
+    checked?: boolean;
+    onCheck?: CheckboxInputProps[ 'onChange' ];
 
     // actions
     canCreateVersion?: boolean;
@@ -49,6 +53,8 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   anchor,
   helpTitle,
   small,
+  checked = false,
+  onCheck,
 
   canCreateVersion,
   canMoveOutside = true,
@@ -65,6 +71,11 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
       componentDescriptor='button'
       {...rest}
       noDropshadow={!rest.onClick}
+      rootClassName={css({
+        '&:hover .checkbox': {
+          opacity: 1,
+        },
+      })}
       style={{
         backgroundColor: rest.disabled ? 'transparent' : theme.bg.light,
         borderColor: rest.disabled ? undefined : theme.text.default,
@@ -77,6 +88,23 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
       anchor={anchor}
       showHelp={!!helpTitle}
       helpTitle={helpTitle}
+      extraContent={
+        onCheck && !rest.disabled && !rest.loading && <div
+          className={cx('checkbox', css({
+            opacity: checked ? undefined : 0,
+          }))}
+          style={{
+            position: 'absolute',
+            top: 3,
+            left: 3,
+          }}
+        >
+          <CheckboxInput
+            checked={checked}
+            onChange={onCheck}
+          />
+        </div>
+      }
     >
       <SpeciesImg species={species} generation={generation} form={form} isFemale={isFemale} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} small={small} />
 

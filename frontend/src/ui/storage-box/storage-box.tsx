@@ -8,9 +8,11 @@ export type StorageBoxProps = {
 export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
   header,
   children,
+  ...rest
 }) => {
   return (
     <TitledContainer
+      {...rest}
       title={
         <div
           style={{

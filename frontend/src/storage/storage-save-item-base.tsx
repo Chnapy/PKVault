@@ -7,7 +7,7 @@ import type { ButtonLikeProps } from '../ui/button/button-like';
 import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
 import { getSaveOrder } from './util/get-save-order';
 
-type StorageSaveItemBaseProps = ButtonLikeProps & Pick<StorageItemProps, 'anchor' | 'helpTitle' | 'small'> & {
+export type StorageSaveItemBaseProps = ButtonLikeProps & Pick<StorageItemProps, 'anchor' | 'helpTitle' | 'small' | 'checked' | 'onCheck'> & {
     saveId: number;
     pkmId: string;
 };
@@ -69,7 +69,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
                         ...saves,
                         [ saveId ]: {
                             saveId,
-                            saveBoxId: savePkm.box,
+                            saveBoxId: savePkm.boxId,
                             order: getSaveOrder(saves, saveId),
                         }
                     }

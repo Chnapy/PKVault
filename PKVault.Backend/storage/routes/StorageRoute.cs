@@ -48,14 +48,14 @@ public class StorageController : ControllerBase
         return savePkms;
     }
 
-    [HttpPut("move/pkm/{pkmId}")]
+    [HttpPut("move/pkm")]
     public async Task<ActionResult<DataDTO>> MovePkm(
-        string pkmId, uint? sourceSaveId,
-        uint? targetSaveId, [BindRequired] int targetBoxId, [BindRequired] int targetBoxSlot,
+        [FromQuery] string[] pkmIds, uint? sourceSaveId,
+        uint? targetSaveId, [BindRequired] int targetBoxId, [FromQuery] int[] targetBoxSlots,
         bool attached
     )
     {
-        var flags = await StorageService.MovePkm(pkmId, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlot, attached);
+        var flags = await StorageService.MovePkm(pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached);
 
         return await DataDTO.FromDataUpdateFlags(flags);
     }
