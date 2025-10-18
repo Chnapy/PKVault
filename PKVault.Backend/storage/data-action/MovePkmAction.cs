@@ -18,10 +18,8 @@ public class MovePkmAction(
             throw new ArgumentException($"Pkm ids and box slots should have same length");
         }
 
-        async Task<DataActionPayload> act(int i)
+        async Task<DataActionPayload> act(string pkmId, int targetBoxSlot)
         {
-            var pkmId = pkmIds[i];
-            var targetBoxSlot = targetBoxSlots[i];
 
             if (sourceSaveId == null && targetSaveId == null)
             {
@@ -41,38 +39,59 @@ public class MovePkmAction(
             return await SaveToSave(loaders, flags, pkmId, targetBoxSlot);
         }
 
-        List<DataActionPayload> payloads = [];
-        for (var i = 0; i < pkmIds.Length; i++)
+        // pkmId, pkmSlot, targetSlot
+        List<(string, int, int)> entries = [];
+
+        // Pkms can overlap if moved as group & trigger error
+        // They should be sorted following move direction to avoid that
+        var mayHaveConflicts = sourceSaveId == targetSaveId;
+        if (mayHaveConflicts)
         {
-            payloads.Add(await act(i));
+            for (var i = 0; i < pkmIds.Length; i++)
+            {
+                var pkmSlot = await GetPkmSlot(loaders, sourceSaveId, pkmIds[i]);
+                entries.Add((pkmIds[i], pkmSlot, targetBoxSlots[i]));
+            }
+
+            // right => +, left => -
+            var moveDirection = entries[0].Item3 - entries[0].Item2;
+
+            // 1. sort by pkm pos
+            entries.Sort((a, b) => a.Item2 < b.Item2 ? -1 : 1);
+
+            // 2. sort by move direction: first pkms for left, last pkms for right
+            entries.Sort((a, b) => a.Item2 < b.Item2 ? moveDirection : -moveDirection);
+        }
+        else
+        {
+            for (var i = 0; i < pkmIds.Length; i++)
+            {
+                entries.Add((pkmIds[i], -1, targetBoxSlots[i]));
+            }
         }
 
-        // var i = -1;
-        // var payloads = await Task.WhenAll(pkmIds.Select(async pkmId =>
-        // {
-        //     i++;
+        // Console.WriteLine($"ENTRIES [{moveDirection}]:\n{string.Join('\n', entries.Select(e => e.Item1 + "_" + e.Item2 + "_" + e.Item3))}");
 
-        //     var targetBoxSlot = targetBoxSlots[i];
-
-        //     if (sourceSaveId == null && targetSaveId == null)
-        //     {
-        //         return await MainToMain(loaders, flags, pkmId, targetBoxSlot);
-        //     }
-
-        //     if (sourceSaveId == null && targetSaveId != null)
-        //     {
-        //         return await MainToSave(loaders, flags, pkmId, targetBoxSlot);
-        //     }
-
-        //     if (sourceSaveId != null && targetSaveId == null)
-        //     {
-        //         return await SaveToMain(loaders, flags, pkmId, targetBoxSlot);
-        //     }
-
-        //     return await SaveToSave(loaders, flags, pkmId, targetBoxSlot);
-        // }));
+        List<DataActionPayload> payloads = [];
+        for (var i = 0; i < entries.Count; i++)
+        {
+            payloads.Add(await act(entries[i].Item1, entries[i].Item3));
+        }
 
         return payloads[0];
+    }
+
+    private static async Task<int> GetPkmSlot(DataEntityLoaders loaders, uint? saveId, string pkmId)
+    {
+        if (saveId == null)
+        {
+            var mainDto = await loaders.pkmLoader.GetDto(pkmId);
+            return (int)mainDto.BoxSlot;
+        }
+
+        var saveLoaders = loaders.saveLoadersDict[(uint)saveId];
+        var saveDto = await saveLoaders.Pkms.GetDto(pkmId);
+        return saveDto.BoxSlot;
     }
 
     private async Task<DataActionPayload> MainToMain(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
@@ -121,7 +140,7 @@ public class MovePkmAction(
         var sourcePkmDto = await sourceSaveLoaders.Pkms.GetDto(pkmId);
         if (sourcePkmDto == default)
         {
-            throw new KeyNotFoundException("Save Pkm not found");
+            throw new KeyNotFoundException($"Save Pkm not found, id={pkmId}");
         }
 
         if (!sourcePkmDto.CanMove)
