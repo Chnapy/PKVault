@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
-import { useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
+import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { getSaveOrder } from '../../storage/util/get-save-order';
@@ -32,7 +32,7 @@ export const StorageItemMainActions: React.FC = () => {
     const mainCreatePkmVersionMutation = useStorageMainCreatePkmVersion();
     const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
     const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm();
-    const evolvePkmMutation = useStorageEvolvePkm();
+    const evolvePkmsMutation = useStorageEvolvePkms();
 
     const selectedPkm = mainPkmQuery.data?.data.find(pkm => pkm.id === selected?.id);
     const pkmSavePkmQuery = useStorageGetSavePkms(selectedPkm?.saveId ?? 0);
@@ -171,9 +171,10 @@ export const StorageItemMainActions: React.FC = () => {
                 anchor='right'
                 bgColor={theme.bg.primary}
                 onClick={async () => {
-                    const mutateResult = await evolvePkmMutation.mutateAsync({
-                        id: pkmVersionCanEvolve.id,
-                        params: {},
+                    const mutateResult = await evolvePkmsMutation.mutateAsync({
+                        params: {
+                            ids: [ pkmVersionCanEvolve.id ]
+                        },
                     });
                     const newId = mutateResult.data.mainPkms
                         ?.find(pkm => pkm.boxId === selectedPkm.boxId && pkm.boxSlot === selectedPkm.boxSlot)?.id;
@@ -196,7 +197,9 @@ export const StorageItemMainActions: React.FC = () => {
             {canDetach && <ButtonWithDisabledPopover
                 as={ButtonWithConfirm}
                 onClick={() => mainPkmDetachSaveMutation.mutateAsync({
-                    pkmId: selectedPkm.id,
+                    params: {
+                        pkmIds: [ selectedPkm.id ]
+                    }
                 })}
                 showHelp
                 anchor='right start'

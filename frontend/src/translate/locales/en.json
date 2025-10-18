@@ -143,5 +143,6 @@
   "storage.save-actions.type.main-delete-pkm": "Delete version gen.{{generation}} from pkm {{name}}",
   "storage.save-actions.type.save-delete-pkm": "Delete pkm {{name}} from save {{save}}",
   "storage.save-actions.type.synchronize-pkm": "Synchronize pkm {{name}} with its attached save",
-  "storage.save-actions.type.evolve-pkm": "Evolve pkm {{name}} in {{save}} from {{oldSpecies}} to {{newSpecies}}"
+  "storage.save-actions.type.evolve-pkm": "Evolve pkm {{name}} in {{save}} from {{oldSpecies}} to {{newSpecies}}",
+  "storage.actions.release": "Release"
 }

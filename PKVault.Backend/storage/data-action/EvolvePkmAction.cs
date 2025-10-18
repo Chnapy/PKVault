@@ -1,20 +1,34 @@
 using PKHeX.Core;
 
-public class EvolvePkmAction(uint? saveId, string id) : DataAction
+public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        if (saveId == null)
+        if (ids.Length == 0)
         {
-            return await ExecuteForMain(loaders, flags);
+            throw new ArgumentException($"Pkm ids cannot be empty");
         }
-        else
+
+        async Task<DataActionPayload> act(string id)
         {
-            return await ExecuteForSave(loaders, flags, (uint)saveId);
+            if (saveId == null)
+            {
+                return await ExecuteForMain(loaders, flags, id);
+            }
+
+            return await ExecuteForSave(loaders, flags, (uint)saveId, id);
         }
+
+        List<DataActionPayload> payloads = [];
+        foreach (var id in ids)
+        {
+            payloads.Add(await act(id));
+        }
+
+        return payloads[0];
     }
 
-    private async Task<DataActionPayload> ExecuteForSave(DataEntityLoaders loaders, DataUpdateFlags flags, uint saveId)
+    private async Task<DataActionPayload> ExecuteForSave(DataEntityLoaders loaders, DataUpdateFlags flags, uint saveId, string id)
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
         var dto = await saveLoaders.Pkms.GetDto(id);
@@ -48,7 +62,7 @@ public class EvolvePkmAction(uint? saveId, string id) : DataAction
         };
     }
 
-    private async Task<DataActionPayload> ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags)
+    private async Task<DataActionPayload> ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags, string id)
     {
         var dto = await loaders.pkmVersionLoader.GetDto(id);
         if (dto == default)

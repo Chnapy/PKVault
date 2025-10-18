@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useStorageEvolvePkm, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
+import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { useTranslate } from '../../translate/i18n';
@@ -28,7 +28,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
 
     const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
     const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm();
-    const evolvePkmMutation = useStorageEvolvePkm();
+    const evolvePkmsMutation = useStorageEvolvePkms();
 
     const selectedPkm = pkmSavePkmQuery.data?.data.find(pkm => pkm.id === selected?.id);
     if (!selectedPkm) {
@@ -125,10 +125,10 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
                 anchor='right'
                 bgColor={theme.bg.primary}
                 onClick={async () => {
-                    const mutateResult = await evolvePkmMutation.mutateAsync({
-                        id: selectedPkm.id,
+                    const mutateResult = await evolvePkmsMutation.mutateAsync({
                         params: {
                             saveId: selectedPkm.saveId,
+                            ids: [ selectedPkm.id ]
                         },
                     });
                     const newId = mutateResult.data.saves
@@ -153,7 +153,9 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
             {canDetach && attachedPkmVersion && <ButtonWithDisabledPopover
                 as={Button}
                 onClick={() => mainPkmDetachSaveMutation.mutateAsync({
-                    pkmId: attachedPkmVersion.pkmId,
+                    params: {
+                        pkmIds: [ attachedPkmVersion.pkmId ]
+                    }
                 })}
                 showHelp
                 anchor='right start'

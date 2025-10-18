@@ -109,24 +109,24 @@ public class StorageService
         );
     }
 
-    public static async Task<DataUpdateFlags> MainPkmDetachSave(string pkmId)
+    public static async Task<DataUpdateFlags> MainPkmDetachSaves(string[] pkmIds)
     {
         return await AddAction(
-            new DetachPkmSaveAction(pkmId)
+            new DetachPkmSaveAction(pkmIds)
         );
     }
 
-    public static async Task<DataUpdateFlags> MainPkmVersionDelete(string pkmVersionId)
+    public static async Task<DataUpdateFlags> MainPkmVersionsDelete(string[] pkmVersionIds)
     {
         return await AddAction(
-            new DeletePkmVersionAction(pkmVersionId)
+            new DeletePkmVersionAction(pkmVersionIds)
         );
     }
 
-    public static async Task<DataUpdateFlags> SaveDeletePkm(uint saveId, string pkmId)
+    public static async Task<DataUpdateFlags> SaveDeletePkms(uint saveId, string[] pkmIds)
     {
         return await AddAction(
-            new SaveDeletePkmAction(saveId, pkmId)
+            new SaveDeletePkmAction(saveId, pkmIds)
         );
     }
 
@@ -137,10 +137,10 @@ public class StorageService
         );
     }
 
-    public static async Task<DataUpdateFlags> EvolvePkm(uint? saveId, string id)
+    public static async Task<DataUpdateFlags> EvolvePkms(uint? saveId, string[] ids)
     {
         return await AddAction(
-            new EvolvePkmAction(saveId, id)
+            new EvolvePkmAction(saveId, ids)
         );
     }
 

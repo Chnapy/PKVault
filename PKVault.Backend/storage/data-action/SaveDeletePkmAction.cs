@@ -1,29 +1,45 @@
-public class SaveDeletePkmAction(uint saveId, string pkmId) : DataAction
+public class SaveDeletePkmAction(uint saveId, string[] pkmIds) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        var saveLoaders = loaders.saveLoadersDict[saveId];
-
-        var dto = await saveLoaders.Pkms.GetDto(pkmId);
-        if (dto == default)
+        if (pkmIds.Length == 0)
         {
-            throw new KeyNotFoundException("Save Pkm not found");
+            throw new ArgumentException($"Pkm version ids cannot be empty");
         }
 
-        await saveLoaders.Pkms.DeleteDto(pkmId);
-        saveLoaders.Pkms.FlushParty();
-
-        flags.Saves.Add(new()
+        async Task<DataActionPayload> act(string pkmId)
         {
-            SaveId = saveId,
-            SavePkms = true,
-        });
-        flags.Dex = true;
+            var saveLoaders = loaders.saveLoadersDict[saveId];
 
-        return new()
+            var dto = await saveLoaders.Pkms.GetDto(pkmId);
+            if (dto == default)
+            {
+                throw new KeyNotFoundException("Save Pkm not found");
+            }
+
+            await saveLoaders.Pkms.DeleteDto(pkmId);
+            saveLoaders.Pkms.FlushParty();
+
+            flags.Saves.Add(new()
+            {
+                SaveId = saveId,
+                SavePkms = true,
+            });
+            flags.Dex = true;
+
+            return new()
+            {
+                type = DataActionType.SAVE_DELETE_PKM,
+                parameters = [saveLoaders.Save.Version, dto.Nickname]
+            };
+        }
+
+        List<DataActionPayload> payloads = [];
+        foreach (var pkmId in pkmIds)
         {
-            type = DataActionType.SAVE_DELETE_PKM,
-            parameters = [saveLoaders.Save.Version, dto.Nickname]
-        };
+            payloads.Add(await act(pkmId));
+        }
+
+        return payloads[0];
     }
 }

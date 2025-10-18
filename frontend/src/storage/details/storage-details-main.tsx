@@ -93,7 +93,9 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
             isShadow={false}
             onRelease={pkm?.canDelete && (pkmVersion.canDelete || nbrRelatedPkmVersion === 1)
                 ? (() => mainPkmVersionDeleteMutation.mutateAsync({
-                    pkmVersionId: pkmVersion.id,
+                    params: {
+                        pkmVersionIds: [ pkmVersion.id ]
+                    },
                 }))
                 : undefined
             }

@@ -1,47 +1,65 @@
+import { css } from '@emotion/css';
+import { PopoverPanel, type PopoverPanelProps } from '@headlessui/react';
 import type React from 'react';
-import { useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
+import { useStorageEvolvePkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { StorageSelectContext } from '../../storage/actions/storage-select-context';
 import { useTranslate } from '../../translate/i18n';
+import { filterIsDefined } from '../../util/filter-is-defined';
 import { Button } from '../button/button';
+import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popover';
 import { TitledContainer } from '../container/titled-container';
 import { Icon } from '../icon/icon';
-import { PopoverPanel, type PopoverPanelProps } from '@headlessui/react';
-import { css } from '@emotion/css';
+import { theme } from '../theme';
 
 export const StorageBoxSaveActions: React.FC<
     Required<Pick<PopoverPanelProps, 'anchor'>> & { saveId: number; boxId: number; }
 > = ({ saveId, boxId, anchor }) => {
     const { t } = useTranslate();
 
-    // const navigate = Route.useNavigate();
     const { ids, hasBox } = StorageSelectContext.useValue();
 
-    // const mainPkmVersionQuery = useStorageGetMainPkmVersions();
+    const mainPkmVersionQuery = useStorageGetMainPkmVersions();
     const pkmSavePkmQuery = useStorageGetSavePkms(saveId);
 
     const pkms = pkmSavePkmQuery.data?.data.filter(pkm => ids.includes(pkm.id)) ?? [];
 
-    const pkmIds = pkms.map(pkm => pkm.id);
+    const moveClickable = StorageMoveContext.useClickable(pkms.map(pkm => pkm.id), saveId);
 
-    const moveClickable = StorageMoveContext.useClickable(pkmIds, saveId);
-
-    // const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
+    const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
     // const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm();
-    // const evolvePkmMutation = useStorageEvolvePkm();
+    const savePkmsDeleteMutation = useStorageSaveDeletePkms();
+    const evolvePkmsMutation = useStorageEvolvePkms();
 
     if (pkms.length === 0 || !hasBox(saveId, boxId)) {
         return null;
     }
 
-    // const attachedPkmVersion = selectedPkm.pkmVersionId ? mainPkmVersionQuery.data?.data.find(version => version.id === selectedPkm.pkmVersionId) : undefined;
+    // const canSynchronizePkms = pkms.filter(pkm => {
+    //     if (!pkm.pkmVersionId) {
+    //         return false;
+    //     }
 
-    // const saveSynchronized = selectedPkm.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
+    // const attachedPkmVersion = mainPkmVersionQuery.data?.data.find(version => version.id === pkm.pkmVersionId);
+    // const saveSynchronized = pkm.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
-    // const canEvolve = selectedPkm.canEvolve && !selectedPkm.pkmVersionId;
-    // const canDetach = !!selectedPkm.pkmVersionId;
-    // const canSynchronize = !!selectedPkm.pkmVersionId && !!attachedPkmVersion && !saveSynchronized;
+    // return !!attachedPkmVersion && !saveSynchronized;
+    // });
+
+    const canEvolvePkms = pkms.filter(pkm => !pkm.pkmVersionId && pkm.canEvolve);
+
+    const canDetachPkms = pkms
+        .map(pkm => {
+            if (!pkm.pkmVersionId) {
+                return undefined;
+            }
+
+            return mainPkmVersionQuery.data?.data.find(version => version.id === pkm.pkmVersionId);
+        })
+        .filter(filterIsDefined);
+
+    const canRemovePkms = pkms.filter(pkm => pkm.canDelete);
 
     return <PopoverPanel
         static
@@ -75,7 +93,7 @@ export const StorageBoxSaveActions: React.FC<
                 >
                     {moveClickable.onClick && <Button onClick={moveClickable.onClick}>
                         <Icon name='logout' solid forButton />
-                        {t('storage.actions.move')}
+                        {t('storage.actions.move')} ({moveClickable.moveCount})
                     </Button>}
 
                     {moveClickable.onClickAttached && <ButtonWithDisabledPopover
@@ -90,64 +108,69 @@ export const StorageBoxSaveActions: React.FC<
                     >
                         <Icon name='link' solid forButton />
                         <Icon name='logout' solid forButton />
-                        {t('storage.actions.move-attached-save')}
+                        {t('storage.actions.move-attached-save')} ({moveClickable.moveAttachedCount})
                     </ButtonWithDisabledPopover>}
 
-                    {/* {canSynchronize && <Button
+                    {/* {canSynchronizePkms.length > 0 && <Button
                 bgColor={theme.bg.primary}
                 onClick={() => savePkmSynchronizeMutation.mutateAsync({
-                    saveId: selectedPkm.saveId!,
+                    saveId,
                     params: {
-                        pkmVersionId: attachedPkmVersion.id,
+                        pkmVersionId
                     }
                 })}
             >
                 <Icon name='link' solid forButton />
                 {t('storage.actions.synchro')}
-            </Button>}
+            </Button>} */}
 
-            {canEvolve && <ButtonWithConfirm
-                anchor='right'
-                bgColor={theme.bg.primary}
-                onClick={async () => {
-                    const mutateResult = await evolvePkmMutation.mutateAsync({
-                        id: selectedPkm.id,
-                        params: {
-                            saveId: selectedPkm.saveId,
-                        },
-                    });
-                    const newId = mutateResult.data.saves
-                        ?.find(save => save.saveId === saveId)?.savePkms
-                        ?.find(pkm => pkm.box === selectedPkm.box && pkm.boxSlot === selectedPkm.boxSlot)?.id;
-                    if (newId) {
-                        navigate({
-                            search: {
-                                selected: {
-                                    id: newId,
+                    {canEvolvePkms.length > 0 && <ButtonWithConfirm
+                        anchor='right'
+                        bgColor={theme.bg.primary}
+                        onClick={async () => {
+                            await evolvePkmsMutation.mutateAsync({
+                                params: {
                                     saveId,
-                                }
-                            }
-                        });
-                    }
-                }}
-            >
-                <Icon name='sparkles' solid forButton />
-                {t('storage.actions.evolve')}
-            </ButtonWithConfirm>}
+                                    ids: canEvolvePkms.map(pkm => pkm.id),
+                                },
+                            });
+                        }}
+                    >
+                        <Icon name='sparkles' solid forButton />
+                        {t('storage.actions.evolve')} ({canEvolvePkms.length})
+                    </ButtonWithConfirm>}
 
-            {canDetach && attachedPkmVersion && <ButtonWithDisabledPopover
-                as={Button}
-                onClick={() => mainPkmDetachSaveMutation.mutateAsync({
-                    pkmId: attachedPkmVersion.pkmId,
-                })}
-                showHelp
-                anchor='right start'
-                helpTitle={t('storage.actions.detach-save.helpTitle')}
-                helpContent={t('storage.actions.detach-save.helpContent')}
-            >
-                <Icon name='link' solid forButton />
-                {t('storage.actions.detach-save')}
-            </ButtonWithDisabledPopover>} */}
+                    {canDetachPkms.length > 0 && <ButtonWithDisabledPopover
+                        as={Button}
+                        onClick={() => mainPkmDetachSaveMutation.mutateAsync({
+                            params: {
+                                pkmIds: canDetachPkms.map(pkm => pkm.pkmId),
+                            }
+                        })}
+                        showHelp
+                        anchor='right start'
+                        helpTitle={t('storage.actions.detach-save.helpTitle')}
+                        helpContent={t('storage.actions.detach-save.helpContent')}
+                    >
+                        <Icon name='link' solid forButton />
+                        {t('storage.actions.detach-save')} ({canDetachPkms.length})
+                    </ButtonWithDisabledPopover>}
+
+                    {canRemovePkms.length > 0 && <ButtonWithConfirm
+                        anchor='right'
+                        bgColor={theme.bg.red}
+                        onClick={async () => {
+                            await savePkmsDeleteMutation.mutateAsync({
+                                saveId,
+                                params: {
+                                    pkmIds: canRemovePkms.map(pkm => pkm.id),
+                                },
+                            });
+                        }}
+                    >
+                        <Icon name='trash' solid forButton />
+                        {t('storage.actions.release')} ({canRemovePkms.length})
+                    </ButtonWithConfirm>}
                 </div>
             </TitledContainer>
         </div>

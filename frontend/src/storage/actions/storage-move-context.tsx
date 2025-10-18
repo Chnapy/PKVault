@@ -83,6 +83,7 @@ export const StorageMoveContext = {
             : pkmSaves.filter(pkmSave => pkmSave?.canMoveAttachedToMain).map(pkm => pkm.id);
 
         return {
+            moveCount: canClickIds.length,
             onClick: canClickIds.length > 0
                 ? (() => {
                     moveContext.setSelected({
@@ -91,6 +92,7 @@ export const StorageMoveContext = {
                     });
                 })
                 : undefined,
+            moveAttachedCount: canClickAttachedIds.length,
             onClickAttached: canClickAttachedIds.length > 0
                 ? (() => {
                     moveContext.setSelected({

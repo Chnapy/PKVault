@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStorageGetSavePkms, useStorageSaveDeletePkm } from '../../data/sdk/storage/storage.gen';
+import { useStorageGetSavePkms, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
 import { StorageDetailsBase } from '../../ui/storage-item-details/storage-details-base';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
@@ -47,7 +47,7 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({
     const { t } = useTranslate();
     const formContext = StorageDetailsForm.useContext();
 
-    const savePkmDeleteMutation = useStorageSaveDeletePkm();
+    const savePkmDeleteMutation = useStorageSaveDeletePkms();
 
     const savePkmQuery = useStorageGetSavePkms(saveId);
     // const pkmVersionsQuery = useStorageGetMainPkmVersions();
@@ -71,7 +71,9 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({
             onRelease={savePkm.canDelete
                 ? (() => savePkmDeleteMutation.mutateAsync({
                     saveId,
-                    pkmId: savePkm.id,
+                    params: {
+                        pkmIds: [ savePkm.id ]
+                    }
                 }))
                 : undefined
             }

@@ -84,10 +84,10 @@ public class StorageController : ControllerBase
         return await DataDTO.FromDataUpdateFlags(flags);
     }
 
-    [HttpPut("main/pkm/{pkmId}/detach-save")]
-    public async Task<ActionResult<DataDTO>> MainPkmDetachSave(string pkmId)
+    [HttpPut("main/pkm/detach-save")]
+    public async Task<ActionResult<DataDTO>> MainPkmDetachSave([FromQuery] string[] pkmIds)
     {
-        var flags = await StorageService.MainPkmDetachSave(pkmId);
+        var flags = await StorageService.MainPkmDetachSaves(pkmIds);
 
         return await DataDTO.FromDataUpdateFlags(flags);
     }
@@ -108,18 +108,18 @@ public class StorageController : ControllerBase
         return await DataDTO.FromDataUpdateFlags(flags);
     }
 
-    [HttpDelete("main/pkm-version/{pkmVersionId}")]
-    public async Task<ActionResult<DataDTO>> MainDeletePkmVersion(string pkmVersionId)
+    [HttpDelete("main/pkm-version")]
+    public async Task<ActionResult<DataDTO>> MainDeletePkmVersion([FromQuery] string[] pkmVersionIds)
     {
-        var flags = await StorageService.MainPkmVersionDelete(pkmVersionId);
+        var flags = await StorageService.MainPkmVersionsDelete(pkmVersionIds);
 
         return await DataDTO.FromDataUpdateFlags(flags);
     }
 
-    [HttpDelete("save/{saveId}/pkm/{pkmId}")]
-    public async Task<ActionResult<DataDTO>> SaveDeletePkm(uint saveId, string pkmId)
+    [HttpDelete("save/{saveId}/pkm")]
+    public async Task<ActionResult<DataDTO>> SaveDeletePkms(uint saveId, [FromQuery] string[] pkmIds)
     {
-        var flags = await StorageService.SaveDeletePkm(saveId, pkmId);
+        var flags = await StorageService.SaveDeletePkms(saveId, pkmIds);
 
         return await DataDTO.FromDataUpdateFlags(flags);
     }
@@ -140,10 +140,10 @@ public class StorageController : ControllerBase
         return await DataDTO.FromDataUpdateFlags(flags);
     }
 
-    [HttpPut("pkm/{id}/evolve")]
-    public async Task<ActionResult<DataDTO>> EvolvePkm(string id, uint? saveId)
+    [HttpPut("pkm/evolve")]
+    public async Task<ActionResult<DataDTO>> EvolvePkms([FromQuery] string[] ids, uint? saveId)
     {
-        var flags = await StorageService.EvolvePkm(saveId, id);
+        var flags = await StorageService.EvolvePkms(saveId, ids);
 
         return await DataDTO.FromDataUpdateFlags(flags);
     }
