@@ -29,29 +29,47 @@ export const StorageSelectContext = {
             })),
         });
 
+        return <context.Provider value={value}>
+            <StorageSelectContext.SanityCheck />
+            {children}
+        </context.Provider>;
+    },
+    SanityCheck: () => {
+        const { saveId, boxId, ids, removeId, clear } = StorageSelectContext.useValue();
+
+        const mainPkmsQuery = useStorageGetMainPkms();
+        const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
+
         const selectsNotDisplayed = Route.useSearch({
             select: (search) => {
-                if (value.value.ids.length === 0) {
+                if (ids.length === 0) {
                     return false;
                 }
 
-                if (value.value.saveId) {
-                    return search.saves?.[ value.value.saveId ]?.saveBoxId !== value.value.boxId;
+                if (saveId) {
+                    return search.saves?.[ saveId ]?.saveBoxId !== boxId;
                 }
 
-                return (search.mainBoxId ?? 0) !== value.value.boxId;
+                return (search.mainBoxId ?? 0) !== boxId;
             }
         });
 
         React.useEffect(() => {
             if (selectsNotDisplayed) {
-                value.setValue({ ids: [] });
-            }
-        }, [ selectsNotDisplayed, value ]);
+                clear();
+            } else {
+                const pkmList = saveId
+                    ? savePkmsQuery.data?.data ?? []
+                    : mainPkmsQuery.data?.data ?? [];
 
-        return <context.Provider value={value}>
-            {children}
-        </context.Provider>;
+                const obsoleteIds = ids.filter(id => !pkmList.find(pkm => pkm.id === id));
+                if (obsoleteIds.length > 0) {
+                    removeId(obsoleteIds);
+                }
+            }
+        }, [ selectsNotDisplayed, clear, removeId, ids, saveId, savePkmsQuery.data?.data, mainPkmsQuery.data?.data ]);
+
+        return null;
     },
     useValue: () => {
         const { value, setValue } = React.useContext(context);
@@ -59,8 +77,9 @@ export const StorageSelectContext = {
         const hasBox = (saveId: number | undefined, boxId: number) => value.saveId === saveId && value.boxId === boxId;
 
         return {
-            ids: value.ids,
             saveId: value.saveId,
+            boxId: value.boxId,
+            ids: value.ids,
             hasBox,
             hasPkm: (saveId: number | undefined, pkmId: string) => value.saveId === saveId && value.ids.includes(pkmId),
             addId: (saveId: number | undefined, boxId: number, pkmIds: string[]) => {
@@ -83,8 +102,12 @@ export const StorageSelectContext = {
                     });
                 }
             },
-            removeId: (pkmId: string) => {
-                const ids = value.ids.filter(id => id !== pkmId);
+            removeId: (pkmIds: string[]) => {
+                if (pkmIds.length === 0) {
+                    return;
+                }
+
+                const ids = value.ids.filter(id => !pkmIds.includes(id));
                 setValue(ids.length > 0
                     ? { ...value, ids }
                     : { ids });
@@ -114,7 +137,7 @@ export const StorageSelectContext = {
             onCheck: pkm && (!movingIds || movingIds.includes(pkmId))
                 ? ((e) => {
                     if (selectContext.hasPkm(saveId, pkmId)) {
-                        selectContext.removeId(pkmId);
+                        selectContext.removeId([ pkmId ]);
                     } else {
                         if (e.nativeEvent instanceof PointerEvent && e.nativeEvent.shiftKey) {
                             const selectedPkms = selectContext.ids.map(id => pkmList.find(pkm => pkm.id === id))

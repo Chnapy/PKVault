@@ -466,17 +466,6 @@ export const StorageMoveContext = {
 
         const clickInfos = getCanClick();
 
-        React.useEffect(() => {
-            if (pkmId
-                && selected?.ids.includes(pkmId)
-                && selected.target
-                && selected.target.saveId === saveId
-                && selected.target.boxId === dropBoxId
-                && selected.target.boxSlots.includes(dropBoxSlot)) {
-                setSelected(undefined);
-            }
-        }, [ dropBoxId, dropBoxSlot, saveId, pkmId, selected, setSelected ]);
-
         const onDrop = async () => {
             if (!selected || multipleSlotsInfos.length === 0) {
                 return;
@@ -512,8 +501,7 @@ export const StorageMoveContext = {
                     }
                 })
                 .finally(() => {
-                    // fallback if useEffect is not triggered for some reason
-                    setTimeout(() => setSelected(undefined), 150);
+                    setSelected(undefined);
                 });
         };
 

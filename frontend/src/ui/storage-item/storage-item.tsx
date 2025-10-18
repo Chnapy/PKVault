@@ -2,14 +2,15 @@ import { css, cx } from '@emotion/css';
 import React from "react";
 import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { useStaticData } from '../../hooks/use-static-data';
+import { useTranslate } from '../../translate/i18n';
 import { type ButtonLikeProps } from '../button/button-like';
 import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../button/button-with-disabled-popover';
 import { DetailsLevel } from '../details-card/details-level';
 import { SpeciesImg } from '../details-card/species-img';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
-import { theme } from '../theme';
 import { CheckboxInput, type CheckboxInputProps } from '../input/checkbox-input';
+import { theme } from '../theme';
 
 export type StorageItemProps =
   & ButtonLikeProps
@@ -64,6 +65,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
 
   ...rest
 }) => {
+  const { t } = useTranslate();
   const staticData = useStaticData();
 
   return (
@@ -90,6 +92,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
       helpTitle={helpTitle}
       extraContent={
         onCheck && !rest.disabled && !rest.loading && <div
+          title={t('storage.actions.select.help')}
           className={cx('checkbox', css({
             opacity: checked ? undefined : 0,
           }))}
