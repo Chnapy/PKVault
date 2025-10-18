@@ -308,7 +308,7 @@ public class BackupService
 
         await LocalSaveService.ReadLocalSaves();
 
-        await StorageService.ResetDataLoader();
+        await StorageService.ResetDataLoader(true);
     }
 
     public static async Task PrepareBackupThenRun(Func<Task> action)
@@ -325,7 +325,7 @@ public class BackupService
 
             await LocalSaveService.ReadLocalSaves();
 
-            await StorageService.ResetDataLoader();
+            await StorageService.ResetDataLoader(false);
         }
         catch
         {

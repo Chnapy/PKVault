@@ -26,10 +26,11 @@ public class SaveInfosController : ControllerBase
 
         await LocalSaveService.ReadLocalSaves();
 
-        await StorageService.ResetDataLoader();
+        await StorageService.ResetDataLoader(true);
 
         return await DataDTO.FromDataUpdateFlags(new()
         {
+            MainPkmVersions = true,
             Saves = [
                 new (){
                     SaveId = 0

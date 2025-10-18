@@ -18,7 +18,7 @@ public class SettingsService
 
         await LocalSaveService.ReadLocalSaves();
 
-        await StorageService.ResetDataLoader();
+        await StorageService.ResetDataLoader(true);
     }
 
     private static SettingsDTO GetSettings()

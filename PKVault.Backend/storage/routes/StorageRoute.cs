@@ -132,14 +132,6 @@ public class StorageController : ControllerBase
         return await DataDTO.FromDataUpdateFlags(flags);
     }
 
-    [HttpPut("save/{saveId}/pkm/synchronize")]
-    public async Task<ActionResult<DataDTO>> SaveSynchronizePkm(uint saveId, [BindRequired] string pkmVersionId)
-    {
-        var flags = await StorageService.SaveSynchronizePkm(saveId, pkmVersionId);
-
-        return await DataDTO.FromDataUpdateFlags(flags);
-    }
-
     [HttpPut("pkm/evolve")]
     public async Task<ActionResult<DataDTO>> EvolvePkms([FromQuery] string[] ids, uint? saveId)
     {

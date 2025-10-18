@@ -15,7 +15,7 @@ public class Program
             {
                 var staticDataTask = StaticDataService.PrepareStaticData();
                 await LocalSaveService.ReadLocalSaves();
-                await StorageService.ResetDataLoader();
+                await StorageService.ResetDataLoader(true);
                 await WarningsService.CheckWarnings();
                 await staticDataTask;
             });
@@ -53,7 +53,7 @@ public class Program
         if (args.Length > 0 && args[0] == "test-PB7")
         {
             await LocalSaveService.ReadLocalSaves();
-            await StorageService.ResetDataLoader();
+            await StorageService.ResetDataLoader(false);
             // await StorageService.SaveMovePkmFromStorage(
             //     4106192122,
             //     "G700754A1E359E2 5 5 14 11 1200",
@@ -88,7 +88,7 @@ public class Program
         if (args.Length > 0 && args[0] == "bench-save-pkm")
         {
             await LocalSaveService.ReadLocalSaves();
-            await StorageService.ResetDataLoader();
+            await StorageService.ResetDataLoader(false);
 
             var logtimeSavePkmAll = LogUtil.Time("Benchmark Save Pkms (all) perfs with 10 sequential calls", (550, 800));
             // List<PkmSaveDTO> savePkms = [];

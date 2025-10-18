@@ -129,4 +129,19 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
             throw;
         }
     }
+
+    public async Task CheckSaveToSynchronize()
+    {
+        foreach (var saveId in LocalSaveService.SaveById.Keys)
+        {
+            var pkmVersionsToSynchronize = await SynchronizePkmAction.GetPkmVersionsToSynchronize(loaders, saveId);
+            if (pkmVersionsToSynchronize.Length > 0)
+            {
+                await AddAction(
+                    new SynchronizePkmAction(saveId, pkmVersionsToSynchronize),
+                    null
+                );
+            }
+        }
+    }
 }

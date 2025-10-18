@@ -428,7 +428,7 @@ public class MovePkmAction(
 
         if (pkmDto!.SaveId != default)
         {
-            await new SynchronizePkmAction(sourceSaveId, pkmVersionEntity.Id).ExecuteWithPayload(loaders, flags);
+            await new SynchronizePkmAction(sourceSaveId, [pkmVersionEntity.Id]).ExecuteWithPayload(loaders, flags);
 
             if (!attached)
             {

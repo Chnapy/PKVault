@@ -28,7 +28,6 @@ export const StorageBoxMainActions: React.FC<
     const moveClickable = StorageMoveContext.useClickable(pkms.map(pkm => pkm.id), undefined);
 
     const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
-    // const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm();
     const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
     const evolvePkmsMutation = useStorageEvolvePkms();
 
@@ -47,21 +46,6 @@ export const StorageBoxMainActions: React.FC<
     });
 
     const canDetachPkms = pkms.filter(pkm => pkm.saveId);
-
-    // const canSynchronizePkms = pkms.filter(pkm => {
-    //   if (!pkm.saveId) {
-    //       return false;
-    //   }
-
-    //   const pkmVersions = mainPkmVersionQuery.data?.data.filter(pkmVersion => pkmVersion.pkmId === pkm.id) ?? [];
-    //   const pkmVersionsIds = pkmVersions.map(pkmVersion => pkmVersion.id);
-
-    //   const attachedSavePkm = pkmSavePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId && pkmVersionsIds.includes(savePkm.pkmVersionId));
-    //   const attachedPkmVersion = attachedSavePkm && pkmVersions.find(version => version.id === attachedSavePkm.pkmVersionId);
-    //   const saveSynchronized = attachedSavePkm?.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
-
-    //   return !!attachedPkmVersion && !saveSynchronized;
-    // });
 
     const canRemovePkms = pkms.map(pkm => {
         if (!pkm.canDelete) {
@@ -123,19 +107,6 @@ export const StorageBoxMainActions: React.FC<
                         <Icon name='logout' solid forButton />
                         {t('storage.actions.move-attached-main')} ({moveClickable.moveAttachedCount})
                     </ButtonWithDisabledPopover>}
-
-                    {/* {canSynchronizeIds.length > 0 && <Button
-                        bgColor={theme.bg.primary}
-                        onClick={() => savePkmSynchronizeMutation.mutateAsync({
-                            saveId: selectedPkm.saveId!,
-                            params: {
-                                pkmVersionId: attachedPkmVersion.id,
-                            }
-                        })}
-                    >
-                        <Icon name='link' solid forButton />
-                        {t('storage.actions.synchro')}
-                    </Button>} */}
 
                     {canEvolvePkms.length > 0 && <ButtonWithConfirm
                         anchor='right'

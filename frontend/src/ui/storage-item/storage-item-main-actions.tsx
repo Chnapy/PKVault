@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
-import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
+import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { getSaveOrder } from '../../storage/util/get-save-order';
@@ -31,7 +31,6 @@ export const StorageItemMainActions: React.FC = () => {
 
     const mainCreatePkmVersionMutation = useStorageMainCreatePkmVersion();
     const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
-    const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm();
     const evolvePkmsMutation = useStorageEvolvePkms();
 
     const selectedPkm = mainPkmQuery.data?.data.find(pkm => pkm.id === selected?.id);
@@ -51,8 +50,6 @@ export const StorageItemMainActions: React.FC = () => {
     const pageSaves = Object.values(saves).map(save => save && saveInfosQuery.data?.data?.[ save.saveId ]).filter(filterIsDefined);
 
     const attachedSavePkm = selectedPkm.saveId ? pkmSavePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId && pkmVersionsIds.includes(savePkm.pkmVersionId)) : undefined;
-    const attachedPkmVersion = attachedSavePkm && pkmVersions.find(version => version.id === attachedSavePkm.pkmVersionId);
-    const saveSynchronized = attachedSavePkm?.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
     const pkmVersionCanEvolve = pkmVersions.find(version => version.canEvolve);
 
@@ -70,7 +67,6 @@ export const StorageItemMainActions: React.FC = () => {
     const canEvolve = pkmVersionCanEvolve && !selectedPkm.saveId;
     const canDetach = !!selectedPkm.saveId;
     const canGoToSave = !!selectedPkm.saveId;
-    const canSynchronize = !!selectedPkm.saveId && !!attachedPkmVersion && !saveSynchronized;
 
     return <StorageItemMainActionsContainer pkmId={selectedPkm.id}>
         <div
@@ -145,19 +141,6 @@ export const StorageItemMainActions: React.FC = () => {
                 <Icon name='link' solid forButton />
                 {t('storage.actions.go-main')}
             </ButtonWithDisabledPopover>}
-
-            {canSynchronize && <Button
-                bgColor={theme.bg.primary}
-                onClick={() => savePkmSynchronizeMutation.mutateAsync({
-                    saveId: selectedPkm.saveId!,
-                    params: {
-                        pkmVersionId: attachedPkmVersion.id,
-                    }
-                })}
-            >
-                <Icon name='link' solid forButton />
-                {t('storage.actions.synchro')}
-            </Button>}
 
             <Button
                 onClick={formEditMode.startEdit}

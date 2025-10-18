@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveSynchronizePkm } from '../../data/sdk/storage/storage.gen';
+import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { useTranslate } from '../../translate/i18n';
@@ -27,7 +27,6 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
     const pkmSavePkmQuery = useStorageGetSavePkms(saveId ?? 0);
 
     const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
-    const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm();
     const evolvePkmsMutation = useStorageEvolvePkms();
 
     const selectedPkm = pkmSavePkmQuery.data?.data.find(pkm => pkm.id === selected?.id);
@@ -38,12 +37,9 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
     const attachedPkmVersion = selectedPkm.pkmVersionId ? mainPkmVersionQuery.data?.data.find(version => version.id === selectedPkm.pkmVersionId) : undefined;
     const attachedPkm = attachedPkmVersion && mainPkmQuery.data?.data.find(pkm => pkm.id === attachedPkmVersion.pkmId);
 
-    const saveSynchronized = selectedPkm.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
-
     const canEvolve = selectedPkm.canEvolve && !selectedPkm.pkmVersionId;
     const canDetach = !!selectedPkm.pkmVersionId;
     const canGoToMain = !!selectedPkm.pkmVersionId;
-    const canSynchronize = !!selectedPkm.pkmVersionId && !!attachedPkmVersion && !saveSynchronized;
 
     return <StorageItemSaveActionsContainer saveId={saveId} pkmId={selectedPkm.id}>
         <div
@@ -99,19 +95,6 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
                 <Icon name='link' solid forButton />
                 {t('storage.actions.go-save')}
             </ButtonWithDisabledPopover>}
-
-            {canSynchronize && <Button
-                bgColor={theme.bg.primary}
-                onClick={() => savePkmSynchronizeMutation.mutateAsync({
-                    saveId: selectedPkm.saveId!,
-                    params: {
-                        pkmVersionId: attachedPkmVersion.id,
-                    }
-                })}
-            >
-                <Icon name='link' solid forButton />
-                {t('storage.actions.synchro')}
-            </Button>}
 
             <Button
                 onClick={formEditMode.startEdit}

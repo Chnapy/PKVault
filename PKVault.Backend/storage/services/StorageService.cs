@@ -4,11 +4,6 @@ public class StorageService
 {
     private static DataMemoryLoader? _memoryLoader;
 
-    public static async Task Initialize()
-    {
-        await ResetDataLoader();
-    }
-
     public static async Task<List<BoxDTO>> GetMainBoxes()
     {
         var memoryLoader = await GetLoader();
@@ -130,13 +125,6 @@ public class StorageService
         );
     }
 
-    public static async Task<DataUpdateFlags> SaveSynchronizePkm(uint saveId, string pkmVersionId)
-    {
-        return await AddAction(
-            new SynchronizePkmAction(saveId, pkmVersionId)
-        );
-    }
-
     public static async Task<DataUpdateFlags> EvolvePkms(uint? saveId, string[] ids)
     {
         return await AddAction(
@@ -205,11 +193,16 @@ public class StorageService
         return _memoryLoader == null || _memoryLoader.actions.Count == 0;
     }
 
-    public static async Task<DataMemoryLoader> ResetDataLoader()
+    public static async Task<DataMemoryLoader> ResetDataLoader(bool checkSaveSynchro)
     {
         var logtime = LogUtil.Time($"Data-loader reset");
 
         _memoryLoader = await DataMemoryLoader.Create();
+
+        if (checkSaveSynchro)
+        {
+            await _memoryLoader.CheckSaveToSynchronize();
+        }
 
         logtime();
 
@@ -220,7 +213,7 @@ public class StorageService
     {
         var previousActions = (await GetLoader()).actions;
 
-        await ResetDataLoader();
+        await ResetDataLoader(false);
 
         var memoryLoader = await GetLoader();
 

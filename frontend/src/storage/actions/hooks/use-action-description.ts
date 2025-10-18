@@ -53,7 +53,8 @@ export const useActionDescription = () => {
                 name: parameters[ 1 ],
             }),
             [ DataActionType.PKM_SYNCHRONIZE ]: () => t('storage.save-actions.type.synchronize-pkm', {
-                name: parameters[ 0 ],
+                count: parameters[ 1 ] as number,
+                save: parameters[ 0 ],
             }),
             [ DataActionType.EVOLVE_PKM ]: () => t('storage.save-actions.type.evolve-pkm', {
                 save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ].name : t('storage.save-actions.part.storage'),

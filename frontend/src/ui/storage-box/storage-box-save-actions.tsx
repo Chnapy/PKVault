@@ -28,24 +28,12 @@ export const StorageBoxSaveActions: React.FC<
     const moveClickable = StorageMoveContext.useClickable(pkms.map(pkm => pkm.id), saveId);
 
     const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
-    // const savePkmSynchronizeMutation = useStorageSaveSynchronizePkm();
     const savePkmsDeleteMutation = useStorageSaveDeletePkms();
     const evolvePkmsMutation = useStorageEvolvePkms();
 
     if (pkms.length === 0 || !hasBox(saveId, boxId)) {
         return null;
     }
-
-    // const canSynchronizePkms = pkms.filter(pkm => {
-    //     if (!pkm.pkmVersionId) {
-    //         return false;
-    //     }
-
-    // const attachedPkmVersion = mainPkmVersionQuery.data?.data.find(version => version.id === pkm.pkmVersionId);
-    // const saveSynchronized = pkm.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
-
-    // return !!attachedPkmVersion && !saveSynchronized;
-    // });
 
     const canEvolvePkms = pkms.filter(pkm => !pkm.pkmVersionId && pkm.canEvolve);
 
@@ -110,19 +98,6 @@ export const StorageBoxSaveActions: React.FC<
                         <Icon name='logout' solid forButton />
                         {t('storage.actions.move-attached-save')} ({moveClickable.moveAttachedCount})
                     </ButtonWithDisabledPopover>}
-
-                    {/* {canSynchronizePkms.length > 0 && <Button
-                bgColor={theme.bg.primary}
-                onClick={() => savePkmSynchronizeMutation.mutateAsync({
-                    saveId,
-                    params: {
-                        pkmVersionId
-                    }
-                })}
-            >
-                <Icon name='link' solid forButton />
-                {t('storage.actions.synchro')}
-            </Button>} */}
 
                     {canEvolvePkms.length > 0 && <ButtonWithConfirm
                         anchor='right'

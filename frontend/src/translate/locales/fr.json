@@ -142,7 +142,7 @@
   "storage.save-actions.type.save-edit-pkm": "Éditer le pkm {{name}} de la sauvegarde {{save}}",
   "storage.save-actions.type.main-delete-pkm": "Supprimer la version gen.{{generation}} du pkm {{name}}",
   "storage.save-actions.type.save-delete-pkm": "Supprimer le pkm {{name}} depuis la sauvegarde {{save}}",
-  "storage.save-actions.type.synchronize-pkm": "Synchroniser le pkm {{name}} avec sa sauvegarde rattachée",
+  "storage.save-actions.type.synchronize-pkm": "Synchroniser {{count}} pkms avec la sauvegarde rattachée {{save}}",
   "storage.save-actions.type.evolve-pkm": "Évoluer le pkm {{name}} dans {{save}} de {{oldSpecies}} à {{newSpecies}}",
   "storage.actions.release": "Relacher"
 }
