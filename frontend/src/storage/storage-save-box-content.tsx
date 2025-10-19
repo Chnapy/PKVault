@@ -7,6 +7,7 @@ import {
   useStorageGetSaveBoxes,
   useStorageGetSavePkms,
 } from "../data/sdk/storage/storage.gen";
+import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from "../routes/storage";
 import { SaveItem } from '../saves/save-item/save-item';
 import type { DataOption } from '../ui/input/select-input';
@@ -26,7 +27,7 @@ export type StorageSaveBoxContentProps = {
   style?: React.CSSProperties;
 };
 
-export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = ({ saveId, boxId, order, style }) => {
+export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withErrorCatcher('default', ({ saveId, boxId, order, style }) => {
   const saveBoxIds = Route.useSearch({ select: (search) => search.saves?.[ saveId ]?.saveBoxIds }) ?? [ 0 ];
   const navigate = Route.useNavigate();
 
@@ -187,24 +188,24 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = ({ sa
         />}
       >
         {allItems.map((pkm, i) => {
-          if (!pkm
-            || (moveContext.selected?.saveId === saveId
-              && !moveContext.selected.target
-              && moveContext.selected.ids.includes(pkm.id)
-            )
-          ) {
-            return (
-              <StorageItemPlaceholder
-                key={i}
+          return <div
+            key={i}
+            style={{ order: i }}
+          >
+            {!pkm
+              || (moveContext.selected?.saveId === saveId
+                && !moveContext.selected.target
+                && moveContext.selected.ids.includes(pkm.id)
+              )
+              ? <StorageItemPlaceholder
                 saveId={saveId}
                 boxId={selectedBox.idInt}
                 boxSlot={i}
                 pkmId={pkm?.id}
               />
-            );
-          }
+              : <StorageSaveItem key={i} saveId={saveId} pkmId={pkm.id} />}
+          </div>;
 
-          return <StorageSaveItem key={i} saveId={saveId} pkmId={pkm.id} />;
         })}
 
         {moveContext.selected?.saveId === saveId && !moveContext.selected.target && (
@@ -215,4 +216,4 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = ({ sa
       <StorageBoxSaveActions saveId={saveId} boxId={selectedBox.idInt} anchor={(order % 2) ? 'left start' : 'right start'} />
     </Popover>
   );
-};
+});

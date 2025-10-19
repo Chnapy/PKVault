@@ -1,5 +1,6 @@
 import { css, cx } from '@emotion/css';
 import type React from "react";
+import { withErrorCatcher } from '../../error/with-error-catcher';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popover';
 import { theme } from '../theme';
@@ -11,7 +12,7 @@ export type StorageItemPlaceholderProps = {
   pkmId?: string; // for move drop/loading only
 };
 
-export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
+export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = withErrorCatcher('item', ({
   saveId,
   boxId,
   boxSlot,
@@ -40,9 +41,6 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
           }
         })
       )}
-      rootClassName={css({
-        order: boxSlot,
-      })}
       disabled={!moveDroppable.onClick}
       loading={moveLoading}
       onClick={moveDroppable.onClick}
@@ -54,4 +52,4 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = ({
       helpTitle={moveDroppable.helpText}
     />
   );
-};
+});

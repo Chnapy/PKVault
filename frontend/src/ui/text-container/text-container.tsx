@@ -1,5 +1,6 @@
 import { css, cx } from '@emotion/css';
 import type React from "react";
+import { ErrorCatcher } from '../../error/error-catcher';
 import { theme } from "../theme";
 
 export type TextContainerProps = {
@@ -70,7 +71,9 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
               height: 1,
             }}
           />
-          {children}
+          <ErrorCatcher>
+            {children}
+          </ErrorCatcher>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import type React from "react";
 import type { GameVersion } from '../../data/sdk/model';
+import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
 import { TextContainer } from "../text-container/text-container";
@@ -17,7 +18,7 @@ export type SaveCardContentSmallProps = {
   trainerGenderMale: boolean;
 };
 
-export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
+export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErrorCatcher('default', ({
   id,
   generation,
   tid,
@@ -81,4 +82,4 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
       </div>
     </div>
   );
-};
+});

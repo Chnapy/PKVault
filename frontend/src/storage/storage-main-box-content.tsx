@@ -7,6 +7,7 @@ import {
   useStorageGetMainBoxes,
   useStorageGetMainPkms
 } from "../data/sdk/storage/storage.gen";
+import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from "../routes/storage";
 import { useTranslate } from '../translate/i18n';
 import { ButtonWithConfirm } from '../ui/button/button-with-confirm';
@@ -26,7 +27,7 @@ import { StorageMainItem } from './storage-main-item';
 export const StorageMainBoxContent: React.FC<{
   boxId: number;
   style?: React.CSSProperties;
-}> = ({ boxId, style }) => {
+}> = withErrorCatcher('default', ({ boxId, style }) => {
   const { t } = useTranslate();
 
   const mainBoxIds = Route.useSearch({ select: (search) => search.mainBoxIds }) ?? [ 0 ];
@@ -163,24 +164,23 @@ export const StorageMainBoxContent: React.FC<{
         }
       >
         {allItems.map((pkm, i) => {
-          if (!pkm
-            || (moveContext.selected
-              && !moveContext.selected.saveId
-              && !moveContext.selected.target
-              && moveContext.selected.ids.includes(pkm.id)
-            )
-          ) {
-            return (
-              <StorageItemPlaceholder
-                key={i}
+          return <div
+            key={i}
+            style={{ order: i }}
+          >
+            {!pkm
+              || (moveContext.selected
+                && !moveContext.selected.saveId
+                && !moveContext.selected.target
+                && moveContext.selected.ids.includes(pkm.id)
+              )
+              ? <StorageItemPlaceholder
                 boxId={selectedBox.idInt}
                 boxSlot={i}
                 pkmId={pkm?.id}
               />
-            );
-          }
-
-          return <StorageMainItem key={i} pkmId={pkm.id} />;
+              : <StorageMainItem pkmId={pkm.id} />}
+          </div>;
         })}
 
         {moveContext.selected && !moveContext.selected.saveId && !moveContext.selected.target && (
@@ -191,4 +191,4 @@ export const StorageMainBoxContent: React.FC<{
       <StorageBoxMainActions boxId={selectedBox.idInt} anchor={'right start'} />
     </Popover>
   );
-};
+});

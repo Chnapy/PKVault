@@ -1,6 +1,7 @@
 import { PopoverButton } from '@headlessui/react';
 import React from 'react';
 import { useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
+import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from '../routes/storage';
 import { StorageItemPopover } from '../ui/storage-item/storage-item-popover';
 import { StorageSelectContext } from './actions/storage-select-context';
@@ -11,7 +12,7 @@ type StorageSaveItemProps = {
     pkmId: string;
 };
 
-export const StorageSaveItem: React.FC<StorageSaveItemProps> = React.memo(({ saveId, pkmId }) => {
+export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher('item', React.memo(({ saveId, pkmId }) => {
     const selected = Route.useSearch({ select: (search) => search.selected });
     const navigate = Route.useNavigate();
 
@@ -54,4 +55,4 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = React.memo(({ sav
             />}
         </StorageItemPopover>
     );
-});
+}));

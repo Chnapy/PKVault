@@ -8,7 +8,7 @@ type BackendError = {
 
 type BackendErrorsContext = {
     errors: BackendError[];
-    addError: (error: BackendError) => void;
+    addError: (error: BackendError | Error) => void;
     removeIndex: (index: number) => void;
 }
 
@@ -16,11 +16,22 @@ const context = React.createContext<BackendErrorsContext>({ errors: [], addError
 
 export const BackendErrorsContext = {
     Provider: ({ children }: React.PropsWithChildren) => {
-        const [ backendErrors, setBackendErrors ] = React.useState<BackendError[]>([]);
+        const [ backendErrors, setBackendErrors ] = React.useState<(BackendError)[]>([]);
 
         return <context.Provider value={{
             errors: backendErrors,
-            addError: error => setBackendErrors(errors => [ ...errors, error ]),
+            addError: error => setBackendErrors(errors => {
+                const alreadyExists = errors.some(err => err.stack === error.stack);
+                if (alreadyExists) {
+                    return errors;
+                }
+
+                return [ ...errors, {
+                    status: 'status' in error ? error.status : 0,
+                    message: error.message,
+                    stack: error.stack ?? '',
+                } ];
+            }),
             removeIndex: index => setBackendErrors(
                 backendErrors.filter((_, i) => i !== index)
             )

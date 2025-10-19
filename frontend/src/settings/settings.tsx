@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import type { SettingsMutableDTO } from '../data/sdk/model/settingsMutableDTO';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
+import { withErrorCatcher } from '../error/with-error-catcher';
 import { useTranslate } from '../translate/i18n';
 import { Button, ButtonLink } from '../ui/button/button';
 import { TitledContainer } from '../ui/container/titled-container';
@@ -11,7 +12,7 @@ import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
 import { SaveGlobsInput } from './save-globs-input';
 
-export const Settings: React.FC = () => {
+export const Settings: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
 
     const settingsQuery = useSettingsGet();
@@ -183,4 +184,4 @@ export const Settings: React.FC = () => {
             </div>}
         </form>
     </TitledContainer>;
-};
+});

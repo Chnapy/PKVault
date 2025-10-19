@@ -3,6 +3,7 @@ import React from 'react';
 import { Gender as GenderType } from '../data/sdk/model';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
+import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from '../routes/storage';
 import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
 import { StorageItemPopover } from '../ui/storage-item/storage-item-popover';
@@ -13,7 +14,7 @@ type StorageMainItemProps = {
     pkmId: string;
 };
 
-export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkmId }) => {
+export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher('item', React.memo(({ pkmId }) => {
     const selected = Route.useSearch({ select: (search) => search.selected });
     const saves = Route.useSearch({ select: (search) => search.saves }) ?? {};
     const navigate = Route.useNavigate();
@@ -105,4 +106,4 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
             />}
         </StorageItemPopover>
     );
-});
+}));

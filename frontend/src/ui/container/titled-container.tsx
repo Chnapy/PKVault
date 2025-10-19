@@ -1,4 +1,5 @@
 import React from 'react';
+import { ErrorCatcher } from '../../error/error-catcher';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { theme } from '../theme';
 import { Container, type ContainerProps } from './container';
@@ -46,29 +47,31 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
             ...containerProps.style,
         }}
     >
-        {title && <div
-            role={enableExpand ? 'button' : undefined}
-            onClick={enableExpand ? (() => setExpanded(!expanded)) : undefined}
-            style={{
-                backgroundColor: contrasted
-                    ? theme.bg.contrastdark
-                    : theme.bg.light,
-                padding: 4,
-                borderRadius: 2,
-                cursor: enableExpand ? 'pointer' : undefined,
-                userSelect: enableExpand ? 'none' : undefined,
-            }}
-        >{title}</div>}
+        <ErrorCatcher>
+            {title && <div
+                role={enableExpand ? 'button' : undefined}
+                onClick={enableExpand ? (() => setExpanded(!expanded)) : undefined}
+                style={{
+                    backgroundColor: contrasted
+                        ? theme.bg.contrastdark
+                        : theme.bg.light,
+                    padding: 4,
+                    borderRadius: 2,
+                    cursor: enableExpand ? 'pointer' : undefined,
+                    userSelect: enableExpand ? 'none' : undefined,
+                }}
+            >{title}</div>}
 
-        {children && expanded && <div
-            style={{
-                flexGrow: 1,
-                padding: 8,
-                overflowY: 'auto',
-                maxHeight,
-            }}
-        >
-            {children}
-        </div>}
+            {children && expanded && <div
+                style={{
+                    flexGrow: 1,
+                    padding: 8,
+                    overflowY: 'auto',
+                    maxHeight,
+                }}
+            >
+                {children}
+            </div>}
+        </ErrorCatcher>
     </Container>;
 };

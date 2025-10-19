@@ -21,6 +21,7 @@ export const theme = {
     default: "#101821",
     light: "#FFFFFF",
     primary: "#3050C8",
+    primaryLight: "#C0C0F8",
 
     red: "#F43F46",
   },

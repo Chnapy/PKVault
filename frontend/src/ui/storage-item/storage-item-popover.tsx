@@ -50,7 +50,6 @@ export const StorageItemPopover: React.FC<StorageItemPopoverProps> = ({
         <Popover
             draggable={true}
             className={css({
-                order: boxSlot,
                 position: 'relative',
                 display: 'inline-flex',
                 alignSelf: "flex-start",

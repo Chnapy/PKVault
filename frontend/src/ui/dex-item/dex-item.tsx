@@ -1,6 +1,7 @@
 import React from "react";
 import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { Gender as GenderType } from '../../data/sdk/model';
+import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useStaticData } from '../../hooks/use-static-data';
 import { SpeciesImg } from '../details-card/species-img';
 import { Gender } from '../gender/gender';
@@ -30,7 +31,7 @@ export const DexFormItem: React.FC<{
   caught: boolean;
   owned: boolean;
   ownedShiny: boolean;
-}> = ({ species, generation, form, genders, seen, caught, owned, ownedShiny }) => {
+}> = withErrorCatcher('item', ({ species, generation, form, genders, seen, caught, owned, ownedShiny }) => {
   const staticData = useStaticData();
 
   const pokeballSprite = getApiFullUrl(staticData.itemPokeball?.sprite ?? '');
@@ -101,4 +102,4 @@ export const DexFormItem: React.FC<{
       </div>
     </div>
   );
-};
+});

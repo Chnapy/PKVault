@@ -6,12 +6,13 @@ import { ButtonLike } from '../../ui/button/button-like';
 import { DexFormItem, type DexItemProps } from "../../ui/dex-item/dex-item";
 import { getSpeciesNO } from '../../ui/dex-item/util/get-species-no';
 import { theme } from '../../ui/theme';
+import { withErrorCatcher } from '../../error/with-error-catcher';
 
 export type PokedexItemProps = Pick<DexItemProps, 'species'> & {
   forms: Pick<DexItemForm, 'form' | 'generation' | 'gender' | 'isSeen' | 'isSeenShiny' | 'isCaught' | 'isOwned' | 'isOwnedShiny'>[];
 };
 
-export const PokedexItem: React.FC<PokedexItemProps> = React.memo(({
+export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', React.memo(({
   species,
   forms,
 }) => {
@@ -159,4 +160,4 @@ export const PokedexItem: React.FC<PokedexItemProps> = React.memo(({
       </div>
     </ButtonLike>
   );
-});
+}));

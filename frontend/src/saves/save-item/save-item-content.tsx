@@ -6,6 +6,7 @@ import {
   useSaveInfosGetAll
 } from "../../data/sdk/save-infos/save-infos.gen";
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
+import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useTranslate } from '../../translate/i18n';
 import { ButtonLink } from '../../ui/button/button';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
@@ -20,7 +21,7 @@ export type SaveItemContentProps = {
   showDelete?: boolean;
 };
 
-export const SaveItemContent: React.FC<SaveItemContentProps> = ({
+export const SaveItemContent: React.FC<SaveItemContentProps> = withErrorCatcher('default', ({
   saveId,
   onClose,
   showDelete,
@@ -78,4 +79,4 @@ export const SaveItemContent: React.FC<SaveItemContentProps> = ({
       </>}
     onClose={onClose}
   />;
-};
+});

@@ -1,5 +1,6 @@
 import React from "react";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
+import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
 import { TitledContainer } from '../../ui/container/titled-container';
@@ -8,7 +9,7 @@ import { usePokedexFilters } from "./hooks/use-pokedex-filters";
 import { PokedexCount } from './pokedex-count';
 import { PokedexItem, type PokedexItemProps } from "./pokedex-item";
 
-export const PokedexList: React.FC = () => {
+export const PokedexList: React.FC = withErrorCatcher('default', () => {
   // console.time("pokedex-list");
   const { t } = useTranslate();
 
@@ -121,4 +122,4 @@ export const PokedexList: React.FC = () => {
       </TitledContainer>)}
     </div>
   );
-};
+});

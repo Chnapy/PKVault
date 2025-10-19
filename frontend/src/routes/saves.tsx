@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type React from "react";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
+import { withErrorCatcher } from '../error/with-error-catcher';
 import { useStaticData } from '../hooks/use-static-data';
 import { SaveItem } from "../saves/save-item/save-item";
 import { useTranslate } from '../translate/i18n';
@@ -11,7 +12,7 @@ import { Icon } from '../ui/icon/icon';
 import { theme } from '../ui/theme';
 import { filterIsDefined } from '../util/filter-is-defined';
 
-const Saves: React.FC = () => {
+const Saves: React.FC = withErrorCatcher('default', () => {
   const { t } = useTranslate();
 
   const staticData = useStaticData();
@@ -89,7 +90,7 @@ const Saves: React.FC = () => {
       </Container>
     </div>
   );
-};
+});
 
 export const Route = createFileRoute("/saves")({
   component: Saves,

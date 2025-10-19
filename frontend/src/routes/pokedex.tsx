@@ -2,11 +2,15 @@ import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import React from "react";
 import z from "zod";
+import { ErrorCatcher } from '../error/error-catcher';
+import { withErrorCatcher } from '../error/with-error-catcher';
 import { PokedexDetails } from "../pokedex/details/pokedex-details";
 import { FiltersCard } from "../pokedex/filters/filters-card";
 import { PokedexList } from "../pokedex/list/pokedex-list";
 
-export const PokedexPage: React.FC = () => {
+export const PokedexPage: React.FC = withErrorCatcher('default', () => {
+  const navigate = Route.useNavigate();
+
   return (
     <div>
       <div>
@@ -31,11 +35,19 @@ export const PokedexPage: React.FC = () => {
           width: 350,
         }}
       >
-        <PokedexDetails />
+        <ErrorCatcher
+          onClose={() => navigate({
+            search: {
+              selected: undefined,
+            }
+          })}
+        >
+          <PokedexDetails />
+        </ErrorCatcher>
       </div>
     </div>
   );
-};
+});
 
 const searchSchema = z.object({
   selected: z.number().optional(),

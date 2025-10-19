@@ -1,5 +1,6 @@
 import type React from "react";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
+import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from "../routes/storage";
 import { SaveItem } from "../saves/save-item/save-item";
 import { useTranslate } from '../translate/i18n';
@@ -11,7 +12,7 @@ import { theme } from '../ui/theme';
 import { filterIsDefined } from '../util/filter-is-defined';
 import { getSaveOrder } from './util/get-save-order';
 
-export const StorageSaveSelect: React.FC = () => {
+export const StorageSaveSelect: React.FC = withErrorCatcher('default', () => {
   const { t } = useTranslate();
 
   const saves = Route.useSearch({ select: (search) => search.saves }) ?? {};
@@ -83,4 +84,4 @@ export const StorageSaveSelect: React.FC = () => {
       </div>
     </TitledContainer>
   );
-};
+});

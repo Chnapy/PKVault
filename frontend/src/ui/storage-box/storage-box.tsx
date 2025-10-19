@@ -1,4 +1,5 @@
 import type React from "react";
+import { ErrorCatcher } from '../../error/error-catcher';
 import { TitledContainer, type TitledContainerProps } from '../container/titled-container';
 
 export type StorageBoxProps = Pick<TitledContainerProps, 'ref' | 'style'> & {
@@ -28,15 +29,17 @@ export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
         </div>
       }
     >
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(6, 1fr)",
-          gap: 4,
-        }}
-      >
-        {children}
-      </div>
+      <ErrorCatcher>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(6, 1fr)",
+            gap: 4,
+          }}
+        >
+          {children}
+        </div>
+      </ErrorCatcher>
     </TitledContainer>
   );
 };

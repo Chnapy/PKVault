@@ -1,5 +1,6 @@
 import React from 'react';
 import { useStorageDeleteActions, useStorageGetActions, useStorageSave } from '../../data/sdk/storage/storage.gen';
+import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { TitledContainer } from '../../ui/container/titled-container';
@@ -7,7 +8,7 @@ import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
 import { useActionDescription } from './hooks/use-action-description';
 
-export const ActionsPanel: React.FC = () => {
+export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
 
     const actionsQuery = useStorageGetActions();
@@ -125,4 +126,4 @@ export const ActionsPanel: React.FC = () => {
             </Button>
         </div>
     </TitledContainer>;
-};
+});

@@ -1,5 +1,6 @@
 import { css } from "@emotion/css";
 import type React from "react";
+import { withErrorCatcher } from '../../error/with-error-catcher';
 import { Container } from "../../ui/container/container";
 import { FilterCaught } from "./components/filter-caught";
 import { FilterFromGames } from "./components/filter-from-games";
@@ -12,7 +13,7 @@ import { FilterTypes } from "./components/filter-types";
 import { ShowForms } from './components/show-forms';
 import { ShowGenders } from './components/show-genders';
 
-export const FiltersCard: React.FC = () => {
+export const FiltersCard: React.FC = withErrorCatcher('default', () => {
   return (
     <Container
       className={css({
@@ -79,4 +80,4 @@ export const FiltersCard: React.FC = () => {
       </div>
     </Container>
   );
-};
+});

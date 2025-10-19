@@ -3,6 +3,7 @@ import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import React from "react";
 import z from "zod";
+import { withErrorCatcher } from '../error/with-error-catcher';
 import { ActionsPanel } from '../storage/actions/actions-panel';
 import { StorageMoveContext } from '../storage/actions/storage-move-context';
 import { StorageSelectContext } from '../storage/actions/storage-select-context';
@@ -13,7 +14,7 @@ import { StorageSaveSelect } from "../storage/storage-save-select";
 import { StorageSearchCheck } from '../storage/storage-search-check';
 import { filterIsDefined } from '../util/filter-is-defined';
 
-export const Storage: React.FC = () => {
+export const Storage: React.FC = withErrorCatcher('default', () => {
   const selected = Route.useSearch({ select: (search) => search.selected });
   const saves = Route.useSearch({ select: (search) => search.saves }) ?? {};
 
@@ -104,7 +105,7 @@ export const Storage: React.FC = () => {
       </StorageSearchCheck>
     </StorageSelectContext.Provider>
   );
-};
+});
 
 export type StorageSearchSchema = z.infer<typeof searchSchema>;
 

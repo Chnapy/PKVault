@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useBackupDelete, useBackupGetAll, useBackupRestore } from '../../data/sdk/backup/backup.gen';
+import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useTranslate } from '../../translate/i18n';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { Container } from '../../ui/container/container';
@@ -7,7 +8,7 @@ import { TitledContainer } from '../../ui/container/titled-container';
 import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
 
-export const Backup: React.FC = () => {
+export const Backup: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
 
     const backupQuery = useBackupGetAll();
@@ -99,4 +100,4 @@ export const Backup: React.FC = () => {
             })}
         </div>
     </TitledContainer>
-}
+});
