@@ -33,7 +33,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = React.memo(({ pkm
     const pkmVersions = allPkmVersions.filter((value) => value.pkmId === pkmId);
     const pkmVersionsIds = pkmVersions.map(version => version.id);
 
-    if (!pkm || pkmVersions.length === 0) {
+    if (!pkm || !pkmVersions[ 0 ]) {
         return null;
     }
 

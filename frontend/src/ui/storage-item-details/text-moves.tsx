@@ -33,11 +33,11 @@ export const TextMoves: React.FC<TextMovesProps> = ({
 
     const staticData = useStaticData();
 
-    const getStaticMove = React.useCallback((moveId: number): StaticMove => {
+    const getStaticMove = React.useCallback((moveId: number): StaticMove | undefined => {
         const staticMove = staticData.moves[ moveId ];
 
         if (moveId === 237) {
-            return {
+            return staticMove && {
                 ...staticMove,
                 dataUntilGeneration: [ {
                     untilGeneration: 99,
@@ -56,9 +56,9 @@ export const TextMoves: React.FC<TextMovesProps> = ({
     const availableMoves = React.useMemo(() => [ ...availableMovesRaw ]
         .sort((a, b) => {
             const sa = getStaticMove(a);
-            const ga = sa.dataUntilGeneration.find(gen => gen.untilGeneration >= generation);
+            const ga = sa?.dataUntilGeneration.find(gen => gen.untilGeneration >= generation);
             const sb = getStaticMove(b);
-            const gb = sb.dataUntilGeneration.find(gen => gen.untilGeneration >= generation);
+            const gb = sb?.dataUntilGeneration.find(gen => gen.untilGeneration >= generation);
 
             const typeDiff = (ga?.type ?? 0) - (gb?.type ?? 0);
             if (typeDiff !== 0) {
@@ -72,7 +72,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
     return <>
         {ability > 0 && <>
             {t('details.ability')} <span style={{ color: theme.text.primary }}>{
-                staticData.abilities[ ability ].name
+                staticData.abilities[ ability ]?.name
             }</span>
             <br /><br />
         </>}
@@ -101,14 +101,14 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                                 availableMoves
                                     .map(move => {
                                         const staticMove = getStaticMove(move);
-                                        const forGen = staticMove.dataUntilGeneration.find(gen => gen.untilGeneration >= generation);
+                                        const forGen = staticMove?.dataUntilGeneration.find(gen => gen.untilGeneration >= generation);
                                         const disabled = formMoves.includes(move);
 
                                         return {
                                             value: move,
                                             option: forGen
                                                 ? <MoveItem
-                                                    name={staticMove.name}
+                                                    name={staticMove?.name ?? ''}
                                                     type={forGen.type}
                                                     category={forGen.category}
                                                     damage={forGen.power}
@@ -148,12 +148,12 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                 : <>
                     {moves.map((move, i) => {
                         const staticMove = getStaticMove(move);
-                        const forGen = staticMove.dataUntilGeneration.find(gen => gen.untilGeneration >= generation);
+                        const forGen = staticMove?.dataUntilGeneration.find(gen => gen.untilGeneration >= generation);
 
                         return forGen
                             ? <MoveItem
                                 key={i}
-                                name={staticMove.name}
+                                name={staticMove?.name ?? ''}
                                 type={forGen.type}
                                 category={forGen.category}
                                 damage={forGen.power}

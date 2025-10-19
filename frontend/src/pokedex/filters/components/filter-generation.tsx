@@ -4,6 +4,7 @@ import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
+import { filterIsDefined } from '../../../util/filter-is-defined';
 
 export const FilterGeneration: React.FC = () => {
   const { t } = useTranslate();
@@ -16,8 +17,8 @@ export const FilterGeneration: React.FC = () => {
 
   const dexAll = useDexGetAll().data?.data ?? {};
   const allGenerations = [ ...new Set(
-    Object.values(dexAll).flatMap(value => Object.values(value)).flatMap(value => staticData.species[ value.species ].generation)
-  ) ];
+    Object.values(dexAll).flatMap(value => Object.values(value)).flatMap(value => staticData.species[ value.species ]?.generation)
+  ) ].filter(filterIsDefined);
 
   const options = allGenerations.map((generation) => ({
     value: generation.toString(),

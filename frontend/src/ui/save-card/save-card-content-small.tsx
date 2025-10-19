@@ -64,7 +64,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = ({
           <span style={{ color: theme.text.red }}>{t('save.gen')} {generation}</span>
           {" - "}
           <span style={{ color: theme.text.primary }}>
-            {t('save.pkm')} {staticData.versions[ version ].name}
+            {t('save.pkm')} {staticData.versions[ version ]?.name}
           </span>
           {" - "}
           <span style={{ color: theme.text.primary }}>{id}</span>

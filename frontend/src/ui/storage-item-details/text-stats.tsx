@@ -108,7 +108,7 @@ export const TextStats: React.FC<TextStatsProps> = ({
         </table>
         <br />
         <MoveItem
-            name={staticData.moves[ 237 ].name}
+            name={staticData.moves[ 237 ]?.name ?? ''}
             type={hiddenPowerType}
             damage={hiddenPowerPower}
             category={hiddenPowerCategory}

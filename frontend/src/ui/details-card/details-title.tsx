@@ -11,7 +11,7 @@ export type DetailsTitleProps = {
 export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> = ({ version, showVersionName, children }) => {
     const staticData = useStaticData();
 
-    const generation = staticData.versions[ version ].generation;
+    const generation = staticData.versions[ version ]?.generation;
 
     return <>
         <img
@@ -20,7 +20,7 @@ export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> 
         />
 
         <div style={{ flexGrow: 1 }}>
-            G{generation}{showVersionName && ` / ${staticData.versions[ version ].name}`}
+            G{generation}{showVersionName && ` / ${staticData.versions[ version ]?.name}`}
         </div>
 
         {children}

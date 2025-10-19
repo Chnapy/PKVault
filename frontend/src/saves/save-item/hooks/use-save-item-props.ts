@@ -10,6 +10,9 @@ export const useSaveItemProps = () => {
         }
 
         const item = saveInfosQuery.data.data[ saveId ];
+        if (!item) {
+            return null;
+        }
 
         return {
             id: item.id,

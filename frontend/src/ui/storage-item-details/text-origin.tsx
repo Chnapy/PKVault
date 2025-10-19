@@ -42,7 +42,7 @@ export const TextOrigin: React.FC<TextOriginProps> = ({
                 width: '1lh',
                 verticalAlign: 'middle'
             }}
-        /> <span style={{ color: theme.text.primary }}>{t('save.pkm')} {versions[ version ].name}</span>
+        /> <span style={{ color: theme.text.primary }}>{t('save.pkm')} {versions[ version ]?.name}</span>
         <br />
         {t('save.ot')} <span style={{ color: theme.text.primary }}>{originTrainerName}</span> <Gender gender={originTrainerGender} /> - {t('details.tid')} <span style={{ color: theme.text.primary }}>{tid}</span>
         <br />

@@ -14,7 +14,7 @@ export const GameButton: React.FC<
   const { versions } = useStaticData();
   const { color } = getGameInfos(version);
 
-  const text = versions[ version ].name;
+  const text = versions[ version ]?.name;
 
   return (
     <Button bgColor={color} style={{ whiteSpace: 'nowrap' }} {...rest}>

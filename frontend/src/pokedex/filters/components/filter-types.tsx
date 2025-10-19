@@ -4,6 +4,7 @@ import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
+import { filterIsDefined } from '../../../util/filter-is-defined';
 
 export const FilterTypes: React.FC = () => {
   const { t } = useTranslate();
@@ -17,7 +18,7 @@ export const FilterTypes: React.FC = () => {
   const dexAll = useDexGetAll().data?.data ?? {};
   const allTypes = [ ...new Set(
     Object.values(dexAll).flatMap(value => Object.values(value)).flatMap(value => value.forms).flatMap(value => value.types)
-  ) ].map(type => staticData.types[ type ]);
+  ) ].map(type => staticData.types[ type ]).filter(filterIsDefined);
 
   return (
     <FilterSelect

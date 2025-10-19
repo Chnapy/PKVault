@@ -21,7 +21,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = React.memo(({
   const navigate = Route.useNavigate();
 
   const staticData = useStaticData();
-  const staticForms = staticData.species[ species ].forms;
+  const staticForms = staticData.species[ species ]?.forms;
 
   const seen = forms.some((spec) => spec.isSeen);
 
@@ -47,7 +47,11 @@ export const PokedexItem: React.FC<PokedexItemProps> = React.memo(({
   }, []);
 
   const content: React.ReactNode = groupsByForm.map((formGroup, i) => {
-    const hasGenderDifferences = staticForms[ formGroup[ 0 ].generation ][ formGroup[ 0 ].form ].hasGenderDifferences;
+    if (!formGroup[ 0 ]) {
+      return null;
+    }
+
+    const hasGenderDifferences = staticForms?.[ formGroup[ 0 ].generation ]?.[ formGroup[ 0 ].form ]?.hasGenderDifferences;
     const showGenders = showGendersRaw && hasGenderDifferences;
 
     if (!showForms && !showGenders) {

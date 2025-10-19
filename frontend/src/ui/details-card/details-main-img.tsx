@@ -44,7 +44,7 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, generat
             }}
         >
             {ball > 0 && <img
-                src={getApiFullUrl(staticData.items[ ball ].sprite)}
+                src={getApiFullUrl(staticData.items[ ball ]?.sprite ?? '')}
                 style={{
                     width: 30,
                     height: 30,

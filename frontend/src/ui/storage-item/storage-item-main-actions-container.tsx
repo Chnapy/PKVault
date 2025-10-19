@@ -16,7 +16,7 @@ export const StorageItemMainActionsContainer: React.FC<React.PropsWithChildren<{
     }
 
     const pkmVersions = mainPkmVersionQuery.data?.data.filter(version => version.pkmId === selectedPkm.id) ?? [];
-    if (pkmVersions.length === 0) {
+    if (!pkmVersions[ 0 ]) {
         return null;
     }
     const { nickname, level } = pkmVersions[ 0 ];

@@ -9,7 +9,7 @@ export const TypeItem: React.FC<TypeItemProps> = ({ type }) => {
 
     return <TypeItemBase
         type={type}
-        name={types[ type ].name}
+        name={types[ type ]?.name ?? ''}
         style={{
             display: 'inline-block',
             verticalAlign: 'top'

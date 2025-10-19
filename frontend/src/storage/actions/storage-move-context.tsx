@@ -198,15 +198,15 @@ export const StorageMoveContext = {
                     const selectedPkm = allPkms.find(pkm => pkm.id === pkmId);
                     const pkmSlot = selectedPkm!.boxSlot;
                     const pkmPos = [ pkmSlot % 6, ~~(pkmSlot / 6) ];
-                    const firstPkmPos = [ firstPkm.boxSlot % 6, ~~(firstPkm.boxSlot / 6) ];
-                    const posDiff = pkmPos.map((x, i) => x - firstPkmPos[ i ]);
+                    const firstPkmPos = [ (firstPkm?.boxSlot ?? 0) % 6, ~~((firstPkm?.boxSlot ?? 0) / 6) ];
+                    const posDiff = pkmPos.map((x, i) => x - firstPkmPos[ i ]!);
 
                     return createPortal(<div
                         ref={ref}
                         style={{
                             position: 'absolute',
-                            left: posDiff[ 0 ] * 102,
-                            top: posDiff[ 1 ] * 102,
+                            left: posDiff[ 0 ]! * 102,
+                            top: posDiff[ 1 ]! * 102,
                             pointerEvents: 'none',
                         }}>
                         {element}
@@ -498,7 +498,7 @@ export const StorageMoveContext = {
                 }
             })
                 .then(() => {
-                    if (selectContext.hasPkm(selected.saveId, selected.ids[ 0 ])) {
+                    if (selected.ids[ 0 ] && selectContext.hasPkm(selected.saveId, selected.ids[ 0 ])) {
                         selectContext.clear();
                     }
                 })

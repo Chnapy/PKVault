@@ -129,7 +129,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = ({ sa
               }
             }),
           })}
-          onPreviousBoxClick={previousBox.id === selectedBox.id
+          onPreviousBoxClick={!previousBox || previousBox.id === selectedBox.id
             ? undefined
             : () => navigate({
               search: ({ saves }) => ({
@@ -143,7 +143,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = ({ sa
                 }
               }),
             })}
-          onNextBoxClick={nextBox.id === selectedBox.id
+          onNextBoxClick={!nextBox || nextBox.id === selectedBox.id
             ? undefined
             : () => navigate({
               search: ({ saves }) => ({
@@ -157,7 +157,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = ({ sa
                 }
               }),
             })}
-          onSplitClick={saveBoxIds.length < 2 && nextBox.id !== selectedBox.id
+          onSplitClick={saveBoxIds.length < 2 && nextBox && nextBox.id !== selectedBox.id
             ? () => navigate({
               search: ({ saves }) => ({
                 saves: {

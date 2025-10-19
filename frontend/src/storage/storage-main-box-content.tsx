@@ -108,21 +108,21 @@ export const StorageMainBoxContent: React.FC<{
                 mainBoxIds: getMainBoxIds(Number(value)),
               },
             })}
-            onPreviousBoxClick={previousBox.id === selectedBox.id
+            onPreviousBoxClick={!previousBox || previousBox.id === selectedBox.id
               ? undefined
               : () => navigate({
                 search: {
                   mainBoxIds: getMainBoxIds(previousBox.idInt),
                 },
               })}
-            onNextBoxClick={nextBox.id === selectedBox.id
+            onNextBoxClick={!nextBox || nextBox.id === selectedBox.id
               ? undefined
               : () => navigate({
                 search: {
                   mainBoxIds: getMainBoxIds(nextBox.idInt),
                 },
               })}
-            onSplitClick={mainBoxIds.length < 2 && nextBox.id !== selectedBox.id
+            onSplitClick={mainBoxIds.length < 2 && nextBox && nextBox.id !== selectedBox.id
               ? () => navigate({
                 search: () => ({
                   mainBoxIds: [ boxId, nextBox.idInt ]

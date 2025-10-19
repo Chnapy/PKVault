@@ -123,8 +123,8 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
 
                     const queryKeyValue = query.queryKey[ 0 ];
 
-                    const isSaveBoxQuery = queryKeyValue.startsWith(saveBoxStart) && queryKeyValue.endsWith(saveBoxEnd);
-                    const isSavePkmQuery = queryKeyValue.startsWith(savePkmStart) && queryKeyValue.endsWith(savePkmEnd);
+                    const isSaveBoxQuery = queryKeyValue.startsWith(saveBoxStart!) && queryKeyValue.endsWith(saveBoxEnd!);
+                    const isSavePkmQuery = queryKeyValue.startsWith(savePkmStart!) && queryKeyValue.endsWith(savePkmEnd!);
 
                     return isSaveBoxQuery || isSavePkmQuery;
                   },

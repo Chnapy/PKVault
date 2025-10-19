@@ -8,6 +8,7 @@ import { Container } from '../ui/container/container';
 import { TitledContainer } from '../ui/container/titled-container';
 import { Icon } from '../ui/icon/icon';
 import { theme } from '../ui/theme';
+import { filterIsDefined } from '../util/filter-is-defined';
 import { getSaveOrder } from './util/get-save-order';
 
 export const StorageSaveSelect: React.FC = () => {
@@ -23,6 +24,7 @@ export const StorageSaveSelect: React.FC = () => {
   }
 
   const saveInfos = Object.values(saveInfosQuery.data.data)
+    .filter(filterIsDefined)
     .filter(saveInfos => !saves[ saveInfos.id ])
     .sort((a, b) => a.lastWriteTime > b.lastWriteTime ? -1 : 1);
 

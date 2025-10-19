@@ -9,6 +9,7 @@ import { Container } from '../ui/container/container';
 import { TitledContainer } from '../ui/container/titled-container';
 import { Icon } from '../ui/icon/icon';
 import { theme } from '../ui/theme';
+import { filterIsDefined } from '../util/filter-is-defined';
 
 const Saves: React.FC = () => {
   const { t } = useTranslate();
@@ -22,9 +23,11 @@ const Saves: React.FC = () => {
 
   const generations = [ ...new Set(Object.values(staticData.versions).map(version => version.generation)) ].sort();
 
-  const saveInfos = Object.values(saveInfosQuery.data.data).sort((a, b) => {
-    return a.lastWriteTime > b.lastWriteTime ? -1 : 1;
-  });
+  const saveInfos = Object.values(saveInfosQuery.data.data)
+    .filter(filterIsDefined)
+    .sort((a, b) => {
+      return a.lastWriteTime > b.lastWriteTime ? -1 : 1;
+    });
 
   return (
     <div
@@ -54,7 +57,7 @@ const Saves: React.FC = () => {
             return null;
           }
 
-          const maxSpecies = Math.max(...saves.map(save => staticData.versions[ save.version ].maxSpeciesId));
+          const maxSpecies = Math.max(...saves.map(save => staticData.versions[ save.version ]?.maxSpeciesId ?? 0));
 
           return <TitledContainer key={generation} title={t('saves.title', { generation, maxSpecies })}>
             <div

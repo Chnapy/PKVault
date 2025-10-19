@@ -1,11 +1,12 @@
 import React from "react";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
 import { useStaticData } from '../../hooks/use-static-data';
+import { useTranslate } from '../../translate/i18n';
 import { TitledContainer } from '../../ui/container/titled-container';
+import { filterIsDefined } from '../../util/filter-is-defined';
 import { usePokedexFilters } from "./hooks/use-pokedex-filters";
 import { PokedexCount } from './pokedex-count';
 import { PokedexItem, type PokedexItemProps } from "./pokedex-item";
-import { useTranslate } from '../../translate/i18n';
 
 export const PokedexList: React.FC = () => {
   // console.time("pokedex-list");
@@ -38,19 +39,19 @@ export const PokedexList: React.FC = () => {
     .filter(speciesValues => !isPkmFiltered(speciesValues));
 
   const itemsByGen: React.ReactNode[][] = filteredSpeciesList.reduce((acc, speciesValues) => {
-    const species = speciesValues[ 0 ].species;
-    const statics = staticData.species[ species ];
+    const species = speciesValues[ 0 ]!.species;
+    const staticGeneration = staticData.species[ species ]?.generation ?? -1;
 
     const nbrForms = Math.max(...speciesValues.map(value => value.forms.length));
     const forms: PokedexItemProps[ 'forms' ] = [];
     for (let i = 0; i < nbrForms; i++) {
-      const currentForms = speciesValues.map(value => value.forms[ i ]).filter(Boolean);
+      const currentForms = speciesValues.map(value => value.forms[ i ]).filter(filterIsDefined);
       const maxGeneration = Math.max(...currentForms.map(value => value.generation));
 
       forms.push({
-        form: currentForms[ 0 ].form,
+        form: currentForms[ 0 ]!.form,
         generation: maxGeneration,
-        gender: currentForms[ 0 ].gender,
+        gender: currentForms[ 0 ]!.gender,
         isSeen: currentForms.some(form => form.isSeen),
         isSeenShiny: currentForms.some(form => form.isSeenShiny),
         isCaught: currentForms.some(form => form.isCaught),
@@ -61,8 +62,8 @@ export const PokedexList: React.FC = () => {
 
     // if (new Set(forms.map(f => f.form)).size === 1) return acc;
 
-    const genAcc = acc[ statics.generation - 1 ] ?? [];
-    acc[ statics.generation - 1 ] = genAcc;
+    const genAcc = acc[ staticGeneration - 1 ] ?? [];
+    acc[ staticGeneration - 1 ] = genAcc;
     genAcc.push(
       <PokedexItem
         key={species}
@@ -102,7 +103,7 @@ export const PokedexList: React.FC = () => {
 
             <div style={{ float: 'right' }}>
               <PokedexCount
-                data={filteredSpeciesList.filter(speciesValues => staticData.species[ speciesValues[ 0 ].species ].generation === i + 1)}
+                data={filteredSpeciesList.filter(speciesValues => staticData.species[ speciesValues[ 0 ]?.species ?? -1 ]?.generation === i + 1)}
               />
             </div>
           </>

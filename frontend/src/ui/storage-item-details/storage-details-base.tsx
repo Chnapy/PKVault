@@ -40,13 +40,13 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
     const moveContext = StorageMoveContext.useValue();
 
     const staticData = useStaticData();
-    const staticForms = staticData.species[ pkm.species ].forms[ pkm.generation ];
+    const staticForms = staticData.species[ pkm.species ]?.forms[ pkm.generation ];
 
     const navigate = Route.useNavigate();
 
-    const formObj = staticForms[ pkm.form ] ?? staticForms[ 0 ];
+    const formObj = staticForms?.[ pkm.form ] ?? staticForms?.[ 0 ];
 
-    const speciesName = formObj.name;
+    const speciesName = formObj?.name;
 
     return <DetailsCardContainer
         bgColor={getGameInfos(pkm.version).color}
@@ -80,7 +80,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
                 id={pkm.id}
                 pid={pkm.pid}
                 species={pkm.species}
-                speciesName={speciesName}
+                speciesName={speciesName ?? ''}
                 nickname={pkm.nickname}
                 nicknameMaxLength={pkm.nicknameMaxLength}
                 // gender={pkm.gender}
@@ -113,9 +113,9 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
         content={
             <>
                 {!!pkm.heldItem && <TextContainer>
-                    {t('details.held-item')} <span style={{ color: theme.text.primary }}>{staticData.items[ pkm.heldItem ].name}</span> <img
-                        src={getApiFullUrl(staticData.items[ pkm.heldItem ].sprite)}
-                        alt={staticData.items[ pkm.heldItem ].name}
+                    {t('details.held-item')} <span style={{ color: theme.text.primary }}>{staticData.items[ pkm.heldItem ]?.name}</span> <img
+                        src={getApiFullUrl(staticData.items[ pkm.heldItem ]?.sprite ?? '')}
+                        alt={staticData.items[ pkm.heldItem ]?.name}
                         style={{
                             height: 24,
                             width: 24,
@@ -128,7 +128,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
                         nature={pkm.nature}
                         ivs={pkm.iVs}
                         evs={pkm.eVs}
-                        maxEv={staticData.versions[ pkm.version ].maxEV}
+                        maxEv={staticData.versions[ pkm.version ]?.maxEV ?? 0}
                         stats={pkm.stats}
                         hiddenPowerType={pkm.hiddenPowerType}
                         hiddenPowerPower={pkm.hiddenPowerPower}

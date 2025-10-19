@@ -27,7 +27,7 @@ export const PokedexCount: React.FC<PokedexCountProps> = ({ data }) => {
         gap: 4
     }}>
         <Icon name='eye' solid forButton /> <span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.forms.some(form => form.isSeen))}</span>
-        <img src={getApiFullUrl(staticData.itemPokeball.sprite)} style={{
+        <img src={getApiFullUrl(staticData.itemPokeball?.sprite ?? '')} style={{
             height: '1lh',
             verticalAlign: 'middle'
         }} /><span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.forms.some(form => form.isCaught))}</span>

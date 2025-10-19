@@ -40,7 +40,7 @@ export const StorageItemMainActions: React.FC = () => {
     }
 
     const pkmVersions = mainPkmVersionQuery.data?.data.filter(version => version.pkmId === selectedPkm.id) ?? [];
-    if (pkmVersions.length === 0) {
+    if (!pkmVersions[ 0 ]) {
         return null;
     }
     const pkmVersionsIds = pkmVersions.map(version => version.id);

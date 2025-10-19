@@ -17,13 +17,18 @@ type SpeciesImgProps = {
 export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, generation, form, isFemale, isShiny, isEgg, isShadow, small, ...imgProps }) => {
     const staticData = useStaticData();
 
-    const staticForms = staticData.species[ species ].forms[ generation ];
+    const staticForms = staticData.species[ species ]?.forms[ generation ];
 
     if (!staticForms?.[ form ]) {
         console.log('UNKNOWN FORM -', species, generation, form);
     }
 
-    const { name, spriteDefault, spriteFemale, spriteShiny, spriteShinyFemale } = staticForms[ form ] ?? staticForms[ 0 ];
+    const staticForm = staticForms?.[ form ] ?? staticForms?.[ 0 ];
+    if (!staticForm) {
+        return null;
+    }
+
+    const { name, spriteDefault, spriteFemale, spriteShiny, spriteShinyFemale } = staticForm;
 
     const getSpriteUrl = (): string => {
         if (isEgg) {

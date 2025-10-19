@@ -26,14 +26,14 @@ export const useActionDescription = () => {
             }),
             [ DataActionType.MOVE_PKM ]: () => t('storage.save-actions.type.move-pkm', {
                 pkmName: parameters[ 0 ],
-                sourceSave: typeof parameters[ 1 ] === 'number' ? staticData.versions[ parameters[ 1 ] ].name : t('storage.save-actions.part.storage'),
-                targetSave: typeof parameters[ 2 ] === 'number' ? staticData.versions[ parameters[ 2 ] ].name : t('storage.save-actions.part.storage'),
+                sourceSave: typeof parameters[ 1 ] === 'number' ? staticData.versions[ parameters[ 1 ] ?? -1 ]?.name : t('storage.save-actions.part.storage'),
+                targetSave: typeof parameters[ 2 ] === 'number' ? staticData.versions[ parameters[ 2 ] ?? -1 ]?.name : t('storage.save-actions.part.storage'),
                 targetBoxName: parameters[ 3 ],
                 targetBoxSlot: parameters[ 4 ],
                 attached: parameters[ 5 ] ? t('storage.save-actions.part.attached') : ''
             }),
             [ DataActionType.DETACH_PKM_SAVE ]: () => t('storage.save-actions.type.detach', {
-                save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ].name : null,
+                save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ?? -1 ]?.name : null,
                 name: parameters[ 1 ],
             }),
             [ DataActionType.EDIT_PKM_VERSION ]: () => t('storage.save-actions.type.main-edit-pkm', {
@@ -41,7 +41,7 @@ export const useActionDescription = () => {
                 generation: parameters[ 1 ],
             }),
             [ DataActionType.EDIT_PKM_SAVE ]: () => t('storage.save-actions.type.save-edit-pkm', {
-                save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ].name : null,
+                save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ?? -1 ]?.name : null,
                 name: parameters[ 1 ],
             }),
             [ DataActionType.DELETE_PKM_VERSION ]: () => t('storage.save-actions.type.main-delete-pkm', {
@@ -49,7 +49,7 @@ export const useActionDescription = () => {
                 generation: parameters[ 1 ],
             }),
             [ DataActionType.SAVE_DELETE_PKM ]: () => t('storage.save-actions.type.save-delete-pkm', {
-                save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ].name : null,
+                save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ?? -1 ]?.name : null,
                 name: parameters[ 1 ],
             }),
             [ DataActionType.PKM_SYNCHRONIZE ]: () => t('storage.save-actions.type.synchronize-pkm', {
@@ -57,10 +57,10 @@ export const useActionDescription = () => {
                 save: parameters[ 0 ],
             }),
             [ DataActionType.EVOLVE_PKM ]: () => t('storage.save-actions.type.evolve-pkm', {
-                save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ].name : t('storage.save-actions.part.storage'),
+                save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ?? -1 ]?.name : t('storage.save-actions.part.storage'),
                 name: parameters[ 1 ],
-                oldSpecies: staticData.species[ Number(parameters[ 2 ]) ].forms[ 9 ][ 0 ].name,
-                newSpecies: staticData.species[ Number(parameters[ 3 ]) ].forms[ 9 ][ 0 ].name,
+                oldSpecies: staticData.species[ Number(parameters[ 2 ] ?? -1) ]?.forms[ 9 ]?.[ 0 ]?.name,
+                newSpecies: staticData.species[ Number(parameters[ 3 ] ?? -1) ]?.forms[ 9 ]?.[ 0 ]?.name,
             }),
         })()
     };

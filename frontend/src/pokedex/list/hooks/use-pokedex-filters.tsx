@@ -17,7 +17,7 @@ export const usePokedexFilters = () => {
   const isPkmFiltered = (
     speciesValues: DexItemDTO[]
   ): boolean => {
-    if (speciesValues.length === 0) {
+    if (!speciesValues[ 0 ]) {
       return true;
     }
 
@@ -27,9 +27,9 @@ export const usePokedexFilters = () => {
     const ownedShiny = speciesValues.some((spec) => spec.forms.some(form => form.isOwnedShiny));
 
     if (filterSpeciesName) {
-      const name = staticData.species[ speciesValues[ 0 ].species ].forms[ 9 ][ 0 ].name;
+      const name = staticData.species[ speciesValues[ 0 ].species ]?.forms[ 9 ]?.[ 0 ]?.name;
 
-      if (!name.toLowerCase().includes(filterSpeciesName.toLowerCase())) {
+      if (!name?.toLowerCase().includes(filterSpeciesName.toLowerCase())) {
         return true;
       }
     }
@@ -37,7 +37,7 @@ export const usePokedexFilters = () => {
     if (filterTypes?.length) {
       if (
         filterTypes.some((type) =>
-          speciesValues[ 0 ].forms.every(form => form.types.every((t) => t !== type))
+          speciesValues[ 0 ]!.forms.every(form => form.types.every((t) => t !== type))
         )
       ) {
         return true;
@@ -79,7 +79,7 @@ export const usePokedexFilters = () => {
     if (filterGenerations?.length) {
       if (
         filterGenerations.every(
-          (generation) => generation !== staticData.species[ speciesValues[ 0 ].species ].generation
+          (generation) => generation !== staticData.species[ speciesValues[ 0 ]!.species ]?.generation
         )
       ) {
         return true;

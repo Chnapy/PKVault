@@ -19,7 +19,8 @@
     "strict": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true
   },
   "include": ["src", "scripts"]
 }

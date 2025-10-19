@@ -48,7 +48,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
             ))}
         </div>
 
-        <StorageDetailsForm.Provider
+        {pkmVersion && <StorageDetailsForm.Provider
             key={pkmVersion.id}
             nickname={pkmVersion.nickname}
             eVs={pkmVersion.eVs}
@@ -57,7 +57,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
             <InnerStorageDetailsMain
                 id={pkmVersion.id}
             />
-        </StorageDetailsForm.Provider>
+        </StorageDetailsForm.Provider>}
     </div>;
 };
 

@@ -33,7 +33,7 @@ export const DexFormItem: React.FC<{
 }> = ({ species, generation, form, genders, seen, caught, owned, ownedShiny }) => {
   const staticData = useStaticData();
 
-  const pokeballSprite = getApiFullUrl(staticData.itemPokeball.sprite);
+  const pokeballSprite = getApiFullUrl(staticData.itemPokeball?.sprite ?? '');
 
   // const caughtGamesColors = [ ...new Set(caughtVersions.map(getGameInfos).map(infos => infos.img)) ];
   // const seenOnlyGamesColors = [ ...new Set(seenOnlyVersions.map(getGameInfos).map(infos => infos.img)) ];

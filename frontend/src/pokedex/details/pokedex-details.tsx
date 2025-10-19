@@ -16,6 +16,7 @@ import { ShinyIcon } from '../../ui/icon/shiny-icon';
 import { SelectNumberInput } from '../../ui/input/select-input';
 import { TextContainer } from '../../ui/text-container/text-container';
 import { theme } from '../../ui/theme';
+import { filterIsDefined } from '../../util/filter-is-defined';
 import { PokedexDetailsOwned } from './pokedex-details-owned';
 import { getGameInfos } from './util/get-game-infos';
 
@@ -48,7 +49,7 @@ export const PokedexDetails: React.FC = () => {
   const gameSaves = speciesValues
     .filter((spec) => spec.forms.some(form => form.isSeen))
     .map((spec) => savesRecord[ spec.saveId ])
-    .filter(Boolean);
+    .filter(filterIsDefined);
 
   const selectedSave = (gameSaves[ selectedSaveIndex ] ?? gameSaves[ 0 ]) as SaveInfosDTO | undefined;
   const selectedSpeciesValue = selectedSave && speciesValues.find(
@@ -95,18 +96,16 @@ export const PokedexDetails: React.FC = () => {
     return null;
   }
 
-  const { forms } = staticData.species[ selectedSpecies ];
-  const staticForms = forms[ selectedSave.generation ];
-
-  const selectedFormSimilars = selectedSpeciesValue.forms.filter(form => form.form === selectedFormIndex);
-  const selectedFormGenders = selectedFormSimilars.map(form => form.gender);
-  const hasMultipleSeenGenders = selectedFormSimilars.filter(form => form.isSeen).length > 1;
-
-  const formObj = staticForms[ selectedFormIndex ] ?? staticForms[ 0 ];
+  const staticForms = staticData.species[ selectedSpecies ]?.forms[ selectedSave.generation ] ?? [];
+  const formObj = staticForms?.[ selectedFormIndex ] ?? staticForms?.[ 0 ];
 
   if (!selectedForm || !formObj) {
     return null;
   }
+
+  const selectedFormSimilars = selectedSpeciesValue.forms.filter(form => form.form === selectedFormIndex);
+  const selectedFormGenders = selectedFormSimilars.map(form => form.gender);
+  const hasMultipleSeenGenders = selectedFormSimilars.filter(form => form.isSeen).length > 1;
 
   const caught = selectedForm.isCaught;
   const owned = selectedShiny ? selectedForm.isOwnedShiny : selectedForm.isOwned;
@@ -154,7 +153,7 @@ export const PokedexDetails: React.FC = () => {
             isFemale={selectedGender === GenderType.Female}
             isOwned={owned}
             isShiny={selectedShiny}
-            ball={caught ? staticData.itemPokeball.id : undefined}
+            ball={caught ? staticData.itemPokeball?.id : undefined}
             shinyPart={selectedSave.generation > 1 && <ButtonLike
               onClick={() => setSelectedShiny(!selectedShiny)}
               disabled={!selectedForm.isOwnedShiny}
@@ -223,7 +222,7 @@ export const PokedexDetails: React.FC = () => {
           {selectedForm.abilities.length > 0 && <TextContainer>
             <span style={{ color: theme.text.primary }}>{t('details.abilities')}</span><br />
             {selectedForm.abilities.map(ability => <div key={ability}>{
-              staticData.abilities[ ability ].name
+              staticData.abilities[ ability ]?.name
             }</div>)}
             {/* {abilitiesHidden.map(ability => <div key={ability}>{ability} (caché)</div>)} */}
           </TextContainer>}

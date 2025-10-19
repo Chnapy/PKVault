@@ -112,7 +112,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
       <SpeciesImg species={species} generation={generation} form={form} isFemale={isFemale} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} small={small} />
 
       {heldItem > 0 && <img
-        src={getApiFullUrl(staticData.items[ heldItem ].sprite)}
+        src={getApiFullUrl(staticData.items[ heldItem ]?.sprite ?? '')}
         style={{
           position: 'absolute',
           bottom: 0,
