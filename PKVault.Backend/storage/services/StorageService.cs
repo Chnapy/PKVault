@@ -252,6 +252,81 @@ public class StorageService
         return _memoryLoader!;
     }
 
+    public static void CleanWrongData()
+    {
+        var time = LogUtil.Time("Clean wrong data");
+
+        var dbDir = SettingsService.AppSettings.SettingsMutable.DB_PATH;
+
+        var pkmMemoryLoader = new PKMMemoryLoader();
+        var pkmRealFileLoader = new PKMFileLoader();
+
+        var boxLoader = new EntityJSONLoader<BoxDTO, BoxEntity>(
+            filePath: Path.Combine(dbDir, "box.json"),
+            entityToDto: async entity => default,
+            dtoToEntity: dto => dto.BoxEntity
+        );
+
+        var pkmLoader = new EntityJSONLoader<PkmDTO, PkmEntity>(
+           filePath: Path.Combine(dbDir, "pkm.json"),
+            entityToDto: async entity => default,
+            dtoToEntity: dto => dto.PkmEntity
+        );
+
+        var pkmVersionLoader = new EntityJSONLoader<PkmVersionDTO, PkmVersionEntity>(
+           filePath: Path.Combine(dbDir, "pkm-version.json"),
+            entityToDto: async entity => default,
+            dtoToEntity: dto => dto.PkmVersionEntity
+        );
+
+        var boxEntities = boxLoader.GetAllEntities();
+        var pkmEntities = pkmLoader.GetAllEntities();
+
+        // remove pkmVersions with inconsistent data
+        pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
+        {
+            var pkmExists = pkmEntities.TryGetValue(pkmVersionEntity.PkmId, out var pkmEntity);
+            if (!pkmExists)
+            {
+                pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
+            }
+            else
+            {
+                var boxExists = boxEntities.TryGetValue(pkmEntity!.BoxId.ToString(), out var boxEntity);
+                if (!boxExists)
+                {
+                    pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
+                }
+                else
+                {
+                    try
+                    {
+                        pkmRealFileLoader.GetEntity(pkmVersionEntity.Filepath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine(ex);
+                        pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
+                    }
+                }
+            }
+        });
+
+        var pkmVersionEntities = pkmVersionLoader.GetAllEntities();
+
+        // remove pkms with inconsistent data
+        pkmEntities.Values.ToList().ForEach(pkmEntity =>
+        {
+            var pkmVersions = pkmVersionEntities.Values.ToList().FindAll(pkmVersion => pkmVersion.PkmId == pkmEntity.Id);
+            if (pkmVersions.Count == 0)
+            {
+                pkmLoader.DeleteEntity(pkmEntity.Id);
+            }
+        });
+
+        time();
+    }
+
     // public static void CleanMainStorageFiles()
     // {
     //     Stopwatch sw = new();

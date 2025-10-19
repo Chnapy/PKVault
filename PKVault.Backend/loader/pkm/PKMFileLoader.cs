@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public class PKMFileLoader : PKMLoader
 {
-    public override byte[]? GetEntity(string filepath)
+    public override byte[] GetEntity(string filepath)
     {
         var bytes = File.ReadAllBytes(filepath);
 

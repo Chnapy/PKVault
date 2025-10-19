@@ -50,10 +50,6 @@ public class DataFileLoader : DataLoader
         PKM getPkmVersionEntityPkm(PkmVersionEntity entity)
         {
             var pkmBytes = pkmFileLoader.GetEntity(entity.Filepath);
-            if (pkmBytes == default)
-            {
-                throw new Exception($"PKM-bytes is null, from entity Id={entity.Id} Filepath={entity.Filepath}");
-            }
             var pkm = PKMLoader.CreatePKM(pkmBytes, entity);
             if (pkm == default)
             {

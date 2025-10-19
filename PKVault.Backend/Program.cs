@@ -14,6 +14,7 @@ public class Program
         SetupTask ??= Task.Run(async () =>
             {
                 var staticDataTask = StaticDataService.PrepareStaticData();
+                StorageService.CleanWrongData();
                 await LocalSaveService.ReadLocalSaves();
                 await StorageService.ResetDataLoader(true);
                 await WarningsService.CheckWarnings();

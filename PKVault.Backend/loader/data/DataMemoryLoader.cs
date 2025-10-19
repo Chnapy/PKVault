@@ -65,10 +65,6 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
             pkmVersionEntities.Values.Select(async pkmVersionEntity =>
             {
                 var pkmBytes = pkmRealFileLoader.GetEntity(pkmVersionEntity.Filepath);
-                if (pkmBytes == default)
-                {
-                    throw new Exception($"PKM is null, Gen={pkmVersionEntity.Generation} Filepath={pkmVersionEntity.Filepath}");
-                }
 
                 var pkmEntity = pkmLoader.GetDto(pkmVersionEntity.PkmId);
 
