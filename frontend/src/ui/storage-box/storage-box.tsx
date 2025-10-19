@@ -1,18 +1,20 @@
 import type React from "react";
-import { TitledContainer } from '../container/titled-container';
+import { TitledContainer, type TitledContainerProps } from '../container/titled-container';
 
-export type StorageBoxProps = {
+export type StorageBoxProps = Pick<TitledContainerProps, 'ref' | 'style'> & {
   header: React.ReactNode;
 };
 
 export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
+  ref,
   header,
   children,
-  ...rest
+  style,
 }) => {
   return (
     <TitledContainer
-      {...rest}
+      ref={ref}
+      style={style}
       title={
         <div
           style={{

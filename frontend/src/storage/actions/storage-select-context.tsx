@@ -47,10 +47,10 @@ export const StorageSelectContext = {
                 }
 
                 if (saveId) {
-                    return search.saves?.[ saveId ]?.saveBoxId !== boxId;
+                    return !search.saves?.[ saveId ]?.saveBoxIds.includes(boxId!);
                 }
 
-                return (search.mainBoxId ?? 0) !== boxId;
+                return !(search.mainBoxIds ?? [ 0 ]).includes(boxId ?? 0);
             }
         });
 

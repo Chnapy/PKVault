@@ -16,7 +16,7 @@ export const StorageSelectAll: React.FC<{
         ? savePkmsQuery.data?.data.filter(item => item.boxId === boxId) ?? []
         : mainPkmsQuery.data?.data.filter(item => item.boxId === boxId) ?? [];
 
-    const ids = selectContext.saveId === saveId ? selectContext.ids : [];
+    const ids = selectContext.saveId === saveId && selectContext.boxId === boxId ? selectContext.ids : [];
 
     const state = ids.length === 0
         ? 'unselected'

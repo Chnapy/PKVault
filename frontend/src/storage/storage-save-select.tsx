@@ -53,7 +53,7 @@ export const StorageSaveSelect: React.FC = () => {
                     ...saves,
                     [ save.id ]: {
                       saveId: save.id,
-                      saveBoxId: 0,
+                      saveBoxIds: [ 0 ],
                       order: getSaveOrder(saves, save.id),
                     }
                   },

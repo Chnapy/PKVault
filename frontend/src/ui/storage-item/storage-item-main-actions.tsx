@@ -128,7 +128,7 @@ export const StorageItemMainActions: React.FC = () => {
                             ...saves,
                             [ selectedPkm.saveId ]: {
                                 saveId: selectedPkm.saveId,
-                                saveBoxId: attachedSavePkm?.boxId ?? 0,
+                                saveBoxIds: [ attachedSavePkm?.boxId ?? 0 ],
                                 order: getSaveOrder(saves, selectedPkm.saveId),
                             }
                         } : saves,

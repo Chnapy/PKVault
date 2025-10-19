@@ -36,9 +36,10 @@ export const StorageSearchCheck: React.FC<React.PropsWithChildren> = ({ children
             // }
         }
 
-        if (storageSearch.mainBoxId !== undefined && mainBoxesQuery.data?.data.every(box => box.id !== storageSearch.mainBoxId!.toString())) {
+        if (storageSearch.mainBoxIds && storageSearch.mainBoxIds.length > 0 && mainBoxesQuery.data
+            && storageSearch.mainBoxIds.some(id => mainBoxesQuery.data.data.every(box => box.id !== id.toString()))) {
             return {
-                mainBoxId: undefined,
+                mainBoxIds: undefined,
             };
         }
 
@@ -49,7 +50,7 @@ export const StorageSearchCheck: React.FC<React.PropsWithChildren> = ({ children
                 selected: undefined,
             };
         }
-    }, [ mainBoxesQuery.data?.data, mainPkmsQuery.data?.data, saveInfosQuery.data, storageSearch ]);
+    }, [ mainBoxesQuery.data, mainPkmsQuery.data, saveInfosQuery.data, storageSearch.mainBoxIds, storageSearch.saves, storageSearch.selected ]);
 
     React.useEffect(() => {
         if (redirectSearch) {

@@ -74,7 +74,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
                 as={Button}
                 onClick={() => navigate({
                     search: ({ saves }) => ({
-                        mainBoxId: attachedPkm?.boxId,
+                        mainBoxIds: attachedPkm && [ attachedPkm.boxId ],
                         selected: {
                             id: attachedPkmVersion.pkmId,
                         },
@@ -82,7 +82,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
                             ...saves,
                             [ selectedPkm.saveId ]: {
                                 saveId: selectedPkm.saveId,
-                                saveBoxId: selectedPkm.boxId,
+                                saveBoxIds: [ selectedPkm.boxId ],
                                 order: getSaveOrder(saves, selectedPkm.saveId),
                             }
                         },

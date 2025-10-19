@@ -120,11 +120,11 @@ const searchSchema = z.object({
     z.number().int(),
     z.object({
       saveId: z.number().int(),
-      saveBoxId: z.number().int(),
+      saveBoxIds: z.array(z.number().int()),
       order: z.number().int(),
     }).optional()
   ).optional(),
-  mainBoxId: z.number().int().optional(),
+  mainBoxIds: z.array(z.number().int()).optional(),
 });
 
 export const Route = createFileRoute("/storage")({

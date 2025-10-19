@@ -69,7 +69,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
                         ...saves,
                         [ saveId ]: {
                             saveId,
-                            saveBoxId: savePkm.boxId,
+                            saveBoxIds: [ savePkm.boxId ],
                             order: getSaveOrder(saves, saveId),
                         }
                     }

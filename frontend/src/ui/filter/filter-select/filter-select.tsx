@@ -17,7 +17,7 @@ import { Icon } from '../../icon/icon';
 
 export type FilterSelectProps = FilterLabelProps &
   ListboxProps<React.ElementType, string[]> & {
-    options: { value: string; label: React.ReactNode }[];
+    options: { value: string; label: React.ReactNode; disabled?: boolean; }[];
     triggerOnHover?: boolean;
   };
 
@@ -75,15 +75,20 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
               maxHeight={300}
             // style={{ margin: 2, marginTop: 6 }}
             >
-              {options.map(({ value, label }, i) => (
+              {options.map(({ value, label, disabled }, i) => (
                 <ListboxOption
                   key={value}
                   value={value}
-                  style={{ marginTop: i ? 2 : 0 }}
+                  style={{
+                    marginTop: i ? 2 : 0,
+                    opacity: disabled ? 0.75 : undefined,
+                    pointerEvents: disabled ? 'none' : undefined,
+                  }}
                   onPointerEnter={getHoverEventHandler((ev) => {
                     (ev.target as HTMLElement).click();
                   })}
                   onPointerLeave={getHoverEventHandler(() => null)}
+                  disabled={disabled}
                 >
                   <FilterLabel
                     enabled={hasValue(value)}

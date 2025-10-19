@@ -38,15 +38,15 @@ export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({ pkmId }) =
             <Button onClick={() => navigate({
                 to: '/storage',
                 search: ({ saves }) => ({
-                    mainBoxId: pkm.boxId,
+                    mainBoxIds: [ pkm.boxId ],
                     selected: {
                         id: pkm.id,
                     },
                     saves: pkm.saveId ? {
                         ...saves,
-                        [ pkm.saveId ]: {
+                        [ pkm.saveId ]: saves?.[ pkm.saveId ] ?? {
                             saveId: pkm.saveId,
-                            saveBoxId: 0,
+                            saveBoxIds: [ 0 ],
                             order: getSaveOrder(saves, pkm.saveId),
                         }
                     } : saves,
