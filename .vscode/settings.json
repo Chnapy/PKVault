@@ -4,7 +4,8 @@
     "**/dist": true,
     "**/bin": true,
     "**/obj": true,
-    "**/wwwroot": true
+    "**/wwwroot": true,
+    "**/tmp": true
   },
   "i18n-ally.localesPaths": [
     "frontend/src/translate/locales"

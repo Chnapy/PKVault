@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
     dtoToEntity: item => item,
-    entityToDto: async item => item
+    entityToDto: item => item
 )
 {
     public override Dictionary<string, BoxDTO> GetAllEntities()
@@ -79,5 +79,10 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
     public override void SetAllEntities(Dictionary<string, BoxDTO> entities)
     {
         throw new Exception($"Not implemented");
+    }
+
+    public override void WriteToFile()
+    {
+        throw new NotImplementedException();
     }
 }

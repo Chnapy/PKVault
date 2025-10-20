@@ -23,7 +23,7 @@ public class MovePkmAction(
 
             if (sourceSaveId == null && targetSaveId == null)
             {
-                return await MainToMain(loaders, flags, pkmId, targetBoxSlot);
+                return MainToMain(loaders, flags, pkmId, targetBoxSlot);
             }
 
             if (sourceSaveId == null && targetSaveId != null)
@@ -36,7 +36,7 @@ public class MovePkmAction(
                 return await SaveToMain(loaders, flags, pkmId, targetBoxSlot);
             }
 
-            return await SaveToSave(loaders, flags, pkmId, targetBoxSlot);
+            return SaveToSave(loaders, flags, pkmId, targetBoxSlot);
         }
 
         // pkmId, pkmSlot, targetSlot
@@ -49,7 +49,7 @@ public class MovePkmAction(
         {
             for (var i = 0; i < pkmIds.Length; i++)
             {
-                var pkmSlot = await GetPkmSlot(loaders, sourceSaveId, pkmIds[i]);
+                var pkmSlot = GetPkmSlot(loaders, sourceSaveId, pkmIds[i]);
                 entries.Add((pkmIds[i], pkmSlot, targetBoxSlots[i]));
             }
 
@@ -81,28 +81,28 @@ public class MovePkmAction(
         return payloads[0];
     }
 
-    private static async Task<int> GetPkmSlot(DataEntityLoaders loaders, uint? saveId, string pkmId)
+    private static int GetPkmSlot(DataEntityLoaders loaders, uint? saveId, string pkmId)
     {
         if (saveId == null)
         {
-            var mainDto = await loaders.pkmLoader.GetDto(pkmId);
+            var mainDto = loaders.pkmLoader.GetDto(pkmId);
             return (int)mainDto.BoxSlot;
         }
 
         var saveLoaders = loaders.saveLoadersDict[(uint)saveId];
-        var saveDto = await saveLoaders.Pkms.GetDto(pkmId);
+        var saveDto = saveLoaders.Pkms.GetDto(pkmId);
         return saveDto.BoxSlot;
     }
 
-    private async Task<DataActionPayload> MainToMain(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
+    private DataActionPayload MainToMain(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
     {
-        var dto = await loaders.pkmLoader.GetDto(pkmId);
+        var dto = loaders.pkmLoader.GetDto(pkmId);
         if (dto == default)
         {
             throw new KeyNotFoundException("Pkm not found");
         }
 
-        var pkmAlreadyPresent = (await loaders.pkmLoader.GetAllDtos()).Find(pkm =>
+        var pkmAlreadyPresent = loaders.pkmLoader.GetAllDtos().Find(pkm =>
             pkm.Id != pkmId
             && pkm.BoxId == targetBoxId
             && pkm.BoxSlot == targetBoxSlot
@@ -121,8 +121,8 @@ public class MovePkmAction(
 
         flags.MainPkms = true;
 
-        var pkmName = (await loaders.pkmVersionLoader.GetDto(pkmId))?.Nickname;
-        var boxName = (await loaders.boxLoader.GetDto(targetBoxId.ToString()))?.Name;
+        var pkmName = loaders.pkmVersionLoader.GetDto(pkmId)?.Nickname;
+        var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
 
         return new()
         {
@@ -131,13 +131,13 @@ public class MovePkmAction(
         };
     }
 
-    private async Task<DataActionPayload> SaveToSave(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
+    private DataActionPayload SaveToSave(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
     {
         var sourceSaveLoaders = loaders.saveLoadersDict[(uint)sourceSaveId!];
         var targetSaveLoaders = loaders.saveLoadersDict[(uint)targetSaveId!];
         var notSameSave = sourceSaveId != targetSaveId;
 
-        var sourcePkmDto = await sourceSaveLoaders.Pkms.GetDto(pkmId);
+        var sourcePkmDto = sourceSaveLoaders.Pkms.GetDto(pkmId);
         if (sourcePkmDto == default)
         {
             throw new KeyNotFoundException($"Save Pkm not found, id={pkmId}");
@@ -153,29 +153,29 @@ public class MovePkmAction(
             throw new ArgumentException($"Save Pkm not compatible with save for id={sourcePkmDto.Id}, generation={sourcePkmDto.Generation}, save.generation={targetSaveLoaders.Save.Generation}");
         }
 
-        if (!SaveInfosDTO.IsSpeciesAllowed(sourcePkmDto.Pkm.Species, targetSaveLoaders.Save))
+        if (!SaveInfosDTO.IsSpeciesAllowed(sourcePkmDto.Species, targetSaveLoaders.Save))
         {
             throw new ArgumentException($"Save Pkm Species not compatible with save for id={sourcePkmDto.Id}, species={sourcePkmDto.Species}, save.maxSpecies={targetSaveLoaders.Save.MaxSpeciesID}");
         }
 
-        var targetPkmDto = await targetSaveLoaders.Pkms.GetDto(targetBoxId, targetBoxSlot);
+        var targetPkmDto = targetSaveLoaders.Pkms.GetDto(targetBoxId, targetBoxSlot);
         if (targetPkmDto != null && !targetPkmDto.CanMove)
         {
             throw new ArgumentException("Save Pkm cannot move");
         }
 
-        await sourceSaveLoaders.Pkms.DeleteDto(sourcePkmDto.Id);
+        sourceSaveLoaders.Pkms.DeleteDto(sourcePkmDto.Id);
 
         if (targetPkmDto != null)
         {
-            var switchedSourcePkmDto = await PkmSaveDTO.FromPkm(sourceSaveLoaders.Save, targetPkmDto.Pkm, sourcePkmDto.BoxId, sourcePkmDto.BoxSlot);
-            await sourceSaveLoaders.Pkms.WriteDto(switchedSourcePkmDto);
+            var switchedSourcePkmDto = PkmSaveDTO.FromPkm(sourceSaveLoaders.Save, targetPkmDto.Pkm, sourcePkmDto.BoxId, sourcePkmDto.BoxSlot);
+            sourceSaveLoaders.Pkms.WriteDto(switchedSourcePkmDto);
         }
 
         sourcePkmDto.BoxId = targetBoxId;
         sourcePkmDto.BoxSlot = targetBoxSlot;
 
-        await targetSaveLoaders.Pkms.WriteDto(sourcePkmDto);
+        targetSaveLoaders.Pkms.WriteDto(sourcePkmDto);
 
         sourceSaveLoaders.Pkms.FlushParty();
         targetSaveLoaders.Pkms.FlushParty();
@@ -195,7 +195,7 @@ public class MovePkmAction(
             SavePkms = true
         });
 
-        var boxName = (await targetSaveLoaders.Boxes.GetDto(targetBoxId.ToString()))?.Name;
+        var boxName = targetSaveLoaders.Boxes.GetDto(targetBoxId.ToString())?.Name;
 
         return new()
         {
@@ -210,18 +210,18 @@ public class MovePkmAction(
 
         if (attached)
         {
-            var hasDuplicates = (await saveLoaders.Pkms.GetAllDtos()).Any(dto => dto.IdBase == pkmId);
+            var hasDuplicates = saveLoaders.Pkms.GetAllDtos().Any(dto => dto.IdBase == pkmId);
             if (hasDuplicates)
             {
                 throw new ArgumentException($"Target save already have a pkm with same ID, move attached cannot be done.");
             }
         }
 
-        var relatedPkmVersionDtos = (await loaders.pkmVersionLoader.GetAllDtos())
+        var relatedPkmVersionDtos = loaders.pkmVersionLoader.GetAllDtos()
             .FindAll(version => version.PkmId == pkmId);
-        var pkmDto = await loaders.pkmLoader.GetDto(pkmId);
+        var pkmDto = loaders.pkmLoader.GetDto(pkmId);
 
-        var existingSlot = await saveLoaders.Pkms.GetDto(targetBoxId, targetBoxSlot);
+        var existingSlot = saveLoaders.Pkms.GetDto(targetBoxId, targetBoxSlot);
         if (attached && existingSlot != null)
         {
             throw new ArgumentException("Switch not possible with attached move");
@@ -238,7 +238,7 @@ public class MovePkmAction(
 
         CheckG3PkmTradeRecord(saveLoaders.Save);
 
-        var boxName = (await saveLoaders.Boxes.GetDto(targetBoxId.ToString()))?.Name;
+        var boxName = saveLoaders.Boxes.GetDto(targetBoxId.ToString())?.Name;
 
         return new()
         {
@@ -260,21 +260,21 @@ public class MovePkmAction(
             }
         }
 
-        var savePkm = await saveLoaders.Pkms.GetDto(pkmId);
+        var savePkm = saveLoaders.Pkms.GetDto(pkmId)
+            ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
+        var pkmDto = loaders.pkmLoader.GetDto(pkmId);
 
-        var pkmDto = await loaders.pkmLoader.GetDto(pkmId);
-
-        var existingSlot = (await loaders.pkmLoader.GetAllDtos()).Find(dto => dto.BoxId == targetBoxId && dto.BoxSlot == targetBoxSlot);
+        var existingSlot = loaders.pkmLoader.GetAllDtos().Find(dto => dto.BoxId == targetBoxId && dto.BoxSlot == targetBoxSlot);
         if (attached && existingSlot != null)
         {
             throw new ArgumentException("Switch not possible with attached move");
         }
         var relatedPkmVersionDtos = existingSlot != null
-            ? (await loaders.pkmVersionLoader.GetAllDtos()).FindAll(version => version.PkmId == existingSlot.Id)
+            ? loaders.pkmVersionLoader.GetAllDtos().FindAll(version => version.PkmId == existingSlot.Id)
             : [];
 
         await SaveToMainWithoutCheckTarget(
-                loaders, flags, (uint)sourceSaveId, (uint)targetBoxId, (uint)targetBoxSlot, savePkm!
+                loaders, flags, (uint)sourceSaveId, (uint)targetBoxId, (uint)targetBoxSlot, savePkm
             );
 
         if (existingSlot != null)
@@ -288,7 +288,7 @@ public class MovePkmAction(
 
         CheckG3PkmTradeRecord(saveLoaders.Save);
 
-        var boxName = (await loaders.boxLoader.GetDto(targetBoxId.ToString()))?.Name;
+        var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
 
         return new()
         {
@@ -329,7 +329,7 @@ public class MovePkmAction(
             throw new ArgumentException($"PkmVersionEntity Generation not compatible with save for id={pkmVersionDto.Id}, generation={pkmVersionDto.Generation}, save.generation={saveLoaders.Save.Generation}");
         }
 
-        if (!SaveInfosDTO.IsSpeciesAllowed(pkmVersionDto.Pkm.Species, saveLoaders.Save))
+        if (!SaveInfosDTO.IsSpeciesAllowed(pkmVersionDto.Species, saveLoaders.Save))
         {
             throw new ArgumentException($"PkmVersionEntity Species not compatible with save for id={pkmVersionDto.Id}, species={pkmVersionDto.Species}, save.maxSpecies={saveLoaders.Save.MaxSpeciesID}");
         }
@@ -349,9 +349,9 @@ public class MovePkmAction(
             loaders.pkmLoader.DeleteEntity(pkmDto.Id);
         }
 
-        var pkmSaveDTO = await PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, targetBoxId, targetBoxSlot);
-        await pkmSaveDTO.RefreshPkmVersionId(loaders.pkmLoader, loaders.pkmVersionLoader);
-        await saveLoaders.Pkms.WriteDto(pkmSaveDTO);
+        var pkmSaveDTO = PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, targetBoxId, targetBoxSlot);
+        pkmSaveDTO.RefreshPkmVersionId(loaders.pkmLoader, loaders.pkmVersionLoader);
+        saveLoaders.Pkms.WriteDto(pkmSaveDTO);
 
         if (attached && pkmSaveDTO.PkmVersionId == null)
         {
@@ -415,7 +415,7 @@ public class MovePkmAction(
                 Generation = savePkm.Generation,
                 Filepath = PKMLoader.GetPKMFilepath(savePkm.Pkm),
             };
-            var pkmVersionDto = await PkmVersionDTO.FromEntity(pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
+            var pkmVersionDto = PkmVersionDTO.FromEntity(pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
 
             loaders.pkmLoader.WriteDto(pkmDtoToCreate);
             loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
@@ -424,7 +424,7 @@ public class MovePkmAction(
             flags.MainPkmVersions = true;
         }
 
-        var pkmDto = await loaders.pkmLoader.GetDto(pkmVersionEntity.PkmId);
+        var pkmDto = loaders.pkmLoader.GetDto(pkmVersionEntity.PkmId);
 
         if (pkmDto!.SaveId != default)
         {
@@ -443,7 +443,7 @@ public class MovePkmAction(
         if (!attached)
         {
             // remove pkm from save
-            await saveLoaders.Pkms.DeleteDto(savePkm.Id);
+            saveLoaders.Pkms.DeleteDto(savePkm.Id);
         }
 
         flags.Saves.Add(new()

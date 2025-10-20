@@ -1,6 +1,7 @@
 import { ListboxOption } from '@headlessui/react';
 import React from 'react';
 import { MoveCategory, type StaticMove } from '../../data/sdk/model';
+import { useStorageGetPkmAvailableMoves } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
 import { SelectNumberInput } from '../input/select-input';
@@ -9,9 +10,10 @@ import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
 
 export type TextMovesProps = {
+    saveId?: number;
+    pkmId: string;
     ability: number;
     moves: number[];
-    availableMoves: number[];
     generation: number;
     hiddenPowerType: number;
     hiddenPowerPower: number;
@@ -19,9 +21,10 @@ export type TextMovesProps = {
 };
 
 export const TextMoves: React.FC<TextMovesProps> = ({
+    saveId,
+    pkmId,
     ability,
     moves,
-    availableMoves: availableMovesRaw,
     generation,
     hiddenPowerType,
     hiddenPowerPower,
@@ -32,6 +35,10 @@ export const TextMoves: React.FC<TextMovesProps> = ({
     const { editMode, register, setValue, watch } = StorageDetailsForm.useContext();
 
     const staticData = useStaticData();
+
+    const availableMovesQuery = useStorageGetPkmAvailableMoves({ saveId, pkmId }, {
+        query: { enabled: editMode }
+    });
 
     const getStaticMove = React.useCallback((moveId: number): StaticMove | undefined => {
         const staticMove = staticData.moves[ moveId ];
@@ -53,7 +60,8 @@ export const TextMoves: React.FC<TextMovesProps> = ({
 
     const formMoves = watch(`moves`);
 
-    const availableMoves = React.useMemo(() => [ ...availableMovesRaw ]
+    const availableMoves = React.useMemo(() => (availableMovesQuery.data?.data ?? [])
+        .map(move => move.id)
         .sort((a, b) => {
             const sa = getStaticMove(a);
             const ga = sa?.dataUntilGeneration.find(gen => gen.untilGeneration >= generation);
@@ -67,7 +75,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
 
             const powerDiff = (ga?.power ?? 0) - (gb?.power ?? 0);
             return powerDiff;
-        }), [ availableMovesRaw, generation, getStaticMove ]);
+        }), [ availableMovesQuery.data?.data, generation, getStaticMove ]);
 
     return <>
         {ability > 0 && <>

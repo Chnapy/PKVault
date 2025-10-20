@@ -1,7 +1,9 @@
 import type React from 'react';
 import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
+import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
+import { getSaveOrder } from '../../storage/util/get-save-order';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
@@ -10,7 +12,6 @@ import { Icon } from '../icon/icon';
 import { StorageDetailsForm } from '../storage-item-details/storage-details-form';
 import { theme } from '../theme';
 import { StorageItemSaveActionsContainer } from './storage-item-save-actions-container';
-import { getSaveOrder } from '../../storage/util/get-save-order';
 
 export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId }) => {
     const { t } = useTranslate();
@@ -21,6 +22,8 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
     const formEditMode = StorageDetailsForm.useEditMode();
 
     const moveClickable = StorageMoveContext.useClickable(selected?.id ? [ selected.id ] : [], saveId);
+
+    const staticData = useStaticData();
 
     const mainPkmQuery = useStorageGetMainPkms();
     const mainPkmVersionQuery = useStorageGetMainPkmVersions();
@@ -34,10 +37,13 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
         return null;
     }
 
+    const staticEvolves = staticData.evolves[ selectedPkm.species ];
+    const evolveSpecies = staticEvolves?.trade[ selectedPkm.version ] ?? staticEvolves?.tradeWithItem[ selectedPkm.heldItemPokeapiName ?? '' ]?.[ selectedPkm.version ];
+
     const attachedPkmVersion = selectedPkm.pkmVersionId ? mainPkmVersionQuery.data?.data.find(version => version.id === selectedPkm.pkmVersionId) : undefined;
     const attachedPkm = attachedPkmVersion && mainPkmQuery.data?.data.find(pkm => pkm.id === attachedPkmVersion.pkmId);
 
-    const canEvolve = selectedPkm.canEvolve && !selectedPkm.pkmVersionId;
+    const canEvolve = !selectedPkm.pkmVersionId && !!evolveSpecies;
     const canDetach = !!selectedPkm.pkmVersionId;
     const canGoToMain = !!selectedPkm.pkmVersionId;
 

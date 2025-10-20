@@ -15,7 +15,7 @@ public class Program
             {
                 var staticDataTask = StaticDataService.PrepareStaticData();
                 StorageService.CleanWrongData();
-                await LocalSaveService.ReadLocalSaves();
+                LocalSaveService.ReadLocalSaves();
                 await StorageService.ResetDataLoader(true);
                 await WarningsService.CheckWarnings();
                 await staticDataTask;
@@ -53,7 +53,7 @@ public class Program
 
         if (args.Length > 0 && args[0] == "test-PB7")
         {
-            await LocalSaveService.ReadLocalSaves();
+            LocalSaveService.ReadLocalSaves();
             await StorageService.ResetDataLoader(false);
             // await StorageService.SaveMovePkmFromStorage(
             //     4106192122,
@@ -88,7 +88,7 @@ public class Program
 
         if (args.Length > 0 && args[0] == "bench-save-pkm")
         {
-            await LocalSaveService.ReadLocalSaves();
+            LocalSaveService.ReadLocalSaves();
             await StorageService.ResetDataLoader(false);
 
             var logtimeSavePkmAll = LogUtil.Time("Benchmark Save Pkms (all) perfs with 10 sequential calls", (550, 800));
@@ -105,7 +105,7 @@ public class Program
             var logtimeSavePkmGet = LogUtil.Time("Benchmark Save Pkms (get) perfs with 2000 sequential calls", (10, 30));
             for (var i = 0; i < 2000; i++)
             {
-                var result = await (await StorageService.GetLoader()).loaders.saveLoadersDict[3809447156].Pkms.GetDto("G30366FC1CF2B528 17 20 21 30 600")
+                var result = (await StorageService.GetLoader()).loaders.saveLoadersDict[3809447156].Pkms.GetDto("G30366FC1CF2B528 17 20 21 30 600")
                     ?? throw new Exception();
             }
             // expected: ~0.001s

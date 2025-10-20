@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class PkmSaveDTO : BasePkmVersionDTO
 {
-    public static async Task<PkmSaveDTO> FromPkm(SaveFile save, PKM pkm, int boxId, int boxSlot)
+    public static PkmSaveDTO FromPkm(SaveFile save, PKM pkm, int boxId, int boxSlot)
     {
         var dto = new PkmSaveDTO
         {
@@ -11,8 +11,6 @@ public class PkmSaveDTO : BasePkmVersionDTO
             BoxId = boxId,
             BoxSlot = boxSlot,
         };
-
-        await dto.RefreshAsyncData(save);
 
         return dto;
     }
@@ -66,17 +64,15 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     public bool CanMoveAttachedToMain { get => CanMoveToMain && !IsDuplicate; }
 
-    public override bool CanEvolve { get => HasTradeEvolve && PkmVersionId == null; }
-
     public required SaveFile Save;
 
-    public async Task RefreshPkmVersionId(EntityLoader<PkmDTO, PkmEntity> pkmLoader, EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionLoader)
+    public void RefreshPkmVersionId(EntityLoader<PkmDTO, PkmEntity> pkmLoader, EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionLoader)
     {
         PkmVersionId = null;
-        var pkmVersion = await pkmVersionLoader.GetDto(IdBase);
+        var pkmVersion = pkmVersionLoader.GetDto(IdBase);
         if (pkmVersion != null)
         {
-            var mainPkm = await pkmLoader.GetDto(pkmVersion.PkmDto.Id);
+            var mainPkm = pkmLoader.GetDto(pkmVersion.PkmDto.Id);
 
             if (mainPkm?.SaveId == Save.ID32)
             {

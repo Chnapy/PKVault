@@ -2,6 +2,7 @@ public struct DataDTO
 {
     public static async Task<DataDTO> FromDataUpdateFlags(DataUpdateFlags flags)
     {
+        var time = LogUtil.Time("Prepare global data payload");
         var tasks = new List<Task>();
 
         var dto = new DataDTO();
@@ -112,6 +113,14 @@ public struct DataDTO
         dto.Warnings = WarningsService.GetWarningsDTO();
         dto.Settings = SettingsService.AppSettings;
 
+        time();
+
+        // time = LogUtil.Time("Response serialization");
+        // var json = System.Text.Json.JsonSerializer.Serialize(dto);
+        // time();
+
+        // Console.WriteLine($"Response counts, MainBoxes={dto.MainBoxes?.Count} MainPkms={dto.MainPkms?.Count} MainPkmVersions={dto.MainPkmVersions?.Count} Dex={dto.Dex?.Count}");
+
         return dto;
     }
 
@@ -122,7 +131,7 @@ public struct DataDTO
     public List<PkmDTO>? MainPkms { get; set; }
     public List<PkmVersionDTO>? MainPkmVersions { get; set; }
     public List<DataSaveDTO>? Saves { get; set; }
-    public Dictionary<int, Dictionary<uint, DexItemDTO>>? Dex { get; set; }
+    public Dictionary<ushort, Dictionary<uint, DexItemDTO>>? Dex { get; set; }
     public List<DataActionPayload>? Actions { get; set; }
     public WarningsDTO? Warnings { get; set; }
     public Dictionary<uint, SaveInfosDTO>? SaveInfos { get; set; }

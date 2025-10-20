@@ -2,8 +2,8 @@ public class MainDeleteBoxAction(string boxId) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        var box = await loaders.boxLoader.GetDto(boxId);
-        var allPkms = await loaders.pkmLoader.GetAllDtos();
+        var box = loaders.boxLoader.GetDto(boxId);
+        var allPkms = loaders.pkmLoader.GetAllDtos();
 
         if (allPkms.Any(pkm => pkm.BoxId == box!.IdInt))
         {

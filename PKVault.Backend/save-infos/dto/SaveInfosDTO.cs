@@ -94,7 +94,7 @@ public class SaveInfosDTO
 
     // public string DownloadUrl { get; set; }
 
-    public static bool IsSpeciesAllowed(int species, SaveFile save)
+    public static bool IsSpeciesAllowed(ushort species, SaveFile save)
     {
         if (save is SAV7b)
         {

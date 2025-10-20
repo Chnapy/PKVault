@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public class PkmVersionDTO : BasePkmVersionDTO
 {
-    public static async Task<PkmVersionDTO> FromEntity(PkmVersionEntity entity, PKM pkm, PkmDTO pkmDto)
+    public static PkmVersionDTO FromEntity(PkmVersionEntity entity, PKM pkm, PkmDTO pkmDto)
     {
         var dto = new PkmVersionDTO
         {
@@ -11,10 +11,6 @@ public class PkmVersionDTO : BasePkmVersionDTO
             PkmVersionEntity = entity,
             PkmDto = pkmDto,
         };
-
-        await dto.RefreshAsyncData(
-            BlankSaveFile.Get(pkm.Context)
-        );
 
         if (dto.Id != entity.Id)
         {
@@ -70,8 +66,6 @@ public class PkmVersionDTO : BasePkmVersionDTO
     }
 
     public bool CanDelete { get { return !IsMain; } }
-
-    public override bool CanEvolve { get => HasTradeEvolve && PkmDto.SaveId == null; }
 
     public required PkmVersionEntity PkmVersionEntity;
 

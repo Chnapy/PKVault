@@ -246,6 +246,11 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return ItemConverter.GetItemForFormat(Pkm.HeldItem, Pkm.Context, EntityContext.Gen9); }
     }
 
+    public string? HeldItemPokeapiName
+    {
+        get => HeldItem > 0 ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[HeldItem]) : null;
+    }
+
     public string DynamicChecksum
     {
         get { return $"{Nickname}.{Level}.{Exp}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}"; }
@@ -254,54 +259,6 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     public int NicknameMaxLength
     {
         get { return Pkm.MaxStringLengthNickname; }
-    }
-
-    public List<MoveItem> AvailableMoves
-    {
-        get
-        {
-            try
-            {
-                var legality = new LegalityAnalysis(Pkm);
-
-                var moveComboSource = new LegalMoveComboSource();
-                var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
-
-                var version = Version.IsValidSavedVersion() ? Version : Version.GetSingleVersion();
-                var blankSav = BlankSaveFile.Get(version, Pkm.OriginalTrainerName, (LanguageID)Pkm.Language);
-
-                // TODO perf issue ? should be done once for each save type
-                var filteredSources = new FilteredGameDataSource(blankSav, GameInfo.Sources);
-                moveSource.ChangeMoveSource(filteredSources.Moves);
-                moveSource.ReloadMoves(legality);
-
-                var movesStr = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).movelist;
-
-                var availableMoves = new List<MoveItem>();
-
-                moveComboSource.DataSource.ToList().ForEach(data =>
-                {
-                    if (data.Value > 0 && moveSource.Info.CanLearn((ushort)data.Value))
-                    {
-                        var item = new MoveItem
-                        {
-                            Id = data.Value,
-                            // Type = MoveInfo.GetType((ushort)data.Value, Pkm.Context),
-                            // Text = movesStr[data.Value],
-                            // SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Length > data.Value && moveSourceTypesRecord[type][data.Value]),
-                        };
-                        availableMoves.Add(item);
-                    }
-                });
-
-                return availableMoves;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex);
-                return [];
-            }
-        }
     }
 
     public bool IsValid
@@ -327,8 +284,6 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public bool CanEdit { get => !IsEgg; }
 
-    public abstract bool CanEvolve { get; }
-
     public required PKM Pkm;
 
     protected bool HasTradeEvolve;
@@ -341,77 +296,6 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         var id = $"G{pkm.Format}{hash}";
 
         return id;
-    }
-
-    // TODO perf issues
-    public async Task RefreshAsyncData(SaveFile save)
-    {
-        await Task.WhenAll(
-            RefreshHasTradeEvolve(save)
-        );
-    }
-
-    private async Task RefreshHasTradeEvolve(SaveFile save)
-    {
-        var evolvesByTrade = await GetTradeEvolveChains(save);
-
-        HasTradeEvolve = evolvesByTrade.Count > 0;
-    }
-
-    public async Task<List<ChainLink>> GetTradeEvolveChains(SaveFile save)
-    {
-        var pokeapiSpeciesName = PokeApiFileClient.PokeApiNameFromPKHexName(GameInfo.Strings.Species[Species]);
-        var evolutionChain = await PokeApi.GetPokemonSpeciesEvolutionChain(
-            GameInfo.Strings.Species[Species]
-        );
-        if (evolutionChain == null)
-        {
-            return [];
-        }
-
-        ChainLink? getSpeciesEvolutionChain(ChainLink currentChain)
-        {
-            if (currentChain.Species.Name == pokeapiSpeciesName)
-            {
-                return currentChain;
-            }
-
-            foreach (var chain in currentChain.EvolvesTo)
-            {
-                var result = getSpeciesEvolutionChain(chain);
-                if (result != null)
-                {
-                    return result;
-                }
-            }
-
-            return null;
-        }
-
-        var speciesChain = getSpeciesEvolutionChain(evolutionChain.Chain);
-        if (speciesChain == null)
-        {
-            return [];
-        }
-
-        var heldItemName = GameInfo.Strings.Item[HeldItem];
-        var heldItemPokeapiName = StaticDataService.GetPokeapiItemName(heldItemName);
-
-        bool checkSpecies(NamedApiResource<PokemonSpecies> speciesObj)
-        {
-            var species = int.Parse(speciesObj.Url.TrimEnd('/').Split('/')[^1]);
-
-            return SaveInfosDTO.IsSpeciesAllowed(species, save);
-        }
-
-        return speciesChain.EvolvesTo.FindAll(chain =>
-            checkSpecies(chain.Species)
-            && chain.EvolutionDetails.Any(details =>
-                details.Trigger.Name == "trade"
-                && (details.HeldItem == null || details.HeldItem.Name == heldItemPokeapiName)
-
-            )
-        );
     }
 }
 

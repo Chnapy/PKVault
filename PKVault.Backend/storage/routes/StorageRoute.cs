@@ -140,6 +140,12 @@ public class StorageController : ControllerBase
         return await DataDTO.FromDataUpdateFlags(flags);
     }
 
+    [HttpGet("pkm/available-moves")]
+    public async Task<ActionResult<List<MoveItem>>> GetPkmAvailableMoves(uint? saveId, string pkmId)
+    {
+        return await StorageService.GetPkmAvailableMoves(saveId, pkmId);
+    }
+
     [HttpGet("action")]
     public ActionResult<List<DataActionPayload>> GetActions()
     {

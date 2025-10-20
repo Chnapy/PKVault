@@ -8,7 +8,7 @@ public class BackupService
 
     private static string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
 
-    public static async Task<DateTime> CreateBackup()
+    public static DateTime CreateBackup()
     {
         var bkpPath = GetBackupsPath();
 
@@ -18,17 +18,21 @@ public class BackupService
 
         PrepareBkpDir();
 
-        Console.WriteLine($"Create backup - DB");
+        var steptime = LogUtil.Time($"Create backup - DB");
 
         var dbPaths = CreateDbBackup(loaders);
 
-        Console.WriteLine($"Create backup - Saves");
+        steptime();
+        steptime = LogUtil.Time($"Create backup - Saves");
 
         var savesPaths = CreateSavesBackup();
 
-        Console.WriteLine($"Create backup - Storage");
+        steptime();
+        steptime = LogUtil.Time($"Create backup - Storage");
 
-        var mainPaths = await CreateMainBackup(loaders);
+        var mainPaths = CreateMainBackup(loaders);
+
+        steptime();
 
         var paths = new Dictionary<string, string>()
             .Concat(dbPaths)
@@ -42,10 +46,11 @@ public class BackupService
             JsonSerializer.Serialize(paths)
         );
 
-        Console.WriteLine($"Create backup - Compress");
+        steptime = LogUtil.Time($"Create backup - Compress");
 
         var dateTime = Compress();
 
+        steptime();
         logtime();
 
         return dateTime;
@@ -143,14 +148,14 @@ public class BackupService
         return paths;
     }
 
-    private static async Task<Dictionary<string, string>> CreateMainBackup(DataEntityLoaders loaders)
+    private static Dictionary<string, string> CreateMainBackup(DataEntityLoaders loaders)
     {
         var bkpPath = GetBackupsPath();
 
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
         var bkpMainDirPath = Path.Combine(bkpTmpDirPath, "main");
 
-        var pkmVersions = await loaders.pkmVersionLoader.GetAllDtos();
+        var pkmVersions = loaders.pkmVersionLoader.GetAllDtos();
 
         var paths = new Dictionary<string, string>();
 
@@ -288,7 +293,7 @@ public class BackupService
         );
 
         // manual backup, no use of PrepareBackupThenRun to avoid infinite loop
-        await CreateBackup();
+        CreateBackup();
 
         foreach (var entry in archive.Entries)
         {
@@ -306,14 +311,14 @@ public class BackupService
 
         logtime();
 
-        await LocalSaveService.ReadLocalSaves();
+        LocalSaveService.ReadLocalSaves();
 
         await StorageService.ResetDataLoader(true);
     }
 
     public static async Task PrepareBackupThenRun(Func<Task> action)
     {
-        var bkpDateTime = await CreateBackup();
+        var bkpDateTime = CreateBackup();
 
         try
         {
@@ -323,7 +328,7 @@ public class BackupService
 
             logtime();
 
-            await LocalSaveService.ReadLocalSaves();
+            LocalSaveService.ReadLocalSaves();
 
             await StorageService.ResetDataLoader(false);
         }

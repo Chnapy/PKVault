@@ -2,6 +2,7 @@ import { useSearch } from '@tanstack/react-router';
 import React from 'react';
 import { Gender as GenderType } from '../data/sdk/model';
 import { useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
+import { useStaticData } from '../hooks/use-static-data';
 import { Route } from '../routes/storage';
 import type { ButtonLikeProps } from '../ui/button/button-like';
 import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
@@ -16,6 +17,8 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
     const selected = useSearch({ from: '/storage', select: (search) => search.selected, shouldThrow: false });
     const navigate = Route.useNavigate();
 
+    const staticData = useStaticData();
+
     const pkmVersionsQuery = useStorageGetMainPkmVersions();
     const savePkmsQuery = useStorageGetSavePkms(saveId);
 
@@ -27,14 +30,17 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
         return null;
     }
 
-    const { species, form, gender, isShiny, isEgg, isShadow } = savePkm;
+    const { species, version, form, gender, isShiny, isEgg, isShadow, heldItemPokeapiName } = savePkm;
+
+    const staticEvolves = staticData.evolves[ species ];
+    const evolveSpecies = staticEvolves?.trade[ version ] ?? staticEvolves?.tradeWithItem[ heldItemPokeapiName ?? '' ]?.[ version ];
 
     // const attachedVersionPkm = savePkm.pkmVersionId ? allPkmVersions.find(savePkm => savePkm.pkmVersionId && pkmVersionsIds.includes(savePkm.pkmVersionId)) : undefined;
     const attachedPkmVersion = savePkm.pkmVersionId ? allPkmVersions.find(version => version.id === savePkm.pkmVersionId) : undefined;
     const saveSynchronized = savePkm.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
     const canMoveAttached = !savePkm.pkmVersionId && !isEgg && !isShadow;
-    const canEvolve = savePkm.canEvolve && !savePkm.pkmVersionId;
+    const canEvolve = !savePkm.pkmVersionId && !!evolveSpecies;
     const canDetach = !!savePkm.pkmVersionId;
     const canSynchronize = !!savePkm.pkmVersionId && !!attachedPkmVersion && !saveSynchronized;
 

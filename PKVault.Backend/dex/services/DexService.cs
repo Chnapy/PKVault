@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class DexService
 {
-    public static async Task<Dictionary<int, Dictionary<uint, DexItemDTO>>> GetDex()
+    public static async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex()
     {
         var saveDict = (await StorageService.GetLoader()).loaders.saveLoadersDict;
         if (saveDict.Count == 0)
@@ -16,10 +16,10 @@ public class DexService
 
         var time = LogUtil.Time($"Update Dex with {saveDict.Count} saves (max-species={maxSpecies})");
 
-        Dictionary<int, Dictionary<uint, DexItemDTO>> dex = [];
-        for (var i = 0; i < maxSpecies; i++)
+        Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex = [];
+        for (ushort i = 1; i < (ushort)Species.MAX_COUNT; i++)
         {
-            dex.Add(i + 1, []);
+            dex.Add(i, []);
         }
 
         saveDict.Values.ToList().ForEach(save => UpdateDexWithSave(dex, save.Save, staticData));
@@ -29,7 +29,7 @@ public class DexService
         return dex;
     }
 
-    private static bool UpdateDexWithSave(Dictionary<int, Dictionary<uint, DexItemDTO>> dex, SaveFile save, StaticDataDTO staticData)
+    private static bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, SaveFile save, StaticDataDTO staticData)
     {
         static bool notHandled(SaveFile save)
         {

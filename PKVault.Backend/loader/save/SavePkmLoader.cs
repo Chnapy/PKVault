@@ -13,9 +13,9 @@ public class SavePkmLoader(
 
     private bool needUpdate = true;
 
-    private async Task UpdateDtos()
+    private void UpdateDtos()
     {
-        var taskList = new List<Task<PkmSaveDTO>>();
+        var dtoList = new List<PkmSaveDTO>();
 
         if (save.HasParty)
         {
@@ -26,7 +26,7 @@ public class SavePkmLoader(
                 if (pkm.Species != 0)
                 {
                     var boxSlot = i;
-                    taskList.Add(Task.Run(() => PkmSaveDTO.FromPkm(save, pkm, BoxDTO.PARTY_ID, boxSlot)));
+                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, BoxDTO.PARTY_ID, boxSlot));
                 }
                 i++;
             });
@@ -46,7 +46,7 @@ public class SavePkmLoader(
                 if (pkm != default && pkm.Species != 0)
                 {
                     var boxSlot = i;
-                    taskList.Add(Task.Run(() => PkmSaveDTO.FromPkm(save, pkm, BoxDTO.DAYCARE_ID, boxSlot)));
+                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, BoxDTO.DAYCARE_ID, boxSlot));
                 }
             }
         }
@@ -61,7 +61,7 @@ public class SavePkmLoader(
                 {
                     var box = i;
                     var boxSlot = j;
-                    taskList.Add(Task.Run(() => PkmSaveDTO.FromPkm(save, pkm, box, boxSlot)));
+                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, box, boxSlot));
                 }
                 j++;
             }
@@ -70,7 +70,7 @@ public class SavePkmLoader(
         var dictById = new Dictionary<string, PkmSaveDTO>();
         var dictByBox = new Dictionary<string, PkmSaveDTO>();
 
-        foreach (var dto in await Task.WhenAll(taskList))
+        foreach (var dto in dtoList)
         {
             // Console.WriteLine($"{dto.Id} - {dto.Box}/{dto.BoxSlot}");
             dictById.Add(dto.Id, dto);
@@ -82,34 +82,34 @@ public class SavePkmLoader(
         needUpdate = false;
     }
 
-    public async Task<List<PkmSaveDTO>> GetAllDtos()
+    public List<PkmSaveDTO> GetAllDtos()
     {
         if (needUpdate)
         {
-            await UpdateDtos();
+            UpdateDtos();
         }
 
-        return [.. await Task.WhenAll(dtoById.Values.Select(async dto => {
+        return [.. dtoById.Values.Select(dto => {
             dto = dto.Clone();
 
-            await dto.RefreshPkmVersionId(pkmLoader, pkmVersionLoader);
+            dto.RefreshPkmVersionId(pkmLoader, pkmVersionLoader);
 
             return dto;
-        }))];
+        })];
     }
 
-    public async Task<PkmSaveDTO?> GetDto(string id)
+    public PkmSaveDTO? GetDto(string id)
     {
         if (needUpdate)
         {
-            await UpdateDtos();
+            UpdateDtos();
         }
 
         if (dtoById.TryGetValue(id, out var dto))
         {
             dto = dto.Clone();
 
-            await dto.RefreshPkmVersionId(pkmLoader, pkmVersionLoader);
+            dto.RefreshPkmVersionId(pkmLoader, pkmVersionLoader);
 
             return dto;
         }
@@ -122,18 +122,18 @@ public class SavePkmLoader(
         return null;
     }
 
-    public async Task<PkmSaveDTO?> GetDto(int box, int boxSlot)
+    public PkmSaveDTO? GetDto(int box, int boxSlot)
     {
         if (needUpdate)
         {
-            await UpdateDtos();
+            UpdateDtos();
         }
 
         if (dtoByBox.TryGetValue(box + "." + boxSlot, out var dto))
         {
             dto = dto.Clone();
 
-            await dto.RefreshPkmVersionId(pkmLoader, pkmVersionLoader);
+            dto.RefreshPkmVersionId(pkmLoader, pkmVersionLoader);
 
             return dto;
         }
@@ -141,7 +141,7 @@ public class SavePkmLoader(
         return null;
     }
 
-    public async Task WriteDto(PkmSaveDTO dto)
+    public void WriteDto(PkmSaveDTO dto)
     {
         if (dto.BoxId == BoxDTO.DAYCARE_ID)
         {
@@ -156,7 +156,7 @@ public class SavePkmLoader(
             throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetType()} to.type={savePkmType}");
         }
 
-        await DeleteDto(dto.Id);
+        DeleteDto(dto.Id);
 
         switch (dto.BoxId)
         {
@@ -174,9 +174,9 @@ public class SavePkmLoader(
         HasWritten = true;
     }
 
-    public async Task DeleteDto(string id)
+    public void DeleteDto(string id)
     {
-        var dto = await GetDto(id);
+        var dto = GetDto(id);
         if (dto != default)
         {
             switch (dto.BoxId)

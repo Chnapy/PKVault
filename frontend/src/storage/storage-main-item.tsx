@@ -4,6 +4,7 @@ import { Gender as GenderType } from '../data/sdk/model';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
+import { useStaticData } from '../hooks/use-static-data';
 import { Route } from '../routes/storage';
 import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
 import { StorageItemPopover } from '../ui/storage-item/storage-item-popover';
@@ -20,6 +21,8 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
     const navigate = Route.useNavigate();
 
     const { checked, onCheck } = StorageSelectContext.useCheck(undefined, pkmId);
+
+    const staticData = useStaticData();
     const saveInfosQuery = useSaveInfosGetAll();
     const pkmsQuery = useStorageGetMainPkms();
     const pkmVersionsQuery = useStorageGetMainPkmVersions();
@@ -60,7 +63,11 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
 
 
     const canMoveAttached = !pkm.saveId && pageSaves.some(pageSave => pkmVersions.some(pkmVersion => pkmVersion.generation === pageSave.generation));
-    const canEvolve = !pkm.saveId && pkmVersions.some(version => version.canEvolve);
+    const canEvolve = !pkm.saveId && pkmVersions.some(pkmVersion => {
+        const staticEvolves = staticData.evolves[ pkmVersion.species ];
+        const evolveSpecies = staticEvolves?.trade[ pkmVersion.version ] ?? staticEvolves?.tradeWithItem[ pkmVersion.heldItemPokeapiName ?? '' ]?.[ pkmVersion.version ];
+        return !!evolveSpecies;
+    });
     const canDetach = !!pkm.saveId;
     const canSynchronize = !!pkm.saveId && !!attachedPkmVersion && !saveSynchronized;
 

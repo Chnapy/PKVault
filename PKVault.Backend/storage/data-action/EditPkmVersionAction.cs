@@ -4,7 +4,7 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        var pkmVersionDto = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
+        var pkmVersionDto = loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkmDto = pkmVersionDto!.PkmDto;
 
         if (pkmDto.SaveId != default)
@@ -12,11 +12,13 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
             throw new ArgumentException("Edit not possible for pkm attached with save");
         }
 
+        var availableMoves = await StorageService.GetPkmAvailableMoves(null, pkmVersionId);
+
         var pkm = pkmVersionDto.Pkm;
 
         EditPkmNickname(pkm, editPayload.Nickname);
         EditPkmEVs(pkm, editPayload.EVs);
-        EditPkmMoves(pkm, pkmVersionDto.AvailableMoves, editPayload.Moves);
+        EditPkmMoves(pkm, availableMoves, editPayload.Moves);
 
         // absolutly required before each write
         // TODO make a using write pkm to ensure use of this call
@@ -24,7 +26,7 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
 
         loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
 
-        var relatedPkmVersions = (await loaders.pkmVersionLoader.GetAllDtos())
+        var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos()
         .FindAll(value => value.PkmDto.Id == pkmDto.Id && value.Id != pkmVersionId);
 
         relatedPkmVersions.ForEach((versionDto) =>

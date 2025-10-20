@@ -2,6 +2,7 @@ import { css } from '@emotion/css';
 import { PopoverPanel, type PopoverPanelProps } from '@headlessui/react';
 import type React from 'react';
 import { useStorageEvolvePkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
+import { useStaticData } from '../../hooks/use-static-data';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { StorageSelectContext } from '../../storage/actions/storage-select-context';
 import { useTranslate } from '../../translate/i18n';
@@ -20,6 +21,8 @@ export const StorageBoxSaveActions: React.FC<
 
     const { ids, hasBox } = StorageSelectContext.useValue();
 
+    const staticData = useStaticData();
+
     const mainPkmVersionQuery = useStorageGetMainPkmVersions();
     const pkmSavePkmQuery = useStorageGetSavePkms(saveId);
 
@@ -35,7 +38,15 @@ export const StorageBoxSaveActions: React.FC<
         return null;
     }
 
-    const canEvolvePkms = pkms.filter(pkm => !pkm.pkmVersionId && pkm.canEvolve);
+    const canEvolvePkms = pkms.filter(pkm => {
+        if (pkm.pkmVersionId) {
+            return false;
+        }
+
+        const staticEvolves = staticData.evolves[ pkm.species ];
+        const evolveSpecies = staticEvolves?.trade[ pkm.version ] ?? staticEvolves?.tradeWithItem[ pkm.heldItemPokeapiName ?? '' ]?.[ pkm.version ];
+        return !!evolveSpecies;
+    });
 
     const canDetachPkms = pkms
         .map(pkm => {

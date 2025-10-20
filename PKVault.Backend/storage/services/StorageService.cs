@@ -1,3 +1,4 @@
+using PKHeX.Core;
 using PKVault.Backend;
 
 public class StorageService
@@ -8,21 +9,21 @@ public class StorageService
     {
         var memoryLoader = await GetLoader();
 
-        return await memoryLoader.loaders.boxLoader.GetAllDtos();
+        return memoryLoader.loaders.boxLoader.GetAllDtos();
     }
 
     public static async Task<List<PkmDTO>> GetMainPkms()
     {
         var memoryLoader = await GetLoader();
 
-        return await memoryLoader.loaders.pkmLoader.GetAllDtos();
+        return memoryLoader.loaders.pkmLoader.GetAllDtos();
     }
 
     public static async Task<List<PkmVersionDTO>> GetMainPkmVersions()
     {
         var memoryLoader = await GetLoader();
 
-        return await memoryLoader.loaders.pkmVersionLoader.GetAllDtos();
+        return memoryLoader.loaders.pkmVersionLoader.GetAllDtos();
     }
 
     public static async Task<List<BoxDTO>> GetSaveBoxes(uint saveId)
@@ -35,7 +36,7 @@ public class StorageService
             return [];
         }
 
-        return await saveLoaders.Boxes.GetAllDtos();
+        return saveLoaders.Boxes.GetAllDtos();
     }
 
     public static async Task<List<PkmSaveDTO>> GetSavePkms(uint saveId)
@@ -48,7 +49,7 @@ public class StorageService
             return [];
         }
 
-        return await saveLoaders.Pkms.GetAllDtos();
+        return saveLoaders.Pkms.GetAllDtos();
     }
 
     public static async Task<DataUpdateFlags> MainCreateBox(string boxName)
@@ -197,7 +198,7 @@ public class StorageService
     {
         var logtime = LogUtil.Time($"Data-loader reset");
 
-        _memoryLoader = await DataMemoryLoader.Create();
+        _memoryLoader = DataMemoryLoader.Create();
 
         if (checkSaveSynchro)
         {
@@ -252,6 +253,56 @@ public class StorageService
         return _memoryLoader!;
     }
 
+    public static async Task<List<MoveItem>> GetPkmAvailableMoves(uint? saveId, string pkmId)
+    {
+        var loader = await GetLoader();
+        var pkm = (saveId == null
+            ? loader.loaders.pkmVersionLoader.GetDto(pkmId)?.Pkm
+            : loader.loaders.saveLoadersDict[(uint)saveId].Pkms.GetDto(pkmId)?.Pkm)
+            ?? throw new ArgumentException($"Pkm not found, saveId={saveId} pkmId={pkmId}");
+
+        try
+        {
+            var legality = new LegalityAnalysis(pkm);
+
+            var moveComboSource = new LegalMoveComboSource();
+            var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
+
+            var version = pkm.Version.IsValidSavedVersion() ? pkm.Version : pkm.Version.GetSingleVersion();
+            var blankSav = BlankSaveFile.Get(version, pkm.OriginalTrainerName, (LanguageID)pkm.Language);
+
+            var filteredSources = new FilteredGameDataSource(blankSav, GameInfo.Sources);
+            moveSource.ChangeMoveSource(filteredSources.Moves);
+            moveSource.ReloadMoves(legality);
+
+            var movesStr = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).movelist;
+
+            var availableMoves = new List<MoveItem>();
+
+            moveComboSource.DataSource.ToList().ForEach(data =>
+            {
+                if (data.Value > 0 && moveSource.Info.CanLearn((ushort)data.Value))
+                {
+                    var item = new MoveItem
+                    {
+                        Id = data.Value,
+                        // Type = MoveInfo.GetType((ushort)data.Value, Pkm.Context),
+                        // Text = movesStr[data.Value],
+                        // SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Length > data.Value && moveSourceTypesRecord[type][data.Value]),
+                    };
+                    availableMoves.Add(item);
+                }
+            });
+
+            return availableMoves;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+            return [];
+        }
+    }
+
     public static void CleanWrongData()
     {
         var time = LogUtil.Time("Clean wrong data");
@@ -263,24 +314,26 @@ public class StorageService
 
         var boxLoader = new EntityJSONLoader<BoxDTO, BoxEntity>(
             filePath: Path.Combine(dbDir, "box.json"),
-            entityToDto: async entity => default,
+            entityToDto: entity => default,
             dtoToEntity: dto => dto.BoxEntity
         );
 
         var pkmLoader = new EntityJSONLoader<PkmDTO, PkmEntity>(
            filePath: Path.Combine(dbDir, "pkm.json"),
-            entityToDto: async entity => default,
+            entityToDto: entity => default,
             dtoToEntity: dto => dto.PkmEntity
         );
 
         var pkmVersionLoader = new EntityJSONLoader<PkmVersionDTO, PkmVersionEntity>(
            filePath: Path.Combine(dbDir, "pkm-version.json"),
-            entityToDto: async entity => default,
+            entityToDto: entity => default,
             dtoToEntity: dto => dto.PkmVersionEntity
         );
 
         var boxEntities = boxLoader.GetAllEntities();
         var pkmEntities = pkmLoader.GetAllEntities();
+
+        List<string> pkmVersionToDelete = [];
 
         // remove pkmVersions with inconsistent data
         pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
@@ -288,14 +341,14 @@ public class StorageService
             var pkmExists = pkmEntities.TryGetValue(pkmVersionEntity.PkmId, out var pkmEntity);
             if (!pkmExists)
             {
-                pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
+                pkmVersionToDelete.Add(pkmVersionEntity.Id);
             }
             else
             {
                 var boxExists = boxEntities.TryGetValue(pkmEntity!.BoxId.ToString(), out var boxEntity);
                 if (!boxExists)
                 {
-                    pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
+                    pkmVersionToDelete.Add(pkmVersionEntity.Id);
                 }
                 else
                 {
@@ -306,13 +359,23 @@ public class StorageService
                     catch (Exception ex)
                     {
                         Console.Error.WriteLine(ex);
-                        pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
+                        pkmVersionToDelete.Add(pkmVersionEntity.Id);
                     }
                 }
             }
         });
 
+        if (pkmVersionToDelete.Count > 0)
+        {
+            // bkp
+            File.Copy(Path.Combine(dbDir, "pkm-version.json"), Path.Combine(dbDir, "pkm-version.json.bkp"), true);
+
+            pkmVersionToDelete.ForEach(pkmVersionId => pkmVersionLoader.DeleteEntity(pkmVersionId));
+        }
+
         var pkmVersionEntities = pkmVersionLoader.GetAllEntities();
+
+        List<string> pkmsToDelete = [];
 
         // remove pkms with inconsistent data
         pkmEntities.Values.ToList().ForEach(pkmEntity =>
@@ -320,9 +383,17 @@ public class StorageService
             var pkmVersions = pkmVersionEntities.Values.ToList().FindAll(pkmVersion => pkmVersion.PkmId == pkmEntity.Id);
             if (pkmVersions.Count == 0)
             {
-                pkmLoader.DeleteEntity(pkmEntity.Id);
+                pkmsToDelete.Add(pkmEntity.Id);
             }
         });
+
+        if (pkmsToDelete.Count > 0)
+        {
+            // bkp
+            File.Copy(Path.Combine(dbDir, "pkm.json"), Path.Combine(dbDir, "pkm.json.bkp"), true);
+
+            pkmsToDelete.ForEach(pkmId => pkmLoader.DeleteEntity(pkmId));
+        }
 
         time();
     }

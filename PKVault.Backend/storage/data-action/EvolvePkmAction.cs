@@ -31,7 +31,7 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
     private async Task<DataActionPayload> ExecuteForSave(DataEntityLoaders loaders, DataUpdateFlags flags, uint saveId, string id)
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
-        var dto = await saveLoaders.Pkms.GetDto(id);
+        var dto = saveLoaders.Pkms.GetDto(id);
         if (dto == default)
         {
             throw new ArgumentException("Save Pkm not found");
@@ -42,11 +42,11 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
 
         var (evolveSpecies, evolveByItem) = await GetEvolve(dto);
 
-        await saveLoaders.Pkms.DeleteDto(dto.Id);
+        saveLoaders.Pkms.DeleteDto(dto.Id);
 
         UpdatePkm(dto.Pkm, evolveSpecies, evolveByItem);
 
-        await saveLoaders.Pkms.WriteDto(dto);
+        saveLoaders.Pkms.WriteDto(dto);
 
         flags.Saves.Add(new()
         {
@@ -64,13 +64,13 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
 
     private async Task<DataActionPayload> ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags, string id)
     {
-        var dto = await loaders.pkmVersionLoader.GetDto(id);
+        var dto = loaders.pkmVersionLoader.GetDto(id);
         if (dto == default)
         {
             throw new KeyNotFoundException("Pkm-version not found");
         }
 
-        var relatedPkmVersions = (await loaders.pkmVersionLoader.GetAllDtos())
+        var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos()
         .FindAll(value => value.PkmDto.Id == dto.PkmDto.Id && value.Id != dto.Id);
 
         if (
@@ -133,35 +133,25 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
 
     private static async Task<(ushort evolveSpecies, bool evolveByItem)> GetEvolve(BasePkmVersionDTO dto)
     {
-        if (!dto.CanEvolve)
+        var staticData = await StaticDataService.PrepareStaticData();
+
+        if (staticData.Evolves.TryGetValue(dto.Species, out var staticEvolve))
         {
-            throw new ArgumentException("Pkm cannot evolve");
+            if (dto.HeldItemPokeapiName != null && staticEvolve.TradeWithItem.TryGetValue(dto.HeldItemPokeapiName, out var evolveMap))
+            {
+                if (evolveMap.TryGetValue((byte)dto.Version, out var evolvedSpeciesWithItem))
+                {
+                    return ((ushort)evolvedSpeciesWithItem, true);
+                }
+            }
+
+            if (staticEvolve.Trade.TryGetValue((byte)dto.Version, out var evolvedSpecies))
+            {
+                return ((ushort)evolvedSpecies, false);
+            }
         }
 
-        var evolveChains = await dto.GetTradeEvolveChains(
-            BlankSaveFile.Get(dto.Pkm.Context)
-        );
-
-        var heldItemName = GameInfo.Strings.Item[dto.HeldItem];
-        var heldItemPokeapiName = StaticDataService.GetPokeapiItemName(heldItemName);
-
-        var itemEvolveChain = evolveChains.Find(chain => chain.EvolutionDetails.Any(details =>
-            details.Trigger.Name == "trade"
-            && details.HeldItem != null && details.HeldItem.Name == heldItemPokeapiName));
-
-        var choosenChain = itemEvolveChain ?? evolveChains.Find(chain => chain.EvolutionDetails.Any(details =>
-            details.Trigger.Name == "trade" && details.HeldItem == null
-        ));
-
-        var evolveName = choosenChain!.Species.Name;
-
-        var evolvePkmSpecies = await PokeApi.GetPokemonSpecies(evolveName);
-        var evolveSpecies = (ushort)evolvePkmSpecies!.Id;
-
-        return (
-            evolveSpecies,
-            evolveByItem: choosenChain == itemEvolveChain
-        );
+        throw new ArgumentException("Pkm cannot evolve");
     }
 
     private static void UpdatePkm(PKM pkm, ushort evolveSpecies, bool evolveByItem)

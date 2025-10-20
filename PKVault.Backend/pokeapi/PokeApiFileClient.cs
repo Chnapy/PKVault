@@ -46,6 +46,15 @@ public partial class PokeApiFileClient
         return page!.Results;
     }
 
+    public async Task<List<ApiResource<T>>> GetAsyncUrlList<T>() where T : ApiResource
+    {
+        string url = GetApiEndpointString<T>();
+
+        ApiResourceList<T>? page = await GetAsyncByPathname<ApiResourceList<T>>(url);
+
+        return page!.Results;
+    }
+
     public async Task<T?> GetAsync<T>(int apiParam)
     {
         string text = IsApiEndpointCaseSensitive<T>() ? apiParam.ToString() : apiParam.ToString().ToLowerInvariant();

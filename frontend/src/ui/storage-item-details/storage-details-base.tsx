@@ -24,16 +24,17 @@ import { Gender } from '../gender/gender';
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'pid' | 'species' | 'version' | 'generation' | 'form' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
-    | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves' | 'availableMoves'
+    | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
     | 'heldItem' | 'isValid' | 'validityReport' | 'canEdit'
 > & {
+    saveId?: number;
     onRelease?: () => unknown;
     onSubmit: () => unknown;
     extraContent?: React.ReactNode;
 };
 
-export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onRelease, onSubmit, extraContent, ...pkm }) => {
+export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, onRelease, onSubmit, extraContent, ...pkm }) => {
     const { t } = useTranslate();
 
     const formContext = StorageDetailsForm.useContext();
@@ -138,9 +139,10 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ onReleas
 
                 <TextContainer>
                     <TextMoves
+                        saveId={saveId}
+                        pkmId={pkm.id}
                         ability={pkm.ability}
                         moves={pkm.moves}
-                        availableMoves={pkm.availableMoves.map(am => am.id)}
                         generation={pkm.generation}
                         hiddenPowerType={pkm.hiddenPowerType}
                         hiddenPowerPower={pkm.hiddenPowerPower}

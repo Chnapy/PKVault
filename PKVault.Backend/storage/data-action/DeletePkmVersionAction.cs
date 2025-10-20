@@ -7,9 +7,9 @@ public class DeletePkmVersionAction(string[] pkmVersionIds) : DataAction
             throw new ArgumentException($"Pkm version ids cannot be empty");
         }
 
-        async Task<DataActionPayload> act(string pkmVersionId)
+        DataActionPayload act(string pkmVersionId)
         {
-            var pkmVersion = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
+            var pkmVersion = loaders.pkmVersionLoader.GetDto(pkmVersionId);
             var pkm = pkmVersion!.PkmDto;
 
             if (pkm.SaveId != null)
@@ -19,7 +19,7 @@ public class DeletePkmVersionAction(string[] pkmVersionIds) : DataAction
 
             flags.MainPkmVersions |= loaders.pkmVersionLoader.DeleteEntity(pkmVersionId);
 
-            var relatedPkmVersions = (await loaders.pkmVersionLoader.GetAllDtos()).FindAll(value => value.PkmDto.Id == pkm.Id);
+            var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos().FindAll(value => value.PkmDto.Id == pkm.Id);
             if (relatedPkmVersions.Count == 0)
             {
                 flags.MainPkms |= loaders.pkmLoader.DeleteEntity(pkm.Id);
@@ -35,7 +35,7 @@ public class DeletePkmVersionAction(string[] pkmVersionIds) : DataAction
         List<DataActionPayload> payloads = [];
         foreach (var pkmVersionId in pkmVersionIds)
         {
-            payloads.Add(await act(pkmVersionId));
+            payloads.Add(act(pkmVersionId));
         }
 
         return payloads[0];

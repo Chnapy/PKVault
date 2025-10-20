@@ -24,7 +24,7 @@ public class SaveInfosController : ControllerBase
             throw new InvalidOperationException($"Empty action list is required");
         }
 
-        await LocalSaveService.ReadLocalSaves();
+        LocalSaveService.ReadLocalSaves();
 
         await StorageService.ResetDataLoader(true);
 

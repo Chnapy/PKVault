@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public abstract class DexGenService<Save> where Save : SaveFile
 {
-    public bool UpdateDexWithSave(Dictionary<int, Dictionary<uint, DexItemDTO>> dex, Save save, StaticDataDTO staticData)
+    public bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, Save save, StaticDataDTO staticData)
     {
         // var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
 

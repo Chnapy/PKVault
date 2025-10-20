@@ -16,7 +16,7 @@ public class SettingsService
 
         AppSettings = GetSettings();
 
-        await LocalSaveService.ReadLocalSaves();
+        LocalSaveService.ReadLocalSaves();
 
         await StorageService.ResetDataLoader(true);
     }

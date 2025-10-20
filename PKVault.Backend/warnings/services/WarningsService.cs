@@ -114,8 +114,8 @@ public class WarningsService
 
         var loader = await StorageService.GetLoader();
 
-        var pkmVersionsTask = loader.loaders.pkmVersionLoader.GetAllDtos();
-        var pkms = await loader.loaders.pkmLoader.GetAllDtos();
+        var pkmVersions = loader.loaders.pkmVersionLoader.GetAllDtos();
+        var pkms = loader.loaders.pkmLoader.GetAllDtos();
 
         var tasks = pkms.Select(async pkm =>
         {
@@ -133,9 +133,9 @@ public class WarningsService
                 var save = saveLoader.Save;
                 var generation = save.Generation;
 
-                var pkmVersion = (await pkmVersionsTask).Find(pkmVersion => pkmVersion.PkmDto.Id == pkm.Id && pkmVersion.Generation == generation);
+                var pkmVersion = pkmVersions.Find(pkmVersion => pkmVersion.PkmDto.Id == pkm.Id && pkmVersion.Generation == generation);
 
-                var savePkm = pkmVersion == null ? null : (await saveLoader.Pkms.GetAllDtos()).Find(pkm => pkm.PkmVersionId == pkmVersion.Id);
+                var savePkm = pkmVersion == null ? null : saveLoader.Pkms.GetAllDtos().Find(pkm => pkm.PkmVersionId == pkmVersion.Id);
 
                 if (savePkm == null)
                 {
@@ -169,7 +169,7 @@ public class WarningsService
         {
             var pkmCountByIdBase = new Dictionary<string, int>();
 
-            var pkms = await saveLoader.Pkms.GetAllDtos();
+            var pkms = saveLoader.Pkms.GetAllDtos();
             pkms.ForEach(pkm =>
             {
                 var count = pkmCountByIdBase.TryGetValue(pkm.IdBase, out var _count) ? _count : 0;

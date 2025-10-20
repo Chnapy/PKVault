@@ -7,17 +7,17 @@ public class SaveDeletePkmAction(uint saveId, string[] pkmIds) : DataAction
             throw new ArgumentException($"Pkm version ids cannot be empty");
         }
 
-        async Task<DataActionPayload> act(string pkmId)
+        DataActionPayload act(string pkmId)
         {
             var saveLoaders = loaders.saveLoadersDict[saveId];
 
-            var dto = await saveLoaders.Pkms.GetDto(pkmId);
+            var dto = saveLoaders.Pkms.GetDto(pkmId);
             if (dto == default)
             {
                 throw new KeyNotFoundException("Save Pkm not found");
             }
 
-            await saveLoaders.Pkms.DeleteDto(pkmId);
+            saveLoaders.Pkms.DeleteDto(pkmId);
             saveLoaders.Pkms.FlushParty();
 
             flags.Saves.Add(new()
@@ -37,7 +37,7 @@ public class SaveDeletePkmAction(uint saveId, string[] pkmIds) : DataAction
         List<DataActionPayload> payloads = [];
         foreach (var pkmId in pkmIds)
         {
-            payloads.Add(await act(pkmId));
+            payloads.Add(act(pkmId));
         }
 
         return payloads[0];

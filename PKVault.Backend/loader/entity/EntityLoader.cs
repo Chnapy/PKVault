@@ -1,29 +1,29 @@
 
 public abstract class EntityLoader<DTO, E>(
     Func<DTO, E> dtoToEntity,
-    Func<E, Task<DTO>> entityToDto
+    Func<E, DTO> entityToDto
 ) where DTO : IWithId<string> where E : IWithId<string>
 {
-    public readonly Func<E, Task<DTO>> entityToDto = entityToDto;
+    public readonly Func<E, DTO> entityToDto = entityToDto;
 
     public Action<DTO>? OnWrite;
     public Action<E>? OnDelete;
 
     public bool HasWritten = false;
 
-    public async Task<List<DTO>> GetAllDtos()
+    public List<DTO> GetAllDtos()
     {
-        return [.. await Task.WhenAll(GetAllEntities().Values.Select(entityToDto))];
+        return [.. GetAllEntities().Values.Select(entityToDto)];
     }
 
     public abstract Dictionary<string, E> GetAllEntities();
 
     public abstract void SetAllEntities(Dictionary<string, E> entities);
 
-    public async Task<DTO?> GetDto(string id)
+    public DTO? GetDto(string id)
     {
         var entity = GetEntity(id);
-        return entity == null ? default : await entityToDto(entity);
+        return entity == null ? default : entityToDto(entity);
     }
 
     public E? GetEntity(string id)
@@ -65,4 +65,6 @@ public abstract class EntityLoader<DTO, E>(
 
         OnWrite?.Invoke(dto);
     }
+
+    public abstract void WriteToFile();
 }

@@ -1,6 +1,6 @@
 public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : DataLoader(_loaders)
 {
-    public static async Task<DataMemoryLoader> Create()
+    public static DataMemoryLoader Create()
     {
         var jsonLoader = DataFileLoader.Create().loaders;
 
@@ -9,7 +9,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
         var pkmVersionEntities = jsonLoader.pkmVersionLoader.GetAllEntities();
 
         var boxLoader = new EntityMemoryLoader<BoxDTO, BoxEntity>(boxEntities,
-            entityToDto: async entity =>
+            entityToDto: entity =>
             {
                 return new BoxDTO
                 {
@@ -21,7 +21,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
         );
 
         var pkmLoader = new EntityMemoryLoader<PkmDTO, PkmEntity>(pkmEntities,
-            entityToDto: async entity => PkmDTO.FromEntity(entity),
+            entityToDto: PkmDTO.FromEntity,
             dtoToEntity: dto => dto.PkmEntity
         );
 
@@ -29,9 +29,9 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
         var pkmRealFileLoader = new PKMFileLoader();
 
         var pkmVersionLoader = new EntityMemoryLoader<PkmVersionDTO, PkmVersionEntity>(pkmVersionEntities,
-            entityToDto: async entity =>
+            entityToDto: entity =>
             {
-                var pkmDto = await pkmLoader.GetDto(entity.PkmId);
+                var pkmDto = pkmLoader.GetDto(entity.PkmId);
                 var pkmBytes = pkmMemoryLoader.GetEntity(entity.Filepath);
                 if (pkmBytes == default)
                 {
@@ -43,7 +43,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
                     throw new Exception($"PKM is null, from entity Id={entity.Id} Filepath={entity.Filepath} bytes.length={pkmBytes.Length}");
                 }
 
-                return await PkmVersionDTO.FromEntity(entity, pkm, pkmDto!);
+                return PkmVersionDTO.FromEntity(entity, pkm, pkmDto!);
             },
             dtoToEntity: dto => dto.PkmVersionEntity
         )
@@ -61,39 +61,36 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
             }
         };
 
-        await Task.WhenAll(
-            pkmVersionEntities.Values.Select(async pkmVersionEntity =>
+        pkmVersionEntities.Values.ToList().ForEach(pkmVersionEntity =>
+        {
+            var pkmBytes = pkmRealFileLoader.GetEntity(pkmVersionEntity.Filepath);
+
+            var pkmEntity = pkmLoader.GetDto(pkmVersionEntity.PkmId);
+
+            var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
+            if (pkm == default)
             {
-                var pkmBytes = pkmRealFileLoader.GetEntity(pkmVersionEntity.Filepath);
+                throw new Exception($"PKM is null, from entity Id={pkmVersionEntity.Id} Filepath={pkmVersionEntity.Filepath} bytes.length={pkmBytes.Length}");
+            }
 
-                var pkmEntity = pkmLoader.GetDto(pkmVersionEntity.PkmId);
-
-                var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
-                if (pkm == default)
-                {
-                    throw new Exception($"PKM is null, from entity Id={pkmVersionEntity.Id} Filepath={pkmVersionEntity.Filepath} bytes.length={pkmBytes.Length}");
-                }
-
-                pkmMemoryLoader.WriteEntity(pkmBytes, pkm, pkmVersionEntity.Filepath);
-            })
-        );
+            pkmMemoryLoader.WriteEntity(pkmBytes, pkm, pkmVersionEntity.Filepath);
+        });
+        Console.WriteLine("pkmMemoryLoader write finished");
 
         var startTime = DateTime.UtcNow;
 
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
-        await Task.WhenAll(
-                LocalSaveService.SaveById.Values.ToList().Select(async (save) =>
-                {
-                    // TODO find a cleaner way
-                    save = save.Clone();
-                    saveLoadersDict.Add(save.ID32, new()
-                    {
-                        Save = save,
-                        Boxes = new SaveBoxLoader(save),
-                        Pkms = new SavePkmLoader(save, pkmLoader, pkmVersionLoader)
-                    });
-                })
-        );
+        LocalSaveService.SaveById.Values.ToList().ForEach((save) =>
+        {
+            // TODO find a cleaner way
+            save = save.Clone();
+            saveLoadersDict.Add(save.ID32, new()
+            {
+                Save = save,
+                Boxes = new SaveBoxLoader(save),
+                Pkms = new SavePkmLoader(save, pkmLoader, pkmVersionLoader)
+            });
+        });
 
         DataEntityLoaders loaders = new()
         {
@@ -128,9 +125,10 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
 
     public async Task CheckSaveToSynchronize()
     {
+        var time = LogUtil.Time($"Check saves to synchronize ({LocalSaveService.SaveById.Count})");
         foreach (var saveId in LocalSaveService.SaveById.Keys)
         {
-            var pkmVersionsToSynchronize = await SynchronizePkmAction.GetPkmVersionsToSynchronize(loaders, saveId);
+            var pkmVersionsToSynchronize = SynchronizePkmAction.GetPkmVersionsToSynchronize(loaders, saveId);
             if (pkmVersionsToSynchronize.Length > 0)
             {
                 await AddAction(
@@ -139,5 +137,6 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
                 );
             }
         }
+        time();
     }
 }

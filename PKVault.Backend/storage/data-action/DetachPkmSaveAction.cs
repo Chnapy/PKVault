@@ -8,9 +8,9 @@ public class DetachPkmSaveAction(string[] pkmIds) : DataAction
             throw new ArgumentException($"Pkm version ids cannot be empty");
         }
 
-        async Task<DataActionPayload> act(string pkmId)
+        DataActionPayload act(string pkmId)
         {
-            var pkm = await loaders.pkmLoader.GetDto(pkmId);
+            var pkm = loaders.pkmLoader.GetDto(pkmId);
             var oldSaveId = pkm!.SaveId;
             if (oldSaveId != null)
             {
@@ -27,7 +27,7 @@ public class DetachPkmSaveAction(string[] pkmIds) : DataAction
                 });
             }
 
-            var pkmNickname = (await loaders.pkmVersionLoader.GetDto(pkmId))?.Nickname;
+            var pkmNickname = loaders.pkmVersionLoader.GetDto(pkmId)?.Nickname;
             var saveExists = loaders.saveLoadersDict.TryGetValue(oldSaveId ?? 0, out var saveLoaders);
 
             return new()
@@ -40,7 +40,7 @@ public class DetachPkmSaveAction(string[] pkmIds) : DataAction
         List<DataActionPayload> payloads = [];
         foreach (var pkmId in pkmIds)
         {
-            payloads.Add(await act(pkmId));
+            payloads.Add(act(pkmId));
         }
 
         return payloads[0];

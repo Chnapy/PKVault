@@ -2,7 +2,7 @@ public class MainCreateBoxAction(string boxName) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        var boxes = await loaders.boxLoader.GetAllDtos();
+        var boxes = loaders.boxLoader.GetAllDtos();
         var maxId = boxes.Select(box => box.IdInt).Max();
 
         var id = maxId + 1;

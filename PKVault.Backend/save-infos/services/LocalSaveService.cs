@@ -5,7 +5,7 @@ public class LocalSaveService
     public static Dictionary<uint, SaveFile> SaveById { get; } = [];
     public static Dictionary<string, SaveFile> SaveByPath { get; } = [];
 
-    public static async Task<bool> ReadLocalSaves()
+    public static bool ReadLocalSaves()
     {
         SaveById.Clear();
         SaveByPath.Clear();

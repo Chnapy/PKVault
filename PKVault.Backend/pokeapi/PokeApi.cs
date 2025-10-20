@@ -23,7 +23,7 @@ public class PokeApi
         return await client.GetAsync<PokemonSpecies>(speciesName);
     }
 
-    public static async Task<PokemonSpecies?> GetPokemonSpecies(int species)
+    public static async Task<PokemonSpecies?> GetPokemonSpecies(ushort species)
     {
         return await client.GetAsync<PokemonSpecies>(species);
     }
@@ -36,6 +36,14 @@ public class PokeApi
             return null;
         }
         return await client.GetAsync(pokemonSpecies.EvolutionChain);
+    }
+
+    public static async Task<List<EvolutionChain>> GetEvolutionChains()
+    {
+        var evolutionChainsUrls = await client.GetAsyncUrlList<EvolutionChain>();
+        return [.. (await Task.WhenAll(evolutionChainsUrls
+            .Select(apiResource => client.GetAsync(apiResource))
+        )).OfType<EvolutionChain>()];
     }
 
     public static async Task<PokemonForm?> GetPokemonForms(NamedApiResource<PokemonForm> namedPokemonForm)
@@ -102,7 +110,7 @@ public class PokeApi
         return await client.GetAsync<PokeApiNet.Version>(id);
     }
 
-    public static uint GetGenerationValue(string resourceName)
+    public static byte GetGenerationValue(string resourceName)
     {
         return resourceName switch
         {

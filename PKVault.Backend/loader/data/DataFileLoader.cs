@@ -18,7 +18,7 @@ public class DataFileLoader : DataLoader
 
         var boxLoader = new EntityJSONLoader<BoxDTO, BoxEntity>(
             filePath: Path.Combine(dbDir, "box.json"),
-            entityToDto: async entity =>
+            entityToDto: entity =>
             {
                 return new BoxDTO
                 {
@@ -43,7 +43,7 @@ public class DataFileLoader : DataLoader
 
         var pkmLoader = new EntityJSONLoader<PkmDTO, PkmEntity>(
            filePath: Path.Combine(dbDir, "pkm.json"),
-            entityToDto: async entity => PkmDTO.FromEntity(entity),
+            entityToDto: PkmDTO.FromEntity,
             dtoToEntity: dto => dto.PkmEntity
         );
 
@@ -61,12 +61,12 @@ public class DataFileLoader : DataLoader
 
         var pkmVersionLoader = new EntityJSONLoader<PkmVersionDTO, PkmVersionEntity>(
            filePath: Path.Combine(dbDir, "pkm-version.json"),
-            entityToDto: async entity =>
+            entityToDto: entity =>
             {
-                var pkmDto = await pkmLoader.GetDto(entity.PkmId);
+                var pkmDto = pkmLoader.GetDto(entity.PkmId);
                 var pkm = getPkmVersionEntityPkm(entity);
 
-                return await PkmVersionDTO.FromEntity(entity, pkm, pkmDto!);
+                return PkmVersionDTO.FromEntity(entity, pkm, pkmDto!);
             },
             dtoToEntity: dto => dto.PkmVersionEntity
         )
@@ -112,6 +112,10 @@ public class DataFileLoader : DataLoader
 
     public void WriteSaves()
     {
+        loaders.boxLoader.WriteToFile();
+        loaders.pkmLoader.WriteToFile();
+        loaders.pkmVersionLoader.WriteToFile();
+
         foreach (var saveLoaders in loaders.saveLoadersDict.Values.ToList())
         {
             if (saveLoaders.Pkms.HasWritten || saveLoaders.Boxes.HasWritten)

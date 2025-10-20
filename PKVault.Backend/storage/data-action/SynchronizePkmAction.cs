@@ -1,10 +1,10 @@
 public class SynchronizePkmAction(uint saveId, string[] pkmVersionIds) : DataAction
 {
-    public static async Task<string[]> GetPkmVersionsToSynchronize(DataEntityLoaders loaders, uint saveId)
+    public static string[] GetPkmVersionsToSynchronize(DataEntityLoaders loaders, uint saveId)
     {
-        var pkmVersionDtos = await loaders.pkmVersionLoader.GetAllDtos();
+        var pkmVersionDtos = loaders.pkmVersionLoader.GetAllDtos();
         var saveLoaders = loaders.saveLoadersDict[saveId];
-        var allSavePkms = await saveLoaders.Pkms.GetAllDtos();
+        var allSavePkms = saveLoaders.Pkms.GetAllDtos();
 
         return [.. pkmVersionDtos.Select(pkmVersion =>
         {
@@ -39,9 +39,9 @@ public class SynchronizePkmAction(uint saveId, string[] pkmVersionIds) : DataAct
             throw new ArgumentException($"Pkm version ids cannot be empty");
         }
 
-        async Task act(string pkmVersionId)
+        void act(string pkmVersionId)
         {
-            var pkmVersionDto = await loaders.pkmVersionLoader.GetDto(pkmVersionId);
+            var pkmVersionDto = loaders.pkmVersionLoader.GetDto(pkmVersionId);
             var pkmDto = pkmVersionDto!.PkmDto;
 
             if (pkmDto.SaveId == default)
@@ -50,7 +50,7 @@ public class SynchronizePkmAction(uint saveId, string[] pkmVersionIds) : DataAct
             }
 
             var saveLoaders = loaders.saveLoadersDict[saveId];
-            var savePkms = (await saveLoaders.Pkms.GetAllDtos()).FindAll(pkm => pkm.PkmVersionId == pkmVersionId);
+            var savePkms = saveLoaders.Pkms.GetAllDtos().FindAll(pkm => pkm.PkmVersionId == pkmVersionId);
 
             if (savePkms.Count == 0)
             {
@@ -64,7 +64,7 @@ public class SynchronizePkmAction(uint saveId, string[] pkmVersionIds) : DataAct
 
             var savePkm = savePkms[0];
 
-            var relatedPkmVersions = (await loaders.pkmVersionLoader.GetAllDtos()).FindAll(value => value.PkmDto.Id == pkmDto.Id);
+            var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos().FindAll(value => value.PkmDto.Id == pkmDto.Id);
 
             relatedPkmVersions.ForEach((version) =>
             {
@@ -80,7 +80,7 @@ public class SynchronizePkmAction(uint saveId, string[] pkmVersionIds) : DataAct
 
         foreach (var pkmVersionId in pkmVersionIds)
         {
-            await act(pkmVersionId);
+            act(pkmVersionId);
         }
 
         return new()

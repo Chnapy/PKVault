@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
+import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { getSaveOrder } from '../../storage/util/get-save-order';
@@ -24,6 +25,8 @@ export const StorageItemMainActions: React.FC = () => {
     const formEditMode = StorageDetailsForm.useEditMode();
 
     const moveClickable = StorageMoveContext.useClickable(selected?.id ? [ selected.id ] : [], undefined);
+
+    const staticData = useStaticData();
 
     const saveInfosQuery = useSaveInfosGetAll();
     const mainPkmQuery = useStorageGetMainPkms();
@@ -51,7 +54,11 @@ export const StorageItemMainActions: React.FC = () => {
 
     const attachedSavePkm = selectedPkm.saveId ? pkmSavePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId && pkmVersionsIds.includes(savePkm.pkmVersionId)) : undefined;
 
-    const pkmVersionCanEvolve = pkmVersions.find(version => version.canEvolve);
+    const pkmVersionCanEvolve = pkmVersions.find(pkmVersion => {
+        const staticEvolves = staticData.evolves[ pkmVersion.species ];
+        const evolveSpecies = staticEvolves?.trade[ pkmVersion.version ] ?? staticEvolves?.tradeWithItem[ pkmVersion.heldItemPokeapiName ?? '' ]?.[ pkmVersion.version ];
+        return !!evolveSpecies;
+    });
 
     const canCreateVersions = selectedPkm.saveId
         ? []

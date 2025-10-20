@@ -2,7 +2,7 @@ public class MainUpdateBoxAction(string boxId, string boxName) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        var box = await loaders.boxLoader.GetDto(boxId);
+        var box = loaders.boxLoader.GetDto(boxId);
 
         var boxOldName = box!.Name;
         box.BoxEntity.Name = boxName;

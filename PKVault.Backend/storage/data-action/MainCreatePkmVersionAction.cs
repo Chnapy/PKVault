@@ -8,13 +8,13 @@ public class MainCreatePkmVersionAction(string pkmId, uint generation) : DataAct
     {
         Console.WriteLine($"Create PKM version, pkmId={pkmId}, generation={generation}");
 
-        var pkmDto = await loaders.pkmLoader.GetDto(pkmId);
+        var pkmDto = loaders.pkmLoader.GetDto(pkmId);
         if (pkmDto == default)
         {
             throw new KeyNotFoundException($"Pkm entity not found, id={pkmId}");
         }
 
-        var pkmVersions = (await loaders.pkmVersionLoader.GetAllDtos()).FindAll(pkmVersion => pkmVersion.PkmDto.Id == pkmId);
+        var pkmVersions = loaders.pkmVersionLoader.GetAllDtos().FindAll(pkmVersion => pkmVersion.PkmDto.Id == pkmId);
 
         var pkmVersionEntity = pkmVersions.Find(pkmVersion => pkmVersion.Generation == generation);
         if (pkmVersionEntity != default)
@@ -41,7 +41,7 @@ public class MainCreatePkmVersionAction(string pkmId, uint generation) : DataAct
             Filepath = PKMLoader.GetPKMFilepath(pkmConverted),
         };
 
-        var pkmVersionCreated = await PkmVersionDTO.FromEntity(pkmVersionEntityCreated, pkmConverted, pkmDto);
+        var pkmVersionCreated = PkmVersionDTO.FromEntity(pkmVersionEntityCreated, pkmConverted, pkmDto);
 
         loaders.pkmVersionLoader.WriteDto(pkmVersionCreated);
 

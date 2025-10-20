@@ -60,6 +60,7 @@ public class StaticDataService
         var natures = GetStaticNatures();
         var abilities = GetStaticAbilities();
         var items = GetStaticItems();
+        var evolves = GetStaticEvolves();
 
         var dto = new StaticDataDTO
         {
@@ -71,6 +72,7 @@ public class StaticDataService
             Natures = await natures,
             Abilities = abilities,
             Items = await items,
+            Evolves = await evolves,
             EggSprite = GetEggSprite()
         };
 
@@ -90,7 +92,7 @@ public class StaticDataService
         return dto;
     }
 
-    public static async Task<Dictionary<int, StaticVersion>> GetStaticVersions()
+    public static async Task<Dictionary<byte, StaticVersion>> GetStaticVersions()
     {
         var time = LogUtil.Time("static-data process versions");
         List<Task<StaticVersion>> tasks = [];
@@ -106,7 +108,7 @@ public class StaticDataService
 
                 return new StaticVersion
                 {
-                    Id = version,
+                    Id = (byte)version,
                     Name = await GetVersionName(version),
                     Generation = version.GetGeneration(),
                     MaxSpeciesId = blankSave?.MaxSpeciesID ?? 0,
@@ -116,16 +118,16 @@ public class StaticDataService
             }));
         }
 
-        var dict = new Dictionary<int, StaticVersion>();
+        var dict = new Dictionary<byte, StaticVersion>();
         foreach (var value in await Task.WhenAll(tasks))
         {
-            dict.Add((int)value.Id, value);
+            dict.Add(value.Id, value);
         }
         time();
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticSpecies>> GetStaticSpecies()
+    public static async Task<Dictionary<ushort, StaticSpecies>> GetStaticSpecies()
     {
         var time = LogUtil.Time("static-data process species");
         var speciesNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Species;
@@ -133,7 +135,7 @@ public class StaticDataService
 
         // List<string> notFound = [];
 
-        for (var i = 1; i <= 1025; i++)  // TODO
+        for (ushort i = 1; i < (ushort)Species.MAX_COUNT; i++)
         {
             var species = i;
             var speciesName = speciesNames[species];
@@ -284,7 +286,7 @@ public class StaticDataService
                         return;
                     }
 
-                    var formListEn = species == (int)Species.Alcremie
+                    var formListEn = species == (ushort)Species.Alcremie
                         ? FormConverter.GetAlcremieFormList(GameInfo.Strings.forms)
                         : FormConverter.GetFormList((ushort)species, GameInfo.Strings.Types, GameInfo.Strings.forms, GameInfo.GenderSymbolASCII, context);
 
@@ -446,7 +448,7 @@ public class StaticDataService
             }));
         }
 
-        var dict = new Dictionary<int, StaticSpecies>();
+        var dict = new Dictionary<ushort, StaticSpecies>();
         foreach (var value in await Task.WhenAll(tasks))
         {
             dict.Add(value.Id, value);
@@ -718,6 +720,83 @@ public class StaticDataService
 
         // File.WriteAllText("./item-not-found.md", string.Join('\n', notFound));
         return dict;
+    }
+
+    public static async Task<Dictionary<ushort, StaticEvolve>> GetStaticEvolves()
+    {
+        var staticEvolves = new Dictionary<ushort, StaticEvolve>();
+
+        void actChain(ChainLink chain)
+        {
+            var species = ushort.Parse(chain.Species.Url.TrimEnd('/').Split('/')[^1]);
+
+            var speciesEvolve = new StaticEvolve()
+            {
+                Species = species,
+                Trade = [],
+                TradeWithItem = [],
+            };
+
+            chain.EvolvesTo.ForEach(evolveTo =>
+            {
+                var evolveSpecies = ushort.Parse(evolveTo.Species.Url.TrimEnd('/').Split('/')[^1]);
+
+                evolveTo.EvolutionDetails.ForEach(details =>
+                {
+                    if (details.Trigger.Name != "trade")
+                    {
+                        return;
+                    }
+
+                    foreach (var version in Enum.GetValues<GameVersion>())
+                    {
+                        if (version.GetContext() == EntityContext.None)
+                        {
+                            continue;
+                        }
+
+                        var blankSave = BlankSaveFile.Get(version.GetContext());
+                        var speciesAllowed = SaveInfosDTO.IsSpeciesAllowed(evolveSpecies, blankSave);
+                        if (!speciesAllowed)
+                        {
+                            // Console.WriteLine($"EVOLVE TRADE NOT ALLOWED {species}->{evolveSpecies} v={version}");
+                            continue;
+                        }
+
+                        if (details.HeldItem == null)
+                        {
+                            speciesEvolve.Trade.Add((byte)version, evolveSpecies);
+                            // Console.WriteLine($"EVOLVE TRADE {species}->{evolveSpecies} v={version}");
+                        }
+                        else
+                        {
+                            if (!speciesEvolve.TradeWithItem.TryGetValue(details.HeldItem.Name, out var versionTradeDict))
+                            {
+                                versionTradeDict = [];
+                                speciesEvolve.TradeWithItem.Add(details.HeldItem.Name, versionTradeDict);
+                            }
+                            versionTradeDict.Add((byte)version, evolveSpecies);
+                            // Console.WriteLine($"EVOLVE TRADE {species}->{evolveSpecies} item={details.HeldItem.Name} v={version}");
+                        }
+                    }
+                });
+
+                actChain(evolveTo);
+            });
+
+            if (speciesEvolve.Trade.Count > 0 || speciesEvolve.TradeWithItem.Count > 0)
+            {
+                staticEvolves.Add(species, speciesEvolve);
+            }
+        }
+
+        var evolutionChains = await PokeApi.GetEvolutionChains();
+
+        evolutionChains.ForEach(evolutionChain => actChain(evolutionChain.Chain));
+
+        // var heldItemPokeapiName = GetPokeapiItemName(heldItemName);
+
+        return staticEvolves;
     }
 
     public static string GetEggSprite()

@@ -1,7 +1,7 @@
 
 public class EntityMemoryLoader<DTO, E>(
     Dictionary<string, E> entities,
-    Func<E, Task<DTO>> entityToDto,
+    Func<E, DTO> entityToDto,
     Func<DTO, E> dtoToEntity
 ) : EntityLoader<DTO, E>(dtoToEntity, entityToDto) where DTO : IWithId<string> where E : IWithId<string>
 {
@@ -15,5 +15,10 @@ public class EntityMemoryLoader<DTO, E>(
         entities = nextEntities.ToDictionary();
 
         HasWritten = true;
+    }
+
+    public override void WriteToFile()
+    {
+        throw new NotImplementedException();
     }
 }
