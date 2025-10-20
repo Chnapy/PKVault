@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
-import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
+import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainCreatePkmVersion, useStorageMainDeletePkmVersion, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
@@ -35,6 +35,7 @@ export const StorageItemMainActions: React.FC = () => {
     const mainCreatePkmVersionMutation = useStorageMainCreatePkmVersion();
     const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
     const evolvePkmsMutation = useStorageEvolvePkms();
+    const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
 
     const selectedPkm = mainPkmQuery.data?.data.find(pkm => pkm.id === selected?.id);
     const pkmSavePkmQuery = useStorageGetSavePkms(selectedPkm?.saveId ?? 0);
@@ -74,6 +75,9 @@ export const StorageItemMainActions: React.FC = () => {
     const canEvolve = pkmVersionCanEvolve && !selectedPkm.saveId;
     const canDetach = !!selectedPkm.saveId;
     const canGoToSave = !!selectedPkm.saveId;
+
+    const canRemovePkm = selectedPkm.canDelete
+        && mainPkmVersionQuery.data?.data.filter(pkmVersion => pkmVersion.pkmId === selectedPkm.id).length === 1;
 
     return <StorageItemMainActionsContainer pkmId={selectedPkm.id}>
         <div
@@ -199,6 +203,19 @@ export const StorageItemMainActions: React.FC = () => {
                 <Icon name='link' solid forButton />
                 {t('storage.actions.detach-main')}
             </ButtonWithDisabledPopover>}
+
+            {canRemovePkm && <ButtonWithConfirm
+                anchor='right'
+                bgColor={theme.bg.red}
+                onClick={() => mainPkmVersionDeleteMutation.mutateAsync({
+                    params: {
+                        pkmVersionIds: [ selectedPkm.id ],
+                    },
+                })}
+            >
+                <Icon name='trash' solid forButton />
+                {t('storage.actions.release')}
+            </ButtonWithConfirm>}
         </div>
     </StorageItemMainActionsContainer>;
 };

@@ -1,7 +1,7 @@
 import { css } from '@emotion/css';
 import { Popover, PopoverButton } from '@headlessui/react';
 import React from "react";
-import { type PkmSaveDTO, type SaveInfosDTO } from "../data/sdk/model";
+import { BoxType, type PkmSaveDTO, type SaveInfosDTO } from "../data/sdk/model";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import {
   useStorageGetSaveBoxes,
@@ -43,20 +43,27 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
   const saveBoxesQuery = useStorageGetSaveBoxes(saveId);
   const savePkmsQuery = useStorageGetSavePkms(saveId);
 
+  const loading = [ saveBoxesQuery, savePkmsQuery ].some(query => query.isLoading);
+
   const saveBoxes = saveBoxesQuery.data?.data ?? [];
   const savePkms = savePkmsQuery.data?.data ?? [];
 
   const selectedBoxIndex = saveBoxes.findIndex((box) => box.idInt === boxId);
-  const selectedBox = saveBoxes[ selectedBoxIndex ];
-
-  if (!selectedBox || !saveInfos) {
-    return null;
-  }
+  const selectedBox = saveBoxes[ selectedBoxIndex ]
+    // placeholder box
+    ?? {
+    id: '-99',
+    idInt: -99,
+    name: '',
+    type: BoxType.Default,
+    slotCount: 30,
+    canReceivePkm: false,
+  };
 
   const previousBox = saveBoxes[ selectedBoxIndex - 1 ] ?? saveBoxes[ saveBoxes.length - 1 ];
   const nextBox = saveBoxes[ selectedBoxIndex + 1 ] ?? saveBoxes[ 0 ];
 
-  const boxPkmsList = savePkms.filter((pkm) => pkm.boxId === selectedBox.idInt);
+  const boxPkmsList = selectedBox ? savePkms.filter((pkm) => pkm.boxId === selectedBox.idInt) : [];
 
   const boxPkms = Object.fromEntries(
     boxPkmsList.map((pkm) => [ pkm.boxSlot, pkm ])
@@ -77,6 +84,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
       <PopoverButton
         as={StorageBox}
         style={style}
+        loading={loading}
         header={<StorageHeader
           saveId={saveId}
           gameLogo={<div
@@ -87,11 +95,11 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
               },
             })}
           >
-            <SaveCardImg
+            {saveInfos && <SaveCardImg
               version={saveInfos.version}
               size={24}
               borderWidth={2}
-            />
+            />}
 
             <div
               className='save-item'

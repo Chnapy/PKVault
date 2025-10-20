@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
+import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
@@ -31,6 +31,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
 
     const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
     const evolvePkmsMutation = useStorageEvolvePkms();
+    const savePkmsDeleteMutation = useStorageSaveDeletePkms();
 
     const selectedPkm = pkmSavePkmQuery.data?.data.find(pkm => pkm.id === selected?.id);
     if (!selectedPkm) {
@@ -46,6 +47,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
     const canEvolve = !selectedPkm.pkmVersionId && !!evolveSpecies;
     const canDetach = !!selectedPkm.pkmVersionId;
     const canGoToMain = !!selectedPkm.pkmVersionId;
+    const canRemovePkm = selectedPkm.canDelete;
 
     return <StorageItemSaveActionsContainer saveId={saveId} pkmId={selectedPkm.id}>
         <div
@@ -154,6 +156,20 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
                 <Icon name='link' solid forButton />
                 {t('storage.actions.detach-save')}
             </ButtonWithDisabledPopover>}
+
+            {canRemovePkm && <ButtonWithConfirm
+                anchor='right'
+                bgColor={theme.bg.red}
+                onClick={() => savePkmsDeleteMutation.mutateAsync({
+                    saveId,
+                    params: {
+                        pkmIds: [ selectedPkm.id ],
+                    },
+                })}
+            >
+                <Icon name='trash' solid forButton />
+                {t('storage.actions.release')}
+            </ButtonWithConfirm>}
         </div>
     </StorageItemSaveActionsContainer>;
 };

@@ -1,7 +1,7 @@
 import { css } from '@emotion/css';
 import { Popover, PopoverButton } from '@headlessui/react';
 import React from "react";
-import type { PkmDTO } from "../data/sdk/model";
+import { BoxType, type PkmDTO } from "../data/sdk/model";
 import {
   useStorageDeleteMainBox,
   useStorageGetMainBoxes,
@@ -42,17 +42,22 @@ export const StorageMainBoxContent: React.FC<{
   const boxesQuery = useStorageGetMainBoxes();
   const pkmsQuery = useStorageGetMainPkms();
 
+  const loading = [ boxesQuery, pkmsQuery ].some(query => query.isLoading);
+
   const boxDeleteMutation = useStorageDeleteMainBox();
 
   const boxes = boxesQuery.data?.data ?? [];
   const pkms = pkmsQuery.data?.data ?? [];
 
   const selectedBoxIndex = boxes.findIndex((box) => box.idInt === boxId);
-  const selectedBox = boxes[ selectedBoxIndex ];
-
-  if (!selectedBox) {
-    return null;
-  }
+  const selectedBox = boxes[ selectedBoxIndex ] ?? {
+    id: '-99',
+    idInt: -99,
+    name: '',
+    type: BoxType.Default,
+    slotCount: 30,
+    canReceivePkm: false,
+  };
 
   const previousBox = boxes[ selectedBoxIndex - 1 ] ?? boxes[ boxes.length - 1 ];
   const nextBox = boxes[ selectedBoxIndex + 1 ] ?? boxes[ 0 ];
@@ -75,6 +80,7 @@ export const StorageMainBoxContent: React.FC<{
     >
       <PopoverButton
         as={StorageBox}
+        loading={loading}
         style={style}
         header={
           <StorageHeader
