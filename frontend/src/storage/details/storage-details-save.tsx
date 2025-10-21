@@ -63,7 +63,6 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({
     return (
         <StorageDetailsBase
             {...savePkm}
-            id={savePkm.idBase}
             validityReport={[
                 savePkm.isDuplicate && t('details.is-duplicate'),
                 savePkm.validityReport ].filter(Boolean).join('\n---\n')

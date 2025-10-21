@@ -85,6 +85,7 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
     return (
         <StorageDetailsBase
             {...pkmVersion}
+            idBase={pkmVersion.id}
             isValid={pkmVersion.isValid}
             validityReport={[
                 !pkmVersion.isAttachedValid && t('details.attached-pkm-not-found'),

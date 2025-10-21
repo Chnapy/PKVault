@@ -22,7 +22,7 @@ import { TextStats } from './text-stats';
 import { Gender } from '../gender/gender';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
-    | 'id' | 'pid' | 'species' | 'version' | 'generation' | 'form' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
+    | 'id' | 'idBase' | 'pid' | 'species' | 'version' | 'generation' | 'form' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
     | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
@@ -78,7 +78,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
         }
         mainInfos={
             <StorageDetailsMainInfos
-                id={pkm.id}
+                idBase={pkm.idBase}
                 pid={pkm.pid}
                 species={pkm.species}
                 speciesName={speciesName ?? ''}

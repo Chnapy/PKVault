@@ -4,7 +4,7 @@ import { TextInput } from '../input/text-input';
 import { StorageDetailsForm } from './storage-details-form';
 
 export type StorageDetailsMainInfosProps = {
-    id: string;
+    idBase: string;
     pid: number;
     species: number;
     speciesName: string;
@@ -15,11 +15,11 @@ export type StorageDetailsMainInfosProps = {
     level: number;
 };
 
-export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = ({ id, pid, species, speciesName, nickname, nicknameMaxLength, types, level }) => {
+export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = ({ idBase, pid, species, speciesName, nickname, nicknameMaxLength, types, level }) => {
     const formContext = StorageDetailsForm.useContext();
 
     return <DetailsMainInfos
-        id={id}
+        idBase={idBase}
         pid={pid}
         species={species}
         speciesName={speciesName}

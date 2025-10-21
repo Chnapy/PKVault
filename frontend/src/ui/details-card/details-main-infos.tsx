@@ -6,7 +6,7 @@ import { TypeItem } from '../type-item/type-item';
 import { DetailsLevel } from './details-level';
 
 export type DetailsMainInfosProps = {
-    id?: string;
+    idBase?: string;
     pid?: number;
     species: number;
     speciesName: React.ReactNode;
@@ -16,7 +16,7 @@ export type DetailsMainInfosProps = {
     level?: number;
 };
 
-export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ id, pid = 0, species, speciesName, nickname, types, level }) => {
+export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid = 0, species, speciesName, nickname, types, level }) => {
     const { t } = useTranslate();
 
     return <>
@@ -42,8 +42,8 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ id, pid = 0,
         {t('details.dex.local')}<span style={{ color: theme.text.primary }}>TODO</span>{' '}
         {t('details.dex.natio')}<span style={{ color: theme.text.primary }}>{getSpeciesNO(species)}</span>
         <br />
-        {id !== undefined ? <>
-            {t('details.id')} <span style={{ color: theme.text.primary }}>{id}</span> {pid > 0 && <>{t('details.pid')} <span style={{ color: theme.text.primary }}>{pid}</span></>}
+        {idBase !== undefined ? <>
+            {t('details.id')} <span style={{ color: theme.text.primary }}>{idBase}</span> {pid > 0 && <>{t('details.pid')} <span style={{ color: theme.text.primary }}>{pid}</span></>}
         </> : ' '}
     </>;
 };

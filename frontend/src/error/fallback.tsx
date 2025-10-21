@@ -37,7 +37,7 @@ export const Fallback = {
                     href="https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app"
                     target="_blank"
                     style={{ color: theme.text.primaryLight, whiteSpace: 'nowrap' }}
-                >projectforum discussion</a>.
+                >projectpokemon discussion</a>.
             </div>
 
             <pre
