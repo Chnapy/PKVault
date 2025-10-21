@@ -1,4 +1,5 @@
 import React from 'react';
+import { theme } from '../theme';
 
 export type CheckboxInputProps = {
     checked: boolean;
@@ -27,6 +28,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({ checked, indetermi
             style={{
                 width: '1lh',
                 height: '1lh',
+                accentColor: theme.bg.primary,
                 pointerEvents: 'none',
             }}
             checked={checked}
