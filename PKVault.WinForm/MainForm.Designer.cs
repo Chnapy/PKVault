@@ -101,6 +101,8 @@ partial class MainForm
 
         var contentTypeProvider = new FileExtensionContentTypeProvider();
 
+        InjectIntoFrontend();
+
         webView.CoreWebView2.AddWebResourceRequestedFilter("http://pkvault/*", CoreWebView2WebResourceContext.All);
         webView.CoreWebView2.AddWebResourceRequestedFilter("http://localhost:*", CoreWebView2WebResourceContext.All);
 
@@ -246,4 +248,92 @@ partial class MainForm
     {
         webView.Size = this.ClientSize - new System.Drawing.Size(webView.Location);
     }
+
+    private async void InjectIntoFrontend()
+    {
+        webView.CoreWebView2.WebMessageReceived += async (object sender, CoreWebView2WebMessageReceivedEventArgs e) =>
+        {
+            var message = e.WebMessageAsJson;
+            Console.WriteLine($"Message received: {message}");
+            try
+            {
+                var fileExploreRequest = JsonSerializer.Deserialize<FileExploreRequest>(message);
+
+                FileExploreResponse GetDialogResponse()
+                {
+                    if (fileExploreRequest.directoryOnly)
+                    {
+                        Console.WriteLine($"Directory only");
+                        using var dialogFolder = new FolderBrowserDialog();
+
+                        dialogFolder.Description = fileExploreRequest.title;
+                        dialogFolder.Multiselect = fileExploreRequest.multiselect;
+                        if (fileExploreRequest.basePath != default)
+                            dialogFolder.InitialDirectory = fileExploreRequest.basePath;
+
+                        var dialogFolderResult = dialogFolder.ShowDialog();
+
+                        return new()
+                        {
+                            type = fileExploreRequest.type,
+                            id = fileExploreRequest.id,
+                            directoryOnly = true,
+                            values = dialogFolderResult == DialogResult.OK
+                                ? dialogFolder.SelectedPaths.Select(path => path.Replace(@"\", "/")).ToArray()
+                                : [],
+                        };
+                    }
+
+                    Console.WriteLine($"File only");
+                    using var dialogFile = new OpenFileDialog();
+
+                    dialogFile.Title = fileExploreRequest.title;
+                    dialogFile.Multiselect = fileExploreRequest.multiselect;
+                    if (fileExploreRequest.basePath != default)
+                        dialogFile.InitialDirectory = fileExploreRequest.basePath;
+
+                    var dialogResult = dialogFile.ShowDialog();
+
+                    return new()
+                    {
+                        type = fileExploreRequest.type,
+                        id = fileExploreRequest.id,
+                        directoryOnly = true,
+                        values = dialogResult == DialogResult.OK
+                            ? dialogFile.FileNames.Select(path => path.Replace(@"\", "/")).ToArray()
+                            : [],
+                    };
+                }
+
+                var response = GetDialogResponse();
+                var responseSerialized = JsonSerializer.Serialize(response);
+                string script = $"window.dispatchEvent(new CustomEvent('fileExplore', {{ detail: JSON.parse('{responseSerialized}') }}));";
+                var result = await webView.ExecuteScriptAsync(script);
+                Console.WriteLine($"Script = {script} result= {result}");
+            }
+            catch (JsonException ex)
+            {
+                Console.Error.WriteLine(ex);
+            }
+        };
+    }
+
+}
+
+struct FileExploreRequest
+{
+    public string type { get; set; } //'file-explore';
+    public int id { get; set; }
+    public bool directoryOnly { get; set; }
+    public string basePath { get; set; }
+    public string title { get; set; }
+    public bool multiselect { get; set; }
+}
+
+struct FileExploreResponse
+{
+    public required string type { get; set; } //'file-explore';
+    public required int id { get; set; }
+    public required bool directoryOnly { get; set; }
+    public required string[] values { get; set; }
 }

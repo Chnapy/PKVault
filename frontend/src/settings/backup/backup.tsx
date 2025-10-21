@@ -60,6 +60,8 @@ export const Backup: React.FC = withErrorCatcher('default', () => {
                         flexDirection: 'column',
                         gap: 4,
                         padding: 8,
+                        maxHeight: 300,
+                        overflowY: 'auto',
                     }}
                 >
                     <div

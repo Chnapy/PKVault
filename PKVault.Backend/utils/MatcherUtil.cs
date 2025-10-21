@@ -16,10 +16,10 @@ public class MatcherUtil
             return [];
         }
 
-        // starts with / or \
-        static bool isAbsolute(string glob) => glob.Length > 0 && (glob[0] == '/' || glob[0] == '\\');
+        // starts with / or \ or x:
+        static bool isAbsolute(string glob) => glob.Length > 0 && (glob[0] == '/' || glob[0] == '\\' || (glob.Length > 2 && glob[1] == ':'));
 
-        var absoluteGlobs = globs.FindAll(isAbsolute);
+        var absoluteGlobs = globs.FindAll(isAbsolute).Select(glob => glob.Length > 2 && glob[1] == ':' ? glob[2..] : glob);
         var relativeGlobs = globs.FindAll(glob => !isAbsolute(glob));
 
         var absoluteMatcher = new Matcher();
@@ -35,6 +35,11 @@ public class MatcherUtil
         var relativeResults = relativeMatches.Files.Select(file => Path.Combine(".", file.Path));
 
         string[] results = [.. absoluteResults, .. relativeResults];
+
+        if (results.Length > 200)
+        {
+            throw new ArgumentException($"Too much results ({results.Length}) for given globs");
+        }
 
         return [.. results.Select(path => path.Replace('\\', '/'))];
     }

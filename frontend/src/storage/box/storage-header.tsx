@@ -74,7 +74,7 @@ export const StorageHeader: React.FC<{
         >
             <StorageSelectAll saveId={saveId} boxId={boxId} />
 
-            <div style={{ display: 'flex', gap: 2 }}>
+            <div style={{ display: 'flex', gap: 2, whiteSpace: 'nowrap' }}>
                 <Icon name='folder' solid forButton />
                 <span style={{ color: theme.text.primary }}>{boxPkmCount}</span>
                 /{boxSlotCount} - {t('total')}.<span style={{ color: theme.text.primary }}>{totalPkmCount}</span>

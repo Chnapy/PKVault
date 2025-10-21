@@ -172,7 +172,7 @@ export const StorageMainBoxContent: React.FC<{
         {allItems.map((pkm, i) => {
           return <div
             key={i}
-            style={{ order: i }}
+            style={{ order: i, display: 'flex' }}
           >
             {!pkm
               || (moveContext.selected

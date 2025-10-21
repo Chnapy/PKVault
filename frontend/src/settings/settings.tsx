@@ -10,7 +10,7 @@ import { Icon } from '../ui/icon/icon';
 import { SelectStringInput } from '../ui/input/select-input';
 import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
-import { SaveGlobsInput } from './save-globs-input';
+import { SaveGlobsList } from './save-globs/save-globs-list';
 
 export const Settings: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
@@ -58,16 +58,6 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                 gap: 8,
             }}
         >
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                gap: 4
-            }}>
-                <Icon name='info-circle' solid forButton />
-                {t('settings.relative-paths')}
-                <br />{settings.appDirectory}
-            </div>
-
             <div
                 style={{
                     display: 'flex',
@@ -94,18 +84,6 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                         onChange={value => setValue('language', value)}
                         disabled={!settings.canUpdateSettings}
                     />
-
-                    <TextInput
-                        label={t('settings.form.db')}
-                        {...register('dB_PATH', { setValueAs: (value) => value.trim() })}
-                        disabled={!settings.canUpdateSettings}
-                    />
-
-                    <TextInput
-                        label={t('settings.form.backups')}
-                        {...register('backuP_PATH', { setValueAs: (value) => value.trim() })}
-                        disabled={!settings.canUpdateSettings}
-                    />
                 </div>
 
                 <div
@@ -121,35 +99,78 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                         value={settings.settingsPath}
                         disabled
                     />
-
-                    <TextInput
-                        label={t('settings.form.storage')}
-                        {...register('storagE_PATH', { setValueAs: (value) => value.trim() })}
-                        disabled={!settings.canUpdateSettings}
-                    />
                 </div>
             </div>
 
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                }}
-            >
-                <SaveGlobsInput
-                    {...register('savE_GLOBS')}
-                    value={watch('savE_GLOBS')}
-                    disabled={!settings.canUpdateSettings}
-                />
+            <SaveGlobsList
+                {...register('savE_GLOBS')}
+                value={watch('savE_GLOBS')}
+                onChange={(value) => setValue('savE_GLOBS', value)}
+                disabled={!settings.canUpdateSettings}
+            />
+
+            <details>
+                <summary style={{ cursor: 'pointer' }}>{t('settings.advanced')}</summary>
+
                 <div style={{
                     display: 'flex',
-                    justifyContent: 'center',
-                    gap: 4
+                    flexDirection: 'column',
+                    gap: 8,
                 }}>
-                    <Icon name='info-circle' solid forButton />
-                    {t('settings.form.saves.help')}
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: 4
+                    }}>
+                        <Icon name='info-circle' solid forButton />
+                        {t('settings.relative-paths')}: {settings.appDirectory}
+                    </div>
+
+                    <div
+                        style={{
+                            display: 'flex',
+                            gap: 8,
+                            flexWrap: 'wrap'
+                        }}
+                    >
+                        <div
+                            style={{
+                                flexGrow: 1,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 8,
+                            }}
+                        >
+                            <TextInput
+                                label={t('settings.form.db')}
+                                {...register('dB_PATH', { setValueAs: (value) => value.trim() })}
+                                disabled={!settings.canUpdateSettings}
+                            />
+
+                            <TextInput
+                                label={t('settings.form.backups')}
+                                {...register('backuP_PATH', { setValueAs: (value) => value.trim() })}
+                                disabled={!settings.canUpdateSettings}
+                            />
+                        </div>
+
+                        <div
+                            style={{
+                                flexGrow: 1,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 8,
+                            }}
+                        >
+                            <TextInput
+                                label={t('settings.form.storage')}
+                                {...register('storagE_PATH', { setValueAs: (value) => value.trim() })}
+                                disabled={!settings.canUpdateSettings}
+                            />
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </details>
 
             <div
                 style={{

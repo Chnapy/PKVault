@@ -28,9 +28,11 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
         refetchOnMount: false,
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,
+        retry: false,
       },
       mutations: {
-        onSettled: async (data) => {
+        onSettled: async (data, error) => {
+          if (error) console.log('error', error);
           if (!isResponse(data)) {
             return;
           }

@@ -198,7 +198,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
         {allItems.map((pkm, i) => {
           return <div
             key={i}
-            style={{ order: i }}
+            style={{ order: i, display: 'flex' }}
           >
             {!pkm
               || (moveContext.selected?.saveId === saveId

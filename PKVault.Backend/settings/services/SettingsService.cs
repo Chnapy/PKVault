@@ -53,14 +53,7 @@ public class SettingsService
         settings = new()
         {
             DB_PATH = "./tmp/db",
-            SAVE_GLOBS = [
-                "./tmp/saves/**/*.sav",
-                "./tmp/saves/**/*.srm",
-                "./tmp/saves/**/*.gci",
-                "./tmp/saves/**/*.dsv",
-                "./tmp/saves/**/*.dat",
-                "./tmp/saves/**/main"
-            ],
+            SAVE_GLOBS = [],
             STORAGE_PATH = "./tmp/storage",
             BACKUP_PATH = "./tmp/backup",
             HTTPS_NOCERT = false,
@@ -69,14 +62,7 @@ public class SettingsService
         settings = new()
         {
             DB_PATH = "./db",
-            SAVE_GLOBS = [
-                "./saves/**/*.sav",
-                "./saves/**/*.srm",
-                "./saves/**/*.gci",
-                "./saves/**/*.dsv",
-                "./saves/**/*.dat",
-                "./saves/**/main"
-            ],
+            SAVE_GLOBS = [],
             STORAGE_PATH = "./storage",
             BACKUP_PATH = "./backup",
         };

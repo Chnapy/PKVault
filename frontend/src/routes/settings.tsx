@@ -14,7 +14,7 @@ const SettingsPage: React.FC = withErrorCatcher('default', () => {
         alignItems: "stretch",
         gap: 16,
         width: '100%',
-        maxWidth: 900,
+        maxWidth: 914,
         marginLeft: 'auto',
         marginRight: 'auto',
       }}
