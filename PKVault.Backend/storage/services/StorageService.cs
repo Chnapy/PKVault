@@ -371,6 +371,7 @@ public class StorageService
             File.Copy(Path.Combine(dbDir, "pkm-version.json"), Path.Combine(dbDir, "pkm-version.json.bkp"), true);
 
             pkmVersionToDelete.ForEach(pkmVersionId => pkmVersionLoader.DeleteEntity(pkmVersionId));
+            pkmVersionLoader.WriteToFile();
         }
 
         var pkmVersionEntities = pkmVersionLoader.GetAllEntities();
@@ -393,6 +394,7 @@ public class StorageService
             File.Copy(Path.Combine(dbDir, "pkm.json"), Path.Combine(dbDir, "pkm.json.bkp"), true);
 
             pkmsToDelete.ForEach(pkmId => pkmLoader.DeleteEntity(pkmId));
+            pkmLoader.WriteToFile();
         }
 
         time();
