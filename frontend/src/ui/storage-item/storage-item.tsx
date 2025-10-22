@@ -158,6 +158,9 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
           alignItems: 'center',
           gap: 2,
           textAlign: 'center',
+          maxWidth: 72,
+          flexWrap: 'wrap',
+          justifyContent: 'flex-end',
         }}
       >
         {isShiny && <ShinyIcon style={{ height: small ? 15 : undefined }} />}
