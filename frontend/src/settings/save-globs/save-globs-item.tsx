@@ -65,7 +65,7 @@ export const SaveGlobsItem: React.FC<SaveGlobsItemProps> = ({ value, onEdit, onR
             >
                 <Icon name={!isFile ? 'folder' : 'file-import'} solid forButton />
 
-                <div style={{ flexGrow: 1 }}>
+                <div style={{ flexGrow: 1, lineBreak: 'anywhere' }}>
                     {isDesktop
                         ? value
                         : <TextInput
@@ -81,6 +81,7 @@ export const SaveGlobsItem: React.FC<SaveGlobsItemProps> = ({ value, onEdit, onR
                         display: 'flex',
                         gap: 4,
                         color: hasError ? theme.text.red : undefined,
+                        whiteSpace: 'nowrap',
                     }}
                 >
                     {hasWarning && <Icon name='exclamation-triangle' solid forButton />}
