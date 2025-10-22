@@ -49,8 +49,10 @@ export const StorageMainBoxContent: React.FC<{
   const boxes = boxesQuery.data?.data ?? [];
   const pkms = pkmsQuery.data?.data ?? [];
 
-  const selectedBoxIndex = boxes.findIndex((box) => box.idInt === boxId);
-  const selectedBox = boxes[ selectedBoxIndex ] ?? {
+  const filteredBoxes = boxes.filter(box => !mainBoxIds.includes(box.idInt) || box.idInt === boxId);
+
+  const selectedBoxIndex = filteredBoxes.findIndex((box) => box.idInt === boxId);
+  const selectedBox = filteredBoxes[ selectedBoxIndex ] ?? {
     id: '-99',
     idInt: -99,
     name: '',
@@ -59,8 +61,8 @@ export const StorageMainBoxContent: React.FC<{
     canReceivePkm: false,
   };
 
-  const previousBox = boxes[ selectedBoxIndex - 1 ] ?? boxes[ boxes.length - 1 ];
-  const nextBox = boxes[ selectedBoxIndex + 1 ] ?? boxes[ 0 ];
+  const previousBox = filteredBoxes[ selectedBoxIndex - 1 ] ?? filteredBoxes[ filteredBoxes.length - 1 ];
+  const nextBox = filteredBoxes[ selectedBoxIndex + 1 ] ?? filteredBoxes[ 0 ];
 
   const boxPkmsList = pkms.filter((pkm) => pkm.boxId === selectedBox.idInt);
 

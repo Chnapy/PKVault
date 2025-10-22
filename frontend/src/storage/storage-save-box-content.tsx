@@ -48,8 +48,10 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
   const saveBoxes = saveBoxesQuery.data?.data ?? [];
   const savePkms = savePkmsQuery.data?.data ?? [];
 
-  const selectedBoxIndex = saveBoxes.findIndex((box) => box.idInt === boxId);
-  const selectedBox = saveBoxes[ selectedBoxIndex ]
+  const filteredBoxes = saveBoxes.filter(box => !saveBoxIds.includes(box.idInt) || box.idInt === boxId);
+
+  const selectedBoxIndex = filteredBoxes.findIndex((box) => box.idInt === boxId);
+  const selectedBox = filteredBoxes[ selectedBoxIndex ]
     // placeholder box
     ?? {
     id: '-99',
@@ -60,8 +62,8 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
     canReceivePkm: false,
   };
 
-  const previousBox = saveBoxes[ selectedBoxIndex - 1 ] ?? saveBoxes[ saveBoxes.length - 1 ];
-  const nextBox = saveBoxes[ selectedBoxIndex + 1 ] ?? saveBoxes[ 0 ];
+  const previousBox = filteredBoxes[ selectedBoxIndex - 1 ] ?? filteredBoxes[ filteredBoxes.length - 1 ];
+  const nextBox = filteredBoxes[ selectedBoxIndex + 1 ] ?? filteredBoxes[ 0 ];
 
   const boxPkmsList = selectedBox ? savePkms.filter((pkm) => pkm.boxId === selectedBox.idInt) : [];
 
