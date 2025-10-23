@@ -1,9 +1,9 @@
 import type React from 'react';
-import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { useStaticData } from '../../hooks/use-static-data';
 import { PathLine } from '../../settings/path-line';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
+import { ItemImg } from '../details-card/item-img';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { TextContainer } from '../text-container/text-container';
@@ -75,7 +75,7 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                     {t('save.time')} <Icon name='clock' solid forButton /> <span style={{ color: theme.text.primary }}>{playTime}</span>
                     <br />
                     {t('save.dex')} <Icon name='eye' solid forButton /> <span style={{ color: theme.text.primary }}>{dexSeenCount}</span>{' '}
-                    <img src={getApiFullUrl(staticData.itemPokeball?.sprite ?? '')} style={{ height: '1lh', width: '1lh', margin: -4 }} /> <span style={{ color: theme.text.primary }}>{dexCaughtCount}</span>
+                    <ItemImg item={staticData.itemPokeball.id} size={'1lh'} style={{ margin: -4 }} /> <span style={{ color: theme.text.primary }}>{dexCaughtCount}</span>
                     <br />
                     {t('save.storage')} <Icon name='folder' solid forButton /> <span style={{ color: theme.text.primary }}>{ownedCount}</span>
                     {shinyCount > 0 && <>

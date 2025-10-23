@@ -153,7 +153,7 @@ export const PokedexDetails: React.FC = () => {
             isFemale={selectedGender === GenderType.Female}
             isOwned={owned}
             isShiny={selectedShiny}
-            ball={caught ? staticData.itemPokeball?.id : undefined}
+            ball={caught ? staticData.itemPokeball.id : undefined}
             shinyPart={selectedSave.generation > 1 && <ButtonLike
               onClick={() => setSelectedShiny(!selectedShiny)}
               disabled={!selectedForm.isOwnedShiny}

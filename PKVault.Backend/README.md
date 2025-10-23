@@ -12,6 +12,12 @@ Generate PokeApi data. This process pick only the data used by the app & compres
 dotnet run gen-pokeapi
 ```
 
+Similar process with spritesheets.
+
+```
+dotnet run gen-spritesheets
+```
+
 ## Dev
 
 Basic dev process.

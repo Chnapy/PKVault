@@ -12,6 +12,7 @@ public class StaticDataDTO
     public required Dictionary<int, StaticAbility> Abilities { get; set; }
     public required Dictionary<int, StaticItem> Items { get; set; }
     public required Dictionary<ushort, StaticEvolve> Evolves { get; set; }
+    public required StaticSpritesheets Spritesheets { get; set; }
     public required string EggSprite { get; set; }
 }
 
@@ -105,6 +106,14 @@ public struct StaticEvolve
     // item -> version -> evolved species
     public required Dictionary<string, Dictionary<byte, ushort>> TradeWithItem { get; set; }
 }
+
+public record StaticSpritesheets
+(
+    Dictionary<string, SpriteInfo> Species,
+    Dictionary<string, SpriteInfo> Items
+);
+
+public record SpriteInfo(string SheetName, int X, int Y, int Width, int Height);
 
 public enum MoveCategory
 {

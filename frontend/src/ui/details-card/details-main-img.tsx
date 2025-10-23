@@ -1,8 +1,7 @@
 import type React from 'react';
-import { getApiFullUrl } from '../../data/mutator/custom-instance';
-import { useStaticData } from '../../hooks/use-static-data';
 import { Icon } from '../icon/icon';
 import { theme } from '../theme';
+import { ItemImg } from './item-img';
 import { SpeciesImg } from './species-img';
 
 export type DetailsMainImgProps = {
@@ -20,8 +19,6 @@ export type DetailsMainImgProps = {
 };
 
 export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, generation, form, isFemale, isShiny, isEgg, isShadow, isOwned, ball = 0, shinyPart, genderPart }) => {
-    const staticData = useStaticData();
-
     return <>
         <div
             style={{
@@ -43,13 +40,7 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, generat
                 color: theme.text.default
             }}
         >
-            {ball > 0 && <img
-                src={getApiFullUrl(staticData.items[ ball ]?.sprite ?? '')}
-                style={{
-                    width: 30,
-                    height: 30,
-                }}
-            />}
+            {ball > 0 && <ItemImg item={ball} />}
 
             {isOwned && <Icon name='folder' solid />}
         </div>

@@ -1,7 +1,7 @@
 import { css, cx } from '@emotion/css';
 import type React from 'react';
-import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { useStaticData } from '../../hooks/use-static-data';
+import { SpriteImg, type SpriteImgProps } from './sprite-img';
 
 type SpeciesImgProps = {
     species: number;
@@ -12,7 +12,7 @@ type SpeciesImgProps = {
     isEgg?: boolean;
     isShadow?: boolean;
     small?: boolean;
-} & React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
+} & Omit<SpriteImgProps, 'spriteInfos' | 'size'>;
 
 export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, generation, form, isFemale, isShiny, isEgg, isShadow, small, ...imgProps }) => {
     const staticData = useStaticData();
@@ -30,7 +30,7 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, generation, for
 
     const { name, spriteDefault, spriteFemale, spriteShiny, spriteShinyFemale } = staticForm;
 
-    const getSpriteUrl = (): string => {
+    const getSpriteUrl = (): string | null => {
         if (isEgg) {
             return staticData.eggSprite;
         }
@@ -42,24 +42,18 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, generation, for
         return isFemale ? spriteFemale ?? spriteDefault : spriteDefault;
     };
 
-    const spriteUrl = getSpriteUrl();
-    const sprite = getApiFullUrl(getSpriteUrl());
-
-    if (!spriteUrl) {
+    const spriteKey = getSpriteUrl();
+    const spriteInfos = typeof spriteKey === 'string' ? staticData.spritesheets.species[ spriteKey ] : undefined;
+    if (!spriteInfos) {
         console.log('No sprite -', name, species, generation, form, staticForms);
     }
 
-    return <img
-        src={sprite}
-        alt={`S-${species}-${generation}-${form}`}
-        loading='lazy'
-        {...imgProps}
+    return spriteInfos && <SpriteImg
+        spriteInfos={spriteInfos}
+        size={small ? 48 : 96}
         className={cx(css({
-            imageRendering: small ? undefined : "pixelated",
-            height: small ? 48 : 96,
-            width: small ? 48 : 96,
-            display: "block",
             filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
         }), imgProps.className)}
+        {...imgProps}
     />;
 };

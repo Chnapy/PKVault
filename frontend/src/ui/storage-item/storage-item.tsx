@@ -1,11 +1,10 @@
 import { css, cx } from '@emotion/css';
 import React from "react";
-import { getApiFullUrl } from '../../data/mutator/custom-instance';
-import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
 import { type ButtonLikeProps } from '../button/button-like';
 import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../button/button-with-disabled-popover';
 import { DetailsLevel } from '../details-card/details-level';
+import { ItemImg } from '../details-card/item-img';
 import { SpeciesImg } from '../details-card/species-img';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
@@ -66,7 +65,6 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   ...rest
 }) => {
   const { t } = useTranslate();
-  const staticData = useStaticData();
 
   return (
     <ButtonWithDisabledPopover
@@ -111,14 +109,13 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
     >
       <SpeciesImg species={species} generation={generation} form={form} isFemale={isFemale} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} small={small} />
 
-      {heldItem > 0 && <img
-        src={getApiFullUrl(staticData.items[ heldItem ]?.sprite ?? '')}
+      {heldItem > 0 && <ItemImg
+        item={heldItem}
+        size={small ? 15 : undefined}
         style={{
           position: 'absolute',
           bottom: 0,
           left: 0,
-          width: small ? 15 : 30,
-          height: small ? 15 : 30,
         }}
       />}
 

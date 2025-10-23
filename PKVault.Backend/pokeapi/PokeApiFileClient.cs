@@ -1,6 +1,4 @@
-using System.Buffers;
 using System.Globalization;
-using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -9,8 +7,7 @@ using PokeApiNet;
 
 public partial class PokeApiFileClient
 {
-    private static readonly Assembly assembly = Assembly.GetExecutingAssembly();
-    private static readonly JsonSerializerOptions jsonOptions = GetJsonOptions();
+    private static readonly AssemblyClient assemblyClient = new(GetJsonOptions());
 
     public async Task<T?> GetAsync<T>(UrlNavigation<T> urlResource) where T : ResourceBase
     {
@@ -70,31 +67,17 @@ public partial class PokeApiFileClient
 
     private static async Task<T?> GetAsyncByUrl<T>(string url)
     {
-        // Console.WriteLine($"POKEAPI = {url}");
+        var uriParts = url
+            .Split('/').ToList()
+            .FindAll(part => part.Length > 0);
 
-        byte[] rentedBuffer = ArrayPool<byte>.Shared.Rent(jsonOptions.DefaultBufferSize);
+        List<string> fileParts = [
+            "pokeapi", "api-data","data",
+            ..uriParts,
+            "index.json.gz"
+        ];
 
-        try
-        {
-            using var jsonStream = GetResourceFromAssembly(url);
-
-            return await DeserializeResource<T>(jsonStream);
-        }
-        // catch
-        // {
-        //     Console.WriteLine($"Error with URL={url}");
-        //     throw;
-        // }
-        finally
-        {
-            // return buffer to pool
-            ArrayPool<byte>.Shared.Return(rentedBuffer);
-        }
-    }
-
-    private static async Task<T?> DeserializeResource<T>(Stream jsonStream)
-    {
-        return await JsonSerializer.DeserializeAsync<T>(jsonStream, jsonOptions);
+        return await assemblyClient.GetAsyncJsonGz<T>(fileParts);
     }
 
     public static string GetApiEndpointString<T>()
@@ -112,43 +95,6 @@ public partial class PokeApiFileClient
         }
 
         return false;
-    }
-
-    private static GZipStream GetResourceFromAssembly(string uri)
-    {
-        var uriParts = uri
-            .Split('/').ToList()
-            .FindAll(part => part.Length > 0);
-
-        List<string> fileParts = [
-            "pokeapi", "api-data","data",
-            ..uriParts,
-            "index.json.gz"
-        ];
-
-        List<string> assemblyParts = [
-            "PKVault.Backend",
-            ..fileParts
-        ];
-
-        var assemblyName = string.Join('.', assemblyParts.Select(part =>
-        {
-            part = part.Replace('-', '_');
-
-            var isInt = int.TryParse(part, out _);
-            if (isInt)
-            {
-                part = $"_{part}";
-            }
-
-            return part;
-        }));
-
-        var stream = assembly.GetManifestResourceStream(assemblyName) ?? throw new KeyNotFoundException($"RESOURCE NOT FOUND: {assemblyName}");
-
-        var gzipStream = new GZipStream(stream, CompressionMode.Decompress);
-
-        return gzipStream;
     }
 
     private static JsonSerializerOptions GetJsonOptions()

@@ -126,6 +126,12 @@ public class Program
             GenApiData.GenerateFiles();
             return false;
         }
+
+        if (args.Length > 0 && args[0] == "gen-spritesheets")
+        {
+            await GenSpritesheet.GenerateAllSpritesheets();
+            return false;
+        }
 #endif
 
         await WaitForSetup();

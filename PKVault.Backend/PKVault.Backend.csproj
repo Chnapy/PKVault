@@ -21,7 +21,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="pokeapi/**/*.json.gz" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+    <Compile Remove="pokeapi\spritesheet\GenSpritesheet.cs" Condition="'$(Configuration)' == 'Release'" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="pokeapi/api-data/**/*.json.gz" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
     <Content Remove="pokeapi/api-data/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never"/>
+
+    <EmbeddedResource Include="pokeapi/spritesheet/sheets/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+    <Content Remove="pokeapi/spritesheet/sheets/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never"/>
   </ItemGroup>
 </Project>

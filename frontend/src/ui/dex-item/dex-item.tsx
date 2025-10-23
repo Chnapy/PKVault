@@ -1,8 +1,8 @@
 import React from "react";
-import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { Gender as GenderType } from '../../data/sdk/model';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useStaticData } from '../../hooks/use-static-data';
+import { ItemImg } from '../details-card/item-img';
 import { SpeciesImg } from '../details-card/species-img';
 import { Gender } from '../gender/gender';
 import { Icon } from '../icon/icon';
@@ -34,8 +34,6 @@ export const DexFormItem: React.FC<{
 }> = withErrorCatcher('item', ({ species, generation, form, genders, seen, caught, owned, ownedShiny }) => {
   const staticData = useStaticData();
 
-  const pokeballSprite = getApiFullUrl(staticData.itemPokeball?.sprite ?? '');
-
   // const caughtGamesColors = [ ...new Set(caughtVersions.map(getGameInfos).map(infos => infos.img)) ];
   // const seenOnlyGamesColors = [ ...new Set(seenOnlyVersions.map(getGameInfos).map(infos => infos.img)) ];
 
@@ -63,14 +61,10 @@ export const DexFormItem: React.FC<{
         {owned && <Icon name='folder' solid forButton />}
 
         {caught && (
-          <img
-            src={pokeballSprite}
-            loading="lazy"
-            style={{
-              height: '1lh',
-              margin: '0 -2px',
-              // imageRendering: "pixelated",
-            }}
+          <ItemImg
+            item={staticData.itemPokeball.id}
+            size={'1lh'}
+            style={{ margin: '0 -2px' }}
           />
         )}
       </div>

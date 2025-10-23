@@ -1,5 +1,4 @@
 import type React from 'react';
-import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { Gender as GenderType, type PkmSaveDTO } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
@@ -10,6 +9,8 @@ import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { DetailsCardContainer } from '../details-card/details-card-container';
 import { DetailsMainImg } from '../details-card/details-main-img';
+import { ItemImg } from '../details-card/item-img';
+import { Gender } from '../gender/gender';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
@@ -19,7 +20,6 @@ import { StorageDetailsTitle } from './storage-details-title';
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
-import { Gender } from '../gender/gender';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'idBase' | 'pid' | 'species' | 'version' | 'generation' | 'form' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
@@ -114,14 +114,13 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
         content={
             <>
                 {!!pkm.heldItem && <TextContainer>
-                    {t('details.held-item')} <span style={{ color: theme.text.primary }}>{staticData.items[ pkm.heldItem ]?.name}</span> <img
-                        src={getApiFullUrl(staticData.items[ pkm.heldItem ]?.sprite ?? '')}
-                        alt={staticData.items[ pkm.heldItem ]?.name}
+                    {t('details.held-item')} <span style={{ color: theme.text.primary }}>{staticData.items[ pkm.heldItem ]?.name}</span> <ItemImg
+                        item={pkm.heldItem}
+                        size={24}
                         style={{
-                            height: 24,
-                            width: 24,
                             verticalAlign: 'middle'
-                        }} />
+                        }}
+                    />
                 </TextContainer>}
 
                 <TextContainer noWrap>

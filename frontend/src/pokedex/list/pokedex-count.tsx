@@ -1,8 +1,8 @@
 import type React from 'react';
-import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import type { DexItemDTO } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
+import { ItemImg } from '../../ui/details-card/item-img';
 import { Icon } from '../../ui/icon/icon';
 import { ShinyIcon } from '../../ui/icon/shiny-icon';
 import { theme } from '../../ui/theme';
@@ -27,10 +27,11 @@ export const PokedexCount: React.FC<PokedexCountProps> = ({ data }) => {
         gap: 4
     }}>
         <Icon name='eye' solid forButton /> <span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.forms.some(form => form.isSeen))}</span>
-        <img src={getApiFullUrl(staticData.itemPokeball?.sprite ?? '')} style={{
-            height: '1lh',
-            verticalAlign: 'middle'
-        }} /><span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.forms.some(form => form.isCaught))}</span>
+        <ItemImg
+            item={staticData.itemPokeball.id}
+            size={'1lh'}
+            style={{ margin: '0 -2px' }}
+        /><span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.forms.some(form => form.isCaught))}</span>
         <Icon name='folder' solid forButton /> <span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.forms.some(form => form.isOwned))}</span>
         <ShinyIcon /><span style={{ color: theme.text.primary }}>{getFilteredItemsCount(item => item.forms.some(form => form.isOwnedShiny))}</span> {t('total')}.
         <span style={{ color: theme.text.primary }}>{data.length}</span>

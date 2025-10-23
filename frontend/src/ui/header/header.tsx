@@ -65,6 +65,7 @@ export const Header: React.FC<React.PropsWithChildren> = ({ children }) => {
                     marginLeft: -1,
                     marginRight: -150,
                     alignSelf: 'stretch',
+                    flexShrink: 0,
                 }}
             >
                 <div
@@ -94,6 +95,9 @@ export const Header: React.FC<React.PropsWithChildren> = ({ children }) => {
                     alignItems: 'center',
                     gap: 16,
                     boxShadow: `0 2px 0 rgba(0,0,0,0.2), inset rgba(0, 0, 0, 0.2) -2px 2px 0px`,
+                    overflowX: 'auto',
+                    whiteSpace: 'nowrap',
+                    scrollbarColor: `${theme.bg.contrastdark} ${theme.bg.contrast}`,
                 }}
             >
                 {children}

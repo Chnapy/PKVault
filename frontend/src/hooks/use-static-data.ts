@@ -9,6 +9,6 @@ export const useStaticData = () => {
 
     return {
         ...data.data,
-        itemPokeball: data.data.items[ 4 ],
+        itemPokeball: data.data.items[ 4 ]!,
     };
 };
