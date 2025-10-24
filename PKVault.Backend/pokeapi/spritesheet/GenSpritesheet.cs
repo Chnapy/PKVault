@@ -7,16 +7,16 @@ using SixLabors.ImageSharp.Processing;
 
 public class GenSpritesheet
 {
-    private static readonly string FolderPath = "./pokeapi/spritesheet/sheets";
-    private static readonly HttpClient client = new();
+    private static readonly string SourcePath = "../pokeapi/sprites";
+    private static readonly string TargetPath = "./pokeapi/spritesheet/sheets";
 
     public static async Task GenerateAllSpritesheets()
     {
-        if (Directory.Exists(FolderPath))
+        if (Directory.Exists(TargetPath))
         {
-            Directory.Delete(FolderPath, true);
+            Directory.Delete(TargetPath, true);
         }
-        Directory.CreateDirectory(FolderPath);
+        Directory.CreateDirectory(TargetPath);
 
         await Task.WhenAll([
             GenerateSpeciesSpritesheet(),
@@ -32,18 +32,21 @@ public class GenSpritesheet
             .Chunk(100);
 
         var spritesInfosList = await Task.WhenAll(speciesBySpritesheet.Select((speciesList, sheetIndex) => GenerateChunk(
-            speciesList.SelectMany(staticSp =>
-                staticSp.Forms.Values.SelectMany(gen => gen.SelectMany(form =>
-                    new List<string?>() {
-                        form.SpriteDefault,
-                        form.SpriteFemale,
-                        form.SpriteShiny,
-                        form.SpriteShinyFemale
-                    }
-                    .OfType<string>()
-                ))
-                .Distinct()
-            ).ToList(),
+            [
+                .. sheetIndex == 0 ? new string[] { StaticDataService.GetEggSprite() } : [],
+                .. speciesList.SelectMany(staticSp =>
+                    staticSp.Forms.Values.SelectMany(gen => gen.SelectMany(form =>
+                        new List<string?>() {
+                            form.SpriteDefault,
+                            form.SpriteFemale,
+                            form.SpriteShiny,
+                            form.SpriteShinyFemale
+                        }
+                        .OfType<string>()
+                    ))
+                    .Distinct()
+                ),
+            ],
             20, // 20 cols * 96 px = 1920 px width
             SpritesheetFileClient.GetSpeciesImgFilename(sheetIndex)
         )));
@@ -78,20 +81,18 @@ public class GenSpritesheet
         // Download sprites
         foreach (var url in urls)
         {
-            var finalUrl = StaticDataService.GetGHUrl(url);
+            var finalUrl = Path.Combine(SourcePath, url);
             try
             {
-                using var response = await client.GetAsync(finalUrl);
-                response.EnsureSuccessStatusCode();
-                await using var stream = await response.Content.ReadAsStreamAsync();
-                var img = await Image.LoadAsync<Rgba32>(stream);
+                using var fileStream = File.OpenRead(finalUrl);
+                var img = await Image.LoadAsync<Rgba32>(fileStream);
                 // Resize if required
                 // img.Mutate(x => x.Resize(SpriteWidth, SpriteHeight));
                 images.Add(img);
             }
             catch
             {
-                Console.WriteLine($"Error download {finalUrl}");
+                Console.WriteLine($"Error source file {finalUrl}");
                 throw;
             }
         }
@@ -120,7 +121,7 @@ public class GenSpritesheet
                 height));
         }
 
-        string sheetPath = Path.Combine(FolderPath, filename);
+        string sheetPath = Path.Combine(TargetPath, filename);
         await sheetImage.SaveAsWebpAsync(sheetPath,
             new WebpEncoder
             {
@@ -147,7 +148,7 @@ public class GenSpritesheet
             .SelectMany(dict => dict)
             .ToDictionary(pair => pair.Key, pair => pair.Value);
 
-        string jsonPath = Path.Combine(FolderPath, filename);
+        string jsonPath = Path.Combine(TargetPath, filename);
         await File.WriteAllTextAsync(jsonPath, JsonSerializer.Serialize(allSpritesInfos, StaticDataService.JsonOptions));
         Console.WriteLine($"Saved index JSON to {jsonPath}");
     }

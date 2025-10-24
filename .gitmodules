@@ -1,3 +1,6 @@
 [submodule "pokeapi/api-data"]
 	path = pokeapi/api-data
 	url = https://github.com/PokeAPI/api-data
+[submodule "pokeapi/sprites"]
+	path = pokeapi/sprites
+	url = https://github.com/PokeAPI/sprites

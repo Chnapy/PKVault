@@ -217,16 +217,16 @@ public class StaticDataService
                     //     pkmObj.Sprites.FrontShinyFemale != null ? GetGHProxyUrl(pkmObj.Sprites.FrontShinyFemale) : defaultForm?.SpriteShinyFemale
                     // );
                     var spriteDefault = (
-                        frontDefaultUrl != null ? GetGHPath(frontDefaultUrl) : defaultForm?.SpriteDefault
+                        frontDefaultUrl != null ? GetPokeapiRelativePath(frontDefaultUrl) : defaultForm?.SpriteDefault
                     );
                     var spriteShiny = (
-                        frontShinyUrl != null ? GetGHPath(frontShinyUrl) : defaultForm?.SpriteShiny
+                        frontShinyUrl != null ? GetPokeapiRelativePath(frontShinyUrl) : defaultForm?.SpriteShiny
                     );
 
                     if (formObj.FormName == "")
                     {
-                        spriteFemale = pkmObj.Sprites.FrontFemale != null ? GetGHPath(pkmObj.Sprites.FrontFemale) : defaultForm?.SpriteFemale;
-                        spriteShinyFemale = pkmObj.Sprites.FrontShinyFemale != null ? GetGHPath(pkmObj.Sprites.FrontShinyFemale) : defaultForm?.SpriteShinyFemale;
+                        spriteFemale = pkmObj.Sprites.FrontFemale != null ? GetPokeapiRelativePath(pkmObj.Sprites.FrontFemale) : defaultForm?.SpriteFemale;
+                        spriteShinyFemale = pkmObj.Sprites.FrontShinyFemale != null ? GetPokeapiRelativePath(pkmObj.Sprites.FrontShinyFemale) : defaultForm?.SpriteShinyFemale;
                     }
                     else
                     {
@@ -247,11 +247,11 @@ public class StaticDataService
 
                     if (spriteDefault == null)
                     {
-                        spriteDefault = frontDefaultUrl != null ? GetGHPath(frontDefaultUrl) : defaultForm?.SpriteDefault;
+                        spriteDefault = frontDefaultUrl != null ? GetPokeapiRelativePath(frontDefaultUrl) : defaultForm?.SpriteDefault;
                     }
                     if (spriteShiny == null)
                     {
-                        spriteShiny = frontShinyUrl != null ? GetGHPath(frontShinyUrl) : defaultForm?.SpriteShiny;
+                        spriteShiny = frontShinyUrl != null ? GetPokeapiRelativePath(frontShinyUrl) : defaultForm?.SpriteShiny;
                     }
 
                     return new StaticSpeciesForm
@@ -708,7 +708,7 @@ public class StaticDataService
                 {
                     Id = itemId,
                     Name = itemName,
-                    Sprite = GetGHPath(sprite),
+                    Sprite = GetPokeapiRelativePath(sprite),
                 };
             }));
         }
@@ -814,7 +814,7 @@ public class StaticDataService
 
     public static string GetEggSprite()
     {
-        return GetGHPath("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png");
+        return GetPokeapiRelativePath("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png");
     }
 
     public static string GetPokeapiItemName(string pkhexItemName)
@@ -974,9 +974,9 @@ public class StaticDataService
         };
     }
 
-    private const string GH_PREFIX = "https://raw.githubusercontent.com/";
+    private const string GH_PREFIX = "https://raw.githubusercontent.com/PokeAPI/sprites/master/";
 
-    private static string GetGHPath(string url)
+    private static string GetPokeapiRelativePath(string url)
     {
         if (url.Length < GH_PREFIX.Length)
         {
@@ -984,15 +984,6 @@ public class StaticDataService
         }
 
         return url[GH_PREFIX.Length..];
-    }
-
-    public static string GetGHUrl(string path)
-    {
-        if (path.StartsWith('/'))
-        {
-            path = path[1..];
-        }
-        return $"{GH_PREFIX}{path}";
     }
 
     private static string PrepareTmpDirectory()
