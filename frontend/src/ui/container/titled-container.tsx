@@ -10,15 +10,16 @@ export type TitledContainerProps = Omit<ContainerProps<'div'>, 'title'> & {
     enableExpand?: boolean;
     initialExpanded?: boolean;
     expanded?: boolean;
+    setExpanded?: (value: boolean) => void;
     maxHeight?: number;
 };
 
 export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerProps>> = ({
-    title, contrasted, enableExpand, initialExpanded = true, expanded: rawExpanded, maxHeight, children, ...containerProps
+    title, contrasted, enableExpand, initialExpanded = true, expanded: rawExpanded, setExpanded, maxHeight, children, ...containerProps
 }) => {
     const moveContext = StorageMoveContext.useValue();
     const isDragging = !!moveContext.selected && !moveContext.selected.target;
-    const [ expandedRaw, setExpanded ] = React.useState(initialExpanded);
+    const [ expandedRaw, setExpandedRaw ] = React.useState(initialExpanded);
 
     let expanded = (!isDragging || !enableExpand)
         && expandedRaw;
@@ -26,6 +27,8 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
     if (rawExpanded !== undefined) {
         expanded = rawExpanded;
     }
+
+    setExpanded ??= setExpandedRaw;
 
     return <Container
         {...containerProps}

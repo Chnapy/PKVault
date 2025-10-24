@@ -10,6 +10,7 @@ import { useActionDescription } from './hooks/use-action-description';
 
 export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
+    const [ expanded, setExpanded ] = React.useState(false);
 
     const actionsQuery = useStorageGetActions();
     const actionsDeleteMutation = useStorageDeleteActions();
@@ -21,24 +22,62 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
 
     const actions = actionsQuery.data?.data ?? [];
 
+    React.useEffect(() => {
+        if (expanded && actions.length === 0) {
+            setExpanded(false);
+        }
+    }, [ actions.length, expanded ]);
+
     const nbrSelectedActions = actionIndexToRemoveFrom === undefined ? 0 : (actions.length - actionIndexToRemoveFrom);
 
-    const expanded = actions.length > 0 ? undefined : false;
+    const expandIcon = actions.length > 0 && <Icon name={expanded ? 'angle-down' : 'angle-up'} forButton />;
 
     return <TitledContainer
         contrasted
-        enableExpand
+        enableExpand={actions.length > 0}
         expanded={expanded}
+        setExpanded={value => {
+            setExpanded(value);
+            if (!value)
+                setActionIndexToRemoveFrom(undefined);
+        }}
         title={<div
             style={{
                 display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'center',
-                gap: 4,
+                gap: 8,
             }}
         >
-            <Icon name='angle-down' forButton />
-            {t('storage.save-actions.title', { count: actions.length })}
-            <Icon name='angle-down' forButton />
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 4,
+                    padding: '0 4px',
+                }}
+            >
+                {expandIcon}
+                {t('storage.save-actions.title', { count: actions.length })}
+                {expandIcon}
+            </div>
+
+            {!expanded && actions.length > 0 && <Button
+                bgColor={theme.bg.primary}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    return saveMutation.mutateAsync();
+                }}
+                style={{
+                    margin: -4,
+                    marginLeft: 'auto',
+                    minWidth: 80,
+                }}
+            >
+                <Icon name='save' solid forButton />
+                {t('action.save')}
+            </Button>}
         </div>}
     >
         <div
