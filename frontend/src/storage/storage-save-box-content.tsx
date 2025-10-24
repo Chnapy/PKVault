@@ -1,7 +1,7 @@
 import { css } from '@emotion/css';
 import { Popover, PopoverButton } from '@headlessui/react';
 import React from "react";
-import { StorageSlotType, type PkmSaveDTO, type SaveInfosDTO } from "../data/sdk/model";
+import { BoxType, type PkmSaveDTO, type SaveInfosDTO } from "../data/sdk/model";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import {
   useStorageGetSaveBoxes,
@@ -57,7 +57,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
     id: '-99',
     idInt: -99,
     name: '',
-    type: StorageSlotType.Box,
+    type: BoxType.Box,
     slotCount: 30,
     canReceivePkm: false,
   };

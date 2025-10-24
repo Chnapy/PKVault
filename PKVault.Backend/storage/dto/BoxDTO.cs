@@ -9,7 +9,7 @@ public class BoxDTO : IWithId<string>
         get { return int.Parse(Id); }
     }
 
-    public StorageSlotType Type { get; set; }
+    public BoxType Type { get; set; }
 
     public string Name { get { return BoxEntity.Name; } }
 
@@ -18,8 +18,8 @@ public class BoxDTO : IWithId<string>
         get => SlotCountVariable == -1
             ? Type switch
             {
-                StorageSlotType.Box => 30,
-                StorageSlotType.Party => 6,
+                BoxType.Box => 30,
+                BoxType.Party => 6,
                 _ => throw new NotImplementedException(),
             }
             : SlotCountVariable;
@@ -27,11 +27,51 @@ public class BoxDTO : IWithId<string>
 
     public int SlotCountVariable = -1;
 
-    public bool CanWrite => Type == StorageSlotType.Box;
+    public bool CanWrite => Type == BoxType.Box;
 
-    public bool CanReceivePkm => Type == StorageSlotType.Party || Type == StorageSlotType.Box;
+    public bool CanReceivePkm => Type == BoxType.Party || Type == BoxType.Box;
 
     public required BoxEntity BoxEntity;
 
-    public static bool CanIdReceivePkm(int boxId) => boxId == -(int)StorageSlotType.Party || boxId >= 0;
+    public static bool CanIdReceivePkm(int boxId) => boxId == (int)BoxType.Party || boxId >= (int)BoxType.Box;
+
+    public static BoxType GetTypeFromStorageSlotType(StorageSlotType slotType) => slotType switch
+    {
+        StorageSlotType.Box => BoxType.Box,
+        StorageSlotType.Party => BoxType.Party,
+        StorageSlotType.BattleBox => BoxType.BattleBox,
+        StorageSlotType.Daycare => BoxType.Daycare,
+        StorageSlotType.GTS => BoxType.GTS,
+        StorageSlotType.FusedKyurem => BoxType.Fused,
+        StorageSlotType.FusedNecrozmaS => BoxType.Fused,
+        StorageSlotType.FusedNecrozmaM => BoxType.Fused,
+        StorageSlotType.FusedCalyrex => BoxType.Fused,
+        StorageSlotType.Misc => BoxType.Misc,
+        StorageSlotType.Resort => BoxType.Resort,
+        StorageSlotType.Ride => BoxType.Ride,
+        _ => throw new NotImplementedException(),
+    };
+}
+
+public enum BoxType : int
+{
+    Box = 0,
+    Party = -1,
+
+    /// <summary> Battle Box </summary>
+    BattleBox = -2,
+    /// <summary> Daycare </summary>
+    Daycare = -3,
+    /// <summary> Global Trade Station (GTS) </summary>
+    GTS = -4,
+
+    /// <summary> Fused Legendary Storage </summary>
+    Fused = -5,
+
+    /// <summary> Miscellaneous </summary>
+    Misc = -6,
+    /// <summary> Poké Pelago (Gen7) </summary>
+    Resort = -7,
+    /// <summary> Ride Legendary Slot (S/V) </summary>
+    Ride = -8,
 }

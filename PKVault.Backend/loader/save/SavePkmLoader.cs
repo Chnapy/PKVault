@@ -26,7 +26,7 @@ public class SavePkmLoader(
                 if (IsSpeciesValid(pkm.Species))
                 {
                     var boxSlot = i;
-                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, -(int)StorageSlotType.Party, boxSlot));
+                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, (int)BoxType.Party, boxSlot));
                 }
                 i++;
             });
@@ -62,7 +62,7 @@ public class SavePkmLoader(
                 if (pkm != default && IsSpeciesValid(pkm.Species))
                 {
                     var boxSlot = i;
-                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, -(int)StorageSlotType.Daycare, boxSlot));
+                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, (int)BoxType.Daycare, boxSlot));
                 }
             }
         }
@@ -75,14 +75,14 @@ public class SavePkmLoader(
 
         extraPkms.ForEach((extra) =>
         {
-            int box = extra.Slot.Type switch
+            var boxType = BoxDTO.GetTypeFromStorageSlotType(extra.Slot.Type);
+            int box = boxType switch
             {
-                StorageSlotType.None => -1,
-                StorageSlotType.Box => throw new NotImplementedException(),
-                _ => -(int)extra.Slot.Type,
+                BoxType.Box => throw new NotImplementedException(),
+                _ => (int)boxType,
             };
             var boxSlot = extra.Slot.Slot;
-            if (extra.Slot.Type == StorageSlotType.Daycare && save is IDaycareStorage saveDaycare)
+            if (boxType == BoxType.Daycare && save is IDaycareStorage saveDaycare)
             {
                 boxSlot += saveDaycare.DaycareSlotCount;
             }
@@ -182,7 +182,7 @@ public class SavePkmLoader(
 
         switch (dto.BoxId)
         {
-            case -(int)StorageSlotType.Party:
+            case (int)BoxType.Party:
                 WriteParty(dto.Pkm, dto.BoxSlot);
                 break;
             default:
@@ -208,7 +208,7 @@ public class SavePkmLoader(
 
             switch (dto.BoxId)
             {
-                case -(int)StorageSlotType.Party:
+                case (int)BoxType.Party:
                     WriteParty(null, dto.BoxSlot);
                     break;
                 default:

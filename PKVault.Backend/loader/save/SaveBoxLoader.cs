@@ -11,14 +11,14 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
 
         if (save.HasParty)
         {
-            var id = (-(int)StorageSlotType.Party).ToString();
+            var id = ((int)BoxType.Party).ToString();
             boxes.Add(id, new BoxDTO
             {
-                Type = StorageSlotType.Party,
+                Type = BoxType.Party,
                 BoxEntity = new()
                 {
                     Id = id,
-                    Name = StorageSlotType.Party.ToString(),
+                    Name = BoxType.Party.ToString(),
                 }
             });
         }
@@ -31,7 +31,7 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
                 var id = i.ToString();
                 boxes.Add(id, new BoxDTO
                 {
-                    Type = StorageSlotType.Box,
+                    Type = BoxType.Box,
                     SlotCountVariable = save.BoxSlotCount,
                     BoxEntity = new()
                     {
@@ -46,40 +46,39 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
 
         if (save is IDaycareStorage saveDaycare)
         {
-            var id = (-(int)StorageSlotType.Daycare).ToString();
+            var id = ((int)BoxType.Daycare).ToString();
             var extraSlotsCount = extraSlots.FindAll(slot => slot.Type == StorageSlotType.Daycare).Count;
             boxes.Add(id, new BoxDTO
             {
-                Type = StorageSlotType.Daycare,
+                Type = BoxType.Daycare,
                 SlotCountVariable = saveDaycare.DaycareSlotCount + extraSlotsCount,
                 BoxEntity = new()
                 {
                     Id = id,
-                    Name = StorageSlotType.Daycare.ToString(),
+                    Name = BoxType.Daycare.ToString(),
                 }
             });
         }
 
         extraSlots
-            .Select(slot => slot.Type)
+            .Select(slot => BoxDTO.GetTypeFromStorageSlotType(slot.Type))
             .Distinct()
             .ToList()
-            .FindAll(slotType => slotType != StorageSlotType.Daycare)
-            .ForEach((slotType) =>
+            .FindAll(slotType => slotType != BoxType.Daycare)
+            .ForEach((boxType) =>
             {
-                int box = slotType switch
+                int box = boxType switch
                 {
-                    StorageSlotType.None => -1,
-                    StorageSlotType.Box => throw new NotImplementedException(),
-                    _ => -(int)slotType,
+                    BoxType.Box => throw new NotImplementedException(),
+                    _ => (int)boxType,
                 };
                 var id = box.ToString();
-                var name = slotType.ToString();
-                var slotCount = extraSlots.FindAll(slot => slot.Type == slotType).Count;
+                var name = boxType.ToString();
+                var slotCount = extraSlots.FindAll(slot => BoxDTO.GetTypeFromStorageSlotType(slot.Type) == boxType).Count;
 
                 boxes.Add(id, new BoxDTO
                 {
-                    Type = slotType,
+                    Type = boxType,
                     SlotCountVariable = slotCount,
                     BoxEntity = new()
                     {
