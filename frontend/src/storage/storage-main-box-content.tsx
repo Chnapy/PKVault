@@ -1,7 +1,7 @@
 import { css } from '@emotion/css';
 import { Popover, PopoverButton } from '@headlessui/react';
 import React from "react";
-import { BoxType, type PkmDTO } from "../data/sdk/model";
+import { StorageSlotType, type PkmDTO } from "../data/sdk/model";
 import {
   useStorageDeleteMainBox,
   useStorageGetMainBoxes,
@@ -56,7 +56,7 @@ export const StorageMainBoxContent: React.FC<{
     id: '-99',
     idInt: -99,
     name: '',
-    type: BoxType.Default,
+    type: StorageSlotType.Box,
     slotCount: 30,
     canReceivePkm: false,
   };

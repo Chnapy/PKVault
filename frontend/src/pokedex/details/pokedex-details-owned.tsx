@@ -15,6 +15,12 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
 
     const savePkmsQuery = useStorageGetSavePkms(saveId);
 
+    const pkmList = savePkmsQuery.data?.data.filter(pkm => pkm.species === species);
+
+    if (!savePkmsQuery.isLoading && pkmList && pkmList.length === 0) {
+        console.log('Pkm not found, saveId/species:', saveId, species)
+    }
+
     return <TextContainer maxHeight={300}>
         <div>{t('details.owned-save')}</div>
 
@@ -32,17 +38,15 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
                 loading
             />}
 
-            {savePkmsQuery.data?.data
-                .filter(pkm => pkm.species === species)
-                .map(pkm =>
-                    <StorageSaveItemBase
-                        key={pkm.id}
-                        saveId={pkm.saveId}
-                        pkmId={pkm.id}
-                        helpTitle={null}
-                        small
-                    />
-                )}
+            {pkmList?.map(pkm =>
+                <StorageSaveItemBase
+                    key={pkm.id}
+                    saveId={pkm.saveId}
+                    pkmId={pkm.id}
+                    helpTitle={null}
+                    small
+                />
+            )}
         </div>
     </TextContainer>;
 };

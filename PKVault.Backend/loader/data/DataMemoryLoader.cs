@@ -1,3 +1,5 @@
+using PKHeX.Core;
+
 public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : DataLoader(_loaders)
 {
     public static DataMemoryLoader Create()
@@ -13,7 +15,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
             {
                 return new BoxDTO
                 {
-                    Type = BoxType.Default,
+                    Type = StorageSlotType.Box,
                     BoxEntity = entity,
                 };
             },

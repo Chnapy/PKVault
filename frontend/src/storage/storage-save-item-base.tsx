@@ -54,9 +54,11 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
             isEgg={isEgg}
             isShiny={isShiny}
             isShadow={isShadow}
+            isStarter={savePkm.isStarter}
             heldItem={savePkm.heldItem}
             warning={!savePkm.isValid}
             level={savePkm.level}
+            party={savePkm.party >= 0 ? savePkm.party : undefined}
             canCreateVersion={false}
             canMoveOutside={canMoveAttached}
             canEvolve={canEvolve}

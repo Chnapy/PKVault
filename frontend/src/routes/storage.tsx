@@ -59,7 +59,7 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
                   bottom: 14,
                   left: "50%",
                   transform: 'translateX(-50%)',
-                  width: 400,
+                  maxWidth: 400,
                   zIndex: 20,
                   '&:hover': {
                     zIndex: 25,

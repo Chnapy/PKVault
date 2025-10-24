@@ -248,7 +248,9 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public string? HeldItemPokeapiName
     {
-        get => HeldItem > 0 ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[HeldItem]) : null;
+        get => HeldItem > 0
+        ? (HeldItem < GameInfo.Strings.Item.Count ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[HeldItem]) : "")
+        : null;
     }
 
     public string DynamicChecksum

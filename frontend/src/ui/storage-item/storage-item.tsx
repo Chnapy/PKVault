@@ -22,9 +22,11 @@ export type StorageItemProps =
     isEgg?: boolean;
     isShiny?: boolean;
     isShadow?: boolean;
+    isStarter?: boolean;
     heldItem?: number;
     warning?: boolean;
     level?: number;
+    party?: number;
     nbrVersions?: number;
     small?: boolean;
     checked?: boolean;
@@ -46,9 +48,11 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   isEgg,
   isShiny,
   isShadow,
+  isStarter,
   heldItem = 0,
   warning,
   level,
+  party,
   nbrVersions = 1,
   anchor,
   helpTitle,
@@ -65,6 +69,19 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   ...rest
 }) => {
   const { t } = useTranslate();
+
+  const renderBubble = (bgColor: string | undefined, children: React.ReactNode) => <div style={{
+    width: 20,
+    height: 20,
+    borderRadius: 99,
+    color: bgColor ? theme.text.light : undefined,
+    backgroundColor: bgColor,
+    fontSize: bgColor ? '80%' : undefined,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'bold'
+  }}>{children}</div>;
 
   return (
     <ButtonWithDisabledPopover
@@ -125,9 +142,14 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
         right: 2,
         textAlign: 'center',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'flex-end',
         gap: 2
       }}>
+        {isStarter && renderBubble(theme.bg.red, <Icon name='heart' solid forButton />)}
+
+        {party !== undefined && renderBubble(theme.bg.green, party + 1)}
+
         {level !== undefined && <div style={{
           backgroundColor: 'rgba(255,255,255,0.4)',
           marginBottom: -4
@@ -135,15 +157,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
           {small ? level : <DetailsLevel level={level} />}
         </div>}
 
-        {nbrVersions > 1 && <div style={{
-          width: 20,
-          height: 20,
-          borderRadius: 99,
-          color: theme.text.light,
-          backgroundColor: theme.bg.dark,
-        }}>
-          {nbrVersions}
-        </div>}
+        {nbrVersions > 1 && renderBubble(theme.bg.dark, nbrVersions)}
       </div>
 
       <div
@@ -162,55 +176,16 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
       >
         {isShiny && <ShinyIcon style={{ height: small ? 15 : undefined }} />}
 
-        {!canMoveOutside && <div style={{
-          width: 20,
-          height: 20,
-          borderRadius: 99,
-          color: theme.text.light,
-          backgroundColor: theme.bg.red,
-        }}>
-          <Icon name='logout' forButton />
-        </div>}
+        {!canMoveOutside && renderBubble(theme.bg.red, <Icon name='logout' solid forButton />)}
 
-        {canEvolve && <div style={{
-          width: 20,
-          height: 20,
-          borderRadius: 99,
-          color: theme.text.light,
-          backgroundColor: theme.bg.primary,
-        }}>
-          <Icon name='sparkles' solid forButton />
-        </div>}
+        {canEvolve && renderBubble(theme.bg.primary, <Icon name='sparkles' solid forButton />)}
 
-        {attached && <div style={{
-          width: 20,
-          height: 20,
-          borderRadius: 99,
-          color: needSynchronize ? theme.text.light : undefined,
-          backgroundColor: needSynchronize ? theme.bg.yellow : undefined,
-        }}>
-          <Icon name='link' forButton />
-        </div>}
+        {attached && renderBubble(needSynchronize ? theme.bg.yellow : undefined,
+          <Icon name='link' solid forButton />)}
 
-        {canCreateVersion && <div style={{
-          width: 20,
-          height: 20,
-          borderRadius: 99,
-          color: theme.text.light,
-          backgroundColor: theme.bg.primary,
-        }}>
-          <Icon name='plus' solid forButton />
-        </div>}
+        {canCreateVersion && renderBubble(theme.bg.primary, <Icon name='plus' solid forButton />)}
 
-        {warning && <div style={{
-          width: 20,
-          height: 20,
-          borderRadius: 99,
-          color: theme.text.light,
-          backgroundColor: theme.bg.yellow,
-        }}>
-          <Icon name='exclaimation' forButton />
-        </div>}
+        {warning && renderBubble(theme.bg.yellow, <Icon name='exclaimation' solid forButton />)}
       </div>
     </ButtonWithDisabledPopover>
   );

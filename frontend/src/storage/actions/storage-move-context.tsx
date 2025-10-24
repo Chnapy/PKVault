@@ -348,6 +348,22 @@ export const StorageMoveContext = {
                         return { enable: false, helpText: t('storage.move.attached-save-self') };
                     }
 
+                    if (sourceSave && targetSave && sourceSave.id !== targetSave.id) {
+                        if (!sourcePkmSave.canMoveToSave) {
+                            return {
+                                enable: false,
+                                helpText: t('storage.move.pkm-cannot', { name: getPkmNickname(sourcePkmSave.id) }),
+                            };
+                        }
+
+                        if (targetPkmSave && !targetPkmSave.canMoveToSave) {
+                            return {
+                                enable: false,
+                                helpText: t('storage.move.pkm-cannot', { name: getPkmNickname(targetPkmSave.id) }),
+                            };
+                        }
+                    }
+
                     if (sourceSave && targetSave && sourceSave.generation !== targetSave.generation) {
                         return { enable: false, helpText: t('storage.move.save-same-gen', { generation: sourceSave.generation }) };
                     }

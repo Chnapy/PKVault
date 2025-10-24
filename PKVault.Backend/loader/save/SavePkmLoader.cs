@@ -23,13 +23,29 @@ public class SavePkmLoader(
             var partyList = save.PartyData.ToList();
             partyList.ForEach((pkm) =>
             {
-                if (pkm.Species != 0)
+                if (IsSpeciesValid(pkm.Species))
                 {
                     var boxSlot = i;
-                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, BoxDTO.PARTY_ID, boxSlot));
+                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, -(int)StorageSlotType.Party, boxSlot));
                 }
                 i++;
             });
+        }
+
+        for (var i = 0; i < save.BoxCount; i++)
+        {
+            var pkms = save.GetBoxData(i).ToList();
+            var j = 0;
+            foreach (var pkm in pkms)
+            {
+                if (IsSpeciesValid(pkm.Species))
+                {
+                    var box = i;
+                    var boxSlot = j;
+                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, box, boxSlot));
+                }
+                j++;
+            }
         }
 
         if (save is IDaycareStorage saveDaycare)
@@ -43,29 +59,35 @@ public class SavePkmLoader(
 
                 var slot = new SlotInfoMisc(saveDaycare.GetDaycareSlot(i), i) { Type = StorageSlotType.Daycare };
                 var pkm = slot.Read(save);
-                if (pkm != default && pkm.Species != 0)
+                if (pkm != default && IsSpeciesValid(pkm.Species))
                 {
                     var boxSlot = i;
-                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, BoxDTO.DAYCARE_ID, boxSlot));
+                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, -(int)StorageSlotType.Daycare, boxSlot));
                 }
             }
         }
 
-        for (var i = 0; i < save.BoxCount; i++)
+        var extraSlots = save.GetExtraSlots(true);
+        var extraPkms = extraSlots.Select(slot => (
+            Pkm: slot.Read(save),
+            Slot: slot
+        )).ToList().FindAll(extra => IsSpeciesValid(extra.Pkm.Species));
+
+        extraPkms.ForEach((extra) =>
         {
-            var pkms = save.GetBoxData(i).ToList();
-            var j = 0;
-            foreach (var pkm in pkms)
+            int box = extra.Slot.Type switch
             {
-                if (pkm.Species != 0)
-                {
-                    var box = i;
-                    var boxSlot = j;
-                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, box, boxSlot));
-                }
-                j++;
+                StorageSlotType.None => -1,
+                StorageSlotType.Box => throw new NotImplementedException(),
+                _ => -(int)extra.Slot.Type,
+            };
+            var boxSlot = extra.Slot.Slot;
+            if (extra.Slot.Type == StorageSlotType.Daycare && save is IDaycareStorage saveDaycare)
+            {
+                boxSlot += saveDaycare.DaycareSlotCount;
             }
-        }
+            dtoList.Add(PkmSaveDTO.FromPkm(save, extra.Pkm, box, boxSlot));
+        });
 
         var dictById = new Dictionary<string, PkmSaveDTO>();
         var dictByBox = new Dictionary<string, PkmSaveDTO>();
@@ -143,7 +165,7 @@ public class SavePkmLoader(
 
     public void WriteDto(PkmSaveDTO dto)
     {
-        if (dto.BoxId == BoxDTO.DAYCARE_ID)
+        if (!BoxDTO.CanIdReceivePkm(dto.BoxId))
         {
             throw new Exception("Not allowed for pkm in daycare");
         }
@@ -160,7 +182,7 @@ public class SavePkmLoader(
 
         switch (dto.BoxId)
         {
-            case BoxDTO.PARTY_ID:
+            case -(int)StorageSlotType.Party:
                 WriteParty(dto.Pkm, dto.BoxSlot);
                 break;
             default:
@@ -179,11 +201,14 @@ public class SavePkmLoader(
         var dto = GetDto(id);
         if (dto != default)
         {
+            if (!BoxDTO.CanIdReceivePkm(dto.BoxId))
+            {
+                throw new Exception("Not allowed for pkm in daycare");
+            }
+
             switch (dto.BoxId)
             {
-                case BoxDTO.DAYCARE_ID:
-                    throw new Exception("Not allowed for pkm in daycare");
-                case BoxDTO.PARTY_ID:
+                case -(int)StorageSlotType.Party:
                     WriteParty(null, dto.BoxSlot);
                     break;
                 default:
@@ -212,7 +237,7 @@ public class SavePkmLoader(
     public void FlushParty()
     {
         var party = save.PartyData.ToList()
-        .FindAll(pkm => pkm.Species != 0);
+        .FindAll(pkm => IsSpeciesValid(pkm.Species));
 
         SetParty(party);
 
@@ -235,4 +260,6 @@ public class SavePkmLoader(
         }
         // Console.WriteLine($"PARTY = {string.Join(',', party.Select(pk => pk.Nickname))}\n{string.Join(',', save.PartyData.ToList().Select(pk => pk.Nickname))}");
     }
+
+    private static bool IsSpeciesValid(ushort species) => species > 0 && species < GameInfo.Strings.Species.Count;
 }

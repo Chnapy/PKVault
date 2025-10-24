@@ -22,7 +22,7 @@ public class DataFileLoader : DataLoader
             {
                 return new BoxDTO
                 {
-                    Type = BoxType.Default,
+                    Type = StorageSlotType.Box,
                     BoxEntity = entity,
                 };
             },
@@ -32,7 +32,7 @@ public class DataFileLoader : DataLoader
         {
             boxLoader.WriteDto(new()
             {
-                Type = BoxType.Default,
+                Type = StorageSlotType.Box,
                 BoxEntity = new()
                 {
                     Id = "0",

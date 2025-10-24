@@ -1,8 +1,7 @@
+using PKHeX.Core;
+
 public class BoxDTO : IWithId<string>
 {
-    public const int PARTY_ID = -1;
-    public const int DAYCARE_ID = -2;
-
     public string Id { get { return BoxEntity.Id; } }
 
     public int IdInt
@@ -10,7 +9,7 @@ public class BoxDTO : IWithId<string>
         get { return int.Parse(Id); }
     }
 
-    public BoxType Type { get; set; }
+    public StorageSlotType Type { get; set; }
 
     public string Name { get { return BoxEntity.Name; } }
 
@@ -19,8 +18,8 @@ public class BoxDTO : IWithId<string>
         get => SlotCountVariable == -1
             ? Type switch
             {
-                BoxType.Default => 30,
-                BoxType.Party => 6,
+                StorageSlotType.Box => 30,
+                StorageSlotType.Party => 6,
                 _ => throw new NotImplementedException(),
             }
             : SlotCountVariable;
@@ -28,14 +27,11 @@ public class BoxDTO : IWithId<string>
 
     public int SlotCountVariable = -1;
 
-    public bool CanReceivePkm { get { return Type != BoxType.Daycare; } }
+    public bool CanWrite => Type == StorageSlotType.Box;
+
+    public bool CanReceivePkm => Type == StorageSlotType.Party || Type == StorageSlotType.Box;
 
     public required BoxEntity BoxEntity;
-}
 
-public enum BoxType
-{
-    Default,
-    Party,
-    Daycare
+    public static bool CanIdReceivePkm(int boxId) => boxId == -(int)StorageSlotType.Party || boxId >= 0;
 }

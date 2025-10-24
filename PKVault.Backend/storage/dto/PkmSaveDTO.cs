@@ -56,13 +56,15 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     // -- actions
 
-    public bool CanMove { get => BoxId != BoxDTO.DAYCARE_ID; }
+    public bool CanMove { get => !IsLocked && BoxDTO.CanIdReceivePkm(BoxId); }
 
-    public bool CanDelete { get => CanMove && PkmVersionId == null; }
+    public bool CanDelete { get => !IsLocked && CanMove && PkmVersionId == null; }
 
-    public bool CanMoveToMain { get => CanDelete && !IsShadow && !IsEgg; }
+    public bool CanMoveToMain { get => !IsLocked && CanDelete && !IsShadow && !IsEgg && Party == -1; }
 
-    public bool CanMoveAttachedToMain { get => CanMoveToMain && !IsDuplicate; }
+    public bool CanMoveToSave { get => !IsLocked && CanMoveToMain; }
+
+    public bool CanMoveAttachedToMain { get => !IsLocked && CanMoveToMain && !IsDuplicate; }
 
     public required SaveFile Save;
 
