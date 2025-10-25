@@ -62,7 +62,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return Pkm.IsShiny; }
     }
 
-    public byte Ball { get => Pkm.Ball; }
+    public int Ball => StaticDataService.GetBallPokeApiId((Ball)Pkm.Ball);
 
     public PKHeX.Core.Gender Gender { get => (PKHeX.Core.Gender)Pkm.Gender; }
 

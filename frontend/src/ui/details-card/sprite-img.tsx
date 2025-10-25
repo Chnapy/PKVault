@@ -36,7 +36,7 @@ export const SpriteImg: React.FC<SpriteImgProps> = ({ spriteInfos, size, ...imgP
     >
         <img
             src={sheetUrl}
-            alt={spriteInfos.sheetName}
+            alt={`${spriteInfos.sheetName}-x=${spriteInfos.x}-y=${spriteInfos.y}`}
             className={css({
                 objectFit: 'none',
                 objectPosition: spriteInfos && `-${spriteInfos.x}px -${spriteInfos.y}px`,

@@ -54,6 +54,7 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, generation, for
         className={cx(css({
             filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
         }), imgProps.className)}
+        data-speciesId={species}
         {...imgProps}
     />;
 };
