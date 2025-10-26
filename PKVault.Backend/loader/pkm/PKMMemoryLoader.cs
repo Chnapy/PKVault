@@ -3,6 +3,8 @@ using PKHeX.Core;
 
 public class PKMMemoryLoader : PKMLoader
 {
+    public bool EnableLog = true;
+
     private Dictionary<string, byte[]> bytesDict = new();
 
     public override byte[]? GetEntity(string filepath)
@@ -14,7 +16,8 @@ public class PKMMemoryLoader : PKMLoader
 
     public override void DeleteEntity(string filepath)
     {
-        Console.WriteLine($"(M) Delete PKM filepath={filepath}");
+        if (EnableLog)
+            Console.WriteLine($"(M) Delete PKM filepath={filepath}");
 
         bytesDict.Remove(filepath);
     }
@@ -25,11 +28,13 @@ public class PKMMemoryLoader : PKMLoader
 
         if (expectedFilepath != null && expectedFilepath != filepath)
         {
-            Console.WriteLine($"(M) PKM-file filepath inconsistency. Expected={expectedFilepath} Obtained={filepath}");
+            if (EnableLog)
+                Console.WriteLine($"(M) PKM-file filepath inconsistency. Expected={expectedFilepath} Obtained={filepath}");
             filepath = expectedFilepath;
         }
 
-        Console.WriteLine($"(M) PKM-file Write idBase={BasePkmVersionDTO.GetPKMIdBase(pkm)} filepath={filepath}");
+        if (EnableLog)
+            Console.WriteLine($"(M) PKM-file Write idBase={BasePkmVersionDTO.GetPKMIdBase(pkm)} filepath={filepath}");
 
         bytesDict.Remove(filepath);
         bytesDict.Add(filepath, bytes);

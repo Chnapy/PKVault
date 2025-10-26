@@ -111,9 +111,9 @@ public class BackupService
 
         return new()
         {
-            [relativeBoxPath] = boxPath,
-            [relativePkmPath] = pkmPath,
-            [relativePkmVersionPath] = pkmVersionPath,
+            [NormalizePath(relativeBoxPath)] = NormalizePath(boxPath),
+            [NormalizePath(relativePkmPath)] = NormalizePath(pkmPath),
+            [NormalizePath(relativePkmVersionPath)] = NormalizePath(pkmVersionPath),
         };
     }
 
@@ -142,7 +142,7 @@ public class BackupService
 
             File.Copy(path, newPath);
 
-            paths.Add(relativePath, path);
+            paths.Add(NormalizePath(relativePath), NormalizePath(path));
         }
 
         return paths;
@@ -174,11 +174,16 @@ public class BackupService
 
             File.Copy(pkmVersion.PkmVersionEntity.Filepath, newPath);
 
-            paths.Add(Path.Combine(relativeDirPath, filename), pkmVersion.PkmVersionEntity.Filepath);
+            paths.Add(
+                NormalizePath(Path.Combine(relativeDirPath, filename)),
+                NormalizePath(pkmVersion.PkmVersionEntity.Filepath)
+            );
         });
 
         return paths;
     }
+
+    private static string NormalizePath(string path) => path.Replace('\\', '/');
 
     private static string SerializeDateTime(DateTime dateTime)
     {
@@ -297,10 +302,11 @@ public class BackupService
 
         foreach (var entry in archive.Entries)
         {
-            if (paths.ContainsKey(entry.FullName))
+            if (
+                paths!.TryGetValue(entry.FullName, out var path)
+                || paths.TryGetValue(entry.FullName.Replace('/', '\\'), out path)
+            )
             {
-                var path = paths[entry.FullName];
-
                 Console.WriteLine($"Extract {entry.FullName} to {path}");
 
                 entry.ExtractToFile(path, true);
@@ -312,7 +318,7 @@ public class BackupService
         logtime();
 
         LocalSaveService.ReadLocalSaves();
-
+        StorageService.CleanWrongData();
         await StorageService.ResetDataLoader(true);
     }
 

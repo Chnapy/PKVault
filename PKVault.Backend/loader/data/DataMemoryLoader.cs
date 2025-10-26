@@ -28,6 +28,8 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
         var pkmMemoryLoader = new PKMMemoryLoader();
         var pkmRealFileLoader = new PKMFileLoader();
 
+        pkmMemoryLoader.EnableLog = false;
+
         var pkmVersionLoader = new EntityMemoryLoader<PkmVersionDTO, PkmVersionEntity>(pkmVersionEntities,
             entityToDto: entity =>
             {
@@ -91,6 +93,8 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
                 Pkms = new SavePkmLoader(save, pkmLoader, pkmVersionLoader)
             });
         });
+
+        pkmMemoryLoader.EnableLog = true;
 
         DataEntityLoaders loaders = new()
         {
