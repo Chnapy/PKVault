@@ -89,6 +89,7 @@
   "storage.move.attached-multiple-versions": "Le pkm {{name}} ne peut pas être déplacé vers une sauvegarde s'il a plusieurs versions. Utilisez \"Déplacer rattaché\", ou supprimez toutes les versions sauf une",
   "storage.move.save-egg": "Les oeufs ne peuvent pas être déplacé à l'exterieur d'une sauvegarde",
   "storage.move.save-shadow": "Les pkm obscurs ne peuvent pas être déplacé à l'exterieur d'une sauvegarde",
+  "storage.move.save-main-duplicate": "Le pkm {{name}} ne peut pas être déplacé vers le stockage principal, une copie y est déjà présente",
   "storage.box.delete.help": "La boîte doit être vide avant de la supprimer",
   "storage.box.split.help": "Diviser en 2",
   "storage.save-select": "Sélection de sauvegarde",

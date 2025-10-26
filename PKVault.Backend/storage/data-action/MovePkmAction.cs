@@ -262,7 +262,12 @@ public class MovePkmAction(
 
         var savePkm = saveLoaders.Pkms.GetDto(pkmId)
             ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
-        var pkmDto = loaders.pkmLoader.GetDto(pkmId);
+        var pkmDto = loaders.pkmLoader.GetDto(savePkm.IdBase);
+
+        if (pkmDto != null && pkmDto.SaveId != sourceSaveId)
+        {
+            throw new ArgumentException($"Pkm with same ID already exists, id={savePkm.IdBase}");
+        }
 
         var existingSlot = loaders.pkmLoader.GetAllDtos().Find(dto => dto.BoxId == targetBoxId && dto.BoxSlot == targetBoxSlot);
         if (attached && existingSlot != null)

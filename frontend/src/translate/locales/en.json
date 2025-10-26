@@ -89,6 +89,7 @@
   "storage.move.attached-multiple-versions": "Pkm {{name}} cannot be moved with multiple versions to a save. Use \"move attached\", or remove all versions except one",
   "storage.move.save-egg": "Eggs cannot be moved outside save",
   "storage.move.save-shadow": "Shadow pkm cannot be moved outside save",
+  "storage.move.save-main-duplicate": "Pkm {{name}} cannot be moved to main storage, a duplicate already exists",
   "storage.box.delete.help": "Box should be empty before delete it",
   "storage.box.split.help": "Split in 2",
   "storage.save-select": "Save selection",

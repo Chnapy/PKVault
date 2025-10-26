@@ -300,7 +300,7 @@ export const StorageMoveContext = {
             const targetBoxMain = !saveId ? mainBoxesQuery.data?.data.find(box => box.idInt === dropBoxId) : undefined;
             const targetBoxSave = saveId ? targetSaveBoxesQuery.data?.data.find(box => box.idInt === dropBoxId) : undefined;
 
-            const getPkmNickname = (id: string) => mainPkmVersionsQuery.data?.data.find(pkm => pkm.pkmId === id)?.nickname;
+            const getMainPkmNickname = (id: string) => mainPkmVersionsQuery.data?.data.find(pkm => pkm.pkmId === id)?.nickname;
 
             const checkBetweenSlot = (
                 targetBoxMain?: BoxDTO, targetBoxSave?: BoxDTO,
@@ -352,14 +352,14 @@ export const StorageMoveContext = {
                         if (!sourcePkmSave.canMoveToSave) {
                             return {
                                 enable: false,
-                                helpText: t('storage.move.pkm-cannot', { name: getPkmNickname(sourcePkmSave.id) }),
+                                helpText: t('storage.move.pkm-cannot', { name: sourcePkmSave.nickname }),
                             };
                         }
 
                         if (targetPkmSave && !targetPkmSave.canMoveToSave) {
                             return {
                                 enable: false,
-                                helpText: t('storage.move.pkm-cannot', { name: getPkmNickname(targetPkmSave.id) }),
+                                helpText: t('storage.move.pkm-cannot', { name: targetPkmSave.nickname }),
                             };
                         }
                     }
@@ -382,8 +382,8 @@ export const StorageMoveContext = {
                         return {
                             enable: false,
                             helpText: sourcePkmMain.saveId
-                                ? t('storage.move.pkm-cannot-attached-already', { name: getPkmNickname(sourcePkmMain.id) })
-                                : (selected.attached ? t('storage.move.pkm-cannot-attached', { name: getPkmNickname(sourcePkmMain.id) }) : t('storage.move.pkm-cannot', { name: getPkmNickname(sourcePkmMain.id) })),
+                                ? t('storage.move.pkm-cannot-attached-already', { name: getMainPkmNickname(sourcePkmMain.id) })
+                                : (selected.attached ? t('storage.move.pkm-cannot-attached', { name: getMainPkmNickname(sourcePkmMain.id) }) : t('storage.move.pkm-cannot', { name: getMainPkmNickname(sourcePkmMain.id) })),
                         };
                     }
 
@@ -392,13 +392,13 @@ export const StorageMoveContext = {
 
                     if (!generation || !relatedPkmVersions.some(version => version.generation === generation)) {
                         return {
-                            enable: false, helpText: t('storage.move.main-need-gen', { name: getPkmNickname(sourcePkmMain.id), generation })
+                            enable: false, helpText: t('storage.move.main-need-gen', { name: getMainPkmNickname(sourcePkmMain.id), generation })
                         };
                     }
 
                     if (!selected.attached) {
                         if (relatedPkmVersions.length > 1) {
-                            return { enable: false, helpText: t('storage.move.attached-multiple-versions', { name: getPkmNickname(sourcePkmMain.id) }) };
+                            return { enable: false, helpText: t('storage.move.attached-multiple-versions', { name: getMainPkmNickname(sourcePkmMain.id) }) };
                         }
                     }
                 }
@@ -416,8 +416,17 @@ export const StorageMoveContext = {
                     if (!(selected.attached ? sourcePkmSave.canMoveAttachedToMain : sourcePkmSave.canMoveToMain)) {
                         return {
                             enable: false, helpText: selected.attached
-                                ? t('storage.move.pkm-cannot-attached', { name: getPkmNickname(sourcePkmSave.id) })
-                                : t('storage.move.pkm-cannot', { name: getPkmNickname(sourcePkmSave.id) })
+                                ? t('storage.move.pkm-cannot-attached', { name: sourcePkmSave.nickname })
+                                : t('storage.move.pkm-cannot', { name: sourcePkmSave.nickname })
+                        };
+                    }
+
+                    const existingStoredPkmVersion = mainPkmVersionsQuery.data?.data.find(pkm => pkm.id === sourcePkmSave.idBase);
+                    const existingStoredPkm = existingStoredPkmVersion && mainPkmsQuery.data?.data.find(pkm => pkm.id === existingStoredPkmVersion.pkmId);
+                    if (existingStoredPkm && existingStoredPkm.saveId !== sourcePkmSave.saveId) {
+                        return {
+                            enable: false,
+                            helpText: t('storage.move.save-main-duplicate', { name: sourcePkmSave.nickname })
                         };
                     }
                 }
