@@ -21,7 +21,7 @@ export const ItemImg: React.FC<ItemImgProps> = ({ item, ...imgProps }) => {
 
     return spriteInfos && <SpriteImg
         spriteInfos={spriteInfos}
-        data-itemId={item}
+        data-itemid={item}
         {...imgProps}
     />;
 };

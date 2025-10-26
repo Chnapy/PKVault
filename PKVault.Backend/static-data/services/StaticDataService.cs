@@ -677,6 +677,7 @@ public class StaticDataService
         List<Task<StaticItem>> tasks = [];
 
         // var notFound = new List<string>();
+        // Console.WriteLine(string.Join('\n', GameInfo.Strings.itemlist.ToList().FindAll(item => item.ToLower().Contains("ball"))));
 
         for (var i = 0; i < itemNames.Length; i++)
         {
@@ -825,9 +826,17 @@ public class StaticDataService
         {
             "leek" => "stick",
             "upgrade" => "up-grade",
+            "strange-ball" => "lastrange-ball",
+            "feather-ball" => "lafeather-ball",
+            "wing-ball" => "lawing-ball",
+            "jet-ball" => "lajet-ball",
+            "leaden-ball" => "laleaden-ball",
+            "gigaton-ball" => "lagigaton-ball",
+            "origin-ball" => "laorigin-ball",
             var _ when pokeapiName.EndsWith("-feather") => $"{pokeapiName[..^8]}-wing",
             var _ when pokeapiName.EndsWith("ium-z") => $"{pokeapiName}--held",
             var _ when pokeapiName.EndsWith("ium-z-[z]") => $"{pokeapiName[..^4]}--bag",
+            var _ when pokeapiName.EndsWith("-(la)") => $"la{pokeapiName[..^5]}",
             _ => pokeapiName
         };
     }
