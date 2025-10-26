@@ -10,6 +10,18 @@
     
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
+    
+    <Version>1.1.1</Version>
+    <ApplicationDisplayVersion>1.1.1</ApplicationDisplayVersion>
+    <ApplicationVersion>1.1.1</ApplicationVersion>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Product>PKVault</Product>
+    <Authors>Richard Haddad</Authors>
+    <Copyright>Richard Haddad</Copyright>
+    <SourceRevisionId>$([System.DateTime]::UtcNow.ToString("yyMMddHHmmss"))</SourceRevisionId>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Chnapy/PKVault</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Chnapy/PKVault</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="PKHeX.Core" Version="25.9.25" />

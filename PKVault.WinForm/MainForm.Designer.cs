@@ -249,7 +249,7 @@ partial class MainForm
         webView.Size = this.ClientSize - new System.Drawing.Size(webView.Location);
     }
 
-    private async void InjectIntoFrontend()
+    private void InjectIntoFrontend()
     {
         webView.CoreWebView2.WebMessageReceived += async (object sender, CoreWebView2WebMessageReceivedEventArgs e) =>
         {

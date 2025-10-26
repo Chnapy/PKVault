@@ -18,11 +18,23 @@
 
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
 
+    <AssemblyName>PKVault</AssemblyName>
     <ApplicationTitle>PKVault</ApplicationTitle>
-    <ApplicationId>com.companyname.pkvault</ApplicationId>
-    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationId>com.chnapy.pkvault</ApplicationId>
+    <Version>1.1.1</Version>
+    <ApplicationDisplayVersion>1.1.1</ApplicationDisplayVersion>
+    <ApplicationVersion>1.1.1</ApplicationVersion>
     <ApplicationIcon>wwwroot/icon.ico</ApplicationIcon>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Product>PKVault</Product>
+    <Description>PKVault is a Pokemon storage and save manipulation tool based on PKHeX.</Description>
+    <AssemblyDescription>PKVault is a Pokemon storage and save manipulation tool based on PKHeX.</AssemblyDescription>
+    <Authors>Richard Haddad</Authors>
+    <Copyright>Richard Haddad</Copyright>
+    <SourceRevisionId>$([System.DateTime]::UtcNow.ToString("yyMMddHHmmss"))</SourceRevisionId>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Chnapy/PKVault</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Chnapy/PKVault</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

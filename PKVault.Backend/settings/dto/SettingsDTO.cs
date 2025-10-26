@@ -9,6 +9,8 @@ public class SettingsDTO
 
     public Guid BuildID { get => Assembly.GetExecutingAssembly().ManifestModule.ModuleVersionId; }
 
+    public string Version => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "";
+
     public string AppDirectory { get => AppDomain.CurrentDomain.BaseDirectory.Replace('\\', '/'); }
 
     public string SettingsPath { get => filePath; }
