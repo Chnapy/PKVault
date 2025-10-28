@@ -47,6 +47,12 @@ partial class MainForm
         ((System.ComponentModel.ISupportInitialize)webView).BeginInit();
         SuspendLayout();
 
+
+        // webView.CoreWebView2InitializationCompleted += async (sender, args) =>
+        // {
+        //     Console.WriteLine($"FOOBAR {sender} {args}");
+        // };
+
         var clientSize = new Size(1360, 800);
 
         // 
@@ -257,7 +263,7 @@ partial class MainForm
             Console.WriteLine($"Message received: {message}");
             try
             {
-                var fileExploreRequest = JsonSerializer.Deserialize<FileExploreRequest>(message);
+                var fileExploreRequest = JsonSerializer.Deserialize(message, FileExploreJsonContext.Default.FileExploreRequest);
 
                 FileExploreResponse GetDialogResponse()
                 {
@@ -306,7 +312,7 @@ partial class MainForm
                 }
 
                 var response = GetDialogResponse();
-                var responseSerialized = JsonSerializer.Serialize(response);
+                var responseSerialized = JsonSerializer.Serialize(response, FileExploreJsonContext.Default.FileExploreResponse);
                 string script = $"window.dispatchEvent(new CustomEvent('fileExplore', {{ detail: JSON.parse('{responseSerialized}') }}));";
                 var result = await webView.ExecuteScriptAsync(script);
                 Console.WriteLine($"Script = {script} result= {result}");
@@ -318,22 +324,4 @@ partial class MainForm
         };
     }
 
-}
-
-struct FileExploreRequest
-{
-    public string type { get; set; } //'file-explore';
-    public int id { get; set; }
-    public bool directoryOnly { get; set; }
-    public string basePath { get; set; }
-    public string title { get; set; }
-    public bool multiselect { get; set; }
-}
-
-struct FileExploreResponse
-{
-    public required string type { get; set; } //'file-explore';
-    public required int id { get; set; }
-    public required bool directoryOnly { get; set; }
-    public required string[] values { get; set; }
 }

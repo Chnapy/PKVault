@@ -315,19 +315,22 @@ public class StorageService
         var boxLoader = new EntityJSONLoader<BoxDTO, BoxEntity>(
             filePath: Path.Combine(dbDir, "box.json"),
             entityToDto: entity => default,
-            dtoToEntity: dto => dto.BoxEntity
+            dtoToEntity: dto => dto.BoxEntity,
+            dictJsonContext: EntitiesJsonContext.Default.DictionaryStringBoxEntity
         );
 
         var pkmLoader = new EntityJSONLoader<PkmDTO, PkmEntity>(
            filePath: Path.Combine(dbDir, "pkm.json"),
             entityToDto: entity => default,
-            dtoToEntity: dto => dto.PkmEntity
+            dtoToEntity: dto => dto.PkmEntity,
+            dictJsonContext: EntitiesJsonContext.Default.DictionaryStringPkmEntity
         );
 
         var pkmVersionLoader = new EntityJSONLoader<PkmVersionDTO, PkmVersionEntity>(
            filePath: Path.Combine(dbDir, "pkm-version.json"),
             entityToDto: entity => default,
-            dtoToEntity: dto => dto.PkmVersionEntity
+            dtoToEntity: dto => dto.PkmVersionEntity,
+            dictJsonContext: EntitiesJsonContext.Default.DictionaryStringPkmVersionEntity
         );
 
         var boxEntities = boxLoader.GetAllEntities();

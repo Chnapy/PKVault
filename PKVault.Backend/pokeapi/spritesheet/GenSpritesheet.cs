@@ -149,7 +149,7 @@ public class GenSpritesheet
             .ToDictionary(pair => pair.Key, pair => pair.Value);
 
         string jsonPath = Path.Combine(TargetPath, filename);
-        await File.WriteAllTextAsync(jsonPath, JsonSerializer.Serialize(allSpritesInfos, StaticDataService.JsonOptions));
+        await File.WriteAllTextAsync(jsonPath, JsonSerializer.Serialize(allSpritesInfos, SpritesheetJsonContext.Default.DictionaryStringSpriteInfo));
         Console.WriteLine($"Saved index JSON to {jsonPath}");
     }
 }

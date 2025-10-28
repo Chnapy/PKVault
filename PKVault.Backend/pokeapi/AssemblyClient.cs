@@ -2,14 +2,17 @@ using System.Buffers;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
-public partial class AssemblyClient(JsonSerializerOptions jsonOptions)
+public partial class AssemblyClient
 {
     private static readonly Assembly assembly = Assembly.GetExecutingAssembly();
 
     public async Task<Stream> GetAsync(List<string> fileParts)
     {
-        byte[] rentedBuffer = ArrayPool<byte>.Shared.Rent(jsonOptions.DefaultBufferSize);
+        byte[] rentedBuffer = ArrayPool<byte>.Shared.Rent(
+            16 * 1024 // buffer 16 Ko
+        );
 
         try
         {
@@ -22,15 +25,15 @@ public partial class AssemblyClient(JsonSerializerOptions jsonOptions)
         }
     }
 
-    public async Task<T?> GetAsyncJson<T>(List<string> fileParts)
+    public async Task<T?> GetAsyncJson<T>(List<string> fileParts, JsonTypeInfo<T> jsonContext)
     {
-        byte[] rentedBuffer = ArrayPool<byte>.Shared.Rent(jsonOptions.DefaultBufferSize);
+        byte[] rentedBuffer = ArrayPool<byte>.Shared.Rent(jsonContext.Options.DefaultBufferSize);
 
         try
         {
             using var stream = GetResourceFromAssembly(fileParts);
 
-            return await DeserializeResource<T>(stream);
+            return await DeserializeResource(stream, jsonContext);
         }
         finally
         {
@@ -39,16 +42,16 @@ public partial class AssemblyClient(JsonSerializerOptions jsonOptions)
         }
     }
 
-    public async Task<T?> GetAsyncJsonGz<T>(List<string> fileParts)
+    public async Task<T?> GetAsyncJsonGz<T>(List<string> fileParts, JsonTypeInfo<T> jsonContext)
     {
-        byte[] rentedBuffer = ArrayPool<byte>.Shared.Rent(jsonOptions.DefaultBufferSize);
+        byte[] rentedBuffer = ArrayPool<byte>.Shared.Rent(jsonContext.Options.DefaultBufferSize);
 
         try
         {
             using var stream = GetResourceFromAssembly(fileParts);
             using var gzipStream = new GZipStream(stream, CompressionMode.Decompress);
 
-            return await DeserializeResource<T>(gzipStream);
+            return await DeserializeResource(gzipStream, jsonContext);
         }
         finally
         {
@@ -57,9 +60,9 @@ public partial class AssemblyClient(JsonSerializerOptions jsonOptions)
         }
     }
 
-    private async Task<T?> DeserializeResource<T>(Stream jsonStream)
+    private async Task<T?> DeserializeResource<T>(Stream jsonStream, JsonTypeInfo<T> jsonContext)
     {
-        return await JsonSerializer.DeserializeAsync<T>(jsonStream, jsonOptions);
+        return await JsonSerializer.DeserializeAsync(jsonStream, jsonContext);
     }
 
     private Stream GetResourceFromAssembly(List<string> fileParts)

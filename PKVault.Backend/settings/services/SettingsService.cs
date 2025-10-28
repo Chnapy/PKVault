@@ -2,15 +2,11 @@ using System.Text.Json;
 
 public class SettingsService
 {
-    private static readonly JsonSerializerOptions jsonOptions = new()
-    {
-        WriteIndented = true
-    };
     public static SettingsDTO AppSettings = GetSettings();
 
     public static async Task UpdateSettings(SettingsMutableDTO settingsMutable)
     {
-        var text = JsonSerializer.Serialize(settingsMutable, jsonOptions);
+        string text = JsonSerializer.Serialize(settingsMutable, SettingsMutableDTOJsonContext.Default.SettingsMutableDTO);
         Console.WriteLine(text);
         File.WriteAllText(SettingsDTO.filePath, text);
 
@@ -26,7 +22,7 @@ public class SettingsService
         if (!File.Exists(SettingsDTO.filePath))
         {
             Console.WriteLine($"Config file not existing: creating {SettingsDTO.filePath}");
-            string defaultJson = JsonSerializer.Serialize(GetDefaultSettingsMutable(), jsonOptions);
+            string defaultJson = JsonSerializer.Serialize(GetDefaultSettingsMutable(), SettingsMutableDTOJsonContext.Default.SettingsMutableDTO);
 
             string? directory = Path.GetDirectoryName(SettingsDTO.filePath);
             if (!string.IsNullOrEmpty(directory))
@@ -38,7 +34,7 @@ public class SettingsService
         }
 
         string json = File.ReadAllText(SettingsDTO.filePath);
-        var mutableDto = JsonSerializer.Deserialize<SettingsMutableDTO>(json)!;
+        var mutableDto = JsonSerializer.Deserialize(json, SettingsMutableDTOJsonContext.Default.SettingsMutableDTO)!;
         return new()
         {
             SettingsMutable = mutableDto,

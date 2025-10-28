@@ -1,9 +1,11 @@
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 public class EntityJSONLoader<DTO, E>(
     string filePath,
     Func<DTO, E> dtoToEntity,
-    Func<E, DTO> entityToDto
+    Func<E, DTO> entityToDto,
+    JsonTypeInfo<Dictionary<string, E>> dictJsonContext
     ) : EntityLoader<DTO, E>(dtoToEntity, entityToDto) where DTO : IWithId<string> where E : IWithId<string>
 {
     private Dictionary<string, E>? entitiesById = null;
@@ -32,7 +34,7 @@ public class EntityJSONLoader<DTO, E>(
 
         Console.WriteLine($"Write entities to {filePath}");
 
-        File.WriteAllText(filePath, JsonSerializer.Serialize(entitiesById));
+        File.WriteAllText(filePath, JsonSerializer.Serialize(entitiesById ?? [], dictJsonContext));
     }
 
     private Dictionary<string, E> GetFileContent()
@@ -40,7 +42,7 @@ public class EntityJSONLoader<DTO, E>(
         if (!File.Exists(filePath))
         {
             Console.WriteLine($"Entity DB file not existing: creating {filePath}");
-            string emptyJson = JsonSerializer.Serialize(new Dictionary<string, E>());
+            string emptyJson = JsonSerializer.Serialize([], dictJsonContext);
 
             string? directory = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrEmpty(directory))
@@ -55,7 +57,7 @@ public class EntityJSONLoader<DTO, E>(
 
         try
         {
-            return JsonSerializer.Deserialize<Dictionary<string, E>>(json) ?? [];
+            return JsonSerializer.Deserialize(json, dictJsonContext) ?? [];
         }
         catch (JsonException ex)
         {

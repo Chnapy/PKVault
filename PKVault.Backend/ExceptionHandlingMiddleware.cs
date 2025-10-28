@@ -4,11 +4,6 @@ using Microsoft.Extensions.Primitives;
 
 public partial class ExceptionHandlingMiddleware
 {
-    private static readonly JsonSerializerOptions jsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
-
     private readonly RequestDelegate _next;
 
     public ExceptionHandlingMiddleware(RequestDelegate next)
@@ -33,7 +28,7 @@ public partial class ExceptionHandlingMiddleware
         }
     }
 
-    private static async Task WriteExceptionResponse(HttpContext context, Exception ex, object? data)
+    private static async Task WriteExceptionResponse(HttpContext context, Exception ex, DataDTO? data)
     {
         Console.Error.WriteLine(ex);
 
@@ -51,7 +46,7 @@ public partial class ExceptionHandlingMiddleware
 
         if (data != null)
         {
-            var result = JsonSerializer.Serialize(data, jsonOptions);
+            var result = JsonSerializer.Serialize(data, RouteJsonContext.Default.DataDTO);
             await context.Response.WriteAsync(result);
         }
     }

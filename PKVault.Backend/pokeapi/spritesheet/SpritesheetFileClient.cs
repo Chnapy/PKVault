@@ -2,7 +2,7 @@ using System.Text.Json;
 
 public partial class SpritesheetFileClient
 {
-    private static readonly AssemblyClient assemblyClient = new(GetJsonOptions());
+    private static readonly AssemblyClient assemblyClient = new();
 
     public static async Task<Dictionary<string, SpriteInfo>> GetAsyncJson(string filename)
     {
@@ -10,7 +10,7 @@ public partial class SpritesheetFileClient
             "pokeapi", "spritesheet","sheets", filename
         ];
 
-        return await assemblyClient.GetAsyncJson<Dictionary<string, SpriteInfo>>(fileParts);
+        return await assemblyClient.GetAsyncJson(fileParts, SpritesheetJsonContext.Default.DictionaryStringSpriteInfo);
     }
 
     public static async Task<Stream> GetAsyncString(string filename)
@@ -27,14 +27,4 @@ public partial class SpritesheetFileClient
 
     public static string GetItemsJsonFilename() => "spritesheet_items.json";
     public static string GetItemsImgFilename(int sheetIndex) => $"spritesheet_items_{sheetIndex}.webp";
-
-    private static JsonSerializerOptions GetJsonOptions()
-    {
-        return new()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            PropertyNameCaseInsensitive = true,
-            DefaultBufferSize = 16 * 1024, // buffer 16 Ko
-        };
-    }
 }

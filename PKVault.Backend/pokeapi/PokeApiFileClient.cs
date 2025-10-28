@@ -1,20 +1,21 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
 using PokeApiNet;
 
 public partial class PokeApiFileClient
 {
-    private static readonly AssemblyClient assemblyClient = new(GetJsonOptions());
+    private static readonly AssemblyClient assemblyClient = new();
 
-    public async Task<T?> GetAsync<T>(UrlNavigation<T> urlResource) where T : ResourceBase
+    public async Task<T?> GetAsync<T>(UrlNavigation<T> urlResource, JsonTypeInfo<T> jsonContext) where T : ResourceBase
     {
-        return await GetAsyncByUrl<T>(urlResource.Url);
+        return await GetAsyncByUrl(urlResource.Url, jsonContext);
     }
 
-    public async Task<T?> GetAsync<T>(string name) where T : NamedApiResource
+    public async Task<T?> GetAsync<T>(string name, JsonTypeInfo<NamedApiResourceList<T>> jsonContextList, JsonTypeInfo<T> jsonContext) where T : NamedApiResource
     {
         if (name.Contains('★'))
         {
@@ -23,7 +24,7 @@ public partial class PokeApiFileClient
 
         var formattedName = PokeApiNameFromPKHexName(name);
 
-        var results = await GetAsyncList<T>();
+        var results = await GetAsyncList(jsonContextList, jsonContext);
 
         var namedApi = results.Find(resource => resource.Name.Equals(formattedName, StringComparison.CurrentCultureIgnoreCase));
         if (namedApi == null)
@@ -31,41 +32,41 @@ public partial class PokeApiFileClient
             return null;
         }
 
-        return await GetAsync(namedApi);
+        return await GetAsync(namedApi, jsonContext);
     }
 
-    public async Task<List<NamedApiResource<T>>> GetAsyncList<T>() where T : NamedApiResource
+    public async Task<List<NamedApiResource<T>>> GetAsyncList<T>(JsonTypeInfo<NamedApiResourceList<T>> jsonContextList, JsonTypeInfo<T> jsonContext) where T : NamedApiResource
     {
-        string url = GetApiEndpointString<T>();
+        string url = GetApiEndpointString(jsonContext.Type);
 
-        NamedApiResourceList<T>? page = await GetAsyncByPathname<NamedApiResourceList<T>>(url);
+        NamedApiResourceList<T>? page = await GetAsyncByPathname(url, jsonContextList);
 
         return page!.Results;
     }
 
-    public async Task<List<ApiResource<T>>> GetAsyncUrlList<T>() where T : ApiResource
+    public async Task<List<ApiResource<T>>> GetAsyncUrlList<T>(JsonTypeInfo<ApiResourceList<T>> jsonContextList, JsonTypeInfo<T> jsonContext) where T : ApiResource
     {
-        string url = GetApiEndpointString<T>();
+        string url = GetApiEndpointString(jsonContext.Type);
 
-        ApiResourceList<T>? page = await GetAsyncByPathname<ApiResourceList<T>>(url);
+        ApiResourceList<T>? page = await GetAsyncByPathname(url, jsonContextList);
 
         return page!.Results;
     }
 
-    public async Task<T?> GetAsync<T>(int apiParam)
+    public async Task<T?> GetAsync<T>(int apiParam, JsonTypeInfo<T> jsonContext)
     {
-        string text = IsApiEndpointCaseSensitive<T>() ? apiParam.ToString() : apiParam.ToString().ToLowerInvariant();
-        string apiEndpointString = GetApiEndpointString<T>();
+        string text = IsApiEndpointCaseSensitive(jsonContext.Type) ? apiParam.ToString() : apiParam.ToString().ToLowerInvariant();
+        string apiEndpointString = GetApiEndpointString(jsonContext.Type);
 
-        return await GetAsyncByPathname<T>($"{apiEndpointString}/{text}");
+        return await GetAsyncByPathname($"{apiEndpointString}/{text}", jsonContext);
     }
 
-    private static async Task<T?> GetAsyncByPathname<T>(string pathname)
+    private static async Task<T?> GetAsyncByPathname<T>(string pathname, JsonTypeInfo<T> jsonContext)
     {
-        return await GetAsyncByUrl<T>($"/api/v2/{pathname}");
+        return await GetAsyncByUrl($"/api/v2/{pathname}", jsonContext);
     }
 
-    private static async Task<T?> GetAsyncByUrl<T>(string url)
+    private static async Task<T?> GetAsyncByUrl<T>(string url, JsonTypeInfo<T> jsonContext)
     {
         var uriParts = url
             .Split('/').ToList()
@@ -77,41 +78,28 @@ public partial class PokeApiFileClient
             "index.json.gz"
         ];
 
-        return await assemblyClient.GetAsyncJsonGz<T>(fileParts);
+        return await assemblyClient.GetAsyncJsonGz(fileParts, jsonContext);
     }
 
-    public static string GetApiEndpointString<T>()
+    public static string GetApiEndpointString(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        System.Type jsonType)
     {
-        return typeof(T).GetProperty("ApiEndpoint", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null)?.ToString()
-            ?? throw new Exception($"ApiEndpoint not found for type {nameof(T)}");
+        return jsonType?.GetProperty("ApiEndpoint", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null)?.ToString()
+            ?? throw new Exception($"ApiEndpoint not found for type {jsonType}");
     }
 
-    private static bool IsApiEndpointCaseSensitive<T>()
+    private static bool IsApiEndpointCaseSensitive(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        System.Type jsonType)
     {
-        PropertyInfo? property = typeof(T).GetProperty("IsApiEndpointCaseSensitive", BindingFlags.Static | BindingFlags.NonPublic);
+        PropertyInfo? property = jsonType.GetProperty("IsApiEndpointCaseSensitive", BindingFlags.Static | BindingFlags.NonPublic);
         if (!(property == null))
         {
             return (bool)property.GetValue(null)!;
         }
 
         return false;
-    }
-
-    private static JsonSerializerOptions GetJsonOptions()
-    {
-        var options = new JsonSerializerOptions()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-            PropertyNameCaseInsensitive = true,
-            DefaultBufferSize = 16 * 1024, // buffer 16 Ko
-        };
-
-        // required for pokeapi deserialize (types are wrong sometimes)
-        options.Converters.Add(
-            new NumberToStringConverter()
-        );
-
-        return options;
     }
 
     public static string PokeApiNameFromPKHexName(string pkhexName)

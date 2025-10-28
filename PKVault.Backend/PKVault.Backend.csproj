@@ -10,7 +10,7 @@
     
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
-    
+
     <Version>1.1.1</Version>
     <ApplicationDisplayVersion>1.1.1</ApplicationDisplayVersion>
     <ApplicationVersion>1.1.1</ApplicationVersion>
@@ -26,18 +26,15 @@
   <ItemGroup>
     <PackageReference Include="PKHeX.Core" Version="25.9.25" />
     <PackageReference Include="PokeApiNet" Version="4.1.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
   </ItemGroup>
-  
-  <ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <PackageReference Include="NSwag.AspNetCore" Version="14.6.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="pokeapi\spritesheet\GenSpritesheet.cs" Condition="'$(Configuration)' == 'Release'" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
   </ItemGroup>
 
   <ItemGroup>

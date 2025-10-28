@@ -8,7 +8,6 @@ using PokeApiNet;
 public class StaticDataService
 {
     private static readonly string TmpDirectory = PrepareTmpDirectory();
-    public static readonly JsonSerializerOptions JsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     private static string? GetTmpStaticDataPath()
     {
@@ -35,7 +34,7 @@ public class StaticDataService
                 using var fileStream = File.Open(tmpStaticDataPath, FileMode.Open);
                 using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
 
-                return JsonSerializer.Deserialize<StaticDataDTO>(gzipStream, JsonOptions)!;
+                return JsonSerializer.Deserialize(gzipStream, StaticDataJsonContext.Default.StaticDataDTO)!;
             }
             // file is wrong
             catch (JsonException)
@@ -82,7 +81,7 @@ public class StaticDataService
 
         time = LogUtil.Time($"Write cached static-data in {tmpStaticDataPath}");
 
-        var jsonContent = JsonSerializer.Serialize(dto, JsonOptions);
+        var jsonContent = JsonSerializer.Serialize(dto, StaticDataJsonContext.Default.StaticDataDTO);
         using var originalFileStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonContent));
         using var compressedFileStream = File.Create(tmpStaticDataPath);
         using var compressionStream = new GZipStream(compressedFileStream, CompressionLevel.Optimal);
@@ -856,10 +855,12 @@ public class StaticDataService
     {
         var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
 
-        return string.Join('/', pokeapiVersions.Select(ver =>
-        {
-            return PokeApi.GetNameForCurrentLanguage(ver.Names);
-        }).Distinct());
+        return string.Join('/', pokeapiVersions
+            .OfType<PokeApiNet.Version>()
+            .Select(ver =>
+            {
+                return PokeApi.GetNameForCurrentLanguage(ver.Names);
+            }).Distinct());
     }
 
     public static int GetBallPokeApiId(Ball ball) => ball switch
@@ -905,7 +906,7 @@ public class StaticDataService
         _ => 0,
     };
 
-    private static Task<PokeApiNet.Version>[] GetPokeApiVersion(GameVersion version)
+    private static Task<PokeApiNet.Version?>[] GetPokeApiVersion(GameVersion version)
     {
         return version switch
         {

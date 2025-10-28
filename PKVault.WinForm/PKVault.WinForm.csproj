@@ -13,6 +13,10 @@
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 
+    <_SuppressWinFormsTrimError>true</_SuppressWinFormsTrimError>
+    <PublishTrimmed>true</PublishTrimmed>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+
     <WebView2LoaderPreference>Static</WebView2LoaderPreference>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 
@@ -47,6 +51,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3485.44" />
     <PackageReference Include="Svg" Version="3.4.7" />
+
+    <TrimmerRootDescriptor Include="linker.xml" />
   </ItemGroup>
 
   <ItemGroup>

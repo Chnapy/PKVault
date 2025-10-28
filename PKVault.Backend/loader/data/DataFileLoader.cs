@@ -26,7 +26,8 @@ public class DataFileLoader : DataLoader
                     BoxEntity = entity,
                 };
             },
-            dtoToEntity: dto => dto.BoxEntity
+            dtoToEntity: dto => dto.BoxEntity,
+            dictJsonContext: EntitiesJsonContext.Default.DictionaryStringBoxEntity
         );
         if (boxLoader.GetAllEntities().Count == 0)
         {
@@ -44,7 +45,8 @@ public class DataFileLoader : DataLoader
         var pkmLoader = new EntityJSONLoader<PkmDTO, PkmEntity>(
            filePath: Path.Combine(dbDir, "pkm.json"),
             entityToDto: PkmDTO.FromEntity,
-            dtoToEntity: dto => dto.PkmEntity
+            dtoToEntity: dto => dto.PkmEntity,
+            dictJsonContext: EntitiesJsonContext.Default.DictionaryStringPkmEntity
         );
 
         PKM getPkmVersionEntityPkm(PkmVersionEntity entity)
@@ -68,7 +70,8 @@ public class DataFileLoader : DataLoader
 
                 return PkmVersionDTO.FromEntity(entity, pkm, pkmDto!);
             },
-            dtoToEntity: dto => dto.PkmVersionEntity
+            dtoToEntity: dto => dto.PkmVersionEntity,
+            dictJsonContext: EntitiesJsonContext.Default.DictionaryStringPkmVersionEntity
         )
         {
             OnWrite = (dto) =>

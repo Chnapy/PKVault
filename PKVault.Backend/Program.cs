@@ -181,10 +181,16 @@ public class Program
 
     public static void ConfigureServices(IServiceCollection services)
     {
-        services.AddControllers(options =>
-        {
-            options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
-        });
+        services
+            .AddControllers(options =>
+            {
+                options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
+            })
+            // required by PublishedTrimmed
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.TypeInfoResolver = RouteJsonContext.Default;
+            });
 
 #if DEBUG
         services.AddEndpointsApiExplorer();

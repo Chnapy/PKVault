@@ -1,4 +1,5 @@
 
+using System.Text.Json.Serialization;
 using PKHeX.Core;
 using PKHeX.Core.Searching;
 using PokeApiNet;
@@ -286,6 +287,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public bool CanEdit { get => !IsEgg; }
 
+    [JsonIgnore()]
     public required PKM Pkm;
 
     protected bool HasTradeEvolve;

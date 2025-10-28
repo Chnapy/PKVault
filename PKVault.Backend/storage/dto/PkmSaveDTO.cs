@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using PKHeX.Core;
 
 public class PkmSaveDTO : BasePkmVersionDTO
@@ -66,6 +67,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     public bool CanMoveAttachedToMain { get => !IsLocked && CanMoveToMain && !IsDuplicate; }
 
+    [JsonIgnore()]
     public required SaveFile Save;
 
     public void RefreshPkmVersionId(EntityLoader<PkmDTO, PkmEntity> pkmLoader, EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionLoader)

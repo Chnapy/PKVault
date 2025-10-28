@@ -43,7 +43,7 @@ public class BackupService
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
         File.WriteAllText(
             Path.Combine(bkpTmpDirPath, "_paths.json"),
-            JsonSerializer.Serialize(paths)
+            JsonSerializer.Serialize(paths, EntitiesJsonContext.Default.DictionaryStringString)
         );
 
         steptime = LogUtil.Time($"Create backup - Compress");
@@ -98,15 +98,15 @@ public class BackupService
 
         File.WriteAllText(
             Path.Combine(bkpTmpDirPath, relativeBoxPath),
-            JsonSerializer.Serialize(boxEntities)
+            JsonSerializer.Serialize(boxEntities, EntitiesJsonContext.Default.DictionaryStringBoxEntity)
         );
         File.WriteAllText(
             Path.Combine(bkpTmpDirPath, relativePkmPath),
-            JsonSerializer.Serialize(pkmEntities)
+            JsonSerializer.Serialize(pkmEntities, EntitiesJsonContext.Default.DictionaryStringPkmEntity)
         );
         File.WriteAllText(
             Path.Combine(bkpTmpDirPath, relativePkmVersionPath),
-            JsonSerializer.Serialize(pkmVersionEntities)
+            JsonSerializer.Serialize(pkmVersionEntities, EntitiesJsonContext.Default.DictionaryStringPkmVersionEntity)
         );
 
         return new()
@@ -293,8 +293,9 @@ public class BackupService
 
         pathsEntry.ExtractToFile(bkpTmpPathsPath, true);
 
-        var paths = JsonSerializer.Deserialize<Dictionary<string, string>>(
-            File.ReadAllText(bkpTmpPathsPath)
+        var paths = JsonSerializer.Deserialize(
+            File.ReadAllText(bkpTmpPathsPath),
+            EntitiesJsonContext.Default.DictionaryStringString
         );
 
         // manual backup, no use of PrepareBackupThenRun to avoid infinite loop
