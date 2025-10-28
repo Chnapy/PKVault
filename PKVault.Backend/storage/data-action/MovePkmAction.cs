@@ -400,6 +400,7 @@ public class MovePkmAction(
 
         // get pkm-version
         var pkmVersionEntity = loaders.pkmVersionLoader.GetEntity(savePkm.Id);
+        var mainPkmAlreadyExists = pkmVersionEntity != null;
 
         if (pkmVersionEntity == null)
         {
@@ -431,7 +432,7 @@ public class MovePkmAction(
 
         var pkmDto = loaders.pkmLoader.GetDto(pkmVersionEntity.PkmId);
 
-        if (pkmDto!.SaveId != default)
+        if (mainPkmAlreadyExists && pkmDto!.SaveId != default)
         {
             await new SynchronizePkmAction(sourceSaveId, [pkmVersionEntity.Id]).ExecuteWithPayload(loaders, flags);
 
