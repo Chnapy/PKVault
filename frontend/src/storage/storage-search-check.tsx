@@ -38,7 +38,7 @@ export const StorageSearchCheck: React.FC<React.PropsWithChildren> = ({ children
             }
 
             if (storageSearch.mainBoxIds && storageSearch.mainBoxIds.length > 0 && mainBoxesQuery.data
-                && storageSearch.mainBoxIds.some(id => mainBoxesQuery.data.data.every(box => box.id !== id.toString()))) {
+                && (!Array.isArray(storageSearch.mainBoxIds) || storageSearch.mainBoxIds.some(id => mainBoxesQuery.data.data.every(box => box.id !== id.toString())))) {
                 return {
                     mainBoxIds: undefined,
                 };
