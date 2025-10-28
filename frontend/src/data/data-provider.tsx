@@ -128,14 +128,20 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                     const isSaveBoxQuery = queryKeyValue.startsWith(saveBoxStart!) && queryKeyValue.endsWith(saveBoxEnd!);
                     const isSavePkmQuery = queryKeyValue.startsWith(savePkmStart!) && queryKeyValue.endsWith(savePkmEnd!);
 
-                    return isSaveBoxQuery || isSavePkmQuery;
+                    const saveId = +(isSaveBoxQuery
+                      ? queryKeyValue.slice(saveBoxStart!.length, -saveBoxEnd!.length)
+                      : (isSavePkmQuery
+                        ? queryKeyValue.slice(savePkmStart!.length, -savePkmEnd!.length)
+                        : 0)
+                    );
+
+                    return saveId !== 0;
                   },
                 });
 
-                saveQueries.forEach(query => {
-                  client.invalidateQueries(query);
-                });
-                return;
+                for (const query of saveQueries) {
+                  client.getQueryCache().remove(query);
+                }
               }
 
               if (saveData.saveBoxes) {

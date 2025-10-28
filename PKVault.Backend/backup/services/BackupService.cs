@@ -210,7 +210,7 @@ public class BackupService
         var fileName = GetBackupFilename(dateTime);
         var bkpZipPath = Path.Combine(bkpPath, fileName);
 
-        ZipFile.CreateFromDirectory(bkpTmpDirPath, bkpZipPath);
+        ZipFile.CreateFromDirectory(bkpTmpDirPath, bkpZipPath, CompressionLevel.Fastest, false);
 
         Console.WriteLine($"Create backup - Zip in {bkpZipPath}");
 

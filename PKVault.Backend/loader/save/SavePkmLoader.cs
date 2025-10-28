@@ -236,6 +236,11 @@ public class SavePkmLoader(
 
     public void FlushParty()
     {
+        if (!save.HasParty)
+        {
+            return;
+        }
+
         var party = save.PartyData.ToList()
         .FindAll(pkm => IsSpeciesValid(pkm.Species));
 
