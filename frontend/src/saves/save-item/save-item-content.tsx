@@ -8,7 +8,7 @@ import {
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useTranslate } from '../../translate/i18n';
-import { ButtonLink } from '../../ui/button/button';
+import { ButtonExternalLink } from '../../ui/button/button';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../../ui/button/button-with-disabled-popover';
 import { Icon } from '../../ui/icon/icon';
@@ -64,9 +64,14 @@ export const SaveItemContent: React.FC<SaveItemContentProps> = withErrorCatcher(
     shinyCount={save.shinyCount}
     actions={showDelete &&
       <>
-        <ButtonWithDisabledPopover as={ButtonLink} to={downloadUrl} {...commonBtnProps}>
-          <Icon name='download' forButton />
-        </ButtonWithDisabledPopover>
+        {commonBtnProps.disabled
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- type inference issue
+          ? <ButtonWithDisabledPopover as={ButtonExternalLink as any} href={downloadUrl} download {...commonBtnProps}>
+            <Icon name='download' forButton />
+          </ButtonWithDisabledPopover>
+          : <ButtonExternalLink href={downloadUrl} download>
+            <Icon name='download' forButton />
+          </ButtonExternalLink>}
 
         <ButtonWithDisabledPopover as={ButtonWithConfirm} onClick={() =>
           saveInfosDeleteMutation.mutateAsync({

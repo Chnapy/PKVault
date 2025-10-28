@@ -68,5 +68,5 @@ export function Button<
   );
 }
 
-const ButtonForLink: typeof Button = props => <Button<'a'> {...props} as='a' />;
-export const ButtonLink = createLink(ButtonForLink);
+export const ButtonExternalLink: typeof Button<'a'> = props => <Button<'a'> {...props} as='a' />;
+export const ButtonLink = createLink(ButtonExternalLink);
