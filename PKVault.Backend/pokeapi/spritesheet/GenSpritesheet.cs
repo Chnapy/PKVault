@@ -8,9 +8,12 @@ using SixLabors.ImageSharp.Processing;
 public class GenSpritesheet
 {
     private static readonly string SourcePath = "../pokeapi/sprites";
-    private static readonly string TargetPath = "./pokeapi/spritesheet/sheets";
+    private static readonly string TargetPath = Path.Combine([.. StaticDataService.GetGeneratedPathParts(), "sheets"]);
 
-    public static async Task GenerateAllSpritesheets()
+    public static async Task<StaticSpritesheets> GenerateAllSpritesheets(
+        Dictionary<ushort, StaticSpecies> staticSpecies,
+        Dictionary<int, StaticItem> staticItems
+    )
     {
         if (Directory.Exists(TargetPath))
         {
@@ -18,16 +21,17 @@ public class GenSpritesheet
         }
         Directory.CreateDirectory(TargetPath);
 
-        await Task.WhenAll([
-            GenerateSpeciesSpritesheet(),
-            GenerateItemsSpritesheet(),
-        ]);
+        var species = GenerateSpeciesSpritesheet(staticSpecies);
+        var items = GenerateItemsSpritesheet(staticItems);
+
+        return new(
+            Species: await species,
+            Items: await items
+        );
     }
 
-    private static async Task GenerateSpeciesSpritesheet()
+    private static async Task<Dictionary<string, SpriteInfo>> GenerateSpeciesSpritesheet(Dictionary<ushort, StaticSpecies> staticSpecies)
     {
-        var staticSpecies = await StaticDataService.GetStaticSpecies();
-
         var speciesBySpritesheet = staticSpecies.Values
             .Chunk(100);
 
@@ -51,13 +55,11 @@ public class GenSpritesheet
             SpritesheetFileClient.GetSpeciesImgFilename(sheetIndex)
         )));
 
-        await GenerateSpritesheetJson(spritesInfosList, SpritesheetFileClient.GetSpeciesJsonFilename());
+        return GetSpritesheetAtlas(spritesInfosList);
     }
 
-    private static async Task GenerateItemsSpritesheet()
+    private static async Task<Dictionary<string, SpriteInfo>> GenerateItemsSpritesheet(Dictionary<int, StaticItem> staticItems)
     {
-        var staticItems = await StaticDataService.GetStaticItems();
-
         var itemsBySpritesheet = staticItems.Values
             .Select(item => item.Sprite).Distinct().ToList().FindAll(path => path.Length > 0)
             .Chunk(3600);
@@ -68,7 +70,7 @@ public class GenSpritesheet
             SpritesheetFileClient.GetItemsImgFilename(sheetIndex)
         )));
 
-        await GenerateSpritesheetJson(itemsInfosList, SpritesheetFileClient.GetItemsJsonFilename());
+        return GetSpritesheetAtlas(itemsInfosList);
     }
 
     private static async Task<Dictionary<string, SpriteInfo>> GenerateChunk(
@@ -142,14 +144,10 @@ public class GenSpritesheet
         return allSpriteInfo;
     }
 
-    private static async Task GenerateSpritesheetJson(Dictionary<string, SpriteInfo>[] spritesInfosList, string filename)
+    private static Dictionary<string, SpriteInfo> GetSpritesheetAtlas(Dictionary<string, SpriteInfo>[] spritesInfosList)
     {
-        var allSpritesInfos = spritesInfosList
+        return spritesInfosList
             .SelectMany(dict => dict)
             .ToDictionary(pair => pair.Key, pair => pair.Value);
-
-        string jsonPath = Path.Combine(TargetPath, filename);
-        await File.WriteAllTextAsync(jsonPath, JsonSerializer.Serialize(allSpritesInfos, SpritesheetJsonContext.Default.DictionaryStringSpriteInfo));
-        Console.WriteLine($"Saved index JSON to {jsonPath}");
     }
 }

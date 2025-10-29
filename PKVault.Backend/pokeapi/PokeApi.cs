@@ -168,9 +168,9 @@ public class PokeApi
         return int.Parse(url.TrimEnd('/').Split('/')[^1]);
     }
 
-    public static string GetNameForCurrentLanguage(List<Names> names)
+    public static string GetNameForLang(List<Names> names, string lang)
     {
-        return names.Find(name => name.Language.Name == SettingsService.AppSettings.GetSafeLanguage())?.Name
-            ?? throw new Exception($"Language not handled: {SettingsService.AppSettings.GetSafeLanguage()}");
+        return names.Find(name => name.Language.Name == lang)?.Name
+            ?? throw new Exception($"Language not handled: {lang}");
     }
 }

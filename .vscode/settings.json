@@ -1,6 +1,7 @@
 {
   "search.exclude": {
     "**/pokeapi/api-data": true,
+    "**/generated": true,
     "**/dist": true,
     "**/bin": true,
     "**/obj": true,

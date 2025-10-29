@@ -23,25 +23,36 @@
     <RepositoryUrl>https://github.com/Chnapy/PKVault</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Chnapy/PKVault</PackageProjectUrl>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <EffectiveMode>$([MSBuild]::ValueOrDefault('$(Mode)', 'default'))</EffectiveMode>
+
+    <ModeDefine Condition=" '$(EffectiveMode)' == 'gen-pokeapi' ">MODE_GEN_POKEAPI</ModeDefine>
+    <ModeDefine Condition=" '$(EffectiveMode)' == 'default' ">MODE_DEFAULT</ModeDefine>
+
+    <DefineConstants>$(DefineConstants);$(ModeDefine)</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="PKHeX.Core" Version="25.9.25" />
     <PackageReference Include="PokeApiNet" Version="4.1.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <PackageReference Include="NSwag.AspNetCore" Version="14.6.0" />
-  </ItemGroup>
+  <Choose>
+    <!-- <When Condition=" '$(EffectiveMode)' == 'gen-pokeapi' ">
+      <ItemGroup>
+      </ItemGroup>
+    </When> -->
 
-  <ItemGroup>
-    <Compile Remove="pokeapi\spritesheet\GenSpritesheet.cs" Condition="'$(Configuration)' == 'Release'" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="pokeapi/api-data/**/*.json.gz" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
-    <Content Remove="pokeapi/api-data/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never"/>
-
-    <EmbeddedResource Include="pokeapi/spritesheet/sheets/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
-    <Content Remove="pokeapi/spritesheet/sheets/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never"/>
-  </ItemGroup>
+    <When Condition=" '$(EffectiveMode)' == 'default' ">
+      <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+        <PackageReference Include="NSwag.AspNetCore" Version="14.6.0" />
+      </ItemGroup>
+      <ItemGroup>
+        <EmbeddedResource Include="pokeapi/generated/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+        <Content Remove="pokeapi/generated/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never"/>
+      </ItemGroup>
+    </When>
+  </Choose>
 </Project>

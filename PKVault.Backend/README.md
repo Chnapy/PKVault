@@ -6,16 +6,11 @@ Dependencies & versions can be found in [PKVault.Backend.csproj](./PKVault.Backe
 
 ## Setup
 
-Generate PokeApi data. This process pick only the data used by the app & compress it as `.json.gz` files.
+Generate PokeApi data & spritesheets.
+This process picks only the data used by the app & compress it as `.json.gz` files, and generates spritesheets.
 
 ```
-dotnet run gen-pokeapi
-```
-
-Similar process with spritesheets.
-
-```
-dotnet run gen-spritesheets
+dotnet run -p:Mode=gen-pokeapi
 ```
 
 ## Dev

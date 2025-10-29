@@ -85,6 +85,7 @@ public partial class AssemblyClient
             return part;
         }));
 
-        return assembly.GetManifestResourceStream(assemblyName) ?? throw new KeyNotFoundException($"RESOURCE NOT FOUND: {assemblyName}");
+        return assembly.GetManifestResourceStream(assemblyName)
+            ?? throw new KeyNotFoundException($"RESOURCE NOT FOUND: {assemblyName}\n{string.Join('\n', assembly.GetManifestResourceNames())}");
     }
 }

@@ -5,7 +5,7 @@ public class SettingsDTO
 {
     public const string filePath = "./config/pkvault.json";
 
-    public static readonly string[] AllowedLanguages = GameLanguage.AllSupportedLanguages.ToArray();
+    public static readonly string[] AllowedLanguages = ["en", "fr"]; //GameLanguage.AllSupportedLanguages.ToArray();
 
     public Guid BuildID { get => Assembly.GetExecutingAssembly().ManifestModule.ModuleVersionId; }
 

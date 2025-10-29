@@ -13,7 +13,7 @@ public struct DataDTO
         {
             tasks.Add(Task.Run(async () =>
             {
-                dto.StaticData = await StaticDataService.PrepareStaticData();
+                dto.StaticData = await StaticDataService.GetStaticData();
             }));
         }
 

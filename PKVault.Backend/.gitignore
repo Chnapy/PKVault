@@ -1,5 +1,4 @@
 db/
 saves/
 config/
-pokeapi/api-data/
-pokeapi/spritesheet/sheets/
+pokeapi/generated/

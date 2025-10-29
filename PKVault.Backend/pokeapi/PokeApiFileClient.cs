@@ -2,14 +2,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
 using PokeApiNet;
 
 public partial class PokeApiFileClient
 {
-    private static readonly AssemblyClient assemblyClient = new();
-
     public async Task<T?> GetAsync<T>(UrlNavigation<T> urlResource, JsonTypeInfo<T> jsonContext) where T : ResourceBase
     {
         return await GetAsyncByUrl(urlResource.Url, jsonContext);
@@ -73,12 +72,14 @@ public partial class PokeApiFileClient
             .FindAll(part => part.Length > 0);
 
         List<string> fileParts = [
-            "pokeapi", "api-data","data",
+            "..", "pokeapi", "api-data","data",
             ..uriParts,
-            "index.json.gz"
+            "index.json"
         ];
 
-        return await assemblyClient.GetAsyncJsonGz(fileParts, jsonContext);
+        var fileStream = File.OpenRead(string.Join('/', fileParts));
+
+        return await JsonSerializer.DeserializeAsync(fileStream, jsonContext);
     }
 
     public static string GetApiEndpointString(

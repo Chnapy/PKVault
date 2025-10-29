@@ -133,7 +133,7 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
 
     private static async Task<(ushort evolveSpecies, bool evolveByItem)> GetEvolve(BasePkmVersionDTO dto)
     {
-        var staticData = await StaticDataService.PrepareStaticData();
+        var staticData = await StaticDataService.GetStaticData();
 
         if (staticData.Evolves.TryGetValue(dto.Species, out var staticEvolve))
         {

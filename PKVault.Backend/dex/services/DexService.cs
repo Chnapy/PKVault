@@ -10,7 +10,7 @@ public class DexService
             return [];
         }
 
-        var staticData = await StaticDataService.PrepareStaticData();
+        var staticData = await StaticDataService.GetStaticData();
 
         var maxSpecies = saveDict.Values.Select(save => save.Save.MaxSpeciesID).Max();
 

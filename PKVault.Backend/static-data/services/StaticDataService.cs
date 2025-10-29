@@ -1,99 +1,25 @@
-
-using System.IO.Compression;
-using System.Text;
-using System.Text.Json;
 using PKHeX.Core;
 using PokeApiNet;
 
 public class StaticDataService
 {
-    private static readonly string TmpDirectory = PrepareTmpDirectory();
-
-    private static string? GetTmpStaticDataPath()
+    public static async Task<StaticDataDTO?> GetStaticData()
     {
-        if (SettingsService.AppSettings.SettingsMutable.LANGUAGE == null)
-        {
-            return null;
-        }
+        var client = new AssemblyClient();
 
-        return Path.Combine(TmpDirectory, $"StaticData-{SettingsService.AppSettings.GetSafeLanguage()}.json.gz");
+        return await client.GetAsyncJsonGz(
+            GetStaticDataPathParts(SettingsService.AppSettings.GetSafeLanguage()),
+            StaticDataJsonContext.Default.StaticDataDTO
+        );
     }
 
-    public static async Task<StaticDataDTO?> PrepareStaticData()
-    {
-        var tmpStaticDataPath = GetTmpStaticDataPath();
-        if (tmpStaticDataPath == null)
-        {
-            return null;
-        }
+    public static List<string> GetGeneratedPathParts() => ["pokeapi", "generated"];
 
-        if (File.Exists(tmpStaticDataPath))
-        {
-            try
-            {
-                using var fileStream = File.Open(tmpStaticDataPath, FileMode.Open);
-                using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
+    public static List<string> GetStaticDataPathParts(string lang) => [
+        ..GetGeneratedPathParts(), "api-data", $"StaticData_{lang}.json.gz"
+    ];
 
-                return JsonSerializer.Deserialize(gzipStream, StaticDataJsonContext.Default.StaticDataDTO)!;
-            }
-            // file is wrong
-            catch (JsonException)
-            {
-                File.Delete(tmpStaticDataPath);
-            }
-            // file locked by previous request
-            catch (IOException)
-            {
-                Thread.Sleep(100);
-                return await PrepareStaticData();
-            }
-        }
-
-        var time = LogUtil.Time("static-data process");
-
-        var versions = GetStaticVersions();
-        var species = GetStaticSpecies();
-        var stats = GetStaticStats();
-        var types = GetStaticTypes();
-        var moves = GetStaticMoves();
-        var natures = GetStaticNatures();
-        var abilities = GetStaticAbilities();
-        var items = GetStaticItems();
-        var evolves = GetStaticEvolves();
-        var spritesheets = GetSpritesheets();
-
-        var dto = new StaticDataDTO
-        {
-            Versions = await versions,
-            Species = await species,
-            Stats = await stats,
-            Types = types,
-            Moves = await moves,
-            Natures = await natures,
-            Abilities = abilities,
-            Items = await items,
-            Evolves = await evolves,
-            Spritesheets = await spritesheets,
-            EggSprite = GetEggSprite()
-        };
-
-        time();
-
-        time = LogUtil.Time($"Write cached static-data in {tmpStaticDataPath}");
-
-        var jsonContent = JsonSerializer.Serialize(dto, StaticDataJsonContext.Default.StaticDataDTO);
-        using var originalFileStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonContent));
-        using var compressedFileStream = File.Create(tmpStaticDataPath);
-        using var compressionStream = new GZipStream(compressedFileStream, CompressionLevel.Optimal);
-
-        originalFileStream.CopyTo(compressionStream);
-
-        time();
-
-        return dto;
-    }
-
-    public static async Task<Dictionary<byte, StaticVersion>> GetStaticVersions()
+    public static async Task<Dictionary<byte, StaticVersion>> GetStaticVersions(string lang)
     {
         var time = LogUtil.Time("static-data process versions");
         List<Task<StaticVersion>> tasks = [];
@@ -110,7 +36,7 @@ public class StaticDataService
                 return new StaticVersion
                 {
                     Id = (byte)version,
-                    Name = await GetVersionName(version),
+                    Name = await GetVersionName(version, lang),
                     Generation = version.GetGeneration(),
                     MaxSpeciesId = blankSave?.MaxSpeciesID ?? 0,
                     MaxIV = blankSave?.MaxIV ?? 0,
@@ -128,10 +54,10 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<ushort, StaticSpecies>> GetStaticSpecies()
+    public static async Task<Dictionary<ushort, StaticSpecies>> GetStaticSpecies(string lang)
     {
-        var time = LogUtil.Time("static-data process species");
-        var speciesNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Species;
+        var time = LogUtil.Time($"static-data {lang} process species");
+        var speciesNames = GameInfo.GetStrings(lang).Species;
         List<Task<StaticSpecies>> tasks = [];
 
         // List<string> notFound = [];
@@ -175,7 +101,7 @@ public class StaticDataService
                     {
                         if (formObj.Names.Count > 0)
                         {
-                            name = PokeApi.GetNameForCurrentLanguage(formObj.Names);
+                            name = PokeApi.GetNameForLang(formObj.Names, lang);
                         }
                     }
                     catch
@@ -189,7 +115,7 @@ public class StaticDataService
                             name == speciesName
                             && formObj.FormNames.Count > 0)
                         {
-                            var apiName = PokeApi.GetNameForCurrentLanguage(formObj.FormNames);
+                            var apiName = PokeApi.GetNameForLang(formObj.FormNames, lang);
                             if (apiName != speciesName)
                             {
                                 name = $"{speciesName} {apiName}";
@@ -459,7 +385,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticStat>> GetStaticStats()
+    public static async Task<Dictionary<int, StaticStat>> GetStaticStats(string lang)
     {
         var time = LogUtil.Time("static-data process stats");
         List<Task<StaticStat>> tasks = [];
@@ -474,7 +400,7 @@ public class StaticDataService
                 return new StaticStat
                 {
                     Id = statIndex,
-                    Name = PokeApi.GetNameForCurrentLanguage(statObj.Names),
+                    Name = PokeApi.GetNameForLang(statObj.Names, lang),
                 };
             }));
         }
@@ -488,9 +414,9 @@ public class StaticDataService
         return dict;
     }
 
-    public static Dictionary<int, StaticType> GetStaticTypes()
+    public static Dictionary<int, StaticType> GetStaticTypes(string lang)
     {
-        var typeNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Types;
+        var typeNames = GameInfo.GetStrings(lang).Types;
         var dict = new Dictionary<int, StaticType>();
 
         for (var i = 0; i < typeNames.Count; i++)
@@ -507,10 +433,10 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticMove>> GetStaticMoves()
+    public static async Task<Dictionary<int, StaticMove>> GetStaticMoves(string lang)
     {
-        var time = LogUtil.Time("static-data process moves");
-        var moveNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Move;
+        var time = LogUtil.Time($"static-data {lang} process moves");
+        var moveNames = GameInfo.GetStrings(lang).Move;
         List<Task<StaticMove>> tasks = [];
 
         for (var i = 0; i < 919; i++)  // TODO
@@ -612,10 +538,10 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticNature>> GetStaticNatures()
+    public static async Task<Dictionary<int, StaticNature>> GetStaticNatures(string lang)
     {
-        var time = LogUtil.Time("static-data process natures");
-        var naturesNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Natures;
+        var time = LogUtil.Time($"static-data {lang} process natures");
+        var naturesNames = GameInfo.GetStrings(lang).Natures;
         List<Task<StaticNature>> tasks = [];
 
         for (var i = 0; i < naturesNames.Count; i++)
@@ -650,9 +576,9 @@ public class StaticDataService
         return dict;
     }
 
-    public static Dictionary<int, StaticAbility> GetStaticAbilities()
+    public static Dictionary<int, StaticAbility> GetStaticAbilities(string lang)
     {
-        var abilitiesNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).abilitylist;
+        var abilitiesNames = GameInfo.GetStrings(lang).abilitylist;
         var dict = new Dictionary<int, StaticAbility>();
 
         for (var i = 0; i < abilitiesNames.Length; i++)
@@ -669,10 +595,10 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticItem>> GetStaticItems()
+    public static async Task<Dictionary<int, StaticItem>> GetStaticItems(string lang)
     {
-        var time = LogUtil.Time("static-data process items");
-        var itemNames = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).itemlist;
+        var time = LogUtil.Time($"static-data {lang} process items");
+        var itemNames = GameInfo.GetStrings(lang).itemlist;
         List<Task<StaticItem>> tasks = [];
 
         // var notFound = new List<string>();
@@ -801,17 +727,6 @@ public class StaticDataService
         return staticEvolves;
     }
 
-    public static async Task<StaticSpritesheets> GetSpritesheets()
-    {
-        var species = SpritesheetFileClient.GetAsyncJson(SpritesheetFileClient.GetSpeciesJsonFilename());
-        var items = SpritesheetFileClient.GetAsyncJson(SpritesheetFileClient.GetItemsJsonFilename());
-
-        return new StaticSpritesheets(
-            Species: await species,
-            Items: await items
-        );
-    }
-
     public static string GetEggSprite()
     {
         return GetPokeapiRelativePath("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png");
@@ -851,7 +766,7 @@ public class StaticDataService
         };
     }
 
-    private static async Task<string> GetVersionName(GameVersion version)
+    private static async Task<string> GetVersionName(GameVersion version, string lang)
     {
         var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
 
@@ -859,7 +774,7 @@ public class StaticDataService
             .OfType<PokeApiNet.Version>()
             .Select(ver =>
             {
-                return PokeApi.GetNameForCurrentLanguage(ver.Names);
+                return PokeApi.GetNameForLang(ver.Names, lang);
             }).Distinct());
     }
 
@@ -1037,18 +952,5 @@ public class StaticDataService
         }
 
         return url[GH_PREFIX.Length..];
-    }
-
-    private static string PrepareTmpDirectory()
-    {
-        var tmpRootFolder = Path.Combine(Path.GetTempPath(), "pkvault");
-        var tmpFolder = Path.Combine(tmpRootFolder, SettingsService.AppSettings.BuildID.ToString());
-
-        if (!Directory.Exists(tmpFolder))
-        {
-            Directory.CreateDirectory(tmpFolder);
-        }
-
-        return tmpFolder;
     }
 }
