@@ -114,7 +114,6 @@ public class WarningsService
 
         var loader = await StorageService.GetLoader();
 
-        var pkmVersions = loader.loaders.pkmVersionLoader.GetAllDtos();
         var pkms = loader.loaders.pkmLoader.GetAllDtos();
 
         var tasks = pkms.Select(async pkm =>
@@ -133,7 +132,8 @@ public class WarningsService
                 var save = saveLoader.Save;
                 var generation = save.Generation;
 
-                var pkmVersion = pkmVersions.Find(pkmVersion => pkmVersion.PkmDto.Id == pkm.Id && pkmVersion.Generation == generation);
+                var pkmVersion = loader.loaders.pkmVersionLoader.GetEntitiesByPkmId(pkm.Id).Values.ToList()
+                    .Find(pkmVersion => pkmVersion.Generation == generation);
 
                 var savePkm = pkmVersion == null ? null : saveLoader.Pkms.GetAllDtos().Find(pkm => pkm.PkmVersionId == pkmVersion.Id);
 

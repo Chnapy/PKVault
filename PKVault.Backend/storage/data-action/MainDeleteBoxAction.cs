@@ -3,7 +3,7 @@ public class MainDeleteBoxAction(string boxId) : DataAction
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var box = loaders.boxLoader.GetDto(boxId);
-        var allPkms = loaders.pkmLoader.GetAllDtos();
+        var allPkms = loaders.pkmLoader.GetAllEntities().Values;
 
         if (allPkms.Any(pkm => pkm.BoxId == box!.IdInt))
         {

@@ -64,8 +64,7 @@ public class SynchronizePkmAction(uint saveId, string[] pkmVersionIds) : DataAct
 
             var savePkm = savePkms[0];
 
-            var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos().FindAll(value => value.PkmDto.Id == pkmDto.Id);
-
+            var relatedPkmVersions = loaders.pkmVersionLoader.GetDtosByPkmId(pkmDto.Id).Values.ToList();
             relatedPkmVersions.ForEach((version) =>
             {
                 var pkm = version.Pkm;

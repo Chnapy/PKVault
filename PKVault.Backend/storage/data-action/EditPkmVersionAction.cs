@@ -26,8 +26,8 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
 
         loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos()
-        .FindAll(value => value.PkmDto.Id == pkmDto.Id && value.Id != pkmVersionId);
+        var relatedPkmVersions = loaders.pkmVersionLoader.GetDtosByPkmId(pkmDto.Id).Values.ToList()
+            .FindAll(value => value.Id != pkmVersionId);
 
         relatedPkmVersions.ForEach((versionDto) =>
         {

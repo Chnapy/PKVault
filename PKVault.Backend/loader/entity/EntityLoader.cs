@@ -22,7 +22,7 @@ public abstract class EntityLoader<DTO, E>(
     {
         entitiesById ??= GetFileContent();
 
-        return entitiesById.ToDictionary();
+        return entitiesById;
     }
 
     private Dictionary<string, E> GetFileContent()
@@ -55,13 +55,6 @@ public abstract class EntityLoader<DTO, E>(
         }
     }
 
-    public virtual void SetAllEntities(Dictionary<string, E> entities)
-    {
-        entitiesById = entities.ToDictionary();
-
-        HasWritten = true;
-    }
-
     public DTO? GetDto(string id)
     {
         var entity = GetEntity(id);
@@ -70,8 +63,7 @@ public abstract class EntityLoader<DTO, E>(
 
     public E? GetEntity(string id)
     {
-        var entities = GetAllEntities();
-        if (entities.TryGetValue(id, out var value))
+        if (GetAllEntities().TryGetValue(id, out var value))
         {
             return value;
         }
@@ -88,9 +80,9 @@ public abstract class EntityLoader<DTO, E>(
             return false;
         }
 
-        var entities = GetAllEntities();
-        entities.Remove(id);
-        SetAllEntities(entities);
+        GetAllEntities().Remove(id);
+
+        HasWritten = true;
 
         return true;
     }
@@ -99,9 +91,9 @@ public abstract class EntityLoader<DTO, E>(
     {
         Console.WriteLine($"{dto.GetType().Name} - Write id={dto.Id} - Entity id={GetEntityFromDTO(dto).Id}");
 
-        var entities = GetAllEntities();
-        entities[dto.Id] = GetEntityFromDTO(dto);
-        SetAllEntities(entities);
+        GetAllEntities()[dto.Id] = GetEntityFromDTO(dto);
+
+        HasWritten = true;
     }
 
     public virtual void WriteToFile()

@@ -155,14 +155,14 @@ public class BackupService
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
         var bkpMainDirPath = Path.Combine(bkpTmpDirPath, "main");
 
-        var pkmVersions = loaders.pkmVersionLoader.GetAllDtos();
+        var pkmVersions = loaders.pkmVersionLoader.GetAllEntities().Values.ToList();
 
         var paths = new Dictionary<string, string>();
 
-        pkmVersions.ForEach(pkmVersion =>
+        pkmVersions.ForEach(pkmVersionEntity =>
         {
-            var filename = Path.GetFileName(pkmVersion.PkmVersionEntity.Filepath);
-            var dirname = new DirectoryInfo(Path.GetDirectoryName(pkmVersion.PkmVersionEntity.Filepath)!).Name;
+            var filename = Path.GetFileName(pkmVersionEntity.Filepath);
+            var dirname = new DirectoryInfo(Path.GetDirectoryName(pkmVersionEntity.Filepath)!).Name;
             var relativeDirPath = Path.Combine("main", dirname);
             var dirPath = Path.Combine(bkpTmpDirPath, relativeDirPath);
 
@@ -172,11 +172,11 @@ public class BackupService
 
             // Console.WriteLine(newPath);
 
-            File.Copy(pkmVersion.PkmVersionEntity.Filepath, newPath);
+            File.Copy(pkmVersionEntity.Filepath, newPath);
 
             paths.Add(
                 NormalizePath(Path.Combine(relativeDirPath, filename)),
-                NormalizePath(pkmVersion.PkmVersionEntity.Filepath)
+                NormalizePath(pkmVersionEntity.Filepath)
             );
         });
 

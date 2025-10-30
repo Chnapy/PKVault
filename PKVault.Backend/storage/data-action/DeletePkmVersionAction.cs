@@ -19,7 +19,7 @@ public class DeletePkmVersionAction(string[] pkmVersionIds) : DataAction
 
             flags.MainPkmVersions |= loaders.pkmVersionLoader.DeleteEntity(pkmVersionId);
 
-            var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos().FindAll(value => value.PkmDto.Id == pkm.Id);
+            var relatedPkmVersions = loaders.pkmVersionLoader.GetEntitiesByPkmId(pkm.Id);
             if (relatedPkmVersions.Count == 0)
             {
                 flags.MainPkms |= loaders.pkmLoader.DeleteEntity(pkm.Id);

@@ -14,7 +14,7 @@ public class MainCreatePkmVersionAction(string pkmId, uint generation) : DataAct
             throw new KeyNotFoundException($"Pkm entity not found, id={pkmId}");
         }
 
-        var pkmVersions = loaders.pkmVersionLoader.GetAllDtos().FindAll(pkmVersion => pkmVersion.PkmDto.Id == pkmId);
+        var pkmVersions = loaders.pkmVersionLoader.GetDtosByPkmId(pkmId).Values.ToList();
 
         var pkmVersionEntity = pkmVersions.Find(pkmVersion => pkmVersion.Generation == generation);
         if (pkmVersionEntity != default)

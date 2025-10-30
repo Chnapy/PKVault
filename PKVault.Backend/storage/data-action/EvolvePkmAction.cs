@@ -70,8 +70,8 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
             throw new KeyNotFoundException("Pkm-version not found");
         }
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetAllDtos()
-        .FindAll(value => value.PkmDto.Id == dto.PkmDto.Id && value.Id != dto.Id);
+        var relatedPkmVersions = loaders.pkmVersionLoader.GetDtosByPkmId(dto.PkmDto.Id).Values.ToList()
+            .FindAll(value => value.Id != dto.Id);
 
         if (
             relatedPkmVersions.Any(version => dto.Species > version.Pkm.MaxSpeciesID)

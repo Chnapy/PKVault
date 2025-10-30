@@ -217,8 +217,7 @@ public class MovePkmAction(
             }
         }
 
-        var relatedPkmVersionDtos = loaders.pkmVersionLoader.GetAllDtos()
-            .FindAll(version => version.PkmId == pkmId);
+        var relatedPkmVersionDtos = loaders.pkmVersionLoader.GetDtosByPkmId(pkmId).Values.ToList();
         var pkmDto = loaders.pkmLoader.GetDto(pkmId);
 
         var existingSlot = saveLoaders.Pkms.GetDto(targetBoxId, targetBoxSlot);
@@ -275,7 +274,7 @@ public class MovePkmAction(
             throw new ArgumentException("Switch not possible with attached move");
         }
         var relatedPkmVersionDtos = existingSlot != null
-            ? loaders.pkmVersionLoader.GetAllDtos().FindAll(version => version.PkmId == existingSlot.Id)
+            ? loaders.pkmVersionLoader.GetDtosByPkmId(existingSlot.Id).Values.ToList()
             : [];
 
         await SaveToMainWithoutCheckTarget(
