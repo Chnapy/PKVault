@@ -70,7 +70,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
     [JsonIgnore()]
     public required SaveFile Save;
 
-    public void RefreshPkmVersionId(EntityLoader<PkmDTO, PkmEntity> pkmLoader, EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionLoader)
+    public void RefreshPkmVersionId(PkmLoader pkmLoader, PkmVersionLoader pkmVersionLoader)
     {
         PkmVersionId = null;
         var pkmVersion = pkmVersionLoader.GetDto(IdBase);

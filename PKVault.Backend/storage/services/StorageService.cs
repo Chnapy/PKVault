@@ -148,14 +148,7 @@ public class StorageService
 
         await BackupService.PrepareBackupThenRun(async () =>
         {
-            var fileLoader = DataFileLoader.Create();
-
-            for (var i = 0; i < actions.Count; i++)
-            {
-                await fileLoader.ApplyAction(actions[i], flags);
-            }
-
-            fileLoader.WriteSaves();
+            memoryLoader.WriteFiles();
         });
 
         flags.Backups = true;
@@ -307,31 +300,9 @@ public class StorageService
     {
         var time = LogUtil.Time("Clean wrong data");
 
-        var dbDir = SettingsService.AppSettings.SettingsMutable.DB_PATH;
-
-        var pkmMemoryLoader = new PKMMemoryLoader();
-        var pkmRealFileLoader = new PKMFileLoader();
-
-        var boxLoader = new EntityJSONLoader<BoxDTO, BoxEntity>(
-            filePath: Path.Combine(dbDir, "box.json"),
-            entityToDto: entity => default,
-            dtoToEntity: dto => dto.BoxEntity,
-            dictJsonContext: EntitiesJsonContext.Default.DictionaryStringBoxEntity
-        );
-
-        var pkmLoader = new EntityJSONLoader<PkmDTO, PkmEntity>(
-           filePath: Path.Combine(dbDir, "pkm.json"),
-            entityToDto: entity => default,
-            dtoToEntity: dto => dto.PkmEntity,
-            dictJsonContext: EntitiesJsonContext.Default.DictionaryStringPkmEntity
-        );
-
-        var pkmVersionLoader = new EntityJSONLoader<PkmVersionDTO, PkmVersionEntity>(
-           filePath: Path.Combine(dbDir, "pkm-version.json"),
-            entityToDto: entity => default,
-            dtoToEntity: dto => dto.PkmVersionEntity,
-            dictJsonContext: EntitiesJsonContext.Default.DictionaryStringPkmVersionEntity
-        );
+        var boxLoader = new BoxLoader();
+        var pkmLoader = new PkmLoader();
+        var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
 
         var boxEntities = boxLoader.GetAllEntities();
         var pkmEntities = pkmLoader.GetAllEntities();
@@ -355,13 +326,17 @@ public class StorageService
                 }
                 else
                 {
+                    byte[]? pkmBytes = null;
                     try
                     {
-                        pkmRealFileLoader.GetEntity(pkmVersionEntity.Filepath);
+                        pkmBytes = pkmVersionLoader.pkmFileLoader.GetEntity(pkmVersionEntity.Filepath);
                     }
                     catch (Exception ex)
                     {
                         Console.Error.WriteLine(ex);
+                    }
+                    if (pkmBytes == null)
+                    {
                         pkmVersionToDelete.Add(pkmVersionEntity.Id);
                     }
                 }
@@ -371,7 +346,7 @@ public class StorageService
         if (pkmVersionToDelete.Count > 0)
         {
             // bkp
-            File.Copy(Path.Combine(dbDir, "pkm-version.json"), Path.Combine(dbDir, "pkm-version.json.bkp"), true);
+            pkmVersionLoader.CreateBackupFile();
 
             pkmVersionToDelete.ForEach(pkmVersionId => pkmVersionLoader.DeleteEntity(pkmVersionId));
             pkmVersionLoader.WriteToFile();
@@ -394,7 +369,7 @@ public class StorageService
         if (pkmsToDelete.Count > 0)
         {
             // bkp
-            File.Copy(Path.Combine(dbDir, "pkm.json"), Path.Combine(dbDir, "pkm.json.bkp"), true);
+            pkmLoader.CreateBackupFile();
 
             pkmsToDelete.ForEach(pkmId => pkmLoader.DeleteEntity(pkmId));
             pkmLoader.WriteToFile();

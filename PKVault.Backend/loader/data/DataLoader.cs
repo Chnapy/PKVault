@@ -16,9 +16,9 @@ public abstract class DataLoader(DataEntityLoaders loaders)
 
 public struct DataEntityLoaders
 {
-    public EntityLoader<BoxDTO, BoxEntity> boxLoader { get; set; }
-    public EntityLoader<PkmDTO, PkmEntity> pkmLoader { get; set; }
-    public EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionLoader { get; set; }
+    public BoxLoader boxLoader { get; set; }
+    public PkmLoader pkmLoader { get; set; }
+    public PkmVersionLoader pkmVersionLoader { get; set; }
     public Dictionary<uint, SaveLoaders> saveLoadersDict { get; set; }
 }
 

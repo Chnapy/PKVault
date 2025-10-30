@@ -14,7 +14,7 @@ public class BackupService
 
         var logtime = LogUtil.Time("Create backup");
 
-        var loaders = DataFileLoader.Create().loaders;
+        var loaders = DataMemoryLoader.Create().loaders;
 
         PrepareBkpDir();
 
@@ -43,7 +43,7 @@ public class BackupService
         var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
         File.WriteAllText(
             Path.Combine(bkpTmpDirPath, "_paths.json"),
-            JsonSerializer.Serialize(paths, EntitiesJsonContext.Default.DictionaryStringString)
+            JsonSerializer.Serialize(paths, EntityJsonContext.Default.DictionaryStringString)
         );
 
         steptime = LogUtil.Time($"Create backup - Compress");
@@ -98,15 +98,15 @@ public class BackupService
 
         File.WriteAllText(
             Path.Combine(bkpTmpDirPath, relativeBoxPath),
-            JsonSerializer.Serialize(boxEntities, EntitiesJsonContext.Default.DictionaryStringBoxEntity)
+            JsonSerializer.Serialize(boxEntities, EntityJsonContext.Default.DictionaryStringBoxEntity)
         );
         File.WriteAllText(
             Path.Combine(bkpTmpDirPath, relativePkmPath),
-            JsonSerializer.Serialize(pkmEntities, EntitiesJsonContext.Default.DictionaryStringPkmEntity)
+            JsonSerializer.Serialize(pkmEntities, EntityJsonContext.Default.DictionaryStringPkmEntity)
         );
         File.WriteAllText(
             Path.Combine(bkpTmpDirPath, relativePkmVersionPath),
-            JsonSerializer.Serialize(pkmVersionEntities, EntitiesJsonContext.Default.DictionaryStringPkmVersionEntity)
+            JsonSerializer.Serialize(pkmVersionEntities, EntityJsonContext.Default.DictionaryStringPkmVersionEntity)
         );
 
         return new()
@@ -295,7 +295,7 @@ public class BackupService
 
         var paths = JsonSerializer.Deserialize(
             File.ReadAllText(bkpTmpPathsPath),
-            EntitiesJsonContext.Default.DictionaryStringString
+            EntityJsonContext.Default.DictionaryStringString
         );
 
         // manual backup, no use of PrepareBackupThenRun to avoid infinite loop

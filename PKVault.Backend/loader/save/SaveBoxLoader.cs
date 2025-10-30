@@ -1,11 +1,10 @@
 using PKHeX.Core;
 
-public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
-    dtoToEntity: item => item,
-    entityToDto: item => item
-)
+public class SaveBoxLoader(SaveFile save)
 {
-    public override Dictionary<string, BoxDTO> GetAllEntities()
+    public bool HasWritten = false;
+
+    public Dictionary<string, BoxDTO> GetAllEntities()
     {
         var boxes = new Dictionary<string, BoxDTO>();
 
@@ -91,7 +90,12 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
         return boxes;
     }
 
-    public override void WriteDto(BoxDTO dto)
+    public List<BoxDTO> GetAllDtos()
+    {
+        return [.. GetAllEntities().Values];
+    }
+
+    public void WriteDto(BoxDTO dto)
     {
         if (!dto.CanWrite)
         {
@@ -105,18 +109,13 @@ public class SaveBoxLoader(SaveFile save) : EntityLoader<BoxDTO, BoxDTO>(
         }
     }
 
-    public override bool DeleteEntity(string id)
+    public BoxDTO? GetDto(string id)
     {
-        throw new Exception($"Not implemented");
-    }
-
-    public override void SetAllEntities(Dictionary<string, BoxDTO> entities)
-    {
-        throw new Exception($"Not implemented");
-    }
-
-    public override void WriteToFile()
-    {
-        throw new NotImplementedException();
+        var entities = GetAllEntities();
+        if (entities.TryGetValue(id, out var value))
+        {
+            return value;
+        }
+        return default;
     }
 }

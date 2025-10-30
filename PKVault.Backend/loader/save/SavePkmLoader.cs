@@ -2,8 +2,8 @@ using PKHeX.Core;
 
 public class SavePkmLoader(
     SaveFile save,
-    EntityLoader<PkmDTO, PkmEntity> pkmLoader,
-    EntityLoader<PkmVersionDTO, PkmVersionEntity> pkmVersionLoader
+    PkmLoader pkmLoader,
+    PkmVersionLoader pkmVersionLoader
 )
 {
     public bool HasWritten = false;
