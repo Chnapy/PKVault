@@ -65,6 +65,8 @@ public class PkmVersionDTO : BasePkmVersionDTO
         }
     }
 
+    public new bool CanEdit => base.CanEdit && PkmDto.SaveId == null;
+
     public bool CanDelete { get { return !IsMain; } }
 
     public required PkmVersionEntity PkmVersionEntity;

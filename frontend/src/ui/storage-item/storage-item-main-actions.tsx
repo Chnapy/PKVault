@@ -75,6 +75,7 @@ export const StorageItemMainActions: React.FC = () => {
     const canEvolve = pkmVersionCanEvolve && !selectedPkm.saveId;
     const canDetach = !!selectedPkm.saveId;
     const canGoToSave = !!selectedPkm.saveId;
+    const canEdit = pkmVersions[ 0 ].canEdit;
 
     const canRemovePkm = selectedPkm.canDelete
         && mainPkmVersionQuery.data?.data.filter(pkmVersion => pkmVersion.pkmId === selectedPkm.id).length === 1;
@@ -153,13 +154,13 @@ export const StorageItemMainActions: React.FC = () => {
                 {t('storage.actions.go-main')}
             </ButtonWithDisabledPopover>}
 
-            <Button
+            {canEdit && <Button
                 onClick={formEditMode.startEdit}
                 disabled={formEditMode.editMode}
             >
                 <Icon name='pen' solid forButton />
                 {t('storage.actions.edit')}
-            </Button>
+            </Button>}
 
             {canEvolve && <ButtonWithConfirm
                 anchor='right'
