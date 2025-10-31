@@ -1,6 +1,8 @@
 {
   "search.exclude": {
+    "**/*.svg": true,
     "**/pokeapi/api-data": true,
+    "**/pokeapi/sprites": true,
     "**/generated": true,
     "**/dist": true,
     "**/bin": true,
