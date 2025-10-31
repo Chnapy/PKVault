@@ -140,7 +140,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 });
 
                 for (const query of saveQueries) {
-                  client.getQueryCache().remove(query);
+                  client.invalidateQueries({ queryKey: query.queryKey })
                 }
               }
 
