@@ -151,7 +151,7 @@ public class WarningsService
             return null;
         });
 
-        return [.. (await Task.WhenAll(tasks))
+        return [.. tasks
             .Where(value => value != null)
             .OfType<PkmVersionWarning>()];
     }
@@ -190,10 +190,10 @@ public class WarningsService
         return (await Task.WhenAll(tasks)).ToList().FindAll(warn => warn.DuplicateIdBases.Length > 0);
     }
 
-    private static int GetSavePlayTimeS(SaveFile save)
-    {
-        return save.PlayedHours * 60 * 60
-        + save.PlayedMinutes * 60
-         + save.PlayedSeconds;
-    }
+    // private static int GetSavePlayTimeS(SaveFile save)
+    // {
+    //     return save.PlayedHours * 60 * 60
+    //     + save.PlayedMinutes * 60
+    //      + save.PlayedSeconds;
+    // }
 }

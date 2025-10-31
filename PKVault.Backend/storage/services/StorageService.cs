@@ -361,17 +361,11 @@ public class StorageService
             }
         });
 
-        if (pkmVersionLoader.HasWritten)
+        if (pkmVersionLoader.HasWritten || pkmLoader.HasWritten)
         {
-            // bkp
-            pkmVersionLoader.CreateBackupFile();
-            pkmVersionLoader.WriteToFile();
-        }
+            BackupService.CreateBackup();
 
-        if (pkmLoader.HasWritten)
-        {
-            // bkp
-            pkmLoader.CreateBackupFile();
+            pkmVersionLoader.WriteToFile();
             pkmLoader.WriteToFile();
         }
 
@@ -409,15 +403,20 @@ public class StorageService
             throw new Exception($"Inconsistant delete, {pkmVersionFilesToDelete} files for PkmVersions may be deleted");
         }
 
-        foreach (var path in pathsToClean)
+        if (pathsToClean.Any())
         {
-            Console.WriteLine($"Clean obsolete storage file {path}");
-            File.Delete(path);
-        }
+            BackupService.CreateBackup();
 
-        Console.WriteLine($"Total files count = {matches.Files.Count()}");
-        Console.WriteLine($"PkmVersion count = {pkmVersionsFilepaths.Count}");
-        Console.WriteLine($"Paths to clean count = {pathsToClean.Count()}");
+            foreach (var path in pathsToClean)
+            {
+                Console.WriteLine($"Clean obsolete file {path}");
+                File.Delete(path);
+            }
+
+            Console.WriteLine($"Total files count = {matches.Files.Count()}");
+            Console.WriteLine($"PkmVersion count = {pkmVersionsFilepaths.Count}");
+            Console.WriteLine($"Paths to clean count = {pathsToClean.Count()}");
+        }
 
         time();
     }

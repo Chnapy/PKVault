@@ -1,14 +1,19 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-public abstract class EntityLoader<DTO, E>(
-    string filePath,
-    JsonTypeInfo<Dictionary<string, E>> dictJsonContext
-) where DTO : IWithId<string> where E : IWithId<string>
+public abstract class EntityLoader<DTO, E> where DTO : IWithId<string> where E : IWithId<string>
 {
     protected Dictionary<string, E>? entitiesById = null;
 
+    public readonly string FilePath;
     public bool HasWritten = false;
+    protected JsonTypeInfo<Dictionary<string, E>> DictJsonContext;
+
+    public EntityLoader(string filePath, JsonTypeInfo<Dictionary<string, E>> dictJsonContext)
+    {
+        FilePath = filePath;
+        DictJsonContext = dictJsonContext;
+    }
 
     protected abstract DTO GetDTOFromEntity(E entity);
     protected abstract E GetEntityFromDTO(DTO dto);
@@ -27,30 +32,30 @@ public abstract class EntityLoader<DTO, E>(
 
     private Dictionary<string, E> GetFileContent()
     {
-        if (!File.Exists(filePath))
+        if (!File.Exists(FilePath))
         {
-            Console.WriteLine($"Entity DB file not existing: creating {filePath}");
-            string emptyJson = JsonSerializer.Serialize([], dictJsonContext);
+            Console.WriteLine($"Entity DB file not existing: creating {FilePath}");
+            string emptyJson = JsonSerializer.Serialize([], DictJsonContext);
 
-            string? directory = Path.GetDirectoryName(filePath);
+            string? directory = Path.GetDirectoryName(FilePath);
             if (!string.IsNullOrEmpty(directory))
             {
                 Directory.CreateDirectory(directory);
             }
 
-            File.WriteAllText(filePath, emptyJson);
+            File.WriteAllText(FilePath, emptyJson);
         }
 
-        string json = File.ReadAllText(filePath);
+        string json = File.ReadAllText(FilePath);
 
         try
         {
-            return JsonSerializer.Deserialize(json, dictJsonContext) ?? [];
+            return JsonSerializer.Deserialize(json, DictJsonContext) ?? [];
         }
         catch (JsonException ex)
         {
             Console.Error.WriteLine(ex);
-            File.Move(filePath, $"{filePath}.bkp", true);
+            File.Move(FilePath, $"{FilePath}.bkp", true);
             return GetFileContent();
         }
     }
@@ -72,19 +77,15 @@ public abstract class EntityLoader<DTO, E>(
 
     public virtual bool DeleteEntity(string id)
     {
-        Console.WriteLine($"Delete entity id={id}");
-
-        var entityToRemove = GetEntity(id);
-        if (entityToRemove == null)
+        var deleted = GetAllEntities().Remove(id);
+        if (deleted)
         {
-            return false;
+            Console.WriteLine($"Deleted entity id={id}");
+
+            HasWritten = true;
         }
 
-        GetAllEntities().Remove(id);
-
-        HasWritten = true;
-
-        return true;
+        return deleted;
     }
 
     public virtual void WriteEntity(E entity)
@@ -105,17 +106,12 @@ public abstract class EntityLoader<DTO, E>(
     {
         if (!HasWritten)
         {
-            Console.WriteLine($"No write changes, ignore file {filePath}");
+            Console.WriteLine($"No write changes, ignore file {FilePath}");
             return;
         }
 
-        Console.WriteLine($"Write entities to {filePath}");
+        Console.WriteLine($"Write entities to {FilePath}");
 
-        File.WriteAllText(filePath, JsonSerializer.Serialize(entitiesById ?? [], dictJsonContext));
-    }
-
-    public void CreateBackupFile()
-    {
-        File.Copy(filePath, filePath + ".bkp", true);
+        File.WriteAllText(FilePath, JsonSerializer.Serialize(entitiesById ?? [], DictJsonContext));
     }
 }

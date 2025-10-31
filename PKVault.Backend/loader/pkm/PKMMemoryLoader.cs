@@ -36,6 +36,11 @@ public class PKMMemoryLoader : PKMLoader
         });
     }
 
+    public Dictionary<string, byte[]> GetAllEntities()
+    {
+        return bytesDict.ToDictionary();
+    }
+
     public override byte[]? GetEntity(string filepath)
     {
         var bytes = bytesDict.GetValueOrDefault(filepath);
@@ -45,10 +50,10 @@ public class PKMMemoryLoader : PKMLoader
 
     public override void DeleteEntity(string filepath)
     {
-        if (EnableLog)
-            Console.WriteLine($"(M) Delete PKM filepath={filepath}");
+        var removed = bytesDict.Remove(filepath);
 
-        bytesDict.Remove(filepath);
+        if (EnableLog && removed)
+            Console.WriteLine($"(M) Delete PKM filepath={filepath}");
 
         actions.Add((Create: false, Path: filepath));
     }

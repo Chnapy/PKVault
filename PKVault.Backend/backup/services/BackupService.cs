@@ -4,179 +4,142 @@ using System.Text.Json;
 
 public class BackupService
 {
-    private static string bkpTempDir = ".bkp";
-
-    private static string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
+    private static readonly string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
 
     public static DateTime CreateBackup()
     {
-        var bkpPath = GetBackupsPath();
-
         var logtime = LogUtil.Time("Create backup");
 
-        var loaders = DataMemoryLoader.Create().loaders;
-
-        PrepareBkpDir();
+        var loader = DataMemoryLoader.Create();
 
         var steptime = LogUtil.Time($"Create backup - DB");
-
-        var dbPaths = CreateDbBackup(loaders);
-
+        var dbPaths = CreateDbBackup(loader.loaders);
         steptime();
+
         steptime = LogUtil.Time($"Create backup - Saves");
-
-        var savesPaths = CreateSavesBackup();
-
+        var savesPaths = CreateSavesBackup(loader.loaders);
         steptime();
+
         steptime = LogUtil.Time($"Create backup - Storage");
-
-        var mainPaths = CreateMainBackup(loaders);
-
+        var mainPaths = CreateMainBackup(loader.loaders);
         steptime();
 
-        var paths = new Dictionary<string, string>()
+        var files = new Dictionary<string, (string TargetPath, byte[] FileContent)>()
             .Concat(dbPaths)
             .Concat(savesPaths)
             .Concat(mainPaths)
             .ToDictionary();
 
-        var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
-        File.WriteAllText(
-            Path.Combine(bkpTmpDirPath, "_paths.json"),
-            JsonSerializer.Serialize(paths, EntityJsonContext.Default.DictionaryStringString)
-        );
+        var paths = files.ToDictionary(pair => pair.Key, pair => pair.Value.TargetPath);
+
+        files.Add("_paths.json", (
+            TargetPath: "",
+            FileContent: JsonSerializer.SerializeToUtf8Bytes(paths, EntityJsonContext.Default.DictionaryStringString)
+        ));
 
         steptime = LogUtil.Time($"Create backup - Compress");
+        using (var memoryStream = new MemoryStream())
+        {
+            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var fileEntry in files)
+                {
+                    var fileContent = fileEntry.Value.FileContent;
+                    var entry = archive.CreateEntry(fileEntry.Key, CompressionLevel.Optimal);
+                    using var entryStream = entry.Open();
+                    entryStream.Write(fileContent, 0, fileContent.Length);
+                    // Console.WriteLine(fileEntry.Key);
+                }
+            }
 
-        var dateTime = Compress();
+            var bkpPath = GetBackupsPath();
+            var fileName = GetBackupFilename(loader.startTime);
+            var bkpZipPath = Path.Combine(bkpPath, fileName);
 
+            File.WriteAllBytes(bkpZipPath, memoryStream.ToArray());
+        }
         steptime();
+
         logtime();
 
-        return dateTime;
+        return loader.startTime;
     }
 
-    private static void PrepareBkpDir()
+    private static Dictionary<string, (string TargetPath, byte[] FileContent)> CreateDbBackup(DataEntityLoaders loaders)
     {
-        var bkpPath = GetBackupsPath();
-
-        var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
-        var bkpDbDirPath = Path.Combine(bkpTmpDirPath, "db");
-        var bkpSavesDirPath = Path.Combine(bkpTmpDirPath, "saves");
-        var bkpMainDirPath = Path.Combine(bkpTmpDirPath, "main");
-
-        if (Directory.Exists(bkpTmpDirPath))
-        {
-            Directory.Delete(bkpTmpDirPath, true);
-        }
-
-        Directory.CreateDirectory(bkpTmpDirPath);
-        Directory.CreateDirectory(bkpDbDirPath);
-        Directory.CreateDirectory(bkpSavesDirPath);
-        Directory.CreateDirectory(bkpMainDirPath);
-    }
-
-    private static Dictionary<string, string> CreateDbBackup(DataEntityLoaders loaders)
-    {
-        var bkpPath = GetBackupsPath();
-
-        var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
-
         var boxEntities = loaders.boxLoader.GetAllEntities();
         var pkmEntities = loaders.pkmLoader.GetAllEntities();
         var pkmVersionEntities = loaders.pkmVersionLoader.GetAllEntities();
 
-        var dbDir = SettingsService.AppSettings.SettingsMutable.DB_PATH;
-
-        var boxPath = Path.Combine(dbDir, "box.json");
-        var pkmPath = Path.Combine(dbDir, "pkm.json");
-        var pkmVersionPath = Path.Combine(dbDir, "pkm-version.json");
+        var boxPath = loaders.boxLoader.FilePath;
+        var pkmPath = loaders.pkmLoader.FilePath;
+        var pkmVersionPath = loaders.pkmVersionLoader.FilePath;
 
         var relativeBoxPath = Path.Combine("db", "box.json");
         var relativePkmPath = Path.Combine("db", "pkm.json");
         var relativePkmVersionPath = Path.Combine("db", "pkm-version.json");
 
-        File.WriteAllText(
-            Path.Combine(bkpTmpDirPath, relativeBoxPath),
-            JsonSerializer.Serialize(boxEntities, EntityJsonContext.Default.DictionaryStringBoxEntity)
-        );
-        File.WriteAllText(
-            Path.Combine(bkpTmpDirPath, relativePkmPath),
-            JsonSerializer.Serialize(pkmEntities, EntityJsonContext.Default.DictionaryStringPkmEntity)
-        );
-        File.WriteAllText(
-            Path.Combine(bkpTmpDirPath, relativePkmVersionPath),
-            JsonSerializer.Serialize(pkmVersionEntities, EntityJsonContext.Default.DictionaryStringPkmVersionEntity)
-        );
+        var boxContent = JsonSerializer.SerializeToUtf8Bytes(boxEntities, EntityJsonContext.Default.DictionaryStringBoxEntity);
+        var pkmContent = JsonSerializer.SerializeToUtf8Bytes(pkmEntities, EntityJsonContext.Default.DictionaryStringPkmEntity);
+        var pkmVersionContent = JsonSerializer.SerializeToUtf8Bytes(pkmVersionEntities, EntityJsonContext.Default.DictionaryStringPkmVersionEntity);
 
         return new()
         {
-            [NormalizePath(relativeBoxPath)] = NormalizePath(boxPath),
-            [NormalizePath(relativePkmPath)] = NormalizePath(pkmPath),
-            [NormalizePath(relativePkmVersionPath)] = NormalizePath(pkmVersionPath),
+            [NormalizePath(relativeBoxPath)] = (TargetPath: NormalizePath(boxPath), FileContent: boxContent),
+            [NormalizePath(relativePkmPath)] = (TargetPath: NormalizePath(pkmPath), FileContent: pkmContent),
+            [NormalizePath(relativePkmVersionPath)] = (TargetPath: NormalizePath(pkmVersionPath), FileContent: pkmVersionContent),
         };
     }
 
-    private static Dictionary<string, string> CreateSavesBackup()
+    private static Dictionary<string, (string TargetPath, byte[] FileContent)> CreateSavesBackup(DataEntityLoaders loaders)
     {
-        var bkpPath = GetBackupsPath();
-        var globs = SettingsService.AppSettings.SettingsMutable.SAVE_GLOBS;
-        var searchPaths = MatcherUtil.SearchPaths(globs);
-
-        var paths = new Dictionary<string, string>();
-
-        var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
-
-        foreach (var path in searchPaths)
+        var paths = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
+        if (loaders.saveLoadersDict.Count == 0)
         {
+            return paths;
+        }
+
+        foreach (var saveLoader in loaders.saveLoadersDict.Values)
+        {
+            var path = saveLoader.Save.Metadata.FilePath;
+            ArgumentNullException.ThrowIfNull(path);
+
             var filename = Path.GetFileNameWithoutExtension(path);
             var ext = Path.GetExtension(path);
-
             var hashCode = string.Format("{0:X}", path.GetHashCode());
-
             var newFilename = $"{filename}_{hashCode}{ext}";
-
             var relativePath = Path.Combine("saves", newFilename);
 
-            var newPath = Path.Combine(bkpTmpDirPath, relativePath);
-
-            File.Copy(path, newPath);
-
-            paths.Add(NormalizePath(relativePath), NormalizePath(path));
+            paths.Add(NormalizePath(relativePath), (
+                TargetPath: NormalizePath(path), FileContent: LocalSaveService.GetSaveFileData(saveLoader.Save)
+            ));
         }
 
         return paths;
     }
 
-    private static Dictionary<string, string> CreateMainBackup(DataEntityLoaders loaders)
+    private static Dictionary<string, (string TargetPath, byte[] FileContent)> CreateMainBackup(DataEntityLoaders loaders)
     {
         var bkpPath = GetBackupsPath();
 
-        var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
-        var bkpMainDirPath = Path.Combine(bkpTmpDirPath, "main");
+        var pkmFilesDict = loaders.pkmVersionLoader.pkmFileLoader.GetAllEntities();
 
-        var pkmVersions = loaders.pkmVersionLoader.GetAllEntities().Values.ToList();
-
-        var paths = new Dictionary<string, string>();
-
-        pkmVersions.ForEach(pkmVersionEntity =>
+        var paths = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
+        if (pkmFilesDict.Values.Count == 0)
         {
-            var filename = Path.GetFileName(pkmVersionEntity.Filepath);
-            var dirname = new DirectoryInfo(Path.GetDirectoryName(pkmVersionEntity.Filepath)!).Name;
+            return paths;
+        }
+
+        pkmFilesDict.ToList().ForEach(pair =>
+        {
+            var filepath = pair.Key;
+            var filename = Path.GetFileName(filepath);
+            var dirname = new DirectoryInfo(Path.GetDirectoryName(filepath)!).Name;
             var relativeDirPath = Path.Combine("main", dirname);
-            var dirPath = Path.Combine(bkpTmpDirPath, relativeDirPath);
-
-            Directory.CreateDirectory(dirPath);
-
-            var newPath = Path.Combine(dirPath, filename);
-
-            // Console.WriteLine(newPath);
-
-            File.Copy(pkmVersionEntity.Filepath, newPath);
 
             paths.Add(
                 NormalizePath(Path.Combine(relativeDirPath, filename)),
-                NormalizePath(pkmVersionEntity.Filepath)
+                (TargetPath: filepath, FileContent: pair.Value)
             );
         });
 
@@ -198,25 +161,6 @@ public class BackupService
     private static string GetBackupFilename(DateTime createdAt)
     {
         return $"pkvault_backup_{SerializeDateTime(createdAt)}.zip";
-    }
-
-    private static DateTime Compress()
-    {
-        var bkpPath = GetBackupsPath();
-
-        var dateTime = DateTime.UtcNow;
-
-        var bkpTmpDirPath = Path.Combine(bkpPath, bkpTempDir);
-        var fileName = GetBackupFilename(dateTime);
-        var bkpZipPath = Path.Combine(bkpPath, fileName);
-
-        ZipFile.CreateFromDirectory(bkpTmpDirPath, bkpZipPath, CompressionLevel.Fastest, false);
-
-        Console.WriteLine($"Create backup - Zip in {bkpZipPath}");
-
-        Directory.Delete(bkpTmpDirPath, true);
-
-        return dateTime;
     }
 
     public static List<BackupDTO> GetBackupList()
@@ -291,6 +235,7 @@ public class BackupService
             throw new Exception("Paths entry not found");
         }
 
+        // TODO read in-memory
         pathsEntry.ExtractToFile(bkpTmpPathsPath, true);
 
         var paths = JsonSerializer.Deserialize(

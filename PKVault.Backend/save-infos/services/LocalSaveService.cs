@@ -144,12 +144,14 @@ public class LocalSaveService
 
         var dirPath = Path.GetDirectoryName(path)!;
 
-        File.WriteAllBytes(path, save.Write().ToArray());
+        File.WriteAllBytes(path, GetSaveFileData(save));
 
         UpdateGlobalsWithSave(save, path);
 
         Console.WriteLine($"Writed save {save.ID32} to {path}");
     }
+
+    public static byte[] GetSaveFileData(SaveFile save) => save.Write().ToArray();
 
     // public static async Task<DataUpdateFlags> UploadNewSave(byte[] fileBytes, string formFilename)
     // {

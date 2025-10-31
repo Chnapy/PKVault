@@ -134,6 +134,12 @@ public class Program
             return false;
         }
 
+        if (args.Length > 0 && args[0] == "test-bkp")
+        {
+            BackupService.CreateBackup();
+            return false;
+        }
+
         return true;
 #else
         throw new Exception("Mode not defined");
