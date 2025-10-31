@@ -22,6 +22,7 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
 
         // absolutly required before each write
         // TODO make a using write pkm to ensure use of this call
+        pkm.ResetPartyStats();
         pkm.RefreshChecksum();
 
         loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
@@ -35,6 +36,7 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
 
             PkmConvertService.PassDynamicsToPkm(pkm, relatedPkm);
 
+            relatedPkm.ResetPartyStats();
             relatedPkm.RefreshChecksum();
 
             loaders.pkmVersionLoader.WriteDto(versionDto);

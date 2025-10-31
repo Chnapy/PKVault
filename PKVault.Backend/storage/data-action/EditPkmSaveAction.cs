@@ -20,6 +20,7 @@ public class EditPkmSaveAction(uint saveId, string pkmSaveId, EditPkmVersionPayl
 
         // absolutly required before each write
         // TODO make a using write pkm to ensure use of this call
+        pkm.ResetPartyStats();
         pkm.RefreshChecksum();
 
         saveLoaders.Pkms.WriteDto(pkmSave);

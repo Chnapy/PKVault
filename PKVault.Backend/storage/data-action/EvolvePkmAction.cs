@@ -182,6 +182,7 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
 
         PkmConvertService.ApplyAbilityToPkm(pkm);
 
+        pkm.ResetPartyStats();
         pkm.RefreshChecksum();
     }
 }

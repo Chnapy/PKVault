@@ -124,6 +124,7 @@ public class PkmConvertService
         PassDynamicsToPkm(sourcePkm, pkmIntermediate);
         PassHeldItemToPkm(sourcePkm, pkmIntermediate);
 
+        pkmIntermediate.ResetPartyStats();
         pkmIntermediate.RefreshChecksum();
 
         Console.WriteLine($"[convert] pkm-intermediate G3, PID={pkmIntermediate.PID} Gender={pkmIntermediate.Gender} IsShiny={pkmIntermediate.IsShiny} Language={pkmIntermediate.Language} ");
@@ -148,6 +149,7 @@ public class PkmConvertService
         sourcePkm.GetMoves(moves);
         ApplyMovesToPkm(destPkm, moves);
 
+        destPkm.ResetPartyStats();
         destPkm.RefreshChecksum();
     }
 
