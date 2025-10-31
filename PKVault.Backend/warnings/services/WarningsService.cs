@@ -116,7 +116,7 @@ public class WarningsService
 
         var pkms = loader.loaders.pkmLoader.GetAllDtos();
 
-        var tasks = pkms.Select(async pkm =>
+        var tasks = pkms.Select(pkm =>
         {
             if (pkm.SaveId != default)
             {

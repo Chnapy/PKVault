@@ -183,7 +183,7 @@ public class BackupService
         return paths;
     }
 
-    private static string NormalizePath(string path) => path.Replace('\\', '/');
+    private static string NormalizePath(string path) => MatcherUtil.NormalizePath(path);
 
     private static string SerializeDateTime(DateTime dateTime)
     {

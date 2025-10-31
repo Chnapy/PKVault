@@ -64,11 +64,16 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         return result;
     }
 
-    public override void WriteDto(PkmVersionDTO dto)
+    public override void WriteEntity(PkmVersionEntity entity)
     {
-        base.WriteDto(dto);
+        // required for specific case when pkm-id changes
+        var existingEntity = GetEntity(entity.Id);
+        if (existingEntity != null && entity.PkmId != existingEntity.PkmId)
+        {
+            DeleteEntity(entity.Id);
+        }
 
-        var entity = GetEntityFromDTO(dto);
+        base.WriteEntity(entity);
 
         if (GetAllEntitiesByPkmId().TryGetValue(entity.PkmId, out var entities))
         {
@@ -78,6 +83,11 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         {
             GetAllEntitiesByPkmId().Add(entity.PkmId, new() { { entity.Id, entity } });
         }
+    }
+
+    public override void WriteDto(PkmVersionDTO dto)
+    {
+        base.WriteDto(dto);
 
         pkmFileLoader.WriteEntity(
             PKMLoader.GetPKMBytes(dto.Pkm), dto.Pkm, dto.PkmVersionEntity.Filepath

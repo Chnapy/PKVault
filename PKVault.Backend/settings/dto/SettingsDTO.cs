@@ -11,7 +11,7 @@ public class SettingsDTO
 
     public string Version => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "";
 
-    public string AppDirectory { get => AppDomain.CurrentDomain.BaseDirectory.Replace('\\', '/'); }
+    public string AppDirectory { get => MatcherUtil.NormalizePath(AppDomain.CurrentDomain.BaseDirectory); }
 
     public string SettingsPath { get => filePath; }
 

@@ -87,13 +87,18 @@ public abstract class EntityLoader<DTO, E>(
         return true;
     }
 
-    public virtual void WriteDto(DTO dto)
+    public virtual void WriteEntity(E entity)
     {
-        Console.WriteLine($"{dto.GetType().Name} - Write id={dto.Id} - Entity id={GetEntityFromDTO(dto).Id}");
+        Console.WriteLine($"{entity.GetType().Name} - Write id={entity.Id} - Entity id={entity.Id}");
 
-        GetAllEntities()[dto.Id] = GetEntityFromDTO(dto);
+        GetAllEntities()[entity.Id] = entity;
 
         HasWritten = true;
+    }
+
+    public virtual void WriteDto(DTO dto)
+    {
+        WriteEntity(GetEntityFromDTO(dto));
     }
 
     public virtual void WriteToFile()

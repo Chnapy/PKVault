@@ -1,3 +1,5 @@
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using PKHeX.Core;
 using PKVault.Backend;
 
@@ -304,25 +306,21 @@ public class StorageService
         var pkmLoader = new PkmLoader();
         var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
 
-        var boxEntities = boxLoader.GetAllEntities();
-        var pkmEntities = pkmLoader.GetAllEntities();
-
-        List<string> pkmVersionToDelete = [];
-
         // remove pkmVersions with inconsistent data
         pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
         {
-            var pkmExists = pkmEntities.TryGetValue(pkmVersionEntity.PkmId, out var pkmEntity);
-            if (!pkmExists)
+            bool deleted = false;
+            var pkmEntity = pkmLoader.GetEntity(pkmVersionEntity.PkmId);
+            if (pkmEntity == null)
             {
-                pkmVersionToDelete.Add(pkmVersionEntity.Id);
+                deleted = pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
             }
             else
             {
-                var boxExists = boxEntities.TryGetValue(pkmEntity!.BoxId.ToString(), out var boxEntity);
-                if (!boxExists)
+                var boxEntity = boxLoader.GetEntity(pkmEntity!.BoxId.ToString());
+                if (boxEntity == null)
                 {
-                    pkmVersionToDelete.Add(pkmVersionEntity.Id);
+                    deleted = pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
                 }
                 else
                 {
@@ -337,76 +335,90 @@ public class StorageService
                     }
                     if (pkmBytes == null)
                     {
-                        pkmVersionToDelete.Add(pkmVersionEntity.Id);
+                        deleted = pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
                     }
+                }
+            }
+
+            if (!deleted)
+            {
+                // if filepath is not normalized
+                if (pkmVersionEntity.Filepath != MatcherUtil.NormalizePath(pkmVersionEntity.Filepath))
+                {
+                    pkmVersionEntity.Filepath = MatcherUtil.NormalizePath(pkmVersionEntity.Filepath);
+                    pkmVersionLoader.WriteEntity(pkmVersionEntity);
                 }
             }
         });
 
-        if (pkmVersionToDelete.Count > 0)
-        {
-            // bkp
-            pkmVersionLoader.CreateBackupFile();
-
-            pkmVersionToDelete.ForEach(pkmVersionId => pkmVersionLoader.DeleteEntity(pkmVersionId));
-            pkmVersionLoader.WriteToFile();
-        }
-
-        var pkmVersionEntities = pkmVersionLoader.GetAllEntities();
-
-        List<string> pkmsToDelete = [];
-
         // remove pkms with inconsistent data
-        pkmEntities.Values.ToList().ForEach(pkmEntity =>
+        pkmLoader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
         {
-            var pkmVersions = pkmVersionEntities.Values.ToList().FindAll(pkmVersion => pkmVersion.PkmId == pkmEntity.Id);
+            var pkmVersions = pkmVersionLoader.GetEntitiesByPkmId(pkmEntity.Id).Values;
             if (pkmVersions.Count == 0)
             {
-                pkmsToDelete.Add(pkmEntity.Id);
+                pkmLoader.DeleteEntity(pkmEntity.Id);
             }
         });
 
-        if (pkmsToDelete.Count > 0)
+        if (pkmVersionLoader.HasWritten)
+        {
+            // bkp
+            pkmVersionLoader.CreateBackupFile();
+            pkmVersionLoader.WriteToFile();
+        }
+
+        if (pkmLoader.HasWritten)
         {
             // bkp
             pkmLoader.CreateBackupFile();
-
-            pkmsToDelete.ForEach(pkmId => pkmLoader.DeleteEntity(pkmId));
             pkmLoader.WriteToFile();
         }
 
         time();
     }
 
-    // public static void CleanMainStorageFiles()
-    // {
-    //     Stopwatch sw = new();
+    public static async Task CleanMainStorageFiles()
+    {
+        var time = LogUtil.Time($"Storage obsolete files clean up");
 
-    //     Console.WriteLine($"Storage files clean up");
+        var loader = await GetLoader();
+        var pkmVersionsFilepaths = loader.loaders.pkmVersionLoader.GetAllDtos().Select(dto => dto.PkmVersionEntity.Filepath).ToList();
 
-    //     sw.Start();
+        var rootDir = ".";
+        var storagePath = SettingsService.AppSettings.SettingsMutable.STORAGE_PATH;
 
-    //     var pkmVersionsFilepaths = memoryLoader.loaders.pkmVersionLoader.GetAllDtos().Select(dto => dto.PkmVersionEntity.Filepath).ToList();
+        var matcher = new Matcher();
+        matcher.AddInclude(Path.Combine(storagePath, "**/*"));
+        var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
 
-    //     var rootDir = ".";
-    //     var storagePath = SettingsService.AppSettings.STORAGE_PATH;
+        var pathsToClean = matches.Files
+        .Select(file => Path.Combine(rootDir, file.Path))
+        .Select(MatcherUtil.NormalizePath)
+        .Select(path => pkmVersionsFilepaths.Contains(path) ? null : path)
+        .OfType<string>();
 
-    //     var matcher = new Matcher();
-    //     matcher.AddInclude(Path.Combine(storagePath, "**/*"));
-    //     var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
+        var pkmVersionFilesToDelete = pkmVersionsFilepaths.Count - (matches.Files.Count() - pathsToClean.Count());
 
-    //     foreach (var file in matches.Files)
-    //     {
-    //         var path = Path.Combine(rootDir, file.Path);
+        Console.WriteLine($"Total files count = {matches.Files.Count()}");
+        Console.WriteLine($"PkmVersion count = {pkmVersionsFilepaths.Count}");
+        Console.WriteLine($"Paths to clean count = {pathsToClean.Count()}");
 
-    //         if (!pkmVersionsFilepaths.Contains(path))
-    //         {
-    //             Console.WriteLine($"Clean storage file {path}");
-    //             File.Delete(path);
-    //         }
-    //     }
-    //     sw.Stop();
+        if (pkmVersionFilesToDelete != 0)
+        {
+            throw new Exception($"Inconsistant delete, {pkmVersionFilesToDelete} files for PkmVersions may be deleted");
+        }
 
-    //     Console.WriteLine($"Storage files cleaned up in {sw.Elapsed}");
-    // }
+        foreach (var path in pathsToClean)
+        {
+            Console.WriteLine($"Clean obsolete storage file {path}");
+            File.Delete(path);
+        }
+
+        Console.WriteLine($"Total files count = {matches.Files.Count()}");
+        Console.WriteLine($"PkmVersion count = {pkmVersionsFilepaths.Count}");
+        Console.WriteLine($"Paths to clean count = {pathsToClean.Count()}");
+
+        time();
+    }
 }

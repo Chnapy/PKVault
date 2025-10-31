@@ -41,6 +41,8 @@ public class MatcherUtil
             throw new ArgumentException($"Too much results ({results.Length}) for given globs");
         }
 
-        return [.. results.Select(path => path.Replace('\\', '/'))];
+        return [.. results.Select(NormalizePath)];
     }
+
+    public static string NormalizePath(string path) => path.Replace('\\', '/');
 }

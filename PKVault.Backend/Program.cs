@@ -128,6 +128,12 @@ public class Program
 
         Console.WriteLine($"Memory checks: initial={initialMemoryUsedMB} MB setuped={setupedMemoryUsedMB} MB diff={setupedMemoryUsedMB - initialMemoryUsedMB} MB");
 
+        if (args.Length > 0 && args[0] == "clean")
+        {
+            await StorageService.CleanMainStorageFiles();
+            return false;
+        }
+
         return true;
 #else
         throw new Exception("Mode not defined");
