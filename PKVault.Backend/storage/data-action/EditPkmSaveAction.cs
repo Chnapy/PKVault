@@ -31,6 +31,11 @@ public class EditPkmSaveAction(uint saveId, string pkmSaveId, EditPkmVersionPayl
             SavePkms = true,
         });
 
+        if (pkmSave.PkmVersionId != null)
+        {
+            await new SynchronizePkmAction(saveId, [pkmSave.PkmVersionId]).ExecuteWithPayload(loaders, flags);
+        }
+
         return new()
         {
             type = DataActionType.EDIT_PKM_SAVE,

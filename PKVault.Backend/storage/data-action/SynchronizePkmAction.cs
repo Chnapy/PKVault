@@ -62,14 +62,21 @@ public class SynchronizePkmAction(uint saveId, string[] pkmVersionIds) : DataAct
                 Console.WriteLine($"Multiple save pkms with same ID for pkmVersion.Id={pkmVersionId}");
             }
 
-            var savePkm = savePkms[0];
+            var savePkm = savePkms[0]!;
 
             var relatedPkmVersions = loaders.pkmVersionLoader.GetDtosByPkmId(pkmDto.Id).Values.ToList();
             relatedPkmVersions.ForEach((version) =>
             {
                 var pkm = version.Pkm;
 
-                PkmConvertService.PassAllToPkmSafe(savePkm!.Pkm, pkm);
+                if (savePkm.PkmVersionId == version.Id)
+                {
+                    PkmConvertService.PassAllToPkmSafe(savePkm.Pkm, pkm);
+                }
+                else
+                {
+                    PkmConvertService.PassAllDynamicsNItemToPkm(savePkm.Pkm, pkm);
+                }
 
                 loaders.pkmVersionLoader.WriteDto(version);
 

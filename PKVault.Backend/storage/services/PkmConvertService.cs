@@ -144,10 +144,16 @@ public class PkmConvertService
         PassStaticsToPkm(sourcePkm, destPkm);
         PassDynamicsToPkm(sourcePkm, destPkm);
         PassHeldItemToPkm(sourcePkm, destPkm);
+        PassMovesToPkm(sourcePkm, destPkm);
 
-        Span<ushort> moves = stackalloc ushort[4];
-        sourcePkm.GetMoves(moves);
-        ApplyMovesToPkm(destPkm, moves);
+        destPkm.ResetPartyStats();
+        destPkm.RefreshChecksum();
+    }
+
+    public static void PassAllDynamicsNItemToPkm(PKM sourcePkm, PKM destPkm)
+    {
+        PassDynamicsToPkm(sourcePkm, destPkm);
+        PassHeldItemToPkm(sourcePkm, destPkm);
 
         destPkm.ResetPartyStats();
         destPkm.RefreshChecksum();
@@ -281,6 +287,13 @@ public class PkmConvertService
             destPkm.ApplyHeldItem(sourcePkm.HeldItem, sourcePkm.Context);
         }
         // Console.WriteLine($"HELD-ITEM = {destPkm.HeldItem}");
+    }
+
+    public static void PassMovesToPkm(PKM sourcePkm, PKM destPkm)
+    {
+        Span<ushort> moves = stackalloc ushort[4];
+        sourcePkm.GetMoves(moves);
+        ApplyMovesToPkm(destPkm, moves);
     }
 
     public static void ApplyNicknameToPkm(PKM pkm, string nickname)
