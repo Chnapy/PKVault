@@ -235,7 +235,7 @@ public class MovePkmAction(
 
         saveLoaders.Pkms.FlushParty();
 
-        CheckG3PkmTradeRecord(saveLoaders.Save);
+        CheckPkmTradeRecord(saveLoaders.Save);
 
         var boxName = saveLoaders.Boxes.GetDto(targetBoxId.ToString())?.Name;
 
@@ -290,7 +290,7 @@ public class MovePkmAction(
 
         saveLoaders.Pkms.FlushParty();
 
-        CheckG3PkmTradeRecord(saveLoaders.Save);
+        CheckPkmTradeRecord(saveLoaders.Save);
 
         var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
 
@@ -481,7 +481,7 @@ public class MovePkmAction(
         }
     }
 
-    private static void CheckG3PkmTradeRecord(SaveFile save)
+    private static void CheckPkmTradeRecord(SaveFile save)
     {
         if (save is SAV3FRLG saveG3FRLG)
         {
@@ -491,6 +491,31 @@ public class MovePkmAction(
 
             var pkmTradeCount = records.GetRecord(pkmTradeIndex);
             records.SetRecord(pkmTradeIndex, pkmTradeCount + 1);
+        }
+        else if (save is SAV4HGSS saveG4HGSS)
+        {
+            /**
+             * Found record data types from Record32:
+             * - times-linked
+             * - link-battles-win
+             * - link-battles-lost
+             * - link-trades
+             */
+            int linkTradesIndex1 = 20;  // cable I guess
+            // int linkTradesIndex2 = 25;  // wifi I guess
+            // List<int> timesLinkedIndexes = [linkTradesIndex1, linkTradesIndex2, 25, 26, 33];
+            // List<int> linkBattlesWinIndexes = [22, 27]; // cable/wifi I guess
+            // List<int> linkBattlesLostIndexes = [23, 28]; // cable/wifi I guess
+            // List<int> linkTradesIndexes = [linkTradesIndex1, linkTradesIndex2];
+
+            int pkmTradeIndex = linkTradesIndex1;
+
+            // required since SAV4.Records getter creates new instance each call
+            var records = saveG4HGSS.Records;
+
+            uint pkmTradeCount = records.GetRecord32(pkmTradeIndex);
+            records.SetRecord32(pkmTradeIndex, pkmTradeCount + 1);
+            records.EndAccess();
         }
     }
 }
