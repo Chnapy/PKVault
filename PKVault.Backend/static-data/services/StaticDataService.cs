@@ -93,7 +93,7 @@ public class StaticDataService
                     return (pkmObj, apiForms);
                 }
 
-                StaticSpeciesForm getVarietyForm(Pokemon pkmObj, PokemonForm formObj, StaticSpeciesForm? defaultForm)
+                StaticSpeciesForm getVarietyForm(byte generation, Pokemon pkmObj, PokemonForm formObj, int formIndex, StaticSpeciesForm? defaultForm)
                 {
                     var name = speciesName;
 
@@ -179,6 +179,20 @@ public class StaticDataService
                         spriteShiny = frontShinyUrl != null ? GetPokeapiRelativePath(frontShinyUrl) : defaultForm?.SpriteShiny;
                     }
 
+                    var hasGenderDifferences = generation > 3 && formObj.FormName == "" && pkmSpeciesObj.HasGenderDifferences;
+
+                    var pkm = EntityBlank.GetBlank(generation);
+                    pkm.Species = species;
+                    pkm.Form = (byte)formIndex;
+                    pkm.RefreshChecksum();
+
+                    var legality = new LegalityAnalysis(pkm);
+                    var battleOnly = legality.Results.Any(result =>
+                        result.Identifier == CheckIdentifier.Form
+                        && result.Result == LegalityCheckResultCode.FormBattle
+                        && !result.Valid
+                    );
+
                     return new StaticSpeciesForm
                     {
                         Id = formObj.Id,
@@ -187,7 +201,8 @@ public class StaticDataService
                         SpriteFemale = spriteFemale,
                         SpriteShiny = spriteShiny,
                         SpriteShinyFemale = spriteShinyFemale,
-                        HasGenderDifferences = formObj.FormName == "" && pkmSpeciesObj.HasGenderDifferences,
+                        HasGenderDifferences = hasGenderDifferences,
+                        IsBattleOnly = battleOnly,
                     };
                 }
 
@@ -202,7 +217,13 @@ public class StaticDataService
                 .ToList().FindAll(entry => entry.Item2.Length > 0);
                 List<(Pokemon, PokemonForm[])> allDatas = [defaultData, .. otherDatas];
 
-                var defaultForm = getVarietyForm(defaultData.Item1, defaultData.Item2[0], null);
+                var defaultForm = getVarietyForm(
+                    EntityContext.Gen9.Generation(),
+                    defaultData.Item1,
+                    defaultData.Item2.ToList().Find(form => !form.IsBattleOnly)!,
+                    0,
+                    null
+                );
 
                 var speciesNameEn = defaultData.Item1.Name;
 
@@ -215,18 +236,18 @@ public class StaticDataService
 
                     var formListEn = species == (ushort)Species.Alcremie
                         ? FormConverter.GetAlcremieFormList(GameInfo.Strings.forms)
-                        : FormConverter.GetFormList((ushort)species, GameInfo.Strings.Types, GameInfo.Strings.forms, GameInfo.GenderSymbolASCII, context);
+                        : FormConverter.GetFormList(species, GameInfo.Strings.Types, GameInfo.Strings.forms, GameInfo.GenderSymbolASCII, context);
 
                     if (formListEn.Length == 0)
                     {
                         formListEn = [""];
                     }
 
-                    (Pokemon, PokemonForm)?[] formListData = [.. formListEn.Select(formNameEn =>
+                    (Pokemon, PokemonForm, int)?[] formListData = [.. formListEn.Select((formNameEn, formIndex) =>
                     {
                         var formApiName = PokeApiFileClient.PokeApiNameFromPKHexName(formNameEn);
 
-                        (Pokemon, PokemonForm)? searchFor (string name, bool intern) {
+                        (Pokemon, PokemonForm, int)? searchFor (string name, bool intern) {
                             if(speciesNameEn == "arceus" && name == "legend") {
                                 return null;
                             }
@@ -254,7 +275,7 @@ public class StaticDataService
 
                             if (name == "" || name == "normal")
                             {
-                                return (defaultData.Item1, defaultData.Item2[0]);
+                                return (defaultData.Item1, defaultData.Item2[0], formIndex);
                             }
 
                             var result = searchByPredicate(form => form.FormName == name, intern);
@@ -328,11 +349,12 @@ public class StaticDataService
                             return result;
                         }
 
-                        (Pokemon, PokemonForm)? searchByPredicate(Func<PokemonForm, bool> predicate, bool intern) {
+                        (Pokemon, PokemonForm, int)? searchByPredicate(Func<PokemonForm, bool> predicate, bool intern) {
                             var data = allDatas.Find(data => data.Item2.Any(predicate));
-                            (Pokemon, PokemonForm)? result = data == default ? null : (
+                            (Pokemon, PokemonForm, int)? result = data == default ? null : (
                                 data.Item1,
-                                data.Item2.ToList().Find(form => predicate(form))!
+                                data.Item2.ToList().Find(form => predicate(form))!,
+                                formIndex
                             );
 
                             return result;
@@ -342,17 +364,8 @@ public class StaticDataService
                     })];
 
                     var varietyForms = formListData.ToList()
-                        .OfType<(Pokemon, PokemonForm)>().ToList()
-                        .FindAll(entry => !entry.Item2.IsBattleOnly)
-                        .Select((data) => getVarietyForm(data.Item1, data.Item2, defaultForm))
-                        .Select((data) =>
-                        {
-                            if (context.Generation() < 4)
-                            {
-                                data.HasGenderDifferences = false;
-                            }
-                            return data;
-                        });
+                        .OfType<(Pokemon, PokemonForm, int)>()
+                        .Select((data) => getVarietyForm(context.Generation(), data.Item1, data.Item2, data.Item3, defaultForm));
 
                     // if (!varietyForms.Any())
                     // {

@@ -56,7 +56,14 @@ export const PokedexDetails: React.FC = () => {
     (value) => value.saveId === selectedSave.id
   )!;
 
-  const firstSeenForm = selectedSpeciesValue?.forms.find(form => form.isSeen)?.form;
+  const staticForms = selectedSpecies && selectedSave ? staticData.species[ selectedSpecies ]?.forms[ selectedSave.generation ] ?? [] : [];
+  const staticFormsFiltered = staticForms
+    .map((staticForm, index) => ({ ...staticForm, index }))
+    .filter(staticForm => !staticForm.isBattleOnly);
+
+  const firstSeenForm = selectedSpeciesValue?.forms.find(form =>
+    form.isSeen && staticFormsFiltered.some(staticForm => staticForm.index === form.form)
+  )?.form;
   const firstSeenGender = selectedSpeciesValue?.forms.find(form => form.form === firstSeenForm && form.isSeen)?.gender;
 
   const selectedForm = selectedSpeciesValue?.forms.find(form =>
@@ -96,8 +103,7 @@ export const PokedexDetails: React.FC = () => {
     return null;
   }
 
-  const staticForms = staticData.species[ selectedSpecies ]?.forms[ selectedSave.generation ] ?? [];
-  const formObj = staticForms?.[ selectedFormIndex ] ?? staticForms?.[ 0 ];
+  const formObj = staticFormsFiltered.find(sf => sf.index === selectedFormIndex) ?? staticFormsFiltered[ 0 ];
 
   if (!selectedForm || !formObj) {
     return null;
@@ -183,18 +189,18 @@ export const PokedexDetails: React.FC = () => {
           <DetailsMainInfos
             species={selectedSpecies}
             speciesName={<div style={{ display: 'inline-flex', gap: 4 }}>
-              {staticForms.length <= 1 && speciesName}
-              {staticForms.length > 1 && <span style={{
+              {staticFormsFiltered.length <= 1 && speciesName}
+              {staticFormsFiltered.length > 1 && <span style={{
                 display: 'inline-flex',
                 flexDirection: 'row',
                 alignItems: 'flex-end',
                 marginTop: -3
               }}>
                 <SelectNumberInput
-                  data={staticForms.map((staticForm, i) => ({
-                    value: i,
+                  data={staticFormsFiltered.map(staticForm => ({
+                    value: staticForm.index,
                     option: staticForm.name,
-                    disabled: !selectedSpeciesValue.forms.some(form => form.form === i && form.isSeen),
+                    disabled: !selectedSpeciesValue.forms.some(form => form.form === staticForm.index && form.isSeen),
                   }))}
                   onChange={setSelectedFormIndex}
                   value={selectedFormIndex}

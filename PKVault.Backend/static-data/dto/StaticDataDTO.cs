@@ -48,6 +48,7 @@ public struct StaticSpeciesForm
     public required string SpriteShiny { get; set; }
     public required string? SpriteShinyFemale { get; set; }
     public required bool HasGenderDifferences { get; set; }
+    public required bool IsBattleOnly { get; set; }
 }
 
 public struct StaticStat
