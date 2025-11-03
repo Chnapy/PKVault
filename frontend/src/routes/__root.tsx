@@ -15,6 +15,7 @@ import { Header } from '../ui/header/header';
 import { HeaderItem } from "../ui/header/header-item";
 import { Icon } from '../ui/icon/icon';
 import { NotificationCard } from '../ui/notification-card/notification-card';
+import { useCheckUpdate } from '../warnings/hooks/use-check-update';
 
 const Root: React.FC = () => {
   const matchRoute = useMatchRoute();
@@ -22,13 +23,14 @@ const Root: React.FC = () => {
   const { t } = useTranslate();
 
   const settings = useSettingsGet().data?.data;
+  const hasUpdate = !!useCheckUpdate();
   const warnings = useWarningsGetWarnings().data?.data;
   const hasStorageActions = !!useStorageGetActions().data?.data.length;
   const savesScanMutation = useSaveInfosScan();
 
   const [ openNotif, setOpenNotif ] = React.useState(false);
   const hasWarnings = !!warnings && warnings.warningsCount > 0;
-  const hasErrors = BackendErrorsContext.useValue().errors.length > 0 || hasWarnings;
+  const hasErrors = BackendErrorsContext.useValue().errors.length > 0 || hasWarnings || hasUpdate;
 
   React.useEffect(() => {
     if (openNotif && !hasErrors) {
@@ -132,7 +134,7 @@ const Root: React.FC = () => {
               position: "fixed",
               top: 47,
               right: 14,
-              width: 400,
+              maxWidth: 400,
               zIndex: 20,
               '&:hover': {
                 zIndex: 25,

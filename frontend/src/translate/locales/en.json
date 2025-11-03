@@ -144,5 +144,6 @@
   "storage.save-actions.type.save-delete-pkm": "Delete pkm {{name}} from save {{save}}",
   "storage.save-actions.type.synchronize-pkm": "Synchronize {{count}} pkms with attached save {{save}}",
   "storage.save-actions.type.evolve-pkm": "Evolve pkm {{name}} in {{save}} from {{oldSpecies}} to {{newSpecies}}",
-  "storage.actions.release": "Release"
+  "storage.actions.release": "Release",
+  "notifications.warnings.update": "New PKVault update {{version}}"
 }

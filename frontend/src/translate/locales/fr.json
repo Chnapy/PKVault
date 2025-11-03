@@ -144,5 +144,6 @@
   "storage.save-actions.type.save-delete-pkm": "Supprimer le pkm {{name}} depuis la sauvegarde {{save}}",
   "storage.save-actions.type.synchronize-pkm": "Synchroniser {{count}} pkms avec la sauvegarde rattachée {{save}}",
   "storage.save-actions.type.evolve-pkm": "Évoluer le pkm {{name}} dans {{save}} de {{oldSpecies}} à {{newSpecies}}",
-  "storage.actions.release": "Relacher"
+  "storage.actions.release": "Relacher",
+  "notifications.warnings.update": "Nouvelle version PKVault {{version}}"
 }

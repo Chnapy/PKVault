@@ -2,6 +2,8 @@ import React from 'react';
 import { BackendErrorsContext } from '../../data/backend-errors-context';
 import { useWarningsGetWarnings } from '../../data/sdk/warnings/warnings.gen';
 import { useTranslate } from '../../translate/i18n';
+import { HasUpdateWarning } from '../../warnings/has-update-warning';
+import { useCheckUpdate } from '../../warnings/hooks/use-check-update';
 import { PkmVersionWarning } from '../../warnings/pkm-version-warning';
 import { SaveChangedWarning } from '../../warnings/save-changed-warning';
 import { Button } from '../button/button';
@@ -13,11 +15,12 @@ export const NotificationCard: React.FC = () => {
     const { t } = useTranslate();
     const { errors, removeIndex } = BackendErrorsContext.useValue();
 
+    const hasUpdate = !!useCheckUpdate();
     const warnings = useWarningsGetWarnings().data?.data;
 
     const nbrWarnings = warnings?.warningsCount ?? 0;
 
-    const hasErrorsAndWarnings = errors.length > 0 && nbrWarnings > 0;
+    const hasErrorsAndWarnings = errors.length > 0 && (nbrWarnings > 0 || hasUpdate);
 
     const title = [
         nbrWarnings > 0 && t('notifications.warnings', { count: nbrWarnings }),
@@ -27,7 +30,7 @@ export const NotificationCard: React.FC = () => {
     return <TitledContainer
         contrasted
         maxHeight={300}
-        title={<div
+        title={title && <div
             style={{
                 display: 'flex',
                 justifyContent: 'center',
@@ -44,6 +47,7 @@ export const NotificationCard: React.FC = () => {
                 {/* {warnings?.playTimeWarnings.map(warn => <div key={warn.saveId}>
                             Issue with save {warn.saveId}, current save seems to have less play-time than previous one
                         </div>)} */}
+                {hasUpdate && <HasUpdateWarning />}
 
                 {warnings?.pkmVersionWarnings.map((warn, i) => <PkmVersionWarning key={i} {...warn} />)}
 

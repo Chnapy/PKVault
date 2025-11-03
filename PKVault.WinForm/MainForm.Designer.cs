@@ -322,6 +322,17 @@ partial class MainForm
                 Console.Error.WriteLine(ex);
             }
         };
+
+        // on new window link open, use default browser instead of edge
+        webView.CoreWebView2.NewWindowRequested += (sender, args) =>
+        {
+            args.Handled = true;
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = args.Uri,
+                UseShellExecute = true
+            });
+        };
     }
 
 }
