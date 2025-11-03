@@ -3,7 +3,6 @@ import { Button } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
 import { SelectStringInput, type DataOption } from '../../ui/input/select-input';
 import { theme } from '../../ui/theme';
-import { StorageMoveContext } from '../actions/storage-move-context';
 import { StorageSelectAll } from '../storage-select-all';
 import { useTranslate } from '../../translate/i18n';
 
@@ -24,9 +23,6 @@ export const StorageHeader: React.FC<{
 }> = ({ saveId, gameLogo, boxId, boxPkmCount, boxSlotCount, totalPkmCount, boxesOptions, onBoxChange, onPreviousBoxClick, onNextBoxClick, onSplitClick, onClose, children }) => {
     const { t } = useTranslate();
 
-    const moveContext = StorageMoveContext.useValue();
-    const isMoveDragging = !!moveContext.selected && !moveContext.selected.target;
-
     return <>
         {gameLogo}
 
@@ -38,7 +34,6 @@ export const StorageHeader: React.FC<{
             }}
         >
             <Button
-                triggerOnHover={isMoveDragging}
                 onClick={onPreviousBoxClick}
                 disabled={!onPreviousBoxClick}
             >
@@ -46,7 +41,6 @@ export const StorageHeader: React.FC<{
             </Button>
 
             <SelectStringInput
-                triggerOnHover={isMoveDragging}
                 data={boxesOptions}
                 value={boxId.toString()}
                 onChange={onBoxChange}
@@ -55,7 +49,6 @@ export const StorageHeader: React.FC<{
             {children}
 
             <Button
-                triggerOnHover={isMoveDragging}
                 onClick={onNextBoxClick}
                 disabled={!onNextBoxClick}
             >

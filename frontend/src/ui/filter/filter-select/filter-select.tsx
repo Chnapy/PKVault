@@ -12,35 +12,26 @@ import {
   type FilterLabelProps,
 } from "../filter-label/filter-label";
 import { TitledContainer } from '../../container/titled-container';
-import { useTriggerOnHover } from '../../button/hooks/use-trigger-on-hover';
 import { Icon } from '../../icon/icon';
 
 export type FilterSelectProps = FilterLabelProps &
   ListboxProps<React.ElementType, string[]> & {
     options: { value: string; label: React.ReactNode; disabled?: boolean; }[];
-    triggerOnHover?: boolean;
   };
 
 export const FilterSelect: React.FC<FilterSelectProps> = ({
   enabled,
   options,
   children,
-  triggerOnHover,
   ...props
 }) => {
   const rootRef = React.useRef<HTMLDivElement>(null);
 
   const hasValue = (value: string) => (props.value ?? []).includes(value);
 
-  const getHoverEventHandler = useTriggerOnHover(triggerOnHover && !props.disabled);
-
   return (
     <div
       ref={rootRef}
-      onPointerLeave={getHoverEventHandler(() => {
-        document.body.dispatchEvent(new MouseEvent('pointerdown'));
-        document.body.dispatchEvent(new MouseEvent('pointerup'));
-      })}
     >
       <FilterLabel enabled={enabled}>
         <Listbox {...props} onChange={props.onChange && ((value: string[] | string) => {
@@ -59,10 +50,6 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
               gap: 2,
               cursor: "pointer",
             })}
-            onPointerEnter={getHoverEventHandler((ev) => {
-              (ev.target as HTMLElement).click();
-            })}
-            onPointerLeave={getHoverEventHandler(() => null)}
           >
             {children}
             <Icon name='angle-down' forButton />
@@ -84,10 +71,6 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
                     opacity: disabled ? 0.75 : undefined,
                     pointerEvents: disabled ? 'none' : undefined,
                   }}
-                  onPointerEnter={getHoverEventHandler((ev) => {
-                    (ev.target as HTMLElement).click();
-                  })}
-                  onPointerLeave={getHoverEventHandler(() => null)}
                   disabled={disabled}
                 >
                   <FilterLabel

@@ -204,7 +204,7 @@ export const StorageMoveContext = {
                     return createPortal(<div
                         ref={ref}
                         style={{
-                            position: 'absolute',
+                            position: 'fixed',
                             left: posDiff[ 0 ]! * 102,
                             top: posDiff[ 1 ]! * 102,
                             pointerEvents: 'none',

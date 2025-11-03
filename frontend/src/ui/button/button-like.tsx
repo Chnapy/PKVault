@@ -2,7 +2,6 @@ import { css, cx } from "@emotion/css";
 import React from "react";
 import { Container, type ContainerProps, type ReactTag } from "../container/container";
 import { Icon } from '../icon/icon';
-import { useTriggerOnHover } from './hooks/use-trigger-on-hover';
 
 export type ButtonLikeProps<
   AS extends ReactTag = ReactTag,
@@ -11,7 +10,6 @@ export type ButtonLikeProps<
   loading?: boolean;
   disabled?: boolean;
   spinColor?: string;
-  triggerOnHover?: boolean;
 }> &
   Omit<ContainerProps<AS>, 'disabled'>;
 
@@ -24,7 +22,6 @@ export function ButtonLike<
   loading,
   disabled,
   spinColor,
-  triggerOnHover,
   children,
   ...restProps
 }: ButtonLikeProps<AS>) {
@@ -46,8 +43,6 @@ export function ButtonLike<
     })
     : undefined;
 
-  const getHoverEventHandler = useTriggerOnHover(triggerOnHover && !disabled);
-
   return (
     <Container<'button'>
       as={as}
@@ -61,10 +56,6 @@ export function ButtonLike<
         className
       )}
       onClick={finalOnClick}
-      onPointerEnter={getHoverEventHandler(ev => {
-        (ev.target as HTMLElement).click();
-      })}
-      onPointerLeave={getHoverEventHandler(() => null)}
       {...restProps}
     >
       <div
