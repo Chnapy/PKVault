@@ -12,6 +12,7 @@ import { StorageMainBox } from "../storage/storage-main-box";
 import { StorageSaveBox } from "../storage/storage-save-box";
 import { StorageSaveSelect } from "../storage/storage-save-select";
 import { StorageSearchCheck } from '../storage/storage-search-check';
+// import { TestFillMainStorage } from '../storage/test-fill-main-storage';
 import { filterIsDefined } from '../util/filter-is-defined';
 
 export const Storage: React.FC = withErrorCatcher('default', () => {
@@ -38,6 +39,10 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
                 marginBottom: 150,
               }}
             >
+              {/* <div style={{ width: '100%', display: 'flex', gap: 8 }}>
+                <TestFillMainStorage />
+              </div> */}
+
               <StorageMainBox />
 
               {Object.values(saves)
