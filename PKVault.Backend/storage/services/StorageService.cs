@@ -380,7 +380,7 @@ public class StorageService
         var pkmVersionsFilepaths = loader.loaders.pkmVersionLoader.GetAllDtos().Select(dto => dto.PkmVersionEntity.Filepath).ToList();
 
         var rootDir = ".";
-        var storagePath = SettingsService.AppSettings.SettingsMutable.STORAGE_PATH;
+        var storagePath = SettingsService.AppSettings.GetStoragePath();
 
         var matcher = new Matcher();
         matcher.AddInclude(Path.Combine(storagePath, "**/*"));

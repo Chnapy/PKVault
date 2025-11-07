@@ -10,7 +10,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
     public PkmVersionLoader(
         PkmLoader _pkmLoader
     ) : base(
-        filePath: Path.Combine(SettingsService.AppSettings.SettingsMutable.DB_PATH, "pkm-version.json"),
+        filePath: Path.Combine(SettingsService.AppSettings.GetDBPath(), "pkm-version.json"),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringPkmVersionEntity
     )
     {

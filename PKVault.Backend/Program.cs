@@ -153,10 +153,10 @@ public class Program
 
         ConfigureServices(builder.Services);
 
-        var certificate = SettingsService.AppSettings.SettingsMutable.HTTPS_CERT_PEM_PATH != default && SettingsService.AppSettings.SettingsMutable.HTTPS_KEY_PEM_PATH != default
+        var certificate = SettingsService.AppSettings.GetHttpsCertPemPathPath() != null && SettingsService.AppSettings.GetHttpsKeyPemPathPath() != null
             ? X509Certificate2.CreateFromPem(
-                File.ReadAllText(SettingsService.AppSettings.SettingsMutable.HTTPS_CERT_PEM_PATH),
-                File.ReadAllText(SettingsService.AppSettings.SettingsMutable.HTTPS_KEY_PEM_PATH)
+                File.ReadAllText(SettingsService.AppSettings.GetHttpsCertPemPathPath()!),
+                File.ReadAllText(SettingsService.AppSettings.GetHttpsKeyPemPathPath()!)
                 )
             : null;
 

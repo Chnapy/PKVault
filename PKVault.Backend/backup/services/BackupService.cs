@@ -120,8 +120,6 @@ public class BackupService
 
     private static Dictionary<string, (string TargetPath, byte[] FileContent)> CreateMainBackup(DataEntityLoaders loaders)
     {
-        var bkpPath = GetBackupsPath();
-
         var pkmFilesDict = loaders.pkmVersionLoader.pkmFileLoader.GetAllEntities();
 
         var paths = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
@@ -294,6 +292,8 @@ public class BackupService
 
     private static string GetBackupsPath()
     {
-        return SettingsService.AppSettings.SettingsMutable.BACKUP_PATH;
+        var backupPath = SettingsService.AppSettings.GetBackupPath();
+        Directory.CreateDirectory(backupPath);
+        return backupPath;
     }
 }
