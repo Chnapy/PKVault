@@ -129,20 +129,51 @@ export const StorageMoveContext = {
         React.useEffect(() => {
             const containerEl = document.body.querySelector(`#${StorageMoveContext.containerId}`) as HTMLDivElement;
 
+            const getParents = (el: HTMLElement, parents: HTMLElement[] = []): HTMLElement[] => {
+                if (!el.parentElement) {
+                    return parents;
+                }
+                return getParents(el.parentElement, [ ...parents, el.parentElement ]);
+            };
+
             if (
                 ref.current
                 && !selected?.target
                 && selected?.ids.includes(pkmId)
                 && selected.saveId === saveId
             ) {
+                const allParents = getParents(ref.current);
+
                 const rect = ref.current.parentElement!.getBoundingClientRect();
                 const { transform } = ref.current.style;
 
+                const scrollXBase = allParents.reduce((acc, el) => acc + el.scrollLeft, 0);
+                const scrollYBase = allParents.reduce((acc, el) => acc + el.scrollTop, 0);
+
+                const moveVariables = {
+                    diffX: 0,
+                    diffY: 0,
+                    scrollX: 0,
+                    scrollY: 0,
+                };
+
+                const getTransform = () => {
+                    const x = moveVariables.diffX + moveVariables.scrollX - scrollXBase;
+                    const y = moveVariables.diffY + moveVariables.scrollY - scrollYBase;
+                    return `translate(${x}px, ${y}px)`;
+                };
+
                 const moveHandler = (ev: Pick<MouseEvent, 'clientX' | 'clientY'>) => {
                     if (ref.current) {
-                        const x = ev.clientX - rect.x;
-                        const y = ev.clientY - rect.y;
-                        ref.current.style.transform = `translate(${x}px, ${y}px)`;
+                        const scrollX = allParents.reduce((acc, el) => acc + el.scrollLeft, 0);
+                        const scrollY = allParents.reduce((acc, el) => acc + el.scrollTop, 0);
+
+                        moveVariables.diffX = ev.clientX - rect.x;
+                        moveVariables.diffY = ev.clientY - rect.y;
+
+                        moveVariables.scrollX = scrollX;
+                        moveVariables.scrollY = scrollY;
+                        ref.current.style.transform = getTransform();
                         // ref.current.style.pointerEvents = 'none';
                     }
                 };
@@ -151,8 +182,17 @@ export const StorageMoveContext = {
                     setSelected(undefined);
                 };
 
+                const scrollHandler = (ev: Event) => {
+                    if (ref.current) {
+                        moveVariables.scrollX = (ev.target as HTMLElement).scrollLeft;
+                        moveVariables.scrollY = (ev.target as HTMLElement).scrollTop;
+                        ref.current.style.transform = getTransform();
+                    }
+                };
+
                 containerEl.addEventListener('pointermove', moveHandler);
                 document.addEventListener('pointerup', upHandler);
+                document.addEventListener('scroll', scrollHandler, true);
 
                 if (window.event instanceof PointerEvent
                     || window.event instanceof MouseEvent
@@ -163,6 +203,7 @@ export const StorageMoveContext = {
                 return () => {
                     containerEl.removeEventListener('pointermove', moveHandler);
                     document.removeEventListener('pointerup', upHandler);
+                    document.removeEventListener('scroll', scrollHandler, true);
 
                     if (ref.current) {
                         ref.current.style.transform = transform;
@@ -204,7 +245,7 @@ export const StorageMoveContext = {
                     return createPortal(<div
                         ref={ref}
                         style={{
-                            position: 'fixed',
+                            position: 'absolute',
                             left: posDiff[ 0 ]! * 102,
                             top: posDiff[ 1 ]! * 102,
                             pointerEvents: 'none',
