@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.StaticFiles;
@@ -98,8 +99,29 @@ partial class MainForm
 
     #endregion
 
-    private async Task WebView_Load()
+    private async Task<bool> WebView_Load()
     {
+        string webViewVersion;
+        try
+        {
+            webViewVersion = CoreWebView2Environment.GetAvailableBrowserVersionString() ?? "";
+            Console.WriteLine($"WebView version = {webViewVersion}");
+        }
+        catch (Exception ex)
+        {
+            webViewVersion = "";
+            Console.Error.WriteLine(ex);
+        }
+
+        // if no webview installed
+        if (webViewVersion == "")
+        {
+            var dialog = new NoWebviewDialog();
+            dialog.ShowDialog();
+            this.Close();
+            return false;
+        }
+
         await webView.EnsureCoreWebView2Async(null);
 
         var assembly = Assembly.GetExecutingAssembly();
@@ -154,6 +176,8 @@ partial class MainForm
                     break;
             }
         };
+
+        return true;
     }
 
     private void WebView_Navigate()

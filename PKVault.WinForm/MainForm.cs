@@ -24,7 +24,9 @@ public partial class MainForm : Form
 
     private async void OnFormLoad(object? sender, EventArgs e)
     {
-        await WebView_Load();
+        var loaded = await WebView_Load();
+        if (!loaded) return;
+
         server = new LocalWebServer();
         await server.Start(args);
         WebView_Navigate();

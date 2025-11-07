@@ -11,7 +11,7 @@ public abstract class EntityLoader<DTO, E> where DTO : IWithId<string> where E :
 
     public EntityLoader(string filePath, JsonTypeInfo<Dictionary<string, E>> dictJsonContext)
     {
-        FilePath = filePath;
+        FilePath = MatcherUtil.NormalizePath(filePath);
         DictJsonContext = dictJsonContext;
     }
 
