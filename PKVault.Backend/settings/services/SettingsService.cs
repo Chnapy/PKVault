@@ -8,7 +8,9 @@ public class SettingsService
     {
         string text = JsonSerializer.Serialize(settingsMutable, SettingsMutableDTOJsonContext.Default.SettingsMutableDTO);
         Console.WriteLine(text);
-        File.WriteAllText(SettingsDTO.filePath, text);
+
+        CheckSettingsFile();
+        File.WriteAllText(SettingsDTO.FilePath, text);
 
         AppSettings = GetSettings();
 
@@ -19,26 +21,31 @@ public class SettingsService
 
     private static SettingsDTO GetSettings()
     {
-        if (!File.Exists(SettingsDTO.filePath))
-        {
-            Console.WriteLine($"Config file not existing: creating {SettingsDTO.filePath}");
-            string defaultJson = JsonSerializer.Serialize(GetDefaultSettingsMutable(), SettingsMutableDTOJsonContext.Default.SettingsMutableDTO);
+        CheckSettingsFile();
 
-            string? directory = Path.GetDirectoryName(SettingsDTO.filePath);
-            if (!string.IsNullOrEmpty(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-            File.WriteAllText(SettingsDTO.filePath, defaultJson);
-        }
-
-        string json = File.ReadAllText(SettingsDTO.filePath);
+        string json = File.ReadAllText(SettingsDTO.FilePath);
         var mutableDto = JsonSerializer.Deserialize(json, SettingsMutableDTOJsonContext.Default.SettingsMutableDTO)!;
         return new()
         {
             SettingsMutable = mutableDto,
         };
+    }
+
+    private static void CheckSettingsFile()
+    {
+        if (!File.Exists(SettingsDTO.FilePath))
+        {
+            Console.WriteLine($"Config file not existing: creating {SettingsDTO.FilePath}");
+            string defaultJson = JsonSerializer.Serialize(GetDefaultSettingsMutable(), SettingsMutableDTOJsonContext.Default.SettingsMutableDTO);
+
+            string? directory = Path.GetDirectoryName(SettingsDTO.FilePath);
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            File.WriteAllText(SettingsDTO.FilePath, defaultJson);
+        }
     }
 
     private static SettingsMutableDTO GetDefaultSettingsMutable()

@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public class SettingsDTO
 {
-    public const string filePath = "./config/pkvault.json";
+    public static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "./config/pkvault.json");
 
     public static readonly string[] AllowedLanguages = ["en", "fr"]; //GameLanguage.AllSupportedLanguages.ToArray();
 
@@ -13,7 +13,7 @@ public class SettingsDTO
 
     public string AppDirectory { get => MatcherUtil.NormalizePath(AppDomain.CurrentDomain.BaseDirectory); }
 
-    public string SettingsPath { get => filePath; }
+    public string SettingsPath { get => FilePath; }
 
     public bool CanUpdateSettings { get => StorageService.HasEmptyActionList(); }
 
