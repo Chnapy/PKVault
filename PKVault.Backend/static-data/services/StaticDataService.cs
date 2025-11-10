@@ -488,7 +488,7 @@ public class StaticDataService
 
                 List<StaticMoveGeneration> dataUntilGeneration = [.. await Task.WhenAll(
                     moveObj.PastValues
-                        .Reverse<PokeApiNet.PastMoveStatValues>()
+                        .Reverse<PastMoveStatValues>()
                         .Select(async pastValue =>
                         {
                             var typeUrl = pastValue.Type?.Url ?? tmpTypeUrl;
@@ -498,7 +498,7 @@ public class StaticDataService
                             tmpPowerUrl = power;
 
                             var versionGroup = await PokeApi.GetVersionGroup(pastValue.VersionGroup);
-                            var untilGeneration = PokeApi.GetGenerationValue(versionGroup.Generation.Name);
+                            byte untilGeneration = (byte) (PokeApi.GetGenerationValue(versionGroup.Generation.Name) - 1);
 
                             return new StaticMoveGeneration()
                             {
