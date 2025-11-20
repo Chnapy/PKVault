@@ -16,6 +16,8 @@ public class MatcherUtil
             return [];
         }
 
+        var networkGlobs = globs.FindAll(glob => glob.StartsWith(@"\\") && !glob.Contains('*'));
+
         // starts with / or \ or x:
         static bool isAbsolute(string glob) => glob.Length > 0 && (glob[0] == '/' || glob[0] == '\\' || (glob.Length > 2 && glob[1] == ':'));
 
@@ -34,7 +36,7 @@ public class MatcherUtil
         var relativeMatches = relativeMatcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(".")));
         var relativeResults = relativeMatches.Files.Select(file => Path.Combine(".", file.Path));
 
-        string[] results = [.. absoluteResults, .. relativeResults];
+        string[] results = [.. absoluteResults, .. relativeResults, .. networkGlobs];
 
         if (results.Length > 200)
         {
@@ -44,5 +46,5 @@ public class MatcherUtil
         return [.. results.Select(NormalizePath)];
     }
 
-    public static string NormalizePath(string path) => path.Replace('\\', '/');
+    public static string NormalizePath(string path) => path.Replace('\\', '/').Replace("//", @"\\");
 }

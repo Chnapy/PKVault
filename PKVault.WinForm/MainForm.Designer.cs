@@ -309,7 +309,9 @@ partial class MainForm
                             id = fileExploreRequest.id,
                             directoryOnly = true,
                             values = dialogFolderResult == DialogResult.OK
-                                ? dialogFolder.SelectedPaths.Select(path => path.Replace(@"\", "/")).ToArray()
+                                ? dialogFolder.SelectedPaths
+                                    .Select(MatcherUtil.NormalizePath)
+                                    .ToArray()
                                 : [],
                         };
                     }
@@ -330,13 +332,16 @@ partial class MainForm
                         id = fileExploreRequest.id,
                         directoryOnly = true,
                         values = dialogResult == DialogResult.OK
-                            ? dialogFile.FileNames.Select(path => path.Replace(@"\", "/")).ToArray()
+                            ? dialogFile.FileNames
+                                .Select(MatcherUtil.NormalizePath)
+                                .ToArray()
                             : [],
                     };
                 }
 
                 var response = GetDialogResponse();
-                var responseSerialized = JsonSerializer.Serialize(response, FileExploreJsonContext.Default.FileExploreResponse);
+                var responseSerialized = JsonSerializer.Serialize(response, FileExploreJsonContext.Default.FileExploreResponse)
+                    .Replace("\\", "\\\\");
                 string script = $"window.dispatchEvent(new CustomEvent('fileExplore', {{ detail: JSON.parse('{responseSerialized}') }}));";
                 var result = await webView.ExecuteScriptAsync(script);
                 Console.WriteLine($"Script = {script} result= {result}");
