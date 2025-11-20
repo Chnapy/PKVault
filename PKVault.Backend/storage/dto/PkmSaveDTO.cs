@@ -61,9 +61,9 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     public bool CanDelete { get => !IsLocked && CanMove && PkmVersionId == null; }
 
-    public bool CanMoveToMain { get => !IsLocked && Version.IsValidSavedVersion() && Generation > 0 && CanDelete && !IsShadow && !IsEgg && Party == -1; }
+    public bool CanMoveToMain { get => !IsLocked && Version > 0 && Generation > 0 && CanDelete && !IsShadow && !IsEgg && Party == -1; }
 
-    public bool CanMoveToSave { get => !IsLocked && Version.IsValidSavedVersion() && Generation > 0 && CanMoveToMain; }
+    public bool CanMoveToSave { get => !IsLocked && Version > 0 && Generation > 0 && CanMoveToMain; }
 
     public bool CanMoveAttachedToMain { get => !IsLocked && CanMoveToMain && !IsDuplicate; }
 
