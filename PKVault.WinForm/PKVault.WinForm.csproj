@@ -25,9 +25,9 @@
     <AssemblyName>PKVault</AssemblyName>
     <ApplicationTitle>PKVault</ApplicationTitle>
     <ApplicationId>com.chnapy.pkvault</ApplicationId>
-    <Version>1.1.3</Version>
-    <ApplicationDisplayVersion>1.1.3</ApplicationDisplayVersion>
-    <ApplicationVersion>1.1.3</ApplicationVersion>
+    <Version>1.1.4</Version>
+    <ApplicationDisplayVersion>1.1.4</ApplicationDisplayVersion>
+    <ApplicationVersion>1.1.4</ApplicationVersion>
     <ApplicationIcon>wwwroot/icon.ico</ApplicationIcon>
     <NeutralLanguage>en</NeutralLanguage>
     <Product>PKVault</Product>
