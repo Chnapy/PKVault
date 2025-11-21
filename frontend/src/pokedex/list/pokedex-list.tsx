@@ -1,5 +1,6 @@
 import React from "react";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
+import type { EntityContext } from '../../data/sdk/model';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
@@ -47,11 +48,11 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
     const forms: PokedexItemProps[ 'forms' ] = [];
     for (let i = 0; i < nbrForms; i++) {
       const currentForms = speciesValues.map(value => value.forms[ i ]).filter(filterIsDefined);
-      const maxGeneration = Math.max(...currentForms.map(value => value.generation));
+      const maxContext = Math.max(...currentForms.map(value => value.context)) as EntityContext;
 
       forms.push({
         form: currentForms[ 0 ]!.form,
-        generation: maxGeneration,
+        context: maxContext,
         gender: currentForms[ 0 ]!.gender,
         isSeen: currentForms.some(form => form.isSeen),
         isSeenShiny: currentForms.some(form => form.isSeenShiny),

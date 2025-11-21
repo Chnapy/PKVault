@@ -1,11 +1,12 @@
 import { css, cx } from '@emotion/css';
 import type React from 'react';
+import type { EntityContext } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { SpriteImg, type SpriteImgProps } from './sprite-img';
 
 type SpeciesImgProps = {
     species: number;
-    generation: number;
+    context: EntityContext;
     form: number;
     isFemale?: boolean;
     isShiny?: boolean;
@@ -14,13 +15,13 @@ type SpeciesImgProps = {
     small?: boolean;
 } & Omit<SpriteImgProps, 'spriteInfos' | 'size'>;
 
-export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, generation, form, isFemale, isShiny, isEgg, isShadow, small, ...imgProps }) => {
+export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, isFemale, isShiny, isEgg, isShadow, small, ...imgProps }) => {
     const staticData = useStaticData();
 
-    const staticForms = staticData.species[ species ]?.forms[ generation ];
+    const staticForms = staticData.species[ species ]?.forms[ context ];
 
     if (!staticForms?.[ form ]) {
-        console.log('UNKNOWN FORM -', species, generation, form);
+        console.log('UNKNOWN FORM -', species, context, form);
     }
 
     const staticForm = staticForms?.[ form ] ?? staticForms?.[ 0 ];
@@ -45,7 +46,7 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, generation, for
     const spriteKey = getSpriteUrl();
     const spriteInfos = typeof spriteKey === 'string' ? staticData.spritesheets.species[ spriteKey ] : undefined;
     if (!spriteInfos) {
-        console.log('No sprite -', name, species, generation, form, staticForms);
+        console.log('No sprite -', name, species, context, form, staticForms);
     }
 
     return spriteInfos && <SpriteImg

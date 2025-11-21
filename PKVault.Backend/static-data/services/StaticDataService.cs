@@ -93,9 +93,29 @@ public class StaticDataService
                     return (pkmObj, apiForms);
                 }
 
-                StaticSpeciesForm getVarietyForm(byte generation, Pokemon pkmObj, PokemonForm formObj, int formIndex, StaticSpeciesForm? defaultForm)
+                StaticSpeciesForm getVarietyForm(byte generation, Pokemon pkmObj, PokemonForm? formObj, int formIndex, StaticSpeciesForm? defaultForm)
                 {
                     var name = speciesName;
+
+                    // rare cases when pokeapi form data is missing
+                    // like with some ZA pkms (starmie-mega for instance)
+                    formObj ??= new()
+                    {
+                        Id = pkmObj.Id,
+                        Names = [new() {
+                            Name = pkmObj.Name,
+                            Language = new() { Name = "en" }
+                        }],
+                        FormNames = [],
+                        FormName = "",
+                        Sprites = new()
+                        {
+                            BackDefault = pkmObj.Sprites.BackDefault,
+                            BackShiny = pkmObj.Sprites.BackShiny,
+                            FrontDefault = pkmObj.Sprites.FrontDefault,
+                            FrontShiny = pkmObj.Sprites.FrontDefault,
+                        }
+                    };
 
                     try
                     {
@@ -213,8 +233,7 @@ public class StaticDataService
                 var otherDatasTask = otherVarieties.Select(variety => getVarietyFormsData(variety));
 
                 var defaultData = await defaultDataTask;
-                var otherDatas = (await Task.WhenAll(otherDatasTask))
-                .ToList().FindAll(entry => entry.Item2.Length > 0);
+                var otherDatas = await Task.WhenAll(otherDatasTask);
                 List<(Pokemon, PokemonForm[])> allDatas = [defaultData, .. otherDatas];
 
                 var defaultForm = getVarietyForm(
@@ -243,11 +262,11 @@ public class StaticDataService
                         formListEn = [""];
                     }
 
-                    (Pokemon, PokemonForm, int)?[] formListData = [.. formListEn.Select((formNameEn, formIndex) =>
+                    (Pokemon, PokemonForm?, int)?[] formListData = [.. formListEn.Select((formNameEn, formIndex) =>
                     {
                         var formApiName = PokeApiFileClient.PokeApiNameFromPKHexName(formNameEn);
 
-                        (Pokemon, PokemonForm, int)? searchFor (string name, bool intern) {
+                        (Pokemon, PokemonForm?, int)? searchFor (string name, bool intern) {
                             if(speciesNameEn == "arceus" && name == "legend") {
                                 return null;
                             }
@@ -322,6 +341,9 @@ public class StaticDataService
                                 "m-violet" => searchFor("violet-meteor", true),
                                 "hero" => searchFor("", true),
                                 "teal" => searchFor("", true),
+                                "medium" => searchFor("average", true),
+                                "jumbo" => searchFor("super", true),
+                                "mega" => searchFor($"{defaultData.Item1.Name}-{name}", true) ?? searchByPkmPredicate(pkm => pkm.Name.EndsWith($"-{name}"), true),
                                 _ => searchFor($"{name}-cap", true)
                                     ?? searchFor($"{name}-breed", true)
                                     ?? searchFor($"{name}-striped", true)
@@ -340,6 +362,10 @@ public class StaticDataService
                                     .Select(data => data.Item2.Select(form => form.FormName))
                                     .SelectMany(list => list).Distinct()
                                 )}");
+                                // if(defaultData.Item1.Name == "starmie") {
+                                // Console.WriteLine(string.Join(',', allDatas.Select(d => string.Join('-', d.Item1.Name))));
+                                // Console.WriteLine(string.Join(',', allDatas.Select(d => string.Join('-', d.Item2.Select(i => i.FormName)))));
+                                // }
                                     // notFound.Add($"{defaultData.Item1.Name} // {context} // {formApiName} -> {string.Join(',', allDatas
                                     //     .Select(data => data.Item2.Select(form => form.FormName))
                                     //     .SelectMany(list => list).Distinct()
@@ -349,11 +375,22 @@ public class StaticDataService
                             return result;
                         }
 
-                        (Pokemon, PokemonForm, int)? searchByPredicate(Func<PokemonForm, bool> predicate, bool intern) {
+                        (Pokemon, PokemonForm?, int)? searchByPredicate(Func<PokemonForm, bool> predicate, bool intern) {
                             var data = allDatas.Find(data => data.Item2.Any(predicate));
-                            (Pokemon, PokemonForm, int)? result = data == default ? null : (
+                            (Pokemon, PokemonForm?, int)? result = data == default ? null : (
                                 data.Item1,
                                 data.Item2.ToList().Find(form => predicate(form))!,
+                                formIndex
+                            );
+
+                            return result;
+                        }
+
+                        (Pokemon, PokemonForm?, int)? searchByPkmPredicate(Func<Pokemon, bool> predicate, bool intern) {
+                            var data = allDatas.Find(data => predicate(data.Item1));
+                            (Pokemon, PokemonForm?, int)? result = data == default ? null : (
+                                data.Item1,
+                                data.Item2.FirstOrDefault(),
                                 formIndex
                             );
 
@@ -364,7 +401,7 @@ public class StaticDataService
                     })];
 
                     var varietyForms = formListData.ToList()
-                        .OfType<(Pokemon, PokemonForm, int)>()
+                        .OfType<(Pokemon, PokemonForm?, int)>()
                         .Select((data) => getVarietyForm(context.Generation(), data.Item1, data.Item2, data.Item3, defaultForm));
 
                     // if (!varietyForms.Any())
@@ -637,7 +674,7 @@ public class StaticDataService
 
                 // if (itemObj == null)
                 // {
-                //     notFound.Add($"{itemId}\t{itemNamePokeapi}");
+                //     Console.WriteLine($"Item not found: {itemId} - {itemNamePokeapi}");
                 // }
 
                 // if (itemNameEn.ToLower().Contains("belt"))
@@ -749,6 +786,17 @@ public class StaticDataService
     {
         var pokeapiName = PokeApiFileClient.PokeApiNameFromPKHexName(pkhexItemName);
 
+        /**
+         * Missing ZA items from pokeapi (may be auto-added later):
+         * - 1592 galarica-wreath -> 1643 no-sprite
+         * - 1582 galarica-cuff -> 1633 no-sprite
+         * - 2570 excadrite
+         * - 2560 victreebelite
+         * - 2564 feraligite
+         * - 2584 zygardite
+         * - 2579 floettite
+         * - 2569 emboarite
+         */
         return pokeapiName switch
         {
             "leek" => "stick",
@@ -903,6 +951,7 @@ public class StaticDataService
             GameVersion.SP => [PokeApi.GetVersion(38)],
             GameVersion.SL => [PokeApi.GetVersion(40)],
             GameVersion.VL => [PokeApi.GetVersion(41)],
+            GameVersion.ZA => [PokeApi.GetVersion(47)],
             #endregion
 
             // The following values are not actually stored values in pk data,

@@ -49,7 +49,8 @@ public class BoxDTO : IWithId<string>
         StorageSlotType.Misc => BoxType.Misc,
         StorageSlotType.Resort => BoxType.Resort,
         StorageSlotType.Ride => BoxType.Ride,
-        _ => throw new NotImplementedException(),
+        StorageSlotType.Shiny => BoxType.Shiny,
+        _ => throw new NotImplementedException(slotType.ToString()),
     };
 }
 
@@ -74,4 +75,7 @@ public enum BoxType : int
     Resort = -7,
     /// <summary> Ride Legendary Slot (S/V) </summary>
     Ride = -8,
+
+    /// <summary> Shiny Overworld Cache </summary>
+    Shiny = -9,
 }

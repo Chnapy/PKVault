@@ -9,7 +9,7 @@ import { theme } from '../../ui/theme';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 
 export type PokedexItemProps = Pick<DexItemProps, 'species'> & {
-  forms: Pick<DexItemForm, 'form' | 'generation' | 'gender' | 'isSeen' | 'isSeenShiny' | 'isCaught' | 'isOwned' | 'isOwnedShiny'>[];
+  forms: Pick<DexItemForm, 'form' | 'context' | 'gender' | 'isSeen' | 'isSeenShiny' | 'isCaught' | 'isOwned' | 'isOwnedShiny'>[];
 };
 
 export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', React.memo(({
@@ -52,7 +52,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
       return null;
     }
 
-    const hasGenderDifferences = staticForms?.[ formGroup[ 0 ].generation ]?.[ formGroup[ 0 ].form ]?.hasGenderDifferences;
+    const hasGenderDifferences = staticForms?.[ formGroup[ 0 ].context ]?.[ formGroup[ 0 ].form ]?.hasGenderDifferences;
     const showGenders = showGendersRaw && hasGenderDifferences;
 
     if (!showForms && !showGenders) {
@@ -61,7 +61,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
       return <DexFormItem
         key={formGroup[ 0 ].form}
         species={species}
-        generation={formGroup[ 0 ].generation}
+        context={formGroup[ 0 ].context}
         form={formGroup[ 0 ].form}
         genders={[ ...new Set(formGroup.map(form => form.gender)) ].sort()}
         seen={forms.some(form => form.isSeen)}
@@ -78,7 +78,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
       return formGroup.map(formItem => <DexFormItem
         key={formItem.gender}
         species={species}
-        generation={formItem.generation}
+        context={formItem.context}
         form={formItem.form}
         genders={[ formItem.gender ]}
         seen={forms.some(form => form.gender === formItem.gender && form.isSeen)}
@@ -95,7 +95,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
       return <DexFormItem
         key={formItem.form}
         species={species}
-        generation={formItem.generation}
+        context={formItem.context}
         form={formItem.form}
         genders={[ ...new Set(formGroup.map(form => form.gender)) ].sort()}
         seen={formGroup.some(form => form.isSeen)}
@@ -109,7 +109,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
     return formGroup.map(formItem => <DexFormItem
       key={`${formItem.form}-${formItem.gender}`}
       species={species}
-      generation={formItem.generation}
+      context={formItem.context}
       form={formItem.form}
       genders={[ formItem.gender ]}
       seen={formItem.isSeen}

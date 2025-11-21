@@ -91,6 +91,7 @@ public abstract class DexGenService<Save> where Save : SaveFile
                 var ownedPkms = pkmList.FindAll(pkm => pkm.Form == form && pkm.Gender == (byte)gender);
                 var itemForm = GetDexItemForm(species, save, ownedPkms, form, gender);
                 // itemForm.FormName = formList[form];
+                itemForm.Context = save.Context;
                 itemForm.Generation = save.Generation;
                 itemForm.Types = [.. itemForm.Types.Distinct().Select(type => (byte)(type + 1))];
                 forms.Add(itemForm);

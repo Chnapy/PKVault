@@ -171,6 +171,7 @@ public class PokeApi
     public static string GetNameForLang(List<Names> names, string lang)
     {
         return names.Find(name => name.Language.Name == lang)?.Name
+            ?? names.Find(name => name.Language.Name == "en")?.Name
             ?? throw new Exception($"Language not handled: {lang}");
     }
 }

@@ -26,6 +26,7 @@ public class DexItemDTO
 public class DexItemForm
 {
     public required byte Form { get; set; }
+    public EntityContext Context { get; set; }
     public byte Generation { get; set; }
     public required Gender Gender { get; set; }
     public required List<byte> Types { get; set; }

@@ -31,6 +31,7 @@ public class SaveInfosDTO
             Id = save.ID32,
             LastWriteTime = lastWriteTime,
             Version = save.Version,
+            Context = save.Context,
             Generation = save.Generation,
             TID = save.DisplayTID,
             SID = save.DisplaySID,
@@ -57,6 +58,8 @@ public class SaveInfosDTO
     public required DateTime LastWriteTime { get; set; }
 
     public required GameVersion Version { get; set; }
+
+    public required EntityContext Context { get; set; }
 
     public required byte Generation { get; set; }
 

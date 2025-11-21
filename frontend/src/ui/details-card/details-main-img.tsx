@@ -1,4 +1,5 @@
 import type React from 'react';
+import type { EntityContext } from '../../data/sdk/model';
 import { Icon } from '../icon/icon';
 import { theme } from '../theme';
 import { ItemImg } from './item-img';
@@ -6,7 +7,7 @@ import { SpeciesImg } from './species-img';
 
 export type DetailsMainImgProps = {
     species: number;
-    generation: number;
+    context: EntityContext;
     form: number;
     isFemale?: boolean;
     isShiny?: boolean;
@@ -18,7 +19,7 @@ export type DetailsMainImgProps = {
     genderPart: React.ReactNode;
 };
 
-export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, generation, form, isFemale, isShiny, isEgg, isShadow, isOwned, ball = 0, shinyPart, genderPart }) => {
+export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, context, form, isFemale, isShiny, isEgg, isShadow, isOwned, ball = 0, shinyPart, genderPart }) => {
     return <>
         <div
             style={{
@@ -26,7 +27,7 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, generat
                 borderRadius: 8,
             }}
         >
-            <SpeciesImg species={species} generation={generation} form={form} isFemale={isFemale} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} />
+            <SpeciesImg species={species} context={context} form={form} isFemale={isFemale} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} />
         </div>
 
         <div

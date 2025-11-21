@@ -41,6 +41,7 @@ export const theme = {
     saphir: "#104070",
     emerald: "#457865",
     ruby: "#781810",
+    za: "#32796B",
   },
   font: {
     default: "Pixel Operator",

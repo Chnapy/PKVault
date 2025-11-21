@@ -56,7 +56,7 @@ export const PokedexDetails: React.FC = () => {
     (value) => value.saveId === selectedSave.id
   )!;
 
-  const staticForms = selectedSpecies && selectedSave ? staticData.species[ selectedSpecies ]?.forms[ selectedSave.generation ] ?? [] : [];
+  const staticForms = selectedSpecies && selectedSave ? staticData.species[ selectedSpecies ]?.forms[ selectedSave.context ] ?? [] : [];
   const staticFormsFiltered = staticForms
     .map((staticForm, index) => ({ ...staticForm, index }))
     .filter(staticForm => !staticForm.isBattleOnly);
@@ -154,7 +154,7 @@ export const PokedexDetails: React.FC = () => {
         mainImg={
           <DetailsMainImg
             species={selectedSpecies}
-            generation={selectedSave.generation}
+            context={selectedSave.context}
             form={selectedFormIndex}
             isFemale={selectedGender === GenderType.Female}
             isOwned={owned}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Gender as GenderType } from '../../data/sdk/model';
+import { EntityContext, Gender as GenderType } from '../../data/sdk/model';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useStaticData } from '../../hooks/use-static-data';
 import { ItemImg } from '../details-card/item-img';
@@ -23,7 +23,7 @@ export type DexItemProps = {
 
 export const DexFormItem: React.FC<{
   species: number;
-  generation: number;
+  context: EntityContext;
   form: number;
   genders: GenderType[];
   seen: boolean;
@@ -31,7 +31,7 @@ export const DexFormItem: React.FC<{
   caught: boolean;
   owned: boolean;
   ownedShiny: boolean;
-}> = withErrorCatcher('item', ({ species, generation, form, genders, seen, caught, owned, ownedShiny }) => {
+}> = withErrorCatcher('item', ({ species, context, form, genders, seen, caught, owned, ownedShiny }) => {
   const staticData = useStaticData();
 
   // const caughtGamesColors = [ ...new Set(caughtVersions.map(getGameInfos).map(infos => infos.img)) ];
@@ -90,7 +90,7 @@ export const DexFormItem: React.FC<{
           borderRadius: 2,
         }}
       >
-        <SpeciesImg species={species} generation={generation} form={form} isFemale={genders[ 0 ] == GenderType.Female} style={{
+        <SpeciesImg species={species} context={context} form={form} isFemale={genders[ 0 ] == GenderType.Female} style={{
           filter: seen ? undefined : "brightness(0) opacity(0.5)",
         }} />
       </div>

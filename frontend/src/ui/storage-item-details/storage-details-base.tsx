@@ -22,7 +22,7 @@ import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
-    | 'id' | 'idBase' | 'pid' | 'species' | 'version' | 'generation' | 'form' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
+    | 'id' | 'idBase' | 'pid' | 'species' | 'version' | 'context' | 'generation' | 'form' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
     | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
@@ -41,7 +41,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
     const moveContext = StorageMoveContext.useValue();
 
     const staticData = useStaticData();
-    const staticForms = staticData.species[ pkm.species ]?.forms[ pkm.generation ];
+    const staticForms = staticData.species[ pkm.species ]?.forms[ pkm.context ];
 
     const navigate = Route.useNavigate();
 
@@ -60,7 +60,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
         mainImg={
             <DetailsMainImg
                 species={pkm.species}
-                generation={pkm.generation}
+                context={pkm.context}
                 form={pkm.form}
                 isFemale={pkm.gender == GenderType.Female}
                 isShiny={pkm.isShiny}

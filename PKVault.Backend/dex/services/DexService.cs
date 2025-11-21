@@ -54,6 +54,7 @@ public class DexService
             SAV8BS bs => new Dex8BSService().UpdateDexWithSave(dex, bs, staticData),
             SAV8LA la => new Dex8LAService().UpdateDexWithSave(dex, la, staticData),
             SAV9SV sv => new Dex9SVService().UpdateDexWithSave(dex, sv, staticData),
+            SAV9ZA za => new Dex9ZAService().UpdateDexWithSave(dex, za, staticData),
             _ => notHandled(save),
         };
 
