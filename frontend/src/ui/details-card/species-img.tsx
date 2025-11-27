@@ -29,11 +29,15 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, 
         return null;
     }
 
-    const { name, spriteDefault, spriteFemale, spriteShiny, spriteShinyFemale } = staticForm;
+    const { name, spriteDefault, spriteFemale, spriteShiny, spriteShinyFemale, spriteShadow } = staticForm;
 
     const getSpriteUrl = (): string | null => {
         if (isEgg) {
             return staticData.eggSprite;
+        }
+
+        if (isShadow && spriteShadow) {
+            return spriteShadow;
         }
 
         if (isShiny) {

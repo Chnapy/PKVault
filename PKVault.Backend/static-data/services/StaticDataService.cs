@@ -221,6 +221,9 @@ public class StaticDataService
                         SpriteFemale = spriteFemale,
                         SpriteShiny = spriteShiny,
                         SpriteShinyFemale = spriteShinyFemale,
+                        SpriteShadow = generation == 3 && species == (ushort)Species.Lugia
+                            ? GetLugiaShadowSprite()
+                            : null,
                         HasGenderDifferences = hasGenderDifferences,
                         IsBattleOnly = battleOnly,
                     };
@@ -780,6 +783,11 @@ public class StaticDataService
     public static string GetEggSprite()
     {
         return GetPokeapiRelativePath("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png");
+    }
+
+    public static string GetLugiaShadowSprite()
+    {
+        return $"custom-sprites/pokemon/shadow/{(ushort)Species.Lugia}.png";
     }
 
     public static string GetPokeapiItemName(string pkhexItemName)

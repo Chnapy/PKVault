@@ -8,6 +8,7 @@ using SixLabors.ImageSharp.Processing;
 public class GenSpritesheet
 {
     private static readonly string SourcePath = "../pokeapi/sprites";
+    private static readonly string CustomSourcePath = "./pokeapi/spritesheet";
     private static readonly string TargetPath = Path.Combine([.. StaticDataService.GetGeneratedPathParts(), "sheets"]);
 
     public static async Task<StaticSpritesheets> GenerateAllSpritesheets(
@@ -44,7 +45,8 @@ public class GenSpritesheet
                             form.SpriteDefault,
                             form.SpriteFemale,
                             form.SpriteShiny,
-                            form.SpriteShinyFemale
+                            form.SpriteShinyFemale,
+                            form.SpriteShadow,
                         }
                         .OfType<string>()
                     ))
@@ -83,7 +85,9 @@ public class GenSpritesheet
         // Download sprites
         foreach (var url in urls)
         {
-            var finalUrl = Path.Combine(SourcePath, url);
+            var finalUrl = url.StartsWith("custom-sprites")
+                ? Path.Combine(CustomSourcePath, url)
+                : Path.Combine(SourcePath, url);
             try
             {
                 using var fileStream = File.OpenRead(finalUrl);
