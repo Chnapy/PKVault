@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using PKHeX.Core;
 
 namespace PKVault.Backend;
 
@@ -48,6 +49,9 @@ public class Program
         var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
         LogUtil.Initialize();
+
+        // required for GB legality
+        ParseSettings.InitFromSaveFileData(FakeSaveFile.Default);
 
         // if (args.Length > 0 && args[0] == "test-PB7")
         // {

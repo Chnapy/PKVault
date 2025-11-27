@@ -294,7 +294,19 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     {
         get
         {
-            return new LegalityAnalysis(Pkm).Report();
+            var la = new LegalityAnalysis(Pkm, FakeSaveFile.Default.Personal);
+
+            try
+            {
+                return la.Report(
+                    SettingsService.AppSettings.GetSafeLanguage()
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+                return ex.ToString();
+            }
         }
     }
 
