@@ -39,10 +39,23 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public byte Form
     {
-        get
+        get => GetForm(Pkm);
+    }
+
+    public static byte GetForm(PKM pkm)
+    {
+        if (pkm.Species == (ushort)PKHeX.Core.Species.Alcremie)
         {
-            return Pkm.Form;
+            if (pkm is PK8 pk8)
+            {
+                return (byte)(pkm.Form * 7 + pk8.FormArgument);
+            }
+            else if (pkm is PK9 pk9)
+            {
+                return (byte)(pkm.Form * 7 + pk9.FormArgument);
+            }
         }
+        return pkm.Form;
     }
 
     // public string SpeciesName

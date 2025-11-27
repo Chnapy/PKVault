@@ -13,13 +13,17 @@ public class Dex9SVService : DexGenService<SAV9SV>
         bool isSeenShiny;
         bool isCaught;
 
+        byte formToUse = species == (ushort)Species.Alcremie
+            ? (byte)(form / 7)
+            : form;
+
         if (save.SaveRevision == 0)
         // paldea
         {
             var dex = save.Zukan.DexPaldea;
             var entry = dex.Get(species);
 
-            var isFormSeen = entry.GetIsFormSeen(form);
+            var isFormSeen = entry.GetIsFormSeen(formToUse);
 
             var isSeenM = entry.GetIsGenderSeen(0) || entry.GetIsGenderSeen(2);
             var isSeenF = entry.GetIsGenderSeen(1);
@@ -34,8 +38,8 @@ public class Dex9SVService : DexGenService<SAV9SV>
             var dex = save.Zukan.DexKitakami;
             var entry = dex.Get(species);
 
-            var isFormSeen = entry.GetSeenForm(form);
-            var isFormCaught = entry.GetObtainedForm(form);
+            var isFormSeen = entry.GetSeenForm(formToUse);
+            var isFormCaught = entry.GetObtainedForm(formToUse);
 
             var isSeenM = entry.GetIsGenderSeen(0) || entry.GetIsGenderSeen(2);
             var isSeenF = entry.GetIsGenderSeen(1);
