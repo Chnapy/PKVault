@@ -21,7 +21,8 @@ public class MatcherUtil
         // starts with / or \ or x:
         static bool isAbsolute(string glob) => glob.Length > 0 && (glob[0] == '/' || glob[0] == '\\' || (glob.Length > 2 && glob[1] == ':'));
 
-        var absoluteGlobs = globs.FindAll(isAbsolute).Select(glob => glob.Length > 2 && glob[1] == ':' ? glob[2..] : glob);
+        var absoluteGlobs = globs.FindAll(isAbsolute).FindAll(glob => glob.Length <= 1 || glob[1] != ':');
+        var driveGlobs = globs.FindAll(isAbsolute).FindAll(glob => glob.Length > 1 && glob[1] == ':');
         var relativeGlobs = globs.FindAll(glob => !isAbsolute(glob));
 
         var absoluteMatcher = new Matcher();
@@ -31,12 +32,26 @@ public class MatcherUtil
 
         // Console.WriteLine($"ABSOLUTE:\n{string.Join('\n', absoluteGlobs)}---Results:\n{string.Join('\n', absoluteResults)}");
 
+        var driveLetters = driveGlobs.Select(glob => glob.ToUpper()[0]).Distinct().ToList();
+        var driveResults = driveLetters.SelectMany(drive =>
+        {
+            var matcher = new Matcher();
+            driveGlobs.ToList()
+                .FindAll(glob => glob.StartsWith(drive))
+                .ForEach(glob => matcher.AddInclude(glob[3..]));
+            var prefix = $"{drive}:/";
+            var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(prefix)));
+            var results = matches.Files.Select(file => Path.Combine(prefix, file.Path));
+
+            return results;
+        });
+
         var relativeMatcher = new Matcher();
         relativeGlobs.ToList().ForEach(glob => relativeMatcher.AddInclude(glob));
         var relativeMatches = relativeMatcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(".")));
         var relativeResults = relativeMatches.Files.Select(file => Path.Combine(".", file.Path));
 
-        string[] results = [.. absoluteResults, .. relativeResults, .. networkGlobs];
+        string[] results = [.. absoluteResults, .. driveResults, .. relativeResults, .. networkGlobs];
 
         if (results.Length > 200)
         {
