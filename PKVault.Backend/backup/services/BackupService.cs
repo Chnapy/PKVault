@@ -146,7 +146,7 @@ public class BackupService
 
     private static string NormalizePath(string path) => MatcherUtil.NormalizePath(path);
 
-    private static string SerializeDateTime(DateTime dateTime)
+    public static string SerializeDateTime(DateTime dateTime)
     {
         return dateTime.ToString(dateTimeFormat);
     }

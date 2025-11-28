@@ -41,9 +41,12 @@ public partial class ExceptionHandlingMiddleware
         context.Response.ContentType = "application/json";
 
         context.Response.Headers.Append("access-control-expose-headers", new StringValues(["error-message", "error-stack"]));
-        context.Response.Headers.Append("error-message", InvalidCharacterRegex().Replace(ex.Message, string.Empty));
-        context.Response.Headers.Append("error-stack", InvalidCharacterRegex().Replace(ex.ToString(), string.Empty));
-
+        context.Response.Headers.Append("error-message", JsonSerializer.Serialize(
+            InvalidCharacterRegex().Replace(ex.Message, "\n").Replace("\n\n", "\n")
+        ));
+        context.Response.Headers.Append("error-stack", JsonSerializer.Serialize(
+            InvalidCharacterRegex().Replace(ex.ToString(), "\n").Replace("\n\n", "\n")
+        ));
         if (data != null)
         {
             var result = JsonSerializer.Serialize(data, RouteJsonContext.Default.DataDTO);

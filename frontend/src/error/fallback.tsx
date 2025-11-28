@@ -37,7 +37,8 @@ export const Fallback = {
                     href="https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app"
                     target="_blank"
                     style={{ color: theme.text.primaryLight, whiteSpace: 'nowrap' }}
-                >projectpokemon discussion</a>.
+                >projectpokemon discussion</a>.<br />
+                Also consider sharing files from folder `logs`.
             </div>
 
             <pre
@@ -50,6 +51,7 @@ export const Fallback = {
                     marginTop: 8,
                     fontSize: 12,
                     backgroundColor: 'rgba(0, 0, 0, .25)',
+                    whiteSpace: 'pre-wrap',
                 }}
             >
                 ErrorType={error?.constructor?.name}<br />

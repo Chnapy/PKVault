@@ -15,7 +15,14 @@ public class Program
         SetupTask ??= Task.Run(async () =>
             {
                 StorageService.CleanWrongData();
-                LocalSaveService.ReadLocalSaves();
+                try
+                {
+                    LocalSaveService.ReadLocalSaves();
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex);
+                }
                 await StorageService.ResetDataLoader(true);
                 await WarningsService.CheckWarnings();
             });
@@ -25,6 +32,8 @@ public class Program
 
     public static async Task Main(string[] args)
     {
+        LogUtil.Initialize();
+
         Copyright();
         var setupDone = await SetupData(args);
 
@@ -33,6 +42,8 @@ public class Program
             var app = PrepareWebApp(5000);
             await app.RunAsync();
         }
+
+        LogUtil.Dispose();
     }
 
     public static void Copyright()
@@ -41,14 +52,13 @@ public class Program
         + "\nThis program comes with ABSOLUTELY NO WARRANTY."
         + "\nThis is free software, and you are welcome to redistribute it under certain conditions."
         + "\nFull license can be accessed here: https://github.com/Chnapy/PKVault/blob/main/LICENSE"
-        + $"\nPKVault BuildID = {SettingsService.AppSettings.BuildID}\n");
+        + $"\nPKVault v{SettingsService.AppSettings.Version} BuildID = {SettingsService.AppSettings.BuildID}"
+        + $"\nCurrent time UTC = {DateTime.UtcNow}\n");
     }
 
     public static async Task<bool> SetupData(string[] args)
     {
         var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
-
-        LogUtil.Initialize();
 
         // required for GB legality
         ParseSettings.InitFromSaveFileData(FakeSaveFile.Default);

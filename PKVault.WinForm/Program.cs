@@ -25,5 +25,7 @@ public static class Program
 #if DEBUG
                 NativeMethods.FreeConsole();
 #endif
+
+                LogUtil.Dispose();
         }
 }

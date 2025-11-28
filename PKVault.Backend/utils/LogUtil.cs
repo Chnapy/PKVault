@@ -5,9 +5,39 @@ public class LogUtil
 {
     private static readonly string stopwatchEmoji = char.ConvertFromUtf32(0x23F1) + char.ConvertFromUtf32(0xFE0F) + " ";
 
+    private static StreamWriter? logWriter;
+
     public static void Initialize()
     {
+        if (logWriter != null)
+        {
+            return;
+        }
+
         Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+        Directory.CreateDirectory("logs");
+
+        logWriter = new StreamWriter($"logs/pkvault-{BackupService.SerializeDateTime(DateTime.UtcNow)}.log", append: true)
+        {
+            AutoFlush = true
+        };
+
+        var consoleOut = Console.Out;
+        var consoleErr = Console.Error;
+
+        var dualOut = new DualWriter(consoleOut, logWriter);
+        var dualErr = new DualWriter(consoleErr, logWriter);
+
+        Console.SetOut(dualOut);
+        Console.SetError(dualErr);
+    }
+
+    public static void Dispose()
+    {
+        Console.WriteLine("Log file gracefully disposed.");
+        logWriter?.Dispose();
+        logWriter = null;
     }
 
     public static Func<long> Time(string message)

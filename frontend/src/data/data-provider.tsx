@@ -41,8 +41,8 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
           const errorStack = data.headers.get('error-stack');
           if (errorMessage) {
             backendErrors.addError({
-              message: errorMessage,
-              stack: errorStack!,
+              message: errorMessage && JSON.parse(errorMessage),
+              stack: errorStack && JSON.parse(errorStack),
               status: data.status,
             });
           }

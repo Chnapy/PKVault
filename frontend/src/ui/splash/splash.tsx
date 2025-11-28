@@ -11,6 +11,7 @@ export const Splash: React.FC<React.PropsWithChildren> = ({ children }) => <div
         alignItems: 'center',
         justifyContent: 'center',
         gap: 16,
+        padding: 16,
     }}
 >
     <img
@@ -21,7 +22,7 @@ export const Splash: React.FC<React.PropsWithChildren> = ({ children }) => <div
         }}
     />
 
-    {children && <Container padding='big'>
+    {children && <Container padding='big' style={{ maxWidth: '100%' }}>
         {children}
     </Container>}
 </div>;
