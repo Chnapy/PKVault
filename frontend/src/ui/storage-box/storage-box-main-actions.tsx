@@ -48,7 +48,7 @@ export const StorageBoxMainActions: React.FC<
         return pkmVersions.some(pkmVersion => {
             const staticEvolves = staticData.evolves[ pkmVersion.species ];
             const evolveSpecies = staticEvolves?.trade[ pkmVersion.version ] ?? staticEvolves?.tradeWithItem[ pkmVersion.heldItemPokeapiName ?? '' ]?.[ pkmVersion.version ];
-            return !!evolveSpecies;
+            return !!evolveSpecies && pkmVersion.level >= evolveSpecies.minLevel;
         });
     });
 

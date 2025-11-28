@@ -41,7 +41,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
         return null;
     }
 
-    const { species, context, form, gender, isShiny, compatibleWithVersions } = pkmVersions[ 0 ];
+    const { species, context, form, gender, isShiny, compatibleWithVersions, level } = pkmVersions[ 0 ];
 
     const hasSaveHeldItems = pageSaves.some(pageSave => pkmVersions.find((version) => version.generation === pageSave.generation)?.heldItem);
     const heldItem = hasSaveHeldItems ? pkmVersions.find((version) => version.id === pkmId)?.heldItem : undefined;
@@ -66,7 +66,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
     const canEvolve = !pkm.saveId && pkmVersions.some(pkmVersion => {
         const staticEvolves = staticData.evolves[ pkmVersion.species ];
         const evolveSpecies = staticEvolves?.trade[ pkmVersion.version ] ?? staticEvolves?.tradeWithItem[ pkmVersion.heldItemPokeapiName ?? '' ]?.[ pkmVersion.version ];
-        return !!evolveSpecies;
+        return !!evolveSpecies && level >= evolveSpecies.minLevel;
     });
     const canDetach = !!pkm.saveId;
     const canSynchronize = !!pkm.saveId && !!attachedPkmVersion && !saveSynchronized;

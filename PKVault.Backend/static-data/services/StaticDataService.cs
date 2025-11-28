@@ -724,11 +724,6 @@ public class StaticDataService
 
                 evolveTo.EvolutionDetails.ForEach(details =>
                 {
-                    if (details.Trigger.Name != "trade")
-                    {
-                        return;
-                    }
-
                     foreach (var version in Enum.GetValues<GameVersion>())
                     {
                         if (version.GetContext() == EntityContext.None)
@@ -744,9 +739,19 @@ public class StaticDataService
                             continue;
                         }
 
+                        if (species == (ushort)Species.Finizen && details.Trigger.Name == "other")
+                        {
+                            speciesEvolve.Trade.Add((byte)version, new(evolveSpecies, details.MinLevel ?? 1));
+                        }
+
+                        if (details.Trigger.Name != "trade")
+                        {
+                            continue;
+                        }
+
                         if (details.HeldItem == null)
                         {
-                            speciesEvolve.Trade.Add((byte)version, evolveSpecies);
+                            speciesEvolve.Trade.Add((byte)version, new(evolveSpecies, details.MinLevel ?? 1));
                             // Console.WriteLine($"EVOLVE TRADE {species}->{evolveSpecies} v={version}");
                         }
                         else
@@ -756,7 +761,7 @@ public class StaticDataService
                                 versionTradeDict = [];
                                 speciesEvolve.TradeWithItem.Add(details.HeldItem.Name, versionTradeDict);
                             }
-                            versionTradeDict.Add((byte)version, evolveSpecies);
+                            versionTradeDict.Add((byte)version, new(evolveSpecies, details.MinLevel ?? 1));
                             // Console.WriteLine($"EVOLVE TRADE {species}->{evolveSpecies} item={details.HeldItem.Name} v={version}");
                         }
                     }

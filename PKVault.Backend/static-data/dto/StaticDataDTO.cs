@@ -102,11 +102,13 @@ public struct StaticItem
 
 public struct StaticEvolve
 {
+    public record StaticEvolveItem(ushort EvolveSpecies, int MinLevel);
+
     public required ushort Species { get; set; }
-    // version -> evolved species
-    public required Dictionary<byte, ushort> Trade { get; set; }
-    // item -> version -> evolved species
-    public required Dictionary<string, Dictionary<byte, ushort>> TradeWithItem { get; set; }
+    // version -> (evolved species, min-level)
+    public required Dictionary<byte, StaticEvolveItem> Trade { get; set; }
+    // item -> version -> (evolved species, min-level)
+    public required Dictionary<string, Dictionary<byte, StaticEvolveItem>> TradeWithItem { get; set; }
 }
 
 public record StaticSpritesheets

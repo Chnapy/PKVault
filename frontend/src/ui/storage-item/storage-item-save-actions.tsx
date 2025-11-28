@@ -44,7 +44,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
     const attachedPkmVersion = selectedPkm.pkmVersionId ? mainPkmVersionQuery.data?.data.find(version => version.id === selectedPkm.pkmVersionId) : undefined;
     const attachedPkm = attachedPkmVersion && mainPkmQuery.data?.data.find(pkm => pkm.id === attachedPkmVersion.pkmId);
 
-    const canEvolve = !selectedPkm.pkmVersionId && !!evolveSpecies;
+    const canEvolve = !selectedPkm.pkmVersionId && !!evolveSpecies && selectedPkm.level >= evolveSpecies.minLevel;
     const canDetach = !!selectedPkm.pkmVersionId;
     const canGoToMain = !!selectedPkm.pkmVersionId;
     const canRemovePkm = selectedPkm.canDelete;

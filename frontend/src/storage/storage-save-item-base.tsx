@@ -30,7 +30,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
         return null;
     }
 
-    const { species, version, form, gender, isShiny, isEgg, isShadow, heldItemPokeapiName } = savePkm;
+    const { species, version, form, gender, isShiny, isEgg, isShadow, heldItemPokeapiName, level } = savePkm;
 
     const staticEvolves = staticData.evolves[ species ];
     const evolveSpecies = staticEvolves?.trade[ version ] ?? staticEvolves?.tradeWithItem[ heldItemPokeapiName ?? '' ]?.[ version ];
@@ -40,7 +40,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
     const saveSynchronized = savePkm.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
     const canMoveAttached = !savePkm.pkmVersionId && !isEgg && !isShadow;
-    const canEvolve = !savePkm.pkmVersionId && !!evolveSpecies;
+    const canEvolve = !savePkm.pkmVersionId && !!evolveSpecies && level >= evolveSpecies.minLevel;
     const canDetach = !!savePkm.pkmVersionId;
     const canSynchronize = !!savePkm.pkmVersionId && !!attachedPkmVersion && !saveSynchronized;
 

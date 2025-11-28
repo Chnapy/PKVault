@@ -58,7 +58,7 @@ export const StorageItemMainActions: React.FC = () => {
     const pkmVersionCanEvolve = pkmVersions.find(pkmVersion => {
         const staticEvolves = staticData.evolves[ pkmVersion.species ];
         const evolveSpecies = staticEvolves?.trade[ pkmVersion.version ] ?? staticEvolves?.tradeWithItem[ pkmVersion.heldItemPokeapiName ?? '' ]?.[ pkmVersion.version ];
-        return !!evolveSpecies;
+        return !!evolveSpecies && pkmVersion.level >= evolveSpecies.minLevel;
     });
 
     const canCreateVersions = selectedPkm.saveId

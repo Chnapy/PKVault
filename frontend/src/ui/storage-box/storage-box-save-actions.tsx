@@ -45,7 +45,7 @@ export const StorageBoxSaveActions: React.FC<
 
         const staticEvolves = staticData.evolves[ pkm.species ];
         const evolveSpecies = staticEvolves?.trade[ pkm.version ] ?? staticEvolves?.tradeWithItem[ pkm.heldItemPokeapiName ?? '' ]?.[ pkm.version ];
-        return !!evolveSpecies;
+        return !!evolveSpecies && pkm.level >= evolveSpecies.minLevel;
     });
 
     const canDetachPkms = pkms

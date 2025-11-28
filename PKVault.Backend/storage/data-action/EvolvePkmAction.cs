@@ -42,6 +42,8 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
 
         var (evolveSpecies, evolveByItem) = await GetEvolve(dto);
 
+        Console.WriteLine($"Evolve from {oldSpecies} to {evolveSpecies} using item? {evolveByItem}");
+
         saveLoaders.Pkms.DeleteDto(dto.Id);
 
         UpdatePkm(dto.Pkm, evolveSpecies, evolveByItem);
@@ -139,15 +141,21 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
         {
             if (dto.HeldItemPokeapiName != null && staticEvolve.TradeWithItem.TryGetValue(dto.HeldItemPokeapiName, out var evolveMap))
             {
-                if (evolveMap.TryGetValue((byte)dto.Version, out var evolvedSpeciesWithItem))
+                if (
+                    evolveMap.TryGetValue((byte)dto.Version, out var evolvedSpeciesWithItem)
+                    && dto.Level >= evolvedSpeciesWithItem.MinLevel
+                )
                 {
-                    return ((ushort)evolvedSpeciesWithItem, true);
+                    return (evolvedSpeciesWithItem.EvolveSpecies, true);
                 }
             }
 
-            if (staticEvolve.Trade.TryGetValue((byte)dto.Version, out var evolvedSpecies))
+            if (
+                staticEvolve.Trade.TryGetValue((byte)dto.Version, out var evolvedSpecies)
+                && dto.Level >= evolvedSpecies.MinLevel
+            )
             {
-                return ((ushort)evolvedSpecies, false);
+                return (evolvedSpecies.EvolveSpecies, false);
             }
         }
 
@@ -157,6 +165,11 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
     private static void UpdatePkm(PKM pkm, ushort evolveSpecies, bool evolveByItem)
     {
         // Console.WriteLine($"EVOLVE TO {evolveSpecies}");
+
+        if (evolveSpecies == 0)
+        {
+            throw new Exception($"Evolve species not defined");
+        }
 
         var currentNickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, pkm.Language, pkm.Format);
         var isNicknamed = pkm.IsNicknamed && !pkm.Nickname.Equals(currentNickname, StringComparison.InvariantCultureIgnoreCase);
