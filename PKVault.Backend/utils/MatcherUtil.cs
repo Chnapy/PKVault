@@ -53,11 +53,6 @@ public class MatcherUtil
 
         string[] results = [.. absoluteResults, .. driveResults, .. relativeResults, .. networkGlobs];
 
-        if (results.Length > 200)
-        {
-            throw new ArgumentException($"Too much results ({results.Length}) for given globs");
-        }
-
         return [.. results.Select(NormalizePath)];
     }
 

@@ -16,7 +16,14 @@ public class SettingsController : ControllerBase
     [HttpGet("test-save-globs")]
     public ActionResult<List<string>> GetSaveGlobsResults([FromQuery] string[] globs)
     {
-        return MatcherUtil.SearchPaths(globs);
+        var results = MatcherUtil.SearchPaths(globs);
+
+        if (results.Count > 200)
+        {
+            throw new ArgumentException($"Too much results ({results.Count}) for given globs");
+        }
+
+        return results;
     }
 
     [HttpPost]
