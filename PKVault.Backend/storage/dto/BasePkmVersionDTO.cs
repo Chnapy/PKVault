@@ -76,6 +76,21 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return Pkm.IsShiny; }
     }
 
+    public bool IsAlpha
+    {
+        get => Pkm is IAlpha pka && pka.IsAlpha;
+    }
+
+    public bool IsNoble
+    {
+        get => Pkm is INoble pkn && pkn.IsNoble;
+    }
+
+    public bool CanGigantamax
+    {
+        get => Pkm is IGigantamaxReadOnly pkg && pkg.CanGigantamax;
+    }
+
     public int Ball => StaticDataService.GetBallPokeApiId((Ball)Pkm.Ball);
 
     public PKHeX.Core.Gender Gender { get => (PKHeX.Core.Gender)Pkm.Gender; }
