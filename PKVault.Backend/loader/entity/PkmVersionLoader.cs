@@ -10,7 +10,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
     public PkmVersionLoader(
         PkmLoader _pkmLoader
     ) : base(
-        filePath: Path.Combine(SettingsService.AppSettings.GetDBPath(), "pkm-version.json"),
+        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.AppSettings.SettingsMutable.DB_PATH, "pkm-version.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringPkmVersionEntity
     )
     {
@@ -129,7 +129,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         return dto.PkmVersionEntity;
     }
 
-    private PKM GetPkmVersionEntityPkm(PkmVersionEntity entity)
+    public PKM GetPkmVersionEntityPkm(PkmVersionEntity entity)
     {
         var pkmBytes = pkmFileLoader.GetEntity(entity.Filepath)
             ?? throw new Exception($"PKM bytes is null, from entity Id={entity.Id} Filepath={entity.Filepath}");

@@ -125,7 +125,7 @@ public class LocalSaveService
             var mainSave = SaveByPath[mainPath];
             var mainSaveLastWriteTime = File.GetLastWriteTime(mainPath);
 
-            record.Add(mainSave.ID32, SaveInfosDTO.FromSave(mainSave, mainSaveLastWriteTime));
+            record.TryAdd(mainSave.ID32, SaveInfosDTO.FromSave(mainSave, mainSaveLastWriteTime));
         });
 
         return record;

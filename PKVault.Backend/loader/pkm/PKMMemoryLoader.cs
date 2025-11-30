@@ -102,4 +102,19 @@ public class PKMMemoryLoader : PKMLoader
             }
         }
     }
+
+    // public void Log()
+    // {
+    //     foreach (var action in actions)
+    //     {
+    //         if (action.Create)
+    //         {
+    //             Console.WriteLine($"CREATE {action.Path}");
+    //         }
+    //         else
+    //         {
+    //             Console.WriteLine($"DELETE {action.Path}");
+    //         }
+    //     }
+    // }
 }

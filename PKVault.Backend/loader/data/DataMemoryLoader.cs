@@ -2,8 +2,6 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
 {
     public static DataMemoryLoader Create()
     {
-        var dbDir = SettingsService.AppSettings.GetDBPath();
-
         var boxLoader = new BoxLoader();
         if (boxLoader.GetAllEntities().Count == 0)
         {

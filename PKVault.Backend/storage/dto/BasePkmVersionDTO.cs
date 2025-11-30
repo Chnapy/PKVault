@@ -322,10 +322,18 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     public static string GetPKMIdBase(PKM pkm)
     {
         var hash = SearchUtil.HashByDetails(pkm);
-        var id = $"G{pkm.Format}{hash}";
+        var id = $"G{pkm.Format}_{hash}_{pkm.TID16}";   // note: SID not stored by pk files
 
         return id;
     }
+
+    // public static string GetOldPKMIdBase(PKM pkm)
+    // {
+    //     var hash = SearchUtil.HashByDetails(pkm);
+    //     var id = $"G{pkm.Format}{hash}";
+
+    //     return id;
+    // }
 }
 
 public struct MoveItem

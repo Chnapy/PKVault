@@ -292,7 +292,7 @@ public class BackupService
 
     private static string GetBackupsPath()
     {
-        var backupPath = SettingsService.AppSettings.GetBackupPath();
+        var backupPath = SettingsService.AppSettings.SettingsMutable.BACKUP_PATH;
         Directory.CreateDirectory(backupPath);
         return backupPath;
     }

@@ -1,7 +1,7 @@
 public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>
 {
     public BoxLoader() : base(
-        filePath: Path.Combine(SettingsService.AppSettings.GetDBPath(), "box.json"),
+        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.AppSettings.SettingsMutable.DB_PATH, "box.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringBoxEntity
     )
     {

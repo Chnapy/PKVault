@@ -306,6 +306,76 @@ public class StorageService
         var pkmLoader = new PkmLoader();
         var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
 
+        /**
+         * Convert entities with old/wrong ID format to new one.
+         * It checks:
+         * - pkm-version entity ID
+         * - pkm entity ID
+         * - pk filenames
+         */
+        pkmLoader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
+        {
+            var pkmVersions = pkmVersionLoader.GetEntitiesByPkmId(pkmEntity.Id).Values.ToList();
+
+            pkmVersions.ForEach(pkmVersionEntity =>
+            {
+                try
+                {
+                    var pkmBytes = File.ReadAllBytes(pkmVersionEntity.Filepath);
+                    var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
+
+                    var oldId = pkmVersionEntity.Id;
+                    var expectedId = BasePkmVersionDTO.GetPKMIdBase(pkm);
+
+                    var oldPkmId = pkmVersionEntity.PkmId;
+
+                    var oldFilepath = pkmVersionEntity.Filepath;
+                    var expectedFilepath = PKMLoader.GetPKMFilepath(pkm);
+                    if (expectedId != oldId)
+                    {
+                        // must be done first
+                        pkmVersionLoader.DeleteEntity(oldId);
+
+                        // update pkm-entity id if main version
+                        if (oldPkmId == oldId)
+                        {
+                            pkmEntity.Id = expectedId;
+                            pkmLoader.DeleteEntity(oldId);
+                            pkmLoader.WriteEntity(pkmEntity);
+                        }
+
+                        // update pk file
+                        if (expectedFilepath != oldFilepath)
+                        {
+                            if (File.Exists(oldFilepath))
+                            {
+                                Console.WriteLine($"Copy {oldFilepath} to {expectedFilepath}");
+                                File.Copy(oldFilepath, expectedFilepath, true);
+                            }
+                            pkmVersionEntity.Filepath = expectedFilepath;
+                        }
+
+                        // update pkm-version-entity id
+                        pkmVersionEntity.Id = expectedId;
+                        pkmVersionLoader.WriteEntity(pkmVersionEntity);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex);
+                }
+            });
+
+            pkmVersions.ForEach(pkmVersionEntity =>
+            {
+                if (pkmVersionEntity.PkmId != pkmEntity.Id)
+                {
+                    pkmVersionEntity.PkmId = pkmEntity.Id;
+                    pkmVersionLoader.WriteEntity(pkmVersionEntity);
+                }
+            });
+        });
+
         // remove pkmVersions with inconsistent data
         pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
         {
@@ -324,16 +394,18 @@ public class StorageService
                 }
                 else
                 {
-                    byte[]? pkmBytes = null;
+                    PKM? pkm = null;
                     try
                     {
-                        pkmBytes = pkmVersionLoader.pkmFileLoader.GetEntity(pkmVersionEntity.Filepath);
+                        var pkmBytes = File.ReadAllBytes(pkmVersionEntity.Filepath);
+                        pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
                     }
                     catch (Exception ex)
                     {
+                        Console.Error.WriteLine($"Path = {pkmVersionEntity.Filepath}");
                         Console.Error.WriteLine(ex);
                     }
-                    if (pkmBytes == null)
+                    if (pkm == null)
                     {
                         deleted = pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
                     }

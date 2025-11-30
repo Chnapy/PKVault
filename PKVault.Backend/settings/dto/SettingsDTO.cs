@@ -23,9 +23,7 @@ public class SettingsDTO
 
     public required SettingsMutableDTO SettingsMutable { get; set; }
 
-    public string GetDBPath() => NormalizeSafePath(SettingsMutable.DB_PATH);
     public string GetStoragePath() => NormalizeSafePath(SettingsMutable.STORAGE_PATH);
-    public string GetBackupPath() => NormalizeSafePath(SettingsMutable.BACKUP_PATH);
     public string? GetHttpsCertPemPathPath() => string.IsNullOrEmpty(SettingsMutable.HTTPS_CERT_PEM_PATH) ? null : NormalizeSafePath(SettingsMutable.HTTPS_CERT_PEM_PATH);
     public string? GetHttpsKeyPemPathPath() => string.IsNullOrEmpty(SettingsMutable.HTTPS_KEY_PEM_PATH) ? null : NormalizeSafePath(SettingsMutable.HTTPS_KEY_PEM_PATH);
 
