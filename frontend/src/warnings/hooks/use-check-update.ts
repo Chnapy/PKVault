@@ -27,13 +27,22 @@ export const useCheckUpdate = (): string | undefined => {
 
     const nextVersion = name.substring(1).split('.').map(Number);
 
-    const canUpdate = settingsVersion.some((settingsPart, i) => {
-        const nextPart = nextVersion[ i ];
+    const canUpdate = (): boolean => {
+        for (let i = 0; i < settingsVersion.length; i++) {
+            const settingsPart = settingsVersion[ i ] ?? 0;
+            const nextPart = nextVersion[ i ] ?? 0;
 
-        return typeof nextPart === 'number' && nextPart > settingsPart;
-    });
+            if (nextPart === settingsPart) {
+                continue;
+            }
 
-    if (canUpdate) {
+            return nextPart > settingsPart;
+        }
+
+        return false;
+    };
+
+    if (canUpdate()) {
         return name;
     }
 };
