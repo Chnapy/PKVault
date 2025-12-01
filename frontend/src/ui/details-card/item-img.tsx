@@ -9,11 +9,11 @@ type ItemImgProps = {
 export const ItemImg: React.FC<ItemImgProps> = ({ item, ...imgProps }) => {
     const staticData = useStaticData();
 
-    const staticForm = staticData.items[ item ];
+    let staticForm = staticData.items[ item ];
 
     if (!staticForm?.sprite) {
         console.log('UNKNOWN ITEM SPRITE -', item);
-        return null;
+        staticForm = staticData.items[ 745 ]!;    // gives "?" sprite
     }
 
     const spriteKey = staticForm.sprite;
