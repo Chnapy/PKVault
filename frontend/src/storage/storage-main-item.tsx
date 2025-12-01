@@ -41,7 +41,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
         return null;
     }
 
-    const { species, context, form, gender, isShiny, compatibleWithVersions, level } = pkmVersions[ 0 ];
+    const { species, context, form, gender, isAlpha, isShiny, compatibleWithVersions, level } = pkmVersions[ 0 ];
 
     const hasSaveHeldItems = pageSaves.some(pageSave => pkmVersions.find((version) => version.generation === pageSave.generation)?.heldItem);
     const heldItem = hasSaveHeldItems ? pkmVersions.find((version) => version.id === pkmId)?.heldItem : undefined;
@@ -87,6 +87,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
                     form,
                     isFemale: gender == GenderType.Female,
                     isEgg: false,
+                    isAlpha,
                     isShiny,
                     isShadow: false,
                     heldItem,

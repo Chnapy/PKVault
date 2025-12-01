@@ -11,6 +11,7 @@ import { DetailsCardContainer } from '../details-card/details-card-container';
 import { DetailsMainImg } from '../details-card/details-main-img';
 import { ItemImg } from '../details-card/item-img';
 import { Gender } from '../gender/gender';
+import { AlphaIcon } from '../icon/alpha-icon';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
@@ -22,7 +23,7 @@ import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
-    | 'id' | 'idBase' | 'pid' | 'species' | 'version' | 'context' | 'generation' | 'form' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
+    | 'id' | 'idBase' | 'pid' | 'species' | 'version' | 'context' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
     | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
@@ -67,12 +68,16 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
                 isEgg={pkm.isEgg}
                 isShadow={pkm.isShadow}
                 ball={pkm.ball}
-                shinyPart={pkm.isShiny && <ShinyIcon
-                    style={{
-                        // width: 12,
-                        margin: '0 -2px',
-                    }}
-                />}
+                shinyPart={<>
+                    {pkm.isAlpha && <AlphaIcon />}
+
+                    {pkm.isShiny && <ShinyIcon
+                        style={{
+                            // width: 12,
+                            margin: '0 -2px',
+                        }}
+                    />}
+                </>}
                 genderPart={<Gender gender={pkm.gender} />}
             />
         }

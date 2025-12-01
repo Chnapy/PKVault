@@ -30,7 +30,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
         return null;
     }
 
-    const { species, version, form, gender, isShiny, isEgg, isShadow, heldItemPokeapiName, level } = savePkm;
+    const { species, version, form, gender, isAlpha, isShiny, isEgg, isShadow, heldItemPokeapiName, level } = savePkm;
 
     const staticEvolves = staticData.evolves[ species ];
     const evolveSpecies = staticEvolves?.trade[ version ] ?? staticEvolves?.tradeWithItem[ heldItemPokeapiName ?? '' ]?.[ version ];
@@ -52,6 +52,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
             form={form}
             isFemale={gender == GenderType.Female}
             isEgg={isEgg}
+            isAlpha={isAlpha}
             isShiny={isShiny}
             isShadow={isShadow}
             isStarter={savePkm.isStarter}

@@ -7,6 +7,7 @@ import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '
 import { DetailsLevel } from '../details-card/details-level';
 import { ItemImg } from '../details-card/item-img';
 import { SpeciesImg } from '../details-card/species-img';
+import { AlphaIcon } from '../icon/alpha-icon';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { CheckboxInput, type CheckboxInputProps } from '../input/checkbox-input';
@@ -21,6 +22,7 @@ export type StorageItemProps =
     form: number;
     isFemale?: boolean;
     isEgg?: boolean;
+    isAlpha?: boolean;
     isShiny?: boolean;
     isShadow?: boolean;
     isStarter?: boolean;
@@ -47,6 +49,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   form,
   isFemale,
   isEgg,
+  isAlpha,
   isShiny,
   isShadow,
   isStarter,
@@ -175,6 +178,8 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
           justifyContent: 'flex-end',
         }}
       >
+        {isAlpha && <AlphaIcon style={{ height: small ? 15 : undefined }} />}
+
         {isShiny && <ShinyIcon style={{ height: small ? 15 : undefined }} />}
 
         {!canMoveOutside && renderBubble(theme.bg.red, <Icon name='logout' solid forButton />)}
