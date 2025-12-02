@@ -20,10 +20,11 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
         var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
 
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
-        LocalSaveService.SaveById.Values.ToList().ForEach((save) =>
+        LocalSaveService.SaveById.Values.ToList().ForEach((_save) =>
         {
             // TODO find a cleaner way
-            save = save.Clone();
+            var save = _save.Clone();
+            save.ID32 = _save.ID32; // required since it can be computed
             saveLoadersDict.Add(save.ID32, new()
             {
                 Save = save,

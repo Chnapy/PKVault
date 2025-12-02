@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using PKHeX.Core;
 
 public class LocalSaveService
@@ -41,6 +43,14 @@ public class LocalSaveService
         if (save == null)
         {
             return false;
+        }
+
+        if (save.ID32 == default)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(path);
+            byte[] hash = SHA1.HashData(bytes);
+            var saveId = BitConverter.ToUInt32(hash, 0);
+            save.ID32 = saveId;
         }
 
         SaveById.TryGetValue(save.ID32, out var existingSave);

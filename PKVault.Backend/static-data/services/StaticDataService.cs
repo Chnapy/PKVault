@@ -809,6 +809,9 @@ public class StaticDataService
          * - 2584 zygardite
          * - 2579 floettite
          * - 2569 emboarite
+         *
+         * Missing Stadium items from pokeapi:
+         * - 128 gorgeous-box
          */
         return pokeapiName switch
         {
@@ -1009,9 +1012,27 @@ public class StaticDataService
             GameVersion.Gen8 => [.. GetPokeApiVersion(GameVersion.SWSH), .. GetPokeApiVersion(GameVersion.BDSP), .. GetPokeApiVersion(GameVersion.PLA)],
             GameVersion.Gen9 => [.. GetPokeApiVersion(GameVersion.SV)],
 
-            GameVersion.StadiumJ => [],
-            GameVersion.Stadium => [],
-            GameVersion.Stadium2 => [],
+            GameVersion.StadiumJ => [
+                Task.FromResult<PokeApiNet.Version?>(new() {
+                    Names = [
+                        new() { Name = "Stadium (J)", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } }
+                    ]
+                })
+            ],
+            GameVersion.Stadium => [
+                Task.FromResult<PokeApiNet.Version?>(new() {
+                    Names = [
+                        new() { Name = "Stadium", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } }
+                    ]
+                })
+            ],
+            GameVersion.Stadium2 => [
+                Task.FromResult<PokeApiNet.Version?>(new() {
+                    Names = [
+                        new() { Name = "Stadium 2", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } }
+                    ]
+                })
+            ],
             GameVersion.EFL => [.. GetPokeApiVersion(GameVersion.E), .. GetPokeApiVersion(GameVersion.FRLG)],
             #endregion
         };

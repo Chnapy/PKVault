@@ -69,10 +69,15 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErr
           </span>
           {" - "}
           <span style={{ color: theme.text.primary }}>{id}</span>
-
           <br />
-          {t('save.ot')} {tid} -{" "}
-          <span style={{ color: theme.text.primary }}>{trainerName}</span>
+
+          {tid > 0
+            ? <>
+              {t('save.ot')} {tid} -{" "}
+              <span style={{ color: theme.text.primary }}>{trainerName}</span>
+            </>
+            : '-'}
+
           <br />
           {t('save.sync')} <span style={{ color: theme.text.primary }}>{renderTimestamp()}</span>{" "}
           {/* {Date.now() - date.getMilliseconds() < 3_600_000 && (
