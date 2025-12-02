@@ -47,7 +47,7 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
         {t('settings.title')}
 
         <div style={{ marginLeft: 'auto' }}>
-            v{settings?.version} - Build ID = {settings?.buildID}
+            v{settings?.version} - Build ID = {settings?.buildID} - PKHeX {settings?.pkhexVersion}
         </div>
     </div>}>
         <form
