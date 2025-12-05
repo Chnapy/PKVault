@@ -2,20 +2,8 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
 {
     public static DataMemoryLoader Create()
     {
+        var bankLoader = new BankLoader();
         var boxLoader = new BoxLoader();
-        if (boxLoader.GetAllEntities().Count == 0)
-        {
-            boxLoader.WriteDto(new()
-            {
-                Type = BoxType.Box,
-                BoxEntity = new()
-                {
-                    Id = "0",
-                    Name = "Box 1"
-                }
-            });
-        }
-
         var pkmLoader = new PkmLoader();
         var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
 
@@ -37,6 +25,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
 
         DataEntityLoaders loaders = new()
         {
+            bankLoader = bankLoader,
             boxLoader = boxLoader,
             pkmLoader = pkmLoader,
             pkmVersionLoader = pkmVersionLoader,
@@ -85,6 +74,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
 
     public void WriteFiles()
     {
+        loaders.bankLoader.WriteToFile();
         loaders.boxLoader.WriteToFile();
         loaders.pkmLoader.WriteToFile();
         loaders.pkmVersionLoader.WriteToFile();

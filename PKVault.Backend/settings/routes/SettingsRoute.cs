@@ -47,6 +47,7 @@ public class SettingsController : ControllerBase
         return await DataDTO.FromDataUpdateFlags(new()
         {
             StaticData = languageChanged,
+            MainBanks = true,
             MainBoxes = true,
             MainPkms = true,
             MainPkmVersions = true,

@@ -63,7 +63,7 @@ export function ButtonLike<
           display: "flex",
           flexGrow: 1,
           maxWidth: '100%',
-          alignItems: "center",
+          // alignItems: "center",
           justifyContent: "center",
           opacity: disabled ? 0.5 : undefined,
         })}

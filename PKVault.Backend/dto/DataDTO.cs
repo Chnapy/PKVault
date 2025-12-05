@@ -31,6 +31,14 @@ public struct DataDTO
             }));
         }
 
+        if (flags.MainBanks)
+        {
+            tasks.Add(Task.Run(async () =>
+            {
+                dto.MainBanks = await StorageService.GetMainBanks();
+            }));
+        }
+
         if (flags.MainBoxes)
         {
             tasks.Add(Task.Run(async () =>
@@ -127,6 +135,7 @@ public struct DataDTO
     public DataDTOType Type { get; set; } = DataDTOType.DATA_DTO;
 
     public StaticDataDTO? StaticData { get; set; }
+    public List<BankDTO>? MainBanks { get; set; }
     public List<BoxDTO>? MainBoxes { get; set; }
     public List<PkmDTO>? MainPkms { get; set; }
     public List<PkmVersionDTO>? MainPkmVersions { get; set; }
@@ -158,6 +167,7 @@ public enum DataDTOType : uint
 public class DataUpdateFlags
 {
     public bool StaticData;
+    public bool MainBanks;
     public bool MainBoxes;
     public bool MainPkms;
     public bool MainPkmVersions;

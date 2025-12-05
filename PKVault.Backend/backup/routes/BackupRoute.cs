@@ -28,6 +28,7 @@ public class BackupController : ControllerBase
 
         return await DataDTO.FromDataUpdateFlags(new()
         {
+            MainBanks = true,
             MainBoxes = true,
             MainPkms = true,
             MainPkmVersions = true,

@@ -7,6 +7,14 @@ namespace PKVault.Backend.storage.routes;
 [Route("api/[controller]")]
 public class StorageController : ControllerBase
 {
+    [HttpGet("main/bank")]
+    public async Task<ActionResult<List<BankDTO>>> GetMainBanks()
+    {
+        var list = await StorageService.GetMainBanks();
+
+        return list;
+    }
+
     [HttpGet("main/box")]
     public async Task<ActionResult<List<BoxDTO>>> GetMainBoxes()
     {
@@ -61,17 +69,17 @@ public class StorageController : ControllerBase
     }
 
     [HttpPost("main/box")]
-    public async Task<ActionResult<DataDTO>> CreateMainBox([BindRequired] string boxName)
+    public async Task<ActionResult<DataDTO>> CreateMainBox([BindRequired] string boxName, [BindRequired] string bankId)
     {
-        var flags = await StorageService.MainCreateBox(boxName);
+        var flags = await StorageService.MainCreateBox(boxName, bankId);
 
         return await DataDTO.FromDataUpdateFlags(flags);
     }
 
     [HttpPut("main/box/{boxId}")]
-    public async Task<ActionResult<DataDTO>> UpdateMainBox(string boxId, [BindRequired] string boxName)
+    public async Task<ActionResult<DataDTO>> UpdateMainBox(string boxId, [BindRequired] string boxName, [BindRequired] int order, [BindRequired] string bankId)
     {
-        var flags = await StorageService.MainUpdateBox(boxId, boxName);
+        var flags = await StorageService.MainUpdateBox(boxId, boxName, order, bankId);
 
         return await DataDTO.FromDataUpdateFlags(flags);
     }
@@ -80,6 +88,30 @@ public class StorageController : ControllerBase
     public async Task<ActionResult<DataDTO>> DeleteMainBox(string boxId)
     {
         var flags = await StorageService.MainDeleteBox(boxId);
+
+        return await DataDTO.FromDataUpdateFlags(flags);
+    }
+
+    [HttpPost("main/bank")]
+    public async Task<ActionResult<DataDTO>> CreateMainBank()
+    {
+        var flags = await StorageService.MainCreateBank();
+
+        return await DataDTO.FromDataUpdateFlags(flags);
+    }
+
+    [HttpPut("main/bank/{bankId}")]
+    public async Task<ActionResult<DataDTO>> UpdateMainBank(string bankId, [BindRequired] string bankName, [BindRequired] bool isDefault, [BindRequired] int order, [BindRequired] BankEntity.BankView view)
+    {
+        var flags = await StorageService.MainUpdateBank(bankId, bankName, isDefault, order, view);
+
+        return await DataDTO.FromDataUpdateFlags(flags);
+    }
+
+    [HttpDelete("main/bank/{bankId}")]
+    public async Task<ActionResult<DataDTO>> DeleteMainBank(string bankId)
+    {
+        var flags = await StorageService.MainDeleteBank(bankId);
 
         return await DataDTO.FromDataUpdateFlags(flags);
     }

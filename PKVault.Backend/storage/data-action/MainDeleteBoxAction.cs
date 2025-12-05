@@ -13,6 +13,7 @@ public class MainDeleteBoxAction(string boxId) : DataAction
         loaders.boxLoader.DeleteEntity(boxId);
 
         flags.MainBoxes = true;
+        flags.MainBanks = true;
 
         return new()
         {

@@ -62,6 +62,16 @@ export const useActionDescription = () => {
                 oldSpecies: staticData.species[ Number(parameters[ 2 ] ?? -1) ]?.forms[ 9 ]?.[ 0 ]?.name,
                 newSpecies: staticData.species[ Number(parameters[ 3 ] ?? -1) ]?.forms[ 9 ]?.[ 0 ]?.name,
             }),
+            [ DataActionType.MAIN_CREATE_BANK ]: () => t('storage.save-actions.type.main-create-box', {
+                name: parameters[ 0 ]
+            }),
+            [ DataActionType.MAIN_UPDATE_BANK ]: () => t('storage.save-actions.type.main-update-box', {
+                oldName: parameters[ 0 ],
+                name: parameters[ 1 ]
+            }),
+            [ DataActionType.MAIN_DELETE_BANK ]: () => t('storage.save-actions.type.main-delete-box', {
+                name: parameters[ 0 ]
+            }),
         })()
     };
 };

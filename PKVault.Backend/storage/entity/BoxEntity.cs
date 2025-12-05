@@ -8,4 +8,8 @@ public class BoxEntity : IWithId<string>
     }
 
     public required string Name { get; set; }
+
+    public required int Order { get; set; }
+
+    public string? BankId { get; set; }
 }

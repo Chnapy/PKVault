@@ -2,7 +2,7 @@ import { useBackupGetAll } from '../data/sdk/backup/backup.gen';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { useStaticDataGet } from '../data/sdk/static-data/static-data.gen';
-import { useStorageGetMainBoxes, useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../data/sdk/storage/storage.gen';
+import { useStorageGetMainBanks, useStorageGetMainBoxes, useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../data/sdk/storage/storage.gen';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
 import { Fallback } from '../error/fallback';
 import { Splash } from '../ui/splash/splash';
@@ -14,6 +14,7 @@ export const SplashData: React.FC<React.PropsWithChildren> = ({ children }) => {
         useWarningsGetWarnings(),
         useBackupGetAll(),
         useSaveInfosGetAll(),
+        useStorageGetMainBanks(),
         useStorageGetMainBoxes(),
         useStorageGetMainPkms(),
         useStorageGetMainPkmVersions(),

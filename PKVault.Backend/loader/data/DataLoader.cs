@@ -16,6 +16,7 @@ public abstract class DataLoader(DataEntityLoaders loaders)
 
 public struct DataEntityLoaders
 {
+    public BankLoader bankLoader { get; set; }
     public BoxLoader boxLoader { get; set; }
     public PkmLoader pkmLoader { get; set; }
     public PkmVersionLoader pkmVersionLoader { get; set; }

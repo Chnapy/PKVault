@@ -13,6 +13,10 @@ public class BoxDTO : IWithId<string>
 
     public string Name { get { return BoxEntity.Name; } }
 
+    public int Order => BoxEntity.Order;
+
+    public string? BankId => BoxEntity.BankId;
+
     public int SlotCount
     {
         get => SlotCountVariable == -1

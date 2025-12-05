@@ -8,7 +8,7 @@ import { DataDTOType, type DataDTO } from './sdk/model';
 import { getSaveInfosGetAllQueryKey, type saveInfosGetAllResponse } from './sdk/save-infos/save-infos.gen';
 import { getSettingsGetQueryKey, type settingsGetResponse } from './sdk/settings/settings.gen';
 import { getStaticDataGetQueryKey, type staticDataGetResponse } from './sdk/static-data/static-data.gen';
-import { getStorageGetActionsQueryKey, getStorageGetMainBoxesQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSaveBoxesQueryKey, getStorageGetSavePkmsQueryKey, type storageGetActionsResponse, type storageGetMainBoxesResponse, type storageGetMainPkmsResponse, type storageGetMainPkmVersionsResponse, type storageGetSaveBoxesResponse, type storageGetSavePkmsResponse } from './sdk/storage/storage.gen';
+import { getStorageGetActionsQueryKey, getStorageGetMainBanksQueryKey, getStorageGetMainBoxesQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSaveBoxesQueryKey, getStorageGetSavePkmsQueryKey, type storageGetActionsResponse, type storageGetMainBanksResponse, type storageGetMainBoxesResponse, type storageGetMainPkmsResponse, type storageGetMainPkmVersionsResponse, type storageGetSaveBoxesResponse, type storageGetSavePkmsResponse } from './sdk/storage/storage.gen';
 import { getWarningsGetWarningsQueryKey, type warningsGetWarningsResponse } from './sdk/warnings/warnings.gen';
 
 const isResponse = (obj: unknown): obj is ResponseBack => responseBackSchema.safeParse(obj).success;
@@ -54,7 +54,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
 
           // console.log('stockage-dto', data);
 
-          const { settings, staticData, mainBoxes, mainPkms, mainPkmVersions, saves, dex, actions, warnings, saveInfos, backups } = data.data;
+          const { settings, staticData, mainBanks, mainBoxes, mainPkms, mainPkmVersions, saves, dex, actions, warnings, saveInfos, backups } = data.data;
 
           if (settings) {
             client.setQueryData(
@@ -75,6 +75,17 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 headers: new Headers(),
                 data: staticData,
               } satisfies staticDataGetResponse
+            );
+          }
+
+          if (mainBanks) {
+            client.setQueryData(
+              getStorageGetMainBanksQueryKey(),
+              {
+                status: 200,
+                headers: new Headers(),
+                data: mainBanks,
+              } satisfies storageGetMainBanksResponse
             );
           }
 

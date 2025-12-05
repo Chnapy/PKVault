@@ -6,9 +6,11 @@ import { Button } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
 import { TextInput } from '../../ui/input/text-input';
 import { theme } from '../../ui/theme';
+import { BankContext } from '../bank/bank-context';
 
 export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void; }> = ({ boxId, close }) => {
     const { t } = useTranslate();
+    const selectedBankBoxes = BankContext.useSelectedBankBoxes();
 
     const box = useStorageGetMainBoxes().data?.data.find(box => box.id === boxId);
     const boxUpdateMutation = useStorageUpdateMainBox();
@@ -20,9 +22,17 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void; }> = (
     });
 
     const onSubmit = handleSubmit(async ({ name }) => {
+        if (!selectedBankBoxes.data || !box) {
+            return;
+        }
+
         await boxUpdateMutation.mutateAsync({
             boxId,
-            params: { boxName: name }
+            params: {
+                boxName: name,
+                order: box.order,
+                bankId: selectedBankBoxes.data.selectedBank.id,
+            }
         });
         close();
     });

@@ -1,15 +1,28 @@
-public class MainUpdateBoxAction(string boxId, string boxName) : DataAction
+public class MainUpdateBoxAction(string boxId, string boxName, int order, string bankId) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        var box = loaders.boxLoader.GetDto(boxId);
+        if (boxName.Length == 0)
+        {
+            throw new ArgumentException($"Box name cannot be empty");
+        }
+
+        if (boxName.Length > 64)
+        {
+            throw new ArgumentException($"Box name cannot be > 64 characters");
+        }
+
+        var box = loaders.boxLoader.GetEntity(boxId);
 
         var boxOldName = box!.Name;
-        box.BoxEntity.Name = boxName;
+        box.Name = boxName;
+        box.Order = order;
+        box.BankId = bankId;
 
-        loaders.boxLoader.WriteDto(box);
+        loaders.boxLoader.WriteEntity(box);
 
         flags.MainBoxes = true;
+        flags.MainBanks = true;
 
         return new()
         {

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import type { SettingsMutableDTO } from '../data/sdk/model/settingsMutableDTO';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
+import { BankContext } from '../storage/bank/bank-context';
 import { useTranslate } from '../translate/i18n';
 import { Button, ButtonLink } from '../ui/button/button';
 import { TitledContainer } from '../ui/container/titled-container';
@@ -29,6 +30,8 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
     const { register, watch, reset, setValue, handleSubmit, formState } = useForm<Omit<SettingsMutableDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
         defaultValues: defaultValue
     });
+
+    const storageDefaultProps = BankContext.useStorageDefaultProps();
 
     if (!settingsMutable) {
         return null;
@@ -201,7 +204,7 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
             }}>
                 <Icon name='info-circle' solid forButton />
                 {t('action.not-possible')}
-                <ButtonLink to='/storage'>{t('action.check-storage')}</ButtonLink>
+                <ButtonLink to='/storage' {...storageDefaultProps}>{t('action.check-storage')}</ButtonLink>
             </div>}
         </form>
     </TitledContainer>;

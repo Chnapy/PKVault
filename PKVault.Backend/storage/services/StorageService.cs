@@ -7,6 +7,13 @@ public class StorageService
 {
     private static DataMemoryLoader? _memoryLoader;
 
+    public static async Task<List<BankDTO>> GetMainBanks()
+    {
+        var memoryLoader = await GetLoader();
+
+        return memoryLoader.loaders.bankLoader.GetAllDtos();
+    }
+
     public static async Task<List<BoxDTO>> GetMainBoxes()
     {
         var memoryLoader = await GetLoader();
@@ -54,17 +61,17 @@ public class StorageService
         return saveLoaders.Pkms.GetAllDtos();
     }
 
-    public static async Task<DataUpdateFlags> MainCreateBox(string boxName)
+    public static async Task<DataUpdateFlags> MainCreateBox(string boxName, string bankId)
     {
         return await AddAction(
-            new MainCreateBoxAction(boxName)
+            new MainCreateBoxAction(boxName, bankId)
         );
     }
 
-    public static async Task<DataUpdateFlags> MainUpdateBox(string boxId, string boxName)
+    public static async Task<DataUpdateFlags> MainUpdateBox(string boxId, string boxName, int order, string bankId)
     {
         return await AddAction(
-            new MainUpdateBoxAction(boxId, boxName)
+            new MainUpdateBoxAction(boxId, boxName, order, bankId)
         );
     }
 
@@ -72,6 +79,27 @@ public class StorageService
     {
         return await AddAction(
             new MainDeleteBoxAction(boxId)
+        );
+    }
+
+    public static async Task<DataUpdateFlags> MainCreateBank()
+    {
+        return await AddAction(
+            new MainCreateBankAction()
+        );
+    }
+
+    public static async Task<DataUpdateFlags> MainUpdateBank(string bankId, string bankName, bool isDefault, int order, BankEntity.BankView view)
+    {
+        return await AddAction(
+            new MainUpdateBankAction(bankId, bankName, isDefault, order, view)
+        );
+    }
+
+    public static async Task<DataUpdateFlags> MainDeleteBank(string bankId)
+    {
+        return await AddAction(
+            new MainDeleteBankAction(bankId)
         );
     }
 
@@ -215,6 +243,7 @@ public class StorageService
 
         var flags = new DataUpdateFlags
         {
+            MainBanks = true,
             MainBoxes = true,
             MainPkms = true,
             MainPkmVersions = true,
@@ -302,9 +331,47 @@ public class StorageService
     {
         var time = LogUtil.Time("Clean wrong data");
 
+        var bankLoader = new BankLoader();
         var boxLoader = new BoxLoader();
         var pkmLoader = new PkmLoader();
         var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
+
+        var banks = bankLoader.GetAllEntities();
+        if (banks.Count == 0)
+        {
+            bankLoader.WriteEntity(new()
+            {
+                Id = "0",
+                Name = "Bank 1",
+                IsDefault = true,
+                Order = 0,
+                View = new(MainBoxIds: [], Saves: []),
+            });
+            banks = bankLoader.GetAllEntities();
+        }
+
+        var boxes = boxLoader.GetAllEntities();
+        if (boxes.Count == 0)
+        {
+            boxLoader.WriteEntity(new()
+            {
+                Id = "0",
+                Name = "Box 1",
+                Order = 0,
+                BankId = banks.First().Key
+            });
+        }
+        else
+        {
+            boxes.Values.ToList().ForEach(box =>
+            {
+                if (box.BankId == null)
+                {
+                    box.BankId = banks.First().Key;
+                    boxLoader.WriteEntity(box);
+                }
+            });
+        }
 
         /**
          * Convert entities with old/wrong ID format to new one.
@@ -433,10 +500,17 @@ public class StorageService
             }
         });
 
-        if (pkmVersionLoader.HasWritten || pkmLoader.HasWritten)
+        if (
+            bankLoader.HasWritten
+            || boxLoader.HasWritten
+            || pkmVersionLoader.HasWritten
+            || pkmLoader.HasWritten
+        )
         {
             BackupService.CreateBackup();
 
+            bankLoader.WriteToFile();
+            boxLoader.WriteToFile();
             pkmVersionLoader.WriteToFile();
             pkmLoader.WriteToFile();
         }

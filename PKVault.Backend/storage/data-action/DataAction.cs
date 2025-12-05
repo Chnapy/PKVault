@@ -19,6 +19,9 @@ public struct DataActionPayload
 
 public enum DataActionType
 {
+    MAIN_CREATE_BANK,
+    MAIN_UPDATE_BANK,
+    MAIN_DELETE_BANK,
     MAIN_CREATE_BOX,
     MAIN_UPDATE_BOX,
     MAIN_DELETE_BOX,

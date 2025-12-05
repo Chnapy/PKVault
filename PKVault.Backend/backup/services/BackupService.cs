@@ -67,24 +67,29 @@ public class BackupService
 
     private static Dictionary<string, (string TargetPath, byte[] FileContent)> CreateDbBackup(DataEntityLoaders loaders)
     {
+        var bankEntities = loaders.bankLoader.GetAllEntities();
         var boxEntities = loaders.boxLoader.GetAllEntities();
         var pkmEntities = loaders.pkmLoader.GetAllEntities();
         var pkmVersionEntities = loaders.pkmVersionLoader.GetAllEntities();
 
+        var bankPath = loaders.bankLoader.FilePath;
         var boxPath = loaders.boxLoader.FilePath;
         var pkmPath = loaders.pkmLoader.FilePath;
         var pkmVersionPath = loaders.pkmVersionLoader.FilePath;
 
+        var relativeBankPath = Path.Combine("db", "bank.json");
         var relativeBoxPath = Path.Combine("db", "box.json");
         var relativePkmPath = Path.Combine("db", "pkm.json");
         var relativePkmVersionPath = Path.Combine("db", "pkm-version.json");
 
+        var bankContent = JsonSerializer.SerializeToUtf8Bytes(bankEntities, EntityJsonContext.Default.DictionaryStringBankEntity);
         var boxContent = JsonSerializer.SerializeToUtf8Bytes(boxEntities, EntityJsonContext.Default.DictionaryStringBoxEntity);
         var pkmContent = JsonSerializer.SerializeToUtf8Bytes(pkmEntities, EntityJsonContext.Default.DictionaryStringPkmEntity);
         var pkmVersionContent = JsonSerializer.SerializeToUtf8Bytes(pkmVersionEntities, EntityJsonContext.Default.DictionaryStringPkmVersionEntity);
 
         return new()
         {
+            [NormalizePath(relativeBankPath)] = (TargetPath: NormalizePath(bankPath), FileContent: bankContent),
             [NormalizePath(relativeBoxPath)] = (TargetPath: NormalizePath(boxPath), FileContent: boxContent),
             [NormalizePath(relativePkmPath)] = (TargetPath: NormalizePath(pkmPath), FileContent: pkmContent),
             [NormalizePath(relativePkmVersionPath)] = (TargetPath: NormalizePath(pkmVersionPath), FileContent: pkmVersionContent),

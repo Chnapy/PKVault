@@ -7,12 +7,14 @@ import { type FileRouteTypes } from "../../routeTree.gen";
 export type HeaderItemProps = {
   selected?: boolean;
   to: FileRouteTypes[ "to" ];
+  search?: Record<string, unknown>;
   endPosition?: boolean;
 };
 
 export const HeaderItem: React.FC<React.PropsWithChildren<HeaderItemProps>> = ({
   selected,
   to,
+  search,
   endPosition,
   children,
 }) => {
@@ -20,9 +22,14 @@ export const HeaderItem: React.FC<React.PropsWithChildren<HeaderItemProps>> = ({
     <Button
       as={Link}
       to={to}
-      search={(search) => {
+      search={(oldSearch) => {
         // remove all search params
-        return Object.fromEntries(Object.keys(search).map(key => [ key, undefined ])) as never;
+        const clearedSearch = Object.fromEntries(Object.keys(oldSearch).map(key => [ key, undefined ]));
+
+        return {
+          ...clearedSearch,
+          ...search,
+        } as never;
       }}
       className={css({
         color: 'inherit',

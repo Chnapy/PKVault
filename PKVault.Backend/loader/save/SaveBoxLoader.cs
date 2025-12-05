@@ -8,6 +8,8 @@ public class SaveBoxLoader(SaveFile save)
     {
         var boxes = new Dictionary<string, BoxDTO>();
 
+        var currentOrder = 0;
+
         if (save.HasParty)
         {
             var id = ((int)BoxType.Party).ToString();
@@ -18,8 +20,10 @@ public class SaveBoxLoader(SaveFile save)
                 {
                     Id = id,
                     Name = BoxType.Party.ToString(),
+                    Order = currentOrder,
                 }
             });
+            currentOrder++;
         }
 
         if (save.HasBox)
@@ -36,8 +40,10 @@ public class SaveBoxLoader(SaveFile save)
                     {
                         Id = id,
                         Name = boxesNames[i],
+                        Order = currentOrder,
                     }
                 });
+                currentOrder++;
             }
         }
 
@@ -55,8 +61,10 @@ public class SaveBoxLoader(SaveFile save)
                 {
                     Id = id,
                     Name = BoxType.Daycare.ToString(),
+                    Order = currentOrder,
                 }
             });
+            currentOrder++;
         }
 
         extraSlots
@@ -83,8 +91,10 @@ public class SaveBoxLoader(SaveFile save)
                     {
                         Id = id,
                         Name = name,
+                        Order = currentOrder,
                     }
                 });
+                currentOrder++;
             });
 
         return boxes;

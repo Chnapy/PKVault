@@ -19,6 +19,7 @@ import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageBoxMainActions } from '../ui/storage-box/storage-box-main-actions';
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
 import { StorageMoveContext } from './actions/storage-move-context';
+import { BankContext } from './bank/bank-context';
 import { StorageBoxCreate } from './box/storage-box-create';
 import { StorageBoxEdit } from './box/storage-box-edit';
 import { StorageHeader } from './box/storage-header';
@@ -33,6 +34,8 @@ export const StorageMainBoxContent: React.FC<{
   const mainBoxIds = Route.useSearch({ select: (search) => search.mainBoxIds }) ?? [ 0 ];
   const navigate = Route.useNavigate();
 
+  const selectedBankBoxes = BankContext.useSelectedBankBoxes();
+
   const boxIndex = mainBoxIds.indexOf(boxId);
 
   const getMainBoxIds = (value: number) => mainBoxIds.map((id, i) => i === boxIndex ? value : id);
@@ -42,14 +45,15 @@ export const StorageMainBoxContent: React.FC<{
   const boxesQuery = useStorageGetMainBoxes();
   const pkmsQuery = useStorageGetMainPkms();
 
-  const loading = [ boxesQuery, pkmsQuery ].some(query => query.isLoading);
+  const loading = [ pkmsQuery, selectedBankBoxes ].some(query => query.isLoading);
 
   const boxDeleteMutation = useStorageDeleteMainBox();
 
-  const boxes = boxesQuery.data?.data ?? [];
+  const boxes = boxesQuery.data?.data.filter(box => box.bankId === selectedBankBoxes.data?.selectedBank.id) ?? [];
   const pkms = pkmsQuery.data?.data ?? [];
 
-  const filteredBoxes = boxes.filter(box => !mainBoxIds.includes(box.idInt) || box.idInt === boxId);
+  const filteredBoxes = selectedBankBoxes.data?.selectedBoxes ?? [];
+  //boxes.filter(box => !mainBoxIds.includes(box.idInt) || box.idInt === boxId);
 
   const selectedBoxIndex = filteredBoxes.findIndex((box) => box.idInt === boxId);
   const selectedBox = filteredBoxes[ selectedBoxIndex ] ?? {

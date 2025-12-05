@@ -7,6 +7,7 @@ import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { useStorageGetActions } from '../data/sdk/storage/storage.gen';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
 import { ErrorCatcher } from '../error/error-catcher';
+import { BankContext } from '../storage/bank/bank-context';
 import { useTranslate } from '../translate/i18n';
 import { Button } from '../ui/button/button';
 import { ButtonWithDisabledPopover } from '../ui/button/button-with-disabled-popover';
@@ -31,6 +32,8 @@ const Root: React.FC = () => {
   const [ openNotif, setOpenNotif ] = React.useState(false);
   const hasWarnings = !!warnings && warnings.warningsCount > 0;
   const hasErrors = BackendErrorsContext.useValue().errors.length > 0 || hasWarnings || hasUpdate;
+
+  const storageDefaultProps = BankContext.useStorageDefaultProps();
 
   React.useEffect(() => {
     if (openNotif && !hasErrors) {
@@ -63,6 +66,7 @@ const Root: React.FC = () => {
               matchRoute({ to: "/storage", pending: true })
             )}
             to={"/storage"}
+            {...storageDefaultProps}
           >
             {t('header.storage')}
             {hasStorageActions && '*'}
@@ -121,7 +125,7 @@ const Root: React.FC = () => {
             paddingTop: 0,
             flexGrow: 1,
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             justifyContent: 'center'
           }}
         >

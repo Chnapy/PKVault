@@ -29,7 +29,7 @@ export const StorageSelectAll: React.FC<{
     return <CheckboxInput
         checked={state !== 'unselected'}
         indeterminate={state === 'indeterminate'}
-        onChange={() => {
+        onChange={async () => {
             if (state === 'selected') {
                 selectContext.clear();
             } else {
