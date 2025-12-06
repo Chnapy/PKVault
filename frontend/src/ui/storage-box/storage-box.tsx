@@ -21,19 +21,17 @@ export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
       ref={ref}
       style={style}
       title={
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
+        <div style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+        }}>
           {header}
         </div>
       }
     >
-      <ErrorCatcher>
+      {(children || loading) && <ErrorCatcher>
         <div
           style={{
             display: "grid",
@@ -74,7 +72,7 @@ export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
             })}
           />
         </div>}
-      </ErrorCatcher>
+      </ErrorCatcher>}
     </TitledContainer>
   );
 };

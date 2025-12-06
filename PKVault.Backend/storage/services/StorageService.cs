@@ -61,10 +61,10 @@ public class StorageService
         return saveLoaders.Pkms.GetAllDtos();
     }
 
-    public static async Task<DataUpdateFlags> MainCreateBox(string boxName, string bankId)
+    public static async Task<DataUpdateFlags> MainCreateBox(string bankId)
     {
         return await AddAction(
-            new MainCreateBoxAction(boxName, bankId)
+            new MainCreateBoxAction(bankId)
         );
     }
 

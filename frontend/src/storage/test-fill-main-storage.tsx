@@ -47,10 +47,11 @@ export const TestFillMainStorage: React.FC = () => {
 
                         try {
                             createBoxResponse = await storageCreateMainBox({
-                                boxName,
                                 bankId: selectedBankBoxes.data!.selectedBank.id,
                             });
                         } catch (error) { console.error(error) }
+
+                        // may break here, box name randomly generated
 
                         const boxId = (createBoxResponse?.data.mainBoxes?.find(box => box.name === boxName)
                             ?? mainBoxes.data!.find(box => box.name === boxName)!).idInt;

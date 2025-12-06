@@ -69,9 +69,9 @@ public class StorageController : ControllerBase
     }
 
     [HttpPost("main/box")]
-    public async Task<ActionResult<DataDTO>> CreateMainBox([BindRequired] string boxName, [BindRequired] string bankId)
+    public async Task<ActionResult<DataDTO>> CreateMainBox([BindRequired] string bankId)
     {
-        var flags = await StorageService.MainCreateBox(boxName, bankId);
+        var flags = await StorageService.MainCreateBox(bankId);
 
         return await DataDTO.FromDataUpdateFlags(flags);
     }

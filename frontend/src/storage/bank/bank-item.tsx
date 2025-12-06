@@ -14,7 +14,7 @@ export const BankItem: React.FC<{
 }> = ({ bankId }) => {
     const { t } = useTranslate();
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();
-    const selectBank = BankContext.useSelectBankProps();
+    const selectBankProps = BankContext.useSelectBankProps();
 
     const banksQuery = useStorageGetMainBanks();
     const bankDeleteMutation = useStorageDeleteMainBank();
@@ -37,7 +37,7 @@ export const BankItem: React.FC<{
     >
         <ButtonLink
             to='/storage'
-            {...selectBank(bankId)}
+            {...selectBankProps(bankId)}
             selected={selectedBankBoxes.data?.selectedBank.id === bankId}
             loading={isLoading}
             style={{

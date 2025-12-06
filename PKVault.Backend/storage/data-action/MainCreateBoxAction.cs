@@ -1,30 +1,33 @@
-public class MainCreateBoxAction(string boxName, string bankId) : DataAction
+public class MainCreateBoxAction(string bankId) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        if (boxName.Length == 0)
-        {
-            throw new ArgumentException($"Box name cannot be empty");
-        }
-
-        if (boxName.Length > 64)
-        {
-            throw new ArgumentException($"Box name cannot be > 64 characters");
-        }
-
-        var boxes = loaders.boxLoader.GetAllDtos();
+        var boxes = loaders.boxLoader.GetAllEntities().Values.ToList().FindAll(box => box.BankId == bankId);
         var maxId = boxes.Select(box => box.IdInt).Max();
         var maxOrder = boxes.Select(box => box.Order).Max();
 
+        string GetNewName()
+        {
+            var i = boxes.Count + 1;
+
+            while (boxes.Any(box => box.Name == $"Box {i}"))
+            {
+                i++;
+            }
+
+            return $"Box {i}";
+        }
+
         var id = maxId + 1;
         var order = maxOrder + 1;
+        var name = GetNewName();
 
         loaders.boxLoader.WriteDto(new()
         {
             BoxEntity = new()
             {
                 Id = id.ToString(),
-                Name = boxName,
+                Name = name,
                 Order = order,
                 BankId = bankId
             }
@@ -36,7 +39,7 @@ public class MainCreateBoxAction(string boxName, string bankId) : DataAction
         return new()
         {
             type = DataActionType.MAIN_CREATE_BOX,
-            parameters = [boxName]
+            parameters = [name]
         };
     }
 }

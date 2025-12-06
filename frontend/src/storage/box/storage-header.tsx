@@ -1,29 +1,36 @@
 import type React from 'react';
+import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
-import { SelectStringInput, type DataOption } from '../../ui/input/select-input';
 import { theme } from '../../ui/theme';
 import { StorageSelectAll } from '../storage-select-all';
-import { useTranslate } from '../../translate/i18n';
 
 export const StorageHeader: React.FC<{
     saveId?: number;
     gameLogo: React.ReactNode;
     boxId: number;
+    boxName: string;
     boxPkmCount: number;
     boxSlotCount: number;
     totalPkmCount: number;
-    boxesOptions: DataOption<string>[];
-    onBoxChange: (value: string) => void;
+    showBoxes: boolean;
+    onBoxesDisplay: () => void;
     onPreviousBoxClick?: () => void;
     onNextBoxClick?: () => void;
     onSplitClick?: () => void;
     onClose?: () => void;
     children?: React.ReactNode;
-}> = ({ saveId, gameLogo, boxId, boxPkmCount, boxSlotCount, totalPkmCount, boxesOptions, onBoxChange, onPreviousBoxClick, onNextBoxClick, onSplitClick, onClose, children }) => {
+}> = ({ saveId, gameLogo, boxId, boxName, boxPkmCount, boxSlotCount, totalPkmCount, showBoxes, onBoxesDisplay, onPreviousBoxClick, onNextBoxClick, onSplitClick, onClose, children }) => {
     const { t } = useTranslate();
 
-    return <>
+    return <div
+        style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 8,
+        }}
+    >
         {gameLogo}
 
         <div
@@ -40,11 +47,11 @@ export const StorageHeader: React.FC<{
                 <Icon name='angle-left' forButton />
             </Button>
 
-            <SelectStringInput
-                data={boxesOptions}
-                value={boxId.toString()}
-                onChange={onBoxChange}
-            />
+            <Button onClick={onBoxesDisplay}>
+                {boxName}
+
+                <Icon name={showBoxes ? 'angle-up' : 'angle-down'} solid forButton />
+            </Button>
 
             {children}
 
@@ -65,19 +72,21 @@ export const StorageHeader: React.FC<{
                 gap: 8
             }}
         >
-            <StorageSelectAll saveId={saveId} boxId={boxId} />
+            {!showBoxes && <>
+                <StorageSelectAll saveId={saveId} boxId={boxId} />
 
-            <div style={{ display: 'flex', gap: 2, whiteSpace: 'nowrap' }}>
-                <Icon name='folder' solid forButton />
-                <span style={{ color: theme.text.primary }}>{boxPkmCount}</span>
-                /{boxSlotCount} - {t('total')}.<span style={{ color: theme.text.primary }}>{totalPkmCount}</span>
-            </div>
+                <div style={{ display: 'flex', gap: 2, whiteSpace: 'nowrap' }}>
+                    <Icon name='folder' solid forButton />
+                    <span style={{ color: theme.text.primary }}>{boxPkmCount}</span>
+                    /{boxSlotCount} - {t('total')}.<span style={{ color: theme.text.primary }}>{totalPkmCount}</span>
+                </div>
 
-            {onSplitClick && <Button
-                onClick={onSplitClick}
-            >
-                <Icon name='page-break' forButton title={t('storage.box.split.help')} style={{ transform: 'rotate(90deg) scale(1.2)' }} />
-            </Button>}
+                {onSplitClick && <Button
+                    onClick={onSplitClick}
+                >
+                    <Icon name='page-break' forButton title={t('storage.box.split.help')} style={{ transform: 'rotate(90deg) scale(1.2)' }} />
+                </Button>}
+            </>}
 
             {onClose && <Button
                 onClick={onClose}
@@ -85,5 +94,5 @@ export const StorageHeader: React.FC<{
                 <Icon name='times' forButton />
             </Button>}
         </div>
-    </>;
+    </div>;
 };

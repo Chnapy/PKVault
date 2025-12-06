@@ -3,25 +3,20 @@ import { Popover, PopoverButton } from '@headlessui/react';
 import React from "react";
 import { BoxType, type PkmDTO } from "../data/sdk/model";
 import {
+  useStorageCreateMainBox,
   useStorageDeleteMainBox,
   useStorageGetMainBoxes,
   useStorageGetMainPkms
 } from "../data/sdk/storage/storage.gen";
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from "../routes/storage";
-import { useTranslate } from '../translate/i18n';
-import { ButtonWithConfirm } from '../ui/button/button-with-confirm';
-import { ButtonWithDisabledPopover } from '../ui/button/button-with-disabled-popover';
-import { ButtonWithPopover } from '../ui/button/button-with-popover';
-import { Icon } from '../ui/icon/icon';
-import { type DataOption } from '../ui/input/select-input';
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageBoxMainActions } from '../ui/storage-box/storage-box-main-actions';
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
 import { StorageMoveContext } from './actions/storage-move-context';
 import { BankContext } from './bank/bank-context';
-import { StorageBoxCreate } from './box/storage-box-create';
 import { StorageBoxEdit } from './box/storage-box-edit';
+import { StorageBoxList } from './box/storage-box-list';
 import { StorageHeader } from './box/storage-header';
 import { StorageMainItem } from './storage-main-item';
 
@@ -29,7 +24,7 @@ export const StorageMainBoxContent: React.FC<{
   boxId: number;
   style?: React.CSSProperties;
 }> = withErrorCatcher('default', ({ boxId, style }) => {
-  const { t } = useTranslate();
+  const [ showBoxes, setShowBoxes ] = React.useState(false);
 
   const mainBoxIds = Route.useSearch({ select: (search) => search.mainBoxIds }) ?? [ 0 ];
   const navigate = Route.useNavigate();
@@ -47,16 +42,14 @@ export const StorageMainBoxContent: React.FC<{
 
   const loading = [ pkmsQuery, selectedBankBoxes ].some(query => query.isLoading);
 
+  const boxCreateMutation = useStorageCreateMainBox();
   const boxDeleteMutation = useStorageDeleteMainBox();
 
   const boxes = boxesQuery.data?.data.filter(box => box.bankId === selectedBankBoxes.data?.selectedBank.id) ?? [];
   const pkms = pkmsQuery.data?.data ?? [];
 
-  const filteredBoxes = selectedBankBoxes.data?.selectedBoxes ?? [];
-  //boxes.filter(box => !mainBoxIds.includes(box.idInt) || box.idInt === boxId);
-
-  const selectedBoxIndex = filteredBoxes.findIndex((box) => box.idInt === boxId);
-  const selectedBox = filteredBoxes[ selectedBoxIndex ] ?? {
+  const selectedBoxIndex = boxes.findIndex((box) => box.idInt === boxId);
+  const selectedBox = boxes[ selectedBoxIndex ] ?? {
     id: '-99',
     idInt: -99,
     name: '',
@@ -65,8 +58,8 @@ export const StorageMainBoxContent: React.FC<{
     canReceivePkm: false,
   };
 
-  const previousBox = filteredBoxes[ selectedBoxIndex - 1 ] ?? filteredBoxes[ filteredBoxes.length - 1 ];
-  const nextBox = filteredBoxes[ selectedBoxIndex + 1 ] ?? filteredBoxes[ 0 ];
+  const previousBox = boxes[ selectedBoxIndex - 1 ] ?? boxes[ boxes.length - 1 ];
+  const nextBox = boxes[ selectedBoxIndex + 1 ] ?? boxes[ 0 ];
 
   const boxPkmsList = pkms.filter((pkm) => pkm.boxId === selectedBox.idInt);
 
@@ -89,115 +82,115 @@ export const StorageMainBoxContent: React.FC<{
         loading={loading}
         style={style}
         header={
-          <StorageHeader
-            gameLogo={<div
-              style={{
-                flex: 1,
-                alignItems: 'center',
-              }}
-            >
-              <img
-                src="/logo.svg"
+          <>
+            <StorageHeader
+              gameLogo={<div
                 style={{
-                  display: 'block',
-                  height: 24,
-                  width: 24,
+                  flex: 1,
+                  alignItems: 'center',
                 }}
-              />
-            </div>}
-            boxId={boxId}
-            boxPkmCount={boxPkmsList.length}
-            boxSlotCount={selectedBox.slotCount}
-            totalPkmCount={pkms.length}
-            boxesOptions={boxes.map((box): DataOption<string> => ({
-              value: box.id,
-              option: <div style={{ margin: '2px 4px' }}>
-                {box.name}
-              </div>,
-              disabled: mainBoxIds.includes(box.idInt),
-            }))}
-            onBoxChange={value => navigate({
-              search: {
-                mainBoxIds: getMainBoxIds(Number(value)),
-              },
-            })}
-            onPreviousBoxClick={!previousBox || previousBox.id === selectedBox.id
-              ? undefined
-              : () => navigate({
-                search: {
-                  mainBoxIds: getMainBoxIds(previousBox.idInt),
-                },
-              })}
-            onNextBoxClick={!nextBox || nextBox.id === selectedBox.id
-              ? undefined
-              : () => navigate({
-                search: {
-                  mainBoxIds: getMainBoxIds(nextBox.idInt),
-                },
-              })}
-            onSplitClick={mainBoxIds.length < 2 && nextBox && nextBox.id !== selectedBox.id
-              ? () => navigate({
-                search: () => ({
-                  mainBoxIds: [ boxId, nextBox.idInt ]
+              >
+                <img
+                  src="/logo.svg"
+                  style={{
+                    display: 'block',
+                    height: 24,
+                    width: 24,
+                  }}
+                />
+              </div>}
+              boxId={boxId}
+              boxName={selectedBox.name}
+              boxPkmCount={boxPkmsList.length}
+              boxSlotCount={selectedBox.slotCount}
+              totalPkmCount={pkms.length}
+              showBoxes={showBoxes}
+              onBoxesDisplay={() => setShowBoxes(value => !value)}
+              onPreviousBoxClick={!previousBox || previousBox.id === selectedBox.id
+                ? undefined
+                : () => navigate({
+                  search: {
+                    mainBoxIds: getMainBoxIds(previousBox.idInt),
+                  },
+                })}
+              onNextBoxClick={!nextBox || nextBox.id === selectedBox.id
+                ? undefined
+                : () => navigate({
+                  search: {
+                    mainBoxIds: getMainBoxIds(nextBox.idInt),
+                  },
+                })}
+              onSplitClick={mainBoxIds.length < 2 && nextBox && nextBox.id !== selectedBox.id
+                ? () => navigate({
+                  search: () => ({
+                    mainBoxIds: [ boxId, nextBox.idInt ]
+                  })
                 })
-              })
-              : undefined}
-            onClose={mainBoxIds.length > 1
-              ? () => navigate({
-                search: () => ({
-                  mainBoxIds: mainBoxIds.filter(id => id !== boxId),
+                : undefined}
+              onClose={mainBoxIds.length > 1
+                ? () => navigate({
+                  search: () => ({
+                    mainBoxIds: mainBoxIds.filter(id => id !== boxId),
+                  })
                 })
-              })
-              : undefined
-            }
-          >
-            <ButtonWithPopover
-              panelContent={close => <StorageBoxEdit boxId={selectedBox.id} close={close} />}
-            >
-              <Icon name='pen' forButton />
-            </ButtonWithPopover>
+                : undefined
+              }
+            />
 
-            <ButtonWithPopover
-              panelContent={close => <StorageBoxCreate close={close} />}
-            >
-              <Icon name='plus' forButton />
-            </ButtonWithPopover>
-
-            <ButtonWithDisabledPopover
-              as={ButtonWithConfirm}
-              onClick={() => boxDeleteMutation.mutateAsync({ boxId: selectedBox.id })}
-              disabled={boxes.length <= 1 || boxPkmsList.length > 0}
-              showHelp={boxPkmsList.length > 0}
-              helpTitle={t('storage.box.delete.help')}
-            >
-              <Icon name='trash' solid forButton />
-            </ButtonWithDisabledPopover>
-          </StorageHeader>
+            {showBoxes && <StorageBoxList
+              selectedBoxes={mainBoxIds}
+              boxes={boxes}
+              pkms={pkms.map(pkm => ({
+                id: pkm.id,
+                boxId: pkm.boxId,
+                boxSlot: pkm.boxSlot,
+              }))}
+              onBoxChange={value => {
+                if (!mainBoxIds.includes(value)) {
+                  navigate({
+                    search: {
+                      mainBoxIds: getMainBoxIds(Number(value)),
+                    },
+                  });
+                }
+                setShowBoxes(false);
+              }}
+              editPanelContent={(boxId, close) => <StorageBoxEdit boxId={boxId} close={close} />}
+              deleteFn={boxId => boxDeleteMutation.mutateAsync({ boxId })}
+              addFn={selectedBankBoxes.data && (() => boxCreateMutation.mutateAsync({
+                params: {
+                  bankId: selectedBankBoxes.data.selectedBank.id,
+                }
+              }))}
+            />}
+          </>
         }
       >
-        {allItems.map((pkm, i) => {
-          return <div
-            key={i}
-            style={{ order: i, display: 'flex' }}
-          >
-            {!pkm
-              || (moveContext.selected
-                && !moveContext.selected.saveId
-                && !moveContext.selected.target
-                && moveContext.selected.ids.includes(pkm.id)
-              )
-              ? <StorageItemPlaceholder
-                boxId={selectedBox.idInt}
-                boxSlot={i}
-                pkmId={pkm?.id}
-              />
-              : <StorageMainItem pkmId={pkm.id} />}
-          </div>;
-        })}
+        {!showBoxes && <>
+          {allItems.map((pkm, i) => {
+            return <div
+              key={i}
+              style={{ order: i, display: 'flex' }}
+            >
+              {!pkm
+                || (moveContext.selected
+                  && !moveContext.selected.saveId
+                  && !moveContext.selected.target
+                  && moveContext.selected.ids.includes(pkm.id)
+                )
+                ? <StorageItemPlaceholder
+                  boxId={selectedBox.idInt}
+                  boxSlot={i}
+                  pkmId={pkm?.id}
+                />
+                : <StorageMainItem pkmId={pkm.id} />}
+            </div>;
+          })}
 
-        {moveContext.selected && !moveContext.selected.saveId && !moveContext.selected.target && (
-          moveContext.selected.ids.map(id => <StorageMainItem key={id} pkmId={id} />)
-        )}
+          {moveContext.selected && !moveContext.selected.saveId && !moveContext.selected.target && (
+            moveContext.selected.ids.map(id => <StorageMainItem key={id} pkmId={id} />)
+          )}
+        </>}
       </PopoverButton>
 
       <StorageBoxMainActions boxId={selectedBox.idInt} anchor={'right start'} />
