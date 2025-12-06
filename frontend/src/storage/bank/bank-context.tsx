@@ -1,49 +1,8 @@
-import React from 'react';
 import { useStorageGetMainBanks, useStorageGetMainBoxes } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import { filterIsDefined } from '../../util/filter-is-defined';
 
-type BankContext = {
-    value: {
-        // selectedBank: string;
-        editMode: boolean;
-    };
-    setValue: React.Dispatch<React.SetStateAction<BankContext[ 'value' ]>>;
-};
-
-const context = React.createContext<BankContext>({
-    value: {
-        // selectedBank: '', 
-        editMode: false
-    },
-    setValue: () => void 0,
-});
-
 export const BankContext = {
-    Provider: ({ children }: React.PropsWithChildren) => {
-        const [ value, setValue ] = React.useState<BankContext[ 'value' ]>({
-            // selectedBank: '',
-            editMode: false,
-        });
-        // const mainBoxIds = Route.useSearch({ select: search => search.mainBoxIds }) ?? [];
-        // const bankQuery = useStorageGetMainBanks();
-        // const selectBank = BankContext.useSelectBank();
-
-        // React.useEffect(() => {
-        //     const defaultBank = bankQuery.data?.data.find(bank => bank.isDefault);
-        //     if (mainBoxIds.length === 0 && defaultBank) {
-        //         selectBank(defaultBank.id);
-        //     }
-        // }, [ bankQuery.data?.data, mainBoxIds.length, selectBank ]);
-
-        return <context.Provider value={{
-            value,
-            setValue,
-        }}>
-            {children}
-        </context.Provider>;
-    },
-    useValue: () => React.useContext(context),
     useSelectedBankBoxes: () => {
         const mainBoxIds = Route.useSearch({ select: search => search.mainBoxIds }) ?? [];
 
@@ -124,20 +83,6 @@ export const BankContext = {
                     saves,
                 } satisfies (typeof Route)[ 'types' ][ 'searchSchemaInput' ]
             }
-        };
-    },
-    useSelectBank: () => {
-        const navigate = Route.useNavigate();
-
-        const selectBankProps = BankContext.useSelectBankProps();
-
-        return (bankId: string) => {
-            const props = selectBankProps(bankId);
-            if (!props) {
-                return;
-            }
-
-            navigate(props);
         };
     },
     useStorageDefaultProps: () => {

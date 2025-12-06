@@ -7,7 +7,6 @@ import { withErrorCatcher } from '../error/with-error-catcher';
 import { ActionsPanel } from '../storage/actions/actions-panel';
 import { StorageMoveContext } from '../storage/actions/storage-move-context';
 import { StorageSelectContext } from '../storage/actions/storage-select-context';
-import { BankContext } from '../storage/bank/bank-context';
 import { BankList } from '../storage/bank/bank-list';
 import { StorageDetails } from "../storage/storage-details";
 import { StorageMainBox } from "../storage/storage-main-box";
@@ -22,99 +21,97 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
   const saves = Route.useSearch({ select: (search) => search.saves }) ?? {};
 
   return (
-    <BankContext.Provider>
-      <StorageSelectContext.Provider>
-        <StorageSearchCheck>
-          <StorageMoveContext.Provider>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-            }}>
-              <div
-                id={StorageMoveContext.containerId}
-                style={{
-                  display: 'flex',
-                  justifyContent: "center",
-                  alignItems: "flex-start",
-                  flexWrap: "wrap",
-                  gap: 16,
-                  margin: 'auto',
-                  marginBottom: 150,
-                }}
-              >
-                {/* <div style={{ width: '100%', display: 'flex', gap: 8 }}>
+    <StorageSelectContext.Provider>
+      <StorageSearchCheck>
+        <StorageMoveContext.Provider>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}>
+            <div
+              id={StorageMoveContext.containerId}
+              style={{
+                display: 'flex',
+                justifyContent: "center",
+                alignItems: "flex-start",
+                flexWrap: "wrap",
+                gap: 16,
+                margin: 'auto',
+                marginBottom: 150,
+              }}
+            >
+              {/* <div style={{ width: '100%', display: 'flex', gap: 8 }}>
                 <TestFillMainStorage />
               </div> */}
 
-                <BankList />
+              <BankList />
 
-                <StorageMainBox />
+              <StorageMainBox />
 
-                {Object.values(saves)
-                  .filter(filterIsDefined)
-                  .sort((a, b) => a.order < b.order ? -1 : 1)
-                  .map(save => <StorageSaveBox key={save.saveId} saveId={save.saveId} />)}
+              {Object.values(saves)
+                .filter(filterIsDefined)
+                .sort((a, b) => a.order < b.order ? -1 : 1)
+                .map(save => <StorageSaveBox key={save.saveId} saveId={save.saveId} />)}
 
-                <div style={{
-                  display: 'flex',
-                  width: 630,
-                  height: 564
-                }}>
-                  <StorageSaveSelect />
-                </div>
+              <div style={{
+                display: 'flex',
+                width: 630,
+                height: 564
+              }}>
+                <StorageSaveSelect />
+              </div>
 
+              <div
+                className={css({
+                  position: "fixed",
+                  bottom: 14,
+                  left: "50%",
+                  transform: 'translateX(-50%)',
+                  maxWidth: 400,
+                  zIndex: 20,
+                  '&:hover': {
+                    zIndex: 25,
+                  }
+                })}
+              >
+                <ActionsPanel />
+              </div>
+
+              {selected && (
                 <div
                   className={css({
                     position: "fixed",
                     bottom: 14,
-                    left: "50%",
-                    transform: 'translateX(-50%)',
-                    maxWidth: 400,
+                    top: 14,
+                    right: 14,
+                    width: 350,
+                    pointerEvents: 'none',
                     zIndex: 20,
+                    display: 'flex',
+                    alignItems: 'flex-end',
                     '&:hover': {
                       zIndex: 25,
+                    },
+                    '& > *': {
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      overflowY: 'auto',
+                      pointerEvents: 'initial',
                     }
                   })}
                 >
-                  <ActionsPanel />
+                  <StorageDetails
+                    key={selected.id}
+                    id={selected.id}
+                    saveId={selected.saveId}
+                  />
                 </div>
-
-                {selected && (
-                  <div
-                    className={css({
-                      position: "fixed",
-                      bottom: 14,
-                      top: 14,
-                      right: 14,
-                      width: 350,
-                      pointerEvents: 'none',
-                      zIndex: 20,
-                      display: 'flex',
-                      alignItems: 'flex-end',
-                      '&:hover': {
-                        zIndex: 25,
-                      },
-                      '& > *': {
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        overflowY: 'auto',
-                        pointerEvents: 'initial',
-                      }
-                    })}
-                  >
-                    <StorageDetails
-                      key={selected.id}
-                      id={selected.id}
-                      saveId={selected.saveId}
-                    />
-                  </div>
-                )}
-              </div>
+              )}
             </div>
-          </StorageMoveContext.Provider>
-        </StorageSearchCheck>
-      </StorageSelectContext.Provider>
-    </BankContext.Provider>
+          </div>
+        </StorageMoveContext.Provider>
+      </StorageSearchCheck>
+    </StorageSelectContext.Provider>
   );
 });
 

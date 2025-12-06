@@ -102,7 +102,7 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
                 checked={watchIsDefault}
                 onChange={() => setValue('isDefault', !watchIsDefault)}
                 disabled={watchIsDefault && banks.filter(b => b.id !== bankId && b.isDefault).length === 0}
-            /> Is default
+            /> {t('storage.bank.edit.is-default')}
         </label>
 
         <div
@@ -118,7 +118,7 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
             >
                 <Icon name='angle-left' solid forButton />
             </Button>
-            Order
+            {t('storage.bank.edit.order')}
             <Button
                 onClick={() => nextBank && setValue('order', nextBank.order + 1)}
                 disabled={!nextBank}
