@@ -21,6 +21,8 @@ public class MainUpdateBoxAction(string boxId, string boxName, int order, string
 
         loaders.boxLoader.WriteEntity(box);
 
+        MainCreateBoxAction.NormalizeBoxOrders(loaders.boxLoader);
+
         flags.MainBoxes = true;
         flags.MainBanks = true;
 

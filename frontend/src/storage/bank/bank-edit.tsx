@@ -16,7 +16,7 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
     const queryClient = useQueryClient();
 
     const banksQuery = useStorageGetMainBanks();
-    const banks = banksQuery.data?.data ?? [];
+    const banks = [ ...banksQuery.data?.data ?? [] ].sort((b1, b2) => b1.order < b2.order ? -1 : 1);
     const bank = banks.find(bank => bank.id === bankId);
     const bankUpdateMutation = useStorageUpdateMainBank();
 
@@ -32,8 +32,8 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
     const watchIsDefault = watch('isDefault');
     const watchOrder = watch('order');
 
-    const previousBank = banks.find(b => b.id !== bankId && b.order < watchOrder);
-    const nextBank = banks.find(b => b.id !== bankId && b.order > watchOrder);
+    const previousBank = [ ...banks ].reverse().find(b => b.id !== bankId && b.order <= watchOrder);
+    const nextBank = banks.find(b => b.id !== bankId && b.order >= watchOrder);
 
     const onSubmit = handleSubmit(async ({ bankName, isDefault, order }) => {
         if (!bank) {
@@ -72,7 +72,7 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
                 };
             });
         }
-    }, [ bank, bankId, banksQuery.queryKey, queryClient, watchName, watchOrder ]);
+    }, [ bank, bankId, queryClient, watchName, watchOrder ]);
 
     // reset list removing temp form data
     React.useEffect(() => {
@@ -113,14 +113,14 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
             }}
         >
             <Button
-                onClick={() => previousBank && setValue('order', previousBank.order - 1)}
+                onClick={() => previousBank && setValue('order', previousBank.order - 5)}
                 disabled={!previousBank}
             >
                 <Icon name='angle-left' solid forButton />
             </Button>
             {t('storage.bank.edit.order')}
             <Button
-                onClick={() => nextBank && setValue('order', nextBank.order + 1)}
+                onClick={() => nextBank && setValue('order', nextBank.order + 5)}
                 disabled={!nextBank}
             >
                 <Icon name='angle-right' solid forButton />

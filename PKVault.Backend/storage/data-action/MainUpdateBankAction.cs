@@ -38,6 +38,8 @@ public class MainUpdateBankAction(string bankId, string bankName, bool isDefault
 
         loaders.bankLoader.WriteEntity(bank);
 
+        MainCreateBankAction.NormalizeBankOrders(loaders.bankLoader);
+
         flags.MainBanks = true;
 
         return new()

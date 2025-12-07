@@ -27,9 +27,11 @@ public class MainCreateBankAction : DataAction
             Id = id.ToString(),
             Name = name,
             IsDefault = false,
-            Order = order,
+            Order = order, // normalized just after
             View = new(MainBoxIds: [], Saves: [])
         });
+
+        NormalizeBankOrders(loaders.bankLoader);
 
         flags.MainBanks = true;
 
@@ -40,5 +42,22 @@ public class MainCreateBankAction : DataAction
             type = DataActionType.MAIN_CREATE_BANK,
             parameters = [name]
         };
+    }
+
+    public static void NormalizeBankOrders(BankLoader bankLoader)
+    {
+        var banks = bankLoader.GetAllEntities();
+
+        var bi = 0;
+        banks.Values.OrderBy(bank => bank.Order).ToList()
+            .ForEach(bank =>
+            {
+                if (bank.Order != bi)
+                {
+                    bank.Order = bi;
+                    bankLoader.WriteEntity(bank);
+                }
+                bi += 10;
+            });
     }
 }

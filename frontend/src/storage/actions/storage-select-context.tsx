@@ -3,6 +3,7 @@ import { useStorageGetMainPkms, useStorageGetSavePkms } from '../../data/sdk/sto
 import { Route } from '../../routes/storage';
 import type { StorageItemProps } from '../../ui/storage-item/storage-item';
 import { filterIsDefined } from '../../util/filter-is-defined';
+import { BankContext } from '../bank/bank-context';
 import { StorageMoveContext } from './storage-move-context';
 
 type Context = {
@@ -39,6 +40,9 @@ export const StorageSelectContext = {
 
         const mainPkmsQuery = useStorageGetMainPkms();
         const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
+        const selectedBankBoxes = BankContext.useSelectedBankBoxes();
+
+        const mainBoxIds = selectedBankBoxes.data?.selectedBoxes.map(box => box.idInt) ?? [];
 
         const selectsNotDisplayed = Route.useSearch({
             select: (search) => {
@@ -50,7 +54,7 @@ export const StorageSelectContext = {
                     return !search.saves?.[ saveId ]?.saveBoxIds.includes(boxId!);
                 }
 
-                return !(search.mainBoxIds ?? [ 0 ]).includes(boxId ?? 0);
+                return !(mainBoxIds ?? [ 0 ]).includes(boxId ?? 0);
             }
         });
 

@@ -11,6 +11,8 @@ public class MainDeleteBankAction(string bankId) : DataAction
 
         loaders.bankLoader.DeleteEntity(bankId);
 
+        MainCreateBankAction.NormalizeBankOrders(loaders.bankLoader);
+
         var boxes = loaders.boxLoader.GetAllEntities().Values.ToList().FindAll(box => box.BankId == bankId);
         foreach (var box in boxes)
         {

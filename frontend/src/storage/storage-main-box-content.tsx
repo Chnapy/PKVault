@@ -26,10 +26,10 @@ export const StorageMainBoxContent: React.FC<{
 }> = withErrorCatcher('default', ({ boxId, style }) => {
   const [ showBoxes, setShowBoxes ] = React.useState(false);
 
-  const mainBoxIds = Route.useSearch({ select: (search) => search.mainBoxIds }) ?? [ 0 ];
   const navigate = Route.useNavigate();
 
   const selectedBankBoxes = BankContext.useSelectedBankBoxes();
+  const mainBoxIds = selectedBankBoxes.data?.selectedBoxes.map(box => box.idInt) ?? [];
 
   const boxIndex = mainBoxIds.indexOf(boxId);
 

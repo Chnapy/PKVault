@@ -34,6 +34,8 @@ public class MainCreateBoxAction(string bankId) : DataAction
             }
         });
 
+        NormalizeBoxOrders(loaders.boxLoader);
+
         flags.MainBoxes = true;
         flags.MainBanks = true;
 
@@ -42,5 +44,31 @@ public class MainCreateBoxAction(string bankId) : DataAction
             type = DataActionType.MAIN_CREATE_BOX,
             parameters = [name]
         };
+    }
+
+    public static void NormalizeBoxOrders(BoxLoader boxLoader)
+    {
+        var boxes = boxLoader.GetAllEntities();
+
+        var bi = 0;
+        string? bankId = null;
+        boxes.Values
+            .OrderBy(box => box.BankId)
+            .ThenBy(box => box.Order).ToList()
+            .ForEach(box =>
+            {
+                if (bankId != box.BankId)
+                {
+                    bankId = box.BankId;
+                    bi = 0;
+                }
+
+                if (box.Order != bi)
+                {
+                    box.Order = bi;
+                    boxLoader.WriteEntity(box);
+                }
+                bi += 10;
+            });
     }
 }

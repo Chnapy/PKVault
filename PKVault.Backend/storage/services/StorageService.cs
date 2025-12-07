@@ -349,6 +349,10 @@ public class StorageService
             });
             banks = bankLoader.GetAllEntities();
         }
+        else
+        {
+            MainCreateBankAction.NormalizeBankOrders(bankLoader);
+        }
 
         var boxes = boxLoader.GetAllEntities();
         if (boxes.Count == 0)
@@ -371,6 +375,8 @@ public class StorageService
                     boxLoader.WriteEntity(box);
                 }
             });
+
+            MainCreateBoxAction.NormalizeBoxOrders(boxLoader);
         }
 
         /**

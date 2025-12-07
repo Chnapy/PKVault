@@ -10,7 +10,7 @@ export const BankList: React.FC = () => {
     const banksQuery = useStorageGetMainBanks();
     const bankCreateMutation = useStorageCreateMainBank();
 
-    const bankList = [ ...banksQuery.data?.data ?? [] ].sort((b1, b2) => b1.order < b2.order ? -1 : 1);
+    const bankList = banksQuery.data?.data ?? [];
 
     return <Container
         style={{
@@ -34,7 +34,7 @@ export const BankList: React.FC = () => {
             bankId={bank.id}
         />)}
 
-        <Button bgColor={theme.bg.primary} big onClick={() => bankCreateMutation.mutateAsync()}>
+        <Button bgColor={theme.bg.primary} big onClick={() => bankCreateMutation.mutateAsync()} style={{ order: 999 }}>
             <Icon name='plus' solid forButton />
         </Button>
     </Container>;

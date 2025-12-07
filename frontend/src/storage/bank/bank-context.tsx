@@ -26,6 +26,7 @@ export const BankContext = {
 
         const defaultBank = bankQuery.data?.data.find(bank => bank.isDefault);
         if (!defaultBank) {
+            console.log('no-default-bank');
             return payload;
         }
 
@@ -34,6 +35,7 @@ export const BankContext = {
         const selectedBankId = selectedBoxes[ 0 ]?.bankId ?? defaultBank.id;
         const selectedBank = bankQuery.data?.data.find(bank => bank.id === selectedBankId);
         if (!selectedBank) {
+            console.log('no-selected-bank');
             return payload;
         }
 
@@ -46,6 +48,10 @@ export const BankContext = {
                 selectedBoxes.push(
                     ...[ boxesQuery.data?.data.find(box => box.bankId === selectedBankId) ].filter(filterIsDefined)
                 );
+            }
+
+            if (selectedBoxes.length === 0) {
+                console.log('no-selected-boxes');
             }
         }
 

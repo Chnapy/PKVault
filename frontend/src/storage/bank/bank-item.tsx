@@ -32,7 +32,8 @@ export const BankItem: React.FC<{
 
     return bank && <div
         style={{
-            display: 'inline-flex'
+            display: 'inline-flex',
+            order: bank.order,
         }}
     >
         <ButtonLink

@@ -12,6 +12,8 @@ public class MainDeleteBoxAction(string boxId) : DataAction
 
         loaders.boxLoader.DeleteEntity(boxId);
 
+        MainCreateBoxAction.NormalizeBoxOrders(loaders.boxLoader);
+
         flags.MainBoxes = true;
         flags.MainBanks = true;
 
