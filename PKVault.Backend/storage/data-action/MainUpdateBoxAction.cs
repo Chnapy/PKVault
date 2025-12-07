@@ -1,4 +1,4 @@
-public class MainUpdateBoxAction(string boxId, string boxName, int order, string bankId) : DataAction
+public class MainUpdateBoxAction(string boxId, string boxName, int order, string bankId, int slotCount, BoxType type) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
@@ -12,12 +12,40 @@ public class MainUpdateBoxAction(string boxId, string boxName, int order, string
             throw new ArgumentException($"Box name cannot be > 64 characters");
         }
 
+        if (slotCount < 1 || slotCount > 300)
+        {
+            throw new ArgumentException($"Box slot count should be between 1-300");
+        }
+
         var box = loaders.boxLoader.GetEntity(boxId);
 
-        var boxOldName = box!.Name;
+        if (box!.BankId != bankId)
+        {
+            var bankBoxes = loaders.boxLoader.GetAllEntities().Values.ToList().FindAll(box => box.BankId == box.BankId);
+            if (bankBoxes.Count <= 1)
+            {
+                throw new ArgumentException($"Bank must keep at least 1 box");
+            }
+
+            // if bank change, set box as last one
+            order = 999;
+        }
+
+        if (box.SlotCount != slotCount)
+        {
+            var pkms = loaders.pkmLoader.GetAllEntities().Values.ToList().FindAll(pkm => pkm.BoxId == box.IdInt);
+            if (pkms.Any(pkm => pkm.BoxSlot >= slotCount - 1))
+            {
+                throw new ArgumentException($"Box slot count change is blocked by a pkm");
+            }
+        }
+
+        var boxOldName = box.Name;
+        box.Type = type;
         box.Name = boxName;
         box.Order = order;
         box.BankId = bankId;
+        box.SlotCount = slotCount;
 
         loaders.boxLoader.WriteEntity(box);
 

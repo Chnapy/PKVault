@@ -50,7 +50,9 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
   const saveBoxes = saveBoxesQuery.data?.data ?? [];
   const savePkms = savePkmsQuery.data?.data ?? [];
 
-  const filteredBoxes = saveBoxes.filter(box => !saveBoxIds.includes(box.idInt) || box.idInt === boxId);
+  const filteredBoxes = saveBoxes
+    .filter(box => !saveBoxIds.includes(box.idInt) || box.idInt === boxId)
+    .sort((b1, b2) => b1.order < b2.order ? -1 : 1);
 
   const selectedBoxIndex = filteredBoxes.findIndex((box) => box.idInt === boxId);
   const selectedBox = filteredBoxes[ selectedBoxIndex ]

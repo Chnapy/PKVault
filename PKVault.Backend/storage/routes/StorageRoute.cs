@@ -77,9 +77,12 @@ public class StorageController : ControllerBase
     }
 
     [HttpPut("main/box/{boxId}")]
-    public async Task<ActionResult<DataDTO>> UpdateMainBox(string boxId, [BindRequired] string boxName, [BindRequired] int order, [BindRequired] string bankId)
+    public async Task<ActionResult<DataDTO>> UpdateMainBox(
+        string boxId, [BindRequired] string boxName, [BindRequired] int order, [BindRequired] string bankId,
+        [BindRequired] int slotCount, [BindRequired] BoxType type
+    )
     {
-        var flags = await StorageService.MainUpdateBox(boxId, boxName, order, bankId);
+        var flags = await StorageService.MainUpdateBox(boxId, boxName, order, bankId, slotCount, type);
 
         return await DataDTO.FromDataUpdateFlags(flags);
     }

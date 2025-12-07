@@ -45,11 +45,13 @@ export const StorageMainBoxContent: React.FC<{
   const boxCreateMutation = useStorageCreateMainBox();
   const boxDeleteMutation = useStorageDeleteMainBox();
 
-  const boxes = boxesQuery.data?.data.filter(box => box.bankId === selectedBankBoxes.data?.selectedBank.id) ?? [];
+  const boxes = boxesQuery.data?.data
+    .filter(box => box.bankId === selectedBankBoxes.data?.selectedBank.id) ?? [];
+  const sortedBoxes = boxes.sort((b1, b2) => b1.order < b2.order ? -1 : 1);
   const pkms = pkmsQuery.data?.data ?? [];
 
-  const selectedBoxIndex = boxes.findIndex((box) => box.idInt === boxId);
-  const selectedBox = boxes[ selectedBoxIndex ] ?? {
+  const selectedBoxIndex = sortedBoxes.findIndex((box) => box.idInt === boxId);
+  const selectedBox = sortedBoxes[ selectedBoxIndex ] ?? {
     id: '-99',
     idInt: -99,
     name: '',
@@ -58,8 +60,8 @@ export const StorageMainBoxContent: React.FC<{
     canReceivePkm: false,
   };
 
-  const previousBox = boxes[ selectedBoxIndex - 1 ] ?? boxes[ boxes.length - 1 ];
-  const nextBox = boxes[ selectedBoxIndex + 1 ] ?? boxes[ 0 ];
+  const previousBox = sortedBoxes[ selectedBoxIndex - 1 ] ?? sortedBoxes[ sortedBoxes.length - 1 ];
+  const nextBox = sortedBoxes[ selectedBoxIndex + 1 ] ?? sortedBoxes[ 0 ];
 
   const boxPkmsList = pkms.filter((pkm) => pkm.boxId === selectedBox.idInt);
 

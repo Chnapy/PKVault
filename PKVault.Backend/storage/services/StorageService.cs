@@ -68,10 +68,10 @@ public class StorageService
         );
     }
 
-    public static async Task<DataUpdateFlags> MainUpdateBox(string boxId, string boxName, int order, string bankId)
+    public static async Task<DataUpdateFlags> MainUpdateBox(string boxId, string boxName, int order, string bankId, int slotCount, BoxType type)
     {
         return await AddAction(
-            new MainUpdateBoxAction(boxId, boxName, order, bankId)
+            new MainUpdateBoxAction(boxId, boxName, order, bankId, slotCount, type)
         );
     }
 

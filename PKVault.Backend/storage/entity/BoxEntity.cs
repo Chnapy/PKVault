@@ -7,7 +7,11 @@ public class BoxEntity : IWithId<string>
         get { return int.Parse(Id); }
     }
 
+    public BoxType Type { get; set; } = BoxType.Box;
+
     public required string Name { get; set; }
+
+    public int SlotCount { get; set; } = 30;
 
     public int Order { get; set; } = 0;
 

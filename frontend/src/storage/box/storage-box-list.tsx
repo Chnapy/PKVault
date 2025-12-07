@@ -43,14 +43,15 @@ export const StorageBoxList: React.FC<{
                 .fill(null)
                 .map((_, i): typeof boxPkms[ number ] | null => boxPkms[ i ] ?? null);
 
-            const canEditBox = box.canWrite && !!editPanelContent;
-            const canDeleteBox = box.canWrite && !!deleteFn && boxes.length > 1 && boxPkmsList.length === 0;
+            const canEditBox = !!editPanelContent;
+            const canDeleteBox = !!deleteFn && boxes.length > 1 && boxPkmsList.length === 0;
 
             return <div
                 key={box.id}
                 className={css({
                     display: 'inline-flex',
                 })}
+                style={{ order: box.order }}
             >
                 <Button
                     onClick={() => onBoxChange(box.idInt)}
@@ -140,6 +141,7 @@ export const StorageBoxList: React.FC<{
         {addFn && <Button bgColor={theme.bg.primary} onClick={addFn} className={css({
             width: 72,
             minHeight: 78,
+            order: 999,
         })}>
             <Icon name='plus' solid forButton />
         </Button>}

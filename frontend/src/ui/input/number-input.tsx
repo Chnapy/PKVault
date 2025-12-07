@@ -37,6 +37,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
                 borderRadius: 4,
                 padding: '2px 4px',
                 textShadow: theme.shadow.text,
+                textAlign: rest.style?.textAlign,
             }}
         />
 

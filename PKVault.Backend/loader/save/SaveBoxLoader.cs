@@ -15,12 +15,13 @@ public class SaveBoxLoader(SaveFile save)
             var id = ((int)BoxType.Party).ToString();
             boxes.Add(id, new BoxDTO
             {
-                Type = BoxType.Party,
                 BoxEntity = new()
                 {
                     Id = id,
+                    Type = BoxType.Party,
                     Name = BoxType.Party.ToString(),
                     Order = currentOrder,
+                    SlotCount = 6,
                 }
             });
             currentOrder++;
@@ -34,13 +35,13 @@ public class SaveBoxLoader(SaveFile save)
                 var id = i.ToString();
                 boxes.Add(id, new BoxDTO
                 {
-                    Type = BoxType.Box,
-                    SlotCountVariable = save.BoxSlotCount,
                     BoxEntity = new()
                     {
                         Id = id,
+                        Type = BoxType.Box,
                         Name = boxesNames[i],
                         Order = currentOrder,
+                        SlotCount = save.BoxSlotCount,
                     }
                 });
                 currentOrder++;
@@ -55,13 +56,13 @@ public class SaveBoxLoader(SaveFile save)
             var extraSlotsCount = extraSlots.FindAll(slot => slot.Type == StorageSlotType.Daycare).Count;
             boxes.Add(id, new BoxDTO
             {
-                Type = BoxType.Daycare,
-                SlotCountVariable = saveDaycare.DaycareSlotCount + extraSlotsCount,
                 BoxEntity = new()
                 {
                     Id = id,
+                    Type = BoxType.Daycare,
                     Name = BoxType.Daycare.ToString(),
                     Order = currentOrder,
+                    SlotCount = saveDaycare.DaycareSlotCount + extraSlotsCount,
                 }
             });
             currentOrder++;
@@ -85,13 +86,13 @@ public class SaveBoxLoader(SaveFile save)
 
                 boxes.Add(id, new BoxDTO
                 {
-                    Type = boxType,
-                    SlotCountVariable = slotCount,
                     BoxEntity = new()
                     {
                         Id = id,
+                        Type = boxType,
                         Name = name,
                         Order = currentOrder,
+                        SlotCount = slotCount,
                     }
                 });
                 currentOrder++;
@@ -107,7 +108,7 @@ public class SaveBoxLoader(SaveFile save)
 
     public void WriteDto(BoxDTO dto)
     {
-        if (!dto.CanWrite)
+        if (!dto.CanSaveWrite)
         {
             throw new Exception("Not allowed for box type not default");
         }

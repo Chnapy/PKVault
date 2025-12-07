@@ -9,31 +9,19 @@ public class BoxDTO : IWithId<string>
         get { return int.Parse(Id); }
     }
 
-    public BoxType Type { get; set; }
+    public BoxType Type => BoxEntity.Type;
 
     public string Name { get { return BoxEntity.Name; } }
+
+    public int SlotCount => BoxEntity.SlotCount;
 
     public int Order => BoxEntity.Order;
 
     public string? BankId => BoxEntity.BankId;
 
-    public int SlotCount
-    {
-        get => SlotCountVariable == -1
-            ? Type switch
-            {
-                BoxType.Box => 30,
-                BoxType.Party => 6,
-                _ => throw new NotImplementedException(),
-            }
-            : SlotCountVariable;
-    }
+    public bool CanSaveWrite => Type == BoxType.Box;
 
-    public int SlotCountVariable = -1;
-
-    public bool CanWrite => Type == BoxType.Box;
-
-    public bool CanReceivePkm => Type == BoxType.Party || Type == BoxType.Box;
+    // public bool CanReceivePkm => Type == BoxType.Party || Type == BoxType.Box;
 
     public required BoxEntity BoxEntity;
 

@@ -11,7 +11,6 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>
     {
         return new BoxDTO
         {
-            Type = BoxType.Box,
             BoxEntity = entity,
         };
     }
