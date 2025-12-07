@@ -52,11 +52,14 @@ public abstract class EntityLoader<DTO, E> where DTO : IWithId<string> where E :
         {
             return JsonSerializer.Deserialize(json, DictJsonContext) ?? [];
         }
-        catch (JsonException ex)
+        catch (Exception ex)
         {
             Console.Error.WriteLine(ex);
-            File.Move(FilePath, $"{FilePath}.bkp", true);
-            return GetFileContent();
+            throw new Exception(
+                $"An error happened with file: {FilePath}"
+                + "\nFile might be malformed, you can delete it to reset data, or report the issue."
+                + $"\n{ex.GetType()}: {ex.Message}"
+            );
         }
     }
 

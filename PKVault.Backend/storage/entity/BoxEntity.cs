@@ -9,7 +9,7 @@ public class BoxEntity : IWithId<string>
 
     public required string Name { get; set; }
 
-    public required int Order { get; set; }
+    public int Order { get; set; } = 0;
 
     public string? BankId { get; set; }
 }

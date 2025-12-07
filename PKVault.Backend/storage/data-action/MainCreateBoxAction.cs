@@ -2,9 +2,10 @@ public class MainCreateBoxAction(string bankId) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        var boxes = loaders.boxLoader.GetAllEntities().Values.ToList().FindAll(box => box.BankId == bankId);
-        var maxId = boxes.Select(box => box.IdInt).Max();
-        var maxOrder = boxes.Select(box => box.Order).Max();
+        var allBoxes = loaders.boxLoader.GetAllEntities().Values.ToList();
+        var boxes = allBoxes.FindAll(box => box.BankId == bankId);
+        var maxId = allBoxes.Select(box => box.IdInt).Max();
+        var maxOrder = boxes.Count == 0 ? 0 : boxes.Select(box => box.Order).Max();
 
         string GetNewName()
         {

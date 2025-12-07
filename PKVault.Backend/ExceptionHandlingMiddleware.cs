@@ -28,25 +28,33 @@ public partial class ExceptionHandlingMiddleware
         }
     }
 
-    private static async Task WriteExceptionResponse(HttpContext context, Exception ex, DataDTO? data)
+    public static void InjectResponseException(HttpResponse response, Exception ex)
     {
-        Console.Error.WriteLine(ex);
-
-        if (context.Response.HasStarted)
+        if (response.HasStarted)
         {
             return;
         }
 
-        context.Response.StatusCode = GetStatusCode(ex);
-        context.Response.ContentType = "application/json";
+        response.StatusCode = GetStatusCode(ex);
+        response.ContentType = "application/json";
 
-        context.Response.Headers.Append("access-control-expose-headers", new StringValues(["error-message", "error-stack"]));
-        context.Response.Headers.Append("error-message", JsonSerializer.Serialize(
-            InvalidCharacterRegex().Replace(ex.Message, "\n").Replace("\n\n", "\n")
+        response.Headers.Append("access-control-expose-headers", new StringValues(["error-message", "error-stack"]));
+        response.Headers.Append("error-message", JsonSerializer.Serialize(
+            InvalidCharacterRegex().Replace(ex.Message, "\n").Replace("\n\n", "\n"),
+            RouteJsonContext.Default.String
         ));
-        context.Response.Headers.Append("error-stack", JsonSerializer.Serialize(
-            InvalidCharacterRegex().Replace(ex.ToString(), "\n").Replace("\n\n", "\n")
+        response.Headers.Append("error-stack", JsonSerializer.Serialize(
+            InvalidCharacterRegex().Replace(ex.ToString(), "\n").Replace("\n\n", "\n"),
+            RouteJsonContext.Default.String
         ));
+    }
+
+    private static async Task WriteExceptionResponse(HttpContext context, Exception ex, DataDTO? data)
+    {
+        Console.Error.WriteLine(ex);
+
+        InjectResponseException(context.Response, ex);
+
         if (data != null)
         {
             var result = JsonSerializer.Serialize(data, RouteJsonContext.Default.DataDTO);

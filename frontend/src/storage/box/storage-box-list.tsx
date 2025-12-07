@@ -24,6 +24,7 @@ export const StorageBoxList: React.FC<{
         className={css({
             width: 614,
             display: 'flex',
+            // justifyContent: 'space-evenly',
             flexWrap: 'wrap',
             gap: 4,
             padding: 5,

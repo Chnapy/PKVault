@@ -15,6 +15,7 @@ using System.Text.Json.Serialization;
 [JsonSerializable(typeof(Dictionary<uint, SaveInfosDTO>))]
 [JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(EditPkmVersionPayload))]
+[JsonSerializable(typeof(string))]
 public partial class RouteJsonContext : JsonSerializerContext
 {
 }
