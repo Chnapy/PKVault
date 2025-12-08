@@ -17,5 +17,5 @@ public class BankEntity : IWithId<string>
 
     public record BankView(int[] MainBoxIds, BankViewSave[] Saves);
 
-    public record BankViewSave(int SaveId, int[] SaveBoxIds, int Order);
+    public record BankViewSave(uint SaveId, int[] SaveBoxIds, int Order);
 }

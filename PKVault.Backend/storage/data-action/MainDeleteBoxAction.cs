@@ -14,6 +14,19 @@ public class MainDeleteBoxAction(string boxId) : DataAction
 
         MainCreateBoxAction.NormalizeBoxOrders(loaders.boxLoader);
 
+        if (box.BankId != null)
+        {
+            var bank = loaders.bankLoader.GetEntity(box.BankId);
+            if (bank.View.MainBoxIds.Contains(box.IdInt))
+            {
+                bank.View = new(
+                    MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
+                    Saves: bank.View.Saves
+                );
+                loaders.bankLoader.WriteEntity(bank);
+            }
+        }
+
         flags.MainBoxes = true;
         flags.MainBanks = true;
 

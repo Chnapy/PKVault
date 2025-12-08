@@ -1,17 +1,24 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import type { StorageUpdateMainBankParams } from '../../data/sdk/model';
+import type { BankView, StorageUpdateMainBankParams } from '../../data/sdk/model';
 import { getStorageGetMainBanksQueryKey, useStorageGetMainBanks, useStorageUpdateMainBank, type storageGetMainBanksResponse200 } from '../../data/sdk/storage/storage.gen';
+import { Route } from '../../routes/storage';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
+import { ButtonWithDisabledPopover } from '../../ui/button/button-with-disabled-popover';
 import { Icon } from '../../ui/icon/icon';
 import { CheckboxInput } from '../../ui/input/checkbox-input';
 import { TextInput } from '../../ui/input/text-input';
 import { theme } from '../../ui/theme';
+import { filterIsDefined } from '../../util/filter-is-defined';
+import { BankContext } from './bank-context';
 
 export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ bankId, close }) => {
     const { t } = useTranslate();
+
+    const mainBoxIds = Route.useSearch({ select: search => search.mainBoxIds }) ?? [];
+    const savesSearch = Route.useSearch({ select: (search) => search.saves }) ?? {};
 
     const queryClient = useQueryClient();
 
@@ -20,25 +27,44 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
     const bank = banks.find(bank => bank.id === bankId);
     const bankUpdateMutation = useStorageUpdateMainBank();
 
-    const { register, handleSubmit, formState, watch, setValue } = useForm<StorageUpdateMainBankParams>({
+    const selectedBankBoxes = BankContext.useSelectedBankBoxes();
+
+    const { register, handleSubmit, formState, watch, setValue } = useForm<StorageUpdateMainBankParams & { view?: BankView }>({
         defaultValues: {
             bankName: bank?.name,
             isDefault: bank?.isDefault,
             order: bank?.order,
+            view: bank?.view,
         }
     });
 
     const watchName = watch('bankName');
     const watchIsDefault = watch('isDefault');
     const watchOrder = watch('order');
+    const watchView = watch('view');
 
     const previousBank = [ ...banks ].reverse().find(b => b.id !== bankId && b.order <= watchOrder);
     const nextBank = banks.find(b => b.id !== bankId && b.order >= watchOrder);
 
-    const onSubmit = handleSubmit(async ({ bankName, isDefault, order }) => {
+    const currentBankView: BankView = {
+        mainBoxIds,
+        saves: Object.values(savesSearch).filter(filterIsDefined).map(({ saveId, saveBoxIds, order }) => ({
+            saveId,
+            saveBoxIds,
+            order,
+        }))
+    };
+
+    const defaultDisabled = watchIsDefault && banks.filter(b => b.id !== bankId && b.isDefault).length === 0;
+    const viewHelpEnable = selectedBankBoxes.data?.selectedBank.id !== bankId;
+    const viewDisabled = viewHelpEnable || JSON.stringify(watchView) === JSON.stringify(currentBankView);
+
+    const onSubmit = handleSubmit(async ({ bankName, isDefault, order, view }) => {
         if (!bank) {
             return;
         }
+
+        view ??= bank.view;
 
         await bankUpdateMutation.mutateAsync({
             bankId,
@@ -47,7 +73,7 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
                 isDefault,
                 order,
             },
-            data: bank.view,
+            data: view,
         });
         close();
     });
@@ -94,14 +120,14 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
             style={{
                 display: 'flex',
                 gap: 4,
-                cursor: 'pointer',
+                cursor: defaultDisabled ? 'not-allowed' : 'pointer',
                 userSelect: 'none',
             }}
         >
             <CheckboxInput
                 checked={watchIsDefault}
                 onChange={() => setValue('isDefault', !watchIsDefault)}
-                disabled={watchIsDefault && banks.filter(b => b.id !== bankId && b.isDefault).length === 0}
+                disabled={defaultDisabled}
             /> {t('storage.bank.edit.is-default')}
         </label>
 
@@ -127,7 +153,18 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
             </Button>
         </div>
 
-        <Button type='submit' bgColor={theme.bg.primary} disabled={watchName.length === 0 || !formState.isValid}>
+        <ButtonWithDisabledPopover
+            as={Button}
+            onClick={() => setValue('view', currentBankView)}
+            helpTitle={t('storage.bank.edit.view.help')}
+            disabled={viewDisabled}
+            showHelp={viewHelpEnable}
+        >
+            <Icon name='eye' forButton />
+            {t('storage.bank.edit.view')}
+        </ButtonWithDisabledPopover>
+
+        <Button type='submit' big bgColor={theme.bg.primary} disabled={watchName.length === 0 || !formState.isValid}>
             <Icon name='pen' forButton />
             {t('action.submit')}
         </Button>

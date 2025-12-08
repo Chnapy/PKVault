@@ -1,14 +1,17 @@
 import type React from 'react';
+import type { BoxType } from '../../data/sdk/model';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
 import { StorageSelectAll } from '../storage-select-all';
+import { BoxName } from './box-name';
 
 export const StorageHeader: React.FC<{
     saveId?: number;
     gameLogo: React.ReactNode;
     boxId: number;
+    boxType: BoxType;
     boxName: string;
     boxPkmCount: number;
     boxSlotCount: number;
@@ -20,7 +23,7 @@ export const StorageHeader: React.FC<{
     onSplitClick?: () => void;
     onClose?: () => void;
     children?: React.ReactNode;
-}> = ({ saveId, gameLogo, boxId, boxName, boxPkmCount, boxSlotCount, totalPkmCount, showBoxes, onBoxesDisplay, onPreviousBoxClick, onNextBoxClick, onSplitClick, onClose, children }) => {
+}> = ({ saveId, gameLogo, boxId, boxType, boxName, boxPkmCount, boxSlotCount, totalPkmCount, showBoxes, onBoxesDisplay, onPreviousBoxClick, onNextBoxClick, onSplitClick, onClose, children }) => {
     const { t } = useTranslate();
 
     return <div
@@ -47,10 +50,12 @@ export const StorageHeader: React.FC<{
                 <Icon name='angle-left' forButton />
             </Button>
 
-            <Button onClick={onBoxesDisplay}>
-                {boxName}
-
-                <Icon name={showBoxes ? 'angle-up' : 'angle-down'} solid forButton />
+            <Button onClick={onBoxesDisplay} style={{ minWidth: 120 }}>
+                <BoxName
+                    boxType={boxType}
+                    boxName={boxName}
+                    icon={<Icon name={showBoxes ? 'angle-up' : 'angle-down'} solid forButton />}
+                />
             </Button>
 
             {children}

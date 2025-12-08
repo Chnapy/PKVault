@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -104,7 +105,9 @@ public class StorageController : ControllerBase
     }
 
     [HttpPut("main/bank/{bankId}")]
-    public async Task<ActionResult<DataDTO>> UpdateMainBank(string bankId, [BindRequired] string bankName, [BindRequired] bool isDefault, [BindRequired] int order, [BindRequired] BankEntity.BankView view)
+    public async Task<ActionResult<DataDTO>> UpdateMainBank(string bankId,
+        [BindRequired] string bankName, [BindRequired] bool isDefault, [BindRequired] int order,
+        [BindRequired] BankEntity.BankView view)
     {
         var flags = await StorageService.MainUpdateBank(bankId, bankName, isDefault, order, view);
 

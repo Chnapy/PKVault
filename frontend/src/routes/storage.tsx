@@ -21,8 +21,8 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
   const saves = Route.useSearch({ select: (search) => search.saves }) ?? {};
 
   return (
-    <StorageSelectContext.Provider>
-      <StorageSearchCheck>
+    <StorageSearchCheck>
+      <StorageSelectContext.Provider>
         <StorageMoveContext.Provider>
           <div style={{
             display: 'flex',
@@ -110,8 +110,8 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
             </div>
           </div>
         </StorageMoveContext.Provider>
-      </StorageSearchCheck>
-    </StorageSelectContext.Provider>
+      </StorageSelectContext.Provider>
+    </StorageSearchCheck>
   );
 });
 

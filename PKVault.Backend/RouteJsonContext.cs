@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 [JsonSerializable(typeof(SettingsDTO))]
 [JsonSerializable(typeof(WarningsDTO))]
+[JsonSerializable(typeof(List<BankDTO>))]
 [JsonSerializable(typeof(List<BoxDTO>))]
 [JsonSerializable(typeof(List<PkmDTO>))]
 [JsonSerializable(typeof(List<PkmVersionDTO>))]
@@ -15,6 +16,8 @@ using System.Text.Json.Serialization;
 [JsonSerializable(typeof(Dictionary<uint, SaveInfosDTO>))]
 [JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(EditPkmVersionPayload))]
+[JsonSerializable(typeof(BankEntity.BankView))]
+[JsonSerializable(typeof(BankEntity.BankViewSave))]
 [JsonSerializable(typeof(string))]
 public partial class RouteJsonContext : JsonSerializerContext
 {

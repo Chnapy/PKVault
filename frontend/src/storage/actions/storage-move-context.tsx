@@ -364,14 +364,14 @@ export const StorageMoveContext = {
 
                 // * -> box save
                 if (targetBoxSave) {
-                    if (!targetBoxSave.canReceivePkm) {
+                    if (!targetBoxSave.canSaveReceivePkm) {
                         return { enable: false, helpText: t('storage.move.box-cannot', { name: targetBoxSave.name }) };
                     }
                 }
 
                 // * -> box main
                 if (targetBoxMain) {
-                    if (!targetBoxMain.canReceivePkm) {
+                    if (!targetBoxMain.canSaveReceivePkm) {
                         return { enable: false, helpText: t('storage.move.box-cannot', { name: targetBoxMain.name }) };
                     }
                 }

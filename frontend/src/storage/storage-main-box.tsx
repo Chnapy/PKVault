@@ -1,10 +1,9 @@
 import React from "react";
-import { BankContext } from './bank/bank-context';
+import { Route } from '../routes/storage';
 import { StorageMainBoxContent } from './storage-main-box-content';
 
 export const StorageMainBox: React.FC = () => {
-  const selectedBankBoxes = BankContext.useSelectedBankBoxes();
-  const mainBoxIds = selectedBankBoxes.data?.selectedBoxes.map(box => box.idInt) ?? [];
+  const mainBoxIds = Route.useSearch({ select: search => search.mainBoxIds }) ?? [];
 
   return (
     <div

@@ -55,11 +55,20 @@ export const BankContext = {
             }
         }
 
+        type SearchInput = typeof Route[ 'types' ][ 'searchSchemaInput' ];
+
         return {
             ...payload,
             data: {
                 selectedBank,
-                selectedBoxes,
+                selectedSearch: selectedBank.view.mainBoxIds.length > 0
+                    ? {
+                        mainBoxIds: selectedBoxes.map(box => box.idInt),
+                        saves: Object.fromEntries(
+                            selectedBank.view.saves.map(save => [ save.saveId, save ])
+                        ),
+                    } satisfies SearchInput
+                    : undefined,
             },
         };
     },
@@ -80,7 +89,9 @@ export const BankContext = {
                 );
             }
 
-            const saves = [ ...bank.view.saves ];
+            const saves = Object.fromEntries(
+                bank.view.saves.map(save => [ save.saveId, save ])
+            );
 
             return {
                 to: '/storage' as const satisfies (typeof Route)[ 'to' ],
@@ -90,13 +101,5 @@ export const BankContext = {
                 } satisfies (typeof Route)[ 'types' ][ 'searchSchemaInput' ]
             }
         };
-    },
-    useStorageDefaultProps: () => {
-        const selectBankProps = BankContext.useSelectBankProps();
-        const bankQuery = useStorageGetMainBanks();
-
-        const bankId = bankQuery.data?.data.find(bank => bank.isDefault)?.id;
-
-        return bankId ? selectBankProps(bankId ?? '') : undefined;
     }
 };

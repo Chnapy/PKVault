@@ -124,6 +124,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
                 </div>
               </div>}
               boxId={boxId}
+              boxType={selectedBox.type}
               boxName={selectedBox.name}
               boxPkmCount={boxPkmsList.length}
               boxSlotCount={selectedBox.slotCount}

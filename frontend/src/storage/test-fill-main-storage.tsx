@@ -1,5 +1,3 @@
-
-
 import type React from 'react';
 import { saveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { storageCreateMainBox, storageDeleteMainBox, storageGetMainBoxes, storageGetSaveBoxes, storageGetSavePkms, storageMovePkm, type storageCreateMainBoxResponse } from '../data/sdk/storage/storage.gen';

@@ -10,6 +10,7 @@ import { NumberInput } from '../../ui/input/number-input';
 import { SelectNumberInput, SelectStringInput } from '../../ui/input/select-input';
 import { TextInput } from '../../ui/input/text-input';
 import { theme } from '../../ui/theme';
+import { BoxTypeIcon } from './box-type-icon';
 
 export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void; }> = ({ boxId, close }) => {
     const { t } = useTranslate();
@@ -110,7 +111,16 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void; }> = (
             label={t('storage.box.edit.type')}
             data={Object.entries(BoxType).map(([ key, value ]) => ({
                 value,
-                option: t(`storage.box.edit.type.${key.toLowerCase() as Lowercase<keyof typeof BoxType>}`),
+                option: <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 4,
+                    paddingLeft: 4,
+                }}>
+                    <BoxTypeIcon boxType={value} />
+                    {t(`storage.box.edit.type.${key.toLowerCase() as Lowercase<keyof typeof BoxType>}`)}
+                </div>,
                 disabled: value === watchType
             })) ?? []}
             value={watchType}
@@ -121,6 +131,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void; }> = (
         <div
             style={{
                 display: 'flex',
+                alignItems: 'center',
                 gap: 8,
             }}
         >
@@ -131,6 +142,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void; }> = (
                     min: minSlotCount,
                     max: 300,
                 })}
+                title={`${minSlotCount} - ${300}`}
                 style={{
                     width: 40,
                     textAlign: 'center'
@@ -165,7 +177,16 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void; }> = (
             label={t('storage.box.edit.bank')}
             data={banksQuery.data?.data.map(bank => ({
                 value: bank.id,
-                option: bank.name,
+                option: <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 4,
+                    paddingLeft: 4,
+                }}>
+                    <Icon name='bank' solid forButton />
+                    {bank.name}
+                </div>,
                 disabled: bank.id === watchBankId
             })) ?? []}
             value={watchBankId}
@@ -173,7 +194,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void; }> = (
             disabled={boxes.length <= 1}
         />
 
-        <Button type='submit' bgColor={theme.bg.primary} disabled={watchName.length === 0 || !formState.isValid}>
+        <Button type='submit' big bgColor={theme.bg.primary} disabled={watchName.length === 0 || !formState.isValid}>
             <Icon name='pen' forButton />
             {t('action.submit')}
         </Button>

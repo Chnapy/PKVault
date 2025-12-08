@@ -21,7 +21,7 @@ public class BoxDTO : IWithId<string>
 
     public bool CanSaveWrite => Type == BoxType.Box;
 
-    // public bool CanReceivePkm => Type == BoxType.Party || Type == BoxType.Box;
+    public bool CanSaveReceivePkm => Type == BoxType.Party || Type == BoxType.Box;
 
     public required BoxEntity BoxEntity;
 

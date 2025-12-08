@@ -18,10 +18,9 @@ export const BankList: React.FC = () => {
             position: 'relative',
             top: -28,
             display: 'flex',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
             gap: 16,
-            padding: 8,
+            padding: 24,
+            paddingBottom: 16,
             backgroundColor: theme.bg.light,
             borderRadius: 0,
             borderLeft: 0,
@@ -29,13 +28,33 @@ export const BankList: React.FC = () => {
             borderTop: 0,
         }}
     >
-        {bankList.map(bank => <BankItem
-            key={bank.id}
-            bankId={bank.id}
-        />)}
+        <div style={{
+            fontSize: '150%',
+            marginTop: 16,
+            textAlign: 'right',
+        }}>
+            <Icon name='bank' solid />
+        </div>
 
-        <Button bgColor={theme.bg.primary} big onClick={() => bankCreateMutation.mutateAsync()} style={{ order: 999 }}>
-            <Icon name='plus' solid forButton />
-        </Button>
+        <div style={{
+            flexGrow: 1,
+            display: 'flex',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            gap: 16,
+        }}>
+            {bankList.map(bank => <BankItem
+                key={bank.id}
+                bankId={bank.id}
+            />)}
+
+            <Button bgColor={theme.bg.primary} big onClick={() => bankCreateMutation.mutateAsync()} style={{ minHeight: 56, order: 999 }}>
+                <Icon name='plus' solid forButton />
+            </Button>
+        </div>
+
+        <div style={{
+            minWidth: 24,
+        }} />
     </Container>;
 };

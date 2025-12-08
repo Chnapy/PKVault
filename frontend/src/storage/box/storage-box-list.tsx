@@ -1,5 +1,6 @@
+import { css } from '@emotion/css';
 import type React from 'react';
-import type { BoxDTO } from '../../data/sdk/model';
+import { type BoxDTO } from '../../data/sdk/model';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
@@ -7,7 +8,7 @@ import { ButtonWithDisabledPopover } from '../../ui/button/button-with-disabled-
 import { ButtonWithPopover } from '../../ui/button/button-with-popover';
 import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
-import { css } from '@emotion/css';
+import { BoxName } from './box-name';
 
 export const StorageBoxList: React.FC<{
     selectedBoxes: number[];
@@ -70,7 +71,10 @@ export const StorageBoxList: React.FC<{
                         alignItems: 'center',
                         height: '100%'
                     })}>
-                        {box.name}
+                        <BoxName
+                            boxType={box.type}
+                            boxName={box.name}
+                        />
 
                         <div
                             className={css({

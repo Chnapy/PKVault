@@ -29,7 +29,7 @@ export const StorageMainBoxContent: React.FC<{
   const navigate = Route.useNavigate();
 
   const selectedBankBoxes = BankContext.useSelectedBankBoxes();
-  const mainBoxIds = selectedBankBoxes.data?.selectedBoxes.map(box => box.idInt) ?? [];
+  const mainBoxIds = Route.useSearch({ select: search => search.mainBoxIds }) ?? [];
 
   const boxIndex = mainBoxIds.indexOf(boxId);
 
@@ -102,6 +102,7 @@ export const StorageMainBoxContent: React.FC<{
                 />
               </div>}
               boxId={boxId}
+              boxType={selectedBox.type}
               boxName={selectedBox.name}
               boxPkmCount={boxPkmsList.length}
               boxSlotCount={selectedBox.slotCount}
