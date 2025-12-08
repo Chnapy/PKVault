@@ -32,6 +32,16 @@ public class MainUpdateBankAction(string bankId, string bankName, bool isDefault
             bank.IsDefault = isDefault;
         }
 
+        var relatedBoxesIds = loaders.boxLoader.GetAllEntities().Values.ToList()
+            .FindAll(box => box.BankId == bankId)
+            .Select(box => box.IdInt).ToArray();
+
+        // view check: only allow boxes attached to this bank
+        view = new(
+            MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => relatedBoxesIds.Contains(id))],
+            Saves: bank.View.Saves
+        );
+
         bank.Name = bankName;
         bank.Order = order;
         bank.View = view;

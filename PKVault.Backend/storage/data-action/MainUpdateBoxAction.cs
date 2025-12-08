@@ -27,6 +27,20 @@ public class MainUpdateBoxAction(string boxId, string boxName, int order, string
                 throw new ArgumentException($"Bank must keep at least 1 box");
             }
 
+            // edit previous bank view: remove this box
+            if (box.BankId != null)
+            {
+                var bank = loaders.bankLoader.GetEntity(box.BankId);
+                if (bank.View.MainBoxIds.Contains(box.IdInt))
+                {
+                    bank.View = new(
+                        MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
+                        Saves: bank.View.Saves
+                    );
+                    loaders.bankLoader.WriteEntity(bank);
+                }
+            }
+
             // if bank change, set box as last one
             order = 999;
         }

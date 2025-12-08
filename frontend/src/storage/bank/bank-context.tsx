@@ -61,7 +61,7 @@ export const BankContext = {
             ...payload,
             data: {
                 selectedBank,
-                selectedSearch: selectedBank.view.mainBoxIds.length > 0
+                selectedSearch: selectedBoxes.length > 0
                     ? {
                         mainBoxIds: selectedBoxes.map(box => box.idInt),
                         saves: Object.fromEntries(
