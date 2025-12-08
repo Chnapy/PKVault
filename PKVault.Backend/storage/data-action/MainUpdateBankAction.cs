@@ -38,8 +38,8 @@ public class MainUpdateBankAction(string bankId, string bankName, bool isDefault
 
         // view check: only allow boxes attached to this bank
         view = new(
-            MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => relatedBoxesIds.Contains(id))],
-            Saves: bank.View.Saves
+            MainBoxIds: [.. view.MainBoxIds.ToList().FindAll(id => relatedBoxesIds.Contains(id))],
+            Saves: view.Saves
         );
 
         bank.Name = bankName;
