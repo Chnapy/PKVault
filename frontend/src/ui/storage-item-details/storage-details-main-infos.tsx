@@ -12,10 +12,11 @@ export type StorageDetailsMainInfosProps = {
     nicknameMaxLength: number;
     // gender?: GenderType;
     types: number[];
+    levelUpPercent: number;
     level: number;
 };
 
-export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = ({ idBase, pid, species, speciesName, nickname, nicknameMaxLength, types, level }) => {
+export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = ({ idBase, pid, species, speciesName, nickname, nicknameMaxLength, types, levelUpPercent, level }) => {
     const formContext = StorageDetailsForm.useContext();
 
     return <DetailsMainInfos
@@ -32,6 +33,7 @@ export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = (
             : nickname}
         // genders={gender !== undefined ? [ gender ] : []}
         types={types}
+        levelUpPercent={levelUpPercent}
         level={level}
     />;
 };

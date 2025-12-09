@@ -119,6 +119,10 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         get { return Pkm.EXP; }
     }
 
+    public uint ExpToLevelUp => Experience.GetEXPToLevelUp(Pkm.CurrentLevel, Pkm.PersonalInfo.EXPGrowth);
+
+    public double LevelUpPercent => Experience.GetEXPToLevelUpPercentage(Pkm.CurrentLevel, Pkm.EXP, Pkm.PersonalInfo.EXPGrowth);
+
     public int[] IVs
     {
         get
@@ -217,7 +221,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
             : MoveCategory.SPECIAL;
     }
 
-    public PKHeX.Core.Nature Nature { get => Pkm.Nature; }
+    public PKHeX.Core.Nature Nature { get => Pkm is GBPKM gbpkm ? Experience.GetNatureVC(gbpkm.EXP) : Pkm.Nature; }
 
     public int Ability
     {
