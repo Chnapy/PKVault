@@ -143,6 +143,7 @@
   "details.nature": "Nature",
   "details.ability": "Talent",
   "details.moves": "Capacités",
+  "details.friendship": "Bonheur",
   "details.origin": "Origine",
   "details.tid": "TID",
   "storage.save-actions.title": "{{count}} actions à sauvegarder",

@@ -14,9 +14,12 @@ export type StorageDetailsMainInfosProps = {
     types: number[];
     levelUpPercent: number;
     level: number;
+    eggHatchCount?: number;
 };
 
-export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = ({ idBase, pid, species, speciesName, nickname, nicknameMaxLength, types, levelUpPercent, level }) => {
+export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = ({
+    idBase, pid, species, speciesName, nickname, nicknameMaxLength, types, levelUpPercent, level, eggHatchCount
+}) => {
     const formContext = StorageDetailsForm.useContext();
 
     return <DetailsMainInfos
@@ -35,5 +38,6 @@ export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = (
         types={types}
         levelUpPercent={levelUpPercent}
         level={level}
+        eggHatchCount={eggHatchCount}
     />;
 };

@@ -2,6 +2,7 @@ import { css } from '@emotion/css';
 import type React from 'react';
 import { useTranslate } from '../../translate/i18n';
 import { getSpeciesNO } from '../dex-item/util/get-species-no';
+import { Gauge } from '../gauge/gauge';
 import { theme } from '../theme';
 import { TypeItem } from '../type-item/type-item';
 import { DetailsLevel } from './details-level';
@@ -16,9 +17,10 @@ export type DetailsMainInfosProps = {
     types: number[];
     levelUpPercent?: number;
     level?: number;
+    eggHatchCount?: number;
 };
 
-export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid = 0, species, speciesName, nickname, types, levelUpPercent, level }) => {
+export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid = 0, species, speciesName, nickname, types, levelUpPercent, level, eggHatchCount = 0 }) => {
     const { t } = useTranslate();
 
     return <>
@@ -36,33 +38,35 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid 
         <br />
         <div style={{ display: 'flex', gap: 4, height: '1lh' }}>
             {types.map(type => <TypeItem key={type} type={type} />)}
-            {level !== undefined && <div style={{
-                marginLeft: 'auto',
+
+            {(level !== undefined || eggHatchCount > 0) && <div style={{
+                flexGrow: 1,
                 color: theme.text.primary,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
             }}>
-                {levelUpPercent !== undefined && <div
-                    title={`${(levelUpPercent * 100).toFixed(0)}%`}
-                    className={css({
-                        width: 60,
-                        height: 6,
-                        display: 'inline-flex',
-                        border: `1px solid ${theme.border.default}`,
-                        borderRadius: 2,
-                    })}
-                >
-                    <div
-                        className={css({
-                            height: '100%',
-                            backgroundColor: theme.bg.primary,
-                        })}
-                        style={{ width: `${levelUpPercent * 100}%` }}
-                    />
-                </div>}
+                {eggHatchCount > 0
+                    ? <>
+                        <Gauge
+                            className={css({ marginLeft: 'auto' })}
+                            value={eggHatchCount / 255}
+                        />
 
-                <DetailsLevel level={level} />
+                        {eggHatchCount}
+                    </>
+                    : level !== undefined && <>
+                        {levelUpPercent !== undefined
+                            ? <Gauge
+                                className={css({ marginLeft: 'auto' })}
+                                value={levelUpPercent}
+                            />
+                            : <div style={{
+                                flexGrow: 1,
+                            }} />}
+
+                        <DetailsLevel level={level} />
+                    </>}
             </div>}
         </div>
         <br />

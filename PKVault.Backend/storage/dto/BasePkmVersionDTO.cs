@@ -123,6 +123,10 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public double LevelUpPercent => Experience.GetEXPToLevelUpPercentage(Pkm.CurrentLevel, Pkm.EXP, Pkm.PersonalInfo.EXPGrowth);
 
+    public byte Friendship => Pkm.IsEgg ? (byte)0 : Pkm.CurrentFriendship;
+
+    public byte EggHatchCount => Pkm.IsEgg ? Pkm.CurrentFriendship : (byte)0;
+
     public int[] IVs
     {
         get

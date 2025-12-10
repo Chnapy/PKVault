@@ -24,7 +24,7 @@ import { TextStats } from './text-stats';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'idBase' | 'pid' | 'species' | 'version' | 'context' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
-    | 'gender' | 'level' | 'levelUpPercent' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
+    | 'gender' | 'level' | 'levelUpPercent' | 'eggHatchCount' | 'friendship' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
     | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
     | 'heldItem' | 'isValid' | 'validityReport' | 'canEdit'
@@ -93,6 +93,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
                 levelUpPercent={pkm.levelUpPercent}
                 level={pkm.level}
                 types={pkm.types}
+                eggHatchCount={pkm.eggHatchCount}
             />
         }
         preContent={<>
@@ -152,6 +153,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
                         hiddenPowerType={pkm.hiddenPowerType}
                         hiddenPowerPower={pkm.hiddenPowerPower}
                         hiddenPowerCategory={pkm.hiddenPowerCategory}
+                        friendship={pkm.friendship}
                     />
                 </TextContainer>
 

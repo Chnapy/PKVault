@@ -4,6 +4,7 @@ import { MoveCategory, type StaticMove } from '../../data/sdk/model';
 import { useStorageGetPkmAvailableMoves } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
+import { Gauge } from '../gauge/gauge';
 import { SelectNumberInput } from '../input/select-input';
 import { MoveItem } from '../move-item/move-item';
 import { theme } from '../theme';
@@ -18,6 +19,7 @@ export type TextMovesProps = {
     hiddenPowerType: number;
     hiddenPowerPower: number;
     hiddenPowerCategory: MoveCategory;
+    friendship: number;
 };
 
 export const TextMoves: React.FC<TextMovesProps> = ({
@@ -29,6 +31,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
     hiddenPowerType,
     hiddenPowerPower,
     hiddenPowerCategory,
+    friendship,
 }) => {
     const { t } = useTranslate();
 
@@ -43,6 +46,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
     const getStaticMove = React.useCallback((moveId: number): StaticMove | undefined => {
         const staticMove = staticData.moves[ moveId ];
 
+        // hidden power
         if (moveId === 237) {
             return staticMove && {
                 ...staticMove,
@@ -54,9 +58,33 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                 } ]
             };
         }
+        // return
+        else if (moveId === 216) {
+            const returnPower = Number.parseInt((friendship / 2.5).toString());
+            return staticMove && {
+                ...staticMove,
+                dataUntilGeneration: [ {
+                    ...staticMove.dataUntilGeneration[ staticMove.dataUntilGeneration.length - 1 ]!,
+                    untilGeneration: 99,
+                    power: returnPower,
+                } ]
+            };
+        }
+        // frustration
+        else if (moveId === 218) {
+            const frustrationPower = Number.parseInt(((255 - friendship) / 2.5).toString());
+            return staticMove && {
+                ...staticMove,
+                dataUntilGeneration: [ {
+                    ...staticMove.dataUntilGeneration[ staticMove.dataUntilGeneration.length - 1 ]!,
+                    untilGeneration: 99,
+                    power: frustrationPower,
+                } ]
+            };
+        }
 
         return staticMove;
-    }, [ hiddenPowerCategory, hiddenPowerPower, hiddenPowerType, staticData.moves ]);
+    }, [ friendship, hiddenPowerCategory, hiddenPowerPower, hiddenPowerType, staticData.moves ]);
 
     const formMoves = watch(`moves`);
 
@@ -92,6 +120,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                 display: 'flex',
                 flexWrap: 'wrap',
                 gap: 4,
+                paddingBottom: 14,
             }}
         >
             {editMode
@@ -173,6 +202,19 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                             : null;
                     })}
                 </>}
+        </div>
+        <div
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+            }}
+        >
+            {t('details.friendship')}
+
+            <Gauge value={friendship / 255} />
+
+            {friendship}
         </div>
     </>;
 };
