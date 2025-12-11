@@ -22,7 +22,7 @@ export const FilterGeneration: React.FC = () => {
 
   const options = allGenerations.map((generation) => ({
     value: generation.toString(),
-    label: t('dex.filters.generations.option', { generation }),
+    label: t('dex.filters.generations.option', { generation, regions: staticData.generations[ generation ]?.regions.join(', ') }),
   }));
 
   return (

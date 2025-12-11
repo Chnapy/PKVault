@@ -12,6 +12,7 @@ public class StaticDataDTO
     public required Dictionary<int, StaticAbility> Abilities { get; set; }
     public required Dictionary<int, StaticItem> Items { get; set; }
     public required Dictionary<ushort, StaticEvolve> Evolves { get; set; }
+    public required Dictionary<byte, StaticGeneration> Generations { get; set; }
     public required StaticSpritesheets Spritesheets { get; set; }
     public required string EggSprite { get; set; }
 }
@@ -21,6 +22,7 @@ public struct StaticVersion
     public required byte Id { get; set; }
     public required string Name { get; set; }
     public required byte Generation { get; set; }
+    public required string[] Region { get; set; }
     public required int MaxSpeciesId { get; set; }
     public required int MaxIV { get; set; }
     public required int MaxEV { get; set; }
@@ -109,6 +111,12 @@ public struct StaticEvolve
     public required Dictionary<byte, StaticEvolveItem> Trade { get; set; }
     // item -> version -> (evolved species, min-level)
     public required Dictionary<string, Dictionary<byte, StaticEvolveItem>> TradeWithItem { get; set; }
+}
+
+public struct StaticGeneration
+{
+    public required int Id { get; set; }
+    public required string[] Regions { get; set; }
 }
 
 public record StaticSpritesheets

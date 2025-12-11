@@ -13,6 +13,8 @@ using PokeApiNet;
 [JsonSerializable(typeof(Stat))]
 [JsonSerializable(typeof(PokeApiNet.Version))]
 [JsonSerializable(typeof(VersionGroup))]
+[JsonSerializable(typeof(Generation))]
+[JsonSerializable(typeof(Region))]
 
 [JsonSerializable(typeof(NamedApiResourceList<Pokemon>))]
 [JsonSerializable(typeof(NamedApiResourceList<PokemonSpecies>))]
@@ -25,6 +27,8 @@ using PokeApiNet;
 [JsonSerializable(typeof(NamedApiResourceList<Stat>))]
 [JsonSerializable(typeof(NamedApiResourceList<PokeApiNet.Version>))]
 [JsonSerializable(typeof(NamedApiResourceList<VersionGroup>))]
+[JsonSerializable(typeof(NamedApiResourceList<Generation>))]
+[JsonSerializable(typeof(NamedApiResourceList<Region>))]
 
 [JsonSerializable(typeof(PokemonSprites.VersionSprites.GenerationVIIISprites.IconsSprites),
 GenerationMode = JsonSourceGenerationMode.Default, TypeInfoPropertyName = "PokemonSpritesVersionSpritesGenerationVIIISpritesIconsSprites")]

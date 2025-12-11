@@ -146,6 +146,20 @@ public class PokeApi
         );
     }
 
+    public static async Task<Region?> GetRegion(int id)
+    {
+        return await client.GetAsync(id,
+            PokeApiJsonContext.Default.Region
+        );
+    }
+
+    public static async Task<Region?> GetRegion(NamedApiResource<Region> namedRegion)
+    {
+        return await client.GetAsync(namedRegion,
+            PokeApiJsonContext.Default.Region
+        );
+    }
+
     public static byte GetGenerationValue(string resourceName)
     {
         return resourceName switch

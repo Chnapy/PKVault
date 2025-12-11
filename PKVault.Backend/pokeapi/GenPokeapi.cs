@@ -39,6 +39,7 @@ public class GenPokeapi
         var abilities = StaticDataService.GetStaticAbilities(lang);
         var items = StaticDataService.GetStaticItems(lang);
         var evolves = StaticDataService.GetStaticEvolves();
+        var generations = StaticDataService.GetStaticGenerations(lang);
 
         var dto = new StaticDataDTO
         {
@@ -51,6 +52,7 @@ public class GenPokeapi
             Abilities = abilities,
             Items = await items,
             Evolves = await evolves,
+            Generations = await generations,
             Spritesheets = await spritesheets,
             EggSprite = StaticDataService.GetEggSprite()
         };

@@ -33,11 +33,15 @@ public class StaticDataService
                 ? null
                 : BlankSaveFile.Get(version.GetContext());
 
+                var versionName = GetVersionName(version, lang);
+                var versionRegion = GetVersionRegionName(version, lang);
+
                 return new StaticVersion
                 {
                     Id = (byte)version,
-                    Name = await GetVersionName(version, lang),
+                    Name = await versionName,
                     Generation = version.GetGeneration(),
+                    Region = await versionRegion,
                     MaxSpeciesId = blankSave?.MaxSpeciesID ?? 0,
                     MaxIV = blankSave?.MaxIV ?? 0,
                     MaxEV = blankSave?.MaxEV ?? 0,
@@ -785,6 +789,44 @@ public class StaticDataService
         return staticEvolves;
     }
 
+    public static async Task<Dictionary<byte, StaticGeneration>> GetStaticGenerations(string lang)
+    {
+        var staticGenerations = new Dictionary<byte, StaticGeneration>();
+
+        for (byte id = 1; id < 20; id++)
+        {
+            try
+            {
+                var region = await PokeApi.GetRegion(id);
+
+                if (region.MainGeneration == null)
+                {
+                    continue;
+                }
+
+                var generation = PokeApi.GetGenerationValue(region.MainGeneration.Name);
+
+                if (!staticGenerations.TryGetValue(generation, out var value))
+                {
+                    value = new StaticGeneration()
+                    {
+                        Id = generation,
+                        Regions = []
+                    };
+                }
+                value.Regions = [.. value.Regions, PokeApi.GetNameForLang(region.Names, lang)];
+                staticGenerations.Remove(generation);
+                staticGenerations.Add(generation, value);
+            }
+            catch
+            {
+                break;
+            }
+        }
+
+        return staticGenerations;
+    }
+
     public static string GetEggSprite()
     {
         return GetPokeapiRelativePath("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png");
@@ -853,6 +895,30 @@ public class StaticDataService
             {
                 return PokeApi.GetNameForLang(ver.Names, lang);
             }).Distinct());
+    }
+
+    private static async Task<string[]> GetVersionRegionName(GameVersion version, string lang)
+    {
+        var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
+
+        return [.. (await Task.WhenAll(
+            pokeapiVersions
+                .OfType<PokeApiNet.Version>()
+                .Select(async ver =>
+                {
+                    if (ver.Id == 0)
+                    {
+                        return [];
+                    }
+
+                    var versionGroup = await PokeApi.GetVersionGroup(ver.VersionGroup);
+                    var regions = await Task.WhenAll(versionGroup.Regions.Select(region =>
+                        PokeApi.GetRegion(region)
+                    ));
+                    return regions.Select(region => PokeApi.GetNameForLang(region.Names, lang));
+                })
+            ))
+            .SelectMany(v => v).Distinct()];
     }
 
     public static int GetBallPokeApiId(Ball ball) => ball switch

@@ -101,7 +101,7 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
         enableExpand
         title={
           <>
-            {t('dex.list.title', { generation: i + 1 })}
+            {t('dex.list.title', { generation: i + 1, regions: staticData.generations[ i + 1 ]?.regions.join(', ') })}
 
             <div style={{ float: 'right' }}>
               <PokedexCount

@@ -60,7 +60,7 @@ const Saves: React.FC = withErrorCatcher('default', () => {
 
           const maxSpecies = Math.max(...saves.map(save => staticData.versions[ save.version ]?.maxSpeciesId ?? 0));
 
-          return <TitledContainer key={generation} title={t('saves.title', { generation, maxSpecies })}>
+          return <TitledContainer key={generation} title={t('saves.title', { generation, regions: staticData.generations[ generation ]?.regions.join(', '), maxSpecies })}>
             <div
               style={{
                 display: 'flex',
