@@ -134,6 +134,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
                     <TextStats
                         nature={pkm.nature}
                         ivs={pkm.iVs}
+                        maxIv={staticData.versions[ pkm.version ]?.maxIV ?? 0}
                         evs={pkm.eVs}
                         maxEv={staticData.versions[ pkm.version ]?.maxEV ?? 0}
                         stats={pkm.stats}
