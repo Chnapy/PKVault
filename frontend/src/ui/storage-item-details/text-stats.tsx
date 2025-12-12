@@ -58,10 +58,12 @@ export const TextStats: React.FC<TextStatsProps> = ({
         {(i + 1) === natureObj?.increasedStatIndex && <Icon name='angle-up' style={{ color: theme.text.primary }} />}
     </td>;
 
+    const maxStatValue = Math.max(...stats, 350);
+
     const dataMax = [
         ivs.map(() => maxIv),
         evs.map(() => maxEv),
-        [ 714, 526, 614, 584, 614, 548 ]
+        stats.map(() => maxStatValue),
     ];
     const data = [
         ivs,
@@ -158,7 +160,11 @@ export const TextStats: React.FC<TextStatsProps> = ({
                     </tbody>
                 </table>
             )
-            : <div style={{ marginTop: -26 }}>
+            : <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginTop: -26
+            }}>
                 <RadarChart
                     width={300}
                     data={data}

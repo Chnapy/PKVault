@@ -3,35 +3,35 @@ import type React from 'react';
 import { theme } from '../theme';
 
 export const RadarChart: React.FC<{
-    width: number;
-    data: number[][];
-    dataMax: number[][];
-    caption?: React.ReactNode;
-    legend: React.ReactNode[];
-    labels: React.ReactNode[];
-    colors: string[];
+  width: number;
+  data: number[][];
+  dataMax: number[][];
+  caption?: React.ReactNode;
+  legend: React.ReactNode[];
+  labels: React.ReactNode[];
+  colors: string[];
 }> = ({
-    width, data, dataMax, caption, legend, labels, colors
+  width, data, dataMax, caption, legend, labels, colors
 }) => {
-        const dataPercentRaw = data.map((values, valuesIndex) => values
-            .map((value, i) => value * 100 / dataMax[ valuesIndex ]![ i ]!)
-        );
-        const dataPercent = dataPercentRaw.map((values) => values
-            .map((value, i) => {
-                const prevValue = values[ (i - 1) % values.length ]!;
-                const nextValue = values[ (i + 1) % values.length ]!;
-                const nextNextValue = values[ (i + 2) % values.length ]!;
+    const dataPercentRaw = data.map((values, valuesIndex) => values
+      .map((value, i) => value * 100 / dataMax[ valuesIndex ]![ i ]!)
+    );
+    const dataPercent = dataPercentRaw.map((values) => values
+      .map((value, i) => {
+        const prevValue = values[ (i - 1) % values.length ]!;
+        const nextValue = values[ (i + 1) % values.length ]!;
+        const nextNextValue = values[ (i + 2) % values.length ]!;
 
-                if (prevValue > 10 && value < 10 && nextValue > 10 && nextNextValue < 10) {
-                    return 10;
-                }
+        if (prevValue > 10 && value < 10 && nextValue > 10 && nextNextValue < 10) {
+          return 10;
+        }
 
-                return value;
-            })
-        );
+        return value;
+      })
+    );
 
-        return <table
-            className={css(`
+    return <table
+      className={css(`
 @charset "UTF-8";
 & {
   --scale: 100;
@@ -52,7 +52,7 @@ export const RadarChart: React.FC<{
   contain: layout;
   counter-reset: scale var(--integer);
   inline-size: calc(var(--radius) * 2);
-  margin: 1rem auto ${caption ? 5 : 4}rem;
+  margin: 10px 2lh ${caption ? 5 : 3}lh;
   overflow: visible;
   position: relative;
   max-inline-size: 100%;
@@ -96,6 +96,7 @@ ${data[ 0 ]!.map((value, i) => `& tr > *:nth-of-type(${i + 1}) {
   border-block-end: 1px solid ${theme.border.default};
   inline-size: 50%;
   left: 0;
+  padding: 0;
   margin: 0;
   position: absolute;
   top: 0;
@@ -209,27 +210,27 @@ ${data[ 0 ]!.map((value, i) => `& td:nth-of-type(${i + 1})::after {
   }
 }
 `)}
-        >
-            {caption && <caption>{caption}</caption>}
-            <thead>
-                <tr>
-                    <td></td>
-                    {legend.map((label, i) => <th key={i} scope="col">{label}</th>)}
-                </tr>
-            </thead>
-            <tbody>
-                {dataPercent.map((values, valuesIndex) => <tr
-                    key={valuesIndex}
-                    className={css(`
+    >
+      {caption && <caption>{caption}</caption>}
+      <thead>
+        <tr>
+          <td></td>
+          {legend.map((label, i) => <th key={i} scope="col">{label}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {dataPercent.map((values, valuesIndex) => <tr
+          key={valuesIndex}
+          className={css(`
                         --color: ${colors[ valuesIndex ]};
                         ${values.map((value, i) => `--${i + 1}: ${value};\n`).join('')}
                         ${data[ valuesIndex ]!.map((value, i) => `--${i + 1}-label: ${value};\n`).join('')}
                         --${values.length + 1}: var(--1);
                     `)}
-                >
-                    <th scope="row">{labels[ valuesIndex ]}</th>
-                    {data[ valuesIndex ]!.map((value, i) => <td key={i}><span>{value}</span></td>)}
-                </tr>)}
-            </tbody>
-        </table>;
-    };
+        >
+          <th scope="row">{labels[ valuesIndex ]}</th>
+          {data[ valuesIndex ]!.map((value, i) => <td key={i}><span>{value}</span></td>)}
+        </tr>)}
+      </tbody>
+    </table>;
+  };
