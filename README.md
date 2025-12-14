@@ -83,15 +83,15 @@ Your can use this app for your own projects following license restrictions.
 
 - Backend / WinForm
 
-  - [PKHeX (Core part)](https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core) - v25.9.25 - License GPLv3
-  - PokeApiNet - v4.1.0 - License MIT
-  - All others dependencies can be found into `*.csproj` files
+  - [PKHeX (Core part)](https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core) - License GPLv3
+  - PokeApiNet - License MIT
+  - Versions & all others dependencies can be found into `*.csproj` files
 
 - Frontend
 
   - Font "Pixel Operator" - from [onlinewebfonts](http://www.onlinewebfonts.com) - License CC BY 4.0
   - Font "Pokemon Emerald" - from [fontstruct](https://fontstruct.com/fontstructions/show/1975556) by "aztecwarrior28" - License CC BY-SA 3.0
-  - [HackerNoon's Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) - v1.0.6 - License MIT
-  - All others dependencies can be found into [frontend/package.json](./frontend/package.json).
+  - [HackerNoon's Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) - License MIT
+  - Versions & all others dependencies can be found into [frontend/package.json](./frontend/package.json).
 
 All image contents of game-icons, pokemons, types, items, move-categories are Copyright The Pokémon Company.
