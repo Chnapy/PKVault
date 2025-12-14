@@ -513,7 +513,8 @@ export const StorageMoveContext = {
                 return { enable: false };
             }
 
-            if (multipleSlotsInfos.some(({ targetSlot }) => targetSlot < 0 || targetSlot > 29)) {
+            const slotCount = (targetBoxMain?.slotCount ?? targetBoxSave?.slotCount ?? 0) - 1;
+            if (multipleSlotsInfos.some(({ targetSlot }) => targetSlot < 0 || targetSlot > slotCount)) {
                 return { enable: false };
             }
 

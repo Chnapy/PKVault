@@ -125,7 +125,6 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void; }> = (
             })) ?? []}
             value={watchType}
             onChange={value => setValue('type', value as BoxType)}
-            disabled={boxes.length <= 1}
         />
 
         <div

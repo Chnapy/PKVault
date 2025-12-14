@@ -7,9 +7,9 @@
 <h6 align="center">
     <a href="https://github.com/Chnapy/PKVault/releases"><b>RELEASES</b></a>
     &nbsp;|&nbsp;
-    <a href="https://projectpokemon.org/home/files/file/5766-pkvault/" target="__blank"><b>PROJECT POKEMON TOOL PAGE</b></a>
+    <a href="https://projectpokemon.org/home/files/file/5766-pkvault/"><b>PROJECT POKEMON TOOL PAGE</b></a>
     &nbsp;|&nbsp;
-    <a href="https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app" target="__blank"><b>PROJECT POKEMON DISCUSSION PAGE</b></a>
+    <a href="https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app"><b>PROJECT POKEMON DISCUSSION PAGE</b></a>
 </h6>
 
 PKVault is a Pokemon storage & save manipulation tool based on [PKHeX](https://github.com/kwsch/PKHeX).
