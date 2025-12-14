@@ -6,9 +6,14 @@
 
 <h6 align="center">
     <a href="https://github.com/Chnapy/PKVault/releases"><b>RELEASES</b></a>
+    &nbsp;|&nbsp;
+    <a href="https://projectpokemon.org/home/files/file/5766-pkvault/" target="__blank"><b>PROJECT POKEMON TOOL PAGE</b></a>
+    &nbsp;|&nbsp;
+    <a href="https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app" target="__blank"><b>PROJECT POKEMON DISCUSSION PAGE</b></a>
 </h6>
 
 PKVault is a Pokemon storage & save manipulation tool based on [PKHeX](https://github.com/kwsch/PKHeX).
+Similar to Pokemon Home, offline as online.
 
 This tool can be used as:
 
@@ -30,9 +35,10 @@ Executables can be found in releases.
 ## Bulk features
 
 - Storage & save manipulation
+  - compatible with all pokemon games, from first generation to **Pokemon Legends: Z-A**
   - transfer pokemons between saves
   - convert pokemon to any generation (ex. G7 to G2)
-  - store pokemons outside saves
+  - store pokemons outside saves using banks & boxes
   - allow use of multiple "versions" for stored pokemons
   - move/delete actions
   - edit pokemon moves, EVs & nickname
