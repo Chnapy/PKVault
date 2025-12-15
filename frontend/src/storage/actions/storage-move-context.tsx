@@ -183,7 +183,7 @@ export const StorageMoveContext = {
                 };
 
                 const scrollHandler = (ev: Event) => {
-                    if (ref.current) {
+                    if (ref.current && (ev.target as HTMLElement)?.getAttribute?.('data-move-root')) {
                         moveVariables.scrollX = (ev.target as HTMLElement).scrollLeft;
                         moveVariables.scrollY = (ev.target as HTMLElement).scrollTop;
                         ref.current.style.transform = getTransform();

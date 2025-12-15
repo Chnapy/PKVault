@@ -5,6 +5,7 @@ import { css } from '@emotion/css';
 export const Frame: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     return <div
+        data-move-root
         className={css({
             position: 'relative',
             height: "100vh",

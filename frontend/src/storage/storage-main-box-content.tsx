@@ -82,6 +82,7 @@ export const StorageMainBoxContent: React.FC<{
       <PopoverButton
         as={StorageBox}
         loading={loading}
+        moreThan30={selectedBox.slotCount > 30}
         style={style}
         header={
           <>

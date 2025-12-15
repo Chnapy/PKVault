@@ -7,12 +7,14 @@ import { Icon } from '../icon/icon';
 export type StorageBoxProps = Pick<TitledContainerProps, 'ref' | 'style'> & {
   header: React.ReactNode;
   loading?: boolean;
+  moreThan30?: boolean;
 };
 
 export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
   ref,
   header,
   loading,
+  moreThan30,
   children,
   style,
 }) => {
@@ -37,6 +39,9 @@ export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
             display: "grid",
             gridTemplateColumns: "repeat(6, 1fr)",
             gap: 4,
+            maxHeight: 506,
+            overflowY: 'visible',
+            margin: moreThan30 ? '0 -5px' : undefined,
           }}
         >
           {children}

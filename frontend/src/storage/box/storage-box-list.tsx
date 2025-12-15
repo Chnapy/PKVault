@@ -23,13 +23,16 @@ export const StorageBoxList: React.FC<{
 
     return <div
         className={css({
-            width: 614,
+            width: 616,
+            maxHeight: 514,
             display: 'flex',
+            alignItems: 'flex-start',
             // justifyContent: 'space-evenly',
             flexWrap: 'wrap',
             gap: 4,
-            padding: 5,
+            padding: 4,
             marginTop: 4,
+            overflowY: 'auto',
         })}
     >
         {boxes.map(box => {

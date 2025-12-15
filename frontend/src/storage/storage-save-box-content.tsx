@@ -90,6 +90,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
       <PopoverButton
         as={StorageBox}
         style={style}
+        moreThan30={selectedBox.slotCount > 30}
         loading={loading}
         header={
           <>
