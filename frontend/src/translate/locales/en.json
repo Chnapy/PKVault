@@ -9,6 +9,7 @@
   "notifications.warnings": "{{count}} warnings",
   "notifications.warnings.save-changed": "Careful, save file {{saveName}} was updated by another program.\nSaving your changes may erase these external changes.\nFile: {{path}}",
   "notifications.warnings.pkm-version": "Pkm {{speciesName}} in box {{boxId}} slot {{boxSlot}} not found in attached save.",
+  "notifications.warnings.save-duplicate": "Careful, save {{saveName}} has file duplicates, it may break saving action.\nPlease keep only a single file:\n{{paths}}",
   "action.confirm": "Confirm ?",
   "saves.not-see": "Not seeing your save ?",
   "action.check-settings": "Check settings",

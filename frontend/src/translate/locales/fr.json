@@ -9,6 +9,7 @@
   "notifications.warnings": "{{count}} warnings",
   "notifications.warnings.save-changed": "Attention, le fichier de sauvegarde {{saveName}} a été modifié par un autre programme.\nSauvegarder vos changements pourraient effacer les modifications exterieurs à PKVault.\nFichier: {{path}}",
   "notifications.warnings.pkm-version": "Pkm {{speciesName}} dans la boîte {{boxId}} emplacement {{boxSlot}} introuvable dans la sauvegarde attachée.",
+  "notifications.warnings.save-duplicate": "Attention, la sauvegarde {{saveName}} a des fichiers doublons, ce qui peut casser l'action de sauvegarde.\nGardez un seul fichier:\n{{paths}}",
   "action.confirm": "Confirmer ?",
   "saves.not-see": "Vous ne voyez pas votre sauvegarde ?",
   "action.check-settings": "Vérifier les parametres",

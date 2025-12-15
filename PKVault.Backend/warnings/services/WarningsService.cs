@@ -8,6 +8,7 @@ public class WarningsService
         PlayTimeWarnings = [],
         PkmVersionWarnings = [],
         PkmDuplicateWarnings = [],
+        SaveDuplicateWarnings = [],
     };
 
     public static WarningsDTO GetWarningsDTO()
@@ -22,6 +23,7 @@ public class WarningsService
         var saveChangedWarnings = CheckSaveChangedWarnings();
         var pkmVersionWarnings = CheckPkmVersionWarnings();
         var pkmDuplicateWarnings = CheckSavePkmDuplicates();
+        var saveDuplicateWarnings = CheckSaveDuplicates();
 
         WarningsDTO = new()
         {
@@ -29,6 +31,7 @@ public class WarningsService
             PlayTimeWarnings = CheckPlayTimeWarning(),
             PkmVersionWarnings = await pkmVersionWarnings,
             PkmDuplicateWarnings = await pkmDuplicateWarnings,
+            SaveDuplicateWarnings = await saveDuplicateWarnings,
         };
 
         logtime();
@@ -188,6 +191,31 @@ public class WarningsService
         });
 
         return (await Task.WhenAll(tasks)).ToList().FindAll(warn => warn.DuplicateIdBases.Length > 0);
+    }
+
+    private static async Task<List<SaveDuplicateWarning>> CheckSaveDuplicates()
+    {
+        var loader = await StorageService.GetLoader();
+
+        if (loader.loaders.saveLoadersDict.Count == 0)
+        {
+            return [];
+        }
+
+        var tasks = loader.loaders.saveLoadersDict.Values.Select(async (saveLoader) =>
+        {
+            var paths = LocalSaveService.SaveByPath.ToList()
+                .FindAll(entry => entry.Value.ID32 == saveLoader.Save.ID32)
+                .Select(entry => entry.Key);
+
+            return new SaveDuplicateWarning()
+            {
+                SaveId = saveLoader.Save.ID32,
+                Paths = [.. paths],
+            };
+        });
+
+        return (await Task.WhenAll(tasks)).ToList().FindAll(warn => warn.Paths.Length > 1);
     }
 
     // private static int GetSavePlayTimeS(SaveFile save)

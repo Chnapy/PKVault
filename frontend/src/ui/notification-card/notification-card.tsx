@@ -6,6 +6,7 @@ import { HasUpdateWarning } from '../../warnings/has-update-warning';
 import { useCheckUpdate } from '../../warnings/hooks/use-check-update';
 import { PkmVersionWarning } from '../../warnings/pkm-version-warning';
 import { SaveChangedWarning } from '../../warnings/save-changed-warning';
+import { SaveDuplicateWarning } from '../../warnings/save-duplicate-warning';
 import { Button } from '../button/button';
 import { TitledContainer } from '../container/titled-container';
 import { Icon } from '../icon/icon';
@@ -48,6 +49,8 @@ export const NotificationCard: React.FC = () => {
                             Issue with save {warn.saveId}, current save seems to have less play-time than previous one
                         </div>)} */}
                 {hasUpdate && <HasUpdateWarning />}
+
+                {warnings?.saveDuplicateWarnings.map((warn, i) => <SaveDuplicateWarning key={i} {...warn} />)}
 
                 {warnings?.pkmVersionWarnings.map((warn, i) => <PkmVersionWarning key={i} {...warn} />)}
 
