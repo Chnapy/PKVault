@@ -35,7 +35,7 @@ public class MainCreateBankAction : DataAction
 
         flags.MainBanks = true;
 
-        await new MainCreateBoxAction(id.ToString()).ExecuteWithPayload(loaders, flags);
+        await new MainCreateBoxAction(id.ToString(), null).ExecuteWithPayload(loaders, flags);
 
         return new()
         {

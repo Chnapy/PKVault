@@ -1,4 +1,4 @@
-public class MainCreateBoxAction(string bankId) : DataAction
+public class MainCreateBoxAction(string bankId, int? slotCount) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
@@ -29,6 +29,7 @@ public class MainCreateBoxAction(string bankId) : DataAction
             {
                 Id = id.ToString(),
                 Name = name,
+                SlotCount = slotCount ?? 30,
                 Order = order,
                 BankId = bankId
             }

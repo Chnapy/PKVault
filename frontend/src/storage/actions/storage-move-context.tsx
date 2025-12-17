@@ -2,7 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import type { BoxDTO, PkmDTO, PkmSaveDTO } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
-import { useStorageGetMainBoxes, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSaveBoxes, useStorageGetSavePkms, useStorageMovePkm } from '../../data/sdk/storage/storage.gen';
+import { useStorageGetMainBoxes, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSaveBoxes, useStorageGetSavePkms, useStorageMovePkm, useStorageMovePkmBank } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { StorageSelectContext } from './storage-select-context';
@@ -13,6 +13,7 @@ type Context = {
         saveId?: number;
         attached?: boolean;
         target?: {
+            bankId?: string;    // only for bank buttons
             saveId?: number;
             boxId: number;
             boxSlots: number[];
@@ -49,6 +50,13 @@ export const StorageMoveContext = {
             (moveTarget.saveId === saveId && moveTarget.boxId === boxId && moveTarget.boxSlots.includes(boxSlot))
             || (selected.saveId === saveId && !!pkmId && selected.ids.includes(pkmId))
         );
+    },
+    useLoadingBank: (bankId: string) => {
+        const { selected } = StorageMoveContext.useValue();
+
+        const moveTarget = selected?.target;
+
+        return moveTarget?.bankId === bankId;
     },
     useClickable: (pkmIdsRaw: string[], saveId: number | undefined) => {
         const moveContext = StorageMoveContext.useValue();
@@ -256,6 +264,177 @@ export const StorageMoveContext = {
 
                 return element;
             },
+        };
+    },
+    useDroppableBank: (bankId: string) => {
+        const { t } = useTranslate();
+        const { selected, setSelected } = StorageMoveContext.useValue();
+        const selectContext = StorageSelectContext.useValue();
+
+        const mainBoxesQuery = useStorageGetMainBoxes();
+        const mainPkmsQuery = useStorageGetMainPkms();
+        const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
+        const sourceSavePkmsQuery = useStorageGetSavePkms(selected?.saveId ?? 0);
+
+        const movePkmBankMutation = useStorageMovePkmBank();
+
+        const isDragging = !!selected && !selected.target;
+
+        const sourceMainPkm = selected && selected.ids.length > 0 ? (
+            selected.saveId
+                ? sourceSavePkmsQuery.data?.data.find(pkm => pkm.id === selected.ids[ 0 ])
+                : mainPkmsQuery.data?.data.find(pkm => pkm.id === selected.ids[ 0 ])
+        ) : undefined;
+
+        type SlotsInfos = {
+            sourceId: string;
+            sourceSlot: number;
+            sourcePkmMain?: PkmDTO;
+            sourcePkmSave?: PkmSaveDTO;
+            sourceMainBox?: BoxDTO;
+        };
+
+        const multipleSlotsInfos = selected?.ids.map((sourceId): SlotsInfos | undefined => {
+            if (!sourceMainPkm) {
+                return;
+            }
+
+            const sourcePkmMain = !selected.saveId ? mainPkmsQuery.data?.data.find(pkm => pkm.id === sourceId) : undefined;
+            const sourcePkmSave = selected.saveId ? sourceSavePkmsQuery.data?.data.find(pkm => pkm.id === sourceId) : undefined;
+            const sourcePkm = sourcePkmMain ?? sourcePkmSave;
+            if (!sourcePkm) {
+                return;
+            }
+
+            const sourceSlot = sourcePkm.boxSlot;
+            const sourceMainBox = sourcePkmMain && mainBoxesQuery.data?.data.find(box => box.idInt === sourcePkmMain.boxId);
+
+            if (sourceMainBox && sourceMainBox.bankId === bankId) {
+                return;
+            }
+
+            return {
+                sourceId,
+                sourceSlot,
+                sourcePkmMain,
+                sourcePkmSave,
+                sourceMainBox,
+            };
+        }).filter(filterIsDefined) ?? [];
+
+        type ClickInfos = {
+            enable: boolean;
+            helpText?: string;
+        };
+
+        const getCanClick = (): ClickInfos => {
+            const checkBetweenSlot = (
+                sourceMainBox?: BoxDTO, sourcePkmSave?: PkmSaveDTO,
+            ): ClickInfos => {
+                if (!isDragging) {
+                    return { enable: false };
+                }
+
+                if (sourceMainBox && sourceMainBox.bankId === bankId) {
+                    return { enable: false };
+                }
+
+                // pkm save -> main
+                else if (sourcePkmSave) {
+                    if (sourcePkmSave.isEgg) {
+                        return { enable: false, helpText: t('storage.move.save-egg') };
+                    }
+
+                    if (sourcePkmSave.isShadow) {
+                        return { enable: false, helpText: t('storage.move.save-shadow') };
+                    }
+
+                    if (!(selected.attached ? sourcePkmSave.canMoveAttachedToMain : sourcePkmSave.canMoveToMain)) {
+                        return {
+                            enable: false, helpText: selected.attached
+                                ? t('storage.move.pkm-cannot-attached', { name: sourcePkmSave.nickname })
+                                : t('storage.move.pkm-cannot', { name: sourcePkmSave.nickname })
+                        };
+                    }
+
+                    const existingStoredPkmVersion = mainPkmVersionsQuery.data?.data.find(pkm => pkm.id === sourcePkmSave.idBase);
+                    const existingStoredPkm = existingStoredPkmVersion && mainPkmsQuery.data?.data.find(pkm => pkm.id === existingStoredPkmVersion.pkmId);
+                    if (existingStoredPkm && existingStoredPkm.saveId !== sourcePkmSave.saveId) {
+                        return {
+                            enable: false,
+                            helpText: t('storage.move.save-main-duplicate', { name: sourcePkmSave.nickname })
+                        };
+                    }
+                }
+
+                return { enable: true };
+            };
+
+            if (multipleSlotsInfos.length === 0) {
+                return { enable: false };
+            }
+
+            for (const { sourceMainBox, sourcePkmSave, } of multipleSlotsInfos) {
+                const result = checkBetweenSlot(
+                    sourceMainBox, sourcePkmSave
+                );
+
+                if (!result.enable) {
+                    return result;
+                }
+            }
+
+            return { enable: true };
+        };
+
+        const clickInfos = getCanClick();
+
+        const onDrop = async () => {
+            if (!selected || multipleSlotsInfos.length === 0) {
+                return;
+            }
+
+            const pkmIds = [ ...multipleSlotsInfos ]
+                .sort((i1, i2) => i1.sourceSlot < i2.sourceSlot ? -1 : 1)
+                .map(slotsInfos => slotsInfos.sourceId);
+
+            setSelected({
+                ...selected,
+                target: {
+                    bankId,
+                    boxId: -1,      // unused
+                    boxSlots: [],   // unused
+                },
+            });
+
+            await movePkmBankMutation.mutateAsync({
+                params: {
+                    bankId,
+                    pkmIds,
+                    sourceSaveId: selected.saveId,
+                    attached: selected.attached,
+                }
+            })
+                .then(() => {
+                    if (selected.ids[ 0 ] && selectContext.hasPkm(selected.saveId, selected.ids[ 0 ])) {
+                        selectContext.clear();
+                    }
+                })
+                // await new Promise(resolve => setTimeout(resolve, 3000))
+                .finally(() => {
+                    setSelected(undefined);
+                });
+        };
+
+        return {
+            isDragging,
+            onClick: clickInfos.enable ? (async () => {
+                await onDrop();
+            }) : undefined,
+            onPointerUp: clickInfos.enable ? (async () => {
+                await onDrop();
+            }) : undefined,
+            helpText: clickInfos.helpText,
         };
     },
     useDroppable: (saveId: number | undefined, dropBoxId: number, dropBoxSlot: number, pkmId?: string) => {

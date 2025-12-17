@@ -64,7 +64,7 @@ public class StorageService
     public static async Task<DataUpdateFlags> MainCreateBox(string bankId)
     {
         return await AddAction(
-            new MainCreateBoxAction(bankId)
+            new MainCreateBoxAction(bankId, null)
         );
     }
 
@@ -111,6 +111,17 @@ public class StorageService
     {
         return await AddAction(
             new MovePkmAction(pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached)
+        );
+    }
+
+    public static async Task<DataUpdateFlags> MovePkmBank(
+        string[] pkmIds, uint? sourceSaveId,
+        string bankId,
+        bool attached
+    )
+    {
+        return await AddAction(
+            new MovePkmBankAction(pkmIds, sourceSaveId, bankId, attached)
         );
     }
 

@@ -69,6 +69,18 @@ public class StorageController : ControllerBase
         return await DataDTO.FromDataUpdateFlags(flags);
     }
 
+    [HttpPut("move/pkm/bank")]
+    public async Task<ActionResult<DataDTO>> MovePkmBank(
+        [FromQuery] string[] pkmIds, uint? sourceSaveId,
+        string bankId,
+        bool attached
+    )
+    {
+        var flags = await StorageService.MovePkmBank(pkmIds, sourceSaveId, bankId, attached);
+
+        return await DataDTO.FromDataUpdateFlags(flags);
+    }
+
     [HttpPost("main/box")]
     public async Task<ActionResult<DataDTO>> CreateMainBox([BindRequired] string bankId)
     {
