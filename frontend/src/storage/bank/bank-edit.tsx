@@ -29,7 +29,7 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
 
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();
 
-    const { register, handleSubmit, formState, watch, setValue } = useForm<StorageUpdateMainBankParams & { view?: BankView }>({
+    const { register, handleSubmit, formState, watch, getValues, setValue } = useForm<StorageUpdateMainBankParams & { view?: BankView }>({
         defaultValues: {
             bankName: bank?.name,
             isDefault: bank?.isDefault,
@@ -126,7 +126,7 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
         >
             <CheckboxInput
                 checked={watchIsDefault}
-                onChange={() => setValue('isDefault', !watchIsDefault)}
+                onChange={() => setValue('isDefault', !getValues('isDefault'))}
                 disabled={defaultDisabled}
             /> {t('storage.bank.edit.is-default')}
         </label>
