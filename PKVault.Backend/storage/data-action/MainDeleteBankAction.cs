@@ -9,15 +9,15 @@ public class MainDeleteBankAction(string bankId) : DataAction
             throw new ArgumentException("Bank being default cannot be deleted");
         }
 
-        loaders.bankLoader.DeleteEntity(bankId);
-
-        MainCreateBankAction.NormalizeBankOrders(loaders.bankLoader);
-
         var boxes = loaders.boxLoader.GetAllEntities().Values.ToList().FindAll(box => box.BankId == bankId);
         foreach (var box in boxes)
         {
             await new MainDeleteBoxAction(box.Id).ExecuteWithPayload(loaders, flags);
         }
+
+        loaders.bankLoader.DeleteEntity(bankId);
+
+        MainCreateBankAction.NormalizeBankOrders(loaders.bankLoader);
 
         flags.MainBanks = true;
 
