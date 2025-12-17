@@ -1,12 +1,9 @@
-import { useSearch } from '@tanstack/react-router';
 import React from 'react';
 import { Gender as GenderType } from '../data/sdk/model';
 import { useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
 import { useStaticData } from '../hooks/use-static-data';
-import { Route } from '../routes/storage';
 import type { ButtonLikeProps } from '../ui/button/button-like';
 import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
-import { getSaveOrder } from './util/get-save-order';
 
 export type StorageSaveItemBaseProps = ButtonLikeProps & Pick<StorageItemProps, 'anchor' | 'helpTitle' | 'small' | 'checked' | 'onCheck'> & {
     saveId: number;
@@ -14,9 +11,6 @@ export type StorageSaveItemBaseProps = ButtonLikeProps & Pick<StorageItemProps, 
 };
 
 export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.memo(({ saveId, pkmId, ...rest }) => {
-    const selected = useSearch({ from: '/storage', select: (search) => search.selected, shouldThrow: false });
-    const navigate = Route.useNavigate();
-
     const staticData = useStaticData();
 
     const pkmVersionsQuery = useStorageGetMainPkmVersions();
@@ -65,25 +59,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
             canEvolve={canEvolve}
             attached={canDetach}
             needSynchronize={canSynchronize}
-            onClick={rest.onClick ?? (() => navigate({
-                to: '/storage',
-                search: ({ saves }) => ({
-                    selected: selected?.saveId && selected.id === pkmId
-                        ? undefined
-                        : {
-                            saveId,
-                            id: pkmId,
-                        },
-                    saves: {
-                        ...saves,
-                        [ saveId ]: {
-                            saveId,
-                            saveBoxIds: [ savePkm.boxId ],
-                            order: getSaveOrder(saves, saveId),
-                        }
-                    }
-                }),
-            }))}
+            onClick={rest.onClick}
         />
     );
 });

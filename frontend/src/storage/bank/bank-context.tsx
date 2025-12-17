@@ -1,10 +1,11 @@
+import { useSearch } from '@tanstack/react-router';
 import { useStorageGetMainBanks, useStorageGetMainBoxes } from '../../data/sdk/storage/storage.gen';
-import { Route } from '../../routes/storage';
+import type { Route } from '../../routes/storage';
 import { filterIsDefined } from '../../util/filter-is-defined';
 
 export const BankContext = {
     useSelectedBankBoxes: () => {
-        const mainBoxIds = Route.useSearch({ select: search => search.mainBoxIds }) ?? [];
+        const mainBoxIds = useSearch({ from: '/storage', select: search => search.mainBoxIds, shouldThrow: false }) ?? [];
 
         const bankQuery = useStorageGetMainBanks();
         const boxesQuery = useStorageGetMainBoxes();
