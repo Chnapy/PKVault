@@ -44,7 +44,10 @@ public class MovePkmBankAction(
                     availableSlotCount++;
                 }
             }
-            boxesUnoccupationDict.Add(boxId, unoccupiedSlots);
+            if (unoccupiedSlots.Count > 0)
+            {
+                boxesUnoccupationDict.Add(boxId, unoccupiedSlots);
+            }
         }
 
         if (availableSlotCount < pkmIds.Length)
@@ -61,7 +64,10 @@ public class MovePkmBankAction(
                 unoccupiedSlots.Add(slot);
                 availableSlotCount++;
             }
-            boxesUnoccupationDict.Add((uint)box.IdInt, unoccupiedSlots);
+            if (unoccupiedSlots.Count > 0)
+            {
+                boxesUnoccupationDict.Add((uint)box.IdInt, unoccupiedSlots);
+            }
         }
 
         async Task<DataActionPayload> act(string pkmId)
