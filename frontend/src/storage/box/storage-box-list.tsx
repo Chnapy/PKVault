@@ -23,7 +23,7 @@ export const StorageBoxList: React.FC<{
 
     return <div
         className={css({
-            width: 616,
+            width: 614,
             maxHeight: 514,
             display: 'flex',
             alignItems: 'flex-start',
