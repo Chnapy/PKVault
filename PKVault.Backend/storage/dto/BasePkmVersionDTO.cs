@@ -317,7 +317,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     {
         get
         {
-            var la = new LegalityAnalysis(Pkm);
+            var la = new LegalityAnalysis(Pkm, Pkm.PersonalInfo);
 
             try
             {

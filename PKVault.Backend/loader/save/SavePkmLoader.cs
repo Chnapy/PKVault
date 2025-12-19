@@ -180,18 +180,49 @@ public class SavePkmLoader(
 
         DeleteDto(dto.Id);
 
-        switch (dto.BoxId)
+        var originalTrainerName = pkm.OriginalTrainerName;
+        var originalTrainerGender = pkm.OriginalTrainerGender;
+        var handlerTrainerName = save.OT;
+        var handlerTrainerGender = save.Gender;
+        var sameTrainer = handlerTrainerName == originalTrainerName && handlerTrainerGender == originalTrainerGender;
+
+        void SetPkmToSave(PKM pkm, EntityImportSettings settings)
         {
-            case (int)BoxType.Party:
-                WriteParty(dto.Pkm, dto.BoxSlot);
-                break;
-            default:
-                save.SetBoxSlotAtIndex(pkm, dto.BoxId, dto.BoxSlot);
-                break;
+            switch (dto.BoxId)
+            {
+                case (int)BoxType.Party:
+                    WriteParty(pkm, dto.BoxSlot, settings);
+                    break;
+                default:
+                    save.SetBoxSlotAtIndex(pkm, dto.BoxId, dto.BoxSlot, settings);
+                    break;
+            }
+        }
+
+        SetPkmToSave(pkm, default);
+
+        // if has HT & OT
+        // UpdateHandler() called by save can create legality issue (like in 7b/7)
+        // So we put values manually to replace any wrong value
+        if (pkm is PB7)
+        {
+            pkm.CurrentHandler = sameTrainer ? (byte)1 : (byte)2;
+            pkm.HandlingTrainerName = sameTrainer ? "" : handlerTrainerName;
+            pkm.HandlingTrainerGender = handlerTrainerGender;
+            pkm.RefreshChecksum();
+            SetPkmToSave(pkm, EntityImportSettings.None);
+        }
+        else if (pkm is PK7 && !sameTrainer)
+        {
+            pkm.CurrentHandler = 2;
+            pkm.HandlingTrainerName = handlerTrainerName;
+            pkm.HandlingTrainerGender = handlerTrainerGender;
+            pkm.RefreshChecksum();
+            SetPkmToSave(pkm, EntityImportSettings.None);
         }
 
         needUpdate = true;
-        // Console.WriteLine($"ADD {dto.Id} / {dto.Box} / {dto.BoxSlot}");
+        // Console.WriteLine($"ADD {dto.Id} / {dto.BoxId} / {dto.BoxSlot} / CurrentHandler={pkm.CurrentHandler}");
 
         HasWritten = true;
     }
@@ -209,7 +240,7 @@ public class SavePkmLoader(
             switch (dto.BoxId)
             {
                 case (int)BoxType.Party:
-                    WriteParty(null, dto.BoxSlot);
+                    WriteParty(null, dto.BoxSlot, default);
                     break;
                 default:
                     save.SetBoxSlotAtIndex(save.BlankPKM, dto.BoxId, dto.BoxSlot);
@@ -223,7 +254,7 @@ public class SavePkmLoader(
         }
     }
 
-    private void WriteParty(PKM? pkm, int slot)
+    private void WriteParty(PKM? pkm, int slot, EntityImportSettings settings)
     {
         var party = save.PartyData.ToList();
         while (party.Count < 6)
@@ -231,7 +262,7 @@ public class SavePkmLoader(
             party.Add(save.BlankPKM);
         }
         party[slot] = pkm ?? save.BlankPKM;
-        SetParty(party);
+        SetParty(party, settings);
     }
 
     public void FlushParty()
@@ -244,23 +275,23 @@ public class SavePkmLoader(
         var party = save.PartyData.ToList()
         .FindAll(pkm => IsSpeciesValid(pkm.Species));
 
-        SetParty(party);
+        SetParty(party, EntityImportSettings.None);
 
         needUpdate = true;
         HasWritten = true;
     }
 
-    private void SetParty(List<PKM> party)
+    private void SetParty(List<PKM> party, EntityImportSettings settings)
     {
         for (var i = 0; i < 6; i++)
         {
             if (i < party.Count)
             {
-                save.SetPartySlotAtIndex(party[i], i);
+                save.SetPartySlotAtIndex(party[i], i, settings);
             }
             else
             {
-                save.SetPartySlotAtIndex(save.BlankPKM, i);
+                save.SetPartySlotAtIndex(save.BlankPKM, i, settings);
             }
         }
         // Console.WriteLine($"PARTY = {string.Join(',', party.Select(pk => pk.Nickname))}\n{string.Join(',', save.PartyData.ToList().Select(pk => pk.Nickname))}");

@@ -53,6 +53,48 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     public new bool IsValid { get => base.IsValid && !IsDuplicate; }
 
+    public new string ValidityReport
+    {
+        get
+        {
+
+            var slotType = BoxId switch
+            {
+                (int)BoxType.Party => StorageSlotType.Party,
+                (int)BoxType.BattleBox => StorageSlotType.BattleBox,
+                (int)BoxType.Daycare => StorageSlotType.Daycare,
+                (int)BoxType.GTS => StorageSlotType.GTS,
+                // (int)BoxType.Fused => StorageSlotType.Fused,
+                (int)BoxType.Misc => StorageSlotType.Misc,
+                (int)BoxType.Resort => StorageSlotType.Resort,
+                (int)BoxType.Ride => StorageSlotType.Ride,
+                (int)BoxType.Shiny => StorageSlotType.Shiny,
+                _ => StorageSlotType.Box
+            };
+
+            if (Party >= 0)
+            {
+                slotType = StorageSlotType.Party;
+            }
+
+            var la = Pkm.GetType() == Save.PKMType // quick sanity check
+                ? new LegalityAnalysis(Pkm, Save.Personal, slotType)
+                : new LegalityAnalysis(Pkm, Pkm.PersonalInfo, slotType);
+
+            try
+            {
+                return la.Report(
+                    SettingsService.AppSettings.GetSafeLanguage()
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+                return ex.ToString();
+            }
+        }
+    }
+
     public string? PkmVersionId { get; set; }
 
     // -- actions
