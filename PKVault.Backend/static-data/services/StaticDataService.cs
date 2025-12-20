@@ -887,6 +887,23 @@ public class StaticDataService
 
     private static async Task<string> GetVersionName(GameVersion version, string lang)
     {
+        if (version == GameVersion.BATREV)
+        {
+            return lang switch
+            {
+                _ => "Battle Revolution",
+            };
+        }
+
+        if (version == GameVersion.RSBOX)
+        {
+            return lang switch
+            {
+                "fr" => "Box Rubis & Saphir",
+                _ => "Box Ruby & Sapphire",
+            };
+        }
+
         var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
 
         return string.Join('/', pokeapiVersions

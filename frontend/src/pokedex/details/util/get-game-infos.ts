@@ -6,6 +6,7 @@ import alphaSapphireImg from '../../../assets/game_icons/alpha-sapphire.png';
 import blackImg from '../../../assets/game_icons/black.png';
 import black2Img from '../../../assets/game_icons/black2.png';
 import blueImg from '../../../assets/game_icons/blue.png';
+import battleRevImg from '../../../assets/game_icons/battle-rev.png';
 import boxRSImg from '../../../assets/game_icons/box-rs.png';
 import brillantDiamondImg from '../../../assets/game_icons/brillant-diamond.png';
 import colosseumImg from '../../../assets/game_icons/colosseum.png';
@@ -106,6 +107,11 @@ export const getGameInfos = (version: GameVersion) => {
 
       [ GameVersion.CXD ]: () => ({
         img: colosseumImg,
+        // color: theme.game.,
+      }),
+
+      [ GameVersion.BATREV ]: () => ({
+        img: battleRevImg,
         // color: theme.game.,
       }),
 
