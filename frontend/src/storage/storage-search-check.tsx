@@ -55,6 +55,7 @@ export const StorageSearchCheck: React.FC<React.PropsWithChildren> = ({ children
 
             if (
                 (storageSearch.selected && !storageSearch.selected.saveId && mainPkmsQuery.data?.data.every(pkm => pkm.id !== storageSearch.selected!.id))
+                || (storageSearch.selected && storageSearch.selected.saveId && !(storageSearch.selected.saveId in (storageSearch.saves ?? {})))
             ) {
                 return {
                     selected: undefined,
