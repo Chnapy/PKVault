@@ -36,6 +36,7 @@ public struct StaticSpecies
     public required Gender[] Genders { get; set; }
     // key is EntityContext
     public required Dictionary<byte, StaticSpeciesForm[]> Forms { get; set; }
+    public required bool IsInHoennDex { get; set; }
     // public required string SpriteDefault { get; set; }
     // public required string SpriteShiny { get; set; }
     // public int[] AvailableMoves { get; set; }

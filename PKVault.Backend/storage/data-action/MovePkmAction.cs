@@ -464,15 +464,9 @@ public class MovePkmAction(
         // enable national-dex in G3 RSE if pkm outside of regional-dex
         if (save is SAV3 saveG3RSE && saveG3RSE is IGen3Hoenn && !saveG3RSE.NationalDex)
         {
-            var hoennDex = await PokeApi.GetPokedex(PokeApiPokedexEnum.HOENN);
-            // Console.WriteLine(hoennDex.name);
-            var isInDex = hoennDex!.PokemonEntries.Any(entry =>
-            {
-                var url = entry.PokemonSpecies.Url;
-                var id = int.Parse(url.TrimEnd('/').Split('/')[^1]);
+            var staticData = await StaticDataService.GetStaticData();
 
-                return id == species;
-            });
+            var isInDex = staticData.Species[(ushort)species].IsInHoennDex;
 
             if (!isInDex)
             {

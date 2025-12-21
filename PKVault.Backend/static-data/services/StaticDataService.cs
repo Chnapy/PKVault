@@ -66,6 +66,13 @@ public class StaticDataService
 
         // List<string> notFound = [];
 
+        var hoennDex = await PokeApi.GetPokedex(PokeApiPokedexEnum.HOENN);
+        var hoennDexSpeciesSet = hoennDex!.PokemonEntries.Select(entry =>
+        {
+            var url = entry.PokemonSpecies.Url;
+            return int.Parse(url.TrimEnd('/').Split('/')[^1]);
+        }).ToHashSet();
+
         for (ushort i = 1; i < (ushort)Species.MAX_COUNT; i++)
         {
             var species = i;
@@ -421,6 +428,8 @@ public class StaticDataService
                     forms.Add((byte)context, [.. varietyForms]);
                 });
 
+                var isInHoennDex = hoennDexSpeciesSet.Contains(species);
+
                 return new StaticSpecies
                 {
                     Id = species,
@@ -428,6 +437,7 @@ public class StaticDataService
                     Generation = generation,
                     Genders = genders,
                     Forms = forms,
+                    IsInHoennDex = isInHoennDex,
                 };
             }));
         }
