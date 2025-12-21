@@ -1,4 +1,5 @@
 import type React from 'react';
+import { HistoryContext } from '../context/history-context';
 import type { PkmVersionWarning as PkmVersionWarningModel } from '../data/sdk/model';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../data/sdk/storage/storage.gen';
 import { useStaticData } from '../hooks/use-static-data';
@@ -11,6 +12,7 @@ import { Icon } from '../ui/icon/icon';
 export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({ pkmId }) => {
     const { t } = useTranslate();
     const navigate = Route.useNavigate();
+    const storageHistoryValue = HistoryContext.useValue()[ '/storage' ];
 
     const staticData = useStaticData();
 
@@ -37,20 +39,24 @@ export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({ pkmId }) =
         <td style={{ verticalAlign: 'top' }}>
             <Button onClick={() => navigate({
                 to: '/storage',
-                search: ({ saves }) => ({
-                    mainBoxIds: [ pkm.boxId ],
-                    selected: {
-                        id: pkm.id,
-                    },
-                    saves: pkm.saveId ? {
-                        ...saves,
-                        [ pkm.saveId ]: saves?.[ pkm.saveId ] ?? {
-                            saveId: pkm.saveId,
-                            saveBoxIds: [ 0 ],
-                            order: getSaveOrder(saves, pkm.saveId),
-                        }
-                    } : saves,
-                })
+                search: (search) => {
+                    const saves = storageHistoryValue?.search.saves ?? search.saves;
+
+                    return {
+                        mainBoxIds: [ pkm.boxId ],
+                        selected: {
+                            id: pkm.id,
+                        },
+                        saves: pkm.saveId ? {
+                            ...saves,
+                            [ pkm.saveId ]: saves?.[ pkm.saveId ] ?? {
+                                saveId: pkm.saveId,
+                                saveBoxIds: [ 0 ],
+                                order: getSaveOrder(saves, pkm.saveId),
+                            }
+                        } : saves,
+                    };
+                },
             })}>
                 <Icon name='eye' forButton />
             </Button>

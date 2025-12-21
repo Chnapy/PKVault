@@ -1,4 +1,5 @@
 import type React from 'react';
+import { HistoryContext } from '../../context/history-context';
 import { useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes';
 import { BankContext } from '../../storage/bank/bank-context';
@@ -17,7 +18,10 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
     const { t } = useTranslate();
     const navigate = Route.useNavigate();
 
+    const storageHistoryValue = HistoryContext.useValue()[ '/storage' ];
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();
+    const storageSearch = storageHistoryValue?.search ?? selectedBankBoxes.data?.selectedSearch;
+
     const savePkmsQuery = useStorageGetSavePkms(saveId);
 
     const pkmList = savePkmsQuery.data?.data.filter(pkm => pkm.species === species);
@@ -53,13 +57,13 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
                     onClick={() => navigate({
                         to: '/storage',
                         search: {
-                            ...selectedBankBoxes.data?.selectedSearch,
+                            ...storageSearch,
                             saves: {
-                                ...selectedBankBoxes.data?.selectedSearch?.saves,
+                                ...storageSearch?.saves,
                                 [ saveId ]: {
                                     saveId,
                                     saveBoxIds: [ pkm.boxId ],
-                                    order: getSaveOrder(selectedBankBoxes.data?.selectedSearch?.saves, saveId),
+                                    order: getSaveOrder(storageSearch?.saves, saveId),
                                 }
                             },
                             selected: {

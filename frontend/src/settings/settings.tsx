@@ -1,5 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { HistoryContext } from '../context/history-context';
 import type { SettingsMutableDTO } from '../data/sdk/model/settingsMutableDTO';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
@@ -14,6 +15,8 @@ import { SaveGlobsList } from './save-globs/save-globs-list';
 
 export const Settings: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
+
+    const storageHistoryValue = HistoryContext.useValue()[ '/storage' ];
 
     const settingsQuery = useSettingsGet();
     const settingsMutation = useSettingsEdit();
@@ -201,7 +204,7 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
             }}>
                 <Icon name='info-circle' solid forButton />
                 {t('action.not-possible')}
-                <ButtonLink to='/storage'>{t('action.check-storage')}</ButtonLink>
+                <ButtonLink to='/storage' {...storageHistoryValue}>{t('action.check-storage')}</ButtonLink>
             </div>}
         </form>
     </TitledContainer>;

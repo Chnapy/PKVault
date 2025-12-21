@@ -1,6 +1,7 @@
 import { css } from '@emotion/css';
 import { createRootRoute, Outlet, useMatchRoute } from "@tanstack/react-router";
 import React from "react";
+import { HistoryContext } from '../context/history-context';
 import { BackendErrorsContext } from '../data/backend-errors-context';
 import { useSaveInfosScan } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
@@ -45,107 +46,109 @@ const Root: React.FC = () => {
   }, [ hasErrors ]);
 
   return (
-    <Frame>
-      <ErrorCatcher>
-        <Header>
-          <HeaderItem
-            selected={Boolean(
-              matchRoute({ to: "/saves" }) ||
-              matchRoute({ to: "/saves", pending: true })
-            )}
-            to={"/saves"}
-          >
-            {t('header.saves')}
-          </HeaderItem>
-          <HeaderItem
-            selected={Boolean(
-              matchRoute({ to: "/storage" }) ||
-              matchRoute({ to: "/storage", pending: true })
-            )}
-            to={"/storage"}
-          >
-            {t('header.storage')}
-            {hasStorageActions && '*'}
-          </HeaderItem>
-          <HeaderItem
-            selected={Boolean(
-              matchRoute({ to: "/pokedex" }) ||
-              matchRoute({ to: "/pokedex", pending: true })
-            )}
-            to={"/pokedex"}
-          >
-            {t('header.dex')}
-          </HeaderItem>
+    <HistoryContext.Provider>
+      <Frame>
+        <ErrorCatcher>
+          <Header>
+            <HeaderItem
+              selected={Boolean(
+                matchRoute({ to: "/saves" }) ||
+                matchRoute({ to: "/saves", pending: true })
+              )}
+              to={"/saves"}
+            >
+              {t('header.saves')}
+            </HeaderItem>
+            <HeaderItem
+              selected={Boolean(
+                matchRoute({ to: "/storage" }) ||
+                matchRoute({ to: "/storage", pending: true })
+              )}
+              to={"/storage"}
+            >
+              {t('header.storage')}
+              {hasStorageActions && '*'}
+            </HeaderItem>
+            <HeaderItem
+              selected={Boolean(
+                matchRoute({ to: "/pokedex" }) ||
+                matchRoute({ to: "/pokedex", pending: true })
+              )}
+              to={"/pokedex"}
+            >
+              {t('header.dex')}
+            </HeaderItem>
 
-          <ButtonWithDisabledPopover
-            as={Button}
-            onClick={() => savesScanMutation.mutateAsync()}
-            disabled={!settings?.canScanSaves}
-            showHelp={!settings?.canScanSaves}
-            helpTitle={t('action.not-possible')}
-          >
-            <Icon
-              name='refresh'
-              forButton
-            />
-            {t('header.scan-saves')}
-          </ButtonWithDisabledPopover>
+            <ButtonWithDisabledPopover
+              as={Button}
+              onClick={() => savesScanMutation.mutateAsync()}
+              disabled={!settings?.canScanSaves}
+              showHelp={!settings?.canScanSaves}
+              helpTitle={t('action.not-possible')}
+            >
+              <Icon
+                name='refresh'
+                forButton
+              />
+              {t('header.scan-saves')}
+            </ButtonWithDisabledPopover>
 
-          <HeaderItem
-            selected={Boolean(
-              matchRoute({ to: "/settings" }) ||
-              matchRoute({ to: "/settings", pending: true })
-            )}
-            to={"/settings"}
-            endPosition
-          >
-            {t('header.settings')}
-          </HeaderItem>
+            <HeaderItem
+              selected={Boolean(
+                matchRoute({ to: "/settings" }) ||
+                matchRoute({ to: "/settings", pending: true })
+              )}
+              to={"/settings"}
+              endPosition
+            >
+              {t('header.settings')}
+            </HeaderItem>
 
-          <ButtonWithDisabledPopover
-            as={Button}
-            onClick={() => setOpenNotif(value => !value)}
-            selected={openNotif}
-            disabled={!hasErrors}
-            showHelp={!hasErrors}
-            helpTitle={t('header.notifications.help')}
-          >
-            <Icon name='bell' solid forButton />
-          </ButtonWithDisabledPopover>
-        </Header>
+            <ButtonWithDisabledPopover
+              as={Button}
+              onClick={() => setOpenNotif(value => !value)}
+              selected={openNotif}
+              disabled={!hasErrors}
+              showHelp={!hasErrors}
+              helpTitle={t('header.notifications.help')}
+            >
+              <Icon name='bell' solid forButton />
+            </ButtonWithDisabledPopover>
+          </Header>
 
-        <div
-          style={{
-            position: "relative",
-            padding: 16,
-            paddingTop: 0,
-            flexGrow: 1,
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'center'
-          }}
-        >
-          <ErrorCatcher>
-            <Outlet />
-          </ErrorCatcher>
-
-          {openNotif && <div
-            className={css({
-              position: "fixed",
-              top: 47,
-              right: 14,
-              maxWidth: 400,
-              zIndex: 20,
-              '&:hover': {
-                zIndex: 25,
-              }
-            })}
+          <div
+            style={{
+              position: "relative",
+              padding: 16,
+              paddingTop: 0,
+              flexGrow: 1,
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center'
+            }}
           >
-            <NotificationCard />
-          </div>}
-        </div>
-      </ErrorCatcher>
-    </Frame>
+            <ErrorCatcher>
+              <Outlet />
+            </ErrorCatcher>
+
+            {openNotif && <div
+              className={css({
+                position: "fixed",
+                top: 47,
+                right: 14,
+                maxWidth: 400,
+                zIndex: 20,
+                '&:hover': {
+                  zIndex: 25,
+                }
+              })}
+            >
+              <NotificationCard />
+            </div>}
+          </div>
+        </ErrorCatcher>
+      </Frame>
+    </HistoryContext.Provider>
   );
 };
 

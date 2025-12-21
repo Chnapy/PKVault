@@ -3,6 +3,7 @@ import { Button } from "@headlessui/react";
 import { Link } from "@tanstack/react-router";
 import type React from "react";
 import { type FileRouteTypes } from "../../routeTree.gen";
+import { HistoryContext } from '../../context/history-context';
 
 export type HeaderItemProps = {
   selected?: boolean;
@@ -14,10 +15,13 @@ export type HeaderItemProps = {
 export const HeaderItem: React.FC<React.PropsWithChildren<HeaderItemProps>> = ({
   selected,
   to,
-  search,
+  search: defaultSearch,
   endPosition,
   children,
 }) => {
+  const historyValue = HistoryContext.useValue()[ to ];
+  const search = historyValue?.search ?? defaultSearch;
+
   return (
     <Button
       as={Link}
