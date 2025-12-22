@@ -20,15 +20,39 @@ public class PkmVersionDTO : BasePkmVersionDTO
         return dto;
     }
 
-    private static readonly List<SaveFile> allVersionBlankSaves = [..Enum.GetValues<GameVersion>().ToList()
+    private static readonly List<(GameVersion Version, SaveFile? Save)> allVersionBlankSaves = [..Enum.GetValues<GameVersion>().ToList()
         .Select(version => {
-            try {
-                return BlankSaveFile.Get(version);
-            } catch (ArgumentOutOfRangeException)
+            var versionToUse = GetSingleVersion(version);
+
+            if (versionToUse == default)
             {
-                return null;
+                return (version, null);
             }
-        }).OfType<SaveFile>()];
+
+            return (version, BlankSaveFile.Get(versionToUse));
+        })];
+
+    /**
+     * Get a valid single version from any version, including groups.
+     */
+    public static GameVersion GetSingleVersion(GameVersion version)
+    {
+        HashSet<GameVersion> ignoredVersions = [
+            default,
+            GameVersion.Any,
+            GameVersion.Invalid,
+            GameVersion.GO,
+        ];
+
+        if (ignoredVersions.Contains(version))
+        {
+            return default;
+        }
+
+        return version.IsValidSavedVersion()
+            ? version
+            : GameUtil.GameVersions.ToList().Find(v => !ignoredVersions.Contains(v) && version.ContainsFromLumped(v));
+    }
 
     public string PkmId { get { return PkmVersionEntity.PkmId; } }
 
@@ -53,19 +77,12 @@ public class PkmVersionDTO : BasePkmVersionDTO
     {
         get
         {
-            // if (!IsMain)
-            // {
-            //     return [];
-            // }
-
-            return [..allVersionBlankSaves.FindAll(blankSav =>
+            return [..allVersionBlankSaves.FindAll(entry =>
             {
-                    return SaveInfosDTO.IsSpeciesAllowed(Species, blankSav);
-            }).Select(blankSav => blankSav.Version)];
+                return entry.Save != null && SaveInfosDTO.IsSpeciesAllowed(Species, entry.Save);
+            }).Select(entry => entry.Version).Order()];
         }
     }
-
-    public new bool CanEdit => base.CanEdit && PkmDto.SaveId == null;
 
     public bool CanDelete { get { return !IsMain; } }
 

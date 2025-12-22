@@ -362,6 +362,8 @@ public class MovePkmAction(
             throw new ArgumentException($"pkmSaveDTO.PkmVersionId is null, should be {pkmSaveDTO.Id}");
         }
 
+        await SynchronizePkmAction.SynchronizeSaveToPkmVersion(loaders, flags, [(pkmDto.Id, null)]);
+
         flags.MainPkms = true;
         flags.MainPkmVersions = true;
         flags.Saves.Add(new()
@@ -431,16 +433,16 @@ public class MovePkmAction(
 
         var pkmDto = loaders.pkmLoader.GetDto(pkmVersionEntity.PkmId);
 
+        // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmDto!.SaveId != default)
         {
-            await new SynchronizePkmAction(sourceSaveId, [pkmVersionEntity.Id]).ExecuteWithPayload(loaders, flags);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(loaders, flags, [(pkmVersionEntity.PkmId, null)]);
 
             if (!attached)
             {
                 pkmDto.PkmEntity.SaveId = default;
+                loaders.pkmLoader.WriteDto(pkmDto);
             }
-
-            loaders.pkmLoader.WriteDto(pkmDto);
         }
 
         flags.MainPkms = true;

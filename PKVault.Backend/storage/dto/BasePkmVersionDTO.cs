@@ -292,7 +292,8 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     public string DynamicChecksum
     {
-        get { return $"{Nickname}.{Level}.{Exp}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}"; }
+        // Data used here is considered to be mutable over time
+        get => $"{Species}.{Form}.{Nickname}.{Level}.{Exp}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}";
     }
 
     public int NicknameMaxLength
@@ -342,10 +343,28 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     protected abstract uint GetGeneration();
 
+    /**
+     * Generate ID similar to PKHeX one.
+     * Note that Species & Form can change over time (evolve),
+     * so only first species of evolution group is used.
+     */
     public static string GetPKMIdBase(PKM pkm)
     {
-        var hash = SearchUtil.HashByDetails(pkm);
-        var id = $"G{pkm.Format}_{hash}_{pkm.TID16}";   // note: SID not stored by pk files
+        static ushort GetBaseSpecies(ushort species)
+        {
+            var previousSpecies = StaticDataService.staticData.Evolves[species].PreviousSpecies;
+            if (previousSpecies != null)
+            {
+                return GetBaseSpecies((ushort)previousSpecies);
+            }
+            return species;
+        }
+
+        var clone = pkm.Clone();
+        clone.Species = GetBaseSpecies(pkm.Species);
+        clone.Form = 0;
+        var hash = SearchUtil.HashByDetails(clone);
+        var id = $"G{clone.Format}_{hash}_{clone.TID16}";   // note: SID not stored by pk files
 
         return id;
     }

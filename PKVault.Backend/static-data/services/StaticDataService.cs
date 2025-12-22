@@ -3,14 +3,18 @@ using PokeApiNet;
 
 public class StaticDataService
 {
-    public static async Task<StaticDataDTO?> GetStaticData()
+    public static StaticDataDTO staticData;
+
+    public static async Task<StaticDataDTO> GetStaticData()
     {
         var client = new AssemblyClient();
 
-        return await client.GetAsyncJsonGz(
+        staticData = (await client.GetAsyncJsonGz(
             GetStaticDataPathParts(SettingsService.AppSettings.GetSafeLanguage()),
             StaticDataJsonContext.Default.StaticDataDTO
-        );
+        ))!;
+
+        return staticData;
     }
 
     public static List<string> GetGeneratedPathParts() => ["pokeapi", "generated"];
@@ -29,9 +33,10 @@ public class StaticDataService
         {
             tasks.Add(Task.Run(async () =>
             {
-                var blankSave = version.GetContext() == EntityContext.None
-                ? null
-                : BlankSaveFile.Get(version.GetContext());
+                var saveVersion = PkmVersionDTO.GetSingleVersion(version);
+                var blankSave = saveVersion == default
+                    ? null
+                    : BlankSaveFile.Get(saveVersion);
 
                 var versionName = GetVersionName(version, lang);
                 var versionRegion = GetVersionRegionName(version, lang);
@@ -728,8 +733,10 @@ public class StaticDataService
             var speciesEvolve = new StaticEvolve()
             {
                 Species = species,
+                PreviousSpecies = null,
                 Trade = [],
                 TradeWithItem = [],
+                Other = [],
             };
 
             chain.EvolvesTo.ForEach(evolveTo =>
@@ -740,12 +747,13 @@ public class StaticDataService
                 {
                     foreach (var version in Enum.GetValues<GameVersion>())
                     {
-                        if (version.GetContext() == EntityContext.None)
+                        var saveVersion = PkmVersionDTO.GetSingleVersion(version);
+                        if (saveVersion == default)
                         {
                             continue;
                         }
 
-                        var blankSave = BlankSaveFile.Get(version.GetContext());
+                        var blankSave = BlankSaveFile.Get(saveVersion);
                         var speciesAllowed = SaveInfosDTO.IsSpeciesAllowed(evolveSpecies, blankSave);
                         if (!speciesAllowed)
                         {
@@ -756,10 +764,17 @@ public class StaticDataService
                         if (species == (ushort)Species.Finizen && details.Trigger.Name == "other")
                         {
                             speciesEvolve.Trade.Add((byte)version, new(evolveSpecies, details.MinLevel ?? 1));
+                            continue;
                         }
 
                         if (details.Trigger.Name != "trade")
                         {
+                            if (!speciesEvolve.Other.TryGetValue((byte)version, out var otherValue))
+                            {
+                                otherValue = [];
+                                speciesEvolve.Other.Add((byte)version, otherValue);
+                            }
+                            otherValue.Add(new(evolveSpecies, details.MinLevel ?? 1));
                             continue;
                         }
 
@@ -784,15 +799,27 @@ public class StaticDataService
                 actChain(evolveTo);
             });
 
-            if (speciesEvolve.Trade.Count > 0 || speciesEvolve.TradeWithItem.Count > 0)
-            {
-                staticEvolves.Add(species, speciesEvolve);
-            }
+            staticEvolves.Add(species, speciesEvolve);
         }
 
         var evolutionChains = await PokeApi.GetEvolutionChains();
 
         evolutionChains.ForEach(evolutionChain => actChain(evolutionChain.Chain));
+
+        foreach (var staticEvolve in staticEvolves.Values)
+        {
+            var previousSpecies = staticEvolves.Values.ToList().Find(evolve =>
+            {
+                HashSet<ushort> evolveSpecies = [
+                    ..evolve.Other.Values.SelectMany(val => val).Select(val => val.EvolveSpecies),
+                    ..evolve.Trade.Values.Select(val => val.EvolveSpecies),
+                    ..evolve.TradeWithItem.Values.SelectMany(val => val.Values).Select(val => val.EvolveSpecies),
+                ];
+                return evolveSpecies.Contains(staticEvolve.Species);
+            })?.Species;
+
+            staticEvolve.PreviousSpecies = previousSpecies;
+        }
 
         // var heldItemPokeapiName = GetPokeapiItemName(heldItemName);
 
@@ -897,23 +924,6 @@ public class StaticDataService
 
     private static async Task<string> GetVersionName(GameVersion version, string lang)
     {
-        if (version == GameVersion.BATREV)
-        {
-            return lang switch
-            {
-                _ => "Battle Revolution",
-            };
-        }
-
-        if (version == GameVersion.RSBOX)
-        {
-            return lang switch
-            {
-                "fr" => "Box Rubis & Saphir",
-                _ => "Box Ruby & Sapphire",
-            };
-        }
-
         var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
 
         return string.Join('/', pokeapiVersions
@@ -1074,13 +1084,26 @@ public class StaticDataService
             GameVersion.RS => [.. GetPokeApiVersion(GameVersion.R), .. GetPokeApiVersion(GameVersion.S)],
             GameVersion.RSE => [.. GetPokeApiVersion(GameVersion.RS), .. GetPokeApiVersion(GameVersion.E)],
             GameVersion.FRLG => [.. GetPokeApiVersion(GameVersion.FR), .. GetPokeApiVersion(GameVersion.LG)],
-            GameVersion.RSBOX => [],
+            GameVersion.RSBOX => [
+                Task.FromResult<PokeApiNet.Version?>(new() {
+                    Names = [
+                        new() { Name = "Box Ruby & Sapphire", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } },
+                        new() { Name = "Box Rubis & Saphir", Language = new() { Name = "fr", Url = "https://pokeapi.co/api/v2/language/5/" } },
+                    ]
+                })
+            ],
             GameVersion.COLO => [PokeApi.GetVersion(19)],
             GameVersion.XD => [PokeApi.GetVersion(20)],
             GameVersion.DP => [.. GetPokeApiVersion(GameVersion.D), .. GetPokeApiVersion(GameVersion.P)],
             GameVersion.DPPt => [.. GetPokeApiVersion(GameVersion.DP), .. GetPokeApiVersion(GameVersion.Pt)],
             GameVersion.HGSS => [.. GetPokeApiVersion(GameVersion.HG), .. GetPokeApiVersion(GameVersion.SS)],
-            GameVersion.BATREV => [],
+            GameVersion.BATREV => [
+                Task.FromResult<PokeApiNet.Version?>(new() {
+                    Names = [
+                        new() { Name = "Battle Revolution", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } }
+                    ]
+                })
+            ],
             GameVersion.BW => [.. GetPokeApiVersion(GameVersion.B), .. GetPokeApiVersion(GameVersion.W)],
             GameVersion.B2W2 => [.. GetPokeApiVersion(GameVersion.B2), .. GetPokeApiVersion(GameVersion.W2)],
             GameVersion.XY => [.. GetPokeApiVersion(GameVersion.X), .. GetPokeApiVersion(GameVersion.Y)],

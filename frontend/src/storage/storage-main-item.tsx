@@ -63,7 +63,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
 
 
     const canMoveAttached = !pkm.saveId && pageSaves.some(pageSave => pkmVersions.some(pkmVersion => pkmVersion.generation === pageSave.generation));
-    const canEvolve = !pkm.saveId && pkmVersions.some(pkmVersion => {
+    const canEvolve = pkmVersions.some(pkmVersion => {
         const staticEvolves = staticData.evolves[ pkmVersion.species ];
         const evolveSpecies = staticEvolves?.trade[ pkmVersion.version ] ?? staticEvolves?.tradeWithItem[ pkmVersion.heldItemPokeapiName ?? '' ]?.[ pkmVersion.version ];
         return !!evolveSpecies && level >= evolveSpecies.minLevel;

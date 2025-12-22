@@ -44,11 +44,14 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
 
         Console.WriteLine($"Evolve from {oldSpecies} to {evolveSpecies} using item? {evolveByItem}");
 
-        saveLoaders.Pkms.DeleteDto(dto.Id);
-
         UpdatePkm(dto.Pkm, evolveSpecies, evolveByItem);
-
         saveLoaders.Pkms.WriteDto(dto);
+
+        if (dto.PkmVersionId != null)
+        {
+            var pkmVersion = loaders.pkmVersionLoader.GetEntity(dto.PkmVersionId);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(loaders, flags, [(pkmVersion.PkmId, dto.Id)]);
+        }
 
         flags.Saves.Add(new()
         {
@@ -87,43 +90,30 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
 
         var (evolveSpecies, evolveByItem) = await GetEvolve(dto);
 
-        // main pkm-version has same id than pkm-entity
-        var mainDto = dto.IsMain ? dto : relatedPkmVersions.Find(version => version.IsMain);
-
         // update dto 1/2
-        loaders.pkmVersionLoader.DeleteEntity(dto.Id);
         UpdatePkm(dto.Pkm, evolveSpecies, evolveByItem);
-        dto.PkmVersionEntity.Id = dto.Id;
         dto.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(dto.Pkm);
+        loaders.pkmVersionLoader.WriteDto(dto);
 
         // update related dto 1/2
         relatedPkmVersions.ForEach((versionDto) =>
         {
-            loaders.pkmVersionLoader.DeleteEntity(versionDto.Id);
             UpdatePkm(versionDto.Pkm, evolveSpecies, false);
-            versionDto.PkmVersionEntity.Id = versionDto.Id;
             versionDto.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(versionDto.Pkm);
-        });
-
-        // pkmId to assign to every pkm-version here
-        var pkmId = mainDto!.Id;
-
-        // update pkm-entity
-        mainDto.PkmDto.PkmEntity.Id = pkmId;
-        loaders.pkmLoader.WriteDto(mainDto.PkmDto);
-
-        // update dto 2/2
-        dto.PkmVersionEntity.PkmId = pkmId;
-        loaders.pkmVersionLoader.WriteDto(dto);
-
-        // update related dto 2/2
-        relatedPkmVersions.ForEach((versionDto) =>
-        {
-            versionDto.PkmVersionEntity.PkmId = pkmId;
             loaders.pkmVersionLoader.WriteDto(versionDto);
         });
 
-        flags.MainPkms = true;
+        if (dto.PkmDto.SaveId != null)
+        {
+            await SynchronizePkmAction.SynchronizePkmVersionToSave(loaders, flags, [(dto.PkmId, null)]);
+
+            flags.Saves.Add(new()
+            {
+                SaveId = (uint)dto.PkmDto.SaveId,
+                SavePkms = true
+            });
+        }
+
         flags.MainPkmVersions = true;
 
         return new DataActionPayload

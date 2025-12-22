@@ -60,11 +60,11 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
         var time = LogUtil.Time($"Check saves to synchronize ({LocalSaveService.SaveById.Count})");
         foreach (var saveId in LocalSaveService.SaveById.Keys)
         {
-            var pkmVersionsToSynchronize = SynchronizePkmAction.GetPkmVersionsToSynchronize(loaders, saveId);
-            if (pkmVersionsToSynchronize.Length > 0)
+            var pkmsToSynchronize = SynchronizePkmAction.GetPkmsToSynchronize(loaders, saveId);
+            if (pkmsToSynchronize.Length > 0)
             {
                 await AddAction(
-                    new SynchronizePkmAction(saveId, pkmVersionsToSynchronize),
+                    new SynchronizePkmAction(pkmsToSynchronize),
                     null
                 );
             }

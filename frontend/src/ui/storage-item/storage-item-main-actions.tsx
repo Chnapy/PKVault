@@ -72,7 +72,7 @@ export const StorageItemMainActions: React.FC = () => {
             })
             .map(pageSave => pageSave.generation)) ].sort();
 
-    const canEvolve = pkmVersionCanEvolve && !selectedPkm.saveId;
+    const canEvolve = pkmVersionCanEvolve;
     const canDetach = !!selectedPkm.saveId;
     const canGoToSave = !!selectedPkm.saveId;
     const canEdit = pkmVersions[ 0 ].canEdit;

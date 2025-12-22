@@ -39,10 +39,6 @@ export const StorageBoxMainActions: React.FC<
     }
 
     const canEvolvePkms = pkms.filter(pkm => {
-        if (pkm.saveId) {
-            return false;
-        }
-
         const pkmVersions = mainPkmVersionQuery.data?.data.filter(pkmVersion => pkmVersion.pkmId === pkm.id) ?? [];
 
         return pkmVersions.some(pkmVersion => {

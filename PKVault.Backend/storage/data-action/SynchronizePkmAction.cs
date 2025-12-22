@@ -1,6 +1,8 @@
-public class SynchronizePkmAction(uint saveId, string[] pkmVersionIds) : DataAction
+using PKHeX.Core;
+
+public class SynchronizePkmAction((string PkmId, string? SavePkmId)[] pkmMainAndPkmSaveIds) : DataAction
 {
-    public static string[] GetPkmVersionsToSynchronize(DataEntityLoaders loaders, uint saveId)
+    public static (string PkmId, string SavePkmId)[] GetPkmsToSynchronize(DataEntityLoaders loaders, uint saveId)
     {
         var pkmVersionDtos = loaders.pkmVersionLoader.GetAllDtos();
         var saveLoaders = loaders.saveLoadersDict[saveId];
@@ -11,13 +13,19 @@ public class SynchronizePkmAction(uint saveId, string[] pkmVersionIds) : DataAct
             var pkmDto = pkmVersion.PkmDto;
             if (pkmDto?.SaveId != saveId)
             {
-                return "";
+                return ("", "");
+            }
+
+            if (pkmVersion.Generation != saveLoaders.Save.Generation)
+            {
+                return ("", "");
             }
 
             var savePkms = allSavePkms.FindAll(pkm => pkm.PkmVersionId == pkmVersion.Id);
+
             if (savePkms.Count != 1)
             {
-                return "";
+                return ("", "");
             }
 
             var savePkm = savePkms[0];
@@ -25,57 +33,84 @@ public class SynchronizePkmAction(uint saveId, string[] pkmVersionIds) : DataAct
             var needsSynchro = pkmVersion.DynamicChecksum != savePkm.DynamicChecksum;
             if (needsSynchro)
             {
-                return pkmVersion.Id;
+                return (pkmVersion.PkmId, savePkm.Id);
             }
 
-            return "";
-        }).ToList().FindAll(pkmVersionId => pkmVersionId.Length > 0).Distinct()];
+            return ("", "");
+        }).ToList().FindAll(entry => entry.Item1.Length > 0).Distinct()];
     }
 
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        if (pkmVersionIds.Length == 0)
+        await SynchronizeSaveToPkmVersion(
+            loaders, flags,
+            pkmMainAndPkmSaveIds
+        );
+
+        var pkmDto = loaders.pkmLoader.GetEntity(pkmMainAndPkmSaveIds[0].PkmId);
+
+        return new()
         {
-            throw new ArgumentException($"Pkm version ids cannot be empty");
+            type = DataActionType.PKM_SYNCHRONIZE,
+            parameters = [pkmDto.SaveId, pkmMainAndPkmSaveIds.Length]
+        };
+    }
+
+    public static async Task SynchronizeSaveToPkmVersion(
+        DataEntityLoaders loaders, DataUpdateFlags flags,
+        (string PkmId, string? SavePkmId)[] pkmMainAndPkmSaveIds
+    )
+    {
+        if (pkmMainAndPkmSaveIds.Length == 0)
+        {
+            throw new ArgumentException($"Pkm main & pkm save ids cannot be empty");
         }
 
-        void act(string pkmVersionId)
+        void act(string pkmId, string? savePkmId)
         {
-            var pkmVersionDto = loaders.pkmVersionLoader.GetDto(pkmVersionId);
-            var pkmDto = pkmVersionDto!.PkmDto;
+            var pkmDto = loaders.pkmLoader.GetDto(pkmId);
+            var pkmVersionDtos = loaders.pkmVersionLoader.GetDtosByPkmId(pkmId).Values.ToList();
 
             if (pkmDto.SaveId == default)
             {
-                throw new ArgumentException($"Cannot synchronize pkm-version detached from save, pkm-version.id={pkmVersionId}");
+                throw new ArgumentException($"Cannot synchronize pkm detached from save, pkm.id={pkmId}");
             }
 
-            var saveLoaders = loaders.saveLoadersDict[saveId];
-            var savePkms = saveLoaders.Pkms.GetAllDtos().FindAll(pkm => pkm.PkmVersionId == pkmVersionId);
+            var saveLoaders = loaders.saveLoadersDict[(uint)pkmDto.SaveId!];
+            var pkmVersionDto = pkmVersionDtos.Find(version => version.Generation == saveLoaders.Save.Generation);
+            var savePkm = savePkmId == null
+                ? saveLoaders.Pkms.GetAllDtos().Find(pkm => pkm.PkmVersionId == pkmVersionDto.Id)
+                : saveLoaders.Pkms.GetDto(savePkmId);
 
-            if (savePkms.Count == 0)
+            if (savePkm == null)
             {
-                Console.WriteLine($"Attached save pkm not found for pkmVersion.Id={pkmVersionId}");
+                Console.WriteLine($"Attached save pkm not found for pkm.Id={pkmId}");
             }
 
-            if (savePkms.Count > 1)
+            pkmVersionDtos.ForEach((version) =>
             {
-                Console.WriteLine($"Multiple save pkms with same ID for pkmVersion.Id={pkmVersionId}");
-            }
+                var versionPkm = version.Pkm;
 
-            var savePkm = savePkms[0]!;
+                // update xp etc,
+                // and species/form only when possible
 
-            var relatedPkmVersions = loaders.pkmVersionLoader.GetDtosByPkmId(pkmDto.Id).Values.ToList();
-            relatedPkmVersions.ForEach((version) =>
-            {
-                var pkm = version.Pkm;
+                var saveVersion = PkmVersionDTO.GetSingleVersion(version.Version);
+                var versionSave = BlankSaveFile.Get(saveVersion);
+                var correctSpeciesForm = versionSave.Personal.IsPresentInGame(savePkm.Pkm.Species, savePkm.Pkm.Form);
+                if (correctSpeciesForm && savePkm.Pkm.Species >= versionPkm.Species)
+                {
+                    versionPkm.Species = savePkm.Pkm.Species;
+                    versionPkm.Form = savePkm.Pkm.Form;
+                    version.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(versionPkm);
+                }
 
                 if (savePkm.PkmVersionId == version.Id)
                 {
-                    PkmConvertService.PassAllToPkmSafe(savePkm.Pkm, pkm);
+                    PkmConvertService.PassAllToPkmSafe(savePkm.Pkm, versionPkm);
                 }
                 else
                 {
-                    PkmConvertService.PassAllDynamicsNItemToPkm(savePkm.Pkm, pkm);
+                    PkmConvertService.PassAllDynamicsNItemToPkm(savePkm.Pkm, versionPkm);
                 }
 
                 loaders.pkmVersionLoader.WriteDto(version);
@@ -84,15 +119,76 @@ public class SynchronizePkmAction(uint saveId, string[] pkmVersionIds) : DataAct
             });
         }
 
-        foreach (var pkmVersionId in pkmVersionIds)
+        foreach (var (pkmId, savePkmId) in pkmMainAndPkmSaveIds)
         {
-            act(pkmVersionId);
+            act(pkmId, savePkmId);
+        }
+    }
+
+    public static async Task SynchronizePkmVersionToSave(
+        DataEntityLoaders loaders, DataUpdateFlags flags,
+        (string PkmId, string? SavePkmId)[] pkmMainAndPkmSaveIds
+    )
+    {
+        if (pkmMainAndPkmSaveIds.Length == 0)
+        {
+            throw new ArgumentException($"Pkm main & pkm save ids cannot be empty");
         }
 
-        return new()
+        void act(string pkmId, string? savePkmId)
         {
-            type = DataActionType.PKM_SYNCHRONIZE,
-            parameters = [saveId, pkmVersionIds.Length]
-        };
+            var pkmDto = loaders.pkmLoader.GetDto(pkmId);
+            var pkmVersionDtos = loaders.pkmVersionLoader.GetDtosByPkmId(pkmId).Values.ToList();
+
+            if (pkmDto.SaveId == default)
+            {
+                throw new ArgumentException($"Cannot synchronize pkm detached from save, pkm.id={pkmId}");
+            }
+
+            var saveLoaders = loaders.saveLoadersDict[(uint)pkmDto.SaveId!];
+            var pkmVersionDto = pkmVersionDtos.Find(version => version.Generation == saveLoaders.Save.Generation);
+            var savePkm = savePkmId == null
+                ? saveLoaders.Pkms.GetAllDtos().Find(pkm => pkm.PkmVersionId == pkmVersionDto.Id)
+                : saveLoaders.Pkms.GetDto(savePkmId);
+
+            if (savePkm == null)
+            {
+                Console.WriteLine($"Attached save pkm not found for pkm.Id={pkmId}");
+            }
+
+            var versionPkm = pkmVersionDto.Pkm;
+
+            // update xp etc,
+            // and species/form only when possible
+
+            var correctSpeciesForm = saveLoaders.Save.Personal.IsPresentInGame(versionPkm.Species, versionPkm.Form);
+            if (correctSpeciesForm)
+            {
+                savePkm.Pkm.Species = versionPkm.Species;
+                savePkm.Pkm.Form = versionPkm.Form;
+            }
+
+            if (savePkm.PkmVersionId == pkmVersionDto.Id)
+            {
+                PkmConvertService.PassAllToPkmSafe(versionPkm, savePkm.Pkm);
+            }
+            else
+            {
+                PkmConvertService.PassAllDynamicsNItemToPkm(versionPkm, savePkm.Pkm);
+            }
+
+            saveLoaders.Pkms.WriteDto(savePkm);
+
+            flags.Saves.Add(new()
+            {
+                SaveId = (uint)pkmDto.SaveId,
+                SavePkms = true,
+            });
+        }
+
+        foreach (var (pkmId, savePkmId) in pkmMainAndPkmSaveIds)
+        {
+            act(pkmId, savePkmId);
+        }
     }
 }

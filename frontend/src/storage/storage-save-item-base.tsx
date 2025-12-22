@@ -34,7 +34,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
     const saveSynchronized = savePkm.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
     const canMoveAttached = !savePkm.pkmVersionId && !isEgg && !isShadow;
-    const canEvolve = !savePkm.pkmVersionId && !!evolveSpecies && level >= evolveSpecies.minLevel;
+    const canEvolve = !!evolveSpecies && level >= evolveSpecies.minLevel;
     const canDetach = !!savePkm.pkmVersionId;
     const canSynchronize = !!savePkm.pkmVersionId && !!attachedPkmVersion && !saveSynchronized;
 

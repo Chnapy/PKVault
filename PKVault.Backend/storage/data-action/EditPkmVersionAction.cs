@@ -7,11 +7,6 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
         var pkmVersionDto = loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkmDto = pkmVersionDto!.PkmDto;
 
-        if (pkmDto.SaveId != default)
-        {
-            throw new ArgumentException("Edit not possible for pkm attached with save");
-        }
-
         var availableMoves = await StorageService.GetPkmAvailableMoves(null, pkmVersionId);
 
         var pkm = pkmVersionDto.Pkm;
@@ -41,6 +36,11 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
 
             loaders.pkmVersionLoader.WriteDto(versionDto);
         });
+
+        if (pkmDto.SaveId != default)
+        {
+            await SynchronizePkmAction.SynchronizePkmVersionToSave(loaders, flags, [(pkmDto.Id, null)]);
+        }
 
         flags.MainPkmVersions = true;
 

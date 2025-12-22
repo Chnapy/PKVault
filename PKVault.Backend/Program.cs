@@ -14,6 +14,7 @@ public class Program
     {
         SetupTask ??= Task.Run(async () =>
             {
+                await StaticDataService.GetStaticData();
                 StorageService.CleanWrongData();
                 try
                 {

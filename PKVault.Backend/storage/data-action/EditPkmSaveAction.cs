@@ -33,7 +33,8 @@ public class EditPkmSaveAction(uint saveId, string pkmSaveId, EditPkmVersionPayl
 
         if (pkmSave.PkmVersionId != null)
         {
-            await new SynchronizePkmAction(saveId, [pkmSave.PkmVersionId]).ExecuteWithPayload(loaders, flags);
+            var pkmVersion = loaders.pkmVersionLoader.GetEntity(pkmSave.PkmVersionId);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(loaders, flags, [(pkmVersion.PkmId, pkmSave.Id)]);
         }
 
         return new()
