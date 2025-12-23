@@ -222,7 +222,7 @@ public class StaticDataService
                     pkm.Form = (byte)formIndex;
                     pkm.RefreshChecksum();
 
-                    var legality = new LegalityAnalysis(pkm);
+                    var legality = BasePkmVersionDTO.GetLegalitySafe(pkm);
                     var battleOnly = legality.Results.Any(result =>
                         result.Identifier == CheckIdentifier.Form
                         && result.Result == LegalityCheckResultCode.FormBattle

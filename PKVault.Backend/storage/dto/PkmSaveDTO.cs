@@ -77,9 +77,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
                 slotType = StorageSlotType.Party;
             }
 
-            var la = Pkm.GetType() == Save.PKMType // quick sanity check
-                ? new LegalityAnalysis(Pkm, Save.Personal, slotType)
-                : new LegalityAnalysis(Pkm, Pkm.PersonalInfo, slotType);
+            var la = GetLegalitySafe(Pkm, Save, slotType);
 
             try
             {

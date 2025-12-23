@@ -305,7 +305,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     {
         get
         {
-            var legality = new LegalityAnalysis(Pkm);
+            var legality = GetLegalitySafe(Pkm);
             // if (Id == "G91020AC14A4E820 20 20 20 20 2000")
             // {
             //     Console.WriteLine($"TEST {Species} parsed={legality.Parsed} pkmValid={Pkm.Valid} legality={legality.Valid}");
@@ -318,7 +318,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     {
         get
         {
-            var la = new LegalityAnalysis(Pkm, Pkm.PersonalInfo);
+            var la = GetLegalitySafe(Pkm);
 
             try
             {
@@ -335,6 +335,32 @@ public abstract class BasePkmVersionDTO : IWithId<string>
     }
 
     public bool CanEdit { get => !IsEgg; }
+
+    /**
+     * Check legality with correct global settings.
+     * Required to expect same result as in PKHeX.
+     *
+     * If no save passed, some checks won't be done.
+     */
+    public static LegalityAnalysis GetLegalitySafe(PKM pkm, SaveFile? save = null, StorageSlotType slotType = StorageSlotType.None)
+    {
+        if (save != null)
+        {
+            ParseSettings.InitFromSaveFileData(save);
+        }
+        else
+        {
+            ParseSettings.ClearActiveTrainer();
+        }
+
+        var la = save != null && pkm.GetType() == save.PKMType // quick sanity check
+            ? new LegalityAnalysis(pkm, save.Personal, slotType)
+            : new LegalityAnalysis(pkm, pkm.PersonalInfo, slotType);
+
+        ParseSettings.ClearActiveTrainer();
+
+        return la;
+    }
 
     [JsonIgnore()]
     public required PKM Pkm;

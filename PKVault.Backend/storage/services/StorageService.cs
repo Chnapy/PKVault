@@ -291,6 +291,9 @@ public class StorageService
     public static async Task<List<MoveItem>> GetPkmAvailableMoves(uint? saveId, string pkmId)
     {
         var loader = await GetLoader();
+        var save = saveId == null
+            ? null
+            : loader.loaders.saveLoadersDict[(uint)saveId].Save;
         var pkm = (saveId == null
             ? loader.loaders.pkmVersionLoader.GetDto(pkmId)?.Pkm
             : loader.loaders.saveLoadersDict[(uint)saveId].Pkms.GetDto(pkmId)?.Pkm)
@@ -298,7 +301,7 @@ public class StorageService
 
         try
         {
-            var legality = new LegalityAnalysis(pkm);
+            var legality = BasePkmVersionDTO.GetLegalitySafe(pkm, save);
 
             var moveComboSource = new LegalMoveComboSource();
             var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);

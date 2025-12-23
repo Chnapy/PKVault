@@ -61,9 +61,6 @@ public class Program
     {
         var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
-        // required for GB legality
-        ParseSettings.InitFromSaveFileData(FakeSaveFile.Default);
-
         // if (args.Length > 0 && args[0] == "test-PB7")
         // {
         //     LocalSaveService.ReadLocalSaves();
