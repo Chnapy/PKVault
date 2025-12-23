@@ -104,6 +104,11 @@ public class SynchronizePkmAction((string PkmId, string? SavePkmId)[] pkmMainAnd
                     version.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(versionPkm);
                 }
 
+                if (savePkm.Pkm.Language != 0)
+                {
+                    versionPkm.Language = savePkm.Pkm.Language;
+                }
+
                 if (savePkm.PkmVersionId == version.Id)
                 {
                     PkmConvertService.PassAllToPkmSafe(savePkm.Pkm, versionPkm);
@@ -166,6 +171,12 @@ public class SynchronizePkmAction((string PkmId, string? SavePkmId)[] pkmMainAnd
             {
                 savePkm.Pkm.Species = versionPkm.Species;
                 savePkm.Pkm.Form = versionPkm.Form;
+            }
+
+            if (saveLoaders.Save.Language != 0)
+            {
+                versionPkm.Language = saveLoaders.Save.Language;
+                loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
             }
 
             if (savePkm.PkmVersionId == pkmVersionDto.Id)

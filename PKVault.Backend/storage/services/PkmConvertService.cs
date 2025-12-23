@@ -184,10 +184,9 @@ public class PkmConvertService
 
     private static void PassStaticsToPkm(PKM sourcePkm, PKM destPkm)
     {
-        destPkm.Language = (int)SettingsService.AppSettings.GetSafeLanguageID(); //pkmOrigin.Language;
-        if (destPkm is IHandlerLanguage pkmIntermediateHLang)
+        if (sourcePkm.Language != 0)
         {
-            pkmIntermediateHLang.HandlingTrainerLanguage = (byte)SettingsService.AppSettings.GetSafeLanguageID();
+            destPkm.Language = sourcePkm.Language;
         }
 
         destPkm.Gender = sourcePkm.Gender;
@@ -240,7 +239,7 @@ public class PkmConvertService
 
     public static void PassDynamicsToPkm(PKM sourcePkm, PKM destPkm)
     {
-        ApplyNicknameToPkm(destPkm, sourcePkm.Nickname);
+        ApplyNicknameToPkm(destPkm, sourcePkm.Nickname, sourcePkm.IsNicknamed);
 
         destPkm.CurrentLevel = sourcePkm.CurrentLevel;
         destPkm.EXP = sourcePkm.EXP;
@@ -296,12 +295,22 @@ public class PkmConvertService
         ApplyMovesToPkm(destPkm, moves);
     }
 
-    public static void ApplyNicknameToPkm(PKM pkm, string nickname)
+    public static void ApplyNicknameToPkm(PKM pkm, string nickname, bool sourcePkmIsNicknamed)
     {
-        var generation = pkm.Format;
+        var language = GetPkmLanguage(pkm);
 
-        var defaultNickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, (int)SettingsService.AppSettings.GetSafeLanguageID(), pkm.Format);
-        if (nickname.Length == 0)
+        if (!sourcePkmIsNicknamed)
+        {
+            nickname = "";
+        }
+
+        var defaultNickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, language, pkm.Format);
+        if (defaultNickname.Length == 0)
+        {
+            Console.WriteLine($"defaultNickname EMPTY for SPECIES={pkm.Species} LANG={language} FORMAT={pkm.Format} NICKNAME={nickname}");
+        }
+
+        if (nickname.Trim().Length == 0)
         {
             nickname = defaultNickname;
         }
@@ -311,7 +320,8 @@ public class PkmConvertService
             nickname = nickname[..pkm.MaxStringLengthNickname];
         }
 
-        var isNicknamed = SpeciesName.IsNicknamed(pkm.Species, nickname, (int)SettingsService.AppSettings.GetSafeLanguageID(), generation) && !nickname.Equals(defaultNickname, StringComparison.InvariantCultureIgnoreCase);
+        var isNicknamed = SpeciesName.IsNicknamed(pkm.Species, nickname, language, pkm.Format)
+            && !nickname.Equals(defaultNickname, StringComparison.InvariantCultureIgnoreCase);
 
         pkm.IsNicknamed = isNicknamed;
         pkm.Nickname = isNicknamed ? nickname : defaultNickname;
@@ -370,5 +380,15 @@ public class PkmConvertService
     private static int ConvertIVG3ToG2(int ivValue)
     {
         return ivValue / 2;
+    }
+
+    public static int GetPkmLanguage(PKM pkm)
+    {
+        if (pkm is GBPKM gbpkm)
+        {
+            return gbpkm.IsSpeciesNameMatch(pkm.Language) ? pkm.Language : gbpkm.GuessedLanguage(pkm.Language);
+        }
+
+        return pkm.Language;
     }
 }

@@ -309,7 +309,7 @@ public class StorageService
                 return [];
             }
 
-            var blankSav = BlankSaveFile.Get(saveVersion, pkm.OriginalTrainerName, (LanguageID)pkm.Language);
+            var blankSav = BlankSaveFile.Get(saveVersion, pkm.OriginalTrainerName, (LanguageID)PkmConvertService.GetPkmLanguage(pkm));
 
             var filteredSources = new FilteredGameDataSource(blankSav, GameInfo.Sources);
             moveSource.ChangeMoveSource(filteredSources.Moves);

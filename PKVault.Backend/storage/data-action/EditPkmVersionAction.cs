@@ -63,7 +63,7 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
             throw new ArgumentException($"Nickname should be <= {pkm.MaxStringLengthNickname} for this generation & language");
         }
 
-        PkmConvertService.ApplyNicknameToPkm(pkm, nickname);
+        PkmConvertService.ApplyNicknameToPkm(pkm, nickname, true);
     }
 
     public static void EditPkmEVs(PKM pkm, int[] evs)
