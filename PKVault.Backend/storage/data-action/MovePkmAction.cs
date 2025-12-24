@@ -362,7 +362,10 @@ public class MovePkmAction(
             throw new ArgumentException($"pkmSaveDTO.PkmVersionId is null, should be {pkmSaveDTO.Id}");
         }
 
-        await SynchronizePkmAction.SynchronizeSaveToPkmVersion(loaders, flags, [(pkmDto.Id, null)]);
+        if (pkmDto.SaveId != null)
+        {
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(loaders, flags, [(pkmDto.Id, null)]);
+        }
 
         flags.MainPkms = true;
         flags.MainPkmVersions = true;
