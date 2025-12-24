@@ -13,7 +13,16 @@ const context = React.createContext<ContextValue>({});
 
 const getHistoryValue = (value: ContextValue, location: HistoryLocation) => {
     const to = location.pathname as keyof FileRoutesByTo;
-    const search = Object.fromEntries(Array.from(new URLSearchParams(location.search)).map(([ k, v ]) => [ k, JSON.parse(v) ]));
+    const search = Object.fromEntries(Array.from(new URLSearchParams(location.search)).map(([ k, v ]) => [
+        k,
+        (() => {
+            try {
+                return JSON.parse(v)
+            } catch {
+                return;
+            }
+        })()
+    ]));
     // console.log(location.href, to, search);
 
     const lastValue = value[ to ];
