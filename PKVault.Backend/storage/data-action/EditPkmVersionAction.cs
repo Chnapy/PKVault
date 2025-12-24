@@ -164,9 +164,9 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
 
         newMoves.ForEach(moveId =>
         {
-            if (availableMoves.FindAll(move => move.Id == moveId).Count() == 0)
+            if (!availableMoves.Any(move => move.Id == moveId))
             {
-                throw new ArgumentException($"Move not available for this pkm-version: {moveId}");
+                throw new ArgumentException($"Move not available for this pkm: move={moveId}");
             }
         });
 

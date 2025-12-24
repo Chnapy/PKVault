@@ -15,6 +15,7 @@ export type TextMovesProps = {
     pkmId: string;
     ability: number;
     moves: number[];
+    movesLegality: boolean[];
     generation: number;
     hiddenPowerType: number;
     hiddenPowerPower: number;
@@ -27,6 +28,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
     pkmId,
     ability,
     moves,
+    movesLegality,
     generation,
     hiddenPowerType,
     hiddenPowerPower,
@@ -104,6 +106,16 @@ export const TextMoves: React.FC<TextMovesProps> = ({
             const powerDiff = (ga?.power ?? 0) - (gb?.power ?? 0);
             return powerDiff;
         }), [ availableMovesQuery.data?.data, generation, getStaticMove ]);
+
+    // in edit-mode remove invalid moves
+    React.useEffect(() => {
+        if (editMode && availableMoves.length > 0) {
+            const fixedMoves = formMoves.map(move => availableMoves.some(moveId => moveId === move) ? move : 0);
+            if (fixedMoves.join('.') !== formMoves.join('.')) {
+                setValue('moves', fixedMoves);
+            }
+        }
+    }, [ availableMoves, editMode, formMoves, setValue ]);
 
     return <>
         {ability > 0 && <>
@@ -194,6 +206,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                                 type={forGen.type}
                                 category={forGen.category}
                                 damage={forGen.power}
+                                isValid={movesLegality[ i ]}
                                 style={{
                                     flex: '1 1 0',
                                     minWidth: '35%'

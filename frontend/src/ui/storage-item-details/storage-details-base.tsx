@@ -25,7 +25,7 @@ import { TextStats } from './text-stats';
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'idBase' | 'pid' | 'species' | 'version' | 'context' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'levelUpPercent' | 'eggHatchCount' | 'friendship' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
-    | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves'
+    | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves' | 'movesLegality'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
     | 'heldItem' | 'isValid' | 'validityReport' | 'canEdit'
 > & {
@@ -100,6 +100,10 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
             {!pkm.isValid && <TextContainer
                 bgColor={theme.bg.yellow}
                 maxHeight={200}
+                style={{
+                    minHeight: '1lh',
+                    flexShrink: 0.1,
+                }}
             >
                 {pkm.validityReport}
             </TextContainer>}
@@ -150,6 +154,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
                         pkmId={pkm.id}
                         ability={pkm.ability}
                         moves={pkm.moves}
+                        movesLegality={pkm.movesLegality}
                         generation={pkm.generation}
                         hiddenPowerType={pkm.hiddenPowerType}
                         hiddenPowerPower={pkm.hiddenPowerPower}

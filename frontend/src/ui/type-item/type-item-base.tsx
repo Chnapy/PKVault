@@ -48,6 +48,7 @@ export const TypeItemBase: React.FC<TypeItemBaseProps> = ({ type, name, clickabl
             style={{
                 position: 'relative',
                 display: 'flex',
+                alignItems: 'center',
             }}
         >
             <img

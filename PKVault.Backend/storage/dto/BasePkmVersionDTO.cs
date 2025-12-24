@@ -250,6 +250,16 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         }
     }
 
+    public List<bool> MovesLegality
+    {
+        get
+        {
+            var la = GetLegalitySafe(Pkm);
+
+            return [.. la.Info.Moves.Select(r => r.Valid)];
+        }
+    }
+
     public ushort TID
     {
         get { return Pkm.TID16; }
