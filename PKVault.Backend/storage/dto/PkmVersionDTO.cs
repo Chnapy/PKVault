@@ -46,7 +46,16 @@ public class PkmVersionDTO : BasePkmVersionDTO
 
         if (ignoredVersions.Contains(version))
         {
-            return default;
+            var context = version.GetContext();
+
+            try
+            {
+                return context.GetSingleGameVersion();
+            }
+            catch
+            {
+                return default;
+            }
         }
 
         return version.IsValidSavedVersion()

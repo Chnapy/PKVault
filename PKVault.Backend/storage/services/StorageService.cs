@@ -306,15 +306,13 @@ public class StorageService
             var moveComboSource = new LegalMoveComboSource();
             var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
 
-            var saveVersion = PkmVersionDTO.GetSingleVersion(pkm.Version);
-            if (saveVersion == default)
-            {
-                return [];
-            }
+            save ??= BlankSaveFile.Get(
+                PkmVersionDTO.GetSingleVersion(pkm.Version),
+                pkm.OriginalTrainerName,
+                (LanguageID)PkmConvertService.GetPkmLanguage(pkm)
+            );
 
-            var blankSav = BlankSaveFile.Get(saveVersion, pkm.OriginalTrainerName, (LanguageID)PkmConvertService.GetPkmLanguage(pkm));
-
-            var filteredSources = new FilteredGameDataSource(blankSav, GameInfo.Sources);
+            var filteredSources = new FilteredGameDataSource(save, GameInfo.Sources);
             moveSource.ChangeMoveSource(filteredSources.Moves);
             moveSource.ReloadMoves(legality);
 

@@ -144,8 +144,8 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
 
     public static void EditPkmMoves(PKM pkm, List<MoveItem> availableMoves, Span<ushort> moves)
     {
-        var newMoves = moves.ToArray().ToList();
-        var existingMoves = pkm.Moves;
+        var newMoves = moves.ToArray().Where(move => move != 0).ToList();
+        var existingMoves = pkm.Moves.Where(move => move != 0);
 
         if (string.Join('.', newMoves) == string.Join('.', existingMoves))
         {

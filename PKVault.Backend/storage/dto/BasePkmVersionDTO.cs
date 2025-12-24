@@ -389,6 +389,23 @@ public abstract class BasePkmVersionDTO : IWithId<string>
         var clone = pkm.Clone();
         clone.Species = GetBaseSpecies(pkm.Species);
         clone.Form = 0;
+        if (pkm is GBPKM gbpkm && clone is GBPKM gbclone)
+        {
+            gbclone.DV16 = gbpkm.DV16;
+        }
+        else
+        {
+            clone.PID = pkm.PID;
+            Span<int> ivs = [
+                pkm.IV_HP,
+                pkm.IV_ATK,
+                pkm.IV_DEF,
+                pkm.IV_SPE,
+                pkm.IV_SPA,
+                pkm.IV_SPD,
+            ];
+            clone.SetIVs(ivs);
+        }
         var hash = SearchUtil.HashByDetails(clone);
         var id = $"G{clone.Format}_{hash}_{clone.TID16}";   // note: SID not stored by pk files
 
