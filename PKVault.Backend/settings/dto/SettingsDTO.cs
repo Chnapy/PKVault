@@ -36,8 +36,7 @@ public class SettingsDTO
 
     public string GetSafeLanguage()
     {
-        return SettingsMutable.LANGUAGE
-            ?? throw new InvalidOperationException($"Language not defined");
+        return SettingsMutable.LANGUAGE ?? "en";
     }
 
     private static string NormalizeSafePath(string path) => MatcherUtil.NormalizePath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path));
