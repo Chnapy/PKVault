@@ -61,15 +61,6 @@ public class SaveInfosController : ControllerBase
     //     return await DataDTO.FromDataUpdateFlags(flags);
     // }
 
-    [HttpDelete()]
-    public async Task<ActionResult<DataDTO>> Delete([BindRequired] uint saveId)
-    {
-        await Program.WaitForSetup();
-
-        var flags = await LocalSaveService.DeleteSaveFromId(saveId);
-        return await DataDTO.FromDataUpdateFlags(flags);
-    }
-
     [HttpGet("{saveId}/download")]
     public ActionResult Download(uint saveId)
     {

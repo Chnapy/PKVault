@@ -78,54 +78,6 @@ public class LocalSaveService
         SaveById[save.ID32] = save;
     }
 
-    private static void DeleteSaveFromPath(string path)
-    {
-        Console.WriteLine($"DELETE SAVE {path}");
-
-        SaveByPath.TryGetValue(path, out var save);
-        if (save != default)
-        {
-            SaveById.TryGetValue(save.ID32, out var otherSave);
-            if (otherSave == save)
-            {
-                SaveById.Remove(save.ID32);
-            }
-
-            File.Delete(path);
-        }
-
-        SaveByPath.Remove(path);
-    }
-
-    public static async Task<DataUpdateFlags> DeleteSaveFromId(uint saveId)
-    {
-        if (!StorageService.HasEmptyActionList())
-        {
-            throw new InvalidOperationException("Storage has waiting actions");
-        }
-
-        var flags = new DataUpdateFlags();
-
-        await BackupService.PrepareBackupThenRun(async () =>
-        {
-            var path = SaveByPath.Keys.ToList().Find(key => SaveByPath[key].ID32 == saveId);
-            DeleteSaveFromPath(path!);
-        });
-
-        flags.Saves.Add(new()
-        {
-            SaveId = saveId,
-            SaveBoxes = true,
-            SavePkms = true
-        });
-        flags.Dex = true;
-        flags.SaveInfos = true;
-        flags.Backups = true;
-        flags.Warnings = true;
-
-        return flags;
-    }
-
     public static Dictionary<uint, SaveInfosDTO> GetAllSaveInfos()
     {
         var record = new Dictionary<uint, SaveInfosDTO>();

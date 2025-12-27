@@ -2,18 +2,15 @@ import React from "react";
 import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import {
   getSaveInfosDownloadUrl,
-  useSaveInfosDelete,
   useSaveInfosGetAll
 } from "../../data/sdk/save-infos/save-infos.gen";
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useTranslate } from '../../translate/i18n';
 import { ButtonExternalLink } from '../../ui/button/button';
-import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../../ui/button/button-with-disabled-popover';
 import { Icon } from '../../ui/icon/icon';
 import { SaveCardContentFull } from '../../ui/save-card/save-card-content-full';
-import { theme } from '../../ui/theme';
 
 export type SaveItemContentProps = {
   saveId: number;
@@ -30,7 +27,6 @@ export const SaveItemContent: React.FC<SaveItemContentProps> = withErrorCatcher(
 
   const settingsQuery = useSettingsGet();
   const saveInfosQuery = useSaveInfosGetAll();
-  const saveInfosDeleteMutation = useSaveInfosDelete();
 
   const settings = settingsQuery.data?.data;
 
@@ -72,15 +68,6 @@ export const SaveItemContent: React.FC<SaveItemContentProps> = withErrorCatcher(
           : <ButtonExternalLink href={downloadUrl} download>
             <Icon name='download' forButton />
           </ButtonExternalLink>}
-
-        <ButtonWithDisabledPopover as={ButtonWithConfirm} onClick={() =>
-          saveInfosDeleteMutation.mutateAsync({
-            params: {
-              saveId: save.id,
-            },
-          })} bgColor={theme.bg.red} {...commonBtnProps}>
-          <Icon name='trash' solid forButton />
-        </ButtonWithDisabledPopover>
       </>}
     onClose={onClose}
   />;
