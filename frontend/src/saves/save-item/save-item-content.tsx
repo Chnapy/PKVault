@@ -6,8 +6,9 @@ import {
 } from "../../data/sdk/save-infos/save-infos.gen";
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../../error/with-error-catcher';
+import { useDesktopMessage } from '../../settings/save-globs/hooks/use-desktop-message';
 import { useTranslate } from '../../translate/i18n';
-import { ButtonExternalLink } from '../../ui/button/button';
+import { Button, ButtonExternalLink } from '../../ui/button/button';
 import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../../ui/button/button-with-disabled-popover';
 import { Icon } from '../../ui/icon/icon';
 import { SaveCardContentFull } from '../../ui/save-card/save-card-content-full';
@@ -27,6 +28,8 @@ export const SaveItemContent: React.FC<SaveItemContentProps> = withErrorCatcher(
 
   const settingsQuery = useSettingsGet();
   const saveInfosQuery = useSaveInfosGetAll();
+
+  const desktopMessage = useDesktopMessage();
 
   const settings = settingsQuery.data?.data;
 
@@ -60,14 +63,27 @@ export const SaveItemContent: React.FC<SaveItemContentProps> = withErrorCatcher(
     shinyCount={save.shinyCount}
     actions={showDelete &&
       <>
-        {commonBtnProps.disabled
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- type inference issue
-          ? <ButtonWithDisabledPopover as={ButtonExternalLink as any} href={downloadUrl} download {...commonBtnProps}>
-            <Icon name='download' forButton />
-          </ButtonWithDisabledPopover>
-          : <ButtonExternalLink href={downloadUrl} download>
-            <Icon name='download' forButton />
-          </ButtonExternalLink>}
+        {desktopMessage
+          ? <>
+            <ButtonWithDisabledPopover as={Button} {...commonBtnProps} onClick={() => desktopMessage.openFile({
+              type: 'open-folder',
+              id: save.id.toString(),
+              isDirectory: false,
+              path: save.path
+            })}>
+              <Icon name='folder' solid forButton />
+            </ButtonWithDisabledPopover>
+          </>
+          : <>
+            {commonBtnProps.disabled
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any -- type inference issue
+              ? <ButtonWithDisabledPopover as={ButtonExternalLink as any} href={downloadUrl} download {...commonBtnProps}>
+                <Icon name='download' forButton />
+              </ButtonWithDisabledPopover>
+              : <ButtonExternalLink href={downloadUrl} download>
+                <Icon name='download' forButton />
+              </ButtonExternalLink>}
+          </>}
       </>}
     onClose={onClose}
   />;

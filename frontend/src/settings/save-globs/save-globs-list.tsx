@@ -2,7 +2,7 @@ import React from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 import { useTranslate } from '../../translate/i18n';
 import { theme } from '../../ui/theme';
-import { isDesktop } from './hooks/use-file-explore';
+import { isDesktop } from './hooks/use-desktop-message';
 import { SaveGlobsAdd } from './save-globs-add';
 import { SaveGlobsItem } from './save-globs-item';
 

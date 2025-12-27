@@ -1,11 +1,12 @@
 import React from 'react';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
+import { useDesktopMessage } from '../../settings/save-globs/hooks/use-desktop-message';
+import { useTranslate } from '../../translate/i18n';
 import { DetailsTab } from '../../ui/details-card/details-tab';
 import { SaveCardContentSmall } from '../../ui/save-card/save-card-content-small';
 import { StorageDetailsBase } from '../../ui/storage-item-details/storage-details-base';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
-import { useTranslate } from '../../translate/i18n';
 
 export type StorageDetailsMainProps = {
     selectedId: string;
@@ -73,10 +74,21 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
     const mainPkmQuery = useStorageGetMainPkms();
     const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
 
+    const desktopMessage = useDesktopMessage();
+
     const pkmVersion = mainPkmVersionsQuery.data?.data.find(version => version.id === id);
     const pkm = pkmVersion && mainPkmQuery.data?.data.find(value => value.id === pkmVersion.pkmId);
     const nbrRelatedPkmVersion = mainPkmVersionsQuery.data?.data.filter(version => version.pkmId === pkm?.id).length;
     const saveCardProps = pkm?.saveId ? getSaveItemProps(pkm.saveId) : undefined;
+
+    const openFile = desktopMessage && pkmVersion?.isFilePresent
+        ? (() => desktopMessage.openFile({
+            type: 'open-folder',
+            id: pkmVersion.id,
+            isDirectory: false,
+            path: pkmVersion.filepath
+        }))
+        : undefined;
 
     if (!pkm || !pkmVersion) {
         return null;
@@ -101,6 +113,7 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
                 : undefined
             }
             onSubmit={() => formContext.submitForPkmVersion(id)}
+            openFile={openFile}
             extraContent={saveCardProps && <SaveCardContentSmall {...saveCardProps} />}
         />
     );

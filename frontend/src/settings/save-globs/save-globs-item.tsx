@@ -7,7 +7,7 @@ import { Icon } from '../../ui/icon/icon';
 import { TextInput } from '../../ui/input/text-input';
 import { theme } from '../../ui/theme';
 import { PathLine } from '../path-line';
-import { isDesktop } from './hooks/use-file-explore';
+import { isDesktop } from './hooks/use-desktop-message';
 
 export type SaveGlobsItemProps = {
     value: string;

@@ -32,10 +32,11 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     saveId?: number;
     onRelease?: () => unknown;
     onSubmit: () => unknown;
+    openFile?: () => unknown;
     extraContent?: React.ReactNode;
 };
 
-export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, onRelease, onSubmit, extraContent, ...pkm }) => {
+export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, onRelease, onSubmit, openFile, extraContent, ...pkm }) => {
     const { t } = useTranslate();
 
     const formContext = StorageDetailsForm.useContext();
@@ -57,6 +58,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
             showVersionName
             canEdit={pkm.canEdit}
             onRelease={onRelease}
+            openFile={openFile}
         />}
         mainImg={
             <DetailsMainImg

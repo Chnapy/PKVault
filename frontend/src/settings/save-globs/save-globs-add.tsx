@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
-import { isDesktop, useFileExplore } from './hooks/use-file-explore';
+import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
 
 export type SaveGlobsItemProps = {
     type: 'file' | 'folder';
@@ -13,15 +13,15 @@ export type SaveGlobsItemProps = {
 export const SaveGlobsAdd: React.FC<SaveGlobsItemProps> = ({ type, onAdd, disabled }) => {
     const { t } = useTranslate();
 
-    const fileExplore = useFileExplore();
+    const desktopMessage = useDesktopMessage();
 
     const onAddFn = async () => {
-        if (!fileExplore) {
+        if (!desktopMessage) {
             onAdd([ './placeholder' ]);
             return;
         }
 
-        const response = await fileExplore({
+        const response = await desktopMessage.fileExplore({
             type: 'file-explore',
             id: type === 'file' ? -1 : -2,
             directoryOnly: type === 'folder',

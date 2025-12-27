@@ -12,12 +12,17 @@ export type StorageDetailsTitleProps = {
     showVersionName?: boolean;
     canEdit: boolean;
     onRelease?: () => unknown;
+    openFile?: () => unknown;
 };
 
-export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ version, showVersionName, canEdit, onRelease }) => {
+export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ version, showVersionName, canEdit, onRelease, openFile }) => {
     const formContext = StorageDetailsForm.useContext();
 
     return <DetailsTitle version={version} showVersionName={showVersionName}>
+        {openFile && <Button onClick={openFile}>
+            <Icon name='folder' solid forButton />
+        </Button>}
+
         <ButtonWithConfirm
             onClick={onRelease}
             disabled={!onRelease}

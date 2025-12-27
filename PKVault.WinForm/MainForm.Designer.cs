@@ -287,62 +287,106 @@ partial class MainForm
             Console.WriteLine($"Message received: {message}");
             try
             {
-                var fileExploreRequest = JsonSerializer.Deserialize(message, FileExploreJsonContext.Default.FileExploreRequest);
+                var desktopRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.DesktopRequestMessage);
 
-                FileExploreResponse GetDialogResponse()
+                string responseSerialized = "";
+
+                switch (desktopRequest.type)
                 {
-                    if (fileExploreRequest.directoryOnly)
-                    {
-                        Console.WriteLine($"Directory only");
-                        using var dialogFolder = new FolderBrowserDialog();
-
-                        dialogFolder.Description = fileExploreRequest.title;
-                        dialogFolder.Multiselect = fileExploreRequest.multiselect;
-                        if (fileExploreRequest.basePath != default)
-                            dialogFolder.InitialDirectory = fileExploreRequest.basePath;
-
-                        var dialogFolderResult = dialogFolder.ShowDialog();
-
-                        return new()
+                    case FileExploreRequestMessage.TYPE:
                         {
-                            type = fileExploreRequest.type,
-                            id = fileExploreRequest.id,
-                            directoryOnly = true,
-                            values = dialogFolderResult == DialogResult.OK
-                                ? dialogFolder.SelectedPaths
-                                    .Select(MatcherUtil.NormalizePath)
-                                    .ToArray()
-                                : [],
-                        };
-                    }
+                            var fileExploreRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.FileExploreRequestMessage);
 
-                    Console.WriteLine($"File only");
-                    using var dialogFile = new OpenFileDialog();
+                            FileExploreResponseMessage GetDialogResponse()
+                            {
+                                if (fileExploreRequest.directoryOnly)
+                                {
+                                    Console.WriteLine($"Directory only");
+                                    using var dialogFolder = new FolderBrowserDialog();
 
-                    dialogFile.Title = fileExploreRequest.title;
-                    dialogFile.Multiselect = fileExploreRequest.multiselect;
-                    if (fileExploreRequest.basePath != default)
-                        dialogFile.InitialDirectory = fileExploreRequest.basePath;
+                                    dialogFolder.Description = fileExploreRequest.title;
+                                    dialogFolder.Multiselect = fileExploreRequest.multiselect;
+                                    if (fileExploreRequest.basePath != default)
+                                        dialogFolder.InitialDirectory = fileExploreRequest.basePath;
 
-                    var dialogResult = dialogFile.ShowDialog();
+                                    var dialogFolderResult = dialogFolder.ShowDialog();
 
-                    return new()
-                    {
-                        type = fileExploreRequest.type,
-                        id = fileExploreRequest.id,
-                        directoryOnly = true,
-                        values = dialogResult == DialogResult.OK
-                            ? dialogFile.FileNames
-                                .Select(MatcherUtil.NormalizePath)
-                                .ToArray()
-                            : [],
-                    };
+                                    return new(
+                                        type: fileExploreRequest.type,
+                                        id: fileExploreRequest.id,
+                                        directoryOnly: true,
+                                        values: dialogFolderResult == DialogResult.OK
+                                            ? dialogFolder.SelectedPaths
+                                                .Select(MatcherUtil.NormalizePath)
+                                                .ToArray()
+                                            : []
+                                    );
+                                }
+
+                                Console.WriteLine($"File only");
+                                using var dialogFile = new OpenFileDialog();
+
+                                dialogFile.Title = fileExploreRequest.title;
+                                dialogFile.Multiselect = fileExploreRequest.multiselect;
+                                if (fileExploreRequest.basePath != default)
+                                    dialogFile.InitialDirectory = fileExploreRequest.basePath;
+
+                                var dialogResult = dialogFile.ShowDialog();
+
+                                return new(
+                                    type: fileExploreRequest.type,
+                                    id: fileExploreRequest.id,
+                                    directoryOnly: true,
+                                    values: dialogResult == DialogResult.OK
+                                        ? dialogFile.FileNames
+                                            .Select(MatcherUtil.NormalizePath)
+                                            .ToArray()
+                                        : []
+                                );
+                            }
+
+                            var response = GetDialogResponse();
+                            responseSerialized = JsonSerializer.Serialize(response, DesktopMessageJsonContext.Default.FileExploreResponseMessage);
+                            break;
+                        }
+                    case OpenFolderRequestMessage.TYPE:
+                        {
+                            var openFolderRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.OpenFolderRequestMessage);
+
+                            var arg = openFolderRequest.isDirectory
+                                ? Path.GetFullPath(openFolderRequest.path)
+                                : string.Format("/e, /select, \"{0}\"", Path.GetFullPath(openFolderRequest.path));
+
+                            var psi = new ProcessStartInfo
+                            {
+                                FileName = "explorer.exe",
+                                Arguments = arg,
+                                UseShellExecute = false
+                            };
+
+                            Console.WriteLine($"RUN explorer.exe {arg}");
+
+                            var process = Process.Start(psi);
+                            process.WaitForInputIdle();
+
+                            var response = new OpenFolderResponseMessage(
+                                type: OpenFolderResponseMessage.TYPE,
+                                id: openFolderRequest.id
+                            );
+                            responseSerialized = JsonSerializer.Serialize(response, DesktopMessageJsonContext.Default.OpenFolderResponseMessage);
+                            break;
+                        }
                 }
 
-                var response = GetDialogResponse();
-                var responseSerialized = JsonSerializer.Serialize(response, FileExploreJsonContext.Default.FileExploreResponse)
-                    .Replace("\\", "\\\\");
-                string script = $"window.dispatchEvent(new CustomEvent('fileExplore', {{ detail: JSON.parse('{responseSerialized}') }}));";
+                if (responseSerialized == "")
+                {
+                    return;
+                }
+
+                responseSerialized = responseSerialized.Replace("\\", "\\\\");
+                string script = "try {"
+                    + $"\nwindow.dispatchEvent(new CustomEvent('desktop-message', {{ detail: JSON.parse('{responseSerialized}') }}));"
+                    + $"\n}} catch(err) {{ console.error('Error with event dispatch from backend, response serialized:', '{responseSerialized}'); }}";
                 var result = await webView.ExecuteScriptAsync(script);
                 Console.WriteLine($"Script = {script} result= {result}");
             }

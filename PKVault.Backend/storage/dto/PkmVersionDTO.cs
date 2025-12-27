@@ -80,6 +80,10 @@ public class PkmVersionDTO : BasePkmVersionDTO
 
     public new bool IsValid { get => base.IsValid && IsAttachedValid; }
 
+    public bool IsFilePresent => File.Exists(Filepath);
+
+    public string Filepath => Path.Combine(SettingsService.AppSettings.AppDirectory, PkmVersionEntity.Filepath);
+
     // public bool CanMoveToSaveStorage { get { return PkmDto.SaveId == default; } }
 
     public List<GameVersion> CompatibleWithVersions
