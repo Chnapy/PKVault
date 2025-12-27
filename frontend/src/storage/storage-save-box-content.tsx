@@ -50,6 +50,8 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
   const saveBoxes = saveBoxesQuery.data?.data ?? [];
   const savePkms = savePkmsQuery.data?.data ?? [];
 
+  const allSmallBoxes = saveBoxes.every(box => box.slotCount <= 20);
+
   const filteredBoxes = saveBoxes
     .filter(box => !saveBoxIds.includes(box.idInt) || box.idInt === boxId)
     .sort((b1, b2) => b1.order < b2.order ? -1 : 1);
@@ -62,9 +64,11 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
     idInt: -99,
     name: '',
     type: BoxType.Box,
-    slotCount: 30,
+    slotCount: allSmallBoxes ? 20 : 30,
     canReceivePkm: false,
   };
+
+  const lineSlotCount = !allSmallBoxes || selectedBox.slotCount === 6 ? 6 : 5;
 
   const previousBox = filteredBoxes[ selectedBoxIndex - 1 ] ?? filteredBoxes[ filteredBoxes.length - 1 ];
   const nextBox = filteredBoxes[ selectedBoxIndex + 1 ] ?? filteredBoxes[ 0 ];
@@ -90,7 +94,8 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
       <PopoverButton
         as={StorageBox}
         style={style}
-        moreThan30={selectedBox.slotCount > 30}
+        slotCount={selectedBox.slotCount}
+        lineSlotCount={lineSlotCount}
         loading={loading}
         header={
           <>

@@ -3,6 +3,7 @@ import type React from 'react';
 import type { EntityContext } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { SpriteImg, type SpriteImgProps } from './sprite-img';
+import { SizingUtil } from '../util/sizing-util';
 
 type SpeciesImgProps = {
     species: number;
@@ -55,7 +56,7 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, 
 
     return spriteInfos && <SpriteImg
         spriteInfos={spriteInfos}
-        size={small ? 48 : 96}
+        size={small ? SizingUtil.itemSize / 2 : SizingUtil.itemSize}
         className={cx(css({
             filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
         }), imgProps.className)}

@@ -3,18 +3,21 @@ import type React from "react";
 import { ErrorCatcher } from '../../error/error-catcher';
 import { TitledContainer, type TitledContainerProps } from '../container/titled-container';
 import { Icon } from '../icon/icon';
+import { SizingUtil } from '../util/sizing-util';
 
 export type StorageBoxProps = Pick<TitledContainerProps, 'ref' | 'style'> & {
   header: React.ReactNode;
   loading?: boolean;
-  moreThan30?: boolean;
+  slotCount?: number;
+  lineSlotCount?: number;
 };
 
 export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
   ref,
   header,
   loading,
-  moreThan30,
+  slotCount = 30,
+  lineSlotCount = 6,
   children,
   style,
 }) => {
@@ -37,11 +40,11 @@ export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(6, 1fr)",
-            gap: 4,
-            maxHeight: 506,
+            gridTemplateColumns: `repeat(${lineSlotCount}, 1fr)`,
+            gap: SizingUtil.itemsGap,
+            maxHeight: SizingUtil.getMaxHeight(),
             overflowY: 'visible',
-            margin: moreThan30 ? '0 -5px' : undefined,
+            margin: slotCount > 30 ? '0 -5px' : undefined,
           }}
         >
           {children}

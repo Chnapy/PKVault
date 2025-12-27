@@ -4,6 +4,7 @@ import { withErrorCatcher } from '../../error/with-error-catcher';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popover';
 import { theme } from '../theme';
+import { SizingUtil } from '../util/sizing-util';
 
 export type StorageItemPlaceholderProps = {
   saveId?: number;
@@ -29,8 +30,8 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = wit
           backgroundColor: 'transparent',//theme.bg.light,
           alignSelf: "flex-start",
           padding: 0,
-          width: 96,
-          height: 96,
+          width: SizingUtil.itemSize,
+          height: SizingUtil.itemSize,
           boxSizing: 'content-box',
         }),
         moveDroppable.onClick && css({

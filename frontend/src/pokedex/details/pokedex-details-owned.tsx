@@ -8,6 +8,7 @@ import { getSaveOrder } from '../../storage/util/get-save-order';
 import { useTranslate } from '../../translate/i18n';
 import { StorageItem } from '../../ui/storage-item/storage-item';
 import { TextContainer } from '../../ui/text-container/text-container';
+import { SizingUtil } from '../../ui/util/sizing-util';
 
 export type PokedexDetailsOwnedProps = {
     saveId: number;
@@ -36,7 +37,7 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
         <div style={{
             display: 'flex',
             flexWrap: 'wrap',
-            gap: 4,
+            gap: SizingUtil.itemsGap,
         }}>
             {savePkmsQuery.isLoading && !savePkmsQuery.data && <StorageItem
                 small

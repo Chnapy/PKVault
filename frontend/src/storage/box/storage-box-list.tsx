@@ -8,6 +8,7 @@ import { ButtonWithDisabledPopover } from '../../ui/button/button-with-disabled-
 import { ButtonWithPopover } from '../../ui/button/button-with-popover';
 import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
+import { SizingUtil } from '../../ui/util/sizing-util';
 import { BoxName } from './box-name';
 
 export const StorageBoxList: React.FC<{
@@ -21,17 +22,18 @@ export const StorageBoxList: React.FC<{
 }> = ({ selectedBoxes, boxes, pkms, onBoxChange, editPanelContent, deleteFn, addFn }) => {
     const { t } = useTranslate();
 
+    const hasBigBoxes = boxes.some(box => box.slotCount > 20);
+
     return <div
         className={css({
-            width: 614,
-            maxHeight: 514,
+            maxWidth: SizingUtil.getMaxWidth(hasBigBoxes ? 6 : 5),
+            maxHeight: SizingUtil.getMaxHeight(),
             display: 'flex',
             alignItems: 'flex-start',
-            // justifyContent: 'space-evenly',
             flexWrap: 'wrap',
-            gap: 4,
-            padding: 4,
-            marginTop: 4,
+            gap: SizingUtil.itemsGap,
+            margin: 4,
+            marginTop: 8,
             overflowY: 'auto',
         })}
     >
@@ -83,7 +85,7 @@ export const StorageBoxList: React.FC<{
                             className={css({
                                 width: 58,
                                 display: "grid",
-                                gridTemplateColumns: "repeat(6, 1fr)",
+                                gridTemplateColumns: `repeat(${hasBigBoxes || box.slotCount === 6 ? 6 : 5}, 1fr)`,
                                 marginBottom: 2,
                             })}
                         >
