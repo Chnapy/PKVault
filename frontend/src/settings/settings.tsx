@@ -11,12 +11,15 @@ import { Icon } from '../ui/icon/icon';
 import { SelectStringInput } from '../ui/input/select-input';
 import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
+import { useDesktopMessage } from './save-globs/hooks/use-desktop-message';
 import { SaveGlobsList } from './save-globs/save-globs-list';
 
 export const Settings: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
 
     const storageHistoryValue = HistoryContext.useValue()[ '/storage' ];
+
+    const desktopMessage = useDesktopMessage();
 
     const settingsQuery = useSettingsGet();
     const settingsMutation = useSettingsEdit();
@@ -29,7 +32,7 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
         savE_GLOBS: settingsMutable.savE_GLOBS.join('\n'),
     }), [ settingsMutable ]);
 
-    const { register, watch, reset, setValue, handleSubmit, formState } = useForm<Omit<SettingsMutableDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
+    const { register, watch, reset, setValue, getValues, handleSubmit, formState } = useForm<Omit<SettingsMutableDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
         defaultValues: defaultValue
     });
 
@@ -98,7 +101,22 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                     }}
                 >
                     <TextInput
-                        label={t('settings.form.config')}
+                        label={desktopMessage
+                            ? <>
+                                <div>{t('settings.form.config')}</div>
+                                <div
+                                    role='button'
+                                    onClick={() => desktopMessage.openFile({
+                                        type: 'open-folder',
+                                        id: 'settingsPath',
+                                        isDirectory: false,
+                                        path: settings.settingsPath,
+                                    })}>
+                                    <Icon name='folder' solid forButton />
+                                </div>
+                            </>
+                            : t('settings.form.config')
+                        }
                         value={settings.settingsPath}
                         disabled
                     />
@@ -145,13 +163,43 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                             }}
                         >
                             <TextInput
-                                label={t('settings.form.db')}
+                                label={desktopMessage
+                                    ? <>
+                                        <div>{t('settings.form.db')}</div>
+                                        <div
+                                            role='button'
+                                            onClick={() => desktopMessage.openFile({
+                                                type: 'open-folder',
+                                                id: 'dB_PATH',
+                                                isDirectory: false,
+                                                path: getValues('dB_PATH'),
+                                            })}>
+                                            <Icon name='folder' solid forButton />
+                                        </div>
+                                    </>
+                                    : t('settings.form.db')
+                                }
                                 {...register('dB_PATH', { setValueAs: (value) => value.trim() })}
                                 disabled={!settings.canUpdateSettings}
                             />
 
                             <TextInput
-                                label={t('settings.form.backups')}
+                                label={desktopMessage
+                                    ? <>
+                                        <div>{t('settings.form.backups')}</div>
+                                        <div
+                                            role='button'
+                                            onClick={() => desktopMessage.openFile({
+                                                type: 'open-folder',
+                                                id: 'backuP_PATH',
+                                                isDirectory: false,
+                                                path: getValues('backuP_PATH'),
+                                            })}>
+                                            <Icon name='folder' solid forButton />
+                                        </div>
+                                    </>
+                                    : t('settings.form.backups')
+                                }
                                 {...register('backuP_PATH', { setValueAs: (value) => value.trim() })}
                                 disabled={!settings.canUpdateSettings}
                             />
@@ -166,7 +214,22 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                             }}
                         >
                             <TextInput
-                                label={t('settings.form.storage')}
+                                label={desktopMessage
+                                    ? <>
+                                        <div>{t('settings.form.storage')}</div>
+                                        <div
+                                            role='button'
+                                            onClick={() => desktopMessage.openFile({
+                                                type: 'open-folder',
+                                                id: 'storagE_PATH',
+                                                isDirectory: false,
+                                                path: getValues('storagE_PATH'),
+                                            })}>
+                                            <Icon name='folder' solid forButton />
+                                        </div>
+                                    </>
+                                    : t('settings.form.storage')
+                                }
                                 {...register('storagE_PATH', { setValueAs: (value) => value.trim() })}
                                 disabled={!settings.canUpdateSettings}
                             />

@@ -7,7 +7,7 @@ import { Icon } from '../../ui/icon/icon';
 import { TextInput } from '../../ui/input/text-input';
 import { theme } from '../../ui/theme';
 import { PathLine } from '../path-line';
-import { isDesktop } from './hooks/use-desktop-message';
+import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
 
 export type SaveGlobsItemProps = {
     value: string;
@@ -18,6 +18,8 @@ export type SaveGlobsItemProps = {
 
 export const SaveGlobsItem: React.FC<SaveGlobsItemProps> = ({ value, onEdit, onRemove, disabled }) => {
     const { t } = useTranslate();
+
+    const desktopMessage = useDesktopMessage();
 
     const isGlob = value.includes('*');
     const isDirectory = isGlob || value.endsWith('/');
@@ -91,6 +93,17 @@ export const SaveGlobsItem: React.FC<SaveGlobsItemProps> = ({ value, onEdit, onR
                             ? 'error'
                             : t('settings.form.saves.test.title', { count: data.length })}
                 </div>}
+
+                {desktopMessage && !isGlob && <Button
+                    onClick={() => desktopMessage.openFile({
+                        type: 'open-folder',
+                        id: value,
+                        isDirectory,
+                        path: value,
+                    })}
+                >
+                    <Icon name='folder' solid forButton />
+                </Button>}
 
                 <Button
                     bgColor={theme.bg.red}

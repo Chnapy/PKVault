@@ -40,6 +40,8 @@ export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onCha
     >
         {label && <div
             style={{
+                display: 'flex',
+                justifyContent: 'space-between',
                 padding: 4,
                 cursor: 'pointer',
                 textShadow: theme.shadow.textlight,
