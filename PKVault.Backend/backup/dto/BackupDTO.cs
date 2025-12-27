@@ -1,5 +1,7 @@
 
 public class BackupDTO
 {
-    public DateTime CreatedAt { get; set; }
+    public required DateTime CreatedAt { get; set; }
+
+    public required string Filepath { get; set; }
 }

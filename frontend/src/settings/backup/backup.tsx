@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useBackupDelete, useBackupGetAll, useBackupRestore } from '../../data/sdk/backup/backup.gen';
+import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useTranslate } from '../../translate/i18n';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
@@ -7,13 +8,17 @@ import { Container } from '../../ui/container/container';
 import { TitledContainer } from '../../ui/container/titled-container';
 import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
+import { useDesktopMessage } from '../save-globs/hooks/use-desktop-message';
 
 export const Backup: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
 
+    const settings = useSettingsGet().data?.data;
     const backupQuery = useBackupGetAll();
     const backupDeleteMutation = useBackupDelete();
     const backupRestoreMutation = useBackupRestore();
+
+    const desktopMessage = useDesktopMessage();
 
     if (!backupQuery.data) {
         return null;
@@ -28,7 +33,29 @@ export const Backup: React.FC = withErrorCatcher('default', () => {
 
     const days = [ ...new Set(sortedBackups.map(backup => new Date(backup.createdAt)).map(renderDate)) ];
 
-    return <TitledContainer title={t('settings.backups.title', { count: backupQuery.data.data.length })}>
+    const title = t('settings.backups.title', { count: backupQuery.data.data.length });
+
+    return <TitledContainer title={desktopMessage
+        ? <div
+            role='button'
+            onClick={() => settings && desktopMessage.openFile({
+                type: 'open-folder',
+                id: 'backups',
+                isDirectory: true,
+                path: settings.settingsMutable.backuP_PATH
+            })}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                cursor: 'pointer',
+            }}
+        >
+            {title}
+
+            <Icon name='folder' solid forButton />
+        </div>
+        : title}>
 
         <div style={{
             display: 'flex',
@@ -77,7 +104,20 @@ export const Backup: React.FC = withErrorCatcher('default', () => {
                         gap: 4
                     }}>
                         <span
-                            style={{ flexGrow: 1, marginRight: 16 }}
+                            role='button'
+                            onClick={desktopMessage
+                                ? (() => desktopMessage.openFile({
+                                    type: 'open-folder',
+                                    id: 'backups',
+                                    isDirectory: true,
+                                    path: backup.filepath,
+                                }))
+                                : undefined}
+                            style={{
+                                flexGrow: 1,
+                                marginRight: 16,
+                                cursor: desktopMessage ? 'pointer' : undefined,
+                            }}
                         >{renderTime(new Date(backup.createdAt))}</span>
 
                         <ButtonWithConfirm onClick={() => backupRestoreMutation.mutateAsync({

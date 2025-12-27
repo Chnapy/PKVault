@@ -184,6 +184,7 @@ public class BackupService
                 return new BackupDTO()
                 {
                     CreatedAt = dateTime,
+                    Filepath = path,
                 };
             }
             catch (Exception err)
