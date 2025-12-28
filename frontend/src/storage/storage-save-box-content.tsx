@@ -10,6 +10,7 @@ import {
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from "../routes/storage";
 import { SaveItem } from '../saves/save-item/save-item';
+import { Icon } from '../ui/icon/icon';
 import { SaveCardImg } from '../ui/save-card/save-card-img';
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageBoxSaveActions } from '../ui/storage-box/storage-box-save-actions';
@@ -136,6 +137,18 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
               boxSlotCount={selectedBox.slotCount}
               totalPkmCount={savePkms.length}
               showBoxes={showBoxes}
+              advancedActions={[
+                {
+                  label: 'Sort pkm',
+                  icon: <Icon name='sort' solid forButton />,
+                  panelContent: () => <div>Feature not ready yet</div>,
+                },
+                {
+                  label: 'Sync Pokedex with another save',
+                  icon: <Icon name='table' solid forButton />,
+                  panelContent: () => <div>Feature not ready yet</div>,
+                },
+              ]}
               onBoxesDisplay={() => setShowBoxes(value => !value)}
               onPreviousBoxClick={!previousBox || previousBox.id === selectedBox.id
                 ? undefined

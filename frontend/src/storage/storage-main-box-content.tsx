@@ -10,6 +10,7 @@ import {
 } from "../data/sdk/storage/storage.gen";
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from "../routes/storage";
+import { Icon } from '../ui/icon/icon';
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageBoxMainActions } from '../ui/storage-box/storage-box-main-actions';
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
@@ -111,6 +112,18 @@ export const StorageMainBoxContent: React.FC<{
               boxSlotCount={selectedBox.slotCount}
               totalPkmCount={pkms.length}
               showBoxes={showBoxes}
+              advancedActions={[
+                {
+                  label: 'Sort pkm',
+                  icon: <Icon name='sort' solid forButton />,
+                  panelContent: () => <div>Feature not ready yet</div>,
+                },
+                {
+                  label: 'Import pkm files',
+                  icon: <Icon name='file-import' solid forButton />,
+                  panelContent: () => <div>Feature not ready yet</div>,
+                },
+              ]}
               onBoxesDisplay={() => setShowBoxes(value => !value)}
               onPreviousBoxClick={!previousBox || previousBox.id === selectedBox.id
                 ? undefined
