@@ -190,6 +190,14 @@ public class StorageController : ControllerBase
         return await DataDTO.FromDataUpdateFlags(flags);
     }
 
+    [HttpPut("pkm/sort")]
+    public async Task<ActionResult<DataDTO>> SortPkms(uint? saveId, [BindRequired] int fromBoxId, [BindRequired] int toBoxId, [BindRequired] bool leaveEmptySlot)
+    {
+        var flags = await StorageService.SortPkms(saveId, fromBoxId, toBoxId, leaveEmptySlot);
+
+        return await DataDTO.FromDataUpdateFlags(flags);
+    }
+
     [HttpGet("pkm/available-moves")]
     public async Task<ActionResult<List<MoveItem>>> GetPkmAvailableMoves(uint? saveId, string pkmId)
     {

@@ -174,6 +174,13 @@ public class StorageService
         );
     }
 
+    public static async Task<DataUpdateFlags> SortPkms(uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot)
+    {
+        return await AddAction(
+            new SortPkmAction(saveId, fromBoxId, toBoxId, leaveEmptySlot)
+        );
+    }
+
     public static async Task<DataUpdateFlags> Save()
     {
         var memoryLoader = await GetLoader();

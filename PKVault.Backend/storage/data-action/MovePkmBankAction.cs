@@ -55,8 +55,7 @@ public class MovePkmBankAction(
             var missingSlotCount = pkmIds.Length - availableSlotCount;
             var boxSlotCount = new int[] { missingSlotCount, 30 }.Max();
 
-            await new MainCreateBoxAction(bankId, boxSlotCount).ExecuteWithPayload(loaders, flags);
-            var box = loaders.boxLoader.GetAllDtos().Last();
+            var box = MainCreateBoxAction.CreateBox(loaders, flags, bankId, boxSlotCount);
             mainBoxes.Add(box);
             HashSet<uint> unoccupiedSlots = [];
             for (uint slot = 0; slot < box.SlotCount; slot++)

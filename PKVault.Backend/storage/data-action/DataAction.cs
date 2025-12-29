@@ -34,4 +34,5 @@ public enum DataActionType
     SAVE_DELETE_PKM,
     PKM_SYNCHRONIZE,
     EVOLVE_PKM,
+    SORT_PKM,
 }

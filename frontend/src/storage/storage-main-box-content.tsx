@@ -15,6 +15,7 @@ import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageBoxMainActions } from '../ui/storage-box/storage-box-main-actions';
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
 import { StorageMoveContext } from './actions/storage-move-context';
+import { SortAdvancedAction } from './advanced-actions/sort-advanced-action';
 import { BankContext } from './bank/bank-context';
 import { StorageBoxEdit } from './box/storage-box-edit';
 import { StorageBoxList } from './box/storage-box-list';
@@ -116,7 +117,7 @@ export const StorageMainBoxContent: React.FC<{
                 {
                   label: 'Sort pkm',
                   icon: <Icon name='sort' solid forButton />,
-                  panelContent: () => <div>Feature not ready yet</div>,
+                  panelContent: close => <SortAdvancedAction selectedBoxId={selectedBox.idInt} close={close} />,
                 },
                 {
                   label: 'Import pkm files',
