@@ -10,12 +10,14 @@ import {
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from "../routes/storage";
 import { SaveItem } from '../saves/save-item/save-item';
+import { useTranslate } from '../translate/i18n';
 import { Icon } from '../ui/icon/icon';
 import { SaveCardImg } from '../ui/save-card/save-card-img';
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageBoxSaveActions } from '../ui/storage-box/storage-box-save-actions';
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
 import { StorageMoveContext } from './actions/storage-move-context';
+import { SortAdvancedAction } from './advanced-actions/sort-advanced-action';
 import { StorageBoxList } from './box/storage-box-list';
 import { StorageHeader } from './box/storage-header';
 import { StorageSaveItem } from './storage-save-item';
@@ -30,6 +32,8 @@ export type StorageSaveBoxContentProps = {
 
 export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withErrorCatcher('default', ({ saveId, boxId, order, style }) => {
   const [ showBoxes, setShowBoxes ] = React.useState(false);
+
+  const { t } = useTranslate();
 
   const saveBoxIds = Route.useSearch({ select: (search) => search.saves?.[ saveId ]?.saveBoxIds }) ?? [ 0 ];
   const navigate = Route.useNavigate();
@@ -139,9 +143,9 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
               showBoxes={showBoxes}
               advancedActions={[
                 {
-                  label: 'Sort pkm',
+                  label: t('storage.box.advanced.sort'),
                   icon: <Icon name='sort' solid forButton />,
-                  panelContent: () => <div>Feature not ready yet</div>,
+                  panelContent: close => <SortAdvancedAction.Save saveId={saveId} selectedBoxId={selectedBox.idInt} close={close} />,
                 },
                 {
                   label: 'Sync Pokedex with another save',

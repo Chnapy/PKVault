@@ -16,14 +16,49 @@ public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveE
     {
         var saveLoaders = loaders.saveLoadersDict[saveId];
 
+        var boxes = GetBoxes(fromBoxId, toBoxId,
+            GetBoxDto: saveLoaders.Boxes.GetDto,
+            GetBoxDtoAll: saveLoaders.Boxes.GetAllDtos
+        )
+            .FindAll(box => box.CanSaveReceivePkm);
 
+        var boxesIds = boxes.Select(box => box.IdInt).ToHashSet();
 
-        flags.Saves.Add(new()
+        var pkms = saveLoaders.Pkms.GetAllDtos().FindAll(pkm => boxesIds.Contains(pkm.BoxId));
+        if (pkms.Count > 0)
         {
-            SaveId = saveId,
-            SavePkms = true
-        });
-        flags.Dex = true;
+            List<PkmSaveDTO> savePkms = GetSortedPkms(
+                pkms,
+                GetSpecies: pkmVersion => pkmVersion.Species,
+                GetForm: pkmVersion => pkmVersion.Form,
+                GetGender: pkmVersion => pkmVersion.Gender
+            );
+            var pkmSpecies = savePkms.Select(pkm => pkm.Species).ToList();
+
+            pkms.ForEach(pkm => saveLoaders.Pkms.DeleteDto(pkm.Id));
+
+            RunSort(
+                boxes,
+                pkmSpecies,
+                applyValue: (entry) =>
+                {
+                    var currentValue = savePkms[entry.Index];
+                    currentValue.BoxId = entry.BoxId;
+                    currentValue.BoxSlot = entry.BoxSlot;
+                    saveLoaders.Pkms.WriteDto(currentValue);
+                },
+                onSpaceMissing: () =>
+                {
+                    throw new ArgumentException($"Missing space, pkm sort cannot be done");
+                }
+            );
+
+            flags.Saves.Add(new()
+            {
+                SaveId = saveId,
+                SavePkms = true
+            });
+        }
 
         return new()
         {
@@ -34,109 +69,41 @@ public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveE
 
     private async Task<DataActionPayload> ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags, int fromBoxId, int toBoxId, bool leaveEmptySlot)
     {
-        var fromBox = loaders.boxLoader.GetDto(fromBoxId.ToString());
-        var bankId = fromBox.BankId;
-
-        var boxes = loaders.boxLoader.GetAllDtos()
-            .FindAll(box => box.BankId == bankId)
-            .OrderBy(box => box.Order).ToList();
-
-        var fromBoxIndex = boxes.FindIndex(box => box.IdInt == fromBoxId);
-        var toBoxIndex = boxes.FindIndex(box => box.IdInt == toBoxId);
-
-        boxes = [.. boxes.Where((box, i) => i >= fromBoxIndex && i <= toBoxIndex)];
+        var boxes = GetBoxes(fromBoxId, toBoxId,
+            GetBoxDto: loaders.boxLoader.GetDto,
+            GetBoxDtoAll: loaders.boxLoader.GetAllDtos
+        );
         var boxesIds = boxes.Select(box => box.IdInt).ToHashSet();
 
-        var pkms = loaders.pkmLoader.GetAllDtos().FindAll(pkm => boxesIds.Contains((int)pkm.BoxId));
-        List<(PkmDTO Pkm, PkmVersionDTO PkmVersion)> pkmsWithVersions = [.. pkms.Select(pkm =>
-            {
-                var pkmVersion = loaders.pkmVersionLoader.GetDtosByPkmId(pkm.Id).Values.ToList().Find(dto => dto.IsMain);
-                return (Pkm: pkm, PkmVersion: pkmVersion!);
-            })
-            .OrderBy(pkmsWithVersion => pkmsWithVersion.PkmVersion.Species)
-            .ThenBy(pkmsWithVersion => pkmsWithVersion.PkmVersion.Form)
-            .ThenBy(pkmsWithVersion => (byte)pkmsWithVersion.PkmVersion.Gender)
-        ];
+        var bankId = boxes[0].BankId;
 
+        var pkms = loaders.pkmLoader.GetAllDtos().FindAll(pkm => boxesIds.Contains((int)pkm.BoxId));
         if (pkms.Count > 0)
         {
+            List<PkmVersionDTO> pkmVersions = GetSortedPkms(
+                pkms: [.. pkms.Select(pkm => loaders.pkmVersionLoader.GetDtosByPkmId(pkm.Id).Values.ToList().Find(dto => dto.IsMain)!)],
+                GetSpecies: pkmVersion => pkmVersion.Species,
+                GetForm: pkmVersion => pkmVersion.Form,
+                GetGender: pkmVersion => pkmVersion.Gender
+            );
+            var pkmSpecies = pkmVersions.Select(pkm => pkm.Species).ToList();
 
-            var lastSpecies = pkmsWithVersions.Last().PkmVersion.Species;
-
-            var currentIndex = 0;
-            var currentBoxIndex = 0;
-            var currentSlot = 0;
-
-            BoxDTO GetCurrentBox()
-            {
-                if (currentBoxIndex >= boxes.Count - 1)
+            RunSort(
+                boxes,
+                pkmSpecies,
+                applyValue: (entry) =>
+                {
+                    var currentValue = pkmVersions[entry.Index];
+                    currentValue.PkmDto.PkmEntity.BoxId = (uint)entry.BoxId;
+                    currentValue.PkmDto.PkmEntity.BoxSlot = (uint)entry.BoxSlot;
+                    loaders.pkmLoader.WriteDto(currentValue.PkmDto);
+                },
+                onSpaceMissing: () =>
                 {
                     var box = MainCreateBoxAction.CreateBox(loaders, flags, bankId, null);
                     boxes.Add(box);
-                    return GetCurrentBox();
                 }
-
-                return boxes[currentBoxIndex];
-            }
-
-            void IncrementBoxSlot()
-            {
-                var currentBox = GetCurrentBox();
-
-                if (currentSlot >= currentBox.SlotCount - 1)
-                {
-                    currentBoxIndex++;
-                    currentSlot = 0;
-                }
-                else
-                {
-                    currentSlot++;
-                }
-            }
-
-            for (var species = 1; species <= lastSpecies; species++)
-            {
-                var currentBox = GetCurrentBox();
-
-                if (currentIndex >= pkmsWithVersions.Count) break;
-                var currentValue = pkmsWithVersions[currentIndex];
-
-                if (currentValue.PkmVersion.Species < species)
-                {
-                    throw new Exception($"Error with species {currentValue.PkmVersion.Species}");
-                }
-
-                if (currentValue.PkmVersion.Species != species)
-                {
-                    if (leaveEmptySlot)
-                    {
-                        IncrementBoxSlot();
-                    }
-                }
-                else
-                {
-                    for (; ; currentIndex++)
-                    {
-                        currentBox = GetCurrentBox();
-
-                        if (currentIndex >= pkmsWithVersions.Count) break;
-                        currentValue = pkmsWithVersions[currentIndex];
-
-                        if (currentValue.PkmVersion.Species != species)
-                        {
-                            break;
-                        }
-
-                        currentValue.Pkm.PkmEntity.BoxId = (uint)currentBox.IdInt;
-                        currentValue.Pkm.PkmEntity.BoxSlot = (uint)currentSlot;
-                        loaders.pkmLoader.WriteDto(currentValue.Pkm);
-
-                        IncrementBoxSlot();
-                    }
-                }
-            }
-
-            // new Set(temp2.map(p => p.boxId + '.' + p.boxSlot)).size === temp2.length
+            );
 
             flags.MainBoxes = true;
             flags.MainPkms = true;
@@ -148,5 +115,107 @@ public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveE
             type = DataActionType.SORT_PKM,
             parameters = []
         };
+    }
+
+    private List<BoxDTO> GetBoxes(int fromBoxId, int toBoxId, Func<string, BoxDTO?> GetBoxDto, Func<List<BoxDTO>> GetBoxDtoAll)
+    {
+        var fromBox = GetBoxDto(fromBoxId.ToString());
+        var bankId = fromBox.BankId;
+
+        var boxes = GetBoxDtoAll()
+            .FindAll(box => box.BankId == bankId)
+            .FindAll(box => saveId == null || box.CanSaveReceivePkm)
+            .OrderBy(box => box.Order).ToList();
+
+        var fromBoxIndex = boxes.FindIndex(box => box.IdInt == fromBoxId);
+        var toBoxIndex = boxes.FindIndex(box => box.IdInt == toBoxId);
+
+        return [.. boxes.Where((box, i) => i >= fromBoxIndex && i <= toBoxIndex)];
+    }
+
+    private static List<P> GetSortedPkms<P>(List<P> pkms, Func<P, ushort> GetSpecies, Func<P, byte> GetForm, Func<P, Gender> GetGender)
+    {
+        return [.. pkms
+            .OrderBy(GetSpecies)
+            .ThenBy(GetForm)
+            .ThenBy(GetGender)
+        ];
+    }
+
+    private void RunSort(List<BoxDTO> boxes, List<ushort> pkmSpecies, Action<(int Index, int BoxId, int BoxSlot)> applyValue, Action onSpaceMissing)
+    {
+        var lastSpecies = pkmSpecies.Last();
+
+        var currentIndex = 0;
+        var currentBoxIndex = 0;
+        var currentSlot = 0;
+
+        BoxDTO GetCurrentBox()
+        {
+            if (currentBoxIndex > boxes.Count - 1)
+            {
+                onSpaceMissing();
+                return GetCurrentBox();
+            }
+
+            return boxes[currentBoxIndex];
+        }
+
+        void IncrementBoxSlot()
+        {
+            var currentBox = GetCurrentBox();
+
+            if (currentSlot > currentBox.SlotCount - 1)
+            {
+                currentBoxIndex++;
+                currentSlot = 0;
+            }
+            else
+            {
+                currentSlot++;
+            }
+        }
+
+        for (var species = 1; species <= lastSpecies; species++)
+        {
+            var currentBox = GetCurrentBox();
+
+            if (currentIndex >= pkmSpecies.Count) break;
+            var currentSpecies = pkmSpecies[currentIndex];
+
+            if (currentSpecies < species)
+            {
+                throw new Exception($"Error with species {currentSpecies}");
+            }
+
+            if (currentSpecies != species)
+            {
+                if (leaveEmptySlot)
+                {
+                    IncrementBoxSlot();
+                }
+            }
+            else
+            {
+                for (; ; currentIndex++)
+                {
+                    currentBox = GetCurrentBox();
+
+                    if (currentIndex >= pkmSpecies.Count) break;
+                    currentSpecies = pkmSpecies[currentIndex];
+
+                    if (currentSpecies != species)
+                    {
+                        break;
+                    }
+
+                    applyValue((Index: currentIndex, BoxId: currentBox.IdInt, BoxSlot: currentSlot));
+
+                    IncrementBoxSlot();
+                }
+            }
+        }
+
+        // new Set(temp2.map(p => p.boxId + '.' + p.boxSlot)).size === temp2.length
     }
 }

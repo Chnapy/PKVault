@@ -111,10 +111,10 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
 
                             return <tr key={i}>
                                 <td
-                                    style={isToRemove ? {
-                                        // color: theme.text.contrast,
-                                        textDecoration: 'line-through'
-                                    } : undefined}
+                                    style={{
+                                        width: '100%',
+                                        textDecoration: isToRemove ? 'line-through' : undefined,
+                                    }}
                                 >
                                     {getActionDescription(action)}
                                 </td>

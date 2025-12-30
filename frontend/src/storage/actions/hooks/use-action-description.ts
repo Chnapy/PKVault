@@ -71,7 +71,7 @@ export const useActionDescription = () => {
             [ DataActionType.MAIN_DELETE_BANK ]: () => t('storage.save-actions.type.main-delete-bank', {
                 name: parameters[ 0 ]
             }),
-            [ DataActionType.SORT_PKM ]: () => 'Sort pkms',
+            [ DataActionType.SORT_PKM ]: () => t('storage.save-actions.type.sort-pkm'),
         })()
     };
 };

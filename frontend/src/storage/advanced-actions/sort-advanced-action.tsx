@@ -1,7 +1,8 @@
+import type { UseQueryResult } from '@tanstack/react-query';
 import type React from 'react';
 import { useForm } from 'react-hook-form';
 import type { StorageSortPkmsParams } from '../../data/sdk/model';
-import { useStorageGetMainBoxes, useStorageSortPkms } from '../../data/sdk/storage/storage.gen';
+import { useStorageGetMainBoxes, useStorageGetSaveBoxes, useStorageSortPkms, type storageGetMainBoxesResponse200, type storageGetSaveBoxesResponse200 } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
@@ -10,16 +11,48 @@ import { SelectNumberInput } from '../../ui/input/select-input';
 import { theme } from '../../ui/theme';
 import { BoxTypeIcon } from '../box/box-type-icon';
 
-export const SortAdvancedAction: React.FC<{
+export const SortAdvancedAction = {
+    Main: ({ selectedBoxId, close }: {
+        selectedBoxId: number;
+        close: () => void;
+    }) => {
+        const boxesQuery = useStorageGetMainBoxes();
+
+        return <InnerSortAdvancedAction
+            selectedBoxId={selectedBoxId}
+            close={close}
+            boxesQuery={boxesQuery}
+        />;
+    },
+    Save: ({ saveId, selectedBoxId, close }: {
+        saveId: number;
+        selectedBoxId: number;
+        close: () => void;
+    }) => {
+        const boxesQuery = useStorageGetSaveBoxes(saveId);
+
+        return <InnerSortAdvancedAction
+            saveId={saveId}
+            selectedBoxId={selectedBoxId}
+            close={close}
+            boxesQuery={boxesQuery}
+        />;
+    },
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
+const InnerSortAdvancedAction: React.FC<{
+    saveId?: number;
     selectedBoxId: number;
     close: () => void;
-}> = ({ selectedBoxId, close }) => {
+    boxesQuery: UseQueryResult<storageGetSaveBoxesResponse200 | storageGetMainBoxesResponse200, unknown>;
+}> = ({ saveId, selectedBoxId, close, boxesQuery }) => {
     const { t } = useTranslate();
 
-    const boxesQuery = useStorageGetMainBoxes();
     const bankId = boxesQuery.data?.data.find(box => box.idInt === selectedBoxId)?.bankId;
     const boxes = boxesQuery.data?.data
         .filter(box => box.bankId === bankId)
+        .filter(box => !saveId || box.canSaveReceivePkm)
         .sort((box1, box2) => box1.order < box2.order ? -1 : 1) ?? [];
 
     const sortPkmsMutation = useStorageSortPkms();
@@ -33,13 +66,19 @@ export const SortAdvancedAction: React.FC<{
     });
 
     const onSubmit = handleSubmit(async ({ fromBoxId, toBoxId, leaveEmptySlot }) => {
-        await sortPkmsMutation.mutateAsync({
+        const result = await sortPkmsMutation.mutateAsync({
             params: {
+                saveId,
                 fromBoxId,
                 toBoxId,
                 leaveEmptySlot,
             }
         });
+
+        if (result.status >= 400) {
+            return;
+        }
+
         close();
     });
 
@@ -54,7 +93,7 @@ export const SortAdvancedAction: React.FC<{
     >
         <SelectNumberInput
             {...register('fromBoxId', { valueAsNumber: true })}
-            label={'From box'}
+            label={t('storage.sort.from-box')}
             data={boxes.map(box => ({
                 value: box.idInt,
                 option: <div style={{
@@ -75,7 +114,7 @@ export const SortAdvancedAction: React.FC<{
 
         <SelectNumberInput
             {...register('toBoxId', { valueAsNumber: true })}
-            label={'To box'}
+            label={t('storage.sort.to-box')}
             data={boxes.map(box => ({
                 value: box.idInt,
                 option: <div style={{
@@ -105,12 +144,15 @@ export const SortAdvancedAction: React.FC<{
             <CheckboxInput
                 checked={watch('leaveEmptySlot')}
                 onChange={() => setValue('leaveEmptySlot', !getValues('leaveEmptySlot'))}
-            /> Leave empty slot
+            /> {t('storage.sort.empty-slot')}
         </label>
 
         <div>
-            Pkms in box range will be sorted by species, starting from Bulbasaur (#1).
-            <br />If you leave empty slot for missing species, boxes may be created in the process (if missing space only).
+            {t('storage.sort.description.1')}
+            <br />
+            {saveId
+                ? t('storage.sort.description.2')
+                : t('storage.sort.description.3')}
         </div>
 
         <Button type='submit' big bgColor={theme.bg.primary} disabled={!formState.isValid}>

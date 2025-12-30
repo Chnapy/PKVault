@@ -10,6 +10,7 @@ import {
 } from "../data/sdk/storage/storage.gen";
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from "../routes/storage";
+import { useTranslate } from '../translate/i18n';
 import { Icon } from '../ui/icon/icon';
 import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageBoxMainActions } from '../ui/storage-box/storage-box-main-actions';
@@ -28,6 +29,7 @@ export const StorageMainBoxContent: React.FC<{
 }> = withErrorCatcher('default', ({ boxId, style }) => {
   const [ showBoxes, setShowBoxes ] = React.useState(false);
 
+  const { t } = useTranslate();
   const navigate = Route.useNavigate();
 
   const selectedBankBoxes = BankContext.useSelectedBankBoxes();
@@ -115,9 +117,9 @@ export const StorageMainBoxContent: React.FC<{
               showBoxes={showBoxes}
               advancedActions={[
                 {
-                  label: 'Sort pkm',
+                  label: t('storage.box.advanced.sort'),
                   icon: <Icon name='sort' solid forButton />,
-                  panelContent: close => <SortAdvancedAction selectedBoxId={selectedBox.idInt} close={close} />,
+                  panelContent: close => <SortAdvancedAction.Main selectedBoxId={selectedBox.idInt} close={close} />,
                 },
                 {
                   label: 'Import pkm files',

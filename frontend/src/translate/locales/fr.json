@@ -112,7 +112,14 @@
   "storage.box.edit.slotCount": "Nombre de slot",
   "storage.box.delete.help": "La boîte doit être vide, et non la dernière avant de la supprimer",
   "storage.box.split.help": "Diviser en 2",
+  "storage.box.advanced.sort": "Trier les pkms",
   "storage.save-select": "Sélection de sauvegarde",
+  "storage.sort.from-box": "Depuis la boîte",
+  "storage.sort.to-box": "Jusqu'à la boîte",
+  "storage.sort.empty-slot": "Laisser les slots vides",
+  "storage.sort.description.1": "Les pkms dans l'intervalle des boîtes seront triés par espèce, à partir de Bulbizarre (#1).",
+  "storage.sort.description.2": "Si vous laissez les slots vides en cas d'espèces manquantes, l'action peut échouer si manque de place.",
+  "storage.sort.description.3": "Si vous laissez les slots vides en cas d'espèces manquantes, des boîtes peuvent être crées si manque de place.",
   "storage.actions.move": "Déplacer",
   "storage.actions.move-attached-main": "Déplacer rattaché",
   "storage.actions.move-attached-main.helpTitle": "Déplacer une copie rattachée de ce pkm vers une sauvegarde",
@@ -168,6 +175,7 @@
   "storage.save-actions.type.save-delete-pkm": "Supprimer le pkm {{name}} depuis la sauvegarde {{save}}",
   "storage.save-actions.type.synchronize-pkm": "Synchroniser {{count}} pkms avec la sauvegarde rattachée {{save}}",
   "storage.save-actions.type.evolve-pkm": "Évoluer le pkm {{name}} dans {{save}} de {{oldSpecies}} à {{newSpecies}}",
+  "storage.save-actions.type.sort-pkm": "Trier les pkms",
   "storage.actions.release": "Relacher",
   "notifications.warnings.update": "Nouvelle version PKVault {{version}}"
 }

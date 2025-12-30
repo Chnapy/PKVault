@@ -109,7 +109,7 @@ export const StorageHeader: React.FC<{
                                     display: 'flex',
                                     flexDirection: 'column',
                                     gap: 4,
-                                    minWidth: 140,
+                                    width: 150,
                                 }}
                             >
                                 {advancedActions.map((action, i) => (
