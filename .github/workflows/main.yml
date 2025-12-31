@@ -1,0 +1,33 @@
+name: Build PKVault
+
+on:
+  push:
+    branches: ["github-actions"]
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Run Backend Generator
+        run: |
+          cd PKVault.Backend
+          dotnet run -p:Mode=gen-pokeapi
+
+      - name: Upload Generated Assets
+        uses: actions/upload-artifact@v4
+        with: 
+          name: poke-assets
+          path: |
+            PKVault.Backend/pokeapi/generated/
