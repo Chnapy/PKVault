@@ -5,8 +5,12 @@ on:
     branches: ["github-actions"]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  generate:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,9 +29,17 @@ jobs:
           cd PKVault.Backend
           dotnet run -p:Mode=gen-pokeapi
 
-      - name: Upload Generated Assets
-        uses: actions/upload-artifact@v4
-        with: 
-          name: poke-assets
-          path: |
-            PKVault.Backend/pokeapi/generated/
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./PKVault.Backend
+          file: ./PKVault.Backend/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/pkvault-backend:latest
