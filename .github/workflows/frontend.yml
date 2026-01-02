@@ -1,0 +1,54 @@
+name: Build PKVault Frontend
+
+on:
+  push:
+    branches: ["github-actions"]
+    paths: ["frontend/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Start Backend for SDK Generation
+        run: |
+          docker run -d -p 5000:5000 --name temp-backend ghcr.io/dldri/pkvault-backend:latest
+          sleep 15
+
+      - name: Generate SDK
+        run: |
+          cd frontend
+          npm install
+          npm gen:sdk
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          platforms: linux/arm64, linux/amd64
+          tags: ghcr.io/${{ github.repository_owner }}/pkvault-backend:latest
+          build-args: |
+            VITE_SERVER_URL=${{ secrets.VITE_SERVER_URL }}
