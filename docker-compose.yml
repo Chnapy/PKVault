@@ -11,6 +11,7 @@ services:
       - 'pkvault_storage:/app/storage'
       - 'pkvault_config:/app/config'
       - '/home/ubuntu/ra-saves:/app/saves'
+    restart: unless-stopped
     healthcheck:
       test:
         - CMD
@@ -20,19 +21,15 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-  pkvault-frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - VITE_SERVER_URL=${VITE_SERVER_URL}
-    environment:
-      - VITE_SERVER_URL=${VITE_SERVER_URL}
+
+    pkvault-frontend:
+    image: 'ghcr.io/dldri/pkvault-frontend:latest'
     ports:
-      - '5001:80'
+      - 5001:80
     restart: unless-stopped
     depends_on:
       - pkvault-backend
+
 volumes:
   pkvault_db: null
   pkvault_storage: null
