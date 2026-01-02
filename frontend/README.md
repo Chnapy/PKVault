@@ -17,7 +17,7 @@ Generate backend SDK.
 > Backend should be running !
 
 ```
-npm gen:sdk
+npm run gen:sdk
 ```
 
 ## Run
