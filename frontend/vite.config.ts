@@ -9,21 +9,23 @@ if (!process.env.VITE_SERVER_URL) {
 
 // https://vite.dev/config/
 export default defineConfig(({ command }) => {
-  plugins: [
-    tanstackRouter({
-      target: "react",
-      autoCodeSplitting: true,
-    }),
-    react(),
-  ],
-  server: {
-    host: "0.0.0.0",
-    allowedHosts: true,
-    https: process.env.VITE_SERVER_URL.startsWith('https') && command === "serve"
-      ? {
-        key: fs.readFileSync("../.devcontainer/.cert/localhost+2.key"),
-        cert: fs.readFileSync("../.devcontainer/.cert/localhost+2.crt"),
-      }
-      : undefined,
-  },
+  return {
+    plugins: [
+      tanstackRouter({
+        target: "react",
+        autoCodeSplitting: true,
+      }),
+      react(),
+    ],
+    server: {
+      host: "0.0.0.0",
+      allowedHosts: true,
+      https: process.env.VITE_SERVER_URL.startsWith('https') && command === "serve"
+        ? {
+          key: fs.readFileSync("../.devcontainer/.cert/localhost+2.key"),
+          cert: fs.readFileSync("../.devcontainer/.cert/localhost+2.crt"),
+        }
+        : undefined,
+    },
+  };
 });
