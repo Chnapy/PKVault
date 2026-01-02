@@ -25,16 +25,28 @@ jobs:
         with:
           node-version: 20
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Start Backend for SDK Generation
         run: |
-          docker run -d -p 5000:5000 --name temp-backend ghcr.io/dldri/pkvault-backend:latest
-          sleep 15
+          cd PKVault.Backend
+          dotnet run -p:Mode=gen-pokeapi
+          dotnet run &
 
       - name: Generate SDK
         run: |
           cd frontend
           npm install
-          npm gen:sdk
+          npm run gen:sdk
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -44,11 +56,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Frontend
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v5
         with:
           context: ./frontend
           push: true
           platforms: linux/arm64, linux/amd64
-          tags: ghcr.io/${{ github.repository_owner }}/pkvault-backend:latest
+          tags: ghcr.io/${{ github.repository_owner }}/pkvault-frontend:latest
           build-args: |
             VITE_SERVER_URL=${{ secrets.VITE_SERVER_URL }}
