@@ -1,0 +1,39 @@
+services:
+  pkvault-backend:
+    image: 'ghcr.io/dldri/pkvault-backend:latest'
+    environment:
+      - 'ASPNETCORE_URLS=http://0.0.0.0:5000'
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - '5000:5000'
+    volumes:
+      - 'pkvault_db:/app/db'
+      - 'pkvault_storage:/app/storage'
+      - 'pkvault_config:/app/config'
+      - '/home/ubuntu/ra-saves:/app/saves'
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - '-f'
+        - 'http://0.0.0.0:5000/api/settings'
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  pkvault-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_SERVER_URL=${VITE_SERVER_URL}
+    environment:
+      - VITE_SERVER_URL=${VITE_SERVER_URL}
+    ports:
+      - '5001:80'
+    restart: unless-stopped
+    depends_on:
+      - pkvault-backend
+volumes:
+  pkvault_db: null
+  pkvault_storage: null
+  pkvault_config: null
