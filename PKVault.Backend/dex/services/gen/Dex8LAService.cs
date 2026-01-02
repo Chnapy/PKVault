@@ -1,8 +1,8 @@
 using PKHeX.Core;
 
-public class Dex8LAService : DexGenService<SAV8LA>
+public class Dex8LAService(SAV8LA save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, SAV8LA save, List<PKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
@@ -53,5 +53,26 @@ public class Dex8LAService : DexGenService<SAV8LA>
             IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
         };
+    }
+
+    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    {
+        if (!save.Personal.IsPresentInGame(species, form))
+            return;
+
+        int[] baseGendersIndex = gender == Gender.Female ? [1, 3] : [0, 2];
+        int[] shinyGendersIndex = gender == Gender.Female ? [5, 7] : [4, 6];
+
+        if (isSeen)
+            save.Blocks.PokedexSave.SetPokeSeenInWildFlags(species, form, (byte)(1 << baseGendersIndex[0]));
+
+        if (isSeenShiny)
+            save.Blocks.PokedexSave.SetPokeSeenInWildFlags(species, form, (byte)(1 << shinyGendersIndex[0]));
+
+        if (isCaught)
+            save.Blocks.PokedexSave.SetPokeCaughtInWildFlags(species, form, (byte)(1 << baseGendersIndex[0]));
+
+        // TODO isCaughtShiny
+        // TODO alpha
     }
 }

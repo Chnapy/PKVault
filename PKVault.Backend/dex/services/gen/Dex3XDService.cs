@@ -1,9 +1,8 @@
-using System.Buffers.Binary;
 using PKHeX.Core;
 
-public class Dex3XDService : DexGenService<SAV3XD>
+public class Dex3XDService(SAV3XD save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, SAV3XD save, List<PKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
@@ -52,6 +51,18 @@ public class Dex3XDService : DexGenService<SAV3XD>
             IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
         };
+    }
+
+    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    {
+        if (!save.Personal.IsPresentInGame(species, form))
+            return;
+
+        if (isSeen)
+            save.SetSeen(species, true);
+
+        if (isCaught)
+            save.SetCaught(species, true);
     }
 
     // private PKM? FindPKM(ushort species, SaveFile save)

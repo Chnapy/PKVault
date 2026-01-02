@@ -181,6 +181,13 @@ public class StorageService
         );
     }
 
+    public static async Task<DataUpdateFlags> DexSync(uint[] saveIds)
+    {
+        return await AddAction(
+            new DexSyncAction(saveIds)
+        );
+    }
+
     public static async Task<DataUpdateFlags> Save()
     {
         var memoryLoader = await GetLoader();

@@ -17,6 +17,7 @@ import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageBoxSaveActions } from '../ui/storage-box/storage-box-save-actions';
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
 import { StorageMoveContext } from './actions/storage-move-context';
+import { DexSyncAdvancedAction } from './advanced-actions/dex-sync-advanced-action';
 import { SortAdvancedAction } from './advanced-actions/sort-advanced-action';
 import { StorageBoxList } from './box/storage-box-list';
 import { StorageHeader } from './box/storage-header';
@@ -148,9 +149,9 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
                   panelContent: close => <SortAdvancedAction.Save saveId={saveId} selectedBoxId={selectedBox.idInt} close={close} />,
                 },
                 {
-                  label: 'Sync Pokedex with another save',
+                  label: t('storage.box.advanced.dex-sync'),
                   icon: <Icon name='table' solid forButton />,
-                  panelContent: () => <div>Feature not ready yet</div>,
+                  panelContent: close => <DexSyncAdvancedAction saveId={saveId} close={close} />,
                 },
               ]}
               onBoxesDisplay={() => setShowBoxes(value => !value)}

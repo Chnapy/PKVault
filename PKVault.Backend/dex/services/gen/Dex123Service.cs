@@ -1,8 +1,8 @@
 using PKHeX.Core;
 
-public class Dex123Service : DexGenService<SaveFile>
+public class Dex123Service(SaveFile save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, SaveFile save, List<PKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
@@ -38,6 +38,18 @@ public class Dex123Service : DexGenService<SaveFile>
             IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
         };
+    }
+
+    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    {
+        if (!save.Personal.IsPresentInGame(species, form))
+            return;
+
+        if (isSeen)
+            save.SetSeen(species, true);
+
+        if (isCaught)
+            save.SetCaught(species, true);
     }
 
     public static byte GetG12Type(byte type)

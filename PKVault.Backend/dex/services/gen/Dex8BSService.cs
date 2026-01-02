@@ -1,8 +1,8 @@
 using PKHeX.Core;
 
-public class Dex8BSService : DexGenService<SAV8BS>
+public class Dex8BSService(SAV8BS save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, SAV8BS save, List<PKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
@@ -53,5 +53,40 @@ public class Dex8BSService : DexGenService<SAV8BS>
             IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
         };
+    }
+
+    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    {
+        if (!save.Personal.IsPresentInGame(species, form))
+            return;
+
+        var pk = new PK8
+        {
+            Species = species,
+            Form = form,
+            Gender = (byte)gender,
+            Language = save.Language
+        };
+        pk.SetIsShiny(isSeenShiny);
+
+        if (isSeen || isCaught)
+            save.Zukan.SetDex(pk);
+
+        if (isSeen)
+            save.Zukan.SetState(species, ZukanState8b.Seen);
+
+        if (isCaught)
+            save.Zukan.SetState(species, ZukanState8b.Caught);
+
+        var formCount = Zukan8b.GetFormCount(species);
+
+        if (formCount > 0)
+        {
+            if (isSeen)
+                save.Zukan.SetHasFormFlag(species, form, false, true);
+
+            if (isSeenShiny)
+                save.Zukan.SetHasFormFlag(species, form, true, true);
+        }
     }
 }

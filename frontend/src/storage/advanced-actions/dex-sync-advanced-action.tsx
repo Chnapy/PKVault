@@ -1,0 +1,111 @@
+import { Listbox, ListboxOption, ListboxOptions } from '@headlessui/react';
+import type React from 'react';
+import { useForm } from 'react-hook-form';
+import type { StorageDexSyncParams } from '../../data/sdk/model';
+import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import { useStorageDexSync } from '../../data/sdk/storage/storage.gen';
+import { useStaticData } from '../../hooks/use-static-data';
+import { useTranslate } from '../../translate/i18n';
+import { Button } from '../../ui/button/button';
+import { FilterLabel } from '../../ui/filter/filter-label/filter-label';
+import { Icon } from '../../ui/icon/icon';
+import { theme } from '../../ui/theme';
+
+export const DexSyncAdvancedAction: React.FC<{
+    saveId: number;
+    close: () => void;
+}> = ({ saveId, close }) => {
+    const { t } = useTranslate();
+
+    const staticData = useStaticData();
+
+    const saveInfosQuery = useSaveInfosGetAll();
+    const saveInfos = Object.values(saveInfosQuery.data?.data ?? {});
+
+    const dexSyncMutation = useStorageDexSync();
+
+    const { handleSubmit, watch, setValue } = useForm<StorageDexSyncParams>({
+        defaultValues: {
+            saveIds: [ saveId ],
+        }
+    });
+
+    const saveIds = watch('saveIds') ?? [];
+
+    const onSubmit = handleSubmit(async ({ saveIds }) => {
+        const result = await dexSyncMutation.mutateAsync({
+            params: {
+                saveIds,
+            }
+        });
+
+        if (result.status >= 400) {
+            return;
+        }
+
+        close();
+    });
+
+    return <form
+        onSubmit={onSubmit}
+        style={{
+            maxWidth: 350,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+        }}
+    >
+        <div>
+            {t('storage.dex-sync.title')}
+        </div>
+
+        <Listbox
+            multiple
+            value={saveIds.map(String)}
+            onChange={(newIds) => {
+                setValue('saveIds', newIds.map(Number));
+            }}
+        >
+            <ListboxOptions static style={{
+                maxHeight: 210,
+                overflowY: 'auto',
+                userSelect: 'none'
+            }}>
+                {saveInfos
+                    .map(save => ({
+                        value: save.id.toString(),
+                        label: <>{staticData.versions[ save.version ]?.name} - {save.trainerName}</>,
+                        selected: saveIds.includes(save.id),
+                        disabled: save.id === saveId,
+                    }))
+                    .map(({ value, label, selected, disabled }, i) => (
+                        <ListboxOption
+                            key={value}
+                            value={value}
+                            style={{
+                                marginTop: i ? 2 : 0,
+                                opacity: disabled ? 0.75 : undefined,
+                                pointerEvents: disabled ? 'none' : undefined,
+                            }}
+                            disabled={disabled}
+                        >
+                            <FilterLabel
+                                enabled={selected}
+                            >
+                                {label}
+                            </FilterLabel>
+                        </ListboxOption>
+                    ))}
+            </ListboxOptions>
+        </Listbox>
+
+        <div>
+            {t('storage.dex-sync.description')}
+        </div>
+
+        <Button type='submit' big bgColor={theme.bg.primary} disabled={saveIds.length < 2}>
+            <Icon name='table' solid forButton />
+            {t('action.submit')}
+        </Button>
+    </form>;
+};

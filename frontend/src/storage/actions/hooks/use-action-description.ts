@@ -72,6 +72,7 @@ export const useActionDescription = () => {
                 name: parameters[ 0 ]
             }),
             [ DataActionType.SORT_PKM ]: () => t('storage.save-actions.type.sort-pkm'),
+            [ DataActionType.DEX_SYNC ]: () => t('storage.save-actions.type.dex-sync'),
         })()
     };
 };

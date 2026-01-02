@@ -1,8 +1,10 @@
 using PKHeX.Core;
 
-public abstract class DexGenService<Save> where Save : SaveFile
+public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 {
-    public bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, Save save, StaticDataDTO staticData)
+    // protected readonly SaveFile save = _save;
+
+    public bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData)
     {
         // var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
 
@@ -32,8 +34,13 @@ public abstract class DexGenService<Save> where Save : SaveFile
         for (ushort species = 1; species < save.MaxSpeciesID + 1; species++)
         {
             pkmBySpecies.TryGetValue(species, out var pkmList);
-            var item = CreateDexItem(species, save, pkmList ?? [], staticData);
-            dex[species][save.ID32] = item;
+            var item = CreateDexItem(species, pkmList ?? [], staticData);
+            if (!dex.TryGetValue(species, out var arr))
+            {
+                arr = [];
+                dex.Add(species, arr);
+            }
+            arr[save.ID32] = item;
 
             // tasks.Add(Task.Run(async () =>
             // {
@@ -48,7 +55,7 @@ public abstract class DexGenService<Save> where Save : SaveFile
         return true;
     }
 
-    private DexItemDTO CreateDexItem(ushort species, Save save, List<PKM> pkmList, StaticDataDTO staticData)
+    private DexItemDTO CreateDexItem(ushort species, List<PKM> pkmList, StaticDataDTO staticData)
     {
         var forms = new List<DexItemForm>();
 
@@ -98,7 +105,7 @@ public abstract class DexGenService<Save> where Save : SaveFile
                     return BasePkmVersionDTO.GetForm(pkm) == form;
                 });
 
-                var itemForm = GetDexItemForm(species, save, ownedPkms, form, gender);
+                var itemForm = GetDexItemForm(species, ownedPkms, form, gender);
                 // itemForm.FormName = formList[form];
                 itemForm.Context = save.Context;
                 itemForm.Generation = save.Generation;
@@ -116,5 +123,7 @@ public abstract class DexGenService<Save> where Save : SaveFile
         };
     }
 
-    protected abstract DexItemForm GetDexItemForm(ushort species, Save save, List<PKM> pkmList, byte form, Gender gender);
+    protected abstract DexItemForm GetDexItemForm(ushort species, List<PKM> pkmList, byte form, Gender gender);
+
+    public abstract void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught);
 }

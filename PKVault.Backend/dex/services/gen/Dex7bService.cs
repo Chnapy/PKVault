@@ -1,8 +1,8 @@
 using PKHeX.Core;
 
-public class Dex7bService : DexGenService<SAV7b>
+public class Dex7bService(SAV7b save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, SAV7b save, List<PKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
@@ -45,5 +45,20 @@ public class Dex7bService : DexGenService<SAV7b>
             // IsLangCh = save.Zukan.GetLanguageFlag(species - 1, 7),
             // IsLangCh2 = save.Zukan.GetLanguageFlag(species - 1, 8)
         };
+    }
+
+    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    {
+        if (!save.Personal.IsPresentInGame(species, form))
+            return;
+
+        if (isSeen)
+            save.Zukan.SetSeen(species, gender == Gender.Female ? 1 : 0, true);
+
+        if (isSeenShiny)
+            save.Zukan.SetSeen(species, gender == Gender.Female ? 3 : 2, true);
+
+        if (isCaught)
+            save.Zukan.SetCaught(species, true);
     }
 }

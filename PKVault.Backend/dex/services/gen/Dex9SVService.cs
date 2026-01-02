@@ -1,8 +1,8 @@
 using PKHeX.Core;
 
-public class Dex9SVService : DexGenService<SAV9SV>
+public class Dex9SVService(SAV9SV save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, SAV9SV save, List<PKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
@@ -74,5 +74,51 @@ public class Dex9SVService : DexGenService<SAV9SV>
             IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
         };
+    }
+
+    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    {
+        if (!save.Personal.IsPresentInGame(species, form))
+            return;
+
+        byte formToUse = species == (ushort)Species.Alcremie
+            ? (byte)(form / 7)
+            : form;
+
+        if (save.SaveRevision == 0)
+        // paldea
+        {
+            var entry = save.Zukan.DexPaldea.Get(species);
+
+            if (isSeen)
+            {
+                entry.SetSeen(true);
+                entry.SetIsFormSeen(formToUse, true);
+                entry.SetIsGenderSeen((byte)gender, true);
+            }
+
+            if (isSeenShiny)
+                entry.SetSeenIsShiny(true);
+
+            if (isCaught)
+                entry.SetCaught(true);
+        }
+        // kitami
+        else
+        {
+            var entry = save.Zukan.DexKitakami.Get(species);
+
+            if (isSeen)
+            {
+                entry.SetSeenForm(formToUse, true);
+                entry.SetIsGenderSeen((byte)gender, true);
+            }
+
+            if (isSeenShiny)
+                entry.SetIsModelSeen(true, true);
+
+            if (isCaught)
+                entry.SetObtainedForm(formToUse, true);
+        }
     }
 }

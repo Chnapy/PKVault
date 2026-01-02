@@ -35,4 +35,5 @@ public enum DataActionType
     PKM_SYNCHRONIZE,
     EVOLVE_PKM,
     SORT_PKM,
+    DEX_SYNC,
 }

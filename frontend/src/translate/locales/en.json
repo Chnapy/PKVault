@@ -113,6 +113,7 @@
   "storage.box.delete.help": "Box should be empty, and not last one before delete it",
   "storage.box.split.help": "Split in 2",
   "storage.box.advanced.sort": "Sort pkms",
+  "storage.box.advanced.dex-sync": "Sync Pokedex",
   "storage.save-select": "Save selection",
   "storage.sort.from-box": "From box",
   "storage.sort.to-box": "To box",
@@ -120,6 +121,8 @@
   "storage.sort.description.1": "Pkms in box range will be sorted by species, starting from Bulbasaur (#1).",
   "storage.sort.description.2": "If you leave empty slots for missing species, process may fail if missing space.",
   "storage.sort.description.3": "If you leave empty slots for missing species, boxes may be created in the process if missing space.",
+  "storage.dex-sync.title": "Select saves that will sync their Pokedex",
+  "storage.dex-sync.description": "Pokedex of each selection will share its data, in both ways.",
   "storage.actions.move": "Move",
   "storage.actions.move-attached-main": "Move attached",
   "storage.actions.move-attached-main.helpTitle": "Move a linked copy of this pkm to the save",
@@ -176,6 +179,7 @@
   "storage.save-actions.type.synchronize-pkm": "Synchronize {{count}} pkms with attached save {{save}}",
   "storage.save-actions.type.evolve-pkm": "Evolve pkm {{name}} in {{save}} from {{oldSpecies}} to {{newSpecies}}",
   "storage.save-actions.type.sort-pkm": "Sort pkms",
+  "storage.save-actions.type.dex-sync": "Pokedex synchronize",
   "storage.actions.release": "Release",
   "notifications.warnings.update": "New PKVault update {{version}}"
 }

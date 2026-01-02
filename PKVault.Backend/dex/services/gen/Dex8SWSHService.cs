@@ -1,8 +1,8 @@
 using PKHeX.Core;
 
-public class Dex8SWSHService : DexGenService<SAV8SWSH>
+public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, SAV8SWSH save, List<PKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
     {
         var Dex = save.Blocks.Zukan;
 
@@ -42,5 +42,20 @@ public class Dex8SWSHService : DexGenService<SAV8SWSH>
             IsOwned = isOwned,
             IsOwnedShiny = isOwnedShiny,
         };
+    }
+
+    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    {
+        if (!save.Personal.IsPresentInGame(species, form))
+            return;
+
+        if (isSeen)
+            save.Blocks.Zukan.SetSeenRegion(species, form, gender == Gender.Female ? 1 : 0, true);
+
+        if (isSeenShiny)
+            save.Blocks.Zukan.SetSeenRegion(species, form, gender == Gender.Female ? 3 : 2, true);
+
+        if (isCaught)
+            save.Blocks.Zukan.SetCaught(species, true);
     }
 }

@@ -198,6 +198,14 @@ public class StorageController : ControllerBase
         return await DataDTO.FromDataUpdateFlags(flags);
     }
 
+    [HttpPut("dex/sync")]
+    public async Task<ActionResult<DataDTO>> DexSync([FromQuery] uint[] saveIds)
+    {
+        var flags = await StorageService.DexSync(saveIds);
+
+        return await DataDTO.FromDataUpdateFlags(flags);
+    }
+
     [HttpGet("pkm/available-moves")]
     public async Task<ActionResult<List<MoveItem>>> GetPkmAvailableMoves(uint? saveId, string pkmId)
     {

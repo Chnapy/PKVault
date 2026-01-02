@@ -1,8 +1,8 @@
 using PKHeX.Core;
 
-public class Dex5Service : DexGenService<SAV5>
+public class Dex5Service(SAV5 save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, SAV5 save, List<PKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
@@ -54,5 +54,31 @@ public class Dex5Service : DexGenService<SAV5>
             // IsLangEs = species <= 493 && save.Zukan.GetLanguageFlag(species - 1, 5),
             // IsLangKo = species <= 493 && save.Zukan.GetLanguageFlag(species - 1, 6),
         };
+    }
+
+    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    {
+        if (!save.Personal.IsPresentInGame(species, form))
+            return;
+
+        if (isSeen)
+            save.Zukan.SetSeen(species, gender == Gender.Female ? 1 : 0, true);
+
+        if (isSeenShiny)
+            save.Zukan.SetSeen(species, gender == Gender.Female ? 3 : 2, true);
+
+        if (isCaught)
+            save.Zukan.SetCaught(species, true);
+
+        var (formIndex, formCount) = save.Zukan.GetFormIndex(species);
+
+        if (formCount > 0)
+        {
+            if (isSeen)
+                save.Zukan.SetFormFlag(formIndex + form, 0, true);
+
+            if (isSeenShiny)
+                save.Zukan.SetFormFlag(formIndex + form, 1, true);
+        }
     }
 }

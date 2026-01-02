@@ -10,19 +10,29 @@ public class DexService
             return [];
         }
 
-        var staticData = await StaticDataService.GetStaticData();
+        return await GetDex([.. saveDict.Keys]);
+    }
 
-        var maxSpecies = saveDict.Values.Select(save => save.Save.MaxSpeciesID).Max();
-
-        var time = LogUtil.Time($"Update Dex with {saveDict.Count} saves (max-species={maxSpecies})");
-
-        Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex = [];
-        for (ushort i = 1; i < (ushort)Species.MAX_COUNT; i++)
+    public static async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex(uint[] saveIds)
+    {
+        if (saveIds.Length == 0)
         {
-            dex.Add(i, []);
+            return [];
         }
 
-        saveDict.Values.ToList().ForEach(save => UpdateDexWithSave(dex, save.Save, staticData));
+        var saveLoadersDict = (await StorageService.GetLoader()).loaders.saveLoadersDict;
+
+        var saves = saveIds.Select(id => saveLoadersDict[id]).ToList();
+
+        var staticData = await StaticDataService.GetStaticData();
+
+        var maxSpecies = saves.Max(save => save.Save.MaxSpeciesID);
+
+        var time = LogUtil.Time($"Update Dex with {saves.Count} saves (max-species={maxSpecies})");
+
+        Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex = [];
+
+        saves.ForEach(save => UpdateDexWithSave(dex, save.Save, staticData));
 
         time();
 
@@ -31,33 +41,39 @@ public class DexService
 
     private static bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, SaveFile save, StaticDataDTO staticData)
     {
-        static bool notHandled(SaveFile save)
-        {
-            Console.WriteLine("Save version/gen not handled: " + save.Version + "/" + save.Generation);
-            return false;
-        }
-
-        var success = save switch
-        {
-            SAV1 sav1 => new Dex123Service().UpdateDexWithSave(dex, sav1, staticData),
-            SAV2 sav2 => new Dex123Service().UpdateDexWithSave(dex, sav2, staticData),
-            SAV3 sav3 => new Dex123Service().UpdateDexWithSave(dex, sav3, staticData),
-            SAV3XD sav3XD => new Dex3XDService().UpdateDexWithSave(dex, sav3XD, staticData),
-            SAV3Colosseum sav3Colo => new Dex3ColoService().UpdateDexWithSave(dex, sav3Colo, staticData),
-            SAV4 sav4 => new Dex4Service().UpdateDexWithSave(dex, sav4, staticData),
-            SAV5 sav5 => new Dex5Service().UpdateDexWithSave(dex, sav5, staticData),
-            SAV6XY xy => new Dex6XYService().UpdateDexWithSave(dex, xy, staticData),
-            SAV6AO ao => new Dex6AOService().UpdateDexWithSave(dex, ao, staticData),
-            SAV7b lgpe => new Dex7bService().UpdateDexWithSave(dex, lgpe, staticData),
-            SAV7 sav7 => new Dex7Service().UpdateDexWithSave(dex, sav7, staticData),
-            SAV8SWSH ss => new Dex8SWSHService().UpdateDexWithSave(dex, ss, staticData),
-            SAV8BS bs => new Dex8BSService().UpdateDexWithSave(dex, bs, staticData),
-            SAV8LA la => new Dex8LAService().UpdateDexWithSave(dex, la, staticData),
-            SAV9SV sv => new Dex9SVService().UpdateDexWithSave(dex, sv, staticData),
-            SAV9ZA za => new Dex9ZAService().UpdateDexWithSave(dex, za, staticData),
-            _ => notHandled(save),
-        };
+        var service = GetDexService(save);
+        var success = service?.UpdateDexWithSave(dex, staticData) ?? false;
 
         return success;
+    }
+
+    public static DexGenService? GetDexService<S>(S save) where S : SaveFile
+    {
+        static DexGenService? notHandled(SaveFile save)
+        {
+            Console.WriteLine("Save version/gen not handled: " + save.Version + "/" + save.Generation);
+            return null;
+        }
+
+        return save switch
+        {
+            SAV1 sav1 => new Dex123Service(sav1),
+            SAV2 sav2 => new Dex123Service(sav2),
+            SAV3 sav3 => new Dex123Service(sav3),
+            SAV3XD sav3XD => new Dex3XDService(sav3XD),
+            SAV3Colosseum sav3Colo => new Dex3ColoService(sav3Colo),
+            SAV4 sav4 => new Dex4Service(sav4),
+            SAV5 sav5 => new Dex5Service(sav5),
+            SAV6XY xy => new Dex6XYService(xy),
+            SAV6AO ao => new Dex6AOService(ao),
+            SAV7b lgpe => new Dex7bService(lgpe),
+            SAV7 sav7 => new Dex7Service(sav7),
+            SAV8SWSH ss => new Dex8SWSHService(ss),
+            SAV8BS bs => new Dex8BSService(bs),
+            SAV8LA la => new Dex8LAService(la),
+            SAV9SV sv => new Dex9SVService(sv),
+            SAV9ZA za => new Dex9ZAService(za),
+            _ => notHandled(save),
+        };
     }
 }
