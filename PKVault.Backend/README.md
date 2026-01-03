@@ -25,7 +25,7 @@ Then you can use swagger: `http://localhost:5000/swagger`
 
 ## Build
 
-Basic build process.
+Basic build process
 
 ```
 dotnet publish
