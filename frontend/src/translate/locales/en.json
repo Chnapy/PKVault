@@ -121,7 +121,7 @@
   "storage.sort.description.1": "Pkms in box range will be sorted by species, starting from Bulbasaur (#1).",
   "storage.sort.description.2": "If you leave empty slots for missing species, process may fail if missing space.",
   "storage.sort.description.3": "If you leave empty slots for missing species, boxes may be created in the process if missing space.",
-  "storage.dex-sync.title": "Select saves that will sync their Pokedex",
+  "storage.dex-sync.title": "Select multiple Pokedex to sync",
   "storage.dex-sync.description": "Pokedex of each selection will share its data, in both ways.",
   "storage.actions.move": "Move",
   "storage.actions.move-attached-main": "Move attached",

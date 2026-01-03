@@ -105,11 +105,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
                     return BasePkmVersionDTO.GetForm(pkm) == form;
                 });
 
-                var itemForm = GetDexItemForm(species, ownedPkms, form, gender);
-                // itemForm.FormName = formList[form];
-                itemForm.Context = save.Context;
-                itemForm.Generation = save.Generation;
-                itemForm.Types = [.. itemForm.Types.Distinct().Select(type => (byte)(type + 1))];
+                var itemForm = GetDexItemFormComplete(species, ownedPkms, form, gender);
                 forms.Add(itemForm);
             });
         }
@@ -125,7 +121,16 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
     protected string GetDexItemID(ushort species) => $"{species}_{save.ID32}";
 
-    public abstract DexItemForm GetDexItemForm(ushort species, List<PKM> pkmList, byte form, Gender gender);
+    public DexItemForm GetDexItemFormComplete(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
+    {
+        var itemForm = GetDexItemForm(species, ownedPkms, form, gender);
+        itemForm.Context = save.Context;
+        itemForm.Generation = save.Generation;
+        itemForm.Types = [.. itemForm.Types.Distinct().Select(type => (byte)(type + 1))];
+        return itemForm;
+    }
+
+    protected abstract DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender);
 
     public abstract void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught);
 }

@@ -6,7 +6,7 @@ import { Icon } from '../icon/icon';
 import { theme } from '../theme';
 
 export type DetailsTabProps = {
-    version: GameVersion;
+    version: GameVersion | null;    // null means pkvault
     otName: string;
     original?: boolean;
     warning?: boolean;

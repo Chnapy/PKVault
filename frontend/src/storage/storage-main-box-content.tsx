@@ -16,6 +16,7 @@ import { StorageBox } from "../ui/storage-box/storage-box";
 import { StorageBoxMainActions } from '../ui/storage-box/storage-box-main-actions';
 import { StorageItemPlaceholder } from "../ui/storage-item/storage-item-placeholder";
 import { StorageMoveContext } from './actions/storage-move-context';
+import { DexSyncAdvancedAction } from './advanced-actions/dex-sync-advanced-action';
 import { SortAdvancedAction } from './advanced-actions/sort-advanced-action';
 import { BankContext } from './bank/bank-context';
 import { StorageBoxEdit } from './box/storage-box-edit';
@@ -120,6 +121,11 @@ export const StorageMainBoxContent: React.FC<{
                   label: t('storage.box.advanced.sort'),
                   icon: <Icon name='sort' solid forButton />,
                   panelContent: close => <SortAdvancedAction.Main selectedBoxId={selectedBox.idInt} close={close} />,
+                },
+                {
+                  label: t('storage.box.advanced.dex-sync'),
+                  icon: <Icon name='table' solid forButton />,
+                  panelContent: close => <DexSyncAdvancedAction saveId={0} close={close} />,
                 },
                 {
                   label: 'Import pkm files',

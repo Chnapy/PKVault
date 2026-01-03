@@ -121,7 +121,7 @@
   "storage.sort.description.1": "Les pkms dans l'intervalle des boîtes seront triés par espèce, à partir de Bulbizarre (#1).",
   "storage.sort.description.2": "Si vous laissez les slots vides en cas d'espèces manquantes, l'action peut échouer si manque de place.",
   "storage.sort.description.3": "Si vous laissez les slots vides en cas d'espèces manquantes, des boîtes peuvent être crées si manque de place.",
-  "storage.dex-sync.title": "Sélectionnez les sauvegardes qui vont synchroniser leur Pokedex",
+  "storage.dex-sync.title": "Sélectionnez les Pokedex à synchroniser",
   "storage.dex-sync.description": "Le Pokedex de chaque sélection partagera sa donnée avec les autres, dans les 2 sens.",
   "storage.actions.move": "Déplacer",
   "storage.actions.move-attached-main": "Déplacer rattaché",

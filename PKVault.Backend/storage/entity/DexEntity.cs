@@ -10,12 +10,8 @@ public class DexEntity : IWithId<string>
 public class DexEntityForm
 {
     public required byte Form { get; set; }
-    public EntityContext Context { get; set; }
-    public byte Generation { get; set; }
+    public required GameVersion Version { get; set; }
     public required Gender Gender { get; set; }
-    public required List<byte> Types { get; set; }
-    public required int[] Abilities { get; set; }
-    public required int[] BaseStats { get; set; }
     public required bool IsCaught { get; set; }
     public required bool IsCaughtShiny { get; set; }
 }

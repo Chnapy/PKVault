@@ -125,7 +125,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
         }
     }
 
-    protected override uint GetGeneration()
+    protected override byte GetGeneration()
     {
         return Save.Generation;
     }

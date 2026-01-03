@@ -125,7 +125,7 @@ public class StorageService
         );
     }
 
-    public static async Task<DataUpdateFlags> MainCreatePkmVersion(string pkmId, uint generation)
+    public static async Task<DataUpdateFlags> MainCreatePkmVersion(string pkmId, byte generation)
     {
         return await AddAction(
             new MainCreatePkmVersionAction(pkmId, generation)
@@ -366,6 +366,17 @@ public class StorageService
         var boxLoader = new BoxLoader();
         var pkmLoader = new PkmLoader();
         var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
+        var dexLoader = new DexLoader();
+
+        DataEntityLoaders loaders = new()
+        {
+            bankLoader = bankLoader,
+            boxLoader = boxLoader,
+            pkmLoader = pkmLoader,
+            pkmVersionLoader = pkmVersionLoader,
+            dexLoader = dexLoader,
+            saveLoadersDict = [],
+        };
 
         var banks = bankLoader.GetAllEntities();
         if (banks.Count == 0)
@@ -537,11 +548,18 @@ public class StorageService
             }
         });
 
+        var dexService = new DexMainService(loaders);
+        pkmVersionLoader.GetAllDtos().ForEach(pkmVersion =>
+        {
+            dexService.EnablePKM(pkmVersion.Pkm, createOnly: true);
+        });
+
         if (
             bankLoader.HasWritten
             || boxLoader.HasWritten
             || pkmVersionLoader.HasWritten
             || pkmLoader.HasWritten
+            || dexLoader.HasWritten
         )
         {
             BackupService.CreateBackup();
@@ -550,6 +568,7 @@ public class StorageService
             boxLoader.WriteToFile();
             pkmVersionLoader.WriteToFile();
             pkmLoader.WriteToFile();
+            dexLoader.WriteToFile();
         }
 
         time();

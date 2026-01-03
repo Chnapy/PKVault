@@ -105,7 +105,7 @@ public class PkmVersionDTO : BasePkmVersionDTO
 
     private PkmVersionDTO() { }
 
-    protected override uint GetGeneration()
+    protected override byte GetGeneration()
     {
         return PkmVersionEntity.Generation;
     }

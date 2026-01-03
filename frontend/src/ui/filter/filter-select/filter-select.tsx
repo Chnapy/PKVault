@@ -43,11 +43,12 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
               color: "inherit",
               background: "inherit",
               display: "flex",
+              alignItems: 'center',
               margin: "-2px -4px",
               borderRadius: 4,
               border: "none",
               padding: "2px 4px",
-              gap: 2,
+              gap: 4,
               cursor: "pointer",
             })}
           >

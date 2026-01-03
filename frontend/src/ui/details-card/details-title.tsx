@@ -4,14 +4,17 @@ import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 
 export type DetailsTitleProps = {
-    version: GameVersion;
+    version: GameVersion | null;    // null means pkvault
+    generation?: number;
     showVersionName?: boolean;
 };
 
-export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> = ({ version, showVersionName, children }) => {
+export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> = ({ version, generation, showVersionName, children }) => {
     const staticData = useStaticData();
 
-    const generation = staticData.versions[ version ]?.generation;
+    if (!generation && version) {
+        generation = staticData.versions[ version ]?.generation;
+    }
 
     return <>
         <img
@@ -20,7 +23,15 @@ export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> 
         />
 
         <div style={{ flexGrow: 1 }}>
-            G{generation}{showVersionName && ` / ${staticData.versions[ version ]?.name}`}
+            {generation ? <>G{generation}</> : null}
+            {showVersionName && <>
+                {' / '}
+                {version
+                    ? <>
+                        {staticData.versions[ version ]?.name}
+                    </>
+                    : 'PKVault'}
+            </>}
         </div>
 
         {children}

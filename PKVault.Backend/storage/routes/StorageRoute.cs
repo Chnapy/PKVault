@@ -143,7 +143,7 @@ public class StorageController : ControllerBase
     }
 
     [HttpPost("main/pkm-version")]
-    public async Task<ActionResult<DataDTO>> MainCreatePkmVersion([BindRequired] string pkmId, [BindRequired] uint generation)
+    public async Task<ActionResult<DataDTO>> MainCreatePkmVersion([BindRequired] string pkmId, [BindRequired] byte generation)
     {
         var flags = await StorageService.MainCreatePkmVersion(pkmId, generation);
 

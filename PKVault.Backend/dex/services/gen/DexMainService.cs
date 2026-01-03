@@ -2,15 +2,13 @@ using PKHeX.Core;
 
 public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveFile.Default)
 {
-    private Dictionary<string, DexEntity> dexEntities = loaders.dexLoader.GetAllEntities();
-
     public override bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData)
     {
         var ownedPkmsBySpecies = loaders.pkmVersionLoader.GetAllDtos()
             .GroupBy(dto => dto.Species)
             .ToDictionary(dtos => dtos.First().Species, dtos => dtos.ToList());
 
-        dexEntities.Values.ToList().ForEach(entity =>
+        loaders.dexLoader.GetAllEntities().Values.ToList().ForEach(entity =>
         {
             ownedPkmsBySpecies.TryGetValue(entity.Species, out var pkmForms);
 
@@ -25,20 +23,33 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
                         && f.Gender == form.Gender
                     ) ?? [];
 
+                    var saveVersion = PkmVersionDTO.GetSingleVersion(form.Version);
+                    var save = saveVersion == default
+                        ? new SAV9ZA()
+                        : BlankSaveFile.Get(saveVersion);
+
+                    var saveDexService = DexService.GetDexService(save, loaders);
+                    var commonForm = saveDexService!.GetDexItemFormComplete(
+                        entity.Species,
+                        [.. pkmFormsFiltered.Select(pkmVersion => pkmVersion.Pkm)],
+                        form.Form,
+                        form.Gender
+                    );
+
                     return new DexItemForm()
                     {
                         Form = form.Form,
-                        Context = form.Context,
-                        Generation = form.Generation,
+                        Context = commonForm.Context,
+                        Generation = commonForm.Generation,
                         Gender = form.Gender,
-                        Types = form.Types,
-                        Abilities = form.Abilities,
-                        BaseStats = form.BaseStats,
+                        Types = commonForm.Types,
+                        Abilities = commonForm.Abilities,
+                        BaseStats = commonForm.BaseStats,
                         IsSeen = form.IsCaught,
                         IsSeenShiny = form.IsCaughtShiny,
                         IsCaught = form.IsCaught,
-                        IsOwned = pkmFormsFiltered.Count > 0,
-                        IsOwnedShiny = pkmFormsFiltered.Any(f => f.IsShiny),
+                        IsOwned = commonForm.IsOwned,
+                        IsOwnedShiny = commonForm.IsOwnedShiny,
                     };
                 })]
             };
@@ -54,33 +65,47 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
         return true;
     }
 
-    public override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender) => throw new NotImplementedException($"Should not be used");
+    protected override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender) => throw new NotImplementedException($"Should not be used");
 
     public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
     {
         EnableSpeciesForm(
-            default, default, default, default, default,
-            species, form, gender, isCaught, false
+            default,
+            species, form, gender, isCaught, false,
+            createOnly: false
         );
     }
 
-    public void EnableSpeciesForm(
-        EntityContext context, byte generation, List<byte>? types, int[]? abilities, int[]? baseStats,
+    public void EnablePKM(PKM pk, SaveFile? save = null, bool createOnly = false)
+    {
+        var version = save?.Version ?? pk.Version;
+
+        EnableSpeciesForm(
+            version,
+            pk.Species, pk.Form, (Gender)pk.Gender, true, pk.IsShiny,
+            createOnly
+        );
+    }
+
+    private void EnableSpeciesForm(
+        GameVersion version,
         ushort species, byte form, Gender gender,
-        bool isCaught, bool isCaughtShiny
+        bool isCaught, bool isCaughtShiny,
+        bool createOnly
     )
     {
-        var entityFound = dexEntities.TryGetValue(species.ToString(), out var entity);
-        var entityForm = entity?.Forms.Find(f => f.Form == form);
-
-        if (!entityFound || entity == null)
+        DexEntity entity = loaders.dexLoader.GetEntity(species.ToString()) ?? new()
         {
-            entity = new()
-            {
-                Id = species.ToString(),
-                Species = species,
-                Forms = []
-            };
+            Id = species.ToString(),
+            Species = species,
+            Forms = []
+        };
+
+        var entityForm = entity?.Forms.Find(f => f.Form == form && f.Gender == gender);
+
+        if (createOnly && entityForm != null)
+        {
+            return;
         }
 
         if (entityForm == null)
@@ -88,42 +113,17 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
             entityForm = new()
             {
                 Form = form,
-                Context = default,
-                Generation = default,
+                Version = default,
                 Gender = gender,
-                Types = [],
-                Abilities = [],
-                BaseStats = [],
                 IsCaught = false,
                 IsCaughtShiny = false,
             };
             entity.Forms.Add(entityForm);
         }
-        Console.WriteLine($"UPDATE context={context} generation={generation}");
-        if (context != default)
-        {
-            entityForm.Context = context;
-            Console.WriteLine($"FOO");
-        }
 
-        if (generation != default)
+        if (version != default)
         {
-            entityForm.Generation = generation;
-        }
-
-        if (types != default)
-        {
-            entityForm.Types = types;
-        }
-
-        if (abilities != default)
-        {
-            entityForm.Abilities = abilities;
-        }
-
-        if (baseStats != default)
-        {
-            entityForm.BaseStats = baseStats;
+            entityForm.Version = version;
         }
 
         if (isCaught)
@@ -132,19 +132,12 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
         if (isCaughtShiny)
             entityForm.IsCaughtShiny = true;
 
+        // write if caught only
+        if (!entityForm.IsCaught)
+        {
+            return;
+        }
+
         loaders.dexLoader.WriteEntity(entity);
-    }
-
-    public void EnablePKM(PKM pk, SaveFile? save = null)
-    {
-        save ??= BlankSaveFile.Get(pk.Version);
-        var saveDexService = DexService.GetDexService(save, loaders);
-
-        var commonForm = saveDexService?.GetDexItemForm(pk.Species, [pk], pk.Form, (Gender)pk.Gender);
-
-        EnableSpeciesForm(
-            save.Context, save.Generation, commonForm?.Types ?? default, commonForm?.Abilities ?? default, commonForm?.BaseStats ?? default,
-            pk.Species, pk.Form, (Gender)pk.Gender, true, pk.IsShiny
-        );
     }
 }

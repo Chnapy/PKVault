@@ -21,11 +21,13 @@ export const FilterCheckbox: React.FC<FilterCheckboxProps> = ({
         className={css({
           color: "inherit",
           background: "inherit",
-          display: "block",
+          display: "flex",
+          alignItems: 'center',
           margin: "-2px -4px",
           borderRadius: 4,
           border: "none",
-          padding: "2px 4px",
+          padding: "2px 6px",
+          gap: 4,
         })}
         {...props}
       >

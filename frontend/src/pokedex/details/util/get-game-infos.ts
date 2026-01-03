@@ -47,7 +47,15 @@ import yImg from '../../../assets/game_icons/y.png';
 import yellowImg from '../../../assets/game_icons/yellow.png';
 import zaImg from '../../../assets/game_icons/legend-za.png';
 
-export const getGameInfos = (version: GameVersion) => {
+export const getGameInfos = (version: GameVersion | null) => {
+  // pkvault
+  if (!version) {
+    return {
+      img: '/logo.svg',
+      color: theme.bg.contrast,
+    };
+  }
+
   /**
    * Specs from GameVersion.cs & pokeapi.co
    */

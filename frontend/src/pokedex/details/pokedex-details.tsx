@@ -1,6 +1,6 @@
 import React from "react";
 import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
-import { Gender as GenderType, type SaveInfosDTO } from '../../data/sdk/model';
+import { EntityContext, Gender as GenderType } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from "../../routes/pokedex";
@@ -48,10 +48,18 @@ export const PokedexDetails: React.FC = () => {
 
   const gameSaves = speciesValues
     .filter((spec) => spec.forms.some(form => form.isSeen))
-    .map((spec) => savesRecord[ spec.saveId ])
+    .map((spec) => spec.saveId === 0
+      // pkvault storage
+      ? {
+        id: 0,
+        context: EntityContext.Gen9a,
+        version: null,
+        trainerName: ''
+      }
+      : savesRecord[ spec.saveId ])
     .filter(filterIsDefined);
 
-  const selectedSave = (gameSaves[ selectedSaveIndex ] ?? gameSaves[ 0 ]) as SaveInfosDTO | undefined;
+  const selectedSave = gameSaves[ selectedSaveIndex ] ?? gameSaves[ 0 ];
   const selectedSpeciesValue = selectedSave && speciesValues.find(
     (value) => value.saveId === selectedSave.id
   )!;
@@ -149,18 +157,19 @@ export const PokedexDetails: React.FC = () => {
         bgColor={getGameInfos(selectedSave.version).color}
         title={<DetailsTitle
           version={selectedSave.version}
+          generation={selectedForm.generation}
           showVersionName
         />}
         mainImg={
           <DetailsMainImg
             species={selectedSpecies}
-            context={selectedSave.context}
+            context={selectedForm.context}
             form={selectedFormIndex}
             isFemale={selectedGender === GenderType.Female}
             isOwned={owned}
             isShiny={selectedShiny}
             ball={caught ? staticData.itemPokeball.id : undefined}
-            shinyPart={selectedSave.generation > 1 && <ButtonLike
+            shinyPart={selectedForm.generation > 1 && <ButtonLike
               onClick={() => setSelectedShiny(!selectedShiny)}
               disabled={!selectedForm.isOwnedShiny}
             >

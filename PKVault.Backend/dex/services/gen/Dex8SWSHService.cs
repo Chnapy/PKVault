@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
 {
-    public override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
     {
         var Dex = save.Blocks.Zukan;
 

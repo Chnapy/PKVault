@@ -1,4 +1,4 @@
-public class MainCreatePkmVersionAction(string pkmId, uint generation) : DataAction
+public class MainCreatePkmVersionAction(string pkmId, byte generation) : DataAction
 {
     // required to keep same generated PID between memory => file loaders
     // because PID is randomly generated

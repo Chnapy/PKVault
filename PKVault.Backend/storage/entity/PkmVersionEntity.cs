@@ -4,7 +4,7 @@ public class PkmVersionEntity : IWithId<string>
 
     public required string PkmId { get; set; }
 
-    public required uint Generation { get; set; }
+    public required byte Generation { get; set; }
 
     // public uint? SaveId { get; set; }
 

@@ -8,7 +8,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 {
     public string Id { get { return GetPKMIdBase(Pkm); } }
 
-    public uint Generation { get { return GetGeneration(); } }
+    public byte Generation { get { return GetGeneration(); } }
 
     public GameVersion Version
     {
@@ -377,7 +377,7 @@ public abstract class BasePkmVersionDTO : IWithId<string>
 
     protected bool HasTradeEvolve;
 
-    protected abstract uint GetGeneration();
+    protected abstract byte GetGeneration();
 
     /**
      * Generate ID similar to PKHeX one.

@@ -14,7 +14,7 @@ export const FilterLabel: React.FC<FilterLabelProps> = ({
   children,
 }) => {
   return (
-    <Button<'label'> as="label" className={className}>
+    <Button<'label'> as="label">
       <div
         className={css({
           flexGrow: 1,
@@ -24,13 +24,14 @@ export const FilterLabel: React.FC<FilterLabelProps> = ({
         })}
       >
         <div
+          className={className}
           style={{
             backgroundColor: theme.bg.darker,
             borderRadius: 4,
             color: theme.text.light,
             textShadow: "1px 1px 0px rgba(255,255,255,0.2)",
             padding: "2px 4px",
-            paddingRight: enabled ? undefined : 12,
+            paddingRight: enabled ? undefined : 8,
             textAlign: "left",
           }}
         >

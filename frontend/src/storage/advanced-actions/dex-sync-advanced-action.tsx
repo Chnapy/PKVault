@@ -1,3 +1,4 @@
+import { css } from '@emotion/css';
 import { Listbox, ListboxOption, ListboxOptions } from '@headlessui/react';
 import type React from 'react';
 import { useForm } from 'react-hook-form';
@@ -5,6 +6,7 @@ import type { StorageDexSyncParams } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageDexSync } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
+import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { FilterLabel } from '../../ui/filter/filter-label/filter-label';
@@ -71,31 +73,62 @@ export const DexSyncAdvancedAction: React.FC<{
                 overflowY: 'auto',
                 userSelect: 'none'
             }}>
-                {saveInfos
-                    .map(save => ({
-                        value: save.id.toString(),
-                        label: <>{staticData.versions[ save.version ]?.name} - {save.trainerName}</>,
-                        selected: saveIds.includes(save.id),
-                        disabled: save.id === saveId,
-                    }))
-                    .map(({ value, label, selected, disabled }, i) => (
-                        <ListboxOption
-                            key={value}
-                            value={value}
-                            style={{
-                                marginTop: i ? 2 : 0,
-                                opacity: disabled ? 0.75 : undefined,
-                                pointerEvents: disabled ? 'none' : undefined,
-                            }}
-                            disabled={disabled}
+                {[
+                    // pkvault storage
+                    {
+                        value: '0',
+                        label: <>
+                            <img
+                                src={getGameInfos(null).img}
+                                style={{
+                                    height: 14,
+                                    width: 14,
+                                }}
+                            />
+                            PKVault
+                        </>,
+                        selected: saveIds.includes(0),
+                        disabled: 0 === saveId,
+                    },
+                    ...saveInfos
+                        .map(save => ({
+                            value: save.id.toString(),
+                            label: <>
+                                <img
+                                    src={getGameInfos(save.version).img}
+                                    style={{
+                                        height: 14,
+                                        width: 14,
+                                    }}
+                                />
+                                {staticData.versions[ save.version ]?.name} - {save.trainerName}
+                            </>,
+                            selected: saveIds.includes(save.id),
+                            disabled: save.id === saveId,
+                        }))
+                ].map(({ value, label, selected, disabled }, i) => (
+                    <ListboxOption
+                        key={value}
+                        value={value}
+                        style={{
+                            marginTop: i ? 2 : 0,
+                            opacity: disabled ? 0.75 : undefined,
+                            pointerEvents: disabled ? 'none' : undefined,
+                        }}
+                        disabled={disabled}
+                    >
+                        <FilterLabel
+                            className={css({
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 4
+                            })}
+                            enabled={selected}
                         >
-                            <FilterLabel
-                                enabled={selected}
-                            >
-                                {label}
-                            </FilterLabel>
-                        </ListboxOption>
-                    ))}
+                            {label}
+                        </FilterLabel>
+                    </ListboxOption>
+                ))}
             </ListboxOptions>
         </Listbox>
 
