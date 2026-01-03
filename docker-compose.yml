@@ -22,7 +22,7 @@ services:
       timeout: 10s
       retries: 3
 
-    pkvault-frontend:
+  pkvault-frontend:
     image: 'ghcr.io/dldri/pkvault-frontend:latest'
     ports:
       - 5001:80
