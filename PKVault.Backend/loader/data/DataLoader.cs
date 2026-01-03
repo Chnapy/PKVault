@@ -16,16 +16,17 @@ public abstract class DataLoader(DataEntityLoaders loaders)
 
 public struct DataEntityLoaders
 {
-    public BankLoader bankLoader { get; set; }
-    public BoxLoader boxLoader { get; set; }
-    public PkmLoader pkmLoader { get; set; }
-    public PkmVersionLoader pkmVersionLoader { get; set; }
-    public Dictionary<uint, SaveLoaders> saveLoadersDict { get; set; }
+    public required BankLoader bankLoader { get; set; }
+    public required BoxLoader boxLoader { get; set; }
+    public required PkmLoader pkmLoader { get; set; }
+    public required PkmVersionLoader pkmVersionLoader { get; set; }
+    public required DexLoader dexLoader { get; set; }
+    public required Dictionary<uint, SaveLoaders> saveLoadersDict { get; set; }
 }
 
 public struct SaveLoaders
 {
-    public SaveFile Save { get; set; }
-    public SaveBoxLoader Boxes { get; set; }
-    public SavePkmLoader Pkms { get; set; }
+    public required SaveFile Save { get; set; }
+    public required SaveBoxLoader Boxes { get; set; }
+    public required SavePkmLoader Pkms { get; set; }
 };

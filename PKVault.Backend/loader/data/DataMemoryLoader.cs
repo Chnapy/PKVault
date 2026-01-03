@@ -6,6 +6,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
         var boxLoader = new BoxLoader();
         var pkmLoader = new PkmLoader();
         var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
+        var dexLoader = new DexLoader();
 
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
         LocalSaveService.SaveById.Values.ToList().ForEach((_save) =>
@@ -29,6 +30,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
             boxLoader = boxLoader,
             pkmLoader = pkmLoader,
             pkmVersionLoader = pkmVersionLoader,
+            dexLoader = dexLoader,
             saveLoadersDict = saveLoadersDict,
         };
 
@@ -78,6 +80,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
         loaders.boxLoader.WriteToFile();
         loaders.pkmLoader.WriteToFile();
         loaders.pkmVersionLoader.WriteToFile();
+        loaders.dexLoader.WriteToFile();
 
         foreach (var saveLoaders in loaders.saveLoadersDict.Values.ToList())
         {

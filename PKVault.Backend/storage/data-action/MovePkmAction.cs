@@ -456,6 +456,8 @@ public class MovePkmAction(
             saveLoaders.Pkms.DeleteDto(savePkm.Id);
         }
 
+        new DexMainService(loaders).EnablePKM(savePkm.Pkm, savePkm.Save);
+
         flags.Saves.Add(new()
         {
             SaveId = sourceSaveId,

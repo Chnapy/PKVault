@@ -10,7 +10,7 @@ public class DexService
             return [];
         }
 
-        return await GetDex([.. saveDict.Keys]);
+        return await GetDex([FakeSaveFile.Default.ID32, .. saveDict.Keys]);
     }
 
     public static async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex(uint[] saveIds)
@@ -20,34 +20,36 @@ public class DexService
             return [];
         }
 
-        var saveLoadersDict = (await StorageService.GetLoader()).loaders.saveLoadersDict;
+        var loaders = (await StorageService.GetLoader()).loaders;
 
-        var saves = saveIds.Select(id => saveLoadersDict[id]).ToList();
+        var saveLoadersDict = loaders.saveLoadersDict;
+
+        var saves = saveIds.Select(id => id == FakeSaveFile.Default.ID32 ? FakeSaveFile.Default : saveLoadersDict[id].Save).ToList();
 
         var staticData = await StaticDataService.GetStaticData();
 
-        var maxSpecies = saves.Max(save => save.Save.MaxSpeciesID);
+        var maxSpecies = saves.Max(save => save.MaxSpeciesID);
 
         var time = LogUtil.Time($"Update Dex with {saves.Count} saves (max-species={maxSpecies})");
 
         Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex = [];
 
-        saves.ForEach(save => UpdateDexWithSave(dex, save.Save, staticData));
+        saves.ForEach(save => UpdateDexWithSave(dex, save, staticData, loaders));
 
         time();
 
         return dex;
     }
 
-    private static bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, SaveFile save, StaticDataDTO staticData)
+    private static bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, SaveFile save, StaticDataDTO staticData, DataEntityLoaders loaders)
     {
-        var service = GetDexService(save);
+        var service = GetDexService(save, loaders);
         var success = service?.UpdateDexWithSave(dex, staticData) ?? false;
 
         return success;
     }
 
-    public static DexGenService? GetDexService<S>(S save) where S : SaveFile
+    public static DexGenService? GetDexService<S>(S save, DataEntityLoaders loaders) where S : SaveFile
     {
         static DexGenService? notHandled(SaveFile save)
         {
@@ -57,6 +59,7 @@ public class DexService
 
         return save switch
         {
+            FakeSaveFile => new DexMainService(loaders),
             SAV1 sav1 => new Dex123Service(sav1),
             SAV2 sav2 => new Dex123Service(sav2),
             SAV3 sav3 => new Dex123Service(sav3),

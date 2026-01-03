@@ -1,11 +1,11 @@
 
 using PKHeX.Core;
 
-public class DexItemDTO
+public class DexItemDTO : IWithId<string>
 {
     public required string Id { get; set; }
     public required ushort Species { get; set; }
-    public required uint SaveId { get; set; }
+    public required uint SaveId { get; set; }   // main storage = 0
     public required List<DexItemForm> Forms { get; set; }
     // public bool IsSeen { get => Forms.Any(form => form.IsSeen); }
     // public bool IsSeenShiny { get => Forms.Any(form => form.IsSeenShiny); }

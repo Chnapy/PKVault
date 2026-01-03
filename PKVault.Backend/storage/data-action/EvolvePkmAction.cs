@@ -114,7 +114,10 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
             });
         }
 
+        new DexMainService(loaders).EnablePKM(dto.Pkm);
+
         flags.MainPkmVersions = true;
+        flags.Dex = true;
 
         return new DataActionPayload
         {

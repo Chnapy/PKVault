@@ -71,21 +71,25 @@ public class BackupService
         var boxEntities = loaders.boxLoader.GetAllEntities();
         var pkmEntities = loaders.pkmLoader.GetAllEntities();
         var pkmVersionEntities = loaders.pkmVersionLoader.GetAllEntities();
+        var dexEntities = loaders.dexLoader.GetAllEntities();
 
         var bankPath = loaders.bankLoader.FilePath;
         var boxPath = loaders.boxLoader.FilePath;
         var pkmPath = loaders.pkmLoader.FilePath;
         var pkmVersionPath = loaders.pkmVersionLoader.FilePath;
+        var dexPath = loaders.dexLoader.FilePath;
 
         var relativeBankPath = Path.Combine("db", "bank.json");
         var relativeBoxPath = Path.Combine("db", "box.json");
         var relativePkmPath = Path.Combine("db", "pkm.json");
         var relativePkmVersionPath = Path.Combine("db", "pkm-version.json");
+        var relativeDexPath = Path.Combine("db", "dex.json");
 
         var bankContent = JsonSerializer.SerializeToUtf8Bytes(bankEntities, EntityJsonContext.Default.DictionaryStringBankEntity);
         var boxContent = JsonSerializer.SerializeToUtf8Bytes(boxEntities, EntityJsonContext.Default.DictionaryStringBoxEntity);
         var pkmContent = JsonSerializer.SerializeToUtf8Bytes(pkmEntities, EntityJsonContext.Default.DictionaryStringPkmEntity);
         var pkmVersionContent = JsonSerializer.SerializeToUtf8Bytes(pkmVersionEntities, EntityJsonContext.Default.DictionaryStringPkmVersionEntity);
+        var dexContent = JsonSerializer.SerializeToUtf8Bytes(dexEntities, EntityJsonContext.Default.DictionaryStringDexEntity);
 
         return new()
         {
@@ -93,6 +97,7 @@ public class BackupService
             [NormalizePath(relativeBoxPath)] = (TargetPath: NormalizePath(boxPath), FileContent: boxContent),
             [NormalizePath(relativePkmPath)] = (TargetPath: NormalizePath(pkmPath), FileContent: pkmContent),
             [NormalizePath(relativePkmVersionPath)] = (TargetPath: NormalizePath(pkmVersionPath), FileContent: pkmVersionContent),
+            [NormalizePath(relativeDexPath)] = (TargetPath: NormalizePath(dexPath), FileContent: dexContent),
         };
     }
 

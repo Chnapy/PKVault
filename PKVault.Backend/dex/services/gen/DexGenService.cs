@@ -4,7 +4,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 {
     // protected readonly SaveFile save = _save;
 
-    public bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData)
+    public virtual bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData)
     {
         // var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
 
@@ -116,14 +116,16 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
         return new DexItemDTO
         {
-            Id = $"{species}_{save.ID32}",
+            Id = GetDexItemID(species),
             Species = species,
             SaveId = save.ID32,
             Forms = forms,
         };
     }
 
-    protected abstract DexItemForm GetDexItemForm(ushort species, List<PKM> pkmList, byte form, Gender gender);
+    protected string GetDexItemID(ushort species) => $"{species}_{save.ID32}";
+
+    public abstract DexItemForm GetDexItemForm(ushort species, List<PKM> pkmList, byte form, Gender gender);
 
     public abstract void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught);
 }
