@@ -75,7 +75,7 @@
   "details.id": "ID",
   "details.pid": "PID",
   "details.abilities": "Talents",
-  "details.owned-save": "Possédé dans la sauvegarde",
+  "details.owned-save": "Possédé dans la sauvegarde/le stockage",
   "details.attached-pkm-not-found": "Pkm introuvable dans sa sauvegarde rattachée.\nSi attendu, considérez detacher le pkm de sa sauvegarde.\nSinon, vérifier l'intégrité de la sauvegarde.",
   "details.is-duplicate": "Des copies de ce pkm existent dans la sauvegarde, l'action \"déplacer rattaché\" ne sera pas disponible.",
   "storage.move.attached-pkm": "Un déplacement rattaché doit cibler un emplacement vide",

@@ -75,7 +75,7 @@
   "details.id": "ID",
   "details.pid": "PID",
   "details.abilities": "Abilities",
-  "details.owned-save": "Owned in save",
+  "details.owned-save": "Owned in save/storage",
   "details.attached-pkm-not-found": "Pkm not found in attached save.\nIf expected consider detach from save.\nOtherwise check the save integrity.",
   "details.is-duplicate": "Copies of this pkm exists in save, \"move attached\" action won't be available.",
   "storage.move.attached-pkm": "Move attached should target empty slot",

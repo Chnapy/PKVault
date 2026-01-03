@@ -1,15 +1,14 @@
 import { PopoverButton } from '@headlessui/react';
 import React from 'react';
-import { Gender as GenderType } from '../data/sdk/model';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { useStaticData } from '../hooks/use-static-data';
 import { Route } from '../routes/storage';
-import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
 import { StorageItemPopover } from '../ui/storage-item/storage-item-popover';
 import { filterIsDefined } from '../util/filter-is-defined';
 import { StorageSelectContext } from './actions/storage-select-context';
+import { StorageMainItemBase, type StorageMainItemBaseProps } from './storage-main-item-base';
 
 type StorageMainItemProps = {
     pkmId: string;
@@ -41,7 +40,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
         return null;
     }
 
-    const { species, context, form, gender, isAlpha, isShiny, compatibleWithVersions, level } = pkmVersions[ 0 ];
+    const { compatibleWithVersions, level } = pkmVersions[ 0 ];
 
     const hasSaveHeldItems = pageSaves.some(pageSave => pkmVersions.find((version) => version.generation === pageSave.generation)?.heldItem);
     const heldItem = hasSaveHeldItems ? pkmVersions.find((version) => version.id === pkmId)?.heldItem : undefined;
@@ -68,7 +67,6 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
         const evolveSpecies = staticEvolves?.trade[ pkmVersion.version ] ?? staticEvolves?.tradeWithItem[ pkmVersion.heldItemPokeapiName ?? '' ]?.[ pkmVersion.version ];
         return !!evolveSpecies && level >= evolveSpecies.minLevel;
     });
-    const canDetach = !!pkm.saveId;
     const canSynchronize = !!pkm.saveId && !!attachedPkmVersion && !saveSynchronized;
 
     return (
@@ -79,24 +77,14 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
             selected={selected && !selected.saveId && selected.id === pkm.id}
         >
             {props => <PopoverButton
-                as={StorageItem}
+                as={StorageMainItemBase}
                 {...{
                     ...props,
-                    species,
-                    context,
-                    form,
-                    isFemale: gender == GenderType.Female,
-                    isEgg: false,
-                    isAlpha,
-                    isShiny,
-                    isShadow: false,
+                    pkmId,
                     heldItem,
-                    warning: pkmVersions.some((value) => !value.isValid),
-                    nbrVersions: pkmVersions.length,
                     canCreateVersion: canCreateVersions.length > 0,
                     canMoveOutside: canMoveAttached,
                     canEvolve,
-                    attached: canDetach,
                     needSynchronize: canSynchronize,
                     onClick: props.onClick ?? (() => navigate({
                         search: {
@@ -110,7 +98,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
                     })),
                     checked,
                     onCheck,
-                } satisfies StorageItemProps}
+                } satisfies StorageMainItemBaseProps}
             />}
         </StorageItemPopover>
     );
