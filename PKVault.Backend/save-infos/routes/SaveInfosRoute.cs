@@ -6,29 +6,29 @@ namespace PKVault.Backend.saveinfos.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SaveInfosController : ControllerBase
+public class SaveInfosController(DataService dataService, LocalSaveService saveService, StorageService storageService) : ControllerBase
 {
     [HttpGet()]
     public async Task<ActionResult<Dictionary<uint, SaveInfosDTO>>> GetAll()
     {
-        await Program.WaitForSetup();
+        await storageService.WaitForSetup();
 
-        return LocalSaveService.GetAllSaveInfos();
+        return saveService.GetAllSaveInfos();
     }
 
     [HttpPut()]
     public async Task<ActionResult<DataDTO>> Scan()
     {
-        if (!StorageService.HasEmptyActionList())
+        if (!storageService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }
 
-        LocalSaveService.ReadLocalSaves();
+        saveService.ReadLocalSaves();
 
-        await StorageService.ResetDataLoader(true);
+        await storageService.ResetDataLoader(true);
 
-        return await DataDTO.FromDataUpdateFlags(new()
+        return await dataService.CreateDataFromUpdateFlags(new()
         {
             MainPkmVersions = true,
             Saves = [
@@ -64,12 +64,12 @@ public class SaveInfosController : ControllerBase
     [HttpGet("{saveId}/download")]
     public ActionResult Download(uint saveId)
     {
-        if (!StorageService.HasEmptyActionList())
+        if (!storageService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }
 
-        var save = LocalSaveService.SaveById[saveId].Clone();
+        var save = saveService.SaveById[saveId].Clone();
         // var path = LocalSaveService.SaveByPath.Keys.ToList().Find(key => LocalSaveService.SaveByPath[key].ID32 == saveId);
 
         var filename = save.Metadata.FileName;

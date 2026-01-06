@@ -1,15 +1,15 @@
-public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : DataLoader(_loaders)
+public class DataMemoryLoader(LocalSaveService saveService, PkmConvertService pkmConvertService, DataEntityLoaders _loaders, DateTime startTime) : DataLoader(_loaders)
 {
-    public static DataMemoryLoader Create()
+    public static DataMemoryLoader Create(LocalSaveService saveService, WarningsService warningsService, PkmConvertService pkmConvertService)
     {
         var bankLoader = new BankLoader();
         var boxLoader = new BoxLoader();
         var pkmLoader = new PkmLoader();
-        var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
+        var pkmVersionLoader = new PkmVersionLoader(warningsService, pkmLoader);
         var dexLoader = new DexLoader();
 
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
-        LocalSaveService.SaveById.Values.ToList().ForEach((_save) =>
+        saveService.SaveById.Values.ToList().ForEach((_save) =>
         {
             // TODO find a cleaner way
             var save = _save.Clone();
@@ -18,7 +18,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
             {
                 Save = save,
                 Boxes = new SaveBoxLoader(save),
-                Pkms = new SavePkmLoader(save, pkmLoader, pkmVersionLoader)
+                Pkms = new SavePkmLoader(warningsService, pkmConvertService, save, pkmLoader, pkmVersionLoader)
             });
         });
 
@@ -34,7 +34,7 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
             saveLoadersDict = saveLoadersDict,
         };
 
-        return new(loaders, startTime);
+        return new(saveService, pkmConvertService, loaders, startTime);
     }
 
     public readonly DateTime startTime = startTime;
@@ -59,14 +59,14 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
 
     public async Task CheckSaveToSynchronize()
     {
-        var time = LogUtil.Time($"Check saves to synchronize ({LocalSaveService.SaveById.Count})");
-        foreach (var saveId in LocalSaveService.SaveById.Keys)
+        var time = LogUtil.Time($"Check saves to synchronize ({saveService.SaveById.Count})");
+        foreach (var saveId in saveService.SaveById.Keys)
         {
             var pkmsToSynchronize = SynchronizePkmAction.GetPkmsToSynchronize(loaders, saveId);
             if (pkmsToSynchronize.Length > 0)
             {
                 await AddAction(
-                    new SynchronizePkmAction(pkmsToSynchronize),
+                    new SynchronizePkmAction(pkmConvertService, pkmsToSynchronize),
                     null
                 );
             }

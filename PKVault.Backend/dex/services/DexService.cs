@@ -1,10 +1,10 @@
 using PKHeX.Core;
 
-public class DexService
+public class DexService(StorageService storageService, StaticDataService staticDataService)
 {
-    public static async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex()
+    public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex()
     {
-        var saveDict = (await StorageService.GetLoader()).loaders.saveLoadersDict;
+        var saveDict = (await storageService.GetLoader()).loaders.saveLoadersDict;
         if (saveDict.Count == 0)
         {
             return [];
@@ -13,20 +13,20 @@ public class DexService
         return await GetDex([FakeSaveFile.Default.ID32, .. saveDict.Keys]);
     }
 
-    public static async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex(uint[] saveIds)
+    public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex(uint[] saveIds)
     {
         if (saveIds.Length == 0)
         {
             return [];
         }
 
-        var loaders = (await StorageService.GetLoader()).loaders;
+        var loaders = (await storageService.GetLoader()).loaders;
 
         var saveLoadersDict = loaders.saveLoadersDict;
 
         var saves = saveIds.Select(id => id == FakeSaveFile.Default.ID32 ? FakeSaveFile.Default : saveLoadersDict[id].Save).ToList();
 
-        var staticData = await StaticDataService.GetStaticData();
+        var staticData = await staticDataService.GetStaticData();
 
         var maxSpecies = saves.Max(save => save.MaxSpeciesID);
 

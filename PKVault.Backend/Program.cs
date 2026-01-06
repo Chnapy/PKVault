@@ -7,51 +7,16 @@ namespace PKVault.Backend;
 
 public class Program
 {
-    private static readonly SemaphoreSlim _setupLock = new(1, 1);
-    private static Task? SetupTask;
-
-    public static async Task WaitForSetup()
-    {
-        if (SetupTask != null)
-            await SetupTask;
-
-        await _setupLock.WaitAsync();
-        try
-        {
-            SetupTask ??= Task.Run(async () =>
-            {
-                await StaticDataService.GetStaticData();
-                await StorageService.DataSetupMigrateClean();
-                try
-                {
-                    LocalSaveService.ReadLocalSaves();
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine(ex);
-                }
-                await StorageService.ResetDataLoader(true);
-                await WarningsService.CheckWarnings();
-            });
-        }
-        finally
-        {
-            _setupLock.Release();
-        }
-
-        await SetupTask;
-    }
-
     public static async Task Main(string[] args)
     {
         LogUtil.Initialize();
 
         Copyright();
-        var setupDone = await SetupData(args);
 
+        var app = PrepareWebApp(5000);
+        var setupDone = await SetupData(app, args);
         if (setupDone)
         {
-            var app = PrepareWebApp(5000);
             await app.RunAsync();
         }
 
@@ -64,11 +29,11 @@ public class Program
         + "\nThis program comes with ABSOLUTELY NO WARRANTY."
         + "\nThis is free software, and you are welcome to redistribute it under certain conditions."
         + "\nFull license can be accessed here: https://github.com/Chnapy/PKVault/blob/main/LICENSE"
-        + $"\nPKVault v{SettingsService.AppSettings.Version} BuildID = {SettingsService.AppSettings.BuildID}"
+        + $"\nPKVault v{SettingsService.BaseSettings.Version} BuildID = {SettingsService.BaseSettings.BuildID}"
         + $"\nCurrent time UTC = {DateTime.UtcNow}\n");
     }
 
-    public static async Task<bool> SetupData(string[] args)
+    public static async Task<bool> SetupData(IHost host, string[] args)
     {
         var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
@@ -142,10 +107,11 @@ public class Program
         // }
 
 #if MODE_GEN_POKEAPI
-            await GenPokeapi.GenerateFiles();
+            await host.Services.GetRequiredService<GenPokeapiService>().GenerateFiles();
             return false;
 #elif MODE_DEFAULT
-        await WaitForSetup();
+
+        await host.Services.GetRequiredService<StorageService>().WaitForSetup();
 
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
@@ -153,13 +119,13 @@ public class Program
 
         if (args.Length > 0 && args[0] == "clean")
         {
-            await StorageService.CleanMainStorageFiles();
+            await host.Services.GetRequiredService<StorageService>().CleanMainStorageFiles();
             return false;
         }
 
         if (args.Length > 0 && args[0] == "test-bkp")
         {
-            BackupService.CreateBackup();
+            host.Services.GetRequiredService<BackupService>().CreateBackup();
             return false;
         }
 
@@ -176,10 +142,10 @@ public class Program
 
         ConfigureServices(builder.Services);
 
-        var certificate = SettingsService.AppSettings.GetHttpsCertPemPathPath() != null && SettingsService.AppSettings.GetHttpsKeyPemPathPath() != null
+        var certificate = SettingsService.BaseSettings.GetHttpsCertPemPathPath() != null && SettingsService.BaseSettings.GetHttpsKeyPemPathPath() != null
             ? X509Certificate2.CreateFromPem(
-                File.ReadAllText(SettingsService.AppSettings.GetHttpsCertPemPathPath()!),
-                File.ReadAllText(SettingsService.AppSettings.GetHttpsKeyPemPathPath()!)
+                File.ReadAllText(SettingsService.BaseSettings.GetHttpsCertPemPathPath()!),
+                File.ReadAllText(SettingsService.BaseSettings.GetHttpsKeyPemPathPath()!)
                 )
             : null;
 
@@ -191,7 +157,7 @@ public class Program
                 {
                     listenOptions.UseHttps(certificate);
                 }
-                else if (SettingsService.AppSettings.SettingsMutable.HTTPS_NOCERT == true)
+                else if (SettingsService.BaseSettings.SettingsMutable.HTTPS_NOCERT == true)
                 {
                     listenOptions.UseHttps();
                 }
@@ -201,7 +167,7 @@ public class Program
 
         var app = builder.Build();
 
-        ConfigureAppBuilder(app, certificate != default || SettingsService.AppSettings.SettingsMutable.HTTPS_NOCERT == true);
+        ConfigureAppBuilder(app, certificate != default || SettingsService.BaseSettings.SettingsMutable.HTTPS_NOCERT == true);
 
         return app;
     }
@@ -218,6 +184,17 @@ public class Program
             {
                 options.JsonSerializerOptions.TypeInfoResolver = RouteJsonContext.Default;
             });
+
+        services.AddSingleton<GenPokeapiService>();
+        services.AddSingleton<StorageService>();
+        services.AddSingleton<DexService>();
+        services.AddSingleton<WarningsService>();
+        services.AddSingleton<BackupService>();
+        services.AddSingleton<LocalSaveService>();
+        services.AddSingleton<StaticDataService>();
+        services.AddSingleton<SettingsService>();
+        services.AddSingleton<DataService>();
+        services.AddSingleton<PkmConvertService>();
 
 #if DEBUG && MODE_DEFAULT
         services.AddEndpointsApiExplorer();

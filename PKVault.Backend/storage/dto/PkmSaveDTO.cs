@@ -25,7 +25,8 @@ public class PkmSaveDTO : BasePkmVersionDTO
             BoxId = BoxId,
             BoxSlot = BoxSlot,
             PkmVersionId = PkmVersionId,
-            HasTradeEvolve = HasTradeEvolve
+            IsDuplicate = IsDuplicate,
+            HasTradeEvolve = HasTradeEvolve,
         };
     }
 
@@ -49,7 +50,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     public bool IsStarter { get => Save.GetBoxSlotFlags(BoxId, BoxSlot).HasFlag(StorageSlotSource.Starter); }
 
-    public bool IsDuplicate { get => WarningsService.GetWarningsDTO().PkmDuplicateWarnings.Any(warn => warn.SaveId == SaveId && warn.DuplicateIdBases.Contains(IdBase)); }
+    public bool IsDuplicate { get; set; }
 
     public new bool IsValid { get => base.IsValid && !IsDuplicate; }
 
@@ -82,7 +83,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
             try
             {
                 return la.Report(
-                    SettingsService.AppSettings.GetSafeLanguage()
+                    SettingsService.BaseSettings.GetSafeLanguage()
                 );
             }
             catch (Exception ex)
@@ -110,7 +111,10 @@ public class PkmSaveDTO : BasePkmVersionDTO
     [JsonIgnore()]
     public required SaveFile Save;
 
-    public void RefreshPkmVersionId(PkmLoader pkmLoader, PkmVersionLoader pkmVersionLoader)
+    private PkmSaveDTO()
+    { }
+
+    public void RefreshExtras(WarningsService warningsService, PkmLoader pkmLoader, PkmVersionLoader pkmVersionLoader)
     {
         PkmVersionId = null;
         var pkmVersion = pkmVersionLoader.GetDto(IdBase);
@@ -123,6 +127,9 @@ public class PkmSaveDTO : BasePkmVersionDTO
                 PkmVersionId = pkmVersion.Id;
             }
         }
+
+        IsDuplicate = warningsService.GetWarningsDTO().PkmDuplicateWarnings.Any(warn =>
+            warn.SaveId == SaveId && warn.DuplicateIdBases.Contains(IdBase));
     }
 
     protected override byte GetGeneration()

@@ -1,8 +1,8 @@
 using PKHeX.Core;
 
-public class WarningsService
+public class WarningsService(StorageService storageService, LocalSaveService saveService)
 {
-    private static WarningsDTO WarningsDTO = new()
+    private WarningsDTO WarningsDTO = new()
     {
         SaveChangedWarnings = [],
         PlayTimeWarnings = [],
@@ -11,12 +11,12 @@ public class WarningsService
         SaveDuplicateWarnings = [],
     };
 
-    public static WarningsDTO GetWarningsDTO()
+    public WarningsDTO GetWarningsDTO()
     {
         return WarningsDTO;
     }
 
-    public static async Task CheckWarnings()
+    public async Task CheckWarnings()
     {
         var logtime = LogUtil.Time($"Warnings check");
 
@@ -37,11 +37,11 @@ public class WarningsService
         logtime();
     }
 
-    private static async Task<List<SaveChangedWarning>> CheckSaveChangedWarnings()
+    private async Task<List<SaveChangedWarning>> CheckSaveChangedWarnings()
     {
         var warns = new List<SaveChangedWarning>();
 
-        var loader = await StorageService.GetLoader();
+        var loader = await storageService.GetLoader();
 
         var startTime = loader.startTime;
 
@@ -54,7 +54,7 @@ public class WarningsService
             .Where(saveLoaders => saveLoaders.Boxes.HasWritten || saveLoaders.Pkms.HasWritten)
             .Where(saveLoaders =>
             {
-                var path = LocalSaveService.SaveByPath.Keys.ToList().Find(path => LocalSaveService.SaveByPath[path].ID32 == saveLoaders.Save.ID32);
+                var path = saveService.SaveByPath.Keys.ToList().Find(path => saveService.SaveByPath[path].ID32 == saveLoaders.Save.ID32);
                 if (path == default)
                 {
                     throw new KeyNotFoundException($"Path not found for given save {saveLoaders.Save.ID32}");
@@ -67,7 +67,7 @@ public class WarningsService
             .Select(saveLoaders => new SaveChangedWarning() { SaveId = saveLoaders.Save.ID32 })];
     }
 
-    private static List<PlayTimeWarning> CheckPlayTimeWarning()
+    private List<PlayTimeWarning> CheckPlayTimeWarning()
     {
         var warns = new List<PlayTimeWarning>();
 
@@ -111,11 +111,11 @@ public class WarningsService
         return warns;
     }
 
-    private static async Task<List<PkmVersionWarning>> CheckPkmVersionWarnings()
+    private async Task<List<PkmVersionWarning>> CheckPkmVersionWarnings()
     {
         var warns = new List<PkmVersionWarning>();
 
-        var loader = await StorageService.GetLoader();
+        var loader = await storageService.GetLoader();
 
         var pkms = loader.loaders.pkmLoader.GetAllDtos();
 
@@ -159,9 +159,9 @@ public class WarningsService
             .OfType<PkmVersionWarning>()];
     }
 
-    private static async Task<List<PkmDuplicateWarning>> CheckSavePkmDuplicates()
+    private async Task<List<PkmDuplicateWarning>> CheckSavePkmDuplicates()
     {
-        var loader = await StorageService.GetLoader();
+        var loader = await storageService.GetLoader();
 
         if (loader.loaders.saveLoadersDict.Count == 0)
         {
@@ -193,9 +193,9 @@ public class WarningsService
         return (await Task.WhenAll(tasks)).ToList().FindAll(warn => warn.DuplicateIdBases.Length > 0);
     }
 
-    private static async Task<List<SaveDuplicateWarning>> CheckSaveDuplicates()
+    private async Task<List<SaveDuplicateWarning>> CheckSaveDuplicates()
     {
-        var loader = await StorageService.GetLoader();
+        var loader = await storageService.GetLoader();
 
         if (loader.loaders.saveLoadersDict.Count == 0)
         {
@@ -204,7 +204,7 @@ public class WarningsService
 
         var tasks = loader.loaders.saveLoadersDict.Values.Select(async (saveLoader) =>
         {
-            var paths = LocalSaveService.SaveByPath.ToList()
+            var paths = saveService.SaveByPath.ToList()
                 .FindAll(entry => entry.Value.ID32 == saveLoader.Save.ID32)
                 .Select(entry => entry.Key);
 
@@ -218,7 +218,7 @@ public class WarningsService
         return (await Task.WhenAll(tasks)).ToList().FindAll(warn => warn.Paths.Length > 1);
     }
 
-    // private static int GetSavePlayTimeS(SaveFile save)
+    // private int GetSavePlayTimeS(SaveFile save)
     // {
     //     return save.PlayedHours * 60 * 60
     //     + save.PlayedMinutes * 60

@@ -1,6 +1,7 @@
 using PKHeX.Core;
 
 public class MovePkmBankAction(
+    WarningsService warningsService, PkmConvertService pkmConvertService,
     string[] pkmIds, uint? sourceSaveId,
     string bankId,
     bool attached
@@ -142,7 +143,7 @@ public class MovePkmBankAction(
 
         if (attached)
         {
-            var hasDuplicates = WarningsService.GetWarningsDTO().PkmDuplicateWarnings.Any(warn => warn.SaveId == sourceSaveId && warn.DuplicateIdBases.Contains(pkmId));
+            var hasDuplicates = warningsService.GetWarningsDTO().PkmDuplicateWarnings.Any(warn => warn.SaveId == sourceSaveId && warn.DuplicateIdBases.Contains(pkmId));
             if (hasDuplicates)
             {
                 throw new ArgumentException($"Target save already have a pkm with same ID, move attached cannot be done.");
@@ -227,7 +228,7 @@ public class MovePkmBankAction(
                 Generation = savePkm.Generation,
                 Filepath = PKMLoader.GetPKMFilepath(savePkm.Pkm),
             };
-            var pkmVersionDto = PkmVersionDTO.FromEntity(pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
+            var pkmVersionDto = PkmVersionDTO.FromEntity(warningsService, pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
 
             loaders.pkmLoader.WriteDto(pkmDtoToCreate);
             loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
@@ -241,7 +242,7 @@ public class MovePkmBankAction(
         // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmDto!.SaveId != default)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(loaders, flags, [(pkmVersionEntity.PkmId, null)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersionEntity.PkmId, null)]);
 
             if (!attached)
             {

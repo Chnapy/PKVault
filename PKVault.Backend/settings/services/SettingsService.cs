@@ -1,10 +1,11 @@
 using System.Text.Json;
 
-public class SettingsService
+public class SettingsService(StorageService storageService, LocalSaveService saveService)
 {
-    public static SettingsDTO AppSettings = GetSettings();
+    // Most of settings available as static
+    public static SettingsDTO BaseSettings = ReadBaseSettings();
 
-    public static async Task UpdateSettings(SettingsMutableDTO settingsMutable)
+    public async Task UpdateSettings(SettingsMutableDTO settingsMutable)
     {
         string text = JsonSerializer.Serialize(settingsMutable, SettingsMutableDTOJsonContext.Default.SettingsMutableDTO);
         Console.WriteLine(text);
@@ -12,14 +13,23 @@ public class SettingsService
         CheckSettingsFile();
         File.WriteAllText(SettingsDTO.FilePath, text);
 
-        AppSettings = GetSettings();
+        BaseSettings = GetSettings();
 
-        LocalSaveService.ReadLocalSaves();
+        saveService.ReadLocalSaves();
 
-        await StorageService.ResetDataLoader(true);
+        await storageService.ResetDataLoader(true);
     }
 
-    private static SettingsDTO GetSettings()
+    // Full settings
+    public SettingsDTO GetSettings()
+    {
+        BaseSettings.CanUpdateSettings = storageService.HasEmptyActionList();
+        BaseSettings.CanScanSaves = storageService.HasEmptyActionList();
+
+        return BaseSettings;
+    }
+
+    private static SettingsDTO ReadBaseSettings()
     {
         CheckSettingsFile();
 

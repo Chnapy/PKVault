@@ -2,18 +2,23 @@ using PKHeX.Core;
 
 public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
 {
+    private readonly WarningsService warningsService;
+
     public readonly PKMMemoryLoader pkmFileLoader;
     private PkmLoader pkmLoader;
 
     private Dictionary<string, Dictionary<string, PkmVersionEntity>>? entitiesByPkmId = null;
 
     public PkmVersionLoader(
+        WarningsService _warningsService,
         PkmLoader _pkmLoader
     ) : base(
-        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.AppSettings.SettingsMutable.DB_PATH, "pkm-version.json")),
+        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.BaseSettings.SettingsMutable.DB_PATH, "pkm-version.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringPkmVersionEntity
     )
     {
+        warningsService = _warningsService;
+
         pkmLoader = _pkmLoader;
         pkmFileLoader = new(pkmLoader, [.. GetAllEntities().Values]);
     }
@@ -121,7 +126,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         var pkmDto = pkmLoader.GetDto(entity.PkmId);
         var pkm = GetPkmVersionEntityPkm(entity);
 
-        return PkmVersionDTO.FromEntity(entity, pkm, pkmDto!);
+        return PkmVersionDTO.FromEntity(warningsService, entity, pkm, pkmDto!);
     }
 
     protected override PkmVersionEntity GetEntityFromDTO(PkmVersionDTO dto)

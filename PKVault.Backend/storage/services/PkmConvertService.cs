@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public class PkmConvertService
 {
-    public static PKM GetConvertedPkm(PKM sourcePkm, uint generation, uint? intermediatePid)
+    public PKM GetConvertedPkm(PKM sourcePkm, uint generation, uint? intermediatePid)
     {
         PKM? blankPkm = generation switch
         {
@@ -26,7 +26,7 @@ public class PkmConvertService
         return GetConvertedPkm(sourcePkm, blankPkm, intermediatePid);
     }
 
-    public static PKM GetConvertedPkm(PKM sourcePkm, PKM blankPkm, uint? intermediatePid)
+    public PKM GetConvertedPkm(PKM sourcePkm, PKM blankPkm, uint? intermediatePid)
     {
         EntityConverter.AllowIncompatibleConversion = EntityCompatibilitySetting.AllowIncompatibleSane;
 
@@ -67,7 +67,7 @@ public class PkmConvertService
         return destPkm;
     }
 
-    private static PKM GetIntermediatePkmConvert(PKM sourcePkm, uint generation, uint? intermediatePid)
+    private PKM GetIntermediatePkmConvert(PKM sourcePkm, uint generation, uint? intermediatePid)
     {
         // G1-2 to G3+
         if (sourcePkm.Format <= 2 && generation > 2)
@@ -78,7 +78,7 @@ public class PkmConvertService
         return sourcePkm;
     }
 
-    private static PKM GetIntermediateConvertG2ToG3(PKM sourcePkm, uint? intermediatePid)
+    private PKM GetIntermediateConvertG2ToG3(PKM sourcePkm, uint? intermediatePid)
     {
         var pkmIntermediate = EntityConverter.ConvertToType(sourcePkm, new PK3().GetType(), out var intermediateResult);
         Console.WriteLine($"Convert-intermediate result={intermediateResult}");
@@ -133,13 +133,13 @@ public class PkmConvertService
         return pkmIntermediate;
     }
 
-    public static void PassAllToPkm(PKM sourcePkm, PKM destPkm)
+    public void PassAllToPkm(PKM sourcePkm, PKM destPkm)
     {
         PassIDBreakableToPkm(sourcePkm, destPkm);
         PassAllToPkmSafe(sourcePkm, destPkm);
     }
 
-    public static void PassAllToPkmSafe(PKM sourcePkm, PKM destPkm)
+    public void PassAllToPkmSafe(PKM sourcePkm, PKM destPkm)
     {
         PassStaticsToPkm(sourcePkm, destPkm);
         PassDynamicsToPkm(sourcePkm, destPkm);
@@ -150,7 +150,7 @@ public class PkmConvertService
         destPkm.RefreshChecksum();
     }
 
-    public static void PassAllDynamicsNItemToPkm(PKM sourcePkm, PKM destPkm)
+    public void PassAllDynamicsNItemToPkm(PKM sourcePkm, PKM destPkm)
     {
         PassDynamicsToPkm(sourcePkm, destPkm);
         PassHeldItemToPkm(sourcePkm, destPkm);
@@ -159,7 +159,7 @@ public class PkmConvertService
         destPkm.RefreshChecksum();
     }
 
-    private static void PassIDBreakableToPkm(PKM sourcePkm, PKM destPkm)
+    private void PassIDBreakableToPkm(PKM sourcePkm, PKM destPkm)
     {
         Func<int, int> convertIVFn = value => value;
         if (sourcePkm.Format <= 2 && destPkm.Format > 2)
@@ -182,7 +182,7 @@ public class PkmConvertService
         destPkm.SetIVs(ivs);
     }
 
-    private static void PassStaticsToPkm(PKM sourcePkm, PKM destPkm)
+    private void PassStaticsToPkm(PKM sourcePkm, PKM destPkm)
     {
         if (sourcePkm.Language != 0)
         {
@@ -237,7 +237,7 @@ public class PkmConvertService
         }
     }
 
-    public static void PassDynamicsToPkm(PKM sourcePkm, PKM destPkm)
+    public void PassDynamicsToPkm(PKM sourcePkm, PKM destPkm)
     {
         ApplyNicknameToPkm(destPkm, sourcePkm.Nickname, sourcePkm.IsNicknamed);
 
@@ -275,7 +275,7 @@ public class PkmConvertService
         ApplyEVsAVsToPkm(destPkm, evs);
     }
 
-    private static void PassHeldItemToPkm(PKM sourcePkm, PKM destPkm)
+    private void PassHeldItemToPkm(PKM sourcePkm, PKM destPkm)
     {
         if (destPkm is PB7 pb7)
         {
@@ -288,14 +288,14 @@ public class PkmConvertService
         // Console.WriteLine($"HELD-ITEM = {destPkm.HeldItem}");
     }
 
-    public static void PassMovesToPkm(PKM sourcePkm, PKM destPkm)
+    public void PassMovesToPkm(PKM sourcePkm, PKM destPkm)
     {
         Span<ushort> moves = stackalloc ushort[4];
         sourcePkm.GetMoves(moves);
         ApplyMovesToPkm(destPkm, moves);
     }
 
-    public static void ApplyNicknameToPkm(PKM pkm, string nickname, bool sourcePkmIsNicknamed)
+    public void ApplyNicknameToPkm(PKM pkm, string nickname, bool sourcePkmIsNicknamed)
     {
         var language = GetPkmLanguage(pkm);
 
@@ -329,7 +329,7 @@ public class PkmConvertService
         // Console.WriteLine($"NICKNAME: {isNicknamed} {pkm.Nickname} expected={nickname} default={defaultNickname}");
     }
 
-    public static void ApplyEVsAVsToPkm(PKM pkm, Span<int> evs)
+    public void ApplyEVsAVsToPkm(PKM pkm, Span<int> evs)
     {
         if (pkm is PB7 pb7)
         {
@@ -344,7 +344,7 @@ public class PkmConvertService
         }
     }
 
-    public static void ApplyAbilityToPkm(PKM pkm)
+    public void ApplyAbilityToPkm(PKM pkm)
     {
         bool hasAbilityOrPidIssue() => BasePkmVersionDTO.GetLegalitySafe(pkm).Results.Any(result =>
             !result.Valid
@@ -356,33 +356,33 @@ public class PkmConvertService
         }
     }
 
-    public static void ApplyMovesToPkm(PKM pkm, Span<ushort> moves)
+    public void ApplyMovesToPkm(PKM pkm, Span<ushort> moves)
     {
         pkm.SetMoves(moves);
         pkm.FixMoves();
     }
 
-    private static int ConvertEVG2ToG3(float evValue)
+    private int ConvertEVG2ToG3(float evValue)
     {
         return (int)(evValue / 65535 * 255);
     }
 
-    private static int ConvertEVG3ToG2(float evValue)
+    private int ConvertEVG3ToG2(float evValue)
     {
         return (int)(evValue * 65535 / 255);
     }
 
-    private static int ConvertIVG2ToG3(int ivValue)
+    private int ConvertIVG2ToG3(int ivValue)
     {
         return ivValue * 2 + (ivValue % 2);
     }
 
-    private static int ConvertIVG3ToG2(int ivValue)
+    private int ConvertIVG3ToG2(int ivValue)
     {
         return ivValue / 2;
     }
 
-    public static int GetPkmLanguage(PKM pkm)
+    public int GetPkmLanguage(PKM pkm)
     {
         if (pkm is GBPKM gbpkm)
         {

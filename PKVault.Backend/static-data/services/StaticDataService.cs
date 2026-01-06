@@ -5,12 +5,12 @@ public class StaticDataService
 {
     public static StaticDataDTO staticData;
 
-    public static async Task<StaticDataDTO> GetStaticData()
+    public async Task<StaticDataDTO> GetStaticData()
     {
         var client = new AssemblyClient();
 
         staticData = (await client.GetAsyncJsonGz(
-            GetStaticDataPathParts(SettingsService.AppSettings.GetSafeLanguage()),
+            GetStaticDataPathParts(SettingsService.BaseSettings.GetSafeLanguage()),
             StaticDataJsonContext.Default.StaticDataDTO
         ))!;
 
@@ -19,11 +19,11 @@ public class StaticDataService
 
     public static List<string> GetGeneratedPathParts() => ["pokeapi", "generated"];
 
-    public static List<string> GetStaticDataPathParts(string lang) => [
+    public List<string> GetStaticDataPathParts(string lang) => [
         ..GetGeneratedPathParts(), "api-data", $"StaticData_{lang}.json.gz"
     ];
 
-    public static async Task<Dictionary<byte, StaticVersion>> GetStaticVersions(string lang)
+    public async Task<Dictionary<byte, StaticVersion>> GetStaticVersions(string lang)
     {
         var time = LogUtil.Time("static-data process versions");
         List<Task<StaticVersion>> tasks = [];
@@ -63,7 +63,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<ushort, StaticSpecies>> GetStaticSpecies(string lang)
+    public async Task<Dictionary<ushort, StaticSpecies>> GetStaticSpecies(string lang)
     {
         var time = LogUtil.Time($"static-data {lang} process species");
         var speciesNames = GameInfo.GetStrings(lang).Species;
@@ -457,7 +457,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticStat>> GetStaticStats(string lang)
+    public async Task<Dictionary<int, StaticStat>> GetStaticStats(string lang)
     {
         var time = LogUtil.Time("static-data process stats");
         List<Task<StaticStat>> tasks = [];
@@ -486,7 +486,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static Dictionary<int, StaticType> GetStaticTypes(string lang)
+    public Dictionary<int, StaticType> GetStaticTypes(string lang)
     {
         var typeNames = GameInfo.GetStrings(lang).Types;
         var dict = new Dictionary<int, StaticType>();
@@ -505,7 +505,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticMove>> GetStaticMoves(string lang)
+    public async Task<Dictionary<int, StaticMove>> GetStaticMoves(string lang)
     {
         var time = LogUtil.Time($"static-data {lang} process moves");
         var moveNames = GameInfo.GetStrings(lang).Move;
@@ -610,7 +610,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticNature>> GetStaticNatures(string lang)
+    public async Task<Dictionary<int, StaticNature>> GetStaticNatures(string lang)
     {
         var time = LogUtil.Time($"static-data {lang} process natures");
         var naturesNames = GameInfo.GetStrings(lang).Natures;
@@ -648,7 +648,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static Dictionary<int, StaticAbility> GetStaticAbilities(string lang)
+    public Dictionary<int, StaticAbility> GetStaticAbilities(string lang)
     {
         var abilitiesNames = GameInfo.GetStrings(lang).abilitylist;
         var dict = new Dictionary<int, StaticAbility>();
@@ -667,7 +667,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<int, StaticItem>> GetStaticItems(string lang)
+    public async Task<Dictionary<int, StaticItem>> GetStaticItems(string lang)
     {
         var time = LogUtil.Time($"static-data {lang} process items");
         var itemNames = GameInfo.GetStrings(lang).itemlist;
@@ -722,7 +722,7 @@ public class StaticDataService
         return dict;
     }
 
-    public static async Task<Dictionary<ushort, StaticEvolve>> GetStaticEvolves()
+    public async Task<Dictionary<ushort, StaticEvolve>> GetStaticEvolves()
     {
         var staticEvolves = new Dictionary<ushort, StaticEvolve>();
 
@@ -826,7 +826,7 @@ public class StaticDataService
         return staticEvolves;
     }
 
-    public static async Task<Dictionary<byte, StaticGeneration>> GetStaticGenerations(string lang)
+    public async Task<Dictionary<byte, StaticGeneration>> GetStaticGenerations(string lang)
     {
         var staticGenerations = new Dictionary<byte, StaticGeneration>();
 
@@ -869,7 +869,7 @@ public class StaticDataService
         return GetPokeapiRelativePath("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png");
     }
 
-    public static string GetLugiaShadowSprite()
+    public string GetLugiaShadowSprite()
     {
         return $"custom-sprites/pokemon/shadow/{(ushort)Species.Lugia}.png";
     }
@@ -934,7 +934,7 @@ public class StaticDataService
             }).Distinct());
     }
 
-    private static async Task<string[]> GetVersionRegionName(GameVersion version, string lang)
+    private async Task<string[]> GetVersionRegionName(GameVersion version, string lang)
     {
         var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
 

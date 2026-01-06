@@ -1,6 +1,9 @@
 using PKHeX.Core;
 
-public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
+public class EvolvePkmAction(
+    StaticDataService staticDataService, PkmConvertService pkmConvertService,
+    uint? saveId, string[] ids
+) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
@@ -50,7 +53,7 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
         if (dto.PkmVersionId != null)
         {
             var pkmVersion = loaders.pkmVersionLoader.GetEntity(dto.PkmVersionId);
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(loaders, flags, [(pkmVersion.PkmId, dto.Id)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersion.PkmId, dto.Id)]);
         }
 
         flags.Saves.Add(new()
@@ -105,7 +108,7 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
 
         if (dto.PkmDto.SaveId != null)
         {
-            await SynchronizePkmAction.SynchronizePkmVersionToSave(loaders, flags, [(dto.PkmId, null)]);
+            await SynchronizePkmAction.SynchronizePkmVersionToSave(pkmConvertService, loaders, flags, [(dto.PkmId, null)]);
 
             flags.Saves.Add(new()
             {
@@ -126,9 +129,9 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
         };
     }
 
-    private static async Task<(ushort evolveSpecies, bool evolveByItem)> GetEvolve(BasePkmVersionDTO dto)
+    private async Task<(ushort evolveSpecies, bool evolveByItem)> GetEvolve(BasePkmVersionDTO dto)
     {
-        var staticData = await StaticDataService.GetStaticData();
+        var staticData = await staticDataService.GetStaticData();
 
         if (staticData.Evolves.TryGetValue(dto.Species, out var staticEvolve))
         {
@@ -155,7 +158,7 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
         throw new ArgumentException("Pkm cannot evolve");
     }
 
-    private static void UpdatePkm(PKM pkm, ushort evolveSpecies, bool evolveByItem)
+    private void UpdatePkm(PKM pkm, ushort evolveSpecies, bool evolveByItem)
     {
         // Console.WriteLine($"EVOLVE TO {evolveSpecies}");
 
@@ -164,7 +167,7 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
             throw new Exception($"Evolve species not defined");
         }
 
-        var currentNickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, PkmConvertService.GetPkmLanguage(pkm), pkm.Format);
+        var currentNickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, pkmConvertService.GetPkmLanguage(pkm), pkm.Format);
         var isNicknamed = pkm.IsNicknamed && !pkm.Nickname.Equals(currentNickname, StringComparison.InvariantCultureIgnoreCase);
 
         if (pkm.Species == evolveSpecies)
@@ -181,12 +184,12 @@ public class EvolvePkmAction(uint? saveId, string[] ids) : DataAction
 
         if (!isNicknamed)
         {
-            pkm.Nickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, PkmConvertService.GetPkmLanguage(pkm), pkm.Format);
+            pkm.Nickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, pkmConvertService.GetPkmLanguage(pkm), pkm.Format);
         }
 
-        PkmConvertService.ApplyNicknameToPkm(pkm, pkm.Nickname, true);
+        pkmConvertService.ApplyNicknameToPkm(pkm, pkm.Nickname, true);
 
-        PkmConvertService.ApplyAbilityToPkm(pkm);
+        pkmConvertService.ApplyAbilityToPkm(pkm);
 
         pkm.ResetPartyStats();
         pkm.RefreshChecksum();

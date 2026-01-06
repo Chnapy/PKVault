@@ -31,7 +31,7 @@ public abstract class PKMLoader
 
     public static string GetPKMFilepath(PKM pkm)
     {
-        return MatcherUtil.NormalizePath(Path.Combine(SettingsService.AppSettings.SettingsMutable.STORAGE_PATH, pkm.Format.ToString(), GetPKMFilename(pkm)));
+        return MatcherUtil.NormalizePath(Path.Combine(SettingsService.BaseSettings.SettingsMutable.STORAGE_PATH, pkm.Format.ToString(), GetPKMFilename(pkm)));
     }
 
     private static string GetPKMFilename(PKM pkm)

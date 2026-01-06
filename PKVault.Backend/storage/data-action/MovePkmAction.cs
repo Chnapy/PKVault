@@ -1,6 +1,7 @@
 using PKHeX.Core;
 
 public class MovePkmAction(
+    WarningsService warningsService, StaticDataService staticDataService, PkmConvertService pkmConvertService,
     string[] pkmIds, uint? sourceSaveId,
     uint? targetSaveId, int targetBoxId, int[] targetBoxSlots,
     bool attached
@@ -252,7 +253,7 @@ public class MovePkmAction(
 
         if (attached)
         {
-            var hasDuplicates = WarningsService.GetWarningsDTO().PkmDuplicateWarnings.Any(warn => warn.SaveId == sourceSaveId && warn.DuplicateIdBases.Contains(pkmId));
+            var hasDuplicates = warningsService.GetWarningsDTO().PkmDuplicateWarnings.Any(warn => warn.SaveId == sourceSaveId && warn.DuplicateIdBases.Contains(pkmId));
             if (hasDuplicates)
             {
                 throw new ArgumentException($"Target save already have a pkm with same ID, move attached cannot be done.");
@@ -354,7 +355,7 @@ public class MovePkmAction(
         }
 
         var pkmSaveDTO = PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, targetBoxId, targetBoxSlot);
-        pkmSaveDTO.RefreshPkmVersionId(loaders.pkmLoader, loaders.pkmVersionLoader);
+        pkmSaveDTO.RefreshExtras(warningsService, loaders.pkmLoader, loaders.pkmVersionLoader);
         saveLoaders.Pkms.WriteDto(pkmSaveDTO);
 
         if (attached && pkmSaveDTO.PkmVersionId == null)
@@ -364,7 +365,7 @@ public class MovePkmAction(
 
         if (pkmDto.SaveId != null)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(loaders, flags, [(pkmDto.Id, null)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmDto.Id, null)]);
         }
 
         flags.MainPkms = true;
@@ -427,7 +428,7 @@ public class MovePkmAction(
                 Generation = savePkm.Generation,
                 Filepath = PKMLoader.GetPKMFilepath(savePkm.Pkm),
             };
-            var pkmVersionDto = PkmVersionDTO.FromEntity(pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
+            var pkmVersionDto = PkmVersionDTO.FromEntity(warningsService, pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
 
             loaders.pkmLoader.WriteDto(pkmDtoToCreate);
             loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
@@ -441,7 +442,7 @@ public class MovePkmAction(
         // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmDto!.SaveId != default)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(loaders, flags, [(pkmVersionEntity.PkmId, null)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersionEntity.PkmId, null)]);
 
             if (!attached)
             {
@@ -468,12 +469,12 @@ public class MovePkmAction(
         flags.Dex = true;
     }
 
-    private static async Task CheckG3NationalDex(SaveFile save, int species)
+    private async Task CheckG3NationalDex(SaveFile save, int species)
     {
         // enable national-dex in G3 RSE if pkm outside of regional-dex
         if (save is SAV3 saveG3RSE && saveG3RSE is IGen3Hoenn && !saveG3RSE.NationalDex)
         {
-            var staticData = await StaticDataService.GetStaticData();
+            var staticData = await staticDataService.GetStaticData();
 
             var isInDex = staticData.Species[(ushort)species].IsInHoennDex;
 

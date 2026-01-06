@@ -4,12 +4,12 @@ namespace PKVault.Backend.storage.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class StaticDataController : ControllerBase
+public class StaticDataController(StaticDataService staticDataService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<StaticDataDTO>> Get()
     {
-        return await StaticDataService.GetStaticData();
+        return await staticDataService.GetStaticData();
     }
 
     [HttpGet("spritesheet/{sheetName}")]

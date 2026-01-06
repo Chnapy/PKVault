@@ -1,6 +1,7 @@
 using PKHeX.Core;
 
 public class SavePkmLoader(
+    WarningsService warningsService, PkmConvertService pkmConvertService,
     SaveFile save,
     PkmLoader pkmLoader,
     PkmVersionLoader pkmVersionLoader
@@ -114,7 +115,7 @@ public class SavePkmLoader(
         return [.. dtoById.Values.Select(dto => {
             dto = dto.Clone();
 
-            dto.RefreshPkmVersionId(pkmLoader, pkmVersionLoader);
+            dto.RefreshExtras(warningsService, pkmLoader, pkmVersionLoader);
 
             return dto;
         })];
@@ -131,7 +132,7 @@ public class SavePkmLoader(
         {
             dto = dto.Clone();
 
-            dto.RefreshPkmVersionId(pkmLoader, pkmVersionLoader);
+            dto.RefreshExtras(warningsService, pkmLoader, pkmVersionLoader);
 
             return dto;
         }
@@ -155,7 +156,7 @@ public class SavePkmLoader(
         {
             dto = dto.Clone();
 
-            dto.RefreshPkmVersionId(pkmLoader, pkmVersionLoader);
+            dto.RefreshExtras(warningsService, pkmLoader, pkmVersionLoader);
 
             return dto;
         }
@@ -172,7 +173,7 @@ public class SavePkmLoader(
 
         var savePkmType = save.BlankPKM.GetType();
 
-        var pkm = PkmConvertService.GetConvertedPkm(dto.Pkm, save.BlankPKM, null);
+        var pkm = pkmConvertService.GetConvertedPkm(dto.Pkm, save.BlankPKM, null);
         if (pkm == default)
         {
             throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetType()} to.type={savePkmType}");

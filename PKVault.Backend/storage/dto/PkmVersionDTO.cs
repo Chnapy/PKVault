@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public class PkmVersionDTO : BasePkmVersionDTO
 {
-    public static PkmVersionDTO FromEntity(PkmVersionEntity entity, PKM pkm, PkmDTO pkmDto)
+    public static PkmVersionDTO FromEntity(WarningsService warningsService, PkmVersionEntity entity, PKM pkm, PkmDTO pkmDto)
     {
         var dto = new PkmVersionDTO
         {
@@ -11,6 +11,11 @@ public class PkmVersionDTO : BasePkmVersionDTO
             PkmVersionEntity = entity,
             PkmDto = pkmDto,
         };
+
+        dto.IsAttachedValid = pkmDto.SaveId == null
+                || !warningsService.GetWarningsDTO().PkmVersionWarnings.Any(warn => warn.PkmVersionId == null
+                    ? warn.PkmId == dto.Id
+                    : warn.PkmVersionId == dto.Id);
 
         if (dto.Id != entity.Id)
         {
@@ -67,22 +72,13 @@ public class PkmVersionDTO : BasePkmVersionDTO
 
     public bool IsMain { get { return Id == PkmId; } }
 
-    public bool IsAttachedValid
-    {
-        get
-        {
-            return PkmDto.SaveId == null
-                || !WarningsService.GetWarningsDTO().PkmVersionWarnings.Any(warn => warn.PkmVersionId == null
-                    ? warn.PkmId == Id
-                    : warn.PkmVersionId == Id);
-        }
-    }
+    public bool IsAttachedValid { get; set; }
 
     public new bool IsValid { get => base.IsValid && IsAttachedValid; }
 
     public bool IsFilePresent => File.Exists(Filepath);
 
-    public string Filepath => Path.Combine(SettingsService.AppSettings.AppDirectory, PkmVersionEntity.Filepath);
+    public string Filepath => Path.Combine(SettingsService.BaseSettings.AppDirectory, PkmVersionEntity.Filepath);
 
     // public bool CanMoveToSaveStorage { get { return PkmDto.SaveId == default; } }
 

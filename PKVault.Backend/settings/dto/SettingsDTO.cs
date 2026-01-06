@@ -4,10 +4,9 @@ using PKHeX.Core;
 public class SettingsDTO
 {
     public static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "./config/pkvault.json");
-
     public static readonly string[] AllowedLanguages = ["en", "fr"]; //GameLanguage.AllSupportedLanguages.ToArray();
 
-    public Guid BuildID { get => Assembly.GetExecutingAssembly().ManifestModule.ModuleVersionId; }
+    public Guid BuildID => Assembly.GetExecutingAssembly().ManifestModule.ModuleVersionId;
 
     public string Version => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "";
 
@@ -17,11 +16,9 @@ public class SettingsDTO
 
     public string SettingsPath { get => FilePath; }
 
-    public bool CanUpdateSettings { get => StorageService.HasEmptyActionList(); }
+    public bool CanUpdateSettings { get; set; }
 
-    public bool CanScanSaves { get => StorageService.HasEmptyActionList(); }
-
-    public bool CanDeleteSaves { get => StorageService.HasEmptyActionList(); }
+    public bool CanScanSaves { get; set; }
 
     public required SettingsMutableDTO SettingsMutable { get; set; }
 

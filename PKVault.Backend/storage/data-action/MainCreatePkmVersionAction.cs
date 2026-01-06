@@ -1,4 +1,7 @@
-public class MainCreatePkmVersionAction(string pkmId, byte generation) : DataAction
+public class MainCreatePkmVersionAction(
+    WarningsService warningsService, PkmConvertService pkmConvertService,
+    string pkmId, byte generation
+) : DataAction
 {
     // required to keep same generated PID between memory => file loaders
     // because PID is randomly generated
@@ -30,7 +33,7 @@ public class MainCreatePkmVersionAction(string pkmId, byte generation) : DataAct
 
         var pkmOrigin = pkmVersionOrigin.Pkm;
 
-        var pkmConverted = PkmConvertService.GetConvertedPkm(pkmOrigin, generation, createdPid);
+        var pkmConverted = pkmConvertService.GetConvertedPkm(pkmOrigin, generation, createdPid);
         createdPid = pkmConverted.PID;
 
         var pkmVersionEntityCreated = new PkmVersionEntity
@@ -42,7 +45,7 @@ public class MainCreatePkmVersionAction(string pkmId, byte generation) : DataAct
             Filepath = PKMLoader.GetPKMFilepath(pkmConverted),
         };
 
-        var pkmVersionCreated = PkmVersionDTO.FromEntity(pkmVersionEntityCreated, pkmConverted, pkmDto);
+        var pkmVersionCreated = PkmVersionDTO.FromEntity(warningsService, pkmVersionEntityCreated, pkmConverted, pkmDto);
 
         loaders.pkmVersionLoader.WriteDto(pkmVersionCreated);
 

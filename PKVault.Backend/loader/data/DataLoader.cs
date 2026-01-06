@@ -14,7 +14,7 @@ public abstract class DataLoader(DataEntityLoaders loaders)
     }
 }
 
-public struct DataEntityLoaders
+public struct DataEntityLoaders(LocalSaveService saveService)
 {
     public required BankLoader bankLoader { get; set; }
     public required BoxLoader boxLoader { get; set; }
@@ -35,7 +35,7 @@ public struct DataEntityLoaders
         {
             if (saveLoaders.Pkms.HasWritten || saveLoaders.Boxes.HasWritten)
             {
-                LocalSaveService.WriteSave(saveLoaders.Save);
+                saveService.WriteSave(saveLoaders.Save);
             }
         }
 

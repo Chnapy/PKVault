@@ -2,24 +2,17 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Primitives;
 
-public partial class ExceptionHandlingMiddleware
+public partial class ExceptionHandlingMiddleware(RequestDelegate next, DataService dataService)
 {
-    private readonly RequestDelegate _next;
-
-    public ExceptionHandlingMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
-
     public async Task Invoke(HttpContext context)
     {
         try
         {
-            await _next(context);
+            await next(context);
         }
         catch (DataActionException ex)
         {
-            var data = await DataDTO.FromDataUpdateFlags(ex.flags);
+            var data = await dataService.CreateDataFromUpdateFlags(ex.flags);
             await WriteExceptionResponse(context, ex.ex, data);
         }
         catch (Exception ex)

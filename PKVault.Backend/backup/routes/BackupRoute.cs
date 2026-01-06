@@ -5,28 +5,28 @@ namespace PKVault.Backend.backup.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class BackupController : ControllerBase
+public class BackupController(BackupService backupService, DataService dataService) : ControllerBase
 {
     [HttpGet()]
     public ActionResult<List<BackupDTO>> GetAll()
     {
-        return BackupService.GetBackupList();
+        return backupService.GetBackupList();
     }
 
     [HttpDelete()]
     public async Task<ActionResult<DataDTO>> Delete([BindRequired] DateTime createdAt)
     {
-        BackupService.DeleteBackup(createdAt);
+        backupService.DeleteBackup(createdAt);
 
-        return await DataDTO.FromDataUpdateFlags(new() { Backups = true });
+        return await dataService.CreateDataFromUpdateFlags(new() { Backups = true });
     }
 
     [HttpPost("restore")]
     public async Task<ActionResult<DataDTO>> Restore([BindRequired] DateTime createdAt)
     {
-        await BackupService.RestoreBackup(createdAt);
+        await backupService.RestoreBackup(createdAt);
 
-        return await DataDTO.FromDataUpdateFlags(new()
+        return await dataService.CreateDataFromUpdateFlags(new()
         {
             MainBanks = true,
             MainBoxes = true,

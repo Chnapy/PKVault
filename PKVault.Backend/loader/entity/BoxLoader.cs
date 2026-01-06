@@ -3,7 +3,7 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>
     public static readonly int OrderGap = 10;
 
     public BoxLoader() : base(
-        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.AppSettings.SettingsMutable.DB_PATH, "box.json")),
+        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.BaseSettings.SettingsMutable.DB_PATH, "box.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringBoxEntity
     )
     {

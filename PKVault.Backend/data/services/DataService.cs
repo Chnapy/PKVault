@@ -1,33 +1,37 @@
-public struct DataDTO
+public class DataService(
+    StorageService storageService, StaticDataService staticDataService,
+    WarningsService warningsService, DexService dexService, LocalSaveService saveService,
+    BackupService backupService, SettingsService settingsService
+)
 {
-    public static async Task<DataDTO> FromDataUpdateFlags(DataUpdateFlags flags)
+    public async Task<DataDTO> CreateDataFromUpdateFlags(DataUpdateFlags flags)
     {
         var time = LogUtil.Time("Prepare global data payload");
         var tasks = new List<Task>();
 
         var dto = new DataDTO();
 
-        var memoryLoader = await StorageService.GetLoader();
+        var memoryLoader = await storageService.GetLoader();
 
         if (flags.StaticData)
         {
             tasks.Add(Task.Run(async () =>
             {
-                dto.StaticData = await StaticDataService.GetStaticData();
+                dto.StaticData = await staticDataService.GetStaticData();
             }));
         }
 
         // Note: should be done first since it may be used by pkm-version
         if (flags.Warnings)
         {
-            tasks.Add(WarningsService.CheckWarnings());
+            tasks.Add(warningsService.CheckWarnings());
         }
 
         if (flags.Dex)
         {
             tasks.Add(Task.Run(async () =>
             {
-                dto.Dex = await DexService.GetDex();
+                dto.Dex = await dexService.GetDex();
             }));
         }
 
@@ -35,7 +39,7 @@ public struct DataDTO
         {
             tasks.Add(Task.Run(async () =>
             {
-                dto.MainBanks = await StorageService.GetMainBanks();
+                dto.MainBanks = await storageService.GetMainBanks();
             }));
         }
 
@@ -43,7 +47,7 @@ public struct DataDTO
         {
             tasks.Add(Task.Run(async () =>
             {
-                dto.MainBoxes = await StorageService.GetMainBoxes();
+                dto.MainBoxes = await storageService.GetMainBoxes();
             }));
         }
 
@@ -51,7 +55,7 @@ public struct DataDTO
         {
             tasks.Add(Task.Run(async () =>
             {
-                dto.MainPkms = await StorageService.GetMainPkms();
+                dto.MainPkms = await storageService.GetMainPkms();
             }));
         }
 
@@ -59,7 +63,7 @@ public struct DataDTO
         {
             tasks.Add(Task.Run(async () =>
             {
-                dto.MainPkmVersions = await StorageService.GetMainPkmVersions();
+                dto.MainPkmVersions = await storageService.GetMainPkmVersions();
             }));
         }
 
@@ -77,7 +81,7 @@ public struct DataDTO
                     {
                         if (memoryLoader.loaders.saveLoadersDict.ContainsKey(saveData.SaveId))
                         {
-                            saveDto.SaveBoxes ??= await StorageService.GetSaveBoxes(saveData.SaveId);
+                            saveDto.SaveBoxes ??= await storageService.GetSaveBoxes(saveData.SaveId);
                         }
                         else
                         {
@@ -92,7 +96,7 @@ public struct DataDTO
                     {
                         if (memoryLoader.loaders.saveLoadersDict.ContainsKey(saveData.SaveId))
                         {
-                            saveDto.SavePkms ??= await StorageService.GetSavePkms(saveData.SaveId);
+                            saveDto.SavePkms ??= await storageService.GetSavePkms(saveData.SaveId);
                         }
                         else
                         {
@@ -105,21 +109,21 @@ public struct DataDTO
 
         if (flags.SaveInfos)
         {
-            dto.SaveInfos = LocalSaveService.GetAllSaveInfos();
+            dto.SaveInfos = saveService.GetAllSaveInfos();
         }
 
         if (flags.Backups)
         {
-            dto.Backups = BackupService.GetBackupList();
+            dto.Backups = backupService.GetBackupList();
         }
 
         await Task.WhenAll(tasks);
 
         dto.Saves = saveDict.Count > 0 ? [.. saveDict.Values] : null;
 
-        dto.Actions = StorageService.GetActionPayloadList();
-        dto.Warnings = WarningsService.GetWarningsDTO();
-        dto.Settings = SettingsService.AppSettings;
+        dto.Actions = storageService.GetActionPayloadList();
+        dto.Warnings = warningsService.GetWarningsDTO();
+        dto.Settings = settingsService.GetSettings();
 
         time();
 
@@ -131,62 +135,4 @@ public struct DataDTO
 
         return dto;
     }
-
-    public DataDTOType Type { get; set; } = DataDTOType.DATA_DTO;
-
-    public StaticDataDTO? StaticData { get; set; }
-    public List<BankDTO>? MainBanks { get; set; }
-    public List<BoxDTO>? MainBoxes { get; set; }
-    public List<PkmDTO>? MainPkms { get; set; }
-    public List<PkmVersionDTO>? MainPkmVersions { get; set; }
-    public List<DataSaveDTO>? Saves { get; set; }
-    public Dictionary<ushort, Dictionary<uint, DexItemDTO>>? Dex { get; set; }
-    public List<DataActionPayload>? Actions { get; set; }
-    public WarningsDTO? Warnings { get; set; }
-    public Dictionary<uint, SaveInfosDTO>? SaveInfos { get; set; }
-    public List<BackupDTO>? Backups { get; set; }
-    public SettingsDTO? Settings { get; set; }
-
-    public DataDTO()
-    {
-    }
-}
-
-public class DataSaveDTO
-{
-    public uint SaveId { get; set; }
-    public List<BoxDTO>? SaveBoxes { get; set; }
-    public List<PkmSaveDTO>? SavePkms { get; set; }
-}
-
-public enum DataDTOType : uint
-{
-    DATA_DTO = 1
-}
-
-public class DataUpdateFlags
-{
-    public bool StaticData;
-    public bool MainBanks;
-    public bool MainBoxes;
-    public bool MainPkms;
-    public bool MainPkmVersions;
-    public List<DataUpdateSaveFlags> Saves = [];
-    public bool Dex;
-    // public bool Actions;
-    public bool Warnings;
-    public bool SaveInfos;
-    public bool Backups;
-    public bool Settings;
-
-    public DataUpdateFlags()
-    {
-    }
-}
-
-public class DataUpdateSaveFlags
-{
-    public uint SaveId;
-    public bool SaveBoxes;
-    public bool SavePkms;
 }

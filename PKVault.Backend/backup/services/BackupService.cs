@@ -2,15 +2,15 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Text.Json;
 
-public class BackupService
+public class BackupService(StorageService storageService, LocalSaveService saveService, WarningsService warningsService, PkmConvertService pkmConvertService)
 {
     private static readonly string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
 
-    public static DateTime CreateBackup()
+    public DateTime CreateBackup()
     {
         var logtime = LogUtil.Time("Create backup");
 
-        var loader = DataMemoryLoader.Create();
+        var loader = DataMemoryLoader.Create(saveService, warningsService, pkmConvertService);
 
         var steptime = LogUtil.Time($"Create backup - DB");
         var dbPaths = CreateDbBackup(loader.loaders);
@@ -65,7 +65,7 @@ public class BackupService
         return loader.startTime;
     }
 
-    private static Dictionary<string, (string TargetPath, byte[] FileContent)> CreateDbBackup(DataEntityLoaders loaders)
+    private Dictionary<string, (string TargetPath, byte[] FileContent)> CreateDbBackup(DataEntityLoaders loaders)
     {
         return loaders.jsonLoaders.Select(loader =>
         {
@@ -81,7 +81,7 @@ public class BackupService
         }).ToDictionary();
     }
 
-    private static Dictionary<string, (string TargetPath, byte[] FileContent)> CreateSavesBackup(DataEntityLoaders loaders)
+    private Dictionary<string, (string TargetPath, byte[] FileContent)> CreateSavesBackup(DataEntityLoaders loaders)
     {
         var paths = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
         if (loaders.saveLoadersDict.Count == 0)
@@ -101,14 +101,14 @@ public class BackupService
             var relativePath = Path.Combine("saves", newFilename);
 
             paths.Add(NormalizePath(relativePath), (
-                TargetPath: NormalizePath(path), FileContent: LocalSaveService.GetSaveFileData(saveLoader.Save)
+                TargetPath: NormalizePath(path), FileContent: saveService.GetSaveFileData(saveLoader.Save)
             ));
         }
 
         return paths;
     }
 
-    private static Dictionary<string, (string TargetPath, byte[] FileContent)> CreateMainBackup(DataEntityLoaders loaders)
+    private Dictionary<string, (string TargetPath, byte[] FileContent)> CreateMainBackup(DataEntityLoaders loaders)
     {
         var pkmFilesDict = loaders.pkmVersionLoader.pkmFileLoader.GetAllEntities();
 
@@ -151,7 +151,7 @@ public class BackupService
         return $"pkvault_backup_{SerializeDateTime(createdAt)}.zip";
     }
 
-    public static List<BackupDTO> GetBackupList()
+    public List<BackupDTO> GetBackupList()
     {
         var bkpPath = GetBackupsPath();
         var glob = Path.Combine(bkpPath, "*.zip");
@@ -183,7 +183,7 @@ public class BackupService
         return result;
     }
 
-    public static void DeleteBackup(DateTime createdAt)
+    public void DeleteBackup(DateTime createdAt)
     {
         var bkpPath = GetBackupsPath();
 
@@ -198,7 +198,7 @@ public class BackupService
         File.Delete(bkpZipPath);
     }
 
-    public static async Task RestoreBackup(DateTime createdAt)
+    public async Task RestoreBackup(DateTime createdAt)
     {
         var bkpPath = GetBackupsPath();
 
@@ -252,12 +252,12 @@ public class BackupService
 
         logtime();
 
-        LocalSaveService.ReadLocalSaves();
-        await StorageService.DataSetupMigrateClean();
-        await StorageService.ResetDataLoader(true);
+        saveService.ReadLocalSaves();
+        await storageService.DataSetupMigrateClean();
+        await storageService.ResetDataLoader(true);
     }
 
-    public static async Task PrepareBackupThenRun(Func<Task> action)
+    public async Task PrepareBackupThenRun(Func<Task> action)
     {
         var bkpDateTime = CreateBackup();
 
@@ -269,9 +269,9 @@ public class BackupService
 
             logtime();
 
-            LocalSaveService.ReadLocalSaves();
+            saveService.ReadLocalSaves();
 
-            await StorageService.ResetDataLoader(false);
+            await storageService.ResetDataLoader(false);
         }
         catch
         {
@@ -281,9 +281,9 @@ public class BackupService
         }
     }
 
-    private static string GetBackupsPath()
+    private string GetBackupsPath()
     {
-        var backupPath = SettingsService.AppSettings.SettingsMutable.BACKUP_PATH;
+        var backupPath = SettingsService.BaseSettings.SettingsMutable.BACKUP_PATH;
         Directory.CreateDirectory(backupPath);
         return backupPath;
     }

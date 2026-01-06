@@ -1,6 +1,9 @@
 using PKHeX.Core;
 
-public class SynchronizePkmAction((string PkmId, string? SavePkmId)[] pkmMainAndPkmSaveIds) : DataAction
+public class SynchronizePkmAction(
+    PkmConvertService pkmConvertService,
+    (string PkmId, string? SavePkmId)[] pkmMainAndPkmSaveIds
+) : DataAction
 {
     public static (string PkmId, string SavePkmId)[] GetPkmsToSynchronize(DataEntityLoaders loaders, uint saveId)
     {
@@ -43,6 +46,7 @@ public class SynchronizePkmAction((string PkmId, string? SavePkmId)[] pkmMainAnd
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         await SynchronizeSaveToPkmVersion(
+            pkmConvertService,
             loaders, flags,
             pkmMainAndPkmSaveIds
         );
@@ -57,6 +61,7 @@ public class SynchronizePkmAction((string PkmId, string? SavePkmId)[] pkmMainAnd
     }
 
     public static async Task SynchronizeSaveToPkmVersion(
+        PkmConvertService pkmConvertService,
         DataEntityLoaders loaders, DataUpdateFlags flags,
         (string PkmId, string? SavePkmId)[] pkmMainAndPkmSaveIds
     )
@@ -111,11 +116,11 @@ public class SynchronizePkmAction((string PkmId, string? SavePkmId)[] pkmMainAnd
 
                 if (savePkm.PkmVersionId == version.Id)
                 {
-                    PkmConvertService.PassAllToPkmSafe(savePkm.Pkm, versionPkm);
+                    pkmConvertService.PassAllToPkmSafe(savePkm.Pkm, versionPkm);
                 }
                 else
                 {
-                    PkmConvertService.PassAllDynamicsNItemToPkm(savePkm.Pkm, versionPkm);
+                    pkmConvertService.PassAllDynamicsNItemToPkm(savePkm.Pkm, versionPkm);
                 }
 
                 loaders.pkmVersionLoader.WriteDto(version);
@@ -131,6 +136,7 @@ public class SynchronizePkmAction((string PkmId, string? SavePkmId)[] pkmMainAnd
     }
 
     public static async Task SynchronizePkmVersionToSave(
+        PkmConvertService pkmConvertService,
         DataEntityLoaders loaders, DataUpdateFlags flags,
         (string PkmId, string? SavePkmId)[] pkmMainAndPkmSaveIds
     )
@@ -181,11 +187,11 @@ public class SynchronizePkmAction((string PkmId, string? SavePkmId)[] pkmMainAnd
 
             if (savePkm.PkmVersionId == pkmVersionDto.Id)
             {
-                PkmConvertService.PassAllToPkmSafe(versionPkm, savePkm.Pkm);
+                pkmConvertService.PassAllToPkmSafe(versionPkm, savePkm.Pkm);
             }
             else
             {
-                PkmConvertService.PassAllDynamicsNItemToPkm(versionPkm, savePkm.Pkm);
+                pkmConvertService.PassAllDynamicsNItemToPkm(versionPkm, savePkm.Pkm);
             }
 
             saveLoaders.Pkms.WriteDto(savePkm);

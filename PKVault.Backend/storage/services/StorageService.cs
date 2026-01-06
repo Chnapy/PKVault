@@ -1,41 +1,82 @@
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using PKHeX.Core;
-using PKVault.Backend;
 
-public class StorageService
+public class StorageService(IServiceProvider sp)
 {
-    private static DataMemoryLoader? _memoryLoader;
+    private readonly SemaphoreSlim _setupLock = new(1, 1);
+    private Task? SetupTask;
+    private DataMemoryLoader? _memoryLoader;
 
-    public static async Task<List<BankDTO>> GetMainBanks()
+    public async Task<DataMemoryLoader> GetLoader()
+    {
+        if (_memoryLoader == null)
+            await WaitForSetup();
+        return _memoryLoader ?? throw new InvalidOperationException("Loader not initialized");
+    }
+
+    public async Task WaitForSetup()
+    {
+        await _setupLock.WaitAsync();
+        try
+        {
+            SetupTask ??= Task.Run(Setup);
+        }
+        finally
+        {
+            _setupLock.Release();
+        }
+
+        await SetupTask;
+    }
+
+    private async Task Setup()
+    {
+        using var scope = sp.CreateScope();
+
+        await scope.ServiceProvider.GetRequiredService<StaticDataService>().GetStaticData();
+        await DataSetupMigrateClean();
+        try
+        {
+            scope.ServiceProvider.GetRequiredService<LocalSaveService>().ReadLocalSaves();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+        }
+        await ResetDataLoader(true);
+        await scope.ServiceProvider.GetRequiredService<WarningsService>().CheckWarnings();
+    }
+
+    public async Task<List<BankDTO>> GetMainBanks()
     {
         var memoryLoader = await GetLoader();
 
         return memoryLoader.loaders.bankLoader.GetAllDtos();
     }
 
-    public static async Task<List<BoxDTO>> GetMainBoxes()
+    public async Task<List<BoxDTO>> GetMainBoxes()
     {
         var memoryLoader = await GetLoader();
 
         return memoryLoader.loaders.boxLoader.GetAllDtos();
     }
 
-    public static async Task<List<PkmDTO>> GetMainPkms()
+    public async Task<List<PkmDTO>> GetMainPkms()
     {
         var memoryLoader = await GetLoader();
 
         return memoryLoader.loaders.pkmLoader.GetAllDtos();
     }
 
-    public static async Task<List<PkmVersionDTO>> GetMainPkmVersions()
+    public async Task<List<PkmVersionDTO>> GetMainPkmVersions()
     {
         var memoryLoader = await GetLoader();
 
         return memoryLoader.loaders.pkmVersionLoader.GetAllDtos();
     }
 
-    public static async Task<List<BoxDTO>> GetSaveBoxes(uint saveId)
+    public async Task<List<BoxDTO>> GetSaveBoxes(uint saveId)
     {
         var memoryLoader = await GetLoader();
 
@@ -48,7 +89,7 @@ public class StorageService
         return saveLoaders.Boxes.GetAllDtos();
     }
 
-    public static async Task<List<PkmSaveDTO>> GetSavePkms(uint saveId)
+    public async Task<List<PkmSaveDTO>> GetSavePkms(uint saveId)
     {
         var memoryLoader = await GetLoader();
 
@@ -61,134 +102,167 @@ public class StorageService
         return saveLoaders.Pkms.GetAllDtos();
     }
 
-    public static async Task<DataUpdateFlags> MainCreateBox(string bankId)
+    public async Task<DataUpdateFlags> MainCreateBox(string bankId)
     {
         return await AddAction(
             new MainCreateBoxAction(bankId, null)
         );
     }
 
-    public static async Task<DataUpdateFlags> MainUpdateBox(string boxId, string boxName, int order, string bankId, int slotCount, BoxType type)
+    public async Task<DataUpdateFlags> MainUpdateBox(string boxId, string boxName, int order, string bankId, int slotCount, BoxType type)
     {
         return await AddAction(
             new MainUpdateBoxAction(boxId, boxName, order, bankId, slotCount, type)
         );
     }
 
-    public static async Task<DataUpdateFlags> MainDeleteBox(string boxId)
+    public async Task<DataUpdateFlags> MainDeleteBox(string boxId)
     {
         return await AddAction(
             new MainDeleteBoxAction(boxId)
         );
     }
 
-    public static async Task<DataUpdateFlags> MainCreateBank()
+    public async Task<DataUpdateFlags> MainCreateBank()
     {
         return await AddAction(
             new MainCreateBankAction()
         );
     }
 
-    public static async Task<DataUpdateFlags> MainUpdateBank(string bankId, string bankName, bool isDefault, int order, BankEntity.BankView view)
+    public async Task<DataUpdateFlags> MainUpdateBank(string bankId, string bankName, bool isDefault, int order, BankEntity.BankView view)
     {
         return await AddAction(
             new MainUpdateBankAction(bankId, bankName, isDefault, order, view)
         );
     }
 
-    public static async Task<DataUpdateFlags> MainDeleteBank(string bankId)
+    public async Task<DataUpdateFlags> MainDeleteBank(string bankId)
     {
         return await AddAction(
             new MainDeleteBankAction(bankId)
         );
     }
 
-    public static async Task<DataUpdateFlags> MovePkm(
+    public async Task<DataUpdateFlags> MovePkm(
         string[] pkmIds, uint? sourceSaveId,
         uint? targetSaveId, int targetBoxId, int[] targetBoxSlots,
         bool attached
     )
     {
+        using var scope = sp.CreateScope();
+
         return await AddAction(
-            new MovePkmAction(pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached)
+            new MovePkmAction(
+                warningsService: scope.ServiceProvider.GetRequiredService<WarningsService>(),
+                staticDataService: scope.ServiceProvider.GetRequiredService<StaticDataService>(),
+                pkmConvertService: scope.ServiceProvider.GetRequiredService<PkmConvertService>(),
+                pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached)
         );
     }
 
-    public static async Task<DataUpdateFlags> MovePkmBank(
+    public async Task<DataUpdateFlags> MovePkmBank(
         string[] pkmIds, uint? sourceSaveId,
         string bankId,
         bool attached
     )
     {
+        using var scope = sp.CreateScope();
+
         return await AddAction(
-            new MovePkmBankAction(pkmIds, sourceSaveId, bankId, attached)
+            new MovePkmBankAction(
+                warningsService: scope.ServiceProvider.GetRequiredService<WarningsService>(),
+                pkmConvertService: scope.ServiceProvider.GetRequiredService<PkmConvertService>(),
+                pkmIds, sourceSaveId, bankId, attached)
         );
     }
 
-    public static async Task<DataUpdateFlags> MainCreatePkmVersion(string pkmId, byte generation)
+    public async Task<DataUpdateFlags> MainCreatePkmVersion(string pkmId, byte generation)
     {
+        using var scope = sp.CreateScope();
+
         return await AddAction(
-            new MainCreatePkmVersionAction(pkmId, generation)
+            new MainCreatePkmVersionAction(
+                warningsService: scope.ServiceProvider.GetRequiredService<WarningsService>(),
+                pkmConvertService: scope.ServiceProvider.GetRequiredService<PkmConvertService>(),
+                pkmId, generation)
         );
     }
 
-    public static async Task<DataUpdateFlags> MainEditPkmVersion(string pkmVersionId, EditPkmVersionPayload payload)
+    public async Task<DataUpdateFlags> MainEditPkmVersion(string pkmVersionId, EditPkmVersionPayload payload)
     {
+        using var scope = sp.CreateScope();
+
         return await AddAction(
-            new EditPkmVersionAction(pkmVersionId, payload)
+            new EditPkmVersionAction(this,
+                pkmConvertService: scope.ServiceProvider.GetRequiredService<PkmConvertService>(),
+                pkmVersionId, payload)
         );
     }
 
-    public static async Task<DataUpdateFlags> SaveEditPkm(uint saveId, string pkmId, EditPkmVersionPayload payload)
+    public async Task<DataUpdateFlags> SaveEditPkm(uint saveId, string pkmId, EditPkmVersionPayload payload)
     {
+        using var scope = sp.CreateScope();
+
         return await AddAction(
-            new EditPkmSaveAction(saveId, pkmId, payload)
+            new EditPkmSaveAction(this,
+                pkmConvertService: scope.ServiceProvider.GetRequiredService<PkmConvertService>(),
+                saveId, pkmId, payload)
         );
     }
 
-    public static async Task<DataUpdateFlags> MainPkmDetachSaves(string[] pkmIds)
+    public async Task<DataUpdateFlags> MainPkmDetachSaves(string[] pkmIds)
     {
         return await AddAction(
             new DetachPkmSaveAction(pkmIds)
         );
     }
 
-    public static async Task<DataUpdateFlags> MainPkmVersionsDelete(string[] pkmVersionIds)
+    public async Task<DataUpdateFlags> MainPkmVersionsDelete(string[] pkmVersionIds)
     {
         return await AddAction(
             new DeletePkmVersionAction(pkmVersionIds)
         );
     }
 
-    public static async Task<DataUpdateFlags> SaveDeletePkms(uint saveId, string[] pkmIds)
+    public async Task<DataUpdateFlags> SaveDeletePkms(uint saveId, string[] pkmIds)
     {
         return await AddAction(
             new SaveDeletePkmAction(saveId, pkmIds)
         );
     }
 
-    public static async Task<DataUpdateFlags> EvolvePkms(uint? saveId, string[] ids)
+    public async Task<DataUpdateFlags> EvolvePkms(uint? saveId, string[] ids)
     {
+        using var scope = sp.CreateScope();
+
         return await AddAction(
-            new EvolvePkmAction(saveId, ids)
+            new EvolvePkmAction(
+                staticDataService: scope.ServiceProvider.GetRequiredService<StaticDataService>(),
+                pkmConvertService: scope.ServiceProvider.GetRequiredService<PkmConvertService>(),
+                saveId, ids)
         );
     }
 
-    public static async Task<DataUpdateFlags> SortPkms(uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot)
+    public async Task<DataUpdateFlags> SortPkms(uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot)
     {
         return await AddAction(
             new SortPkmAction(saveId, fromBoxId, toBoxId, leaveEmptySlot)
         );
     }
 
-    public static async Task<DataUpdateFlags> DexSync(uint[] saveIds)
+    public async Task<DataUpdateFlags> DexSync(uint[] saveIds)
     {
+        using var scope = sp.CreateScope();
+
         return await AddAction(
-            new DexSyncAction(saveIds)
+            new DexSyncAction(
+                dexService: scope.ServiceProvider.GetRequiredService<DexService>(),
+                saveIds)
         );
     }
 
-    public static async Task<DataUpdateFlags> Save()
+    public async Task<DataUpdateFlags> Save()
     {
         var memoryLoader = await GetLoader();
         var flags = new DataUpdateFlags();
@@ -201,7 +275,9 @@ public class StorageService
 
         Console.WriteLine("SAVING IN PROGRESS");
 
-        await BackupService.PrepareBackupThenRun(memoryLoader.loaders.WriteToFiles);
+        using var scope = sp.CreateScope();
+        await scope.ServiceProvider.GetRequiredService<BackupService>()
+            .PrepareBackupThenRun(memoryLoader.loaders.WriteToFiles);
 
         flags.Backups = true;
         flags.Warnings = true;
@@ -209,7 +285,7 @@ public class StorageService
         return flags;
     }
 
-    private static async Task<DataUpdateFlags> AddAction(DataAction action)
+    private async Task<DataUpdateFlags> AddAction(DataAction action)
     {
         var memoryLoader = await GetLoader();
 
@@ -221,29 +297,34 @@ public class StorageService
         }
         catch (Exception ex)
         {
-            // re-run actions to avoid persisted side-effects, no removal here
+            // re-run actions to avoid persisted side-effects, int.MaxValue means no action removed, just reset
             var flags = await RemoveDataActionsAndReset(int.MaxValue);
             throw new DataActionException(ex, flags);
         }
     }
 
-    public static List<DataActionPayload> GetActionPayloadList()
+    public List<DataActionPayload> GetActionPayloadList()
     {
         var actionPayloadList = new List<DataActionPayload>();
         _memoryLoader?.actions.ForEach(action => actionPayloadList.Add(action.payload));
         return actionPayloadList;
     }
 
-    public static bool HasEmptyActionList()
+    public bool HasEmptyActionList()
     {
         return _memoryLoader == null || _memoryLoader.actions.Count == 0;
     }
 
-    public static async Task<DataMemoryLoader> ResetDataLoader(bool checkSaveSynchro)
+    public async Task<DataMemoryLoader> ResetDataLoader(bool checkSaveSynchro)
     {
         var logtime = LogUtil.Time($"Data-loader reset");
 
-        _memoryLoader = DataMemoryLoader.Create();
+        using var scope = sp.CreateScope();
+        _memoryLoader = DataMemoryLoader.Create(
+            saveService: scope.ServiceProvider.GetRequiredService<LocalSaveService>(),
+            warningsService: scope.ServiceProvider.GetRequiredService<WarningsService>(),
+            pkmConvertService: scope.ServiceProvider.GetRequiredService<PkmConvertService>()
+        );
 
         if (checkSaveSynchro)
         {
@@ -255,7 +336,7 @@ public class StorageService
         return _memoryLoader;
     }
 
-    public static async Task<DataUpdateFlags> RemoveDataActionsAndReset(int actionIndexToRemoveFrom)
+    public async Task<DataUpdateFlags> RemoveDataActionsAndReset(int actionIndexToRemoveFrom)
     {
         var previousActions = (await GetLoader()).actions;
 
@@ -289,27 +370,7 @@ public class StorageService
         return flags;
     }
 
-    private static readonly SemaphoreSlim _loaderLock = new(1, 1);
-
-    public static async Task<DataMemoryLoader> GetLoader()
-    {
-        if (_memoryLoader != null)
-            return _memoryLoader;
-
-        await _loaderLock.WaitAsync();
-        try
-        {
-            if (_memoryLoader == null)
-                await Program.WaitForSetup();
-            return _memoryLoader ?? throw new InvalidOperationException("Loader not initialized");
-        }
-        finally
-        {
-            _loaderLock.Release();
-        }
-    }
-
-    public static async Task<List<MoveItem>> GetPkmAvailableMoves(uint? saveId, string pkmId)
+    public async Task<List<MoveItem>> GetPkmAvailableMoves(uint? saveId, string pkmId)
     {
         var loader = await GetLoader();
         var save = saveId == null
@@ -327,17 +388,20 @@ public class StorageService
             var moveComboSource = new LegalMoveComboSource();
             var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
 
+            using var scope = sp.CreateScope();
+
             save ??= BlankSaveFile.Get(
                 PkmVersionDTO.GetSingleVersion(pkm.Version),
                 pkm.OriginalTrainerName,
-                (LanguageID)PkmConvertService.GetPkmLanguage(pkm)
+                (LanguageID)scope.ServiceProvider.GetRequiredService<PkmConvertService>()
+                    .GetPkmLanguage(pkm)
             );
 
             var filteredSources = new FilteredGameDataSource(save, GameInfo.Sources);
             moveSource.ChangeMoveSource(filteredSources.Moves);
             moveSource.ReloadMoves(legality);
 
-            var movesStr = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).movelist;
+            var movesStr = GameInfo.GetStrings(SettingsService.BaseSettings.GetSafeLanguage()).movelist;
 
             var availableMoves = new List<MoveItem>();
 
@@ -365,14 +429,18 @@ public class StorageService
         }
     }
 
-    public static async Task DataSetupMigrateClean()
+    public async Task DataSetupMigrateClean()
     {
         var time = LogUtil.Time("Data Setup + Migrate + Clean");
+
+        using var scope = sp.CreateScope();
 
         var bankLoader = new BankLoader();
         var boxLoader = new BoxLoader();
         var pkmLoader = new PkmLoader();
-        var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
+        var pkmVersionLoader = new PkmVersionLoader(
+            _warningsService: scope.ServiceProvider.GetRequiredService<WarningsService>(),
+            pkmLoader);
         var dexLoader = new DexLoader();
 
         DataEntityLoaders loaders = new()
@@ -391,7 +459,8 @@ public class StorageService
 
         if (loaders.GetHasWritten())
         {
-            BackupService.CreateBackup();
+            scope.ServiceProvider.GetRequiredService<BackupService>()
+                .CreateBackup();
 
             await loaders.WriteToFiles();
         }
@@ -399,7 +468,7 @@ public class StorageService
         time();
     }
 
-    public static async Task CleanMainStorageFiles()
+    public async Task CleanMainStorageFiles()
     {
         var time = LogUtil.Time($"Storage obsolete files clean up");
 
@@ -407,7 +476,7 @@ public class StorageService
         var pkmVersionsFilepaths = loader.loaders.pkmVersionLoader.GetAllDtos().Select(dto => dto.PkmVersionEntity.Filepath).ToList();
 
         var rootDir = ".";
-        var storagePath = SettingsService.AppSettings.GetStoragePath();
+        var storagePath = SettingsService.BaseSettings.GetStoragePath();
 
         var matcher = new Matcher();
         matcher.AddInclude(Path.Combine(storagePath, "**/*"));
@@ -432,7 +501,9 @@ public class StorageService
 
         if (pathsToClean.Any())
         {
-            BackupService.CreateBackup();
+            using var scope = sp.CreateScope();
+            scope.ServiceProvider.GetRequiredService<BackupService>()
+                .CreateBackup();
 
             foreach (var path in pathsToClean)
             {

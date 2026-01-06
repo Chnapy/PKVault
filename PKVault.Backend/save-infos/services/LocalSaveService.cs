@@ -4,15 +4,15 @@ using PKHeX.Core;
 
 public class LocalSaveService
 {
-    public static Dictionary<uint, SaveFile> SaveById { get; } = [];
-    public static Dictionary<string, SaveFile> SaveByPath { get; } = [];
+    public Dictionary<uint, SaveFile> SaveById { get; } = [];
+    public Dictionary<string, SaveFile> SaveByPath { get; } = [];
 
-    public static bool ReadLocalSaves()
+    public bool ReadLocalSaves()
     {
         SaveById.Clear();
         SaveByPath.Clear();
 
-        var globs = SettingsService.AppSettings.SettingsMutable.SAVE_GLOBS;
+        var globs = SettingsService.BaseSettings.SettingsMutable.SAVE_GLOBS;
         var searchPaths = MatcherUtil.SearchPaths(globs);
 
         var hasBeenUpdated = false;
@@ -33,7 +33,7 @@ public class LocalSaveService
         return hasBeenUpdated;
     }
 
-    private static bool UpdateSaveFromPath(string path)
+    private bool UpdateSaveFromPath(string path)
     {
         // Console.WriteLine($"UPDATE SAVE {path}");
 
@@ -72,13 +72,13 @@ public class LocalSaveService
         return true;
     }
 
-    private static void UpdateGlobalsWithSave(SaveFile save, string path)
+    private void UpdateGlobalsWithSave(SaveFile save, string path)
     {
         SaveByPath[path] = save;
         SaveById[save.ID32] = save;
     }
 
-    public static Dictionary<uint, SaveInfosDTO> GetAllSaveInfos()
+    public Dictionary<uint, SaveInfosDTO> GetAllSaveInfos()
     {
         var record = new Dictionary<uint, SaveInfosDTO>();
 
@@ -93,7 +93,7 @@ public class LocalSaveService
         return record;
     }
 
-    public static void WriteSave(SaveFile save)
+    public void WriteSave(SaveFile save)
     {
         var path = SaveByPath.Keys.ToList().Find(path => SaveByPath[path].ID32 == save.ID32);
         if (path == default)
@@ -113,9 +113,9 @@ public class LocalSaveService
         Console.WriteLine($"Writed save {save.ID32} to {path}");
     }
 
-    public static byte[] GetSaveFileData(SaveFile save) => save.Write().ToArray();
+    public byte[] GetSaveFileData(SaveFile save) => save.Write().ToArray();
 
-    // public static async Task<DataUpdateFlags> UploadNewSave(byte[] fileBytes, string formFilename)
+    // public async Task<DataUpdateFlags> UploadNewSave(byte[] fileBytes, string formFilename)
     // {
     //     if (!StorageService.HasEmptyActionList())
     //     {

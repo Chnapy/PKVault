@@ -1,19 +1,22 @@
 using PKHeX.Core;
 
-public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload editPayload) : DataAction
+public class EditPkmVersionAction(
+    StorageService storageService, PkmConvertService pkmConvertService,
+    string pkmVersionId, EditPkmVersionPayload editPayload
+) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var pkmVersionDto = loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkmDto = pkmVersionDto!.PkmDto;
 
-        var availableMoves = await StorageService.GetPkmAvailableMoves(null, pkmVersionId);
+        var availableMoves = await storageService.GetPkmAvailableMoves(null, pkmVersionId);
 
         var pkm = pkmVersionDto.Pkm;
 
-        EditPkmNickname(pkm, editPayload.Nickname);
-        EditPkmEVs(pkm, editPayload.EVs);
-        EditPkmMoves(pkm, availableMoves, editPayload.Moves);
+        EditPkmNickname(pkmConvertService, pkm, editPayload.Nickname);
+        EditPkmEVs(pkmConvertService, pkm, editPayload.EVs);
+        EditPkmMoves(pkmConvertService, pkm, availableMoves, editPayload.Moves);
 
         // absolutly required before each write
         // TODO make a using write pkm to ensure use of this call
@@ -29,7 +32,7 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
         {
             var relatedPkm = versionDto.Pkm;
 
-            PkmConvertService.PassDynamicsToPkm(pkm, relatedPkm);
+            pkmConvertService.PassDynamicsToPkm(pkm, relatedPkm);
 
             relatedPkm.ResetPartyStats();
             relatedPkm.RefreshChecksum();
@@ -39,7 +42,7 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
 
         if (pkmDto.SaveId != default)
         {
-            await SynchronizePkmAction.SynchronizePkmVersionToSave(loaders, flags, [(pkmDto.Id, null)]);
+            await SynchronizePkmAction.SynchronizePkmVersionToSave(pkmConvertService, loaders, flags, [(pkmDto.Id, null)]);
         }
 
         flags.MainPkmVersions = true;
@@ -51,7 +54,7 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
         };
     }
 
-    public static void EditPkmNickname(PKM pkm, string nickname)
+    public static void EditPkmNickname(PkmConvertService pkmConvertService, PKM pkm, string nickname)
     {
         if (pkm.Nickname == nickname)
         {
@@ -63,10 +66,10 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
             throw new ArgumentException($"Nickname should be <= {pkm.MaxStringLengthNickname} for this generation & language");
         }
 
-        PkmConvertService.ApplyNicknameToPkm(pkm, nickname, true);
+        pkmConvertService.ApplyNicknameToPkm(pkm, nickname, true);
     }
 
-    public static void EditPkmEVs(PKM pkm, int[] evs)
+    public static void EditPkmEVs(PkmConvertService pkmConvertService, PKM pkm, int[] evs)
     {
         if (evs.Count() != 6)
         {
@@ -139,10 +142,10 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
             return;
         }
 
-        PkmConvertService.ApplyEVsAVsToPkm(pkm, newEVs);
+        pkmConvertService.ApplyEVsAVsToPkm(pkm, newEVs);
     }
 
-    public static void EditPkmMoves(PKM pkm, List<MoveItem> availableMoves, Span<ushort> moves)
+    public static void EditPkmMoves(PkmConvertService pkmConvertService, PKM pkm, List<MoveItem> availableMoves, Span<ushort> moves)
     {
         var newMoves = moves.ToArray().Where(move => move != 0).ToList();
         var existingMoves = pkm.Moves.Where(move => move != 0);
@@ -170,7 +173,7 @@ public class EditPkmVersionAction(string pkmVersionId, EditPkmVersionPayload edi
             }
         });
 
-        PkmConvertService.ApplyMovesToPkm(pkm, moves);
+        pkmConvertService.ApplyMovesToPkm(pkm, moves);
     }
 }
 

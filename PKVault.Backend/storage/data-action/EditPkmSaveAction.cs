@@ -1,4 +1,7 @@
-public class EditPkmSaveAction(uint saveId, string pkmSaveId, EditPkmVersionPayload editPayload) : DataAction
+public class EditPkmSaveAction(
+    StorageService storageService, PkmConvertService pkmConvertService,
+    uint saveId, string pkmSaveId, EditPkmVersionPayload editPayload
+) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
@@ -12,11 +15,11 @@ public class EditPkmSaveAction(uint saveId, string pkmSaveId, EditPkmVersionPayl
 
         var pkm = pkmSave!.Pkm;
 
-        var availableMoves = await StorageService.GetPkmAvailableMoves(saveId, pkmSaveId);
+        var availableMoves = await storageService.GetPkmAvailableMoves(saveId, pkmSaveId);
 
-        EditPkmVersionAction.EditPkmNickname(pkm, editPayload.Nickname);
-        EditPkmVersionAction.EditPkmEVs(pkm, editPayload.EVs);
-        EditPkmVersionAction.EditPkmMoves(pkm, availableMoves, editPayload.Moves);
+        EditPkmVersionAction.EditPkmNickname(pkmConvertService, pkm, editPayload.Nickname);
+        EditPkmVersionAction.EditPkmEVs(pkmConvertService, pkm, editPayload.EVs);
+        EditPkmVersionAction.EditPkmMoves(pkmConvertService, pkm, availableMoves, editPayload.Moves);
 
         // absolutly required before each write
         // TODO make a using write pkm to ensure use of this call
@@ -34,7 +37,7 @@ public class EditPkmSaveAction(uint saveId, string pkmSaveId, EditPkmVersionPayl
         if (pkmSave.PkmVersionId != null)
         {
             var pkmVersion = loaders.pkmVersionLoader.GetEntity(pkmSave.PkmVersionId);
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(loaders, flags, [(pkmVersion.PkmId, pkmSave.Id)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersion.PkmId, pkmSave.Id)]);
         }
 
         return new()

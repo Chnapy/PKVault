@@ -3,7 +3,7 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>
     public static readonly int OrderGap = 10;
 
     public BankLoader() : base(
-        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.AppSettings.SettingsMutable.DB_PATH, "bank.json")),
+        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.BaseSettings.SettingsMutable.DB_PATH, "bank.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringBankEntity
     )
     {

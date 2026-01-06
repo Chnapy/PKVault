@@ -280,7 +280,7 @@ public abstract class BasePkmVersionDTO : IWithId
     {
         get
         {
-            return GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage())
+            return GameInfo.GetStrings(SettingsService.BaseSettings.GetSafeLanguage())
         .GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version);
         }
     }
@@ -332,7 +332,7 @@ public abstract class BasePkmVersionDTO : IWithId
             try
             {
                 return la.Report(
-                    SettingsService.AppSettings.GetSafeLanguage()
+                    SettingsService.BaseSettings.GetSafeLanguage()
                 );
             }
             catch (Exception ex)

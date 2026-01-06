@@ -1,6 +1,6 @@
 using PKHeX.Core;
 
-public class DexSyncAction(uint[] saveIds) : DataAction
+public class DexSyncAction(DexService dexService, uint[] saveIds) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
@@ -11,7 +11,7 @@ public class DexSyncAction(uint[] saveIds) : DataAction
 
         var saveLoaders = saveIds.Select<uint, SaveLoaders?>(id => id == FakeSaveFile.Default.ID32 ? null : loaders.saveLoadersDict[id]).ToList();
 
-        var dex = await DexService.GetDex(saveIds);
+        var dex = await dexService.GetDex(saveIds);
 
         saveLoaders.ForEach(saveLoader =>
         {

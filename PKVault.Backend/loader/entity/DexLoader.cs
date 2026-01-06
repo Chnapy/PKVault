@@ -1,7 +1,7 @@
 public class DexLoader : EntityLoader<DexItemDTO, DexEntity>
 {
     public DexLoader() : base(
-        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.AppSettings.SettingsMutable.DB_PATH, "dex.json")),
+        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.BaseSettings.SettingsMutable.DB_PATH, "dex.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringDexEntity
     )
     {

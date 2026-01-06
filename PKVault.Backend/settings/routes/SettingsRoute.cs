@@ -5,12 +5,12 @@ namespace PKVault.Backend.settings.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SettingsController : ControllerBase
+public class SettingsController(DataService dataService, SettingsService settingsService, StorageService storageService) : ControllerBase
 {
     [HttpGet]
     public ActionResult<SettingsDTO> Get()
     {
-        return SettingsService.AppSettings;
+        return settingsService.GetSettings();
     }
 
     [HttpGet("test-save-globs")]
@@ -29,7 +29,7 @@ public class SettingsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<DataDTO>> Edit([BindRequired] SettingsMutableDTO settingsMutable)
     {
-        if (!StorageService.HasEmptyActionList())
+        if (!storageService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }
@@ -39,12 +39,12 @@ public class SettingsController : ControllerBase
             throw new ArgumentException($"Language value not allowed: {settingsMutable.LANGUAGE}");
         }
 
-        var languageChanged = SettingsService.AppSettings.SettingsMutable.LANGUAGE != settingsMutable.LANGUAGE;
+        var languageChanged = settingsService.GetSettings().SettingsMutable.LANGUAGE != settingsMutable.LANGUAGE;
 
         settingsMutable.SAVE_GLOBS = [.. settingsMutable.SAVE_GLOBS.Select(glob => glob.Trim())];
-        await SettingsService.UpdateSettings(settingsMutable);
+        await settingsService.UpdateSettings(settingsMutable);
 
-        return await DataDTO.FromDataUpdateFlags(new()
+        return await dataService.CreateDataFromUpdateFlags(new()
         {
             StaticData = languageChanged,
             MainBanks = true,
