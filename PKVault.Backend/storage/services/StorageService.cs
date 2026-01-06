@@ -449,7 +449,9 @@ public class StorageService(
             pkmLoader);
         var dexLoader = new DexLoader();
 
-        DataEntityLoaders loaders = new()
+        DataEntityLoaders loaders = new(
+            saveService: scope.ServiceProvider.GetRequiredService<LocalSaveService>()
+        )
         {
             bankLoader = bankLoader,
             boxLoader = boxLoader,

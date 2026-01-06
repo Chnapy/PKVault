@@ -14,7 +14,7 @@ public abstract class DataLoader(DataEntityLoaders loaders)
     }
 }
 
-public struct DataEntityLoaders(LocalSaveService saveService)
+public class DataEntityLoaders(LocalSaveService saveService)
 {
     public required BankLoader bankLoader { get; set; }
     public required BoxLoader boxLoader { get; set; }
@@ -23,11 +23,11 @@ public struct DataEntityLoaders(LocalSaveService saveService)
     public required DexLoader dexLoader { get; set; }
     public required Dictionary<uint, SaveLoaders> saveLoadersDict { get; set; }
 
-    public readonly List<IEntityLoaderWrite> jsonLoaders => [bankLoader, boxLoader, pkmLoader, pkmVersionLoader, dexLoader];
+    public List<IEntityLoaderWrite> jsonLoaders => [bankLoader, boxLoader, pkmLoader, pkmVersionLoader, dexLoader];
 
-    public readonly bool GetHasWritten() => jsonLoaders.Any(loader => loader.HasWritten);
+    public bool GetHasWritten() => jsonLoaders.Any(loader => loader.HasWritten);
 
-    public readonly async Task WriteToFiles()
+    public async Task WriteToFiles()
     {
         var jsonTasks = jsonLoaders.Select(loader => loader.WriteToFile());
 
@@ -42,7 +42,7 @@ public struct DataEntityLoaders(LocalSaveService saveService)
         await Task.WhenAll(jsonTasks);
     }
 
-    public readonly void SetupInitialData()
+    public void SetupInitialData()
     {
         var time = LogUtil.Time("Data Setup");
 
@@ -52,7 +52,7 @@ public struct DataEntityLoaders(LocalSaveService saveService)
         time();
     }
 
-    public readonly void MigrateGlobalEntities()
+    public void MigrateGlobalEntities()
     {
         var time = LogUtil.Time("Data Migrate");
 
@@ -62,7 +62,7 @@ public struct DataEntityLoaders(LocalSaveService saveService)
         time();
     }
 
-    public readonly void CleanData()
+    public void CleanData()
     {
         var time = LogUtil.Time("Data Clean");
 

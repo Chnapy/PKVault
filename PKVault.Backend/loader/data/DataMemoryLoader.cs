@@ -24,7 +24,7 @@ public class DataMemoryLoader(LocalSaveService saveService, PkmConvertService pk
 
         var startTime = DateTime.UtcNow;
 
-        DataEntityLoaders loaders = new()
+        DataEntityLoaders loaders = new(saveService)
         {
             bankLoader = bankLoader,
             boxLoader = boxLoader,
