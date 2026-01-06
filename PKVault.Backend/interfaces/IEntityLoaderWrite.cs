@@ -5,7 +5,7 @@ public interface IEntityLoaderWrite
 
     public byte[] SerializeToUtf8Bytes();
 
-    public void WriteToFile();
+    public Task WriteToFile();
 
     public void SetupInitialData(DataEntityLoaders loaders);
 

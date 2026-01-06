@@ -253,7 +253,7 @@ public class BackupService
         logtime();
 
         LocalSaveService.ReadLocalSaves();
-        StorageService.DataSetupMigrateClean();
+        await StorageService.DataSetupMigrateClean();
         await StorageService.ResetDataLoader(true);
     }
 

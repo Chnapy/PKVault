@@ -27,9 +27,9 @@ public struct DataEntityLoaders
 
     public readonly bool GetHasWritten() => jsonLoaders.Any(loader => loader.HasWritten);
 
-    public readonly void WriteToFiles()
+    public readonly async Task WriteToFiles()
     {
-        jsonLoaders.ForEach(loader => loader.WriteToFile());
+        var jsonTasks = jsonLoaders.Select(loader => loader.WriteToFile());
 
         foreach (var saveLoaders in saveLoadersDict.Values.ToList())
         {
@@ -38,6 +38,8 @@ public struct DataEntityLoaders
                 LocalSaveService.WriteSave(saveLoaders.Save);
             }
         }
+
+        await Task.WhenAll(jsonTasks);
     }
 
     public readonly void SetupInitialData()

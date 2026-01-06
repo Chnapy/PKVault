@@ -109,9 +109,9 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         return [];
     }
 
-    public override void WriteToFile()
+    public override async Task WriteToFile()
     {
-        base.WriteToFile();
+        await base.WriteToFile();
 
         pkmFileLoader.WriteToFiles();
     }

@@ -201,10 +201,7 @@ public class StorageService
 
         Console.WriteLine("SAVING IN PROGRESS");
 
-        await BackupService.PrepareBackupThenRun(async () =>
-        {
-            memoryLoader.WriteFiles();
-        });
+        await BackupService.PrepareBackupThenRun(memoryLoader.loaders.WriteToFiles);
 
         flags.Backups = true;
         flags.Warnings = true;
@@ -358,7 +355,7 @@ public class StorageService
         }
     }
 
-    public static void DataSetupMigrateClean()
+    public static async Task DataSetupMigrateClean()
     {
         var time = LogUtil.Time("Data Setup + Migrate + Clean");
 
@@ -386,7 +383,7 @@ public class StorageService
         {
             BackupService.CreateBackup();
 
-            loaders.WriteToFiles();
+            await loaders.WriteToFiles();
         }
 
         time();

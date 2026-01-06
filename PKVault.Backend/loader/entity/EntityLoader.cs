@@ -107,7 +107,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
         WriteEntity(GetEntityFromDTO(dto));
     }
 
-    public virtual void WriteToFile()
+    public virtual async Task WriteToFile()
     {
         if (!HasWritten)
         {
@@ -117,7 +117,12 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
 
         Console.WriteLine($"Write entities to {FilePath}");
 
-        File.WriteAllText(FilePath, JsonSerializer.Serialize(entitiesById ?? [], DictJsonContext));
+        using var fileStream = File.Create(FilePath);
+        await JsonSerializer.SerializeAsync(
+            fileStream,
+            entitiesById ?? [],
+            DictJsonContext
+        );
     }
 
     public abstract int GetLastSchemaVersion();

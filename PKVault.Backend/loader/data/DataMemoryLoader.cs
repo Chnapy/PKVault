@@ -73,9 +73,4 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
         }
         time();
     }
-
-    public void WriteFiles()
-    {
-        loaders.WriteToFiles();
-    }
 }
