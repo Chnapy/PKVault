@@ -2,7 +2,10 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Text.Json;
 
-public class BackupService(StorageService storageService, LocalSaveService saveService, WarningsService warningsService, PkmConvertService pkmConvertService)
+public class BackupService(
+    LoaderService loaderService, MaintenanceService maintenanceService, LocalSaveService saveService,
+    WarningsService warningsService, PkmConvertService pkmConvertService
+)
 {
     private static readonly string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
 
@@ -253,8 +256,8 @@ public class BackupService(StorageService storageService, LocalSaveService saveS
         logtime();
 
         saveService.ReadLocalSaves();
-        await storageService.DataSetupMigrateClean();
-        await storageService.ResetDataLoader(true);
+        await maintenanceService.DataSetupMigrateClean();
+        await loaderService.ResetDataLoader(true);
     }
 
     public async Task PrepareBackupThenRun(Func<Task> action)
@@ -271,7 +274,7 @@ public class BackupService(StorageService storageService, LocalSaveService saveS
 
             saveService.ReadLocalSaves();
 
-            await storageService.ResetDataLoader(false);
+            await loaderService.ResetDataLoader(false);
         }
         catch
         {

@@ -4,12 +4,12 @@ namespace PKVault.Backend.dex.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class DexController(StorageService storageService, DexService dexService) : ControllerBase
+public class DexController(LoaderService loaderService, DexService dexService) : ControllerBase
 {
     [HttpGet()]
     public async Task<ActionResult<Dictionary<ushort, Dictionary<uint, DexItemDTO>>>> GetAll()
     {
-        await storageService.WaitForSetup();
+        await loaderService.WaitForSetup();
 
         var record = await dexService.GetDex();
 

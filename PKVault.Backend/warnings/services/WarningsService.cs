@@ -1,6 +1,6 @@
 using PKHeX.Core;
 
-public class WarningsService(StorageService storageService, LocalSaveService saveService)
+public class WarningsService(LoaderService loaderService, LocalSaveService saveService)
 {
     private WarningsDTO WarningsDTO = new()
     {
@@ -41,7 +41,7 @@ public class WarningsService(StorageService storageService, LocalSaveService sav
     {
         var warns = new List<SaveChangedWarning>();
 
-        var loader = await storageService.GetLoader();
+        var loader = await loaderService.GetLoader();
 
         var startTime = loader.startTime;
 
@@ -115,7 +115,7 @@ public class WarningsService(StorageService storageService, LocalSaveService sav
     {
         var warns = new List<PkmVersionWarning>();
 
-        var loader = await storageService.GetLoader();
+        var loader = await loaderService.GetLoader();
 
         var pkms = loader.loaders.pkmLoader.GetAllDtos();
 
@@ -161,7 +161,7 @@ public class WarningsService(StorageService storageService, LocalSaveService sav
 
     private async Task<List<PkmDuplicateWarning>> CheckSavePkmDuplicates()
     {
-        var loader = await storageService.GetLoader();
+        var loader = await loaderService.GetLoader();
 
         if (loader.loaders.saveLoadersDict.Count == 0)
         {
@@ -195,7 +195,7 @@ public class WarningsService(StorageService storageService, LocalSaveService sav
 
     private async Task<List<SaveDuplicateWarning>> CheckSaveDuplicates()
     {
-        var loader = await storageService.GetLoader();
+        var loader = await loaderService.GetLoader();
 
         if (loader.loaders.saveLoadersDict.Count == 0)
         {

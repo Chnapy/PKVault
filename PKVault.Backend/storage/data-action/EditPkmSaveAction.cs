@@ -1,5 +1,5 @@
 public class EditPkmSaveAction(
-    StorageService storageService, PkmConvertService pkmConvertService,
+    ActionService actionService, PkmConvertService pkmConvertService,
     uint saveId, string pkmSaveId, EditPkmVersionPayload editPayload
 ) : DataAction
 {
@@ -15,7 +15,7 @@ public class EditPkmSaveAction(
 
         var pkm = pkmSave!.Pkm;
 
-        var availableMoves = await storageService.GetPkmAvailableMoves(saveId, pkmSaveId);
+        var availableMoves = await actionService.GetPkmAvailableMoves(saveId, pkmSaveId);
 
         EditPkmVersionAction.EditPkmNickname(pkmConvertService, pkm, editPayload.Nickname);
         EditPkmVersionAction.EditPkmEVs(pkmConvertService, pkm, editPayload.EVs);

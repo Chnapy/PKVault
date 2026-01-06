@@ -5,7 +5,7 @@ namespace PKVault.Backend.settings.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SettingsController(DataService dataService, SettingsService settingsService, StorageService storageService) : ControllerBase
+public class SettingsController(DataService dataService, SettingsService settingsService, LoaderService loaderService) : ControllerBase
 {
     [HttpGet]
     public ActionResult<SettingsDTO> Get()
@@ -29,7 +29,7 @@ public class SettingsController(DataService dataService, SettingsService setting
     [HttpPost]
     public async Task<ActionResult<DataDTO>> Edit([BindRequired] SettingsMutableDTO settingsMutable)
     {
-        if (!storageService.HasEmptyActionList())
+        if (!loaderService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }

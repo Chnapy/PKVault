@@ -113,7 +113,7 @@ public class Program
             return false;
 #elif MODE_DEFAULT
 
-        await host.Services.GetRequiredService<StorageService>().WaitForSetup();
+        await host.Services.GetRequiredService<LoaderService>().WaitForSetup();
 
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
@@ -121,7 +121,7 @@ public class Program
 
         if (args.Length > 0 && args[0] == "clean")
         {
-            await host.Services.GetRequiredService<StorageService>().CleanMainStorageFiles();
+            await host.Services.GetRequiredService<MaintenanceService>().CleanMainStorageFiles();
             return false;
         }
 
@@ -205,7 +205,10 @@ public class Program
             });
 
         services.AddSingleton<GenPokeapiService>();
-        services.AddSingleton<StorageService>();
+        services.AddSingleton<LoaderService>();
+        services.AddSingleton<StorageQueryService>();
+        services.AddSingleton<ActionService>();
+        services.AddSingleton<MaintenanceService>();
         services.AddSingleton<DexService>();
         services.AddSingleton<WarningsService>();
         services.AddSingleton<BackupService>();

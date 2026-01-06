@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-public class SettingsService(StorageService storageService, LocalSaveService saveService)
+public class SettingsService(LoaderService loaderService, LocalSaveService saveService)
 {
     // Most of settings available as static
     public static SettingsDTO BaseSettings = ReadBaseSettings();
@@ -17,14 +17,14 @@ public class SettingsService(StorageService storageService, LocalSaveService sav
 
         saveService.ReadLocalSaves();
 
-        await storageService.ResetDataLoader(true);
+        await loaderService.ResetDataLoader(true);
     }
 
     // Full settings
     public SettingsDTO GetSettings()
     {
-        BaseSettings.CanUpdateSettings = storageService.HasEmptyActionList();
-        BaseSettings.CanScanSaves = storageService.HasEmptyActionList();
+        BaseSettings.CanUpdateSettings = loaderService.HasEmptyActionList();
+        BaseSettings.CanScanSaves = loaderService.HasEmptyActionList();
 
         return BaseSettings;
     }

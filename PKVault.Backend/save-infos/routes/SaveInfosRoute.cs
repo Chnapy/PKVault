@@ -1,17 +1,16 @@
 using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace PKVault.Backend.saveinfos.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SaveInfosController(DataService dataService, LocalSaveService saveService, StorageService storageService) : ControllerBase
+public class SaveInfosController(DataService dataService, LocalSaveService saveService, LoaderService loaderService) : ControllerBase
 {
     [HttpGet()]
     public async Task<ActionResult<Dictionary<uint, SaveInfosDTO>>> GetAll()
     {
-        await storageService.WaitForSetup();
+        await loaderService.WaitForSetup();
 
         return saveService.GetAllSaveInfos();
     }
@@ -19,14 +18,14 @@ public class SaveInfosController(DataService dataService, LocalSaveService saveS
     [HttpPut()]
     public async Task<ActionResult<DataDTO>> Scan()
     {
-        if (!storageService.HasEmptyActionList())
+        if (!loaderService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }
 
         saveService.ReadLocalSaves();
 
-        await storageService.ResetDataLoader(true);
+        await loaderService.ResetDataLoader(true);
 
         return await dataService.CreateDataFromUpdateFlags(new()
         {
@@ -64,7 +63,7 @@ public class SaveInfosController(DataService dataService, LocalSaveService saveS
     [HttpGet("{saveId}/download")]
     public ActionResult Download(uint saveId)
     {
-        if (!storageService.HasEmptyActionList())
+        if (!loaderService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }

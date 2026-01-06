@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -6,12 +5,12 @@ namespace PKVault.Backend.storage.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class StorageController(DataService dataService, StorageService storageService) : ControllerBase
+public class StorageController(DataService dataService, LoaderService loaderService, StorageQueryService storageQueryService, ActionService actionService) : ControllerBase
 {
     [HttpGet("main/bank")]
     public async Task<ActionResult<List<BankDTO>>> GetMainBanks()
     {
-        var list = await storageService.GetMainBanks();
+        var list = await storageQueryService.GetMainBanks();
 
         return list;
     }
@@ -19,7 +18,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpGet("main/box")]
     public async Task<ActionResult<List<BoxDTO>>> GetMainBoxes()
     {
-        var list = await storageService.GetMainBoxes();
+        var list = await storageQueryService.GetMainBoxes();
 
         return list;
     }
@@ -27,7 +26,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpGet("main/pkm")]
     public async Task<ActionResult<List<PkmDTO>>> GetMainPkms()
     {
-        var list = await storageService.GetMainPkms();
+        var list = await storageQueryService.GetMainPkms();
 
         return list;
     }
@@ -36,7 +35,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpGet("main/pkm-version")]
     public async Task<ActionResult<List<PkmVersionDTO>>> GetMainPkmVersions()
     {
-        var list = await storageService.GetMainPkmVersions();
+        var list = await storageQueryService.GetMainPkmVersions();
 
         return list;
     }
@@ -44,7 +43,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpGet("save/{saveId}/box")]
     public async Task<ActionResult<List<BoxDTO>>> GetSaveBoxes(uint saveId)
     {
-        var saveBoxes = await storageService.GetSaveBoxes(saveId);
+        var saveBoxes = await storageQueryService.GetSaveBoxes(saveId);
 
         return saveBoxes;
     }
@@ -52,7 +51,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpGet("save/{saveId}/pkm")]
     public async Task<ActionResult<List<PkmSaveDTO>>> GetSavePkms(uint saveId)
     {
-        var savePkms = await storageService.GetSavePkms(saveId);
+        var savePkms = await storageQueryService.GetSavePkms(saveId);
 
         return savePkms;
     }
@@ -64,7 +63,7 @@ public class StorageController(DataService dataService, StorageService storageSe
         bool attached
     )
     {
-        var flags = await storageService.MovePkm(pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached);
+        var flags = await actionService.MovePkm(pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -76,7 +75,7 @@ public class StorageController(DataService dataService, StorageService storageSe
         bool attached
     )
     {
-        var flags = await storageService.MovePkmBank(pkmIds, sourceSaveId, bankId, attached);
+        var flags = await actionService.MovePkmBank(pkmIds, sourceSaveId, bankId, attached);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -84,7 +83,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpPost("main/box")]
     public async Task<ActionResult<DataDTO>> CreateMainBox([BindRequired] string bankId)
     {
-        var flags = await storageService.MainCreateBox(bankId);
+        var flags = await actionService.MainCreateBox(bankId);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -95,7 +94,7 @@ public class StorageController(DataService dataService, StorageService storageSe
         [BindRequired] int slotCount, [BindRequired] BoxType type
     )
     {
-        var flags = await storageService.MainUpdateBox(boxId, boxName, order, bankId, slotCount, type);
+        var flags = await actionService.MainUpdateBox(boxId, boxName, order, bankId, slotCount, type);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -103,7 +102,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpDelete("main/box/{boxId}")]
     public async Task<ActionResult<DataDTO>> DeleteMainBox(string boxId)
     {
-        var flags = await storageService.MainDeleteBox(boxId);
+        var flags = await actionService.MainDeleteBox(boxId);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -111,7 +110,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpPost("main/bank")]
     public async Task<ActionResult<DataDTO>> CreateMainBank()
     {
-        var flags = await storageService.MainCreateBank();
+        var flags = await actionService.MainCreateBank();
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -121,7 +120,7 @@ public class StorageController(DataService dataService, StorageService storageSe
         [BindRequired] string bankName, [BindRequired] bool isDefault, [BindRequired] int order,
         [BindRequired] BankEntity.BankView view)
     {
-        var flags = await storageService.MainUpdateBank(bankId, bankName, isDefault, order, view);
+        var flags = await actionService.MainUpdateBank(bankId, bankName, isDefault, order, view);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -129,7 +128,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpDelete("main/bank/{bankId}")]
     public async Task<ActionResult<DataDTO>> DeleteMainBank(string bankId)
     {
-        var flags = await storageService.MainDeleteBank(bankId);
+        var flags = await actionService.MainDeleteBank(bankId);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -137,7 +136,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpPut("main/pkm/detach-save")]
     public async Task<ActionResult<DataDTO>> MainPkmDetachSave([FromQuery] string[] pkmIds)
     {
-        var flags = await storageService.MainPkmDetachSaves(pkmIds);
+        var flags = await actionService.MainPkmDetachSaves(pkmIds);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -145,7 +144,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpPost("main/pkm-version")]
     public async Task<ActionResult<DataDTO>> MainCreatePkmVersion([BindRequired] string pkmId, [BindRequired] byte generation)
     {
-        var flags = await storageService.MainCreatePkmVersion(pkmId, generation);
+        var flags = await actionService.MainCreatePkmVersion(pkmId, generation);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -153,7 +152,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpPut("main/pkm-version/{pkmVersionId}")]
     public async Task<ActionResult<DataDTO>> MainEditPkmVersion(string pkmVersionId, [BindRequired] EditPkmVersionPayload payload)
     {
-        var flags = await storageService.MainEditPkmVersion(pkmVersionId, payload);
+        var flags = await actionService.MainEditPkmVersion(pkmVersionId, payload);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -161,7 +160,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpDelete("main/pkm-version")]
     public async Task<ActionResult<DataDTO>> MainDeletePkmVersion([FromQuery] string[] pkmVersionIds)
     {
-        var flags = await storageService.MainPkmVersionsDelete(pkmVersionIds);
+        var flags = await actionService.MainPkmVersionsDelete(pkmVersionIds);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -169,7 +168,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpDelete("save/{saveId}/pkm")]
     public async Task<ActionResult<DataDTO>> SaveDeletePkms(uint saveId, [FromQuery] string[] pkmIds)
     {
-        var flags = await storageService.SaveDeletePkms(saveId, pkmIds);
+        var flags = await actionService.SaveDeletePkms(saveId, pkmIds);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -177,7 +176,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpPut("save/{saveId}/pkm/{pkmId}")]
     public async Task<ActionResult<DataDTO>> SaveEditPkm(uint saveId, string pkmId, [BindRequired] EditPkmVersionPayload payload)
     {
-        var flags = await storageService.SaveEditPkm(saveId, pkmId, payload);
+        var flags = await actionService.SaveEditPkm(saveId, pkmId, payload);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -185,7 +184,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpPut("pkm/evolve")]
     public async Task<ActionResult<DataDTO>> EvolvePkms([FromQuery] string[] ids, uint? saveId)
     {
-        var flags = await storageService.EvolvePkms(saveId, ids);
+        var flags = await actionService.EvolvePkms(saveId, ids);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -193,7 +192,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpPut("pkm/sort")]
     public async Task<ActionResult<DataDTO>> SortPkms(uint? saveId, [BindRequired] int fromBoxId, [BindRequired] int toBoxId, [BindRequired] bool leaveEmptySlot)
     {
-        var flags = await storageService.SortPkms(saveId, fromBoxId, toBoxId, leaveEmptySlot);
+        var flags = await actionService.SortPkms(saveId, fromBoxId, toBoxId, leaveEmptySlot);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -201,7 +200,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpPut("dex/sync")]
     public async Task<ActionResult<DataDTO>> DexSync([FromQuery] uint[] saveIds)
     {
-        var flags = await storageService.DexSync(saveIds);
+        var flags = await actionService.DexSync(saveIds);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -209,19 +208,19 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpGet("pkm/available-moves")]
     public async Task<ActionResult<List<MoveItem>>> GetPkmAvailableMoves(uint? saveId, string pkmId)
     {
-        return await storageService.GetPkmAvailableMoves(saveId, pkmId);
+        return await actionService.GetPkmAvailableMoves(saveId, pkmId);
     }
 
     [HttpGet("action")]
     public ActionResult<List<DataActionPayload>> GetActions()
     {
-        return storageService.GetActionPayloadList();
+        return loaderService.GetActionPayloadList();
     }
 
     [HttpDelete("action")]
     public async Task<ActionResult<DataDTO>> DeleteActions([BindRequired] int actionIndexToRemoveFrom)
     {
-        var flags = await storageService.RemoveDataActionsAndReset(actionIndexToRemoveFrom);
+        var flags = await actionService.RemoveDataActionsAndReset(actionIndexToRemoveFrom);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -229,7 +228,7 @@ public class StorageController(DataService dataService, StorageService storageSe
     [HttpPost("action/save")]
     public async Task<ActionResult<DataDTO>> Save()
     {
-        var flags = await storageService.Save();
+        var flags = await actionService.Save();
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }

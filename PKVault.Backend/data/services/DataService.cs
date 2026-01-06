@@ -1,5 +1,5 @@
 public class DataService(
-    StorageService storageService, StaticDataService staticDataService,
+    LoaderService loaderService, StorageQueryService storageQueryService, StaticDataService staticDataService,
     WarningsService warningsService, DexService dexService, LocalSaveService saveService,
     BackupService backupService, SettingsService settingsService
 )
@@ -11,7 +11,7 @@ public class DataService(
 
         var dto = new DataDTO();
 
-        var memoryLoader = await storageService.GetLoader();
+        var memoryLoader = await loaderService.GetLoader();
 
         if (flags.StaticData)
         {
@@ -39,7 +39,7 @@ public class DataService(
         {
             tasks.Add(Task.Run(async () =>
             {
-                dto.MainBanks = await storageService.GetMainBanks();
+                dto.MainBanks = await storageQueryService.GetMainBanks();
             }));
         }
 
@@ -47,7 +47,7 @@ public class DataService(
         {
             tasks.Add(Task.Run(async () =>
             {
-                dto.MainBoxes = await storageService.GetMainBoxes();
+                dto.MainBoxes = await storageQueryService.GetMainBoxes();
             }));
         }
 
@@ -55,7 +55,7 @@ public class DataService(
         {
             tasks.Add(Task.Run(async () =>
             {
-                dto.MainPkms = await storageService.GetMainPkms();
+                dto.MainPkms = await storageQueryService.GetMainPkms();
             }));
         }
 
@@ -63,7 +63,7 @@ public class DataService(
         {
             tasks.Add(Task.Run(async () =>
             {
-                dto.MainPkmVersions = await storageService.GetMainPkmVersions();
+                dto.MainPkmVersions = await storageQueryService.GetMainPkmVersions();
             }));
         }
 
@@ -81,7 +81,7 @@ public class DataService(
                     {
                         if (memoryLoader.loaders.saveLoadersDict.ContainsKey(saveData.SaveId))
                         {
-                            saveDto.SaveBoxes ??= await storageService.GetSaveBoxes(saveData.SaveId);
+                            saveDto.SaveBoxes ??= await storageQueryService.GetSaveBoxes(saveData.SaveId);
                         }
                         else
                         {
@@ -96,7 +96,7 @@ public class DataService(
                     {
                         if (memoryLoader.loaders.saveLoadersDict.ContainsKey(saveData.SaveId))
                         {
-                            saveDto.SavePkms ??= await storageService.GetSavePkms(saveData.SaveId);
+                            saveDto.SavePkms ??= await storageQueryService.GetSavePkms(saveData.SaveId);
                         }
                         else
                         {
@@ -121,7 +121,7 @@ public class DataService(
 
         dto.Saves = saveDict.Count > 0 ? [.. saveDict.Values] : null;
 
-        dto.Actions = storageService.GetActionPayloadList();
+        dto.Actions = loaderService.GetActionPayloadList();
         dto.Warnings = warningsService.GetWarningsDTO();
         dto.Settings = settingsService.GetSettings();
 

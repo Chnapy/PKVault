@@ -1,7 +1,7 @@
 using PKHeX.Core;
 
 public class EditPkmVersionAction(
-    StorageService storageService, PkmConvertService pkmConvertService,
+    ActionService actionService, PkmConvertService pkmConvertService,
     string pkmVersionId, EditPkmVersionPayload editPayload
 ) : DataAction
 {
@@ -10,7 +10,7 @@ public class EditPkmVersionAction(
         var pkmVersionDto = loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkmDto = pkmVersionDto!.PkmDto;
 
-        var availableMoves = await storageService.GetPkmAvailableMoves(null, pkmVersionId);
+        var availableMoves = await actionService.GetPkmAvailableMoves(null, pkmVersionId);
 
         var pkm = pkmVersionDto.Pkm;
 
