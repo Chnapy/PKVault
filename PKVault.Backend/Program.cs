@@ -1,7 +1,9 @@
-﻿using System.Net;
+﻿using System.IO.Compression;
+using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace PKVault.Backend;
 
@@ -174,6 +176,23 @@ public class Program
 
     public static void ConfigureServices(IServiceCollection services)
     {
+        services.AddResponseCompression(opts =>
+        {
+            opts.Providers.Add<BrotliCompressionProvider>();
+            opts.Providers.Add<GzipCompressionProvider>();
+            opts.EnableForHttps = true;
+        });
+
+        services.Configure<BrotliCompressionProviderOptions>(options =>
+        {
+            options.Level = CompressionLevel.Optimal;
+        });
+
+        services.Configure<GzipCompressionProviderOptions>(options =>
+        {
+            options.Level = CompressionLevel.Optimal;
+        });
+
         services
             .AddControllers(options =>
             {
@@ -210,6 +229,8 @@ public class Program
 
     public static void ConfigureAppBuilder(IApplicationBuilder app, bool useHttps)
     {
+        app.UseResponseCompression();
+
         if (useHttps)
         {
             app.UseHttpsRedirection();
