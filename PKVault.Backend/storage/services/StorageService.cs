@@ -2,7 +2,10 @@ using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using PKHeX.Core;
 
-public class StorageService(IServiceProvider sp)
+public class StorageService(
+    // Direct use of service-provider because of circular dependencies
+    IServiceProvider sp
+)
 {
     private readonly SemaphoreSlim _setupLock = new(1, 1);
     private Task? SetupTask;
@@ -10,8 +13,11 @@ public class StorageService(IServiceProvider sp)
 
     public async Task<DataMemoryLoader> GetLoader()
     {
-        if (_memoryLoader == null)
-            await WaitForSetup();
+        if (_memoryLoader != null)
+            return _memoryLoader;
+
+        await WaitForSetup();
+
         return _memoryLoader ?? throw new InvalidOperationException("Loader not initialized");
     }
 
@@ -20,7 +26,7 @@ public class StorageService(IServiceProvider sp)
         await _setupLock.WaitAsync();
         try
         {
-            SetupTask ??= Task.Run(Setup);
+            SetupTask ??= Setup();
         }
         finally
         {
@@ -44,7 +50,7 @@ public class StorageService(IServiceProvider sp)
         {
             Console.Error.WriteLine(ex);
         }
-        await ResetDataLoader(true);
+        _memoryLoader = await ResetDataLoader(true);
         await scope.ServiceProvider.GetRequiredService<WarningsService>().CheckWarnings();
     }
 
