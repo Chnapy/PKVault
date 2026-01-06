@@ -1,7 +1,9 @@
 using PKHeX.Core;
 
-public class DexEntity : IWithId<string>
+public class DexEntity : IEntity
 {
+    public int SchemaVersion { get; set; } = 0;
+
     public required string Id { get; set; }
     public required ushort Species { get; set; }
     public required List<DexEntityForm> Forms { get; set; }

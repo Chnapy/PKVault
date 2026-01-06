@@ -1,7 +1,7 @@
 
 using PKHeX.Core;
 
-public class DexItemDTO : IWithId<string>
+public class DexItemDTO : IWithId
 {
     public required string Id { get; set; }
     public required ushort Species { get; set; }

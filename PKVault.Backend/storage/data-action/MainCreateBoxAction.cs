@@ -38,7 +38,9 @@ public class MainCreateBoxAction(string bankId, int? slotCount) : DataAction
         {
             BoxEntity = new()
             {
+                SchemaVersion = loaders.boxLoader.GetLastSchemaVersion(),
                 Id = id.ToString(),
+                Type = BoxType.Box,
                 Name = name,
                 SlotCount = slotCount ?? 30,
                 Order = order,
@@ -47,38 +49,11 @@ public class MainCreateBoxAction(string bankId, int? slotCount) : DataAction
         };
 
         loaders.boxLoader.WriteDto(dto);
-
-        NormalizeBoxOrders(loaders.boxLoader);
+        loaders.boxLoader.NormalizeOrders();
 
         flags.MainBoxes = true;
         flags.MainBanks = true;
 
         return dto;
-    }
-
-    public static void NormalizeBoxOrders(BoxLoader boxLoader)
-    {
-        var boxes = boxLoader.GetAllEntities();
-
-        var bi = 0;
-        string? bankId = null;
-        boxes.Values
-            .OrderBy(box => box.BankId)
-            .ThenBy(box => box.Order).ToList()
-            .ForEach(box =>
-            {
-                if (bankId != box.BankId)
-                {
-                    bankId = box.BankId;
-                    bi = 0;
-                }
-
-                if (box.Order != bi)
-                {
-                    box.Order = bi;
-                    boxLoader.WriteEntity(box);
-                }
-                bi += 10;
-            });
     }
 }

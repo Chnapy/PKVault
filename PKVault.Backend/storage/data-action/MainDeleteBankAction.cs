@@ -16,8 +16,7 @@ public class MainDeleteBankAction(string bankId) : DataAction
         }
 
         loaders.bankLoader.DeleteEntity(bankId);
-
-        MainCreateBankAction.NormalizeBankOrders(loaders.bankLoader);
+        loaders.bankLoader.NormalizeOrders();
 
         flags.MainBanks = true;
 

@@ -1,6 +1,4 @@
-using PKHeX.Core;
-
-public class BankDTO : IWithId<string>
+public class BankDTO : IWithId
 {
     public string Id => BankEntity.Id;
 

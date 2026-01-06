@@ -96,6 +96,7 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
     {
         DexEntity entity = loaders.dexLoader.GetEntity(species.ToString()) ?? new()
         {
+            SchemaVersion = loaders.dexLoader.GetLastSchemaVersion(),
             Id = species.ToString(),
             Species = species,
             Forms = []

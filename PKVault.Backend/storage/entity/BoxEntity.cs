@@ -1,5 +1,7 @@
-public class BoxEntity : IWithId<string>
+public class BoxEntity : IEntity
 {
+    public int SchemaVersion { get; set; } = 0;
+
     public required string Id { get; set; }
 
     public int IdInt
@@ -7,7 +9,7 @@ public class BoxEntity : IWithId<string>
         get { return int.Parse(Id); }
     }
 
-    public BoxType Type { get; set; } = BoxType.Box;
+    public required BoxType Type { get; set; } = BoxType.Box;
 
     public required string Name { get; set; }
 
@@ -15,5 +17,5 @@ public class BoxEntity : IWithId<string>
 
     public int Order { get; set; } = 0;
 
-    public string? BankId { get; set; }
+    public string BankId { get; set; } = "";
 }

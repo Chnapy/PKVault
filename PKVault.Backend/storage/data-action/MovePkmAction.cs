@@ -411,6 +411,7 @@ public class MovePkmAction(
             // create pkm & pkm-version
             var pkmEntityToCreate = new PkmEntity
             {
+                SchemaVersion = loaders.pkmLoader.GetLastSchemaVersion(),
                 Id = savePkm.IdBase,
                 BoxId = targetBoxId,
                 BoxSlot = targetBoxSlot,
@@ -420,6 +421,7 @@ public class MovePkmAction(
 
             pkmVersionEntity = new PkmVersionEntity
             {
+                SchemaVersion = loaders.pkmVersionLoader.GetLastSchemaVersion(),
                 Id = savePkm.IdBase,
                 PkmId = pkmEntityToCreate.Id,
                 Generation = savePkm.Generation,

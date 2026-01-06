@@ -47,8 +47,7 @@ public class MainUpdateBankAction(string bankId, string bankName, bool isDefault
         bank.View = view;
 
         loaders.bankLoader.WriteEntity(bank);
-
-        MainCreateBankAction.NormalizeBankOrders(loaders.bankLoader);
+        loaders.bankLoader.NormalizeOrders();
 
         flags.MainBanks = true;
 

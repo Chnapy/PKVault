@@ -1,5 +1,11 @@
-public class BankEntity : IWithId<string>
+public class BankEntity : IEntity
 {
+    public record BankView(int[] MainBoxIds, BankViewSave[] Saves);
+
+    public record BankViewSave(uint SaveId, int[] SaveBoxIds, int Order);
+
+    public int SchemaVersion { get; set; } = 0;
+
     public required string Id { get; set; }
 
     public int IdInt
@@ -14,8 +20,4 @@ public class BankEntity : IWithId<string>
     public required int Order { get; set; }
 
     public required BankView View { get; set; }
-
-    public record BankView(int[] MainBoxIds, BankViewSave[] Saves);
-
-    public record BankViewSave(uint SaveId, int[] SaveBoxIds, int Order);
 }

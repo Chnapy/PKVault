@@ -17,11 +17,13 @@ public class SaveBoxLoader(SaveFile save)
             {
                 BoxEntity = new()
                 {
+                    SchemaVersion = default,
                     Id = id,
                     Type = BoxType.Party,
                     Name = BoxType.Party.ToString(),
                     Order = currentOrder,
                     SlotCount = 6,
+                    BankId = default,
                 }
             });
             currentOrder++;
@@ -37,11 +39,13 @@ public class SaveBoxLoader(SaveFile save)
                 {
                     BoxEntity = new()
                     {
+                        SchemaVersion = default,
                         Id = id,
                         Type = BoxType.Box,
                         Name = boxesNames[i],
                         Order = currentOrder,
                         SlotCount = save.BoxSlotCount,
+                        BankId = default,
                     }
                 });
                 currentOrder++;
@@ -58,11 +62,13 @@ public class SaveBoxLoader(SaveFile save)
             {
                 BoxEntity = new()
                 {
+                    SchemaVersion = default,
                     Id = id,
                     Type = BoxType.Daycare,
                     Name = BoxType.Daycare.ToString(),
                     Order = currentOrder,
                     SlotCount = saveDaycare.DaycareSlotCount + extraSlotsCount,
+                    BankId = default,
                 }
             });
             currentOrder++;
@@ -88,11 +94,13 @@ public class SaveBoxLoader(SaveFile save)
                 {
                     BoxEntity = new()
                     {
+                        SchemaVersion = default,
                         Id = id,
                         Type = boxType,
                         Name = name,
                         Order = currentOrder,
                         SlotCount = slotCount,
+                        BankId = default,
                     }
                 });
                 currentOrder++;

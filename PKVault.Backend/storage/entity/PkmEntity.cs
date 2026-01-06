@@ -1,5 +1,7 @@
-public class PkmEntity : IWithId<string>
+public class PkmEntity : IEntity
 {
+    public int SchemaVersion { get; set; } = 0;
+
     public required string Id { get; set; }
 
     public required uint BoxId { get; set; }

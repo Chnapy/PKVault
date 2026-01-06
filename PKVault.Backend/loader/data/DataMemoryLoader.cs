@@ -76,18 +76,6 @@ public class DataMemoryLoader(DataEntityLoaders _loaders, DateTime startTime) : 
 
     public void WriteFiles()
     {
-        loaders.bankLoader.WriteToFile();
-        loaders.boxLoader.WriteToFile();
-        loaders.pkmLoader.WriteToFile();
-        loaders.pkmVersionLoader.WriteToFile();
-        loaders.dexLoader.WriteToFile();
-
-        foreach (var saveLoaders in loaders.saveLoadersDict.Values.ToList())
-        {
-            if (saveLoaders.Pkms.HasWritten || saveLoaders.Boxes.HasWritten)
-            {
-                LocalSaveService.WriteSave(saveLoaders.Save);
-            }
-        }
+        loaders.WriteToFiles();
     }
 }

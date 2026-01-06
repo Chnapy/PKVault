@@ -1,4 +1,4 @@
-public class PkmDTO : IWithId<string>
+public class PkmDTO : IWithId
 {
     public static PkmDTO FromEntity(PkmEntity entity)
     {

@@ -2,9 +2,8 @@
 using System.Text.Json.Serialization;
 using PKHeX.Core;
 using PKHeX.Core.Searching;
-using PokeApiNet;
 
-public abstract class BasePkmVersionDTO : IWithId<string>
+public abstract class BasePkmVersionDTO : IWithId
 {
     public string Id { get { return GetPKMIdBase(Pkm); } }
 

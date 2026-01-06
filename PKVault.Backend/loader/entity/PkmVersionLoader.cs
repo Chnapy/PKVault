@@ -141,4 +141,98 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
 
         return pkm;
     }
+
+    public override int GetLastSchemaVersion() => 1;
+
+    public override void SetupInitialData(DataEntityLoaders loaders)
+    {
+    }
+
+    protected override Action<DataEntityLoaders>? GetMigrateFunc(int currentSchemaVersion) => currentSchemaVersion switch
+    {
+        0 => MigrateV0ToV1,
+        _ => null
+    };
+
+    private void MigrateV0ToV1(DataEntityLoaders loaders)
+    {
+        // Most part is done in PkmLoader for strong couplage reasons
+
+        GetAllEntities().Values.ToList().ForEach(entity => WriteEntity(new()
+        {
+            SchemaVersion = 1,
+            Id = entity.Id,
+            PkmId = entity.PkmId,
+            Generation = entity.Generation,
+            Filepath = entity.Filepath
+        }));
+    }
+
+    public override void CleanData(DataEntityLoaders loaders)
+    {
+        // rename pk filename if needed
+        GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
+        {
+            var pkmBytes = File.ReadAllBytes(pkmVersionEntity.Filepath);
+            var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
+
+            var oldFilepath = pkmVersionEntity.Filepath;
+            var expectedFilepath = PKMLoader.GetPKMFilepath(pkm);
+
+            // update pk file
+            if (expectedFilepath != oldFilepath)
+            {
+                if (File.Exists(oldFilepath))
+                {
+                    Console.WriteLine($"Copy {oldFilepath} to {expectedFilepath}");
+                    File.Copy(oldFilepath, expectedFilepath, true);
+                }
+                pkmVersionEntity.Filepath = expectedFilepath;
+                WriteEntity(pkmVersionEntity);
+            }
+
+            // if filepath is not normalized
+            if (pkmVersionEntity.Filepath != MatcherUtil.NormalizePath(pkmVersionEntity.Filepath))
+            {
+                pkmVersionEntity.Filepath = MatcherUtil.NormalizePath(pkmVersionEntity.Filepath);
+                WriteEntity(pkmVersionEntity);
+            }
+        });
+
+        // remove pkmVersions with inconsistent data
+        GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
+        {
+            var pkmEntity = pkmLoader.GetEntity(pkmVersionEntity.PkmId);
+            if (pkmEntity == null)
+            {
+                DeleteEntity(pkmVersionEntity.Id);
+            }
+            else
+            {
+                var boxEntity = loaders.boxLoader.GetEntity(pkmEntity!.BoxId.ToString());
+                if (boxEntity == null)
+                {
+                    DeleteEntity(pkmVersionEntity.Id);
+                }
+                else
+                {
+                    PKM? pkm = null;
+                    try
+                    {
+                        var pkmBytes = File.ReadAllBytes(pkmVersionEntity.Filepath);
+                        pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine($"Path = {pkmVersionEntity.Filepath}");
+                        Console.Error.WriteLine(ex);
+                    }
+                    if (pkm == null)
+                    {
+                        DeleteEntity(pkmVersionEntity.Id);
+                    }
+                }
+            }
+        });
+    }
 }

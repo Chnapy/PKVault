@@ -22,6 +22,53 @@ public struct DataEntityLoaders
     public required PkmVersionLoader pkmVersionLoader { get; set; }
     public required DexLoader dexLoader { get; set; }
     public required Dictionary<uint, SaveLoaders> saveLoadersDict { get; set; }
+
+    public readonly List<IEntityLoaderWrite> jsonLoaders => [bankLoader, boxLoader, pkmLoader, pkmVersionLoader, dexLoader];
+
+    public readonly bool GetHasWritten() => jsonLoaders.Any(loader => loader.HasWritten);
+
+    public readonly void WriteToFiles()
+    {
+        jsonLoaders.ForEach(loader => loader.WriteToFile());
+
+        foreach (var saveLoaders in saveLoadersDict.Values.ToList())
+        {
+            if (saveLoaders.Pkms.HasWritten || saveLoaders.Boxes.HasWritten)
+            {
+                LocalSaveService.WriteSave(saveLoaders.Save);
+            }
+        }
+    }
+
+    public readonly void SetupInitialData()
+    {
+        var time = LogUtil.Time("Data Setup");
+
+        var loaders = this;
+        jsonLoaders.ForEach(loader => loader.SetupInitialData(loaders));
+
+        time();
+    }
+
+    public readonly void MigrateGlobalEntities()
+    {
+        var time = LogUtil.Time("Data Migrate");
+
+        var loaders = this;
+        jsonLoaders.ForEach(loader => loader.MigrateGlobalEntities(loaders));
+
+        time();
+    }
+
+    public readonly void CleanData()
+    {
+        var time = LogUtil.Time("Data Clean");
+
+        var loaders = this;
+        jsonLoaders.ForEach(loader => loader.CleanData(loaders));
+
+        time();
+    }
 }
 
 public struct SaveLoaders

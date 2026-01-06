@@ -35,6 +35,7 @@ public class MainCreatePkmVersionAction(string pkmId, byte generation) : DataAct
 
         var pkmVersionEntityCreated = new PkmVersionEntity
         {
+            SchemaVersion = loaders.pkmVersionLoader.GetLastSchemaVersion(),
             Id = BasePkmVersionDTO.GetPKMIdBase(pkmConverted),
             PkmId = pkmId,
             Generation = generation,

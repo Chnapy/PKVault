@@ -1,12 +1,12 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-public abstract class EntityLoader<DTO, E> where DTO : IWithId<string> where E : IWithId<string>
+public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWithId where E : IEntity
 {
     protected Dictionary<string, E>? entitiesById = null;
 
-    public readonly string FilePath;
-    public bool HasWritten = false;
+    public string FilePath { get; }
+    public bool HasWritten { get; set; } = false;
     protected JsonTypeInfo<Dictionary<string, E>> DictJsonContext;
 
     public EntityLoader(string filePath, JsonTypeInfo<Dictionary<string, E>> dictJsonContext)
@@ -29,6 +29,8 @@ public abstract class EntityLoader<DTO, E> where DTO : IWithId<string> where E :
 
         return entitiesById;
     }
+
+    public byte[] SerializeToUtf8Bytes() => JsonSerializer.SerializeToUtf8Bytes(GetAllEntities(), DictJsonContext);
 
     private Dictionary<string, E> GetFileContent()
     {
@@ -83,7 +85,7 @@ public abstract class EntityLoader<DTO, E> where DTO : IWithId<string> where E :
         var deleted = GetAllEntities().Remove(id);
         if (deleted)
         {
-            Console.WriteLine($"Deleted entity id={id}");
+            Console.WriteLine($"Deleted id={id}");
 
             HasWritten = true;
         }
@@ -93,7 +95,7 @@ public abstract class EntityLoader<DTO, E> where DTO : IWithId<string> where E :
 
     public virtual void WriteEntity(E entity)
     {
-        Console.WriteLine($"{entity.GetType().Name} - Write id={entity.Id} - Entity id={entity.Id}");
+        Console.WriteLine($"{entity.GetType().Name} - Write id={entity.Id}");
 
         GetAllEntities()[entity.Id] = entity;
 
@@ -117,4 +119,32 @@ public abstract class EntityLoader<DTO, E> where DTO : IWithId<string> where E :
 
         File.WriteAllText(FilePath, JsonSerializer.Serialize(entitiesById ?? [], DictJsonContext));
     }
+
+    public abstract int GetLastSchemaVersion();
+
+    public abstract void SetupInitialData(DataEntityLoaders loaders);
+
+    public void MigrateGlobalEntities(DataEntityLoaders loaders)
+    {
+        var firstItem = GetAllEntities().First().Value;
+        if (firstItem == null)
+        {
+            return;
+        }
+
+        if (firstItem.SchemaVersion == GetLastSchemaVersion())
+        {
+            return;
+        }
+
+        var migrateFn = GetMigrateFunc(firstItem.SchemaVersion) ?? throw new NotSupportedException($"Schema version {firstItem.SchemaVersion}");
+
+        migrateFn(loaders);
+
+        MigrateGlobalEntities(loaders);
+    }
+
+    protected abstract Action<DataEntityLoaders>? GetMigrateFunc(int currentSchemaVersion);
+
+    public abstract void CleanData(DataEntityLoaders loaders);
 }

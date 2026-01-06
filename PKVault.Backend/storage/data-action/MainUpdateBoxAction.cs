@@ -62,8 +62,7 @@ public class MainUpdateBoxAction(string boxId, string boxName, int order, string
         box.SlotCount = slotCount;
 
         loaders.boxLoader.WriteEntity(box);
-
-        MainCreateBoxAction.NormalizeBoxOrders(loaders.boxLoader);
+        loaders.boxLoader.NormalizeOrders();
 
         flags.MainBoxes = true;
         flags.MainBanks = true;

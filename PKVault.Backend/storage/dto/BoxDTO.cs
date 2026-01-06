@@ -1,6 +1,6 @@
 using PKHeX.Core;
 
-public class BoxDTO : IWithId<string>
+public class BoxDTO : IWithId
 {
     public string Id { get { return BoxEntity.Id; } }
 

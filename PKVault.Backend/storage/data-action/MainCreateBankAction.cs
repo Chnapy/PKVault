@@ -3,8 +3,8 @@ public class MainCreateBankAction : DataAction
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var banks = loaders.bankLoader.GetAllDtos();
-        var maxId = banks.Select(bank => bank.IdInt).Max();
-        var maxOrder = banks.Select(bank => bank.Order).Max();
+        var maxId = banks.Max(bank => bank.IdInt);
+        var maxOrder = banks.Max(bank => bank.Order);
 
         string GetNewName()
         {
@@ -24,14 +24,14 @@ public class MainCreateBankAction : DataAction
 
         loaders.bankLoader.WriteEntity(new()
         {
+            SchemaVersion = loaders.bankLoader.GetLastSchemaVersion(),
             Id = id.ToString(),
             Name = name,
             IsDefault = false,
             Order = order, // normalized just after
             View = new(MainBoxIds: [], Saves: [])
         });
-
-        NormalizeBankOrders(loaders.bankLoader);
+        loaders.bankLoader.NormalizeOrders();
 
         flags.MainBanks = true;
 
@@ -42,22 +42,5 @@ public class MainCreateBankAction : DataAction
             type = DataActionType.MAIN_CREATE_BANK,
             parameters = [name]
         };
-    }
-
-    public static void NormalizeBankOrders(BankLoader bankLoader)
-    {
-        var banks = bankLoader.GetAllEntities();
-
-        var bi = 0;
-        banks.Values.OrderBy(bank => bank.Order).ToList()
-            .ForEach(bank =>
-            {
-                if (bank.Order != bi)
-                {
-                    bank.Order = bi;
-                    bankLoader.WriteEntity(bank);
-                }
-                bi += 10;
-            });
     }
 }

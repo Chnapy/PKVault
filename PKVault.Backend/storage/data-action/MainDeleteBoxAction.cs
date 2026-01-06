@@ -11,8 +11,7 @@ public class MainDeleteBoxAction(string boxId) : DataAction
         }
 
         loaders.boxLoader.DeleteEntity(boxId);
-
-        MainCreateBoxAction.NormalizeBoxOrders(loaders.boxLoader);
+        loaders.boxLoader.NormalizeOrders();
 
         if (box.BankId != null)
         {

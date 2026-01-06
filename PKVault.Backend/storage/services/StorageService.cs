@@ -358,9 +358,9 @@ public class StorageService
         }
     }
 
-    public static void CleanWrongData()
+    public static void DataSetupMigrateClean()
     {
-        var time = LogUtil.Time("Clean wrong data");
+        var time = LogUtil.Time("Data Setup + Migrate + Clean");
 
         var bankLoader = new BankLoader();
         var boxLoader = new BoxLoader();
@@ -378,197 +378,15 @@ public class StorageService
             saveLoadersDict = [],
         };
 
-        var banks = bankLoader.GetAllEntities();
-        if (banks.Count == 0)
-        {
-            bankLoader.WriteEntity(new()
-            {
-                Id = "0",
-                Name = "Bank 1",
-                IsDefault = true,
-                Order = 0,
-                View = new(MainBoxIds: [], Saves: []),
-            });
-            banks = bankLoader.GetAllEntities();
-        }
-        else
-        {
-            MainCreateBankAction.NormalizeBankOrders(bankLoader);
-        }
+        loaders.SetupInitialData();
+        loaders.MigrateGlobalEntities();
+        loaders.CleanData();
 
-        var boxes = boxLoader.GetAllEntities();
-        if (boxes.Count == 0)
-        {
-            boxLoader.WriteEntity(new()
-            {
-                Id = "0",
-                Name = "Box 1",
-                Order = 0,
-                BankId = banks.First().Key
-            });
-        }
-        else
-        {
-            boxes.Values.ToList().ForEach(box =>
-            {
-                if (box.BankId == null)
-                {
-                    box.BankId = banks.First().Key;
-                    boxLoader.WriteEntity(box);
-                }
-            });
-
-            MainCreateBoxAction.NormalizeBoxOrders(boxLoader);
-        }
-
-        /**
-         * Convert entities with old/wrong ID format to new one.
-         * It checks:
-         * - pkm-version entity ID
-         * - pkm entity ID
-         * - pk filenames
-         */
-        pkmLoader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
-        {
-            var pkmVersions = pkmVersionLoader.GetEntitiesByPkmId(pkmEntity.Id).Values.ToList();
-
-            pkmVersions.ForEach(pkmVersionEntity =>
-            {
-                try
-                {
-                    var pkmBytes = File.ReadAllBytes(pkmVersionEntity.Filepath);
-                    var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
-
-                    var oldId = pkmVersionEntity.Id;
-                    var expectedId = BasePkmVersionDTO.GetPKMIdBase(pkm);
-
-                    var oldPkmId = pkmVersionEntity.PkmId;
-
-                    var oldFilepath = pkmVersionEntity.Filepath;
-                    var expectedFilepath = PKMLoader.GetPKMFilepath(pkm);
-                    if (expectedId != oldId)
-                    {
-                        // must be done first
-                        pkmVersionLoader.DeleteEntity(oldId);
-
-                        // update pkm-entity id if main version
-                        if (oldPkmId == oldId)
-                        {
-                            pkmEntity.Id = expectedId;
-                            pkmLoader.DeleteEntity(oldId);
-                            pkmLoader.WriteEntity(pkmEntity);
-                        }
-
-                        // update pk file
-                        if (expectedFilepath != oldFilepath)
-                        {
-                            if (File.Exists(oldFilepath))
-                            {
-                                Console.WriteLine($"Copy {oldFilepath} to {expectedFilepath}");
-                                File.Copy(oldFilepath, expectedFilepath, true);
-                            }
-                            pkmVersionEntity.Filepath = expectedFilepath;
-                        }
-
-                        // update pkm-version-entity id
-                        pkmVersionEntity.Id = expectedId;
-                        pkmVersionLoader.WriteEntity(pkmVersionEntity);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine(ex);
-                }
-            });
-
-            pkmVersions.ForEach(pkmVersionEntity =>
-            {
-                if (pkmVersionEntity.PkmId != pkmEntity.Id)
-                {
-                    pkmVersionEntity.PkmId = pkmEntity.Id;
-                    pkmVersionLoader.WriteEntity(pkmVersionEntity);
-                }
-            });
-        });
-
-        // remove pkmVersions with inconsistent data
-        pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
-        {
-            bool deleted = false;
-            var pkmEntity = pkmLoader.GetEntity(pkmVersionEntity.PkmId);
-            if (pkmEntity == null)
-            {
-                deleted = pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
-            }
-            else
-            {
-                var boxEntity = boxLoader.GetEntity(pkmEntity!.BoxId.ToString());
-                if (boxEntity == null)
-                {
-                    deleted = pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
-                }
-                else
-                {
-                    PKM? pkm = null;
-                    try
-                    {
-                        var pkmBytes = File.ReadAllBytes(pkmVersionEntity.Filepath);
-                        pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.Error.WriteLine($"Path = {pkmVersionEntity.Filepath}");
-                        Console.Error.WriteLine(ex);
-                    }
-                    if (pkm == null)
-                    {
-                        deleted = pkmVersionLoader.DeleteEntity(pkmVersionEntity.Id);
-                    }
-                }
-            }
-
-            if (!deleted)
-            {
-                // if filepath is not normalized
-                if (pkmVersionEntity.Filepath != MatcherUtil.NormalizePath(pkmVersionEntity.Filepath))
-                {
-                    pkmVersionEntity.Filepath = MatcherUtil.NormalizePath(pkmVersionEntity.Filepath);
-                    pkmVersionLoader.WriteEntity(pkmVersionEntity);
-                }
-            }
-        });
-
-        // remove pkms with inconsistent data
-        pkmLoader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
-        {
-            var pkmVersions = pkmVersionLoader.GetEntitiesByPkmId(pkmEntity.Id).Values;
-            if (pkmVersions.Count == 0)
-            {
-                pkmLoader.DeleteEntity(pkmEntity.Id);
-            }
-        });
-
-        var dexService = new DexMainService(loaders);
-        pkmVersionLoader.GetAllDtos().ForEach(pkmVersion =>
-        {
-            dexService.EnablePKM(pkmVersion.Pkm, createOnly: true);
-        });
-
-        if (
-            bankLoader.HasWritten
-            || boxLoader.HasWritten
-            || pkmVersionLoader.HasWritten
-            || pkmLoader.HasWritten
-            || dexLoader.HasWritten
-        )
+        if (loaders.GetHasWritten())
         {
             BackupService.CreateBackup();
 
-            bankLoader.WriteToFile();
-            boxLoader.WriteToFile();
-            pkmVersionLoader.WriteToFile();
-            pkmLoader.WriteToFile();
-            dexLoader.WriteToFile();
+            loaders.WriteToFiles();
         }
 
         time();

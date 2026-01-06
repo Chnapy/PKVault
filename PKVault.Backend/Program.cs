@@ -15,7 +15,7 @@ public class Program
         SetupTask ??= Task.Run(async () =>
             {
                 await StaticDataService.GetStaticData();
-                StorageService.CleanWrongData();
+                StorageService.DataSetupMigrateClean();
                 try
                 {
                     LocalSaveService.ReadLocalSaves();
