@@ -44,7 +44,10 @@ public class DexService
     private static bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, SaveFile save, StaticDataDTO staticData, DataEntityLoaders loaders)
     {
         var service = GetDexService(save, loaders);
+
+        // var time = LogUtil.Time($"Update Dex with save {save.ID32} {save.Version}");
         var success = service?.UpdateDexWithSave(dex, staticData) ?? false;
+        // time();
 
         return success;
     }

@@ -8,6 +8,8 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
             .GroupBy(dto => dto.Species)
             .ToDictionary(dtos => dtos.First().Species, dtos => dtos.ToList());
 
+        Dictionary<GameVersion, SaveFile> savesByVersion = [];
+
         loaders.dexLoader.GetAllEntities().Values.ToList().ForEach(entity =>
         {
             ownedPkmsBySpecies.TryGetValue(entity.Species, out var pkmForms);
@@ -24,9 +26,13 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
                     ) ?? [];
 
                     var saveVersion = PkmVersionDTO.GetSingleVersion(form.Version);
-                    var save = saveVersion == default
-                        ? new SAV9ZA()
-                        : BlankSaveFile.Get(saveVersion);
+                    if (!savesByVersion.TryGetValue(saveVersion, out var save))
+                    {
+                        save = saveVersion == default
+                            ? new SAV9ZA()
+                            : BlankSaveFile.Get(saveVersion);
+                        savesByVersion.Add(saveVersion, save);
+                    }
 
                     var saveDexService = DexService.GetDexService(save, loaders);
                     var commonForm = saveDexService!.GetDexItemFormComplete(
