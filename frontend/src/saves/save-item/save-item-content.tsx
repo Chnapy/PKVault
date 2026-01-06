@@ -65,14 +65,14 @@ export const SaveItemContent: React.FC<SaveItemContentProps> = withErrorCatcher(
       <>
         {desktopMessage
           ? <>
-            <ButtonWithDisabledPopover as={Button} {...commonBtnProps} onClick={() => desktopMessage.openFile({
+            <Button onClick={() => desktopMessage.openFile({
               type: 'open-folder',
               id: save.id.toString(),
               isDirectory: false,
               path: save.path
             })}>
               <Icon name='folder' solid forButton />
-            </ButtonWithDisabledPopover>
+            </Button>
           </>
           : <>
             {commonBtnProps.disabled
