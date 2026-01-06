@@ -2,17 +2,23 @@
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using PKHeX.Core;
 
 namespace PKVault.Backend;
 
 public class Program
 {
+    private static readonly SemaphoreSlim _setupLock = new(1, 1);
     private static Task? SetupTask;
 
     public static async Task WaitForSetup()
     {
-        SetupTask ??= Task.Run(async () =>
+        if (SetupTask != null)
+            await SetupTask;
+
+        await _setupLock.WaitAsync();
+        try
+        {
+            SetupTask ??= Task.Run(async () =>
             {
                 await StaticDataService.GetStaticData();
                 await StorageService.DataSetupMigrateClean();
@@ -27,6 +33,11 @@ public class Program
                 await StorageService.ResetDataLoader(true);
                 await WarningsService.CheckWarnings();
             });
+        }
+        finally
+        {
+            _setupLock.Release();
+        }
 
         await SetupTask;
     }

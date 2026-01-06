@@ -289,14 +289,24 @@ public class StorageService
         return flags;
     }
 
+    private static readonly SemaphoreSlim _loaderLock = new(1, 1);
+
     public static async Task<DataMemoryLoader> GetLoader()
     {
-        if (_memoryLoader == null)
-        {
-            await Program.WaitForSetup();
-        }
+        if (_memoryLoader != null)
+            return _memoryLoader;
 
-        return _memoryLoader!;
+        await _loaderLock.WaitAsync();
+        try
+        {
+            if (_memoryLoader == null)
+                await Program.WaitForSetup();
+            return _memoryLoader ?? throw new InvalidOperationException("Loader not initialized");
+        }
+        finally
+        {
+            _loaderLock.Release();
+        }
     }
 
     public static async Task<List<MoveItem>> GetPkmAvailableMoves(uint? saveId, string pkmId)
