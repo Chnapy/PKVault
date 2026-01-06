@@ -6,18 +6,6 @@ public class Dex123Service(SaveFile save) : DexGenService(save)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
-        Span<int> abilities = stackalloc int[pi.AbilityCount];
-        pi.GetAbilities(abilities);
-
-        int[] baseStats = [
-            pi.GetBaseStatValue(0),
-            pi.GetBaseStatValue(1),
-            pi.GetBaseStatValue(2),
-            pi.GetBaseStatValue(4),
-            pi.GetBaseStatValue(5),
-            pi.GetBaseStatValue(3),
-        ];
-
         var isOwned = ownedPkms.Count > 0;
         var isSeen = isOwned || save.GetSeen(species);
         var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
@@ -30,8 +18,8 @@ public class Dex123Service(SaveFile save) : DexGenService(save)
                 save.Generation <= 2 ? GetG12Type(pi.Type1) : pi.Type1,
                 save.Generation <= 2 ? GetG12Type(pi.Type2) : pi.Type2
             ],
-            Abilities = [.. abilities.ToArray().Distinct()],
-            BaseStats = baseStats,
+            Abilities = GetAbilities(pi),
+            BaseStats = GetBaseStats(pi),
             IsSeen = isSeen,
             IsSeenShiny = false,    // TODO
             IsCaught = ownedPkms.Count > 0 || save.GetCaught(species),

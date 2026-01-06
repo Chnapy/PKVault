@@ -3,7 +3,7 @@ using System.IO.Compression;
 using System.Text.Json;
 
 public class BackupService(
-    LoaderService loaderService, MaintenanceService maintenanceService, LocalSaveService saveService,
+    LoaderService loaderService, MaintenanceService maintenanceService, SaveService saveService,
     WarningsService warningsService, PkmConvertService pkmConvertService
 )
 {

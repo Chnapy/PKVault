@@ -121,6 +121,25 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
     protected string GetDexItemID(ushort species) => $"{species}_{save.ID32}";
 
+    protected int[] GetAbilities(PersonalInfo pi)
+    {
+        Span<int> abilities = stackalloc int[pi.AbilityCount];
+        pi.GetAbilities(abilities);
+        return [.. abilities.ToArray().Distinct()];
+    }
+
+    protected int[] GetBaseStats(PersonalInfo pi)
+    {
+        return [
+            pi.GetBaseStatValue(0),
+            pi.GetBaseStatValue(1),
+            pi.GetBaseStatValue(2),
+            pi.GetBaseStatValue(4),
+            pi.GetBaseStatValue(5),
+            pi.GetBaseStatValue(3),
+        ];
+    }
+
     public DexItemForm GetDexItemFormComplete(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
     {
         var itemForm = GetDexItemForm(species, ownedPkms, form, gender);

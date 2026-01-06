@@ -1,6 +1,6 @@
-public class DataMemoryLoader(LocalSaveService saveService, PkmConvertService pkmConvertService, DataEntityLoaders _loaders, DateTime startTime) : DataLoader(_loaders)
+public class DataMemoryLoader(SaveService saveService, PkmConvertService pkmConvertService, DataEntityLoaders _loaders, DateTime startTime) : DataLoader(_loaders)
 {
-    public static DataMemoryLoader Create(LocalSaveService saveService, WarningsService warningsService, PkmConvertService pkmConvertService)
+    public static DataMemoryLoader Create(SaveService saveService, WarningsService warningsService, PkmConvertService pkmConvertService)
     {
         var bankLoader = new BankLoader();
         var boxLoader = new BoxLoader();

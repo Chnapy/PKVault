@@ -28,25 +28,13 @@ public class Dex8BSService(SAV8BS save) : DexGenService(save)
 
         var isCaught = isSeen && state == ZukanState8b.Caught;
 
-        Span<int> abilities = stackalloc int[pi.AbilityCount];
-        pi.GetAbilities(abilities);
-
-        int[] baseStats = [
-            pi.GetBaseStatValue(0),
-            pi.GetBaseStatValue(1),
-            pi.GetBaseStatValue(2),
-            pi.GetBaseStatValue(4),
-            pi.GetBaseStatValue(5),
-            pi.GetBaseStatValue(3),
-        ];
-
         return new DexItemForm
         {
             Form = form,
             Gender = gender,
             Types = [pi.Type1, pi.Type2],
-            Abilities = [.. abilities.ToArray().Distinct()],
-            BaseStats = baseStats,
+            Abilities = GetAbilities(pi),
+            BaseStats = GetBaseStats(pi),
             IsSeen = isSeen,
             IsSeenShiny = isSeenShiny,
             IsCaught = isCaught,

@@ -51,11 +51,7 @@ public class SettingsController(DataService dataService, SettingsService setting
             MainBoxes = true,
             MainPkms = true,
             MainPkmVersions = true,
-            Saves = [
-                new (){
-                    SaveId = 0
-                }
-            ],
+            Saves = [DataUpdateSaveFlags.REFRESH_ALL_SAVES],
             Dex = true,
             // Actions = true,
             // Warnings = true,

@@ -11,25 +11,13 @@ public class Dex7Service(SAV7 save) : DexGenService(save)
         var isSeenShiny = isOwnedShiny || save.Zukan.GetSeen(species, gender == Gender.Female ? 3 : 2);
         var isSeen = isSeenShiny || isOwned || save.Zukan.GetSeen(species, gender == Gender.Female ? 1 : 0);
 
-        Span<int> abilities = stackalloc int[pi.AbilityCount];
-        pi.GetAbilities(abilities);
-
-        int[] baseStats = [
-            pi.GetBaseStatValue(0),
-            pi.GetBaseStatValue(1),
-            pi.GetBaseStatValue(2),
-            pi.GetBaseStatValue(4),
-            pi.GetBaseStatValue(5),
-            pi.GetBaseStatValue(3),
-        ];
-
         return new DexItemForm
         {
             Form = form,
             Gender = gender,
             Types = [pi.Type1, pi.Type2],
-            Abilities = [.. abilities.ToArray().Distinct()],
-            BaseStats = baseStats,
+            Abilities = GetAbilities(pi),
+            BaseStats = GetBaseStats(pi),
             IsSeen = isSeen,
             IsSeenShiny = isSeenShiny,
             IsCaught = isSeen && save.GetCaught(species),

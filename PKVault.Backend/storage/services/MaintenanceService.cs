@@ -4,7 +4,7 @@ using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 public class MaintenanceService(
     // Direct use of service-provider because of circular dependencies
     IServiceProvider sp,
-    LoaderService loaderService, LocalSaveService saveService, WarningsService warningsService
+    LoaderService loaderService, SaveService saveService, WarningsService warningsService
 )
 {
     public async Task DataSetupMigrateClean()

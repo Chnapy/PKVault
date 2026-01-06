@@ -1,6 +1,6 @@
 using PKHeX.Core;
 
-public class WarningsService(LoaderService loaderService, LocalSaveService saveService)
+public class WarningsService(LoaderService loaderService, SaveService saveService)
 {
     private WarningsDTO WarningsDTO = new()
     {

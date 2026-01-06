@@ -5,7 +5,7 @@ namespace PKVault.Backend.saveinfos.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SaveInfosController(DataService dataService, LocalSaveService saveService, LoaderService loaderService) : ControllerBase
+public class SaveInfosController(DataService dataService, SaveService saveService, LoaderService loaderService) : ControllerBase
 {
     [HttpGet()]
     public async Task<ActionResult<Dictionary<uint, SaveInfosDTO>>> GetAll()
@@ -30,11 +30,7 @@ public class SaveInfosController(DataService dataService, LocalSaveService saveS
         return await dataService.CreateDataFromUpdateFlags(new()
         {
             MainPkmVersions = true,
-            Saves = [
-                new (){
-                    SaveId = 0
-                }
-            ],
+            Saves = [DataUpdateSaveFlags.REFRESH_ALL_SAVES],
             Dex = true,
             SaveInfos = true,
             Warnings = true,

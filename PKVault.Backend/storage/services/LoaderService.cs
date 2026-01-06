@@ -1,7 +1,7 @@
 public class LoaderService(
     // Direct use of service-provider because of circular dependencies
     IServiceProvider sp,
-    StaticDataService staticDataService, LocalSaveService saveService, PkmConvertService pkmConvertService
+    StaticDataService staticDataService, SaveService saveService, PkmConvertService pkmConvertService
 )
 {
     private readonly SemaphoreSlim _setupLock = new(1, 1);

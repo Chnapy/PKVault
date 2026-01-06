@@ -5,7 +5,7 @@ public abstract class PKMLoader
 {
     public static PKM CreatePKM(byte[] bytes, PkmVersionEntity pkmVersionEntity)
     {
-        // required !
+        // required to avoid mutation, like by PKHeX
         bytes = (byte[])bytes.Clone();
 
         var format = EntityFileExtension.GetContextFromExtension(pkmVersionEntity.Filepath, (EntityContext)pkmVersionEntity.Generation);

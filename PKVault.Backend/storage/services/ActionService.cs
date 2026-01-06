@@ -184,10 +184,15 @@ public class ActionService(
         }
         catch (Exception ex)
         {
-            // re-run actions to avoid persisted side-effects, int.MaxValue means no action removed, just reset
-            var flags = await RemoveDataActionsAndReset(int.MaxValue);
+            var flags = await CloneLoaderKeepingAction();
             throw new DataActionException(ex, flags);
         }
+    }
+
+    private async Task<DataUpdateFlags> CloneLoaderKeepingAction()
+    {
+        // int.MaxValue means no action removed, just reset keeping actions
+        return await RemoveDataActionsAndReset(int.MaxValue);
     }
 
     public async Task<DataUpdateFlags> RemoveDataActionsAndReset(int actionIndexToRemoveFrom)
@@ -205,11 +210,7 @@ public class ActionService(
             MainBoxes = true,
             MainPkms = true,
             MainPkmVersions = true,
-            Saves = [
-                new() {
-                    SaveId = 0
-                }
-            ],
+            Saves = [DataUpdateSaveFlags.REFRESH_ALL_SAVES],
             Dex = true,
             Warnings = true,
         };

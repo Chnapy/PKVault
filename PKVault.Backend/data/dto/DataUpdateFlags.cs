@@ -16,6 +16,8 @@ public class DataUpdateFlags
 
 public class DataUpdateSaveFlags
 {
+    public static readonly DataUpdateSaveFlags REFRESH_ALL_SAVES = new() { SaveId = 0 };
+
     public uint SaveId;
     public bool SaveBoxes;
     public bool SavePkms;

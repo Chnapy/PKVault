@@ -1,11 +1,12 @@
+using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text;
 using PKHeX.Core;
 
-public class LocalSaveService
+public class SaveService
 {
-    public Dictionary<uint, SaveFile> SaveById { get; } = [];
-    public Dictionary<string, SaveFile> SaveByPath { get; } = [];
+    public ConcurrentDictionary<uint, SaveFile> SaveById { get; } = [];
+    public ConcurrentDictionary<string, SaveFile> SaveByPath { get; } = [];
 
     public bool ReadLocalSaves()
     {

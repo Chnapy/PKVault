@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-public class SettingsService(LoaderService loaderService, LocalSaveService saveService)
+public class SettingsService(LoaderService loaderService, SaveService saveService)
 {
     // Most of settings available as static
     public static SettingsDTO BaseSettings = ReadBaseSettings();

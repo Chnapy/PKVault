@@ -17,25 +17,13 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
         var isSeenShiny = isOwnedShiny || isSeenShinyForm;
         var isSeen = isOwned || isSeenShiny || isSeenForm;
 
-        Span<int> abilities = stackalloc int[pi.AbilityCount];
-        pi.GetAbilities(abilities);
-
-        int[] baseStats = [
-            pi.GetBaseStatValue(0),
-            pi.GetBaseStatValue(1),
-            pi.GetBaseStatValue(2),
-            pi.GetBaseStatValue(4),
-            pi.GetBaseStatValue(5),
-            pi.GetBaseStatValue(3),
-        ];
-
         return new DexItemForm
         {
             Form = form,
             Gender = gender,
             Types = [pi.Type1, pi.Type2],
-            Abilities = [.. abilities.ToArray().Distinct()],
-            BaseStats = baseStats,
+            Abilities = GetAbilities(pi),
+            BaseStats = GetBaseStats(pi),
             IsSeen = isSeen,
             IsSeenShiny = isSeenShiny,
             IsCaught = isSeen && (ownedPkms.Count > 0 || Dex.GetCaught(species)),

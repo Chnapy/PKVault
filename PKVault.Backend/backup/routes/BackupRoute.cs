@@ -32,11 +32,7 @@ public class BackupController(BackupService backupService, DataService dataServi
             MainBoxes = true,
             MainPkms = true,
             MainPkmVersions = true,
-            Saves = [
-                new (){
-                    SaveId = 0
-                }
-            ],
+            Saves = [DataUpdateSaveFlags.REFRESH_ALL_SAVES],
             // Actions = true,
             // Warnings = true,
             SaveInfos = true,

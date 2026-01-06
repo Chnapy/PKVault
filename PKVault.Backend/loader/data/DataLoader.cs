@@ -14,7 +14,7 @@ public abstract class DataLoader(DataEntityLoaders loaders)
     }
 }
 
-public class DataEntityLoaders(LocalSaveService saveService)
+public class DataEntityLoaders(SaveService saveService)
 {
     public required BankLoader bankLoader { get; set; }
     public required BoxLoader boxLoader { get; set; }

@@ -1,6 +1,6 @@
 public class DataService(
     LoaderService loaderService, StorageQueryService storageQueryService, StaticDataService staticDataService,
-    WarningsService warningsService, DexService dexService, LocalSaveService saveService,
+    WarningsService warningsService, DexService dexService, SaveService saveService,
     BackupService backupService, SettingsService settingsService
 )
 {

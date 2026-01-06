@@ -212,7 +212,7 @@ public class Program
         services.AddSingleton<DexService>();
         services.AddSingleton<WarningsService>();
         services.AddSingleton<BackupService>();
-        services.AddSingleton<LocalSaveService>();
+        services.AddSingleton<SaveService>();
         services.AddSingleton<StaticDataService>();
         services.AddSingleton<SettingsService>();
         services.AddSingleton<DataService>();
