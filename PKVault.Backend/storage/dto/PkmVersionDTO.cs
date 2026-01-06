@@ -101,6 +101,11 @@ public class PkmVersionDTO : BasePkmVersionDTO
 
     private PkmVersionDTO() { }
 
+    protected override LegalityAnalysis GetLegalitySafe()
+    {
+        return GetLegalitySafe(Pkm);
+    }
+
     protected override byte GetGeneration()
     {
         return PkmVersionEntity.Generation;

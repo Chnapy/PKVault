@@ -253,7 +253,7 @@ public abstract class BasePkmVersionDTO : IWithId
     {
         get
         {
-            var la = GetLegalitySafe(Pkm);
+            var la = GetLegalitySafe();
 
             return [.. la.Info.Moves.Select(r => r.Valid)];
         }
@@ -314,7 +314,7 @@ public abstract class BasePkmVersionDTO : IWithId
     {
         get
         {
-            var legality = GetLegalitySafe(Pkm);
+            var legality = GetLegalitySafe();
             // if (Id == "G91020AC14A4E820 20 20 20 20 2000")
             // {
             //     Console.WriteLine($"TEST {Species} parsed={legality.Parsed} pkmValid={Pkm.Valid} legality={legality.Valid}");
@@ -327,7 +327,7 @@ public abstract class BasePkmVersionDTO : IWithId
     {
         get
         {
-            var la = GetLegalitySafe(Pkm);
+            var la = GetLegalitySafe();
 
             try
             {
@@ -345,6 +345,10 @@ public abstract class BasePkmVersionDTO : IWithId
 
     public bool CanEdit { get => !IsEgg; }
 
+    protected abstract LegalityAnalysis GetLegalitySafe();
+
+    private static readonly object _legalityLock = new();
+
     /**
      * Check legality with correct global settings.
      * Required to expect same result as in PKHeX.
@@ -353,22 +357,26 @@ public abstract class BasePkmVersionDTO : IWithId
      */
     public static LegalityAnalysis GetLegalitySafe(PKM pkm, SaveFile? save = null, StorageSlotType slotType = StorageSlotType.None)
     {
-        if (save != null)
+        // lock required because of ParseSettings static context causing race condition
+        lock (_legalityLock)
         {
-            ParseSettings.InitFromSaveFileData(save);
-        }
-        else
-        {
+            if (save != null)
+            {
+                ParseSettings.InitFromSaveFileData(save);
+            }
+            else
+            {
+                ParseSettings.ClearActiveTrainer();
+            }
+
+            var la = save != null && pkm.GetType() == save.PKMType // quick sanity check
+                ? new LegalityAnalysis(pkm, save.Personal, slotType)
+                : new LegalityAnalysis(pkm, pkm.PersonalInfo, slotType);
+
             ParseSettings.ClearActiveTrainer();
+
+            return la;
         }
-
-        var la = save != null && pkm.GetType() == save.PKMType // quick sanity check
-            ? new LegalityAnalysis(pkm, save.Personal, slotType)
-            : new LegalityAnalysis(pkm, pkm.PersonalInfo, slotType);
-
-        ParseSettings.ClearActiveTrainer();
-
-        return la;
     }
 
     [JsonIgnore()]
