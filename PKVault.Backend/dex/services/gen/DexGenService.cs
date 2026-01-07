@@ -125,10 +125,12 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
     public static List<byte> GetTypes(byte generation, PersonalInfo pi)
     {
-        return [
+        byte[] types = [
             generation <= 2 ? GetG12Type(pi.Type1) : pi.Type1,
             generation <= 2 ? GetG12Type(pi.Type2) : pi.Type2
         ];
+
+        return [.. types.Distinct().Select(type => (byte)(type + 1))];
     }
 
     private static byte GetG12Type(byte type)
@@ -174,7 +176,6 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         var itemForm = GetDexItemForm(species, ownedPkms, form, gender);
         itemForm.Context = save.Context;
         itemForm.Generation = save.Generation;
-        itemForm.Types = [.. itemForm.Types.Distinct().Select(type => (byte)(type + 1))];
         return itemForm;
     }
 
