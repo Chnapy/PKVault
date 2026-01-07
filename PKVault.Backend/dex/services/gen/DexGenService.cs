@@ -121,6 +121,35 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
     protected string GetDexItemID(ushort species) => $"{species}_{save.ID32}";
 
+    public List<byte> GetTypes(PersonalInfo pi) => GetTypes(save.Generation, pi);
+
+    public static List<byte> GetTypes(byte generation, PersonalInfo pi)
+    {
+        return [
+            generation <= 2 ? GetG12Type(pi.Type1) : pi.Type1,
+            generation <= 2 ? GetG12Type(pi.Type2) : pi.Type2
+        ];
+    }
+
+    private static byte GetG12Type(byte type)
+    {
+        return type switch
+        {
+            7 => 6,
+            8 => 7,
+            9 => 8,
+            20 => 9,
+            21 => 10,
+            22 => 11,
+            23 => 12,
+            24 => 13,
+            25 => 14,
+            26 => 15,
+            27 => 16,
+            _ => type,
+        };
+    }
+
     protected int[] GetAbilities(PersonalInfo pi)
     {
         Span<int> abilities = stackalloc int[pi.AbilityCount];

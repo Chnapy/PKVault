@@ -21,7 +21,7 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
         {
             Form = form,
             Gender = gender,
-            Types = [pi.Type1, pi.Type2],
+            Types = GetTypes(pi),
             Abilities = GetAbilities(pi),
             BaseStats = GetBaseStats(pi),
             IsSeen = isSeen,

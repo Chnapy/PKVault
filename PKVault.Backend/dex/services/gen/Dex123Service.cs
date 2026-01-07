@@ -14,10 +14,7 @@ public class Dex123Service(SaveFile save) : DexGenService(save)
         {
             Form = form,
             Gender = gender,
-            Types = [
-                save.Generation <= 2 ? GetG12Type(pi.Type1) : pi.Type1,
-                save.Generation <= 2 ? GetG12Type(pi.Type2) : pi.Type2
-            ],
+            Types = GetTypes(pi),
             Abilities = GetAbilities(pi),
             BaseStats = GetBaseStats(pi),
             IsSeen = isSeen,
@@ -38,24 +35,5 @@ public class Dex123Service(SaveFile save) : DexGenService(save)
 
         if (isCaught)
             save.SetCaught(species, true);
-    }
-
-    public static byte GetG12Type(byte type)
-    {
-        return type switch
-        {
-            7 => 6,
-            8 => 7,
-            9 => 8,
-            20 => 9,
-            21 => 10,
-            22 => 11,
-            23 => 12,
-            24 => 13,
-            25 => 14,
-            26 => 15,
-            27 => 16,
-            _ => type,
-        };
     }
 }

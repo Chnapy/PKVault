@@ -94,19 +94,7 @@ public abstract class BasePkmVersionDTO : IWithId
 
     public PKHeX.Core.Gender Gender { get => (PKHeX.Core.Gender)Pkm.Gender; }
 
-    public List<byte> Types
-    {
-        get
-        {
-            var type1 = Generation <= 2
-                ? Dex123Service.GetG12Type(Pkm.PersonalInfo.Type1)
-                : Pkm.PersonalInfo.Type1;
-            var type2 = Generation <= 2
-                ? Dex123Service.GetG12Type(Pkm.PersonalInfo.Type2)
-                : Pkm.PersonalInfo.Type2;
-            return [.. new List<byte>() { (byte)(type1 + 1), (byte)(type2 + 1) }.Distinct()];
-        }
-    }
+    public List<byte> Types => DexGenService.GetTypes(Generation, Pkm.PersonalInfo);
 
     public byte Level
     {
