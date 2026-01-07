@@ -1,4 +1,5 @@
 import React from 'react';
+import { usePkmSaveDuplicate } from '../../data/hooks/use-pkm-save-duplicate';
 import { useStorageGetSavePkms, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
 import { StorageDetailsBase } from '../../ui/storage-item-details/storage-details-base';
@@ -52,6 +53,8 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({
     const savePkmQuery = useStorageGetSavePkms(saveId);
     // const pkmVersionsQuery = useStorageGetMainPkmVersions();
 
+    const getPkmSaveDuplicate = usePkmSaveDuplicate();
+
     const savePkm = savePkmQuery.data?.data.find((pkm) => pkm.id === id);
     if (!savePkm)
         return null;
@@ -60,14 +63,17 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({
     //     ? !pkmVersionsQuery.data?.data.some(pkmVersion => pkmVersion.id === savePkm.pkmVersionId)
     //     : false;
 
+    const { isDuplicate, isValid, canDelete } = getPkmSaveDuplicate(savePkm);
+
     return (
         <StorageDetailsBase
             {...savePkm}
+            isValid={isValid}
             validityReport={[
-                savePkm.isDuplicate && t('details.is-duplicate'),
+                isDuplicate && t('details.is-duplicate'),
                 savePkm.validityReport ].filter(Boolean).join('\n---\n')
             }
-            onRelease={savePkm.canDelete
+            onRelease={canDelete
                 ? (() => savePkmDeleteMutation.mutateAsync({
                     saveId,
                     params: {

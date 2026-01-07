@@ -34,9 +34,9 @@ public class EditPkmSaveAction(
             SavePkms = true,
         });
 
-        if (pkmSave.PkmVersionId != null)
+        var pkmVersion = pkmSave.GetPkmVersion(loaders.pkmVersionLoader);
+        if (pkmVersion != null)
         {
-            var pkmVersion = loaders.pkmVersionLoader.GetEntity(pkmSave.PkmVersionId);
             await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersion.PkmId, pkmSave.Id)]);
         }
 

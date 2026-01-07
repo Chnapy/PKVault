@@ -5,6 +5,8 @@ public class StaticDataService
 {
     public static StaticDataDTO staticData;
 
+    public static readonly EntityContext LAST_ENTITY_CONTEXT = EntityContext.Gen9a;
+
     public async Task<StaticDataDTO> GetStaticData()
     {
         var client = new AssemblyClient();
@@ -256,7 +258,7 @@ public class StaticDataService
                 List<(Pokemon, PokemonForm[])> allDatas = [defaultData, .. otherDatas];
 
                 var defaultForm = getVarietyForm(
-                    EntityContext.Gen9.Generation(),
+                    LAST_ENTITY_CONTEXT.Generation(),
                     defaultData.Item1,
                     defaultData.Item2.ToList().Find(form => !form.IsBattleOnly)!,
                     0,

@@ -5,336 +5,6 @@ using PKHeX.Core.Searching;
 
 public abstract class BasePkmVersionDTO : IWithId
 {
-    public string Id { get { return GetPKMIdBase(Pkm); } }
-
-    public byte Generation { get { return GetGeneration(); } }
-
-    public GameVersion Version
-    {
-        get { return Pkm.Version; }
-    }
-
-    public EntityContext Context
-    {
-        get { return Pkm.Context; }
-    }
-
-    public uint PID
-    {
-        get { return Pkm.PID; }
-    }
-
-    public bool IsNicknamed { get => Pkm.IsNicknamed; }
-
-    public string Nickname
-    {
-        get { return Pkm.Nickname; }
-    }
-
-    public ushort Species
-    {
-        get { return Pkm.Species; }
-    }
-
-    public byte Form
-    {
-        get => GetForm(Pkm);
-    }
-
-    public static byte GetForm(PKM pkm)
-    {
-        if (pkm.Species == (ushort)PKHeX.Core.Species.Alcremie)
-        {
-            if (pkm is PK8 pk8)
-            {
-                return (byte)(pkm.Form * 7 + pk8.FormArgument);
-            }
-            else if (pkm is PK9 pk9)
-            {
-                return (byte)(pkm.Form * 7 + pk9.FormArgument);
-            }
-        }
-        return pkm.Form;
-    }
-
-    // public string SpeciesName
-    // {
-    //     get
-    //     {
-    //         return GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Species[Pkm.Species];
-    //     }
-    // }
-
-    public bool IsEgg
-    {
-        get { return Pkm.IsEgg; }
-    }
-
-    public bool IsShiny
-    {
-        get { return Pkm.IsShiny; }
-    }
-
-    public bool IsAlpha
-    {
-        get => Pkm is IAlpha pka && pka.IsAlpha;
-    }
-
-    public bool IsNoble
-    {
-        get => Pkm is INoble pkn && pkn.IsNoble;
-    }
-
-    public bool CanGigantamax
-    {
-        get => Pkm is IGigantamaxReadOnly pkg && pkg.CanGigantamax;
-    }
-
-    public int Ball => StaticDataService.GetBallPokeApiId((Ball)Pkm.Ball);
-
-    public PKHeX.Core.Gender Gender { get => (PKHeX.Core.Gender)Pkm.Gender; }
-
-    public List<byte> Types => DexGenService.GetTypes(Generation, Pkm.PersonalInfo);
-
-    public byte Level
-    {
-        get { return Pkm.CurrentLevel; }
-    }
-
-    public uint Exp
-    {
-        get { return Pkm.EXP; }
-    }
-
-    public uint ExpToLevelUp => Experience.GetEXPToLevelUp(Pkm.CurrentLevel, Pkm.PersonalInfo.EXPGrowth);
-
-    public double LevelUpPercent => Experience.GetEXPToLevelUpPercentage(Pkm.CurrentLevel, Pkm.EXP, Pkm.PersonalInfo.EXPGrowth);
-
-    public byte Friendship => Pkm.IsEgg ? (byte)0 : Pkm.CurrentFriendship;
-
-    public byte EggHatchCount => Pkm.IsEgg ? Pkm.CurrentFriendship : (byte)0;
-
-    public int[] IVs
-    {
-        get
-        {
-            return [
-                Pkm.IV_HP,
-                Pkm.IV_ATK,
-                Pkm.IV_DEF,
-                Pkm.IV_SPA,
-                Pkm.IV_SPD,
-                Pkm.IV_SPE,
-            ];
-        }
-    }
-
-    public int[] EVs
-    {
-        get
-        {
-            if (Pkm is PB7 pb7)
-            {
-                return [
-                    pb7.AV_HP,
-                    pb7.AV_ATK,
-                    pb7.AV_DEF,
-                    pb7.AV_SPA,
-                    pb7.AV_SPD,
-                    pb7.AV_SPE,
-                ];
-            }
-            else
-            {
-                return [
-                    Pkm.EV_HP,
-                    Pkm.EV_ATK,
-                    Pkm.EV_DEF,
-                    Pkm.EV_SPA,
-                    Pkm.EV_SPD,
-                    Pkm.EV_SPE,
-                ];
-            }
-        }
-    }
-
-    public int[] Stats
-    {
-        get
-        {
-            Pkm.SetStats(Pkm.GetStats(Pkm.PersonalInfo));
-
-            return [
-                Pkm.Stat_HPMax,
-                Pkm.Stat_ATK,
-                Pkm.Stat_DEF,
-                Pkm.Stat_SPA,
-                Pkm.Stat_SPD,
-                Pkm.Stat_SPE,
-            ];
-        }
-    }
-
-    public int[] BaseStats
-    {
-        get
-        {
-            return [
-                Pkm.PersonalInfo.GetBaseStatValue(0),
-                Pkm.PersonalInfo.GetBaseStatValue(1),
-                Pkm.PersonalInfo.GetBaseStatValue(2),
-                Pkm.PersonalInfo.GetBaseStatValue(4),
-                Pkm.PersonalInfo.GetBaseStatValue(5),
-                Pkm.PersonalInfo.GetBaseStatValue(3),
-            ];
-        }
-    }
-
-    public byte HiddenPowerType
-    {
-        get
-        {
-            HiddenPower.TryGetTypeIndex(Pkm.HPType, out var hptype);
-
-            return (byte)(hptype + 1);
-        }
-    }
-
-    public int HiddenPowerPower
-    {
-        get { return Pkm.HPPower; }
-    }
-
-    public MoveCategory HiddenPowerCategory
-    {
-        get => Generation <= 3
-            ? (HiddenPowerType < 10 ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL) // TODO duplicate with static-data
-            : MoveCategory.SPECIAL;
-    }
-
-    public PKHeX.Core.Nature Nature { get => Pkm is GBPKM gbpkm ? Experience.GetNatureVC(gbpkm.EXP) : Pkm.Nature; }
-
-    public int Ability
-    {
-        get
-        {
-            return Pkm.Ability == -1
-                ? 0
-                : Pkm.Ability;
-        }
-    }
-
-    public List<ushort> Moves
-    {
-        get
-        {
-            return [
-                Pkm.Move1,
-                Pkm.Move2,
-                Pkm.Move3,
-                Pkm.Move4
-            ];
-        }
-    }
-
-    public List<bool> MovesLegality
-    {
-        get
-        {
-            var la = GetLegalitySafe();
-
-            return [.. la.Info.Moves.Select(r => r.Valid)];
-        }
-    }
-
-    public ushort TID
-    {
-        get { return Pkm.TID16; }
-    }
-
-    public string OriginTrainerName
-    {
-        get { return Pkm.OriginalTrainerName; }
-    }
-
-    public PKHeX.Core.Gender OriginTrainerGender { get => (PKHeX.Core.Gender)Pkm.OriginalTrainerGender; }
-
-    public DateOnly? OriginMetDate
-    {
-        get { return Pkm.MetDate; }
-    }
-
-    public string OriginMetLocation
-    {
-        get
-        {
-            return GameInfo.GetStrings(SettingsService.BaseSettings.GetSafeLanguage())
-        .GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version);
-        }
-    }
-
-    public byte? OriginMetLevel { get { return Pkm.MetLevel == 0 ? null : Pkm.MetLevel; } }
-
-    public int HeldItem
-    {
-        get { return ItemConverter.GetItemForFormat(Pkm.HeldItem, Pkm.Context, EntityContext.Gen9); }
-    }
-
-    public string? HeldItemPokeapiName
-    {
-        get => HeldItem > 0
-        ? (HeldItem < GameInfo.Strings.Item.Count ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[HeldItem]) : "")
-        : null;
-    }
-
-    public string DynamicChecksum
-    {
-        // Data used here is considered to be mutable over time
-        get => $"{Species}.{Form}.{Nickname}.{Level}.{Exp}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}";
-    }
-
-    public int NicknameMaxLength
-    {
-        get { return Pkm.MaxStringLengthNickname; }
-    }
-
-    public bool IsValid
-    {
-        get
-        {
-            var legality = GetLegalitySafe();
-            // if (Id == "G91020AC14A4E820 20 20 20 20 2000")
-            // {
-            //     Console.WriteLine($"TEST {Species} parsed={legality.Parsed} pkmValid={Pkm.Valid} legality={legality.Valid}");
-            // }
-            return legality.Parsed && legality.Valid;
-        }
-    }
-
-    public string ValidityReport
-    {
-        get
-        {
-            var la = GetLegalitySafe();
-
-            try
-            {
-                return la.Report(
-                    SettingsService.BaseSettings.GetSafeLanguage()
-                );
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex);
-                return ex.ToString();
-            }
-        }
-    }
-
-    public bool CanEdit { get => !IsEgg; }
-
-    protected abstract LegalityAnalysis GetLegalitySafe();
-
     private static readonly object _legalityLock = new();
 
     /**
@@ -367,12 +37,21 @@ public abstract class BasePkmVersionDTO : IWithId
         }
     }
 
-    [JsonIgnore()]
-    public required PKM Pkm;
-
-    protected bool HasTradeEvolve;
-
-    protected abstract byte GetGeneration();
+    public static byte GetForm(PKM pkm)
+    {
+        if (pkm.Species == (ushort)PKHeX.Core.Species.Alcremie)
+        {
+            if (pkm is PK8 pk8)
+            {
+                return (byte)(pkm.Form * 7 + pk8.FormArgument);
+            }
+            else if (pkm is PK9 pk9)
+            {
+                return (byte)(pkm.Form * 7 + pk9.FormArgument);
+            }
+        }
+        return pkm.Form;
+    }
 
     /**
      * Generate ID similar to PKHeX one.
@@ -424,6 +103,259 @@ public abstract class BasePkmVersionDTO : IWithId
 
     //     return id;
     // }
+
+    public string Id { get; }
+
+    public byte Generation { get; }
+
+    public GameVersion Version { get; }
+
+    public EntityContext Context { get; }
+
+    public uint PID { get; }
+
+    public bool IsNicknamed { get; }
+
+    public string Nickname { get; }
+
+    public ushort Species { get; }
+
+    public byte Form { get; }
+
+    // public string SpeciesName
+    // {
+    //     get
+    //     {
+    //         return GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage()).Species[Pkm.Species];
+    //     }
+    // }
+
+    public bool IsEgg { get; }
+
+    public bool IsShiny { get; }
+
+    public bool IsAlpha { get; }
+
+    public bool IsNoble { get; }
+
+    public bool CanGigantamax { get; }
+
+    public int Ball { get; }
+
+    public Gender Gender { get; }
+
+    public List<byte> Types { get; }
+
+    public byte Level { get; }
+
+    public uint Exp { get; }
+
+    public uint ExpToLevelUp { get; }
+
+    public double LevelUpPercent { get; }
+
+    public byte Friendship { get; }
+
+    public byte EggHatchCount { get; }
+
+    public int[] IVs { get; }
+
+    public int[] EVs { get; }
+
+    public int[] Stats { get; }
+
+    public int[] BaseStats { get; }
+
+    public byte HiddenPowerType { get; }
+
+    public int HiddenPowerPower { get; }
+
+    public MoveCategory HiddenPowerCategory { get; }
+
+    public Nature Nature { get; }
+
+    public int Ability { get; }
+
+    public List<ushort> Moves { get; }
+
+    public List<bool> MovesLegality { get; }
+
+    public ushort TID { get; }
+
+    public string OriginTrainerName { get; }
+
+    public Gender OriginTrainerGender { get; }
+
+    public DateOnly? OriginMetDate { get; }
+
+    public string OriginMetLocation { get; }
+
+    public byte? OriginMetLevel { get; }
+
+    public int HeldItem { get; }
+
+    public string? HeldItemPokeapiName { get; }
+
+    public string DynamicChecksum { get; }
+
+    public int NicknameMaxLength { get; }
+
+    public bool IsValid { get; set; }
+
+    public string ValidityReport { get; }
+
+    public bool CanEdit { get; }
+
+    [JsonIgnore()]
+    public readonly PKM Pkm;
+
+    protected BasePkmVersionDTO(
+        string id,
+        PKM pkm,
+        byte generation
+    )
+    {
+        Id = id;
+        Pkm = pkm;
+
+        Generation = generation;
+
+        Version = Pkm.Version;
+        Context = Pkm.Context;
+        PID = Pkm.PID;
+        IsNicknamed = Pkm.IsNicknamed;
+        Nickname = Pkm.Nickname;
+        Species = Pkm.Species;
+        Form = GetForm(Pkm);
+        IsEgg = Pkm.IsEgg;
+        IsShiny = Pkm.IsShiny;
+        IsAlpha = Pkm is IAlpha pka && pka.IsAlpha;
+        IsNoble = Pkm is INoble pkn && pkn.IsNoble;
+        CanGigantamax = Pkm is IGigantamaxReadOnly pkg && pkg.CanGigantamax;
+        Ball = StaticDataService.GetBallPokeApiId((Ball)Pkm.Ball);
+        Gender = (Gender)Pkm.Gender;
+        Types = DexGenService.GetTypes(Generation, Pkm.PersonalInfo);
+        Level = Pkm.CurrentLevel;
+        Exp = Pkm.EXP;
+        ExpToLevelUp = Experience.GetEXPToLevelUp(Pkm.CurrentLevel, Pkm.PersonalInfo.EXPGrowth);
+        LevelUpPercent = Experience.GetEXPToLevelUpPercentage(Pkm.CurrentLevel, Pkm.EXP, Pkm.PersonalInfo.EXPGrowth);
+        Friendship = Pkm.IsEgg ? (byte)0 : Pkm.CurrentFriendship;
+        EggHatchCount = Pkm.IsEgg ? Pkm.CurrentFriendship : (byte)0;
+        IVs = [
+            Pkm.IV_HP,
+            Pkm.IV_ATK,
+            Pkm.IV_DEF,
+            Pkm.IV_SPA,
+            Pkm.IV_SPD,
+            Pkm.IV_SPE,
+        ];
+
+        if (Pkm is PB7 pb7)
+        {
+            EVs = [
+                pb7.AV_HP,
+                pb7.AV_ATK,
+                pb7.AV_DEF,
+                pb7.AV_SPA,
+                pb7.AV_SPD,
+                pb7.AV_SPE,
+            ];
+        }
+        else
+        {
+            EVs = [
+                Pkm.EV_HP,
+                Pkm.EV_ATK,
+                Pkm.EV_DEF,
+                Pkm.EV_SPA,
+                Pkm.EV_SPD,
+                Pkm.EV_SPE,
+            ];
+        }
+
+        pkm.SetStats(pkm.GetStats(pkm.PersonalInfo));
+        Stats = [
+            pkm.Stat_HPMax,
+            pkm.Stat_ATK,
+            pkm.Stat_DEF,
+            pkm.Stat_SPA,
+            pkm.Stat_SPD,
+            pkm.Stat_SPE,
+        ];
+
+        BaseStats = [
+            pkm.PersonalInfo.GetBaseStatValue(0),
+            pkm.PersonalInfo.GetBaseStatValue(1),
+            pkm.PersonalInfo.GetBaseStatValue(2),
+            pkm.PersonalInfo.GetBaseStatValue(4),
+            pkm.PersonalInfo.GetBaseStatValue(5),
+            pkm.PersonalInfo.GetBaseStatValue(3),
+        ];
+
+        HiddenPower.TryGetTypeIndex(pkm.HPType, out var hptype);
+        HiddenPowerType = (byte)(hptype + 1);
+
+        HiddenPowerPower = Pkm.HPPower;
+
+        HiddenPowerCategory = Generation <= 3
+            ? (HiddenPowerType < 10 ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL) // TODO duplicate with static-data
+            : MoveCategory.SPECIAL;
+
+        Nature = Pkm is GBPKM gbpkm ? Experience.GetNatureVC(gbpkm.EXP) : Pkm.Nature;
+
+        Ability = Pkm.Ability == -1
+            ? 0
+            : Pkm.Ability;
+
+        Moves = [
+            Pkm.Move1,
+            Pkm.Move2,
+            Pkm.Move3,
+            Pkm.Move4
+        ];
+
+        var la = GetLegalitySafe();
+
+        MovesLegality = [.. la.Info.Moves.Select(r => r.Valid)];
+
+        TID = Pkm.TID16;
+
+        OriginTrainerName = Pkm.OriginalTrainerName;
+        OriginTrainerGender = (Gender)Pkm.OriginalTrainerGender;
+        OriginMetDate = Pkm.MetDate;
+        OriginMetLocation = GameInfo.GetStrings(SettingsService.BaseSettings.GetSafeLanguage())
+            .GetLocationName(pkm.WasEgg, pkm.MetLocation, pkm.Format, pkm.Generation, pkm.Version);
+        OriginMetLevel = Pkm.MetLevel == 0 ? null : Pkm.MetLevel;
+
+        HeldItem = ItemConverter.GetItemForFormat(pkm.HeldItem, pkm.Context, StaticDataService.LAST_ENTITY_CONTEXT);
+        HeldItemPokeapiName = HeldItem > 0
+            ? (HeldItem < GameInfo.Strings.Item.Count ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[HeldItem]) : "")
+            : null;
+
+        // Data used here is considered to be mutable over pkm lifetime
+        DynamicChecksum = $"{Species}.{Form}.{Nickname}.{Level}.{Exp}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}";
+
+        NicknameMaxLength = Pkm.MaxStringLengthNickname;
+
+        IsValid = la.Parsed && la.Valid;
+
+        try
+        {
+            ValidityReport = la.Report(
+                SettingsService.BaseSettings.GetSafeLanguage()
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"ValidityReport exception, id={id}");
+            Console.Error.WriteLine(ex);
+            ValidityReport = ex.ToString();
+        }
+
+        CanEdit = !IsEgg;
+    }
+
+    protected abstract LegalityAnalysis GetLegalitySafe();
 }
 
 public struct MoveItem

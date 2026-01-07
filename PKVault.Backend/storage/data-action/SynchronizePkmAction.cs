@@ -24,7 +24,7 @@ public class SynchronizePkmAction(
                 return ("", "");
             }
 
-            var savePkms = allSavePkms.FindAll(pkm => pkm.PkmVersionId == pkmVersion.Id);
+            var savePkms = allSavePkms.FindAll(pkm => pkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == pkmVersion.Id);
 
             if (savePkms.Count != 1)
             {
@@ -84,7 +84,7 @@ public class SynchronizePkmAction(
             var saveLoaders = loaders.saveLoadersDict[(uint)pkmDto.SaveId!];
             var pkmVersionDto = pkmVersionDtos.Find(version => version.Generation == saveLoaders.Save.Generation);
             var savePkm = savePkmId == null
-                ? saveLoaders.Pkms.GetAllDtos().Find(pkm => pkm.PkmVersionId == pkmVersionDto.Id)
+                ? saveLoaders.Pkms.GetAllDtos().Find(pkm => pkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == pkmVersionDto.Id)
                 : saveLoaders.Pkms.GetDto(savePkmId);
 
             if (savePkm == null)
@@ -114,7 +114,7 @@ public class SynchronizePkmAction(
                     versionPkm.Language = savePkm.Pkm.Language;
                 }
 
-                if (savePkm.PkmVersionId == version.Id)
+                if (savePkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == version.Id)
                 {
                     pkmConvertService.PassAllToPkmSafe(savePkm.Pkm, versionPkm);
                 }
@@ -159,7 +159,7 @@ public class SynchronizePkmAction(
             var saveLoaders = loaders.saveLoadersDict[(uint)pkmDto.SaveId!];
             var pkmVersionDto = pkmVersionDtos.Find(version => version.Generation == saveLoaders.Save.Generation);
             var savePkm = savePkmId == null
-                ? saveLoaders.Pkms.GetAllDtos().Find(pkm => pkm.PkmVersionId == pkmVersionDto.Id)
+                ? saveLoaders.Pkms.GetAllDtos().Find(pkm => pkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == pkmVersionDto.Id)
                 : saveLoaders.Pkms.GetDto(savePkmId);
 
             if (savePkm == null)
@@ -185,7 +185,7 @@ public class SynchronizePkmAction(
                 loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
             }
 
-            if (savePkm.PkmVersionId == pkmVersionDto.Id)
+            if (savePkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == pkmVersionDto.Id)
             {
                 pkmConvertService.PassAllToPkmSafe(versionPkm, savePkm.Pkm);
             }

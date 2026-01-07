@@ -50,9 +50,9 @@ public class EvolvePkmAction(
         UpdatePkm(dto.Pkm, evolveSpecies, evolveByItem);
         saveLoaders.Pkms.WriteDto(dto);
 
-        if (dto.PkmVersionId != null)
+        var pkmVersion = dto.GetPkmVersion(loaders.pkmVersionLoader);
+        if (pkmVersion != null)
         {
-            var pkmVersion = loaders.pkmVersionLoader.GetEntity(dto.PkmVersionId);
             await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersion.PkmId, dto.Id)]);
         }
 

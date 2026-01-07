@@ -1,5 +1,6 @@
 import { PopoverButton } from '@headlessui/react';
 import React from 'react';
+import { usePkmSaveVersion } from '../data/hooks/use-pkm-save-version';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
@@ -36,6 +37,8 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
     const pkmVersions = allPkmVersions.filter((value) => value.pkmId === pkmId);
     const pkmVersionsIds = pkmVersions.map(version => version.id);
 
+    const getPkmSaveVersion = usePkmSaveVersion();
+
     if (!pkm || !pkmVersions[ 0 ]) {
         return null;
     }
@@ -45,8 +48,13 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
     const hasSaveHeldItems = pageSaves.some(pageSave => pkmVersions.find((version) => version.generation === pageSave.generation)?.heldItem);
     const heldItem = hasSaveHeldItems ? pkmVersions.find((version) => version.id === pkmId)?.heldItem : undefined;
 
-    const attachedSavePkm = pkm.saveId ? pkmSavePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId && pkmVersionsIds.includes(savePkm.pkmVersionId)) : undefined;
-    const attachedPkmVersion = attachedSavePkm && allPkmVersions.find(version => version.id === attachedSavePkm.pkmVersionId);
+    const attachedSavePkm = pkm.saveId
+        ? pkmSavePkmQuery.data?.data.find(savePkm => {
+            const version = getPkmSaveVersion(savePkm.idBase, savePkm.saveId);
+            return version && pkmVersionsIds.includes(version.id);
+        })
+        : undefined;
+    const attachedPkmVersion = attachedSavePkm && getPkmSaveVersion(attachedSavePkm.idBase, attachedSavePkm.saveId);
     const saveSynchronized = attachedSavePkm?.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
     const canCreateVersions = pkm.saveId

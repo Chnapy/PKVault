@@ -4,7 +4,7 @@ using System.Text.Json;
 
 public class BackupService(
     LoaderService loaderService, MaintenanceService maintenanceService, SaveService saveService,
-    WarningsService warningsService, PkmConvertService pkmConvertService
+    PkmConvertService pkmConvertService
 )
 {
     private static readonly string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
@@ -13,7 +13,7 @@ public class BackupService(
     {
         var logtime = LogUtil.Time("Create backup");
 
-        var loader = DataMemoryLoader.Create(saveService, warningsService, pkmConvertService);
+        var loader = DataMemoryLoader.Create(saveService, pkmConvertService);
 
         var steptime = LogUtil.Time($"Create backup - DB");
         var dbPaths = CreateDbBackup(loader.loaders);

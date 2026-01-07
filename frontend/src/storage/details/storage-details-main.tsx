@@ -1,4 +1,5 @@
 import React from 'react';
+import { usePkmVersionAttach } from '../../data/hooks/use-pkm-version-attach';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
 import { useDesktopMessage } from '../../settings/save-globs/hooks/use-desktop-message';
@@ -74,6 +75,8 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
     const mainPkmQuery = useStorageGetMainPkms();
     const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
 
+    const getPkmVersionAttach = usePkmVersionAttach();
+
     const desktopMessage = useDesktopMessage();
 
     const pkmVersion = mainPkmVersionsQuery.data?.data.find(version => version.id === id);
@@ -100,7 +103,7 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
             idBase={pkmVersion.id}
             isValid={pkmVersion.isValid}
             validityReport={[
-                !pkmVersion.isAttachedValid && t('details.attached-pkm-not-found'),
+                !getPkmVersionAttach(pkm, pkmVersion.id).isAttachedValid && t('details.attached-pkm-not-found'),
                 pkmVersion.validityReport ].filter(Boolean).join('\n---\n')
             }
             isShadow={false}

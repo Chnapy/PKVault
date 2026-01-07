@@ -1,10 +1,7 @@
 using PKHeX.Core;
 
 public class SavePkmLoader(
-    WarningsService warningsService, PkmConvertService pkmConvertService,
-    SaveFile save,
-    PkmLoader pkmLoader,
-    PkmVersionLoader pkmVersionLoader
+    PkmConvertService pkmConvertService, SaveFile save
 )
 {
     public bool HasWritten = false;
@@ -27,7 +24,9 @@ public class SavePkmLoader(
                 if (IsSpeciesValid(pkm.Species))
                 {
                     var boxSlot = i;
-                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, (int)BoxType.Party, boxSlot));
+                    dtoList.Add(PkmSaveDTO.FromPkm(
+                        save, pkm, (int)BoxType.Party, boxSlot
+                    ));
                 }
                 i++;
             });
@@ -43,7 +42,9 @@ public class SavePkmLoader(
                 {
                     var box = i;
                     var boxSlot = j;
-                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, box, boxSlot));
+                    dtoList.Add(PkmSaveDTO.FromPkm(
+                        save, pkm, box, boxSlot
+                    ));
                 }
                 j++;
             }
@@ -63,7 +64,9 @@ public class SavePkmLoader(
                 if (pkm != default && IsSpeciesValid(pkm.Species))
                 {
                     var boxSlot = i;
-                    dtoList.Add(PkmSaveDTO.FromPkm(save, pkm, (int)BoxType.Daycare, boxSlot));
+                    dtoList.Add(PkmSaveDTO.FromPkm(
+                        save, pkm, (int)BoxType.Daycare, boxSlot
+                    ));
                 }
             }
         }
@@ -87,7 +90,9 @@ public class SavePkmLoader(
             {
                 boxSlot += saveDaycare.DaycareSlotCount;
             }
-            dtoList.Add(PkmSaveDTO.FromPkm(save, extra.Pkm, box, boxSlot));
+            dtoList.Add(PkmSaveDTO.FromPkm(
+                save, extra.Pkm, box, boxSlot
+            ));
         });
 
         var dictById = new Dictionary<string, PkmSaveDTO>();
@@ -112,13 +117,7 @@ public class SavePkmLoader(
             UpdateDtos();
         }
 
-        return [.. dtoById.Values.Select(dto => {
-            dto = dto.Clone();
-
-            dto.RefreshExtras(warningsService, pkmLoader, pkmVersionLoader);
-
-            return dto;
-        })];
+        return [.. dtoById.Values];
     }
 
     public PkmSaveDTO? GetDto(string id)
@@ -130,10 +129,6 @@ public class SavePkmLoader(
 
         if (dtoById.TryGetValue(id, out var dto))
         {
-            dto = dto.Clone();
-
-            dto.RefreshExtras(warningsService, pkmLoader, pkmVersionLoader);
-
             return dto;
         }
 
@@ -154,10 +149,6 @@ public class SavePkmLoader(
 
         if (dtoByBox.TryGetValue(box + "." + boxSlot, out var dto))
         {
-            dto = dto.Clone();
-
-            dto.RefreshExtras(warningsService, pkmLoader, pkmVersionLoader);
-
             return dto;
         }
 

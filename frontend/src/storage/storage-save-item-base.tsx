@@ -1,6 +1,8 @@
 import React from 'react';
+import { usePkmSaveDuplicate } from '../data/hooks/use-pkm-save-duplicate';
+import { usePkmSaveVersion } from '../data/hooks/use-pkm-save-version';
 import { Gender as GenderType } from '../data/sdk/model';
-import { useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
+import { useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
 import { useStaticData } from '../hooks/use-static-data';
 import type { ButtonLikeProps } from '../ui/button/button-like';
 import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
@@ -13,12 +15,12 @@ export type StorageSaveItemBaseProps = ButtonLikeProps & Pick<StorageItemProps, 
 export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.memo(({ saveId, pkmId, ...rest }) => {
     const staticData = useStaticData();
 
-    const pkmVersionsQuery = useStorageGetMainPkmVersions();
     const savePkmsQuery = useStorageGetSavePkms(saveId);
 
-    const savePkm = savePkmsQuery.data?.data.find(pkm => pkm.id === pkmId);
+    const getPkmSaveDuplicate = usePkmSaveDuplicate();
+    const getPkmSaveVersion = usePkmSaveVersion();
 
-    const allPkmVersions = pkmVersionsQuery.data?.data ?? [];
+    const savePkm = savePkmsQuery.data?.data.find(pkm => pkm.id === pkmId);
 
     if (!savePkm) {
         return null;
@@ -30,13 +32,13 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
     const evolveSpecies = staticEvolves?.trade[ version ] ?? staticEvolves?.tradeWithItem[ heldItemPokeapiName ?? '' ]?.[ version ];
 
     // const attachedVersionPkm = savePkm.pkmVersionId ? allPkmVersions.find(savePkm => savePkm.pkmVersionId && pkmVersionsIds.includes(savePkm.pkmVersionId)) : undefined;
-    const attachedPkmVersion = savePkm.pkmVersionId ? allPkmVersions.find(version => version.id === savePkm.pkmVersionId) : undefined;
+    const attachedPkmVersion = getPkmSaveVersion(savePkm.idBase, savePkm.saveId);
     const saveSynchronized = savePkm.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
-    const canMoveAttached = !savePkm.pkmVersionId && !isEgg && !isShadow;
+    const canMoveAttached = !attachedPkmVersion && !isEgg && !isShadow;
     const canEvolve = !!evolveSpecies && level >= evolveSpecies.minLevel;
-    const canDetach = !!savePkm.pkmVersionId;
-    const canSynchronize = !!savePkm.pkmVersionId && !!attachedPkmVersion && !saveSynchronized;
+    const canDetach = !!attachedPkmVersion;
+    const canSynchronize = !!attachedPkmVersion && !saveSynchronized;
 
     return (
         <StorageItem
@@ -51,7 +53,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
             isShadow={isShadow}
             isStarter={savePkm.isStarter}
             heldItem={savePkm.heldItem}
-            warning={!savePkm.isValid}
+            warning={!getPkmSaveDuplicate(savePkm).isValid}
             level={savePkm.level}
             party={savePkm.party >= 0 ? savePkm.party : undefined}
             canCreateVersion={false}

@@ -1,11 +1,11 @@
 public class DataMemoryLoader(SaveService saveService, PkmConvertService pkmConvertService, DataEntityLoaders _loaders, DateTime startTime) : DataLoader(_loaders)
 {
-    public static DataMemoryLoader Create(SaveService saveService, WarningsService warningsService, PkmConvertService pkmConvertService)
+    public static DataMemoryLoader Create(SaveService saveService, PkmConvertService pkmConvertService)
     {
         var bankLoader = new BankLoader();
         var boxLoader = new BoxLoader();
         var pkmLoader = new PkmLoader();
-        var pkmVersionLoader = new PkmVersionLoader(warningsService, pkmLoader);
+        var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
         var dexLoader = new DexLoader();
 
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
@@ -18,7 +18,7 @@ public class DataMemoryLoader(SaveService saveService, PkmConvertService pkmConv
             {
                 Save = save,
                 Boxes = new SaveBoxLoader(save),
-                Pkms = new SavePkmLoader(warningsService, pkmConvertService, save, pkmLoader, pkmVersionLoader)
+                Pkms = new SavePkmLoader(pkmConvertService, save)
             });
         });
 

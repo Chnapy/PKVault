@@ -1,5 +1,7 @@
 import type React from 'react';
-import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
+import { usePkmSaveDuplicate } from '../../data/hooks/use-pkm-save-duplicate';
+import { usePkmSaveVersion } from '../../data/hooks/use-pkm-save-version';
+import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
@@ -26,12 +28,14 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
     const staticData = useStaticData();
 
     const mainPkmQuery = useStorageGetMainPkms();
-    const mainPkmVersionQuery = useStorageGetMainPkmVersions();
     const pkmSavePkmQuery = useStorageGetSavePkms(saveId ?? 0);
 
     const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
     const evolvePkmsMutation = useStorageEvolvePkms();
     const savePkmsDeleteMutation = useStorageSaveDeletePkms();
+
+    const getPkmSaveVersion = usePkmSaveVersion();
+    const getPkmSaveDuplicate = usePkmSaveDuplicate();
 
     const selectedPkm = pkmSavePkmQuery.data?.data.find(pkm => pkm.id === selected?.id);
     if (!selectedPkm) {
@@ -41,13 +45,13 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
     const staticEvolves = staticData.evolves[ selectedPkm.species ];
     const evolveSpecies = staticEvolves?.trade[ selectedPkm.version ] ?? staticEvolves?.tradeWithItem[ selectedPkm.heldItemPokeapiName ?? '' ]?.[ selectedPkm.version ];
 
-    const attachedPkmVersion = selectedPkm.pkmVersionId ? mainPkmVersionQuery.data?.data.find(version => version.id === selectedPkm.pkmVersionId) : undefined;
+    const attachedPkmVersion = getPkmSaveVersion(selectedPkm.idBase, selectedPkm.saveId);
     const attachedPkm = attachedPkmVersion && mainPkmQuery.data?.data.find(pkm => pkm.id === attachedPkmVersion.pkmId);
 
     const canEvolve = !!evolveSpecies && selectedPkm.level >= evolveSpecies.minLevel;
-    const canDetach = !!selectedPkm.pkmVersionId;
-    const canGoToMain = !!selectedPkm.pkmVersionId;
-    const canRemovePkm = selectedPkm.canDelete;
+    const canDetach = !!attachedPkmVersion;
+    const canGoToMain = !!attachedPkmVersion;
+    const canRemovePkm = getPkmSaveDuplicate(selectedPkm).canDelete;
 
     return <StorageItemSaveActionsContainer saveId={saveId} pkmId={selectedPkm.id}>
         <div

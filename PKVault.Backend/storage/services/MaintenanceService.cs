@@ -4,7 +4,7 @@ using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 public class MaintenanceService(
     // Direct use of service-provider because of circular dependencies
     IServiceProvider sp,
-    LoaderService loaderService, SaveService saveService, WarningsService warningsService
+    LoaderService loaderService, SaveService saveService
 )
 {
     public async Task DataSetupMigrateClean()
@@ -16,7 +16,7 @@ public class MaintenanceService(
         var bankLoader = new BankLoader();
         var boxLoader = new BoxLoader();
         var pkmLoader = new PkmLoader();
-        var pkmVersionLoader = new PkmVersionLoader(warningsService, pkmLoader);
+        var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
         var dexLoader = new DexLoader();
 
         DataEntityLoaders loaders = new(saveService)

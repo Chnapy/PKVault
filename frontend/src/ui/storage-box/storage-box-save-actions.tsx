@@ -1,7 +1,8 @@
 import { css } from '@emotion/css';
 import { PopoverPanel, type PopoverPanelProps } from '@headlessui/react';
 import type React from 'react';
-import { useStorageEvolvePkms, useStorageGetMainPkmVersions, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
+import { usePkmSaveVersion } from '../../data/hooks/use-pkm-save-version';
+import { useStorageEvolvePkms, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { StorageSelectContext } from '../../storage/actions/storage-select-context';
@@ -13,6 +14,7 @@ import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popove
 import { TitledContainer } from '../container/titled-container';
 import { Icon } from '../icon/icon';
 import { theme } from '../theme';
+import { usePkmSaveDuplicate } from '../../data/hooks/use-pkm-save-duplicate';
 
 export const StorageBoxSaveActions: React.FC<
     Required<Pick<PopoverPanelProps, 'anchor'>> & { saveId: number; boxId: number; }
@@ -23,7 +25,6 @@ export const StorageBoxSaveActions: React.FC<
 
     const staticData = useStaticData();
 
-    const mainPkmVersionQuery = useStorageGetMainPkmVersions();
     const pkmSavePkmQuery = useStorageGetSavePkms(saveId);
 
     const pkms = pkmSavePkmQuery.data?.data.filter(pkm => ids.includes(pkm.id)) ?? [];
@@ -33,6 +34,9 @@ export const StorageBoxSaveActions: React.FC<
     const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
     const savePkmsDeleteMutation = useStorageSaveDeletePkms();
     const evolvePkmsMutation = useStorageEvolvePkms();
+
+    const getPkmSaveVersion = usePkmSaveVersion();
+    const getPkmSaveDuplicate = usePkmSaveDuplicate();
 
     if (pkms.length === 0 || !hasBox(saveId, boxId)) {
         return null;
@@ -45,16 +49,10 @@ export const StorageBoxSaveActions: React.FC<
     });
 
     const canDetachPkms = pkms
-        .map(pkm => {
-            if (!pkm.pkmVersionId) {
-                return undefined;
-            }
-
-            return mainPkmVersionQuery.data?.data.find(version => version.id === pkm.pkmVersionId);
-        })
+        .map(pkm => getPkmSaveVersion(pkm.idBase, pkm.saveId))
         .filter(filterIsDefined);
 
-    const canRemovePkms = pkms.filter(pkm => pkm.canDelete);
+    const canRemovePkms = pkms.filter(pkm => getPkmSaveDuplicate(pkm).canDelete);
 
     return <PopoverPanel
         static

@@ -1,21 +1,12 @@
-
 using PKHeX.Core;
 
 public class PkmVersionDTO : BasePkmVersionDTO
 {
-    public static PkmVersionDTO FromEntity(WarningsService warningsService, PkmVersionEntity entity, PKM pkm, PkmDTO pkmDto)
+    public static PkmVersionDTO FromEntity(PkmVersionEntity entity, PKM pkm, PkmDTO pkmDto)
     {
-        var dto = new PkmVersionDTO
-        {
-            Pkm = pkm,
-            PkmVersionEntity = entity,
-            PkmDto = pkmDto,
-        };
-
-        dto.IsAttachedValid = pkmDto.SaveId == null
-                || !warningsService.GetWarningsDTO().PkmVersionWarnings.Any(warn => warn.PkmVersionId == null
-                    ? warn.PkmId == dto.Id
-                    : warn.PkmVersionId == dto.Id);
+        var dto = new PkmVersionDTO(
+            entity, pkm, pkmDto
+        );
 
         if (dto.Id != entity.Id)
         {
@@ -25,13 +16,15 @@ public class PkmVersionDTO : BasePkmVersionDTO
         return dto;
     }
 
+    private static readonly Dictionary<int, IReadOnlyList<GameVersion>> compatibleVersionsBySpecies = [];
+
     private static readonly List<(GameVersion Version, SaveFile? Save)> allVersionBlankSaves = [..Enum.GetValues<GameVersion>().ToList()
         .Select(version => {
             var versionToUse = GetSingleVersion(version);
 
             if (versionToUse == default)
             {
-                return (version, null);
+                return (version, null!);
             }
 
             return (version, BlankSaveFile.Get(versionToUse));
@@ -68,46 +61,47 @@ public class PkmVersionDTO : BasePkmVersionDTO
             : GameUtil.GameVersions.ToList().Find(v => !ignoredVersions.Contains(v) && version.ContainsFromLumped(v));
     }
 
-    public string PkmId { get { return PkmVersionEntity.PkmId; } }
+    public string PkmId { get; }
 
-    public bool IsMain { get { return Id == PkmId; } }
+    public bool IsMain { get; }
 
-    public bool IsAttachedValid { get; set; }
+    // TODO possible perf issue
+    public bool IsFilePresent { get; }
 
-    public new bool IsValid { get => base.IsValid && IsAttachedValid; }
+    public string Filepath { get; }
 
-    public bool IsFilePresent => File.Exists(Filepath);
+    public IReadOnlyList<GameVersion> CompatibleWithVersions { get; }
 
-    public string Filepath => Path.Combine(SettingsService.BaseSettings.AppDirectory, PkmVersionEntity.Filepath);
+    public bool CanDelete { get; }
 
-    // public bool CanMoveToSaveStorage { get { return PkmDto.SaveId == default; } }
+    public readonly PkmVersionEntity PkmVersionEntity;
 
-    public List<GameVersion> CompatibleWithVersions
+    public readonly PkmDTO PkmDto;
+
+    private PkmVersionDTO(
+        PkmVersionEntity entity, PKM pkm, PkmDTO pkmDto
+    ) : base(entity.Id, pkm, entity.Generation)
     {
-        get
+        PkmVersionEntity = entity;
+        PkmDto = pkmDto;
+
+        PkmId = PkmVersionEntity.PkmId;
+        IsMain = Id == PkmId;
+        Filepath = Path.Combine(SettingsService.BaseSettings.AppDirectory, entity.Filepath);
+        IsFilePresent = File.Exists(Filepath);
+
+        if (!compatibleVersionsBySpecies.TryGetValue(pkm.Species, out var compatibleWithVersions))
         {
-            return [..allVersionBlankSaves.FindAll(entry =>
+            compatibleWithVersions = [..allVersionBlankSaves.FindAll(entry =>
             {
-                return entry.Save != null && SaveInfosDTO.IsSpeciesAllowed(Species, entry.Save);
+                return entry.Save != null && SaveInfosDTO.IsSpeciesAllowed(pkm.Species, entry.Save);
             }).Select(entry => entry.Version).Order()];
+            compatibleVersionsBySpecies.Add(pkm.Species, compatibleWithVersions);
         }
+        CompatibleWithVersions = compatibleWithVersions;
+
+        CanDelete = !IsMain;
     }
 
-    public bool CanDelete { get { return !IsMain; } }
-
-    public required PkmVersionEntity PkmVersionEntity;
-
-    public required PkmDTO PkmDto;
-
-    private PkmVersionDTO() { }
-
-    protected override LegalityAnalysis GetLegalitySafe()
-    {
-        return GetLegalitySafe(Pkm);
-    }
-
-    protected override byte GetGeneration()
-    {
-        return PkmVersionEntity.Generation;
-    }
+    protected override LegalityAnalysis GetLegalitySafe() => GetLegalitySafe(Pkm);
 }

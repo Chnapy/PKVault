@@ -1,5 +1,5 @@
 public class MainCreatePkmVersionAction(
-    WarningsService warningsService, PkmConvertService pkmConvertService,
+    PkmConvertService pkmConvertService,
     string pkmId, byte generation
 ) : DataAction
 {
@@ -45,7 +45,7 @@ public class MainCreatePkmVersionAction(
             Filepath = PKMLoader.GetPKMFilepath(pkmConverted),
         };
 
-        var pkmVersionCreated = PkmVersionDTO.FromEntity(warningsService, pkmVersionEntityCreated, pkmConverted, pkmDto);
+        var pkmVersionCreated = PkmVersionDTO.FromEntity(pkmVersionEntityCreated, pkmConverted, pkmDto);
 
         loaders.pkmVersionLoader.WriteDto(pkmVersionCreated);
 

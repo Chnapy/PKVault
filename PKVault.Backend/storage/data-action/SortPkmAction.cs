@@ -43,9 +43,10 @@ public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveE
                 applyValue: (entry) =>
                 {
                     var currentValue = savePkms[entry.Index];
-                    currentValue.BoxId = entry.BoxId;
-                    currentValue.BoxSlot = entry.BoxSlot;
-                    saveLoaders.Pkms.WriteDto(currentValue);
+                    saveLoaders.Pkms.WriteDto(PkmSaveDTO.FromPkm(
+                        currentValue.Save, currentValue.Pkm,
+                        entry.BoxId, entry.BoxSlot
+                    ));
                 },
                 onSpaceMissing: () =>
                 {

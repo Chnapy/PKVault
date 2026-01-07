@@ -3,93 +3,87 @@ using PKHeX.Core;
 
 public class PkmSaveDTO : BasePkmVersionDTO
 {
-    public static PkmSaveDTO FromPkm(SaveFile save, PKM pkm, int boxId, int boxSlot)
+    public static PkmSaveDTO FromPkm(
+        SaveFile save, PKM pkm, int boxId, int boxSlot
+    )
     {
-        var dto = new PkmSaveDTO
-        {
-            Pkm = pkm,
-            Save = save,
-            BoxId = boxId,
-            BoxSlot = boxSlot,
-        };
+        var idBase = GetPKMIdBase(pkm);
 
-        return dto;
+        return new PkmSaveDTO(
+            idBase,
+            save, pkm, boxId, boxSlot
+        );
     }
 
-    public PkmSaveDTO Clone()
+    public static string GetPKMId(string idBase, int box, int slot)
     {
-        return new()
-        {
-            Pkm = Pkm,
-            Save = Save,
-            BoxId = BoxId,
-            BoxSlot = BoxSlot,
-            PkmVersionId = PkmVersionId,
-            IsDuplicate = IsDuplicate,
-            HasTradeEvolve = HasTradeEvolve,
-        };
+        return $"{idBase}B{box}S{slot}"; ;
     }
 
-    public new string Id { get => GetPKMId(Pkm, BoxId, BoxSlot); }
+    public string IdBase { get; }
 
-    public string IdBase { get => base.Id; }
+    public uint SaveId { get; }
 
-    public uint SaveId { get { return Save.ID32; } }
+    public int BoxId { get; }
 
-    public required int BoxId { get; set; }
+    public int BoxSlot { get; }
 
-    public required int BoxSlot { get; set; }
+    public bool IsShadow { get; }
 
-    public bool IsShadow { get { return Pkm is IShadowCapture pkmShadow && pkmShadow.IsShadow; } }
+    public int Team { get; }
 
-    public int Team { get => Save.GetBoxSlotFlags(BoxId, BoxSlot).IsBattleTeam(); }
+    public bool IsLocked { get; }
 
-    public bool IsLocked { get => Save.GetBoxSlotFlags(BoxId, BoxSlot).HasFlag(StorageSlotSource.Locked); }
+    public int Party { get; }
 
-    public int Party { get => Save.GetBoxSlotFlags(BoxId, BoxSlot).IsParty(); }
-
-    public bool IsStarter { get => Save.GetBoxSlotFlags(BoxId, BoxSlot).HasFlag(StorageSlotSource.Starter); }
-
-    public bool IsDuplicate { get; set; }
-
-    public new bool IsValid { get => base.IsValid && !IsDuplicate; }
-
-    public string? PkmVersionId { get; set; }
+    public bool IsStarter { get; }
 
     // -- actions
 
-    public bool CanMove { get => !IsLocked && BoxDTO.CanIdReceivePkm(BoxId); }
+    public bool CanMove { get; }
 
-    public bool CanDelete { get => !IsLocked && CanMove && PkmVersionId == null; }
+    public bool CanDelete { get; }
 
-    public bool CanMoveToMain { get => !IsLocked && Version > 0 && Generation > 0 && CanDelete && !IsShadow && !IsEgg && Party == -1; }
+    public bool CanMoveToMain { get; }
 
-    public bool CanMoveToSave { get => !IsLocked && Version > 0 && Generation > 0 && CanMoveToMain; }
-
-    public bool CanMoveAttachedToMain { get => !IsLocked && CanMoveToMain && !IsDuplicate; }
+    public bool CanMoveToSave { get; }
 
     [JsonIgnore()]
-    public required SaveFile Save;
+    public readonly SaveFile Save;
 
-    private PkmSaveDTO()
-    { }
-
-    public void RefreshExtras(WarningsService warningsService, PkmLoader pkmLoader, PkmVersionLoader pkmVersionLoader)
+    private PkmSaveDTO(
+        string idBase,
+        SaveFile save, PKM pkm, int boxId, int boxSlot
+    ) : base(GetPKMId(idBase, boxId, boxSlot), pkm, save.Generation)
     {
-        PkmVersionId = null;
+        Save = save;
+        SaveId = save.ID32;
+        BoxId = boxId;
+        BoxSlot = boxSlot;
+
+        IdBase = idBase;
+
+        IsShadow = Pkm is IShadowCapture pkmShadow && pkmShadow.IsShadow;
+
+        Team = Save.GetBoxSlotFlags(BoxId, BoxSlot).IsBattleTeam();
+        IsLocked = Save.GetBoxSlotFlags(BoxId, BoxSlot).HasFlag(StorageSlotSource.Locked);
+        Party = Save.GetBoxSlotFlags(BoxId, BoxSlot).IsParty();
+        IsStarter = Save.GetBoxSlotFlags(BoxId, BoxSlot).HasFlag(StorageSlotSource.Starter);
+
+        CanMove = !IsLocked && BoxDTO.CanIdReceivePkm(BoxId);
+        CanDelete = !IsLocked && CanMove;
+        CanMoveToMain = !IsLocked && Version > 0 && Generation > 0 && CanDelete && !IsShadow && !IsEgg && Party == -1;
+        CanMoveToSave = !IsLocked && Version > 0 && Generation > 0 && CanMoveToMain;
+    }
+
+    public PkmVersionDTO? GetPkmVersion(PkmVersionLoader pkmVersionLoader)
+    {
         var pkmVersion = pkmVersionLoader.GetDto(IdBase);
-        if (pkmVersion != null)
+        if (pkmVersion?.PkmDto?.SaveId == Save.ID32)
         {
-            var mainPkm = pkmLoader.GetDto(pkmVersion.PkmDto.Id);
-
-            if (mainPkm?.SaveId == Save.ID32)
-            {
-                PkmVersionId = pkmVersion.Id;
-            }
+            return pkmVersion;
         }
-
-        IsDuplicate = warningsService.GetWarningsDTO().PkmDuplicateWarnings.Any(warn =>
-            warn.SaveId == SaveId && warn.DuplicateIdBases.Contains(IdBase));
+        return null;
     }
 
     protected override LegalityAnalysis GetLegalitySafe()
@@ -114,15 +108,5 @@ public class PkmSaveDTO : BasePkmVersionDTO
         }
 
         return GetLegalitySafe(Pkm, Save, slotType);
-    }
-
-    protected override byte GetGeneration()
-    {
-        return Save.Generation;
-    }
-
-    public static string GetPKMId(PKM pkm, int box, int slot)
-    {
-        return $"{GetPKMIdBase(pkm)}B{box}S{slot}"; ;
     }
 }

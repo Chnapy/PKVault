@@ -169,12 +169,15 @@ public class MovePkmAction(
 
         if (targetPkmDto != null)
         {
-            var switchedSourcePkmDto = PkmSaveDTO.FromPkm(sourceSaveLoaders.Save, targetPkmDto.Pkm, sourcePkmDto.BoxId, sourcePkmDto.BoxSlot);
+            var switchedSourcePkmDto = PkmSaveDTO.FromPkm(
+                sourceSaveLoaders.Save, targetPkmDto.Pkm, sourcePkmDto.BoxId, sourcePkmDto.BoxSlot
+            );
             sourceSaveLoaders.Pkms.WriteDto(switchedSourcePkmDto);
         }
 
-        sourcePkmDto.BoxId = targetBoxId;
-        sourcePkmDto.BoxSlot = targetBoxSlot;
+        sourcePkmDto = PkmSaveDTO.FromPkm(
+            sourcePkmDto.Save, sourcePkmDto.Pkm, targetBoxId, targetBoxSlot
+        );
 
         targetSaveLoaders.Pkms.WriteDto(sourcePkmDto);
 
@@ -354,11 +357,12 @@ public class MovePkmAction(
             loaders.pkmLoader.DeleteEntity(pkmDto.Id);
         }
 
-        var pkmSaveDTO = PkmSaveDTO.FromPkm(saveLoaders.Save, pkm, targetBoxId, targetBoxSlot);
-        pkmSaveDTO.RefreshExtras(warningsService, loaders.pkmLoader, loaders.pkmVersionLoader);
+        var pkmSaveDTO = PkmSaveDTO.FromPkm(
+            saveLoaders.Save, pkm, targetBoxId, targetBoxSlot
+        );
         saveLoaders.Pkms.WriteDto(pkmSaveDTO);
 
-        if (attached && pkmSaveDTO.PkmVersionId == null)
+        if (attached && pkmSaveDTO.GetPkmVersion(loaders.pkmVersionLoader) == null)
         {
             throw new ArgumentException($"pkmSaveDTO.PkmVersionId is null, should be {pkmSaveDTO.Id}");
         }
@@ -428,7 +432,7 @@ public class MovePkmAction(
                 Generation = savePkm.Generation,
                 Filepath = PKMLoader.GetPKMFilepath(savePkm.Pkm),
             };
-            var pkmVersionDto = PkmVersionDTO.FromEntity(warningsService, pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
+            var pkmVersionDto = PkmVersionDTO.FromEntity(pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
 
             loaders.pkmLoader.WriteDto(pkmDtoToCreate);
             loaders.pkmVersionLoader.WriteDto(pkmVersionDto);

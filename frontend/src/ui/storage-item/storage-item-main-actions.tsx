@@ -14,6 +14,7 @@ import { Icon } from '../icon/icon';
 import { StorageDetailsForm } from '../storage-item-details/storage-details-form';
 import { theme } from '../theme';
 import { StorageItemMainActionsContainer } from './storage-item-main-actions-container';
+import { usePkmSaveVersion } from '../../data/hooks/use-pkm-save-version';
 
 export const StorageItemMainActions: React.FC = () => {
     const { t } = useTranslate();
@@ -37,6 +38,8 @@ export const StorageItemMainActions: React.FC = () => {
     const evolvePkmsMutation = useStorageEvolvePkms();
     const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
 
+    const getPkmSaveVersion = usePkmSaveVersion();
+
     const selectedPkm = mainPkmQuery.data?.data.find(pkm => pkm.id === selected?.id);
     const pkmSavePkmQuery = useStorageGetSavePkms(selectedPkm?.saveId ?? 0);
     if (!selectedPkm) {
@@ -47,13 +50,10 @@ export const StorageItemMainActions: React.FC = () => {
     if (!pkmVersions[ 0 ]) {
         return null;
     }
-    const pkmVersionsIds = pkmVersions.map(version => version.id);
 
     const { compatibleWithVersions } = pkmVersions[ 0 ];
 
     const pageSaves = Object.values(saves).map(save => save && saveInfosQuery.data?.data?.[ save.saveId ]).filter(filterIsDefined);
-
-    const attachedSavePkm = selectedPkm.saveId ? pkmSavePkmQuery.data?.data.find(savePkm => savePkm.pkmVersionId && pkmVersionsIds.includes(savePkm.pkmVersionId)) : undefined;
 
     const pkmVersionCanEvolve = pkmVersions.find(pkmVersion => {
         const staticEvolves = staticData.evolves[ pkmVersion.species ];
@@ -130,22 +130,33 @@ export const StorageItemMainActions: React.FC = () => {
 
             {canGoToSave && <ButtonWithDisabledPopover
                 as={Button}
-                onClick={() => navigate({
-                    search: ({ saves }) => ({
-                        selected: attachedSavePkm && {
-                            saveId: selectedPkm.saveId,
-                            id: attachedSavePkm.id,
-                        },
-                        saves: selectedPkm.saveId ? {
-                            ...saves,
-                            [ selectedPkm.saveId ]: {
+                onClick={() => {
+                    const pkmVersionsIds = new Set(pkmVersions.map(version => version.id));
+
+                    const attachedSavePkm = selectedPkm.saveId
+                        ? pkmSavePkmQuery.data?.data.find(savePkm => {
+                            const version = getPkmSaveVersion(savePkm.idBase, savePkm.saveId);
+                            return version && pkmVersionsIds.has(version.id);
+                        })
+                        : undefined;
+
+                    navigate({
+                        search: ({ saves }) => ({
+                            selected: attachedSavePkm && {
                                 saveId: selectedPkm.saveId,
-                                saveBoxIds: [ attachedSavePkm?.boxId ?? 0 ],
-                                order: getSaveOrder(saves, selectedPkm.saveId),
-                            }
-                        } : saves,
-                    })
-                })}
+                                id: attachedSavePkm.id,
+                            },
+                            saves: selectedPkm.saveId ? {
+                                ...saves,
+                                [ selectedPkm.saveId ]: {
+                                    saveId: selectedPkm.saveId,
+                                    saveBoxIds: [ attachedSavePkm?.boxId ?? 0 ],
+                                    order: getSaveOrder(saves, selectedPkm.saveId),
+                                }
+                            } : saves,
+                        })
+                    });
+                }}
                 showHelp
                 anchor='right start'
                 helpTitle={t('storage.actions.go-main.helpTitle')}

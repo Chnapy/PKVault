@@ -228,7 +228,7 @@ public class MovePkmBankAction(
                 Generation = savePkm.Generation,
                 Filepath = PKMLoader.GetPKMFilepath(savePkm.Pkm),
             };
-            var pkmVersionDto = PkmVersionDTO.FromEntity(warningsService, pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
+            var pkmVersionDto = PkmVersionDTO.FromEntity(pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
 
             loaders.pkmLoader.WriteDto(pkmDtoToCreate);
             loaders.pkmVersionLoader.WriteDto(pkmVersionDto);

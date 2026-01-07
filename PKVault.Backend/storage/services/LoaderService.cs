@@ -55,10 +55,8 @@ public class LoaderService(
     {
         var logtime = LogUtil.Time($"Data-loader reset");
 
-        using var scope = sp.CreateScope();
         _memoryLoader = DataMemoryLoader.Create(
             saveService,
-            warningsService: scope.ServiceProvider.GetRequiredService<WarningsService>(),
             pkmConvertService
         );
 

@@ -115,15 +115,15 @@ public class WarningsService(LoaderService loaderService, SaveService saveServic
     {
         var warns = new List<PkmVersionWarning>();
 
-        var loader = await loaderService.GetLoader();
+        var loaders = (await loaderService.GetLoader()).loaders;
 
-        var pkms = loader.loaders.pkmLoader.GetAllDtos();
+        var pkms = loaders.pkmLoader.GetAllDtos();
 
         var tasks = pkms.Select(pkm =>
         {
             if (pkm.SaveId != default)
             {
-                var exists = loader.loaders.saveLoadersDict.TryGetValue((uint)pkm.SaveId!, out var saveLoader);
+                var exists = loaders.saveLoadersDict.TryGetValue((uint)pkm.SaveId!, out var saveLoader);
                 if (!exists)
                 {
                     return new PkmVersionWarning()
@@ -135,10 +135,10 @@ public class WarningsService(LoaderService loaderService, SaveService saveServic
                 var save = saveLoader.Save;
                 var generation = save.Generation;
 
-                var pkmVersion = loader.loaders.pkmVersionLoader.GetEntitiesByPkmId(pkm.Id).Values.ToList()
+                var pkmVersion = loaders.pkmVersionLoader.GetEntitiesByPkmId(pkm.Id).Values.ToList()
                     .Find(pkmVersion => pkmVersion.Generation == generation);
 
-                var savePkm = pkmVersion == null ? null : saveLoader.Pkms.GetAllDtos().Find(pkm => pkm.PkmVersionId == pkmVersion.Id);
+                var savePkm = pkmVersion == null ? null : saveLoader.Pkms.GetAllDtos().Find(pkm => pkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == pkmVersion.Id);
 
                 if (savePkm == null)
                 {
