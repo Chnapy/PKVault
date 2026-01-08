@@ -120,8 +120,6 @@ public class MovePkmAction(
 
         loaders.pkmLoader.WriteDto(dto);
 
-        flags.MainPkms = true;
-
         var pkmName = loaders.pkmVersionLoader.GetDto(pkmId)?.Nickname;
         var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
 
@@ -184,21 +182,6 @@ public class MovePkmAction(
         sourceSaveLoaders.Pkms.FlushParty();
         targetSaveLoaders.Pkms.FlushParty();
 
-        if (notSameSave)
-        {
-            flags.Saves.Add(new()
-            {
-                SaveId = sourceSaveLoaders.Save.ID32,
-                SavePkms = true
-            });
-        }
-
-        flags.Saves.Add(new()
-        {
-            SaveId = targetSaveLoaders.Save.ID32,
-            SavePkms = true
-        });
-
         var boxName = targetSaveLoaders.Boxes.GetDto(targetBoxId.ToString())?.Name;
 
         return new()
@@ -254,17 +237,17 @@ public class MovePkmAction(
     {
         var saveLoaders = loaders.saveLoadersDict[(uint)sourceSaveId!];
 
+        var savePkm = saveLoaders.Pkms.GetDto(pkmId)
+            ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
+
         if (attached)
         {
-            var hasDuplicates = warningsService.GetWarningsDTO().PkmDuplicateWarnings.Any(warn => warn.SaveId == sourceSaveId && warn.DuplicateIdBases.Contains(pkmId));
-            if (hasDuplicates)
+            if (savePkm.IsDuplicate)
             {
                 throw new ArgumentException($"Target save already have a pkm with same ID, move attached cannot be done.");
             }
         }
 
-        var savePkm = saveLoaders.Pkms.GetDto(pkmId)
-            ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
         var pkmDto = loaders.pkmLoader.GetDto(savePkm.IdBase);
 
         if (pkmDto != null && pkmDto.SaveId != sourceSaveId)
@@ -354,6 +337,7 @@ public class MovePkmAction(
         else
         {
             loaders.pkmVersionLoader.DeleteEntity(pkmVersionDto.Id);
+
             loaders.pkmLoader.DeleteEntity(pkmDto.Id);
         }
 
@@ -372,13 +356,6 @@ public class MovePkmAction(
             await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmDto.Id, null)]);
         }
 
-        flags.MainPkms = true;
-        flags.MainPkmVersions = true;
-        flags.Saves.Add(new()
-        {
-            SaveId = targetSaveId,
-            SavePkms = true,
-        });
         flags.Dex = true;
     }
 
@@ -436,9 +413,6 @@ public class MovePkmAction(
 
             loaders.pkmLoader.WriteDto(pkmDtoToCreate);
             loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
-
-            flags.MainPkms = true;
-            flags.MainPkmVersions = true;
         }
 
         var pkmDto = loaders.pkmLoader.GetDto(pkmVersionEntity.PkmId);
@@ -455,8 +429,6 @@ public class MovePkmAction(
             }
         }
 
-        flags.MainPkms = true;
-
         if (!attached)
         {
             // remove pkm from save
@@ -465,11 +437,6 @@ public class MovePkmAction(
 
         new DexMainService(loaders).EnablePKM(savePkm.Pkm, savePkm.Save);
 
-        flags.Saves.Add(new()
-        {
-            SaveId = sourceSaveId,
-            SavePkms = true,
-        });
         flags.Dex = true;
     }
 

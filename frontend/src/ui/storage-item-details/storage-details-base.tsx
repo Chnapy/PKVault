@@ -1,5 +1,5 @@
 import type React from 'react';
-import { Gender as GenderType, type PkmSaveDTO } from '../../data/sdk/model';
+import { Gender as GenderType, type PkmLegalityDTO, type PkmSaveDTO } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Route } from '../../routes/storage';
@@ -25,16 +25,18 @@ import { TextStats } from './text-stats';
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'idBase' | 'pid' | 'species' | 'version' | 'context' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'levelUpPercent' | 'eggHatchCount' | 'friendship' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
-    | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves' | 'movesLegality'
+    | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
-    | 'heldItem' | 'isValid' | 'validityReport' | 'canEdit'
-> & {
-    saveId?: number;
-    onRelease?: () => unknown;
-    onSubmit: () => unknown;
-    openFile?: () => unknown;
-    extraContent?: React.ReactNode;
-};
+    | 'heldItem' | 'canEdit'
+>
+    & Pick<PkmLegalityDTO, 'isValid' | 'validityReport' | 'movesLegality'>
+    & {
+        saveId?: number;
+        onRelease?: () => unknown;
+        onSubmit: () => unknown;
+        openFile?: () => unknown;
+        extraContent?: React.ReactNode;
+    };
 
 export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, onRelease, onSubmit, openFile, extraContent, ...pkm }) => {
     const { t } = useTranslate();

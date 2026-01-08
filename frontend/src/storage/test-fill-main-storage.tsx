@@ -1,5 +1,4 @@
 import type React from 'react';
-import { usePkmSaveDuplicate } from '../data/hooks/use-pkm-save-duplicate';
 import { saveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { storageCreateMainBox, storageDeleteMainBox, storageGetMainBoxes, storageGetSaveBoxes, storageGetSavePkms, storageMovePkm, type storageCreateMainBoxResponse } from '../data/sdk/storage/storage.gen';
 import { Button } from '../ui/button/button';
@@ -7,8 +6,6 @@ import { BankContext } from './bank/bank-context';
 
 export const TestFillMainStorage: React.FC = () => {
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();
-
-    const getPkmSaveDuplicate = usePkmSaveDuplicate();
 
     const onClick = async () => {
         const savesInfos = await saveInfosGetAll();
@@ -32,7 +29,7 @@ export const TestFillMainStorage: React.FC = () => {
                     try {
                         const saveBoxPkms = savePkms.data
                             .filter(pkm => pkm.boxId === saveBox.idInt)
-                            .filter(pkm => getPkmSaveDuplicate(pkm).canMoveAttachedToMain);
+                            .filter(pkm => pkm.canMoveAttachedToMain);
 
                         const boxName = `AUTO-${saveInfos.tid}-${saveBox.idInt}-${saveBox.name}`;
                         const mainBox = mainBoxes.data.find(box => box.name === boxName);
@@ -54,7 +51,7 @@ export const TestFillMainStorage: React.FC = () => {
 
                         // may break here, box name randomly generated
 
-                        const boxId = (createBoxResponse?.data.mainBoxes?.find(box => box.name === boxName)
+                        const boxId = (Object.values(createBoxResponse?.data.mainBoxes?.data ?? {}).find(box => box.name === boxName)
                             ?? mainBoxes.data!.find(box => box.name === boxName)!).idInt;
 
                         try {

@@ -53,12 +53,6 @@ public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveE
                     throw new ArgumentException($"Missing space, pkm sort cannot be done");
                 }
             );
-
-            flags.Saves.Add(new()
-            {
-                SaveId = saveId,
-                SavePkms = true
-            });
         }
 
         return new()
@@ -105,10 +99,6 @@ public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveE
                     boxes.Add(box);
                 }
             );
-
-            flags.MainBoxes = true;
-            flags.MainPkms = true;
-            flags.MainPkmVersions = true;
         }
 
         return new DataActionPayload

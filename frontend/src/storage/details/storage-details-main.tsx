@@ -1,4 +1,5 @@
 import React from 'react';
+import { usePkmLegality, usePkmLegalityMap } from '../../data/hooks/use-pkm-legality';
 import { usePkmVersionAttach } from '../../data/hooks/use-pkm-version-attach';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
@@ -21,6 +22,8 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
     const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
 
     const pkmVersionList = mainPkmVersionsQuery.data?.data.filter(value => value.pkmId === selectedId) ?? [];
+    const pkmLegalityMapQuery = usePkmLegalityMap(pkmVersionList.map(pkm => pkm.id));
+    const pkmLegalityMap = pkmLegalityMapQuery.data?.data ?? {};
     if (pkmVersionList.length === 0) {
         return null;
     }
@@ -45,7 +48,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
                     original={pkmVersion.isMain}
                     onClick={() => setSelectedIndex(i)}
                     disabled={finalIndex === i}
-                    warning={!pkmVersion.isValid}
+                    warning={!pkmLegalityMap[ pkmVersion.id ]?.isValid}
                 />
             ))}
         </div>
@@ -75,6 +78,9 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
     const mainPkmQuery = useStorageGetMainPkms();
     const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
 
+    const pkmLegalityQuery = usePkmLegality(id);
+    const pkmLegality = pkmLegalityQuery.data?.data;
+
     const getPkmVersionAttach = usePkmVersionAttach();
 
     const desktopMessage = useDesktopMessage();
@@ -100,11 +106,13 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
     return (
         <StorageDetailsBase
             {...pkmVersion}
+            isValid
+            movesLegality={[]}
+            {...pkmLegality}
             idBase={pkmVersion.id}
-            isValid={pkmVersion.isValid}
             validityReport={[
                 !getPkmVersionAttach(pkm, pkmVersion.id).isAttachedValid && t('details.attached-pkm-not-found'),
-                pkmVersion.validityReport ].filter(Boolean).join('\n---\n')
+                pkmLegality?.validityReport ].filter(Boolean).join('\n---\n')
             }
             isShadow={false}
             onRelease={pkm?.canDelete && (pkmVersion.canDelete || nbrRelatedPkmVersion === 1)

@@ -28,11 +28,11 @@ public class BackupController(BackupService backupService, DataService dataServi
 
         return await dataService.CreateDataFromUpdateFlags(new()
         {
-            MainBanks = true,
-            MainBoxes = true,
-            MainPkms = true,
-            MainPkmVersions = true,
-            Saves = [DataUpdateSaveFlags.REFRESH_ALL_SAVES],
+            MainBanks = new() { All = true },
+            MainBoxes = new() { All = true },
+            MainPkms = new() { All = true },
+            MainPkmVersions = new() { All = true },
+            Saves = new() { All = true },
             // Actions = true,
             // Warnings = true,
             SaveInfos = true,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePkmSaveDuplicate } from '../data/hooks/use-pkm-save-duplicate';
+import { usePkmLegality } from '../data/hooks/use-pkm-legality';
 import { usePkmSaveVersion } from '../data/hooks/use-pkm-save-version';
 import { Gender as GenderType } from '../data/sdk/model';
 import { useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
@@ -17,8 +17,10 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
 
     const savePkmsQuery = useStorageGetSavePkms(saveId);
 
-    const getPkmSaveDuplicate = usePkmSaveDuplicate();
     const getPkmSaveVersion = usePkmSaveVersion();
+
+    const pkmLegalityQuery = usePkmLegality(pkmId, saveId);
+    const pkmLegality = pkmLegalityQuery.data?.data;
 
     const savePkm = savePkmsQuery.data?.data.find(pkm => pkm.id === pkmId);
 
@@ -53,7 +55,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
             isShadow={isShadow}
             isStarter={savePkm.isStarter}
             heldItem={savePkm.heldItem}
-            warning={!getPkmSaveDuplicate(savePkm).isValid}
+            warning={!!pkmLegality && !pkmLegality.isValid}
             level={savePkm.level}
             party={savePkm.party >= 0 ? savePkm.party : undefined}
             canCreateVersion={false}

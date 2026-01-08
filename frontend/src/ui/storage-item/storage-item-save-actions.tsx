@@ -1,5 +1,4 @@
 import type React from 'react';
-import { usePkmSaveDuplicate } from '../../data/hooks/use-pkm-save-duplicate';
 import { usePkmSaveVersion } from '../../data/hooks/use-pkm-save-version';
 import { useStorageEvolvePkms, useStorageGetMainPkms, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
@@ -35,7 +34,6 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
     const savePkmsDeleteMutation = useStorageSaveDeletePkms();
 
     const getPkmSaveVersion = usePkmSaveVersion();
-    const getPkmSaveDuplicate = usePkmSaveDuplicate();
 
     const selectedPkm = pkmSavePkmQuery.data?.data.find(pkm => pkm.id === selected?.id);
     if (!selectedPkm) {
@@ -51,7 +49,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
     const canEvolve = !!evolveSpecies && selectedPkm.level >= evolveSpecies.minLevel;
     const canDetach = !!attachedPkmVersion;
     const canGoToMain = !!attachedPkmVersion;
-    const canRemovePkm = getPkmSaveDuplicate(selectedPkm).canDelete;
+    const canRemovePkm = selectedPkm.canDelete;
 
     return <StorageItemSaveActionsContainer saveId={saveId} pkmId={selectedPkm.id}>
         <div
@@ -126,9 +124,9 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
                             ids: [ selectedPkm.id ]
                         },
                     });
-                    const newId = mutateResult.data.saves
-                        ?.find(save => save.saveId === saveId)?.savePkms
-                        ?.find(pkm => pkm.boxId === selectedPkm.boxId && pkm.boxSlot === selectedPkm.boxSlot)?.id;
+                    const savePkms = Object.values(mutateResult.data.saves
+                        ?.find(save => save.saveId === saveId)?.savePkms?.data ?? {});
+                    const newId = savePkms.find(pkm => pkm.boxId === selectedPkm.boxId && pkm.boxSlot === selectedPkm.boxSlot)?.id;
                     if (newId) {
                         navigate({
                             search: {

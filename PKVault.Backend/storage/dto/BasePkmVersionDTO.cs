@@ -1,42 +1,9 @@
-
 using System.Text.Json.Serialization;
 using PKHeX.Core;
 using PKHeX.Core.Searching;
 
 public abstract class BasePkmVersionDTO : IWithId
 {
-    private static readonly object _legalityLock = new();
-
-    /**
-     * Check legality with correct global settings.
-     * Required to expect same result as in PKHeX.
-     *
-     * If no save passed, some checks won't be done.
-     */
-    public static LegalityAnalysis GetLegalitySafe(PKM pkm, SaveFile? save = null, StorageSlotType slotType = StorageSlotType.None)
-    {
-        // lock required because of ParseSettings static context causing race condition
-        lock (_legalityLock)
-        {
-            if (save != null)
-            {
-                ParseSettings.InitFromSaveFileData(save);
-            }
-            else
-            {
-                ParseSettings.ClearActiveTrainer();
-            }
-
-            var la = save != null && pkm.GetType() == save.PKMType // quick sanity check
-                ? new LegalityAnalysis(pkm, save.Personal, slotType)
-                : new LegalityAnalysis(pkm, pkm.PersonalInfo, slotType);
-
-            ParseSettings.ClearActiveTrainer();
-
-            return la;
-        }
-    }
-
     public static byte GetForm(PKM pkm)
     {
         if (pkm.Species == (ushort)PKHeX.Core.Species.Alcremie)
@@ -178,8 +145,6 @@ public abstract class BasePkmVersionDTO : IWithId
 
     public List<ushort> Moves { get; }
 
-    public List<bool> MovesLegality { get; }
-
     public ushort TID { get; }
 
     public string OriginTrainerName { get; }
@@ -200,11 +165,9 @@ public abstract class BasePkmVersionDTO : IWithId
 
     public int NicknameMaxLength { get; }
 
-    public bool IsValid { get; set; }
-
-    public string ValidityReport { get; }
-
     public bool CanEdit { get; }
+
+    public double LoadingDuration { get; set; }
 
     [JsonIgnore()]
     public readonly PKM Pkm;
@@ -314,10 +277,6 @@ public abstract class BasePkmVersionDTO : IWithId
             Pkm.Move4
         ];
 
-        var la = GetLegalitySafe();
-
-        MovesLegality = [.. la.Info.Moves.Select(r => r.Valid)];
-
         TID = Pkm.TID16;
 
         OriginTrainerName = Pkm.OriginalTrainerName;
@@ -337,25 +296,8 @@ public abstract class BasePkmVersionDTO : IWithId
 
         NicknameMaxLength = Pkm.MaxStringLengthNickname;
 
-        IsValid = la.Parsed && la.Valid;
-
-        try
-        {
-            ValidityReport = la.Report(
-                SettingsService.BaseSettings.GetSafeLanguage()
-            );
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"ValidityReport exception, id={id}");
-            Console.Error.WriteLine(ex);
-            ValidityReport = ex.ToString();
-        }
-
         CanEdit = !IsEgg;
     }
-
-    protected abstract LegalityAnalysis GetLegalitySafe();
 }
 
 public struct MoveItem

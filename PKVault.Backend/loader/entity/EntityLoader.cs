@@ -9,6 +9,8 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
     public bool HasWritten { get; set; } = false;
     protected JsonTypeInfo<Dictionary<string, E>> DictJsonContext;
 
+    private DataUpdateFlagsState<string> flags = new();
+
     public EntityLoader(string filePath, JsonTypeInfo<Dictionary<string, E>> dictJsonContext)
     {
         FilePath = MatcherUtil.NormalizePath(filePath);
@@ -87,6 +89,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
         {
             Console.WriteLine($"Deleted id={id}");
 
+            flags.Ids.Add(id);
             HasWritten = true;
         }
 
@@ -99,12 +102,18 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
 
         GetAllEntities()[entity.Id] = entity;
 
+        flags.Ids.Add(entity.Id);
         HasWritten = true;
     }
 
     public virtual void WriteDto(DTO dto)
     {
         WriteEntity(GetEntityFromDTO(dto));
+    }
+
+    public void SetFlags(DataUpdateFlagsState<string> _flags)
+    {
+        flags = _flags;
     }
 
     public virtual async Task WriteToFile()

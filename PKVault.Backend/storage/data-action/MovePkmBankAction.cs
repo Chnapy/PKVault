@@ -1,7 +1,7 @@
 using PKHeX.Core;
 
 public class MovePkmBankAction(
-    WarningsService warningsService, PkmConvertService pkmConvertService,
+    PkmConvertService pkmConvertService,
     string[] pkmIds, uint? sourceSaveId,
     string bankId,
     bool attached
@@ -96,9 +96,6 @@ public class MovePkmBankAction(
             payloads.Add(await act(pkmId));
         }
 
-        flags.MainBanks = true;
-        flags.MainBoxes = true;
-
         return payloads[0];
     }
 
@@ -125,8 +122,6 @@ public class MovePkmBankAction(
 
         loaders.pkmLoader.WriteDto(dto);
 
-        flags.MainPkms = true;
-
         var pkmName = loaders.pkmVersionLoader.GetDto(pkmId)?.Nickname;
         var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
 
@@ -141,17 +136,17 @@ public class MovePkmBankAction(
     {
         var saveLoaders = loaders.saveLoadersDict[(uint)sourceSaveId!];
 
+        var savePkm = saveLoaders.Pkms.GetDto(pkmId)
+            ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
+
         if (attached)
         {
-            var hasDuplicates = warningsService.GetWarningsDTO().PkmDuplicateWarnings.Any(warn => warn.SaveId == sourceSaveId && warn.DuplicateIdBases.Contains(pkmId));
-            if (hasDuplicates)
+            if (savePkm.IsDuplicate)
             {
                 throw new ArgumentException($"Target save already have a pkm with same ID, move attached cannot be done.");
             }
         }
 
-        var savePkm = saveLoaders.Pkms.GetDto(pkmId)
-            ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
         var pkmDto = loaders.pkmLoader.GetDto(savePkm.IdBase);
 
         if (pkmDto != null && pkmDto.SaveId != sourceSaveId)
@@ -232,9 +227,6 @@ public class MovePkmBankAction(
 
             loaders.pkmLoader.WriteDto(pkmDtoToCreate);
             loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
-
-            flags.MainPkms = true;
-            flags.MainPkmVersions = true;
         }
 
         var pkmDto = loaders.pkmLoader.GetDto(pkmVersionEntity.PkmId);
@@ -251,8 +243,6 @@ public class MovePkmBankAction(
             }
         }
 
-        flags.MainPkms = true;
-
         if (!attached)
         {
             // remove pkm from save
@@ -261,11 +251,6 @@ public class MovePkmBankAction(
 
         new DexMainService(loaders).EnablePKM(savePkm.Pkm, savePkm.Save);
 
-        flags.Saves.Add(new()
-        {
-            SaveId = sourceSaveId,
-            SavePkms = true,
-        });
         flags.Dex = true;
     }
 

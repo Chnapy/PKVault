@@ -6,7 +6,6 @@ import { useStorageGetMainBoxes, useStorageGetMainPkms, useStorageGetMainPkmVers
 import { useTranslate } from '../../translate/i18n';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { StorageSelectContext } from './storage-select-context';
-import { usePkmSaveDuplicate } from '../../data/hooks/use-pkm-save-duplicate';
 
 type Context = {
     selected?: {
@@ -70,8 +69,6 @@ export const StorageMoveContext = {
         const mainPkmsQuery = useStorageGetMainPkms();
         const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
 
-        const getPkmSaveDuplicate = usePkmSaveDuplicate();
-
         // const mainBoxesQuery = useStorageGetMainBoxes();
         // const saveBoxesQuery = useStorageGetSaveBoxes(saveId ?? 0);
 
@@ -91,7 +88,7 @@ export const StorageMoveContext = {
 
         const canClickAttachedIds = !saveId
             ? pkmMains.filter(pkmMain => pkmMain.canMoveAttachedToSave).map(pkm => pkm.id)
-            : pkmSaves.filter(pkmSave => getPkmSaveDuplicate(pkmSave).canMoveAttachedToMain).map(pkm => pkm.id);
+            : pkmSaves.filter(pkmSave => pkmSave.canMoveAttachedToMain).map(pkm => pkm.id);
 
         return {
             moveCount: canClickIds.length,
@@ -281,8 +278,6 @@ export const StorageMoveContext = {
 
         const movePkmBankMutation = useStorageMovePkmBank();
 
-        const getPkmSaveDuplicate = usePkmSaveDuplicate();
-
         const isDragging = !!selected && !selected.target;
 
         const sourceMainPkm = selected && selected.ids.length > 0 ? (
@@ -354,7 +349,7 @@ export const StorageMoveContext = {
                         return { enable: false, helpText: t('storage.move.save-shadow') };
                     }
 
-                    if (!(selected.attached ? getPkmSaveDuplicate(sourcePkmSave).canMoveAttachedToMain : sourcePkmSave.canMoveToMain)) {
+                    if (!(selected.attached ? sourcePkmSave.canMoveAttachedToMain : sourcePkmSave.canMoveToMain)) {
                         return {
                             enable: false, helpText: selected.attached
                                 ? t('storage.move.pkm-cannot-attached', { name: sourcePkmSave.nickname })
@@ -458,8 +453,6 @@ export const StorageMoveContext = {
         const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
         const sourceSavePkmsQuery = useStorageGetSavePkms(selected?.saveId ?? 0);
         const targetSavePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
-
-        const getPkmSaveDuplicate = usePkmSaveDuplicate();
 
         const isDragging = !!selected && !selected.target;
         const isCurrentItemDragging = !!pkmId && selected && selected.ids.includes(pkmId) && selected.saveId === saveId;
@@ -640,7 +633,7 @@ export const StorageMoveContext = {
                         return { enable: false, helpText: t('storage.move.save-shadow') };
                     }
 
-                    if (!(selected.attached ? getPkmSaveDuplicate(sourcePkmSave).canMoveAttachedToMain : sourcePkmSave.canMoveToMain)) {
+                    if (!(selected.attached ? sourcePkmSave.canMoveAttachedToMain : sourcePkmSave.canMoveToMain)) {
                         return {
                             enable: false, helpText: selected.attached
                                 ? t('storage.move.pkm-cannot-attached', { name: sourcePkmSave.nickname })

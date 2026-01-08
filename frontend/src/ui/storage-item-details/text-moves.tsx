@@ -206,7 +206,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                                 type={forGen.type}
                                 category={forGen.category}
                                 damage={forGen.power}
-                                isValid={movesLegality[ i ]}
+                                isValid={movesLegality[ i ] ?? true}
                                 style={{
                                     flex: '1 1 0',
                                     minWidth: '35%'

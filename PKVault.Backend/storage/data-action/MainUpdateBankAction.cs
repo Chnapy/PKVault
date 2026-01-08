@@ -49,8 +49,6 @@ public class MainUpdateBankAction(string bankId, string bankName, bool isDefault
         loaders.bankLoader.WriteEntity(bank);
         loaders.bankLoader.NormalizeOrders();
 
-        flags.MainBanks = true;
-
         return new()
         {
             type = DataActionType.MAIN_UPDATE_BANK,

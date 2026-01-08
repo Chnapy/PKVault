@@ -11,6 +11,8 @@ public class SavePkmLoader(
 
     private bool needUpdate = true;
 
+    private DataUpdateSaveListFlags savesFlags = new();
+
     private void UpdateDtos()
     {
         var dtoList = new List<PkmSaveDTO>();
@@ -98,12 +100,26 @@ public class SavePkmLoader(
         var dictById = new Dictionary<string, PkmSaveDTO>();
         var dictByBox = new Dictionary<string, PkmSaveDTO>();
 
+        var duplicatesDictByIdBase = new Dictionary<string, List<PkmSaveDTO>>();
+
         foreach (var dto in dtoList)
         {
             // Console.WriteLine($"{dto.Id} - {dto.Box}/{dto.BoxSlot}");
             dictById.Add(dto.Id, dto);
             dictByBox.Add(dto.BoxId + "." + dto.BoxSlot, dto);
+
+            if (!duplicatesDictByIdBase.TryGetValue(dto.IdBase, out var duplicateList))
+            {
+                duplicateList = [];
+                duplicatesDictByIdBase.Add(dto.IdBase, duplicateList);
+            }
+            duplicateList.Add(dto);
         }
+
+        duplicatesDictByIdBase.Values.Where(list => list.Count > 1).SelectMany(list => list).ToList().ForEach(dto =>
+        {
+            dto.IsDuplicate = true;
+        });
 
         dtoById = dictById;
         dtoByBox = dictByBox;
@@ -182,6 +198,8 @@ public class SavePkmLoader(
                 break;
         }
 
+        savesFlags.UseSave(save.ID32).SavePkms.Ids.Add(dto.Id);
+
         needUpdate = true;
         // Console.WriteLine($"ADD {dto.Id} / {dto.BoxId} / {dto.BoxSlot} / CurrentHandler={pkm.CurrentHandler}");
 
@@ -210,6 +228,7 @@ public class SavePkmLoader(
 
             // Console.WriteLine($"REMOVE {id} / {dto.Box} / {dto.BoxSlot}");
 
+            savesFlags.UseSave(save.ID32).SavePkms.Ids.Add(dto.Id);
             needUpdate = true;
             HasWritten = true;
         }
@@ -248,7 +267,16 @@ public class SavePkmLoader(
         {
             if (i < party.Count)
             {
-                save.SetPartySlotAtIndex(party[i], i);
+                var pkm = party[i];
+                save.SetPartySlotAtIndex(pkm, i);
+
+                if (pkm.Species > 0)
+                {
+                    var dtoId = PkmSaveDTO.GetPKMId(
+                        BasePkmVersionDTO.GetPKMIdBase(pkm), (int)BoxType.Party, i
+                    );
+                    savesFlags.UseSave(save.ID32).SavePkms.Ids.Add(dtoId);
+                }
             }
             else
             {
@@ -259,4 +287,9 @@ public class SavePkmLoader(
     }
 
     private static bool IsSpeciesValid(ushort species) => species > 0 && species < GameInfo.Strings.Species.Count;
+
+    public void SetFlags(DataUpdateSaveListFlags _savesFlags)
+    {
+        savesFlags = _savesFlags;
+    }
 }

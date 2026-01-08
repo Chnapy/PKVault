@@ -33,8 +33,6 @@ public class MainCreateBankAction : DataAction
         });
         loaders.bankLoader.NormalizeOrders();
 
-        flags.MainBanks = true;
-
         MainCreateBoxAction.CreateBox(loaders, flags, id.ToString(), null);
 
         return new()

@@ -26,9 +26,6 @@ public class MainDeleteBoxAction(string boxId) : DataAction
             }
         }
 
-        flags.MainBoxes = true;
-        flags.MainBanks = true;
-
         return new()
         {
             type = DataActionType.MAIN_DELETE_BOX,

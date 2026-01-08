@@ -49,8 +49,6 @@ public class MainCreatePkmVersionAction(
 
         loaders.pkmVersionLoader.WriteDto(pkmVersionCreated);
 
-        flags.MainPkmVersions = true;
-
         return new()
         {
             type = DataActionType.MAIN_CREATE_PKM_VERSION,

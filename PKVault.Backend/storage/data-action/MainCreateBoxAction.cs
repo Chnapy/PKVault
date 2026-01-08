@@ -51,9 +51,6 @@ public class MainCreateBoxAction(string bankId, int? slotCount) : DataAction
         loaders.boxLoader.WriteDto(dto);
         loaders.boxLoader.NormalizeOrders();
 
-        flags.MainBoxes = true;
-        flags.MainBanks = true;
-
         return dto;
     }
 }

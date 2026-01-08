@@ -1,12 +1,19 @@
+using System.Diagnostics;
 using PKHeX.Core;
 
 public class PkmVersionDTO : BasePkmVersionDTO
 {
     public static PkmVersionDTO FromEntity(PkmVersionEntity entity, PKM pkm, PkmDTO pkmDto)
     {
+        Stopwatch sw = new();
+        sw.Start();
+
         var dto = new PkmVersionDTO(
             entity, pkm, pkmDto
         );
+
+        sw.Stop();
+        dto.LoadingDuration = sw.Elapsed.TotalMilliseconds;
 
         if (dto.Id != entity.Id)
         {
@@ -102,6 +109,4 @@ public class PkmVersionDTO : BasePkmVersionDTO
 
         CanDelete = !IsMain;
     }
-
-    protected override LegalityAnalysis GetLegalitySafe() => GetLegalitySafe(Pkm);
 }

@@ -346,7 +346,7 @@ public class PkmConvertService
 
     public void ApplyAbilityToPkm(PKM pkm)
     {
-        bool hasAbilityOrPidIssue() => BasePkmVersionDTO.GetLegalitySafe(pkm).Results.Any(result =>
+        bool hasAbilityOrPidIssue() => PkmLegalityDTO.GetLegalitySafe(pkm).Results.Any(result =>
             !result.Valid
             && (result.Identifier == CheckIdentifier.Ability || result.Identifier == CheckIdentifier.PID)
         );

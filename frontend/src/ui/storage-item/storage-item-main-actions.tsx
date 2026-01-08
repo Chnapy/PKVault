@@ -182,8 +182,8 @@ export const StorageItemMainActions: React.FC = () => {
                             ids: [ pkmVersionCanEvolve.id ]
                         },
                     });
-                    const newId = mutateResult.data.mainPkms
-                        ?.find(pkm => pkm.boxId === selectedPkm.boxId && pkm.boxSlot === selectedPkm.boxSlot)?.id;
+                    const mainPkms = Object.values(mutateResult.data.mainPkms?.data ?? {});
+                    const newId = mainPkms.find(pkm => pkm.boxId === selectedPkm.boxId && pkm.boxSlot === selectedPkm.boxSlot)?.id;
                     if (newId) {
                         navigate({
                             search: {

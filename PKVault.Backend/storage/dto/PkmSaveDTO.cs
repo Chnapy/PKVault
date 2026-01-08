@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 using PKHeX.Core;
 
@@ -7,12 +8,20 @@ public class PkmSaveDTO : BasePkmVersionDTO
         SaveFile save, PKM pkm, int boxId, int boxSlot
     )
     {
+        Stopwatch sw = new();
+        sw.Start();
+
         var idBase = GetPKMIdBase(pkm);
 
-        return new PkmSaveDTO(
+        var dto = new PkmSaveDTO(
             idBase,
             save, pkm, boxId, boxSlot
         );
+
+        sw.Stop();
+        dto.LoadingDuration = sw.Elapsed.TotalMilliseconds;
+
+        return dto;
     }
 
     public static string GetPKMId(string idBase, int box, int slot)
@@ -38,6 +47,8 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     public bool IsStarter { get; }
 
+    public bool IsDuplicate { get; set; }
+
     // -- actions
 
     public bool CanMove { get; }
@@ -47,6 +58,8 @@ public class PkmSaveDTO : BasePkmVersionDTO
     public bool CanMoveToMain { get; }
 
     public bool CanMoveToSave { get; }
+
+    public bool CanMoveAttachedToMain => CanMoveToMain && !IsDuplicate;
 
     [JsonIgnore()]
     public readonly SaveFile Save;
@@ -84,29 +97,5 @@ public class PkmSaveDTO : BasePkmVersionDTO
             return pkmVersion;
         }
         return null;
-    }
-
-    protected override LegalityAnalysis GetLegalitySafe()
-    {
-        var slotType = BoxId switch
-        {
-            (int)BoxType.Party => StorageSlotType.Party,
-            (int)BoxType.BattleBox => StorageSlotType.BattleBox,
-            (int)BoxType.Daycare => StorageSlotType.Daycare,
-            (int)BoxType.GTS => StorageSlotType.GTS,
-            // (int)BoxType.Fused => StorageSlotType.Fused,
-            (int)BoxType.Misc => StorageSlotType.Misc,
-            (int)BoxType.Resort => StorageSlotType.Resort,
-            (int)BoxType.Ride => StorageSlotType.Ride,
-            (int)BoxType.Shiny => StorageSlotType.Shiny,
-            _ => StorageSlotType.Box
-        };
-
-        if (Party >= 0)
-        {
-            slotType = StorageSlotType.Party;
-        }
-
-        return GetLegalitySafe(Pkm, Save, slotType);
     }
 }

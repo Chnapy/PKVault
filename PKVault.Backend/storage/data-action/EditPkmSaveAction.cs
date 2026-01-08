@@ -28,12 +28,6 @@ public class EditPkmSaveAction(
 
         saveLoaders.Pkms.WriteDto(pkmSave);
 
-        flags.Saves.Add(new()
-        {
-            SaveId = saveId,
-            SavePkms = true,
-        });
-
         var pkmVersion = pkmSave.GetPkmVersion(loaders.pkmVersionLoader);
         if (pkmVersion != null)
         {

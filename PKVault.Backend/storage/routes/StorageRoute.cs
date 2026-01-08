@@ -56,6 +56,14 @@ public class StorageController(DataService dataService, LoaderService loaderServ
         return savePkms;
     }
 
+    [HttpGet("pkm/legality")]
+    public async Task<ActionResult<Dictionary<string, PkmLegalityDTO>>> GetPkmsLegality([FromQuery] string[] pkmIds, uint? saveId)
+    {
+        var pkmsLegality = await storageQueryService.GetPkmsLegality(pkmIds, saveId);
+
+        return pkmsLegality;
+    }
+
     [HttpPut("move/pkm")]
     public async Task<ActionResult<DataDTO>> MovePkm(
         [FromQuery] string[] pkmIds, uint? sourceSaveId,

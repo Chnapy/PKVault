@@ -47,11 +47,11 @@ public class SettingsController(DataService dataService, SettingsService setting
         return await dataService.CreateDataFromUpdateFlags(new()
         {
             StaticData = languageChanged,
-            MainBanks = true,
-            MainBoxes = true,
-            MainPkms = true,
-            MainPkmVersions = true,
-            Saves = [DataUpdateSaveFlags.REFRESH_ALL_SAVES],
+            MainBanks = new() { All = true },
+            MainBoxes = new() { All = true },
+            MainPkms = new() { All = true },
+            MainPkmVersions = new() { All = true },
+            Saves = new() { All = true },
             Dex = true,
             // Actions = true,
             // Warnings = true,

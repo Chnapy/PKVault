@@ -8,6 +8,8 @@ public abstract class DataLoader(DataEntityLoaders loaders)
     {
         var logtime = LogUtil.Time($"Apply action - {action.GetType()}");
 
+        loaders.SetFlags(flags);
+
         await action.ExecuteWithPayload(loaders, flags);
 
         logtime();
@@ -24,6 +26,19 @@ public class DataEntityLoaders(SaveService saveService)
     public required Dictionary<uint, SaveLoaders> saveLoadersDict { get; set; }
 
     public List<IEntityLoaderWrite> jsonLoaders => [bankLoader, boxLoader, pkmLoader, pkmVersionLoader, dexLoader];
+
+    public void SetFlags(DataUpdateFlags flags)
+    {
+        bankLoader.SetFlags(flags.MainBanks);
+        boxLoader.SetFlags(flags.MainBoxes);
+        pkmLoader.SetFlags(flags.MainPkms);
+        pkmVersionLoader.SetFlags(flags.MainPkmVersions);
+
+        saveLoadersDict.Values.ToList().ForEach(saveLoader =>
+        {
+            saveLoader.Pkms.SetFlags(flags.Saves);
+        });
+    }
 
     public bool GetHasWritten() => jsonLoaders.Any(loader => loader.HasWritten);
 

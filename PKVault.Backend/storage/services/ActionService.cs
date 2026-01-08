@@ -70,7 +70,6 @@ public class ActionService(
     {
         return await AddAction(
             new MovePkmBankAction(
-                warningsService,
                 pkmConvertService,
                 pkmIds, sourceSaveId, bankId, attached)
         );
@@ -205,11 +204,11 @@ public class ActionService(
 
         var flags = new DataUpdateFlags
         {
-            MainBanks = true,
-            MainBoxes = true,
-            MainPkms = true,
-            MainPkmVersions = true,
-            Saves = [DataUpdateSaveFlags.REFRESH_ALL_SAVES],
+            MainBanks = new() { All = true },
+            MainBoxes = new() { All = true },
+            MainPkms = new() { All = true },
+            MainPkmVersions = new() { All = true },
+            Saves = new() { All = true },
             Dex = true,
             Warnings = true,
         };
@@ -238,7 +237,7 @@ public class ActionService(
 
         try
         {
-            var legality = BasePkmVersionDTO.GetLegalitySafe(pkm, save);
+            var legality = PkmLegalityDTO.GetLegalitySafe(pkm, save);
 
             var moveComboSource = new LegalMoveComboSource();
             var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);

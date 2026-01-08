@@ -124,8 +124,6 @@ public class SynchronizePkmAction(
                 }
 
                 loaders.pkmVersionLoader.WriteDto(version);
-
-                flags.MainPkmVersions = true;
             });
         }
 
@@ -195,12 +193,6 @@ public class SynchronizePkmAction(
             }
 
             saveLoaders.Pkms.WriteDto(savePkm);
-
-            flags.Saves.Add(new()
-            {
-                SaveId = (uint)pkmDto.SaveId,
-                SavePkms = true,
-            });
         }
 
         foreach (var (pkmId, savePkmId) in pkmMainAndPkmSaveIds)

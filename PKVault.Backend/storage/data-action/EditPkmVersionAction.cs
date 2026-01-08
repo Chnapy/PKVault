@@ -45,8 +45,6 @@ public class EditPkmVersionAction(
             await SynchronizePkmAction.SynchronizePkmVersionToSave(pkmConvertService, loaders, flags, [(pkmDto.Id, null)]);
         }
 
-        flags.MainPkmVersions = true;
-
         return new()
         {
             type = DataActionType.EDIT_PKM_VERSION,

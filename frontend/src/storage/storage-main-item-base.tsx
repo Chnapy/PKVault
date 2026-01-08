@@ -1,4 +1,5 @@
 import React from 'react';
+import { usePkmLegalityMap } from '../data/hooks/use-pkm-legality';
 import { Gender as GenderType } from '../data/sdk/model';
 import { useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../data/sdk/storage/storage.gen';
 import type { ButtonLikeProps } from '../ui/button/button-like';
@@ -18,6 +19,10 @@ export const StorageMainItemBase: React.FC<StorageMainItemBaseProps> = React.mem
 
     const allPkmVersions = pkmVersionsQuery.data?.data ?? [];
     const pkmVersions = allPkmVersions.filter((value) => value.pkmId === pkmId);
+    const pkmVersionsIds = pkmVersions.map(pkmVersion => pkmVersion.id);
+
+    const pkmLegalityMapQuery = usePkmLegalityMap(pkmVersionsIds);
+    const pkmLegalityMap = Object.values(pkmLegalityMapQuery.data?.data ?? {});
 
     if (!pkm || !pkmVersions[ 0 ]) {
         return null;
@@ -38,7 +43,7 @@ export const StorageMainItemBase: React.FC<StorageMainItemBaseProps> = React.mem
             isAlpha,
             isShiny,
             isShadow: false,
-            warning: pkmVersions.some((value) => !value.isValid),
+            warning: pkmLegalityMap.some((value) => !value.isValid),
             nbrVersions: pkmVersions.length,
             attached: canDetach,
         }}

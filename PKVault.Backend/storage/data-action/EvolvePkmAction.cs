@@ -56,11 +56,6 @@ public class EvolvePkmAction(
             await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersion.PkmId, dto.Id)]);
         }
 
-        flags.Saves.Add(new()
-        {
-            SaveId = saveId,
-            SavePkms = true
-        });
         flags.Dex = true;
 
         return new()
@@ -109,17 +104,10 @@ public class EvolvePkmAction(
         if (dto.PkmDto.SaveId != null)
         {
             await SynchronizePkmAction.SynchronizePkmVersionToSave(pkmConvertService, loaders, flags, [(dto.PkmId, null)]);
-
-            flags.Saves.Add(new()
-            {
-                SaveId = (uint)dto.PkmDto.SaveId,
-                SavePkms = true
-            });
         }
 
         new DexMainService(loaders).EnablePKM(dto.Pkm);
 
-        flags.MainPkmVersions = true;
         flags.Dex = true;
 
         return new DataActionPayload

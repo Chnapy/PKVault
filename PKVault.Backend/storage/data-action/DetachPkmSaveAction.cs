@@ -16,15 +16,6 @@ public class DetachPkmSaveAction(string[] pkmIds) : DataAction
             {
                 pkm.PkmEntity.SaveId = default;
                 loaders.pkmLoader.WriteDto(pkm);
-
-                flags.MainPkms = true;
-                flags.MainPkmVersions = true;   // when there is warnings
-
-                flags.Saves.Add(new()
-                {
-                    SaveId = (uint)oldSaveId,
-                    SavePkms = true,
-                });
             }
 
             var pkmNickname = loaders.pkmVersionLoader.GetDto(pkmId)?.Nickname;

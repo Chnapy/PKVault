@@ -29,8 +29,7 @@ public class SaveInfosController(DataService dataService, SaveService saveServic
 
         return await dataService.CreateDataFromUpdateFlags(new()
         {
-            MainPkmVersions = true,
-            Saves = [DataUpdateSaveFlags.REFRESH_ALL_SAVES],
+            Saves = new() { All = true },
             Dex = true,
             SaveInfos = true,
             Warnings = true,

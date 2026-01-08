@@ -14,7 +14,6 @@ import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popove
 import { TitledContainer } from '../container/titled-container';
 import { Icon } from '../icon/icon';
 import { theme } from '../theme';
-import { usePkmSaveDuplicate } from '../../data/hooks/use-pkm-save-duplicate';
 
 export const StorageBoxSaveActions: React.FC<
     Required<Pick<PopoverPanelProps, 'anchor'>> & { saveId: number; boxId: number; }
@@ -36,7 +35,6 @@ export const StorageBoxSaveActions: React.FC<
     const evolvePkmsMutation = useStorageEvolvePkms();
 
     const getPkmSaveVersion = usePkmSaveVersion();
-    const getPkmSaveDuplicate = usePkmSaveDuplicate();
 
     if (pkms.length === 0 || !hasBox(saveId, boxId)) {
         return null;
@@ -52,7 +50,7 @@ export const StorageBoxSaveActions: React.FC<
         .map(pkm => getPkmSaveVersion(pkm.idBase, pkm.saveId))
         .filter(filterIsDefined);
 
-    const canRemovePkms = pkms.filter(pkm => getPkmSaveDuplicate(pkm).canDelete);
+    const canRemovePkms = pkms.filter(pkm => pkm.canDelete);
 
     return <PopoverPanel
         static

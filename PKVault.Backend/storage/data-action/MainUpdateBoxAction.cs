@@ -64,9 +64,6 @@ public class MainUpdateBoxAction(string boxId, string boxName, int order, string
         loaders.boxLoader.WriteEntity(box);
         loaders.boxLoader.NormalizeOrders();
 
-        flags.MainBoxes = true;
-        flags.MainBanks = true;
-
         return new()
         {
             type = DataActionType.MAIN_UPDATE_BOX,

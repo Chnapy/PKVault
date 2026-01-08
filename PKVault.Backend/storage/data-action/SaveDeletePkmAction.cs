@@ -20,11 +20,6 @@ public class SaveDeletePkmAction(uint saveId, string[] pkmIds) : DataAction
             saveLoaders.Pkms.DeleteDto(pkmId);
             saveLoaders.Pkms.FlushParty();
 
-            flags.Saves.Add(new()
-            {
-                SaveId = saveId,
-                SavePkms = true,
-            });
             flags.Dex = true;
 
             return new()
