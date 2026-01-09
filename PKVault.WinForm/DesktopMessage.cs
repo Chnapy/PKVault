@@ -47,3 +47,12 @@ public record OpenFolderResponseMessage
 {
     public const string TYPE = "open-folder";
 };
+
+public record StartFinishRequestMessage
+(
+    string type, //'start-finish'
+    bool hasError
+)
+{
+    public const string TYPE = "start-finish";
+}

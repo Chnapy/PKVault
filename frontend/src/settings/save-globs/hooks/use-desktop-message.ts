@@ -27,6 +27,11 @@ type OpenFolderResponse = {
     id: string;
 };
 
+type StartFinishRequest = {
+    type: 'start-finish';
+    hasError: boolean;
+};
+
 type Response = FileExploreResponse | OpenFolderResponse;
 
 declare global {
@@ -87,5 +92,12 @@ export const useDesktopMessage = () => {
 
             requestDesktop(request);
         }),
+        startLoadingFinished: (hasError: boolean) => {
+            const request: StartFinishRequest = {
+                type: 'start-finish',
+                hasError,
+            };
+            requestDesktop(request);
+        },
     };
 };

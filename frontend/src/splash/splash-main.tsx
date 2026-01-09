@@ -6,6 +6,8 @@ import { Splash } from '../ui/splash/splash';
 import { SplashData } from './splash-data';
 
 export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
+    const appStartTime = React.useRef(Date.now());
+
     const settingsQuery = useSettingsGet();
     const settingsEditMutation = useSettingsEdit();
 
@@ -27,7 +29,7 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
     }
 
     if (language) {
-        return <SplashData>{children}</SplashData>;
+        return <SplashData appStartTime={appStartTime.current}>{children}</SplashData>;
     }
 
     return <Splash>

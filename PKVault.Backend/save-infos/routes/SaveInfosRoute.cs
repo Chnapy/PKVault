@@ -10,8 +10,6 @@ public class SaveInfosController(DataService dataService, SaveService saveServic
     [HttpGet()]
     public async Task<ActionResult<Dictionary<uint, SaveInfosDTO>>> GetAll()
     {
-        await loaderService.WaitForSetup();
-
         return saveService.GetAllSaveInfos();
     }
 

@@ -101,6 +101,8 @@ partial class MainForm
 
     private async Task<bool> WebView_Load()
     {
+        var time = LogUtil.Time($"Load WebView");
+
         string webViewVersion;
         try
         {
@@ -131,13 +133,13 @@ partial class MainForm
 
         InjectIntoFrontend();
 
-        webView.CoreWebView2.AddWebResourceRequestedFilter("http://pkvault/*", CoreWebView2WebResourceContext.All);
+        webView.CoreWebView2.AddWebResourceRequestedFilter("http://pkvault../*", CoreWebView2WebResourceContext.All);
         webView.CoreWebView2.AddWebResourceRequestedFilter("http://localhost:*", CoreWebView2WebResourceContext.All);
 
         webView.CoreWebView2.WebResourceRequested += async (sender, args) =>
         {
             // http://localhost:57135/api/storage/main/pkm-version
-            // http://pkvault/index.html?server=http://localhost:57471
+            // http://pkvault../index.html?server=http://localhost:57471
             var uri = args.Request.Uri;
             // Console.WriteLine($"DEBUG {uri}");
 
@@ -177,16 +179,25 @@ partial class MainForm
             }
         };
 
+        time();
+
         return true;
     }
 
     private void WebView_Navigate()
     {
-        var navigateTo = $"http://pkvault/index.html?server={LocalWebServer.HOST_URL}";
+        // specific domain with '..' to bypass webview slow dns resolver
+        // @see https://github.com/MicrosoftEdge/WebView2Feedback/issues/2381#issuecomment-3032253958
+        var navigateTo = $"http://pkvault../index.html?server={LocalWebServer.HOST_URL}";
 
-        Console.WriteLine($"Navigate WebView to {navigateTo}");
+        var time = LogUtil.Time($"Navigate WebView to {navigateTo}");
 
         webView.CoreWebView2.Navigate(navigateTo);
+        webView.CoreWebView2.NavigationCompleted += (object sender, CoreWebView2NavigationCompletedEventArgs e) =>
+        {
+            time();
+            partialStartupTime();
+        };
     }
 
     private async Task HandleApiRequest(CoreWebView2WebResourceRequestedEventArgs args)
@@ -374,6 +385,13 @@ partial class MainForm
                                 id: openFolderRequest.id
                             );
                             responseSerialized = JsonSerializer.Serialize(response, DesktopMessageJsonContext.Default.OpenFolderResponseMessage);
+                            break;
+                        }
+                    case StartFinishRequestMessage.TYPE:
+                        {
+                            // var startFinishRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.StartFinishRequestMessage);
+                            fullStartupTime();
+
                             break;
                         }
                 }

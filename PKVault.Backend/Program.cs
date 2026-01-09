@@ -13,10 +13,13 @@ public class Program
     {
         LogUtil.Initialize();
 
+        var time = LogUtil.Time($"Setup backend load");
+
         Copyright();
 
         var app = PrepareWebApp(5000);
         var setupDone = await SetupData(app, args);
+        time();
         if (setupDone)
         {
             await app.RunAsync();
@@ -27,7 +30,7 @@ public class Program
 
     public static void Copyright()
     {
-        Console.WriteLine("PKVault Copyright (C) 2025  Richard Haddad"
+        Console.WriteLine("PKVault Copyright (C) 2026  Richard Haddad"
         + "\nThis program comes with ABSOLUTELY NO WARRANTY."
         + "\nThis is free software, and you are welcome to redistribute it under certain conditions."
         + "\nFull license can be accessed here: https://github.com/Chnapy/PKVault/blob/main/LICENSE"
@@ -112,8 +115,6 @@ public class Program
             await host.Services.GetRequiredService<GenPokeapiService>().GenerateFiles();
             return false;
 #elif MODE_DEFAULT
-
-        await host.Services.GetRequiredService<LoaderService>().WaitForSetup();
 
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
@@ -246,6 +247,7 @@ public class Program
             .AllowAnyHeader());
 
         app.UseMiddleware<ExceptionHandlingMiddleware>();
+        app.UseMiddleware<SetupMiddleware>();
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();

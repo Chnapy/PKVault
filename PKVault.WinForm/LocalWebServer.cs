@@ -35,8 +35,6 @@ public class LocalWebServer
         Console.WriteLine($"LocalWebServer start for {HOST_URL}");
 
         _ = Task.Run(() => webHost.Run());
-
-        await PKVault.Backend.Program.SetupData(webHost, args);
     }
 
     public async Task Stop()

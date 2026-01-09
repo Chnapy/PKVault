@@ -3,11 +3,15 @@
 public partial class MainForm : Form
 {
     private readonly string[] args;
+    private readonly Func<long> fullStartupTime;
+    private readonly Func<long> partialStartupTime;
     private LocalWebServer? server;
 
-    public MainForm(string[] _args)
+    public MainForm(string[] _args, Func<long> _fullStartupTime, Func<long> _partialStartupTime)
     {
         args = _args;
+        fullStartupTime = _fullStartupTime;
+        partialStartupTime = _partialStartupTime;
 
         try
         {
@@ -27,8 +31,13 @@ public partial class MainForm : Form
         var loaded = await WebView_Load();
         if (!loaded) return;
 
+        var serverTime = LogUtil.Time($"Start LocalWebServer");
+
         server = new LocalWebServer();
         await server.Start(args);
+
+        serverTime();
+
         WebView_Navigate();
     }
 
