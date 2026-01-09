@@ -170,35 +170,6 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
 
     public override void CleanData(DataEntityLoaders loaders)
     {
-        // rename pk filename if needed
-        GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
-        {
-            var pkmBytes = File.ReadAllBytes(pkmVersionEntity.Filepath);
-            var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
-
-            var oldFilepath = pkmVersionEntity.Filepath;
-            var expectedFilepath = PKMLoader.GetPKMFilepath(pkm);
-
-            // update pk file
-            if (expectedFilepath != oldFilepath)
-            {
-                if (File.Exists(oldFilepath))
-                {
-                    Console.WriteLine($"Copy {oldFilepath} to {expectedFilepath}");
-                    File.Copy(oldFilepath, expectedFilepath, true);
-                }
-                pkmVersionEntity.Filepath = expectedFilepath;
-                WriteEntity(pkmVersionEntity);
-            }
-
-            // if filepath is not normalized
-            if (pkmVersionEntity.Filepath != MatcherUtil.NormalizePath(pkmVersionEntity.Filepath))
-            {
-                pkmVersionEntity.Filepath = MatcherUtil.NormalizePath(pkmVersionEntity.Filepath);
-                WriteEntity(pkmVersionEntity);
-            }
-        });
-
         // remove pkmVersions with inconsistent data
         GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
         {
@@ -232,6 +203,35 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
                         DeleteEntity(pkmVersionEntity.Id);
                     }
                 }
+            }
+        });
+
+        // rename pk filename if needed
+        GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
+        {
+            var pkmBytes = File.ReadAllBytes(pkmVersionEntity.Filepath);
+            var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
+
+            var oldFilepath = pkmVersionEntity.Filepath;
+            var expectedFilepath = PKMLoader.GetPKMFilepath(pkm);
+
+            // update pk file
+            if (expectedFilepath != oldFilepath)
+            {
+                if (File.Exists(oldFilepath))
+                {
+                    Console.WriteLine($"Copy {oldFilepath} to {expectedFilepath}");
+                    File.Copy(oldFilepath, expectedFilepath, true);
+                }
+                pkmVersionEntity.Filepath = expectedFilepath;
+                WriteEntity(pkmVersionEntity);
+            }
+
+            // if filepath is not normalized
+            if (pkmVersionEntity.Filepath != MatcherUtil.NormalizePath(pkmVersionEntity.Filepath))
+            {
+                pkmVersionEntity.Filepath = MatcherUtil.NormalizePath(pkmVersionEntity.Filepath);
+                WriteEntity(pkmVersionEntity);
             }
         });
     }

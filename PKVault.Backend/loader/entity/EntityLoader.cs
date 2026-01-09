@@ -140,7 +140,13 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
 
     public void MigrateGlobalEntities(DataEntityLoaders loaders)
     {
-        var firstItem = GetAllEntities().First().Value;
+        var entities = GetAllEntities();
+        if (entities.Count == 0)
+        {
+            return;
+        }
+
+        var firstItem = entities.First().Value;
         if (firstItem == null)
         {
             return;

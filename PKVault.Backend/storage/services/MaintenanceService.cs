@@ -29,9 +29,9 @@ public class MaintenanceService(
             saveLoadersDict = [],
         };
 
+        loaders.CleanData();
         loaders.SetupInitialData();
         loaders.MigrateGlobalEntities();
-        loaders.CleanData();
 
         if (loaders.GetHasWritten())
         {
