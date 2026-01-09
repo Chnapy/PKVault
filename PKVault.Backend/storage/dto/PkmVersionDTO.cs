@@ -51,7 +51,7 @@ public class PkmVersionDTO : BasePkmVersionDTO
 
         if (ignoredVersions.Contains(version))
         {
-            var context = version.GetContext();
+            var context = version.Context;
 
             try
             {

@@ -9,7 +9,7 @@ public class BoxEntity : IEntity
         get { return int.Parse(Id); }
     }
 
-    public required BoxType Type { get; set; } = BoxType.Box;
+    public BoxType Type { get; set; } = BoxType.Box;
 
     public required string Name { get; set; }
 

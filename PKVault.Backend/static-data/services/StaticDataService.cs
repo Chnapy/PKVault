@@ -47,7 +47,7 @@ public class StaticDataService
                 {
                     Id = (byte)version,
                     Name = await versionName,
-                    Generation = version.GetGeneration(),
+                    Generation = version.Generation,
                     Region = await versionRegion,
                     MaxSpeciesId = blankSave?.MaxSpeciesID ?? 0,
                     MaxIV = blankSave?.MaxIV ?? 0,
@@ -98,7 +98,7 @@ public class StaticDataService
                     _ => [PKHeX.Core.Gender.Male, PKHeX.Core.Gender.Female],
                 };
 
-                var contexts = Enum.GetValues<EntityContext>().ToList().FindAll(context => context.IsValid());
+                var contexts = Enum.GetValues<EntityContext>().ToList().FindAll(context => context.IsValid);
 
                 var forms = new Dictionary<byte, StaticSpeciesForm[]>();
 
@@ -258,7 +258,7 @@ public class StaticDataService
                 List<(Pokemon, PokemonForm[])> allDatas = [defaultData, .. otherDatas];
 
                 var defaultForm = getVarietyForm(
-                    LAST_ENTITY_CONTEXT.Generation(),
+                    LAST_ENTITY_CONTEXT.Generation,
                     defaultData.Item1,
                     defaultData.Item2.ToList().Find(form => !form.IsBattleOnly)!,
                     0,
@@ -269,7 +269,7 @@ public class StaticDataService
 
                 contexts.ForEach(context =>
                 {
-                    if (generation > context.Generation())
+                    if (generation > context.Generation)
                     {
                         return;
                     }
@@ -423,7 +423,7 @@ public class StaticDataService
 
                     var varietyForms = formListData.ToList()
                         .OfType<(Pokemon, PokemonForm?, int)>()
-                        .Select((data) => getVarietyForm(context.Generation(), data.Item1, data.Item2, data.Item3, defaultForm));
+                        .Select((data) => getVarietyForm(context.Generation, data.Item1, data.Item2, data.Item3, defaultForm));
 
                     // if (!varietyForms.Any())
                     // {
