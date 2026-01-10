@@ -2,11 +2,19 @@ using PKHeX.Core;
 
 public class DexEntity : IEntity
 {
-    public int SchemaVersion { get; set; } = 0;
+    public override int SchemaVersion { get; set; } = 0;
 
-    public required string Id { get; set; }
+    public override required string Id { get; set; }
     public required ushort Species { get; set; }
     public required List<DexEntityForm> Forms { get; set; }
+
+    public override DexEntity Clone() => new()
+    {
+        SchemaVersion = SchemaVersion,
+        Id = Id,
+        Species = Species,
+        Forms = Forms
+    };
 }
 
 public class DexEntityForm

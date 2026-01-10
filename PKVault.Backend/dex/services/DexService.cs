@@ -1,10 +1,10 @@
 using PKHeX.Core;
 
-public class DexService(LoaderService loaderService, StaticDataService staticDataService)
+public class DexService(LoadersService loadersService, StaticDataService staticDataService)
 {
     public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex()
     {
-        var saveDict = (await loaderService.GetLoader()).loaders.saveLoadersDict;
+        var saveDict = (await loadersService.GetLoaders()).saveLoadersDict;
         if (saveDict.Count == 0)
         {
             return [];
@@ -20,7 +20,7 @@ public class DexService(LoaderService loaderService, StaticDataService staticDat
             return [];
         }
 
-        var loaders = (await loaderService.GetLoader()).loaders;
+        var loaders = await loadersService.GetLoaders();
 
         var saveLoadersDict = loaders.saveLoadersDict;
 

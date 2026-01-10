@@ -7,8 +7,8 @@ namespace PKVault.Backend.warnings.routes;
 public class WarningsController(WarningsService warningsService) : ControllerBase
 {
     [HttpGet("warnings")]
-    public ActionResult<WarningsDTO> GetWarnings()
+    public async Task<ActionResult<WarningsDTO>> GetWarnings()
     {
-        return warningsService.GetWarningsDTO();
+        return await warningsService.GetWarningsDTO();
     }
 }

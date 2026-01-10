@@ -1,21 +1,20 @@
 using PKHeX.Core;
 
-public class WarningsService(LoaderService loaderService, SaveService saveService)
+public class WarningsService(LoadersService loadersService, SaveService saveService)
 {
-    private WarningsDTO WarningsDTO = new()
-    {
-        SaveChangedWarnings = [],
-        PlayTimeWarnings = [],
-        PkmVersionWarnings = [],
-        SaveDuplicateWarnings = [],
-    };
+    private WarningsDTO? WarningsDTO = null;
 
-    public WarningsDTO GetWarningsDTO()
+    public async Task<WarningsDTO> GetWarningsDTO()
     {
+        if (WarningsDTO == null)
+        {
+            return await CheckWarnings();
+        }
+
         return WarningsDTO;
     }
 
-    public async Task CheckWarnings()
+    public async Task<WarningsDTO> CheckWarnings()
     {
         var logtime = LogUtil.Time($"Warnings check");
 
@@ -32,26 +31,30 @@ public class WarningsService(LoaderService loaderService, SaveService saveServic
         };
 
         logtime();
+
+        return WarningsDTO;
     }
 
     private async Task<List<SaveChangedWarning>> CheckSaveChangedWarnings()
     {
         var warns = new List<SaveChangedWarning>();
 
-        var loader = await loaderService.GetLoader();
+        var loaders = await loadersService.GetLoaders();
 
-        var startTime = loader.startTime;
+        var startTime = loaders.startTime;
 
-        if (loader.loaders.saveLoadersDict.Count == 0)
+        if (loaders.saveLoadersDict.Count == 0)
         {
             return [];
         }
 
-        return [.. loader.loaders.saveLoadersDict.Values
+        var saveByPath = await saveService.GetSaveByPath();
+
+        return [.. loaders.saveLoadersDict.Values
             .Where(saveLoaders => saveLoaders.Boxes.HasWritten || saveLoaders.Pkms.HasWritten)
             .Where(saveLoaders =>
             {
-                var path = saveService.SaveByPath.Keys.ToList().Find(path => saveService.SaveByPath[path].ID32 == saveLoaders.Save.ID32);
+                var path = saveByPath.Keys.ToList().Find(path => saveByPath[path].ID32 == saveLoaders.Save.ID32);
                 if (path == default)
                 {
                     throw new KeyNotFoundException($"Path not found for given save {saveLoaders.Save.ID32}");
@@ -112,7 +115,7 @@ public class WarningsService(LoaderService loaderService, SaveService saveServic
     {
         var warns = new List<PkmVersionWarning>();
 
-        var loaders = (await loaderService.GetLoader()).loaders;
+        var loaders = await loadersService.GetLoaders();
 
         var pkms = loaders.pkmLoader.GetAllDtos();
 
@@ -158,16 +161,18 @@ public class WarningsService(LoaderService loaderService, SaveService saveServic
 
     private async Task<List<SaveDuplicateWarning>> CheckSaveDuplicates()
     {
-        var loader = await loaderService.GetLoader();
+        var loaders = await loadersService.GetLoaders();
 
-        if (loader.loaders.saveLoadersDict.Count == 0)
+        if (loaders.saveLoadersDict.Count == 0)
         {
             return [];
         }
 
-        var tasks = loader.loaders.saveLoadersDict.Values.Select(async (saveLoader) =>
+        var saveByPath = await saveService.GetSaveByPath();
+
+        var tasks = loaders.saveLoadersDict.Values.Select(async (saveLoader) =>
         {
-            var paths = saveService.SaveByPath.ToList()
+            var paths = saveByPath.ToList()
                 .FindAll(entry => entry.Value.ID32 == saveLoader.Save.ID32)
                 .Select(entry => entry.Key);
 

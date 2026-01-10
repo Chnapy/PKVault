@@ -3,28 +3,27 @@ using System.IO.Compression;
 using System.Text.Json;
 
 public class BackupService(
-    LoaderService loaderService, MaintenanceService maintenanceService, SaveService saveService,
-    PkmConvertService pkmConvertService
+    LoadersService loadersService, SaveService saveService
 )
 {
     private static readonly string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
 
-    public DateTime CreateBackup()
+    public async Task<DateTime> CreateBackup()
     {
         var logtime = LogUtil.Time("Create backup");
 
-        var loader = DataMemoryLoader.Create(saveService, pkmConvertService);
+        var loaders = await loadersService.CreateLoaders();
 
         var steptime = LogUtil.Time($"Create backup - DB");
-        var dbPaths = CreateDbBackup(loader.loaders);
+        var dbPaths = CreateDbBackup(loaders);
         steptime();
 
         steptime = LogUtil.Time($"Create backup - Saves");
-        var savesPaths = CreateSavesBackup(loader.loaders);
+        var savesPaths = CreateSavesBackup(loaders);
         steptime();
 
         steptime = LogUtil.Time($"Create backup - Storage");
-        var mainPaths = CreateMainBackup(loader.loaders);
+        var mainPaths = CreateMainBackup(loaders);
         steptime();
 
         var files = new Dictionary<string, (string TargetPath, byte[] FileContent)>()
@@ -56,7 +55,7 @@ public class BackupService(
             }
 
             var bkpPath = GetBackupsPath();
-            var fileName = GetBackupFilename(loader.startTime);
+            var fileName = GetBackupFilename(loaders.startTime);
             var bkpZipPath = Path.Combine(bkpPath, fileName);
 
             File.WriteAllBytes(bkpZipPath, memoryStream.ToArray());
@@ -65,7 +64,7 @@ public class BackupService(
 
         logtime();
 
-        return loader.startTime;
+        return loaders.startTime;
     }
 
     private Dictionary<string, (string TargetPath, byte[] FileContent)> CreateDbBackup(DataEntityLoaders loaders)
@@ -104,7 +103,7 @@ public class BackupService(
             var relativePath = Path.Combine("saves", newFilename);
 
             paths.Add(NormalizePath(relativePath), (
-                TargetPath: NormalizePath(path), FileContent: saveService.GetSaveFileData(saveLoader.Save)
+                TargetPath: NormalizePath(path), FileContent: SaveService.GetSaveFileData(saveLoader.Save)
             ));
         }
 
@@ -236,7 +235,7 @@ public class BackupService(
         );
 
         // manual backup, no use of PrepareBackupThenRun to avoid infinite loop
-        CreateBackup();
+        await CreateBackup();
 
         foreach (var entry in archive.Entries)
         {
@@ -255,14 +254,13 @@ public class BackupService(
 
         logtime();
 
-        saveService.ReadLocalSaves();
-        await maintenanceService.DataSetupMigrateClean();
-        await loaderService.ResetDataLoader(true);
+        saveService.InvalidateSaves();
+        loadersService.InvalidateLoaders((maintainData: true, checkSaves: true));
     }
 
     public async Task PrepareBackupThenRun(Func<Task> action)
     {
-        var bkpDateTime = CreateBackup();
+        var bkpDateTime = await CreateBackup();
 
         try
         {
@@ -272,9 +270,8 @@ public class BackupService(
 
             logtime();
 
-            saveService.ReadLocalSaves();
-
-            await loaderService.ResetDataLoader(false);
+            saveService.InvalidateSaves();
+            loadersService.InvalidateLoaders((maintainData: false, checkSaves: true));
         }
         catch
         {

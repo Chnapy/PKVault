@@ -18,11 +18,19 @@ public class Program
         Copyright();
 
         var app = PrepareWebApp(5000);
-        var setupDone = await SetupData(app, args);
+        var setupPostRun = await SetupData(app, args);
         time();
-        if (setupDone)
+        if (setupPostRun != null)
         {
-            await app.RunAsync();
+            var appTask = app.RunAsync();
+
+            var setupPostRunTime = LogUtil.Time($"Setup post-run");
+
+            await setupPostRun();
+
+            setupPostRunTime();
+
+            await appTask;
         }
 
         LogUtil.Dispose();
@@ -38,105 +46,43 @@ public class Program
         + $"\nCurrent time UTC = {DateTime.UtcNow}\n");
     }
 
-    public static async Task<bool> SetupData(IHost host, string[] args)
+    public static async Task<Func<Task>?> SetupData(IHost host, string[] args)
     {
         var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
-        // if (args.Length > 0 && args[0] == "test-PB7")
-        // {
-        //     LocalSaveService.ReadLocalSaves();
-        //     await StorageService.ResetDataLoader(false);
-        //     // await StorageService.SaveMovePkmFromStorage(
-        //     //     4106192122,
-        //     //     "G700754A1E359E2 5 5 14 11 1200",
-        //     //     3, 3
-        //     // );
-        //     var list = await StorageService.GetSavePkms(4106192122);
-        //     var lastDto = list.Last();
-
-        //     Console.WriteLine($"Id={lastDto.Id}\nPID={lastDto.PID}\nNickname={lastDto.Nickname}"
-        //         + $"\nGender={lastDto.Gender}\nAV_ATK={lastDto.EVs[1]}\nAbility={lastDto.Ability}"
-        //         + $"\nMoves.1={lastDto.Moves[0]}\nMoves.2={lastDto.Moves[1]}\nMoves.3={lastDto.Moves[2]}\nMoves.4={lastDto.Moves[3]}"
-        //         + $"\nBall={lastDto.Ball}"
-        //     );
-        //     Console.WriteLine(lastDto.ValidityReport);
-
-        //     return false;
-        // }
-
-        // if (args.Length > 0 && args[0] == "bench-pokeapi")
-        // {
-        //     var logtimePkm = LogUtil.Time("Benchmark PokeApi perfs with 10.000 sequential calls pokemon", (10_500, 11_500));
-        //     for (var species = 1; species < 10_000; species++)
-        //     {
-        //         await PokeApi.GetPokemon((species % 900) + 1);
-        //     }
-        //     // expected: ~10s
-        //     var timePkm = (double)logtimePkm();
-        //     Console.WriteLine($"Call pokemon av. time = {timePkm / 10_000}ms");
-        //     return false;
-        // }
-
-        // if (args.Length > 0 && args[0] == "bench-save-pkm")
-        // {
-        //     LocalSaveService.ReadLocalSaves();
-        //     await StorageService.ResetDataLoader(false);
-
-        //     var logtimeSavePkmAll = LogUtil.Time("Benchmark Save Pkms (all) perfs with 10 sequential calls", (550, 800));
-        //     // List<PkmSaveDTO> savePkms = [];
-        //     for (var i = 0; i < 10; i++)
-        //     {
-        //         await StorageService.GetSavePkms(3809447156);
-        //         // savePkms.ForEach(pkm => Console.WriteLine($"{pkm.Id} - {pkm.Box}/{pkm.BoxSlot}"));
-        //     }
-        //     // expected: ~0.5s
-        //     logtimeSavePkmAll();
-        //     // Console.WriteLine($"count={savePkms.Count} last_id={savePkms.Last().Id}");
-
-        //     var logtimeSavePkmGet = LogUtil.Time("Benchmark Save Pkms (get) perfs with 2000 sequential calls", (10, 30));
-        //     for (var i = 0; i < 2000; i++)
-        //     {
-        //         var result = (await StorageService.GetLoader()).loaders.saveLoadersDict[3809447156].Pkms.GetDto("G30366FC1CF2B528 17 20 21 30 600")
-        //             ?? throw new Exception();
-        //     }
-        //     // expected: ~0.001s
-        //     logtimeSavePkmGet();
-
-        //     // diff=110
-
-        //     var setupedMemoryUsedMB1 = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
-
-        //     Console.WriteLine($"Memory checks: initial={initialMemoryUsedMB} MB setuped={setupedMemoryUsedMB1} MB diff={setupedMemoryUsedMB1 - initialMemoryUsedMB} MB");
-
-        //     return false;
-        // }
-
 #if MODE_GEN_POKEAPI
             await host.Services.GetRequiredService<GenPokeapiService>().GenerateFiles();
-            return false;
+            return null;
 #elif MODE_DEFAULT
 
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
         Console.WriteLine($"Memory checks: initial={initialMemoryUsedMB} MB setuped={setupedMemoryUsedMB} MB diff={setupedMemoryUsedMB - initialMemoryUsedMB} MB");
 
+        await host.Services.GetRequiredService<StaticDataService>().GetStaticData();
+
         if (args.Length > 0 && args[0] == "clean")
         {
             await host.Services.GetRequiredService<MaintenanceService>().CleanMainStorageFiles();
-            return false;
+            return null;
         }
 
         if (args.Length > 0 && args[0] == "test-bkp")
         {
-            host.Services.GetRequiredService<BackupService>().CreateBackup();
-            return false;
+            await host.Services.GetRequiredService<BackupService>().CreateBackup();
+            return null;
         }
 
-        return true;
+        return async () =>
+        {
+            await Task.WhenAll([
+                host.Services.GetRequiredService<SaveService>().EnsureInitialized(),
+                host.Services.GetRequiredService<LoadersService>().EnsureInitialized(),
+            ]);
+        };
 #else
         throw new Exception("Mode not defined");
 #endif
-
     }
 
     public static WebApplication PrepareWebApp(int port)
@@ -206,7 +152,7 @@ public class Program
             });
 
         services.AddSingleton<GenPokeapiService>();
-        services.AddSingleton<LoaderService>();
+        services.AddSingleton<LoadersService>();
         services.AddSingleton<StorageQueryService>();
         services.AddSingleton<ActionService>();
         services.AddSingleton<MaintenanceService>();
@@ -247,7 +193,6 @@ public class Program
             .AllowAnyHeader());
 
         app.UseMiddleware<ExceptionHandlingMiddleware>();
-        app.UseMiddleware<SetupMiddleware>();
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();

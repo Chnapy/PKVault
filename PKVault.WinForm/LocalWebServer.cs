@@ -28,13 +28,15 @@ public class LocalWebServer
         }
     }
 
-    public async Task Start(string[] args)
+    public async Task<Func<Task>?> Start(string[] args)
     {
-        if (webHost == null) return;
+        if (webHost == null) return null;
 
         Console.WriteLine($"LocalWebServer start for {HOST_URL}");
 
         _ = Task.Run(() => webHost.Run());
+
+        return await PKVault.Backend.Program.SetupData(webHost, args);
     }
 
     public async Task Stop()

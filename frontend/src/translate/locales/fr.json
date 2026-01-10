@@ -180,6 +180,7 @@
   "storage.save-actions.type.evolve-pkm": "Évoluer le pkm {{name}} dans {{save}} de {{oldSpecies}} à {{newSpecies}}",
   "storage.save-actions.type.sort-pkm": "Trier les pkms",
   "storage.save-actions.type.dex-sync": "Synchroniser les Pokedex",
+  "storage.save-actions.type.data-normalize": "Normalisation des fichiers (mise à jour, nettoyage)",
   "storage.actions.release": "Relacher",
   "notifications.warnings.update": "Nouvelle version PKVault {{version}}"
 }

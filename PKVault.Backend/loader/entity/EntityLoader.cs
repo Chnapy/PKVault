@@ -27,12 +27,23 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
 
     public virtual Dictionary<string, E> GetAllEntities()
     {
-        entitiesById ??= GetFileContent();
+        var entities = GetRealEntities();
 
-        return entitiesById;
+        var clonesDict = new Dictionary<string, E>(entities.Count);
+        foreach (var entry in entities)
+        {
+            clonesDict.Add(entry.Key, (E)entry.Value.Clone());
+        }
+        return clonesDict;
     }
 
-    public byte[] SerializeToUtf8Bytes() => JsonSerializer.SerializeToUtf8Bytes(GetAllEntities(), DictJsonContext);
+    public byte[] SerializeToUtf8Bytes() => JsonSerializer.SerializeToUtf8Bytes(GetRealEntities(), DictJsonContext);
+
+    private Dictionary<string, E> GetRealEntities()
+    {
+        entitiesById ??= GetFileContent();
+        return entitiesById;
+    }
 
     private Dictionary<string, E> GetFileContent()
     {
@@ -75,16 +86,16 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
 
     public E? GetEntity(string id)
     {
-        if (GetAllEntities().TryGetValue(id, out var value))
+        if (GetRealEntities().TryGetValue(id, out var value))
         {
-            return value;
+            return (E)value.Clone();
         }
         return default;
     }
 
     public virtual bool DeleteEntity(string id)
     {
-        var deleted = GetAllEntities().Remove(id);
+        var deleted = GetRealEntities().Remove(id);
         if (deleted)
         {
             Console.WriteLine($"Deleted id={id}");
@@ -100,7 +111,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
     {
         Console.WriteLine($"{entity.GetType().Name} - Write id={entity.Id}");
 
-        GetAllEntities()[entity.Id] = entity;
+        GetRealEntities()[entity.Id] = entity;
 
         flags.Ids.Add(entity.Id);
         HasWritten = true;

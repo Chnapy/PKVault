@@ -1,4 +1,8 @@
-public interface IEntity : IWithId
+public abstract class IEntity : IWithId
 {
-    public int SchemaVersion { get; set; }
+    public abstract int SchemaVersion { get; set; }
+
+    public abstract string Id { get; set; }
+
+    public abstract IEntity Clone();
 }

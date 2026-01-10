@@ -4,7 +4,6 @@ import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { useStaticDataGet } from '../data/sdk/static-data/static-data.gen';
 import { useStorageGetMainBanks, useStorageGetMainBoxes, useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../data/sdk/storage/storage.gen';
-import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
 import { Fallback } from '../error/fallback';
 import { useDesktopMessage } from '../settings/save-globs/hooks/use-desktop-message';
 import { Splash } from '../ui/splash/splash';
@@ -13,7 +12,6 @@ export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number
     const queries = [
         useStaticDataGet(),
         useSettingsGet(),
-        useWarningsGetWarnings(),
         useBackupGetAll(),
         useSaveInfosGetAll(),
         useStorageGetMainBanks(),

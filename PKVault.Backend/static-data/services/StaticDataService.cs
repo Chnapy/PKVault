@@ -3,18 +3,21 @@ using PokeApiNet;
 
 public class StaticDataService
 {
-    public static StaticDataDTO staticData;
+    public static StaticDataDTO staticData { get; private set; }
 
     public static readonly EntityContext LAST_ENTITY_CONTEXT = EntityContext.Gen9a;
 
     public async Task<StaticDataDTO> GetStaticData()
     {
-        var client = new AssemblyClient();
+        if (staticData == null)
+        {
+            var client = new AssemblyClient();
 
-        staticData = (await client.GetAsyncJsonGz(
-            GetStaticDataPathParts(SettingsService.BaseSettings.GetSafeLanguage()),
-            StaticDataJsonContext.Default.StaticDataDTO
-        ))!;
+            staticData = (await client.GetAsyncJsonGz(
+                GetStaticDataPathParts(SettingsService.BaseSettings.GetSafeLanguage()),
+                StaticDataJsonContext.Default.StaticDataDTO
+            ))!;
+        }
 
         return staticData;
     }

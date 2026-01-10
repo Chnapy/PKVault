@@ -1,5 +1,5 @@
 public class DataService(
-    LoaderService loaderService, StorageQueryService storageQueryService, StaticDataService staticDataService,
+    LoadersService loadersService, StorageQueryService storageQueryService, StaticDataService staticDataService,
     WarningsService warningsService, DexService dexService, SaveService saveService,
     BackupService backupService, SettingsService settingsService
 )
@@ -7,8 +7,6 @@ public class DataService(
     public async Task<DataDTO> CreateDataFromUpdateFlags(DataUpdateFlags flags)
     {
         var time = LogUtil.Time("Prepare global data payload");
-
-        var memoryLoader = await loaderService.GetLoader();
 
         var staticDataTask = Task.Run(async () => flags.StaticData
             ? await staticDataService.GetStaticData()
@@ -194,9 +192,9 @@ public class DataService(
             };
         }));
 
-        var saveInfos = flags.SaveInfos
-            ? saveService.GetAllSaveInfos()
-            : null;
+        var saveInfosTask = Task.Run(async () => flags.SaveInfos
+            ? await saveService.GetAllSaveInfos()
+            : null);
 
         var backups = flags.Backups
             ? backupService.GetBackupList()
@@ -206,9 +204,9 @@ public class DataService(
 
         var dto = new DataDTO()
         {
-            Warnings = warningsService.GetWarningsDTO(),
+            Warnings = await warningsService.GetWarningsDTO(),
             Settings = settingsService.GetSettings(),
-            Actions = loaderService.GetActionPayloadList(),
+            Actions = loadersService.GetActionPayloadList(),
             StaticData = await staticDataTask,
             MainBanks = await mainBanksTask,
             MainBoxes = await mainBoxesTask,
@@ -217,7 +215,7 @@ public class DataService(
             MainPkmLegalities = await mainPkmLegalitiesTask,
             Saves = [.. await savesTask],
             InvalidateAllSaves = flags.Saves.All,
-            SaveInfos = saveInfos,
+            SaveInfos = await saveInfosTask,
             Backups = backups,
             Dex = await dexTask,
         };

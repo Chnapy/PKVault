@@ -34,11 +34,14 @@ public partial class MainForm : Form
         var serverTime = LogUtil.Time($"Start LocalWebServer");
 
         server = new LocalWebServer();
-        await server.Start(args);
+        var setupPostRun = await server.Start(args);
 
         serverTime();
 
         WebView_Navigate();
+
+        if (setupPostRun != null)
+            await setupPostRun();
     }
 
     protected override async void OnFormClosing(FormClosingEventArgs e)

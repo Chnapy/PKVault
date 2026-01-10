@@ -1,23 +1,11 @@
 using PKHeX.Core;
 
-public abstract class DataLoader(DataEntityLoaders loaders)
-{
-    public readonly DataEntityLoaders loaders = loaders;
-
-    public async Task ApplyAction(DataAction action, DataUpdateFlags flags)
-    {
-        var logtime = LogUtil.Time($"Apply action - {action.GetType()}");
-
-        loaders.SetFlags(flags);
-
-        await action.ExecuteWithPayload(loaders, flags);
-
-        logtime();
-    }
-}
-
 public class DataEntityLoaders(SaveService saveService)
 {
+    public readonly DateTime startTime = DateTime.UtcNow;
+
+    public readonly List<DataAction> actions = [];
+
     public required BankLoader bankLoader { get; set; }
     public required BoxLoader boxLoader { get; set; }
     public required PkmLoader pkmLoader { get; set; }
@@ -44,17 +32,19 @@ public class DataEntityLoaders(SaveService saveService)
 
     public async Task WriteToFiles()
     {
-        var jsonTasks = jsonLoaders.Select(loader => loader.WriteToFile());
+        List<Task> tasks = [.. jsonLoaders.Select(loader => loader.WriteToFile())];
 
         foreach (var saveLoaders in saveLoadersDict.Values.ToList())
         {
             if (saveLoaders.Pkms.HasWritten || saveLoaders.Boxes.HasWritten)
             {
-                saveService.WriteSave(saveLoaders.Save);
+                tasks.Add(
+                    saveService.WriteSave(saveLoaders.Save)
+                );
             }
         }
 
-        await Task.WhenAll(jsonTasks);
+        await Task.WhenAll(tasks);
     }
 
     public void SetupInitialData()

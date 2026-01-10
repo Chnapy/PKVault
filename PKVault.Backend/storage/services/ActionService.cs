@@ -1,7 +1,7 @@
 using PKHeX.Core;
 
 public class ActionService(
-    LoaderService loaderService, PkmConvertService pkmConvertService, StaticDataService staticDataService,
+    LoadersService loadersService, PkmConvertService pkmConvertService, StaticDataService staticDataService,
     WarningsService warningsService, DexService dexService, BackupService backupService
 )
 {
@@ -151,10 +151,10 @@ public class ActionService(
 
     public async Task<DataUpdateFlags> Save()
     {
-        var memoryLoader = await loaderService.GetLoader();
+        var loaders = await loadersService.GetLoaders();
         var flags = new DataUpdateFlags();
 
-        var actions = memoryLoader.actions;
+        var actions = loaders.actions;
         if (actions.Count == 0)
         {
             return flags;
@@ -162,8 +162,9 @@ public class ActionService(
 
         Console.WriteLine("SAVING IN PROGRESS");
 
-        await backupService.PrepareBackupThenRun(memoryLoader.loaders.WriteToFiles);
+        await backupService.PrepareBackupThenRun(loaders.WriteToFiles);
 
+        flags.SaveInfos = true;
         flags.Backups = true;
         flags.Warnings = true;
 
@@ -172,11 +173,9 @@ public class ActionService(
 
     private async Task<DataUpdateFlags> AddAction(DataAction action)
     {
-        var memoryLoader = await loaderService.GetLoader();
-
         try
         {
-            var flags = await memoryLoader.AddAction(action, null);
+            var flags = await loadersService.AddAction(action, null);
             flags.Warnings = true;
             return flags;
         }
@@ -195,12 +194,10 @@ public class ActionService(
 
     public async Task<DataUpdateFlags> RemoveDataActionsAndReset(int actionIndexToRemoveFrom)
     {
-        var memoryLoader = await loaderService.GetLoader();
-        var previousActions = memoryLoader.actions;
+        var loaders = await loadersService.GetLoaders();
+        var previousActions = loaders.actions;
 
-        await loaderService.ResetDataLoader(false);
-
-        memoryLoader = await loaderService.GetLoader();
+        loadersService.InvalidateLoaders((maintainData: false, checkSaves: false));
 
         var flags = new DataUpdateFlags
         {
@@ -217,7 +214,7 @@ public class ActionService(
         {
             if (actionIndexToRemoveFrom > i)
             {
-                await memoryLoader.AddAction(previousActions[i], flags);
+                await loadersService.AddAction(previousActions[i], flags);
             }
         }
 
@@ -226,13 +223,13 @@ public class ActionService(
 
     public async Task<List<MoveItem>> GetPkmAvailableMoves(uint? saveId, string pkmId)
     {
-        var loader = await loaderService.GetLoader();
+        var loaders = await loadersService.GetLoaders();
         var save = saveId == null
             ? null
-            : loader.loaders.saveLoadersDict[(uint)saveId].Save;
+            : loaders.saveLoadersDict[(uint)saveId].Save;
         var pkm = (saveId == null
-            ? loader.loaders.pkmVersionLoader.GetDto(pkmId)?.Pkm
-            : loader.loaders.saveLoadersDict[(uint)saveId].Pkms.GetDto(pkmId)?.Pkm)
+            ? loaders.pkmVersionLoader.GetDto(pkmId)?.Pkm
+            : loaders.saveLoadersDict[(uint)saveId].Pkms.GetDto(pkmId)?.Pkm)
             ?? throw new ArgumentException($"Pkm not found, saveId={saveId} pkmId={pkmId}");
 
         try

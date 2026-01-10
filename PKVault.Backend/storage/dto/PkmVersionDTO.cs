@@ -68,18 +68,22 @@ public class PkmVersionDTO : BasePkmVersionDTO
             : GameUtil.GameVersions.ToList().Find(v => !ignoredVersions.Contains(v) && version.ContainsFromLumped(v));
     }
 
-    public string PkmId { get; }
+    public new string Id => PkmVersionEntity.Id;
 
-    public bool IsMain { get; }
+    public string PkmId => PkmVersionEntity.PkmId;
+
+    public bool IsMain => Id == PkmId;
 
     // TODO possible perf issue
     public bool IsFilePresent { get; }
 
-    public string Filepath { get; }
+    public string Filepath => PkmVersionEntity.Filepath;
+
+    public string FilepathAbsolute => Path.Combine(SettingsService.BaseSettings.AppDirectory, PkmVersionEntity.Filepath);
 
     public IReadOnlyList<GameVersion> CompatibleWithVersions { get; }
 
-    public bool CanDelete { get; }
+    public bool CanDelete => !IsMain;
 
     public readonly PkmVersionEntity PkmVersionEntity;
 
@@ -92,10 +96,7 @@ public class PkmVersionDTO : BasePkmVersionDTO
         PkmVersionEntity = entity;
         PkmDto = pkmDto;
 
-        PkmId = PkmVersionEntity.PkmId;
-        IsMain = Id == PkmId;
-        Filepath = Path.Combine(SettingsService.BaseSettings.AppDirectory, entity.Filepath);
-        IsFilePresent = File.Exists(Filepath);
+        IsFilePresent = File.Exists(FilepathAbsolute);
 
         if (!compatibleVersionsBySpecies.TryGetValue(pkm.Species, out var compatibleWithVersions))
         {
@@ -106,7 +107,5 @@ public class PkmVersionDTO : BasePkmVersionDTO
             compatibleVersionsBySpecies.Add(pkm.Species, compatibleWithVersions);
         }
         CompatibleWithVersions = compatibleWithVersions;
-
-        CanDelete = !IsMain;
     }
 }

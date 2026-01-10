@@ -85,13 +85,18 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         }
     }
 
-    public override void WriteDto(PkmVersionDTO dto)
+    public void WriteEntity(PkmVersionEntity entity, PKM pkm)
     {
-        base.WriteDto(dto);
+        WriteEntity(entity);
 
         pkmFileLoader.WriteEntity(
-            PKMLoader.GetPKMBytes(dto.Pkm), dto.Pkm, dto.PkmVersionEntity.Filepath
+            PKMLoader.GetPKMBytes(pkm), pkm, entity.Filepath
         );
+    }
+
+    public override void WriteDto(PkmVersionDTO dto)
+    {
+        WriteEntity(dto.PkmVersionEntity, dto.Pkm);
     }
 
     public Dictionary<string, PkmVersionDTO> GetDtosByPkmId(string pkmId)
@@ -207,31 +212,33 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         });
 
         // rename pk filename if needed
-        GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
+        GetAllEntities().Values.ToList().ForEach(entity =>
         {
-            var pkmBytes = File.ReadAllBytes(pkmVersionEntity.Filepath);
-            var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
+            var pkmBytes = File.ReadAllBytes(entity.Filepath);
+            var pkm = PKMLoader.CreatePKM(pkmBytes, entity);
 
-            var oldFilepath = pkmVersionEntity.Filepath;
+            var oldFilepath = entity.Filepath;
             var expectedFilepath = PKMLoader.GetPKMFilepath(pkm);
 
             // update pk file
             if (expectedFilepath != oldFilepath)
             {
-                if (File.Exists(oldFilepath))
-                {
-                    Console.WriteLine($"Copy {oldFilepath} to {expectedFilepath}");
-                    File.Copy(oldFilepath, expectedFilepath, true);
-                }
-                pkmVersionEntity.Filepath = expectedFilepath;
-                WriteEntity(pkmVersionEntity);
+                // Console.WriteLine($"Wrong filepath rename:\n- wrong filepath={oldFilepath}\n- expected filepath={expectedFilepath}");
+
+                entity.Filepath = expectedFilepath;
+                WriteEntity(entity, pkm);
             }
 
+            oldFilepath = entity.Filepath;
+            expectedFilepath = MatcherUtil.NormalizePath(entity.Filepath);
+
             // if filepath is not normalized
-            if (pkmVersionEntity.Filepath != MatcherUtil.NormalizePath(pkmVersionEntity.Filepath))
+            if (oldFilepath != expectedFilepath)
             {
-                pkmVersionEntity.Filepath = MatcherUtil.NormalizePath(pkmVersionEntity.Filepath);
-                WriteEntity(pkmVersionEntity);
+                // Console.WriteLine($"Normalize filepath rename:\n- wrong filepath={oldFilepath}\n- expected filepath={expectedFilepath}");
+
+                entity.Filepath = expectedFilepath;
+                WriteEntity(entity, pkm);
             }
         });
     }
