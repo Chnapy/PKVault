@@ -5,42 +5,78 @@ public class SynchronizePkmAction(
     (string PkmId, string? SavePkmId)[] pkmMainAndPkmSaveIds
 ) : DataAction
 {
-    public static (string PkmId, string SavePkmId)[] GetPkmsToSynchronize(DataEntityLoaders loaders, uint saveId)
+    public static async Task<(string PkmId, string SavePkmId)[][]> GetSavesPkmsToSynchronize(DataEntityLoaders loaders)
     {
+        var saveLoaders = loaders.saveLoadersDict;
+
+        if (saveLoaders.Count == 0)
+        {
+            return [];
+        }
+
+        var time = LogUtil.Time($"Check saves to synchronize ({saveLoaders.Count} saves)");
+
         var pkmVersionDtos = loaders.pkmVersionLoader.GetAllDtos();
+
+        var pkmVersionsBySaveId = pkmVersionDtos
+            .Where(pv => pv.PkmDto.SaveId != null
+                && saveLoaders.TryGetValue((uint)pv.PkmDto.SaveId, out var save)
+                && save.Save.Generation == pv.Generation)
+            .GroupBy(pv => (uint)pv.PkmDto.SaveId!)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        (string PkmId, string SavePkmId)[][] synchronizationData = await Task.WhenAll(
+            saveLoaders.Keys.Select(saveId => Task.Run(async () =>
+            {
+                pkmVersionsBySaveId.TryGetValue(saveId, out var pkmVersionsBySave);
+                return await GetPkmsToSynchronize(
+                    loaders,
+                    saveId,
+                    pkmVersionsBySave ?? []
+                );
+            }))
+        );
+
+        time();
+
+        return synchronizationData;
+    }
+
+    private static async Task<(string PkmId, string SavePkmId)[]> GetPkmsToSynchronize(DataEntityLoaders loaders, uint saveId, List<PkmVersionDTO> pkmVersions)
+    {
         var saveLoaders = loaders.saveLoadersDict[saveId];
         var allSavePkms = saveLoaders.Pkms.GetAllDtos();
 
-        return [.. pkmVersionDtos.Select(pkmVersion =>
+        var savePkmsByVersionId = new Dictionary<string, PkmSaveDTO>(pkmVersions.Count);
+
+        foreach (var savePkm in allSavePkms)
         {
-            var pkmDto = pkmVersion.PkmDto;
-            if (pkmDto?.SaveId != saveId)
+            if (savePkm.IsDuplicate)
             {
-                return ("", "");
+                continue;
             }
 
-            if (pkmVersion.Generation != saveLoaders.Save.Generation)
+            var versionId = savePkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id;
+            if (versionId != null)
             {
-                return ("", "");
+                savePkmsByVersionId[versionId] = savePkm;
             }
+        }
 
-            var savePkms = allSavePkms.FindAll(pkm => pkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == pkmVersion.Id);
+        var result = new List<(string PkmId, string SavePkmId)>();
 
-            if (savePkms.Count != 1)
+        foreach (var pkmVersion in pkmVersions)
+        {
+            if (!savePkmsByVersionId.TryGetValue(pkmVersion.Id, out var savePkm))
+                continue;
+
+            if (pkmVersion.DynamicChecksum != savePkm.DynamicChecksum)
             {
-                return ("", "");
+                result.Add((pkmVersion.PkmId, savePkm.Id));
             }
+        }
 
-            var savePkm = savePkms[0];
-
-            var needsSynchro = pkmVersion.DynamicChecksum != savePkm.DynamicChecksum;
-            if (needsSynchro)
-            {
-                return (pkmVersion.PkmId, savePkm.Id);
-            }
-
-            return ("", "");
-        }).ToList().FindAll(entry => entry.Item1.Length > 0).Distinct()];
+        return [.. result];
     }
 
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)

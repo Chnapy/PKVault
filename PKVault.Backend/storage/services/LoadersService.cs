@@ -124,27 +124,19 @@ public class LoadersService
 
     private async Task CheckSaveToSynchronize(DataEntityLoaders loaders)
     {
-        var saveById = await saveService.GetSaveById();
+        (string PkmId, string SavePkmId)[][] synchronizationData = await SynchronizePkmAction.GetSavesPkmsToSynchronize(loaders);
 
-        var time = LogUtil.Time($"Check saves to synchronize ({saveById.Count})");
-
-        if (saveById.Count > 0)
+        foreach (var data in synchronizationData)
         {
-            foreach (var saveId in saveById.Keys)
+            if (data.Length > 0)
             {
-                var pkmsToSynchronize = SynchronizePkmAction.GetPkmsToSynchronize(loaders, saveId);
-                if (pkmsToSynchronize.Length > 0)
-                {
-                    await AddAction(
-                        loaders,
-                        new SynchronizePkmAction(pkmConvertService, pkmsToSynchronize),
-                        null
-                    );
-                }
+                await AddAction(
+                    loaders,
+                    new SynchronizePkmAction(pkmConvertService, data),
+                    null
+                );
             }
         }
-
-        time();
     }
 
     public void InvalidateLoaders((bool maintainData, bool checkSaves) flags)
