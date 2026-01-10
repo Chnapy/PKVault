@@ -5,13 +5,13 @@ using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-public class GenSpritesheet
+public class GenSpritesheetService
 {
-    private static readonly string SourcePath = "../pokeapi/sprites";
-    private static readonly string CustomSourcePath = "./pokeapi/spritesheet";
+    private const string SourcePath = "../pokeapi/sprites";
+    private const string CustomSourcePath = "./pokeapi/spritesheet";
     private static readonly string TargetPath = Path.Combine([.. StaticDataService.GetGeneratedPathParts(), "sheets"]);
 
-    public static async Task<StaticSpritesheets> GenerateAllSpritesheets(
+    public async Task<StaticSpritesheets> GenerateAllSpritesheets(
         Dictionary<ushort, StaticSpecies> staticSpecies,
         Dictionary<int, StaticItem> staticItems
     )
@@ -31,7 +31,7 @@ public class GenSpritesheet
         );
     }
 
-    private static async Task<Dictionary<string, SpriteInfo>> GenerateSpeciesSpritesheet(Dictionary<ushort, StaticSpecies> staticSpecies)
+    private async Task<Dictionary<string, SpriteInfo>> GenerateSpeciesSpritesheet(Dictionary<ushort, StaticSpecies> staticSpecies)
     {
         var speciesBySpritesheet = staticSpecies.Values
             .Chunk(100);
@@ -60,7 +60,7 @@ public class GenSpritesheet
         return GetSpritesheetAtlas(spritesInfosList);
     }
 
-    private static async Task<Dictionary<string, SpriteInfo>> GenerateItemsSpritesheet(Dictionary<int, StaticItem> staticItems)
+    private async Task<Dictionary<string, SpriteInfo>> GenerateItemsSpritesheet(Dictionary<int, StaticItem> staticItems)
     {
         var itemsBySpritesheet = staticItems.Values
             .Select(item => item.Sprite).Distinct().ToList().FindAll(path => path.Length > 0)
@@ -75,7 +75,7 @@ public class GenSpritesheet
         return GetSpritesheetAtlas(itemsInfosList);
     }
 
-    private static async Task<Dictionary<string, SpriteInfo>> GenerateChunk(
+    private async Task<Dictionary<string, SpriteInfo>> GenerateChunk(
         List<string> urls, int columns, string filename
     )
     {

@@ -2,7 +2,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 
-public class GenPokeapiService(StaticDataService staticDataService)
+public class GenPokeapiService(StaticDataService staticDataService, GenSpritesheetService genSpritesheetService)
 {
     public async Task GenerateFiles()
     {
@@ -13,7 +13,7 @@ public class GenPokeapiService(StaticDataService staticDataService)
             var species = staticDataService.GetStaticSpecies("en");
             var items = staticDataService.GetStaticItems("en");
 
-            return await GenSpritesheet.GenerateAllSpritesheets(
+            return await genSpritesheetService.GenerateAllSpritesheets(
                 await species,
                 await items
             );

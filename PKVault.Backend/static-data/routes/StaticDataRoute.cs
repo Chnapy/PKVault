@@ -15,7 +15,7 @@ public class StaticDataController(StaticDataService staticDataService) : Control
     [HttpGet("spritesheet/{sheetName}")]
     public async Task<IActionResult> GetSpritesheetImg(string sheetName, [FromQuery] Guid buildID)
     {
-        using var stream = await SpritesheetFileClient.GetAsyncString(sheetName);
+        using var stream = await staticDataService.GetSpritesheetStream(sheetName);
 
         Response.Headers.Pragma = "cache";
         Response.Headers.CacheControl = "public, max-age=31536000"; // 1y

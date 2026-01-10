@@ -152,6 +152,8 @@ public class Program
             });
 
         services.AddSingleton<GenPokeapiService>();
+        services.AddSingleton<GenSpritesheetService>();
+        services.AddSingleton<PokeApiService>();
         services.AddSingleton<LoadersService>();
         services.AddSingleton<StorageQueryService>();
         services.AddSingleton<ActionService>();

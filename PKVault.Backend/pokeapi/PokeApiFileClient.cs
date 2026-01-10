@@ -60,12 +60,12 @@ public partial class PokeApiFileClient
         return await GetAsyncByPathname($"{apiEndpointString}/{text}", jsonContext);
     }
 
-    private static async Task<T?> GetAsyncByPathname<T>(string pathname, JsonTypeInfo<T> jsonContext)
+    private async Task<T?> GetAsyncByPathname<T>(string pathname, JsonTypeInfo<T> jsonContext)
     {
         return await GetAsyncByUrl($"/api/v2/{pathname}", jsonContext);
     }
 
-    private static async Task<T?> GetAsyncByUrl<T>(string url, JsonTypeInfo<T> jsonContext)
+    private async Task<T?> GetAsyncByUrl<T>(string url, JsonTypeInfo<T> jsonContext)
     {
         var uriParts = url
             .Split('/').ToList()
@@ -82,7 +82,7 @@ public partial class PokeApiFileClient
         return await JsonSerializer.DeserializeAsync(fileStream, jsonContext);
     }
 
-    public static string GetApiEndpointString(
+    public string GetApiEndpointString(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicProperties)]
         System.Type jsonType)
     {
@@ -90,7 +90,7 @@ public partial class PokeApiFileClient
             ?? throw new Exception($"ApiEndpoint not found for type {jsonType}");
     }
 
-    private static bool IsApiEndpointCaseSensitive(
+    private bool IsApiEndpointCaseSensitive(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicProperties)]
         System.Type jsonType)
     {

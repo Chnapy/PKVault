@@ -2,9 +2,9 @@ public partial class SpritesheetFileClient
 {
     public static readonly string[] SheetsParts = [.. StaticDataService.GetGeneratedPathParts(), "sheets"];
 
-    private static readonly AssemblyClient assemblyClient = new();
+    private readonly AssemblyClient assemblyClient = new();
 
-    public static async Task<Stream> GetAsyncString(string filename)
+    public async Task<Stream> GetAsyncString(string filename)
     {
         List<string> fileParts = [
             ..SheetsParts, filename

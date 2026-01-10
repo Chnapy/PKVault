@@ -1,11 +1,12 @@
 using PKHeX.Core;
 using PokeApiNet;
 
-public class StaticDataService
+public class StaticDataService(PokeApiService pokeApiService)
 {
+    public static readonly EntityContext LAST_ENTITY_CONTEXT = EntityContext.Gen9a;
     public static StaticDataDTO staticData { get; private set; }
 
-    public static readonly EntityContext LAST_ENTITY_CONTEXT = EntityContext.Gen9a;
+    private readonly SpritesheetFileClient spritesheetFileClient = new();
 
     public async Task<StaticDataDTO> GetStaticData()
     {
@@ -20,6 +21,11 @@ public class StaticDataService
         }
 
         return staticData;
+    }
+
+    public async Task<Stream> GetSpritesheetStream(string sheetName)
+    {
+        return await spritesheetFileClient.GetAsyncString(sheetName);
     }
 
     public static List<string> GetGeneratedPathParts() => ["pokeapi", "generated"];
@@ -76,7 +82,7 @@ public class StaticDataService
 
         // List<string> notFound = [];
 
-        var hoennDex = await PokeApi.GetPokedex(PokeApiPokedexEnum.HOENN);
+        var hoennDex = await pokeApiService.GetPokedex(PokeApiPokedexEnum.HOENN);
         var hoennDexSpeciesSet = hoennDex!.PokemonEntries.Select(entry =>
         {
             var url = entry.PokemonSpecies.Url;
@@ -90,8 +96,8 @@ public class StaticDataService
 
             tasks.Add(Task.Run(async () =>
             {
-                var pkmSpeciesObj = await PokeApi.GetPokemonSpecies(species);
-                var generation = PokeApi.GetGenerationValue(pkmSpeciesObj.Generation.Name);
+                var pkmSpeciesObj = await pokeApiService.GetPokemonSpecies(species);
+                var generation = PokeApiService.GetGenerationValue(pkmSpeciesObj.Generation.Name);
 
                 PKHeX.Core.Gender[] genders = pkmSpeciesObj.GenderRate switch
                 {
@@ -107,8 +113,8 @@ public class StaticDataService
 
                 async Task<(Pokemon, PokemonForm[])> getVarietyFormsData(PokemonSpeciesVariety pkmVariety)
                 {
-                    var pkmObj = await PokeApi.GetPokemon(pkmVariety.Pokemon);
-                    var apiForms = await Task.WhenAll(pkmObj.Forms.Select((formUrl) => PokeApi.GetPokemonForms(formUrl)));
+                    var pkmObj = await pokeApiService.GetPokemon(pkmVariety.Pokemon);
+                    var apiForms = await Task.WhenAll(pkmObj.Forms.Select((formUrl) => pokeApiService.GetPokemonForms(formUrl)));
                     // .ToList().FindAll(form => !form.IsBattleOnly).ToArray();
 
                     return (pkmObj, apiForms);
@@ -142,7 +148,7 @@ public class StaticDataService
                     {
                         if (formObj.Names.Count > 0)
                         {
-                            name = PokeApi.GetNameForLang(formObj.Names, lang);
+                            name = PokeApiService.GetNameForLang(formObj.Names, lang);
                         }
                     }
                     catch
@@ -156,7 +162,7 @@ public class StaticDataService
                             name == speciesName
                             && formObj.FormNames.Count > 0)
                         {
-                            var apiName = PokeApi.GetNameForLang(formObj.FormNames, lang);
+                            var apiName = PokeApiService.GetNameForLang(formObj.FormNames, lang);
                             if (apiName != speciesName)
                             {
                                 name = $"{speciesName} {apiName}";
@@ -472,12 +478,12 @@ public class StaticDataService
             var statIndex = i;
             tasks.Add(Task.Run(async () =>
             {
-                var statObj = await PokeApi.GetStat(statIndex);
+                var statObj = await pokeApiService.GetStat(statIndex);
 
                 return new StaticStat
                 {
                     Id = statIndex,
-                    Name = PokeApi.GetNameForLang(statObj.Names, lang),
+                    Name = PokeApiService.GetNameForLang(statObj.Names, lang),
                 };
             }));
         }
@@ -538,9 +544,9 @@ public class StaticDataService
                     };
                 }
 
-                var moveObj = await PokeApi.GetMove(moveId);
+                var moveObj = await pokeApiService.GetMove(moveId);
 
-                var type = PokeApi.GetIdFromUrl(moveObj.Type.Url);
+                var type = PokeApiService.GetIdFromUrl(moveObj.Type.Url);
 
                 var category = GetMoveCategory(moveObj.DamageClass.Name);
                 var oldCategory = category == MoveCategory.STATUS ? category : (
@@ -561,13 +567,13 @@ public class StaticDataService
                             tmpTypeUrl = typeUrl;
                             tmpPowerUrl = power;
 
-                            var versionGroup = await PokeApi.GetVersionGroup(pastValue.VersionGroup);
-                            byte untilGeneration = (byte) (PokeApi.GetGenerationValue(versionGroup.Generation.Name) - 1);
+                            var versionGroup = await pokeApiService.GetVersionGroup(pastValue.VersionGroup);
+                            byte untilGeneration = (byte) (PokeApiService.GetGenerationValue(versionGroup.Generation.Name) - 1);
 
                             return new StaticMoveGeneration()
                             {
                                 UntilGeneration = untilGeneration,
-                                Type = PokeApi.GetIdFromUrl(typeUrl),
+                                Type = PokeApiService.GetIdFromUrl(typeUrl),
                                 Category = untilGeneration <= 3 ? oldCategory : category,
                                 Power = power,
                             };
@@ -578,7 +584,7 @@ public class StaticDataService
                 dataUntilGeneration.Add(new()
                 {
                     UntilGeneration = 99,
-                    Type = PokeApi.GetIdFromUrl(moveObj.Type.Url),
+                    Type = PokeApiService.GetIdFromUrl(moveObj.Type.Url),
                     Category = category,
                     Power = moveObj.Power,
                 });
@@ -628,17 +634,17 @@ public class StaticDataService
             tasks.Add(Task.Run(async () =>
             {
                 var natureNameEn = GameInfo.Strings.natures[natureId];
-                var natureObj = await PokeApi.GetNature(natureNameEn);
+                var natureObj = await pokeApiService.GetNature(natureNameEn);
 
                 return new StaticNature
                 {
                     Id = natureId,
                     Name = natureName,
                     IncreasedStatIndex = natureObj.IncreasedStat != null
-                        ? PokeApi.GetIdFromUrl(natureObj.IncreasedStat.Url)
+                        ? PokeApiService.GetIdFromUrl(natureObj.IncreasedStat.Url)
                         : null,
                     DecreasedStatIndex = natureObj.DecreasedStat != null
-                        ? PokeApi.GetIdFromUrl(natureObj.DecreasedStat.Url)
+                        ? PokeApiService.GetIdFromUrl(natureObj.DecreasedStat.Url)
                         : null,
                 };
             }));
@@ -696,7 +702,7 @@ public class StaticDataService
 
             tasks.Add(Task.Run(async () =>
             {
-                var itemObj = await PokeApi.GetItem(itemNamePokeapi);
+                var itemObj = await pokeApiService.GetItem(itemNamePokeapi);
                 var sprite = itemObj?.Sprites.Default ?? "";
 
                 // if (itemObj == null)
@@ -807,7 +813,7 @@ public class StaticDataService
             staticEvolves.Add(species, speciesEvolve);
         }
 
-        var evolutionChains = await PokeApi.GetEvolutionChains();
+        var evolutionChains = await pokeApiService.GetEvolutionChains();
 
         evolutionChains.ForEach(evolutionChain => actChain(evolutionChain.Chain));
 
@@ -839,14 +845,14 @@ public class StaticDataService
         {
             try
             {
-                var region = await PokeApi.GetRegion(id);
+                var region = await pokeApiService.GetRegion(id);
 
                 if (region.MainGeneration == null)
                 {
                     continue;
                 }
 
-                var generation = PokeApi.GetGenerationValue(region.MainGeneration.Name);
+                var generation = PokeApiService.GetGenerationValue(region.MainGeneration.Name);
 
                 if (!staticGenerations.TryGetValue(generation, out var value))
                 {
@@ -856,7 +862,7 @@ public class StaticDataService
                         Regions = []
                     };
                 }
-                value.Regions = [.. value.Regions, PokeApi.GetNameForLang(region.Names, lang)];
+                value.Regions = [.. value.Regions, PokeApiService.GetNameForLang(region.Names, lang)];
                 staticGenerations.Remove(generation);
                 staticGenerations.Add(generation, value);
             }
@@ -927,7 +933,7 @@ public class StaticDataService
         };
     }
 
-    private static async Task<string> GetVersionName(GameVersion version, string lang)
+    private async Task<string> GetVersionName(GameVersion version, string lang)
     {
         var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
 
@@ -935,7 +941,7 @@ public class StaticDataService
             .OfType<PokeApiNet.Version>()
             .Select(ver =>
             {
-                return PokeApi.GetNameForLang(ver.Names, lang);
+                return PokeApiService.GetNameForLang(ver.Names, lang);
             }).Distinct());
     }
 
@@ -953,11 +959,11 @@ public class StaticDataService
                         return [];
                     }
 
-                    var versionGroup = await PokeApi.GetVersionGroup(ver.VersionGroup);
+                    var versionGroup = await pokeApiService.GetVersionGroup(ver.VersionGroup);
                     var regions = await Task.WhenAll(versionGroup.Regions.Select(region =>
-                        PokeApi.GetRegion(region)
+                        pokeApiService.GetRegion(region)
                     ));
-                    return regions.Select(region => PokeApi.GetNameForLang(region.Names, lang));
+                    return regions.Select(region => PokeApiService.GetNameForLang(region.Names, lang));
                 })
             ))
             .SelectMany(v => v).Distinct()];
@@ -1006,7 +1012,7 @@ public class StaticDataService
         _ => 0,
     };
 
-    private static Task<PokeApiNet.Version?>[] GetPokeApiVersion(GameVersion version)
+    private Task<PokeApiNet.Version?>[] GetPokeApiVersion(GameVersion version)
     {
         return version switch
         {
@@ -1014,68 +1020,68 @@ public class StaticDataService
             GameVersion.Invalid => [],
 
             #region Gen3
-            GameVersion.S => [PokeApi.GetVersion(8)],
-            GameVersion.R => [PokeApi.GetVersion(7)],
-            GameVersion.E => [PokeApi.GetVersion(9)],
-            GameVersion.FR => [PokeApi.GetVersion(10)],
-            GameVersion.LG => [PokeApi.GetVersion(11)],
-            GameVersion.CXD => [PokeApi.GetVersion(19), PokeApi.GetVersion(20)],
+            GameVersion.S => [pokeApiService.GetVersion(8)],
+            GameVersion.R => [pokeApiService.GetVersion(7)],
+            GameVersion.E => [pokeApiService.GetVersion(9)],
+            GameVersion.FR => [pokeApiService.GetVersion(10)],
+            GameVersion.LG => [pokeApiService.GetVersion(11)],
+            GameVersion.CXD => [pokeApiService.GetVersion(19), pokeApiService.GetVersion(20)],
             #endregion
 
             #region Gen4
-            GameVersion.D => [PokeApi.GetVersion(12)],
-            GameVersion.P => [PokeApi.GetVersion(13)],
-            GameVersion.Pt => [PokeApi.GetVersion(14)],
-            GameVersion.HG => [PokeApi.GetVersion(15)],
-            GameVersion.SS => [PokeApi.GetVersion(16)],
+            GameVersion.D => [pokeApiService.GetVersion(12)],
+            GameVersion.P => [pokeApiService.GetVersion(13)],
+            GameVersion.Pt => [pokeApiService.GetVersion(14)],
+            GameVersion.HG => [pokeApiService.GetVersion(15)],
+            GameVersion.SS => [pokeApiService.GetVersion(16)],
             #endregion
 
             #region Gen5
-            GameVersion.W => [PokeApi.GetVersion(18)],
-            GameVersion.B => [PokeApi.GetVersion(17)],
-            GameVersion.W2 => [PokeApi.GetVersion(22)],
-            GameVersion.B2 => [PokeApi.GetVersion(21)],
+            GameVersion.W => [pokeApiService.GetVersion(18)],
+            GameVersion.B => [pokeApiService.GetVersion(17)],
+            GameVersion.W2 => [pokeApiService.GetVersion(22)],
+            GameVersion.B2 => [pokeApiService.GetVersion(21)],
             #endregion
 
             #region Gen6
-            GameVersion.X => [PokeApi.GetVersion(23)],
-            GameVersion.Y => [PokeApi.GetVersion(24)],
-            GameVersion.AS => [PokeApi.GetVersion(26)],
-            GameVersion.OR => [PokeApi.GetVersion(25)],
+            GameVersion.X => [pokeApiService.GetVersion(23)],
+            GameVersion.Y => [pokeApiService.GetVersion(24)],
+            GameVersion.AS => [pokeApiService.GetVersion(26)],
+            GameVersion.OR => [pokeApiService.GetVersion(25)],
             #endregion
 
             #region Gen7
-            GameVersion.SN => [PokeApi.GetVersion(27)],
-            GameVersion.MN => [PokeApi.GetVersion(28)],
-            GameVersion.US => [PokeApi.GetVersion(29)],
-            GameVersion.UM => [PokeApi.GetVersion(30)],
+            GameVersion.SN => [pokeApiService.GetVersion(27)],
+            GameVersion.MN => [pokeApiService.GetVersion(28)],
+            GameVersion.US => [pokeApiService.GetVersion(29)],
+            GameVersion.UM => [pokeApiService.GetVersion(30)],
             #endregion
             GameVersion.GO => [],
 
             #region Virtual Console (3DS) Gen1
-            GameVersion.RD => [PokeApi.GetVersion(1)],
-            GameVersion.GN => [PokeApi.GetVersion(2)],
-            GameVersion.BU => [PokeApi.GetVersion(46)],
-            GameVersion.YW => [PokeApi.GetVersion(3)],
+            GameVersion.RD => [pokeApiService.GetVersion(1)],
+            GameVersion.GN => [pokeApiService.GetVersion(2)],
+            GameVersion.BU => [pokeApiService.GetVersion(46)],
+            GameVersion.YW => [pokeApiService.GetVersion(3)],
             #endregion
 
             #region Virtual Console (3DS) Gen2
-            GameVersion.GD => [PokeApi.GetVersion(4)],
-            GameVersion.SI => [PokeApi.GetVersion(5)],
-            GameVersion.C => [PokeApi.GetVersion(6)],
+            GameVersion.GD => [pokeApiService.GetVersion(4)],
+            GameVersion.SI => [pokeApiService.GetVersion(5)],
+            GameVersion.C => [pokeApiService.GetVersion(6)],
             #endregion
 
             #region Nintendo Switch
-            GameVersion.GP => [PokeApi.GetVersion(31)],
-            GameVersion.GE => [PokeApi.GetVersion(32)],
-            GameVersion.SW => [PokeApi.GetVersion(33)],
-            GameVersion.SH => [PokeApi.GetVersion(34)],
-            GameVersion.PLA => [PokeApi.GetVersion(39)],
-            GameVersion.BD => [PokeApi.GetVersion(37)],
-            GameVersion.SP => [PokeApi.GetVersion(38)],
-            GameVersion.SL => [PokeApi.GetVersion(40)],
-            GameVersion.VL => [PokeApi.GetVersion(41)],
-            GameVersion.ZA => [PokeApi.GetVersion(47)],
+            GameVersion.GP => [pokeApiService.GetVersion(31)],
+            GameVersion.GE => [pokeApiService.GetVersion(32)],
+            GameVersion.SW => [pokeApiService.GetVersion(33)],
+            GameVersion.SH => [pokeApiService.GetVersion(34)],
+            GameVersion.PLA => [pokeApiService.GetVersion(39)],
+            GameVersion.BD => [pokeApiService.GetVersion(37)],
+            GameVersion.SP => [pokeApiService.GetVersion(38)],
+            GameVersion.SL => [pokeApiService.GetVersion(40)],
+            GameVersion.VL => [pokeApiService.GetVersion(41)],
+            GameVersion.ZA => [pokeApiService.GetVersion(47)],
             #endregion
 
             // The following values are not actually stored values in pk data,
@@ -1097,8 +1103,8 @@ public class StaticDataService
                     ]
                 })
             ],
-            GameVersion.COLO => [PokeApi.GetVersion(19)],
-            GameVersion.XD => [PokeApi.GetVersion(20)],
+            GameVersion.COLO => [pokeApiService.GetVersion(19)],
+            GameVersion.XD => [pokeApiService.GetVersion(20)],
             GameVersion.DP => [.. GetPokeApiVersion(GameVersion.D), .. GetPokeApiVersion(GameVersion.P)],
             GameVersion.DPPt => [.. GetPokeApiVersion(GameVersion.DP), .. GetPokeApiVersion(GameVersion.Pt)],
             GameVersion.HGSS => [.. GetPokeApiVersion(GameVersion.HG), .. GetPokeApiVersion(GameVersion.SS)],
