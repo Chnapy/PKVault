@@ -58,7 +58,7 @@ public class PKMMemoryLoader : PKMLoader
         actions.Add((Create: false, Path: filepath));
     }
 
-    public override string WriteEntity(byte[] bytes, PKM pkm, string? expectedFilepath)
+    public override string WriteEntity(byte[] bytes, ImmutablePKM pkm, string? expectedFilepath)
     {
         var filepath = GetPKMFilepath(pkm);
 
@@ -70,7 +70,7 @@ public class PKMMemoryLoader : PKMLoader
         }
 
         if (EnableLog)
-            Console.WriteLine($"(M) PKM-file Write idBase={BasePkmVersionDTO.GetPKMIdBase(pkm)} filepath={filepath}");
+            Console.WriteLine($"(M) PKM-file Write idBase={pkm.GetPKMIdBase()} filepath={filepath}");
 
         bytesDict.Remove(filepath);
         bytesDict.Add(filepath, bytes);

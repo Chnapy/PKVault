@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class Dex7bService(SAV7b save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 

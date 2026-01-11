@@ -103,7 +103,7 @@ public class BackupService(
             var relativePath = Path.Combine("saves", newFilename);
 
             paths.Add(NormalizePath(relativePath), (
-                TargetPath: NormalizePath(path), FileContent: SaveService.GetSaveFileData(saveLoader.Save)
+                TargetPath: NormalizePath(path), FileContent: saveLoader.Save.GetSaveFileData()
             ));
         }
 

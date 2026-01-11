@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public class SaveInfosDTO
 {
-    public static SaveInfosDTO FromSave(SaveFile save, DateTime lastWriteTime)
+    public static SaveInfosDTO FromSave(SaveWrapper save, DateTime lastWriteTime)
     {
         var seenCount = save.SeenCount;
         var caughtCount = save.CaughtCount;
@@ -28,7 +28,7 @@ public class SaveInfosDTO
 
         return new SaveInfosDTO
         {
-            Id = save.ID32,
+            Id = save.Id,
             LastWriteTime = lastWriteTime,
             Version = save.Version,
             Context = save.Context,
@@ -96,16 +96,4 @@ public class SaveInfosDTO
     // public bool CanDelete { get; set; }
 
     // public string DownloadUrl { get; set; }
-
-    public static bool IsSpeciesAllowed(ushort species, SaveFile save)
-    {
-        if (save is SAV7b)
-        {
-            return species <= 151
-                || species == 808
-                || species == 809;
-        }
-
-        return species <= save.MaxSpeciesID;
-    }
 }

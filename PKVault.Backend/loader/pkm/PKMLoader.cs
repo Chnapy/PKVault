@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public abstract class PKMLoader
 {
-    public static PKM CreatePKM(byte[] bytes, PkmVersionEntity pkmVersionEntity)
+    public static ImmutablePKM CreatePKM(byte[] bytes, PkmVersionEntity pkmVersionEntity)
     {
         // required to avoid mutation, like by PKHeX
         bytes = (byte[])bytes.Clone();
@@ -21,24 +21,24 @@ public abstract class PKMLoader
             _ => EntityFormat.GetFromBytes(bytes)!
         };
 
-        return pkm;
+        return new(pkm);
     }
 
-    public static byte[] GetPKMBytes(PKM pkm)
+    public static byte[] GetPKMBytes(ImmutablePKM pkm)
     {
         return [.. pkm.DecryptedPartyData];
     }
 
-    public static string GetPKMFilepath(PKM pkm)
+    public static string GetPKMFilepath(ImmutablePKM pkm)
     {
         return MatcherUtil.NormalizePath(Path.Combine(SettingsService.BaseSettings.SettingsMutable.STORAGE_PATH, pkm.Format.ToString(), GetPKMFilename(pkm)));
     }
 
-    private static string GetPKMFilename(PKM pkm)
+    private static string GetPKMFilename(ImmutablePKM pkm)
     {
         var star = pkm.IsShiny ? " ★" : string.Empty;
         var speciesName = GameInfo.Strings.Species[pkm.Species].ToUpperInvariant().Replace(":", "");
-        var id = BasePkmVersionDTO.GetPKMIdBase(pkm);
+        var id = pkm.GetPKMIdBase();
         return $"{pkm.Species:0000}{star} - {speciesName} - {id}.{pkm.Extension}";
     }
 
@@ -46,5 +46,5 @@ public abstract class PKMLoader
 
     public abstract void DeleteEntity(string filepath);
 
-    public abstract string WriteEntity(byte[] bytes, PKM pkm, string? expectedFilepath);
+    public abstract string WriteEntity(byte[] bytes, ImmutablePKM pkm, string? expectedFilepath);
 }

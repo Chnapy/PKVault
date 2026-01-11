@@ -10,14 +10,14 @@ public class PkmLegalityDTO : IWithId
      *
      * If no save passed, some checks won't be done.
      */
-    public static LegalityAnalysis GetLegalitySafe(PKM pkm, SaveFile? save = null, StorageSlotType slotType = StorageSlotType.None)
+    public static LegalityAnalysis GetLegalitySafe(ImmutablePKM pkm, SaveWrapper? save = null, StorageSlotType slotType = StorageSlotType.None)
     {
         // lock required because of ParseSettings static context causing race condition
         lock (legalityLock)
         {
             if (save != null)
             {
-                ParseSettings.InitFromSaveFileData(save);
+                ParseSettings.InitFromSaveFileData(save.GetSave());
             }
             else
             {
@@ -25,8 +25,8 @@ public class PkmLegalityDTO : IWithId
             }
 
             var la = save != null && pkm.GetType() == save.PKMType // quick sanity check
-                ? new LegalityAnalysis(pkm, save.Personal, slotType)
-                : new LegalityAnalysis(pkm, pkm.PersonalInfo, slotType);
+                ? new LegalityAnalysis(pkm.GetPkm(), save.Personal, slotType)
+                : new LegalityAnalysis(pkm.GetPkm(), pkm.PersonalInfo, slotType);
 
             ParseSettings.ClearActiveTrainer();
 
@@ -79,8 +79,8 @@ public class PkmLegalityDTO : IWithId
 
     protected PkmLegalityDTO(
         string id,
-        PKM pkm,
-        SaveFile? save,
+        ImmutablePKM pkm,
+        SaveWrapper? save,
         StorageSlotType slotType = StorageSlotType.None
     )
     {

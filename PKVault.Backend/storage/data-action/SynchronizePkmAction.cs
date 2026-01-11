@@ -138,28 +138,33 @@ public class SynchronizePkmAction(
                 var saveVersion = PkmVersionDTO.GetSingleVersion(version.Version);
                 var versionSave = BlankSaveFile.Get(saveVersion);
                 var correctSpeciesForm = versionSave.Personal.IsPresentInGame(savePkm.Pkm.Species, savePkm.Pkm.Form);
-                if (correctSpeciesForm && savePkm.Pkm.Species >= versionPkm.Species)
+                versionPkm = versionPkm.Update(versionPkm =>
                 {
-                    versionPkm.Species = savePkm.Pkm.Species;
-                    versionPkm.Form = savePkm.Pkm.Form;
-                    version.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(versionPkm);
-                }
+                    if (correctSpeciesForm && savePkm.Pkm.Species >= versionPkm.Species)
+                    {
+                        versionPkm.Species = savePkm.Pkm.Species;
+                        versionPkm.Form = savePkm.Pkm.Form;
+                    }
 
-                if (savePkm.Pkm.Language != 0)
-                {
-                    versionPkm.Language = savePkm.Pkm.Language;
-                }
+                    if (savePkm.Pkm.Language != 0)
+                    {
+                        versionPkm.Language = savePkm.Pkm.Language;
+                    }
 
-                if (savePkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == version.Id)
-                {
-                    pkmConvertService.PassAllToPkmSafe(savePkm.Pkm, versionPkm);
-                }
-                else
-                {
-                    pkmConvertService.PassAllDynamicsNItemToPkm(savePkm.Pkm, versionPkm);
-                }
+                    if (savePkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == version.Id)
+                    {
+                        pkmConvertService.PassAllToPkmSafe(savePkm.Pkm, versionPkm);
+                    }
+                    else
+                    {
+                        pkmConvertService.PassAllDynamicsNItemToPkm(savePkm.Pkm, versionPkm);
+                    }
+                });
 
-                loaders.pkmVersionLoader.WriteDto(version);
+                loaders.pkmVersionLoader.WriteEntity(
+                    version.PkmVersionEntity with { Filepath = PKMLoader.GetPKMFilepath(versionPkm) },
+                    versionPkm
+                );
             });
         }
 
@@ -209,24 +214,37 @@ public class SynchronizePkmAction(
             var correctSpeciesForm = saveLoaders.Save.Personal.IsPresentInGame(versionPkm.Species, versionPkm.Form);
             if (correctSpeciesForm)
             {
-                savePkm.Pkm.Species = versionPkm.Species;
-                savePkm.Pkm.Form = versionPkm.Form;
+                savePkm = savePkm.WithPKM(
+                    savePkm.Pkm.Update(pkm =>
+                    {
+                        pkm.Species = versionPkm.Species;
+                        pkm.Form = versionPkm.Form;
+                    })
+                );
             }
 
             if (saveLoaders.Save.Language != 0)
             {
-                versionPkm.Language = saveLoaders.Save.Language;
-                loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
+                versionPkm = versionPkm.Update(pkm =>
+                {
+                    pkm.Language = saveLoaders.Save.Language;
+                });
+                loaders.pkmVersionLoader.WriteEntity(pkmVersionDto.PkmVersionEntity, versionPkm);
             }
 
-            if (savePkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == pkmVersionDto.Id)
-            {
-                pkmConvertService.PassAllToPkmSafe(versionPkm, savePkm.Pkm);
-            }
-            else
-            {
-                pkmConvertService.PassAllDynamicsNItemToPkm(versionPkm, savePkm.Pkm);
-            }
+            savePkm = savePkm.WithPKM(
+                savePkm.Pkm.Update(pkm =>
+                {
+                    if (savePkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == pkmVersionDto.Id)
+                    {
+                        pkmConvertService.PassAllToPkmSafe(versionPkm, pkm);
+                    }
+                    else
+                    {
+                        pkmConvertService.PassAllDynamicsNItemToPkm(versionPkm, pkm);
+                    }
+                })
+            );
 
             saveLoaders.Pkms.WriteDto(savePkm);
         }

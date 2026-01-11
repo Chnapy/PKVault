@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class ActionService(
     LoadersService loadersService, PkmConvertService pkmConvertService, StaticDataService staticDataService,
-    WarningsService warningsService, DexService dexService, BackupService backupService
+    DexService dexService, BackupService backupService
 )
 {
     public async Task<DataUpdateFlags> MainCreateBox(string bankId)
@@ -55,7 +55,6 @@ public class ActionService(
     {
         return await AddAction(
             new MovePkmAction(
-                warningsService,
                 staticDataService,
                 pkmConvertService,
                 pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached)
@@ -239,13 +238,13 @@ public class ActionService(
             var moveComboSource = new LegalMoveComboSource();
             var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
 
-            save ??= BlankSaveFile.Get(
+            save ??= new(BlankSaveFile.Get(
                 PkmVersionDTO.GetSingleVersion(pkm.Version),
                 pkm.OriginalTrainerName,
-                (LanguageID)pkmConvertService.GetPkmLanguage(pkm)
-            );
+                (LanguageID)pkmConvertService.GetPkmLanguage(pkm.GetPkm())
+            ), "");
 
-            var filteredSources = new FilteredGameDataSource(save, GameInfo.Sources);
+            var filteredSources = new FilteredGameDataSource(save.GetSave(), GameInfo.Sources);
             moveSource.ChangeMoveSource(filteredSources.Moves);
             moveSource.ReloadMoves(legality);
 

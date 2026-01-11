@@ -28,16 +28,15 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>
     {
         if (GetAllEntities().Count == 0)
         {
-            WriteEntity(new()
-            {
-                SchemaVersion = GetLastSchemaVersion(),
-                Id = "0",
-                Type = BoxType.Box,
-                SlotCount = 30,
-                Order = 0,
-                Name = "Box 1",
-                BankId = loaders.bankLoader.GetAllEntities().First().Key
-            });
+            WriteEntity(new(
+                SchemaVersion: GetLastSchemaVersion(),
+                Id: "0",
+                Type: BoxType.Box,
+                SlotCount: 30,
+                Order: 0,
+                Name: "Box 1",
+                BankId: loaders.bankLoader.GetAllEntities().First().Key
+            ));
         }
     }
 
@@ -66,16 +65,7 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>
                     currentOrder = 0;
                 }
 
-                WriteEntity(new()
-                {
-                    SchemaVersion = 1,
-                    Id = entity.Id,
-                    Name = entity.Name,
-                    Type = entity.Type,
-                    SlotCount = entity.SlotCount,
-                    Order = currentOrder,
-                    BankId = entityBankId,
-                });
+                WriteEntity(entity with { SchemaVersion = 1 });
 
                 currentOrder += OrderGap;
             });
@@ -98,8 +88,7 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>
 
                 if (box.Order != currentOrder)
                 {
-                    box.Order = currentOrder;
-                    WriteEntity(box);
+                    WriteEntity(box with { Order = currentOrder });
                 }
                 currentOrder += OrderGap;
             });

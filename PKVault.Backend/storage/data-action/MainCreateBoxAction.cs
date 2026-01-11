@@ -11,7 +11,7 @@ public class MainCreateBoxAction(string bankId, int? slotCount) : DataAction
         };
     }
 
-    public static BoxDTO CreateBox(DataEntityLoaders loaders, DataUpdateFlags flags, string bankId, int? slotCount)
+    public static BoxEntity CreateBox(DataEntityLoaders loaders, DataUpdateFlags flags, string bankId, int? slotCount)
     {
         var allBoxes = loaders.boxLoader.GetAllEntities().Values.ToList();
         var boxes = allBoxes.FindAll(box => box.BankId == bankId);
@@ -36,21 +36,28 @@ public class MainCreateBoxAction(string bankId, int? slotCount) : DataAction
 
         BoxDTO dto = new()
         {
-            BoxEntity = new()
-            {
-                SchemaVersion = loaders.boxLoader.GetLastSchemaVersion(),
-                Id = id.ToString(),
-                Type = BoxType.Box,
-                Name = name,
-                SlotCount = slotCount ?? 30,
-                Order = order,
-                BankId = bankId
-            }
+            BoxEntity = new(
+                SchemaVersion: loaders.boxLoader.GetLastSchemaVersion(),
+                Id: id.ToString(),
+                Type: BoxType.Box,
+                Name: name,
+                SlotCount: slotCount ?? 30,
+                Order: order,
+                BankId: bankId
+            )
         };
 
-        loaders.boxLoader.WriteDto(dto);
+        var entity = loaders.boxLoader.WriteEntity(new(
+            SchemaVersion: loaders.boxLoader.GetLastSchemaVersion(),
+            Id: id.ToString(),
+            Type: BoxType.Box,
+            Name: name,
+            SlotCount: slotCount ?? 30,
+            Order: order,
+            BankId: bankId
+        ));
         loaders.boxLoader.NormalizeOrders();
 
-        return dto;
+        return entity;
     }
 }

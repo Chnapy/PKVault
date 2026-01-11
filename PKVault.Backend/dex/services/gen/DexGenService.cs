@@ -8,23 +8,25 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
     {
         // var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
 
-        var pkmBySpecies = new Dictionary<ushort, List<PKM>>();
+        var pkmBySpecies = new Dictionary<ushort, List<ImmutablePKM>>();
 
-        save.GetAllPKM().ForEach(pkm =>
-        {
-            if (pkm.IsEgg)
+        save.GetAllPKM()
+            .Select(pkm => new ImmutablePKM(pkm)).ToList()
+            .ForEach(pkm =>
             {
-                return;
-            }
+                if (pkm.IsEgg)
+                {
+                    return;
+                }
 
-            pkmBySpecies.TryGetValue(pkm.Species, out var pkmList);
-            if (pkmList == null)
-            {
-                pkmList ??= [];
-                pkmBySpecies.TryAdd(pkm.Species, pkmList);
-            }
-            pkmList.Add(pkm);
-        });
+                pkmBySpecies.TryGetValue(pkm.Species, out var pkmList);
+                if (pkmList == null)
+                {
+                    pkmList ??= [];
+                    pkmBySpecies.TryAdd(pkm.Species, pkmList);
+                }
+                pkmList.Add(pkm);
+            });
 
         // var pkmLoader = StorageService.memoryLoader.loaders.pkmLoader;
         // var saveLoader = StorageService.memoryLoader.loaders.saveLoadersDict[save.ID32];
@@ -55,7 +57,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         return true;
     }
 
-    private DexItemDTO CreateDexItem(ushort species, List<PKM> pkmList, StaticDataDTO staticData)
+    private DexItemDTO CreateDexItem(ushort species, List<ImmutablePKM> pkmList, StaticDataDTO staticData)
     {
         var forms = new List<DexItemForm>();
 
@@ -102,7 +104,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
                         return false;
                     }
 
-                    return BasePkmVersionDTO.GetForm(pkm) == form;
+                    return pkm.Form == form;
                 });
 
                 var itemForm = GetDexItemFormComplete(species, ownedPkms, form, gender);
@@ -171,7 +173,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         ];
     }
 
-    public DexItemForm GetDexItemFormComplete(ushort species, List<PKM> ownedPkms, byte form, Gender gender)
+    public DexItemForm GetDexItemFormComplete(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender)
     {
         var itemForm = GetDexItemForm(species, ownedPkms, form, gender);
         itemForm.Context = save.Context;
@@ -179,7 +181,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         return itemForm;
     }
 
-    protected abstract DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender);
+    protected abstract DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender);
 
     public abstract void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught);
 }

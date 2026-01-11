@@ -4,73 +4,6 @@ using PKHeX.Core.Searching;
 
 public abstract class BasePkmVersionDTO : IWithId
 {
-    public static byte GetForm(PKM pkm)
-    {
-        if (pkm.Species == (ushort)PKHeX.Core.Species.Alcremie)
-        {
-            if (pkm is PK8 pk8)
-            {
-                return (byte)(pkm.Form * 7 + pk8.FormArgument);
-            }
-            else if (pkm is PK9 pk9)
-            {
-                return (byte)(pkm.Form * 7 + pk9.FormArgument);
-            }
-        }
-        return pkm.Form;
-    }
-
-    /**
-     * Generate ID similar to PKHeX one.
-     * Note that Species & Form can change over time (evolve),
-     * so only first species of evolution group is used.
-     */
-    public static string GetPKMIdBase(PKM pkm)
-    {
-        static ushort GetBaseSpecies(ushort species)
-        {
-            var previousSpecies = StaticDataService.staticData.Evolves[species].PreviousSpecies;
-            if (previousSpecies != null)
-            {
-                return GetBaseSpecies((ushort)previousSpecies);
-            }
-            return species;
-        }
-
-        var clone = pkm.Clone();
-        clone.Species = GetBaseSpecies(pkm.Species);
-        clone.Form = 0;
-        if (pkm is GBPKM gbpkm && clone is GBPKM gbclone)
-        {
-            gbclone.DV16 = gbpkm.DV16;
-        }
-        else
-        {
-            clone.PID = pkm.PID;
-            Span<int> ivs = [
-                pkm.IV_HP,
-                pkm.IV_ATK,
-                pkm.IV_DEF,
-                pkm.IV_SPE,
-                pkm.IV_SPA,
-                pkm.IV_SPD,
-            ];
-            clone.SetIVs(ivs);
-        }
-        var hash = SearchUtil.HashByDetails(clone);
-        var id = $"G{clone.Format}_{hash}_{clone.TID16}";   // note: SID not stored by pk files
-
-        return id;
-    }
-
-    // public static string GetOldPKMIdBase(PKM pkm)
-    // {
-    //     var hash = SearchUtil.HashByDetails(pkm);
-    //     var id = $"G{pkm.Format}{hash}";
-
-    //     return id;
-    // }
-
     public string Id { get; }
 
     public byte Generation { get; }
@@ -170,11 +103,11 @@ public abstract class BasePkmVersionDTO : IWithId
     public double LoadingDuration { get; set; }
 
     [JsonIgnore()]
-    public readonly PKM Pkm;
+    public readonly ImmutablePKM Pkm;
 
     protected BasePkmVersionDTO(
         string id,
-        PKM pkm,
+        ImmutablePKM pkm,
         byte generation
     )
     {
@@ -189,7 +122,7 @@ public abstract class BasePkmVersionDTO : IWithId
         IsNicknamed = Pkm.IsNicknamed;
         Nickname = Pkm.Nickname;
         Species = Pkm.Species;
-        Form = GetForm(Pkm);
+        Form = Pkm.Form;
         IsEgg = Pkm.IsEgg;
         IsShiny = Pkm.IsShiny;
         IsAlpha = Pkm is IAlpha pka && pka.IsAlpha;
@@ -204,56 +137,11 @@ public abstract class BasePkmVersionDTO : IWithId
         LevelUpPercent = Experience.GetEXPToLevelUpPercentage(Pkm.CurrentLevel, Pkm.EXP, Pkm.PersonalInfo.EXPGrowth);
         Friendship = Pkm.IsEgg ? (byte)0 : Pkm.CurrentFriendship;
         EggHatchCount = Pkm.IsEgg ? Pkm.CurrentFriendship : (byte)0;
-        IVs = [
-            Pkm.IV_HP,
-            Pkm.IV_ATK,
-            Pkm.IV_DEF,
-            Pkm.IV_SPA,
-            Pkm.IV_SPD,
-            Pkm.IV_SPE,
-        ];
 
-        if (Pkm is PB7 pb7)
-        {
-            EVs = [
-                pb7.AV_HP,
-                pb7.AV_ATK,
-                pb7.AV_DEF,
-                pb7.AV_SPA,
-                pb7.AV_SPD,
-                pb7.AV_SPE,
-            ];
-        }
-        else
-        {
-            EVs = [
-                Pkm.EV_HP,
-                Pkm.EV_ATK,
-                Pkm.EV_DEF,
-                Pkm.EV_SPA,
-                Pkm.EV_SPD,
-                Pkm.EV_SPE,
-            ];
-        }
-
-        pkm.SetStats(pkm.GetStats(pkm.PersonalInfo));
-        Stats = [
-            pkm.Stat_HPMax,
-            pkm.Stat_ATK,
-            pkm.Stat_DEF,
-            pkm.Stat_SPA,
-            pkm.Stat_SPD,
-            pkm.Stat_SPE,
-        ];
-
-        BaseStats = [
-            pkm.PersonalInfo.GetBaseStatValue(0),
-            pkm.PersonalInfo.GetBaseStatValue(1),
-            pkm.PersonalInfo.GetBaseStatValue(2),
-            pkm.PersonalInfo.GetBaseStatValue(4),
-            pkm.PersonalInfo.GetBaseStatValue(5),
-            pkm.PersonalInfo.GetBaseStatValue(3),
-        ];
+        IVs = Pkm.GetIVs();
+        EVs = Pkm.GetEVs();
+        Stats = pkm.GetStats();
+        BaseStats = Pkm.GetBaseStats();
 
         HiddenPower.TryGetTypeIndex(pkm.HPType, out var hptype);
         HiddenPowerType = (byte)(hptype + 1);
@@ -264,18 +152,13 @@ public abstract class BasePkmVersionDTO : IWithId
             ? (HiddenPowerType < 10 ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL) // TODO duplicate with static-data
             : MoveCategory.SPECIAL;
 
-        Nature = Pkm is GBPKM gbpkm ? Experience.GetNatureVC(gbpkm.EXP) : Pkm.Nature;
+        Nature = Pkm.GetNature();
 
         Ability = Pkm.Ability == -1
             ? 0
             : Pkm.Ability;
 
-        Moves = [
-            Pkm.Move1,
-            Pkm.Move2,
-            Pkm.Move3,
-            Pkm.Move4
-        ];
+        Moves = [.. Pkm.GetMoves()];
 
         TID = Pkm.TID16;
 
@@ -298,6 +181,8 @@ public abstract class BasePkmVersionDTO : IWithId
 
         CanEdit = !IsEgg;
     }
+
+    public abstract BasePkmVersionDTO WithPKM(ImmutablePKM pkm);
 }
 
 public struct MoveItem

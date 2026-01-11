@@ -36,18 +36,13 @@ public class MainCreatePkmVersionAction(
         var pkmConverted = pkmConvertService.GetConvertedPkm(pkmOrigin, generation, createdPid);
         createdPid = pkmConverted.PID;
 
-        var pkmVersionEntityCreated = new PkmVersionEntity
-        {
-            SchemaVersion = loaders.pkmVersionLoader.GetLastSchemaVersion(),
-            Id = BasePkmVersionDTO.GetPKMIdBase(pkmConverted),
-            PkmId = pkmId,
-            Generation = generation,
-            Filepath = PKMLoader.GetPKMFilepath(pkmConverted),
-        };
-
-        var pkmVersionCreated = PkmVersionDTO.FromEntity(pkmVersionEntityCreated, pkmConverted, pkmDto);
-
-        loaders.pkmVersionLoader.WriteDto(pkmVersionCreated);
+        loaders.pkmVersionLoader.WriteEntity(new(
+            SchemaVersion: loaders.pkmVersionLoader.GetLastSchemaVersion(),
+            Id: pkmConverted.GetPKMIdBase(),
+            PkmId: pkmId,
+            Generation: generation,
+            Filepath: PKMLoader.GetPKMFilepath(pkmConverted)
+        ), pkmConverted);
 
         return new()
         {

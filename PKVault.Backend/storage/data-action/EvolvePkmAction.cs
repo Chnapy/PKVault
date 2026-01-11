@@ -47,7 +47,10 @@ public class EvolvePkmAction(
 
         Console.WriteLine($"Evolve from {oldSpecies} to {evolveSpecies} using item? {evolveByItem}");
 
-        UpdatePkm(dto.Pkm, evolveSpecies, evolveByItem);
+        dto = dto.WithPKM(dto.Pkm.Update(pkm =>
+        {
+            UpdatePkm(pkm, evolveSpecies, evolveByItem);
+        }));
         saveLoaders.Pkms.WriteDto(dto);
 
         var pkmVersion = dto.GetPkmVersion(loaders.pkmVersionLoader);
@@ -89,16 +92,26 @@ public class EvolvePkmAction(
         var (evolveSpecies, evolveByItem) = await GetEvolve(dto);
 
         // update dto 1/2
-        UpdatePkm(dto.Pkm, evolveSpecies, evolveByItem);
-        dto.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(dto.Pkm);
-        loaders.pkmVersionLoader.WriteDto(dto);
+        dto = dto.WithPKM(dto.Pkm.Update(pkm =>
+        {
+            UpdatePkm(pkm, evolveSpecies, evolveByItem);
+        }));
+        loaders.pkmVersionLoader.WriteEntity(
+            dto.PkmVersionEntity with { Filepath = PKMLoader.GetPKMFilepath(dto.Pkm) },
+            dto.Pkm
+        );
 
         // update related dto 1/2
         relatedPkmVersions.ForEach((versionDto) =>
         {
-            UpdatePkm(versionDto.Pkm, evolveSpecies, false);
-            versionDto.PkmVersionEntity.Filepath = PKMLoader.GetPKMFilepath(versionDto.Pkm);
-            loaders.pkmVersionLoader.WriteDto(versionDto);
+            versionDto = versionDto.WithPKM(versionDto.Pkm.Update(pkm =>
+            {
+                UpdatePkm(pkm, evolveSpecies, false);
+            }));
+            loaders.pkmVersionLoader.WriteEntity(
+                versionDto.PkmVersionEntity with { Filepath = PKMLoader.GetPKMFilepath(versionDto.Pkm) },
+                versionDto.Pkm
+            );
         });
 
         if (dto.PkmDto.SaveId != null)

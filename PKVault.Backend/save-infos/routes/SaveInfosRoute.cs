@@ -67,7 +67,7 @@ public class SaveInfosController(DataService dataService, SaveService saveServic
 
         var filename = save.Metadata.FileName;
 
-        byte[] fileBytes = save.Write().ToArray();
+        byte[] fileBytes = save.GetSaveFileData();
         return File(fileBytes, MediaTypeNames.Application.Octet, filename);
     }
 }

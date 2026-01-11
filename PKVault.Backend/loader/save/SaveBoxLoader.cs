@@ -1,6 +1,6 @@
 using PKHeX.Core;
 
-public class SaveBoxLoader(SaveFile save)
+public class SaveBoxLoader(SaveWrapper save)
 {
     public bool HasWritten = false;
 
@@ -15,44 +15,42 @@ public class SaveBoxLoader(SaveFile save)
             var id = ((int)BoxType.Party).ToString();
             boxes.Add(id, new BoxDTO
             {
-                BoxEntity = new()
-                {
-                    SchemaVersion = default,
-                    Id = id,
-                    Type = BoxType.Party,
-                    Name = BoxType.Party.ToString(),
-                    Order = currentOrder,
-                    SlotCount = 6,
-                    BankId = default,
-                }
+                BoxEntity = new(
+                    SchemaVersion: default,
+                    Id: id,
+                    Type: BoxType.Party,
+                    Name: BoxType.Party.ToString(),
+                    Order: currentOrder,
+                    SlotCount: 6,
+                    BankId: ""
+                )
             });
             currentOrder++;
         }
 
         if (save.HasBox)
         {
-            var boxesNames = BoxUtil.GetBoxNames(save).ToList();
+            var boxesNames = save.GetBoxNames();
             for (int i = 0; i < boxesNames.Count; i++)
             {
                 var id = i.ToString();
                 boxes.Add(id, new BoxDTO
                 {
-                    BoxEntity = new()
-                    {
-                        SchemaVersion = default,
-                        Id = id,
-                        Type = BoxType.Box,
-                        Name = boxesNames[i],
-                        Order = currentOrder,
-                        SlotCount = save.BoxSlotCount,
-                        BankId = default,
-                    }
+                    BoxEntity = new(
+                        SchemaVersion: default,
+                        Id: id,
+                        Type: BoxType.Box,
+                        Name: boxesNames[i],
+                        Order: currentOrder,
+                        SlotCount: save.BoxSlotCount,
+                        BankId: ""
+                    )
                 });
                 currentOrder++;
             }
         }
 
-        var extraSlots = save.GetExtraSlots(true);
+        var extraSlots = save.GetSave().GetExtraSlots(true);
 
         if (save is IDaycareStorage saveDaycare)
         {
@@ -60,16 +58,15 @@ public class SaveBoxLoader(SaveFile save)
             var extraSlotsCount = extraSlots.FindAll(slot => slot.Type == StorageSlotType.Daycare).Count;
             boxes.Add(id, new BoxDTO
             {
-                BoxEntity = new()
-                {
-                    SchemaVersion = default,
-                    Id = id,
-                    Type = BoxType.Daycare,
-                    Name = BoxType.Daycare.ToString(),
-                    Order = currentOrder,
-                    SlotCount = saveDaycare.DaycareSlotCount + extraSlotsCount,
-                    BankId = default,
-                }
+                BoxEntity = new(
+                    SchemaVersion: default,
+                    Id: id,
+                    Type: BoxType.Daycare,
+                    Name: BoxType.Daycare.ToString(),
+                    Order: currentOrder,
+                    SlotCount: saveDaycare.DaycareSlotCount + extraSlotsCount,
+                    BankId: ""
+                )
             });
             currentOrder++;
         }
@@ -92,16 +89,15 @@ public class SaveBoxLoader(SaveFile save)
 
                 boxes.Add(id, new BoxDTO
                 {
-                    BoxEntity = new()
-                    {
-                        SchemaVersion = default,
-                        Id = id,
-                        Type = boxType,
-                        Name = name,
-                        Order = currentOrder,
-                        SlotCount = slotCount,
-                        BankId = default,
-                    }
+                    BoxEntity = new(
+                        SchemaVersion: default,
+                        Id: id,
+                        Type: boxType,
+                        Name: name,
+                        Order: currentOrder,
+                        SlotCount: slotCount,
+                        BankId: ""
+                    )
                 });
                 currentOrder++;
             });

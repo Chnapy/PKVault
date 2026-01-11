@@ -28,15 +28,14 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>
     {
         if (GetAllEntities().Count == 0)
         {
-            WriteEntity(new()
-            {
-                SchemaVersion = GetLastSchemaVersion(),
-                Id = "0",
-                Name = "Bank 1",
-                IsDefault = true,
-                Order = 0,
-                View = new(MainBoxIds: [], Saves: []),
-            });
+            WriteEntity(new(
+                SchemaVersion: GetLastSchemaVersion(),
+                Id: "0",
+                Name: "Bank 1",
+                IsDefault: true,
+                Order: 0,
+                View: new(MainBoxIds: [], Saves: [])
+            ));
         }
     }
 
@@ -52,15 +51,7 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>
         GetAllEntities().Values.OrderBy(bank => bank.Order).ToList()
             .ForEach(entity =>
             {
-                WriteEntity(new()
-                {
-                    SchemaVersion = 1,
-                    Id = entity.Id,
-                    Name = entity.Name,
-                    IsDefault = entity.IsDefault,
-                    Order = currentOrder,
-                    View = entity.View,
-                });
+                WriteEntity(entity with { SchemaVersion = 1 });
                 currentOrder += OrderGap;
             });
     }
@@ -73,8 +64,7 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>
             {
                 if (bank.Order != currentOrder)
                 {
-                    bank.Order = currentOrder;
-                    WriteEntity(bank);
+                    WriteEntity(bank with { Order = currentOrder });
                 }
                 currentOrder += OrderGap;
             });

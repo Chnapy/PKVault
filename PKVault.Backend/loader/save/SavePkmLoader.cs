@@ -1,7 +1,7 @@
 using PKHeX.Core;
 
 public class SavePkmLoader(
-    PkmConvertService pkmConvertService, SaveFile save
+    PkmConvertService pkmConvertService, SaveWrapper save
 )
 {
     public bool HasWritten = false;
@@ -20,10 +20,10 @@ public class SavePkmLoader(
         if (save.HasParty)
         {
             var i = 0;
-            var partyList = save.PartyData.ToList();
+            var partyList = save.GetPartyData();
             partyList.ForEach((pkm) =>
             {
-                if (IsSpeciesValid(pkm.Species))
+                if (pkm.IsSpeciesValid())
                 {
                     var boxSlot = i;
                     dtoList.Add(PkmSaveDTO.FromPkm(
@@ -36,11 +36,11 @@ public class SavePkmLoader(
 
         for (var i = 0; i < save.BoxCount; i++)
         {
-            var pkms = save.GetBoxData(i).ToList();
+            var pkms = save.GetBoxData(i);
             var j = 0;
             foreach (var pkm in pkms)
             {
-                if (IsSpeciesValid(pkm.Species))
+                if (pkm.IsSpeciesValid())
                 {
                     var box = i;
                     var boxSlot = j;
@@ -62,8 +62,8 @@ public class SavePkmLoader(
                 }
 
                 var slot = new SlotInfoMisc(saveDaycare.GetDaycareSlot(i), i) { Type = StorageSlotType.Daycare };
-                var pkm = slot.Read(save);
-                if (pkm != default && IsSpeciesValid(pkm.Species))
+                var pkm = new ImmutablePKM(slot.Read(save.GetSave()));
+                if (pkm != default && pkm.IsSpeciesValid())
                 {
                     var boxSlot = i;
                     dtoList.Add(PkmSaveDTO.FromPkm(
@@ -75,9 +75,9 @@ public class SavePkmLoader(
 
         var extraSlots = save.GetExtraSlots(true);
         var extraPkms = extraSlots.Select(slot => (
-            Pkm: slot.Read(save),
+            Pkm: new ImmutablePKM(slot.Read(save.GetSave())),
             Slot: slot
-        )).ToList().FindAll(extra => IsSpeciesValid(extra.Pkm.Species));
+        )).ToList().FindAll(extra => extra.Pkm.IsSpeciesValid());
 
         extraPkms.ForEach((extra) =>
         {
@@ -178,9 +178,9 @@ public class SavePkmLoader(
             throw new Exception("Not allowed for pkm in daycare");
         }
 
-        var savePkmType = save.BlankPKM.GetType();
+        var savePkmType = save.PKMType;
 
-        var pkm = pkmConvertService.GetConvertedPkm(dto.Pkm, save.BlankPKM, null);
+        var pkm = pkmConvertService.GetConvertedPkm(dto.Pkm, save.GetBlankPKM().GetPkm(), null);
         if (pkm == default)
         {
             throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetType()} to.type={savePkmType}");
@@ -222,7 +222,7 @@ public class SavePkmLoader(
                     WriteParty(null, dto.BoxSlot);
                     break;
                 default:
-                    save.SetBoxSlotAtIndex(save.BlankPKM, dto.BoxId, dto.BoxSlot);
+                    save.SetBoxSlotAtIndex(save.GetBlankPKM(), dto.BoxId, dto.BoxSlot);
                     break;
             }
 
@@ -234,14 +234,14 @@ public class SavePkmLoader(
         }
     }
 
-    private void WriteParty(PKM? pkm, int slot)
+    private void WriteParty(ImmutablePKM? pkm, int slot)
     {
-        var party = save.PartyData.ToList();
+        var party = save.GetPartyData();
         while (party.Count < 6)
         {
-            party.Add(save.BlankPKM);
+            party.Add(save.GetBlankPKM());
         }
-        party[slot] = pkm ?? save.BlankPKM;
+        party[slot] = pkm ?? save.GetBlankPKM();
         SetParty(party);
     }
 
@@ -252,8 +252,8 @@ public class SavePkmLoader(
             return;
         }
 
-        var party = save.PartyData.ToList()
-        .FindAll(pkm => IsSpeciesValid(pkm.Species));
+        var party = save.GetPartyData()
+        .FindAll(pkm => pkm.IsSpeciesValid());
 
         SetParty(party);
 
@@ -261,7 +261,7 @@ public class SavePkmLoader(
         HasWritten = true;
     }
 
-    private void SetParty(List<PKM> party)
+    private void SetParty(List<ImmutablePKM> party)
     {
         for (var i = 0; i < 6; i++)
         {
@@ -273,20 +273,18 @@ public class SavePkmLoader(
                 if (pkm.Species > 0)
                 {
                     var dtoId = PkmSaveDTO.GetPKMId(
-                        BasePkmVersionDTO.GetPKMIdBase(pkm), (int)BoxType.Party, i
+                        pkm.GetPKMIdBase(), (int)BoxType.Party, i
                     );
                     savesFlags.UseSave(save.ID32).SavePkms.Ids.Add(dtoId);
                 }
             }
             else
             {
-                save.SetPartySlotAtIndex(save.BlankPKM, i);
+                save.SetPartySlotAtIndex(save.GetBlankPKM(), i);
             }
         }
         // Console.WriteLine($"PARTY = {string.Join(',', party.Select(pk => pk.Nickname))}\n{string.Join(',', save.PartyData.ToList().Select(pk => pk.Nickname))}");
     }
-
-    private static bool IsSpeciesValid(ushort species) => species > 0 && species < GameInfo.Strings.Species.Count;
 
     public void SetFlags(DataUpdateSaveListFlags _savesFlags)
     {

@@ -51,7 +51,7 @@ public class PkmLoader : EntityLoader<PkmDTO, PkmEntity>
                     var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
 
                     var oldId = pkmVersionEntity.Id;
-                    var expectedId = BasePkmVersionDTO.GetPKMIdBase(pkm);
+                    var expectedId = pkm.GetPKMIdBase();
 
                     var oldPkmId = pkmVersionEntity.PkmId;
 
@@ -64,14 +64,12 @@ public class PkmLoader : EntityLoader<PkmDTO, PkmEntity>
                         // update pkm-entity id if main version
                         if (oldPkmId == oldId)
                         {
-                            pkmEntity.Id = expectedId;
                             loaders.pkmLoader.DeleteEntity(oldId);
-                            loaders.pkmLoader.WriteEntity(pkmEntity);
+                            pkmEntity = loaders.pkmLoader.WriteEntity(pkmEntity with { Id = expectedId });
                         }
 
                         // update pkm-version-entity id
-                        pkmVersionEntity.Id = expectedId;
-                        loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity);
+                        pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with { Id = expectedId });
                     }
                 }
                 catch (Exception ex)
@@ -85,19 +83,11 @@ public class PkmLoader : EntityLoader<PkmDTO, PkmEntity>
                 // wrong PkmId
                 if (pkmVersionEntity.PkmId != pkmEntity.Id)
                 {
-                    pkmVersionEntity.PkmId = pkmEntity.Id;
-                    loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity);
+                    pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with { PkmId = pkmEntity.Id });
                 }
             });
 
-            WriteEntity(new()
-            {
-                SchemaVersion = 1,
-                Id = pkmEntity.Id,
-                SaveId = pkmEntity.SaveId,
-                BoxId = pkmEntity.BoxId,
-                BoxSlot = pkmEntity.BoxSlot,
-            });
+            pkmEntity = WriteEntity(pkmEntity with { SchemaVersion = 1 });
         });
     }
 

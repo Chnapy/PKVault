@@ -1,7 +1,7 @@
 using PKHeX.Core;
 
 public class MovePkmAction(
-    WarningsService warningsService, StaticDataService staticDataService, PkmConvertService pkmConvertService,
+    StaticDataService staticDataService, PkmConvertService pkmConvertService,
     string[] pkmIds, uint? sourceSaveId,
     uint? targetSaveId, int targetBoxId, int[] targetBoxSlots,
     bool attached
@@ -110,15 +110,18 @@ public class MovePkmAction(
         );
         if (pkmAlreadyPresent != null)
         {
-            pkmAlreadyPresent.PkmEntity.BoxId = dto.PkmEntity.BoxId;
-            pkmAlreadyPresent.PkmEntity.BoxSlot = dto.PkmEntity.BoxSlot;
-            loaders.pkmLoader.WriteDto(pkmAlreadyPresent);
+            loaders.pkmLoader.WriteEntity(pkmAlreadyPresent.PkmEntity with
+            {
+                BoxId = dto.BoxId,
+                BoxSlot = dto.BoxSlot
+            });
         }
 
-        dto.PkmEntity.BoxId = (uint)targetBoxId;
-        dto.PkmEntity.BoxSlot = (uint)targetBoxSlot;
-
-        loaders.pkmLoader.WriteDto(dto);
+        loaders.pkmLoader.WriteEntity(dto.PkmEntity with
+        {
+            BoxId = (uint)targetBoxId,
+            BoxSlot = (uint)targetBoxSlot
+        });
 
         var pkmName = loaders.pkmVersionLoader.GetDto(pkmId)?.Nickname;
         var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
@@ -152,7 +155,7 @@ public class MovePkmAction(
             throw new ArgumentException($"Save Pkm not compatible with save for id={sourcePkmDto.Id}, generation={sourcePkmDto.Generation}, save.generation={targetSaveLoaders.Save.Generation}");
         }
 
-        if (!SaveInfosDTO.IsSpeciesAllowed(sourcePkmDto.Species, targetSaveLoaders.Save))
+        if (!targetSaveLoaders.Save.IsSpeciesAllowed(sourcePkmDto.Species))
         {
             throw new ArgumentException($"Save Pkm Species not compatible with save for id={sourcePkmDto.Id}, species={sourcePkmDto.Species}, save.maxSpecies={targetSaveLoaders.Save.MaxSpeciesID}");
         }
@@ -308,11 +311,11 @@ public class MovePkmAction(
             throw new ArgumentException($"PkmVersionEntity not found for generation={saveLoaders.Save.Generation}");
         }
 
-        var pkmDto = pkmVersionDto.PkmDto;
+        var pkmEntity = pkmVersionDto.PkmDto.PkmEntity;
 
-        if (pkmDto.SaveId != default)
+        if (pkmEntity.SaveId != default)
         {
-            throw new ArgumentException($"PkmEntity already in save, id={pkmDto.Id}, saveId={pkmDto.SaveId}");
+            throw new ArgumentException($"PkmEntity already in save, id={pkmEntity.Id}, saveId={pkmEntity.SaveId}");
         }
 
         if (pkmVersionDto.Generation != saveLoaders.Save.Generation)
@@ -320,7 +323,7 @@ public class MovePkmAction(
             throw new ArgumentException($"PkmVersionEntity Generation not compatible with save for id={pkmVersionDto.Id}, generation={pkmVersionDto.Generation}, save.generation={saveLoaders.Save.Generation}");
         }
 
-        if (!SaveInfosDTO.IsSpeciesAllowed(pkmVersionDto.Species, saveLoaders.Save))
+        if (!saveLoaders.Save.IsSpeciesAllowed(pkmVersionDto.Species))
         {
             throw new ArgumentException($"PkmVersionEntity Species not compatible with save for id={pkmVersionDto.Id}, species={pkmVersionDto.Species}, save.maxSpecies={saveLoaders.Save.MaxSpeciesID}");
         }
@@ -331,14 +334,13 @@ public class MovePkmAction(
 
         if (attached)
         {
-            pkmDto.PkmEntity.SaveId = saveLoaders.Save.ID32;
-            loaders.pkmLoader.WriteDto(pkmDto);
+            pkmEntity = loaders.pkmLoader.WriteEntity(pkmEntity with { SaveId = saveLoaders.Save.ID32 });
         }
         else
         {
             loaders.pkmVersionLoader.DeleteEntity(pkmVersionDto.Id);
 
-            loaders.pkmLoader.DeleteEntity(pkmDto.Id);
+            loaders.pkmLoader.DeleteEntity(pkmEntity.Id);
         }
 
         var pkmSaveDTO = PkmSaveDTO.FromPkm(
@@ -351,9 +353,9 @@ public class MovePkmAction(
             throw new ArgumentException($"pkmSaveDTO.PkmVersionId is null, should be {pkmSaveDTO.Id}");
         }
 
-        if (pkmDto.SaveId != null)
+        if (pkmEntity.SaveId != null)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmDto.Id, null)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmEntity.Id, null)]);
         }
 
         flags.Dex = true;
@@ -391,41 +393,33 @@ public class MovePkmAction(
         if (pkmVersionEntity == null)
         {
             // create pkm & pkm-version
-            var pkmEntityToCreate = new PkmEntity
-            {
-                SchemaVersion = loaders.pkmLoader.GetLastSchemaVersion(),
-                Id = savePkm.IdBase,
-                BoxId = targetBoxId,
-                BoxSlot = targetBoxSlot,
-                SaveId = attached ? sourceSaveId : null
-            };
-            var pkmDtoToCreate = PkmDTO.FromEntity(pkmEntityToCreate);
+            var pkmEntityToCreate = loaders.pkmLoader.WriteEntity(new(
+                SchemaVersion: loaders.pkmLoader.GetLastSchemaVersion(),
+                Id: savePkm.IdBase,
+                BoxId: targetBoxId,
+                BoxSlot: targetBoxSlot,
+                SaveId: attached ? sourceSaveId : null
+            ));
 
-            pkmVersionEntity = new PkmVersionEntity
-            {
-                SchemaVersion = loaders.pkmVersionLoader.GetLastSchemaVersion(),
-                Id = savePkm.IdBase,
-                PkmId = pkmEntityToCreate.Id,
-                Generation = savePkm.Generation,
-                Filepath = PKMLoader.GetPKMFilepath(savePkm.Pkm),
-            };
-            var pkmVersionDto = PkmVersionDTO.FromEntity(pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
-
-            loaders.pkmLoader.WriteDto(pkmDtoToCreate);
-            loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
+            pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(new(
+                SchemaVersion: loaders.pkmVersionLoader.GetLastSchemaVersion(),
+                Id: savePkm.IdBase,
+                PkmId: pkmEntityToCreate.Id,
+                Generation: savePkm.Generation,
+                Filepath: PKMLoader.GetPKMFilepath(savePkm.Pkm)
+            ), savePkm.Pkm);
         }
 
-        var pkmDto = loaders.pkmLoader.GetDto(pkmVersionEntity.PkmId);
+        var pkmEntity = loaders.pkmLoader.GetEntity(pkmVersionEntity.PkmId);
 
         // if moved to already attached pkm, just update it
-        if (mainPkmAlreadyExists && pkmDto!.SaveId != default)
+        if (mainPkmAlreadyExists && pkmEntity!.SaveId != default)
         {
             await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersionEntity.PkmId, null)]);
 
             if (!attached)
             {
-                pkmDto.PkmEntity.SaveId = default;
-                loaders.pkmLoader.WriteDto(pkmDto);
+                loaders.pkmLoader.WriteEntity(pkmEntity with { SaveId = default });
             }
         }
 
@@ -440,10 +434,10 @@ public class MovePkmAction(
         flags.Dex = true;
     }
 
-    private async Task CheckG3NationalDex(SaveFile save, int species)
+    private async Task CheckG3NationalDex(SaveWrapper save, int species)
     {
         // enable national-dex in G3 RSE if pkm outside of regional-dex
-        if (save is SAV3 saveG3RSE && saveG3RSE is IGen3Hoenn && !saveG3RSE.NationalDex)
+        if (save.GetSave() is SAV3 saveG3RSE && saveG3RSE is IGen3Hoenn && !saveG3RSE.NationalDex)
         {
             var staticData = await staticDataService.GetStaticData();
 
@@ -456,9 +450,9 @@ public class MovePkmAction(
         }
     }
 
-    private static void CheckPkmTradeRecord(SaveFile save)
+    private static void CheckPkmTradeRecord(SaveWrapper save)
     {
-        if (save is SAV3FRLG saveG3FRLG)
+        if (save.GetSave() is SAV3FRLG saveG3FRLG)
         {
             var records = new Record3(saveG3FRLG);
 
@@ -467,7 +461,7 @@ public class MovePkmAction(
             var pkmTradeCount = records.GetRecord(pkmTradeIndex);
             records.SetRecord(pkmTradeIndex, pkmTradeCount + 1);
         }
-        else if (save is SAV4HGSS saveG4HGSS)
+        else if (save.GetSave() is SAV4HGSS saveG4HGSS)
         {
             /**
              * Found record data types from Record32:

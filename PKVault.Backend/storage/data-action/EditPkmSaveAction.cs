@@ -13,18 +13,19 @@ public class EditPkmSaveAction(
         //     throw new Exception("Edit not possible for pkm attached with save");
         // }
 
-        var pkm = pkmSave!.Pkm;
-
         var availableMoves = await actionService.GetPkmAvailableMoves(saveId, pkmSaveId);
 
-        EditPkmVersionAction.EditPkmNickname(pkmConvertService, pkm, editPayload.Nickname);
-        EditPkmVersionAction.EditPkmEVs(pkmConvertService, pkm, editPayload.EVs);
-        EditPkmVersionAction.EditPkmMoves(pkmConvertService, pkm, availableMoves, editPayload.Moves);
+        var pkm = pkmSave!.Pkm.Update(pkm =>
+        {
+            EditPkmVersionAction.EditPkmNickname(pkmConvertService, pkm, editPayload.Nickname);
+            EditPkmVersionAction.EditPkmEVs(pkmConvertService, pkm, editPayload.EVs);
+            EditPkmVersionAction.EditPkmMoves(pkmConvertService, pkm, availableMoves, editPayload.Moves);
 
-        // absolutly required before each write
-        // TODO make a using write pkm to ensure use of this call
-        pkm.ResetPartyStats();
-        pkm.RefreshChecksum();
+            // absolutly required before each write
+            // TODO make a using write pkm to ensure use of this call
+            pkm.ResetPartyStats();
+            pkm.RefreshChecksum();
+        });
 
         saveLoaders.Pkms.WriteDto(pkmSave);
 

@@ -18,11 +18,13 @@ public class MainDeleteBoxAction(string boxId) : DataAction
             var bank = loaders.bankLoader.GetEntity(box.BankId);
             if (bank.View.MainBoxIds.Contains(box.IdInt))
             {
-                bank.View = new(
-                    MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
-                    Saves: bank.View.Saves
-                );
-                loaders.bankLoader.WriteEntity(bank);
+                loaders.bankLoader.WriteEntity(bank with
+                {
+                    View = new(
+                        MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
+                        Saves: bank.View.Saves
+                    )
+                });
             }
         }
 

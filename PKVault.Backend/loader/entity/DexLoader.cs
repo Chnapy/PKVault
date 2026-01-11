@@ -32,13 +32,7 @@ public class DexLoader : EntityLoader<DexItemDTO, DexEntity>
     {
         GetAllEntities().Values.ToList().ForEach(entity =>
         {
-            WriteEntity(new()
-            {
-                SchemaVersion = 1,
-                Id = entity.Id,
-                Species = entity.Species,
-                Forms = entity.Forms
-            });
+            WriteEntity(entity with { SchemaVersion = 1 });
         });
     }
 

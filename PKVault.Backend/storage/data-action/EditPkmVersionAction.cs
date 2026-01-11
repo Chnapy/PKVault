@@ -12,32 +12,34 @@ public class EditPkmVersionAction(
 
         var availableMoves = await actionService.GetPkmAvailableMoves(null, pkmVersionId);
 
-        var pkm = pkmVersionDto.Pkm;
+        var pkm = pkmVersionDto.Pkm.Update(pkm =>
+        {
+            EditPkmNickname(pkmConvertService, pkm, editPayload.Nickname);
+            EditPkmEVs(pkmConvertService, pkm, editPayload.EVs);
+            EditPkmMoves(pkmConvertService, pkm, availableMoves, editPayload.Moves);
 
-        EditPkmNickname(pkmConvertService, pkm, editPayload.Nickname);
-        EditPkmEVs(pkmConvertService, pkm, editPayload.EVs);
-        EditPkmMoves(pkmConvertService, pkm, availableMoves, editPayload.Moves);
+            // absolutly required before each write
+            // TODO make a using write pkm to ensure use of this call
+            pkm.ResetPartyStats();
+            pkm.RefreshChecksum();
+        });
 
-        // absolutly required before each write
-        // TODO make a using write pkm to ensure use of this call
-        pkm.ResetPartyStats();
-        pkm.RefreshChecksum();
-
-        loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
+        loaders.pkmVersionLoader.WriteEntity(pkmVersionDto.PkmVersionEntity, pkm);
 
         var relatedPkmVersions = loaders.pkmVersionLoader.GetDtosByPkmId(pkmDto.Id).Values.ToList()
             .FindAll(value => value.Id != pkmVersionId);
 
         relatedPkmVersions.ForEach((versionDto) =>
         {
-            var relatedPkm = versionDto.Pkm;
+            var relatedPkm = versionDto.Pkm.Update(relatedPkm =>
+            {
+                pkmConvertService.PassDynamicsToPkm(pkm, relatedPkm);
 
-            pkmConvertService.PassDynamicsToPkm(pkm, relatedPkm);
+                relatedPkm.ResetPartyStats();
+                relatedPkm.RefreshChecksum();
+            });
 
-            relatedPkm.ResetPartyStats();
-            relatedPkm.RefreshChecksum();
-
-            loaders.pkmVersionLoader.WriteDto(versionDto);
+            loaders.pkmVersionLoader.WriteEntity(versionDto.PkmVersionEntity, relatedPkm);
         });
 
         if (pkmDto.SaveId != default)

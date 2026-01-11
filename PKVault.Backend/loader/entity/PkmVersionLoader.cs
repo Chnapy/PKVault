@@ -64,7 +64,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         return result;
     }
 
-    public override void WriteEntity(PkmVersionEntity entity)
+    public override PkmVersionEntity WriteEntity(PkmVersionEntity entity)
     {
         // required for specific case when pkm-id changes
         var existingEntity = GetEntity(entity.Id);
@@ -73,7 +73,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
             DeleteEntity(entity.Id);
         }
 
-        base.WriteEntity(entity);
+        entity = base.WriteEntity(entity);
 
         if (GetAllEntitiesByPkmId().TryGetValue(entity.PkmId, out var entities))
         {
@@ -83,20 +83,18 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         {
             GetAllEntitiesByPkmId().Add(entity.PkmId, new() { { entity.Id, entity } });
         }
+        return entity;
     }
 
-    public void WriteEntity(PkmVersionEntity entity, PKM pkm)
+    public PkmVersionEntity WriteEntity(PkmVersionEntity entity, ImmutablePKM pkm)
     {
         WriteEntity(entity);
 
         pkmFileLoader.WriteEntity(
             PKMLoader.GetPKMBytes(pkm), pkm, entity.Filepath
         );
-    }
 
-    public override void WriteDto(PkmVersionDTO dto)
-    {
-        WriteEntity(dto.PkmVersionEntity, dto.Pkm);
+        return entity;
     }
 
     public Dictionary<string, PkmVersionDTO> GetDtosByPkmId(string pkmId)
@@ -134,7 +132,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         return dto.PkmVersionEntity;
     }
 
-    public PKM GetPkmVersionEntityPkm(PkmVersionEntity entity)
+    public ImmutablePKM GetPkmVersionEntityPkm(PkmVersionEntity entity)
     {
         var pkmBytes = pkmFileLoader.GetEntity(entity.Filepath)
             ?? throw new Exception($"PKM bytes is null, from entity Id={entity.Id} Filepath={entity.Filepath}");
@@ -163,14 +161,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
     {
         // Most part is done in PkmLoader for strong couplage reasons
 
-        GetAllEntities().Values.ToList().ForEach(entity => WriteEntity(new()
-        {
-            SchemaVersion = 1,
-            Id = entity.Id,
-            PkmId = entity.PkmId,
-            Generation = entity.Generation,
-            Filepath = entity.Filepath
-        }));
+        GetAllEntities().Values.ToList().ForEach(entity => WriteEntity(entity with { SchemaVersion = 1 }));
     }
 
     public override void CleanData(DataEntityLoaders loaders)
@@ -192,7 +183,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
                 }
                 else
                 {
-                    PKM? pkm = null;
+                    ImmutablePKM? pkm = null;
                     try
                     {
                         var pkmBytes = File.ReadAllBytes(pkmVersionEntity.Filepath);
@@ -225,8 +216,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
             {
                 // Console.WriteLine($"Wrong filepath rename:\n- wrong filepath={oldFilepath}\n- expected filepath={expectedFilepath}");
 
-                entity.Filepath = expectedFilepath;
-                WriteEntity(entity, pkm);
+                entity = WriteEntity(entity with { Filepath = expectedFilepath }, pkm);
             }
 
             oldFilepath = entity.Filepath;
@@ -237,8 +227,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
             {
                 // Console.WriteLine($"Normalize filepath rename:\n- wrong filepath={oldFilepath}\n- expected filepath={expectedFilepath}");
 
-                entity.Filepath = expectedFilepath;
-                WriteEntity(entity, pkm);
+                entity = WriteEntity(entity with { Filepath = expectedFilepath }, pkm);
             }
         });
     }

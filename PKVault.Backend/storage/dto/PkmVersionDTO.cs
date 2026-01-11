@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public class PkmVersionDTO : BasePkmVersionDTO
 {
-    public static PkmVersionDTO FromEntity(PkmVersionEntity entity, PKM pkm, PkmDTO pkmDto)
+    public static PkmVersionDTO FromEntity(PkmVersionEntity entity, ImmutablePKM pkm, PkmDTO pkmDto)
     {
         Stopwatch sw = new();
         sw.Start();
@@ -25,7 +25,7 @@ public class PkmVersionDTO : BasePkmVersionDTO
 
     private static readonly Dictionary<int, IReadOnlyList<GameVersion>> compatibleVersionsBySpecies = [];
 
-    private static readonly List<(GameVersion Version, SaveFile? Save)> allVersionBlankSaves = [..Enum.GetValues<GameVersion>().ToList()
+    private static readonly List<(GameVersion Version, SaveWrapper? Save)> allVersionBlankSaves = [..Enum.GetValues<GameVersion>().ToList()
         .Select(version => {
             var versionToUse = GetSingleVersion(version);
 
@@ -34,7 +34,7 @@ public class PkmVersionDTO : BasePkmVersionDTO
                 return (version, null!);
             }
 
-            return (version, BlankSaveFile.Get(versionToUse));
+            return (version, new SaveWrapper(BlankSaveFile.Get(versionToUse), ""));
         })];
 
     /**
@@ -90,7 +90,7 @@ public class PkmVersionDTO : BasePkmVersionDTO
     public readonly PkmDTO PkmDto;
 
     private PkmVersionDTO(
-        PkmVersionEntity entity, PKM pkm, PkmDTO pkmDto
+        PkmVersionEntity entity, ImmutablePKM pkm, PkmDTO pkmDto
     ) : base(entity.Id, pkm, entity.Generation)
     {
         PkmVersionEntity = entity;
@@ -102,10 +102,17 @@ public class PkmVersionDTO : BasePkmVersionDTO
         {
             compatibleWithVersions = [..allVersionBlankSaves.FindAll(entry =>
             {
-                return entry.Save != null && SaveInfosDTO.IsSpeciesAllowed(pkm.Species, entry.Save);
+                return entry.Save != null && entry.Save.IsSpeciesAllowed(pkm.Species);
             }).Select(entry => entry.Version).Order()];
             compatibleVersionsBySpecies.Add(pkm.Species, compatibleWithVersions);
         }
         CompatibleWithVersions = compatibleWithVersions;
+    }
+
+    public override PkmVersionDTO WithPKM(ImmutablePKM pkm)
+    {
+        return FromEntity(
+            PkmVersionEntity, pkm, PkmDto
+        );
     }
 }

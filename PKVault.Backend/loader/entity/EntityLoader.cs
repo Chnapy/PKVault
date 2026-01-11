@@ -27,23 +27,11 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
 
     public virtual Dictionary<string, E> GetAllEntities()
     {
-        var entities = GetRealEntities();
-
-        var clonesDict = new Dictionary<string, E>(entities.Count);
-        foreach (var entry in entities)
-        {
-            clonesDict.Add(entry.Key, (E)entry.Value.Clone());
-        }
-        return clonesDict;
-    }
-
-    public byte[] SerializeToUtf8Bytes() => JsonSerializer.SerializeToUtf8Bytes(GetRealEntities(), DictJsonContext);
-
-    private Dictionary<string, E> GetRealEntities()
-    {
         entitiesById ??= GetFileContent();
         return entitiesById;
     }
+
+    public byte[] SerializeToUtf8Bytes() => JsonSerializer.SerializeToUtf8Bytes(GetAllEntities(), DictJsonContext);
 
     private Dictionary<string, E> GetFileContent()
     {
@@ -86,16 +74,16 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
 
     public E? GetEntity(string id)
     {
-        if (GetRealEntities().TryGetValue(id, out var value))
+        if (GetAllEntities().TryGetValue(id, out var value))
         {
-            return (E)value.Clone();
+            return value;
         }
         return default;
     }
 
     public virtual bool DeleteEntity(string id)
     {
-        var deleted = GetRealEntities().Remove(id);
+        var deleted = GetAllEntities().Remove(id);
         if (deleted)
         {
             Console.WriteLine($"Deleted id={id}");
@@ -107,19 +95,16 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
         return deleted;
     }
 
-    public virtual void WriteEntity(E entity)
+    public virtual E WriteEntity(E entity)
     {
         Console.WriteLine($"{entity.GetType().Name} - Write id={entity.Id}");
 
-        GetRealEntities()[entity.Id] = entity;
+        GetAllEntities()[entity.Id] = entity;
 
         flags.Ids.Add(entity.Id);
         HasWritten = true;
-    }
 
-    public virtual void WriteDto(DTO dto)
-    {
-        WriteEntity(GetEntityFromDTO(dto));
+        return entity;
     }
 
     public void SetFlags(DataUpdateFlagsState<string> _flags)

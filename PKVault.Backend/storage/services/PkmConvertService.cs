@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public class PkmConvertService
 {
-    public PKM GetConvertedPkm(PKM sourcePkm, uint generation, uint? intermediatePid)
+    public ImmutablePKM GetConvertedPkm(ImmutablePKM sourcePkm, uint generation, uint? intermediatePid)
     {
         PKM? blankPkm = generation switch
         {
@@ -26,11 +26,11 @@ public class PkmConvertService
         return GetConvertedPkm(sourcePkm, blankPkm, intermediatePid);
     }
 
-    public PKM GetConvertedPkm(PKM sourcePkm, PKM blankPkm, uint? intermediatePid)
+    public ImmutablePKM GetConvertedPkm(ImmutablePKM sourcePkm, PKM blankPkm, uint? intermediatePid)
     {
         EntityConverter.AllowIncompatibleConversion = EntityCompatibilitySetting.AllowIncompatibleSane;
 
-        if (!EntityConverter.IsCompatibleWithModifications(sourcePkm, blankPkm))
+        if (!EntityConverter.IsCompatibleWithModifications(sourcePkm.GetPkm(), blankPkm))
         {
             throw new Exception($"PKM conversion not possible, origin PKM not compatible with generation={blankPkm.Format}");
         }
@@ -38,7 +38,7 @@ public class PkmConvertService
         var intermediatePkm = GetIntermediatePkmConvert(sourcePkm, blankPkm.Format, intermediatePid);
 
         var converted = EntityConverter.TryMakePKMCompatible(
-            intermediatePkm,
+            intermediatePkm.GetPkm(),
             blankPkm,
             out var result,
             out var destPkm
@@ -53,7 +53,7 @@ public class PkmConvertService
 
         if (result == EntityConverterResult.None)
         {
-            return destPkm;
+            return new(destPkm);
         }
 
         if (destPkm.Generation != blankPkm.Format)
@@ -64,10 +64,10 @@ public class PkmConvertService
 
         PassAllToPkm(sourcePkm, destPkm);
 
-        return destPkm;
+        return new(destPkm);
     }
 
-    private PKM GetIntermediatePkmConvert(PKM sourcePkm, uint generation, uint? intermediatePid)
+    private ImmutablePKM GetIntermediatePkmConvert(ImmutablePKM sourcePkm, uint generation, uint? intermediatePid)
     {
         // G1-2 to G3+
         if (sourcePkm.Format <= 2 && generation > 2)
@@ -78,9 +78,9 @@ public class PkmConvertService
         return sourcePkm;
     }
 
-    private PKM GetIntermediateConvertG2ToG3(PKM sourcePkm, uint? intermediatePid)
+    private ImmutablePKM GetIntermediateConvertG2ToG3(ImmutablePKM sourcePkm, uint? intermediatePid)
     {
-        var pkmIntermediate = EntityConverter.ConvertToType(sourcePkm, new PK3().GetType(), out var intermediateResult);
+        var pkmIntermediate = EntityConverter.ConvertToType(sourcePkm.GetPkm(), new PK3().GetType(), out var intermediateResult);
         Console.WriteLine($"Convert-intermediate result={intermediateResult}");
 
         if (pkmIntermediate == default)
@@ -130,16 +130,16 @@ public class PkmConvertService
         Console.WriteLine($"[convert] pkm-intermediate G3, PID={pkmIntermediate.PID} Gender={pkmIntermediate.Gender} IsShiny={pkmIntermediate.IsShiny} Language={pkmIntermediate.Language} ");
         Console.WriteLine($"\tVersion={pkmIntermediate.Version} MetLocation={pkmIntermediate.MetLocation} MetLevel={pkmIntermediate.MetLevel} Ball={pkmIntermediate.Ball} FatefulEncounter={pkmIntermediate.FatefulEncounter}");
 
-        return pkmIntermediate;
+        return new(pkmIntermediate);
     }
 
-    public void PassAllToPkm(PKM sourcePkm, PKM destPkm)
+    public void PassAllToPkm(ImmutablePKM sourcePkm, PKM destPkm)
     {
         PassIDBreakableToPkm(sourcePkm, destPkm);
         PassAllToPkmSafe(sourcePkm, destPkm);
     }
 
-    public void PassAllToPkmSafe(PKM sourcePkm, PKM destPkm)
+    public void PassAllToPkmSafe(ImmutablePKM sourcePkm, PKM destPkm)
     {
         PassStaticsToPkm(sourcePkm, destPkm);
         PassDynamicsToPkm(sourcePkm, destPkm);
@@ -150,7 +150,7 @@ public class PkmConvertService
         destPkm.RefreshChecksum();
     }
 
-    public void PassAllDynamicsNItemToPkm(PKM sourcePkm, PKM destPkm)
+    public void PassAllDynamicsNItemToPkm(ImmutablePKM sourcePkm, PKM destPkm)
     {
         PassDynamicsToPkm(sourcePkm, destPkm);
         PassHeldItemToPkm(sourcePkm, destPkm);
@@ -159,7 +159,7 @@ public class PkmConvertService
         destPkm.RefreshChecksum();
     }
 
-    private void PassIDBreakableToPkm(PKM sourcePkm, PKM destPkm)
+    private void PassIDBreakableToPkm(ImmutablePKM sourcePkm, PKM destPkm)
     {
         Func<int, int> convertIVFn = value => value;
         if (sourcePkm.Format <= 2 && destPkm.Format > 2)
@@ -182,7 +182,7 @@ public class PkmConvertService
         destPkm.SetIVs(ivs);
     }
 
-    private void PassStaticsToPkm(PKM sourcePkm, PKM destPkm)
+    private void PassStaticsToPkm(ImmutablePKM sourcePkm, PKM destPkm)
     {
         if (sourcePkm.Language != 0)
         {
@@ -237,7 +237,7 @@ public class PkmConvertService
         }
     }
 
-    public void PassDynamicsToPkm(PKM sourcePkm, PKM destPkm)
+    public void PassDynamicsToPkm(ImmutablePKM sourcePkm, PKM destPkm)
     {
         ApplyNicknameToPkm(destPkm, sourcePkm.Nickname, sourcePkm.IsNicknamed);
 
@@ -250,7 +250,7 @@ public class PkmConvertService
         {
             convertEVFn = value => (int)(value / sourcePkm.MaxEV * 200);
         }
-        else if (sourcePkm is PB7)
+        else if (sourcePkm.GetPkm() is PB7)
         {
             convertEVFn = value => (int)(value / 200 * destPkm.MaxEV);
         }
@@ -275,7 +275,7 @@ public class PkmConvertService
         ApplyEVsAVsToPkm(destPkm, evs);
     }
 
-    private void PassHeldItemToPkm(PKM sourcePkm, PKM destPkm)
+    private void PassHeldItemToPkm(ImmutablePKM sourcePkm, PKM destPkm)
     {
         if (destPkm is PB7 pb7)
         {
@@ -288,10 +288,9 @@ public class PkmConvertService
         // Console.WriteLine($"HELD-ITEM = {destPkm.HeldItem}");
     }
 
-    public void PassMovesToPkm(PKM sourcePkm, PKM destPkm)
+    public void PassMovesToPkm(ImmutablePKM sourcePkm, PKM destPkm)
     {
-        Span<ushort> moves = stackalloc ushort[4];
-        sourcePkm.GetMoves(moves);
+        var moves = sourcePkm.GetMoves();
         ApplyMovesToPkm(destPkm, moves);
     }
 
@@ -346,7 +345,7 @@ public class PkmConvertService
 
     public void ApplyAbilityToPkm(PKM pkm)
     {
-        bool hasAbilityOrPidIssue() => PkmLegalityDTO.GetLegalitySafe(pkm).Results.Any(result =>
+        bool hasAbilityOrPidIssue() => PkmLegalityDTO.GetLegalitySafe(new(pkm)).Results.Any(result =>
             !result.Valid
             && (result.Identifier == CheckIdentifier.Ability || result.Identifier == CheckIdentifier.PID)
         );

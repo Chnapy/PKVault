@@ -8,7 +8,7 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
             .GroupBy(dto => dto.Species)
             .ToDictionary(dtos => dtos.First().Species, dtos => dtos.ToList());
 
-        Dictionary<GameVersion, SaveFile> savesByVersion = [];
+        Dictionary<GameVersion, SaveWrapper> savesByVersion = [];
 
         loaders.dexLoader.GetAllEntities().Values.ToList().ForEach(entity =>
         {
@@ -28,9 +28,9 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
                     var saveVersion = PkmVersionDTO.GetSingleVersion(form.Version);
                     if (!savesByVersion.TryGetValue(saveVersion, out var save))
                     {
-                        save = saveVersion == default
+                        save = new(saveVersion == default
                             ? new SAV9ZA()
-                            : BlankSaveFile.Get(saveVersion);
+                            : BlankSaveFile.Get(saveVersion), "");
                         savesByVersion.Add(saveVersion, save);
                     }
 
@@ -71,7 +71,7 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
         return true;
     }
 
-    protected override DexItemForm GetDexItemForm(ushort species, List<PKM> ownedPkms, byte form, Gender gender) => throw new NotImplementedException($"Should not be used");
+    protected override DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender) => throw new NotImplementedException($"Should not be used");
 
     public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
     {
@@ -82,7 +82,7 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
         );
     }
 
-    public void EnablePKM(PKM pk, SaveFile? save = null, bool createOnly = false)
+    public void EnablePKM(ImmutablePKM pk, SaveWrapper? save = null, bool createOnly = false)
     {
         var version = save?.Version ?? pk.Version;
 
@@ -100,13 +100,12 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
         bool createOnly
     )
     {
-        DexEntity entity = loaders.dexLoader.GetEntity(species.ToString()) ?? new()
-        {
-            SchemaVersion = loaders.dexLoader.GetLastSchemaVersion(),
-            Id = species.ToString(),
-            Species = species,
-            Forms = []
-        };
+        DexEntity entity = loaders.dexLoader.GetEntity(species.ToString()) ?? new(
+            SchemaVersion: loaders.dexLoader.GetLastSchemaVersion(),
+            Id: species.ToString(),
+            Species: species,
+            Forms: []
+        );
 
         var entityForm = entity?.Forms.Find(f => f.Form == form && f.Gender == gender);
 
@@ -117,27 +116,26 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
 
         if (entityForm == null)
         {
-            entityForm = new()
-            {
-                Form = form,
-                Version = default,
-                Gender = gender,
-                IsCaught = false,
-                IsCaughtShiny = false,
-            };
+            entityForm = new(
+                Form: form,
+                Version: default,
+                Gender: gender,
+                IsCaught: false,
+                IsCaughtShiny: false
+            );
             entity.Forms.Add(entityForm);
         }
 
         if (version != default)
         {
-            entityForm.Version = version;
+            entityForm = entityForm with { Version = version };
         }
 
         if (isCaught)
-            entityForm.IsCaught = true;
+            entityForm = entityForm with { IsCaught = true };
 
         if (isCaughtShiny)
-            entityForm.IsCaughtShiny = true;
+            entityForm = entityForm with { IsCaughtShiny = true };
 
         // write if caught only
         if (!entityForm.IsCaught)

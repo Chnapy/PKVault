@@ -5,13 +5,13 @@ using PKHeX.Core;
 public class PkmSaveDTO : BasePkmVersionDTO
 {
     public static PkmSaveDTO FromPkm(
-        SaveFile save, PKM pkm, int boxId, int boxSlot
+        SaveWrapper save, ImmutablePKM pkm, int boxId, int boxSlot
     )
     {
         Stopwatch sw = new();
         sw.Start();
 
-        var idBase = GetPKMIdBase(pkm);
+        var idBase = pkm.GetPKMIdBase();
 
         var dto = new PkmSaveDTO(
             idBase,
@@ -62,11 +62,11 @@ public class PkmSaveDTO : BasePkmVersionDTO
     public bool CanMoveAttachedToMain => CanMoveToMain && !IsDuplicate;
 
     [JsonIgnore()]
-    public readonly SaveFile Save;
+    public readonly SaveWrapper Save;
 
     private PkmSaveDTO(
         string idBase,
-        SaveFile save, PKM pkm, int boxId, int boxSlot
+        SaveWrapper save, ImmutablePKM pkm, int boxId, int boxSlot
     ) : base(GetPKMId(idBase, boxId, boxSlot), pkm, save.Generation)
     {
         Save = save;
@@ -87,6 +87,13 @@ public class PkmSaveDTO : BasePkmVersionDTO
         CanDelete = !IsLocked && CanMove;
         CanMoveToMain = !IsLocked && Version > 0 && Generation > 0 && CanDelete && !IsShadow && !IsEgg && Party == -1;
         CanMoveToSave = !IsLocked && Version > 0 && Generation > 0 && CanMoveToMain;
+    }
+
+    public override PkmSaveDTO WithPKM(ImmutablePKM pkm)
+    {
+        return FromPkm(
+            Save, pkm, BoxId, BoxSlot
+        );
     }
 
     public PkmVersionDTO? GetPkmVersion(PkmVersionLoader pkmVersionLoader)

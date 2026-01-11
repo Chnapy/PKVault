@@ -40,14 +40,11 @@ public class LoadersService
         var dexLoader = new DexLoader();
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
 
-        var saveById = await saveService.GetSaveById();
+        var saveById = await saveService.GetSaveCloneById();
         if (saveById.Count > 0)
         {
-            saveById.Values.ToList().ForEach((_save) =>
+            saveById.Values.ToList().ForEach((save) =>
             {
-                // TODO find a cleaner way
-                var save = _save.Clone();
-                save.ID32 = _save.ID32; // required since it can be computed
                 saveLoadersDict.Add(save.ID32, new()
                 {
                     Save = save,

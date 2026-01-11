@@ -25,11 +25,10 @@ public class MainUpdateBankAction(string bankId, string bankName, bool isDefault
 
             otherDefaultBanks.ForEach(b =>
             {
-                b.IsDefault = false;
-                loaders.bankLoader.WriteEntity(b);
+                loaders.bankLoader.WriteEntity(b with { IsDefault = false });
             });
 
-            bank.IsDefault = isDefault;
+            bank = loaders.bankLoader.WriteEntity(bank with { IsDefault = isDefault });
         }
 
         var relatedBoxesIds = loaders.boxLoader.GetAllEntities().Values.ToList()
@@ -42,9 +41,12 @@ public class MainUpdateBankAction(string bankId, string bankName, bool isDefault
             Saves: view.Saves
         );
 
-        bank.Name = bankName;
-        bank.Order = order;
-        bank.View = view;
+        bank = loaders.bankLoader.WriteEntity(bank with
+        {
+            Name = bankName,
+            Order = order,
+            View = view
+        });
 
         loaders.bankLoader.WriteEntity(bank);
         loaders.bankLoader.NormalizeOrders();

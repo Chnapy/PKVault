@@ -1,15 +1,11 @@
 using System.Collections.Concurrent;
-using System.Security.Cryptography;
-using System.Text;
 using PKHeX.Core;
 
 public class SaveService
 {
-    public static byte[] GetSaveFileData(SaveFile save) => save.Write().ToArray();
-
     private readonly Locker<
         bool,
-        (ConcurrentDictionary<uint, SaveFile> SaveById, ConcurrentDictionary<string, SaveFile> SaveByPath)
+        (ConcurrentDictionary<uint, SaveWrapper> SaveById, ConcurrentDictionary<string, SaveWrapper> SaveByPath)
     > savesLocker;
 
     public SaveService()
@@ -17,13 +13,21 @@ public class SaveService
         savesLocker = new("Saves", true, ReadLocalSaves);
     }
 
-    public async Task<Dictionary<uint, SaveFile>> GetSaveById()
+    public async Task<Dictionary<uint, SaveWrapper>> GetSaveCloneById()
+    {
+        var (SaveById, _) = await savesLocker.GetValue();
+        return SaveById
+          .Select(entry => (entry.Key, entry.Value.Clone()))
+          .ToDictionary();
+    }
+
+    public async Task<Dictionary<uint, SaveWrapper>> GetSaveById()
     {
         var (SaveById, _) = await savesLocker.GetValue();
         return SaveById.ToDictionary();
     }
 
-    public async Task<Dictionary<string, SaveFile>> GetSaveByPath()
+    public async Task<Dictionary<string, SaveWrapper>> GetSaveByPath()
     {
         var (_, SaveByPath) = await savesLocker.GetValue();
         return SaveByPath.ToDictionary();
@@ -39,13 +43,13 @@ public class SaveService
             var mainSave = SaveByPath[mainPath];
             var mainSaveLastWriteTime = File.GetLastWriteTime(mainPath);
 
-            record.TryAdd(mainSave.ID32, SaveInfosDTO.FromSave(mainSave, mainSaveLastWriteTime));
+            record.TryAdd(mainSave.Id, SaveInfosDTO.FromSave(mainSave, mainSaveLastWriteTime));
         });
 
         return record;
     }
 
-    public async Task WriteSave(SaveFile save)
+    public async Task WriteSave(SaveWrapper save)
     {
         var (SaveById, SaveByPath) = await savesLocker.GetValue();
         var path = SaveByPath.Keys.ToList().Find(path => SaveByPath[path].ID32 == save.ID32);
@@ -59,11 +63,11 @@ public class SaveService
 
         var dirPath = Path.GetDirectoryName(path)!;
 
-        File.WriteAllBytes(path, GetSaveFileData(save));
+        File.WriteAllBytes(path, save.GetSaveFileData());
 
         UpdateGlobalsWithSave(SaveById, SaveByPath, save, path);
 
-        Console.WriteLine($"Writed save {save.ID32} to {path}");
+        Console.WriteLine($"Writed save {save.Id} to {path}");
     }
 
     public void InvalidateSaves()
@@ -76,10 +80,10 @@ public class SaveService
         await savesLocker.GetValue();
     }
 
-    private async Task<(ConcurrentDictionary<uint, SaveFile> SaveById, ConcurrentDictionary<string, SaveFile> SaveByPath)> ReadLocalSaves(bool _)
+    private async Task<(ConcurrentDictionary<uint, SaveWrapper> SaveById, ConcurrentDictionary<string, SaveWrapper> SaveByPath)> ReadLocalSaves(bool _)
     {
-        ConcurrentDictionary<uint, SaveFile> SaveById = [];
-        ConcurrentDictionary<string, SaveFile> SaveByPath = [];
+        ConcurrentDictionary<uint, SaveWrapper> SaveById = [];
+        ConcurrentDictionary<string, SaveWrapper> SaveByPath = [];
 
         var globs = SettingsService.BaseSettings.SettingsMutable.SAVE_GLOBS;
         var searchPaths = MatcherUtil.SearchPaths(globs);
@@ -96,29 +100,24 @@ public class SaveService
     }
 
     private void UpdateSaveFromPath(
-        ConcurrentDictionary<uint, SaveFile> SaveById,
-        ConcurrentDictionary<string, SaveFile> SaveByPath,
+        ConcurrentDictionary<uint, SaveWrapper> SaveById,
+        ConcurrentDictionary<string, SaveWrapper> SaveByPath,
         string path)
     {
         // Console.WriteLine($"UPDATE SAVE {path}");
 
-        var save = SaveByPath.TryGetValue(path, out var value) ? value
-        : (SaveUtil.TryGetSaveFile(path, out var result) ? result : null);
+        SaveWrapper? save = SaveByPath.TryGetValue(path, out var value)
+            ? value
+            : (SaveUtil.TryGetSaveFile(path, out var result)
+                ? new(result, path)
+                : null);
 
         if (save == null)
         {
             return;
         }
 
-        if (save.ID32 == default)
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(path);
-            byte[] hash = SHA1.HashData(bytes);
-            var saveId = BitConverter.ToUInt32(hash, 0);
-            save.ID32 = saveId;
-        }
-
-        SaveById.TryGetValue(save.ID32, out var existingSave);
+        SaveById.TryGetValue(save.Id, out var existingSave);
         if (existingSave != default)
         {
             // Console.WriteLine($"Multiple existing saves with ID {save.ID32}");
@@ -132,16 +131,16 @@ public class SaveService
 
         UpdateGlobalsWithSave(SaveById, SaveByPath, save, path);
 
-        Console.WriteLine($"Save {save.ID32} - G{save.Generation} - Version {save.Version} - play-time {save.PlayTimeString}");
+        Console.WriteLine($"Save {save.Id} - G{save.Generation} - Version {save.Version} - play-time {save.PlayTimeString}");
     }
 
     private void UpdateGlobalsWithSave(
-        ConcurrentDictionary<uint, SaveFile> SaveById,
-        ConcurrentDictionary<string, SaveFile> SaveByPath,
-        SaveFile save, string path)
+        ConcurrentDictionary<uint, SaveWrapper> SaveById,
+        ConcurrentDictionary<string, SaveWrapper> SaveByPath,
+        SaveWrapper save, string path)
     {
         SaveByPath[path] = save;
-        SaveById[save.ID32] = save;
+        SaveById[save.Id] = save;
     }
 
     // public async Task<DataUpdateFlags> UploadNewSave(byte[] fileBytes, string formFilename)

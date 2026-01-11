@@ -89,14 +89,16 @@ public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveE
                 applyValue: (entry) =>
                 {
                     var currentValue = pkmVersions[entry.Index];
-                    currentValue.PkmDto.PkmEntity.BoxId = (uint)entry.BoxId;
-                    currentValue.PkmDto.PkmEntity.BoxSlot = (uint)entry.BoxSlot;
-                    loaders.pkmLoader.WriteDto(currentValue.PkmDto);
+                    loaders.pkmLoader.WriteEntity(currentValue.PkmDto.PkmEntity with
+                    {
+                        BoxId = (uint)entry.BoxId,
+                        BoxSlot = (uint)entry.BoxSlot
+                    });
                 },
                 onSpaceMissing: () =>
                 {
                     var box = MainCreateBoxAction.CreateBox(loaders, flags, bankId, null);
-                    boxes.Add(box);
+                    boxes.Add(new BoxDTO() { BoxEntity = box });
                 }
             );
         }

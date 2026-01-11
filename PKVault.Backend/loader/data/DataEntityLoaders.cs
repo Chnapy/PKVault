@@ -80,7 +80,7 @@ public class DataEntityLoaders(SaveService saveService)
 
 public struct SaveLoaders
 {
-    public required SaveFile Save { get; set; }
+    public required SaveWrapper Save { get; set; }
     public required SaveBoxLoader Boxes { get; set; }
     public required SavePkmLoader Pkms { get; set; }
 };

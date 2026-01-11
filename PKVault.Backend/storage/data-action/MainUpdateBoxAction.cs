@@ -33,11 +33,13 @@ public class MainUpdateBoxAction(string boxId, string boxName, int order, string
                 var bank = loaders.bankLoader.GetEntity(box.BankId);
                 if (bank.View.MainBoxIds.Contains(box.IdInt))
                 {
-                    bank.View = new(
-                        MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
-                        Saves: bank.View.Saves
-                    );
-                    loaders.bankLoader.WriteEntity(bank);
+                    bank = loaders.bankLoader.WriteEntity(bank with
+                    {
+                        View = new(
+                            MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
+                            Saves: bank.View.Saves
+                        )
+                    });
                 }
             }
 
@@ -55,13 +57,15 @@ public class MainUpdateBoxAction(string boxId, string boxName, int order, string
         }
 
         var boxOldName = box.Name;
-        box.Type = type;
-        box.Name = boxName;
-        box.Order = order;
-        box.BankId = bankId;
-        box.SlotCount = slotCount;
 
-        loaders.boxLoader.WriteEntity(box);
+        loaders.boxLoader.WriteEntity(box with
+        {
+            Type = type,
+            Name = boxName,
+            Order = order,
+            BankId = bankId,
+            SlotCount = slotCount,
+        });
         loaders.boxLoader.NormalizeOrders();
 
         return new()

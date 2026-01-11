@@ -24,7 +24,7 @@ public class DexService(LoadersService loadersService, StaticDataService staticD
 
         var saveLoadersDict = loaders.saveLoadersDict;
 
-        var saves = saveIds.Select(id => id == FakeSaveFile.Default.ID32 ? FakeSaveFile.Default : saveLoadersDict[id].Save).ToList();
+        List<SaveWrapper> saves = saveIds.Select(id => id == FakeSaveFile.Default.ID32 ? new(FakeSaveFile.Default, "") : saveLoadersDict[id].Save).ToList();
 
         var staticData = await staticDataService.GetStaticData();
 
@@ -41,7 +41,7 @@ public class DexService(LoadersService loadersService, StaticDataService staticD
         return dex;
     }
 
-    private static bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, SaveFile save, StaticDataDTO staticData, DataEntityLoaders loaders)
+    private static bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, SaveWrapper save, StaticDataDTO staticData, DataEntityLoaders loaders)
     {
         var service = GetDexService(save, loaders);
 
@@ -52,15 +52,15 @@ public class DexService(LoadersService loadersService, StaticDataService staticD
         return success;
     }
 
-    public static DexGenService? GetDexService<S>(S save, DataEntityLoaders loaders) where S : SaveFile
+    public static DexGenService? GetDexService(SaveWrapper save, DataEntityLoaders loaders)
     {
-        static DexGenService? notHandled(SaveFile save)
+        static DexGenService? notHandled(SaveWrapper save)
         {
             Console.WriteLine("Save version/gen not handled: " + save.Version + "/" + save.Generation);
             return null;
         }
 
-        return save switch
+        return save.GetSave() switch
         {
             FakeSaveFile => new DexMainService(loaders),
             SAV1 sav1 => new Dex123Service(sav1),

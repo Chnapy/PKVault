@@ -15,7 +15,7 @@ public class DexSyncAction(DexService dexService, uint[] saveIds) : DataAction
 
         saveLoaders.ForEach(saveLoader =>
         {
-            var service = DexService.GetDexService(saveLoader?.Save ?? FakeSaveFile.Default, loaders);
+            var service = DexService.GetDexService(saveLoader?.Save ?? new(FakeSaveFile.Default, ""), loaders);
 
             dex.ToList().ForEach(specEntry => specEntry.Value.Values.ToList().ForEach(entry =>
             {

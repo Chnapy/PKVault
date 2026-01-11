@@ -57,7 +57,7 @@ public class MovePkmBankAction(
             var boxSlotCount = new int[] { missingSlotCount, 30 }.Max();
 
             var box = MainCreateBoxAction.CreateBox(loaders, flags, bankId, boxSlotCount);
-            mainBoxes.Add(box);
+
             HashSet<uint> unoccupiedSlots = [];
             for (uint slot = 0; slot < box.SlotCount; slot++)
             {
@@ -117,10 +117,11 @@ public class MovePkmBankAction(
             throw new Exception("Pkm already present");
         }
 
-        dto.PkmEntity.BoxId = targetBoxId;
-        dto.PkmEntity.BoxSlot = targetBoxSlot;
-
-        loaders.pkmLoader.WriteDto(dto);
+        loaders.pkmLoader.WriteEntity(dto.PkmEntity with
+        {
+            BoxId = targetBoxId,
+            BoxSlot = targetBoxSlot
+        });
 
         var pkmName = loaders.pkmVersionLoader.GetDto(pkmId)?.Nickname;
         var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
@@ -205,28 +206,21 @@ public class MovePkmBankAction(
         if (pkmVersionEntity == null)
         {
             // create pkm & pkm-version
-            var pkmEntityToCreate = new PkmEntity
-            {
-                SchemaVersion = loaders.pkmLoader.GetLastSchemaVersion(),
-                Id = savePkm.IdBase,
-                BoxId = targetBoxId,
-                BoxSlot = targetBoxSlot,
-                SaveId = attached ? sourceSaveId : null
-            };
-            var pkmDtoToCreate = PkmDTO.FromEntity(pkmEntityToCreate);
+            var pkmEntityToCreate = loaders.pkmLoader.WriteEntity(new(
+                SchemaVersion: loaders.pkmLoader.GetLastSchemaVersion(),
+                Id: savePkm.IdBase,
+                BoxId: targetBoxId,
+                BoxSlot: targetBoxSlot,
+                SaveId: attached ? sourceSaveId : null
+            ));
 
-            pkmVersionEntity = new PkmVersionEntity
-            {
-                SchemaVersion = loaders.pkmVersionLoader.GetLastSchemaVersion(),
-                Id = savePkm.IdBase,
-                PkmId = pkmEntityToCreate.Id,
-                Generation = savePkm.Generation,
-                Filepath = PKMLoader.GetPKMFilepath(savePkm.Pkm),
-            };
-            var pkmVersionDto = PkmVersionDTO.FromEntity(pkmVersionEntity, savePkm.Pkm, pkmDtoToCreate);
-
-            loaders.pkmLoader.WriteDto(pkmDtoToCreate);
-            loaders.pkmVersionLoader.WriteDto(pkmVersionDto);
+            pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(new(
+                SchemaVersion: loaders.pkmVersionLoader.GetLastSchemaVersion(),
+                Id: savePkm.IdBase,
+                PkmId: pkmEntityToCreate.Id,
+                Generation: savePkm.Generation,
+                Filepath: PKMLoader.GetPKMFilepath(savePkm.Pkm)
+            ), savePkm.Pkm);
         }
 
         var pkmDto = loaders.pkmLoader.GetDto(pkmVersionEntity.PkmId);
@@ -238,8 +232,7 @@ public class MovePkmBankAction(
 
             if (!attached)
             {
-                pkmDto.PkmEntity.SaveId = default;
-                loaders.pkmLoader.WriteDto(pkmDto);
+                loaders.pkmLoader.WriteEntity(pkmDto.PkmEntity with { SaveId = default });
             }
         }
 
@@ -254,9 +247,9 @@ public class MovePkmBankAction(
         flags.Dex = true;
     }
 
-    private static void CheckPkmTradeRecord(SaveFile save)
+    private static void CheckPkmTradeRecord(SaveWrapper save)
     {
-        if (save is SAV3FRLG saveG3FRLG)
+        if (save.GetSave() is SAV3FRLG saveG3FRLG)
         {
             var records = new Record3(saveG3FRLG);
 
@@ -265,7 +258,7 @@ public class MovePkmBankAction(
             var pkmTradeCount = records.GetRecord(pkmTradeIndex);
             records.SetRecord(pkmTradeIndex, pkmTradeCount + 1);
         }
-        else if (save is SAV4HGSS saveG4HGSS)
+        else if (save.GetSave() is SAV4HGSS saveG4HGSS)
         {
             /**
              * Found record data types from Record32:

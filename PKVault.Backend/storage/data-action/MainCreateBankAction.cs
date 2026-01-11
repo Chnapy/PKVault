@@ -22,15 +22,14 @@ public class MainCreateBankAction : DataAction
         var order = maxOrder + 1;
         var name = GetNewName();
 
-        loaders.bankLoader.WriteEntity(new()
-        {
-            SchemaVersion = loaders.bankLoader.GetLastSchemaVersion(),
-            Id = id.ToString(),
-            Name = name,
-            IsDefault = false,
-            Order = order, // normalized just after
-            View = new(MainBoxIds: [], Saves: [])
-        });
+        loaders.bankLoader.WriteEntity(new(
+            SchemaVersion: loaders.bankLoader.GetLastSchemaVersion(),
+            Id: id.ToString(),
+            Name: name,
+            IsDefault: false,
+            Order: order, // normalized just after
+            View: new(MainBoxIds: [], Saves: [])
+        ));
         loaders.bankLoader.NormalizeOrders();
 
         MainCreateBoxAction.CreateBox(loaders, flags, id.ToString(), null);

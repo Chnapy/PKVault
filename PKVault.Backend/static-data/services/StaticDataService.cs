@@ -228,10 +228,12 @@ public class StaticDataService(PokeApiService pokeApiService)
 
                     var hasGenderDifferences = generation > 3 && formObj.FormName == "" && pkmSpeciesObj.HasGenderDifferences;
 
-                    var pkm = EntityBlank.GetBlank(generation);
-                    pkm.Species = species;
-                    pkm.Form = (byte)formIndex;
-                    pkm.RefreshChecksum();
+                    var pkm = new ImmutablePKM(EntityBlank.GetBlank(generation)).Update(pkm =>
+                    {
+                        pkm.Species = species;
+                        pkm.Form = (byte)formIndex;
+                        pkm.RefreshChecksum();
+                    });
 
                     var legality = PkmLegalityDTO.GetLegalitySafe(pkm);
                     var battleOnly = legality.Results.Any(result =>
@@ -764,8 +766,8 @@ public class StaticDataService(PokeApiService pokeApiService)
                             continue;
                         }
 
-                        var blankSave = BlankSaveFile.Get(saveVersion);
-                        var speciesAllowed = SaveInfosDTO.IsSpeciesAllowed(evolveSpecies, blankSave);
+                        var blankSave = new SaveWrapper(BlankSaveFile.Get(saveVersion), "");
+                        var speciesAllowed = blankSave.IsSpeciesAllowed(evolveSpecies);
                         if (!speciesAllowed)
                         {
                             // Console.WriteLine($"EVOLVE TRADE NOT ALLOWED {species}->{evolveSpecies} v={version}");
