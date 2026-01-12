@@ -78,9 +78,8 @@ public class DataEntityLoaders(SaveService saveService)
     }
 }
 
-public struct SaveLoaders
-{
-    public required SaveWrapper Save { get; set; }
-    public required SaveBoxLoader Boxes { get; set; }
-    public required SavePkmLoader Pkms { get; set; }
-};
+public record SaveLoaders(
+    SaveWrapper Save,
+    SaveBoxLoader Boxes,
+    SavePkmLoader Pkms
+);

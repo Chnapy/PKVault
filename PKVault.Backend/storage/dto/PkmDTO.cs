@@ -1,11 +1,12 @@
-public class PkmDTO : IWithId
+using System.Text.Json.Serialization;
+
+public record PkmDTO(
+    [property: JsonIgnore] PkmEntity PkmEntity
+) : IWithId
 {
     public static PkmDTO FromEntity(PkmEntity entity)
     {
-        return new PkmDTO
-        {
-            PkmEntity = entity,
-        };
+        return new(entity);
     }
 
     public string Id { get { return PkmEntity.Id; } }
@@ -21,6 +22,4 @@ public class PkmDTO : IWithId
     public bool CanMoveAttachedToSave { get => SaveId == null; }
 
     public bool CanDelete { get => SaveId == null; }
-
-    public required PkmEntity PkmEntity;
 }

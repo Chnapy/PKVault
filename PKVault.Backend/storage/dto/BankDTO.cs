@@ -1,4 +1,8 @@
-public class BankDTO : IWithId
+using System.Text.Json.Serialization;
+
+public record BankDTO(
+    [property: JsonIgnore] BankEntity BankEntity
+) : IWithId
 {
     public string Id => BankEntity.Id;
 
@@ -11,6 +15,4 @@ public class BankDTO : IWithId
     public int Order => BankEntity.Order;
 
     public BankEntity.BankView View => BankEntity.View;
-
-    public required BankEntity BankEntity;
 }

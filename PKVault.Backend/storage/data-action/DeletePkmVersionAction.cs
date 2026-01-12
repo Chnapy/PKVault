@@ -25,11 +25,10 @@ public class DeletePkmVersionAction(string[] pkmVersionIds) : DataAction
                 loaders.pkmLoader.DeleteEntity(pkm.Id);
             }
 
-            return new()
-            {
-                type = DataActionType.DELETE_PKM_VERSION,
-                parameters = [pkmVersion.Nickname, pkmVersion.Generation]
-            };
+            return new(
+                type: DataActionType.DELETE_PKM_VERSION,
+                parameters: [pkmVersion.Nickname, pkmVersion.Generation]
+            );
         }
 
         List<DataActionPayload> payloads = [];

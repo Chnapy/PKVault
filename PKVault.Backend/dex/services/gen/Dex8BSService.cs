@@ -28,19 +28,18 @@ public class Dex8BSService(SAV8BS save) : DexGenService(save)
 
         var isCaught = isSeen && state == ZukanState8b.Caught;
 
-        return new DexItemForm
-        {
-            Form = form,
-            Gender = gender,
-            Types = GetTypes(pi),
-            Abilities = GetAbilities(pi),
-            BaseStats = GetBaseStats(pi),
-            IsSeen = isSeen,
-            IsSeenShiny = isSeenShiny,
-            IsCaught = isCaught,
-            IsOwned = isOwned,
-            IsOwnedShiny = isOwnedShiny,
-        };
+        return new DexItemForm(
+            Form: form,
+            Gender: gender,
+            Types: GetTypes(pi),
+            Abilities: GetAbilities(pi),
+            BaseStats: GetBaseStats(pi),
+            IsSeen: isSeen,
+            IsSeenShiny: isSeenShiny,
+            IsCaught: isCaught,
+            IsOwned: isOwned,
+            IsOwnedShiny: isOwnedShiny
+        );
     }
 
     public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)

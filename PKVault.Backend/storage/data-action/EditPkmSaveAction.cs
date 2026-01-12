@@ -35,10 +35,9 @@ public class EditPkmSaveAction(
             await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersion.PkmId, pkmSave.Id)]);
         }
 
-        return new()
-        {
-            type = DataActionType.EDIT_PKM_SAVE,
-            parameters = [saveLoaders.Save.Version, pkmSave.Nickname]
-        };
+        return new(
+            type: DataActionType.EDIT_PKM_SAVE,
+            parameters: [saveLoaders.Save.Version, pkmSave.Nickname]
+        );
     }
 }

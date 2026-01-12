@@ -24,19 +24,18 @@ public class Dex3ColoService(SAV3Colosseum save) : DexGenService(save)
         var isSeen = isOwned || save.GetSeen(species);
         var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
 
-        return new DexItemForm
-        {
-            Form = form,
-            Gender = gender,
-            Types = GetTypes(pi),
-            Abilities = GetAbilities(pi),
-            BaseStats = GetBaseStats(pi),
-            IsSeen = isSeen,
-            IsSeenShiny = false,
-            IsCaught = ownedPkms.Count > 0 || save.GetCaught(species),
-            IsOwned = isOwned,
-            IsOwnedShiny = isOwnedShiny,
-        };
+        return new DexItemForm(
+            Form: form,
+            Gender: gender,
+            Types: GetTypes(pi),
+            Abilities: GetAbilities(pi),
+            BaseStats: GetBaseStats(pi),
+            IsSeen: isSeen,
+            IsSeenShiny: false,
+            IsCaught: ownedPkms.Count > 0 || save.GetCaught(species),
+            IsOwned: isOwned,
+            IsOwnedShiny: isOwnedShiny
+        );
     }
 
     public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)

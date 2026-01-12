@@ -41,21 +41,20 @@ public class GenPokeapiService(StaticDataService staticDataService, GenSpriteshe
         var evolves = staticDataService.GetStaticEvolves();
         var generations = staticDataService.GetStaticGenerations(lang);
 
-        var dto = new StaticDataDTO
-        {
-            Versions = await versions,
-            Species = await species,
-            Stats = await stats,
-            Types = types,
-            Moves = await moves,
-            Natures = await natures,
-            Abilities = abilities,
-            Items = await items,
-            Evolves = await evolves,
-            Generations = await generations,
-            Spritesheets = await spritesheets,
-            EggSprite = StaticDataService.GetEggSprite()
-        };
+        var dto = new StaticDataDTO(
+            Versions: await versions,
+            Species: await species,
+            Stats: await stats,
+            Types: types,
+            Moves: await moves,
+            Natures: await natures,
+            Abilities: abilities,
+            Items: await items,
+            Evolves: await evolves,
+            Generations: await generations,
+            Spritesheets: await spritesheets,
+            EggSprite: StaticDataService.GetEggSprite()
+        );
 
         time();
 

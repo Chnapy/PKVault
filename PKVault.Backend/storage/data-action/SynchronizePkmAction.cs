@@ -89,11 +89,10 @@ public class SynchronizePkmAction(
 
         var pkmDto = loaders.pkmLoader.GetEntity(pkmMainAndPkmSaveIds[0].PkmId);
 
-        return new()
-        {
-            type = DataActionType.PKM_SYNCHRONIZE,
-            parameters = [pkmDto.SaveId, pkmMainAndPkmSaveIds.Length]
-        };
+        return new(
+            type: DataActionType.PKM_SYNCHRONIZE,
+            parameters: [pkmDto.SaveId, pkmMainAndPkmSaveIds.Length]
+        );
     }
 
     public static async Task SynchronizeSaveToPkmVersion(

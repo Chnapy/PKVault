@@ -126,11 +126,10 @@ public class MovePkmBankAction(
         var pkmName = loaders.pkmVersionLoader.GetDto(pkmId)?.Nickname;
         var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
 
-        return new()
-        {
-            type = DataActionType.MOVE_PKM,
-            parameters = [pkmName, null, null, boxName, targetBoxSlot, attached]
-        };
+        return new(
+            type: DataActionType.MOVE_PKM,
+            parameters: [pkmName, null, null, boxName, targetBoxSlot, attached]
+        );
     }
 
     private async Task<DataActionPayload> SaveToMain(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, uint targetBoxId, uint targetBoxSlot)
@@ -174,11 +173,10 @@ public class MovePkmBankAction(
 
         var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
 
-        return new()
-        {
-            type = DataActionType.MOVE_PKM,
-            parameters = [savePkm?.Nickname, saveLoaders.Save.Version, null, boxName, targetBoxSlot, attached]
-        };
+        return new(
+            type: DataActionType.MOVE_PKM,
+            parameters: [savePkm?.Nickname, saveLoaders.Save.Version, null, boxName, targetBoxSlot, attached]
+        );
     }
 
     private async Task SaveToMainWithoutCheckTarget(

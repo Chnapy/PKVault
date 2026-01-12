@@ -14,12 +14,11 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
         {
             ownedPkmsBySpecies.TryGetValue(entity.Species, out var pkmForms);
 
-            var item = new DexItemDTO()
-            {
-                Id = GetDexItemID(entity.Species),
-                Species = entity.Species,
-                SaveId = FakeSaveFile.Default.ID32,
-                Forms = [.. entity.Forms.Select(form =>
+            var item = new DexItemDTO(
+                Id: GetDexItemID(entity.Species),
+                Species: entity.Species,
+                SaveId: FakeSaveFile.Default.ID32,
+                Forms: [.. entity.Forms.Select(form =>
                 {
                     var pkmFormsFiltered = pkmForms?.FindAll(f => f.Form == form.Form
                         && f.Gender == form.Gender
@@ -42,23 +41,22 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
                         form.Gender
                     );
 
-                    return new DexItemForm()
-                    {
-                        Form = form.Form,
-                        Context = commonForm.Context,
-                        Generation = commonForm.Generation,
-                        Gender = form.Gender,
-                        Types = commonForm.Types,
-                        Abilities = commonForm.Abilities,
-                        BaseStats = commonForm.BaseStats,
-                        IsSeen = form.IsCaught,
-                        IsSeenShiny = form.IsCaughtShiny,
-                        IsCaught = form.IsCaught,
-                        IsOwned = commonForm.IsOwned,
-                        IsOwnedShiny = commonForm.IsOwnedShiny,
-                    };
+                    return new DexItemForm(
+                        Form: form.Form,
+                        Context: commonForm.Context,
+                        Generation: commonForm.Generation,
+                        Gender: form.Gender,
+                        Types: commonForm.Types,
+                        Abilities: commonForm.Abilities,
+                        BaseStats: commonForm.BaseStats,
+                        IsSeen: form.IsCaught,
+                        IsSeenShiny: form.IsCaughtShiny,
+                        IsCaught: form.IsCaught,
+                        IsOwned: commonForm.IsOwned,
+                        IsOwnedShiny: commonForm.IsOwnedShiny
+                    );
                 })]
-            };
+            );
 
             if (!dex.TryGetValue(entity.Species, out var arr))
             {

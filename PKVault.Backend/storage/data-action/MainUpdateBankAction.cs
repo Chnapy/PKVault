@@ -51,10 +51,9 @@ public class MainUpdateBankAction(string bankId, string bankName, bool isDefault
         loaders.bankLoader.WriteEntity(bank);
         loaders.bankLoader.NormalizeOrders();
 
-        return new()
-        {
-            type = DataActionType.MAIN_UPDATE_BANK,
-            parameters = [bankName, isDefault, view]
-        };
+        return new(
+            type: DataActionType.MAIN_UPDATE_BANK,
+            parameters: [bankName, isDefault, view]
+        );
     }
 }

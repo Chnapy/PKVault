@@ -168,11 +168,10 @@ public class BackupService(
 
                 var dateTime = DeserializeDateTime(dateTimeStr);
 
-                return new BackupDTO()
-                {
-                    CreatedAt = dateTime,
-                    Filepath = path,
-                };
+                return new BackupDTO(
+                    CreatedAt: dateTime,
+                    Filepath: path
+                );
             }
             catch (Exception err)
             {

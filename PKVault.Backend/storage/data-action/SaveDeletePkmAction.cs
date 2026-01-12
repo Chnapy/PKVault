@@ -22,11 +22,10 @@ public class SaveDeletePkmAction(uint saveId, string[] pkmIds) : DataAction
 
             flags.Dex = true;
 
-            return new()
-            {
-                type = DataActionType.SAVE_DELETE_PKM,
-                parameters = [saveLoaders.Save.Version, dto.Nickname]
-            };
+            return new(
+                type: DataActionType.SAVE_DELETE_PKM,
+                parameters: [saveLoaders.Save.Version, dto.Nickname]
+            );
         }
 
         List<DataActionPayload> payloads = [];

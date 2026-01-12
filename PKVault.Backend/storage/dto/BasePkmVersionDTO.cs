@@ -1,8 +1,7 @@
 using System.Text.Json.Serialization;
 using PKHeX.Core;
-using PKHeX.Core.Searching;
 
-public abstract class BasePkmVersionDTO : IWithId
+public abstract record BasePkmVersionDTO : IWithId
 {
     public string Id { get; }
 
@@ -185,10 +184,9 @@ public abstract class BasePkmVersionDTO : IWithId
     public abstract BasePkmVersionDTO WithPKM(ImmutablePKM pkm);
 }
 
-public struct MoveItem
-{
-    public int Id { get; set; }
-    public byte Type { get; set; }
-    public string Text { get; set; }
-    public List<MoveSourceType> SourceTypes { get; set; }
-};
+public record MoveItem(
+    int Id
+// byte Type,
+// string Text,
+// List<MoveSourceType> SourceTypes
+);

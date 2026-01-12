@@ -55,11 +55,10 @@ public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveE
             );
         }
 
-        return new()
-        {
-            type = DataActionType.SORT_PKM,
-            parameters = []
-        };
+        return new(
+            type: DataActionType.SORT_PKM,
+            parameters: []
+        );
     }
 
     private async Task<DataActionPayload> ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags, int fromBoxId, int toBoxId, bool leaveEmptySlot)
@@ -98,16 +97,15 @@ public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveE
                 onSpaceMissing: () =>
                 {
                     var box = MainCreateBoxAction.CreateBox(loaders, flags, bankId, null);
-                    boxes.Add(new BoxDTO() { BoxEntity = box });
+                    boxes.Add(new(box));
                 }
             );
         }
 
-        return new DataActionPayload
-        {
-            type = DataActionType.SORT_PKM,
-            parameters = []
-        };
+        return new DataActionPayload(
+            type: DataActionType.SORT_PKM,
+            parameters: []
+        );
     }
 
     private List<BoxDTO> GetBoxes(int fromBoxId, int toBoxId, Func<string, BoxDTO?> GetBoxDto, Func<List<BoxDTO>> GetBoxDtoAll)

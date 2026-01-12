@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 using PKHeX.Core;
 
-public class PkmSaveDTO : BasePkmVersionDTO
+public record PkmSaveDTO : BasePkmVersionDTO
 {
     public static PkmSaveDTO FromPkm(
         SaveWrapper save, ImmutablePKM pkm, int boxId, int boxSlot
@@ -47,7 +47,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
 
     public bool IsStarter { get; }
 
-    public bool IsDuplicate { get; set; }
+    public bool IsDuplicate { get; private set; }
 
     // -- actions
 
@@ -70,7 +70,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
     ) : base(GetPKMId(idBase, boxId, boxSlot), pkm, save.Generation)
     {
         Save = save;
-        SaveId = save.ID32;
+        SaveId = save.Id;
         BoxId = boxId;
         BoxSlot = boxSlot;
 
@@ -89,6 +89,11 @@ public class PkmSaveDTO : BasePkmVersionDTO
         CanMoveToSave = !IsLocked && Version > 0 && Generation > 0 && CanMoveToMain;
     }
 
+    public void SetDuplicate(bool isDuplicate)
+    {
+        IsDuplicate = isDuplicate;
+    }
+
     public override PkmSaveDTO WithPKM(ImmutablePKM pkm)
     {
         return FromPkm(
@@ -99,7 +104,7 @@ public class PkmSaveDTO : BasePkmVersionDTO
     public PkmVersionDTO? GetPkmVersion(PkmVersionLoader pkmVersionLoader)
     {
         var pkmVersion = pkmVersionLoader.GetDto(IdBase);
-        if (pkmVersion?.PkmDto?.SaveId == Save.ID32)
+        if (pkmVersion?.PkmDto?.SaveId == Save.Id)
         {
             return pkmVersion;
         }

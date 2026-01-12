@@ -112,13 +112,12 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
             });
         }
 
-        return new DexItemDTO
-        {
-            Id = GetDexItemID(species),
-            Species = species,
-            SaveId = save.ID32,
-            Forms = forms,
-        };
+        return new DexItemDTO(
+            Id: GetDexItemID(species),
+            Species: species,
+            SaveId: save.ID32,
+            Forms: forms
+        );
     }
 
     protected string GetDexItemID(ushort species) => $"{species}_{save.ID32}";
@@ -175,10 +174,11 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
     public DexItemForm GetDexItemFormComplete(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender)
     {
-        var itemForm = GetDexItemForm(species, ownedPkms, form, gender);
-        itemForm.Context = save.Context;
-        itemForm.Generation = save.Generation;
-        return itemForm;
+        return GetDexItemForm(species, ownedPkms, form, gender) with
+        {
+            Context = save.Context,
+            Generation = save.Generation
+        };
     }
 
     protected abstract DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender);

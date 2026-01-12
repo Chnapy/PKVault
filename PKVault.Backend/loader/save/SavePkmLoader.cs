@@ -118,7 +118,7 @@ public class SavePkmLoader(
 
         duplicatesDictByIdBase.Values.Where(list => list.Count > 1).SelectMany(list => list).ToList().ForEach(dto =>
         {
-            dto.IsDuplicate = true;
+            dto.SetDuplicate(true);
         });
 
         dtoById = dictById;
@@ -198,7 +198,7 @@ public class SavePkmLoader(
                 break;
         }
 
-        savesFlags.UseSave(save.ID32).SavePkms.Ids.Add(dto.Id);
+        savesFlags.UseSave(save.Id).SavePkms.Ids.Add(dto.Id);
 
         needUpdate = true;
         // Console.WriteLine($"ADD {dto.Id} / {dto.BoxId} / {dto.BoxSlot} / CurrentHandler={pkm.CurrentHandler}");
@@ -228,7 +228,7 @@ public class SavePkmLoader(
 
             // Console.WriteLine($"REMOVE {id} / {dto.Box} / {dto.BoxSlot}");
 
-            savesFlags.UseSave(save.ID32).SavePkms.Ids.Add(dto.Id);
+            savesFlags.UseSave(save.Id).SavePkms.Ids.Add(dto.Id);
             needUpdate = true;
             HasWritten = true;
         }
@@ -275,7 +275,7 @@ public class SavePkmLoader(
                     var dtoId = PkmSaveDTO.GetPKMId(
                         pkm.GetPKMIdBase(), (int)BoxType.Party, i
                     );
-                    savesFlags.UseSave(save.ID32).SavePkms.Ids.Add(dtoId);
+                    savesFlags.UseSave(save.Id).SavePkms.Ids.Add(dtoId);
                 }
             }
             else

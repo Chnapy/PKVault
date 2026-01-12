@@ -256,13 +256,12 @@ public class ActionService(
             {
                 if (data.Value > 0 && moveSource.Info.CanLearn((ushort)data.Value))
                 {
-                    var item = new MoveItem
-                    {
-                        Id = data.Value,
-                        // Type = MoveInfo.GetType((ushort)data.Value, Pkm.Context),
-                        // Text = movesStr[data.Value],
-                        // SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Length > data.Value && moveSourceTypesRecord[type][data.Value]),
-                    };
+                    var item = new MoveItem(
+                        Id: data.Value
+                    // Type = MoveInfo.GetType((ushort)data.Value, Pkm.Context),
+                    // Text = movesStr[data.Value],
+                    // SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Length > data.Value && moveSourceTypesRecord[type][data.Value]),
+                    );
                     availableMoves.Add(item);
                 }
             });

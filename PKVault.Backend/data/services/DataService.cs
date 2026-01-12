@@ -25,21 +25,19 @@ public class DataService(
         {
             if (flags.MainBanks.All)
             {
-                return new()
-                {
-                    All = true,
-                    Data = (await storageQueryService.GetMainBanks())
+                return new(
+                    All: true,
+                    Data: (await storageQueryService.GetMainBanks())
                             .Select(dto => (dto.Id, dto ?? null)).ToDictionary()
-                };
+                );
             }
 
             if (flags.MainBanks.Ids.Count > 0)
             {
-                return new()
-                {
-                    All = false,
-                    Data = await storageQueryService.GetMainBanks([.. flags.MainBanks.Ids])
-                };
+                return new(
+                    All: false,
+                    Data: await storageQueryService.GetMainBanks([.. flags.MainBanks.Ids])
+                );
             }
 
             return null;
@@ -49,21 +47,19 @@ public class DataService(
         {
             if (flags.MainBoxes.All)
             {
-                return new()
-                {
-                    All = true,
-                    Data = (await storageQueryService.GetMainBoxes())
+                return new(
+                    All: true,
+                    Data: (await storageQueryService.GetMainBoxes())
                             .Select(dto => (dto.Id, dto ?? null)).ToDictionary()
-                };
+                );
             }
 
             if (flags.MainBoxes.Ids.Count > 0)
             {
-                return new()
-                {
-                    All = false,
-                    Data = await storageQueryService.GetMainBoxes([.. flags.MainBoxes.Ids])
-                };
+                return new(
+                    All: false,
+                    Data: await storageQueryService.GetMainBoxes([.. flags.MainBoxes.Ids])
+                );
             }
 
             return null;
@@ -73,21 +69,19 @@ public class DataService(
         {
             if (flags.MainPkms.All)
             {
-                return new()
-                {
-                    All = true,
-                    Data = (await storageQueryService.GetMainPkms())
+                return new(
+                    All: true,
+                    Data: (await storageQueryService.GetMainPkms())
                             .Select(dto => (dto.Id, dto ?? null)).ToDictionary()
-                };
+                );
             }
 
             if (flags.MainPkms.Ids.Count > 0)
             {
-                return new()
-                {
-                    All = false,
-                    Data = await storageQueryService.GetMainPkms([.. flags.MainPkms.Ids])
-                };
+                return new(
+                    All: false,
+                    Data: await storageQueryService.GetMainPkms([.. flags.MainPkms.Ids])
+                );
             }
 
             return null;
@@ -97,21 +91,19 @@ public class DataService(
         {
             if (flags.MainPkmVersions.All)
             {
-                return new()
-                {
-                    All = true,
-                    Data = (await storageQueryService.GetMainPkmVersions())
+                return new(
+                    All: true,
+                    Data: (await storageQueryService.GetMainPkmVersions())
                             .Select(dto => (dto.Id, dto ?? null)).ToDictionary()
-                };
+                );
             }
 
             if (flags.MainPkmVersions.Ids.Count > 0)
             {
-                return new()
-                {
-                    All = false,
-                    Data = await storageQueryService.GetMainPkmVersions([.. flags.MainPkmVersions.Ids])
-                };
+                return new(
+                    All: false,
+                    Data: await storageQueryService.GetMainPkmVersions([.. flags.MainPkmVersions.Ids])
+                );
             }
 
             return null;
@@ -123,13 +115,12 @@ public class DataService(
 
             if (mainPkmVersions != null)
             {
-                return new()
-                {
-                    All = mainPkmVersions.All,
-                    Data = await storageQueryService.GetPkmsLegality(
+                return new(
+                    All: mainPkmVersions.All,
+                    Data: await storageQueryService.GetPkmsLegality(
                         [.. mainPkmVersions.Data.Keys], null
                     )
-                };
+                );
             }
 
             return null;
@@ -145,21 +136,19 @@ public class DataService(
             {
                 if (saveData.SavePkms.All)
                 {
-                    return new()
-                    {
-                        All = true,
-                        Data = (await storageQueryService.GetSavePkms(saveData.SaveId))
+                    return new(
+                        All: true,
+                        Data: (await storageQueryService.GetSavePkms(saveData.SaveId))
                                 .Select(dto => (dto.Id, dto ?? null)).ToDictionary()
-                    };
+                    );
                 }
 
                 if (saveData.SavePkms.Ids.Count > 0)
                 {
-                    return new()
-                    {
-                        All = false,
-                        Data = await storageQueryService.GetSavePkms(saveData.SaveId, [.. saveData.SavePkms.Ids])
-                    };
+                    return new(
+                        All: false,
+                        Data: await storageQueryService.GetSavePkms(saveData.SaveId, [.. saveData.SavePkms.Ids])
+                    );
                 }
 
                 return null;
@@ -171,25 +160,23 @@ public class DataService(
 
                 if (savePkms != null)
                 {
-                    return new()
-                    {
-                        All = savePkms.All,
-                        Data = await storageQueryService.GetPkmsLegality(
+                    return new(
+                        All: savePkms.All,
+                        Data: await storageQueryService.GetPkmsLegality(
                             [.. savePkms.Data.Keys], saveData.SaveId
                         )
-                    };
+                    );
                 }
 
                 return null;
             });
 
-            return new DataSaveDTO()
-            {
-                SaveId = saveData.SaveId,
-                SaveBoxes = await saveBoxesTask,
-                SavePkms = await savePkmsTask,
-                SavePkmLegality = await savePkmLegalitiesTask,
-            };
+            return new DataSaveDTO(
+                SaveId: saveData.SaveId,
+                SaveBoxes: await saveBoxesTask,
+                SavePkms: await savePkmsTask,
+                SavePkmLegality: await savePkmLegalitiesTask
+            );
         }));
 
         var saveInfosTask = Task.Run(async () => flags.SaveInfos
@@ -202,23 +189,22 @@ public class DataService(
 
         await warningsTask;
 
-        var dto = new DataDTO()
-        {
-            Warnings = await warningsService.GetWarningsDTO(),
-            Settings = settingsService.GetSettings(),
-            Actions = loadersService.GetActionPayloadList(),
-            StaticData = await staticDataTask,
-            MainBanks = await mainBanksTask,
-            MainBoxes = await mainBoxesTask,
-            MainPkms = await mainPkmsTask,
-            MainPkmVersions = await mainPkmVersionsTask,
-            MainPkmLegalities = await mainPkmLegalitiesTask,
-            Saves = [.. await savesTask],
-            InvalidateAllSaves = flags.Saves.All,
-            SaveInfos = await saveInfosTask,
-            Backups = backups,
-            Dex = await dexTask,
-        };
+        var dto = new DataDTO(
+            Warnings: await warningsService.GetWarningsDTO(),
+            Settings: settingsService.GetSettings(),
+            Actions: loadersService.GetActionPayloadList(),
+            StaticData: await staticDataTask,
+            MainBanks: await mainBanksTask,
+            MainBoxes: await mainBoxesTask,
+            MainPkms: await mainPkmsTask,
+            MainPkmVersions: await mainPkmVersionsTask,
+            MainPkmLegalities: await mainPkmLegalitiesTask,
+            Saves: [.. await savesTask],
+            InvalidateAllSaves: flags.Saves.All,
+            SaveInfos: await saveInfosTask,
+            Backups: backups,
+            Dex: await dexTask
+        );
 
         time();
 

@@ -28,10 +28,9 @@ public class MainDeleteBoxAction(string boxId) : DataAction
             }
         }
 
-        return new()
-        {
-            type = DataActionType.MAIN_DELETE_BOX,
-            parameters = [box!.Name]
-        };
+        return new(
+            type: DataActionType.MAIN_DELETE_BOX,
+            parameters: [box!.Name]
+        );
     }
 }

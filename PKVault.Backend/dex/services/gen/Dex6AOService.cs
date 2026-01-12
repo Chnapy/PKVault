@@ -22,28 +22,18 @@ public class Dex6AOService(SAV6AO save) : DexGenService(save)
         var isSeenShiny = isOwnedShiny || (formCount > 0 ? isSeenShinyForm : isSeenShinyBase);
         var isSeen = isSeenShiny || isOwned || (formCount > 0 ? isSeenForm : isSeenBase);
 
-        return new DexItemForm
-        {
-            Form = form,
-            Gender = gender,
-            Types = GetTypes(pi),
-            Abilities = GetAbilities(pi),
-            BaseStats = GetBaseStats(pi),
-            IsSeen = isSeen,
-            IsSeenShiny = isSeenShiny,
-            IsCaught = isSeen && save.GetCaught(species),
-            IsOwned = isOwned,
-            IsOwnedShiny = isOwnedShiny,
-            // IsLangJa = save.Zukan.GetLanguageFlag(species - 1, 0),
-            // IsLangEn = save.Zukan.GetLanguageFlag(species - 1, 1),
-            // IsLangFr = save.Zukan.GetLanguageFlag(species - 1, 2),
-            // IsLangIt = save.Zukan.GetLanguageFlag(species - 1, 3),
-            // IsLangDe = save.Zukan.GetLanguageFlag(species - 1, 4),
-            // IsLangEs = save.Zukan.GetLanguageFlag(species - 1, 5),
-            // IsLangKo = save.Zukan.GetLanguageFlag(species - 1, 6),
-            // IsLangCh = save.Zukan.GetLanguageFlag(species - 1, 7),
-            // IsLangCh2 = save.Zukan.GetLanguageFlag(species - 1, 8)
-        };
+        return new DexItemForm(
+            Form: form,
+            Gender: gender,
+            Types: GetTypes(pi),
+            Abilities: GetAbilities(pi),
+            BaseStats: GetBaseStats(pi),
+            IsSeen: isSeen,
+            IsSeenShiny: isSeenShiny,
+            IsCaught: isSeen && save.GetCaught(species),
+            IsOwned: isOwned,
+            IsOwnedShiny: isOwnedShiny
+        );
     }
 
     public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)

@@ -1,6 +1,6 @@
 using PKHeX.Core;
 
-public class PkmLegalityDTO : IWithId
+public record PkmLegalityDTO : IWithId
 {
     private static readonly Lock legalityLock = new();
 
@@ -85,7 +85,7 @@ public class PkmLegalityDTO : IWithId
     )
     {
         Id = id;
-        SaveId = save?.ID32;
+        SaveId = save?.Id;
 
         var la = GetLegalitySafe(pkm, save, slotType);
 

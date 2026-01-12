@@ -52,10 +52,10 @@ public class SaveService
     public async Task WriteSave(SaveWrapper save)
     {
         var (SaveById, SaveByPath) = await savesLocker.GetValue();
-        var path = SaveByPath.Keys.ToList().Find(path => SaveByPath[path].ID32 == save.ID32);
+        var path = SaveByPath.Keys.ToList().Find(path => SaveByPath[path].Id == save.Id);
         if (path == default)
         {
-            throw new KeyNotFoundException($"Path not found for given save {save.ID32}");
+            throw new KeyNotFoundException($"Path not found for given save {save.Id}");
         }
 
         var fileName = Path.GetFileNameWithoutExtension(path);
@@ -131,7 +131,7 @@ public class SaveService
 
         UpdateGlobalsWithSave(SaveById, SaveByPath, save, path);
 
-        Console.WriteLine($"Save {save.Id} - G{save.Generation} - Version {save.Version} - play-time {save.PlayTimeString}");
+        Console.WriteLine($"Save {save.Id} {save.Id} {save.Id} - G{save.Generation} - Version {save.Version} - play-time {save.PlayTimeString}");
     }
 
     private void UpdateGlobalsWithSave(

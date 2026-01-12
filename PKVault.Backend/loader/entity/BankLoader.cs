@@ -11,10 +11,7 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>
 
     protected override BankDTO GetDTOFromEntity(BankEntity entity)
     {
-        return new BankDTO
-        {
-            BankEntity = entity,
-        };
+        return new BankDTO(entity);
     }
 
     protected override BankEntity GetEntityFromDTO(BankDTO dto)

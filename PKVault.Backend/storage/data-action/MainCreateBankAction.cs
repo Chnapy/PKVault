@@ -34,10 +34,9 @@ public class MainCreateBankAction : DataAction
 
         MainCreateBoxAction.CreateBox(loaders, flags, id.ToString(), null);
 
-        return new()
-        {
-            type = DataActionType.MAIN_CREATE_BANK,
-            parameters = [name]
-        };
+        return new(
+            type: DataActionType.MAIN_CREATE_BANK,
+            parameters: [name]
+        );
     }
 }

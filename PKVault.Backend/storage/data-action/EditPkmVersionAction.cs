@@ -47,11 +47,10 @@ public class EditPkmVersionAction(
             await SynchronizePkmAction.SynchronizePkmVersionToSave(pkmConvertService, loaders, flags, [(pkmDto.Id, null)]);
         }
 
-        return new()
-        {
-            type = DataActionType.EDIT_PKM_VERSION,
-            parameters = [pkmVersionDto.Nickname, pkmVersionDto.Generation]
-        };
+        return new(
+            type: DataActionType.EDIT_PKM_VERSION,
+            parameters: [pkmVersionDto.Nickname, pkmVersionDto.Generation]
+        );
     }
 
     public static void EditPkmNickname(PkmConvertService pkmConvertService, PKM pkm, string nickname)
@@ -177,11 +176,8 @@ public class EditPkmVersionAction(
     }
 }
 
-public struct EditPkmVersionPayload
-{
-    public string Nickname { get; set; }
-
-    public int[] EVs { get; set; }
-
-    public ushort[] Moves { get; set; }
-}
+public record EditPkmVersionPayload(
+    string Nickname,
+    int[] EVs,
+    ushort[] Moves
+);

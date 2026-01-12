@@ -20,11 +20,10 @@ public class DetachPkmSaveAction(string[] pkmIds) : DataAction
             var pkmNickname = loaders.pkmVersionLoader.GetDto(pkmId)?.Nickname;
             var saveExists = loaders.saveLoadersDict.TryGetValue(oldSaveId ?? 0, out var saveLoaders);
 
-            return new()
-            {
-                type = DataActionType.DETACH_PKM_SAVE,
-                parameters = [saveExists ? saveLoaders.Save.Version : null, pkmNickname]
-            };
+            return new(
+                type: DataActionType.DETACH_PKM_SAVE,
+                parameters: [saveExists ? saveLoaders.Save.Version : null, pkmNickname]
+            );
         }
 
         List<DataActionPayload> payloads = [];

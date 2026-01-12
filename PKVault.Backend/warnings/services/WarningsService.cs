@@ -22,13 +22,12 @@ public class WarningsService(LoadersService loadersService, SaveService saveServ
         var pkmVersionWarnings = CheckPkmVersionWarnings();
         var saveDuplicateWarnings = CheckSaveDuplicates();
 
-        WarningsDTO = new()
-        {
-            SaveChangedWarnings = await saveChangedWarnings,
-            PlayTimeWarnings = CheckPlayTimeWarning(),
-            PkmVersionWarnings = await pkmVersionWarnings,
-            SaveDuplicateWarnings = await saveDuplicateWarnings,
-        };
+        WarningsDTO = new(
+            SaveChangedWarnings: await saveChangedWarnings,
+            PlayTimeWarnings: CheckPlayTimeWarning(),
+            PkmVersionWarnings: await pkmVersionWarnings,
+            SaveDuplicateWarnings: await saveDuplicateWarnings
+        );
 
         logtime();
 
@@ -54,17 +53,17 @@ public class WarningsService(LoadersService loadersService, SaveService saveServ
             .Where(saveLoaders => saveLoaders.Boxes.HasWritten || saveLoaders.Pkms.HasWritten)
             .Where(saveLoaders =>
             {
-                var path = saveByPath.Keys.ToList().Find(path => saveByPath[path].ID32 == saveLoaders.Save.ID32);
+                var path = saveByPath.Keys.ToList().Find(path => saveByPath[path].Id == saveLoaders.Save.Id);
                 if (path == default)
                 {
-                    throw new KeyNotFoundException($"Path not found for given save {saveLoaders.Save.ID32}");
+                    throw new KeyNotFoundException($"Path not found for given save {saveLoaders.Save.Id}");
                 }
 
                 var lastWriteTime = File.GetLastWriteTimeUtc(path);
                 // Console.WriteLine($"Check save {saveLoaders.Save.ID32} to {path}.\nWrite-time from {lastWriteTime} to {startTime}.");
                 return lastWriteTime > startTime;
             })
-            .Select(saveLoaders => new SaveChangedWarning() { SaveId = saveLoaders.Save.ID32 })];
+            .Select(saveLoaders => new SaveChangedWarning( SaveId: saveLoaders.Save.Id ))];
     }
 
     private List<PlayTimeWarning> CheckPlayTimeWarning()
@@ -126,10 +125,9 @@ public class WarningsService(LoadersService loadersService, SaveService saveServ
                 var exists = loaders.saveLoadersDict.TryGetValue((uint)pkm.SaveId!, out var saveLoader);
                 if (!exists)
                 {
-                    return new PkmVersionWarning()
-                    {
-                        PkmId = pkm.Id,
-                    };
+                    return new PkmVersionWarning(
+                        PkmId: pkm.Id
+                    );
                 }
 
                 var save = saveLoader.Save;
@@ -144,11 +142,10 @@ public class WarningsService(LoadersService loadersService, SaveService saveServ
                 {
                     Console.WriteLine($"Pkm-version warning");
 
-                    return new PkmVersionWarning()
-                    {
-                        PkmId = pkm.Id,
-                        PkmVersionId = pkmVersion?.Id,
-                    };
+                    return new PkmVersionWarning(
+                        PkmId: pkm.Id,
+                        PkmVersionId: pkmVersion?.Id
+                    );
                 }
             }
             return null;
@@ -173,14 +170,13 @@ public class WarningsService(LoadersService loadersService, SaveService saveServ
         var tasks = loaders.saveLoadersDict.Values.Select(async (saveLoader) =>
         {
             var paths = saveByPath.ToList()
-                .FindAll(entry => entry.Value.ID32 == saveLoader.Save.ID32)
+                .FindAll(entry => entry.Value.Id == saveLoader.Save.Id)
                 .Select(entry => entry.Key);
 
-            return new SaveDuplicateWarning()
-            {
-                SaveId = saveLoader.Save.ID32,
-                Paths = [.. paths],
-            };
+            return new SaveDuplicateWarning(
+                SaveId: saveLoader.Save.Id,
+                Paths: [.. paths]
+            );
         });
 
         return (await Task.WhenAll(tasks)).ToList().FindAll(warn => warn.Paths.Length > 1);

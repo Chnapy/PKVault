@@ -126,11 +126,10 @@ public class MovePkmAction(
         var pkmName = loaders.pkmVersionLoader.GetDto(pkmId)?.Nickname;
         var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
 
-        return new()
-        {
-            type = DataActionType.MOVE_PKM,
-            parameters = [pkmName, null, null, boxName, targetBoxSlot, attached]
-        };
+        return new(
+            type: DataActionType.MOVE_PKM,
+            parameters: [pkmName, null, null, boxName, targetBoxSlot, attached]
+        );
     }
 
     private DataActionPayload SaveToSave(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
@@ -187,11 +186,10 @@ public class MovePkmAction(
 
         var boxName = targetSaveLoaders.Boxes.GetDto(targetBoxId.ToString())?.Name;
 
-        return new()
-        {
-            type = DataActionType.MOVE_PKM,
-            parameters = [sourcePkmDto.Nickname, sourceSaveLoaders.Save.Version, targetSaveLoaders.Save.Version, boxName, targetBoxSlot, attached]
-        };
+        return new(
+            type: DataActionType.MOVE_PKM,
+            parameters: [sourcePkmDto.Nickname, sourceSaveLoaders.Save.Version, targetSaveLoaders.Save.Version, boxName, targetBoxSlot, attached]
+        );
     }
 
     private async Task<DataActionPayload> MainToSave(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
@@ -229,11 +227,10 @@ public class MovePkmAction(
 
         var boxName = saveLoaders.Boxes.GetDto(targetBoxId.ToString())?.Name;
 
-        return new()
-        {
-            type = DataActionType.MOVE_PKM,
-            parameters = [relatedPkmVersionDtos[0].Nickname, null, saveLoaders.Save.Version, boxName, targetBoxSlot, attached]
-        };
+        return new(
+            type: DataActionType.MOVE_PKM,
+            parameters: [relatedPkmVersionDtos[0].Nickname, null, saveLoaders.Save.Version, boxName, targetBoxSlot, attached]
+        );
     }
 
     private async Task<DataActionPayload> SaveToMain(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
@@ -284,11 +281,10 @@ public class MovePkmAction(
 
         var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
 
-        return new()
-        {
-            type = DataActionType.MOVE_PKM,
-            parameters = [savePkm?.Nickname, saveLoaders.Save.Version, null, boxName, targetBoxSlot, attached]
-        };
+        return new(
+            type: DataActionType.MOVE_PKM,
+            parameters: [savePkm?.Nickname, saveLoaders.Save.Version, null, boxName, targetBoxSlot, attached]
+        );
     }
 
     private async Task MainToSaveWithoutCheckTarget(
@@ -334,7 +330,7 @@ public class MovePkmAction(
 
         if (attached)
         {
-            pkmEntity = loaders.pkmLoader.WriteEntity(pkmEntity with { SaveId = saveLoaders.Save.ID32 });
+            pkmEntity = loaders.pkmLoader.WriteEntity(pkmEntity with { SaveId = saveLoaders.Save.Id });
         }
         else
         {

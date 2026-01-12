@@ -62,22 +62,20 @@ public class SettingsService(LoadersService loadersService, SaveService saveServ
         SettingsMutableDTO settings;
 
 #if DEBUG
-        settings = new()
-        {
-            DB_PATH = "./tmp/db",
-            SAVE_GLOBS = [],
-            STORAGE_PATH = "./tmp/storage",
-            BACKUP_PATH = "./tmp/backup",
-            HTTPS_NOCERT = false,
-        };
+        settings = new(
+            DB_PATH: "./tmp/db",
+            SAVE_GLOBS: [],
+            STORAGE_PATH: "./tmp/storage",
+            BACKUP_PATH: "./tmp/backup",
+            HTTPS_NOCERT: false
+        );
 #else
-        settings = new()
-        {
-            DB_PATH = "./db",
-            SAVE_GLOBS = [],
-            STORAGE_PATH = "./storage",
-            BACKUP_PATH = "./backup",
-        };
+        settings = new(
+            DB_PATH: "./db",
+            SAVE_GLOBS: [],
+            STORAGE_PATH: "./storage",
+            BACKUP_PATH: "./backup"
+        );
 #endif
 
         return settings;

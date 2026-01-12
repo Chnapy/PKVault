@@ -11,10 +11,7 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>
 
     protected override BoxDTO GetDTOFromEntity(BoxEntity entity)
     {
-        return new BoxDTO
-        {
-            BoxEntity = entity,
-        };
+        return new BoxDTO(entity);
     }
 
     protected override BoxEntity GetEntityFromDTO(BoxDTO dto)

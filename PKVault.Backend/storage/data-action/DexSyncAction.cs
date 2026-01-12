@@ -25,16 +25,14 @@ public class DexSyncAction(DexService dexService, uint[] saveIds) : DataAction
                 });
             }));
 
-            if (saveLoader != null)
-                ((SaveLoaders)saveLoader).Pkms.HasWritten = true;
+            saveLoader?.Pkms.HasWritten = true;
         });
 
         flags.Dex = true;
 
-        return new()
-        {
-            type = DataActionType.DEX_SYNC,
-            parameters = []
-        };
+        return new(
+            type: DataActionType.DEX_SYNC,
+            parameters: []
+        );
     }
 }

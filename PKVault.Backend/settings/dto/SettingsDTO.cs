@@ -39,21 +39,13 @@ public class SettingsDTO
     private static string NormalizeSafePath(string path) => MatcherUtil.NormalizePath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path));
 }
 
-public class SettingsMutableDTO
-{
-    public required string DB_PATH { get; set; }
-
-    public required string[] SAVE_GLOBS { get; set; }
-
-    public required string STORAGE_PATH { get; set; }
-
-    public required string BACKUP_PATH { get; set; }
-
-    public bool? HTTPS_NOCERT { get; set; }
-
-    public string? HTTPS_CERT_PEM_PATH { get; set; }
-
-    public string? HTTPS_KEY_PEM_PATH { get; set; }
-
-    public string? LANGUAGE { get; set; }
-}
+public record SettingsMutableDTO(
+    string DB_PATH,
+    string[] SAVE_GLOBS,
+    string STORAGE_PATH,
+    string BACKUP_PATH,
+    bool? HTTPS_NOCERT = null,
+    string? HTTPS_CERT_PEM_PATH = null,
+    string? HTTPS_KEY_PEM_PATH = null,
+    string? LANGUAGE = null
+);

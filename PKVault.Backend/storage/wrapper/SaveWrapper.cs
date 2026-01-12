@@ -62,7 +62,6 @@ public class SaveWrapper(SaveFile Save, string path)
     #region Player Info
     public byte Gender => Save.Gender;
     public int Language => Save.Language;
-    public uint ID32 => Save.ID32;
     public ushort TID16 => Save.TID16;
     public ushort SID16 => Save.SID16;
     public string OT => Save.OT;

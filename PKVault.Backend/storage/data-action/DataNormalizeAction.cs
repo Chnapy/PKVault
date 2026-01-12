@@ -10,10 +10,9 @@ public class DataNormalizeAction : DataAction
 
         time();
 
-        return new()
-        {
-            type = DataActionType.DATA_NORMALIZE,
-            parameters = []
-        };
+        return new(
+            type: DataActionType.DATA_NORMALIZE,
+            parameters: []
+        );
     }
 }

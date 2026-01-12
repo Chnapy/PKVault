@@ -17,19 +17,18 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
         var isSeenShiny = isOwnedShiny || isSeenShinyForm;
         var isSeen = isOwned || isSeenShiny || isSeenForm;
 
-        return new DexItemForm
-        {
-            Form = form,
-            Gender = gender,
-            Types = GetTypes(pi),
-            Abilities = GetAbilities(pi),
-            BaseStats = GetBaseStats(pi),
-            IsSeen = isSeen,
-            IsSeenShiny = isSeenShiny,
-            IsCaught = isSeen && (ownedPkms.Count > 0 || Dex.GetCaught(species)),
-            IsOwned = isOwned,
-            IsOwnedShiny = isOwnedShiny,
-        };
+        return new DexItemForm(
+            Form: form,
+            Gender: gender,
+            Types: GetTypes(pi),
+            Abilities: GetAbilities(pi),
+            BaseStats: GetBaseStats(pi),
+            IsSeen: isSeen,
+            IsSeenShiny: isSeenShiny,
+            IsCaught: isSeen && (ownedPkms.Count > 0 || Dex.GetCaught(species)),
+            IsOwned: isOwned,
+            IsOwnedShiny: isOwnedShiny
+        );
     }
 
     public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)

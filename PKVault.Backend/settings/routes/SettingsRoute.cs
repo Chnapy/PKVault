@@ -41,7 +41,10 @@ public class SettingsController(DataService dataService, SettingsService setting
 
         var languageChanged = settingsService.GetSettings().SettingsMutable.LANGUAGE != settingsMutable.LANGUAGE;
 
-        settingsMutable.SAVE_GLOBS = [.. settingsMutable.SAVE_GLOBS.Select(glob => glob.Trim())];
+        settingsMutable = settingsMutable with
+        {
+            SAVE_GLOBS = [.. settingsMutable.SAVE_GLOBS.Select(glob => glob.Trim())]
+        };
         await settingsService.UpdateSettings(settingsMutable);
 
         return await dataService.CreateDataFromUpdateFlags(new()

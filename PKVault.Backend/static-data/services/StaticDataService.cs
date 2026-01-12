@@ -52,16 +52,15 @@ public class StaticDataService(PokeApiService pokeApiService)
                 var versionName = GetVersionName(version, lang);
                 var versionRegion = GetVersionRegionName(version, lang);
 
-                return new StaticVersion
-                {
-                    Id = (byte)version,
-                    Name = await versionName,
-                    Generation = version.Generation,
-                    Region = await versionRegion,
-                    MaxSpeciesId = blankSave?.MaxSpeciesID ?? 0,
-                    MaxIV = blankSave?.MaxIV ?? 0,
-                    MaxEV = blankSave?.MaxEV ?? 0,
-                };
+                return new StaticVersion(
+                    Id: (byte)version,
+                    Name: await versionName,
+                    Generation: version.Generation,
+                    Region: await versionRegion,
+                    MaxSpeciesId: blankSave?.MaxSpeciesID ?? 0,
+                    MaxIV: blankSave?.MaxIV ?? 0,
+                    MaxEV: blankSave?.MaxEV ?? 0
+                );
             }));
         }
 
@@ -242,20 +241,19 @@ public class StaticDataService(PokeApiService pokeApiService)
                         && !result.Valid
                     );
 
-                    return new StaticSpeciesForm
-                    {
-                        Id = formObj.Id,
-                        Name = name,
-                        SpriteDefault = spriteDefault,
-                        SpriteFemale = spriteFemale,
-                        SpriteShiny = spriteShiny,
-                        SpriteShinyFemale = spriteShinyFemale,
-                        SpriteShadow = generation == 3 && species == (ushort)Species.Lugia
+                    return new StaticSpeciesForm(
+                        Id: formObj.Id,
+                        Name: name,
+                        SpriteDefault: spriteDefault,
+                        SpriteFemale: spriteFemale,
+                        SpriteShiny: spriteShiny,
+                        SpriteShinyFemale: spriteShinyFemale,
+                        SpriteShadow: generation == 3 && species == (ushort)Species.Lugia
                             ? GetLugiaShadowSprite()
                             : null,
-                        HasGenderDifferences = hasGenderDifferences,
-                        IsBattleOnly = battleOnly,
-                    };
+                        HasGenderDifferences: hasGenderDifferences,
+                        IsBattleOnly: battleOnly
+                    );
                 }
 
                 var defaultVariety = pkmSpeciesObj.Varieties.Find(variety => variety.IsDefault);
@@ -448,15 +446,14 @@ public class StaticDataService(PokeApiService pokeApiService)
 
                 var isInHoennDex = hoennDexSpeciesSet.Contains(species);
 
-                return new StaticSpecies
-                {
-                    Id = species,
+                return new StaticSpecies(
+                    Id: species,
                     // Name = speciesName,
-                    Generation = generation,
-                    Genders = genders,
-                    Forms = forms,
-                    IsInHoennDex = isInHoennDex,
-                };
+                    Generation: generation,
+                    Genders: genders,
+                    Forms: forms,
+                    IsInHoennDex: isInHoennDex
+                );
             }));
         }
 
@@ -482,11 +479,10 @@ public class StaticDataService(PokeApiService pokeApiService)
             {
                 var statObj = await pokeApiService.GetStat(statIndex);
 
-                return new StaticStat
-                {
-                    Id = statIndex,
-                    Name = PokeApiService.GetNameForLang(statObj.Names, lang),
-                };
+                return new StaticStat(
+                    Id: statIndex,
+                    Name: PokeApiService.GetNameForLang(statObj.Names, lang)
+                );
             }));
         }
 
@@ -508,11 +504,10 @@ public class StaticDataService(PokeApiService pokeApiService)
         {
             var typeName = typeNames[i];
             var typeId = i + 1;
-            dict.Add(typeId, new()
-            {
-                Id = typeId,
-                Name = typeName,
-            });
+            dict.Add(typeId, new(
+                Id: typeId,
+                Name: typeName
+            ));
         }
 
         return dict;
@@ -532,18 +527,16 @@ public class StaticDataService(PokeApiService pokeApiService)
             {
                 if (moveId == 0)
                 {
-                    return new StaticMove()
-                    {
-                        Id = moveId,
-                        Name = moveName,
-                        DataUntilGeneration = [new()
-                        {
-                            UntilGeneration = 99,
-                            Type = 1,   // normal
-                            Category = MoveCategory.STATUS,
-                            Power = null,
-                        }],
-                    };
+                    return new StaticMove(
+                        Id: moveId,
+                        Name: moveName,
+                        DataUntilGeneration: [new(
+                            UntilGeneration: 99,
+                            Type: 1,   // normal
+                            Category: MoveCategory.STATUS,
+                            Power: null
+                        )]
+                    );
                 }
 
                 var moveObj = await pokeApiService.GetMove(moveId);
@@ -572,45 +565,41 @@ public class StaticDataService(PokeApiService pokeApiService)
                             var versionGroup = await pokeApiService.GetVersionGroup(pastValue.VersionGroup);
                             byte untilGeneration = (byte) (PokeApiService.GetGenerationValue(versionGroup.Generation.Name) - 1);
 
-                            return new StaticMoveGeneration()
-                            {
-                                UntilGeneration = untilGeneration,
-                                Type = PokeApiService.GetIdFromUrl(typeUrl),
-                                Category = untilGeneration <= 3 ? oldCategory : category,
-                                Power = power,
-                            };
+                            return new StaticMoveGeneration(
+                                UntilGeneration: untilGeneration,
+                                Type: PokeApiService.GetIdFromUrl(typeUrl),
+                                Category: untilGeneration <= 3 ? oldCategory : category,
+                                Power: power
+                            );
                         })
                         .Reverse()
                 )];
 
-                dataUntilGeneration.Add(new()
-                {
-                    UntilGeneration = 99,
-                    Type = PokeApiService.GetIdFromUrl(moveObj.Type.Url),
-                    Category = category,
-                    Power = moveObj.Power,
-                });
+                dataUntilGeneration.Add(new(
+                    UntilGeneration: 99,
+                    Type: PokeApiService.GetIdFromUrl(moveObj.Type.Url),
+                    Category: category,
+                    Power: moveObj.Power
+                ));
 
                 if (oldCategory != category && !dataUntilGeneration.Any(data => data.UntilGeneration == 3))
                 {
                     var dataPostG3 = dataUntilGeneration.Find(data => data.UntilGeneration > 3);
-                    dataUntilGeneration.Add(new()
-                    {
-                        UntilGeneration = 3,
-                        Type = dataPostG3.Type,
-                        Category = oldCategory,
-                        Power = dataPostG3.Power,
-                    });
+                    dataUntilGeneration.Add(new(
+                        UntilGeneration: 3,
+                        Type: dataPostG3.Type,
+                        Category: oldCategory,
+                        Power: dataPostG3.Power
+                    ));
                 }
 
                 dataUntilGeneration.Sort((a, b) => a.UntilGeneration < b.UntilGeneration ? -1 : 1);
 
-                return new StaticMove
-                {
-                    Id = moveId,
-                    Name = moveName,
-                    DataUntilGeneration = [.. dataUntilGeneration],
-                };
+                return new StaticMove(
+                    Id: moveId,
+                    Name: moveName,
+                    DataUntilGeneration: [.. dataUntilGeneration]
+                );
             }));
         }
 
@@ -638,17 +627,16 @@ public class StaticDataService(PokeApiService pokeApiService)
                 var natureNameEn = GameInfo.Strings.natures[natureId];
                 var natureObj = await pokeApiService.GetNature(natureNameEn);
 
-                return new StaticNature
-                {
-                    Id = natureId,
-                    Name = natureName,
-                    IncreasedStatIndex = natureObj.IncreasedStat != null
+                return new StaticNature(
+                    Id: natureId,
+                    Name: natureName,
+                    IncreasedStatIndex: natureObj.IncreasedStat != null
                         ? PokeApiService.GetIdFromUrl(natureObj.IncreasedStat.Url)
                         : null,
-                    DecreasedStatIndex = natureObj.DecreasedStat != null
+                    DecreasedStatIndex: natureObj.DecreasedStat != null
                         ? PokeApiService.GetIdFromUrl(natureObj.DecreasedStat.Url)
-                        : null,
-                };
+                        : null
+                );
             }));
         }
 
@@ -670,11 +658,10 @@ public class StaticDataService(PokeApiService pokeApiService)
         {
             var abilityId = i;
             var abilityName = abilitiesNames[abilityId];
-            dict.Add(abilityId, new StaticAbility
-            {
-                Id = abilityId,
-                Name = abilityName,
-            });
+            dict.Add(abilityId, new StaticAbility(
+                Id: abilityId,
+                Name: abilityName
+            ));
         }
 
         return dict;
@@ -715,12 +702,11 @@ public class StaticDataService(PokeApiService pokeApiService)
                 // if (itemNameEn.ToLower().Contains("belt"))
                 // Console.WriteLine($"Error with item {itemId} - {itemNameEn} / {PokeApiFileClient.PokeApiNameFromPKHexName(itemNameEn)} / {itemName}");
 
-                return new StaticItem
-                {
-                    Id = itemId,
-                    Name = itemName,
-                    Sprite = GetPokeapiRelativePath(sprite),
-                };
+                return new StaticItem(
+                    Id: itemId,
+                    Name: itemName,
+                    Sprite: GetPokeapiRelativePath(sprite)
+                );
             }));
         }
 
@@ -743,14 +729,12 @@ public class StaticDataService(PokeApiService pokeApiService)
         {
             var species = ushort.Parse(chain.Species.Url.TrimEnd('/').Split('/')[^1]);
 
-            var speciesEvolve = new StaticEvolve()
-            {
-                Species = species,
-                PreviousSpecies = null,
-                Trade = [],
-                TradeWithItem = [],
-                Other = [],
-            };
+            var speciesEvolve = new StaticEvolve(
+                Species: species,
+                Trade: [],
+                TradeWithItem: [],
+                Other: []
+            );
 
             chain.EvolvesTo.ForEach(evolveTo =>
             {
@@ -858,13 +842,12 @@ public class StaticDataService(PokeApiService pokeApiService)
 
                 if (!staticGenerations.TryGetValue(generation, out var value))
                 {
-                    value = new StaticGeneration()
-                    {
-                        Id = generation,
-                        Regions = []
-                    };
+                    value = new StaticGeneration(
+                        Id: generation,
+                        Regions: []
+                    );
                 }
-                value.Regions = [.. value.Regions, PokeApiService.GetNameForLang(region.Names, lang)];
+                value = value with { Regions = [.. value.Regions, PokeApiService.GetNameForLang(region.Names, lang)] };
                 staticGenerations.Remove(generation);
                 staticGenerations.Add(generation, value);
             }

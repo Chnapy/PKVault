@@ -45,12 +45,11 @@ public class LoadersService
         {
             saveById.Values.ToList().ForEach((save) =>
             {
-                saveLoadersDict.Add(save.ID32, new()
-                {
-                    Save = save,
-                    Boxes = new SaveBoxLoader(save),
-                    Pkms = new SavePkmLoader(pkmConvertService, save)
-                });
+                saveLoadersDict.Add(save.Id, new(
+                    Save: save,
+                    Boxes: new SaveBoxLoader(save),
+                    Pkms: new SavePkmLoader(pkmConvertService, save)
+                ));
             });
         }
 

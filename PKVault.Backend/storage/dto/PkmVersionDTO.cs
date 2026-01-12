@@ -1,7 +1,8 @@
 using System.Diagnostics;
+using System.Text.Json.Serialization;
 using PKHeX.Core;
 
-public class PkmVersionDTO : BasePkmVersionDTO
+public record PkmVersionDTO : BasePkmVersionDTO
 {
     public static PkmVersionDTO FromEntity(PkmVersionEntity entity, ImmutablePKM pkm, PkmDTO pkmDto)
     {
@@ -85,8 +86,10 @@ public class PkmVersionDTO : BasePkmVersionDTO
 
     public bool CanDelete => !IsMain;
 
+    [JsonIgnore()]
     public readonly PkmVersionEntity PkmVersionEntity;
 
+    [JsonIgnore()]
     public readonly PkmDTO PkmDto;
 
     private PkmVersionDTO(

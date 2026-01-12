@@ -1,32 +1,18 @@
 
-public class WarningsDTO
+public record WarningsDTO(
+List<SaveChangedWarning> SaveChangedWarnings,
+List<PlayTimeWarning> PlayTimeWarnings,
+List<PkmVersionWarning> PkmVersionWarnings,
+List<SaveDuplicateWarning> SaveDuplicateWarnings
+)
 {
-    public required List<SaveChangedWarning> SaveChangedWarnings { get; set; }
-    public required List<PlayTimeWarning> PlayTimeWarnings { get; set; }
-    public required List<PkmVersionWarning> PkmVersionWarnings { get; set; }
-    public required List<SaveDuplicateWarning> SaveDuplicateWarnings { get; set; }
-
     public int WarningsCount { get => SaveChangedWarnings.Count + PlayTimeWarnings.Count + PkmVersionWarnings.Count + SaveDuplicateWarnings.Count; }
 }
 
-public class SaveChangedWarning
-{
-    public uint SaveId { get; set; }
-}
+public record SaveChangedWarning(uint SaveId);
 
-public class PlayTimeWarning
-{
-    public uint SaveId { get; set; }
-}
+public record PlayTimeWarning(uint SaveId);
 
-public class PkmVersionWarning
-{
-    public required string PkmId { get; set; }
-    public string? PkmVersionId { get; set; }
-}
+public record PkmVersionWarning(string PkmId, string? PkmVersionId = null);
 
-public class SaveDuplicateWarning
-{
-    public required uint SaveId { get; set; }
-    public required string[] Paths { get; set; }
-}
+public record SaveDuplicateWarning(uint SaveId, string[] Paths);

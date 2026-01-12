@@ -1,6 +1,9 @@
+using System.Text.Json.Serialization;
 using PKHeX.Core;
 
-public class BoxDTO : IWithId
+public record BoxDTO(
+    [property: JsonIgnore] BoxEntity BoxEntity
+) : IWithId
 {
     public string Id { get { return BoxEntity.Id; } }
 
@@ -22,8 +25,6 @@ public class BoxDTO : IWithId
     public bool CanSaveWrite => Type == BoxType.Box;
 
     public bool CanSaveReceivePkm => Type == BoxType.Party || Type == BoxType.Box;
-
-    public required BoxEntity BoxEntity;
 
     public static bool CanIdReceivePkm(int boxId) => boxId == (int)BoxType.Party || boxId >= (int)BoxType.Box;
 

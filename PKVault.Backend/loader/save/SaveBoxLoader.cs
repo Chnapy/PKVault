@@ -6,16 +6,14 @@ public class SaveBoxLoader(SaveWrapper save)
 
     public Dictionary<string, BoxDTO> GetAllEntities()
     {
-        var boxes = new Dictionary<string, BoxDTO>();
+        var boxes = new Dictionary<string, BoxEntity>();
 
         var currentOrder = 0;
 
         if (save.HasParty)
         {
             var id = ((int)BoxType.Party).ToString();
-            boxes.Add(id, new BoxDTO
-            {
-                BoxEntity = new(
+            boxes.Add(id, new(
                     SchemaVersion: default,
                     Id: id,
                     Type: BoxType.Party,
@@ -23,8 +21,7 @@ public class SaveBoxLoader(SaveWrapper save)
                     Order: currentOrder,
                     SlotCount: 6,
                     BankId: ""
-                )
-            });
+                ));
             currentOrder++;
         }
 
@@ -34,9 +31,7 @@ public class SaveBoxLoader(SaveWrapper save)
             for (int i = 0; i < boxesNames.Count; i++)
             {
                 var id = i.ToString();
-                boxes.Add(id, new BoxDTO
-                {
-                    BoxEntity = new(
+                boxes.Add(id, new(
                         SchemaVersion: default,
                         Id: id,
                         Type: BoxType.Box,
@@ -44,8 +39,7 @@ public class SaveBoxLoader(SaveWrapper save)
                         Order: currentOrder,
                         SlotCount: save.BoxSlotCount,
                         BankId: ""
-                    )
-                });
+                    ));
                 currentOrder++;
             }
         }
@@ -56,9 +50,7 @@ public class SaveBoxLoader(SaveWrapper save)
         {
             var id = ((int)BoxType.Daycare).ToString();
             var extraSlotsCount = extraSlots.FindAll(slot => slot.Type == StorageSlotType.Daycare).Count;
-            boxes.Add(id, new BoxDTO
-            {
-                BoxEntity = new(
+            boxes.Add(id, new(
                     SchemaVersion: default,
                     Id: id,
                     Type: BoxType.Daycare,
@@ -66,8 +58,7 @@ public class SaveBoxLoader(SaveWrapper save)
                     Order: currentOrder,
                     SlotCount: saveDaycare.DaycareSlotCount + extraSlotsCount,
                     BankId: ""
-                )
-            });
+                ));
             currentOrder++;
         }
 
@@ -87,9 +78,7 @@ public class SaveBoxLoader(SaveWrapper save)
                 var name = boxType.ToString();
                 var slotCount = extraSlots.FindAll(slot => BoxDTO.GetTypeFromStorageSlotType(slot.Type) == boxType).Count;
 
-                boxes.Add(id, new BoxDTO
-                {
-                    BoxEntity = new(
+                boxes.Add(id, new(
                         SchemaVersion: default,
                         Id: id,
                         Type: boxType,
@@ -97,12 +86,11 @@ public class SaveBoxLoader(SaveWrapper save)
                         Order: currentOrder,
                         SlotCount: slotCount,
                         BankId: ""
-                    )
-                });
+                    ));
                 currentOrder++;
             });
 
-        return boxes;
+        return boxes.Select(entry => (entry.Key, new BoxDTO(entry.Value))).ToDictionary();
     }
 
     public List<BoxDTO> GetAllDtos()

@@ -18,10 +18,9 @@ public class MainDeleteBankAction(string bankId) : DataAction
         loaders.bankLoader.DeleteEntity(bankId);
         loaders.bankLoader.NormalizeOrders();
 
-        return new()
-        {
-            type = DataActionType.MAIN_DELETE_BANK,
-            parameters = [bank.Name]
-        };
+        return new(
+            type: DataActionType.MAIN_DELETE_BANK,
+            parameters: [bank.Name]
+        );
     }
 }

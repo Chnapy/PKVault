@@ -44,10 +44,9 @@ public class MainCreatePkmVersionAction(
             Filepath: PKMLoader.GetPKMFilepath(pkmConverted)
         ), pkmConverted);
 
-        return new()
-        {
-            type = DataActionType.MAIN_CREATE_PKM_VERSION,
-            parameters = [pkmVersionOrigin.Nickname, generation]
-        };
+        return new(
+            type: DataActionType.MAIN_CREATE_PKM_VERSION,
+            parameters: [pkmVersionOrigin.Nickname, generation]
+        );
     }
 }

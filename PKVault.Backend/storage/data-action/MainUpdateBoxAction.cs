@@ -68,10 +68,9 @@ public class MainUpdateBoxAction(string boxId, string boxName, int order, string
         });
         loaders.boxLoader.NormalizeOrders();
 
-        return new()
-        {
-            type = DataActionType.MAIN_UPDATE_BOX,
-            parameters = [boxOldName, boxName]
-        };
+        return new(
+            type: DataActionType.MAIN_UPDATE_BOX,
+            parameters: [boxOldName, boxName]
+        );
     }
 }

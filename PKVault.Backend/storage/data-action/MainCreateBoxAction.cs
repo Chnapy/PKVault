@@ -4,11 +4,10 @@ public class MainCreateBoxAction(string bankId, int? slotCount) : DataAction
     {
         var dto = CreateBox(loaders, flags, bankId, slotCount);
 
-        return new()
-        {
-            type = DataActionType.MAIN_CREATE_BOX,
-            parameters = [dto.Name]
-        };
+        return new(
+            type: DataActionType.MAIN_CREATE_BOX,
+            parameters: [dto.Name]
+        );
     }
 
     public static BoxEntity CreateBox(DataEntityLoaders loaders, DataUpdateFlags flags, string bankId, int? slotCount)
@@ -33,19 +32,6 @@ public class MainCreateBoxAction(string bankId, int? slotCount) : DataAction
         var id = maxId + 1;
         var order = maxOrder + 1;
         var name = GetNewName();
-
-        BoxDTO dto = new()
-        {
-            BoxEntity = new(
-                SchemaVersion: loaders.boxLoader.GetLastSchemaVersion(),
-                Id: id.ToString(),
-                Type: BoxType.Box,
-                Name: name,
-                SlotCount: slotCount ?? 30,
-                Order: order,
-                BankId: bankId
-            )
-        };
 
         var entity = loaders.boxLoader.WriteEntity(new(
             SchemaVersion: loaders.boxLoader.GetLastSchemaVersion(),

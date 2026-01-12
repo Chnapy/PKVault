@@ -11,11 +11,10 @@ public abstract class DataAction
     }
 }
 
-public struct DataActionPayload
-{
-    public DataActionType type { get; set; }
-    public object?[] parameters { get; set; }
-}
+public record DataActionPayload(
+    DataActionType type,
+    object?[] parameters
+);
 
 public enum DataActionType
 {

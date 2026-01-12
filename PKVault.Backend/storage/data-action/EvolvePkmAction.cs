@@ -61,11 +61,10 @@ public class EvolvePkmAction(
 
         flags.Dex = true;
 
-        return new()
-        {
-            type = DataActionType.EVOLVE_PKM,
-            parameters = [saveLoaders.Save.Version, oldName, oldSpecies, dto.Species]
-        };
+        return new(
+            type: DataActionType.EVOLVE_PKM,
+            parameters: [saveLoaders.Save.Version, oldName, oldSpecies, dto.Species]
+        );
     }
 
     private async Task<DataActionPayload> ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags, string id)
@@ -123,11 +122,10 @@ public class EvolvePkmAction(
 
         flags.Dex = true;
 
-        return new DataActionPayload
-        {
-            type = DataActionType.EVOLVE_PKM,
-            parameters = [null, oldName, oldSpecies, dto.Species]
-        };
+        return new DataActionPayload(
+            type: DataActionType.EVOLVE_PKM,
+            parameters: [null, oldName, oldSpecies, dto.Species]
+        );
     }
 
     private async Task<(ushort evolveSpecies, bool evolveByItem)> GetEvolve(BasePkmVersionDTO dto)
