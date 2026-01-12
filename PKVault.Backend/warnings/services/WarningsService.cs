@@ -1,5 +1,8 @@
 using PKHeX.Core;
 
+/**
+ * Warnings checks in current session data.
+ */
 public class WarningsService(LoadersService loadersService, SaveService saveService)
 {
     private WarningsDTO? WarningsDTO = null;

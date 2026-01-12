@@ -1,6 +1,11 @@
 
 using PKHeX.Core;
 
+/**
+ * Convert any PKM from a generation to another one.
+ * Pass (copy) properties from a PKM to another one.
+ * Apply properties to a PKM.
+ */
 public class PkmConvertService
 {
     public ImmutablePKM GetConvertedPkm(ImmutablePKM sourcePkm, uint generation, uint? intermediatePid)

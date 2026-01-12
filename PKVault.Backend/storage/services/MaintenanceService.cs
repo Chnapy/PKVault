@@ -1,6 +1,9 @@
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
+/**
+ * Data maintenance, out of app common lifecycle.
+ */
 public class MaintenanceService(
     // Direct use of service-provider because of circular dependencies
     IServiceProvider sp

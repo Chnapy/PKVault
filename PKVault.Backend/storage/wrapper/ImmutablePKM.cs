@@ -166,7 +166,7 @@ public class ImmutablePKM(PKM Pkm)
     {
         static ushort GetBaseSpecies(ushort species)
         {
-            var previousSpecies = StaticDataService.staticData.Evolves[species].PreviousSpecies;
+            var previousSpecies = StaticDataService.GetDefinedStaticDataDTO().Evolves[species].PreviousSpecies;
             if (previousSpecies != null)
             {
                 return GetBaseSpecies((ushort)previousSpecies);

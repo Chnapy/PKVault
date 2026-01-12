@@ -51,7 +51,7 @@ public class Program
         var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
 #if MODE_GEN_POKEAPI
-            await host.Services.GetRequiredService<GenPokeapiService>().GenerateFiles();
+            await host.Services.GetRequiredService<GenStaticDataService>().GenerateFiles();
             return null;
 #elif MODE_DEFAULT
 
@@ -151,9 +151,13 @@ public class Program
                 options.JsonSerializerOptions.TypeInfoResolver = RouteJsonContext.Default;
             });
 
-        services.AddSingleton<GenPokeapiService>();
-        services.AddSingleton<GenSpritesheetService>();
+#if MODE_GEN_POKEAPI
         services.AddSingleton<PokeApiService>();
+        services.AddSingleton<GenSpritesheetService>();
+        services.AddSingleton<GenStaticDataService>();
+#endif
+
+        services.AddSingleton<StaticDataService>();
         services.AddSingleton<LoadersService>();
         services.AddSingleton<StorageQueryService>();
         services.AddSingleton<ActionService>();
@@ -162,7 +166,6 @@ public class Program
         services.AddSingleton<WarningsService>();
         services.AddSingleton<BackupService>();
         services.AddSingleton<SaveService>();
-        services.AddSingleton<StaticDataService>();
         services.AddSingleton<SettingsService>();
         services.AddSingleton<DataService>();
         services.AddSingleton<PkmConvertService>();

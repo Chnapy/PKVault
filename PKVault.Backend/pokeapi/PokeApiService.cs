@@ -1,5 +1,10 @@
 using PokeApiNet;
 
+/**
+ * Data fetcher not used during classic run.
+ * 
+ * Gives pokeapi data from local json files.
+ */
 public class PokeApiService
 {
     private readonly PokeApiFileClient client = new();

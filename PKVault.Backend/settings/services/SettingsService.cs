@@ -1,5 +1,8 @@
 using System.Text.Json;
 
+/**
+ * App settings read, create and update.
+ */
 public class SettingsService(LoadersService loadersService, SaveService saveService)
 {
     // Most of settings available as static

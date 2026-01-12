@@ -1,6 +1,9 @@
+/**
+ * Gives spritesheets content.
+ */
 public partial class SpritesheetFileClient
 {
-    public static readonly string[] SheetsParts = [.. StaticDataService.GetGeneratedPathParts(), "sheets"];
+    public static readonly string[] SheetsParts = [.. GenStaticDataService.GetGeneratedPathParts(), "sheets"];
 
     private readonly AssemblyClient assemblyClient = new();
 

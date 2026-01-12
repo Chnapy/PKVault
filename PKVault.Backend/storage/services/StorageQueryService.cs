@@ -1,3 +1,6 @@
+/**
+ * Data queries related to storage.
+ */
 public class StorageQueryService(LoadersService loadersService)
 {
     public async Task<List<BankDTO>> GetMainBanks()

@@ -1,3 +1,6 @@
+/**
+ * Data response after action, providing only data mutated.
+ */
 public class DataService(
     LoadersService loadersService, StorageQueryService storageQueryService, StaticDataService staticDataService,
     WarningsService warningsService, DexService dexService, SaveService saveService,

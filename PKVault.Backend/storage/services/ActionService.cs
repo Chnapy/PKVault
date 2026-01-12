@@ -1,5 +1,8 @@
 using PKHeX.Core;
 
+/**
+ * Action mutation for current session.
+ */
 public class ActionService(
     LoadersService loadersService, PkmConvertService pkmConvertService, StaticDataService staticDataService,
     DexService dexService, BackupService backupService

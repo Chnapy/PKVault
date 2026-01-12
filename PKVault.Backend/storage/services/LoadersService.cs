@@ -1,3 +1,6 @@
+/**
+ * Handles data loaders for current session.
+ */
 public class LoadersService
 {
     private readonly SaveService saveService;

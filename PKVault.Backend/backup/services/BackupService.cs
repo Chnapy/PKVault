@@ -2,6 +2,9 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Text.Json;
 
+/**
+ * Backups creation, restore, remove and listing.
+ */
 public class BackupService(
     LoadersService loadersService, SaveService saveService
 )

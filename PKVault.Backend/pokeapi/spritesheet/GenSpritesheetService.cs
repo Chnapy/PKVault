@@ -5,11 +5,16 @@ using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
+/**
+ * Generator not used during classic run.
+ * 
+ * Generates species and items spritesheets.
+ */
 public class GenSpritesheetService
 {
     private const string SourcePath = "../pokeapi/sprites";
     private const string CustomSourcePath = "./pokeapi/spritesheet";
-    private static readonly string TargetPath = Path.Combine([.. StaticDataService.GetGeneratedPathParts(), "sheets"]);
+    private static readonly string TargetPath = Path.Combine([.. GenStaticDataService.GetGeneratedPathParts(), "sheets"]);
 
     public async Task<StaticSpritesheets> GenerateAllSpritesheets(
         Dictionary<ushort, StaticSpecies> staticSpecies,
@@ -38,7 +43,7 @@ public class GenSpritesheetService
 
         var spritesInfosList = await Task.WhenAll(speciesBySpritesheet.Select((speciesList, sheetIndex) => GenerateChunk(
             [
-                .. sheetIndex == 0 ? new string[] { StaticDataService.GetEggSprite() } : [],
+                .. sheetIndex == 0 ? new string[] { GenStaticDataService.GetEggSprite() } : [],
                 .. speciesList.SelectMany(staticSp =>
                     staticSp.Forms.Values.SelectMany(gen => gen.SelectMany(form =>
                         new List<string?>() {

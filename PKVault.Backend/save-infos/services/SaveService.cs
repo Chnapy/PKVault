@@ -1,6 +1,9 @@
 using System.Collections.Concurrent;
 using PKHeX.Core;
 
+/**
+ * Saves files reading and writing.
+ */
 public class SaveService
 {
     private readonly Locker<
