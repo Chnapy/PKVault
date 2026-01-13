@@ -32,7 +32,7 @@ public class LoadersService
         var loaders = await CreateLoaders();
 
         if (flags.maintainData)
-            await AddAction(loaders, new DataNormalizeAction(), null);
+            await AddAction(loaders, new DataNormalizeAction(fileIOService), null);
 
         if (flags.checkSaves)
             await CheckSaveToSynchronize(loaders);

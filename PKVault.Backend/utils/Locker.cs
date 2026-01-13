@@ -19,6 +19,7 @@ public class Locker<P, T>(string Name, P initialParam, Func<P, Task<T>> DefineVa
     {
         Param = param;
         Initialized = false;
+        Value = default;  // release memory
     }
 
     private async Task EnsureInitialized()

@@ -46,36 +46,6 @@ public class DataEntityLoaders(SaveService saveService)
 
         await Task.WhenAll(tasks);
     }
-
-    public void SetupInitialData()
-    {
-        var time = LogUtil.Time("Data Setup");
-
-        var loaders = this;
-        jsonLoaders.ForEach(loader => loader.SetupInitialData(loaders));
-
-        time();
-    }
-
-    public void MigrateGlobalEntities()
-    {
-        var time = LogUtil.Time("Data Migrate");
-
-        var loaders = this;
-        jsonLoaders.ForEach(loader => loader.MigrateGlobalEntities(loaders));
-
-        time();
-    }
-
-    public void CleanData()
-    {
-        var time = LogUtil.Time("Data Clean");
-
-        var loaders = this;
-        jsonLoaders.ForEach(loader => loader.CleanData(loaders));
-
-        time();
-    }
 }
 
 public record SaveLoaders(

@@ -114,36 +114,4 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
     }
 
     public abstract int GetLastSchemaVersion();
-
-    public abstract void SetupInitialData(DataEntityLoaders loaders);
-
-    public void MigrateGlobalEntities(DataEntityLoaders loaders)
-    {
-        var entities = GetAllEntities();
-        if (entities.Count == 0)
-        {
-            return;
-        }
-
-        var firstItem = entities.First().Value;
-        if (firstItem == null)
-        {
-            return;
-        }
-
-        if (firstItem.SchemaVersion == GetLastSchemaVersion())
-        {
-            return;
-        }
-
-        var migrateFn = GetMigrateFunc(firstItem.SchemaVersion) ?? throw new NotSupportedException($"Schema version {firstItem.SchemaVersion}");
-
-        migrateFn(loaders);
-
-        MigrateGlobalEntities(loaders);
-    }
-
-    protected abstract Action<DataEntityLoaders>? GetMigrateFunc(int currentSchemaVersion);
-
-    public abstract void CleanData(DataEntityLoaders loaders);
 }
