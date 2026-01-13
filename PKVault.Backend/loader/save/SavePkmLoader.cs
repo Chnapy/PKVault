@@ -5,12 +5,16 @@ public class SavePkmLoader(
     SaveWrapper save
 )
 {
+    public static string GetPKMId(string idBase, int box, int slot)
+    {
+        return $"{idBase}B{box}S{slot}"; ;
+    }
+
     public bool HasWritten = false;
 
     private Dictionary<string, PkmSaveDTO> dtoById = [];
     private Dictionary<string, PkmSaveDTO> dtoByBox = [];
-
-    private bool needUpdate = true;
+    private bool NeedUpdate = true;
 
     private DataUpdateSaveListFlags savesFlags = new();
 
@@ -30,11 +34,6 @@ public class SavePkmLoader(
         );
 
         return dto;
-    }
-
-    public static string GetPKMId(string idBase, int box, int slot)
-    {
-        return $"{idBase}B{box}S{slot}"; ;
     }
 
     private void UpdateDtos()
@@ -128,9 +127,8 @@ public class SavePkmLoader(
 
         foreach (var dto in dtoList)
         {
-            // Console.WriteLine($"{dto.Id} - {dto.Box}/{dto.BoxSlot}");
             dictById.Add(dto.Id, dto);
-            dictByBox.Add(dto.BoxId + "." + dto.BoxSlot, dto);
+            dictByBox.Add(GetDTOByBoxKey(dto.BoxId, dto.BoxSlot), dto);
 
             if (!duplicatesDictByIdBase.TryGetValue(dto.IdBase, out var duplicateList))
             {
@@ -144,17 +142,17 @@ public class SavePkmLoader(
         {
             dto = dto with { IsDuplicate = true };
             dictById[dto.Id] = dto;
-            dictByBox[dto.BoxId + "." + dto.BoxSlot] = dto;
+            dictByBox[GetDTOByBoxKey(dto.BoxId, dto.BoxSlot)] = dto;
         });
 
         dtoById = dictById;
         dtoByBox = dictByBox;
-        needUpdate = false;
+        NeedUpdate = false;
     }
 
     public List<PkmSaveDTO> GetAllDtos()
     {
-        if (needUpdate)
+        if (NeedUpdate)
         {
             UpdateDtos();
         }
@@ -164,7 +162,7 @@ public class SavePkmLoader(
 
     public PkmSaveDTO? GetDto(string id)
     {
-        if (needUpdate)
+        if (NeedUpdate)
         {
             UpdateDtos();
         }
@@ -174,22 +172,17 @@ public class SavePkmLoader(
             return dto;
         }
 
-        // if (!id.Substring(id.Length - 3, 3).Contains('S'))
-        // {
-        //     throw new Exception($"Not using save ID with box slot: {id}");
-        // }
-
         return null;
     }
 
     public PkmSaveDTO? GetDto(int box, int boxSlot)
     {
-        if (needUpdate)
+        if (NeedUpdate)
         {
             UpdateDtos();
         }
 
-        if (dtoByBox.TryGetValue(box + "." + boxSlot, out var dto))
+        if (dtoByBox.TryGetValue(GetDTOByBoxKey(box, boxSlot), out var dto))
         {
             return dto;
         }
@@ -224,12 +217,7 @@ public class SavePkmLoader(
                 break;
         }
 
-        savesFlags.UseSave(save.Id).SavePkms.Ids.Add(dto.Id);
-
-        needUpdate = true;
-        // Console.WriteLine($"ADD {dto.Id} / {dto.BoxId} / {dto.BoxSlot} / CurrentHandler={pkm.CurrentHandler}");
-
-        HasWritten = true;
+        SetDTO(dto);
     }
 
     public void DeleteDto(string id)
@@ -252,11 +240,7 @@ public class SavePkmLoader(
                     break;
             }
 
-            // Console.WriteLine($"REMOVE {id} / {dto.Box} / {dto.BoxSlot}");
-
-            savesFlags.UseSave(save.Id).SavePkms.Ids.Add(dto.Id);
-            needUpdate = true;
-            HasWritten = true;
+            RemoveDTO(dto);
         }
     }
 
@@ -282,9 +266,6 @@ public class SavePkmLoader(
         .FindAll(pkm => pkm.IsSpeciesValid());
 
         SetParty(party);
-
-        needUpdate = true;
-        HasWritten = true;
     }
 
     private void SetParty(List<ImmutablePKM> party)
@@ -295,25 +276,56 @@ public class SavePkmLoader(
             {
                 var pkm = party[i];
                 save.SetPartySlotAtIndex(pkm, i);
-
-                if (pkm.Species > 0)
+                if (pkm.IsSpeciesValid())
                 {
-                    var dtoId = GetPKMId(
-                        pkm.GetPKMIdBase(), (int)BoxType.Party, i
+                    var boxSlot = i;
+                    SetDTO(
+                        CreateDTO(
+                            save, pkm, (int)BoxType.Party, boxSlot
+                        )
                     );
-                    savesFlags.UseSave(save.Id).SavePkms.Ids.Add(dtoId);
                 }
             }
             else
             {
-                save.SetPartySlotAtIndex(save.GetBlankPKM(), i);
+                RemoveDTO((int)BoxType.Party, i);
             }
         }
-        // Console.WriteLine($"PARTY = {string.Join(',', party.Select(pk => pk.Nickname))}\n{string.Join(',', save.PartyData.ToList().Select(pk => pk.Nickname))}");
     }
 
     public void SetFlags(DataUpdateSaveListFlags _savesFlags)
     {
         savesFlags = _savesFlags;
     }
+
+    private void SetDTO(PkmSaveDTO dto)
+    {
+        RemoveDTO(dto.BoxId, dto.BoxSlot);
+
+        dtoById[dto.Id] = dto;
+        dtoByBox[GetDTOByBoxKey(dto.BoxId, dto.BoxSlot)] = dto;
+
+        savesFlags.UseSave(save.Id).SavePkms.Ids.Add(dto.Id);
+        HasWritten = true;
+    }
+
+    private void RemoveDTO(int boxId, int boxSlot)
+    {
+        var boxKey = GetDTOByBoxKey(boxId, boxSlot);
+        if (dtoByBox.TryGetValue(boxKey, out var value))
+        {
+            RemoveDTO(value);
+        }
+    }
+
+    private void RemoveDTO(PkmSaveDTO dto)
+    {
+        dtoById.Remove(dto.Id);
+        dtoByBox.Remove(GetDTOByBoxKey(dto.BoxId, dto.BoxSlot));
+
+        savesFlags.UseSave(save.Id).SavePkms.Ids.Add(dto.Id);
+        HasWritten = true;
+    }
+
+    private string GetDTOByBoxKey(int box, int boxSlot) => box + "." + boxSlot;
 }

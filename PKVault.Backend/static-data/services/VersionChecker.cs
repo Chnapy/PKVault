@@ -1,8 +1,9 @@
+using System.Collections.Concurrent;
 using PKHeX.Core;
 
 public class VersionChecker
 {
-    private readonly Dictionary<int, IReadOnlyList<GameVersion>> compatibleVersionsBySpecies = [];
+    private readonly ConcurrentDictionary<int, IReadOnlyList<GameVersion>> compatibleVersionsBySpecies = [];
     private readonly List<(GameVersion Version, SaveWrapper? Save)> allVersionBlankSaves;
 
     public VersionChecker()
