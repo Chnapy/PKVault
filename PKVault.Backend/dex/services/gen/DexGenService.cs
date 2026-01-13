@@ -99,7 +99,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
             {
                 var ownedPkms = pkmList.FindAll(pkm =>
                 {
-                    if (pkm.Gender != (byte)gender)
+                    if (pkm.Gender != gender)
                     {
                         return false;
                     }

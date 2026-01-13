@@ -6,7 +6,8 @@ using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
  */
 public class MaintenanceService(
     // Direct use of service-provider because of circular dependencies
-    IServiceProvider sp
+    IServiceProvider sp,
+    FileIOService fileIOService, SettingsService settingsService
 )
 {
     public async Task CleanMainStorageFiles()
@@ -16,10 +17,10 @@ public class MaintenanceService(
         using var scope = sp.CreateScope();
 
         var loaders = await scope.ServiceProvider.GetRequiredService<LoadersService>().GetLoaders();
-        var pkmVersionsFilepaths = loaders.pkmVersionLoader.GetAllDtos().Select(dto => dto.PkmVersionEntity.Filepath).ToList();
+        var pkmVersionsFilepaths = loaders.pkmVersionLoader.GetAllDtos().Select(dto => dto.Filepath).ToList();
 
         var rootDir = ".";
-        var storagePath = SettingsService.BaseSettings.GetStoragePath();
+        var storagePath = settingsService.GetSettings().GetStoragePath();
 
         var matcher = new Matcher();
         matcher.AddInclude(Path.Combine(storagePath, "**/*"));
@@ -50,7 +51,7 @@ public class MaintenanceService(
             foreach (var path in pathsToClean)
             {
                 Console.WriteLine($"Clean obsolete file {path}");
-                File.Delete(path);
+                fileIOService.Delete(path);
             }
 
             Console.WriteLine($"Total files count = {matches.Files.Count()}");

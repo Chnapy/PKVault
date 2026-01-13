@@ -34,7 +34,7 @@ public class SettingsController(DataService dataService, SettingsService setting
             throw new InvalidOperationException($"Empty action list is required");
         }
 
-        if (settingsMutable.LANGUAGE == null || !SettingsDTO.AllowedLanguages.Contains(settingsMutable.LANGUAGE))
+        if (settingsMutable.LANGUAGE == null || !SettingsService.AllowedLanguages.Contains(settingsMutable.LANGUAGE))
         {
             throw new ArgumentException($"Language value not allowed: {settingsMutable.LANGUAGE}");
         }

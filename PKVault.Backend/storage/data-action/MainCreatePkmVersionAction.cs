@@ -41,7 +41,7 @@ public class MainCreatePkmVersionAction(
             Id: pkmConverted.GetPKMIdBase(),
             PkmId: pkmId,
             Generation: generation,
-            Filepath: PKMLoader.GetPKMFilepath(pkmConverted)
+            Filepath: loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkmConverted)
         ), pkmConverted);
 
         return new(

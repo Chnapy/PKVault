@@ -10,7 +10,7 @@ using SixLabors.ImageSharp.Processing;
  * 
  * Generates species and items spritesheets.
  */
-public class GenSpritesheetService
+public class GenSpritesheetService(FileIOService fileIOService)
 {
     private const string SourcePath = "../pokeapi/sprites";
     private const string CustomSourcePath = "./pokeapi/spritesheet";
@@ -21,11 +21,8 @@ public class GenSpritesheetService
         Dictionary<int, StaticItem> staticItems
     )
     {
-        if (Directory.Exists(TargetPath))
-        {
-            Directory.Delete(TargetPath, true);
-        }
-        Directory.CreateDirectory(TargetPath);
+        fileIOService.Delete(TargetPath);
+        fileIOService.CreateDirectory(TargetPath);
 
         var species = GenerateSpeciesSpritesheet(staticSpecies);
         var items = GenerateItemsSpritesheet(staticItems);
@@ -95,8 +92,7 @@ public class GenSpritesheetService
                 : Path.Combine(SourcePath, url);
             try
             {
-                using var fileStream = File.OpenRead(finalUrl);
-                var img = await Image.LoadAsync<Rgba32>(fileStream);
+                var img = await fileIOService.ReadImage(finalUrl);
                 // Resize if required
                 // img.Mutate(x => x.Resize(SpriteWidth, SpriteHeight));
                 images.Add(img);

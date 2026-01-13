@@ -10,11 +10,11 @@ public class DetachPkmSaveAction(string[] pkmIds) : DataAction
 
         DataActionPayload act(string pkmId)
         {
-            var pkmDto = loaders.pkmLoader.GetDto(pkmId);
-            var oldSaveId = pkmDto!.SaveId;
+            var pkmEntity = loaders.pkmLoader.GetEntity(pkmId);
+            var oldSaveId = pkmEntity!.SaveId;
             if (oldSaveId != null)
             {
-                loaders.pkmLoader.WriteEntity(pkmDto.PkmEntity with { SaveId = default });
+                loaders.pkmLoader.WriteEntity(pkmEntity with { SaveId = default });
             }
 
             var pkmNickname = loaders.pkmVersionLoader.GetDto(pkmId)?.Nickname;

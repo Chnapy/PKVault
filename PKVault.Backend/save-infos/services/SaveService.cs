@@ -6,13 +6,17 @@ using PKHeX.Core;
  */
 public class SaveService
 {
+    private FileIOService fileIOService;
+    private SettingsService settingsService;
     private readonly Locker<
         bool,
         (ConcurrentDictionary<uint, SaveWrapper> SaveById, ConcurrentDictionary<string, SaveWrapper> SaveByPath)
     > savesLocker;
 
-    public SaveService()
+    public SaveService(FileIOService _fileIOService, SettingsService _settingsService)
     {
+        fileIOService = _fileIOService;
+        settingsService = _settingsService;
         savesLocker = new("Saves", true, ReadLocalSaves);
     }
 
@@ -44,7 +48,7 @@ public class SaveService
         SaveByPath.Keys.ToList().ForEach(mainPath =>
         {
             var mainSave = SaveByPath[mainPath];
-            var mainSaveLastWriteTime = File.GetLastWriteTime(mainPath);
+            var mainSaveLastWriteTime = fileIOService.GetLastWriteTime(mainPath);
 
             record.TryAdd(mainSave.Id, SaveInfosDTO.FromSave(mainSave, mainSaveLastWriteTime));
         });
@@ -66,7 +70,7 @@ public class SaveService
 
         var dirPath = Path.GetDirectoryName(path)!;
 
-        File.WriteAllBytes(path, save.GetSaveFileData());
+        fileIOService.WriteBytes(path, save.GetSaveFileData());
 
         UpdateGlobalsWithSave(SaveById, SaveByPath, save, path);
 
@@ -88,7 +92,7 @@ public class SaveService
         ConcurrentDictionary<uint, SaveWrapper> SaveById = [];
         ConcurrentDictionary<string, SaveWrapper> SaveByPath = [];
 
-        var globs = SettingsService.BaseSettings.SettingsMutable.SAVE_GLOBS;
+        var globs = settingsService.GetSettings().SettingsMutable.SAVE_GLOBS;
         var searchPaths = MatcherUtil.SearchPaths(globs);
 
         await Task.WhenAll(
@@ -118,18 +122,6 @@ public class SaveService
         if (save == null)
         {
             return;
-        }
-
-        SaveById.TryGetValue(save.Id, out var existingSave);
-        if (existingSave != default)
-        {
-            // Console.WriteLine($"Multiple existing saves with ID {save.ID32}");
-            // var lastWriteTime = File.GetLastWriteTime(path);
-            // bool modifiedRecently = (DateTime.Now - lastWriteTime).TotalSeconds <= TIMER_INTERVAL;
-            // if (!modifiedRecently)
-            // {
-            //     return false;
-            // }
         }
 
         UpdateGlobalsWithSave(SaveById, SaveByPath, save, path);

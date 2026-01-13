@@ -2,21 +2,29 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>
 {
     public static readonly int OrderGap = 10;
 
-    public BankLoader() : base(
-        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.BaseSettings.SettingsMutable.DB_PATH, "bank.json")),
+    public BankLoader(FileIOService fileIOService, SettingsService settingsService) : base(
+        fileIOService,
+        filePath: MatcherUtil.NormalizePath(Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "bank.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringBankEntity
     )
     {
     }
 
-    protected override BankDTO GetDTOFromEntity(BankEntity entity)
+    public BankDTO CreateDTO(BankEntity entity)
     {
-        return new BankDTO(entity);
+        return new(
+            Id: entity.Id,
+            IdInt: entity.IdInt,
+            Name: entity.Name,
+            IsDefault: entity.IsDefault,
+            Order: entity.Order,
+            View: entity.View
+        );
     }
 
-    protected override BankEntity GetEntityFromDTO(BankDTO dto)
+    protected override BankDTO GetDTOFromEntity(BankEntity entity)
     {
-        return dto.BankEntity;
+        return CreateDTO(entity);
     }
 
     public override int GetLastSchemaVersion() => 1;

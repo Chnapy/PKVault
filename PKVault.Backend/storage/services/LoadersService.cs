@@ -5,13 +5,19 @@ public class LoadersService
 {
     private readonly SaveService saveService;
     private readonly PkmConvertService pkmConvertService;
+    private readonly FileIOService fileIOService;
+    private readonly SettingsService settingsService;
 
     private readonly Locker<(bool maintainData, bool checkSaves), DataEntityLoaders> loadersLocker;
 
-    public LoadersService(SaveService _saveService, PkmConvertService _pkmConvertService)
+    public LoadersService(
+        SaveService _saveService, PkmConvertService _pkmConvertService, FileIOService _fileIOService, SettingsService _settingsService
+    )
     {
         saveService = _saveService;
         pkmConvertService = _pkmConvertService;
+        fileIOService = _fileIOService;
+        settingsService = _settingsService;
 
         loadersLocker = new("Loaders", (maintainData: true, checkSaves: true), ResetLoaders);
     }
@@ -36,11 +42,11 @@ public class LoadersService
 
     public async Task<DataEntityLoaders> CreateLoaders()
     {
-        var bankLoader = new BankLoader();
-        var boxLoader = new BoxLoader();
-        var pkmLoader = new PkmLoader();
-        var pkmVersionLoader = new PkmVersionLoader(pkmLoader);
-        var dexLoader = new DexLoader();
+        var bankLoader = new BankLoader(fileIOService, settingsService);
+        var boxLoader = new BoxLoader(fileIOService, settingsService);
+        var pkmLoader = new PkmLoader(fileIOService, settingsService);
+        var pkmVersionLoader = new PkmVersionLoader(fileIOService, settingsService, pkmLoader);
+        var dexLoader = new DexLoader(fileIOService, settingsService);
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
 
         var saveById = await saveService.GetSaveCloneById();
@@ -50,8 +56,8 @@ public class LoadersService
             {
                 saveLoadersDict.Add(save.Id, new(
                     Save: save,
-                    Boxes: new SaveBoxLoader(save),
-                    Pkms: new SavePkmLoader(pkmConvertService, save)
+                    Boxes: new SaveBoxLoader(save, boxLoader),
+                    Pkms: new SavePkmLoader(settingsService, pkmConvertService, save)
                 ));
             });
         }

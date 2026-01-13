@@ -7,7 +7,7 @@ using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
 using PokeApiNet;
 
-public partial class PokeApiFileClient
+public partial class PokeApiFileClient(FileIOService fileIOService)
 {
     public async Task<T?> GetAsync<T>(UrlNavigation<T> urlResource, JsonTypeInfo<T> jsonContext) where T : ResourceBase
     {
@@ -77,9 +77,7 @@ public partial class PokeApiFileClient
             "index.json"
         ];
 
-        var fileStream = File.OpenRead(string.Join('/', fileParts));
-
-        return await JsonSerializer.DeserializeAsync(fileStream, jsonContext);
+        return await fileIOService.ReadJSONFileAsync(string.Join('/', fileParts), jsonContext);
     }
 
     public string GetApiEndpointString(

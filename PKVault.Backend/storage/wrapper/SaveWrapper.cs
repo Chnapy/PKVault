@@ -90,7 +90,7 @@ public class SaveWrapper(SaveFile Save, string path)
     // public IList<PKM> PartyData => Save.PartyData;
 
     public void SetPartySlotAtIndex(ImmutablePKM pk, int index, EntityImportSettings settings = default) =>
-        Save.SetPartySlotAtIndex(pk.GetPkm(), index, settings);
+        Save.SetPartySlotAtIndex(pk.GetMutablePkm(), index, settings);
     #endregion
 
     #region Slot Storing
@@ -167,9 +167,9 @@ public class SaveWrapper(SaveFile Save, string path)
     // public ImmutablePKM GetBoxSlotAtIndex(int index)
     // public int GetBoxSlotOffset(int index)
     public void SetBoxSlotAtIndex(ImmutablePKM pk, int box, int slot, EntityImportSettings settings = default) =>
-        Save.SetBoxSlotAtIndex(pk.GetPkm(), box, slot, settings);
+        Save.SetBoxSlotAtIndex(pk.GetMutablePkm(), box, slot, settings);
     public void SetBoxSlotAtIndex(ImmutablePKM pk, int index, EntityImportSettings settings = default) =>
-        Save.SetBoxSlotAtIndex(pk.GetPkm(), index, settings);
+        Save.SetBoxSlotAtIndex(pk.GetMutablePkm(), index, settings);
     #endregion
 
     public List<SlotInfoMisc> GetExtraSlots(bool all = false) => Save.GetExtraSlots(all);

@@ -1,50 +1,17 @@
-using System.Text.Json.Serialization;
-using PKHeX.Core;
-
 public record BoxDTO(
-    [property: JsonIgnore] BoxEntity BoxEntity
+    string Id,
+    BoxType Type,
+    string Name,
+    int SlotCount,
+    int Order,
+    string? BankId
 ) : IWithId
 {
-    public string Id { get { return BoxEntity.Id; } }
-
-    public int IdInt
-    {
-        get { return int.Parse(Id); }
-    }
-
-    public BoxType Type => BoxEntity.Type;
-
-    public string Name { get { return BoxEntity.Name; } }
-
-    public int SlotCount => BoxEntity.SlotCount;
-
-    public int Order => BoxEntity.Order;
-
-    public string? BankId => BoxEntity.BankId;
+    public int IdInt => int.Parse(Id);
 
     public bool CanSaveWrite => Type == BoxType.Box;
 
     public bool CanSaveReceivePkm => Type == BoxType.Party || Type == BoxType.Box;
-
-    public static bool CanIdReceivePkm(int boxId) => boxId == (int)BoxType.Party || boxId >= (int)BoxType.Box;
-
-    public static BoxType GetTypeFromStorageSlotType(StorageSlotType slotType) => slotType switch
-    {
-        StorageSlotType.Box => BoxType.Box,
-        StorageSlotType.Party => BoxType.Party,
-        StorageSlotType.BattleBox => BoxType.BattleBox,
-        StorageSlotType.Daycare => BoxType.Daycare,
-        StorageSlotType.GTS => BoxType.GTS,
-        StorageSlotType.FusedKyurem => BoxType.Fused,
-        StorageSlotType.FusedNecrozmaS => BoxType.Fused,
-        StorageSlotType.FusedNecrozmaM => BoxType.Fused,
-        StorageSlotType.FusedCalyrex => BoxType.Fused,
-        StorageSlotType.Misc => BoxType.Misc,
-        StorageSlotType.Resort => BoxType.Resort,
-        StorageSlotType.Ride => BoxType.Ride,
-        StorageSlotType.Shiny => BoxType.Shiny,
-        _ => throw new NotImplementedException(slotType.ToString()),
-    };
 }
 
 public enum BoxType : int

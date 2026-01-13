@@ -10,8 +10,7 @@ public class DeletePkmVersionAction(string[] pkmVersionIds) : DataAction
         DataActionPayload act(string pkmVersionId)
         {
             var pkmVersion = loaders.pkmVersionLoader.GetDto(pkmVersionId);
-            var pkm = pkmVersion!.PkmDto;
-
+            var pkm = loaders.pkmLoader.GetEntity(pkmVersion.PkmId);
             if (pkm.SaveId != null)
             {
                 throw new ArgumentException($"Cannot delete pkm-version attached in save, pkm-version.id={pkmVersionId}");

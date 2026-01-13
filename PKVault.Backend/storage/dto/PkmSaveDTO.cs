@@ -1,113 +1,38 @@
-using System.Diagnostics;
 using System.Text.Json.Serialization;
 using PKHeX.Core;
 
-public record PkmSaveDTO : BasePkmVersionDTO
+public record PkmSaveDTO(
+    bool CanEdit,
+    string SettingsLanguage,
+    ImmutablePKM Pkm,
+
+    uint SaveId,
+    int BoxId,
+    int BoxSlot,
+    bool IsDuplicate,
+
+    [property: JsonIgnore] SaveWrapper Save
+) : BasePkmVersionDTO(
+    SavePkmLoader.GetPKMId(Pkm.GetPKMIdBase(), BoxId, BoxSlot),
+    Pkm.Generation,
+    CanEdit,
+    SettingsLanguage,
+    Pkm
+)
 {
-    public static PkmSaveDTO FromPkm(
-        SaveWrapper save, ImmutablePKM pkm, int boxId, int boxSlot
-    )
-    {
-        Stopwatch sw = new();
-        sw.Start();
+    public string IdBase => Pkm.GetPKMIdBase();
 
-        var idBase = pkm.GetPKMIdBase();
+    public bool IsShadow => Pkm.IsShadow;
+    public int Team => BoxSlotFlags.IsBattleTeam();
+    public bool IsLocked => BoxSlotFlags.HasFlag(StorageSlotSource.Locked);
+    public int Party => BoxSlotFlags.IsParty();
+    public bool IsStarter => BoxSlotFlags.HasFlag(StorageSlotSource.Starter);
 
-        var dto = new PkmSaveDTO(
-            idBase,
-            save, pkm, boxId, boxSlot
-        );
-
-        sw.Stop();
-        dto.LoadingDuration = sw.Elapsed.TotalMilliseconds;
-
-        return dto;
-    }
-
-    public static string GetPKMId(string idBase, int box, int slot)
-    {
-        return $"{idBase}B{box}S{slot}"; ;
-    }
-
-    public string IdBase { get; }
-
-    public uint SaveId { get; }
-
-    public int BoxId { get; }
-
-    public int BoxSlot { get; }
-
-    public bool IsShadow { get; }
-
-    public int Team { get; }
-
-    public bool IsLocked { get; }
-
-    public int Party { get; }
-
-    public bool IsStarter { get; }
-
-    public bool IsDuplicate { get; private set; }
-
-    // -- actions
-
-    public bool CanMove { get; }
-
-    public bool CanDelete { get; }
-
-    public bool CanMoveToMain { get; }
-
-    public bool CanMoveToSave { get; }
-
+    public bool CanMove => !IsLocked && BoxLoader.CanIdReceivePkm(BoxId);
+    public bool CanDelete => !IsLocked && CanMove;
+    public bool CanMoveToMain => !IsLocked && Pkm.Version > 0 && Pkm.Generation > 0 && CanDelete && !Pkm.IsShadow && !Pkm.IsEgg && Party == -1;
+    public bool CanMoveToSave => !IsLocked && Pkm.Version > 0 && Pkm.Generation > 0 && CanMoveToMain;
     public bool CanMoveAttachedToMain => CanMoveToMain && !IsDuplicate;
 
-    [JsonIgnore()]
-    public readonly SaveWrapper Save;
-
-    private PkmSaveDTO(
-        string idBase,
-        SaveWrapper save, ImmutablePKM pkm, int boxId, int boxSlot
-    ) : base(GetPKMId(idBase, boxId, boxSlot), pkm, save.Generation)
-    {
-        Save = save;
-        SaveId = save.Id;
-        BoxId = boxId;
-        BoxSlot = boxSlot;
-
-        IdBase = idBase;
-
-        IsShadow = Pkm is IShadowCapture pkmShadow && pkmShadow.IsShadow;
-
-        Team = Save.GetBoxSlotFlags(BoxId, BoxSlot).IsBattleTeam();
-        IsLocked = Save.GetBoxSlotFlags(BoxId, BoxSlot).HasFlag(StorageSlotSource.Locked);
-        Party = Save.GetBoxSlotFlags(BoxId, BoxSlot).IsParty();
-        IsStarter = Save.GetBoxSlotFlags(BoxId, BoxSlot).HasFlag(StorageSlotSource.Starter);
-
-        CanMove = !IsLocked && BoxDTO.CanIdReceivePkm(BoxId);
-        CanDelete = !IsLocked && CanMove;
-        CanMoveToMain = !IsLocked && Version > 0 && Generation > 0 && CanDelete && !IsShadow && !IsEgg && Party == -1;
-        CanMoveToSave = !IsLocked && Version > 0 && Generation > 0 && CanMoveToMain;
-    }
-
-    public void SetDuplicate(bool isDuplicate)
-    {
-        IsDuplicate = isDuplicate;
-    }
-
-    public override PkmSaveDTO WithPKM(ImmutablePKM pkm)
-    {
-        return FromPkm(
-            Save, pkm, BoxId, BoxSlot
-        );
-    }
-
-    public PkmVersionDTO? GetPkmVersion(PkmVersionLoader pkmVersionLoader)
-    {
-        var pkmVersion = pkmVersionLoader.GetDto(IdBase);
-        if (pkmVersion?.PkmDto?.SaveId == Save.Id)
-        {
-            return pkmVersion;
-        }
-        return null;
-    }
+    private readonly StorageSlotSource BoxSlotFlags = Save.GetBoxSlotFlags(BoxId, BoxSlot);
 }

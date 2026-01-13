@@ -3,22 +3,26 @@ using System.Text.Json.Serialization.Metadata;
 
 public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWithId where E : IEntity
 {
+    protected FileIOService fileIOService;
+
     protected Dictionary<string, E>? entitiesById = null;
+    private DataUpdateFlagsState<string> flags = new();
 
     public string FilePath { get; }
     public bool HasWritten { get; set; } = false;
     protected JsonTypeInfo<Dictionary<string, E>> DictJsonContext;
 
-    private DataUpdateFlagsState<string> flags = new();
-
-    public EntityLoader(string filePath, JsonTypeInfo<Dictionary<string, E>> dictJsonContext)
+    public EntityLoader(
+        FileIOService _fileIOService,
+        string filePath, JsonTypeInfo<Dictionary<string, E>> dictJsonContext
+    )
     {
+        fileIOService = _fileIOService;
         FilePath = MatcherUtil.NormalizePath(filePath);
         DictJsonContext = dictJsonContext;
     }
 
     protected abstract DTO GetDTOFromEntity(E entity);
-    protected abstract E GetEntityFromDTO(DTO dto);
 
     public List<DTO> GetAllDtos()
     {
@@ -35,25 +39,9 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
 
     private Dictionary<string, E> GetFileContent()
     {
-        if (!File.Exists(FilePath))
-        {
-            Console.WriteLine($"Entity DB file not existing: creating {FilePath}");
-            string emptyJson = JsonSerializer.Serialize([], DictJsonContext);
-
-            string? directory = Path.GetDirectoryName(FilePath);
-            if (!string.IsNullOrEmpty(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-            File.WriteAllText(FilePath, emptyJson);
-        }
-
-        string json = File.ReadAllText(FilePath);
-
         try
         {
-            return JsonSerializer.Deserialize(json, DictJsonContext) ?? [];
+            return fileIOService.ReadJSONFile(FilePath, DictJsonContext, []);
         }
         catch (Exception ex)
         {
@@ -122,12 +110,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
 
         Console.WriteLine($"Write entities to {FilePath}");
 
-        using var fileStream = File.Create(FilePath);
-        await JsonSerializer.SerializeAsync(
-            fileStream,
-            entitiesById ?? [],
-            DictJsonContext
-        );
+        await fileIOService.WriteJSONFileAsync(FilePath, DictJsonContext, entitiesById ?? []);
     }
 
     public abstract int GetLastSchemaVersion();

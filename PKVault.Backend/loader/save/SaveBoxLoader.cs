@@ -1,6 +1,6 @@
 using PKHeX.Core;
 
-public class SaveBoxLoader(SaveWrapper save)
+public class SaveBoxLoader(SaveWrapper save, BoxLoader boxLoader)
 {
     public bool HasWritten = false;
 
@@ -63,7 +63,7 @@ public class SaveBoxLoader(SaveWrapper save)
         }
 
         extraSlots
-            .Select(slot => BoxDTO.GetTypeFromStorageSlotType(slot.Type))
+            .Select(slot => BoxLoader.GetTypeFromStorageSlotType(slot.Type))
             .Distinct()
             .ToList()
             .FindAll(slotType => slotType != BoxType.Daycare)
@@ -76,7 +76,7 @@ public class SaveBoxLoader(SaveWrapper save)
                 };
                 var id = box.ToString();
                 var name = boxType.ToString();
-                var slotCount = extraSlots.FindAll(slot => BoxDTO.GetTypeFromStorageSlotType(slot.Type) == boxType).Count;
+                var slotCount = extraSlots.FindAll(slot => BoxLoader.GetTypeFromStorageSlotType(slot.Type) == boxType).Count;
 
                 boxes.Add(id, new(
                         SchemaVersion: default,
@@ -90,7 +90,7 @@ public class SaveBoxLoader(SaveWrapper save)
                 currentOrder++;
             });
 
-        return boxes.Select(entry => (entry.Key, new BoxDTO(entry.Value))).ToDictionary();
+        return boxes.Select(entry => (entry.Key, boxLoader.CreateDTO(entry.Value))).ToDictionary();
     }
 
     public List<BoxDTO> GetAllDtos()

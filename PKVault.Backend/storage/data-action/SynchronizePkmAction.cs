@@ -19,10 +19,14 @@ public class SynchronizePkmAction(
         var pkmVersionDtos = loaders.pkmVersionLoader.GetAllDtos();
 
         var pkmVersionsBySaveId = pkmVersionDtos
-            .Where(pv => pv.PkmDto.SaveId != null
-                && saveLoaders.TryGetValue((uint)pv.PkmDto.SaveId, out var save)
-                && save.Save.Generation == pv.Generation)
-            .GroupBy(pv => (uint)pv.PkmDto.SaveId!)
+            .Where(pv =>
+            {
+                var pkmDto = loaders.pkmLoader.GetEntity(pv.PkmId);
+                return pkmDto?.SaveId != null
+                && saveLoaders.TryGetValue((uint)pkmDto.SaveId, out var save)
+                && save.Save.Generation == pv.Generation;
+            })
+            .GroupBy(pv => (uint)loaders.pkmLoader.GetEntity(pv.PkmId)!.SaveId!)
             .ToDictionary(g => g.Key, g => g.ToList());
 
         (string PkmId, string SavePkmId)[][] synchronizationData = await Task.WhenAll(
@@ -56,7 +60,7 @@ public class SynchronizePkmAction(
                 continue;
             }
 
-            var versionId = savePkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id;
+            var versionId = loaders.pkmVersionLoader.GetPkmSaveVersion(savePkm)?.Id;
             if (versionId != null)
             {
                 savePkmsByVersionId[versionId] = savePkm;
@@ -119,7 +123,7 @@ public class SynchronizePkmAction(
             var saveLoaders = loaders.saveLoadersDict[(uint)pkmDto.SaveId!];
             var pkmVersionDto = pkmVersionDtos.Find(version => version.Generation == saveLoaders.Save.Generation);
             var savePkm = savePkmId == null
-                ? saveLoaders.Pkms.GetAllDtos().Find(pkm => pkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == pkmVersionDto.Id)
+                ? saveLoaders.Pkms.GetAllDtos().Find(pkm => loaders.pkmVersionLoader.GetPkmSaveVersion(pkm)?.Id == pkmVersionDto.Id)
                 : saveLoaders.Pkms.GetDto(savePkmId);
 
             if (savePkm == null)
@@ -134,7 +138,7 @@ public class SynchronizePkmAction(
                 // update xp etc,
                 // and species/form only when possible
 
-                var saveVersion = PkmVersionDTO.GetSingleVersion(version.Version);
+                var saveVersion = StaticDataService.GetSingleVersion(version.Version);
                 var versionSave = BlankSaveFile.Get(saveVersion);
                 var correctSpeciesForm = versionSave.Personal.IsPresentInGame(savePkm.Pkm.Species, savePkm.Pkm.Form);
                 versionPkm = versionPkm.Update(versionPkm =>
@@ -150,7 +154,7 @@ public class SynchronizePkmAction(
                         versionPkm.Language = savePkm.Pkm.Language;
                     }
 
-                    if (savePkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == version.Id)
+                    if (loaders.pkmVersionLoader.GetPkmSaveVersion(savePkm)?.Id == version.Id)
                     {
                         pkmConvertService.PassAllToPkmSafe(savePkm.Pkm, versionPkm);
                     }
@@ -160,8 +164,9 @@ public class SynchronizePkmAction(
                     }
                 });
 
+                var versionEntity = loaders.pkmVersionLoader.GetEntity(version.Id);
                 loaders.pkmVersionLoader.WriteEntity(
-                    version.PkmVersionEntity with { Filepath = PKMLoader.GetPKMFilepath(versionPkm) },
+                    versionEntity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(versionPkm) },
                     versionPkm
                 );
             });
@@ -197,7 +202,7 @@ public class SynchronizePkmAction(
             var saveLoaders = loaders.saveLoadersDict[(uint)pkmDto.SaveId!];
             var pkmVersionDto = pkmVersionDtos.Find(version => version.Generation == saveLoaders.Save.Generation);
             var savePkm = savePkmId == null
-                ? saveLoaders.Pkms.GetAllDtos().Find(pkm => pkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == pkmVersionDto.Id)
+                ? saveLoaders.Pkms.GetAllDtos().Find(pkm => loaders.pkmVersionLoader.GetPkmSaveVersion(pkm)?.Id == pkmVersionDto.Id)
                 : saveLoaders.Pkms.GetDto(savePkmId);
 
             if (savePkm == null)
@@ -213,13 +218,14 @@ public class SynchronizePkmAction(
             var correctSpeciesForm = saveLoaders.Save.Personal.IsPresentInGame(versionPkm.Species, versionPkm.Form);
             if (correctSpeciesForm)
             {
-                savePkm = savePkm.WithPKM(
-                    savePkm.Pkm.Update(pkm =>
+                savePkm = savePkm with
+                {
+                    Pkm = savePkm.Pkm.Update(pkm =>
                     {
                         pkm.Species = versionPkm.Species;
                         pkm.Form = versionPkm.Form;
                     })
-                );
+                };
             }
 
             if (saveLoaders.Save.Language != 0)
@@ -228,13 +234,15 @@ public class SynchronizePkmAction(
                 {
                     pkm.Language = saveLoaders.Save.Language;
                 });
-                loaders.pkmVersionLoader.WriteEntity(pkmVersionDto.PkmVersionEntity, versionPkm);
+                var versionEntity = loaders.pkmVersionLoader.GetEntity(pkmVersionDto.Id);
+                loaders.pkmVersionLoader.WriteEntity(versionEntity, versionPkm);
             }
 
-            savePkm = savePkm.WithPKM(
-                savePkm.Pkm.Update(pkm =>
+            savePkm = savePkm with
+            {
+                Pkm = savePkm.Pkm.Update(pkm =>
                 {
-                    if (savePkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == pkmVersionDto.Id)
+                    if (loaders.pkmVersionLoader.GetPkmSaveVersion(savePkm)?.Id == pkmVersionDto.Id)
                     {
                         pkmConvertService.PassAllToPkmSafe(versionPkm, pkm);
                     }
@@ -243,7 +251,7 @@ public class SynchronizePkmAction(
                         pkmConvertService.PassAllDynamicsNItemToPkm(versionPkm, pkm);
                     }
                 })
-            );
+            };
 
             saveLoaders.Pkms.WriteDto(savePkm);
         }

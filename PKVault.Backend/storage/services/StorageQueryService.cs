@@ -1,7 +1,7 @@
 /**
  * Data queries related to storage.
  */
-public class StorageQueryService(LoadersService loadersService)
+public class StorageQueryService(LoadersService loadersService, PkmLegalityService pkmLegalityService)
 {
     public async Task<List<BankDTO>> GetMainBanks()
     {
@@ -127,11 +127,11 @@ public class StorageQueryService(LoadersService loadersService)
             if (saveId == null)
             {
                 var pkmVersion = loaders.pkmVersionLoader.GetDto(id);
-                return (id, pkmVersion == null ? null : new PkmLegalityDTO(pkmVersion));
+                return (id, pkmVersion == null ? null : pkmLegalityService.CreateDTO(pkmVersion));
             }
 
             var pkmSave = loaders.saveLoadersDict[(uint)saveId].Pkms.GetDto(id);
-            return (id, pkmSave == null ? null : new PkmLegalityDTO(pkmSave));
+            return (id, pkmSave == null ? null : pkmLegalityService.CreateDTO(pkmSave));
         }).ToDictionary();
     }
 }

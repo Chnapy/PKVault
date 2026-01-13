@@ -38,11 +38,12 @@ public class Program
 
     public static void Copyright()
     {
+        var (BuildID, Version) = SettingsService.GetBuildInfo();
         Console.WriteLine("PKVault Copyright (C) 2026  Richard Haddad"
         + "\nThis program comes with ABSOLUTELY NO WARRANTY."
         + "\nThis is free software, and you are welcome to redistribute it under certain conditions."
         + "\nFull license can be accessed here: https://github.com/Chnapy/PKVault/blob/main/LICENSE"
-        + $"\nPKVault v{SettingsService.BaseSettings.Version} BuildID = {SettingsService.BaseSettings.BuildID}"
+        + $"\nPKVault v{Version} BuildID = {BuildID}"
         + $"\nCurrent time UTC = {DateTime.UtcNow}\n");
     }
 
@@ -91,11 +92,16 @@ public class Program
 
         ConfigureServices(builder.Services);
 
-        var certificate = SettingsService.BaseSettings.GetHttpsCertPemPathPath() != null && SettingsService.BaseSettings.GetHttpsKeyPemPathPath() != null
+        var sp = builder.Services.BuildServiceProvider();
+        var fileIOService = sp.GetRequiredService<FileIOService>();
+        var settings = sp.GetRequiredService<SettingsService>()
+            .GetSettings();
+
+        var certificate = settings.GetHttpsCertPemPathPath() != null && settings.GetHttpsKeyPemPathPath() != null
             ? X509Certificate2.CreateFromPem(
-                File.ReadAllText(SettingsService.BaseSettings.GetHttpsCertPemPathPath()!),
-                File.ReadAllText(SettingsService.BaseSettings.GetHttpsKeyPemPathPath()!)
-                )
+                fileIOService.ReadText(settings.GetHttpsCertPemPathPath()!),
+                fileIOService.ReadText(settings.GetHttpsKeyPemPathPath()!)
+            )
             : null;
 
         builder.WebHost.ConfigureKestrel(serverOptions =>
@@ -106,7 +112,7 @@ public class Program
                 {
                     listenOptions.UseHttps(certificate);
                 }
-                else if (SettingsService.BaseSettings.SettingsMutable.HTTPS_NOCERT == true)
+                else if (settings.SettingsMutable.HTTPS_NOCERT == true)
                 {
                     listenOptions.UseHttps();
                 }
@@ -116,7 +122,7 @@ public class Program
 
         var app = builder.Build();
 
-        ConfigureAppBuilder(app, certificate != default || SettingsService.BaseSettings.SettingsMutable.HTTPS_NOCERT == true);
+        ConfigureAppBuilder(app, certificate != default || settings.SettingsMutable.HTTPS_NOCERT == true);
 
         return app;
     }
@@ -158,6 +164,7 @@ public class Program
 #endif
 
         services.AddSingleton<StaticDataService>();
+        services.AddSingleton<FileIOService>();
         services.AddSingleton<LoadersService>();
         services.AddSingleton<StorageQueryService>();
         services.AddSingleton<ActionService>();
@@ -169,6 +176,7 @@ public class Program
         services.AddSingleton<SettingsService>();
         services.AddSingleton<DataService>();
         services.AddSingleton<PkmConvertService>();
+        services.AddSingleton<PkmLegalityService>();
 
 #if DEBUG && MODE_DEFAULT
         services.AddEndpointsApiExplorer();

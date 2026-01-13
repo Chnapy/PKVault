@@ -1,15 +1,15 @@
 using PKHeX.Core;
 using PokeApiNet;
-using System.IO.Compression;
-using System.Text;
-using System.Text.Json;
 
 /**
  * Generator not used during classic run.
  * 
  * Generates all static data and spritesheets.
  */
-public class GenStaticDataService(PokeApiService pokeApiService, GenSpritesheetService genSpritesheetService)
+public class GenStaticDataService(
+    PokeApiService pokeApiService, GenSpritesheetService genSpritesheetService, FileIOService fileIOService,
+    PkmLegalityService pkmLegalityService
+)
 {
     public static readonly EntityContext LAST_ENTITY_CONTEXT = EntityContext.Gen9a;
 
@@ -34,7 +34,7 @@ public class GenStaticDataService(PokeApiService pokeApiService, GenSpritesheetS
             );
         });
 
-        await Task.WhenAll(SettingsDTO.AllowedLanguages.Select(lang =>
+        await Task.WhenAll(SettingsService.AllowedLanguages.Select(lang =>
             GenerateStaticData(lang, spritesheetsTask)
         ));
 
@@ -74,22 +74,10 @@ public class GenStaticDataService(PokeApiService pokeApiService, GenSpritesheetS
         time();
 
         var staticDataPath = Path.Combine([.. GetStaticDataPathParts(lang)]);
-        var parentPath = Path.GetDirectoryName(staticDataPath)!;
 
         time = LogUtil.Time($"Write static-data {lang} to {staticDataPath}");
 
-        var jsonContent = JsonSerializer.Serialize(dto, StaticDataJsonContext.Default.StaticDataDTO);
-
-        if (!Directory.Exists(parentPath))
-        {
-            Directory.CreateDirectory(parentPath);
-        }
-
-        using var originalFileStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonContent));
-        using var compressedFileStream = File.Create(staticDataPath);
-        using var compressionStream = new GZipStream(compressedFileStream, CompressionLevel.Optimal);
-
-        originalFileStream.CopyTo(compressionStream);
+        fileIOService.WriteJSONGZipFile(staticDataPath, StaticDataJsonContext.Default.StaticDataDTO, dto);
 
         time();
     }
@@ -104,7 +92,7 @@ public class GenStaticDataService(PokeApiService pokeApiService, GenSpritesheetS
         {
             tasks.Add(Task.Run(async () =>
             {
-                var saveVersion = PkmVersionDTO.GetSingleVersion(version);
+                var saveVersion = GetSingleVersion(version);
                 var blankSave = saveVersion == default
                     ? null
                     : BlankSaveFile.Get(saveVersion);
@@ -294,7 +282,7 @@ public class GenStaticDataService(PokeApiService pokeApiService, GenSpritesheetS
                         pkm.RefreshChecksum();
                     });
 
-                    var legality = PkmLegalityDTO.GetLegalitySafe(pkm);
+                    var legality = pkmLegalityService.GetLegalitySafe(pkm);
                     var battleOnly = legality.Results.Any(result =>
                         result.Identifier == CheckIdentifier.Form
                         && result.Result == LegalityCheckResultCode.FormBattle
@@ -523,7 +511,7 @@ public class GenStaticDataService(PokeApiService pokeApiService, GenSpritesheetS
             dict.Add(value.Id, value);
         }
         time();
-        // File.WriteAllText("toto.txt", string.Join('\n', notFound));
+
         return dict;
     }
 
@@ -777,7 +765,6 @@ public class GenStaticDataService(PokeApiService pokeApiService, GenSpritesheetS
         }
         time();
 
-        // File.WriteAllText("./item-not-found.md", string.Join('\n', notFound));
         return dict;
     }
 
@@ -804,7 +791,7 @@ public class GenStaticDataService(PokeApiService pokeApiService, GenSpritesheetS
                 {
                     foreach (var version in Enum.GetValues<GameVersion>())
                     {
-                        var saveVersion = PkmVersionDTO.GetSingleVersion(version);
+                        var saveVersion = GetSingleVersion(version);
                         if (saveVersion == default)
                         {
                             continue;
@@ -1165,6 +1152,37 @@ public class GenStaticDataService(PokeApiService pokeApiService, GenSpritesheetS
             GameVersion.EFL => [.. GetPokeApiVersion(GameVersion.E), .. GetPokeApiVersion(GameVersion.FRLG)],
             #endregion
         };
+    }
+
+    /**
+     * Get a valid single version from any version, including groups.
+     */
+    public static GameVersion GetSingleVersion(GameVersion version)
+    {
+        HashSet<GameVersion> ignoredVersions = [
+            default,
+            GameVersion.Any,
+            GameVersion.Invalid,
+            GameVersion.GO,
+        ];
+
+        if (ignoredVersions.Contains(version))
+        {
+            var context = version.Context;
+
+            try
+            {
+                return context.GetSingleGameVersion();
+            }
+            catch
+            {
+                return default;
+            }
+        }
+
+        return version.IsValidSavedVersion()
+            ? version
+            : GameUtil.GameVersions.ToList().Find(v => !ignoredVersions.Contains(v) && version.ContainsFromLumped(v));
     }
 
     private const string GH_PREFIX = "https://raw.githubusercontent.com/PokeAPI/sprites/master/";

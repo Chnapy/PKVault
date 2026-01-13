@@ -97,27 +97,27 @@ public class MovePkmAction(
 
     private DataActionPayload MainToMain(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
     {
-        var dto = loaders.pkmLoader.GetDto(pkmId);
-        if (dto == default)
+        var entity = loaders.pkmLoader.GetEntity(pkmId);
+        if (entity == default)
         {
             throw new KeyNotFoundException("Pkm not found");
         }
 
-        var pkmAlreadyPresent = loaders.pkmLoader.GetAllDtos().Find(pkm =>
+        var pkmAlreadyPresent = loaders.pkmLoader.GetAllEntities().Values.ToList().Find(pkm =>
             pkm.Id != pkmId
             && pkm.BoxId == targetBoxId
             && pkm.BoxSlot == targetBoxSlot
         );
         if (pkmAlreadyPresent != null)
         {
-            loaders.pkmLoader.WriteEntity(pkmAlreadyPresent.PkmEntity with
+            loaders.pkmLoader.WriteEntity(pkmAlreadyPresent with
             {
-                BoxId = dto.BoxId,
-                BoxSlot = dto.BoxSlot
+                BoxId = entity.BoxId,
+                BoxSlot = entity.BoxSlot
             });
         }
 
-        loaders.pkmLoader.WriteEntity(dto.PkmEntity with
+        loaders.pkmLoader.WriteEntity(entity with
         {
             BoxId = (uint)targetBoxId,
             BoxSlot = (uint)targetBoxSlot
@@ -169,13 +169,13 @@ public class MovePkmAction(
 
         if (targetPkmDto != null)
         {
-            var switchedSourcePkmDto = PkmSaveDTO.FromPkm(
+            var switchedSourcePkmDto = sourceSaveLoaders.Pkms.CreateDTO(
                 sourceSaveLoaders.Save, targetPkmDto.Pkm, sourcePkmDto.BoxId, sourcePkmDto.BoxSlot
             );
             sourceSaveLoaders.Pkms.WriteDto(switchedSourcePkmDto);
         }
 
-        sourcePkmDto = PkmSaveDTO.FromPkm(
+        sourcePkmDto = sourceSaveLoaders.Pkms.CreateDTO(
             sourcePkmDto.Save, sourcePkmDto.Pkm, targetBoxId, targetBoxSlot
         );
 
@@ -307,8 +307,7 @@ public class MovePkmAction(
             throw new ArgumentException($"PkmVersionEntity not found for generation={saveLoaders.Save.Generation}");
         }
 
-        var pkmEntity = pkmVersionDto.PkmDto.PkmEntity;
-
+        var pkmEntity = loaders.pkmLoader.GetEntity(pkmVersionDto.PkmId);
         if (pkmEntity.SaveId != default)
         {
             throw new ArgumentException($"PkmEntity already in save, id={pkmEntity.Id}, saveId={pkmEntity.SaveId}");
@@ -339,12 +338,12 @@ public class MovePkmAction(
             loaders.pkmLoader.DeleteEntity(pkmEntity.Id);
         }
 
-        var pkmSaveDTO = PkmSaveDTO.FromPkm(
+        var pkmSaveDTO = saveLoaders.Pkms.CreateDTO(
             saveLoaders.Save, pkm, targetBoxId, targetBoxSlot
         );
         saveLoaders.Pkms.WriteDto(pkmSaveDTO);
 
-        if (attached && pkmSaveDTO.GetPkmVersion(loaders.pkmVersionLoader) == null)
+        if (attached && loaders.pkmVersionLoader.GetPkmSaveVersion(pkmSaveDTO) == null)
         {
             throw new ArgumentException($"pkmSaveDTO.PkmVersionId is null, should be {pkmSaveDTO.Id}");
         }
@@ -402,7 +401,7 @@ public class MovePkmAction(
                 Id: savePkm.IdBase,
                 PkmId: pkmEntityToCreate.Id,
                 Generation: savePkm.Generation,
-                Filepath: PKMLoader.GetPKMFilepath(savePkm.Pkm)
+                Filepath: loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(savePkm.Pkm)
             ), savePkm.Pkm);
         }
 

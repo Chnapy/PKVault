@@ -6,7 +6,8 @@ using System.Text.Json;
  * Backups creation, restore, remove and listing.
  */
 public class BackupService(
-    LoadersService loadersService, SaveService saveService
+    FileIOService fileIOService, LoadersService loadersService, SaveService saveService,
+    SettingsService settingsService
 )
 {
     private static readonly string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
@@ -61,7 +62,7 @@ public class BackupService(
             var fileName = GetBackupFilename(loaders.startTime);
             var bkpZipPath = Path.Combine(bkpPath, fileName);
 
-            File.WriteAllBytes(bkpZipPath, memoryStream.ToArray());
+            fileIOService.WriteBytes(bkpZipPath, memoryStream.ToArray());
         }
         steptime();
 
@@ -194,12 +195,7 @@ public class BackupService(
         var fileName = GetBackupFilename(createdAt);
         var bkpZipPath = Path.Combine(bkpPath, fileName);
 
-        if (!File.Exists(bkpZipPath))
-        {
-            throw new KeyNotFoundException($"File does not exist: {bkpZipPath}");
-        }
-
-        File.Delete(bkpZipPath);
+        fileIOService.Delete(bkpZipPath);
     }
 
     public async Task RestoreBackup(DateTime createdAt)
@@ -211,7 +207,7 @@ public class BackupService(
         Console.WriteLine($"Backup restore {fileName}");
 
         var bkpZipPath = Path.Combine(bkpPath, fileName);
-        if (!File.Exists(bkpZipPath))
+        if (!fileIOService.Exists(bkpZipPath))
         {
             throw new Exception($"File does not exist: {bkpZipPath}");
         }
@@ -231,8 +227,8 @@ public class BackupService(
         // TODO read in-memory
         pathsEntry.ExtractToFile(bkpTmpPathsPath, true);
 
-        var paths = JsonSerializer.Deserialize(
-            File.ReadAllText(bkpTmpPathsPath),
+        var paths = fileIOService.ReadJSONFile(
+            bkpTmpPathsPath,
             EntityJsonContext.Default.DictionaryStringString
         );
 
@@ -252,7 +248,7 @@ public class BackupService(
             }
         }
 
-        File.Delete(bkpTmpPathsPath);
+        fileIOService.Delete(bkpTmpPathsPath);
 
         logtime();
 
@@ -285,8 +281,8 @@ public class BackupService(
 
     private string GetBackupsPath()
     {
-        var backupPath = SettingsService.BaseSettings.SettingsMutable.BACKUP_PATH;
-        Directory.CreateDirectory(backupPath);
+        var backupPath = settingsService.GetSettings().SettingsMutable.BACKUP_PATH;
+        fileIOService.CreateDirectory(backupPath);
         return backupPath;
     }
 }

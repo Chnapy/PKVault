@@ -6,7 +6,7 @@ using PKHeX.Core;
  * Pass (copy) properties from a PKM to another one.
  * Apply properties to a PKM.
  */
-public class PkmConvertService
+public class PkmConvertService(PkmLegalityService pkmLegalityService)
 {
     public ImmutablePKM GetConvertedPkm(ImmutablePKM sourcePkm, uint generation, uint? intermediatePid)
     {
@@ -35,7 +35,7 @@ public class PkmConvertService
     {
         EntityConverter.AllowIncompatibleConversion = EntityCompatibilitySetting.AllowIncompatibleSane;
 
-        if (!EntityConverter.IsCompatibleWithModifications(sourcePkm.GetPkm(), blankPkm))
+        if (!EntityConverter.IsCompatibleWithModifications(sourcePkm.GetMutablePkm(), blankPkm))
         {
             throw new Exception($"PKM conversion not possible, origin PKM not compatible with generation={blankPkm.Format}");
         }
@@ -43,7 +43,7 @@ public class PkmConvertService
         var intermediatePkm = GetIntermediatePkmConvert(sourcePkm, blankPkm.Format, intermediatePid);
 
         var converted = EntityConverter.TryMakePKMCompatible(
-            intermediatePkm.GetPkm(),
+            intermediatePkm.GetMutablePkm(),
             blankPkm,
             out var result,
             out var destPkm
@@ -85,7 +85,7 @@ public class PkmConvertService
 
     private ImmutablePKM GetIntermediateConvertG2ToG3(ImmutablePKM sourcePkm, uint? intermediatePid)
     {
-        var pkmIntermediate = EntityConverter.ConvertToType(sourcePkm.GetPkm(), new PK3().GetType(), out var intermediateResult);
+        var pkmIntermediate = EntityConverter.ConvertToType(sourcePkm.GetMutablePkm(), new PK3().GetType(), out var intermediateResult);
         Console.WriteLine($"Convert-intermediate result={intermediateResult}");
 
         if (pkmIntermediate == default)
@@ -113,7 +113,7 @@ public class PkmConvertService
             }
             else
             {
-                pkmIntermediate.SetPIDGender(sourcePkm.Gender);
+                pkmIntermediate.SetPIDGender((byte)sourcePkm.Gender);
             }
         }
 
@@ -194,7 +194,7 @@ public class PkmConvertService
             destPkm.Language = sourcePkm.Language;
         }
 
-        destPkm.Gender = sourcePkm.Gender;
+        destPkm.Gender = (byte)sourcePkm.Gender;
 
         destPkm.OriginalTrainerName = sourcePkm.OriginalTrainerName;
 
@@ -255,7 +255,7 @@ public class PkmConvertService
         {
             convertEVFn = value => (int)(value / sourcePkm.MaxEV * 200);
         }
-        else if (sourcePkm.GetPkm() is PB7)
+        else if (sourcePkm.GetMutablePkm() is PB7)
         {
             convertEVFn = value => (int)(value / 200 * destPkm.MaxEV);
         }
@@ -350,7 +350,7 @@ public class PkmConvertService
 
     public void ApplyAbilityToPkm(PKM pkm)
     {
-        bool hasAbilityOrPidIssue() => PkmLegalityDTO.GetLegalitySafe(new(pkm)).Results.Any(result =>
+        bool hasAbilityOrPidIssue() => pkmLegalityService.GetLegalitySafe(new(pkm)).Results.Any(result =>
             !result.Valid
             && (result.Identifier == CheckIdentifier.Ability || result.Identifier == CheckIdentifier.PID)
         );

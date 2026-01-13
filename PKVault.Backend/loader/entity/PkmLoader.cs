@@ -1,20 +1,26 @@
 public class PkmLoader : EntityLoader<PkmDTO, PkmEntity>
 {
-    public PkmLoader() : base(
-        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.BaseSettings.SettingsMutable.DB_PATH, "pkm.json")),
+    public PkmLoader(FileIOService fileIOService, SettingsService settingsService) : base(
+        fileIOService,
+        filePath: MatcherUtil.NormalizePath(Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "pkm.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringPkmEntity
     )
     {
     }
 
-    protected override PkmDTO GetDTOFromEntity(PkmEntity entity)
+    public PkmDTO CreateDTO(PkmEntity entity)
     {
-        return PkmDTO.FromEntity(entity);
+        return new PkmDTO(
+            Id: entity.Id,
+            BoxId: entity.BoxId,
+            BoxSlot: entity.BoxSlot,
+            SaveId: entity.SaveId
+        );
     }
 
-    protected override PkmEntity GetEntityFromDTO(PkmDTO dto)
+    protected override PkmDTO GetDTOFromEntity(PkmEntity entity)
     {
-        return dto.PkmEntity;
+        return CreateDTO(entity);
     }
 
     public override int GetLastSchemaVersion() => 1;
@@ -47,7 +53,7 @@ public class PkmLoader : EntityLoader<PkmDTO, PkmEntity>
             {
                 try
                 {
-                    var pkmBytes = File.ReadAllBytes(pkmVersionEntity.Filepath);
+                    var pkmBytes = fileIOService.ReadBytes(pkmVersionEntity.Filepath);
                     var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
 
                     var oldId = pkmVersionEntity.Id;

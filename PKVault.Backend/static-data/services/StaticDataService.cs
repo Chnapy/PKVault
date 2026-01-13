@@ -3,7 +3,7 @@ using PKHeX.Core;
 /**
  * Gives static-data, including pokeapi data and spritesheets.
  */
-public class StaticDataService
+public class StaticDataService(SettingsService settingsService)
 {
     public static readonly EntityContext LAST_ENTITY_CONTEXT = GenStaticDataService.LAST_ENTITY_CONTEXT;
     private static StaticDataDTO? staticData = null;
@@ -17,7 +17,7 @@ public class StaticDataService
             var client = new AssemblyClient();
 
             staticData = (await client.GetAsyncJsonGz(
-                GenStaticDataService.GetStaticDataPathParts(SettingsService.BaseSettings.GetSafeLanguage()),
+                GenStaticDataService.GetStaticDataPathParts(settingsService.GetSettings().GetSafeLanguage()),
                 StaticDataJsonContext.Default.StaticDataDTO
             ))!;
         }
@@ -34,6 +34,8 @@ public class StaticDataService
     {
         return await spritesheetFileClient.GetAsyncString(sheetName);
     }
+
+    public static GameVersion GetSingleVersion(GameVersion version) => GenStaticDataService.GetSingleVersion(version);
 
     public static string GetPokeapiItemName(string pkhexItemName) => GenStaticDataService.GetPokeapiItemName(pkhexItemName);
 

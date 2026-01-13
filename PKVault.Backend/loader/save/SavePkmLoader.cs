@@ -1,7 +1,8 @@
 using PKHeX.Core;
 
 public class SavePkmLoader(
-    PkmConvertService pkmConvertService, SaveWrapper save
+    SettingsService settingsService, PkmConvertService pkmConvertService,
+    SaveWrapper save
 )
 {
     public bool HasWritten = false;
@@ -12,6 +13,29 @@ public class SavePkmLoader(
     private bool needUpdate = true;
 
     private DataUpdateSaveListFlags savesFlags = new();
+
+    public PkmSaveDTO CreateDTO(SaveWrapper save, ImmutablePKM pkm, int boxId, int boxSlot)
+    {
+        var dto = new PkmSaveDTO(
+            CanEdit: !pkm.IsEgg,
+            SettingsLanguage: settingsService.GetSettings().GetSafeLanguage(),
+            Pkm: pkm,
+
+            SaveId: save.Id,
+            BoxId: boxId,
+            BoxSlot: boxSlot,
+            IsDuplicate: false,
+
+            Save: save
+        );
+
+        return dto;
+    }
+
+    public static string GetPKMId(string idBase, int box, int slot)
+    {
+        return $"{idBase}B{box}S{slot}"; ;
+    }
 
     private void UpdateDtos()
     {
@@ -26,7 +50,7 @@ public class SavePkmLoader(
                 if (pkm.IsSpeciesValid())
                 {
                     var boxSlot = i;
-                    dtoList.Add(PkmSaveDTO.FromPkm(
+                    dtoList.Add(CreateDTO(
                         save, pkm, (int)BoxType.Party, boxSlot
                     ));
                 }
@@ -44,7 +68,7 @@ public class SavePkmLoader(
                 {
                     var box = i;
                     var boxSlot = j;
-                    dtoList.Add(PkmSaveDTO.FromPkm(
+                    dtoList.Add(CreateDTO(
                         save, pkm, box, boxSlot
                     ));
                 }
@@ -66,7 +90,7 @@ public class SavePkmLoader(
                 if (pkm != default && pkm.IsSpeciesValid())
                 {
                     var boxSlot = i;
-                    dtoList.Add(PkmSaveDTO.FromPkm(
+                    dtoList.Add(CreateDTO(
                         save, pkm, (int)BoxType.Daycare, boxSlot
                     ));
                 }
@@ -81,7 +105,7 @@ public class SavePkmLoader(
 
         extraPkms.ForEach((extra) =>
         {
-            var boxType = BoxDTO.GetTypeFromStorageSlotType(extra.Slot.Type);
+            var boxType = BoxLoader.GetTypeFromStorageSlotType(extra.Slot.Type);
             int box = boxType switch
             {
                 BoxType.Box => throw new NotImplementedException(),
@@ -92,7 +116,7 @@ public class SavePkmLoader(
             {
                 boxSlot += saveDaycare.DaycareSlotCount;
             }
-            dtoList.Add(PkmSaveDTO.FromPkm(
+            dtoList.Add(CreateDTO(
                 save, extra.Pkm, box, boxSlot
             ));
         });
@@ -118,7 +142,9 @@ public class SavePkmLoader(
 
         duplicatesDictByIdBase.Values.Where(list => list.Count > 1).SelectMany(list => list).ToList().ForEach(dto =>
         {
-            dto.SetDuplicate(true);
+            dto = dto with { IsDuplicate = true };
+            dictById[dto.Id] = dto;
+            dictByBox[dto.BoxId + "." + dto.BoxSlot] = dto;
         });
 
         dtoById = dictById;
@@ -173,14 +199,14 @@ public class SavePkmLoader(
 
     public void WriteDto(PkmSaveDTO dto)
     {
-        if (!BoxDTO.CanIdReceivePkm(dto.BoxId))
+        if (!BoxLoader.CanIdReceivePkm(dto.BoxId))
         {
             throw new Exception("Not allowed for pkm in daycare");
         }
 
         var savePkmType = save.PKMType;
 
-        var pkm = pkmConvertService.GetConvertedPkm(dto.Pkm, save.GetBlankPKM().GetPkm(), null);
+        var pkm = pkmConvertService.GetConvertedPkm(dto.Pkm, save.GetBlankPKM().GetMutablePkm(), null);
         if (pkm == default)
         {
             throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetType()} to.type={savePkmType}");
@@ -211,7 +237,7 @@ public class SavePkmLoader(
         var dto = GetDto(id);
         if (dto != default)
         {
-            if (!BoxDTO.CanIdReceivePkm(dto.BoxId))
+            if (!BoxLoader.CanIdReceivePkm(dto.BoxId))
             {
                 throw new Exception("Not allowed for pkm in daycare");
             }
@@ -272,7 +298,7 @@ public class SavePkmLoader(
 
                 if (pkm.Species > 0)
                 {
-                    var dtoId = PkmSaveDTO.GetPKMId(
+                    var dtoId = GetPKMId(
                         pkm.GetPKMIdBase(), (int)BoxType.Party, i
                     );
                     savesFlags.UseSave(save.Id).SavePkms.Ids.Add(dtoId);

@@ -1,6 +1,8 @@
 using PKHeX.Core;
 
-public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot) : DataAction
+public class SortPkmAction(
+    uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot
+) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
@@ -43,7 +45,7 @@ public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveE
                 applyValue: (entry) =>
                 {
                     var currentValue = savePkms[entry.Index];
-                    saveLoaders.Pkms.WriteDto(PkmSaveDTO.FromPkm(
+                    saveLoaders.Pkms.WriteDto(saveLoaders.Pkms.CreateDTO(
                         currentValue.Save, currentValue.Pkm,
                         entry.BoxId, entry.BoxSlot
                     ));
@@ -88,7 +90,8 @@ public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveE
                 applyValue: (entry) =>
                 {
                     var currentValue = pkmVersions[entry.Index];
-                    loaders.pkmLoader.WriteEntity(currentValue.PkmDto.PkmEntity with
+                    var entity = loaders.pkmLoader.GetEntity(currentValue.PkmId);
+                    loaders.pkmLoader.WriteEntity(entity with
                     {
                         BoxId = (uint)entry.BoxId,
                         BoxSlot = (uint)entry.BoxSlot
@@ -97,7 +100,7 @@ public class SortPkmAction(uint? saveId, int fromBoxId, int toBoxId, bool leaveE
                 onSpaceMissing: () =>
                 {
                     var box = MainCreateBoxAction.CreateBox(loaders, flags, bankId, null);
-                    boxes.Add(new(box));
+                    boxes.Add(loaders.boxLoader.CreateDTO(box));
                 }
             );
         }

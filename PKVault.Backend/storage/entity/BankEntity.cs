@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 public record BankEntity(
     string Id,
     string Name,
@@ -11,5 +13,6 @@ public record BankEntity(
 
     public record BankViewSave(uint SaveId, int[] SaveBoxIds, int Order);
 
+    [JsonIgnore()]
     public int IdInt => int.Parse(Id);
 }

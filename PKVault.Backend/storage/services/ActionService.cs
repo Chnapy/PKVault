@@ -5,7 +5,8 @@ using PKHeX.Core;
  */
 public class ActionService(
     LoadersService loadersService, PkmConvertService pkmConvertService, StaticDataService staticDataService,
-    DexService dexService, BackupService backupService
+    DexService dexService, BackupService backupService, SettingsService settingsService,
+    PkmLegalityService pkmLegalityService
 )
 {
     public async Task<DataUpdateFlags> MainCreateBox(string bankId)
@@ -58,8 +59,7 @@ public class ActionService(
     {
         return await AddAction(
             new MovePkmAction(
-                staticDataService,
-                pkmConvertService,
+                staticDataService, pkmConvertService,
                 pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached)
         );
     }
@@ -138,7 +138,9 @@ public class ActionService(
     public async Task<DataUpdateFlags> SortPkms(uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot)
     {
         return await AddAction(
-            new SortPkmAction(saveId, fromBoxId, toBoxId, leaveEmptySlot)
+            new SortPkmAction(
+                saveId, fromBoxId, toBoxId, leaveEmptySlot
+            )
         );
     }
 
@@ -236,22 +238,22 @@ public class ActionService(
 
         try
         {
-            var legality = PkmLegalityDTO.GetLegalitySafe(pkm, save);
+            var legality = pkmLegalityService.GetLegalitySafe(pkm, save);
 
             var moveComboSource = new LegalMoveComboSource();
             var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
 
             save ??= new(BlankSaveFile.Get(
-                PkmVersionDTO.GetSingleVersion(pkm.Version),
+                StaticDataService.GetSingleVersion(pkm.Version),
                 pkm.OriginalTrainerName,
-                (LanguageID)pkmConvertService.GetPkmLanguage(pkm.GetPkm())
+                (LanguageID)pkmConvertService.GetPkmLanguage(pkm.GetMutablePkm())
             ), "");
 
             var filteredSources = new FilteredGameDataSource(save.GetSave(), GameInfo.Sources);
             moveSource.ChangeMoveSource(filteredSources.Moves);
             moveSource.ReloadMoves(legality);
 
-            var movesStr = GameInfo.GetStrings(SettingsService.BaseSettings.GetSafeLanguage()).movelist;
+            var movesStr = GameInfo.GetStrings(settingsService.GetSettings().GetSafeLanguage()).movelist;
 
             var availableMoves = new List<MoveItem>();
 

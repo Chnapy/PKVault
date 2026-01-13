@@ -1,21 +1,55 @@
-using PKHeX.Core;
-
 public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
 {
-    public readonly PKMMemoryLoader pkmFileLoader;
-    private PkmLoader pkmLoader;
+    private readonly SettingsService settingsService;
+
+    public readonly PKMLoader pkmFileLoader;
+    private readonly PkmLoader pkmLoader;
+
+    private readonly VersionChecker versionChecker = new();
 
     private Dictionary<string, Dictionary<string, PkmVersionEntity>>? entitiesByPkmId = null;
 
     public PkmVersionLoader(
+        FileIOService fileIOService,
+        SettingsService _settingsService,
         PkmLoader _pkmLoader
     ) : base(
-        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.BaseSettings.SettingsMutable.DB_PATH, "pkm-version.json")),
+        fileIOService,
+        filePath: MatcherUtil.NormalizePath(Path.Combine(_settingsService.GetSettings().SettingsMutable.DB_PATH, "pkm-version.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringPkmVersionEntity
     )
     {
+        settingsService = _settingsService;
         pkmLoader = _pkmLoader;
-        pkmFileLoader = new(pkmLoader, [.. GetAllEntities().Values]);
+        pkmFileLoader = new(fileIOService, _settingsService, pkmLoader, [.. GetAllEntities().Values]);
+    }
+
+    public PkmVersionDTO CreateDTO(PkmVersionEntity entity, ImmutablePKM pkm)
+    {
+        var filepathAbsolute = Path.Combine(settingsService.GetSettings().AppDirectory, entity.Filepath);
+        var isFilePresent = fileIOService.Exists(filepathAbsolute);
+
+        var dto = new PkmVersionDTO(
+            Id: entity.Id,
+            Generation: entity.Generation,
+            CanEdit: !pkm.IsEgg,
+            SettingsLanguage: settingsService.GetSettings().GetSafeLanguage(),
+            Pkm: pkm,
+
+            PkmId: entity.PkmId,
+            IsFilePresent: isFilePresent,
+            Filepath: entity.Filepath,
+            FilepathAbsolute: filepathAbsolute,
+
+            versionChecker
+        );
+
+        if (dto.Id != entity.Id)
+        {
+            throw new Exception($"Id mismatch dto.id={dto.Id} entity.id={entity.Id}");
+        }
+
+        return dto;
     }
 
     public Dictionary<string, Dictionary<string, PkmVersionEntity>> GetAllEntitiesByPkmId()
@@ -42,6 +76,22 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         });
 
         return entitiesByPkmId;
+    }
+
+    public PkmVersionDTO? GetPkmSaveVersion(PkmSaveDTO pkmSave)
+    {
+        var pkmVersion = GetDto(pkmSave.IdBase);
+        if (pkmVersion == null)
+        {
+            return null;
+        }
+
+        var pkm = pkmLoader.GetEntity(pkmVersion.PkmId);
+        if (pkm?.SaveId == pkmSave.Save.Id)
+        {
+            return pkmVersion;
+        }
+        return null;
     }
 
     public override bool DeleteEntity(string id)
@@ -121,15 +171,9 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
 
     protected override PkmVersionDTO GetDTOFromEntity(PkmVersionEntity entity)
     {
-        var pkmDto = pkmLoader.GetDto(entity.PkmId);
         var pkm = GetPkmVersionEntityPkm(entity);
 
-        return PkmVersionDTO.FromEntity(entity, pkm, pkmDto!);
-    }
-
-    protected override PkmVersionEntity GetEntityFromDTO(PkmVersionDTO dto)
-    {
-        return dto.PkmVersionEntity;
+        return CreateDTO(entity, pkm);
     }
 
     public ImmutablePKM GetPkmVersionEntityPkm(PkmVersionEntity entity)
@@ -186,7 +230,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
                     ImmutablePKM? pkm = null;
                     try
                     {
-                        var pkmBytes = File.ReadAllBytes(pkmVersionEntity.Filepath);
+                        var pkmBytes = fileIOService.ReadBytes(pkmVersionEntity.Filepath);
                         pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
                     }
                     catch (Exception ex)
@@ -205,11 +249,11 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         // rename pk filename if needed
         GetAllEntities().Values.ToList().ForEach(entity =>
         {
-            var pkmBytes = File.ReadAllBytes(entity.Filepath);
+            var pkmBytes = fileIOService.ReadBytes(entity.Filepath);
             var pkm = PKMLoader.CreatePKM(pkmBytes, entity);
 
             var oldFilepath = entity.Filepath;
-            var expectedFilepath = PKMLoader.GetPKMFilepath(pkm);
+            var expectedFilepath = pkmFileLoader.GetPKMFilepath(pkm);
 
             // update pk file
             if (expectedFilepath != oldFilepath)

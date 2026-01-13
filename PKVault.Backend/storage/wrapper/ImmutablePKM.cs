@@ -25,7 +25,7 @@ public class ImmutablePKM(PKM Pkm)
     public string Extension => Pkm.Extension;
     public PersonalInfo PersonalInfo => Pkm.PersonalInfo;
 
-    public ReadOnlySpan<byte> Data => Pkm.Data;
+    // public ReadOnlySpan<byte> Data => Pkm.Data;
 
     public byte[] EncryptedPartyData => Pkm.EncryptedPartyData;
     public byte[] EncryptedBoxData => Pkm.EncryptedBoxData;
@@ -33,9 +33,9 @@ public class ImmutablePKM(PKM Pkm)
     public byte[] DecryptedBoxData => Pkm.DecryptedBoxData;
 
     // Trash Bytes
-    public ReadOnlySpan<byte> NicknameTrash => Pkm.NicknameTrash;
-    public ReadOnlySpan<byte> OriginalTrainerTrash => Pkm.OriginalTrainerTrash;
-    public ReadOnlySpan<byte> HandlingTrainerTrash => Pkm.HandlingTrainerTrash;
+    // public ReadOnlySpan<byte> NicknameTrash => Pkm.NicknameTrash;
+    // public ReadOnlySpan<byte> OriginalTrainerTrash => Pkm.OriginalTrainerTrash;
+    // public ReadOnlySpan<byte> HandlingTrainerTrash => Pkm.HandlingTrainerTrash;
 
     public EntityContext Context => Pkm.Context;
     public byte Format => Pkm.Format;
@@ -43,11 +43,11 @@ public class ImmutablePKM(PKM Pkm)
     // Surface Properties
     public ushort Species => Pkm.Species;
     public string Nickname => Pkm.Nickname;
-    public int HeldItem => Pkm.HeldItem;
-    public byte Gender => Pkm.Gender;
+    // public int HeldItem => Pkm.HeldItem;
+    public Gender Gender => (Gender)Pkm.Gender;
     // public Nature Nature => Pkm.Nature;
     public Nature StatNature => Pkm.StatNature;
-    public int Ability => Pkm.Ability;
+    // public int Ability => Pkm.Ability;
     public byte CurrentFriendship => Pkm.CurrentFriendship;
     public byte Form => GetForm(Pkm);
     public bool IsEgg => Pkm.IsEgg;
@@ -157,6 +157,57 @@ public class ImmutablePKM(PKM Pkm)
 
     public byte CurrentLevel => Pkm.CurrentLevel;
 
+    public bool IsShadow => Pkm is IShadowCapture pkmShadow && pkmShadow.IsShadow;
+    public bool IsAlpha => Pkm is IAlpha pka && pka.IsAlpha;
+    public bool IsNoble => Pkm is INoble pkn && pkn.IsNoble;
+    public bool CanGigantamax => Pkm is IGigantamaxReadOnly pkg && pkg.CanGigantamax;
+    public List<byte> Types => DexGenService.GetTypes(Format, Pkm.PersonalInfo);
+    public uint ExpToLevelUp => Experience.GetEXPToLevelUp(Pkm.CurrentLevel, Pkm.PersonalInfo.EXPGrowth);
+    public double LevelUpPercent => Experience.GetEXPToLevelUpPercentage(Pkm.CurrentLevel, Pkm.EXP, Pkm.PersonalInfo.EXPGrowth);
+    public byte Friendship => Pkm.IsEgg ? (byte)0 : Pkm.CurrentFriendship;
+    public byte EggHatchCount => Pkm.IsEgg ? Pkm.CurrentFriendship : (byte)0;
+
+    public int[] IVs => GetIVs();
+    public int[] EVs => GetEVs();
+    public int[] Stats => GetStats();
+    public int[] BaseStats => GetBaseStats();
+
+    public byte HiddenPowerType => HiddenPower.TryGetTypeIndex(Pkm.HPType, out var hptype)
+        ? (byte)(hptype + 1)
+        : (byte)0;
+
+    public int HiddenPowerPower => Pkm.HPPower;
+
+    public MoveCategory HiddenPowerCategory => Generation <= 3
+        ? (HiddenPowerType < 10 ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL) // TODO duplicate with static-data
+        : MoveCategory.SPECIAL;
+
+    public Nature Nature => GetNature();
+
+    public int Ability => Pkm.Ability == -1
+        ? 0
+        : Pkm.Ability;
+
+    public List<ushort> Moves => [.. GetMoves()];
+
+    public ushort TID => Pkm.TID16;
+
+    public string OriginTrainerName => Pkm.OriginalTrainerName;
+    public Gender OriginTrainerGender => (Gender)Pkm.OriginalTrainerGender;
+    public DateOnly? OriginMetDate => Pkm.MetDate;
+    public byte? OriginMetLevel => Pkm.MetLevel == 0 ? null : Pkm.MetLevel;
+
+    public string GetOriginMetLocation(string language) => GameInfo.GetStrings(language)
+        .GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version);
+
+    public int HeldItem => ItemConverter.GetItemForFormat(Pkm.HeldItem, Pkm.Context, StaticDataService.LAST_ENTITY_CONTEXT);
+    public string? HeldItemPokeapiName => HeldItem > 0
+        ? (HeldItem < GameInfo.Strings.Item.Count ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[HeldItem]) : "")
+        : null;
+
+    // Data used here is considered to be mutable over pkm lifetime
+    public string DynamicChecksum => $"{Species}.{Form}.{Nickname}.{CurrentLevel}.{EXP}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}";
+
     /**
      * Generate ID similar to PKHeX one.
      * Note that Species & Form can change over time (evolve),
@@ -178,7 +229,7 @@ public class ImmutablePKM(PKM Pkm)
         {
             clone.Species = GetBaseSpecies(Pkm.Species);
             clone.Form = 0;
-            if (GetPkm() is GBPKM gbpkm && clone is GBPKM gbclone)
+            if (GetMutablePkm() is GBPKM gbpkm && clone is GBPKM gbclone)
             {
                 gbclone.DV16 = gbpkm.DV16;
             }
@@ -196,7 +247,7 @@ public class ImmutablePKM(PKM Pkm)
                 clone.SetIVs(ivs);
             }
         });
-        var hash = SearchUtil.HashByDetails(clone.GetPkm());
+        var hash = SearchUtil.HashByDetails(clone.GetMutablePkm());
         var id = $"G{clone.Format}_{hash}_{clone.TID16}";   // note: SID not stored by pk files
 
         return id;
@@ -274,7 +325,7 @@ public class ImmutablePKM(PKM Pkm)
 
     public bool IsSpeciesValid() => Species > 0 && Species < GameInfo.Strings.Species.Count;
 
-    public PKM GetPkm() => Pkm;
+    public PKM GetMutablePkm() => Pkm;
 
     /**
      * Create a PKM clone and mutate it with given mutator function.

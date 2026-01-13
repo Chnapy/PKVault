@@ -1,20 +1,27 @@
-using System.Text.Json;
+using System.Reflection;
 
 /**
  * App settings read, create and update.
  */
-public class SettingsService(LoadersService loadersService, SaveService saveService)
+public class SettingsService(IServiceProvider sp)
 {
-    // Most of settings available as static
-    public static SettingsDTO BaseSettings = ReadBaseSettings();
+    public static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "./config/pkvault.json");
+    public static readonly string[] AllowedLanguages = ["en", "fr"]; //GameLanguage.AllSupportedLanguages.ToArray();
+
+    private FileIOService fileIOService => sp.GetRequiredService<FileIOService>();
+    private SaveService saveService => sp.GetRequiredService<SaveService>();
+    private LoadersService loadersService => sp.GetRequiredService<LoadersService>();
+
+    private SettingsDTO? BaseSettings;
 
     public async Task UpdateSettings(SettingsMutableDTO settingsMutable)
     {
-        string text = JsonSerializer.Serialize(settingsMutable, SettingsMutableDTOJsonContext.Default.SettingsMutableDTO);
+        var text = fileIOService.WriteJSONFile(
+            FilePath,
+            SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
+            settingsMutable
+        );
         Console.WriteLine(text);
-
-        CheckSettingsFile();
-        File.WriteAllText(SettingsDTO.FilePath, text);
 
         BaseSettings = GetSettings();
 
@@ -25,39 +32,47 @@ public class SettingsService(LoadersService loadersService, SaveService saveServ
     // Full settings
     public SettingsDTO GetSettings()
     {
-        BaseSettings.CanUpdateSettings = loadersService.HasEmptyActionList();
-        BaseSettings.CanScanSaves = loadersService.HasEmptyActionList();
-
-        return BaseSettings;
-    }
-
-    private static SettingsDTO ReadBaseSettings()
-    {
-        CheckSettingsFile();
-
-        string json = File.ReadAllText(SettingsDTO.FilePath);
-        var mutableDto = JsonSerializer.Deserialize(json, SettingsMutableDTOJsonContext.Default.SettingsMutableDTO)!;
-        return new()
+        if (BaseSettings == null)
         {
-            SettingsMutable = mutableDto,
+            BaseSettings = ReadBaseSettings();
+        }
+
+        return BaseSettings with
+        {
+            CanUpdateSettings = loadersService.HasEmptyActionList(),
+            CanScanSaves = loadersService.HasEmptyActionList()
         };
     }
 
-    private static void CheckSettingsFile()
+    public static (Guid BuildID, string Version) GetBuildInfo()
     {
-        if (!File.Exists(SettingsDTO.FilePath))
-        {
-            Console.WriteLine($"Config file not existing: creating {SettingsDTO.FilePath}");
-            string defaultJson = JsonSerializer.Serialize(GetDefaultSettingsMutable(), SettingsMutableDTOJsonContext.Default.SettingsMutableDTO);
+        var assembly = Assembly.GetExecutingAssembly();
+        return (
+            BuildID: assembly.ManifestModule.ModuleVersionId,
+            Version: assembly.GetName().Version?.ToString(3) ?? ""
+        );
+    }
 
-            string? directory = Path.GetDirectoryName(SettingsDTO.FilePath);
-            if (!string.IsNullOrEmpty(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
+    private SettingsDTO ReadBaseSettings()
+    {
+        var mutableDto = fileIOService.ReadJSONFile(
+            FilePath,
+            SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
+            GetDefaultSettingsMutable()
+        );
 
-            File.WriteAllText(SettingsDTO.FilePath, defaultJson);
-        }
+        var (BuildID, Version) = GetBuildInfo();
+
+        return new(
+            BuildID,
+            Version,
+            PkhexVersion: Assembly.GetAssembly(typeof(PKHeX.Core.PKM))?.GetName().Version?.ToString(3) ?? "",
+            AppDirectory: MatcherUtil.NormalizePath(AppDomain.CurrentDomain.BaseDirectory),
+            SettingsPath: FilePath,
+            CanUpdateSettings: false,
+            CanScanSaves: false,
+            SettingsMutable: mutableDto
+        );
     }
 
     private static SettingsMutableDTO GetDefaultSettingsMutable()

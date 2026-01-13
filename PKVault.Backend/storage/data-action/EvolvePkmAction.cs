@@ -47,13 +47,16 @@ public class EvolvePkmAction(
 
         Console.WriteLine($"Evolve from {oldSpecies} to {evolveSpecies} using item? {evolveByItem}");
 
-        dto = dto.WithPKM(dto.Pkm.Update(pkm =>
+        dto = dto with
+        {
+            Pkm = dto.Pkm.Update(pkm =>
         {
             UpdatePkm(pkm, evolveSpecies, evolveByItem);
-        }));
+        })
+        };
         saveLoaders.Pkms.WriteDto(dto);
 
-        var pkmVersion = dto.GetPkmVersion(loaders.pkmVersionLoader);
+        var pkmVersion = loaders.pkmVersionLoader.GetPkmSaveVersion(dto);
         if (pkmVersion != null)
         {
             await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersion.PkmId, dto.Id)]);
@@ -69,13 +72,14 @@ public class EvolvePkmAction(
 
     private async Task<DataActionPayload> ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags, string id)
     {
+        var entity = loaders.pkmVersionLoader.GetEntity(id);
         var dto = loaders.pkmVersionLoader.GetDto(id);
         if (dto == default)
         {
             throw new KeyNotFoundException("Pkm-version not found");
         }
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetDtosByPkmId(dto.PkmDto.Id).Values.ToList()
+        var relatedPkmVersions = loaders.pkmVersionLoader.GetDtosByPkmId(dto.PkmId).Values.ToList()
             .FindAll(value => value.Id != dto.Id);
 
         if (
@@ -90,30 +94,38 @@ public class EvolvePkmAction(
 
         var (evolveSpecies, evolveByItem) = await GetEvolve(dto);
 
-        // update dto 1/2
-        dto = dto.WithPKM(dto.Pkm.Update(pkm =>
+        // update dto pkm
+        dto = dto with
         {
-            UpdatePkm(pkm, evolveSpecies, evolveByItem);
-        }));
+            Pkm = dto.Pkm.Update(pkm =>
+            {
+                UpdatePkm(pkm, evolveSpecies, evolveByItem);
+            })
+        };
         loaders.pkmVersionLoader.WriteEntity(
-            dto.PkmVersionEntity with { Filepath = PKMLoader.GetPKMFilepath(dto.Pkm) },
+            entity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(dto.Pkm) },
             dto.Pkm
         );
 
-        // update related dto 1/2
+        // update related dto pkm
         relatedPkmVersions.ForEach((versionDto) =>
         {
-            versionDto = versionDto.WithPKM(versionDto.Pkm.Update(pkm =>
+            versionDto = versionDto with
             {
-                UpdatePkm(pkm, evolveSpecies, false);
-            }));
+                Pkm = versionDto.Pkm.Update(pkm =>
+                {
+                    UpdatePkm(pkm, evolveSpecies, false);
+                })
+            };
+            var versionEntity = loaders.pkmVersionLoader.GetEntity(versionDto.Id);
             loaders.pkmVersionLoader.WriteEntity(
-                versionDto.PkmVersionEntity with { Filepath = PKMLoader.GetPKMFilepath(versionDto.Pkm) },
+                versionEntity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(versionDto.Pkm) },
                 versionDto.Pkm
             );
         });
 
-        if (dto.PkmDto.SaveId != null)
+        var pkmEntity = loaders.pkmLoader.GetEntity(dto.PkmId);
+        if (pkmEntity.SaveId != null)
         {
             await SynchronizePkmAction.SynchronizePkmVersionToSave(pkmConvertService, loaders, flags, [(dto.PkmId, null)]);
         }

@@ -5,9 +5,9 @@ using PokeApiNet;
  * 
  * Gives pokeapi data from local json files.
  */
-public class PokeApiService
+public class PokeApiService(FileIOService fileIOService)
 {
-    private readonly PokeApiFileClient client = new();
+    private readonly PokeApiFileClient client = new(fileIOService);
 
     // public static async Task<PokemonSpecies?> GetPokemonSpecies(string speciesName)
     // {

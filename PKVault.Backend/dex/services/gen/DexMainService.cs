@@ -24,7 +24,7 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
                         && f.Gender == form.Gender
                     ) ?? [];
 
-                    var saveVersion = PkmVersionDTO.GetSingleVersion(form.Version);
+                    var saveVersion = StaticDataService.GetSingleVersion(form.Version);
                     if (!savesByVersion.TryGetValue(saveVersion, out var save))
                     {
                         save = new(saveVersion == default

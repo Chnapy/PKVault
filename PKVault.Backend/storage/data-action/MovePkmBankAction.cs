@@ -101,8 +101,8 @@ public class MovePkmBankAction(
 
     private DataActionPayload MainToMain(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, uint targetBoxId, uint targetBoxSlot)
     {
-        var dto = loaders.pkmLoader.GetDto(pkmId);
-        if (dto == default)
+        var entity = loaders.pkmLoader.GetEntity(pkmId);
+        if (entity == default)
         {
             throw new KeyNotFoundException("Pkm not found");
         }
@@ -117,7 +117,7 @@ public class MovePkmBankAction(
             throw new Exception("Pkm already present");
         }
 
-        loaders.pkmLoader.WriteEntity(dto.PkmEntity with
+        loaders.pkmLoader.WriteEntity(entity with
         {
             BoxId = targetBoxId,
             BoxSlot = targetBoxSlot
@@ -217,20 +217,20 @@ public class MovePkmBankAction(
                 Id: savePkm.IdBase,
                 PkmId: pkmEntityToCreate.Id,
                 Generation: savePkm.Generation,
-                Filepath: PKMLoader.GetPKMFilepath(savePkm.Pkm)
+                Filepath: loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(savePkm.Pkm)
             ), savePkm.Pkm);
         }
 
-        var pkmDto = loaders.pkmLoader.GetDto(pkmVersionEntity.PkmId);
+        var pkmEntity = loaders.pkmLoader.GetEntity(pkmVersionEntity.PkmId);
 
         // if moved to already attached pkm, just update it
-        if (mainPkmAlreadyExists && pkmDto!.SaveId != default)
+        if (mainPkmAlreadyExists && pkmEntity!.SaveId != default)
         {
             await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersionEntity.PkmId, null)]);
 
             if (!attached)
             {
-                loaders.pkmLoader.WriteEntity(pkmDto.PkmEntity with { SaveId = default });
+                loaders.pkmLoader.WriteEntity(pkmEntity with { SaveId = default });
             }
         }
 

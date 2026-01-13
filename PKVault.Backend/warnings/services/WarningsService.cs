@@ -3,7 +3,7 @@ using PKHeX.Core;
 /**
  * Warnings checks in current session data.
  */
-public class WarningsService(LoadersService loadersService, SaveService saveService)
+public class WarningsService(LoadersService loadersService, SaveService saveService, FileIOService fileIOService)
 {
     private WarningsDTO? WarningsDTO = null;
 
@@ -62,7 +62,7 @@ public class WarningsService(LoadersService loadersService, SaveService saveServ
                     throw new KeyNotFoundException($"Path not found for given save {saveLoaders.Save.Id}");
                 }
 
-                var lastWriteTime = File.GetLastWriteTimeUtc(path);
+                var lastWriteTime = fileIOService.GetLastWriteTimeUtc(path);
                 // Console.WriteLine($"Check save {saveLoaders.Save.ID32} to {path}.\nWrite-time from {lastWriteTime} to {startTime}.");
                 return lastWriteTime > startTime;
             })
@@ -139,7 +139,7 @@ public class WarningsService(LoadersService loadersService, SaveService saveServ
                 var pkmVersion = loaders.pkmVersionLoader.GetEntitiesByPkmId(pkm.Id).Values.ToList()
                     .Find(pkmVersion => pkmVersion.Generation == generation);
 
-                var savePkm = pkmVersion == null ? null : saveLoader.Pkms.GetAllDtos().Find(pkm => pkm.GetPkmVersion(loaders.pkmVersionLoader)?.Id == pkmVersion.Id);
+                var savePkm = pkmVersion == null ? null : saveLoader.Pkms.GetAllDtos().Find(pkm => loaders.pkmVersionLoader.GetPkmSaveVersion(pkm)?.Id == pkmVersion.Id);
 
                 if (savePkm == null)
                 {

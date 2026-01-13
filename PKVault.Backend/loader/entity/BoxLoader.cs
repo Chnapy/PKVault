@@ -1,22 +1,52 @@
+using PKHeX.Core;
+
 public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>
 {
     public static readonly int OrderGap = 10;
 
-    public BoxLoader() : base(
-        filePath: MatcherUtil.NormalizePath(Path.Combine(SettingsService.BaseSettings.SettingsMutable.DB_PATH, "box.json")),
+    public static bool CanIdReceivePkm(int boxId) => boxId == (int)BoxType.Party || boxId >= (int)BoxType.Box;
+
+    public static BoxType GetTypeFromStorageSlotType(StorageSlotType slotType) => slotType switch
+    {
+        StorageSlotType.Box => BoxType.Box,
+        StorageSlotType.Party => BoxType.Party,
+        StorageSlotType.BattleBox => BoxType.BattleBox,
+        StorageSlotType.Daycare => BoxType.Daycare,
+        StorageSlotType.GTS => BoxType.GTS,
+        StorageSlotType.FusedKyurem => BoxType.Fused,
+        StorageSlotType.FusedNecrozmaS => BoxType.Fused,
+        StorageSlotType.FusedNecrozmaM => BoxType.Fused,
+        StorageSlotType.FusedCalyrex => BoxType.Fused,
+        StorageSlotType.Misc => BoxType.Misc,
+        StorageSlotType.Resort => BoxType.Resort,
+        StorageSlotType.Ride => BoxType.Ride,
+        StorageSlotType.Shiny => BoxType.Shiny,
+        _ => throw new NotImplementedException(slotType.ToString()),
+    };
+
+    public BoxLoader(FileIOService fileIOService, SettingsService settingsService) : base(
+        fileIOService,
+        filePath: MatcherUtil.NormalizePath(Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "box.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringBoxEntity
     )
     {
     }
 
-    protected override BoxDTO GetDTOFromEntity(BoxEntity entity)
+    public BoxDTO CreateDTO(BoxEntity entity)
     {
-        return new BoxDTO(entity);
+        return new(
+            Id: entity.Id,
+            Type: entity.Type,
+            Name: entity.Name,
+            SlotCount: entity.SlotCount,
+            Order: entity.Order,
+            BankId: entity.BankId
+        );
     }
 
-    protected override BoxEntity GetEntityFromDTO(BoxDTO dto)
+    protected override BoxDTO GetDTOFromEntity(BoxEntity entity)
     {
-        return dto.BoxEntity;
+        return CreateDTO(entity);
     }
 
     public override int GetLastSchemaVersion() => 1;
