@@ -1,14 +1,11 @@
 import React from 'react';
+import type { ErrorType } from './mutator/custom-instance';
 
-type BackendError = {
-    status: number;
-    message: string;
-    stack: string;
-};
+type BackendError = Pick<ErrorType<never>, 'status' | 'message' | 'stack'>;
 
 type BackendErrorsContext = {
     errors: BackendError[];
-    addError: (error: BackendError | Error) => void;
+    addError: (error: Partial<BackendError | Error>) => void;
     removeIndex: (index: number) => void;
 }
 
@@ -27,10 +24,10 @@ export const BackendErrorsContext = {
                 }
 
                 return [ ...errors, {
-                    status: 'status' in error ? error.status : 0,
-                    message: error.message,
+                    status: 'status' in error ? error.status ?? 0 : 0,
+                    message: error.message ?? '',
                     stack: error.stack ?? '',
-                } ];
+                } satisfies BackendError ];
             }),
             removeIndex: index => setBackendErrors(
                 backendErrors.filter((_, i) => i !== index)

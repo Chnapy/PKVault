@@ -47,7 +47,7 @@
 
     <When Condition=" '$(EffectiveMode)' == 'default' ">
       <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-        <PackageReference Include="NSwag.AspNetCore" Version="14.6.0" />
+        <PackageReference Include="NSwag.AspNetCore" Version="14.6.3" />
       </ItemGroup>
       <ItemGroup>
         <EmbeddedResource Include="pokeapi/generated/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />

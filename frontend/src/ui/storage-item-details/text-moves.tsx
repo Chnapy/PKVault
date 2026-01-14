@@ -90,7 +90,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
 
     const formMoves = watch(`moves`);
 
-    const availableMoves = React.useMemo(() => (Array.isArray(availableMovesQuery.data?.data) ? availableMovesQuery.data.data : [])
+    const availableMoves = React.useMemo(() => (availableMovesQuery.data?.data ?? [])
         .map(move => move.id)
         .sort((a, b) => {
             const sa = getStaticMove(a);

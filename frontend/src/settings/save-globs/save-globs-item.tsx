@@ -28,12 +28,12 @@ export const SaveGlobsItem: React.FC<SaveGlobsItemProps> = ({ value, onEdit, onR
     const globResultsQuery = useSettingsGetSaveGlobsResults({ globs: [ value ] });
 
     const { isLoading } = globResultsQuery;
-    const data = Array.isArray(globResultsQuery.data?.data) ? globResultsQuery.data.data : [];
+    const data = globResultsQuery.data?.data ?? [];
 
     const showFiles = isDirectory || data.length !== 1;
 
-    const hasHttpError = !globResultsQuery.isLoading && !!globResultsQuery.data && globResultsQuery.data.status >= 400;
-    const hasError = !globResultsQuery.isLoading && (hasHttpError || globResultsQuery.isError || data.length > 50);
+    const hasHttpError = globResultsQuery.isError;
+    const hasError = !globResultsQuery.isLoading && (globResultsQuery.isError || data.length > 50);
     const hasWarning = !globResultsQuery.isLoading && (hasError || data.length === 0);
 
     // console.log(globResultsQuery.isError, globResultsQuery.error, globResultsQuery.isLoadingError, globResultsQuery.data)

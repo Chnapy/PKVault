@@ -185,6 +185,17 @@ public class Program
             document.PostProcess = doc =>
             {
                 doc.Info.Title = "PKVault API";
+
+                // Required for PKHeX.Core.Gender which has duplicates
+                foreach (var enumSchema in doc.Definitions.Values.Where(s => s.IsEnumeration))
+                {
+                    var distinctValues = enumSchema.Enumeration.Distinct().ToList();
+                    enumSchema.Enumeration.Clear();
+                    foreach (var value in distinctValues)
+                    {
+                        enumSchema.Enumeration.Add(value);
+                    }
+                }
             };
         });
 #endif

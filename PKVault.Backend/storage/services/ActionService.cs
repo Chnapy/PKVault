@@ -177,17 +177,9 @@ public class ActionService(
 
     private async Task<DataUpdateFlags> AddAction(DataAction action)
     {
-        try
-        {
-            var flags = await loadersService.AddAction(action, null);
-            flags.Warnings = true;
-            return flags;
-        }
-        catch (Exception ex)
-        {
-            var flags = await CloneLoaderKeepingAction();
-            throw new DataActionException(ex, flags);
-        }
+        var flags = await loadersService.AddAction(action, null);
+        flags.Warnings = true;
+        return flags;
     }
 
     private async Task<DataUpdateFlags> CloneLoaderKeepingAction()
@@ -236,47 +228,39 @@ public class ActionService(
             : loaders.saveLoadersDict[(uint)saveId].Pkms.GetDto(pkmId)?.Pkm)
             ?? throw new ArgumentException($"Pkm not found, saveId={saveId} pkmId={pkmId}");
 
-        try
+        var legality = pkmLegalityService.GetLegalitySafe(pkm, save);
+
+        var moveComboSource = new LegalMoveComboSource();
+        var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
+
+        save ??= new(BlankSaveFile.Get(
+            StaticDataService.GetSingleVersion(pkm.Version),
+            pkm.OriginalTrainerName,
+            (LanguageID)pkmConvertService.GetPkmLanguage(pkm.GetMutablePkm())
+        ), "");
+
+        var filteredSources = new FilteredGameDataSource(save.GetSave(), GameInfo.Sources);
+        moveSource.ChangeMoveSource(filteredSources.Moves);
+        moveSource.ReloadMoves(legality);
+
+        var movesStr = GameInfo.GetStrings(settingsService.GetSettings().GetSafeLanguage()).movelist;
+
+        var availableMoves = new List<MoveItem>();
+
+        moveComboSource.DataSource.ToList().ForEach(data =>
         {
-            var legality = pkmLegalityService.GetLegalitySafe(pkm, save);
-
-            var moveComboSource = new LegalMoveComboSource();
-            var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
-
-            save ??= new(BlankSaveFile.Get(
-                StaticDataService.GetSingleVersion(pkm.Version),
-                pkm.OriginalTrainerName,
-                (LanguageID)pkmConvertService.GetPkmLanguage(pkm.GetMutablePkm())
-            ), "");
-
-            var filteredSources = new FilteredGameDataSource(save.GetSave(), GameInfo.Sources);
-            moveSource.ChangeMoveSource(filteredSources.Moves);
-            moveSource.ReloadMoves(legality);
-
-            var movesStr = GameInfo.GetStrings(settingsService.GetSettings().GetSafeLanguage()).movelist;
-
-            var availableMoves = new List<MoveItem>();
-
-            moveComboSource.DataSource.ToList().ForEach(data =>
+            if (data.Value > 0 && moveSource.Info.CanLearn((ushort)data.Value))
             {
-                if (data.Value > 0 && moveSource.Info.CanLearn((ushort)data.Value))
-                {
-                    var item = new MoveItem(
-                        Id: data.Value
-                    // Type = MoveInfo.GetType((ushort)data.Value, Pkm.Context),
-                    // Text = movesStr[data.Value],
-                    // SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Length > data.Value && moveSourceTypesRecord[type][data.Value]),
-                    );
-                    availableMoves.Add(item);
-                }
-            });
+                var item = new MoveItem(
+                    Id: data.Value
+                // Type = MoveInfo.GetType((ushort)data.Value, Pkm.Context),
+                // Text = movesStr[data.Value],
+                // SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Length > data.Value && moveSourceTypesRecord[type][data.Value]),
+                );
+                availableMoves.Add(item);
+            }
+        });
 
-            return availableMoves;
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine(ex);
-            return [];
-        }
+        return availableMoves;
     }
 }

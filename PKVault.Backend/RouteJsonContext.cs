@@ -20,6 +20,7 @@ using System.Text.Json.Serialization;
 [JsonSerializable(typeof(BankEntity.BankView))]
 [JsonSerializable(typeof(BankEntity.BankViewSave))]
 [JsonSerializable(typeof(string))]
+[JsonSerializable(typeof(Microsoft.AspNetCore.Mvc.ValidationProblemDetails))]
 public partial class RouteJsonContext : JsonSerializerContext
 {
 }

@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Primitives;
 
-public partial class ExceptionHandlingMiddleware(RequestDelegate next, DataService dataService)
+public partial class ExceptionHandlingMiddleware(RequestDelegate next)
 {
     public async Task Invoke(HttpContext context)
     {
@@ -10,26 +10,24 @@ public partial class ExceptionHandlingMiddleware(RequestDelegate next, DataServi
         {
             await next(context);
         }
-        catch (DataActionException ex)
-        {
-            var data = await dataService.CreateDataFromUpdateFlags(ex.flags);
-            await WriteExceptionResponse(context, ex.ex, data);
-        }
         catch (Exception ex)
         {
-            await WriteExceptionResponse(context, ex, null);
+            await WriteExceptionResponse(context, ex);
         }
     }
 
-    public static void InjectResponseException(HttpResponse response, Exception ex)
+    private static async Task WriteExceptionResponse(HttpContext context, Exception ex)
     {
+        Console.Error.WriteLine(ex);
+        var response = context.Response;
         if (response.HasStarted)
         {
             return;
         }
 
         response.StatusCode = GetStatusCode(ex);
-        response.ContentType = "application/json";
+        response.ContentType = "text/plain";
+        response.ContentLength = 0;
 
         response.Headers.Append("access-control-expose-headers", new StringValues(["error-message", "error-stack"]));
         response.Headers.Append("error-message", JsonSerializer.Serialize(
@@ -40,19 +38,8 @@ public partial class ExceptionHandlingMiddleware(RequestDelegate next, DataServi
             InvalidCharacterRegex().Replace(ex.ToString(), "\n").Replace("\n\n", "\n"),
             RouteJsonContext.Default.String
         ));
-    }
 
-    private static async Task WriteExceptionResponse(HttpContext context, Exception ex, DataDTO? data)
-    {
-        Console.Error.WriteLine(ex);
-
-        InjectResponseException(context.Response, ex);
-
-        if (data != null)
-        {
-            var result = JsonSerializer.Serialize(data, RouteJsonContext.Default.DataDTO);
-            await context.Response.WriteAsync(result);
-        }
+        await response.Body.FlushAsync();
     }
 
     private static int GetStatusCode(Exception ex)

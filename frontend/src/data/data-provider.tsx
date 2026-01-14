@@ -3,15 +3,15 @@ import React from "react";
 import { filterIsDefined } from '../util/filter-is-defined';
 import { BackendErrorsContext } from './backend-errors-context';
 import { getPkmLegalityQueryKey, type PkmLegalityQueryData } from './hooks/use-pkm-legality';
-import { responseBackSchema, type ResponseBack } from './mutator/custom-instance';
-import { getBackupGetAllQueryKey, type backupGetAllResponse } from './sdk/backup/backup.gen';
-import { getDexGetAllQueryKey, type dexGetAllResponse } from './sdk/dex/dex.gen';
+import { QueryError, responseBackSchema, type ResponseBack } from './mutator/custom-instance';
+import { getBackupGetAllQueryKey, type backupGetAllResponseSuccess } from './sdk/backup/backup.gen';
+import { getDexGetAllQueryKey, type dexGetAllResponseSuccess } from './sdk/dex/dex.gen';
 import { DataDTOType, type DataDTO, type DataDTOStateOfDictionaryOfStringAndPkmLegalityDTOData } from './sdk/model';
-import { getSaveInfosGetAllQueryKey, type saveInfosGetAllResponse } from './sdk/save-infos/save-infos.gen';
-import { getSettingsGetQueryKey, type settingsGetResponse } from './sdk/settings/settings.gen';
-import { getStaticDataGetQueryKey, type staticDataGetResponse } from './sdk/static-data/static-data.gen';
-import { getStorageGetActionsQueryKey, getStorageGetMainBanksQueryKey, getStorageGetMainBoxesQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSaveBoxesQueryKey, getStorageGetSavePkmsQueryKey, type storageGetActionsResponse, type storageGetMainPkmsResponse, type storageGetSaveBoxesResponse, type storageGetSavePkmsResponse } from './sdk/storage/storage.gen';
-import { getWarningsGetWarningsQueryKey, type warningsGetWarningsResponse } from './sdk/warnings/warnings.gen';
+import { getSaveInfosGetAllQueryKey, type saveInfosGetAllResponseSuccess } from './sdk/save-infos/save-infos.gen';
+import { getSettingsGetQueryKey, type settingsGetResponseSuccess } from './sdk/settings/settings.gen';
+import { getStaticDataGetQueryKey, type staticDataGetResponseSuccess } from './sdk/static-data/static-data.gen';
+import { getStorageGetActionsQueryKey, getStorageGetMainBanksQueryKey, getStorageGetMainBoxesQueryKey, getStorageGetMainPkmsQueryKey, getStorageGetMainPkmVersionsQueryKey, getStorageGetSaveBoxesQueryKey, getStorageGetSavePkmsQueryKey, type storageGetActionsResponseSuccess, type storageGetMainPkmsResponseSuccess, type storageGetSaveBoxesResponseSuccess, type storageGetSavePkmsResponseSuccess } from './sdk/storage/storage.gen';
+import { getWarningsGetWarningsQueryKey, type warningsGetWarningsResponseSuccess } from './sdk/warnings/warnings.gen';
 
 const isResponse = (obj: unknown): obj is ResponseBack => responseBackSchema.safeParse(obj).success;
 
@@ -34,23 +34,15 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
       },
       mutations: {
         onSettled: async (data, error) => {
-          if (error) console.log('error', error);
-          if (!isResponse(data)) {
-            return;
-          }
-
-          const errorMessage = data.headers.get('error-message');
-          const errorStack = data.headers.get('error-stack');
-          if (errorMessage) {
+          if (error instanceof QueryError) {
             backendErrors.addError({
-              message: errorMessage && JSON.parse(errorMessage),
-              stack: errorStack && JSON.parse(errorStack),
-              status: data.status,
+              message: error.errorMessage ?? undefined,
+              stack: error.errorStack ?? undefined,
+              status: error.status,
             });
           }
 
-          if (!hasDataDTO(data)) {
-            // console.log('NOT stockage-dto', data, error);
+          if (!isResponse(data) || !hasDataDTO(data)) {
             return;
           }
 
@@ -69,7 +61,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 return Object.values(responseData.data ?? {}).filter(filterIsDefined);
               }
 
-              const oldResponse: Partial<storageGetMainPkmsResponse> = client.getQueryData(queryKey) ?? {};
+              const oldResponse: Partial<storageGetMainPkmsResponseSuccess> = client.getQueryData(queryKey) ?? {};
               const oldData = Object.fromEntries((oldResponse.data ?? [])
                 .map(item => [ item.id, item ]));
 
@@ -115,7 +107,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 status: 200,
                 headers: new Headers(),
                 data: settings,
-              } satisfies settingsGetResponse
+              } satisfies settingsGetResponseSuccess
             );
           }
 
@@ -126,7 +118,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 status: 200,
                 headers: new Headers(),
                 data: staticData,
-              } satisfies staticDataGetResponse
+              } satisfies staticDataGetResponseSuccess
             );
           }
 
@@ -191,17 +183,17 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                     status: 200,
                     headers: new Headers(),
                     data: saveData.saveBoxes,
-                  } satisfies storageGetSaveBoxesResponse
+                  } satisfies storageGetSaveBoxesResponseSuccess
                 );
               }
 
               if (saveData.savePkms) {
-                const getData = (): storageGetSavePkmsResponse[ 'data' ] => {
+                const getData = (): storageGetSavePkmsResponseSuccess[ 'data' ] => {
                   if (saveData.savePkms?.all) {
                     return Object.values(saveData.savePkms.data ?? {}).filter(filterIsDefined);
                   }
 
-                  const oldSavePkmsResponse: Partial<storageGetSavePkmsResponse> = client.getQueryData(
+                  const oldSavePkmsResponse: Partial<storageGetSavePkmsResponseSuccess> = client.getQueryData(
                     getStorageGetSavePkmsQueryKey(saveData.saveId)
                   ) ?? {};
                   const oldSavePkms = Object.fromEntries((oldSavePkmsResponse.data ?? [])
@@ -219,7 +211,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                     status: 200,
                     headers: new Headers(),
                     data: getData(),
-                  } satisfies storageGetSavePkmsResponse
+                  } satisfies storageGetSavePkmsResponseSuccess
                 );
               }
 
@@ -236,7 +228,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 status: 200,
                 headers: new Headers(),
                 data: dex,
-              } satisfies dexGetAllResponse
+              } satisfies dexGetAllResponseSuccess
             );
           }
 
@@ -247,7 +239,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 status: 200,
                 headers: new Headers(),
                 data: actions,
-              } satisfies storageGetActionsResponse
+              } satisfies storageGetActionsResponseSuccess
             );
           }
 
@@ -258,7 +250,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 status: 200,
                 headers: new Headers(),
                 data: warnings,
-              } satisfies warningsGetWarningsResponse
+              } satisfies warningsGetWarningsResponseSuccess
             );
           }
 
@@ -269,7 +261,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 status: 200,
                 headers: new Headers(),
                 data: saveInfos,
-              } satisfies saveInfosGetAllResponse
+              } satisfies saveInfosGetAllResponseSuccess
             );
           }
 
@@ -280,7 +272,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({
                 status: 200,
                 headers: new Headers(),
                 data: backups,
-              } satisfies backupGetAllResponse
+              } satisfies backupGetAllResponseSuccess
             );
           }
         }

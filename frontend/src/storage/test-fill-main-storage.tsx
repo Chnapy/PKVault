@@ -1,6 +1,6 @@
 import type React from 'react';
 import { saveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
-import { storageCreateMainBox, storageDeleteMainBox, storageGetMainBoxes, storageGetSaveBoxes, storageGetSavePkms, storageMovePkm, type storageCreateMainBoxResponse } from '../data/sdk/storage/storage.gen';
+import { storageCreateMainBox, storageDeleteMainBox, storageGetMainBoxes, storageGetSaveBoxes, storageGetSavePkms, storageMovePkm, type storageCreateMainBoxResponseSuccess } from '../data/sdk/storage/storage.gen';
 import { Button } from '../ui/button/button';
 import { BankContext } from './bank/bank-context';
 
@@ -41,7 +41,7 @@ export const TestFillMainStorage: React.FC = () => {
 
                         if (saveBoxPkms.length === 0) continue;
 
-                        let createBoxResponse: storageCreateMainBoxResponse | undefined;
+                        let createBoxResponse: storageCreateMainBoxResponseSuccess | undefined;
 
                         try {
                             createBoxResponse = await storageCreateMainBox({

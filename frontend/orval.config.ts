@@ -10,10 +10,6 @@ export default defineConfig({
   backend: {
     input: {
       target: `${VITE_SERVER_URL}/swagger/v1/swagger.json`,
-
-      parserOptions: {
-        validate: false,
-      },
     },
     output: {
       client: "react-query",
@@ -22,7 +18,14 @@ export default defineConfig({
       target: "src/data/sdk/sdk.ts",
       schemas: "src/data/sdk/model",
       httpClient: "fetch",
+      urlEncodeParameters: true,
       override: {
+        fetch: {
+          // required by forceSuccessResponse
+          // @see https://github.com/orval-labs/orval/issues/2550
+          includeHttpResponseReturnType: true,
+          forceSuccessResponse: true,
+        },
         mutator: {
           path: './src/data/mutator/custom-instance.ts',
           name: 'customInstance',

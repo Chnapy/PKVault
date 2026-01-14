@@ -22,11 +22,11 @@ export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number
 
     const desktopMessage = useDesktopMessage();
 
-    const isLoading = queries.some(query => query.isLoading);
+    const isLoading = queries.some(query => query.isLoading
+        // for some reason isLoading can be false and data still not loaded
+        || query.data === undefined);
 
-    const errorQuery = queries.find(query => query.isError || query.data?.status !== 200);
-    const errorStack = errorQuery?.data?.headers.get('error-stack');
-    const error = errorQuery?.error ?? (errorStack && JSON.parse(errorStack));
+    const error = queries.find(query => query.isError)?.error;
 
     React.useEffect(() => {
         if (isLoading) {
@@ -36,12 +36,12 @@ export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number
         const appStartDuration = Date.now() - appStartTime;
         console.log('Setup data load duration:', appStartDuration);
 
-        desktopMessage?.startLoadingFinished(!!errorQuery);
+        desktopMessage?.startLoadingFinished(!!error);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ desktopMessage, isLoading ]);
 
-    if (!isLoading && !errorQuery) {
+    if (!isLoading && !error) {
         return children;
     }
 
