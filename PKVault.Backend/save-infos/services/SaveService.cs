@@ -113,16 +113,21 @@ public class SaveService
     {
         // Console.WriteLine($"UPDATE SAVE {path}");
 
-        SaveWrapper? save = SaveByPath.TryGetValue(path, out var value)
-            ? value
-            : (SaveUtil.TryGetSaveFile(path, out var result)
-                ? new(result, path)
-                : null);
-
-        if (save == null)
+        var (TooSmall, TooBig) = fileIOService.CheckGameFile(path);
+        if (TooSmall || TooBig)
         {
             return;
         }
+
+        var data = fileIOService.ReadBytes(path);
+        if (!SaveUtil.TryGetSaveFile(data, out var saveRaw, path))
+            return;
+
+        saveRaw.Metadata.SetExtraInfo(path);
+        if (saveRaw.Generation <= 3)
+            SaveLanguage.TryRevise(saveRaw);
+
+        SaveWrapper save = new(saveRaw, path);
 
         UpdateGlobalsWithSave(SaveById, SaveByPath, save, path);
 

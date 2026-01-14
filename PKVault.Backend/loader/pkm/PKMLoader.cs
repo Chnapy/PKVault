@@ -37,11 +37,12 @@ public class PKMLoader
             PKMLoadError? error = null;
             try
             {
-                var fi = new FileInfo(pkmVersionEntity.Filepath);
-                if (FileUtil.IsFileTooBig(fi.Length))
+                var (TooSmall, TooBig) = fileIOService.CheckGameFile(pkmVersionEntity.Filepath);
+
+                if (TooBig)
                     throw new PKMLoadException(PKMLoadError.TOO_BIG);
 
-                if (FileUtil.IsFileTooSmall(fi.Length))
+                if (TooSmall)
                     throw new PKMLoadException(PKMLoadError.TOO_SMALL);
 
                 bytes = fileIOService.ReadBytes(pkmVersionEntity.Filepath);

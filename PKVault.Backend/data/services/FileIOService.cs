@@ -5,6 +5,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System.IO.Compression;
 using System.Text;
+using PKHeX.Core;
 
 public class FileIOService
 {
@@ -100,6 +101,21 @@ public class FileIOService
     {
         using var fileStream = File.OpenRead(path);
         return await Image.LoadAsync<Rgba32>(fileStream);
+    }
+
+    public (bool TooSmall, bool TooBig) CheckGameFile(string path)
+    {
+        var fi = new FileInfo(path);
+        if (FileUtil.IsFileTooBig(fi.Length))
+            throw new PKMLoadException(PKMLoadError.TOO_BIG);
+
+        if (FileUtil.IsFileTooSmall(fi.Length))
+            throw new PKMLoadException(PKMLoadError.TOO_SMALL);
+
+        return (
+            TooSmall: FileUtil.IsFileTooSmall(fi.Length),
+            TooBig: FileUtil.IsFileTooBig(fi.Length)
+        );
     }
 
     public bool Exists(string path)
