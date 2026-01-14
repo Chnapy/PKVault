@@ -25,8 +25,8 @@ public class GenStaticDataService(
 
         var spritesheetsTask = Task.Run(async () =>
         {
-            var species = GetStaticSpecies("en");
-            var items = GetStaticItems("en");
+            var species = GetStaticSpecies(SettingsService.DefaultLanguage);
+            var items = GetStaticItems(SettingsService.DefaultLanguage);
 
             return await genSpritesheetService.GenerateAllSpritesheets(
                 await species,
@@ -178,7 +178,7 @@ public class GenStaticDataService(
                         Id = pkmObj.Id,
                         Names = [new() {
                             Name = pkmObj.Name,
-                            Language = new() { Name = "en" }
+                            Language = new() { Name = SettingsService.DefaultLanguage }
                         }],
                         FormNames = [],
                         FormName = "",

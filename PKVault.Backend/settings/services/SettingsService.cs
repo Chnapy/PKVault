@@ -6,7 +6,8 @@ using System.Reflection;
 public class SettingsService(IServiceProvider sp)
 {
     public static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "./config/pkvault.json");
-    public static readonly string[] AllowedLanguages = ["en", "fr"]; //GameLanguage.AllSupportedLanguages.ToArray();
+    public static readonly string DefaultLanguage = "en";
+    public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr"]; //GameLanguage.AllSupportedLanguages.ToArray();
 
     private FileIOService fileIOService => sp.GetRequiredService<FileIOService>();
     private SaveService saveService => sp.GetRequiredService<SaveService>();
@@ -23,7 +24,7 @@ public class SettingsService(IServiceProvider sp)
         );
         Console.WriteLine(text);
 
-        BaseSettings = GetSettings();
+        BaseSettings = ReadBaseSettings();
 
         saveService.InvalidateSaves();
         loadersService.InvalidateLoaders((maintainData: true, checkSaves: true));

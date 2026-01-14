@@ -22,7 +22,7 @@ SettingsMutableDTO SettingsMutable
 
     public string GetSafeLanguage()
     {
-        return SettingsMutable.LANGUAGE ?? "en";
+        return SettingsMutable.LANGUAGE ?? SettingsService.DefaultLanguage;
     }
 
     private static string NormalizeSafePath(string path) => MatcherUtil.NormalizePath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path));

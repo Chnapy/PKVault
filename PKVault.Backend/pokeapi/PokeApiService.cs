@@ -176,7 +176,7 @@ public class PokeApiService(FileIOService fileIOService)
     public static string GetNameForLang(List<Names> names, string lang)
     {
         return names.Find(name => name.Language.Name == lang)?.Name
-            ?? names.Find(name => name.Language.Name == "en")?.Name
+            ?? names.Find(name => name.Language.Name == SettingsService.DefaultLanguage)?.Name
             ?? throw new Exception($"Language not handled: {lang}");
     }
 }

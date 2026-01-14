@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using PKHeX.Core;
 
 /**
@@ -6,20 +7,23 @@ using PKHeX.Core;
 public class StaticDataService(SettingsService settingsService)
 {
     public static readonly EntityContext LAST_ENTITY_CONTEXT = GenStaticDataService.LAST_ENTITY_CONTEXT;
-    private static StaticDataDTO? staticData = null;
+    private static readonly ConcurrentDictionary<string, StaticDataDTO> StaticDataDict = [];
 
     private readonly SpritesheetFileClient spritesheetFileClient = new();
 
-    public async Task<StaticDataDTO> GetStaticData()
+    public async Task<StaticDataDTO> GetStaticData() => await GetStaticData(settingsService.GetSettings().GetSafeLanguage());
+
+    public async Task<StaticDataDTO> GetStaticData(string lang)
     {
-        if (staticData == null)
+        if (!StaticDataDict.TryGetValue(lang, out var staticData))
         {
             var client = new AssemblyClient();
 
             staticData = (await client.GetAsyncJsonGz(
-                GenStaticDataService.GetStaticDataPathParts(settingsService.GetSettings().GetSafeLanguage()),
+                GenStaticDataService.GetStaticDataPathParts(lang),
                 StaticDataJsonContext.Default.StaticDataDTO
             ))!;
+            StaticDataDict[lang] = staticData;
         }
 
         return staticData;
@@ -27,7 +31,9 @@ public class StaticDataService(SettingsService settingsService)
 
     public static StaticDataDTO GetDefinedStaticDataDTO()
     {
-        return staticData ?? throw new InvalidOperationException($"Static Data is null");
+        return StaticDataDict.TryGetValue(SettingsService.DefaultLanguage, out var staticData)
+            ? staticData
+            : throw new InvalidOperationException($"Static Data is null");
     }
 
     public async Task<Stream> GetSpritesheetStream(string sheetName)
