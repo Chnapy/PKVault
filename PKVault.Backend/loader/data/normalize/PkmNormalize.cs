@@ -1,5 +1,4 @@
 public class PkmNormalize(
-    FileIOService fileIOService,
     PkmLoader loader
 ) : DataNormalize<PkmDTO, PkmEntity>(loader)
 {
@@ -31,8 +30,11 @@ public class PkmNormalize(
             {
                 try
                 {
-                    var pkmBytes = fileIOService.ReadBytes(pkmVersionEntity.Filepath);
-                    var pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
+                    var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
+                    if (!pkm.IsEnabled)
+                    {
+                        return;
+                    }
 
                     var oldId = pkmVersionEntity.Id;
                     var expectedId = pkm.GetPKMIdBase();

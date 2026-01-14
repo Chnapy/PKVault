@@ -4,7 +4,6 @@ using PKHeX.Core;
 public record PkmVersionDTO(
     string Id,
     byte Generation,
-    bool CanEdit,
     string SettingsLanguage,
     ImmutablePKM Pkm,
 
@@ -17,7 +16,6 @@ public record PkmVersionDTO(
 ) : BasePkmVersionDTO(
     Id,
     Generation,
-    CanEdit,
     SettingsLanguage,
     Pkm
 )

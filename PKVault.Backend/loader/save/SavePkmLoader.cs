@@ -21,7 +21,6 @@ public class SavePkmLoader(
     public PkmSaveDTO CreateDTO(SaveWrapper save, ImmutablePKM pkm, int boxId, int boxSlot)
     {
         var dto = new PkmSaveDTO(
-            CanEdit: !pkm.IsEgg,
             SettingsLanguage: settingsService.GetSettings().GetSafeLanguage(),
             Pkm: pkm,
 
@@ -46,7 +45,7 @@ public class SavePkmLoader(
             var partyList = save.GetPartyData();
             partyList.ForEach((pkm) =>
             {
-                if (pkm.IsSpeciesValid())
+                if (pkm.IsSpeciesValid)
                 {
                     var boxSlot = i;
                     dtoList.Add(CreateDTO(
@@ -63,7 +62,7 @@ public class SavePkmLoader(
             var j = 0;
             foreach (var pkm in pkms)
             {
-                if (pkm.IsSpeciesValid())
+                if (pkm.IsSpeciesValid)
                 {
                     var box = i;
                     var boxSlot = j;
@@ -86,7 +85,7 @@ public class SavePkmLoader(
 
                 var slot = new SlotInfoMisc(saveDaycare.GetDaycareSlot(i), i) { Type = StorageSlotType.Daycare };
                 var pkm = new ImmutablePKM(slot.Read(save.GetSave()));
-                if (pkm != default && pkm.IsSpeciesValid())
+                if (pkm != default && pkm.IsSpeciesValid)
                 {
                     var boxSlot = i;
                     dtoList.Add(CreateDTO(
@@ -100,7 +99,7 @@ public class SavePkmLoader(
         var extraPkms = extraSlots.Select(slot => (
             Pkm: new ImmutablePKM(slot.Read(save.GetSave())),
             Slot: slot
-        )).ToList().FindAll(extra => extra.Pkm.IsSpeciesValid());
+        )).ToList().FindAll(extra => extra.Pkm.IsSpeciesValid);
 
         extraPkms.ForEach((extra) =>
         {
@@ -192,6 +191,11 @@ public class SavePkmLoader(
 
     public void WriteDto(PkmSaveDTO dto)
     {
+        if (!dto.IsEnabled)
+        {
+            throw new InvalidOperationException($"Write disabled PkmSaveDTO not allowed");
+        }
+
         if (!BoxLoader.CanIdReceivePkm(dto.BoxId))
         {
             throw new Exception("Not allowed for pkm in daycare");
@@ -263,7 +267,7 @@ public class SavePkmLoader(
         }
 
         var party = save.GetPartyData()
-        .FindAll(pkm => pkm.IsSpeciesValid());
+        .FindAll(pkm => pkm.IsSpeciesValid);
 
         SetParty(party);
     }
@@ -276,7 +280,7 @@ public class SavePkmLoader(
             {
                 var pkm = party[i];
                 save.SetPartySlotAtIndex(pkm, i);
-                if (pkm.IsSpeciesValid())
+                if (pkm.IsSpeciesValid)
                 {
                     var boxSlot = i;
                     SetDTO(

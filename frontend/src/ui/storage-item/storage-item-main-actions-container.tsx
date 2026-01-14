@@ -16,23 +16,26 @@ export const StorageItemMainActionsContainer: React.FC<React.PropsWithChildren<{
     }
 
     const pkmVersions = mainPkmVersionQuery.data?.data.filter(version => version.pkmId === selectedPkm.id) ?? [];
-    if (!pkmVersions[ 0 ]) {
+    const mainPkmVersion = pkmVersions.find(pk => pk.isMain);
+    if (!mainPkmVersion) {
         return null;
     }
-    const { nickname, level } = pkmVersions[ 0 ];
+    const { nickname, level, isEnabled } = mainPkmVersion;
 
-    return <TitledContainer
+    const title = isEnabled && <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+    }}>
+        <Icon name='angle-left' solid forButton />
+        {nickname}{' '}
+        <DetailsLevel level={level} />
+    </div>;
+
+    return (title || children) && <TitledContainer
         contrasted
         enableExpand
-        title={<div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-        }}>
-            <Icon name='angle-left' solid forButton />
-            {nickname}{' '}
-            <DetailsLevel level={level} />
-        </div>}
+        title={title}
     >
         {children}
     </TitledContainer>;

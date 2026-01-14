@@ -45,6 +45,7 @@ export const StorageMainItemBase: React.FC<StorageMainItemBaseProps> = React.mem
             isShadow: false,
             warning: pkmLegalityMap.some((value) => !value.isValid),
             nbrVersions: pkmVersions.length,
+            hasDisabledVersion: pkmVersions.some(pk => !pk.isEnabled),
             attached: canDetach,
         }}
     />;

@@ -52,7 +52,15 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                     paddingLeft: 4,
                 }}
             >
-                {title}
+                <div style={{
+                    flexGrow: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    overflow: 'hidden'
+                }}>
+                    {title}
+                </div>
 
                 <Button
                     onClick={() => setShowDetails(value => !value)} disabled={showFullDetails !== undefined}
@@ -66,7 +74,7 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                 </Button>
             </div>
 
-            <div
+            {(mainImg || mainInfos) && <div
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -95,7 +103,7 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                         {mainInfos}
                     </TextContainer>
                 </div>
-            </div>
+            </div>}
 
             {preContent}
 

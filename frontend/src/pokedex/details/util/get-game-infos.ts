@@ -47,7 +47,17 @@ import yImg from '../../../assets/game_icons/y.png';
 import yellowImg from '../../../assets/game_icons/yellow.png';
 import zaImg from '../../../assets/game_icons/legend-za.png';
 
-export const getGameInfos = (version: GameVersion | null) => {
+export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = true): {
+  img: string;
+  color: string;
+} => {
+  if (!isEnabled) {
+    return {
+      img: getGameInfos(null).img,
+      color: theme.bg.dark,
+    };
+  }
+
   // pkvault
   if (!version) {
     return {

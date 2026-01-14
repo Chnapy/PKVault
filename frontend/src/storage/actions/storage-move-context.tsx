@@ -67,6 +67,7 @@ export const StorageMoveContext = {
             : pkmIdsRaw;
 
         const mainPkmsQuery = useStorageGetMainPkms();
+        const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
         const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
 
         // const mainBoxesQuery = useStorageGetMainBoxes();
@@ -75,6 +76,9 @@ export const StorageMoveContext = {
         const pkmMains = !moveContext.selected && !saveId
             ? pkmIds.map(id => mainPkmsQuery.data?.data.find(pkm => pkm.id === id)).filter(filterIsDefined)
             : [];
+        const pkmVersions = pkmMains.map(pkm => pkm.canMoveAttachedToSave
+            ? mainPkmVersionsQuery.data?.data.find(pk => pk.pkmId === pkm.id && pk.isMain && pk.isEnabled)
+            : undefined).filter(filterIsDefined);
         const pkmSaves = !moveContext.selected && !!saveId
             ? pkmIds.map(id => savePkmsQuery.data?.data.find(pkm => pkm.id === id)).filter(filterIsDefined)
             : [];
@@ -87,7 +91,9 @@ export const StorageMoveContext = {
             : pkmSaves.filter(pkmSave => pkmSave.canMove || pkmSave.canMoveToMain).map(pkm => pkm.id);
 
         const canClickAttachedIds = !saveId
-            ? pkmMains.filter(pkmMain => pkmMain.canMoveAttachedToSave).map(pkm => pkm.id)
+            ? pkmMains.filter(pkmMain => pkmMain.canMoveAttachedToSave
+                && pkmVersions.some(pk => pk.pkmId === pkmMain.id)
+            ).map(pkm => pkm.id)
             : pkmSaves.filter(pkmSave => pkmSave.canMoveAttachedToMain).map(pkm => pkm.id);
 
         return {
@@ -514,6 +520,10 @@ export const StorageMoveContext = {
 
         const getCanClick = (): ClickInfos => {
 
+            if (multipleSlotsInfos.length === 0) {
+                return { enable: false };
+            }
+
             const sourceSave = selected?.saveId ? saveInfosQuery.data?.data[ selected.saveId ] : undefined;
             const targetSave = saveId ? saveInfosQuery.data?.data[ saveId ] : undefined;
 
@@ -610,7 +620,9 @@ export const StorageMoveContext = {
                     const relatedPkmVersions = mainPkmVersionsQuery.data?.data.filter(version => version.pkmId === sourcePkmMain.id) ?? [];
                     const generation = targetPkmSave?.generation ?? targetSave?.generation;
 
-                    if (!generation || !relatedPkmVersions.some(version => version.generation === generation)) {
+                    const basePkmVersion = relatedPkmVersions.find(version => version.generation === generation);
+
+                    if (!generation || !basePkmVersion) {
                         return {
                             enable: false, helpText: t('storage.move.main-need-gen', { name: getMainPkmNickname(sourcePkmMain.id), generation })
                         };
@@ -620,6 +632,12 @@ export const StorageMoveContext = {
                         if (relatedPkmVersions.length > 1) {
                             return { enable: false, helpText: t('storage.move.attached-multiple-versions', { name: getMainPkmNickname(sourcePkmMain.id) }) };
                         }
+                    }
+
+                    if (!basePkmVersion.isEnabled) {
+                        return {
+                            enable: false, helpText: t('storage.move.main-disabled')
+                        };
                     }
                 }
 
@@ -687,10 +705,6 @@ export const StorageMoveContext = {
 
                 return { enable: true };
             };
-
-            if (multipleSlotsInfos.length === 0) {
-                return { enable: false };
-            }
 
             const slotCount = (targetBoxMain?.slotCount ?? targetBoxSave?.slotCount ?? 0) - 1;
             if (multipleSlotsInfos.some(({ targetSlot }) => targetSlot < 0 || targetSlot > slotCount)) {

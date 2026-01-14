@@ -5,7 +5,10 @@ public class DexNormalize(DexLoader loader) : DataNormalize<DexItemDTO, DexEntit
         var dexService = new DexMainService(loaders);
         loaders.pkmVersionLoader.GetAllDtos().ForEach(pkmVersion =>
         {
-            dexService.EnablePKM(pkmVersion.Pkm, createOnly: true);
+            if (pkmVersion.Pkm.IsEnabled)
+            {
+                dexService.EnablePKM(pkmVersion.Pkm, createOnly: true);
+            }
         });
     }
 

@@ -21,7 +21,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
     {
         settingsService = _settingsService;
         pkmLoader = _pkmLoader;
-        pkmFileLoader = new(fileIOService, _settingsService, pkmLoader, [.. GetAllEntities().Values]);
+        pkmFileLoader = new(fileIOService, _settingsService, [.. GetAllEntities().Values]);
     }
 
     public PkmVersionDTO CreateDTO(PkmVersionEntity entity, ImmutablePKM pkm)
@@ -32,7 +32,6 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         var dto = new PkmVersionDTO(
             Id: entity.Id,
             Generation: entity.Generation,
-            CanEdit: !pkm.IsEgg,
             SettingsLanguage: settingsService.GetSettings().GetSafeLanguage(),
             Pkm: pkm,
 
@@ -140,9 +139,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
     {
         WriteEntity(entity);
 
-        pkmFileLoader.WriteEntity(
-            PKMLoader.GetPKMBytes(pkm), pkm, entity.Filepath
-        );
+        pkmFileLoader.WriteEntity(pkm, entity.Filepath);
 
         return entity;
     }
@@ -178,15 +175,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
 
     public ImmutablePKM GetPkmVersionEntityPkm(PkmVersionEntity entity)
     {
-        var pkmBytes = pkmFileLoader.GetEntity(entity.Filepath)
-            ?? throw new Exception($"PKM bytes is null, from entity Id={entity.Id} Filepath={entity.Filepath}");
-        var pkm = PKMLoader.CreatePKM(pkmBytes, entity);
-        if (pkm == default)
-        {
-            throw new Exception($"PKM is null, from entity Id={entity.Id} Filepath={entity.Filepath} bytes.length={pkmBytes.Length}");
-        }
-
-        return pkm;
+        return pkmFileLoader.CreatePKM(entity);
     }
 
     public override int GetLastSchemaVersion() => 1;

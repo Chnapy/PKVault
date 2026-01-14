@@ -39,11 +39,13 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
 
     const getPkmSaveVersion = usePkmSaveVersion();
 
-    if (!pkm || !pkmVersions[ 0 ]) {
+    const mainPkmVersion = pkmVersions.find(pk => pk.isMain);
+
+    if (!pkm || !mainPkmVersion) {
         return null;
     }
 
-    const { compatibleWithVersions, level } = pkmVersions[ 0 ];
+    const { compatibleWithVersions, level } = mainPkmVersion;
 
     const hasSaveHeldItems = pageSaves.some(pageSave => pkmVersions.find((version) => version.generation === pageSave.generation)?.heldItem);
     const heldItem = hasSaveHeldItems ? pkmVersions.find((version) => version.id === pkmId)?.heldItem : undefined;
@@ -57,7 +59,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
     const attachedPkmVersion = attachedSavePkm && getPkmSaveVersion(attachedSavePkm.idBase, attachedSavePkm.saveId);
     const saveSynchronized = attachedSavePkm?.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
-    const canCreateVersions = pkm.saveId
+    const canCreateVersions = pkm.saveId || !mainPkmVersion.isEnabled
         ? []
         : [ ... new Set(pageSaves
             .filter(pageSave => {
@@ -69,7 +71,8 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
             .map(pageSave => pageSave.generation)) ].sort();
 
 
-    const canMoveAttached = !pkm.saveId && pageSaves.some(pageSave => pkmVersions.some(pkmVersion => pkmVersion.generation === pageSave.generation));
+    const canMoveAttached = !pkm.saveId
+        && pageSaves.some(pageSave => pkmVersions.some(pkmVersion => pkmVersion.isEnabled && pkmVersion.generation === pageSave.generation));
     const canEvolve = pkmVersions.some(pkmVersion => {
         const staticEvolves = staticData.evolves[ pkmVersion.species ];
         const evolveSpecies = staticEvolves?.trade[ pkmVersion.version ] ?? staticEvolves?.tradeWithItem[ pkmVersion.heldItemPokeapiName ?? '' ]?.[ pkmVersion.version ];

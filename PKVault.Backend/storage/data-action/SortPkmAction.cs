@@ -170,7 +170,8 @@ public class SortPkmAction(
             }
         }
 
-        for (var species = 1; species <= lastSpecies; species++)
+        // starts from 0 to handle disabled pkms
+        for (var species = 0; species <= lastSpecies; species++)
         {
             var currentBox = GetCurrentBox();
 

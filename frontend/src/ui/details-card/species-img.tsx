@@ -1,6 +1,6 @@
 import { css, cx } from '@emotion/css';
 import type React from 'react';
-import type { EntityContext } from '../../data/sdk/model';
+import { EntityContext } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { SpriteImg, type SpriteImgProps } from './sprite-img';
 import { SizingUtil } from '../util/sizing-util';
@@ -18,6 +18,11 @@ type SpeciesImgProps = {
 
 export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, isFemale, isShiny, isEgg, isShadow, small, ...imgProps }) => {
     const staticData = useStaticData();
+
+    const disabled = species === 0;
+    if (disabled) {
+        species = 1;
+    }
 
     const staticForms = staticData.species[ species ]?.forms[ context ];
 
@@ -59,6 +64,7 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, 
         size={small ? SizingUtil.itemSize / 2 : SizingUtil.itemSize}
         className={cx(css({
             filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
+            opacity: disabled ? 0.25 : undefined,
         }), imgProps.className)}
         data-speciesid={species}
         {...imgProps}

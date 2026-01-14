@@ -47,21 +47,26 @@ export const StorageItemMainActions: React.FC = () => {
     }
 
     const pkmVersions = mainPkmVersionQuery.data?.data.filter(version => version.pkmId === selectedPkm.id) ?? [];
-    if (!pkmVersions[ 0 ]) {
+    const mainPkmVersion = pkmVersions.find(pk => pk.isMain);
+    if (!mainPkmVersion) {
         return null;
     }
 
-    const { compatibleWithVersions } = pkmVersions[ 0 ];
+    const { compatibleWithVersions } = mainPkmVersion;
 
     const pageSaves = Object.values(saves).map(save => save && saveInfosQuery.data?.data?.[ save.saveId ]).filter(filterIsDefined);
 
     const pkmVersionCanEvolve = pkmVersions.find(pkmVersion => {
+        if (!pkmVersion.isEnabled) {
+            return false;
+        }
+
         const staticEvolves = staticData.evolves[ pkmVersion.species ];
         const evolveSpecies = staticEvolves?.trade[ pkmVersion.version ] ?? staticEvolves?.tradeWithItem[ pkmVersion.heldItemPokeapiName ?? '' ]?.[ pkmVersion.version ];
         return !!evolveSpecies && pkmVersion.level >= evolveSpecies.minLevel;
     });
 
-    const canCreateVersions = selectedPkm.saveId
+    const canCreateVersions = selectedPkm.saveId || !mainPkmVersion.isEnabled
         ? []
         : [ ... new Set(pageSaves
             .filter(pageSave => {
@@ -75,7 +80,7 @@ export const StorageItemMainActions: React.FC = () => {
     const canEvolve = pkmVersionCanEvolve;
     const canDetach = !!selectedPkm.saveId;
     const canGoToSave = !!selectedPkm.saveId;
-    const canEdit = pkmVersions[ 0 ].canEdit;
+    const canEdit = mainPkmVersion.canEdit;
 
     const canRemovePkm = selectedPkm.canDelete
         && mainPkmVersionQuery.data?.data.filter(pkmVersion => pkmVersion.pkmId === selectedPkm.id).length === 1;

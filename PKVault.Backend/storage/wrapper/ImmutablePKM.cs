@@ -4,7 +4,7 @@ using PKHeX.Core.Searching;
 /**
  * Immutable PKM wrapper, giving control and limit side-effects.
  */
-public class ImmutablePKM(PKM Pkm)
+public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
 {
     public static byte GetForm(PKM pkm)
     {
@@ -208,6 +208,14 @@ public class ImmutablePKM(PKM Pkm)
     // Data used here is considered to be mutable over pkm lifetime
     public string DynamicChecksum => $"{Species}.{Form}.{Nickname}.{CurrentLevel}.{EXP}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}";
 
+    public bool IsSpeciesValid => Species > 0 && Species < GameInfo.Strings.Species.Count;
+
+    public PKMLoadError? LoadError => loadError;
+
+    public bool HasLoadError => loadError != null;
+
+    public bool IsEnabled => !HasLoadError && IsSpeciesValid;
+
     /**
      * Generate ID similar to PKHeX one.
      * Note that Species & Form can change over time (evolve),
@@ -217,6 +225,11 @@ public class ImmutablePKM(PKM Pkm)
     {
         static ushort GetBaseSpecies(ushort species)
         {
+            if (species == 0)
+            {
+                return 0;
+            }
+
             var previousSpecies = StaticDataService.GetDefinedStaticDataDTO().Evolves[species].PreviousSpecies;
             if (previousSpecies != null)
             {
@@ -323,8 +336,6 @@ public class ImmutablePKM(PKM Pkm)
 
     public Nature GetNature() => Pkm is GBPKM gbpkm ? Experience.GetNatureVC(gbpkm.EXP) : Pkm.Nature;
 
-    public bool IsSpeciesValid() => Species > 0 && Species < GameInfo.Strings.Species.Count;
-
     public PKM GetMutablePkm() => Pkm;
 
     /**
@@ -337,6 +348,15 @@ public class ImmutablePKM(PKM Pkm)
 
         mutator(clone);
 
-        return new(clone);
+        return new(clone, LoadError);
     }
+}
+
+public enum PKMLoadError
+{
+    UNKNOWN,
+    NOT_FOUND,
+    TOO_SMALL,
+    TOO_BIG,
+    UNAUTHORIZED
 }

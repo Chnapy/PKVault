@@ -4,7 +4,6 @@ using PKHeX.Core;
 public abstract record BasePkmVersionDTO(
     string Id,
     byte Generation,
-    bool CanEdit,
 
     [property: JsonIgnore] string SettingsLanguage,
     [property: JsonIgnore] ImmutablePKM Pkm
@@ -51,6 +50,12 @@ public abstract record BasePkmVersionDTO(
     public string? HeldItemPokeapiName => Pkm.HeldItemPokeapiName;
     public string DynamicChecksum => Pkm.DynamicChecksum;
     public int NicknameMaxLength => Pkm.MaxStringLengthNickname;
+
+    public PKMLoadError? LoadError => Pkm.LoadError;
+    public bool HasLoadError => Pkm.HasLoadError;
+    public bool IsEnabled => Pkm.IsEnabled;
+
+    public bool CanEdit => IsEnabled && !Pkm.IsEgg;
 };
 
 public record MoveItem(int Id);

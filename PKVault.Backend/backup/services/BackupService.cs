@@ -133,7 +133,7 @@ public class BackupService(
 
             paths.Add(
                 NormalizePath(Path.Combine(relativeDirPath, filename)),
-                (TargetPath: filepath, FileContent: pair.Value)
+                (TargetPath: filepath, FileContent: pair.Value.Data)
             );
         });
 

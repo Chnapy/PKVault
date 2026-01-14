@@ -12,6 +12,7 @@ export const PathLine: React.FC<{ children: string }> = ({ children }) => {
             whiteSpace: 'nowrap',
             display: 'flex',
             alignItems: 'center',
+            overflow: 'hidden',
         }}
     >
         {firstPartsStr && <>

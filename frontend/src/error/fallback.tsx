@@ -5,13 +5,15 @@ import { Icon } from '../ui/icon/icon';
 import { theme } from '../ui/theme';
 
 export type FallbackExtraProps = {
+    className?: string;
     onClose?: () => void;
 };
 
 export const Fallback = {
-    'default': ({ error, onClose }: FallbackProps & FallbackExtraProps) => {
+    'default': ({ error, className, onClose }: FallbackProps & FallbackExtraProps) => {
 
         return <Container
+            className={className}
             style={{
                 backgroundColor: theme.bg.red,
                 color: theme.text.light,
@@ -61,9 +63,10 @@ export const Fallback = {
             </pre>
         </Container>;
     },
-    'item': ({ error, onClose }: FallbackProps & FallbackExtraProps) => {
+    'item': ({ error, className, onClose }: FallbackProps & FallbackExtraProps) => {
 
         return <Container
+            className={className}
             style={{
                 backgroundColor: theme.bg.red,
                 color: theme.text.light,

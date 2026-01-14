@@ -1,5 +1,6 @@
 import type React from 'react';
 import type { GameVersion } from '../../data/sdk/model';
+import { PathLine } from '../../settings/path-line';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { DetailsTitle } from '../details-card/details-title';
@@ -8,17 +9,23 @@ import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
 
 export type StorageDetailsTitleProps = {
-    version: GameVersion;
+    isEnabled: boolean;
+    filepath?: string;
+    version: GameVersion | null;
     showVersionName?: boolean;
     canEdit: boolean;
     onRelease?: () => unknown;
     openFile?: () => unknown;
 };
 
-export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ version, showVersionName, canEdit, onRelease, openFile }) => {
+export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ isEnabled, filepath, version, showVersionName, canEdit, onRelease, openFile }) => {
     const formContext = StorageDetailsForm.useContext();
 
-    return <DetailsTitle version={version} showVersionName={showVersionName}>
+    return <DetailsTitle version={version} showVersionName={showVersionName && isEnabled}>
+        {!isEnabled && version === null && filepath
+            ? <PathLine>{filepath}</PathLine>
+            : null}
+
         {openFile && <Button onClick={openFile}>
             <Icon name='folder' solid forButton />
         </Button>}

@@ -22,6 +22,17 @@ public class PkmLegalityService(SettingsService settingsService)
         StorageSlotType slotType = StorageSlotType.None
     )
     {
+        if (!pkm.IsEnabled)
+        {
+            return new(
+                Id: id,
+                SaveId: save?.Id,
+                MovesLegality: [],
+                IsValid: false,
+                ValidityReport: ""
+            );
+        }
+
         var la = GetLegalitySafe(pkm, save, slotType);
 
         string ValidityReport;

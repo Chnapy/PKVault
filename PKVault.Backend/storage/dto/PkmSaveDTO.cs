@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using PKHeX.Core;
 
 public record PkmSaveDTO(
-    bool CanEdit,
     string SettingsLanguage,
     ImmutablePKM Pkm,
 
@@ -15,7 +14,6 @@ public record PkmSaveDTO(
 ) : BasePkmVersionDTO(
     SavePkmLoader.GetPKMId(Pkm.GetPKMIdBase(), BoxId, BoxSlot),
     Pkm.Generation,
-    CanEdit,
     SettingsLanguage,
     Pkm
 )

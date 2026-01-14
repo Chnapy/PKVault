@@ -1,5 +1,4 @@
 public class PkmVersionNormalize(
-    FileIOService fileIOService,
     PkmVersionLoader loader
 ) : DataNormalize<PkmVersionDTO, PkmVersionEntity>(loader)
 {
@@ -37,32 +36,17 @@ public class PkmVersionNormalize(
                 {
                     loader.DeleteEntity(pkmVersionEntity.Id);
                 }
-                else
-                {
-                    ImmutablePKM? pkm = null;
-                    try
-                    {
-                        var pkmBytes = fileIOService.ReadBytes(pkmVersionEntity.Filepath);
-                        pkm = PKMLoader.CreatePKM(pkmBytes, pkmVersionEntity);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.Error.WriteLine($"Path = {pkmVersionEntity.Filepath}");
-                        Console.Error.WriteLine(ex);
-                    }
-                    if (pkm == null)
-                    {
-                        loader.DeleteEntity(pkmVersionEntity.Id);
-                    }
-                }
             }
         });
 
         // rename pk filename if needed
         loader.GetAllEntities().Values.ToList().ForEach(entity =>
         {
-            var pkmBytes = fileIOService.ReadBytes(entity.Filepath);
-            var pkm = PKMLoader.CreatePKM(pkmBytes, entity);
+            var pkm = loader.GetPkmVersionEntityPkm(entity);
+            if (pkm.HasLoadError)
+            {
+                return;
+            }
 
             var oldFilepath = entity.Filepath;
             var expectedFilepath = loader.pkmFileLoader.GetPKMFilepath(pkm);

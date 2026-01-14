@@ -1,5 +1,5 @@
 import type React from 'react';
-import { Gender as GenderType, type PkmLegalityDTO, type PkmSaveDTO } from '../../data/sdk/model';
+import { GameVersion, Gender as GenderType, type PkmLegalityDTO, type PkmSaveDTO } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Route } from '../../routes/storage';
@@ -23,14 +23,16 @@ import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
-    | 'id' | 'idBase' | 'pid' | 'species' | 'version' | 'context' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
+    | 'id' | 'idBase' | 'pid' | 'species' | 'context' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'levelUpPercent' | 'eggHatchCount' | 'friendship' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
     | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
-    | 'heldItem' | 'canEdit'
+    | 'heldItem' | 'canEdit' | 'isEnabled' | 'hasLoadError'
 >
     & Pick<PkmLegalityDTO, 'isValid' | 'validityReport' | 'movesLegality'>
     & {
+        filepath?: string;
+        version: GameVersion | null;
         saveId?: number;
         onRelease?: () => unknown;
         onSubmit: () => unknown;
@@ -38,7 +40,7 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
         extraContent?: React.ReactNode;
     };
 
-export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, onRelease, onSubmit, openFile, extraContent, ...pkm }) => {
+export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath, saveId, onRelease, onSubmit, openFile, extraContent, ...pkm }) => {
     const { t } = useTranslate();
 
     const formContext = StorageDetailsForm.useContext();
@@ -54,55 +56,53 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
     const speciesName = formObj?.name;
 
     return <DetailsCardContainer
-        bgColor={getGameInfos(pkm.version).color}
+        bgColor={getGameInfos(pkm.version, pkm.isEnabled).color}
         title={<StorageDetailsTitle
+            isEnabled={pkm.isEnabled}
+            filepath={filepath}
             version={pkm.version}
             showVersionName
             canEdit={pkm.canEdit}
             onRelease={onRelease}
             openFile={openFile}
         />}
-        mainImg={
-            <DetailsMainImg
-                species={pkm.species}
-                context={pkm.context}
-                form={pkm.form}
-                isFemale={pkm.gender == GenderType.Female}
-                isShiny={pkm.isShiny}
-                isEgg={pkm.isEgg}
-                isShadow={pkm.isShadow}
-                ball={pkm.ball}
-                shinyPart={<>
-                    {pkm.isAlpha && <AlphaIcon />}
+        mainImg={pkm.isEnabled && <DetailsMainImg
+            species={pkm.species}
+            context={pkm.context}
+            form={pkm.form}
+            isFemale={pkm.gender == GenderType.Female}
+            isShiny={pkm.isShiny}
+            isEgg={pkm.isEgg}
+            isShadow={pkm.isShadow}
+            ball={pkm.ball}
+            shinyPart={<>
+                {pkm.isAlpha && <AlphaIcon />}
 
-                    {pkm.isShiny && <ShinyIcon
-                        style={{
-                            // width: 12,
-                            margin: '0 -2px',
-                        }}
-                    />}
-                </>}
-                genderPart={<Gender gender={pkm.gender} />}
-            />
-        }
-        mainInfos={
-            <StorageDetailsMainInfos
-                idBase={pkm.idBase}
-                pid={pkm.pid}
-                species={pkm.species}
-                speciesName={speciesName ?? ''}
-                nickname={pkm.nickname}
-                nicknameMaxLength={pkm.nicknameMaxLength}
-                // gender={pkm.gender}
-                levelUpPercent={pkm.levelUpPercent}
-                level={pkm.level}
-                types={pkm.types}
-                eggHatchCount={pkm.eggHatchCount}
-            />
-        }
+                {pkm.isShiny && <ShinyIcon
+                    style={{
+                        // width: 12,
+                        margin: '0 -2px',
+                    }}
+                />}
+            </>}
+            genderPart={<Gender gender={pkm.gender} />}
+        />}
+        mainInfos={pkm.isEnabled && <StorageDetailsMainInfos
+            idBase={pkm.idBase}
+            pid={pkm.pid}
+            species={pkm.species}
+            speciesName={speciesName ?? ''}
+            nickname={pkm.nickname}
+            nicknameMaxLength={pkm.nicknameMaxLength}
+            // gender={pkm.gender}
+            levelUpPercent={pkm.levelUpPercent}
+            level={pkm.level}
+            types={pkm.types}
+            eggHatchCount={pkm.eggHatchCount}
+        />}
         preContent={<>
-            {!pkm.isValid && <TextContainer
-                bgColor={theme.bg.yellow}
+            {(!pkm.isEnabled || !pkm.isValid) && <TextContainer
+                bgColor={pkm.isEnabled ? theme.bg.yellow : theme.bg.red}
                 maxHeight={200}
                 style={{
                     minHeight: '1lh',
@@ -126,67 +126,65 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ saveId, 
                         </Button>
                     </>} */}
         </>}
-        content={
-            <>
-                {!!pkm.heldItem && <TextContainer>
-                    {t('details.held-item')} <span style={{ color: theme.text.primary }}>{staticData.items[ pkm.heldItem ]?.name}</span> <ItemImg
-                        item={pkm.heldItem}
-                        size={24}
-                        style={{
-                            verticalAlign: 'middle'
-                        }}
-                    />
-                </TextContainer>}
+        content={pkm.isEnabled && <>
+            {!!pkm.heldItem && <TextContainer>
+                {t('details.held-item')} <span style={{ color: theme.text.primary }}>{staticData.items[ pkm.heldItem ]?.name}</span> <ItemImg
+                    item={pkm.heldItem}
+                    size={24}
+                    style={{
+                        verticalAlign: 'middle'
+                    }}
+                />
+            </TextContainer>}
 
-                <TextContainer noWrap>
-                    <TextStats
-                        nature={pkm.nature}
-                        ivs={pkm.iVs}
-                        maxIv={staticData.versions[ pkm.version ]?.maxIV ?? 0}
-                        evs={pkm.eVs}
-                        maxEv={staticData.versions[ pkm.version ]?.maxEV ?? 0}
-                        stats={pkm.stats}
-                        hiddenPowerType={pkm.hiddenPowerType}
-                        hiddenPowerPower={pkm.hiddenPowerPower}
-                        hiddenPowerCategory={pkm.hiddenPowerCategory}
-                    />
-                </TextContainer>
+            <TextContainer noWrap>
+                <TextStats
+                    nature={pkm.nature}
+                    ivs={pkm.iVs}
+                    maxIv={staticData.versions[ pkm.version ?? -1 ]?.maxIV ?? 0}
+                    evs={pkm.eVs}
+                    maxEv={staticData.versions[ pkm.version ?? -1 ]?.maxEV ?? 0}
+                    stats={pkm.stats}
+                    hiddenPowerType={pkm.hiddenPowerType}
+                    hiddenPowerPower={pkm.hiddenPowerPower}
+                    hiddenPowerCategory={pkm.hiddenPowerCategory}
+                />
+            </TextContainer>
 
-                <TextContainer>
-                    <TextMoves
-                        saveId={saveId}
-                        pkmId={pkm.id}
-                        ability={pkm.ability}
-                        moves={pkm.moves}
-                        movesLegality={pkm.movesLegality}
-                        generation={pkm.generation}
-                        hiddenPowerType={pkm.hiddenPowerType}
-                        hiddenPowerPower={pkm.hiddenPowerPower}
-                        hiddenPowerCategory={pkm.hiddenPowerCategory}
-                        friendship={pkm.friendship}
-                    />
-                </TextContainer>
+            <TextContainer>
+                <TextMoves
+                    saveId={saveId}
+                    pkmId={pkm.id}
+                    ability={pkm.ability}
+                    moves={pkm.moves}
+                    movesLegality={pkm.movesLegality}
+                    generation={pkm.generation}
+                    hiddenPowerType={pkm.hiddenPowerType}
+                    hiddenPowerPower={pkm.hiddenPowerPower}
+                    hiddenPowerCategory={pkm.hiddenPowerCategory}
+                    friendship={pkm.friendship}
+                />
+            </TextContainer>
 
-                <TextContainer>
-                    <TextOrigin
-                        version={pkm.version}
-                        tid={pkm.tid}
-                        originTrainerName={pkm.originTrainerName}
-                        originTrainerGender={pkm.originTrainerGender}
-                        originMetDate={pkm.originMetDate}
-                        originMetLocation={pkm.originMetLocation}
-                        originMetLevel={pkm.originMetLevel}
-                    />
-                </TextContainer>
-            </>
-        }
+            <TextContainer>
+                <TextOrigin
+                    version={pkm.version}
+                    tid={pkm.tid}
+                    originTrainerName={pkm.originTrainerName}
+                    originTrainerGender={pkm.originTrainerGender}
+                    originMetDate={pkm.originMetDate}
+                    originMetLocation={pkm.originMetLocation}
+                    originMetLevel={pkm.originMetLevel}
+                />
+            </TextContainer>
+        </>}
         extraContent={extraContent}
         onClose={() => navigate({
             search: {
                 selected: undefined,
             }
         })}
-        showFullDetails={moveContext.selected
+        showFullDetails={!pkm.isEnabled || moveContext.selected
             ? false
             : (formContext.editMode ? true : undefined)}
         actions={formContext.editMode && <div style={{

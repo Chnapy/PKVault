@@ -31,6 +31,7 @@ export type StorageItemProps =
     level?: number;
     party?: number;
     nbrVersions?: number;
+    hasDisabledVersion?: boolean;
     small?: boolean;
     checked?: boolean;
     onCheck?: CheckboxInputProps[ 'onChange' ];
@@ -58,6 +59,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   level,
   party,
   nbrVersions = 1,
+  hasDisabledVersion,
   anchor,
   helpTitle,
   small,
@@ -161,7 +163,19 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
           {small ? level : <DetailsLevel level={level} />}
         </div>}
 
-        {nbrVersions > 1 && renderBubble(theme.bg.dark, nbrVersions)}
+        {hasDisabledVersion || nbrVersions > 1
+          ? <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+          }}>
+            {hasDisabledVersion && renderBubble(undefined, <span style={{ color: theme.text.red }}>
+              <Icon name='folder' solid forButton />
+              <Icon name='exclaimation' solid forButton />
+            </span>)}
+            {nbrVersions > 1 && renderBubble(theme.bg.dark, nbrVersions)}
+          </div>
+          : null}
       </div>
 
       <div
