@@ -96,7 +96,7 @@ public class PKMLoader
         }
 
         if (EnableLog)
-            Console.WriteLine($"(M) PKM-file Write idBase={pkm.GetPKMIdBase()} filepath={filepath}");
+            Console.WriteLine($"(M) PKM-file Write idBase={pkm.GetPKMIdBase()} filepath={filepath} bytes.length={bytes.Length}");
 
         bytesDict.Remove(filepath);
         bytesDict.Add(filepath, (bytes, null));
@@ -141,7 +141,7 @@ public class PKMLoader
             FileUtil.TryGetPKM(bytes, out var pk, ext, new SimpleTrainerInfo() { Context = (EntityContext)pkmVersionEntity.Generation });
             if (pk == null)
             {
-                throw new PKMLoadException(PKMLoadError.UNKNOWN);
+                throw new Exception($"TryGetPKM gives null pkm, path={pkmVersionEntity.Filepath} bytes.length={bytes.Length}");
             }
             pkm = pk;
 

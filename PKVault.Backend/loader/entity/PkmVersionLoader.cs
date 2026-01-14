@@ -101,14 +101,27 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
             return false;
         }
 
+        var result = DeleteEntityOnly(id);
+
+        pkmFileLoader.DeleteEntity(entityToRemove.Filepath);
+
+        return result;
+    }
+
+    private bool DeleteEntityOnly(string id)
+    {
+        var entityToRemove = GetEntity(id);
+        if (entityToRemove == null)
+        {
+            return false;
+        }
+
         var result = base.DeleteEntity(id);
 
         if (GetAllEntitiesByPkmId().TryGetValue(entityToRemove.PkmId, out var entities))
         {
             entities.Remove(id);
         }
-
-        pkmFileLoader.DeleteEntity(entityToRemove.Filepath);
 
         return result;
     }
@@ -119,7 +132,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
         var existingEntity = GetEntity(entity.Id);
         if (existingEntity != null && entity.PkmId != existingEntity.PkmId)
         {
-            DeleteEntity(entity.Id);
+            DeleteEntityOnly(entity.Id);
         }
 
         entity = base.WriteEntity(entity);

@@ -225,9 +225,12 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     {
         static ushort GetBaseSpecies(ushort species)
         {
-            if (species == 0)
+            if (species == 0
+                // specific case with Shedinja which is created with Ninjask exact same data
+                || species == (ushort)PKHeX.Core.Species.Shedinja
+            )
             {
-                return 0;
+                return species;
             }
 
             var previousSpecies = StaticDataService.GetDefinedStaticDataDTO().Evolves[species].PreviousSpecies;

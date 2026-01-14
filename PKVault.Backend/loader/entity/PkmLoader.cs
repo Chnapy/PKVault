@@ -23,5 +23,5 @@ public class PkmLoader : EntityLoader<PkmDTO, PkmEntity>
         return CreateDTO(entity);
     }
 
-    public override int GetLastSchemaVersion() => 1;
+    public override int GetLastSchemaVersion() => 2;
 }
