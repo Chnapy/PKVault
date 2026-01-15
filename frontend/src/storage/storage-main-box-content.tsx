@@ -127,11 +127,6 @@ export const StorageMainBoxContent: React.FC<{
                   icon: <Icon name='table' solid forButton />,
                   panelContent: close => <DexSyncAdvancedAction saveId={0} close={close} />,
                 },
-                {
-                  label: 'Import pkm files',
-                  icon: <Icon name='file-import' solid forButton />,
-                  panelContent: () => <div>Feature not ready yet</div>,
-                },
               ]}
               onBoxesDisplay={() => setShowBoxes(value => !value)}
               onPreviousBoxClick={!previousBox || previousBox.id === selectedBox.id

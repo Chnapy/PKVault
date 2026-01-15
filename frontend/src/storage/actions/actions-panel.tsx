@@ -7,7 +7,6 @@ import { TitledContainer } from '../../ui/container/titled-container';
 import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
 import { useActionDescription } from './hooks/use-action-description';
-import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { DataActionType } from '../../data/sdk/model';
 
 export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
@@ -113,12 +112,10 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
 
                             // these actions are data normalization on startup,
                             // remove them can break data
-                            const ButtonComponent = !selected && ([
+                            const cannotBeRemoved = ([
                                 DataActionType.DATA_NORMALIZE,
                                 DataActionType.PKM_SYNCHRONIZE
-                            ] as number[]).includes(action.type)
-                                ? ButtonWithConfirm
-                                : Button;
+                            ] as number[]).includes(action.type);
 
                             return <tr key={i}>
                                 <td
@@ -130,7 +127,7 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
                                     {getActionDescription(action)}
                                 </td>
                                 <td>
-                                    <ButtonComponent
+                                    {!cannotBeRemoved && <Button
                                         onClick={() => selected
                                             ? setActionIndexToRemoveFrom(undefined)
                                             : setActionIndexToRemoveFrom(i)
@@ -138,7 +135,7 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
                                         selected={selected}
                                     >
                                         <Icon name='times' forButton />
-                                    </ButtonComponent>
+                                    </Button>}
                                 </td>
                             </tr>;
                         })}

@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using SixLabors.ImageSharp;
-// using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using System.IO.Compression;
 using System.Text;
@@ -11,16 +10,7 @@ public class FileIOService
 {
     public TValue ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue)
     {
-        var value = ReadJSONFile(path, jsonTypeInfo);
-        if (value != null)
-        {
-            return value;
-        }
-
-        Console.WriteLine($"JSON file not existing: creating {path}");
-        WriteJSONFile(path, jsonTypeInfo, defaultValue);
-
-        return defaultValue;
+        return ReadJSONFile(path, jsonTypeInfo) ?? defaultValue;
     }
 
     public TValue? ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo)

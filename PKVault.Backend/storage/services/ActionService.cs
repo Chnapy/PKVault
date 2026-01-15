@@ -182,12 +182,6 @@ public class ActionService(
         return flags;
     }
 
-    private async Task<DataUpdateFlags> CloneLoaderKeepingAction()
-    {
-        // int.MaxValue means no action removed, just reset keeping actions
-        return await RemoveDataActionsAndReset(int.MaxValue);
-    }
-
     public async Task<DataUpdateFlags> RemoveDataActionsAndReset(int actionIndexToRemoveFrom)
     {
         var loaders = await loadersService.GetLoaders();
