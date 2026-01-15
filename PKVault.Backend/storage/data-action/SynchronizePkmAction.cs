@@ -134,6 +134,10 @@ public class SynchronizePkmAction(
             pkmVersionDtos.ForEach((version) =>
             {
                 var versionPkm = version.Pkm;
+                if (!versionPkm.IsEnabled)
+                {
+                    return;
+                }
 
                 // update xp etc,
                 // and species/form only when possible
