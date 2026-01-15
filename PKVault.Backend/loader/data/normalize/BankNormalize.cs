@@ -27,7 +27,11 @@ public class BankNormalize(BankLoader loader) : DataNormalize<BankDTO, BankEntit
         loader.GetAllEntities().Values.OrderBy(bank => bank.Order).ToList()
             .ForEach(entity =>
             {
-                loader.WriteEntity(entity with { SchemaVersion = 1 });
+                loader.WriteEntity(entity with
+                {
+                    SchemaVersion = 1,
+                    Order = currentOrder
+                });
                 currentOrder += BankLoader.OrderGap;
             });
     }

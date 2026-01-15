@@ -17,6 +17,7 @@ public class PkmNormalize(
 
     private void MigrateV0ToV1(DataEntityLoaders loaders)
     {
+        var time = LogUtil.Time($"Pkm normalize: MigrateV0ToV1");
         /**
          * Convert entities with old/wrong ID format to new one.
          * It checks:
@@ -27,61 +28,56 @@ public class PkmNormalize(
          */
         loader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
         {
-            var pkmVersions = loaders.pkmVersionLoader.GetEntitiesByPkmId(pkmEntity.Id).Values.ToList();
-
-            pkmVersions.ForEach(pkmVersionEntity =>
+            var oldPkmEntityId = pkmEntity.Id;
+            loaders.pkmVersionLoader.GetEntitiesByPkmId(pkmEntity.Id).Values.ToList().ForEach(pkmVersionEntity =>
             {
-                try
+                var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
+                if (!pkm.IsEnabled)
                 {
-                    var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
-                    if (!pkm.IsEnabled)
-                    {
-                        return;
-                    }
-
-                    var oldId = pkmVersionEntity.Id;
-                    var expectedId = pkm.GetPKMIdBase();
-
-                    var oldPkmId = pkmVersionEntity.PkmId;
-
-                    // wrong Id
-                    if (expectedId != oldId)
-                    {
-                        // must be done first
-                        loaders.pkmVersionLoader.DeleteEntity(oldId);
-
-                        // update pkm-entity id if main version
-                        if (oldPkmId == oldId)
-                        {
-                            loaders.pkmLoader.DeleteEntity(oldId);
-                            pkmEntity = loaders.pkmLoader.WriteEntity(pkmEntity with { Id = expectedId });
-                        }
-
-                        // update pkm-version-entity id
-                        pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with { Id = expectedId });
-                    }
+                    return;
                 }
-                catch (Exception ex)
+
+                var oldId = pkmVersionEntity.Id;
+                var expectedId = pkm.GetPKMIdBase();
+
+                var isMainVersion = pkmVersionEntity.PkmId == oldId;
+
+                // must be done first
+                loaders.pkmVersionLoader.DeleteEntity(oldId);
+
+                // update pkm-entity id if main version
+                if (isMainVersion)
                 {
-                    Console.Error.WriteLine(ex);
+                    pkmEntity = loaders.pkmLoader.WriteEntity(pkmEntity with { Id = expectedId });
                 }
+
+                var filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkm);
+
+                // update pkm-version-entity id
+                pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(
+                    pkmVersionEntity with { Id = expectedId, Filepath = filepath },
+                    pkm);
             });
 
-            pkmVersions.ForEach(pkmVersionEntity =>
+            if (pkmEntity.Id != oldPkmEntityId)
             {
-                // wrong PkmId
-                if (pkmVersionEntity.PkmId != pkmEntity.Id)
+                loaders.pkmVersionLoader.GetEntitiesByPkmId(oldPkmEntityId).Values.ToList().ForEach(pkmVersionEntity =>
                 {
+                    // wrong PkmId
                     pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with { PkmId = pkmEntity.Id });
-                }
-            });
+                });
+
+                loader.DeleteEntity(oldPkmEntityId);
+            }
 
             pkmEntity = loader.WriteEntity(pkmEntity with { SchemaVersion = 1 });
         });
+        time();
     }
 
     private void MigrateV1ToV2(DataEntityLoaders loaders)
     {
+        var time = LogUtil.Time($"Pkm normalize: MigrateV1ToV2");
         /**
          * Convert Shedinja pkm entities with old ID format to new one.
          * It checks:
@@ -140,10 +136,12 @@ public class PkmNormalize(
 
             pkmEntity = loader.WriteEntity(pkmEntity with { SchemaVersion = 2 });
         });
+        time();
     }
 
     public override void CleanData(DataEntityLoaders loaders)
     {
+        var time = LogUtil.Time($"Pkm normalize: CleanData remove pkms with no pkmVersions");
         // remove pkms with no pkmVersions
         loader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
         {
@@ -153,5 +151,7 @@ public class PkmNormalize(
                 loader.DeleteEntity(pkmEntity.Id);
             }
         });
+
+        time();
     }
 }

@@ -29,7 +29,8 @@ public class SettingsController(DataService dataService, SettingsService setting
     [HttpPost]
     public async Task<ActionResult<DataDTO>> Edit([BindRequired] SettingsMutableDTO settingsMutable)
     {
-        if (!loadersService.HasEmptyActionList())
+        var currentSettings = settingsService.GetSettings();
+        if (!loadersService.HasEmptyActionList() && currentSettings.SettingsMutable.LANGUAGE != null)
         {
             throw new InvalidOperationException($"Empty action list is required");
         }
@@ -39,7 +40,7 @@ public class SettingsController(DataService dataService, SettingsService setting
             throw new ArgumentException($"Language value not allowed: {settingsMutable.LANGUAGE}");
         }
 
-        var languageChanged = settingsService.GetSettings().SettingsMutable.LANGUAGE != settingsMutable.LANGUAGE;
+        var languageChanged = currentSettings.SettingsMutable.LANGUAGE != settingsMutable.LANGUAGE;
 
         settingsMutable = settingsMutable with
         {

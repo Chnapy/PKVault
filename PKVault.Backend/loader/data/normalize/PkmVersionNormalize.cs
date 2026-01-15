@@ -16,11 +16,15 @@ public class PkmVersionNormalize(
     {
         // Most part is done in PkmLoader for strong couplage reasons
 
+        var time = LogUtil.Time($"PkmVersion normalize: MigrateV0ToV1");
+
         loader.GetAllEntities().Values.ToList().ForEach(entity => loader.WriteEntity(entity with { SchemaVersion = 1 }));
+        time();
     }
 
     public override void CleanData(DataEntityLoaders loaders)
     {
+        var time1 = LogUtil.Time($"PkmVersion normalize: CleanData remove pkmVersions with inconsistent data");
         // remove pkmVersions with inconsistent data
         loader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
         {
@@ -38,7 +42,9 @@ public class PkmVersionNormalize(
                 }
             }
         });
+        time1();
 
+        var time2 = LogUtil.Time($"PkmVersion normalize: CleanData rename pk filename if needed");
         // rename pk filename if needed
         loader.GetAllEntities().Values.ToList().ForEach(entity =>
         {
@@ -70,5 +76,6 @@ public class PkmVersionNormalize(
                 entity = loader.WriteEntity(entity with { Filepath = expectedFilepath }, pkm);
             }
         });
+        time2();
     }
 }

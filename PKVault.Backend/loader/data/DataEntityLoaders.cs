@@ -28,7 +28,8 @@ public class DataEntityLoaders(SaveService saveService)
         });
     }
 
-    public bool GetHasWritten() => jsonLoaders.Any(loader => loader.HasWritten);
+    public bool GetHasWritten() => jsonLoaders.Any(loader => loader.HasWritten)
+        || saveLoadersDict.Values.Any(saveLoaders => saveLoaders.Pkms.HasWritten || saveLoaders.Boxes.HasWritten);
 
     public async Task WriteToFiles()
     {

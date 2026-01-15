@@ -558,13 +558,6 @@ export const StorageMoveContext = {
                     }
                 }
 
-                // * -> box main
-                if (targetBoxMain) {
-                    if (!targetBoxMain.canSaveReceivePkm) {
-                        return { enable: false, helpText: t('storage.move.box-cannot', { name: targetBoxMain.name }) };
-                    }
-                }
-
                 // pkm main -> main
                 if (sourcePkmMain && (targetBoxMain || targetPkmMain)) {
                     if (selected.attached) {

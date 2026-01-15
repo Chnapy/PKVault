@@ -41,7 +41,12 @@ public class BoxNormalize(BoxLoader loader) : DataNormalize<BoxDTO, BoxEntity>(l
                     currentOrder = 0;
                 }
 
-                loader.WriteEntity(entity with { SchemaVersion = 1 });
+                loader.WriteEntity(entity with
+                {
+                    SchemaVersion = 1,
+                    Order = currentOrder,
+                    BankId = entityBankId
+                });
 
                 currentOrder += BoxLoader.OrderGap;
             });

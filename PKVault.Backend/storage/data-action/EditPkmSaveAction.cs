@@ -27,7 +27,7 @@ public class EditPkmSaveAction(
             pkm.RefreshChecksum();
         });
 
-        saveLoaders.Pkms.WriteDto(pkmSave);
+        saveLoaders.Pkms.WriteDto(pkmSave with { Pkm = pkm });
 
         var pkmVersion = loaders.pkmVersionLoader.GetPkmSaveVersion(pkmSave);
         if (pkmVersion != null)
