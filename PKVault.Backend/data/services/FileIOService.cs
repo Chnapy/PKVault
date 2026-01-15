@@ -96,11 +96,6 @@ public class FileIOService
     public (bool TooSmall, bool TooBig) CheckGameFile(string path)
     {
         var fi = new FileInfo(path);
-        if (FileUtil.IsFileTooBig(fi.Length))
-            throw new PKMLoadException(PKMLoadError.TOO_BIG);
-
-        if (FileUtil.IsFileTooSmall(fi.Length))
-            throw new PKMLoadException(PKMLoadError.TOO_SMALL);
 
         return (
             TooSmall: FileUtil.IsFileTooSmall(fi.Length),

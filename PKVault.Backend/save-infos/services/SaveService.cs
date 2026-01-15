@@ -113,25 +113,32 @@ public class SaveService
     {
         // Console.WriteLine($"UPDATE SAVE {path}");
 
-        var (TooSmall, TooBig) = fileIOService.CheckGameFile(path);
-        if (TooSmall || TooBig)
+        try
         {
-            return;
+            var (TooSmall, TooBig) = fileIOService.CheckGameFile(path);
+            if (TooSmall || TooBig)
+            {
+                return;
+            }
+
+            var data = fileIOService.ReadBytes(path);
+            if (!SaveUtil.TryGetSaveFile(data, out var saveRaw, path))
+                return;
+
+            saveRaw.Metadata.SetExtraInfo(path);
+            if (saveRaw.Generation <= 3)
+                SaveLanguage.TryRevise(saveRaw);
+
+            SaveWrapper save = new(saveRaw, path);
+
+            UpdateGlobalsWithSave(SaveById, SaveByPath, save, path);
+
+            Console.WriteLine($"Save {save.Id} {save.Id} {save.Id} - G{save.Generation} - Version {save.Version} - play-time {save.PlayTimeString}");
         }
-
-        var data = fileIOService.ReadBytes(path);
-        if (!SaveUtil.TryGetSaveFile(data, out var saveRaw, path))
-            return;
-
-        saveRaw.Metadata.SetExtraInfo(path);
-        if (saveRaw.Generation <= 3)
-            SaveLanguage.TryRevise(saveRaw);
-
-        SaveWrapper save = new(saveRaw, path);
-
-        UpdateGlobalsWithSave(SaveById, SaveByPath, save, path);
-
-        Console.WriteLine($"Save {save.Id} {save.Id} {save.Id} - G{save.Generation} - Version {save.Version} - play-time {save.PlayTimeString}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+        }
     }
 
     private void UpdateGlobalsWithSave(
