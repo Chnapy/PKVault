@@ -77,8 +77,8 @@ public class Program
         return async () =>
         {
             await Task.WhenAll([
-                host.Services.GetRequiredService<SaveService>().EnsureInitialized(),
-                host.Services.GetRequiredService<LoadersService>().EnsureInitialized(),
+                host.Services.GetRequiredService<ISaveService>().EnsureInitialized(),
+                host.Services.GetRequiredService<ILoadersService>().EnsureInitialized(),
             ]);
         };
 #else
@@ -93,8 +93,8 @@ public class Program
         ConfigureServices(builder.Services);
 
         var sp = builder.Services.BuildServiceProvider();
-        var fileIOService = sp.GetRequiredService<FileIOService>();
-        var settings = sp.GetRequiredService<SettingsService>()
+        var fileIOService = sp.GetRequiredService<IFileIOService>();
+        var settings = sp.GetRequiredService<ISettingsService>()
             .GetSettings();
 
         var certificate = settings.GetHttpsCertPemPathPath() != null && settings.GetHttpsKeyPemPathPath() != null
@@ -164,16 +164,16 @@ public class Program
 #endif
 
         services.AddSingleton<StaticDataService>();
-        services.AddSingleton<FileIOService>();
-        services.AddSingleton<LoadersService>();
+        services.AddSingleton<IFileIOService, FileIOService>();
+        services.AddSingleton<ILoadersService, LoadersService>();
         services.AddSingleton<StorageQueryService>();
         services.AddSingleton<ActionService>();
         services.AddSingleton<MaintenanceService>();
         services.AddSingleton<DexService>();
         services.AddSingleton<WarningsService>();
         services.AddSingleton<BackupService>();
-        services.AddSingleton<SaveService>();
-        services.AddSingleton<SettingsService>();
+        services.AddSingleton<ISaveService, SaveService>();
+        services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<DataService>();
         services.AddSingleton<PkmConvertService>();
         services.AddSingleton<PkmLegalityService>();

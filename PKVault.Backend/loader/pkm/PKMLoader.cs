@@ -1,7 +1,17 @@
 
 using PKHeX.Core;
 
-public class PKMLoader
+public interface IPKMLoader
+{
+    public Dictionary<string, (byte[] Data, PKMLoadError? Error)> GetAllEntities();
+    public void DeleteEntity(string filepath);
+    public string WriteEntity(ImmutablePKM pkm, string? expectedFilepath);
+    public void WriteToFiles();
+    public ImmutablePKM CreatePKM(PkmVersionEntity pkmVersionEntity);
+    public string GetPKMFilepath(ImmutablePKM pkm);
+}
+
+public class PKMLoader : IPKMLoader
 {
     private static byte[] GetPKMBytes(ImmutablePKM pkm)
     {
@@ -18,14 +28,14 @@ public class PKMLoader
 
     public bool EnableLog = true;
 
-    private FileIOService fileIOService;
-    private SettingsService settingsService;
+    private IFileIOService fileIOService;
+    private ISettingsService settingsService;
     private Dictionary<string, (byte[] Data, PKMLoadError? Error)> bytesDict = [];
     private List<(bool Create, string Path)> actions = [];
 
     public PKMLoader(
-        FileIOService _fileIOService,
-        SettingsService _settingsService,
+        IFileIOService _fileIOService,
+        ISettingsService _settingsService,
         List<PkmVersionEntity> pkmVersionEntities
     )
     {

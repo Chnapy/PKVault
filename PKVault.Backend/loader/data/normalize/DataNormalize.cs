@@ -1,5 +1,5 @@
 public abstract class DataNormalize<DTO, E>(
-    EntityLoader<DTO, E> loader
+    IEntityLoader<DTO, E> loader
 ) : IDataNormalize where DTO : IWithId where E : IEntity
 {
     public abstract void SetupInitialData(DataEntityLoaders loaders);

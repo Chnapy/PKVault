@@ -1,8 +1,14 @@
-public class BankLoader : EntityLoader<BankDTO, BankEntity>
+public interface IBankLoader : IEntityLoader<BankDTO, BankEntity>
+{
+    public BankDTO CreateDTO(BankEntity entity);
+    public void NormalizeOrders();
+}
+
+public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
 {
     public static readonly int OrderGap = 10;
 
-    public BankLoader(FileIOService fileIOService, SettingsService settingsService) : base(
+    public BankLoader(IFileIOService fileIOService, ISettingsService settingsService) : base(
         fileIOService,
         filePath: MatcherUtil.NormalizePath(Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "bank.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringBankEntity

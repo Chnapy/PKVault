@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+    <!-- https://learn.microsoft.com/en-us/dotnet/core/additional-tools/dotnet-coverage#settings -->
+    <CodeCoverage>
+
+        <ModulePaths>
+            <Include>
+                <ModulePath>.*\.dll$</ModulePath>
+                <ModulePath>.*\.exe$</ModulePath>
+            </Include>
+            <Exclude>
+                <ModulePath>.*CPPUnitTestFramework.*</ModulePath>
+            </Exclude>
+        </ModulePaths>
+
+        <Functions>
+            <Exclude>
+                <Function>^Fabrikam\.UnitTest\..*</Function>
+                <Function>^std::.*</Function>
+                <Function>^ATL::.*</Function>
+                <Function>.*::__GetTestMethodInfo.*</Function>
+                <Function>^Microsoft::VisualStudio::CppCodeCoverageFramework::.*</Function>
+                <Function>^Microsoft::VisualStudio::CppUnitTestFramework::.*</Function>
+            </Exclude>
+        </Functions>
+
+        <Attributes>
+            <Exclude>
+                <Attribute>^System\.Diagnostics\.DebuggerHiddenAttribute$</Attribute>
+                <Attribute>^System\.Diagnostics\.DebuggerNonUserCodeAttribute$</Attribute>
+                <Attribute>^System\.CodeDom\.Compiler\.GeneratedCodeAttribute$</Attribute>
+                <Attribute>^System\.Diagnostics\.CodeAnalysis\.ExcludeFromCodeCoverageAttribute$</Attribute>
+            </Exclude>
+        </Attributes>
+
+        <Sources>
+            <Exclude>
+                <Source>.*\.g\.cs$</Source>
+                <Source>.*\.g\.i\.cs$</Source>
+                
+                <Source>.*[\\\/]obj[\\\/].*</Source>
+                <Source>.*[\\\/]bin[\\\/].*</Source>
+            </Exclude>
+        </Sources>
+    </CodeCoverage>
+</Configuration>

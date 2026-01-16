@@ -1,7 +1,7 @@
 using PKHeX.Core;
 
 public class PkmNormalize(
-    PkmLoader loader
+    IPkmLoader loader
 ) : DataNormalize<PkmDTO, PkmEntity>(loader)
 {
     public override void SetupInitialData(DataEntityLoaders loaders)

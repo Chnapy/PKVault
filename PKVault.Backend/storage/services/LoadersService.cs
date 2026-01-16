@@ -1,17 +1,29 @@
+
+public interface ILoadersService
+{
+    public Task<DataEntityLoaders> GetLoaders();
+    public Task<DataEntityLoaders> CreateLoaders();
+    public List<DataActionPayload> GetActionPayloadList();
+    public bool HasEmptyActionList();
+    public Task<DataUpdateFlags> AddAction(DataAction action, DataUpdateFlags? flags);
+    public void InvalidateLoaders((bool maintainData, bool checkSaves) flags);
+    public Task EnsureInitialized();
+}
+
 /**
  * Handles data loaders for current session.
  */
-public class LoadersService
+public class LoadersService : ILoadersService
 {
-    private readonly SaveService saveService;
+    private readonly ISaveService saveService;
     private readonly PkmConvertService pkmConvertService;
-    private readonly FileIOService fileIOService;
-    private readonly SettingsService settingsService;
+    private readonly IFileIOService fileIOService;
+    private readonly ISettingsService settingsService;
 
     private readonly Locker<(bool maintainData, bool checkSaves), DataEntityLoaders> loadersLocker;
 
     public LoadersService(
-        SaveService _saveService, PkmConvertService _pkmConvertService, FileIOService _fileIOService, SettingsService _settingsService
+        ISaveService _saveService, PkmConvertService _pkmConvertService, IFileIOService _fileIOService, ISettingsService _settingsService
     )
     {
         saveService = _saveService;

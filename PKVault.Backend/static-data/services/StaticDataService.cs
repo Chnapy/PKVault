@@ -4,7 +4,7 @@ using PKHeX.Core;
 /**
  * Gives static-data, including pokeapi data and spritesheets.
  */
-public class StaticDataService(SettingsService settingsService)
+public class StaticDataService(ISettingsService settingsService)
 {
     public static readonly EntityContext LAST_ENTITY_CONTEXT = GenStaticDataService.LAST_ENTITY_CONTEXT;
     private static readonly ConcurrentDictionary<string, StaticDataDTO> StaticDataDict = [];

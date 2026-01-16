@@ -1,19 +1,30 @@
 using System.Collections.Concurrent;
 using PKHeX.Core;
 
+public interface ISaveService
+{
+    public Task<Dictionary<uint, SaveWrapper>> GetSaveCloneById();
+    public Task<Dictionary<uint, SaveWrapper>> GetSaveById();
+    public Task<Dictionary<string, SaveWrapper>> GetSaveByPath();
+    public Task<Dictionary<uint, SaveInfosDTO>> GetAllSaveInfos();
+    public Task WriteSave(SaveWrapper save);
+    public void InvalidateSaves();
+    public Task EnsureInitialized();
+}
+
 /**
  * Saves files reading and writing.
  */
-public class SaveService
+public class SaveService : ISaveService
 {
-    private FileIOService fileIOService;
-    private SettingsService settingsService;
+    private IFileIOService fileIOService;
+    private ISettingsService settingsService;
     private readonly Locker<
         bool,
         (ConcurrentDictionary<uint, SaveWrapper> SaveById, ConcurrentDictionary<string, SaveWrapper> SaveByPath)
     > savesLocker;
 
-    public SaveService(FileIOService _fileIOService, SettingsService _settingsService)
+    public SaveService(IFileIOService _fileIOService, ISettingsService _settingsService)
     {
         fileIOService = _fileIOService;
         settingsService = _settingsService;

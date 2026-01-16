@@ -7,7 +7,7 @@ using PokeApiNet;
  * Generates all static data and spritesheets.
  */
 public class GenStaticDataService(
-    PokeApiService pokeApiService, GenSpritesheetService genSpritesheetService, FileIOService fileIOService,
+    PokeApiService pokeApiService, GenSpritesheetService genSpritesheetService, IFileIOService fileIOService,
     PkmLegalityService pkmLegalityService
 )
 {

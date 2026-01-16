@@ -5,7 +5,7 @@ namespace PKVault.Backend.settings.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SettingsController(DataService dataService, SettingsService settingsService, LoadersService loadersService) : ControllerBase
+public class SettingsController(DataService dataService, ISettingsService settingsService, ILoadersService loadersService) : ControllerBase
 {
     [HttpGet]
     public ActionResult<SettingsDTO> Get()

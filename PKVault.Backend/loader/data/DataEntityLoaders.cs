@@ -1,16 +1,16 @@
 using PKHeX.Core;
 
-public class DataEntityLoaders(SaveService saveService)
+public class DataEntityLoaders(ISaveService saveService)
 {
-    public readonly DateTime startTime = DateTime.UtcNow;
+    public DateTime startTime = DateTime.UtcNow;
 
     public readonly List<DataAction> actions = [];
 
-    public required BankLoader bankLoader { get; set; }
-    public required BoxLoader boxLoader { get; set; }
-    public required PkmLoader pkmLoader { get; set; }
-    public required PkmVersionLoader pkmVersionLoader { get; set; }
-    public required DexLoader dexLoader { get; set; }
+    public required IBankLoader bankLoader { get; set; }
+    public required IBoxLoader boxLoader { get; set; }
+    public required IPkmLoader pkmLoader { get; set; }
+    public required IPkmVersionLoader pkmVersionLoader { get; set; }
+    public required IDexLoader dexLoader { get; set; }
     public required Dictionary<uint, SaveLoaders> saveLoadersDict { get; set; }
 
     public List<IEntityLoaderWrite> jsonLoaders => [bankLoader, boxLoader, pkmLoader, pkmVersionLoader, dexLoader];
@@ -51,6 +51,6 @@ public class DataEntityLoaders(SaveService saveService)
 
 public record SaveLoaders(
     SaveWrapper Save,
-    SaveBoxLoader Boxes,
-    SavePkmLoader Pkms
+    ISaveBoxLoader Boxes,
+    ISavePkmLoader Pkms
 );

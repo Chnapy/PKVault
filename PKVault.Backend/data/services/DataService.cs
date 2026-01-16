@@ -2,9 +2,9 @@
  * Data response after action, providing only data mutated.
  */
 public class DataService(
-    LoadersService loadersService, StorageQueryService storageQueryService, StaticDataService staticDataService,
-    WarningsService warningsService, DexService dexService, SaveService saveService,
-    BackupService backupService, SettingsService settingsService
+    ILoadersService loadersService, StorageQueryService storageQueryService, StaticDataService staticDataService,
+    WarningsService warningsService, DexService dexService, ISaveService saveService,
+    BackupService backupService, ISettingsService settingsService
 )
 {
     public async Task<DataDTO> CreateDataFromUpdateFlags(DataUpdateFlags flags)

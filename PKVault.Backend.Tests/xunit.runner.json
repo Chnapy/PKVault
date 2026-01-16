@@ -1,0 +1,11 @@
+{
+    "$schema": "https://xunit.net/schema/current/xunit.runner.schema.json",
+    "parallelizeAssembly": true,
+    "parallelizeTestCollections": true,
+    "maxParallelThreads": 0,
+    "methodDisplay": "classAndMethod",
+    "longRunningTestSeconds": 30,
+    "stopOnFail": false,
+    "printMaxObjectDepth": 3,
+    "printMaxObjectMemberCount": 50
+}

@@ -5,7 +5,7 @@ namespace PKVault.Backend.saveinfos.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SaveInfosController(DataService dataService, SaveService saveService, LoadersService loadersService) : ControllerBase
+public class SaveInfosController(DataService dataService, ISaveService saveService, ILoadersService loadersService) : ControllerBase
 {
     [HttpGet()]
     public async Task<ActionResult<Dictionary<uint, SaveInfosDTO>>> GetAll()

@@ -1,8 +1,18 @@
 using PKHeX.Core;
 
-public class SaveBoxLoader(SaveWrapper save, BoxLoader boxLoader)
+public interface ISaveBoxLoader
 {
-    public bool HasWritten = false;
+    public bool HasWritten { get; set; }
+
+    public Dictionary<string, BoxDTO> GetAllEntities();
+    public List<BoxDTO> GetAllDtos();
+    public void WriteDto(BoxDTO dto);
+    public BoxDTO? GetDto(string id);
+}
+
+public class SaveBoxLoader(SaveWrapper save, IBoxLoader boxLoader) : ISaveBoxLoader
+{
+    public bool HasWritten { get; set; } = false;
 
     public Dictionary<string, BoxDTO> GetAllEntities()
     {

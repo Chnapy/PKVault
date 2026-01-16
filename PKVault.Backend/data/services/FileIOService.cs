@@ -5,8 +5,30 @@ using SixLabors.ImageSharp.PixelFormats;
 using System.IO.Compression;
 using System.Text;
 using PKHeX.Core;
+using System.Collections.ObjectModel;
 
-public class FileIOService
+public interface IFileIOService
+{
+    public TValue ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue);
+    public TValue? ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo);
+    public Task<TValue?> ReadJSONFileAsync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo);
+    public IArchive ReadZip(string path);
+    public string ReadText(string path);
+    public byte[] ReadBytes(string path);
+    public void WriteBytes(string path, byte[] value);
+    public Task WriteJSONFileAsync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value);
+    public string WriteJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value);
+    public void WriteJSONGZipFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value);
+    public Task<Image<Rgba32>> ReadImage(string path);
+    public (bool TooSmall, bool TooBig) CheckGameFile(string path);
+    public bool Exists(string path);
+    public DateTime GetLastWriteTime(string path);
+    public DateTime GetLastWriteTimeUtc(string path);
+    public bool Delete(string path);
+    public void CreateDirectory(string path);
+}
+
+public class FileIOService : IFileIOService
 {
     public TValue ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue)
     {
@@ -34,6 +56,11 @@ public class FileIOService
         var fileStream = File.OpenRead(path);
 
         return await JsonSerializer.DeserializeAsync(fileStream, jsonTypeInfo);
+    }
+
+    public IArchive ReadZip(string path)
+    {
+        return new Archive(ZipFile.OpenRead(path));
     }
 
     public string ReadText(string path)
@@ -148,4 +175,36 @@ public class FileIOService
             CreateDirectory(directoryPath);
         }
     }
+}
+
+public interface IArchive : IDisposable
+{
+    public ReadOnlyCollection<IArchiveEntry> Entries { get; }
+}
+
+public interface IArchiveEntry
+{
+    public string Name { get; }
+    public string FullName { get; }
+
+    public void ExtractToFile(string destinationFileName, bool overwrite);
+}
+
+public class Archive(ZipArchive archive) : IArchive
+{
+    public ReadOnlyCollection<IArchiveEntry> Entries => [..archive.Entries
+        .Select(entry => new ArchiveEntry(entry))];
+
+    public void Dispose()
+    {
+        archive.Dispose();
+    }
+}
+
+public class ArchiveEntry(ZipArchiveEntry entry) : IArchiveEntry
+{
+    public string Name => entry.Name;
+    public string FullName => entry.FullName;
+
+    public void ExtractToFile(string destinationFileName, bool overwrite) => entry.ExtractToFile(destinationFileName, overwrite);
 }

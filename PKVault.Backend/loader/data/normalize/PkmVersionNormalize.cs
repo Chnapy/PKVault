@@ -1,5 +1,5 @@
 public class PkmVersionNormalize(
-    PkmVersionLoader loader
+    IPkmVersionLoader loader
 ) : DataNormalize<PkmVersionDTO, PkmVersionEntity>(loader)
 {
     public override void SetupInitialData(DataEntityLoaders loaders)

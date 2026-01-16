@@ -6,8 +6,8 @@ using System.Text.Json;
  * Backups creation, restore, remove and listing.
  */
 public class BackupService(
-    FileIOService fileIOService, LoadersService loadersService, SaveService saveService,
-    SettingsService settingsService
+    IFileIOService fileIOService, ILoadersService loadersService, ISaveService saveService,
+    ISettingsService settingsService
 )
 {
     private static readonly string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
@@ -98,7 +98,10 @@ public class BackupService(
         foreach (var saveLoader in loaders.saveLoadersDict.Values)
         {
             var path = saveLoader.Save.Metadata.FilePath;
-            ArgumentNullException.ThrowIfNull(path);
+            if (string.IsNullOrEmpty(path))
+            {
+                continue;
+            }
 
             var filename = Path.GetFileNameWithoutExtension(path);
             var ext = Path.GetExtension(path);
@@ -126,6 +129,11 @@ public class BackupService(
 
         pkmFilesDict.ToList().ForEach(pair =>
         {
+            if (pair.Value.Error != null)
+            {
+                return;
+            }
+
             var filepath = pair.Key;
             var filename = Path.GetFileName(filepath);
             var dirname = new DirectoryInfo(Path.GetDirectoryName(filepath)!).Name;
@@ -214,7 +222,7 @@ public class BackupService(
 
         var logtime = LogUtil.Time("Backup restore");
 
-        using var archive = ZipFile.OpenRead(bkpZipPath);
+        using var archive = fileIOService.ReadZip(bkpZipPath);
 
         var bkpTmpPathsPath = Path.Combine(bkpPath, "._paths.json");
 
@@ -231,6 +239,8 @@ public class BackupService(
             bkpTmpPathsPath,
             EntityJsonContext.Default.DictionaryStringString
         );
+
+        ArgumentNullException.ThrowIfNull(paths, bkpTmpPathsPath);
 
         // manual backup, no use of PrepareBackupThenRun to avoid infinite loop
         await CreateBackup();

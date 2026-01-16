@@ -1,6 +1,6 @@
 using PKHeX.Core;
 
-public class PkmLegalityService(SettingsService settingsService)
+public class PkmLegalityService(ISettingsService settingsService)
 {
     private readonly Lock legalityLock = new();
 

@@ -5,7 +5,7 @@ using PokeApiNet;
  * 
  * Gives pokeapi data from local json files.
  */
-public class PokeApiService(FileIOService fileIOService)
+public class PokeApiService(IFileIOService fileIOService)
 {
     private readonly PokeApiFileClient client = new(fileIOService);
 

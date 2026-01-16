@@ -1,16 +1,31 @@
 using PKHeX.Core;
 
+public interface ISavePkmLoader
+{
+    public bool HasWritten { get; set; }
+
+    public PkmSaveDTO CreateDTO(SaveWrapper save, ImmutablePKM pkm, int boxId, int boxSlot);
+    public List<PkmSaveDTO> GetAllDtos();
+    public PkmSaveDTO? GetDto(string id);
+    public PkmSaveDTO? GetDto(int box, int boxSlot);
+    public void WriteDto(PkmSaveDTO dto);
+    public void DeleteDto(string id);
+    public void FlushParty();
+    public void SetFlags(DataUpdateSaveListFlags _savesFlags);
+
+}
+
 public class SavePkmLoader(
-    SettingsService settingsService, PkmConvertService pkmConvertService,
+    ISettingsService settingsService, PkmConvertService pkmConvertService,
     SaveWrapper save
-)
+) : ISavePkmLoader
 {
     public static string GetPKMId(string idBase, int box, int slot)
     {
         return $"{idBase}B{box}S{slot}"; ;
     }
 
-    public bool HasWritten = false;
+    public bool HasWritten { get; set; } = false;
 
     private Dictionary<string, PkmSaveDTO> dtoById = [];
     private Dictionary<string, PkmSaveDTO> dtoByBox = [];

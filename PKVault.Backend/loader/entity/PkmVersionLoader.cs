@@ -1,18 +1,31 @@
-public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
+public interface IPkmVersionLoader : IEntityLoader<PkmVersionDTO, PkmVersionEntity>
 {
-    private readonly SettingsService settingsService;
+    public IPKMLoader pkmFileLoader { get; }
 
-    public readonly PKMLoader pkmFileLoader;
-    private readonly PkmLoader pkmLoader;
+    public PkmVersionDTO CreateDTO(PkmVersionEntity entity, ImmutablePKM pkm);
+    public Dictionary<string, Dictionary<string, PkmVersionEntity>> GetAllEntitiesByPkmId();
+    public PkmVersionDTO? GetPkmSaveVersion(PkmSaveDTO pkmSave);
+    public PkmVersionEntity WriteEntity(PkmVersionEntity entity, ImmutablePKM pkm);
+    public Dictionary<string, PkmVersionDTO> GetDtosByPkmId(string pkmId);
+    public Dictionary<string, PkmVersionEntity> GetEntitiesByPkmId(string pkmId);
+    public ImmutablePKM GetPkmVersionEntityPkm(PkmVersionEntity entity);
+}
+
+public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, IPkmVersionLoader
+{
+    private readonly ISettingsService settingsService;
+
+    public IPKMLoader pkmFileLoader { get; }
+    private readonly IPkmLoader pkmLoader;
 
     private readonly VersionChecker versionChecker = new();
 
     private Dictionary<string, Dictionary<string, PkmVersionEntity>>? entitiesByPkmId = null;
 
     public PkmVersionLoader(
-        FileIOService fileIOService,
-        SettingsService _settingsService,
-        PkmLoader _pkmLoader
+        IFileIOService fileIOService,
+        ISettingsService _settingsService,
+        IPkmLoader _pkmLoader
     ) : base(
         fileIOService,
         filePath: MatcherUtil.NormalizePath(Path.Combine(_settingsService.GetSettings().SettingsMutable.DB_PATH, "pkm-version.json")),
@@ -21,7 +34,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>
     {
         settingsService = _settingsService;
         pkmLoader = _pkmLoader;
-        pkmFileLoader = new(fileIOService, _settingsService, [.. GetAllEntities().Values]);
+        pkmFileLoader = new PKMLoader(fileIOService, _settingsService, [.. GetAllEntities().Values]);
     }
 
     public PkmVersionDTO CreateDTO(PkmVersionEntity entity, ImmutablePKM pkm)
