@@ -63,6 +63,7 @@ public class BackupService(
             var bkpZipPath = Path.Combine(bkpPath, fileName);
 
             fileIOService.WriteBytes(bkpZipPath, memoryStream.ToArray());
+            Console.WriteLine($"Write backup to {bkpZipPath}");
         }
         steptime();
 
@@ -244,6 +245,12 @@ public class BackupService(
 
         // manual backup, no use of PrepareBackupThenRun to avoid infinite loop
         await CreateBackup();
+
+        var loaders = await loadersService.GetLoaders();
+
+        // remove all current json data files
+        // to avoid remaining old data
+        loaders.jsonLoaders.ForEach(jsonLoader => fileIOService.Delete(jsonLoader.FilePath));
 
         foreach (var entry in archive.Entries)
         {

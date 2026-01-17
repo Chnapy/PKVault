@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using System.IO.Abstractions;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
@@ -163,8 +164,9 @@ public class Program
         services.AddSingleton<GenStaticDataService>();
 #endif
 
-        services.AddSingleton<StaticDataService>();
+        services.AddSingleton<IFileSystem>(new FileSystem());
         services.AddSingleton<IFileIOService, FileIOService>();
+        services.AddSingleton<StaticDataService>();
         services.AddSingleton<ILoadersService, LoadersService>();
         services.AddSingleton<StorageQueryService>();
         services.AddSingleton<ActionService>();

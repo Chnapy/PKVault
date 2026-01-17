@@ -2,11 +2,11 @@ using Moq;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Text;
-using System.Text.Json.Serialization.Metadata;
+using System.IO.Abstractions.TestingHelpers;
 
 public class BackupServiceTests
 {
-    private readonly Mock<IFileIOService> mockFileIO = new();
+    private readonly MockFileSystem mockFileSystem = new MockFileSystem();
     private readonly Mock<ILoadersService> mockLoaders = new();
     private readonly Mock<ISaveService> mockSave = new();
     private readonly Mock<ISettingsService> mockSettings = new();
@@ -14,7 +14,7 @@ public class BackupServiceTests
 
     public BackupServiceTests()
     {
-        backupService = new(mockFileIO.Object, mockLoaders.Object, mockSave.Object, mockSettings.Object);
+        backupService = new(new FileIOService(mockFileSystem), mockLoaders.Object, mockSave.Object, mockSettings.Object);
     }
 
     [Fact]
@@ -22,17 +22,18 @@ public class BackupServiceTests
     {
         ConfigureSettings("mock-bkp");
 
-        mockLoaders.Setup(x => x.CreateLoaders()).ReturnsAsync(GetEntityLoaders());
+        mockLoaders.Setup(x => x.CreateLoaders()).ReturnsAsync(
+            GetEntityLoaders(DateTime.Parse("2011-03-21 13:26:11"))
+        );
 
         // Act
         var result = await backupService.CreateBackup();
 
-        var expectedPath = @"mock-bkp\pkvault_backup_2011-03-21T132611-000Z.zip";
+        // Console.WriteLine(string.Join('\n', mockFileSystem.AllPaths));
 
-        mockFileIO.Verify(x => x.WriteBytes(
-            It.Is<string>(p => p == expectedPath),
-            It.Is<byte[]>(v => ArchiveMatchContent(v))
-        ), Times.Once);
+        Assert.True(mockFileSystem.FileExists(@"mock-bkp\pkvault_backup_2011-03-21T132611-000Z.zip"));
+        var data = mockFileSystem.File.ReadAllBytes(@"mock-bkp\pkvault_backup_2011-03-21T132611-000Z.zip");
+        ArchiveMatchContent(data);
     }
 
     [Fact]
@@ -40,7 +41,7 @@ public class BackupServiceTests
     {
         ConfigureSettings("mock-bkp");
 
-        var expectedPath = @"mock-bkp\pkvault_backup_2011-03-21T132611-000Z.zip";
+        var expectedPath = @"mock-bkp\pkvault_backup_2013-03-21T132611-000Z.zip";
 
         var paths = new Dictionary<string, string>()
             {
@@ -53,62 +54,151 @@ public class BackupServiceTests
                 {"main/mock-pkm-files/456","mock-pkm-files/456"}
             };
 
-        static Mock<IArchiveEntry> WriteToArchive(string filename, string destFilename)
-        {
-            Mock<IArchiveEntry> entry = new();
-            entry.Setup(x => x.Name).Returns(filename);
-            entry.Setup(x => x.FullName).Returns(filename);
-            entry.Setup(x => x.ExtractToFile(It.Is<string>(p => p == destFilename), It.IsAny<bool>())).Verifiable();
-
-            return entry;
-        }
-
-        Mock<IArchiveEntry>[] entries = [
-            WriteToArchive("_paths.json", "mock-bkp\\._paths.json"),
-            WriteToArchive("db/mock-bank.json", "mock-bank.json"),
-            WriteToArchive("db/mock-box.json", "mock-box.json"),
-            WriteToArchive("db/mock-pkm.json", "mock-pkm.json"),
-            WriteToArchive("db/mock-pkm-version.json", "mock-pkm-version.json"),
-            WriteToArchive("db/mock-dex.json", "mock-dex.json"),
-            WriteToArchive("saves/mock-save-path_123", "mock-save-path"),
-            WriteToArchive("main/mock-pkm-files/456", "mock-pkm-files/456")
+        (string Path, string Content)[] entries = [
+            ("_paths.json", JsonSerializer.Serialize(paths)),
+            ("db/mock-bank.json", "mock-bank"),
+            ("db/mock-box.json", "mock-box"),
+            ("db/mock-pkm.json", "mock-pkm"),
+            ("db/mock-pkm-version.json", "mock-pkm-version"),
+            ("db/mock-dex.json", "mock-dex"),
+            ("saves/mock-save-path_123", "mock-save"),
+            ("main/mock-pkm-files/456", "mock-pkm-456")
         ];
 
-        mockFileIO.Setup(x => x.Exists(It.Is<string>(p => p == expectedPath))).Returns(true);
-        mockFileIO.Setup(x => x.ReadZip(It.Is<string>(p => p == expectedPath))).Returns(() =>
+        using (var memoryStream = new MemoryStream())
         {
-            Mock<IArchive> archive = new();
+            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var (Path, Content) in entries)
+                {
+                    var fileContent = Encoding.ASCII.GetBytes(Content);
+                    var entry = archive.CreateEntry(Path);
+                    using var entryStream = entry.Open();
+                    entryStream.Write(fileContent, 0, fileContent.Length);
+                    // Console.WriteLine(fileEntry.Key);
+                }
+            }
+            mockFileSystem.Directory.CreateDirectory("mock-bkp");
+            mockFileSystem.File.WriteAllBytes(expectedPath, memoryStream.ToArray());
+        }
 
-            archive.Setup(x => x.Entries).Returns([.. entries.Select(mock => mock.Object)]);
-
-            return archive.Object;
-        });
-        mockFileIO.Setup(x => x.ReadJSONFile(
-            It.Is<string>(p => p == "mock-bkp\\._paths.json"),
-            It.IsAny<JsonTypeInfo<Dictionary<string, string>>>()
-        )).Returns(paths).Verifiable();
-
-        mockLoaders.Setup(x => x.CreateLoaders()).ReturnsAsync(GetEntityLoaders());
-
-        await backupService.RestoreBackup(
-            DateTime.Parse("2011-03-21 13:26:11")
+        mockLoaders.Setup(x => x.GetLoaders()).ReturnsAsync(
+            GetEntityLoaders(DateTime.Parse("2010-03-21 13:26:11"))
+        );
+        mockLoaders.Setup(x => x.CreateLoaders()).ReturnsAsync(
+            GetEntityLoaders(DateTime.Parse("2011-03-21 13:26:11"))
         );
 
-        mockFileIO.Verify();
+        mockLoaders.Setup(x => x.InvalidateLoaders(new(true, true))).Verifiable();
+        mockSave.Setup(x => x.InvalidateSaves()).Verifiable();
 
-        entries.ToList().ForEach(entry =>
+        await backupService.RestoreBackup(
+            DateTime.Parse("2013-03-21 13:26:11")
+        );
+
+        // check if backup creation were made
+        Assert.True(mockFileSystem.FileExists(@"mock-bkp\pkvault_backup_2011-03-21T132611-000Z.zip"));
+        var data = mockFileSystem.File.ReadAllBytes(@"mock-bkp\pkvault_backup_2011-03-21T132611-000Z.zip");
+        ArchiveMatchContent(data);
+
+        // Console.WriteLine(string.Join('\n', mockFileSystem.AllFiles));
+
+        // check all entries extracted
+        paths.ToList().ForEach(pathItem =>
         {
-            entry.Verify();
+            Assert.True(mockFileSystem.FileExists(pathItem.Value));
+            var fileContent = mockFileSystem.File.ReadAllText(pathItem.Value);
+            var expectedContent = entries.ToList().Find(e => e.Path == pathItem.Key).Content;
+            Assert.Equal(fileContent, expectedContent);
         });
+
+        mockLoaders.Verify(x => x.InvalidateLoaders(new(true, true)));
+        mockSave.Verify(x => x.InvalidateSaves());
     }
 
-    private DataEntityLoaders GetEntityLoaders()
+    [Fact]
+    public async Task RestoreBackup_RestorePartialFiles()
     {
+        ConfigureSettings("mock-bkp");
 
-        Mock<IBankLoader> mockBankLoader = EntityLoaderUtil.GetMockBankLoader("mock-bank.json", Encoding.ASCII.GetBytes("mock-bank-values"));
-        Mock<IBoxLoader> mockBoxLoader = EntityLoaderUtil.GetMockBoxLoader("mock-box.json", Encoding.ASCII.GetBytes("mock-box-values"));
-        Mock<IPkmLoader> mockPkmLoader = EntityLoaderUtil.GetMockPkmLoader("mock-pkm.json", Encoding.ASCII.GetBytes("mock-pkm-values"));
-        Mock<IPkmVersionLoader> mockPkmVersionLoader = EntityLoaderUtil.GetMockPkmVersionLoader(
+        mockFileSystem.AddEmptyFile("mock-bank.json");
+        mockFileSystem.AddEmptyFile("mock-box.json");
+        mockFileSystem.AddEmptyFile("mock-pkm.json");
+        mockFileSystem.AddEmptyFile("mock-dex.json");
+
+        var expectedPath = @"mock-bkp\pkvault_backup_2013-03-21T132611-000Z.zip";
+
+        var paths = new Dictionary<string, string>()
+            {
+                {"db/mock-box.json","mock-box.json"},
+                {"db/mock-pkm.json","mock-pkm.json"},
+                {"db/mock-pkm-version.json","mock-pkm-version.json"},
+                {$"saves/mock-save-path_123","mock-save-path"},
+                {"main/mock-pkm-files/456","mock-pkm-files/456"}
+            };
+
+        (string Path, string Content)[] entries = [
+            ("_paths.json", JsonSerializer.Serialize(paths)),
+            ("db/mock-box.json", "mock-box"),
+            ("db/mock-pkm.json", "mock-pkm"),
+            ("db/mock-pkm-version.json", "mock-pkm-version"),
+            ("saves/mock-save-path_123", "mock-save"),
+            ("main/mock-pkm-files/456", "mock-pkm-456")
+        ];
+
+        using (var memoryStream = new MemoryStream())
+        {
+            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var (Path, Content) in entries)
+                {
+                    var fileContent = Encoding.ASCII.GetBytes(Content);
+                    var entry = archive.CreateEntry(Path);
+                    using var entryStream = entry.Open();
+                    entryStream.Write(fileContent, 0, fileContent.Length);
+                    // Console.WriteLine(fileEntry.Key);
+                }
+            }
+            mockFileSystem.Directory.CreateDirectory("mock-bkp");
+            mockFileSystem.File.WriteAllBytes(expectedPath, memoryStream.ToArray());
+        }
+
+        mockLoaders.Setup(x => x.GetLoaders()).ReturnsAsync(
+            GetEntityLoaders(DateTime.Parse("2010-03-21 13:26:11"))
+        );
+        mockLoaders.Setup(x => x.CreateLoaders()).ReturnsAsync(
+            GetEntityLoaders(DateTime.Parse("2011-03-21 13:26:11"))
+        );
+
+        await backupService.RestoreBackup(
+            DateTime.Parse("2013-03-21 13:26:11")
+        );
+
+        // Console.WriteLine(string.Join('\n', mockFileSystem.AllFiles));
+
+        // check all entries extracted
+        paths.ToList().ForEach(pathItem =>
+        {
+            Assert.True(mockFileSystem.FileExists(pathItem.Value));
+            var fileContent = mockFileSystem.File.ReadAllText(pathItem.Value);
+            var expectedContent = entries.ToList().Find(e => e.Path == pathItem.Key).Content;
+            Assert.Equal(fileContent, expectedContent);
+        });
+
+        // check DB files are deleted (bank + dex) before archive file are extracted
+        // avoiding remaining obsolete data
+        Assert.False(mockFileSystem.FileExists("mock-bank.json"));
+        Assert.False(mockFileSystem.FileExists("mock-dex.json"));
+    }
+
+    private DataEntityLoaders GetEntityLoaders(
+        DateTime startTime
+    )
+    {
+        var mockBankLoader = EntityLoaderUtil.GetMockBankLoader("mock-bank.json", Encoding.ASCII.GetBytes("mock-bank-values"));
+        var mockBoxLoader = EntityLoaderUtil.GetMockBoxLoader("mock-box.json", Encoding.ASCII.GetBytes("mock-box-values"));
+        var mockPkmLoader = EntityLoaderUtil.GetMockPkmLoader("mock-pkm.json", Encoding.ASCII.GetBytes("mock-pkm-values"));
+        var mockPkmVersionLoader = EntityLoaderUtil.GetMockPkmVersionLoader(
             "mock-pkm-version.json",
             Encoding.ASCII.GetBytes("mock-pkm-version-values"),
             pkmFiles: new(){
@@ -116,16 +206,16 @@ public class BackupServiceTests
                 { "mock-pkm-files/456", (Data: Encoding.ASCII.GetBytes("mock-pkfile-content"), Error: null) }
             }
         );
-        Mock<IDexLoader> mockDexLoader = EntityLoaderUtil.GetMockDexLoader("mock-dex.json", Encoding.ASCII.GetBytes("mock-dex-values"));
+        var mockDexLoader = EntityLoaderUtil.GetMockDexLoader("mock-dex.json", Encoding.ASCII.GetBytes("mock-dex-values"));
 
-        Mock<SaveWrapper> saveWrapper = SaveWrapperTests.GetMockSave("mock-save-path", Encoding.ASCII.GetBytes("mock-save-content"));
+        var saveWrapper = SaveWrapperTests.GetMockSave("mock-save-path", Encoding.ASCII.GetBytes("mock-save-content"));
 
         Mock<ISaveBoxLoader> mockSaveBoxLoader = new();
         Mock<ISavePkmLoader> mockSavePkmLoader = new();
 
         return new DataEntityLoaders(mockSave.Object)
         {
-            startTime = DateTime.Parse("2011-03-21 13:26:11"),
+            startTime = startTime,
             bankLoader = mockBankLoader.Object,
             boxLoader = mockBoxLoader.Object,
             pkmLoader = mockPkmLoader.Object,
@@ -171,7 +261,7 @@ public class BackupServiceTests
             var fileReader = new StreamReader(entryStream);
             var fileContent = fileReader.ReadToEnd();
 
-            Console.WriteLine($"File {filename} => {fileContent}");
+            // Console.WriteLine($"File {filename} => {fileContent}");
 
             Assert.Equal(
                 expectedContent,
