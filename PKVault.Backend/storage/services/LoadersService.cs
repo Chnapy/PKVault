@@ -19,17 +19,20 @@ public class LoadersService : ILoadersService
     private readonly PkmConvertService pkmConvertService;
     private readonly IFileIOService fileIOService;
     private readonly ISettingsService settingsService;
+    private readonly StaticDataService staticDataService;
 
     private readonly Locker<(bool maintainData, bool checkSaves), DataEntityLoaders> loadersLocker;
 
     public LoadersService(
-        ISaveService _saveService, PkmConvertService _pkmConvertService, IFileIOService _fileIOService, ISettingsService _settingsService
+        ISaveService _saveService, PkmConvertService _pkmConvertService, IFileIOService _fileIOService,
+        ISettingsService _settingsService, StaticDataService _staticDataService
     )
     {
         saveService = _saveService;
         pkmConvertService = _pkmConvertService;
         fileIOService = _fileIOService;
         settingsService = _settingsService;
+        staticDataService = _staticDataService;
 
         loadersLocker = new("Loaders", (maintainData: true, checkSaves: true), ResetLoaders);
     }
@@ -41,10 +44,12 @@ public class LoadersService : ILoadersService
 
     private async Task<DataEntityLoaders> ResetLoaders((bool maintainData, bool checkSaves) flags)
     {
+        var staticData = await staticDataService.GetStaticData();
+
         var loaders = await CreateLoaders();
 
         if (flags.maintainData)
-            await AddAction(loaders, new DataNormalizeAction(), null);
+            await AddAction(loaders, new DataNormalizeAction(staticData.Evolves), null);
 
         if (flags.checkSaves)
             await CheckSaveToSynchronize(loaders);
@@ -54,10 +59,19 @@ public class LoadersService : ILoadersService
 
     public async Task<DataEntityLoaders> CreateLoaders()
     {
-        var bankLoader = new BankLoader(fileIOService, settingsService);
-        var boxLoader = new BoxLoader(fileIOService, settingsService);
+        var staticData = await staticDataService.GetStaticData();
+
+        var settings = settingsService.GetSettings();
+
+        var bankLoader = new BankLoader(fileIOService, settings.SettingsMutable.DB_PATH);
+        var boxLoader = new BoxLoader(fileIOService, settings.SettingsMutable.DB_PATH);
         var pkmLoader = new PkmLoader(fileIOService, settingsService);
-        var pkmVersionLoader = new PkmVersionLoader(fileIOService, settingsService, pkmLoader);
+        var pkmVersionLoader = new PkmVersionLoader(
+            fileIOService,
+            _appPath: settings.AppDirectory, dbPath: settings.SettingsMutable.DB_PATH,
+            storagePath: settings.SettingsMutable.STORAGE_PATH, _language: settings.GetSafeLanguage(),
+            staticData.Evolves,
+            pkmLoader);
         var dexLoader = new DexLoader(fileIOService, settingsService);
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
 
@@ -69,7 +83,7 @@ public class LoadersService : ILoadersService
                 saveLoadersDict.Add(save.Id, new(
                     Save: save,
                     Boxes: new SaveBoxLoader(save, boxLoader),
-                    Pkms: new SavePkmLoader(settingsService, pkmConvertService, save)
+                    Pkms: new SavePkmLoader(settingsService, pkmConvertService, staticData.Evolves, save)
                 ));
             });
         }
@@ -141,6 +155,8 @@ public class LoadersService : ILoadersService
 
     private async Task CheckSaveToSynchronize(DataEntityLoaders loaders)
     {
+        var staticData = await staticDataService.GetStaticData();
+
         (string PkmId, string SavePkmId)[][] synchronizationData = await SynchronizePkmAction.GetSavesPkmsToSynchronize(loaders);
 
         foreach (var data in synchronizationData)
@@ -149,7 +165,7 @@ public class LoadersService : ILoadersService
             {
                 await AddAction(
                     loaders,
-                    new SynchronizePkmAction(pkmConvertService, data),
+                    new SynchronizePkmAction(pkmConvertService, staticData.Evolves, data),
                     null
                 );
             }

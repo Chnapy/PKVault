@@ -1,5 +1,5 @@
 public class PkmVersionNormalize(
-    IPkmVersionLoader loader
+    IPkmVersionLoader loader, Dictionary<ushort, StaticEvolve> evolves
 ) : DataNormalize<PkmVersionDTO, PkmVersionEntity>(loader)
 {
     public override void SetupInitialData(DataEntityLoaders loaders)
@@ -55,7 +55,7 @@ public class PkmVersionNormalize(
             }
 
             var oldFilepath = entity.Filepath;
-            var expectedFilepath = loader.pkmFileLoader.GetPKMFilepath(pkm);
+            var expectedFilepath = loader.pkmFileLoader.GetPKMFilepath(pkm, evolves);
 
             // update pk file
             if (expectedFilepath != oldFilepath)

@@ -5,10 +5,10 @@ public interface IPKMLoader
 {
     public Dictionary<string, (byte[] Data, PKMLoadError? Error)> GetAllEntities();
     public void DeleteEntity(string filepath);
-    public string WriteEntity(ImmutablePKM pkm, string? expectedFilepath);
+    public string WriteEntity(ImmutablePKM pkm, string filepath, Dictionary<ushort, StaticEvolve> evolves);
     public void WriteToFiles();
     public ImmutablePKM CreatePKM(PkmVersionEntity pkmVersionEntity);
-    public string GetPKMFilepath(ImmutablePKM pkm);
+    public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves);
 }
 
 public class PKMLoader : IPKMLoader
@@ -18,29 +18,29 @@ public class PKMLoader : IPKMLoader
         return [.. pkm.DecryptedPartyData];
     }
 
-    private static string GetPKMFilename(ImmutablePKM pkm)
+    private static string GetPKMFilename(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves)
     {
         var star = pkm.IsShiny ? " ★" : string.Empty;
         var speciesName = GameInfo.Strings.Species[pkm.Species].ToUpperInvariant().Replace(":", "");
-        var id = pkm.GetPKMIdBase();
+        var id = pkm.GetPKMIdBase(evolves);
         return $"{pkm.Species:0000}{star} - {speciesName} - {id}.{pkm.Extension}";
     }
 
     public bool EnableLog = true;
 
     private IFileIOService fileIOService;
-    private ISettingsService settingsService;
+    private string storagePath;
     private Dictionary<string, (byte[] Data, PKMLoadError? Error)> bytesDict = [];
     private List<(bool Create, string Path)> actions = [];
 
     public PKMLoader(
         IFileIOService _fileIOService,
-        ISettingsService _settingsService,
+        string _storagePath,
         List<PkmVersionEntity> pkmVersionEntities
     )
     {
         fileIOService = _fileIOService;
-        settingsService = _settingsService;
+        storagePath = _storagePath;
         pkmVersionEntities.ForEach(pkmVersionEntity =>
         {
             byte[] bytes = [];
@@ -87,26 +87,25 @@ public class PKMLoader : IPKMLoader
         actions.Add((Create: false, Path: filepath));
     }
 
-    public string WriteEntity(ImmutablePKM pkm, string? expectedFilepath)
+    public string WriteEntity(ImmutablePKM pkm, string filepath, Dictionary<ushort, StaticEvolve> evolves)
     {
         if (!pkm.IsEnabled)
         {
             throw new InvalidOperationException($"Write disabled PKM not allowed");
         }
 
-        var filepath = GetPKMFilepath(pkm);
-
         var bytes = GetPKMBytes(pkm);
 
-        if (expectedFilepath != null && expectedFilepath != filepath)
+        var pkmFilepath = GetPKMFilepath(pkm, evolves);
+        if (pkmFilepath != filepath)
         {
+            // throw new InvalidOperationException($"(M) PKM-file filepath inconsistency. Expected={expectedFilepath} Obtained={filepath}");
             if (EnableLog)
-                Console.WriteLine($"(M) PKM-file filepath inconsistency. Expected={expectedFilepath} Obtained={filepath}");
-            filepath = expectedFilepath;
+                Console.WriteLine($"(M) PKM-file filepath inconsistency. Expected={pkmFilepath} Obtained={filepath}");
         }
 
         if (EnableLog)
-            Console.WriteLine($"(M) PKM-file Write idBase={pkm.GetPKMIdBase()} filepath={filepath} bytes.length={bytes.Length}");
+            Console.WriteLine($"(M) PKM-file Write idBase={pkm.GetPKMIdBase(evolves)} filepath={filepath} bytes.length={bytes.Length}");
 
         bytesDict.Remove(filepath);
         bytesDict.Add(filepath, (bytes, null));
@@ -198,14 +197,18 @@ public class PKMLoader : IPKMLoader
         _ => PKMLoadError.UNKNOWN
     };
 
-    public string GetPKMFilepath(ImmutablePKM pkm)
+    public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves)
     {
         if (!pkm.IsEnabled)
         {
             throw new InvalidOperationException($"Get filepath from disabled PKM not allowed");
         }
 
-        return MatcherUtil.NormalizePath(Path.Combine(settingsService.GetSettings().SettingsMutable.STORAGE_PATH, pkm.Format.ToString(), GetPKMFilename(pkm)));
+        return MatcherUtil.NormalizePath(Path.Combine(
+            storagePath,
+            pkm.Format.ToString(),
+            GetPKMFilename(pkm, evolves)
+        ));
     }
 }
 

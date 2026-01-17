@@ -7,7 +7,7 @@ using PKHeX.Core;
 public class StaticDataService(ISettingsService settingsService)
 {
     public static readonly EntityContext LAST_ENTITY_CONTEXT = GenStaticDataService.LAST_ENTITY_CONTEXT;
-    private static readonly ConcurrentDictionary<string, StaticDataDTO> StaticDataDict = [];
+    private readonly ConcurrentDictionary<string, StaticDataDTO> StaticDataDict = [];
 
     private readonly SpritesheetFileClient spritesheetFileClient = new();
 
@@ -29,12 +29,12 @@ public class StaticDataService(ISettingsService settingsService)
         return staticData;
     }
 
-    public static StaticDataDTO GetDefinedStaticDataDTO()
-    {
-        return StaticDataDict.TryGetValue(SettingsService.DefaultLanguage, out var staticData)
-            ? staticData
-            : throw new InvalidOperationException($"Static Data is null");
-    }
+    // public static StaticDataDTO GetDefinedStaticDataDTO()
+    // {
+    //     return StaticDataDict.TryGetValue(SettingsService.DefaultLanguage, out var staticData)
+    //         ? staticData
+    //         : throw new InvalidOperationException($"Static Data is null");
+    // }
 
     public async Task<Stream> GetSpritesheetStream(string sheetName)
     {

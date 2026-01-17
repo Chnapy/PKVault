@@ -1,4 +1,4 @@
-public class DataNormalizeAction : DataAction
+public class DataNormalizeAction(Dictionary<ushort, StaticEvolve> evolves) : DataAction
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
@@ -7,8 +7,8 @@ public class DataNormalizeAction : DataAction
         List<IDataNormalize> normalizers = [
             new BankNormalize(loaders.bankLoader),
             new BoxNormalize(loaders.boxLoader),
-            new PkmNormalize(loaders.pkmLoader),
-            new PkmVersionNormalize(loaders.pkmVersionLoader),
+            new PkmNormalize(loaders.pkmLoader, evolves),
+            new PkmVersionNormalize(loaders.pkmVersionLoader, evolves),
             new DexNormalize(loaders.dexLoader)
         ];
 

@@ -1,5 +1,6 @@
 public class EditPkmSaveAction(
     ActionService actionService, PkmConvertService pkmConvertService,
+    Dictionary<ushort, StaticEvolve> Evolves,
     uint saveId, string pkmSaveId, EditPkmVersionPayload editPayload
 ) : DataAction
 {
@@ -32,7 +33,7 @@ public class EditPkmSaveAction(
         var pkmVersion = loaders.pkmVersionLoader.GetPkmSaveVersion(pkmSave);
         if (pkmVersion != null)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersion.PkmId, pkmSave.Id)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersion.PkmId, pkmSave.Id)]);
         }
 
         return new(

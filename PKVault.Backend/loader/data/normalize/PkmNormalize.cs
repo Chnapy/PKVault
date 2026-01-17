@@ -1,7 +1,7 @@
 using PKHeX.Core;
 
 public class PkmNormalize(
-    IPkmLoader loader
+    IPkmLoader loader, Dictionary<ushort, StaticEvolve> evolves
 ) : DataNormalize<PkmDTO, PkmEntity>(loader)
 {
     public override void SetupInitialData(DataEntityLoaders loaders)
@@ -38,7 +38,7 @@ public class PkmNormalize(
                 }
 
                 var oldId = pkmVersionEntity.Id;
-                var expectedId = pkm.GetPKMIdBase();
+                var expectedId = pkm.GetPKMIdBase(evolves);
 
                 var isMainVersion = pkmVersionEntity.PkmId == oldId;
 
@@ -51,7 +51,7 @@ public class PkmNormalize(
                     pkmEntity = loaders.pkmLoader.WriteEntity(pkmEntity with { Id = expectedId });
                 }
 
-                var filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkm);
+                var filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkm, evolves);
 
                 // update pkm-version-entity id
                 pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(
@@ -101,7 +101,7 @@ public class PkmNormalize(
                 if (pkm.Species == (ushort)Species.Shedinja)
                 {
                     var oldId = pkmVersionEntity.Id;
-                    var expectedId = pkm.GetPKMIdBase();
+                    var expectedId = pkm.GetPKMIdBase(evolves);
 
                     var isMainVersion = pkmVersionEntity.PkmId == oldId;
 
@@ -114,7 +114,7 @@ public class PkmNormalize(
                         pkmEntity = loaders.pkmLoader.WriteEntity(pkmEntity with { Id = expectedId });
                     }
 
-                    var filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkm);
+                    var filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkm, evolves);
 
                     // update pkm-version-entity id
                     pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(

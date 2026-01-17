@@ -10,15 +10,16 @@ public record PkmSaveDTO(
     int BoxSlot,
     bool IsDuplicate,
 
-    [property: JsonIgnore] SaveWrapper Save
+    [property: JsonIgnore] SaveWrapper Save,
+    [property: JsonIgnore] Dictionary<ushort, StaticEvolve> Evolves
 ) : BasePkmVersionDTO(
-    SavePkmLoader.GetPKMId(Pkm.GetPKMIdBase(), BoxId, BoxSlot),
+    SavePkmLoader.GetPKMId(Pkm.GetPKMIdBase(Evolves), BoxId, BoxSlot),
     Pkm.Generation,
     SettingsLanguage,
     Pkm
 )
 {
-    public string IdBase => Pkm.GetPKMIdBase();
+    public string IdBase => Pkm.GetPKMIdBase(Evolves);
 
     public bool IsShadow => Pkm.IsShadow;
     public int Team => BoxSlotFlags.IsBattleTeam();

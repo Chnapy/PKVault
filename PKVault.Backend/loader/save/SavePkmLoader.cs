@@ -16,7 +16,7 @@ public interface ISavePkmLoader
 }
 
 public class SavePkmLoader(
-    ISettingsService settingsService, PkmConvertService pkmConvertService,
+    ISettingsService settingsService, PkmConvertService pkmConvertService, Dictionary<ushort, StaticEvolve> evolves,
     SaveWrapper save
 ) : ISavePkmLoader
 {
@@ -44,7 +44,8 @@ public class SavePkmLoader(
             BoxSlot: boxSlot,
             IsDuplicate: false,
 
-            Save: save
+            Save: save,
+            Evolves: evolves
         );
 
         return dto;

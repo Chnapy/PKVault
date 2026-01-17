@@ -30,9 +30,9 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         _ => throw new NotImplementedException(slotType.ToString()),
     };
 
-    public BoxLoader(IFileIOService fileIOService, ISettingsService settingsService) : base(
+    public BoxLoader(IFileIOService fileIOService, string dbPath) : base(
         fileIOService,
-        filePath: MatcherUtil.NormalizePath(Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "box.json")),
+        filePath: MatcherUtil.NormalizePath(Path.Combine(dbPath, "box.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringBoxEntity
     )
     {

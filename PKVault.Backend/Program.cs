@@ -61,7 +61,7 @@ public class Program
 
         Console.WriteLine($"Memory checks: initial={initialMemoryUsedMB} MB setuped={setupedMemoryUsedMB} MB diff={setupedMemoryUsedMB - initialMemoryUsedMB} MB");
 
-        await host.Services.GetRequiredService<StaticDataService>().GetStaticData(SettingsService.DefaultLanguage);
+        // await host.Services.GetRequiredService<StaticDataService>().GetStaticData(SettingsService.DefaultLanguage);
 
         if (args.Length > 0 && args[0] == "clean")
         {

@@ -2,6 +2,7 @@ using PKHeX.Core;
 
 public class MovePkmBankAction(
     PkmConvertService pkmConvertService,
+    Dictionary<ushort, StaticEvolve> Evolves,
     string[] pkmIds, uint? sourceSaveId,
     string bankId,
     bool attached
@@ -217,7 +218,7 @@ public class MovePkmBankAction(
                 Id: savePkm.IdBase,
                 PkmId: pkmEntityToCreate.Id,
                 Generation: savePkm.Generation,
-                Filepath: loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(savePkm.Pkm)
+                Filepath: loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(savePkm.Pkm, Evolves)
             ), savePkm.Pkm);
         }
 
@@ -226,7 +227,7 @@ public class MovePkmBankAction(
         // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmEntity!.SaveId != default)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersionEntity.PkmId, null)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersionEntity.PkmId, null)]);
 
             if (!attached)
             {

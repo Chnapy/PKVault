@@ -13,7 +13,9 @@ public interface IPkmVersionLoader : IEntityLoader<PkmVersionDTO, PkmVersionEnti
 
 public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, IPkmVersionLoader
 {
-    private readonly ISettingsService settingsService;
+    private readonly string appPath;
+    private readonly string language;
+    private readonly Dictionary<ushort, StaticEvolve> evolves;
 
     public IPKMLoader pkmFileLoader { get; }
     private readonly IPkmLoader pkmLoader;
@@ -24,28 +26,34 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
 
     public PkmVersionLoader(
         IFileIOService fileIOService,
-        ISettingsService _settingsService,
+        string _appPath,
+        string dbPath,
+        string storagePath,
+        string _language,
+        Dictionary<ushort, StaticEvolve> _evolves,
         IPkmLoader _pkmLoader
     ) : base(
         fileIOService,
-        filePath: MatcherUtil.NormalizePath(Path.Combine(_settingsService.GetSettings().SettingsMutable.DB_PATH, "pkm-version.json")),
+        filePath: MatcherUtil.NormalizePath(Path.Combine(dbPath, "pkm-version.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringPkmVersionEntity
     )
     {
-        settingsService = _settingsService;
+        appPath = _appPath;
+        language = _language;
+        evolves = _evolves;
         pkmLoader = _pkmLoader;
-        pkmFileLoader = new PKMLoader(fileIOService, _settingsService, [.. GetAllEntities().Values]);
+        pkmFileLoader = new PKMLoader(fileIOService, storagePath, [.. GetAllEntities().Values]);
     }
 
     public PkmVersionDTO CreateDTO(PkmVersionEntity entity, ImmutablePKM pkm)
     {
-        var filepathAbsolute = Path.Combine(settingsService.GetSettings().AppDirectory, entity.Filepath);
+        var filepathAbsolute = Path.Combine(appPath, entity.Filepath);
         var isFilePresent = fileIOService.Exists(filepathAbsolute);
 
         var dto = new PkmVersionDTO(
             Id: entity.Id,
             Generation: entity.Generation,
-            SettingsLanguage: settingsService.GetSettings().GetSafeLanguage(),
+            SettingsLanguage: language,
             Pkm: pkm,
 
             PkmId: entity.PkmId,
@@ -165,7 +173,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
     {
         WriteEntity(entity);
 
-        pkmFileLoader.WriteEntity(pkm, entity.Filepath);
+        pkmFileLoader.WriteEntity(pkm, entity.Filepath, evolves);
 
         return entity;
     }
