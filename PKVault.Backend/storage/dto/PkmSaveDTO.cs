@@ -14,7 +14,7 @@ public record PkmSaveDTO(
     [property: JsonIgnore] Dictionary<ushort, StaticEvolve> Evolves
 ) : BasePkmVersionDTO(
     SavePkmLoader.GetPKMId(Pkm.GetPKMIdBase(Evolves), BoxId, BoxSlot),
-    Pkm.Generation,
+    Save.Generation,
     SettingsLanguage,
     Pkm
 )

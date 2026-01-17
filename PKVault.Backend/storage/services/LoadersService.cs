@@ -83,7 +83,7 @@ public class LoadersService : ILoadersService
                 saveLoadersDict.Add(save.Id, new(
                     Save: save,
                     Boxes: new SaveBoxLoader(save, boxLoader),
-                    Pkms: new SavePkmLoader(settingsService, pkmConvertService, staticData.Evolves, save)
+                    Pkms: new SavePkmLoader(pkmConvertService, language: settings.GetSafeLanguage(), staticData.Evolves, save)
                 ));
             });
         }
