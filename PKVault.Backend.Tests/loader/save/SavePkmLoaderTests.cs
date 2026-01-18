@@ -240,6 +240,13 @@ public class SavePkmLoaderTests : IAsyncLifetime
         Assert.False(all.Find(dto => dto.Id == dto1.Id)!.IsDuplicate);
         Assert.True(all.Find(dto => dto.Id == dto2.Id)!.IsDuplicate);
         Assert.True(all.Find(dto => dto.Id == dto3.Id)!.IsDuplicate);
+
+        loader.DeleteDto(dto2.Id);
+
+        all = loader.GetAllDtos();
+
+        Assert.False(all.Find(dto => dto.Id == dto1.Id)!.IsDuplicate);
+        Assert.False(all.Find(dto => dto.Id == dto3.Id)!.IsDuplicate);
     }
 
     #endregion

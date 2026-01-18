@@ -10,6 +10,13 @@ Basic test process.
 
 ```
 dotnet test
+# or
+dotnet run
+
+# run a single test
+dotnet test --filter-class "ClassNameTests"
+# or
+dotnet run -class "ClassNameTests"
 ```
 
 ## Coverage
