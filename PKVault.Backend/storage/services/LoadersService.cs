@@ -157,7 +157,7 @@ public class LoadersService : ILoadersService
     {
         var staticData = await staticDataService.GetStaticData();
 
-        (string PkmId, string SavePkmId)[][] synchronizationData = await SynchronizePkmAction.GetSavesPkmsToSynchronize(loaders);
+        (string PkmVersionId, string SavePkmId)[][] synchronizationData = await SynchronizePkmAction.GetSavesPkmsToSynchronize(loaders);
 
         foreach (var data in synchronizationData)
         {

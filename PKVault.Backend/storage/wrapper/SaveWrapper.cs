@@ -3,16 +3,11 @@ using System.Security.Cryptography;
 using System.Text;
 using PKHeX.Core;
 
-public interface ISaveWrapper
-{ }
-
 /**
  * SaveFile wrapper for control & conveniance.
  * Not immutable for clone performance constraints.
  */
-public class SaveWrapper(SaveFile Save,
-// TODO use Save.Metadata.FilePath instead
-string path) : ISaveWrapper
+public class SaveWrapper(SaveFile Save)
 {
     public uint Id
     {
@@ -21,6 +16,7 @@ string path) : ISaveWrapper
             if (Save.ID32 == default)
             {
                 // var encodeBase = $"{(byte)Save.Version}-{Save.Generation}-{Save.TID16}-{Save.Metadata.FilePath}";
+                var path = Save.Metadata.FilePath;
                 byte[] bytes = Encoding.UTF8.GetBytes(path);
                 byte[] hash = SHA1.HashData(bytes);
                 return BitConverter.ToUInt32(hash, 0);
@@ -221,5 +217,5 @@ string path) : ISaveWrapper
      * Clone SaveFile and all its PKM.
      * May be slow.
      */
-    public SaveWrapper Clone() => new(Save.Clone(), path);
+    public SaveWrapper Clone() => new(Save.Clone());
 }

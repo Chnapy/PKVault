@@ -453,7 +453,7 @@ public class PkmVersionLoaderTests : IAsyncLifetime
             _ => throw new NotImplementedException()
         };
         save.ID32 = saveId;
-        var wrapper = new SaveWrapper(save, "/test/save.sav");
+        var wrapper = new SaveWrapper(save);
         return wrapper;
     }
 }

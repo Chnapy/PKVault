@@ -4,9 +4,10 @@ public class MainDeleteBankAction(string bankId) : DataAction
     {
         var bank = loaders.bankLoader.GetEntity(bankId);
 
-        if (bank!.IsDefault)
+        var banksCount = loaders.bankLoader.GetAllEntities().Count;
+        if (banksCount < 2)
         {
-            throw new ArgumentException("Bank being default cannot be deleted");
+            throw new ArgumentException("Last Bank cannot be deleted");
         }
 
         var boxes = loaders.boxLoader.GetAllEntities().Values.ToList().FindAll(box => box.BankId == bankId);
@@ -16,6 +17,12 @@ public class MainDeleteBankAction(string bankId) : DataAction
         }
 
         loaders.bankLoader.DeleteEntity(bankId);
+        if (bank.IsDefault)
+        {
+            var newDefaultBank = loaders.bankLoader.GetAllEntities().First().Value;
+            loaders.bankLoader.WriteEntity(newDefaultBank with { IsDefault = true });
+        }
+
         loaders.bankLoader.NormalizeOrders();
 
         return new(

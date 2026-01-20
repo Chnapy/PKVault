@@ -104,7 +104,7 @@
   "storage.bank.edit.order": "Ordre",
   "storage.bank.edit.view": "Utiliser la vue actuelle",
   "storage.bank.edit.view.help": "La banque doit être sélectionnée avant de changer la vue",
-  "storage.bank.delete.help": "La banque doit être vide (0 pkms), et non-default avant de la supprimer",
+  "storage.bank.delete.help": "La banque doit être vide (0 pkms) avant de la supprimer",
   "storage.box.edit.bank": "Banque",
   "storage.box.edit.type": "Type",
   "storage.box.edit.type.box": "Boîte",

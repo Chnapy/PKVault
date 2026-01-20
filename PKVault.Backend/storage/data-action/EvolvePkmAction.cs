@@ -76,7 +76,7 @@ public class EvolvePkmAction(
         var entity = loaders.pkmVersionLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-version not found");
         var entityPkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(entity);
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox((int)entity.BoxId!, (int)entity.BoxSlot!).Values.ToList()
+        var relatedPkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox(entity.BoxId, entity.BoxSlot).Values.ToList()
             .FindAll(value => value.Id != entity.Id)
             .Select(entity => (Version: entity, Pkm: loaders.pkmVersionLoader.GetPkmVersionEntityPkm(entity))).ToList();
 

@@ -56,8 +56,6 @@ public class SettingsController(DataService dataService, ISettingsService settin
             MainPkmVersions = new() { All = true },
             Saves = new() { All = true },
             Dex = true,
-            // Actions = true,
-            // Warnings = true,
             SaveInfos = true,
             Backups = true,
             Settings = true,

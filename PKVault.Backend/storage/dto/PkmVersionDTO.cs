@@ -30,7 +30,6 @@ public record PkmVersionDTO(
     Evolves
 )
 {
-    public override bool CanDelete => base.CanDelete && AttachedSaveId == null;
     public bool CanMoveAttachedToSave => CanMoveToSave && AttachedSaveId == null;
 
     public IReadOnlyList<GameVersion> CompatibleWithVersions => VersionChecker.GetCompatibleVersionsForSpecies(Pkm.Species);

@@ -99,7 +99,7 @@ public class MovePkmAction(
     private DataActionPayload MainToMain(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmVersionId, int targetBoxSlot)
     {
         var baseEntity = loaders.pkmVersionLoader.GetEntity(pkmVersionId) ?? throw new KeyNotFoundException("Pkm not found");
-        var entities = loaders.pkmVersionLoader.GetEntitiesByBox((int)baseEntity.BoxId!, (int)baseEntity.BoxSlot!);
+        var entities = loaders.pkmVersionLoader.GetEntitiesByBox(baseEntity.BoxId, baseEntity.BoxSlot);
         var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(baseEntity);
 
         var pkmsAlreadyPresent = loaders.pkmVersionLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot).Values.ToList();
@@ -197,7 +197,7 @@ public class MovePkmAction(
         var pkmVersion = loaders.pkmVersionLoader.GetEntity(pkmVersionId);
         var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersion);
 
-        var pkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox((int)pkmVersion.BoxId!, (int)pkmVersion.BoxSlot!).Values.ToList();
+        var pkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox(pkmVersion.BoxId!, pkmVersion.BoxSlot!).Values.ToList();
 
         if (attached)
         {
@@ -218,12 +218,12 @@ public class MovePkmAction(
 
         if (existingSlot != null)
         {
-            await SaveToMainWithoutCheckTarget(loaders, flags, (uint)targetSaveId, (int)pkmVersion.BoxId, (int)pkmVersion.BoxSlot, existingSlot);
+            await SaveToMainWithoutCheckTarget(loaders, flags, (uint)targetSaveId, pkmVersion.BoxId, pkmVersion.BoxSlot, existingSlot);
         }
 
         saveLoaders.Pkms.FlushParty();
 
-        CheckPkmTradeRecord(saveLoaders.Save);
+        IncrementSaveTradeRecord(saveLoaders.Save);
 
         var boxName = saveLoaders.Boxes.GetDto(targetBoxId.ToString())?.Name;
 
@@ -274,7 +274,7 @@ public class MovePkmAction(
 
         saveLoaders.Pkms.FlushParty();
 
-        CheckPkmTradeRecord(saveLoaders.Save);
+        IncrementSaveTradeRecord(saveLoaders.Save);
 
         var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
 
@@ -439,7 +439,7 @@ public class MovePkmAction(
         }
     }
 
-    private static void CheckPkmTradeRecord(SaveWrapper save)
+    public static void IncrementSaveTradeRecord(SaveWrapper save)
     {
         if (save.GetSave() is SAV3FRLG saveG3FRLG)
         {

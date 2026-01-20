@@ -17,7 +17,12 @@ public class MainCreatePkmVersionAction(
             throw new ArgumentException($"Pkm-version original not found, pkmVersion.id={pkmVersionId} generation={generation}");
         }
 
-        var pkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox((int)pkmVersionOrigin.BoxId!, (int)pkmVersionOrigin.BoxSlot!).Values.ToList();
+        if (!pkmVersionOrigin.IsMain)
+        {
+            throw new ArgumentException($"Pkm-version should have IsMain=true, pkmVersion.id={pkmVersionId} generation={generation}");
+        }
+
+        var pkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox(pkmVersionOrigin.BoxId, pkmVersionOrigin.BoxSlot).Values.ToList();
 
         var pkmVersionEntity = pkmVersions.Find(pkmVersion => pkmVersion.Generation == generation);
         if (pkmVersionEntity != default)

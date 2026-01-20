@@ -29,7 +29,7 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
                     {
                         save = new(saveVersion == default
                             ? new SAV9ZA()
-                            : BlankSaveFile.Get(saveVersion), "");
+                            : BlankSaveFile.Get(saveVersion));
                         savesByVersion.Add(saveVersion, save);
                     }
 

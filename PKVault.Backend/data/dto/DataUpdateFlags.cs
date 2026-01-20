@@ -3,11 +3,9 @@ public class DataUpdateFlags
     public bool StaticData;
     public DataUpdateFlagsState<string> MainBanks = new();
     public DataUpdateFlagsState<string> MainBoxes = new();
-    // public DataUpdateFlagsState<string> MainPkms = new();
     public DataUpdateFlagsState<string> MainPkmVersions = new();
     public DataUpdateSaveListFlags Saves = new();
     public bool Dex;
-    // public bool Actions;
     public bool Warnings;
     public bool SaveInfos;
     public bool Backups;

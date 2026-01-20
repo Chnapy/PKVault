@@ -32,8 +32,6 @@ public class BackupController(BackupService backupService, DataService dataServi
             MainBoxes = new() { All = true },
             MainPkmVersions = new() { All = true },
             Saves = new() { All = true },
-            // Actions = true,
-            // Warnings = true,
             SaveInfos = true,
             Backups = true,
             Warnings = true,

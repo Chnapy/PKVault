@@ -1,8 +1,8 @@
 public record PkmVersionEntity(
     string Id,
-    int? BoxId,
-    int? BoxSlot,
-    bool? IsMain,
+    int BoxId,
+    int BoxSlot,
+    bool IsMain,
     uint? AttachedSaveId,
     string? AttachedSavePkmIdBase,
     byte Generation,

@@ -17,7 +17,7 @@ public class VersionChecker
                 return (version, null!);
             }
 
-            return (version, new SaveWrapper(BlankSaveFile.Get(versionToUse), ""));
+            return (version, new SaveWrapper(BlankSaveFile.Get(versionToUse)));
         })];
     }
 

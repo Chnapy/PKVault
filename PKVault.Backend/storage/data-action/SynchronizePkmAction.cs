@@ -1,6 +1,5 @@
 using PKHeX.Core;
 
-// TODO refacto simplifying whole logic using PkmVersionEntity.AttachedSavePkmIdBase
 public class SynchronizePkmAction(
     PkmConvertService pkmConvertService,
     Dictionary<ushort, StaticEvolve> Evolves,
@@ -96,15 +95,10 @@ public class SynchronizePkmAction(
             var savePkms = saveLoaders.Pkms.GetDtosByIdBase(savePkmIdBase);
             if (savePkms.Count != 1)
             {
-                throw new InvalidOperationException($"Multiple savePkms found ({savePkms.Count}) for IdBase={savePkmIdBase}");
+                throw new InvalidOperationException($"Multiple savePkms found ({savePkms.Count}) for pkmVersion.id={pkmVersionId} savePkmIdBase={savePkmIdBase}");
             }
 
             var savePkm = savePkms.First().Value;
-            if (savePkm == null)
-            {
-                Console.WriteLine($"Attached save pkm not found for pkmVersion.id={pkmVersionId} savePkmIdBase={savePkmIdBase}");
-            }
-
             pkmVersionEntities.ForEach((version) =>
             {
                 var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(version);
@@ -181,7 +175,7 @@ public class SynchronizePkmAction(
             var savePkms = saveLoaders.Pkms.GetDtosByIdBase(savePkmIdBase);
             if (savePkms.Count != 1)
             {
-                throw new InvalidOperationException($"Multiple savePkms found ({savePkms.Count}) for IdBase={savePkmIdBase}");
+                throw new InvalidOperationException($"Multiple savePkms found ({savePkms.Count}) for pkmVersion.id={pkmVersionId} savePkmIdBase={savePkmIdBase}");
             }
 
             var savePkm = savePkms.First().Value;

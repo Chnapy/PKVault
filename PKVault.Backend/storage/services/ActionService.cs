@@ -83,14 +83,14 @@ public class ActionService(
         );
     }
 
-    public async Task<DataUpdateFlags> MainCreatePkmVersion(string pkmId, byte generation)
+    public async Task<DataUpdateFlags> MainCreatePkmVersion(string pkmVersionId, byte generation)
     {
         var staticData = await staticDataService.GetStaticData();
 
         return await AddAction(
             new MainCreatePkmVersionAction(
                 pkmConvertService, staticData.Evolves,
-                pkmId, generation)
+                pkmVersionId, generation)
         );
     }
 
@@ -243,7 +243,7 @@ public class ActionService(
             StaticDataService.GetSingleVersion(pkm.Version),
             pkm.OriginalTrainerName,
             (LanguageID)pkmConvertService.GetPkmLanguage(pkm.GetMutablePkm())
-        ), "");
+        ));
 
         var filteredSources = new FilteredGameDataSource(save.GetSave(), GameInfo.Sources);
         moveSource.ChangeMoveSource(filteredSources.Moves);

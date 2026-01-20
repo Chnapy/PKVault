@@ -9,11 +9,6 @@ public class EditPkmSaveAction(
         var saveLoaders = loaders.saveLoadersDict[saveId];
         var pkmSave = saveLoaders.Pkms.GetDto(pkmSaveId);
 
-        // if (pkmSave.PkmVersionId != default)
-        // {
-        //     throw new Exception("Edit not possible for pkm attached with save");
-        // }
-
         var availableMoves = await actionService.GetPkmAvailableMoves(saveId, pkmSaveId);
 
         var pkm = pkmSave!.Pkm.Update(pkm =>

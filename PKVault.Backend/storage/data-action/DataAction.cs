@@ -1,7 +1,6 @@
 public abstract class DataAction
 {
     public DataActionPayload payload;
-    // public abstract DataActionPayload GetPayload();
 
     protected abstract Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags);
 

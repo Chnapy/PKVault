@@ -27,7 +27,7 @@ public class DexService(ILoadersService loadersService, StaticDataService static
 
         var saveLoadersDict = loaders.saveLoadersDict;
 
-        List<SaveWrapper> saves = saveIds.Select(id => id == FakeSaveFile.Default.ID32 ? new(FakeSaveFile.Default, "") : saveLoadersDict[id].Save).ToList();
+        List<SaveWrapper> saves = saveIds.Select(id => id == FakeSaveFile.Default.ID32 ? new(FakeSaveFile.Default) : saveLoadersDict[id].Save).ToList();
 
         var staticData = await staticDataService.GetStaticData();
 

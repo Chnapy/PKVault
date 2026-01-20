@@ -155,13 +155,6 @@ public class SavePkmLoader(
             duplicateDict.Add(dto.Id, dto);
         }
 
-        // duplicatesDictByIdBase.Values.Where(list => list.Count > 1).SelectMany(list => list.Values).ToList().ForEach(dto =>
-        // {
-        //     dto = dto with { IsDuplicate = true };
-        //     dictById[dto.Id] = dto;
-        //     dictByBox[GetDTOByBoxKey(dto.BoxId, dto.BoxSlot)] = dto;
-        // });
-
         dtoById = dictById;
         dtoByBox = dictByBox;
         dtosByIdBase = duplicatesDictByIdBase;

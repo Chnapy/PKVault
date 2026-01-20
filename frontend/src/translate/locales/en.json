@@ -104,7 +104,7 @@
   "storage.bank.edit.order": "Order",
   "storage.bank.edit.view": "Use current view",
   "storage.bank.edit.view.help": "Bank should be selected before updating view",
-  "storage.bank.delete.help": "Bank should be empty (no pkm), and should not be set as default before delete it",
+  "storage.bank.delete.help": "Bank should be empty (no pkm) before delete it",
   "storage.box.edit.bank": "Bank",
   "storage.box.edit.type": "Type",
   "storage.box.edit.type.box": "Box",

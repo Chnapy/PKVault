@@ -158,7 +158,7 @@ public class MovePkmBankAction(
 
         saveLoaders.Pkms.FlushParty();
 
-        CheckPkmTradeRecord(saveLoaders.Save);
+        MovePkmAction.IncrementSaveTradeRecord(saveLoaders.Save);
 
         var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
 
@@ -230,43 +230,5 @@ public class MovePkmBankAction(
         new DexMainService(loaders).EnablePKM(savePkm.Pkm, savePkm.Save);
 
         flags.Dex = true;
-    }
-
-    private static void CheckPkmTradeRecord(SaveWrapper save)
-    {
-        if (save.GetSave() is SAV3FRLG saveG3FRLG)
-        {
-            var records = new Record3(saveG3FRLG);
-
-            var pkmTradeIndex = 21;
-
-            var pkmTradeCount = records.GetRecord(pkmTradeIndex);
-            records.SetRecord(pkmTradeIndex, pkmTradeCount + 1);
-        }
-        else if (save.GetSave() is SAV4HGSS saveG4HGSS)
-        {
-            /**
-             * Found record data types from Record32:
-             * - times-linked
-             * - link-battles-win
-             * - link-battles-lost
-             * - link-trades
-             */
-            int linkTradesIndex1 = 20;  // cable I guess
-            // int linkTradesIndex2 = 25;  // wifi I guess
-            // List<int> timesLinkedIndexes = [linkTradesIndex1, linkTradesIndex2, 25, 26, 33];
-            // List<int> linkBattlesWinIndexes = [22, 27]; // cable/wifi I guess
-            // List<int> linkBattlesLostIndexes = [23, 28]; // cable/wifi I guess
-            // List<int> linkTradesIndexes = [linkTradesIndex1, linkTradesIndex2];
-
-            int pkmTradeIndex = linkTradesIndex1;
-
-            // required since SAV4.Records getter creates new instance each call
-            var records = saveG4HGSS.Records;
-
-            uint pkmTradeCount = records.GetRecord32(pkmTradeIndex);
-            records.SetRecord32(pkmTradeIndex, pkmTradeCount + 1);
-            records.EndAccess();
-        }
     }
 }

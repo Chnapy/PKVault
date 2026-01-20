@@ -52,8 +52,6 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
 
     public PkmVersionDTO CreateDTO(PkmVersionEntity entity, ImmutablePKM pkm)
     {
-        AssertIsNotLegacy(entity);
-
         var filepathAbsolute = Path.Combine(appPath, entity.Filepath);
         var isFilePresent = fileIOService.Exists(filepathAbsolute);
 
@@ -63,9 +61,9 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             SettingsLanguage: language,
             Pkm: pkm,
 
-            BoxId: (int)entity.BoxId!,
-            BoxSlot: (int)entity.BoxSlot!,
-            IsMain: (bool)entity.IsMain!,
+            BoxId: entity.BoxId,
+            BoxSlot: entity.BoxSlot,
+            IsMain: entity.IsMain,
             AttachedSaveId: entity.AttachedSaveId,
             AttachedSavePkmIdBase: entity.AttachedSavePkmIdBase,
 
@@ -145,14 +143,13 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             return false;
         }
 
-        var boxKey = GetEntityByBoxKey(entityToRemove.BoxId ?? -1, entityToRemove.BoxSlot ?? -1);
         var saveId = entityToRemove.AttachedSaveId ?? 0;
         var savePkmIdBase = entityToRemove.AttachedSavePkmIdBase ?? "";
 
         var result = base.DeleteEntity(id);
 
-        if (entitiesByBox.TryGetValue(entityToRemove.BoxId ?? -1, out var boxEntities)
-            && boxEntities.TryGetValue(entityToRemove.BoxSlot ?? -1, out var slotEntities))
+        if (entitiesByBox.TryGetValue(entityToRemove.BoxId, out var boxEntities)
+            && boxEntities.TryGetValue(entityToRemove.BoxSlot, out var slotEntities))
         {
             slotEntities.Remove(id);
         }
@@ -177,20 +174,17 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
 
         entity = base.WriteEntity(entity);
 
-        if (entity.BoxId != null && entity.BoxSlot != null)
+        if (!entitiesByBox.TryGetValue(entity.BoxId, out var boxEntities))
         {
-            if (!entitiesByBox.TryGetValue((int)entity.BoxId, out var boxEntities))
-            {
-                boxEntities = [];
-                entitiesByBox.Add((int)entity.BoxId, boxEntities);
-            }
-            if (!boxEntities.TryGetValue((int)entity.BoxSlot, out var slotEntities))
-            {
-                slotEntities = [];
-                boxEntities.Add((int)entity.BoxSlot, slotEntities);
-            }
-            slotEntities.Add(entity.Id, entity);
+            boxEntities = [];
+            entitiesByBox.Add(entity.BoxId, boxEntities);
         }
+        if (!boxEntities.TryGetValue(entity.BoxSlot, out var slotEntities))
+        {
+            slotEntities = [];
+            boxEntities.Add(entity.BoxSlot, slotEntities);
+        }
+        slotEntities.Add(entity.Id, entity);
 
         if (
             entity.AttachedSaveId != null
@@ -224,20 +218,17 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
 
         entitiesById.Values.ToList().ForEach(entity =>
         {
-            if (entity.BoxId != null && entity.BoxSlot != null)
+            if (!entitiesByBox.TryGetValue(entity.BoxId, out var boxEntities))
             {
-                if (!entitiesByBox.TryGetValue((int)entity.BoxId, out var boxEntities))
-                {
-                    boxEntities = [];
-                    entitiesByBox.Add((int)entity.BoxId, boxEntities);
-                }
-                if (!boxEntities.TryGetValue((int)entity.BoxSlot, out var slotEntities))
-                {
-                    slotEntities = [];
-                    boxEntities.Add((int)entity.BoxSlot, slotEntities);
-                }
-                slotEntities.Add(entity.Id, entity);
+                boxEntities = [];
+                entitiesByBox.Add(entity.BoxId, boxEntities);
             }
+            if (!boxEntities.TryGetValue(entity.BoxSlot, out var slotEntities))
+            {
+                slotEntities = [];
+                boxEntities.Add(entity.BoxSlot, slotEntities);
+            }
+            slotEntities.Add(entity.Id, entity);
 
             if (entity.AttachedSaveId != null && entity.AttachedSavePkmIdBase != null)
             {
@@ -287,16 +278,4 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
     public override int GetLastSchemaVersion() => 1;
 
     public static string GetEntityByBoxKey(int box, int boxSlot) => box + "." + boxSlot;
-
-    private void AssertIsNotLegacy(PkmVersionEntity entity)
-    {
-        if (
-            entity.BoxId == null
-            || entity.BoxSlot == null
-            || entity.IsMain == null
-        )
-        {
-            throw new InvalidOperationException($"Legacy PkmVersionEntity => {entity.Id}");
-        }
-    }
 }

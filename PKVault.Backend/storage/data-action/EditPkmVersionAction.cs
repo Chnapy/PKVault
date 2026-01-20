@@ -26,7 +26,7 @@ public class EditPkmVersionAction(
 
         loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity, pkm);
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox((int)pkmVersionEntity.BoxId!, (int)pkmVersionEntity.BoxSlot!).Values.ToList()
+        var relatedPkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox(pkmVersionEntity.BoxId, pkmVersionEntity.BoxSlot).Values.ToList()
             .FindAll(value => value.Id != pkmVersionId);
 
         relatedPkmVersions.ForEach((versionEntity) =>

@@ -81,8 +81,8 @@ public class SortPkmAction(
             var filteredPkms = pkms
                 .Select(pkm =>
                 {
-                    var mainVersion = loaders.pkmVersionLoader.GetEntitiesByBox((int)pkm.BoxId!, (int)pkm.BoxSlot!).Values.ToList()
-                        .Find(pkm => (bool)pkm.IsMain!)!;
+                    var mainVersion = loaders.pkmVersionLoader.GetEntitiesByBox(pkm.BoxId, pkm.BoxSlot).Values.ToList()
+                        .Find(pkm => pkm.IsMain)!;
                     var mainVersionPkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(mainVersion);
                     return (Version: mainVersion, Pkm: mainVersionPkm);
                 });
@@ -101,7 +101,7 @@ public class SortPkmAction(
                 applyValue: (entry) =>
                 {
                     var currentValue = pkmVersions[entry.Index].Version;
-                    var entities = loaders.pkmVersionLoader.GetEntitiesByBox((int)currentValue.BoxId!, (int)currentValue.BoxSlot!);
+                    var entities = loaders.pkmVersionLoader.GetEntitiesByBox(currentValue.BoxId, currentValue.BoxSlot);
                     entities.Values.ToList().ForEach(entity =>
                     {
                         loaders.pkmVersionLoader.WriteEntity(entity with
@@ -224,7 +224,5 @@ public class SortPkmAction(
                 }
             }
         }
-
-        // new Set(temp2.map(p => p.boxId + '.' + p.boxSlot)).size === temp2.length
     }
 }

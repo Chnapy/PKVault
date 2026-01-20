@@ -23,14 +23,6 @@ public class StorageController(DataService dataService, ILoadersService loadersS
         return list;
     }
 
-    // [HttpGet("main/pkm")]
-    // public async Task<ActionResult<List<PkmDTO>>> GetMainPkms()
-    // {
-    //     var list = await storageQueryService.GetMainPkms();
-
-    //     return list;
-    // }
-
     // TODO return dict for perf
     [HttpGet("main/pkm-version")]
     public async Task<ActionResult<List<PkmVersionDTO>>> GetMainPkmVersions()
@@ -142,17 +134,17 @@ public class StorageController(DataService dataService, ILoadersService loadersS
     }
 
     [HttpPut("main/pkm/detach-save")]
-    public async Task<ActionResult<DataDTO>> MainPkmDetachSave([FromQuery] string[] pkmIds)
+    public async Task<ActionResult<DataDTO>> MainPkmDetachSave([FromQuery] string[] pkmVersionIds)
     {
-        var flags = await actionService.MainPkmDetachSaves(pkmIds);
+        var flags = await actionService.MainPkmDetachSaves(pkmVersionIds);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
     [HttpPost("main/pkm-version")]
-    public async Task<ActionResult<DataDTO>> MainCreatePkmVersion([BindRequired] string pkmId, [BindRequired] byte generation)
+    public async Task<ActionResult<DataDTO>> MainCreatePkmVersion([BindRequired] string pkmVersionId, [BindRequired] byte generation)
     {
-        var flags = await actionService.MainCreatePkmVersion(pkmId, generation);
+        var flags = await actionService.MainCreatePkmVersion(pkmVersionId, generation);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
