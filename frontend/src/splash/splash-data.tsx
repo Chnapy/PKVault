@@ -3,7 +3,7 @@ import { useBackupGetAll } from '../data/sdk/backup/backup.gen';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { useStaticDataGet } from '../data/sdk/static-data/static-data.gen';
-import { useStorageGetMainBanks, useStorageGetMainBoxes, useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../data/sdk/storage/storage.gen';
+import { useStorageGetMainBanks, useStorageGetMainBoxes, useStorageGetMainPkmVersions } from '../data/sdk/storage/storage.gen';
 import { Fallback } from '../error/fallback';
 import { useDesktopMessage } from '../settings/save-globs/hooks/use-desktop-message';
 import { Splash } from '../ui/splash/splash';
@@ -16,17 +16,19 @@ export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number
         useSaveInfosGetAll(),
         useStorageGetMainBanks(),
         useStorageGetMainBoxes(),
-        useStorageGetMainPkms(),
         useStorageGetMainPkmVersions(),
     ] as const;
 
     const desktopMessage = useDesktopMessage();
 
-    const isLoading = queries.some(query => query.isLoading
-        // for some reason isLoading can be false and data still not loaded
-        || query.data === undefined);
+    const isLoading = queries.some(
+        (query) =>
+            query.isLoading ||
+            // for some reason isLoading can be false and data still not loaded
+            query.data === undefined,
+    );
 
-    const error = queries.find(query => query.isError)?.error;
+    const error = queries.find((query) => query.isError)?.error;
 
     React.useEffect(() => {
         if (isLoading) {
@@ -39,13 +41,11 @@ export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number
         desktopMessage?.startLoadingFinished(!!error);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ desktopMessage, isLoading ]);
+    }, [desktopMessage, isLoading]);
 
     if (!isLoading && !error) {
         return children;
     }
 
-    return <Splash>
-        {error && <Fallback.default error={error} resetErrorBoundary={() => null} />}
-    </Splash>;
+    return <Splash>{error && <Fallback.default error={error} resetErrorBoundary={() => null} />}</Splash>;
 };

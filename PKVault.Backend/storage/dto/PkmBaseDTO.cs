@@ -1,14 +1,23 @@
 using System.Text.Json.Serialization;
 using PKHeX.Core;
 
-public abstract record BasePkmVersionDTO(
+public abstract record PkmBaseDTO(
     string Id,
     byte Generation,
 
+    int BoxId,
+    int BoxSlot,
+
+    bool IsDuplicate,
+
     [property: JsonIgnore] string SettingsLanguage,
-    [property: JsonIgnore] ImmutablePKM Pkm
+    [property: JsonIgnore] ImmutablePKM Pkm,
+    [property: JsonIgnore] Dictionary<ushort, StaticEvolve> Evolves
 ) : IWithId
 {
+    public string IdBase => Pkm.GetPKMIdBase(Evolves);
+    public string BoxKey => PkmVersionLoader.GetEntityByBoxKey(BoxId, BoxSlot);
+
     public GameVersion Version => Pkm.Version;
     public EntityContext Context => Pkm.Context;
     public uint PID => Pkm.PID;
@@ -51,11 +60,47 @@ public abstract record BasePkmVersionDTO(
     public string DynamicChecksum => Pkm.DynamicChecksum;
     public int NicknameMaxLength => Pkm.MaxStringLengthNickname;
 
+    public bool IsShadow => Pkm.IsShadow;
+
+    public virtual bool CanMove => true;
+    public virtual bool CanDelete => true;
+    public virtual bool CanMoveToSave => IsEnabled && Pkm.Version > 0 && Pkm.Generation > 0 && CanMove;
+
+    public bool CanEdit => IsEnabled && !IsEgg;
+    public bool CanEvolve
+    {
+        get
+        {
+            if (!IsEnabled || IsEgg || IsShadow)
+                return false;
+
+            if (!Evolves.TryGetValue(Species, out var staticEvolves))
+            {
+                return false;
+            }
+
+            if (staticEvolves.Trade.TryGetValue((byte)Version, out var tradeEvolveSpecies))
+            {
+                return Level >= tradeEvolveSpecies.MinLevel;
+            }
+
+            if (!staticEvolves.TradeWithItem.TryGetValue(HeldItemPokeapiName ?? "", out var tradeWithItemEvolveSpecies))
+            {
+                return false;
+            }
+
+            if (!tradeWithItemEvolveSpecies.TryGetValue((byte)Version, out var evolveSpecies))
+            {
+                return false;
+            }
+
+            return Level >= evolveSpecies.MinLevel;
+        }
+    }
+
     public PKMLoadError? LoadError => Pkm.LoadError;
     public bool HasLoadError => Pkm.HasLoadError;
     public bool IsEnabled => Pkm.IsEnabled;
-
-    public bool CanEdit => IsEnabled && !Pkm.IsEgg;
 };
 
 public record MoveItem(int Id);

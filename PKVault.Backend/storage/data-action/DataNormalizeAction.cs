@@ -7,7 +7,7 @@ public class DataNormalizeAction(Dictionary<ushort, StaticEvolve> evolves) : Dat
         List<IDataNormalize> normalizers = [
             new BankNormalize(loaders.bankLoader),
             new BoxNormalize(loaders.boxLoader),
-            new PkmNormalize(loaders.pkmLoader, evolves),
+            new PkmNormalize(loaders.legacyPkmLoader, evolves),
             new PkmVersionNormalize(loaders.pkmVersionLoader, evolves),
             new DexNormalize(loaders.dexLoader)
         ];

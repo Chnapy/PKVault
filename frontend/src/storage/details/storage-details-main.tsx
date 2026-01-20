@@ -2,7 +2,7 @@ import React from 'react';
 import { usePkmLegality, usePkmLegalityMap } from '../../data/hooks/use-pkm-legality';
 import { usePkmVersionAttach } from '../../data/hooks/use-pkm-version-attach';
 import { PKMLoadError } from '../../data/sdk/model';
-import { useStorageGetMainPkms, useStorageGetMainPkmVersions, useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
+import { useStorageGetMainPkmVersions, useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
 import { useDesktopMessage } from '../../settings/save-globs/hooks/use-desktop-message';
 import { useTranslate } from '../../translate/i18n';
@@ -12,64 +12,60 @@ import { StorageDetailsBase } from '../../ui/storage-item-details/storage-detail
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { switchUtilRequired } from '../../util/switch-util';
+import { usePkmVersionSlotInfos } from '../../data/hooks/use-pkm-version-slot-infos';
 
 export type StorageDetailsMainProps = {
     selectedId: string;
 };
 
-export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({
-    selectedId,
-}) => {
+export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selectedId }) => {
     const [ selectedIndex, setSelectedIndex ] = React.useState(0);
 
-    const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
+    const versionInfos = usePkmVersionSlotInfos(selectedId);
 
-    const pkmVersionList = mainPkmVersionsQuery.data?.data.filter(value => value.pkmId === selectedId) ?? [];
-    const pkmLegalityMapQuery = usePkmLegalityMap(pkmVersionList.map(pkm => pkm.id));
+    const pkmLegalityMapQuery = usePkmLegalityMap(versionInfos?.versions.map(pkm => pkm.id) ?? []);
     const pkmLegalityMap = pkmLegalityMapQuery.data?.data ?? {};
-    if (pkmVersionList.length === 0) {
+
+    if (!versionInfos) {
         return null;
     }
 
-    const finalIndex = pkmVersionList[ selectedIndex ] ? selectedIndex : 0;
-    const pkmVersion = pkmVersionList[ finalIndex ];
+    const { versions } = versionInfos;
 
-    return <div
-        style={{ flexGrow: 1 }}
-    >
-        <div
-            style={{
-                display: 'flex',
-                gap: '0 4px',
-                padding: '0 8px',
-                flexWrap: 'wrap-reverse',
-            }}
-        >
-            {pkmVersionList.map((pkmVersion, i) => (
-                <DetailsTab
-                    key={pkmVersion.id}
-                    isEnabled={pkmVersion.isEnabled}
-                    version={pkmVersion.isEnabled ? pkmVersion.version : null}
-                    otName={`G${pkmVersion.generation}`}
-                    original={pkmVersion.isMain}
-                    onClick={() => setSelectedIndex(i)}
-                    disabled={finalIndex === i}
-                    warning={!pkmLegalityMap[ pkmVersion.id ]?.isValid}
-                />
-            ))}
+    const finalIndex = versions[ selectedIndex ] ? selectedIndex : 0;
+    const pkmVersion = versions[ finalIndex ];
+
+    return (
+        <div style={{ flexGrow: 1 }}>
+            <div
+                style={{
+                    display: 'flex',
+                    gap: '0 4px',
+                    padding: '0 8px',
+                    flexWrap: 'wrap-reverse',
+                }}
+            >
+                {versions.map((pkmVersion, i) => (
+                    <DetailsTab
+                        key={pkmVersion.id}
+                        isEnabled={pkmVersion.isEnabled}
+                        version={pkmVersion.isEnabled ? pkmVersion.version : null}
+                        otName={`G${pkmVersion.generation}`}
+                        original={pkmVersion.isMain}
+                        onClick={() => setSelectedIndex(i)}
+                        disabled={finalIndex === i}
+                        warning={!pkmLegalityMap[ pkmVersion.id ]?.isValid}
+                    />
+                ))}
+            </div>
+
+            {pkmVersion && (
+                <StorageDetailsForm.Provider key={pkmVersion.id} nickname={pkmVersion.nickname} eVs={pkmVersion.eVs} moves={pkmVersion.moves}>
+                    <InnerStorageDetailsMain id={pkmVersion.id} />
+                </StorageDetailsForm.Provider>
+            )}
         </div>
-
-        {pkmVersion && <StorageDetailsForm.Provider
-            key={pkmVersion.id}
-            nickname={pkmVersion.nickname}
-            eVs={pkmVersion.eVs}
-            moves={pkmVersion.moves}
-        >
-            <InnerStorageDetailsMain
-                id={pkmVersion.id}
-            />
-        </StorageDetailsForm.Provider>}
-    </div>;
+    );
 };
 
 const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
@@ -81,7 +77,6 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
 
     const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
 
-    const mainPkmQuery = useStorageGetMainPkms();
     const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
 
     const pkmLegalityQuery = usePkmLegality(id);
@@ -92,20 +87,20 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
     const desktopMessage = useDesktopMessage();
 
     const pkmVersion = mainPkmVersionsQuery.data?.data.find(version => version.id === id);
-    const pkm = pkmVersion && mainPkmQuery.data?.data.find(value => value.id === pkmVersion.pkmId);
-    const nbrRelatedPkmVersion = mainPkmVersionsQuery.data?.data.filter(version => version.pkmId === pkm?.id).length;
-    const saveCardProps = pkm?.saveId ? getSaveItemProps(pkm.saveId) : undefined;
+    const saveCardProps = pkmVersion?.attachedSaveId ? getSaveItemProps(pkmVersion.attachedSaveId) : undefined;
 
-    const openFile = desktopMessage && pkmVersion?.isFilePresent
-        ? (() => desktopMessage.openFile({
-            type: 'open-folder',
-            id: pkmVersion.id,
-            isDirectory: false,
-            path: pkmVersion.filepath
-        }))
-        : undefined;
+    const openFile =
+        desktopMessage && pkmVersion?.isFilePresent
+            ? () =>
+                desktopMessage.openFile({
+                    type: 'open-folder',
+                    id: pkmVersion.id,
+                    isDirectory: false,
+                    path: pkmVersion.filepath,
+                })
+            : undefined;
 
-    if (!pkm || !pkmVersion) {
+    if (!pkmVersion) {
         return null;
     }
 
@@ -118,7 +113,8 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
             {...pkmLegality}
             idBase={pkmVersion.id}
             validityReport={[
-                filterIsDefined(pkmVersion.loadError) && t('details.load-error', {
+                filterIsDefined(pkmVersion.loadError) &&
+                t('details.load-error', {
                     loadError: switchUtilRequired(pkmVersion.loadError, {
                         [ PKMLoadError.UNKNOWN ]: t('details.load-error.0'),
                         [ PKMLoadError.NOT_FOUND ]: t('details.load-error.1'),
@@ -126,20 +122,24 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
                         [ PKMLoadError.TOO_BIG ]: t('details.load-error.3'),
                         [ PKMLoadError.UNAUTHORIZED ]: t('details.load-error.4'),
                     }),
-                    filepath: pkmVersion.filepath
+                    filepath: pkmVersion.filepath,
                 }),
                 !pkmVersion.isEnabled && t('details.is-disabled'),
-                !getPkmVersionAttach(pkm, pkmVersion.id).isAttachedValid && t('details.attached-pkm-not-found'),
-                pkmLegality?.validityReport
-            ].filter(Boolean).join('\n---\n')}
+                !getPkmVersionAttach(pkmVersion, pkmVersion.id).isAttachedValid && t('details.attached-pkm-not-found'),
+                pkmLegality?.validityReport,
+            ]
+                .filter(Boolean)
+                .join('\n---\n')}
             isShadow={false}
-            onRelease={pkm?.canDelete && (pkmVersion.canDelete || nbrRelatedPkmVersion === 1)
-                ? (() => mainPkmVersionDeleteMutation.mutateAsync({
-                    params: {
-                        pkmVersionIds: [ pkmVersion.id ]
-                    },
-                }))
-                : undefined
+            onRelease={
+                pkmVersion.canDelete
+                    ? () =>
+                        mainPkmVersionDeleteMutation.mutateAsync({
+                            params: {
+                                pkmVersionIds: [ pkmVersion.id ],
+                            },
+                        })
+                    : undefined
             }
             onSubmit={() => formContext.submitForPkmVersion(id)}
             openFile={openFile}

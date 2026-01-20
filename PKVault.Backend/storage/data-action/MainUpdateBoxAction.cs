@@ -49,8 +49,11 @@ public class MainUpdateBoxAction(string boxId, string boxName, int order, string
 
         if (box.SlotCount != slotCount)
         {
-            var pkms = loaders.pkmLoader.GetAllEntities().Values.ToList().FindAll(pkm => pkm.BoxId == box.IdInt);
-            if (pkms.Any(pkm => pkm.BoxSlot >= slotCount - 1))
+            var boxPkms = loaders.pkmVersionLoader.GetEntitiesByBox(box.IdInt);
+            if (boxPkms.Any(pkm =>
+                // Key = boxSlot
+                pkm.Key >= slotCount - 1
+            ))
             {
                 throw new ArgumentException($"Box slot count change is blocked by a pkm");
             }

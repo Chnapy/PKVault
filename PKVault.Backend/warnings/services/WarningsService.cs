@@ -119,35 +119,31 @@ public class WarningsService(ILoadersService loadersService, ISaveService saveSe
 
         var loaders = await loadersService.GetLoaders();
 
-        var pkms = loaders.pkmLoader.GetAllDtos();
+        var pkms = loaders.pkmVersionLoader.GetAllEntities();
 
-        var tasks = pkms.Select(pkm =>
+        var tasks = pkms.Values.Select(pkmVersion =>
         {
-            if (pkm.SaveId != default)
+            if (pkmVersion.AttachedSaveId != default)
             {
-                var exists = loaders.saveLoadersDict.TryGetValue((uint)pkm.SaveId!, out var saveLoader);
+                var exists = loaders.saveLoadersDict.TryGetValue((uint)pkmVersion.AttachedSaveId!, out var saveLoader);
                 if (!exists)
                 {
                     return new PkmVersionWarning(
-                        PkmId: pkm.Id
+                        PkmVersionId: pkmVersion.Id
                     );
                 }
 
                 var save = saveLoader.Save;
                 var generation = save.Generation;
 
-                var pkmVersion = loaders.pkmVersionLoader.GetEntitiesByPkmId(pkm.Id).Values.ToList()
-                    .Find(pkmVersion => pkmVersion.Generation == generation);
-
-                var savePkm = pkmVersion == null ? null : saveLoader.Pkms.GetAllDtos().Find(pkm => loaders.pkmVersionLoader.GetPkmSaveVersion(pkm)?.Id == pkmVersion.Id);
+                var savePkm = saveLoader.Pkms.GetDtosByIdBase(pkmVersion.AttachedSavePkmIdBase ?? "");
 
                 if (savePkm == null)
                 {
                     Console.WriteLine($"Pkm-version warning");
 
                     return new PkmVersionWarning(
-                        PkmId: pkm.Id,
-                        PkmVersionId: pkmVersion?.Id
+                        PkmVersionId: pkmVersion.Id
                     );
                 }
             }

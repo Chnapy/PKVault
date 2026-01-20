@@ -3,9 +3,9 @@ public class MainDeleteBoxAction(string boxId) : DataAction
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
         var box = loaders.boxLoader.GetDto(boxId);
-        var allPkms = loaders.pkmLoader.GetAllEntities().Values;
+        var boxPkms = loaders.pkmVersionLoader.GetEntitiesByBox(box!.IdInt);
 
-        if (allPkms.Any(pkm => pkm.BoxId == box!.IdInt))
+        if (!boxPkms.IsEmpty)
         {
             throw new ArgumentException($"Cannot delete box with pkm inside");
         }

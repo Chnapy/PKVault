@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 [JsonSerializable(typeof(WarningsDTO))]
 [JsonSerializable(typeof(List<BankDTO>))]
 [JsonSerializable(typeof(List<BoxDTO>))]
-[JsonSerializable(typeof(List<PkmDTO>))]
 [JsonSerializable(typeof(List<PkmVersionDTO>))]
 [JsonSerializable(typeof(List<PkmSaveDTO>))]
 [JsonSerializable(typeof(List<MoveItem>))]

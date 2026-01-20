@@ -14,7 +14,7 @@ public class PkmVersionNormalize(
 
     private void MigrateV0ToV1(DataEntityLoaders loaders)
     {
-        // Most part is done in PkmLoader for strong couplage reasons
+        // Most part is done in LegacyPkmLoader for strong couplage reasons
 
         var time = LogUtil.Time($"PkmVersion normalize: MigrateV0ToV1");
 
@@ -28,17 +28,17 @@ public class PkmVersionNormalize(
         // remove pkmVersions with inconsistent data
         loader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
         {
-            var pkmEntity = loaders.pkmLoader.GetEntity(pkmVersionEntity.PkmId);
+            var pkmEntity = loaders.legacyPkmLoader.GetEntity(pkmVersionEntity.PkmId);
             if (pkmEntity == null)
             {
-                loader.DeleteEntity(pkmVersionEntity.Id);
+                // loader.DeleteEntity(pkmVersionEntity.Id);
             }
             else
             {
                 var boxEntity = loaders.boxLoader.GetEntity(pkmEntity!.BoxId.ToString());
                 if (boxEntity == null)
                 {
-                    loader.DeleteEntity(pkmVersionEntity.Id);
+                    // loader.DeleteEntity(pkmVersionEntity.Id);
                 }
             }
         });

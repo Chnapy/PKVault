@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using PKHeX.Core;
 
 public interface ISavePkmLoader
@@ -8,6 +9,7 @@ public interface ISavePkmLoader
     public List<PkmSaveDTO> GetAllDtos();
     public PkmSaveDTO? GetDto(string id);
     public PkmSaveDTO? GetDto(int box, int boxSlot);
+    public ImmutableDictionary<string, PkmSaveDTO> GetDtosByIdBase(string idBase);
     public void WriteDto(PkmSaveDTO dto);
     public void DeleteDto(string id);
     public void FlushParty();
@@ -40,7 +42,6 @@ public class SavePkmLoader(
             SettingsLanguage: language,
             Pkm: pkm,
 
-            SaveId: save.Id,
             BoxId: boxId,
             BoxSlot: boxSlot,
             IsDuplicate: false,
@@ -205,6 +206,21 @@ public class SavePkmLoader(
         }
 
         return null;
+    }
+
+    public ImmutableDictionary<string, PkmSaveDTO> GetDtosByIdBase(string idBase)
+    {
+        if (NeedUpdate)
+        {
+            UpdateDtos();
+        }
+
+        if (dtosByIdBase.TryGetValue(idBase, out var dtoDict))
+        {
+            return dtoDict.ToImmutableDictionary();
+        }
+
+        return [];
     }
 
     private PkmSaveDTO DTOWithDuplicateCheck(PkmSaveDTO dto)

@@ -1,8 +1,8 @@
 using PKHeX.Core;
 
 public class PkmNormalize(
-    IPkmLoader loader, Dictionary<ushort, StaticEvolve> evolves
-) : DataNormalize<PkmDTO, PkmEntity>(loader)
+    ILegacyPkmLoader loader, Dictionary<ushort, StaticEvolve> evolves
+) : DataNormalize<LegacyPkmEntity, LegacyPkmEntity>(loader)
 {
     public override void SetupInitialData(DataEntityLoaders loaders)
     {
@@ -12,6 +12,7 @@ public class PkmNormalize(
     {
         0 => MigrateV0ToV1,
         1 => MigrateV1ToV2,
+        2 => MigrateV2ToV3,
         _ => null
     };
 
@@ -29,8 +30,13 @@ public class PkmNormalize(
         loader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
         {
             var oldPkmEntityId = pkmEntity.Id;
-            loaders.pkmVersionLoader.GetEntitiesByPkmId(pkmEntity.Id).Values.ToList().ForEach(pkmVersionEntity =>
+            loaders.pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
             {
+                if (pkmVersionEntity.PkmId != pkmEntity.Id)
+                {
+                    return;
+                }
+
                 var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
                 if (!pkm.IsEnabled)
                 {
@@ -48,7 +54,7 @@ public class PkmNormalize(
                 // update pkm-entity id if main version
                 if (isMainVersion)
                 {
-                    pkmEntity = loaders.pkmLoader.WriteEntity(pkmEntity with { Id = expectedId });
+                    pkmEntity = loaders.legacyPkmLoader.WriteEntity(pkmEntity with { Id = expectedId });
                 }
 
                 var filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkm, evolves);
@@ -61,8 +67,13 @@ public class PkmNormalize(
 
             if (pkmEntity.Id != oldPkmEntityId)
             {
-                loaders.pkmVersionLoader.GetEntitiesByPkmId(oldPkmEntityId).Values.ToList().ForEach(pkmVersionEntity =>
+                loaders.pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
                 {
+                    if (pkmVersionEntity.PkmId != oldPkmEntityId)
+                    {
+                        return;
+                    }
+
                     // wrong PkmId
                     pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with { PkmId = pkmEntity.Id });
                 });
@@ -90,8 +101,13 @@ public class PkmNormalize(
         loader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
         {
             var oldPkmEntityId = pkmEntity.Id;
-            loaders.pkmVersionLoader.GetEntitiesByPkmId(oldPkmEntityId).Values.ToList().ForEach(pkmVersionEntity =>
+            loaders.pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
             {
+                if (pkmVersionEntity.PkmId != oldPkmEntityId)
+                {
+                    return;
+                }
+
                 var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
                 if (!pkm.IsEnabled)
                 {
@@ -111,7 +127,7 @@ public class PkmNormalize(
                     // update pkm-entity id if main version
                     if (isMainVersion)
                     {
-                        pkmEntity = loaders.pkmLoader.WriteEntity(pkmEntity with { Id = expectedId });
+                        pkmEntity = loaders.legacyPkmLoader.WriteEntity(pkmEntity with { Id = expectedId });
                     }
 
                     var filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkm, evolves);
@@ -125,8 +141,13 @@ public class PkmNormalize(
 
             if (pkmEntity.Id != oldPkmEntityId)
             {
-                loaders.pkmVersionLoader.GetEntitiesByPkmId(oldPkmEntityId).Values.ToList().ForEach(pkmVersionEntity =>
+                loaders.pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
                 {
+                    if (pkmVersionEntity.PkmId != oldPkmEntityId)
+                    {
+                        return;
+                    }
+
                     // wrong PkmId
                     pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with { PkmId = pkmEntity.Id });
                 });
@@ -139,14 +160,62 @@ public class PkmNormalize(
         time();
     }
 
+    private void MigrateV2ToV3(DataEntityLoaders loaders)
+    {
+        var time = LogUtil.Time($"Pkm normalize: MigrateV2ToV3");
+        /**
+         * 
+         */
+        loader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
+        {
+            var oldPkmEntityId = pkmEntity.Id;
+            loaders.pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
+            {
+                if (pkmVersionEntity.PkmId != oldPkmEntityId)
+                {
+                    return;
+                }
+
+                var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
+                if (!pkm.IsEnabled)
+                {
+                    return;
+                }
+
+                uint? attachedSaveId = null;
+                string? attachedSavePkmIdBase = null;
+                if (pkmEntity.SaveId != null && loaders.saveLoadersDict.TryGetValue((uint)pkmEntity.SaveId, out var saveLoader))
+                {
+                    if (saveLoader.Save.Generation == pkmVersionEntity.Generation)
+                    {
+                        attachedSaveId = pkmEntity.SaveId;
+                        attachedSavePkmIdBase = pkmVersionEntity.Id;
+                    }
+                }
+
+                loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with
+                {
+                    BoxId = (int)pkmEntity.BoxId,
+                    BoxSlot = (int)pkmEntity.BoxSlot,
+                    IsMain = pkmEntity.Id == pkmVersionEntity.Id,
+                    AttachedSaveId = attachedSaveId,
+                    AttachedSavePkmIdBase = attachedSavePkmIdBase
+                });
+            });
+
+            pkmEntity = loader.WriteEntity(pkmEntity with { SchemaVersion = 3 });
+        });
+        time();
+    }
+
     public override void CleanData(DataEntityLoaders loaders)
     {
         var time = LogUtil.Time($"Pkm normalize: CleanData remove pkms with no pkmVersions");
         // remove pkms with no pkmVersions
         loader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
         {
-            var pkmVersions = loaders.pkmVersionLoader.GetEntitiesByPkmId(pkmEntity.Id).Values;
-            if (pkmVersions.Count == 0)
+            var pkmVersions = loaders.pkmVersionLoader.GetAllEntities().Values.Where(pkmVersionEntity => pkmVersionEntity.PkmId == pkmEntity.Id);
+            if (!pkmVersions.Any())
             {
                 loader.DeleteEntity(pkmEntity.Id);
             }

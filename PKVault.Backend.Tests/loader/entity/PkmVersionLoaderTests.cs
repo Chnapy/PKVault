@@ -1,5 +1,4 @@
 using System.IO.Abstractions.TestingHelpers;
-using Moq;
 using PKHeX.Core;
 
 public class PkmVersionLoaderTests : IAsyncLifetime
@@ -8,13 +7,11 @@ public class PkmVersionLoaderTests : IAsyncLifetime
 
     private readonly MockFileSystem mockFileSystem;
     private readonly IFileIOService fileIOService;
-    private readonly Mock<IPkmLoader> mockPkmLoader;
 
     public PkmVersionLoaderTests()
     {
         mockFileSystem = new MockFileSystem();
         fileIOService = new FileIOService(mockFileSystem);
-        mockPkmLoader = new Mock<IPkmLoader>();
     }
 
     public async ValueTask InitializeAsync()
@@ -39,8 +36,22 @@ public class PkmVersionLoaderTests : IAsyncLifetime
             fileIOService,
             _appPath: "app", dbPath: "db",
             storagePath: "storage", _language: "en",
-            evolves,
-            mockPkmLoader.Object);
+            evolves);
+    }
+
+    private PkmVersionEntity CreateEntity()
+    {
+        return new PkmVersionEntity(
+            Id: "",
+            Generation: 3,
+            Filepath: "storage/3/test.pk3",
+            BoxId: 0,
+            BoxSlot: 0,
+            IsMain: false,
+            AttachedSaveId: null,
+            AttachedSavePkmIdBase: null,
+            SchemaVersion: 1
+        );
     }
 
     private ImmutablePKM CreateTestPkm(ushort species = 25, byte generation = 3)
@@ -63,13 +74,7 @@ public class PkmVersionLoaderTests : IAsyncLifetime
     {
         var loader = CreateLoader();
         var pkm = CreateTestPkm(species: 25, generation: 3);
-        var entity = new PkmVersionEntity(
-            Id: "1",
-            PkmId: "pkm1",
-            Generation: 3,
-            Filepath: "storage/3/test.pk3",
-            SchemaVersion: 1
-        );
+        var entity = CreateEntity() with { Id = "1" };
 
         var result = loader.WriteEntity(entity, pkm);
 
@@ -88,13 +93,7 @@ public class PkmVersionLoaderTests : IAsyncLifetime
     {
         var loader = CreateLoader();
         var pkm = CreateTestPkm();
-        var entity = new PkmVersionEntity(
-            Id: "1",
-            PkmId: "pkm1",
-            Generation: 3,
-            Filepath: "storage/3/test.pk3",
-            SchemaVersion: 1
-        );
+        var entity = CreateEntity() with { Id = "1" };
         loader.WriteEntity(entity, pkm);
 
         var deleted = loader.DeleteEntity(entity.Id);
@@ -105,43 +104,80 @@ public class PkmVersionLoaderTests : IAsyncLifetime
     }
 
     [Fact]
-    public void GetEntitiesByPkmId_ShouldReturnAllVersions()
+    public void GetEntitiesByBox_ShouldReturnAllVersions()
     {
         var loader = CreateLoader();
         var pkm1 = CreateTestPkm(generation: 3);
         var pkm2 = CreateTestPkm(generation: 4);
 
-        loader.WriteEntity(new PkmVersionEntity(
-            "1", "pkm1", 3, "storage/3/test.pk3", 1
-        ), pkm1);
-        loader.WriteEntity(new PkmVersionEntity(
-            "2", "pkm2", 4, "storage/4/test.pk4", 1
-        ), pkm2);
+        loader.WriteEntity(CreateEntity() with
+        {
+            Id = "1",
+            Generation = 4,
+            Filepath = "storage/4/test.pk4",
+            BoxId = 0,
+            BoxSlot = 0
+        }, pkm1);
+        loader.WriteEntity(CreateEntity() with
+        {
+            Id = "2",
+            Generation = 3,
+            Filepath = "storage/3/test.pk3",
+            BoxId = 0,
+            BoxSlot = 0
+        }, pkm2);
+        loader.WriteEntity(CreateEntity() with
+        {
+            Id = "3",
+            Generation = 5,
+            Filepath = "storage/5/test2.pk5",
+            BoxId = 0,
+            BoxSlot = 1
+        }, pkm2);
 
-        var pkm2Versions = loader.GetEntitiesByPkmId("pkm2");
+        var firstSlotVersions = loader.GetEntitiesByBox(0, 0);
+        var secondSlotVersions = loader.GetEntitiesByBox(0, 1);
 
-        Assert.Single(pkm2Versions);
-        Assert.Equal(4, pkm2Versions["2"].Generation);
+        Assert.Equal(2, firstSlotVersions.Count);
+        Assert.Equal(4, firstSlotVersions["1"].Generation);
+        Assert.Equal(3, firstSlotVersions["2"].Generation);
+
+        Assert.Single(secondSlotVersions);
+        Assert.Equal(5, secondSlotVersions["3"].Generation);
     }
 
     [Fact]
-    public void GetDtosByPkmId_ShouldReturnDTOs()
+    public void GetEntitiesBySaveId_ShouldReturnAllVersions()
     {
         var loader = CreateLoader();
-        var pkm1 = CreateTestPkm(species: 25);
-        loader.WriteEntity(new(
-            "1", "pkm1", 3, "storage/3/test1.pk3", 1
-        ), pkm1);
+        var pkm1 = CreateTestPkm(generation: 3);
+        var pkm2 = CreateTestPkm(generation: 4);
 
-        var pkm2 = CreateTestPkm(species: 26);
-        loader.WriteEntity(new(
-            "2", "pkm2", 3, "storage/3/test2.pk3", 1
-        ), pkm2);
+        loader.WriteEntity(CreateEntity() with
+        {
+            Id = "1",
+            Generation = 4,
+            Filepath = "storage/4/test.pk4",
+            BoxId = 0,
+            BoxSlot = 1,
+            AttachedSaveId = 100,
+            AttachedSavePkmIdBase = "1b"
+        }, pkm1);
+        loader.WriteEntity(CreateEntity() with
+        {
+            Id = "2",
+            Generation = 3,
+            Filepath = "storage/3/test.pk3",
+            BoxId = 0,
+            BoxSlot = 0,
+            AttachedSaveId = 200,
+            AttachedSavePkmIdBase = "2b"
+        }, pkm2);
 
-        var dtos = loader.GetDtosByPkmId("pkm2");
+        var pkm2Versions = loader.GetEntitiesBySave(200);
 
-        Assert.Single(dtos);
-        Assert.Equal(26, dtos["2"].Species);
+        Assert.Single(pkm2Versions);
+        Assert.Equal(3, pkm2Versions["2b"].Generation);
     }
 
     #endregion
@@ -155,60 +191,22 @@ public class PkmVersionLoaderTests : IAsyncLifetime
         var pkm = CreateTestPkm(species: 25, generation: 3);
         mockFileSystem.AddFile("storage/3/test.pk3", new MockFileData(pkm.DecryptedPartyData));
 
-        var entity = new PkmVersionEntity(
-            Id: "1",
-            PkmId: "pkm1",
-            Generation: 3,
-            Filepath: "storage/3/test.pk3",
-            SchemaVersion: 1
-        );
+        var entity = CreateEntity() with
+        {
+            Id = "1",
+            Generation = 3,
+            Filepath = "storage/3/test.pk3",
+            IsMain = true
+        };
 
         var dto = loader.CreateDTO(entity, pkm);
 
         Assert.Equal("1", dto.Id);
-        Assert.Equal("pkm1", dto.PkmId);
         Assert.Equal(3, dto.Generation);
         Assert.Equal("storage/3/test.pk3", dto.Filepath);
         Assert.Equal("app\\storage/3/test.pk3", dto.FilepathAbsolute);
         Assert.Equal(25, dto.Species);
-    }
-
-    [Fact]
-    public void CreateDTO_IsMain_ShouldBeTrue_WhenIdMatchesPkmId()
-    {
-        var loader = CreateLoader();
-        var pkm = CreateTestPkm();
-        var entity = new PkmVersionEntity(
-            Id: "1",
-            PkmId: "1", // Same ID = main version
-            Generation: 3,
-            Filepath: "storage/3/test.pk3",
-            SchemaVersion: 1
-        );
-
-        var dto = loader.CreateDTO(entity, pkm);
-
         Assert.True(dto.IsMain);
-        Assert.False(dto.CanDelete);
-    }
-
-    [Fact]
-    public void CreateDTO_IsMain_ShouldBeFalse_WhenIdsDiffer()
-    {
-        var loader = CreateLoader();
-        var pkm = CreateTestPkm();
-        var entity = new PkmVersionEntity(
-            Id: "1",
-            PkmId: "2", // different ID
-            Generation: 3,
-            Filepath: "storage/3/test.pk3",
-            SchemaVersion: 1
-        );
-
-        var dto = loader.CreateDTO(entity, pkm);
-
-        Assert.False(dto.IsMain);
-        Assert.True(dto.CanDelete);
     }
 
     #endregion
@@ -221,9 +219,12 @@ public class PkmVersionLoaderTests : IAsyncLifetime
         var loader = CreateLoader();
         var pkm = CreateTestPkm(species: 25);
 
-        var entity = new PkmVersionEntity(
-            pkm.GetPKMIdBase(evolves), "pkm1", 3, "storage/3/test.pk3", 1
-        );
+        var entity = CreateEntity() with
+        {
+            Id = "1",   // pkm.GetPKMIdBase(evolves)
+            Generation = 3,
+            Filepath = "storage/3/test.pk3"
+        };
         loader.WriteEntity(entity, pkm);
 
         var loadedPkm = loader.GetPkmVersionEntityPkm(entity);
@@ -236,9 +237,12 @@ public class PkmVersionLoaderTests : IAsyncLifetime
     public void GetPkmVersionEntityPkm_ShouldHandleMissingFile()
     {
         var loader = CreateLoader();
-        var entity = new PkmVersionEntity(
-            "1", "pkm1", 3, "storage/3/missing.pk3", 1
-        );
+        var entity = CreateEntity() with
+        {
+            Id = "1",   // pkm.GetPKMIdBase(evolves)
+            Generation = 3,
+            Filepath = "storage/3/missing.pk3"
+        };
 
         var loadedPkm = loader.GetPkmVersionEntityPkm(entity);
 
@@ -256,89 +260,148 @@ public class PkmVersionLoaderTests : IAsyncLifetime
     {
         var loader = CreateLoader();
         var pkm = CreateTestPkm(generation: 3);
-        var save = CreateMockSave(generation: 3, saveId: 100);
 
-        var entity = new PkmVersionEntity(
-            pkm.GetPKMIdBase(evolves), "pkm1", 3, "storage/3/test.pk3", 1
-        );
+        var entity = CreateEntity() with
+        {
+            Id = "1",
+            Generation = 3,
+            Filepath = "storage/3/test.pk3",
+            AttachedSaveId = 100,
+            AttachedSavePkmIdBase = "mock-id-base"
+        };
         loader.WriteEntity(entity, pkm);
 
-        // Mock PkmLoader to return expected SaveId
-        mockPkmLoader.Setup(p => p.GetEntity("pkm1"))
-            .Returns(new PkmEntity("pkm1", 1, 1, SaveId: 100, 1));
-
-        var pkmSave = new PkmSaveDTO(
-            SettingsLanguage: "en",
-            Pkm: pkm,
-            SaveId: 100,
-            BoxId: 0,
-            BoxSlot: 0,
-            IsDuplicate: false,
-            Save: save,
-            Evolves: evolves
-        );
-
-        var version = loader.GetPkmSaveVersion(pkmSave);
+        var version = loader.GetEntityBySave(100, "mock-id-base");
 
         Assert.NotNull(version);
-        Assert.Equal(pkm.GetPKMIdBase(evolves), version.Id);
-    }
-
-    [Fact]
-    public void GetPkmSaveVersion_ShouldReturnNull_WhenGenerationMismatch()
-    {
-        var loader = CreateLoader();
-        var pkm = CreateTestPkm(generation: 3);
-        var save = CreateMockSave(generation: 4, saveId: 100); // different
-
-        var entity = new PkmVersionEntity(
-            "1", "pkm1", 3, "storage/3/test.pk3", 1
-        );
-        loader.WriteEntity(entity, pkm);
-
-        mockPkmLoader.Setup(p => p.GetEntity("pkm1"))
-            .Returns(new PkmEntity("pkm1", 1, 1, 100, 1));
-
-        var pkmSave = new PkmSaveDTO(
-            SettingsLanguage: "en",
-            Pkm: pkm,
-            SaveId: 100,
-            BoxId: 0,
-            BoxSlot: 0,
-            IsDuplicate: false,
-            Save: save,
-            Evolves: evolves
-        );
-
-        var version = loader.GetPkmSaveVersion(pkmSave);
-
-        Assert.Null(version);
+        Assert.Equal("1", version.Id);
     }
 
     #endregion
 
-    #region Entity Update with ID Change
+    #region Entity update with index change
+
+    // [Fact]
+    // public void WriteEntity_ShouldHandlePkmIdChange()
+    // {
+    //     var loader = CreateLoader();
+    //     var pkm = CreateTestPkm();
+    //     var original = new PkmVersionEntity(
+    //         "1", "pkm1", 3, "storage/3/test.pk3", 1
+    //     );
+    //     loader.WriteEntity(original, pkm);
+
+    //     var updated = original with { PkmId = "pkm2" };
+    //     loader.WriteEntity(updated, pkm);
+
+    //     var pkm1Entities = loader.GetEntitiesByPkmId("pkm1");
+    //     var pkm2Entities = loader.GetEntitiesByPkmId("pkm2");
+
+    //     Assert.Empty(pkm1Entities);
+
+    //     Assert.Single(pkm2Entities);
+    //     Assert.Equivalent(updated, pkm2Entities["1"]);
+    // }
 
     [Fact]
-    public void WriteEntity_ShouldHandlePkmIdChange()
+    public void GetEntity_ReturnsDifferentReferences()
     {
         var loader = CreateLoader();
-        var pkm = CreateTestPkm();
-        var original = new PkmVersionEntity(
-            "1", "pkm1", 3, "storage/3/test.pk3", 1
+        var pkm1 = CreateTestPkm(generation: 3);
+        var pkm2 = CreateTestPkm(generation: 4);
+
+        var entity1 = loader.WriteEntity(CreateEntity() with
+        {
+            Id = "1",
+            Generation = 4,
+            Filepath = "storage/4/test.pk4",
+            BoxId = 0,
+            BoxSlot = 0,
+            AttachedSaveId = 100,
+            AttachedSavePkmIdBase = "1b"
+        }, pkm1);
+        var entity2 = loader.WriteEntity(CreateEntity() with
+        {
+            Id = "2",
+            Generation = 3,
+            Filepath = "storage/3/test.pk3",
+            BoxId = 0,
+            BoxSlot = 0,
+            AttachedSaveId = 200,
+            AttachedSavePkmIdBase = "2b"
+        }, pkm2);
+
+        Assert.True(
+            loader.GetEntitiesByBox(0) != loader.GetEntitiesByBox(0)
         );
-        loader.WriteEntity(original, pkm);
 
-        var updated = original with { PkmId = "pkm2" };
-        loader.WriteEntity(updated, pkm);
+        Assert.True(
+            loader.GetEntitiesByBox(0, 0) != loader.GetEntitiesByBox(0, 0)
+        );
 
-        var pkm1Entities = loader.GetEntitiesByPkmId("pkm1");
-        var pkm2Entities = loader.GetEntitiesByPkmId("pkm2");
+        Assert.True(
+            loader.GetEntitiesBySave(100) != loader.GetEntitiesBySave(100)
+        );
+    }
 
-        Assert.Empty(pkm1Entities);
+    [Fact]
+    public void WriteEntity_UpdatesBoxIndex()
+    {
+        var loader = CreateLoader();
+        var pkm1 = CreateTestPkm(generation: 3);
+        var pkm2 = CreateTestPkm(generation: 4);
 
-        Assert.Single(pkm2Entities);
-        Assert.Equivalent(updated, pkm2Entities["1"]);
+        var entity1 = loader.WriteEntity(CreateEntity() with
+        {
+            Id = "1",
+            Generation = 4,
+            Filepath = "storage/4/test.pk4",
+            BoxId = 0,
+            BoxSlot = 0
+        }, pkm1);
+        var entity2 = loader.WriteEntity(CreateEntity() with
+        {
+            Id = "2",
+            Generation = 3,
+            Filepath = "storage/3/test.pk3",
+            BoxId = 0,
+            BoxSlot = 0
+        }, pkm2);
+        var entity3 = loader.WriteEntity(CreateEntity() with
+        {
+            Id = "3",
+            Generation = 5,
+            Filepath = "storage/5/test2.pk5",
+            BoxId = 0,
+            BoxSlot = 1
+        }, pkm2);
+
+        loader.WriteEntity(entity3 with
+        {
+            BoxId = 0,
+            BoxSlot = 0
+        });
+
+        loader.WriteEntity(entity1 with
+        {
+            BoxId = 0,
+            BoxSlot = 1
+        });
+        loader.WriteEntity(entity2 with
+        {
+            BoxId = 0,
+            BoxSlot = 1
+        });
+
+        var firstSlotVersions = loader.GetEntitiesByBox(0, 0);
+        var secondSlotVersions = loader.GetEntitiesByBox(0, 1);
+
+        Assert.Single(firstSlotVersions);
+        Assert.Equal(5, firstSlotVersions["3"].Generation);
+
+        Assert.Equal(2, secondSlotVersions.Count);
+        Assert.Equal(4, secondSlotVersions["1"].Generation);
+        Assert.Equal(3, secondSlotVersions["2"].Generation);
     }
 
     #endregion
@@ -350,9 +413,11 @@ public class PkmVersionLoaderTests : IAsyncLifetime
     {
         var loader = CreateLoader();
         var pkm = CreateTestPkm();
-        var entity = new PkmVersionEntity(
-            "1", "pkm1", 3, "storage/3/test.pk3", 1
-        );
+        var entity = CreateEntity() with
+        {
+            Id = "1",
+            Filepath = "storage/3/test.pk3"
+        };
         loader.WriteEntity(entity, pkm);
 
         await loader.WriteToFile();
@@ -366,9 +431,11 @@ public class PkmVersionLoaderTests : IAsyncLifetime
     {
         var loader = CreateLoader();
         var pkm = CreateTestPkm();
-        var entity = new PkmVersionEntity(
-            "1", "pkm1", 3, "storage/3/test.pk3", 1
-        );
+        var entity = CreateEntity() with
+        {
+            Id = "1",
+            Filepath = "storage/3/test.pk3"
+        };
         loader.WriteEntity(entity, pkm);
 
         Assert.False(mockFileSystem.FileExists("/db/pkm-version.json"));

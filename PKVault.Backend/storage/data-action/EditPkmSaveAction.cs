@@ -30,10 +30,10 @@ public class EditPkmSaveAction(
 
         saveLoaders.Pkms.WriteDto(pkmSave with { Pkm = pkm });
 
-        var pkmVersion = loaders.pkmVersionLoader.GetPkmSaveVersion(pkmSave);
+        var pkmVersion = loaders.pkmVersionLoader.GetEntityBySave(pkmSave.SaveId, pkmSave.IdBase);
         if (pkmVersion != null)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersion.PkmId, pkmSave.Id)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersion.Id, pkmSave.IdBase)]);
         }
 
         return new(

@@ -39,23 +39,23 @@ public class StorageQueryService(ILoadersService loadersService, PkmLegalityServ
         }).ToDictionary();
     }
 
-    public async Task<List<PkmDTO>> GetMainPkms()
-    {
-        var loaders = await loadersService.GetLoaders();
+    // public async Task<List<PkmDTO>> GetMainPkms()
+    // {
+    //     var loaders = await loadersService.GetLoaders();
 
-        return loaders.pkmLoader.GetAllDtos();
-    }
+    //     return loaders.pkmLoader.GetAllDtos();
+    // }
 
-    public async Task<Dictionary<string, PkmDTO?>> GetMainPkms(string[] pkmIds)
-    {
-        var loaders = await loadersService.GetLoaders();
+    // public async Task<Dictionary<string, PkmDTO?>> GetMainPkms(string[] pkmIds)
+    // {
+    //     var loaders = await loadersService.GetLoaders();
 
-        return pkmIds.Select(id =>
-        {
-            var pkm = loaders.pkmLoader.GetDto(id);
-            return (id, pkm);
-        }).ToDictionary();
-    }
+    //     return pkmIds.Select(id =>
+    //     {
+    //         var pkm = loaders.pkmLoader.GetDto(id);
+    //         return (id, pkm);
+    //     }).ToDictionary();
+    // }
 
     public async Task<List<PkmVersionDTO>> GetMainPkmVersions()
     {

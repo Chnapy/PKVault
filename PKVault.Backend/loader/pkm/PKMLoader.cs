@@ -7,6 +7,7 @@ public interface IPKMLoader
     public void DeleteEntity(string filepath);
     public string WriteEntity(ImmutablePKM pkm, string filepath, Dictionary<ushort, StaticEvolve> evolves);
     public void WriteToFiles();
+    public ImmutablePKM CreatePKM(string id, string filepath, byte generation);
     public ImmutablePKM CreatePKM(PkmVersionEntity pkmVersionEntity);
     public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves);
 }
@@ -36,18 +37,18 @@ public class PKMLoader : IPKMLoader
     public PKMLoader(
         IFileIOService _fileIOService,
         string _storagePath,
-        List<PkmVersionEntity> pkmVersionEntities
+        List<string> filepaths
     )
     {
         fileIOService = _fileIOService;
         storagePath = _storagePath;
-        pkmVersionEntities.ForEach(pkmVersionEntity =>
+        filepaths.ForEach(filepath =>
         {
             byte[] bytes = [];
             PKMLoadError? error = null;
             try
             {
-                var (TooSmall, TooBig) = fileIOService.CheckGameFile(pkmVersionEntity.Filepath);
+                var (TooSmall, TooBig) = fileIOService.CheckGameFile(filepath);
 
                 if (TooBig)
                     throw new PKMLoadException(PKMLoadError.TOO_BIG);
@@ -55,7 +56,7 @@ public class PKMLoader : IPKMLoader
                 if (TooSmall)
                     throw new PKMLoadException(PKMLoadError.TOO_SMALL);
 
-                bytes = fileIOService.ReadBytes(pkmVersionEntity.Filepath);
+                bytes = fileIOService.ReadBytes(filepath);
             }
             catch (Exception ex)
             {
@@ -63,7 +64,7 @@ public class PKMLoader : IPKMLoader
                 error = GetPKMLoadError(ex);
             }
 
-            bytesDict.Add(pkmVersionEntity.Filepath, (bytes, error));
+            bytesDict.Add(filepath, (bytes, error));
         });
     }
 
@@ -136,7 +137,14 @@ public class PKMLoader : IPKMLoader
 
     public ImmutablePKM CreatePKM(PkmVersionEntity pkmVersionEntity)
     {
-        var (bytes, loadError) = GetEntity(pkmVersionEntity.Filepath);
+        return CreatePKM(
+            pkmVersionEntity.Id, pkmVersionEntity.Filepath, pkmVersionEntity.Generation
+        );
+    }
+
+    public ImmutablePKM CreatePKM(string id, string filepath, byte generation)
+    {
+        var (bytes, loadError) = GetEntity(filepath);
         if (loadError != null)
         {
             return new(GetPlaceholderPKM(), loadError);
@@ -145,12 +153,12 @@ public class PKMLoader : IPKMLoader
         PKM pkm;
         try
         {
-            var ext = Path.GetExtension(pkmVersionEntity.Filepath.AsSpan());
+            var ext = Path.GetExtension(filepath.AsSpan());
 
-            FileUtil.TryGetPKM(bytes, out var pk, ext, new SimpleTrainerInfo() { Context = (EntityContext)pkmVersionEntity.Generation });
+            FileUtil.TryGetPKM(bytes, out var pk, ext, new SimpleTrainerInfo() { Context = (EntityContext)generation });
             if (pk == null)
             {
-                throw new Exception($"TryGetPKM gives null pkm, path={pkmVersionEntity.Filepath} bytes.length={bytes.Length}");
+                throw new Exception($"TryGetPKM gives null pkm, path={filepath} bytes.length={bytes.Length}");
             }
             pkm = pk;
 
@@ -166,7 +174,7 @@ public class PKMLoader : IPKMLoader
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"PKM file load failure with PkmVersion.Id={pkmVersionEntity.Id} path=${pkmVersionEntity.Filepath}");
+            Console.Error.WriteLine($"PKM file load failure with PkmVersion.Id={id} path=${filepath}");
             Console.Error.WriteLine(ex);
 
             pkm = GetPlaceholderPKM();

@@ -23,13 +23,13 @@ public class StorageController(DataService dataService, ILoadersService loadersS
         return list;
     }
 
-    [HttpGet("main/pkm")]
-    public async Task<ActionResult<List<PkmDTO>>> GetMainPkms()
-    {
-        var list = await storageQueryService.GetMainPkms();
+    // [HttpGet("main/pkm")]
+    // public async Task<ActionResult<List<PkmDTO>>> GetMainPkms()
+    // {
+    //     var list = await storageQueryService.GetMainPkms();
 
-        return list;
-    }
+    //     return list;
+    // }
 
     // TODO return dict for perf
     [HttpGet("main/pkm-version")]

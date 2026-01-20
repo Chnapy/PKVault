@@ -5,33 +5,35 @@ public record PkmSaveDTO(
     string SettingsLanguage,
     ImmutablePKM Pkm,
 
-    uint SaveId,
     int BoxId,
     int BoxSlot,
     bool IsDuplicate,
 
     [property: JsonIgnore] SaveWrapper Save,
-    [property: JsonIgnore] Dictionary<ushort, StaticEvolve> Evolves
-) : BasePkmVersionDTO(
+    Dictionary<ushort, StaticEvolve> Evolves
+) : PkmBaseDTO(
     SavePkmLoader.GetPKMId(Pkm.GetPKMIdBase(Evolves), BoxId, BoxSlot),
     Save.Generation,
+    BoxId,
+    BoxSlot,
+    IsDuplicate,
     SettingsLanguage,
-    Pkm
+    Pkm,
+    Evolves
 )
 {
-    public string IdBase => Pkm.GetPKMIdBase(Evolves);
+    public uint SaveId => Save.Id;
 
-    public bool IsShadow => Pkm.IsShadow;
     public int Team => BoxSlotFlags.IsBattleTeam();
     public bool IsLocked => BoxSlotFlags.HasFlag(StorageSlotSource.Locked);
     public int Party => BoxSlotFlags.IsParty();
     public bool IsStarter => BoxSlotFlags.HasFlag(StorageSlotSource.Starter);
 
-    public bool CanMove => !IsLocked && BoxLoader.CanIdReceivePkm(BoxId);
-    public bool CanDelete => !IsLocked && CanMove;
-    public bool CanMoveToMain => !IsLocked && Pkm.Version > 0 && Pkm.Generation > 0 && CanDelete && !Pkm.IsShadow && !Pkm.IsEgg && Party == -1;
-    public bool CanMoveToSave => !IsLocked && Pkm.Version > 0 && Pkm.Generation > 0 && CanMoveToMain;
+    public override bool CanMove => base.CanMove && !IsLocked && BoxLoader.CanIdReceivePkm(BoxId);
+    public override bool CanDelete => base.CanDelete && !IsLocked && BoxLoader.CanIdReceivePkm(BoxId);
+    public override bool CanMoveToSave => base.CanMoveToSave && !IsLocked;
+    public bool CanMoveToMain => IsEnabled && Pkm.Version > 0 && Pkm.Generation > 0 && CanDelete && !IsShadow && !IsEgg && !IsLocked && Party == -1;
     public bool CanMoveAttachedToMain => CanMoveToMain && !IsDuplicate;
 
-    private readonly StorageSlotSource BoxSlotFlags = Save.GetBoxSlotFlags(BoxId, BoxSlot);
+    private StorageSlotSource BoxSlotFlags => Save.GetBoxSlotFlags(BoxId, BoxSlot);
 }

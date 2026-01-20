@@ -68,27 +68,27 @@ public class DataService(
             return null;
         });
 
-        var mainPkmsTask = Task.Run<DataDTOState<Dictionary<string, PkmDTO?>>?>(async () =>
-        {
-            if (flags.MainPkms.All)
-            {
-                return new(
-                    All: true,
-                    Data: (await storageQueryService.GetMainPkms())
-                            .Select(dto => (dto.Id, dto ?? null)).ToDictionary()
-                );
-            }
+        // var mainPkmsTask = Task.Run<DataDTOState<Dictionary<string, PkmDTO?>>?>(async () =>
+        // {
+        //     if (flags.MainPkms.All)
+        //     {
+        //         return new(
+        //             All: true,
+        //             Data: (await storageQueryService.GetMainPkms())
+        //                     .Select(dto => (dto.Id, dto ?? null)).ToDictionary()
+        //         );
+        //     }
 
-            if (flags.MainPkms.Ids.Count > 0)
-            {
-                return new(
-                    All: false,
-                    Data: await storageQueryService.GetMainPkms([.. flags.MainPkms.Ids])
-                );
-            }
+        //     if (flags.MainPkms.Ids.Count > 0)
+        //     {
+        //         return new(
+        //             All: false,
+        //             Data: await storageQueryService.GetMainPkms([.. flags.MainPkms.Ids])
+        //         );
+        //     }
 
-            return null;
-        });
+        //     return null;
+        // });
 
         var mainPkmVersionsTask = Task.Run<DataDTOState<Dictionary<string, PkmVersionDTO?>>?>(async () =>
         {
@@ -199,7 +199,7 @@ public class DataService(
             StaticData: await staticDataTask,
             MainBanks: await mainBanksTask,
             MainBoxes: await mainBoxesTask,
-            MainPkms: await mainPkmsTask,
+            // MainPkms: await mainPkmsTask,
             MainPkmVersions: await mainPkmVersionsTask,
             MainPkmLegalities: await mainPkmLegalitiesTask,
             Saves: [.. await savesTask],

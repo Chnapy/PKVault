@@ -127,7 +127,7 @@ public class ActionServiceTests
             startTime = startTime,
             bankLoader = mockBankLoader.Object,
             boxLoader = mockBoxLoader.Object,
-            pkmLoader = mockPkmLoader.Object,
+            legacyPkmLoader = mockPkmLoader.Object,
             pkmVersionLoader = mockPkmVersionLoader.Object,
             dexLoader = mockDexLoader.Object,
             saveLoadersDict = new(){
