@@ -1,7 +1,7 @@
 /**
  * Data queries related to storage.
  */
-public class StorageQueryService(LoadersService loadersService, PkmLegalityService pkmLegalityService)
+public class StorageQueryService(ILoadersService loadersService, PkmLegalityService pkmLegalityService)
 {
     public async Task<List<BankDTO>> GetMainBanks()
     {

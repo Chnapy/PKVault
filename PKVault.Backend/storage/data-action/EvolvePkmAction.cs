@@ -1,7 +1,8 @@
 using PKHeX.Core;
 
 public class EvolvePkmAction(
-    StaticDataService staticDataService, PkmConvertService pkmConvertService,
+    PkmConvertService pkmConvertService,
+    Dictionary<ushort, StaticEvolve> Evolves,
     uint? saveId, string[] ids
 ) : DataAction
 {
@@ -43,7 +44,7 @@ public class EvolvePkmAction(
         var oldName = dto.Nickname;
         var oldSpecies = dto.Species;
 
-        var (evolveSpecies, evolveByItem) = await GetEvolve(dto);
+        var (evolveSpecies, evolveByItem) = GetEvolve(dto);
 
         Console.WriteLine($"Evolve from {oldSpecies} to {evolveSpecies} using item? {evolveByItem}");
 
@@ -59,7 +60,7 @@ public class EvolvePkmAction(
         var pkmVersion = loaders.pkmVersionLoader.GetPkmSaveVersion(dto);
         if (pkmVersion != null)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersion.PkmId, dto.Id)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersion.PkmId, dto.Id)]);
         }
 
         flags.Dex = true;
@@ -92,7 +93,7 @@ public class EvolvePkmAction(
         var oldName = dto.Nickname;
         var oldSpecies = dto.Species;
 
-        var (evolveSpecies, evolveByItem) = await GetEvolve(dto);
+        var (evolveSpecies, evolveByItem) = GetEvolve(dto);
 
         // update dto pkm
         dto = dto with
@@ -103,7 +104,7 @@ public class EvolvePkmAction(
             })
         };
         loaders.pkmVersionLoader.WriteEntity(
-            entity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(dto.Pkm) },
+            entity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(dto.Pkm, Evolves) },
             dto.Pkm
         );
 
@@ -119,7 +120,7 @@ public class EvolvePkmAction(
             };
             var versionEntity = loaders.pkmVersionLoader.GetEntity(versionDto.Id);
             loaders.pkmVersionLoader.WriteEntity(
-                versionEntity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(versionDto.Pkm) },
+                versionEntity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(versionDto.Pkm, Evolves) },
                 versionDto.Pkm
             );
         });
@@ -140,11 +141,9 @@ public class EvolvePkmAction(
         );
     }
 
-    private async Task<(ushort evolveSpecies, bool evolveByItem)> GetEvolve(BasePkmVersionDTO dto)
+    private (ushort evolveSpecies, bool evolveByItem) GetEvolve(BasePkmVersionDTO dto)
     {
-        var staticData = await staticDataService.GetStaticData();
-
-        if (staticData.Evolves.TryGetValue(dto.Species, out var staticEvolve))
+        if (Evolves.TryGetValue(dto.Species, out var staticEvolve))
         {
             if (dto.HeldItemPokeapiName != null && staticEvolve.TradeWithItem.TryGetValue(dto.HeldItemPokeapiName, out var evolveMap))
             {

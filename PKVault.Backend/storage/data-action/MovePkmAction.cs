@@ -1,7 +1,8 @@
 using PKHeX.Core;
 
 public class MovePkmAction(
-    StaticDataService staticDataService, PkmConvertService pkmConvertService,
+    PkmConvertService pkmConvertService,
+    Dictionary<ushort, StaticEvolve> Evolves, Dictionary<ushort, StaticSpecies> Species,
     string[] pkmIds, uint? sourceSaveId,
     uint? targetSaveId, int targetBoxId, int[] targetBoxSlots,
     bool attached
@@ -350,7 +351,7 @@ public class MovePkmAction(
 
         if (pkmEntity.SaveId != null)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmEntity.Id, null)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmEntity.Id, null)]);
         }
 
         flags.Dex = true;
@@ -401,7 +402,7 @@ public class MovePkmAction(
                 Id: savePkm.IdBase,
                 PkmId: pkmEntityToCreate.Id,
                 Generation: savePkm.Generation,
-                Filepath: loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(savePkm.Pkm)
+                Filepath: loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(savePkm.Pkm, Evolves)
             ), savePkm.Pkm);
         }
 
@@ -410,7 +411,7 @@ public class MovePkmAction(
         // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmEntity!.SaveId != default)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, [(pkmVersionEntity.PkmId, null)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersionEntity.PkmId, null)]);
 
             if (!attached)
             {
@@ -434,9 +435,7 @@ public class MovePkmAction(
         // enable national-dex in G3 RSE if pkm outside of regional-dex
         if (save.GetSave() is SAV3 saveG3RSE && saveG3RSE is IGen3Hoenn && !saveG3RSE.NationalDex)
         {
-            var staticData = await staticDataService.GetStaticData();
-
-            var isInDex = staticData.Species[(ushort)species].IsInHoennDex;
+            var isInDex = Species[(ushort)species].IsInHoennDex;
 
             if (!isInDex)
             {

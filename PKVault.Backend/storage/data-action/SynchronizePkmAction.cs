@@ -2,6 +2,7 @@ using PKHeX.Core;
 
 public class SynchronizePkmAction(
     PkmConvertService pkmConvertService,
+    Dictionary<ushort, StaticEvolve> Evolves,
     (string PkmId, string? SavePkmId)[] pkmMainAndPkmSaveIds
 ) : DataAction
 {
@@ -88,6 +89,7 @@ public class SynchronizePkmAction(
         await SynchronizeSaveToPkmVersion(
             pkmConvertService,
             loaders, flags,
+            Evolves,
             pkmMainAndPkmSaveIds
         );
 
@@ -102,6 +104,7 @@ public class SynchronizePkmAction(
     public static async Task SynchronizeSaveToPkmVersion(
         PkmConvertService pkmConvertService,
         DataEntityLoaders loaders, DataUpdateFlags flags,
+        Dictionary<ushort, StaticEvolve> Evolves,
         (string PkmId, string? SavePkmId)[] pkmMainAndPkmSaveIds
     )
     {
@@ -170,7 +173,7 @@ public class SynchronizePkmAction(
 
                 var versionEntity = loaders.pkmVersionLoader.GetEntity(version.Id);
                 loaders.pkmVersionLoader.WriteEntity(
-                    versionEntity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(versionPkm) },
+                    versionEntity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(versionPkm, Evolves) },
                     versionPkm
                 );
             });

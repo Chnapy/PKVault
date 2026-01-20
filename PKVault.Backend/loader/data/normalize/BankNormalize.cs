@@ -1,4 +1,4 @@
-public class BankNormalize(BankLoader loader) : DataNormalize<BankDTO, BankEntity>(loader)
+public class BankNormalize(IBankLoader loader) : DataNormalize<BankDTO, BankEntity>(loader)
 {
     public override void SetupInitialData(DataEntityLoaders loaders)
     {

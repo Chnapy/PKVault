@@ -3,11 +3,16 @@ using System.Security.Cryptography;
 using System.Text;
 using PKHeX.Core;
 
+public interface ISaveWrapper
+{ }
+
 /**
  * SaveFile wrapper for control & conveniance.
  * Not immutable for clone performance constraints.
  */
-public class SaveWrapper(SaveFile Save, string path)
+public class SaveWrapper(SaveFile Save,
+// TODO use Save.Metadata.FilePath instead
+string path) : ISaveWrapper
 {
     public uint Id
     {
@@ -180,7 +185,7 @@ public class SaveWrapper(SaveFile Save, string path)
 
     public List<ImmutablePKM> GetAllPKM() => [.. Save.GetAllPKM().Select(pkm => new ImmutablePKM(pkm))];
 
-    public byte[] GetSaveFileData()
+    public virtual byte[] GetSaveFileData()
     {
         return Save.Write().ToArray();
     }

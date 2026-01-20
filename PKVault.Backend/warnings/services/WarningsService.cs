@@ -3,7 +3,7 @@ using PKHeX.Core;
 /**
  * Warnings checks in current session data.
  */
-public class WarningsService(LoadersService loadersService, SaveService saveService, FileIOService fileIOService)
+public class WarningsService(ILoadersService loadersService, ISaveService saveService, IFileIOService fileIOService)
 {
     private WarningsDTO? WarningsDTO = null;
 

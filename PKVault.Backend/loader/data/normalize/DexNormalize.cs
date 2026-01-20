@@ -1,4 +1,4 @@
-public class DexNormalize(DexLoader loader) : DataNormalize<DexItemDTO, DexEntity>(loader)
+public class DexNormalize(IDexLoader loader) : DataNormalize<DexItemDTO, DexEntity>(loader)
 {
     public override void SetupInitialData(DataEntityLoaders loaders)
     {

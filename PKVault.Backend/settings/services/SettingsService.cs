@@ -1,17 +1,23 @@
 using System.Reflection;
 
+public interface ISettingsService
+{
+    public Task UpdateSettings(SettingsMutableDTO settingsMutable);
+    public SettingsDTO GetSettings();
+}
+
 /**
  * App settings read, create and update.
  */
-public class SettingsService(IServiceProvider sp)
+public class SettingsService(IServiceProvider sp) : ISettingsService
 {
     public static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "./config/pkvault.json");
     public static readonly string DefaultLanguage = "en";
     public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr"]; //GameLanguage.AllSupportedLanguages.ToArray();
 
-    private FileIOService fileIOService => sp.GetRequiredService<FileIOService>();
-    private SaveService saveService => sp.GetRequiredService<SaveService>();
-    private LoadersService loadersService => sp.GetRequiredService<LoadersService>();
+    private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
+    private ISaveService saveService => sp.GetRequiredService<ISaveService>();
+    private ILoadersService loadersService => sp.GetRequiredService<ILoadersService>();
 
     private SettingsDTO? BaseSettings;
 

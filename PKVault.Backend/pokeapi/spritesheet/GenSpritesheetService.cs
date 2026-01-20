@@ -10,7 +10,7 @@ using SixLabors.ImageSharp.Processing;
  * 
  * Generates species and items spritesheets.
  */
-public class GenSpritesheetService(FileIOService fileIOService)
+public class GenSpritesheetService(IFileIOService fileIOService)
 {
     private const string SourcePath = "../pokeapi/sprites";
     private const string CustomSourcePath = "./pokeapi/spritesheet";

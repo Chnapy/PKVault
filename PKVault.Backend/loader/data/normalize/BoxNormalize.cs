@@ -1,4 +1,4 @@
-public class BoxNormalize(BoxLoader loader) : DataNormalize<BoxDTO, BoxEntity>(loader)
+public class BoxNormalize(IBoxLoader loader) : DataNormalize<BoxDTO, BoxEntity>(loader)
 {
     public override void SetupInitialData(DataEntityLoaders loaders)
     {

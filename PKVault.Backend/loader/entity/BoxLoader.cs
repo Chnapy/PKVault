@@ -1,6 +1,12 @@
 using PKHeX.Core;
 
-public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>
+public interface IBoxLoader : IEntityLoader<BoxDTO, BoxEntity>
+{
+    public BoxDTO CreateDTO(BoxEntity entity);
+    public void NormalizeOrders();
+}
+
+public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
 {
     public static readonly int OrderGap = 10;
 
@@ -24,9 +30,9 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>
         _ => throw new NotImplementedException(slotType.ToString()),
     };
 
-    public BoxLoader(FileIOService fileIOService, SettingsService settingsService) : base(
+    public BoxLoader(IFileIOService fileIOService, string dbPath) : base(
         fileIOService,
-        filePath: MatcherUtil.NormalizePath(Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "box.json")),
+        filePath: MatcherUtil.NormalizePath(Path.Combine(dbPath, "box.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringBoxEntity
     )
     {

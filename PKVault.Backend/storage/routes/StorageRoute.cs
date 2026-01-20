@@ -5,7 +5,7 @@ namespace PKVault.Backend.storage.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class StorageController(DataService dataService, LoadersService loadersService, StorageQueryService storageQueryService, ActionService actionService) : ControllerBase
+public class StorageController(DataService dataService, ILoadersService loadersService, StorageQueryService storageQueryService, ActionService actionService) : ControllerBase
 {
     [HttpGet("main/bank")]
     public async Task<ActionResult<List<BankDTO>>> GetMainBanks()

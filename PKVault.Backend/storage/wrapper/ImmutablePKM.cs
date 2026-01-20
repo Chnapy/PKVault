@@ -221,9 +221,9 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
      * Note that Species & Form can change over time (evolve),
      * so only first species of evolution group is used.
      */
-    public string GetPKMIdBase()
+    public string GetPKMIdBase(Dictionary<ushort, StaticEvolve> evolves)
     {
-        static ushort GetBaseSpecies(ushort species)
+        ushort GetBaseSpecies(ushort species)
         {
             if (species == 0
                 // specific case with Shedinja which is created with Ninjask exact same data
@@ -233,7 +233,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
                 return species;
             }
 
-            var previousSpecies = StaticDataService.GetDefinedStaticDataDTO().Evolves[species].PreviousSpecies;
+            var previousSpecies = evolves[species].PreviousSpecies;
             if (previousSpecies != null)
             {
                 return GetBaseSpecies((ushort)previousSpecies);

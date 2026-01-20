@@ -4,8 +4,8 @@ using PKHeX.Core;
  * Action mutation for current session.
  */
 public class ActionService(
-    LoadersService loadersService, PkmConvertService pkmConvertService, StaticDataService staticDataService,
-    DexService dexService, BackupService backupService, SettingsService settingsService,
+    ILoadersService loadersService, PkmConvertService pkmConvertService, StaticDataService staticDataService,
+    DexService dexService, BackupService backupService, ISettingsService settingsService,
     PkmLegalityService pkmLegalityService
 )
 {
@@ -57,9 +57,12 @@ public class ActionService(
         bool attached
     )
     {
+        var staticData = await staticDataService.GetStaticData();
+
         return await AddAction(
             new MovePkmAction(
-                staticDataService, pkmConvertService,
+                pkmConvertService,
+                Evolves: staticData.Evolves, Species: staticData.Species,
                 pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached)
         );
     }
@@ -70,18 +73,23 @@ public class ActionService(
         bool attached
     )
     {
+        var staticData = await staticDataService.GetStaticData();
+
         return await AddAction(
             new MovePkmBankAction(
                 pkmConvertService,
+                staticData.Evolves,
                 pkmIds, sourceSaveId, bankId, attached)
         );
     }
 
     public async Task<DataUpdateFlags> MainCreatePkmVersion(string pkmId, byte generation)
     {
+        var staticData = await staticDataService.GetStaticData();
+
         return await AddAction(
             new MainCreatePkmVersionAction(
-                pkmConvertService,
+                pkmConvertService, staticData.Evolves,
                 pkmId, generation)
         );
     }
@@ -97,9 +105,12 @@ public class ActionService(
 
     public async Task<DataUpdateFlags> SaveEditPkm(uint saveId, string pkmId, EditPkmVersionPayload payload)
     {
+        var staticData = await staticDataService.GetStaticData();
+
         return await AddAction(
             new EditPkmSaveAction(this,
                 pkmConvertService,
+                staticData.Evolves,
                 saveId, pkmId, payload)
         );
     }
@@ -127,10 +138,12 @@ public class ActionService(
 
     public async Task<DataUpdateFlags> EvolvePkms(uint? saveId, string[] ids)
     {
+        var staticData = await staticDataService.GetStaticData();
+
         return await AddAction(
             new EvolvePkmAction(
-                staticDataService,
                 pkmConvertService,
+                Evolves: staticData.Evolves,
                 saveId, ids)
         );
     }

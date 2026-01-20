@@ -1,6 +1,11 @@
-public class PkmLoader : EntityLoader<PkmDTO, PkmEntity>
+public interface IPkmLoader : IEntityLoader<PkmDTO, PkmEntity>
 {
-    public PkmLoader(FileIOService fileIOService, SettingsService settingsService) : base(
+    public PkmDTO CreateDTO(PkmEntity entity);
+}
+
+public class PkmLoader : EntityLoader<PkmDTO, PkmEntity>, IPkmLoader
+{
+    public PkmLoader(IFileIOService fileIOService, ISettingsService settingsService) : base(
         fileIOService,
         filePath: MatcherUtil.NormalizePath(Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "pkm.json")),
         dictJsonContext: EntityJsonContext.Default.DictionaryStringPkmEntity

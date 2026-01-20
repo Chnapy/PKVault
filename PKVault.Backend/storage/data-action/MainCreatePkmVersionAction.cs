@@ -1,5 +1,5 @@
 public class MainCreatePkmVersionAction(
-    PkmConvertService pkmConvertService,
+    PkmConvertService pkmConvertService, Dictionary<ushort, StaticEvolve> evolves,
     string pkmId, byte generation
 ) : DataAction
 {
@@ -38,10 +38,10 @@ public class MainCreatePkmVersionAction(
 
         loaders.pkmVersionLoader.WriteEntity(new(
             SchemaVersion: loaders.pkmVersionLoader.GetLastSchemaVersion(),
-            Id: pkmConverted.GetPKMIdBase(),
+            Id: pkmConverted.GetPKMIdBase(evolves),
             PkmId: pkmId,
             Generation: generation,
-            Filepath: loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkmConverted)
+            Filepath: loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkmConverted, evolves)
         ), pkmConverted);
 
         return new(

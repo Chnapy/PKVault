@@ -3,7 +3,7 @@ using PKHeX.Core;
 /**
  * Gives Pokedex data for PKVault and saves.
  */
-public class DexService(LoadersService loadersService, StaticDataService staticDataService)
+public class DexService(ILoadersService loadersService, StaticDataService staticDataService)
 {
     public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex()
     {

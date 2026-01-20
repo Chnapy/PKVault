@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWithId where E : IEntity
+public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : IWithId where E : IEntity
 {
-    protected FileIOService fileIOService;
+    protected IFileIOService fileIOService;
 
     protected Dictionary<string, E>? entitiesById = null;
     private DataUpdateFlagsState<string> flags = new();
@@ -13,7 +13,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWit
     protected JsonTypeInfo<Dictionary<string, E>> DictJsonContext;
 
     public EntityLoader(
-        FileIOService _fileIOService,
+        IFileIOService _fileIOService,
         string filePath, JsonTypeInfo<Dictionary<string, E>> dictJsonContext
     )
     {

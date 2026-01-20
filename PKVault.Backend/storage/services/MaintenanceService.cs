@@ -7,7 +7,7 @@ using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 public class MaintenanceService(
     // Direct use of service-provider because of circular dependencies
     IServiceProvider sp,
-    FileIOService fileIOService, SettingsService settingsService
+    IFileIOService fileIOService, ISettingsService settingsService
 )
 {
     public async Task CleanMainStorageFiles()
@@ -16,7 +16,7 @@ public class MaintenanceService(
 
         using var scope = sp.CreateScope();
 
-        var loaders = await scope.ServiceProvider.GetRequiredService<LoadersService>().GetLoaders();
+        var loaders = await scope.ServiceProvider.GetRequiredService<ILoadersService>().GetLoaders();
         var pkmVersionsFilepaths = loaders.pkmVersionLoader.GetAllDtos().Select(dto => dto.Filepath).ToList();
 
         var rootDir = ".";
