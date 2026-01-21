@@ -21,6 +21,7 @@ import { StorageBoxList } from './box/storage-box-list';
 import { StorageHeader } from './box/storage-header';
 import { StorageSaveItem } from './storage-save-item';
 import { getSaveOrder } from './util/get-save-order';
+import { SizingUtil } from '../ui/util/sizing-util';
 
 export type StorageSaveBoxContentProps = {
   saveId: number;
@@ -54,7 +55,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
   const saveBoxes = saveBoxesQuery.data?.data ?? [];
   const savePkms = Object.values(savePkmsQuery.data?.data.byId ?? {});
 
-  const allSmallBoxes = saveBoxes.every(box => box.slotCount <= 20);
+  const maxBoxSlotCount = Math.max(0, ...saveBoxes.map(box => box.slotCount));
 
   const filteredBoxes = saveBoxes.filter(box => !saveBoxIds.includes(box.idInt) || box.idInt === boxId).sort((b1, b2) => (b1.order < b2.order ? -1 : 1));
 
@@ -66,11 +67,12 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
     idInt: -99,
     name: '',
     type: BoxType.Box,
-    slotCount: allSmallBoxes ? 20 : 30,
+    slotCount: maxBoxSlotCount || 20,
     canReceivePkm: false,
   };
 
-  const lineSlotCount = !allSmallBoxes || selectedBox.slotCount === 6 ? 6 : 5;
+  const boxSlotCount = selectedBox.slotCount;
+  const nbrItemsPerLine = SizingUtil.getItemsPerLine(boxSlotCount);
 
   const previousBox = filteredBoxes[ selectedBoxIndex - 1 ] ?? filteredBoxes[ filteredBoxes.length - 1 ];
   const nextBox = filteredBoxes[ selectedBoxIndex + 1 ] ?? filteredBoxes[ 0 ];
@@ -92,7 +94,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
         as={StorageBox}
         style={style}
         slotCount={selectedBox.slotCount}
-        lineSlotCount={lineSlotCount}
+        lineSlotCount={nbrItemsPerLine}
         loading={loading}
         header={
           <>

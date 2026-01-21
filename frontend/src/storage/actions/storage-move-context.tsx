@@ -6,6 +6,7 @@ import type { BoxDTO, PkmSaveDTO, PkmVersionDTO } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetBoxes, useStorageMovePkm, useStorageMovePkmBank } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
+import { SizingUtil } from '../../ui/util/sizing-util';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { StorageSelectContext } from './storage-select-context';
 
@@ -116,6 +117,8 @@ export const StorageMoveContext = {
         const mainPkmsQuery = usePkmVersionIndex();
         const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);
 
+        const boxesQuery = useStorageGetBoxes({ saveId });
+
         const sourcePkmMains = selected && !selected.saveId ? selected.ids.map(id => mainPkmsQuery.data?.data.byId[ id ]).filter(filterIsDefined) : [];
         const sourcePkmSaves = selected && selected.saveId ? selected.ids.map(id => savePkmsQuery.data?.data.byId[ id ]).filter(filterIsDefined) : [];
 
@@ -222,16 +225,17 @@ export const StorageMoveContext = {
                 : undefined,
             renderItem: (element: React.ReactNode) => {
                 if (selected?.ids.includes(pkmId) && selected.saveId === saveId) {
-                    const nbrPkmsPerLine = 6;
                     const allPkms = [ ...sourcePkmMains, ...sourcePkmSaves ];
                     const firstPkm = allPkms[ 0 ];
                     const selectedPkm = allPkms.find(pkm => pkm.id === pkmId);
+
+                    const boxSlotCount = boxesQuery.data?.data.find(box => box.idInt === firstPkm?.boxId)?.slotCount;
+                    const nbrPkmsPerLine = SizingUtil.getItemsPerLine(boxSlotCount ?? -1);
+
                     const pkmSlot = selectedPkm!.boxSlot;
                     const pkmPos = [ pkmSlot % nbrPkmsPerLine, ~~(pkmSlot / nbrPkmsPerLine) ];
                     const firstPkmPos = [ (firstPkm?.boxSlot ?? 0) % nbrPkmsPerLine, ~~((firstPkm?.boxSlot ?? 0) / nbrPkmsPerLine) ];
                     const posDiff = pkmPos.map((x, i) => x - firstPkmPos[ i ]!);
-
-                    console.log(firstPkm?.boxId, firstPkm?.boxSlot);
 
                     return createPortal(
                         <div
