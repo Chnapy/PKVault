@@ -23,7 +23,6 @@ public class StorageController(DataService dataService, ILoadersService loadersS
         return list;
     }
 
-    // TODO return dict for perf
     [HttpGet("main/pkm-version")]
     public async Task<ActionResult<List<PkmVersionDTO>>> GetMainPkmVersions()
     {

@@ -1,8 +1,9 @@
 import { css } from '@emotion/css';
 import { Popover, PopoverButton } from '@headlessui/react';
 import React from 'react';
+import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
 import { BoxType, type PkmVersionDTO } from '../data/sdk/model';
-import { useStorageCreateMainBox, useStorageDeleteMainBox, useStorageGetMainBoxes, useStorageGetMainPkmVersions } from '../data/sdk/storage/storage.gen';
+import { useStorageCreateMainBox, useStorageDeleteMainBox, useStorageGetMainBoxes } from '../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from '../routes/storage';
 import { useTranslate } from '../translate/i18n';
@@ -23,7 +24,7 @@ export const StorageMainBoxContent: React.FC<{
     boxId: number;
     style?: React.CSSProperties;
 }> = withErrorCatcher('default', ({ boxId, style }) => {
-    const [showBoxes, setShowBoxes] = React.useState(false);
+    const [ showBoxes, setShowBoxes ] = React.useState(false);
 
     const { t } = useTranslate();
     const navigate = Route.useNavigate();
@@ -38,9 +39,9 @@ export const StorageMainBoxContent: React.FC<{
     const moveContext = StorageMoveContext.useValue();
 
     const boxesQuery = useStorageGetMainBoxes();
-    const pkmsQuery = useStorageGetMainPkmVersions();
+    const pkmsQuery = usePkmVersionIndex();
 
-    const loading = [pkmsQuery, selectedBankBoxes].some(query => query.isLoading);
+    const loading = [ pkmsQuery, selectedBankBoxes ].some(query => query.isLoading);
 
     const boxCreateMutation = useStorageCreateMainBox();
     const boxDeleteMutation = useStorageDeleteMainBox();
@@ -48,10 +49,10 @@ export const StorageMainBoxContent: React.FC<{
     const boxes = boxesQuery.data?.data.filter(box => box.bankId === selectedBankBoxes.data?.selectedBank.id) ?? [];
     const sortedBoxes = boxes.sort((b1, b2) => (b1.order < b2.order ? -1 : 1));
     const filteredBoxes = sortedBoxes.filter(box => !mainBoxIds.includes(box.idInt) || box.idInt === boxId);
-    const pkms = pkmsQuery.data?.data.filter(pk => pk.isMain) ?? [];
+    const pkms = Object.values(pkmsQuery.data?.data.byId ?? {}).filter(pk => pk.isMain);
 
     const selectedBoxIndex = filteredBoxes.findIndex(box => box.idInt === boxId);
-    const selectedBox = filteredBoxes[selectedBoxIndex] ?? {
+    const selectedBox = filteredBoxes[ selectedBoxIndex ] ?? {
         id: '-99',
         idInt: -99,
         name: '',
@@ -60,14 +61,16 @@ export const StorageMainBoxContent: React.FC<{
         canReceivePkm: false,
     };
 
-    const previousBox = filteredBoxes[selectedBoxIndex - 1] ?? filteredBoxes[filteredBoxes.length - 1];
-    const nextBox = filteredBoxes[selectedBoxIndex + 1] ?? filteredBoxes[0];
+    const previousBox = filteredBoxes[ selectedBoxIndex - 1 ] ?? filteredBoxes[ filteredBoxes.length - 1 ];
+    const nextBox = filteredBoxes[ selectedBoxIndex + 1 ] ?? filteredBoxes[ 0 ];
 
-    const boxPkmsList = pkms.filter(pkm => pkm.boxId === selectedBox.idInt);
+    const boxPkmsList = Object.values(pkmsQuery.data?.data.byBox[ selectedBox.idInt ] ?? {})
+        .flat()
+        .filter(pkm => pkm.isMain);
 
-    const boxPkms = Object.fromEntries(boxPkmsList.map(pkm => [pkm.boxSlot, pkm]));
+    const boxPkms = Object.fromEntries(boxPkmsList.map(pkm => [ pkm.boxSlot, pkm ]));
 
-    const allItems = new Array(selectedBox.slotCount).fill(null).map((_, i): PkmVersionDTO | null => boxPkms[i] ?? null);
+    const allItems = new Array(selectedBox.slotCount).fill(null).map((_, i): PkmVersionDTO | null => boxPkms[ i ] ?? null);
 
     return (
         <Popover
@@ -124,40 +127,40 @@ export const StorageMainBoxContent: React.FC<{
                                 !previousBox || previousBox.id === selectedBox.id
                                     ? undefined
                                     : () =>
-                                          navigate({
-                                              search: {
-                                                  mainBoxIds: getMainBoxIds(previousBox.idInt),
-                                              },
-                                          })
+                                        navigate({
+                                            search: {
+                                                mainBoxIds: getMainBoxIds(previousBox.idInt),
+                                            },
+                                        })
                             }
                             onNextBoxClick={
                                 !nextBox || nextBox.id === selectedBox.id
                                     ? undefined
                                     : () =>
-                                          navigate({
-                                              search: {
-                                                  mainBoxIds: getMainBoxIds(nextBox.idInt),
-                                              },
-                                          })
+                                        navigate({
+                                            search: {
+                                                mainBoxIds: getMainBoxIds(nextBox.idInt),
+                                            },
+                                        })
                             }
                             onSplitClick={
                                 mainBoxIds.length < 2 && nextBox && nextBox.id !== selectedBox.id
                                     ? () =>
-                                          navigate({
-                                              search: () => ({
-                                                  mainBoxIds: [boxId, nextBox.idInt],
-                                              }),
-                                          })
+                                        navigate({
+                                            search: () => ({
+                                                mainBoxIds: [ boxId, nextBox.idInt ],
+                                            }),
+                                        })
                                     : undefined
                             }
                             onClose={
                                 mainBoxIds.length > 1
                                     ? () =>
-                                          navigate({
-                                              search: () => ({
-                                                  mainBoxIds: mainBoxIds.filter(id => id !== boxId),
-                                              }),
-                                          })
+                                        navigate({
+                                            search: () => ({
+                                                mainBoxIds: mainBoxIds.filter(id => id !== boxId),
+                                            }),
+                                        })
                                     : undefined
                             }
                         />
@@ -203,10 +206,10 @@ export const StorageMainBoxContent: React.FC<{
                             return (
                                 <div key={i} style={{ order: i, display: 'flex' }}>
                                     {!pkm ||
-                                    (moveContext.selected &&
-                                        !moveContext.selected.saveId &&
-                                        !moveContext.selected.target &&
-                                        moveContext.selected.ids.includes(pkm.id)) ? (
+                                        (moveContext.selected &&
+                                            !moveContext.selected.saveId &&
+                                            !moveContext.selected.target &&
+                                            moveContext.selected.ids.includes(pkm.id)) ? (
                                         <StorageItemPlaceholder boxId={selectedBox.idInt} boxSlot={i} pkmId={pkm?.id} />
                                     ) : (
                                         <StorageMainItem pkmId={pkm.id} />

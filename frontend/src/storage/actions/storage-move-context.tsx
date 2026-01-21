@@ -1,10 +1,10 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import type { BoxDTO, PkmVersionDTO, PkmSaveDTO } from '../../data/sdk/model';
+import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
+import type { BoxDTO, PkmSaveDTO, PkmVersionDTO } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import {
     useStorageGetMainBoxes,
-    useStorageGetMainPkmVersions,
     useStorageGetSaveBoxes,
     useStorageGetSavePkms,
     useStorageMovePkm,
@@ -71,14 +71,13 @@ export const StorageMoveContext = {
 
         const pkmIds = pkmIdsRaw.some(id => selectContext.hasPkm(saveId, id)) ? selectContext.ids : pkmIdsRaw;
 
-        const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
+        const mainPkmVersionsQuery = usePkmVersionIndex();
         const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
 
         // const mainBoxesQuery = useStorageGetMainBoxes();
         // const saveBoxesQuery = useStorageGetSaveBoxes(saveId ?? 0);
 
-        const pkmMains =
-            !moveContext.selected && !saveId ? pkmIds.map(id => mainPkmVersionsQuery.data?.data.find(pkm => pkm.id === id)).filter(filterIsDefined) : [];
+        const pkmMains = !moveContext.selected && !saveId ? pkmIds.map(id => mainPkmVersionsQuery.data?.data.byId[ id ]).filter(filterIsDefined) : [];
         const pkmSaves = !moveContext.selected && !!saveId ? pkmIds.map(id => savePkmsQuery.data?.data.find(pkm => pkm.id === id)).filter(filterIsDefined) : [];
 
         // const boxMain = !moveContext.selected && storageType === 'main' ? mainBoxesQuery.data?.data.find(box => box.idInt === pkmMain?.boxId) : undefined;
@@ -119,15 +118,14 @@ export const StorageMoveContext = {
         const { selected, setSelected } = StorageMoveContext.useValue();
         const selectContext = StorageSelectContext.useValue();
 
-        const mainPkmsQuery = useStorageGetMainPkmVersions();
+        const mainPkmsQuery = usePkmVersionIndex();
         const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
 
-        const sourcePkmMains =
-            selected && !selected.saveId ? selected.ids.map(id => mainPkmsQuery.data?.data.find(pkm => pkm.id === id)).filter(filterIsDefined) : [];
+        const sourcePkmMains = selected && !selected.saveId ? selected.ids.map(id => mainPkmsQuery.data?.data.byId[ id ]).filter(filterIsDefined) : [];
         const sourcePkmSaves =
             selected && selected.saveId ? selected.ids.map(id => savePkmsQuery.data?.data.find(pkm => pkm.id === id)).filter(filterIsDefined) : [];
 
-        const pkmMain = !selected && !saveId ? mainPkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
+        const pkmMain = !selected && !saveId ? mainPkmsQuery.data?.data.byId[ pkmId ] : undefined;
         const pkmSave = !selected && !!saveId ? savePkmsQuery.data?.data.find(pkm => pkm.id === pkmId) : undefined;
 
         const canClick = !saveId ? !!pkmMain : pkmSave?.canMove || pkmSave?.canMoveToMain;
@@ -264,7 +262,7 @@ export const StorageMoveContext = {
         const selectContext = StorageSelectContext.useValue();
 
         const mainBoxesQuery = useStorageGetMainBoxes();
-        const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
+        const mainPkmVersionsQuery = usePkmVersionIndex();
         const sourceSavePkmsQuery = useStorageGetSavePkms(selected?.saveId ?? 0);
 
         const movePkmBankMutation = useStorageMovePkmBank();
@@ -275,7 +273,7 @@ export const StorageMoveContext = {
             selected && selected.ids.length > 0
                 ? selected.saveId
                     ? sourceSavePkmsQuery.data?.data.find(pkm => pkm.id === selected.ids[ 0 ])
-                    : mainPkmVersionsQuery.data?.data.find(pkm => pkm.id === selected.ids[ 0 ])
+                    : mainPkmVersionsQuery.data?.data.byId[ selected.ids[ 0 ]! ]
                 : undefined;
 
         type SlotsInfos = {
@@ -293,7 +291,7 @@ export const StorageMoveContext = {
                         return;
                     }
 
-                    const sourcePkmMain = !selected.saveId ? mainPkmVersionsQuery.data?.data.find(pkm => pkm.id === sourceId) : undefined;
+                    const sourcePkmMain = !selected.saveId ? mainPkmVersionsQuery.data?.data.byId[ sourceId ] : undefined;
                     const sourcePkmSave = selected.saveId ? sourceSavePkmsQuery.data?.data.find(pkm => pkm.id === sourceId) : undefined;
                     const sourcePkm = sourcePkmMain ?? sourcePkmSave;
                     if (!sourcePkm) {
@@ -355,7 +353,7 @@ export const StorageMoveContext = {
                         };
                     }
 
-                    const existingStoredPkmVersion = mainPkmVersionsQuery.data?.data.find(pkm => pkm.id === sourcePkmSave.idBase);
+                    const existingStoredPkmVersion = mainPkmVersionsQuery.data?.data.byId[ sourcePkmSave.idBase ];
                     if (existingStoredPkmVersion && existingStoredPkmVersion.attachedSaveId !== sourcePkmSave.saveId) {
                         return {
                             enable: false,
@@ -449,7 +447,7 @@ export const StorageMoveContext = {
         const mainBoxesQuery = useStorageGetMainBoxes();
         const targetSaveBoxesQuery = useStorageGetSaveBoxes(saveId ?? 0);
 
-        const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
+        const mainPkmVersionsQuery = usePkmVersionIndex();
         const sourceSavePkmsQuery = useStorageGetSavePkms(selected?.saveId ?? 0);
         const targetSavePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
 
@@ -460,7 +458,7 @@ export const StorageMoveContext = {
             selected && selected.ids.length > 0
                 ? selected.saveId
                     ? sourceSavePkmsQuery.data?.data.find(pkm => pkm.id === selected.ids[ 0 ])
-                    : mainPkmVersionsQuery.data?.data.find(pkm => pkm.id === selected.ids[ 0 ])
+                    : mainPkmVersionsQuery.data?.data.byId[ selected.ids[ 0 ]! ]
                 : undefined;
 
         type SlotsInfos = {
@@ -469,7 +467,7 @@ export const StorageMoveContext = {
             sourcePkmMain?: PkmVersionDTO;
             sourcePkmSave?: PkmSaveDTO;
             targetSlot: number;
-            targetPkmMain?: PkmVersionDTO;
+            targetPkmMains: PkmVersionDTO[];
             targetPkmSave?: PkmSaveDTO;
         };
 
@@ -480,7 +478,7 @@ export const StorageMoveContext = {
                         return;
                     }
 
-                    const sourcePkmMain = !selected.saveId ? mainPkmVersionsQuery.data?.data.find(pkm => pkm.id === sourceId) : undefined;
+                    const sourcePkmMain = !selected.saveId ? mainPkmVersionsQuery.data?.data.byId[ sourceId ] : undefined;
                     const sourcePkmSave = selected.saveId ? sourceSavePkmsQuery.data?.data.find(pkm => pkm.id === sourceId) : undefined;
                     const sourcePkm = sourcePkmMain ?? sourcePkmSave;
                     if (!sourcePkm) {
@@ -490,15 +488,13 @@ export const StorageMoveContext = {
                     const sourceSlot = sourcePkm.boxSlot;
                     const targetSlot = dropBoxSlot + (sourceSlot - sourceMainPkm.boxSlot);
 
-                    const targetPkmMain = !saveId
-                        ? mainPkmVersionsQuery.data?.data.find(pkm => pkm.boxId === dropBoxId && pkm.boxSlot === targetSlot)
-                        : undefined;
+                    const targetPkmMains = !saveId ? (mainPkmVersionsQuery.data?.data.byBox[ dropBoxId ]?.[ targetSlot ] ?? []) : [];
                     const targetPkmSave = saveId
                         ? targetSavePkmsQuery.data?.data.find(pkm => pkm.boxId === dropBoxId && pkm.boxSlot === targetSlot)
                         : undefined;
 
                     if (
-                        (sourcePkmMain && targetPkmMain && sourcePkmMain.id === targetPkmMain.id) ||
+                        (sourcePkmMain && targetPkmMains.length > 0 && targetPkmMains.some(targetMain => sourcePkmMain.id === targetMain.id)) ||
                         (sourcePkmSave && targetPkmSave && sourcePkmSave.id === targetPkmSave.id)
                     ) {
                         return;
@@ -510,7 +506,7 @@ export const StorageMoveContext = {
                         sourcePkmMain,
                         sourcePkmSave,
                         targetSlot,
-                        targetPkmMain,
+                        targetPkmMains,
                         targetPkmSave,
                     };
                 })
@@ -532,7 +528,7 @@ export const StorageMoveContext = {
             const targetBoxMain = !saveId ? mainBoxesQuery.data?.data.find(box => box.idInt === dropBoxId) : undefined;
             const targetBoxSave = saveId ? targetSaveBoxesQuery.data?.data.find(box => box.idInt === dropBoxId) : undefined;
 
-            const getMainPkmNickname = (id: string) => mainPkmVersionsQuery.data?.data.find(pkm => pkm.id === id)?.nickname;
+            const getMainPkmNickname = (id: string) => mainPkmVersionsQuery.data?.data.byId[ id ]?.nickname;
 
             const checkBetweenSlot = (
                 targetBoxMain?: BoxDTO,
@@ -648,7 +644,7 @@ export const StorageMoveContext = {
                         };
                     }
 
-                    const relatedPkmVersions = mainPkmVersionsQuery.data?.data.filter(version => version.boxKey === sourcePkmMain.boxKey) ?? [];
+                    const relatedPkmVersions = mainPkmVersionsQuery.data?.data.byBox[ sourcePkmMain.boxId ]?.[ sourcePkmMain.boxSlot ] ?? [];
                     const generation = targetPkmSave?.generation ?? targetSave?.generation;
 
                     const basePkmVersion = relatedPkmVersions.find(version => version.generation === generation);
@@ -705,7 +701,7 @@ export const StorageMoveContext = {
                         };
                     }
 
-                    const existingStoredPkmVersion = mainPkmVersionsQuery.data?.data.find(pkm => pkm.id === sourcePkmSave.idBase);
+                    const existingStoredPkmVersion = mainPkmVersionsQuery.data?.data.byId[ sourcePkmSave.idBase ];
                     if (existingStoredPkmVersion && existingStoredPkmVersion.attachedSaveId !== sourcePkmSave.saveId) {
                         return {
                             enable: false,
@@ -742,11 +738,14 @@ export const StorageMoveContext = {
                 return { enable: false };
             }
 
-            for (const { targetPkmMain, targetPkmSave, sourcePkmMain, sourcePkmSave } of multipleSlotsInfos) {
-                const result = checkBetweenSlot(targetBoxMain, targetBoxSave, targetPkmMain, targetPkmSave, sourcePkmMain, sourcePkmSave);
+            for (const { targetPkmMains, targetPkmSave, sourcePkmMain, sourcePkmSave } of multipleSlotsInfos) {
+                const normalizedTargetPkmMains = targetPkmMains.length === 0 ? [ undefined ] : targetPkmMains;
+                for (const targetPkmMain of normalizedTargetPkmMains) {
+                    const result = checkBetweenSlot(targetBoxMain, targetBoxSave, targetPkmMain, targetPkmSave, sourcePkmMain, sourcePkmSave);
 
-                if (!result.enable) {
-                    return result;
+                    if (!result.enable) {
+                        return result;
+                    }
                 }
             }
 

@@ -1,35 +1,29 @@
-import type React from "react";
-import { HistoryContext } from "../context/history-context";
-import type { PkmVersionWarning as PkmVersionWarningModel } from "../data/sdk/model";
-import { useStorageGetMainPkmVersions } from "../data/sdk/storage/storage.gen";
-import { useStaticData } from "../hooks/use-static-data";
-import { Route } from "../routes/storage";
-import { getSaveOrder } from "../storage/util/get-save-order";
-import { useTranslate } from "../translate/i18n";
-import { Button } from "../ui/button/button";
-import { Icon } from "../ui/icon/icon";
+import type React from 'react';
+import { HistoryContext } from '../context/history-context';
+import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
+import type { PkmVersionWarning as PkmVersionWarningModel } from '../data/sdk/model';
+import { useStaticData } from '../hooks/use-static-data';
+import { Route } from '../routes/storage';
+import { getSaveOrder } from '../storage/util/get-save-order';
+import { useTranslate } from '../translate/i18n';
+import { Button } from '../ui/button/button';
+import { Icon } from '../ui/icon/icon';
 
-export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({
-    pkmVersionId,
-}) => {
+export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({ pkmVersionId }) => {
     const { t } = useTranslate();
     const navigate = Route.useNavigate();
-    const storageHistoryValue = HistoryContext.useValue()[ "/storage" ];
+    const storageHistoryValue = HistoryContext.useValue()[ '/storage' ];
 
     const staticData = useStaticData();
 
-    const pkmVersionsQuery = useStorageGetMainPkmVersions();
+    const pkmVersionsQuery = usePkmVersionIndex();
 
-    const pkmVersion = pkmVersionsQuery.data?.data.find(
-        (pkmVersion) => pkmVersion.id === pkmVersionId,
-    );
-
+    const pkmVersion = pkmVersionsQuery.data?.data.byId[ pkmVersionId ];
     if (!pkmVersion) {
         return null;
     }
 
-    const staticForms =
-        staticData.species[ pkmVersion.species ]?.forms[ pkmVersion.context ];
+    const staticForms = staticData.species[ pkmVersion.species ]?.forms[ pkmVersion.context ];
 
     const formObj = staticForms?.[ pkmVersion.form ] ?? staticForms?.[ 0 ];
 
@@ -38,18 +32,18 @@ export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({
     return (
         <tr>
             <td>
-                {t("notifications.warnings.pkm-version", {
+                {t('notifications.warnings.pkm-version', {
                     speciesName,
                     boxId: pkmVersion.boxId,
                     boxSlot: pkmVersion.boxSlot,
                 })}
             </td>
-            <td style={{ verticalAlign: "top" }}>
+            <td style={{ verticalAlign: 'top' }}>
                 <Button
                     onClick={() =>
                         navigate({
-                            to: "/storage",
-                            search: (search) => {
+                            to: '/storage',
+                            search: search => {
                                 const saves = storageHistoryValue?.search.saves ?? search.saves;
 
                                 return {
@@ -60,9 +54,7 @@ export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({
                                     saves: pkmVersion.attachedSaveId
                                         ? {
                                             ...saves,
-                                            [ pkmVersion.attachedSaveId ]: saves?.[
-                                                pkmVersion.attachedSaveId
-                                            ] ?? {
+                                            [ pkmVersion.attachedSaveId ]: saves?.[ pkmVersion.attachedSaveId ] ?? {
                                                 saveId: pkmVersion.attachedSaveId,
                                                 saveBoxIds: [ 0 ],
                                                 order: getSaveOrder(saves, pkmVersion.attachedSaveId),
@@ -74,7 +66,7 @@ export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({
                         })
                     }
                 >
-                    <Icon name="eye" forButton />
+                    <Icon name='eye' forButton />
                 </Button>
             </td>
         </tr>

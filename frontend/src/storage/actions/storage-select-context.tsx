@@ -1,10 +1,11 @@
 import React from 'react';
-import { useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
+import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
+import { usePkmVersionSlotInfos } from '../../data/hooks/use-pkm-version-slot-infos';
+import { useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import type { StorageItemProps } from '../../ui/storage-item/storage-item';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { StorageMoveContext } from './storage-move-context';
-import { usePkmVersionSlotInfos } from '../../data/hooks/use-pkm-version-slot-infos';
 
 type Context = {
     value: {
@@ -41,7 +42,7 @@ export const StorageSelectContext = {
     SanityCheck: () => {
         const { saveId, boxId, ids, removeId, clear } = StorageSelectContext.useValue();
 
-        const mainPkmsQuery = useStorageGetMainPkmVersions();
+        const mainPkmsQuery = usePkmVersionIndex();
         const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
 
         const mainBoxIds = Route.useSearch({ select: search => search.mainBoxIds }) ?? [];
@@ -64,9 +65,9 @@ export const StorageSelectContext = {
             if (selectsNotDisplayed) {
                 clear();
             } else {
-                const pkmList = saveId ? (savePkmsQuery.data?.data ?? []) : (mainPkmsQuery.data?.data ?? []);
-
-                const obsoleteIds = ids.filter(id => !pkmList.find(pkm => pkm.id === id));
+                const obsoleteIds = saveId
+                    ? ids.filter(id => !savePkmsQuery.data?.data.find(pkm => pkm.id === id))
+                    : ids.filter(id => !mainPkmsQuery.data?.data.byId[ id ]);
                 if (obsoleteIds.length > 0) {
                     removeId(obsoleteIds);
                 }
@@ -122,7 +123,7 @@ export const StorageSelectContext = {
         const selectContext = StorageSelectContext.useValue();
         const movingIds = StorageMoveContext.useValue().selected?.ids;
 
-        const mainPkmsQuery = useStorageGetMainPkmVersions();
+        const mainPkmsQuery = usePkmVersionIndex();
         const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
 
         const versionInfos = usePkmVersionSlotInfos(saveId ? undefined : pkmId);
@@ -133,20 +134,20 @@ export const StorageSelectContext = {
                 const pkm = pkmData.find(pkm => pkm.id === pkmId);
 
                 return {
-                    pkmData,
                     pkm,
                     pkmStack: [ pkm ].filter(filterIsDefined),
+                    getPkmsByBox: (boxId: number) => pkmData.filter(pk => pk.boxId === boxId),
                 };
             }
 
             return {
-                pkmData: mainPkmsQuery.data?.data ?? [],
                 pkm: versionInfos?.baseVersion,
                 pkmStack: versionInfos?.versions ?? [],
+                getPkmsByBox: (boxId: number) => Object.values(mainPkmsQuery.data?.data.byBox[ boxId ] ?? {}).flat(),
             };
         };
 
-        const { pkmData, pkm, pkmStack } = getInfos();
+        const { pkm, pkmStack, getPkmsByBox } = getInfos();
 
         const pkmIds = pkmStack.map(pk => pk.id);
 
@@ -161,7 +162,7 @@ export const StorageSelectContext = {
                             selectContext.removeId(pkmIds);
                         } else {
                             if (e.nativeEvent instanceof PointerEvent && e.nativeEvent.shiftKey) {
-                                const pkmsInBox = pkmData.filter(pk => pk.boxId === pkm.boxId);
+                                const pkmsInBox = getPkmsByBox(pkm.boxId);
                                 const selectedPkms = selectContext.ids.map(id => pkmsInBox.find(pkm => pkm.id === id)).filter(filterIsDefined);
                                 const lastSelectedPkmSlot = selectedPkms[ selectedPkms.length - 1 ]?.boxSlot ?? -1;
 

@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useStorageGetMainPkmVersions } from '../../data/sdk/storage/storage.gen';
+import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
 import { TitledContainer } from '../container/titled-container';
 import { DetailsLevel } from '../details-card/details-level';
 import { Icon } from '../icon/icon';
@@ -9,9 +9,9 @@ export const StorageItemMainActionsContainer: React.FC<
         pkmId: string;
     }>
 > = ({ pkmId, children }) => {
-    const mainPkmVersionQuery = useStorageGetMainPkmVersions();
+    const mainPkmVersionQuery = usePkmVersionIndex();
 
-    const selectedPkm = mainPkmVersionQuery.data?.data.find(pkm => pkm.id === pkmId);
+    const selectedPkm = mainPkmVersionQuery.data?.data.byId[ pkmId ];
     if (!selectedPkm) {
         return null;
     }

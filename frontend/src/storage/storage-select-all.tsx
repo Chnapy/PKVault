@@ -1,5 +1,6 @@
 import React from 'react';
-import { useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
+import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
+import { useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
 import { CheckboxInput } from '../ui/input/checkbox-input';
 import { StorageSelectContext } from './actions/storage-select-context';
 
@@ -9,12 +10,12 @@ export const StorageSelectAll: React.FC<{
 }> = ({ saveId, boxId }) => {
     const selectContext = StorageSelectContext.useValue();
 
-    const mainPkmsQuery = useStorageGetMainPkmVersions();
+    const mainPkmsQuery = usePkmVersionIndex();
     const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
 
     const pkms = saveId
         ? (savePkmsQuery.data?.data.filter(item => item.boxId === boxId) ?? [])
-        : (mainPkmsQuery.data?.data.filter(item => item.boxId === boxId) ?? []);
+        : Object.values(mainPkmsQuery.data?.data.byBox[ boxId ] ?? {}).flat();
 
     const ids = selectContext.saveId === saveId && selectContext.boxId === boxId ? selectContext.ids : [];
 

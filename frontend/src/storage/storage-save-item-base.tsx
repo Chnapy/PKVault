@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePkmLegality } from '../data/hooks/use-pkm-legality';
-import { usePkmSaveVersion } from '../data/hooks/use-pkm-save-version';
+import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
 import { Gender as GenderType } from '../data/sdk/model';
 import { useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
 import type { ButtonLikeProps } from '../ui/button/button-like';
@@ -15,7 +15,7 @@ export type StorageSaveItemBaseProps = ButtonLikeProps &
 export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.memo(({ saveId, pkmId, ...rest }) => {
     const savePkmsQuery = useStorageGetSavePkms(saveId);
 
-    const getPkmSaveVersion = usePkmSaveVersion();
+    const pkmVersionIndex = usePkmVersionIndex();
 
     const pkmLegalityQuery = usePkmLegality(pkmId, saveId);
     const pkmLegality = pkmLegalityQuery.data?.data;
@@ -28,7 +28,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
 
     const { species, form, gender, isAlpha, isShiny, isEgg, isShadow, canEvolve } = savePkm;
 
-    const attachedPkmVersion = getPkmSaveVersion(savePkm.idBase, savePkm.saveId);
+    const attachedPkmVersion = pkmVersionIndex.data?.data.byAttachedSave[ savePkm.saveId ]?.[ savePkm.idBase ];
     const saveSynchronized = savePkm.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
     const canMoveAttached = !attachedPkmVersion && !isEgg && !isShadow;

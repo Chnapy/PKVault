@@ -27,6 +27,7 @@
     "react-error-boundary": "^6.0.0",
     "react-hook-form": "^7.62.0",
     "react-i18next": "^16.0.0",
+    "reselect": "^5.1.1",
     "zod": "^3.25.76"
   },
   "devDependencies": {

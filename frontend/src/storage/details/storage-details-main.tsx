@@ -1,8 +1,10 @@
 import React from 'react';
 import { usePkmLegality, usePkmLegalityMap } from '../../data/hooks/use-pkm-legality';
 import { usePkmVersionAttach } from '../../data/hooks/use-pkm-version-attach';
+import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
+import { usePkmVersionSlotInfos } from '../../data/hooks/use-pkm-version-slot-infos';
 import { PKMLoadError } from '../../data/sdk/model';
-import { useStorageGetMainPkmVersions, useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
+import { useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
 import { useDesktopMessage } from '../../settings/save-globs/hooks/use-desktop-message';
 import { useTranslate } from '../../translate/i18n';
@@ -12,7 +14,6 @@ import { StorageDetailsBase } from '../../ui/storage-item-details/storage-detail
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { switchUtilRequired } from '../../util/switch-util';
-import { usePkmVersionSlotInfos } from '../../data/hooks/use-pkm-version-slot-infos';
 
 export type StorageDetailsMainProps = {
     selectedId: string;
@@ -77,7 +78,7 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
 
     const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
 
-    const mainPkmVersionsQuery = useStorageGetMainPkmVersions();
+    const mainPkmVersionsQuery = usePkmVersionIndex();
 
     const pkmLegalityQuery = usePkmLegality(id);
     const pkmLegality = pkmLegalityQuery.data?.data;
@@ -86,7 +87,7 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
 
     const desktopMessage = useDesktopMessage();
 
-    const pkmVersion = mainPkmVersionsQuery.data?.data.find(version => version.id === id);
+    const pkmVersion = mainPkmVersionsQuery.data?.data.byId[ id ];
     const saveCardProps = pkmVersion?.attachedSaveId ? getSaveItemProps(pkmVersion.attachedSaveId) : undefined;
 
     const openFile =

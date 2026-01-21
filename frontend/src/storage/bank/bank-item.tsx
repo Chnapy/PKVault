@@ -1,19 +1,15 @@
-import type React from "react";
-import {
-  useStorageDeleteMainBank,
-  useStorageGetMainBanks,
-  useStorageGetMainBoxes,
-  useStorageGetMainPkmVersions,
-} from "../../data/sdk/storage/storage.gen";
-import { useTranslate } from "../../translate/i18n";
-import { Button, ButtonLink } from "../../ui/button/button";
-import { ButtonWithConfirm } from "../../ui/button/button-with-confirm";
-import { ButtonWithDisabledPopover } from "../../ui/button/button-with-disabled-popover";
-import { ButtonWithPopover } from "../../ui/button/button-with-popover";
-import { Icon } from "../../ui/icon/icon";
-import { StorageMoveContext } from "../actions/storage-move-context";
-import { BankContext } from "./bank-context";
-import { BankEdit } from "./bank-edit";
+import type React from 'react';
+import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
+import { useStorageDeleteMainBank, useStorageGetMainBanks, useStorageGetMainBoxes } from '../../data/sdk/storage/storage.gen';
+import { useTranslate } from '../../translate/i18n';
+import { Button, ButtonLink } from '../../ui/button/button';
+import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
+import { ButtonWithDisabledPopover } from '../../ui/button/button-with-disabled-popover';
+import { ButtonWithPopover } from '../../ui/button/button-with-popover';
+import { Icon } from '../../ui/icon/icon';
+import { StorageMoveContext } from '../actions/storage-move-context';
+import { BankContext } from './bank-context';
+import { BankEdit } from './bank-edit';
 
 export const BankItem: React.FC<{
   bankId: string;
@@ -27,48 +23,41 @@ export const BankItem: React.FC<{
   const banksQuery = useStorageGetMainBanks();
   const bankDeleteMutation = useStorageDeleteMainBank();
   const boxesQuery = useStorageGetMainBoxes();
-  const pkmsQuery = useStorageGetMainPkmVersions();
+  const pkmsQuery = usePkmVersionIndex();
 
-  const isLoading =
-    moveLoading ||
-    [selectedBankBoxes, banksQuery, boxesQuery, pkmsQuery].some(
-      (query) => query.isLoading,
-    );
+  const isLoading = moveLoading || [ selectedBankBoxes, banksQuery, boxesQuery, pkmsQuery ].some(query => query.isLoading);
 
   const banks = banksQuery.data?.data ?? [];
-  const bank = banks.find((item) => item.id === bankId);
-  const boxes =
-    boxesQuery.data?.data
-      .filter((box) => box.bankId === bank?.id)
-      .map((box) => box.idInt) ?? [];
-  const pkms = pkmsQuery.data?.data.filter((pkm) => boxes.includes(pkm.boxId));
+  const bank = banks.find(item => item.id === bankId);
+  const boxes = boxesQuery.data?.data.filter(box => box.bankId === bank?.id).map(box => box.idInt) ?? [];
+  const pkms = boxes.map(boxId => Object.values(pkmsQuery.data?.data.byBox[ boxId ] ?? {}).flat()).flat();
 
   const canDelete = pkms?.length === 0;
 
   const buttonMainContent = bank && (
     <div
       style={{
-        display: "flex",
-        alignItems: "center",
-        textAlign: "center",
+        display: 'flex',
+        alignItems: 'center',
+        textAlign: 'center',
       }}
     >
       {bank.isDefault && (
         <Icon
-          name="star"
+          name='star'
           solid
           forButton
           style={{
-            alignSelf: "flex-start",
+            alignSelf: 'flex-start',
             marginRight: 4,
           }}
         />
       )}
       {bank.name}
       <br />
-      {t("storage.bank.description", {
+      {t('storage.bank.description', {
         boxCount: boxes.length,
-        pkmCount: pkms?.length ?? "-",
+        pkmCount: pkms.length,
       })}
     </div>
   );
@@ -77,7 +66,7 @@ export const BankItem: React.FC<{
     bank && (
       <div
         style={{
-          display: "inline-flex",
+          display: 'inline-flex',
           order: bank.order,
         }}
       >
@@ -89,7 +78,7 @@ export const BankItem: React.FC<{
             selected={selectedBankBoxes.data?.selectedBank.id === bankId}
             loading={isLoading}
             onPointerUp={moveDroppable.onPointerUp}
-            anchor="bottom"
+            anchor='bottom'
             showHelp={!!moveDroppable.helpText}
             helpTitle={moveDroppable.helpText}
             style={{
@@ -103,7 +92,7 @@ export const BankItem: React.FC<{
           </ButtonWithDisabledPopover>
         ) : (
           <ButtonLink
-            to="/storage"
+            to='/storage'
             {...selectBankProps(bankId)}
             selected={selectedBankBoxes.data?.selectedBank.id === bankId}
             loading={isLoading}
@@ -119,7 +108,7 @@ export const BankItem: React.FC<{
 
         <div>
           <ButtonWithPopover
-            panelContent={(close) => <BankEdit bankId={bankId} close={close} />}
+            panelContent={close => <BankEdit bankId={bankId} close={close} />}
             loading={isLoading}
             style={{
               // borderLeftWidth: 0,
@@ -128,12 +117,12 @@ export const BankItem: React.FC<{
               borderBottomRightRadius: 0,
             }}
           >
-            <Icon name="pen" forButton />
+            <Icon name='pen' forButton />
           </ButtonWithPopover>
 
           <ButtonWithDisabledPopover
             as={ButtonWithConfirm}
-            helpTitle={t("storage.bank.delete.help")}
+            helpTitle={t('storage.bank.delete.help')}
             showHelp={!canDelete}
             onClick={() => bankDeleteMutation.mutateAsync({ bankId })}
             disabled={!canDelete}
@@ -145,7 +134,7 @@ export const BankItem: React.FC<{
               borderTopRightRadius: 0,
             }}
           >
-            <Icon name="trash" solid forButton />
+            <Icon name='trash' solid forButton />
           </ButtonWithDisabledPopover>
         </div>
       </div>

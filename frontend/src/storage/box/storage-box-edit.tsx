@@ -1,12 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
 import { BoxType, type StorageUpdateMainBoxParams } from '../../data/sdk/model';
 import {
     getStorageGetMainBoxesQueryKey,
     useStorageGetMainBanks,
     useStorageGetMainBoxes,
-    useStorageGetMainPkmVersions,
     useStorageUpdateMainBox,
     type storageGetMainBoxesResponse200,
 } from '../../data/sdk/storage/storage.gen';
@@ -27,12 +27,12 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
     const boxUpdateMutation = useStorageUpdateMainBox();
     const banksQuery = useStorageGetMainBanks();
     const boxesQuery = useStorageGetMainBoxes();
-    const pkmsQuery = useStorageGetMainPkmVersions();
+    const pkmsQuery = usePkmVersionIndex();
 
     const box = boxesQuery.data?.data.find(box => box.id === boxId);
-    const boxes = [...(boxesQuery.data?.data ?? [])].filter(b => b.bankId === box?.bankId).sort((b1, b2) => (b1.order < b2.order ? -1 : 1));
+    const boxes = [ ...(boxesQuery.data?.data ?? []) ].filter(b => b.bankId === box?.bankId).sort((b1, b2) => (b1.order < b2.order ? -1 : 1));
 
-    const minSlotCount = Math.max(0, ...(pkmsQuery.data?.data.filter(pkm => pkm.boxId === box?.idInt).map(pkm => pkm.boxSlot) ?? [])) + 1;
+    const minSlotCount = Math.max(0, ...Object.keys(pkmsQuery.data?.data.byBox[ box?.idInt ?? -1 ] ?? {}).map(Number)) + 1;
 
     const { register, handleSubmit, formState, watch, setValue } = useForm<StorageUpdateMainBoxParams>({
         defaultValues: {
@@ -50,7 +50,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
     const watchOrder = watch('order');
     const watchBankId = watch('bankId');
 
-    const previousBox = [...boxes].reverse().find(b => b.id !== boxId && b.order <= watchOrder);
+    const previousBox = [ ...boxes ].reverse().find(b => b.id !== boxId && b.order <= watchOrder);
     const nextBox = boxes.find(b => b.id !== boxId && b.order >= watchOrder);
 
     const onSubmit = handleSubmit(async ({ type, boxName, slotCount, order, bankId }) => {
@@ -91,7 +91,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
                 };
             });
         }
-    }, [box, boxId, queryClient, watchName, watchOrder]);
+    }, [ box, boxId, queryClient, watchName, watchOrder ]);
 
     // reset list removing temp form data
     React.useEffect(() => {
@@ -100,7 +100,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
                 queryKey: getStorageGetMainBoxesQueryKey(),
             });
         };
-    }, [queryClient]);
+    }, [ queryClient ]);
 
     return (
         <form
@@ -123,7 +123,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
                 {...register('type')}
                 label={t('storage.box.edit.type')}
                 data={
-                    Object.entries(BoxType).map(([key, value]) => ({
+                    Object.entries(BoxType).map(([ key, value ]) => ({
                         value,
                         option: (
                             <div

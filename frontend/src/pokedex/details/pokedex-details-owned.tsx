@@ -1,6 +1,7 @@
 import type React from 'react';
 import { HistoryContext } from '../../context/history-context';
-import { useStorageGetMainPkmVersions, useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
+import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
+import { useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes';
 import { BankContext } from '../../storage/bank/bank-context';
 import { StorageMainItemBase } from '../../storage/storage-main-item-base';
@@ -20,12 +21,12 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
     const { t } = useTranslate();
     const navigate = Route.useNavigate();
 
-    const storageHistoryValue = HistoryContext.useValue()['/storage'];
+    const storageHistoryValue = HistoryContext.useValue()[ '/storage' ];
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();
     const storageSearch = storageHistoryValue?.search ?? selectedBankBoxes.data?.selectedSearch;
 
     const savePkmsQuery = useStorageGetSavePkms(saveId);
-    const pkmVersionsQuery = useStorageGetMainPkmVersions();
+    const pkmVersionsQuery = usePkmVersionIndex();
 
     return (
         <TextContainer maxHeight={300}>
@@ -44,9 +45,9 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
                             <StorageItem small species={species} context={9} form={0} helpTitle={null} loading />
                         )}
 
-                        {pkmVersionsQuery.data?.data
-                            .filter((pkm) => pkm.species === species && pkm.isMain)
-                            ?.map((pkmVersion) => (
+                        {pkmVersionsQuery.data?.data.bySpecies[ species ]
+                            ?.filter(pkm => pkm.isMain)
+                            ?.map(pkmVersion => (
                                 <StorageMainItemBase
                                     key={pkmVersion.id}
                                     pkmId={pkmVersion.id}
@@ -57,7 +58,7 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
                                             to: '/storage',
                                             search: {
                                                 ...storageSearch,
-                                                mainBoxIds: [pkmVersion?.boxId ?? 0],
+                                                mainBoxIds: [ pkmVersion?.boxId ?? 0 ],
                                                 selected: {
                                                     saveId: undefined,
                                                     id: pkmVersion.id,
@@ -75,8 +76,8 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
                         )}
 
                         {savePkmsQuery.data?.data
-                            .filter((pkm) => pkm.species === species)
-                            ?.map((pkm) => (
+                            .filter(pkm => pkm.species === species)
+                            ?.map(pkm => (
                                 <StorageSaveItemBase
                                     key={pkm.id}
                                     saveId={pkm.saveId}
@@ -90,9 +91,9 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
                                                 ...storageSearch,
                                                 saves: {
                                                     ...storageSearch?.saves,
-                                                    [saveId]: {
+                                                    [ saveId ]: {
                                                         saveId,
-                                                        saveBoxIds: [pkm.boxId],
+                                                        saveBoxIds: [ pkm.boxId ],
                                                         order: getSaveOrder(storageSearch?.saves, saveId),
                                                     },
                                                 },
