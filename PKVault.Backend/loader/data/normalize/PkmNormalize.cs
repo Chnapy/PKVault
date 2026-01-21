@@ -176,12 +176,6 @@ public class PkmNormalize(
                     return;
                 }
 
-                var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
-                if (!pkm.IsEnabled)
-                {
-                    return;
-                }
-
                 uint? attachedSaveId = null;
                 string? attachedSavePkmIdBase = null;
                 if (pkmEntity.SaveId != null && loaders.saveLoadersDict.TryGetValue((uint)pkmEntity.SaveId, out var saveLoader))
