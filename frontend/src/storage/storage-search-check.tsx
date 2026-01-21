@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
-import { useStorageGetMainBoxes } from '../data/sdk/storage/storage.gen';
+import { useStorageGetBoxes } from '../data/sdk/storage/storage.gen';
 import { Route } from '../routes/storage';
 import { BankContext } from './bank/bank-context';
 
@@ -9,7 +9,7 @@ export const StorageSearchCheck: React.FC<React.PropsWithChildren> = ({ children
     const navigate = Route.useNavigate();
     const storageSearch = Route.useSearch({ select: search => search });
 
-    const mainBoxesQuery = useStorageGetMainBoxes();
+    const mainBoxesQuery = useStorageGetBoxes();
     const mainPkmsQuery = usePkmVersionIndex();
     const saveInfosQuery = useSaveInfosGetAll();
     // const saveBoxesQuery = useStorageGetSaveBoxes(storageSearch.save ?? 0);

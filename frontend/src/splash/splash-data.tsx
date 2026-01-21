@@ -4,7 +4,7 @@ import { useBackupGetAll } from '../data/sdk/backup/backup.gen';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { useStaticDataGet } from '../data/sdk/static-data/static-data.gen';
-import { useStorageGetMainBanks, useStorageGetMainBoxes } from '../data/sdk/storage/storage.gen';
+import { useStorageGetMainBanks, useStorageGetBoxes } from '../data/sdk/storage/storage.gen';
 import { Fallback } from '../error/fallback';
 import { useDesktopMessage } from '../settings/save-globs/hooks/use-desktop-message';
 import { Splash } from '../ui/splash/splash';
@@ -16,7 +16,7 @@ export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number
         useBackupGetAll(),
         useSaveInfosGetAll(),
         useStorageGetMainBanks(),
-        useStorageGetMainBoxes(),
+        useStorageGetBoxes(),
         usePkmVersionIndex(),
     ] as const;
 

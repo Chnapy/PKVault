@@ -4,7 +4,7 @@ import React from 'react';
 import { usePkmSaveIndex } from '../data/hooks/use-pkm-save-index';
 import { BoxType, type PkmSaveDTO, type SaveInfosDTO } from '../data/sdk/model';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
-import { useStorageGetSaveBoxes } from '../data/sdk/storage/storage.gen';
+import { useStorageGetBoxes } from '../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from '../routes/storage';
 import { SaveItem } from '../saves/save-item/save-item';
@@ -46,7 +46,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
   const saveInfosQuery = useSaveInfosGetAll();
   const saveInfos = saveInfosQuery.data?.data[ saveId ] as SaveInfosDTO | undefined;
 
-  const saveBoxesQuery = useStorageGetSaveBoxes(saveId);
+  const saveBoxesQuery = useStorageGetBoxes({ saveId });
   const savePkmsQuery = usePkmSaveIndex(saveId);
 
   const loading = [ saveBoxesQuery, savePkmsQuery ].some(query => query.isLoading);

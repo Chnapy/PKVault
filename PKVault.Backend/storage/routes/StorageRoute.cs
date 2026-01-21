@@ -15,14 +15,6 @@ public class StorageController(DataService dataService, ILoadersService loadersS
         return list;
     }
 
-    [HttpGet("main/box")]
-    public async Task<ActionResult<List<BoxDTO>>> GetMainBoxes()
-    {
-        var list = await storageQueryService.GetMainBoxes();
-
-        return list;
-    }
-
     [HttpGet("main/pkm-version")]
     public async Task<ActionResult<List<PkmVersionDTO>>> GetMainPkmVersions()
     {
@@ -31,12 +23,14 @@ public class StorageController(DataService dataService, ILoadersService loadersS
         return list;
     }
 
-    [HttpGet("save/{saveId}/box")]
-    public async Task<ActionResult<List<BoxDTO>>> GetSaveBoxes(uint saveId)
+    [HttpGet("box")]
+    public async Task<ActionResult<List<BoxDTO>>> GetBoxes([FromQuery] uint? saveId = null)
     {
-        var saveBoxes = await storageQueryService.GetSaveBoxes(saveId);
+        var boxes = saveId == null
+            ? await storageQueryService.GetMainBoxes()
+            : await storageQueryService.GetSaveBoxes((uint)saveId);
 
-        return saveBoxes;
+        return boxes;
     }
 
     [HttpGet("save/{saveId}/pkm")]

@@ -1,6 +1,6 @@
 import type React from 'react';
 import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
-import { useStorageDeleteMainBank, useStorageGetMainBanks, useStorageGetMainBoxes } from '../../data/sdk/storage/storage.gen';
+import { useStorageDeleteMainBank, useStorageGetMainBanks, useStorageGetBoxes } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
 import { Button, ButtonLink } from '../../ui/button/button';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
@@ -22,7 +22,7 @@ export const BankItem: React.FC<{
 
   const banksQuery = useStorageGetMainBanks();
   const bankDeleteMutation = useStorageDeleteMainBank();
-  const boxesQuery = useStorageGetMainBoxes();
+  const boxesQuery = useStorageGetBoxes();
   const pkmsQuery = usePkmVersionIndex();
 
   const isLoading = moveLoading || [ selectedBankBoxes, banksQuery, boxesQuery, pkmsQuery ].some(query => query.isLoading);

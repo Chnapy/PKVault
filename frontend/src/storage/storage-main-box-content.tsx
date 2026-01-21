@@ -3,7 +3,7 @@ import { Popover, PopoverButton } from '@headlessui/react';
 import React from 'react';
 import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
 import { BoxType, type PkmVersionDTO } from '../data/sdk/model';
-import { useStorageCreateMainBox, useStorageDeleteMainBox, useStorageGetMainBoxes } from '../data/sdk/storage/storage.gen';
+import { useStorageCreateMainBox, useStorageDeleteMainBox, useStorageGetBoxes } from '../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from '../routes/storage';
 import { useTranslate } from '../translate/i18n';
@@ -38,7 +38,7 @@ export const StorageMainBoxContent: React.FC<{
 
     const moveContext = StorageMoveContext.useValue();
 
-    const boxesQuery = useStorageGetMainBoxes();
+    const boxesQuery = useStorageGetBoxes();
     const pkmsQuery = usePkmVersionIndex();
 
     const loading = [ pkmsQuery, selectedBankBoxes ].some(query => query.isLoading);

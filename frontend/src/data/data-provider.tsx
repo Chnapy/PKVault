@@ -14,12 +14,11 @@ import { getSettingsGetQueryKey, type settingsGetResponseSuccess } from './sdk/s
 import { getStaticDataGetQueryKey, type staticDataGetResponseSuccess } from './sdk/static-data/static-data.gen';
 import {
     getStorageGetActionsQueryKey,
+    getStorageGetBoxesQueryKey,
     getStorageGetMainBanksQueryKey,
-    getStorageGetMainBoxesQueryKey,
-    getStorageGetSaveBoxesQueryKey,
     getStorageGetSavePkmsQueryKey,
     type storageGetActionsResponseSuccess,
-    type storageGetSaveBoxesResponseSuccess,
+    type storageGetBoxesResponseSuccess,
 } from './sdk/storage/storage.gen';
 import { getWarningsGetWarningsQueryKey, type warningsGetWarningsResponseSuccess } from './sdk/warnings/warnings.gen';
 
@@ -141,7 +140,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                             }
 
                             if (mainBoxes) {
-                                applyResponseData(mainBoxes, getStorageGetMainBoxesQueryKey());
+                                applyResponseData(mainBoxes, getStorageGetBoxesQueryKey());
                             }
 
                             if (mainPkmVersions) {
@@ -153,7 +152,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                             }
 
                             if (invalidateAllSaves) {
-                                const [ saveBoxStart, saveBoxEnd ] = getStorageGetSaveBoxesQueryKey(-999)[ 0 ].split('-999');
+                                const [ saveBoxStart, saveBoxEnd ] = getStorageGetBoxesQueryKey({ saveId: -999 })[ 0 ].split('-999');
                                 const [ savePkmStart, savePkmEnd ] = getStorageGetSavePkmsQueryKey(-999)[ 0 ].split('-999');
 
                                 const saveQueries = client.getQueryCache().findAll({
@@ -183,11 +182,11 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                             } else if (saves) {
                                 saves.forEach(saveData => {
                                     if (saveData.saveBoxes) {
-                                        client.setQueryData(getStorageGetSaveBoxesQueryKey(saveData.saveId), {
+                                        client.setQueryData(getStorageGetBoxesQueryKey({ saveId: saveData.saveId }), {
                                             status: 200,
                                             headers: new Headers(),
                                             data: saveData.saveBoxes,
-                                        } satisfies storageGetSaveBoxesResponseSuccess);
+                                        } satisfies storageGetBoxesResponseSuccess);
                                     }
 
                                     if (saveData.savePkms) {

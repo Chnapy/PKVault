@@ -4,11 +4,11 @@ import { useForm } from 'react-hook-form';
 import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
 import { BoxType, type StorageUpdateMainBoxParams } from '../../data/sdk/model';
 import {
-    getStorageGetMainBoxesQueryKey,
+    getStorageGetBoxesQueryKey,
     useStorageGetMainBanks,
-    useStorageGetMainBoxes,
+    useStorageGetBoxes,
     useStorageUpdateMainBox,
-    type storageGetMainBoxesResponse200,
+    type storageGetBoxesResponse200,
 } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
@@ -26,7 +26,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
 
     const boxUpdateMutation = useStorageUpdateMainBox();
     const banksQuery = useStorageGetMainBanks();
-    const boxesQuery = useStorageGetMainBoxes();
+    const boxesQuery = useStorageGetBoxes();
     const pkmsQuery = usePkmVersionIndex();
 
     const box = boxesQuery.data?.data.find(box => box.id === boxId);
@@ -74,7 +74,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
     // apply some form data to cached data list to view in real-time name & order changes
     React.useEffect(() => {
         if (box && (watchName !== box.name || watchOrder !== box.order)) {
-            queryClient.setQueryData(getStorageGetMainBoxesQueryKey(), (data: storageGetMainBoxesResponse200) => {
+            queryClient.setQueryData(getStorageGetBoxesQueryKey(), (data: storageGetBoxesResponse200) => {
                 return {
                     ...data,
                     data: data?.data.map(b => {
@@ -97,7 +97,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
     React.useEffect(() => {
         return () => {
             queryClient.invalidateQueries({
-                queryKey: getStorageGetMainBoxesQueryKey(),
+                queryKey: getStorageGetBoxesQueryKey(),
             });
         };
     }, [ queryClient ]);

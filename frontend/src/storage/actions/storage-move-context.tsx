@@ -4,7 +4,7 @@ import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
 import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
 import type { BoxDTO, PkmSaveDTO, PkmVersionDTO } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
-import { useStorageGetMainBoxes, useStorageGetSaveBoxes, useStorageMovePkm, useStorageMovePkmBank } from '../../data/sdk/storage/storage.gen';
+import { useStorageGetBoxes, useStorageMovePkm, useStorageMovePkmBank } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { StorageSelectContext } from './storage-select-context';
@@ -222,13 +222,16 @@ export const StorageMoveContext = {
                 : undefined,
             renderItem: (element: React.ReactNode) => {
                 if (selected?.ids.includes(pkmId) && selected.saveId === saveId) {
+                    const nbrPkmsPerLine = 6;
                     const allPkms = [ ...sourcePkmMains, ...sourcePkmSaves ];
                     const firstPkm = allPkms[ 0 ];
                     const selectedPkm = allPkms.find(pkm => pkm.id === pkmId);
                     const pkmSlot = selectedPkm!.boxSlot;
-                    const pkmPos = [ pkmSlot % 6, ~~(pkmSlot / 6) ];
-                    const firstPkmPos = [ (firstPkm?.boxSlot ?? 0) % 6, ~~((firstPkm?.boxSlot ?? 0) / 6) ];
+                    const pkmPos = [ pkmSlot % nbrPkmsPerLine, ~~(pkmSlot / nbrPkmsPerLine) ];
+                    const firstPkmPos = [ (firstPkm?.boxSlot ?? 0) % nbrPkmsPerLine, ~~((firstPkm?.boxSlot ?? 0) / nbrPkmsPerLine) ];
                     const posDiff = pkmPos.map((x, i) => x - firstPkmPos[ i ]!);
+
+                    console.log(firstPkm?.boxId, firstPkm?.boxSlot);
 
                     return createPortal(
                         <div
@@ -255,7 +258,7 @@ export const StorageMoveContext = {
         const { selected, setSelected } = StorageMoveContext.useValue();
         const selectContext = StorageSelectContext.useValue();
 
-        const mainBoxesQuery = useStorageGetMainBoxes();
+        const mainBoxesQuery = useStorageGetBoxes();
         const mainPkmVersionsQuery = usePkmVersionIndex();
         const sourceSavePkmsQuery = usePkmSaveIndex(selected?.saveId ?? 0);
 
@@ -438,8 +441,8 @@ export const StorageMoveContext = {
 
         const movePkmMutation = useStorageMovePkm();
 
-        const mainBoxesQuery = useStorageGetMainBoxes();
-        const targetSaveBoxesQuery = useStorageGetSaveBoxes(saveId ?? 0);
+        // const mainBoxesQuery = useStorageGetMainBoxes();
+        const boxesQuery = useStorageGetBoxes({ saveId });
 
         const mainPkmVersionsQuery = usePkmVersionIndex();
         const sourceSavePkmsQuery = usePkmSaveIndex(selected?.saveId ?? 0);
@@ -517,8 +520,9 @@ export const StorageMoveContext = {
             const sourceSave = selected?.saveId ? saveInfosQuery.data?.data[ selected.saveId ] : undefined;
             const targetSave = saveId ? saveInfosQuery.data?.data[ saveId ] : undefined;
 
-            const targetBoxMain = !saveId ? mainBoxesQuery.data?.data.find(box => box.idInt === dropBoxId) : undefined;
-            const targetBoxSave = saveId ? targetSaveBoxesQuery.data?.data.find(box => box.idInt === dropBoxId) : undefined;
+            const targetBox = boxesQuery.data?.data.find(box => box.idInt === dropBoxId);
+            const targetBoxMain = !saveId ? targetBox : undefined;
+            const targetBoxSave = saveId ? targetBox : undefined;
 
             const getMainPkmNickname = (id: string) => mainPkmVersionsQuery.data?.data.byId[ id ]?.nickname;
 
@@ -725,7 +729,7 @@ export const StorageMoveContext = {
                 return { enable: true };
             };
 
-            const slotCount = (targetBoxMain?.slotCount ?? targetBoxSave?.slotCount ?? 0) - 1;
+            const slotCount = (targetBox?.slotCount ?? 0) - 1;
             if (multipleSlotsInfos.some(({ targetSlot }) => targetSlot < 0 || targetSlot > slotCount)) {
                 return { enable: false };
             }
