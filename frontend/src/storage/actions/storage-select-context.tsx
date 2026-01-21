@@ -1,7 +1,7 @@
 import React from 'react';
+import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
 import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
 import { usePkmVersionSlotInfos } from '../../data/hooks/use-pkm-version-slot-infos';
-import { useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import type { StorageItemProps } from '../../ui/storage-item/storage-item';
 import { filterIsDefined } from '../../util/filter-is-defined';
@@ -43,7 +43,7 @@ export const StorageSelectContext = {
         const { saveId, boxId, ids, removeId, clear } = StorageSelectContext.useValue();
 
         const mainPkmsQuery = usePkmVersionIndex();
-        const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
+        const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);
 
         const mainBoxIds = Route.useSearch({ select: search => search.mainBoxIds }) ?? [];
 
@@ -65,9 +65,7 @@ export const StorageSelectContext = {
             if (selectsNotDisplayed) {
                 clear();
             } else {
-                const obsoleteIds = saveId
-                    ? ids.filter(id => !savePkmsQuery.data?.data.find(pkm => pkm.id === id))
-                    : ids.filter(id => !mainPkmsQuery.data?.data.byId[ id ]);
+                const obsoleteIds = saveId ? ids.filter(id => !savePkmsQuery.data?.data.byId[ id ]) : ids.filter(id => !mainPkmsQuery.data?.data.byId[ id ]);
                 if (obsoleteIds.length > 0) {
                     removeId(obsoleteIds);
                 }
@@ -124,19 +122,18 @@ export const StorageSelectContext = {
         const movingIds = StorageMoveContext.useValue().selected?.ids;
 
         const mainPkmsQuery = usePkmVersionIndex();
-        const savePkmsQuery = useStorageGetSavePkms(saveId ?? 0);
+        const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);
 
         const versionInfos = usePkmVersionSlotInfos(saveId ? undefined : pkmId);
 
         const getInfos = () => {
             if (saveId) {
-                const pkmData = savePkmsQuery.data?.data ?? [];
-                const pkm = pkmData.find(pkm => pkm.id === pkmId);
+                const pkm = savePkmsQuery.data?.data.byId[ pkmId ];
 
                 return {
                     pkm,
                     pkmStack: [ pkm ].filter(filterIsDefined),
-                    getPkmsByBox: (boxId: number) => pkmData.filter(pk => pk.boxId === boxId),
+                    getPkmsByBox: (boxId: number) => Object.values(savePkmsQuery.data?.data.byBox[ boxId ] ?? {}),
                 };
             }
 

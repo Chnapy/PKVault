@@ -1,8 +1,8 @@
 import React from 'react';
 import { usePkmLegality } from '../data/hooks/use-pkm-legality';
+import { usePkmSaveIndex } from '../data/hooks/use-pkm-save-index';
 import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
 import { Gender as GenderType } from '../data/sdk/model';
-import { useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
 import type { ButtonLikeProps } from '../ui/button/button-like';
 import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
 
@@ -13,14 +13,14 @@ export type StorageSaveItemBaseProps = ButtonLikeProps &
     };
 
 export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.memo(({ saveId, pkmId, ...rest }) => {
-    const savePkmsQuery = useStorageGetSavePkms(saveId);
+    const savePkmsQuery = usePkmSaveIndex(saveId);
 
     const pkmVersionIndex = usePkmVersionIndex();
 
     const pkmLegalityQuery = usePkmLegality(pkmId, saveId);
     const pkmLegality = pkmLegalityQuery.data?.data;
 
-    const savePkm = savePkmsQuery.data?.data.find(pkm => pkm.id === pkmId);
+    const savePkm = savePkmsQuery.data?.data.byId[ pkmId ];
 
     if (!savePkm) {
         return null;

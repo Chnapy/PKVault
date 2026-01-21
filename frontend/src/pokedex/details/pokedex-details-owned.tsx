@@ -1,7 +1,7 @@
 import type React from 'react';
 import { HistoryContext } from '../../context/history-context';
+import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
 import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
-import { useStorageGetSavePkms } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes';
 import { BankContext } from '../../storage/bank/bank-context';
 import { StorageMainItemBase } from '../../storage/storage-main-item-base';
@@ -25,7 +25,7 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();
     const storageSearch = storageHistoryValue?.search ?? selectedBankBoxes.data?.selectedSearch;
 
-    const savePkmsQuery = useStorageGetSavePkms(saveId);
+    const savePkmsQuery = usePkmSaveIndex(saveId);
     const pkmVersionsQuery = usePkmVersionIndex();
 
     return (
@@ -75,37 +75,35 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
                             <StorageItem small species={species} context={9} form={0} helpTitle={null} loading />
                         )}
 
-                        {savePkmsQuery.data?.data
-                            .filter(pkm => pkm.species === species)
-                            ?.map(pkm => (
-                                <StorageSaveItemBase
-                                    key={pkm.id}
-                                    saveId={pkm.saveId}
-                                    pkmId={pkm.id}
-                                    helpTitle={null}
-                                    small
-                                    onClick={() =>
-                                        navigate({
-                                            to: '/storage',
-                                            search: {
-                                                ...storageSearch,
-                                                saves: {
-                                                    ...storageSearch?.saves,
-                                                    [ saveId ]: {
-                                                        saveId,
-                                                        saveBoxIds: [ pkm.boxId ],
-                                                        order: getSaveOrder(storageSearch?.saves, saveId),
-                                                    },
-                                                },
-                                                selected: {
+                        {savePkmsQuery.data?.data.bySpecies[ species ]?.map(pkm => (
+                            <StorageSaveItemBase
+                                key={pkm.id}
+                                saveId={pkm.saveId}
+                                pkmId={pkm.id}
+                                helpTitle={null}
+                                small
+                                onClick={() =>
+                                    navigate({
+                                        to: '/storage',
+                                        search: {
+                                            ...storageSearch,
+                                            saves: {
+                                                ...storageSearch?.saves,
+                                                [ saveId ]: {
                                                     saveId,
-                                                    id: pkm.id,
+                                                    saveBoxIds: [ pkm.boxId ],
+                                                    order: getSaveOrder(storageSearch?.saves, saveId),
                                                 },
                                             },
-                                        })
-                                    }
-                                />
-                            ))}
+                                            selected: {
+                                                saveId,
+                                                id: pkm.id,
+                                            },
+                                        },
+                                    })
+                                }
+                            />
+                        ))}
                     </>
                 )}
             </div>

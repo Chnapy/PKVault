@@ -1,8 +1,9 @@
 import { css } from '@emotion/css';
 import { PopoverPanel, type PopoverPanelProps } from '@headlessui/react';
 import type React from 'react';
+import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
 import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
-import { useStorageEvolvePkms, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
+import { useStorageEvolvePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { StorageSelectContext } from '../../storage/actions/storage-select-context';
@@ -27,9 +28,9 @@ export const StorageBoxSaveActions: React.FC<
 
   const staticData = useStaticData();
 
-  const pkmSavePkmQuery = useStorageGetSavePkms(saveId);
+  const pkmSavePkmQuery = usePkmSaveIndex(saveId);
 
-  const pkms = pkmSavePkmQuery.data?.data.filter(pkm => ids.includes(pkm.id)) ?? [];
+  const pkms = ids.map(id => pkmSavePkmQuery.data?.data.byId[ id ]).filter(filterIsDefined);
 
   const moveClickable = StorageMoveContext.useClickable(
     pkms.map(pkm => pkm.id),

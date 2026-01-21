@@ -1,7 +1,7 @@
 import { Route } from '../../routes/storage';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { useSaveInfosGetAll } from '../sdk/save-infos/save-infos.gen';
-import { useStorageGetSavePkms } from '../sdk/storage/storage.gen';
+import { usePkmSaveIndex } from './use-pkm-save-index';
 import { usePkmVersionIndex } from './use-pkm-version-index';
 
 export const usePkmVersionSlotInfos = (baseVersionId: string | undefined) => {
@@ -17,7 +17,7 @@ export const usePkmVersionSlotInfos = (baseVersionId: string | undefined) => {
 
     const attachedVersion = versions.find(version => version.attachedSaveId);
 
-    const pkmSavePkmQuery = useStorageGetSavePkms(attachedVersion?.attachedSaveId ?? 0);
+    const pkmSavePkmQuery = usePkmSaveIndex(attachedVersion?.attachedSaveId ?? 0);
 
     if (!mainVersion) {
         return;
@@ -29,7 +29,7 @@ export const usePkmVersionSlotInfos = (baseVersionId: string | undefined) => {
 
     const { compatibleWithVersions } = mainVersion;
 
-    const attachedSavePkm = attachedVersion ? pkmSavePkmQuery.data?.data.find(savePkm => savePkm.idBase === attachedVersion.attachedSavePkmIdBase) : undefined;
+    const attachedSavePkm = attachedVersion ? pkmSavePkmQuery.data?.data.byIdBase[attachedVersion.attachedSavePkmIdBase!]?.[0] : undefined;
 
     const canCreateVersions =
         attachedVersion || !mainVersion.isEnabled

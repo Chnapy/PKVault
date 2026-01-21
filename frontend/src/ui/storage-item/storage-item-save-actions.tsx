@@ -1,6 +1,7 @@
 import type React from 'react';
+import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
 import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
-import { useStorageEvolvePkms, useStorageGetSavePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
+import { useStorageEvolvePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { getSaveOrder } from '../../storage/util/get-save-order';
@@ -23,7 +24,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
 
   const moveClickable = StorageMoveContext.useClickable(selected?.id ? [ selected.id ] : [], saveId);
 
-  const pkmSavePkmQuery = useStorageGetSavePkms(saveId ?? 0);
+  const pkmSavePkmQuery = usePkmSaveIndex(saveId ?? 0);
 
   const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
   const evolvePkmsMutation = useStorageEvolvePkms();
@@ -31,7 +32,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
 
   const pkmVersionIndex = usePkmVersionIndex();
 
-  const selectedPkm = pkmSavePkmQuery.data?.data.find(pkm => pkm.id === selected?.id);
+  const selectedPkm = pkmSavePkmQuery.data?.data.byId[ selected?.id ?? '' ];
   if (!selectedPkm) {
     return null;
   }

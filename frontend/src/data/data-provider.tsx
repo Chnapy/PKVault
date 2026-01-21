@@ -3,6 +3,8 @@ import React from 'react';
 import { filterIsDefined } from '../util/filter-is-defined';
 import { BackendErrorsContext } from './backend-errors-context';
 import { getPkmLegalityQueryKey, type PkmLegalityQueryData } from './hooks/use-pkm-legality';
+import { updatePkmSaveCache } from './hooks/use-pkm-save-index';
+import { updatePkmVersionCache } from './hooks/use-pkm-version-index';
 import { QueryError, responseBackSchema, type ResponseBack } from './mutator/custom-instance';
 import { getBackupGetAllQueryKey, type backupGetAllResponseSuccess } from './sdk/backup/backup.gen';
 import { getDexGetAllQueryKey, type dexGetAllResponseSuccess } from './sdk/dex/dex.gen';
@@ -14,12 +16,10 @@ import {
     getStorageGetActionsQueryKey,
     getStorageGetMainBanksQueryKey,
     getStorageGetMainBoxesQueryKey,
-    getStorageGetMainPkmVersionsQueryKey,
     getStorageGetSaveBoxesQueryKey,
     getStorageGetSavePkmsQueryKey,
     type storageGetActionsResponseSuccess,
     type storageGetSaveBoxesResponseSuccess,
-    type storageGetSavePkmsResponseSuccess,
 } from './sdk/storage/storage.gen';
 import { getWarningsGetWarningsQueryKey, type warningsGetWarningsResponseSuccess } from './sdk/warnings/warnings.gen';
 
@@ -30,7 +30,7 @@ const hasDataDTO = (obj: ResponseBack): obj is ResponseBack<DataDTO> =>
 
 export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const backendErrors = BackendErrorsContext.useValue();
-    const [client] = React.useState(
+    const [ client ] = React.useState(
         () =>
             new QueryClient({
                 defaultOptions: {
@@ -72,7 +72,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                                     }
 
                                     const oldResponse: Partial<{ data?: { id: string }[] }> = client.getQueryData(queryKey) ?? {};
-                                    const oldData = Object.fromEntries((oldResponse.data ?? []).map((item) => [item.id, item]));
+                                    const oldData = Object.fromEntries((oldResponse.data ?? []).map(item => [ item.id, item ]));
 
                                     return Object.values({
                                         ...oldData,
@@ -88,7 +88,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                             };
 
                             const applyPkmLegalities = (saveId: number, pkmLegalitiesMap: DataDTOStateOfDictionaryOfStringAndPkmLegalityDTOData) => {
-                                Object.entries(pkmLegalitiesMap).forEach(([pkmId, pkmLegality]) => {
+                                Object.entries(pkmLegalitiesMap).forEach(([ pkmId, pkmLegality ]) => {
                                     const queryKey = getPkmLegalityQueryKey(pkmId, saveId);
                                     if (pkmLegality) {
                                         client.setQueryData(queryKey, {
@@ -145,7 +145,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                             }
 
                             if (mainPkmVersions) {
-                                applyResponseData(mainPkmVersions, getStorageGetMainPkmVersionsQueryKey());
+                                updatePkmVersionCache(client, mainPkmVersions);
                             }
 
                             if (mainPkmLegalities) {
@@ -153,16 +153,16 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                             }
 
                             if (invalidateAllSaves) {
-                                const [saveBoxStart, saveBoxEnd] = getStorageGetSaveBoxesQueryKey(-999)[0].split('-999');
-                                const [savePkmStart, savePkmEnd] = getStorageGetSavePkmsQueryKey(-999)[0].split('-999');
+                                const [ saveBoxStart, saveBoxEnd ] = getStorageGetSaveBoxesQueryKey(-999)[ 0 ].split('-999');
+                                const [ savePkmStart, savePkmEnd ] = getStorageGetSavePkmsQueryKey(-999)[ 0 ].split('-999');
 
                                 const saveQueries = client.getQueryCache().findAll({
-                                    predicate: (query) => {
-                                        if (!Array.isArray(query.queryKey) || typeof query.queryKey[0] !== 'string') {
+                                    predicate: query => {
+                                        if (!Array.isArray(query.queryKey) || typeof query.queryKey[ 0 ] !== 'string') {
                                             return false;
                                         }
 
-                                        const queryKeyValue = query.queryKey[0];
+                                        const queryKeyValue = query.queryKey[ 0 ];
 
                                         const isSaveBoxQuery = queryKeyValue.startsWith(saveBoxStart!) && queryKeyValue.endsWith(saveBoxEnd!);
                                         const isSavePkmQuery = queryKeyValue.startsWith(savePkmStart!) && queryKeyValue.endsWith(savePkmEnd!);
@@ -170,8 +170,8 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                                         const saveId = +(isSaveBoxQuery
                                             ? queryKeyValue.slice(saveBoxStart!.length, -saveBoxEnd!.length)
                                             : isSavePkmQuery
-                                              ? queryKeyValue.slice(savePkmStart!.length, -savePkmEnd!.length)
-                                              : 0);
+                                                ? queryKeyValue.slice(savePkmStart!.length, -savePkmEnd!.length)
+                                                : 0);
 
                                         return saveId !== 0;
                                     },
@@ -180,10 +180,8 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                                 for (const query of saveQueries) {
                                     client.invalidateQueries({ queryKey: query.queryKey });
                                 }
-                            }
-
-                            if (saves) {
-                                saves.forEach((saveData) => {
+                            } else if (saves) {
+                                saves.forEach(saveData => {
                                     if (saveData.saveBoxes) {
                                         client.setQueryData(getStorageGetSaveBoxesQueryKey(saveData.saveId), {
                                             status: 200,
@@ -193,26 +191,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                                     }
 
                                     if (saveData.savePkms) {
-                                        const getData = (): storageGetSavePkmsResponseSuccess['data'] => {
-                                            if (saveData.savePkms?.all) {
-                                                return Object.values(saveData.savePkms.data ?? {}).filter(filterIsDefined);
-                                            }
-
-                                            const oldSavePkmsResponse: Partial<storageGetSavePkmsResponseSuccess> =
-                                                client.getQueryData(getStorageGetSavePkmsQueryKey(saveData.saveId)) ?? {};
-                                            const oldSavePkms = Object.fromEntries((oldSavePkmsResponse.data ?? []).map((savePkm) => [savePkm.id, savePkm]));
-
-                                            return Object.values({
-                                                ...oldSavePkms,
-                                                ...saveData.savePkms!.data,
-                                            }).filter(filterIsDefined);
-                                        };
-
-                                        client.setQueryData(getStorageGetSavePkmsQueryKey(saveData.saveId), {
-                                            status: 200,
-                                            headers: new Headers(),
-                                            data: getData(),
-                                        } satisfies storageGetSavePkmsResponseSuccess);
+                                        updatePkmSaveCache(client, saveData.saveId, saveData.savePkms);
                                     }
 
                                     if (saveData.savePkmLegality) {
