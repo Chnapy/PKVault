@@ -24,13 +24,13 @@ public class EntityLoaderUtil
         return mockBoxLoader;
     }
 
-    public static Mock<IPkmLoader> GetMockPkmLoader(
+    public static Mock<ILegacyPkmLoader> GetMockPkmLoader(
         string filename,
         byte[] content
     )
     {
 
-        Mock<IPkmLoader> mockPkmLoader = new();
+        Mock<ILegacyPkmLoader> mockPkmLoader = new();
         mockPkmLoader.Setup(x => x.FilePath).Returns(filename);
         mockPkmLoader.Setup(x => x.SerializeToUtf8Bytes()).Returns(content);
         return mockPkmLoader;

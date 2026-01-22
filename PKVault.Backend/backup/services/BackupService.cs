@@ -54,7 +54,6 @@ public class BackupService(
                     var entry = archive.CreateEntry(fileEntry.Key, CompressionLevel.Optimal);
                     using var entryStream = entry.Open();
                     entryStream.Write(fileContent, 0, fileContent.Length);
-                    // Console.WriteLine(fileEntry.Key);
                 }
             }
 

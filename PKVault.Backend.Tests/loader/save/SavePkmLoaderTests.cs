@@ -43,7 +43,7 @@ public class SavePkmLoaderTests : IAsyncLifetime
     {
         var save = new SAV3E();
         save.ID32 = 100;
-        return new SaveWrapper(save, "/test/save.sav");
+        return new SaveWrapper(save);
     }
 
     private ImmutablePKM CreateTestPkm(ushort species = 25)

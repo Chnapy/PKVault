@@ -10,18 +10,17 @@ public class DeletePkmVersionAction(string[] pkmVersionIds) : DataAction
         DataActionPayload act(string pkmVersionId)
         {
             var pkmVersion = loaders.pkmVersionLoader.GetDto(pkmVersionId);
-            var pkm = loaders.pkmLoader.GetEntity(pkmVersion.PkmId);
-            if (pkm.SaveId != null)
-            {
-                throw new ArgumentException($"Cannot delete pkm-version attached in save, pkm-version.id={pkmVersionId}");
-            }
 
             loaders.pkmVersionLoader.DeleteEntity(pkmVersionId);
 
-            var relatedPkmVersions = loaders.pkmVersionLoader.GetEntitiesByPkmId(pkm.Id);
-            if (relatedPkmVersions.Count == 0)
+            if (pkmVersion.IsMain)
             {
-                loaders.pkmLoader.DeleteEntity(pkm.Id);
+                var versions = loaders.pkmVersionLoader.GetEntitiesByBox(pkmVersion.BoxId, pkmVersion.BoxSlot);
+                if (versions.Count > 0)
+                {
+                    var newMainVersion = versions.First().Value;
+                    loaders.pkmVersionLoader.WriteEntity(newMainVersion with { IsMain = true });
+                }
             }
 
             return new(

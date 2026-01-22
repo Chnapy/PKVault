@@ -49,32 +49,4 @@ public class Dex3ColoService(SAV3Colosseum save) : DexGenService(save)
         if (isCaught)
             save.SetCaught(species, true);
     }
-
-    // private PKM? FindPKM(ushort species, SaveFile save)
-    // {
-
-    //     for (var i = 0; i < 6; i++)
-    //     {
-    //         var partyPkm = save.GetPartySlotAtIndex(i);
-    //         if (partyPkm.Species == species)
-    //         {
-    //             return partyPkm;
-    //         }
-    //     }
-
-    //     for (var i = 0; i < 8; i++)
-    //     {
-    //         for (var j = 0; j < 30; j++)
-    //         {
-    //             var boxPkm = save.GetBoxSlotAtIndex(i, j);
-    //             if (boxPkm.Species == species)
-    //             {
-    //                 return boxPkm;
-    //             }
-    //         }
-    //     }
-
-    //     return null;
-    // }
-
 }

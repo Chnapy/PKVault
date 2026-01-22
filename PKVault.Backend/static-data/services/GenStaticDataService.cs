@@ -797,7 +797,7 @@ public class GenStaticDataService(
                             continue;
                         }
 
-                        var blankSave = new SaveWrapper(BlankSaveFile.Get(saveVersion), "");
+                        var blankSave = new SaveWrapper(BlankSaveFile.Get(saveVersion));
                         var speciesAllowed = blankSave.IsSpeciesAllowed(evolveSpecies);
                         if (!speciesAllowed)
                         {

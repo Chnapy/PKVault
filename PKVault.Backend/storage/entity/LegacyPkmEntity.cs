@@ -1,4 +1,4 @@
-public record PkmEntity(
+public record LegacyPkmEntity(
     string Id,
     uint BoxId,
     uint BoxSlot,

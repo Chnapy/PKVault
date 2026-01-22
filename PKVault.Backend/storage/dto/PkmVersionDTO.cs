@@ -7,20 +7,30 @@ public record PkmVersionDTO(
     string SettingsLanguage,
     ImmutablePKM Pkm,
 
-    string PkmId,
+    int BoxId,
+    int BoxSlot,
+    bool IsMain,
+    uint? AttachedSaveId,
+    string? AttachedSavePkmIdBase,
+
     bool IsFilePresent,
     string Filepath,
     string FilepathAbsolute,
 
-    [property: JsonIgnore] VersionChecker VersionChecker
-) : BasePkmVersionDTO(
+    [property: JsonIgnore] VersionChecker VersionChecker,
+    Dictionary<ushort, StaticEvolve> Evolves
+) : PkmBaseDTO(
     Id,
     Generation,
+    BoxId,
+    BoxSlot,
+    IsDuplicate: false,
     SettingsLanguage,
-    Pkm
+    Pkm,
+    Evolves
 )
 {
-    public bool IsMain => Id == PkmId;
+    public bool CanMoveAttachedToSave => CanMoveToSave && AttachedSaveId == null;
+
     public IReadOnlyList<GameVersion> CompatibleWithVersions => VersionChecker.GetCompatibleVersionsForSpecies(Pkm.Species);
-    public bool CanDelete => !IsMain;
-};
+}

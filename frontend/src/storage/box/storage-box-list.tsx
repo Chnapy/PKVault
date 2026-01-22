@@ -14,7 +14,7 @@ import { BoxName } from './box-name';
 export const StorageBoxList: React.FC<{
     selectedBoxes: number[];
     boxes: BoxDTO[];
-    pkms: { id: string; boxId: number; boxSlot: number; }[];
+    pkms: { id: string; boxId: number; boxSlot: number }[];
     onBoxChange: (boxId: number) => void;
     editPanelContent?: (boxId: string, close: () => void) => React.ReactNode;
     deleteFn?: (boxId: string) => Promise<unknown>;
@@ -22,137 +22,150 @@ export const StorageBoxList: React.FC<{
 }> = ({ selectedBoxes, boxes, pkms, onBoxChange, editPanelContent, deleteFn, addFn }) => {
     const { t } = useTranslate();
 
-    const hasBigBoxes = boxes.some(box => box.slotCount > 20);
+    const maxBoxSlotCount = Math.max(0, ...boxes.map(box => box.slotCount));
+    const nbrItemsPerLine = SizingUtil.getItemsPerLine(maxBoxSlotCount);
 
-    return <div
-        className={css({
-            maxWidth: SizingUtil.getMaxWidth(hasBigBoxes ? 6 : 5),
-            maxHeight: SizingUtil.getMaxHeight(),
-            display: 'flex',
-            alignItems: 'flex-start',
-            flexWrap: 'wrap',
-            gap: SizingUtil.itemsGap,
-            margin: 4,
-            marginTop: 8,
-            overflowY: 'auto',
-        })}
-    >
-        {boxes.map(box => {
+    return (
+        <div
+            className={css({
+                maxWidth: SizingUtil.getMaxWidth(nbrItemsPerLine),
+                maxHeight: SizingUtil.getMaxHeight(),
+                display: 'flex',
+                alignItems: 'flex-start',
+                flexWrap: 'wrap',
+                gap: SizingUtil.itemsGap,
+                margin: 4,
+                marginTop: 8,
+                overflowY: 'auto',
+            })}
+        >
+            {boxes.map(box => {
+                const nbrItemsPerLine = SizingUtil.getItemsPerLine(box.slotCount);
 
-            const boxPkmsList = pkms.filter(pkm => pkm.boxId === box.idInt);
+                const boxPkmsList = pkms.filter(pkm => pkm.boxId === box.idInt);
 
-            const boxPkms = Object.fromEntries(
-                boxPkmsList.map((pkm) => [ pkm.boxSlot, pkm ])
-            );
+                const boxPkms = Object.fromEntries(boxPkmsList.map(pkm => [ pkm.boxSlot, pkm ]));
 
-            const allItems = new Array(box.slotCount)
-                .fill(null)
-                .map((_, i): typeof boxPkms[ number ] | null => boxPkms[ i ] ?? null);
+                const allItems = new Array(box.slotCount).fill(null).map((_, i): (typeof boxPkms)[ number ] | null => boxPkms[ i ] ?? null);
 
-            const canEditBox = !!editPanelContent;
-            const canDeleteBox = !!deleteFn && boxes.length > 1 && boxPkmsList.length === 0;
+                const canEditBox = !!editPanelContent;
+                const canDeleteBox = !!deleteFn && boxes.length > 1 && boxPkmsList.length === 0;
 
-            return <div
-                key={box.id}
-                className={css({
-                    display: 'inline-flex',
-                })}
-                style={{ order: box.order }}
-            >
-                <Button
-                    onClick={() => onBoxChange(box.idInt)}
-                    selected={selectedBoxes.includes(box.idInt)}
-                    // disabled={selectedBoxes.includes(box.idInt)}
-                    // loading={isLoading}
-                    className={css({
-                        zIndex: 1,
-                        borderTopRightRadius: 0,
-                        borderBottomRightRadius: 0,
-                    })}
-                >
-                    <div className={css({
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        height: '100%'
-                    })}>
-                        <BoxName
-                            boxType={box.type}
-                            boxName={box.name}
-                        />
-
-                        <div
+                return (
+                    <div
+                        key={box.id}
+                        className={css({
+                            display: 'inline-flex',
+                        })}
+                        style={{ order: box.order }}
+                    >
+                        <Button
+                            onClick={() => onBoxChange(box.idInt)}
+                            selected={selectedBoxes.includes(box.idInt)}
+                            // disabled={selectedBoxes.includes(box.idInt)}
+                            // loading={isLoading}
                             className={css({
-                                width: 58,
-                                display: "grid",
-                                gridTemplateColumns: `repeat(${hasBigBoxes || box.slotCount === 6 ? 6 : 5}, 1fr)`,
-                                marginBottom: 2,
+                                zIndex: 1,
+                                borderTopRightRadius: 0,
+                                borderBottomRightRadius: 0,
                             })}
                         >
-                            {allItems.map((pkm, i) => <div
-                                key={i}
+                            <div
                                 className={css({
                                     display: 'flex',
+                                    flexDirection: 'column',
                                     alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: 58 / 6,
-                                    height: 58 / 6,
-                                    borderWidth: 1,
-                                    borderStyle: 'solid',
-                                    borderColor: '#aaa',
+                                    height: '100%',
                                 })}
-                                style={{ order: i }}
                             >
-                                {pkm && <div className={css({
-                                    width: '60%',
-                                    height: '60%',
-                                    borderRadius: 50,
-                                    backgroundColor: theme.bg.default,
-                                })} />}
-                            </div>)}
+                                <BoxName boxType={box.type} boxName={box.name} />
+
+                                <div
+                                    className={css({
+                                        // width: 58,
+                                        display: 'grid',
+                                        gridTemplateColumns: `repeat(${nbrItemsPerLine}, 1fr)`,
+                                        marginBottom: 2,
+                                    })}
+                                >
+                                    {allItems.map((pkm, i) => (
+                                        <div
+                                            key={i}
+                                            className={css({
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                width: 58 / 6,
+                                                height: 58 / 6,
+                                                borderWidth: 1,
+                                                borderStyle: 'solid',
+                                                borderColor: '#aaa',
+                                            })}
+                                            style={{ order: i }}
+                                        >
+                                            {pkm && (
+                                                <div
+                                                    className={css({
+                                                        width: '60%',
+                                                        height: '60%',
+                                                        borderRadius: 50,
+                                                        backgroundColor: theme.bg.default,
+                                                    })}
+                                                />
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </Button>
+
+                        <div>
+                            <ButtonWithPopover
+                                panelContent={close => editPanelContent?.(box.id, close)}
+                                // loading={isLoading}
+                                disabled={!canEditBox}
+                                className={css({
+                                    borderTopLeftRadius: 0,
+                                    borderBottomLeftRadius: 0,
+                                    borderBottomRightRadius: 0,
+                                })}
+                            >
+                                <Icon name='pen' forButton />
+                            </ButtonWithPopover>
+
+                            <ButtonWithDisabledPopover
+                                as={ButtonWithConfirm}
+                                helpTitle={t('storage.box.delete.help')}
+                                showHelp={!canDeleteBox}
+                                onClick={deleteFn && (() => deleteFn(box.id))}
+                                disabled={!canDeleteBox}
+                                // loading={isLoading}
+                                className={css({
+                                    borderTopLeftRadius: 0,
+                                    borderBottomLeftRadius: 0,
+                                    borderTopRightRadius: 0,
+                                })}
+                            >
+                                <Icon name='trash' solid forButton />
+                            </ButtonWithDisabledPopover>
                         </div>
                     </div>
+                );
+            })}
+
+            {addFn && (
+                <Button
+                    bgColor={theme.bg.primary}
+                    onClick={addFn}
+                    className={css({
+                        width: 72,
+                        minHeight: 78,
+                        order: 999,
+                    })}
+                >
+                    <Icon name='plus' solid forButton />
                 </Button>
-
-                <div>
-                    <ButtonWithPopover
-                        panelContent={close => editPanelContent?.(box.id, close)}
-                        // loading={isLoading}
-                        disabled={!canEditBox}
-                        className={css({
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            borderBottomRightRadius: 0,
-                        })}
-                    >
-                        <Icon name='pen' forButton />
-                    </ButtonWithPopover>
-
-                    <ButtonWithDisabledPopover
-                        as={ButtonWithConfirm}
-                        helpTitle={t('storage.box.delete.help')}
-                        showHelp={!canDeleteBox}
-                        onClick={deleteFn && (() => deleteFn(box.id))}
-                        disabled={!canDeleteBox}
-                        // loading={isLoading}
-                        className={css({
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            borderTopRightRadius: 0,
-                        })}
-                    >
-                        <Icon name='trash' solid forButton />
-                    </ButtonWithDisabledPopover>
-                </div>
-            </div>;
-        })}
-
-        {addFn && <Button bgColor={theme.bg.primary} onClick={addFn} className={css({
-            width: 72,
-            minHeight: 78,
-            order: 999,
-        })}>
-            <Icon name='plus' solid forButton />
-        </Button>}
-    </div>;
+            )}
+        </div>
+    );
 };

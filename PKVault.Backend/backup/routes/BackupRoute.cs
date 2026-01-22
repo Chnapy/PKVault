@@ -30,11 +30,8 @@ public class BackupController(BackupService backupService, DataService dataServi
         {
             MainBanks = new() { All = true },
             MainBoxes = new() { All = true },
-            MainPkms = new() { All = true },
             MainPkmVersions = new() { All = true },
             Saves = new() { All = true },
-            // Actions = true,
-            // Warnings = true,
             SaveInfos = true,
             Backups = true,
             Warnings = true,

@@ -9,11 +9,6 @@ public class EditPkmSaveAction(
         var saveLoaders = loaders.saveLoadersDict[saveId];
         var pkmSave = saveLoaders.Pkms.GetDto(pkmSaveId);
 
-        // if (pkmSave.PkmVersionId != default)
-        // {
-        //     throw new Exception("Edit not possible for pkm attached with save");
-        // }
-
         var availableMoves = await actionService.GetPkmAvailableMoves(saveId, pkmSaveId);
 
         var pkm = pkmSave!.Pkm.Update(pkm =>
@@ -30,10 +25,10 @@ public class EditPkmSaveAction(
 
         saveLoaders.Pkms.WriteDto(pkmSave with { Pkm = pkm });
 
-        var pkmVersion = loaders.pkmVersionLoader.GetPkmSaveVersion(pkmSave);
+        var pkmVersion = loaders.pkmVersionLoader.GetEntityBySave(pkmSave.SaveId, pkmSave.IdBase);
         if (pkmVersion != null)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersion.PkmId, pkmSave.Id)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersion.Id, pkmSave.IdBase)]);
         }
 
         return new(

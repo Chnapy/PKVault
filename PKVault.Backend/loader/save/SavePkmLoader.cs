@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using PKHeX.Core;
 
 public interface ISavePkmLoader
@@ -8,6 +9,7 @@ public interface ISavePkmLoader
     public List<PkmSaveDTO> GetAllDtos();
     public PkmSaveDTO? GetDto(string id);
     public PkmSaveDTO? GetDto(int box, int boxSlot);
+    public ImmutableDictionary<string, PkmSaveDTO> GetDtosByIdBase(string idBase);
     public void WriteDto(PkmSaveDTO dto);
     public void DeleteDto(string id);
     public void FlushParty();
@@ -40,7 +42,6 @@ public class SavePkmLoader(
             SettingsLanguage: language,
             Pkm: pkm,
 
-            SaveId: save.Id,
             BoxId: boxId,
             BoxSlot: boxSlot,
             IsDuplicate: false,
@@ -154,13 +155,6 @@ public class SavePkmLoader(
             duplicateDict.Add(dto.Id, dto);
         }
 
-        // duplicatesDictByIdBase.Values.Where(list => list.Count > 1).SelectMany(list => list.Values).ToList().ForEach(dto =>
-        // {
-        //     dto = dto with { IsDuplicate = true };
-        //     dictById[dto.Id] = dto;
-        //     dictByBox[GetDTOByBoxKey(dto.BoxId, dto.BoxSlot)] = dto;
-        // });
-
         dtoById = dictById;
         dtoByBox = dictByBox;
         dtosByIdBase = duplicatesDictByIdBase;
@@ -205,6 +199,21 @@ public class SavePkmLoader(
         }
 
         return null;
+    }
+
+    public ImmutableDictionary<string, PkmSaveDTO> GetDtosByIdBase(string idBase)
+    {
+        if (NeedUpdate)
+        {
+            UpdateDtos();
+        }
+
+        if (dtosByIdBase.TryGetValue(idBase, out var dtoDict))
+        {
+            return dtoDict.ToImmutableDictionary();
+        }
+
+        return [];
     }
 
     private PkmSaveDTO DTOWithDuplicateCheck(PkmSaveDTO dto)

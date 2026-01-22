@@ -1,42 +1,41 @@
 import type React from 'react';
-import { useStorageGetMainPkms, useStorageGetMainPkmVersions } from '../../data/sdk/storage/storage.gen';
+import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
 import { TitledContainer } from '../container/titled-container';
 import { DetailsLevel } from '../details-card/details-level';
 import { Icon } from '../icon/icon';
 
-export const StorageItemMainActionsContainer: React.FC<React.PropsWithChildren<{
-    pkmId: string;
-}>> = ({ pkmId, children }) => {
-    const mainPkmQuery = useStorageGetMainPkms();
-    const mainPkmVersionQuery = useStorageGetMainPkmVersions();
+export const StorageItemMainActionsContainer: React.FC<
+    React.PropsWithChildren<{
+        pkmId: string;
+    }>
+> = ({ pkmId, children }) => {
+    const mainPkmVersionQuery = usePkmVersionIndex();
 
-    const selectedPkm = mainPkmQuery.data?.data.find(pkm => pkm.id === pkmId);
+    const selectedPkm = mainPkmVersionQuery.data?.data.byId[ pkmId ];
     if (!selectedPkm) {
         return null;
     }
 
-    const pkmVersions = mainPkmVersionQuery.data?.data.filter(version => version.pkmId === selectedPkm.id) ?? [];
-    const mainPkmVersion = pkmVersions.find(pk => pk.isMain);
-    if (!mainPkmVersion) {
-        return null;
-    }
-    const { nickname, level, isEnabled } = mainPkmVersion;
+    const { nickname, level, isEnabled } = selectedPkm;
 
-    const title = isEnabled && <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-    }}>
-        <Icon name='angle-left' solid forButton />
-        {nickname}{' '}
-        <DetailsLevel level={level} />
-    </div>;
+    const title = isEnabled && (
+        <div
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+            }}
+        >
+            <Icon name='angle-left' solid forButton />
+            {nickname} <DetailsLevel level={level} />
+        </div>
+    );
 
-    return (title || children) && <TitledContainer
-        contrasted
-        enableExpand
-        title={title}
-    >
-        {children}
-    </TitledContainer>;
+    return (
+        (title || children) && (
+            <TitledContainer contrasted enableExpand title={title}>
+                {children}
+            </TitledContainer>
+        )
+    );
 };

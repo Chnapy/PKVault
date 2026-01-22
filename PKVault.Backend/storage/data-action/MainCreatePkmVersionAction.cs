@@ -1,6 +1,6 @@
 public class MainCreatePkmVersionAction(
     PkmConvertService pkmConvertService, Dictionary<ushort, StaticEvolve> evolves,
-    string pkmId, byte generation
+    string pkmVersionId, byte generation
 ) : DataAction
 {
     // required to keep same generated PID between memory => file loaders
@@ -9,29 +9,28 @@ public class MainCreatePkmVersionAction(
 
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        Console.WriteLine($"Create PKM version, pkmId={pkmId}, generation={generation}");
+        Console.WriteLine($"Create PKM version, pkmVersionId={pkmVersionId}, generation={generation}");
 
-        var pkmDto = loaders.pkmLoader.GetDto(pkmId);
-        if (pkmDto == default)
+        var pkmVersionOrigin = loaders.pkmVersionLoader.GetEntity(pkmVersionId);
+        if (pkmVersionOrigin == default)
         {
-            throw new KeyNotFoundException($"Pkm entity not found, id={pkmId}");
+            throw new ArgumentException($"Pkm-version original not found, pkmVersion.id={pkmVersionId} generation={generation}");
         }
 
-        var pkmVersions = loaders.pkmVersionLoader.GetDtosByPkmId(pkmId).Values.ToList();
+        if (!pkmVersionOrigin.IsMain)
+        {
+            throw new ArgumentException($"Pkm-version should have IsMain=true, pkmVersion.id={pkmVersionId} generation={generation}");
+        }
+
+        var pkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox(pkmVersionOrigin.BoxId, pkmVersionOrigin.BoxSlot).Values.ToList();
 
         var pkmVersionEntity = pkmVersions.Find(pkmVersion => pkmVersion.Generation == generation);
         if (pkmVersionEntity != default)
         {
-            throw new ArgumentException($"Pkm-version already exists, pkm.id={pkmId} generation={generation}");
+            throw new ArgumentException($"Pkm-version already exists, pkmVersion.id={pkmVersionEntity.Id} generation={generation}");
         }
 
-        var pkmVersionOrigin = pkmVersions.Find(pkmVersion => pkmVersion.IsMain);
-        if (pkmVersionOrigin == default)
-        {
-            throw new ArgumentException($"Pkm-version original not found, pkm.id={pkmId} generation={generation}");
-        }
-
-        var pkmOrigin = pkmVersionOrigin.Pkm;
+        var pkmOrigin = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionOrigin);
 
         var pkmConverted = pkmConvertService.GetConvertedPkm(pkmOrigin, generation, createdPid);
         createdPid = pkmConverted.PID;
@@ -39,14 +38,18 @@ public class MainCreatePkmVersionAction(
         loaders.pkmVersionLoader.WriteEntity(new(
             SchemaVersion: loaders.pkmVersionLoader.GetLastSchemaVersion(),
             Id: pkmConverted.GetPKMIdBase(evolves),
-            PkmId: pkmId,
+            BoxId: pkmVersionOrigin.BoxId,
+            BoxSlot: pkmVersionOrigin.BoxSlot,
+            IsMain: false,
+            AttachedSaveId: null,
+            AttachedSavePkmIdBase: null,
             Generation: generation,
             Filepath: loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkmConverted, evolves)
         ), pkmConverted);
 
         return new(
             type: DataActionType.MAIN_CREATE_PKM_VERSION,
-            parameters: [pkmVersionOrigin.Nickname, generation]
+            parameters: [pkmOrigin.Nickname, generation]
         );
     }
 }

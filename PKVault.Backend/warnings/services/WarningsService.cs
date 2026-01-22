@@ -1,5 +1,3 @@
-using PKHeX.Core;
-
 /**
  * Warnings checks in current session data.
  */
@@ -27,7 +25,6 @@ public class WarningsService(ILoadersService loadersService, ISaveService saveSe
 
         WarningsDTO = new(
             SaveChangedWarnings: await saveChangedWarnings,
-            PlayTimeWarnings: CheckPlayTimeWarning(),
             PkmVersionWarnings: await pkmVersionWarnings,
             SaveDuplicateWarnings: await saveDuplicateWarnings
         );
@@ -69,85 +66,37 @@ public class WarningsService(ILoadersService loadersService, ISaveService saveSe
             .Select(saveLoaders => new SaveChangedWarning( SaveId: saveLoaders.Save.Id ))];
     }
 
-    private List<PlayTimeWarning> CheckPlayTimeWarning()
-    {
-        var warns = new List<PlayTimeWarning>();
-
-        // LocalSaveService.SaveByPath.Keys.ToList().ForEach(path =>
-        // {
-        //     var save = LocalSaveService.SaveByPath[path];
-
-        //     var fileName = Path.GetFileNameWithoutExtension(path);
-        //     var ext = Path.GetExtension(path);
-
-        //     var dirPath = Path.GetDirectoryName(path)!;
-
-        //     var bkpDirPath = Path.Combine(dirPath, Settings.backupDir);
-        //     var bkpFileName = $"{fileName}_*{ext}";
-        //     var bkpFilePath = Path.Combine(bkpDirPath, bkpFileName);
-
-        //     var matcher = new Matcher();
-        //     matcher.AddInclude(bkpFilePath);
-        //     var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(Settings.rootDir)));
-
-        //     var bkpPaths = matches.Files.Select(file => Path.Combine(Settings.rootDir, file.Path)).ToList();
-        //     bkpPaths.Sort();
-        //     bkpPaths.Reverse();
-
-        //     if (bkpPaths.Count > 0)
-        //     {
-        //         var previousSave = SaveUtil.GetVariantSAV(bkpPaths[0]);
-
-        //         if (GetSavePlayTimeS(save) < GetSavePlayTimeS(previousSave!))
-        //         {
-        //             Console.WriteLine($"Play-time warning");
-
-        //             warns.Add(new PlayTimeWarning()
-        //             {
-        //                 SaveId = save.ID32,
-        //             });
-        //         }
-        //     }
-        // });
-
-        return warns;
-    }
-
     private async Task<List<PkmVersionWarning>> CheckPkmVersionWarnings()
     {
         var warns = new List<PkmVersionWarning>();
 
         var loaders = await loadersService.GetLoaders();
 
-        var pkms = loaders.pkmLoader.GetAllDtos();
+        var pkms = loaders.pkmVersionLoader.GetAllEntities();
 
-        var tasks = pkms.Select(pkm =>
+        var tasks = pkms.Values.Select(pkmVersion =>
         {
-            if (pkm.SaveId != default)
+            if (pkmVersion.AttachedSaveId != default)
             {
-                var exists = loaders.saveLoadersDict.TryGetValue((uint)pkm.SaveId!, out var saveLoader);
+                var exists = loaders.saveLoadersDict.TryGetValue((uint)pkmVersion.AttachedSaveId!, out var saveLoader);
                 if (!exists)
                 {
                     return new PkmVersionWarning(
-                        PkmId: pkm.Id
+                        PkmVersionId: pkmVersion.Id
                     );
                 }
 
                 var save = saveLoader.Save;
                 var generation = save.Generation;
 
-                var pkmVersion = loaders.pkmVersionLoader.GetEntitiesByPkmId(pkm.Id).Values.ToList()
-                    .Find(pkmVersion => pkmVersion.Generation == generation);
-
-                var savePkm = pkmVersion == null ? null : saveLoader.Pkms.GetAllDtos().Find(pkm => loaders.pkmVersionLoader.GetPkmSaveVersion(pkm)?.Id == pkmVersion.Id);
+                var savePkm = saveLoader.Pkms.GetDtosByIdBase(pkmVersion.AttachedSavePkmIdBase ?? "");
 
                 if (savePkm == null)
                 {
                     Console.WriteLine($"Pkm-version warning");
 
                     return new PkmVersionWarning(
-                        PkmId: pkm.Id,
-                        PkmVersionId: pkmVersion?.Id
+                        PkmVersionId: pkmVersion.Id
                     );
                 }
             }
@@ -184,11 +133,4 @@ public class WarningsService(ILoadersService loadersService, ISaveService saveSe
 
         return (await Task.WhenAll(tasks)).ToList().FindAll(warn => warn.Paths.Length > 1);
     }
-
-    // private int GetSavePlayTimeS(SaveFile save)
-    // {
-    //     return save.PlayedHours * 60 * 60
-    //     + save.PlayedMinutes * 60
-    //      + save.PlayedSeconds;
-    // }
 }

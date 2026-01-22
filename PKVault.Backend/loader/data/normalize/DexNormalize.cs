@@ -3,13 +3,15 @@ public class DexNormalize(IDexLoader loader) : DataNormalize<DexItemDTO, DexEnti
     public override void SetupInitialData(DataEntityLoaders loaders)
     {
         var dexService = new DexMainService(loaders);
-        loaders.pkmVersionLoader.GetAllDtos().ForEach(pkmVersion =>
-        {
-            if (pkmVersion.Pkm.IsEnabled)
+        loaders.pkmVersionLoader.GetAllEntities().Values
+            .Select(loaders.pkmVersionLoader.GetPkmVersionEntityPkm).ToList()
+            .ForEach(pkm =>
             {
-                dexService.EnablePKM(pkmVersion.Pkm, createOnly: true);
-            }
-        });
+                if (pkm.IsEnabled)
+                {
+                    dexService.EnablePKM(pkm, createOnly: true);
+                }
+            });
     }
 
     protected override Action<DataEntityLoaders>? GetMigrateFunc(int currentSchemaVersion) => currentSchemaVersion switch

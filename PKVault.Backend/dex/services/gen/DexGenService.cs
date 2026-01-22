@@ -2,8 +2,6 @@ using PKHeX.Core;
 
 public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 {
-    // protected readonly SaveFile save = _save;
-
     public virtual bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData)
     {
         // var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
@@ -43,14 +41,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
                 dex.Add(species, arr);
             }
             arr[save.ID32] = item;
-
-            // tasks.Add(Task.Run(async () =>
-            // {
-            //     var pkmDtos = await saveLoader.Pkms.GetDtos(i);
-            // }));
         }
-
-        // await Task.WhenAll(tasks);
 
         // logtime();
 

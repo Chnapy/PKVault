@@ -63,7 +63,6 @@ public class SaveInfosController(DataService dataService, ISaveService saveServi
         var saveById = await saveService.GetSaveById();
 
         var save = saveById[saveId].Clone();
-        // var path = LocalSaveService.SaveByPath.Keys.ToList().Find(key => LocalSaveService.SaveByPath[key].ID32 == saveId);
 
         var filename = save.Metadata.FileName;
 

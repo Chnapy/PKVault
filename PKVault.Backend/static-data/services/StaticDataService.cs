@@ -29,13 +29,6 @@ public class StaticDataService(ISettingsService settingsService)
         return staticData;
     }
 
-    // public static StaticDataDTO GetDefinedStaticDataDTO()
-    // {
-    //     return StaticDataDict.TryGetValue(SettingsService.DefaultLanguage, out var staticData)
-    //         ? staticData
-    //         : throw new InvalidOperationException($"Static Data is null");
-    // }
-
     public async Task<Stream> GetSpritesheetStream(string sheetName)
     {
         return await spritesheetFileClient.GetAsyncString(sheetName);

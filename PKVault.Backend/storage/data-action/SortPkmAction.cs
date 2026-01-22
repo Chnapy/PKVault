@@ -73,28 +73,48 @@ public class SortPkmAction(
 
         var bankId = boxes[0].BankId;
 
-        var pkms = loaders.pkmLoader.GetAllDtos().FindAll(pkm => boxesIds.Contains((int)pkm.BoxId));
-        if (pkms.Count > 0)
+        var pkms = boxesIds.SelectMany(boxId =>
+            loaders.pkmVersionLoader.GetEntitiesByBox(boxId).Select(dict => dict.Value)
+        ).SelectMany(dict => dict.Values).Where(pk => pk.IsMain);
+        if (pkms.Any())
         {
-            List<PkmVersionDTO> pkmVersions = GetSortedPkms(
-                pkms: [.. pkms.Select(pkm => loaders.pkmVersionLoader.GetDtosByPkmId(pkm.Id).Values.ToList().Find(dto => dto.IsMain)!)],
-                GetSpecies: pkmVersion => pkmVersion.Species,
-                GetForm: pkmVersion => pkmVersion.Form,
-                GetGender: pkmVersion => pkmVersion.Gender
+            var filteredPkms = pkms
+                .Select(mainVersion =>
+                {
+                    var mainVersionPkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(mainVersion);
+                    return (Version: mainVersion, Pkm: mainVersionPkm);
+                });
+
+            var pkmVersions = GetSortedPkms(
+                pkms: [.. filteredPkms],
+                GetSpecies: pkmVersion => pkmVersion.Pkm.Species,
+                GetForm: pkmVersion => pkmVersion.Pkm.Form,
+                GetGender: pkmVersion => pkmVersion.Pkm.Gender
             );
-            var pkmSpecies = pkmVersions.Select(pkm => pkm.Species).ToList();
+            var pkmSpecies = pkmVersions.Select(pkm => pkm.Pkm.Species).ToList();
+
+            // required to avoid conflicts
+            HashSet<string> placedVersions = [];
 
             RunSort(
                 boxes,
                 pkmSpecies,
                 applyValue: (entry) =>
                 {
-                    var currentValue = pkmVersions[entry.Index];
-                    var entity = loaders.pkmLoader.GetEntity(currentValue.PkmId);
-                    loaders.pkmLoader.WriteEntity(entity with
+                    var currentValue = pkmVersions[entry.Index].Version;
+                    var currentPkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(currentValue);
+
+                    var entities = loaders.pkmVersionLoader.GetEntitiesByBox(currentValue.BoxId, currentValue.BoxSlot).Values
+                        .Where(version => !placedVersions.Contains(version.Id));
+                    entities.ToList().ForEach(entity =>
                     {
-                        BoxId = (uint)entry.BoxId,
-                        BoxSlot = (uint)entry.BoxSlot
+                        loaders.pkmVersionLoader.WriteEntity(entity with
+                        {
+                            BoxId = entry.BoxId,
+                            BoxSlot = entry.BoxSlot
+                        });
+
+                        placedVersions.Add(entity.Id);
                     });
                 },
                 onSpaceMissing: () =>
@@ -139,6 +159,8 @@ public class SortPkmAction(
     private void RunSort(List<BoxDTO> boxes, List<ushort> pkmSpecies, Action<(int Index, int BoxId, int BoxSlot)> applyValue, Action onSpaceMissing)
     {
         var lastSpecies = pkmSpecies.Last();
+        // starts from 0 only to handle disabled pkms
+        var minSpecies = pkmSpecies.First() == 0 ? 0 : 1;
 
         var currentIndex = 0;
         var currentBoxIndex = 0;
@@ -170,8 +192,7 @@ public class SortPkmAction(
             }
         }
 
-        // starts from 0 to handle disabled pkms
-        for (var species = 0; species <= lastSpecies; species++)
+        for (var species = minSpecies; species <= lastSpecies; species++)
         {
             var currentBox = GetCurrentBox();
 
@@ -210,7 +231,5 @@ public class SortPkmAction(
                 }
             }
         }
-
-        // new Set(temp2.map(p => p.boxId + '.' + p.boxSlot)).size === temp2.length
     }
 }

@@ -65,13 +65,13 @@ public class LoadersService : ILoadersService
 
         var bankLoader = new BankLoader(fileIOService, settings.SettingsMutable.DB_PATH);
         var boxLoader = new BoxLoader(fileIOService, settings.SettingsMutable.DB_PATH);
-        var pkmLoader = new PkmLoader(fileIOService, settingsService);
+        var legacyPkmLoader = new LegacyPkmLoader(fileIOService, settingsService);
         var pkmVersionLoader = new PkmVersionLoader(
             fileIOService,
             _appPath: settings.AppDirectory, dbPath: settings.SettingsMutable.DB_PATH,
             storagePath: settings.SettingsMutable.STORAGE_PATH, _language: settings.GetSafeLanguage(),
-            staticData.Evolves,
-            pkmLoader);
+            staticData.Evolves
+        );
         var dexLoader = new DexLoader(fileIOService, settingsService);
         var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
 
@@ -92,7 +92,7 @@ public class LoadersService : ILoadersService
         {
             bankLoader = bankLoader,
             boxLoader = boxLoader,
-            pkmLoader = pkmLoader,
+            legacyPkmLoader = legacyPkmLoader,
             pkmVersionLoader = pkmVersionLoader,
             dexLoader = dexLoader,
             saveLoadersDict = saveLoadersDict,
@@ -157,7 +157,7 @@ public class LoadersService : ILoadersService
     {
         var staticData = await staticDataService.GetStaticData();
 
-        (string PkmId, string SavePkmId)[][] synchronizationData = await SynchronizePkmAction.GetSavesPkmsToSynchronize(loaders);
+        (string PkmVersionId, string SavePkmId)[][] synchronizationData = await SynchronizePkmAction.GetSavesPkmsToSynchronize(loaders);
 
         foreach (var data in synchronizationData)
         {

@@ -1,44 +1,37 @@
 import React from 'react';
 import { usePkmLegality } from '../data/hooks/use-pkm-legality';
-import { usePkmSaveVersion } from '../data/hooks/use-pkm-save-version';
+import { usePkmSaveIndex } from '../data/hooks/use-pkm-save-index';
+import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
 import { Gender as GenderType } from '../data/sdk/model';
-import { useStorageGetSavePkms } from '../data/sdk/storage/storage.gen';
-import { useStaticData } from '../hooks/use-static-data';
 import type { ButtonLikeProps } from '../ui/button/button-like';
 import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
 
-export type StorageSaveItemBaseProps = ButtonLikeProps & Pick<StorageItemProps, 'anchor' | 'helpTitle' | 'small' | 'checked' | 'onCheck'> & {
-    saveId: number;
-    pkmId: string;
-};
+export type StorageSaveItemBaseProps = ButtonLikeProps &
+    Pick<StorageItemProps, 'anchor' | 'helpTitle' | 'small' | 'checked' | 'onCheck'> & {
+        saveId: number;
+        pkmId: string;
+    };
 
 export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.memo(({ saveId, pkmId, ...rest }) => {
-    const staticData = useStaticData();
+    const savePkmsQuery = usePkmSaveIndex(saveId);
 
-    const savePkmsQuery = useStorageGetSavePkms(saveId);
-
-    const getPkmSaveVersion = usePkmSaveVersion();
+    const pkmVersionIndex = usePkmVersionIndex();
 
     const pkmLegalityQuery = usePkmLegality(pkmId, saveId);
     const pkmLegality = pkmLegalityQuery.data?.data;
 
-    const savePkm = savePkmsQuery.data?.data.find(pkm => pkm.id === pkmId);
+    const savePkm = savePkmsQuery.data?.data.byId[ pkmId ];
 
     if (!savePkm) {
         return null;
     }
 
-    const { species, version, form, gender, isAlpha, isShiny, isEgg, isShadow, heldItemPokeapiName, level } = savePkm;
+    const { species, form, gender, isAlpha, isShiny, isEgg, isShadow, canEvolve } = savePkm;
 
-    const staticEvolves = staticData.evolves[ species ];
-    const evolveSpecies = staticEvolves?.trade[ version ] ?? staticEvolves?.tradeWithItem[ heldItemPokeapiName ?? '' ]?.[ version ];
-
-    // const attachedVersionPkm = savePkm.pkmVersionId ? allPkmVersions.find(savePkm => savePkm.pkmVersionId && pkmVersionsIds.includes(savePkm.pkmVersionId)) : undefined;
-    const attachedPkmVersion = getPkmSaveVersion(savePkm.idBase, savePkm.saveId);
+    const attachedPkmVersion = pkmVersionIndex.data?.data.byAttachedSave[ savePkm.saveId ]?.[ savePkm.idBase ];
     const saveSynchronized = savePkm.dynamicChecksum === attachedPkmVersion?.dynamicChecksum;
 
     const canMoveAttached = !attachedPkmVersion && !isEgg && !isShadow;
-    const canEvolve = !!evolveSpecies && level >= evolveSpecies.minLevel;
     const canDetach = !!attachedPkmVersion;
     const canSynchronize = !!attachedPkmVersion && !saveSynchronized;
 

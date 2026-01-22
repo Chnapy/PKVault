@@ -140,7 +140,7 @@ public class SaveService : ISaveService
             if (saveRaw.Generation <= 3)
                 SaveLanguage.TryRevise(saveRaw);
 
-            SaveWrapper save = new(saveRaw, path);
+            SaveWrapper save = new(saveRaw);
 
             UpdateGlobalsWithSave(SaveById, SaveByPath, save, path);
 
@@ -160,32 +160,4 @@ public class SaveService : ISaveService
         SaveByPath[path] = save;
         SaveById[save.Id] = save;
     }
-
-    // public async Task<DataUpdateFlags> UploadNewSave(byte[] fileBytes, string formFilename)
-    // {
-    //     if (!StorageService.HasEmptyActionList())
-    //     {
-    //         throw new Exception("Storage has waiting actions");
-    //     }
-
-    //     var flags = new DataUpdateFlags();
-
-    //     var save = SaveUtil.GetVariantSAV(fileBytes, formFilename)!;
-
-    //     await BackupService.PrepareBackupThenRun(async () =>
-    //     {
-    //         WriteSave(save);
-    //     });
-
-    //     flags.Saves.Add(new()
-    //     {
-    //         SaveId = save.ID32,
-    //         SaveBoxes = true,
-    //         SavePkms = true
-    //     });
-    //     flags.SaveInfos = true;
-    //     flags.Backups = true;
-
-    //     return flags;
-    // }
 }

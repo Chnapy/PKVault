@@ -7,13 +7,12 @@ public class EditPkmVersionAction(
 {
     protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
     {
-        var pkmVersionDto = loaders.pkmVersionLoader.GetDto(pkmVersionId);
         var pkmVersionEntity = loaders.pkmVersionLoader.GetEntity(pkmVersionId);
-        var pkmEntity = loaders.pkmLoader.GetEntity(pkmVersionDto.PkmId);
+        var pkmVersionPKM = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
 
         var availableMoves = await actionService.GetPkmAvailableMoves(null, pkmVersionId);
 
-        var pkm = pkmVersionDto.Pkm.Update(pkm =>
+        var pkm = pkmVersionPKM.Update(pkm =>
         {
             EditPkmNickname(pkmConvertService, pkm, editPayload.Nickname);
             EditPkmEVs(pkmConvertService, pkm, editPayload.EVs);
@@ -27,31 +26,30 @@ public class EditPkmVersionAction(
 
         loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity, pkm);
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetDtosByPkmId(pkmEntity.Id).Values.ToList()
+        var relatedPkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox(pkmVersionEntity.BoxId, pkmVersionEntity.BoxSlot).Values.ToList()
             .FindAll(value => value.Id != pkmVersionId);
 
-        relatedPkmVersions.ForEach((versionDto) =>
+        relatedPkmVersions.ForEach((versionEntity) =>
         {
-            var relatedPkm = versionDto.Pkm.Update(relatedPkm =>
+            var relatedPkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(versionEntity).Update(relatedPkm =>
             {
                 pkmConvertService.PassDynamicsToPkm(pkm, relatedPkm);
 
                 relatedPkm.ResetPartyStats();
                 relatedPkm.RefreshChecksum();
             });
-            var relatedEntity = loaders.pkmVersionLoader.GetEntity(versionDto.Id);
 
-            loaders.pkmVersionLoader.WriteEntity(relatedEntity, relatedPkm);
+            loaders.pkmVersionLoader.WriteEntity(versionEntity, relatedPkm);
         });
 
-        if (pkmEntity.SaveId != default)
+        if (pkmVersionEntity.AttachedSaveId != null)
         {
-            await SynchronizePkmAction.SynchronizePkmVersionToSave(pkmConvertService, loaders, flags, [(pkmEntity.Id, null)]);
+            await SynchronizePkmAction.SynchronizePkmVersionToSave(pkmConvertService, loaders, flags, [(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)]);
         }
 
         return new(
             type: DataActionType.EDIT_PKM_VERSION,
-            parameters: [pkmVersionDto.Nickname, pkmVersionDto.Generation]
+            parameters: [pkmVersionPKM.Nickname, pkmVersionPKM.Generation]
         );
     }
 

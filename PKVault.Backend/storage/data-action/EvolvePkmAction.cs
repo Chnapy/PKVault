@@ -44,7 +44,7 @@ public class EvolvePkmAction(
         var oldName = dto.Nickname;
         var oldSpecies = dto.Species;
 
-        var (evolveSpecies, evolveByItem) = GetEvolve(dto);
+        var (evolveSpecies, evolveByItem) = GetEvolve(dto.Pkm);
 
         Console.WriteLine($"Evolve from {oldSpecies} to {evolveSpecies} using item? {evolveByItem}");
 
@@ -57,10 +57,10 @@ public class EvolvePkmAction(
         };
         saveLoaders.Pkms.WriteDto(dto);
 
-        var pkmVersion = loaders.pkmVersionLoader.GetPkmSaveVersion(dto);
+        var pkmVersion = loaders.pkmVersionLoader.GetEntityBySave(dto.SaveId, dto.IdBase);
         if (pkmVersion != null)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersion.PkmId, dto.Id)]);
+            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersion.Id, dto.IdBase)]);
         }
 
         flags.Dex = true;
@@ -73,83 +73,72 @@ public class EvolvePkmAction(
 
     private async Task<DataActionPayload> ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags, string id)
     {
-        var entity = loaders.pkmVersionLoader.GetEntity(id);
-        var dto = loaders.pkmVersionLoader.GetDto(id);
-        if (dto == default)
-        {
-            throw new KeyNotFoundException("Pkm-version not found");
-        }
+        var entity = loaders.pkmVersionLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-version not found");
+        var entityPkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(entity);
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetDtosByPkmId(dto.PkmId).Values.ToList()
-            .FindAll(value => value.Id != dto.Id);
+        var relatedPkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox(entity.BoxId, entity.BoxSlot).Values.ToList()
+            .FindAll(value => value.Id != entity.Id)
+            .Select(entity => (Version: entity, Pkm: loaders.pkmVersionLoader.GetPkmVersionEntityPkm(entity))).ToList();
 
         if (
-            relatedPkmVersions.Any(version => dto.Species > version.Pkm.MaxSpeciesID)
+            relatedPkmVersions.Any(version => entityPkm.Species > version.Pkm.MaxSpeciesID)
         )
         {
             throw new ArgumentException($"One of pkm-version cannot evolve, species not compatible with its generation");
         }
 
-        var oldName = dto.Nickname;
-        var oldSpecies = dto.Species;
+        var oldName = entityPkm.Nickname;
+        var oldSpecies = entityPkm.Species;
 
-        var (evolveSpecies, evolveByItem) = GetEvolve(dto);
+        var (evolveSpecies, evolveByItem) = GetEvolve(entityPkm);
 
-        // update dto pkm
-        dto = dto with
+        // update pkm
+        entityPkm = entityPkm.Update(pkm =>
         {
-            Pkm = dto.Pkm.Update(pkm =>
-            {
-                UpdatePkm(pkm, evolveSpecies, evolveByItem);
-            })
-        };
+            UpdatePkm(pkm, evolveSpecies, evolveByItem);
+        });
         loaders.pkmVersionLoader.WriteEntity(
-            entity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(dto.Pkm, Evolves) },
-            dto.Pkm
+            entity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(entityPkm, Evolves) },
+            entityPkm
         );
 
         // update related dto pkm
-        relatedPkmVersions.ForEach((versionDto) =>
+        relatedPkmVersions.ForEach((version) =>
         {
-            versionDto = versionDto with
+            version.Pkm = version.Pkm.Update(pkm =>
             {
-                Pkm = versionDto.Pkm.Update(pkm =>
-                {
-                    UpdatePkm(pkm, evolveSpecies, false);
-                })
-            };
-            var versionEntity = loaders.pkmVersionLoader.GetEntity(versionDto.Id);
+                UpdatePkm(pkm, evolveSpecies, false);
+            });
             loaders.pkmVersionLoader.WriteEntity(
-                versionEntity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(versionDto.Pkm, Evolves) },
-                versionDto.Pkm
+                version.Version with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(version.Pkm, Evolves) },
+                version.Pkm
             );
         });
 
-        var pkmEntity = loaders.pkmLoader.GetEntity(dto.PkmId);
-        if (pkmEntity.SaveId != null)
+        if (entity.AttachedSaveId != null)
         {
-            await SynchronizePkmAction.SynchronizePkmVersionToSave(pkmConvertService, loaders, flags, [(dto.PkmId, null)]);
+            await SynchronizePkmAction.SynchronizePkmVersionToSave(pkmConvertService, loaders, flags, [(entity.Id, entity.AttachedSavePkmIdBase!)]);
         }
 
-        new DexMainService(loaders).EnablePKM(dto.Pkm);
+        new DexMainService(loaders).EnablePKM(entityPkm);
 
         flags.Dex = true;
 
         return new DataActionPayload(
             type: DataActionType.EVOLVE_PKM,
-            parameters: [null, oldName, oldSpecies, dto.Species]
+            parameters: [null, oldName, oldSpecies, entityPkm.Species]
         );
     }
 
-    private (ushort evolveSpecies, bool evolveByItem) GetEvolve(BasePkmVersionDTO dto)
+    private (ushort evolveSpecies, bool evolveByItem) GetEvolve(ImmutablePKM pkm)
     {
-        if (Evolves.TryGetValue(dto.Species, out var staticEvolve))
+        if (Evolves.TryGetValue(pkm.Species, out var staticEvolve))
         {
-            if (dto.HeldItemPokeapiName != null && staticEvolve.TradeWithItem.TryGetValue(dto.HeldItemPokeapiName, out var evolveMap))
+            if (pkm.HeldItemPokeapiName != null && staticEvolve.TradeWithItem.TryGetValue(pkm.HeldItemPokeapiName, out var evolveMap))
             {
                 if (
-                    evolveMap.TryGetValue((byte)dto.Version, out var evolvedSpeciesWithItem)
-                    && dto.Level >= evolvedSpeciesWithItem.MinLevel
+                    evolveMap.TryGetValue((byte)pkm.Version, out var evolvedSpeciesWithItem)
+                    && pkm.CurrentLevel >= evolvedSpeciesWithItem.MinLevel
                 )
                 {
                     return (evolvedSpeciesWithItem.EvolveSpecies, true);
@@ -157,8 +146,8 @@ public class EvolvePkmAction(
             }
 
             if (
-                staticEvolve.Trade.TryGetValue((byte)dto.Version, out var evolvedSpecies)
-                && dto.Level >= evolvedSpecies.MinLevel
+                staticEvolve.Trade.TryGetValue((byte)pkm.Version, out var evolvedSpecies)
+                && pkm.CurrentLevel >= evolvedSpecies.MinLevel
             )
             {
                 return (evolvedSpecies.EvolveSpecies, false);

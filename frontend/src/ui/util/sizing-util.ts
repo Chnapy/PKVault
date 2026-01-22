@@ -1,4 +1,3 @@
-
 const itemSize = 96;
 
 export const SizingUtil = {
@@ -7,4 +6,20 @@ export const SizingUtil = {
     itemsGap: 4,
     getMaxWidth: (lineItemCount: number) => lineItemCount * SizingUtil.itemFullSize + (lineItemCount - 1) * SizingUtil.itemsGap,
     getMaxHeight: () => SizingUtil.getMaxWidth(5),
+    getItemsPerLine: (boxSlotCount: number) => {
+        if (boxSlotCount <= 6) {
+            return boxSlotCount;
+        }
+
+        switch (boxSlotCount) {
+            case 20:
+                return 4;
+            case 25:
+                return 5;
+            case 30:
+                return 6;
+        }
+
+        return 6;
+    },
 };

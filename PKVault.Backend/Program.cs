@@ -61,8 +61,6 @@ public class Program
 
         Console.WriteLine($"Memory checks: initial={initialMemoryUsedMB} MB setuped={setupedMemoryUsedMB} MB diff={setupedMemoryUsedMB - initialMemoryUsedMB} MB");
 
-        // await host.Services.GetRequiredService<StaticDataService>().GetStaticData(SettingsService.DefaultLanguage);
-
         if (args.Length > 0 && args[0] == "clean")
         {
             await host.Services.GetRequiredService<MaintenanceService>().CleanMainStorageFiles();
@@ -233,11 +231,11 @@ public class Program
     public static int GetAvailablePort()
     {
         var listener = new TcpListener(IPAddress.Loopback, 0);
-        listener.Start(); // Demande au système d’attribuer un port libre
+        listener.Start();
 
-        int port = ((IPEndPoint)listener.LocalEndpoint).Port; // Récupère le port attribué
+        int port = ((IPEndPoint)listener.LocalEndpoint).Port;
 
-        listener.Stop(); // Libère le port
+        listener.Stop();
 
         return port;
     }

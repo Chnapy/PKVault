@@ -14,7 +14,7 @@ public class SaveWrapperTests
         ArgumentNullException.ThrowIfNull(save);
         save.Metadata.SetExtraInfo(path);
 
-        Mock<SaveWrapper> saveWrapper = new(save, path);
+        Mock<SaveWrapper> saveWrapper = new(save);
         saveWrapper.Setup(x => x.GetSaveFileData()).Returns(content);
 
         return saveWrapper;
