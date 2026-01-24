@@ -30,6 +30,8 @@ public class SessionService(
 
             Console.WriteLine($"DB main copied to session");
         }
+
+        await RunMigrations();
     }
 
     public async Task PersistSession()
@@ -39,6 +41,31 @@ public class SessionService(
         fileIOService.Move(SessionDbPath, MainDbPath, overwrite: true);
 
         Console.WriteLine($"DB session copied to main");
+    }
+
+    private async Task RunMigrations()
+    {
+        var time = LogUtil.Time("Data Migration + Clean + Seeding");
+
+        using var scope = sp.CreateScope();
+        using var db = scope.ServiceProvider.GetRequiredService<SessionDbContext>();
+
+        // Console.WriteLine($"CONTEXT ID = {db.ContextId.InstanceId}");
+
+        var pendingMigrations = await db.Database.GetPendingMigrationsAsync();
+
+        Console.WriteLine($"{pendingMigrations.Count()} pending migrations");
+        Console.WriteLine($"{string.Join('\n', pendingMigrations)}");
+
+        // TODO somehow not compatible with PublishTrimmed
+        // await db.Database.MigrateAsync();
+        await db.Database.EnsureCreatedAsync(); // remove when migrations work
+
+        var appliedMigrations = await db.Database.GetAppliedMigrationsAsync();
+
+        Console.WriteLine($"{appliedMigrations.Count()} applied migrations");
+
+        time();
     }
 
     private async Task CloseConnection()

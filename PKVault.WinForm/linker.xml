@@ -9,8 +9,6 @@
   <assembly fullname="Microsoft.EntityFrameworkCore" preserve="all"/>
   <assembly fullname="Microsoft.EntityFrameworkCore.Relational" preserve="all" />
   <assembly fullname="Microsoft.EntityFrameworkCore.Sqlite" preserve="all" />
-  <assembly fullname="Microsoft.EntityFrameworkCore.Migrations" preserve="all" />
-  <assembly fullname="Microsoft.EntityFrameworkCore.Storage" preserve="all" />
   <assembly fullname="PKVault.Backend">
     <type fullname="PKVault.Backend.*" preserve="all"/>
   </assembly>

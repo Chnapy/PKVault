@@ -277,7 +277,7 @@ public class BackupService(
         logtime();
 
         saveService.InvalidateSaves();
-        loadersService.InvalidateLoaders((maintainData: true, checkSaves: true));
+        loadersService.InvalidateLoaders(checkSaves: true);
     }
 
     public async Task PrepareBackupThenRun(Func<Task> action)
@@ -293,7 +293,7 @@ public class BackupService(
             logtime();
 
             saveService.InvalidateSaves();
-            loadersService.InvalidateLoaders((maintainData: false, checkSaves: true));
+            loadersService.InvalidateLoaders(checkSaves: true);
         }
         catch
         {

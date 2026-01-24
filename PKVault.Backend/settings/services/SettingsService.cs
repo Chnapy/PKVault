@@ -34,7 +34,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         BaseSettings = ReadBaseSettings();
 
         saveService.InvalidateSaves();
-        loadersService.InvalidateLoaders((maintainData: true, checkSaves: true));
+        loadersService.InvalidateLoaders(checkSaves: true);
     }
 
     // Full settings

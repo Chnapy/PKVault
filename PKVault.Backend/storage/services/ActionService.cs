@@ -16,18 +16,6 @@ public class ActionService(
 
     private readonly List<ActionRecord> actions = [];
 
-    public async Task<DataUpdateFlags> DataNormalize(DataEntityLoaders loaders)
-    {
-        using var scope = sp.CreateScope();
-
-        return await AddAction(
-            scope,
-            (scope) => scope.ServiceProvider.GetRequiredService<DataNormalizeAction>(),
-            new(),
-            loaders
-        );
-    }
-
     public async Task<DataUpdateFlags> SynchronizePkm(SynchronizePkmActionInput input)
     {
         using var scope = sp.CreateScope();
@@ -272,7 +260,7 @@ public class ActionService(
         List<ActionRecord> previousActions = [.. actions];
         actions.Clear();
 
-        loadersService.InvalidateLoaders((maintainData: false, checkSaves: false));
+        loadersService.InvalidateLoaders(checkSaves: false);
         // await loadersService.GetLoaders();
 
         using var scope = sp.CreateScope();

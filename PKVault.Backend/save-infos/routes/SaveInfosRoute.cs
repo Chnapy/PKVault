@@ -22,7 +22,7 @@ public class SaveInfosController(DataService dataService, ISaveService saveServi
         }
 
         saveService.InvalidateSaves();
-        loadersService.InvalidateLoaders((maintainData: false, checkSaves: true));
+        loadersService.InvalidateLoaders(checkSaves: true);
 
         return await dataService.CreateDataFromUpdateFlags(new()
         {

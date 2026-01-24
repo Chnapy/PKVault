@@ -186,7 +186,6 @@ public class Program
         services.AddSingleton<PkmLegalityService>();
 
         Console.WriteLine($"Setup services - Actions");
-        services.AddScoped<DataNormalizeAction>();
         services.AddScoped<SynchronizePkmAction>();
         services.AddScoped<MainCreateBoxAction>();
         services.AddScoped<MainUpdateBoxAction>();

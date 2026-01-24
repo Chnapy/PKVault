@@ -7,7 +7,7 @@ public interface ILoadersService
     // public List<DataActionPayload> GetActionPayloadList();
     // public bool HasEmptyActionList();
     // public Task<DataUpdateFlags> AddAction(DataAction action, DataUpdateFlags? flags);
-    public void InvalidateLoaders((bool maintainData, bool checkSaves) flags);
+    public void InvalidateLoaders(bool checkSaves);
     public Task EnsureInitialized();
 }
 
@@ -23,7 +23,7 @@ public class LoadersService : ILoadersService
     private readonly StaticDataService staticDataService;
     private readonly SessionService sessionService;
 
-    private readonly Locker<(bool maintainData, bool checkSaves), DataEntityLoaders> loadersLocker;
+    private readonly Locker<bool, DataEntityLoaders> loadersLocker;
 
     public LoadersService(
         IServiceProvider _sp,
@@ -38,7 +38,7 @@ public class LoadersService : ILoadersService
         staticDataService = _staticDataService;
         sessionService = _sessionService;
 
-        loadersLocker = new("Loaders", (maintainData: true, checkSaves: true), ResetLoaders);
+        loadersLocker = new("Loaders", true, ResetLoaders);
     }
 
     public async Task<DataEntityLoaders> GetLoaders()
@@ -46,19 +46,13 @@ public class LoadersService : ILoadersService
         return await loadersLocker.GetValue();
     }
 
-    private async Task<DataEntityLoaders> ResetLoaders((bool maintainData, bool checkSaves) flags)
+    private async Task<DataEntityLoaders> ResetLoaders(bool checkSaves)
     {
         var loaders = await CreateLoaders();
 
         await sessionService.StartNewSession();
 
-        if (flags.maintainData)
-        {
-            var actionService = sp.GetRequiredService<ActionService>();
-            await actionService.DataNormalize(loaders);
-        }
-
-        if (flags.checkSaves)
+        if (checkSaves)
             await CheckSaveToSynchronize(loaders);
 
         return loaders;
@@ -92,12 +86,12 @@ public class LoadersService : ILoadersService
         }
     }
 
-    public void InvalidateLoaders((bool maintainData, bool checkSaves) flags)
+    public void InvalidateLoaders(bool checkSaves)
     {
         // sp.GetRequiredService<SessionService>()
         //     .StartNewSession();
 
-        loadersLocker.Invalidate(flags);
+        loadersLocker.Invalidate(checkSaves);
     }
 
     public async Task EnsureInitialized()
