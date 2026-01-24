@@ -1,18 +1,40 @@
-public class PkmVersionNormalize(
-    IPkmVersionLoader loader, Dictionary<ushort, StaticEvolve> evolves
-) : DataNormalize<PkmVersionDTO, PkmVersionEntity>(loader)
+public class LegacyPkmVersionNormalize(
+    LegacyPkmVersionLoader loader, Dictionary<ushort, StaticEvolve> evolves
+)
 {
-    public override void SetupInitialData(DataEntityLoaders loaders)
+    public void MigrateGlobalEntities()
     {
+        var entities = loader.GetAllEntities();
+        if (entities.Count == 0)
+        {
+            return;
+        }
+
+        var firstItem = entities.First().Value;
+        if (firstItem == null)
+        {
+            return;
+        }
+
+        if (firstItem.SchemaVersion == loader.GetLastSchemaVersion())
+        {
+            return;
+        }
+
+        var migrateFn = GetMigrateFunc(firstItem.SchemaVersion) ?? throw new NotSupportedException($"Schema version {firstItem.SchemaVersion}");
+
+        migrateFn();
+
+        MigrateGlobalEntities();
     }
 
-    protected override Action<DataEntityLoaders>? GetMigrateFunc(int currentSchemaVersion) => currentSchemaVersion switch
+    protected Action? GetMigrateFunc(int currentSchemaVersion) => currentSchemaVersion switch
     {
         0 => MigrateV0ToV1,
         _ => null
     };
 
-    private void MigrateV0ToV1(DataEntityLoaders loaders)
+    private void MigrateV0ToV1()
     {
         // Most part is done in LegacyPkmLoader for strong couplage reasons
 
@@ -22,7 +44,7 @@ public class PkmVersionNormalize(
         time();
     }
 
-    public override void CleanData(DataEntityLoaders loaders)
+    public void CleanData()
     {
         var time2 = LogUtil.Time($"PkmVersion normalize: CleanData rename pk filename if needed");
         // rename pk filename if needed

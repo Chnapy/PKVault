@@ -1,12 +1,10 @@
-public abstract class DataAction
+public abstract class DataAction<I>
 {
-    public DataActionPayload payload;
+    protected abstract Task<DataActionPayload?> Execute(I input, DataUpdateFlags flags);
 
-    protected abstract Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags);
-
-    public async Task ExecuteWithPayload(DataEntityLoaders loaders, DataUpdateFlags flags)
+    public async Task<DataActionPayload?> ExecuteWithPayload(I input, DataUpdateFlags flags)
     {
-        payload = await Execute(loaders, flags);
+        return await Execute(input, flags);
     }
 }
 

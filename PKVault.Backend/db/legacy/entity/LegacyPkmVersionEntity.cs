@@ -1,4 +1,4 @@
-public record PkmVersionEntity(
+public record LegacyPkmVersionEntity(
     string Id,
     int BoxId,
     int BoxSlot,
@@ -9,4 +9,4 @@ public record PkmVersionEntity(
     string Filepath,
     string PkmId = "",  // for legacy migration only
     int SchemaVersion = 0
-) : IEntity(SchemaVersion, Id);
+) : ILegacyEntity(SchemaVersion, Id);

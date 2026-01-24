@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 public interface IBankLoader : IEntityLoader<BankDTO, BankEntity>
 {
     public BankDTO CreateDTO(BankEntity entity);
@@ -8,10 +10,8 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
 {
     public static readonly int OrderGap = 10;
 
-    public BankLoader(IFileIOService fileIOService, string dbPath) : base(
-        fileIOService,
-        filePath: MatcherUtil.NormalizePath(Path.Combine(dbPath, "bank.json")),
-        dictJsonContext: EntityJsonContext.Default.DictionaryStringBankEntity
+    public BankLoader(IFileIOService fileIOService, SessionDbContext db) : base(
+        fileIOService, db, db.BanksFlags
     )
     {
     }
@@ -20,7 +20,7 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
     {
         return new(
             Id: entity.Id,
-            IdInt: entity.IdInt,
+            IdInt: int.Parse(entity.Id),
             Name: entity.Name,
             IsDefault: entity.IsDefault,
             Order: entity.Order,
@@ -28,12 +28,10 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
         );
     }
 
-    protected override BankDTO GetDTOFromEntity(BankEntity entity)
+    protected override async Task<BankDTO> GetDTOFromEntity(BankEntity entity)
     {
         return CreateDTO(entity);
     }
-
-    public override int GetLastSchemaVersion() => 1;
 
     public void NormalizeOrders()
     {
@@ -48,4 +46,6 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
                 currentOrder += OrderGap;
             });
     }
+
+    protected override DbSet<BankEntity> GetDbSet() => db.Banks;
 }

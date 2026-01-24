@@ -41,5 +41,5 @@ public class DataUpdateSaveListFlags
 public class DataUpdateFlagsState<T>
 {
     public bool All = false;
-    public readonly HashSet<T> Ids = [];
+    public HashSet<T> Ids = [];
 }

@@ -1,13 +1,13 @@
 using PKHeX.Core;
 
-public record DexEntity(
+public record LegacyDexEntity(
     string Id,
     ushort Species,
-    List<DexEntityForm> Forms,
+    List<LegacyDexEntityForm> Forms,
     int SchemaVersion = 0
-) : IEntity(SchemaVersion, Id);
+) : ILegacyEntity(SchemaVersion, Id);
 
-public record DexEntityForm(
+public record LegacyDexEntityForm(
     byte Form,
     GameVersion Version,
     Gender Gender,

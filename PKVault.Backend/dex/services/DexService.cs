@@ -3,11 +3,15 @@ using PKHeX.Core;
 /**
  * Gives Pokedex data for PKVault and saves.
  */
-public class DexService(ILoadersService loadersService, StaticDataService staticDataService)
+public class DexService(
+    IServiceProvider sp,
+    ILoadersService loadersService, StaticDataService staticDataService
+)
 {
     public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex()
     {
-        var saveDict = (await loadersService.GetLoaders()).saveLoadersDict;
+        var loaders = await loadersService.GetLoaders();
+        var saveDict = loaders.saveLoadersDict;
         if (saveDict.Count == 0)
         {
             return [];
@@ -37,25 +41,28 @@ public class DexService(ILoadersService loadersService, StaticDataService static
 
         Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex = [];
 
-        saves.ForEach(save => UpdateDexWithSave(dex, save, staticData, loaders));
+        foreach (var save in saves)
+        {
+            await UpdateDexWithSave(dex, save, staticData, loaders);
+        }
 
         time();
 
         return dex;
     }
 
-    private static bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, SaveWrapper save, StaticDataDTO staticData, DataEntityLoaders loaders)
+    private async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, SaveWrapper save, StaticDataDTO staticData, DataEntityLoaders loaders)
     {
         var service = GetDexService(save, loaders);
 
         // var time = LogUtil.Time($"Update Dex with save {save.ID32} {save.Version}");
-        var success = service?.UpdateDexWithSave(dex, staticData) ?? false;
+        var success = service != null && (await service.UpdateDexWithSave(dex, staticData));
         // time();
 
         return success;
     }
 
-    public static DexGenService? GetDexService(SaveWrapper save, DataEntityLoaders loaders)
+    public DexGenService? GetDexService(SaveWrapper save, DataEntityLoaders loaders)
     {
         static DexGenService? notHandled(SaveWrapper save)
         {
@@ -65,7 +72,7 @@ public class DexService(ILoadersService loadersService, StaticDataService static
 
         return save.GetSave() switch
         {
-            FakeSaveFile => new DexMainService(loaders),
+            FakeSaveFile => new DexMainService(sp, loaders),
             SAV1 sav1 => new Dex123Service(sav1),
             SAV2 sav2 => new Dex123Service(sav2),
             SAV3 sav3 => new Dex123Service(sav3),

@@ -10,7 +10,7 @@ public interface ISaveBoxLoader
     public BoxDTO? GetDto(string id);
 }
 
-public class SaveBoxLoader(SaveWrapper save, IBoxLoader boxLoader) : ISaveBoxLoader
+public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoader
 {
     public bool HasWritten { get; set; } = false;
 
@@ -24,7 +24,6 @@ public class SaveBoxLoader(SaveWrapper save, IBoxLoader boxLoader) : ISaveBoxLoa
         {
             var id = ((int)BoxType.Party).ToString();
             boxes.Add(id, new(
-                    SchemaVersion: default,
                     Id: id,
                     Type: BoxType.Party,
                     Name: BoxType.Party.ToString(),
@@ -42,7 +41,6 @@ public class SaveBoxLoader(SaveWrapper save, IBoxLoader boxLoader) : ISaveBoxLoa
             {
                 var id = i.ToString();
                 boxes.Add(id, new(
-                        SchemaVersion: default,
                         Id: id,
                         Type: BoxType.Box,
                         Name: boxesNames[i],
@@ -61,7 +59,6 @@ public class SaveBoxLoader(SaveWrapper save, IBoxLoader boxLoader) : ISaveBoxLoa
             var id = ((int)BoxType.Daycare).ToString();
             var extraSlotsCount = extraSlots.FindAll(slot => slot.Type == StorageSlotType.Daycare).Count;
             boxes.Add(id, new(
-                    SchemaVersion: default,
                     Id: id,
                     Type: BoxType.Daycare,
                     Name: BoxType.Daycare.ToString(),
@@ -89,7 +86,6 @@ public class SaveBoxLoader(SaveWrapper save, IBoxLoader boxLoader) : ISaveBoxLoa
                 var slotCount = extraSlots.FindAll(slot => BoxLoader.GetTypeFromStorageSlotType(slot.Type) == boxType).Count;
 
                 boxes.Add(id, new(
-                        SchemaVersion: default,
                         Id: id,
                         Type: boxType,
                         Name: name,
@@ -99,6 +95,9 @@ public class SaveBoxLoader(SaveWrapper save, IBoxLoader boxLoader) : ISaveBoxLoa
                     ));
                 currentOrder++;
             });
+
+        using var scope = sp.CreateScope();
+        var boxLoader = scope.ServiceProvider.GetRequiredService<IBoxLoader>();
 
         return boxes.Select(entry => (entry.Key, boxLoader.CreateDTO(entry.Value))).ToDictionary();
     }

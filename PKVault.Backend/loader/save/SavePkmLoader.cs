@@ -6,9 +6,10 @@ public interface ISavePkmLoader
     public bool HasWritten { get; set; }
 
     public PkmSaveDTO CreateDTO(SaveWrapper save, ImmutablePKM pkm, int boxId, int boxSlot);
+    public PkmSaveDTO CreateDTO(SaveWrapper save, ImmutablePKM pkm, string boxId, int boxSlot);
     public List<PkmSaveDTO> GetAllDtos();
     public PkmSaveDTO? GetDto(string id);
-    public PkmSaveDTO? GetDto(int box, int boxSlot);
+    public PkmSaveDTO? GetDto(string boxId, int boxSlot);
     public ImmutableDictionary<string, PkmSaveDTO> GetDtosByIdBase(string idBase);
     public void WriteDto(PkmSaveDTO dto);
     public void DeleteDto(string id);
@@ -35,6 +36,11 @@ public class SavePkmLoader(
     private bool NeedUpdate = true;
 
     private DataUpdateSaveListFlags savesFlags = new();
+
+    public PkmSaveDTO CreateDTO(SaveWrapper save, ImmutablePKM pkm, string boxId, int boxSlot)
+    {
+        return CreateDTO(save, pkm, int.Parse(boxId), boxSlot);
+    }
 
     public PkmSaveDTO CreateDTO(SaveWrapper save, ImmutablePKM pkm, int boxId, int boxSlot)
     {
@@ -145,7 +151,7 @@ public class SavePkmLoader(
         foreach (var dto in dtoList)
         {
             dictById.Add(dto.Id, dto);
-            dictByBox.Add(GetDTOByBoxKey(dto.BoxId, dto.BoxSlot), dto);
+            dictByBox.Add(GetDTOByBoxKey(dto.BoxId.ToString(), dto.BoxSlot), dto);
 
             if (!duplicatesDictByIdBase.TryGetValue(dto.IdBase, out var duplicateDict))
             {
@@ -186,14 +192,14 @@ public class SavePkmLoader(
         return null;
     }
 
-    public PkmSaveDTO? GetDto(int box, int boxSlot)
+    public PkmSaveDTO? GetDto(string boxId, int boxSlot)
     {
         if (NeedUpdate)
         {
             UpdateDtos();
         }
 
-        if (dtoByBox.TryGetValue(GetDTOByBoxKey(box, boxSlot), out var dto))
+        if (dtoByBox.TryGetValue(GetDTOByBoxKey(boxId, boxSlot), out var dto))
         {
             return DTOWithDuplicateCheck(dto);
         }
@@ -351,7 +357,7 @@ public class SavePkmLoader(
         dtoDict.Add(dto.Id, dto);
 
         dtoById[dto.Id] = dto;
-        dtoByBox[GetDTOByBoxKey(dto.BoxId, dto.BoxSlot)] = dto;
+        dtoByBox[GetDTOByBoxKey(dto.BoxId.ToString(), dto.BoxSlot)] = dto;
 
         savesFlags.UseSave(save.Id).SavePkms.Ids.Add(dto.Id);
         HasWritten = true;
@@ -359,7 +365,7 @@ public class SavePkmLoader(
 
     private void RemoveDTO(int boxId, int boxSlot)
     {
-        var boxKey = GetDTOByBoxKey(boxId, boxSlot);
+        var boxKey = GetDTOByBoxKey(boxId.ToString(), boxSlot);
         if (dtoByBox.TryGetValue(boxKey, out var value))
         {
             RemoveDTO(value);
@@ -369,7 +375,7 @@ public class SavePkmLoader(
     private void RemoveDTO(PkmSaveDTO dto)
     {
         dtoById.Remove(dto.Id);
-        dtoByBox.Remove(GetDTOByBoxKey(dto.BoxId, dto.BoxSlot));
+        dtoByBox.Remove(GetDTOByBoxKey(dto.BoxId.ToString(), dto.BoxSlot));
 
         if (dtosByIdBase.TryGetValue(dto.IdBase, out var dtoDict))
         {
@@ -380,5 +386,5 @@ public class SavePkmLoader(
         HasWritten = true;
     }
 
-    private string GetDTOByBoxKey(int box, int boxSlot) => box + "." + boxSlot;
+    private string GetDTOByBoxKey(string boxId, int boxSlot) => boxId + "." + boxSlot;
 }

@@ -1,16 +1,25 @@
 using PKHeX.Core;
 
-public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveFile.Default)
+public class DexMainService(
+    IServiceProvider sp,
+    DataEntityLoaders loaders
+) : DexGenService(FakeSaveFile.Default)
 {
-    public override bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData)
+    public override async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData)
     {
-        var ownedPkmsBySpecies = loaders.pkmVersionLoader.GetAllDtos()
+        using var scope = sp.CreateScope();
+
+        var dexService = scope.ServiceProvider.GetRequiredService<DexService>();
+        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+        var dexLoader = scope.ServiceProvider.GetRequiredService<IDexLoader>();
+
+        var ownedPkmsBySpecies = (await pkmVersionLoader.GetAllDtos())
             .GroupBy(dto => dto.Species)
             .ToDictionary(dtos => dtos.First().Species, dtos => dtos.ToList());
 
         Dictionary<GameVersion, SaveWrapper> savesByVersion = [];
 
-        loaders.dexLoader.GetAllEntities().Values.ToList().ForEach(entity =>
+        dexLoader.GetAllEntities().Values.ToList().ForEach(entity =>
         {
             ownedPkmsBySpecies.TryGetValue(entity.Species, out var pkmForms);
 
@@ -33,7 +42,7 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
                         savesByVersion.Add(saveVersion, save);
                     }
 
-                    var saveDexService = DexService.GetDexService(save, loaders);
+                    var saveDexService = dexService.GetDexService(save, loaders);
                     var commonForm = saveDexService!.GetDexItemFormComplete(
                         entity.Species,
                         [.. pkmFormsFiltered.Select(pkmVersion => pkmVersion.Pkm)],
@@ -86,7 +95,7 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
 
         EnableSpeciesForm(
             version,
-            pk.Species, pk.Form, (Gender)pk.Gender, true, pk.IsShiny,
+            pk.Species, pk.Form, pk.Gender, true, pk.IsShiny,
             createOnly
         );
     }
@@ -98,8 +107,10 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
         bool createOnly
     )
     {
-        DexEntity entity = loaders.dexLoader.GetEntity(species.ToString()) ?? new(
-            SchemaVersion: loaders.dexLoader.GetLastSchemaVersion(),
+        using var scope = sp.CreateScope();
+        var dexLoader = scope.ServiceProvider.GetRequiredService<IDexLoader>();
+
+        DexEntity entity = dexLoader.GetEntity(species.ToString()) ?? new(
             Id: species.ToString(),
             Species: species,
             Forms: []
@@ -141,6 +152,6 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
             return;
         }
 
-        loaders.dexLoader.WriteEntity(entity);
+        dexLoader.WriteEntity(entity);
     }
 }

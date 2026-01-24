@@ -162,8 +162,13 @@ public class Program
         services.AddSingleton<GenStaticDataService>();
 #endif
 
+        Console.WriteLine($"Setup service - DB");
+        services.AddDbContext<SessionDbContext>();
+
+        Console.WriteLine($"Setup services - Main");
         services.AddSingleton<IFileSystem>(new FileSystem());
         services.AddSingleton<IFileIOService, FileIOService>();
+        services.AddSingleton<SessionService>();
         services.AddSingleton<StaticDataService>();
         services.AddSingleton<ILoadersService, LoadersService>();
         services.AddSingleton<StorageQueryService>();
@@ -177,6 +182,33 @@ public class Program
         services.AddSingleton<DataService>();
         services.AddSingleton<PkmConvertService>();
         services.AddSingleton<PkmLegalityService>();
+
+        Console.WriteLine($"Setup services - Actions");
+        services.AddScoped<DataNormalizeAction>();
+        services.AddScoped<SynchronizePkmAction>();
+        services.AddScoped<MainCreateBoxAction>();
+        services.AddScoped<MainUpdateBoxAction>();
+        services.AddScoped<MainDeleteBoxAction>();
+        services.AddScoped<MainCreateBankAction>();
+        services.AddScoped<MainUpdateBankAction>();
+        services.AddScoped<MainDeleteBankAction>();
+        services.AddScoped<MovePkmAction>();
+        services.AddScoped<MovePkmBankAction>();
+        services.AddScoped<MainCreatePkmVersionAction>();
+        services.AddScoped<EditPkmVersionAction>();
+        services.AddScoped<EditPkmSaveAction>();
+        services.AddScoped<DetachPkmSaveAction>();
+        services.AddScoped<DeletePkmVersionAction>();
+        services.AddScoped<SaveDeletePkmAction>();
+        services.AddScoped<EvolvePkmAction>();
+        services.AddScoped<SortPkmAction>();
+        services.AddScoped<DexSyncAction>();
+
+        Console.WriteLine($"Setup services - Loaders");
+        services.AddScoped<IBankLoader, BankLoader>();
+        services.AddScoped<IBoxLoader, BoxLoader>();
+        services.AddScoped<IPkmVersionLoader, PkmVersionLoader>();
+        services.AddScoped<IDexLoader, DexLoader>();
 
 #if DEBUG && MODE_DEFAULT
         services.AddEndpointsApiExplorer();
@@ -199,6 +231,8 @@ public class Program
             };
         });
 #endif
+
+        Console.WriteLine($"Setup services - Finished");
     }
 
     public static void ConfigureAppBuilder(IApplicationBuilder app, bool useHttps)

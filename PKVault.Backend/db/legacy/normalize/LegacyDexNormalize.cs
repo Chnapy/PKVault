@@ -1,10 +1,6 @@
-public abstract class DataNormalize<DTO, E>(
-    IEntityLoader<DTO, E> loader
-) : IDataNormalize where DTO : IWithId where E : IEntity
+public class LegacyDexNormalize(LegacyDexLoader loader)
 {
-    public abstract void SetupInitialData(DataEntityLoaders loaders);
-
-    public void MigrateGlobalEntities(DataEntityLoaders loaders)
+    public void MigrateGlobalEntities()
     {
         var entities = loader.GetAllEntities();
         if (entities.Count == 0)
@@ -25,12 +21,22 @@ public abstract class DataNormalize<DTO, E>(
 
         var migrateFn = GetMigrateFunc(firstItem.SchemaVersion) ?? throw new NotSupportedException($"Schema version {firstItem.SchemaVersion}");
 
-        migrateFn(loaders);
+        migrateFn();
 
-        MigrateGlobalEntities(loaders);
+        MigrateGlobalEntities();
     }
 
-    protected abstract Action<DataEntityLoaders>? GetMigrateFunc(int currentSchemaVersion);
+    protected Action? GetMigrateFunc(int currentSchemaVersion) => currentSchemaVersion switch
+    {
+        0 => MigrateV0ToV1,
+        _ => null
+    };
 
-    public abstract void CleanData(DataEntityLoaders loaders);
+    private void MigrateV0ToV1()
+    {
+        loader.GetAllEntities().Values.ToList().ForEach(entity =>
+        {
+            loader.WriteEntity(entity with { SchemaVersion = 1 });
+        });
+    }
 }

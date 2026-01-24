@@ -1,84 +1,37 @@
 using System.Collections.Immutable;
 
-public interface IPkmVersionLoader : IEntityLoader<PkmVersionDTO, PkmVersionEntity>
+public class LegacyPkmVersionLoader : LegacyEntityLoader<LegacyPkmVersionEntity>
 {
-    public IPKMLoader pkmFileLoader { get; }
+    public static string GetFilepath(string dbPath) => MatcherUtil.NormalizePath(Path.Combine(dbPath, "pkm-version.json"));
 
-    public PkmVersionDTO CreateDTO(PkmVersionEntity entity, ImmutablePKM pkm);
-    public PkmVersionEntity WriteEntity(PkmVersionEntity entity, ImmutablePKM pkm);
-    public ImmutableDictionary<int, ImmutableDictionary<string, PkmVersionEntity>> GetEntitiesByBox(int boxId);
-    public ImmutableDictionary<string, PkmVersionEntity> GetEntitiesByBox(int boxId, int boxSlot);
-    public ImmutableDictionary<string, PkmVersionEntity> GetEntitiesBySave(uint saveId);
-    public PkmVersionEntity? GetEntityBySave(uint saveId, string savePkmIdBase);
-    public ImmutablePKM GetPkmVersionEntityPkm(PkmVersionEntity entity);
-}
-
-public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, IPkmVersionLoader
-{
-    private readonly string appPath;
-    private readonly string language;
     private readonly Dictionary<ushort, StaticEvolve> evolves;
 
     public IPKMLoader pkmFileLoader { get; }
 
-    private readonly VersionChecker versionChecker = new();
+    // boxId => boxSlot => LegacyPkmVersionEntity.Id => LegacyPkmVersionEntity
+    private Dictionary<int, Dictionary<int, Dictionary<string, LegacyPkmVersionEntity>>> entitiesByBox = [];
 
-    // boxId => boxSlot => PkmVersionEntity.Id => PkmVersionEntity
-    private Dictionary<int, Dictionary<int, Dictionary<string, PkmVersionEntity>>> entitiesByBox = [];
-
-    // saveId => attachedSavePkmIdBase => PkmVersionEntity
-    private Dictionary<uint, Dictionary<string, PkmVersionEntity>> entitiesBySave = [];
+    // saveId => attachedSavePkmIdBase => LegacyPkmVersionEntity
+    private Dictionary<uint, Dictionary<string, LegacyPkmVersionEntity>> entitiesBySave = [];
 
     private bool NeedUpdate = true;
 
-    public PkmVersionLoader(
+    public LegacyPkmVersionLoader(
         IFileIOService fileIOService,
-        string _appPath,
         string dbPath,
         string storagePath,
-        string _language,
         Dictionary<ushort, StaticEvolve> _evolves
     ) : base(
         fileIOService,
-        filePath: MatcherUtil.NormalizePath(Path.Combine(dbPath, "pkm-version.json")),
-        dictJsonContext: EntityJsonContext.Default.DictionaryStringPkmVersionEntity
+        filePath: GetFilepath(dbPath),
+        dictJsonContext: LegacyEntityJsonContext.Default.DictionaryStringLegacyPkmVersionEntity
     )
     {
-        appPath = _appPath;
-        language = _language;
         evolves = _evolves;
-        pkmFileLoader = new PKMLoader(fileIOService, storagePath, [.. GetAllEntities().Values.Select(pv => pv.Filepath)]);
+        pkmFileLoader = new PKMLoader(fileIOService, storagePath);
     }
 
-    public PkmVersionDTO CreateDTO(PkmVersionEntity entity, ImmutablePKM pkm)
-    {
-        var filepathAbsolute = Path.Combine(appPath, entity.Filepath);
-        var isFilePresent = fileIOService.Exists(filepathAbsolute);
-
-        var dto = new PkmVersionDTO(
-            Id: entity.Id,
-            Generation: entity.Generation,
-            SettingsLanguage: language,
-            Pkm: pkm,
-
-            BoxId: entity.BoxId,
-            BoxSlot: entity.BoxSlot,
-            IsMain: entity.IsMain,
-            AttachedSaveId: entity.AttachedSaveId,
-            AttachedSavePkmIdBase: entity.AttachedSavePkmIdBase,
-
-            IsFilePresent: isFilePresent,
-            Filepath: entity.Filepath,
-            FilepathAbsolute: filepathAbsolute,
-
-            VersionChecker: versionChecker,
-            Evolves: evolves
-        );
-
-        return dto;
-    }
-
-    public ImmutableDictionary<int, ImmutableDictionary<string, PkmVersionEntity>> GetEntitiesByBox(int boxId)
+    public ImmutableDictionary<int, ImmutableDictionary<string, LegacyPkmVersionEntity>> GetEntitiesByBox(int boxId)
     {
         SetupEntities();
 
@@ -90,7 +43,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             : [];
     }
 
-    public ImmutableDictionary<string, PkmVersionEntity> GetEntitiesByBox(int boxId, int boxSlot)
+    public ImmutableDictionary<string, LegacyPkmVersionEntity> GetEntitiesByBox(int boxId, int boxSlot)
     {
         SetupEntities();
 
@@ -99,7 +52,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             : [];
     }
 
-    public ImmutableDictionary<string, PkmVersionEntity> GetEntitiesBySave(uint saveId)
+    public ImmutableDictionary<string, LegacyPkmVersionEntity> GetEntitiesBySave(uint saveId)
     {
         SetupEntities();
 
@@ -108,12 +61,12 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             : [];
     }
 
-    public PkmVersionEntity? GetEntityBySave(uint saveId, string savePkmIdBase)
+    public LegacyPkmVersionEntity? GetEntityBySave(uint saveId, string savePkmIdBase)
     {
         return GetEntitiesBySave(saveId).TryGetValue(savePkmIdBase, out var entity) ? entity : null;
     }
 
-    public override Dictionary<string, PkmVersionEntity> GetAllEntities()
+    public override Dictionary<string, LegacyPkmVersionEntity> GetAllEntities()
     {
         SetupEntities();
 
@@ -162,7 +115,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         return result;
     }
 
-    public override PkmVersionEntity WriteEntity(PkmVersionEntity entity)
+    public override LegacyPkmVersionEntity WriteEntity(LegacyPkmVersionEntity entity)
     {
         SetupEntities();
 
@@ -247,7 +200,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         NeedUpdate = false;
     }
 
-    public PkmVersionEntity WriteEntity(PkmVersionEntity entity, ImmutablePKM pkm)
+    public LegacyPkmVersionEntity WriteEntity(LegacyPkmVersionEntity entity, ImmutablePKM pkm)
     {
         WriteEntity(entity);
 
@@ -263,16 +216,9 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         pkmFileLoader.WriteToFiles();
     }
 
-    protected override PkmVersionDTO GetDTOFromEntity(PkmVersionEntity entity)
+    public ImmutablePKM GetPkmVersionEntityPkm(LegacyPkmVersionEntity entity)
     {
-        var pkm = GetPkmVersionEntityPkm(entity);
-
-        return CreateDTO(entity, pkm);
-    }
-
-    public ImmutablePKM GetPkmVersionEntityPkm(PkmVersionEntity entity)
-    {
-        return pkmFileLoader.CreatePKM(entity);
+        return pkmFileLoader.CreatePKM(entity.Id, entity.Filepath, entity.Generation);
     }
 
     public override int GetLastSchemaVersion() => 1;

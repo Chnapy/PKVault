@@ -1,7 +1,10 @@
 /**
  * Warnings checks in current session data.
  */
-public class WarningsService(ILoadersService loadersService, ISaveService saveService, IFileIOService fileIOService)
+public class WarningsService(
+    IServiceProvider sp,
+    ILoadersService loadersService, ISaveService saveService, IFileIOService fileIOService
+)
 {
     private WarningsDTO? WarningsDTO = null;
 
@@ -68,11 +71,14 @@ public class WarningsService(ILoadersService loadersService, ISaveService saveSe
 
     private async Task<List<PkmVersionWarning>> CheckPkmVersionWarnings()
     {
+        using var scope = sp.CreateScope();
+        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+
         var warns = new List<PkmVersionWarning>();
 
         var loaders = await loadersService.GetLoaders();
 
-        var pkms = loaders.pkmVersionLoader.GetAllEntities();
+        var pkms = pkmVersionLoader.GetAllEntities();
 
         var tasks = pkms.Values.Select(pkmVersion =>
         {

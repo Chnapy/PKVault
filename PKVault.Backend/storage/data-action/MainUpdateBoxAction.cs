@@ -1,27 +1,33 @@
-public class MainUpdateBoxAction(string boxId, string boxName, int order, string bankId, int slotCount, BoxType type) : DataAction
+public record MainUpdateBoxActionInput(string boxId, string boxName, int order, string bankId, int slotCount, BoxType type);
+
+public class MainUpdateBoxAction(
+    IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVersionLoader pkmVersionLoader
+) : DataAction<MainUpdateBoxActionInput>
 {
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload?> Execute(MainUpdateBoxActionInput input, DataUpdateFlags flags)
     {
-        if (boxName.Length == 0)
+        if (input.boxName.Length == 0)
         {
             throw new ArgumentException($"Box name cannot be empty");
         }
 
-        if (boxName.Length > 64)
+        if (input.boxName.Length > 64)
         {
             throw new ArgumentException($"Box name cannot be > 64 characters");
         }
 
-        if (slotCount < 1 || slotCount > 300)
+        if (input.slotCount < 1 || input.slotCount > 300)
         {
             throw new ArgumentException($"Box slot count should be between 1-300");
         }
 
-        var box = loaders.boxLoader.GetEntity(boxId);
+        var box = boxLoader.GetEntity(input.boxId);
 
-        if (box!.BankId != bankId)
+        var order = input.order;
+
+        if (box!.BankId != input.bankId)
         {
-            var bankBoxes = loaders.boxLoader.GetAllEntities().Values.ToList().FindAll(box => box.BankId == box.BankId);
+            var bankBoxes = boxLoader.GetAllEntities().Values.ToList().FindAll(box => box.BankId == box.BankId);
             if (bankBoxes.Count <= 1)
             {
                 throw new ArgumentException($"Bank must keep at least 1 box");
@@ -30,13 +36,13 @@ public class MainUpdateBoxAction(string boxId, string boxName, int order, string
             // edit previous bank view: remove this box
             if (box.BankId != null)
             {
-                var bank = loaders.bankLoader.GetEntity(box.BankId);
-                if (bank.View.MainBoxIds.Contains(box.IdInt))
+                var bank = bankLoader.GetEntity(box.BankId);
+                if (bank.View.MainBoxIds.Contains(int.Parse(box.Id)))
                 {
-                    bank = loaders.bankLoader.WriteEntity(bank with
+                    bank = bankLoader.WriteEntity(bank with
                     {
                         View = new(
-                            MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
+                            MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != int.Parse(box.Id))],
                             Saves: bank.View.Saves
                         )
                     });
@@ -47,12 +53,12 @@ public class MainUpdateBoxAction(string boxId, string boxName, int order, string
             order = 999;
         }
 
-        if (box.SlotCount != slotCount)
+        if (box.SlotCount != input.slotCount)
         {
-            var boxPkms = loaders.pkmVersionLoader.GetEntitiesByBox(box.IdInt);
+            var boxPkms = pkmVersionLoader.GetEntitiesByBox(int.Parse(box.Id));
             if (boxPkms.Any(pkm =>
                 // Key = boxSlot
-                pkm.Key >= slotCount - 1
+                pkm.Key >= input.slotCount - 1
             ))
             {
                 throw new ArgumentException($"Box slot count change is blocked by a pkm");
@@ -61,19 +67,19 @@ public class MainUpdateBoxAction(string boxId, string boxName, int order, string
 
         var boxOldName = box.Name;
 
-        loaders.boxLoader.WriteEntity(box with
+        boxLoader.WriteEntity(box with
         {
-            Type = type,
-            Name = boxName,
+            Type = input.type,
+            Name = input.boxName,
             Order = order,
-            BankId = bankId,
-            SlotCount = slotCount,
+            BankId = input.bankId,
+            SlotCount = input.slotCount,
         });
-        loaders.boxLoader.NormalizeOrders();
+        boxLoader.NormalizeOrders();
 
         return new(
             type: DataActionType.MAIN_UPDATE_BOX,
-            parameters: [boxOldName, boxName]
+            parameters: [boxOldName, input.boxName]
         );
     }
 }

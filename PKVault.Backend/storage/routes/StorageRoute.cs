@@ -5,7 +5,7 @@ namespace PKVault.Backend.storage.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class StorageController(DataService dataService, ILoadersService loadersService, StorageQueryService storageQueryService, ActionService actionService) : ControllerBase
+public class StorageController(DataService dataService, StorageQueryService storageQueryService, ActionService actionService) : ControllerBase
 {
     [HttpGet("main/bank")]
     public async Task<ActionResult<List<BankDTO>>> GetMainBanks()
@@ -52,7 +52,7 @@ public class StorageController(DataService dataService, ILoadersService loadersS
     [HttpPut("move/pkm")]
     public async Task<ActionResult<DataDTO>> MovePkm(
         [FromQuery] string[] pkmIds, uint? sourceSaveId,
-        uint? targetSaveId, [BindRequired] int targetBoxId, [FromQuery] int[] targetBoxSlots,
+        uint? targetSaveId, [BindRequired] string targetBoxId, [FromQuery] int[] targetBoxSlots,
         bool attached
     )
     {
@@ -207,7 +207,7 @@ public class StorageController(DataService dataService, ILoadersService loadersS
     [HttpGet("action")]
     public ActionResult<List<DataActionPayload>> GetActions()
     {
-        return loadersService.GetActionPayloadList();
+        return actionService.GetActionPayloadList();
     }
 
     [HttpDelete("action")]

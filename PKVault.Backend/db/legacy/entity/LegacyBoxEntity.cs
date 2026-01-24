@@ -1,4 +1,4 @@
-public record BoxEntity(
+public record LegacyBoxEntity(
     string Id,
     string Name,
     BoxType Type = BoxType.Box,
@@ -6,7 +6,7 @@ public record BoxEntity(
     int Order = 0,
     string BankId = "",
     int SchemaVersion = 0
-) : IEntity(SchemaVersion, Id)
+) : ILegacyEntity(SchemaVersion, Id)
 {
     public int IdInt => int.Parse(Id);
 }

@@ -1,60 +1,69 @@
 /**
  * Data queries related to storage.
  */
-public class StorageQueryService(ILoadersService loadersService, PkmLegalityService pkmLegalityService)
+public class StorageQueryService(
+    IServiceProvider sp,
+    ILoadersService loadersService, PkmLegalityService pkmLegalityService
+)
 {
     public async Task<List<BankDTO>> GetMainBanks()
     {
-        var loaders = await loadersService.GetLoaders();
+        using var scope = sp.CreateScope();
+        var bankLoader = scope.ServiceProvider.GetRequiredService<IBankLoader>();
 
-        return loaders.bankLoader.GetAllDtos();
+        return await bankLoader.GetAllDtos();
     }
 
     public async Task<Dictionary<string, BankDTO?>> GetMainBanks(string[] ids)
     {
-        var loaders = await loadersService.GetLoaders();
+        using var scope = sp.CreateScope();
+        var bankLoader = scope.ServiceProvider.GetRequiredService<IBankLoader>();
 
-        return ids.Select(id =>
+        return (await Task.WhenAll(ids.Select(async id =>
         {
-            var bank = loaders.bankLoader.GetDto(id);
+            var bank = await bankLoader.GetDto(id);
             return (id, bank);
-        }).ToDictionary();
+        }))).ToDictionary();
     }
 
     public async Task<List<BoxDTO>> GetMainBoxes()
     {
-        var loaders = await loadersService.GetLoaders();
+        using var scope = sp.CreateScope();
+        var boxLoader = scope.ServiceProvider.GetRequiredService<IBoxLoader>();
 
-        return loaders.boxLoader.GetAllDtos();
+        return await boxLoader.GetAllDtos();
     }
 
     public async Task<Dictionary<string, BoxDTO?>> GetMainBoxes(string[] ids)
     {
-        var loaders = await loadersService.GetLoaders();
+        using var scope = sp.CreateScope();
+        var boxLoader = scope.ServiceProvider.GetRequiredService<IBoxLoader>();
 
-        return ids.Select(id =>
+        return (await Task.WhenAll(ids.Select(async id =>
         {
-            var box = loaders.boxLoader.GetDto(id);
+            var box = await boxLoader.GetDto(id);
             return (id, box);
-        }).ToDictionary();
+        }))).ToDictionary();
     }
 
     public async Task<List<PkmVersionDTO>> GetMainPkmVersions()
     {
-        var loaders = await loadersService.GetLoaders();
+        using var scope = sp.CreateScope();
+        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
 
-        return loaders.pkmVersionLoader.GetAllDtos();
+        return await pkmVersionLoader.GetAllDtos();
     }
 
     public async Task<Dictionary<string, PkmVersionDTO?>> GetMainPkmVersions(string[] pkmIds)
     {
-        var loaders = await loadersService.GetLoaders();
+        using var scope = sp.CreateScope();
+        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
 
-        return pkmIds.Select(id =>
+        return (await Task.WhenAll(pkmIds.Select(async id =>
         {
-            var pkmVersion = loaders.pkmVersionLoader.GetDto(id);
+            var pkmVersion = await pkmVersionLoader.GetDto(id);
             return (id, pkmVersion);
-        }).ToDictionary();
+        }))).ToDictionary();
     }
 
     public async Task<List<BoxDTO>> GetSaveBoxes(uint saveId)
@@ -102,18 +111,20 @@ public class StorageQueryService(ILoadersService loadersService, PkmLegalityServ
 
     public async Task<Dictionary<string, PkmLegalityDTO?>> GetPkmsLegality(string[] pkmIds, uint? saveId)
     {
+        using var scope = sp.CreateScope();
+        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
         var loaders = await loadersService.GetLoaders();
 
-        return pkmIds.Select(id =>
+        return (await Task.WhenAll(pkmIds.Select(async id =>
         {
             if (saveId == null)
             {
-                var pkmVersion = loaders.pkmVersionLoader.GetDto(id);
+                var pkmVersion = await pkmVersionLoader.GetDto(id);
                 return (id, pkmVersion == null ? null : pkmLegalityService.CreateDTO(pkmVersion));
             }
 
             var pkmSave = loaders.saveLoadersDict[(uint)saveId].Pkms.GetDto(id);
             return (id, pkmSave == null ? null : pkmLegalityService.CreateDTO(pkmSave));
-        }).ToDictionary();
+        }))).ToDictionary();
     }
 }

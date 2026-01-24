@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public interface IPKMLoader
 {
-    public Dictionary<string, (byte[] Data, PKMLoadError? Error)> GetAllEntities();
+    public (byte[] Data, PKMLoadError? Error) GetEntity(string filepath);
     public void DeleteEntity(string filepath);
     public string WriteEntity(ImmutablePKM pkm, string filepath, Dictionary<ushort, StaticEvolve> evolves);
     public void WriteToFiles();
@@ -36,46 +36,16 @@ public class PKMLoader : IPKMLoader
 
     public PKMLoader(
         IFileIOService _fileIOService,
-        string _storagePath,
-        List<string> filepaths
+        string _storagePath
     )
     {
         fileIOService = _fileIOService;
         storagePath = _storagePath;
-        filepaths.ForEach(filepath =>
-        {
-            byte[] bytes = [];
-            PKMLoadError? error = null;
-            try
-            {
-                var (TooSmall, TooBig) = fileIOService.CheckGameFile(filepath);
-
-                if (TooBig)
-                    throw new PKMLoadException(PKMLoadError.TOO_BIG);
-
-                if (TooSmall)
-                    throw new PKMLoadException(PKMLoadError.TOO_SMALL);
-
-                bytes = fileIOService.ReadBytes(filepath);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex);
-                error = GetPKMLoadError(ex);
-            }
-
-            bytesDict.Add(filepath, (bytes, error));
-        });
     }
 
-    public Dictionary<string, (byte[] Data, PKMLoadError? Error)> GetAllEntities()
+    public (byte[] Data, PKMLoadError? Error) GetEntity(string filepath)
     {
-        return bytesDict.ToDictionary();
-    }
-
-    private (byte[] Data, PKMLoadError? Error) GetEntity(string filepath)
-    {
-        return bytesDict.GetValueOrDefault(filepath);
+        return GetFileOrLoad(filepath);
     }
 
     public void DeleteEntity(string filepath)
@@ -133,6 +103,40 @@ public class PKMLoader : IPKMLoader
                 fileIOService.Delete(action.Path);
             }
         }
+    }
+
+    private (byte[] Data, PKMLoadError? Error) GetFileOrLoad(string filepath)
+    {
+        if (bytesDict.TryGetValue(filepath, out var file))
+        {
+            return file;
+        }
+
+        byte[] bytes = [];
+        PKMLoadError? error = null;
+        try
+        {
+            var (TooSmall, TooBig) = fileIOService.CheckGameFile(filepath);
+
+            if (TooBig)
+                throw new PKMLoadException(PKMLoadError.TOO_BIG);
+
+            if (TooSmall)
+                throw new PKMLoadException(PKMLoadError.TOO_SMALL);
+
+            bytes = fileIOService.ReadBytes(filepath);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+            error = GetPKMLoadError(ex);
+        }
+
+        file = (bytes, error);
+
+        bytesDict.Add(filepath, file);
+
+        return file;
     }
 
     public ImmutablePKM CreatePKM(PkmVersionEntity pkmVersionEntity)

@@ -1,29 +1,33 @@
-public class MainDeleteBankAction(string bankId) : DataAction
-{
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
-    {
-        var bank = loaders.bankLoader.GetEntity(bankId);
+public record MainDeleteBankActionInput(string bankId);
 
-        var banksCount = loaders.bankLoader.GetAllEntities().Count;
+public class MainDeleteBankAction(
+    IBankLoader bankLoader, IBoxLoader boxLoader, MainDeleteBoxAction mainDeleteBoxAction
+) : DataAction<MainDeleteBankActionInput>
+{
+    protected override async Task<DataActionPayload?> Execute(MainDeleteBankActionInput input, DataUpdateFlags flags)
+    {
+        var bank = bankLoader.GetEntity(input.bankId);
+
+        var banksCount = bankLoader.GetAllEntities().Count;
         if (banksCount < 2)
         {
             throw new ArgumentException("Last Bank cannot be deleted");
         }
 
-        var boxes = loaders.boxLoader.GetAllEntities().Values.ToList().FindAll(box => box.BankId == bankId);
+        var boxes = boxLoader.GetAllEntities().Values.ToList().FindAll(box => box.BankId == input.bankId);
         foreach (var box in boxes)
         {
-            await new MainDeleteBoxAction(box.Id).ExecuteWithPayload(loaders, flags);
+            await mainDeleteBoxAction.ExecuteWithPayload(new(box.Id), flags);
         }
 
-        loaders.bankLoader.DeleteEntity(bankId);
+        bankLoader.DeleteEntity(input.bankId);
         if (bank.IsDefault)
         {
-            var newDefaultBank = loaders.bankLoader.GetAllEntities().First().Value;
-            loaders.bankLoader.WriteEntity(newDefaultBank with { IsDefault = true });
+            var newDefaultBank = bankLoader.GetAllEntities().First().Value;
+            bankLoader.WriteEntity(newDefaultBank with { IsDefault = true });
         }
 
-        loaders.bankLoader.NormalizeOrders();
+        bankLoader.NormalizeOrders();
 
         return new(
             type: DataActionType.MAIN_DELETE_BANK,

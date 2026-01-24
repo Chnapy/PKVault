@@ -1,14 +1,36 @@
 using PKHeX.Core;
 
-public class PkmNormalize(
-    ILegacyPkmLoader loader, Dictionary<ushort, StaticEvolve> evolves
-) : DataNormalize<LegacyPkmEntity, LegacyPkmEntity>(loader)
+public class LegacyPkmNormalize(
+    LegacyPkmLoader loader, Dictionary<ushort, StaticEvolve> evolves
+)
 {
-    public override void SetupInitialData(DataEntityLoaders loaders)
+    public void MigrateGlobalEntities(LegacyPkmVersionLoader pkmVersionLoader, Dictionary<uint, SaveWrapper> savesDict)
     {
+        var entities = loader.GetAllEntities();
+        if (entities.Count == 0)
+        {
+            return;
+        }
+
+        var firstItem = entities.First().Value;
+        if (firstItem == null)
+        {
+            return;
+        }
+
+        if (firstItem.SchemaVersion == loader.GetLastSchemaVersion())
+        {
+            return;
+        }
+
+        var migrateFn = GetMigrateFunc(firstItem.SchemaVersion) ?? throw new NotSupportedException($"Schema version {firstItem.SchemaVersion}");
+
+        migrateFn(pkmVersionLoader, savesDict);
+
+        MigrateGlobalEntities(pkmVersionLoader, savesDict);
     }
 
-    protected override Action<DataEntityLoaders>? GetMigrateFunc(int currentSchemaVersion) => currentSchemaVersion switch
+    protected Action<LegacyPkmVersionLoader, Dictionary<uint, SaveWrapper>>? GetMigrateFunc(int currentSchemaVersion) => currentSchemaVersion switch
     {
         0 => MigrateV0ToV1,
         1 => MigrateV1ToV2,
@@ -16,7 +38,7 @@ public class PkmNormalize(
         _ => null
     };
 
-    private void MigrateV0ToV1(DataEntityLoaders loaders)
+    private void MigrateV0ToV1(LegacyPkmVersionLoader pkmVersionLoader, Dictionary<uint, SaveWrapper> savesDict)
     {
         var time = LogUtil.Time($"Pkm normalize: MigrateV0ToV1");
         /**
@@ -30,14 +52,14 @@ public class PkmNormalize(
         loader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
         {
             var oldPkmEntityId = pkmEntity.Id;
-            loaders.pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
+            pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
             {
                 if (pkmVersionEntity.PkmId != pkmEntity.Id)
                 {
                     return;
                 }
 
-                var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
+                var pkm = pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
                 if (!pkm.IsEnabled)
                 {
                     return;
@@ -49,25 +71,25 @@ public class PkmNormalize(
                 var isMainVersion = pkmVersionEntity.PkmId == oldId;
 
                 // must be done first
-                loaders.pkmVersionLoader.DeleteEntity(oldId);
+                pkmVersionLoader.DeleteEntity(oldId);
 
                 // update pkm-entity id if main version
                 if (isMainVersion)
                 {
-                    pkmEntity = loaders.legacyPkmLoader.WriteEntity(pkmEntity with { Id = expectedId });
+                    pkmEntity = loader.WriteEntity(pkmEntity with { Id = expectedId });
                 }
 
-                var filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkm, evolves);
+                var filepath = pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkm, evolves);
 
                 // update pkm-version-entity id
-                pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(
+                pkmVersionEntity = pkmVersionLoader.WriteEntity(
                     pkmVersionEntity with { Id = expectedId, Filepath = filepath },
                     pkm);
             });
 
             if (pkmEntity.Id != oldPkmEntityId)
             {
-                loaders.pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
+                pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
                 {
                     if (pkmVersionEntity.PkmId != oldPkmEntityId)
                     {
@@ -75,7 +97,7 @@ public class PkmNormalize(
                     }
 
                     // wrong PkmId
-                    pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with { PkmId = pkmEntity.Id });
+                    pkmVersionEntity = pkmVersionLoader.WriteEntity(pkmVersionEntity with { PkmId = pkmEntity.Id });
                 });
 
                 loader.DeleteEntity(oldPkmEntityId);
@@ -86,7 +108,7 @@ public class PkmNormalize(
         time();
     }
 
-    private void MigrateV1ToV2(DataEntityLoaders loaders)
+    private void MigrateV1ToV2(LegacyPkmVersionLoader pkmVersionLoader, Dictionary<uint, SaveWrapper> savesDict)
     {
         var time = LogUtil.Time($"Pkm normalize: MigrateV1ToV2");
         /**
@@ -101,14 +123,14 @@ public class PkmNormalize(
         loader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
         {
             var oldPkmEntityId = pkmEntity.Id;
-            loaders.pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
+            pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
             {
                 if (pkmVersionEntity.PkmId != oldPkmEntityId)
                 {
                     return;
                 }
 
-                var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
+                var pkm = pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
                 if (!pkm.IsEnabled)
                 {
                     return;
@@ -122,18 +144,18 @@ public class PkmNormalize(
                     var isMainVersion = pkmVersionEntity.PkmId == oldId;
 
                     // must be done first
-                    loaders.pkmVersionLoader.DeleteEntity(oldId);
+                    pkmVersionLoader.DeleteEntity(oldId);
 
                     // update pkm-entity id if main version
                     if (isMainVersion)
                     {
-                        pkmEntity = loaders.legacyPkmLoader.WriteEntity(pkmEntity with { Id = expectedId });
+                        pkmEntity = loader.WriteEntity(pkmEntity with { Id = expectedId });
                     }
 
-                    var filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkm, evolves);
+                    var filepath = pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkm, evolves);
 
                     // update pkm-version-entity id
-                    pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(
+                    pkmVersionEntity = pkmVersionLoader.WriteEntity(
                         pkmVersionEntity with { Id = expectedId, Filepath = filepath },
                         pkm);
                 }
@@ -141,7 +163,7 @@ public class PkmNormalize(
 
             if (pkmEntity.Id != oldPkmEntityId)
             {
-                loaders.pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
+                pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
                 {
                     if (pkmVersionEntity.PkmId != oldPkmEntityId)
                     {
@@ -149,7 +171,7 @@ public class PkmNormalize(
                     }
 
                     // wrong PkmId
-                    pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with { PkmId = pkmEntity.Id });
+                    pkmVersionEntity = pkmVersionLoader.WriteEntity(pkmVersionEntity with { PkmId = pkmEntity.Id });
                 });
 
                 loader.DeleteEntity(oldPkmEntityId);
@@ -160,7 +182,7 @@ public class PkmNormalize(
         time();
     }
 
-    private void MigrateV2ToV3(DataEntityLoaders loaders)
+    private void MigrateV2ToV3(LegacyPkmVersionLoader pkmVersionLoader, Dictionary<uint, SaveWrapper> savesDict)
     {
         var time = LogUtil.Time($"Pkm normalize: MigrateV2ToV3");
         /**
@@ -169,7 +191,7 @@ public class PkmNormalize(
         loader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
         {
             var oldPkmEntityId = pkmEntity.Id;
-            loaders.pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
+            pkmVersionLoader.GetAllEntities().Values.ToList().ForEach(pkmVersionEntity =>
             {
                 if (pkmVersionEntity.PkmId != oldPkmEntityId)
                 {
@@ -178,16 +200,16 @@ public class PkmNormalize(
 
                 uint? attachedSaveId = null;
                 string? attachedSavePkmIdBase = null;
-                if (pkmEntity.SaveId != null && loaders.saveLoadersDict.TryGetValue((uint)pkmEntity.SaveId, out var saveLoader))
+                if (pkmEntity.SaveId != null && savesDict.TryGetValue((uint)pkmEntity.SaveId, out var save))
                 {
-                    if (saveLoader.Save.Generation == pkmVersionEntity.Generation)
+                    if (save.Generation == pkmVersionEntity.Generation)
                     {
                         attachedSaveId = pkmEntity.SaveId;
                         attachedSavePkmIdBase = pkmVersionEntity.Id;
                     }
                 }
 
-                loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with
+                pkmVersionLoader.WriteEntity(pkmVersionEntity with
                 {
                     BoxId = (int)pkmEntity.BoxId,
                     BoxSlot = (int)pkmEntity.BoxSlot,
@@ -202,13 +224,13 @@ public class PkmNormalize(
         time();
     }
 
-    public override void CleanData(DataEntityLoaders loaders)
+    public void CleanData(LegacyPkmVersionLoader pkmVersionLoader)
     {
         var time = LogUtil.Time($"Pkm normalize: CleanData remove pkms with no pkmVersions");
         // remove pkms with no pkmVersions
         loader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
         {
-            var pkmVersions = loaders.pkmVersionLoader.GetAllEntities().Values.Where(pkmVersionEntity => pkmVersionEntity.PkmId == pkmEntity.Id);
+            var pkmVersions = pkmVersionLoader.GetAllEntities().Values.Where(pkmVersionEntity => pkmVersionEntity.PkmId == pkmEntity.Id);
             if (!pkmVersions.Any())
             {
                 loader.DeleteEntity(pkmEntity.Id);

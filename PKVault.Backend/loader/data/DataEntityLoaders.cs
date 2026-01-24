@@ -1,38 +1,53 @@
-using PKHeX.Core;
-
-public class DataEntityLoaders(ISaveService saveService)
+public class DataEntityLoaders
 {
+    public static async Task<DataEntityLoaders> Create(
+        IServiceProvider sp,
+        ISaveService saveService, SettingsDTO settings, PkmConvertService pkmConvertService,
+        Dictionary<ushort, StaticEvolve> evolves
+    )
+    {
+        var saveLoadersDict = new Dictionary<uint, SaveLoaders>();
+
+        var saveById = await saveService.GetSaveCloneById();
+        if (saveById.Count > 0)
+        {
+            saveById.Values.ToList().ForEach((save) =>
+            {
+                saveLoadersDict.Add(save.Id, new(
+                    Save: save,
+                    Boxes: new SaveBoxLoader(save, sp),
+                    Pkms: new SavePkmLoader(pkmConvertService, language: settings.GetSafeLanguage(), evolves, save)
+                ));
+            });
+        }
+
+        return new()
+        {
+            saveService = saveService,
+            saveLoadersDict = saveLoadersDict
+        };
+    }
+
+    public required ISaveService saveService;
+
     public DateTime startTime = DateTime.UtcNow;
 
-    public readonly List<DataAction> actions = [];
+    public required Dictionary<uint, SaveLoaders> saveLoadersDict;
 
-    public required IBankLoader bankLoader { get; set; }
-    public required IBoxLoader boxLoader { get; set; }
-    public required ILegacyPkmLoader legacyPkmLoader { get; set; }
-    public required IPkmVersionLoader pkmVersionLoader { get; set; }
-    public required IDexLoader dexLoader { get; set; }
-    public required Dictionary<uint, SaveLoaders> saveLoadersDict { get; set; }
-
-    public List<IEntityLoaderWrite> jsonLoaders => [bankLoader, boxLoader, legacyPkmLoader, pkmVersionLoader, dexLoader];
+    private DataEntityLoaders()
+    { }
 
     public void SetFlags(DataUpdateFlags flags)
     {
-        bankLoader.SetFlags(flags.MainBanks);
-        boxLoader.SetFlags(flags.MainBoxes);
-        pkmVersionLoader.SetFlags(flags.MainPkmVersions);
-
         saveLoadersDict.Values.ToList().ForEach(saveLoader =>
         {
             saveLoader.Pkms.SetFlags(flags.Saves);
         });
     }
 
-    public bool GetHasWritten() => jsonLoaders.Any(loader => loader.HasWritten)
-        || saveLoadersDict.Values.Any(saveLoaders => saveLoaders.Pkms.HasWritten || saveLoaders.Boxes.HasWritten);
-
     public async Task WriteToFiles()
     {
-        List<Task> tasks = [.. jsonLoaders.Select(loader => loader.WriteToFile())];
+        List<Task> tasks = [];
 
         foreach (var saveLoaders in saveLoadersDict.Values.ToList())
         {

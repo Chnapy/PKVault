@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : IWithId where E : IEntity
+public abstract class LegacyEntityLoader<E> where E : ILegacyEntity
 {
     protected IFileIOService fileIOService;
 
@@ -12,7 +12,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
     public bool HasWritten { get; set; } = false;
     protected JsonTypeInfo<Dictionary<string, E>> DictJsonContext;
 
-    public EntityLoader(
+    public LegacyEntityLoader(
         IFileIOService _fileIOService,
         string filePath, JsonTypeInfo<Dictionary<string, E>> dictJsonContext
     )
@@ -20,13 +20,6 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         fileIOService = _fileIOService;
         FilePath = MatcherUtil.NormalizePath(filePath);
         DictJsonContext = dictJsonContext;
-    }
-
-    protected abstract DTO GetDTOFromEntity(E entity);
-
-    public List<DTO> GetAllDtos()
-    {
-        return [.. GetAllEntities().Values.Select(GetDTOFromEntity)];
     }
 
     public virtual Dictionary<string, E> GetAllEntities()
@@ -52,12 +45,6 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
                 + $"\n{ex.GetType()}: {ex.Message}"
             );
         }
-    }
-
-    public DTO? GetDto(string id)
-    {
-        var entity = GetEntity(id);
-        return entity == null ? default : GetDTOFromEntity(entity);
     }
 
     public E? GetEntity(string id)
@@ -114,4 +101,8 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
     }
 
     public abstract int GetLastSchemaVersion();
+
+    // public List<E> GetAllDtos() => [.. GetAllEntities().Values];
+
+    // public E? GetDto(string id) => GetEntity(id);
 }

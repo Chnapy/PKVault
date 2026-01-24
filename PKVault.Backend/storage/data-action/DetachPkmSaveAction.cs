@@ -1,27 +1,34 @@
 
-public class DetachPkmSaveAction(string[] pkmVersionIds) : DataAction
+public record DetachPkmSaveActionInput(string[] pkmVersionIds);
+
+public class DetachPkmSaveAction(
+    ILoadersService loadersService,
+    IPkmVersionLoader pkmVersionLoader
+) : DataAction<DetachPkmSaveActionInput>
 {
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload?> Execute(DetachPkmSaveActionInput input, DataUpdateFlags flags)
     {
-        if (pkmVersionIds.Length == 0)
+        if (input.pkmVersionIds.Length == 0)
         {
             throw new ArgumentException($"Pkm version ids cannot be empty");
         }
 
+        var loaders = await loadersService.GetLoaders();
+
         DataActionPayload act(string pkmVersionId)
         {
-            var pkmVersionEntity = loaders.pkmVersionLoader.GetEntity(pkmVersionId);
+            var pkmVersionEntity = pkmVersionLoader.GetEntity(pkmVersionId);
             var oldSaveId = pkmVersionEntity!.AttachedSaveId;
             if (oldSaveId != null)
             {
-                loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with
+                pkmVersionLoader.WriteEntity(pkmVersionEntity with
                 {
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null
                 });
             }
 
-            var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
+            var pkm = pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
 
             var pkmNickname = pkm.Nickname;
             var saveExists = loaders.saveLoadersDict.TryGetValue(oldSaveId ?? 0, out var saveLoaders);
@@ -33,7 +40,7 @@ public class DetachPkmSaveAction(string[] pkmVersionIds) : DataAction
         }
 
         List<DataActionPayload> payloads = [];
-        foreach (var pkmVersionId in pkmVersionIds)
+        foreach (var pkmVersionId in input.pkmVersionIds)
         {
             payloads.Add(act(pkmVersionId));
         }

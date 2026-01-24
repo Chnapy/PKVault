@@ -25,6 +25,8 @@ public interface IFileIOService
     public bool Exists(string path);
     public DateTime GetLastWriteTime(string path);
     public DateTime GetLastWriteTimeUtc(string path);
+    public void Copy(string sourceFileName, string destFileName, bool overwrite);
+    public void Move(string sourceFileName, string destFileName, bool overwrite);
     public bool Delete(string path);
     public void CreateDirectory(string path);
 }
@@ -146,6 +148,16 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
     public DateTime GetLastWriteTimeUtc(string path)
     {
         return fileSystem.File.GetLastWriteTimeUtc(path);
+    }
+
+    public void Copy(string sourceFileName, string destFileName, bool overwrite)
+    {
+        fileSystem.File.Copy(sourceFileName, destFileName, overwrite);
+    }
+
+    public void Move(string sourceFileName, string destFileName, bool overwrite)
+    {
+        fileSystem.File.Move(sourceFileName, destFileName, overwrite);
     }
 
     public bool Delete(string path)

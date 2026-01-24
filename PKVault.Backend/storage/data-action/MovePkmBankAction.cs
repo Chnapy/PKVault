@@ -1,41 +1,44 @@
 using PKHeX.Core;
 
+public record MovePkmBankActionInput(string[] pkmIds, uint? sourceSaveId, string bankId, bool attached);
+
 public class MovePkmBankAction(
-    PkmConvertService pkmConvertService,
-    Dictionary<ushort, StaticEvolve> Evolves,
-    string[] pkmIds, uint? sourceSaveId,
-    string bankId,
-    bool attached
-) : DataAction
+    IServiceProvider sp,
+    ILoadersService loadersService, StaticDataService staticDataService,
+    IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVersionLoader pkmVersionLoader,
+    MainCreateBoxAction mainCreateBoxAction, SynchronizePkmAction synchronizePkmAction
+) : DataAction<MovePkmBankActionInput>
 {
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload?> Execute(MovePkmBankActionInput input, DataUpdateFlags flags)
     {
-        if (pkmIds.Length == 0)
+        if (input.pkmIds.Length == 0)
         {
             throw new ArgumentException($"Pkm ids cannot be empty");
         }
 
-        var bank = loaders.bankLoader.GetEntity(bankId)
+        var loaders = await loadersService.GetLoaders();
+
+        var bank = bankLoader.GetEntity(input.bankId)
             ?? throw new ArgumentException($"Bank not found");
 
-        var mainBoxes = loaders.boxLoader.GetAllDtos()
-            .FindAll(box => box.BankId == bankId)
+        var mainBoxes = (await boxLoader.GetAllDtos())
+            .FindAll(box => box.BankId == input.bankId)
             .OrderBy(box => box.Order).ToList();
 
         var boxDict = new Dictionary<int, int[]>();
         var boxesOccupationDict = mainBoxes.Select(box => (
-            box.IdInt,
-            loaders.pkmVersionLoader.GetEntitiesByBox(box.IdInt)
+            box.Id,
+            pkmVersionLoader.GetEntitiesByBox(box.Id)
                 .Select(dict => dict.Key)   // boxSlot
                 .ToHashSet()
         )).ToDictionary();
-        var boxesUnoccupationDict = new Dictionary<int, HashSet<int>>();
+        var boxesUnoccupationDict = new Dictionary<string, HashSet<int>>();
 
         var availableSlotCount = 0;
 
         foreach (var boxId in boxesOccupationDict.Keys)
         {
-            var box = mainBoxes.Find(box => box.IdInt == boxId);
+            var box = mainBoxes.Find(box => box.Id == boxId);
             HashSet<int> unoccupiedSlots = [];
             for (int slot = 0; slot < box.SlotCount; slot++)
             {
@@ -51,12 +54,12 @@ public class MovePkmBankAction(
             }
         }
 
-        if (availableSlotCount < pkmIds.Length)
+        if (availableSlotCount < input.pkmIds.Length)
         {
-            var missingSlotCount = pkmIds.Length - availableSlotCount;
+            var missingSlotCount = input.pkmIds.Length - availableSlotCount;
             var boxSlotCount = new int[] { missingSlotCount, 30 }.Max();
 
-            var box = MainCreateBoxAction.CreateBox(loaders, flags, bankId, boxSlotCount);
+            var box = mainCreateBoxAction.CreateBox(new(input.bankId, boxSlotCount));
 
             HashSet<int> unoccupiedSlots = [];
             for (int slot = 0; slot < box.SlotCount; slot++)
@@ -66,7 +69,7 @@ public class MovePkmBankAction(
             }
             if (unoccupiedSlots.Count > 0)
             {
-                boxesUnoccupationDict.Add(box.IdInt, unoccupiedSlots);
+                boxesUnoccupationDict.Add(box.Id, unoccupiedSlots);
             }
         }
 
@@ -80,18 +83,18 @@ public class MovePkmBankAction(
                 boxesUnoccupationDict.Remove(boxId);
             }
 
-            if (sourceSaveId == null)
+            if (input.sourceSaveId == null)
             {
-                return MainToMain(loaders, flags, pkmId, boxId, boxSlot);
+                return await MainToMain(input, pkmId, boxId, boxSlot);
             }
 
-            return await SaveToMain(loaders, flags, pkmId, boxId, boxSlot);
+            return await SaveToMain(input, loaders, flags, pkmId, boxId, boxSlot);
         }
 
         // Console.WriteLine($"ENTRIES [{moveDirection}]:\n{string.Join('\n', entries.Select(e => e.Item1 + "_" + e.Item2 + "_" + e.Item3))}");
 
         List<DataActionPayload> payloads = [];
-        foreach (var pkmId in pkmIds)
+        foreach (var pkmId in input.pkmIds)
         {
             payloads.Add(await act(pkmId));
         }
@@ -99,39 +102,39 @@ public class MovePkmBankAction(
         return payloads[0];
     }
 
-    private DataActionPayload MainToMain(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmVersionId, int targetBoxId, int targetBoxSlot)
+    private async Task<DataActionPayload> MainToMain(MovePkmBankActionInput input, string pkmVersionId, string targetBoxId, int targetBoxSlot)
     {
-        var entity = loaders.pkmVersionLoader.GetEntity(pkmVersionId) ?? throw new KeyNotFoundException("PkmVersion not found");
-        var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(entity);
+        var entity = pkmVersionLoader.GetEntity(pkmVersionId) ?? throw new KeyNotFoundException("PkmVersion not found");
+        var pkm = pkmVersionLoader.GetPkmVersionEntityPkm(entity);
 
-        var pkmsAlreadyPresent = loaders.pkmVersionLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot).Values;
+        var pkmsAlreadyPresent = pkmVersionLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot).Values;
         if (pkmsAlreadyPresent.Any())
         {
             throw new Exception("Pkm already present");
         }
 
-        loaders.pkmVersionLoader.WriteEntity(entity with
+        pkmVersionLoader.WriteEntity(entity with
         {
             BoxId = targetBoxId,
             BoxSlot = targetBoxSlot
         });
 
-        var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
+        var boxName = (await boxLoader.GetDto(targetBoxId.ToString()))?.Name;
 
         return new(
             type: DataActionType.MOVE_PKM,
-            parameters: [pkm.Nickname, null, null, boxName, targetBoxSlot, attached]
+            parameters: [pkm.Nickname, null, null, boxName, targetBoxSlot, input.attached]
         );
     }
 
-    private async Task<DataActionPayload> SaveToMain(DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxId, int targetBoxSlot)
+    private async Task<DataActionPayload> SaveToMain(MovePkmBankActionInput input, DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, string targetBoxId, int targetBoxSlot)
     {
-        var saveLoaders = loaders.saveLoadersDict[(uint)sourceSaveId!];
+        var saveLoaders = loaders.saveLoadersDict[(uint)input.sourceSaveId!];
 
         var savePkm = saveLoaders.Pkms.GetDto(pkmId)
             ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
 
-        if (attached)
+        if (input.attached)
         {
             if (savePkm.IsDuplicate)
             {
@@ -139,38 +142,39 @@ public class MovePkmBankAction(
             }
         }
 
-        var pkmVersion = loaders.pkmVersionLoader.GetEntity(savePkm.IdBase);
+        var pkmVersion = pkmVersionLoader.GetEntity(savePkm.IdBase);
 
-        if (pkmVersion != null && pkmVersion.AttachedSaveId != sourceSaveId)
+        if (pkmVersion != null && pkmVersion.AttachedSaveId != input.sourceSaveId)
         {
             throw new ArgumentException($"Pkm with same ID already exists, id={savePkm.IdBase}");
         }
 
-        var existingSlots = loaders.pkmVersionLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot);
+        var existingSlots = pkmVersionLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot);
         if (existingSlots.Count > 0)
         {
             throw new Exception("Pkm already present");
         }
 
         await SaveToMainWithoutCheckTarget(
-                loaders, flags, (uint)sourceSaveId, targetBoxId, targetBoxSlot, savePkm
+                input, loaders, flags, (uint)input.sourceSaveId, targetBoxId, targetBoxSlot, savePkm
             );
 
         saveLoaders.Pkms.FlushParty();
 
         MovePkmAction.IncrementSaveTradeRecord(saveLoaders.Save);
 
-        var boxName = loaders.boxLoader.GetDto(targetBoxId.ToString())?.Name;
+        var boxName = (await boxLoader.GetDto(targetBoxId.ToString()))?.Name;
 
         return new(
             type: DataActionType.MOVE_PKM,
-            parameters: [savePkm?.Nickname, saveLoaders.Save.Version, null, boxName, targetBoxSlot, attached]
+            parameters: [savePkm?.Nickname, saveLoaders.Save.Version, null, boxName, targetBoxSlot, input.attached]
         );
     }
 
     private async Task SaveToMainWithoutCheckTarget(
+        MovePkmBankActionInput input,
         DataEntityLoaders loaders, DataUpdateFlags flags,
-        uint sourceSaveId, int targetBoxId, int targetBoxSlot,
+        uint sourceSaveId, string targetBoxId, int targetBoxSlot,
         PkmSaveDTO savePkm
     )
     {
@@ -187,33 +191,34 @@ public class MovePkmBankAction(
         }
 
         // get pkm-version
-        var pkmVersionEntity = loaders.pkmVersionLoader.GetEntity(savePkm.Id);
+        var pkmVersionEntity = pkmVersionLoader.GetEntity(savePkm.Id);
         var mainPkmAlreadyExists = pkmVersionEntity != null;
 
         if (pkmVersionEntity == null)
         {
+            var staticData = await staticDataService.GetStaticData();
+
             // create pkm-version
-            pkmVersionEntity = loaders.pkmVersionLoader.WriteEntity(new(
-                SchemaVersion: loaders.pkmVersionLoader.GetLastSchemaVersion(),
+            pkmVersionEntity = await pkmVersionLoader.WriteEntity(new(
                 Id: savePkm.IdBase,
                 BoxId: targetBoxId,
                 BoxSlot: targetBoxSlot,
                 IsMain: true,
-                AttachedSaveId: attached ? sourceSaveId : null,
-                AttachedSavePkmIdBase: attached ? savePkm.IdBase : null,
+                AttachedSaveId: input.attached ? sourceSaveId : null,
+                AttachedSavePkmIdBase: input.attached ? savePkm.IdBase : null,
                 Generation: savePkm.Generation,
-                Filepath: loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(savePkm.Pkm, Evolves)
+                Filepath: pkmVersionLoader.pkmFileLoader.GetPKMFilepath(savePkm.Pkm, staticData.Evolves)
             ), savePkm.Pkm);
         }
 
         // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmVersionEntity.AttachedSaveId != null)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)]);
+            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)], loaders));
 
-            if (!attached)
+            if (!input.attached)
             {
-                loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with
+                pkmVersionLoader.WriteEntity(pkmVersionEntity with
                 {
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null
@@ -221,13 +226,13 @@ public class MovePkmBankAction(
             }
         }
 
-        if (!attached)
+        if (!input.attached)
         {
             // remove pkm from save
             saveLoaders.Pkms.DeleteDto(savePkm.Id);
         }
 
-        new DexMainService(loaders).EnablePKM(savePkm.Pkm, savePkm.Save);
+        new DexMainService(sp, loaders).EnablePKM(savePkm.Pkm, savePkm.Save);
 
         flags.Dex = true;
     }

@@ -1,8 +1,13 @@
-public class MainCreateBankAction : DataAction
+public record MainCreateBankActionInput();
+
+public class MainCreateBankAction(
+    IBankLoader bankLoader,
+    MainCreateBoxAction mainCreateBoxAction
+) : DataAction<MainCreateBankActionInput>
 {
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload?> Execute(MainCreateBankActionInput input, DataUpdateFlags flags)
     {
-        var banks = loaders.bankLoader.GetAllDtos();
+        var banks = await bankLoader.GetAllDtos();
         var maxId = banks.Max(bank => bank.IdInt);
         var maxOrder = banks.Max(bank => bank.Order);
 
@@ -22,17 +27,16 @@ public class MainCreateBankAction : DataAction
         var order = maxOrder + 1;
         var name = GetNewName();
 
-        loaders.bankLoader.WriteEntity(new(
-            SchemaVersion: loaders.bankLoader.GetLastSchemaVersion(),
+        bankLoader.WriteEntity(new(
             Id: id.ToString(),
             Name: name,
             IsDefault: false,
             Order: order, // normalized just after
             View: new(MainBoxIds: [], Saves: [])
         ));
-        loaders.bankLoader.NormalizeOrders();
+        bankLoader.NormalizeOrders();
 
-        MainCreateBoxAction.CreateBox(loaders, flags, id.ToString(), null);
+        mainCreateBoxAction.CreateBox(new(id.ToString(), null));
 
         return new(
             type: DataActionType.MAIN_CREATE_BANK,

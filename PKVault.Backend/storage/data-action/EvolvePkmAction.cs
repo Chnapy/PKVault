@@ -1,30 +1,35 @@
 using PKHeX.Core;
 
+public record EvolvePkmActionInput(uint? saveId, string[] ids);
+
 public class EvolvePkmAction(
-    PkmConvertService pkmConvertService,
-    Dictionary<ushort, StaticEvolve> Evolves,
-    uint? saveId, string[] ids
-) : DataAction
+    IServiceProvider sp,
+    PkmConvertService pkmConvertService, StaticDataService staticDataService, ILoadersService loadersService,
+    SynchronizePkmAction synchronizePkmAction,
+    IPkmVersionLoader pkmVersionLoader
+) : DataAction<EvolvePkmActionInput>
 {
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload?> Execute(EvolvePkmActionInput input, DataUpdateFlags flags)
     {
-        if (ids.Length == 0)
+        if (input.ids.Length == 0)
         {
             throw new ArgumentException($"Pkm ids cannot be empty");
         }
 
+        var loaders = await loadersService.GetLoaders();
+
         async Task<DataActionPayload> act(string id)
         {
-            if (saveId == null)
+            if (input.saveId == null)
             {
                 return await ExecuteForMain(loaders, flags, id);
             }
 
-            return await ExecuteForSave(loaders, flags, (uint)saveId, id);
+            return await ExecuteForSave(loaders, flags, (uint)input.saveId, id);
         }
 
         List<DataActionPayload> payloads = [];
-        foreach (var id in ids)
+        foreach (var id in input.ids)
         {
             payloads.Add(await act(id));
         }
@@ -44,7 +49,7 @@ public class EvolvePkmAction(
         var oldName = dto.Nickname;
         var oldSpecies = dto.Species;
 
-        var (evolveSpecies, evolveByItem) = GetEvolve(dto.Pkm);
+        var (evolveSpecies, evolveByItem) = await GetEvolve(dto.Pkm);
 
         Console.WriteLine($"Evolve from {oldSpecies} to {evolveSpecies} using item? {evolveByItem}");
 
@@ -57,10 +62,10 @@ public class EvolvePkmAction(
         };
         saveLoaders.Pkms.WriteDto(dto);
 
-        var pkmVersion = loaders.pkmVersionLoader.GetEntityBySave(dto.SaveId, dto.IdBase);
+        var pkmVersion = pkmVersionLoader.GetEntityBySave(dto.SaveId, dto.IdBase);
         if (pkmVersion != null)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersion.Id, dto.IdBase)]);
+            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, dto.IdBase)], loaders));
         }
 
         flags.Dex = true;
@@ -73,12 +78,14 @@ public class EvolvePkmAction(
 
     private async Task<DataActionPayload> ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags, string id)
     {
-        var entity = loaders.pkmVersionLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-version not found");
-        var entityPkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(entity);
+        var staticData = await staticDataService.GetStaticData();
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox(entity.BoxId, entity.BoxSlot).Values.ToList()
+        var entity = pkmVersionLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-version not found");
+        var entityPkm = pkmVersionLoader.GetPkmVersionEntityPkm(entity);
+
+        var relatedPkmVersions = pkmVersionLoader.GetEntitiesByBox(entity.BoxId, entity.BoxSlot).Values.ToList()
             .FindAll(value => value.Id != entity.Id)
-            .Select(entity => (Version: entity, Pkm: loaders.pkmVersionLoader.GetPkmVersionEntityPkm(entity))).ToList();
+            .Select(entity => (Version: entity, Pkm: pkmVersionLoader.GetPkmVersionEntityPkm(entity))).ToList();
 
         if (
             relatedPkmVersions.Any(version => entityPkm.Species > version.Pkm.MaxSpeciesID)
@@ -90,15 +97,15 @@ public class EvolvePkmAction(
         var oldName = entityPkm.Nickname;
         var oldSpecies = entityPkm.Species;
 
-        var (evolveSpecies, evolveByItem) = GetEvolve(entityPkm);
+        var (evolveSpecies, evolveByItem) = await GetEvolve(entityPkm);
 
         // update pkm
         entityPkm = entityPkm.Update(pkm =>
         {
             UpdatePkm(pkm, evolveSpecies, evolveByItem);
         });
-        loaders.pkmVersionLoader.WriteEntity(
-            entity with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(entityPkm, Evolves) },
+        await pkmVersionLoader.WriteEntity(
+            entity with { Filepath = pkmVersionLoader.pkmFileLoader.GetPKMFilepath(entityPkm, staticData.Evolves) },
             entityPkm
         );
 
@@ -109,18 +116,18 @@ public class EvolvePkmAction(
             {
                 UpdatePkm(pkm, evolveSpecies, false);
             });
-            loaders.pkmVersionLoader.WriteEntity(
-                version.Version with { Filepath = loaders.pkmVersionLoader.pkmFileLoader.GetPKMFilepath(version.Pkm, Evolves) },
+            pkmVersionLoader.WriteEntity(
+                version.Version with { Filepath = pkmVersionLoader.pkmFileLoader.GetPKMFilepath(version.Pkm, staticData.Evolves) },
                 version.Pkm
             );
         });
 
         if (entity.AttachedSaveId != null)
         {
-            await SynchronizePkmAction.SynchronizePkmVersionToSave(pkmConvertService, loaders, flags, [(entity.Id, entity.AttachedSavePkmIdBase!)]);
+            await synchronizePkmAction.SynchronizePkmVersionToSave(new([(entity.Id, entity.AttachedSavePkmIdBase!)], loaders));
         }
 
-        new DexMainService(loaders).EnablePKM(entityPkm);
+        new DexMainService(sp, loaders).EnablePKM(entityPkm);
 
         flags.Dex = true;
 
@@ -130,9 +137,11 @@ public class EvolvePkmAction(
         );
     }
 
-    private (ushort evolveSpecies, bool evolveByItem) GetEvolve(ImmutablePKM pkm)
+    private async Task<(ushort evolveSpecies, bool evolveByItem)> GetEvolve(ImmutablePKM pkm)
     {
-        if (Evolves.TryGetValue(pkm.Species, out var staticEvolve))
+        var staticData = await staticDataService.GetStaticData();
+
+        if (staticData.Evolves.TryGetValue(pkm.Species, out var staticEvolve))
         {
             if (pkm.HeldItemPokeapiName != null && staticEvolve.TradeWithItem.TryGetValue(pkm.HeldItemPokeapiName, out var evolveMap))
             {

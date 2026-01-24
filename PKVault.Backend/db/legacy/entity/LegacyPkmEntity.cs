@@ -4,4 +4,4 @@ public record LegacyPkmEntity(
     uint BoxSlot,
     uint? SaveId,
     int SchemaVersion = 0
-) : IEntity(SchemaVersion, Id);
+) : ILegacyEntity(SchemaVersion, Id);

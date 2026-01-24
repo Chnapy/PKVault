@@ -1,22 +1,25 @@
 using PKHeX.Core;
 
-public class EditPkmVersionAction(
-    ActionService actionService, PkmConvertService pkmConvertService,
-    string pkmVersionId, EditPkmVersionPayload editPayload
-) : DataAction
-{
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
-    {
-        var pkmVersionEntity = loaders.pkmVersionLoader.GetEntity(pkmVersionId);
-        var pkmVersionPKM = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
+public record EditPkmVersionActionInput(string pkmVersionId, EditPkmVersionPayload editPayload);
 
-        var availableMoves = await actionService.GetPkmAvailableMoves(null, pkmVersionId);
+public class EditPkmVersionAction(
+    ActionService actionService, PkmConvertService pkmConvertService, ILoadersService loadersService,
+    SynchronizePkmAction synchronizePkmAction,
+    IPkmVersionLoader pkmVersionLoader
+) : DataAction<EditPkmVersionActionInput>
+{
+    protected override async Task<DataActionPayload?> Execute(EditPkmVersionActionInput input, DataUpdateFlags flags)
+    {
+        var pkmVersionEntity = pkmVersionLoader.GetEntity(input.pkmVersionId);
+        var pkmVersionPKM = pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
+
+        var availableMoves = await actionService.GetPkmAvailableMoves(null, input.pkmVersionId);
 
         var pkm = pkmVersionPKM.Update(pkm =>
         {
-            EditPkmNickname(pkmConvertService, pkm, editPayload.Nickname);
-            EditPkmEVs(pkmConvertService, pkm, editPayload.EVs);
-            EditPkmMoves(pkmConvertService, pkm, availableMoves, editPayload.Moves);
+            EditPkmNickname(pkmConvertService, pkm, input.editPayload.Nickname);
+            EditPkmEVs(pkmConvertService, pkm, input.editPayload.EVs);
+            EditPkmMoves(pkmConvertService, pkm, availableMoves, input.editPayload.Moves);
 
             // absolutly required before each write
             // TODO make a using write pkm to ensure use of this call
@@ -24,14 +27,14 @@ public class EditPkmVersionAction(
             pkm.RefreshChecksum();
         });
 
-        loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity, pkm);
+        await pkmVersionLoader.WriteEntity(pkmVersionEntity, pkm);
 
-        var relatedPkmVersions = loaders.pkmVersionLoader.GetEntitiesByBox(pkmVersionEntity.BoxId, pkmVersionEntity.BoxSlot).Values.ToList()
-            .FindAll(value => value.Id != pkmVersionId);
+        var relatedPkmVersions = pkmVersionLoader.GetEntitiesByBox(pkmVersionEntity.BoxId, pkmVersionEntity.BoxSlot).Values.ToList()
+            .FindAll(value => value.Id != input.pkmVersionId);
 
         relatedPkmVersions.ForEach((versionEntity) =>
         {
-            var relatedPkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(versionEntity).Update(relatedPkm =>
+            var relatedPkm = pkmVersionLoader.GetPkmVersionEntityPkm(versionEntity).Update(relatedPkm =>
             {
                 pkmConvertService.PassDynamicsToPkm(pkm, relatedPkm);
 
@@ -39,12 +42,13 @@ public class EditPkmVersionAction(
                 relatedPkm.RefreshChecksum();
             });
 
-            loaders.pkmVersionLoader.WriteEntity(versionEntity, relatedPkm);
+            pkmVersionLoader.WriteEntity(versionEntity, relatedPkm);
         });
 
         if (pkmVersionEntity.AttachedSaveId != null)
         {
-            await SynchronizePkmAction.SynchronizePkmVersionToSave(pkmConvertService, loaders, flags, [(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)]);
+            var loaders = await loadersService.GetLoaders();
+            await synchronizePkmAction.SynchronizePkmVersionToSave(new([(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)], loaders));
         }
 
         return new(

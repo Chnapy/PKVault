@@ -6,8 +6,9 @@ using System.Text.Json;
  * Backups creation, restore, remove and listing.
  */
 public class BackupService(
+    IServiceProvider sp,
     IFileIOService fileIOService, ILoadersService loadersService, ISaveService saveService,
-    ISettingsService settingsService
+    ISettingsService settingsService, SessionService sessionService
 )
 {
     private static readonly string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
@@ -19,7 +20,7 @@ public class BackupService(
         var loaders = await loadersService.CreateLoaders();
 
         var steptime = LogUtil.Time($"Create backup - DB");
-        var dbPaths = CreateDbBackup(loaders);
+        var dbPaths = CreateDbBackup();
         steptime();
 
         steptime = LogUtil.Time($"Create backup - Saves");
@@ -71,20 +72,24 @@ public class BackupService(
         return loaders.startTime;
     }
 
-    private Dictionary<string, (string TargetPath, byte[] FileContent)> CreateDbBackup(DataEntityLoaders loaders)
+    private Dictionary<string, (string TargetPath, byte[] FileContent)> CreateDbBackup()
     {
-        return loaders.jsonLoaders.Select(loader =>
+        var dict = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
+
+        var filePath = sessionService.MainDbPath;
+        if (fileIOService.Exists(filePath))
         {
-            var filePath = loader.FilePath;
             var fileName = Path.GetFileName(filePath);
             var relativePath = Path.Combine("db", fileName);
-            var content = loader.SerializeToUtf8Bytes();
+            var content = fileIOService.ReadBytes(filePath);
 
-            return (
+            dict.Add(
                 NormalizePath(relativePath),
-                (TargetPath: NormalizePath(filePath), FileContent: content)
+                    (TargetPath: NormalizePath(filePath), FileContent: content)
             );
-        }).ToDictionary();
+        }
+
+        return dict;
     }
 
     private Dictionary<string, (string TargetPath, byte[] FileContent)> CreateSavesBackup(DataEntityLoaders loaders)
@@ -119,7 +124,10 @@ public class BackupService(
 
     private Dictionary<string, (string TargetPath, byte[] FileContent)> CreateMainBackup(DataEntityLoaders loaders)
     {
-        var pkmFilesDict = loaders.pkmVersionLoader.pkmFileLoader.GetAllEntities();
+        using var scope = sp.CreateScope();
+        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+
+        var pkmFilesDict = pkmVersionLoader.GetAllPKMFiles();
 
         var paths = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
         if (pkmFilesDict.Values.Count == 0)
@@ -247,9 +255,9 @@ public class BackupService(
 
         var loaders = await loadersService.GetLoaders();
 
-        // remove all current json data files
+        // remove current db file
         // to avoid remaining old data
-        loaders.jsonLoaders.ForEach(jsonLoader => fileIOService.Delete(jsonLoader.FilePath));
+        fileIOService.Delete(sessionService.MainDbPath);
 
         foreach (var entry in archive.Entries)
         {

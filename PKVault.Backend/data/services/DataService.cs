@@ -2,7 +2,7 @@
  * Data response after action, providing only data mutated.
  */
 public class DataService(
-    ILoadersService loadersService, StorageQueryService storageQueryService, StaticDataService staticDataService,
+    ActionService actionService, StorageQueryService storageQueryService, StaticDataService staticDataService,
     WarningsService warningsService, DexService dexService, ISaveService saveService,
     BackupService backupService, ISettingsService settingsService
 )
@@ -173,7 +173,7 @@ public class DataService(
         var dto = new DataDTO(
             Warnings: await warningsService.GetWarningsDTO(),
             Settings: settingsService.GetSettings(),
-            Actions: loadersService.GetActionPayloadList(),
+            Actions: actionService.GetActionPayloadList(),
             StaticData: await staticDataTask,
             MainBanks: await mainBanksTask,
             MainBoxes: await mainBoxesTask,

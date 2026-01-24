@@ -1,27 +1,34 @@
+using Microsoft.AspNetCore.Components.Forms;
 using PKHeX.Core;
 
+public record SortPkmActionInput(uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot);
+
 public class SortPkmAction(
-    uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot
-) : DataAction
+    ILoadersService loadersService,
+    MainCreateBoxAction mainCreateBoxAction,
+    IPkmVersionLoader pkmVersionLoader, IBoxLoader boxLoader
+) : DataAction<SortPkmActionInput>
 {
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload?> Execute(SortPkmActionInput input, DataUpdateFlags flags)
     {
-        if (saveId == null)
+        if (input.saveId == null)
         {
-            return await ExecuteForMain(loaders, flags, fromBoxId, toBoxId, leaveEmptySlot);
+            return await ExecuteForMain(input.fromBoxId, input.toBoxId, input.leaveEmptySlot);
         }
 
-        return await ExecuteForSave(loaders, flags, (uint)saveId, fromBoxId, toBoxId, leaveEmptySlot);
+        return await ExecuteForSave((uint)input.saveId, input.fromBoxId, input.toBoxId, input.leaveEmptySlot);
     }
 
-    private async Task<DataActionPayload> ExecuteForSave(DataEntityLoaders loaders, DataUpdateFlags flags, uint saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot)
+    // TODO save + leaveEmptySlot
+    private async Task<DataActionPayload> ExecuteForSave(uint saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot)
     {
+        var loaders = await loadersService.GetLoaders();
         var saveLoaders = loaders.saveLoadersDict[saveId];
 
-        var boxes = GetBoxes(fromBoxId, toBoxId,
-            GetBoxDto: saveLoaders.Boxes.GetDto,
-            GetBoxDtoAll: saveLoaders.Boxes.GetAllDtos
-        )
+        var boxes = (await GetBoxes(saveId, fromBoxId, toBoxId,
+            GetBoxDto: async (id) => saveLoaders.Boxes.GetDto(id),
+            GetBoxDtoAll: async () => saveLoaders.Boxes.GetAllDtos()
+        ))
             .FindAll(box => box.CanSaveReceivePkm);
 
         var boxesIds = boxes.Select(box => box.IdInt).ToHashSet();
@@ -53,7 +60,8 @@ public class SortPkmAction(
                 onSpaceMissing: () =>
                 {
                     throw new ArgumentException($"Missing space, pkm sort cannot be done");
-                }
+                },
+                leaveEmptySlot
             );
         }
 
@@ -63,25 +71,25 @@ public class SortPkmAction(
         );
     }
 
-    private async Task<DataActionPayload> ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags, int fromBoxId, int toBoxId, bool leaveEmptySlot)
+    private async Task<DataActionPayload> ExecuteForMain(int fromBoxId, int toBoxId, bool leaveEmptySlot)
     {
-        var boxes = GetBoxes(fromBoxId, toBoxId,
-            GetBoxDto: loaders.boxLoader.GetDto,
-            GetBoxDtoAll: loaders.boxLoader.GetAllDtos
+        var boxes = await GetBoxes(saveId: null, fromBoxId, toBoxId,
+            GetBoxDto: boxLoader.GetDto,
+            GetBoxDtoAll: boxLoader.GetAllDtos
         );
         var boxesIds = boxes.Select(box => box.IdInt).ToHashSet();
 
         var bankId = boxes[0].BankId;
 
         var pkms = boxesIds.SelectMany(boxId =>
-            loaders.pkmVersionLoader.GetEntitiesByBox(boxId).Select(dict => dict.Value)
+            pkmVersionLoader.GetEntitiesByBox(boxId).Select(dict => dict.Value)
         ).SelectMany(dict => dict.Values).Where(pk => pk.IsMain);
         if (pkms.Any())
         {
             var filteredPkms = pkms
                 .Select(mainVersion =>
                 {
-                    var mainVersionPkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(mainVersion);
+                    var mainVersionPkm = pkmVersionLoader.GetPkmVersionEntityPkm(mainVersion);
                     return (Version: mainVersion, Pkm: mainVersionPkm);
                 });
 
@@ -102,13 +110,13 @@ public class SortPkmAction(
                 applyValue: (entry) =>
                 {
                     var currentValue = pkmVersions[entry.Index].Version;
-                    var currentPkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(currentValue);
+                    var currentPkm = pkmVersionLoader.GetPkmVersionEntityPkm(currentValue);
 
-                    var entities = loaders.pkmVersionLoader.GetEntitiesByBox(currentValue.BoxId, currentValue.BoxSlot).Values
+                    var entities = pkmVersionLoader.GetEntitiesByBox(currentValue.BoxId, currentValue.BoxSlot).Values
                         .Where(version => !placedVersions.Contains(version.Id));
                     entities.ToList().ForEach(entity =>
                     {
-                        loaders.pkmVersionLoader.WriteEntity(entity with
+                        pkmVersionLoader.WriteEntity(entity with
                         {
                             BoxId = entry.BoxId,
                             BoxSlot = entry.BoxSlot
@@ -119,9 +127,10 @@ public class SortPkmAction(
                 },
                 onSpaceMissing: () =>
                 {
-                    var box = MainCreateBoxAction.CreateBox(loaders, flags, bankId, null);
-                    boxes.Add(loaders.boxLoader.CreateDTO(box));
-                }
+                    var box = mainCreateBoxAction.CreateBox(new(bankId, null));
+                    boxes.Add(boxLoader.CreateDTO(box));
+                },
+                leaveEmptySlot
             );
         }
 
@@ -131,12 +140,12 @@ public class SortPkmAction(
         );
     }
 
-    private List<BoxDTO> GetBoxes(int fromBoxId, int toBoxId, Func<string, BoxDTO?> GetBoxDto, Func<List<BoxDTO>> GetBoxDtoAll)
+    private async Task<List<BoxDTO>> GetBoxes(uint? saveId, int fromBoxId, int toBoxId, Func<string, Task<BoxDTO?>> GetBoxDto, Func<Task<List<BoxDTO>>> GetBoxDtoAll)
     {
-        var fromBox = GetBoxDto(fromBoxId.ToString());
+        var fromBox = await GetBoxDto(fromBoxId.ToString());
         var bankId = fromBox.BankId;
 
-        var boxes = GetBoxDtoAll()
+        var boxes = (await GetBoxDtoAll())
             .FindAll(box => box.BankId == bankId)
             .FindAll(box => saveId == null || box.CanSaveReceivePkm)
             .OrderBy(box => box.Order).ToList();
@@ -156,7 +165,7 @@ public class SortPkmAction(
         ];
     }
 
-    private void RunSort(List<BoxDTO> boxes, List<ushort> pkmSpecies, Action<(int Index, int BoxId, int BoxSlot)> applyValue, Action onSpaceMissing)
+    private void RunSort(List<BoxDTO> boxes, List<ushort> pkmSpecies, Action<(int Index, string BoxId, int BoxSlot)> applyValue, Action onSpaceMissing, bool leaveEmptySlot)
     {
         var lastSpecies = pkmSpecies.Last();
         // starts from 0 only to handle disabled pkms
@@ -225,7 +234,7 @@ public class SortPkmAction(
                         break;
                     }
 
-                    applyValue((Index: currentIndex, BoxId: currentBox.IdInt, BoxSlot: currentSlot));
+                    applyValue((Index: currentIndex, BoxId: currentBox.Id, BoxSlot: currentSlot));
 
                     IncrementBoxSlot();
                 }

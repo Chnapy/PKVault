@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
 public interface IBoxLoader : IEntityLoader<BoxDTO, BoxEntity>
@@ -30,10 +31,8 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         _ => throw new NotImplementedException(slotType.ToString()),
     };
 
-    public BoxLoader(IFileIOService fileIOService, string dbPath) : base(
-        fileIOService,
-        filePath: MatcherUtil.NormalizePath(Path.Combine(dbPath, "box.json")),
-        dictJsonContext: EntityJsonContext.Default.DictionaryStringBoxEntity
+    public BoxLoader(IFileIOService fileIOService, SessionDbContext db) : base(
+        fileIOService, db, db.BoxesFlags
     )
     {
     }
@@ -50,12 +49,10 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         );
     }
 
-    protected override BoxDTO GetDTOFromEntity(BoxEntity entity)
+    protected override async Task<BoxDTO> GetDTOFromEntity(BoxEntity entity)
     {
         return CreateDTO(entity);
     }
-
-    public override int GetLastSchemaVersion() => 1;
 
     public void NormalizeOrders()
     {
@@ -79,4 +76,6 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
                 currentOrder += OrderGap;
             });
     }
+
+    protected override DbSet<BoxEntity> GetDbSet() => db.Boxes;
 }
