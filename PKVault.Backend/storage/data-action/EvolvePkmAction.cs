@@ -9,7 +9,7 @@ public class EvolvePkmAction(
     IPkmVersionLoader pkmVersionLoader
 ) : DataAction<EvolvePkmActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(EvolvePkmActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(EvolvePkmActionInput input, DataUpdateFlags flags)
     {
         if (input.ids.Length == 0)
         {

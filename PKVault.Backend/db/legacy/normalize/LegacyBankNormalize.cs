@@ -5,7 +5,14 @@ public class LegacyBankNormalize(LegacyBankLoader loader)
         var entities = loader.GetAllEntities();
         if (entities.Count == 0)
         {
-            return;
+            loader.WriteEntity(new(
+                Id: "0",
+                Name: "Bank 1",
+                IsDefault: true,
+                Order: 0,
+                View: new([], [])
+            ));
+            entities = loader.GetAllEntities();
         }
 
         var firstItem = entities.First().Value;

@@ -2,7 +2,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 
 public class SessionDbContext(
-    SessionService sessionService
+    SessionService sessionService, DbSeedingService dbSeedingService
 ) : DbContext
 {
     // static ConcurrentDictionary<Guid, DbContextId> contexts = [];
@@ -22,7 +22,10 @@ public class SessionDbContext(
     {
         options
             .UseSqlite($"Data Source={sessionService.SessionDbPath}")
-            .UseAsyncSeeding(DbSeeding.Seed);
+            .LogTo(Console.WriteLine, LogLevel.Information)
+            .EnableDetailedErrors()
+            .EnableSensitiveDataLogging()
+            .UseAsyncSeeding(dbSeedingService.Seed);
 
         // contexts.TryAdd(ContextId.InstanceId, ContextId);
 

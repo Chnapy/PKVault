@@ -9,7 +9,7 @@ public class MovePkmBankAction(
     MainCreateBoxAction mainCreateBoxAction, SynchronizePkmAction synchronizePkmAction
 ) : DataAction<MovePkmBankActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(MovePkmBankActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(MovePkmBankActionInput input, DataUpdateFlags flags)
     {
         if (input.pkmIds.Length == 0)
         {

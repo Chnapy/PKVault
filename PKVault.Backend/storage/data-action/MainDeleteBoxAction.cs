@@ -2,7 +2,7 @@ public record MainDeleteBoxActionInput(string boxId);
 
 public class MainDeleteBoxAction(IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVersionLoader pkmVersionLoader) : DataAction<MainDeleteBoxActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(MainDeleteBoxActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(MainDeleteBoxActionInput input, DataUpdateFlags flags)
     {
         var box = await boxLoader.GetDto(input.boxId);
         var boxPkms = pkmVersionLoader.GetEntitiesByBox(box!.IdInt);

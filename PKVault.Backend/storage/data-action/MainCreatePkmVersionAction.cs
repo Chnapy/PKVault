@@ -13,7 +13,7 @@ public class MainCreatePkmVersionAction(
     IPkmVersionLoader pkmVersionLoader
 ) : DataAction<MainCreatePkmVersionActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(MainCreatePkmVersionActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(MainCreatePkmVersionActionInput input, DataUpdateFlags flags)
     {
         Console.WriteLine($"Create PKM version, pkmVersionId={input.PkmVersionId}, generation={input.Generation}");
 

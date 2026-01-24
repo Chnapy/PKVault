@@ -6,7 +6,7 @@ public class DexSyncAction(
     DexService dexService, ILoadersService loadersService
 ) : DataAction<DexSyncActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(DexSyncActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DexSyncActionInput input, DataUpdateFlags flags)
     {
         if (input.saveIds.Length < 2)
         {

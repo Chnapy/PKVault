@@ -5,7 +5,14 @@ public class LegacyBoxNormalize(LegacyBoxLoader loader)
         var entities = loader.GetAllEntities();
         if (entities.Count == 0)
         {
-            return;
+            loader.WriteEntity(new(
+                Id: "0",
+                Name: "Box 1",
+                Type: BoxType.Box,
+                SlotCount: 30,
+                Order: 0
+            ));
+            entities = loader.GetAllEntities();
         }
 
         var firstItem = entities.First().Value;

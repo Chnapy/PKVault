@@ -5,7 +5,7 @@ public class MainCreateBankAction(
     MainCreateBoxAction mainCreateBoxAction
 ) : DataAction<MainCreateBankActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(MainCreateBankActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(MainCreateBankActionInput input, DataUpdateFlags flags)
     {
         var banks = await bankLoader.GetAllDtos();
         var maxId = banks.Max(bank => bank.IdInt);

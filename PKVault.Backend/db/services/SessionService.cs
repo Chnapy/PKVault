@@ -16,50 +16,44 @@ public class SessionService(
     {
         if (fileIOService.Exists(SessionDbPath))
         {
-            try
-            {
-                // DB context should be stopped before file delete
-                using (var scope = sp.CreateScope())
-                {
-                    using var db = scope.ServiceProvider.GetRequiredService<SessionDbContext>();
+            using var scope = sp.CreateScope();
+            using var db = scope.ServiceProvider.GetRequiredService<SessionDbContext>();
 
-                    // required to really close connection
-                    if (db.Database.GetDbConnection() is SqliteConnection sqliteConnection)
-                    {
-                        SqliteConnection.ClearPool(sqliteConnection);
-                    }
+            await db.Database.EnsureDeletedAsync();
 
-                    await db.Database.CloseConnectionAsync();
-                    await db.DisposeAsync();
-
-                    Console.WriteLine($"DB CONNECTION CLOSED");
-                }
-
-                // GC.Collect();
-                // GC.WaitForPendingFinalizers();
-                // GC.Collect();
-
-                fileIOService.Delete(SessionDbPath + "-wal");
-                fileIOService.Delete(SessionDbPath + "-shm");
-                fileIOService.Delete(SessionDbPath);
-            }
-            catch (IOException)
-            {
-                await Task.Delay(500);
-                fileIOService.Delete(SessionDbPath + "-wal");
-                fileIOService.Delete(SessionDbPath + "-shm");
-                fileIOService.Delete(SessionDbPath);
-            }
+            Console.WriteLine($"DB session deleted");
         }
 
         if (fileIOService.Exists(MainDbPath))
         {
-            fileIOService.Copy(MainDbPath, SessionDbPath, overwrite: false);
+            fileIOService.Copy(MainDbPath, SessionDbPath, overwrite: true);
+
+            Console.WriteLine($"DB main copied to session");
         }
     }
 
-    public void PersistSession()
+    public async Task PersistSession()
     {
+        await CloseConnection();
+
         fileIOService.Move(SessionDbPath, MainDbPath, overwrite: true);
+
+        Console.WriteLine($"DB session copied to main");
+    }
+
+    private async Task CloseConnection()
+    {
+        using var scope = sp.CreateScope();
+        using var db = scope.ServiceProvider.GetRequiredService<SessionDbContext>();
+
+        // required to really close connection
+        if (db.Database.GetDbConnection() is SqliteConnection sqliteConnection)
+        {
+            SqliteConnection.ClearPool(sqliteConnection);
+        }
+
+        await db.Database.CloseConnectionAsync();
+
+        Console.WriteLine($"DB session connection closed");
     }
 }

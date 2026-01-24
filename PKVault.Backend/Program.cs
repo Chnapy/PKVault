@@ -162,13 +162,15 @@ public class Program
         services.AddSingleton<GenStaticDataService>();
 #endif
 
-        Console.WriteLine($"Setup service - DB");
+        Console.WriteLine($"Setup services - DB");
         services.AddDbContext<SessionDbContext>();
+
+        services.AddSingleton<SessionService>();
+        services.AddSingleton<DbSeedingService>();
 
         Console.WriteLine($"Setup services - Main");
         services.AddSingleton<IFileSystem>(new FileSystem());
         services.AddSingleton<IFileIOService, FileIOService>();
-        services.AddSingleton<SessionService>();
         services.AddSingleton<StaticDataService>();
         services.AddSingleton<ILoadersService, LoadersService>();
         services.AddSingleton<StorageQueryService>();

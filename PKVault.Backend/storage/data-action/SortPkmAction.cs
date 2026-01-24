@@ -9,7 +9,7 @@ public class SortPkmAction(
     IPkmVersionLoader pkmVersionLoader, IBoxLoader boxLoader
 ) : DataAction<SortPkmActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(SortPkmActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(SortPkmActionInput input, DataUpdateFlags flags)
     {
         if (input.saveId == null)
         {

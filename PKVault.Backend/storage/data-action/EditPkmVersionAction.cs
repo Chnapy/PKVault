@@ -8,7 +8,7 @@ public class EditPkmVersionAction(
     IPkmVersionLoader pkmVersionLoader
 ) : DataAction<EditPkmVersionActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(EditPkmVersionActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(EditPkmVersionActionInput input, DataUpdateFlags flags)
     {
         var pkmVersionEntity = pkmVersionLoader.GetEntity(input.pkmVersionId);
         var pkmVersionPKM = pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);

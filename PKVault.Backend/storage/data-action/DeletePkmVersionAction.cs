@@ -4,7 +4,7 @@ public class DeletePkmVersionAction(
     IPkmVersionLoader pkmVersionLoader
 ) : DataAction<DeletePkmVersionActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(DeletePkmVersionActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DeletePkmVersionActionInput input, DataUpdateFlags flags)
     {
         if (input.pkmVersionIds.Length == 0)
         {

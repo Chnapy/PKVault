@@ -6,7 +6,7 @@ public class EditPkmSaveAction(
     IPkmVersionLoader pkmVersionLoader
 ) : DataAction<EditPkmSaveActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(EditPkmSaveActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(EditPkmSaveActionInput input, DataUpdateFlags flags)
     {
         var loaders = await loadersService.GetLoaders();
         var saveLoaders = loaders.saveLoadersDict[input.saveId];

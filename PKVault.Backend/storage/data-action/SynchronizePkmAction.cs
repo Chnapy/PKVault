@@ -55,7 +55,7 @@ public class SynchronizePkmAction(
         return synchronizationData;
     }
 
-    protected override async Task<DataActionPayload?> Execute(SynchronizePkmActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(SynchronizePkmActionInput input, DataUpdateFlags flags)
     {
         await SynchronizeSaveToPkmVersion(input);
 

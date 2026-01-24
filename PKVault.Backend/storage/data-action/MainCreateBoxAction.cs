@@ -4,7 +4,7 @@ public record MainCreateBoxActionInput(
 
 public class MainCreateBoxAction(IBoxLoader boxLoader) : DataAction<MainCreateBoxActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(MainCreateBoxActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(MainCreateBoxActionInput input, DataUpdateFlags flags)
     {
         var dto = CreateBox(input);
 

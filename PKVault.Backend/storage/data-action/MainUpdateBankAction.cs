@@ -4,7 +4,7 @@ public class MainUpdateBankAction(
     IBankLoader bankLoader, IBoxLoader boxLoader
 ) : DataAction<MainUpdateBankActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(MainUpdateBankActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(MainUpdateBankActionInput input, DataUpdateFlags flags)
     {
         if (input.bankName.Length == 0)
         {

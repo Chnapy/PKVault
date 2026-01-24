@@ -1,8 +1,8 @@
 public abstract class DataAction<I>
 {
-    protected abstract Task<DataActionPayload?> Execute(I input, DataUpdateFlags flags);
+    protected abstract Task<DataActionPayload> Execute(I input, DataUpdateFlags flags);
 
-    public async Task<DataActionPayload?> ExecuteWithPayload(I input, DataUpdateFlags flags)
+    public async Task<DataActionPayload> ExecuteWithPayload(I input, DataUpdateFlags flags)
     {
         return await Execute(input, flags);
     }

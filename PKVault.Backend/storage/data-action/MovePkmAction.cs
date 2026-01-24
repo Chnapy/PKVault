@@ -11,7 +11,7 @@ public class MovePkmAction(
     IPkmVersionLoader pkmVersionLoader, IBoxLoader boxLoader
 ) : DataAction<MovePkmActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(MovePkmActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(MovePkmActionInput input, DataUpdateFlags flags)
     {
         if (input.pkmIds.Length == 0 || input.targetBoxSlots.Length == 0)
         {

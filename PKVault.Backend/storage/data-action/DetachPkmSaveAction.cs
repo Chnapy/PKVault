@@ -6,7 +6,7 @@ public class DetachPkmSaveAction(
     IPkmVersionLoader pkmVersionLoader
 ) : DataAction<DetachPkmSaveActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(DetachPkmSaveActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DetachPkmSaveActionInput input, DataUpdateFlags flags)
     {
         if (input.pkmVersionIds.Length == 0)
         {

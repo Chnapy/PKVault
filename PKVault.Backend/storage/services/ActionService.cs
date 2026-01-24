@@ -10,7 +10,7 @@ public class ActionService(
 )
 {
     public record ActionRecord(
-        Func<IServiceScope, DataUpdateFlags, Task<DataActionPayload?>> ActionFn,
+        Func<IServiceScope, DataUpdateFlags, Task<DataActionPayload>> ActionFn,
         DataActionPayload Payload
     );
 
@@ -237,7 +237,6 @@ public class ActionService(
 
     public async Task<DataUpdateFlags> Save()
     {
-        var loaders = await loadersService.GetLoaders();
         var flags = new DataUpdateFlags();
 
         if (actions.Count == 0)
@@ -247,14 +246,18 @@ public class ActionService(
 
         Console.WriteLine("SAVING IN PROGRESS");
 
+        var loaders = await loadersService.GetLoaders();
+
         await backupService.PrepareBackupThenRun(async () =>
         {
-            sessionService.PersistSession();
-
-            await loaders.WriteToFiles();
+            await sessionService.PersistSession();
 
             // TODO
             // pkmVersionLoader.pkmFileLoader.WriteToFiles();
+
+            await loaders.WriteToFiles();
+
+            actions.Clear();
         });
 
         flags.SaveInfos = true;
@@ -323,7 +326,7 @@ public class ActionService(
         DataEntityLoaders? loaders = null
     )
     {
-        async Task<DataActionPayload?> applyFn(IServiceScope scope, DataUpdateFlags flags)
+        async Task<DataActionPayload> applyFn(IServiceScope scope, DataUpdateFlags flags)
         {
             var action = getScopedAction(scope);
 
@@ -349,7 +352,7 @@ public class ActionService(
 
     private async Task<DataUpdateFlags> AddActionInner(
         IServiceScope scope,
-        Func<IServiceScope, DataUpdateFlags, Task<DataActionPayload?>> actionFn,
+        Func<IServiceScope, DataUpdateFlags, Task<DataActionPayload>> actionFn,
         DataUpdateFlags? flags,
         DataEntityLoaders? loaders = null
     )
@@ -389,17 +392,14 @@ public class ActionService(
             ]
         };
 
-        // add to action-list only if action did something
-        if (actionRecord != null)
-        {
-            actions.Add(actionRecord);
-        }
+        actions.Add(actionRecord);
+
         return flags;
     }
 
-    private async Task<ActionRecord?> ApplyAction(
+    private async Task<ActionRecord> ApplyAction(
         IServiceScope scope,
-        Func<IServiceScope, DataUpdateFlags, Task<DataActionPayload?>> actionFn,
+        Func<IServiceScope, DataUpdateFlags, Task<DataActionPayload>> actionFn,
         DataUpdateFlags flags,
         DataEntityLoaders? loaders = null
     )
@@ -411,9 +411,7 @@ public class ActionService(
 
         // Console.WriteLine($"Context={db.ContextId}");
 
-        return payload != null
-            ? new ActionRecord(actionFn, payload)
-            : null;
+        return new ActionRecord(actionFn, payload);
     }
 
     public async Task<List<MoveItem>> GetPkmAvailableMoves(uint? saveId, string pkmId)

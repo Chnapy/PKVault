@@ -4,7 +4,7 @@ public class SaveDeletePkmAction(
     ILoadersService loadersService
 ) : DataAction<SaveDeletePkmActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(SaveDeletePkmActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(SaveDeletePkmActionInput input, DataUpdateFlags flags)
     {
         if (input.pkmIds.Length == 0)
         {

@@ -4,7 +4,7 @@ public class MainDeleteBankAction(
     IBankLoader bankLoader, IBoxLoader boxLoader, MainDeleteBoxAction mainDeleteBoxAction
 ) : DataAction<MainDeleteBankActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(MainDeleteBankActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(MainDeleteBankActionInput input, DataUpdateFlags flags)
     {
         var bank = bankLoader.GetEntity(input.bankId);
 

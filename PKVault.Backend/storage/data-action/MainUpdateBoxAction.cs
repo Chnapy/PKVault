@@ -4,7 +4,7 @@ public class MainUpdateBoxAction(
     IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVersionLoader pkmVersionLoader
 ) : DataAction<MainUpdateBoxActionInput>
 {
-    protected override async Task<DataActionPayload?> Execute(MainUpdateBoxActionInput input, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(MainUpdateBoxActionInput input, DataUpdateFlags flags)
     {
         if (input.boxName.Length == 0)
         {
