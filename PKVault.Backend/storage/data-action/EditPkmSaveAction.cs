@@ -1,15 +1,14 @@
 public record EditPkmSaveActionInput(uint saveId, string pkmSaveId, EditPkmVersionPayload editPayload);
 
 public class EditPkmSaveAction(
-    ActionService actionService, PkmConvertService pkmConvertService, ILoadersService loadersService,
+    ActionService actionService, PkmConvertService pkmConvertService,
     SynchronizePkmAction synchronizePkmAction,
-    IPkmVersionLoader pkmVersionLoader
+    IPkmVersionLoader pkmVersionLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<EditPkmSaveActionInput>
 {
     protected override async Task<DataActionPayload> Execute(EditPkmSaveActionInput input, DataUpdateFlags flags)
     {
-        var loaders = await loadersService.GetLoaders();
-        var saveLoaders = loaders.saveLoadersDict[input.saveId];
+        var saveLoaders = savesLoadersService.GetLoaders(input.saveId);
         var pkmSave = saveLoaders.Pkms.GetDto(input.pkmSaveId);
 
         var availableMoves = await actionService.GetPkmAvailableMoves(input.saveId, input.pkmSaveId);
@@ -31,7 +30,7 @@ public class EditPkmSaveAction(
         var pkmVersion = pkmVersionLoader.GetEntityBySave(pkmSave.SaveId, pkmSave.IdBase);
         if (pkmVersion != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, pkmSave.IdBase)], loaders));
+            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, pkmSave.IdBase)]));
         }
 
         return new(

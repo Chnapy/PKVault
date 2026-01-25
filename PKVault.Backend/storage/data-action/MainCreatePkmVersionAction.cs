@@ -10,7 +10,7 @@ public class MainCreatePkmVersionActionInput(string pkmVersionId, byte generatio
 
 public class MainCreatePkmVersionAction(
     PkmConvertService pkmConvertService, StaticDataService staticDataService,
-    IPkmVersionLoader pkmVersionLoader
+    IPkmVersionLoader pkmVersionLoader, IPkmFileLoader pkmFileLoader
 ) : DataAction<MainCreatePkmVersionActionInput>
 {
     protected override async Task<DataActionPayload> Execute(MainCreatePkmVersionActionInput input, DataUpdateFlags flags)
@@ -51,7 +51,7 @@ public class MainCreatePkmVersionAction(
             AttachedSaveId: null,
             AttachedSavePkmIdBase: null,
             Generation: input.Generation,
-            Filepath: pkmVersionLoader.pkmFileLoader.GetPKMFilepath(pkmConverted, staticData.Evolves)
+            Filepath: pkmFileLoader.GetPKMFilepath(pkmConverted, staticData.Evolves)
         ), pkmConverted);
 
         return new(

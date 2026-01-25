@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 
 public interface IPkmVersionLoader : IEntityLoader<PkmVersionDTO, PkmVersionEntity>
 {
-    public IPKMLoader pkmFileLoader { get; }
-
     public Task<PkmVersionDTO> CreateDTO(PkmVersionEntity entity, ImmutablePKM pkm);
     public Task<PkmVersionEntity> WriteEntity(PkmVersionEntity entity, ImmutablePKM pkm);
     public ImmutableDictionary<int, ImmutableDictionary<string, PkmVersionEntity>> GetEntitiesByBox(int boxId);
@@ -14,22 +12,21 @@ public interface IPkmVersionLoader : IEntityLoader<PkmVersionDTO, PkmVersionEnti
     public ImmutableDictionary<string, PkmVersionEntity> GetEntitiesBySave(uint saveId);
     public PkmVersionEntity? GetEntityBySave(uint saveId, string savePkmIdBase);
     public ImmutablePKM GetPkmVersionEntityPkm(PkmVersionEntity entity);
-    public Dictionary<string, (byte[] Data, PKMLoadError? Error)> GetAllPKMFiles();
 }
 
 public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, IPkmVersionLoader
 {
     private StaticDataService staticDataService;
+    private IPkmFileLoader pkmFileLoader;
     private readonly string appPath;
     private readonly string language;
-
-    public IPKMLoader pkmFileLoader { get; }
 
     private readonly VersionChecker versionChecker = new();
 
     public PkmVersionLoader(
         IFileIOService fileIOService,
         ISettingsService settingsService,
+        IPkmFileLoader _pkmFileLoader,
         SessionDbContext db,
         StaticDataService _staticDataService
     ) : base(
@@ -37,13 +34,12 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
     )
     {
         staticDataService = _staticDataService;
+        pkmFileLoader = _pkmFileLoader;
 
         var settings = settingsService.GetSettings();
 
         appPath = settings.AppDirectory;
         language = settings.GetSafeLanguage();
-
-        pkmFileLoader = new PKMLoader(fileIOService, settings.SettingsMutable.STORAGE_PATH);
     }
 
     public async Task<PkmVersionDTO> CreateDTO(PkmVersionEntity entity, ImmutablePKM pkm)
@@ -150,14 +146,6 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
     public ImmutablePKM GetPkmVersionEntityPkm(PkmVersionEntity entity)
     {
         return pkmFileLoader.CreatePKM(entity);
-    }
-
-    public Dictionary<string, (byte[] Data, PKMLoadError? Error)> GetAllPKMFiles()
-    {
-        return GetAllEntities().Values.ToDictionary(
-            pv => pv.Filepath,
-            pv => pkmFileLoader.GetEntity(pv.Filepath)
-        );
     }
 
     protected override DbSet<PkmVersionEntity> GetDbSet() => db.PkmVersions;

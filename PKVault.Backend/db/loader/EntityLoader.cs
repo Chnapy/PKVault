@@ -42,7 +42,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         return entity == null ? default : await GetDTOFromEntity(entity);
     }
 
-    public E? GetEntity(string id)
+    public virtual E? GetEntity(string id)
     {
         db.ChangeTracker.Clear();
         return GetDbSet().Find(id);
@@ -69,8 +69,16 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
     {
         Console.WriteLine($"{entity.GetType().Name} - Write id={entity.Id} - ContextId={db.ContextId}");
 
-        db.ChangeTracker.Clear();
-        GetDbSet().Update(entity);
+        if (GetEntity(entity.Id) != null)
+        {
+            db.ChangeTracker.Clear();
+            GetDbSet().Update(entity);
+        }
+        else
+        {
+            db.ChangeTracker.Clear();
+            GetDbSet().Add(entity);
+        }
         SaveChanges();
         // Console.WriteLine($"Context={db.ContextId}");
 

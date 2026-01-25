@@ -4,5 +4,5 @@ public record BoxEntity(
     int Order,
     BoxType Type,
     int SlotCount,
-    string BankId
+    string? BankId
 ) : IEntity(Id);

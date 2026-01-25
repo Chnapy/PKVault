@@ -10,6 +10,7 @@ public class DbSeedingService(
         var time = LogUtil.Time("DB seeding");
         await SeedJSONLegacyData(db, cancelToken);
         await SeedInitialData(db, cancelToken);
+        await SeedPkmFilesData(db, cancelToken);
         time();
     }
 
@@ -27,6 +28,8 @@ public class DbSeedingService(
                 Order: 0,
                 View: new([], [])
             ), cancelToken);
+
+            await db.SaveChangesAsync(cancelToken);
         }
 
         if (!boxes.Any())
@@ -39,6 +42,8 @@ public class DbSeedingService(
                 Order: 0,
                 BankId: "0"
             ), cancelToken);
+
+            await db.SaveChangesAsync(cancelToken);
         }
     }
 
@@ -161,5 +166,52 @@ public class DbSeedingService(
         await db.SaveChangesAsync(cancelToken);
 
         return true;
+    }
+
+    private async Task SeedPkmFilesData(DbContext db, CancellationToken cancelToken)
+    {
+        var pkmFiles = db.Set<PkmFileEntity>();
+        var pkmVersions = db.Set<PkmVersionEntity>();
+
+        async Task<PkmFileEntity> pkmVersionToPkmFileEntity(PkmVersionEntity pkmVersion)
+        {
+            var filepath = pkmVersion.Filepath;
+
+            byte[] bytes = [];
+            PKMLoadError? error = null;
+            try
+            {
+                var (TooSmall, TooBig) = fileIOService.CheckGameFile(filepath);
+
+                if (TooBig)
+                    throw new PKMLoadException(PKMLoadError.TOO_BIG);
+
+                if (TooSmall)
+                    throw new PKMLoadException(PKMLoadError.TOO_SMALL);
+
+                bytes = fileIOService.ReadBytes(filepath);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+                error = PkmFileLoader.GetPKMLoadError(ex);
+            }
+
+            return new PkmFileEntity(
+                Filepath: filepath,
+                Data: bytes,
+                Error: error,
+                Updated: false,
+                Deleted: false
+            );
+        }
+
+        await pkmFiles.AddRangeAsync(
+            await Task.WhenAll(pkmVersions.Select(
+                pkmVersionToPkmFileEntity
+            )),
+        cancelToken);
+
+        await db.SaveChangesAsync(cancelToken);
     }
 }

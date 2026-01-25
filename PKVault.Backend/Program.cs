@@ -77,7 +77,7 @@ public class Program
         {
             await Task.WhenAll([
                 host.Services.GetRequiredService<ISaveService>().EnsureInitialized(),
-                host.Services.GetRequiredService<ILoadersService>().EnsureInitialized(),
+                host.Services.GetRequiredService<SessionService>().EnsureSessionCreated(),
             ]);
         };
 #else
@@ -172,7 +172,6 @@ public class Program
         services.AddSingleton<IFileSystem>(new FileSystem());
         services.AddSingleton<IFileIOService, FileIOService>();
         services.AddSingleton<StaticDataService>();
-        services.AddSingleton<ILoadersService, LoadersService>();
         services.AddSingleton<StorageQueryService>();
         services.AddSingleton<ActionService>();
         services.AddSingleton<MaintenanceService>();
@@ -209,7 +208,9 @@ public class Program
         services.AddScoped<IBankLoader, BankLoader>();
         services.AddScoped<IBoxLoader, BoxLoader>();
         services.AddScoped<IPkmVersionLoader, PkmVersionLoader>();
+        services.AddScoped<IPkmFileLoader, PkmFileLoader>();
         services.AddScoped<IDexLoader, DexLoader>();
+        services.AddSingleton<ISavesLoadersService, SavesLoadersService>();   // singleton for perf reasons
 
 #if DEBUG && MODE_DEFAULT
         services.AddEndpointsApiExplorer();

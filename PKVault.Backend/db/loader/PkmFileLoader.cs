@@ -1,18 +1,22 @@
 
+using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
-public interface IPKMLoader
+public interface IPkmFileLoader
 {
-    public (byte[] Data, PKMLoadError? Error) GetEntity(string filepath);
+    public void ClearData();
+
+    public PkmFileEntity? GetEntity(string filepath);
+    public List<PkmFileEntity> GetAllEntities();
     public void DeleteEntity(string filepath);
-    public string WriteEntity(ImmutablePKM pkm, string filepath, Dictionary<ushort, StaticEvolve> evolves);
+    public void WriteEntity(ImmutablePKM pkm, string filepath, Dictionary<ushort, StaticEvolve> evolves);
     public void WriteToFiles();
     public ImmutablePKM CreatePKM(string id, string filepath, byte generation);
     public ImmutablePKM CreatePKM(PkmVersionEntity pkmVersionEntity);
     public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves);
 }
 
-public class PKMLoader : IPKMLoader
+public class PkmFileLoader : IPkmFileLoader
 {
     private static byte[] GetPKMBytes(ImmutablePKM pkm)
     {
@@ -31,34 +35,54 @@ public class PKMLoader : IPKMLoader
 
     private IFileIOService fileIOService;
     private string storagePath;
-    private Dictionary<string, (byte[] Data, PKMLoadError? Error)> bytesDict = [];
-    private List<(bool Create, string Path)> actions = [];
+    private SessionDbContext db;
 
-    public PKMLoader(
+    public PkmFileLoader(
         IFileIOService _fileIOService,
-        string _storagePath
+        ISettingsService settingsService,
+        SessionDbContext _db
     )
     {
         fileIOService = _fileIOService;
-        storagePath = _storagePath;
+        storagePath = settingsService.GetSettings().SettingsMutable.STORAGE_PATH;
+        db = _db;
     }
 
-    public (byte[] Data, PKMLoadError? Error) GetEntity(string filepath)
+    public PkmFileEntity? GetEntity(string filepath)
     {
-        return GetFileOrLoad(filepath);
+        db.ChangeTracker.Clear();
+        var entity = GetDbSet().Find(filepath);
+        if (entity != null && entity.Deleted)
+        {
+            return null;
+        }
+        return entity;
+    }
+
+    public List<PkmFileEntity> GetAllEntities()
+    {
+        db.ChangeTracker.Clear();
+        return [.. GetDbSet().AsNoTracking()];
     }
 
     public void DeleteEntity(string filepath)
     {
-        var removed = bytesDict.Remove(filepath);
+        if (EnableLog)
+            Console.WriteLine($"(M) Delete PKM file filepath={filepath}");
 
-        if (EnableLog && removed)
-            Console.WriteLine($"(M) Delete PKM filepath={filepath}");
-
-        actions.Add((Create: false, Path: filepath));
+        db.ChangeTracker.Clear();
+        GetDbSet()
+            .Update(new(
+                Filepath: filepath,
+                Data: [],
+                Error: null,
+                Updated: false,
+                Deleted: true
+            ));
+        db.SaveChanges();
     }
 
-    public string WriteEntity(ImmutablePKM pkm, string filepath, Dictionary<ushort, StaticEvolve> evolves)
+    public void WriteEntity(ImmutablePKM pkm, string filepath, Dictionary<ushort, StaticEvolve> evolves)
     {
         if (!pkm.IsEnabled)
         {
@@ -67,76 +91,59 @@ public class PKMLoader : IPKMLoader
 
         var bytes = GetPKMBytes(pkm);
 
-        var pkmFilepath = GetPKMFilepath(pkm, evolves);
-        if (pkmFilepath != filepath)
-        {
-            // throw new InvalidOperationException($"(M) PKM-file filepath inconsistency. Expected={expectedFilepath} Obtained={filepath}");
-            if (EnableLog)
-                Console.WriteLine($"(M) PKM-file filepath inconsistency. Expected={pkmFilepath} Obtained={filepath}");
-        }
-
         if (EnableLog)
             Console.WriteLine($"(M) PKM-file Write idBase={pkm.GetPKMIdBase(evolves)} filepath={filepath} bytes.length={bytes.Length}");
 
-        bytesDict.Remove(filepath);
-        bytesDict.Add(filepath, (bytes, null));
+        var entity = new PkmFileEntity(
+            Filepath: filepath,
+            Data: bytes,
+            Error: null,
+            Updated: true,
+            Deleted: false
+        );
 
-        actions.Add((Create: true, Path: filepath));
-
-        // Console.WriteLine($"{string.Join('\n', bytesDict.Keys)}");
-
-        return filepath;
+        if (GetEntity(entity.Filepath) != null)
+        {
+            db.ChangeTracker.Clear();
+            GetDbSet().Update(entity);
+        }
+        else
+        {
+            db.ChangeTracker.Clear();
+            GetDbSet().Add(entity);
+        }
+        db.SaveChanges();
     }
 
     public void WriteToFiles()
     {
-        foreach (var action in actions)
-        {
-            if (action.Create)
+        db.ChangeTracker.Clear();
+        GetDbSet()
+            .AsNoTracking()
+            .Where(pkmFile => pkmFile.Deleted)
+            .ToList()
+            .ForEach(pkmFileToDelete =>
             {
-                var (bytes, _) = GetEntity(action.Path);
+                fileIOService.Delete(pkmFileToDelete.Filepath);
+            });
 
-                fileIOService.WriteBytes(action.Path, bytes);
-            }
-            else
+        db.ChangeTracker.Clear();
+        GetDbSet()
+            .AsNoTracking()
+            .Where(pkmFile => pkmFile.Updated && !pkmFile.Deleted)
+            .ToList()
+            .ForEach(pkmFileToUpdate =>
             {
-                fileIOService.Delete(action.Path);
-            }
-        }
+                fileIOService.WriteBytes(pkmFileToUpdate.Filepath, pkmFileToUpdate.Data);
+            });
     }
 
-    private (byte[] Data, PKMLoadError? Error) GetFileOrLoad(string filepath)
+    public void ClearData()
     {
-        if (bytesDict.TryGetValue(filepath, out var file))
-        {
-            return file;
-        }
-
-        byte[] bytes = [];
-        PKMLoadError? error = null;
-        try
-        {
-            var (TooSmall, TooBig) = fileIOService.CheckGameFile(filepath);
-
-            if (TooBig)
-                throw new PKMLoadException(PKMLoadError.TOO_BIG);
-
-            if (TooSmall)
-                throw new PKMLoadException(PKMLoadError.TOO_SMALL);
-
-            bytes = fileIOService.ReadBytes(filepath);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine(ex);
-            error = GetPKMLoadError(ex);
-        }
-
-        file = (bytes, error);
-
-        bytesDict.Add(filepath, file);
-
-        return file;
+        db.ChangeTracker.Clear();
+        // clear db
+        GetDbSet().ExecuteDelete();
+        db.SaveChanges();
     }
 
     public ImmutablePKM CreatePKM(PkmVersionEntity pkmVersionEntity)
@@ -148,21 +155,24 @@ public class PKMLoader : IPKMLoader
 
     public ImmutablePKM CreatePKM(string id, string filepath, byte generation)
     {
-        var (bytes, loadError) = GetEntity(filepath);
-        if (loadError != null)
+        var entity = GetEntity(filepath);
+        ArgumentNullException.ThrowIfNull(entity);
+
+        if (entity.Error != null)
         {
-            return new(GetPlaceholderPKM(), loadError);
+            return new(GetPlaceholderPKM(), entity.Error);
         }
 
+        var loadError = entity.Error;
         PKM pkm;
         try
         {
             var ext = Path.GetExtension(filepath.AsSpan());
 
-            FileUtil.TryGetPKM(bytes, out var pk, ext, new SimpleTrainerInfo() { Context = (EntityContext)generation });
+            FileUtil.TryGetPKM(entity.Data, out var pk, ext, new SimpleTrainerInfo() { Context = (EntityContext)generation });
             if (pk == null)
             {
-                throw new Exception($"TryGetPKM gives null pkm, path={filepath} bytes.length={bytes.Length}");
+                throw new Exception($"TryGetPKM gives null pkm, path={filepath} bytes.length={entity.Data.Length}");
             }
             pkm = pk;
 
@@ -200,7 +210,7 @@ public class PKMLoader : IPKMLoader
         };
     }
 
-    private PKMLoadError GetPKMLoadError(Exception ex) => ex switch
+    public static PKMLoadError GetPKMLoadError(Exception ex) => ex switch
     {
         FileNotFoundException => PKMLoadError.NOT_FOUND,
         DirectoryNotFoundException => PKMLoadError.NOT_FOUND,
@@ -222,6 +232,8 @@ public class PKMLoader : IPKMLoader
             GetPKMFilename(pkm, evolves)
         ));
     }
+
+    protected DbSet<PkmFileEntity> GetDbSet() => db.PkmFiles;
 }
 
 public class PKMLoadException(PKMLoadError error) : IOException($"PKM load error occured: {error}")

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
@@ -52,6 +53,20 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
     protected override async Task<BoxDTO> GetDTOFromEntity(BoxEntity entity)
     {
         return CreateDTO(entity);
+    }
+
+    public override ImmutableDictionary<string, BoxEntity> GetAllEntities()
+    {
+        db.ChangeTracker.Clear();
+        return GetDbSet()
+            .AsNoTracking()
+            .ToImmutableDictionary(e => e.Id, e => e);
+    }
+
+    public override BoxEntity? GetEntity(string id)
+    {
+        db.ChangeTracker.Clear();
+        return GetDbSet().Find(id);
     }
 
     public void NormalizeOrders()

@@ -5,8 +5,8 @@ using PKHeX.Core;
  */
 public class ActionService(
     IServiceProvider sp,
-    ILoadersService loadersService, PkmConvertService pkmConvertService, BackupService backupService,
-    ISettingsService settingsService, PkmLegalityService pkmLegalityService, SessionService sessionService
+    PkmConvertService pkmConvertService, BackupService backupService, ISettingsService settingsService,
+    PkmLegalityService pkmLegalityService, SessionService sessionService, ISavesLoadersService savesLoadersService
 )
 {
     public record ActionRecord(
@@ -23,8 +23,7 @@ public class ActionService(
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<SynchronizePkmAction>(),
-            input,
-            input.loaders
+            input
         );
     }
 
@@ -234,16 +233,9 @@ public class ActionService(
 
         Console.WriteLine("SAVING IN PROGRESS");
 
-        var loaders = await loadersService.GetLoaders();
-
         await backupService.PrepareBackupThenRun(async () =>
         {
             await sessionService.PersistSession();
-
-            // TODO
-            // pkmVersionLoader.pkmFileLoader.WriteToFiles();
-
-            await loaders.WriteToFiles();
 
             actions.Clear();
         });
@@ -260,8 +252,7 @@ public class ActionService(
         List<ActionRecord> previousActions = [.. actions];
         actions.Clear();
 
-        loadersService.InvalidateLoaders(checkSaves: false);
-        // await loadersService.GetLoaders();
+        await sessionService.StartNewSession();
 
         using var scope = sp.CreateScope();
 
@@ -310,8 +301,7 @@ public class ActionService(
     private async Task<DataUpdateFlags> AddAction<I>(
         IServiceScope scope,
         Func<IServiceScope, DataAction<I>> getScopedAction,
-        I input,
-        DataEntityLoaders? loaders = null
+        I input
     )
     {
         async Task<DataActionPayload> applyFn(IServiceScope scope, DataUpdateFlags flags)
@@ -330,8 +320,7 @@ public class ActionService(
         var flags = await AddActionInner(
             scope,
             applyFn,
-            null,
-            loaders
+            null
         );
         flags.Warnings = true;
 
@@ -341,16 +330,14 @@ public class ActionService(
     private async Task<DataUpdateFlags> AddActionInner(
         IServiceScope scope,
         Func<IServiceScope, DataUpdateFlags, Task<DataActionPayload>> actionFn,
-        DataUpdateFlags? flags,
-        DataEntityLoaders? loaders = null
+        DataUpdateFlags? flags
     )
     {
         flags ??= new();
         var actionRecord = await ApplyAction(
             scope,
             actionFn,
-            flags,
-            loaders
+            flags
         );
 
         var db = scope.ServiceProvider.GetRequiredService<SessionDbContext>();
@@ -388,12 +375,10 @@ public class ActionService(
     private async Task<ActionRecord> ApplyAction(
         IServiceScope scope,
         Func<IServiceScope, DataUpdateFlags, Task<DataActionPayload>> actionFn,
-        DataUpdateFlags flags,
-        DataEntityLoaders? loaders = null
+        DataUpdateFlags flags
     )
     {
-        loaders ??= await loadersService.GetLoaders();
-        loaders.SetFlags(flags);
+        savesLoadersService.SetFlags(flags);
 
         var payload = await actionFn(scope, flags);
 
@@ -406,14 +391,13 @@ public class ActionService(
     {
         using var scope = sp.CreateScope();
         var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
-        var loaders = await loadersService.GetLoaders();
 
         var save = saveId == null
             ? null
-            : loaders.saveLoadersDict[(uint)saveId].Save;
+            : savesLoadersService.GetLoaders((uint)saveId).Save;
         var pkm = (saveId == null
             ? (await pkmVersionLoader.GetDto(pkmId))?.Pkm
-            : loaders.saveLoadersDict[(uint)saveId].Pkms.GetDto(pkmId)?.Pkm)
+            : savesLoadersService.GetLoaders((uint)saveId).Pkms.GetDto(pkmId)?.Pkm)
             ?? throw new ArgumentException($"Pkm not found, saveId={saveId} pkmId={pkmId}");
 
         var legality = pkmLegalityService.GetLegalitySafe(pkm, save);

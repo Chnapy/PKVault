@@ -4,9 +4,9 @@ public record EvolvePkmActionInput(uint? saveId, string[] ids);
 
 public class EvolvePkmAction(
     IServiceProvider sp,
-    PkmConvertService pkmConvertService, StaticDataService staticDataService, ILoadersService loadersService,
+    PkmConvertService pkmConvertService, StaticDataService staticDataService,
     SynchronizePkmAction synchronizePkmAction,
-    IPkmVersionLoader pkmVersionLoader
+    IPkmVersionLoader pkmVersionLoader, IPkmFileLoader pkmFileLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<EvolvePkmActionInput>
 {
     protected override async Task<DataActionPayload> Execute(EvolvePkmActionInput input, DataUpdateFlags flags)
@@ -16,16 +16,14 @@ public class EvolvePkmAction(
             throw new ArgumentException($"Pkm ids cannot be empty");
         }
 
-        var loaders = await loadersService.GetLoaders();
-
         async Task<DataActionPayload> act(string id)
         {
             if (input.saveId == null)
             {
-                return await ExecuteForMain(loaders, flags, id);
+                return await ExecuteForMain(flags, id);
             }
 
-            return await ExecuteForSave(loaders, flags, (uint)input.saveId, id);
+            return await ExecuteForSave(flags, (uint)input.saveId, id);
         }
 
         List<DataActionPayload> payloads = [];
@@ -37,9 +35,9 @@ public class EvolvePkmAction(
         return payloads[0];
     }
 
-    private async Task<DataActionPayload> ExecuteForSave(DataEntityLoaders loaders, DataUpdateFlags flags, uint saveId, string id)
+    private async Task<DataActionPayload> ExecuteForSave(DataUpdateFlags flags, uint saveId, string id)
     {
-        var saveLoaders = loaders.saveLoadersDict[saveId];
+        var saveLoaders = savesLoadersService.GetLoaders(saveId);
         var dto = saveLoaders.Pkms.GetDto(id);
         if (dto == default)
         {
@@ -65,7 +63,7 @@ public class EvolvePkmAction(
         var pkmVersion = pkmVersionLoader.GetEntityBySave(dto.SaveId, dto.IdBase);
         if (pkmVersion != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, dto.IdBase)], loaders));
+            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, dto.IdBase)]));
         }
 
         flags.Dex = true;
@@ -76,7 +74,7 @@ public class EvolvePkmAction(
         );
     }
 
-    private async Task<DataActionPayload> ExecuteForMain(DataEntityLoaders loaders, DataUpdateFlags flags, string id)
+    private async Task<DataActionPayload> ExecuteForMain(DataUpdateFlags flags, string id)
     {
         var staticData = await staticDataService.GetStaticData();
 
@@ -105,7 +103,7 @@ public class EvolvePkmAction(
             UpdatePkm(pkm, evolveSpecies, evolveByItem);
         });
         await pkmVersionLoader.WriteEntity(
-            entity with { Filepath = pkmVersionLoader.pkmFileLoader.GetPKMFilepath(entityPkm, staticData.Evolves) },
+            entity with { Filepath = pkmFileLoader.GetPKMFilepath(entityPkm, staticData.Evolves) },
             entityPkm
         );
 
@@ -117,17 +115,17 @@ public class EvolvePkmAction(
                 UpdatePkm(pkm, evolveSpecies, false);
             });
             pkmVersionLoader.WriteEntity(
-                version.Version with { Filepath = pkmVersionLoader.pkmFileLoader.GetPKMFilepath(version.Pkm, staticData.Evolves) },
+                version.Version with { Filepath = pkmFileLoader.GetPKMFilepath(version.Pkm, staticData.Evolves) },
                 version.Pkm
             );
         });
 
         if (entity.AttachedSaveId != null)
         {
-            await synchronizePkmAction.SynchronizePkmVersionToSave(new([(entity.Id, entity.AttachedSavePkmIdBase!)], loaders));
+            await synchronizePkmAction.SynchronizePkmVersionToSave(new([(entity.Id, entity.AttachedSavePkmIdBase!)]));
         }
 
-        new DexMainService(sp, loaders).EnablePKM(entityPkm);
+        new DexMainService(sp).EnablePKM(entityPkm);
 
         flags.Dex = true;
 

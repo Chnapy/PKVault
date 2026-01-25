@@ -11,6 +11,7 @@ public class SessionDbContext(
     public DbSet<BoxEntity> Boxes { get; set; }
     public DbSet<PkmVersionEntity> PkmVersions { get; set; }
     public DbSet<DexEntity> Pokedex { get; set; }
+    public DbSet<PkmFileEntity> PkmFiles { get; set; }
 
     public DataUpdateFlagsState<string> BanksFlags = new();
     public DataUpdateFlagsState<string> BoxesFlags = new();
@@ -22,7 +23,7 @@ public class SessionDbContext(
     {
         options
             .UseSqlite($"Data Source={sessionService.SessionDbPath}")
-            .LogTo(Console.WriteLine, LogLevel.Information)
+            .LogTo(Console.WriteLine, LogLevel.Warning)
             .EnableDetailedErrors()
             .EnableSensitiveDataLogging()
             .UseAsyncSeeding(dbSeedingService.Seed);
@@ -81,7 +82,7 @@ public class SessionDbContext(
         modelBuilder.Entity<PkmVersionEntity>()
             .HasOne<BoxEntity>()
             .WithMany()
-            .HasForeignKey(p => p.BoxId);
+            .HasForeignKey(e => e.BoxId);
 
         modelBuilder.Entity<DexEntity>(entity =>
         {
@@ -93,6 +94,11 @@ public class SessionDbContext(
                   v => JsonSerializer.Deserialize(v, EntityJsonContext.Default.ListDexEntityForm)!
               )
               .HasColumnType("TEXT");
+        });
+
+        modelBuilder.Entity<PkmFileEntity>(entity =>
+        {
+            entity.HasKey(p => p.Filepath);
         });
     }
 }

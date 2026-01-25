@@ -4,9 +4,8 @@ using PKHeX.Core;
 public record SortPkmActionInput(uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot);
 
 public class SortPkmAction(
-    ILoadersService loadersService,
     MainCreateBoxAction mainCreateBoxAction,
-    IPkmVersionLoader pkmVersionLoader, IBoxLoader boxLoader
+    IPkmVersionLoader pkmVersionLoader, IBoxLoader boxLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<SortPkmActionInput>
 {
     protected override async Task<DataActionPayload> Execute(SortPkmActionInput input, DataUpdateFlags flags)
@@ -22,8 +21,7 @@ public class SortPkmAction(
     // TODO save + leaveEmptySlot
     private async Task<DataActionPayload> ExecuteForSave(uint saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot)
     {
-        var loaders = await loadersService.GetLoaders();
-        var saveLoaders = loaders.saveLoadersDict[saveId];
+        var saveLoaders = savesLoadersService.GetLoaders(saveId);
 
         var boxes = (await GetBoxes(saveId, fromBoxId, toBoxId,
             GetBoxDto: async (id) => saveLoaders.Boxes.GetDto(id),

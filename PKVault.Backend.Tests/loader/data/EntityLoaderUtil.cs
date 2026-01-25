@@ -42,7 +42,7 @@ public class EntityLoaderUtil
         Dictionary<string, (byte[] Data, PKMLoadError? Error)> pkmFiles
     )
     {
-        Mock<IPKMLoader> mockPkmFileLoader = new();
+        Mock<IPkmFileLoader> mockPkmFileLoader = new();
         mockPkmFileLoader.Setup(x => x.GetAllEntities()).Returns(pkmFiles);
 
         Mock<IPkmVersionLoader> mockPkmVersionLoader = new();

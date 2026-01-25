@@ -5,7 +5,9 @@ namespace PKVault.Backend.saveinfos.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SaveInfosController(DataService dataService, ISaveService saveService, ILoadersService loadersService, ActionService actionService) : ControllerBase
+public class SaveInfosController(
+    DataService dataService, ISaveService saveService, SessionService sessionService, ActionService actionService
+) : ControllerBase
 {
     [HttpGet()]
     public async Task<ActionResult<Dictionary<uint, SaveInfosDTO>>> GetAll()
@@ -22,7 +24,7 @@ public class SaveInfosController(DataService dataService, ISaveService saveServi
         }
 
         saveService.InvalidateSaves();
-        loadersService.InvalidateLoaders(checkSaves: true);
+        await sessionService.StartNewSession();
 
         return await dataService.CreateDataFromUpdateFlags(new()
         {

@@ -1,8 +1,7 @@
 using PKHeX.Core;
 
 public class DexMainService(
-    IServiceProvider sp,
-    DataEntityLoaders loaders
+    IServiceProvider sp
 ) : DexGenService(FakeSaveFile.Default)
 {
     public override async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData)
@@ -42,7 +41,7 @@ public class DexMainService(
                         savesByVersion.Add(saveVersion, save);
                     }
 
-                    var saveDexService = dexService.GetDexService(save, loaders);
+                    var saveDexService = dexService.GetDexService(save);
                     var commonForm = saveDexService!.GetDexItemFormComplete(
                         entity.Species,
                         [.. pkmFormsFiltered.Select(pkmVersion => pkmVersion.Pkm)],

@@ -3,16 +3,96 @@ using Microsoft.EntityFrameworkCore;
 
 public class SessionService(
     IServiceProvider sp,
-    IFileIOService fileIOService, ISettingsService settingsService
+    IFileIOService fileIOService, ISettingsService settingsService,
+    ISavesLoadersService savesLoadersService
 )
 {
     private string DbFolderPath => settingsService.GetSettings().SettingsMutable.DB_PATH;
     public string MainDbPath => Path.Combine(DbFolderPath, "pkvault.db");
     public string SessionDbPath => Path.Combine(DbFolderPath, "pkvault-session.db");
 
+    public DateTime? StartTime { get; private set; }
+
+    private Task? StartTask = null;
+
     public bool HasMainDb() => fileIOService.Exists(MainDbPath);
 
     public async Task StartNewSession()
+    {
+        StartTime = DateTime.UtcNow;
+
+        var task = Task.Run(async () =>
+        {
+            await Task.WhenAll(
+                ResetDbSession(),
+                savesLoadersService.Setup()
+            );
+
+            await CheckSaveToSynchronize();
+        });
+
+        StartTask = task;
+
+        await task;
+    }
+
+    private async Task CheckSaveToSynchronize()
+    {
+        using var scope = sp.CreateScope();
+
+        var actionService = scope.ServiceProvider.GetRequiredService<ActionService>();
+        var synchronizePkmAction = scope.ServiceProvider.GetRequiredService<SynchronizePkmAction>();
+
+        var synchronizationData = await synchronizePkmAction.GetSavesPkmsToSynchronize();
+
+        foreach (var data in synchronizationData)
+        {
+            if (data.pkmVersionAndPkmSaveIds.Length > 0)
+            {
+                await actionService.SynchronizePkm(data);
+            }
+        }
+    }
+
+    public async Task EnsureSessionCreated()
+    {
+        if (StartTask == null)
+        {
+            await StartNewSession();
+        }
+        else
+        {
+            await StartTask;
+        }
+    }
+
+    public async Task PersistSession()
+    {
+        // before copy to main:
+        // - persist PKM files
+        // - clear session-only PkmFile tables
+        using (var scope = sp.CreateScope())
+        {
+            var pkmFileLoader = scope.ServiceProvider.GetRequiredService<PkmFileLoader>();
+
+            pkmFileLoader.WriteToFiles();
+            pkmFileLoader.ClearData();
+        }
+
+        await savesLoadersService.WriteToFiles();
+        savesLoadersService.Clear();
+
+        await CloseConnection();
+        StartTask = null;
+
+        fileIOService.Move(SessionDbPath, MainDbPath, overwrite: true);
+
+        StartTime = null;
+
+        Console.WriteLine($"DB session copied to main");
+    }
+
+    private async Task ResetDbSession()
     {
         if (fileIOService.Exists(SessionDbPath))
         {
@@ -31,19 +111,10 @@ public class SessionService(
             Console.WriteLine($"DB main copied to session");
         }
 
-        await RunMigrations();
+        await RunDbMigrations();
     }
 
-    public async Task PersistSession()
-    {
-        await CloseConnection();
-
-        fileIOService.Move(SessionDbPath, MainDbPath, overwrite: true);
-
-        Console.WriteLine($"DB session copied to main");
-    }
-
-    private async Task RunMigrations()
+    private async Task RunDbMigrations()
     {
         var time = LogUtil.Time("Data Migration + Clean + Seeding");
 

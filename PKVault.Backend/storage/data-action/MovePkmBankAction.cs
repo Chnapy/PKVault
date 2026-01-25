@@ -4,8 +4,8 @@ public record MovePkmBankActionInput(string[] pkmIds, uint? sourceSaveId, string
 
 public class MovePkmBankAction(
     IServiceProvider sp,
-    ILoadersService loadersService, StaticDataService staticDataService,
-    IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVersionLoader pkmVersionLoader,
+    StaticDataService staticDataService,
+    IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVersionLoader pkmVersionLoader, IPkmFileLoader pkmFileLoader, ISavesLoadersService savesLoadersService,
     MainCreateBoxAction mainCreateBoxAction, SynchronizePkmAction synchronizePkmAction
 ) : DataAction<MovePkmBankActionInput>
 {
@@ -15,8 +15,6 @@ public class MovePkmBankAction(
         {
             throw new ArgumentException($"Pkm ids cannot be empty");
         }
-
-        var loaders = await loadersService.GetLoaders();
 
         var bank = bankLoader.GetEntity(input.bankId)
             ?? throw new ArgumentException($"Bank not found");
@@ -88,7 +86,7 @@ public class MovePkmBankAction(
                 return await MainToMain(input, pkmId, boxId, boxSlot);
             }
 
-            return await SaveToMain(input, loaders, flags, pkmId, boxId, boxSlot);
+            return await SaveToMain(input, flags, pkmId, boxId, boxSlot);
         }
 
         // Console.WriteLine($"ENTRIES [{moveDirection}]:\n{string.Join('\n', entries.Select(e => e.Item1 + "_" + e.Item2 + "_" + e.Item3))}");
@@ -127,9 +125,9 @@ public class MovePkmBankAction(
         );
     }
 
-    private async Task<DataActionPayload> SaveToMain(MovePkmBankActionInput input, DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, string targetBoxId, int targetBoxSlot)
+    private async Task<DataActionPayload> SaveToMain(MovePkmBankActionInput input, DataUpdateFlags flags, string pkmId, string targetBoxId, int targetBoxSlot)
     {
-        var saveLoaders = loaders.saveLoadersDict[(uint)input.sourceSaveId!];
+        var saveLoaders = savesLoadersService.GetLoaders((uint)input.sourceSaveId!);
 
         var savePkm = saveLoaders.Pkms.GetDto(pkmId)
             ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
@@ -156,7 +154,7 @@ public class MovePkmBankAction(
         }
 
         await SaveToMainWithoutCheckTarget(
-                input, loaders, flags, (uint)input.sourceSaveId, targetBoxId, targetBoxSlot, savePkm
+                input, flags, (uint)input.sourceSaveId, targetBoxId, targetBoxSlot, savePkm
             );
 
         saveLoaders.Pkms.FlushParty();
@@ -173,12 +171,12 @@ public class MovePkmBankAction(
 
     private async Task SaveToMainWithoutCheckTarget(
         MovePkmBankActionInput input,
-        DataEntityLoaders loaders, DataUpdateFlags flags,
+        DataUpdateFlags flags,
         uint sourceSaveId, string targetBoxId, int targetBoxSlot,
         PkmSaveDTO savePkm
     )
     {
-        var saveLoaders = loaders.saveLoadersDict[sourceSaveId];
+        var saveLoaders = savesLoadersService.GetLoaders(sourceSaveId);
 
         if (savePkm.Pkm is IShadowCapture savePkmShadow && savePkmShadow.IsShadow)
         {
@@ -207,14 +205,14 @@ public class MovePkmBankAction(
                 AttachedSaveId: input.attached ? sourceSaveId : null,
                 AttachedSavePkmIdBase: input.attached ? savePkm.IdBase : null,
                 Generation: savePkm.Generation,
-                Filepath: pkmVersionLoader.pkmFileLoader.GetPKMFilepath(savePkm.Pkm, staticData.Evolves)
+                Filepath: pkmFileLoader.GetPKMFilepath(savePkm.Pkm, staticData.Evolves)
             ), savePkm.Pkm);
         }
 
         // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmVersionEntity.AttachedSaveId != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)], loaders));
+            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)]));
 
             if (!input.attached)
             {
@@ -232,7 +230,7 @@ public class MovePkmBankAction(
             saveLoaders.Pkms.DeleteDto(savePkm.Id);
         }
 
-        new DexMainService(sp, loaders).EnablePKM(savePkm.Pkm, savePkm.Save);
+        new DexMainService(sp).EnablePKM(savePkm.Pkm, savePkm.Save);
 
         flags.Dex = true;
     }

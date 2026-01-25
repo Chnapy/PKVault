@@ -3,7 +3,7 @@ using PKHeX.Core;
 public record EditPkmVersionActionInput(string pkmVersionId, EditPkmVersionPayload editPayload);
 
 public class EditPkmVersionAction(
-    ActionService actionService, PkmConvertService pkmConvertService, ILoadersService loadersService,
+    ActionService actionService, PkmConvertService pkmConvertService,
     SynchronizePkmAction synchronizePkmAction,
     IPkmVersionLoader pkmVersionLoader
 ) : DataAction<EditPkmVersionActionInput>
@@ -47,8 +47,7 @@ public class EditPkmVersionAction(
 
         if (pkmVersionEntity.AttachedSaveId != null)
         {
-            var loaders = await loadersService.GetLoaders();
-            await synchronizePkmAction.SynchronizePkmVersionToSave(new([(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)], loaders));
+            await synchronizePkmAction.SynchronizePkmVersionToSave(new([(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)]));
         }
 
         return new(

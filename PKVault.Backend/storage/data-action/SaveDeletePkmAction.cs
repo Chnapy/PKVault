@@ -1,7 +1,7 @@
 public record SaveDeletePkmActionInput(uint saveId, string[] pkmIds);
 
 public class SaveDeletePkmAction(
-    ILoadersService loadersService
+    ISavesLoadersService savesLoadersService
 ) : DataAction<SaveDeletePkmActionInput>
 {
     protected override async Task<DataActionPayload> Execute(SaveDeletePkmActionInput input, DataUpdateFlags flags)
@@ -11,11 +11,9 @@ public class SaveDeletePkmAction(
             throw new ArgumentException($"Pkm version ids cannot be empty");
         }
 
-        var loaders = await loadersService.GetLoaders();
-
         DataActionPayload act(string pkmId)
         {
-            var saveLoaders = loaders.saveLoadersDict[input.saveId];
+            var saveLoaders = savesLoadersService.GetLoaders(input.saveId);
 
             var dto = saveLoaders.Pkms.GetDto(pkmId);
             if (dto == default)

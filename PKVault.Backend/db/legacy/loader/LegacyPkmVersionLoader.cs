@@ -6,7 +6,7 @@ public class LegacyPkmVersionLoader : LegacyEntityLoader<LegacyPkmVersionEntity>
 
     private readonly Dictionary<ushort, StaticEvolve> evolves;
 
-    public IPKMLoader pkmFileLoader { get; }
+    public ILegacyPkmFileLoader pkmFileLoader { get; }
 
     // boxId => boxSlot => LegacyPkmVersionEntity.Id => LegacyPkmVersionEntity
     private Dictionary<int, Dictionary<int, Dictionary<string, LegacyPkmVersionEntity>>> entitiesByBox = [];
@@ -28,7 +28,7 @@ public class LegacyPkmVersionLoader : LegacyEntityLoader<LegacyPkmVersionEntity>
     )
     {
         evolves = _evolves;
-        pkmFileLoader = new PKMLoader(fileIOService, storagePath);
+        pkmFileLoader = new LegacyPkmFileLoader(fileIOService, storagePath);
     }
 
     public ImmutableDictionary<int, ImmutableDictionary<string, LegacyPkmVersionEntity>> GetEntitiesByBox(int boxId)

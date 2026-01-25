@@ -6,9 +6,9 @@ public record MovePkmActionInput(string[] pkmIds, uint? sourceSaveId,
 
 public class MovePkmAction(
     IServiceProvider sp,
-    ILoadersService loadersService, StaticDataService staticDataService,
+    StaticDataService staticDataService,
     SynchronizePkmAction synchronizePkmAction,
-    IPkmVersionLoader pkmVersionLoader, IBoxLoader boxLoader
+    IPkmVersionLoader pkmVersionLoader, IPkmFileLoader pkmFileLoader, IBoxLoader boxLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<MovePkmActionInput>
 {
     protected override async Task<DataActionPayload> Execute(MovePkmActionInput input, DataUpdateFlags flags)
@@ -23,8 +23,6 @@ public class MovePkmAction(
             throw new ArgumentException($"Pkm ids and box slots should have same length");
         }
 
-        var loaders = await loadersService.GetLoaders();
-
         async Task<DataActionPayload> act(string pkmId, int targetBoxSlot)
         {
 
@@ -35,15 +33,15 @@ public class MovePkmAction(
 
             if (input.sourceSaveId == null && input.targetSaveId != null)
             {
-                return await MainToSave(input, loaders, flags, pkmId, targetBoxSlot);
+                return await MainToSave(input, flags, pkmId, targetBoxSlot);
             }
 
             if (input.sourceSaveId != null && input.targetSaveId == null)
             {
-                return await SaveToMain(input, loaders, flags, pkmId, targetBoxSlot);
+                return await SaveToMain(input, flags, pkmId, targetBoxSlot);
             }
 
-            return SaveToSave(input, loaders, pkmId, targetBoxSlot);
+            return SaveToSave(input, pkmId, targetBoxSlot);
         }
 
         // pkmId, pkmSlot, targetSlot
@@ -90,15 +88,13 @@ public class MovePkmAction(
 
     private async Task<int> GetPkmSlot(uint? saveId, string pkmId)
     {
-        var loaders = await loadersService.GetLoaders();
-
         if (saveId == null)
         {
             var mainDto = await pkmVersionLoader.GetDto(pkmId);
             return mainDto.BoxSlot;
         }
 
-        var saveLoaders = loaders.saveLoadersDict[(uint)saveId];
+        var saveLoaders = savesLoadersService.GetLoaders((uint)saveId);
         var saveDto = saveLoaders.Pkms.GetDto(pkmId);
         return saveDto.BoxSlot;
     }
@@ -137,10 +133,10 @@ public class MovePkmAction(
         );
     }
 
-    private DataActionPayload SaveToSave(MovePkmActionInput input, DataEntityLoaders loaders, string pkmId, int targetBoxSlot)
+    private DataActionPayload SaveToSave(MovePkmActionInput input, string pkmId, int targetBoxSlot)
     {
-        var sourceSaveLoaders = loaders.saveLoadersDict[(uint)input.sourceSaveId!];
-        var targetSaveLoaders = loaders.saveLoadersDict[(uint)input.targetSaveId!];
+        var sourceSaveLoaders = savesLoadersService.GetLoaders((uint)input.sourceSaveId!);
+        var targetSaveLoaders = savesLoadersService.GetLoaders((uint)input.targetSaveId!);
 
         var sourcePkmDto = sourceSaveLoaders.Pkms.GetDto(pkmId);
         if (sourcePkmDto == default)
@@ -196,9 +192,9 @@ public class MovePkmAction(
         );
     }
 
-    private async Task<DataActionPayload> MainToSave(MovePkmActionInput input, DataEntityLoaders loaders, DataUpdateFlags flags, string pkmVersionId, int targetBoxSlot)
+    private async Task<DataActionPayload> MainToSave(MovePkmActionInput input, DataUpdateFlags flags, string pkmVersionId, int targetBoxSlot)
     {
-        var saveLoaders = loaders.saveLoadersDict[(uint)input.targetSaveId!];
+        var saveLoaders = savesLoadersService.GetLoaders((uint)input.targetSaveId!);
 
         var pkmVersion = pkmVersionLoader.GetEntity(pkmVersionId);
         var pkm = pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersion);
@@ -220,11 +216,11 @@ public class MovePkmAction(
             throw new ArgumentException("Switch not possible with attached move");
         }
 
-        await MainToSaveWithoutCheckTarget(input, loaders, flags, (uint)input.targetSaveId, input.targetBoxId, targetBoxSlot, pkmVersions);
+        await MainToSaveWithoutCheckTarget(input, flags, (uint)input.targetSaveId, input.targetBoxId, targetBoxSlot, pkmVersions);
 
         if (existingSlot != null)
         {
-            await SaveToMainWithoutCheckTarget(input, loaders, flags, (uint)input.targetSaveId, pkmVersion.BoxId, pkmVersion.BoxSlot, existingSlot);
+            await SaveToMainWithoutCheckTarget(input, flags, (uint)input.targetSaveId, pkmVersion.BoxId, pkmVersion.BoxSlot, existingSlot);
         }
 
         saveLoaders.Pkms.FlushParty();
@@ -239,9 +235,9 @@ public class MovePkmAction(
         );
     }
 
-    private async Task<DataActionPayload> SaveToMain(MovePkmActionInput input, DataEntityLoaders loaders, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
+    private async Task<DataActionPayload> SaveToMain(MovePkmActionInput input, DataUpdateFlags flags, string pkmId, int targetBoxSlot)
     {
-        var saveLoaders = loaders.saveLoadersDict[(uint)input.sourceSaveId!];
+        var saveLoaders = savesLoadersService.GetLoaders((uint)input.sourceSaveId!);
 
         var savePkm = saveLoaders.Pkms.GetDto(pkmId)
             ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
@@ -268,13 +264,13 @@ public class MovePkmAction(
         }
 
         await SaveToMainWithoutCheckTarget(
-            input, loaders, flags, (uint)input.sourceSaveId, input.targetBoxId, targetBoxSlot, savePkm
+            input, flags, (uint)input.sourceSaveId, input.targetBoxId, targetBoxSlot, savePkm
         );
 
         if (existingSlots.Count > 0)
         {
             await MainToSaveWithoutCheckTarget(
-                input, loaders, flags, (uint)input.sourceSaveId, savePkm!.BoxId.ToString(), savePkm.BoxSlot, existingSlots
+                input, flags, (uint)input.sourceSaveId, savePkm!.BoxId.ToString(), savePkm.BoxSlot, existingSlots
             );
         }
 
@@ -292,12 +288,12 @@ public class MovePkmAction(
 
     private async Task MainToSaveWithoutCheckTarget(
         MovePkmActionInput input,
-        DataEntityLoaders loaders, DataUpdateFlags flags,
+        DataUpdateFlags flags,
         uint targetSaveId, string targetBoxId, int targetBoxSlot,
         List<PkmVersionEntity> relatedPkmVersions
     )
     {
-        var saveLoaders = loaders.saveLoadersDict[targetSaveId];
+        var saveLoaders = savesLoadersService.GetLoaders(targetSaveId);
 
         if (!input.attached && relatedPkmVersions.Count > 1)
         {
@@ -355,7 +351,7 @@ public class MovePkmAction(
 
         if (pkmVersion.AttachedSaveId != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, pkmVersion.AttachedSavePkmIdBase!)], loaders));
+            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, pkmVersion.AttachedSavePkmIdBase!)]));
         }
 
         flags.Dex = true;
@@ -363,12 +359,12 @@ public class MovePkmAction(
 
     private async Task SaveToMainWithoutCheckTarget(
         MovePkmActionInput input,
-        DataEntityLoaders loaders, DataUpdateFlags flags,
+        DataUpdateFlags flags,
         uint sourceSaveId, string targetBoxId, int targetBoxSlot,
         PkmSaveDTO savePkm
     )
     {
-        var saveLoaders = loaders.saveLoadersDict[sourceSaveId];
+        var saveLoaders = savesLoadersService.GetLoaders(sourceSaveId);
 
         // var savePkm = await saveLoaders.Pkms.GetDto(pkmId);
 
@@ -404,14 +400,14 @@ public class MovePkmAction(
                 AttachedSaveId: input.attached ? sourceSaveId : null,
                 AttachedSavePkmIdBase: input.attached ? savePkm.IdBase : null,
                 Generation: savePkm.Generation,
-                Filepath: pkmVersionLoader.pkmFileLoader.GetPKMFilepath(savePkm.Pkm, staticData.Evolves)
+                Filepath: pkmFileLoader.GetPKMFilepath(savePkm.Pkm, staticData.Evolves)
             ), savePkm.Pkm);
         }
 
         // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmVersionEntity!.AttachedSaveId != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)], loaders));
+            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)]));
 
             if (!input.attached)
             {
@@ -429,7 +425,7 @@ public class MovePkmAction(
             saveLoaders.Pkms.DeleteDto(savePkm.Id);
         }
 
-        new DexMainService(sp, loaders).EnablePKM(savePkm.Pkm, savePkm.Save);
+        new DexMainService(sp).EnablePKM(savePkm.Pkm, savePkm.Save);
 
         flags.Dex = true;
     }

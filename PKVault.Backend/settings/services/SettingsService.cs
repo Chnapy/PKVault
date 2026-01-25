@@ -17,13 +17,14 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
     private ISaveService saveService => sp.GetRequiredService<ISaveService>();
-    private ILoadersService loadersService => sp.GetRequiredService<ILoadersService>();
     private ActionService actionService => sp.GetRequiredService<ActionService>();
 
     private SettingsDTO? BaseSettings;
 
     public async Task UpdateSettings(SettingsMutableDTO settingsMutable)
     {
+        var sessionService = sp.GetRequiredService<SessionService>();
+
         var text = fileIOService.WriteJSONFile(
             FilePath,
             SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
@@ -34,7 +35,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         BaseSettings = ReadBaseSettings();
 
         saveService.InvalidateSaves();
-        loadersService.InvalidateLoaders(checkSaves: true);
+        await sessionService.StartNewSession();
     }
 
     // Full settings

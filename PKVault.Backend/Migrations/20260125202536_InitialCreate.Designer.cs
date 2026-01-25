@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace PKVault.Backend.Migrations
 {
     [DbContext(typeof(SessionDbContext))]
-    [Migration("20260122204718_InitialCreate")]
+    [Migration("20260125202536_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -48,7 +48,6 @@ namespace PKVault.Backend.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("BankId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -86,6 +85,29 @@ namespace PKVault.Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Pokedex");
+                });
+
+            modelBuilder.Entity("PkmFileEntity", b =>
+                {
+                    b.Property<string>("Filepath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("Data")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("Error")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Updated")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Filepath");
+
+                    b.ToTable("PkmFiles");
                 });
 
             modelBuilder.Entity("PkmVersionEntity", b =>
@@ -135,9 +157,7 @@ namespace PKVault.Backend.Migrations
                 {
                     b.HasOne("BankEntity", null)
                         .WithMany()
-                        .HasForeignKey("BankId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BankId");
                 });
 
             modelBuilder.Entity("PkmVersionEntity", b =>

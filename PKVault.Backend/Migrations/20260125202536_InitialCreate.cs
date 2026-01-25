@@ -10,8 +10,6 @@ namespace PKVault.Backend.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // columns names MUST be defined for publish-trimmed !
-
             migrationBuilder.CreateTable(
                 name: "Banks",
                 columns: table => new
@@ -25,6 +23,21 @@ namespace PKVault.Backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Banks", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PkmFiles",
+                columns: table => new
+                {
+                    Filepath = table.Column<string>(name: "Filepath", type: "TEXT", nullable: false),
+                    Data = table.Column<byte[]>(name: "Data", type: "BLOB", nullable: false),
+                    Error = table.Column<int>(name: "Error", type: "INTEGER", nullable: true),
+                    Updated = table.Column<bool>(name: "Updated", type: "INTEGER", nullable: false),
+                    Deleted = table.Column<bool>(name: "Deleted", type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PkmFiles", x => x.Filepath);
                 });
 
             migrationBuilder.CreateTable(
@@ -49,7 +62,7 @@ namespace PKVault.Backend.Migrations
                     Order = table.Column<int>(name: "Order", type: "INTEGER", nullable: false),
                     Type = table.Column<int>(name: "Type", type: "INTEGER", nullable: false),
                     SlotCount = table.Column<int>(name: "SlotCount", type: "INTEGER", nullable: false),
-                    BankId = table.Column<string>(name: "BankId", type: "TEXT", nullable: false)
+                    BankId = table.Column<string>(name: "BankId", type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -58,8 +71,7 @@ namespace PKVault.Backend.Migrations
                         name: "FK_Boxes_Banks_BankId",
                         column: x => x.BankId,
                         principalTable: "Banks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -117,6 +129,9 @@ namespace PKVault.Backend.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "PkmFiles");
+
             migrationBuilder.DropTable(
                 name: "PkmVersions");
 

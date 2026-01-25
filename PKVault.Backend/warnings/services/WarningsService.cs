@@ -3,7 +3,8 @@
  */
 public class WarningsService(
     IServiceProvider sp,
-    ILoadersService loadersService, ISaveService saveService, IFileIOService fileIOService
+    ISaveService saveService, IFileIOService fileIOService,
+    SessionService sessionService, ISavesLoadersService savesLoadersService
 )
 {
     private WarningsDTO? WarningsDTO = null;
@@ -41,18 +42,18 @@ public class WarningsService(
     {
         var warns = new List<SaveChangedWarning>();
 
-        var loaders = await loadersService.GetLoaders();
+        var startTime = sessionService.StartTime;
 
-        var startTime = loaders.startTime;
+        var savesLoaders = savesLoadersService.GetAllLoaders();
 
-        if (loaders.saveLoadersDict.Count == 0)
+        if (savesLoaders.Count == 0)
         {
             return [];
         }
 
         var saveByPath = await saveService.GetSaveByPath();
 
-        return [.. loaders.saveLoadersDict.Values
+        return [.. savesLoaders
             .Where(saveLoaders => saveLoaders.Boxes.HasWritten || saveLoaders.Pkms.HasWritten)
             .Where(saveLoaders =>
             {
@@ -76,16 +77,14 @@ public class WarningsService(
 
         var warns = new List<PkmVersionWarning>();
 
-        var loaders = await loadersService.GetLoaders();
-
         var pkms = pkmVersionLoader.GetAllEntities();
 
         var tasks = pkms.Values.Select(pkmVersion =>
         {
             if (pkmVersion.AttachedSaveId != default)
             {
-                var exists = loaders.saveLoadersDict.TryGetValue((uint)pkmVersion.AttachedSaveId!, out var saveLoader);
-                if (!exists)
+                var saveLoader = savesLoadersService.GetLoaders((uint)pkmVersion.AttachedSaveId!);
+                if (saveLoader == null)
                 {
                     return new PkmVersionWarning(
                         PkmVersionId: pkmVersion.Id
@@ -116,16 +115,16 @@ public class WarningsService(
 
     private async Task<List<SaveDuplicateWarning>> CheckSaveDuplicates()
     {
-        var loaders = await loadersService.GetLoaders();
+        var savesLoaders = savesLoadersService.GetAllLoaders();
 
-        if (loaders.saveLoadersDict.Count == 0)
+        if (savesLoaders.Count == 0)
         {
             return [];
         }
 
         var saveByPath = await saveService.GetSaveByPath();
 
-        var tasks = loaders.saveLoadersDict.Values.Select(async (saveLoader) =>
+        var tasks = savesLoaders.Select(async (saveLoader) =>
         {
             var paths = saveByPath.ToList()
                 .FindAll(entry => entry.Value.Id == saveLoader.Save.Id)
