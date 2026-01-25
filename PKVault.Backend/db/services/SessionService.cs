@@ -57,9 +57,8 @@ public class SessionService(
         Console.WriteLine($"{pendingMigrations.Count()} pending migrations");
         Console.WriteLine($"{string.Join('\n', pendingMigrations)}");
 
-        // TODO somehow not compatible with PublishTrimmed
-        // await db.Database.MigrateAsync();
-        await db.Database.EnsureCreatedAsync(); // remove when migrations work
+        // migrations may fail in publish-trimmed if columns names not defined
+        await db.Database.MigrateAsync();
 
         var appliedMigrations = await db.Database.GetAppliedMigrationsAsync();
 

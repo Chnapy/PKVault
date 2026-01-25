@@ -10,15 +10,17 @@ namespace PKVault.Backend.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // columns names MUST be defined for publish-trimmed !
+
             migrationBuilder.CreateTable(
                 name: "Banks",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    IsDefault = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Order = table.Column<int>(type: "INTEGER", nullable: false),
-                    View = table.Column<string>(type: "TEXT", nullable: false)
+                    Id = table.Column<string>(name: "Id", type: "TEXT", nullable: false),
+                    Name = table.Column<string>(name: "Name", type: "TEXT", nullable: false),
+                    IsDefault = table.Column<bool>(name: "IsDefault", type: "INTEGER", nullable: false),
+                    Order = table.Column<int>(name: "Order", type: "INTEGER", nullable: false),
+                    View = table.Column<string>(name: "View", type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -29,9 +31,9 @@ namespace PKVault.Backend.Migrations
                 name: "Pokedex",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    Species = table.Column<ushort>(type: "INTEGER", nullable: false),
-                    Forms = table.Column<string>(type: "TEXT", nullable: false)
+                    Id = table.Column<string>(name: "Id", type: "TEXT", nullable: false),
+                    Species = table.Column<ushort>(name: "Species", type: "INTEGER", nullable: false),
+                    Forms = table.Column<string>(name: "Forms", type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -42,12 +44,12 @@ namespace PKVault.Backend.Migrations
                 name: "Boxes",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Order = table.Column<int>(type: "INTEGER", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    SlotCount = table.Column<int>(type: "INTEGER", nullable: false),
-                    BankId = table.Column<string>(type: "TEXT", nullable: false)
+                    Id = table.Column<string>(name: "Id", type: "TEXT", nullable: false),
+                    Name = table.Column<string>(name: "Name", type: "TEXT", nullable: false),
+                    Order = table.Column<int>(name: "Order", type: "INTEGER", nullable: false),
+                    Type = table.Column<int>(name: "Type", type: "INTEGER", nullable: false),
+                    SlotCount = table.Column<int>(name: "SlotCount", type: "INTEGER", nullable: false),
+                    BankId = table.Column<string>(name: "BankId", type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,14 +66,14 @@ namespace PKVault.Backend.Migrations
                 name: "PkmVersions",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    BoxId = table.Column<string>(type: "TEXT", nullable: false),
-                    BoxSlot = table.Column<int>(type: "INTEGER", nullable: false),
-                    IsMain = table.Column<bool>(type: "INTEGER", nullable: false),
-                    AttachedSaveId = table.Column<uint>(type: "INTEGER", nullable: true),
-                    AttachedSavePkmIdBase = table.Column<string>(type: "TEXT", nullable: true),
-                    Generation = table.Column<byte>(type: "INTEGER", nullable: false),
-                    Filepath = table.Column<string>(type: "TEXT", nullable: false)
+                    Id = table.Column<string>(name: "Id", type: "TEXT", nullable: false),
+                    BoxId = table.Column<string>(name: "BoxId", type: "TEXT", nullable: false),
+                    BoxSlot = table.Column<int>(name: "BoxSlot", type: "INTEGER", nullable: false),
+                    IsMain = table.Column<bool>(name: "IsMain", type: "INTEGER", nullable: false),
+                    AttachedSaveId = table.Column<uint>(name: "AttachedSaveId", type: "INTEGER", nullable: true),
+                    AttachedSavePkmIdBase = table.Column<string>(name: "AttachedSavePkmIdBase", type: "TEXT", nullable: true),
+                    Generation = table.Column<byte>(name: "Generation", type: "INTEGER", nullable: false),
+                    Filepath = table.Column<string>(name: "Filepath", type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
