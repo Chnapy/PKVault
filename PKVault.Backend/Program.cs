@@ -20,7 +20,8 @@ public class Program
 
         var app = PrepareWebApp(5000);
         var setupPostRun = await SetupData(app, args);
-        time();
+        time.Stop();
+
         if (setupPostRun != null)
         {
             var appTask = app.RunAsync();
@@ -29,7 +30,7 @@ public class Program
 
             await setupPostRun();
 
-            setupPostRunTime();
+            setupPostRunTime.Stop();
 
             await appTask;
         }
@@ -88,6 +89,13 @@ public class Program
     public static WebApplication PrepareWebApp(int port)
     {
         var builder = WebApplication.CreateBuilder([]);
+
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+        LogUtil.BuilderLoggingFilters.ForEach(filter =>
+        {
+            builder.Logging.AddFilter(filter.category, filter.level);
+        });
 
         ConfigureServices(builder.Services);
 

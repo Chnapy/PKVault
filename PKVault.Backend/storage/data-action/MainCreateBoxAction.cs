@@ -37,14 +37,15 @@ public class MainCreateBoxAction(IBoxLoader boxLoader) : DataAction<MainCreateBo
         var order = maxOrder + 1;
         var name = GetNewName();
 
-        var entity = await boxLoader.WriteEntity(new(
-            Id: id.ToString(),
-            Type: BoxType.Box,
-            Name: name,
-            SlotCount: input.slotCount ?? 30,
-            Order: order,
-            BankId: input.bankId
-        ));
+        var entity = await boxLoader.AddEntity(new()
+        {
+            Id = id.ToString(),
+            Type = BoxType.Box,
+            Name = name,
+            SlotCount = input.slotCount ?? 30,
+            Order = order,
+            BankId = input.bankId
+        });
         await boxLoader.NormalizeOrders();
 
         return entity;

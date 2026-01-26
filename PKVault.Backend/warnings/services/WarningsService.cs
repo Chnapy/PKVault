@@ -21,7 +21,7 @@ public class WarningsService(
 
     public async Task<WarningsDTO> CheckWarnings()
     {
-        var logtime = LogUtil.Time($"Warnings check");
+        using var _ = LogUtil.Time($"Warnings check");
 
         var saveChangedWarnings = CheckSaveChangedWarnings();
         var pkmVersionWarnings = CheckPkmVersionWarnings();
@@ -32,8 +32,6 @@ public class WarningsService(
             PkmVersionWarnings: await pkmVersionWarnings,
             SaveDuplicateWarnings: await saveDuplicateWarnings
         );
-
-        logtime();
 
         return WarningsDTO;
     }
@@ -77,33 +75,30 @@ public class WarningsService(
 
         var warns = new List<PkmVersionWarning>();
 
-        var pkms = await pkmVersionLoader.GetAllEntities();
+        var attachedPkmVersions = await pkmVersionLoader.GetEntitiesAttached();
 
-        var tasks = pkms.Values.Select(pkmVersion =>
+        var tasks = attachedPkmVersions.Values.Select(attachedPkmVersion =>
         {
-            if (pkmVersion.AttachedSaveId != default)
+            var saveLoader = savesLoadersService.GetLoaders((uint)attachedPkmVersion.AttachedSaveId!);
+            if (saveLoader == null)
             {
-                var saveLoader = savesLoadersService.GetLoaders((uint)pkmVersion.AttachedSaveId!);
-                if (saveLoader == null)
-                {
-                    return new PkmVersionWarning(
-                        PkmVersionId: pkmVersion.Id
-                    );
-                }
+                return new PkmVersionWarning(
+                    PkmVersionId: attachedPkmVersion.Id
+                );
+            }
 
-                var save = saveLoader.Save;
-                var generation = save.Generation;
+            var save = saveLoader.Save;
+            var generation = save.Generation;
 
-                var savePkm = saveLoader.Pkms.GetDtosByIdBase(pkmVersion.AttachedSavePkmIdBase ?? "");
+            var savePkm = saveLoader.Pkms.GetDtosByIdBase(attachedPkmVersion.AttachedSavePkmIdBase ?? "");
 
-                if (savePkm == null)
-                {
-                    Console.WriteLine($"Pkm-version warning");
+            if (savePkm == null)
+            {
+                Console.WriteLine($"Pkm-version warning");
 
-                    return new PkmVersionWarning(
-                        PkmVersionId: pkmVersion.Id
-                    );
-                }
+                return new PkmVersionWarning(
+                    PkmVersionId: attachedPkmVersion.Id
+                );
             }
             return null;
         });

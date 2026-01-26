@@ -15,21 +15,21 @@ public class BackupService(
 
     public async Task<DateTime> CreateBackup()
     {
-        var logtime = LogUtil.Time("Create backup");
+        using var _ = LogUtil.Time("Create backup");
 
         var startTime = DateTime.UtcNow;
 
         var steptime = LogUtil.Time($"Create backup - DB");
         var dbPaths = CreateDbBackup();
-        steptime();
+        steptime.Stop();
 
         steptime = LogUtil.Time($"Create backup - Saves");
         var savesPaths = await CreateSavesBackup();
-        steptime();
+        steptime.Stop();
 
         steptime = LogUtil.Time($"Create backup - Storage");
         var mainPaths = await CreateMainBackup();
-        steptime();
+        steptime.Stop();
 
         var files = new Dictionary<string, (string TargetPath, byte[] FileContent)>()
             .Concat(dbPaths)
@@ -65,9 +65,7 @@ public class BackupService(
             fileIOService.WriteBytes(bkpZipPath, memoryStream.ToArray());
             Console.WriteLine($"Write backup to {bkpZipPath}");
         }
-        steptime();
-
-        logtime();
+        steptime.Stop();
 
         return startTime;
     }
@@ -132,7 +130,7 @@ public class BackupService(
 
         var paths = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
 
-        (await pkmFileLoader.GetAllEntities())
+        (await pkmFileLoader.GetEnabledEntities())
             .ForEach(pkmFile =>
             {
                 if (pkmFile.Error != null)
@@ -277,10 +275,10 @@ public class BackupService(
 
         fileIOService.Delete(bkpTmpPathsPath);
 
-        logtime();
+        logtime.Stop();
 
         saveService.InvalidateSaves();
-        await sessionService.StartNewSession();
+        await sessionService.StartNewSession(checkSynchronize: true);
     }
 
     public async Task PrepareBackupThenRun(Func<Task> action)
@@ -293,10 +291,10 @@ public class BackupService(
 
             await action();
 
-            logtime();
+            logtime.Stop();
 
             saveService.InvalidateSaves();
-            await sessionService.StartNewSession();
+            await sessionService.StartNewSession(checkSynchronize: false);
         }
         catch
         {

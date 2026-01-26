@@ -6,7 +6,7 @@ public class EvolvePkmAction(
     IServiceProvider sp,
     PkmConvertService pkmConvertService, StaticDataService staticDataService,
     SynchronizePkmAction synchronizePkmAction,
-    IPkmVersionLoader pkmVersionLoader, IPkmFileLoader pkmFileLoader, ISavesLoadersService savesLoadersService
+    IPkmVersionLoader pkmVersionLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<EvolvePkmActionInput>
 {
     protected override async Task<DataActionPayload> Execute(EvolvePkmActionInput input, DataUpdateFlags flags)
@@ -79,12 +79,12 @@ public class EvolvePkmAction(
         var staticData = await staticDataService.GetStaticData();
 
         var entity = await pkmVersionLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-version not found");
-        var entityPkm = await pkmVersionLoader.GetPkmVersionEntityPkm(entity);
+        var entityPkm = await pkmVersionLoader.GetPKM(entity);
 
         var relatedPkmVersions = await Task.WhenAll(
             (await pkmVersionLoader.GetEntitiesByBox(entity.BoxId, entity.BoxSlot)).Values.ToList()
                 .FindAll(value => value.Id != entity.Id)
-                .Select(async entity => (Version: entity, Pkm: await pkmVersionLoader.GetPkmVersionEntityPkm(entity)))
+                .Select(async entity => (Version: entity, Pkm: await pkmVersionLoader.GetPKM(entity)))
         );
 
         if (
@@ -104,10 +104,7 @@ public class EvolvePkmAction(
         {
             UpdatePkm(pkm, evolveSpecies, evolveByItem);
         });
-        await pkmVersionLoader.WriteEntity(
-            entity with { Filepath = pkmFileLoader.GetPKMFilepath(entityPkm, staticData.Evolves) },
-            entityPkm
-        );
+        await pkmVersionLoader.UpdateEntity(entity, entityPkm);
 
         // update related dto pkm
         await Task.WhenAll(
@@ -117,10 +114,7 @@ public class EvolvePkmAction(
                 {
                     UpdatePkm(pkm, evolveSpecies, false);
                 });
-                await pkmVersionLoader.WriteEntity(
-                    version.Version with { Filepath = pkmFileLoader.GetPKMFilepath(version.Pkm, staticData.Evolves) },
-                    version.Pkm
-                );
+                await pkmVersionLoader.UpdateEntity(version.Version, version.Pkm);
             })
         );
 

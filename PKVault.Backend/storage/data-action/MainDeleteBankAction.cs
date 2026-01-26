@@ -8,23 +8,24 @@ public class MainDeleteBankAction(
     {
         var bank = await bankLoader.GetEntity(input.bankId);
 
-        var banksCount = (await bankLoader.GetAllEntities()).Count;
+        var banksCount = await bankLoader.Count();
         if (banksCount < 2)
         {
             throw new ArgumentException("Last Bank cannot be deleted");
         }
 
-        var boxes = (await boxLoader.GetAllEntities()).Values.ToList().FindAll(box => box.BankId == input.bankId);
+        var boxes = (await boxLoader.GetEntitiesByBank(input.bankId)).Values;
         foreach (var box in boxes)
         {
             await mainDeleteBoxAction.ExecuteWithPayload(new(box.Id), flags);
         }
 
-        await bankLoader.DeleteEntity(input.bankId);
+        await bankLoader.DeleteEntity(bank);
         if (bank.IsDefault)
         {
-            var newDefaultBank = (await bankLoader.GetAllEntities()).First().Value;
-            await bankLoader.WriteEntity(newDefaultBank with { IsDefault = true });
+            var newDefaultBank = await bankLoader.First();
+            newDefaultBank.IsDefault = true;
+            await bankLoader.UpdateEntity(newDefaultBank);
         }
 
         await bankLoader.NormalizeOrders();

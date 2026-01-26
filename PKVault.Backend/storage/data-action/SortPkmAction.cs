@@ -88,7 +88,7 @@ public class SortPkmAction(
             var filteredPkms = await Task.WhenAll(pkms
                 .Select(async mainVersion =>
                 {
-                    var mainVersionPkm = await pkmVersionLoader.GetPkmVersionEntityPkm(mainVersion);
+                    var mainVersionPkm = await pkmVersionLoader.GetPKM(mainVersion);
                     return (Version: mainVersion, Pkm: mainVersionPkm);
                 }));
 
@@ -109,17 +109,15 @@ public class SortPkmAction(
                 applyValue: async (entry) =>
                 {
                     var currentValue = pkmVersions[entry.Index].Version;
-                    var currentPkm = await pkmVersionLoader.GetPkmVersionEntityPkm(currentValue);
+                    var currentPkm = await pkmVersionLoader.GetPKM(currentValue);
 
                     var entities = (await pkmVersionLoader.GetEntitiesByBox(currentValue.BoxId, currentValue.BoxSlot)).Values
                         .Where(version => !placedVersions.Contains(version.Id));
                     foreach (var entity in entities)
                     {
-                        await pkmVersionLoader.WriteEntity(entity with
-                        {
-                            BoxId = entry.BoxId,
-                            BoxSlot = entry.BoxSlot
-                        });
+                        entity.BoxId = entry.BoxId;
+                        entity.BoxSlot = entry.BoxSlot;
+                        await pkmVersionLoader.UpdateEntity(entity);
 
                         placedVersions.Add(entity.Id);
                     }

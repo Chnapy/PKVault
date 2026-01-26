@@ -24,7 +24,7 @@ public class SaveInfosController(
         }
 
         saveService.InvalidateSaves();
-        await sessionService.StartNewSession();
+        await sessionService.StartNewSession(checkSynchronize: true);
 
         return await dataService.CreateDataFromUpdateFlags(new()
         {

@@ -20,9 +20,11 @@ public class SessionService(
 
     public bool HasMainDb() => fileIOService.Exists(MainDbPath);
 
-    public async Task StartNewSession()
+    public async Task StartNewSession(bool checkSynchronize)
     {
         StartTime = DateTime.UtcNow;
+
+        using var _ = LogUtil.Time("Starting new session");
 
         var task = Task.Run(async () =>
         {
@@ -31,7 +33,10 @@ public class SessionService(
                 savesLoadersService.Setup()
             );
 
-            await CheckSaveToSynchronize();
+            if (checkSynchronize)
+            {
+                await CheckSaveToSynchronize();
+            }
         });
 
         StartTask = task;
@@ -67,7 +72,7 @@ public class SessionService(
     {
         if (StartTask == null)
         {
-            await StartNewSession();
+            await StartNewSession(checkSynchronize: true);
         }
         // bypass check
         else if (byPassContextId != null && byPassContextId == ByPassContextId)
@@ -130,7 +135,7 @@ public class SessionService(
 
     private async Task RunDbMigrations()
     {
-        var time = LogUtil.Time("Data Migration + Clean + Seeding");
+        using var _ = LogUtil.Time("Data Migration + Clean + Seeding");
 
         using var scope = sp.CreateScope();
         using var db = scope.ServiceProvider.GetRequiredService<SessionDbContext>();
@@ -148,8 +153,6 @@ public class SessionService(
         var appliedMigrations = await db.Database.GetAppliedMigrationsAsync();
 
         Console.WriteLine($"{appliedMigrations.Count()} applied migrations");
-
-        time();
     }
 
     private async Task CloseConnection()

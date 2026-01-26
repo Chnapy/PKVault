@@ -8,4 +8,4 @@ public record SavePkmEntity(
 
     bool Updated,
     bool Deleted
-) : IEntity(Id);
+);

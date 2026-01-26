@@ -27,13 +27,14 @@ public class MainCreateBankAction(
         var order = maxOrder + 1;
         var name = GetNewName();
 
-        await bankLoader.WriteEntity(new(
-            Id: id.ToString(),
-            Name: name,
-            IsDefault: false,
-            Order: order, // normalized just after
-            View: new(MainBoxIds: [], Saves: [])
-        ));
+        await bankLoader.AddEntity(new()
+        {
+            Id = id.ToString(),
+            Name = name,
+            IsDefault = false,
+            Order = order, // normalized just after
+            View = new(MainBoxIds: [], Saves: [])
+        });
         await bankLoader.NormalizeOrders();
 
         await mainCreateBoxAction.CreateBox(new(id.ToString(), null));

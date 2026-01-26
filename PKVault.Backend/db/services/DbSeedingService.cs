@@ -7,11 +7,10 @@ public class DbSeedingService(
 {
     public async Task Seed(DbContext db, bool _, CancellationToken cancelToken)
     {
-        var time = LogUtil.Time("DB seeding");
+        using var __ = LogUtil.Time("DB seeding");
         await SeedJSONLegacyData(db, cancelToken);
         await SeedInitialData(db, cancelToken);
         await SeedPkmFilesData(db, cancelToken);
-        time();
     }
 
     private async Task SeedInitialData(DbContext db, CancellationToken cancelToken)
@@ -21,27 +20,29 @@ public class DbSeedingService(
 
         if (!banks.Any())
         {
-            await banks.AddAsync(new(
-                Id: "0",
-                Name: "Bank 1",
-                IsDefault: true,
-                Order: 0,
-                View: new([], [])
-            ), cancelToken);
+            await banks.AddAsync(new()
+            {
+                Id = "0",
+                Name = "Bank 1",
+                IsDefault = true,
+                Order = 0,
+                View = new([], [])
+            }, cancelToken);
 
             await db.SaveChangesAsync(cancelToken);
         }
 
         if (!boxes.Any())
         {
-            await boxes.AddAsync(new(
-                Id: "0",
-                Name: "Box 1",
-                Type: BoxType.Box,
-                SlotCount: 30,
-                Order: 0,
-                BankId: "0"
-            ), cancelToken);
+            await boxes.AddAsync(new()
+            {
+                Id = "0",
+                Name = "Box 1",
+                Type = BoxType.Box,
+                SlotCount = 30,
+                Order = 0,
+                BankId = "0"
+            }, cancelToken);
 
             await db.SaveChangesAsync(cancelToken);
         }
@@ -55,8 +56,6 @@ public class DbSeedingService(
             Console.WriteLine("Already on sqlite, no json migration");
             return false;
         }
-
-        Console.WriteLine("Json migration starting");
 
         var staticData = await staticDataService.GetStaticData();
         var evolves = staticData.Evolves;
@@ -82,6 +81,8 @@ public class DbSeedingService(
         {
             return false;
         }
+
+        using var _ = LogUtil.Time("Seed json legacy migration");
 
         var saveById = await saveService.GetSaveCloneById();
 
@@ -111,59 +112,89 @@ public class DbSeedingService(
         var pkmVersions = db.Set<PkmVersionEntity>();
         var dex = db.Set<DexEntity>();
 
-        await banks.AddRangeAsync(
-            legacyBankLoader.GetAllEntities().Values.Select(e => new BankEntity(
-                Id: e.Id,
-                Name: e.Name,
-                IsDefault: e.IsDefault,
-                Order: e.Order,
-                View: new(e.View.MainBoxIds, [..e.View.Saves.Select(s => new BankEntity.BankViewSave(
-                    SaveId: s.SaveId,
-                    SaveBoxIds: s.SaveBoxIds,
-                    Order: s.Order
-                ))])
-            )),
-        cancelToken);
+        await using var transaction = await db.Database.BeginTransactionAsync(cancelToken);
 
-        await boxes.AddRangeAsync(
-            legacyBoxLoader.GetAllEntities().Values.Select(e => new BoxEntity(
-                Id: e.Id,
-                Name: e.Name,
-                Order: e.Order,
-                Type: e.Type,
-                SlotCount: e.SlotCount,
-                BankId: e.BankId
-            )),
-        cancelToken);
+        try
+        {
+            await banks.AddRangeAsync(
+                legacyBankLoader.GetAllEntities().Values.Select(e => new BankEntity()
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    IsDefault = e.IsDefault,
+                    Order = e.Order,
+                    View = new(e.View.MainBoxIds, [..e.View.Saves.Select(s => new BankEntity.BankViewSave(
+                        SaveId: s.SaveId,
+                        SaveBoxIds: s.SaveBoxIds,
+                        Order: s.Order
+                    ))])
+                }),
+            cancelToken);
 
-        await pkmVersions.AddRangeAsync(
-            legacyPkmVersionLoader.GetAllEntities().Values.Select(e => new PkmVersionEntity(
-                Id: e.Id,
-                BoxId: e.BoxId.ToString(),
-                BoxSlot: e.BoxSlot,
-                IsMain: e.IsMain,
-                AttachedSaveId: e.AttachedSaveId,
-                AttachedSavePkmIdBase: e.AttachedSavePkmIdBase,
-                Generation: e.Generation,
-                Filepath: e.Filepath
-            )),
-        cancelToken);
+            await boxes.AddRangeAsync(
+                legacyBoxLoader.GetAllEntities().Values.Select(e => new BoxEntity()
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Order = e.Order,
+                    Type = e.Type,
+                    SlotCount = e.SlotCount,
+                    BankId = e.BankId
+                }),
+            cancelToken);
 
-        await dex.AddRangeAsync(
-            legacyDexLoader.GetAllEntities().Values.Select(e => new DexEntity(
-                Id: e.Id,
-                Species: e.Species,
-                Forms: [..e.Forms.Select(f => new DexEntityForm(
-                    Form: f.Form,
-                    Version: f.Version,
-                    Gender: f.Gender,
-                    IsCaught: f.IsCaught,
-                    IsCaughtShiny: f.IsCaughtShiny
-                ))]
-            )),
-        cancelToken);
+            await pkmVersions.AddRangeAsync(
+                legacyPkmVersionLoader.GetAllEntities().Values.Select(e =>
+                {
+                    var (Data, Error) = legacyPkmVersionLoader.pkmFileLoader.GetEntity(e.Filepath);
 
-        await db.SaveChangesAsync(cancelToken);
+                    return new PkmVersionEntity()
+                    {
+                        Id = e.Id,
+                        BoxId = e.BoxId.ToString(),
+                        BoxSlot = e.BoxSlot,
+                        IsMain = e.IsMain,
+                        AttachedSaveId = e.AttachedSaveId,
+                        AttachedSavePkmIdBase = e.AttachedSavePkmIdBase,
+                        Generation = e.Generation,
+                        Filepath = e.Filepath,
+
+                        PkmFile = new()
+                        {
+                            Filepath = e.Filepath,
+                            Data = Data,
+                            Error = Error,
+                            Updated = false,
+                            Deleted = false
+                        }
+                    };
+                }),
+            cancelToken);
+
+            await dex.AddRangeAsync(
+                legacyDexLoader.GetAllEntities().Values.Select(e => new DexEntity()
+                {
+                    Id = e.Id,
+                    Species = e.Species,
+                    Forms = [..e.Forms.Select(f => new DexEntityForm(
+                        Form: f.Form,
+                        Version: f.Version,
+                        Gender: f.Gender,
+                        IsCaught: f.IsCaught,
+                        IsCaughtShiny: f.IsCaughtShiny
+                    ))]
+                }),
+            cancelToken);
+
+            await db.SaveChangesAsync(cancelToken);
+
+            await transaction.CommitAsync(cancelToken);
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancelToken);
+            throw;
+        }
 
         return true;
     }
@@ -197,21 +228,42 @@ public class DbSeedingService(
                 error = PkmFileLoader.GetPKMLoadError(ex);
             }
 
-            return new PkmFileEntity(
-                Filepath: filepath,
-                Data: bytes,
-                Error: error,
-                Updated: false,
-                Deleted: false
-            );
+            return new PkmFileEntity()
+            {
+                Filepath = filepath,
+                Data = bytes,
+                Error = error,
+                Updated = false,
+                Deleted = false
+            };
         }
 
-        await pkmFiles.AddRangeAsync(
-            await Task.WhenAll(pkmVersions.Select(
-                pkmVersionToPkmFileEntity
-            )),
-        cancelToken);
+        var pkmFilesToAdd = await Task.WhenAll(pkmVersions
+            .Where(pkmVersion => pkmVersion.PkmFile == default)
+            .Select(pkmVersionToPkmFileEntity)
+        );
 
-        await db.SaveChangesAsync(cancelToken);
+        if (pkmFilesToAdd.Length == 0)
+        {
+            return;
+        }
+
+        using var _ = LogUtil.Time("Seed PKM files migration");
+
+        await using var transaction = await db.Database.BeginTransactionAsync(cancelToken);
+
+        try
+        {
+            await pkmFiles.AddRangeAsync(pkmFilesToAdd, cancelToken);
+
+            await db.SaveChangesAsync(cancelToken);
+
+            await transaction.CommitAsync(cancelToken);
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancelToken);
+            throw;
+        }
     }
 }

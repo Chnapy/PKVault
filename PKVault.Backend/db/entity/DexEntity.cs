@@ -1,10 +1,11 @@
 using PKHeX.Core;
 
-public record DexEntity(
-    string Id,
-    ushort Species,
-    List<DexEntityForm> Forms
-) : IEntity(Id);
+public class DexEntity : IEntity
+{
+    public override required string Id { get; init; }
+    public required ushort Species { get; set; }
+    public required List<DexEntityForm> Forms { get; set; }
+}
 
 public record DexEntityForm(
     byte Form,

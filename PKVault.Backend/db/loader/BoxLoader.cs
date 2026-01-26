@@ -1,9 +1,11 @@
+using System.Collections.Immutable;
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
 public interface IBoxLoader : IEntityLoader<BoxDTO, BoxEntity>
 {
     public BoxDTO CreateDTO(BoxEntity entity);
+    public Task<ImmutableDictionary<string, BoxEntity>> GetEntitiesByBank(string bankId);
     public Task NormalizeOrders();
 }
 
@@ -57,6 +59,14 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         return CreateDTO(entity);
     }
 
+    public async Task<ImmutableDictionary<string, BoxEntity>> GetEntitiesByBank(string bankId)
+    {
+        var dbSet = await GetDbSet();
+
+        return dbSet.Where(p => p.BankId == bankId)
+            .ToImmutableDictionary(p => p.Id);
+    }
+
     public async Task NormalizeOrders()
     {
         var entities = await GetAllEntities();
@@ -74,7 +84,8 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
 
             if (box.Order != currentOrder)
             {
-                await WriteEntity(box with { Order = currentOrder });
+                box.Order = currentOrder;
+                await UpdateEntity(box);
             }
             currentOrder += OrderGap;
         }

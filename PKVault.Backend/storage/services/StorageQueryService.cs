@@ -108,12 +108,20 @@ public class StorageQueryService(
         using var scope = sp.CreateScope();
         var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
 
+        var pkmVersions = saveId == null
+            ? await pkmVersionLoader.GetEntitiesByIds(pkmIds)
+            : [];
+
         return (await Task.WhenAll(pkmIds.Select(async id =>
         {
             if (saveId == null)
             {
-                var pkmVersion = await pkmVersionLoader.GetDto(id);
-                return (id, pkmVersion == null ? null : pkmLegalityService.CreateDTO(pkmVersion));
+                pkmVersions.TryGetValue(id, out var pkmVersion);
+
+                return (id, pkmVersion == null
+                    ? null
+                    : await pkmLegalityService.CreateDTO(pkmVersion, await pkmVersionLoader.GetPKM(pkmVersion))
+                );
             }
 
             var pkmSave = savesLoadersService.GetLoaders((uint)saveId).Pkms.GetDto(id);

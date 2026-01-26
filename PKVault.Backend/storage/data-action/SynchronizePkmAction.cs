@@ -5,8 +5,8 @@ public record SynchronizePkmActionInput(
 );
 
 public class SynchronizePkmAction(
-    PkmConvertService pkmConvertService, StaticDataService staticDataService,
-    IPkmVersionLoader pkmVersionLoader, IPkmFileLoader pkmFileLoader, ISavesLoadersService savesLoadersService
+    PkmConvertService pkmConvertService,
+    IPkmVersionLoader pkmVersionLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<SynchronizePkmActionInput>
 {
     public async Task<SynchronizePkmActionInput[]> GetSavesPkmsToSynchronize()
@@ -18,41 +18,43 @@ public class SynchronizePkmAction(
             return [];
         }
 
-        var time = LogUtil.Time($"Check saves to synchronize ({saveLoaders.Count} saves)");
+        using var _ = LogUtil.Time($"Check saves to synchronize ({saveLoaders.Count} saves)");
 
-        var pkmVersionDtos = await pkmVersionLoader.GetAllEntities();
+        var pkmVersionsBySaveId = await pkmVersionLoader.GetEntitiesAttachedGroupedBySave();
 
-        var pkmVersionsBySaveId = pkmVersionDtos.Values
-            .Where(pv =>
+        List<SynchronizePkmActionInput> synchronizationData = [];
+
+        foreach (var saveLoader in saveLoaders)
+        {
+            pkmVersionsBySaveId.TryGetValue(saveLoader.Save.Id, out var pkmVersionsBySave);
+
+            var result = new List<(string PkmVersionId, string SavePkmIdBase)>();
+
+            foreach (var pkmVersion in pkmVersionsBySave ?? [])
             {
-                return pv.AttachedSaveId != null
-                && savesLoadersService.GetLoaders((uint)pv.AttachedSaveId) != null;
-            })
-            .GroupBy(pv => (uint)pv.AttachedSaveId!)
-            .ToDictionary(g => g.Key, g => g.ToList());
-
-        SynchronizePkmActionInput[] synchronizationData = await Task.WhenAll(
-            saveLoaders.Select(saveLoader => Task.Run(() =>
-            {
-                pkmVersionsBySaveId.TryGetValue(saveLoader.Save.Id, out var pkmVersionsBySave);
-
-                var result = new List<(string PkmVersionId, string SavePkmIdBase)>();
-
-                (pkmVersionsBySave ?? []).ForEach(pkmVersion =>
+                if (pkmVersion.AttachedSavePkmIdBase != null)
                 {
-                    if (pkmVersion.AttachedSavePkmIdBase != null)
+                    var savePkms = saveLoader.Pkms.GetDtosByIdBase(pkmVersion.AttachedSavePkmIdBase);
+                    if (savePkms.Count != 1)
+                        continue;
+
+                    var savePkm = savePkms.Values.First();
+                    var versionPkm = await pkmVersionLoader.GetPKM(pkmVersion);
+
+                    if (versionPkm.DynamicChecksum != savePkm.DynamicChecksum)
                     {
                         result.Add((pkmVersion.Id, pkmVersion.AttachedSavePkmIdBase));
                     }
-                });
+                }
+            }
 
-                return new SynchronizePkmActionInput([.. result]);
-            }))
-        );
+            if (result.Count > 0)
+            {
+                synchronizationData.Add(new SynchronizePkmActionInput([.. result]));
+            }
+        }
 
-        time();
-
-        return synchronizationData;
+        return [.. synchronizationData];
     }
 
     protected override async Task<DataActionPayload> Execute(SynchronizePkmActionInput input, DataUpdateFlags flags)
@@ -74,20 +76,17 @@ public class SynchronizePkmAction(
             throw new ArgumentException($"Pkm main & pkm save ids cannot be empty");
         }
 
-        var staticData = await staticDataService.GetStaticData();
-        var evolves = staticData.Evolves;
-
         async Task act(string pkmVersionId, string savePkmIdBase)
         {
-            var pkmVersionDto = await pkmVersionLoader.GetDto(pkmVersionId);
-            var pkmVersionEntities = (await pkmVersionLoader.GetEntitiesByBox(pkmVersionDto.BoxId, pkmVersionDto.BoxSlot)).Values.ToList();
+            var pkmVersionEntity = await pkmVersionLoader.GetEntity(pkmVersionId);
+            var pkmVersionEntities = (await pkmVersionLoader.GetEntitiesByBox(pkmVersionEntity.BoxId, pkmVersionEntity.BoxSlot)).Values.ToList();
 
-            if (pkmVersionDto.AttachedSaveId == null)
+            if (pkmVersionEntity.AttachedSaveId == null)
             {
                 throw new ArgumentException($"Cannot synchronize pkm detached from save, pkmVersion.id={pkmVersionId}");
             }
 
-            var saveLoaders = savesLoadersService.GetLoaders((uint)pkmVersionDto.AttachedSaveId!);
+            var saveLoaders = savesLoadersService.GetLoaders((uint)pkmVersionEntity.AttachedSaveId!);
             var savePkms = saveLoaders.Pkms.GetDtosByIdBase(savePkmIdBase);
             if (savePkms.Count != 1)
             {
@@ -97,7 +96,7 @@ public class SynchronizePkmAction(
             var savePkm = savePkms.First().Value;
             foreach (var version in pkmVersionEntities)
             {
-                var pkm = await pkmVersionLoader.GetPkmVersionEntityPkm(version);
+                var pkm = await pkmVersionLoader.GetPKM(version);
                 if (!pkm.IsEnabled)
                 {
                     return;
@@ -134,10 +133,7 @@ public class SynchronizePkmAction(
                 });
 
                 var versionEntity = await pkmVersionLoader.GetEntity(version.Id);
-                await pkmVersionLoader.WriteEntity(
-                    versionEntity with { Filepath = pkmFileLoader.GetPKMFilepath(pkm, evolves) },
-                    pkm
-                );
+                await pkmVersionLoader.UpdateEntity(versionEntity, pkm);
             }
         }
 
@@ -157,7 +153,7 @@ public class SynchronizePkmAction(
         async Task act(string pkmVersionId, string savePkmIdBase)
         {
             var pkmVersionDto = await pkmVersionLoader.GetDto(pkmVersionId);
-            var pkmVersionDtos = (await pkmVersionLoader.GetEntitiesByBox(pkmVersionDto.BoxId, pkmVersionDto.BoxSlot)).Values.ToList();
+            var pkmVersionEntities = (await pkmVersionLoader.GetEntitiesByBox(pkmVersionDto.BoxId, pkmVersionDto.BoxSlot)).Values.ToList();
 
             if (pkmVersionDto.AttachedSaveId == null)
             {
@@ -202,7 +198,7 @@ public class SynchronizePkmAction(
                     pkm.Language = saveLoaders.Save.Language;
                 });
                 var versionEntity = await pkmVersionLoader.GetEntity(pkmVersionDto.Id);
-                await pkmVersionLoader.WriteEntity(versionEntity, versionPkm);
+                await pkmVersionLoader.UpdateEntity(versionEntity, versionPkm);
             }
 
             var attachedVersionEntity = await pkmVersionLoader.GetEntityBySave(savePkm.SaveId, savePkm.IdBase);

@@ -38,15 +38,14 @@ public class LegacyPkmVersionNormalize(
     {
         // Most part is done in LegacyPkmLoader for strong couplage reasons
 
-        var time = LogUtil.Time($"PkmVersion normalize: MigrateV0ToV1");
+        using var _ = LogUtil.Time($"PkmVersion normalize: MigrateV0ToV1");
 
         loader.GetAllEntities().Values.ToList().ForEach(entity => loader.WriteEntity(entity with { SchemaVersion = 1 }));
-        time();
     }
 
     public void CleanData()
     {
-        var time2 = LogUtil.Time($"PkmVersion normalize: CleanData rename pk filename if needed");
+        using var _ = LogUtil.Time($"PkmVersion normalize: CleanData rename pk filename if needed");
         // rename pk filename if needed
         loader.GetAllEntities().Values.ToList().ForEach(entity =>
         {
@@ -78,6 +77,5 @@ public class LegacyPkmVersionNormalize(
                 entity = loader.WriteEntity(entity with { Filepath = expectedFilepath }, pkm);
             }
         });
-        time2();
     }
 }

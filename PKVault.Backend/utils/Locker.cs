@@ -50,10 +50,9 @@ public class Locker<P, T>(string Name, P initialParam, Func<P, Task<T>> DefineVa
         {
             if (Initialized) return;
 
-            var time = LogUtil.Time($"Locker {Name}: Initialize");
+            using var _ = LogUtil.Time($"Locker {Name}: Initialize");
             Value = await DefineValue(Param);
             Initialized = true;
-            time();
         }
         finally
         {

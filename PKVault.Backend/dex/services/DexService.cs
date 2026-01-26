@@ -36,7 +36,7 @@ public class DexService(
 
         var maxSpecies = saves.Max(save => save.MaxSpeciesID);
 
-        var time = LogUtil.Time($"Update Dex with {saves.Count} saves (max-species={maxSpecies})");
+        using var _ = LogUtil.Time($"Update Dex with {saves.Count} saves (max-species={maxSpecies})");
 
         Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex = [];
 
@@ -44,8 +44,6 @@ public class DexService(
         {
             await UpdateDexWithSave(dex, save, staticData);
         }
-
-        time();
 
         return dex;
     }

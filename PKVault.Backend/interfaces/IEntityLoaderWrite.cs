@@ -1,18 +1,17 @@
-using System.Collections.Immutable;
-
 public interface IEntityLoader<DTO, E> : IEntityLoaderWrite where DTO : IWithId where E : IEntity
 {
     public Task<List<DTO>> GetAllDtos();
-    public Task<ImmutableDictionary<string, E>> GetAllEntities();
+    public Task<Dictionary<string, E>> GetAllEntities();
     public Task<DTO?> GetDto(string id);
     public Task<E?> GetEntity(string id);
-    public Task<bool> DeleteEntity(string id);
-    public Task<E> WriteEntity(E entity);
+    public Task DeleteEntity(E entity);
+    public Task<E> AddEntity(E entity);
+    public Task UpdateEntity(E entity);
+    public Task<E> First();
+    public Task<int> Count();
 }
 
 public interface IEntityLoaderWrite
 {
-    public bool HasWritten { get; }
-
     public void SetFlags(DataUpdateFlagsState<string> _flags);
 }

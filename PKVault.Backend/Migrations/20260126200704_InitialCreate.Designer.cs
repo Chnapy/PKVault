@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace PKVault.Backend.Migrations
 {
     [DbContext(typeof(SessionDbContext))]
-    [Migration("20260125202536_InitialCreate")]
+    [Migration("20260126200704_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -48,6 +48,7 @@ namespace PKVault.Backend.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("BankId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -145,6 +146,9 @@ namespace PKVault.Backend.Migrations
 
                     b.HasIndex("BoxId");
 
+                    b.HasIndex("Filepath")
+                        .IsUnique();
+
                     b.HasIndex("AttachedSaveId", "AttachedSavePkmIdBase")
                         .HasFilter("AttachedSaveId IS NOT NULL");
 
@@ -157,7 +161,9 @@ namespace PKVault.Backend.Migrations
                 {
                     b.HasOne("BankEntity", null)
                         .WithMany()
-                        .HasForeignKey("BankId");
+                        .HasForeignKey("BankId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PkmVersionEntity", b =>
@@ -167,6 +173,13 @@ namespace PKVault.Backend.Migrations
                         .HasForeignKey("BoxId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("PkmFileEntity", "PkmFile")
+                        .WithOne()
+                        .HasForeignKey("PkmVersionEntity", "Filepath")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("PkmFile");
                 });
 #pragma warning restore 612, 618
         }

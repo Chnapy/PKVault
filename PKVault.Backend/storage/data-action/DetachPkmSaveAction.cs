@@ -18,14 +18,12 @@ public class DetachPkmSaveAction(
             var oldSaveId = pkmVersionEntity!.AttachedSaveId;
             if (oldSaveId != null)
             {
-                await pkmVersionLoader.WriteEntity(pkmVersionEntity with
-                {
-                    AttachedSaveId = null,
-                    AttachedSavePkmIdBase = null
-                });
+                pkmVersionEntity.AttachedSaveId = null;
+                pkmVersionEntity.AttachedSavePkmIdBase = null;
+                await pkmVersionLoader.UpdateEntity(pkmVersionEntity);
             }
 
-            var pkm = await pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
+            var pkm = await pkmVersionLoader.GetPKM(pkmVersionEntity);
 
             var pkmNickname = pkm.Nickname;
             var saveLoaders = savesLoadersService.GetLoaders(oldSaveId ?? 0);

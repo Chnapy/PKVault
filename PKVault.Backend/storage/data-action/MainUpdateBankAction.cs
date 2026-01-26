@@ -29,14 +29,15 @@ public class MainUpdateBankAction(
 
             foreach (var b in otherDefaultBanks)
             {
-                await bankLoader.WriteEntity(b with { IsDefault = false });
+                b.IsDefault = false;
+                await bankLoader.UpdateEntity(b);
             }
 
-            bank = await bankLoader.WriteEntity(bank with { IsDefault = input.isDefault });
+            bank.IsDefault = input.isDefault;
+            await bankLoader.UpdateEntity(bank);
         }
 
-        var relatedBoxesIds = (await boxLoader.GetAllEntities()).Values.ToList()
-            .FindAll(box => box.BankId == input.bankId)
+        var relatedBoxesIds = (await boxLoader.GetEntitiesByBank(input.bankId)).Values
             .Select(box => int.Parse(box.Id)).ToArray();
 
         // view check: only allow boxes attached to this bank
@@ -45,14 +46,10 @@ public class MainUpdateBankAction(
             Saves: input.view.Saves
         );
 
-        bank = await bankLoader.WriteEntity(bank with
-        {
-            Name = input.bankName,
-            Order = input.order,
-            View = view
-        });
-
-        await bankLoader.WriteEntity(bank);
+        bank.Name = input.bankName;
+        bank.Order = input.order;
+        bank.View = view;
+        await bankLoader.UpdateEntity(bank);
         await bankLoader.NormalizeOrders();
 
         return new(

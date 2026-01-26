@@ -11,7 +11,7 @@ public class EditPkmVersionAction(
     protected override async Task<DataActionPayload> Execute(EditPkmVersionActionInput input, DataUpdateFlags flags)
     {
         var pkmVersionEntity = await pkmVersionLoader.GetEntity(input.pkmVersionId);
-        var pkmVersionPKM = await pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
+        var pkmVersionPKM = await pkmVersionLoader.GetPKM(pkmVersionEntity);
 
         var availableMoves = await actionService.GetPkmAvailableMoves(null, input.pkmVersionId);
 
@@ -27,14 +27,14 @@ public class EditPkmVersionAction(
             pkm.RefreshChecksum();
         });
 
-        await pkmVersionLoader.WriteEntity(pkmVersionEntity, pkm);
+        await pkmVersionLoader.UpdateEntity(pkmVersionEntity, pkm);
 
         var relatedPkmVersions = (await pkmVersionLoader.GetEntitiesByBox(pkmVersionEntity.BoxId, pkmVersionEntity.BoxSlot)).Values.ToList()
             .FindAll(value => value.Id != input.pkmVersionId);
 
         foreach (var versionEntity in relatedPkmVersions)
         {
-            var relatedPkm = (await pkmVersionLoader.GetPkmVersionEntityPkm(versionEntity)).Update(relatedPkm =>
+            var relatedPkm = (await pkmVersionLoader.GetPKM(versionEntity)).Update(relatedPkm =>
             {
                 pkmConvertService.PassDynamicsToPkm(pkm, relatedPkm);
 
@@ -42,7 +42,7 @@ public class EditPkmVersionAction(
                 relatedPkm.RefreshChecksum();
             });
 
-            await pkmVersionLoader.WriteEntity(versionEntity, relatedPkm);
+            await pkmVersionLoader.UpdateEntity(versionEntity, relatedPkm);
         }
 
         if (pkmVersionEntity.AttachedSaveId != null)

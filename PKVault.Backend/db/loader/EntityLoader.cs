@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Microsoft.EntityFrameworkCore;
 
 public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : IWithId where E : IEntity
@@ -7,8 +6,6 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
     protected SessionService sessionService;
     protected SessionDbContext db;
     private DataUpdateFlagsState<string> flags;
-
-    public bool HasWritten { get; set; } = false;
 
     public EntityLoader(
         IFileIOService _fileIOService,
@@ -32,15 +29,16 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         return [.. await Task.WhenAll(entities.Values.Select(GetDTOFromEntity))];
     }
 
-    public virtual async Task<ImmutableDictionary<string, E>> GetAllEntities()
+    public virtual async Task<Dictionary<string, E>> GetAllEntities()
     {
         var dbSet = await GetDbSet();
 
+        using var _ = LogUtil.Time($"{typeof(E)} - GetAllEntities");
+
         // Console.WriteLine($"{typeof(E).Name} - GetAllEntities - ContextId={db.ContextId}");
-        db.ChangeTracker.Clear();
-        return dbSet
+        return await dbSet
             .AsNoTracking()
-            .ToImmutableDictionary(e => e.Id, e => e);
+            .ToDictionaryAsync(e => e.Id);
     }
 
     public async Task<DTO?> GetDto(string id)
@@ -53,52 +51,72 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
     {
         var dbSet = await GetDbSet();
 
-        db.ChangeTracker.Clear();
+        using var _ = LogUtil.Time($"{typeof(E)} - GetEntity");
+
         return await dbSet.FindAsync(id);
     }
 
-    public virtual async Task<bool> DeleteEntity(string id)
+    public virtual async Task DeleteEntity(E entity)
     {
         var dbSet = await GetDbSet();
 
-        var existingEntity = await GetEntity(id);
-        if (existingEntity != null)
-        {
-            db.ChangeTracker.Clear();
-            dbSet.Remove(existingEntity);
-            await SaveChanges();
+        using var _ = LogUtil.Time($"{typeof(E)} - DeleteEntity");
 
-            flags.Ids.Add(id);
-            HasWritten = true;
-            Console.WriteLine($"Deleted {typeof(E)} id={id}");
-            return true;
-        }
-        return false;
+        dbSet.Remove(entity);
+        await SaveChanges();
+
+        flags.Ids.Add(entity.Id);
+        Console.WriteLine($"Deleted {typeof(E)} id={entity.Id}");
     }
 
-    public virtual async Task<E> WriteEntity(E entity)
+    public virtual async Task<E> AddEntity(E entity)
     {
-        Console.WriteLine($"{entity.GetType().Name} - Write id={entity.Id} - ContextId={db.ContextId}");
+        Console.WriteLine($"{entity.GetType().Name} - Add id={entity.Id} - ContextId={db.ContextId}");
 
         var dbSet = await GetDbSet();
 
-        if (await GetEntity(entity.Id) != null)
-        {
-            db.ChangeTracker.Clear();
-            dbSet.Update(entity);
-        }
-        else
-        {
-            db.ChangeTracker.Clear();
-            dbSet.Add(entity);
-        }
+        using var _ = LogUtil.Time($"{typeof(E)} - AddEntity");
+
+        await dbSet.AddAsync(entity);
         await SaveChanges();
         // Console.WriteLine($"Context={db.ContextId}");
 
         flags.Ids.Add(entity.Id);
-        HasWritten = true;
 
         return entity;
+    }
+
+    public virtual async Task UpdateEntity(E entity)
+    {
+        Console.WriteLine($"{entity.GetType().Name} - Update id={entity.Id} - ContextId={db.ContextId}");
+
+        var dbSet = await GetDbSet();
+
+        using var _ = LogUtil.Time($"{typeof(E)} - UpdateEntity");
+
+        dbSet.Update(entity);
+        await SaveChanges();
+        // Console.WriteLine($"Context={db.ContextId}");
+
+        flags.Ids.Add(entity.Id);
+    }
+
+    public async Task<E> First()
+    {
+        var dbSet = await GetDbSet();
+
+        using var _ = LogUtil.Time($"{typeof(E)} - First");
+
+        return await dbSet.FirstAsync();
+    }
+
+    public async Task<int> Count()
+    {
+        var dbSet = await GetDbSet();
+
+        using var _ = LogUtil.Time($"{typeof(E)} - Count");
+
+        return await dbSet.CountAsync();
     }
 
     public async Task SaveChanges()

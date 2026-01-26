@@ -250,7 +250,7 @@ public class ActionService(
         List<ActionRecord> previousActions = [.. actions];
         actions.Clear();
 
-        await sessionService.StartNewSession();
+        await sessionService.StartNewSession(checkSynchronize: false);
 
         using var scope = sp.CreateScope();
 
@@ -306,13 +306,9 @@ public class ActionService(
         {
             var action = getScopedAction(scope);
 
-            var logtime = LogUtil.Time($"Apply action - {action.GetType()}");
+            using var _ = LogUtil.Time($"Apply action - {action.GetType()}");
 
-            var payload = await action.ExecuteWithPayload(input, flags);
-
-            logtime();
-
-            return payload;
+            return await action.ExecuteWithPayload(input, flags);
         }
 
         var flags = await AddActionInner(

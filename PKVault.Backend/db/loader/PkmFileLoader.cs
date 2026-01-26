@@ -4,14 +4,11 @@ using PKHeX.Core;
 
 public interface IPkmFileLoader
 {
-    public Task<PkmFileEntity?> GetEntity(string filepath);
-    public Task<List<PkmFileEntity>> GetAllEntities();
-    public Task DeleteEntity(string filepath);
-    public Task WriteEntity(ImmutablePKM pkm, string filepath, Dictionary<ushort, StaticEvolve> evolves);
+    public Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool updated, bool deleted);
+    public Task<List<PkmFileEntity>> GetEnabledEntities();
     public Task WriteToFiles();
     public Task ClearData();
-    public Task<ImmutablePKM> CreatePKM(string id, string filepath, byte generation);
-    public Task<ImmutablePKM> CreatePKM(PkmVersionEntity pkmVersionEntity);
+    public Task<ImmutablePKM> CreatePKM(PkmFileEntity entity, byte generation);
     public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves);
 }
 
@@ -50,85 +47,39 @@ public class PkmFileLoader : IPkmFileLoader
         db = _db;
     }
 
-    public async Task<PkmFileEntity?> GetEntity(string filepath)
+    public async Task<List<PkmFileEntity>> GetEnabledEntities()
     {
         var dbSet = await GetDbSet();
 
-        db.ChangeTracker.Clear();
-        var entity = await dbSet.FindAsync(filepath);
-        if (entity != null && entity.Deleted)
-        {
-            return null;
-        }
-        return entity;
+        return await dbSet
+            .AsNoTracking()
+            .Where(p => p.Error == null)
+            .ToListAsync();
     }
 
-    public async Task<List<PkmFileEntity>> GetAllEntities()
-    {
-        var dbSet = await GetDbSet();
-
-        db.ChangeTracker.Clear();
-        return [.. dbSet.AsNoTracking()];
-    }
-
-    public async Task DeleteEntity(string filepath)
-    {
-        var dbSet = await GetDbSet();
-
-        if (EnableLog)
-            Console.WriteLine($"(M) Delete PKM file filepath={filepath}");
-
-        db.ChangeTracker.Clear();
-        dbSet.Update(new(
-            Filepath: filepath,
-            Data: [],
-            Error: null,
-            Updated: false,
-            Deleted: true
-        ));
-        db.SaveChanges();
-    }
-
-    public async Task WriteEntity(ImmutablePKM pkm, string filepath, Dictionary<ushort, StaticEvolve> evolves)
+    public async Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool updated, bool deleted)
     {
         if (!pkm.IsEnabled)
         {
             throw new InvalidOperationException($"Write disabled PKM not allowed");
         }
 
-        var dbSet = await GetDbSet();
-
         var bytes = GetPKMBytes(pkm);
 
-        if (EnableLog)
-            Console.WriteLine($"(M) PKM-file Write idBase={pkm.GetPKMIdBase(evolves)} filepath={filepath} bytes.length={bytes.Length}");
-
-        var entity = new PkmFileEntity(
-            Filepath: filepath,
-            Data: bytes,
-            Error: null,
-            Updated: true,
-            Deleted: false
-        );
-
-        if (await GetEntity(entity.Filepath) != null)
+        return new()
         {
-            db.ChangeTracker.Clear();
-            dbSet.Update(entity);
-        }
-        else
-        {
-            db.ChangeTracker.Clear();
-            await dbSet.AddAsync(entity);
-        }
-        await db.SaveChangesAsync();
+            Filepath = filepath,
+            Data = bytes,
+            Error = null,
+            Updated = true,
+            Deleted = false
+        };
     }
 
     public async Task WriteToFiles()
     {
         var dbSet = await GetDbSet();
 
-        db.ChangeTracker.Clear();
         var pkmFilesToDelete = await dbSet
             .AsNoTracking()
             .Where(pkmFile => pkmFile.Deleted)
@@ -139,7 +90,6 @@ public class PkmFileLoader : IPkmFileLoader
             fileIOService.Delete(pkmFileToDelete.Filepath);
         });
 
-        db.ChangeTracker.Clear();
         var pkmFilesToUpdate = await dbSet
             .AsNoTracking()
             .Where(pkmFile => pkmFile.Updated && !pkmFile.Deleted)
@@ -155,23 +105,14 @@ public class PkmFileLoader : IPkmFileLoader
     {
         var dbSet = await GetDbSet();
 
-        db.ChangeTracker.Clear();
         // clear db
         await dbSet.ExecuteDeleteAsync();
         await db.SaveChangesAsync();
     }
 
-    public async Task<ImmutablePKM> CreatePKM(PkmVersionEntity pkmVersionEntity)
+    public async Task<ImmutablePKM> CreatePKM(PkmFileEntity entity, byte generation)
     {
-        return await CreatePKM(
-            pkmVersionEntity.Id, pkmVersionEntity.Filepath, pkmVersionEntity.Generation
-        );
-    }
-
-    public async Task<ImmutablePKM> CreatePKM(string id, string filepath, byte generation)
-    {
-        var entity = await GetEntity(filepath);
-        ArgumentNullException.ThrowIfNull(entity);
+        var filepath = entity.Filepath;
 
         if (entity.Error != null)
         {
@@ -203,7 +144,7 @@ public class PkmFileLoader : IPkmFileLoader
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"PKM file load failure with PkmVersion.Id={id} path=${filepath}");
+            Console.Error.WriteLine($"PKM file load failure with PkmFileEntity.Filepath=${filepath}");
             Console.Error.WriteLine(ex);
 
             pkm = GetPlaceholderPKM();

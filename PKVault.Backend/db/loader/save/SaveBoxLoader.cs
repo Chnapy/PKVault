@@ -23,14 +23,15 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
         if (save.HasParty)
         {
             var id = ((int)BoxType.Party).ToString();
-            boxes.Add(id, new(
-                    Id: id,
-                    Type: BoxType.Party,
-                    Name: BoxType.Party.ToString(),
-                    Order: currentOrder,
-                    SlotCount: 6,
-                    BankId: ""
-                ));
+            boxes.Add(id, new()
+            {
+                Id = id,
+                Type = BoxType.Party,
+                Name = BoxType.Party.ToString(),
+                Order = currentOrder,
+                SlotCount = 6,
+                BankId = ""
+            });
             currentOrder++;
         }
 
@@ -40,14 +41,15 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
             for (int i = 0; i < boxesNames.Count; i++)
             {
                 var id = i.ToString();
-                boxes.Add(id, new(
-                        Id: id,
-                        Type: BoxType.Box,
-                        Name: boxesNames[i],
-                        Order: currentOrder,
-                        SlotCount: save.BoxSlotCount,
-                        BankId: ""
-                    ));
+                boxes.Add(id, new()
+                {
+                    Id = id,
+                    Type = BoxType.Box,
+                    Name = boxesNames[i],
+                    Order = currentOrder,
+                    SlotCount = save.BoxSlotCount,
+                    BankId = ""
+                });
                 currentOrder++;
             }
         }
@@ -58,14 +60,15 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
         {
             var id = ((int)BoxType.Daycare).ToString();
             var extraSlotsCount = extraSlots.FindAll(slot => slot.Type == StorageSlotType.Daycare).Count;
-            boxes.Add(id, new(
-                    Id: id,
-                    Type: BoxType.Daycare,
-                    Name: BoxType.Daycare.ToString(),
-                    Order: currentOrder,
-                    SlotCount: saveDaycare.DaycareSlotCount + extraSlotsCount,
-                    BankId: ""
-                ));
+            boxes.Add(id, new()
+            {
+                Id = id,
+                Type = BoxType.Daycare,
+                Name = BoxType.Daycare.ToString(),
+                Order = currentOrder,
+                SlotCount = saveDaycare.DaycareSlotCount + extraSlotsCount,
+                BankId = ""
+            });
             currentOrder++;
         }
 
@@ -85,14 +88,15 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
                 var name = boxType.ToString();
                 var slotCount = extraSlots.FindAll(slot => BoxLoader.GetTypeFromStorageSlotType(slot.Type) == boxType).Count;
 
-                boxes.Add(id, new(
-                        Id: id,
-                        Type: boxType,
-                        Name: name,
-                        Order: currentOrder,
-                        SlotCount: slotCount,
-                        BankId: ""
-                    ));
+                boxes.Add(id, new()
+                {
+                    Id = id,
+                    Type = boxType,
+                    Name = name,
+                    Order = currentOrder,
+                    SlotCount = slotCount,
+                    BankId = ""
+                });
                 currentOrder++;
             });
 

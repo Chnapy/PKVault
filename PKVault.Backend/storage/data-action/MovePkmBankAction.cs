@@ -4,8 +4,7 @@ public record MovePkmBankActionInput(string[] pkmIds, uint? sourceSaveId, string
 
 public class MovePkmBankAction(
     IServiceProvider sp,
-    StaticDataService staticDataService,
-    IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVersionLoader pkmVersionLoader, IPkmFileLoader pkmFileLoader, ISavesLoadersService savesLoadersService,
+    IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVersionLoader pkmVersionLoader, ISavesLoadersService savesLoadersService,
     MainCreateBoxAction mainCreateBoxAction, SynchronizePkmAction synchronizePkmAction
 ) : DataAction<MovePkmBankActionInput>
 {
@@ -19,8 +18,7 @@ public class MovePkmBankAction(
         var bank = (await bankLoader.GetEntity(input.bankId))
             ?? throw new ArgumentException($"Bank not found");
 
-        var mainBoxes = (await boxLoader.GetAllDtos())
-            .FindAll(box => box.BankId == input.bankId)
+        var mainBoxes = (await boxLoader.GetEntitiesByBank(input.bankId)).Values
             .OrderBy(box => box.Order).ToList();
 
         var boxDict = new Dictionary<int, int[]>();
@@ -105,7 +103,7 @@ public class MovePkmBankAction(
     private async Task<DataActionPayload> MainToMain(MovePkmBankActionInput input, string pkmVersionId, string targetBoxId, int targetBoxSlot)
     {
         var entity = (await pkmVersionLoader.GetEntity(pkmVersionId)) ?? throw new KeyNotFoundException("PkmVersion not found");
-        var pkm = await pkmVersionLoader.GetPkmVersionEntityPkm(entity);
+        var pkm = await pkmVersionLoader.GetPKM(entity);
 
         var pkmsAlreadyPresent = (await pkmVersionLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot)).Values;
         if (pkmsAlreadyPresent.Any())
@@ -113,13 +111,11 @@ public class MovePkmBankAction(
             throw new Exception("Pkm already present");
         }
 
-        await pkmVersionLoader.WriteEntity(entity with
-        {
-            BoxId = targetBoxId,
-            BoxSlot = targetBoxSlot
-        });
+        entity.BoxId = targetBoxId;
+        entity.BoxSlot = targetBoxSlot;
+        await pkmVersionLoader.UpdateEntity(entity);
 
-        var boxName = (await boxLoader.GetDto(targetBoxId.ToString()))?.Name;
+        var boxName = (await boxLoader.GetEntity(targetBoxId.ToString()))?.Name;
 
         return new(
             type: DataActionType.MOVE_PKM,
@@ -163,7 +159,7 @@ public class MovePkmBankAction(
 
         MovePkmAction.IncrementSaveTradeRecord(saveLoaders.Save);
 
-        var boxName = (await boxLoader.GetDto(targetBoxId.ToString()))?.Name;
+        var boxName = (await boxLoader.GetEntity(targetBoxId.ToString()))?.Name;
 
         return new(
             type: DataActionType.MOVE_PKM,
@@ -196,19 +192,21 @@ public class MovePkmBankAction(
 
         if (pkmVersionEntity == null)
         {
-            var staticData = await staticDataService.GetStaticData();
-
             // create pkm-version
-            pkmVersionEntity = await pkmVersionLoader.WriteEntity(new(
-                Id: savePkm.IdBase,
-                BoxId: targetBoxId,
-                BoxSlot: targetBoxSlot,
-                IsMain: true,
-                AttachedSaveId: input.attached ? sourceSaveId : null,
-                AttachedSavePkmIdBase: input.attached ? savePkm.IdBase : null,
-                Generation: savePkm.Generation,
-                Filepath: pkmFileLoader.GetPKMFilepath(savePkm.Pkm, staticData.Evolves)
-            ), savePkm.Pkm);
+            pkmVersionEntity = await pkmVersionLoader.AddEntity(new()
+            {
+                Id = savePkm.IdBase,
+                BoxId = targetBoxId,
+                BoxSlot = targetBoxSlot,
+                IsMain = true,
+                AttachedSaveId = input.attached ? sourceSaveId : null,
+                AttachedSavePkmIdBase = input.attached ? savePkm.IdBase : null,
+                Generation = savePkm.Generation,
+                Filepath = "",
+
+                PkmFile = null
+            },
+            savePkm.Pkm);
         }
 
         // if moved to already attached pkm, just update it
@@ -218,11 +216,9 @@ public class MovePkmBankAction(
 
             if (!input.attached)
             {
-                await pkmVersionLoader.WriteEntity(pkmVersionEntity with
-                {
-                    AttachedSaveId = null,
-                    AttachedSavePkmIdBase = null
-                });
+                pkmVersionEntity.AttachedSaveId = null;
+                pkmVersionEntity.AttachedSavePkmIdBase = null;
+                await pkmVersionLoader.UpdateEntity(pkmVersionEntity);
             }
         }
 

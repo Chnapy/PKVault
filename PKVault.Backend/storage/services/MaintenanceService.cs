@@ -12,7 +12,7 @@ public class MaintenanceService(
 {
     public async Task CleanMainStorageFiles()
     {
-        var time = LogUtil.Time($"Storage obsolete files clean up");
+        using var _ = LogUtil.Time($"Storage obsolete files clean up");
 
         using var scope = sp.CreateScope();
 
@@ -59,7 +59,5 @@ public class MaintenanceService(
             Console.WriteLine($"PkmVersion count = {pkmVersionsFilepaths.Count}");
             Console.WriteLine($"Paths to clean count = {pathsToClean.Count()}");
         }
-
-        time();
     }
 }

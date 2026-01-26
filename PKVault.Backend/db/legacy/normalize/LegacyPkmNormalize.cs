@@ -40,7 +40,7 @@ public class LegacyPkmNormalize(
 
     private void MigrateV0ToV1(LegacyPkmVersionLoader pkmVersionLoader, Dictionary<uint, SaveWrapper> savesDict)
     {
-        var time = LogUtil.Time($"Pkm normalize: MigrateV0ToV1");
+        using var _ = LogUtil.Time($"Pkm normalize: MigrateV0ToV1");
         /**
          * Convert entities with old/wrong ID format to new one.
          * It checks:
@@ -105,12 +105,11 @@ public class LegacyPkmNormalize(
 
             pkmEntity = loader.WriteEntity(pkmEntity with { SchemaVersion = 1 });
         });
-        time();
     }
 
     private void MigrateV1ToV2(LegacyPkmVersionLoader pkmVersionLoader, Dictionary<uint, SaveWrapper> savesDict)
     {
-        var time = LogUtil.Time($"Pkm normalize: MigrateV1ToV2");
+        using var _ = LogUtil.Time($"Pkm normalize: MigrateV1ToV2");
         /**
          * Convert Shedinja pkm entities with old ID format to new one.
          * It checks:
@@ -179,12 +178,11 @@ public class LegacyPkmNormalize(
 
             pkmEntity = loader.WriteEntity(pkmEntity with { SchemaVersion = 2 });
         });
-        time();
     }
 
     private void MigrateV2ToV3(LegacyPkmVersionLoader pkmVersionLoader, Dictionary<uint, SaveWrapper> savesDict)
     {
-        var time = LogUtil.Time($"Pkm normalize: MigrateV2ToV3");
+        using var _ = LogUtil.Time($"Pkm normalize: MigrateV2ToV3");
         /**
          * 
          */
@@ -221,12 +219,11 @@ public class LegacyPkmNormalize(
 
             pkmEntity = loader.WriteEntity(pkmEntity with { SchemaVersion = 3 });
         });
-        time();
     }
 
     public void CleanData(LegacyPkmVersionLoader pkmVersionLoader)
     {
-        var time = LogUtil.Time($"Pkm normalize: CleanData remove pkms with no pkmVersions");
+        using var _ = LogUtil.Time($"Pkm normalize: CleanData remove pkms with no pkmVersions");
         // remove pkms with no pkmVersions
         loader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
         {
@@ -236,7 +233,5 @@ public class LegacyPkmNormalize(
                 loader.DeleteEntity(pkmEntity.Id);
             }
         });
-
-        time();
     }
 }

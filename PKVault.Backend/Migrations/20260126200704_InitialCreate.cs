@@ -62,7 +62,7 @@ namespace PKVault.Backend.Migrations
                     Order = table.Column<int>(name: "Order", type: "INTEGER", nullable: false),
                     Type = table.Column<int>(name: "Type", type: "INTEGER", nullable: false),
                     SlotCount = table.Column<int>(name: "SlotCount", type: "INTEGER", nullable: false),
-                    BankId = table.Column<string>(name: "BankId", type: "TEXT", nullable: true)
+                    BankId = table.Column<string>(name: "BankId", type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -71,7 +71,8 @@ namespace PKVault.Backend.Migrations
                         name: "FK_Boxes_Banks_BankId",
                         column: x => x.BankId,
                         principalTable: "Banks",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -95,6 +96,12 @@ namespace PKVault.Backend.Migrations
                         column: x => x.BoxId,
                         principalTable: "Boxes",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PkmVersions_PkmFiles_Filepath",
+                        column: x => x.Filepath,
+                        principalTable: "PkmFiles",
+                        principalColumn: "Filepath",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -124,14 +131,17 @@ namespace PKVault.Backend.Migrations
                 name: "IX_PkmVersions_BoxId_BoxSlot",
                 table: "PkmVersions",
                 columns: new[] { "BoxId", "BoxSlot" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PkmVersions_Filepath",
+                table: "PkmVersions",
+                column: "Filepath",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "PkmFiles");
-
             migrationBuilder.DropTable(
                 name: "PkmVersions");
 
@@ -140,6 +150,9 @@ namespace PKVault.Backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Boxes");
+
+            migrationBuilder.DropTable(
+                name: "PkmFiles");
 
             migrationBuilder.DropTable(
                 name: "Banks");

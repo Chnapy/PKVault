@@ -10,7 +10,7 @@ public class MainCreatePkmVersionActionInput(string pkmVersionId, byte generatio
 
 public class MainCreatePkmVersionAction(
     PkmConvertService pkmConvertService, StaticDataService staticDataService,
-    IPkmVersionLoader pkmVersionLoader, IPkmFileLoader pkmFileLoader
+    IPkmVersionLoader pkmVersionLoader
 ) : DataAction<MainCreatePkmVersionActionInput>
 {
     protected override async Task<DataActionPayload> Execute(MainCreatePkmVersionActionInput input, DataUpdateFlags flags)
@@ -38,21 +38,25 @@ public class MainCreatePkmVersionAction(
 
         var staticData = await staticDataService.GetStaticData();
 
-        var pkmOrigin = await pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionOrigin);
+        var pkmOrigin = await pkmVersionLoader.GetPKM(pkmVersionOrigin);
 
         var pkmConverted = pkmConvertService.GetConvertedPkm(pkmOrigin, input.Generation, input.CreatedPID);
         input.CreatedPID = pkmConverted.PID;
 
-        await pkmVersionLoader.WriteEntity(new(
-            Id: pkmConverted.GetPKMIdBase(staticData.Evolves),
-            BoxId: pkmVersionOrigin.BoxId,
-            BoxSlot: pkmVersionOrigin.BoxSlot,
-            IsMain: false,
-            AttachedSaveId: null,
-            AttachedSavePkmIdBase: null,
-            Generation: input.Generation,
-            Filepath: pkmFileLoader.GetPKMFilepath(pkmConverted, staticData.Evolves)
-        ), pkmConverted);
+        await pkmVersionLoader.AddEntity(new()
+        {
+            Id = pkmConverted.GetPKMIdBase(staticData.Evolves),
+            BoxId = pkmVersionOrigin.BoxId,
+            BoxSlot = pkmVersionOrigin.BoxSlot,
+            IsMain = false,
+            AttachedSaveId = null,
+            AttachedSavePkmIdBase = null,
+            Generation = input.Generation,
+            Filepath = "",
+
+            PkmFile = null
+        },
+        pkmConverted);
 
         return new(
             type: DataActionType.MAIN_CREATE_PKM_VERSION,

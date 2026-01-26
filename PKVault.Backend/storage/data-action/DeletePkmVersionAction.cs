@@ -13,9 +13,10 @@ public class DeletePkmVersionAction(
 
         async Task<DataActionPayload> act(string pkmVersionId)
         {
-            var pkmVersion = await pkmVersionLoader.GetDto(pkmVersionId);
+            var pkmVersion = await pkmVersionLoader.GetEntity(pkmVersionId);
+            var pkm = await pkmVersionLoader.GetPKM(pkmVersion);
 
-            await pkmVersionLoader.DeleteEntity(pkmVersionId);
+            await pkmVersionLoader.DeleteEntity(pkmVersion);
 
             if (pkmVersion.IsMain)
             {
@@ -23,13 +24,14 @@ public class DeletePkmVersionAction(
                 if (versions.Count > 0)
                 {
                     var newMainVersion = versions.First().Value;
-                    await pkmVersionLoader.WriteEntity(newMainVersion with { IsMain = true });
+                    newMainVersion.IsMain = true;
+                    await pkmVersionLoader.UpdateEntity(newMainVersion);
                 }
             }
 
             return new(
                 type: DataActionType.DELETE_PKM_VERSION,
-                parameters: [pkmVersion.Nickname, pkmVersion.Generation]
+                parameters: [pkm.Nickname, pkmVersion.Generation]
             );
         }
 

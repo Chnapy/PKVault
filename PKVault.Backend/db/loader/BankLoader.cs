@@ -46,7 +46,8 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
         {
             if (bank.Order != currentOrder)
             {
-                await WriteEntity(bank with { Order = currentOrder });
+                bank.Order = currentOrder;
+                await UpdateEntity(bank);
             }
             currentOrder += OrderGap;
         }

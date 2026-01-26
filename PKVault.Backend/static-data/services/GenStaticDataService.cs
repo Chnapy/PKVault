@@ -21,7 +21,7 @@ public class GenStaticDataService(
 
     public async Task GenerateFiles()
     {
-        var time = LogUtil.Time("-- Generate PokeApi static-data & spritesheets");
+        using var _ = LogUtil.Time("-- Generate PokeApi static-data & spritesheets");
 
         var spritesheetsTask = Task.Run(async () =>
         {
@@ -37,8 +37,6 @@ public class GenStaticDataService(
         await Task.WhenAll(SettingsService.AllowedLanguages.Select(lang =>
             GenerateStaticData(lang, spritesheetsTask)
         ));
-
-        time();
     }
 
     public async Task GenerateStaticData(string lang, Task<StaticSpritesheets> spritesheets)
@@ -71,7 +69,7 @@ public class GenStaticDataService(
             EggSprite: GetEggSprite()
         );
 
-        time();
+        time.Dispose();
 
         var staticDataPath = Path.Combine([.. GetStaticDataPathParts(lang)]);
 
@@ -79,12 +77,12 @@ public class GenStaticDataService(
 
         fileIOService.WriteJSONGZipFile(staticDataPath, StaticDataJsonContext.Default.StaticDataDTO, dto);
 
-        time();
+        time.Dispose();
     }
 
     public async Task<Dictionary<byte, StaticVersion>> GetStaticVersions(string lang)
     {
-        var time = LogUtil.Time("static-data process versions");
+        using var _ = LogUtil.Time("static-data process versions");
         List<Task<StaticVersion>> tasks = [];
         var staticVersions = new Dictionary<int, StaticVersion>();
 
@@ -117,13 +115,13 @@ public class GenStaticDataService(
         {
             dict.Add(value.Id, value);
         }
-        time();
+
         return dict;
     }
 
     public async Task<Dictionary<ushort, StaticSpecies>> GetStaticSpecies(string lang)
     {
-        var time = LogUtil.Time($"static-data {lang} process species");
+        using var _ = LogUtil.Time($"static-data {lang} process species");
         var speciesNames = GameInfo.GetStrings(lang).Species;
         List<Task<StaticSpecies>> tasks = [];
 
@@ -510,14 +508,13 @@ public class GenStaticDataService(
         {
             dict.Add(value.Id, value);
         }
-        time();
 
         return dict;
     }
 
     public async Task<Dictionary<int, StaticStat>> GetStaticStats(string lang)
     {
-        var time = LogUtil.Time("static-data process stats");
+        using var _ = LogUtil.Time("static-data process stats");
         List<Task<StaticStat>> tasks = [];
 
         for (var i = 1; i <= 6; i++)
@@ -539,7 +536,7 @@ public class GenStaticDataService(
         {
             dict.Add(value.Id, value);
         }
-        time();
+
         return dict;
     }
 
@@ -563,7 +560,7 @@ public class GenStaticDataService(
 
     public async Task<Dictionary<int, StaticMove>> GetStaticMoves(string lang)
     {
-        var time = LogUtil.Time($"static-data {lang} process moves");
+        using var _ = LogUtil.Time($"static-data {lang} process moves");
         var moveNames = GameInfo.GetStrings(lang).Move;
         List<Task<StaticMove>> tasks = [];
 
@@ -656,13 +653,13 @@ public class GenStaticDataService(
         {
             dict.Add(value.Id, value);
         }
-        time();
+
         return dict;
     }
 
     public async Task<Dictionary<int, StaticNature>> GetStaticNatures(string lang)
     {
-        var time = LogUtil.Time($"static-data {lang} process natures");
+        using var _ = LogUtil.Time($"static-data {lang} process natures");
         var naturesNames = GameInfo.GetStrings(lang).Natures;
         List<Task<StaticNature>> tasks = [];
 
@@ -693,7 +690,7 @@ public class GenStaticDataService(
         {
             dict.Add(value.Id, value);
         }
-        time();
+
         return dict;
     }
 
@@ -717,7 +714,7 @@ public class GenStaticDataService(
 
     public async Task<Dictionary<int, StaticItem>> GetStaticItems(string lang)
     {
-        var time = LogUtil.Time($"static-data {lang} process items");
+        using var _ = LogUtil.Time($"static-data {lang} process items");
         var itemNames = GameInfo.GetStrings(lang).itemlist;
         List<Task<StaticItem>> tasks = [];
 
@@ -763,7 +760,6 @@ public class GenStaticDataService(
         {
             dict.Add(value.Id, value);
         }
-        time();
 
         return dict;
     }

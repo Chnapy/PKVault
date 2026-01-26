@@ -109,11 +109,13 @@ public class DexMainService(
         using var scope = sp.CreateScope();
         var dexLoader = scope.ServiceProvider.GetRequiredService<IDexLoader>();
 
-        DexEntity entity = (await dexLoader.GetEntity(species.ToString())) ?? new(
-            Id: species.ToString(),
-            Species: species,
-            Forms: []
-        );
+        var existingEntity = await dexLoader.GetEntity(species.ToString());
+        var entity = existingEntity ?? new()
+        {
+            Id = species.ToString(),
+            Species = species,
+            Forms = []
+        };
 
         var entityForm = entity?.Forms.Find(f => f.Form == form && f.Gender == gender);
 
@@ -151,6 +153,13 @@ public class DexMainService(
             return;
         }
 
-        await dexLoader.WriteEntity(entity);
+        if (existingEntity != null)
+        {
+            await dexLoader.UpdateEntity(entity);
+        }
+        else
+        {
+            await dexLoader.AddEntity(entity);
+        }
     }
 }

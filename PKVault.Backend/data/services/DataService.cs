@@ -9,7 +9,7 @@ public class DataService(
 {
     public async Task<DataDTO> CreateDataFromUpdateFlags(DataUpdateFlags flags)
     {
-        var time = LogUtil.Time("Prepare global data payload");
+        using var _ = LogUtil.Time("Prepare global data payload");
 
         var staticDataTask = Task.Run(async () => flags.StaticData
             ? await staticDataService.GetStaticData()
@@ -168,10 +168,53 @@ public class DataService(
             ? backupService.GetBackupList()
             : null;
 
-        await warningsTask;
+        // using (var w = LogUtil.Time("warningsTask"))
+        // {
+        //     await warningsTask;
+        // }
+
+        // using (var w = LogUtil.Time("staticDataTask"))
+        // {
+        //     await staticDataTask;
+        // }
+
+        // using (var w = LogUtil.Time("mainBanksTask"))
+        // {
+        //     await mainBanksTask;
+        // }
+
+        // using (var w = LogUtil.Time("mainBoxesTask"))
+        // {
+        //     await mainBoxesTask;
+        // }
+
+        // using (var w = LogUtil.Time("mainPkmVersionsTask"))
+        // {
+        //     await mainPkmVersionsTask;
+        // }
+
+        // using (var w = LogUtil.Time("mainPkmLegalitiesTask"))
+        // {
+        //     await mainPkmLegalitiesTask;
+        // }
+
+        // using (var w = LogUtil.Time("savesTask"))
+        // {
+        //     await savesTask;
+        // }
+
+        // using (var w = LogUtil.Time("saveInfosTask"))
+        // {
+        //     await saveInfosTask;
+        // }
+
+        // using (var w = LogUtil.Time("dexTask"))
+        // {
+        //     await dexTask;
+        // }
 
         var dto = new DataDTO(
-            Warnings: await warningsService.GetWarningsDTO(),
+            Warnings: await warningsTask,
             Settings: settingsService.GetSettings(),
             Actions: actionService.GetActionPayloadList(),
             StaticData: await staticDataTask,
@@ -185,8 +228,6 @@ public class DataService(
             Backups: backups,
             Dex: await dexTask
         );
-
-        time();
 
         // time = LogUtil.Time("Response serialization");
         // var json = System.Text.Json.JsonSerializer.Serialize(dto);

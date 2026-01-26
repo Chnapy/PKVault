@@ -27,8 +27,8 @@ public class MainUpdateBoxAction(
 
         if (box!.BankId != input.bankId)
         {
-            var bankBoxes = (await boxLoader.GetAllEntities()).Values.ToList().FindAll(box => box.BankId == box.BankId);
-            if (bankBoxes.Count <= 1)
+            var bankBoxes = (await boxLoader.GetEntitiesByBank(box.BankId)).Values;
+            if (bankBoxes.Count() <= 1)
             {
                 throw new ArgumentException($"Bank must keep at least 1 box");
             }
@@ -39,13 +39,11 @@ public class MainUpdateBoxAction(
                 var bank = await bankLoader.GetEntity(box.BankId);
                 if (bank.View.MainBoxIds.Contains(int.Parse(box.Id)))
                 {
-                    bank = await bankLoader.WriteEntity(bank with
-                    {
-                        View = new(
-                            MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != int.Parse(box.Id))],
-                            Saves: bank.View.Saves
-                        )
-                    });
+                    bank.View = new(
+                        MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != int.Parse(box.Id))],
+                        Saves: bank.View.Saves
+                    );
+                    await bankLoader.UpdateEntity(bank);
                 }
             }
 
@@ -67,14 +65,12 @@ public class MainUpdateBoxAction(
 
         var boxOldName = box.Name;
 
-        await boxLoader.WriteEntity(box with
-        {
-            Type = input.type,
-            Name = input.boxName,
-            Order = order,
-            BankId = input.bankId,
-            SlotCount = input.slotCount,
-        });
+        box.Type = input.type;
+        box.Name = input.boxName;
+        box.Order = order;
+        box.BankId = input.bankId;
+        box.SlotCount = input.slotCount;
+        await boxLoader.UpdateEntity(box);
         await boxLoader.NormalizeOrders();
 
         return new(

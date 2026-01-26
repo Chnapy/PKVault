@@ -23,7 +23,7 @@ public class SessionDbContext(
     {
         options
             .UseSqlite($"Data Source={sessionService.SessionDbPath}")
-            .LogTo(Console.WriteLine, LogLevel.Warning)
+            .LogTo(Console.WriteLine, LogUtil.DBLogLevel)
             .EnableDetailedErrors()
             .EnableSensitiveDataLogging()
             .UseAsyncSeeding(dbSeedingService.Seed);
@@ -61,11 +61,12 @@ public class SessionDbContext(
         modelBuilder.Entity<BoxEntity>(entity =>
         {
             entity.HasKey(p => p.Id);
+
+            entity
+                .HasOne<BankEntity>()
+                .WithMany()
+                .HasForeignKey(p => p.BankId);
         });
-        modelBuilder.Entity<BoxEntity>()
-            .HasOne<BankEntity>()
-            .WithMany()
-            .HasForeignKey(p => p.BankId);
 
         modelBuilder.Entity<PkmVersionEntity>(entity =>
         {
@@ -78,11 +79,22 @@ public class SessionDbContext(
                 .HasFilter("AttachedSaveId IS NOT NULL");
             entity.HasIndex(p => new { p.AttachedSaveId, p.AttachedSavePkmIdBase })
                 .HasFilter("AttachedSaveId IS NOT NULL");
+
+            entity.Property(p => p.Filepath)
+                .IsRequired();
+
+            entity
+                .HasOne<BoxEntity>()
+                .WithMany()
+                .HasForeignKey(e => e.BoxId);
+
+            entity
+                .HasOne(p => p.PkmFile)
+                .WithOne()
+                .HasForeignKey<PkmVersionEntity>(p => p.Filepath)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
         });
-        modelBuilder.Entity<PkmVersionEntity>()
-            .HasOne<BoxEntity>()
-            .WithMany()
-            .HasForeignKey(e => e.BoxId);
 
         modelBuilder.Entity<DexEntity>(entity =>
         {
