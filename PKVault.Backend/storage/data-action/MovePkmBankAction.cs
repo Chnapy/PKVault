@@ -16,7 +16,7 @@ public class MovePkmBankAction(
             throw new ArgumentException($"Pkm ids cannot be empty");
         }
 
-        var bank = bankLoader.GetEntity(input.bankId)
+        var bank = (await bankLoader.GetEntity(input.bankId))
             ?? throw new ArgumentException($"Bank not found");
 
         var mainBoxes = (await boxLoader.GetAllDtos())
@@ -24,12 +24,14 @@ public class MovePkmBankAction(
             .OrderBy(box => box.Order).ToList();
 
         var boxDict = new Dictionary<int, int[]>();
-        var boxesOccupationDict = mainBoxes.Select(box => (
-            box.Id,
-            pkmVersionLoader.GetEntitiesByBox(box.Id)
-                .Select(dict => dict.Key)   // boxSlot
-                .ToHashSet()
-        )).ToDictionary();
+        var boxesOccupationDict = (
+            await Task.WhenAll(mainBoxes.Select(async box => (
+                box.Id,
+                (await pkmVersionLoader.GetEntitiesByBox(box.Id))
+                    .Select(dict => dict.Key)   // boxSlot
+                    .ToHashSet()
+            )))
+        ).ToDictionary();
         var boxesUnoccupationDict = new Dictionary<string, HashSet<int>>();
 
         var availableSlotCount = 0;
@@ -57,7 +59,7 @@ public class MovePkmBankAction(
             var missingSlotCount = input.pkmIds.Length - availableSlotCount;
             var boxSlotCount = new int[] { missingSlotCount, 30 }.Max();
 
-            var box = mainCreateBoxAction.CreateBox(new(input.bankId, boxSlotCount));
+            var box = await mainCreateBoxAction.CreateBox(new(input.bankId, boxSlotCount));
 
             HashSet<int> unoccupiedSlots = [];
             for (int slot = 0; slot < box.SlotCount; slot++)
@@ -102,16 +104,16 @@ public class MovePkmBankAction(
 
     private async Task<DataActionPayload> MainToMain(MovePkmBankActionInput input, string pkmVersionId, string targetBoxId, int targetBoxSlot)
     {
-        var entity = pkmVersionLoader.GetEntity(pkmVersionId) ?? throw new KeyNotFoundException("PkmVersion not found");
-        var pkm = pkmVersionLoader.GetPkmVersionEntityPkm(entity);
+        var entity = (await pkmVersionLoader.GetEntity(pkmVersionId)) ?? throw new KeyNotFoundException("PkmVersion not found");
+        var pkm = await pkmVersionLoader.GetPkmVersionEntityPkm(entity);
 
-        var pkmsAlreadyPresent = pkmVersionLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot).Values;
+        var pkmsAlreadyPresent = (await pkmVersionLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot)).Values;
         if (pkmsAlreadyPresent.Any())
         {
             throw new Exception("Pkm already present");
         }
 
-        pkmVersionLoader.WriteEntity(entity with
+        await pkmVersionLoader.WriteEntity(entity with
         {
             BoxId = targetBoxId,
             BoxSlot = targetBoxSlot
@@ -140,14 +142,14 @@ public class MovePkmBankAction(
             }
         }
 
-        var pkmVersion = pkmVersionLoader.GetEntity(savePkm.IdBase);
+        var pkmVersion = await pkmVersionLoader.GetEntity(savePkm.IdBase);
 
         if (pkmVersion != null && pkmVersion.AttachedSaveId != input.sourceSaveId)
         {
             throw new ArgumentException($"Pkm with same ID already exists, id={savePkm.IdBase}");
         }
 
-        var existingSlots = pkmVersionLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot);
+        var existingSlots = await pkmVersionLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot);
         if (existingSlots.Count > 0)
         {
             throw new Exception("Pkm already present");
@@ -189,7 +191,7 @@ public class MovePkmBankAction(
         }
 
         // get pkm-version
-        var pkmVersionEntity = pkmVersionLoader.GetEntity(savePkm.Id);
+        var pkmVersionEntity = await pkmVersionLoader.GetEntity(savePkm.Id);
         var mainPkmAlreadyExists = pkmVersionEntity != null;
 
         if (pkmVersionEntity == null)
@@ -216,7 +218,7 @@ public class MovePkmBankAction(
 
             if (!input.attached)
             {
-                pkmVersionLoader.WriteEntity(pkmVersionEntity with
+                await pkmVersionLoader.WriteEntity(pkmVersionEntity with
                 {
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null
@@ -230,7 +232,7 @@ public class MovePkmBankAction(
             saveLoaders.Pkms.DeleteDto(savePkm.Id);
         }
 
-        new DexMainService(sp).EnablePKM(savePkm.Pkm, savePkm.Save);
+        await new DexMainService(sp).EnablePKM(savePkm.Pkm, savePkm.Save);
 
         flags.Dex = true;
     }

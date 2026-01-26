@@ -16,7 +16,7 @@ public class MainUpdateBankAction(
             throw new ArgumentException($"Bank name cannot be > 64 characters");
         }
 
-        var bank = bankLoader.GetEntity(input.bankId);
+        var bank = await bankLoader.GetEntity(input.bankId);
 
         if (bank!.IsDefault && !input.isDefault)
         {
@@ -25,17 +25,17 @@ public class MainUpdateBankAction(
 
         if (!bank.IsDefault && input.isDefault)
         {
-            var otherDefaultBanks = bankLoader.GetAllEntities().Values.ToList().FindAll(b => b.Id != input.bankId && b.IsDefault);
+            var otherDefaultBanks = (await bankLoader.GetAllEntities()).Values.ToList().FindAll(b => b.Id != input.bankId && b.IsDefault);
 
-            otherDefaultBanks.ForEach(b =>
+            foreach (var b in otherDefaultBanks)
             {
-                bankLoader.WriteEntity(b with { IsDefault = false });
-            });
+                await bankLoader.WriteEntity(b with { IsDefault = false });
+            }
 
-            bank = bankLoader.WriteEntity(bank with { IsDefault = input.isDefault });
+            bank = await bankLoader.WriteEntity(bank with { IsDefault = input.isDefault });
         }
 
-        var relatedBoxesIds = boxLoader.GetAllEntities().Values.ToList()
+        var relatedBoxesIds = (await boxLoader.GetAllEntities()).Values.ToList()
             .FindAll(box => box.BankId == input.bankId)
             .Select(box => int.Parse(box.Id)).ToArray();
 
@@ -45,15 +45,15 @@ public class MainUpdateBankAction(
             Saves: input.view.Saves
         );
 
-        bank = bankLoader.WriteEntity(bank with
+        bank = await bankLoader.WriteEntity(bank with
         {
             Name = input.bankName,
             Order = input.order,
             View = view
         });
 
-        bankLoader.WriteEntity(bank);
-        bankLoader.NormalizeOrders();
+        await bankLoader.WriteEntity(bank);
+        await bankLoader.NormalizeOrders();
 
         return new(
             type: DataActionType.MAIN_UPDATE_BANK,

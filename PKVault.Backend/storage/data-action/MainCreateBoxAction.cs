@@ -6,7 +6,7 @@ public class MainCreateBoxAction(IBoxLoader boxLoader) : DataAction<MainCreateBo
 {
     protected override async Task<DataActionPayload> Execute(MainCreateBoxActionInput input, DataUpdateFlags flags)
     {
-        var dto = CreateBox(input);
+        var dto = await CreateBox(input);
 
         return new(
             type: DataActionType.MAIN_CREATE_BOX,
@@ -14,9 +14,9 @@ public class MainCreateBoxAction(IBoxLoader boxLoader) : DataAction<MainCreateBo
         );
     }
 
-    public BoxEntity CreateBox(MainCreateBoxActionInput input)
+    public async Task<BoxEntity> CreateBox(MainCreateBoxActionInput input)
     {
-        var allBoxes = boxLoader.GetAllEntities().Values.ToList();
+        var allBoxes = (await boxLoader.GetAllEntities()).Values.ToList();
         var boxes = allBoxes.FindAll(box => box.BankId == input.bankId);
         var maxId = allBoxes.Max(box => int.Parse(box.Id));
         var maxOrder = boxes.Count == 0 ? 0 : boxes.Max(box => box.Order);
@@ -37,7 +37,7 @@ public class MainCreateBoxAction(IBoxLoader boxLoader) : DataAction<MainCreateBo
         var order = maxOrder + 1;
         var name = GetNewName();
 
-        var entity = boxLoader.WriteEntity(new(
+        var entity = await boxLoader.WriteEntity(new(
             Id: id.ToString(),
             Type: BoxType.Box,
             Name: name,
@@ -45,7 +45,7 @@ public class MainCreateBoxAction(IBoxLoader boxLoader) : DataAction<MainCreateBo
             Order: order,
             BankId: input.bankId
         ));
-        boxLoader.NormalizeOrders();
+        await boxLoader.NormalizeOrders();
 
         return entity;
     }

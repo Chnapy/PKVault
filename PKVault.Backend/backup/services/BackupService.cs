@@ -28,7 +28,7 @@ public class BackupService(
         steptime();
 
         steptime = LogUtil.Time($"Create backup - Storage");
-        var mainPaths = CreateMainBackup();
+        var mainPaths = await CreateMainBackup();
         steptime();
 
         var files = new Dictionary<string, (string TargetPath, byte[] FileContent)>()
@@ -125,14 +125,14 @@ public class BackupService(
         return paths;
     }
 
-    private Dictionary<string, (string TargetPath, byte[] FileContent)> CreateMainBackup()
+    private async Task<Dictionary<string, (string TargetPath, byte[] FileContent)>> CreateMainBackup()
     {
         using var scope = sp.CreateScope();
         var pkmFileLoader = scope.ServiceProvider.GetRequiredService<IPkmFileLoader>();
 
         var paths = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
 
-        pkmFileLoader.GetAllEntities()
+        (await pkmFileLoader.GetAllEntities())
             .ForEach(pkmFile =>
             {
                 if (pkmFile.Error != null)

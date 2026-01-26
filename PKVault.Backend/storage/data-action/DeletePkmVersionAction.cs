@@ -15,15 +15,15 @@ public class DeletePkmVersionAction(
         {
             var pkmVersion = await pkmVersionLoader.GetDto(pkmVersionId);
 
-            pkmVersionLoader.DeleteEntity(pkmVersionId);
+            await pkmVersionLoader.DeleteEntity(pkmVersionId);
 
             if (pkmVersion.IsMain)
             {
-                var versions = pkmVersionLoader.GetEntitiesByBox(pkmVersion.BoxId, pkmVersion.BoxSlot);
+                var versions = await pkmVersionLoader.GetEntitiesByBox(pkmVersion.BoxId, pkmVersion.BoxSlot);
                 if (versions.Count > 0)
                 {
                     var newMainVersion = versions.First().Value;
-                    pkmVersionLoader.WriteEntity(newMainVersion with { IsMain = true });
+                    await pkmVersionLoader.WriteEntity(newMainVersion with { IsMain = true });
                 }
             }
 

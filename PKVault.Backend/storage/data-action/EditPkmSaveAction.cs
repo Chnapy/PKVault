@@ -27,7 +27,7 @@ public class EditPkmSaveAction(
 
         saveLoaders.Pkms.WriteDto(pkmSave with { Pkm = pkm });
 
-        var pkmVersion = pkmVersionLoader.GetEntityBySave(pkmSave.SaveId, pkmSave.IdBase);
+        var pkmVersion = await pkmVersionLoader.GetEntityBySave(pkmSave.SaveId, pkmSave.IdBase);
         if (pkmVersion != null)
         {
             await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, pkmSave.IdBase)]));

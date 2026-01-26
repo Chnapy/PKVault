@@ -77,7 +77,7 @@ public class WarningsService(
 
         var warns = new List<PkmVersionWarning>();
 
-        var pkms = pkmVersionLoader.GetAllEntities();
+        var pkms = await pkmVersionLoader.GetAllEntities();
 
         var tasks = pkms.Values.Select(pkmVersion =>
         {

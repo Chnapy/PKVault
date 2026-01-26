@@ -60,7 +60,7 @@ public class EvolvePkmAction(
         };
         saveLoaders.Pkms.WriteDto(dto);
 
-        var pkmVersion = pkmVersionLoader.GetEntityBySave(dto.SaveId, dto.IdBase);
+        var pkmVersion = await pkmVersionLoader.GetEntityBySave(dto.SaveId, dto.IdBase);
         if (pkmVersion != null)
         {
             await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, dto.IdBase)]));
@@ -78,12 +78,14 @@ public class EvolvePkmAction(
     {
         var staticData = await staticDataService.GetStaticData();
 
-        var entity = pkmVersionLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-version not found");
-        var entityPkm = pkmVersionLoader.GetPkmVersionEntityPkm(entity);
+        var entity = await pkmVersionLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-version not found");
+        var entityPkm = await pkmVersionLoader.GetPkmVersionEntityPkm(entity);
 
-        var relatedPkmVersions = pkmVersionLoader.GetEntitiesByBox(entity.BoxId, entity.BoxSlot).Values.ToList()
-            .FindAll(value => value.Id != entity.Id)
-            .Select(entity => (Version: entity, Pkm: pkmVersionLoader.GetPkmVersionEntityPkm(entity))).ToList();
+        var relatedPkmVersions = await Task.WhenAll(
+            (await pkmVersionLoader.GetEntitiesByBox(entity.BoxId, entity.BoxSlot)).Values.ToList()
+                .FindAll(value => value.Id != entity.Id)
+                .Select(async entity => (Version: entity, Pkm: await pkmVersionLoader.GetPkmVersionEntityPkm(entity)))
+        );
 
         if (
             relatedPkmVersions.Any(version => entityPkm.Species > version.Pkm.MaxSpeciesID)
@@ -108,24 +110,26 @@ public class EvolvePkmAction(
         );
 
         // update related dto pkm
-        relatedPkmVersions.ForEach((version) =>
-        {
-            version.Pkm = version.Pkm.Update(pkm =>
+        await Task.WhenAll(
+            relatedPkmVersions.ToList().Select(async (version) =>
             {
-                UpdatePkm(pkm, evolveSpecies, false);
-            });
-            pkmVersionLoader.WriteEntity(
-                version.Version with { Filepath = pkmFileLoader.GetPKMFilepath(version.Pkm, staticData.Evolves) },
-                version.Pkm
-            );
-        });
+                version.Pkm = version.Pkm.Update(pkm =>
+                {
+                    UpdatePkm(pkm, evolveSpecies, false);
+                });
+                await pkmVersionLoader.WriteEntity(
+                    version.Version with { Filepath = pkmFileLoader.GetPKMFilepath(version.Pkm, staticData.Evolves) },
+                    version.Pkm
+                );
+            })
+        );
 
         if (entity.AttachedSaveId != null)
         {
             await synchronizePkmAction.SynchronizePkmVersionToSave(new([(entity.Id, entity.AttachedSavePkmIdBase!)]));
         }
 
-        new DexMainService(sp).EnablePKM(entityPkm);
+        await new DexMainService(sp).EnablePKM(entityPkm);
 
         flags.Dex = true;
 

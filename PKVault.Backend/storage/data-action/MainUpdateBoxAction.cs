@@ -21,13 +21,13 @@ public class MainUpdateBoxAction(
             throw new ArgumentException($"Box slot count should be between 1-300");
         }
 
-        var box = boxLoader.GetEntity(input.boxId);
+        var box = await boxLoader.GetEntity(input.boxId);
 
         var order = input.order;
 
         if (box!.BankId != input.bankId)
         {
-            var bankBoxes = boxLoader.GetAllEntities().Values.ToList().FindAll(box => box.BankId == box.BankId);
+            var bankBoxes = (await boxLoader.GetAllEntities()).Values.ToList().FindAll(box => box.BankId == box.BankId);
             if (bankBoxes.Count <= 1)
             {
                 throw new ArgumentException($"Bank must keep at least 1 box");
@@ -36,10 +36,10 @@ public class MainUpdateBoxAction(
             // edit previous bank view: remove this box
             if (box.BankId != null)
             {
-                var bank = bankLoader.GetEntity(box.BankId);
+                var bank = await bankLoader.GetEntity(box.BankId);
                 if (bank.View.MainBoxIds.Contains(int.Parse(box.Id)))
                 {
-                    bank = bankLoader.WriteEntity(bank with
+                    bank = await bankLoader.WriteEntity(bank with
                     {
                         View = new(
                             MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != int.Parse(box.Id))],
@@ -55,7 +55,7 @@ public class MainUpdateBoxAction(
 
         if (box.SlotCount != input.slotCount)
         {
-            var boxPkms = pkmVersionLoader.GetEntitiesByBox(int.Parse(box.Id));
+            var boxPkms = await pkmVersionLoader.GetEntitiesByBox(int.Parse(box.Id));
             if (boxPkms.Any(pkm =>
                 // Key = boxSlot
                 pkm.Key >= input.slotCount - 1
@@ -67,7 +67,7 @@ public class MainUpdateBoxAction(
 
         var boxOldName = box.Name;
 
-        boxLoader.WriteEntity(box with
+        await boxLoader.WriteEntity(box with
         {
             Type = input.type,
             Name = input.boxName,
@@ -75,7 +75,7 @@ public class MainUpdateBoxAction(
             BankId = input.bankId,
             SlotCount = input.slotCount,
         });
-        boxLoader.NormalizeOrders();
+        await boxLoader.NormalizeOrders();
 
         return new(
             type: DataActionType.MAIN_UPDATE_BOX,

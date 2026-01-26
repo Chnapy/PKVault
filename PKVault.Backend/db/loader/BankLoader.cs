@@ -3,15 +3,18 @@ using Microsoft.EntityFrameworkCore;
 public interface IBankLoader : IEntityLoader<BankDTO, BankEntity>
 {
     public BankDTO CreateDTO(BankEntity entity);
-    public void NormalizeOrders();
+    public Task NormalizeOrders();
 }
 
 public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
 {
     public static readonly int OrderGap = 10;
 
-    public BankLoader(IFileIOService fileIOService, SessionDbContext db) : base(
-        fileIOService, db, db.BanksFlags
+    public BankLoader(
+        IFileIOService fileIOService,
+        SessionService sessionService,
+        SessionDbContext db) : base(
+        fileIOService, sessionService, db, db.BanksFlags
     )
     {
     }
@@ -33,19 +36,21 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
         return CreateDTO(entity);
     }
 
-    public void NormalizeOrders()
+    public async Task NormalizeOrders()
     {
+        var entities = await GetAllEntities();
+
         var currentOrder = 0;
-        GetAllEntities().Values.OrderBy(bank => bank.Order).ToList()
-            .ForEach(bank =>
+
+        foreach (var bank in entities.Values.OrderBy(bank => bank.Order))
+        {
+            if (bank.Order != currentOrder)
             {
-                if (bank.Order != currentOrder)
-                {
-                    WriteEntity(bank with { Order = currentOrder });
-                }
-                currentOrder += OrderGap;
-            });
+                await WriteEntity(bank with { Order = currentOrder });
+            }
+            currentOrder += OrderGap;
+        }
     }
 
-    protected override DbSet<BankEntity> GetDbSet() => db.Banks;
+    protected override DbSet<BankEntity> GetDbSetRaw() => db.Banks;
 }

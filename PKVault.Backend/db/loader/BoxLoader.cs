@@ -1,11 +1,10 @@
-using System.Collections.Immutable;
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
 public interface IBoxLoader : IEntityLoader<BoxDTO, BoxEntity>
 {
     public BoxDTO CreateDTO(BoxEntity entity);
-    public void NormalizeOrders();
+    public Task NormalizeOrders();
 }
 
 public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
@@ -32,8 +31,11 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         _ => throw new NotImplementedException(slotType.ToString()),
     };
 
-    public BoxLoader(IFileIOService fileIOService, SessionDbContext db) : base(
-        fileIOService, db, db.BoxesFlags
+    public BoxLoader(
+        IFileIOService fileIOService,
+        SessionService sessionService,
+        SessionDbContext db) : base(
+        fileIOService, sessionService, db, db.BoxesFlags
     )
     {
     }
@@ -55,42 +57,28 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         return CreateDTO(entity);
     }
 
-    public override ImmutableDictionary<string, BoxEntity> GetAllEntities()
+    public async Task NormalizeOrders()
     {
-        db.ChangeTracker.Clear();
-        return GetDbSet()
-            .AsNoTracking()
-            .ToImmutableDictionary(e => e.Id, e => e);
-    }
+        var entities = await GetAllEntities();
 
-    public override BoxEntity? GetEntity(string id)
-    {
-        db.ChangeTracker.Clear();
-        return GetDbSet().Find(id);
-    }
-
-    public void NormalizeOrders()
-    {
         var currentOrder = 0;
         string? bankId = null;
-        GetAllEntities().Values
-            .OrderBy(box => box.BankId)
-            .ThenBy(box => box.Order).ToList()
-            .ForEach(box =>
-            {
-                if (bankId != box.BankId)
-                {
-                    bankId = box.BankId;
-                    currentOrder = 0;
-                }
 
-                if (box.Order != currentOrder)
-                {
-                    WriteEntity(box with { Order = currentOrder });
-                }
-                currentOrder += OrderGap;
-            });
+        foreach (var box in entities.Values.OrderBy(box => box.BankId).ThenBy(box => box.Order))
+        {
+            if (bankId != box.BankId)
+            {
+                bankId = box.BankId;
+                currentOrder = 0;
+            }
+
+            if (box.Order != currentOrder)
+            {
+                await WriteEntity(box with { Order = currentOrder });
+            }
+            currentOrder += OrderGap;
+        }
     }
 
-    protected override DbSet<BoxEntity> GetDbSet() => db.Boxes;
+    protected override DbSet<BoxEntity> GetDbSetRaw() => db.Boxes;
 }

@@ -40,7 +40,7 @@ public class Dex3XDService(SAV3XD save) : DexGenService(save)
         );
     }
 
-    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
     {
         if (!save.Personal.IsPresentInGame(species, form))
             return;

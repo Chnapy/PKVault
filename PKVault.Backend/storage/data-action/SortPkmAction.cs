@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Components.Forms;
 using PKHeX.Core;
 
 public record SortPkmActionInput(uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot);
@@ -44,10 +43,10 @@ public class SortPkmAction(
 
             pkms.ForEach(pkm => saveLoaders.Pkms.DeleteDto(pkm.Id));
 
-            RunSort(
+            await RunSort(
                 boxes,
                 pkmSpecies,
-                applyValue: (entry) =>
+                applyValue: async (entry) =>
                 {
                     var currentValue = savePkms[entry.Index];
                     saveLoaders.Pkms.WriteDto(saveLoaders.Pkms.CreateDTO(
@@ -55,7 +54,7 @@ public class SortPkmAction(
                         entry.BoxId, entry.BoxSlot
                     ));
                 },
-                onSpaceMissing: () =>
+                onSpaceMissing: async () =>
                 {
                     throw new ArgumentException($"Missing space, pkm sort cannot be done");
                 },
@@ -79,17 +78,19 @@ public class SortPkmAction(
 
         var bankId = boxes[0].BankId;
 
-        var pkms = boxesIds.SelectMany(boxId =>
-            pkmVersionLoader.GetEntitiesByBox(boxId).Select(dict => dict.Value)
-        ).SelectMany(dict => dict.Values).Where(pk => pk.IsMain);
+        var pkms = (await Task.WhenAll(boxesIds.Select(async boxId =>
+                (await pkmVersionLoader.GetEntitiesByBox(boxId)).Select(dict => dict.Value)
+            )))
+            .SelectMany(x => x)
+            .SelectMany(dict => dict.Values).Where(pk => pk.IsMain);
         if (pkms.Any())
         {
-            var filteredPkms = pkms
-                .Select(mainVersion =>
+            var filteredPkms = await Task.WhenAll(pkms
+                .Select(async mainVersion =>
                 {
-                    var mainVersionPkm = pkmVersionLoader.GetPkmVersionEntityPkm(mainVersion);
+                    var mainVersionPkm = await pkmVersionLoader.GetPkmVersionEntityPkm(mainVersion);
                     return (Version: mainVersion, Pkm: mainVersionPkm);
-                });
+                }));
 
             var pkmVersions = GetSortedPkms(
                 pkms: [.. filteredPkms],
@@ -102,30 +103,30 @@ public class SortPkmAction(
             // required to avoid conflicts
             HashSet<string> placedVersions = [];
 
-            RunSort(
+            await RunSort(
                 boxes,
                 pkmSpecies,
-                applyValue: (entry) =>
+                applyValue: async (entry) =>
                 {
                     var currentValue = pkmVersions[entry.Index].Version;
-                    var currentPkm = pkmVersionLoader.GetPkmVersionEntityPkm(currentValue);
+                    var currentPkm = await pkmVersionLoader.GetPkmVersionEntityPkm(currentValue);
 
-                    var entities = pkmVersionLoader.GetEntitiesByBox(currentValue.BoxId, currentValue.BoxSlot).Values
+                    var entities = (await pkmVersionLoader.GetEntitiesByBox(currentValue.BoxId, currentValue.BoxSlot)).Values
                         .Where(version => !placedVersions.Contains(version.Id));
-                    entities.ToList().ForEach(entity =>
+                    foreach (var entity in entities)
                     {
-                        pkmVersionLoader.WriteEntity(entity with
+                        await pkmVersionLoader.WriteEntity(entity with
                         {
                             BoxId = entry.BoxId,
                             BoxSlot = entry.BoxSlot
                         });
 
                         placedVersions.Add(entity.Id);
-                    });
+                    }
                 },
-                onSpaceMissing: () =>
+                onSpaceMissing: async () =>
                 {
-                    var box = mainCreateBoxAction.CreateBox(new(bankId, null));
+                    var box = await mainCreateBoxAction.CreateBox(new(bankId, null));
                     boxes.Add(boxLoader.CreateDTO(box));
                 },
                 leaveEmptySlot
@@ -163,7 +164,7 @@ public class SortPkmAction(
         ];
     }
 
-    private void RunSort(List<BoxDTO> boxes, List<ushort> pkmSpecies, Action<(int Index, string BoxId, int BoxSlot)> applyValue, Action onSpaceMissing, bool leaveEmptySlot)
+    private async Task RunSort(List<BoxDTO> boxes, List<ushort> pkmSpecies, Func<(int Index, string BoxId, int BoxSlot), Task> applyValue, Func<Task> onSpaceMissing, bool leaveEmptySlot)
     {
         var lastSpecies = pkmSpecies.Last();
         // starts from 0 only to handle disabled pkms
@@ -173,20 +174,20 @@ public class SortPkmAction(
         var currentBoxIndex = 0;
         var currentSlot = 0;
 
-        BoxDTO GetCurrentBox()
+        async Task<BoxDTO> GetCurrentBox()
         {
             if (currentBoxIndex > boxes.Count - 1)
             {
-                onSpaceMissing();
-                return GetCurrentBox();
+                await onSpaceMissing();
+                return await GetCurrentBox();
             }
 
             return boxes[currentBoxIndex];
         }
 
-        void IncrementBoxSlot()
+        async Task IncrementBoxSlot()
         {
-            var currentBox = GetCurrentBox();
+            var currentBox = await GetCurrentBox();
 
             if (currentSlot > currentBox.SlotCount - 1)
             {
@@ -201,7 +202,7 @@ public class SortPkmAction(
 
         for (var species = minSpecies; species <= lastSpecies; species++)
         {
-            var currentBox = GetCurrentBox();
+            var currentBox = await GetCurrentBox();
 
             if (currentIndex >= pkmSpecies.Count) break;
             var currentSpecies = pkmSpecies[currentIndex];
@@ -215,14 +216,14 @@ public class SortPkmAction(
             {
                 if (leaveEmptySlot)
                 {
-                    IncrementBoxSlot();
+                    await IncrementBoxSlot();
                 }
             }
             else
             {
                 for (; ; currentIndex++)
                 {
-                    currentBox = GetCurrentBox();
+                    currentBox = await GetCurrentBox();
 
                     if (currentIndex >= pkmSpecies.Count) break;
                     currentSpecies = pkmSpecies[currentIndex];
@@ -232,9 +233,9 @@ public class SortPkmAction(
                         break;
                     }
 
-                    applyValue((Index: currentIndex, BoxId: currentBox.Id, BoxSlot: currentSlot));
+                    await applyValue((Index: currentIndex, BoxId: currentBox.Id, BoxSlot: currentSlot));
 
-                    IncrementBoxSlot();
+                    await IncrementBoxSlot();
                 }
             }
         }

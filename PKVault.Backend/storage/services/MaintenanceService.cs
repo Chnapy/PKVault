@@ -18,7 +18,7 @@ public class MaintenanceService(
 
         var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
 
-        var pkmVersionsFilepaths = pkmVersionLoader.GetAllEntities().Values.Select(entity => entity.Filepath).ToList();
+        var pkmVersionsFilepaths = (await pkmVersionLoader.GetAllEntities()).Values.Select(entity => entity.Filepath).ToList();
 
         var rootDir = ".";
         var storagePath = settingsService.GetSettings().GetStoragePath();

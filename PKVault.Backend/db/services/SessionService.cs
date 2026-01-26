@@ -15,6 +15,9 @@ public class SessionService(
 
     private Task? StartTask = null;
 
+    // bypass DB check if same as DB.ContextId
+    private Guid? ByPassContextId = null;
+
     public bool HasMainDb() => fileIOService.Exists(MainDbPath);
 
     public async Task StartNewSession()
@@ -40,6 +43,10 @@ public class SessionService(
     {
         using var scope = sp.CreateScope();
 
+        // required to avoid deadlock: SessionService => SynchronizeAction => loaders => SessionService
+        ByPassContextId = scope.ServiceProvider.GetRequiredService<SessionDbContext>()
+            .ContextId.InstanceId;
+
         var actionService = scope.ServiceProvider.GetRequiredService<ActionService>();
         var synchronizePkmAction = scope.ServiceProvider.GetRequiredService<SynchronizePkmAction>();
 
@@ -49,16 +56,23 @@ public class SessionService(
         {
             if (data.pkmVersionAndPkmSaveIds.Length > 0)
             {
-                await actionService.SynchronizePkm(data);
+                await actionService.SynchronizePkm(data, scope);
             }
         }
+
+        ByPassContextId = null;
     }
 
-    public async Task EnsureSessionCreated()
+    public async Task EnsureSessionCreated(Guid? byPassContextId = null)
     {
         if (StartTask == null)
         {
             await StartNewSession();
+        }
+        // bypass check
+        else if (byPassContextId != null && byPassContextId == ByPassContextId)
+        {
+            return;
         }
         else
         {
@@ -75,8 +89,8 @@ public class SessionService(
         {
             var pkmFileLoader = scope.ServiceProvider.GetRequiredService<PkmFileLoader>();
 
-            pkmFileLoader.WriteToFiles();
-            pkmFileLoader.ClearData();
+            await pkmFileLoader.WriteToFiles();
+            await pkmFileLoader.ClearData();
         }
 
         await savesLoadersService.WriteToFiles();

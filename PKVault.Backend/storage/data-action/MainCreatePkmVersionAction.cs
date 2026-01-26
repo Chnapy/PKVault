@@ -17,7 +17,7 @@ public class MainCreatePkmVersionAction(
     {
         Console.WriteLine($"Create PKM version, pkmVersionId={input.PkmVersionId}, generation={input.Generation}");
 
-        var pkmVersionOrigin = pkmVersionLoader.GetEntity(input.PkmVersionId);
+        var pkmVersionOrigin = await pkmVersionLoader.GetEntity(input.PkmVersionId);
         if (pkmVersionOrigin == default)
         {
             throw new ArgumentException($"Pkm-version original not found, pkmVersion.id={input.PkmVersionId} generation={input.Generation}");
@@ -28,7 +28,7 @@ public class MainCreatePkmVersionAction(
             throw new ArgumentException($"Pkm-version should have IsMain=true, pkmVersion.id={input.PkmVersionId} generation={input.Generation}");
         }
 
-        var pkmVersions = pkmVersionLoader.GetEntitiesByBox(pkmVersionOrigin.BoxId, pkmVersionOrigin.BoxSlot).Values.ToList();
+        var pkmVersions = (await pkmVersionLoader.GetEntitiesByBox(pkmVersionOrigin.BoxId, pkmVersionOrigin.BoxSlot)).Values.ToList();
 
         var pkmVersionEntity = pkmVersions.Find(pkmVersion => pkmVersion.Generation == input.Generation);
         if (pkmVersionEntity != default)
@@ -38,7 +38,7 @@ public class MainCreatePkmVersionAction(
 
         var staticData = await staticDataService.GetStaticData();
 
-        var pkmOrigin = pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionOrigin);
+        var pkmOrigin = await pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionOrigin);
 
         var pkmConverted = pkmConvertService.GetConvertedPkm(pkmOrigin, input.Generation, input.CreatedPID);
         input.CreatedPID = pkmConverted.PID;

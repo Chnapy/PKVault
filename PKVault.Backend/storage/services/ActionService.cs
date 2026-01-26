@@ -16,10 +16,8 @@ public class ActionService(
 
     private readonly List<ActionRecord> actions = [];
 
-    public async Task<DataUpdateFlags> SynchronizePkm(SynchronizePkmActionInput input)
+    public async Task<DataUpdateFlags> SynchronizePkm(SynchronizePkmActionInput input, IServiceScope scope)
     {
-        using var scope = sp.CreateScope();
-
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<SynchronizePkmAction>(),

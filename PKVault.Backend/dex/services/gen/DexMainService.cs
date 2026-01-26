@@ -18,7 +18,7 @@ public class DexMainService(
 
         Dictionary<GameVersion, SaveWrapper> savesByVersion = [];
 
-        dexLoader.GetAllEntities().Values.ToList().ForEach(entity =>
+        (await dexLoader.GetAllEntities()).Values.ToList().ForEach(entity =>
         {
             ownedPkmsBySpecies.TryGetValue(entity.Species, out var pkmForms);
 
@@ -79,27 +79,27 @@ public class DexMainService(
 
     protected override DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender) => throw new NotImplementedException($"Should not be used");
 
-    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
     {
-        EnableSpeciesForm(
+        await EnableSpeciesForm(
             default,
             species, form, gender, isCaught, false,
             createOnly: false
         );
     }
 
-    public void EnablePKM(ImmutablePKM pk, SaveWrapper? save = null, bool createOnly = false)
+    public async Task EnablePKM(ImmutablePKM pk, SaveWrapper? save = null, bool createOnly = false)
     {
         var version = save?.Version ?? pk.Version;
 
-        EnableSpeciesForm(
+        await EnableSpeciesForm(
             version,
             pk.Species, pk.Form, pk.Gender, true, pk.IsShiny,
             createOnly
         );
     }
 
-    private void EnableSpeciesForm(
+    private async Task EnableSpeciesForm(
         GameVersion version,
         ushort species, byte form, Gender gender,
         bool isCaught, bool isCaughtShiny,
@@ -109,7 +109,7 @@ public class DexMainService(
         using var scope = sp.CreateScope();
         var dexLoader = scope.ServiceProvider.GetRequiredService<IDexLoader>();
 
-        DexEntity entity = dexLoader.GetEntity(species.ToString()) ?? new(
+        DexEntity entity = (await dexLoader.GetEntity(species.ToString())) ?? new(
             Id: species.ToString(),
             Species: species,
             Forms: []
@@ -151,6 +151,6 @@ public class DexMainService(
             return;
         }
 
-        dexLoader.WriteEntity(entity);
+        await dexLoader.WriteEntity(entity);
     }
 }

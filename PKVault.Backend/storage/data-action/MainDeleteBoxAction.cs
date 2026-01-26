@@ -5,22 +5,22 @@ public class MainDeleteBoxAction(IBoxLoader boxLoader, IBankLoader bankLoader, I
     protected override async Task<DataActionPayload> Execute(MainDeleteBoxActionInput input, DataUpdateFlags flags)
     {
         var box = await boxLoader.GetDto(input.boxId);
-        var boxPkms = pkmVersionLoader.GetEntitiesByBox(box!.IdInt);
+        var boxPkms = await pkmVersionLoader.GetEntitiesByBox(box!.IdInt);
 
         if (!boxPkms.IsEmpty)
         {
             throw new ArgumentException($"Cannot delete box with pkm inside");
         }
 
-        boxLoader.DeleteEntity(input.boxId);
-        boxLoader.NormalizeOrders();
+        await boxLoader.DeleteEntity(input.boxId);
+        await boxLoader.NormalizeOrders();
 
         if (box.BankId != null)
         {
-            var bank = bankLoader.GetEntity(box.BankId);
+            var bank = await bankLoader.GetEntity(box.BankId);
             if (bank.View.MainBoxIds.Contains(box.IdInt))
             {
-                bankLoader.WriteEntity(bank with
+                await bankLoader.WriteEntity(bank with
                 {
                     View = new(
                         MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],

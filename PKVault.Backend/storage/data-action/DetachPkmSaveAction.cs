@@ -12,20 +12,20 @@ public class DetachPkmSaveAction(
             throw new ArgumentException($"Pkm version ids cannot be empty");
         }
 
-        DataActionPayload act(string pkmVersionId)
+        async Task<DataActionPayload> act(string pkmVersionId)
         {
-            var pkmVersionEntity = pkmVersionLoader.GetEntity(pkmVersionId);
+            var pkmVersionEntity = await pkmVersionLoader.GetEntity(pkmVersionId);
             var oldSaveId = pkmVersionEntity!.AttachedSaveId;
             if (oldSaveId != null)
             {
-                pkmVersionLoader.WriteEntity(pkmVersionEntity with
+                await pkmVersionLoader.WriteEntity(pkmVersionEntity with
                 {
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null
                 });
             }
 
-            var pkm = pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
+            var pkm = await pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
 
             var pkmNickname = pkm.Nickname;
             var saveLoaders = savesLoadersService.GetLoaders(oldSaveId ?? 0);
@@ -39,7 +39,7 @@ public class DetachPkmSaveAction(
         List<DataActionPayload> payloads = [];
         foreach (var pkmVersionId in input.pkmVersionIds)
         {
-            payloads.Add(act(pkmVersionId));
+            payloads.Add(await act(pkmVersionId));
         }
 
         return payloads[0];

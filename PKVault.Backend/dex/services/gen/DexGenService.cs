@@ -174,5 +174,5 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
     protected abstract DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender);
 
-    public abstract void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught);
+    public abstract Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught);
 }
