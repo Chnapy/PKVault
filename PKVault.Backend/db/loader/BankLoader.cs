@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 public interface IBankLoader : IEntityLoader<BankDTO, BankEntity>
 {
     public BankDTO CreateDTO(BankEntity entity);
+    public Task<int> GetMaxId();
+    public Task<int> GetMaxOrder();
     public Task NormalizeOrders();
 }
 
@@ -23,7 +25,7 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
     {
         return new(
             Id: entity.Id,
-            IdInt: int.Parse(entity.Id),
+            IdInt: entity.IdInt,
             Name: entity.Name,
             IsDefault: entity.IsDefault,
             Order: entity.Order,
@@ -36,13 +38,31 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
         return CreateDTO(entity);
     }
 
+    public async Task<int> GetMaxId()
+    {
+        var dbSet = await GetDbSet();
+
+        return await dbSet.MaxAsync(p => p.IdInt);
+    }
+
+    public async Task<int> GetMaxOrder()
+    {
+        var dbSet = await GetDbSet();
+
+        return await dbSet.MaxAsync(p => p.Order);
+    }
+
     public async Task NormalizeOrders()
     {
-        var entities = await GetAllEntities();
+        var dbSet = await GetDbSet();
+
+        var entities = await dbSet
+            .OrderBy(bank => bank.Order)
+            .ToArrayAsync();
 
         var currentOrder = 0;
 
-        foreach (var bank in entities.Values.OrderBy(bank => bank.Order))
+        foreach (var bank in entities)
         {
             if (bank.Order != currentOrder)
             {

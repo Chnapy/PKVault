@@ -19,11 +19,7 @@ public class StorageQueryService(
         using var scope = sp.CreateScope();
         var bankLoader = scope.ServiceProvider.GetRequiredService<IBankLoader>();
 
-        return (await Task.WhenAll(ids.Select(async id =>
-        {
-            var bank = await bankLoader.GetDto(id);
-            return (id, bank);
-        }))).ToDictionary();
+        return await bankLoader.GetDtosByIds(ids);
     }
 
     public async Task<List<BoxDTO>> GetMainBoxes()
@@ -39,11 +35,7 @@ public class StorageQueryService(
         using var scope = sp.CreateScope();
         var boxLoader = scope.ServiceProvider.GetRequiredService<IBoxLoader>();
 
-        return (await Task.WhenAll(ids.Select(async id =>
-        {
-            var box = await boxLoader.GetDto(id);
-            return (id, box);
-        }))).ToDictionary();
+        return await boxLoader.GetDtosByIds(ids);
     }
 
     public async Task<List<PkmVersionDTO>> GetMainPkmVersions()
@@ -59,11 +51,7 @@ public class StorageQueryService(
         using var scope = sp.CreateScope();
         var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
 
-        return (await Task.WhenAll(pkmIds.Select(async id =>
-        {
-            var pkmVersion = await pkmVersionLoader.GetDto(id);
-            return (id, pkmVersion);
-        }))).ToDictionary();
+        return await pkmVersionLoader.GetDtosByIds(pkmIds);
     }
 
     public async Task<List<BoxDTO>> GetSaveBoxes(uint saveId)

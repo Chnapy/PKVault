@@ -272,6 +272,9 @@ public class ActionService(
             }
         }
 
+        await scope.ServiceProvider.GetRequiredService<SessionDbContext>()
+            .SaveChangesAsync();
+
         return flags;
     }
 
@@ -316,6 +319,10 @@ public class ActionService(
             applyFn,
             null
         );
+
+        await scope.ServiceProvider.GetRequiredService<SessionDbContext>()
+            .SaveChangesAsync();
+
         flags.Warnings = true;
 
         return flags;
@@ -386,13 +393,25 @@ public class ActionService(
         using var scope = sp.CreateScope();
         var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
 
-        var save = saveId == null
-            ? null
-            : savesLoadersService.GetLoaders((uint)saveId).Save;
-        var pkm = (saveId == null
-            ? (await pkmVersionLoader.GetDto(pkmId))?.Pkm
-            : savesLoadersService.GetLoaders((uint)saveId).Pkms.GetDto(pkmId)?.Pkm)
-            ?? throw new ArgumentException($"Pkm not found, saveId={saveId} pkmId={pkmId}");
+        var saveLoader = saveId == null ? null : savesLoadersService.GetLoaders((uint)saveId);
+
+        var save = saveLoader?.Save;
+
+        async Task<ImmutablePKM> GetPkm()
+        {
+            if (saveLoader == null)
+            {
+                var pkmVersion = await pkmVersionLoader.GetEntity(pkmId);
+                ArgumentNullException.ThrowIfNull(pkmVersion);
+
+                return await pkmVersionLoader.GetPKM(pkmVersion);
+            }
+
+            return saveLoader.Pkms.GetDto(pkmId)?.Pkm
+                ?? throw new ArgumentException($"Pkm not found, saveId={saveId} pkmId={pkmId}");
+        }
+
+        var pkm = await GetPkm();
 
         var legality = pkmLegalityService.GetLegalitySafe(pkm, save);
 

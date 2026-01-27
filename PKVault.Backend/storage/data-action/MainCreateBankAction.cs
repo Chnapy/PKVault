@@ -7,15 +7,15 @@ public class MainCreateBankAction(
 {
     protected override async Task<DataActionPayload> Execute(MainCreateBankActionInput input, DataUpdateFlags flags)
     {
-        var banks = await bankLoader.GetAllDtos();
-        var maxId = banks.Max(bank => bank.IdInt);
-        var maxOrder = banks.Max(bank => bank.Order);
+        var banks = await bankLoader.GetAllEntities();
+        var maxId = await bankLoader.GetMaxId();
+        var maxOrder = await bankLoader.GetMaxOrder();
 
         string GetNewName()
         {
             var i = banks.Count + 1;
 
-            while (banks.Any(bank => bank.Name == $"Bank {i}"))
+            while (banks.Values.Any(bank => bank.Name == $"Bank {i}"))
             {
                 i++;
             }
@@ -30,6 +30,7 @@ public class MainCreateBankAction(
         await bankLoader.AddEntity(new()
         {
             Id = id.ToString(),
+            IdInt = id,
             Name = name,
             IsDefault = false,
             Order = order, // normalized just after

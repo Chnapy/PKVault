@@ -15,6 +15,7 @@ namespace PKVault.Backend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(name: "Id", type: "TEXT", nullable: false),
+                    IdInt = table.Column<int>(name: "IdInt", type: "INTEGER", nullable: false),
                     Name = table.Column<string>(name: "Name", type: "TEXT", nullable: false),
                     IsDefault = table.Column<bool>(name: "IsDefault", type: "INTEGER", nullable: false),
                     Order = table.Column<int>(name: "Order", type: "INTEGER", nullable: false),
@@ -58,6 +59,7 @@ namespace PKVault.Backend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(name: "Id", type: "TEXT", nullable: false),
+                    IdInt = table.Column<int>(name: "IdInt", type: "INTEGER", nullable: false),
                     Name = table.Column<string>(name: "Name", type: "TEXT", nullable: false),
                     Order = table.Column<int>(name: "Order", type: "INTEGER", nullable: false),
                     Type = table.Column<int>(name: "Type", type: "INTEGER", nullable: false),

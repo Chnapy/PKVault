@@ -38,7 +38,7 @@ public class MainUpdateBankAction(
         }
 
         var relatedBoxesIds = (await boxLoader.GetEntitiesByBank(input.bankId)).Values
-            .Select(box => int.Parse(box.Id)).ToArray();
+            .Select(box => box.IdInt).ToArray();
 
         // view check: only allow boxes attached to this bank
         BankEntity.BankView view = new(

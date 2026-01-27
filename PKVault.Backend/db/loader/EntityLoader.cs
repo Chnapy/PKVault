@@ -29,6 +29,19 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         return [.. await Task.WhenAll(entities.Values.Select(GetDTOFromEntity))];
     }
 
+    public virtual async Task<Dictionary<string, DTO?>> GetDtosByIds(string[] ids)
+    {
+        var entities = await GetEntitiesByIds(ids);
+        var dtos = await Task.WhenAll(entities
+            .Select(async e => (
+                e.Key,
+                e.Value == null ? default : await GetDTOFromEntity(e.Value)
+            ))
+        );
+
+        return dtos.ToDictionary();
+    }
+
     public virtual async Task<Dictionary<string, E>> GetAllEntities()
     {
         var dbSet = await GetDbSet();
@@ -39,6 +52,26 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         return await dbSet
             .AsNoTracking()
             .ToDictionaryAsync(e => e.Id);
+    }
+
+    public virtual async Task<Dictionary<string, E?>> GetEntitiesByIds(string[] ids)
+    {
+        var dbSet = await GetDbSet();
+
+        using var _ = LogUtil.Time($"{typeof(E)} - GetEntitiesByIds");
+
+        var found = await dbSet
+            .Where(p => ids.Contains(p.Id))
+            .ToDictionaryAsync(p => p.Id);
+
+        var result = new Dictionary<string, E?>(ids.Length);
+        foreach (var id in ids)
+        {
+            found.TryGetValue(id, out var entity);
+            result[id] = entity;
+        }
+
+        return result;
     }
 
     public async Task<DTO?> GetDto(string id)
@@ -63,7 +96,6 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         using var _ = LogUtil.Time($"{typeof(E)} - DeleteEntity");
 
         dbSet.Remove(entity);
-        await SaveChanges();
 
         flags.Ids.Add(entity.Id);
         Console.WriteLine($"Deleted {typeof(E)} id={entity.Id}");
@@ -78,7 +110,6 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         using var _ = LogUtil.Time($"{typeof(E)} - AddEntity");
 
         await dbSet.AddAsync(entity);
-        await SaveChanges();
         // Console.WriteLine($"Context={db.ContextId}");
 
         flags.Ids.Add(entity.Id);
@@ -95,7 +126,6 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         using var _ = LogUtil.Time($"{typeof(E)} - UpdateEntity");
 
         dbSet.Update(entity);
-        await SaveChanges();
         // Console.WriteLine($"Context={db.ContextId}");
 
         flags.Ids.Add(entity.Id);
@@ -117,11 +147,6 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         using var _ = LogUtil.Time($"{typeof(E)} - Count");
 
         return await dbSet.CountAsync();
-    }
-
-    public async Task SaveChanges()
-    {
-        await db.SaveChangesAsync();
     }
 
     public void SetFlags(DataUpdateFlagsState<string> _flags)

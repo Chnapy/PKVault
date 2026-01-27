@@ -37,10 +37,10 @@ public class MainUpdateBoxAction(
             if (box.BankId != null)
             {
                 var bank = await bankLoader.GetEntity(box.BankId);
-                if (bank.View.MainBoxIds.Contains(int.Parse(box.Id)))
+                if (bank.View.MainBoxIds.Contains(box.IdInt))
                 {
                     bank.View = new(
-                        MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != int.Parse(box.Id))],
+                        MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
                         Saves: bank.View.Saves
                     );
                     await bankLoader.UpdateEntity(bank);
@@ -53,7 +53,7 @@ public class MainUpdateBoxAction(
 
         if (box.SlotCount != input.slotCount)
         {
-            var boxPkms = await pkmVersionLoader.GetEntitiesByBox(int.Parse(box.Id));
+            var boxPkms = await pkmVersionLoader.GetEntitiesByBox(box.IdInt);
             if (boxPkms.Any(pkm =>
                 // Key = boxSlot
                 pkm.Key >= input.slotCount - 1

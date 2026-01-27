@@ -25,7 +25,7 @@ public class SessionDbContext(
             .UseSqlite($"Data Source={sessionService.SessionDbPath}")
             .LogTo(Console.WriteLine, LogUtil.DBLogLevel)
             .EnableDetailedErrors()
-            .EnableSensitiveDataLogging()
+            .EnableSensitiveDataLogging()   // PKVault does not contain any sensitive data
             .UseAsyncSeeding(dbSeedingService.Seed);
 
         // contexts.TryAdd(ContextId.InstanceId, ContextId);

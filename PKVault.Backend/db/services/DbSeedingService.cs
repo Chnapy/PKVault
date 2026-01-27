@@ -23,6 +23,7 @@ public class DbSeedingService(
             await banks.AddAsync(new()
             {
                 Id = "0",
+                IdInt = 0,
                 Name = "Bank 1",
                 IsDefault = true,
                 Order = 0,
@@ -37,6 +38,7 @@ public class DbSeedingService(
             await boxes.AddAsync(new()
             {
                 Id = "0",
+                IdInt = 0,
                 Name = "Box 1",
                 Type = BoxType.Box,
                 SlotCount = 30,
@@ -120,6 +122,7 @@ public class DbSeedingService(
                 legacyBankLoader.GetAllEntities().Values.Select(e => new BankEntity()
                 {
                     Id = e.Id,
+                    IdInt = e.IdInt,
                     Name = e.Name,
                     IsDefault = e.IsDefault,
                     Order = e.Order,
@@ -135,6 +138,7 @@ public class DbSeedingService(
                 legacyBoxLoader.GetAllEntities().Values.Select(e => new BoxEntity()
                 {
                     Id = e.Id,
+                    IdInt = e.IdInt,
                     Name = e.Name,
                     Order = e.Order,
                     Type = e.Type,

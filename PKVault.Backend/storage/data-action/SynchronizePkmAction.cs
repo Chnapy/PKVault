@@ -152,15 +152,15 @@ public class SynchronizePkmAction(
 
         async Task act(string pkmVersionId, string savePkmIdBase)
         {
-            var pkmVersionDto = await pkmVersionLoader.GetDto(pkmVersionId);
-            var pkmVersionEntities = (await pkmVersionLoader.GetEntitiesByBox(pkmVersionDto.BoxId, pkmVersionDto.BoxSlot)).Values.ToList();
+            var pkmVersionEntity = await pkmVersionLoader.GetEntity(pkmVersionId);
+            var pkmVersionEntities = (await pkmVersionLoader.GetEntitiesByBox(pkmVersionEntity.BoxId, pkmVersionEntity.BoxSlot)).Values.ToList();
 
-            if (pkmVersionDto.AttachedSaveId == null)
+            if (pkmVersionEntity.AttachedSaveId == null)
             {
                 throw new ArgumentException($"Cannot synchronize pkm detached from save, pkmVersion.id={pkmVersionId}");
             }
 
-            var saveLoaders = savesLoadersService.GetLoaders((uint)pkmVersionDto.AttachedSaveId!);
+            var saveLoaders = savesLoadersService.GetLoaders((uint)pkmVersionEntity.AttachedSaveId!);
             var savePkms = saveLoaders.Pkms.GetDtosByIdBase(savePkmIdBase);
             if (savePkms.Count != 1)
             {
@@ -173,7 +173,7 @@ public class SynchronizePkmAction(
                 Console.WriteLine($"Attached save pkm not found for pkmVersion.Id={pkmVersionId}");
             }
 
-            var versionPkm = pkmVersionDto.Pkm;
+            var versionPkm = await pkmVersionLoader.GetPKM(pkmVersionEntity);
 
             // update xp etc,
             // and species/form only when possible
@@ -197,7 +197,7 @@ public class SynchronizePkmAction(
                 {
                     pkm.Language = saveLoaders.Save.Language;
                 });
-                var versionEntity = await pkmVersionLoader.GetEntity(pkmVersionDto.Id);
+                var versionEntity = await pkmVersionLoader.GetEntity(pkmVersionEntity.Id);
                 await pkmVersionLoader.UpdateEntity(versionEntity, versionPkm);
             }
 
@@ -206,7 +206,7 @@ public class SynchronizePkmAction(
             {
                 Pkm = savePkm.Pkm.Update(pkm =>
                 {
-                    if (attachedVersionEntity?.Id == pkmVersionDto.Id)
+                    if (attachedVersionEntity?.Id == pkmVersionEntity.Id)
                     {
                         pkmConvertService.PassAllToPkmSafe(versionPkm, pkm);
                     }

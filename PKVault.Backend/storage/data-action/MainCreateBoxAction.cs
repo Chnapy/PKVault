@@ -16,16 +16,15 @@ public class MainCreateBoxAction(IBoxLoader boxLoader) : DataAction<MainCreateBo
 
     public async Task<BoxEntity> CreateBox(MainCreateBoxActionInput input)
     {
-        var allBoxes = (await boxLoader.GetAllEntities()).Values.ToList();
-        var boxes = allBoxes.FindAll(box => box.BankId == input.bankId);
-        var maxId = allBoxes.Max(box => int.Parse(box.Id));
-        var maxOrder = boxes.Count == 0 ? 0 : boxes.Max(box => box.Order);
+        var boxes = await boxLoader.GetEntitiesByBank(input.bankId);
+        var maxId = await boxLoader.GetMaxId();
+        var maxOrder = boxes.Count == 0 ? 0 : boxes.Values.Max(box => box.Order);
 
         string GetNewName()
         {
             var i = boxes.Count + 1;
 
-            while (boxes.Any(box => box.Name == $"Box {i}"))
+            while (boxes.Values.Any(box => box.Name == $"Box {i}"))
             {
                 i++;
             }
@@ -40,6 +39,7 @@ public class MainCreateBoxAction(IBoxLoader boxLoader) : DataAction<MainCreateBo
         var entity = await boxLoader.AddEntity(new()
         {
             Id = id.ToString(),
+            IdInt = id,
             Type = BoxType.Box,
             Name = name,
             SlotCount = input.slotCount ?? 30,

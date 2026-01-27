@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Microsoft.EntityFrameworkCore;
 
 public interface IPkmVersionLoader : IEntityLoader<PkmVersionDTO, PkmVersionEntity>
@@ -7,12 +6,11 @@ public interface IPkmVersionLoader : IEntityLoader<PkmVersionDTO, PkmVersionEnti
     public Task<PkmVersionEntity> AddEntity(PkmVersionEntity entity, ImmutablePKM pkm);
     public Task UpdateEntity(PkmVersionEntity entity, ImmutablePKM pkm);
 
-    public Task<Dictionary<string, PkmVersionEntity>> GetEntitiesByIds(string[] ids);
-    public Task<ImmutableDictionary<int, ImmutableDictionary<string, PkmVersionEntity>>> GetEntitiesByBox(int boxId);
-    public Task<ImmutableDictionary<int, ImmutableDictionary<string, PkmVersionEntity>>> GetEntitiesByBox(string boxId);
-    public Task<ImmutableDictionary<string, PkmVersionEntity>> GetEntitiesByBox(int boxId, int boxSlot);
-    public Task<ImmutableDictionary<string, PkmVersionEntity>> GetEntitiesByBox(string boxId, int boxSlot);
-    public Task<ImmutableDictionary<string, PkmVersionEntity>> GetEntitiesBySave(uint saveId);
+    public Task<Dictionary<int, Dictionary<string, PkmVersionEntity>>> GetEntitiesByBox(int boxId);
+    public Task<Dictionary<int, Dictionary<string, PkmVersionEntity>>> GetEntitiesByBox(string boxId);
+    public Task<Dictionary<string, PkmVersionEntity>> GetEntitiesByBox(int boxId, int boxSlot);
+    public Task<Dictionary<string, PkmVersionEntity>> GetEntitiesByBox(string boxId, int boxSlot);
+    public Task<Dictionary<string, PkmVersionEntity>> GetEntitiesBySave(uint saveId);
     public Task<Dictionary<uint, List<PkmVersionEntity>>> GetEntitiesAttachedGroupedBySave();
     public Task<Dictionary<string, PkmVersionEntity>> GetEntitiesAttached();
     public Task<PkmVersionEntity?> GetEntityBySave(uint saveId, string savePkmIdBase);
@@ -102,63 +100,72 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             .ToDictionaryAsync(p => p.Id);
     }
 
-    public async Task<Dictionary<string, PkmVersionEntity>> GetEntitiesByIds(string[] ids)
+    public override async Task<Dictionary<string, PkmVersionEntity?>> GetEntitiesByIds(string[] ids)
     {
         var dbSet = await GetDbSet();
 
         using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntitiesByIds");
 
-        return await dbSet
+        var found = await dbSet
             .Where(p => ids.Contains(p.Id))
             .Include(p => p.PkmFile)
             .ToDictionaryAsync(p => p.Id);
+
+        var result = new Dictionary<string, PkmVersionEntity?>(ids.Length);
+        foreach (var id in ids)
+        {
+            found.TryGetValue(id, out var entity);
+            result[id] = entity;
+        }
+
+        return result;
     }
 
-    public async Task<ImmutableDictionary<int, ImmutableDictionary<string, PkmVersionEntity>>> GetEntitiesByBox(int boxId)
+    public async Task<Dictionary<int, Dictionary<string, PkmVersionEntity>>> GetEntitiesByBox(int boxId)
     {
         return await GetEntitiesByBox(boxId.ToString());
     }
 
-    public async Task<ImmutableDictionary<int, ImmutableDictionary<string, PkmVersionEntity>>> GetEntitiesByBox(string boxId)
+    public async Task<Dictionary<int, Dictionary<string, PkmVersionEntity>>> GetEntitiesByBox(string boxId)
     {
         var dbSet = await GetDbSet();
 
         using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntitiesByBox");
 
-        return dbSet.Where(p => p.BoxId == boxId)
+        return await dbSet.Where(p => p.BoxId == boxId)
             .Include(p => p.PkmFile)
             .GroupBy(p => p.BoxSlot)
-            .ToImmutableDictionary(
+            .ToDictionaryAsync(
                 p => p.First().BoxSlot,
-                p => p.ToImmutableDictionary(p => p.Id)
+                p => p.ToDictionary(p => p.Id)
             );
     }
 
-    public async Task<ImmutableDictionary<string, PkmVersionEntity>> GetEntitiesByBox(int boxId, int boxSlot)
+    public async Task<Dictionary<string, PkmVersionEntity>> GetEntitiesByBox(int boxId, int boxSlot)
     {
         return await GetEntitiesByBox(boxId.ToString(), boxSlot);
     }
 
-    public async Task<ImmutableDictionary<string, PkmVersionEntity>> GetEntitiesByBox(string boxId, int boxSlot)
+    public async Task<Dictionary<string, PkmVersionEntity>> GetEntitiesByBox(string boxId, int boxSlot)
     {
         var dbSet = await GetDbSet();
 
         using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntitiesByBox + Slot");
 
-        return dbSet.Where(p => p.BoxId == boxId && p.BoxSlot == boxSlot)
+        return await dbSet.Where(p => p.BoxId == boxId && p.BoxSlot == boxSlot)
             .Include(p => p.PkmFile)
-            .ToImmutableDictionary(p => p.Id);
+            .ToDictionaryAsync(p => p.Id);
     }
 
-    public async Task<ImmutableDictionary<string, PkmVersionEntity>> GetEntitiesBySave(uint saveId)
+    public async Task<Dictionary<string, PkmVersionEntity>> GetEntitiesBySave(uint saveId)
     {
         var dbSet = await GetDbSet();
 
         using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntitiesBySave");
 
-        return dbSet.Where(p => p.AttachedSaveId == saveId)
+        return await dbSet.Where(p => p.AttachedSaveId == saveId)
             .Include(p => p.PkmFile)
-            .ToImmutableDictionary(p => p.AttachedSavePkmIdBase!);
+            .ToDictionaryAsync(p => p.AttachedSavePkmIdBase!);
     }
 
     public async Task<PkmVersionEntity?> GetEntityBySave(uint saveId, string savePkmIdBase)

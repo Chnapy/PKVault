@@ -1,11 +1,11 @@
-using System.Collections.Immutable;
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
 public interface IBoxLoader : IEntityLoader<BoxDTO, BoxEntity>
 {
     public BoxDTO CreateDTO(BoxEntity entity);
-    public Task<ImmutableDictionary<string, BoxEntity>> GetEntitiesByBank(string bankId);
+    public Task<Dictionary<string, BoxEntity>> GetEntitiesByBank(string bankId);
+    public Task<int> GetMaxId();
     public Task NormalizeOrders();
 }
 
@@ -59,22 +59,34 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         return CreateDTO(entity);
     }
 
-    public async Task<ImmutableDictionary<string, BoxEntity>> GetEntitiesByBank(string bankId)
+    public async Task<Dictionary<string, BoxEntity>> GetEntitiesByBank(string bankId)
     {
         var dbSet = await GetDbSet();
 
-        return dbSet.Where(p => p.BankId == bankId)
-            .ToImmutableDictionary(p => p.Id);
+        return await dbSet.Where(p => p.BankId == bankId)
+            .ToDictionaryAsync(p => p.Id);
+    }
+
+    public async Task<int> GetMaxId()
+    {
+        var dbSet = await GetDbSet();
+
+        return await dbSet.MaxAsync(p => p.IdInt);
     }
 
     public async Task NormalizeOrders()
     {
-        var entities = await GetAllEntities();
+        var dbSet = await GetDbSet();
+
+        var entities = await dbSet
+            .OrderBy(box => box.BankId)
+            .ThenBy(box => box.Order)
+            .ToArrayAsync();
 
         var currentOrder = 0;
         string? bankId = null;
 
-        foreach (var box in entities.Values.OrderBy(box => box.BankId).ThenBy(box => box.Order))
+        foreach (var box in entities)
         {
             if (bankId != box.BankId)
             {

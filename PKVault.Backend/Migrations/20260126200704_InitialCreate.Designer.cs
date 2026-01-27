@@ -23,6 +23,9 @@ namespace PKVault.Backend.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("IdInt")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("IsDefault")
                         .HasColumnType("INTEGER");
 
@@ -46,6 +49,9 @@ namespace PKVault.Backend.Migrations
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("IdInt")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("BankId")
                         .IsRequired()

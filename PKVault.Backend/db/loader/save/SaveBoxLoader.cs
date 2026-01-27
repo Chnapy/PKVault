@@ -26,6 +26,7 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
             boxes.Add(id, new()
             {
                 Id = id,
+                IdInt = (int)BoxType.Party,
                 Type = BoxType.Party,
                 Name = BoxType.Party.ToString(),
                 Order = currentOrder,
@@ -44,6 +45,7 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
                 boxes.Add(id, new()
                 {
                     Id = id,
+                    IdInt = i,
                     Type = BoxType.Box,
                     Name = boxesNames[i],
                     Order = currentOrder,
@@ -63,6 +65,7 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
             boxes.Add(id, new()
             {
                 Id = id,
+                IdInt = (int)BoxType.Daycare,
                 Type = BoxType.Daycare,
                 Name = BoxType.Daycare.ToString(),
                 Order = currentOrder,
@@ -91,6 +94,7 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
                 boxes.Add(id, new()
                 {
                     Id = id,
+                    IdInt = box,
                     Type = boxType,
                     Name = name,
                     Order = currentOrder,
