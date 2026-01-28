@@ -28,6 +28,7 @@
     <EffectiveMode>$([MSBuild]::ValueOrDefault('$(Mode)', 'default'))</EffectiveMode>
 
     <ModeDefine Condition=" '$(EffectiveMode)' == 'gen-pokeapi' ">MODE_GEN_POKEAPI</ModeDefine>
+    <ModeDefine Condition=" '$(EffectiveMode)' == 'gen-migration' ">MODE_GEN_MIGRATION</ModeDefine>
     <ModeDefine Condition=" '$(EffectiveMode)' == 'default' ">MODE_DEFAULT</ModeDefine>
 
     <DefineConstants>$(DefineConstants);$(ModeDefine)</DefineConstants>

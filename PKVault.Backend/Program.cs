@@ -14,6 +14,14 @@ public class Program
     {
         LogUtil.Initialize();
 
+#if MODE_GEN_MIGRATION
+        if (!Microsoft.EntityFrameworkCore.EF.IsDesignTime)
+        {
+            await MigrationUtil.AddMigrationTrimmedCompatible(args[0]);
+            return;
+        }
+#endif
+
         var time = LogUtil.Time($"Setup backend load");
 
         Copyright();
@@ -54,8 +62,8 @@ public class Program
         var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
 #if MODE_GEN_POKEAPI
-            await host.Services.GetRequiredService<GenStaticDataService>().GenerateFiles();
-            return null;
+        await host.Services.GetRequiredService<GenStaticDataService>().GenerateFiles();
+        return null;
 #elif MODE_DEFAULT
 
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
