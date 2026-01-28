@@ -253,10 +253,15 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             var staticData = await staticDataService.GetStaticData();
             var filepath = pkmFileLoader.GetPKMFilepath(pkm, staticData.Evolves);
 
-            if (filepath != entity.Filepath)
+            if (filepath != entity.Filepath || entity.PkmFile == null)
             {
                 entity.Filepath = filepath;
                 entity.PkmFile = await pkmFileLoader.PrepareEntity(pkm, entity.Filepath, updated: true, deleted: false);
+            }
+            else
+            {
+                entity.PkmFile.Data = pkmFileLoader.GetPKMBytes(pkm);
+                entity.PkmFile.Updated = true;
             }
 
             entity.Species = pkm.Species;
@@ -266,6 +271,15 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         }
 
         await UpdateEntity(entity);
+    }
+
+    public override async Task DeleteEntity(PkmVersionEntity entity)
+    {
+        entity.PkmFile?.Deleted = true;
+
+        await UpdateEntity(entity);
+
+        await base.DeleteEntity(entity);
     }
 
     protected override async Task<PkmVersionDTO> GetDTOFromEntity(PkmVersionEntity entity)

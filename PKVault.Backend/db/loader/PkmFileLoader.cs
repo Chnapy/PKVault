@@ -9,16 +9,12 @@ public interface IPkmFileLoader
     public Task WriteToFiles();
     public Task ClearData();
     public Task<ImmutablePKM> CreatePKM(PkmFileEntity entity, byte generation);
+    public byte[] GetPKMBytes(ImmutablePKM pkm);
     public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves);
 }
 
 public class PkmFileLoader : IPkmFileLoader
 {
-    private static byte[] GetPKMBytes(ImmutablePKM pkm)
-    {
-        return [.. pkm.DecryptedPartyData];
-    }
-
     private static string GetPKMFilename(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves)
     {
         var star = pkm.IsShiny ? " ★" : string.Empty;
@@ -152,6 +148,11 @@ public class PkmFileLoader : IPkmFileLoader
         }
 
         return new(pkm, loadError);
+    }
+
+    public byte[] GetPKMBytes(ImmutablePKM pkm)
+    {
+        return [.. pkm.DecryptedPartyData];
     }
 
     private PKM GetPlaceholderPKM()

@@ -56,6 +56,11 @@ public class SessionDbContext(
                   v => JsonSerializer.Deserialize(v, EntityJsonContext.Default.BankView)!
               )
               .HasColumnType("TEXT");
+
+            entity
+                .HasMany<BoxEntity>()
+                .WithOne()
+                .HasForeignKey(p => p.BankId);
         });
 
         modelBuilder.Entity<BoxEntity>(entity =>
@@ -63,9 +68,9 @@ public class SessionDbContext(
             entity.HasKey(p => p.Id);
 
             entity
-                .HasOne<BankEntity>()
-                .WithMany()
-                .HasForeignKey(p => p.BankId);
+                .HasMany<PkmVersionEntity>()
+                .WithOne()
+                .HasForeignKey(e => e.BoxId);
         });
 
         modelBuilder.Entity<PkmVersionEntity>(entity =>
@@ -87,15 +92,10 @@ public class SessionDbContext(
             entity.HasIndex(p => new { p.Species, p.Form, p.Gender, p.IsShiny });
 
             entity
-                .HasOne<BoxEntity>()
-                .WithMany()
-                .HasForeignKey(e => e.BoxId);
-
-            entity
                 .HasOne(p => p.PkmFile)
                 .WithOne()
                 .HasForeignKey<PkmVersionEntity>(p => p.Filepath)
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired(false);
         });
 

@@ -77,7 +77,7 @@ public class MigrationUtil
         // Regex catching:
         // - column name ("ID" etc)
         // - parameters (type: "...", ...)
-        var pattern = @"^\s*(\w+)\s*=\s*table\.Column<\w+>\(([^)]*)\),?\s*$";
+        var pattern = @"^\s*(\w+)\s*=\s*table\.Column<.+>\(([^)]*)\),?\s*$";
 
         return Regex.Replace(line, pattern, match =>
         {

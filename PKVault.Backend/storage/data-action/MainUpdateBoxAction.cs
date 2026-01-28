@@ -34,17 +34,14 @@ public class MainUpdateBoxAction(
             }
 
             // edit previous bank view: remove this box
-            if (box.BankId != null)
+            var bank = await bankLoader.GetEntity(box.BankId);
+            if (bank.View.MainBoxIds.Contains(box.IdInt))
             {
-                var bank = await bankLoader.GetEntity(box.BankId);
-                if (bank.View.MainBoxIds.Contains(box.IdInt))
-                {
-                    bank.View = new(
-                        MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
-                        Saves: bank.View.Saves
-                    );
-                    await bankLoader.UpdateEntity(bank);
-                }
+                bank.View = new(
+                    MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
+                    Saves: bank.View.Saves
+                );
+                await bankLoader.UpdateEntity(bank);
             }
 
             // if bank change, set box as last one

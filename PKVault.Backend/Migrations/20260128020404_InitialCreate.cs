@@ -31,7 +31,7 @@ namespace PKVault.Backend.Migrations
                 columns: table => new
                 {
                     Filepath = table.Column<string>(name: "Filepath", type: "TEXT", nullable: false),
-                    Data = table.Column<byte[]>(type: "BLOB", nullable: false),
+                    Data = table.Column<byte[]>(name: "Data", type: "BLOB", nullable: false),
                     Error = table.Column<int>(name: "Error", type: "INTEGER", nullable: true),
                     Updated = table.Column<bool>(name: "Updated", type: "INTEGER", nullable: false),
                     Deleted = table.Column<bool>(name: "Deleted", type: "INTEGER", nullable: false)
@@ -111,8 +111,7 @@ namespace PKVault.Backend.Migrations
                         name: "FK_PkmVersions_PkmFiles_Filepath",
                         column: x => x.Filepath,
                         principalTable: "PkmFiles",
-                        principalColumn: "Filepath",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Filepath");
                 });
 
             migrationBuilder.CreateIndex(

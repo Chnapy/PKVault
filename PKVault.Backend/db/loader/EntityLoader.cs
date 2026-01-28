@@ -97,6 +97,9 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
 
         dbSet.Remove(entity);
 
+        // required to remove entity from future queries
+        await db.SaveChangesAsync();
+
         flags.Ids.Add(entity.Id);
         Console.WriteLine($"Deleted {typeof(E)} id={entity.Id}");
     }

@@ -15,17 +15,14 @@ public class MainDeleteBoxAction(IBoxLoader boxLoader, IBankLoader bankLoader, I
         await boxLoader.DeleteEntity(box);
         await boxLoader.NormalizeOrders();
 
-        if (box.BankId != null)
+        var bank = await bankLoader.GetEntity(box.BankId);
+        if (bank.View.MainBoxIds.Contains(box.IdInt))
         {
-            var bank = await bankLoader.GetEntity(box.BankId);
-            if (bank.View.MainBoxIds.Contains(box.IdInt))
-            {
-                bank.View = new(
-                    MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
-                    Saves: bank.View.Saves
-                );
-                await bankLoader.UpdateEntity(bank);
-            }
+            bank.View = new(
+                MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
+                Saves: bank.View.Saves
+            );
+            await bankLoader.UpdateEntity(bank);
         }
 
         return new(

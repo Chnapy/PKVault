@@ -213,7 +213,7 @@ namespace PKVault.Backend.Migrations
                     b.HasOne("PkmFileEntity", "PkmFile")
                         .WithOne()
                         .HasForeignKey("PkmVersionEntity", "Filepath")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("PkmFile");
                 });

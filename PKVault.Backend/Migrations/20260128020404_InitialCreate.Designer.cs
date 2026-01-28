@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace PKVault.Backend.Migrations
 {
     [DbContext(typeof(SessionDbContext))]
-    [Migration("20260128000640_InitialCreate")]
+    [Migration("20260128020404_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -216,7 +216,7 @@ namespace PKVault.Backend.Migrations
                     b.HasOne("PkmFileEntity", "PkmFile")
                         .WithOne()
                         .HasForeignKey("PkmVersionEntity", "Filepath")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("PkmFile");
                 });
