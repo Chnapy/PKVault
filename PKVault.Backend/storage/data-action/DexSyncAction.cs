@@ -19,24 +19,36 @@ public class DexSyncAction(
             : savesLoadersService.GetLoaders(id)
         ).ToList();
 
-        var dex = await dexService.GetDex(input.saveIds);
+        var dex = await dexService.GetDex(input.saveIds, null);
 
-        saveLoaders.ForEach(saveLoader =>
-        {
-            var service = dexService.GetDexService(saveLoader?.Save ?? new(FakeSaveFile.Default));
-
-            dex.ToList().ForEach(specEntry => specEntry.Value.Values.ToList().ForEach(entry =>
+        // TODO improve perfs, avoiding n3 complexity with thousand DB calls
+        await Task.WhenAll(
+            saveLoaders.Select(async saveLoader =>
             {
-                entry.Forms.ForEach(form =>
+                var service = dexService.GetDexService(saveLoader?.Save ?? new(FakeSaveFile.Default));
+
+                foreach (var specEntry in dex.Values)
                 {
-                    service!.EnableSpeciesForm(entry.Species, form.Form, form.Gender, form.IsSeen, form.IsSeenShiny, form.IsCaught);
-                });
-            }));
+                    foreach (var entry in specEntry.Values)
+                    {
+                        foreach (var form in entry.Forms)
+                        {
+                            await service!.EnableSpeciesForm(
+                                entry.Species,
+                                form.Form,
+                                form.Gender,
+                                form.IsSeen,
+                                form.IsSeenShiny,
+                                form.IsCaught);
+                        }
+                    }
+                }
 
-            saveLoader?.Pkms.HasWritten = true;
-        });
+                saveLoader?.Pkms.HasWritten = true;
+            })
+        );
 
-        flags.Dex = true;
+        flags.Dex.All = true;
 
         return new(
             type: DataActionType.DEX_SYNC,

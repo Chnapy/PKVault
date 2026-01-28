@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace PKVault.Backend.Migrations
 {
     [DbContext(typeof(SessionDbContext))]
-    [Migration("20260126200704_InitialCreate")]
+    [Migration("20260128000640_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -50,12 +50,12 @@ namespace PKVault.Backend.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("IdInt")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("BankId")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("IdInt")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -77,19 +77,36 @@ namespace PKVault.Backend.Migrations
                     b.ToTable("Boxes");
                 });
 
-            modelBuilder.Entity("DexEntity", b =>
+            modelBuilder.Entity("DexFormEntity", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Forms")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<byte>("Form")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte>("Gender")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsCaught")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsCaughtShiny")
+                        .HasColumnType("INTEGER");
 
                     b.Property<ushort>("Species")
                         .HasColumnType("INTEGER");
 
+                    b.Property<byte>("Version")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Form");
+
+                    b.HasIndex("Gender");
+
+                    b.HasIndex("Species");
 
                     b.ToTable("Pokedex");
                 });
@@ -139,10 +156,22 @@ namespace PKVault.Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<byte>("Form")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte>("Gender")
+                        .HasColumnType("INTEGER");
+
                     b.Property<byte>("Generation")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsMain")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsShiny")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ushort>("Species")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -159,6 +188,10 @@ namespace PKVault.Backend.Migrations
                         .HasFilter("AttachedSaveId IS NOT NULL");
 
                     b.HasIndex("BoxId", "BoxSlot");
+
+                    b.HasIndex("Species", "Form", "Gender");
+
+                    b.HasIndex("Species", "Form", "Gender", "IsShiny");
 
                     b.ToTable("PkmVersions");
                 });

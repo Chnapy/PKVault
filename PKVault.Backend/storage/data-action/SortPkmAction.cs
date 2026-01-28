@@ -24,7 +24,7 @@ public class SortPkmAction(
 
         var boxes = (await GetBoxes(saveId, fromBoxId, toBoxId,
             GetBoxDto: async (id) => saveLoaders.Boxes.GetDto(id),
-            GetBoxDtoAll: async () => saveLoaders.Boxes.GetAllDtos()
+            GetBoxDtoByBank: async (bankId) => saveLoaders.Boxes.GetAllDtos()
         ))
             .FindAll(box => box.CanSaveReceivePkm);
 
@@ -72,7 +72,11 @@ public class SortPkmAction(
     {
         var boxes = await GetBoxes(saveId: null, fromBoxId, toBoxId,
             GetBoxDto: boxLoader.GetDto,
-            GetBoxDtoAll: boxLoader.GetAllDtos
+            GetBoxDtoByBank: async (bankId) =>
+            {
+                return [.. (await boxLoader.GetEntitiesByBank(bankId)).Values
+                    .Select(boxLoader.CreateDTO)];
+            }
         );
         var boxesIds = boxes.Select(box => box.IdInt).ToHashSet();
 
@@ -137,13 +141,12 @@ public class SortPkmAction(
         );
     }
 
-    private async Task<List<BoxDTO>> GetBoxes(uint? saveId, int fromBoxId, int toBoxId, Func<string, Task<BoxDTO?>> GetBoxDto, Func<Task<List<BoxDTO>>> GetBoxDtoAll)
+    private async Task<List<BoxDTO>> GetBoxes(uint? saveId, int fromBoxId, int toBoxId, Func<string, Task<BoxDTO?>> GetBoxDto, Func<string, Task<List<BoxDTO>>> GetBoxDtoByBank)
     {
         var fromBox = await GetBoxDto(fromBoxId.ToString());
         var bankId = fromBox.BankId;
 
-        var boxes = (await GetBoxDtoAll())
-            .FindAll(box => box.BankId == bankId)
+        var boxes = (await GetBoxDtoByBank(bankId))
             .FindAll(box => saveId == null || box.CanSaveReceivePkm)
             .OrderBy(box => box.Order).ToList();
 

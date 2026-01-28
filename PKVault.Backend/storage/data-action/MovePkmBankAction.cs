@@ -204,6 +204,11 @@ public class MovePkmBankAction(
                 Generation = savePkm.Generation,
                 Filepath = "",
 
+                Species = savePkm.Species,
+                Form = savePkm.Form,
+                Gender = savePkm.Gender,
+                IsShiny = savePkm.IsShiny,
+
                 PkmFile = null
             },
             savePkm.Pkm);
@@ -230,6 +235,6 @@ public class MovePkmBankAction(
 
         await new DexMainService(sp).EnablePKM(savePkm.Pkm, savePkm.Save);
 
-        flags.Dex = true;
+        flags.Dex.Ids.Add(savePkm.Species.ToString());
     }
 }

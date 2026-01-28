@@ -259,8 +259,8 @@ public class ActionService(
             MainBanks = new() { All = true },
             MainBoxes = new() { All = true },
             MainPkmVersions = new() { All = true },
+            Dex = new() { All = true },
             Saves = new() { All = true },
-            Dex = true,
             Warnings = true,
         };
 

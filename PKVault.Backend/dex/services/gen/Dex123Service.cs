@@ -2,15 +2,15 @@ using PKHeX.Core;
 
 public class Dex123Service(SaveFile save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
-        var isOwned = ownedPkms.Count > 0;
         var isSeen = isOwned || save.GetSeen(species);
-        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
 
         return new DexItemForm(
+            Id: DexLoader.GetId(species, form, gender),
+            Species: species,
             Form: form,
             Gender: gender,
             Types: GetTypes(pi),
@@ -18,7 +18,7 @@ public class Dex123Service(SaveFile save) : DexGenService(save)
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
             IsSeenShiny: false,    // TODO
-            IsCaught: ownedPkms.Count > 0 || save.GetCaught(species),
+            IsCaught: isOwned || save.GetCaught(species),
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
         );

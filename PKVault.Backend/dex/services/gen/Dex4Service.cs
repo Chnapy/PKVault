@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class Dex4Service(SAV4 save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
@@ -11,11 +11,11 @@ public class Dex4Service(SAV4 save) : DexGenService(save)
         var speciesSeen = save.Dex.GetSeen(species);
         var formSeen = forms.Where(f => speciesSeen && f != byte.MaxValue && f < forms.Length).Distinct().ToArray();
 
-        var isOwned = ownedPkms.Count > 0;
         var isSeen = isOwned || (forms.Length > 0 ? formSeen.Contains(form) : speciesSeen);
-        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
 
         return new DexItemForm(
+            Id: DexLoader.GetId(species, form, gender),
+            Species: species,
             Form: form,
             Gender: gender,
             Types: GetTypes(pi),

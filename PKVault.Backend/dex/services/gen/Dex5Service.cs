@@ -2,16 +2,13 @@ using PKHeX.Core;
 
 public class Dex5Service(SAV5 save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
         var dex = save.Zukan;
 
         var (formIndex, formCount) = dex.GetFormIndex(species);
-
-        var isOwned = ownedPkms.Count > 0;
-        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
 
         var isSeenBase = dex.GetSeen(species, gender == Gender.Female ? 1 : 0);
         var isSeenShinyBase = dex.GetSeen(species, gender == Gender.Female ? 3 : 2);
@@ -23,6 +20,8 @@ public class Dex5Service(SAV5 save) : DexGenService(save)
         var isSeen = isSeenShiny || isOwned || (formCount > 0 ? isSeenForm : isSeenBase);
 
         return new DexItemForm(
+            Id: DexLoader.GetId(species, form, gender),
+            Species: species,
             Form: form,
             Gender: gender,
             Types: GetTypes(pi),

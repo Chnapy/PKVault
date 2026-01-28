@@ -31,6 +31,7 @@ public class BackupController(BackupService backupService, DataService dataServi
             MainBanks = new() { All = true },
             MainBoxes = new() { All = true },
             MainPkmVersions = new() { All = true },
+            Dex = new() { All = true },
             Saves = new() { All = true },
             SaveInfos = true,
             Backups = true,

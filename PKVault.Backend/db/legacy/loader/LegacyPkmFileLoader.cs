@@ -26,7 +26,7 @@ public class LegacyPkmFileLoader : ILegacyPkmFileLoader
         return $"{pkm.Species:0000}{star} - {speciesName} - {id}.{pkm.Extension}";
     }
 
-    public bool EnableLog = true;
+    // public bool EnableLog = true;
 
     private IFileIOService fileIOService;
     private string storagePath;
@@ -53,8 +53,8 @@ public class LegacyPkmFileLoader : ILegacyPkmFileLoader
     {
         var removed = bytesDict.Remove(filepath);
 
-        if (EnableLog && removed)
-            Console.WriteLine($"(M) Delete PKM filepath={filepath}");
+        // if (EnableLog && removed)
+        //     Console.WriteLine($"(M) Delete PKM filepath={filepath}");
 
         actions.Add((Create: false, Path: filepath));
     }
@@ -72,12 +72,12 @@ public class LegacyPkmFileLoader : ILegacyPkmFileLoader
         if (pkmFilepath != filepath)
         {
             // throw new InvalidOperationException($"(M) PKM-file filepath inconsistency. Expected={expectedFilepath} Obtained={filepath}");
-            if (EnableLog)
-                Console.WriteLine($"(M) PKM-file filepath inconsistency. Expected={pkmFilepath} Obtained={filepath}");
+            // if (EnableLog)
+            //     Console.WriteLine($"(M) PKM-file filepath inconsistency. Expected={pkmFilepath} Obtained={filepath}");
         }
 
-        if (EnableLog)
-            Console.WriteLine($"(M) PKM-file Write idBase={pkm.GetPKMIdBase(evolves)} filepath={filepath} bytes.length={bytes.Length}");
+        // if (EnableLog)
+        //     Console.WriteLine($"(M) PKM-file Write idBase={pkm.GetPKMIdBase(evolves)} filepath={filepath} bytes.length={bytes.Length}");
 
         bytesDict.Remove(filepath);
         bytesDict.Add(filepath, (bytes, null));

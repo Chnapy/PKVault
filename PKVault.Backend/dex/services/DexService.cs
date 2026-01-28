@@ -8,7 +8,7 @@ public class DexService(
     StaticDataService staticDataService, ISavesLoadersService savesLoadersService
 )
 {
-    public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex()
+    public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex(HashSet<ushort>? speciesSet)
     {
         var saveLoaders = savesLoadersService.GetAllLoaders();
 
@@ -17,10 +17,10 @@ public class DexService(
             return [];
         }
 
-        return await GetDex([FakeSaveFile.Default.ID32, .. saveLoaders.Select(sl => sl.Save.Id)]);
+        return await GetDex([FakeSaveFile.Default.ID32, .. saveLoaders.Select(sl => sl.Save.Id)], speciesSet);
     }
 
-    public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex(uint[] saveIds)
+    public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex(uint[] saveIds, HashSet<ushort>? speciesSet)
     {
         if (saveIds.Length == 0)
         {
@@ -42,21 +42,14 @@ public class DexService(
 
         foreach (var save in saves)
         {
-            await UpdateDexWithSave(dex, save, staticData);
+            var service = GetDexService(save);
+
+            // var time = LogUtil.Time($"Update Dex with save {save.ID32} {save.Version}");
+            var success = service != null && (await service.UpdateDexWithSave(dex, staticData, speciesSet));
+            // time();
         }
 
         return dex;
-    }
-
-    private async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, SaveWrapper save, StaticDataDTO staticData)
-    {
-        var service = GetDexService(save);
-
-        // var time = LogUtil.Time($"Update Dex with save {save.ID32} {save.Version}");
-        var success = service != null && (await service.UpdateDexWithSave(dex, staticData));
-        // time();
-
-        return success;
     }
 
     public DexGenService? GetDexService(SaveWrapper save)

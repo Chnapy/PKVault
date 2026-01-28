@@ -5,13 +5,13 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
     protected IFileIOService fileIOService;
     protected SessionService sessionService;
     protected SessionDbContext db;
-    private DataUpdateFlagsState<string> flags;
+    private DataUpdateFlagsState flags;
 
     public EntityLoader(
         IFileIOService _fileIOService,
         SessionService _sessionService,
         SessionDbContext _db,
-        DataUpdateFlagsState<string> _flags
+        DataUpdateFlagsState _flags
     )
     {
         fileIOService = _fileIOService;
@@ -131,13 +131,13 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         flags.Ids.Add(entity.Id);
     }
 
-    public async Task<E> First()
+    public async Task<E?> First()
     {
         var dbSet = await GetDbSet();
 
         using var _ = LogUtil.Time($"{typeof(E)} - First");
 
-        return await dbSet.FirstAsync();
+        return await dbSet.FirstOrDefaultAsync();
     }
 
     public async Task<int> Count()
@@ -147,11 +147,6 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         using var _ = LogUtil.Time($"{typeof(E)} - Count");
 
         return await dbSet.CountAsync();
-    }
-
-    public void SetFlags(DataUpdateFlagsState<string> _flags)
-    {
-        flags = _flags;
     }
 
     protected async Task<DbSet<E>> GetDbSet()

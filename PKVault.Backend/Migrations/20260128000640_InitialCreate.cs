@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -31,7 +31,7 @@ namespace PKVault.Backend.Migrations
                 columns: table => new
                 {
                     Filepath = table.Column<string>(name: "Filepath", type: "TEXT", nullable: false),
-                    Data = table.Column<byte[]>(name: "Data", type: "BLOB", nullable: false),
+                    Data = table.Column<byte[]>(type: "BLOB", nullable: false),
                     Error = table.Column<int>(name: "Error", type: "INTEGER", nullable: true),
                     Updated = table.Column<bool>(name: "Updated", type: "INTEGER", nullable: false),
                     Deleted = table.Column<bool>(name: "Deleted", type: "INTEGER", nullable: false)
@@ -47,7 +47,11 @@ namespace PKVault.Backend.Migrations
                 {
                     Id = table.Column<string>(name: "Id", type: "TEXT", nullable: false),
                     Species = table.Column<ushort>(name: "Species", type: "INTEGER", nullable: false),
-                    Forms = table.Column<string>(name: "Forms", type: "TEXT", nullable: false)
+                    Form = table.Column<byte>(name: "Form", type: "INTEGER", nullable: false),
+                    Gender = table.Column<byte>(name: "Gender", type: "INTEGER", nullable: false),
+                    Version = table.Column<byte>(name: "Version", type: "INTEGER", nullable: false),
+                    IsCaught = table.Column<bool>(name: "IsCaught", type: "INTEGER", nullable: false),
+                    IsCaughtShiny = table.Column<bool>(name: "IsCaughtShiny", type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -88,7 +92,11 @@ namespace PKVault.Backend.Migrations
                     AttachedSaveId = table.Column<uint>(name: "AttachedSaveId", type: "INTEGER", nullable: true),
                     AttachedSavePkmIdBase = table.Column<string>(name: "AttachedSavePkmIdBase", type: "TEXT", nullable: true),
                     Generation = table.Column<byte>(name: "Generation", type: "INTEGER", nullable: false),
-                    Filepath = table.Column<string>(name: "Filepath", type: "TEXT", nullable: false)
+                    Filepath = table.Column<string>(name: "Filepath", type: "TEXT", nullable: false),
+                    Species = table.Column<ushort>(name: "Species", type: "INTEGER", nullable: false),
+                    Form = table.Column<byte>(name: "Form", type: "INTEGER", nullable: false),
+                    Gender = table.Column<byte>(name: "Gender", type: "INTEGER", nullable: false),
+                    IsShiny = table.Column<bool>(name: "IsShiny", type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -139,6 +147,31 @@ namespace PKVault.Backend.Migrations
                 table: "PkmVersions",
                 column: "Filepath",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PkmVersions_Species_Form_Gender",
+                table: "PkmVersions",
+                columns: new[] { "Species", "Form", "Gender" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PkmVersions_Species_Form_Gender_IsShiny",
+                table: "PkmVersions",
+                columns: new[] { "Species", "Form", "Gender", "IsShiny" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pokedex_Form",
+                table: "Pokedex",
+                column: "Form");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pokedex_Gender",
+                table: "Pokedex",
+                column: "Gender");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pokedex_Species",
+                table: "Pokedex",
+                column: "Species");
         }
 
         /// <inheritdoc />

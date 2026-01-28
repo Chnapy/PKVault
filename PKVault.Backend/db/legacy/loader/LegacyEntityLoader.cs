@@ -6,10 +6,8 @@ public abstract class LegacyEntityLoader<E> where E : ILegacyEntity
     protected IFileIOService fileIOService;
 
     protected Dictionary<string, E>? entitiesById = null;
-    private DataUpdateFlagsState<string> flags = new();
 
     public string FilePath { get; }
-    public bool HasWritten { get; set; } = false;
     protected JsonTypeInfo<Dictionary<string, E>> DictJsonContext;
 
     public LegacyEntityLoader(
@@ -61,10 +59,7 @@ public abstract class LegacyEntityLoader<E> where E : ILegacyEntity
         var deleted = GetAllEntities().Remove(id);
         if (deleted)
         {
-            Console.WriteLine($"Deleted id={id}");
-
-            flags.Ids.Add(id);
-            HasWritten = true;
+            // Console.WriteLine($"Deleted id={id}");
         }
 
         return deleted;
@@ -72,32 +67,11 @@ public abstract class LegacyEntityLoader<E> where E : ILegacyEntity
 
     public virtual E WriteEntity(E entity)
     {
-        Console.WriteLine($"{entity.GetType().Name} - Write id={entity.Id}");
+        // Console.WriteLine($"{entity.GetType().Name} - Write id={entity.Id}");
 
         GetAllEntities()[entity.Id] = entity;
 
-        flags.Ids.Add(entity.Id);
-        HasWritten = true;
-
         return entity;
-    }
-
-    public void SetFlags(DataUpdateFlagsState<string> _flags)
-    {
-        flags = _flags;
-    }
-
-    public virtual async Task WriteToFile()
-    {
-        if (!HasWritten)
-        {
-            Console.WriteLine($"No write changes, ignore file {FilePath}");
-            return;
-        }
-
-        Console.WriteLine($"Write entities to {FilePath}");
-
-        await fileIOService.WriteJSONFileAsync(FilePath, DictJsonContext, entitiesById ?? []);
     }
 
     public abstract int GetLastSchemaVersion();

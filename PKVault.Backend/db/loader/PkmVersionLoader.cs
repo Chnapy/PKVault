@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PKHeX.Core;
 
 public interface IPkmVersionLoader : IEntityLoader<PkmVersionDTO, PkmVersionEntity>
 {
@@ -14,6 +15,8 @@ public interface IPkmVersionLoader : IEntityLoader<PkmVersionDTO, PkmVersionEnti
     public Task<Dictionary<uint, List<PkmVersionEntity>>> GetEntitiesAttachedGroupedBySave();
     public Task<Dictionary<string, PkmVersionEntity>> GetEntitiesAttached();
     public Task<PkmVersionEntity?> GetEntityBySave(uint saveId, string savePkmIdBase);
+    public Task<bool> HasEntityByForm(ushort species, byte form, Gender gender);
+    public Task<bool> HasEntityByFormShiny(ushort species, byte form, Gender gender);
     public Task<ImmutablePKM> GetPKM(PkmVersionEntity entity);
 }
 
@@ -174,9 +177,9 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
 
         using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntityBySave");
 
-        return dbSet.Where(p => p.AttachedSaveId == saveId && p.AttachedSavePkmIdBase == savePkmIdBase)
+        return await dbSet.Where(p => p.AttachedSaveId == saveId && p.AttachedSavePkmIdBase == savePkmIdBase)
             .Include(p => p.PkmFile)
-            .First();
+            .FirstOrDefaultAsync();
     }
 
     public async Task<Dictionary<uint, List<PkmVersionEntity>>> GetEntitiesAttachedGroupedBySave()
@@ -202,26 +205,66 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             .ToDictionaryAsync(p => p.Id);
     }
 
+    public async Task<bool> HasEntityByForm(ushort species, byte form, Gender gender)
+    {
+        var dbSet = await GetDbSet();
+
+        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - HasEntityByForm");
+
+        return await dbSet
+            .AnyAsync(p => p.Species == species && p.Form == form && p.Gender == gender);
+    }
+
+    public async Task<bool> HasEntityByFormShiny(ushort species, byte form, Gender gender)
+    {
+        var dbSet = await GetDbSet();
+
+        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - HasEntityByFormShiny");
+
+        return await dbSet
+            .AnyAsync(p => p.Species == species && p.Form == form && p.Gender == gender && p.IsShiny);
+    }
+
     public async Task<PkmVersionEntity> AddEntity(PkmVersionEntity entity, ImmutablePKM pkm)
     {
+        if (!pkm.IsEnabled)
+        {
+            throw new InvalidOperationException($"Cannot add disabled PkmVersion");
+        }
+
         var staticData = await staticDataService.GetStaticData();
         var filepath = pkmFileLoader.GetPKMFilepath(pkm, staticData.Evolves);
 
         entity.Filepath = filepath;
         entity.PkmFile = await pkmFileLoader.PrepareEntity(pkm, filepath, updated: true, deleted: false);
+
+        entity.Species = pkm.Species;
+        entity.Form = pkm.Form;
+        entity.Gender = pkm.Gender;
+        entity.IsShiny = pkm.IsShiny;
+
         return await AddEntity(entity);
     }
 
     public async Task UpdateEntity(PkmVersionEntity entity, ImmutablePKM pkm)
     {
-        var staticData = await staticDataService.GetStaticData();
-        var filepath = pkmFileLoader.GetPKMFilepath(pkm, staticData.Evolves);
-
-        if (filepath != entity.Filepath)
+        if (pkm.IsEnabled)
         {
-            entity.Filepath = filepath;
-            entity.PkmFile = await pkmFileLoader.PrepareEntity(pkm, entity.Filepath, updated: true, deleted: false);
+            var staticData = await staticDataService.GetStaticData();
+            var filepath = pkmFileLoader.GetPKMFilepath(pkm, staticData.Evolves);
+
+            if (filepath != entity.Filepath)
+            {
+                entity.Filepath = filepath;
+                entity.PkmFile = await pkmFileLoader.PrepareEntity(pkm, entity.Filepath, updated: true, deleted: false);
+            }
+
+            entity.Species = pkm.Species;
+            entity.Form = pkm.Form;
+            entity.Gender = pkm.Gender;
+            entity.IsShiny = pkm.IsShiny;
         }
+
         await UpdateEntity(entity);
     }
 

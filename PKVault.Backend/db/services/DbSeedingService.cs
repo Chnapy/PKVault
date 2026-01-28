@@ -112,7 +112,7 @@ public class DbSeedingService(
         var banks = db.Set<BankEntity>();
         var boxes = db.Set<BoxEntity>();
         var pkmVersions = db.Set<PkmVersionEntity>();
-        var dex = db.Set<DexEntity>();
+        var dex = db.Set<DexFormEntity>();
 
         await using var transaction = await db.Database.BeginTransactionAsync(cancelToken);
 
@@ -151,6 +151,7 @@ public class DbSeedingService(
                 legacyPkmVersionLoader.GetAllEntities().Values.Select(e =>
                 {
                     var (Data, Error) = legacyPkmVersionLoader.pkmFileLoader.GetEntity(e.Filepath);
+                    var pkm = legacyPkmVersionLoader.pkmFileLoader.CreatePKM(e.Id, e.Filepath, e.Generation);
 
                     return new PkmVersionEntity()
                     {
@@ -162,6 +163,11 @@ public class DbSeedingService(
                         AttachedSavePkmIdBase = e.AttachedSavePkmIdBase,
                         Generation = e.Generation,
                         Filepath = e.Filepath,
+
+                        Species = pkm.Species,
+                        Form = pkm.Form,
+                        Gender = pkm.Gender,
+                        IsShiny = pkm.IsShiny,
 
                         PkmFile = new()
                         {
@@ -176,18 +182,17 @@ public class DbSeedingService(
             cancelToken);
 
             await dex.AddRangeAsync(
-                legacyDexLoader.GetAllEntities().Values.Select(e => new DexEntity()
-                {
-                    Id = e.Id,
-                    Species = e.Species,
-                    Forms = [..e.Forms.Select(f => new DexEntityForm(
-                        Form: f.Form,
-                        Version: f.Version,
-                        Gender: f.Gender,
-                        IsCaught: f.IsCaught,
-                        IsCaughtShiny: f.IsCaughtShiny
-                    ))]
-                }),
+                legacyDexLoader.GetAllEntities().Values
+                    .SelectMany(e => e.Forms.Select(f => new DexFormEntity()
+                    {
+                        Id = DexLoader.GetId(e.Species, f.Form, f.Gender),
+                        Species = e.Species,
+                        Form = f.Form,
+                        Gender = f.Gender,
+                        Version = f.Version,
+                        IsCaught = f.IsCaught,
+                        IsCaughtShiny = f.IsCaughtShiny
+                    })),
             cancelToken);
 
             await db.SaveChangesAsync(cancelToken);

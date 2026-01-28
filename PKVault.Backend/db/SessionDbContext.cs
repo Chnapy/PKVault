@@ -10,12 +10,12 @@ public class SessionDbContext(
     public DbSet<BankEntity> Banks { get; set; }
     public DbSet<BoxEntity> Boxes { get; set; }
     public DbSet<PkmVersionEntity> PkmVersions { get; set; }
-    public DbSet<DexEntity> Pokedex { get; set; }
+    public DbSet<DexFormEntity> Pokedex { get; set; }
     public DbSet<PkmFileEntity> PkmFiles { get; set; }
 
-    public DataUpdateFlagsState<string> BanksFlags = new();
-    public DataUpdateFlagsState<string> BoxesFlags = new();
-    public DataUpdateFlagsState<string> PkmVersionsFlags = new();
+    public DataUpdateFlagsState BanksFlags = new();
+    public DataUpdateFlagsState BoxesFlags = new();
+    public DataUpdateFlagsState PkmVersionsFlags = new();
 
     // The following configures EF to create a Sqlite database file in the
     // special "local" folder for your platform.
@@ -83,6 +83,9 @@ public class SessionDbContext(
             entity.Property(p => p.Filepath)
                 .IsRequired();
 
+            entity.HasIndex(p => new { p.Species, p.Form, p.Gender });
+            entity.HasIndex(p => new { p.Species, p.Form, p.Gender, p.IsShiny });
+
             entity
                 .HasOne<BoxEntity>()
                 .WithMany()
@@ -96,21 +99,18 @@ public class SessionDbContext(
                 .IsRequired(false);
         });
 
-        modelBuilder.Entity<DexEntity>(entity =>
-        {
-            entity.HasKey(p => p.Id);
-
-            entity.Property(p => p.Forms)
-              .HasConversion(
-                  v => JsonSerializer.Serialize(v, EntityJsonContext.Default.ListDexEntityForm),
-                  v => JsonSerializer.Deserialize(v, EntityJsonContext.Default.ListDexEntityForm)!
-              )
-              .HasColumnType("TEXT");
-        });
-
         modelBuilder.Entity<PkmFileEntity>(entity =>
         {
             entity.HasKey(p => p.Filepath);
+        });
+
+        modelBuilder.Entity<DexFormEntity>(entity =>
+        {
+            entity.HasKey(p => p.Id);
+
+            entity.HasIndex(p => p.Species);
+            entity.HasIndex(p => p.Form);
+            entity.HasIndex(p => p.Gender);
         });
     }
 }

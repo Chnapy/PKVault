@@ -29,7 +29,7 @@ public class SaveInfosController(
         return await dataService.CreateDataFromUpdateFlags(new()
         {
             Saves = new() { All = true },
-            Dex = true,
+            Dex = new() { All = true },
             SaveInfos = true,
             Warnings = true,
         });

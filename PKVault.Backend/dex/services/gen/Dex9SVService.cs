@@ -2,12 +2,9 @@ using PKHeX.Core;
 
 public class Dex9SVService(SAV9SV save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
-
-        var isOwned = ownedPkms.Count > 0;
-        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
 
         bool isSeen;
         bool isSeenShiny;
@@ -50,6 +47,8 @@ public class Dex9SVService(SAV9SV save) : DexGenService(save)
         }
 
         return new DexItemForm(
+            Id: DexLoader.GetId(species, form, gender),
+            Species: species,
             Form: form,
             Gender: gender,
             Types: GetTypes(pi),

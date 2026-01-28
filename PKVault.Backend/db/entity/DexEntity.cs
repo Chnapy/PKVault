@@ -1,16 +1,12 @@
 using PKHeX.Core;
 
-public class DexEntity : IEntity
+public class DexFormEntity : IEntity
 {
     public override required string Id { get; init; }
-    public required ushort Species { get; set; }
-    public required List<DexEntityForm> Forms { get; set; }
+    public required ushort Species { get; init; }
+    public required byte Form { get; init; }
+    public required Gender Gender { get; init; }
+    public required GameVersion Version { get; set; }
+    public required bool IsCaught { get; set; }
+    public required bool IsCaughtShiny { get; set; }
 }
-
-public record DexEntityForm(
-    byte Form,
-    GameVersion Version,
-    Gender Gender,
-    bool IsCaught,
-    bool IsCaughtShiny
-);

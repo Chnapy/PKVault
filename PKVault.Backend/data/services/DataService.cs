@@ -133,17 +133,28 @@ public class DataService(
         return await warningsService.CheckWarnings();
     }
 
-    private async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>?> GetPossibleDex(bool flag)
+    private async Task<DataDTOState<Dictionary<ushort, Dictionary<uint, DexItemDTO>>>?> GetPossibleDex(DataUpdateFlagsState flag)
     {
-        if (!flag)
+        if (flag.All)
         {
-            return null;
+            return new(
+                All: true,
+                Data: await dexService.GetDex(null)
+            );
         }
 
-        return await dexService.GetDex();
+        if (flag.Ids.Count > 0)
+        {
+            return new(
+                All: false,
+                Data: await dexService.GetDex([.. flag.Ids.Select(ushort.Parse)])
+            );
+        }
+
+        return null;
     }
 
-    private async Task<DataDTOState<Dictionary<string, BankDTO?>>?> GetPossibleMainBanks(DataUpdateFlagsState<string> flag)
+    private async Task<DataDTOState<Dictionary<string, BankDTO?>>?> GetPossibleMainBanks(DataUpdateFlagsState flag)
     {
         if (flag.All)
         {
@@ -165,7 +176,7 @@ public class DataService(
         return null;
     }
 
-    private async Task<DataDTOState<Dictionary<string, BoxDTO?>>?> GetPossibleMainBoxes(DataUpdateFlagsState<string> flag)
+    private async Task<DataDTOState<Dictionary<string, BoxDTO?>>?> GetPossibleMainBoxes(DataUpdateFlagsState flag)
     {
         if (flag.All)
         {
@@ -187,7 +198,7 @@ public class DataService(
         return null;
     }
 
-    private async Task<DataDTOState<Dictionary<string, PkmVersionDTO?>>?> GetPossibleMainPkmVersions(DataUpdateFlagsState<string> flag)
+    private async Task<DataDTOState<Dictionary<string, PkmVersionDTO?>>?> GetPossibleMainPkmVersions(DataUpdateFlagsState flag)
     {
         if (flag.All)
         {
@@ -238,7 +249,7 @@ public class DataService(
         return await storageQueryService.GetSaveBoxes(saveId);
     }
 
-    private async Task<DataDTOState<Dictionary<string, PkmSaveDTO?>>?> GetPossibleSavePkms(uint saveId, DataUpdateFlagsState<string> flag)
+    private async Task<DataDTOState<Dictionary<string, PkmSaveDTO?>>?> GetPossibleSavePkms(uint saveId, DataUpdateFlagsState flag)
     {
         if (flag.All)
         {

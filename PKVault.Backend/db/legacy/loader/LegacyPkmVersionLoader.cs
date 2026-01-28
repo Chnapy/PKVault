@@ -209,13 +209,6 @@ public class LegacyPkmVersionLoader : LegacyEntityLoader<LegacyPkmVersionEntity>
         return entity;
     }
 
-    public override async Task WriteToFile()
-    {
-        await base.WriteToFile();
-
-        pkmFileLoader.WriteToFiles();
-    }
-
     public ImmutablePKM GetPkmVersionEntityPkm(LegacyPkmVersionEntity entity)
     {
         return pkmFileLoader.CreatePKM(entity.Id, entity.Filepath, entity.Generation);

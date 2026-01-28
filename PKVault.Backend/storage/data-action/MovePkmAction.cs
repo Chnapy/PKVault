@@ -348,7 +348,7 @@ public class MovePkmAction(
             await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, pkmVersion.AttachedSavePkmIdBase!)]));
         }
 
-        flags.Dex = true;
+        flags.Dex.Ids.Add(pkmSaveDTO.Species.ToString());
     }
 
     private async Task SaveToMainWithoutCheckTarget(
@@ -359,13 +359,6 @@ public class MovePkmAction(
     )
     {
         var saveLoaders = savesLoadersService.GetLoaders(sourceSaveId);
-
-        // var savePkm = await saveLoaders.Pkms.GetDto(pkmId);
-
-        // if (savePkm == default)
-        // {
-        //     throw new Exception($"PkmSaveDTO not found for id={pkmId}, count={(await saveLoaders.Pkms.GetAllDtos()).Count}");
-        // }
 
         if (savePkm.Pkm is IShadowCapture savePkmShadow && savePkmShadow.IsShadow)
         {
@@ -383,8 +376,6 @@ public class MovePkmAction(
 
         if (pkmVersionEntity == null)
         {
-            var staticData = await staticDataService.GetStaticData();
-
             // create pkm-version
             pkmVersionEntity = await pkmVersionLoader.AddEntity(new()
             {
@@ -396,6 +387,11 @@ public class MovePkmAction(
                 AttachedSavePkmIdBase = input.attached ? savePkm.IdBase : null,
                 Generation = savePkm.Generation,
                 Filepath = "",
+
+                Species = savePkm.Species,
+                Form = savePkm.Form,
+                Gender = savePkm.Gender,
+                IsShiny = savePkm.IsShiny,
 
                 PkmFile = null
             },
@@ -423,7 +419,7 @@ public class MovePkmAction(
 
         await new DexMainService(sp).EnablePKM(savePkm.Pkm, savePkm.Save);
 
-        flags.Dex = true;
+        flags.Dex.Ids.Add(savePkm.Species.ToString());
     }
 
     private async Task CheckG3NationalDex(SaveWrapper save, int species)

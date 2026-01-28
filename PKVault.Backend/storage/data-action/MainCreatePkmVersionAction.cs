@@ -54,6 +54,11 @@ public class MainCreatePkmVersionAction(
             Generation = input.Generation,
             Filepath = "",
 
+            Species = pkmConverted.Species,
+            Form = pkmConverted.Form,
+            Gender = pkmConverted.Gender,
+            IsShiny = pkmConverted.IsShiny,
+
             PkmFile = null
         },
         pkmConverted);

@@ -142,6 +142,12 @@ public class SessionService(
 
         // Console.WriteLine($"CONTEXT ID = {db.ContextId.InstanceId}");
 
+        var migrations = db.Database.GetMigrations();
+        if (!migrations.Any())
+        {
+            throw new InvalidOperationException($"No migration files");
+        }
+
         var pendingMigrations = await db.Database.GetPendingMigrationsAsync();
 
         Console.WriteLine($"{pendingMigrations.Count()} pending migrations");
