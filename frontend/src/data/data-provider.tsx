@@ -7,7 +7,7 @@ import { updatePkmSaveCache } from './hooks/use-pkm-save-index';
 import { updatePkmVersionCache } from './hooks/use-pkm-version-index';
 import { QueryError, responseBackSchema, type ResponseBack } from './mutator/custom-instance';
 import { getBackupGetAllQueryKey, type backupGetAllResponseSuccess } from './sdk/backup/backup.gen';
-import { getDexGetAllQueryKey, type dexGetAllResponseSuccess } from './sdk/dex/dex.gen';
+import { getDexGetAllQueryKey } from './sdk/dex/dex.gen';
 import { DataDTOType, type DataDTO, type DataDTOStateOfDictionaryOfStringAndPkmLegalityDTOData } from './sdk/model';
 import { getSaveInfosGetAllQueryKey, type saveInfosGetAllResponseSuccess } from './sdk/save-infos/save-infos.gen';
 import { getSettingsGetQueryKey, type settingsGetResponseSuccess } from './sdk/settings/settings.gen';
@@ -109,10 +109,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                                 mainBanks,
                                 mainBoxes,
                                 mainPkmVersions,
+                                dex,
                                 mainPkmLegalities,
                                 saves,
                                 invalidateAllSaves,
-                                dex,
                                 actions,
                                 warnings,
                                 saveInfos,
@@ -145,6 +145,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
 
                             if (mainPkmVersions) {
                                 updatePkmVersionCache(client, mainPkmVersions);
+                            }
+
+                            if (dex) {
+                                applyResponseData(dex, getDexGetAllQueryKey());
                             }
 
                             if (mainPkmLegalities) {
@@ -197,14 +201,6 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                                         applyPkmLegalities(saveData.saveId, saveData.savePkmLegality.data ?? {});
                                     }
                                 });
-                            }
-
-                            if (dex) {
-                                client.setQueryData(getDexGetAllQueryKey(), {
-                                    status: 200,
-                                    headers: new Headers(),
-                                    data: dex,
-                                } satisfies dexGetAllResponseSuccess);
                             }
 
                             if (actions) {

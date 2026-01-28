@@ -3,59 +3,56 @@ using PKHeX.Core;
 /**
  * Gives Pokedex data for PKVault and saves.
  */
-public class DexService(ILoadersService loadersService, StaticDataService staticDataService)
+public class DexService(
+    IServiceProvider sp,
+    StaticDataService staticDataService, ISavesLoadersService savesLoadersService
+)
 {
-    public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex()
+    public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex(HashSet<ushort>? speciesSet)
     {
-        var saveDict = (await loadersService.GetLoaders()).saveLoadersDict;
-        if (saveDict.Count == 0)
+        var saveLoaders = savesLoadersService.GetAllLoaders();
+
+        if (saveLoaders.Count == 0)
         {
             return [];
         }
 
-        return await GetDex([FakeSaveFile.Default.ID32, .. saveDict.Keys]);
+        return await GetDex([FakeSaveFile.Default.ID32, .. saveLoaders.Select(sl => sl.Save.Id)], speciesSet);
     }
 
-    public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex(uint[] saveIds)
+    public async Task<Dictionary<ushort, Dictionary<uint, DexItemDTO>>> GetDex(uint[] saveIds, HashSet<ushort>? speciesSet)
     {
         if (saveIds.Length == 0)
         {
             return [];
         }
 
-        var loaders = await loadersService.GetLoaders();
-
-        var saveLoadersDict = loaders.saveLoadersDict;
-
-        List<SaveWrapper> saves = saveIds.Select(id => id == FakeSaveFile.Default.ID32 ? new(FakeSaveFile.Default) : saveLoadersDict[id].Save).ToList();
+        List<SaveWrapper> saves = [.. saveIds.Select(id => id == FakeSaveFile.Default.ID32
+            ? new(FakeSaveFile.Default)
+            : savesLoadersService.GetLoaders(id).Save
+        )];
 
         var staticData = await staticDataService.GetStaticData();
 
         var maxSpecies = saves.Max(save => save.MaxSpeciesID);
 
-        var time = LogUtil.Time($"Update Dex with {saves.Count} saves (max-species={maxSpecies})");
+        using var _ = LogUtil.Time($"Update Dex with {saves.Count} saves (max-species={maxSpecies})");
 
         Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex = [];
 
-        saves.ForEach(save => UpdateDexWithSave(dex, save, staticData, loaders));
+        foreach (var save in saves)
+        {
+            var service = GetDexService(save);
 
-        time();
+            // var time = LogUtil.Time($"Update Dex with save {save.ID32} {save.Version}");
+            var success = service != null && (await service.UpdateDexWithSave(dex, staticData, speciesSet));
+            // time();
+        }
 
         return dex;
     }
 
-    private static bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, SaveWrapper save, StaticDataDTO staticData, DataEntityLoaders loaders)
-    {
-        var service = GetDexService(save, loaders);
-
-        // var time = LogUtil.Time($"Update Dex with save {save.ID32} {save.Version}");
-        var success = service?.UpdateDexWithSave(dex, staticData) ?? false;
-        // time();
-
-        return success;
-    }
-
-    public static DexGenService? GetDexService(SaveWrapper save, DataEntityLoaders loaders)
+    public DexGenService? GetDexService(SaveWrapper save)
     {
         static DexGenService? notHandled(SaveWrapper save)
         {
@@ -65,7 +62,7 @@ public class DexService(ILoadersService loadersService, StaticDataService static
 
         return save.GetSave() switch
         {
-            FakeSaveFile => new DexMainService(loaders),
+            FakeSaveFile => new DexMainService(sp),
             SAV1 sav1 => new Dex123Service(sav1),
             SAV2 sav2 => new Dex123Service(sav2),
             SAV3 sav3 => new Dex123Service(sav3),

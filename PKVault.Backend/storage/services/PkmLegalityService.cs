@@ -4,9 +4,9 @@ public class PkmLegalityService(ISettingsService settingsService)
 {
     private readonly Lock legalityLock = new();
 
-    public PkmLegalityDTO CreateDTO(PkmVersionDTO pkmVersion)
+    public async Task<PkmLegalityDTO> CreateDTO(PkmVersionEntity pkmVersion, ImmutablePKM pkm)
     {
-        return CreateDTO(pkmVersion.Id, pkmVersion.Pkm, null);
+        return CreateDTO(pkmVersion.Id, pkm, null);
     }
 
     public PkmLegalityDTO CreateDTO(PkmSaveDTO pkmSave)

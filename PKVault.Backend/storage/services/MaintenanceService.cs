@@ -12,12 +12,13 @@ public class MaintenanceService(
 {
     public async Task CleanMainStorageFiles()
     {
-        var time = LogUtil.Time($"Storage obsolete files clean up");
+        using var _ = LogUtil.Time($"Storage obsolete files clean up");
 
         using var scope = sp.CreateScope();
 
-        var loaders = await scope.ServiceProvider.GetRequiredService<ILoadersService>().GetLoaders();
-        var pkmVersionsFilepaths = loaders.pkmVersionLoader.GetAllEntities().Values.Select(entity => entity.Filepath).ToList();
+        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+
+        var pkmVersionsFilepaths = (await pkmVersionLoader.GetAllEntities()).Values.Select(entity => entity.Filepath).ToList();
 
         var rootDir = ".";
         var storagePath = settingsService.GetSettings().GetStoragePath();
@@ -58,7 +59,5 @@ public class MaintenanceService(
             Console.WriteLine($"PkmVersion count = {pkmVersionsFilepaths.Count}");
             Console.WriteLine($"Paths to clean count = {pathsToClean.Count()}");
         }
-
-        time();
     }
 }

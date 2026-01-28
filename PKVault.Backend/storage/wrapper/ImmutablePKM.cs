@@ -358,6 +358,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
 public enum PKMLoadError
 {
     UNKNOWN,
+    NOT_LOADED,
     NOT_FOUND,
     TOO_SMALL,
     TOO_BIG,

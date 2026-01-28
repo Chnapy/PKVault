@@ -1,11 +1,11 @@
 public class DataUpdateFlags
 {
     public bool StaticData;
-    public DataUpdateFlagsState<string> MainBanks = new();
-    public DataUpdateFlagsState<string> MainBoxes = new();
-    public DataUpdateFlagsState<string> MainPkmVersions = new();
+    public DataUpdateFlagsState MainBanks = new();
+    public DataUpdateFlagsState MainBoxes = new();
+    public DataUpdateFlagsState MainPkmVersions = new();
+    public DataUpdateFlagsState Dex = new();
     public DataUpdateSaveListFlags Saves = new();
-    public bool Dex;
     public bool Warnings;
     public bool SaveInfos;
     public bool Backups;
@@ -16,7 +16,7 @@ public class DataUpdateSaveFlags(uint saveId)
 {
     public uint SaveId => saveId;
     public bool SaveBoxes;
-    public DataUpdateFlagsState<string> SavePkms = new();
+    public DataUpdateFlagsState SavePkms = new();
 }
 
 public class DataUpdateSaveListFlags
@@ -38,8 +38,8 @@ public class DataUpdateSaveListFlags
     public List<DataUpdateSaveFlags> GetSaves() => All ? [] : [.. Saves.Values];
 }
 
-public class DataUpdateFlagsState<T>
+public class DataUpdateFlagsState
 {
     public bool All = false;
-    public readonly HashSet<T> Ids = [];
+    public HashSet<string> Ids = [];
 }

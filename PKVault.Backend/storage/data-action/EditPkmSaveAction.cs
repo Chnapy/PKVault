@@ -1,21 +1,23 @@
+public record EditPkmSaveActionInput(uint saveId, string pkmSaveId, EditPkmVersionPayload editPayload);
+
 public class EditPkmSaveAction(
     ActionService actionService, PkmConvertService pkmConvertService,
-    Dictionary<ushort, StaticEvolve> Evolves,
-    uint saveId, string pkmSaveId, EditPkmVersionPayload editPayload
-) : DataAction
+    SynchronizePkmAction synchronizePkmAction,
+    IPkmVersionLoader pkmVersionLoader, ISavesLoadersService savesLoadersService
+) : DataAction<EditPkmSaveActionInput>
 {
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(EditPkmSaveActionInput input, DataUpdateFlags flags)
     {
-        var saveLoaders = loaders.saveLoadersDict[saveId];
-        var pkmSave = saveLoaders.Pkms.GetDto(pkmSaveId);
+        var saveLoaders = savesLoadersService.GetLoaders(input.saveId);
+        var pkmSave = saveLoaders.Pkms.GetDto(input.pkmSaveId);
 
-        var availableMoves = await actionService.GetPkmAvailableMoves(saveId, pkmSaveId);
+        var availableMoves = await actionService.GetPkmAvailableMoves(input.saveId, input.pkmSaveId);
 
         var pkm = pkmSave!.Pkm.Update(pkm =>
         {
-            EditPkmVersionAction.EditPkmNickname(pkmConvertService, pkm, editPayload.Nickname);
-            EditPkmVersionAction.EditPkmEVs(pkmConvertService, pkm, editPayload.EVs);
-            EditPkmVersionAction.EditPkmMoves(pkmConvertService, pkm, availableMoves, editPayload.Moves);
+            EditPkmVersionAction.EditPkmNickname(pkmConvertService, pkm, input.editPayload.Nickname);
+            EditPkmVersionAction.EditPkmEVs(pkmConvertService, pkm, input.editPayload.EVs);
+            EditPkmVersionAction.EditPkmMoves(pkmConvertService, pkm, availableMoves, input.editPayload.Moves);
 
             // absolutly required before each write
             // TODO make a using write pkm to ensure use of this call
@@ -25,10 +27,10 @@ public class EditPkmSaveAction(
 
         saveLoaders.Pkms.WriteDto(pkmSave with { Pkm = pkm });
 
-        var pkmVersion = loaders.pkmVersionLoader.GetEntityBySave(pkmSave.SaveId, pkmSave.IdBase);
+        var pkmVersion = await pkmVersionLoader.GetEntityBySave(pkmSave.SaveId, pkmSave.IdBase);
         if (pkmVersion != null)
         {
-            await SynchronizePkmAction.SynchronizeSaveToPkmVersion(pkmConvertService, loaders, flags, Evolves, [(pkmVersion.Id, pkmSave.IdBase)]);
+            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, pkmSave.IdBase)]));
         }
 
         return new(

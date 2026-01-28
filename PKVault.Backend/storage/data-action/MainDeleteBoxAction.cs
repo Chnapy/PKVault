@@ -1,31 +1,28 @@
-public class MainDeleteBoxAction(string boxId) : DataAction
-{
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
-    {
-        var box = loaders.boxLoader.GetDto(boxId);
-        var boxPkms = loaders.pkmVersionLoader.GetEntitiesByBox(box!.IdInt);
+public record MainDeleteBoxActionInput(string boxId);
 
-        if (!boxPkms.IsEmpty)
+public class MainDeleteBoxAction(IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVersionLoader pkmVersionLoader) : DataAction<MainDeleteBoxActionInput>
+{
+    protected override async Task<DataActionPayload> Execute(MainDeleteBoxActionInput input, DataUpdateFlags flags)
+    {
+        var box = await boxLoader.GetEntity(input.boxId);
+        var boxPkms = await pkmVersionLoader.GetEntitiesByBox(box.IdInt);
+
+        if (boxPkms.Count > 0)
         {
             throw new ArgumentException($"Cannot delete box with pkm inside");
         }
 
-        loaders.boxLoader.DeleteEntity(boxId);
-        loaders.boxLoader.NormalizeOrders();
+        await boxLoader.DeleteEntity(box);
+        await boxLoader.NormalizeOrders();
 
-        if (box.BankId != null)
+        var bank = await bankLoader.GetEntity(box.BankId);
+        if (bank.View.MainBoxIds.Contains(box.IdInt))
         {
-            var bank = loaders.bankLoader.GetEntity(box.BankId);
-            if (bank.View.MainBoxIds.Contains(box.IdInt))
-            {
-                loaders.bankLoader.WriteEntity(bank with
-                {
-                    View = new(
-                        MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
-                        Saves: bank.View.Saves
-                    )
-                });
-            }
+            bank.View = new(
+                MainBoxIds: [.. bank.View.MainBoxIds.ToList().FindAll(id => id != box.IdInt)],
+                Saves: bank.View.Saves
+            );
+            await bankLoader.UpdateEntity(bank);
         }
 
         return new(

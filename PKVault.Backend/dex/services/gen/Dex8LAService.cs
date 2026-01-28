@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class Dex8LAService(SAV8LA save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
@@ -16,9 +16,6 @@ public class Dex8LAService(SAV8LA save) : DexGenService(save)
         var obtain = dex.GetPokeObtainFlags(species, form);
         var caughtWild = dex.GetPokeCaughtInWildFlags(species, form);
 
-        var isOwned = ownedPkms.Count > 0;
-        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
-
         int[] baseGendersIndex = gender == Gender.Female ? [1, 3] : [0, 2];
         int[] shinyGendersIndex = gender == Gender.Female ? [5, 7] : [4, 6];
 
@@ -29,6 +26,8 @@ public class Dex8LAService(SAV8LA save) : DexGenService(save)
         var isSeen = isSeenShiny || isOwned || isCaught || baseGendersIndex.Any(i => (seenWild & (1 << i)) != 0);
 
         return new DexItemForm(
+            Id: DexLoader.GetId(species, form, gender),
+            Species: species,
             Form: form,
             Gender: gender,
             Types: GetTypes(pi),
@@ -42,7 +41,7 @@ public class Dex8LAService(SAV8LA save) : DexGenService(save)
         );
     }
 
-    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
     {
         if (!save.Personal.IsPresentInGame(species, form))
             return;

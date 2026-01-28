@@ -2,12 +2,9 @@ using PKHeX.Core;
 
 public class Dex9ZAService(SAV9ZA save) : DexGenService(save)
 {
-    protected override DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender)
+    protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
-
-        var isOwned = ownedPkms.Count > 0;
-        var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
 
         var entry = save.Zukan.GetEntry(species);
 
@@ -20,6 +17,8 @@ public class Dex9ZAService(SAV9ZA save) : DexGenService(save)
         var isCaught = isSeen && (isOwned || entry.GetIsFormCaught(form));
 
         return new DexItemForm(
+            Id: DexLoader.GetId(species, form, gender),
+            Species: species,
             Form: form,
             Gender: gender,
             Types: GetTypes(pi),
@@ -33,7 +32,7 @@ public class Dex9ZAService(SAV9ZA save) : DexGenService(save)
         );
     }
 
-    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
     {
         if (!save.Personal.IsPresentInGame(species, form))
             return;

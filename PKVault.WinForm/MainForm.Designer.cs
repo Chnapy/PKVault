@@ -101,7 +101,7 @@ partial class MainForm
 
     private async Task<bool> WebView_Load()
     {
-        var time = LogUtil.Time($"Load WebView");
+        using var _ = LogUtil.Time($"Load WebView");
 
         string webViewVersion;
         try
@@ -179,8 +179,6 @@ partial class MainForm
             }
         };
 
-        time();
-
         return true;
     }
 
@@ -195,8 +193,8 @@ partial class MainForm
         webView.CoreWebView2.Navigate(navigateTo);
         webView.CoreWebView2.NavigationCompleted += (object sender, CoreWebView2NavigationCompletedEventArgs e) =>
         {
-            time();
-            partialStartupTime();
+            time.Dispose();
+            partialStartupTime.Dispose();
         };
     }
 
@@ -390,7 +388,7 @@ partial class MainForm
                     case StartFinishRequestMessage.TYPE:
                         {
                             // var startFinishRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.StartFinishRequestMessage);
-                            fullStartupTime();
+                            fullStartupTime.Dispose();
 
                             break;
                         }

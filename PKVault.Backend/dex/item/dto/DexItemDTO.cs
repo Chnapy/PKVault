@@ -9,16 +9,18 @@ public record DexItemDTO(
 ) : IWithId;
 
 public record DexItemForm(
-byte Form,
-Gender Gender,
-List<byte> Types,
-int[] Abilities,
-int[] BaseStats,
-bool IsSeen,
-bool IsSeenShiny,
-bool IsCaught,
-bool IsOwned,
-bool IsOwnedShiny,
-EntityContext Context = default,
-byte Generation = default
-);
+    string Id,
+    ushort Species,
+    byte Form,
+    Gender Gender,
+    List<byte> Types,
+    int[] Abilities,
+    int[] BaseStats,
+    bool IsSeen,
+    bool IsSeenShiny,
+    bool IsCaught,
+    bool IsOwned,
+    bool IsOwnedShiny,
+    EntityContext Context = default,
+    byte Generation = default
+) : IWithId;
