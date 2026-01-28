@@ -242,9 +242,8 @@ public class ActionService(
 
         await backupService.PrepareBackupThenRun(async () =>
         {
-            await sessionService.PersistSession();
-
             actions.Clear();
+            await sessionService.PersistSession();
         });
 
         flags.SaveInfos = true;

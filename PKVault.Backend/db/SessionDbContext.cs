@@ -85,6 +85,7 @@ public class SessionDbContext(
             entity.HasIndex(p => new { p.AttachedSaveId, p.AttachedSavePkmIdBase })
                 .HasFilter("AttachedSaveId IS NOT NULL");
 
+            entity.HasIndex(p => p.Filepath);
             entity.Property(p => p.Filepath)
                 .IsRequired();
 
@@ -95,8 +96,7 @@ public class SessionDbContext(
                 .HasOne(p => p.PkmFile)
                 .WithOne()
                 .HasForeignKey<PkmVersionEntity>(p => p.Filepath)
-                .OnDelete(DeleteBehavior.NoAction)
-                .IsRequired(false);
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         modelBuilder.Entity<PkmFileEntity>(entity =>

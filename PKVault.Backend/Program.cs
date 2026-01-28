@@ -26,7 +26,7 @@ public class Program
 
         Copyright();
 
-        var app = PrepareWebApp(5000);
+        var app = await PrepareWebApp(5000);
         var setupPostRun = await SetupData(app, args);
         time.Stop();
 
@@ -94,7 +94,7 @@ public class Program
 #endif
     }
 
-    public static WebApplication PrepareWebApp(int port)
+    public static async Task<WebApplication> PrepareWebApp(int port)
     {
         var builder = WebApplication.CreateBuilder([]);
 
@@ -112,12 +112,17 @@ public class Program
         var settings = sp.GetRequiredService<ISettingsService>()
             .GetSettings();
 
-        var certificate = settings.GetHttpsCertPemPathPath() != null && settings.GetHttpsKeyPemPathPath() != null
-            ? X509Certificate2.CreateFromPem(
-                fileIOService.ReadText(settings.GetHttpsCertPemPathPath()!),
-                fileIOService.ReadText(settings.GetHttpsKeyPemPathPath()!)
-            )
-            : null;
+        X509Certificate2? GetCertificate()
+        {
+            var certPemPath = settings.GetHttpsCertPemPathPath();
+            var keyPemPath = settings.GetHttpsKeyPemPathPath();
+
+            return certPemPath != null && keyPemPath != null
+                ? X509Certificate2.CreateFromPem(certPemPath, keyPemPath)
+                : null;
+        }
+
+        var certificate = GetCertificate();
 
         builder.WebHost.ConfigureKestrel(serverOptions =>
         {

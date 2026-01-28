@@ -75,7 +75,7 @@ public class GenStaticDataService(
 
         time = LogUtil.Time($"Write static-data {lang} to {staticDataPath}");
 
-        fileIOService.WriteJSONGZipFile(staticDataPath, StaticDataJsonContext.Default.StaticDataDTO, dto);
+        await fileIOService.WriteJSONGZipFile(staticDataPath, StaticDataJsonContext.Default.StaticDataDTO, dto);
 
         time.Dispose();
     }

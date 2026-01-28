@@ -67,6 +67,8 @@ public class SavesLoadersService(
 
     public async Task WriteToFiles()
     {
+        using var _ = LogUtil.Time($"SavesLoadersService.WriteToFiles");
+
         List<Task> tasks = [];
 
         foreach (var loaders in Loaders.Values.ToList())

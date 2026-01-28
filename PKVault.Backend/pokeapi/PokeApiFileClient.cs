@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
 using PokeApiNet;
@@ -77,7 +76,7 @@ public partial class PokeApiFileClient(IFileIOService fileIOService)
             "index.json"
         ];
 
-        return await fileIOService.ReadJSONFileAsync(string.Join('/', fileParts), jsonContext);
+        return await fileIOService.ReadJSONFile(string.Join('/', fileParts), jsonContext);
     }
 
     public string GetApiEndpointString(

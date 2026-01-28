@@ -100,15 +100,16 @@ public class SessionService(
 
     public async Task PersistSession()
     {
+        using var _ = LogUtil.Time($"Persist session with copy session to main");
+
         // before copy to main:
         // - persist PKM files
         // - clear session-only PkmFile tables
         using (var scope = sp.CreateScope())
         {
-            var pkmFileLoader = scope.ServiceProvider.GetRequiredService<PkmFileLoader>();
+            var pkmFileLoader = scope.ServiceProvider.GetRequiredService<IPkmFileLoader>();
 
             await pkmFileLoader.WriteToFiles();
-            await pkmFileLoader.ClearData();
         }
 
         await savesLoadersService.WriteToFiles();
@@ -117,11 +118,10 @@ public class SessionService(
         await CloseConnection();
         StartTask = null;
 
+        Console.WriteLine($"Move session DB to main");
         fileIOService.Move(SessionDbPath, MainDbPath, overwrite: true);
 
         StartTime = null;
-
-        Console.WriteLine($"DB session copied to main");
     }
 
     private async Task ResetDbSession()
@@ -176,6 +176,8 @@ public class SessionService(
 
     private async Task CloseConnection()
     {
+        using var _ = LogUtil.Time($"SessionService.CloseConnection");
+
         using var scope = sp.CreateScope();
         using var db = scope.ServiceProvider.GetRequiredService<SessionDbContext>();
 

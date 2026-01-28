@@ -12,6 +12,7 @@ public record PkmVersionLoaderAddPayload(
 
     string? Id = null,    // override Pkm Id, useful with disabled Pkm
     string? Filepath = null,    // override Pkm filepath, useful with disabled Pkm
+    bool Updated = true,
     bool CheckPkm = true    // check if Pkm is disabled
 );
 
@@ -284,7 +285,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             IsShiny = payload.Pkm.IsShiny,
 
             Filepath = filepath,
-            PkmFile = await pkmFileLoader.PrepareEntity(payload.Pkm, filepath, checkPkm: payload.CheckPkm),
+            PkmFile = await pkmFileLoader.PrepareEntity(payload.Pkm, filepath, updated: payload.Updated, checkPkm: payload.CheckPkm),
         };
     }
 

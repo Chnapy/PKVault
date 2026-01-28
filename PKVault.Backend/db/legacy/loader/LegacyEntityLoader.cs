@@ -32,7 +32,7 @@ public abstract class LegacyEntityLoader<E> where E : ILegacyEntity
     {
         try
         {
-            return fileIOService.ReadJSONFile(FilePath, DictJsonContext, []);
+            return fileIOService.ReadJSONFileSync(FilePath, DictJsonContext, []);
         }
         catch (Exception ex)
         {

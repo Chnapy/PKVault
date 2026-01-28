@@ -20,7 +20,7 @@ public class BackupService(
         var startTime = DateTime.UtcNow;
 
         var steptime = LogUtil.Time($"Create backup - DB");
-        var dbPaths = CreateDbBackup();
+        var dbPaths = await CreateDbBackup();
         steptime.Stop();
 
         steptime = LogUtil.Time($"Create backup - Saves");
@@ -53,8 +53,8 @@ public class BackupService(
                 {
                     var fileContent = fileEntry.Value.FileContent;
                     var entry = archive.CreateEntry(fileEntry.Key, CompressionLevel.Optimal);
-                    using var entryStream = entry.Open();
-                    entryStream.Write(fileContent, 0, fileContent.Length);
+                    using var entryStream = await entry.OpenAsync();
+                    await entryStream.WriteAsync(fileContent);
                 }
             }
 
@@ -62,7 +62,7 @@ public class BackupService(
             var fileName = GetBackupFilename(startTime);
             var bkpZipPath = Path.Combine(bkpPath, fileName);
 
-            fileIOService.WriteBytes(bkpZipPath, memoryStream.ToArray());
+            await fileIOService.WriteBytes(bkpZipPath, memoryStream.ToArray());
             Console.WriteLine($"Write backup to {bkpZipPath}");
         }
         steptime.Stop();
@@ -70,7 +70,7 @@ public class BackupService(
         return startTime;
     }
 
-    private Dictionary<string, (string TargetPath, byte[] FileContent)> CreateDbBackup()
+    private async Task<Dictionary<string, (string TargetPath, byte[] FileContent)>> CreateDbBackup()
     {
         var dict = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
 
@@ -79,12 +79,31 @@ public class BackupService(
         {
             var fileName = Path.GetFileName(filePath);
             var relativePath = Path.Combine("db", fileName);
-            var content = fileIOService.ReadBytes(filePath);
+            var content = await fileIOService.ReadBytes(filePath);
 
             dict.Add(
                 NormalizePath(relativePath),
                     (TargetPath: NormalizePath(filePath), FileContent: content)
             );
+        }
+
+        var settings = settingsService.GetSettings();
+        var dbPath = settings.SettingsMutable.DB_PATH;
+
+        List<string> filepaths = DataNormalizeAction.GetLegacyFilepaths(dbPath);
+        foreach (var filepath in filepaths)
+        {
+            if (fileIOService.Exists(filepath))
+            {
+                var fileName = Path.GetFileName(filepath);
+                var relativePath = Path.Combine("db", fileName);
+                var content = await fileIOService.ReadBytes(filepath);
+
+                dict.Add(
+                    NormalizePath(relativePath),
+                        (TargetPath: NormalizePath(filepath), FileContent: content)
+                );
+            }
         }
 
         return dict;
@@ -217,7 +236,7 @@ public class BackupService(
         fileIOService.Delete(bkpZipPath);
     }
 
-    public async Task RestoreBackup(DateTime createdAt)
+    public async Task RestoreBackup(DateTime createdAt, bool withSafeBackup)
     {
         var bkpPath = GetBackupsPath();
 
@@ -246,19 +265,29 @@ public class BackupService(
         // TODO read in-memory
         pathsEntry.ExtractToFile(bkpTmpPathsPath, true);
 
-        var paths = fileIOService.ReadJSONFile(
+        var paths = await fileIOService.ReadJSONFile(
             bkpTmpPathsPath,
             EntityJsonContext.Default.DictionaryStringString
         );
 
         ArgumentNullException.ThrowIfNull(paths, bkpTmpPathsPath);
 
-        // manual backup, no use of PrepareBackupThenRun to avoid infinite loop
-        await CreateBackup();
+        if (withSafeBackup)
+        {
+            // manual backup, no use of PrepareBackupThenRun to avoid infinite loop
+            await CreateBackup();
+        }
 
-        // remove current db file
+        var settings = settingsService.GetSettings();
+        var dbPath = settings.SettingsMutable.DB_PATH;
+
+        // remove current db file & old JSON files
         // to avoid remaining old data
         fileIOService.Delete(sessionService.MainDbPath);
+        DataNormalizeAction.GetLegacyFilepaths(dbPath)
+            .ForEach(filepath => fileIOService.Delete(filepath));
+
+        var time = LogUtil.Time($"Extracting {archive.Entries.Count} files");
 
         foreach (var entry in archive.Entries)
         {
@@ -267,11 +296,13 @@ public class BackupService(
                 || paths.TryGetValue(entry.FullName.Replace('/', '\\'), out path)
             )
             {
-                Console.WriteLine($"Extract {entry.FullName} to {path}");
+                // Console.WriteLine($"Extract {entry.FullName} to {path}");
 
                 entry.ExtractToFile(path, true);
             }
         }
+
+        time.Dispose();
 
         fileIOService.Delete(bkpTmpPathsPath);
 
@@ -296,9 +327,11 @@ public class BackupService(
             saveService.InvalidateSaves();
             await sessionService.StartNewSession(checkInitialActions: false);
         }
-        catch
+        catch (Exception ex)
         {
-            await RestoreBackup(bkpDateTime);
+            Console.Error.WriteLine(ex);
+
+            await RestoreBackup(bkpDateTime, withSafeBackup: false);
 
             throw;
         }

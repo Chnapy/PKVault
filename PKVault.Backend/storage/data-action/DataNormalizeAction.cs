@@ -7,35 +7,40 @@ public class DataNormalizeAction(
     StaticDataService staticDataService, ISaveService saveService
 ) : DataAction<DataNormalizeActionInput>
 {
+    public static List<string> GetLegacyFilepaths(string dbPath) => [
+        LegacyBankLoader.GetFilepath(dbPath),
+        LegacyBoxLoader.GetFilepath(dbPath),
+        LegacyPkmLoader.GetFilepath(dbPath),
+        LegacyPkmVersionLoader.GetFilepath(dbPath),
+        LegacyDexLoader.GetFilepath(dbPath)
+    ];
+
     public async Task<bool> HasDataToNormalize()
     {
         if (!await bankLoader.Any())
         {
+            Console.WriteLine("HasDataToNormalize - No bank");
             return true;
         }
 
         if (!await boxLoader.Any())
         {
+            Console.WriteLine("HasDataToNormalize - No box");
             return true;
         }
 
-        if (!sessionService.HasMainDb())
+        if (sessionService.HasMainDb())
         {
-            return true;
+            return false;
         }
 
         var settings = settingsService.GetSettings();
         var dbPath = settings.SettingsMutable.DB_PATH;
 
-        string[] filepaths = [
-            LegacyBankLoader.GetFilepath(dbPath),
-            LegacyBoxLoader.GetFilepath(dbPath),
-            LegacyPkmVersionLoader.GetFilepath(dbPath),
-            LegacyDexLoader.GetFilepath(dbPath)
-        ];
-        var hasLegacy = filepaths.Any(fileIOService.Exists);
+        var hasLegacy = GetLegacyFilepaths(dbPath).Any(fileIOService.Exists);
         if (hasLegacy)
         {
+            Console.WriteLine("HasDataToNormalize - Legacy");
             return true;
         }
 
@@ -96,13 +101,7 @@ public class DataNormalizeAction(
         var dbPath = settings.SettingsMutable.DB_PATH;
         var storagePath = settings.SettingsMutable.STORAGE_PATH;
 
-        string[] filepaths = [
-            LegacyBankLoader.GetFilepath(dbPath),
-            LegacyBoxLoader.GetFilepath(dbPath),
-            LegacyPkmVersionLoader.GetFilepath(dbPath),
-            LegacyDexLoader.GetFilepath(dbPath)
-        ];
-        var hasLegacy = filepaths.Any(fileIOService.Exists);
+        var hasLegacy = GetLegacyFilepaths(dbPath).Any(fileIOService.Exists);
         if (!hasLegacy)
         {
             return false;
@@ -122,7 +121,7 @@ public class DataNormalizeAction(
         );
         var legacyDexLoader = new LegacyDexLoader(fileIOService, dbPath);
 
-        using var _ = LogUtil.Time("Seed json legacy migration");
+        using var _ = LogUtil.Time("Data normalize - json legacy migration");
 
         var saveById = await saveService.GetSaveCloneById();
 
@@ -146,11 +145,6 @@ public class DataNormalizeAction(
         Console.WriteLine($"- {legacyBoxLoader.GetAllEntities().Count} boxes");
         Console.WriteLine($"- {legacyPkmVersionLoader.GetAllEntities().Count} pkmVersions");
         Console.WriteLine($"- {legacyDexLoader.GetAllEntities().Count} dex");
-
-        // var banks = db.Set<BankEntity>();
-        // var boxes = db.Set<BoxEntity>();
-        // var pkmVersions = db.Set<PkmVersionEntity>();
-        // var dex = db.Set<DexFormEntity>();
 
         await using var transaction = await db.Database.BeginTransactionAsync();
 
@@ -198,6 +192,7 @@ public class DataNormalizeAction(
                     // disabled pkms are allowed here to avoid data loss
                     Id: e.Id,
                     Filepath: e.Filepath,
+                    Updated: false,
                     CheckPkm: false
                 ))
             );

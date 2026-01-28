@@ -25,12 +25,11 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
     {
         var sessionService = sp.GetRequiredService<SessionService>();
 
-        var text = fileIOService.WriteJSONFile(
+        await fileIOService.WriteJSONFile(
             FilePath,
             SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
             settingsMutable
         );
-        Console.WriteLine(text);
 
         BaseSettings = ReadBaseSettings();
 
@@ -64,7 +63,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private SettingsDTO ReadBaseSettings()
     {
-        var mutableDto = fileIOService.ReadJSONFile(
+        var mutableDto = fileIOService.ReadJSONFileSync(
             FilePath,
             SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
             GetDefaultSettingsMutable()

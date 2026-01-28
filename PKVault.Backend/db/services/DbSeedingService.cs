@@ -11,42 +11,24 @@ public class DbSeedingService(IFileIOService fileIOService)
 
     private async Task SeedPkmFilesData(DbContext db, CancellationToken cancelToken)
     {
-        var pkmFiles = db.Set<PkmFileEntity>();
-        var pkmVersions = db.Set<PkmVersionEntity>();
-
-        var pkmFilesToAdd = (await pkmVersions
-            .Where(pkmVersion => pkmVersion.PkmFile == default)
-            .ToArrayAsync(cancelToken))
-            .Select(e => PkmVersionToPkmFileEntity(e.Filepath));
-
-        if (!pkmFilesToAdd.Any())
-        {
-            return;
-        }
+        var pkmFilesDb = db.Set<PkmFileEntity>();
 
         using var _ = LogUtil.Time("Seed PKM files migration");
 
-        await using var transaction = await db.Database.BeginTransactionAsync(cancelToken);
+        var pkmFiles = await pkmFilesDb
+            .ToListAsync(cancelToken);
 
-        try
-        {
-            await pkmFiles.AddRangeAsync(pkmFilesToAdd, cancelToken);
+        var updatedPkmFiles = await Task.WhenAll(pkmFiles.Select(UpdatePkmFile));
 
-            await db.SaveChangesAsync(cancelToken);
+        pkmFilesDb.UpdateRange(updatedPkmFiles);
 
-            await transaction.CommitAsync(cancelToken);
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancelToken);
-            throw;
-        }
+        await db.SaveChangesAsync(cancelToken);
     }
 
-    private PkmFileEntity PkmVersionToPkmFileEntity(string filepath)
+    private async Task<PkmFileEntity> UpdatePkmFile(PkmFileEntity pkmFile)
     {
-        byte[] bytes = [];
-        PKMLoadError? error = null;
+        var filepath = pkmFile.Filepath;
+
         try
         {
             var (TooSmall, TooBig) = fileIOService.CheckGameFile(filepath);
@@ -57,21 +39,20 @@ public class DbSeedingService(IFileIOService fileIOService)
             if (TooSmall)
                 throw new PKMLoadException(PKMLoadError.TOO_SMALL);
 
-            bytes = fileIOService.ReadBytes(filepath);
+            pkmFile.Data = await fileIOService.ReadBytes(filepath);
+            pkmFile.Error = null;
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine(ex);
-            error = PkmFileLoader.GetPKMLoadError(ex);
+
+            pkmFile.Data = [];
+            pkmFile.Error = PkmFileLoader.GetPKMLoadError(ex);
         }
 
-        return new PkmFileEntity()
-        {
-            Filepath = filepath,
-            Data = bytes,
-            Error = error,
-            Updated = false,
-            Deleted = false
-        };
+        pkmFile.Updated = false;
+        pkmFile.Deleted = false;
+
+        return pkmFile;
     }
 }

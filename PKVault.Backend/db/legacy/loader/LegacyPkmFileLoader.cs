@@ -5,7 +5,6 @@ public interface ILegacyPkmFileLoader
     public (byte[] Data, PKMLoadError? Error) GetEntity(string filepath);
     public void DeleteEntity(string filepath);
     public string WriteEntity(ImmutablePKM pkm, string filepath, Dictionary<ushort, StaticEvolve> evolves);
-    public void WriteToFiles();
     public ImmutablePKM CreatePKM(string id, string filepath, byte generation);
     public ImmutablePKM CreatePKM(PkmVersionEntity pkmVersionEntity);
     public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves);
@@ -89,23 +88,6 @@ public class LegacyPkmFileLoader : ILegacyPkmFileLoader
         return filepath;
     }
 
-    public void WriteToFiles()
-    {
-        foreach (var action in actions)
-        {
-            if (action.Create)
-            {
-                var (bytes, _) = GetEntity(action.Path);
-
-                fileIOService.WriteBytes(action.Path, bytes);
-            }
-            else
-            {
-                fileIOService.Delete(action.Path);
-            }
-        }
-    }
-
     private (byte[] Data, PKMLoadError? Error) GetFileOrLoad(string filepath)
     {
         if (bytesDict.TryGetValue(filepath, out var file))
@@ -125,7 +107,7 @@ public class LegacyPkmFileLoader : ILegacyPkmFileLoader
             if (TooSmall)
                 throw new LegacyPKMLoadException(LegacyPKMLoadError.TOO_SMALL);
 
-            bytes = fileIOService.ReadBytes(filepath);
+            bytes = fileIOService.ReadBytesSync(filepath);
         }
         catch (Exception ex)
         {
