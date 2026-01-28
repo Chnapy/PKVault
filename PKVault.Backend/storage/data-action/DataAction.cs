@@ -32,4 +32,5 @@ public enum DataActionType
     EVOLVE_PKM,
     SORT_PKM,
     DEX_SYNC,
+    DATA_NORMALIZE,
 }

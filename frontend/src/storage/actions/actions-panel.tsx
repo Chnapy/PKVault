@@ -115,6 +115,7 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
                             // these actions are data normalization on startup,
                             // remove them can break data
                             const cannotBeRemoved = ([
+                                DataActionType.DATA_NORMALIZE,
                                 DataActionType.PKM_SYNCHRONIZE
                             ] as number[]).includes(action.type);
 

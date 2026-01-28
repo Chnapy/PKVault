@@ -278,7 +278,7 @@ public class BackupService(
         logtime.Stop();
 
         saveService.InvalidateSaves();
-        await sessionService.StartNewSession(checkSynchronize: true);
+        await sessionService.StartNewSession(checkInitialActions: true);
     }
 
     public async Task PrepareBackupThenRun(Func<Task> action)
@@ -294,7 +294,7 @@ public class BackupService(
             logtime.Stop();
 
             saveService.InvalidateSaves();
-            await sessionService.StartNewSession(checkSynchronize: false);
+            await sessionService.StartNewSession(checkInitialActions: false);
         }
         catch
         {

@@ -35,7 +35,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         BaseSettings = ReadBaseSettings();
 
         saveService.InvalidateSaves();
-        await sessionService.StartNewSession(checkSynchronize: true);
+        await sessionService.StartNewSession(checkInitialActions: true);
     }
 
     // Full settings

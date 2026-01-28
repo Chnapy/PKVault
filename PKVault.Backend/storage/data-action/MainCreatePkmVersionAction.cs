@@ -43,25 +43,15 @@ public class MainCreatePkmVersionAction(
         var pkmConverted = pkmConvertService.GetConvertedPkm(pkmOrigin, input.Generation, input.CreatedPID);
         input.CreatedPID = pkmConverted.PID;
 
-        await pkmVersionLoader.AddEntity(new()
-        {
-            Id = pkmConverted.GetPKMIdBase(staticData.Evolves),
-            BoxId = pkmVersionOrigin.BoxId,
-            BoxSlot = pkmVersionOrigin.BoxSlot,
-            IsMain = false,
-            AttachedSaveId = null,
-            AttachedSavePkmIdBase = null,
-            Generation = input.Generation,
-            Filepath = "",
-
-            Species = pkmConverted.Species,
-            Form = pkmConverted.Form,
-            Gender = pkmConverted.Gender,
-            IsShiny = pkmConverted.IsShiny,
-
-            PkmFile = null
-        },
-        pkmConverted);
+        await pkmVersionLoader.AddEntity(new(
+            BoxId: pkmVersionOrigin.BoxId,
+            BoxSlot: pkmVersionOrigin.BoxSlot,
+            IsMain: false,
+            AttachedSaveId: null,
+            AttachedSavePkmIdBase: null,
+            Generation: input.Generation,
+            Pkm: pkmConverted
+        ));
 
         return new(
             type: DataActionType.MAIN_CREATE_PKM_VERSION,

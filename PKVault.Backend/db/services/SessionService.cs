@@ -20,7 +20,7 @@ public class SessionService(
 
     public bool HasMainDb() => fileIOService.Exists(MainDbPath);
 
-    public async Task StartNewSession(bool checkSynchronize)
+    public async Task StartNewSession(bool checkInitialActions)
     {
         StartTime = DateTime.UtcNow;
 
@@ -33,9 +33,19 @@ public class SessionService(
                 savesLoadersService.Setup()
             );
 
-            if (checkSynchronize)
+            if (checkInitialActions)
             {
-                await CheckSaveToSynchronize();
+                using var scope = sp.CreateScope();
+
+                // required to avoid deadlocks, ex: SessionService => SynchronizeAction => loaders => SessionService
+                ByPassContextId = scope.ServiceProvider.GetRequiredService<SessionDbContext>()
+                    .ContextId.InstanceId;
+
+                await CheckDataToNormalize(scope);
+
+                await CheckSaveToSynchronize(scope);
+
+                ByPassContextId = null;
             }
         });
 
@@ -44,14 +54,19 @@ public class SessionService(
         await task;
     }
 
-    private async Task CheckSaveToSynchronize()
+    private async Task CheckDataToNormalize(IServiceScope scope)
     {
-        using var scope = sp.CreateScope();
+        var actionService = scope.ServiceProvider.GetRequiredService<ActionService>();
+        var dataNormalizeAction = scope.ServiceProvider.GetRequiredService<DataNormalizeAction>();
 
-        // required to avoid deadlock: SessionService => SynchronizeAction => loaders => SessionService
-        ByPassContextId = scope.ServiceProvider.GetRequiredService<SessionDbContext>()
-            .ContextId.InstanceId;
+        if (await dataNormalizeAction.HasDataToNormalize())
+        {
+            await actionService.DataNormalize(scope);
+        }
+    }
 
+    private async Task CheckSaveToSynchronize(IServiceScope scope)
+    {
         var actionService = scope.ServiceProvider.GetRequiredService<ActionService>();
         var synchronizePkmAction = scope.ServiceProvider.GetRequiredService<SynchronizePkmAction>();
 
@@ -64,15 +79,13 @@ public class SessionService(
                 await actionService.SynchronizePkm(data, scope);
             }
         }
-
-        ByPassContextId = null;
     }
 
     public async Task EnsureSessionCreated(Guid? byPassContextId = null)
     {
         if (StartTask == null)
         {
-            await StartNewSession(checkSynchronize: true);
+            await StartNewSession(checkInitialActions: true);
         }
         // bypass check
         else if (byPassContextId != null && byPassContextId == ByPassContextId)

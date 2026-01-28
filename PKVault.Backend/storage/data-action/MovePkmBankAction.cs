@@ -193,25 +193,15 @@ public class MovePkmBankAction(
         if (pkmVersionEntity == null)
         {
             // create pkm-version
-            pkmVersionEntity = await pkmVersionLoader.AddEntity(new()
-            {
-                Id = savePkm.IdBase,
-                BoxId = targetBoxId,
-                BoxSlot = targetBoxSlot,
-                IsMain = true,
-                AttachedSaveId = input.attached ? sourceSaveId : null,
-                AttachedSavePkmIdBase = input.attached ? savePkm.IdBase : null,
-                Generation = savePkm.Generation,
-                Filepath = "",
-
-                Species = savePkm.Species,
-                Form = savePkm.Form,
-                Gender = savePkm.Gender,
-                IsShiny = savePkm.IsShiny,
-
-                PkmFile = null
-            },
-            savePkm.Pkm);
+            pkmVersionEntity = await pkmVersionLoader.AddEntity(new(
+                BoxId: targetBoxId,
+                BoxSlot: targetBoxSlot,
+                IsMain: true,
+                AttachedSaveId: input.attached ? sourceSaveId : null,
+                AttachedSavePkmIdBase: input.attached ? savePkm.IdBase : null,
+                Generation: savePkm.Generation,
+                Pkm: savePkm.Pkm
+            ));
         }
 
         // if moved to already attached pkm, just update it

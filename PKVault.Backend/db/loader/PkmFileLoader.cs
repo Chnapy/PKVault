@@ -4,7 +4,7 @@ using PKHeX.Core;
 
 public interface IPkmFileLoader
 {
-    public Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool updated, bool deleted);
+    public Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool checkPkm = true);
     public Task<List<PkmFileEntity>> GetEnabledEntities();
     public Task WriteToFiles();
     public Task ClearData();
@@ -53,19 +53,21 @@ public class PkmFileLoader : IPkmFileLoader
             .ToListAsync();
     }
 
-    public async Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool updated, bool deleted)
+    public async Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool checkPkm = true)
     {
-        if (!pkm.IsEnabled)
+        if (checkPkm && !pkm.IsEnabled)
         {
             throw new InvalidOperationException($"Write disabled PKM not allowed");
         }
 
-        var bytes = GetPKMBytes(pkm);
+        var data = pkm.IsEnabled
+            ? GetPKMBytes(pkm)
+            : [];
 
         return new()
         {
             Filepath = filepath,
-            Data = bytes,
+            Data = data,
             Error = null,
             Updated = true,
             Deleted = false

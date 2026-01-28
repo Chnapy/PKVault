@@ -188,6 +188,7 @@
   "storage.save-actions.type.evolve-pkm": "Evolve pkm {{name}} in {{save}} from {{oldSpecies}} to {{newSpecies}}",
   "storage.save-actions.type.sort-pkm": "Sort pkms",
   "storage.save-actions.type.dex-sync": "Pokedex synchronize",
+  "storage.save-actions.type.data-normalize": "Data files normalize (update, clean)",
   "storage.actions.release": "Release",
   "notifications.warnings.update": "New PKVault update {{version}}"
 }

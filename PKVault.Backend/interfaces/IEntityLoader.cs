@@ -9,6 +9,8 @@ public interface IEntityLoader<DTO, E> where DTO : IWithId where E : IEntity
     public Task DeleteEntity(E entity);
     public Task<E> AddEntity(E entity);
     public Task UpdateEntity(E entity);
+    public Task<IEnumerable<E>> AddEntities(IEnumerable<E> entities);
+    public Task<bool> Any();
     public Task<E?> First();
     public Task<int> Count();
 }

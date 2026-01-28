@@ -120,13 +120,36 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         return entity;
     }
 
+    public virtual async Task<IEnumerable<E>> AddEntities(IEnumerable<E> entities)
+    {
+        if (!entities.Any())
+        {
+            return entities;
+        }
+
+        Console.WriteLine($"{typeof(E).Name} - Add multiple ({entities.Count()}) - ContextId={db.ContextId}");
+
+        var dbSet = await GetDbSet();
+
+        using var _ = LogUtil.Time($"{typeof(E)} - AddEntities");
+
+        await dbSet.AddRangeAsync(entities);
+
+        foreach (var entity in entities)
+        {
+            flags.Ids.Add(entity.Id);
+        }
+
+        return entities;
+    }
+
     public virtual async Task UpdateEntity(E entity)
     {
         Console.WriteLine($"{entity.GetType().Name} - Update id={entity.Id} - ContextId={db.ContextId}");
 
         var dbSet = await GetDbSet();
 
-        using var _ = LogUtil.Time($"{typeof(E)} - UpdateEntity");
+        // using var _ = LogUtil.Time($"{typeof(E)} - UpdateEntity");
 
         dbSet.Update(entity);
         // Console.WriteLine($"Context={db.ContextId}");
@@ -134,11 +157,41 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         flags.Ids.Add(entity.Id);
     }
 
+    // public virtual async Task UpdateEntities(E[] entities)
+    // {
+    //     if (entities.Length == 0)
+    //     {
+    //         return;
+    //     }
+
+    //     Console.WriteLine($"{typeof(E).Name} - Update multiple ({entities.Length}) - ContextId={db.ContextId}");
+
+    //     var dbSet = await GetDbSet();
+
+    //     // using var _ = LogUtil.Time($"{typeof(E)} - UpdateEntities");
+
+    //     dbSet.UpdateRange(entities);
+
+    //     foreach (var entity in entities)
+    //     {
+    //         flags.Ids.Add(entity.Id);
+    //     }
+    // }
+
+    public async Task<bool> Any()
+    {
+        var dbSet = await GetDbSet();
+
+        // using var _ = LogUtil.Time($"{typeof(E)} - Any");
+
+        return await dbSet.AnyAsync();
+    }
+
     public async Task<E?> First()
     {
         var dbSet = await GetDbSet();
 
-        using var _ = LogUtil.Time($"{typeof(E)} - First");
+        // using var _ = LogUtil.Time($"{typeof(E)} - First");
 
         return await dbSet.FirstOrDefaultAsync();
     }

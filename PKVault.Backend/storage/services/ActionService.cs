@@ -16,6 +16,15 @@ public class ActionService(
 
     private readonly List<ActionRecord> actions = [];
 
+    public async Task<DataUpdateFlags> DataNormalize(IServiceScope scope)
+    {
+        return await AddAction(
+            scope,
+            (scope) => scope.ServiceProvider.GetRequiredService<DataNormalizeAction>(),
+            new()
+        );
+    }
+
     public async Task<DataUpdateFlags> SynchronizePkm(SynchronizePkmActionInput input, IServiceScope scope)
     {
         return await AddAction(
@@ -250,7 +259,7 @@ public class ActionService(
         List<ActionRecord> previousActions = [.. actions];
         actions.Clear();
 
-        await sessionService.StartNewSession(checkSynchronize: false);
+        await sessionService.StartNewSession(checkInitialActions: false);
 
         using var scope = sp.CreateScope();
 

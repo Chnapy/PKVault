@@ -87,6 +87,7 @@ export const useActionDescription = () => {
                 }),
             [DataActionType.SORT_PKM]: () => t('storage.save-actions.type.sort-pkm'),
             [DataActionType.DEX_SYNC]: () => t('storage.save-actions.type.dex-sync'),
+            [DataActionType.DATA_NORMALIZE]: () => t('storage.save-actions.type.data-normalize'),
         })();
     };
 };

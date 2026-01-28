@@ -1,10 +1,25 @@
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
+public record PkmVersionLoaderAddPayload(
+    string BoxId,
+    int BoxSlot,
+    bool IsMain,
+    uint? AttachedSaveId,
+    string? AttachedSavePkmIdBase,
+    byte Generation,
+    ImmutablePKM Pkm,
+
+    string? Id = null,    // override Pkm Id, useful with disabled Pkm
+    string? Filepath = null,    // override Pkm filepath, useful with disabled Pkm
+    bool CheckPkm = true    // check if Pkm is disabled
+);
+
 public interface IPkmVersionLoader : IEntityLoader<PkmVersionDTO, PkmVersionEntity>
 {
     public Task<PkmVersionDTO> CreateDTO(PkmVersionEntity entity);
-    public Task<PkmVersionEntity> AddEntity(PkmVersionEntity entity, ImmutablePKM pkm);
+    public Task<PkmVersionEntity> AddEntity(PkmVersionLoaderAddPayload payload);
+    public Task<IEnumerable<PkmVersionEntity>> AddEntities(IEnumerable<PkmVersionLoaderAddPayload> payloads);
     public Task UpdateEntity(PkmVersionEntity entity, ImmutablePKM pkm);
 
     public Task<Dictionary<int, Dictionary<string, PkmVersionEntity>>> GetEntitiesByBox(int boxId);
@@ -225,25 +240,52 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             .AnyAsync(p => p.Species == species && p.Form == form && p.Gender == gender && p.IsShiny);
     }
 
-    public async Task<PkmVersionEntity> AddEntity(PkmVersionEntity entity, ImmutablePKM pkm)
+    public async Task<PkmVersionEntity> AddEntity(PkmVersionLoaderAddPayload payload)
     {
-        if (!pkm.IsEnabled)
+        var entity = await GetEntityFromAddPayload(payload);
+
+        return await AddEntity(entity);
+    }
+
+    public async Task<IEnumerable<PkmVersionEntity>> AddEntities(IEnumerable<PkmVersionLoaderAddPayload> payloads)
+    {
+        var entities = await Task.WhenAll(payloads.Select(GetEntityFromAddPayload));
+
+        return await base.AddEntities(entities);
+    }
+
+    private async Task<PkmVersionEntity> GetEntityFromAddPayload(PkmVersionLoaderAddPayload payload)
+    {
+        if (payload.CheckPkm && !payload.Pkm.IsEnabled)
         {
             throw new InvalidOperationException($"Cannot add disabled PkmVersion");
         }
 
         var staticData = await staticDataService.GetStaticData();
-        var filepath = pkmFileLoader.GetPKMFilepath(pkm, staticData.Evolves);
 
-        entity.Filepath = filepath;
-        entity.PkmFile = await pkmFileLoader.PrepareEntity(pkm, filepath, updated: true, deleted: false);
+        var id = payload.Id
+            ?? payload.Pkm.GetPKMIdBase(staticData.Evolves);
+        var filepath = payload.Filepath
+            ?? pkmFileLoader.GetPKMFilepath(payload.Pkm, staticData.Evolves);
 
-        entity.Species = pkm.Species;
-        entity.Form = pkm.Form;
-        entity.Gender = pkm.Gender;
-        entity.IsShiny = pkm.IsShiny;
+        return new PkmVersionEntity()
+        {
+            Id = id,
+            BoxId = payload.BoxId,
+            BoxSlot = payload.BoxSlot,
+            IsMain = payload.IsMain,
+            AttachedSaveId = payload.AttachedSaveId,
+            AttachedSavePkmIdBase = payload.AttachedSavePkmIdBase,
+            Generation = payload.Generation,
 
-        return await AddEntity(entity);
+            Species = payload.Pkm.Species,
+            Form = payload.Pkm.Form,
+            Gender = payload.Pkm.Gender,
+            IsShiny = payload.Pkm.IsShiny,
+
+            Filepath = filepath,
+            PkmFile = await pkmFileLoader.PrepareEntity(payload.Pkm, filepath, checkPkm: payload.CheckPkm),
+        };
     }
 
     public async Task UpdateEntity(PkmVersionEntity entity, ImmutablePKM pkm)
@@ -256,7 +298,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             if (filepath != entity.Filepath || entity.PkmFile == null)
             {
                 entity.Filepath = filepath;
-                entity.PkmFile = await pkmFileLoader.PrepareEntity(pkm, entity.Filepath, updated: true, deleted: false);
+                entity.PkmFile = await pkmFileLoader.PrepareEntity(pkm, entity.Filepath);
             }
             else
             {
