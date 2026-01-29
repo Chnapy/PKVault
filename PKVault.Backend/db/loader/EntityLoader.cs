@@ -2,19 +2,16 @@ using Microsoft.EntityFrameworkCore;
 
 public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : IWithId where E : IEntity
 {
-    protected IFileIOService fileIOService;
-    protected SessionService sessionService;
+    protected ISessionServiceMinimal sessionService;
     protected SessionDbContext db;
     private DataUpdateFlagsState flags;
 
     public EntityLoader(
-        IFileIOService _fileIOService,
-        SessionService _sessionService,
+        ISessionServiceMinimal _sessionService,
         SessionDbContext _db,
         DataUpdateFlagsState _flags
     )
     {
-        fileIOService = _fileIOService;
         sessionService = _sessionService;
         db = _db;
         flags = _flags;

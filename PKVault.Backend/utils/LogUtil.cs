@@ -3,12 +3,12 @@ using System.Diagnostics;
 
 public class LogUtil
 {
-    public static List<(string category, LogLevel level)> BuilderLoggingFilters = [
+    public static readonly List<(string category, LogLevel level)> BuilderLoggingFilters = [
         ("Microsoft", LogLevel.Warning),
         ("Microsoft.AspNetCore", LogLevel.Warning),
         // ("Microsoft.AspNetCore.Mvc", LogLevel.Warning)
     ];
-    public static LogLevel DBLogLevel = LogLevel.Warning;
+    public static readonly LogLevel DBLogLevel = LogLevel.Warning;
 
     private static readonly string stopwatchEmoji = char.ConvertFromUtf32(0x23F1) + char.ConvertFromUtf32(0xFE0F) + " ";
     private static StreamWriter? logWriter;

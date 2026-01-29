@@ -6,9 +6,9 @@ using System.Text.Json;
  * Backups creation, restore, remove and listing.
  */
 public class BackupService(
-    IServiceProvider sp,
+    IServiceProvider sp, TimeProvider timeProvider,
     IFileIOService fileIOService, ISaveService saveService,
-    ISettingsService settingsService, SessionService sessionService
+    ISettingsService settingsService, ISessionService sessionService
 )
 {
     private static readonly string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
@@ -17,7 +17,7 @@ public class BackupService(
     {
         using var _ = LogUtil.Time("Create backup");
 
-        var startTime = DateTime.UtcNow;
+        var startTime = timeProvider.GetUtcNow().DateTime;
 
         var steptime = LogUtil.Time($"Create backup - DB");
         var dbPaths = await CreateDbBackup();
@@ -149,31 +149,25 @@ public class BackupService(
 
         var paths = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
 
-        (await pkmFileLoader.GetEnabledEntities())
-            .ForEach(pkmFile =>
+        var allFilepaths = await pkmFileLoader.GetEnabledFilepaths();
+
+        var filesInfos = await Task.WhenAll(allFilepaths
+            .Where(fileIOService.Exists)
+            .Select(async filepath =>
             {
-                if (pkmFile.Error != null)
-                {
-                    return;
-                }
-
-                var filepath = pkmFile.Filepath;
-
-                if (!fileIOService.Exists(filepath))
-                {
-                    return;
-                }
-
                 var filename = Path.GetFileName(filepath);
                 var dirname = new DirectoryInfo(Path.GetDirectoryName(filepath)!).Name;
                 var relativeDirPath = Path.Combine("main", dirname);
 
-                paths.Add(
-                    NormalizePath(Path.Combine(relativeDirPath, filename)),
-                    (TargetPath: filepath, FileContent: pkmFile.Data)
-                );
-            });
+                var fileContent = await fileIOService.ReadBytes(filepath);
 
+                return (
+                    NormalizePath(Path.Combine(relativeDirPath, filename)),
+                    (TargetPath: filepath, FileContent: fileContent)
+                );
+            }));
+
+        filesInfos.ToList().ForEach(infos => paths.Add(infos.Item1, infos.Item2));
 
         return paths;
     }

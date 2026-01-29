@@ -6,7 +6,7 @@ namespace PKVault.Backend.saveinfos.routes;
 [ApiController]
 [Route("api/[controller]")]
 public class SaveInfosController(
-    DataService dataService, ISaveService saveService, SessionService sessionService, ActionService actionService
+    DataService dataService, ISaveService saveService, ISessionService sessionService, ActionService actionService
 ) : ControllerBase
 {
     [HttpGet()]

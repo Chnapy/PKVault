@@ -13,10 +13,9 @@ public class DexLoader : EntityLoader<DexItemForm, DexFormEntity>, IDexLoader
     public static string GetId(ushort species, byte form, Gender gender) => $"{species}.{form}.{gender}";
 
     public DexLoader(
-        IFileIOService fileIOService,
-        SessionService sessionService,
+        ISessionServiceMinimal sessionService,
         SessionDbContext db) : base(
-        fileIOService, sessionService, db, new()
+        sessionService, db, new()
     )
     {
     }

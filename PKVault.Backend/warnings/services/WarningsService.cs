@@ -4,7 +4,7 @@
 public class WarningsService(
     IServiceProvider sp,
     ISaveService saveService, IFileIOService fileIOService,
-    SessionService sessionService, ISavesLoadersService savesLoadersService
+    ISessionService sessionService, ISavesLoadersService savesLoadersService
 )
 {
     private WarningsDTO? WarningsDTO = null;

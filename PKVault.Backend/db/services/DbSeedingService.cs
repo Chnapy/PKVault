@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 
-public class DbSeedingService(IFileIOService fileIOService)
+public interface IDbSeedingService
+{
+    public Task Seed(DbContext db, bool _, CancellationToken cancelToken);
+}
+
+public class DbSeedingService(IFileIOService fileIOService) : IDbSeedingService
 {
     public async Task Seed(DbContext db, bool _, CancellationToken cancelToken)
     {

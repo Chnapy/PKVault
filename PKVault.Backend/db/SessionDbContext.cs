@@ -2,7 +2,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 
 public class SessionDbContext(
-    SessionService sessionService, DbSeedingService dbSeedingService
+    ISessionServiceMinimal sessionService, IDbSeedingService dbSeedingService
 ) : DbContext
 {
     // static ConcurrentDictionary<Guid, DbContextId> contexts = [];

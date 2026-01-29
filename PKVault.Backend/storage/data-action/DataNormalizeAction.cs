@@ -3,7 +3,7 @@ public record DataNormalizeActionInput();
 public class DataNormalizeAction(
     SessionDbContext db,
     IBankLoader bankLoader, IBoxLoader boxLoader, IPkmVersionLoader pkmVersionLoader, IDexLoader dexLoader,
-    SessionService sessionService, IFileIOService fileIOService, ISettingsService settingsService,
+    ISessionService sessionService, IFileIOService fileIOService, ISettingsService settingsService,
     StaticDataService staticDataService, ISaveService saveService
 ) : DataAction<DataNormalizeActionInput>
 {

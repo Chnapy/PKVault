@@ -1,11 +1,28 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
+public interface ISessionService : ISessionServiceMinimal
+{
+    public DateTime? StartTime { get; }
+
+    public bool HasMainDb();
+    public Task StartNewSession(bool checkInitialActions);
+    public Task PersistSession();
+}
+
+public interface ISessionServiceMinimal
+{
+    public string MainDbPath { get; }
+    public string SessionDbPath { get; }
+
+    public Task EnsureSessionCreated(Guid? byPassContextId = null);
+}
+
 public class SessionService(
-    IServiceProvider sp,
+    IServiceProvider sp, TimeProvider timeProvider,
     IFileIOService fileIOService, ISettingsService settingsService,
     ISavesLoadersService savesLoadersService
-)
+) : ISessionService
 {
     private string DbFolderPath => settingsService.GetSettings().SettingsMutable.DB_PATH;
     public string MainDbPath => Path.Combine(DbFolderPath, "pkvault.db");
@@ -22,7 +39,7 @@ public class SessionService(
 
     public async Task StartNewSession(bool checkInitialActions)
     {
-        StartTime = DateTime.UtcNow;
+        StartTime = timeProvider.GetUtcNow().DateTime;
 
         using var _ = LogUtil.Time("Starting new session");
 
@@ -85,6 +102,7 @@ public class SessionService(
     {
         if (StartTask == null)
         {
+            Console.WriteLine($"Session no created - Start new one");
             await StartNewSession(checkInitialActions: true);
         }
         // bypass check
@@ -131,9 +149,12 @@ public class SessionService(
             using var scope = sp.CreateScope();
             using var db = scope.ServiceProvider.GetRequiredService<SessionDbContext>();
 
-            await db.Database.EnsureDeletedAsync();
+            var deleted1 = await db.Database.EnsureDeletedAsync();
+            var deleted2 = fileIOService.Delete(SessionDbPath);
+            fileIOService.Delete(SessionDbPath + "-shm");
+            fileIOService.Delete(SessionDbPath + "-wal");
 
-            Console.WriteLine($"DB session deleted");
+            Console.WriteLine($"DB session deleted={deleted1}/{deleted2}");
         }
 
         if (fileIOService.Exists(MainDbPath))

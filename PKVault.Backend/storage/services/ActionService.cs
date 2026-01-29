@@ -6,7 +6,7 @@ using PKHeX.Core;
 public class ActionService(
     IServiceProvider sp,
     PkmConvertService pkmConvertService, BackupService backupService, ISettingsService settingsService,
-    PkmLegalityService pkmLegalityService, SessionService sessionService, ISavesLoadersService savesLoadersService
+    PkmLegalityService pkmLegalityService, ISessionService sessionService, ISavesLoadersService savesLoadersService
 )
 {
     public record ActionRecord(
@@ -14,7 +14,7 @@ public class ActionService(
         DataActionPayload Payload
     );
 
-    private readonly List<ActionRecord> actions = [];
+    public readonly List<ActionRecord> Actions = [];
 
     public async Task<DataUpdateFlags> DataNormalize(IServiceScope scope)
     {
@@ -233,7 +233,7 @@ public class ActionService(
     {
         var flags = new DataUpdateFlags();
 
-        if (actions.Count == 0)
+        if (Actions.Count == 0)
         {
             return flags;
         }
@@ -242,7 +242,7 @@ public class ActionService(
 
         await backupService.PrepareBackupThenRun(async () =>
         {
-            actions.Clear();
+            Actions.Clear();
             await sessionService.PersistSession();
         });
 
@@ -255,8 +255,8 @@ public class ActionService(
 
     public async Task<DataUpdateFlags> RemoveDataActionsAndReset(int actionIndexToRemoveFrom)
     {
-        List<ActionRecord> previousActions = [.. actions];
-        actions.Clear();
+        List<ActionRecord> previousActions = [.. Actions];
+        Actions.Clear();
 
         await sessionService.StartNewSession(checkInitialActions: false);
 
@@ -288,12 +288,12 @@ public class ActionService(
 
     public List<DataActionPayload> GetActionPayloadList()
     {
-        return [.. actions.Select(action => action.Payload)];
+        return [.. Actions.Select(action => action.Payload)];
     }
 
     public bool HasEmptyActionList()
     {
-        return actions.Count == 0;
+        return Actions.Count == 0;
     }
 
     private async Task<DataUpdateFlags> AddActionByRecord(
@@ -376,7 +376,7 @@ public class ActionService(
             ]
         };
 
-        actions.Add(actionRecord);
+        Actions.Add(actionRecord);
 
         return flags;
     }

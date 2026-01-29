@@ -13,10 +13,9 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
     public static readonly int OrderGap = 10;
 
     public BankLoader(
-        IFileIOService fileIOService,
-        SessionService sessionService,
+        ISessionServiceMinimal sessionService,
         SessionDbContext db) : base(
-        fileIOService, sessionService, db, db.BanksFlags
+        sessionService, db, db.BanksFlags
     )
     {
     }

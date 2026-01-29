@@ -23,7 +23,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     public async Task UpdateSettings(SettingsMutableDTO settingsMutable)
     {
-        var sessionService = sp.GetRequiredService<SessionService>();
+        var sessionService = sp.GetRequiredService<ISessionService>();
 
         await fileIOService.WriteJSONFile(
             FilePath,

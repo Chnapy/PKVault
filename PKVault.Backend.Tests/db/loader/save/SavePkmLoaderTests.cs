@@ -41,8 +41,10 @@ public class SavePkmLoaderTests : IAsyncLifetime
 
     private SaveWrapper CreateTestSave()
     {
-        var save = new SAV3E();
-        save.ID32 = 100;
+        var save = new SAV3E
+        {
+            ID32 = 100
+        };
         return new SaveWrapper(save);
     }
 
@@ -161,7 +163,7 @@ public class SavePkmLoaderTests : IAsyncLifetime
         loader.WriteDto(dto1);
         loader.WriteDto(dto2);
 
-        var result = loader.GetDto(box: 0, boxSlot: 5);
+        var result = loader.GetDto(boxId: "0", boxSlot: 5);
 
         Assert.Equal(150, result.Species);
         Assert.Single(loader.GetAllDtos());
@@ -326,8 +328,8 @@ public class SavePkmLoaderTests : IAsyncLifetime
         var movedDto = loader.CreateDTO(mockSave, pkm, 0, 5);
         loader.WriteDto(movedDto);
 
-        Assert.Null(loader.GetDto((int)BoxType.Party, 0));
-        Assert.NotNull(loader.GetDto(0, 5));
+        Assert.Null(loader.GetDto(((int)BoxType.Party).ToString(), 0));
+        Assert.NotNull(loader.GetDto("0", 5));
     }
 
     [Fact]
@@ -350,8 +352,8 @@ public class SavePkmLoaderTests : IAsyncLifetime
         loader.WriteDto(swapped1);
         loader.WriteDto(swapped2);
 
-        Assert.Equal(150, loader.GetDto(0, 0)!.Species);
-        Assert.Equal(25, loader.GetDto(0, 5)!.Species);
+        Assert.Equal(150, loader.GetDto("0", 0)!.Species);
+        Assert.Equal(25, loader.GetDto("0", 5)!.Species);
     }
 
     #endregion
@@ -364,6 +366,6 @@ public class SavePkmLoaderTests : IAsyncLifetime
         var dto = loader.CreateDTO(mockSave, pkm, 2, 10);
         loader.WriteDto(dto);
 
-        Assert.NotNull(loader.GetDto(box: 2, boxSlot: 10));
+        Assert.NotNull(loader.GetDto(boxId: "2", boxSlot: 10));
     }
 }

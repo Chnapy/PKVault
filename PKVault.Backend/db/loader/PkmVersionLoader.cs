@@ -38,6 +38,7 @@ public interface IPkmVersionLoader : IEntityLoader<PkmVersionDTO, PkmVersionEnti
 
 public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, IPkmVersionLoader
 {
+    private IFileIOService fileIOService;
     private StaticDataService staticDataService;
     private IPkmFileLoader pkmFileLoader;
     private readonly string appPath;
@@ -46,16 +47,17 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
     private readonly VersionChecker versionChecker = new();
 
     public PkmVersionLoader(
-        IFileIOService fileIOService,
-        SessionService sessionService,
+        IFileIOService _fileIOService,
+        ISessionServiceMinimal sessionService,
         ISettingsService settingsService,
         IPkmFileLoader _pkmFileLoader,
         SessionDbContext db,
         StaticDataService _staticDataService
     ) : base(
-        fileIOService, sessionService, db, db.PkmVersionsFlags
+        sessionService, db, db.PkmVersionsFlags
     )
     {
+        fileIOService = _fileIOService;
         staticDataService = _staticDataService;
         pkmFileLoader = _pkmFileLoader;
 

@@ -34,10 +34,9 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
     };
 
     public BoxLoader(
-        IFileIOService fileIOService,
-        SessionService sessionService,
+        ISessionServiceMinimal sessionService,
         SessionDbContext db) : base(
-        fileIOService, sessionService, db, db.BoxesFlags
+        sessionService, db, db.BoxesFlags
     )
     {
     }

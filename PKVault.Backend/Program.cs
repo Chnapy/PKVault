@@ -86,7 +86,7 @@ public class Program
         {
             await Task.WhenAll([
                 host.Services.GetRequiredService<ISaveService>().EnsureInitialized(),
-                host.Services.GetRequiredService<SessionService>().EnsureSessionCreated(),
+                host.Services.GetRequiredService<ISessionServiceMinimal>().EnsureSessionCreated(),
             ]);
         };
 #else
@@ -183,11 +183,14 @@ public class Program
         services.AddSingleton<GenStaticDataService>();
 #endif
 
+        services.AddSingleton(TimeProvider.System);
+
         Console.WriteLine($"Setup services - DB");
         services.AddDbContext<SessionDbContext>();
 
-        services.AddSingleton<SessionService>();
-        services.AddSingleton<DbSeedingService>();
+        services.AddSingleton<ISessionService, SessionService>();
+        services.AddSingleton<ISessionServiceMinimal, ISessionService>(sp => sp.GetRequiredService<ISessionService>());   // use same instance as ISessionService
+        services.AddSingleton<IDbSeedingService, DbSeedingService>();
 
         Console.WriteLine($"Setup services - Main");
         services.AddSingleton<IFileSystem>(new FileSystem());

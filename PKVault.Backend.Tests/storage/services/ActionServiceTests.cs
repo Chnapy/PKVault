@@ -1,39 +1,79 @@
 using System.IO.Abstractions.TestingHelpers;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 public class ActionServiceTests
 {
     private readonly MockFileSystem mockFileSystem;
     private readonly IFileIOService fileIOService;
-    private readonly Mock<ILoadersService> mockLoadersService;
     private readonly Mock<ISettingsService> mockSettingsService;
-    private readonly Mock<ISaveService> mockSaveService = new();
-
-    private readonly ActionService actionService;
 
     public ActionServiceTests()
     {
         mockFileSystem = new MockFileSystem();
         fileIOService = new FileIOService(mockFileSystem);
 
-        mockLoadersService = new();
         mockSettingsService = new();
-        StaticDataService staticDataService = new(mockSettingsService.Object);
-        PkmLegalityService pkmLegalityService = new(mockSettingsService.Object);
-        DexService dexService = new(mockLoadersService.Object, staticDataService);
+    }
 
-        actionService = new(
-            loadersService: mockLoadersService.Object,
+    private ActionService GetService(DateTime now, bool throwOnSessionPersist = false)
+    {
+        var serviceCollection = new ServiceCollection();
+
+        var mockTimeProvider = new Mock<TimeProvider>();
+        mockTimeProvider.Setup(x => x.GetUtcNow()).Returns(new DateTimeOffset(now));
+
+        mockFileSystem.AddFile("mock-main.db", "mock-db");  // main db
+        DataNormalizeAction.GetLegacyFilepaths("legacy")
+            .ForEach(legacyPath => mockFileSystem.AddFile(legacyPath, "mock-legacy-data"));
+
+        Mock<ISessionService> mockSessionService = new();
+        mockSessionService.Setup(x => x.MainDbPath).Returns("mock-main.db");
+        if (throwOnSessionPersist)
+        {
+            mockSessionService.Setup(x => x.PersistSession()).ThrowsAsync(new Exception());
+        }
+
+        PkmLegalityService pkmLegalityService = new(mockSettingsService.Object);
+
+        Mock<ISaveService> mockSaveService = new();
+
+        var saveWrapper = SaveWrapperTests.GetMockSave("mock-save-path", Encoding.ASCII.GetBytes("mock-save-content"));
+        mockSaveService.Setup(x => x.GetSaveById()).ReturnsAsync(new Dictionary<uint, SaveWrapper>()
+        {
+            {saveWrapper.Object.Id, saveWrapper.Object}
+        });
+
+        mockFileSystem.AddFile("mock-pkm-files/123", "mock-data");
+
+        var mockPkmFileService = new Mock<IPkmFileLoader>();
+        mockPkmFileService.Setup(x => x.GetEnabledFilepaths()).ReturnsAsync([
+            "mock-pkm-files/123",
+            "mock-pkm-files/456",
+        ]);
+
+        serviceCollection.AddSingleton(mockPkmFileService.Object);
+
+        var sp = serviceCollection.BuildServiceProvider();
+
+        SavesLoadersService savesLoadersService = new(sp, mockSaveService.Object);
+
+        return new(
+            sp: sp,
             pkmConvertService: new(pkmLegalityService),
-            staticDataService,
-            dexService,
             backupService: new(
-                fileIOService, mockLoadersService.Object,
-                mockSaveService.Object, mockSettingsService.Object
+                sp: sp,
+                mockTimeProvider.Object,
+                fileIOService,
+                mockSaveService.Object,
+                mockSettingsService.Object,
+                mockSessionService.Object
             ),
             settingsService: mockSettingsService.Object,
-            pkmLegalityService: pkmLegalityService
+            pkmLegalityService: pkmLegalityService,
+            sessionService: mockSessionService.Object,
+            savesLoadersService: savesLoadersService
         );
     }
 
@@ -42,20 +82,16 @@ public class ActionServiceTests
     {
         ConfigureSettings("mock-bkp");
 
-        var loaders = GetEntityLoaders(
-            DateTime.Parse("2011-03-21 13:26:11")
+        var actionService = GetService(
+            now: DateTime.Parse("2013-03-21 13:26:11")
         );
 
-        loaders.actions.Add(
-            new FakeDataAction(shouldThrow: false)
-        );
-
-        mockLoadersService.Setup(x => x.CreateLoaders()).ReturnsAsync(
-            () => GetEntityLoaders(
-                DateTime.Parse("2013-03-21 13:26:11")
+        actionService.Actions.Add(
+            new(
+                ActionFn: async (scope, flags) => new(DataActionType.DATA_NORMALIZE, []),
+                new(DataActionType.DATA_NORMALIZE, [])
             )
         );
-        mockLoadersService.Setup(x => x.GetLoaders()).ReturnsAsync(loaders);
 
         var flags = await actionService.Save();
 
@@ -67,77 +103,29 @@ public class ActionServiceTests
     {
         ConfigureSettings("mock-bkp");
 
-        var loaders = GetEntityLoaders(
-            DateTime.Parse("2011-03-21 13:26:11"),
-            throwsOnDexWrite: true
-        );
-        loaders.actions.Add(
-            new FakeDataAction(shouldThrow: false)
+        var actionService = GetService(
+            now: DateTime.Parse("2013-03-21 13:26:11"),
+            throwOnSessionPersist: true
         );
 
-        mockLoadersService.Setup(x => x.CreateLoaders()).ReturnsAsync(
-            () => GetEntityLoaders(
-                DateTime.Parse("2013-03-21 13:26:11")
+        actionService.Actions.Add(
+            new(
+                ActionFn: async (scope, flags) => new(DataActionType.DATA_NORMALIZE, []),
+                new(DataActionType.DATA_NORMALIZE, [])
             )
         );
-        mockLoadersService.Setup(x => x.GetLoaders()).ReturnsAsync(loaders);
 
         await Assert.ThrowsAnyAsync<Exception>(actionService.Save);
 
         Assert.True(mockFileSystem.FileExists("mock-bkp\\pkvault_backup_2013-03-21T132611-000Z.zip"));
 
-        Assert.True(mockFileSystem.FileExists("mock-bank.json"));
-        Assert.True(mockFileSystem.FileExists("mock-box.json"));
-        Assert.True(mockFileSystem.FileExists("mock-pkm.json"));
-        Assert.True(mockFileSystem.FileExists("mock-pkm-version.json"));
-        Assert.True(mockFileSystem.FileExists("mock-dex.json"));
+        Assert.True(mockFileSystem.FileExists("mock-main.db"));
+
+        DataNormalizeAction.GetLegacyFilepaths("legacy")
+            .ForEach(legacyPath => Assert.True(mockFileSystem.FileExists(legacyPath)));
+
         Assert.True(mockFileSystem.FileExists("mock-save-path"));
-        Assert.True(mockFileSystem.FileExists("mock-pkm-files\\456"));
-    }
-
-    private DataEntityLoaders GetEntityLoaders(
-        DateTime startTime,
-        bool throwsOnDexWrite = false
-    )
-    {
-        var mockBankLoader = EntityLoaderUtil.GetMockBankLoader("mock-bank.json", Encoding.ASCII.GetBytes("mock-bank-values"));
-        var mockBoxLoader = EntityLoaderUtil.GetMockBoxLoader("mock-box.json", Encoding.ASCII.GetBytes("mock-box-values"));
-        var mockPkmLoader = EntityLoaderUtil.GetMockPkmLoader("mock-pkm.json", Encoding.ASCII.GetBytes("mock-pkm-values"));
-        var mockPkmVersionLoader = EntityLoaderUtil.GetMockPkmVersionLoader(
-            "mock-pkm-version.json",
-            Encoding.ASCII.GetBytes("mock-pkm-version-values"),
-            pkmFiles: new(){
-                { "mock-pkm-files/123", (Data: [], Error: PKMLoadError.NOT_FOUND) },    // should be ignored
-                { "mock-pkm-files/456", (Data: Encoding.ASCII.GetBytes("mock-pkfile-content"), Error: null) }
-            }
-        );
-        var mockDexLoader = EntityLoaderUtil.GetMockDexLoader("mock-dex.json", Encoding.ASCII.GetBytes("mock-dex-values"));
-        if (throwsOnDexWrite)
-        {
-            mockDexLoader.Setup(x => x.WriteToFile()).Throws<Exception>();
-        }
-
-        var saveWrapper = SaveWrapperTests.GetMockSave("mock-save-path", Encoding.ASCII.GetBytes("mock-save-content"));
-
-        Mock<ISaveBoxLoader> mockSaveBoxLoader = new();
-        Mock<ISavePkmLoader> mockSavePkmLoader = new();
-
-        return new DataEntityLoaders(mockSaveService.Object)
-        {
-            startTime = startTime,
-            bankLoader = mockBankLoader.Object,
-            boxLoader = mockBoxLoader.Object,
-            legacyPkmLoader = mockPkmLoader.Object,
-            pkmVersionLoader = mockPkmVersionLoader.Object,
-            dexLoader = mockDexLoader.Object,
-            saveLoadersDict = new(){
-                    {saveWrapper.Object.Id, new(
-                        saveWrapper.Object,
-                        mockSaveBoxLoader.Object,
-                        mockSavePkmLoader.Object
-                    )}
-                }
-        };
+        Assert.True(mockFileSystem.FileExists("mock-pkm-files\\123"));
     }
 
     private void ConfigureSettings(
@@ -151,18 +139,5 @@ public class ActionServiceTests
                 LANGUAGE: "en"
             )
         ));
-    }
-}
-
-class FakeDataAction(bool shouldThrow) : DataAction
-{
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
-    {
-        if (shouldThrow)
-        {
-            throw new Exception();
-        }
-
-        return new(DataActionType.DATA_NORMALIZE, []);
     }
 }
