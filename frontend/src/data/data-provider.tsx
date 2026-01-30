@@ -7,7 +7,7 @@ import { updatePkmSaveCache } from './hooks/use-pkm-save-index';
 import { updatePkmVersionCache } from './hooks/use-pkm-version-index';
 import { QueryError, responseBackSchema, type ResponseBack } from './mutator/custom-instance';
 import { getBackupGetAllQueryKey, type backupGetAllResponseSuccess } from './sdk/backup/backup.gen';
-import { getDexGetAllQueryKey } from './sdk/dex/dex.gen';
+import { getDexGetAllQueryKey, type dexGetAllResponseSuccess } from './sdk/dex/dex.gen';
 import { DataDTOType, type DataDTO, type DataDTOStateOfDictionaryOfStringAndPkmLegalityDTOData } from './sdk/model';
 import { getSaveInfosGetAllQueryKey, type saveInfosGetAllResponseSuccess } from './sdk/save-infos/save-infos.gen';
 import { getSettingsGetQueryKey, type settingsGetResponseSuccess } from './sdk/settings/settings.gen';
@@ -86,6 +86,30 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                                 } satisfies QueryDataBase);
                             };
 
+                            const applyDex = function (responseData: DataDTOState) {
+                                const queryKey = getDexGetAllQueryKey();
+
+                                const getData = () => {
+                                    if (responseData.all) {
+                                        return responseData.data ?? {};
+                                    }
+
+                                    const oldResponse: Partial<dexGetAllResponseSuccess> = client.getQueryData(queryKey) ?? {};
+                                    const oldData = oldResponse.data ?? {};
+
+                                    return Object.values({
+                                        ...oldData,
+                                        ...responseData.data,
+                                    }).filter(filterIsDefined);
+                                };
+
+                                client.setQueryData(queryKey, {
+                                    status: 200,
+                                    headers: new Headers(),
+                                    data: getData(),
+                                } satisfies QueryDataBase);
+                            };
+
                             const applyPkmLegalities = (saveId: number, pkmLegalitiesMap: DataDTOStateOfDictionaryOfStringAndPkmLegalityDTOData) => {
                                 Object.entries(pkmLegalitiesMap).forEach(([ pkmId, pkmLegality ]) => {
                                     const queryKey = getPkmLegalityQueryKey(pkmId, saveId);
@@ -148,7 +172,7 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                             }
 
                             if (dex) {
-                                applyResponseData(dex, getDexGetAllQueryKey());
+                                applyDex(dex);
                             }
 
                             if (mainPkmLegalities) {

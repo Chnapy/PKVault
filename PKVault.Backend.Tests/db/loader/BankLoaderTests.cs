@@ -1,25 +1,20 @@
-using System.IO.Abstractions.TestingHelpers;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
 public class BankLoaderTests : IAsyncDisposable
 {
     private readonly string dbPath;
-    private readonly MockFileSystem mockFileSystem;
-    private readonly IFileIOService fileIOService;
     private readonly SessionDbContext _db;
     private readonly Mock<ISessionServiceMinimal> sessionService;
-    private readonly Mock<DbSeedingService> dbSeedingService;
+    private readonly Mock<IDbSeedingService> dbSeedingService;
 
     public BankLoaderTests()
     {
         var testId = Guid.NewGuid().ToString();
         dbPath = $"db-{testId}.db";
 
-        mockFileSystem = new MockFileSystem();
-        fileIOService = new FileIOService(mockFileSystem);
         sessionService = new();
-        dbSeedingService = new(fileIOService);
+        dbSeedingService = new();
 
         sessionService.Setup(s => s.SessionDbPath).Returns(dbPath);
         _db = new(sessionService.Object, dbSeedingService.Object);

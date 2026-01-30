@@ -29,7 +29,7 @@ public class ActionServiceTests
         mockSessionService.Setup(x => x.MainDbPath).Returns("mock-main.db");
         if (throwOnSessionPersist)
         {
-            mockSessionService.Setup(x => x.PersistSession()).ThrowsAsync(new Exception());
+            mockSessionService.Setup(x => x.PersistSession(It.IsAny<IServiceScope>())).ThrowsAsync(new Exception());
         }
 
         PkmLegalityService pkmLegalityService = new(mockSettingsService.Object);

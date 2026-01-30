@@ -58,7 +58,7 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
             return default;
         }
 
-        var fileStream = fileSystem.File.OpenRead(path);
+        using var fileStream = fileSystem.File.OpenRead(path);
 
         return await JsonSerializer.DeserializeAsync(fileStream, jsonTypeInfo);
     }

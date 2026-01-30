@@ -10,7 +10,7 @@ public interface IDexLoader : IEntityLoader<DexItemForm, DexFormEntity>
 
 public class DexLoader : EntityLoader<DexItemForm, DexFormEntity>, IDexLoader
 {
-    public static string GetId(ushort species, byte form, Gender gender) => $"{species}.{form}.{gender}";
+    public static string GetId(ushort species, byte form, Gender gender) => $"{species}.{form}.{(byte)gender}";
 
     public DexLoader(
         ISessionServiceMinimal sessionService,

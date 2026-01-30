@@ -233,7 +233,12 @@ public class ActionService(
 
         Console.WriteLine("SAVING IN PROGRESS");
 
-        await backupService.PrepareBackupThenRun(sessionService.PersistSession);
+        await backupService.PrepareBackupThenRun(async () =>
+        {
+            using var scope = sp.CreateScope();
+
+            await sessionService.PersistSession(scope);
+        });
 
         flags.SaveInfos = true;
         flags.Backups = true;

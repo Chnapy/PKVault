@@ -11,7 +11,7 @@ public interface ISessionService : ISessionServiceMinimal
     public List<DataActionPayload> GetActionPayloadList();
 
     public Task StartNewSession(bool checkInitialActions);
-    public Task PersistSession();
+    public Task PersistSession(IServiceScope scope);
 }
 
 public interface ISessionServiceMinimal
@@ -66,7 +66,7 @@ public class SessionService(
 
         Actions.Clear();
 
-        var task = Task.Run(async () =>
+        StartTask = Task.Run(async () =>
         {
             await Task.WhenAll(
                 ResetDbSession(),
@@ -81,20 +81,23 @@ public class SessionService(
                 ByPassContextId = scope.ServiceProvider.GetRequiredService<SessionDbContext>()
                     .ContextId.InstanceId;
 
-                await CheckDataToNormalize(scope);
+                var dataNormalized = await CheckDataToNormalize(scope);
 
                 await CheckSaveToSynchronize(scope);
+
+                if (dataNormalized)
+                {
+                    await CheckFirstRunAutoSave(scope);
+                }
 
                 ByPassContextId = null;
             }
         });
 
-        StartTask = task;
-
-        await task;
+        await StartTask;
     }
 
-    private async Task CheckDataToNormalize(IServiceScope scope)
+    private async Task<bool> CheckDataToNormalize(IServiceScope scope)
     {
         var actionService = scope.ServiceProvider.GetRequiredService<ActionService>();
         var dataNormalizeAction = scope.ServiceProvider.GetRequiredService<DataNormalizeAction>();
@@ -102,7 +105,9 @@ public class SessionService(
         if (await dataNormalizeAction.HasDataToNormalize())
         {
             await actionService.DataNormalize(scope);
+            return true;
         }
+        return false;
     }
 
     private async Task CheckSaveToSynchronize(IServiceScope scope)
@@ -118,6 +123,27 @@ public class SessionService(
             {
                 await actionService.SynchronizePkm(data, scope);
             }
+        }
+    }
+
+    /**
+     * If first app run (with no data),
+     * persist session data then restart new one, for conveniance,
+     * avoiding the need to save initial data
+     */
+    private async Task CheckFirstRunAutoSave(IServiceScope scope)
+    {
+        var savesLoaders = scope.ServiceProvider.GetRequiredService<ISavesLoadersService>();
+        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+
+        var hasAnyData = savesLoaders.GetAllLoaders().Count > 0
+            || await pkmVersionLoader.Any();
+
+        if (!hasAnyData)
+        {
+            Console.WriteLine($"Fresh start detected - Session persisting & retarting");
+            await PersistSession(scope);
+            await StartNewSession(checkInitialActions: false);
         }
     }
 
@@ -139,19 +165,15 @@ public class SessionService(
         }
     }
 
-    public async Task PersistSession()
+    public async Task PersistSession(IServiceScope scope)
     {
         using var _ = LogUtil.Time($"Persist session with copy session to main");
 
         // before copy to main:
         // - persist PKM files
         // - clear session-only PkmFile tables
-        using (var scope = sp.CreateScope())
-        {
-            var pkmFileLoader = scope.ServiceProvider.GetRequiredService<IPkmFileLoader>();
-
-            await pkmFileLoader.WriteToFiles();
-        }
+        var pkmFileLoader = scope.ServiceProvider.GetRequiredService<IPkmFileLoader>();
+        await pkmFileLoader.WriteToFiles();
 
         await savesLoadersService.WriteToFiles();
         savesLoadersService.Clear();
