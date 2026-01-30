@@ -9,13 +9,6 @@ public class ActionService(
     PkmLegalityService pkmLegalityService, ISessionService sessionService, ISavesLoadersService savesLoadersService
 )
 {
-    public record ActionRecord(
-        Func<IServiceScope, DataUpdateFlags, Task<DataActionPayload>> ActionFn,
-        DataActionPayload Payload
-    );
-
-    public readonly List<ActionRecord> Actions = [];
-
     public async Task<DataUpdateFlags> DataNormalize(IServiceScope scope)
     {
         return await AddAction(
@@ -233,18 +226,14 @@ public class ActionService(
     {
         var flags = new DataUpdateFlags();
 
-        if (Actions.Count == 0)
+        if (sessionService.HasEmptyActionList())
         {
             return flags;
         }
 
         Console.WriteLine("SAVING IN PROGRESS");
 
-        await backupService.PrepareBackupThenRun(async () =>
-        {
-            Actions.Clear();
-            await sessionService.PersistSession();
-        });
+        await backupService.PrepareBackupThenRun(sessionService.PersistSession);
 
         flags.SaveInfos = true;
         flags.Backups = true;
@@ -255,8 +244,7 @@ public class ActionService(
 
     public async Task<DataUpdateFlags> RemoveDataActionsAndReset(int actionIndexToRemoveFrom)
     {
-        List<ActionRecord> previousActions = [.. Actions];
-        Actions.Clear();
+        List<SessionService.ActionRecord> previousActions = [.. sessionService.Actions];
 
         await sessionService.StartNewSession(checkInitialActions: false);
 
@@ -286,19 +274,9 @@ public class ActionService(
         return flags;
     }
 
-    public List<DataActionPayload> GetActionPayloadList()
-    {
-        return [.. Actions.Select(action => action.Payload)];
-    }
-
-    public bool HasEmptyActionList()
-    {
-        return Actions.Count == 0;
-    }
-
     private async Task<DataUpdateFlags> AddActionByRecord(
         IServiceScope scope,
-        ActionRecord actionRecord,
+        SessionService.ActionRecord actionRecord,
         DataUpdateFlags? _flags
     )
     {
@@ -376,12 +354,12 @@ public class ActionService(
             ]
         };
 
-        Actions.Add(actionRecord);
+        sessionService.Actions.Add(actionRecord);
 
         return flags;
     }
 
-    private async Task<ActionRecord> ApplyAction(
+    private async Task<SessionService.ActionRecord> ApplyAction(
         IServiceScope scope,
         Func<IServiceScope, DataUpdateFlags, Task<DataActionPayload>> actionFn,
         DataUpdateFlags flags
@@ -393,7 +371,7 @@ public class ActionService(
 
         // Console.WriteLine($"Context={db.ContextId}");
 
-        return new ActionRecord(actionFn, payload);
+        return new SessionService.ActionRecord(actionFn, payload);
     }
 
     public async Task<List<MoveItem>> GetPkmAvailableMoves(uint? saveId, string pkmId)

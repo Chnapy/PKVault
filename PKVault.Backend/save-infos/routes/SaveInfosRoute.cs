@@ -6,7 +6,7 @@ namespace PKVault.Backend.saveinfos.routes;
 [ApiController]
 [Route("api/[controller]")]
 public class SaveInfosController(
-    DataService dataService, ISaveService saveService, ISessionService sessionService, ActionService actionService
+    DataService dataService, ISaveService saveService, ISessionService sessionService
 ) : ControllerBase
 {
     [HttpGet()]
@@ -18,7 +18,7 @@ public class SaveInfosController(
     [HttpPut()]
     public async Task<ActionResult<DataDTO>> Scan()
     {
-        if (!actionService.HasEmptyActionList())
+        if (!sessionService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }
@@ -57,7 +57,7 @@ public class SaveInfosController(
     [HttpGet("{saveId}/download")]
     public async Task<ActionResult> Download(uint saveId)
     {
-        if (!actionService.HasEmptyActionList())
+        if (!sessionService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }

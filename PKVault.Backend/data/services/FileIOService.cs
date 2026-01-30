@@ -29,6 +29,7 @@ public interface IFileIOService
     public void Move(string sourceFileName, string destFileName, bool overwrite);
     public bool Delete(string path);
     public void CreateDirectory(string path);
+    public void CreateDirectoryIfAny(string path);
 }
 
 public class FileIOService(IFileSystem fileSystem) : IFileIOService
@@ -179,7 +180,7 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
         fileSystem.Directory.CreateDirectory(path);
     }
 
-    private void CreateDirectoryIfAny(string path)
+    public void CreateDirectoryIfAny(string path)
     {
         var directoryPath = Path.GetDirectoryName(path);
         if (!string.IsNullOrWhiteSpace(directoryPath))

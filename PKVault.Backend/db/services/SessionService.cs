@@ -4,8 +4,12 @@ using Microsoft.EntityFrameworkCore;
 public interface ISessionService : ISessionServiceMinimal
 {
     public DateTime? StartTime { get; }
+    public List<SessionService.ActionRecord> Actions { get; }
 
     public bool HasMainDb();
+    public bool HasEmptyActionList();
+    public List<DataActionPayload> GetActionPayloadList();
+
     public Task StartNewSession(bool checkInitialActions);
     public Task PersistSession();
 }
@@ -24,6 +28,11 @@ public class SessionService(
     ISavesLoadersService savesLoadersService
 ) : ISessionService
 {
+    public record ActionRecord(
+        Func<IServiceScope, DataUpdateFlags, Task<DataActionPayload>> ActionFn,
+        DataActionPayload Payload
+    );
+
     private string DbFolderPath => settingsService.GetSettings().SettingsMutable.DB_PATH;
     public string MainDbPath => Path.Combine(DbFolderPath, "pkvault.db");
     public string SessionDbPath => Path.Combine(DbFolderPath, "pkvault-session.db");
@@ -35,13 +44,27 @@ public class SessionService(
     // bypass DB check if same as DB.ContextId
     private Guid? ByPassContextId = null;
 
+    public List<ActionRecord> Actions { get; } = [];
+
     public bool HasMainDb() => fileIOService.Exists(MainDbPath);
+
+    public List<DataActionPayload> GetActionPayloadList()
+    {
+        return [.. Actions.Select(action => action.Payload)];
+    }
+
+    public bool HasEmptyActionList()
+    {
+        return Actions.Count == 0;
+    }
 
     public async Task StartNewSession(bool checkInitialActions)
     {
         StartTime = timeProvider.GetUtcNow().DateTime;
 
         using var _ = LogUtil.Time("Starting new session");
+
+        Actions.Clear();
 
         var task = Task.Run(async () =>
         {
@@ -133,6 +156,8 @@ public class SessionService(
         await savesLoadersService.WriteToFiles();
         savesLoadersService.Clear();
 
+        Actions.Clear();
+
         await CloseConnection();
         StartTask = null;
 
@@ -186,6 +211,10 @@ public class SessionService(
 
         Console.WriteLine($"{pendingMigrations.Count()} pending migrations");
         Console.WriteLine($"{string.Join('\n', pendingMigrations)}");
+
+        // DB creation requires its directory to be created
+        fileIOService.CreateDirectoryIfAny(MainDbPath);
+        fileIOService.CreateDirectoryIfAny(SessionDbPath);
 
         // migrations may fail in publish-trimmed if columns names not defined
         await db.Database.MigrateAsync();

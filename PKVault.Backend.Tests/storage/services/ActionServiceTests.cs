@@ -5,16 +5,14 @@ using Moq;
 
 public class ActionServiceTests
 {
-    private readonly MockFileSystem mockFileSystem;
+    private readonly MockFileSystem mockFileSystem = new();
     private readonly IFileIOService fileIOService;
-    private readonly Mock<ISettingsService> mockSettingsService;
+    private readonly Mock<ISettingsService> mockSettingsService = new();
+    private readonly Mock<ISessionService> mockSessionService = new();
 
     public ActionServiceTests()
     {
-        mockFileSystem = new MockFileSystem();
         fileIOService = new FileIOService(mockFileSystem);
-
-        mockSettingsService = new();
     }
 
     private ActionService GetService(DateTime now, bool throwOnSessionPersist = false)
@@ -28,7 +26,6 @@ public class ActionServiceTests
         DataNormalizeAction.GetLegacyFilepaths("legacy")
             .ForEach(legacyPath => mockFileSystem.AddFile(legacyPath, "mock-legacy-data"));
 
-        Mock<ISessionService> mockSessionService = new();
         mockSessionService.Setup(x => x.MainDbPath).Returns("mock-main.db");
         if (throwOnSessionPersist)
         {
@@ -86,12 +83,12 @@ public class ActionServiceTests
             now: DateTime.Parse("2013-03-21 13:26:11")
         );
 
-        actionService.Actions.Add(
+        mockSessionService.Setup(x => x.Actions).Returns([
             new(
                 ActionFn: async (scope, flags) => new(DataActionType.DATA_NORMALIZE, []),
                 new(DataActionType.DATA_NORMALIZE, [])
             )
-        );
+        ]);
 
         var flags = await actionService.Save();
 
@@ -108,12 +105,13 @@ public class ActionServiceTests
             throwOnSessionPersist: true
         );
 
-        actionService.Actions.Add(
+
+        mockSessionService.Setup(x => x.Actions).Returns([
             new(
                 ActionFn: async (scope, flags) => new(DataActionType.DATA_NORMALIZE, []),
                 new(DataActionType.DATA_NORMALIZE, [])
             )
-        );
+        ]);
 
         await Assert.ThrowsAnyAsync<Exception>(actionService.Save);
 

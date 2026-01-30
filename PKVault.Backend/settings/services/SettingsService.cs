@@ -17,7 +17,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
     private ISaveService saveService => sp.GetRequiredService<ISaveService>();
-    private ActionService actionService => sp.GetRequiredService<ActionService>();
+    private ISessionService sessionService => sp.GetRequiredService<ISessionService>();
 
     private SettingsDTO? BaseSettings;
 
@@ -47,8 +47,8 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
         return BaseSettings with
         {
-            CanUpdateSettings = actionService.HasEmptyActionList(),
-            CanScanSaves = actionService.HasEmptyActionList()
+            CanUpdateSettings = sessionService.HasEmptyActionList(),
+            CanScanSaves = sessionService.HasEmptyActionList()
         };
     }
 
