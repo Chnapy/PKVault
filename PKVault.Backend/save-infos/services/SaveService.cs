@@ -81,7 +81,7 @@ public class SaveService : ISaveService
 
         var dirPath = Path.GetDirectoryName(path)!;
 
-        fileIOService.WriteBytes(path, save.GetSaveFileData());
+        await fileIOService.WriteBytes(path, save.GetSaveFileData());
 
         UpdateGlobalsWithSave(SaveById, SaveByPath, save, path);
 
@@ -107,7 +107,7 @@ public class SaveService : ISaveService
         var searchPaths = MatcherUtil.SearchPaths(globs);
 
         await Task.WhenAll(
-            searchPaths.Select(path => Task.Run(() => UpdateSaveFromPath(SaveById, SaveByPath, path)))
+            searchPaths.Select(path => UpdateSaveFromPath(SaveById, SaveByPath, path))
         );
 
         var memoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
@@ -117,7 +117,7 @@ public class SaveService : ISaveService
         return (SaveById, SaveByPath);
     }
 
-    private void UpdateSaveFromPath(
+    private async Task UpdateSaveFromPath(
         ConcurrentDictionary<uint, SaveWrapper> SaveById,
         ConcurrentDictionary<string, SaveWrapper> SaveByPath,
         string path)
@@ -132,7 +132,7 @@ public class SaveService : ISaveService
                 return;
             }
 
-            var data = fileIOService.ReadBytes(path);
+            var data = await fileIOService.ReadBytes(path);
             if (!SaveUtil.TryGetSaveFile(data, out var saveRaw, path))
                 return;
 

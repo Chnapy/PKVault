@@ -26,7 +26,7 @@ export const DexSyncAdvancedAction: React.FC<{
 
     const dexSyncMutation = useStorageDexSync();
 
-    const { handleSubmit, watch, setValue } = useForm<StorageDexSyncParams>({
+    const { handleSubmit, watch, setValue, formState } = useForm<StorageDexSyncParams>({
         defaultValues: {
             saveIds: [ saveId ],
         }
@@ -136,7 +136,7 @@ export const DexSyncAdvancedAction: React.FC<{
             {t('storage.dex-sync.description')}
         </div>
 
-        <Button type='submit' big bgColor={theme.bg.primary} disabled={saveIds.length < 2}>
+        <Button type='submit' big bgColor={theme.bg.primary} loading={formState.isSubmitting} disabled={saveIds.length < 2}>
             <Icon name='table' solid forButton />
             {t('action.submit')}
         </Button>

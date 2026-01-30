@@ -779,7 +779,7 @@ export const StorageMoveContext = {
                         pkmIds,
                         sourceSaveId: selected.saveId,
                         targetSaveId: saveId,
-                        targetBoxId: dropBoxId,
+                        targetBoxId: dropBoxId.toString(),
                         targetBoxSlots,
                         attached: selected.attached,
                     },

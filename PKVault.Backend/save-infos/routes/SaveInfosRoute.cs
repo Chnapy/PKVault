@@ -5,7 +5,9 @@ namespace PKVault.Backend.saveinfos.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SaveInfosController(DataService dataService, ISaveService saveService, ILoadersService loadersService) : ControllerBase
+public class SaveInfosController(
+    DataService dataService, ISaveService saveService, ISessionService sessionService
+) : ControllerBase
 {
     [HttpGet()]
     public async Task<ActionResult<Dictionary<uint, SaveInfosDTO>>> GetAll()
@@ -16,18 +18,18 @@ public class SaveInfosController(DataService dataService, ISaveService saveServi
     [HttpPut()]
     public async Task<ActionResult<DataDTO>> Scan()
     {
-        if (!loadersService.HasEmptyActionList())
+        if (!sessionService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }
 
         saveService.InvalidateSaves();
-        loadersService.InvalidateLoaders((maintainData: false, checkSaves: true));
+        await sessionService.StartNewSession(checkInitialActions: true);
 
         return await dataService.CreateDataFromUpdateFlags(new()
         {
             Saves = new() { All = true },
-            Dex = true,
+            Dex = new() { All = true },
             SaveInfos = true,
             Warnings = true,
         });
@@ -55,7 +57,7 @@ public class SaveInfosController(DataService dataService, ISaveService saveServi
     [HttpGet("{saveId}/download")]
     public async Task<ActionResult> Download(uint saveId)
     {
-        if (!loadersService.HasEmptyActionList())
+        if (!sessionService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }

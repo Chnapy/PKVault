@@ -67,7 +67,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
     idInt: -99,
     name: '',
     type: BoxType.Box,
-    slotCount: maxBoxSlotCount || 20,
+    slotCount: maxBoxSlotCount || 30,
     canReceivePkm: false,
   };
 

@@ -10,51 +10,55 @@ using System.IO.Abstractions;
 
 public interface IFileIOService
 {
-    public TValue ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue);
-    public TValue? ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo);
-    public Task<TValue?> ReadJSONFileAsync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo);
+    public Task<TValue> ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue);
+    public Task<TValue?> ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo);
+    public TValue ReadJSONFileSync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue);
     public IArchive ReadZip(string path);
-    public string ReadText(string path);
-    public byte[] ReadBytes(string path);
-    public void WriteBytes(string path, byte[] value);
-    public Task WriteJSONFileAsync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value);
-    public string WriteJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value);
-    public void WriteJSONGZipFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value);
+    public Task<string> ReadText(string path);
+    public Task<byte[]> ReadBytes(string path);
+    public byte[] ReadBytesSync(string path);
+    public Task WriteBytes(string path, byte[] value);
+    public Task WriteJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value);
+    public Task WriteJSONGZipFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value);
     public Task<Image<Rgba32>> ReadImage(string path);
     public (bool TooSmall, bool TooBig) CheckGameFile(string path);
     public bool Exists(string path);
     public DateTime GetLastWriteTime(string path);
     public DateTime GetLastWriteTimeUtc(string path);
+    public void Copy(string sourceFileName, string destFileName, bool overwrite);
+    public void Move(string sourceFileName, string destFileName, bool overwrite);
     public bool Delete(string path);
     public void CreateDirectory(string path);
+    public void CreateDirectoryIfAny(string path);
 }
 
 public class FileIOService(IFileSystem fileSystem) : IFileIOService
 {
-    public TValue ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue)
+    public TValue ReadJSONFileSync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue)
     {
-        return ReadJSONFile(path, jsonTypeInfo) ?? defaultValue;
+        if (!Exists(path))
+        {
+            return defaultValue;
+        }
+
+        var json = fileSystem.File.ReadAllText(path);
+
+        return JsonSerializer.Deserialize(json, jsonTypeInfo) ?? defaultValue;
     }
 
-    public TValue? ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo)
+    public async Task<TValue> ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue)
+    {
+        return await ReadJSONFile(path, jsonTypeInfo) ?? defaultValue;
+    }
+
+    public async Task<TValue?> ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo)
     {
         if (!Exists(path))
         {
             return default;
         }
 
-        string json = fileSystem.File.ReadAllText(path);
-        return JsonSerializer.Deserialize(json, jsonTypeInfo);
-    }
-
-    public async Task<TValue?> ReadJSONFileAsync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo)
-    {
-        if (!Exists(path))
-        {
-            return default;
-        }
-
-        var fileStream = fileSystem.File.OpenRead(path);
+        using var fileStream = fileSystem.File.OpenRead(path);
 
         return await JsonSerializer.DeserializeAsync(fileStream, jsonTypeInfo);
     }
@@ -66,24 +70,29 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
         return new Archive(zip, fileSystem);
     }
 
-    public string ReadText(string path)
+    public async Task<string> ReadText(string path)
     {
-        return fileSystem.File.ReadAllText(path);
+        return await fileSystem.File.ReadAllTextAsync(path);
     }
 
-    public byte[] ReadBytes(string path)
+    public Task<byte[]> ReadBytes(string path)
+    {
+        return fileSystem.File.ReadAllBytesAsync(path);
+    }
+
+    public byte[] ReadBytesSync(string path)
     {
         return fileSystem.File.ReadAllBytes(path);
     }
 
-    public void WriteBytes(string path, byte[] value)
+    public async Task WriteBytes(string path, byte[] value)
     {
         CreateDirectoryIfAny(path);
 
-        fileSystem.File.WriteAllBytes(path, value);
+        await fileSystem.File.WriteAllBytesAsync(path, value);
     }
 
-    public async Task WriteJSONFileAsync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value)
+    public async Task WriteJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value)
     {
         CreateDirectoryIfAny(path);
 
@@ -95,16 +104,7 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
         );
     }
 
-    public string WriteJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value)
-    {
-        CreateDirectoryIfAny(path);
-
-        string json = JsonSerializer.Serialize(value, jsonTypeInfo);
-        fileSystem.File.WriteAllText(path, json);
-        return json;
-    }
-
-    public void WriteJSONGZipFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value)
+    public async Task WriteJSONGZipFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value)
     {
         CreateDirectoryIfAny(path);
 
@@ -114,7 +114,7 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
         using var compressedFileStream = fileSystem.File.Create(path);
         using var compressionStream = new GZipStream(compressedFileStream, CompressionLevel.Optimal);
 
-        originalFileStream.CopyTo(compressionStream);
+        await originalFileStream.CopyToAsync(compressionStream);
     }
 
     public async Task<Image<Rgba32>> ReadImage(string path)
@@ -148,6 +148,16 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
         return fileSystem.File.GetLastWriteTimeUtc(path);
     }
 
+    public void Copy(string sourceFileName, string destFileName, bool overwrite)
+    {
+        fileSystem.File.Copy(sourceFileName, destFileName, overwrite);
+    }
+
+    public void Move(string sourceFileName, string destFileName, bool overwrite)
+    {
+        fileSystem.File.Move(sourceFileName, destFileName, overwrite);
+    }
+
     public bool Delete(string path)
     {
         if (Exists(path))
@@ -170,7 +180,7 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
         fileSystem.Directory.CreateDirectory(path);
     }
 
-    private void CreateDirectoryIfAny(string path)
+    public void CreateDirectoryIfAny(string path)
     {
         var directoryPath = Path.GetDirectoryName(path);
         if (!string.IsNullOrWhiteSpace(directoryPath))

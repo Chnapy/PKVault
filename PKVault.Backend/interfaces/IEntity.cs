@@ -1,4 +1,4 @@
-public abstract record IEntity(
-    int SchemaVersion,
-    string Id
-) : IWithId;
+public abstract class IEntity : IWithId
+{
+    public abstract string Id { get; init; }
+}

@@ -60,7 +60,7 @@ export const TestFillMainStorage: React.FC = () => {
                         const boxId = (
                             Object.values(createBoxResponse?.data.mainBoxes?.data ?? {}).find(box => box.name === boxName) ??
                             mainBoxes.data!.find(box => box.name === boxName)!
-                        ).idInt;
+                        ).id;
 
                         try {
                             await storageMovePkm({

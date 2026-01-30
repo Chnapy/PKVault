@@ -28,12 +28,18 @@
     <EffectiveMode>$([MSBuild]::ValueOrDefault('$(Mode)', 'default'))</EffectiveMode>
 
     <ModeDefine Condition=" '$(EffectiveMode)' == 'gen-pokeapi' ">MODE_GEN_POKEAPI</ModeDefine>
+    <ModeDefine Condition=" '$(EffectiveMode)' == 'gen-migration' ">MODE_GEN_MIGRATION</ModeDefine>
     <ModeDefine Condition=" '$(EffectiveMode)' == 'default' ">MODE_DEFAULT</ModeDefine>
 
     <DefineConstants>$(DefineConstants);$(ModeDefine)</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
     <PackageReference Include="PKHeX.Core" Version="26.01.07" />
     <PackageReference Include="PokeApiNet" Version="4.1.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />

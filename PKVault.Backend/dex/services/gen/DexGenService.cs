@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 {
-    public virtual bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData)
+    public virtual async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData, HashSet<ushort>? speciesSet)
     {
         // var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
 
@@ -13,6 +13,11 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
             .ForEach(pkm =>
             {
                 if (pkm.IsEgg)
+                {
+                    return;
+                }
+
+                if (speciesSet != null && !speciesSet.Contains(pkm.Species))
                 {
                     return;
                 }
@@ -33,6 +38,11 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
         for (ushort species = 1; species < save.MaxSpeciesID + 1; species++)
         {
+            if (speciesSet != null && !speciesSet.Contains(species))
+            {
+                continue;
+            }
+
             pkmBySpecies.TryGetValue(species, out var pkmList);
             var item = CreateDexItem(species, pkmList ?? [], staticData);
             if (!dex.TryGetValue(species, out var arr))
@@ -97,8 +107,10 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
                     return pkm.Form == form;
                 });
+                var isOwned = ownedPkms.Count > 0;
+                var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
 
-                var itemForm = GetDexItemFormComplete(species, ownedPkms, form, gender);
+                var itemForm = GetDexItemFormComplete(species, isOwned, isOwnedShiny, form, gender);
                 forms.Add(itemForm);
             });
         }
@@ -163,16 +175,16 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         ];
     }
 
-    public DexItemForm GetDexItemFormComplete(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender)
+    public DexItemForm GetDexItemFormComplete(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
     {
-        return GetDexItemForm(species, ownedPkms, form, gender) with
+        return GetDexItemForm(species, isOwned, isOwnedShiny, form, gender) with
         {
             Context = save.Context,
             Generation = save.Generation
         };
     }
 
-    protected abstract DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender);
+    protected abstract DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender);
 
-    public abstract void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught);
+    public abstract Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught);
 }

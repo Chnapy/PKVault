@@ -1,41 +1,43 @@
 
-public class DetachPkmSaveAction(string[] pkmVersionIds) : DataAction
+public record DetachPkmSaveActionInput(string[] pkmVersionIds);
+
+public class DetachPkmSaveAction(
+    IPkmVersionLoader pkmVersionLoader, ISavesLoadersService savesLoadersService
+) : DataAction<DetachPkmSaveActionInput>
 {
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(DetachPkmSaveActionInput input, DataUpdateFlags flags)
     {
-        if (pkmVersionIds.Length == 0)
+        if (input.pkmVersionIds.Length == 0)
         {
             throw new ArgumentException($"Pkm version ids cannot be empty");
         }
 
-        DataActionPayload act(string pkmVersionId)
+        async Task<DataActionPayload> act(string pkmVersionId)
         {
-            var pkmVersionEntity = loaders.pkmVersionLoader.GetEntity(pkmVersionId);
+            var pkmVersionEntity = await pkmVersionLoader.GetEntity(pkmVersionId);
             var oldSaveId = pkmVersionEntity!.AttachedSaveId;
             if (oldSaveId != null)
             {
-                loaders.pkmVersionLoader.WriteEntity(pkmVersionEntity with
-                {
-                    AttachedSaveId = null,
-                    AttachedSavePkmIdBase = null
-                });
+                pkmVersionEntity.AttachedSaveId = null;
+                pkmVersionEntity.AttachedSavePkmIdBase = null;
+                await pkmVersionLoader.UpdateEntity(pkmVersionEntity);
             }
 
-            var pkm = loaders.pkmVersionLoader.GetPkmVersionEntityPkm(pkmVersionEntity);
+            var pkm = await pkmVersionLoader.GetPKM(pkmVersionEntity);
 
             var pkmNickname = pkm.Nickname;
-            var saveExists = loaders.saveLoadersDict.TryGetValue(oldSaveId ?? 0, out var saveLoaders);
+            var saveLoaders = savesLoadersService.GetLoaders(oldSaveId ?? 0);
 
             return new(
                 type: DataActionType.DETACH_PKM_SAVE,
-                parameters: [saveExists ? saveLoaders.Save.Version : null, pkmNickname]
+                parameters: [saveLoaders?.Save.Version, pkmNickname]
             );
         }
 
         List<DataActionPayload> payloads = [];
-        foreach (var pkmVersionId in pkmVersionIds)
+        foreach (var pkmVersionId in input.pkmVersionIds)
         {
-            payloads.Add(act(pkmVersionId));
+            payloads.Add(await act(pkmVersionId));
         }
 
         return payloads[0];

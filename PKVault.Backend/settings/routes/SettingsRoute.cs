@@ -5,7 +5,7 @@ namespace PKVault.Backend.settings.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SettingsController(DataService dataService, ISettingsService settingsService, ILoadersService loadersService) : ControllerBase
+public class SettingsController(DataService dataService, ISettingsService settingsService, ISessionService sessionService) : ControllerBase
 {
     [HttpGet]
     public ActionResult<SettingsDTO> Get()
@@ -30,7 +30,7 @@ public class SettingsController(DataService dataService, ISettingsService settin
     public async Task<ActionResult<DataDTO>> Edit([BindRequired] SettingsMutableDTO settingsMutable)
     {
         var currentSettings = settingsService.GetSettings();
-        if (!loadersService.HasEmptyActionList() && currentSettings.SettingsMutable.LANGUAGE != null)
+        if (!sessionService.HasEmptyActionList() && currentSettings.SettingsMutable.LANGUAGE != null)
         {
             throw new InvalidOperationException($"Empty action list is required");
         }
@@ -54,8 +54,8 @@ public class SettingsController(DataService dataService, ISettingsService settin
             MainBanks = new() { All = true },
             MainBoxes = new() { All = true },
             MainPkmVersions = new() { All = true },
+            Dex = new() { All = true },
             Saves = new() { All = true },
-            Dex = true,
             SaveInfos = true,
             Backups = true,
             Settings = true,

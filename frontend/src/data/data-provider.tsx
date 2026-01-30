@@ -86,6 +86,30 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                                 } satisfies QueryDataBase);
                             };
 
+                            const applyDex = function (responseData: DataDTOState) {
+                                const queryKey = getDexGetAllQueryKey();
+
+                                const getData = () => {
+                                    if (responseData.all) {
+                                        return responseData.data ?? {};
+                                    }
+
+                                    const oldResponse: Partial<dexGetAllResponseSuccess> = client.getQueryData(queryKey) ?? {};
+                                    const oldData = oldResponse.data ?? {};
+
+                                    return Object.values({
+                                        ...oldData,
+                                        ...responseData.data,
+                                    }).filter(filterIsDefined);
+                                };
+
+                                client.setQueryData(queryKey, {
+                                    status: 200,
+                                    headers: new Headers(),
+                                    data: getData(),
+                                } satisfies QueryDataBase);
+                            };
+
                             const applyPkmLegalities = (saveId: number, pkmLegalitiesMap: DataDTOStateOfDictionaryOfStringAndPkmLegalityDTOData) => {
                                 Object.entries(pkmLegalitiesMap).forEach(([ pkmId, pkmLegality ]) => {
                                     const queryKey = getPkmLegalityQueryKey(pkmId, saveId);
@@ -109,10 +133,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                                 mainBanks,
                                 mainBoxes,
                                 mainPkmVersions,
+                                dex,
                                 mainPkmLegalities,
                                 saves,
                                 invalidateAllSaves,
-                                dex,
                                 actions,
                                 warnings,
                                 saveInfos,
@@ -145,6 +169,10 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
 
                             if (mainPkmVersions) {
                                 updatePkmVersionCache(client, mainPkmVersions);
+                            }
+
+                            if (dex) {
+                                applyDex(dex);
                             }
 
                             if (mainPkmLegalities) {
@@ -197,14 +225,6 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                                         applyPkmLegalities(saveData.saveId, saveData.savePkmLegality.data ?? {});
                                     }
                                 });
-                            }
-
-                            if (dex) {
-                                client.setQueryData(getDexGetAllQueryKey(), {
-                                    status: 200,
-                                    headers: new Headers(),
-                                    data: dex,
-                                } satisfies dexGetAllResponseSuccess);
                             }
 
                             if (actions) {

@@ -1,59 +1,60 @@
-public class MainUpdateBankAction(string bankId, string bankName, bool isDefault, int order, BankEntity.BankView view) : DataAction
+public record MainUpdateBankActionInput(string bankId, string bankName, bool isDefault, int order, BankEntity.BankView view);
+
+public class MainUpdateBankAction(
+    IBankLoader bankLoader, IBoxLoader boxLoader
+) : DataAction<MainUpdateBankActionInput>
 {
-    protected override async Task<DataActionPayload> Execute(DataEntityLoaders loaders, DataUpdateFlags flags)
+    protected override async Task<DataActionPayload> Execute(MainUpdateBankActionInput input, DataUpdateFlags flags)
     {
-        if (bankName.Length == 0)
+        if (input.bankName.Length == 0)
         {
             throw new ArgumentException($"Bank name cannot be empty");
         }
 
-        if (bankName.Length > 64)
+        if (input.bankName.Length > 64)
         {
             throw new ArgumentException($"Bank name cannot be > 64 characters");
         }
 
-        var bank = loaders.bankLoader.GetEntity(bankId);
+        var bank = await bankLoader.GetEntity(input.bankId);
 
-        if (bank!.IsDefault && !isDefault)
+        if (bank!.IsDefault && !input.isDefault)
         {
             throw new ArgumentException($"Bank is-default cannot be unset manually");
         }
 
-        if (!bank.IsDefault && isDefault)
+        if (!bank.IsDefault && input.isDefault)
         {
-            var otherDefaultBanks = loaders.bankLoader.GetAllEntities().Values.ToList().FindAll(b => b.Id != bankId && b.IsDefault);
+            var otherDefaultBanks = (await bankLoader.GetAllEntities()).Values.ToList().FindAll(b => b.Id != input.bankId && b.IsDefault);
 
-            otherDefaultBanks.ForEach(b =>
+            foreach (var b in otherDefaultBanks)
             {
-                loaders.bankLoader.WriteEntity(b with { IsDefault = false });
-            });
+                b.IsDefault = false;
+                await bankLoader.UpdateEntity(b);
+            }
 
-            bank = loaders.bankLoader.WriteEntity(bank with { IsDefault = isDefault });
+            bank.IsDefault = input.isDefault;
+            await bankLoader.UpdateEntity(bank);
         }
 
-        var relatedBoxesIds = loaders.boxLoader.GetAllEntities().Values.ToList()
-            .FindAll(box => box.BankId == bankId)
+        var relatedBoxesIds = (await boxLoader.GetEntitiesByBank(input.bankId)).Values
             .Select(box => box.IdInt).ToArray();
 
         // view check: only allow boxes attached to this bank
-        view = new(
-            MainBoxIds: [.. view.MainBoxIds.ToList().FindAll(id => relatedBoxesIds.Contains(id))],
-            Saves: view.Saves
+        BankEntity.BankView view = new(
+            MainBoxIds: [.. input.view.MainBoxIds.ToList().FindAll(id => relatedBoxesIds.Contains(id))],
+            Saves: input.view.Saves
         );
 
-        bank = loaders.bankLoader.WriteEntity(bank with
-        {
-            Name = bankName,
-            Order = order,
-            View = view
-        });
-
-        loaders.bankLoader.WriteEntity(bank);
-        loaders.bankLoader.NormalizeOrders();
+        bank.Name = input.bankName;
+        bank.Order = input.order;
+        bank.View = view;
+        await bankLoader.UpdateEntity(bank);
+        await bankLoader.NormalizeOrders();
 
         return new(
             type: DataActionType.MAIN_UPDATE_BANK,
-            parameters: [bankName, isDefault, view]
+            parameters: [input.bankName, input.isDefault, view]
         );
     }
 }

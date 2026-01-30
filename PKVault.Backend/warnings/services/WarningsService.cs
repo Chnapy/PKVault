@@ -1,7 +1,11 @@
 /**
  * Warnings checks in current session data.
  */
-public class WarningsService(ILoadersService loadersService, ISaveService saveService, IFileIOService fileIOService)
+public class WarningsService(
+    IServiceProvider sp,
+    ISaveService saveService, IFileIOService fileIOService,
+    ISessionService sessionService, ISavesLoadersService savesLoadersService
+)
 {
     private WarningsDTO? WarningsDTO = null;
 
@@ -17,7 +21,7 @@ public class WarningsService(ILoadersService loadersService, ISaveService saveSe
 
     public async Task<WarningsDTO> CheckWarnings()
     {
-        var logtime = LogUtil.Time($"Warnings check");
+        using var _ = LogUtil.Time($"Warnings check");
 
         var saveChangedWarnings = CheckSaveChangedWarnings();
         var pkmVersionWarnings = CheckPkmVersionWarnings();
@@ -29,8 +33,6 @@ public class WarningsService(ILoadersService loadersService, ISaveService saveSe
             SaveDuplicateWarnings: await saveDuplicateWarnings
         );
 
-        logtime();
-
         return WarningsDTO;
     }
 
@@ -38,18 +40,18 @@ public class WarningsService(ILoadersService loadersService, ISaveService saveSe
     {
         var warns = new List<SaveChangedWarning>();
 
-        var loaders = await loadersService.GetLoaders();
+        var startTime = sessionService.StartTime;
 
-        var startTime = loaders.startTime;
+        var savesLoaders = savesLoadersService.GetAllLoaders();
 
-        if (loaders.saveLoadersDict.Count == 0)
+        if (savesLoaders.Count == 0)
         {
             return [];
         }
 
         var saveByPath = await saveService.GetSaveByPath();
 
-        return [.. loaders.saveLoadersDict.Values
+        return [.. savesLoaders
             .Where(saveLoaders => saveLoaders.Boxes.HasWritten || saveLoaders.Pkms.HasWritten)
             .Where(saveLoaders =>
             {
@@ -68,37 +70,35 @@ public class WarningsService(ILoadersService loadersService, ISaveService saveSe
 
     private async Task<List<PkmVersionWarning>> CheckPkmVersionWarnings()
     {
+        using var scope = sp.CreateScope();
+        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+
         var warns = new List<PkmVersionWarning>();
 
-        var loaders = await loadersService.GetLoaders();
+        var attachedPkmVersions = await pkmVersionLoader.GetEntitiesAttached();
 
-        var pkms = loaders.pkmVersionLoader.GetAllEntities();
-
-        var tasks = pkms.Values.Select(pkmVersion =>
+        var tasks = attachedPkmVersions.Values.Select(attachedPkmVersion =>
         {
-            if (pkmVersion.AttachedSaveId != default)
+            var saveLoader = savesLoadersService.GetLoaders((uint)attachedPkmVersion.AttachedSaveId!);
+            if (saveLoader == null)
             {
-                var exists = loaders.saveLoadersDict.TryGetValue((uint)pkmVersion.AttachedSaveId!, out var saveLoader);
-                if (!exists)
-                {
-                    return new PkmVersionWarning(
-                        PkmVersionId: pkmVersion.Id
-                    );
-                }
+                return new PkmVersionWarning(
+                    PkmVersionId: attachedPkmVersion.Id
+                );
+            }
 
-                var save = saveLoader.Save;
-                var generation = save.Generation;
+            var save = saveLoader.Save;
+            var generation = save.Generation;
 
-                var savePkm = saveLoader.Pkms.GetDtosByIdBase(pkmVersion.AttachedSavePkmIdBase ?? "");
+            var savePkm = saveLoader.Pkms.GetDtosByIdBase(attachedPkmVersion.AttachedSavePkmIdBase ?? "");
 
-                if (savePkm == null)
-                {
-                    Console.WriteLine($"Pkm-version warning");
+            if (savePkm == null)
+            {
+                Console.WriteLine($"Pkm-version warning");
 
-                    return new PkmVersionWarning(
-                        PkmVersionId: pkmVersion.Id
-                    );
-                }
+                return new PkmVersionWarning(
+                    PkmVersionId: attachedPkmVersion.Id
+                );
             }
             return null;
         });
@@ -110,16 +110,16 @@ public class WarningsService(ILoadersService loadersService, ISaveService saveSe
 
     private async Task<List<SaveDuplicateWarning>> CheckSaveDuplicates()
     {
-        var loaders = await loadersService.GetLoaders();
+        var savesLoaders = savesLoadersService.GetAllLoaders();
 
-        if (loaders.saveLoadersDict.Count == 0)
+        if (savesLoaders.Count == 0)
         {
             return [];
         }
 
         var saveByPath = await saveService.GetSaveByPath();
 
-        var tasks = loaders.saveLoadersDict.Values.Select(async (saveLoader) =>
+        var tasks = savesLoaders.Select(async (saveLoader) =>
         {
             var paths = saveByPath.ToList()
                 .FindAll(entry => entry.Value.Id == saveLoader.Save.Id)

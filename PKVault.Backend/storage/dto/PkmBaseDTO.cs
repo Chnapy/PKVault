@@ -16,7 +16,7 @@ public abstract record PkmBaseDTO(
 ) : IWithId
 {
     public string IdBase => Pkm.GetPKMIdBase(Evolves);
-    public string BoxKey => PkmVersionLoader.GetEntityByBoxKey(BoxId, BoxSlot);
+    public string BoxKey => BoxId + "." + BoxSlot;
 
     public GameVersion Version => Pkm.Version;
     public EntityContext Context => Pkm.Context;

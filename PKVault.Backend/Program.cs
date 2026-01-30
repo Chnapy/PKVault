@@ -14,13 +14,22 @@ public class Program
     {
         LogUtil.Initialize();
 
+#if MODE_GEN_MIGRATION
+        if (!Microsoft.EntityFrameworkCore.EF.IsDesignTime)
+        {
+            await MigrationUtil.AddMigrationTrimmedCompatible(args[0]);
+            return;
+        }
+#endif
+
         var time = LogUtil.Time($"Setup backend load");
 
         Copyright();
 
-        var app = PrepareWebApp(5000);
+        var app = await PrepareWebApp(5000);
         var setupPostRun = await SetupData(app, args);
-        time();
+        time.Stop();
+
         if (setupPostRun != null)
         {
             var appTask = app.RunAsync();
@@ -29,7 +38,7 @@ public class Program
 
             await setupPostRun();
 
-            setupPostRunTime();
+            setupPostRunTime.Stop();
 
             await appTask;
         }
@@ -53,8 +62,8 @@ public class Program
         var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
 #if MODE_GEN_POKEAPI
-            await host.Services.GetRequiredService<GenStaticDataService>().GenerateFiles();
-            return null;
+        await host.Services.GetRequiredService<GenStaticDataService>().GenerateFiles();
+        return null;
 #elif MODE_DEFAULT
 
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
@@ -77,7 +86,7 @@ public class Program
         {
             await Task.WhenAll([
                 host.Services.GetRequiredService<ISaveService>().EnsureInitialized(),
-                host.Services.GetRequiredService<ILoadersService>().EnsureInitialized(),
+                host.Services.GetRequiredService<ISessionServiceMinimal>().EnsureSessionCreated(),
             ]);
         };
 #else
@@ -85,9 +94,16 @@ public class Program
 #endif
     }
 
-    public static WebApplication PrepareWebApp(int port)
+    public static async Task<WebApplication> PrepareWebApp(int port)
     {
         var builder = WebApplication.CreateBuilder([]);
+
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+        LogUtil.BuilderLoggingFilters.ForEach(filter =>
+        {
+            builder.Logging.AddFilter(filter.category, filter.level);
+        });
 
         ConfigureServices(builder.Services);
 
@@ -96,12 +112,17 @@ public class Program
         var settings = sp.GetRequiredService<ISettingsService>()
             .GetSettings();
 
-        var certificate = settings.GetHttpsCertPemPathPath() != null && settings.GetHttpsKeyPemPathPath() != null
-            ? X509Certificate2.CreateFromPem(
-                fileIOService.ReadText(settings.GetHttpsCertPemPathPath()!),
-                fileIOService.ReadText(settings.GetHttpsKeyPemPathPath()!)
-            )
-            : null;
+        X509Certificate2? GetCertificate()
+        {
+            var certPemPath = settings.GetHttpsCertPemPathPath();
+            var keyPemPath = settings.GetHttpsKeyPemPathPath();
+
+            return certPemPath != null && keyPemPath != null
+                ? X509Certificate2.CreateFromPem(certPemPath, keyPemPath)
+                : null;
+        }
+
+        var certificate = GetCertificate();
 
         builder.WebHost.ConfigureKestrel(serverOptions =>
         {
@@ -162,10 +183,19 @@ public class Program
         services.AddSingleton<GenStaticDataService>();
 #endif
 
+        services.AddSingleton(TimeProvider.System);
+
+        Console.WriteLine($"Setup services - DB");
+        services.AddDbContext<SessionDbContext>();
+
+        services.AddSingleton<ISessionService, SessionService>();
+        services.AddSingleton<ISessionServiceMinimal, ISessionService>(sp => sp.GetRequiredService<ISessionService>());   // use same instance as ISessionService
+        services.AddSingleton<IDbSeedingService, DbSeedingService>();
+
+        Console.WriteLine($"Setup services - Main");
         services.AddSingleton<IFileSystem>(new FileSystem());
         services.AddSingleton<IFileIOService, FileIOService>();
         services.AddSingleton<StaticDataService>();
-        services.AddSingleton<ILoadersService, LoadersService>();
         services.AddSingleton<StorageQueryService>();
         services.AddSingleton<ActionService>();
         services.AddSingleton<MaintenanceService>();
@@ -177,6 +207,35 @@ public class Program
         services.AddSingleton<DataService>();
         services.AddSingleton<PkmConvertService>();
         services.AddSingleton<PkmLegalityService>();
+
+        Console.WriteLine($"Setup services - Actions");
+        services.AddScoped<DataNormalizeAction>();
+        services.AddScoped<SynchronizePkmAction>();
+        services.AddScoped<MainCreateBoxAction>();
+        services.AddScoped<MainUpdateBoxAction>();
+        services.AddScoped<MainDeleteBoxAction>();
+        services.AddScoped<MainCreateBankAction>();
+        services.AddScoped<MainUpdateBankAction>();
+        services.AddScoped<MainDeleteBankAction>();
+        services.AddScoped<MovePkmAction>();
+        services.AddScoped<MovePkmBankAction>();
+        services.AddScoped<MainCreatePkmVersionAction>();
+        services.AddScoped<EditPkmVersionAction>();
+        services.AddScoped<EditPkmSaveAction>();
+        services.AddScoped<DetachPkmSaveAction>();
+        services.AddScoped<DeletePkmVersionAction>();
+        services.AddScoped<SaveDeletePkmAction>();
+        services.AddScoped<EvolvePkmAction>();
+        services.AddScoped<SortPkmAction>();
+        services.AddScoped<DexSyncAction>();
+
+        Console.WriteLine($"Setup services - Loaders");
+        services.AddScoped<IBankLoader, BankLoader>();
+        services.AddScoped<IBoxLoader, BoxLoader>();
+        services.AddScoped<IPkmVersionLoader, PkmVersionLoader>();
+        services.AddScoped<IPkmFileLoader, PkmFileLoader>();
+        services.AddScoped<IDexLoader, DexLoader>();
+        services.AddSingleton<ISavesLoadersService, SavesLoadersService>();   // singleton for perf reasons
 
 #if DEBUG && MODE_DEFAULT
         services.AddEndpointsApiExplorer();
@@ -199,6 +258,8 @@ public class Program
             };
         });
 #endif
+
+        Console.WriteLine($"Setup services - Finished");
     }
 
     public static void ConfigureAppBuilder(IApplicationBuilder app, bool useHttps)

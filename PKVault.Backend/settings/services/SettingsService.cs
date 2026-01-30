@@ -17,23 +17,24 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
     private ISaveService saveService => sp.GetRequiredService<ISaveService>();
-    private ILoadersService loadersService => sp.GetRequiredService<ILoadersService>();
+    private ISessionService sessionService => sp.GetRequiredService<ISessionService>();
 
     private SettingsDTO? BaseSettings;
 
     public async Task UpdateSettings(SettingsMutableDTO settingsMutable)
     {
-        var text = fileIOService.WriteJSONFile(
+        var sessionService = sp.GetRequiredService<ISessionService>();
+
+        await fileIOService.WriteJSONFile(
             FilePath,
             SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
             settingsMutable
         );
-        Console.WriteLine(text);
 
         BaseSettings = ReadBaseSettings();
 
         saveService.InvalidateSaves();
-        loadersService.InvalidateLoaders((maintainData: true, checkSaves: true));
+        await sessionService.StartNewSession(checkInitialActions: true);
     }
 
     // Full settings
@@ -46,8 +47,8 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
         return BaseSettings with
         {
-            CanUpdateSettings = loadersService.HasEmptyActionList(),
-            CanScanSaves = loadersService.HasEmptyActionList()
+            CanUpdateSettings = sessionService.HasEmptyActionList(),
+            CanScanSaves = sessionService.HasEmptyActionList()
         };
     }
 
@@ -62,7 +63,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private SettingsDTO ReadBaseSettings()
     {
-        var mutableDto = fileIOService.ReadJSONFile(
+        var mutableDto = fileIOService.ReadJSONFileSync(
             FilePath,
             SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
             GetDefaultSettingsMutable()

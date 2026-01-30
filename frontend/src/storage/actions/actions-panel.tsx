@@ -23,11 +23,13 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
 
     const actions = actionsQuery.data?.data ?? [];
 
+    const shouldBeReduced = actions.length === 0;
+
     React.useEffect(() => {
-        if (expanded && actions.length === 0) {
+        if (expanded && shouldBeReduced) {
             setExpanded(false);
         }
-    }, [ actions.length, expanded ]);
+    }, [ shouldBeReduced, expanded ]);
 
     const nbrSelectedActions = actionIndexToRemoveFrom === undefined ? 0 : (actions.length - actionIndexToRemoveFrom);
 

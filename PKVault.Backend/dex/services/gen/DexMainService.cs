@@ -1,28 +1,40 @@
 using PKHeX.Core;
 
-public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveFile.Default)
+public class DexMainService(
+    IServiceProvider sp
+) : DexGenService(FakeSaveFile.Default)
 {
-    public override bool UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData)
+    public override async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData, HashSet<ushort>? speciesSet)
     {
-        var ownedPkmsBySpecies = loaders.pkmVersionLoader.GetAllDtos()
-            .GroupBy(dto => dto.Species)
-            .ToDictionary(dtos => dtos.First().Species, dtos => dtos.ToList());
+        using var _ = LogUtil.Time($"DexMainService.UpdateDexWithSave");
+
+        using var scope = sp.CreateScope();
+
+        var dexService = scope.ServiceProvider.GetRequiredService<DexService>();
+        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+        var dexLoader = scope.ServiceProvider.GetRequiredService<IDexLoader>();
 
         Dictionary<GameVersion, SaveWrapper> savesByVersion = [];
 
-        loaders.dexLoader.GetAllEntities().Values.ToList().ForEach(entity =>
+        var formsBySpecies = speciesSet == null
+            ? await dexLoader.GetEntitiesBySpecies()
+            : await dexLoader.GetEntitiesBySpecies(speciesSet);
+
+        for (ushort species = 1; species < (ushort)Species.MAX_COUNT; species++)
         {
-            ownedPkmsBySpecies.TryGetValue(entity.Species, out var pkmForms);
+            if (!formsBySpecies.TryGetValue(species, out var forms))
+            {
+                continue;
+            }
 
             var item = new DexItemDTO(
-                Id: GetDexItemID(entity.Species),
-                Species: entity.Species,
+                Id: GetDexItemID(species),
+                Species: species,
                 SaveId: FakeSaveFile.Default.ID32,
-                Forms: [.. entity.Forms.Select(form =>
+                Forms: [.. await Task.WhenAll(forms.Select(async form =>
                 {
-                    var pkmFormsFiltered = pkmForms?.FindAll(f => f.Form == form.Form
-                        && f.Gender == form.Gender
-                    ) ?? [];
+                    var isOwned = await pkmVersionLoader.HasEntityByForm(species, form.Form, form.Gender);
+                    var isOwnedShiny = isOwned && await pkmVersionLoader.HasEntityByFormShiny(species, form.Form, form.Gender);
 
                     var saveVersion = StaticDataService.GetSingleVersion(form.Version);
                     if (!savesByVersion.TryGetValue(saveVersion, out var save))
@@ -33,114 +45,108 @@ public class DexMainService(DataEntityLoaders loaders) : DexGenService(FakeSaveF
                         savesByVersion.Add(saveVersion, save);
                     }
 
-                    var saveDexService = DexService.GetDexService(save, loaders);
+                    var saveDexService = dexService.GetDexService(save);
                     var commonForm = saveDexService!.GetDexItemFormComplete(
-                        entity.Species,
-                        [.. pkmFormsFiltered.Select(pkmVersion => pkmVersion.Pkm)],
+                        species,
+                        isOwned,
+                        isOwnedShiny,
                         form.Form,
                         form.Gender
                     );
 
-                    return new DexItemForm(
-                        Form: form.Form,
-                        Context: commonForm.Context,
-                        Generation: commonForm.Generation,
-                        Gender: form.Gender,
-                        Types: commonForm.Types,
-                        Abilities: commonForm.Abilities,
-                        BaseStats: commonForm.BaseStats,
-                        IsSeen: form.IsCaught,
-                        IsSeenShiny: form.IsCaughtShiny,
-                        IsCaught: form.IsCaught,
-                        IsOwned: commonForm.IsOwned,
-                        IsOwnedShiny: commonForm.IsOwnedShiny
-                    );
-                })]
+                    return dexLoader.CreateDTO(form, commonForm);
+                }))]
             );
 
-            if (!dex.TryGetValue(entity.Species, out var arr))
+            if (!dex.TryGetValue(species, out var arr))
             {
                 arr = [];
-                dex.Add(entity.Species, arr);
+                dex.Add(species, arr);
             }
             arr[FakeSaveFile.Default.ID32] = item;
-        });
+        }
 
         return true;
     }
 
-    protected override DexItemForm GetDexItemForm(ushort species, List<ImmutablePKM> ownedPkms, byte form, Gender gender) => throw new NotImplementedException($"Should not be used");
+    protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
+        => throw new NotImplementedException($"Should not be used");
 
-    public override void EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
     {
-        EnableSpeciesForm(
+        await EnableSpeciesForm(
             default,
             species, form, gender, isCaught, false,
             createOnly: false
         );
     }
 
-    public void EnablePKM(ImmutablePKM pk, SaveWrapper? save = null, bool createOnly = false)
+    public async Task EnablePKM(ImmutablePKM pk, SaveWrapper? save = null, bool createOnly = false)
     {
         var version = save?.Version ?? pk.Version;
 
-        EnableSpeciesForm(
+        await EnableSpeciesForm(
             version,
-            pk.Species, pk.Form, (Gender)pk.Gender, true, pk.IsShiny,
+            pk.Species, pk.Form, pk.Gender, true, pk.IsShiny,
             createOnly
         );
     }
 
-    private void EnableSpeciesForm(
+    private async Task EnableSpeciesForm(
         GameVersion version,
         ushort species, byte form, Gender gender,
         bool isCaught, bool isCaughtShiny,
         bool createOnly
     )
     {
-        DexEntity entity = loaders.dexLoader.GetEntity(species.ToString()) ?? new(
-            SchemaVersion: loaders.dexLoader.GetLastSchemaVersion(),
-            Id: species.ToString(),
-            Species: species,
-            Forms: []
-        );
+        using var scope = sp.CreateScope();
+        var dexLoader = scope.ServiceProvider.GetRequiredService<IDexLoader>();
 
-        var entityForm = entity?.Forms.Find(f => f.Form == form && f.Gender == gender);
+        var id = DexLoader.GetId(species, form, gender);
 
-        if (createOnly && entityForm != null)
+        var entity = await dexLoader.GetEntity(id);
+        var needCreate = entity == null;
+
+        if (createOnly && !needCreate)
         {
             return;
         }
 
-        if (entityForm == null)
+        entity ??= new()
         {
-            entityForm = new(
-                Form: form,
-                Version: default,
-                Gender: gender,
-                IsCaught: false,
-                IsCaughtShiny: false
-            );
-            entity.Forms.Add(entityForm);
-        }
+            Id = id,
+            Species = species,
+            Form = form,
+            Version = default,
+            Gender = gender,
+            IsCaught = false,
+            IsCaughtShiny = false
+        };
 
         if (version != default)
         {
-            entityForm = entityForm with { Version = version };
+            entity.Version = version;
         }
 
         if (isCaught)
-            entityForm = entityForm with { IsCaught = true };
+            entity.IsCaught = true;
 
         if (isCaughtShiny)
-            entityForm = entityForm with { IsCaughtShiny = true };
+            entity.IsCaughtShiny = true;
 
         // write if caught only
-        if (!entityForm.IsCaught)
+        if (!entity.IsCaught)
         {
             return;
         }
 
-        loaders.dexLoader.WriteEntity(entity);
+        if (needCreate)
+        {
+            await dexLoader.AddEntity(entity);
+        }
+        else
+        {
+            await dexLoader.UpdateEntity(entity);
+        }
     }
 }

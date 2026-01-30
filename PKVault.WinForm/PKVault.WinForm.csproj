@@ -17,6 +17,9 @@
     <PublishTrimmed>true</PublishTrimmed>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
 
+    <!-- can be used for lib trimmed debug -->
+    <!-- <EnableTrimAnalyzer>true</EnableTrimAnalyzer> -->
+
     <WebView2LoaderPreference>Static</WebView2LoaderPreference>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 
