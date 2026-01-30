@@ -43,7 +43,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
     {
         var dbSet = await GetDbSet();
 
-        using var _ = LogUtil.Time($"{typeof(E)} - GetAllEntities");
+        // using var _ = LogUtil.Time($"{typeof(E)} - GetAllEntities");
 
         // Console.WriteLine($"{typeof(E).Name} - GetAllEntities - ContextId={db.ContextId}");
         return await dbSet
@@ -55,7 +55,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
     {
         var dbSet = await GetDbSet();
 
-        using var _ = LogUtil.Time($"{typeof(E)} - GetEntitiesByIds");
+        // using var _ = LogUtil.Time($"{typeof(E)} - GetEntitiesByIds");
 
         var found = await dbSet
             .Where(p => ids.Contains(p.Id))
@@ -81,7 +81,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
     {
         var dbSet = await GetDbSet();
 
-        using var _ = LogUtil.Time($"{typeof(E)} - GetEntity");
+        // using var _ = LogUtil.Time($"{typeof(E)} - GetEntity");
 
         return await dbSet.FindAsync(id);
     }
@@ -90,7 +90,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
     {
         var dbSet = await GetDbSet();
 
-        using var _ = LogUtil.Time($"{typeof(E)} - DeleteEntity");
+        // using var _ = LogUtil.Time($"{typeof(E)} - DeleteEntity");
 
         dbSet.Remove(entity);
 
@@ -98,16 +98,16 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         await db.SaveChangesAsync();
 
         flags.Ids.Add(entity.Id);
-        Console.WriteLine($"Deleted {typeof(E)} id={entity.Id}");
+        // Console.WriteLine($"Deleted {typeof(E)} id={entity.Id}");
     }
 
     public virtual async Task<E> AddEntity(E entity)
     {
-        Console.WriteLine($"{entity.GetType().Name} - Add id={entity.Id} - ContextId={db.ContextId}");
+        // Console.WriteLine($"{entity.GetType().Name} - Add id={entity.Id} - ContextId={db.ContextId}");
 
         var dbSet = await GetDbSet();
 
-        using var _ = LogUtil.Time($"{typeof(E)} - AddEntity");
+        // using var _ = LogUtil.Time($"{typeof(E)} - AddEntity");
 
         await dbSet.AddAsync(entity);
         // Console.WriteLine($"Context={db.ContextId}");
@@ -125,11 +125,11 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
             return entities;
         }
 
-        Console.WriteLine($"{typeof(E).Name} - Add multiple ({entities.Count()}) - ContextId={db.ContextId}");
+        // Console.WriteLine($"{typeof(E).Name} - Add multiple ({entities.Count()}) - ContextId={db.ContextId}");
 
         var dbSet = await GetDbSet();
 
-        using var _ = LogUtil.Time($"{typeof(E)} - AddEntities");
+        // using var _ = LogUtil.Time($"{typeof(E)} - AddEntities");
 
         await dbSet.AddRangeAsync(entities);
         await db.SaveChangesAsync();
@@ -144,7 +144,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
 
     public virtual async Task UpdateEntity(E entity)
     {
-        Console.WriteLine($"{entity.GetType().Name} - Update id={entity.Id} - ContextId={db.ContextId}");
+        // Console.WriteLine($"{entity.GetType().Name} - Update id={entity.Id} - ContextId={db.ContextId}");
 
         var dbSet = await GetDbSet();
 
@@ -200,7 +200,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
     {
         var dbSet = await GetDbSet();
 
-        using var _ = LogUtil.Time($"{typeof(E)} - Count");
+        // using var _ = LogUtil.Time($"{typeof(E)} - Count");
 
         return await dbSet.CountAsync();
     }

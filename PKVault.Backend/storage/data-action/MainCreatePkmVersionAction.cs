@@ -3,9 +3,9 @@ public class MainCreatePkmVersionActionInput(string pkmVersionId, byte generatio
     public string PkmVersionId => pkmVersionId;
     public byte Generation => generation;
 
-    // required to keep same generated PID between memory => file loaders
-    // because PID is randomly generated
-    public uint? CreatedPID = null;
+    // required to keep same generated PKM between memory => file loaders
+    // because PID, stats etc are randomly generated
+    public ImmutablePKM? CreatedPKM = null;
 }
 
 public class MainCreatePkmVersionAction(
@@ -40,8 +40,8 @@ public class MainCreatePkmVersionAction(
 
         var pkmOrigin = await pkmVersionLoader.GetPKM(pkmVersionOrigin);
 
-        var pkmConverted = pkmConvertService.GetConvertedPkm(pkmOrigin, input.Generation, input.CreatedPID);
-        input.CreatedPID = pkmConverted.PID;
+        var pkmConverted = input.CreatedPKM ?? pkmConvertService.GetConvertedPkm(pkmOrigin, input.Generation);
+        input.CreatedPKM = pkmConverted;
 
         await pkmVersionLoader.AddEntity(new(
             BoxId: pkmVersionOrigin.BoxId,

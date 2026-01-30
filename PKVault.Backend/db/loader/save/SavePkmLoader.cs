@@ -245,7 +245,7 @@ public class SavePkmLoader(
 
         var savePkmType = save.PKMType;
 
-        var pkm = pkmConvertService.GetConvertedPkm(dto.Pkm, save.GetBlankPKM().GetMutablePkm(), null);
+        var pkm = pkmConvertService.GetConvertedPkm(dto.Pkm, save.GetBlankPKM().GetMutablePkm());
         if (pkm == default)
         {
             throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetType()} to.type={savePkmType}");

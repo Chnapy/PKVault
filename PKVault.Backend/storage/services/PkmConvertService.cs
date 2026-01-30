@@ -8,7 +8,7 @@ using PKHeX.Core;
  */
 public class PkmConvertService(PkmLegalityService pkmLegalityService)
 {
-    public ImmutablePKM GetConvertedPkm(ImmutablePKM sourcePkm, uint generation, uint? intermediatePid)
+    public ImmutablePKM GetConvertedPkm(ImmutablePKM sourcePkm, uint generation)
     {
         PKM? blankPkm = generation switch
         {
@@ -28,10 +28,10 @@ public class PkmConvertService(PkmLegalityService pkmLegalityService)
             throw new Exception($"PKM case not found for generation={generation}");
         }
 
-        return GetConvertedPkm(sourcePkm, blankPkm, intermediatePid);
+        return GetConvertedPkm(sourcePkm, blankPkm);
     }
 
-    public ImmutablePKM GetConvertedPkm(ImmutablePKM sourcePkm, PKM blankPkm, uint? intermediatePid)
+    public ImmutablePKM GetConvertedPkm(ImmutablePKM sourcePkm, PKM blankPkm)
     {
         EntityConverter.AllowIncompatibleConversion = EntityCompatibilitySetting.AllowIncompatibleSane;
 
@@ -40,7 +40,7 @@ public class PkmConvertService(PkmLegalityService pkmLegalityService)
             throw new Exception($"PKM conversion not possible, origin PKM not compatible with generation={blankPkm.Format}");
         }
 
-        var intermediatePkm = GetIntermediatePkmConvert(sourcePkm, blankPkm.Format, intermediatePid);
+        var intermediatePkm = GetIntermediatePkmConvert(sourcePkm, blankPkm.Format);
 
         var converted = EntityConverter.TryMakePKMCompatible(
             intermediatePkm.GetMutablePkm(),
@@ -72,18 +72,18 @@ public class PkmConvertService(PkmLegalityService pkmLegalityService)
         return new(destPkm);
     }
 
-    private ImmutablePKM GetIntermediatePkmConvert(ImmutablePKM sourcePkm, uint generation, uint? intermediatePid)
+    private ImmutablePKM GetIntermediatePkmConvert(ImmutablePKM sourcePkm, uint generation)
     {
         // G1-2 to G3+
         if (sourcePkm.Format <= 2 && generation > 2)
         {
-            return GetIntermediateConvertG2ToG3(sourcePkm, intermediatePid);
+            return GetIntermediateConvertG2ToG3(sourcePkm);
         }
 
         return sourcePkm;
     }
 
-    private ImmutablePKM GetIntermediateConvertG2ToG3(ImmutablePKM sourcePkm, uint? intermediatePid)
+    private ImmutablePKM GetIntermediateConvertG2ToG3(ImmutablePKM sourcePkm)
     {
         var pkmIntermediate = EntityConverter.ConvertToType(sourcePkm.GetMutablePkm(), new PK3().GetType(), out var intermediateResult);
         Console.WriteLine($"Convert-intermediate result={intermediateResult}");
@@ -99,22 +99,13 @@ public class PkmConvertService(PkmLegalityService pkmLegalityService)
         //     pkmIntermediateHLang.HandlingTrainerLanguage = (byte)LanguageID.French;
         // }
 
-        // allow to keep same generated PID between memory => file loaders
-        // because PID is randomly generated
-        if (intermediatePid != null)
+        if (sourcePkm.IsShiny)
         {
-            pkmIntermediate.PID = (uint)intermediatePid;
+            CommonEdits.SetShiny(pkmIntermediate, Shiny.Random);
         }
         else
         {
-            if (sourcePkm.IsShiny)
-            {
-                CommonEdits.SetShiny(pkmIntermediate, Shiny.Random);
-            }
-            else
-            {
-                pkmIntermediate.SetPIDGender((byte)sourcePkm.Gender);
-            }
+            pkmIntermediate.SetPIDGender((byte)sourcePkm.Gender);
         }
 
         // pkmIntermediate.Origin
