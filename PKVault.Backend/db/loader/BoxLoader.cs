@@ -100,6 +100,8 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
             }
             currentOrder += OrderGap;
         }
+
+        await db.SaveChangesAsync();
     }
 
     protected override DbSet<BoxEntity> GetDbSetRaw() => db.Boxes;

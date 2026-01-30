@@ -111,6 +111,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
 
         await dbSet.AddAsync(entity);
         // Console.WriteLine($"Context={db.ContextId}");
+        await db.SaveChangesAsync();
 
         flags.Ids.Add(entity.Id);
 
@@ -131,6 +132,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         using var _ = LogUtil.Time($"{typeof(E)} - AddEntities");
 
         await dbSet.AddRangeAsync(entities);
+        await db.SaveChangesAsync();
 
         foreach (var entity in entities)
         {
@@ -150,6 +152,7 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
 
         dbSet.Update(entity);
         // Console.WriteLine($"Context={db.ContextId}");
+        await db.SaveChangesAsync();
 
         flags.Ids.Add(entity.Id);
     }

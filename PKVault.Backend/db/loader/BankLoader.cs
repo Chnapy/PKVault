@@ -70,6 +70,8 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
             }
             currentOrder += OrderGap;
         }
+
+        await db.SaveChangesAsync();
     }
 
     protected override DbSet<BankEntity> GetDbSetRaw() => db.Banks;

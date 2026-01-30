@@ -41,7 +41,7 @@ public class SynchronizePkmAction(
                     var savePkm = savePkms.Values.First();
                     var versionPkm = await pkmVersionLoader.GetPKM(pkmVersion);
 
-                    if (versionPkm.DynamicChecksum != savePkm.DynamicChecksum)
+                    if (versionPkm.IsEnabled && versionPkm.DynamicChecksum != savePkm.DynamicChecksum)
                     {
                         result.Add((pkmVersion.Id, pkmVersion.AttachedSavePkmIdBase));
                     }

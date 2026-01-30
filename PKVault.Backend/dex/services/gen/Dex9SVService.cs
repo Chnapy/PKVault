@@ -64,7 +64,7 @@ public class Dex9SVService(SAV9SV save) : DexGenService(save)
 
     public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
     {
-        if (!save.Personal.IsPresentInGame(species, form))
+        if (!save.Personal.IsPresentInGame(species, form) || species > save.MaxSpeciesID)
             return;
 
         byte formToUse = species == (ushort)Species.Alcremie
