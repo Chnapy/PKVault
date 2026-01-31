@@ -8,6 +8,7 @@ import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
 import { useActionDescription } from './hooks/use-action-description';
 import { DataActionType } from '../../data/sdk/model';
+import { css } from '@emotion/css';
 
 export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
@@ -45,21 +46,21 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
                 setActionIndexToRemoveFrom(undefined);
         }}
         title={<div
-            style={{
+            className={css({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 8,
-            }}
+            })}
         >
             <div
-                style={{
+                className={css({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 4,
                     padding: '0 4px',
-                }}
+                })}
             >
                 {expandIcon}
                 {t('storage.save-actions.title', { count: actions.length })}
@@ -72,11 +73,11 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
                     e.stopPropagation();
                     return saveMutation.mutateAsync();
                 }}
-                style={{
+                className={css({
                     margin: -4,
                     marginLeft: 'auto',
                     minWidth: 80,
-                }}
+                })}
             >
                 <Icon name='save' solid forButton />
                 {t('action.save')}
@@ -84,24 +85,24 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
         </div>}
     >
         <div
-            style={{
+            className={css({
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 8,
-            }}
+            })}
         >
-            <div style={{
+            <div className={css({
                 maxHeight: 300,
                 overflowY: 'auto',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 4,
-            }}>
-                <div style={{
+            })}>
+                <div className={css({
                     display: 'flex',
                     justifyContent: 'center',
                     gap: 4
-                }}>
+                })}>
                     <Icon name='info-circle' solid forButton />
                     {t('storage.save-actions.help')}
                 </div>
@@ -121,10 +122,10 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
 
                             return <tr key={i}>
                                 <td
-                                    style={{
+                                    className={css({
                                         width: '100%',
                                         textDecoration: isToRemove ? 'line-through' : undefined,
-                                    }}
+                                    })}
                                 >
                                     {getActionDescription(action)}
                                 </td>
@@ -156,9 +157,9 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
                         setActionIndexToRemoveFrom(undefined);
                     }}
                     bgColor={theme.bg.red}
-                    style={{
+                    className={css({
                         alignSelf: 'flex-end'
-                    }}
+                    })}
                 >
                     <Icon name='times' forButton />
                     {t('storage.save-actions.actions.delete', { count: nbrSelectedActions })}

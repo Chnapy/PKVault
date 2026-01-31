@@ -9,6 +9,7 @@ import { ShinyIcon } from '../icon/shiny-icon';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
 import { SaveCardContentSmall, type SaveCardContentSmallProps } from './save-card-content-small';
+import { css } from '@emotion/css';
 
 export type SaveCardContentFullProps = SaveCardContentSmallProps & {
     path: string;
@@ -44,14 +45,14 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
 
     return (
         <div
-            style={{
+            className={css({
                 position: 'relative',
                 display: "flex",
                 flexDirection: 'column',
                 borderRadius: 8,
                 background: theme.bg.blue,
                 textAlign: 'left',
-            }}
+            })}
         >
             <SaveCardContentSmall
                 id={id}
@@ -64,24 +65,24 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
             />
 
             <div
-                style={{
+                className={css({
                     flexGrow: 1,
-                }}
+                })}
             >
                 <TextContainer>
                     <PathLine>{path}</PathLine>
-                    {t('save.time')} <Icon name='clock' solid forButton /> <span style={{ color: theme.text.primary }}>{playTime}</span>
+                    {t('save.time')} <Icon name='clock' solid forButton /> <span className={css({ color: theme.text.primary })}>{playTime}</span>
                     <br />
-                    {t('save.dex')} <Icon name='eye' solid forButton /> <span style={{ color: theme.text.primary }}>{dexSeenCount}</span>{' '}
-                    <ItemImg item={staticData.itemPokeball.id} size={'1lh'} style={{ margin: -4 }} /> <span style={{ color: theme.text.primary }}>{dexCaughtCount}</span>
+                    {t('save.dex')} <Icon name='eye' solid forButton /> <span className={css({ color: theme.text.primary })}>{dexSeenCount}</span>{' '}
+                    <ItemImg item={staticData.itemPokeball.id} size={'1lh'} className={css({ margin: -4 })} /> <span className={css({ color: theme.text.primary })}>{dexCaughtCount}</span>
                     <br />
-                    {t('save.storage')} <Icon name='folder' solid forButton /> <span style={{ color: theme.text.primary }}>{ownedCount}</span>
+                    {t('save.storage')} <Icon name='folder' solid forButton /> <span className={css({ color: theme.text.primary })}>{ownedCount}</span>
                     {shinyCount > 0 && <>
-                        {' '} <ShinyIcon style={{ height: 16, margin: -4 }} /> <span style={{ color: theme.text.primary }}>{shinyCount}</span>
+                        {' '} <ShinyIcon className={css({ height: 16, margin: -4 })} /> <span className={css({ color: theme.text.primary })}>{shinyCount}</span>
                     </>}
 
                     {actions && (
-                        <span style={{ position: "absolute", right: -5, bottom: 0, display: 'flex', gap: 4 }}>
+                        <span className={css({ position: "absolute", right: -5, bottom: 0, display: 'flex', gap: 4 })}>
                             {actions}
                         </span>
                     )}
@@ -90,11 +91,11 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
 
             {onClose && <Button
                 onClick={onClose}
-                style={{
+                className={css({
                     position: 'absolute',
                     top: 0,
                     right: 0,
-                }}>
+                })}>
                 <Icon name='times' forButton />
             </Button>}
         </div>

@@ -1,5 +1,5 @@
 import type React from 'react';
-import { cx } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 
 import "@hackernoon/pixel-icon-library/fonts/iconfont.css";
 
@@ -14,16 +14,12 @@ export type IconProps = {
 export const Icon: React.FC<IconProps> = ({ name, solid, alt, forButton, ...rest }) => {
     return <i
         {...rest}
-        className={cx('hn', `hn-${name}${alt ? '-alt' : ''}${solid ? '-solid' : ''}`, rest.className)}
-        style={{
-            ...rest.style,
-            ...(forButton
-                ? {
-                    fontSize: '75%',
-                    lineHeight: '1lh',
-                    verticalAlign: 'middle',
-                }
-                : {})
-        }}
+        className={cx('hn', `hn-${name}${alt ? '-alt' : ''}${solid ? '-solid' : ''}`, {
+            [ css({
+                fontSize: '75%',
+                lineHeight: '1lh',
+                verticalAlign: 'middle',
+            }) ]: forButton
+        }, rest.className)}
     />;
 };

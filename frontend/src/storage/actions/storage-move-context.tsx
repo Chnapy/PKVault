@@ -9,6 +9,7 @@ import { useTranslate } from '../../translate/i18n';
 import { SizingUtil } from '../../ui/util/sizing-util';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { StorageSelectContext } from './storage-select-context';
+import { css } from '@emotion/css';
 
 type Context = {
     selected?: {
@@ -232,12 +233,12 @@ export const StorageMoveContext = {
                     return createPortal(
                         <div
                             ref={ref}
-                            style={{
+                            className={css({
                                 position: 'absolute',
                                 left: posDiff[ 0 ]! * 102,
                                 top: posDiff[ 1 ]! * 102,
                                 pointerEvents: 'none',
-                            }}
+                            })}
                         >
                             {element}
                         </div>,

@@ -4,6 +4,7 @@ import { useTranslate } from '../translate/i18n';
 import { Button } from '../ui/button/button';
 import { Splash } from '../ui/splash/splash';
 import { SplashData } from './splash-data';
+import { css } from '@emotion/css';
 
 export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
     const appStartTime = React.useRef(Date.now());
@@ -34,17 +35,17 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     return <Splash>
         <div
-            style={{
+            className={css({
                 textAlign: 'center',
-            }}
+            })}
         >Choose prefered language</div>
         <div
-            style={{
+            className={css({
                 marginTop: 8,
                 display: 'flex',
                 justifyContent: 'center',
                 gap: 8,
-            }}
+            })}
         >
             <Button big onClick={() => settingsEditMutation.mutateAsync({
                 data: {

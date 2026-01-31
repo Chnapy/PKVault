@@ -9,6 +9,7 @@ import { TitledContainer } from '../../ui/container/titled-container';
 import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
 import { useDesktopMessage } from '../save-globs/hooks/use-desktop-message';
+import { css } from '@emotion/css';
 
 export const Backup: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
@@ -44,12 +45,12 @@ export const Backup: React.FC = withErrorCatcher('default', () => {
                 isDirectory: true,
                 path: settings.settingsMutable.backuP_PATH
             })}
-            style={{
+            className={css({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
                 cursor: 'pointer',
-            }}
+            })}
         >
             {title}
 
@@ -57,24 +58,24 @@ export const Backup: React.FC = withErrorCatcher('default', () => {
         </div>
         : title}>
 
-        <div style={{
+        <div className={css({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 4,
             marginBottom: 4,
-        }}>
+        })}>
             <Icon name='info-circle' solid forButton />
             {t('settings.backups.help')}
         </div>
 
         <div
-            style={{
+            className={css({
                 display: 'flex',
                 gap: 8,
                 alignItems: 'flex-start',
                 flexWrap: 'wrap'
-            }}
+            })}
         >
 
             {days.map(day => {
@@ -82,27 +83,27 @@ export const Backup: React.FC = withErrorCatcher('default', () => {
 
                 return <Container
                     key={day}
-                    style={{
+                    className={css({
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 4,
                         padding: 8,
                         maxHeight: 300,
                         overflowY: 'auto',
-                    }}
+                    })}
                 >
                     <div
-                        style={{
+                        className={css({
                             textAlign: 'center',
                             marginBottom: 8,
-                        }}
+                        })}
                     >{day}</div>
 
-                    {dayBackups.map(backup => <div key={backup.createdAt} style={{
+                    {dayBackups.map(backup => <div key={backup.createdAt} className={css({
                         display: 'flex',
                         alignItems: 'center',
                         gap: 4
-                    }}>
+                    })}>
                         <span
                             role='button'
                             onClick={desktopMessage
@@ -113,11 +114,11 @@ export const Backup: React.FC = withErrorCatcher('default', () => {
                                     path: backup.filepath,
                                 }))
                                 : undefined}
-                            style={{
+                            className={css({
                                 flexGrow: 1,
                                 marginRight: 16,
                                 cursor: desktopMessage ? 'pointer' : undefined,
-                            }}
+                            })}
                         >{renderTime(new Date(backup.createdAt))}</span>
 
                         <ButtonWithConfirm onClick={() => backupRestoreMutation.mutateAsync({

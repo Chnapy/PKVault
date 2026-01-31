@@ -3,6 +3,7 @@ import { useTranslate } from '../translate/i18n';
 import { ButtonExternalLink } from '../ui/button/button';
 import { Icon } from '../ui/icon/icon';
 import { useCheckUpdate } from './hooks/use-check-update';
+import { css } from '@emotion/css';
 
 export const HasUpdateWarning: React.FC = () => {
     const { t } = useTranslate();
@@ -18,7 +19,7 @@ export const HasUpdateWarning: React.FC = () => {
                 version: updateVersion
             })}
         </td>
-        <td style={{ verticalAlign: 'top' }}>
+        <td className={css({ verticalAlign: 'top' })}>
             <ButtonExternalLink href='https://projectpokemon.org/home/files/file/5766-pkvault/' target='__blank'>
                 <Icon name='external-link' solid forButton />
             </ButtonExternalLink>

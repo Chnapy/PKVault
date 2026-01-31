@@ -56,7 +56,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
             <Icon name='angle-down' forButton />
           </ListboxButton>
 
-          <ListboxOptions anchor="bottom" style={{ zIndex: 30 }}>
+          <ListboxOptions anchor="bottom" className={css({ zIndex: 30 })}>
             <TitledContainer
               contrasted
               title={null}
@@ -66,11 +66,11 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
                 <ListboxOption
                   key={value}
                   value={value}
-                  style={{
+                  className={css({
                     marginTop: i ? 2 : 0,
                     opacity: disabled ? 0.75 : undefined,
                     pointerEvents: disabled ? 'none' : undefined,
-                  }}
+                  })}
                   disabled={disabled}
                 >
                   <FilterLabel

@@ -11,6 +11,7 @@ import { TitledContainer } from '../ui/container/titled-container';
 import { Icon } from '../ui/icon/icon';
 import { theme } from '../ui/theme';
 import { filterIsDefined } from '../util/filter-is-defined';
+import { css } from '@emotion/css';
 
 const Saves: React.FC = withErrorCatcher('default', () => {
   const { t } = useTranslate();
@@ -32,7 +33,7 @@ const Saves: React.FC = withErrorCatcher('default', () => {
 
   return (
     <div
-      style={{
+      className={css({
         display: "flex",
         flexDirection: 'column',
         alignItems: "center",
@@ -40,15 +41,15 @@ const Saves: React.FC = withErrorCatcher('default', () => {
         maxWidth: 900,
         marginLeft: 'auto',
         marginRight: 'auto',
-      }}
+      })}
     >
       <div
-        style={{
+        className={css({
           display: 'flex',
           gap: 16,
           alignItems: 'flex-start',
           flexWrap: 'wrap'
-        }}
+        })}
       >
         {generations.map(generation => {
           const saves = saveInfos.filter(save => save.generation === generation);
@@ -60,12 +61,12 @@ const Saves: React.FC = withErrorCatcher('default', () => {
 
           return <TitledContainer key={generation} title={t('saves.title', { generation, regions: staticData.generations[ generation ]?.regions.join(', '), maxSpecies })}>
             <div
-              style={{
+              className={css({
                 display: 'flex',
                 gap: 8,
                 alignItems: 'flex-start',
                 flexWrap: 'wrap'
-              }}
+              })}
             >
               {saves.map(save => <SaveItem key={save.id} saveId={save.id} showDelete />)}
             </div>
@@ -73,13 +74,13 @@ const Saves: React.FC = withErrorCatcher('default', () => {
         })}
       </div>
 
-      <Container style={{
+      <Container className={css({
         display: 'flex',
         alignItems: 'center',
         gap: 4,
         backgroundColor: theme.bg.panel,
         padding: '8px 16px',
-      }}>
+      })}>
         <Icon name='info-circle' solid forButton />
         {t('saves.not-see')}
         <ButtonLink to={'/settings'}>

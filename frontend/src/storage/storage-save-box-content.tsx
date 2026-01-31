@@ -1,4 +1,4 @@
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 import { Popover, PopoverButton } from '@headlessui/react';
 import React from 'react';
 import { usePkmSaveIndex } from '../data/hooks/use-pkm-save-index';
@@ -27,10 +27,10 @@ export type StorageSaveBoxContentProps = {
   saveId: number;
   boxId: number;
   order: number;
-  style?: React.CSSProperties;
+  className?: string;
 };
 
-export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withErrorCatcher('default', ({ saveId, boxId, order, style }) => {
+export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withErrorCatcher('default', ({ saveId, boxId, order, className }) => {
   const [ showBoxes, setShowBoxes ] = React.useState(false);
 
   const { t } = useTranslate();
@@ -92,7 +92,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
     >
       <PopoverButton
         as={StorageBox}
-        style={style}
+        className={className}
         slotCount={selectedBox.slotCount}
         lineSlotCount={nbrItemsPerLine}
         loading={loading}
@@ -112,15 +112,14 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
                   {saveInfos && <SaveCardImg version={saveInfos.version} size={24} borderWidth={2} />}
 
                   <div
-                    className='save-item'
-                    style={{
+                    className={cx('save-item', css({
                       position: 'absolute',
                       top: 38,
                       left: 6,
                       zIndex: 5,
                       opacity: 0,
                       pointerEvents: 'none',
-                    }}
+                    }))}
                   >
                     <SaveItem saveId={saveId} />
                   </div>
@@ -250,7 +249,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
           <>
             {allItems.map((pkm, i) => {
               return (
-                <div key={i} style={{ order: i, display: 'flex' }}>
+                <div key={i} className={css({ order: i, display: 'flex' })}>
                   {!pkm ||
                     (moveContext.selected?.saveId === saveId && !moveContext.selected.target && moveContext.selected.ids.includes(pkm.id)) ? (
                     <StorageItemPlaceholder saveId={saveId} boxId={selectedBox.idInt} boxSlot={i} pkmId={pkm?.id} />

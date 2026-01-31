@@ -76,7 +76,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
 }) => {
   const { t } = useTranslate();
 
-  const renderBubble = (bgColor: string | undefined, children: React.ReactNode) => <div style={{
+  const renderBubble = (bgColor: string | undefined, children: React.ReactNode) => <div className={css({
     width: 20,
     height: 20,
     borderRadius: 99,
@@ -87,7 +87,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
     alignItems: 'center',
     justifyContent: 'center',
     fontWeight: 'bold'
-  }}>{children}</div>;
+  })}>{children}</div>;
 
   return (
     <ButtonWithDisabledPopover
@@ -99,15 +99,14 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
           opacity: 1,
         },
       })}
-      style={{
+      className={cx(css({
         backgroundColor: rest.disabled ? 'transparent' : theme.bg.light,
         borderColor: rest.disabled ? undefined : theme.text.default,
         position: 'relative',
         alignSelf: "flex-start",
         padding: 0,
         overflow: 'hidden',
-        ...rest.style,
-      }}
+      }), rest.className)}
       anchor={anchor}
       showHelp={!!helpTitle}
       helpTitle={helpTitle}
@@ -115,13 +114,11 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
         onCheck && !rest.disabled && !rest.loading && <div
           title={t('storage.actions.select.help')}
           className={cx('checkbox', css({
-            opacity: checked ? undefined : 0,
-          }))}
-          style={{
             position: 'absolute',
             top: 3,
             left: 3,
-          }}
+          }))}
+          style={{ opacity: checked ? undefined : 0 }}
         >
           <CheckboxInput
             checked={checked}
@@ -135,14 +132,14 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
       {heldItem > 0 && <ItemImg
         item={heldItem}
         size={small ? 15 : undefined}
-        style={{
+        className={css({
           position: 'absolute',
           bottom: 0,
           left: 0,
-        }}
+        })}
       />}
 
-      <div style={{
+      <div className={css({
         position: 'absolute',
         bottom: 2,
         right: 2,
@@ -151,25 +148,25 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
         flexDirection: 'column',
         alignItems: 'flex-end',
         gap: 2
-      }}>
+      })}>
         {isStarter && renderBubble(theme.bg.red, <Icon name='heart' solid forButton />)}
 
         {party !== undefined && renderBubble(theme.bg.green, party + 1)}
 
-        {level !== undefined && <div style={{
+        {level !== undefined && <div className={css({
           backgroundColor: 'rgba(255,255,255,0.4)',
           marginBottom: -4
-        }}>
+        })}>
           {small ? level : <DetailsLevel level={level} />}
         </div>}
 
         {hasDisabledVersion || nbrVersions > 1
-          ? <div style={{
+          ? <div className={css({
             display: 'flex',
             alignItems: 'center',
             gap: 2,
-          }}>
-            {hasDisabledVersion && renderBubble(undefined, <span style={{ color: theme.text.red }}>
+          })}>
+            {hasDisabledVersion && renderBubble(undefined, <span className={css({ color: theme.text.red })}>
               <Icon name='folder' solid forButton />
               <Icon name='exclaimation' solid forButton />
             </span>)}
@@ -179,7 +176,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
       </div>
 
       <div
-        style={{
+        className={css({
           position: 'absolute',
           top: 2,
           right: 2,
@@ -190,11 +187,11 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
           maxWidth: 72,
           flexWrap: 'wrap',
           justifyContent: 'flex-end',
-        }}
+        })}
       >
-        {isAlpha && <AlphaIcon style={{ height: small ? 15 : undefined }} />}
+        {isAlpha && <AlphaIcon className={small ? css({ height: 15 }) : undefined} />}
 
-        {isShiny && <ShinyIcon style={{ height: small ? 15 : undefined }} />}
+        {isShiny && <ShinyIcon className={small ? css({ height: 15 }) : undefined} />}
 
         {!canMoveOutside && renderBubble(theme.bg.red, <Icon name='logout' solid forButton />)}
 

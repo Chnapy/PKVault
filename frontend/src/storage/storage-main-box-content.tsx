@@ -22,8 +22,8 @@ import { StorageMainItem } from './storage-main-item';
 
 export const StorageMainBoxContent: React.FC<{
     boxId: number;
-    style?: React.CSSProperties;
-}> = withErrorCatcher('default', ({ boxId, style }) => {
+    className?: string;
+}> = withErrorCatcher('default', ({ boxId, className }) => {
     const [ showBoxes, setShowBoxes ] = React.useState(false);
 
     const { t } = useTranslate();
@@ -82,24 +82,24 @@ export const StorageMainBoxContent: React.FC<{
                 as={StorageBox}
                 loading={loading}
                 slotCount={selectedBox.slotCount}
-                style={style}
+                className={className}
                 header={
                     <>
                         <StorageHeader
                             gameLogo={
                                 <div
-                                    style={{
+                                    className={css({
                                         flex: 1,
                                         alignItems: 'center',
-                                    }}
+                                    })}
                                 >
                                     <img
                                         src='/logo.svg'
-                                        style={{
+                                        className={css({
                                             display: 'block',
                                             height: 24,
                                             width: 24,
-                                        }}
+                                        })}
                                     />
                                 </div>
                             }
@@ -204,7 +204,7 @@ export const StorageMainBoxContent: React.FC<{
                     <>
                         {allItems.map((pkm, i) => {
                             return (
-                                <div key={i} style={{ order: i, display: 'flex' }}>
+                                <div key={i} className={css({ order: i, display: 'flex' })}>
                                     {!pkm ||
                                         (moveContext.selected &&
                                             !moveContext.selected.saveId &&

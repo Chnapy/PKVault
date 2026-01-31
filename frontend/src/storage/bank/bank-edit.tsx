@@ -13,6 +13,7 @@ import { TextInput } from '../../ui/input/text-input';
 import { theme } from '../../ui/theme';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { BankContext } from './bank-context';
+import { css } from '@emotion/css';
 
 export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ bankId, close }) => {
     const { t } = useTranslate();
@@ -107,22 +108,22 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
         };
     }, [ queryClient ]);
 
-    return <form style={{
+    return <form className={css({
         display: 'flex',
         flexDirection: 'column',
         gap: 8
-    }} onSubmit={onSubmit}>
+    })} onSubmit={onSubmit}>
         <TextInput
             {...register('bankName', { setValueAs: (value) => value.trim(), minLength: 2, maxLength: 64 })}
         />
 
         <label
-            style={{
+            className={css({
                 display: 'flex',
                 gap: 4,
                 cursor: defaultDisabled ? 'not-allowed' : 'pointer',
                 userSelect: 'none',
-            }}
+            })}
         >
             <CheckboxInput
                 checked={watchIsDefault}
@@ -132,11 +133,11 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
         </label>
 
         <div
-            style={{
+            className={css({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between'
-            }}
+            })}
         >
             <Button
                 onClick={() => previousBank && setValue('order', previousBank.order - 5)}

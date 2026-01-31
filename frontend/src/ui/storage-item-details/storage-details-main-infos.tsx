@@ -2,6 +2,7 @@ import type React from 'react';
 import { DetailsMainInfos } from '../details-card/details-main-infos';
 import { TextInput } from '../input/text-input';
 import { StorageDetailsForm } from './storage-details-form';
+import { css } from '@emotion/css';
 
 export type StorageDetailsMainInfosProps = {
     idBase: string;
@@ -29,7 +30,7 @@ export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = (
         nickname={formContext.editMode
             ? <TextInput
                 {...formContext.register('nickname', { maxLength: nicknameMaxLength })}
-                style={{ display: 'inline-block', height: '1lh', width: 8 * nicknameMaxLength, padding: 0, textAlign: 'center' }}
+                className={css({ display: 'inline-block', height: '1lh', width: 8 * nicknameMaxLength, padding: 0, textAlign: 'center' })}
             />
             : nickname}
         types={types}

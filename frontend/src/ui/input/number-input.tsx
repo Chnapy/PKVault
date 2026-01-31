@@ -1,6 +1,6 @@
 import type React from 'react';
 import { theme } from '../theme';
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 
 export type NumberInputProps = {
     value?: number;
@@ -11,7 +11,7 @@ export type NumberInputProps = {
 
 export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, rangeMax, ...rest }) => {
     return <div
-        style={{
+        className={cx(css({
             color: theme.text.light,
             backgroundColor: theme.bg.darker,
             borderRadius: 4,
@@ -19,14 +19,12 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
             filter: theme.shadow.filter,
             overflow: 'hidden',
             verticalAlign: 'middle',
-            ...rest.style,
-        }}
+        }), rest.className)}
     >
         <input
             type="text"
             value={value}
-            {...rest}
-            style={{
+            className={css({
                 width: '100%',
                 color: theme.text.default,
                 backgroundColor: theme.bg.default,
@@ -37,7 +35,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
                 padding: '2px 4px',
                 textShadow: theme.shadow.text,
                 textAlign: rest.style?.textAlign,
-            }}
+            })}
         />
 
         {rangeMin !== undefined && rangeMax !== undefined &&

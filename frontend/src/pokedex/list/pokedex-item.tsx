@@ -7,6 +7,7 @@ import { DexFormItem, type DexItemProps } from "../../ui/dex-item/dex-item";
 import { getSpeciesNO } from '../../ui/dex-item/util/get-species-no';
 import { theme } from '../../ui/theme';
 import { withErrorCatcher } from '../../error/with-error-catcher';
+import { css } from '@emotion/css';
 
 export type PokedexItemProps = Pick<DexItemProps, 'species'> & {
   forms: Pick<DexItemForm, 'form' | 'context' | 'gender' | 'isSeen' | 'isSeenShiny' | 'isCaught' | 'isOwned' | 'isOwnedShiny'>[];
@@ -126,24 +127,24 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
       selected={selected}
       noDropshadow={!onClick}
       disabled={!onClick}
-      style={{
+      className={css({
         position: 'relative',
         alignSelf: "flex-start",
         padding: 0,
         borderColor: seen ? theme.text.default : undefined,
-      }}
+      })}
     >
       <div
-        style={{
+        className={css({
           display: 'flex',
           flexWrap: 'wrap',
-        }}
+        })}
       >
         {content}
       </div>
 
       <div
-        style={{
+        className={css({
           position: 'absolute',
           left: 0,
           top: 0,
@@ -154,7 +155,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
           backgroundColor: theme.bg.darker,
           color: theme.text.light,
           borderBottomRightRadius: 4,
-        }}
+        })}
       >
         <span>{getSpeciesNO(species)}</span>
       </div>

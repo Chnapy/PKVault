@@ -8,6 +8,7 @@ import { getSaveOrder } from '../storage/util/get-save-order';
 import { useTranslate } from '../translate/i18n';
 import { Button } from '../ui/button/button';
 import { Icon } from '../ui/icon/icon';
+import { css } from '@emotion/css';
 
 export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({ pkmVersionId }) => {
     const { t } = useTranslate();
@@ -38,7 +39,7 @@ export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({ pkmVersion
                     boxSlot: pkmVersion.boxSlot,
                 })}
             </td>
-            <td style={{ verticalAlign: 'top' }}>
+            <td className={css({ verticalAlign: 'top' })}>
                 <Button
                     onClick={() =>
                         navigate({

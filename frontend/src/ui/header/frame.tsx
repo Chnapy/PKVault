@@ -32,14 +32,14 @@ export const Frame: React.FC<React.PropsWithChildren> = ({ children }) => {
         })}
     >
         <div
-            style={{
+            className={css({
                 minHeight: '100%',
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "stretch",
                 gap: 16,
                 scrollbarColor: 'initial',
-            }}
+            })}
         >
             {children}
         </div>

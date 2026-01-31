@@ -23,13 +23,13 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
     <StorageSearchCheck>
       <StorageSelectContext.Provider>
         <StorageMoveContext.Provider>
-          <div style={{
+          <div className={css({
             display: 'flex',
             justifyContent: 'space-between',
-          }}>
+          })}>
             <div
               id={StorageMoveContext.containerId}
-              style={{
+              className={css({
                 display: 'flex',
                 justifyContent: "center",
                 alignItems: "flex-start",
@@ -37,7 +37,7 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
                 gap: 16,
                 margin: 'auto',
                 marginBottom: 150,
-              }}
+              })}
             >
               <BankList />
 
@@ -48,11 +48,11 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
                 .sort((a, b) => a.order < b.order ? -1 : 1)
                 .map(save => <StorageSaveBox key={save.saveId} saveId={save.saveId} />)}
 
-              <div style={{
+              <div className={css({
                 display: 'flex',
                 width: 630,
                 height: 564
-              }}>
+              })}>
                 <StorageSaveSelect />
               </div>
 

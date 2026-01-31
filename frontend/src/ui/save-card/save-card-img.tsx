@@ -2,6 +2,7 @@ import type React from 'react';
 import type { GameVersion } from '../../data/sdk/model';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { theme } from '../theme';
+import { css } from '@emotion/css';
 
 export const SaveCardImg: React.FC<{
     version: GameVersion;
@@ -13,7 +14,7 @@ export const SaveCardImg: React.FC<{
     return <img
         src={gameInfos.img}
         alt={"version-" + version}
-        style={{
+        className={css({
             imageRendering: typeof size === 'number' && (size % 64) === 0 ? "pixelated" : undefined,
             height: size,
             display: "block",
@@ -23,6 +24,6 @@ export const SaveCardImg: React.FC<{
             borderWidth: borderWidth,
             borderRadius: typeof size === 'number' ? ~~(size / 8) : 8,
             boxSizing: 'content-box',
-        }}
+        })}
     />;
 };

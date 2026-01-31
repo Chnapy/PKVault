@@ -9,6 +9,7 @@ import { filterIsDefined } from '../../util/filter-is-defined';
 import { usePokedexFilters } from "./hooks/use-pokedex-filters";
 import { PokedexCount } from './pokedex-count';
 import { PokedexItem, type PokedexItemProps } from "./pokedex-item";
+import { css } from '@emotion/css';
 
 export const PokedexList: React.FC = withErrorCatcher('default', () => {
   const { t } = useTranslate();
@@ -76,7 +77,7 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
 
   return (
     <div
-      style={{
+      className={css({
         display: "flex",
         flexDirection: 'column',
         justifyContent: "center",
@@ -84,7 +85,7 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
         overflow: "auto",
         flexWrap: "wrap",
         padding: 4,
-      }}
+      })}
     >
       <PokedexCount
         data={filteredSpeciesList}
@@ -97,7 +98,7 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
           <>
             {t('dex.list.title', { generation: i + 1, regions: staticData.generations[ i + 1 ]?.regions.join(', ') })}
 
-            <div style={{ float: 'right' }}>
+            <div className={css({ float: 'right' })}>
               <PokedexCount
                 data={filteredSpeciesList.filter(speciesValues => staticData.species[ speciesValues[ 0 ]?.species ?? -1 ]?.generation === i + 1)}
               />
@@ -105,12 +106,12 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
           </>
         }
       >
-        <div style={{
+        <div className={css({
           display: 'flex',
           justifyContent: 'center',
           flexWrap: 'wrap',
           gap: 8,
-        }}
+        })}
         >
           {genItems}
         </div>

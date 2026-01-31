@@ -24,19 +24,19 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid 
 
     return <>
         {nickname && <>{nickname}{' - '}</>}
-        <span style={{ color: theme.text.primary }}>{speciesName}</span>
+        <span className={css({ color: theme.text.primary })}>{speciesName}</span>
 
         <br />
-        <div style={{ display: 'flex', gap: 4, height: '1lh' }}>
+        <div className={css({ display: 'flex', gap: 4, height: '1lh' })}>
             {types.map(type => <TypeItem key={type} type={type} />)}
 
-            {(level !== undefined || eggHatchCount > 0) && <div style={{
+            {(level !== undefined || eggHatchCount > 0) && <div className={css({
                 flexGrow: 1,
                 color: theme.text.primary,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
-            }}>
+            })}>
                 {eggHatchCount > 0
                     ? <>
                         <Gauge
@@ -52,20 +52,20 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid 
                                 className={css({ marginLeft: 'auto' })}
                                 value={levelUpPercent}
                             />
-                            : <div style={{
+                            : <div className={css({
                                 flexGrow: 1,
-                            }} />}
+                            })} />}
 
                         <DetailsLevel level={level} />
                     </>}
             </div>}
         </div>
         <br />
-        {t('details.dex.local')}<span style={{ color: theme.text.primary }}>TODO</span>{' '}
-        {t('details.dex.natio')}<span style={{ color: theme.text.primary }}>{getSpeciesNO(species)}</span>
+        {t('details.dex.local')}<span className={css({ color: theme.text.primary })}>TODO</span>{' '}
+        {t('details.dex.natio')}<span className={css({ color: theme.text.primary })}>{getSpeciesNO(species)}</span>
         <br />
         {idBase !== undefined ? <>
-            {t('details.id')} <span style={{ color: theme.text.primary }}>{idBase}</span> {pid > 0 && <>{t('details.pid')} <span style={{ color: theme.text.primary }}>{pid}</span></>}
+            {t('details.id')} <span className={css({ color: theme.text.primary })}>{idBase}</span> {pid > 0 && <>{t('details.pid')} <span className={css({ color: theme.text.primary })}>{pid}</span></>}
         </> : ' '}
     </>;
 };

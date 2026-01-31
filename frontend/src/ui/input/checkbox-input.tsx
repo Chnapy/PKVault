@@ -1,5 +1,6 @@
 import React from 'react';
 import { theme } from '../theme';
+import { css } from '@emotion/css';
 
 export type CheckboxInputProps = {
     checked: boolean;
@@ -19,19 +20,19 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({ checked, indetermi
 
     return <div
         role='checkbox'
-        style={{
+        className={css({
             display: 'inline-flex'
-        }}
+        })}
         onClick={disabled ? undefined : onChange}>
         <input
             ref={ref}
             type='checkbox'
-            style={{
+            className={css({
                 width: '1lh',
                 height: '1lh',
                 accentColor: theme.bg.primary,
                 pointerEvents: 'none',
-            }}
+            })}
             checked={checked}
             readOnly
             disabled={disabled}

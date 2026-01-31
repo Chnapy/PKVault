@@ -1,4 +1,4 @@
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 import type React from 'react';
 import { theme } from '../theme';
 import { getTypeImg } from './util/get-type-img';
@@ -15,22 +15,20 @@ export const TypeItemBase: React.FC<TypeItemBaseProps> = ({ type, name, clickabl
 
     return <div
         {...rest}
-        className={css({
+        className={cx(css({
             backgroundColor: '#FFF',
             color: theme.text.default,
             position: 'relative',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
-            ...clickable
-                ? {
-                    cursor: 'pointer',
-                    '&:hover': {
-                        textDecoration: 'underline'
-                    }
+        }), {
+            [ css({
+                cursor: 'pointer',
+                '&:hover': {
+                    textDecoration: 'underline'
                 }
-                : undefined,
-            ...rest.style,
-        })}
+            }) ]: clickable
+        }, rest.className)}
     >
         <div
             className={css({
@@ -45,29 +43,29 @@ export const TypeItemBase: React.FC<TypeItemBaseProps> = ({ type, name, clickabl
         />
 
         <div
-            style={{
+            className={css({
                 position: 'relative',
                 display: 'flex',
                 alignItems: 'center',
-            }}
+            })}
         >
             <img
                 src={typeImg.img}
-                style={{
+                className={css({
                     height: 20,
                     width: 20,
                     backgroundColor: typeImg.color
-                }}
+                })}
             />
 
             <div
-                style={{
+                className={css({
                     flexGrow: 1,
                     padding: '0 4px',
                     textOverflow: 'clip',
                     overflow: 'hidden',
                     textAlign: 'left',
-                }}
+                })}
             >
                 {name}
             </div>

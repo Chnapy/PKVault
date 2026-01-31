@@ -5,7 +5,7 @@ import { TitledContainer, type TitledContainerProps } from '../container/titled-
 import { Icon } from '../icon/icon';
 import { SizingUtil } from '../util/sizing-util';
 
-export type StorageBoxProps = Pick<TitledContainerProps, 'ref' | 'style'> & {
+export type StorageBoxProps = Pick<TitledContainerProps, 'ref' | 'className'> & {
   header: React.ReactNode;
   loading?: boolean;
   slotCount?: number;
@@ -14,25 +14,25 @@ export type StorageBoxProps = Pick<TitledContainerProps, 'ref' | 'style'> & {
 
 export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
   ref,
+  className,
   header,
   loading,
   slotCount = 30,
   lineSlotCount = 6,
   children,
-  style,
 }) => {
   return (
     <TitledContainer
       ref={ref}
-      style={style}
+      className={className}
       title={
         <div
-          style={{
+          className={css({
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
             gap: 4,
-          }}
+          })}
         >
           {header}
         </div>
@@ -47,20 +47,20 @@ export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
             })}
           >
             <div
-              style={{
+              className={css({
                 display: 'grid',
                 gridTemplateColumns: `repeat(${lineSlotCount}, 1fr)`,
                 gap: SizingUtil.itemsGap,
                 maxHeight: SizingUtil.getMaxHeight(),
                 overflowY: 'visible',
                 margin: slotCount > 30 ? '0 -5px' : undefined,
-              }}
+              })}
             >
               {children}
             </div>
             {loading && (
               <div
-                style={{
+                className={css({
                   width: '100%',
                   height: '100%',
                   background: 'rgba(0, 0, 0, .1)',
@@ -71,7 +71,7 @@ export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 24,
-                }}
+                })}
               >
                 <Icon
                   name='spinner-third'

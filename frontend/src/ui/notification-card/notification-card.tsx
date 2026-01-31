@@ -11,6 +11,7 @@ import { Button } from '../button/button';
 import { TitledContainer } from '../container/titled-container';
 import { Icon } from '../icon/icon';
 import { theme } from '../theme';
+import { css } from '@emotion/css';
 
 export const NotificationCard: React.FC = () => {
     const { t } = useTranslate();
@@ -32,18 +33,18 @@ export const NotificationCard: React.FC = () => {
         contrasted
         maxHeight={300}
         title={title && <div
-            style={{
+            className={css({
                 display: 'flex',
                 justifyContent: 'center',
                 gap: 4,
-            }}
+            })}
         >
             <Icon name='angle-down' forButton />
             {title}
             <Icon name='angle-down' forButton />
         </div>}
     >
-        <table style={{ wordBreak: 'break-word' }}>
+        <table className={css({ wordBreak: 'break-word' })}>
             <tbody>
                 {hasUpdate && <HasUpdateWarning />}
 
@@ -59,21 +60,21 @@ export const NotificationCard: React.FC = () => {
                     return <tr key={i}>
                         <td>
                             <details>
-                                <summary style={{ cursor: 'pointer' }}>{error.message}</summary>
+                                <summary className={css({ cursor: 'pointer' })}>{error.message}</summary>
 
-                                <code style={{
+                                <code className={css({
                                     display: 'flex',
                                     fontSize: '75%',
                                     backgroundColor: theme.bg.contrastdark,
                                     padding: 4,
                                     maxHeight: 200,
                                     overflowY: 'auto',
-                                }}>
+                                })}>
                                     {error.stack}
                                 </code>
                             </details>
                         </td>
-                        <td style={{ verticalAlign: 'top' }}>
+                        <td className={css({ verticalAlign: 'top' })}>
                             <Button onClick={() => removeIndex(i)}>
                                 <Icon name='times' forButton />
                             </Button>

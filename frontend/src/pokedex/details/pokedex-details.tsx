@@ -19,6 +19,7 @@ import { theme } from '../../ui/theme';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { PokedexDetailsOwned } from './pokedex-details-owned';
 import { getGameInfos } from './util/get-game-infos';
+import { css, cx } from '@emotion/css';
 
 export const PokedexDetails: React.FC = () => {
   const { t } = useTranslate();
@@ -126,17 +127,17 @@ export const PokedexDetails: React.FC = () => {
 
   const baseStats = selectedForm.baseStats;
   const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);
-  const cellBaseStyle: React.CSSProperties = { padding: 0, textAlign: 'center' };
+  const cellBaseClassName = css({ padding: 0, textAlign: 'center' });
 
   return (
     <div>
       <div
-        style={{
+        className={css({
           display: 'flex',
           gap: '0 4px',
           padding: '0 8px',
           flexWrap: 'wrap-reverse',
-        }}
+        })}
       >
         {gameSaves.map((save, i) => (
           <DetailsTab
@@ -170,11 +171,11 @@ export const PokedexDetails: React.FC = () => {
               disabled={!selectedForm.isOwnedShiny}
             >
               <ShinyIcon
-                style={{
+                className={css({
                   width: '1lh',
                   height: '1lh',
                   filter: selectedShiny ? undefined : 'brightness(0) opacity(0.5)',
-                }}
+                })}
               />
             </ButtonLike>}
             genderPart={selectedFormGenders.length > 1
@@ -182,7 +183,7 @@ export const PokedexDetails: React.FC = () => {
                 onClick={() => setSelectedGender((selectedGender + 1) % selectedFormGenders.length as GenderType)}
                 disabled={!hasMultipleSeenGenders}
               >
-                <Gender gender={selectedGender} style={{ width: '1lh' }} />
+                <Gender gender={selectedGender} className={css({ width: '1lh' })} />
               </ButtonLike>
               : <Gender gender={selectedGender} />
             }
@@ -191,14 +192,14 @@ export const PokedexDetails: React.FC = () => {
         mainInfos={
           <DetailsMainInfos
             species={selectedSpecies}
-            speciesName={<div style={{ display: 'inline-flex', gap: 4 }}>
+            speciesName={<div className={css({ display: 'inline-flex', gap: 4 })}>
               {staticFormsFiltered.length <= 1 && speciesName}
-              {staticFormsFiltered.length > 1 && <span style={{
+              {staticFormsFiltered.length > 1 && <span className={css({
                 display: 'inline-flex',
                 flexDirection: 'row',
                 alignItems: 'flex-end',
                 marginTop: -3
-              }}>
+              })}>
                 <SelectNumberInput
                   data={staticFormsFiltered.map(staticForm => ({
                     value: staticForm.index,
@@ -208,11 +209,11 @@ export const PokedexDetails: React.FC = () => {
                   onChange={setSelectedFormIndex}
                   value={selectedFormIndex}
                   bgColor='transparent'
-                  style={{
+                  className={css({
                     height: '1lh',
                     color: 'inherit',
                     borderColor: 'currentcolor',
-                  }}
+                  })}
                 />
               </span>}
             </div>}
@@ -222,7 +223,7 @@ export const PokedexDetails: React.FC = () => {
         preContent={null}
         content={<>
           {selectedForm.abilities.length > 0 && <TextContainer>
-            <span style={{ color: theme.text.primary }}>{t('details.abilities')}</span><br />
+            <span className={css({ color: theme.text.primary })}>{t('details.abilities')}</span><br />
             {selectedForm.abilities.map(ability => <div key={ability}>{
               staticData.abilities[ ability ]?.name
             }</div>)}
@@ -230,26 +231,26 @@ export const PokedexDetails: React.FC = () => {
 
           <TextContainer>
             <table
-              style={{
+              className={css({
                 borderSpacing: '8px 0'
-              }}
+              })}
             >
               <thead>
                 <tr>
-                  <td style={cellBaseStyle}></td>
-                  <td style={cellBaseStyle}>{t('details.stats.base')}</td>
+                  <td className={cellBaseClassName}></td>
+                  <td className={cellBaseClassName}>{t('details.stats.base')}</td>
                 </tr>
               </thead>
               <tbody>
                 {[ t('details.stats.hp'), t('details.stats.atk'), t('details.stats.def'), t('details.stats.spa'), t('details.stats.spd'), t('details.stats.spe') ]
                   .map((statName, i) => <tr key={statName}>
-                    <td style={{ ...cellBaseStyle, textAlign: 'left' }}>{statName}</td>
-                    <td style={cellBaseStyle}>{baseStats[ i ]}</td>
+                    <td className={cx(cellBaseClassName, css({ textAlign: 'left' }))}>{statName}</td>
+                    <td className={cellBaseClassName}>{baseStats[ i ]}</td>
                   </tr>)}
 
                 <tr>
-                  <td style={{ ...cellBaseStyle, textAlign: 'left', textTransform: 'capitalize' }}>{t('total')}</td>
-                  <td style={cellBaseStyle}>{totalBaseStats}</td>
+                  <td className={cx(cellBaseClassName, css({ textAlign: 'left', textTransform: 'capitalize' }))}>{t('total')}</td>
+                  <td className={cellBaseClassName}>{totalBaseStats}</td>
                 </tr>
               </tbody>
             </table>

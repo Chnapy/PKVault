@@ -1,5 +1,6 @@
 import React from 'react';
 import { theme } from '../theme';
+import { css, cx } from '@emotion/css';
 
 export type TextInputProps = {
     value?: string;
@@ -10,7 +11,7 @@ export type TextInputProps = {
     & React.HTMLAttributes<HTMLInputElement | HTMLTextAreaElement>;
 
 export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onChange, label, area, ...rest }, ref) => {
-    const inputStyle: React.CSSProperties = {
+    const inputClassName = css({
         flexGrow: 1,
         height: '100%',
         width: '100%',
@@ -23,10 +24,10 @@ export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onCha
         padding: '2px 4px',
         textShadow: theme.shadow.text,
         opacity: rest.disabled ? 0.8 : undefined,
-    };
+    });
 
     return <label
-        style={{
+        className={cx(css({
             display: 'inline-flex',
             flexDirection: 'column',
             color: theme.text.light,
@@ -35,17 +36,16 @@ export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onCha
             filter: theme.shadow.filter,
             overflow: 'hidden',
             verticalAlign: 'middle',
-            ...rest.style,
-        }}
+        }), rest.className)}
     >
         {label && <div
-            style={{
+            className={css({
                 display: 'flex',
                 justifyContent: 'space-between',
                 padding: 4,
                 cursor: 'pointer',
                 textShadow: theme.shadow.textlight,
-            }}
+            })}
         >
             {label}
         </div>}
@@ -58,7 +58,7 @@ export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onCha
                 readOnly={!onChange}
                 spellCheck={false}
                 {...rest}
-                style={inputStyle}
+                className={inputClassName}
             />
             : <input
                 ref={ref}
@@ -68,7 +68,7 @@ export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onCha
                 readOnly={!onChange}
                 spellCheck={false}
                 {...rest}
-                style={inputStyle}
+                className={inputClassName}
             />
         }
 

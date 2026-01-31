@@ -117,7 +117,7 @@ const Root: React.FC = () => {
           </Header>
 
           <div
-            style={{
+            className={css({
               position: "relative",
               padding: 16,
               paddingTop: 0,
@@ -125,7 +125,7 @@ const Root: React.FC = () => {
               display: 'flex',
               alignItems: 'flex-start',
               justifyContent: 'center'
-            }}
+            })}
           >
             <ErrorCatcher>
               <Outlet />

@@ -10,6 +10,7 @@ import { CheckboxInput } from '../../ui/input/checkbox-input';
 import { SelectNumberInput } from '../../ui/input/select-input';
 import { theme } from '../../ui/theme';
 import { BoxTypeIcon } from '../box/box-type-icon';
+import { css } from '@emotion/css';
 
 export const SortAdvancedAction = {
     Main: ({ selectedBoxId, close }: { selectedBoxId: number; close: () => void }) => {
@@ -70,12 +71,12 @@ const InnerSortAdvancedAction: React.FC<{
     return (
         <form
             onSubmit={onSubmit}
-            style={{
+            className={css({
                 maxWidth: 350,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 8,
-            }}
+            })}
         >
             <SelectNumberInput
                 {...register('fromBoxId', { valueAsNumber: true })}
@@ -85,13 +86,13 @@ const InnerSortAdvancedAction: React.FC<{
                         value: box.idInt,
                         option: (
                             <div
-                                style={{
+                                className={css({
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     gap: 4,
                                     paddingLeft: 4,
-                                }}
+                                })}
                             >
                                 <BoxTypeIcon boxType={box.type} />
                                 {box.name}
@@ -112,13 +113,13 @@ const InnerSortAdvancedAction: React.FC<{
                         value: box.idInt,
                         option: (
                             <div
-                                style={{
+                                className={css({
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     gap: 4,
                                     paddingLeft: 4,
-                                }}
+                                })}
                             >
                                 <BoxTypeIcon boxType={box.type} />
                                 {box.name}
@@ -132,12 +133,12 @@ const InnerSortAdvancedAction: React.FC<{
             />
 
             <label
-                style={{
+                className={css({
                     display: 'flex',
                     gap: 4,
                     cursor: 'pointer',
                     userSelect: 'none',
-                }}
+                })}
             >
                 <CheckboxInput checked={watch('leaveEmptySlot')} onChange={() => setValue('leaveEmptySlot', !getValues('leaveEmptySlot'))} />{' '}
                 {t('storage.sort.empty-slot')}

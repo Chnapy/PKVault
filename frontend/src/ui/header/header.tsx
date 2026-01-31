@@ -1,21 +1,22 @@
 import type React from 'react';
 import { theme } from '../theme';
+import { css } from '@emotion/css';
 
 export const Header: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     return (
         <div
-            style={{
+            className={css({
                 display: 'flex',
                 marginBottom: 0,
                 alignItems: 'flex-start',
                 position: 'sticky',
                 top: 0,
                 zIndex: 10,
-            }}
+            })}
         >
             <div
-                style={{
+                className={css({
                     backgroundColor: theme.bg.contrast,
                     display: 'flex',
                     padding: 8,
@@ -24,34 +25,34 @@ export const Header: React.FC<React.PropsWithChildren> = ({ children }) => {
                     gap: 16,
                     zIndex: 1,
                     boxShadow: `0 2px 0 rgba(0,0,0,0.2)`,
-                }}
+                })}
             >
                 <img
                     src="/logo.svg"
-                    style={{
+                    className={css({
                         height: 48,
                         width: 48,
-                    }}
+                    })}
                 />
 
                 <div>
                     <div
-                        style={{
+                        className={css({
                             display: 'flex',
                             gap: 12
-                        }}
+                        })}
                     >
-                        <div style={{ backgroundColor: theme.game.red, borderRadius: 99, width: 12, height: 12 }} />
-                        <div style={{ backgroundColor: theme.game.yellow, borderRadius: 99, width: 12, height: 12 }} />
-                        <div style={{ backgroundColor: theme.game.emerald, borderRadius: 99, width: 12, height: 12 }} />
+                        <div className={css({ backgroundColor: theme.game.red, borderRadius: 99, width: 12, height: 12 })} />
+                        <div className={css({ backgroundColor: theme.game.yellow, borderRadius: 99, width: 12, height: 12 })} />
+                        <div className={css({ backgroundColor: theme.game.emerald, borderRadius: 99, width: 12, height: 12 })} />
                     </div>
                     <div
-                        style={{
+                        className={css({
                             fontSize: 24,
                             fontWeight: 'bold',
                             color: theme.text.light,
                             marginTop: 8,
-                        }}
+                        })}
                     >
                         PKVault
                     </div>
@@ -59,17 +60,17 @@ export const Header: React.FC<React.PropsWithChildren> = ({ children }) => {
             </div>
 
             <div
-                style={{
+                className={css({
                     overflow: 'hidden',
                     paddingLeft: 1,
                     marginLeft: -1,
                     marginRight: -150,
                     alignSelf: 'stretch',
                     flexShrink: 0,
-                }}
+                })}
             >
                 <div
-                    style={{
+                    className={css({
                         backgroundColor: theme.bg.contrast,
                         height: '100%',
                         width: 150,
@@ -77,12 +78,12 @@ export const Header: React.FC<React.PropsWithChildren> = ({ children }) => {
                         transformOrigin: 'bottom left',
                         boxShadow: `0 2px 0 rgba(0,0,0,0.1)`,
                         pointerEvents: 'none',
-                    }}
+                    })}
                 />
             </div>
 
             <div
-                style={{
+                className={css({
                     backgroundColor: theme.bg.contrastdark,
                     flexGrow: 1,
                     padding: 4,
@@ -97,7 +98,7 @@ export const Header: React.FC<React.PropsWithChildren> = ({ children }) => {
                     overflowX: 'auto',
                     whiteSpace: 'nowrap',
                     scrollbarColor: `${theme.bg.contrastdark} ${theme.bg.contrast}`,
-                }}
+                })}
             >
                 {children}
             </div>

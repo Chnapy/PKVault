@@ -3,6 +3,7 @@ import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
 import { TitledContainer } from '../container/titled-container';
 import { DetailsLevel } from '../details-card/details-level';
 import { Icon } from '../icon/icon';
+import { css } from '@emotion/css';
 
 export const StorageItemSaveActionsContainer: React.FC<
     React.PropsWithChildren<{
@@ -25,11 +26,11 @@ export const StorageItemSaveActionsContainer: React.FC<
             enableExpand
             title={
                 <div
-                    style={{
+                    className={css({
                         display: 'flex',
                         alignItems: 'center',
                         gap: 4,
-                    }}
+                    })}
                 >
                     <Icon name='angle-left' solid forButton />
                     {nickname} <DetailsLevel level={level} />

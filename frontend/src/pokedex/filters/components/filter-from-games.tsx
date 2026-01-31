@@ -6,6 +6,7 @@ import { useTranslate } from '../../../translate/i18n';
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
 import { filterIsDefined } from '../../../util/filter-is-defined';
 import { getGameInfos } from '../../details/util/get-game-infos';
+import { css } from '@emotion/css';
 
 export const FilterFromGames: React.FC = () => {
   const { t } = useTranslate();
@@ -23,17 +24,17 @@ export const FilterFromGames: React.FC = () => {
   const options = [
     {
       value: '0',
-      label: <div style={{
+      label: <div className={css({
         display: 'flex',
         alignItems: 'center',
         gap: 4,
-      }}>
+      })}>
         <img
           src={getGameInfos(null).img}
-          style={{
+          className={css({
             height: 14,
             width: 14,
-          }}
+          })}
         />
         PKVault
       </div>
@@ -45,17 +46,17 @@ export const FilterFromGames: React.FC = () => {
 
         return {
           value: save.id + "",
-          label: <div style={{
+          label: <div className={css({
             display: 'flex',
             alignItems: 'center',
             gap: 4,
-          }}>
+          })}>
             <img
               src={getGameInfos(save.version).img}
-              style={{
+              className={css({
                 height: 14,
                 width: 14,
-              }}
+              })}
             />
             {name} - {save.trainerName}
           </div>
@@ -79,10 +80,10 @@ export const FilterFromGames: React.FC = () => {
     >
       <img
         src={getGameInfos(null).img}
-        style={{
+        className={css({
           height: 14,
           width: 14,
-        }}
+        })}
       />
       {t('dex.filters.games')}
     </FilterSelect>

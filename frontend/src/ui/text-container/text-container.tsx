@@ -31,12 +31,12 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
           overflow: 'hidden',
           flexGrow: 1,
           display: 'flex',
-          ...rest.style,
-        })
+        }),
+        rest.className
       )}
     >
       <div
-        style={{
+        className={css({
           padding: forceScroll ? "0px 8px" : "3px 8px",
           backgroundColor: theme.bg.default,
           borderRadius: 4,
@@ -45,10 +45,10 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
           color: theme.text.default,
           overflowY: 'auto',
           maxHeight,
-        }}
+        })}
       >
         <div
-          style={{
+          className={cx(css({
             paddingLeft: 3,
             marginLeft: -2,
             backgroundImage: `linear-gradient(to right, ${theme.bg.default} 4px, transparent 1px), linear-gradient(${theme.border.lines} 1px, transparent 1px)`,
@@ -57,18 +57,19 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
             minHeight: "100%",
             position: "relative",
             whiteSpace: 'break-spaces',
-            ...noWrap ? {
+          }), {
+            [ css({
               whiteSpace: 'nowrap',
               overflowX: forceScroll ? 'scroll' : 'auto',
-            } : null
-          }}
+            }) ]: noWrap
+          })}
         >
           <div
-            style={{
+            className={css({
               display: "block",
               background: theme.bg.default,
               height: 1,
-            }}
+            })}
           />
           <ErrorCatcher>
             {children}

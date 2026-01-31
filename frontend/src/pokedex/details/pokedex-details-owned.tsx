@@ -11,6 +11,7 @@ import { useTranslate } from '../../translate/i18n';
 import { StorageItem } from '../../ui/storage-item/storage-item';
 import { TextContainer } from '../../ui/text-container/text-container';
 import { SizingUtil } from '../../ui/util/sizing-util';
+import { css } from '@emotion/css';
 
 export type PokedexDetailsOwnedProps = {
     saveId: number;
@@ -33,11 +34,11 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
             <div>{t('details.owned-save')}</div>
 
             <div
-                style={{
+                className={css({
                     display: 'flex',
                     flexWrap: 'wrap',
                     gap: SizingUtil.itemsGap,
-                }}
+                })}
             >
                 {saveId === 0 ? (
                     <>

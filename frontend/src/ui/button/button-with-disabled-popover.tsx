@@ -67,7 +67,7 @@ export const ButtonWithDisabledPopover = <AS extends ReactTag>({ loading, disabl
                 pointerEvents: 'none',
             })}
         >
-            <div style={{ maxWidth: 350, whiteSpace: 'break-spaces' }}>
+            <div className={css({ maxWidth: 350, whiteSpace: 'break-spaces' })}>
                 <TitledContainer
                     contrasted
                     title={helpTitle}

@@ -9,6 +9,7 @@ import { SelectNumberInput } from '../input/select-input';
 import { MoveItem } from '../move-item/move-item';
 import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
+import { css } from '@emotion/css';
 
 export type TextMovesProps = {
     saveId?: number;
@@ -119,21 +120,21 @@ export const TextMoves: React.FC<TextMovesProps> = ({
 
     return <>
         {ability > 0 && <>
-            {t('details.ability')} <span style={{ color: theme.text.primary }}>{
+            {t('details.ability')} <span className={css({ color: theme.text.primary })}>{
                 staticData.abilities[ ability ]?.name
             }</span>
             <br /><br />
         </>}
 
-        <span style={{ color: theme.text.primary }}>{t('details.moves')}</span>
+        <span className={css({ color: theme.text.primary })}>{t('details.moves')}</span>
         <br />
         <div
-            style={{
+            className={css({
                 display: 'flex',
                 flexWrap: 'wrap',
                 gap: 4,
                 paddingBottom: 14,
-            }}
+            })}
         >
             {editMode
                 ? <>
@@ -172,11 +173,11 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                                 key={item.value}
                                 value={item.value}
                                 disabled={item.disabled}
-                                style={item.disabled
-                                    ? {
+                                className={item.disabled
+                                    ? css({
                                         opacity: 0.5,
                                         cursor: 'not-allowed'
-                                    }
+                                    })
                                     : undefined
                                 }
                             >
@@ -184,12 +185,12 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                             </ListboxOption>}
                             anchor='left'
                             bgColor='transparent'
-                            style={{
+                            className={css({
                                 color: theme.text.default,
                                 borderColor: theme.border.default,
                                 flex: '1 1 0',
                                 minWidth: '35%'
-                            }}
+                            })}
                         />;
 
                     })}
@@ -207,21 +208,21 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                                 category={forGen.category}
                                 damage={forGen.power}
                                 isValid={movesLegality[ i ] ?? true}
-                                style={{
+                                className={css({
                                     flex: '1 1 0',
                                     minWidth: '35%'
-                                }}
+                                })}
                             />
                             : null;
                     })}
                 </>}
         </div>
         <div
-            style={{
+            className={css({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
-            }}
+            })}
         >
             {t('details.friendship')}
 

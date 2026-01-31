@@ -6,6 +6,7 @@ import { useTranslate } from '../../translate/i18n';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
 import { SaveCardImg } from './save-card-img';
+import { css } from '@emotion/css';
 
 export type SaveCardContentSmallProps = {
   id: number;
@@ -41,44 +42,44 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErr
 
   return (
     <div
-      style={{
+      className={css({
         display: "flex",
         borderRadius: 8,
         background: theme.bg.blue,
         alignItems: "flex-start",
         textAlign: 'left',
         overflow: 'hidden',
-      }}
+      })}
     >
       <SaveCardImg version={version} />
 
       <div
-        style={{
+        className={css({
           flexGrow: 1,
           overflow: 'hidden'
-        }}
+        })}
       >
-        <TextContainer noWrap forceScroll style={{
+        <TextContainer noWrap forceScroll className={css({
           paddingBottom: 0,
-        }}>
-          <span style={{ color: theme.text.red }}>{t('save.gen')} {generation}</span>
+        })}>
+          <span className={css({ color: theme.text.red })}>{t('save.gen')} {generation}</span>
           {" - "}
-          <span style={{ color: theme.text.primary }}>
+          <span className={css({ color: theme.text.primary })}>
             {t('save.pkm')} {staticData.versions[ version ]?.name}
           </span>
           {" - "}
-          <span style={{ color: theme.text.primary }}>{id}</span>
+          <span className={css({ color: theme.text.primary })}>{id}</span>
           <br />
 
           {tid > 0
             ? <>
               {t('save.ot')} {tid} -{" "}
-              <span style={{ color: theme.text.primary }}>{trainerName}</span>
+              <span className={css({ color: theme.text.primary })}>{trainerName}</span>
             </>
             : '-'}
 
           <br />
-          {t('save.sync')} <span style={{ color: theme.text.primary }}>{renderTimestamp()}</span>
+          {t('save.sync')} <span className={css({ color: theme.text.primary })}>{renderTimestamp()}</span>
         </TextContainer>
       </div>
     </div>
