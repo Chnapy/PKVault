@@ -1,8 +1,8 @@
 import type React from 'react';
-import { useTranslate } from '../translate/i18n';
-import { ButtonExternalLink } from '../ui/button/button';
-import { Icon } from '../ui/icon/icon';
-import { useCheckUpdate } from './hooks/use-check-update';
+import { useTranslate } from '../../translate/i18n';
+import { ButtonExternalLink } from '../../ui/button/button';
+import { Icon } from '../../ui/icon/icon';
+import { useCheckUpdate } from '../hooks/use-check-update';
 import { css } from '@emotion/css';
 
 export const HasUpdateWarning: React.FC = () => {

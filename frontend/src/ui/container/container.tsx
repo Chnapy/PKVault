@@ -80,8 +80,7 @@ export function Container<
   return (
     <Component
       className={cx(root(props), className)}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      {...(componentProps as any)}
+      {...componentProps}
     >
       {children}
     </Component>

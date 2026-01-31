@@ -1,13 +1,13 @@
 import type React from 'react';
-import { HistoryContext } from '../context/history-context';
-import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
-import type { PkmVersionWarning as PkmVersionWarningModel } from '../data/sdk/model';
-import { useStaticData } from '../hooks/use-static-data';
-import { Route } from '../routes/storage';
-import { getSaveOrder } from '../storage/util/get-save-order';
-import { useTranslate } from '../translate/i18n';
-import { Button } from '../ui/button/button';
-import { Icon } from '../ui/icon/icon';
+import { HistoryContext } from '../../context/history-context';
+import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
+import type { PkmVersionWarning as PkmVersionWarningModel } from '../../data/sdk/model';
+import { useStaticData } from '../../hooks/use-static-data';
+import { Route } from '../../routes/storage';
+import { getSaveOrder } from '../../storage/util/get-save-order';
+import { useTranslate } from '../../translate/i18n';
+import { Button } from '../../ui/button/button';
+import { Icon } from '../../ui/icon/icon';
 import { css } from '@emotion/css';
 
 export const PkmVersionWarning: React.FC<PkmVersionWarningModel> = ({ pkmVersionId }) => {

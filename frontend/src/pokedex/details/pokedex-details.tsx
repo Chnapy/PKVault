@@ -1,7 +1,6 @@
+import { css, cx } from '@emotion/css';
 import React from "react";
-import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
-import { EntityContext, Gender as GenderType } from '../../data/sdk/model';
-import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import { Gender as GenderType } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from "../../routes/pokedex";
 import { useTranslate } from '../../translate/i18n';
@@ -16,105 +15,43 @@ import { ShinyIcon } from '../../ui/icon/shiny-icon';
 import { SelectNumberInput } from '../../ui/input/select-input';
 import { TextContainer } from '../../ui/text-container/text-container';
 import { theme } from '../../ui/theme';
-import { filterIsDefined } from '../../util/filter-is-defined';
+import { usePokedexDetailsSelect } from './hooks/use-pokedex-details-select';
 import { PokedexDetailsOwned } from './pokedex-details-owned';
 import { getGameInfos } from './util/get-game-infos';
-import { css, cx } from '@emotion/css';
 
 export const PokedexDetails: React.FC = () => {
   const { t } = useTranslate();
 
-  const selectedSpecies = Route.useSearch({
-    select: (search) => search.selected,
-  });
   const navigate = Route.useNavigate();
 
   const staticData = useStaticData();
 
-  const dexGetAllQuery = useDexGetAll();
-  const saveInfosMainQuery = useSaveInfosGetAll();
+  const selectInfos = usePokedexDetailsSelect();
 
-  const [ selectedSaveIndex, setSelectedSaveIndex ] = React.useState(0);
-  const [ selectedFormIndex, setSelectedFormIndex ] = React.useState(0);
-  const [ selectedGender, setSelectedGender ] = React.useState<GenderType>(GenderType.Genderless);
-  const [ selectedShiny, setSelectedShiny ] = React.useState(false);
-
-  const savesRecord = saveInfosMainQuery.data?.data ?? {};
-  const speciesRecord = dexGetAllQuery.data?.data ?? {};
-
-  const speciesValues = Object.values(
-    speciesRecord[ selectedSpecies + "" ] ?? {}
-  );
-
-  const gameSaves = speciesValues
-    .filter((spec) => spec.forms.some(form => form.isSeen))
-    .map((spec) => spec.saveId === 0
-      // pkvault storage
-      ? {
-        id: 0,
-        context: EntityContext.Gen9a,
-        version: null,
-        trainerName: ''
-      }
-      : savesRecord[ spec.saveId ])
-    .filter(filterIsDefined);
-
-  const selectedSave = gameSaves[ selectedSaveIndex ] ?? gameSaves[ 0 ];
-  const selectedSpeciesValue = selectedSave && speciesValues.find(
-    (value) => value.saveId === selectedSave.id
-  )!;
-
-  const staticForms = selectedSpecies && selectedSave ? staticData.species[ selectedSpecies ]?.forms[ selectedSave.context ] ?? [] : [];
-  const staticFormsFiltered = staticForms
-    .map((staticForm, index) => ({ ...staticForm, index }))
-    .filter(staticForm => !staticForm.isBattleOnly);
-
-  const firstSeenForm = selectedSpeciesValue?.forms.find(form =>
-    form.isSeen && staticFormsFiltered.some(staticForm => staticForm.index === form.form)
-  )?.form;
-  const firstSeenGender = selectedSpeciesValue?.forms.find(form => form.form === firstSeenForm && form.isSeen)?.gender;
-
-  const selectedForm = selectedSpeciesValue?.forms.find(form =>
-    form.form === selectedFormIndex
-    && form.gender === selectedGender
-  );
-
-  React.useEffect(() => {
-    if (selectedSaveIndex > 0 && !gameSaves[ selectedSaveIndex ]) {
-      setSelectedSaveIndex(0);
-      setSelectedFormIndex(0);
-      setSelectedGender(GenderType.Genderless);
-      setSelectedShiny(false);
-    }
-  }, [ gameSaves, selectedSaveIndex ]);
-
-  React.useEffect(() => {
-    if (!selectedForm?.isSeen) {
-      setSelectedFormIndex(firstSeenForm ?? 0);
-      setSelectedGender(firstSeenGender ?? GenderType.Genderless);
-    }
-
-    if (!selectedForm?.isSeenShiny) {
-      setSelectedShiny(false);
-    }
-  }, [ firstSeenForm, firstSeenGender, selectedSpecies, selectedForm ]);
-
-  React.useEffect(() => {
-    if (selectedFormIndex > 0 && !selectedForm) {
-      setSelectedFormIndex(firstSeenForm ?? 0);
-      setSelectedGender(firstSeenGender ?? GenderType.Genderless);
-    }
-  }, [ selectedFormIndex, selectedForm, firstSeenGender, firstSeenForm ]);
-
-  if (!selectedSpecies || !gameSaves.length || !selectedSave || !selectedSpeciesValue) {
+  if (!selectInfos) {
     return null;
   }
 
-  const formObj = staticFormsFiltered.find(sf => sf.index === selectedFormIndex) ?? staticFormsFiltered[ 0 ];
+  const {
+    selectedSaveIndex,
+    selectedFormIndex,
+    selectedGender,
+    selectedShiny,
 
-  if (!selectedForm || !formObj) {
-    return null;
-  }
+    setSelectedSaveIndex,
+    setSelectedFormIndex,
+    setSelectedGender,
+    setSelectedShiny,
+
+    selectedSpecies,
+    selectedSave,
+    selectedForm,
+    selectedStaticFormWithIndex,
+    selectedSpeciesValue,
+
+    gameSaves,
+    staticFormsFiltered,
+  } = selectInfos;
 
   const selectedFormSimilars = selectedSpeciesValue.forms.filter(form => form.form === selectedFormIndex);
   const selectedFormGenders = selectedFormSimilars.map(form => form.gender);
@@ -123,7 +60,7 @@ export const PokedexDetails: React.FC = () => {
   const caught = selectedForm.isCaught;
   const owned = selectedShiny ? selectedForm.isOwnedShiny : selectedForm.isOwned;
 
-  const speciesName = formObj.name;
+  const speciesName = selectedStaticFormWithIndex.name;
 
   const baseStats = selectedForm.baseStats;
   const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);

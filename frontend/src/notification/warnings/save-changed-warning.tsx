@@ -1,8 +1,8 @@
 import type React from 'react';
-import type { SaveChangedWarning as SaveChangedWarningModel } from '../data/sdk/model';
-import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
-import { useStaticData } from '../hooks/use-static-data';
-import { useTranslate } from '../translate/i18n';
+import type { SaveChangedWarning as SaveChangedWarningModel } from '../../data/sdk/model';
+import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import { useStaticData } from '../../hooks/use-static-data';
+import { useTranslate } from '../../translate/i18n';
 
 export const SaveChangedWarning: React.FC<SaveChangedWarningModel> = ({ saveId }) => {
     const { t } = useTranslate();

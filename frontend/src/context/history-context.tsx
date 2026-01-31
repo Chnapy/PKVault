@@ -40,6 +40,9 @@ const getHistoryValue = (value: ContextValue, location: HistoryLocation) => {
     return value;
 };
 
+/**
+ * Keep history of navigation.
+ */
 export const HistoryContext = {
     Provider: ({ children }: React.PropsWithChildren) => {
         const history = useRouter().history;
