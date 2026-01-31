@@ -24,6 +24,5 @@ export const SaveChangedWarning: React.FC<SaveChangedWarningModel> = ({ saveId }
                 path: save.path,
             })}
         </td>
-        {/* <td style={{ verticalAlign: 'top' }}></td> */}
     </tr>;
 };

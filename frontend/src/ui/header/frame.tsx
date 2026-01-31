@@ -41,7 +41,6 @@ export const Frame: React.FC<React.PropsWithChildren> = ({ children }) => {
                 scrollbarColor: 'initial',
             }}
         >
-            {/* <div style={{ height: 1600 }} /> */}
             {children}
         </div>
     </div>;

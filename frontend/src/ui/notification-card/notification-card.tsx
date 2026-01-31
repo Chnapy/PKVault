@@ -45,9 +45,6 @@ export const NotificationCard: React.FC = () => {
     >
         <table style={{ wordBreak: 'break-word' }}>
             <tbody>
-                {/* {warnings?.playTimeWarnings.map(warn => <div key={warn.saveId}>
-                            Issue with save {warn.saveId}, current save seems to have less play-time than previous one
-                        </div>)} */}
                 {hasUpdate && <HasUpdateWarning />}
 
                 {warnings?.saveDuplicateWarnings.map((warn, i) => <SaveDuplicateWarning key={i} {...warn} />)}
@@ -67,7 +64,6 @@ export const NotificationCard: React.FC = () => {
                                 <code style={{
                                     display: 'flex',
                                     fontSize: '75%',
-                                    // lineBreak: 'anywhere',
                                     backgroundColor: theme.bg.contrastdark,
                                     padding: 4,
                                     maxHeight: 200,

@@ -36,8 +36,6 @@ export const SaveGlobsItem: React.FC<SaveGlobsItemProps> = ({ value, onEdit, onR
     const hasError = !globResultsQuery.isLoading && (globResultsQuery.isError || data.length > 50);
     const hasWarning = !globResultsQuery.isLoading && (hasError || data.length === 0);
 
-    // console.log(globResultsQuery.isError, globResultsQuery.error, globResultsQuery.isLoadingError, globResultsQuery.data)
-
     return <Container
         style={{
             display: 'flex',

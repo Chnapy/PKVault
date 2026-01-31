@@ -13,7 +13,6 @@ export type DetailsMainInfosProps = {
     species: number;
     speciesName: React.ReactNode;
     nickname?: React.ReactNode;
-    // genders: GenderType[];
     types: number[];
     levelUpPercent?: number;
     level?: number;
@@ -27,14 +26,6 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid 
         {nickname && <>{nickname}{' - '}</>}
         <span style={{ color: theme.text.primary }}>{speciesName}</span>
 
-        {/* {genders.map(gender => <span
-            key={gender}
-            style={{
-                float: 'right',
-            }}
-        >
-            <Gender gender={gender} />
-        </span>)} */}
         <br />
         <div style={{ display: 'flex', gap: 4, height: '1lh' }}>
             {types.map(type => <TypeItem key={type} type={type} />)}

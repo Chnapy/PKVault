@@ -61,7 +61,6 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
               contrasted
               title={null}
               maxHeight={300}
-            // style={{ margin: 2, marginTop: 6 }}
             >
               {options.map(({ value, label, disabled }, i) => (
                 <ListboxOption
@@ -76,9 +75,6 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
                 >
                   <FilterLabel
                     enabled={hasValue(value)}
-                    className={css({
-                      // display: "block",
-                    })}
                   >
                     {label}
                   </FilterLabel>

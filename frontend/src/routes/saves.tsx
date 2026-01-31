@@ -35,9 +35,7 @@ const Saves: React.FC = withErrorCatcher('default', () => {
       style={{
         display: "flex",
         flexDirection: 'column',
-        // alignItems: "flex-start",
         alignItems: "center",
-        // flexWrap: "wrap",
         gap: 16,
         maxWidth: 900,
         marginLeft: 'auto',

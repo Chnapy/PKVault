@@ -23,7 +23,6 @@ const getHistoryValue = (value: ContextValue, location: HistoryLocation) => {
             }
         })()
     ]));
-    // console.log(location.href, to, search);
 
     const lastValue = value[ to ];
     if (!lastValue

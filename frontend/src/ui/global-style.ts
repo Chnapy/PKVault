@@ -9,7 +9,6 @@ injectGlobal(`
 
   :root {
     font-family: 'Pixel Operator', sans-serif;
-    // line-height: 1.5;
 
     color: ${theme.text.default};
     text-shadow: ${theme.shadow.text};

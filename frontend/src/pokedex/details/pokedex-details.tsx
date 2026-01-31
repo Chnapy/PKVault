@@ -21,7 +21,6 @@ import { PokedexDetailsOwned } from './pokedex-details-owned';
 import { getGameInfos } from './util/get-game-infos';
 
 export const PokedexDetails: React.FC = () => {
-  // console.time("pokedex-details");
   const { t } = useTranslate();
 
   const selectedSpecies = Route.useSearch({
@@ -107,7 +106,6 @@ export const PokedexDetails: React.FC = () => {
   }, [ selectedFormIndex, selectedForm, firstSeenGender, firstSeenForm ]);
 
   if (!selectedSpecies || !gameSaves.length || !selectedSave || !selectedSpeciesValue) {
-    // console.timeEnd("pokedex-details");
     return null;
   }
 
@@ -129,8 +127,6 @@ export const PokedexDetails: React.FC = () => {
   const baseStats = selectedForm.baseStats;
   const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);
   const cellBaseStyle: React.CSSProperties = { padding: 0, textAlign: 'center' };
-
-  // console.timeEnd("pokedex-details");
 
   return (
     <div>
@@ -175,10 +171,8 @@ export const PokedexDetails: React.FC = () => {
             >
               <ShinyIcon
                 style={{
-                  // width: 12,
                   width: '1lh',
                   height: '1lh',
-                  // margin: -2,
                   filter: selectedShiny ? undefined : 'brightness(0) opacity(0.5)',
                 }}
               />
@@ -222,24 +216,16 @@ export const PokedexDetails: React.FC = () => {
                 />
               </span>}
             </div>}
-            // genders={genders}
             types={selectedForm.types}
           />
         }
         preContent={null}
         content={<>
-          {/* {selectedSpeciesValue.description && (
-          <div style={{ display: "flex" }}>
-            <TextContainer>{description}</TextContainer>
-          </div>
-        )} */}
-
           {selectedForm.abilities.length > 0 && <TextContainer>
             <span style={{ color: theme.text.primary }}>{t('details.abilities')}</span><br />
             {selectedForm.abilities.map(ability => <div key={ability}>{
               staticData.abilities[ ability ]?.name
             }</div>)}
-            {/* {abilitiesHidden.map(ability => <div key={ability}>{ability} (caché)</div>)} */}
           </TextContainer>}
 
           <TextContainer>

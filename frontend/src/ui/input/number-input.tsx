@@ -4,7 +4,6 @@ import { css } from '@emotion/css';
 
 export type NumberInputProps = {
     value?: number;
-    // onChange: React.ChangeEventHandler<HTMLInputElement>;
     rangeMin?: number;
     rangeMax?: number;
 }
@@ -54,10 +53,6 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
                     cursor: 'pointer',
                     borderRadius: 3,
                     width: 40,
-
-                    /* Input Track */
-
-                    /* Chrome, Safari, Edge (Chromium) */
                     '&::-webkit-slider-runnable-track': {
                         background: theme.bg.darker,
                         border: `1px solid ${theme.bg.darker}`,
@@ -66,10 +61,6 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
                         overflow: 'hidden',
                         cursor: 'w-resize'
                     },
-
-                    /* Input Thumb */
-
-                    /* Chrome, Safari, Edge (Chromium) */
                     '&::-webkit-slider-thumb': {
                         appearance: 'none',
                         background: theme.bg.light,
@@ -77,18 +68,9 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
                         height: '100%',
                         cursor: 'w-resize'
                     },
-
-                    /* Focus styles */
-
                     '&:focus': {
                         outline: 'none',
                     },
-
-                    /* Chrome, Safari, Edge (Chromium) */
-                    // '&:focus::-webkit-slider-thumb': {
-                    //     outline: '2px solid #fff',
-                    //     outlineOffset: 2,
-                    // },
                 })}
             />}
     </div>;

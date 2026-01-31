@@ -49,9 +49,7 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                 display: "flex",
                 flexDirection: 'column',
                 borderRadius: 8,
-                // padding: 4,
                 background: theme.bg.blue,
-                // alignItems: "flex-start",
                 textAlign: 'left',
             }}
         >

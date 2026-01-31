@@ -44,7 +44,6 @@ export const RadarChart: React.FC<{
   --part: calc(360deg / var(--items));
   --integer: calc(var(--scale));
 
-  // background-image: repeating-radial-gradient(circle at 50%, var(--foreground-o-25) 0 2px, transparent 0 calc(var(--size) * var(--step))), repeating-radial-gradient(circle at 50%, var(--foreground-o-10) 0 2px, transparent 0 var(--size));
   block-size: calc(var(--radius) * 2);
   border: 1px solid;
   border-color: ${theme.border.default};
@@ -144,12 +143,6 @@ ${data[ 0 ]!.map((value, i) => `& td:nth-of-type(${i + 1}) span {
   display: block;
   font-size: small;
 }
-
-// & [scope=col]:nth-child(1)::after {
-//   --integer: calc(var(--1));
-//   content: counter(value) " / " counter(scale);
-//   counter-reset: value var(--integer);
-// }
 
 & tbody {
   columns: var(--areas);

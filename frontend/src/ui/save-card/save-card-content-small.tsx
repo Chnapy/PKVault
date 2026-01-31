@@ -13,7 +13,6 @@ export type SaveCardContentSmallProps = {
   version: GameVersion;
   generation: number;
   tid: number;
-  // sid: number;
   trainerName: string;
   trainerGenderMale: boolean;
 };
@@ -79,10 +78,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErr
             : '-'}
 
           <br />
-          {t('save.sync')} <span style={{ color: theme.text.primary }}>{renderTimestamp()}</span>{" "}
-          {/* {Date.now() - date.getMilliseconds() < 3_600_000 && (
-            <span style={{ color: theme.text.red }}>NEW !</span>
-          )} */}
+          {t('save.sync')} <span style={{ color: theme.text.primary }}>{renderTimestamp()}</span>
         </TextContainer>
       </div>
     </div>

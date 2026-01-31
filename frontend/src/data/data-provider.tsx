@@ -125,8 +125,6 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                                 });
                             };
 
-                            // console.log('stockage-dto', data);
-
                             const {
                                 settings,
                                 staticData,

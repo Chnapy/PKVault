@@ -37,7 +37,6 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, context
                 left: 2,
                 display: 'flex',
                 alignItems: 'center',
-                // gap: 4,
                 color: theme.text.default
             }}
         >

@@ -6,7 +6,6 @@ import { theme } from "../theme";
 
 const root = (props: ContainerProps) =>
   css({
-    // display: "inline-block",
     backgroundColor: theme.bg.default,
     border: `1px solid ${theme.border.default}`,
     padding: switchUtil(props.padding ?? "default", {
@@ -22,7 +21,6 @@ const root = (props: ContainerProps) =>
     filter: props.noDropshadow
       ? undefined
       : `drop-shadow(${props.padding === "big" ? 2 : 1}px ${props.padding === "big" ? 2 : 1}px 0 rgba(0,0,0,.2))`,
-    // transition: ".2s outline-width",
     "&:not(:disabled)": {
       cursor:
         (props.componentDescriptor ?? props.as) === "button" && !props.selected
@@ -31,7 +29,6 @@ const root = (props: ContainerProps) =>
       "&:hover:not(:active)":
         (props.componentDescriptor ?? props.as) === "button" && !props.selected
           ? {
-            // outline: `2px dashed ${theme.border.contrast}`,
             outlineWidth: 1,
           }
           : undefined,

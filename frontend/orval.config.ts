@@ -33,19 +33,5 @@ export default defineConfig({
         useTypeOverInterfaces: true,
       },
     },
-    // hooks: {
-    //   afterAllFilesWrite: "prettier -w",
-    // },
   },
-  // "backend-zod": {
-  //   ...commonConfig,
-  //   output: {
-  //     ...commonConfig.output,
-  //     client: "zod",
-  //     fileExtension: ".zod.gen.ts",
-  //   },
-  //   hooks: {
-  //     afterAllFilesWrite: "prettier -w",
-  //   },
-  // },
 });

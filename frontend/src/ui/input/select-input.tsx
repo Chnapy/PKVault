@@ -46,7 +46,6 @@ const SelectInput = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<
             filter: theme.shadow.filter,
             overflow: 'hidden',
             verticalAlign: 'middle',
-            // padding: 2,
             ...rest.style,
         }}
     >

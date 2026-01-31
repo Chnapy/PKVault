@@ -23,6 +23,5 @@ export const SaveDuplicateWarning: React.FC<SaveDuplicateWarningModel> = ({ save
                 paths: paths.join('\n'),
             })}
         </td>
-        {/* <td style={{ verticalAlign: 'top' }}></td> */}
     </tr>;
 };

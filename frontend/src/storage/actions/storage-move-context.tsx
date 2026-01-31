@@ -70,14 +70,8 @@ export const StorageMoveContext = {
         const mainPkmVersionsQuery = usePkmVersionIndex();
         const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);
 
-        // const mainBoxesQuery = useStorageGetMainBoxes();
-        // const saveBoxesQuery = useStorageGetSaveBoxes(saveId ?? 0);
-
         const pkmMains = !moveContext.selected && !saveId ? pkmIds.map(id => mainPkmVersionsQuery.data?.data.byId[ id ]).filter(filterIsDefined) : [];
         const pkmSaves = !moveContext.selected && !!saveId ? pkmIds.map(id => savePkmsQuery.data?.data.byId[ id ]).filter(filterIsDefined) : [];
-
-        // const boxMain = !moveContext.selected && storageType === 'main' ? mainBoxesQuery.data?.data.find(box => box.idInt === pkmMain?.boxId) : undefined;
-        // const boxSave = !moveContext.selected && storageType === 'save' ? saveBoxesQuery.data?.data.find(box => box.idInt === pkmSave?.box) : undefined;
 
         const canClickIds = !saveId ? pkmMains.map(pkm => pkm.id) : pkmSaves.filter(pkmSave => pkmSave.canMove || pkmSave.canMoveToMain).map(pkm => pkm.id);
 
@@ -170,7 +164,6 @@ export const StorageMoveContext = {
                         moveVariables.scrollX = scrollX;
                         moveVariables.scrollY = scrollY;
                         ref.current.style.transform = getTransform();
-                        // ref.current.style.pointerEvents = 'none';
                     }
                 };
 
@@ -201,7 +194,6 @@ export const StorageMoveContext = {
 
                     if (ref.current) {
                         ref.current.style.transform = transform;
-                        // ref.current.style.pointerEvents = pointerEvents;
                     }
                 };
             }
@@ -415,7 +407,6 @@ export const StorageMoveContext = {
                         selectContext.clear();
                     }
                 })
-                // await new Promise(resolve => setTimeout(resolve, 3000))
                 .finally(() => {
                     setSelected(undefined);
                 });
@@ -445,7 +436,6 @@ export const StorageMoveContext = {
 
         const movePkmMutation = useStorageMovePkm();
 
-        // const mainBoxesQuery = useStorageGetMainBoxes();
         const boxesQuery = useStorageGetBoxes({ saveId });
 
         const mainPkmVersionsQuery = usePkmVersionIndex();
@@ -544,10 +534,6 @@ export const StorageMoveContext = {
                     return { enable: false };
                 }
 
-                // if (!!targetPkm && selected.ids.includes(targetPkm.id)) {
-                // return { enable: false, helpText: 'bar ' + targetPkm?.id + ' ' };
-                // }
-
                 if (selected.attached && targetPkm) {
                     return { enable: false, helpText: t('storage.move.attached-pkm') };
                 }
@@ -622,7 +608,6 @@ export const StorageMoveContext = {
                             };
                         }
                     }
-                    // console.log(targetPkmSave.generation, sourcePkmSave.generation, targetPkmSave.canMove)
                 }
 
                 // pkm main -> save
@@ -770,8 +755,6 @@ export const StorageMoveContext = {
                     boxSlots: targetBoxSlots,
                 },
             });
-
-            // await new Promise(resolve => setTimeout(resolve, 3000));
 
             await movePkmMutation
                 .mutateAsync({

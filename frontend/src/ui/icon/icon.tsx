@@ -17,13 +17,11 @@ export const Icon: React.FC<IconProps> = ({ name, solid, alt, forButton, ...rest
         className={cx('hn', `hn-${name}${alt ? '-alt' : ''}${solid ? '-solid' : ''}`, rest.className)}
         style={{
             ...rest.style,
-            // color: 'currentcolor',
             ...(forButton
                 ? {
                     fontSize: '75%',
                     lineHeight: '1lh',
                     verticalAlign: 'middle',
-                    // width: 'calc(1lh - 4px)',
                 }
                 : {})
         }}

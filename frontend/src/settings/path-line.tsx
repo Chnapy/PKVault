@@ -27,9 +27,7 @@ export const PathLine: React.FC<{ children: string }> = ({ children }) => {
                 {firstPartsStr}
             </div>/
         </>}
-        {directory && <div
-        // style={{ opacity: 0.5 }}
-        >
+        {directory && <div>
             {directory}/
         </div>}
         {filename}

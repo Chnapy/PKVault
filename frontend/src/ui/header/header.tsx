@@ -75,7 +75,6 @@ export const Header: React.FC<React.PropsWithChildren> = ({ children }) => {
                         width: 150,
                         transform: 'rotate(-45deg)',
                         transformOrigin: 'bottom left',
-                        // borderBottom: `2px solid ${theme.border.contrast}`,
                         boxShadow: `0 2px 0 rgba(0,0,0,0.1)`,
                         pointerEvents: 'none',
                     }}

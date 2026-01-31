@@ -15,8 +15,6 @@ export type DexItemProps = {
   caught: boolean;
   owned: boolean;
   ownedShiny: boolean;
-  // caughtVersions: GameVersion[];
-  // seenOnlyVersions: GameVersion[];
   selected?: boolean;
   onClick?: () => void;
 };
@@ -33,9 +31,6 @@ export const DexFormItem: React.FC<{
   ownedShiny: boolean;
 }> = withErrorCatcher('item', ({ species, context, form, genders, seen, caught, owned, ownedShiny }) => {
   const staticData = useStaticData();
-
-  // const caughtGamesColors = [ ...new Set(caughtVersions.map(getGameInfos).map(infos => infos.img)) ];
-  // const seenOnlyGamesColors = [ ...new Set(seenOnlyVersions.map(getGameInfos).map(infos => infos.img)) ];
 
   return (
     <div
@@ -73,7 +68,6 @@ export const DexFormItem: React.FC<{
         style={{
           position: 'absolute',
           right: 2,
-          // left: '50%',
           bottom: 0,
           display: "inline-flex",
           alignItems: "center",

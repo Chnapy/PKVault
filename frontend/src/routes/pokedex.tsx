@@ -61,7 +61,6 @@ const searchSchema = z.object({
   filterGenerations: z.array(z.number()).optional(), // generation.name
   showForms: z.boolean().optional(),
   showGenders: z.boolean().optional(),
-  // sort: z.enum(['newest', 'oldest', 'price']).default('newest'),
 });
 
 export const Route = createFileRoute("/pokedex")({

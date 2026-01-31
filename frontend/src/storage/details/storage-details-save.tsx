@@ -22,14 +22,6 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({ selected
             <InnerStorageDetailsSave
                 id={savePkm.id}
                 saveId={saveId}
-            // goToMainPkm={pkm && (() => navigate({
-            //     search: {
-            //         selected: {
-            //             type: 'main',
-            //             id: pkm.id,
-            //         },
-            //     }
-            // }))}
             />
         </StorageDetailsForm.Provider>
     );
@@ -42,17 +34,12 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({ id,
     const savePkmDeleteMutation = useStorageSaveDeletePkms();
 
     const savePkmQuery = usePkmSaveIndex(saveId);
-    // const pkmVersionsQuery = useStorageGetMainPkmVersions();
 
     const pkmLegalityQuery = usePkmLegality(id, saveId);
     const pkmLegality = pkmLegalityQuery.data?.data;
 
     const savePkm = savePkmQuery.data?.data.byId[ id ];
     if (!savePkm) return null;
-
-    // const attachedPkmNotFound = savePkm.pkmVersionId
-    //     ? !pkmVersionsQuery.data?.data.some(pkmVersion => pkmVersion.id === savePkm.pkmVersionId)
-    //     : false;
 
     return (
         <StorageDetailsBase

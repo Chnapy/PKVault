@@ -12,8 +12,6 @@ export const StorageSearchCheck: React.FC<React.PropsWithChildren> = ({ children
     const mainBoxesQuery = useStorageGetBoxes();
     const mainPkmsQuery = usePkmVersionIndex();
     const saveInfosQuery = useSaveInfosGetAll();
-    // const saveBoxesQuery = useStorageGetSaveBoxes(storageSearch.save ?? 0);
-    // const savePkmsQuery = useStorageGetSavePkms(storageSearch.save ?? 0);
 
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();
     const selectedSearch = selectedBankBoxes.data?.selectedSearch;
@@ -43,11 +41,6 @@ export const StorageSearchCheck: React.FC<React.PropsWithChildren> = ({ children
                         saves: cleanedSaves,
                     };
                 }
-                // else if (storageSearch.saveBoxId !== undefined && saveBoxesQuery.data?.data.every(box => box.id !== storageSearch.saveBoxId)) {
-                //     return {
-                //         saveBoxId: undefined,
-                //     };
-                // }
             }
 
             if (

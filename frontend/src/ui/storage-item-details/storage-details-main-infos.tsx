@@ -10,7 +10,6 @@ export type StorageDetailsMainInfosProps = {
     speciesName: string;
     nickname: string;
     nicknameMaxLength: number;
-    // gender?: GenderType;
     types: number[];
     levelUpPercent: number;
     level: number;
@@ -30,11 +29,9 @@ export const StorageDetailsMainInfos: React.FC<StorageDetailsMainInfosProps> = (
         nickname={formContext.editMode
             ? <TextInput
                 {...formContext.register('nickname', { maxLength: nicknameMaxLength })}
-                // maxLength={nicknameMaxLength}
                 style={{ display: 'inline-block', height: '1lh', width: 8 * nicknameMaxLength, padding: 0, textAlign: 'center' }}
             />
             : nickname}
-        // genders={gender !== undefined ? [ gender ] : []}
         types={types}
         levelUpPercent={levelUpPercent}
         level={level}

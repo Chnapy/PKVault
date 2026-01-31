@@ -14,7 +14,6 @@ import { StorageSaveBox } from "../storage/storage-save-box";
 import { StorageSaveSelect } from "../storage/storage-save-select";
 import { StorageSearchCheck } from '../storage/storage-search-check';
 import { filterIsDefined } from '../util/filter-is-defined';
-// import { TestFillMainStorage } from '../storage/test-fill-main-storage';
 
 export const Storage: React.FC = withErrorCatcher('default', () => {
   const selected = Route.useSearch({ select: (search) => search.selected });
@@ -40,10 +39,6 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
                 marginBottom: 150,
               }}
             >
-              {/* <div style={{ width: '100%', display: 'flex', gap: 8 }}>
-                <TestFillMainStorage />
-              </div> */}
-
               <BankList />
 
               <StorageMainBox />

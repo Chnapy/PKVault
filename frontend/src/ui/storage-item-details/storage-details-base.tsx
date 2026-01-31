@@ -80,7 +80,6 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
 
                 {pkm.isShiny && <ShinyIcon
                     style={{
-                        // width: 12,
                         margin: '0 -2px',
                     }}
                 />}
@@ -94,7 +93,6 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             speciesName={speciesName ?? ''}
             nickname={pkm.nickname}
             nicknameMaxLength={pkm.nicknameMaxLength}
-            // gender={pkm.gender}
             levelUpPercent={pkm.levelUpPercent}
             level={pkm.level}
             types={pkm.types}
@@ -111,20 +109,6 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             >
                 {pkm.validityReport}
             </TextContainer>}
-
-            {/* {!!mainBoxId && !!mainBoxSlot && goToMainPkm && <>
-                        <Button onClick={goToMainPkm}>
-                            <div style={{ width: '100%' }}>
-                                Go to main-pkm
-                            </div>
-                            <div style={{ width: '100%' }}>
-                                Box {mainBoxId} slot {mainBoxSlot}
-                            </div>
-                            <div style={{ width: '100%', color: !saveSynchronized ? theme.text.contrast : undefined }}>
-                                {saveSynchronized ? 'synchronized' : 'unsynchronized'}
-                            </div>
-                        </Button>
-                    </>} */}
         </>}
         content={pkm.isEnabled && <>
             {!!pkm.heldItem && <TextContainer>

@@ -14,7 +14,6 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
     <div
       style={{
         display: 'flex',
-        // gap: 8,
       }}
     >
       {saveBoxIds.map((boxId, i) => <StorageSaveBoxContent

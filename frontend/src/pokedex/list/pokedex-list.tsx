@@ -11,7 +11,6 @@ import { PokedexCount } from './pokedex-count';
 import { PokedexItem, type PokedexItemProps } from "./pokedex-item";
 
 export const PokedexList: React.FC = withErrorCatcher('default', () => {
-  // console.time("pokedex-list");
   const { t } = useTranslate();
 
   const staticData = useStaticData();
@@ -62,8 +61,6 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
       });
     }
 
-    // if (new Set(forms.map(f => f.form)).size === 1) return acc;
-
     const genAcc = acc[ staticGeneration - 1 ] ?? [];
     acc[ staticGeneration - 1 ] = genAcc;
     genAcc.push(
@@ -77,8 +74,6 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
     return acc;
   }, [] as React.ReactNode[][]);
 
-  // console.timeEnd("pokedex-list");
-
   return (
     <div
       style={{
@@ -87,7 +82,6 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
         justifyContent: "center",
         gap: 8,
         overflow: "auto",
-        //   maxHeight: "100%",
         flexWrap: "wrap",
         padding: 4,
       }}

@@ -46,7 +46,6 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
 
     const watchType = watch('type');
     const watchName = watch('boxName');
-    // const watchSlotCount = watch('slotCount');
     const watchOrder = watch('order');
     const watchBankId = watch('bankId');
 

@@ -13,8 +13,6 @@ export const FilterCheckbox: React.FC<FilterCheckboxProps> = ({
   children,
   ...props
 }) => {
-  // const [state, setState] = React.useState<'checked' | 'unchecked' | 'indeterminate'>('indeterminate');
-
   return (
     <FilterLabel enabled={enabled}>
       <Checkbox

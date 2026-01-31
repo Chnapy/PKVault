@@ -111,7 +111,6 @@ export const BankItem: React.FC<{
             panelContent={close => <BankEdit bankId={bankId} close={close} />}
             loading={isLoading}
             style={{
-              // borderLeftWidth: 0,
               borderTopLeftRadius: 0,
               borderBottomLeftRadius: 0,
               borderBottomRightRadius: 0,
@@ -128,7 +127,6 @@ export const BankItem: React.FC<{
             disabled={!canDelete}
             loading={isLoading}
             style={{
-              // borderLeftWidth: 0,
               borderTopLeftRadius: 0,
               borderBottomLeftRadius: 0,
               borderTopRightRadius: 0,

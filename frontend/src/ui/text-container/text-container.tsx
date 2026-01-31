@@ -41,7 +41,6 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
           backgroundColor: theme.bg.default,
           borderRadius: 4,
           flexGrow: 1,
-          // width: "100%",
           overflow: 'hidden',
           color: theme.text.default,
           overflowY: 'auto',
