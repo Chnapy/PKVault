@@ -4,10 +4,10 @@ import { getStorageGetSavePkmsQueryKey, storageGetSavePkms } from '../sdk/storag
 import { filterIsDefined } from '../../util/filter-is-defined';
 
 type PkmSaveIndexes = {
-    byId: Record<PkmSaveDTO['id'], PkmSaveDTO>;
-    byIdBase: Record<PkmSaveDTO['idBase'], PkmSaveDTO[]>;
-    byBox: Record<PkmSaveDTO['boxId'], Record<PkmSaveDTO['boxSlot'], PkmSaveDTO>>;
-    bySpecies: Record<PkmSaveDTO['species'], PkmSaveDTO[]>;
+    byId: Record<PkmSaveDTO[ 'id' ], PkmSaveDTO>;
+    byIdBase: Record<PkmSaveDTO[ 'idBase' ], PkmSaveDTO[]>;
+    byBox: Record<PkmSaveDTO[ 'boxId' ], Record<PkmSaveDTO[ 'boxSlot' ], PkmSaveDTO>>;
+    bySpecies: Record<PkmSaveDTO[ 'species' ], PkmSaveDTO[]>;
 };
 
 const buildIndexes = (saveId: number, data: PkmSaveDTO[]) => {
@@ -21,16 +21,16 @@ const buildIndexes = (saveId: number, data: PkmSaveDTO[]) => {
     };
 
     data.forEach(pkmSave => {
-        indexes.byId[pkmSave.id] = pkmSave;
+        indexes.byId[ pkmSave.id ] = pkmSave;
 
-        indexes.byIdBase[pkmSave.idBase] ??= [];
-        indexes.byIdBase[pkmSave.idBase]!.push(pkmSave);
+        indexes.byIdBase[ pkmSave.idBase ] ??= [];
+        indexes.byIdBase[ pkmSave.idBase ]!.push(pkmSave);
 
-        indexes.byBox[pkmSave.boxId] ??= {};
-        indexes.byBox[pkmSave.boxId]![pkmSave.boxSlot] = pkmSave;
+        indexes.byBox[ pkmSave.boxId ] ??= {};
+        indexes.byBox[ pkmSave.boxId ]![ pkmSave.boxSlot ] = pkmSave;
 
-        indexes.bySpecies[pkmSave.species] ??= [];
-        indexes.bySpecies[pkmSave.species]!.push(pkmSave);
+        indexes.bySpecies[ pkmSave.species ] ??= [];
+        indexes.bySpecies[ pkmSave.species ]!.push(pkmSave);
     });
 
     console.timeEnd(`Build PkmSave indexes, saveId=${saveId}`);
@@ -44,6 +44,9 @@ type QueryData = {
     headers: Headers;
 };
 
+/**
+ * Fetch save pkms with caching & indexing.
+ */
 export const usePkmSaveIndex = (saveId: number) => {
     const queryKey = getStorageGetSavePkmsQueryKey(saveId);
 
@@ -61,6 +64,9 @@ export const usePkmSaveIndex = (saveId: number) => {
     });
 };
 
+/**
+ * Update react-query cache with given data, after formatting.
+ */
 export const updatePkmSaveCache = (client: QueryClient, saveId: number, savePkms: DataDTOStateOfDictionaryOfStringAndPkmSaveDTO) => {
     const cachedResponse: Partial<QueryData> = client.getQueryData(getStorageGetSavePkmsQueryKey(saveId)) ?? {};
 

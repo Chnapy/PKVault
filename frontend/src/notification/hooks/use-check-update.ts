@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 
+/**
+ * Check any app new release from github.
+ */
 export const useCheckUpdate = (): string | undefined => {
     const settingsQuery = useSettingsGet();
     const updateQuery = useQuery({

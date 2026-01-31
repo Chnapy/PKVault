@@ -6,6 +6,10 @@ import { Splash } from '../ui/splash/splash';
 import { SplashData } from './splash-data';
 import { css } from '@emotion/css';
 
+/**
+ * Display splash screen until whole data is loaded without error.
+ * If first start, ask for app language.
+ */
 export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
     const appStartTime = React.useRef(Date.now());
 

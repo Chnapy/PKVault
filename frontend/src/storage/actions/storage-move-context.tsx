@@ -30,6 +30,16 @@ const context = React.createContext<Context>({
     setSelected: () => void 0,
 });
 
+// TODO complete refacto using state machine, this part is too complex to maintain
+/**
+ * Manage pkms move action with all possible cases:
+ * - one or multiple pkms selected
+ * - move into current box or another box
+ * - move between PKVault <-> save
+ * - move between save A <-> save B
+ * - move to another bank
+ * - move as attached or not
+ */
 export const StorageMoveContext = {
     containerId: 'storage-move-container',
     Provider: ({ children }: React.PropsWithChildren) => {
@@ -44,6 +54,9 @@ export const StorageMoveContext = {
         return <context.Provider value={value}>{children}</context.Provider>;
     },
     useValue: () => React.useContext(context),
+    /**
+     * Move in process for given position and/or pkmId.
+     */
     useLoading: (saveId: number | undefined, boxId: number, boxSlot: number, pkmId?: string) => {
         const { selected } = StorageMoveContext.useValue();
 
@@ -55,6 +68,9 @@ export const StorageMoveContext = {
                 (selected.saveId === saveId && !!pkmId && selected.ids.includes(pkmId)))
         );
     },
+    /**
+     * Move to given bank in process.
+     */
     useLoadingBank: (bankId: string) => {
         const { selected } = StorageMoveContext.useValue();
 
@@ -62,6 +78,9 @@ export const StorageMoveContext = {
 
         return moveTarget?.bankId === bankId;
     },
+    /**
+     * Given pkms can be moved.
+     */
     useClickable: (pkmIdsRaw: string[], saveId: number | undefined) => {
         const moveContext = StorageMoveContext.useValue();
         const selectContext = StorageSelectContext.useValue();
@@ -104,6 +123,10 @@ export const StorageMoveContext = {
                     : undefined,
         };
     },
+    /**
+     * Translate item rendering following given pkm moving state.
+     * If pkm is not moving, do nothing.
+     */
     useDraggable: (pkmId: string, saveId: number | undefined) => {
         const ref = React.useRef<HTMLDivElement>(null);
         const { selected, setSelected } = StorageMoveContext.useValue();
@@ -250,6 +273,10 @@ export const StorageMoveContext = {
             },
         };
     },
+    /**
+     * Estimate if given bank can receive currently moving pkm.
+     * If no moving pkm, do nothing.
+     */
     useDroppableBank: (bankId: string) => {
         const { t } = useTranslate();
         const { selected, setSelected } = StorageMoveContext.useValue();
@@ -428,6 +455,10 @@ export const StorageMoveContext = {
             helpText: clickInfos.helpText,
         };
     },
+    /**
+     * Estimate if given position can receive currently moving pkm.
+     * If no moving pkm, do nothing.
+     */
     useDroppable: (saveId: number | undefined, dropBoxId: number, dropBoxSlot: number, pkmId?: string) => {
         const { t } = useTranslate();
         const { selected, setSelected } = StorageMoveContext.useValue();

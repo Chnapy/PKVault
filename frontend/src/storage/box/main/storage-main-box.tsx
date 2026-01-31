@@ -1,5 +1,5 @@
 import React from "react";
-import { Route } from '../routes/storage';
+import { Route } from '../../../routes/storage';
 import { StorageMainBoxContent } from './storage-main-box-content';
 import { css, cx } from '@emotion/css';
 

@@ -11,6 +11,9 @@ export type IconProps = {
 }
     & React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
+/**
+ * Icons from https://pixeliconlibrary.com/
+ */
 export const Icon: React.FC<IconProps> = ({ name, solid, alt, forButton, ...rest }) => {
     return <i
         {...rest}

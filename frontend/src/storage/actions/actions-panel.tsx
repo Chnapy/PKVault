@@ -10,6 +10,9 @@ import { useActionDescription } from './hooks/use-action-description';
 import { DataActionType } from '../../data/sdk/model';
 import { css } from '@emotion/css';
 
+/**
+ * Display current session actions, and save button.
+ */
 export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
     const [ expanded, setExpanded ] = React.useState(false);

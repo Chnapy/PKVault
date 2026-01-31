@@ -21,6 +21,10 @@ const context = React.createContext<Context>({
     setValue: () => void 0,
 });
 
+/**
+ * Select multiple pkms into a box, in PKVault or save storage.
+ * Scoped to a single box at a time.
+ */
 export const StorageSelectContext = {
     Provider: ({ children }: React.PropsWithChildren) => {
         const [ value, setValue ] = React.useState<Context>({
@@ -39,6 +43,11 @@ export const StorageSelectContext = {
             </context.Provider>
         );
     },
+    /**
+     * Clear obsolete selection in some cases:
+     * - select in another box
+     * - selected pkm does not exist anymore
+     */
     SanityCheck: () => {
         const { saveId, boxId, ids, removeId, clear } = StorageSelectContext.useValue();
 
@@ -65,7 +74,9 @@ export const StorageSelectContext = {
             if (selectsNotDisplayed) {
                 clear();
             } else {
-                const obsoleteIds = saveId ? ids.filter(id => !savePkmsQuery.data?.data.byId[ id ]) : ids.filter(id => !mainPkmsQuery.data?.data.byId[ id ]);
+                const obsoleteIds = saveId
+                    ? ids.filter(id => !savePkmsQuery.data?.data.byId[ id ])
+                    : ids.filter(id => !mainPkmsQuery.data?.data.byId[ id ]);
                 if (obsoleteIds.length > 0) {
                     removeId(obsoleteIds);
                 }
@@ -117,6 +128,9 @@ export const StorageSelectContext = {
             },
         };
     },
+    /**
+     * Get selection infos for given pkm.
+     */
     useCheck: (saveId: number | undefined, pkmId: string): Pick<StorageItemProps, 'checked' | 'onCheck'> => {
         const selectContext = StorageSelectContext.useValue();
         const movingIds = StorageMoveContext.useValue().selected?.ids;

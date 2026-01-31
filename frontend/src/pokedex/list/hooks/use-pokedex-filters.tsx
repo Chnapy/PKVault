@@ -2,6 +2,9 @@ import type { DexItemDTO } from "../../../data/sdk/model";
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 
+/**
+ * Gives filter functions based on enabled pokedex filters
+ */
 export const usePokedexFilters = () => {
   const filterSpeciesName = Route.useSearch({ select: (search) => search.filterSpeciesName });
   const filterTypes = Route.useSearch({ select: (search) => search.filterTypes });

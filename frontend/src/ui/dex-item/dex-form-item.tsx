@@ -10,16 +10,6 @@ import { ShinyIcon } from '../icon/shiny-icon';
 import { theme } from "../theme";
 import { css } from '@emotion/css';
 
-export type DexItemProps = {
-  species: number;
-  seen: boolean;
-  caught: boolean;
-  owned: boolean;
-  ownedShiny: boolean;
-  selected?: boolean;
-  onClick?: () => void;
-};
-
 export const DexFormItem: React.FC<{
   species: number;
   context: EntityContext;

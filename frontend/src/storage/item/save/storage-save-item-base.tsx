@@ -1,10 +1,10 @@
 import React from 'react';
-import { usePkmLegality } from '../data/hooks/use-pkm-legality';
-import { usePkmSaveIndex } from '../data/hooks/use-pkm-save-index';
-import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
-import { Gender as GenderType } from '../data/sdk/model';
-import type { ButtonLikeProps } from '../ui/button/button-like';
-import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
+import { usePkmLegality } from '../../../data/hooks/use-pkm-legality';
+import { usePkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
+import { usePkmVersionIndex } from '../../../data/hooks/use-pkm-version-index';
+import { Gender as GenderType } from '../../../data/sdk/model';
+import type { ButtonLikeProps } from '../../../ui/button/button-like';
+import { StorageItem, type StorageItemProps } from '../../../ui/storage-item/storage-item';
 
 export type StorageSaveItemBaseProps = ButtonLikeProps &
     Pick<StorageItemProps, 'anchor' | 'helpTitle' | 'small' | 'checked' | 'onCheck'> & {
