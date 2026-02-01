@@ -44,7 +44,6 @@ export const SpriteImg: React.FC<SpriteImgProps> = ({ spriteInfos, size, ...imgP
                 height: spriteInfos && spriteInfos.height,
                 width: spriteInfos && spriteInfos.width,
                 transform: `${scale !== 1 ? `scale(${scale})` : ''}`,
-                // transformOrigin: 'center center',
             })}
         />
     </div>;

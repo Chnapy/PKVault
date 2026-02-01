@@ -3,13 +3,15 @@ import { type DexItemForm } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from "../../routes/pokedex";
 import { ButtonLike } from '../../ui/button/button-like';
-import { DexFormItem, type DexItemProps } from "../../ui/dex-item/dex-item";
+import { DexFormItem } from "../../ui/dex-item/dex-form-item";
 import { getSpeciesNO } from '../../ui/dex-item/util/get-species-no';
 import { theme } from '../../ui/theme';
 import { withErrorCatcher } from '../../error/with-error-catcher';
+import { css } from '@emotion/css';
 
-export type PokedexItemProps = Pick<DexItemProps, 'species'> & {
-  forms: Pick<DexItemForm, 'form' | 'context' | 'gender' | 'isSeen' | 'isSeenShiny' | 'isCaught' | 'isOwned' | 'isOwnedShiny'>[];
+export type PokedexItemProps = {
+  species: number;
+  forms: Pick<DexItemForm, 'id' | 'form' | 'context' | 'gender' | 'isSeen' | 'isSeenShiny' | 'isCaught' | 'isOwned' | 'isOwnedShiny'>[];
 };
 
 export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', React.memo(({
@@ -59,7 +61,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
       if (i > 0) return null;
 
       return <DexFormItem
-        key={formGroup[ 0 ].form}
+        key={formGroup[ 0 ].id}
         species={species}
         context={formGroup[ 0 ].context}
         form={formGroup[ 0 ].form}
@@ -76,7 +78,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
       if (i > 0) return null;
 
       return formGroup.map(formItem => <DexFormItem
-        key={formItem.gender}
+        key={formItem.id}
         species={species}
         context={formItem.context}
         form={formItem.form}
@@ -93,7 +95,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
       const formItem = formGroup[ 0 ];
 
       return <DexFormItem
-        key={formItem.form}
+        key={formItem.id}
         species={species}
         context={formItem.context}
         form={formItem.form}
@@ -107,7 +109,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
     }
 
     return formGroup.map(formItem => <DexFormItem
-      key={`${formItem.form}-${formItem.gender}`}
+      key={formItem.id}
       species={species}
       context={formItem.context}
       form={formItem.form}
@@ -126,24 +128,24 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
       selected={selected}
       noDropshadow={!onClick}
       disabled={!onClick}
-      style={{
+      className={css({
         position: 'relative',
         alignSelf: "flex-start",
         padding: 0,
         borderColor: seen ? theme.text.default : undefined,
-      }}
+      })}
     >
       <div
-        style={{
+        className={css({
           display: 'flex',
           flexWrap: 'wrap',
-        }}
+        })}
       >
         {content}
       </div>
 
       <div
-        style={{
+        className={css({
           position: 'absolute',
           left: 0,
           top: 0,
@@ -154,7 +156,7 @@ export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher('item', 
           backgroundColor: theme.bg.darker,
           color: theme.text.light,
           borderBottomRightRadius: 4,
-        }}
+        })}
       >
         <span>{getSpeciesNO(species)}</span>
       </div>

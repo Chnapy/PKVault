@@ -6,6 +6,7 @@ import { theme } from '../theme';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { useTranslate } from '../../translate/i18n';
 import { DetailsLevel } from '../details-card/details-level';
+import { css } from '@emotion/css';
 
 export type TextOriginProps = {
     version: GameVersion | null;
@@ -33,18 +34,18 @@ export const TextOrigin: React.FC<TextOriginProps> = ({
     const gameinfos = getGameInfos(version);
 
     return <>
-        <span style={{ color: theme.text.primary }}>{t('details.origin')}</span>
+        <span className={css({ color: theme.text.primary })}>{t('details.origin')}</span>
         <br />
         <img
             src={gameinfos.img}
-            style={{
+            className={css({
                 height: '1lh',
                 width: '1lh',
                 verticalAlign: 'middle'
-            }}
-        /> <span style={{ color: theme.text.primary }}>{t('save.pkm')} {versions[ version ?? -1 ]?.name}</span>
+            })}
+        /> <span className={css({ color: theme.text.primary })}>{t('save.pkm')} {versions[ version ?? -1 ]?.name}</span>
         <br />
-        {t('save.ot')} <span style={{ color: theme.text.primary }}>{originTrainerName}</span> <Gender gender={originTrainerGender} /> - {t('details.tid')} <span style={{ color: theme.text.primary }}>{tid}</span>
+        {t('save.ot')} <span className={css({ color: theme.text.primary })}>{originTrainerName}</span> <Gender gender={originTrainerGender} /> - {t('details.tid')} <span className={css({ color: theme.text.primary })}>{tid}</span>
         <br />
         {originMetLocation}{originMetLevel ? <> - <DetailsLevel level={originMetLevel} /></> : null}
     </>;

@@ -1,9 +1,9 @@
 import React from 'react';
-import { usePkmLegalityMap } from '../data/hooks/use-pkm-legality';
-import { usePkmVersionSlotInfos } from '../data/hooks/use-pkm-version-slot-infos';
-import { Gender as GenderType } from '../data/sdk/model';
-import type { ButtonLikeProps } from '../ui/button/button-like';
-import { StorageItem, type StorageItemProps } from '../ui/storage-item/storage-item';
+import { usePkmLegalityMap } from '../../../data/hooks/use-pkm-legality';
+import { usePkmVersionSlotInfos } from '../../../data/hooks/use-pkm-version-slot-infos';
+import { Gender as GenderType } from '../../../data/sdk/model';
+import type { ButtonLikeProps } from '../../../ui/button/button-like';
+import { StorageItem, type StorageItemProps } from '../../../ui/storage-item/storage-item';
 
 export type StorageMainItemBaseProps = ButtonLikeProps &
     Pick<

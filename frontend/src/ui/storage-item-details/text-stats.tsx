@@ -10,6 +10,7 @@ import { MoveItem } from '../move-item/move-item';
 import { RadarChart } from '../radar-chart/radar-chart';
 import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
+import { css, cx } from '@emotion/css';
 
 export type TextStatsProps = {
     nature?: number;
@@ -50,12 +51,12 @@ export const TextStats: React.FC<TextStatsProps> = ({
     const remainingEVs = Math.max(totalEVs - totalFormEVs, 0);
     const formMaxValues = getValues('eVs').map(ev => Math.min(ev + remainingEVs, maxEv));
 
-    const cellBaseStyle: React.CSSProperties = { padding: 0, textAlign: 'center' };
+    const cellBaseClassName = css({ padding: 0, textAlign: 'center' });
 
-    const renderStatNameCell = (statName: string, i: number) => <td style={{ ...cellBaseStyle, textAlign: 'left' }}>
+    const renderStatNameCell = (statName: string, i: number) => <td className={cx(cellBaseClassName, css({ textAlign: 'left' }))}>
         {statName}{' '}
-        {(i + 1) === natureObj?.decreasedStatIndex && <Icon name='angle-down' style={{ color: theme.text.red }} />}
-        {(i + 1) === natureObj?.increasedStatIndex && <Icon name='angle-up' style={{ color: theme.text.primary }} />}
+        {(i + 1) === natureObj?.decreasedStatIndex && <Icon name='angle-down' className={css({ color: theme.text.red })} />}
+        {(i + 1) === natureObj?.increasedStatIndex && <Icon name='angle-up' className={css({ color: theme.text.primary })} />}
     </td>;
 
     const maxStatValue = Math.max(...stats, 350);
@@ -73,39 +74,39 @@ export const TextStats: React.FC<TextStatsProps> = ({
     const legend = [ t('details.stats.hp'), t('details.stats.atk'), t('details.stats.def'), t('details.stats.spa'), t('details.stats.spd'), t('details.stats.spe') ]
         .map((label, i) => <React.Fragment key={label}>
             {label}
-            {(i + 1) === natureObj?.decreasedStatIndex && <Icon name='angle-down' style={{ color: theme.text.red }} />}
-            {(i + 1) === natureObj?.increasedStatIndex && <Icon name='angle-up' style={{ color: theme.text.primary }} />}
+            {(i + 1) === natureObj?.decreasedStatIndex && <Icon name='angle-down' className={css({ color: theme.text.red })} />}
+            {(i + 1) === natureObj?.increasedStatIndex && <Icon name='angle-up' className={css({ color: theme.text.primary })} />}
         </React.Fragment>)
     const labels = [ t('details.stats.ivs'), t('details.stats.evs'), t('details.stats.name') ];
     const colors = [ theme.bg.yellow, theme.bg.green, theme.bg.primary ];
 
     return <>
         {natureObj && <>
-            {t('details.nature')} <span style={{ color: theme.text.primary }}>{natureObj.name}</span>
+            {t('details.nature')} <span className={css({ color: theme.text.primary })}>{natureObj.name}</span>
             <br />
             <br />
         </>}
 
-        <div style={{ display: 'inline-flex', height: '1lh' }}>
+        <div className={css({ display: 'inline-flex', height: '1lh' })}>
             <Button
                 onClick={() => setShowTable(false)}
                 disabled={!showTable}
-                style={{
+                className={css({
                     height: 26,
                     borderTopRightRadius: 0,
                     borderBottomRightRadius: 0,
-                }}
+                })}
             >
                 <Icon name='chart-network' forButton />
             </Button>
             <Button
                 onClick={() => setShowTable(true)}
                 disabled={showTable}
-                style={{
+                className={css({
                     height: 26,
                     borderTopLeftRadius: 0,
                     borderBottomLeftRadius: 0,
-                }}
+                })}
             >
                 <Icon name='table' solid forButton />
             </Button>
@@ -114,16 +115,16 @@ export const TextStats: React.FC<TextStatsProps> = ({
         {showTable
             ? (
                 <table
-                    style={{
+                    className={css({
                         borderSpacing: '8px 0'
-                    }}
+                    })}
                 >
                     <thead>
                         <tr>
-                            <td style={cellBaseStyle}></td>
-                            {!editMode && <td style={cellBaseStyle}>{t('details.stats.ivs')}</td>}
-                            <td style={cellBaseStyle}>{t('details.stats.evs')}</td>
-                            {!editMode && <td style={cellBaseStyle}>{t('details.stats.name')}</td>}
+                            <td className={cellBaseClassName}></td>
+                            {!editMode && <td className={cellBaseClassName}>{t('details.stats.ivs')}</td>}
+                            <td className={cellBaseClassName}>{t('details.stats.evs')}</td>
+                            {!editMode && <td className={cellBaseClassName}>{t('details.stats.name')}</td>}
                         </tr>
                     </thead>
                     <tbody>
@@ -131,40 +132,40 @@ export const TextStats: React.FC<TextStatsProps> = ({
                             .map((statName, i) => editMode
                                 ? <tr key={statName}>
                                     {renderStatNameCell(statName, i)}
-                                    <td style={cellBaseStyle}>
+                                    <td className={cellBaseClassName}>
                                         <NumberInput {...register(`eVs.${i}`, {
                                             valueAsNumber: true,
                                             min: 0,
                                             max: formMaxValues[ i ]
-                                        })} rangeMin={0} rangeMax={formMaxValues[ i ]} style={{ display: 'flex', height: '1lh' }} />
+                                        })} rangeMin={0} rangeMax={formMaxValues[ i ]} className={css({ display: 'flex', height: '1lh' })} />
                                     </td>
                                 </tr>
                                 : <tr key={statName}>
                                     {renderStatNameCell(statName, i)}
-                                    <td style={cellBaseStyle}>{ivs[ i ]}</td>
-                                    <td style={cellBaseStyle}>{evs[ i ]}</td>
-                                    <td style={cellBaseStyle}>{stats[ i ]}</td>
+                                    <td className={cellBaseClassName}>{ivs[ i ]}</td>
+                                    <td className={cellBaseClassName}>{evs[ i ]}</td>
+                                    <td className={cellBaseClassName}>{stats[ i ]}</td>
                                 </tr>)}
 
                         {editMode
                             ? <tr>
-                                <td style={{ ...cellBaseStyle, textAlign: 'left', textTransform: 'capitalize' }}>{t('total')}</td>
-                                <td style={cellBaseStyle}>{totalFormEVs} / {totalEVs}</td>
+                                <td className={cx(cellBaseClassName, css({ textAlign: 'left', textTransform: 'capitalize' }))}>{t('total')}</td>
+                                <td className={cellBaseClassName}>{totalFormEVs} / {totalEVs}</td>
                             </tr>
                             : <tr>
-                                <td style={{ ...cellBaseStyle, textAlign: 'left', textTransform: 'capitalize' }}>{t('total')}</td>
-                                <td style={cellBaseStyle}>{totalIVs}</td>
-                                <td style={cellBaseStyle}>{totalEVs}</td>
-                                <td style={cellBaseStyle}>{totalStats}</td>
+                                <td className={cx(cellBaseClassName, css({ textAlign: 'left', textTransform: 'capitalize' }))}>{t('total')}</td>
+                                <td className={cellBaseClassName}>{totalIVs}</td>
+                                <td className={cellBaseClassName}>{totalEVs}</td>
+                                <td className={cellBaseClassName}>{totalStats}</td>
                             </tr>}
                     </tbody>
                 </table>
             )
-            : <div style={{
+            : <div className={css({
                 display: 'flex',
                 justifyContent: 'center',
                 marginTop: -26
-            }}>
+            })}>
                 <RadarChart
                     width={300}
                     data={data}
@@ -182,10 +183,10 @@ export const TextStats: React.FC<TextStatsProps> = ({
             type={hiddenPowerType}
             damage={hiddenPowerPower}
             category={hiddenPowerCategory}
-            style={{
+            className={css({
                 display: 'inline-block',
                 verticalAlign: 'bottom'
-            }}
+            })}
         />
     </>;
 };

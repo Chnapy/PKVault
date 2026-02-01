@@ -1,36 +1,36 @@
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 import { Popover, PopoverButton } from '@headlessui/react';
 import React from 'react';
-import { usePkmSaveIndex } from '../data/hooks/use-pkm-save-index';
-import { BoxType, type PkmSaveDTO, type SaveInfosDTO } from '../data/sdk/model';
-import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
-import { useStorageGetBoxes } from '../data/sdk/storage/storage.gen';
-import { withErrorCatcher } from '../error/with-error-catcher';
-import { Route } from '../routes/storage';
-import { SaveItem } from '../saves/save-item/save-item';
-import { useTranslate } from '../translate/i18n';
-import { Icon } from '../ui/icon/icon';
-import { SaveCardImg } from '../ui/save-card/save-card-img';
-import { StorageBox } from '../ui/storage-box/storage-box';
-import { StorageBoxSaveActions } from '../ui/storage-box/storage-box-save-actions';
-import { StorageItemPlaceholder } from '../ui/storage-item/storage-item-placeholder';
-import { StorageMoveContext } from './actions/storage-move-context';
-import { DexSyncAdvancedAction } from './advanced-actions/dex-sync-advanced-action';
-import { SortAdvancedAction } from './advanced-actions/sort-advanced-action';
-import { StorageBoxList } from './box/storage-box-list';
-import { StorageHeader } from './box/storage-header';
-import { StorageSaveItem } from './storage-save-item';
-import { getSaveOrder } from './util/get-save-order';
-import { SizingUtil } from '../ui/util/sizing-util';
+import { usePkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
+import { BoxType, type PkmSaveDTO, type SaveInfosDTO } from '../../../data/sdk/model';
+import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
+import { useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
+import { withErrorCatcher } from '../../../error/with-error-catcher';
+import { Route } from '../../../routes/storage';
+import { SaveItem } from '../../../saves/save-item/save-item';
+import { useTranslate } from '../../../translate/i18n';
+import { Icon } from '../../../ui/icon/icon';
+import { SaveCardImg } from '../../../ui/save-card/save-card-img';
+import { StorageBox } from '../../../ui/storage-box/storage-box';
+import { StorageBoxSaveActions } from '../../../ui/storage-box/storage-box-save-actions';
+import { StorageItemPlaceholder } from '../../../ui/storage-item/storage-item-placeholder';
+import { StorageMoveContext } from '../../actions/storage-move-context';
+import { DexSyncAdvancedAction } from '../../advanced-actions/dex-sync-advanced-action';
+import { SortAdvancedAction } from '../../advanced-actions/sort-advanced-action';
+import { StorageBoxList } from '../storage-box-list';
+import { StorageHeader } from '../storage-header';
+import { StorageSaveItem } from '../../item/save/storage-save-item';
+import { getSaveOrder } from '../../util/get-save-order';
+import { SizingUtil } from '../../../ui/util/sizing-util';
 
 export type StorageSaveBoxContentProps = {
   saveId: number;
   boxId: number;
   order: number;
-  style?: React.CSSProperties;
+  className?: string;
 };
 
-export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withErrorCatcher('default', ({ saveId, boxId, order, style }) => {
+export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withErrorCatcher('default', ({ saveId, boxId, order, className }) => {
   const [ showBoxes, setShowBoxes ] = React.useState(false);
 
   const { t } = useTranslate();
@@ -92,7 +92,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
     >
       <PopoverButton
         as={StorageBox}
-        style={style}
+        className={className}
         slotCount={selectedBox.slotCount}
         lineSlotCount={nbrItemsPerLine}
         loading={loading}
@@ -112,15 +112,14 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
                   {saveInfos && <SaveCardImg version={saveInfos.version} size={24} borderWidth={2} />}
 
                   <div
-                    className='save-item'
-                    style={{
+                    className={cx('save-item', css({
                       position: 'absolute',
                       top: 38,
                       left: 6,
                       zIndex: 5,
                       opacity: 0,
                       pointerEvents: 'none',
-                    }}
+                    }))}
                   >
                     <SaveItem saveId={saveId} />
                   </div>
@@ -250,7 +249,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
           <>
             {allItems.map((pkm, i) => {
               return (
-                <div key={i} style={{ order: i, display: 'flex' }}>
+                <div key={i} className={css({ order: i, display: 'flex' })}>
                   {!pkm ||
                     (moveContext.selected?.saveId === saveId && !moveContext.selected.target && moveContext.selected.ids.includes(pkm.id)) ? (
                     <StorageItemPlaceholder saveId={saveId} boxId={selectedBox.idInt} boxSlot={i} pkmId={pkm?.id} />

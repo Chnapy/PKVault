@@ -13,6 +13,7 @@ import { Icon } from '../icon/icon';
 import { StorageDetailsForm } from '../storage-item-details/storage-details-form';
 import { theme } from '../theme';
 import { StorageItemSaveActionsContainer } from './storage-item-save-actions-container';
+import { css } from '@emotion/css';
 
 export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId }) => {
   const { t } = useTranslate();
@@ -47,12 +48,12 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
   return (
     <StorageItemSaveActionsContainer saveId={saveId} pkmId={selectedPkm.id}>
       <div
-        style={{
+        className={css({
           display: 'flex',
           flexDirection: 'column',
           gap: 4,
           maxWidth: 170,
-        }}
+        })}
       >
         {moveClickable.onClick && (
           <Button onClick={moveClickable.onClick}>

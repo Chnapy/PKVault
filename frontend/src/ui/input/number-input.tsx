@@ -1,10 +1,9 @@
 import type React from 'react';
 import { theme } from '../theme';
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 
 export type NumberInputProps = {
     value?: number;
-    // onChange: React.ChangeEventHandler<HTMLInputElement>;
     rangeMin?: number;
     rangeMax?: number;
 }
@@ -12,7 +11,7 @@ export type NumberInputProps = {
 
 export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, rangeMax, ...rest }) => {
     return <div
-        style={{
+        className={cx(css({
             color: theme.text.light,
             backgroundColor: theme.bg.darker,
             borderRadius: 4,
@@ -20,14 +19,12 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
             filter: theme.shadow.filter,
             overflow: 'hidden',
             verticalAlign: 'middle',
-            ...rest.style,
-        }}
+        }), rest.className)}
     >
         <input
             type="text"
             value={value}
-            {...rest}
-            style={{
+            className={css({
                 width: '100%',
                 color: theme.text.default,
                 backgroundColor: theme.bg.default,
@@ -38,7 +35,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
                 padding: '2px 4px',
                 textShadow: theme.shadow.text,
                 textAlign: rest.style?.textAlign,
-            }}
+            })}
         />
 
         {rangeMin !== undefined && rangeMax !== undefined &&
@@ -54,10 +51,6 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
                     cursor: 'pointer',
                     borderRadius: 3,
                     width: 40,
-
-                    /* Input Track */
-
-                    /* Chrome, Safari, Edge (Chromium) */
                     '&::-webkit-slider-runnable-track': {
                         background: theme.bg.darker,
                         border: `1px solid ${theme.bg.darker}`,
@@ -66,10 +59,6 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
                         overflow: 'hidden',
                         cursor: 'w-resize'
                     },
-
-                    /* Input Thumb */
-
-                    /* Chrome, Safari, Edge (Chromium) */
                     '&::-webkit-slider-thumb': {
                         appearance: 'none',
                         background: theme.bg.light,
@@ -77,18 +66,9 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
                         height: '100%',
                         cursor: 'w-resize'
                     },
-
-                    /* Focus styles */
-
                     '&:focus': {
                         outline: 'none',
                     },
-
-                    /* Chrome, Safari, Edge (Chromium) */
-                    // '&:focus::-webkit-slider-thumb': {
-                    //     outline: '2px solid #fff',
-                    //     outlineOffset: 2,
-                    // },
                 })}
             />}
     </div>;

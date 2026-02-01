@@ -1,6 +1,7 @@
 import type React from 'react';
 import { BoxType } from '../../data/sdk/model';
 import { BoxTypeIcon } from './box-type-icon';
+import { css } from '@emotion/css';
 
 export const BoxName: React.FC<{
     boxType: BoxType;
@@ -15,18 +16,18 @@ export const BoxName: React.FC<{
 
     const hasDetails = !!typeLetter || !!icon;
 
-    return <div style={{
+    return <div className={css({
         width: '100%',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         gap: hasDetails ? 2 : undefined,
-    }}>
-        {hasDetails && <span style={{
+    })}>
+        {hasDetails && <span className={css({
             flex: 1,
             display: 'flex',
             alignItems: 'center',
-        }}>
+        })}>
             {typeLetter && <BoxTypeIcon boxType={boxType} />}
         </span>}
 
@@ -34,6 +35,6 @@ export const BoxName: React.FC<{
             {boxName}
         </span>
 
-        {hasDetails && <span style={{ flex: 1, textAlign: 'right' }}>{icon}</span>}
+        {hasDetails && <span className={css({ flex: 1, textAlign: 'right' })}>{icon}</span>}
     </div>
 };

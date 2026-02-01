@@ -9,6 +9,7 @@ import { useTranslate } from '../../translate/i18n';
 import { SizingUtil } from '../../ui/util/sizing-util';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { StorageSelectContext } from './storage-select-context';
+import { css } from '@emotion/css';
 
 type Context = {
     selected?: {
@@ -29,6 +30,16 @@ const context = React.createContext<Context>({
     setSelected: () => void 0,
 });
 
+// TODO complete refacto using state machine, this part is too complex to maintain
+/**
+ * Manage pkms move action with all possible cases:
+ * - one or multiple pkms selected
+ * - move into current box or another box
+ * - move between PKVault <-> save
+ * - move between save A <-> save B
+ * - move to another bank
+ * - move as attached or not
+ */
 export const StorageMoveContext = {
     containerId: 'storage-move-container',
     Provider: ({ children }: React.PropsWithChildren) => {
@@ -43,6 +54,9 @@ export const StorageMoveContext = {
         return <context.Provider value={value}>{children}</context.Provider>;
     },
     useValue: () => React.useContext(context),
+    /**
+     * Move in process for given position and/or pkmId.
+     */
     useLoading: (saveId: number | undefined, boxId: number, boxSlot: number, pkmId?: string) => {
         const { selected } = StorageMoveContext.useValue();
 
@@ -54,6 +68,9 @@ export const StorageMoveContext = {
                 (selected.saveId === saveId && !!pkmId && selected.ids.includes(pkmId)))
         );
     },
+    /**
+     * Move to given bank in process.
+     */
     useLoadingBank: (bankId: string) => {
         const { selected } = StorageMoveContext.useValue();
 
@@ -61,6 +78,9 @@ export const StorageMoveContext = {
 
         return moveTarget?.bankId === bankId;
     },
+    /**
+     * Given pkms can be moved.
+     */
     useClickable: (pkmIdsRaw: string[], saveId: number | undefined) => {
         const moveContext = StorageMoveContext.useValue();
         const selectContext = StorageSelectContext.useValue();
@@ -70,14 +90,8 @@ export const StorageMoveContext = {
         const mainPkmVersionsQuery = usePkmVersionIndex();
         const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);
 
-        // const mainBoxesQuery = useStorageGetMainBoxes();
-        // const saveBoxesQuery = useStorageGetSaveBoxes(saveId ?? 0);
-
         const pkmMains = !moveContext.selected && !saveId ? pkmIds.map(id => mainPkmVersionsQuery.data?.data.byId[ id ]).filter(filterIsDefined) : [];
         const pkmSaves = !moveContext.selected && !!saveId ? pkmIds.map(id => savePkmsQuery.data?.data.byId[ id ]).filter(filterIsDefined) : [];
-
-        // const boxMain = !moveContext.selected && storageType === 'main' ? mainBoxesQuery.data?.data.find(box => box.idInt === pkmMain?.boxId) : undefined;
-        // const boxSave = !moveContext.selected && storageType === 'save' ? saveBoxesQuery.data?.data.find(box => box.idInt === pkmSave?.box) : undefined;
 
         const canClickIds = !saveId ? pkmMains.map(pkm => pkm.id) : pkmSaves.filter(pkmSave => pkmSave.canMove || pkmSave.canMoveToMain).map(pkm => pkm.id);
 
@@ -109,6 +123,10 @@ export const StorageMoveContext = {
                     : undefined,
         };
     },
+    /**
+     * Translate item rendering following given pkm moving state.
+     * If pkm is not moving, do nothing.
+     */
     useDraggable: (pkmId: string, saveId: number | undefined) => {
         const ref = React.useRef<HTMLDivElement>(null);
         const { selected, setSelected } = StorageMoveContext.useValue();
@@ -170,7 +188,6 @@ export const StorageMoveContext = {
                         moveVariables.scrollX = scrollX;
                         moveVariables.scrollY = scrollY;
                         ref.current.style.transform = getTransform();
-                        // ref.current.style.pointerEvents = 'none';
                     }
                 };
 
@@ -201,7 +218,6 @@ export const StorageMoveContext = {
 
                     if (ref.current) {
                         ref.current.style.transform = transform;
-                        // ref.current.style.pointerEvents = pointerEvents;
                     }
                 };
             }
@@ -240,12 +256,12 @@ export const StorageMoveContext = {
                     return createPortal(
                         <div
                             ref={ref}
-                            style={{
+                            className={css({
                                 position: 'absolute',
                                 left: posDiff[ 0 ]! * 102,
                                 top: posDiff[ 1 ]! * 102,
                                 pointerEvents: 'none',
-                            }}
+                            })}
                         >
                             {element}
                         </div>,
@@ -257,6 +273,10 @@ export const StorageMoveContext = {
             },
         };
     },
+    /**
+     * Estimate if given bank can receive currently moving pkm.
+     * If no moving pkm, do nothing.
+     */
     useDroppableBank: (bankId: string) => {
         const { t } = useTranslate();
         const { selected, setSelected } = StorageMoveContext.useValue();
@@ -415,7 +435,6 @@ export const StorageMoveContext = {
                         selectContext.clear();
                     }
                 })
-                // await new Promise(resolve => setTimeout(resolve, 3000))
                 .finally(() => {
                     setSelected(undefined);
                 });
@@ -436,6 +455,10 @@ export const StorageMoveContext = {
             helpText: clickInfos.helpText,
         };
     },
+    /**
+     * Estimate if given position can receive currently moving pkm.
+     * If no moving pkm, do nothing.
+     */
     useDroppable: (saveId: number | undefined, dropBoxId: number, dropBoxSlot: number, pkmId?: string) => {
         const { t } = useTranslate();
         const { selected, setSelected } = StorageMoveContext.useValue();
@@ -445,7 +468,6 @@ export const StorageMoveContext = {
 
         const movePkmMutation = useStorageMovePkm();
 
-        // const mainBoxesQuery = useStorageGetMainBoxes();
         const boxesQuery = useStorageGetBoxes({ saveId });
 
         const mainPkmVersionsQuery = usePkmVersionIndex();
@@ -544,10 +566,6 @@ export const StorageMoveContext = {
                     return { enable: false };
                 }
 
-                // if (!!targetPkm && selected.ids.includes(targetPkm.id)) {
-                // return { enable: false, helpText: 'bar ' + targetPkm?.id + ' ' };
-                // }
-
                 if (selected.attached && targetPkm) {
                     return { enable: false, helpText: t('storage.move.attached-pkm') };
                 }
@@ -622,7 +640,6 @@ export const StorageMoveContext = {
                             };
                         }
                     }
-                    // console.log(targetPkmSave.generation, sourcePkmSave.generation, targetPkmSave.canMove)
                 }
 
                 // pkm main -> save
@@ -770,8 +787,6 @@ export const StorageMoveContext = {
                     boxSlots: targetBoxSlots,
                 },
             });
-
-            // await new Promise(resolve => setTimeout(resolve, 3000));
 
             await movePkmMutation
                 .mutateAsync({

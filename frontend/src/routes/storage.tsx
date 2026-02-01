@@ -8,13 +8,12 @@ import { ActionsPanel } from '../storage/actions/actions-panel';
 import { StorageMoveContext } from '../storage/actions/storage-move-context';
 import { StorageSelectContext } from '../storage/actions/storage-select-context';
 import { BankList } from '../storage/bank/bank-list';
-import { StorageDetails } from "../storage/storage-details";
-import { StorageMainBox } from "../storage/storage-main-box";
-import { StorageSaveBox } from "../storage/storage-save-box";
+import { StorageDetails } from "../storage/details/storage-details";
+import { StorageMainBox } from "../storage/box/main/storage-main-box";
+import { StorageSaveBox } from "../storage/box/save/storage-save-box";
 import { StorageSaveSelect } from "../storage/storage-save-select";
 import { StorageSearchCheck } from '../storage/storage-search-check';
 import { filterIsDefined } from '../util/filter-is-defined';
-// import { TestFillMainStorage } from '../storage/test-fill-main-storage';
 
 export const Storage: React.FC = withErrorCatcher('default', () => {
   const selected = Route.useSearch({ select: (search) => search.selected });
@@ -24,13 +23,13 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
     <StorageSearchCheck>
       <StorageSelectContext.Provider>
         <StorageMoveContext.Provider>
-          <div style={{
+          <div className={css({
             display: 'flex',
             justifyContent: 'space-between',
-          }}>
+          })}>
             <div
               id={StorageMoveContext.containerId}
-              style={{
+              className={css({
                 display: 'flex',
                 justifyContent: "center",
                 alignItems: "flex-start",
@@ -38,12 +37,8 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
                 gap: 16,
                 margin: 'auto',
                 marginBottom: 150,
-              }}
+              })}
             >
-              {/* <div style={{ width: '100%', display: 'flex', gap: 8 }}>
-                <TestFillMainStorage />
-              </div> */}
-
               <BankList />
 
               <StorageMainBox />
@@ -53,11 +48,11 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
                 .sort((a, b) => a.order < b.order ? -1 : 1)
                 .map(save => <StorageSaveBox key={save.saveId} saveId={save.saveId} />)}
 
-              <div style={{
+              <div className={css({
                 display: 'flex',
                 width: 630,
                 height: 564
-              }}>
+              })}>
                 <StorageSaveSelect />
               </div>
 

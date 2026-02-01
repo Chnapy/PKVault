@@ -3,6 +3,7 @@ import { ErrorCatcher } from '../../error/error-catcher';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { theme } from '../theme';
 import { Container, type ContainerProps } from './container';
+import { css, cx } from '@emotion/css';
 
 export type TitledContainerProps = Omit<ContainerProps<'div'>, 'title'> & {
     title: React.ReactNode;
@@ -32,7 +33,7 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
 
     return <Container
         {...containerProps}
-        style={{
+        className={cx(css({
             backgroundColor: contrasted
                 ? theme.bg.contrast
                 : theme.bg.panel,
@@ -47,14 +48,13 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
                 : undefined,
             display: 'flex',
             flexDirection: 'column',
-            ...containerProps.style,
-        }}
+        }), containerProps.className)}
     >
         <ErrorCatcher>
             {title && <div
                 role={enableExpand ? 'button' : undefined}
                 onClick={enableExpand ? (() => setExpanded(!expanded)) : undefined}
-                style={{
+                className={css({
                     backgroundColor: contrasted
                         ? theme.bg.contrastdark
                         : theme.bg.light,
@@ -62,16 +62,16 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
                     borderRadius: 2,
                     cursor: enableExpand ? 'pointer' : undefined,
                     userSelect: enableExpand ? 'none' : undefined,
-                }}
+                })}
             >{title}</div>}
 
             {children && expanded && <div
-                style={{
+                className={css({
                     flexGrow: 1,
                     padding: 8,
                     overflowY: 'auto',
                     maxHeight,
-                }}
+                })}
             >
                 {children}
             </div>}

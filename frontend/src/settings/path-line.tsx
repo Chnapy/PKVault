@@ -1,3 +1,4 @@
+import { css } from '@emotion/css';
 
 export const PathLine: React.FC<{ children: string }> = ({ children }) => {
     const parts = children.split('/');
@@ -8,28 +9,26 @@ export const PathLine: React.FC<{ children: string }> = ({ children }) => {
 
     return <div
         title={children}
-        style={{
+        className={css({
             whiteSpace: 'nowrap',
             display: 'flex',
             alignItems: 'center',
             overflow: 'hidden',
-        }}
+        })}
     >
         {firstPartsStr && <>
             <div
-                style={{
+                className={css({
                     opacity: 0.5,
                     textOverflow: 'ellipsis',
                     overflow: 'hidden',
                     minWidth: 10,
-                }}
+                })}
             >
                 {firstPartsStr}
             </div>/
         </>}
-        {directory && <div
-        // style={{ opacity: 0.5 }}
-        >
+        {directory && <div>
             {directory}/
         </div>}
         {filename}

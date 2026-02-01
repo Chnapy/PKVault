@@ -50,12 +50,12 @@ export const DexSyncAdvancedAction: React.FC<{
 
     return <form
         onSubmit={onSubmit}
-        style={{
+        className={css({
             maxWidth: 350,
             display: 'flex',
             flexDirection: 'column',
             gap: 8,
-        }}
+        })}
     >
         <div>
             {t('storage.dex-sync.title')}
@@ -68,11 +68,11 @@ export const DexSyncAdvancedAction: React.FC<{
                 setValue('saveIds', newIds.map(Number));
             }}
         >
-            <ListboxOptions static style={{
+            <ListboxOptions static className={css({
                 maxHeight: 210,
                 overflowY: 'auto',
                 userSelect: 'none'
-            }}>
+            })}>
                 {[
                     // pkvault storage
                     {
@@ -80,10 +80,10 @@ export const DexSyncAdvancedAction: React.FC<{
                         label: <>
                             <img
                                 src={getGameInfos(null).img}
-                                style={{
+                                className={css({
                                     height: 14,
                                     width: 14,
-                                }}
+                                })}
                             />
                             PKVault
                         </>,
@@ -96,10 +96,10 @@ export const DexSyncAdvancedAction: React.FC<{
                             label: <>
                                 <img
                                     src={getGameInfos(save.version).img}
-                                    style={{
+                                    className={css({
                                         height: 14,
                                         width: 14,
-                                    }}
+                                    })}
                                 />
                                 {staticData.versions[ save.version ]?.name} - {save.trainerName}
                             </>,
@@ -110,11 +110,11 @@ export const DexSyncAdvancedAction: React.FC<{
                     <ListboxOption
                         key={value}
                         value={value}
-                        style={{
+                        className={css({
                             marginTop: i ? 2 : 0,
                             opacity: disabled ? 0.75 : undefined,
                             pointerEvents: disabled ? 'none' : undefined,
-                        }}
+                        })}
                         disabled={disabled}
                     >
                         <FilterLabel

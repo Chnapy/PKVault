@@ -46,7 +46,6 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = wit
       loading={moveLoading}
       onClick={moveDroppable.onClick}
       onPointerUp={moveDroppable.onPointerUp}
-      // selected={isOver}
       noDropshadow
       anchor='top'
       showHelp={!!moveDroppable.helpText}

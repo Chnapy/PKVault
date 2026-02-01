@@ -36,35 +36,35 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
     const finalShowDetails = showFullDetails !== undefined ? showFullDetails : showDetails;
 
     return (
-        <Container padding="big" borderRadius="big" style={{
+        <Container padding="big" borderRadius="big" className={css({
             display: "flex",
             flexDirection: 'column',
             gap: 4,
             backgroundColor: bgColor ?? theme.bg.contrast,
             borderColor: bgColor ?? theme.border.contrast,
             color: theme.text.light,
-        }}>
+        })}>
             <div
-                style={{
+                className={css({
                     display: 'flex',
                     alignItems: 'center',
                     gap: 4,
                     paddingLeft: 4,
-                }}
+                })}
             >
-                <div style={{
+                <div className={css({
                     flexGrow: 1,
                     display: 'flex',
                     alignItems: 'center',
                     gap: 4,
                     overflow: 'hidden'
-                }}>
+                })}>
                     {title}
                 </div>
 
                 <Button
                     onClick={() => setShowDetails(value => !value)} disabled={showFullDetails !== undefined}
-                    style={{ minWidth: '2lh' }}
+                    className={css({ minWidth: '2lh' })}
                 >
                     <Icon name={finalShowDetails ? 'angle-down' : 'angle-up'} forButton />
                 </Button>
@@ -75,26 +75,26 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
             </div>
 
             {(mainImg || mainInfos) && <div
-                style={{
+                className={css({
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 4,
                     borderRadius: 8,
                     background: theme.bg.blue,
-                }}
+                })}
             >
-                <div style={{
+                <div className={css({
                     display: "flex",
                     alignItems: 'stretch',
-                }}>
+                })}>
                     <div
-                        style={{
+                        className={css({
                             position: 'relative',
                             padding: 4,
                             borderRadius: 8,
                             background: theme.bg.dark,
                             alignSelf: 'flex-start',
-                        }}
+                        })}
                     >
                         {mainImg}
                     </div>

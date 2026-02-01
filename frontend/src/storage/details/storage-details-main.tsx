@@ -14,6 +14,7 @@ import { StorageDetailsBase } from '../../ui/storage-item-details/storage-detail
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { switchUtilRequired } from '../../util/switch-util';
+import { css } from '@emotion/css';
 
 export type StorageDetailsMainProps = {
     selectedId: string;
@@ -37,14 +38,14 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selected
     const pkmVersion = versions[ finalIndex ];
 
     return (
-        <div style={{ flexGrow: 1 }}>
+        <div className={css({ flexGrow: 1 })}>
             <div
-                style={{
+                className={css({
                     display: 'flex',
                     gap: '0 4px',
                     padding: '0 8px',
                     flexWrap: 'wrap-reverse',
-                }}
+                })}
             >
                 {versions.map((pkmVersion, i) => (
                     <DetailsTab

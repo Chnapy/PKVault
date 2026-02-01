@@ -9,9 +9,9 @@ import { filterIsDefined } from '../../util/filter-is-defined';
 import { usePokedexFilters } from "./hooks/use-pokedex-filters";
 import { PokedexCount } from './pokedex-count';
 import { PokedexItem, type PokedexItemProps } from "./pokedex-item";
+import { css } from '@emotion/css';
 
 export const PokedexList: React.FC = withErrorCatcher('default', () => {
-  // console.time("pokedex-list");
   const { t } = useTranslate();
 
   const staticData = useStaticData();
@@ -30,9 +30,9 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
     .map(Number)
     .sort((a, b) => a - b);
 
-  const lastKey = keys[ keys.length - 1 ];
+  const lastSpecies = keys[ keys.length - 1 ];
 
-  const speciesList = new Array(lastKey).fill(0).map((_, i) => i + 1);
+  const speciesList = new Array(lastSpecies).fill(0).map((_, i) => i + 1);
 
   const filteredSpeciesList = speciesList
     .map(species => Object.values(
@@ -40,9 +40,13 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
     ).filter(filterSpeciesValues))
     .filter(speciesValues => !isPkmFiltered(speciesValues));
 
-  const itemsByGen: React.ReactNode[][] = filteredSpeciesList.reduce((acc, speciesValues) => {
+  // TODO move data-manipulation in dex indexing data hook
+  const speciesItemsByGeneration = filteredSpeciesList.reduce<{
+    generation: number;
+    speciesItems: React.ReactNode[];
+  }[]>((acc, speciesValues) => {
     const species = speciesValues[ 0 ]!.species;
-    const staticGeneration = staticData.species[ species ]?.generation ?? -1;
+    const generation = staticData.species[ species ]?.generation ?? -1;
 
     const nbrForms = Math.max(...speciesValues.map(value => value.forms.length));
     const forms: PokedexItemProps[ 'forms' ] = [];
@@ -51,6 +55,7 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
       const maxContext = Math.max(...currentForms.map(value => value.context)) as EntityContext;
 
       forms.push({
+        id: currentForms[ 0 ]!.id,
         form: currentForms[ 0 ]!.form,
         context: maxContext,
         gender: currentForms[ 0 ]!.gender,
@@ -62,11 +67,15 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
       });
     }
 
-    // if (new Set(forms.map(f => f.form)).size === 1) return acc;
+    const accIndex = generation - 1;
 
-    const genAcc = acc[ staticGeneration - 1 ] ?? [];
-    acc[ staticGeneration - 1 ] = genAcc;
-    genAcc.push(
+    const accCurrentItem = acc[ accIndex ] ?? {
+      generation,
+      speciesItems: []
+    };
+    acc[ accIndex ] = accCurrentItem;
+
+    accCurrentItem.speciesItems.push(
       <PokedexItem
         key={species}
         species={species}
@@ -75,50 +84,47 @@ export const PokedexList: React.FC = withErrorCatcher('default', () => {
     );
 
     return acc;
-  }, [] as React.ReactNode[][]);
-
-  // console.timeEnd("pokedex-list");
+  }, []);
 
   return (
     <div
-      style={{
+      className={css({
         display: "flex",
         flexDirection: 'column',
         justifyContent: "center",
         gap: 8,
         overflow: "auto",
-        //   maxHeight: "100%",
         flexWrap: "wrap",
         padding: 4,
-      }}
+      })}
     >
       <PokedexCount
         data={filteredSpeciesList}
       />
 
-      {itemsByGen.map((genItems, i) => <TitledContainer
-        key={i}
+      {speciesItemsByGeneration.map(({ generation, speciesItems }) => <TitledContainer
+        key={generation}
         enableExpand
         title={
           <>
-            {t('dex.list.title', { generation: i + 1, regions: staticData.generations[ i + 1 ]?.regions.join(', ') })}
+            {t('dex.list.title', { generation, regions: staticData.generations[ generation ]?.regions.join(', ') })}
 
-            <div style={{ float: 'right' }}>
+            <div className={css({ float: 'right' })}>
               <PokedexCount
-                data={filteredSpeciesList.filter(speciesValues => staticData.species[ speciesValues[ 0 ]?.species ?? -1 ]?.generation === i + 1)}
+                data={filteredSpeciesList.filter(speciesValues => staticData.species[ speciesValues[ 0 ]?.species ?? -1 ]?.generation === generation)}
               />
             </div>
           </>
         }
       >
-        <div style={{
+        <div className={css({
           display: 'flex',
           justifyContent: 'center',
           flexWrap: 'wrap',
           gap: 8,
-        }}
+        })}
         >
-          {genItems}
+          {speciesItems}
         </div>
       </TitledContainer>)}
     </div>

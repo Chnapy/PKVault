@@ -21,6 +21,7 @@ import { StorageDetailsTitle } from './storage-details-title';
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
+import { css } from '@emotion/css';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'idBase' | 'pid' | 'species' | 'context' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
@@ -79,10 +80,9 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 {pkm.isAlpha && <AlphaIcon />}
 
                 {pkm.isShiny && <ShinyIcon
-                    style={{
-                        // width: 12,
+                    className={css({
                         margin: '0 -2px',
-                    }}
+                    })}
                 />}
             </>}
             genderPart={<Gender gender={pkm.gender} />}
@@ -94,7 +94,6 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             speciesName={speciesName ?? ''}
             nickname={pkm.nickname}
             nicknameMaxLength={pkm.nicknameMaxLength}
-            // gender={pkm.gender}
             levelUpPercent={pkm.levelUpPercent}
             level={pkm.level}
             types={pkm.types}
@@ -104,36 +103,22 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             {(!pkm.isEnabled || !pkm.isValid) && <TextContainer
                 bgColor={pkm.isEnabled ? theme.bg.yellow : theme.bg.red}
                 maxHeight={200}
-                style={{
+                className={css({
                     minHeight: '1lh',
                     flexShrink: 0.1,
-                }}
+                })}
             >
                 {pkm.validityReport}
             </TextContainer>}
-
-            {/* {!!mainBoxId && !!mainBoxSlot && goToMainPkm && <>
-                        <Button onClick={goToMainPkm}>
-                            <div style={{ width: '100%' }}>
-                                Go to main-pkm
-                            </div>
-                            <div style={{ width: '100%' }}>
-                                Box {mainBoxId} slot {mainBoxSlot}
-                            </div>
-                            <div style={{ width: '100%', color: !saveSynchronized ? theme.text.contrast : undefined }}>
-                                {saveSynchronized ? 'synchronized' : 'unsynchronized'}
-                            </div>
-                        </Button>
-                    </>} */}
         </>}
         content={pkm.isEnabled && <>
             {!!pkm.heldItem && <TextContainer>
-                {t('details.held-item')} <span style={{ color: theme.text.primary }}>{staticData.items[ pkm.heldItem ]?.name}</span> <ItemImg
+                {t('details.held-item')} <span className={css({ color: theme.text.primary })}>{staticData.items[ pkm.heldItem ]?.name}</span> <ItemImg
                     item={pkm.heldItem}
                     size={24}
-                    style={{
+                    className={css({
                         verticalAlign: 'middle'
-                    }}
+                    })}
                 />
             </TextContainer>}
 
@@ -187,22 +172,22 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
         showFullDetails={!pkm.isEnabled || moveContext.selected
             ? false
             : (formContext.editMode ? true : undefined)}
-        actions={formContext.editMode && <div style={{
+        actions={formContext.editMode && <div className={css({
             display: 'flex',
             gap: 4
-        }}>
+        })}>
             <Button
                 onClick={() => formContext.cancel()}
-                style={{ flexGrow: 1 }}
+                className={css({ flexGrow: 1 })}
             >
                 {t('action.cancel')}
             </Button>
 
-            <div style={{ flexGrow: 1 }}>
+            <div className={css({ flexGrow: 1 })}>
                 <ButtonWithConfirm
                     bgColor={theme.bg.primary}
                     onClick={onSubmit}
-                    style={{ flexGrow: 1 }}
+                    className={css({ flexGrow: 1 })}
                 >
                     {t('action.submit')}
                 </ButtonWithConfirm>

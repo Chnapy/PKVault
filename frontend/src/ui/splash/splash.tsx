@@ -1,9 +1,10 @@
 import type React from 'react';
 import { Container } from '../container/container';
 import { theme } from '../theme';
+import { css } from '@emotion/css';
 
 export const Splash: React.FC<React.PropsWithChildren> = ({ children }) => <div
-    style={{
+    className={css({
         backgroundColor: theme.bg.contrast,
         height: '100vh',
         display: 'flex',
@@ -12,17 +13,17 @@ export const Splash: React.FC<React.PropsWithChildren> = ({ children }) => <div
         justifyContent: 'center',
         gap: 16,
         padding: 16,
-    }}
+    })}
 >
     <img
         src='/logo.svg'
-        style={{
+        className={css({
             width: 128,
             height: 128,
-        }}
+        })}
     />
 
-    {children && <Container padding='big' style={{ maxWidth: '100%' }}>
+    {children && <Container padding='big' className={css({ maxWidth: '100%' })}>
         {children}
     </Container>}
 </div>;
