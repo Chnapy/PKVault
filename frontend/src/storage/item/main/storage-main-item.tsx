@@ -1,10 +1,10 @@
 import { PopoverButton } from '@headlessui/react';
 import React from 'react';
-import { usePkmVersionSlotInfos } from '../data/hooks/use-pkm-version-slot-infos';
-import { withErrorCatcher } from '../error/with-error-catcher';
-import { Route } from '../routes/storage';
-import { StorageItemPopover } from '../ui/storage-item/storage-item-popover';
-import { StorageSelectContext } from './actions/storage-select-context';
+import { usePkmVersionSlotInfos } from '../../../data/hooks/use-pkm-version-slot-infos';
+import { withErrorCatcher } from '../../../error/with-error-catcher';
+import { Route } from '../../../routes/storage';
+import { StorageItemPopover } from '../../../ui/storage-item/storage-item-popover';
+import { StorageSelectContext } from '../../actions/storage-select-context';
 import { StorageMainItemBase, type StorageMainItemBaseProps } from './storage-main-item-base';
 
 type StorageMainItemProps = {

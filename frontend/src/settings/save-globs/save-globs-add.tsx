@@ -3,6 +3,7 @@ import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
 import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
+import { css } from '@emotion/css';
 
 export type SaveGlobsItemProps = {
     type: 'file' | 'folder';
@@ -40,7 +41,7 @@ export const SaveGlobsAdd: React.FC<SaveGlobsItemProps> = ({ type, onAdd, disabl
 
     return <Button
         onClick={onAddFn}
-        style={{ flexGrow: 1 }}
+        className={css({ flexGrow: 1 })}
         disabled={disabled}
     >
         <Icon name='plus' solid forButton />

@@ -4,6 +4,7 @@ import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
 import { ItemImg } from '../../../ui/details-card/item-img';
 import { FilterCheckbox } from "../../../ui/filter/filter-checkbox/filter-checkbox";
+import { css } from '@emotion/css';
 
 export const FilterCaught: React.FC = () => {
   const { t } = useTranslate();
@@ -34,7 +35,7 @@ export const FilterCaught: React.FC = () => {
       <ItemImg
         item={staticData.itemPokeball.id}
         size={'1lh'}
-        style={{ margin: '0 -4px' }}
+        className={css({ margin: '0 -4px' })}
       />
 
       {searchValue === undefined

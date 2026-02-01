@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ErrorType } from './mutator/custom-instance';
+import { QueryError, type ErrorType } from './mutator/custom-instance';
 
 type BackendError = Pick<ErrorType<never>, 'status' | 'message' | 'stack'>;
 
@@ -37,4 +37,17 @@ export const BackendErrorsContext = {
         </context.Provider>;
     },
     useValue: () => React.useContext(context),
+    useOnMutationResponse: () => {
+        const context = BackendErrorsContext.useValue();
+
+        return (data: unknown, error: Error | null) => {
+            if (error instanceof QueryError) {
+                context.addError({
+                    message: error.errorMessage ?? undefined,
+                    stack: error.errorStack ?? undefined,
+                    status: error.status,
+                });
+            }
+        };
+    },
 };

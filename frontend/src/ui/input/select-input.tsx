@@ -4,6 +4,7 @@ import { Button, type ButtonProps } from '../button/button';
 import { TitledContainer } from '../container/titled-container';
 import { Icon } from '../icon/icon';
 import { theme } from '../theme';
+import { css, cx } from '@emotion/css';
 
 export type DataOption<K extends string | number> = { value: K; option: React.ReactNode; disabled?: boolean };
 
@@ -25,11 +26,11 @@ const SelectInput = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<
         as={Button}
         value={item.value}
         disabled={item.disabled}
-        style={item.disabled
-            ? {
+        className={item.disabled
+            ? css({
                 opacity: 0.5,
                 cursor: 'not-allowed'
-            }
+            })
             : undefined
         }
     >
@@ -37,7 +38,7 @@ const SelectInput = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<
     </ListboxOption>;
 
     return (<label
-        style={{
+        className={cx(css({
             display: 'inline-flex',
             flexDirection: 'column',
             color: theme.text.light,
@@ -46,41 +47,39 @@ const SelectInput = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<
             filter: theme.shadow.filter,
             overflow: 'hidden',
             verticalAlign: 'middle',
-            // padding: 2,
-            ...rest.style,
-        }}
+        }), rest.className)}
     >
         {label && <div
-            style={{
+            className={css({
                 padding: 4,
                 cursor: 'pointer',
                 textShadow: theme.shadow.textlight,
-            }}
+            })}
         >
             {label}
         </div>}
 
         <Listbox value={value} onChange={onChange}>
             <ListboxButton as={Button} ref={ref} {...rest}>
-                <div style={{ flexGrow: 1, margin: '-2px -4px', marginRight: 0, overflow: 'hidden' }}>
+                <div className={css({ flexGrow: 1, margin: '-2px -4px', marginRight: 0, overflow: 'hidden' })}>
                     {data.find(item => item.value === value)?.option}
                 </div>
 
                 <Icon name='angle-down' solid forButton />
             </ListboxButton>
 
-            <ListboxOptions anchor={anchor} style={{ zIndex: 30 }}>
+            <ListboxOptions anchor={anchor} className={css({ zIndex: 30 })}>
                 <TitledContainer
                     contrasted
                     title={null}
                     maxHeight={500}
                 >
                     <div
-                        style={{
+                        className={css({
                             display: 'flex',
                             flexDirection: 'column',
                             gap: 4,
-                        }}
+                        })}
                     >
                         {data.map(renderOption)}
                     </div>

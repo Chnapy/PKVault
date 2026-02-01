@@ -13,10 +13,10 @@ export type ButtonWithPopoverProps = Omit<ButtonProps<typeof PopoverButton>, 'as
 export const ButtonWithPopover: React.FC<ButtonWithPopoverProps> = ({ anchor = 'bottom', panelTitle, panelContent, ...btnProps }) => {
 
     return <Popover
-        style={{
+        className={css({
             display: 'flex',
             flexDirection: 'column'
-        }}
+        })}
     >
         {({ open, close }) => <>
             <PopoverButton as={Button} {...btnProps} disabled={open || btnProps.disabled} />

@@ -3,12 +3,13 @@ import type React from "react";
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { Backup } from '../settings/backup/backup';
 import { Settings } from '../settings/settings';
+import { css } from '@emotion/css';
 
 const SettingsPage: React.FC = withErrorCatcher('default', () => {
 
   return (
     <div
-      style={{
+      className={css({
         display: "flex",
         flexDirection: 'column',
         alignItems: "stretch",
@@ -17,7 +18,7 @@ const SettingsPage: React.FC = withErrorCatcher('default', () => {
         maxWidth: 914,
         marginLeft: 'auto',
         marginRight: 'auto',
-      }}
+      })}
     >
       <Settings />
 

@@ -28,11 +28,11 @@ export const FiltersCard: React.FC = withErrorCatcher('default', () => {
       <FilterSpecies />
 
       <div
-        style={{
+        className={css({
           display: "flex",
           flexDirection: "column",
           gap: 4,
-        }}
+        })}
       >
         <div
           className={css({
@@ -66,11 +66,11 @@ export const FiltersCard: React.FC = withErrorCatcher('default', () => {
       </div>
 
       <div
-        style={{
+        className={css({
           display: "flex",
           flexDirection: "column",
           gap: 4,
-        }}
+        })}
       >
 
         <ShowForms />

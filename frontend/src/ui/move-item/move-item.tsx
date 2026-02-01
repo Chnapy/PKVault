@@ -4,6 +4,7 @@ import { Icon } from '../icon/icon';
 import { theme } from '../theme';
 import { TypeItemBase, type TypeItemBaseProps } from '../type-item/type-item-base';
 import { getMoveCategoryImg } from './util/get-move-category-img';
+import { css } from '@emotion/css';
 
 export type MoveItemProps = TypeItemBaseProps & {
     category: MoveCategory;
@@ -15,7 +16,7 @@ export const MoveItem: React.FC<MoveItemProps> = ({ category, damage, isValid = 
     const categoryImg = getMoveCategoryImg(category);
 
     return <TypeItemBase {...rest}>
-        {!isValid && <div style={{
+        {!isValid && <div className={css({
             width: '0.8lh',
             height: '0.8lh',
             borderRadius: 99,
@@ -27,12 +28,12 @@ export const MoveItem: React.FC<MoveItemProps> = ({ category, damage, isValid = 
             justifyContent: 'center',
             fontWeight: 'bold',
             flexShrink: 0
-        }}>
+        })}>
             <Icon name='exclaimation' solid forButton />
         </div>}
 
         <div
-            style={{
+            className={css({
                 width: 25,
                 color: theme.text.default,
                 backgroundImage: `url("${categoryImg}")`,
@@ -40,7 +41,7 @@ export const MoveItem: React.FC<MoveItemProps> = ({ category, damage, isValid = 
                 textAlign: 'center',
                 flexShrink: 0,
                 alignSelf: 'normal',
-            }}
+            })}
         >
             {damage}
         </div>

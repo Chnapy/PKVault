@@ -4,10 +4,10 @@ import type { DataDTOStateOfDictionaryOfStringAndPkmVersionDTO, PkmVersionDTO } 
 import { getStorageGetMainPkmVersionsQueryKey, storageGetMainPkmVersions } from '../sdk/storage/storage.gen';
 
 type PkmVersionIndexes = {
-    byId: Record<PkmVersionDTO['id'], PkmVersionDTO>;
-    byBox: Record<PkmVersionDTO['boxId'], Record<PkmVersionDTO['boxSlot'], PkmVersionDTO[]>>;
-    byAttachedSave: Record<NonNullable<PkmVersionDTO['attachedSaveId']>, Record<NonNullable<PkmVersionDTO['attachedSavePkmIdBase']>, PkmVersionDTO>>;
-    bySpecies: Record<PkmVersionDTO['species'], PkmVersionDTO[]>;
+    byId: Record<PkmVersionDTO[ 'id' ], PkmVersionDTO>;
+    byBox: Record<PkmVersionDTO[ 'boxId' ], Record<PkmVersionDTO[ 'boxSlot' ], PkmVersionDTO[]>>;
+    byAttachedSave: Record<NonNullable<PkmVersionDTO[ 'attachedSaveId' ]>, Record<NonNullable<PkmVersionDTO[ 'attachedSavePkmIdBase' ]>, PkmVersionDTO>>;
+    bySpecies: Record<PkmVersionDTO[ 'species' ], PkmVersionDTO[]>;
 };
 
 const buildIndexes = (data: PkmVersionDTO[]) => {
@@ -21,19 +21,19 @@ const buildIndexes = (data: PkmVersionDTO[]) => {
     };
 
     data.forEach(version => {
-        indexes.byId[version.id] = version;
+        indexes.byId[ version.id ] = version;
 
-        indexes.byBox[version.boxId] ??= {};
-        indexes.byBox[version.boxId]![version.boxSlot] ??= [];
-        indexes.byBox[version.boxId]![version.boxSlot]!.push(version);
+        indexes.byBox[ version.boxId ] ??= {};
+        indexes.byBox[ version.boxId ]![ version.boxSlot ] ??= [];
+        indexes.byBox[ version.boxId ]![ version.boxSlot ]!.push(version);
 
         if (version.attachedSaveId && version.attachedSavePkmIdBase) {
-            indexes.byAttachedSave[version.attachedSaveId] ??= {};
-            indexes.byAttachedSave[version.attachedSaveId]![version.attachedSavePkmIdBase] = version;
+            indexes.byAttachedSave[ version.attachedSaveId ] ??= {};
+            indexes.byAttachedSave[ version.attachedSaveId ]![ version.attachedSavePkmIdBase ] = version;
         }
 
-        indexes.bySpecies[version.species] ??= [];
-        indexes.bySpecies[version.species]!.push(version);
+        indexes.bySpecies[ version.species ] ??= [];
+        indexes.bySpecies[ version.species ]!.push(version);
     });
 
     console.timeEnd('Build PkmVersion indexes');
@@ -47,6 +47,9 @@ type QueryData = {
     headers: Headers;
 };
 
+/**
+ * Fetch save pkms with caching & indexing.
+ */
 export const usePkmVersionIndex = () => {
     const queryKey = getStorageGetMainPkmVersionsQueryKey();
 
@@ -63,6 +66,9 @@ export const usePkmVersionIndex = () => {
     });
 };
 
+/**
+ * Update react-query cache with given data, after formatting.
+ */
 export const updatePkmVersionCache = (client: QueryClient, pkmVersions: DataDTOStateOfDictionaryOfStringAndPkmVersionDTO) => {
     const cachedResponse: Partial<QueryData> = client.getQueryData(getStorageGetMainPkmVersionsQueryKey()) ?? {};
 

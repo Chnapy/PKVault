@@ -10,6 +10,7 @@ import { Icon } from '../../ui/icon/icon';
 import { StorageMoveContext } from '../actions/storage-move-context';
 import { BankContext } from './bank-context';
 import { BankEdit } from './bank-edit';
+import { css } from '@emotion/css';
 
 export const BankItem: React.FC<{
   bankId: string;
@@ -36,21 +37,21 @@ export const BankItem: React.FC<{
 
   const buttonMainContent = bank && (
     <div
-      style={{
+      className={css({
         display: 'flex',
         alignItems: 'center',
         textAlign: 'center',
-      }}
+      })}
     >
       {bank.isDefault && (
         <Icon
           name='star'
           solid
           forButton
-          style={{
+          className={css({
             alignSelf: 'flex-start',
             marginRight: 4,
-          }}
+          })}
         />
       )}
       {bank.name}
@@ -65,10 +66,10 @@ export const BankItem: React.FC<{
   return (
     bank && (
       <div
-        style={{
+        className={css({
           display: 'inline-flex',
           order: bank.order,
-        }}
+        })}
       >
         {moveDroppable.isDragging ? (
           <ButtonWithDisabledPopover
@@ -81,12 +82,12 @@ export const BankItem: React.FC<{
             anchor='bottom'
             showHelp={!!moveDroppable.helpText}
             helpTitle={moveDroppable.helpText}
-            style={{
+            className={css({
               flexGrow: 1,
               zIndex: 1,
               borderTopRightRadius: 0,
               borderBottomRightRadius: 0,
-            }}
+            })}
           >
             {buttonMainContent}
           </ButtonWithDisabledPopover>
@@ -96,11 +97,11 @@ export const BankItem: React.FC<{
             {...selectBankProps(bankId)}
             selected={selectedBankBoxes.data?.selectedBank.id === bankId}
             loading={isLoading}
-            style={{
+            className={css({
               zIndex: 1,
               borderTopRightRadius: 0,
               borderBottomRightRadius: 0,
-            }}
+            })}
           >
             {buttonMainContent}
           </ButtonLink>
@@ -110,12 +111,11 @@ export const BankItem: React.FC<{
           <ButtonWithPopover
             panelContent={close => <BankEdit bankId={bankId} close={close} />}
             loading={isLoading}
-            style={{
-              // borderLeftWidth: 0,
+            className={css({
               borderTopLeftRadius: 0,
               borderBottomLeftRadius: 0,
               borderBottomRightRadius: 0,
-            }}
+            })}
           >
             <Icon name='pen' forButton />
           </ButtonWithPopover>
@@ -127,12 +127,11 @@ export const BankItem: React.FC<{
             onClick={() => bankDeleteMutation.mutateAsync({ bankId })}
             disabled={!canDelete}
             loading={isLoading}
-            style={{
-              // borderLeftWidth: 0,
+            className={css({
               borderTopLeftRadius: 0,
               borderBottomLeftRadius: 0,
               borderTopRightRadius: 0,
-            }}
+            })}
           >
             <Icon name='trash' solid forButton />
           </ButtonWithDisabledPopover>

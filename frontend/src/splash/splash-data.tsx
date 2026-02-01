@@ -9,6 +9,9 @@ import { Fallback } from '../error/fallback';
 import { useDesktopMessage } from '../settings/save-globs/hooks/use-desktop-message';
 import { Splash } from '../ui/splash/splash';
 
+/**
+ * Display splash screen until whole data is loaded without error.
+ */
 export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number }>> = ({ appStartTime, children }) => {
     const queries = [
         useStaticDataGet(),

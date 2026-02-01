@@ -13,6 +13,7 @@ import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
 import { useDesktopMessage } from './save-globs/hooks/use-desktop-message';
 import { SaveGlobsList } from './save-globs/save-globs-list';
+import { css } from '@emotion/css';
 
 export const Settings: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
@@ -49,35 +50,35 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
         });
     });
 
-    return <TitledContainer title={<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+    return <TitledContainer title={<div className={css({ display: 'flex', justifyContent: 'space-between' })}>
         {t('settings.title')}
 
-        <div style={{ marginLeft: 'auto' }}>
+        <div className={css({ marginLeft: 'auto' })}>
             v{settings?.version} - Build ID = {settings?.buildID} - PKHeX {settings?.pkhexVersion}
         </div>
     </div>}>
         <form
             onSubmit={submit}
-            style={{
+            className={css({
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 8,
-            }}
+            })}
         >
             <div
-                style={{
+                className={css({
                     display: 'flex',
                     gap: 8,
                     flexWrap: 'wrap'
-                }}
+                })}
             >
                 <div
-                    style={{
+                    className={css({
                         flexGrow: 1,
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 8,
-                    }}
+                    })}
                 >
                     <SelectStringInput
                         label={t('settings.form.language')}
@@ -93,12 +94,12 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                 </div>
 
                 <div
-                    style={{
+                    className={css({
                         flexGrow: 1,
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 8,
-                    }}
+                    })}
                 >
                     <TextInput
                         label={desktopMessage
@@ -131,36 +132,36 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
             />
 
             <details>
-                <summary style={{ cursor: 'pointer' }}>{t('settings.advanced')}</summary>
+                <summary className={css({ cursor: 'pointer' })}>{t('settings.advanced')}</summary>
 
-                <div style={{
+                <div className={css({
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 8,
-                }}>
-                    <div style={{
+                })}>
+                    <div className={css({
                         display: 'flex',
                         justifyContent: 'center',
                         gap: 4
-                    }}>
+                    })}>
                         <Icon name='info-circle' solid forButton />
                         {t('settings.relative-paths')}: {settings.appDirectory}
                     </div>
 
                     <div
-                        style={{
+                        className={css({
                             display: 'flex',
                             gap: 8,
                             flexWrap: 'wrap'
-                        }}
+                        })}
                     >
                         <div
-                            style={{
+                            className={css({
                                 flexGrow: 1,
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: 8,
-                            }}
+                            })}
                         >
                             <TextInput
                                 label={desktopMessage
@@ -206,12 +207,12 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                         </div>
 
                         <div
-                            style={{
+                            className={css({
                                 flexGrow: 1,
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: 8,
-                            }}
+                            })}
                         >
                             <TextInput
                                 label={desktopMessage
@@ -239,11 +240,11 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
             </details>
 
             <div
-                style={{
+                className={css({
                     display: 'flex',
                     justifyContent: 'center',
                     gap: 8,
-                }}
+                })}
             >
                 <Button
                     onClick={() => reset(defaultValue)}
@@ -259,12 +260,12 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                 >{t('action.submit')}</Button>
             </div>
 
-            {!settings.canUpdateSettings && <div style={{
+            {!settings.canUpdateSettings && <div className={css({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 4,
-            }}>
+            })}>
                 <Icon name='info-circle' solid forButton />
                 {t('action.not-possible')}
                 <ButtonLink to='/storage' {...storageHistoryValue}>{t('action.check-storage')}</ButtonLink>

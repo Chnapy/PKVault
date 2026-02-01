@@ -4,6 +4,7 @@ public record MovePkmActionInput(string[] pkmIds, uint? sourceSaveId,
     uint? targetSaveId, string targetBoxId, int[] targetBoxSlots,
     bool attached);
 
+// TODO refacto, this part is too complex to maintain
 public class MovePkmAction(
     IServiceProvider sp,
     StaticDataService staticDataService,

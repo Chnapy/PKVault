@@ -1,4 +1,4 @@
-import { css } from "@emotion/css";
+import { css, cx } from "@emotion/css";
 import type React from "react";
 import { theme } from "../../theme";
 import { Button } from '../../button/button';
@@ -24,8 +24,7 @@ export const FilterLabel: React.FC<FilterLabelProps> = ({
         })}
       >
         <div
-          className={className}
-          style={{
+          className={cx(css({
             backgroundColor: theme.bg.darker,
             borderRadius: 4,
             color: theme.text.light,
@@ -33,7 +32,7 @@ export const FilterLabel: React.FC<FilterLabelProps> = ({
             padding: "2px 4px",
             paddingRight: enabled ? undefined : 8,
             textAlign: "left",
-          }}
+          }), className)}
         >
           {children}
         </div>

@@ -18,6 +18,7 @@ import { SelectNumberInput, SelectStringInput } from '../../ui/input/select-inpu
 import { TextInput } from '../../ui/input/text-input';
 import { theme } from '../../ui/theme';
 import { BoxTypeIcon } from './box-type-icon';
+import { css } from '@emotion/css';
 
 export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({ boxId, close }) => {
     const { t } = useTranslate();
@@ -46,7 +47,6 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
 
     const watchType = watch('type');
     const watchName = watch('boxName');
-    // const watchSlotCount = watch('slotCount');
     const watchOrder = watch('order');
     const watchBankId = watch('bankId');
 
@@ -104,11 +104,11 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
 
     return (
         <form
-            style={{
+            className={css({
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 8,
-            }}
+            })}
             onSubmit={onSubmit}
         >
             <TextInput
@@ -127,13 +127,13 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
                         value,
                         option: (
                             <div
-                                style={{
+                                className={css({
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     gap: 4,
                                     paddingLeft: 4,
-                                }}
+                                })}
                             >
                                 <BoxTypeIcon boxType={value} />
                                 {t(`storage.box.edit.type.${key.toLowerCase() as Lowercase<keyof typeof BoxType>}`)}
@@ -147,11 +147,11 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
             />
 
             <div
-                style={{
+                className={css({
                     display: 'flex',
                     alignItems: 'center',
                     gap: 8,
-                }}
+                })}
             >
                 {t('storage.box.edit.slotCount')}
                 <NumberInput
@@ -161,19 +161,19 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
                         max: 300,
                     })}
                     title={`${minSlotCount} - ${300}`}
-                    style={{
+                    className={css({
                         width: 40,
                         textAlign: 'center',
-                    }}
+                    })}
                 />
             </div>
 
             <div
-                style={{
+                className={css({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                }}
+                })}
             >
                 <Button onClick={() => previousBox && setValue('order', previousBox.order - 5)} disabled={!previousBox}>
                     <Icon name='angle-left' solid forButton />
@@ -192,13 +192,13 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
                         value: bank.id,
                         option: (
                             <div
-                                style={{
+                                className={css({
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     gap: 4,
                                     paddingLeft: 4,
-                                }}
+                                })}
                             >
                                 <Icon name='bank' solid forButton />
                                 {bank.name}

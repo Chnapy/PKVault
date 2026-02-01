@@ -1,29 +1,29 @@
 import { css } from '@emotion/css';
 import { Popover, PopoverButton } from '@headlessui/react';
 import React from 'react';
-import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
-import { BoxType, type PkmVersionDTO } from '../data/sdk/model';
-import { useStorageCreateMainBox, useStorageDeleteMainBox, useStorageGetBoxes } from '../data/sdk/storage/storage.gen';
-import { withErrorCatcher } from '../error/with-error-catcher';
-import { Route } from '../routes/storage';
-import { useTranslate } from '../translate/i18n';
-import { Icon } from '../ui/icon/icon';
-import { StorageBox } from '../ui/storage-box/storage-box';
-import { StorageBoxMainActions } from '../ui/storage-box/storage-box-main-actions';
-import { StorageItemPlaceholder } from '../ui/storage-item/storage-item-placeholder';
-import { StorageMoveContext } from './actions/storage-move-context';
-import { DexSyncAdvancedAction } from './advanced-actions/dex-sync-advanced-action';
-import { SortAdvancedAction } from './advanced-actions/sort-advanced-action';
-import { BankContext } from './bank/bank-context';
-import { StorageBoxEdit } from './box/storage-box-edit';
-import { StorageBoxList } from './box/storage-box-list';
-import { StorageHeader } from './box/storage-header';
-import { StorageMainItem } from './storage-main-item';
+import { usePkmVersionIndex } from '../../../data/hooks/use-pkm-version-index';
+import { BoxType, type PkmVersionDTO } from '../../../data/sdk/model';
+import { useStorageCreateMainBox, useStorageDeleteMainBox, useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
+import { withErrorCatcher } from '../../../error/with-error-catcher';
+import { Route } from '../../../routes/storage';
+import { useTranslate } from '../../../translate/i18n';
+import { Icon } from '../../../ui/icon/icon';
+import { StorageBox } from '../../../ui/storage-box/storage-box';
+import { StorageBoxMainActions } from '../../../ui/storage-box/storage-box-main-actions';
+import { StorageItemPlaceholder } from '../../../ui/storage-item/storage-item-placeholder';
+import { StorageMoveContext } from '../../actions/storage-move-context';
+import { DexSyncAdvancedAction } from '../../advanced-actions/dex-sync-advanced-action';
+import { SortAdvancedAction } from '../../advanced-actions/sort-advanced-action';
+import { BankContext } from '../../bank/bank-context';
+import { StorageBoxEdit } from '../storage-box-edit';
+import { StorageBoxList } from '../storage-box-list';
+import { StorageHeader } from '../storage-header';
+import { StorageMainItem } from '../../item/main/storage-main-item';
 
 export const StorageMainBoxContent: React.FC<{
     boxId: number;
-    style?: React.CSSProperties;
-}> = withErrorCatcher('default', ({ boxId, style }) => {
+    className?: string;
+}> = withErrorCatcher('default', ({ boxId, className }) => {
     const [ showBoxes, setShowBoxes ] = React.useState(false);
 
     const { t } = useTranslate();
@@ -82,24 +82,24 @@ export const StorageMainBoxContent: React.FC<{
                 as={StorageBox}
                 loading={loading}
                 slotCount={selectedBox.slotCount}
-                style={style}
+                className={className}
                 header={
                     <>
                         <StorageHeader
                             gameLogo={
                                 <div
-                                    style={{
+                                    className={css({
                                         flex: 1,
                                         alignItems: 'center',
-                                    }}
+                                    })}
                                 >
                                     <img
                                         src='/logo.svg'
-                                        style={{
+                                        className={css({
                                             display: 'block',
                                             height: 24,
                                             width: 24,
-                                        }}
+                                        })}
                                     />
                                 </div>
                             }
@@ -204,7 +204,7 @@ export const StorageMainBoxContent: React.FC<{
                     <>
                         {allItems.map((pkm, i) => {
                             return (
-                                <div key={i} style={{ order: i, display: 'flex' }}>
+                                <div key={i} className={css({ order: i, display: 'flex' })}>
                                     {!pkm ||
                                         (moveContext.selected &&
                                             !moveContext.selected.saveId &&

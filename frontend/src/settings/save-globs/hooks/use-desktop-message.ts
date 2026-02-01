@@ -54,6 +54,10 @@ const requestDesktop = (request: { type: string }) => {
     window.chrome?.webview.postMessage(request);
 };
 
+/**
+ * Gives desktop actions only in desktop context.
+ * If returns undefined, then app is in web context.
+ */
 export const useDesktopMessage = () => {
     if (!isDesktop) {
         return undefined;

@@ -2,6 +2,7 @@ import type React from 'react';
 import type { GameVersion } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
+import { css } from '@emotion/css';
 
 export type DetailsTitleProps = {
     version: GameVersion | null;    // null means pkvault
@@ -19,10 +20,10 @@ export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> 
     return <>
         <img
             src={getGameInfos(version).img}
-            style={{ height: 28, width: 28 }}
+            className={css({ height: 28, width: 28 })}
         />
 
-        <div style={{ flexGrow: 1 }}>
+        <div className={css({ flexGrow: 1 })}>
             {generation ? <>G{generation}</> : null}
             {showVersionName && <>
                 {' / '}

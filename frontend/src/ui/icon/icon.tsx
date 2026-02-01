@@ -1,5 +1,5 @@
 import type React from 'react';
-import { cx } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 
 import "@hackernoon/pixel-icon-library/fonts/iconfont.css";
 
@@ -11,21 +11,18 @@ export type IconProps = {
 }
     & React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
+/**
+ * Icons from https://pixeliconlibrary.com/
+ */
 export const Icon: React.FC<IconProps> = ({ name, solid, alt, forButton, ...rest }) => {
     return <i
         {...rest}
-        className={cx('hn', `hn-${name}${alt ? '-alt' : ''}${solid ? '-solid' : ''}`, rest.className)}
-        style={{
-            ...rest.style,
-            // color: 'currentcolor',
-            ...(forButton
-                ? {
-                    fontSize: '75%',
-                    lineHeight: '1lh',
-                    verticalAlign: 'middle',
-                    // width: 'calc(1lh - 4px)',
-                }
-                : {})
-        }}
+        className={cx('hn', `hn-${name}${alt ? '-alt' : ''}${solid ? '-solid' : ''}`, {
+            [ css({
+                fontSize: '75%',
+                lineHeight: '1lh',
+                verticalAlign: 'middle',
+            }) ]: forButton
+        }, rest.className)}
     />;
 };

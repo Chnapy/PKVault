@@ -8,6 +8,7 @@ import { TextInput } from '../../ui/input/text-input';
 import { theme } from '../../ui/theme';
 import { PathLine } from '../path-line';
 import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
+import { css } from '@emotion/css';
 
 export type SaveGlobsItemProps = {
     value: string;
@@ -36,26 +37,24 @@ export const SaveGlobsItem: React.FC<SaveGlobsItemProps> = ({ value, onEdit, onR
     const hasError = !globResultsQuery.isLoading && (globResultsQuery.isError || data.length > 50);
     const hasWarning = !globResultsQuery.isLoading && (hasError || data.length === 0);
 
-    // console.log(globResultsQuery.isError, globResultsQuery.error, globResultsQuery.isLoadingError, globResultsQuery.data)
-
     return <Container
-        style={{
+        className={css({
             display: 'flex',
             flexDirection: 'column',
             flexWrap: 'nowrap',
             padding: 0,
             backgroundColor: theme.bg.light,
-        }}
+        })}
     >
         <details
-            style={{
+            className={css({
                 display: 'flex',
                 flexDirection: 'column',
                 flexWrap: 'nowrap',
-            }}
+            })}
         >
             <summary
-                style={{
+                className={css({
                     display: 'flex',
                     alignItems: 'center',
                     flexWrap: 'nowrap',
@@ -63,28 +62,28 @@ export const SaveGlobsItem: React.FC<SaveGlobsItemProps> = ({ value, onEdit, onR
                     padding: 4,
                     paddingLeft: 8,
                     cursor: showFiles && data.length > 0 ? 'pointer' : undefined,
-                }}
+                })}
             >
                 <Icon name={!isFile ? 'folder' : 'file-import'} solid forButton />
 
-                <div style={{ flexGrow: 1, lineBreak: 'anywhere' }}>
+                <div className={css({ flexGrow: 1, lineBreak: 'anywhere' })}>
                     {isDesktop
                         ? value
                         : <TextInput
                             value={value}
                             onChange={({ currentTarget }) => onEdit(currentTarget.value)}
-                            style={{ width: '100%' }}
+                            className={css({ width: '100%' })}
                             disabled={disabled}
                         />}
                 </div>
 
                 {(showFiles || isLoading || globResultsQuery.isError) && <div
-                    style={{
+                    className={css({
                         display: 'flex',
                         gap: 4,
                         color: hasError ? theme.text.red : undefined,
                         whiteSpace: 'nowrap',
-                    }}
+                    })}
                 >
                     {hasWarning && <Icon name='exclamation-triangle' solid forButton />}
                     {isLoading
@@ -114,14 +113,14 @@ export const SaveGlobsItem: React.FC<SaveGlobsItemProps> = ({ value, onEdit, onR
                 </Button>
             </summary>
 
-            {showFiles && data.length > 0 && <pre style={{
+            {showFiles && data.length > 0 && <pre className={css({
                 fontFamily: 'inherit',
                 backgroundColor: theme.bg.panel,
                 maxHeight: 200,
                 overflow: 'auto',
                 padding: 4,
                 margin: 0,
-            }}>
+            })}>
                 {!isLoading && data.map(path => <PathLine key={path}>{path}</PathLine>)}
             </pre>}
         </details>

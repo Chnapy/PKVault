@@ -4,13 +4,14 @@ import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
 import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
 import { Route } from '../../routes';
 import { BankContext } from '../../storage/bank/bank-context';
-import { StorageMainItemBase } from '../../storage/storage-main-item-base';
-import { StorageSaveItemBase } from '../../storage/storage-save-item-base';
+import { StorageMainItemBase } from '../../storage/item/main/storage-main-item-base';
+import { StorageSaveItemBase } from '../../storage/item/save/storage-save-item-base';
 import { getSaveOrder } from '../../storage/util/get-save-order';
 import { useTranslate } from '../../translate/i18n';
 import { StorageItem } from '../../ui/storage-item/storage-item';
 import { TextContainer } from '../../ui/text-container/text-container';
 import { SizingUtil } from '../../ui/util/sizing-util';
+import { css } from '@emotion/css';
 
 export type PokedexDetailsOwnedProps = {
     saveId: number;
@@ -33,11 +34,11 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
             <div>{t('details.owned-save')}</div>
 
             <div
-                style={{
+                className={css({
                     display: 'flex',
                     flexWrap: 'wrap',
                     gap: SizingUtil.itemsGap,
-                }}
+                })}
             >
                 {saveId === 0 ? (
                     <>

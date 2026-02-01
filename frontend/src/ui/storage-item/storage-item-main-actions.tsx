@@ -17,6 +17,7 @@ import { Icon } from "../icon/icon";
 import { StorageDetailsForm } from "../storage-item-details/storage-details-form";
 import { theme } from "../theme";
 import { StorageItemMainActionsContainer } from "./storage-item-main-actions-container";
+import { css } from '@emotion/css';
 
 export const StorageItemMainActions: React.FC = () => {
   const { t } = useTranslate();
@@ -27,7 +28,7 @@ export const StorageItemMainActions: React.FC = () => {
   const formEditMode = StorageDetailsForm.useEditMode();
 
   const moveClickable = StorageMoveContext.useClickable(
-    selected?.id ? [selected.id] : [],
+    selected?.id ? [ selected.id ] : [],
     undefined,
   );
 
@@ -57,12 +58,12 @@ export const StorageItemMainActions: React.FC = () => {
   return (
     <StorageItemMainActionsContainer pkmId={mainVersion.id}>
       <div
-        style={{
+        className={css({
           display: "flex",
           flexDirection: "column",
           gap: 4,
           maxWidth: 170,
-        }}
+        })}
       >
         {moveClickable.onClick && (
           <Button onClick={moveClickable.onClick}>
@@ -123,16 +124,16 @@ export const StorageItemMainActions: React.FC = () => {
                   },
                   saves: attachedVersion
                     ? {
-                        ...saves,
-                        [attachedVersion.attachedSaveId!]: {
-                          saveId: attachedVersion.attachedSaveId!,
-                          saveBoxIds: [attachedSavePkm?.boxId ?? 0],
-                          order: getSaveOrder(
-                            saves,
-                            attachedVersion.attachedSaveId!,
-                          ),
-                        },
-                      }
+                      ...saves,
+                      [ attachedVersion.attachedSaveId! ]: {
+                        saveId: attachedVersion.attachedSaveId!,
+                        saveBoxIds: [ attachedSavePkm?.boxId ?? 0 ],
+                        order: getSaveOrder(
+                          saves,
+                          attachedVersion.attachedSaveId!,
+                        ),
+                      },
+                    }
                     : saves,
                 }),
               });
@@ -163,7 +164,7 @@ export const StorageItemMainActions: React.FC = () => {
             onClick={async () => {
               const mutateResult = await evolvePkmsMutation.mutateAsync({
                 params: {
-                  ids: [canEvolveVersion.id],
+                  ids: [ canEvolveVersion.id ],
                 },
               });
               const mainPkms = Object.values(
@@ -195,7 +196,7 @@ export const StorageItemMainActions: React.FC = () => {
             onClick={() =>
               mainPkmDetachSaveMutation.mutateAsync({
                 params: {
-                  pkmVersionIds: [attachedVersion!.id],
+                  pkmVersionIds: [ attachedVersion!.id ],
                 },
               })
             }

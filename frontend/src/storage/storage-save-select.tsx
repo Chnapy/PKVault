@@ -11,6 +11,7 @@ import { Icon } from '../ui/icon/icon';
 import { theme } from '../ui/theme';
 import { filterIsDefined } from '../util/filter-is-defined';
 import { getSaveOrder } from './util/get-save-order';
+import { css } from '@emotion/css';
 
 export const StorageSaveSelect: React.FC = withErrorCatcher('default', () => {
   const { t } = useTranslate();
@@ -32,17 +33,17 @@ export const StorageSaveSelect: React.FC = withErrorCatcher('default', () => {
   return (
     <TitledContainer
       title={t('storage.save-select')}
-      style={{
+      className={css({
         width: '100%'
-      }}
+      })}
     >
       <div
-        style={{
+        className={css({
           display: 'grid',
           gridTemplateColumns: '50% 50%',
           gap: 8,
           paddingRight: 8,
-        }}
+        })}
       >
         {saveInfos.map((save, i) => (
           <SaveItem
@@ -66,7 +67,7 @@ export const StorageSaveSelect: React.FC = withErrorCatcher('default', () => {
           />
         ))}
 
-        <Container style={{
+        <Container className={css({
           alignSelf: 'center',
           display: 'flex',
           alignItems: 'center',
@@ -74,7 +75,7 @@ export const StorageSaveSelect: React.FC = withErrorCatcher('default', () => {
           gap: 4,
           backgroundColor: theme.bg.panel,
           padding: '8px 16px',
-        }}>
+        })}>
           <Icon name='info-circle' solid forButton />
           {t('saves.not-see')}
           <ButtonLink to={'/settings'}>

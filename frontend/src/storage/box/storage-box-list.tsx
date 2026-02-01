@@ -62,8 +62,6 @@ export const StorageBoxList: React.FC<{
                         <Button
                             onClick={() => onBoxChange(box.idInt)}
                             selected={selectedBoxes.includes(box.idInt)}
-                            // disabled={selectedBoxes.includes(box.idInt)}
-                            // loading={isLoading}
                             className={css({
                                 zIndex: 1,
                                 borderTopRightRadius: 0,
@@ -82,7 +80,6 @@ export const StorageBoxList: React.FC<{
 
                                 <div
                                     className={css({
-                                        // width: 58,
                                         display: 'grid',
                                         gridTemplateColumns: `repeat(${nbrItemsPerLine}, 1fr)`,
                                         marginBottom: 2,
@@ -122,7 +119,6 @@ export const StorageBoxList: React.FC<{
                         <div>
                             <ButtonWithPopover
                                 panelContent={close => editPanelContent?.(box.id, close)}
-                                // loading={isLoading}
                                 disabled={!canEditBox}
                                 className={css({
                                     borderTopLeftRadius: 0,
@@ -139,7 +135,6 @@ export const StorageBoxList: React.FC<{
                                 showHelp={!canDeleteBox}
                                 onClick={deleteFn && (() => deleteFn(box.id))}
                                 disabled={!canDeleteBox}
-                                // loading={isLoading}
                                 className={css({
                                     borderTopLeftRadius: 0,
                                     borderBottomLeftRadius: 0,

@@ -3,6 +3,9 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { BackendErrorsContext } from '../data/backend-errors-context';
 import { Fallback, type FallbackExtraProps } from './fallback';
 
+/**
+ * Catch component render errors with smooth display.
+ */
 export const ErrorCatcher: React.FC<FallbackExtraProps & {
     fallback?: typeof Fallback.default;
     children: React.ReactNode;

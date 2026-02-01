@@ -68,29 +68,29 @@ export const StorageBoxSaveActions: React.FC<
         },
       })}
     >
-      <div style={{ maxWidth: 350, whiteSpace: 'break-spaces' }}>
+      <div className={css({ maxWidth: 350, whiteSpace: 'break-spaces' })}>
         <TitledContainer
           contrasted
           enableExpand
           title={
             <div
-              style={{
+              className={css({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
-              }}
+              })}
             >
               {t('storage.actions.select-title', { count: ids.length })}
             </div>
           }
         >
           <div
-            style={{
+            className={css({
               display: 'flex',
               flexDirection: 'column',
               gap: 4,
               minWidth: 140,
-            }}
+            })}
           >
             {moveClickable.onClick && (
               <Button onClick={moveClickable.onClick}>

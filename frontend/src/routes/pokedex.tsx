@@ -7,6 +7,7 @@ import { withErrorCatcher } from '../error/with-error-catcher';
 import { PokedexDetails } from "../pokedex/details/pokedex-details";
 import { FiltersCard } from "../pokedex/filters/filters-card";
 import { PokedexList } from "../pokedex/list/pokedex-list";
+import { css } from '@emotion/css';
 
 export const PokedexPage: React.FC = withErrorCatcher('default', () => {
   const navigate = Route.useNavigate();
@@ -15,11 +16,11 @@ export const PokedexPage: React.FC = withErrorCatcher('default', () => {
     <div>
       <div>
         <div
-          style={{
+          className={css({
             display: "flex",
             justifyContent: "center",
             paddingBottom: 8,
-          }}
+          })}
         >
           <FiltersCard />
         </div>
@@ -28,12 +29,12 @@ export const PokedexPage: React.FC = withErrorCatcher('default', () => {
       </div>
 
       <div
-        style={{
+        className={css({
           position: "fixed",
           bottom: 24,
           right: 24,
           width: 350,
-        }}
+        })}
       >
         <ErrorCatcher
           onClose={() => navigate({
@@ -61,7 +62,6 @@ const searchSchema = z.object({
   filterGenerations: z.array(z.number()).optional(), // generation.name
   showForms: z.boolean().optional(),
   showGenders: z.boolean().optional(),
-  // sort: z.enum(['newest', 'oldest', 'price']).default('newest'),
 });
 
 export const Route = createFileRoute("/pokedex")({

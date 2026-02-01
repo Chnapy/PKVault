@@ -7,6 +7,7 @@ import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
 import { StorageSelectAll } from '../storage-select-all';
 import { BoxName } from './box-name';
+import { css } from '@emotion/css';
 
 export const StorageHeader: React.FC<{
     saveId?: number;
@@ -36,21 +37,21 @@ export const StorageHeader: React.FC<{
         const { t } = useTranslate();
 
         return <div
-            style={{
+            className={css({
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 gap: 8,
-            }}
+            })}
         >
             {gameLogo}
 
             <div
-                style={{
+                className={css({
                     display: 'flex',
                     justifyContent: 'center',
                     gap: 4,
-                }}
+                })}
             >
                 <Button
                     onClick={onPreviousBoxClick}
@@ -59,7 +60,7 @@ export const StorageHeader: React.FC<{
                     <Icon name='angle-left' forButton />
                 </Button>
 
-                <Button onClick={onBoxesDisplay} style={{ minWidth: 120 }}>
+                <Button onClick={onBoxesDisplay} className={css({ minWidth: 120 })}>
                     <BoxName
                         boxType={boxType}
                         boxName={boxName}
@@ -78,39 +79,39 @@ export const StorageHeader: React.FC<{
             </div>
 
             <div
-                style={{
+                className={css({
                     flex: 1,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'flex-end',
                     gap: 8
-                }}
+                })}
             >
                 {!showBoxes && <>
                     <StorageSelectAll saveId={saveId} boxId={boxId} />
 
-                    <div style={{ display: 'flex', gap: 2, whiteSpace: 'nowrap' }}>
+                    <div className={css({ display: 'flex', gap: 2, whiteSpace: 'nowrap' })}>
                         <Icon name='folder' solid forButton />
-                        <span style={{ color: theme.text.primary }}>{boxPkmCount}</span>
-                        /{boxSlotCount} - {t('total')}.<span style={{ color: theme.text.primary }}>{totalPkmCount}</span>
+                        <span className={css({ color: theme.text.primary })}>{boxPkmCount}</span>
+                        /{boxSlotCount} - {t('total')}.<span className={css({ color: theme.text.primary })}>{totalPkmCount}</span>
                     </div>
 
                     {onSplitClick && <Button
                         onClick={onSplitClick}
                     >
-                        <Icon name='page-break' forButton title={t('storage.box.split.help')} style={{ transform: 'rotate(90deg) scale(1.2)' }} />
+                        <Icon name='page-break' forButton title={t('storage.box.split.help')} className={css({ transform: 'rotate(90deg) scale(1.2)' })} />
                     </Button>}
 
                     {advancedActions.length > 0 && <ButtonWithPopover
                         anchor='right start'
                         panelContent={() => (
                             <div
-                                style={{
+                                className={css({
                                     display: 'flex',
                                     flexDirection: 'column',
                                     gap: 4,
                                     width: 150,
-                                }}
+                                })}
                             >
                                 {advancedActions.map((action, i) => (
                                     <ButtonWithPopover

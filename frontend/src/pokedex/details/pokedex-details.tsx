@@ -1,7 +1,6 @@
+import { css, cx } from '@emotion/css';
 import React from "react";
-import { useDexGetAll } from "../../data/sdk/dex/dex.gen";
-import { EntityContext, Gender as GenderType } from '../../data/sdk/model';
-import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import { Gender as GenderType } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from "../../routes/pokedex";
 import { useTranslate } from '../../translate/i18n';
@@ -16,106 +15,43 @@ import { ShinyIcon } from '../../ui/icon/shiny-icon';
 import { SelectNumberInput } from '../../ui/input/select-input';
 import { TextContainer } from '../../ui/text-container/text-container';
 import { theme } from '../../ui/theme';
-import { filterIsDefined } from '../../util/filter-is-defined';
+import { usePokedexDetailsSelect } from './hooks/use-pokedex-details-select';
 import { PokedexDetailsOwned } from './pokedex-details-owned';
 import { getGameInfos } from './util/get-game-infos';
 
 export const PokedexDetails: React.FC = () => {
-  // console.time("pokedex-details");
   const { t } = useTranslate();
 
-  const selectedSpecies = Route.useSearch({
-    select: (search) => search.selected,
-  });
   const navigate = Route.useNavigate();
 
   const staticData = useStaticData();
 
-  const dexGetAllQuery = useDexGetAll();
-  const saveInfosMainQuery = useSaveInfosGetAll();
+  const selectInfos = usePokedexDetailsSelect();
 
-  const [ selectedSaveIndex, setSelectedSaveIndex ] = React.useState(0);
-  const [ selectedFormIndex, setSelectedFormIndex ] = React.useState(0);
-  const [ selectedGender, setSelectedGender ] = React.useState<GenderType>(GenderType.Genderless);
-  const [ selectedShiny, setSelectedShiny ] = React.useState(false);
-
-  const savesRecord = saveInfosMainQuery.data?.data ?? {};
-  const speciesRecord = dexGetAllQuery.data?.data ?? {};
-
-  const speciesValues = Object.values(
-    speciesRecord[ selectedSpecies + "" ] ?? {}
-  );
-
-  const gameSaves = speciesValues
-    .filter((spec) => spec.forms.some(form => form.isSeen))
-    .map((spec) => spec.saveId === 0
-      // pkvault storage
-      ? {
-        id: 0,
-        context: EntityContext.Gen9a,
-        version: null,
-        trainerName: ''
-      }
-      : savesRecord[ spec.saveId ])
-    .filter(filterIsDefined);
-
-  const selectedSave = gameSaves[ selectedSaveIndex ] ?? gameSaves[ 0 ];
-  const selectedSpeciesValue = selectedSave && speciesValues.find(
-    (value) => value.saveId === selectedSave.id
-  )!;
-
-  const staticForms = selectedSpecies && selectedSave ? staticData.species[ selectedSpecies ]?.forms[ selectedSave.context ] ?? [] : [];
-  const staticFormsFiltered = staticForms
-    .map((staticForm, index) => ({ ...staticForm, index }))
-    .filter(staticForm => !staticForm.isBattleOnly);
-
-  const firstSeenForm = selectedSpeciesValue?.forms.find(form =>
-    form.isSeen && staticFormsFiltered.some(staticForm => staticForm.index === form.form)
-  )?.form;
-  const firstSeenGender = selectedSpeciesValue?.forms.find(form => form.form === firstSeenForm && form.isSeen)?.gender;
-
-  const selectedForm = selectedSpeciesValue?.forms.find(form =>
-    form.form === selectedFormIndex
-    && form.gender === selectedGender
-  );
-
-  React.useEffect(() => {
-    if (selectedSaveIndex > 0 && !gameSaves[ selectedSaveIndex ]) {
-      setSelectedSaveIndex(0);
-      setSelectedFormIndex(0);
-      setSelectedGender(GenderType.Genderless);
-      setSelectedShiny(false);
-    }
-  }, [ gameSaves, selectedSaveIndex ]);
-
-  React.useEffect(() => {
-    if (!selectedForm?.isSeen) {
-      setSelectedFormIndex(firstSeenForm ?? 0);
-      setSelectedGender(firstSeenGender ?? GenderType.Genderless);
-    }
-
-    if (!selectedForm?.isSeenShiny) {
-      setSelectedShiny(false);
-    }
-  }, [ firstSeenForm, firstSeenGender, selectedSpecies, selectedForm ]);
-
-  React.useEffect(() => {
-    if (selectedFormIndex > 0 && !selectedForm) {
-      setSelectedFormIndex(firstSeenForm ?? 0);
-      setSelectedGender(firstSeenGender ?? GenderType.Genderless);
-    }
-  }, [ selectedFormIndex, selectedForm, firstSeenGender, firstSeenForm ]);
-
-  if (!selectedSpecies || !gameSaves.length || !selectedSave || !selectedSpeciesValue) {
-    // console.timeEnd("pokedex-details");
+  if (!selectInfos) {
     return null;
   }
 
-  const formObj = staticFormsFiltered.find(sf => sf.index === selectedFormIndex) ?? staticFormsFiltered[ 0 ];
+  const {
+    selectedSaveIndex,
+    selectedFormIndex,
+    selectedGender,
+    selectedShiny,
 
-  if (!selectedForm || !formObj) {
-    return null;
-  }
+    setSelectedSaveIndex,
+    setSelectedFormIndex,
+    setSelectedGender,
+    setSelectedShiny,
+
+    selectedSpecies,
+    selectedSave,
+    selectedForm,
+    selectedStaticFormWithIndex,
+    selectedSpeciesValue,
+
+    gameSaves,
+    staticFormsFiltered,
+  } = selectInfos;
 
   const selectedFormSimilars = selectedSpeciesValue.forms.filter(form => form.form === selectedFormIndex);
   const selectedFormGenders = selectedFormSimilars.map(form => form.gender);
@@ -124,23 +60,21 @@ export const PokedexDetails: React.FC = () => {
   const caught = selectedForm.isCaught;
   const owned = selectedShiny ? selectedForm.isOwnedShiny : selectedForm.isOwned;
 
-  const speciesName = formObj.name;
+  const speciesName = selectedStaticFormWithIndex.name;
 
   const baseStats = selectedForm.baseStats;
   const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);
-  const cellBaseStyle: React.CSSProperties = { padding: 0, textAlign: 'center' };
-
-  // console.timeEnd("pokedex-details");
+  const cellBaseClassName = css({ padding: 0, textAlign: 'center' });
 
   return (
     <div>
       <div
-        style={{
+        className={css({
           display: 'flex',
           gap: '0 4px',
           padding: '0 8px',
           flexWrap: 'wrap-reverse',
-        }}
+        })}
       >
         {gameSaves.map((save, i) => (
           <DetailsTab
@@ -174,13 +108,11 @@ export const PokedexDetails: React.FC = () => {
               disabled={!selectedForm.isOwnedShiny}
             >
               <ShinyIcon
-                style={{
-                  // width: 12,
+                className={css({
                   width: '1lh',
                   height: '1lh',
-                  // margin: -2,
                   filter: selectedShiny ? undefined : 'brightness(0) opacity(0.5)',
-                }}
+                })}
               />
             </ButtonLike>}
             genderPart={selectedFormGenders.length > 1
@@ -188,7 +120,7 @@ export const PokedexDetails: React.FC = () => {
                 onClick={() => setSelectedGender((selectedGender + 1) % selectedFormGenders.length as GenderType)}
                 disabled={!hasMultipleSeenGenders}
               >
-                <Gender gender={selectedGender} style={{ width: '1lh' }} />
+                <Gender gender={selectedGender} className={css({ width: '1lh' })} />
               </ButtonLike>
               : <Gender gender={selectedGender} />
             }
@@ -197,14 +129,14 @@ export const PokedexDetails: React.FC = () => {
         mainInfos={
           <DetailsMainInfos
             species={selectedSpecies}
-            speciesName={<div style={{ display: 'inline-flex', gap: 4 }}>
+            speciesName={<div className={css({ display: 'inline-flex', gap: 4 })}>
               {staticFormsFiltered.length <= 1 && speciesName}
-              {staticFormsFiltered.length > 1 && <span style={{
+              {staticFormsFiltered.length > 1 && <span className={css({
                 display: 'inline-flex',
                 flexDirection: 'row',
                 alignItems: 'flex-end',
                 marginTop: -3
-              }}>
+              })}>
                 <SelectNumberInput
                   data={staticFormsFiltered.map(staticForm => ({
                     value: staticForm.index,
@@ -214,56 +146,48 @@ export const PokedexDetails: React.FC = () => {
                   onChange={setSelectedFormIndex}
                   value={selectedFormIndex}
                   bgColor='transparent'
-                  style={{
+                  className={css({
                     height: '1lh',
                     color: 'inherit',
                     borderColor: 'currentcolor',
-                  }}
+                  })}
                 />
               </span>}
             </div>}
-            // genders={genders}
             types={selectedForm.types}
           />
         }
         preContent={null}
         content={<>
-          {/* {selectedSpeciesValue.description && (
-          <div style={{ display: "flex" }}>
-            <TextContainer>{description}</TextContainer>
-          </div>
-        )} */}
-
           {selectedForm.abilities.length > 0 && <TextContainer>
-            <span style={{ color: theme.text.primary }}>{t('details.abilities')}</span><br />
+            <span className={css({ color: theme.text.primary })}>{t('details.abilities')}</span><br />
             {selectedForm.abilities.map(ability => <div key={ability}>{
               staticData.abilities[ ability ]?.name
             }</div>)}
-            {/* {abilitiesHidden.map(ability => <div key={ability}>{ability} (caché)</div>)} */}
           </TextContainer>}
 
           <TextContainer>
             <table
-              style={{
+              className={css({
                 borderSpacing: '8px 0'
-              }}
+              })}
             >
               <thead>
                 <tr>
-                  <td style={cellBaseStyle}></td>
-                  <td style={cellBaseStyle}>{t('details.stats.base')}</td>
+                  <td className={cellBaseClassName}></td>
+                  <td className={cellBaseClassName}>{t('details.stats.base')}</td>
                 </tr>
               </thead>
               <tbody>
                 {[ t('details.stats.hp'), t('details.stats.atk'), t('details.stats.def'), t('details.stats.spa'), t('details.stats.spd'), t('details.stats.spe') ]
                   .map((statName, i) => <tr key={statName}>
-                    <td style={{ ...cellBaseStyle, textAlign: 'left' }}>{statName}</td>
-                    <td style={cellBaseStyle}>{baseStats[ i ]}</td>
+                    <td className={cx(cellBaseClassName, css({ textAlign: 'left' }))}>{statName}</td>
+                    <td className={cellBaseClassName}>{baseStats[ i ]}</td>
                   </tr>)}
 
                 <tr>
-                  <td style={{ ...cellBaseStyle, textAlign: 'left', textTransform: 'capitalize' }}>{t('total')}</td>
-                  <td style={cellBaseStyle}>{totalBaseStats}</td>
+                  <td className={cx(cellBaseClassName, css({ textAlign: 'left', textTransform: 'capitalize' }))}>{t('total')}</td>
+                  <td className={cellBaseClassName}>{totalBaseStats}</td>
                 </tr>
               </tbody>
             </table>

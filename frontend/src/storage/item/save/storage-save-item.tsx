@@ -1,10 +1,10 @@
 import { PopoverButton } from '@headlessui/react';
 import React from 'react';
-import { usePkmSaveIndex } from '../data/hooks/use-pkm-save-index';
-import { withErrorCatcher } from '../error/with-error-catcher';
-import { Route } from '../routes/storage';
-import { StorageItemPopover } from '../ui/storage-item/storage-item-popover';
-import { StorageSelectContext } from './actions/storage-select-context';
+import { usePkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
+import { withErrorCatcher } from '../../../error/with-error-catcher';
+import { Route } from '../../../routes/storage';
+import { StorageItemPopover } from '../../../ui/storage-item/storage-item-popover';
+import { StorageSelectContext } from '../../actions/storage-select-context';
 import { StorageSaveItemBase, type StorageSaveItemBaseProps } from './storage-save-item-base';
 
 type StorageSaveItemProps = {

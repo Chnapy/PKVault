@@ -2,6 +2,7 @@ import React from "react";
 import { Container } from "../../ui/container/container";
 import { theme } from '../../ui/theme';
 import { SaveItemContent, type SaveItemContentProps } from './save-item-content';
+import { css } from '@emotion/css';
 
 export type SaveItemProps = SaveItemContentProps & {
   width?: number | string;
@@ -17,7 +18,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
     <Container
       as={onClick ? "button" : "div"}
       padding="big"
-      style={{
+      className={css({
         backgroundColor: onClick
           ? theme.bg.light
           : theme.bg.panel,
@@ -28,7 +29,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
         flexDirection: "column",
         gap: 4,
         width
-      }}
+      })}
       onClick={onClick}
     >
       <SaveItemContent {...saveItemContentProps} />

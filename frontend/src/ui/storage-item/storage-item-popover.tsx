@@ -83,7 +83,6 @@ export const StorageItemPopover: React.FC<StorageItemPopoverProps> = ({
                     : <>
                         {hover && <div
                             className={cx('storage-item-title', css({
-                                // opacity: 0,
                                 pointerEvents: 'none',
                             }))}
                         >

@@ -64,11 +64,10 @@ export const ButtonWithDisabledPopover = <AS extends ReactTag>({ loading, disabl
             anchor={anchor}
             className={css({
                 zIndex: 30,
-                // display: hover ? undefined : 'none',
                 pointerEvents: 'none',
             })}
         >
-            <div style={{ maxWidth: 350, whiteSpace: 'break-spaces' }}>
+            <div className={css({ maxWidth: 350, whiteSpace: 'break-spaces' })}>
                 <TitledContainer
                     contrasted
                     title={helpTitle}
