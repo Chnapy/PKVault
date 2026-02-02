@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
-import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
-import { usePkmVersionSlotInfos } from '../../data/hooks/use-pkm-version-slot-infos';
+import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
+import { usePkmVariantSlotInfos } from '../../data/hooks/use-pkm-variant-slot-infos';
 import { Route } from '../../routes/storage';
 import type { StorageItemProps } from '../../ui/storage-item/storage-item';
 import { filterIsDefined } from '../../util/filter-is-defined';
@@ -51,7 +51,7 @@ export const StorageSelectContext = {
     SanityCheck: () => {
         const { saveId, boxId, ids, removeId, clear } = StorageSelectContext.useValue();
 
-        const mainPkmsQuery = usePkmVersionIndex();
+        const mainPkmsQuery = usePkmVariantIndex();
         const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);
 
         const mainBoxIds = Route.useSearch({ select: search => search.mainBoxIds }) ?? [];
@@ -135,10 +135,10 @@ export const StorageSelectContext = {
         const selectContext = StorageSelectContext.useValue();
         const movingIds = StorageMoveContext.useValue().selected?.ids;
 
-        const mainPkmsQuery = usePkmVersionIndex();
+        const mainPkmsQuery = usePkmVariantIndex();
         const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);
 
-        const versionInfos = usePkmVersionSlotInfos(saveId ? undefined : pkmId);
+        const variantInfos = usePkmVariantSlotInfos(saveId ? undefined : pkmId);
 
         const getInfos = () => {
             if (saveId) {
@@ -152,8 +152,8 @@ export const StorageSelectContext = {
             }
 
             return {
-                pkm: versionInfos?.baseVersion,
-                pkmStack: versionInfos?.versions ?? [],
+                pkm: variantInfos?.baseVariant,
+                pkmStack: variantInfos?.variants ?? [],
                 getPkmsByBox: (boxId: number) => Object.values(mainPkmsQuery.data?.data.byBox[ boxId ] ?? {}).flat(),
             };
         };

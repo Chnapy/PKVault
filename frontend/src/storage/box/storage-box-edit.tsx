@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
+import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { BoxType, type StorageUpdateMainBoxParams } from '../../data/sdk/model';
 import {
     getStorageGetBoxesQueryKey,
@@ -28,7 +28,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
     const boxUpdateMutation = useStorageUpdateMainBox();
     const banksQuery = useStorageGetMainBanks();
     const boxesQuery = useStorageGetBoxes();
-    const pkmsQuery = usePkmVersionIndex();
+    const pkmsQuery = usePkmVariantIndex();
 
     const box = boxesQuery.data?.data.find(box => box.id === boxId);
     const boxes = [ ...(boxesQuery.data?.data ?? []) ].filter(b => b.bankId === box?.bankId).sort((b1, b2) => (b1.order < b2.order ? -1 : 1));

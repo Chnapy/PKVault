@@ -138,7 +138,7 @@ public class PkmFileLoader : IPkmFileLoader
             }
             pkm = pk;
 
-            // pkm ??= pkmVersionEntity.Generation switch
+            // pkm ??= pkmVariantEntity.Generation switch
             // {
             //     1 => new PK1(bytes),
             //     2 => new PK2(bytes),

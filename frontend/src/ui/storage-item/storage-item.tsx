@@ -30,14 +30,14 @@ export type StorageItemProps =
     warning?: boolean;
     level?: number;
     party?: number;
-    nbrVersions?: number;
-    hasDisabledVersion?: boolean;
+    nbrVariants?: number;
+    hasDisabledVariant?: boolean;
     small?: boolean;
     checked?: boolean;
     onCheck?: CheckboxInputProps[ 'onChange' ];
 
     // actions
-    canCreateVersion?: boolean;
+    canCreateVariant?: boolean;
     canMoveOutside?: boolean;
     canEvolve?: boolean;
     attached?: boolean;
@@ -58,15 +58,15 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   warning,
   level,
   party,
-  nbrVersions = 1,
-  hasDisabledVersion,
+  nbrVariants = 1,
+  hasDisabledVariant,
   anchor,
   helpTitle,
   small,
   checked = false,
   onCheck,
 
-  canCreateVersion,
+  canCreateVariant,
   canMoveOutside = true,
   canEvolve,
   attached,
@@ -160,17 +160,17 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
           {small ? level : <DetailsLevel level={level} />}
         </div>}
 
-        {hasDisabledVersion || nbrVersions > 1
+        {hasDisabledVariant || nbrVariants > 1
           ? <div className={css({
             display: 'flex',
             alignItems: 'center',
             gap: 2,
           })}>
-            {hasDisabledVersion && renderBubble(undefined, <span className={css({ color: theme.text.red })}>
+            {hasDisabledVariant && renderBubble(undefined, <span className={css({ color: theme.text.red })}>
               <Icon name='folder' solid forButton />
               <Icon name='exclaimation' solid forButton />
             </span>)}
-            {nbrVersions > 1 && renderBubble(theme.bg.dark, nbrVersions)}
+            {nbrVariants > 1 && renderBubble(theme.bg.dark, nbrVariants)}
           </div>
           : null}
       </div>
@@ -200,7 +200,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
         {attached && renderBubble(needSynchronize ? theme.bg.yellow : undefined,
           <Icon name='link' solid forButton />)}
 
-        {canCreateVersion && renderBubble(theme.bg.primary, <Icon name='plus' solid forButton />)}
+        {canCreateVariant && renderBubble(theme.bg.primary, <Icon name='plus' solid forButton />)}
 
         {warning && renderBubble(theme.bg.yellow, <Icon name='exclaimation' solid forButton />)}
       </div>

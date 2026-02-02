@@ -1,11 +1,11 @@
 public record MainDeleteBoxActionInput(string boxId);
 
-public class MainDeleteBoxAction(IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVersionLoader pkmVersionLoader) : DataAction<MainDeleteBoxActionInput>
+public class MainDeleteBoxAction(IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVariantLoader pkmVariantLoader) : DataAction<MainDeleteBoxActionInput>
 {
     protected override async Task<DataActionPayload> Execute(MainDeleteBoxActionInput input, DataUpdateFlags flags)
     {
         var box = await boxLoader.GetEntity(input.boxId);
-        var boxPkms = await pkmVersionLoader.GetEntitiesByBox(box.IdInt);
+        var boxPkms = await pkmVariantLoader.GetEntitiesByBox(box.IdInt);
 
         if (boxPkms.Count > 0)
         {

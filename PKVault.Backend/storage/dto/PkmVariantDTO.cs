@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using PKHeX.Core;
 
-public record PkmVersionDTO(
+public record PkmVariantDTO(
     string Id,
     byte Generation,
     string SettingsLanguage,

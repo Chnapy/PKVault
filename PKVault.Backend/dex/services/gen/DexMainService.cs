@@ -11,7 +11,7 @@ public class DexMainService(
         using var scope = sp.CreateScope();
 
         var dexService = scope.ServiceProvider.GetRequiredService<DexService>();
-        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+        var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
         var dexLoader = scope.ServiceProvider.GetRequiredService<IDexLoader>();
 
         Dictionary<GameVersion, SaveWrapper> savesByVersion = [];
@@ -33,8 +33,8 @@ public class DexMainService(
                 SaveId: FakeSaveFile.Default.ID32,
                 Forms: [.. await Task.WhenAll(forms.Select(async form =>
                 {
-                    var isOwned = await pkmVersionLoader.HasEntityByForm(species, form.Form, form.Gender);
-                    var isOwnedShiny = isOwned && await pkmVersionLoader.HasEntityByFormShiny(species, form.Form, form.Gender);
+                    var isOwned = await pkmVariantLoader.HasEntityByForm(species, form.Form, form.Gender);
+                    var isOwnedShiny = isOwned && await pkmVariantLoader.HasEntityByFormShiny(species, form.Form, form.Gender);
 
                     var saveVersion = StaticDataService.GetSingleVersion(form.Version);
                     if (!savesByVersion.TryGetValue(saveVersion, out var save))

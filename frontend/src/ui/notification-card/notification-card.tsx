@@ -9,13 +9,13 @@ export type NotificationCardProps = {
     errorsCount: number;
     update: React.ReactNode;
     saveDuplicateWarnings: React.ReactNode;
-    pkmVersionWarnings: React.ReactNode;
+    pkmVariantWarnings: React.ReactNode;
     saveChangedWarnings: React.ReactNode;
     errors: React.ReactNode;
 };
 
 export const NotificationCard: React.FC<NotificationCardProps> = ({
-    warningsCount, errorsCount, update, saveDuplicateWarnings, pkmVersionWarnings, saveChangedWarnings, errors
+    warningsCount, errorsCount, update, saveDuplicateWarnings, pkmVariantWarnings, saveChangedWarnings, errors
 }) => {
     const { t } = useTranslate();
 
@@ -46,7 +46,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
                 {update}
 
                 {saveDuplicateWarnings}
-                {pkmVersionWarnings}
+                {pkmVariantWarnings}
                 {saveChangedWarnings}
 
                 {hasErrorsAndWarnings && <tr><td><hr /></td></tr>}

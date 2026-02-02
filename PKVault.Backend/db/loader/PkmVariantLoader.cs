@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
-public record PkmVersionLoaderAddPayload(
+public record PkmVariantLoaderAddPayload(
     string BoxId,
     int BoxSlot,
     bool IsMain,
@@ -16,27 +16,27 @@ public record PkmVersionLoaderAddPayload(
     bool CheckPkm = true    // check if Pkm is disabled
 );
 
-public interface IPkmVersionLoader : IEntityLoader<PkmVersionDTO, PkmVersionEntity>
+public interface IPkmVariantLoader : IEntityLoader<PkmVariantDTO, PkmVariantEntity>
 {
-    public Task<PkmVersionDTO> CreateDTO(PkmVersionEntity entity);
-    public Task<PkmVersionEntity> AddEntity(PkmVersionLoaderAddPayload payload);
-    public Task<IEnumerable<PkmVersionEntity>> AddEntities(IEnumerable<PkmVersionLoaderAddPayload> payloads);
-    public Task UpdateEntity(PkmVersionEntity entity, ImmutablePKM pkm);
+    public Task<PkmVariantDTO> CreateDTO(PkmVariantEntity entity);
+    public Task<PkmVariantEntity> AddEntity(PkmVariantLoaderAddPayload payload);
+    public Task<IEnumerable<PkmVariantEntity>> AddEntities(IEnumerable<PkmVariantLoaderAddPayload> payloads);
+    public Task UpdateEntity(PkmVariantEntity entity, ImmutablePKM pkm);
 
-    public Task<Dictionary<int, Dictionary<string, PkmVersionEntity>>> GetEntitiesByBox(int boxId);
-    public Task<Dictionary<int, Dictionary<string, PkmVersionEntity>>> GetEntitiesByBox(string boxId);
-    public Task<Dictionary<string, PkmVersionEntity>> GetEntitiesByBox(int boxId, int boxSlot);
-    public Task<Dictionary<string, PkmVersionEntity>> GetEntitiesByBox(string boxId, int boxSlot);
-    public Task<Dictionary<string, PkmVersionEntity>> GetEntitiesBySave(uint saveId);
-    public Task<Dictionary<uint, List<PkmVersionEntity>>> GetEntitiesAttachedGroupedBySave();
-    public Task<Dictionary<string, PkmVersionEntity>> GetEntitiesAttached();
-    public Task<PkmVersionEntity?> GetEntityBySave(uint saveId, string savePkmIdBase);
+    public Task<Dictionary<int, Dictionary<string, PkmVariantEntity>>> GetEntitiesByBox(int boxId);
+    public Task<Dictionary<int, Dictionary<string, PkmVariantEntity>>> GetEntitiesByBox(string boxId);
+    public Task<Dictionary<string, PkmVariantEntity>> GetEntitiesByBox(int boxId, int boxSlot);
+    public Task<Dictionary<string, PkmVariantEntity>> GetEntitiesByBox(string boxId, int boxSlot);
+    public Task<Dictionary<string, PkmVariantEntity>> GetEntitiesBySave(uint saveId);
+    public Task<Dictionary<uint, List<PkmVariantEntity>>> GetEntitiesAttachedGroupedBySave();
+    public Task<Dictionary<string, PkmVariantEntity>> GetEntitiesAttached();
+    public Task<PkmVariantEntity?> GetEntityBySave(uint saveId, string savePkmIdBase);
     public Task<bool> HasEntityByForm(ushort species, byte form, Gender gender);
     public Task<bool> HasEntityByFormShiny(ushort species, byte form, Gender gender);
-    public Task<ImmutablePKM> GetPKM(PkmVersionEntity entity);
+    public Task<ImmutablePKM> GetPKM(PkmVariantEntity entity);
 }
 
-public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, IPkmVersionLoader
+public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, IPkmVariantLoader
 {
     private IFileIOService fileIOService;
     private StaticDataService staticDataService;
@@ -46,7 +46,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
 
     private readonly VersionChecker versionChecker = new();
 
-    public PkmVersionLoader(
+    public PkmVariantLoader(
         IFileIOService _fileIOService,
         ISessionServiceMinimal sessionService,
         ISettingsService settingsService,
@@ -54,7 +54,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         SessionDbContext db,
         StaticDataService _staticDataService
     ) : base(
-        sessionService, db, db.PkmVersionsFlags
+        sessionService, db, db.PkmVariantsFlags
     )
     {
         fileIOService = _fileIOService;
@@ -67,7 +67,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         language = settings.GetSafeLanguage();
     }
 
-    public async Task<PkmVersionDTO> CreateDTO(PkmVersionEntity entity)
+    public async Task<PkmVariantDTO> CreateDTO(PkmVariantEntity entity)
     {
         var pkm = await GetPKM(entity);
 
@@ -76,7 +76,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         var filepathAbsolute = Path.Combine(appPath, entity.Filepath);
         var isFilePresent = fileIOService.Exists(filepathAbsolute);
 
-        var dto = new PkmVersionDTO(
+        var dto = new PkmVariantDTO(
             Id: entity.Id,
             Generation: entity.Generation,
             SettingsLanguage: language,
@@ -99,40 +99,40 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         return dto;
     }
 
-    public override async Task<PkmVersionEntity?> GetEntity(string id)
+    public override async Task<PkmVariantEntity?> GetEntity(string id)
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntity");
+        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntity");
 
         return await dbSet
             .Include(p => p.PkmFile)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public override async Task<Dictionary<string, PkmVersionEntity>> GetAllEntities()
+    public override async Task<Dictionary<string, PkmVariantEntity>> GetAllEntities()
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetAllEntities");
+        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetAllEntities");
 
         return await dbSet
             .Include(p => p.PkmFile)
             .ToDictionaryAsync(p => p.Id);
     }
 
-    public override async Task<Dictionary<string, PkmVersionEntity?>> GetEntitiesByIds(string[] ids)
+    public override async Task<Dictionary<string, PkmVariantEntity?>> GetEntitiesByIds(string[] ids)
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntitiesByIds");
+        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesByIds");
 
         var found = await dbSet
             .Where(p => ids.Contains(p.Id))
             .Include(p => p.PkmFile)
             .ToDictionaryAsync(p => p.Id);
 
-        var result = new Dictionary<string, PkmVersionEntity?>(ids.Length);
+        var result = new Dictionary<string, PkmVariantEntity?>(ids.Length);
         foreach (var id in ids)
         {
             found.TryGetValue(id, out var entity);
@@ -142,16 +142,16 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         return result;
     }
 
-    public async Task<Dictionary<int, Dictionary<string, PkmVersionEntity>>> GetEntitiesByBox(int boxId)
+    public async Task<Dictionary<int, Dictionary<string, PkmVariantEntity>>> GetEntitiesByBox(int boxId)
     {
         return await GetEntitiesByBox(boxId.ToString());
     }
 
-    public async Task<Dictionary<int, Dictionary<string, PkmVersionEntity>>> GetEntitiesByBox(string boxId)
+    public async Task<Dictionary<int, Dictionary<string, PkmVariantEntity>>> GetEntitiesByBox(string boxId)
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntitiesByBox");
+        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesByBox");
 
         return await dbSet.Where(p => p.BoxId == boxId)
             .Include(p => p.PkmFile)
@@ -162,49 +162,49 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             );
     }
 
-    public async Task<Dictionary<string, PkmVersionEntity>> GetEntitiesByBox(int boxId, int boxSlot)
+    public async Task<Dictionary<string, PkmVariantEntity>> GetEntitiesByBox(int boxId, int boxSlot)
     {
         return await GetEntitiesByBox(boxId.ToString(), boxSlot);
     }
 
-    public async Task<Dictionary<string, PkmVersionEntity>> GetEntitiesByBox(string boxId, int boxSlot)
+    public async Task<Dictionary<string, PkmVariantEntity>> GetEntitiesByBox(string boxId, int boxSlot)
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntitiesByBox + Slot");
+        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesByBox + Slot");
 
         return await dbSet.Where(p => p.BoxId == boxId && p.BoxSlot == boxSlot)
             .Include(p => p.PkmFile)
             .ToDictionaryAsync(p => p.Id);
     }
 
-    public async Task<Dictionary<string, PkmVersionEntity>> GetEntitiesBySave(uint saveId)
+    public async Task<Dictionary<string, PkmVariantEntity>> GetEntitiesBySave(uint saveId)
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntitiesBySave");
+        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesBySave");
 
         return await dbSet.Where(p => p.AttachedSaveId == saveId)
             .Include(p => p.PkmFile)
             .ToDictionaryAsync(p => p.AttachedSavePkmIdBase!);
     }
 
-    public async Task<PkmVersionEntity?> GetEntityBySave(uint saveId, string savePkmIdBase)
+    public async Task<PkmVariantEntity?> GetEntityBySave(uint saveId, string savePkmIdBase)
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntityBySave");
+        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntityBySave");
 
         return await dbSet.Where(p => p.AttachedSaveId == saveId && p.AttachedSavePkmIdBase == savePkmIdBase)
             .Include(p => p.PkmFile)
             .FirstOrDefaultAsync();
     }
 
-    public async Task<Dictionary<uint, List<PkmVersionEntity>>> GetEntitiesAttachedGroupedBySave()
+    public async Task<Dictionary<uint, List<PkmVariantEntity>>> GetEntitiesAttachedGroupedBySave()
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntitiesAttachedGroupedBySave");
+        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesAttachedGroupedBySave");
 
         return await dbSet.Where(p => p.AttachedSaveId != null)
             .Include(p => p.PkmFile)
@@ -212,11 +212,11 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
             .ToDictionaryAsync(g => g.Key, g => g.ToList());
     }
 
-    public async Task<Dictionary<string, PkmVersionEntity>> GetEntitiesAttached()
+    public async Task<Dictionary<string, PkmVariantEntity>> GetEntitiesAttached()
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - GetEntitiesAttached");
+        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesAttached");
 
         return await dbSet.Where(p => p.AttachedSaveId != null)
             .Include(p => p.PkmFile)
@@ -227,7 +227,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - HasEntityByForm");
+        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - HasEntityByForm");
 
         return await dbSet
             .AnyAsync(p => p.Species == species && p.Form == form && p.Gender == gender);
@@ -237,31 +237,31 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVersionEntity)} - HasEntityByFormShiny");
+        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - HasEntityByFormShiny");
 
         return await dbSet
             .AnyAsync(p => p.Species == species && p.Form == form && p.Gender == gender && p.IsShiny);
     }
 
-    public async Task<PkmVersionEntity> AddEntity(PkmVersionLoaderAddPayload payload)
+    public async Task<PkmVariantEntity> AddEntity(PkmVariantLoaderAddPayload payload)
     {
         var entity = await GetEntityFromAddPayload(payload);
 
         return await AddEntity(entity);
     }
 
-    public async Task<IEnumerable<PkmVersionEntity>> AddEntities(IEnumerable<PkmVersionLoaderAddPayload> payloads)
+    public async Task<IEnumerable<PkmVariantEntity>> AddEntities(IEnumerable<PkmVariantLoaderAddPayload> payloads)
     {
         var entities = await Task.WhenAll(payloads.Select(GetEntityFromAddPayload));
 
         return await base.AddEntities(entities);
     }
 
-    private async Task<PkmVersionEntity> GetEntityFromAddPayload(PkmVersionLoaderAddPayload payload)
+    private async Task<PkmVariantEntity> GetEntityFromAddPayload(PkmVariantLoaderAddPayload payload)
     {
         if (payload.CheckPkm && !payload.Pkm.IsEnabled)
         {
-            throw new InvalidOperationException($"Cannot add disabled PkmVersion");
+            throw new InvalidOperationException($"Cannot add disabled PkmVariant");
         }
 
         var staticData = await staticDataService.GetStaticData();
@@ -271,7 +271,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         var filepath = payload.Filepath
             ?? pkmFileLoader.GetPKMFilepath(payload.Pkm, staticData.Evolves);
 
-        return new PkmVersionEntity()
+        return new PkmVariantEntity()
         {
             Id = id,
             BoxId = payload.BoxId,
@@ -291,7 +291,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         };
     }
 
-    public async Task UpdateEntity(PkmVersionEntity entity, ImmutablePKM pkm)
+    public async Task UpdateEntity(PkmVariantEntity entity, ImmutablePKM pkm)
     {
         if (pkm.IsEnabled)
         {
@@ -318,7 +318,7 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         await UpdateEntity(entity);
     }
 
-    public override async Task DeleteEntity(PkmVersionEntity entity)
+    public override async Task DeleteEntity(PkmVariantEntity entity)
     {
         entity.PkmFile?.Deleted = true;
 
@@ -327,14 +327,14 @@ public class PkmVersionLoader : EntityLoader<PkmVersionDTO, PkmVersionEntity>, I
         await base.DeleteEntity(entity);
     }
 
-    protected override async Task<PkmVersionDTO> GetDTOFromEntity(PkmVersionEntity entity)
+    protected override async Task<PkmVariantDTO> GetDTOFromEntity(PkmVariantEntity entity)
     {
         return await CreateDTO(entity);
     }
 
-    protected override DbSet<PkmVersionEntity> GetDbSetRaw() => db.PkmVersions;
+    protected override DbSet<PkmVariantEntity> GetDbSetRaw() => db.PkmVersions;
 
-    public async Task<ImmutablePKM> GetPKM(PkmVersionEntity entity)
+    public async Task<ImmutablePKM> GetPKM(PkmVariantEntity entity)
     {
         ArgumentNullException.ThrowIfNull(entity.PkmFile);
         return await pkmFileLoader.CreatePKM(entity.PkmFile, entity.Generation);

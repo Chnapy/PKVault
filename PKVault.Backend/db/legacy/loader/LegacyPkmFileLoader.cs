@@ -6,7 +6,7 @@ public interface ILegacyPkmFileLoader
     public void DeleteEntity(string filepath);
     public string WriteEntity(ImmutablePKM pkm, string filepath, Dictionary<ushort, StaticEvolve> evolves);
     public ImmutablePKM CreatePKM(string id, string filepath, byte generation);
-    public ImmutablePKM CreatePKM(PkmVersionEntity pkmVersionEntity);
+    public ImmutablePKM CreatePKM(PkmVariantEntity pkmVersionEntity);
     public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves);
 }
 
@@ -122,7 +122,7 @@ public class LegacyPkmFileLoader : ILegacyPkmFileLoader
         return file;
     }
 
-    public ImmutablePKM CreatePKM(PkmVersionEntity pkmVersionEntity)
+    public ImmutablePKM CreatePKM(PkmVariantEntity pkmVersionEntity)
     {
         return CreatePKM(
             pkmVersionEntity.Id, pkmVersionEntity.Filepath, pkmVersionEntity.Generation

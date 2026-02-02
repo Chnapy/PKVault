@@ -2,7 +2,7 @@ public record DataNormalizeActionInput();
 
 public class DataNormalizeAction(
     SessionDbContext db,
-    IBankLoader bankLoader, IBoxLoader boxLoader, IPkmVersionLoader pkmVersionLoader, IDexLoader dexLoader,
+    IBankLoader bankLoader, IBoxLoader boxLoader, IPkmVariantLoader pkmVariantLoader, IDexLoader dexLoader,
     ISessionService sessionService, IFileIOService fileIOService, ISettingsService settingsService,
     StaticDataService staticDataService, ISaveService saveService
 ) : DataAction<DataNormalizeActionInput>
@@ -179,8 +179,8 @@ public class DataNormalizeAction(
                 })
             );
 
-            await pkmVersionLoader.AddEntities(
-                legacyPkmVersionLoader.GetAllEntities().Values.Select(e => new PkmVersionLoaderAddPayload(
+            await pkmVariantLoader.AddEntities(
+                legacyPkmVersionLoader.GetAllEntities().Values.Select(e => new PkmVariantLoaderAddPayload(
                     BoxId: e.BoxId.ToString(),
                     BoxSlot: e.BoxSlot,
                     IsMain: e.IsMain,

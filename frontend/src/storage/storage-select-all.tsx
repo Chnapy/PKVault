@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePkmSaveIndex } from '../data/hooks/use-pkm-save-index';
-import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
+import { usePkmVariantIndex } from '../data/hooks/use-pkm-variant-index';
 import { CheckboxInput } from '../ui/input/checkbox-input';
 import { StorageSelectContext } from './actions/storage-select-context';
 
@@ -10,7 +10,7 @@ export const StorageSelectAll: React.FC<{
 }> = ({ saveId, boxId }) => {
     const selectContext = StorageSelectContext.useValue();
 
-    const mainPkmsQuery = usePkmVersionIndex();
+    const mainPkmsQuery = usePkmVariantIndex();
     const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);
 
     const pkms = saveId ? Object.values(savePkmsQuery.data?.data.byBox[ boxId ] ?? {}) : Object.values(mainPkmsQuery.data?.data.byBox[ boxId ] ?? {}).flat();

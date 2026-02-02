@@ -1,29 +1,29 @@
 
-public record DetachPkmSaveActionInput(string[] pkmVersionIds);
+public record DetachPkmSaveActionInput(string[] pkmVariantIds);
 
 public class DetachPkmSaveAction(
-    IPkmVersionLoader pkmVersionLoader, ISavesLoadersService savesLoadersService
+    IPkmVariantLoader pkmVariantLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<DetachPkmSaveActionInput>
 {
     protected override async Task<DataActionPayload> Execute(DetachPkmSaveActionInput input, DataUpdateFlags flags)
     {
-        if (input.pkmVersionIds.Length == 0)
+        if (input.pkmVariantIds.Length == 0)
         {
             throw new ArgumentException($"Pkm version ids cannot be empty");
         }
 
-        async Task<DataActionPayload> act(string pkmVersionId)
+        async Task<DataActionPayload> act(string pkmVariantId)
         {
-            var pkmVersionEntity = await pkmVersionLoader.GetEntity(pkmVersionId);
-            var oldSaveId = pkmVersionEntity!.AttachedSaveId;
+            var pkmVariantEntity = await pkmVariantLoader.GetEntity(pkmVariantId);
+            var oldSaveId = pkmVariantEntity!.AttachedSaveId;
             if (oldSaveId != null)
             {
-                pkmVersionEntity.AttachedSaveId = null;
-                pkmVersionEntity.AttachedSavePkmIdBase = null;
-                await pkmVersionLoader.UpdateEntity(pkmVersionEntity);
+                pkmVariantEntity.AttachedSaveId = null;
+                pkmVariantEntity.AttachedSavePkmIdBase = null;
+                await pkmVariantLoader.UpdateEntity(pkmVariantEntity);
             }
 
-            var pkm = await pkmVersionLoader.GetPKM(pkmVersionEntity);
+            var pkm = await pkmVariantLoader.GetPKM(pkmVariantEntity);
 
             var pkmNickname = pkm.Nickname;
             var saveLoaders = savesLoadersService.GetLoaders(oldSaveId ?? 0);
@@ -35,9 +35,9 @@ public class DetachPkmSaveAction(
         }
 
         List<DataActionPayload> payloads = [];
-        foreach (var pkmVersionId in input.pkmVersionIds)
+        foreach (var pkmVariantId in input.pkmVariantIds)
         {
-            payloads.Add(await act(pkmVersionId));
+            payloads.Add(await act(pkmVariantId));
         }
 
         return payloads[0];

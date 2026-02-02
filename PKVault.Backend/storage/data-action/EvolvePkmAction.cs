@@ -6,7 +6,7 @@ public class EvolvePkmAction(
     IServiceProvider sp,
     PkmConvertService pkmConvertService, StaticDataService staticDataService,
     SynchronizePkmAction synchronizePkmAction,
-    IPkmVersionLoader pkmVersionLoader, ISavesLoadersService savesLoadersService
+    IPkmVariantLoader pkmVariantLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<EvolvePkmActionInput>
 {
     protected override async Task<DataActionPayload> Execute(EvolvePkmActionInput input, DataUpdateFlags flags)
@@ -60,10 +60,10 @@ public class EvolvePkmAction(
         };
         saveLoaders.Pkms.WriteDto(dto);
 
-        var pkmVersion = await pkmVersionLoader.GetEntityBySave(dto.SaveId, dto.IdBase);
-        if (pkmVersion != null)
+        var pkmVariant = await pkmVariantLoader.GetEntityBySave(dto.SaveId, dto.IdBase);
+        if (pkmVariant != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, dto.IdBase)]));
+            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariant.Id, dto.IdBase)]));
         }
 
         flags.Dex.Ids.Add(oldSpecies.ToString());
@@ -79,17 +79,17 @@ public class EvolvePkmAction(
     {
         var staticData = await staticDataService.GetStaticData();
 
-        var entity = await pkmVersionLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-version not found");
-        var entityPkm = await pkmVersionLoader.GetPKM(entity);
+        var entity = await pkmVariantLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-version not found");
+        var entityPkm = await pkmVariantLoader.GetPKM(entity);
 
-        var relatedPkmVersions = await Task.WhenAll(
-            (await pkmVersionLoader.GetEntitiesByBox(entity.BoxId, entity.BoxSlot)).Values.ToList()
+        var relatedPkmVariants = await Task.WhenAll(
+            (await pkmVariantLoader.GetEntitiesByBox(entity.BoxId, entity.BoxSlot)).Values.ToList()
                 .FindAll(value => value.Id != entity.Id)
-                .Select(async entity => (Version: entity, Pkm: await pkmVersionLoader.GetPKM(entity)))
+                .Select(async entity => (Version: entity, Pkm: await pkmVariantLoader.GetPKM(entity)))
         );
 
         if (
-            relatedPkmVersions.Any(version => entityPkm.Species > version.Pkm.MaxSpeciesID)
+            relatedPkmVariants.Any(version => entityPkm.Species > version.Pkm.MaxSpeciesID)
         )
         {
             throw new ArgumentException($"One of pkm-version cannot evolve, species not compatible with its generation");
@@ -105,23 +105,23 @@ public class EvolvePkmAction(
         {
             UpdatePkm(pkm, evolveSpecies, evolveByItem);
         });
-        await pkmVersionLoader.UpdateEntity(entity, entityPkm);
+        await pkmVariantLoader.UpdateEntity(entity, entityPkm);
 
         // update related dto pkm
         await Task.WhenAll(
-            relatedPkmVersions.ToList().Select(async (version) =>
+            relatedPkmVariants.ToList().Select(async (version) =>
             {
                 version.Pkm = version.Pkm.Update(pkm =>
                 {
                     UpdatePkm(pkm, evolveSpecies, false);
                 });
-                await pkmVersionLoader.UpdateEntity(version.Version, version.Pkm);
+                await pkmVariantLoader.UpdateEntity(version.Version, version.Pkm);
             })
         );
 
         if (entity.AttachedSaveId != null)
         {
-            await synchronizePkmAction.SynchronizePkmVersionToSave(new([(entity.Id, entity.AttachedSavePkmIdBase!)]));
+            await synchronizePkmAction.SynchronizePkmVariantToSave(new([(entity.Id, entity.AttachedSavePkmIdBase!)]));
         }
 
         await new DexMainService(sp).EnablePKM(entityPkm);

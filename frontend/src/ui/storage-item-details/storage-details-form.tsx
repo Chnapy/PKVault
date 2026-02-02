@@ -1,13 +1,13 @@
 import type React from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import type { EditPkmVersionPayload } from '../../data/sdk/model';
-import { useStorageMainEditPkmVersion, useStorageSaveEditPkm } from '../../data/sdk/storage/storage.gen';
+import type { EditPkmVariantPayload } from '../../data/sdk/model';
+import { useStorageMainEditPkmVariant, useStorageSaveEditPkm } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 
-type FormData = EditPkmVersionPayload;
+type FormData = EditPkmVariantPayload;
 
 export const StorageDetailsForm = {
-    Provider: ({ children, ...initialPayload }: React.PropsWithChildren<EditPkmVersionPayload>) => {
+    Provider: ({ children, ...initialPayload }: React.PropsWithChildren<EditPkmVariantPayload>) => {
         const methods = useForm<FormData>({
             defaultValues: {
                 ...initialPayload
@@ -50,7 +50,7 @@ export const StorageDetailsForm = {
 
         const { editMode, startEdit, stopEdit } = StorageDetailsForm.useEditMode();
 
-        const mainEditPkmVersionMutation = useStorageMainEditPkmVersion();
+        const mainEditPkmVariantMutation = useStorageMainEditPkmVariant();
         const saveEditPkmMutation = useStorageSaveEditPkm();
 
         return {
@@ -62,9 +62,9 @@ export const StorageDetailsForm = {
                 methods.reset();
                 stopEdit();
             },
-            submitForPkmVersion: async (pkmVersionId: string) => {
-                await mainEditPkmVersionMutation.mutateAsync({
-                    pkmVersionId,
+            submitForPkmVariant: async (pkmVariantId: string) => {
+                await mainEditPkmVariantMutation.mutateAsync({
+                    pkmVariantId,
                     data: {
                         nickname: methods.getValues('nickname'),
                         eVs: methods.getValues('eVs'),

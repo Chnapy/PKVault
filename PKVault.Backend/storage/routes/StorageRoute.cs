@@ -16,9 +16,9 @@ public class StorageController(DataService dataService, StorageQueryService stor
     }
 
     [HttpGet("main/pkm-version")]
-    public async Task<ActionResult<List<PkmVersionDTO>>> GetMainPkmVersions()
+    public async Task<ActionResult<List<PkmVariantDTO>>> GetMainPkmVariants()
     {
-        var list = await storageQueryService.GetMainPkmVersions();
+        var list = await storageQueryService.GetMainPkmVariants();
 
         return list;
     }
@@ -127,33 +127,33 @@ public class StorageController(DataService dataService, StorageQueryService stor
     }
 
     [HttpPut("main/pkm/detach-save")]
-    public async Task<ActionResult<DataDTO>> MainPkmDetachSave([FromQuery] string[] pkmVersionIds)
+    public async Task<ActionResult<DataDTO>> MainPkmDetachSave([FromQuery] string[] pkmVariantIds)
     {
-        var flags = await actionService.MainPkmDetachSaves(pkmVersionIds);
+        var flags = await actionService.MainPkmDetachSaves(pkmVariantIds);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
     [HttpPost("main/pkm-version")]
-    public async Task<ActionResult<DataDTO>> MainCreatePkmVersion([BindRequired] string pkmVersionId, [BindRequired] byte generation)
+    public async Task<ActionResult<DataDTO>> MainCreatePkmVariant([BindRequired] string pkmVariantId, [BindRequired] byte generation)
     {
-        var flags = await actionService.MainCreatePkmVersion(pkmVersionId, generation);
+        var flags = await actionService.MainCreatePkmVariant(pkmVariantId, generation);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
-    [HttpPut("main/pkm-version/{pkmVersionId}")]
-    public async Task<ActionResult<DataDTO>> MainEditPkmVersion(string pkmVersionId, [BindRequired] EditPkmVersionPayload payload)
+    [HttpPut("main/pkm-version/{pkmVariantId}")]
+    public async Task<ActionResult<DataDTO>> MainEditPkmVariant(string pkmVariantId, [BindRequired] EditPkmVariantPayload payload)
     {
-        var flags = await actionService.MainEditPkmVersion(pkmVersionId, payload);
+        var flags = await actionService.MainEditPkmVariant(pkmVariantId, payload);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
     [HttpDelete("main/pkm-version")]
-    public async Task<ActionResult<DataDTO>> MainDeletePkmVersion([FromQuery] string[] pkmVersionIds)
+    public async Task<ActionResult<DataDTO>> MainDeletePkmVariant([FromQuery] string[] pkmVariantIds)
     {
-        var flags = await actionService.MainPkmVersionsDelete(pkmVersionIds);
+        var flags = await actionService.MainPkmVariantsDelete(pkmVariantIds);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -167,7 +167,7 @@ public class StorageController(DataService dataService, StorageQueryService stor
     }
 
     [HttpPut("save/{saveId}/pkm/{pkmId}")]
-    public async Task<ActionResult<DataDTO>> SaveEditPkm(uint saveId, string pkmId, [BindRequired] EditPkmVersionPayload payload)
+    public async Task<ActionResult<DataDTO>> SaveEditPkm(uint saveId, string pkmId, [BindRequired] EditPkmVariantPayload payload)
     {
         var flags = await actionService.SaveEditPkm(saveId, pkmId, payload);
 

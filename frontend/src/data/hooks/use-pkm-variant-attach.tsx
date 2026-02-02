@@ -1,14 +1,14 @@
-import type { PkmVersionDTO } from '../sdk/model';
+import type { PkmVariantDTO } from '../sdk/model';
 import { useWarningsGetWarnings } from '../sdk/warnings/warnings.gen';
 
-export const usePkmVersionAttach = () => {
+export const usePkmVariantAttach = () => {
     const warningsQuery = useWarningsGetWarnings();
 
-    return (pkm: Pick<PkmVersionDTO, 'id' | 'attachedSaveId'>, pkmVersionId: string) => {
+    return (pkm: Pick<PkmVariantDTO, 'id' | 'attachedSaveId'>, pkmVariantId: string) => {
         const isAttachedValid =
             pkm.attachedSaveId == null ||
             warningsQuery.isLoading ||
-            !warningsQuery.data?.data.pkmVersionWarnings.some((warn) => warn.pkmVersionId == pkmVersionId);
+            !warningsQuery.data?.data.pkmVariantWarnings.some((warn) => warn.pkmVariantId == pkmVariantId);
 
         return {
             isAttachedValid,

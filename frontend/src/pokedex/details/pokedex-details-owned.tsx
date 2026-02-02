@@ -1,7 +1,7 @@
 import type React from 'react';
 import { HistoryContext } from '../../context/history-context';
 import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
-import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
+import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { Route } from '../../routes';
 import { BankContext } from '../../storage/bank/bank-context';
 import { StorageMainItemBase } from '../../storage/item/main/storage-main-item-base';
@@ -27,7 +27,7 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
     const storageSearch = storageHistoryValue?.search ?? selectedBankBoxes.data?.selectedSearch;
 
     const savePkmsQuery = usePkmSaveIndex(saveId);
-    const pkmVersionsQuery = usePkmVersionIndex();
+    const pkmVariantsQuery = usePkmVariantIndex();
 
     return (
         <TextContainer maxHeight={300}>
@@ -42,16 +42,16 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
             >
                 {saveId === 0 ? (
                     <>
-                        {pkmVersionsQuery.isLoading && !pkmVersionsQuery.data && (
+                        {pkmVariantsQuery.isLoading && !pkmVariantsQuery.data && (
                             <StorageItem small species={species} context={9} form={0} helpTitle={null} loading />
                         )}
 
-                        {pkmVersionsQuery.data?.data.bySpecies[ species ]
+                        {pkmVariantsQuery.data?.data.bySpecies[ species ]
                             ?.filter(pkm => pkm.isMain)
-                            ?.map(pkmVersion => (
+                            ?.map(pkmVariant => (
                                 <StorageMainItemBase
-                                    key={pkmVersion.id}
-                                    pkmId={pkmVersion.id}
+                                    key={pkmVariant.id}
+                                    pkmId={pkmVariant.id}
                                     helpTitle={null}
                                     small
                                     onClick={() =>
@@ -59,10 +59,10 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
                                             to: '/storage',
                                             search: {
                                                 ...storageSearch,
-                                                mainBoxIds: [ pkmVersion?.boxId ?? 0 ],
+                                                mainBoxIds: [ pkmVariant?.boxId ?? 0 ],
                                                 selected: {
                                                     saveId: undefined,
-                                                    id: pkmVersion.id,
+                                                    id: pkmVariant.id,
                                                 },
                                             },
                                         })

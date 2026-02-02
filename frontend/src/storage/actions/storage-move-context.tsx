@@ -1,8 +1,8 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
-import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
-import type { BoxDTO, PkmSaveDTO, PkmVersionDTO } from '../../data/sdk/model';
+import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
+import type { BoxDTO, PkmSaveDTO, PkmVariantDTO } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetBoxes, useStorageMovePkm, useStorageMovePkmBank } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
@@ -87,10 +87,10 @@ export const StorageMoveContext = {
 
         const pkmIds = pkmIdsRaw.some(id => selectContext.hasPkm(saveId, id)) ? selectContext.ids : pkmIdsRaw;
 
-        const mainPkmVersionsQuery = usePkmVersionIndex();
+        const mainPkmVariantsQuery = usePkmVariantIndex();
         const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);
 
-        const pkmMains = !moveContext.selected && !saveId ? pkmIds.map(id => mainPkmVersionsQuery.data?.data.byId[ id ]).filter(filterIsDefined) : [];
+        const pkmMains = !moveContext.selected && !saveId ? pkmIds.map(id => mainPkmVariantsQuery.data?.data.byId[ id ]).filter(filterIsDefined) : [];
         const pkmSaves = !moveContext.selected && !!saveId ? pkmIds.map(id => savePkmsQuery.data?.data.byId[ id ]).filter(filterIsDefined) : [];
 
         const canClickIds = !saveId ? pkmMains.map(pkm => pkm.id) : pkmSaves.filter(pkmSave => pkmSave.canMove || pkmSave.canMoveToMain).map(pkm => pkm.id);
@@ -132,7 +132,7 @@ export const StorageMoveContext = {
         const { selected, setSelected } = StorageMoveContext.useValue();
         const selectContext = StorageSelectContext.useValue();
 
-        const mainPkmsQuery = usePkmVersionIndex();
+        const mainPkmsQuery = usePkmVariantIndex();
         const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);
 
         const boxesQuery = useStorageGetBoxes({ saveId });
@@ -283,7 +283,7 @@ export const StorageMoveContext = {
         const selectContext = StorageSelectContext.useValue();
 
         const mainBoxesQuery = useStorageGetBoxes();
-        const mainPkmVersionsQuery = usePkmVersionIndex();
+        const mainPkmVariantsQuery = usePkmVariantIndex();
         const sourceSavePkmsQuery = usePkmSaveIndex(selected?.saveId ?? 0);
 
         const movePkmBankMutation = useStorageMovePkmBank();
@@ -294,13 +294,13 @@ export const StorageMoveContext = {
             selected && selected.ids.length > 0
                 ? selected.saveId
                     ? sourceSavePkmsQuery.data?.data.byId[ selected.ids[ 0 ]! ]
-                    : mainPkmVersionsQuery.data?.data.byId[ selected.ids[ 0 ]! ]
+                    : mainPkmVariantsQuery.data?.data.byId[ selected.ids[ 0 ]! ]
                 : undefined;
 
         type SlotsInfos = {
             sourceId: string;
             sourceSlot: number;
-            sourcePkmMain?: PkmVersionDTO;
+            sourcePkmMain?: PkmVariantDTO;
             sourcePkmSave?: PkmSaveDTO;
             sourceMainBox?: BoxDTO;
         };
@@ -312,7 +312,7 @@ export const StorageMoveContext = {
                         return;
                     }
 
-                    const sourcePkmMain = !selected.saveId ? mainPkmVersionsQuery.data?.data.byId[ sourceId ] : undefined;
+                    const sourcePkmMain = !selected.saveId ? mainPkmVariantsQuery.data?.data.byId[ sourceId ] : undefined;
                     const sourcePkmSave = selected.saveId ? sourceSavePkmsQuery.data?.data.byId[ sourceId ] : undefined;
                     const sourcePkm = sourcePkmMain ?? sourcePkmSave;
                     if (!sourcePkm) {
@@ -374,8 +374,8 @@ export const StorageMoveContext = {
                         };
                     }
 
-                    const existingStoredPkmVersion = mainPkmVersionsQuery.data?.data.byId[ sourcePkmSave.idBase ];
-                    if (existingStoredPkmVersion && existingStoredPkmVersion.attachedSaveId !== sourcePkmSave.saveId) {
+                    const existingStoredPkmVariant = mainPkmVariantsQuery.data?.data.byId[ sourcePkmSave.idBase ];
+                    if (existingStoredPkmVariant && existingStoredPkmVariant.attachedSaveId !== sourcePkmSave.saveId) {
                         return {
                             enable: false,
                             helpText: t('storage.move.save-main-duplicate', {
@@ -470,7 +470,7 @@ export const StorageMoveContext = {
 
         const boxesQuery = useStorageGetBoxes({ saveId });
 
-        const mainPkmVersionsQuery = usePkmVersionIndex();
+        const mainPkmVariantsQuery = usePkmVariantIndex();
         const sourceSavePkmsQuery = usePkmSaveIndex(selected?.saveId ?? 0);
         const targetSavePkmsQuery = usePkmSaveIndex(saveId ?? 0);
 
@@ -481,16 +481,16 @@ export const StorageMoveContext = {
             selected && selected.ids.length > 0
                 ? selected.saveId
                     ? sourceSavePkmsQuery.data?.data.byId[ selected.ids[ 0 ]! ]
-                    : mainPkmVersionsQuery.data?.data.byId[ selected.ids[ 0 ]! ]
+                    : mainPkmVariantsQuery.data?.data.byId[ selected.ids[ 0 ]! ]
                 : undefined;
 
         type SlotsInfos = {
             sourceId: string;
             sourceSlot: number;
-            sourcePkmMain?: PkmVersionDTO;
+            sourcePkmMain?: PkmVariantDTO;
             sourcePkmSave?: PkmSaveDTO;
             targetSlot: number;
-            targetPkmMains: PkmVersionDTO[];
+            targetPkmMains: PkmVariantDTO[];
             targetPkmSave?: PkmSaveDTO;
         };
 
@@ -501,7 +501,7 @@ export const StorageMoveContext = {
                         return;
                     }
 
-                    const sourcePkmMain = !selected.saveId ? mainPkmVersionsQuery.data?.data.byId[ sourceId ] : undefined;
+                    const sourcePkmMain = !selected.saveId ? mainPkmVariantsQuery.data?.data.byId[ sourceId ] : undefined;
                     const sourcePkmSave = selected.saveId ? sourceSavePkmsQuery.data?.data.byId[ sourceId ] : undefined;
                     const sourcePkm = sourcePkmMain ?? sourcePkmSave;
                     if (!sourcePkm) {
@@ -511,7 +511,7 @@ export const StorageMoveContext = {
                     const sourceSlot = sourcePkm.boxSlot;
                     const targetSlot = dropBoxSlot + (sourceSlot - sourceMainPkm.boxSlot);
 
-                    const targetPkmMains = !saveId ? (mainPkmVersionsQuery.data?.data.byBox[ dropBoxId ]?.[ targetSlot ] ?? []) : [];
+                    const targetPkmMains = !saveId ? (mainPkmVariantsQuery.data?.data.byBox[ dropBoxId ]?.[ targetSlot ] ?? []) : [];
                     const targetPkmSave = saveId ? targetSavePkmsQuery.data?.data.byBox[ dropBoxId ]?.[ targetSlot ] : undefined;
 
                     if (
@@ -550,14 +550,14 @@ export const StorageMoveContext = {
             const targetBoxMain = !saveId ? targetBox : undefined;
             const targetBoxSave = saveId ? targetBox : undefined;
 
-            const getMainPkmNickname = (id: string) => mainPkmVersionsQuery.data?.data.byId[ id ]?.nickname;
+            const getMainPkmNickname = (id: string) => mainPkmVariantsQuery.data?.data.byId[ id ]?.nickname;
 
             const checkBetweenSlot = (
                 targetBoxMain?: BoxDTO,
                 targetBoxSave?: BoxDTO,
-                targetPkmMain?: PkmVersionDTO,
+                targetPkmMain?: PkmVariantDTO,
                 targetPkmSave?: PkmSaveDTO,
-                sourcePkmMain?: PkmVersionDTO,
+                sourcePkmMain?: PkmVariantDTO,
                 sourcePkmSave?: PkmSaveDTO,
             ): ClickInfos => {
                 const targetPkm = targetPkmMain ?? targetPkmSave;
@@ -661,12 +661,12 @@ export const StorageMoveContext = {
                         };
                     }
 
-                    const relatedPkmVersions = mainPkmVersionsQuery.data?.data.byBox[ sourcePkmMain.boxId ]?.[ sourcePkmMain.boxSlot ] ?? [];
+                    const relatedPkmVariants = mainPkmVariantsQuery.data?.data.byBox[ sourcePkmMain.boxId ]?.[ sourcePkmMain.boxSlot ] ?? [];
                     const generation = targetPkmSave?.generation ?? targetSave?.generation;
 
-                    const basePkmVersion = relatedPkmVersions.find(version => version.generation === generation);
+                    const basePkmVariant = relatedPkmVariants.find(variant => variant.generation === generation);
 
-                    if (!generation || !basePkmVersion) {
+                    if (!generation || !basePkmVariant) {
                         return {
                             enable: false,
                             helpText: t('storage.move.main-need-gen', {
@@ -677,17 +677,17 @@ export const StorageMoveContext = {
                     }
 
                     if (!selected.attached) {
-                        if (relatedPkmVersions.length > 1) {
+                        if (relatedPkmVariants.length > 1) {
                             return {
                                 enable: false,
-                                helpText: t('storage.move.attached-multiple-versions', {
+                                helpText: t('storage.move.attached-multiple-variants', {
                                     name: getMainPkmNickname(sourcePkmMain.id),
                                 }),
                             };
                         }
                     }
 
-                    if (!basePkmVersion.isEnabled) {
+                    if (!basePkmVariant.isEnabled) {
                         return {
                             enable: false,
                             helpText: t('storage.move.main-disabled'),
@@ -718,8 +718,8 @@ export const StorageMoveContext = {
                         };
                     }
 
-                    const existingStoredPkmVersion = mainPkmVersionsQuery.data?.data.byId[ sourcePkmSave.idBase ];
-                    if (existingStoredPkmVersion && existingStoredPkmVersion.attachedSaveId !== sourcePkmSave.saveId) {
+                    const existingStoredPkmVariant = mainPkmVariantsQuery.data?.data.byId[ sourcePkmSave.idBase ];
+                    if (existingStoredPkmVariant && existingStoredPkmVariant.attachedSaveId !== sourcePkmSave.saveId) {
                         return {
                             enable: false,
                             helpText: t('storage.move.save-main-duplicate', {

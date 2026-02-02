@@ -1,9 +1,9 @@
 import type React from "react";
-import { usePkmVersionSlotInfos } from "../../data/hooks/use-pkm-version-slot-infos";
+import { usePkmVariantSlotInfos } from "../../data/hooks/use-pkm-variant-slot-infos";
 import {
   useStorageEvolvePkms,
-  useStorageMainCreatePkmVersion,
-  useStorageMainDeletePkmVersion,
+  useStorageMainCreatePkmVariant,
+  useStorageMainDeletePkmVariant,
   useStorageMainPkmDetachSave,
 } from "../../data/sdk/storage/storage.gen";
 import { Route } from "../../routes/storage";
@@ -32,31 +32,31 @@ export const StorageItemMainActions: React.FC = () => {
     undefined,
   );
 
-  const mainCreatePkmVersionMutation = useStorageMainCreatePkmVersion();
+  const mainCreatePkmVariantMutation = useStorageMainCreatePkmVariant();
   const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
   const evolvePkmsMutation = useStorageEvolvePkms();
-  const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
+  const mainPkmVariantDeleteMutation = useStorageMainDeletePkmVariant();
 
-  const versionInfos = usePkmVersionSlotInfos(selected?.id);
-  if (!versionInfos) {
+  const variantInfos = usePkmVariantSlotInfos(selected?.id);
+  if (!variantInfos) {
     return null;
   }
 
   const {
-    mainVersion,
-    attachedVersion,
+    mainVariant,
+    attachedVariant,
     attachedSavePkm,
     canEditAll,
-    canCreateVersions,
-    canEvolveVersion,
+    canCreateVariants,
+    canEvolveVariant,
     canDetach,
     canGoToSave,
-    canRemoveVersions,
+    canRemoveVariants,
     pageSaves,
-  } = versionInfos;
+  } = variantInfos;
 
   return (
-    <StorageItemMainActionsContainer pkmId={mainVersion.id}>
+    <StorageItemMainActionsContainer pkmId={mainVariant.id}>
       <div
         className={css({
           display: "flex",
@@ -87,28 +87,28 @@ export const StorageItemMainActions: React.FC = () => {
           </ButtonWithDisabledPopover>
         )}
 
-        {canCreateVersions.map((generation) => (
+        {canCreateVariants.map((generation) => (
           <ButtonWithDisabledPopover
             key={generation}
             as={Button}
             bgColor={theme.bg.primary}
             onClick={() =>
-              mainCreatePkmVersionMutation.mutateAsync({
+              mainCreatePkmVariantMutation.mutateAsync({
                 params: {
                   generation: generation,
-                  pkmVersionId: mainVersion.id,
+                  pkmVariantId: mainVariant.id,
                 },
               })
             }
             showHelp
             anchor="right start"
-            helpTitle={t("storage.actions.create-version.helpTitle", {
+            helpTitle={t("storage.actions.create-variant.helpTitle", {
               generation: generation,
             })}
-            helpContent={t("storage.actions.create-version.helpContent")}
+            helpContent={t("storage.actions.create-variant.helpContent")}
           >
             <Icon name="plus" solid forButton />
-            {t("storage.actions.create-version", { generation: generation })}
+            {t("storage.actions.create-variant", { generation: generation })}
           </ButtonWithDisabledPopover>
         ))}
 
@@ -122,15 +122,15 @@ export const StorageItemMainActions: React.FC = () => {
                     saveId: attachedSavePkm.saveId,
                     id: attachedSavePkm.id,
                   },
-                  saves: attachedVersion
+                  saves: attachedVariant
                     ? {
                       ...saves,
-                      [ attachedVersion.attachedSaveId! ]: {
-                        saveId: attachedVersion.attachedSaveId!,
+                      [ attachedVariant.attachedSaveId! ]: {
+                        saveId: attachedVariant.attachedSaveId!,
                         saveBoxIds: [ attachedSavePkm?.boxId ?? 0 ],
                         order: getSaveOrder(
                           saves,
-                          attachedVersion.attachedSaveId!,
+                          attachedVariant.attachedSaveId!,
                         ),
                       },
                     }
@@ -157,21 +157,21 @@ export const StorageItemMainActions: React.FC = () => {
           </Button>
         )}
 
-        {canEvolveVersion && (
+        {canEvolveVariant && (
           <ButtonWithConfirm
             anchor="right"
             bgColor={theme.bg.primary}
             onClick={async () => {
               const mutateResult = await evolvePkmsMutation.mutateAsync({
                 params: {
-                  ids: [ canEvolveVersion.id ],
+                  ids: [ canEvolveVariant.id ],
                 },
               });
               const mainPkms = Object.values(
-                mutateResult.data.mainPkmVersions?.data ?? {},
+                mutateResult.data.mainPkmVariants?.data ?? {},
               );
               const newId = mainPkms.find(
-                (pkm) => pkm.boxKey === mainVersion.boxKey,
+                (pkm) => pkm.boxKey === mainVariant.boxKey,
               )?.id;
               if (newId) {
                 navigate({
@@ -196,7 +196,7 @@ export const StorageItemMainActions: React.FC = () => {
             onClick={() =>
               mainPkmDetachSaveMutation.mutateAsync({
                 params: {
-                  pkmVersionIds: [ attachedVersion!.id ],
+                  pkmVariantIds: [ attachedVariant!.id ],
                 },
               })
             }
@@ -210,14 +210,14 @@ export const StorageItemMainActions: React.FC = () => {
           </ButtonWithDisabledPopover>
         )}
 
-        {canRemoveVersions.length > 0 && (
+        {canRemoveVariants.length > 0 && (
           <ButtonWithConfirm
             anchor="right"
             bgColor={theme.bg.red}
             onClick={() =>
-              mainPkmVersionDeleteMutation.mutateAsync({
+              mainPkmVariantDeleteMutation.mutateAsync({
                 params: {
-                  pkmVersionIds: canRemoveVersions.map((version) => version.id),
+                  pkmVariantIds: canRemoveVariants.map((variant) => variant.id),
                 },
               })
             }

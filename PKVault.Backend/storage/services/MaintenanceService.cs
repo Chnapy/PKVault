@@ -16,9 +16,9 @@ public class MaintenanceService(
 
         using var scope = sp.CreateScope();
 
-        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+        var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
 
-        var pkmVersionsFilepaths = (await pkmVersionLoader.GetAllEntities()).Values.Select(entity => entity.Filepath).ToList();
+        var pkmVariantsFilepaths = (await pkmVariantLoader.GetAllEntities()).Values.Select(entity => entity.Filepath).ToList();
 
         var rootDir = ".";
         var storagePath = settingsService.GetSettings().GetStoragePath();
@@ -30,18 +30,18 @@ public class MaintenanceService(
         var pathsToClean = matches.Files
         .Select(file => Path.Combine(rootDir, file.Path))
         .Select(MatcherUtil.NormalizePath)
-        .Select(path => pkmVersionsFilepaths.Contains(path) ? null : path)
+        .Select(path => pkmVariantsFilepaths.Contains(path) ? null : path)
         .OfType<string>();
 
-        var pkmVersionFilesToDelete = pkmVersionsFilepaths.Count - (matches.Files.Count() - pathsToClean.Count());
+        var pkmVariantFilesToDelete = pkmVariantsFilepaths.Count - (matches.Files.Count() - pathsToClean.Count());
 
         Console.WriteLine($"Total files count = {matches.Files.Count()}");
-        Console.WriteLine($"PkmVersion count = {pkmVersionsFilepaths.Count}");
+        Console.WriteLine($"PkmVariant count = {pkmVariantsFilepaths.Count}");
         Console.WriteLine($"Paths to clean count = {pathsToClean.Count()}");
 
-        if (pkmVersionFilesToDelete != 0)
+        if (pkmVariantFilesToDelete != 0)
         {
-            throw new Exception($"Inconsistant delete, {pkmVersionFilesToDelete} files for PkmVersions may be deleted");
+            throw new Exception($"Inconsistant delete, {pkmVariantFilesToDelete} files for PkmVariants may be deleted");
         }
 
         if (pathsToClean.Any())
@@ -56,7 +56,7 @@ public class MaintenanceService(
             }
 
             Console.WriteLine($"Total files count = {matches.Files.Count()}");
-            Console.WriteLine($"PkmVersion count = {pkmVersionsFilepaths.Count}");
+            Console.WriteLine($"PkmVariant count = {pkmVariantsFilepaths.Count}");
             Console.WriteLine($"Paths to clean count = {pathsToClean.Count()}");
         }
     }

@@ -53,7 +53,7 @@ public class SettingsController(DataService dataService, ISettingsService settin
             StaticData = languageChanged,
             MainBanks = new() { All = true },
             MainBoxes = new() { All = true },
-            MainPkmVersions = new() { All = true },
+            MainPkmVariants = new() { All = true },
             Dex = new() { All = true },
             Saves = new() { All = true },
             SaveInfos = true,

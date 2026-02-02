@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
+import { usePkmVariantIndex } from '../data/hooks/use-pkm-variant-index';
 import { useBackupGetAll } from '../data/sdk/backup/backup.gen';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
@@ -20,7 +20,7 @@ export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number
         useSaveInfosGetAll(),
         useStorageGetMainBanks(),
         useStorageGetBoxes(),
-        usePkmVersionIndex(),
+        usePkmVariantIndex(),
     ] as const;
 
     const desktopMessage = useDesktopMessage();

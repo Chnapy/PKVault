@@ -219,11 +219,11 @@ public class Program
         services.AddScoped<MainDeleteBankAction>();
         services.AddScoped<MovePkmAction>();
         services.AddScoped<MovePkmBankAction>();
-        services.AddScoped<MainCreatePkmVersionAction>();
-        services.AddScoped<EditPkmVersionAction>();
+        services.AddScoped<MainCreatePkmVariantAction>();
+        services.AddScoped<EditPkmVariantAction>();
         services.AddScoped<EditPkmSaveAction>();
         services.AddScoped<DetachPkmSaveAction>();
-        services.AddScoped<DeletePkmVersionAction>();
+        services.AddScoped<DeletePkmVariantAction>();
         services.AddScoped<SaveDeletePkmAction>();
         services.AddScoped<EvolvePkmAction>();
         services.AddScoped<SortPkmAction>();
@@ -232,7 +232,7 @@ public class Program
         Console.WriteLine($"Setup services - Loaders");
         services.AddScoped<IBankLoader, BankLoader>();
         services.AddScoped<IBoxLoader, BoxLoader>();
-        services.AddScoped<IPkmVersionLoader, PkmVersionLoader>();
+        services.AddScoped<IPkmVariantLoader, PkmVariantLoader>();
         services.AddScoped<IPkmFileLoader, PkmFileLoader>();
         services.AddScoped<IDexLoader, DexLoader>();
         services.AddSingleton<ISavesLoadersService, SavesLoadersService>();   // singleton for perf reasons

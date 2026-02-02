@@ -1,6 +1,6 @@
 import { PopoverButton } from '@headlessui/react';
 import React from 'react';
-import { usePkmVersionSlotInfos } from '../../../data/hooks/use-pkm-version-slot-infos';
+import { usePkmVariantSlotInfos } from '../../../data/hooks/use-pkm-variant-slot-infos';
 import { withErrorCatcher } from '../../../error/with-error-catcher';
 import { Route } from '../../../routes/storage';
 import { StorageItemPopover } from '../../../ui/storage-item/storage-item-popover';
@@ -19,21 +19,21 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
 
         const { checked, onCheck } = StorageSelectContext.useCheck(undefined, pkmId);
 
-        const versionInfos = usePkmVersionSlotInfos(pkmId);
+        const variantInfos = usePkmVariantSlotInfos(pkmId);
 
-        if (!versionInfos) {
+        if (!variantInfos) {
             return null;
         }
 
-        const { mainVersion, canCreateVersions, canEvolveVersion, canSynchronize, canMoveAttached } = versionInfos;
+        const { mainVariant, canCreateVariants, canEvolveVariant, canSynchronize, canMoveAttached } = variantInfos;
 
-        const { heldItem } = mainVersion;
+        const { heldItem } = mainVariant;
 
         return (
             <StorageItemPopover
                 pkmId={pkmId}
-                boxId={mainVersion.boxId}
-                boxSlot={mainVersion.boxSlot}
+                boxId={mainVariant.boxId}
+                boxSlot={mainVariant.boxSlot}
                 selected={selected && !selected.saveId && selected.id === pkmId}
             >
                 {props => (
@@ -43,9 +43,9 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
                             ...props,
                             pkmId,
                             heldItem,
-                            canCreateVersion: canCreateVersions.length > 0,
+                            canCreateVariant: canCreateVariants.length > 0,
                             canMoveOutside: canMoveAttached,
-                            canEvolve: !!canEvolveVersion,
+                            canEvolve: !!canEvolveVariant,
                             needSynchronize: canSynchronize,
                             onClick:
                                 props.onClick ??

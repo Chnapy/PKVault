@@ -123,29 +123,29 @@ public class ActionService(
         );
     }
 
-    public async Task<DataUpdateFlags> MainCreatePkmVersion(string pkmVersionId, byte generation)
+    public async Task<DataUpdateFlags> MainCreatePkmVariant(string pkmVariantId, byte generation)
     {
         using var scope = sp.CreateScope();
 
         return await AddAction(
             scope,
-            (scope) => scope.ServiceProvider.GetRequiredService<MainCreatePkmVersionAction>(),
-            new(pkmVersionId, generation)
+            (scope) => scope.ServiceProvider.GetRequiredService<MainCreatePkmVariantAction>(),
+            new(pkmVariantId, generation)
         );
     }
 
-    public async Task<DataUpdateFlags> MainEditPkmVersion(string pkmVersionId, EditPkmVersionPayload payload)
+    public async Task<DataUpdateFlags> MainEditPkmVariant(string pkmVariantId, EditPkmVariantPayload payload)
     {
         using var scope = sp.CreateScope();
 
         return await AddAction(
             scope,
-            (scope) => scope.ServiceProvider.GetRequiredService<EditPkmVersionAction>(),
-            new(pkmVersionId, payload)
+            (scope) => scope.ServiceProvider.GetRequiredService<EditPkmVariantAction>(),
+            new(pkmVariantId, payload)
         );
     }
 
-    public async Task<DataUpdateFlags> SaveEditPkm(uint saveId, string pkmId, EditPkmVersionPayload payload)
+    public async Task<DataUpdateFlags> SaveEditPkm(uint saveId, string pkmId, EditPkmVariantPayload payload)
     {
         using var scope = sp.CreateScope();
 
@@ -167,14 +167,14 @@ public class ActionService(
         );
     }
 
-    public async Task<DataUpdateFlags> MainPkmVersionsDelete(string[] pkmVersionIds)
+    public async Task<DataUpdateFlags> MainPkmVariantsDelete(string[] pkmVariantIds)
     {
         using var scope = sp.CreateScope();
 
         return await AddAction(
             scope,
-            (scope) => scope.ServiceProvider.GetRequiredService<DeletePkmVersionAction>(),
-            new(pkmVersionIds)
+            (scope) => scope.ServiceProvider.GetRequiredService<DeletePkmVariantAction>(),
+            new(pkmVariantIds)
         );
     }
 
@@ -259,7 +259,7 @@ public class ActionService(
         {
             MainBanks = new() { All = true },
             MainBoxes = new() { All = true },
-            MainPkmVersions = new() { All = true },
+            MainPkmVariants = new() { All = true },
             Dex = new() { All = true },
             Saves = new() { All = true },
             Warnings = true,
@@ -350,12 +350,12 @@ public class ActionService(
                 ..db.BoxesFlags.Ids,
             ]
         };
-        flags.MainPkmVersions = new()
+        flags.MainPkmVariants = new()
         {
-            All = flags.MainPkmVersions.All || db.PkmVersionsFlags.All,
+            All = flags.MainPkmVariants.All || db.PkmVariantsFlags.All,
             Ids = [
-                ..flags.MainPkmVersions.Ids,
-                ..db.PkmVersionsFlags.Ids,
+                ..flags.MainPkmVariants.Ids,
+                ..db.PkmVariantsFlags.Ids,
             ]
         };
 
@@ -382,7 +382,7 @@ public class ActionService(
     public async Task<List<MoveItem>> GetPkmAvailableMoves(uint? saveId, string pkmId)
     {
         using var scope = sp.CreateScope();
-        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+        var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
 
         var saveLoader = saveId == null ? null : savesLoadersService.GetLoaders((uint)saveId);
 
@@ -392,10 +392,10 @@ public class ActionService(
         {
             if (saveLoader == null)
             {
-                var pkmVersion = await pkmVersionLoader.GetEntity(pkmId);
-                ArgumentNullException.ThrowIfNull(pkmVersion);
+                var pkmVariant = await pkmVariantLoader.GetEntity(pkmId);
+                ArgumentNullException.ThrowIfNull(pkmVariant);
 
-                return await pkmVersionLoader.GetPKM(pkmVersion);
+                return await pkmVariantLoader.GetPKM(pkmVariant);
             }
 
             return saveLoader.Pkms.GetDto(pkmId)?.Pkm

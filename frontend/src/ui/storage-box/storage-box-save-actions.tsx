@@ -2,7 +2,7 @@ import { css } from '@emotion/css';
 import { PopoverPanel, type PopoverPanelProps } from '@headlessui/react';
 import type React from 'react';
 import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
-import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
+import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { useStorageEvolvePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
@@ -41,7 +41,7 @@ export const StorageBoxSaveActions: React.FC<
   const savePkmsDeleteMutation = useStorageSaveDeletePkms();
   const evolvePkmsMutation = useStorageEvolvePkms();
 
-  const pkmVersionIndex = usePkmVersionIndex();
+  const pkmVariantIndex = usePkmVariantIndex();
 
   if (pkms.length === 0 || !hasBox(saveId, boxId)) {
     return null;
@@ -53,7 +53,7 @@ export const StorageBoxSaveActions: React.FC<
     return !!evolveSpecies && pkm.level >= evolveSpecies.minLevel;
   });
 
-  const canDetachPkms = pkms.map(pkm => pkmVersionIndex.data?.data.byAttachedSave[ pkm.saveId ]?.[ pkm.idBase ]).filter(filterIsDefined);
+  const canDetachPkms = pkms.map(pkm => pkmVariantIndex.data?.data.byAttachedSave[ pkm.saveId ]?.[ pkm.idBase ]).filter(filterIsDefined);
 
   const canRemovePkms = pkms.filter(pkm => pkm.canDelete);
 
@@ -138,7 +138,7 @@ export const StorageBoxSaveActions: React.FC<
                 onClick={() =>
                   mainPkmDetachSaveMutation.mutateAsync({
                     params: {
-                      pkmVersionIds: canDetachPkms.map(pkm => pkm.id),
+                      pkmVariantIds: canDetachPkms.map(pkm => pkm.id),
                     },
                   })
                 }

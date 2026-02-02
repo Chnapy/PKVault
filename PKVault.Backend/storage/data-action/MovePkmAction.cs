@@ -9,7 +9,7 @@ public class MovePkmAction(
     IServiceProvider sp,
     StaticDataService staticDataService,
     SynchronizePkmAction synchronizePkmAction,
-    IPkmVersionLoader pkmVersionLoader, IBoxLoader boxLoader, ISavesLoadersService savesLoadersService
+    IPkmVariantLoader pkmVariantLoader, IBoxLoader boxLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<MovePkmActionInput>
 {
     protected override async Task<DataActionPayload> Execute(MovePkmActionInput input, DataUpdateFlags flags)
@@ -91,7 +91,7 @@ public class MovePkmAction(
     {
         if (saveId == null)
         {
-            var mainDto = await pkmVersionLoader.GetEntity(pkmId);
+            var mainDto = await pkmVariantLoader.GetEntity(pkmId);
             return mainDto.BoxSlot;
         }
 
@@ -100,26 +100,26 @@ public class MovePkmAction(
         return saveDto.BoxSlot;
     }
 
-    private async Task<DataActionPayload> MainToMain(MovePkmActionInput input, string pkmVersionId, int targetBoxSlot)
+    private async Task<DataActionPayload> MainToMain(MovePkmActionInput input, string pkmVariantId, int targetBoxSlot)
     {
-        var baseEntity = await pkmVersionLoader.GetEntity(pkmVersionId) ?? throw new KeyNotFoundException("Pkm not found");
-        var entities = await pkmVersionLoader.GetEntitiesByBox(baseEntity.BoxId, baseEntity.BoxSlot);
-        var pkm = await pkmVersionLoader.GetPKM(baseEntity);
+        var baseEntity = await pkmVariantLoader.GetEntity(pkmVariantId) ?? throw new KeyNotFoundException("Pkm not found");
+        var entities = await pkmVariantLoader.GetEntitiesByBox(baseEntity.BoxId, baseEntity.BoxSlot);
+        var pkm = await pkmVariantLoader.GetPKM(baseEntity);
 
-        var pkmsAlreadyPresent = (await pkmVersionLoader.GetEntitiesByBox(input.targetBoxId, targetBoxSlot)).Values.ToList();
+        var pkmsAlreadyPresent = (await pkmVariantLoader.GetEntitiesByBox(input.targetBoxId, targetBoxSlot)).Values.ToList();
 
         foreach (var pkmAlreadyPresent in pkmsAlreadyPresent)
         {
             pkmAlreadyPresent.BoxId = baseEntity.BoxId;
             pkmAlreadyPresent.BoxSlot = baseEntity.BoxSlot;
-            await pkmVersionLoader.UpdateEntity(pkmAlreadyPresent);
+            await pkmVariantLoader.UpdateEntity(pkmAlreadyPresent);
         }
 
         foreach (var entity in entities.Values)
         {
             entity.BoxId = input.targetBoxId;
             entity.BoxSlot = targetBoxSlot;
-            await pkmVersionLoader.UpdateEntity(entity);
+            await pkmVariantLoader.UpdateEntity(entity);
         }
 
         var boxName = (await boxLoader.GetEntity(input.targetBoxId.ToString()))?.Name;
@@ -189,18 +189,18 @@ public class MovePkmAction(
         );
     }
 
-    private async Task<DataActionPayload> MainToSave(MovePkmActionInput input, DataUpdateFlags flags, string pkmVersionId, int targetBoxSlot)
+    private async Task<DataActionPayload> MainToSave(MovePkmActionInput input, DataUpdateFlags flags, string pkmVariantId, int targetBoxSlot)
     {
         var saveLoaders = savesLoadersService.GetLoaders((uint)input.targetSaveId!);
 
-        var pkmVersion = await pkmVersionLoader.GetEntity(pkmVersionId);
-        var pkm = await pkmVersionLoader.GetPKM(pkmVersion);
+        var pkmVariant = await pkmVariantLoader.GetEntity(pkmVariantId);
+        var pkm = await pkmVariantLoader.GetPKM(pkmVariant);
 
-        var pkmVersions = (await pkmVersionLoader.GetEntitiesByBox(pkmVersion.BoxId!, pkmVersion.BoxSlot!)).Values.ToList();
+        var pkmVariants = (await pkmVariantLoader.GetEntitiesByBox(pkmVariant.BoxId!, pkmVariant.BoxSlot!)).Values.ToList();
 
         if (input.attached)
         {
-            var hasDuplicates = pkmVersions.Any(pkm => saveLoaders.Pkms.GetDtosByIdBase(pkm.Id).Count > 0);
+            var hasDuplicates = pkmVariants.Any(pkm => saveLoaders.Pkms.GetDtosByIdBase(pkm.Id).Count > 0);
             if (hasDuplicates)
             {
                 throw new ArgumentException($"Target save already have a pkm with same ID, move attached cannot be done.");
@@ -213,11 +213,11 @@ public class MovePkmAction(
             throw new ArgumentException("Switch not possible with attached move");
         }
 
-        await MainToSaveWithoutCheckTarget(input, flags, (uint)input.targetSaveId, input.targetBoxId, targetBoxSlot, pkmVersions);
+        await MainToSaveWithoutCheckTarget(input, flags, (uint)input.targetSaveId, input.targetBoxId, targetBoxSlot, pkmVariants);
 
         if (existingSlot != null)
         {
-            await SaveToMainWithoutCheckTarget(input, flags, (uint)input.targetSaveId, pkmVersion.BoxId, pkmVersion.BoxSlot, existingSlot);
+            await SaveToMainWithoutCheckTarget(input, flags, (uint)input.targetSaveId, pkmVariant.BoxId, pkmVariant.BoxSlot, existingSlot);
         }
 
         saveLoaders.Pkms.FlushParty();
@@ -247,14 +247,14 @@ public class MovePkmAction(
             }
         }
 
-        var pkmVersion = await pkmVersionLoader.GetEntity(savePkm.IdBase);
+        var pkmVariant = await pkmVariantLoader.GetEntity(savePkm.IdBase);
 
-        if (pkmVersion != null && pkmVersion.AttachedSaveId != input.sourceSaveId)
+        if (pkmVariant != null && pkmVariant.AttachedSaveId != input.sourceSaveId)
         {
             throw new ArgumentException($"Pkm with same ID already exists, id={savePkm.IdBase}");
         }
 
-        var existingSlots = (await pkmVersionLoader.GetEntitiesByBox(input.targetBoxId, targetBoxSlot)).Values.ToList();
+        var existingSlots = (await pkmVariantLoader.GetEntitiesByBox(input.targetBoxId, targetBoxSlot)).Values.ToList();
         if (input.attached && existingSlots.Count > 0)
         {
             throw new ArgumentException("Switch not possible with attached move");
@@ -287,38 +287,38 @@ public class MovePkmAction(
         MovePkmActionInput input,
         DataUpdateFlags flags,
         uint targetSaveId, string targetBoxId, int targetBoxSlot,
-        List<PkmVersionEntity> relatedPkmVersions
+        List<PkmVariantEntity> relatedPkmVariants
     )
     {
         var saveLoaders = savesLoadersService.GetLoaders(targetSaveId);
 
-        if (!input.attached && relatedPkmVersions.Count > 1)
+        if (!input.attached && relatedPkmVariants.Count > 1)
         {
             throw new ArgumentException($"Not-attached move from main to save requires a single version");
         }
 
-        var pkmVersion = relatedPkmVersions.Find(version => version.Generation == saveLoaders.Save.Generation);
+        var pkmVariant = relatedPkmVariants.Find(version => version.Generation == saveLoaders.Save.Generation);
 
-        if (pkmVersion == default)
+        if (pkmVariant == default)
         {
-            throw new ArgumentException($"PkmVersionEntity not found for generation={saveLoaders.Save.Generation}");
+            throw new ArgumentException($"PkmVariantEntity not found for generation={saveLoaders.Save.Generation}");
         }
 
-        if (pkmVersion.AttachedSaveId != default)
+        if (pkmVariant.AttachedSaveId != default)
         {
-            throw new ArgumentException($"PkmVersionEntity already in save, id={pkmVersion.Id}, saveId={pkmVersion.AttachedSaveId}");
+            throw new ArgumentException($"PkmVariantEntity already in save, id={pkmVariant.Id}, saveId={pkmVariant.AttachedSaveId}");
         }
 
-        if (pkmVersion.Generation != saveLoaders.Save.Generation)
+        if (pkmVariant.Generation != saveLoaders.Save.Generation)
         {
-            throw new ArgumentException($"PkmVersionEntity Generation not compatible with save for id={pkmVersion.Id}, generation={pkmVersion.Generation}, save.generation={saveLoaders.Save.Generation}");
+            throw new ArgumentException($"PkmVariantEntity Generation not compatible with save for id={pkmVariant.Id}, generation={pkmVariant.Generation}, save.generation={saveLoaders.Save.Generation}");
         }
 
-        var pkm = await pkmVersionLoader.GetPKM(pkmVersion);
+        var pkm = await pkmVariantLoader.GetPKM(pkmVariant);
 
         if (!saveLoaders.Save.IsSpeciesAllowed(pkm.Species))
         {
-            throw new ArgumentException($"PkmVersionEntity Species not compatible with save for id={pkmVersion.Id}, species={pkm.Species}, save.maxSpecies={saveLoaders.Save.MaxSpeciesID}");
+            throw new ArgumentException($"PkmVariantEntity Species not compatible with save for id={pkmVariant.Id}, species={pkm.Species}, save.maxSpecies={saveLoaders.Save.MaxSpeciesID}");
         }
 
         await CheckG3NationalDex(saveLoaders.Save, pkm.Species);
@@ -330,23 +330,23 @@ public class MovePkmAction(
 
         if (input.attached)
         {
-            pkmVersion.AttachedSaveId = saveLoaders.Save.Id;
-            pkmVersion.AttachedSavePkmIdBase = pkmSaveDTO.IdBase;
-            await pkmVersionLoader.UpdateEntity(pkmVersion);
+            pkmVariant.AttachedSaveId = saveLoaders.Save.Id;
+            pkmVariant.AttachedSavePkmIdBase = pkmSaveDTO.IdBase;
+            await pkmVariantLoader.UpdateEntity(pkmVariant);
         }
         else
         {
-            await pkmVersionLoader.DeleteEntity(pkmVersion);
+            await pkmVariantLoader.DeleteEntity(pkmVariant);
         }
 
-        if (input.attached && (await pkmVersionLoader.GetEntityBySave(pkmSaveDTO.SaveId, pkmSaveDTO.IdBase)) == null)
+        if (input.attached && (await pkmVariantLoader.GetEntityBySave(pkmSaveDTO.SaveId, pkmSaveDTO.IdBase)) == null)
         {
-            throw new ArgumentException($"pkmSaveDTO.PkmVersionId is null, should be {pkmSaveDTO.Id}");
+            throw new ArgumentException($"pkmSaveDTO.PkmVariantId is null, should be {pkmSaveDTO.Id}");
         }
 
-        if (pkmVersion.AttachedSaveId != null)
+        if (pkmVariant.AttachedSaveId != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersion.Id, pkmVersion.AttachedSavePkmIdBase!)]));
+            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariant.Id, pkmVariant.AttachedSavePkmIdBase!)]));
         }
 
         flags.Dex.Ids.Add(pkmSaveDTO.Species.ToString());
@@ -372,13 +372,13 @@ public class MovePkmAction(
         }
 
         // get pkm-version
-        var pkmVersionEntity = await pkmVersionLoader.GetEntity(savePkm.Id);
-        var mainPkmAlreadyExists = pkmVersionEntity != null;
+        var pkmVariantEntity = await pkmVariantLoader.GetEntity(savePkm.Id);
+        var mainPkmAlreadyExists = pkmVariantEntity != null;
 
-        if (pkmVersionEntity == null)
+        if (pkmVariantEntity == null)
         {
             // create pkm-version
-            pkmVersionEntity = await pkmVersionLoader.AddEntity(new(
+            pkmVariantEntity = await pkmVariantLoader.AddEntity(new(
                 BoxId: targetBoxId,
                 BoxSlot: targetBoxSlot,
                 IsMain: true,
@@ -390,15 +390,15 @@ public class MovePkmAction(
         }
 
         // if moved to already attached pkm, just update it
-        if (mainPkmAlreadyExists && pkmVersionEntity!.AttachedSaveId != null)
+        if (mainPkmAlreadyExists && pkmVariantEntity!.AttachedSaveId != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)]));
+            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!)]));
 
             if (!input.attached)
             {
-                pkmVersionEntity.AttachedSaveId = null;
-                pkmVersionEntity.AttachedSavePkmIdBase = null;
-                await pkmVersionLoader.UpdateEntity(pkmVersionEntity);
+                pkmVariantEntity.AttachedSaveId = null;
+                pkmVariantEntity.AttachedSavePkmIdBase = null;
+                await pkmVariantLoader.UpdateEntity(pkmVariantEntity);
             }
         }
 
