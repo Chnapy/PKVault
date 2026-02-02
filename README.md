@@ -36,14 +36,14 @@ Executables can be found in releases.
 
 - Storage & save manipulation
   - compatible with all pokemon games, from first generation to **Pokemon Legends: Z-A**
-  - transfer pokemons between saves
+  - move pokemons between saves
   - convert pokemon to any generation (ex. G7 to G2)
   - store pokemons outside saves using banks & boxes
-  - allow use of multiple "versions" for stored pokemons
+  - allow use of multiple "variants" for stored pokemons
   - move/delete actions
   - edit pokemon moves, EVs & nickname
   - evolve pokemons requiring trade or trade + held-item (ex. Kadabra -> Alakazam)
-  - link a save pokemon with all his versions, sharing data like exp & EVs
+  - link a save pokemon with all his variants, sharing data like exp & EVs
   - backup all saves & storage before any save action
     - backups listing
     - backups restore always possible
@@ -54,29 +54,13 @@ Executables can be found in releases.
     - possible shiny dex
 - Dynamic saves listing based on paths & globs
 
-## Get started as dev
-
-You can target dev & build for desktop Windows app or web app.
-
-> Editor note: all code & its documentation were made with/for VS Code. Any other editor may still work, without warranty.
-
-### 1 - General preparation
-
-- Clone this repository including submodules (pokeapi)
-- Run the setup part in [PKVault.Backend/README.md](./PKVault.Backend/README.md#setup)
-- Same with setup part in [frontend/README.md](./frontend/README.md#setup)
-
-### 2a - Web app (backend + frontend)
-
-- Run the dev part in [PKVault.Backend/README.md](./PKVault.Backend/README.md#dev)
-- Same with dev part in [frontend/README.md](./frontend/README.md#dev)
-
-### 2b - Desktop app (WinForm)
-
-- From project root, run `make prepare-winform` (needs tool `make`)
-- Run the setup & dev parts in [PKVault.WinForm/README.md](./PKVault.WinForm/README.md)
-
 ## [Functional documentation](./docs/functional/en/README.md)
+
+## [Technical documentation](./docs/technical/README.md)
+
+Includes quick start.
+
+## [Contribute](./.github/CONTRIBUTING.md)
 
 ## Licenses
 

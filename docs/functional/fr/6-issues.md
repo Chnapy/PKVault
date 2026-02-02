@@ -9,4 +9,6 @@ Vous pouvez les partager via:
 
 ## Contribuer
 
-TODO
+Toute volonté de contribuer à l'évolution de PKVault est très appréciée !
+
+Pour plus de détails regardez la [documentation dédiée](/.github/CONTRIBUTING.md).
