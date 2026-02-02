@@ -76,19 +76,19 @@ You can target dev & build for desktop Windows app or web app.
 - From project root, run `make prepare-winform` (needs tool `make`)
 - Run the setup & dev parts in [PKVault.WinForm/README.md](./PKVault.WinForm/README.md)
 
+## [Functional documentation](./docs/functional/en/README.md)
+
 ## Licenses
 
 This app (PKVault) is licensed under GPLv3 terms, as described in file [LICENSE](./LICENSE).
 Your can use this app for your own projects following license restrictions.
 
 - Backend / WinForm
-
   - [PKHeX (Core part)](https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core) - License GPLv3
   - PokeApiNet - License MIT
   - Versions & all others dependencies can be found into `*.csproj` files
 
 - Frontend
-
   - Font "Pixel Operator" - from [onlinewebfonts](http://www.onlinewebfonts.com) - License CC BY 4.0
   - Font "Pokemon Emerald" - from [fontstruct](https://fontstruct.com/fontstructions/show/1975556) by "aztecwarrior28" - License CC BY-SA 3.0
   - [HackerNoon's Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) - License MIT

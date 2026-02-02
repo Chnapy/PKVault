@@ -4,7 +4,7 @@ import { BackendErrorsContext } from '../data/backend-errors-context';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
 import { HasUpdateWarning } from './warnings/has-update-warning';
 import { useCheckUpdate } from './hooks/use-check-update';
-import { PkmVersionWarning } from './warnings/pkm-version-warning';
+import { PkmVariantWarning } from './warnings/pkm-variant-warning';
 import { SaveChangedWarning } from './warnings/save-changed-warning';
 import { SaveDuplicateWarning } from './warnings/save-duplicate-warning';
 import { Button } from '../ui/button/button';
@@ -23,7 +23,7 @@ export const NotificationCardManager: React.FC = () => {
         errorsCount={errors.length}
         update={hasUpdate && <HasUpdateWarning />}
         saveDuplicateWarnings={warnings?.saveDuplicateWarnings.map((warn, i) => <SaveDuplicateWarning key={i} {...warn} />)}
-        pkmVersionWarnings={warnings?.pkmVersionWarnings.map((warn, i) => <PkmVersionWarning key={i} {...warn} />)}
+        pkmVariantWarnings={warnings?.pkmVariantWarnings.map((warn, i) => <PkmVariantWarning key={i} {...warn} />)}
         saveChangedWarnings={warnings?.saveChangedWarnings.map((warn, i) => <SaveChangedWarning key={i} {...warn} />)}
         errors={errors.map((error, i) => {
             return <tr key={i}>

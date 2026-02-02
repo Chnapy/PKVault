@@ -1,6 +1,6 @@
 using PKHeX.Core;
 
-public class PkmVersionEntity : IEntity
+public class PkmVariantEntity : IEntity
 {
     public override required string Id { get; init; }
     public required string BoxId { get; set; }

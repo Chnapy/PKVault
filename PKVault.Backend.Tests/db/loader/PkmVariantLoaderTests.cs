@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using PKHeX.Core;
 
-public class PkmVersionLoaderTests : IAsyncDisposable
+public class PkmVariantLoaderTests : IAsyncDisposable
 {
     private readonly string dbPath;
     private readonly MockFileSystem mockFileSystem;
@@ -15,7 +15,7 @@ public class PkmVersionLoaderTests : IAsyncDisposable
     private readonly Mock<ISessionServiceMinimal> sessionService;
     private readonly Mock<DbSeedingService> dbSeedingService;
 
-    public PkmVersionLoaderTests()
+    public PkmVariantLoaderTests()
     {
         var testId = Guid.NewGuid().ToString();
         dbPath = $"db-PkmVersionLoaderTests-{testId}.db";
@@ -55,9 +55,9 @@ public class PkmVersionLoaderTests : IAsyncDisposable
         return _db;
     }
 
-    private async Task<PkmVersionLoader> CreateLoader(SessionDbContext db)
+    private async Task<PkmVariantLoader> CreateLoader(SessionDbContext db)
     {
-        return new PkmVersionLoader(fileIOService, sessionService.Object, mockSettings.Object, pkmFileLoader, db, staticDataService);
+        return new PkmVariantLoader(fileIOService, sessionService.Object, mockSettings.Object, pkmFileLoader, db, staticDataService);
     }
 
     // private PkmVersionEntity CreateEntity(string id)
@@ -138,7 +138,7 @@ public class PkmVersionLoaderTests : IAsyncDisposable
 
         var idBase = pkm.GetPKMIdBase(staticData.Evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
-        var expectedEntity = new PkmVersionEntity()
+        var expectedEntity = new PkmVariantEntity()
         {
             Id = idBase,
             Generation = 3,
@@ -541,7 +541,7 @@ public class PkmVersionLoaderTests : IAsyncDisposable
 
         mockFileSystem.AddFile($"app\\{filepath}", new MockFileData(pkm.DecryptedPartyData));
 
-        var entity = new PkmVersionEntity()
+        var entity = new PkmVariantEntity()
         {
             Id = idBase,
             Generation = 3,
@@ -595,7 +595,7 @@ public class PkmVersionLoaderTests : IAsyncDisposable
         var idBase = pkm.GetPKMIdBase(staticData.Evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
 
-        var entity = new PkmVersionEntity()
+        var entity = new PkmVariantEntity()
         {
             Id = idBase,
             Generation = 3,
@@ -640,7 +640,7 @@ public class PkmVersionLoaderTests : IAsyncDisposable
         var idBase = pkm.GetPKMIdBase(staticData.Evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
 
-        var entity = new PkmVersionEntity()
+        var entity = new PkmVariantEntity()
         {
             Id = idBase,
             Generation = 3,

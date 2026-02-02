@@ -1,6 +1,6 @@
 import type React from 'react';
 import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
-import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
+import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { useStorageEvolvePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
@@ -31,18 +31,18 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
   const evolvePkmsMutation = useStorageEvolvePkms();
   const savePkmsDeleteMutation = useStorageSaveDeletePkms();
 
-  const pkmVersionIndex = usePkmVersionIndex();
+  const pkmVariantIndex = usePkmVariantIndex();
 
   const selectedPkm = pkmSavePkmQuery.data?.data.byId[ selected?.id ?? '' ];
   if (!selectedPkm) {
     return null;
   }
 
-  const attachedPkmVersion = pkmVersionIndex.data?.data.byAttachedSave[ selectedPkm.saveId ]?.[ selectedPkm.idBase ];
+  const attachedPkmVariant = pkmVariantIndex.data?.data.byAttachedSave[ selectedPkm.saveId ]?.[ selectedPkm.idBase ];
 
   const canEvolve = selectedPkm.canEvolve;
-  const canDetach = !!attachedPkmVersion;
-  const canGoToMain = !!attachedPkmVersion;
+  const canDetach = !!attachedPkmVariant;
+  const canGoToMain = !!attachedPkmVariant;
   const canRemovePkm = selectedPkm.canDelete;
 
   return (
@@ -77,15 +77,15 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
           </ButtonWithDisabledPopover>
         )}
 
-        {canGoToMain && attachedPkmVersion && (
+        {canGoToMain && attachedPkmVariant && (
           <ButtonWithDisabledPopover
             as={Button}
             onClick={() =>
               navigate({
                 search: ({ saves }) => ({
-                  mainBoxIds: attachedPkmVersion && [ attachedPkmVersion.boxId ],
+                  mainBoxIds: attachedPkmVariant && [ attachedPkmVariant.boxId ],
                   selected: {
-                    id: attachedPkmVersion.id,
+                    id: attachedPkmVariant.id,
                   },
                   saves: {
                     ...saves,
@@ -142,13 +142,13 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
           </ButtonWithConfirm>
         )}
 
-        {canDetach && attachedPkmVersion && (
+        {canDetach && attachedPkmVariant && (
           <ButtonWithDisabledPopover
             as={Button}
             onClick={() =>
               mainPkmDetachSaveMutation.mutateAsync({
                 params: {
-                  pkmVersionIds: [ attachedPkmVersion.id ],
+                  pkmVariantIds: [ attachedPkmVariant.id ],
                 },
               })
             }

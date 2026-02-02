@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePkmVersionIndex } from '../data/hooks/use-pkm-version-index';
+import { usePkmVariantIndex } from '../data/hooks/use-pkm-variant-index';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetBoxes } from '../data/sdk/storage/storage.gen';
 import { Route } from '../routes/storage';
@@ -10,7 +10,7 @@ export const StorageSearchCheck: React.FC<React.PropsWithChildren> = ({ children
     const storageSearch = Route.useSearch({ select: search => search });
 
     const mainBoxesQuery = useStorageGetBoxes();
-    const mainPkmsQuery = usePkmVersionIndex();
+    const mainPkmsQuery = usePkmVariantIndex();
     const saveInfosQuery = useSaveInfosGetAll();
 
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();

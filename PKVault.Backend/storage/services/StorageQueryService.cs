@@ -38,20 +38,20 @@ public class StorageQueryService(
         return await boxLoader.GetDtosByIds(ids);
     }
 
-    public async Task<List<PkmVersionDTO>> GetMainPkmVersions()
+    public async Task<List<PkmVariantDTO>> GetMainPkmVariants()
     {
         using var scope = sp.CreateScope();
-        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+        var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
 
-        return await pkmVersionLoader.GetAllDtos();
+        return await pkmVariantLoader.GetAllDtos();
     }
 
-    public async Task<Dictionary<string, PkmVersionDTO?>> GetMainPkmVersions(string[] pkmIds)
+    public async Task<Dictionary<string, PkmVariantDTO?>> GetMainPkmVariants(string[] pkmIds)
     {
         using var scope = sp.CreateScope();
-        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+        var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
 
-        return await pkmVersionLoader.GetDtosByIds(pkmIds);
+        return await pkmVariantLoader.GetDtosByIds(pkmIds);
     }
 
     public async Task<List<BoxDTO>> GetSaveBoxes(uint saveId)
@@ -94,21 +94,21 @@ public class StorageQueryService(
     public async Task<Dictionary<string, PkmLegalityDTO?>> GetPkmsLegality(string[] pkmIds, uint? saveId)
     {
         using var scope = sp.CreateScope();
-        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+        var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
 
-        var pkmVersions = saveId == null
-            ? await pkmVersionLoader.GetEntitiesByIds(pkmIds)
+        var pkmVariants = saveId == null
+            ? await pkmVariantLoader.GetEntitiesByIds(pkmIds)
             : [];
 
         return (await Task.WhenAll(pkmIds.Select(async id =>
         {
             if (saveId == null)
             {
-                pkmVersions.TryGetValue(id, out var pkmVersion);
+                pkmVariants.TryGetValue(id, out var pkmVariant);
 
-                return (id, pkmVersion == null
+                return (id, pkmVariant == null
                     ? null
-                    : await pkmLegalityService.CreateDTO(pkmVersion, await pkmVersionLoader.GetPKM(pkmVersion))
+                    : await pkmLegalityService.CreateDTO(pkmVariant, await pkmVariantLoader.GetPKM(pkmVariant))
                 );
             }
 

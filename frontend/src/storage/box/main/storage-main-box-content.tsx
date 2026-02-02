@@ -1,8 +1,8 @@
 import { css } from '@emotion/css';
 import { Popover, PopoverButton } from '@headlessui/react';
 import React from 'react';
-import { usePkmVersionIndex } from '../../../data/hooks/use-pkm-version-index';
-import { BoxType, type PkmVersionDTO } from '../../../data/sdk/model';
+import { usePkmVariantIndex } from '../../../data/hooks/use-pkm-variant-index';
+import { BoxType, type PkmVariantDTO } from '../../../data/sdk/model';
 import { useStorageCreateMainBox, useStorageDeleteMainBox, useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../../../error/with-error-catcher';
 import { Route } from '../../../routes/storage';
@@ -39,7 +39,7 @@ export const StorageMainBoxContent: React.FC<{
     const moveContext = StorageMoveContext.useValue();
 
     const boxesQuery = useStorageGetBoxes();
-    const pkmsQuery = usePkmVersionIndex();
+    const pkmsQuery = usePkmVariantIndex();
 
     const loading = [ pkmsQuery, selectedBankBoxes ].some(query => query.isLoading);
 
@@ -70,7 +70,7 @@ export const StorageMainBoxContent: React.FC<{
 
     const boxPkms = Object.fromEntries(boxPkmsList.map(pkm => [ pkm.boxSlot, pkm ]));
 
-    const allItems = new Array(selectedBox.slotCount).fill(null).map((_, i): PkmVersionDTO | null => boxPkms[ i ] ?? null);
+    const allItems = new Array(selectedBox.slotCount).fill(null).map((_, i): PkmVariantDTO | null => boxPkms[ i ] ?? null);
 
     return (
         <Popover

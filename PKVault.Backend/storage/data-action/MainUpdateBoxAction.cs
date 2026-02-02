@@ -1,7 +1,7 @@
 public record MainUpdateBoxActionInput(string boxId, string boxName, int order, string bankId, int slotCount, BoxType type);
 
 public class MainUpdateBoxAction(
-    IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVersionLoader pkmVersionLoader
+    IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVariantLoader pkmVariantLoader
 ) : DataAction<MainUpdateBoxActionInput>
 {
     protected override async Task<DataActionPayload> Execute(MainUpdateBoxActionInput input, DataUpdateFlags flags)
@@ -50,7 +50,7 @@ public class MainUpdateBoxAction(
 
         if (box.SlotCount != input.slotCount)
         {
-            var boxPkms = await pkmVersionLoader.GetEntitiesByBox(box.IdInt);
+            var boxPkms = await pkmVariantLoader.GetEntitiesByBox(box.IdInt);
             if (boxPkms.Any(pkm =>
                 // Key = boxSlot
                 pkm.Key >= input.slotCount - 1

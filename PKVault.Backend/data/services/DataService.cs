@@ -20,8 +20,8 @@ public class DataService(
 
         var mainBanksTask = GetPossibleMainBanks(flags.MainBanks);
         var mainBoxesTask = GetPossibleMainBoxes(flags.MainBoxes);
-        var mainPkmVersionsTask = GetPossibleMainPkmVersions(flags.MainPkmVersions);
-        var mainPkmLegalitiesTask = GetPossibleMainPkmLegalities(mainPkmVersionsTask);
+        var mainPkmVariantsTask = GetPossibleMainPkmVariants(flags.MainPkmVariants);
+        var mainPkmLegalitiesTask = GetPossibleMainPkmLegalities(mainPkmVariantsTask);
 
         var savesTask = Task.WhenAll(flags.Saves.GetSaves().Select(async flag =>
         {
@@ -63,9 +63,9 @@ public class DataService(
         //     await mainBoxesTask;
         // }
 
-        // using (var w = LogUtil.Time("mainPkmVersionsTask"))
+        // using (var w = LogUtil.Time("mainPkmVariantsTask"))
         // {
-        //     await mainPkmVersionsTask;
+        //     await mainPkmVariantsTask;
         // }
 
         // using (var w = LogUtil.Time("mainPkmLegalitiesTask"))
@@ -95,7 +95,7 @@ public class DataService(
             StaticData: await staticDataTask,
             MainBanks: await mainBanksTask,
             MainBoxes: await mainBoxesTask,
-            MainPkmVersions: await mainPkmVersionsTask,
+            MainPkmVariants: await mainPkmVariantsTask,
             MainPkmLegalities: await mainPkmLegalitiesTask,
             Saves: [.. await savesTask],
             InvalidateAllSaves: flags.Saves.All,
@@ -108,7 +108,7 @@ public class DataService(
         // var json = System.Text.Json.JsonSerializer.Serialize(dto);
         // time();
 
-        // Console.WriteLine($"Response counts, MainBoxes={dto.MainBoxes?.Count} MainPkms={dto.MainPkms?.Count} MainPkmVersions={dto.MainPkmVersions?.Count} Dex={dto.Dex?.Count}");
+        // Console.WriteLine($"Response counts, MainBoxes={dto.MainBoxes?.Count} MainPkms={dto.MainPkms?.Count} MainPkmVariants={dto.MainPkmVariants?.Count} Dex={dto.Dex?.Count}");
 
         return dto;
     }
@@ -198,13 +198,13 @@ public class DataService(
         return null;
     }
 
-    private async Task<DataDTOState<Dictionary<string, PkmVersionDTO?>>?> GetPossibleMainPkmVersions(DataUpdateFlagsState flag)
+    private async Task<DataDTOState<Dictionary<string, PkmVariantDTO?>>?> GetPossibleMainPkmVariants(DataUpdateFlagsState flag)
     {
         if (flag.All)
         {
             return new(
                 All: true,
-                Data: (await storageQueryService.GetMainPkmVersions())
+                Data: (await storageQueryService.GetMainPkmVariants())
                         .ToDictionary(dto => dto.Id, dto => dto ?? null)
             );
         }
@@ -213,7 +213,7 @@ public class DataService(
         {
             return new(
                 All: false,
-                Data: await storageQueryService.GetMainPkmVersions([.. flag.Ids])
+                Data: await storageQueryService.GetMainPkmVariants([.. flag.Ids])
             );
         }
 
@@ -221,17 +221,17 @@ public class DataService(
     }
 
     private async Task<DataDTOState<Dictionary<string, PkmLegalityDTO?>>?> GetPossibleMainPkmLegalities(
-        Task<DataDTOState<Dictionary<string, PkmVersionDTO?>>?> mainPkmVersionsTask
+        Task<DataDTOState<Dictionary<string, PkmVariantDTO?>>?> mainPkmVariantsTask
     )
     {
-        var mainPkmVersions = await mainPkmVersionsTask;
+        var mainPkmVariants = await mainPkmVariantsTask;
 
-        if (mainPkmVersions != null)
+        if (mainPkmVariants != null)
         {
             return new(
-                All: mainPkmVersions.All,
+                All: mainPkmVariants.All,
                 Data: await storageQueryService.GetPkmsLegality(
-                    [.. mainPkmVersions.Data.Keys], null
+                    [.. mainPkmVariants.Data.Keys], null
                 )
             );
         }

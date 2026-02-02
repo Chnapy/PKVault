@@ -16,7 +16,7 @@ export const HasUpdateWarning: React.FC = () => {
     return <tr>
         <td>
             {t('notifications.warnings.update', {
-                version: updateVersion
+                variant: updateVersion
             })}
         </td>
         <td className={css({ verticalAlign: 'top' })}>

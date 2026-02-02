@@ -1,10 +1,10 @@
 import React from 'react';
 import { usePkmLegality, usePkmLegalityMap } from '../../data/hooks/use-pkm-legality';
-import { usePkmVersionAttach } from '../../data/hooks/use-pkm-version-attach';
-import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
-import { usePkmVersionSlotInfos } from '../../data/hooks/use-pkm-version-slot-infos';
+import { usePkmVariantAttach } from '../../data/hooks/use-pkm-variant-attach';
+import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
+import { usePkmVariantSlotInfos } from '../../data/hooks/use-pkm-variant-slot-infos';
 import { PKMLoadError } from '../../data/sdk/model';
-import { useStorageMainDeletePkmVersion } from '../../data/sdk/storage/storage.gen';
+import { useStorageMainDeletePkmVariant } from '../../data/sdk/storage/storage.gen';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
 import { useDesktopMessage } from '../../settings/save-globs/hooks/use-desktop-message';
 import { useTranslate } from '../../translate/i18n';
@@ -23,19 +23,19 @@ export type StorageDetailsMainProps = {
 export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selectedId }) => {
     const [ selectedIndex, setSelectedIndex ] = React.useState(0);
 
-    const versionInfos = usePkmVersionSlotInfos(selectedId);
+    const variantInfos = usePkmVariantSlotInfos(selectedId);
 
-    const pkmLegalityMapQuery = usePkmLegalityMap(versionInfos?.versions.map(pkm => pkm.id) ?? []);
+    const pkmLegalityMapQuery = usePkmLegalityMap(variantInfos?.variants.map(pkm => pkm.id) ?? []);
     const pkmLegalityMap = pkmLegalityMapQuery.data?.data ?? {};
 
-    if (!versionInfos) {
+    if (!variantInfos) {
         return null;
     }
 
-    const { versions } = versionInfos;
+    const { variants } = variantInfos;
 
-    const finalIndex = versions[ selectedIndex ] ? selectedIndex : 0;
-    const pkmVersion = versions[ finalIndex ];
+    const finalIndex = variants[ selectedIndex ] ? selectedIndex : 0;
+    const pkmVariant = variants[ finalIndex ];
 
     return (
         <div className={css({ flexGrow: 1 })}>
@@ -47,23 +47,23 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selected
                     flexWrap: 'wrap-reverse',
                 })}
             >
-                {versions.map((pkmVersion, i) => (
+                {variants.map((pkmVariant, i) => (
                     <DetailsTab
-                        key={pkmVersion.id}
-                        isEnabled={pkmVersion.isEnabled}
-                        version={pkmVersion.isEnabled ? pkmVersion.version : null}
-                        otName={`G${pkmVersion.generation}`}
-                        original={pkmVersion.isMain}
+                        key={pkmVariant.id}
+                        isEnabled={pkmVariant.isEnabled}
+                        version={pkmVariant.isEnabled ? pkmVariant.version : null}
+                        otName={`G${pkmVariant.generation}`}
+                        original={pkmVariant.isMain}
                         onClick={() => setSelectedIndex(i)}
                         disabled={finalIndex === i}
-                        warning={!pkmLegalityMap[ pkmVersion.id ]?.isValid}
+                        warning={!pkmLegalityMap[ pkmVariant.id ]?.isValid}
                     />
                 ))}
             </div>
 
-            {pkmVersion && (
-                <StorageDetailsForm.Provider key={pkmVersion.id} nickname={pkmVersion.nickname} eVs={pkmVersion.eVs} moves={pkmVersion.moves}>
-                    <InnerStorageDetailsMain id={pkmVersion.id} />
+            {pkmVariant && (
+                <StorageDetailsForm.Provider key={pkmVariant.id} nickname={pkmVariant.nickname} eVs={pkmVariant.eVs} moves={pkmVariant.moves}>
+                    <InnerStorageDetailsMain id={pkmVariant.id} />
                 </StorageDetailsForm.Provider>
             )}
         </div>
@@ -77,73 +77,74 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
 
     const getSaveItemProps = useSaveItemProps();
 
-    const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
+    const mainPkmVariantDeleteMutation = useStorageMainDeletePkmVariant();
 
-    const mainPkmVersionsQuery = usePkmVersionIndex();
+    const mainPkmVariantsQuery = usePkmVariantIndex();
 
     const pkmLegalityQuery = usePkmLegality(id);
     const pkmLegality = pkmLegalityQuery.data?.data;
 
-    const getPkmVersionAttach = usePkmVersionAttach();
+    const getPkmVariantAttach = usePkmVariantAttach();
 
     const desktopMessage = useDesktopMessage();
 
-    const pkmVersion = mainPkmVersionsQuery.data?.data.byId[ id ];
-    const saveCardProps = pkmVersion?.attachedSaveId ? getSaveItemProps(pkmVersion.attachedSaveId) : undefined;
+    const pkmVariant = mainPkmVariantsQuery.data?.data.byId[ id ];
+    const saveCardProps = pkmVariant?.attachedSaveId ? getSaveItemProps(pkmVariant.attachedSaveId) : undefined;
 
     const openFile =
-        desktopMessage && pkmVersion?.isFilePresent
+        desktopMessage && pkmVariant?.isFilePresent
             ? () =>
                 desktopMessage.openFile({
                     type: 'open-folder',
-                    id: pkmVersion.id,
+                    id: pkmVariant.id,
                     isDirectory: false,
-                    path: pkmVersion.filepath,
+                    path: pkmVariant.filepath,
                 })
             : undefined;
 
-    if (!pkmVersion) {
+    if (!pkmVariant) {
         return null;
     }
 
     return (
         <StorageDetailsBase
-            {...pkmVersion}
-            version={pkmVersion.isEnabled ? pkmVersion.version : null}
+            {...pkmVariant}
+            version={pkmVariant.isEnabled ? pkmVariant.version : null}
             isValid
             movesLegality={[]}
             {...pkmLegality}
-            idBase={pkmVersion.id}
+            idBase={pkmVariant.id}
             validityReport={[
-                filterIsDefined(pkmVersion.loadError) &&
+                filterIsDefined(pkmVariant.loadError) &&
                 t('details.load-error', {
-                    loadError: switchUtilRequired(pkmVersion.loadError, {
+                    loadError: switchUtilRequired(pkmVariant.loadError, {
                         [ PKMLoadError.UNKNOWN ]: t('details.load-error.0'),
+                        [ PKMLoadError.NOT_LOADED ]: t('details.load-error.0'),
                         [ PKMLoadError.NOT_FOUND ]: t('details.load-error.1'),
                         [ PKMLoadError.TOO_SMALL ]: t('details.load-error.2'),
                         [ PKMLoadError.TOO_BIG ]: t('details.load-error.3'),
                         [ PKMLoadError.UNAUTHORIZED ]: t('details.load-error.4'),
                     }),
-                    filepath: pkmVersion.filepath,
+                    filepath: pkmVariant.filepath,
                 }),
-                !pkmVersion.isEnabled && t('details.is-disabled'),
-                !getPkmVersionAttach(pkmVersion, pkmVersion.id).isAttachedValid && t('details.attached-pkm-not-found'),
+                !pkmVariant.isEnabled && t('details.is-disabled'),
+                !getPkmVariantAttach(pkmVariant, pkmVariant.id).isAttachedValid && t('details.attached-pkm-not-found'),
                 pkmLegality?.validityReport,
             ]
                 .filter(Boolean)
                 .join('\n---\n')}
             isShadow={false}
             onRelease={
-                pkmVersion.canDelete
+                pkmVariant.canDelete
                     ? () =>
-                        mainPkmVersionDeleteMutation.mutateAsync({
+                        mainPkmVariantDeleteMutation.mutateAsync({
                             params: {
-                                pkmVersionIds: [ pkmVersion.id ],
+                                pkmVariantIds: [ pkmVariant.id ],
                             },
                         })
                     : undefined
             }
-            onSubmit={() => formContext.submitForPkmVersion(id)}
+            onSubmit={() => formContext.submitForPkmVariant(id)}
             openFile={openFile}
             extraContent={saveCardProps && <SaveCardContentSmall {...saveCardProps} />}
         />

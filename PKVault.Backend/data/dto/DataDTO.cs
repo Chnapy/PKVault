@@ -2,7 +2,7 @@ public record DataDTO(
     StaticDataDTO? StaticData,
     DataDTOState<Dictionary<string, BankDTO?>>? MainBanks,
     DataDTOState<Dictionary<string, BoxDTO?>>? MainBoxes,
-    DataDTOState<Dictionary<string, PkmVersionDTO?>>? MainPkmVersions,
+    DataDTOState<Dictionary<string, PkmVariantDTO?>>? MainPkmVariants,
     DataDTOState<Dictionary<string, PkmLegalityDTO?>>? MainPkmLegalities,
     DataDTOState<Dictionary<ushort, Dictionary<uint, DexItemDTO>>>? Dex,
     List<DataSaveDTO>? Saves,

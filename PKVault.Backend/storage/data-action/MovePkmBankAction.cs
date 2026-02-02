@@ -4,7 +4,7 @@ public record MovePkmBankActionInput(string[] pkmIds, uint? sourceSaveId, string
 
 public class MovePkmBankAction(
     IServiceProvider sp,
-    IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVersionLoader pkmVersionLoader, ISavesLoadersService savesLoadersService,
+    IBoxLoader boxLoader, IBankLoader bankLoader, IPkmVariantLoader pkmVariantLoader, ISavesLoadersService savesLoadersService,
     MainCreateBoxAction mainCreateBoxAction, SynchronizePkmAction synchronizePkmAction
 ) : DataAction<MovePkmBankActionInput>
 {
@@ -25,7 +25,7 @@ public class MovePkmBankAction(
         var boxesOccupationDict = (
             await Task.WhenAll(mainBoxes.Select(async box => (
                 box.Id,
-                (await pkmVersionLoader.GetEntitiesByBox(box.Id))
+                (await pkmVariantLoader.GetEntitiesByBox(box.Id))
                     .Select(dict => dict.Key)   // boxSlot
                     .ToHashSet()
             )))
@@ -100,12 +100,12 @@ public class MovePkmBankAction(
         return payloads[0];
     }
 
-    private async Task<DataActionPayload> MainToMain(MovePkmBankActionInput input, string pkmVersionId, string targetBoxId, int targetBoxSlot)
+    private async Task<DataActionPayload> MainToMain(MovePkmBankActionInput input, string pkmVariantId, string targetBoxId, int targetBoxSlot)
     {
-        var entity = (await pkmVersionLoader.GetEntity(pkmVersionId)) ?? throw new KeyNotFoundException("PkmVersion not found");
-        var pkm = await pkmVersionLoader.GetPKM(entity);
+        var entity = (await pkmVariantLoader.GetEntity(pkmVariantId)) ?? throw new KeyNotFoundException("PkmVariant not found");
+        var pkm = await pkmVariantLoader.GetPKM(entity);
 
-        var pkmsAlreadyPresent = (await pkmVersionLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot)).Values;
+        var pkmsAlreadyPresent = (await pkmVariantLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot)).Values;
         if (pkmsAlreadyPresent.Any())
         {
             throw new Exception("Pkm already present");
@@ -113,7 +113,7 @@ public class MovePkmBankAction(
 
         entity.BoxId = targetBoxId;
         entity.BoxSlot = targetBoxSlot;
-        await pkmVersionLoader.UpdateEntity(entity);
+        await pkmVariantLoader.UpdateEntity(entity);
 
         var boxName = (await boxLoader.GetEntity(targetBoxId.ToString()))?.Name;
 
@@ -138,14 +138,14 @@ public class MovePkmBankAction(
             }
         }
 
-        var pkmVersion = await pkmVersionLoader.GetEntity(savePkm.IdBase);
+        var pkmVariant = await pkmVariantLoader.GetEntity(savePkm.IdBase);
 
-        if (pkmVersion != null && pkmVersion.AttachedSaveId != input.sourceSaveId)
+        if (pkmVariant != null && pkmVariant.AttachedSaveId != input.sourceSaveId)
         {
             throw new ArgumentException($"Pkm with same ID already exists, id={savePkm.IdBase}");
         }
 
-        var existingSlots = await pkmVersionLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot);
+        var existingSlots = await pkmVariantLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot);
         if (existingSlots.Count > 0)
         {
             throw new Exception("Pkm already present");
@@ -187,13 +187,13 @@ public class MovePkmBankAction(
         }
 
         // get pkm-version
-        var pkmVersionEntity = await pkmVersionLoader.GetEntity(savePkm.Id);
-        var mainPkmAlreadyExists = pkmVersionEntity != null;
+        var pkmVariantEntity = await pkmVariantLoader.GetEntity(savePkm.Id);
+        var mainPkmAlreadyExists = pkmVariantEntity != null;
 
-        if (pkmVersionEntity == null)
+        if (pkmVariantEntity == null)
         {
             // create pkm-version
-            pkmVersionEntity = await pkmVersionLoader.AddEntity(new(
+            pkmVariantEntity = await pkmVariantLoader.AddEntity(new(
                 BoxId: targetBoxId,
                 BoxSlot: targetBoxSlot,
                 IsMain: true,
@@ -205,15 +205,15 @@ public class MovePkmBankAction(
         }
 
         // if moved to already attached pkm, just update it
-        if (mainPkmAlreadyExists && pkmVersionEntity.AttachedSaveId != null)
+        if (mainPkmAlreadyExists && pkmVariantEntity.AttachedSaveId != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVersion(new([(pkmVersionEntity.Id, pkmVersionEntity.AttachedSavePkmIdBase!)]));
+            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!)]));
 
             if (!input.attached)
             {
-                pkmVersionEntity.AttachedSaveId = null;
-                pkmVersionEntity.AttachedSavePkmIdBase = null;
-                await pkmVersionLoader.UpdateEntity(pkmVersionEntity);
+                pkmVariantEntity.AttachedSaveId = null;
+                pkmVariantEntity.AttachedSavePkmIdBase = null;
+                await pkmVariantLoader.UpdateEntity(pkmVariantEntity);
             }
         }
 

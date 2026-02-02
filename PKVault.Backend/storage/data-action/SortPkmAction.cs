@@ -4,7 +4,7 @@ public record SortPkmActionInput(uint? saveId, int fromBoxId, int toBoxId, bool 
 
 public class SortPkmAction(
     MainCreateBoxAction mainCreateBoxAction,
-    IPkmVersionLoader pkmVersionLoader, IBoxLoader boxLoader, ISavesLoadersService savesLoadersService
+    IPkmVariantLoader pkmVariantLoader, IBoxLoader boxLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<SortPkmActionInput>
 {
     protected override async Task<DataActionPayload> Execute(SortPkmActionInput input, DataUpdateFlags flags)
@@ -35,9 +35,9 @@ public class SortPkmAction(
         {
             List<PkmSaveDTO> savePkms = GetSortedPkms(
                 pkms,
-                GetSpecies: pkmVersion => pkmVersion.Species,
-                GetForm: pkmVersion => pkmVersion.Form,
-                GetGender: pkmVersion => pkmVersion.Gender
+                GetSpecies: pkmVariant => pkmVariant.Species,
+                GetForm: pkmVariant => pkmVariant.Form,
+                GetGender: pkmVariant => pkmVariant.Gender
             );
             var pkmSpecies = savePkms.Select(pkm => pkm.Species).ToList();
 
@@ -83,7 +83,7 @@ public class SortPkmAction(
         var bankId = boxes[0].BankId;
 
         var pkms = (await Task.WhenAll(boxesIds.Select(async boxId =>
-                (await pkmVersionLoader.GetEntitiesByBox(boxId)).Select(dict => dict.Value)
+                (await pkmVariantLoader.GetEntitiesByBox(boxId)).Select(dict => dict.Value)
             )))
             .SelectMany(x => x)
             .SelectMany(dict => dict.Values).Where(pk => pk.IsMain);
@@ -92,17 +92,17 @@ public class SortPkmAction(
             var filteredPkms = await Task.WhenAll(pkms
                 .Select(async mainVersion =>
                 {
-                    var mainVersionPkm = await pkmVersionLoader.GetPKM(mainVersion);
+                    var mainVersionPkm = await pkmVariantLoader.GetPKM(mainVersion);
                     return (Version: mainVersion, Pkm: mainVersionPkm);
                 }));
 
-            var pkmVersions = GetSortedPkms(
+            var pkmVariants = GetSortedPkms(
                 pkms: [.. filteredPkms],
-                GetSpecies: pkmVersion => pkmVersion.Pkm.Species,
-                GetForm: pkmVersion => pkmVersion.Pkm.Form,
-                GetGender: pkmVersion => pkmVersion.Pkm.Gender
+                GetSpecies: pkmVariant => pkmVariant.Pkm.Species,
+                GetForm: pkmVariant => pkmVariant.Pkm.Form,
+                GetGender: pkmVariant => pkmVariant.Pkm.Gender
             );
-            var pkmSpecies = pkmVersions.Select(pkm => pkm.Pkm.Species).ToList();
+            var pkmSpecies = pkmVariants.Select(pkm => pkm.Pkm.Species).ToList();
 
             // required to avoid conflicts
             HashSet<string> placedVersions = [];
@@ -112,16 +112,16 @@ public class SortPkmAction(
                 pkmSpecies,
                 applyValue: async (entry) =>
                 {
-                    var currentValue = pkmVersions[entry.Index].Version;
-                    var currentPkm = await pkmVersionLoader.GetPKM(currentValue);
+                    var currentValue = pkmVariants[entry.Index].Version;
+                    var currentPkm = await pkmVariantLoader.GetPKM(currentValue);
 
-                    var entities = (await pkmVersionLoader.GetEntitiesByBox(currentValue.BoxId, currentValue.BoxSlot)).Values
+                    var entities = (await pkmVariantLoader.GetEntitiesByBox(currentValue.BoxId, currentValue.BoxSlot)).Values
                         .Where(version => !placedVersions.Contains(version.Id));
                     foreach (var entity in entities)
                     {
                         entity.BoxId = entry.BoxId;
                         entity.BoxSlot = entry.BoxSlot;
-                        await pkmVersionLoader.UpdateEntity(entity);
+                        await pkmVariantLoader.UpdateEntity(entity);
 
                         placedVersions.Add(entity.Id);
                     }

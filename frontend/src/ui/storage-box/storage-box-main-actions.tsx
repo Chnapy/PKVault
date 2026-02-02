@@ -1,8 +1,8 @@
 import { css } from '@emotion/css';
 import { PopoverPanel, type PopoverPanelProps } from '@headlessui/react';
 import type React from 'react';
-import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
-import { useStorageEvolvePkms, useStorageMainDeletePkmVersion, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
+import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
+import { useStorageEvolvePkms, useStorageMainDeletePkmVariant, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
 import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { StorageSelectContext } from '../../storage/actions/storage-select-context';
 import { useTranslate } from '../../translate/i18n';
@@ -19,9 +19,9 @@ export const StorageBoxMainActions: React.FC<Required<Pick<PopoverPanelProps, 'a
 
   const { ids, hasBox } = StorageSelectContext.useValue();
 
-  const mainPkmVersionQuery = usePkmVersionIndex();
+  const mainPkmVariantQuery = usePkmVariantIndex();
 
-  const pkms = ids.map(id => mainPkmVersionQuery.data?.data.byId[ id ]).filter(filterIsDefined);
+  const pkms = ids.map(id => mainPkmVariantQuery.data?.data.byId[ id ]).filter(filterIsDefined);
 
   const moveClickable = StorageMoveContext.useClickable(
     pkms.map(pkm => pkm.id),
@@ -29,14 +29,14 @@ export const StorageBoxMainActions: React.FC<Required<Pick<PopoverPanelProps, 'a
   );
 
   const mainPkmDetachSaveMutation = useStorageMainPkmDetachSave();
-  const mainPkmVersionDeleteMutation = useStorageMainDeletePkmVersion();
+  const mainPkmVariantDeleteMutation = useStorageMainDeletePkmVariant();
   const evolvePkmsMutation = useStorageEvolvePkms();
 
   if (pkms.length === 0 || !hasBox(undefined, boxId)) {
     return null;
   }
 
-  const canEvolvePkms = pkms.filter(pkmVersion => pkmVersion.canEvolve);
+  const canEvolvePkms = pkms.filter(pkmVariant => pkmVariant.canEvolve);
 
   const canDetachPkms = pkms.filter(pkm => pkm.attachedSaveId);
   const canRemovePkms = pkms.filter(pkm => pkm.canDelete);
@@ -121,7 +121,7 @@ export const StorageBoxMainActions: React.FC<Required<Pick<PopoverPanelProps, 'a
                 onClick={() =>
                   mainPkmDetachSaveMutation.mutateAsync({
                     params: {
-                      pkmVersionIds: canDetachPkms.map(pkm => pkm.id),
+                      pkmVariantIds: canDetachPkms.map(pkm => pkm.id),
                     },
                   })
                 }
@@ -140,9 +140,9 @@ export const StorageBoxMainActions: React.FC<Required<Pick<PopoverPanelProps, 'a
                 anchor='right'
                 bgColor={theme.bg.red}
                 onClick={async () => {
-                  await mainPkmVersionDeleteMutation.mutateAsync({
+                  await mainPkmVariantDeleteMutation.mutateAsync({
                     params: {
-                      pkmVersionIds: canRemovePkms.map(pkmVersion => pkmVersion.id),
+                      pkmVariantIds: canRemovePkms.map(pkmVariant => pkmVariant.id),
                     },
                   });
                 }}

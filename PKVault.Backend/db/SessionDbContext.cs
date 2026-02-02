@@ -9,13 +9,13 @@ public class SessionDbContext(
 
     public DbSet<BankEntity> Banks { get; set; }
     public DbSet<BoxEntity> Boxes { get; set; }
-    public DbSet<PkmVersionEntity> PkmVersions { get; set; }
+    public DbSet<PkmVariantEntity> PkmVersions { get; set; }
     public DbSet<DexFormEntity> Pokedex { get; set; }
     public DbSet<PkmFileEntity> PkmFiles { get; set; }
 
     public DataUpdateFlagsState BanksFlags = new();
     public DataUpdateFlagsState BoxesFlags = new();
-    public DataUpdateFlagsState PkmVersionsFlags = new();
+    public DataUpdateFlagsState PkmVariantsFlags = new();
 
     // The following configures EF to create a Sqlite database file in the
     // special "local" folder for your platform.
@@ -68,12 +68,12 @@ public class SessionDbContext(
             entity.HasKey(p => p.Id);
 
             entity
-                .HasMany<PkmVersionEntity>()
+                .HasMany<PkmVariantEntity>()
                 .WithOne()
                 .HasForeignKey(e => e.BoxId);
         });
 
-        modelBuilder.Entity<PkmVersionEntity>(entity =>
+        modelBuilder.Entity<PkmVariantEntity>(entity =>
         {
             entity.HasKey(p => p.Id);
 
@@ -95,7 +95,7 @@ public class SessionDbContext(
             entity
                 .HasOne(p => p.PkmFile)
                 .WithOne()
-                .HasForeignKey<PkmVersionEntity>(p => p.Filepath)
+                .HasForeignKey<PkmVariantEntity>(p => p.Filepath)
                 .OnDelete(DeleteBehavior.NoAction);
         });
 

@@ -1,5 +1,5 @@
 import type React from 'react';
-import { usePkmVersionIndex } from '../../data/hooks/use-pkm-version-index';
+import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { TitledContainer } from '../container/titled-container';
 import { DetailsLevel } from '../details-card/details-level';
 import { Icon } from '../icon/icon';
@@ -10,9 +10,9 @@ export const StorageItemMainActionsContainer: React.FC<
         pkmId: string;
     }>
 > = ({ pkmId, children }) => {
-    const mainPkmVersionQuery = usePkmVersionIndex();
+    const mainPkmVariantQuery = usePkmVariantIndex();
 
-    const selectedPkm = mainPkmVersionQuery.data?.data.byId[ pkmId ];
+    const selectedPkm = mainPkmVariantQuery.data?.data.byId[ pkmId ];
     if (!selectedPkm) {
         return null;
     }

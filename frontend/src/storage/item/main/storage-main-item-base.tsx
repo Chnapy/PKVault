@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePkmLegalityMap } from '../../../data/hooks/use-pkm-legality';
-import { usePkmVersionSlotInfos } from '../../../data/hooks/use-pkm-version-slot-infos';
+import { usePkmVariantSlotInfos } from '../../../data/hooks/use-pkm-variant-slot-infos';
 import { Gender as GenderType } from '../../../data/sdk/model';
 import type { ButtonLikeProps } from '../../../ui/button/button-like';
 import { StorageItem, type StorageItemProps } from '../../../ui/storage-item/storage-item';
@@ -8,26 +8,26 @@ import { StorageItem, type StorageItemProps } from '../../../ui/storage-item/sto
 export type StorageMainItemBaseProps = ButtonLikeProps &
     Pick<
         StorageItemProps,
-        'anchor' | 'helpTitle' | 'small' | 'checked' | 'onCheck' | 'heldItem' | 'canCreateVersion' | 'canMoveOutside' | 'canEvolve' | 'needSynchronize'
+        'anchor' | 'helpTitle' | 'small' | 'checked' | 'onCheck' | 'heldItem' | 'canCreateVariant' | 'canMoveOutside' | 'canEvolve' | 'needSynchronize'
     > & {
         pkmId: string;
     };
 
 export const StorageMainItemBase: React.FC<StorageMainItemBaseProps> = React.memo(({ pkmId, ...rest }) => {
-    const versionInfos = usePkmVersionSlotInfos(pkmId);
+    const variantInfos = usePkmVariantSlotInfos(pkmId);
 
-    const versionsIds = versionInfos?.versions.map(version => version.id) ?? [];
+    const variantsIds = variantInfos?.variants.map(variant => variant.id) ?? [];
 
-    const pkmLegalityMapQuery = usePkmLegalityMap(versionsIds);
+    const pkmLegalityMapQuery = usePkmLegalityMap(variantsIds);
     const pkmLegalityMap = Object.values(pkmLegalityMapQuery.data?.data ?? {});
 
-    if (!versionInfos) {
+    if (!variantInfos) {
         return null;
     }
 
-    const { mainVersion, versions, canDetach } = versionInfos;
+    const { mainVariant, variants, canDetach } = variantInfos;
 
-    const { species, context, form, gender, isAlpha, isShiny } = mainVersion;
+    const { species, context, form, gender, isAlpha, isShiny } = mainVariant;
 
     return (
         <StorageItem
@@ -42,8 +42,8 @@ export const StorageMainItemBase: React.FC<StorageMainItemBaseProps> = React.mem
                 isShiny,
                 isShadow: false,
                 warning: pkmLegalityMap.some(value => !value.isValid),
-                nbrVersions: versions.length,
-                hasDisabledVersion: versions.some(pk => !pk.isEnabled),
+                nbrVariants: variants.length,
+                hasDisabledVariant: variants.some(pk => !pk.isEnabled),
                 attached: canDetach,
             }}
         />

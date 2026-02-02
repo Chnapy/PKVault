@@ -18,7 +18,7 @@ import {
 import { getWarningsGetWarningsQueryKey, type warningsGetWarningsResponseSuccess } from '../sdk/warnings/warnings.gen';
 import { getPkmLegalityQueryKey, type PkmLegalityQueryData } from '../hooks/use-pkm-legality';
 import { updatePkmSaveCache } from '../hooks/use-pkm-save-index';
-import { updatePkmVersionCache } from '../hooks/use-pkm-version-index';
+import { updatePkmVariantCache } from '../hooks/use-pkm-variant-index';
 
 type QueryDataBase = {
     status: number;
@@ -46,7 +46,7 @@ export const updateCacheMutationResponse = (client: QueryClient, data: unknown) 
         staticData,
         mainBanks,
         mainBoxes,
-        mainPkmVersions,
+        mainPkmVariants,
         dex,
         mainPkmLegalities,
         saves,
@@ -81,8 +81,8 @@ export const updateCacheMutationResponse = (client: QueryClient, data: unknown) 
         applyResponseData(client, mainBoxes, getStorageGetBoxesQueryKey());
     }
 
-    if (mainPkmVersions) {
-        updatePkmVersionCache(client, mainPkmVersions);
+    if (mainPkmVariants) {
+        updatePkmVariantCache(client, mainPkmVariants);
     }
 
     if (dex) {

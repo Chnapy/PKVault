@@ -119,7 +119,7 @@ public class SessionService(
 
         foreach (var data in synchronizationData)
         {
-            if (data.pkmVersionAndPkmSaveIds.Length > 0)
+            if (data.pkmVariantAndPkmSaveIds.Length > 0)
             {
                 await actionService.SynchronizePkm(data, scope);
             }
@@ -134,10 +134,10 @@ public class SessionService(
     private async Task CheckFirstRunAutoSave(IServiceScope scope)
     {
         var savesLoaders = scope.ServiceProvider.GetRequiredService<ISavesLoadersService>();
-        var pkmVersionLoader = scope.ServiceProvider.GetRequiredService<IPkmVersionLoader>();
+        var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
 
         var hasAnyData = savesLoaders.GetAllLoaders().Count > 0
-            || await pkmVersionLoader.Any();
+            || await pkmVariantLoader.Any();
 
         if (!hasAnyData)
         {
