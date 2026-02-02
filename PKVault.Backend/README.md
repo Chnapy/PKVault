@@ -4,6 +4,22 @@ All the logic & data manipulation (including save) is done here. It's also where
 
 Dependencies & versions can be found in [PKVault.Backend.csproj](./PKVault.Backend.csproj).
 
+## Technical foundations
+
+PKVault backend is based on .NET 10, and is using C# 14.
+
+Database is using EF Core with SQLite (previously JSON, now legacy).
+
+Pokemon files & saves are manipulated using PKHeX.Core.
+
+## Flowcharts
+
+These docs help understanding backend architecture & some lifecycles:
+
+- [Architecture](./docs/ARCHITECTURE.md)
+- [Session lifecycle](./docs/SESSION.md)
+- [Data structure](./docs/DATA.md)
+
 ## Setup
 
 Generate PokeApi data & spritesheets.

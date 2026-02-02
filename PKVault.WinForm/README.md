@@ -3,8 +3,6 @@
 This desktop app is just a view to backend & frontend.
 It runs backend process & display frontend in window.
 
-cp -r ../frontend/dist ./wwwroot
-
 ## Setup
 
 This app requires builded frontend. You have 2 options:
@@ -29,8 +27,6 @@ Basic dev process.
 ```
 dotnet run
 ```
-
-> A terminal opens showing debug & logs.
 
 ## Build
 
