@@ -19,7 +19,6 @@ export const RenderIfVisible: React.FC<
     const observer = new IntersectionObserver(
       ([entry]) => {
         setVisible(entry?.isIntersecting ?? false);
-        // console.log(`Item ${id} visible:`, entry?.isIntersecting);
       },
       {
         threshold: 0, // trigger from 0% visible
