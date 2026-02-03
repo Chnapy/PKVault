@@ -117,8 +117,9 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
             position: 'absolute',
             top: 3,
             left: 3,
-          }))}
-          style={{ opacity: checked ? undefined : 0 }}
+          }), {
+            [css({ opacity: 0 })]: !checked
+          })}
         >
           <CheckboxInput
             checked={checked}
