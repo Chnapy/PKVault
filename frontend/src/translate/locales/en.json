@@ -131,6 +131,7 @@
   "storage.sort.description.3": "If you leave empty slots for missing species, boxes may be created in the process if missing space.",
   "storage.dex-sync.title": "Select multiple Pokedex to sync",
   "storage.dex-sync.description": "Pokedex of each selection will share its data, in both ways.",
+  "storage.actions.unsafe": "Warning: this action can be unsafe.\nAfter use check your save integrity, on any issue you can restore a backup.",
   "storage.actions.move": "Move",
   "storage.actions.move-attached-main": "Move attached",
   "storage.actions.move-attached-main.helpTitle": "Move a linked copy of this pkm to the save",
