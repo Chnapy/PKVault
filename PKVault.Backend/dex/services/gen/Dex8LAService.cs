@@ -41,7 +41,12 @@ public class Dex8LAService(SAV8LA save) : DexGenService(save)
         );
     }
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    protected override IEnumerable<LanguageID> GetDexLanguages(ushort species)
+    {
+        return [];
+    }
+
+    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
     {
         if (!save.Personal.IsPresentInGame(species, form))
             return;

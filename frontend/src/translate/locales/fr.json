@@ -131,6 +131,7 @@
   "storage.sort.description.3": "Si vous laissez les slots vides en cas d'espèces manquantes, des boîtes peuvent être crées si manque de place.",
   "storage.dex-sync.title": "Sélectionnez les Pokedex à synchroniser",
   "storage.dex-sync.description": "Le Pokedex de chaque sélection partagera sa donnée avec les autres, dans les 2 sens.",
+  "storage.actions.unsafe": "Attention: cette action peut être instable.\nVérifiez l'intégrité de la sauvegarde après son utilisation, en cas de problème vous pouvez restaurer un backup.",
   "storage.actions.move": "Déplacer",
   "storage.actions.move-attached-main": "Déplacer rattaché",
   "storage.actions.move-attached-main.helpTitle": "Déplacer une copie rattachée de ce pkm vers une sauvegarde",

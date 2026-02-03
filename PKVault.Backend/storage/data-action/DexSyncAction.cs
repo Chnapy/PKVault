@@ -23,15 +23,20 @@ public class DexSyncAction(
 
         var allValues = dex.Values
             .SelectMany(specEntry => specEntry.Values)
-            .SelectMany(entry => entry.Forms)
-            .Select(form => (
-                form.Species,
-                form.Form,
-                form.Gender,
-                form.IsSeen,
-                form.IsSeenShiny,
-                form.IsCaught
-            ));
+            .SelectMany(entry =>
+            {
+                var languagesHash = string.Join('.', entry.Languages.Select(id => (byte)id).ToArray().Order());
+                return entry.Forms
+                    .Select(form => (
+                        form.Species,
+                        form.Form,
+                        form.Gender,
+                        form.IsSeen,
+                        form.IsSeenShiny,
+                        form.IsCaught,
+                        LanguagesHash: languagesHash
+                    ));
+            });
 
         var uniqueValues = allValues.ToHashSet();
 
@@ -45,17 +50,22 @@ public class DexSyncAction(
             .Select(g =>
             {
                 var baseForm = g.First();
-                if (g.Count() == 1)
-                {
-                    return baseForm;
-                }
 
                 bool IsSeen = false, IsSeenShiny = false, IsCaught = false;
+                HashSet<LanguageID> languages = [];
                 foreach (var form in g)
                 {
                     IsSeen |= form.IsSeen;
                     IsSeenShiny |= form.IsSeenShiny;
                     IsCaught |= form.IsCaught;
+                    if (form.LanguagesHash.Length > 0)
+                    {
+                        IEnumerable<LanguageID> formLanguages = form.LanguagesHash.Split('.').Select(lang => (LanguageID)byte.Parse(lang));
+                        foreach (var lang in formLanguages)
+                        {
+                            languages.Add(lang);
+                        }
+                    }
                 }
 
                 return (
@@ -64,7 +74,8 @@ public class DexSyncAction(
                     baseForm.Gender,
                     IsSeen,
                     IsSeenShiny,
-                    IsCaught
+                    IsCaught,
+                    Languages: languages.Order().ToArray()
                 );
             });
 
@@ -76,21 +87,26 @@ public class DexSyncAction(
         Console.WriteLine($"Ungrouped values = {ungroupedValues.Count()}");
         Console.WriteLine("\n\n");
 
-        // TODO improve perfs, avoiding n3 complexity with thousand DB calls
+        // TODO improve perfs, avoiding n complexity with thousand DB calls
         await Task.WhenAll(
             saveLoaders.Select(async saveLoader =>
             {
                 var service = dexService.GetDexService(saveLoader?.Save ?? new(FakeSaveFile.Default));
+                if (service == null)
+                {
+                    return;
+                }
 
                 foreach (var form in ungroupedValues)
                 {
-                    await service!.EnableSpeciesForm(
+                    await service.EnableSpeciesForm(
                         form.Species,
                         form.Form,
                         form.Gender,
                         form.IsSeen,
                         form.IsSeenShiny,
-                        form.IsCaught
+                        form.IsCaught,
+                        form.Languages
                     );
                 }
 

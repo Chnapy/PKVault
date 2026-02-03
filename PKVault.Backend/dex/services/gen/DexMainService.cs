@@ -55,7 +55,8 @@ public class DexMainService(
                     );
 
                     return dexLoader.CreateDTO(form, commonForm);
-                }))]
+                }))],
+                Languages: [.. forms.SelectMany(form => form.Languages).Distinct().Order()]
             );
 
             if (!dex.TryGetValue(species, out var arr))
@@ -72,11 +73,13 @@ public class DexMainService(
     protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
         => throw new NotImplementedException($"Should not be used");
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    protected override IEnumerable<LanguageID> GetDexLanguages(ushort species) => [];
+
+    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
     {
         await EnableSpeciesForm(
             default,
-            species, form, gender, isCaught, false,
+            species, form, gender, isCaught, false, languages,
             createOnly: false
         );
     }
@@ -87,7 +90,7 @@ public class DexMainService(
 
         await EnableSpeciesForm(
             version,
-            pk.Species, pk.Form, pk.Gender, true, pk.IsShiny,
+            pk.Species, pk.Form, pk.Gender, true, pk.IsShiny, [pk.LanguageID],
             createOnly
         );
     }
@@ -95,7 +98,7 @@ public class DexMainService(
     private async Task EnableSpeciesForm(
         GameVersion version,
         ushort species, byte form, Gender gender,
-        bool isCaught, bool isCaughtShiny,
+        bool isCaught, bool isCaughtShiny, LanguageID[] languages,
         bool createOnly
     )
     {
@@ -120,7 +123,8 @@ public class DexMainService(
             Version = default,
             Gender = gender,
             IsCaught = false,
-            IsCaughtShiny = false
+            IsCaughtShiny = false,
+            Languages = []
         };
 
         if (version != default)
@@ -138,6 +142,14 @@ public class DexMainService(
         if (!entity.IsCaught)
         {
             return;
+        }
+
+        foreach (var lang in languages)
+        {
+            if (!entity.Languages.Contains(lang))
+            {
+                entity.Languages.Add(lang);
+            }
         }
 
         if (needCreate)

@@ -115,11 +115,18 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
             });
         }
 
+        var languages = GetDexLanguages(species);
+        if (!languages.Any())
+        {
+            languages = [GetSaveLanguage()];
+        }
+
         return new DexItemDTO(
             Id: GetDexItemID(species),
             Species: species,
             SaveId: save.ID32,
-            Forms: forms
+            Forms: forms,
+            Languages: [.. languages]
         );
     }
 
@@ -184,7 +191,20 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         };
     }
 
+    protected LanguageID GetSaveLanguage()
+    {
+        if (save is ILangDeviantSave savLangDeviant)
+        {
+            if (savLangDeviant.Japanese) return LanguageID.Japanese;
+            if (savLangDeviant.Korean) return LanguageID.Korean;
+        }
+
+        return (LanguageID)save.Language;
+    }
+
     protected abstract DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender);
 
-    public abstract Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught);
+    protected abstract IEnumerable<LanguageID> GetDexLanguages(ushort species);
+
+    public abstract Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages);
 }

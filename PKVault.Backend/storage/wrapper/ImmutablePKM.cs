@@ -111,6 +111,15 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public uint PID => Pkm.PID;
 
     // Misc Properties
+    public LanguageID LanguageID
+    {
+        get
+        {
+            if (Pkm.Japanese) return LanguageID.Japanese;
+            if (Pkm.Korean) return LanguageID.Korean;
+            return (LanguageID)Pkm.Language;
+        }
+    }
     public int Language => Pkm.Language;
     public bool FatefulEncounter => Pkm.FatefulEncounter;
     public uint TSV => Pkm.TSV;

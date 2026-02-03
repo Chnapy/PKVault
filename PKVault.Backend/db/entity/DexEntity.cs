@@ -9,4 +9,5 @@ public class DexFormEntity : IEntity
     public required GameVersion Version { get; set; }
     public required bool IsCaught { get; set; }
     public required bool IsCaughtShiny { get; set; }
+    public required List<LanguageID> Languages { get; set; }
 }
