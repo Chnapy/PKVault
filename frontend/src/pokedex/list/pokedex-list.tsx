@@ -65,6 +65,7 @@ export const PokedexList: React.FC = withErrorCatcher("default", () => {
             ownedCount,
             shinyCount,
             totalCount,
+            itemsCount,
           },
           i,
         ) => (
@@ -94,7 +95,7 @@ export const PokedexList: React.FC = withErrorCatcher("default", () => {
             <RenderIfVisible
               id={generation}
               minWidth={200}
-              minHeight={estimateSectionContentMinHeight(speciesInfos.length)}
+              minHeight={estimateSectionContentMinHeight(itemsCount)}
               initialVisible={i === 0}
             >
               <div

@@ -20,6 +20,7 @@ type Counts = {
     ownedCount: number;
     shinyCount: number;
     totalCount: number;
+    itemsCount: number;
 };
 
 type SpeciesInfos = {
@@ -151,6 +152,7 @@ export const usePokedexItems = (): PokedexItems => {
         const ownedCount = acc[ generation ]?.ownedCount ?? 0;
         const shinyCount = acc[ generation ]?.shinyCount ?? 0;
         const totalCount = acc[ generation ]?.totalCount ?? 0;
+        const itemsCount = acc[ generation ]?.itemsCount ?? 0;
 
         const itemForGeneration: SpeciesItemsByGeneration = {
             ...acc[ generation ],
@@ -168,6 +170,7 @@ export const usePokedexItems = (): PokedexItems => {
             ownedCount: ownedCount + (isOwned ? 1 : 0),
             shinyCount: shinyCount + (isOwnedShiny ? 1 : 0),
             totalCount: totalCount + 1,
+            itemsCount: itemsCount + itemsToRender.length,
         };
 
         return {
@@ -183,6 +186,7 @@ export const usePokedexItems = (): PokedexItems => {
     const ownedCount = speciesItemsByGenerationList.reduce((acc, item) => acc + item.ownedCount, 0);
     const shinyCount = speciesItemsByGenerationList.reduce((acc, item) => acc + item.shinyCount, 0);
     const totalCount = speciesItemsByGenerationList.reduce((acc, item) => acc + item.totalCount, 0);
+    const itemsCount = speciesItemsByGenerationList.reduce((acc, item) => acc + item.itemsCount, 0);
 
     return {
         speciesItemsByGenerationList,
@@ -191,5 +195,6 @@ export const usePokedexItems = (): PokedexItems => {
         ownedCount,
         shinyCount,
         totalCount,
+        itemsCount,
     };
 };
