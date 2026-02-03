@@ -2,6 +2,11 @@ using PKHeX.Core;
 
 public class Dex9SVService(SAV9SV save) : DexGenService(save)
 {
+    private readonly LanguageID[] AllLanguages = [
+        LanguageID.Japanese, LanguageID.English, LanguageID.French, LanguageID.Italian, LanguageID.German, LanguageID.Spanish, LanguageID.Korean,
+        LanguageID.ChineseS, LanguageID.ChineseT
+    ];
+
     protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
@@ -62,7 +67,24 @@ public class Dex9SVService(SAV9SV save) : DexGenService(save)
         );
     }
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    protected override IEnumerable<LanguageID> GetDexLanguages(ushort species)
+    {
+
+        if (save.SaveRevision == 0)
+        // paldea
+        {
+            return AllLanguages.Where((lang) =>
+                save.Zukan.DexPaldea.Get(species).GetLanguageFlag(PokeDexEntry9Paldea.GetDexLangFlag((int)lang)));
+        }
+        // kitami
+        else
+        {
+            return AllLanguages.Where((lang) =>
+                save.Zukan.DexKitakami.Get(species).GetLanguageFlag(PokeDexEntry9Kitakami.GetDexLangFlag((int)lang)));
+        }
+    }
+
+    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
     {
         if (!save.Personal.IsPresentInGame(species, form) || species > save.MaxSpeciesID)
             return;
@@ -75,19 +97,37 @@ public class Dex9SVService(SAV9SV save) : DexGenService(save)
         // paldea
         {
             var entry = save.Zukan.DexPaldea.Get(species);
+            if (!entry.IsKnown)
+                entry.SetDisplayIsNew();
 
             if (isSeen)
             {
                 entry.SetSeen(true);
                 entry.SetIsFormSeen(formToUse, true);
                 entry.SetIsGenderSeen((byte)gender, true);
+                entry.SetDisplayForm(formToUse);
+                entry.SetDisplayGender((byte)gender);
             }
 
             if (isSeenShiny)
-                entry.SetSeenIsShiny(true);
+            {
+                entry.SetDisplayIsShiny();
+                entry.SetSeenIsShiny();
+            }
 
             if (isCaught)
                 entry.SetCaught(true);
+
+            var safeLanguages = languages.Where(AllLanguages.Contains);
+            if (!safeLanguages.Any())
+            {
+                safeLanguages = [GetSaveLanguage()];
+            }
+
+            foreach (var lang in safeLanguages)
+            {
+                entry.SetLanguageFlag(PokeDexEntry9Paldea.GetDexLangFlag((int)lang), true);
+            }
         }
         // kitami
         else
@@ -97,6 +137,7 @@ public class Dex9SVService(SAV9SV save) : DexGenService(save)
             if (isSeen)
             {
                 entry.SetSeenForm(formToUse, true);
+                entry.SetHeardForm(formToUse, true);
                 entry.SetIsGenderSeen((byte)gender, true);
             }
 
@@ -105,6 +146,17 @@ public class Dex9SVService(SAV9SV save) : DexGenService(save)
 
             if (isCaught)
                 entry.SetObtainedForm(formToUse, true);
+
+            var safeLanguages = languages.Where(AllLanguages.Contains);
+            if (!safeLanguages.Any())
+            {
+                safeLanguages = [GetSaveLanguage()];
+            }
+
+            foreach (var lang in safeLanguages)
+            {
+                entry.SetLanguageFlag(PokeDexEntry9Kitakami.GetDexLangFlag((int)lang), true);
+            }
         }
     }
 }

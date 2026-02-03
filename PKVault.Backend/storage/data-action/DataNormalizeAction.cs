@@ -100,6 +100,7 @@ public class DataNormalizeAction(
         var settings = settingsService.GetSettings();
         var dbPath = settings.SettingsMutable.DB_PATH;
         var storagePath = settings.SettingsMutable.STORAGE_PATH;
+        var languageId = settings.GetSafeLanguageID();
 
         var hasLegacy = GetLegacyFilepaths(dbPath).Any(fileIOService.Exists);
         if (!hasLegacy)
@@ -207,7 +208,8 @@ public class DataNormalizeAction(
                         Gender = f.Gender,
                         Version = f.Version,
                         IsCaught = f.IsCaught,
-                        IsCaughtShiny = f.IsCaughtShiny
+                        IsCaughtShiny = f.IsCaughtShiny,
+                        Languages = [languageId]    // pkm language is lost here, so we use app language as fallback
                     }))
             );
 

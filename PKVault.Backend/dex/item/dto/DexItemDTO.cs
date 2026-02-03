@@ -5,7 +5,8 @@ public record DexItemDTO(
     string Id,
     ushort Species,
     uint SaveId,
-    List<DexItemForm> Forms
+    List<DexItemForm> Forms,
+    LanguageID[] Languages
 ) : IWithId;
 
 public record DexItemForm(

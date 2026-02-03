@@ -2,6 +2,11 @@ using PKHeX.Core;
 
 public class Dex8BSService(SAV8BS save) : DexGenService(save)
 {
+    private readonly LanguageID[] AllLanguages = [
+        LanguageID.Japanese, LanguageID.English, LanguageID.French, LanguageID.Italian, LanguageID.German, LanguageID.Spanish, LanguageID.Korean,
+        LanguageID.ChineseS, LanguageID.ChineseT
+    ];
+
     protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);
@@ -41,7 +46,12 @@ public class Dex8BSService(SAV8BS save) : DexGenService(save)
         );
     }
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught)
+    protected override IEnumerable<LanguageID> GetDexLanguages(ushort species)
+    {
+        return AllLanguages.Where((_, i) => save.Zukan.GetLanguageFlag(species, i));
+    }
+
+    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
     {
         if (!save.Personal.IsPresentInGame(species, form))
             return;
@@ -73,6 +83,18 @@ public class Dex8BSService(SAV8BS save) : DexGenService(save)
 
             if (isSeenShiny)
                 save.Zukan.SetHasFormFlag(species, form, true, true);
+        }
+
+        var safeLanguages = languages.Where(AllLanguages.Contains);
+        if (!safeLanguages.Any())
+        {
+            safeLanguages = [GetSaveLanguage()];
+        }
+
+        foreach (var lang in safeLanguages)
+        {
+            var langIndex = AllLanguages.IndexOf(lang);
+            save.Zukan.SetLanguageFlag(species, langIndex, true);
         }
     }
 }
