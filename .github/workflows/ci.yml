@@ -27,3 +27,5 @@ jobs:
 
       - name: Frontend - Checks & Build
         run: docker build . --target frontend-builder
+        env:
+          VITE_SERVER_URL: http://localhost:5000
