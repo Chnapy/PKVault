@@ -67,6 +67,8 @@ RUN npm ci
 
 COPY frontend .
 
+RUN npm run gen:routes
+
 # generate SDK
 ARG VITE_OPENAPI_PATH=swagger.json
 ENV VITE_OPENAPI_PATH=$VITE_OPENAPI_PATH
