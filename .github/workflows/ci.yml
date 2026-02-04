@@ -26,6 +26,4 @@ jobs:
         run: docker build . --target backend-publish
 
       - name: Frontend - Checks & Build
-        run: docker build . --target frontend-builder
-        with:
-          build-args: VITE_SERVER_URL=http://localhost:5000
+        run: docker build . --target frontend-builder --build-arg VITE_SERVER_URL=http://localhost:5000
