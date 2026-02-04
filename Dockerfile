@@ -3,6 +3,8 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend-builder
 
 WORKDIR /src
 
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 COPY ["PKVault.Backend/PKVault.Backend.csproj", "PKVault.Backend/"]
 COPY ["PKVault.Backend.Tests/PKVault.Backend.Tests.csproj", "PKVault.Backend.Tests/"]
 
@@ -16,15 +18,12 @@ COPY ./PKVault.Backend.Tests ./PKVault.Backend.Tests
 RUN dotnet build "PKVault.Backend/PKVault.Backend.csproj"
 RUN dotnet build "PKVault.Backend.Tests/PKVault.Backend.Tests.csproj"
 
-RUN dotnet tool install --global NSwag.ConsoleCore
-ENV PATH="$PATH:/root/.dotnet/tools"
-
 # generate swagger for frontend
-RUN nswag aspnetcore2openapi \
-  /project:"PKVault.Backend/PKVault.Backend.csproj" \
-  /configuration:Debug \
-  /output:/app/swagger.json \
-  /noBuild:true
+RUN dotnet run --project "PKVault.Backend/PKVault.Backend.csproj" --no-build & \
+  until curl -f -s http://localhost:5000/swagger/v1/swagger.json -o /swagger.json; do \
+  sleep 1; \
+  done && \
+  pkill dotnet
 
 # tests
 RUN dotnet test --project "./PKVault.Backend.Tests/PKVault.Backend.Tests.csproj" --no-restore --no-build
@@ -52,7 +51,7 @@ ENV ASPNETCORE_ENVIRONMENT=Production
 
 # extract swagger from backend
 FROM alpine:latest AS swagger-extractor
-COPY --from=backend-builder /app/swagger.json /swagger.json
+COPY --from=backend-builder /swagger.json /swagger.json
 
 # frontend builder
 ARG VITE_SERVER_URL
