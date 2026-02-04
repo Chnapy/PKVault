@@ -1,0 +1,71 @@
+services:
+  pkvault-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend-runtime
+    entrypoint: ./PKVault.Backend
+    image: pkvault-backend
+    container_name: pkvault-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+    volumes:
+      # TODO literal paths here don't allow changing settings paths
+      - ./pkvault-data/config:/app/config
+      - ./pkvault-data/db:/app/db
+      - ./pkvault-data/storage:/app/storage
+      - ./pkvault-data/backup:/app/backup
+      - ./pkvault-data/logs:/app/logs
+      - ./pkvault-data/saves:/app/saves
+    healthcheck:
+      # TODO create health route
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/settings"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - pkvault-network
+
+  pkvault-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend-runtime
+      args:
+        # on windows needs to add pkvault-backend in hosts file
+        VITE_SERVER_URL: http://pkvault-backend:5000
+    entrypoint: serve -s dist -l 3000
+    image: pkvault-frontend
+    container_name: pkvault-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      pkvault-backend:
+        condition: service_healthy
+    environment:
+      # on windows needs to add pkvault-backend in hosts file
+      - VITE_SERVER_URL=http://pkvault-backend:5000
+    networks:
+      - pkvault-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000/index.html",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+networks:
+  pkvault-network:
+    driver: bridge

@@ -20,15 +20,6 @@ These docs help understanding backend architecture & some lifecycles:
 - [Session lifecycle](./docs/SESSION.md)
 - [Data structure](./docs/DATA.md)
 
-## Setup
-
-Generate PokeApi data & spritesheets.
-This process picks only the data used by the app & compress it as `.json.gz` files, and generates spritesheets.
-
-```
-dotnet run -p:Mode=gen-pokeapi
-```
-
 ## Dev
 
 Basic dev process.
@@ -48,6 +39,15 @@ To avoid this issue migration should be generated using this command.
 
 ```
 dotnet run -p:Mode=gen-migration MigrationName
+```
+
+### Generate static-data & spritesheets
+
+Generate PokeApi data & spritesheets.
+This process picks only the data used by the app & compress it as `.json.gz` files, and generates spritesheets.
+
+```
+dotnet run -p:Mode=gen-pokeapi
 ```
 
 ## Build

@@ -16,6 +16,7 @@ public class MatcherUtil
             return [];
         }
 
+        // network globs on Windows, ex: "\\192.168.1.8\data"
         var networkGlobs = globs.FindAll(glob => glob.StartsWith(@"\\") && !glob.Contains('*'));
 
         // starts with / or \ or x:
