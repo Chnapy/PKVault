@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**/*.md"
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "**/*.md"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Backend - Build & Test
+        run: docker build . --target backend-build
+
+      - name: Backend - Publish
+        run: docker build . --target backend-publish
+
+      - name: Frontend - Checks & Build
+        run: docker build . --target frontend-builder
