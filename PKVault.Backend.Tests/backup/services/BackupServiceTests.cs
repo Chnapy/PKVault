@@ -94,8 +94,8 @@ public class BackupServiceTests
 
         // Console.WriteLine(string.Join('\n', mockFileSystem.AllPaths));
 
-        Assert.True(mockFileSystem.FileExists(@"mock-bkp\pkvault_backup_2011-03-21T132611-000Z.zip"));
-        var data = mockFileSystem.File.ReadAllBytes(@"mock-bkp\pkvault_backup_2011-03-21T132611-000Z.zip");
+        Assert.True(mockFileSystem.FileExists(Path.Combine("mock-bkp", "pkvault_backup_2011-03-21T132611-000Z.zip")));
+        var data = mockFileSystem.File.ReadAllBytes(Path.Combine("mock-bkp", "pkvault_backup_2011-03-21T132611-000Z.zip"));
         ArchiveMatchContent(data);
     }
 
@@ -106,7 +106,7 @@ public class BackupServiceTests
             now: DateTime.Parse("2011-03-21 13:26:11")
         );
 
-        var expectedPath = @"mock-bkp\pkvault_backup_2013-03-21T132611-000Z.zip";
+        var expectedPath = Path.Combine("mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip");
 
         var paths = new Dictionary<string, string>()
             {
@@ -158,8 +158,8 @@ public class BackupServiceTests
         );
 
         // check if backup creation were made
-        Assert.True(mockFileSystem.FileExists(@"mock-bkp\pkvault_backup_2011-03-21T132611-000Z.zip"));
-        var data = mockFileSystem.File.ReadAllBytes(@"mock-bkp\pkvault_backup_2011-03-21T132611-000Z.zip");
+        Assert.True(mockFileSystem.FileExists(Path.Combine("mock-bkp", "pkvault_backup_2011-03-21T132611-000Z.zip")));
+        var data = mockFileSystem.File.ReadAllBytes(Path.Combine("mock-bkp", "pkvault_backup_2011-03-21T132611-000Z.zip"));
         ArchiveMatchContent(data);
 
         // Console.WriteLine(string.Join('\n', mockFileSystem.AllFiles));
@@ -190,7 +190,7 @@ public class BackupServiceTests
         mockFileSystem.AddEmptyFile("mock-db/pkm-version.json");
         mockFileSystem.AddEmptyFile("mock-db/dex.json");
 
-        var expectedPath = @"mock-bkp\pkvault_backup_2013-03-21T132611-000Z.zip";
+        var expectedPath = Path.Combine("mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip");
 
         var paths = new Dictionary<string, string>()
             {

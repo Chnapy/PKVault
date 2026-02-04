@@ -412,3 +412,6 @@ temp_*/
 TODO.md
 PKVault.Desktop/
 Toto/
+
+# from docker container
+pkvault-data/

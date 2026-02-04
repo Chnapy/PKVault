@@ -539,7 +539,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var idBase = pkm.GetPKMIdBase(staticData.Evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
 
-        mockFileSystem.AddFile($"app\\{filepath}", new MockFileData(pkm.DecryptedPartyData));
+        mockFileSystem.AddFile(Path.Combine($"app", filepath), new MockFileData(pkm.DecryptedPartyData));
 
         var entity = new PkmVariantEntity()
         {
@@ -572,7 +572,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         Assert.Equal(idBase, dto.Id);
         Assert.Equal(3, dto.Generation);
         Assert.Equal(filepath, dto.Filepath);
-        Assert.Equal($"app\\{filepath}", dto.FilepathAbsolute);
+        Assert.Equal(Path.Combine("app", filepath), dto.FilepathAbsolute);
         Assert.Equal(25, dto.Species);
         Assert.True(dto.IsMain);
         Assert.True(dto.IsFilePresent);

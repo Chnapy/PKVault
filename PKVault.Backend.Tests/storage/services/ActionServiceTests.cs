@@ -92,7 +92,10 @@ public class ActionServiceTests
 
         var flags = await actionService.Save();
 
-        Assert.True(mockFileSystem.FileExists("mock-bkp\\pkvault_backup_2013-03-21T132611-000Z.zip"));
+        Assert.True(mockFileSystem.FileExists(
+                Path.Combine("mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip")
+            ),
+            $"File is missing, list of current files:\n{string.Join('\n', mockFileSystem.AllFiles)}");
     }
 
     [Fact]
@@ -115,7 +118,7 @@ public class ActionServiceTests
 
         await Assert.ThrowsAnyAsync<Exception>(actionService.Save);
 
-        Assert.True(mockFileSystem.FileExists("mock-bkp\\pkvault_backup_2013-03-21T132611-000Z.zip"));
+        Assert.True(mockFileSystem.FileExists(Path.Combine("mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip")));
 
         Assert.True(mockFileSystem.FileExists("mock-main.db"));
 
@@ -123,7 +126,7 @@ public class ActionServiceTests
             .ForEach(legacyPath => Assert.True(mockFileSystem.FileExists(legacyPath)));
 
         Assert.True(mockFileSystem.FileExists("mock-save-path"));
-        Assert.True(mockFileSystem.FileExists("mock-pkm-files\\123"));
+        Assert.True(mockFileSystem.FileExists(Path.Combine("mock-pkm-files", "123")));
     }
 
     private void ConfigureSettings(

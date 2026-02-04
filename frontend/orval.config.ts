@@ -1,15 +1,15 @@
 import { defineConfig } from "orval";
 
-const VITE_SERVER_URL: string | undefined = globalThis[ 'process' ]?.env?.VITE_SERVER_URL;
+const VITE_OPENAPI_PATH: string | undefined = globalThis[ 'process' ]?.env?.VITE_OPENAPI_PATH;
 
-if (!VITE_SERVER_URL) {
-  throw new Error("VITE_SERVER_URL env variable not defined");
+if (!VITE_OPENAPI_PATH) {
+  throw new Error("VITE_OPENAPI_PATH env variable not defined");
 }
 
 export default defineConfig({
   backend: {
     input: {
-      target: `${VITE_SERVER_URL}/swagger/v1/swagger.json`,
+      target: VITE_OPENAPI_PATH,
     },
     output: {
       client: "react-query",
