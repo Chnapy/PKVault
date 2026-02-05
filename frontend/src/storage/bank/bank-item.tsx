@@ -33,7 +33,7 @@ export const BankItem: React.FC<{
   const boxes = boxesQuery.data?.data.filter(box => box.bankId === bank?.id).map(box => box.idInt) ?? [];
   const pkms = boxes.map(boxId => Object.values(pkmsQuery.data?.data.byBox[ boxId ] ?? {}).flat()).flat();
 
-  const canDelete = pkms?.length === 0;
+  const canDelete = banks.length > 1;
 
   const buttonMainContent = bank && (
     <div
@@ -120,10 +120,7 @@ export const BankItem: React.FC<{
             <Icon name='pen' forButton />
           </ButtonWithPopover>
 
-          <ButtonWithDisabledPopover
-            as={ButtonWithConfirm}
-            helpTitle={t('storage.bank.delete.help')}
-            showHelp={!canDelete}
+          <ButtonWithConfirm
             onClick={() => bankDeleteMutation.mutateAsync({ bankId })}
             disabled={!canDelete}
             loading={isLoading}
@@ -134,7 +131,7 @@ export const BankItem: React.FC<{
             })}
           >
             <Icon name='trash' solid forButton />
-          </ButtonWithDisabledPopover>
+          </ButtonWithConfirm>
         </div>
       </div>
     )
