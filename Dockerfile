@@ -67,6 +67,25 @@ RUN npm run c:type
 ARG VITE_SERVER_URL=http://localhost:3000
 RUN VITE_SERVER_URL=$VITE_SERVER_URL npm run build
 
+# winform builder
+FROM backend-builder AS winform-builder
+
+WORKDIR /src
+
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+COPY ["PKVault.WinForm/PKVault.WinForm.csproj", "PKVault.WinForm/"]
+
+RUN dotnet restore "PKVault.WinForm/PKVault.WinForm.csproj"
+
+COPY ./PKVault.WinForm ./PKVault.WinForm
+
+RUN dotnet build "PKVault.WinForm/PKVault.WinForm.csproj"
+
+# winform publish
+FROM winform-builder AS winform-publish
+RUN dotnet publish "PKVault.WinForm/PKVault.WinForm.csproj" -c Release -o /app/publish
+
 # monolith: backend & frontend
 FROM alpine:latest AS monolith
 RUN apk add --no-cache \

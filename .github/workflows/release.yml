@@ -1,6 +1,7 @@
 name: Release
 
 on:
+  pull_request:
   workflow_dispatch: # manual trigger
 
 permissions:
@@ -45,10 +46,21 @@ jobs:
           echo "TAG=$VERSION" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Build image
+      - name: Build web image
         env:
           TAG: ${{ env.TAG }}
         run: docker compose -f docker-compose.yml build
+
+      - name: Build WinForm exe
+        env:
+          TAG: ${{ env.TAG }}
+        run: |
+          docker build . --target winform-publish -t tmp-winform
+          docker create --name tmp-winform tmp-winform
+          docker cp tmp-winform:/app/publish/PKVault.exe PKVault.exe
+          docker rm tmp-winform
+          docker rmi tmp-winform
+          ls -la PKVault.exe
 
       - name: Push image multi-tags to GitHub Container registry
         env:
@@ -85,3 +97,5 @@ jobs:
           tag_name: v${{ steps.get-version.outputs.version }}
           name: v${{ steps.get-version.outputs.version }}
           generate_release_notes: true
+          files: |
+            PKVault.exe
