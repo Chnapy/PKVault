@@ -1,0 +1,87 @@
+name: Release
+
+on:
+  workflow_dispatch: # manual trigger
+
+permissions:
+  contents: write # releases
+  packages: write # ghcr
+
+env:
+  REGISTRY_IMAGE_NAME: ghcr.io/chnapy/pkvault
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from backend .csproj
+        id: get-version
+        uses: KageKirin/get-csproj-version@v0
+        with:
+          file: "./PKVault.Backend/PKVault.Backend.csproj"
+
+      - name: Check if version already exist
+        env:
+          VERSION: v${{ steps.get-version.outputs.version }}
+        run: |
+          if git ls-remote --tags origin | grep -q "refs/tags/$VERSION"; then
+            echo "❌ Error: version $VERSION already exist (tag)!"
+            exit 1
+          fi
+          if gh release list | grep -q "$VERSION"; then
+            echo "❌ Error: version $VERSION already exist (release)!"
+            exit 1
+          fi
+
+      - name: Set image version
+        id: version
+        run: |
+          VERSION=${{ steps.get-version.outputs.version }}
+          echo "TAG=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Build image
+        env:
+          TAG: ${{ env.TAG }}
+        run: docker compose -f docker-compose.yml build
+
+      - name: Push image multi-tags to GitHub Container registry
+        env:
+          TAG: ${{ env.TAG }}
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u chnapy --password-stdin
+
+          MAJOR_MINOR=${TAG%.*}
+          SRC=${REGISTRY_IMAGE_NAME}:${TAG}
+
+          echo "Pushing $SRC and derivatives..."
+
+          # main tag
+          docker push $SRC
+
+          # major.minor
+          docker tag $SRC ${REGISTRY_IMAGE_NAME}:${MAJOR_MINOR}
+          docker push ${REGISTRY_IMAGE_NAME}:${MAJOR_MINOR}
+
+          # latest
+          docker tag $SRC ${REGISTRY_IMAGE_NAME}:latest
+          docker push ${REGISTRY_IMAGE_NAME}:latest
+
+      - name: Create tag
+        env:
+          VERSION: v${{ steps.get-version.outputs.version }}
+        run: |
+          git tag $VERSION
+          git push origin $VERSION
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.get-version.outputs.version }}
+          name: v${{ steps.get-version.outputs.version }}
+          generate_release_notes: true

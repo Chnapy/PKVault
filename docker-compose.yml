@@ -1,9 +1,9 @@
 services:
   pkvault:
+    image: ghcr.io/chnapy/pkvault:${TAG:-latest}
     build:
       context: .
       dockerfile: Dockerfile
-    image: pkvault
     container_name: pkvault
     ports:
       - "3000:3000"
