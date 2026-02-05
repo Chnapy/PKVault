@@ -102,6 +102,8 @@ Ce système trouve son intérêt avec l'utilisation de variantes: lorsqu'une syn
 
 Il est alors possible d'utiliser un même pokémon dans plusieurs jeux, et le voir progresser au fil des générations.
 
+Un pokemon ne peut être attaché qu'à une sauvegarde à la fois.
+
 ## Actions sur les pokémons
 
 <details>
@@ -159,7 +161,7 @@ Déplace un pokémon, avec plusieurs cas possibles:
 - d'une sauvegarde au stockage PKVault
 - d'une sauvegarde à une autre sauvegarde
 
-Le déplacement d'une variante vers une sauvegarde ne peut se faire que s'il existe une variante de la bonne génération. Dans le cas contraire crééez en une avant.
+Le déplacement d'une variante vers une sauvegarde peut créer dans le même temps une variante compatible avec la sauvegarde, si besoin.
 
 Le déplacement peut se faire de manière attaché, auquel cas le pokémon est en réalité cloné (voir [Pokémons attachés](#pokémons-attachés)).
 
