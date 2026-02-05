@@ -65,7 +65,7 @@ public class PkmFileLoader : IPkmFileLoader
             : [];
         var error = pkm.LoadError;
 
-        return new()
+        var entity = new PkmFileEntity()
         {
             Filepath = filepath,
             Data = data,
@@ -73,6 +73,22 @@ public class PkmFileLoader : IPkmFileLoader
             Updated = updated,
             Deleted = false
         };
+
+        await AttachEntity(entity);
+
+        return entity;
+    }
+
+    private async Task AttachEntity(PkmFileEntity entity)
+    {
+        var dbSet = await GetDbSet();
+
+        var exists = await dbSet.AnyAsync(e => e.Filepath == entity.Filepath);
+
+        db.PkmFiles.Attach(entity);
+        db.Entry(entity).State = exists
+            ? EntityState.Modified
+            : EntityState.Added;
     }
 
     public async Task WriteToFiles()

@@ -644,6 +644,17 @@ export const StorageMoveContext = {
 
                 // pkm main -> save
                 else if (sourcePkmMain && (targetBoxSave || targetPkmSave)) {
+
+                    const save = sourceSave ?? targetSave;
+                    if (save && !sourcePkmMain.compatibleWithVersions.includes(save.version)) {
+                        return {
+                            enable: false,
+                            helpText: t('storage.move.main-incompatible-version', {
+                                name: sourcePkmMain.nickname
+                            }),
+                        };
+                    }
+
                     if (!(selected.attached ? sourcePkmMain.canMoveAttachedToSave : sourcePkmMain.canMoveToSave)) {
                         return {
                             enable: false,
@@ -665,32 +676,29 @@ export const StorageMoveContext = {
                     const generation = targetPkmSave?.generation ?? targetSave?.generation;
 
                     const basePkmVariant = relatedPkmVariants.find(variant => variant.generation === generation);
-
-                    if (!generation || !basePkmVariant) {
+                    if (basePkmVariant && !basePkmVariant.isEnabled) {
                         return {
                             enable: false,
-                            helpText: t('storage.move.main-need-gen', {
-                                name: getMainPkmNickname(sourcePkmMain.id),
-                                generation,
+                            helpText: t('storage.move.main-disabled'),
+                        };
+                    }
+
+                    if (!basePkmVariant && targetPkmSave) {
+                        return {
+                            enable: false,
+                            helpText: t('storage.move.pkm-cannot-create-variant', {
+                                name: sourcePkmMain.nickname,
                             }),
                         };
                     }
 
-                    if (!selected.attached) {
-                        if (relatedPkmVariants.length > 1) {
-                            return {
-                                enable: false,
-                                helpText: t('storage.move.attached-multiple-variants', {
-                                    name: getMainPkmNickname(sourcePkmMain.id),
-                                }),
-                            };
-                        }
-                    }
-
-                    if (!basePkmVariant.isEnabled) {
+                    const attachedPkmVariant = relatedPkmVariants.find(variant => variant.attachedSaveId);
+                    if (attachedPkmVariant) {
                         return {
                             enable: false,
-                            helpText: t('storage.move.main-disabled'),
+                            helpText: t('storage.move.pkm-cannot-attached-already', {
+                                name: sourcePkmMain.nickname,
+                            }),
                         };
                     }
                 }
