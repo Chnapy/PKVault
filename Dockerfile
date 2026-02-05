@@ -30,24 +30,9 @@ RUN dotnet test --project "./PKVault.Backend.Tests/PKVault.Backend.Tests.csproj"
 
 # backend publish
 FROM backend-builder AS backend-publish
-RUN dotnet publish "PKVault.Backend/PKVault.Backend.csproj" -c Release -o /app/publish --no-restore
-
-# backend runtime
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS backend-runtime
-
-WORKDIR /app
-
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
-COPY --from=backend-publish /app/publish .
-
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD dotnet-health || exit 1
-
-EXPOSE 5000
-
-ENV ASPNETCORE_URLS=http://+:5000
-ENV ASPNETCORE_ENVIRONMENT=Production
+# build including dotnet runtime + compatible Alpine
+RUN dotnet build "PKVault.Backend/PKVault.Backend.csproj" -r linux-musl-x64
+RUN dotnet publish "PKVault.Backend/PKVault.Backend.csproj" -c Release -o /app/publish --self-contained -r linux-musl-x64
 
 # extract swagger from backend
 FROM alpine:latest AS swagger-extractor
@@ -79,19 +64,40 @@ RUN npm run c:type
 # RUN npm run c:lint
 
 # build
-ARG VITE_SERVER_URL
+ARG VITE_SERVER_URL=http://localhost:3000
 RUN VITE_SERVER_URL=$VITE_SERVER_URL npm run build
 
-# frontend runtime
-FROM node:22-alpine AS frontend-runtime
-
+# monolith: backend & frontend
+FROM alpine:latest AS monolith
+RUN apk add --no-cache \
+  nginx \
+  supervisor \
+  curl \
+  # icu libs required for backend date manipulation non-utc
+  icu-libs \
+  # complete cultures (en/fr/...)
+  icu-data-full \
+  # timezones
+  tzdata \
+  && rm -rf /var/cache/apk/*
 WORKDIR /app
 
-RUN npm install -g serve
+# setup logs folders
+RUN mkdir -p /var/log/supervisord /var/log/nginx /var/run/nginx \
+  && chown -R 755 /var/log/nginx /var/run/nginx \
+  && chmod -R 755 /var/log/supervisord
 
-COPY --from=frontend-builder /app/dist ./dist
+COPY --from=backend-publish /app/publish /app/backend
+COPY --from=frontend-builder /app/dist /app/frontend
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:3000/index.html || exit 1
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+ARG VITE_SERVER_URL=http://localhost:3000
+ENV VITE_SERVER_URL=$VITE_SERVER_URL
+
+VOLUME [ "/app/backend/config", "/app/backend/db", "/app/backend/storage", "/app/backend/backup", "/app/backend/logs" ]
 
 EXPOSE 3000
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
