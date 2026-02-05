@@ -79,6 +79,7 @@ COPY ["PKVault.WinForm/PKVault.WinForm.csproj", "PKVault.WinForm/"]
 RUN dotnet restore "PKVault.WinForm/PKVault.WinForm.csproj"
 
 COPY ./PKVault.WinForm ./PKVault.WinForm
+COPY --from=frontend-builder /app/dist ./PKVault.WinForm/wwwroot
 
 RUN dotnet build "PKVault.WinForm/PKVault.WinForm.csproj"
 
