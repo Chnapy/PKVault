@@ -100,6 +100,8 @@ This system is useful with the use of variants: when synchronization occurs, all
 
 It is then possible to use the same pokemon in multiple games, and watch it progress across generations.
 
+A pokemon can be attached to a single save at once.
+
 ## Actions on pokemons
 
 <details> 
@@ -157,7 +159,7 @@ Moves a pokemon, with several possible cases:
 - from a save to PKVault storage
 - from one save to another save
 
-Moving a variant to a save can only be done if there is a variant of the correct generation. Otherwise create one first.
+Moving a variant to a save may create a variant of the correct generation if required. In this case the move will be done as attached.
 
 The move can be done in an attached manner, in which case the pokemon is actually cloned (see [Attached pokemons](#attached-pokemons)).
 

@@ -187,22 +187,19 @@ public class MovePkmBankAction(
         }
 
         // get pkm-version
-        var pkmVariantEntity = await pkmVariantLoader.GetEntity(savePkm.Id);
+        var pkmVariantEntity = await pkmVariantLoader.GetEntityBySave(savePkm.SaveId, savePkm.IdBase);
         var mainPkmAlreadyExists = pkmVariantEntity != null;
 
-        if (pkmVariantEntity == null)
-        {
-            // create pkm-version
-            pkmVariantEntity = await pkmVariantLoader.AddEntity(new(
-                BoxId: targetBoxId,
-                BoxSlot: targetBoxSlot,
-                IsMain: true,
-                AttachedSaveId: input.attached ? sourceSaveId : null,
-                AttachedSavePkmIdBase: input.attached ? savePkm.IdBase : null,
-                Generation: savePkm.Generation,
-                Pkm: savePkm.Pkm
-            ));
-        }
+        // create pkm-version
+        pkmVariantEntity ??= await pkmVariantLoader.AddEntity(new(
+            BoxId: targetBoxId,
+            BoxSlot: targetBoxSlot,
+            IsMain: true,
+            AttachedSaveId: input.attached ? sourceSaveId : null,
+            AttachedSavePkmIdBase: input.attached ? savePkm.IdBase : null,
+            Generation: savePkm.Generation,
+            Pkm: savePkm.Pkm
+        ));
 
         // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmVariantEntity.AttachedSaveId != null)
