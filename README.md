@@ -17,10 +17,8 @@ Similar to Pokemon Home, offline as online.
 
 This tool can be used as:
 
-- desktop Windows app ([PKVault.WinForm](./PKVault.WinForm))
-- web app with C# backend ([PKVault.Backend](./PKVault.Backend)) and Typescript/React frontend ([frontend](./frontend)) for contexts like homelab
-
-Executables can be found in releases.
+- desktop Windows app ([PKVault.WinForm](./PKVault.WinForm)), executables in [releases](https://github.com/Chnapy/PKVault/releases)
+- web app with C# backend ([PKVault.Backend](./PKVault.Backend)) and Typescript/React frontend ([frontend](./frontend)) for contexts like homelab, check [Docker usage](#docker-usage)
 
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
@@ -53,6 +51,26 @@ Executables can be found in releases.
     - possible living dex
     - possible shiny dex
 - Dynamic saves listing based on paths & globs
+
+## Docker usage
+
+You can use a plug'n'play docker image, example:
+
+```yml
+services:
+  pkvault:
+    image: ghcr.io/chnapy/pkvault:latest # or specific version, like 1.2.0
+    ports:
+      - "3000:3000"
+    volumes:
+      # Note: if you update settings paths, you should update them here too
+      - ./your-data/config:/app/backend/config
+      - ./your-data/db:/app/backend/db
+      - ./your-data/storage:/app/backend/storage
+      - ./your-data/backup:/app/backend/backup
+      - ./your-data/logs:/app/backend/logs
+      - ./your-data/saves:/app/backend/saves # saves can be somewhere else, no constraints
+```
 
 ## [Functional documentation](./docs/functional/en/README.md)
 
