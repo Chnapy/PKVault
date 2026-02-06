@@ -1,7 +1,7 @@
 public record MainDeleteBankActionInput(string bankId);
 
 public class MainDeleteBankAction(
-    IBankLoader bankLoader, IBoxLoader boxLoader
+    IBankLoader bankLoader
 ) : DataAction<MainDeleteBankActionInput>
 {
     protected override async Task<DataActionPayload> Execute(MainDeleteBankActionInput input, DataUpdateFlags flags)
@@ -13,11 +13,6 @@ public class MainDeleteBankAction(
         {
             throw new ArgumentException("Last Bank cannot be deleted");
         }
-
-        // boxes are deleted by cascade
-        // still have to track them
-        (await boxLoader.GetEntitiesByBank(input.bankId)).Values.ToList()
-            .ForEach(box => flags.MainBoxes.Ids.Add(box.Id));
 
         await bankLoader.DeleteEntity(bank);
         if (bank.IsDefault)

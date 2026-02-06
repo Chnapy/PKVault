@@ -54,7 +54,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
         SessionDbContext db,
         StaticDataService _staticDataService
     ) : base(
-        sessionService, db, db.PkmVariantsFlags
+        sessionService, db
     )
     {
         fileIOService = _fileIOService;

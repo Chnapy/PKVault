@@ -24,8 +24,6 @@ public class SaveDeletePkmAction(
             saveLoaders.Pkms.DeleteDto(pkmId);
             saveLoaders.Pkms.FlushParty();
 
-            flags.Dex.Ids.Add(dto.Species.ToString());
-
             return new(
                 type: DataActionType.SAVE_DELETE_PKM,
                 parameters: [saveLoaders.Save.Version, dto.Nickname]

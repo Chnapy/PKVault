@@ -33,12 +33,17 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         _ => throw new NotImplementedException(slotType.ToString()),
     };
 
+    private readonly IPkmVariantLoader pkmVariantLoader;
+
     public BoxLoader(
         ISessionServiceMinimal sessionService,
-        SessionDbContext db) : base(
-        sessionService, db, db.BoxesFlags
+        SessionDbContext db,
+        IPkmVariantLoader _pkmVariantLoader
+    ) : base(
+        sessionService, db
     )
     {
+        pkmVariantLoader = _pkmVariantLoader;
     }
 
     public BoxDTO CreateDTO(BoxEntity entity)
@@ -56,6 +61,17 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
     protected override async Task<BoxDTO> GetDTOFromEntity(BoxEntity entity)
     {
         return CreateDTO(entity);
+    }
+
+    public override async Task DeleteEntity(BoxEntity entity)
+    {
+        var pkmsToRemove = await pkmVariantLoader.GetEntitiesByBox(entity.Id);
+        foreach (var pkm in pkmsToRemove.Values.SelectMany(entry => entry.Values))
+        {
+            await pkmVariantLoader.DeleteEntity(pkm);
+        }
+
+        await base.DeleteEntity(entity);
     }
 
     public async Task<Dictionary<string, BoxEntity>> GetEntitiesByBank(string bankId)

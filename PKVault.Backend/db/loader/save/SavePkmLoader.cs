@@ -14,8 +14,7 @@ public interface ISavePkmLoader
     public void WriteDto(PkmSaveDTO dto);
     public void DeleteDto(string id);
     public void FlushParty();
-    public void SetFlags(DataUpdateSaveListFlags _savesFlags);
-
+    public void SetFlags(DataUpdateSaveListFlags _savesFlags, DataUpdateFlagsState _dexFlags);
 }
 
 public class SavePkmLoader(
@@ -36,6 +35,7 @@ public class SavePkmLoader(
     private bool NeedUpdate = true;
 
     private DataUpdateSaveListFlags savesFlags = new();
+    private DataUpdateFlagsState dexFlags = new();
 
     public PkmSaveDTO CreateDTO(SaveWrapper save, ImmutablePKM pkm, string boxId, int boxSlot)
     {
@@ -264,6 +264,8 @@ public class SavePkmLoader(
         }
 
         SetDTO(dto);
+
+        dexFlags.Ids.Add(dto.Species.ToString());
     }
 
     public void DeleteDto(string id)
@@ -287,6 +289,8 @@ public class SavePkmLoader(
             }
 
             RemoveDTO(dto);
+
+            dexFlags.Ids.Add(dto.Species.ToString());
         }
     }
 
@@ -340,9 +344,10 @@ public class SavePkmLoader(
         }
     }
 
-    public void SetFlags(DataUpdateSaveListFlags _savesFlags)
+    public void SetFlags(DataUpdateSaveListFlags _savesFlags, DataUpdateFlagsState _dexFlags)
     {
         savesFlags = _savesFlags;
+        dexFlags = _dexFlags;
     }
 
     private void SetDTO(PkmSaveDTO dto)

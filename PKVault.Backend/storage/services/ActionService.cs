@@ -358,6 +358,14 @@ public class ActionService(
                 ..db.PkmVariantsFlags.Ids,
             ]
         };
+        flags.Dex = new()
+        {
+            All = flags.Dex.All || db.DexFlags.All,
+            Ids = [
+                ..flags.Dex.Ids,
+                ..db.DexFlags.Ids,
+            ]
+        };
 
         sessionService.Actions.Add(actionRecord);
 

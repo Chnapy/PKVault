@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 public class SessionDbContext(
     ISessionServiceMinimal sessionService, IDbSeedingService dbSeedingService
@@ -16,6 +17,7 @@ public class SessionDbContext(
     public DataUpdateFlagsState BanksFlags = new();
     public DataUpdateFlagsState BoxesFlags = new();
     public DataUpdateFlagsState PkmVariantsFlags = new();
+    public DataUpdateFlagsState DexFlags = new();
 
     // The following configures EF to create a Sqlite database file in the
     // special "local" folder for your platform.
@@ -24,8 +26,11 @@ public class SessionDbContext(
         options
             .UseSqlite($"Data Source={sessionService.SessionDbPath}")
             .LogTo(Console.WriteLine, LogUtil.DBLogLevel)
+            // ignore not relevant warning "PRAGMA foreign_keys = 0" in migrations
+            .ConfigureWarnings(w => w.Ignore(RelationalEventId.NonTransactionalMigrationOperationWarning))
             .EnableDetailedErrors()
-            .EnableSensitiveDataLogging()   // PKVault does not contain any sensitive data
+            // PKVault does not contain any sensitive data
+            .EnableSensitiveDataLogging()
             .UseAsyncSeeding(dbSeedingService.Seed);
 
         // contexts.TryAdd(ContextId.InstanceId, ContextId);
@@ -60,7 +65,8 @@ public class SessionDbContext(
             entity
                 .HasMany<BoxEntity>()
                 .WithOne()
-                .HasForeignKey(p => p.BankId);
+                .HasForeignKey(p => p.BankId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         modelBuilder.Entity<BoxEntity>(entity =>
@@ -70,7 +76,8 @@ public class SessionDbContext(
             entity
                 .HasMany<PkmVariantEntity>()
                 .WithOne()
-                .HasForeignKey(e => e.BoxId);
+                .HasForeignKey(e => e.BoxId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         modelBuilder.Entity<PkmVariantEntity>(entity =>
@@ -112,5 +119,51 @@ public class SessionDbContext(
             entity.HasIndex(p => p.Form);
             entity.HasIndex(p => p.Gender);
         });
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        TrackChangesToFlags();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        TrackChangesToFlags();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    /**
+     * Pass tracked changes to flags
+     */
+    private void TrackChangesToFlags()
+    {
+        var trackEntries = ChangeTracker.Entries()
+            .Where(entry => entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.State == EntityState.Deleted);
+
+        foreach (var entry in trackEntries)
+        {
+            switch (entry.Entity)
+            {
+                case BankEntity bank:
+                    BanksFlags.Ids.Add(bank.Id);
+                    break;
+                case BoxEntity box:
+                    BoxesFlags.Ids.Add(box.Id);
+                    break;
+                case PkmVariantEntity pkmVariant:
+                    PkmVariantsFlags.Ids.Add(pkmVariant.Id);
+                    DexFlags.Ids.Add(pkmVariant.Species.ToString());
+                    if (entry.State == EntityState.Modified)
+                    {
+                        var oldEntity = (PkmVariantEntity)entry.OriginalValues.ToObject();
+                        DexFlags.Ids.Add(oldEntity.Species.ToString());
+                    }
+                    break;
+                case DexFormEntity dex:
+                    DexFlags.Ids.Add(dex.Species.ToString());
+                    break;
+            }
+        }
     }
 }

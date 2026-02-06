@@ -66,9 +66,6 @@ public class EvolvePkmAction(
             await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariant.Id, dto.IdBase)]));
         }
 
-        flags.Dex.Ids.Add(oldSpecies.ToString());
-        flags.Dex.Ids.Add(evolveSpecies.ToString());
-
         return new(
             type: DataActionType.EVOLVE_PKM,
             parameters: [saveLoaders.Save.Version, oldName, oldSpecies, dto.Species]
@@ -125,9 +122,6 @@ public class EvolvePkmAction(
         }
 
         await new DexMainService(sp).EnablePKM(entityPkm);
-
-        flags.Dex.Ids.Add(oldSpecies.ToString());
-        flags.Dex.Ids.Add(evolveSpecies.ToString());
 
         return new DataActionPayload(
             type: DataActionType.EVOLVE_PKM,

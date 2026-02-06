@@ -56,7 +56,7 @@ public class SavesLoadersService(
     {
         Loaders.Values.ToList().ForEach(saveLoader =>
         {
-            saveLoader.Pkms.SetFlags(flags.Saves);
+            saveLoader.Pkms.SetFlags(flags.Saves, flags.Dex);
         });
     }
 
