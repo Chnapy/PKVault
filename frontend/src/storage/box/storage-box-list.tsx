@@ -1,10 +1,8 @@
 import { css } from '@emotion/css';
 import type React from 'react';
 import { type BoxDTO } from '../../data/sdk/model';
-import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
-import { ButtonWithDisabledPopover } from '../../ui/button/button-with-disabled-popover';
 import { ButtonWithPopover } from '../../ui/button/button-with-popover';
 import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
@@ -20,8 +18,6 @@ export const StorageBoxList: React.FC<{
     deleteFn?: (boxId: string) => Promise<unknown>;
     addFn?: () => Promise<unknown>;
 }> = ({ selectedBoxes, boxes, pkms, onBoxChange, editPanelContent, deleteFn, addFn }) => {
-    const { t } = useTranslate();
-
     const maxBoxSlotCount = Math.max(0, ...boxes.map(box => box.slotCount));
     const nbrItemsPerLine = SizingUtil.getItemsPerLine(maxBoxSlotCount);
 
@@ -49,7 +45,7 @@ export const StorageBoxList: React.FC<{
                 const allItems = new Array(box.slotCount).fill(null).map((_, i): (typeof boxPkms)[ number ] | null => boxPkms[ i ] ?? null);
 
                 const canEditBox = !!editPanelContent;
-                const canDeleteBox = !!deleteFn && boxes.length > 1 && boxPkmsList.length === 0;
+                const canDeleteBox = !!deleteFn && boxes.length > 1;
 
                 return (
                     <div
@@ -129,10 +125,7 @@ export const StorageBoxList: React.FC<{
                                 <Icon name='pen' forButton />
                             </ButtonWithPopover>
 
-                            <ButtonWithDisabledPopover
-                                as={ButtonWithConfirm}
-                                helpTitle={t('storage.box.delete.help')}
-                                showHelp={!canDeleteBox}
+                            <ButtonWithConfirm
                                 onClick={deleteFn && (() => deleteFn(box.id))}
                                 disabled={!canDeleteBox}
                                 className={css({
@@ -142,7 +135,7 @@ export const StorageBoxList: React.FC<{
                                 })}
                             >
                                 <Icon name='trash' solid forButton />
-                            </ButtonWithDisabledPopover>
+                            </ButtonWithConfirm>
                         </div>
                     </div>
                 );
