@@ -8,8 +8,8 @@
     <!-- <PublishAot>true</PublishAot> -->
     <!-- <IsAotCompatible>true</IsAotCompatible> -->
     
-    <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>true</SelfContained>
+    <!-- <PublishSingleFile>true</PublishSingleFile> -->
+    <!-- <SelfContained>true</SelfContained> -->
 
     <Version>1.4.2</Version>
     <ApplicationDisplayVersion>1.4.2</ApplicationDisplayVersion>
