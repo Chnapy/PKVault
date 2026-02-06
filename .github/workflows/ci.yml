@@ -19,11 +19,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Backend - Build & Test
+      - name: Backend - Build
         run: docker build . --target backend-builder
 
-      - name: Backend - Publish
-        run: docker build . --target backend-publish
+      - name: Backend - Test
+        run: docker build . --target backend-test
 
-      - name: Frontend - Checks & Build
+      - name: Frontend - Prepare
         run: docker build . --target frontend-builder
+
+      - name: Frontend - Checks
+        run: docker build . --target frontend-check
+
+      - name: Frontend - Build
+        run: docker build . --target frontend-publish
+
+      - name: WinForm - Build
+        run: docker build . --target winform-builder
