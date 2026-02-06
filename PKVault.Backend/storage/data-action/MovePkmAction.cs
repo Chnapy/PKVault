@@ -404,8 +404,6 @@ public class MovePkmAction(
         {
             await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariant.Id, pkmVariant.AttachedSavePkmIdBase!)]));
         }
-
-        flags.Dex.Ids.Add(pkmSaveDTO.Species.ToString());
     }
 
     private async Task SaveToMainWithoutCheckTarget(
@@ -462,8 +460,6 @@ public class MovePkmAction(
         }
 
         await new DexMainService(sp).EnablePKM(savePkm.Pkm, savePkm.Save);
-
-        flags.Dex.Ids.Add(savePkm.Species.ToString());
     }
 
     private async Task CheckG3NationalDex(SaveWrapper save, int species)

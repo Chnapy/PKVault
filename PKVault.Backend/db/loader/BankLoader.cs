@@ -12,12 +12,17 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
 {
     public static readonly int OrderGap = 10;
 
+    private readonly IBoxLoader boxLoader;
+
     public BankLoader(
         ISessionServiceMinimal sessionService,
-        SessionDbContext db) : base(
-        sessionService, db, db.BanksFlags
+        SessionDbContext db,
+        IBoxLoader _boxLoader
+    ) : base(
+        sessionService, db
     )
     {
+        boxLoader = _boxLoader;
     }
 
     public BankDTO CreateDTO(BankEntity entity)
@@ -35,6 +40,17 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
     protected override async Task<BankDTO> GetDTOFromEntity(BankEntity entity)
     {
         return CreateDTO(entity);
+    }
+
+    public override async Task DeleteEntity(BankEntity entity)
+    {
+        var boxesToRemove = await boxLoader.GetEntitiesByBank(entity.Id);
+        foreach (var box in boxesToRemove.Values)
+        {
+            await boxLoader.DeleteEntity(box);
+        }
+
+        await base.DeleteEntity(entity);
     }
 
     public async Task<int> GetMaxId()

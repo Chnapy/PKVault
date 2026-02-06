@@ -221,7 +221,5 @@ public class MovePkmBankAction(
         }
 
         await new DexMainService(sp).EnablePKM(savePkm.Pkm, savePkm.Save);
-
-        flags.Dex.Ids.Add(savePkm.Species.ToString());
     }
 }

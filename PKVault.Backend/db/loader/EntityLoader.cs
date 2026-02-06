@@ -4,17 +4,14 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
 {
     protected ISessionServiceMinimal sessionService;
     protected SessionDbContext db;
-    private DataUpdateFlagsState flags;
 
     public EntityLoader(
         ISessionServiceMinimal _sessionService,
-        SessionDbContext _db,
-        DataUpdateFlagsState _flags
+        SessionDbContext _db
     )
     {
         sessionService = _sessionService;
         db = _db;
-        flags = _flags;
     }
 
     protected abstract Task<DTO> GetDTOFromEntity(E entity);
@@ -97,7 +94,6 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         // required to remove entity from future queries
         await db.SaveChangesAsync();
 
-        flags.Ids.Add(entity.Id);
         // Console.WriteLine($"Deleted {typeof(E)} id={entity.Id}");
     }
 
@@ -112,8 +108,6 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         await dbSet.AddAsync(entity);
         // Console.WriteLine($"Context={db.ContextId}");
         await db.SaveChangesAsync();
-
-        flags.Ids.Add(entity.Id);
 
         return entity;
     }
@@ -134,11 +128,6 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         await dbSet.AddRangeAsync(entities);
         await db.SaveChangesAsync();
 
-        foreach (var entity in entities)
-        {
-            flags.Ids.Add(entity.Id);
-        }
-
         return entities;
     }
 
@@ -153,8 +142,6 @@ public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : I
         dbSet.Update(entity);
         // Console.WriteLine($"Context={db.ContextId}");
         await db.SaveChangesAsync();
-
-        flags.Ids.Add(entity.Id);
     }
 
     // public virtual async Task UpdateEntities(E[] entities)

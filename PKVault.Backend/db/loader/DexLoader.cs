@@ -15,7 +15,7 @@ public class DexLoader : EntityLoader<DexItemForm, DexFormEntity>, IDexLoader
     public DexLoader(
         ISessionServiceMinimal sessionService,
         SessionDbContext db) : base(
-        sessionService, db, new()
+        sessionService, db
     )
     {
     }
