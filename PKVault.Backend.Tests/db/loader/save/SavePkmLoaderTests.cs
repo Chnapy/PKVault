@@ -259,15 +259,16 @@ public class SavePkmLoaderTests : IAsyncLifetime
     public void SetFlags_ShouldTrackChanges()
     {
         var loader = CreateLoader();
-        var flags = new DataUpdateSaveListFlags();
-        loader.SetFlags(flags);
+        var savesFlags = new DataUpdateSaveListFlags();
+        var dexFlags = new DataUpdateFlagsState();
+        loader.SetFlags(savesFlags, dexFlags);
 
         var pkm = CreateTestPkm();
         var dto = loader.CreateDTO(mockSave, pkm, 0, 0);
 
         loader.WriteDto(dto);
 
-        var saveFlags = flags.GetSaves().FirstOrDefault();
+        var saveFlags = savesFlags.GetSaves().FirstOrDefault();
 
         Assert.NotNull(saveFlags);
         Assert.Contains(dto.Id, saveFlags.SavePkms.Ids);

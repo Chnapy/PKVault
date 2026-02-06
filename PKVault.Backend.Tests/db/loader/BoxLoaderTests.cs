@@ -34,7 +34,9 @@ public class BoxLoaderTests : IAsyncDisposable
 
     private async Task<BoxLoader> CreateLoader(SessionDbContext db)
     {
-        return new BoxLoader(sessionService.Object, db);
+        Mock<IPkmVariantLoader> mockPkmVariantLoader = new();
+        mockPkmVariantLoader.Setup(l => l.GetEntitiesByBox(It.IsAny<string>())).ReturnsAsync([]);
+        return new BoxLoader(sessionService.Object, db, mockPkmVariantLoader.Object);
     }
 
     #region CRUD operations

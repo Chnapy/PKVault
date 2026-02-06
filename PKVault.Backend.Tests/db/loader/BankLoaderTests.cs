@@ -34,7 +34,9 @@ public class BankLoaderTests : IAsyncDisposable
 
     private async Task<BankLoader> CreateLoader(SessionDbContext db)
     {
-        return new BankLoader(sessionService.Object, db);
+        Mock<IBoxLoader> mockBoxLoader = new();
+        mockBoxLoader.Setup(l => l.GetEntitiesByBank(It.IsAny<string>())).ReturnsAsync([]);
+        return new BankLoader(sessionService.Object, db, mockBoxLoader.Object);
     }
 
     #region CRUD operations
