@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 public class SessionDbContext(
     ISessionServiceMinimal sessionService, IDbSeedingService dbSeedingService
@@ -25,8 +26,11 @@ public class SessionDbContext(
         options
             .UseSqlite($"Data Source={sessionService.SessionDbPath}")
             .LogTo(Console.WriteLine, LogUtil.DBLogLevel)
+            // ignore not relevant warning "PRAGMA foreign_keys = 0" in migrations
+            .ConfigureWarnings(w => w.Ignore(RelationalEventId.NonTransactionalMigrationOperationWarning))
             .EnableDetailedErrors()
-            .EnableSensitiveDataLogging()   // PKVault does not contain any sensitive data
+            // PKVault does not contain any sensitive data
+            .EnableSensitiveDataLogging()
             .UseAsyncSeeding(dbSeedingService.Seed);
 
         // contexts.TryAdd(ContextId.InstanceId, ContextId);
