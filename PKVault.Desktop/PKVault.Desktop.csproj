@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Platforms>AnyCPU</Platforms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    
+    <PublishTrimmed>true</PublishTrimmed>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+
+    <!-- can be used for lib trimmed debug -->
+    <!-- <EnableTrimAnalyzer>true</EnableTrimAnalyzer> -->
+
+    <RuntimeIdentifiers>
+      win-x64;
+      linux-x64;
+      linux-arm64;
+      osx-x64;
+      osx-arm64
+    </RuntimeIdentifiers>
+
+    <AssemblyName>PKVault</AssemblyName>
+    <ApplicationTitle>PKVault</ApplicationTitle>
+    <ApplicationId>com.chnapy.pkvault</ApplicationId>
+    <Version>1.4.3</Version>
+    <ApplicationDisplayVersion>1.4.3</ApplicationDisplayVersion>
+    <ApplicationVersion>1.4.3</ApplicationVersion>
+    <ApplicationIcon>Resources/wwwroot/icon.ico</ApplicationIcon>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Product>PKVault</Product>
+    <Description>PKVault is a Pokemon storage and save manipulation tool based on PKHeX.</Description>
+    <AssemblyDescription>PKVault is a Pokemon storage and save manipulation tool based on PKHeX.</AssemblyDescription>
+    <Authors>Richard Haddad</Authors>
+    <Copyright>Richard Haddad</Copyright>
+    <SourceRevisionId>$([System.DateTime]::UtcNow.ToString("yyMMddHHmmss"))</SourceRevisionId>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Chnapy/PKVault</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Chnapy/PKVault</PackageProjectUrl>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources/wwwroot/**/*" />
+
+    <TrimmerRootDescriptor Include="linker.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Photino.NET" Version="4.0.16" />
+    <PackageReference Include="Photino.NET.Server" Version="4.0.12" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PKVault.Backend\PKVault.Backend.csproj" />
+  </ItemGroup>
+</Project>
