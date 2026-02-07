@@ -96,7 +96,6 @@ export const SaveGlobsItem: React.FC<SaveGlobsItemProps> = ({ value, onEdit, onR
                 {desktopMessage && !isGlob && <Button
                     onClick={() => desktopMessage.openFile({
                         type: 'open-folder',
-                        id: value,
                         isDirectory,
                         path: value,
                     })}

@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.StaticFiles;
@@ -22,13 +25,21 @@ class Program
         var staticServerRun = SetupStaticAssetsServer(out var baseUrl);
         _ = staticServerRun();
 
+        var server = new LocalWebServer();
+
         window.RegisterWindowCreatedHandler(async (sender, e) =>
         {
             Console.WriteLine("CREATED");
 
-            var backendServerPostRun = await SetupBackendServer(args);
+            var backendServerPostRun = await SetupBackendServer(server, args);
             await backendServerPostRun();
 
+        });
+        window.RegisterWindowClosingHandler((sender, e) =>
+        {
+            _ = server.Stop();
+
+            return false;
         });
         // window.RegisterWindowCreatingHandler((sender, e) =>
         // {
@@ -38,12 +49,13 @@ class Program
 
         SetupWindow(window, baseUrl);
 
+        InjectIntoFrontend(window);
+
         window.WaitForClose();
     }
 
-    private static async Task<Func<Task>> SetupBackendServer(string[] args)
+    private static async Task<Func<Task>> SetupBackendServer(LocalWebServer server, string[] args)
     {
-        var server = new LocalWebServer();
         var setupPostRun = await server.Start(args);
 
         return setupPostRun
@@ -127,14 +139,150 @@ class Program
                 if (File.Exists(tmpIconFilepath))
                     File.Delete(tmpIconFilepath);
             })
-            .RegisterWebMessageReceivedHandler((sender, message) =>
-            {
-                var window = (PhotinoWindow)sender!;
-
-                string response = $"Received message: \"{message}\"";
-
-                window.SendWebMessage(response);
-            })
             .Load(baseUrl + $"/index.html?server={LocalWebServer.HOST_URL}");
+    }
+
+    private static void InjectIntoFrontend(PhotinoWindow window)
+    {
+        window.RegisterWebMessageReceivedHandler(async (sender, message) =>
+        {
+            Console.WriteLine($"Message received: {message}");
+            if (string.IsNullOrEmpty(message))
+            {
+                return;
+            }
+
+            try
+            {
+                var desktopRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.DesktopRequestMessage);
+
+                string responseSerialized = "";
+
+                switch (desktopRequest.type)
+                {
+                    case FileExploreRequestMessage.TYPE:
+                        {
+                            var fileExploreRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.FileExploreRequestMessage);
+
+                            async Task<FileExploreResponseMessage> GetDialogResponse()
+                            {
+                                if (fileExploreRequest.directoryOnly)
+                                {
+                                    Console.WriteLine($"Directory only");
+                                    var dirResults = await window.ShowOpenFolderAsync(
+                                        title: "TEST TITLE",
+                                        defaultPath: fileExploreRequest.basePath != default
+                                            ? fileExploreRequest.basePath
+                                            : null,
+                                        multiSelect: fileExploreRequest.multiselect
+                                    );
+                                    // using var dialogFolder = new FolderBrowserDialog();
+
+                                    // dialogFolder.Description = fileExploreRequest.title;
+                                    // dialogFolder.Multiselect = fileExploreRequest.multiselect;
+                                    // if (fileExploreRequest.basePath != default)
+                                    //     dialogFolder.InitialDirectory = fileExploreRequest.basePath;
+
+                                    // var dialogFolderResult = dialogFolder.ShowDialog();
+
+                                    return new(
+                                        type: fileExploreRequest.type,
+                                        id: fileExploreRequest.id,
+                                        directoryOnly: true,
+                                        values: dirResults
+                                            .Select(MatcherUtil.NormalizePath)
+                                            .ToArray()
+                                    );
+                                }
+
+                                Console.WriteLine($"File only");
+                                var fileResults = await window.ShowOpenFileAsync(
+                                    title: "TEST TITLE",
+                                    defaultPath: fileExploreRequest.basePath != default
+                                        ? fileExploreRequest.basePath
+                                        : null,
+                                    multiSelect: fileExploreRequest.multiselect
+                                );
+
+                                // using var dialogFile = new OpenFileDialog();
+
+                                // dialogFile.Title = fileExploreRequest.title;
+                                // dialogFile.Multiselect = fileExploreRequest.multiselect;
+                                // if (fileExploreRequest.basePath != default)
+                                //     dialogFile.InitialDirectory = fileExploreRequest.basePath;
+
+                                // var dialogResult = dialogFile.ShowDialog();
+
+                                return new(
+                                    type: fileExploreRequest.type,
+                                    id: fileExploreRequest.id,
+                                    directoryOnly: true,
+                                    values: fileResults
+                                        .Select(MatcherUtil.NormalizePath)
+                                        .ToArray()
+                                );
+                            }
+
+                            var response = await GetDialogResponse();
+                            responseSerialized = JsonSerializer.Serialize(response, DesktopMessageJsonContext.Default.FileExploreResponseMessage);
+                            break;
+                        }
+                    case OpenFolderRequestMessage.TYPE:
+                        {
+                            var openFolderRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.OpenFolderRequestMessage);
+
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                var arg = openFolderRequest.isDirectory
+                                    ? Path.GetFullPath(openFolderRequest.path)
+                                    : string.Format("/e, /select, \"{0}\"", Path.GetFullPath(openFolderRequest.path));
+
+                                var psi = new ProcessStartInfo
+                                {
+                                    FileName = "explorer.exe",
+                                    Arguments = arg,
+                                    UseShellExecute = false
+                                };
+
+                                Console.WriteLine($"RUN explorer.exe {arg}");
+
+                                var process = Process.Start(psi);
+                                process.WaitForInputIdle();
+
+                                break;
+                            }
+                            else
+                            {
+                                // TODO linux & mac
+                                throw new Exception($"OS not supported");
+                            }
+                        }
+                    case StartFinishRequestMessage.TYPE:
+                        {
+                            // var startFinishRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.StartFinishRequestMessage);
+                            // fullStartupTime.Dispose();
+
+                            break;
+                        }
+                }
+
+                if (responseSerialized == "")
+                {
+                    return;
+                }
+
+                responseSerialized = responseSerialized.Replace("\\", "\\\\");
+
+                var data = $"{{ \"detail\": {responseSerialized} }}";
+
+                await window.SendWebMessageAsync(data);
+
+                Console.WriteLine($"Response = {data}");
+            }
+            catch (JsonException ex)
+            {
+                Console.Error.WriteLine(ex);
+            }
+        });
     }
 }

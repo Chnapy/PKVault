@@ -41,7 +41,6 @@ export const Backup: React.FC = withErrorCatcher('default', () => {
             role='button'
             onClick={() => settings && desktopMessage.openFile({
                 type: 'open-folder',
-                id: 'backups',
                 isDirectory: true,
                 path: settings.settingsMutable.backuP_PATH
             })}
@@ -109,7 +108,6 @@ export const Backup: React.FC = withErrorCatcher('default', () => {
                             onClick={desktopMessage
                                 ? (() => desktopMessage.openFile({
                                     type: 'open-folder',
-                                    id: 'backups',
                                     isDirectory: true,
                                     path: backup.filepath,
                                 }))

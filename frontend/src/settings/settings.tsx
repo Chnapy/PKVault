@@ -109,7 +109,6 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                                     role='button'
                                     onClick={() => desktopMessage.openFile({
                                         type: 'open-folder',
-                                        id: 'settingsPath',
                                         isDirectory: false,
                                         path: settings.settingsPath,
                                     })}>
@@ -171,7 +170,6 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                                             role='button'
                                             onClick={() => desktopMessage.openFile({
                                                 type: 'open-folder',
-                                                id: 'dB_PATH',
                                                 isDirectory: false,
                                                 path: getValues('dB_PATH'),
                                             })}>
@@ -192,7 +190,6 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                                             role='button'
                                             onClick={() => desktopMessage.openFile({
                                                 type: 'open-folder',
-                                                id: 'backuP_PATH',
                                                 isDirectory: false,
                                                 path: getValues('backuP_PATH'),
                                             })}>
@@ -222,7 +219,6 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                                             role='button'
                                             onClick={() => desktopMessage.openFile({
                                                 type: 'open-folder',
-                                                id: 'storagE_PATH',
                                                 isDirectory: false,
                                                 path: getValues('storagE_PATH'),
                                             })}>
