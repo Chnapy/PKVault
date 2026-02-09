@@ -32,7 +32,7 @@ Then you can use swagger: `http://localhost:5000/swagger`
 
 ### DB migration
 
-Since PKVault.WinForm is using PublishTrimmed property, reflection is disabled all over the project.
+Since PKVault.Desktop is using PublishTrimmed property, reflection is disabled all over the project.
 Because of this constraint, EF Core generated migrations cannot work by themselves.
 
 To avoid this issue migration should be generated using this command.

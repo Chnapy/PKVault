@@ -11,7 +11,7 @@ public interface ISettingsService
  */
 public class SettingsService(IServiceProvider sp) : ISettingsService
 {
-    public static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "./config/pkvault.json");
+    public static readonly string FilePath = MatcherUtil.NormalizePath(Path.Combine(GetAppDirectory(), "./config/pkvault.json"));
     public static readonly string DefaultLanguage = "en";
     public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr"]; //GameLanguage.AllSupportedLanguages.ToArray();
 
@@ -52,6 +52,23 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         };
     }
 
+    public static string GetAppDirectory()
+    {
+        // PKVault.AppImage
+        var appImagePath = Environment.GetEnvironmentVariable("APPIMAGE");
+        if (appImagePath != null)
+        {
+            var appImageDirectory = Path.GetDirectoryName(appImagePath);
+            return appImageDirectory ?? appImagePath;
+        }
+
+        var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+        var exeDirectory = exePath != null ? Path.GetDirectoryName(exePath) : null;
+
+        return exeDirectory
+            ?? AppDomain.CurrentDomain.BaseDirectory;
+    }
+
     public static (Guid BuildID, string Version) GetBuildInfo()
     {
         var assembly = Assembly.GetExecutingAssembly();
@@ -75,7 +92,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             BuildID,
             Version,
             PkhexVersion: Assembly.GetAssembly(typeof(PKHeX.Core.PKM))?.GetName().Version?.ToString(3) ?? "",
-            AppDirectory: MatcherUtil.NormalizePath(AppDomain.CurrentDomain.BaseDirectory),
+            AppDirectory: MatcherUtil.NormalizePath(GetAppDirectory()),
             SettingsPath: FilePath,
             CanUpdateSettings: false,
             CanScanSaves: false,

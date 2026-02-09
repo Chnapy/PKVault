@@ -33,7 +33,7 @@ public class SessionService(
         DataActionPayload Payload
     );
 
-    private string DbFolderPath => settingsService.GetSettings().SettingsMutable.DB_PATH;
+    private string DbFolderPath => settingsService.GetSettings().GetDbPath();
     public string MainDbPath => Path.Combine(DbFolderPath, "pkvault.db");
     public string SessionDbPath => Path.Combine(DbFolderPath, "pkvault-session.db");
 

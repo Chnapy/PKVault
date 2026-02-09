@@ -18,6 +18,9 @@
     <!-- can be used for lib trimmed debug -->
     <!-- <EnableTrimAnalyzer>true</EnableTrimAnalyzer> -->
 
+    <!-- hides verbose trim warnings that cannot be solved, for AspNetCore.Mvc, EF Core, and other libs -->
+    <NoWarn>IL2026;IL2037;IL2104</NoWarn>
+
     <RuntimeIdentifiers>
       win-x64;
       linux-x64;

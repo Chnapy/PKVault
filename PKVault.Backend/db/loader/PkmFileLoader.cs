@@ -38,7 +38,7 @@ public class PkmFileLoader : IPkmFileLoader
     {
         fileIOService = _fileIOService;
         sessionService = _sessionService;
-        storagePath = settingsService.GetSettings().SettingsMutable.STORAGE_PATH;
+        storagePath = settingsService.GetSettings().GetStoragePath();
         db = _db;
     }
 

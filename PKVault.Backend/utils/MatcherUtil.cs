@@ -24,7 +24,8 @@ public class MatcherUtil
 
         var absoluteGlobs = globs.FindAll(isAbsolute).FindAll(glob => glob.Length <= 1 || glob[1] != ':');
         var driveGlobs = globs.FindAll(isAbsolute).FindAll(glob => glob.Length > 1 && glob[1] == ':');
-        var relativeGlobs = globs.FindAll(glob => !isAbsolute(glob));
+        var relativeGlobs = globs.FindAll(glob => !isAbsolute(glob))
+            .Select(glob => Path.Combine(SettingsService.GetAppDirectory(), glob));
 
         var absoluteMatcher = new Matcher();
         absoluteGlobs.ToList().ForEach(glob => absoluteMatcher.AddInclude(glob));
@@ -57,5 +58,8 @@ public class MatcherUtil
         return [.. results.Select(NormalizePath)];
     }
 
-    public static string NormalizePath(string path) => path.Replace('\\', '/').Replace("//", @"\\");
+    public static string NormalizePath(string path) => path
+        .Replace('\\', '/')
+        .Replace("//", @"\\")
+        .Replace("/./", "/");
 }

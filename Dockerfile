@@ -78,25 +78,42 @@ FROM frontend-builder AS frontend-publish
 ARG VITE_SERVER_URL=http://localhost:3000
 RUN VITE_SERVER_URL=$VITE_SERVER_URL npm run build
 
-# winform builder
-FROM backend-builder AS winform-builder
+# desktop builder
+FROM backend-builder AS desktop-builder
 
 WORKDIR /src
 
-COPY ["PKVault.WinForm/PKVault.WinForm.csproj", "PKVault.WinForm/"]
+COPY ["PKVault.Desktop/PKVault.Desktop.csproj", "PKVault.Desktop/"]
 
-RUN dotnet restore "PKVault.WinForm/PKVault.WinForm.csproj"
+RUN dotnet restore "PKVault.Desktop/PKVault.Desktop.csproj"
 
-COPY ./PKVault.WinForm ./PKVault.WinForm
-COPY --from=frontend-publish /app/dist ./PKVault.WinForm/wwwroot
+COPY ./PKVault.Desktop ./PKVault.Desktop
+COPY --from=frontend-publish /app/dist ./PKVault.Desktop/Resources/wwwroot
 
-RUN dotnet build "PKVault.WinForm/PKVault.WinForm.csproj"
+RUN dotnet build "PKVault.Desktop/PKVault.Desktop.csproj"
 
-# winform publish
-FROM winform-builder AS winform-publish
-RUN dotnet publish "PKVault.WinForm/PKVault.WinForm.csproj" -c Release -o /app/publish
+# desktop publish
+FROM desktop-builder AS desktop-publish
+
+ARG RID
+ENV RID=${RID:-linux-x64}
+
+RUN dotnet publish "PKVault.Desktop/PKVault.Desktop.csproj" -c Release -o /app/publish -r ${RID}
 
 RUN ls -la /app/publish
+
+RUN if [ "$(echo $RID | grep -o 'linux-x64')" ]; then \
+  ./build-appimage.sh; \
+  else \
+  cp -r /app/publish /app/publish-final && \
+  echo "=== Skip AppImage (non-linux-x64: $RID) ==="; \
+  fi
+
+FROM alpine:latest AS desktop
+
+COPY --from=desktop-publish /app/publish-final /app
+
+RUN ls -la /app
 
 # monolith: backend & frontend
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS monolith

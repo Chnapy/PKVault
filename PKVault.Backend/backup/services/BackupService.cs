@@ -88,7 +88,7 @@ public class BackupService(
         }
 
         var settings = settingsService.GetSettings();
-        var dbPath = settings.SettingsMutable.DB_PATH;
+        var dbPath = settings.GetDbPath();
 
         List<string> filepaths = DataNormalizeAction.GetLegacyFilepaths(dbPath);
         foreach (var filepath in filepaths)
@@ -273,7 +273,7 @@ public class BackupService(
         }
 
         var settings = settingsService.GetSettings();
-        var dbPath = settings.SettingsMutable.DB_PATH;
+        var dbPath = settings.GetDbPath();
 
         // remove current db file & old JSON files
         // to avoid remaining old data
@@ -333,7 +333,7 @@ public class BackupService(
 
     private string GetBackupsPath()
     {
-        var backupPath = settingsService.GetSettings().SettingsMutable.BACKUP_PATH;
+        var backupPath = settingsService.GetSettings().GetBackupPath();
         fileIOService.CreateDirectory(backupPath);
         return backupPath;
     }

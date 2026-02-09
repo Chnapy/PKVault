@@ -10,10 +10,12 @@ using Photino.NET.Server;
 
 namespace PKVault.Desktop;
 
-//NOTE: To hide the console window, go to the project properties and change the Output Type to Windows Application.
-// Or edit the .csproj file and change the <OutputType> tag from "WinExe" to "Exe".
 class Program
 {
+    private static readonly bool WindowsOS = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+    private static readonly bool LinuxOS = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    private static readonly bool MacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+
     private static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
     private static readonly string AssemblyStaticPrefix = "PKVault.Desktop.Resources.wwwroot.";
 
@@ -111,9 +113,9 @@ class Program
 
     private static void SetupWindow(PhotinoWindow window, string baseUrl)
     {
-        using Stream? iconStream = Assembly.GetManifestResourceStream($"{AssemblyStaticPrefix}icon.ico");
+        using Stream? iconStream = Assembly.GetManifestResourceStream($"{AssemblyStaticPrefix}icon.png");
 
-        var tmpIconFilepath = Path.Combine(Path.GetTempPath(), $"photino-icon.ico");
+        var tmpIconFilepath = Path.Combine(Path.GetTempPath(), $"pkvault-icon.png");
 
         using var fileStream = File.Create(tmpIconFilepath);
         iconStream.CopyTo(fileStream);
@@ -172,26 +174,17 @@ class Program
                                     var dirResults = await window.ShowOpenFolderAsync(
                                         title: "TEST TITLE",
                                         defaultPath: fileExploreRequest.basePath != default
-                                            ? fileExploreRequest.basePath
+                                            ? MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), fileExploreRequest.basePath))
+                                                .Replace('/', '\\')
                                             : null,
                                         multiSelect: fileExploreRequest.multiselect
                                     );
-                                    // using var dialogFolder = new FolderBrowserDialog();
-
-                                    // dialogFolder.Description = fileExploreRequest.title;
-                                    // dialogFolder.Multiselect = fileExploreRequest.multiselect;
-                                    // if (fileExploreRequest.basePath != default)
-                                    //     dialogFolder.InitialDirectory = fileExploreRequest.basePath;
-
-                                    // var dialogFolderResult = dialogFolder.ShowDialog();
 
                                     return new(
                                         type: fileExploreRequest.type,
                                         id: fileExploreRequest.id,
                                         directoryOnly: true,
-                                        values: dirResults
-                                            .Select(MatcherUtil.NormalizePath)
-                                            .ToArray()
+                                        values: [.. dirResults.Select(MatcherUtil.NormalizePath)]
                                     );
                                 }
 
@@ -199,7 +192,8 @@ class Program
                                 var fileResults = await window.ShowOpenFileAsync(
                                     title: "TEST TITLE",
                                     defaultPath: fileExploreRequest.basePath != default
-                                        ? fileExploreRequest.basePath
+                                        ? MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), fileExploreRequest.basePath))
+                                            .Replace('/', '\\')
                                         : null,
                                     multiSelect: fileExploreRequest.multiselect
                                 );
@@ -217,9 +211,7 @@ class Program
                                     type: fileExploreRequest.type,
                                     id: fileExploreRequest.id,
                                     directoryOnly: true,
-                                    values: fileResults
-                                        .Select(MatcherUtil.NormalizePath)
-                                        .ToArray()
+                                    values: [.. fileResults.Select(MatcherUtil.NormalizePath)]
                                 );
                             }
 
@@ -231,11 +223,14 @@ class Program
                         {
                             var openFolderRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.OpenFolderRequestMessage);
 
-                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            var path = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), openFolderRequest.path))
+                                .Replace('/', '\\');
+
+                            if (WindowsOS)
                             {
                                 var arg = openFolderRequest.isDirectory
-                                    ? Path.GetFullPath(openFolderRequest.path)
-                                    : string.Format("/e, /select, \"{0}\"", Path.GetFullPath(openFolderRequest.path));
+                                    ? path
+                                    : string.Format("/e, /select, \"{0}\"", path);
 
                                 var psi = new ProcessStartInfo
                                 {
@@ -246,16 +241,44 @@ class Program
 
                                 Console.WriteLine($"RUN explorer.exe {arg}");
 
-                                var process = Process.Start(psi);
-                                process.WaitForInputIdle();
-
-                                break;
+                                Process.Start(psi)?.WaitForInputIdle();
                             }
+                            // TODO crash the app on linux
+                            // else if (LinuxOS)
+                            // {
+                            //     var arg = openFolderRequest.isDirectory
+                            //         ? path
+                            //         : string.Format("--select \"{0}\"", path);
+
+                            //     var psi = new ProcessStartInfo
+                            //     {
+                            //         FileName = "xdg-open",
+                            //         Arguments = arg,
+                            //         UseShellExecute = false
+                            //     };
+
+                            //     Console.WriteLine($"RUN xdg-open {arg}");
+                            //     try
+                            //     {
+                            //         Process.Start(psi)?.WaitForInputIdle();
+                            //     }
+                            //     catch
+                            //     {
+                            //         // if xdg-open doesn't work, try something else
+                            //         var fallback = new ProcessStartInfo
+                            //         {
+                            //             FileName = openFolderRequest.path,
+                            //             UseShellExecute = true
+                            //         };
+                            //         Process.Start(fallback)?.WaitForInputIdle();
+                            //     }
+                            // }
                             else
                             {
-                                // TODO linux & mac
-                                throw new Exception($"OS not supported");
+                                // TODO mac
+                                throw new PlatformNotSupportedException($"MacOS not supported");
                             }
+                            break;
                         }
                     case StartFinishRequestMessage.TYPE:
                         {

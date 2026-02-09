@@ -10,7 +10,7 @@ import { SplashMain } from './splash/splash-main.tsx';
 
 const router = createRouter({
   routeTree,
-  // required for WinForm
+  // required for desktop
   history: createHashHistory()
 });
 

@@ -17,7 +17,7 @@ Similar to Pokemon Home, offline as online.
 
 This tool can be used as:
 
-- desktop Windows app ([PKVault.WinForm](./PKVault.WinForm)), executables in [releases](https://github.com/Chnapy/PKVault/releases)
+- desktop multi-platform app ([PKVault.Desktop](./PKVault.Desktop)), executables in [releases](https://github.com/Chnapy/PKVault/releases)
 - web app with C# backend ([PKVault.Backend](./PKVault.Backend)) and Typescript/React frontend ([frontend](./frontend)) for contexts like homelab, check [Docker usage](#docker-usage)
 
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
@@ -85,7 +85,7 @@ Includes quick start.
 This app (PKVault) is licensed under GPLv3 terms, as described in file [LICENSE](./LICENSE).
 Your can use this app for your own projects following license restrictions.
 
-- Backend / WinForm
+- Backend / Desktop
   - [PKHeX (Core part)](https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core) - License GPLv3
   - PokeApiNet - License MIT
   - Versions & all others dependencies can be found into `*.csproj` files

@@ -34,5 +34,5 @@ jobs:
       - name: Frontend - Build
         run: docker build . --target frontend-publish
 
-      - name: WinForm - Build
-        run: docker build . --target winform-builder
+      - name: Desktop - Build
+        run: docker build . --target desktop-builder
