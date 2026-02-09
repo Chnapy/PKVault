@@ -24,8 +24,7 @@ public class MatcherUtil
 
         var absoluteGlobs = globs.FindAll(isAbsolute).FindAll(glob => glob.Length <= 1 || glob[1] != ':');
         var driveGlobs = globs.FindAll(isAbsolute).FindAll(glob => glob.Length > 1 && glob[1] == ':');
-        var relativeGlobs = globs.FindAll(glob => !isAbsolute(glob))
-            .Select(glob => Path.Combine(SettingsService.GetAppDirectory(), glob));
+        var relativeGlobs = globs.FindAll(glob => !isAbsolute(glob));
 
         var absoluteMatcher = new Matcher();
         absoluteGlobs.ToList().ForEach(glob => absoluteMatcher.AddInclude(glob));
@@ -50,7 +49,7 @@ public class MatcherUtil
 
         var relativeMatcher = new Matcher();
         relativeGlobs.ToList().ForEach(glob => relativeMatcher.AddInclude(glob));
-        var relativeMatches = relativeMatcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(".")));
+        var relativeMatches = relativeMatcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(SettingsService.GetAppDirectory())));
         var relativeResults = relativeMatches.Files.Select(file => Path.Combine(".", file.Path));
 
         string[] results = [.. absoluteResults, .. driveResults, .. relativeResults, .. networkGlobs];

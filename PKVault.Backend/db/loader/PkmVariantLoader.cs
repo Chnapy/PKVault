@@ -73,7 +73,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
 
         var staticData = await staticDataService.GetStaticData();
 
-        var filepathAbsolute = Path.Combine(appPath, entity.Filepath);
+        var filepathAbsolute = MatcherUtil.NormalizePath(Path.Combine(appPath, entity.Filepath));
         var isFilePresent = fileIOService.Exists(filepathAbsolute);
 
         var dto = new PkmVariantDTO(

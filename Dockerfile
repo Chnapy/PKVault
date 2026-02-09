@@ -103,7 +103,8 @@ RUN dotnet publish "PKVault.Desktop/PKVault.Desktop.csproj" -c Release -o /app/p
 RUN ls -la /app/publish
 
 RUN if [ "$(echo $RID | grep -o 'linux-x64')" ]; then \
-  ./build-appimage.sh; \
+  chmod +x PKVault.Desktop/build-appimage.sh && \
+  ./PKVault.Desktop/build-appimage.sh; \
   else \
   cp -r /app/publish /app/publish-final && \
   echo "=== Skip AppImage (non-linux-x64: $RID) ==="; \

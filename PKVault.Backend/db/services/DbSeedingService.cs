@@ -32,7 +32,7 @@ public class DbSeedingService(IFileIOService fileIOService) : IDbSeedingService
 
     private async Task<PkmFileEntity> UpdatePkmFile(PkmFileEntity pkmFile)
     {
-        var filepath = pkmFile.Filepath;
+        var filepath = Path.Combine(SettingsService.GetAppDirectory(), pkmFile.Filepath);
 
         try
         {

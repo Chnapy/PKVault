@@ -405,7 +405,6 @@ FodyWeavers.xsd
 # PKHeX.Web
 plugins/
 
-tmp/
 temp/
 temp_*/
 

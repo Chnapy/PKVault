@@ -28,7 +28,10 @@ SettingsMutableDTO SettingsMutable
         return SettingsMutable.LANGUAGE ?? SettingsService.DefaultLanguage;
     }
 
-    private static string NormalizeSafePath(string path) => MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), path));
+    private static string NormalizeSafePath(string path) => MatcherUtil.NormalizePath(Path.Combine(
+        SettingsService.GetAppDirectory(),
+        path
+    ));
 }
 
 public record SettingsMutableDTO(

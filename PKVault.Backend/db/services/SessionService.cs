@@ -17,6 +17,7 @@ public interface ISessionService : ISessionServiceMinimal
 public interface ISessionServiceMinimal
 {
     public string MainDbPath { get; }
+    public string MainDbRelativePath { get; }
     public string SessionDbPath { get; }
 
     public Task EnsureSessionCreated(Guid? byPassContextId = null);
@@ -35,6 +36,7 @@ public class SessionService(
 
     private string DbFolderPath => settingsService.GetSettings().GetDbPath();
     public string MainDbPath => Path.Combine(DbFolderPath, "pkvault.db");
+    public string MainDbRelativePath => Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "pkvault.db");
     public string SessionDbPath => Path.Combine(DbFolderPath, "pkvault-session.db");
 
     public DateTime? StartTime { get; private set; }

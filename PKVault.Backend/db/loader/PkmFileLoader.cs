@@ -38,7 +38,7 @@ public class PkmFileLoader : IPkmFileLoader
     {
         fileIOService = _fileIOService;
         sessionService = _sessionService;
-        storagePath = settingsService.GetSettings().GetStoragePath();
+        storagePath = settingsService.GetSettings().SettingsMutable.STORAGE_PATH;
         db = _db;
     }
 
@@ -106,7 +106,8 @@ public class PkmFileLoader : IPkmFileLoader
 
         pkmFilesToDelete.ForEach(pkmFileToDelete =>
         {
-            fileIOService.Delete(pkmFileToDelete.Filepath);
+            var filepath = Path.Combine(SettingsService.GetAppDirectory(), pkmFileToDelete.Filepath);
+            fileIOService.Delete(filepath);
         });
 
         var pkmFilesToUpdate = await dbSet
@@ -118,7 +119,8 @@ public class PkmFileLoader : IPkmFileLoader
 
         pkmFilesToUpdate.ForEach(pkmFileToUpdate =>
         {
-            fileIOService.WriteBytes(pkmFileToUpdate.Filepath, pkmFileToUpdate.Data);
+            var filepath = Path.Combine(SettingsService.GetAppDirectory(), pkmFileToUpdate.Filepath);
+            fileIOService.WriteBytes(filepath, pkmFileToUpdate.Data);
         });
 
         dbSet.RemoveRange(pkmFilesToDelete);

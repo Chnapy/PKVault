@@ -294,7 +294,10 @@ class Program
                     return;
                 }
 
-                responseSerialized = responseSerialized.Replace("\\", "\\\\");
+                if (WindowsOS)
+                {
+                    responseSerialized = responseSerialized.Replace("\\", "\\\\");
+                }
 
                 var data = $"{{ \"detail\": {responseSerialized} }}";
 

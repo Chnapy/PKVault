@@ -74,25 +74,27 @@ public class BackupService(
     {
         var dict = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
 
-        var filePath = sessionService.MainDbPath;
-        if (fileIOService.Exists(filePath))
+        var rawDbFilepath = sessionService.MainDbRelativePath;
+        var dbFilepath = sessionService.MainDbPath;
+        if (fileIOService.Exists(dbFilepath))
         {
-            var fileName = Path.GetFileName(filePath);
+            var fileName = Path.GetFileName(dbFilepath);
             var relativePath = Path.Combine("db", fileName);
-            var content = await fileIOService.ReadBytes(filePath);
+            var content = await fileIOService.ReadBytes(dbFilepath);
 
             dict.Add(
                 NormalizePath(relativePath),
-                    (TargetPath: NormalizePath(filePath), FileContent: content)
+                    (TargetPath: NormalizePath(rawDbFilepath), FileContent: content)
             );
         }
 
         var settings = settingsService.GetSettings();
-        var dbPath = settings.GetDbPath();
+        var dbPath = settings.SettingsMutable.DB_PATH;
 
-        List<string> filepaths = DataNormalizeAction.GetLegacyFilepaths(dbPath);
-        foreach (var filepath in filepaths)
+        List<string> rawFilepaths = DataNormalizeAction.GetLegacyFilepaths(dbPath);
+        foreach (var rawFilepath in rawFilepaths)
         {
+            var filepath = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), rawFilepath));
             if (fileIOService.Exists(filepath))
             {
                 var fileName = Path.GetFileName(filepath);
@@ -101,7 +103,7 @@ public class BackupService(
 
                 dict.Add(
                     NormalizePath(relativePath),
-                        (TargetPath: NormalizePath(filepath), FileContent: content)
+                        (TargetPath: NormalizePath(rawFilepath), FileContent: content)
                 );
             }
         }
@@ -286,7 +288,7 @@ public class BackupService(
         foreach (var entry in archive.Entries)
         {
             if (
-                paths!.TryGetValue(entry.FullName, out var path)
+                paths.TryGetValue(entry.FullName, out var path)
                 || paths.TryGetValue(entry.FullName.Replace('/', '\\'), out path)
             )
             {
