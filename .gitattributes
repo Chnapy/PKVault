@@ -1,1 +1,4 @@
-*.webp binary
+*.webp  binary
+
+# .sh scripts must use LF line-break character
+*.sh    text eol=lf

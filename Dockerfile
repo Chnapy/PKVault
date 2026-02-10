@@ -104,7 +104,7 @@ RUN ls -la /app/publish
 
 RUN if [ "$(echo $RID | grep -o 'linux-x64')" ]; then \
   chmod +x PKVault.Desktop/build-appimage.sh && \
-  ./PKVault.Desktop/build-appimage.sh; \
+  sh PKVault.Desktop/build-appimage.sh; \
   else \
   cp -r /app/publish /app/publish-final && \
   echo "=== Skip AppImage (non-linux-x64: $RID) ==="; \

@@ -28,5 +28,5 @@ echo "AppImage created: /app/publish/PKVault.AppImage"
 ls -la /app
 
 mkdir -p /app/publish-final
-cp /app/publish/PKVault.exe /app/publish-final/ ||
-    cp /app/publish/PKVault.AppImage /app/publish-final/
+cp /app/publish/PKVault.AppImage /app/publish-final/
+chmod +x /app/publish-final/PKVault.AppImage

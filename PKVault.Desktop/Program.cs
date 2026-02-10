@@ -122,9 +122,10 @@ class Program
 
         window
             .SetTitle("PKVault")
-            // Resize to a percentage of the main monitor work area
-            .SetUseOsDefaultSize(true)
-            // .SetSize(1360, 800)
+            // Windows only: resize to a percentage of the main monitor work area
+            .SetUseOsDefaultSize(WindowsOS)
+            // Linux only: static initial size
+            .SetSize(1360, 800)
             .Center()
             .SetResizable(true)
             .SetIconFile(tmpIconFilepath)
@@ -243,40 +244,42 @@ class Program
 
                                 Process.Start(psi)?.WaitForInputIdle();
                             }
-                            // TODO crash the app on linux
-                            // else if (LinuxOS)
-                            // {
-                            //     var arg = openFolderRequest.isDirectory
-                            //         ? path
-                            //         : string.Format("--select \"{0}\"", path);
+                            else if (LinuxOS)
+                            {
+                                // xdg can open only folders
+                                var arg = $"\"{(
+                                    openFolderRequest.isDirectory
+                                        ? MatcherUtil.NormalizePath(path)
+                                        : Path.GetDirectoryName(MatcherUtil.NormalizePath(path))!
+                                )}\"";
 
-                            //     var psi = new ProcessStartInfo
-                            //     {
-                            //         FileName = "xdg-open",
-                            //         Arguments = arg,
-                            //         UseShellExecute = false
-                            //     };
+                                var psi = new ProcessStartInfo
+                                {
+                                    FileName = "xdg-open",
+                                    Arguments = arg,
+                                    UseShellExecute = false
+                                };
 
-                            //     Console.WriteLine($"RUN xdg-open {arg}");
-                            //     try
-                            //     {
-                            //         Process.Start(psi)?.WaitForInputIdle();
-                            //     }
-                            //     catch
-                            //     {
-                            //         // if xdg-open doesn't work, try something else
-                            //         var fallback = new ProcessStartInfo
-                            //         {
-                            //             FileName = openFolderRequest.path,
-                            //             UseShellExecute = true
-                            //         };
-                            //         Process.Start(fallback)?.WaitForInputIdle();
-                            //     }
-                            // }
+                                Console.WriteLine($"RUN xdg-open {arg}");
+                                try
+                                {
+                                    // Careful: WaitForInputIdle() causes crash on Linux
+                                    Process.Start(psi);
+                                }
+                                catch
+                                {
+                                    // if xdg-open doesn't work, try something else
+                                    var fallback = new ProcessStartInfo
+                                    {
+                                        FileName = openFolderRequest.path,
+                                        UseShellExecute = true
+                                    };
+                                    Process.Start(fallback);
+                                }
+                            }
                             else
                             {
-                                // TODO mac
-                                throw new PlatformNotSupportedException($"MacOS not supported");
+                                throw new PlatformNotSupportedException($"OS not supported: {RuntimeInformation.OSDescription}");
                             }
                             break;
                         }

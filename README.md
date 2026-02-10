@@ -17,9 +17,14 @@ Similar to Pokemon Home, offline as online.
 
 This tool can be used as:
 
-- desktop multi-platform app ([PKVault.Desktop](./PKVault.Desktop)), executables in [releases](https://github.com/Chnapy/PKVault/releases)
-- web app with C# backend ([PKVault.Backend](./PKVault.Backend)) and Typescript/React frontend ([frontend](./frontend)) for contexts like homelab, check [Docker usage](#docker-usage)
+- 📥 Desktop app
+  - Windows -> [PKVault.exe](https://github.com/Chnapy/PKVault/releases/latest)
+  - Linux & SteamDeck -> [PKVault.AppImage](https://github.com/Chnapy/PKVault/releases/latest)
 
+- 🐳 Docker web-app
+  - `image: ghcr.io/chnapy/pkvault` -> check [below for usage](#docker-usage)
+
+![Platforms](https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20SteamDeck%20|%20Docker-informational)
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
 <p align="center">
@@ -54,7 +59,9 @@ This tool can be used as:
 
 ## Docker usage
 
-You can use a plug'n'play docker image, example:
+You can use a plug'n'play docker image, compatible `Linux x86_64` and `Linux ARM` (like Raspberry Pis).
+
+`docker-compose.yml` example:
 
 ```yml
 services:
@@ -71,6 +78,8 @@ services:
       - ./your-data/logs:/app/backend/logs
       - ./your-data/saves:/app/backend/saves # saves can be somewhere else, no constraints
 ```
+
+Perfect for homelab context.
 
 ## [Functional documentation](./docs/functional/en/README.md)
 
