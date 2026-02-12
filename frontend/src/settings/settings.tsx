@@ -85,6 +85,7 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                         data={[
                             { value: 'en', option: 'English', disabled: watch('language') === 'en' },
                             { value: 'fr', option: 'Français', disabled: watch('language') === 'fr' },
+                            { value: 'de', option: 'Deutsch', disabled: watch('language') === 'de' },
                         ]}
                         {...register('language')}
                         value={watch('language')}
