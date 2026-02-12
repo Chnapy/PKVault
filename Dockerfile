@@ -100,6 +100,23 @@ RUN ls -la /app/publish
 
 # monolith: backend & frontend
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS monolith
+
+ARG VERSION
+ARG VCS_REF
+ARG BUILD_DATE
+
+LABEL org.opencontainers.image.title="PKVault" \
+  org.opencontainers.image.description="Pokemon storage and save manipulation tool based on PKHeX." \
+  org.opencontainers.image.url="https://github.com/Chnapy/PKVault" \
+  org.opencontainers.image.source="https://github.com/Chnapy/PKVault" \
+  org.opencontainers.image.version="${VERSION}" \
+  org.opencontainers.image.revision="${VCS_REF}" \
+  org.opencontainers.image.created="${BUILD_DATE}" \
+  org.opencontainers.image.licenses="GPLv3" \
+  org.opencontainers.image.vendor="PKVault" \
+  org.opencontainers.image.authors="Richard Haddad" \
+  org.opencontainers.image.base.name="mcr.microsoft.com/dotnet/aspnet:10.0-alpine"
+
 RUN apk add --no-cache \
   nginx \
   supervisor \
