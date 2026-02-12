@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 public interface ISettingsService
 {
@@ -54,12 +55,14 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     public static string GetAppDirectory()
     {
-        // PKVault.AppImage
-        var appImagePath = Environment.GetEnvironmentVariable("APPIMAGE");
-        if (appImagePath != null)
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            var appImageDirectory = Path.GetDirectoryName(appImagePath);
-            return appImageDirectory ?? appImagePath;
+            return (
+                // expected in flatpak context
+                Environment.GetEnvironmentVariable("XDG_DATA_HOME")
+                // expected in all other linux contexts
+                ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) ?? "~/", "pkvault")
+            );
         }
 
         var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;

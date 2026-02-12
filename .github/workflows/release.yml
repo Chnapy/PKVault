@@ -1,6 +1,7 @@
 name: Release
 
 on:
+  pull_request:
   workflow_dispatch: # manual trigger
 
 permissions:
@@ -29,18 +30,18 @@ jobs:
         with:
           file: "./PKVault.Backend/PKVault.Backend.csproj"
 
-      - name: Check if version already exist
-        env:
-          VERSION: v${{ steps.get-version.outputs.version }}
-        run: |
-          if git ls-remote --tags origin | grep -q "refs/tags/$VERSION"; then
-            echo "❌ Error: version $VERSION already exist (tag)!"
-            exit 1
-          fi
-          if gh release list | grep -q "$VERSION"; then
-            echo "❌ Error: version $VERSION already exist (release)!"
-            exit 1
-          fi
+      # - name: Check if version already exist
+      #   env:
+      #     VERSION: v${{ steps.get-version.outputs.version }}
+      #   run: |
+      #     if git ls-remote --tags origin | grep -q "refs/tags/$VERSION"; then
+      #       echo "❌ Error: version $VERSION already exist (tag)!"
+      #       exit 1
+      #     fi
+      #     if gh release list | grep -q "$VERSION"; then
+      #       echo "❌ Error: version $VERSION already exist (release)!"
+      #       exit 1
+      #     fi
 
       - name: Compute tag and major/minor
         id: compute
@@ -66,43 +67,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set image version
-        run: |
-          echo "TAG=${{ needs.version.outputs.tag }}" >> $GITHUB_ENV
-          echo "MAJOR_MINOR=${{ needs.version.outputs.major_minor }}" >> $GITHUB_ENV
-          echo "VERSION=${{ needs.version.outputs.version }}" >> $GITHUB_ENV
-          echo "VCS_REF=${GITHUB_SHA}" >> $GITHUB_ENV
-          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+      # - name: Set image version
+      #   run: |
+      #     echo "TAG=${{ needs.version.outputs.tag }}" >> $GITHUB_ENV
+      #     echo "MAJOR_MINOR=${{ needs.version.outputs.major_minor }}" >> $GITHUB_ENV
+      #     echo "VERSION=${{ needs.version.outputs.version }}" >> $GITHUB_ENV
+      #     echo "VCS_REF=${GITHUB_SHA}" >> $GITHUB_ENV
+      #     echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v3
 
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Login to GHCR
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push monolith image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile
-          target: monolith
-          platforms: ${{ matrix.platform }}
-          push: true
-          tags: |
-            ${{ env.REGISTRY_IMAGE_NAME }}:${{ env.TAG }}
-            ${{ env.REGISTRY_IMAGE_NAME }}:${{ env.MAJOR_MINOR }}
-            ${{ env.REGISTRY_IMAGE_NAME }}:latest
-          build-args: |
-            VITE_SERVER_URL=http://localhost:3000
-            VERSION=${{ env.VERSION }}
-            VCS_REF=${{ env.VCS_REF }}
-            BUILD_DATE=${{ env.BUILD_DATE }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      # - name: Build and push monolith image
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: .
+      #     file: ./Dockerfile
+      #     target: monolith
+      #     platforms: ${{ matrix.platform }}
+      #     push: true
+      #     tags: |
+      #       ${{ env.REGISTRY_IMAGE_NAME }}:${{ env.TAG }}
+      #       ${{ env.REGISTRY_IMAGE_NAME }}:${{ env.MAJOR_MINOR }}
+      #       ${{ env.REGISTRY_IMAGE_NAME }}:latest
+      #     build-args: |
+      #       VITE_SERVER_URL=http://localhost:3000
+      #       VERSION=${{ env.VERSION }}
+      #       VCS_REF=${{ env.VCS_REF }}
+      #       BUILD_DATE=${{ env.BUILD_DATE }}
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
 
   release:
     name: Create GitHub release
@@ -119,9 +120,10 @@ jobs:
 
       - name: Build Win64 desktop image & extract executable
         run: |
-          docker build . --target desktop --build-arg RID=win-x64 -t tmp-desktop-win64
+          docker build . --target desktop --build-arg RID=win-x64 --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-win64
           docker create --name tmp-desktop-win64 tmp-desktop-win64
-          docker cp tmp-desktop-win64:/app/PKVault.exe PKVault.exe
+
+          docker cp tmp-desktop-win64:/app/PKVault.exe PKVault-${{ env.VERSION }}.exe
 
           docker rm tmp-desktop-win64
           docker rmi tmp-desktop-win64
@@ -130,10 +132,20 @@ jobs:
 
       - name: Build Linux64 desktop image & extract executable
         run: |
-          docker build . --target desktop --build-arg RID=linux-x64 -t tmp-desktop-linux64
+          docker build . --target desktop-linux --build-arg RID=linux-x64 --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-linux64
           docker create --name tmp-desktop-linux64 tmp-desktop-linux64
-          docker cp tmp-desktop-linux64:/app/PKVault.AppImage PKVault.AppImage
-          chmod +x PKVault.AppImage
+
+          docker cp tmp-desktop-linux64:/app/PKVault pkvault-${{ env.VERSION }}
+          chmod +x pkvault-${{ env.VERSION }}
+
+          docker cp tmp-desktop-linux64:/app/PKVault.AppImage pkvault-${{ env.VERSION }}.AppImage
+          chmod +x pkvault-${{ env.VERSION }}.AppImage
+
+          docker cp tmp-desktop-linux64:/app/PKVault.deb pkvault-${{ env.VERSION }}.deb
+          chmod +x pkvault-${{ env.VERSION }}.deb
+
+          docker cp tmp-desktop-linux64:/app/PKVault.flatpak pkvault-${{ env.VERSION }}.flatpak
+          chmod +x pkvault-${{ env.VERSION }}.flatpak
 
           docker rm tmp-desktop-linux64
           docker rmi tmp-desktop-linux64
@@ -147,12 +159,19 @@ jobs:
           git tag $VERSION
           git push origin $VERSION
 
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ env.VERSION }}
-          name: v${{ env.VERSION }}
-          generate_release_notes: true
-          files: |
-            PKVault.exe
-            PKVault.AppImage
+      - name: Test
+        run: |
+          ls -la .
+
+      # - name: Create release
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     tag_name: v${{ env.VERSION }}
+      #     name: v${{ env.VERSION }}
+      #     generate_release_notes: true
+      #     files: |
+      #       PKVault-${{ env.VERSION }}.exe
+      #       pkvault-${{ env.VERSION }}
+      #       pkvault-${{ env.VERSION }}.AppImage
+      #       pkvault-${{ env.VERSION }}.flatpak
+      #       pkvault-${{ env.VERSION }}.deb

@@ -19,7 +19,7 @@ This tool can be used as:
 
 - 📥 Desktop app
   - Windows -> [PKVault.exe](https://github.com/Chnapy/PKVault/releases/latest)
-  - Linux & SteamDeck -> [PKVault.AppImage](https://github.com/Chnapy/PKVault/releases/latest)
+  - Linux & SteamDeck -> [pkvault.AppImage](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault.deb](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault.flatpak](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault](https://github.com/Chnapy/PKVault/releases/latest)
 
 - 🐳 Docker web-app
   - `image: ghcr.io/chnapy/pkvault` -> check [below for usage](#docker-usage)
