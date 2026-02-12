@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7-labs
+
 # backend builder
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend-builder
 
