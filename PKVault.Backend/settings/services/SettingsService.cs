@@ -13,7 +13,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 {
     public static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "./config/pkvault.json");
     public static readonly string DefaultLanguage = "en";
-    public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr"]; //GameLanguage.AllSupportedLanguages.ToArray();
+    public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr", "de"]; //GameLanguage.AllSupportedLanguages.ToArray();
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
     private ISaveService saveService => sp.GetRequiredService<ISaveService>();
