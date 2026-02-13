@@ -68,6 +68,9 @@ jobs:
         run: |
           echo "TAG=${{ needs.version.outputs.tag }}" >> $GITHUB_ENV
           echo "MAJOR_MINOR=${{ needs.version.outputs.major_minor }}" >> $GITHUB_ENV
+          echo "VERSION=${{ needs.version.outputs.version }}" >> $GITHUB_ENV
+          echo "VCS_REF=${GITHUB_SHA}" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -93,6 +96,9 @@ jobs:
             ${{ env.REGISTRY_IMAGE_NAME }}:latest
           build-args: |
             VITE_SERVER_URL=http://localhost:3000
+            VERSION=${{ env.VERSION }}
+            VCS_REF=${{ env.VCS_REF }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
