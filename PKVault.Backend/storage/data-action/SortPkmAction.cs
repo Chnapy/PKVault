@@ -190,7 +190,7 @@ public class SortPkmAction(
         {
             var currentBox = await GetCurrentBox();
 
-            if (currentSlot > currentBox.SlotCount - 1)
+            if (currentSlot >= currentBox.SlotCount - 1)
             {
                 currentBoxIndex++;
                 currentSlot = 0;
