@@ -63,6 +63,12 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
                     language: 'fr',
                 }
             })}>Français</Button>
+            <Button big onClick={() => settingsEditMutation.mutateAsync({
+                data: {
+                    ...settingsMutable,
+                    language: 'de',
+                }
+            })}>Deutsch</Button>
         </div>
     </Splash>;
 };
