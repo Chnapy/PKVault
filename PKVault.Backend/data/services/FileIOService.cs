@@ -231,6 +231,10 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
 
     private string NormalizePath(string path)
     {
+#if MODE_GEN_POKEAPI
+        return path;
+#endif
+
         var prefix = SettingsService.GetAppDirectory();
 
         return path.StartsWith(prefix) ? path : Path.Combine(prefix, path);
