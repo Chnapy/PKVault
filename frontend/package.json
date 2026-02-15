@@ -21,6 +21,7 @@
     "@tanstack/react-router-devtools": "^1.127.1",
     "@tanstack/zod-adapter": "^1.127.3",
     "@yornaath/batshit": "^0.14.0",
+    "github-slugger": "^2.0.0",
     "i18next": "^25.5.2",
     "js-convert-case": "^4.2.0",
     "normalize.css": "^8.0.1",
@@ -29,6 +30,9 @@
     "react-error-boundary": "^6.0.0",
     "react-hook-form": "^7.62.0",
     "react-i18next": "^16.0.0",
+    "react-markdown": "^10.1.0",
+    "rehype-raw": "^7.0.0",
+    "rehype-slug": "^6.0.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {

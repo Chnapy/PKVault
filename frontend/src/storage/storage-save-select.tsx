@@ -1,6 +1,8 @@
+import { css } from '@emotion/css';
 import type React from "react";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
+import type { DocsGenEnSlugs } from '../help/hooks/use-help-navigate';
 import { Route } from "../routes/storage";
 import { SaveItem } from "../saves/save-item/save-item";
 import { useTranslate } from '../translate/i18n';
@@ -11,7 +13,6 @@ import { Icon } from '../ui/icon/icon';
 import { theme } from '../ui/theme';
 import { filterIsDefined } from '../util/filter-is-defined';
 import { getSaveOrder } from './util/get-save-order';
-import { css } from '@emotion/css';
 
 export const StorageSaveSelect: React.FC = withErrorCatcher('default', () => {
   const { t } = useTranslate();
@@ -72,14 +73,30 @@ export const StorageSaveSelect: React.FC = withErrorCatcher('default', () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          flexWrap: 'wrap',
           gap: 4,
           backgroundColor: theme.bg.panel,
           padding: '8px 16px',
         })}>
-          <Icon name='info-circle' solid forButton />
-          {t('saves.not-see')}
+          <div className={css({
+            display: 'flex',
+            gap: 4,
+          })}>
+            <Icon name='info-circle' solid forButton />
+            {t('saves.not-see')}
+          </div>
+          <br />
+
           <ButtonLink to={'/settings'}>
             {t('action.check-settings')}
+          </ButtonLink>
+
+          <ButtonLink
+            to={'.'}
+            search={{ help: '1-quick-start.md' satisfies DocsGenEnSlugs }}
+          >
+            <Icon name='info-circle' solid />
+            {t('action.quick-start')}
           </ButtonLink>
         </Container>
       </div>

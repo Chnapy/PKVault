@@ -7,20 +7,19 @@ import { HistoryContext } from '../../context/history-context';
 
 export type HeaderItemProps = {
   selected?: boolean;
-  to: FileRouteTypes[ "to" ];
+  to?: FileRouteTypes[ "to" ];
   search?: Record<string, unknown>;
-  endPosition?: boolean;
 };
 
 export const HeaderItem: React.FC<React.PropsWithChildren<HeaderItemProps>> = ({
   selected,
   to,
   search: defaultSearch,
-  endPosition,
   children,
 }) => {
-  const historyValue = HistoryContext.useValue()[ to ];
-  const search = historyValue?.search ?? defaultSearch;
+  const historyContext = HistoryContext.useValue();
+  const historyValue = to ? historyContext[ to ] : undefined;
+  const search = { ...defaultSearch, ...historyValue?.search };
 
   return (
     <Button
@@ -42,7 +41,9 @@ export const HeaderItem: React.FC<React.PropsWithChildren<HeaderItemProps>> = ({
         borderRadius: 8,
         textDecoration: selected ? 'underline' : undefined,
         transition: 'background-color .2s',
-        marginLeft: endPosition ? 'auto' : undefined,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
 
         "&:hover": {
           textDecoration: 'underline',

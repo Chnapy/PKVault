@@ -27,3 +27,5 @@ dist-ssr
 src/data/sdk*
 
 tmp/
+
+public/docs/

@@ -1,9 +1,11 @@
+import { css } from '@emotion/css';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { HistoryContext } from '../context/history-context';
 import type { SettingsMutableDTO } from '../data/sdk/model/settingsMutableDTO';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
+import { HelpButton } from '../help/help-button';
 import { useTranslate } from '../translate/i18n';
 import { Button, ButtonLink } from '../ui/button/button';
 import { TitledContainer } from '../ui/container/titled-container';
@@ -13,7 +15,6 @@ import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
 import { useDesktopMessage } from './save-globs/hooks/use-desktop-message';
 import { SaveGlobsList } from './save-globs/save-globs-list';
-import { css } from '@emotion/css';
 
 export const Settings: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
@@ -51,7 +52,17 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
     });
 
     return <TitledContainer title={<div className={css({ display: 'flex', justifyContent: 'space-between' })}>
-        {t('settings.title')}
+        <div
+            className={css({
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+            })}
+        >
+            {t('settings.title')}
+
+            <HelpButton slug='5-settings.md' />
+        </div>
 
         <div className={css({ marginLeft: 'auto' })}>
             v{settings?.version} - Build ID = {settings?.buildID} - PKHeX {settings?.pkhexVersion}

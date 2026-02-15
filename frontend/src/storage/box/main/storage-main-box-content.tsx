@@ -5,6 +5,7 @@ import { usePkmVariantIndex } from '../../../data/hooks/use-pkm-variant-index';
 import { BoxType, type PkmVariantDTO } from '../../../data/sdk/model';
 import { useStorageCreateMainBox, useStorageDeleteMainBox, useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../../../error/with-error-catcher';
+import { HelpButton } from '../../../help/help-button';
 import { Route } from '../../../routes/storage';
 import { useTranslate } from '../../../translate/i18n';
 import { Icon } from '../../../ui/icon/icon';
@@ -15,10 +16,10 @@ import { StorageMoveContext } from '../../actions/storage-move-context';
 import { DexSyncAdvancedAction } from '../../advanced-actions/dex-sync-advanced-action';
 import { SortAdvancedAction } from '../../advanced-actions/sort-advanced-action';
 import { BankContext } from '../../bank/bank-context';
+import { StorageMainItem } from '../../item/main/storage-main-item';
 import { StorageBoxEdit } from '../storage-box-edit';
 import { StorageBoxList } from '../storage-box-list';
 import { StorageHeader } from '../storage-header';
-import { StorageMainItem } from '../../item/main/storage-main-item';
 
 export const StorageMainBoxContent: React.FC<{
     boxId: number;
@@ -195,6 +196,7 @@ export const StorageMainBoxContent: React.FC<{
                                             },
                                         }))
                                 }
+                                help={<HelpButton slug='3-storage.md#banks-and-boxes' />}
                             />
                         )}
                     </>

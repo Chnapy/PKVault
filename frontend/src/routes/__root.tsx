@@ -1,11 +1,15 @@
 import { css } from '@emotion/css';
 import { createRootRoute, Outlet, useMatchRoute } from "@tanstack/react-router";
+import { fallback, zodValidator } from '@tanstack/zod-adapter';
 import React from "react";
+import z from 'zod';
 import { HistoryContext } from '../context/history-context';
 import { useSaveInfosScan } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { useStorageGetActions } from '../data/sdk/storage/storage.gen';
 import { ErrorCatcher } from '../error/error-catcher';
+import { HelpDialog } from '../help/help-dialog';
+import type { DocsGenEnSlugs } from '../help/hooks/use-help-navigate';
 import { NotificationButton } from '../notification/notification-button';
 import { useTranslate } from '../translate/i18n';
 import { Button } from '../ui/button/button';
@@ -72,18 +76,32 @@ const Root: React.FC = () => {
               {t('header.scan-saves')}
             </ButtonWithDisabledPopover>
 
-            <HeaderItem
-              selected={Boolean(
-                matchRoute({ to: "/settings" }) ||
-                matchRoute({ to: "/settings", pending: true })
-              )}
-              to={"/settings"}
-              endPosition
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginLeft: 'auto'
+              }}
             >
-              {t('header.settings')}
-            </HeaderItem>
+              <HeaderItem
+                search={{ help: 'README.md' satisfies DocsGenEnSlugs }}
+              >
+                <Icon name="info-circle" forButton />
+                {t('header.help')}
+              </HeaderItem>
 
-            <NotificationButton />
+              <HeaderItem
+                selected={Boolean(
+                  matchRoute({ to: "/settings" }) ||
+                  matchRoute({ to: "/settings", pending: true })
+                )}
+                to={"/settings"}
+              >
+                {t('header.settings')}
+              </HeaderItem>
+
+              <NotificationButton />
+            </div>
           </Header>
 
           <div
@@ -101,12 +119,20 @@ const Root: React.FC = () => {
               <Outlet />
             </ErrorCatcher>
           </div>
+
+          <HelpDialog />
         </ErrorCatcher>
       </Frame>
     </HistoryContext.Provider>
   );
 };
 
+const searchSchema = z.object({
+  // /docs/{lang}/file.md#section
+  help: z.string().optional(),
+});
+
 export const Route = createRootRoute({
   component: Root,
+  validateSearch: zodValidator(fallback(searchSchema, {})),
 });

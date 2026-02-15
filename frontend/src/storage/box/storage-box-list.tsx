@@ -17,7 +17,8 @@ export const StorageBoxList: React.FC<{
     editPanelContent?: (boxId: string, close: () => void) => React.ReactNode;
     deleteFn?: (boxId: string) => Promise<unknown>;
     addFn?: () => Promise<unknown>;
-}> = ({ selectedBoxes, boxes, pkms, onBoxChange, editPanelContent, deleteFn, addFn }) => {
+    help?: React.ReactNode;
+}> = ({ selectedBoxes, boxes, pkms, onBoxChange, editPanelContent, deleteFn, addFn, help }) => {
     const maxBoxSlotCount = Math.max(0, ...boxes.map(box => box.slotCount));
     const nbrItemsPerLine = SizingUtil.getItemsPerLine(maxBoxSlotCount);
 
@@ -148,12 +149,23 @@ export const StorageBoxList: React.FC<{
                     className={css({
                         width: 72,
                         minHeight: 78,
-                        order: 999,
+                        order: 998,
                     })}
                 >
                     <Icon name='plus' solid forButton />
                 </Button>
             )}
+
+            {help && <div
+                className={css({
+                    minHeight: 78,
+                    order: 999,
+                    display: 'flex',
+                    alignItems: 'center',
+                })}
+            >
+                {help}
+            </div>}
         </div>
     );
 };
