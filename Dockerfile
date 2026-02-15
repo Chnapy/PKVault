@@ -51,7 +51,6 @@ FROM node:22-alpine AS frontend-builder
 WORKDIR /app
 
 COPY frontend/package.json frontend/package-lock.json ./
-COPY --from=swagger-extractor /swagger.json ./
 
 RUN npm ci
 
@@ -59,11 +58,19 @@ COPY frontend .
 
 RUN npm run gen:routes
 
+COPY --from=swagger-extractor /swagger.json ./
+
 # generate SDK
 ARG VITE_OPENAPI_PATH=swagger.json
 ENV VITE_OPENAPI_PATH=$VITE_OPENAPI_PATH
 
 RUN npm run gen:sdk:basic
+
+COPY ./docs/functional ./_docs
+
+ENV DOCS_PATH=./_docs
+
+RUN npm run gen:docs
 
 # frontend check
 FROM frontend-builder AS frontend-check

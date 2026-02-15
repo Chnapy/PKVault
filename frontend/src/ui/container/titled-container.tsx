@@ -45,7 +45,7 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
                 : theme.text.default,
             scrollbarColor: contrasted
                 ? `${theme.bg.contrastdark} ${theme.bg.contrast}`
-                : undefined,
+                : 'initial',
             display: 'flex',
             flexDirection: 'column',
         }), containerProps.className)}

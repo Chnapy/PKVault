@@ -9,6 +9,7 @@ import { theme } from '../../ui/theme';
 import { useActionDescription } from './hooks/use-action-description';
 import { DataActionType } from '../../data/sdk/model';
 import { css } from '@emotion/css';
+import { HelpButton } from '../../help/help-button';
 
 /**
  * Display current session actions, and save button.
@@ -103,11 +104,13 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
             })}>
                 <div className={css({
                     display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'center',
                     gap: 4
                 })}>
-                    <Icon name='info-circle' solid forButton />
                     {t('storage.save-actions.help')}
+
+                    <HelpButton slug='2-session.md' />
                 </div>
 
                 <table>

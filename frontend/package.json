@@ -10,7 +10,8 @@
     "c:lint": "eslint .",
     "gen:routes": "tsr generate",
     "gen:sdk": "rm -rf src/data/sdk* && cross-env VITE_OPENAPI_PATH=http://localhost:5000/swagger/v1/swagger.json npm run gen:sdk:basic && prettier -w src/data/sdk*/**/*.ts",
-    "gen:sdk:basic": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 orval"
+    "gen:sdk:basic": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 orval",
+    "gen:docs": "node ./generate-docs.ts"
   },
   "dependencies": {
     "@emotion/css": "^11.13.5",
@@ -21,6 +22,7 @@
     "@tanstack/react-router-devtools": "^1.127.1",
     "@tanstack/zod-adapter": "^1.127.3",
     "@yornaath/batshit": "^0.14.0",
+    "github-slugger": "^2.0.0",
     "i18next": "^25.5.2",
     "js-convert-case": "^4.2.0",
     "normalize.css": "^8.0.1",
@@ -29,12 +31,16 @@
     "react-error-boundary": "^6.0.0",
     "react-hook-form": "^7.62.0",
     "react-i18next": "^16.0.0",
+    "react-markdown": "^10.1.0",
+    "rehype-raw": "^7.0.0",
+    "rehype-slug": "^6.0.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
     "@tanstack/router-cli": "^1.158.0",
     "@tanstack/router-plugin": "^1.127.1",
+    "@types/node": "^25.2.3",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react-swc": "^3.10.2",
