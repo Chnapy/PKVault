@@ -1,18 +1,15 @@
 import { css } from '@emotion/css';
 import type React from 'react';
 import { ButtonLink } from '../ui/button/button';
-import docsGen from './docs.gen';
-import { useTranslate } from '../translate/i18n';
+import { useHelpMenuItems } from './hooks/use-help-menu-items';
 
 type HelpDialogMenuProps = {
     finalSelectedPath: string;
 };
 
 export const HelpDialogMenu: React.FC<HelpDialogMenuProps> = ({ finalSelectedPath }) => {
-    const lang = useTranslate().i18n.language;
 
-    const menu = docsGen
-        .filter(item => item.language === lang);
+    const { menuItems } = useHelpMenuItems();
 
     return <div
         className={css({
@@ -21,7 +18,7 @@ export const HelpDialogMenu: React.FC<HelpDialogMenuProps> = ({ finalSelectedPat
             gap: 4,
         })}
     >
-        {menu.map(menuItem => {
+        {menuItems.map(menuItem => {
             const selected = menuItem.path === finalSelectedPath;
 
             return <ButtonLink

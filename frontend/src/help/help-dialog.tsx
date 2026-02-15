@@ -6,27 +6,26 @@ import { useTranslate } from '../translate/i18n';
 import { ButtonLike } from '../ui/button/button-like';
 import { TitledContainer } from '../ui/container/titled-container';
 import { Icon } from '../ui/icon/icon';
-import docsGen from './docs.gen';
 import { HelpDialogContent } from './help-dialog-content';
 import { HelpDialogMenu } from './help-dialog-menu';
+import { useHelpMenuItems } from './hooks/use-help-menu-items';
 import { useHelpNavigate } from './hooks/use-help-navigate';
 
 export const HelpDialog: React.FC = () => {
-    const { t, i18n } = useTranslate();
-    const lang = i18n.language;
+    const { t } = useTranslate();
 
     const helpPath = Route.useSearch({ select: search => search.help ?? '' });
     const helpNavigate = useHelpNavigate();
 
     const [ helpHash, helpAnchor ] = helpPath.split('#');
 
-    const menu = docsGen
-        .filter(item => item.language === lang);
-    const menuItem = menu.find(item => item.endPath === helpHash) ?? menu[ 0 ];
+    const { language, menuItems } = useHelpMenuItems();
 
-    const selectedEndPath = menuItem?.endPath;
+    const menuItem = menuItems.find(item => item.endPath === helpHash) ?? menuItems[ 0 ]!;
 
-    const finalSelectedPath = `/docs/${lang}/${selectedEndPath}`;
+    const selectedEndPath = menuItem.endPath;
+
+    const finalSelectedPath = `/docs/${language}/${selectedEndPath}`;
 
     const onClose = () => helpNavigate(undefined);
 
@@ -118,12 +117,12 @@ export const HelpDialog: React.FC = () => {
                                 })}
                                 title={null}
                             >
-                                {selectedEndPath && <HelpDialogContent
+                                <HelpDialogContent
                                     selectedEndPath={selectedEndPath}
                                     finalSelectedPath={finalSelectedPath}
                                     anchor={helpAnchor}
-                                    slugs={menuItem && [ ...menuItem.slugs ]}
-                                />}
+                                    slugs={[ ...menuItem.slugs ]}
+                                />
                             </TitledContainer>
                         </div>
                     </TitledContainer>
