@@ -8,7 +8,9 @@ if (!process.env.VITE_SERVER_URL) {
   throw new Error("VITE_SERVER_URL env variable not defined");
 }
 
-prepareDocs();
+if (process.env.NODE_ENV === 'development') {
+  prepareDocs('../docs/functional');
+}
 
 // https://vite.dev/config/
 export default defineConfig({

@@ -16,14 +16,14 @@ const slugger = new GithubSlugger();
 /**
  * Prepare static functional documentation for consumption in frontend
  */
-export const prepareDocs = () => {
+export const prepareDocs = (sourcePath: string) => {
     const paths = {
-        sourceDocs: '../docs/functional',
+        sourceDocs: sourcePath,
         targetDocs: './public/docs',
         indexFile: `./src/help/docs.gen.ts`
     };
 
-    fs.rmSync(paths.targetDocs, { recursive: true });
+    fs.rmSync(paths.targetDocs, { recursive: true, force: true });
     fs.cpSync(paths.sourceDocs, paths.targetDocs, { recursive: true });
 
     const menu = fs.readdirSync(paths.targetDocs, 'utf8')
