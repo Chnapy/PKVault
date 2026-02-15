@@ -70,13 +70,22 @@ public partial class PokeApiFileClient(IFileIOService fileIOService)
             .Split('/').ToList()
             .FindAll(part => part.Length > 0);
 
-        List<string> fileParts = [
-            "..", "pokeapi", "api-data","data",
-            ..uriParts,
-            "index.json"
-        ];
+        var pokeapiDataDirPath = Path.Combine("..", "pokeapi", "api-data", "data");
+        if (!Directory.Exists(pokeapiDataDirPath))
+        {
+            throw new Exception($"{pokeapiDataDirPath} doesn't exist. Did you pull pokeapi submodules ?");
+        }
 
-        return await fileIOService.ReadJSONFile(string.Join('/', fileParts), jsonContext);
+        var path = Path.Combine(pokeapiDataDirPath, string.Join('/', uriParts), "index.json");
+
+        var result = await fileIOService.ReadJSONFile(path, jsonContext);
+
+        if (result == null && fileIOService.Exists(path))
+        {
+            throw new Exception($"Json reading error, data structure may have changed - PATH={path}");
+        }
+
+        return result;
     }
 
     public string GetApiEndpointString(

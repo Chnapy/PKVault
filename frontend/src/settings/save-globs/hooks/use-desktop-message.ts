@@ -1,3 +1,4 @@
+import z from 'zod';
 
 type FileExploreRequest = {
     type: 'file-explore';
@@ -17,14 +18,8 @@ type FileExploreResponse = {
 
 type OpenFolderRequest = {
     type: 'open-folder';
-    id: string;
     path: string;
     isDirectory: boolean;
-};
-
-type OpenFolderResponse = {
-    type: 'open-folder';
-    id: string;
 };
 
 type StartFinishRequest = {
@@ -32,27 +27,54 @@ type StartFinishRequest = {
     hasError: boolean;
 };
 
-type Response = FileExploreResponse | OpenFolderResponse;
+type Response = | FileExploreResponse;
 
 declare global {
-    interface Window {
-        chrome?: {
-            webview: {
-                postMessage: (message: unknown) => void;
-            };
-        };
+    interface External {
+        sendMessage?: (message: string) => void;
+        receiveMessage?: (callback: (data: string) => void) => void;
     }
 }
 
-export const isDesktop = window.chrome?.webview !== undefined;
+export const isDesktop = window.external.sendMessage !== undefined;
 
-const desktopMessageType = 'desktop-message';
+const desktopResponseSchema = z.object({
+    detail: z.object({
+        type: z.string()
+    })
+});
 
-const isDesktopMessageResponse = (event: Event): event is CustomEvent<Response> => event.type === desktopMessageType;
+const isDesktopMessageResponse = (data: unknown): data is { detail: Response } => desktopResponseSchema.safeParse(data).success;
 
-const requestDesktop = (request: { type: string }) => {
-    window.chrome?.webview.postMessage(request);
-};
+const requestDesktop = <R extends Response>(request: { type: string; id?: string | number; }) => new Promise<R>(resolve => {
+    let resolved = false;
+
+    console.log('send to desktop:', request);
+
+    window.external.sendMessage?.(JSON.stringify(request));
+
+    if (request.id !== undefined) {
+        window.external.receiveMessage?.(message => {
+            if (resolved) {
+                return;
+            }
+
+            console.log('received from desktop:', message);
+
+            const data = JSON.parse(message);
+
+            if (!isDesktopMessageResponse(data) || data.detail.type !== request.type || data.detail.id !== request.id) {
+                return;
+            }
+
+            resolved = true;
+
+            resolve(data.detail as R);
+        });
+    } else {
+        resolve(undefined as never);
+    }
+});
 
 /**
  * Gives desktop actions only in desktop context.
@@ -64,44 +86,14 @@ export const useDesktopMessage = () => {
     }
 
     return {
-        fileExplore: (request: FileExploreRequest) => new Promise<FileExploreResponse>(resolve => {
-            const eventListener: EventListenerOrEventListenerObject = (event) => {
-                console.log('Event from parent:', event);
-                if (!isDesktopMessageResponse(event) || event.detail.type !== 'file-explore' || event.detail.id !== request.id) {
-                    return;
-                }
+        fileExplore: (request: FileExploreRequest) => requestDesktop<FileExploreResponse>(request),
 
-                window.removeEventListener(desktopMessageType, eventListener);
+        openFile: (request: OpenFolderRequest) => requestDesktop<never>(request),
 
-                resolve(event.detail);
-            };
+        startLoadingFinished: (hasError: boolean) => requestDesktop<never>({
+            type: 'start-finish',
+            hasError,
+        } as StartFinishRequest),
 
-            window.addEventListener(desktopMessageType, eventListener);
-
-            requestDesktop(request);
-        }),
-        openFile: (request: OpenFolderRequest) => new Promise<OpenFolderResponse>(resolve => {
-            const eventListener: EventListenerOrEventListenerObject = (event) => {
-                console.log('Event from parent:', event);
-                if (!isDesktopMessageResponse(event) || event.detail.type !== 'open-folder' || event.detail.id !== request.id) {
-                    return;
-                }
-
-                window.removeEventListener(desktopMessageType, eventListener);
-
-                resolve(event.detail);
-            };
-
-            window.addEventListener(desktopMessageType, eventListener);
-
-            requestDesktop(request);
-        }),
-        startLoadingFinished: (hasError: boolean) => {
-            const request: StartFinishRequest = {
-                type: 'start-finish',
-                hasError,
-            };
-            requestDesktop(request);
-        },
     };
 };

@@ -96,7 +96,6 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
             ? () =>
                 desktopMessage.openFile({
                     type: 'open-folder',
-                    id: pkmVariant.id,
                     isDirectory: false,
                     path: pkmVariant.filepath,
                 })

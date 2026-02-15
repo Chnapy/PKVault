@@ -51,7 +51,6 @@ export const SaveItemContent: React.FC<SaveItemContentProps> = withErrorCatcher(
         {desktopMessage
           ? <Button onClick={() => desktopMessage.openFile({
             type: 'open-folder',
-            id: save.id.toString(),
             isDirectory: false,
             path: save.path
           })}>

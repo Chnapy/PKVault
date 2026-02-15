@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 public interface ISavesLoadersService
 {
     public List<SaveLoadersRecord> GetAllLoaders();
-    public SaveLoadersRecord GetLoaders(uint saveId);
+    public SaveLoadersRecord? GetLoaders(uint saveId);
     public Task Setup();
     public void SetFlags(DataUpdateFlags flags);
     public void Clear();
@@ -19,11 +19,11 @@ public class SavesLoadersService(
 
     public List<SaveLoadersRecord> GetAllLoaders() => [.. Loaders.Values];
 
-    public SaveLoadersRecord GetLoaders(uint saveId)
+    public SaveLoadersRecord? GetLoaders(uint saveId)
     {
         if (!Loaders.TryGetValue(saveId, out var loaders))
         {
-            throw new ArgumentException();
+            return null;
         }
         return loaders;
     }

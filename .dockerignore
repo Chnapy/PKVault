@@ -5,8 +5,8 @@
 .vscode
 **/.DS_Store
 **/node_modules
-**/bin
-**/obj
+**/PKVault.*/bin
+**/PKVault.*/obj
 **/dist
 **/tmp
 **/.angular
@@ -16,5 +16,3 @@ coverage/
 .env.local
 *.log
 swagger.json
-
-**/config

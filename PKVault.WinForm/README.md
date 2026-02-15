@@ -1,5 +1,7 @@
 # PKVault.WinForm
 
+> Obsolete, replaced by PKVault.Desktop
+
 This desktop app is just a view to backend & frontend.
 It runs backend process & display frontend in window.
 

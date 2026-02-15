@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 public interface ISettingsService
 {
@@ -11,7 +12,7 @@ public interface ISettingsService
  */
 public class SettingsService(IServiceProvider sp) : ISettingsService
 {
-    public static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "./config/pkvault.json");
+    public static readonly string FilePath = MatcherUtil.NormalizePath(Path.Combine(GetAppDirectory(), "./config/pkvault.json"));
     public static readonly string DefaultLanguage = "en";
     public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr", "de"]; //GameLanguage.AllSupportedLanguages.ToArray();
 
@@ -52,6 +53,25 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         };
     }
 
+    public static string GetAppDirectory()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            return (
+                // expected in flatpak context
+                Environment.GetEnvironmentVariable("XDG_DATA_HOME")
+                // expected in all other linux contexts
+                ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) ?? "~/", "pkvault")
+            );
+        }
+
+        var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+        var exeDirectory = exePath != null ? Path.GetDirectoryName(exePath) : null;
+
+        return exeDirectory
+            ?? AppDomain.CurrentDomain.BaseDirectory;
+    }
+
     public static (Guid BuildID, string Version) GetBuildInfo()
     {
         var assembly = Assembly.GetExecutingAssembly();
@@ -75,7 +95,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             BuildID,
             Version,
             PkhexVersion: Assembly.GetAssembly(typeof(PKHeX.Core.PKM))?.GetName().Version?.ToString(3) ?? "",
-            AppDirectory: MatcherUtil.NormalizePath(AppDomain.CurrentDomain.BaseDirectory),
+            AppDirectory: MatcherUtil.NormalizePath(GetAppDirectory()),
             SettingsPath: FilePath,
             CanUpdateSettings: false,
             CanScanSaves: false,

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=PKVault
+Comment=PKVault is a Pokemon storage and save manipulation tool based on PKHeX.
+Exec=PKVault
+Icon=org.chnapy.pkvault
+Terminal=false
+Categories=Utility;
+StartupNotify=true
+

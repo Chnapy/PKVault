@@ -49,7 +49,7 @@ public class MatcherUtil
 
         var relativeMatcher = new Matcher();
         relativeGlobs.ToList().ForEach(glob => relativeMatcher.AddInclude(glob));
-        var relativeMatches = relativeMatcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(".")));
+        var relativeMatches = relativeMatcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(SettingsService.GetAppDirectory())));
         var relativeResults = relativeMatches.Files.Select(file => Path.Combine(".", file.Path));
 
         string[] results = [.. absoluteResults, .. driveResults, .. relativeResults, .. networkGlobs];
@@ -57,5 +57,8 @@ public class MatcherUtil
         return [.. results.Select(NormalizePath)];
     }
 
-    public static string NormalizePath(string path) => path.Replace('\\', '/').Replace("//", @"\\");
+    public static string NormalizePath(string path) => path
+        .Replace('\\', '/')
+        .Replace("//", @"\\")
+        .Replace("/./", "/");
 }

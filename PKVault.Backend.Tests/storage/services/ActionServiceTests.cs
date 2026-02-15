@@ -26,7 +26,8 @@ public class ActionServiceTests
         DataNormalizeAction.GetLegacyFilepaths("legacy")
             .ForEach(legacyPath => mockFileSystem.AddFile(legacyPath, "mock-legacy-data"));
 
-        mockSessionService.Setup(x => x.MainDbPath).Returns("mock-main.db");
+        mockSessionService.Setup(x => x.MainDbPath).Returns(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-main.db"));
+        mockSessionService.Setup(x => x.MainDbRelativePath).Returns("mock-main.db");
         if (throwOnSessionPersist)
         {
             mockSessionService.Setup(x => x.PersistSession(It.IsAny<IServiceScope>())).ThrowsAsync(new Exception());
@@ -93,7 +94,7 @@ public class ActionServiceTests
         var flags = await actionService.Save();
 
         Assert.True(mockFileSystem.FileExists(
-                Path.Combine("mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip")
+                Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip")
             ),
             $"File is missing, list of current files:\n{string.Join('\n', mockFileSystem.AllFiles)}");
     }
@@ -118,14 +119,14 @@ public class ActionServiceTests
 
         await Assert.ThrowsAnyAsync<Exception>(actionService.Save);
 
-        Assert.True(mockFileSystem.FileExists(Path.Combine("mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip")));
+        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip")));
 
         Assert.True(mockFileSystem.FileExists("mock-main.db"));
 
         DataNormalizeAction.GetLegacyFilepaths("legacy")
             .ForEach(legacyPath => Assert.True(mockFileSystem.FileExists(legacyPath)));
 
-        Assert.True(mockFileSystem.FileExists("mock-save-path"));
+        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-save-path")), string.Join('\n', mockFileSystem.AllFiles));
         Assert.True(mockFileSystem.FileExists(Path.Combine("mock-pkm-files", "123")));
     }
 

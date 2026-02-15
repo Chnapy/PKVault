@@ -35,7 +35,7 @@ public class DataNormalizeAction(
         }
 
         var settings = settingsService.GetSettings();
-        var dbPath = settings.SettingsMutable.DB_PATH;
+        var dbPath = settings.GetDbPath();
 
         var hasLegacy = GetLegacyFilepaths(dbPath).Any(fileIOService.Exists);
         if (hasLegacy)
@@ -98,8 +98,8 @@ public class DataNormalizeAction(
         }
 
         var settings = settingsService.GetSettings();
-        var dbPath = settings.SettingsMutable.DB_PATH;
-        var storagePath = settings.SettingsMutable.STORAGE_PATH;
+        var dbPath = settings.GetDbPath();
+        var storagePath = settings.GetStoragePath();
         var languageId = settings.GetSafeLanguageID();
 
         var hasLegacy = GetLegacyFilepaths(dbPath).Any(fileIOService.Exists);

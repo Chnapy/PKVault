@@ -12,6 +12,7 @@ env:
 
 jobs:
   version:
+    name: Extract & check version
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get-version.outputs.version }}
@@ -50,6 +51,7 @@ jobs:
           echo "major_minor=$MAJOR_MINOR" >> $GITHUB_OUTPUT
 
   docker:
+    name: Build & push monolith Docker image
     needs: version
     strategy:
       fail-fast: false
@@ -82,7 +84,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push multi-arch image
+      - name: Build and push monolith image
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -103,6 +105,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   release:
+    name: Create GitHub release
     needs: [version, docker]
     runs-on: ubuntu-latest
 
@@ -114,16 +117,39 @@ jobs:
           echo "TAG=${{ needs.version.outputs.tag }}" >> $GITHUB_ENV
           echo "VERSION=${{ needs.version.outputs.version }}" >> $GITHUB_ENV
 
-      - name: Build WinForm exe
-        env:
-          TAG: ${{ env.TAG }}
+      - name: Build Win64 desktop image & extract executable
         run: |
-          docker build . --target winform-publish -t tmp-winform
-          docker create --name tmp-winform tmp-winform
-          docker cp tmp-winform:/app/publish/PKVault.exe PKVault.exe
-          docker rm tmp-winform
-          docker rmi tmp-winform
-          ls -la PKVault.exe
+          docker build . --target desktop --build-arg RID=win-x64 --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-win64
+          docker create --name tmp-desktop-win64 tmp-desktop-win64
+
+          docker cp tmp-desktop-win64:/app/PKVault.exe PKVault-${{ env.VERSION }}.exe
+
+          docker rm tmp-desktop-win64
+          docker rmi tmp-desktop-win64
+
+          ls -la .
+
+      - name: Build Linux64 desktop image & extract executable
+        run: |
+          docker build . --target desktop-linux --build-arg RID=linux-x64 --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-linux64
+          docker create --name tmp-desktop-linux64 tmp-desktop-linux64
+
+          docker cp tmp-desktop-linux64:/app/PKVault pkvault-${{ env.VERSION }}
+          chmod +x pkvault-${{ env.VERSION }}
+
+          docker cp tmp-desktop-linux64:/app/PKVault.AppImage pkvault-${{ env.VERSION }}.AppImage
+          chmod +x pkvault-${{ env.VERSION }}.AppImage
+
+          docker cp tmp-desktop-linux64:/app/PKVault.deb pkvault-${{ env.VERSION }}.deb
+          chmod +x pkvault-${{ env.VERSION }}.deb
+
+          docker cp tmp-desktop-linux64:/app/PKVault.flatpak pkvault-${{ env.VERSION }}.flatpak
+          chmod +x pkvault-${{ env.VERSION }}.flatpak
+
+          docker rm tmp-desktop-linux64
+          docker rmi tmp-desktop-linux64
+
+          ls -la .
 
       - name: Create tag
         env:
@@ -139,4 +165,8 @@ jobs:
           name: v${{ env.VERSION }}
           generate_release_notes: true
           files: |
-            PKVault.exe
+            PKVault-${{ env.VERSION }}.exe
+            pkvault-${{ env.VERSION }}
+            pkvault-${{ env.VERSION }}.AppImage
+            pkvault-${{ env.VERSION }}.flatpak
+            pkvault-${{ env.VERSION }}.deb

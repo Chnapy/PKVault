@@ -2,14 +2,23 @@
 
 PKVault fonctionne sur Windows pour sa version desktop. Une version dédiée Linux/Steamdeck est prévue.
 
-A l'instar de PKHeX, PKVault dépend de .NET 10 pour fonctionner. L'application étant basée sur des technologies web, PKVault dépend également de WebView.
+A l'instar de PKHeX, PKVault dépend de .NET 10 pour fonctionner. L'application étant multi-plateforme et basée sur des technologies web, PKVault dépend également de controles web dépendant de l'OS utilisé:
+
+- WebView2 pour Windows,
+- WebKitGTK+2 pour Linux,
+- WKWebView pour Mac
 
 Pour le moment l'interface est conçue pour une utilisation sur grand écran et clavier/souris uniquement.
 
 ## Fichiers manipulés
 
-De base PKVault manipule ses propres fichiers et dossiers, à son niveau.
+Sur Windows, PKVault manipule ses propres fichiers et dossiers, à son niveau.
 Il est d'ailleurs recommandé de placer l'executable PKVault.exe dans un dossier dédié.
+
+Sur Linux, le dossier utilisé est l'un d'eux:
+
+- `/home/$USER/Documents/pkvault`
+- `/home/$USER/.var/app/org.chnapy.pkvault/data` - pour le fichier flatpak
 
 Vous trouverez les fichiers suivant:
 
@@ -18,6 +27,5 @@ Vous trouverez les fichiers suivant:
 - `db/` - Dossier pour les données PKVault
 - `backup/` - Dossier pour les backups (format `.zip` standard)
 - `logs/` - Dossier pour les logs, utiles pour le débugguage
-- `PKVault.exe.WebView2/` - Dossier généré pour WebView
 
 Au delà de ces fichiers, les sauvegardes que vous renseignez seront également manipulées.

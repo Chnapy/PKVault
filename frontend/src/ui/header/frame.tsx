@@ -7,11 +7,23 @@ export const Frame: React.FC<React.PropsWithChildren> = ({ children }) => {
     return <div
         data-move-root
         className={css({
+            // scrollbar depends on browser
+            '--scrollbar-width': 10,
+            '--scrollbar-width-px': 'calc(var(--scrollbar-width) * 1px)',
+
+            '@supports (-moz-appearance:none)': {
+                '&': {
+                    '--scrollbar-width': 8,
+                }
+            },
+
             position: 'relative',
             height: "100vh",
             overflow: 'scroll',
             scrollbarColor: `${theme.bg.contrastdark} ${theme.bg.contrast}`,
-            border: `10px solid ${theme.bg.contrast}`,
+            borderWidth: 'var(--scrollbar-width-px)',
+            borderStyle: 'solid',
+            borderColor: theme.bg.contrast,
             borderRight: 'none',
             borderBottom: 'none',
             backgroundColor: theme.bg.app,
@@ -21,10 +33,10 @@ export const Frame: React.FC<React.PropsWithChildren> = ({ children }) => {
             '&::before': {
                 content: '""',
                 position: 'fixed',
-                top: 10,
-                bottom: 10,
-                left: 10,
-                right: 10,
+                top: 'var(--scrollbar-width-px)',
+                bottom: 'var(--scrollbar-width-px)',
+                left: 'var(--scrollbar-width-px)',
+                right: 'var(--scrollbar-width-px)',
                 border: `2px solid rgba(0, 0, 0, 0.2)`,
                 zIndex: 10,
                 pointerEvents: 'none',

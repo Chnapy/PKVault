@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7-labs
+
 # backend builder
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend-builder
 
@@ -78,25 +80,104 @@ FROM frontend-builder AS frontend-publish
 ARG VITE_SERVER_URL=http://localhost:3000
 RUN VITE_SERVER_URL=$VITE_SERVER_URL npm run build
 
-# winform builder
-FROM backend-builder AS winform-builder
+# desktop builder
+FROM backend-builder AS desktop-builder
 
 WORKDIR /src
 
-COPY ["PKVault.WinForm/PKVault.WinForm.csproj", "PKVault.WinForm/"]
+COPY ["PKVault.Desktop/PKVault.Desktop.csproj", "PKVault.Desktop/"]
 
-RUN dotnet restore "PKVault.WinForm/PKVault.WinForm.csproj"
+RUN dotnet restore "PKVault.Desktop/PKVault.Desktop.csproj"
 
-COPY ./PKVault.WinForm ./PKVault.WinForm
-COPY --from=frontend-publish /app/dist ./PKVault.WinForm/wwwroot
+COPY --exclude=publishers ./PKVault.Desktop ./PKVault.Desktop
+COPY --from=frontend-publish /app/dist ./PKVault.Desktop/Resources/wwwroot
 
-RUN dotnet build "PKVault.WinForm/PKVault.WinForm.csproj"
+RUN dotnet build "PKVault.Desktop/PKVault.Desktop.csproj"
 
-# winform publish
-FROM winform-builder AS winform-publish
-RUN dotnet publish "PKVault.WinForm/PKVault.WinForm.csproj" -c Release -o /app/publish
+# desktop publish
+FROM desktop-builder AS desktop-publish
+
+ARG RID
+ENV RID=${RID:-linux-x64}
+
+RUN dotnet publish "PKVault.Desktop/PKVault.Desktop.csproj" -c Release -o /app/publish -r ${RID}
 
 RUN ls -la /app/publish
+
+RUN if [ "$(echo $RID | grep -o 'win-x64')" ]; then \
+  cp -r /app/publish /app/publish-final && \
+  echo "=== Skip AppImage (non-linux-x64: $RID) ==="; \
+  fi
+
+FROM desktop-publish AS desktop-publish-linux-base
+
+COPY ./PKVault.Desktop/publishers/common ./PKVault.Desktop/publishers/common
+
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends \
+  wget binutils file \
+  lintian \
+  flatpak flatpak-builder ostree && \
+  apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+
+RUN mkdir -p /app/publish-final
+
+# desktop linux - AppImage
+FROM desktop-publish-linux-base AS desktop-publish-linux-appimage
+
+ARG VERSION
+ENV VERSION=${VERSION}
+
+COPY ./PKVault.Desktop/publishers/AppImage ./PKVault.Desktop/publishers/AppImage
+
+WORKDIR /src/PKVault.Desktop/publishers/AppImage
+
+RUN chmod +x build-appimage.sh && \
+  sh build-appimage.sh
+
+# desktop linux - deb  
+FROM desktop-publish-linux-base AS desktop-publish-linux-deb
+
+ARG VERSION
+ENV VERSION=${VERSION}
+
+COPY ./PKVault.Desktop/publishers/deb ./PKVault.Desktop/publishers/deb
+
+WORKDIR /src/PKVault.Desktop/publishers/deb
+
+RUN chmod +x build-deb.sh && \
+  sh build-deb.sh
+
+# desktop linux - flatpak
+FROM desktop-publish-linux-base AS desktop-publish-linux-flatpak
+
+ARG VERSION
+ENV VERSION=${VERSION}
+
+COPY ./PKVault.Desktop/publishers/flatpak ./PKVault.Desktop/publishers/flatpak
+
+WORKDIR /src/PKVault.Desktop/publishers/flatpak
+
+RUN chmod +x build-flatpak-build.sh build-flatpak-install.sh && \
+  sh build-flatpak-install.sh && \
+  sh build-flatpak-build.sh
+
+FROM alpine:latest AS desktop
+
+COPY --from=desktop-publish /app/publish-final /app
+
+RUN ls -la /app
+
+FROM alpine:latest AS desktop-linux
+
+COPY --from=desktop-publish /app/publish/PKVault /tmp/raw/PKVault
+COPY --from=desktop-publish-linux-appimage /app/publish-final/ /tmp/appimage/
+COPY --from=desktop-publish-linux-deb /app/publish-final/ /tmp/deb/
+COPY --from=desktop-publish-linux-flatpak /app/publish-final/ /tmp/flatpak/
+
+RUN mkdir -p /app && \
+  cp /tmp/raw/* /tmp/appimage/* /tmp/deb/* /tmp/flatpak/* /app/ && \
+  ls -la /app/
 
 # monolith: backend & frontend
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS monolith
