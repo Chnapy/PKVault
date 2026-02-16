@@ -1,7 +1,7 @@
 [Application]
 name=org.chnapy.pkvault
-runtime=org.gnome.Platform/x86_64/49
-sdk=org.gnome.Sdk/x86_64/49
+runtime=org.gnome.Platform/x86_64/48
+sdk=org.gnome.Sdk/x86_64/48
 command=PKVault
 
 [Context]

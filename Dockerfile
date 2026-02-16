@@ -123,8 +123,7 @@ COPY ./PKVault.Desktop/publishers/common ./PKVault.Desktop/publishers/common
 RUN apt-get update && \
   apt-get install -y --no-install-recommends \
   wget binutils file \
-  lintian \
-  flatpak flatpak-builder ostree && \
+  lintian && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 RUN mkdir -p /app/publish-final
@@ -156,18 +155,20 @@ RUN chmod +x build-deb.sh && \
   sh build-deb.sh
 
 # desktop linux - flatpak
-FROM desktop-publish-linux-base AS desktop-publish-linux-flatpak
+FROM ghcr.io/flathub-infra/flatpak-github-actions:gnome-48 AS desktop-publish-linux-flatpak
+
+COPY ./PKVault.Desktop/publishers/flatpak .
+COPY ./PKVault.Desktop/publishers/common ../common
+COPY --from=desktop-publish /app/publish/PKVault /app/publish/PKVault
 
 ARG VERSION
 ENV VERSION=${VERSION}
 
-COPY ./PKVault.Desktop/publishers/flatpak ./PKVault.Desktop/publishers/flatpak
+ARG BUILD_DATE
+ENV BUILD_DATE=${BUILD_DATE}
 
-WORKDIR /src/PKVault.Desktop/publishers/flatpak
-
-RUN chmod +x build-flatpak-build.sh build-flatpak-install.sh && \
-  sh build-flatpak-install.sh && \
-  sh build-flatpak-build.sh
+RUN chmod +x build-flatpak.sh && \
+  sh build-flatpak.sh
 
 FROM alpine:latest AS desktop
 
