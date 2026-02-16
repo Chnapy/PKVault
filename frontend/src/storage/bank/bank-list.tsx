@@ -56,8 +56,9 @@ export const BankList: React.FC = () => {
         </div>
 
         <div className={css({
+            display: 'flex',
+            alignItems: 'center',
             minWidth: 24,
-            marginTop: 16,
         })}>
             <HelpButton slug='3-storage.md#banks-and-boxes' />
         </div>
