@@ -26,8 +26,14 @@ mkdir -p /app/publish/pkvault.deb/usr/share/applications
 cp ./pkvault.desktop /app/publish/pkvault.deb/usr/share/applications/
 
 # all icon files
+mkdir -p /app/publish/pkvault.deb/usr/share/icons/hicolor/16x16/apps/
+cp ../common/icons/pkvault_16x16.png /app/publish/pkvault.deb/usr/share/icons/hicolor/16x16/apps/pkvault.png
+
 mkdir -p /app/publish/pkvault.deb/usr/share/icons/hicolor/32x32/apps/
 cp ../common/icons/pkvault_32x32.png /app/publish/pkvault.deb/usr/share/icons/hicolor/32x32/apps/pkvault.png
+
+mkdir -p /app/publish/pkvault.deb/usr/share/icons/hicolor/48x48/apps/
+cp ../common/icons/pkvault_48x48.png /app/publish/pkvault.deb/usr/share/icons/hicolor/48x48/apps/pkvault.png
 
 mkdir -p /app/publish/pkvault.deb/usr/share/icons/hicolor/64x64/apps/
 cp ../common/icons/pkvault_64x64.png /app/publish/pkvault.deb/usr/share/icons/hicolor/64x64/apps/pkvault.png

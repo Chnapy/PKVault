@@ -2,16 +2,74 @@
 <component type="desktop">
   <id>org.chnapy.pkvault</id>
   <metadata_license>CC0-1.0</metadata_license>
-  <project_license>GPLv3</project_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <launchable type="desktop-id">org.chnapy.pkvault.desktop</launchable>
+
   <name>PKVault</name>
-  <summary>PKVault is a Pokemon storage and save manipulation tool based on PKHeX.</summary>
+  <summary>Pokemon storage and save manipulation tool based on PKHeX</summary>
   <description>
-    <p>PKVault is a Pokemon storage and save manipulation tool based on PKHeX.</p>
+    <p>
+      PKVault is a Pokemon storage and save manipulation tool based on PKHeX, similar to Pokemon Home.
+      Edit your save files, manage your collection, transfer Pokémon between games and more.
+    </p>
   </description>
+
+  <categories>
+    <category>Utility</category>
+    <category>Game</category>
+  </categories>
+
+  <keywords>
+    <keyword>pokemon</keyword>
+    <keyword>pkhex</keyword>
+    <keyword>save</keyword>
+    <keyword>storage</keyword>
+    <keyword>editor</keyword>
+    <keyword>collection</keyword>
+  </keywords>
+
+  <icon type="stock">org.chnapy.pkvault</icon>
+
+  <screenshots>
+    <screenshot type="default" width="1398" height="1030">
+      <image width="1398" height="1030" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_1.png?raw=true</image>
+      <caption>Collection view</caption>
+    </screenshot>
+    <screenshot type="default" width="1398" height="1030">
+      <image width="1398" height="1030" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_2.png?raw=true</image>
+      <caption>Pokemon edit</caption>
+    </screenshot>
+    <screenshot type="default" width="1398" height="1030">
+      <image width="1398" height="1030" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_3.png?raw=true</image>
+      <caption>Pokedex</caption>
+    </screenshot>
+    <screenshot type="default" width="1398" height="1030">
+      <image width="1398" height="1030" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_4.png?raw=true</image>
+      <caption>Saves view</caption>
+    </screenshot>
+    <screenshot type="default" width="1398" height="1030">
+      <image width="1398" height="1030" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_5.png?raw=true</image>
+      <caption>Settings</caption>
+    </screenshot>
+  </screenshots>
+
+  <content_rating type="oars-1.1" />
+
+  <custom>
+    <value key="flatpak.permissions">["filesystem=home", "socket=x11", "device=dri"]</value>
+  </custom>
+
   <url type="homepage">https://github.com/Chnapy/PKVault</url>
-  <developer_name>Richard Haddad</developer_name>
+  <url type="bugtracker">https://github.com/Chnapy/PKVault/issues</url>
+  
+  <developer id="dev.chnapy">
+    <name>Richard Haddad</name>
+    <url>https://github.com/Chnapy</url>
+  </developer>
+
   <releases>
-    <release version="(VERSION)">
+    <!-- VERSION="x.x.x" DATE="yyyy-mm-dd" -->
+    <release version="(VERSION)" date="(DATE)">
     </release>
   </releases>
 </component>
