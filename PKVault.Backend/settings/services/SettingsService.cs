@@ -58,10 +58,16 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             return (
+                // expected in Docker monolith context
+                Environment.GetEnvironmentVariable("PKVAULT_PATH")
                 // expected in flatpak context
-                Environment.GetEnvironmentVariable("XDG_DATA_HOME")
+                ?? Environment.GetEnvironmentVariable("XDG_DATA_HOME")
                 // expected in all other linux contexts
-                ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) ?? "~/", "pkvault")
+                ?? Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                    ?? "~/",
+                    "pkvault"
+                )
             );
         }
 

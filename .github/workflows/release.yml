@@ -96,7 +96,6 @@ jobs:
           platforms: ${{ matrix.platform }}
           tags: ${{ env.REGISTRY_IMAGE }}
           build-args: |
-            VITE_SERVER_URL=http://localhost:3000
             VERSION=${{ env.VERSION }}
             VCS_REF=${{ env.VCS_REF }}
             BUILD_DATE=${{ env.BUILD_DATE }}

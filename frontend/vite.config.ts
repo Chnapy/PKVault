@@ -1,12 +1,7 @@
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react-swc";
-import fs from "node:fs";
 import { defineConfig } from "vite";
 import { prepareDocs } from './src/help/prepare-docs';
-
-if (!process.env.VITE_SERVER_URL) {
-  throw new Error("VITE_SERVER_URL env variable not defined");
-}
 
 if (process.env.NODE_ENV === 'development') {
   prepareDocs('../docs/functional');
@@ -24,11 +19,12 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     allowedHosts: true,
-    https: process.env.VITE_SERVER_URL.startsWith('https')
-      ? {
-        key: fs.readFileSync("../.devcontainer/.cert/localhost+2.key"),
-        cert: fs.readFileSync("../.devcontainer/.cert/localhost+2.crt"),
-      }
-      : undefined,
+    // TODO setup https if enabled
+    // https: process.env.USE_HTTPS
+    //   ? {
+    //     key: fs.readFileSync("../.devcontainer/.cert/localhost+2.key"),
+    //     cert: fs.readFileSync("../.devcontainer/.cert/localhost+2.crt"),
+    //   }
+    //   : undefined,
   },
 });

@@ -1,12 +1,6 @@
 import z from 'zod';
 
-const baseURLEnv: string | undefined = import.meta.env.VITE_SERVER_URL;
-
-if (!baseURLEnv) {
-    throw new Error("VITE_SERVER_URL env not defined");
-}
-
-const baseURL = new URL(window.location.href).searchParams.get('server') || baseURLEnv;
+const baseURL = new URL(window.location.href).searchParams.get('server') || window.location.origin;
 
 console.log('Server url =>', baseURL);
 

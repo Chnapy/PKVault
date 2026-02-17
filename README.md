@@ -66,20 +66,27 @@ You can use a plug'n'play docker image, compatible `Linux x86_64` and `Linux ARM
 ```yml
 services:
   pkvault:
-    image: ghcr.io/chnapy/pkvault:latest # or specific version, like 1.2.0
+    image: ghcr.io/chnapy/pkvault:latest # or specific version, like 1.5.1
     ports:
       - "3000:3000"
     volumes:
-      # Note: if you update settings paths, you should update them here too
-      - ./your-data/config:/app/backend/config
-      - ./your-data/db:/app/backend/db
-      - ./your-data/storage:/app/backend/storage
-      - ./your-data/backup:/app/backend/backup
-      - ./your-data/logs:/app/backend/logs
-      - ./your-data/saves:/app/backend/saves # saves can be somewhere else, no constraints
+      - ./your-data:/pkvault
+
+      # you must add in app settings save paths: /pkvault/saves/
+      - ./your-saves:/pkvault/saves
 ```
 
 Perfect for homelab context.
+
+Or using basic docker run:
+
+```
+docker run \
+  -p 3000:3000 \
+  -v ./your-data:/pkvault \
+  -v ./your-saves:/pkvault/saves \
+  ghcr.io/chnapy/pkvault:latest
+```
 
 ## [Functional documentation](./docs/functional/en/README.md)
 
