@@ -182,6 +182,7 @@ jobs:
         run: |
           echo "TAG=${{ needs.version.outputs.tag }}" >> $GITHUB_ENV
           echo "VERSION=${{ needs.version.outputs.version }}" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
 
       - name: Build Win64 desktop image & extract executable
         run: |
@@ -197,7 +198,7 @@ jobs:
 
       - name: Build Linux64 desktop image & extract executable
         run: |
-          docker build . --target desktop-linux --build-arg RID=linux-x64 --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-linux64
+          docker build . --target desktop-linux --build-arg RID=linux-x64 --build-arg VERSION=${{ env.VERSION }} --build-arg BUILD_DATE=${{ env.BUILD_DATE }} -t tmp-desktop-linux64
           docker create --name tmp-desktop-linux64 tmp-desktop-linux64
 
           docker cp tmp-desktop-linux64:/app/PKVault pkvault-${{ env.VERSION }}
