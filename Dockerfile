@@ -221,13 +221,15 @@ RUN mkdir -p /var/log/supervisord /var/log/nginx /var/run/nginx \
   && chown -R 755 /var/log/nginx /var/run/nginx \
   && chmod -R 755 /var/log/supervisord
 
+ENV PKVAULT_PATH=/pkvault
+
 COPY --from=backend-publish /app/publish /app/backend
 COPY --from=frontend-publish /app/dist /app/frontend
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-VOLUME [ "/app/backend/config", "/app/backend/db", "/app/backend/storage", "/app/backend/backup", "/app/backend/logs" ]
+VOLUME [ "/pkvault" ]
 
 EXPOSE 3000
 
