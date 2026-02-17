@@ -80,12 +80,10 @@ RUN npm run c:type
 # RUN npm run c:lint
 
 # frontend publish
-ARG VITE_SERVER_URL
 FROM frontend-builder AS frontend-publish
 
 # build
-ARG VITE_SERVER_URL=http://localhost:3000
-RUN VITE_SERVER_URL=$VITE_SERVER_URL npm run build
+RUN npm run build
 
 # desktop builder
 FROM backend-builder AS desktop-builder
@@ -228,9 +226,6 @@ COPY --from=frontend-publish /app/dist /app/frontend
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-ARG VITE_SERVER_URL=http://localhost:3000
-ENV VITE_SERVER_URL=$VITE_SERVER_URL
 
 VOLUME [ "/app/backend/config", "/app/backend/db", "/app/backend/storage", "/app/backend/backup", "/app/backend/logs" ]
 
