@@ -1,3 +1,4 @@
+import { css } from '@emotion/css';
 import React from 'react';
 import { usePkmLegality, usePkmLegalityMap } from '../../data/hooks/use-pkm-legality';
 import { usePkmVariantAttach } from '../../data/hooks/use-pkm-variant-attach';
@@ -9,12 +10,13 @@ import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-prop
 import { useDesktopMessage } from '../../settings/save-globs/hooks/use-desktop-message';
 import { useTranslate } from '../../translate/i18n';
 import { DetailsTab } from '../../ui/details-card/details-tab';
+import { Icon } from '../../ui/icon/icon';
 import { SaveCardContentSmall } from '../../ui/save-card/save-card-content-small';
 import { StorageDetailsBase } from '../../ui/storage-item-details/storage-details-base';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
-import { filterIsDefined } from '../../util/filter-is-defined';
+import { TextContainer } from '../../ui/text-container/text-container';
+import { theme } from '../../ui/theme';
 import { switchUtilRequired } from '../../util/switch-util';
-import { css } from '@emotion/css';
 
 export type StorageDetailsMainProps = {
     selectedId: string;
@@ -113,25 +115,63 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
             movesLegality={[]}
             {...pkmLegality}
             idBase={pkmVariant.id}
-            validityReport={[
-                filterIsDefined(pkmVariant.loadError) &&
-                t('details.load-error', {
-                    loadError: switchUtilRequired(pkmVariant.loadError, {
-                        [ PKMLoadError.UNKNOWN ]: t('details.load-error.0'),
-                        [ PKMLoadError.NOT_LOADED ]: t('details.load-error.0'),
-                        [ PKMLoadError.NOT_FOUND ]: t('details.load-error.1'),
-                        [ PKMLoadError.TOO_SMALL ]: t('details.load-error.2'),
-                        [ PKMLoadError.TOO_BIG ]: t('details.load-error.3'),
-                        [ PKMLoadError.UNAUTHORIZED ]: t('details.load-error.4'),
-                    }),
-                    filepath: pkmVariant.filepath,
-                }),
-                !pkmVariant.isEnabled && t('details.is-disabled'),
-                !getPkmVariantAttach(pkmVariant, pkmVariant.id).isAttachedValid && t('details.attached-pkm-not-found'),
-                pkmLegality?.validityReport,
-            ]
-                .filter(Boolean)
-                .join('\n---\n')}
+            reports={<>
+                {pkmVariant.loadError && !pkmVariant.isEnabled && <TextContainer
+                    bgColor={theme.bg.red}
+                    maxHeight={200}
+                    className={css({
+                        minHeight: '1lh',
+                        flexShrink: 0.1,
+                    })}
+                >
+                    {!pkmVariant.isEnabled && t('details.is-disabled')}
+                    <br />
+                    <br />
+                    {pkmVariant.loadError && t('details.load-error', {
+                        loadError: switchUtilRequired(pkmVariant.loadError, {
+                            [ PKMLoadError.UNKNOWN ]: t('details.load-error.0'),
+                            [ PKMLoadError.NOT_LOADED ]: t('details.load-error.0'),
+                            [ PKMLoadError.NOT_FOUND ]: t('details.load-error.1'),
+                            [ PKMLoadError.TOO_SMALL ]: t('details.load-error.2'),
+                            [ PKMLoadError.TOO_BIG ]: t('details.load-error.3'),
+                            [ PKMLoadError.UNAUTHORIZED ]: t('details.load-error.4'),
+                        }),
+                        filepath: pkmVariant.filepath,
+                    })}
+                </TextContainer>}
+
+                {pkmVariant.isEnabled && !getPkmVariantAttach(pkmVariant, pkmVariant.id).isAttachedValid && <TextContainer
+                    bgColor={theme.bg.yellow}
+                    maxHeight={200}
+                    className={css({
+                        minHeight: '1lh',
+                        flexShrink: 0.1,
+                    })}
+                >
+                    {t('details.attached-pkm-not-found.1')}
+                    <br />
+                    <br />
+                    {t('details.attached-pkm-not-found.2')}
+                </TextContainer>}
+
+                {pkmVariant.isEnabled && pkmLegality && !pkmLegality.isValid && pkmLegality.validityReport && <TextContainer
+                    bgColor={theme.bg.yellow}
+                    maxHeight={200}
+                    className={css({
+                        minHeight: '1lh',
+                        flexShrink: 0.1,
+                    })}
+                >
+                    <Icon name='exclamation-triangle' forButton />{' '}
+                    {t('details.legality.1')}
+                    <br />
+                    <br />
+                    {pkmLegality.validityReport}
+                    <br />
+                    <br />
+                    {t('details.legality.2')}
+                </TextContainer>}
+            </>}
             isShadow={false}
             onRelease={
                 pkmVariant.canDelete
