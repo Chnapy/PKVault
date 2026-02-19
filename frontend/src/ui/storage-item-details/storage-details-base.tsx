@@ -30,18 +30,19 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
     | 'heldItem' | 'canEdit' | 'isEnabled' | 'hasLoadError'
 >
-    & Pick<PkmLegalityDTO, 'isValid' | 'validityReport' | 'movesLegality'>
+    & Pick<PkmLegalityDTO, 'movesLegality'>
     & {
         filepath?: string;
         version: GameVersion | null;
         saveId?: number;
+        reports?: React.ReactNode;
         onRelease?: () => unknown;
         onSubmit: () => unknown;
         openFile?: () => unknown;
         extraContent?: React.ReactNode;
     };
 
-export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath, saveId, onRelease, onSubmit, openFile, extraContent, ...pkm }) => {
+export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath, saveId, reports, onRelease, onSubmit, openFile, extraContent, ...pkm }) => {
     const { t } = useTranslate();
 
     const formContext = StorageDetailsForm.useContext();
@@ -99,18 +100,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             types={pkm.types}
             eggHatchCount={pkm.eggHatchCount}
         />}
-        preContent={<>
-            {(!pkm.isEnabled || !pkm.isValid) && <TextContainer
-                bgColor={pkm.isEnabled ? theme.bg.yellow : theme.bg.red}
-                maxHeight={200}
-                className={css({
-                    minHeight: '1lh',
-                    flexShrink: 0.1,
-                })}
-            >
-                {pkm.validityReport}
-            </TextContainer>}
-        </>}
+        preContent={reports}
         content={pkm.isEnabled && <>
             {!!pkm.heldItem && <TextContainer>
                 {t('details.held-item')} <span className={css({ color: theme.text.primary })}>{staticData.items[ pkm.heldItem ]?.name}</span> <ItemImg
