@@ -11,7 +11,7 @@ type PkmVariantIndexes = {
 };
 
 const buildIndexes = (data: PkmVariantDTO[]) => {
-    console.time('Build PkmVariant indexes');
+    // console.time('Build PkmVariant indexes');
 
     const indexes: PkmVariantIndexes = {
         byId: {},
@@ -36,7 +36,7 @@ const buildIndexes = (data: PkmVariantDTO[]) => {
         indexes.bySpecies[ pkmVariant.species ]!.push(pkmVariant);
     });
 
-    console.timeEnd('Build PkmVariant indexes');
+    // console.timeEnd('Build PkmVariant indexes');
 
     return indexes;
 };
