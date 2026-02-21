@@ -77,6 +77,8 @@ FROM frontend-builder AS frontend-check
 
 RUN npm run c:type
 
+RUN npm run test
+
 # RUN npm run c:lint
 
 # frontend publish

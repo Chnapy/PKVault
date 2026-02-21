@@ -7,13 +7,15 @@ import type { StorageItemProps } from '../../ui/storage-item/storage-item';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { StorageMoveContext } from './storage-move-context';
 
+export type StorageSelectContextValue = {
+    saveId?: number;
+    boxId?: number;
+    ids: string[];
+};
+
 type Context = {
-    value: {
-        saveId?: number;
-        boxId?: number;
-        ids: string[];
-    };
-    setValue: (value: Context[ 'value' ]) => void;
+    value: StorageSelectContextValue;
+    setValue: (value: StorageSelectContextValue) => void;
 };
 
 const context = React.createContext<Context>({
@@ -26,9 +28,17 @@ const context = React.createContext<Context>({
  * Scoped to a single box at a time.
  */
 export const StorageSelectContext = {
-    Provider: ({ children }: React.PropsWithChildren) => {
+    Provider: ({ defaultValue, children }: React.PropsWithChildren<{ defaultValue?: StorageSelectContextValue }>) => {
+        return (
+            <StorageSelectContext.SimpleProvider defaultValue={defaultValue}>
+                <StorageSelectContext.SanityCheck />
+                {children}
+            </StorageSelectContext.SimpleProvider>
+        );
+    },
+    SimpleProvider: ({ defaultValue, children }: React.PropsWithChildren<{ defaultValue?: StorageSelectContextValue }>) => {
         const [ value, setValue ] = React.useState<Context>({
-            value: { ids: [] },
+            value: { ids: [], ...defaultValue },
             setValue: value =>
                 setValue(context => ({
                     ...context,
@@ -38,7 +48,6 @@ export const StorageSelectContext = {
 
         return (
             <context.Provider value={value}>
-                <StorageSelectContext.SanityCheck />
                 {children}
             </context.Provider>
         );
