@@ -11,7 +11,7 @@ type PkmSaveIndexes = {
 };
 
 const buildIndexes = (saveId: number, data: PkmSaveDTO[]) => {
-    console.time(`Build PkmSave indexes, saveId=${saveId}`);
+    // console.time(`Build PkmSave indexes, saveId=${saveId}`);
 
     const indexes: PkmSaveIndexes = {
         byId: {},
@@ -33,7 +33,7 @@ const buildIndexes = (saveId: number, data: PkmSaveDTO[]) => {
         indexes.bySpecies[ pkmSave.species ]!.push(pkmSave);
     });
 
-    console.timeEnd(`Build PkmSave indexes, saveId=${saveId}`);
+    // console.timeEnd(`Build PkmSave indexes, saveId=${saveId}`);
 
     return indexes;
 };
