@@ -3,27 +3,199 @@ import { setupServer } from 'msw/node';
 import { beforeAll, afterEach, afterAll } from 'vitest';
 import { getSaveInfosGetAllUrl, type saveInfosGetAllResponse200ApplicationJson } from '../../../data/sdk/save-infos/save-infos.gen';
 import { getStorageGetBoxesUrl, type storageGetBoxesResponse200, getStorageGetMainPkmVariantsUrl, type storageGetMainPkmVariantsResponse200, getStorageGetSavePkmsUrl, type storageGetSavePkmsResponse200, getStorageMovePkmUrl, getStorageMovePkmBankUrl } from '../../../data/sdk/storage/storage.gen';
+import { BoxType, type BoxDTO, type PkmSaveDTO, type PkmVariantDTO, type SaveInfosDTO } from '../../../data/sdk/model';
 
 export const setupTestDataServer = () => {
+    const createSaveInfos = (data: Partial<SaveInfosDTO>): SaveInfosDTO => ({
+        id: -1,
+        lastWriteTime: '',
+        version: 1,
+        context: 3,
+        generation: 3,
+        tid: 0,
+        sid: 0,
+        language: 2,
+        playTime: '',
+        trainerGender: 0,
+        trainerName: '',
+        dexSeenCount: 0,
+        dexCaughtCount: 0,
+        ownedCount: 0,
+        shinyCount: 0,
+        partyCount: 0,
+        daycareCount: 0,
+        boxCount: 5,
+        boxSlotCount: 30,
+        path: '',
+        ...data,
+    });
+
+    const createBox = (data: Partial<BoxDTO>): BoxDTO => ({
+        id: '',
+        idInt: -1,
+        bankId: '',
+        type: BoxType.Box,
+        name: '',
+        slotCount: 30,
+        order: 0,
+        canSaveWrite: true,
+        canSaveReceivePkm: true,
+        ...data,
+    });
+
+    const createPkmVariant = (data: Partial<PkmVariantDTO>): PkmVariantDTO => ({
+        id: '',
+        generation: 3,
+        boxId: 0,
+        boxSlot: 0,
+        isDuplicate: false,
+        idBase: '',
+        boxKey: '',
+        version: 1,
+        context: 3,
+        pid: -1,
+        isNicknamed: false,
+        nickname: '',
+        species: 1,
+        form: 0,
+        isEgg: false,
+        isShiny: false,
+        isAlpha: false,
+        isNoble: false,
+        canGigantamax: false,
+        ball: -1,
+        gender: 0,
+        types: [],
+        level: 1,
+        exp: 0,
+        expToLevelUp: -1,
+        levelUpPercent: -1,
+        friendship: 0,
+        eggHatchCount: -1,
+        iVs: [],
+        eVs: [],
+        stats: [],
+        baseStats: [],
+        hiddenPowerType: -1,
+        hiddenPowerPower: -1,
+        hiddenPowerCategory: 0,
+        nature: 0,
+        ability: -1,
+        moves: [],
+        tid: -1,
+        originTrainerName: '',
+        originTrainerGender: 0,
+        originMetDate: '',
+        originMetLocation: '',
+        heldItem: -1,
+        heldItemPokeapiName: '',
+        dynamicChecksum: '',
+        nicknameMaxLength: -1,
+        isShadow: false,
+        canMove: true,
+        canDelete: true,
+        canMoveToSave: true,
+        canEdit: true,
+        canEvolve: true,
+        hasLoadError: false,
+        isEnabled: true,
+
+        isMain: true,
+        isFilePresent: true,
+        filepath: '',
+        filepathAbsolute: '',
+        canMoveAttachedToSave: true,
+        compatibleWithVersions: [ 1 ],
+
+        ...data,
+    });
+
+    const createPkmSave = (data: Partial<PkmSaveDTO>): PkmSaveDTO => ({
+        id: '',
+        generation: 3,
+        boxId: -1,
+        boxSlot: -1,
+        isDuplicate: false,
+        idBase: '',
+        boxKey: '',
+        version: 1,
+        context: 3,
+        pid: -1,
+        isNicknamed: false,
+        nickname: '',
+        species: 1,
+        form: 0,
+        isEgg: false,
+        isShiny: false,
+        isAlpha: false,
+        isNoble: false,
+        canGigantamax: false,
+        ball: -1,
+        gender: 0,
+        types: [],
+        level: 1,
+        exp: 0,
+        expToLevelUp: -1,
+        levelUpPercent: -1,
+        friendship: 0,
+        eggHatchCount: -1,
+        iVs: [],
+        eVs: [],
+        stats: [],
+        baseStats: [],
+        hiddenPowerType: -1,
+        hiddenPowerPower: -1,
+        hiddenPowerCategory: 0,
+        nature: 0,
+        ability: -1,
+        moves: [],
+        tid: -1,
+        originTrainerName: '',
+        originTrainerGender: 0,
+        originMetDate: '',
+        originMetLocation: '',
+        heldItem: -1,
+        heldItemPokeapiName: '',
+        dynamicChecksum: '',
+        nicknameMaxLength: -1,
+        isShadow: false,
+        canMove: true,
+        canDelete: true,
+        canMoveToSave: true,
+        canEdit: true,
+        canEvolve: true,
+        hasLoadError: false,
+        isEnabled: true,
+
+        saveId: -1,
+        team: -1,
+        isLocked: false,
+        party: -1,
+        isStarter: false,
+        canMoveToMain: true,
+        canMoveAttachedToMain: true,
+
+        ...data,
+    });
 
     const server = setupServer(
         http.get(getSaveInfosGetAllUrl(), () => {
             return HttpResponse.json<saveInfosGetAllResponse200ApplicationJson[ 'data' ]>({
-                123: {
+                123: createSaveInfos({
                     id: 123,
                     generation: 3,
                     version: 1,
-                },
-                456: {
+                }),
+                456: createSaveInfos({
                     id: 456,
                     generation: 4,
                     version: 1,
-                },
-                789: {
+                }),
+                789: createSaveInfos({
                     id: 789,
                     generation: 3,
                     version: 1,
-                },
+                }),
             });
         }),
         http.get(getStorageGetBoxesUrl(), ({ request }) => {
@@ -32,78 +204,78 @@ export const setupTestDataServer = () => {
             switch (saveId) {
                 case 0:
                     return HttpResponse.json<storageGetBoxesResponse200[ 'data' ]>([
-                        {
+                        createBox({
                             id: '0',
                             idInt: 0,
                             slotCount: 30,
                             bankId: '0',
-                        },
-                        {
+                        }),
+                        createBox({
                             id: '1',
                             idInt: 1,
                             slotCount: 30,
                             bankId: '1',
-                        },
-                        {
+                        }),
+                        createBox({
                             id: '2',
                             idInt: 2,
                             slotCount: 30,
-                        },
-                        {
+                        }),
+                        createBox({
                             id: '3',
                             idInt: 3,
                             slotCount: 30,
-                        }
+                        })
                     ]);
                 case 123:
                     return HttpResponse.json<storageGetBoxesResponse200[ 'data' ]>([
-                        {
+                        createBox({
                             id: '0',
                             idInt: 0,
                             slotCount: 30,
                             canSaveWrite: true,
                             canSaveReceivePkm: true,
-                        },
-                        {
+                        }),
+                        createBox({
                             id: '1',
                             idInt: 1,
                             slotCount: 30,
                             canSaveWrite: true,
                             canSaveReceivePkm: true,
-                        },
-                        {
+                        }),
+                        createBox({
                             id: '2',
                             idInt: 2,
                             slotCount: 30,
                             canSaveWrite: false,
                             canSaveReceivePkm: false,
-                        },
+                        }),
                     ]);
                 case 456:
                     return HttpResponse.json<storageGetBoxesResponse200[ 'data' ]>([
-                        {
+                        createBox({
                             id: '0',
                             idInt: 0,
                             slotCount: 30,
                             canSaveWrite: true,
                             canSaveReceivePkm: true,
-                        },
+                        }),
                     ]);
                 case 789:
                     return HttpResponse.json<storageGetBoxesResponse200[ 'data' ]>([
-                        {
+                        createBox({
                             id: '0',
                             idInt: 0,
                             slotCount: 30,
                             canSaveWrite: true,
                             canSaveReceivePkm: true,
-                        },
+                        }),
                     ]);
             }
         }),
         http.get(getStorageGetMainPkmVariantsUrl(), () => {
             return HttpResponse.json<storageGetMainPkmVariantsResponse200[ 'data' ]>([
-                {
+                createPkmVariant({
                     id: 'canMove',
                     boxId: 0,
                     boxSlot: 0,
@@ -114,8 +286,8 @@ export const setupTestDataServer = () => {
                     canMoveAttachedToSave: true,
                     canMoveToSave: true,
                     compatibleWithVersions: [ 1 ],
-                },
-                {
+                }),
+                createPkmVariant({
                     id: 'canMove2',
                     boxId: 0,
                     boxSlot: 1,
@@ -126,8 +298,8 @@ export const setupTestDataServer = () => {
                     canMoveAttachedToSave: true,
                     canMoveToSave: true,
                     compatibleWithVersions: [ 1 ],
-                },
-                {
+                }),
+                createPkmVariant({
                     id: 'cannotMove',
                     boxId: 0,
                     boxSlot: 2,
@@ -138,8 +310,8 @@ export const setupTestDataServer = () => {
                     canMoveAttachedToSave: false,
                     canMoveToSave: false,
                     compatibleWithVersions: [ 1 ],
-                },
-                {
+                }),
+                createPkmVariant({
                     id: 'canMoveNotCompatible',
                     boxId: 0,
                     boxSlot: 3,
@@ -150,8 +322,8 @@ export const setupTestDataServer = () => {
                     canMoveAttachedToSave: true,
                     canMoveToSave: true,
                     compatibleWithVersions: [ 0 ],
-                },
-                {
+                }),
+                createPkmVariant({
                     id: 'isDisabled',
                     boxId: 0,
                     boxSlot: 4,
@@ -162,8 +334,8 @@ export const setupTestDataServer = () => {
                     canMoveAttachedToSave: true,
                     canMoveToSave: true,
                     compatibleWithVersions: [ 1 ],
-                },
-                {
+                }),
+                createPkmVariant({
                     id: 'isAttached',
                     attachedSaveId: 123,
                     attachedSavePkmIdBase: 'isAttached',
@@ -176,8 +348,8 @@ export const setupTestDataServer = () => {
                     canMoveAttachedToSave: true,
                     canMoveToSave: true,
                     compatibleWithVersions: [ 1 ],
-                },
-                {
+                }),
+                createPkmVariant({
                     id: 'existID',
                     idBase: 'existID',
                     boxId: 0,
@@ -189,146 +361,158 @@ export const setupTestDataServer = () => {
                     canMoveAttachedToSave: true,
                     canMoveToSave: true,
                     compatibleWithVersions: [ 1 ],
-                },
+                }),
             ]);
         }),
         http.get(getStorageGetSavePkmsUrl(123), () => {
             return HttpResponse.json<storageGetSavePkmsResponse200[ 'data' ]>([
-                {
+                createPkmSave({
                     id: 'canMove',
                     saveId: 123,
                     boxId: 0,
                     boxSlot: 0,
                     species: 1,
+                    generation: 3,
                     isEnabled: true,
                     canMove: true,
                     canMoveAttachedToMain: true,
                     canMoveToSave: true,
                     canMoveToMain: true,
-                },
-                {
+                }),
+                createPkmSave({
                     id: 'cannotMove',
                     saveId: 123,
                     boxId: 0,
                     boxSlot: 0,
                     species: 1,
+                    generation: 3,
                     isEnabled: true,
                     canMove: false,
                     canMoveAttachedToMain: false,
                     canMoveToSave: false,
                     canMoveToMain: false,
-                },
-                {
+                }),
+                createPkmSave({
                     id: 'isAttached',
                     idBase: 'isAttached',
                     saveId: 123,
                     boxId: 0,
                     boxSlot: 1,
                     species: 1,
+                    generation: 3,
                     isEnabled: true,
                     canMove: true,
                     canMoveAttachedToMain: true,
                     canMoveToSave: true,
                     canMoveToMain: true,
-                },
-                {
+                }),
+                createPkmSave({
                     id: 'canMove2',
                     saveId: 123,
                     boxId: 0,
                     boxSlot: 1,
                     species: 1,
+                    generation: 3,
                     isEnabled: true,
                     canMove: true,
                     canMoveAttachedToMain: true,
                     canMoveToSave: true,
                     canMoveToMain: true,
-                },
-                {
+                }),
+                createPkmSave({
                     id: 'egg',
                     saveId: 123,
                     boxId: 0,
                     boxSlot: 2,
                     species: 1,
+                    generation: 3,
                     isEnabled: true,
                     canMove: true,
                     canMoveAttachedToMain: true,
                     canMoveToSave: true,
                     canMoveToMain: true,
                     isEgg: true,
-                },
-                {
+                }),
+                createPkmSave({
                     id: 'shadow',
                     saveId: 123,
                     boxId: 0,
                     boxSlot: 3,
                     species: 1,
+                    generation: 3,
                     isEnabled: true,
                     canMove: true,
                     canMoveAttachedToMain: true,
                     canMoveToSave: true,
                     canMoveToMain: true,
                     isShadow: true,
-                },
-                {
+                }),
+                createPkmSave({
                     id: 'existID',
                     idBase: 'existID',
                     saveId: 123,
                     boxId: 0,
                     boxSlot: 4,
                     species: 1,
+                    generation: 3,
                     isEnabled: true,
                     canMove: true,
                     canMoveAttachedToMain: true,
                     canMoveToSave: true,
                     canMoveToMain: true,
-                },
+                }),
             ]);
         }),
         http.get(getStorageGetSavePkmsUrl(456), () => {
             return HttpResponse.json<storageGetSavePkmsResponse200[ 'data' ]>([
-                {
+                createPkmSave({
                     id: 'canMove',
                     saveId: 456,
                     boxId: 0,
                     boxSlot: 0,
                     species: 1,
+                    generation: 4,
                     isEnabled: true,
                     canMove: true,
                     canMoveAttachedToMain: true,
                     canMoveToSave: true,
                     canMoveToMain: true,
-                },
+                }),
             ]);
         }),
         http.get(getStorageGetSavePkmsUrl(789), () => {
             return HttpResponse.json<storageGetSavePkmsResponse200[ 'data' ]>([
-                {
+                createPkmSave({
                     id: 'canMove',
                     saveId: 789,
                     boxId: 0,
                     boxSlot: 0,
                     species: 1,
+                    generation: 3,
                     isEnabled: true,
                     canMove: true,
                     canMoveAttachedToMain: true,
                     canMoveToSave: true,
                     canMoveToMain: true,
-                },
-                {
+                }),
+                createPkmSave({
                     id: 'cannotMove',
                     saveId: 789,
                     boxId: 0,
                     boxSlot: 1,
                     species: 1,
+                    generation: 3,
                     isEnabled: true,
                     canMove: false,
                     canMoveAttachedToMain: false,
                     canMoveToSave: false,
                     canMoveToMain: false,
-                },
+                }),
             ]);
         }),
-        http.put(getStorageMovePkmUrl(), () => {
+        http.put(getStorageMovePkmUrl({
+            targetBoxId: undefined!
+        }), () => {
             return HttpResponse.json({});
         }),
         http.put(getStorageMovePkmBankUrl(), () => {
