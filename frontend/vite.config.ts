@@ -26,5 +26,11 @@ export default defineConfig({
     //     cert: fs.readFileSync("../.devcontainer/.cert/localhost+2.crt"),
     //   }
     //   : undefined,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      }
+    }
   },
 });
