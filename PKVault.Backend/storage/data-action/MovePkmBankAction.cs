@@ -102,18 +102,22 @@ public class MovePkmBankAction(
 
     private async Task<DataActionPayload> MainToMain(MovePkmBankActionInput input, string pkmVariantId, string targetBoxId, int targetBoxSlot)
     {
-        var entity = (await pkmVariantLoader.GetEntity(pkmVariantId)) ?? throw new KeyNotFoundException("PkmVariant not found");
-        var pkm = await pkmVariantLoader.GetPKM(entity);
+        var baseEntity = (await pkmVariantLoader.GetEntity(pkmVariantId)) ?? throw new KeyNotFoundException("PkmVariant not found");
+        var entities = await pkmVariantLoader.GetEntitiesByBox(baseEntity.BoxId, baseEntity.BoxSlot);
+        var pkm = await pkmVariantLoader.GetPKM(baseEntity);
 
         var pkmsAlreadyPresent = (await pkmVariantLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot)).Values;
-        if (pkmsAlreadyPresent.Any())
+        if (pkmsAlreadyPresent.Count != 0)
         {
             throw new Exception("Pkm already present");
         }
 
-        entity.BoxId = targetBoxId;
-        entity.BoxSlot = targetBoxSlot;
-        await pkmVariantLoader.UpdateEntity(entity);
+        foreach (var entity in entities.Values)
+        {
+            entity.BoxId = targetBoxId;
+            entity.BoxSlot = targetBoxSlot;
+            await pkmVariantLoader.UpdateEntity(entity);
+        }
 
         var boxName = (await boxLoader.GetEntity(targetBoxId.ToString()))?.Name;
 
