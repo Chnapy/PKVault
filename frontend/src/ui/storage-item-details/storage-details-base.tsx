@@ -1,9 +1,10 @@
+import { css } from '@emotion/css';
 import type React from 'react';
 import { GameVersion, Gender as GenderType, type PkmLegalityDTO, type PkmSaveDTO } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Route } from '../../routes/storage';
-import { StorageMoveContext } from '../../storage/actions/storage-move-context';
+import { MoveContext } from '../../storage/move/context/move-context';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
@@ -21,7 +22,6 @@ import { StorageDetailsTitle } from './storage-details-title';
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
-import { css } from '@emotion/css';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'idBase' | 'pid' | 'species' | 'context' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
@@ -46,7 +46,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
     const { t } = useTranslate();
 
     const formContext = StorageDetailsForm.useContext();
-    const moveContext = StorageMoveContext.useValue();
+    const isMoveDragging = MoveContext.useValue().state.status === 'dragging';
 
     const staticData = useStaticData();
     const staticForms = staticData.species[ pkm.species ]?.forms[ pkm.context ];
@@ -159,7 +159,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 selected: undefined,
             }
         })}
-        showFullDetails={!pkm.isEnabled || moveContext.selected
+        showFullDetails={!pkm.isEnabled || isMoveDragging
             ? false
             : (formContext.editMode ? true : undefined)}
         actions={formContext.editMode && <div className={css({

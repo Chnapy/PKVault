@@ -1,7 +1,11 @@
 import { css, cx } from '@emotion/css';
 import { Popover, PopoverPanel } from '@headlessui/react';
 import React from 'react';
-import { StorageMoveContext } from '../../storage/actions/storage-move-context';
+import { MoveContext } from '../../storage/move/context/move-context';
+import { useMoveClickable } from '../../storage/move/hooks/use-move-clickable';
+import { useMoveDragging } from '../../storage/move/hooks/use-move-dragging';
+import { useMoveDroppable } from '../../storage/move/hooks/use-move-droppable';
+import { useMoveLoading } from '../../storage/move/hooks/use-move-loading';
 import type { ButtonLikeProps } from '../button/button-like';
 import type { ButtonWithDisabledPopoverProps } from '../button/button-with-disabled-popover';
 import { StorageItemMainActions } from './storage-item-main-actions';
@@ -30,10 +34,11 @@ export const StorageItemPopover: React.FC<StorageItemPopoverProps> = ({
 }) => {
     const [ hover, setHover ] = React.useState(false);
 
-    const moveContext = StorageMoveContext.useValue();
-    const moveDroppable = StorageMoveContext.useDroppable(saveId, boxId, boxSlot, pkmId);
-    const moveDraggable = StorageMoveContext.useDraggable(pkmId, saveId);
-    const moveLoading = StorageMoveContext.useLoading(saveId, boxId, boxSlot, pkmId);
+    const isMoveIdle = MoveContext.useValue().state.status === 'idle';
+    const moveClickable = useMoveClickable([ pkmId ], saveId);
+    const moveDroppable = useMoveDroppable(saveId, boxId, boxSlot, pkmId);
+    const moveDraggable = useMoveDragging(pkmId, saveId);
+    const moveLoading = useMoveLoading(saveId, boxId, boxSlot, pkmId);
 
     const disabled = !moveDroppable.isCurrentItemDragging && moveDroppable.isDragging && !moveDroppable.onClick;
 
@@ -57,7 +62,7 @@ export const StorageItemPopover: React.FC<StorageItemPopoverProps> = ({
         >
             {children({
                 onClick: moveDroppable.onClick,
-                onPointerMove: moveDraggable.onPointerMove,
+                onPointerMove: moveClickable.onPointerMove,
                 onPointerUp: moveDroppable.onPointerUp,
                 onPointerEnter: () => setHover(true),
                 onPointerLeave: () => setHover(false),
@@ -78,7 +83,7 @@ export const StorageItemPopover: React.FC<StorageItemPopoverProps> = ({
                     }
                 })}
             >
-                {!moveLoading && !moveContext.selected && selected
+                {!moveLoading && isMoveIdle && selected
                     ? (saveId ? <StorageItemSaveActions saveId={saveId} /> : <StorageItemMainActions />)
                     : <>
                         {hover && <div

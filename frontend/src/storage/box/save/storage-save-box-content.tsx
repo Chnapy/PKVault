@@ -14,14 +14,14 @@ import { SaveCardImg } from '../../../ui/save-card/save-card-img';
 import { StorageBox } from '../../../ui/storage-box/storage-box';
 import { StorageBoxSaveActions } from '../../../ui/storage-box/storage-box-save-actions';
 import { StorageItemPlaceholder } from '../../../ui/storage-item/storage-item-placeholder';
-import { StorageMoveContext } from '../../actions/storage-move-context';
+import { SizingUtil } from '../../../ui/util/sizing-util';
 import { DexSyncAdvancedAction } from '../../advanced-actions/dex-sync-advanced-action';
 import { SortAdvancedAction } from '../../advanced-actions/sort-advanced-action';
+import { StorageSaveItem } from '../../item/save/storage-save-item';
+import { MoveContext } from '../../move/context/move-context';
+import { getSaveOrder } from '../../util/get-save-order';
 import { StorageBoxList } from '../storage-box-list';
 import { StorageHeader } from '../storage-header';
-import { StorageSaveItem } from '../../item/save/storage-save-item';
-import { getSaveOrder } from '../../util/get-save-order';
-import { SizingUtil } from '../../../ui/util/sizing-util';
 
 export type StorageSaveBoxContentProps = {
   saveId: number;
@@ -42,7 +42,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
 
   const getSaveBoxIds = (value: number) => saveBoxIds.map((id, i) => (i === boxIndex ? value : id));
 
-  const moveContext = StorageMoveContext.useValue();
+  const moveState = MoveContext.useValue().state;
 
   const saveInfosQuery = useSaveInfosGetAll();
   const saveInfos = saveInfosQuery.data?.data[ saveId ] as SaveInfosDTO | undefined;
@@ -251,18 +251,21 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
               return (
                 <div key={i} className={css({ order: i, display: 'flex' })}>
                   {!pkm ||
-                    (moveContext.selected?.saveId === saveId && !moveContext.selected.target && moveContext.selected.ids.includes(pkm.id)) ? (
-                    <StorageItemPlaceholder saveId={saveId} boxId={selectedBox.idInt} boxSlot={i} pkmId={pkm?.id} />
-                  ) : (
-                    <StorageSaveItem key={i} saveId={saveId} pkmId={pkm.id} />
-                  )}
+                    (moveState.status === 'dragging' &&
+                      moveState.source.saveId === saveId &&
+                      moveState.source.ids.includes(pkm.id))
+                    ? (
+                      <StorageItemPlaceholder saveId={saveId} boxId={selectedBox.idInt} boxSlot={i} pkmId={pkm?.id} />
+                    ) : (
+                      <StorageSaveItem key={i} saveId={saveId} pkmId={pkm.id} />
+                    )}
                 </div>
               );
             })}
 
-            {moveContext.selected?.saveId === saveId &&
-              !moveContext.selected.target &&
-              moveContext.selected.ids.map(id => <StorageSaveItem key={id} saveId={saveId} pkmId={id} />)}
+            {moveState.status === 'dragging' &&
+              moveState.source.saveId === saveId &&
+              moveState.source.ids.map(id => <StorageSaveItem key={id} saveId={saveId} pkmId={id} />)}
           </>
         )}
       </PopoverButton>

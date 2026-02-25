@@ -5,7 +5,7 @@ import { usePkmVariantSlotInfos } from '../../data/hooks/use-pkm-variant-slot-in
 import { Route } from '../../routes/storage';
 import type { StorageItemProps } from '../../ui/storage-item/storage-item';
 import { filterIsDefined } from '../../util/filter-is-defined';
-import { StorageMoveContext } from './storage-move-context';
+import { MoveContext } from '../move/context/move-context';
 
 export type StorageSelectContextValue = {
     saveId?: number;
@@ -142,7 +142,7 @@ export const StorageSelectContext = {
      */
     useCheck: (saveId: number | undefined, pkmId: string): Pick<StorageItemProps, 'checked' | 'onCheck'> => {
         const selectContext = StorageSelectContext.useValue();
-        const movingIds = StorageMoveContext.useValue().selected?.ids;
+        const isMoveIdle = MoveContext.useValue().state.status === 'idle';
 
         const mainPkmsQuery = usePkmVariantIndex();
         const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);
@@ -176,7 +176,7 @@ export const StorageSelectContext = {
         return {
             checked,
             onCheck:
-                pkm && (!movingIds || movingIds.includes(pkmId))
+                pkm && isMoveIdle
                     ? e => {
                         if (selectContext.hasPkm(saveId, pkmId)) {
                             selectContext.removeId(pkmIds);

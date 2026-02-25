@@ -1,7 +1,8 @@
 import { css, cx } from '@emotion/css';
 import type React from "react";
 import { withErrorCatcher } from '../../error/with-error-catcher';
-import { StorageMoveContext } from '../../storage/actions/storage-move-context';
+import { useMoveDroppable } from '../../storage/move/hooks/use-move-droppable';
+import { useMoveLoading } from '../../storage/move/hooks/use-move-loading';
 import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popover';
 import { theme } from '../theme';
 import { SizingUtil } from '../util/sizing-util';
@@ -19,9 +20,9 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = wit
   boxSlot,
   pkmId,
 }) => {
-  const moveDroppable = StorageMoveContext.useDroppable(saveId, boxId, boxSlot, pkmId);
+  const moveDroppable = useMoveDroppable(saveId, boxId, boxSlot, pkmId);
 
-  const moveLoading = StorageMoveContext.useLoading(saveId, boxId, boxSlot, pkmId);
+  const moveLoading = useMoveLoading(saveId, boxId, boxSlot, pkmId);
 
   return (
     <ButtonWithDisabledPopover

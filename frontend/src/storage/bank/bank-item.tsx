@@ -1,16 +1,17 @@
+import { css } from '@emotion/css';
 import type React from 'react';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
-import { useStorageDeleteMainBank, useStorageGetMainBanks, useStorageGetBoxes } from '../../data/sdk/storage/storage.gen';
+import { useStorageDeleteMainBank, useStorageGetBoxes, useStorageGetMainBanks } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
 import { Button, ButtonLink } from '../../ui/button/button';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { ButtonWithDisabledPopover } from '../../ui/button/button-with-disabled-popover';
 import { ButtonWithPopover } from '../../ui/button/button-with-popover';
 import { Icon } from '../../ui/icon/icon';
-import { StorageMoveContext } from '../actions/storage-move-context';
+import { useMoveDroppableBank } from '../move/hooks/use-move-droppable-bank';
+import { useMoveLoadingBank } from '../move/hooks/use-move-loading-bank';
 import { BankContext } from './bank-context';
 import { BankEdit } from './bank-edit';
-import { css } from '@emotion/css';
 
 export const BankItem: React.FC<{
   bankId: string;
@@ -18,8 +19,8 @@ export const BankItem: React.FC<{
   const { t } = useTranslate();
   const selectedBankBoxes = BankContext.useSelectedBankBoxes();
   const selectBankProps = BankContext.useSelectBankProps();
-  const moveDroppable = StorageMoveContext.useDroppableBank(bankId);
-  const moveLoading = StorageMoveContext.useLoadingBank(bankId);
+  const moveDroppable = useMoveDroppableBank(bankId);
+  const moveLoading = useMoveLoadingBank(bankId);
 
   const banksQuery = useStorageGetMainBanks();
   const bankDeleteMutation = useStorageDeleteMainBank();
