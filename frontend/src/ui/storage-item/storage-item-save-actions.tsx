@@ -1,9 +1,10 @@
+import { css } from '@emotion/css';
 import type React from 'react';
 import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { useStorageEvolvePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
-import { StorageMoveContext } from '../../storage/actions/storage-move-context';
+import { useMoveClickable } from '../../storage/move/hooks/use-move-clickable';
 import { getSaveOrder } from '../../storage/util/get-save-order';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
@@ -13,7 +14,6 @@ import { Icon } from '../icon/icon';
 import { StorageDetailsForm } from '../storage-item-details/storage-details-form';
 import { theme } from '../theme';
 import { StorageItemSaveActionsContainer } from './storage-item-save-actions-container';
-import { css } from '@emotion/css';
 
 export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId }) => {
   const { t } = useTranslate();
@@ -23,7 +23,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
 
   const formEditMode = StorageDetailsForm.useEditMode();
 
-  const moveClickable = StorageMoveContext.useClickable(selected?.id ? [ selected.id ] : [], saveId);
+  const moveClickable = useMoveClickable(selected?.id ? [ selected.id ] : [], saveId);
 
   const pkmSavePkmQuery = usePkmSaveIndex(saveId ?? 0);
 
@@ -55,17 +55,17 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
           maxWidth: 170,
         })}
       >
-        {moveClickable.onClick && (
-          <Button onClick={moveClickable.onClick}>
+        {moveClickable.startDrag && (
+          <Button onClick={moveClickable.startDrag}>
             <Icon name='logout' solid forButton />
             {t('storage.actions.move')}
           </Button>
         )}
 
-        {moveClickable.onClickAttached && (
+        {moveClickable.startDragAttached && (
           <ButtonWithDisabledPopover
             as={Button}
-            onClick={moveClickable.onClickAttached}
+            onClick={moveClickable.startDragAttached}
             showHelp
             anchor='right start'
             helpTitle={t('storage.actions.move-attached-save.helpTitle')}

@@ -5,12 +5,12 @@ import React from "react";
 import z from "zod";
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { ActionsPanel } from '../storage/actions/actions-panel';
-import { StorageMoveContext } from '../storage/actions/storage-move-context';
 import { StorageSelectContext } from '../storage/actions/storage-select-context';
 import { BankList } from '../storage/bank/bank-list';
-import { StorageDetails } from "../storage/details/storage-details";
 import { StorageMainBox } from "../storage/box/main/storage-main-box";
 import { StorageSaveBox } from "../storage/box/save/storage-save-box";
+import { StorageDetails } from "../storage/details/storage-details";
+import { MoveContext } from '../storage/move/context/move-context';
 import { StorageSaveSelect } from "../storage/storage-save-select";
 import { StorageSearchCheck } from '../storage/storage-search-check';
 import { filterIsDefined } from '../util/filter-is-defined';
@@ -22,13 +22,13 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
   return (
     <StorageSearchCheck>
       <StorageSelectContext.Provider>
-        <StorageMoveContext.Provider>
+        <MoveContext.Provider>
           <div className={css({
             display: 'flex',
             justifyContent: 'space-between',
           })}>
             <div
-              id={StorageMoveContext.containerId}
+              id={MoveContext.containerId}
               className={css({
                 display: 'flex',
                 justifyContent: "center",
@@ -104,7 +104,7 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
               )}
             </div>
           </div>
-        </StorageMoveContext.Provider>
+        </MoveContext.Provider>
       </StorageSelectContext.Provider>
     </StorageSearchCheck>
   );

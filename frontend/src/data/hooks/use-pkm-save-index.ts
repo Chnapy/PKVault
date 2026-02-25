@@ -3,7 +3,7 @@ import type { DataDTOStateOfDictionaryOfStringAndPkmSaveDTO, PkmSaveDTO } from '
 import { getStorageGetSavePkmsQueryKey, storageGetSavePkms } from '../sdk/storage/storage.gen';
 import { filterIsDefined } from '../../util/filter-is-defined';
 
-type PkmSaveIndexes = {
+export type PkmSaveIndexes = {
     byId: Record<PkmSaveDTO[ 'id' ], PkmSaveDTO>;
     byIdBase: Record<PkmSaveDTO[ 'idBase' ], PkmSaveDTO[]>;
     byBox: Record<PkmSaveDTO[ 'boxId' ], Record<PkmSaveDTO[ 'boxSlot' ], PkmSaveDTO>>;

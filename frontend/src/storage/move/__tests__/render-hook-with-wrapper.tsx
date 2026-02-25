@@ -2,12 +2,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { waitFor } from '@testing-library/dom';
 import { renderHook } from '@testing-library/react';
 import { expect } from 'vitest';
-import { StorageMoveContext, type StorageMoveContextValue } from '../storage-move-context';
-import { StorageSelectContext, type StorageSelectContextValue } from '../storage-select-context';
+import { StorageSelectContext, type StorageSelectContextValue } from '../../actions/storage-select-context';
+import { MoveContext } from '../context/move-context';
+import type { MoveState } from '../state/move-state';
 
 export const renderHookWithWrapper = <Result, Props>(
     useHook: (initialProps: Props) => Result,
-    moveDefaultValue?: StorageMoveContextValue,
+    moveDefaultValue?: MoveState,
     selectDefaultValue?: StorageSelectContextValue,
 ) => {
     const queryClient = new QueryClient({
@@ -23,12 +24,12 @@ export const renderHookWithWrapper = <Result, Props>(
         },
     });
 
-    let moveContextValue: StorageMoveContextValue | undefined;
+    let moveContextValue: MoveState | undefined;
     let selectContextValue: StorageSelectContextValue | undefined;
 
     const useWrapperHook = (initialProps: Props) => {
         const result = useHook(initialProps);
-        moveContextValue = StorageMoveContext.useValue().selected;
+        moveContextValue = MoveContext.useValue().state;
         selectContextValue = StorageSelectContext.useValue();
         return result;
     };
@@ -37,9 +38,9 @@ export const renderHookWithWrapper = <Result, Props>(
         wrapper: ({ children }) => {
             return <QueryClientProvider client={queryClient}>
                 <StorageSelectContext.SimpleProvider defaultValue={selectDefaultValue}>
-                    <StorageMoveContext.Provider defaultValue={moveDefaultValue}>
+                    <MoveContext.Provider defaultValue={moveDefaultValue}>
                         {children}
-                    </StorageMoveContext.Provider>
+                    </MoveContext.Provider>
                 </StorageSelectContext.SimpleProvider>
             </QueryClientProvider>;
         },

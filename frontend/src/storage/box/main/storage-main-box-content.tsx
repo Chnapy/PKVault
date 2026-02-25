@@ -12,11 +12,11 @@ import { Icon } from '../../../ui/icon/icon';
 import { StorageBox } from '../../../ui/storage-box/storage-box';
 import { StorageBoxMainActions } from '../../../ui/storage-box/storage-box-main-actions';
 import { StorageItemPlaceholder } from '../../../ui/storage-item/storage-item-placeholder';
-import { StorageMoveContext } from '../../actions/storage-move-context';
 import { DexSyncAdvancedAction } from '../../advanced-actions/dex-sync-advanced-action';
 import { SortAdvancedAction } from '../../advanced-actions/sort-advanced-action';
 import { BankContext } from '../../bank/bank-context';
 import { StorageMainItem } from '../../item/main/storage-main-item';
+import { MoveContext } from '../../move/context/move-context';
 import { StorageBoxEdit } from '../storage-box-edit';
 import { StorageBoxList } from '../storage-box-list';
 import { StorageHeader } from '../storage-header';
@@ -37,7 +37,7 @@ export const StorageMainBoxContent: React.FC<{
 
     const getMainBoxIds = (value: number) => mainBoxIds.map((id, i) => (i === boxIndex ? value : id));
 
-    const moveContext = StorageMoveContext.useValue();
+    const moveState = MoveContext.useValue().state;
 
     const boxesQuery = useStorageGetBoxes();
     const pkmsQuery = usePkmVariantIndex();
@@ -208,10 +208,9 @@ export const StorageMainBoxContent: React.FC<{
                             return (
                                 <div key={i} className={css({ order: i, display: 'flex' })}>
                                     {!pkm ||
-                                        (moveContext.selected &&
-                                            !moveContext.selected.saveId &&
-                                            !moveContext.selected.target &&
-                                            moveContext.selected.ids.includes(pkm.id)) ? (
+                                        (moveState.status === 'dragging' &&
+                                            !moveState.source.saveId &&
+                                            moveState.source.ids.includes(pkm.id)) ? (
                                         <StorageItemPlaceholder boxId={selectedBox.idInt} boxSlot={i} pkmId={pkm?.id} />
                                     ) : (
                                         <StorageMainItem pkmId={pkm.id} />
@@ -220,10 +219,9 @@ export const StorageMainBoxContent: React.FC<{
                             );
                         })}
 
-                        {moveContext.selected &&
-                            !moveContext.selected.saveId &&
-                            !moveContext.selected.target &&
-                            moveContext.selected.ids.map(id => <StorageMainItem key={id} pkmId={id} />)}
+                        {moveState.status === 'dragging' &&
+                            !moveState.source.saveId &&
+                            moveState.source.ids.map(id => <StorageMainItem key={id} pkmId={id} />)}
                     </>
                 )}
             </PopoverButton>

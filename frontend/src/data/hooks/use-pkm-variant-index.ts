@@ -3,7 +3,7 @@ import { filterIsDefined } from '../../util/filter-is-defined';
 import type { DataDTOStateOfDictionaryOfStringAndPkmVariantDTO, PkmVariantDTO } from '../sdk/model';
 import { getStorageGetMainPkmVariantsQueryKey, storageGetMainPkmVariants } from '../sdk/storage/storage.gen';
 
-type PkmVariantIndexes = {
+export type PkmVariantIndexes = {
     byId: Record<PkmVariantDTO[ 'id' ], PkmVariantDTO>;
     byBox: Record<PkmVariantDTO[ 'boxId' ], Record<PkmVariantDTO[ 'boxSlot' ], PkmVariantDTO[]>>;
     byAttachedSave: Record<NonNullable<PkmVariantDTO[ 'attachedSaveId' ]>, Record<NonNullable<PkmVariantDTO[ 'attachedSavePkmIdBase' ]>, PkmVariantDTO>>;

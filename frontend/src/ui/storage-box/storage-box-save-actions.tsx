@@ -5,8 +5,8 @@ import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { useStorageEvolvePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
-import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { StorageSelectContext } from '../../storage/actions/storage-select-context';
+import { useMoveClickable } from '../../storage/move/hooks/use-move-clickable';
 import { useTranslate } from '../../translate/i18n';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { Button } from '../button/button';
@@ -32,7 +32,7 @@ export const StorageBoxSaveActions: React.FC<
 
   const pkms = ids.map(id => pkmSavePkmQuery.data?.data.byId[ id ]).filter(filterIsDefined);
 
-  const moveClickable = StorageMoveContext.useClickable(
+  const moveClickable = useMoveClickable(
     pkms.map(pkm => pkm.id),
     saveId,
   );
@@ -92,17 +92,17 @@ export const StorageBoxSaveActions: React.FC<
               minWidth: 140,
             })}
           >
-            {moveClickable.onClick && (
-              <Button onClick={moveClickable.onClick}>
+            {moveClickable.startDrag && (
+              <Button onClick={moveClickable.startDrag}>
                 <Icon name='logout' solid forButton />
                 {t('storage.actions.move')} ({moveClickable.moveCount})
               </Button>
             )}
 
-            {moveClickable.onClickAttached && (
+            {moveClickable.startDragAttached && (
               <ButtonWithDisabledPopover
                 as={Button}
-                onClick={moveClickable.onClickAttached}
+                onClick={moveClickable.startDragAttached}
                 showHelp
                 anchor='right start'
                 helpTitle={t('storage.actions.move-attached-save.helpTitle')}

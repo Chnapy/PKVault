@@ -1,9 +1,9 @@
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
-import { beforeAll, afterEach, afterAll } from 'vitest';
+import { afterAll, afterEach, beforeAll } from 'vitest';
+import { BoxType, type BankDTO, type BoxDTO, type PkmSaveDTO, type PkmVariantDTO, type SaveInfosDTO } from '../../../data/sdk/model';
 import { getSaveInfosGetAllUrl, type saveInfosGetAllResponse200ApplicationJson } from '../../../data/sdk/save-infos/save-infos.gen';
-import { getStorageGetBoxesUrl, type storageGetBoxesResponse200, getStorageGetMainPkmVariantsUrl, type storageGetMainPkmVariantsResponse200, getStorageGetSavePkmsUrl, type storageGetSavePkmsResponse200, getStorageMovePkmUrl, getStorageMovePkmBankUrl } from '../../../data/sdk/storage/storage.gen';
-import { BoxType, type BoxDTO, type PkmSaveDTO, type PkmVariantDTO, type SaveInfosDTO } from '../../../data/sdk/model';
+import { getStorageGetBoxesUrl, getStorageGetMainBanksUrl, getStorageGetMainPkmVariantsUrl, getStorageGetSavePkmsUrl, getStorageMovePkmBankUrl, getStorageMovePkmUrl, type storageGetBoxesResponse200, type storageGetMainBanksResponse200, type storageGetMainPkmVariantsResponse200, type storageGetSavePkmsResponse200 } from '../../../data/sdk/storage/storage.gen';
 
 export const setupTestDataServer = () => {
     const createSaveInfos = (data: Partial<SaveInfosDTO>): SaveInfosDTO => ({
@@ -27,6 +27,16 @@ export const setupTestDataServer = () => {
         boxCount: 5,
         boxSlotCount: 30,
         path: '',
+        ...data,
+    });
+
+    const createBank = (data: Partial<BankDTO>): BankDTO => ({
+        id: '',
+        idInt: -1,
+        name: '',
+        order: 0,
+        isDefault: false,
+        view: { mainBoxIds: [], saves: [] },
         ...data,
     });
 
@@ -198,6 +208,22 @@ export const setupTestDataServer = () => {
                 }),
             });
         }),
+        http.get(getStorageGetMainBanksUrl(), () => {
+            return HttpResponse.json<storageGetMainBanksResponse200[ 'data' ]>([
+                createBank({
+                    id: '0',
+                    idInt: 0,
+                }),
+                createBank({
+                    id: '1',
+                    idInt: 1,
+                }),
+                createBank({
+                    id: '2',
+                    idInt: 2,
+                }),
+            ]);
+        }),
         http.get(getStorageGetBoxesUrl(), ({ request }) => {
             const url = new URL(request.url)
             const saveId = Number(url.searchParams.get('saveId') ?? '0');
@@ -362,6 +388,30 @@ export const setupTestDataServer = () => {
                     canMoveToSave: true,
                     compatibleWithVersions: [ 1 ],
                 }),
+                createPkmVariant({
+                    id: 'cannotMoveToSave',
+                    boxId: 0,
+                    boxSlot: 7,
+                    species: 1,
+                    generation: 3,
+                    isEnabled: true,
+                    canMove: true,
+                    canMoveAttachedToSave: true,
+                    canMoveToSave: false,
+                    compatibleWithVersions: [ 1 ],
+                }),
+                createPkmVariant({
+                    id: 'cannotMoveAttachedToSave',
+                    boxId: 0,
+                    boxSlot: 8,
+                    species: 1,
+                    generation: 3,
+                    isEnabled: true,
+                    canMove: true,
+                    canMoveAttachedToSave: false,
+                    canMoveToSave: true,
+                    compatibleWithVersions: [ 1 ],
+                }),
             ]);
         }),
         http.get(getStorageGetSavePkmsUrl(123), () => {
@@ -383,7 +433,7 @@ export const setupTestDataServer = () => {
                     id: 'cannotMove',
                     saveId: 123,
                     boxId: 0,
-                    boxSlot: 0,
+                    boxSlot: 8,
                     species: 1,
                     generation: 3,
                     isEnabled: true,
@@ -458,6 +508,45 @@ export const setupTestDataServer = () => {
                     isEnabled: true,
                     canMove: true,
                     canMoveAttachedToMain: true,
+                    canMoveToSave: true,
+                    canMoveToMain: true,
+                }),
+                createPkmSave({
+                    id: 'cannotMoveToMain',
+                    saveId: 123,
+                    boxId: 0,
+                    boxSlot: 5,
+                    species: 1,
+                    generation: 3,
+                    isEnabled: true,
+                    canMove: true,
+                    canMoveAttachedToMain: true,
+                    canMoveToSave: true,
+                    canMoveToMain: false,
+                }),
+                createPkmSave({
+                    id: 'cannotMoveToSave',
+                    saveId: 123,
+                    boxId: 0,
+                    boxSlot: 6,
+                    species: 1,
+                    generation: 3,
+                    isEnabled: true,
+                    canMove: true,
+                    canMoveAttachedToMain: true,
+                    canMoveToSave: false,
+                    canMoveToMain: true,
+                }),
+                createPkmSave({
+                    id: 'cannotMoveAttachedToMain',
+                    saveId: 123,
+                    boxId: 0,
+                    boxSlot: 7,
+                    species: 1,
+                    generation: 3,
+                    isEnabled: true,
+                    canMove: true,
+                    canMoveAttachedToMain: false,
                     canMoveToSave: true,
                     canMoveToMain: true,
                 }),
