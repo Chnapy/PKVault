@@ -2,9 +2,9 @@ using PKHeX.Core;
 
 public class PkmConvertService2
 {
-    public PKM ConvertTo(PKM sourcePkm, PKM blankTargetPkm)
+    public PKM ConvertTo(PKM sourcePkm, PKM blankTargetPkm, LanguageID fallbackLang)
     {
-        var result = ConvertRecursive(sourcePkm.Clone(), blankTargetPkm.GetType());
+        var result = ConvertRecursive(sourcePkm.Clone(), blankTargetPkm.GetType(), fallbackLang);
 
         if (result.GetType() != blankTargetPkm.GetType())
             throw new InvalidOperationException($"Failed to convert to {blankTargetPkm.GetType().Name}");
@@ -15,22 +15,22 @@ public class PkmConvertService2
         return result;
     }
 
-    private PKM ConvertRecursive(PKM current, Type targetType)
+    private PKM ConvertRecursive(PKM current, Type targetType, LanguageID fallbackLang)
     {
         if (current.GetType() == targetType)
             return current;
 
         var direct = TryPKToVariant(current, targetType);
         if (direct != null)
-            return ConvertRecursive(direct, targetType);
+            return ConvertRecursive(direct, targetType, fallbackLang);
 
-        var forward = TryForwardConversion(current);
+        var forward = TryForwardConversion(current, fallbackLang);
         if (forward != null)
-            return ConvertRecursive(forward, targetType);
+            return ConvertRecursive(forward, targetType, fallbackLang);
 
         var backward = TryBackwardConversion(current);
         if (backward != null)
-            return ConvertRecursive(backward, targetType);
+            return ConvertRecursive(backward, targetType, fallbackLang);
 
         throw new InvalidOperationException($"No conversion path from {current.GetType().Name} to {targetType.Name}");
     }
@@ -67,13 +67,13 @@ public class PkmConvertService2
         };
     }
 
-    private static PKM? TryForwardConversion(PKM source)
+    private static PKM? TryForwardConversion(PKM source, LanguageID fallbackLang)
     {
         var pkm = TryVariantToPK(source)
             ?? source.GetType().Name switch
             {
                 "PK1" => ((PK1)source).ConvertToPK2(),
-                "PK2" => ((PK2)source).ConvertToPK3(),
+                "PK2" => ((PK2)source).ConvertToPK3(fallbackLang),
                 "PK3" => ((PK3)source).ConvertToPK4(),
                 "PK4" => ((PK4)source).ConvertToPK5(),
                 "PK5" => ((PK5)source).ConvertToPK6(),

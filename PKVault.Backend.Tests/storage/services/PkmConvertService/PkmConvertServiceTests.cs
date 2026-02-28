@@ -9,24 +9,40 @@ using PKHeX.Core;
 public class PkmConvertServiceTests
 {
     private static readonly byte[] pikachuPK1Bytes = File.ReadAllBytes("./assets/0025 - PIKACHU - 98F7.pk1");
-
     private static readonly Dictionary<string, object> pikachuExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
         File.ReadAllText("./assets/pikachu-expected.json")
     )!;
 
-    private static bool pkFolderCleaned = false;
+    private static readonly byte[] bizarrePK2Bytes = File.ReadAllBytes("./assets/0201-08 ★ - BIZARRE - 962B.pk2");
+    private static readonly Dictionary<string, object> bizarreExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
+        File.ReadAllText("./assets/bizarre-expected.json")
+    )!;
 
-    public PkmConvertServiceTests()
-    {
-    }
+    private static bool pkFolderCleaned = false;
 
     private PkmConvertService2 GetService()
     {
         return new();
     }
 
+    private void SetupPKDirectory(string folderName)
+    {
+        if (!pkFolderCleaned)
+        {
+            pkFolderCleaned = true;
+
+            if (Directory.Exists("./pkm-files"))
+                Directory.Delete("./pkm-files", true);
+            Directory.CreateDirectory("./pkm-files");
+        }
+
+        if (!Directory.Exists(Path.Combine("./pkm-files", folderName)))
+            Directory.CreateDirectory(Path.Combine("./pkm-files", folderName));
+    }
+
     [Theory]
     [
+        InlineData("PK1"),
         InlineData("PK2"),
         InlineData("SK2"),
         InlineData("PK3"),
@@ -51,38 +67,31 @@ public class PkmConvertServiceTests
         InlineData("PK9"),
         InlineData("PA9")
     ]
-    public async Task TestAllConversions(string targetTypeName)
+    public async Task TestAllPikachuForwardConversions(string targetTypeName)
     {
-        if (!pkFolderCleaned)
-        {
-            pkFolderCleaned = true;
-
-            if (Directory.Exists("./pkm-files"))
-                Directory.Delete("./pkm-files", true);
-            Directory.CreateDirectory("./pkm-files");
-        }
+        SetupPKDirectory("pikachu");
 
         var service = GetService();
 
         // 1. Charger PK1 original
-        FileUtil.TryGetPKM(pikachuPK1Bytes, out var sourcePk1, "pk1");
-        Assert.NotNull(sourcePk1);
-        Assert.Equal(25, sourcePk1.Species);
+        FileUtil.TryGetPKM(pikachuPK1Bytes, out var sourcePkm, "pk1");
+        Assert.NotNull(sourcePkm);
+        Assert.Equal(25, sourcePkm.Species);
 
         // 2. Créer blank cible
         var blank = CreateBlankTarget(targetTypeName);
 
         // 3. Convertir
-        var result = service.ConvertTo(sourcePk1, blank);
+        var result = service.ConvertTo(sourcePkm, blank, LanguageID.French);
 
         // 4. Vérifier type
         Assert.Equal(targetTypeName, result.GetType().Name);
 
         // 5. Vérifier données attendues
-        AssertExpectedData(result, targetTypeName);
+        AssertExpectedData(result, (JsonElement)pikachuExpectedData[targetTypeName]);
 
         // var filename = FileUtil.GetPKMTempFileName(result, false);
-        File.WriteAllBytes("./pkm-files/" + result.FileName, result.DecryptedPartyData);
+        File.WriteAllBytes(Path.Combine("./pkm-files", "pikachu", result.FileName), result.DecryptedPartyData);
 
         // var client = new AssemblyClient();
         // var staticData = (await client.GetAsyncJsonGz(
@@ -115,6 +124,59 @@ public class PkmConvertServiceTests
         //     .FindAll(r => !r.Valid)
         //     .Select(r => $"{r.Identifier}-{r.Result}"))}");
         // Assert.True(legality.Valid, $"Illegalities in {targetTypeName}:\n{legality.Report()}");
+    }
+
+    [Theory]
+    [
+        InlineData("PK2"),
+    InlineData("SK2"),
+    InlineData("PK3"),
+    // InlineData("CK3"),
+    // InlineData("XK3")
+    ]
+    // [
+    //     InlineData("PK4"),
+    //     InlineData("BK4"),
+    //     InlineData("RK4"),
+    //     InlineData("PK5")
+    // ]
+    // [
+    //     InlineData("PK6"),
+    //     InlineData("PK7"),
+    //     InlineData("PB7"),
+    //     InlineData("PK8")
+    // ]
+    // [
+    //     InlineData("PB8"),
+    //     InlineData("PA8"),
+    //     InlineData("PK9"),
+    //     InlineData("PA9")
+    // ]
+    public async Task TestAllBizarreForwardConversions(string targetTypeName)
+    {
+        SetupPKDirectory("bizarre");
+
+        var service = GetService();
+
+        // 1. Charger PK1 original
+        FileUtil.TryGetPKM(bizarrePK2Bytes, out var sourcePkm, "pk2");
+        Assert.NotNull(sourcePkm);
+        Assert.Equal(201, sourcePkm.Species);
+
+        // 2. Créer blank cible
+        var blank = CreateBlankTarget(targetTypeName);
+
+        // 3. Convertir
+        var result = service.ConvertTo(sourcePkm, blank, LanguageID.French);
+
+        // 4. Vérifier type
+        Assert.Equal(targetTypeName, result.GetType().Name);
+
+        // 5. Vérifier données attendues
+        AssertExpectedData(result, (JsonElement)bizarreExpectedData[targetTypeName]);
+
+        // var filename = FileUtil.GetPKMTempFileName(result, false);
+        File.WriteAllBytes(Path.Combine("./pkm-files", "bizarre", result.FileName), result.DecryptedPartyData);
     }
 
     // [Fact]
@@ -166,10 +228,8 @@ public class PkmConvertServiceTests
         };
     }
 
-    private void AssertExpectedData(PKM pkm, string typeName)
+    private void AssertExpectedData(PKM pkm, JsonElement expectedData)
     {
-        var expectedData = (JsonElement)pikachuExpectedData[typeName];
-
         Assert.Equal(expectedData.GetProperty("species").GetInt32(), pkm.Species);
         Assert.Equal(expectedData.GetProperty("form").GetInt32(), pkm.Form);
         Assert.Equal(expectedData.GetProperty("gender").GetByte(), pkm.Gender);

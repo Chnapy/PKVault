@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public static class PK2Extensions
 {
-    public static PK3 ConvertToPK3(this PK2 pk2)
+    public static PK3 ConvertToPK3(this PK2 pk2, LanguageID fallbackLang)
     {
         // Inspired by PK2.ConvertToPK7
 
@@ -13,7 +13,7 @@ public static class PK2Extensions
         int ability = 0; // Hidden
         var language = pk2.Japanese
             ? (byte)LanguageID.Japanese
-            : (pk2.Language + 1);
+            : (byte)fallbackLang;
 
         var pk3 = new PK3()
         {
@@ -40,7 +40,7 @@ public static class PK2Extensions
             Move3_PPUps = pk2.Move3_PPUps,
             Move4_PPUps = pk2.Move4_PPUps,
             Gender = pk2.Gender,
-            IsNicknamed = false,
+            IsNicknamed = pk2.IsNicknamed,
             Form = pk2.Form,
 
             CurrentHandler = 1,
@@ -48,7 +48,9 @@ public static class PK2Extensions
             HandlingTrainerGender = pk2.OriginalTrainerGender,
 
             Language = language,
-            Nickname = SpeciesName.GetSpeciesNameGeneration(pk2.Species, language, 3),
+            Nickname = pk2.IsNicknamed
+                ? pk2.Nickname
+                : SpeciesName.GetSpeciesNameGeneration(pk2.Species, language, 3),
             OriginalTrainerName = pk2.GetTransferTrainerName(language),
             OriginalTrainerGender = pk2.OriginalTrainerGender, // Crystal
             OriginalTrainerFriendship = pi.BaseFriendship,
@@ -58,13 +60,18 @@ public static class PK2Extensions
             AbilityNumber = 1 << ability,
         };
 
-        if (pk2.IsShiny)
+        do
         {
-            pk3.SetShiny();
+            pk3.PID = EntityPID.GetRandomPID(rnd, pk2.Species, pk2.Gender, pk3.Version, pk3.Nature, pk3.Form, pk3.PID);
         }
-        else
+        while (
+            pk3.IsShiny != pk2.IsShiny
+            || pk3.Form != pk2.Form
+            || pk3.Gender != pk2.Gender
+        );
+        if (pk3.Format >= 6 && (pk3.Gen3 || pk3.Gen4 || pk3.Gen5))
         {
-            pk3.SetPIDGender(pk2.Gender);
+            pk3.EncryptionConstant = pk3.PID;
         }
 
         if (pk2.Species is 151 or 251)

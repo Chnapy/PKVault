@@ -1,0 +1,115 @@
+{
+    "PK2": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "nature": 0,
+        "ability": -1,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            8,
+            11,
+            10,
+            10,
+            10,
+            10
+        ],
+        "language": 0,
+        "illegalities": []
+    },
+    "SK2": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "nature": 0,
+        "ability": -1,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            8,
+            11,
+            10,
+            10,
+            10,
+            10
+        ],
+        "language": 0,
+        "illegalities": []
+    },
+    "PK3": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "ability": 26,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            16,
+            23,
+            20,
+            20,
+            20,
+            20
+        ],
+        "language": 3,
+        "illegalities": []
+    }
+}
