@@ -79,14 +79,19 @@ public static class PK8Extensions
             TeraTypeOverride = (MoveType)Tera9RNG.GetTeraTypeFromPersonal(pk8.Species, pk8.Form, 0),
         };
 
-        if (pk8.IsShiny)
-        {
-            pk9.SetIsShiny(true);
-        }
-        else
-        {
-            pk9.SetPIDGender(pk8.Gender);
-        }
+        pk9.FixAbility();
+
+        pk9.FixMetLocation([
+            GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
+            GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG,
+            GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2,
+            GameVersion.X, GameVersion.Y, GameVersion.OR, GameVersion.AS,
+            GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM,
+            GameVersion.SW, GameVersion.SH, GameVersion.BD, GameVersion.SP, GameVersion.PLA,
+            GameVersion.SL, GameVersion.VL,
+        ]);
+
+        pk9.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
 
         pk9.Heal();
         pk9.RefreshChecksum();
@@ -163,14 +168,18 @@ public static class PK8Extensions
             EV_SPE = pk8.EV_SPE,
         };
 
-        if (pk8.IsShiny)
-        {
-            pb8.SetIsShiny(true);
-        }
-        else
-        {
-            pb8.SetPIDGender(pk8.Gender);
-        }
+        pb8.FixAbility();
+
+        pb8.FixMetLocation([
+            GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
+            GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG,
+            GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2,
+            GameVersion.X, GameVersion.Y, GameVersion.OR, GameVersion.AS,
+            GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM,
+            GameVersion.SW, GameVersion.SH, GameVersion.BD, GameVersion.SP, GameVersion.PLA,
+        ]);
+
+        pb8.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
 
         pb8.Heal();
         pb8.RefreshChecksum();
@@ -247,14 +256,18 @@ public static class PK8Extensions
             EV_SPE = pk8.EV_SPE,
         };
 
-        if (pk8.IsShiny)
-        {
-            pa8.SetIsShiny(true);
-        }
-        else
-        {
-            pa8.SetPIDGender(pk8.Gender);
-        }
+        pa8.FixAbility();
+
+        pa8.FixMetLocation([
+            GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
+            GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG,
+            GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2,
+            GameVersion.X, GameVersion.Y, GameVersion.OR, GameVersion.AS,
+            GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM,
+            GameVersion.SW, GameVersion.SH, GameVersion.BD, GameVersion.SP, GameVersion.PLA,
+        ]);
+
+        pa8.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
 
         pa8.ResetHeight();
         pa8.ResetWeight();

@@ -60,19 +60,9 @@ public static class PK2Extensions
             AbilityNumber = 1 << ability,
         };
 
-        do
-        {
-            pk3.PID = EntityPID.GetRandomPID(rnd, pk2.Species, pk2.Gender, pk3.Version, pk3.Nature, pk3.Form, pk3.PID);
-        }
-        while (
-            pk3.IsShiny != pk2.IsShiny
-            || pk3.Form != pk2.Form
-            || pk3.Gender != pk2.Gender
-        );
-        if (pk3.Format >= 6 && (pk3.Gen3 || pk3.Gen4 || pk3.Gen5))
-        {
-            pk3.EncryptionConstant = pk3.PID;
-        }
+        pk3.FixMetLocation([GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD]);
+
+        pk3.FixPID(pk2.IsShiny, pk2.Form, pk2.Gender, pk3.Nature);
 
         if (pk2.Species is 151 or 251)
         {

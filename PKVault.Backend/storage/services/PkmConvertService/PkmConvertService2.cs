@@ -69,15 +69,20 @@ public class PkmConvertService2
 
     private static PKM? TryForwardConversion(PKM source, LanguageID fallbackLang)
     {
+        if (source is ITrainerInfo sourceTrainer)
+        {
+            RecentTrainerCache.SetRecentTrainer(sourceTrainer);
+        }
+
         var pkm = TryVariantToPK(source)
             ?? source.GetType().Name switch
             {
                 "PK1" => ((PK1)source).ConvertToPK2(),
                 "PK2" => ((PK2)source).ConvertToPK3(fallbackLang),
-                "PK3" => ((PK3)source).ConvertToPK4(),
-                "PK4" => ((PK4)source).ConvertToPK5(),
-                "PK5" => ((PK5)source).ConvertToPK6(),
-                "PK6" => ((PK6)source).ConvertToPK7(),
+                "PK3" => ((PK3)source).ConvertToPK4Fixed(),
+                "PK4" => ((PK4)source).ConvertToPK5Fixed(),
+                "PK5" => ((PK5)source).ConvertToPK6Fixed(),
+                "PK6" => ((PK6)source).ConvertToPK7Fixed(),
                 "PK7" => ((PK7)source).ConvertToPK8(),
                 "PK8" => ((PK8)source).ConvertToPK9(),
 
@@ -95,6 +100,11 @@ public class PkmConvertService2
 
     private static PKM? TryBackwardConversion(PKM source)
     {
+        if (source is ITrainerInfo sourceTrainer)
+        {
+            RecentTrainerCache.SetRecentTrainer(sourceTrainer);
+        }
+
         var pkm = TryVariantToPK(source)
             ?? source.GetType().Name switch
             {

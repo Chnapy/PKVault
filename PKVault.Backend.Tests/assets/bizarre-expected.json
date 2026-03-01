@@ -3,6 +3,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
+        "version": 56,
         "level": 5,
         "exp": 125,
         "moves": [
@@ -41,6 +42,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
+        "version": 56,
         "level": 5,
         "exp": 125,
         "moves": [
@@ -79,6 +81,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
+        "version": 4,
         "level": 5,
         "exp": 125,
         "moves": [
@@ -110,6 +113,458 @@
             20
         ],
         "language": 3,
-        "illegalities": []
+        "illegalities": [
+            "PID-PIDTypeMismatch",
+            "Level-LevelMetBelow"
+        ]
+    },
+    "CK3": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 4,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "ability": 26,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            16,
+            23,
+            20,
+            20,
+            20,
+            20
+        ],
+        "language": 3,
+        "illegalities": [
+            "PID-PIDTypeMismatch",
+            "Level-LevelMetBelow"
+        ]
+    },
+    "XK3": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 4,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "ability": 26,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            16,
+            23,
+            20,
+            20,
+            20,
+            20
+        ],
+        "language": 3,
+        "illegalities": [
+            "PID-PIDTypeMismatch",
+            "Level-LevelMetBelow"
+        ]
+    },
+    "PK4": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 10,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "ability": 26,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            16,
+            23,
+            20,
+            20,
+            20,
+            20
+        ],
+        "language": 3,
+        "illegalities": [
+            "PID-PIDTypeMismatch",
+            "Level-LevelMetBelow"
+        ]
+    },
+    "BK4": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 10,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "ability": 26,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            16,
+            23,
+            20,
+            20,
+            20,
+            20
+        ],
+        "language": 3,
+        "illegalities": [
+            "PID-PIDTypeMismatch",
+            "Level-LevelMetBelow"
+        ]
+    },
+    "RK4": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 10,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "ability": 26,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            16,
+            23,
+            20,
+            20,
+            20,
+            20
+        ],
+        "language": 3,
+        "illegalities": [
+            "PID-PIDTypeMismatch",
+            "Level-LevelMetBelow"
+        ]
+    },
+    "PK5": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 8,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "ability": 26,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            16,
+            23,
+            20,
+            20,
+            20,
+            20
+        ],
+        "language": 3,
+        "illegalities": [
+            "PID-PIDTypeMismatch"
+        ]
+    },
+    "PK6": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 8,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "ability": 26,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            16,
+            23,
+            20,
+            20,
+            20,
+            20
+        ],
+        "language": 3,
+        "illegalities": [
+            "PID-PIDTypeMismatch"
+        ]
+    },
+    "PK7": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 8,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "ability": 26,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            16,
+            23,
+            20,
+            20,
+            20,
+            20
+        ],
+        "language": 3,
+        "illegalities": [
+            "PID-PIDTypeMismatch"
+        ]
+    },
+    "PK8": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 8,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "ability": 0,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            16,
+            23,
+            20,
+            20,
+            20,
+            20
+        ],
+        "language": 3,
+        "illegalities": [
+            "PID-PIDTypeMismatch",
+            "Encounter-TransferTrackerMissing",
+            "Encounter-TransferBad"
+        ]
+    },
+    "PB8": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 8,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "ability": 26,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            16,
+            23,
+            20,
+            20,
+            20,
+            20
+        ],
+        "language": 3,
+        "illegalities": [
+            "PID-PIDTypeMismatch",
+            "Encounter-TransferTrackerMissing"
+        ]
+    },
+    "PA8": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 8,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "ability": 26,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            16,
+            23,
+            20,
+            20,
+            20,
+            20
+        ],
+        "language": 3,
+        "illegalities": [
+            "PID-PIDTypeMismatch",
+            "Encounter-TransferTrackerMissing"
+        ]
     }
 }

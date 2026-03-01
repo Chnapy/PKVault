@@ -77,14 +77,9 @@ public static class PK9Extensions
             ObedienceLevel = pk9.ObedienceLevel,
         };
 
-        if (pk9.IsShiny)
-        {
-            pa9.SetIsShiny(true);
-        }
-        else
-        {
-            pa9.SetPIDGender(pk9.Gender);
-        }
+        pa9.FixMetLocation([GameVersion.ZA]);
+
+        pa9.FixPID(pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
 
         pa9.Heal();
         pa9.RefreshChecksum();

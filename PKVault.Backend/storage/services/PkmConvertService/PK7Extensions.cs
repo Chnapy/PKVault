@@ -51,6 +51,7 @@ public static class PK7Extensions
             OriginalTrainerGender = pk7.OriginalTrainerGender,
             OriginalTrainerFriendship = pk7.OriginalTrainerFriendship,
             HandlingTrainerFriendship = pk7.HandlingTrainerFriendship,
+            HandlingTrainerLanguage = (byte)pk7.Language,
 
             Ability = pk7.Ability,
             AbilityNumber = pk7.AbilityNumber,
@@ -70,25 +71,24 @@ public static class PK7Extensions
             EV_SPA = pk7.EV_SPA,
             EV_SPD = pk7.EV_SPD,
             EV_SPE = pk7.EV_SPE,
-
         };
 
-        if (pk7.IsShiny)
-        {
-            pk8.SetIsShiny(true);
-        }
-        else
-        {
-            pk8.SetPIDGender(pk7.Gender);
-        }
+        // Console.WriteLine($"1-ABILITY PK7 {pk7.Ability} PK8 {pk8.Ability}");
+        pk8.FixAbility();
+        // Console.WriteLine($"AB1={pk8.PersonalInfo.Ability1}");
+        // Console.WriteLine($"AB2={pk8.PersonalInfo.Ability2}");
+        // Console.WriteLine($"2-ABILITY PK7 {pk7.Ability} PK8 {pk8.Ability}");
 
-        var an = pk7.AbilityNumber;
-        if (an is 1 or 2 or 4) // Valid Ability Numbers
-        {
-            int index = an >> 1;
-            if (pk7.PersonalInfo.GetAbilityAtIndex(index) == pk7.Ability) // correct pair
-                pk8.Ability = pk8.PersonalInfo.GetAbilityAtIndex(index);
-        }
+        pk8.FixMetLocation([
+            GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
+            GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG,
+            GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2,
+            GameVersion.X, GameVersion.Y, GameVersion.OR, GameVersion.AS,
+            GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM,
+            GameVersion.SW, GameVersion.SH, GameVersion.BD, GameVersion.SP, GameVersion.PLA,
+        ]);
+
+        pk8.FixPID(pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature);
 
         // for Furfrou and Hoopa
         pk8.FormArgumentRemain = pk7.FormArgumentRemain;
@@ -196,13 +196,12 @@ public static class PK7Extensions
 
         };
 
-        var an = pk7.AbilityNumber;
-        if (an is 1 or 2 or 4) // Valid Ability Numbers
-        {
-            int index = an >> 1;
-            if (pk7.PersonalInfo.GetAbilityAtIndex(index) == pk7.Ability) // correct pair
-                pb7.Ability = pb7.PersonalInfo.GetAbilityAtIndex(index);
-        }
+        // pb7.FixMetLocation([
+        //     // GameVersion.RD, GameVersion.GN, GameVersion.BU, GameVersion.YW,
+        //     // GameVersion.GD, GameVersion.SI, GameVersion.C,
+        //     GameVersion.GP, GameVersion.GE,
+        //     GameVersion.GO,
+        // ]);
 
         pb7.ResetCalculatedValues();
 

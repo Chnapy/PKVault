@@ -1,9 +1,4 @@
-using System.IO.Abstractions.TestingHelpers;
-using System.Reflection.Metadata;
-using System.Text;
 using System.Text.Json;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using PKHeX.Core;
 
 public class PkmConvertServiceTests
@@ -73,110 +68,66 @@ public class PkmConvertServiceTests
 
         var service = GetService();
 
-        // 1. Charger PK1 original
         FileUtil.TryGetPKM(pikachuPK1Bytes, out var sourcePkm, "pk1");
         Assert.NotNull(sourcePkm);
         Assert.Equal(25, sourcePkm.Species);
 
-        // 2. Créer blank cible
         var blank = CreateBlankTarget(targetTypeName);
 
-        // 3. Convertir
         var result = service.ConvertTo(sourcePkm, blank, LanguageID.French);
 
-        // 4. Vérifier type
         Assert.Equal(targetTypeName, result.GetType().Name);
 
-        // 5. Vérifier données attendues
-        AssertExpectedData(result, (JsonElement)pikachuExpectedData[targetTypeName]);
-
-        // var filename = FileUtil.GetPKMTempFileName(result, false);
         File.WriteAllBytes(Path.Combine("./pkm-files", "pikachu", result.FileName), result.DecryptedPartyData);
 
-        // var client = new AssemblyClient();
-        // var staticData = (await client.GetAsyncJsonGz(
-        //     GenStaticDataService.GetStaticDataPathParts("en"),
-        //     StaticDataJsonContext.Default.StaticDataDTO
-        // ))!;
-        // var staticMoves = staticData.Moves;
-        // var staticMoves = staticData.Versions[(byte)GameVersion.S].;
-
-        // Console.WriteLine(string.Join(',',
-        //     GameInfo.Strings.Gen3.GetLocationNames(0).ToArray().Select((name, i) => $"{i} - {name}")
-        // ));
-
-        // var sourceMovesItems = GetPkmAvailableMoves(sourcePk1);
-        // var resultMovesItems = GetPkmAvailableMoves(result);
-
-        // Console.WriteLine($"{sourcePk1.GetType()} moves = {String.Join(',', result.Moves.Select(m => staticMoves[m].Name))}\n\n");
-        // Console.WriteLine($"{sourcePk1.GetType()} moves = {String.Join(',', result.Moves.Select(m => sourceMovesItems.Find(item => item.Id == m)))}");
-
-        // Console.WriteLine($"{result.GetType()} moves = {String.Join(',', result.Moves.Select(m => staticMoves[m].Name))}\n\n");
-        // Console.WriteLine($"{result.GetType()} moves = {String.Join(',', result.Moves.Select(m => resultMovesItems.Find(item => item.Id == m)))}");
-
-        // Console.WriteLine($"{result.GetType()} available moves = {String.Join(',', resultMovesItems.Select(m => staticMoves[m.Id].Name))}\n\n");
-        // Console.WriteLine($"{result.GetType()} available moves = {String.Join(',', resultMovesItems.Select(m => m.Id))}");
-
-        // 6. Vérifier légalité
-        // var legality = new LegalityAnalysis(result);
-        // Assert.True(legality.Valid, $"Illegalities in {targetTypeName}:\n{string.Join('\n',
-        //     legality.Results.ToList()
-        //     .FindAll(r => !r.Valid)
-        //     .Select(r => $"{r.Identifier}-{r.Result}"))}");
-        // Assert.True(legality.Valid, $"Illegalities in {targetTypeName}:\n{legality.Report()}");
+        AssertExpectedData(result, (JsonElement)pikachuExpectedData[targetTypeName]);
     }
 
     [Theory]
     [
         InlineData("PK2"),
-    InlineData("SK2"),
-    InlineData("PK3"),
-    // InlineData("CK3"),
-    // InlineData("XK3")
+        InlineData("SK2"),
+        InlineData("PK3"),
+        InlineData("CK3"),
+        InlineData("XK3")
     ]
-    // [
-    //     InlineData("PK4"),
-    //     InlineData("BK4"),
-    //     InlineData("RK4"),
-    //     InlineData("PK5")
-    // ]
-    // [
-    //     InlineData("PK6"),
-    //     InlineData("PK7"),
-    //     InlineData("PB7"),
-    //     InlineData("PK8")
-    // ]
-    // [
-    //     InlineData("PB8"),
-    //     InlineData("PA8"),
-    //     InlineData("PK9"),
-    //     InlineData("PA9")
-    // ]
+    [
+        InlineData("PK4"),
+        InlineData("BK4"),
+        InlineData("RK4"),
+        InlineData("PK5")
+    ]
+    [
+        InlineData("PK6"),
+        InlineData("PK7"),
+        // InlineData("PB7"),  // G2 pkms not available here
+        InlineData("PK8")
+    ]
+    [
+        InlineData("PB8"),
+        InlineData("PA8"),
+    // InlineData("PK9"),  // Unown not available here
+    // InlineData("PA9")   // Unown not available here
+    ]
     public async Task TestAllBizarreForwardConversions(string targetTypeName)
     {
         SetupPKDirectory("bizarre");
 
         var service = GetService();
 
-        // 1. Charger PK1 original
         FileUtil.TryGetPKM(bizarrePK2Bytes, out var sourcePkm, "pk2");
         Assert.NotNull(sourcePkm);
         Assert.Equal(201, sourcePkm.Species);
 
-        // 2. Créer blank cible
         var blank = CreateBlankTarget(targetTypeName);
 
-        // 3. Convertir
         var result = service.ConvertTo(sourcePkm, blank, LanguageID.French);
 
-        // 4. Vérifier type
         Assert.Equal(targetTypeName, result.GetType().Name);
 
-        // 5. Vérifier données attendues
-        AssertExpectedData(result, (JsonElement)bizarreExpectedData[targetTypeName]);
-
-        // var filename = FileUtil.GetPKMTempFileName(result, false);
         File.WriteAllBytes(Path.Combine("./pkm-files", "bizarre", result.FileName), result.DecryptedPartyData);
+
+        AssertExpectedData(result, (JsonElement)bizarreExpectedData[targetTypeName]);
     }
 
     // [Fact]
@@ -233,6 +184,7 @@ public class PkmConvertServiceTests
         Assert.Equal(expectedData.GetProperty("species").GetInt32(), pkm.Species);
         Assert.Equal(expectedData.GetProperty("form").GetInt32(), pkm.Form);
         Assert.Equal(expectedData.GetProperty("gender").GetByte(), pkm.Gender);
+        Assert.Equal(expectedData.GetProperty("version").GetByte(), (byte)pkm.Version);
         Assert.Equal(expectedData.GetProperty("level").GetInt32(), pkm.CurrentLevel);
         Assert.Equal(expectedData.GetProperty("exp").GetUInt32(), pkm.EXP);
         Assert.Equal(expectedData.GetProperty("shiny").GetBoolean(), pkm.IsShiny);
@@ -315,11 +267,6 @@ public class PkmConvertServiceTests
             ]);
         }
 
-        // if (pkm is ITeraType pkmTera)
-        // {
-        //     Assert.Equal(expectedData.GetProperty("teratype").GetSByte(), (sbyte)pkmTera.TeraType);
-        // }
-
         var legality = new LegalityAnalysis(pkm);
 
         if (!legality.Valid)
@@ -360,44 +307,4 @@ public class PkmConvertServiceTests
             }
         }
     }
-
-    // public List<MoveItem> GetPkmAvailableMoves(PKM pkm)
-    // {
-    //     var legality = new LegalityAnalysis(pkm);
-
-    //     var moveComboSource = new LegalMoveComboSource();
-    //     var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
-
-    //     var save = BlankSaveFile.Get(
-    //         StaticDataService.GetSingleVersion(pkm.Version),
-    //         pkm.OriginalTrainerName,
-    //         (LanguageID)(pkm is GBPKM gbpkm
-    //             ? gbpkm.IsSpeciesNameMatch(pkm.Language) ? pkm.Language : gbpkm.GuessedLanguage(pkm.Language)
-    //             : pkm.Language)
-    //     );
-
-    //     var filteredSources = new FilteredGameDataSource(save, GameInfo.Sources);
-    //     moveSource.ChangeMoveSource(filteredSources.Moves);
-    //     moveSource.ReloadMoves(legality);
-
-    //     var movesStr = GameInfo.GetStrings("en").movelist;
-
-    //     var availableMoves = new List<MoveItem>();
-
-    //     moveComboSource.DataSource.ToList().ForEach(data =>
-    //     {
-    //         if (data.Value > 0 && moveSource.Info.CanLearn((ushort)data.Value))
-    //         {
-    //             var item = new MoveItem(
-    //                 Id: data.Value
-    //             // Type = MoveInfo.GetType((ushort)data.Value, Pkm.Context),
-    //             // Text = movesStr[data.Value],
-    //             // SourceTypes = moveSourceTypes.FindAll(type => moveSourceTypesRecord[type].Length > data.Value && moveSourceTypesRecord[type][data.Value]),
-    //             );
-    //             availableMoves.Add(item);
-    //         }
-    //     });
-
-    //     return availableMoves;
-    // }
 }
