@@ -639,6 +639,10 @@
             150
         ],
         "ribbons": {},
+        "size": [
+            72,
+            144
+        ],
         "illegalities": []
     },
     "PK8": {
@@ -903,6 +907,11 @@
             "RibbonChampionG3": 1,
             "RibbonEffort": 1
         },
+        "size": [
+            1,
+            1,
+            0
+        ],
         "illegalities": [
             "PID-PIDTypeMismatch",
             "Encounter-TransferTrackerMissing",

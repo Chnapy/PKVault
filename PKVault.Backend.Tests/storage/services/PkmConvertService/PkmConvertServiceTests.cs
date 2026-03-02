@@ -366,6 +366,35 @@ public class PkmConvertServiceTests
             Assert.Equal(ribbons.Deserialize<Dictionary<string, byte>>(), ribbonInfos);
         }
 
+        if (expectedData.TryGetProperty("size", out var size))
+        {
+            var ribbonInfos = RibbonInfo.GetRibbonInfo(pkm)
+                .Where(info => info.HasRibbon || info.RibbonCount > 0)
+                .ToDictionary(
+                    info => info.Name,
+                    info => info.HasRibbon ? (byte)1 : info.RibbonCount
+                );
+
+            List<int> pkmSize = [];
+
+            if (pkm is IScaledSizeAbsolute sa)
+            {
+                pkmSize.Add((int)sa.HeightAbsolute);
+                pkmSize.Add((int)sa.WeightAbsolute);
+            }
+            else if (pkm is IScaledSize ss)
+            {
+                pkmSize.Add(ss.HeightScalar);
+                pkmSize.Add(ss.WeightScalar);
+            }
+            if (pkm is IScaledSize3 scale)
+            {
+                pkmSize.Add(scale.Scale);
+            }
+
+            Assert.Equal(size.EnumerateArray().Select(v => v.GetInt32()), pkmSize);
+        }
+
         if (expectedData.TryGetProperty("contest", out var contest))
         {
             if (pkm is IContestStats pkmContest)
