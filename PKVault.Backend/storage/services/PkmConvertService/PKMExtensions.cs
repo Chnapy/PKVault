@@ -1,24 +1,169 @@
+using System.Security.Cryptography;
+using System.Text;
 using PKHeX.Core;
 
 public static class PKMExtensions
 {
-    public static void FixPID(this PKM pkm, bool isShiny, byte form, byte gender, Nature nature)
+    public static void FixCommonLegalityIssues(this PKM pkm)
+    {
+        pkm.FixPID(pkm.IsShiny, pkm.Form, pkm.Gender, pkm.Nature, true);
+        pkm.FixBallLegality();
+        pkm.FixHeldItemLegality();
+        pkm.FixRibbonLegality();
+        pkm.FixContestLegality();
+    }
+
+    public static void FixRibbonLegality(this PKM pkm)
+    {
+        if (pkm is GBPKM)
+        {
+            return;
+        }
+
+        LegalityAnalysis legality = new(pkm);
+        if (!legality.Valid && legality.Results.Any(r => !r.Valid
+            && r.Identifier == CheckIdentifier.Ribbon))
+        {
+            var args = new RibbonVerifierArguments(
+                legality.Info.Entity,
+                legality.EncounterMatch,
+                legality.Info.EvoChainsAllGens
+            );
+            RibbonApplicator.FixInvalidRibbons(args);
+        }
+    }
+
+    public static void FixContestLegality(this PKM pkm)
+    {
+        if (pkm is not IContestStats contest)
+        {
+            return;
+        }
+
+        LegalityAnalysis legality = new(pkm);
+        if (legality.Valid)
+        {
+            return;
+        }
+
+        var invalidMemories = legality.Results.Where(r => !r.Valid
+            && r.Identifier == CheckIdentifier.Memory);
+
+        if (invalidMemories.Any(r => r.Result == LegalityCheckResultCode.ContestZero))
+        {
+            contest.ContestCool = 0;
+            contest.ContestBeauty = 0;
+            contest.ContestCute = 0;
+            contest.ContestSmart = 0;
+            contest.ContestTough = 0;
+            contest.ContestSheen = 0;
+        }
+        else if (invalidMemories.Any(r => r.Result == LegalityCheckResultCode.ContestZeroSheen))
+        {
+            contest.ContestSheen = 0;
+        }
+    }
+
+    public static void FixHeldItemLegality(this PKM pkm)
+    {
+        LegalityAnalysis legality = new(pkm);
+
+        if (!legality.Valid && legality.Results.Any(r =>
+            !r.Valid &&
+            r.Identifier == CheckIdentifier.HeldItem &&
+            r.Result == LegalityCheckResultCode.ItemUnreleased
+        ))
+        {
+            pkm.HeldItem = 0;
+        }
+    }
+
+    public static void FixBallLegality(this PKM pkm)
+    {
+        bool hasBallIllegality()
+        {
+            LegalityAnalysis legality = new(pkm);
+            return !legality.Valid && legality.Results.Any(r =>
+                !r.Valid &&
+                r.Identifier == CheckIdentifier.Ball
+            );
+        }
+
+        var initialBall = pkm.Ball;
+
+        // first try to use default Pokeball
+        // enough for most cases
+        if (pkm.Ball != (byte)Ball.Poke && hasBallIllegality())
+        {
+            pkm.Ball = (byte)Ball.Poke;
+        }
+
+        // then tryu with all other balls
+        var balls = Enum.GetValues<Ball>();
+        for (var i = 0; i < balls.Length && hasBallIllegality(); i++)
+        {
+            var ball = balls[i];
+            // ignore already tried balls
+            if ((byte)ball == initialBall || ball == Ball.Poke)
+            {
+                continue;
+            }
+
+            if (hasBallIllegality())
+            {
+                pkm.Ball = (byte)ball;
+            }
+        }
+
+        // if nothing works, reset to initial ball
+        if (hasBallIllegality())
+        {
+            pkm.Ball = initialBall;
+        }
+    }
+
+    public static void PassHeldItem(this PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
+    {
+        pkm.HeldItem = ItemConverter.GetItemForFormat(srcHeldItem, srcContext, pkm.Context);
+
+        if (srcHeldItem > 0 && pkm.HeldItem == 0)
+        {
+            var stringsSrc = GameInfo.Strings.GetItemStrings(srcContext, srcVersion);
+            var stringsDest = GameInfo.Strings.GetItemStrings(pkm.Context, pkm.Version);
+
+            var strSrc = stringsSrc[srcHeldItem];
+            var strDestIndex = stringsDest.ToList().FindIndex(str => str == strSrc);
+            if (strDestIndex > 0)
+            {
+                pkm.HeldItem = strDestIndex;
+            }
+        }
+    }
+
+    public static void FixPID(this PKM pkm, bool isShiny, byte form, byte gender, Nature nature, bool checkLegality = false)
     {
         var rnd = Util.Rand;
         var i = 0;
-        LegalityAnalysis legality = new(pkm);
+
+        bool hasPIDFixableIllegality()
+        {
+            if (!checkLegality)
+            {
+                return false;
+            }
+
+            LegalityAnalysis legality = new(pkm);
+            return !legality.Valid && legality.Results.Any(r =>
+                r.Identifier == CheckIdentifier.EC && r.Result == LegalityCheckResultCode.TransferEncryptGen6BitFlip
+            );
+        }
 
         while (
             pkm.IsShiny != isShiny
             || pkm.Form != form
             || pkm.Gender != gender
             || pkm.Nature != nature
-
-            // TODO may cause performance issues,
-            // consider tolerate this illegality
-            || (!legality.Valid && legality.Results.Any(r =>
-                r.Identifier == CheckIdentifier.EC && r.Result == LegalityCheckResultCode.TransferEncryptGen6BitFlip
-            ))
+            || hasPIDFixableIllegality()
         )
         {
             pkm.PID = EntityPID.GetRandomPID(rnd, pkm.Species, gender, pkm.Version, nature, form, pkm.PID);
@@ -27,8 +172,6 @@ public static class PKMExtensions
             {
                 break;
             }
-
-            legality = new(pkm);
         }
 
         if (pkm.Format >= 6 && (pkm.Gen3 || pkm.Gen4 || pkm.Gen5))
@@ -92,26 +235,6 @@ public static class PKMExtensions
         {
             var legality = new LegalityAnalysis(pkm);
 
-            // IEnumerable<CheckResult> abilityIssue = !legality.Valid
-            //     ? legality.Results.Where(r =>
-            //         !r.Valid
-            //         && (
-            //             r.Identifier == CheckIdentifier.Ability
-            //         )
-            //     )
-            //     : [];
-
-            // if (abilityIssue.Any())
-            // {
-            //     Console.WriteLine($"ABILITY ISSUE ({pkm.Ability}/{pkm.AbilityNumber}/{pkm.PersonalInfo.AbilityCount}) = {abilityIssue.First().Identifier}/{abilityIssue.First().Result}\n{legality.Report()}");
-            // }
-            // else
-            // {
-            //     Console.WriteLine($"ABILITY OK ({pkm.Ability}/{pkm.AbilityNumber}/{pkm.PersonalInfo.AbilityCount})\n{legality.Report()}");
-            // }
-
-            // return abilityIssue.Any();
-
             return !legality.Valid && legality.Results.Any(r =>
                 !r.Valid
                 && (
@@ -126,24 +249,27 @@ public static class PKMExtensions
         }
     }
 
+    public static void FixSID(this PKM pkm)
+    {
+        if (pkm.SID16 == 0)
+        {
+            string key = $"{pkm.OriginalTrainerName}|{pkm.TID16}";
+            byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(key));
+
+            var raw = BitConverter.ToInt32(hash, 0) & 0x7FFFFFFF;
+            var id = (ushort)(raw % 100000);
+            pkm.SID16 = id;
+        }
+    }
+
     public static void SetSuggestedMetLocation(PKM pkm)
     {
         var encounter = EncounterSuggestion.GetSuggestedMetInfo(pkm);
         if (encounter == null) return;
-        // ArgumentNullException.ThrowIfNull(encounter);
 
-        // var level = encounter.LevelMin;
-        // int minLevel = EncounterSuggestion.GetLowestLevel(pkm, level);
-        // if (minLevel == 0)
-        //     minLevel = level;
         ushort location = encounter.Location;
         if (pkm.Format < 3 && encounter.Encounter is { } x && !x.Version.Contains(GameVersion.C))
             location = 0;
-
-        // if (minLevel < level)
-        //     minLevel = level;
-
-        // var foo = EntitySuggestionUtil.GetMetLocationSuggestionMessage(pkm, level, location, minLevel, encounter.Encounter);
 
         if (pkm.Format >= 3)
         {
@@ -165,8 +291,5 @@ public static class PKMExtensions
                 pk2.MetTimeOfDay = location == 0 ? 0 : encounter.GetSuggestedMetTimeOfDay();
             }
         }
-
-        // if (pk6.CurrentLevel < minLevel)
-        //     TB_Level.Text = minLevel.ToString();
     }
 }

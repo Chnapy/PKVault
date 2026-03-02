@@ -14,6 +14,11 @@ public static class PK5Extensions
             GameVersion.X, GameVersion.Y, GameVersion.OR, GameVersion.AS
         ]);
 
+        pk6.PassHeldItem(pk5.HeldItem, pk5.Context, pk5.Version);
+
+        pk6.OriginalTrainerFriendship = pk5.CurrentFriendship;
+        pk6.HandlingTrainerFriendship = pk5.CurrentFriendship;
+
         return pk6;
     }
 

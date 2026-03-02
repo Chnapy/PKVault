@@ -43,22 +43,26 @@ public static class PK2Extensions
             IsNicknamed = pk2.IsNicknamed,
             Form = pk2.Form,
 
-            CurrentHandler = 1,
-            HandlingTrainerName = pk2.OriginalTrainerName,
-            HandlingTrainerGender = pk2.OriginalTrainerGender,
-
             Language = language,
             Nickname = pk2.IsNicknamed
                 ? pk2.Nickname
                 : SpeciesName.GetSpeciesNameGeneration(pk2.Species, language, 3),
+
+            CurrentHandler = 1,
             OriginalTrainerName = pk2.GetTransferTrainerName(language),
             OriginalTrainerGender = pk2.OriginalTrainerGender, // Crystal
-            OriginalTrainerFriendship = pi.BaseFriendship,
-            HandlingTrainerFriendship = pi.BaseFriendship,
+            OriginalTrainerFriendship = pk2.CurrentFriendship,
+            HandlingTrainerName = pk2.OriginalTrainerName,
+            HandlingTrainerGender = pk2.OriginalTrainerGender,
+            HandlingTrainerFriendship = pk2.CurrentFriendship,
 
             Ability = pi.GetAbilityAtIndex(ability),
             AbilityNumber = 1 << ability,
         };
+
+        pk3.FixSID();
+
+        pk3.PassHeldItem(pk2.HeldItem, pk2.Context, pk2.Version);
 
         pk3.FixMetLocation([GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD]);
 
@@ -103,8 +107,6 @@ public static class PK2Extensions
         pk3.SetEVs(evs);
 
         pk3.FixMoves();
-        pk3.Heal();
-        pk3.RefreshChecksum();
 
         return pk3;
     }

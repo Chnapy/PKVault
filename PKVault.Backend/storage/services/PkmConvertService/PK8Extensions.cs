@@ -20,6 +20,7 @@ public static class PK8Extensions
             EncryptionConstant = rnd.Rand32(),
             Species = pk8.Species,
             TID16 = pk8.TID16,
+            SID16 = pk8.SID16,
             CurrentLevel = pk8.CurrentLevel,
             EXP = pk8.EXP,
             Nature = pk8.Nature,
@@ -79,6 +80,23 @@ public static class PK8Extensions
             TeraTypeOverride = (MoveType)Tera9RNG.GetTeraTypeFromPersonal(pk8.Species, pk8.Form, 0),
         };
 
+        for (var i = 0; i < pk9.MarkingCount; i++)
+        {
+            pk9.SetMarking(i, pk8.GetMarking(i));
+        }
+
+        pk8.CopyContestStatsTo(pk9);
+
+        pk8.CopyRibbonSetCommon3(pk9);
+        pk8.CopyRibbonSetEvent3(pk9);
+        pk8.CopyRibbonSetCommon4(pk9);
+        pk8.CopyRibbonSetEvent4(pk9);
+        pk8.CopyRibbonSetCommon6(pk9);
+        pk8.CopyRibbonSetMemory6(pk9);
+        pk8.CopyRibbonSetCommon7(pk9);
+
+        pk9.PassHeldItem(pk8.HeldItem, pk8.Context, pk8.Version);
+
         pk9.FixAbility();
 
         pk9.FixMetLocation([
@@ -92,9 +110,6 @@ public static class PK8Extensions
         ]);
 
         pk9.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
-
-        pk9.Heal();
-        pk9.RefreshChecksum();
 
         return pk9;
     }
@@ -116,6 +131,7 @@ public static class PK8Extensions
             EncryptionConstant = rnd.Rand32(),
             Species = pk8.Species,
             TID16 = pk8.TID16,
+            SID16 = pk8.SID16,
             CurrentLevel = pk8.CurrentLevel,
             EXP = pk8.EXP,
             Nature = pk8.Nature,
@@ -168,6 +184,23 @@ public static class PK8Extensions
             EV_SPE = pk8.EV_SPE,
         };
 
+        for (var i = 0; i < pk8.MarkingCount; i++)
+        {
+            pb8.SetMarking(i, pk8.GetMarking(i));
+        }
+
+        pk8.CopyContestStatsTo(pb8);
+
+        pk8.CopyRibbonSetCommon3(pb8);
+        pk8.CopyRibbonSetEvent3(pb8);
+        pk8.CopyRibbonSetCommon4(pb8);
+        pk8.CopyRibbonSetEvent4(pb8);
+        pk8.CopyRibbonSetCommon6(pb8);
+        pk8.CopyRibbonSetMemory6(pb8);
+        pk8.CopyRibbonSetCommon7(pb8);
+
+        pb8.PassHeldItem(pk8.HeldItem, pk8.Context, pk8.Version);
+
         pb8.FixAbility();
 
         pb8.FixMetLocation([
@@ -180,9 +213,6 @@ public static class PK8Extensions
         ]);
 
         pb8.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
-
-        pb8.Heal();
-        pb8.RefreshChecksum();
 
         return pb8;
     }
@@ -204,6 +234,7 @@ public static class PK8Extensions
             EncryptionConstant = rnd.Rand32(),
             Species = pk8.Species,
             TID16 = pk8.TID16,
+            SID16 = pk8.SID16,
             CurrentLevel = pk8.CurrentLevel,
             EXP = pk8.EXP,
             Nature = pk8.Nature,
@@ -256,6 +287,21 @@ public static class PK8Extensions
             EV_SPE = pk8.EV_SPE,
         };
 
+        for (var i = 0; i < pk8.MarkingCount; i++)
+        {
+            pa8.SetMarking(i, pk8.GetMarking(i));
+        }
+
+        pk8.CopyContestStatsTo(pa8);
+
+        pk8.CopyRibbonSetCommon3(pa8);
+        pk8.CopyRibbonSetEvent3(pa8);
+        pk8.CopyRibbonSetCommon4(pa8);
+        pk8.CopyRibbonSetEvent4(pa8);
+        pk8.CopyRibbonSetCommon6(pa8);
+        pk8.CopyRibbonSetMemory6(pa8);
+        pk8.CopyRibbonSetCommon7(pa8);
+
         pa8.FixAbility();
 
         pa8.FixMetLocation([
@@ -271,9 +317,6 @@ public static class PK8Extensions
 
         pa8.ResetHeight();
         pa8.ResetWeight();
-
-        pa8.Heal();
-        pa8.RefreshChecksum();
 
         return pa8;
     }

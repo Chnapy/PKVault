@@ -9,6 +9,9 @@ public class PkmConvertService2
         if (result.GetType() != blankTargetPkm.GetType())
             throw new InvalidOperationException($"Failed to convert to {blankTargetPkm.GetType().Name}");
 
+        result.FixCommonLegalityIssues();
+
+        result.Heal();
         result.ResetPartyStats();
         result.RefreshChecksum();
 
@@ -46,12 +49,12 @@ public class PkmConvertService2
             ("PK2", "SK2") => ((PK2)source).ConvertToSK2(),
 
             // G3  
-            ("PK3", "CK3") => ((PK3)source).ConvertToCK3(),
-            ("PK3", "XK3") => ((PK3)source).ConvertToXK3(),
+            ("PK3", "CK3") => ((PK3)source).ConvertToCK3Fixed(),
+            ("PK3", "XK3") => ((PK3)source).ConvertToXK3Fixed(),
 
             // G4
-            ("PK4", "BK4") => ((PK4)source).ConvertToBK4(),
-            ("PK4", "RK4") => ((PK4)source).ConvertToRK4(),
+            ("PK4", "BK4") => ((PK4)source).ConvertToBK4Fixed(),
+            ("PK4", "RK4") => ((PK4)source).ConvertToRK4Fixed(),
 
             // G7
             ("PK7", "PB7") => ((PK7)source).ConvertToPB7(),

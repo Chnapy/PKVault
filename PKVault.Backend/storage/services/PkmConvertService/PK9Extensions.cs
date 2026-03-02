@@ -20,6 +20,7 @@ public static class PK9Extensions
             EncryptionConstant = rnd.Rand32(),
             Species = pk9.Species,
             TID16 = pk9.TID16,
+            SID16 = pk9.SID16,
             CurrentLevel = pk9.CurrentLevel,
             EXP = pk9.EXP,
             Nature = pk9.Nature,
@@ -77,12 +78,26 @@ public static class PK9Extensions
             ObedienceLevel = pk9.ObedienceLevel,
         };
 
+        for (var i = 0; i < pk9.MarkingCount; i++)
+        {
+            pa9.SetMarking(i, pk9.GetMarking(i));
+        }
+
+        pk9.CopyContestStatsTo(pa9);
+
+        pk9.CopyRibbonSetCommon3(pa9);
+        pk9.CopyRibbonSetEvent3(pa9);
+        pk9.CopyRibbonSetCommon4(pa9);
+        pk9.CopyRibbonSetEvent4(pa9);
+        pk9.CopyRibbonSetCommon6(pa9);
+        pk9.CopyRibbonSetMemory6(pa9);
+        pk9.CopyRibbonSetCommon7(pa9);
+
+        pa9.PassHeldItem(pk9.HeldItem, pk9.Context, pk9.Version);
+
         pa9.FixMetLocation([GameVersion.ZA]);
 
         pa9.FixPID(pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
-
-        pa9.Heal();
-        pa9.RefreshChecksum();
 
         return pa9;
     }

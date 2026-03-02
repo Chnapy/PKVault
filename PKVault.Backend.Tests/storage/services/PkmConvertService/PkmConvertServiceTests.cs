@@ -3,14 +3,19 @@ using PKHeX.Core;
 
 public class PkmConvertServiceTests
 {
-    private static readonly byte[] pikachuPK1Bytes = File.ReadAllBytes("./assets/0025 - PIKACHU - 98F7.pk1");
+    private static readonly byte[] pikachuBytes = File.ReadAllBytes("./assets/0025 - PIKACHU - 98F7.pk1");
     private static readonly Dictionary<string, object> pikachuExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
         File.ReadAllText("./assets/pikachu-expected.json")
     )!;
 
-    private static readonly byte[] bizarrePK2Bytes = File.ReadAllBytes("./assets/0201-08 ★ - BIZARRE - 962B.pk2");
+    private static readonly byte[] bizarreBytes = File.ReadAllBytes("./assets/0201-08 ★ - BIZARRE - 962B.pk2");
     private static readonly Dictionary<string, object> bizarreExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
         File.ReadAllText("./assets/bizarre-expected.json")
+    )!;
+
+    private static readonly byte[] mukBytes = File.ReadAllBytes("./assets/0089 - Muk.pk3");
+    private static readonly Dictionary<string, object> mukExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
+        File.ReadAllText("./assets/muk-expected.json")
     )!;
 
     private static bool pkFolderCleaned = false;
@@ -68,7 +73,7 @@ public class PkmConvertServiceTests
 
         var service = GetService();
 
-        FileUtil.TryGetPKM(pikachuPK1Bytes, out var sourcePkm, "pk1");
+        FileUtil.TryGetPKM(pikachuBytes, out var sourcePkm, "pk1");
         Assert.NotNull(sourcePkm);
         Assert.Equal(25, sourcePkm.Species);
 
@@ -100,14 +105,14 @@ public class PkmConvertServiceTests
     [
         InlineData("PK6"),
         InlineData("PK7"),
-        // InlineData("PB7"),  // G2 pkms not available here
+        InlineData("PB7"),  // G2 pkms not available here
         InlineData("PK8")
     ]
     [
         InlineData("PB8"),
         InlineData("PA8"),
-    // InlineData("PK9"),  // Unown not available here
-    // InlineData("PA9")   // Unown not available here
+        InlineData("PK9"),  // Unown not available here
+        InlineData("PA9")   // Unown not available here
     ]
     public async Task TestAllBizarreForwardConversions(string targetTypeName)
     {
@@ -115,7 +120,7 @@ public class PkmConvertServiceTests
 
         var service = GetService();
 
-        FileUtil.TryGetPKM(bizarrePK2Bytes, out var sourcePkm, "pk2");
+        FileUtil.TryGetPKM(bizarreBytes, out var sourcePkm, "pk2");
         Assert.NotNull(sourcePkm);
         Assert.Equal(201, sourcePkm.Species);
 
@@ -128,6 +133,51 @@ public class PkmConvertServiceTests
         File.WriteAllBytes(Path.Combine("./pkm-files", "bizarre", result.FileName), result.DecryptedPartyData);
 
         AssertExpectedData(result, (JsonElement)bizarreExpectedData[targetTypeName]);
+    }
+
+    [Theory]
+    [
+        InlineData("PK3"),
+        InlineData("CK3"),
+        InlineData("XK3")
+    ]
+    [
+        InlineData("PK4"),
+        InlineData("BK4"),
+        InlineData("RK4"),
+        InlineData("PK5")
+    ]
+    [
+        InlineData("PK6"),
+        InlineData("PK7"),
+        InlineData("PB7"),
+        InlineData("PK8")
+    ]
+    [
+        InlineData("PB8"),
+        InlineData("PA8"),
+        InlineData("PK9"),
+        InlineData("PA9")
+    ]
+    public async Task TestAllMukForwardConversions(string targetTypeName)
+    {
+        SetupPKDirectory("muk");
+
+        var service = GetService();
+
+        FileUtil.TryGetPKM(mukBytes, out var sourcePkm, "pk3");
+        Assert.NotNull(sourcePkm);
+        Assert.Equal(89, sourcePkm.Species);
+
+        var blank = CreateBlankTarget(targetTypeName);
+
+        var result = service.ConvertTo(sourcePkm, blank, LanguageID.French);
+
+        Assert.Equal(targetTypeName, result.GetType().Name);
+
+        File.WriteAllBytes(Path.Combine("./pkm-files", "muk", result.FileName), result.DecryptedPartyData);
+
+        AssertExpectedData(result, (JsonElement)mukExpectedData[targetTypeName]);
     }
 
     // [Fact]
@@ -203,6 +253,11 @@ public class PkmConvertServiceTests
             Assert.Equal(metLocation.GetInt32(), pkm.MetLocation);
         }
 
+        if (expectedData.TryGetProperty("ball", out var ball))
+        {
+            Assert.Equal(ball.GetByte(), pkm.Ball);
+        }
+
         // Moves
         if (expectedData.TryGetProperty("moves", out var moves))
         {
@@ -265,6 +320,68 @@ public class PkmConvertServiceTests
                 pkm.Stat_SPD,
                 pkm.Stat_SPE,
             ]);
+        }
+
+        if (expectedData.TryGetProperty("friendship", out var friendship))
+        {
+            Assert.Equal(friendship.GetByte(), pkm.CurrentFriendship);
+        }
+
+        if (expectedData.TryGetProperty("helditem", out var helditem))
+        {
+            Assert.Equal(helditem.GetInt32(), pkm.HeldItem);
+        }
+
+        if (expectedData.TryGetProperty("sid", out var sid))
+        {
+            Assert.Equal(sid.GetInt32(), pkm.SID16);
+        }
+
+        if (expectedData.TryGetProperty("marks", out var marks))
+        {
+            if (pkm is IAppliedMarkings<bool> pkmMarkings)
+            {
+                List<bool> pkmMarks = [];
+                for (var i = 0; i < pkmMarkings.MarkingCount; i++)
+                {
+                    pkmMarks.Add(pkmMarkings.GetMarking(i));
+                }
+
+                Assert.Equal(
+                    marks.EnumerateArray().Select(v => v.GetBoolean()!),
+                    pkmMarks
+                );
+            }
+        }
+
+        if (expectedData.TryGetProperty("ribbons", out var ribbons))
+        {
+            var ribbonInfos = RibbonInfo.GetRibbonInfo(pkm)
+                .Where(info => info.HasRibbon || info.RibbonCount > 0)
+                .ToDictionary(
+                    info => info.Name,
+                    info => info.HasRibbon ? (byte)1 : info.RibbonCount
+                );
+
+            Assert.Equal(ribbons.Deserialize<Dictionary<string, byte>>(), ribbonInfos);
+        }
+
+        if (expectedData.TryGetProperty("contest", out var contest))
+        {
+            if (pkm is IContestStats pkmContest)
+            {
+                Assert.Equal(
+                    contest.EnumerateArray().Select(v => v.GetByte()!),
+                    [
+                        pkmContest.ContestCool,
+                        pkmContest.ContestBeauty,
+                        pkmContest.ContestCute,
+                        pkmContest.ContestSmart,
+                        pkmContest.ContestTough,
+                        pkmContest.ContestSheen,
+                    ]
+                );
+            }
         }
 
         var legality = new LegalityAnalysis(pkm);

@@ -20,6 +20,7 @@ public static class PK7Extensions
             EncryptionConstant = rnd.Rand32(),
             Species = pk7.Species,
             TID16 = pk7.TID16,
+            SID16 = pk7.SID16,
             CurrentLevel = pk7.CurrentLevel,
             EXP = pk7.EXP,
             Nature = pk7.Nature,
@@ -73,6 +74,18 @@ public static class PK7Extensions
             EV_SPE = pk7.EV_SPE,
         };
 
+        pk7.CopyContestStatsTo(pk8);
+
+        pk7.CopyRibbonSetCommon3(pk8);
+        pk7.CopyRibbonSetEvent3(pk8);
+        pk7.CopyRibbonSetCommon4(pk8);
+        pk7.CopyRibbonSetEvent4(pk8);
+        pk7.CopyRibbonSetCommon6(pk8);
+        pk7.CopyRibbonSetMemory6(pk8);
+        pk7.CopyRibbonSetCommon7(pk8);
+
+        pk8.PassHeldItem(pk7.HeldItem, pk7.Context, pk7.Version);
+
         // Console.WriteLine($"1-ABILITY PK7 {pk7.Ability} PK8 {pk8.Ability}");
         pk8.FixAbility();
         // Console.WriteLine($"AB1={pk8.PersonalInfo.Ability1}");
@@ -94,9 +107,6 @@ public static class PK7Extensions
         pk8.FormArgumentRemain = pk7.FormArgumentRemain;
         pk8.FormArgumentElapsed = pk7.FormArgumentElapsed;
         pk8.FormArgumentMaximum = pk7.FormArgumentMaximum;
-
-        pk8.Heal();
-        pk8.RefreshChecksum();
 
         return pk8;
     }
@@ -137,6 +147,7 @@ public static class PK7Extensions
             EncryptionConstant = rnd.Rand32(),
             Species = pk7.Species,
             TID16 = pk7.TID16,
+            SID16 = pk7.SID16,
             CurrentLevel = pk7.CurrentLevel,
             EXP = pk7.EXP,
             Nature = pk7.Nature,
@@ -204,9 +215,6 @@ public static class PK7Extensions
         // ]);
 
         pb7.ResetCalculatedValues();
-
-        pb7.Heal();
-        pb7.RefreshChecksum();
 
         return pb7;
     }
