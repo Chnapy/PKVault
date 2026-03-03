@@ -725,9 +725,9 @@
         "exp": 55237,
         "moves": [
             1,
-            151,
-            103,
-            124
+            0,
+            0,
+            0
         ],
         "shiny": false,
         "nicknamed": false,
@@ -783,14 +783,14 @@
         "gender": 0,
         "version": 1,
         "helditem": 264,
-        "ball": 4,
+        "ball": 2,
         "level": 38,
         "exp": 55237,
         "moves": [
             1,
-            151,
             103,
-            124
+            124,
+            0
         ],
         "shiny": false,
         "nicknamed": false,
@@ -840,9 +840,7 @@
             "RibbonEffort": 1
         },
         "illegalities": [
-            "PID-PIDTypeMismatch",
-            "Encounter-TransferTrackerMissing",
-            "Move-0"
+            "Encounter-TransferTrackerMissing"
         ]
     },
     "PK9": {
@@ -851,14 +849,14 @@
         "gender": 0,
         "version": 1,
         "helditem": 0,
-        "ball": 4,
+        "ball": 2,
         "level": 38,
         "exp": 55237,
         "moves": [
             1,
-            151,
             103,
-            124
+            124,
+            0
         ],
         "shiny": false,
         "nicknamed": false,
@@ -913,9 +911,7 @@
             0
         ],
         "illegalities": [
-            "PID-PIDTypeMismatch",
-            "Encounter-TransferTrackerMissing",
-            "Move-0"
+            "Encounter-TransferTrackerMissing"
         ]
     },
     "PA9": {
@@ -929,9 +925,9 @@
         "exp": 55237,
         "moves": [
             1,
-            151,
-            103,
-            124
+            0,
+            0,
+            0
         ],
         "shiny": false,
         "nicknamed": false,
@@ -979,9 +975,6 @@
         "illegalities": [
             "Encounter-EncInvalid",
             "Encounter-TransferBad",
-            "Move-0",
-            "Move-0",
-            "Move-0",
             "Move-0"
         ]
     }

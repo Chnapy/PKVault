@@ -18,6 +18,8 @@ public static class PK5Extensions
 
         pk6.FixPID(pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);
 
+        pk6.PassMoves(pk5);
+
         pk6.OriginalTrainerFriendship = pk5.CurrentFriendship;
         pk6.HandlingTrainerFriendship = pk5.CurrentFriendship;
 
@@ -49,14 +51,6 @@ public static class PK5Extensions
             PID = pk5.PID,
             Ball = pk5.Ball,
 
-            Move1 = pk5.Move1,
-            Move2 = pk5.Move2,
-            Move3 = pk5.Move3,
-            Move4 = pk5.Move4,
-            Move1_PPUps = pk5.Move1_PPUps,
-            Move2_PPUps = pk5.Move2_PPUps,
-            Move3_PPUps = pk5.Move3_PPUps,
-            Move4_PPUps = pk5.Move4_PPUps,
             Gender = pk5.Gender,
             IsNicknamed = pk5.IsNicknamed,
             Form = pk5.Form,
@@ -108,6 +102,8 @@ public static class PK5Extensions
         pk4.FixMetLocation([GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.HG, GameVersion.SS]);
 
         pk4.FixPID(pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);
+
+        pk4.PassMoves(pk5);
 
         return pk4;
     }

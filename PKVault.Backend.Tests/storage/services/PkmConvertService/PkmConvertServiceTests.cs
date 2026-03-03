@@ -18,6 +18,9 @@ public class PkmConvertServiceTests
     private static readonly Dictionary<string, object> bizarreForwardExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
         File.ReadAllText("./assets/bizarre-front-expected.json")
     )!;
+    private static readonly Dictionary<string, object> bizarreVariantBackwardExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
+        File.ReadAllText("./assets/bizarre-variant-back-expected.json")
+    )!;
 
     private static readonly byte[] mukForwardBytes = File.ReadAllBytes("./assets/muk-front.pk3");
     private static readonly Dictionary<string, object> mukForwardExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
@@ -137,6 +140,51 @@ public class PkmConvertServiceTests
         File.WriteAllBytes(Path.Combine("./pkm-files", "pikachu-back", result.FileName), result.DecryptedPartyData);
 
         AssertExpectedData(result, (JsonElement)pikachuBackwardExpectedData[targetTypeName]);
+    }
+
+    [Theory]
+    [
+        InlineData("SK2"),
+        InlineData("CK3"),
+        InlineData("XK3")
+    ]
+    // [
+    //     InlineData("BK4"),
+    //     InlineData("RK4"),
+    // ]
+    // [
+    //     InlineData("PB7"),
+    // ]
+    // [
+    //     InlineData("PB8"),
+    //     InlineData("PA8"),
+    //     InlineData("PA9")
+    // ]
+    public async Task TestAllBizarreVariantBackwardConversions(string variantTypeName)
+    {
+        SetupPKDirectory("bizarre-back-variant");
+
+        var service = GetService();
+
+        FileUtil.TryGetPKM(bizarreForwardBytes, out var sourcePkm, "pk2");
+        Assert.NotNull(sourcePkm);
+        Assert.Equal(201, sourcePkm.Species);
+
+        var blank = CreateBlankTarget(variantTypeName);
+
+        var result1 = service.ConvertTo(new(sourcePkm), blank).GetMutablePkm();
+
+        Assert.Equal(variantTypeName, result1.GetType().Name);
+
+        blank = CreateBlankTarget("PK2");
+
+        var result = service.ConvertTo(new(result1), blank).GetMutablePkm();
+
+        Assert.Equal("PK2", result.GetType().Name);
+
+        File.WriteAllBytes(Path.Combine("./pkm-files", "bizarre-back-variant", $"{variantTypeName}-{result.FileName}"), result.DecryptedPartyData);
+
+        AssertExpectedData(result, (JsonElement)bizarreVariantBackwardExpectedData[$"{variantTypeName}->PK2"]);
     }
 
     [Theory]

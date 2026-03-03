@@ -17,6 +17,8 @@ public static class PK6Extensions
 
         pk7.FixPID(pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature);
 
+        pk7.PassMoves(pk6);
+
         return pk7;
     }
 
@@ -45,14 +47,6 @@ public static class PK6Extensions
             PID = pk6.PID,
             Ball = pk6.Ball,
 
-            Move1 = pk6.Move1,
-            Move2 = pk6.Move2,
-            Move3 = pk6.Move3,
-            Move4 = pk6.Move4,
-            Move1_PPUps = pk6.Move1_PPUps,
-            Move2_PPUps = pk6.Move2_PPUps,
-            Move3_PPUps = pk6.Move3_PPUps,
-            Move4_PPUps = pk6.Move4_PPUps,
             Gender = pk6.Gender,
             IsNicknamed = pk6.IsNicknamed,
             Form = pk6.Form,
@@ -104,6 +98,8 @@ public static class PK6Extensions
         pk5.FixMetLocation([GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2]);
 
         pk5.FixPID(pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature);
+
+        pk5.PassMoves(pk6);
 
         return pk5;
     }

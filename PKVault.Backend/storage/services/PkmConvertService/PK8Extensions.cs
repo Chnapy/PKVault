@@ -28,14 +28,6 @@ public static class PK8Extensions
             PID = pk8.PID,
             Ball = pk8.Ball,
 
-            Move1 = pk8.Move1,
-            Move2 = pk8.Move2,
-            Move3 = pk8.Move3,
-            Move4 = pk8.Move4,
-            Move1_PPUps = pk8.Move1_PPUps,
-            Move2_PPUps = pk8.Move2_PPUps,
-            Move3_PPUps = pk8.Move3_PPUps,
-            Move4_PPUps = pk8.Move4_PPUps,
             Gender = pk8.Gender,
             IsNicknamed = pk8.IsNicknamed,
             Form = pk8.Form,
@@ -111,6 +103,8 @@ public static class PK8Extensions
 
         pk9.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
 
+        pk9.PassMoves(pk8);
+
         return pk9;
     }
 
@@ -139,14 +133,6 @@ public static class PK8Extensions
             PID = pk8.PID,
             Ball = pk8.Ball,
 
-            Move1 = pk8.Move1,
-            Move2 = pk8.Move2,
-            Move3 = pk8.Move3,
-            Move4 = pk8.Move4,
-            Move1_PPUps = pk8.Move1_PPUps,
-            Move2_PPUps = pk8.Move2_PPUps,
-            Move3_PPUps = pk8.Move3_PPUps,
-            Move4_PPUps = pk8.Move4_PPUps,
             Gender = pk8.Gender,
             IsNicknamed = pk8.IsNicknamed,
             Form = pk8.Form,
@@ -214,6 +200,8 @@ public static class PK8Extensions
 
         pb8.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
 
+        pb8.PassMoves(pk8);
+
         return pb8;
     }
 
@@ -242,14 +230,6 @@ public static class PK8Extensions
             PID = pk8.PID,
             Ball = pk8.Ball,
 
-            Move1 = pk8.Move1,
-            Move2 = pk8.Move2,
-            Move3 = pk8.Move3,
-            Move4 = pk8.Move4,
-            Move1_PPUps = pk8.Move1_PPUps,
-            Move2_PPUps = pk8.Move2_PPUps,
-            Move3_PPUps = pk8.Move3_PPUps,
-            Move4_PPUps = pk8.Move4_PPUps,
             Gender = pk8.Gender,
             IsNicknamed = pk8.IsNicknamed,
             Form = pk8.Form,
@@ -315,6 +295,8 @@ public static class PK8Extensions
 
         pa8.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
 
+        pa8.PassMoves(pk8);
+
         pa8.ResetHeight();
         pa8.ResetWeight();
 
@@ -346,14 +328,6 @@ public static class PK8Extensions
             PID = pk8.PID,
             Ball = pk8.Ball,
 
-            Move1 = pk8.Move1,
-            Move2 = pk8.Move2,
-            Move3 = pk8.Move3,
-            Move4 = pk8.Move4,
-            Move1_PPUps = pk8.Move1_PPUps,
-            Move2_PPUps = pk8.Move2_PPUps,
-            Move3_PPUps = pk8.Move3_PPUps,
-            Move4_PPUps = pk8.Move4_PPUps,
             Gender = pk8.Gender,
             IsNicknamed = pk8.IsNicknamed,
             Form = pk8.Form,
@@ -408,6 +382,8 @@ public static class PK8Extensions
         pk7.FixMetLocation([GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM]);
 
         pk7.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
+
+        pk7.PassMoves(pk8);
 
         // for Furfrou and Hoopa
         pk7.FormArgumentRemain = pk8.FormArgumentRemain;

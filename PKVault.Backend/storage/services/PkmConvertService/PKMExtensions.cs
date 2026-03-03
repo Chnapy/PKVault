@@ -126,6 +126,11 @@ public static class PKMExtensions
     {
         pkm.HeldItem = ItemConverter.GetItemForFormat(srcHeldItem, srcContext, pkm.Context);
 
+        pkm.PassHeldItemByString(srcHeldItem, srcContext, srcVersion);
+    }
+
+    public static void PassHeldItemByString(this PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
+    {
         if (srcHeldItem > 0 && pkm.HeldItem == 0)
         {
             var stringsSrc = GameInfo.Strings.GetItemStrings(srcContext, srcVersion);
@@ -138,6 +143,81 @@ public static class PKMExtensions
                 pkm.HeldItem = strDestIndex;
             }
         }
+    }
+
+    public static void PassMoves(this PKM pkm, PKM pkmSrc)
+    {
+        (ushort Move, int PPUps)[] srcMoves = [
+            (pkmSrc.Move1, pkmSrc.Move1_PPUps),
+            (pkmSrc.Move2, pkmSrc.Move2_PPUps),
+            (pkmSrc.Move3, pkmSrc.Move3_PPUps),
+            (pkmSrc.Move4, pkmSrc.Move4_PPUps),
+        ];
+
+        List<(ushort Move, int PPUps)> cleanedMoves = [.. srcMoves.Select((move,i) =>
+        {
+            if (move.Move >= pkm.MaxMoveID)
+                return (Move: (ushort)0, PPUps: 0);
+            return move;
+        })
+        .Where(move => move.Move != 0)];
+
+        while (cleanedMoves.Count < 4)
+        {
+            cleanedMoves.Add((Move: 0, PPUps: 0));
+        }
+
+        for (var i = 0; i < srcMoves.Length; i++)
+        {
+            var move = srcMoves[i];
+            pkm.SetMove(i, move.Move);
+            switch (i)
+            {
+                case 0:
+                    pkm.Move1_PPUps = move.PPUps;
+                    break;
+                case 1:
+                    pkm.Move2_PPUps = move.PPUps;
+                    break;
+                case 2:
+                    pkm.Move3_PPUps = move.PPUps;
+                    break;
+                case 3:
+                    pkm.Move4_PPUps = move.PPUps;
+                    break;
+            }
+        }
+        pkm.FixMoves();
+
+        // Console.WriteLine($"MOVES = {pkm.Move1}/{pkm.Move2}/{pkm.Move3}/{pkm.Move4}");
+
+        var legality = new LegalityAnalysis(pkm);
+        var movesLegality = legality.Info.Moves;
+        if (!movesLegality.Any(r => !r.Valid))
+        {
+            return;
+        }
+
+        for (var i = 0; i < movesLegality.Length; i++)
+        {
+            var r = movesLegality[i];
+            if (r.Valid)
+                continue;
+
+            if (r.Info.Method == LearnMethod.Unobtainable)
+            {
+                pkm.SetMove(i, 0);
+            }
+        }
+
+        // if no more moves
+        // reset first one
+        if (pkm.Move1 + pkm.Move2 + pkm.Move3 + pkm.Move4 == 0)
+        {
+            pkm.SetMove(0, pkmSrc.Move1);
+        }
+
+        pkm.FixMoves();
     }
 
     public static void FixPID(this PKM pkm, bool isShiny, byte form, byte gender, Nature nature, bool checkLegality = false)

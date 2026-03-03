@@ -28,14 +28,6 @@ public static class PK7Extensions
             PID = pk7.PID,
             Ball = pk7.Ball,
 
-            Move1 = pk7.Move1,
-            Move2 = pk7.Move2,
-            Move3 = pk7.Move3,
-            Move4 = pk7.Move4,
-            Move1_PPUps = pk7.Move1_PPUps,
-            Move2_PPUps = pk7.Move2_PPUps,
-            Move3_PPUps = pk7.Move3_PPUps,
-            Move4_PPUps = pk7.Move4_PPUps,
             Gender = pk7.Gender,
             IsNicknamed = pk7.IsNicknamed,
             Form = pk7.Form,
@@ -99,6 +91,8 @@ public static class PK7Extensions
 
         pk8.FixPID(pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature);
 
+        pk8.PassMoves(pk7);
+
         // for Furfrou and Hoopa
         pk8.FormArgumentRemain = pk7.FormArgumentRemain;
         pk8.FormArgumentElapsed = pk7.FormArgumentElapsed;
@@ -150,14 +144,6 @@ public static class PK7Extensions
             PID = pk7.PID,
             Ball = pk7.Ball,
 
-            Move1 = pk7.Move1,
-            Move2 = pk7.Move2,
-            Move3 = pk7.Move3,
-            Move4 = pk7.Move4,
-            Move1_PPUps = pk7.Move1_PPUps,
-            Move2_PPUps = pk7.Move2_PPUps,
-            Move3_PPUps = pk7.Move3_PPUps,
-            Move4_PPUps = pk7.Move4_PPUps,
             Gender = pk7.Gender,
             IsNicknamed = pk7.IsNicknamed,
             Form = pk7.Form,
@@ -203,6 +189,8 @@ public static class PK7Extensions
 
         };
 
+        pb7.PassMoves(pk7);
+
         // pb7.FixMetLocation([
         //     // GameVersion.RD, GameVersion.GN, GameVersion.BU, GameVersion.YW,
         //     // GameVersion.GD, GameVersion.SI, GameVersion.C,
@@ -240,14 +228,6 @@ public static class PK7Extensions
             PID = pk7.PID,
             Ball = pk7.Ball,
 
-            Move1 = pk7.Move1,
-            Move2 = pk7.Move2,
-            Move3 = pk7.Move3,
-            Move4 = pk7.Move4,
-            Move1_PPUps = pk7.Move1_PPUps,
-            Move2_PPUps = pk7.Move2_PPUps,
-            Move3_PPUps = pk7.Move3_PPUps,
-            Move4_PPUps = pk7.Move4_PPUps,
             Gender = pk7.Gender,
             IsNicknamed = pk7.IsNicknamed,
             Form = pk7.Form,
@@ -306,6 +286,8 @@ public static class PK7Extensions
         pk6.FormArgumentRemain = pk7.FormArgumentRemain;
         pk6.FormArgumentElapsed = pk7.FormArgumentElapsed;
         pk6.FormArgumentMaximum = pk7.FormArgumentMaximum;
+
+        pk6.PassMoves(pk7);
 
         return pk6;
     }

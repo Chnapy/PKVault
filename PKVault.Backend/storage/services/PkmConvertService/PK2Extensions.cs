@@ -31,14 +31,6 @@ public static class PK2Extensions
             MetLevel = 0,
 
             Version = GameVersion.S,
-            Move1 = pk2.Move1,
-            Move2 = pk2.Move2,
-            Move3 = pk2.Move3,
-            Move4 = pk2.Move4,
-            Move1_PPUps = pk2.Move1_PPUps,
-            Move2_PPUps = pk2.Move2_PPUps,
-            Move3_PPUps = pk2.Move3_PPUps,
-            Move4_PPUps = pk2.Move4_PPUps,
             Gender = pk2.Gender,
             IsNicknamed = pk2.IsNicknamed,
             Form = pk2.Form,
@@ -106,7 +98,7 @@ public static class PK2Extensions
 
         pk3.FixPID(pk2.IsShiny, pk2.Form, pk2.Gender, pk3.Nature);
 
-        pk3.FixMoves();
+        pk3.PassMoves(pk2);
 
         return pk3;
     }

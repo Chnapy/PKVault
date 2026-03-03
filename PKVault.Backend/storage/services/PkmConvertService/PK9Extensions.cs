@@ -28,14 +28,6 @@ public static class PK9Extensions
             PID = pk9.PID,
             Ball = pk9.Ball,
 
-            Move1 = pk9.Move1,
-            Move2 = pk9.Move2,
-            Move3 = pk9.Move3,
-            Move4 = pk9.Move4,
-            Move1_PPUps = pk9.Move1_PPUps,
-            Move2_PPUps = pk9.Move2_PPUps,
-            Move3_PPUps = pk9.Move3_PPUps,
-            Move4_PPUps = pk9.Move4_PPUps,
             Gender = pk9.Gender,
             IsNicknamed = pk9.IsNicknamed,
             Form = pk9.Form,
@@ -99,6 +91,8 @@ public static class PK9Extensions
 
         pa9.FixPID(pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
 
+        pa9.PassMoves(pk9);
+
         return pa9;
     }
 
@@ -127,14 +121,6 @@ public static class PK9Extensions
             PID = pk9.PID,
             Ball = pk9.Ball,
 
-            Move1 = pk9.Move1,
-            Move2 = pk9.Move2,
-            Move3 = pk9.Move3,
-            Move4 = pk9.Move4,
-            Move1_PPUps = pk9.Move1_PPUps,
-            Move2_PPUps = pk9.Move2_PPUps,
-            Move3_PPUps = pk9.Move3_PPUps,
-            Move4_PPUps = pk9.Move4_PPUps,
             Gender = pk9.Gender,
             IsNicknamed = pk9.IsNicknamed,
             Form = pk9.Form,
@@ -196,6 +182,8 @@ public static class PK9Extensions
         pk8.FormArgumentElapsed = pk9.FormArgumentElapsed;
         pk8.FormArgumentMaximum = pk9.FormArgumentMaximum;
 
+        pk8.PassMoves(pk9);
+
         return pk8;
     }
 
@@ -224,14 +212,6 @@ public static class PK9Extensions
             PID = pa9.PID,
             Ball = pa9.Ball,
 
-            Move1 = pa9.Move1,
-            Move2 = pa9.Move2,
-            Move3 = pa9.Move3,
-            Move4 = pa9.Move4,
-            Move1_PPUps = pa9.Move1_PPUps,
-            Move2_PPUps = pa9.Move2_PPUps,
-            Move3_PPUps = pa9.Move3_PPUps,
-            Move4_PPUps = pa9.Move4_PPUps,
             Gender = pa9.Gender,
             IsNicknamed = pa9.IsNicknamed,
             Form = pa9.Form,
@@ -298,6 +278,8 @@ public static class PK9Extensions
         pk9.FixMetLocation([GameVersion.SL, GameVersion.VL]);
 
         pk9.FixPID(pa9.IsShiny, pa9.Form, pa9.Gender, pa9.Nature);
+
+        pk9.PassMoves(pa9);
 
         return pk9;
     }

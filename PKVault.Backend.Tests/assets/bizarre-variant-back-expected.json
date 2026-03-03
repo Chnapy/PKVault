@@ -1,0 +1,125 @@
+{
+    "SK2->PK2": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 56,
+        "helditem": 91,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "nature": 0,
+        "ability": -1,
+        "friendship": 200,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            8,
+            11,
+            10,
+            10,
+            10,
+            10
+        ],
+        "language": 0,
+        "illegalities": []
+    },
+    "CK3->PK2": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 56,
+        "helditem": 91,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "nature": 0,
+        "ability": -1,
+        "friendship": 200,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            8,
+            11,
+            10,
+            10,
+            10,
+            10
+        ],
+        "language": 0,
+        "illegalities": []
+    },
+    "XK3->PK2": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 56,
+        "helditem": 91,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "nature": 0,
+        "ability": -1,
+        "friendship": 200,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "ivs": [
+            8,
+            11,
+            10,
+            10,
+            10,
+            10
+        ],
+        "language": 0,
+        "illegalities": []
+    }
+}

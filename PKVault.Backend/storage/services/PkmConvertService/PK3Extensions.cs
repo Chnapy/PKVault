@@ -14,6 +14,8 @@ public static class PK3Extensions
 
         pk4.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
 
+        pk4.PassMoves(pk3);
+
         pk4.OriginalTrainerFriendship = pk3.CurrentFriendship;
         pk4.HandlingTrainerFriendship = pk3.CurrentFriendship;
 
@@ -31,6 +33,8 @@ public static class PK3Extensions
 
         pk.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
 
+        pk.PassMoves(pk3);
+
         return pk;
     }
 
@@ -44,6 +48,8 @@ public static class PK3Extensions
         }
 
         pk.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
+
+        pk.PassMoves(pk3);
 
         return pk;
     }
@@ -68,14 +74,6 @@ public static class PK3Extensions
             MetDate = pk3.MetDate,
             MetLevel = 0,
 
-            Move1 = pk3.Move1,
-            Move2 = pk3.Move2,
-            Move3 = pk3.Move3,
-            Move4 = pk3.Move4,
-            Move1_PPUps = pk3.Move1_PPUps,
-            Move2_PPUps = pk3.Move2_PPUps,
-            Move3_PPUps = pk3.Move3_PPUps,
-            Move4_PPUps = pk3.Move4_PPUps,
             Gender = pk3.Gender,
             IsNicknamed = pk3.IsNicknamed,
             Form = pk3.Form,
@@ -94,7 +92,7 @@ public static class PK3Extensions
             HandlingTrainerFriendship = pk3.CurrentFriendship,
         };
 
-        pk2.PassHeldItem(pk3.HeldItem, pk3.Context, pk3.Version);
+        pk2.PassHeldItemByString(pk3.HeldItem, pk3.Context, pk3.Version);
 
         pk2.FixMetLocation([GameVersion.GD, GameVersion.SI, GameVersion.C]);
 
@@ -128,7 +126,7 @@ public static class PK3Extensions
 
         pk2.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk2.Nature);
 
-        pk2.FixMoves();
+        pk2.PassMoves(pk3);
 
         return pk2;
     }
