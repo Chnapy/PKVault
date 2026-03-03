@@ -1,10 +1,31 @@
 using PKHeX.Core;
 
-public class PkmConvertService2
+public class PkmConvertService(ISettingsService settingsService)
 {
-    public PKM ConvertTo(PKM sourcePkm, PKM blankTargetPkm, LanguageID fallbackLang)
+    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, uint generation)
     {
-        var result = ConvertRecursive(sourcePkm.Clone(), blankTargetPkm.GetType(), fallbackLang);
+        PKM blankPkm = generation switch
+        {
+            1 => new PK1(),
+            2 => new PK2(),
+            3 => new PK3(),
+            4 => new PK4(),
+            5 => new PK5(),
+            6 => new PK6(),
+            7 => new PK7(),
+            8 => new PK8(),
+            9 => new PK9(),
+            _ => throw new Exception($"PKM case not found for generation={generation}")
+        };
+
+        return ConvertTo(sourcePkm, blankPkm);
+    }
+
+    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, PKM blankTargetPkm)
+    {
+        var fallbackLang = settingsService.GetSettings().GetSafeLanguageID();
+
+        var result = ConvertRecursive(sourcePkm.GetMutablePkm().Clone(), blankTargetPkm.GetType(), fallbackLang);
 
         if (result.GetType() != blankTargetPkm.GetType())
             throw new InvalidOperationException($"Failed to convert to {blankTargetPkm.GetType().Name}");
@@ -15,7 +36,12 @@ public class PkmConvertService2
         result.ResetPartyStats();
         result.RefreshChecksum();
 
-        return result;
+        if (result.Species == 0)
+        {
+            throw new Exception($"Convert failed, Species=0");
+        }
+
+        return new(result);
     }
 
     private PKM ConvertRecursive(PKM current, Type targetType, LanguageID fallbackLang)

@@ -4,7 +4,7 @@ public record EvolvePkmActionInput(uint? saveId, string[] ids);
 
 public class EvolvePkmAction(
     IServiceProvider sp,
-    PkmConvertService pkmConvertService, StaticDataService staticDataService,
+    PkmUpdateService pkmUpdateService, StaticDataService staticDataService,
     SynchronizePkmAction synchronizePkmAction,
     IPkmVariantLoader pkmVariantLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<EvolvePkmActionInput>
@@ -167,7 +167,7 @@ public class EvolvePkmAction(
             throw new Exception($"Evolve species not defined");
         }
 
-        var currentNickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, pkmConvertService.GetPkmLanguage(pkm), pkm.Format);
+        var currentNickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, pkmUpdateService.GetPkmLanguage(pkm), pkm.Format);
         var isNicknamed = pkm.IsNicknamed && !pkm.Nickname.Equals(currentNickname, StringComparison.InvariantCultureIgnoreCase);
 
         if (pkm.Species == evolveSpecies)
@@ -184,12 +184,12 @@ public class EvolvePkmAction(
 
         if (!isNicknamed)
         {
-            pkm.Nickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, pkmConvertService.GetPkmLanguage(pkm), pkm.Format);
+            pkm.Nickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, pkmUpdateService.GetPkmLanguage(pkm), pkm.Format);
         }
 
-        pkmConvertService.ApplyNicknameToPkm(pkm, pkm.Nickname, true);
+        pkmUpdateService.ApplyNicknameToPkm(pkm, pkm.Nickname, true);
 
-        pkmConvertService.ApplyAbilityToPkm(pkm);
+        pkmUpdateService.ApplyAbilityToPkm(pkm);
 
         pkm.ResetPartyStats();
         pkm.RefreshChecksum();

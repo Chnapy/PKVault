@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Moq;
 using PKHeX.Core;
 
 public class PkmConvertServiceTests
@@ -25,9 +26,18 @@ public class PkmConvertServiceTests
 
     private static bool pkFolderCleaned = false;
 
-    private PkmConvertService2 GetService()
+    private PkmConvertService GetService()
     {
-        return new();
+        Mock<ISettingsService> mockSettingsService = new();
+        mockSettingsService.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
+            BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "", SettingsPath: "",
+            CanUpdateSettings: false, CanScanSaves: false, SettingsMutable: new(
+                DB_PATH: "", SAVE_GLOBS: [], STORAGE_PATH: "", BACKUP_PATH: "",
+                LANGUAGE: "fr"
+            )
+        ));
+
+        return new(mockSettingsService.Object);
     }
 
     private void SetupPKDirectory(string folderName)
@@ -84,7 +94,7 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(targetTypeName);
 
-        var result = service.ConvertTo(sourcePkm, blank, LanguageID.French);
+        var result = service.ConvertTo(new(sourcePkm), blank).GetMutablePkm();
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
@@ -120,7 +130,7 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(targetTypeName);
 
-        var result = service.ConvertTo(sourcePkm, blank, LanguageID.French);
+        var result = service.ConvertTo(new(sourcePkm), blank).GetMutablePkm();
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
@@ -167,7 +177,7 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(targetTypeName);
 
-        var result = service.ConvertTo(sourcePkm, blank, LanguageID.French);
+        var result = service.ConvertTo(new(sourcePkm), blank).GetMutablePkm();
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
@@ -212,7 +222,7 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(targetTypeName);
 
-        var result = service.ConvertTo(sourcePkm, blank, LanguageID.French);
+        var result = service.ConvertTo(new(sourcePkm), blank).GetMutablePkm();
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 

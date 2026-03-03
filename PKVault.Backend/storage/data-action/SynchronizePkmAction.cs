@@ -5,7 +5,7 @@ public record SynchronizePkmActionInput(
 );
 
 public class SynchronizePkmAction(
-    PkmConvertService pkmConvertService,
+    PkmUpdateService pkmUpdateService,
     IPkmVariantLoader pkmVariantLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<SynchronizePkmActionInput>
 {
@@ -124,11 +124,11 @@ public class SynchronizePkmAction(
 
                     if (attachedVersionEntity?.Id == version.Id)
                     {
-                        pkmConvertService.PassAllToPkmSafe(savePkm.Pkm, versionPkm);
+                        pkmUpdateService.PassAllToPkmSafe(savePkm.Pkm, versionPkm);
                     }
                     else
                     {
-                        pkmConvertService.PassAllDynamicsNItemToPkm(savePkm.Pkm, versionPkm);
+                        pkmUpdateService.PassAllDynamicsNItemToPkm(savePkm.Pkm, versionPkm);
                     }
                 });
 
@@ -208,11 +208,11 @@ public class SynchronizePkmAction(
                 {
                     if (attachedVersionEntity?.Id == pkmVariantEntity.Id)
                     {
-                        pkmConvertService.PassAllToPkmSafe(versionPkm, pkm);
+                        pkmUpdateService.PassAllToPkmSafe(versionPkm, pkm);
                     }
                     else
                     {
-                        pkmConvertService.PassAllDynamicsNItemToPkm(versionPkm, pkm);
+                        pkmUpdateService.PassAllDynamicsNItemToPkm(versionPkm, pkm);
                     }
                 })
             };

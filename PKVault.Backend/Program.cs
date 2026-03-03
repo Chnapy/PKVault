@@ -206,6 +206,7 @@ public class Program
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<DataService>();
         services.AddSingleton<PkmConvertService>();
+        services.AddSingleton<PkmUpdateService>();
         services.AddSingleton<PkmLegalityService>();
 
         Console.WriteLine($"Setup services - Actions");
