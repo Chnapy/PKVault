@@ -66,8 +66,6 @@ public static class PK2Extensions
 
         pk3.FixMetLocation([GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD]);
 
-        pk3.FixPID(pk2.IsShiny, pk2.Form, pk2.Gender, pk3.Nature);
-
         if (pk2.Species is 151 or 251)
         {
             pk3.FatefulEncounter = true;
@@ -105,6 +103,8 @@ public static class PK2Extensions
             }
         }
         pk3.SetEVs(evs);
+
+        pk3.FixPID(pk2.IsShiny, pk2.Form, pk2.Gender, pk3.Nature);
 
         pk3.FixMoves();
 
@@ -155,18 +155,8 @@ public static class PK2Extensions
         return (int)(evValue / 65535 * 255);
     }
 
-    private static int ConvertEVG3ToG2(float evValue)
-    {
-        return (int)(evValue * 65535 / 255);
-    }
-
     private static int ConvertIVG2ToG3(int ivValue)
     {
         return ivValue * 2 + (ivValue % 2);
-    }
-
-    private static int ConvertIVG3ToG2(int ivValue)
-    {
-        return ivValue / 2;
     }
 }

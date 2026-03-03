@@ -20,20 +20,31 @@ public class PkmConvertService2
 
     private PKM ConvertRecursive(PKM current, Type targetType, LanguageID fallbackLang)
     {
+        var currentValue = GetPKMTypeWeight(current.GetType());
+        var targetValue = GetPKMTypeWeight(targetType);
+        var direction = targetValue - currentValue;
+
         if (current.GetType() == targetType)
             return current;
 
-        var direct = TryPKToVariant(current, targetType);
-        if (direct != null)
-            return ConvertRecursive(direct, targetType, fallbackLang);
+        if (direction > 0)
+        {
 
-        var forward = TryForwardConversion(current, fallbackLang);
-        if (forward != null)
-            return ConvertRecursive(forward, targetType, fallbackLang);
+            var direct = TryPKToVariant(current, targetType);
+            if (direct != null)
+                return ConvertRecursive(direct, targetType, fallbackLang);
 
-        var backward = TryBackwardConversion(current);
-        if (backward != null)
-            return ConvertRecursive(backward, targetType, fallbackLang);
+            var forward = TryForwardConversion(current, fallbackLang);
+            if (forward != null)
+                return ConvertRecursive(forward, targetType, fallbackLang);
+        }
+        else
+        {
+
+            var backward = TryBackwardConversion(current);
+            if (backward != null)
+                return ConvertRecursive(backward, targetType, fallbackLang);
+        }
 
         throw new InvalidOperationException($"No conversion path from {current.GetType().Name} to {targetType.Name}");
     }
@@ -93,7 +104,7 @@ public class PkmConvertService2
             };
 
         // Check unexpected nature changes after G2
-        if (source.Generation > 2 && source.Nature != pkm.Nature)
+        if (pkm != null && source.Generation > 2 && source.Nature != pkm.Nature)
         {
             throw new Exception($"Different nature {source.Nature} / {pkm.Nature}");
         }
@@ -124,7 +135,7 @@ public class PkmConvertService2
             };
 
         // Check unexpected nature changes before G2
-        if (pkm.Generation > 2 && source.Nature != pkm.Nature)
+        if (pkm != null && pkm.Generation > 2 && source.Nature != pkm.Nature)
         {
             throw new Exception($"Different nature {source.Nature} / {pkm.Nature}");
         }
@@ -144,8 +155,33 @@ public class PkmConvertService2
             "PB7" => ((PB7)source).ConvertToPK7(),
             "PB8" => ((PB8)source).ConvertToPK8(),
             "PA8" => ((PA8)source).ConvertToPK8(),
+            "PA9" => ((PA9)source).ConvertToPK9(),
 
             _ => null
         };
     }
+
+    private static int GetPKMTypeWeight(Type pkmType) => pkmType.Name switch
+    {
+        "PK1" => 0,
+        "PK2" => 1,
+        "SK2" => 2,
+        "PK3" => 3,
+        "CK3" => 4,
+        "XK3" => 5,
+        "PK4" => 6,
+        "BK4" => 7,
+        "RK4" => 8,
+        "PK5" => 9,
+        "PK6" => 10,
+        "PK7" => 11,
+        "PB7" => 12,
+        "PK8" => 13,
+        "PB8" => 14,
+        "PA8" => 15,
+        "PK9" => 16,
+        "PA9" => 17,
+
+        _ => throw new ArgumentException($"PKM type not handled: {pkmType}"),
+    };
 }

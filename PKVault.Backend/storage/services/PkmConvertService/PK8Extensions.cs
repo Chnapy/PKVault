@@ -323,6 +323,97 @@ public static class PK8Extensions
 
     public static PK7 ConvertToPK7(this PK8 pk8)
     {
-        return new();
+        var rnd = Util.Rand;
+
+        var pk7 = new PK7()
+        {
+            Version = GameVersion.SN,
+            MetLocation = 30001,
+            MetDate = pk8.MetDate ?? EncounterDate.GetDateSwitch(),
+            MetLevel = pk8.MetLevel,
+
+            // EggLocation = Locations.LinkTrade6,
+            // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
+
+            EncryptionConstant = rnd.Rand32(),
+            Species = pk8.Species,
+            TID16 = pk8.TID16,
+            SID16 = pk8.SID16,
+            CurrentLevel = pk8.CurrentLevel,
+            EXP = pk8.EXP,
+            Nature = pk8.Nature,
+            StatNature = pk8.Nature,
+            PID = pk8.PID,
+            Ball = pk8.Ball,
+
+            Move1 = pk8.Move1,
+            Move2 = pk8.Move2,
+            Move3 = pk8.Move3,
+            Move4 = pk8.Move4,
+            Move1_PPUps = pk8.Move1_PPUps,
+            Move2_PPUps = pk8.Move2_PPUps,
+            Move3_PPUps = pk8.Move3_PPUps,
+            Move4_PPUps = pk8.Move4_PPUps,
+            Gender = pk8.Gender,
+            IsNicknamed = pk8.IsNicknamed,
+            Form = pk8.Form,
+
+            CurrentHandler = 1,
+            HandlingTrainerName = pk8.OriginalTrainerName,
+            HandlingTrainerGender = pk8.OriginalTrainerGender,
+
+            Language = pk8.Language,
+            Nickname = pk8.IsNicknamed
+                ? pk8.Nickname
+                : SpeciesName.GetSpeciesNameGeneration(pk8.Species, pk8.Language, 7),
+            OriginalTrainerName = pk8.OriginalTrainerName,
+            OriginalTrainerGender = pk8.OriginalTrainerGender,
+            OriginalTrainerFriendship = pk8.OriginalTrainerFriendship,
+            HandlingTrainerFriendship = pk8.HandlingTrainerFriendship,
+
+            Ability = pk8.Ability,
+            AbilityNumber = pk8.AbilityNumber,
+
+            IVs = [
+                pk8.IV_HP,
+                pk8.IV_ATK,
+                pk8.IV_DEF,
+                pk8.IV_SPE,
+                pk8.IV_SPA,
+                pk8.IV_SPD,
+            ],
+
+            EV_HP = pk8.EV_HP,
+            EV_ATK = pk8.EV_ATK,
+            EV_DEF = pk8.EV_DEF,
+            EV_SPA = pk8.EV_SPA,
+            EV_SPD = pk8.EV_SPD,
+            EV_SPE = pk8.EV_SPE,
+        };
+
+        pk8.CopyContestStatsTo(pk7);
+
+        pk8.CopyRibbonSetCommon3(pk7);
+        pk8.CopyRibbonSetEvent3(pk7);
+        pk8.CopyRibbonSetCommon4(pk7);
+        pk8.CopyRibbonSetEvent4(pk7);
+        pk8.CopyRibbonSetCommon6(pk7);
+        pk8.CopyRibbonSetMemory6(pk7);
+        pk8.CopyRibbonSetCommon7(pk7);
+
+        pk7.PassHeldItem(pk8.HeldItem, pk8.Context, pk8.Version);
+
+        pk7.FixAbility();
+
+        pk7.FixMetLocation([GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM]);
+
+        pk7.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
+
+        // for Furfrou and Hoopa
+        pk7.FormArgumentRemain = pk8.FormArgumentRemain;
+        pk7.FormArgumentElapsed = pk8.FormArgumentElapsed;
+        pk7.FormArgumentMaximum = pk8.FormArgumentMaximum;
+
+        return pk7;
     }
 }

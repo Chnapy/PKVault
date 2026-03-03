@@ -3,19 +3,24 @@ using PKHeX.Core;
 
 public class PkmConvertServiceTests
 {
-    private static readonly byte[] pikachuBytes = File.ReadAllBytes("./assets/0025 - PIKACHU - 98F7.pk1");
-    private static readonly Dictionary<string, object> pikachuExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
-        File.ReadAllText("./assets/pikachu-expected.json")
+    private static readonly byte[] pikachuForwardBytes = File.ReadAllBytes("./assets/pikachu-front.pk1");
+    private static readonly Dictionary<string, object> pikachuForwardExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
+        File.ReadAllText("./assets/pikachu-front-expected.json")
     )!;
 
-    private static readonly byte[] bizarreBytes = File.ReadAllBytes("./assets/0201-08 ★ - BIZARRE - 962B.pk2");
-    private static readonly Dictionary<string, object> bizarreExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
-        File.ReadAllText("./assets/bizarre-expected.json")
+    private static readonly byte[] pikachuBackwardBytes = File.ReadAllBytes("./assets/pikachu-back.pa9");
+    private static readonly Dictionary<string, object> pikachuBackwardExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
+        File.ReadAllText("./assets/pikachu-back-expected.json")
     )!;
 
-    private static readonly byte[] mukBytes = File.ReadAllBytes("./assets/0089 - Muk.pk3");
-    private static readonly Dictionary<string, object> mukExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
-        File.ReadAllText("./assets/muk-expected.json")
+    private static readonly byte[] bizarreForwardBytes = File.ReadAllBytes("./assets/bizarre-front.pk2");
+    private static readonly Dictionary<string, object> bizarreForwardExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
+        File.ReadAllText("./assets/bizarre-front-expected.json")
+    )!;
+
+    private static readonly byte[] mukForwardBytes = File.ReadAllBytes("./assets/muk-front.pk3");
+    private static readonly Dictionary<string, object> mukForwardExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
+        File.ReadAllText("./assets/muk-front-expected.json")
     )!;
 
     private static bool pkFolderCleaned = false;
@@ -69,11 +74,11 @@ public class PkmConvertServiceTests
     ]
     public async Task TestAllPikachuForwardConversions(string targetTypeName)
     {
-        SetupPKDirectory("pikachu");
+        SetupPKDirectory("pikachu-front");
 
         var service = GetService();
 
-        FileUtil.TryGetPKM(pikachuBytes, out var sourcePkm, "pk1");
+        FileUtil.TryGetPKM(pikachuForwardBytes, out var sourcePkm, "pk1");
         Assert.NotNull(sourcePkm);
         Assert.Equal(25, sourcePkm.Species);
 
@@ -83,9 +88,45 @@ public class PkmConvertServiceTests
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
-        File.WriteAllBytes(Path.Combine("./pkm-files", "pikachu", result.FileName), result.DecryptedPartyData);
+        File.WriteAllBytes(Path.Combine("./pkm-files", "pikachu-front", result.FileName), result.DecryptedPartyData);
 
-        AssertExpectedData(result, (JsonElement)pikachuExpectedData[targetTypeName]);
+        AssertExpectedData(result, (JsonElement)pikachuForwardExpectedData[targetTypeName]);
+    }
+
+    [Theory]
+    [
+        InlineData("PA9"),
+        InlineData("PK9"),
+        InlineData("PK8"),
+    ]
+    [
+        InlineData("PK7"),
+        InlineData("PK6"),
+        InlineData("PK5"),
+        InlineData("PK4"),
+        InlineData("PK3"),
+        InlineData("PK2"),
+        InlineData("PK1"),
+    ]
+    public async Task TestAllPikachuBackwardConversions(string targetTypeName)
+    {
+        SetupPKDirectory("pikachu-back");
+
+        var service = GetService();
+
+        FileUtil.TryGetPKM(pikachuBackwardBytes, out var sourcePkm, "pa9");
+        Assert.NotNull(sourcePkm);
+        Assert.Equal(25, sourcePkm.Species);
+
+        var blank = CreateBlankTarget(targetTypeName);
+
+        var result = service.ConvertTo(sourcePkm, blank, LanguageID.French);
+
+        Assert.Equal(targetTypeName, result.GetType().Name);
+
+        File.WriteAllBytes(Path.Combine("./pkm-files", "pikachu-back", result.FileName), result.DecryptedPartyData);
+
+        AssertExpectedData(result, (JsonElement)pikachuBackwardExpectedData[targetTypeName]);
     }
 
     [Theory]
@@ -116,11 +157,11 @@ public class PkmConvertServiceTests
     ]
     public async Task TestAllBizarreForwardConversions(string targetTypeName)
     {
-        SetupPKDirectory("bizarre");
+        SetupPKDirectory("bizarre-front");
 
         var service = GetService();
 
-        FileUtil.TryGetPKM(bizarreBytes, out var sourcePkm, "pk2");
+        FileUtil.TryGetPKM(bizarreForwardBytes, out var sourcePkm, "pk2");
         Assert.NotNull(sourcePkm);
         Assert.Equal(201, sourcePkm.Species);
 
@@ -130,9 +171,9 @@ public class PkmConvertServiceTests
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
-        File.WriteAllBytes(Path.Combine("./pkm-files", "bizarre", result.FileName), result.DecryptedPartyData);
+        File.WriteAllBytes(Path.Combine("./pkm-files", "bizarre-front", result.FileName), result.DecryptedPartyData);
 
-        AssertExpectedData(result, (JsonElement)bizarreExpectedData[targetTypeName]);
+        AssertExpectedData(result, (JsonElement)bizarreForwardExpectedData[targetTypeName]);
     }
 
     [Theory]
@@ -161,11 +202,11 @@ public class PkmConvertServiceTests
     ]
     public async Task TestAllMukForwardConversions(string targetTypeName)
     {
-        SetupPKDirectory("muk");
+        SetupPKDirectory("muk-front");
 
         var service = GetService();
 
-        FileUtil.TryGetPKM(mukBytes, out var sourcePkm, "pk3");
+        FileUtil.TryGetPKM(mukForwardBytes, out var sourcePkm, "pk3");
         Assert.NotNull(sourcePkm);
         Assert.Equal(89, sourcePkm.Species);
 
@@ -175,9 +216,9 @@ public class PkmConvertServiceTests
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
-        File.WriteAllBytes(Path.Combine("./pkm-files", "muk", result.FileName), result.DecryptedPartyData);
+        File.WriteAllBytes(Path.Combine("./pkm-files", "muk-front", result.FileName), result.DecryptedPartyData);
 
-        AssertExpectedData(result, (JsonElement)mukExpectedData[targetTypeName]);
+        AssertExpectedData(result, (JsonElement)mukForwardExpectedData[targetTypeName]);
     }
 
     // [Fact]

@@ -168,7 +168,7 @@ public static class PKMExtensions
         {
             pkm.PID = EntityPID.GetRandomPID(rnd, pkm.Species, gender, pkm.Version, nature, form, pkm.PID);
             i++;
-            if (i > 100_000)
+            if (i > 1_000_000)
             {
                 break;
             }
@@ -192,6 +192,7 @@ public static class PKMExtensions
                     (r.Identifier == CheckIdentifier.Encounter && r.Result != LegalityCheckResultCode.TransferTrackerMissing)
                     || r.Identifier == CheckIdentifier.Fateful
                     || r.Identifier == CheckIdentifier.GameOrigin
+                    || (r.Identifier == CheckIdentifier.Ability && r.Result == LegalityCheckResultCode.AbilityHiddenFail)
                 )).Count;
         }
 
