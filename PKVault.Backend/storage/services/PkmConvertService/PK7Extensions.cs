@@ -291,4 +291,94 @@ public static class PK7Extensions
 
         return pk6;
     }
+
+    public static PK7 ConvertToPK7(this PB7 pb7)
+    {
+        var rnd = Util.Rand;
+
+        byte convertAVToEV(float value) => (byte)(value * EffortValues.Max252 / 200);
+
+        var pk7 = new PK7()
+        {
+            Version = GameVersion.SN,
+            MetLocation = 30001,
+            MetDate = pb7.MetDate ?? EncounterDate.GetDateSwitch(),
+            MetLevel = pb7.MetLevel,
+
+            // EggLocation = Locations.LinkTrade6,
+            // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
+
+            EncryptionConstant = rnd.Rand32(),
+            Species = pb7.Species,
+            TID16 = pb7.TID16,
+            SID16 = pb7.SID16,
+            CurrentLevel = pb7.CurrentLevel,
+            EXP = pb7.EXP,
+            Nature = pb7.Nature,
+            StatNature = pb7.Nature,
+            PID = pb7.PID,
+            Ball = pb7.Ball,
+
+            Gender = pb7.Gender,
+            IsNicknamed = pb7.IsNicknamed,
+            Form = pb7.Form,
+
+            CurrentHandler = 1,
+            HandlingTrainerName = pb7.OriginalTrainerName,
+            HandlingTrainerGender = pb7.OriginalTrainerGender,
+
+            Language = pb7.Language,
+            Nickname = pb7.IsNicknamed
+                ? pb7.Nickname
+                : SpeciesName.GetSpeciesNameGeneration(pb7.Species, pb7.Language, 7),
+            OriginalTrainerName = pb7.OriginalTrainerName,
+            OriginalTrainerGender = pb7.OriginalTrainerGender,
+            OriginalTrainerFriendship = pb7.OriginalTrainerFriendship,
+            HandlingTrainerFriendship = pb7.HandlingTrainerFriendship,
+
+            Ability = pb7.Ability,
+            AbilityNumber = pb7.AbilityNumber,
+
+            IVs = [
+                pb7.IV_HP,
+                pb7.IV_ATK,
+                pb7.IV_DEF,
+                pb7.IV_SPE,
+                pb7.IV_SPA,
+                pb7.IV_SPD,
+            ],
+
+            EV_HP = convertAVToEV(pb7.AV_HP),
+            EV_ATK = convertAVToEV(pb7.AV_ATK),
+            EV_DEF = convertAVToEV(pb7.AV_DEF),
+            EV_SPA = convertAVToEV(pb7.AV_SPA),
+            EV_SPD = convertAVToEV(pb7.AV_SPD),
+            EV_SPE = convertAVToEV(pb7.AV_SPE),
+        };
+
+        pb7.CopyRibbonSetCommon3(pk7);
+        pb7.CopyRibbonSetEvent3(pk7);
+        pb7.CopyRibbonSetCommon4(pk7);
+        pb7.CopyRibbonSetEvent4(pk7);
+        pb7.CopyRibbonSetCommon6(pk7);
+        pb7.CopyRibbonSetMemory6(pk7);
+        pb7.CopyRibbonSetCommon7(pk7);
+
+        pk7.PassHeldItem(pb7.HeldItem, pb7.Context, pb7.Version);
+
+        pk7.FixAbility();
+
+        pk7.FixMetLocation([GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM]);
+
+        pk7.FixPID(pb7.IsShiny, pb7.Form, pb7.Gender, pb7.Nature);
+
+        pk7.PassMoves(pb7);
+
+        // for Furfrou and Hoopa
+        pk7.FormArgumentRemain = pb7.FormArgumentRemain;
+        pk7.FormArgumentElapsed = pb7.FormArgumentElapsed;
+        pk7.FormArgumentMaximum = pb7.FormArgumentMaximum;
+
+        return pk7;
+    }
 }

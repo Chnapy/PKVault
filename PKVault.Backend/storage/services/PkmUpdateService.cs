@@ -238,12 +238,12 @@ public class PkmUpdateService(PkmLegalityService pkmLegalityService)
 
     private int ConvertEVG2ToG3(float evValue)
     {
-        return (int)(evValue / 65535 * 255);
+        return (int)(evValue / ushort.MaxValue * EffortValues.Max255);
     }
 
     private int ConvertEVG3ToG2(float evValue)
     {
-        return (int)(evValue * 65535 / 255);
+        return (int)(evValue * ushort.MaxValue / EffortValues.Max255);
     }
 
     private int ConvertIVG2ToG3(int ivValue)

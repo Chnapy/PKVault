@@ -225,6 +225,38 @@ public static class PKMExtensions
         var rnd = Util.Rand;
         var i = 0;
 
+        bool hasWrongShiny()
+        {
+            if (pkm is PK1)
+                return false;
+
+            return pkm.IsShiny != isShiny;
+        }
+
+        bool hasWrongForm()
+        {
+            if (pkm is PK1)
+                return false;
+
+            return pkm.Form != form;
+        }
+
+        bool hasWrongGender()
+        {
+            if (pkm is PK1)
+                return false;
+
+            return pkm.Gender != gender;
+        }
+
+        bool hasWrongNature()
+        {
+            if (pkm is GBPKM)
+                return false;
+
+            return pkm.Nature != nature;
+        }
+
         bool hasPIDFixableIllegality()
         {
             if (!checkLegality)
@@ -239,17 +271,33 @@ public static class PKMExtensions
         }
 
         while (
-            pkm.IsShiny != isShiny
-            || pkm.Form != form
-            || pkm.Gender != gender
-            || pkm.Nature != nature
+            hasWrongShiny()
+            || hasWrongForm()
+            || hasWrongGender()
+            || hasWrongNature()
             || hasPIDFixableIllegality()
         )
         {
+            if (pkm is GBPKM gbpkm)
+            {
+                if (isShiny)
+                {
+                    gbpkm.SetShiny();
+                }
+                else
+                {
+                    gbpkm.SetPIDGender(gender);
+                }
+                break;
+            }
+
             pkm.PID = EntityPID.GetRandomPID(rnd, pkm.Species, gender, pkm.Version, nature, form, pkm.PID);
             i++;
+
             if (i > 1_000_000)
             {
+                Console.WriteLine($"PID FIX ERROR: {pkm.GetType().Name} {pkm.Nickname} {pkm.Species}");
+                Console.WriteLine($"PID shiny={pkm.IsShiny}/{isShiny} form={pkm.Form}/{form} gender={pkm.Gender}/{gender} nature={pkm.Nature}/{nature} checkLegality={checkLegality}");
                 break;
             }
         }

@@ -115,11 +115,11 @@ public static class PK3Extensions
             ConvertEVG3ToG2(pk3.EV_SPD),
         ];
         // var totalEvs = evs.ToArray().Sum();
-        // if (totalEvs > 510)
+        // if (totalEvs > EffortValues.Max510)
         // {
         //     for (var i = 0; i < evs.Length; i++)
         //     {
-        //         evs[i] = (int)(evs[i] * ((decimal)510 / totalEvs));
+        //         evs[i] = (int)(evs[i] * ((decimal)EffortValues.Max510 / totalEvs));
         //     }
         // }
         pk2.SetEVs(evs);
@@ -133,7 +133,7 @@ public static class PK3Extensions
 
     private static int ConvertEVG3ToG2(float evValue)
     {
-        return (int)(evValue * 65535 / 255);
+        return (int)(evValue * ushort.MaxValue / EffortValues.Max255);
     }
 
     private static int ConvertIVG3ToG2(int ivValue)

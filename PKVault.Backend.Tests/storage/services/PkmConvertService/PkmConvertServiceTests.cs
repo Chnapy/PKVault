@@ -148,18 +148,18 @@ public class PkmConvertServiceTests
         InlineData("CK3"),
         InlineData("XK3")
     ]
-    // [
-    //     InlineData("BK4"),
-    //     InlineData("RK4"),
-    // ]
-    // [
-    //     InlineData("PB7"),
-    // ]
-    // [
-    //     InlineData("PB8"),
-    //     InlineData("PA8"),
-    //     InlineData("PA9")
-    // ]
+    [
+        InlineData("BK4"),
+        InlineData("RK4"),
+    ]
+    [
+        InlineData("PB7"),
+    ]
+    [
+        InlineData("PB8"),
+        InlineData("PA8"),
+        InlineData("PA9")
+    ]
     public async Task TestAllBizarreVariantBackwardConversions(string variantTypeName)
     {
         SetupPKDirectory("bizarre-back-variant");
@@ -516,6 +516,8 @@ public class PkmConvertServiceTests
 
         if (!legality.Valid)
         {
+            Console.WriteLine();
+            Console.WriteLine($"{pkm.GetType().Name} - {pkm.Nickname}");
             Console.WriteLine(legality.Report());
         }
 
@@ -537,6 +539,8 @@ public class PkmConvertServiceTests
         {
             Console.WriteLine(r);
         }
+        if (illegalities.Length > 0)
+            Console.WriteLine();
 
         if (expectedData.TryGetProperty("illegalities", out var illegalitiesJson))
         {

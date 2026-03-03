@@ -115,17 +115,17 @@ public class EditPkmVariantAction(
                 throw new ArgumentException($"G7 GG EV cannot be > 200");
             }
 
-            if (pkm.Format <= 2 && ev > 65535)
+            if (pkm.Format <= 2 && ev > ushort.MaxValue)
             {
                 throw new ArgumentException($"G1-2 EV cannot be > 65535");
             }
 
-            if (pkm.Format > 2 && pkm.Format <= 5 && ev > 255)
+            if (pkm.Format > 2 && pkm.Format <= 5 && ev > EffortValues.Max255)
             {
                 throw new ArgumentException($"G3-5 EV cannot be > 255");
             }
 
-            if (pkm.Format > 5 && ev > 252)
+            if (pkm.Format > 5 && ev > EffortValues.Max252)
             {
                 throw new ArgumentException($"G6+ EV cannot be > 252");
             }

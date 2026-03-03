@@ -22,12 +22,12 @@
         "tid": 58388,
         "ot": "CHNAPY",
         "evs": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
+            50000,
+            40000,
+            30000,
+            20000,
+            20000,
+            10000
         ],
         "ivs": [
             8,
@@ -63,12 +63,12 @@
         "tid": 58388,
         "ot": "CHNAPY",
         "evs": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
+            38550,
+            30840,
+            23130,
+            15163,
+            15163,
+            7453
         ],
         "ivs": [
             8,
@@ -104,12 +104,258 @@
         "tid": 58388,
         "ot": "CHNAPY",
         "evs": [
-            0,
-            0,
-            0,
+            38550,
+            30840,
+            23130,
+            15163,
+            15163,
+            7453
+        ],
+        "ivs": [
+            8,
+            11,
+            10,
+            10,
+            10,
+            10
+        ],
+        "language": 0,
+        "illegalities": []
+    },
+    "BK4->PK2": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 56,
+        "helditem": 91,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
             0,
             0,
             0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "nature": 0,
+        "ability": -1,
+        "friendship": 200,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            38550,
+            30840,
+            23130,
+            15163,
+            15163,
+            7453
+        ],
+        "ivs": [
+            8,
+            11,
+            10,
+            10,
+            10,
+            10
+        ],
+        "language": 0,
+        "illegalities": []
+    },
+    "RK4->PK2": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 56,
+        "helditem": 91,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "nature": 0,
+        "ability": -1,
+        "friendship": 200,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            38550,
+            30840,
+            23130,
+            15163,
+            15163,
+            7453
+        ],
+        "ivs": [
+            8,
+            11,
+            10,
+            10,
+            10,
+            10
+        ],
+        "language": 0,
+        "illegalities": []
+    },
+    "PB7->PK2": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 56,
+        "helditem": 0,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "nature": 0,
+        "ability": -1,
+        "friendship": 200,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            38293,
+            30583,
+            22873,
+            14649,
+            14649,
+            7196
+        ],
+        "ivs": [
+            8,
+            11,
+            10,
+            10,
+            10,
+            10
+        ],
+        "language": 0,
+        "illegalities": []
+    },
+    "PB8->PK2": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 56,
+        "helditem": 91,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "nature": 0,
+        "ability": -1,
+        "friendship": 200,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            38550,
+            30840,
+            23130,
+            15163,
+            15163,
+            7453
+        ],
+        "ivs": [
+            8,
+            11,
+            10,
+            10,
+            10,
+            10
+        ],
+        "language": 0,
+        "illegalities": []
+    },
+    "PA8->PK2": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 56,
+        "helditem": 0,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "nature": 0,
+        "ability": -1,
+        "friendship": 200,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            38550,
+            30840,
+            23130,
+            15163,
+            15163,
+            7453
+        ],
+        "ivs": [
+            8,
+            11,
+            10,
+            10,
+            10,
+            10
+        ],
+        "language": 0,
+        "illegalities": []
+    },
+    "PA9->PK2": {
+        "species": 201,
+        "form": 8,
+        "gender": 2,
+        "version": 56,
+        "helditem": 0,
+        "level": 5,
+        "exp": 125,
+        "moves": [
+            237,
+            0,
+            0,
+            0
+        ],
+        "shiny": true,
+        "nicknamed": true,
+        "nickname": "BIZARRE",
+        "nature": 0,
+        "ability": -1,
+        "friendship": 200,
+        "tid": 58388,
+        "ot": "CHNAPY",
+        "evs": [
+            38550,
+            30840,
+            23130,
+            15163,
+            15163,
+            7453
         ],
         "ivs": [
             8,
