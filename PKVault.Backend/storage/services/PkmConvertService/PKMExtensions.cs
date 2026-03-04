@@ -2,6 +2,8 @@ using System.Security.Cryptography;
 using System.Text;
 using PKHeX.Core;
 
+public record PKMRndValues(uint PID, uint EncryptionConstant);
+
 public static class PKMExtensions
 {
     public static void FixCommonLegalityIssues(this PKM pkm)
@@ -220,14 +222,12 @@ public static class PKMExtensions
         pkm.FixMoves();
     }
 
-    public static void CopyCommonPropertiesFrom(this PKM pkm, PKM pkmSrc, byte generation)
+    public static void CopyCommonPropertiesFrom(this PKM pkm, PKM pkmSrc, byte generation, PKMRndValues? rndValues)
     {
         if (pkmSrc.Species > pkm.MaxSpeciesID)
         {
             throw new InvalidOperationException($"Species incompatible: {pkmSrc.Species} > {pkm.MaxSpeciesID}");
         }
-
-        var rnd = Util.Rand;
 
         pkm.Species = pkmSrc.Species;
         pkm.Gender = pkmSrc.Gender;
@@ -241,8 +241,8 @@ public static class PKMExtensions
         pkm.Nature = pkmSrc.Nature;
         pkm.StatNature = pkmSrc.StatNature;
 
-        pkm.PID = pkmSrc.PID;
-        pkm.EncryptionConstant = rnd.Rand32();
+        pkm.PID = rndValues?.PID ?? pkmSrc.PID;
+        pkm.EncryptionConstant = rndValues?.EncryptionConstant ?? Util.Rand.Rand32();
 
         pkm.Ability = pkmSrc.Ability;
         pkm.AbilityNumber = pkmSrc.AbilityNumber;
@@ -461,6 +461,18 @@ public static class PKMExtensions
             var id = (ushort)(raw % 100000);
             pkm.SID16 = id;
         }
+    }
+
+    public static int[] GetAllIVs(this PKM pkm)
+    {
+        return [
+            pkm.IV_HP,
+            pkm.IV_ATK,
+            pkm.IV_DEF,
+            pkm.IV_SPE,
+            pkm.IV_SPA,
+            pkm.IV_SPD,
+        ];
     }
 
     public static void SetSuggestedMetLocation(PKM pkm)

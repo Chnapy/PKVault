@@ -3,11 +3,9 @@ using PKHeX.Core;
 
 public static class PK2Extensions
 {
-    public static PK3 ConvertToPK3(this PK2 pk2, LanguageID fallbackLang)
+    public static PK3 ConvertToPK3(this PK2 pk2, LanguageID fallbackLang, PKMRndValues? rndValues)
     {
         // Inspired by PK2.ConvertToPK7
-
-        var rnd = Util.Rand;
 
         var pi = PersonalTable.RS[pk2.Species];
         int ability = 0; // Hidden
@@ -17,13 +15,13 @@ public static class PK2Extensions
 
         var pk3 = new PK3()
         {
-            EncryptionConstant = rnd.Rand32(),
+            EncryptionConstant = rndValues?.EncryptionConstant ?? Util.Rand.Rand32(),
             Species = pk2.Species,
             TID16 = pk2.TID16,
             CurrentLevel = pk2.CurrentLevel,
             EXP = pk2.EXP,
             Nature = Experience.GetNatureVC(pk2.EXP),
-            PID = rnd.Rand32(),
+            PID = rndValues?.PID ?? Util.Rand.Rand32(),
             Ball = 4,
 
             MetLocation = 0,
@@ -68,15 +66,7 @@ public static class PK2Extensions
             pk3.Nickname = pk2.Korean ? pk2.Nickname : StringConverter12Transporter.GetString(pk2.NicknameTrash, pk2.Japanese);
         }
 
-        Span<int> ivs = [
-            ConvertIVG2ToG3(pk2.IV_HP),
-            ConvertIVG2ToG3(pk2.IV_ATK),
-            ConvertIVG2ToG3(pk2.IV_DEF),
-            ConvertIVG2ToG3(pk2.IV_SPE),
-            ConvertIVG2ToG3(pk2.IV_SPA),
-            ConvertIVG2ToG3(pk2.IV_SPD),
-        ];
-        pk3.SetIVs(ivs);
+        pk3.SetIVs(ConvertIVsToG3(pk2.GetAllIVs()));
 
         Span<int> evs = [
             ConvertEVG2ToG3(pk2.EV_HP),
@@ -96,11 +86,17 @@ public static class PK2Extensions
         }
         pk3.SetEVs(evs);
 
-        pk3.FixPID(pk2.IsShiny, pk2.Form, pk2.Gender, pk3.Nature);
+        if (rndValues == null)
+            pk3.FixPID(pk2.IsShiny, pk2.Form, pk2.Gender, pk3.Nature);
 
         pk3.CopyMovesFrom(pk2);
 
         return pk3;
+    }
+
+    public static int[] ConvertIVsToG3(int[] ivs)
+    {
+        return [.. ivs.Select(ConvertIVG2ToG3)];
     }
 
     private static string GetTransferTrainerName(this PK2 pk2, int lang)
@@ -121,9 +117,9 @@ public static class PK2Extensions
         return !current[..length].SequenceEqual(expect[..length]);
     }
 
-    public static bool IsNicknamedBank(this PK2 pk2) => pk2.GetIsNicknamedLength(pk2.GuessedLanguage());
+    private static bool IsNicknamedBank(this PK2 pk2) => pk2.GetIsNicknamedLength(pk2.GuessedLanguage());
 
-    public static int GuessedLanguage(this PK2 pk2, int fallback = (int)LanguageID.English)
+    private static int GuessedLanguage(this PK2 pk2, int fallback = (int)LanguageID.English)
     {
         int lang = pk2.Language;
         if (lang > 0)
@@ -133,7 +129,7 @@ public static class PK2Extensions
         return (int)LanguageID.English;
     }
 
-    public static int GetNonNickname(this PK2 pk2, int language, Span<byte> data)
+    private static int GetNonNickname(this PK2 pk2, int language, Span<byte> data)
     {
         var name = SpeciesName.GetSpeciesNameGeneration(pk2.Species, language, pk2.Format);
         int length = pk2.SetString(data, name, data.Length, StringConverterOption.Clear50);

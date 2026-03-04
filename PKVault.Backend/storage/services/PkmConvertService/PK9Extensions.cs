@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public static class PK9Extensions
 {
-    public static PA9 ConvertToPA9(this PK9 pk9)
+    public static PA9 ConvertToPA9(this PK9 pk9, PKMRndValues? rndValues)
     {
         var pa9 = new PA9()
         {
@@ -21,7 +21,7 @@ public static class PK9Extensions
             ObedienceLevel = pk9.ObedienceLevel,
         };
 
-        pa9.CopyCommonPropertiesFrom(pk9, 9);
+        pa9.CopyCommonPropertiesFrom(pk9, 9, rndValues);
         pa9.CopyIVsFrom(pk9);
         pa9.CopyEVsFrom(pk9);
 
@@ -44,14 +44,15 @@ public static class PK9Extensions
 
         pa9.FixMetLocation([GameVersion.ZA]);
 
-        pa9.FixPID(pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
+        if (rndValues == null)
+            pa9.FixPID(pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
 
         pa9.CopyMovesFrom(pk9);
 
         return pa9;
     }
 
-    public static PK8 ConvertToPK8(this PK9 pk9)
+    public static PK8 ConvertToPK8(this PK9 pk9, PKMRndValues? rndValues)
     {
         var pk8 = new PK8()
         {
@@ -66,7 +67,7 @@ public static class PK9Extensions
             HandlingTrainerLanguage = (byte)pk9.Language,
         };
 
-        pk8.CopyCommonPropertiesFrom(pk9, 8);
+        pk8.CopyCommonPropertiesFrom(pk9, 8, rndValues);
         pk8.CopyIVsFrom(pk9);
         pk8.CopyEVsFrom(pk9);
 
@@ -86,7 +87,8 @@ public static class PK9Extensions
 
         pk8.FixMetLocation([GameVersion.SW, GameVersion.SH]);
 
-        pk8.FixPID(pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
+        if (rndValues == null)
+            pk8.FixPID(pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
 
         // for Furfrou and Hoopa
         pk8.FormArgumentRemain = pk9.FormArgumentRemain;
@@ -98,7 +100,7 @@ public static class PK9Extensions
         return pk8;
     }
 
-    public static PK9 ConvertToPK9(this PA9 pa9)
+    public static PK9 ConvertToPK9(this PA9 pa9, PKMRndValues? rndValues)
     {
         var pk9 = new PK9()
         {
@@ -118,7 +120,7 @@ public static class PK9Extensions
             TeraTypeOverride = (MoveType)Tera9RNG.GetTeraTypeFromPersonal(pa9.Species, pa9.Form, 0),
         };
 
-        pk9.CopyCommonPropertiesFrom(pa9, 9);
+        pk9.CopyCommonPropertiesFrom(pa9, 9, rndValues);
         pk9.CopyIVsFrom(pa9);
         pk9.CopyEVsFrom(pa9);
 
@@ -143,7 +145,8 @@ public static class PK9Extensions
 
         pk9.FixMetLocation([GameVersion.SL, GameVersion.VL]);
 
-        pk9.FixPID(pa9.IsShiny, pa9.Form, pa9.Gender, pa9.Nature);
+        if (rndValues == null)
+            pk9.FixPID(pa9.IsShiny, pa9.Form, pa9.Gender, pa9.Nature);
 
         pk9.CopyMovesFrom(pa9);
 

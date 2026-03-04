@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public static class PK5Extensions
 {
-    public static PK6 ConvertToPK6Fixed(this PK5 pk5)
+    public static PK6 ConvertToPK6Fixed(this PK5 pk5, PKMRndValues? rndValues)
     {
         var pk6 = pk5.ConvertToPK6();
 
@@ -16,7 +16,8 @@ public static class PK5Extensions
 
         pk6.CopyHeldItemFrom(pk5.HeldItem, pk5.Context, pk5.Version);
 
-        pk6.FixPID(pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);
+        if (rndValues == null)
+            pk6.FixPID(pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);
 
         pk6.CopyMovesFrom(pk5);
 
@@ -26,7 +27,7 @@ public static class PK5Extensions
         return pk6;
     }
 
-    public static PK4 ConvertToPK4(this PK5 pk5)
+    public static PK4 ConvertToPK4(this PK5 pk5, PKMRndValues? rndValues)
     {
         var pk4 = new PK4()
         {
@@ -39,7 +40,7 @@ public static class PK5Extensions
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
         };
 
-        pk4.CopyCommonPropertiesFrom(pk5, 4);
+        pk4.CopyCommonPropertiesFrom(pk5, 4, rndValues);
         pk4.CopyIVsFrom(pk5);
         pk4.CopyEVsFrom(pk5);
 
@@ -56,7 +57,8 @@ public static class PK5Extensions
 
         pk4.FixMetLocation([GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.HG, GameVersion.SS]);
 
-        pk4.FixPID(pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);
+        if (rndValues == null)
+            pk4.FixPID(pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);
 
         pk4.CopyMovesFrom(pk5);
 

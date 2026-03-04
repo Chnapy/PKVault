@@ -3,7 +3,7 @@ using PKHeX.Core;
 public record EditPkmVariantActionInput(string pkmVariantId, EditPkmVariantPayload editPayload);
 
 public class EditPkmVariantAction(
-    ActionService actionService, PkmUpdateService pkmUpdateService,
+    ActionService actionService, PkmUpdateService pkmUpdateService, PkmConvertService pkmConvertService,
     SynchronizePkmAction synchronizePkmAction,
     IPkmVariantLoader pkmVariantLoader
 ) : DataAction<EditPkmVariantActionInput>
@@ -32,17 +32,17 @@ public class EditPkmVariantAction(
         var relatedPkmVariants = (await pkmVariantLoader.GetEntitiesByBox(pkmVariantEntity.BoxId, pkmVariantEntity.BoxSlot)).Values.ToList()
             .FindAll(value => value.Id != input.pkmVariantId);
 
-        foreach (var versionEntity in relatedPkmVariants)
+        foreach (var variantEntity in relatedPkmVariants)
         {
-            var relatedPkm = (await pkmVariantLoader.GetPKM(versionEntity)).Update(relatedPkm =>
-            {
-                pkmUpdateService.PassDynamicsToPkm(pkm, relatedPkm);
+            var relatedPkm = await pkmVariantLoader.GetPKM(variantEntity);
 
-                relatedPkm.ResetPartyStats();
-                relatedPkm.RefreshChecksum();
-            });
+            var convertedPkm = pkmConvertService.ConvertToExisting(
+                pkm,
+                relatedPkm.GetMutablePkm(),
+                keepMoves: true
+            );
 
-            await pkmVariantLoader.UpdateEntity(versionEntity, relatedPkm);
+            await pkmVariantLoader.UpdateEntity(variantEntity, convertedPkm);
         }
 
         if (pkmVariantEntity.AttachedSaveId != null)

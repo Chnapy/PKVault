@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public static class PK3Extensions
 {
-    public static PK4 ConvertToPK4Fixed(this PK3 pk3)
+    public static PK4 ConvertToPK4Fixed(this PK3 pk3, PKMRndValues? rndValues)
     {
         var pk4 = pk3.ConvertToPK4();
 
@@ -12,7 +12,8 @@ public static class PK3Extensions
             GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG
         ]);
 
-        pk4.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
+        if (rndValues == null)
+            pk4.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
 
         pk4.CopyMovesFrom(pk3);
 
@@ -22,7 +23,7 @@ public static class PK3Extensions
         return pk4;
     }
 
-    public static XK3 ConvertToXK3Fixed(this PK3 pk3)
+    public static XK3 ConvertToXK3Fixed(this PK3 pk3, PKMRndValues? rndValues)
     {
         var pk = pk3.ConvertToXK3();
 
@@ -31,14 +32,15 @@ public static class PK3Extensions
             pk.SetMarking(i, pk3.GetMarking(i));
         }
 
-        pk.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
+        if (rndValues == null)
+            pk.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
 
         pk.CopyMovesFrom(pk3);
 
         return pk;
     }
 
-    public static CK3 ConvertToCK3Fixed(this PK3 pk3)
+    public static CK3 ConvertToCK3Fixed(this PK3 pk3, PKMRndValues? rndValues)
     {
         var pk = pk3.ConvertToCK3();
 
@@ -47,27 +49,26 @@ public static class PK3Extensions
             pk.SetMarking(i, pk3.GetMarking(i));
         }
 
-        pk.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
+        if (rndValues == null)
+            pk.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
 
         pk.CopyMovesFrom(pk3);
 
         return pk;
     }
 
-    public static PK2 ConvertToPK2(this PK3 pk3)
+    public static PK2 ConvertToPK2(this PK3 pk3, PKMRndValues? rndValues)
     {
-        var rnd = Util.Rand;
-
         var pk2 = new PK2()
         {
             Version = GameVersion.C,
-            EncryptionConstant = rnd.Rand32(),
+            EncryptionConstant = rndValues?.EncryptionConstant ?? Util.Rand.Rand32(),
             Species = pk3.Species,
             TID16 = pk3.TID16,
             CurrentLevel = pk3.CurrentLevel,
             EXP = pk3.EXP,
             Nature = Experience.GetNatureVC(pk3.EXP),
-            PID = rnd.Rand32(),
+            PID = rndValues?.PID ?? Util.Rand.Rand32(),
             Ball = 4,
 
             MetLocation = 0,
@@ -96,15 +97,7 @@ public static class PK3Extensions
 
         pk2.FixMetLocation([GameVersion.GD, GameVersion.SI, GameVersion.C]);
 
-        Span<int> ivs = [
-            ConvertIVG3ToG2(pk3.IV_HP),
-            ConvertIVG3ToG2(pk3.IV_ATK),
-            ConvertIVG3ToG2(pk3.IV_DEF),
-            ConvertIVG3ToG2(pk3.IV_SPE),
-            ConvertIVG3ToG2(pk3.IV_SPA),
-            ConvertIVG3ToG2(pk3.IV_SPD),
-        ];
-        pk2.SetIVs(ivs);
+        pk2.SetIVs(ConvertIVsToG2(pk3.GetAllIVs()));
 
         Span<int> evs = [
             ConvertEVG3ToG2(pk3.EV_HP),
@@ -124,11 +117,17 @@ public static class PK3Extensions
         // }
         pk2.SetEVs(evs);
 
-        pk2.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk2.Nature);
+        if (rndValues == null)
+            pk2.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk2.Nature);
 
         pk2.CopyMovesFrom(pk3);
 
         return pk2;
+    }
+
+    public static int[] ConvertIVsToG2(int[] ivs)
+    {
+        return [.. ivs.Select(ConvertIVG3ToG2)];
     }
 
     private static int ConvertEVG3ToG2(float evValue)

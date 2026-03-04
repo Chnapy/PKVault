@@ -85,6 +85,12 @@ public class PkmConvertServiceTests
         InlineData("PK9"),
         InlineData("PA9")
     ]
+    /**
+     * Basic conversion with Pikachu (#25):
+     * - direction: forward
+     * - PK1 to all games
+     * - PID predictability with existing pkm
+     */
     public async Task TestAllPikachuForwardConversions(string targetTypeName)
     {
         SetupPKDirectory("pikachu-front");
@@ -97,13 +103,25 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(targetTypeName);
 
-        var result = service.ConvertTo(new(sourcePkm), blank).GetMutablePkm();
+        var result = service.ConvertTo(new(sourcePkm), blank, null).GetMutablePkm();
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
         File.WriteAllBytes(Path.Combine("./pkm-files", "pikachu-front", result.FileName), result.DecryptedPartyData);
 
         AssertExpectedData(result, (JsonElement)pikachuForwardExpectedData[targetTypeName]);
+
+        // check PID predictability
+        if (result is not GBPKM && blank is not GBPKM)
+        {
+            var result2 = service.ConvertTo(new(sourcePkm), blank, new(
+                PID: result.PID,
+                EncryptionConstant: result.EncryptionConstant
+            )).GetMutablePkm();
+
+            Assert.Equal(result.PID, result2.PID);
+            Assert.Equal(result.EncryptionConstant, result2.EncryptionConstant);
+        }
     }
 
     [Theory]
@@ -121,6 +139,12 @@ public class PkmConvertServiceTests
         InlineData("PK2"),
         InlineData("PK1"),
     ]
+    /**
+     * Basic conversion with Pikachu (#25):
+     * - direction: backward
+     * - PA9 to main games
+     * - PID predictability with existing pkm
+     */
     public async Task TestAllPikachuBackwardConversions(string targetTypeName)
     {
         SetupPKDirectory("pikachu-back");
@@ -133,13 +157,25 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(targetTypeName);
 
-        var result = service.ConvertTo(new(sourcePkm), blank).GetMutablePkm();
+        var result = service.ConvertTo(new(sourcePkm), blank, null).GetMutablePkm();
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
         File.WriteAllBytes(Path.Combine("./pkm-files", "pikachu-back", result.FileName), result.DecryptedPartyData);
 
         AssertExpectedData(result, (JsonElement)pikachuBackwardExpectedData[targetTypeName]);
+
+        // check PID predictability
+        if (result is not GBPKM && blank is not GBPKM)
+        {
+            var result2 = service.ConvertTo(new(sourcePkm), blank, new(
+                PID: result.PID,
+                EncryptionConstant: result.EncryptionConstant
+            )).GetMutablePkm();
+
+            Assert.Equal(result.PID, result2.PID);
+            Assert.Equal(result.EncryptionConstant, result2.EncryptionConstant);
+        }
     }
 
     [Theory]
@@ -160,6 +196,13 @@ public class PkmConvertServiceTests
         InlineData("PA8"),
         InlineData("PA9")
     ]
+    /**
+     * Complex conversion with Unown (#201):
+     * - Form, Shiny, Helditem
+     * - direction: backward
+     * - Variant games to PK2
+     * - PID predictability with existing pkm
+     */
     public async Task TestAllBizarreVariantBackwardConversions(string variantTypeName)
     {
         SetupPKDirectory("bizarre-back-variant");
@@ -172,19 +215,31 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(variantTypeName);
 
-        var result1 = service.ConvertTo(new(sourcePkm), blank).GetMutablePkm();
+        var result1 = service.ConvertTo(new(sourcePkm), blank, null).GetMutablePkm();
 
         Assert.Equal(variantTypeName, result1.GetType().Name);
 
         blank = CreateBlankTarget("PK2");
 
-        var result = service.ConvertTo(new(result1), blank).GetMutablePkm();
+        var result = service.ConvertTo(new(result1), blank, null).GetMutablePkm();
 
         Assert.Equal("PK2", result.GetType().Name);
 
         File.WriteAllBytes(Path.Combine("./pkm-files", "bizarre-back-variant", $"{variantTypeName}-{result.FileName}"), result.DecryptedPartyData);
 
         AssertExpectedData(result, (JsonElement)bizarreVariantBackwardExpectedData[$"{variantTypeName}->PK2"]);
+
+        // check PID predictability
+        if (result is not GBPKM && blank is not GBPKM)
+        {
+            var result2 = service.ConvertTo(new(sourcePkm), blank, new(
+                PID: result.PID,
+                EncryptionConstant: result.EncryptionConstant
+            )).GetMutablePkm();
+
+            Assert.Equal(result.PID, result2.PID);
+            Assert.Equal(result.EncryptionConstant, result2.EncryptionConstant);
+        }
     }
 
     [Theory]
@@ -213,6 +268,13 @@ public class PkmConvertServiceTests
         InlineData("PK9"),  // Unown not available here
         InlineData("PA9")   // Unown not available here
     ]
+    /**
+     * Complex conversion with Unown (#201):
+     * - Form, Shiny, Helditem
+     * - direction: forward
+     * - PK2 to all games
+     * - PID predictability with existing pkm
+     */
     public async Task TestAllBizarreForwardConversions(string targetTypeName)
     {
         SetupPKDirectory("bizarre-front");
@@ -225,13 +287,25 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(targetTypeName);
 
-        var result = service.ConvertTo(new(sourcePkm), blank).GetMutablePkm();
+        var result = service.ConvertTo(new(sourcePkm), blank, null).GetMutablePkm();
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
         File.WriteAllBytes(Path.Combine("./pkm-files", "bizarre-front", result.FileName), result.DecryptedPartyData);
 
         AssertExpectedData(result, (JsonElement)bizarreForwardExpectedData[targetTypeName]);
+
+        // check PID predictability
+        if (result is not GBPKM && blank is not GBPKM)
+        {
+            var result2 = service.ConvertTo(new(sourcePkm), blank, new(
+                PID: result.PID,
+                EncryptionConstant: result.EncryptionConstant
+            )).GetMutablePkm();
+
+            Assert.Equal(result.PID, result2.PID);
+            Assert.Equal(result.EncryptionConstant, result2.EncryptionConstant);
+        }
     }
 
     [Theory]
@@ -258,6 +332,13 @@ public class PkmConvertServiceTests
         InlineData("PK9"),
         InlineData("PA9")
     ]
+    /**
+     * Complex conversion with Muk (#89):
+     * - Nature, Ability, Helditem, Markings, Contest, Ribbon
+     * - direction: forward
+     * - PK3 to all games
+     * - PID predictability with existing pkm
+     */
     public async Task TestAllMukForwardConversions(string targetTypeName)
     {
         SetupPKDirectory("muk-front");
@@ -270,37 +351,26 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(targetTypeName);
 
-        var result = service.ConvertTo(new(sourcePkm), blank).GetMutablePkm();
+        var result = service.ConvertTo(new(sourcePkm), blank, null).GetMutablePkm();
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
         File.WriteAllBytes(Path.Combine("./pkm-files", "muk-front", result.FileName), result.DecryptedPartyData);
 
         AssertExpectedData(result, (JsonElement)mukForwardExpectedData[targetTypeName]);
+
+        // check PID predictability
+        if (result is not GBPKM && blank is not GBPKM)
+        {
+            var result2 = service.ConvertTo(new(sourcePkm), blank, new(
+                PID: result.PID,
+                EncryptionConstant: result.EncryptionConstant
+            )).GetMutablePkm();
+
+            Assert.Equal(result.PID, result2.PID);
+            Assert.Equal(result.EncryptionConstant, result2.EncryptionConstant);
+        }
     }
-
-    // [Fact]
-    // public void TestRoundTrip_PK1_PK9_PK1()
-    // {
-    //     var service = GetService();
-
-    //     FileUtil.TryGetPKM(pikachuPK1Bytes, out var pk1, "pk1");
-    //     Assert.NotNull(pk1);
-
-    //     var pa9Blank = new PA9();
-
-    //     // PK1 → PA9  
-    //     var pa9 = service.ConvertTo(pk1, pa9Blank);
-    //     Assert.IsType<PA9>(pa9);
-
-    //     // PA9 → PK1 (round-trip)
-    //     var pk1Back = service.ConvertTo(pa9, pk1);
-    //     Assert.IsType<PK1>(pk1Back);
-
-    //     // Vérifications clés préservées
-    //     Assert.Equal(pk1.Species, pk1Back.Species);
-    //     Assert.Equal(pk1.CurrentLevel, pk1Back.CurrentLevel);
-    // }
 
     private static PKM CreateBlankTarget(string typeName)
     {

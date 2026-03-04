@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public static class PK7Extensions
 {
-    public static PK8 ConvertToPK8(this PK7 pk7)
+    public static PK8 ConvertToPK8(this PK7 pk7, PKMRndValues? rndValues)
     {
         var pk8 = new PK8()
         {
@@ -18,7 +18,7 @@ public static class PK7Extensions
             HandlingTrainerLanguage = (byte)pk7.Language,
         };
 
-        pk8.CopyCommonPropertiesFrom(pk7, 8);
+        pk8.CopyCommonPropertiesFrom(pk7, 8, rndValues);
         pk8.CopyIVsFrom(pk7);
         pk8.CopyEVsFrom(pk7);
 
@@ -45,7 +45,8 @@ public static class PK7Extensions
             GameVersion.SW, GameVersion.SH, GameVersion.BD, GameVersion.SP, GameVersion.PLA,
         ]);
 
-        pk8.FixPID(pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature);
+        if (rndValues == null)
+            pk8.FixPID(pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature);
 
         pk8.CopyMovesFrom(pk7);
 
@@ -57,22 +58,9 @@ public static class PK7Extensions
         return pk8;
     }
 
-    public static PB7 ConvertToPB7(this PK7 pk7)
+    public static PB7 ConvertToPB7(this PK7 pk7, PKMRndValues? rndValues)
     {
         byte convertEVToAV(float value) => byte.Max((byte)(value / pk7.MaxEV * 200), 2);
-
-        int convertIVOdd(int value) => (value % 2) == 0
-            ? value + 1
-            : value;
-
-        var ivAtkSpa = int.Max(
-            convertIVOdd(pk7.IV_ATK),
-            convertIVOdd(pk7.IV_SPA)
-        );
-        var ivDefSpd = int.Max(
-            convertIVOdd(pk7.IV_DEF),
-            convertIVOdd(pk7.IV_SPD)
-        );
 
         var pb7 = new PB7()
         {
@@ -90,20 +78,7 @@ public static class PK7Extensions
 
             ReceivedDate = EncounterDate.GetDateSwitch(),
 
-            /**
-             * IV rules with PB7:
-             * - HP, ATK, DEF, SPA, SPD should be odd
-             * - ATK = SPA
-             * - DEF = SPD
-             */
-            IVs = [
-                convertIVOdd(pk7.IV_HP),
-                ivAtkSpa,
-                ivDefSpd,
-                pk7.IV_SPE,
-                ivAtkSpa,
-                ivDefSpd,
-            ],
+            IVs = ConvertIVsG3ToG7B(pk7.GetAllIVs()),
 
             AV_HP = convertEVToAV(pk7.EV_HP),
             AV_ATK = convertEVToAV(pk7.EV_ATK),
@@ -114,7 +89,7 @@ public static class PK7Extensions
 
         };
 
-        pb7.CopyCommonPropertiesFrom(pk7, 7);
+        pb7.CopyCommonPropertiesFrom(pk7, 7, rndValues);
 
         pb7.CopyMovesFrom(pk7);
 
@@ -130,7 +105,45 @@ public static class PK7Extensions
         return pb7;
     }
 
-    public static PK6 ConvertToPK6(this PK7 pk7)
+    /**
+     * IV rules with PB7:
+     * - HP, ATK, DEF, SPA, SPD should be odd
+     * - ATK = SPA
+     * - DEF = SPD
+     */
+    public static int[] ConvertIVsG3ToG7B(int[] ivs)
+    {
+        static int convertIVOdd(int value) => (value % 2) == 0
+            ? value + 1
+            : value;
+
+        var IV_HP = ivs[0];
+        var IV_ATK = ivs[1];
+        var IV_DEF = ivs[2];
+        var IV_SPE = ivs[3];
+        var IV_SPA = ivs[4];
+        var IV_SPD = ivs[5];
+
+        var ivAtkSpa = int.Max(
+            convertIVOdd(IV_ATK),
+            convertIVOdd(IV_SPA)
+        );
+        var ivDefSpd = int.Max(
+            convertIVOdd(IV_DEF),
+            convertIVOdd(IV_SPD)
+        );
+
+        return [
+            convertIVOdd(IV_HP),
+            ivAtkSpa,
+            ivDefSpd,
+            IV_SPE,
+            ivAtkSpa,
+            ivDefSpd,
+        ];
+    }
+
+    public static PK6 ConvertToPK6(this PK7 pk7, PKMRndValues? rndValues)
     {
         var pk6 = new PK6()
         {
@@ -143,7 +156,7 @@ public static class PK7Extensions
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
         };
 
-        pk6.CopyCommonPropertiesFrom(pk7, 6);
+        pk6.CopyCommonPropertiesFrom(pk7, 6, rndValues);
         pk6.CopyIVsFrom(pk7);
         pk6.CopyEVsFrom(pk7);
 
@@ -162,7 +175,8 @@ public static class PK7Extensions
 
         pk6.FixMetLocation([GameVersion.X, GameVersion.Y, GameVersion.AS, GameVersion.OR]);
 
-        pk6.FixPID(pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature);
+        if (rndValues == null)
+            pk6.FixPID(pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature);
 
         // for Furfrou and Hoopa
         pk6.FormArgumentRemain = pk7.FormArgumentRemain;
@@ -174,7 +188,7 @@ public static class PK7Extensions
         return pk6;
     }
 
-    public static PK7 ConvertToPK7(this PB7 pb7)
+    public static PK7 ConvertToPK7(this PB7 pb7, PKMRndValues? rndValues)
     {
         byte convertAVToEV(float value) => (byte)(value * EffortValues.Max252 / 200);
 
@@ -196,7 +210,7 @@ public static class PK7Extensions
             EV_SPE = convertAVToEV(pb7.AV_SPE),
         };
 
-        pk7.CopyCommonPropertiesFrom(pb7, 7);
+        pk7.CopyCommonPropertiesFrom(pb7, 7, rndValues);
         pk7.CopyIVsFrom(pb7);
 
         pb7.CopyRibbonSetCommon3(pk7);
@@ -213,7 +227,8 @@ public static class PK7Extensions
 
         pk7.FixMetLocation([GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM]);
 
-        pk7.FixPID(pb7.IsShiny, pb7.Form, pb7.Gender, pb7.Nature);
+        if (rndValues == null)
+            pk7.FixPID(pb7.IsShiny, pb7.Form, pb7.Gender, pb7.Nature);
 
         pk7.CopyMovesFrom(pb7);
 

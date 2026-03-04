@@ -18,14 +18,40 @@ public class PkmConvertService(ISettingsService settingsService)
             _ => throw new Exception($"PKM case not found for generation={generation}")
         };
 
-        return ConvertTo(sourcePkm, blankPkm);
+        return ConvertTo(sourcePkm, blankPkm, null);
     }
 
-    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, PKM blankTargetPkm)
+    public ImmutablePKM ConvertToExisting(ImmutablePKM sourcePkm, PKM existingTargetPkm, bool keepMoves)
+    {
+        var result = ConvertTo(
+            sourcePkm,
+            existingTargetPkm,
+            new(
+                PID: existingTargetPkm.PID,
+                EncryptionConstant: existingTargetPkm.EncryptionConstant
+            )
+        );
+
+        if (keepMoves)
+        {
+            result = result.Update(pkm =>
+            {
+                pkm.CopyMovesFrom(existingTargetPkm);
+
+                pkm.Heal();
+                pkm.ResetPartyStats();
+                pkm.RefreshChecksum();
+            });
+        }
+
+        return result;
+    }
+
+    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, PKM blankTargetPkm, PKMRndValues? rndValues)
     {
         var fallbackLang = settingsService.GetSettings().GetSafeLanguageID();
 
-        var result = ConvertRecursive(sourcePkm.GetMutablePkm().Clone(), blankTargetPkm.GetType(), fallbackLang);
+        var result = ConvertRecursive(sourcePkm.GetMutablePkm().Clone(), blankTargetPkm.GetType(), fallbackLang, rndValues);
 
         if (result.GetType() != blankTargetPkm.GetType())
             throw new InvalidOperationException($"Failed to convert to {blankTargetPkm.GetType().Name}");
@@ -44,7 +70,7 @@ public class PkmConvertService(ISettingsService settingsService)
         return new(result);
     }
 
-    private PKM ConvertRecursive(PKM current, Type targetType, LanguageID fallbackLang)
+    private PKM ConvertRecursive(PKM current, Type targetType, LanguageID fallbackLang, PKMRndValues? rndValues)
     {
         var currentValue = GetPKMTypeWeight(current.GetType());
         var targetValue = GetPKMTypeWeight(targetType);
@@ -56,26 +82,26 @@ public class PkmConvertService(ISettingsService settingsService)
         if (direction > 0)
         {
 
-            var direct = TryPKToVariant(current, targetType);
+            var direct = TryPKToVariant(current, targetType, rndValues);
             if (direct != null)
-                return ConvertRecursive(direct, targetType, fallbackLang);
+                return ConvertRecursive(direct, targetType, fallbackLang, rndValues);
 
-            var forward = TryForwardConversion(current, fallbackLang);
+            var forward = TryForwardConversion(current, fallbackLang, rndValues);
             if (forward != null)
-                return ConvertRecursive(forward, targetType, fallbackLang);
+                return ConvertRecursive(forward, targetType, fallbackLang, rndValues);
         }
         else
         {
 
-            var backward = TryBackwardConversion(current);
+            var backward = TryBackwardConversion(current, rndValues);
             if (backward != null)
-                return ConvertRecursive(backward, targetType, fallbackLang);
+                return ConvertRecursive(backward, targetType, fallbackLang, rndValues);
         }
 
         throw new InvalidOperationException($"No conversion path from {current.GetType().Name} to {targetType.Name}");
     }
 
-    private static PKM? TryPKToVariant(PKM source, Type targetType)
+    private static PKM? TryPKToVariant(PKM source, Type targetType, PKMRndValues? rndValues)
     {
         return (source.GetType().Name, targetType.Name) switch
         {
@@ -86,45 +112,45 @@ public class PkmConvertService(ISettingsService settingsService)
             ("PK2", "SK2") => ((PK2)source).ConvertToSK2(),
 
             // G3  
-            ("PK3", "CK3") => ((PK3)source).ConvertToCK3Fixed(),
-            ("PK3", "XK3") => ((PK3)source).ConvertToXK3Fixed(),
+            ("PK3", "CK3") => ((PK3)source).ConvertToCK3Fixed(rndValues),
+            ("PK3", "XK3") => ((PK3)source).ConvertToXK3Fixed(rndValues),
 
             // G4
-            ("PK4", "BK4") => ((PK4)source).ConvertToBK4Fixed(),
-            ("PK4", "RK4") => ((PK4)source).ConvertToRK4Fixed(),
+            ("PK4", "BK4") => ((PK4)source).ConvertToBK4Fixed(rndValues),
+            ("PK4", "RK4") => ((PK4)source).ConvertToRK4Fixed(rndValues),
 
             // G7
-            ("PK7", "PB7") => ((PK7)source).ConvertToPB7(),
+            ("PK7", "PB7") => ((PK7)source).ConvertToPB7(rndValues),
 
             // G8
-            ("PK8", "PB8") => ((PK8)source).ConvertToPB8(),
-            ("PK8", "PA8") => ((PK8)source).ConvertToPA8(),
+            ("PK8", "PB8") => ((PK8)source).ConvertToPB8(rndValues),
+            ("PK8", "PA8") => ((PK8)source).ConvertToPA8(rndValues),
 
             // G9
-            ("PK9", "PA9") => ((PK9)source).ConvertToPA9(),
+            ("PK9", "PA9") => ((PK9)source).ConvertToPA9(rndValues),
 
             _ => null
         };
     }
 
-    private static PKM? TryForwardConversion(PKM source, LanguageID fallbackLang)
+    private static PKM? TryForwardConversion(PKM source, LanguageID fallbackLang, PKMRndValues? rndValues)
     {
         if (source is ITrainerInfo sourceTrainer)
         {
             RecentTrainerCache.SetRecentTrainer(sourceTrainer);
         }
 
-        var pkm = TryVariantToPK(source)
+        var pkm = TryVariantToPK(source, rndValues)
             ?? source.GetType().Name switch
             {
                 "PK1" => ((PK1)source).ConvertToPK2(),
-                "PK2" => ((PK2)source).ConvertToPK3(fallbackLang),
-                "PK3" => ((PK3)source).ConvertToPK4Fixed(),
-                "PK4" => ((PK4)source).ConvertToPK5Fixed(),
-                "PK5" => ((PK5)source).ConvertToPK6Fixed(),
-                "PK6" => ((PK6)source).ConvertToPK7Fixed(),
-                "PK7" => ((PK7)source).ConvertToPK8(),
-                "PK8" => ((PK8)source).ConvertToPK9(),
+                "PK2" => ((PK2)source).ConvertToPK3(fallbackLang, rndValues),
+                "PK3" => ((PK3)source).ConvertToPK4Fixed(rndValues),
+                "PK4" => ((PK4)source).ConvertToPK5Fixed(rndValues),
+                "PK5" => ((PK5)source).ConvertToPK6Fixed(rndValues),
+                "PK6" => ((PK6)source).ConvertToPK7Fixed(rndValues),
+                "PK7" => ((PK7)source).ConvertToPK8(rndValues),
+                "PK8" => ((PK8)source).ConvertToPK9(rndValues),
 
                 _ => null
             };
@@ -138,23 +164,23 @@ public class PkmConvertService(ISettingsService settingsService)
         return pkm;
     }
 
-    private static PKM? TryBackwardConversion(PKM source)
+    private static PKM? TryBackwardConversion(PKM source, PKMRndValues? rndValues)
     {
         if (source is ITrainerInfo sourceTrainer)
         {
             RecentTrainerCache.SetRecentTrainer(sourceTrainer);
         }
 
-        var pkm = TryVariantToPK(source)
+        var pkm = TryVariantToPK(source, rndValues)
             ?? source.GetType().Name switch
             {
-                "PK9" => ((PK9)source).ConvertToPK8(),
-                "PK8" => ((PK8)source).ConvertToPK7(),
-                "PK7" => ((PK7)source).ConvertToPK6(),
-                "PK6" => ((PK6)source).ConvertToPK5(),
-                "PK5" => ((PK5)source).ConvertToPK4(),
-                "PK4" => ((PK4)source).ConvertToPK3(),
-                "PK3" => ((PK3)source).ConvertToPK2(),
+                "PK9" => ((PK9)source).ConvertToPK8(rndValues),
+                "PK8" => ((PK8)source).ConvertToPK7(rndValues),
+                "PK7" => ((PK7)source).ConvertToPK6(rndValues),
+                "PK6" => ((PK6)source).ConvertToPK5(rndValues),
+                "PK5" => ((PK5)source).ConvertToPK4(rndValues),
+                "PK4" => ((PK4)source).ConvertToPK3(rndValues),
+                "PK3" => ((PK3)source).ConvertToPK2(rndValues),
                 "PK2" => ((PK2)source).ConvertToPK1(),
 
                 _ => null
@@ -169,7 +195,7 @@ public class PkmConvertService(ISettingsService settingsService)
         return pkm;
     }
 
-    private static PKM? TryVariantToPK(PKM source)
+    private static PKM? TryVariantToPK(PKM source, PKMRndValues? rndValues)
     {
         return source.GetType().Name switch
         {
@@ -178,10 +204,10 @@ public class PkmConvertService(ISettingsService settingsService)
             "XK3" => ((XK3)source).ConvertToPK3(),
             "BK4" => ((BK4)source).ConvertToPK4(),
             "RK4" => ((RK4)source).ConvertToPK4(),
-            "PB7" => ((PB7)source).ConvertToPK7(),
-            "PB8" => ((PB8)source).ConvertToPK8(),
-            "PA8" => ((PA8)source).ConvertToPK8(),
-            "PA9" => ((PA9)source).ConvertToPK9(),
+            "PB7" => ((PB7)source).ConvertToPK7(rndValues),
+            "PB8" => ((PB8)source).ConvertToPK8(rndValues),
+            "PA8" => ((PA8)source).ConvertToPK8(rndValues),
+            "PA9" => ((PA9)source).ConvertToPK9(rndValues),
 
             _ => null
         };

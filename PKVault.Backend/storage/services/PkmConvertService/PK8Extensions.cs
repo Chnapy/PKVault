@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public static class PK8Extensions
 {
-    public static PK9 ConvertToPK9(this PK8 pk8)
+    public static PK9 ConvertToPK9(this PK8 pk8, PKMRndValues? rndValues)
     {
         var pk9 = new PK9()
         {
@@ -23,7 +23,7 @@ public static class PK8Extensions
             TeraTypeOverride = (MoveType)Tera9RNG.GetTeraTypeFromPersonal(pk8.Species, pk8.Form, 0),
         };
 
-        pk9.CopyCommonPropertiesFrom(pk8, 9);
+        pk9.CopyCommonPropertiesFrom(pk8, 9, rndValues);
         pk9.CopyIVsFrom(pk8);
         pk9.CopyEVsFrom(pk8);
 
@@ -56,14 +56,15 @@ public static class PK8Extensions
             GameVersion.SL, GameVersion.VL,
         ]);
 
-        pk9.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
+        if (rndValues == null)
+            pk9.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
 
         pk9.CopyMovesFrom(pk8);
 
         return pk9;
     }
 
-    public static PB8 ConvertToPB8(this PK8 pk8)
+    public static PB8 ConvertToPB8(this PK8 pk8, PKMRndValues? rndValues)
     {
         var pb8 = new PB8()
         {
@@ -76,7 +77,7 @@ public static class PK8Extensions
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
         };
 
-        pb8.CopyCommonPropertiesFrom(pk8, 8);
+        pb8.CopyCommonPropertiesFrom(pk8, 8, rndValues);
         pb8.CopyIVsFrom(pk8);
         pb8.CopyEVsFrom(pk8);
 
@@ -108,14 +109,15 @@ public static class PK8Extensions
             GameVersion.SW, GameVersion.SH, GameVersion.BD, GameVersion.SP, GameVersion.PLA,
         ]);
 
-        pb8.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
+        if (rndValues == null)
+            pb8.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
 
         pb8.CopyMovesFrom(pk8);
 
         return pb8;
     }
 
-    public static PA8 ConvertToPA8(this PK8 pk8)
+    public static PA8 ConvertToPA8(this PK8 pk8, PKMRndValues? rndValues)
     {
         var pa8 = new PA8()
         {
@@ -128,7 +130,7 @@ public static class PK8Extensions
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
         };
 
-        pa8.CopyCommonPropertiesFrom(pk8, 8);
+        pa8.CopyCommonPropertiesFrom(pk8, 8, rndValues);
         pa8.CopyIVsFrom(pk8);
         pa8.CopyEVsFrom(pk8);
 
@@ -158,7 +160,8 @@ public static class PK8Extensions
             GameVersion.SW, GameVersion.SH, GameVersion.BD, GameVersion.SP, GameVersion.PLA,
         ]);
 
-        pa8.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
+        if (rndValues == null)
+            pa8.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
 
         pa8.CopyMovesFrom(pk8);
 
@@ -168,7 +171,7 @@ public static class PK8Extensions
         return pa8;
     }
 
-    public static PK7 ConvertToPK7(this PK8 pk8)
+    public static PK7 ConvertToPK7(this PK8 pk8, PKMRndValues? rndValues)
     {
         var pk7 = new PK7()
         {
@@ -181,7 +184,7 @@ public static class PK8Extensions
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
         };
 
-        pk7.CopyCommonPropertiesFrom(pk8, 7);
+        pk7.CopyCommonPropertiesFrom(pk8, 7, rndValues);
         pk7.CopyIVsFrom(pk8);
         pk7.CopyEVsFrom(pk8);
 
@@ -201,7 +204,8 @@ public static class PK8Extensions
 
         pk7.FixMetLocation([GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM]);
 
-        pk7.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
+        if (rndValues == null)
+            pk7.FixPID(pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
 
         pk7.CopyMovesFrom(pk8);
 
@@ -213,7 +217,7 @@ public static class PK8Extensions
         return pk7;
     }
 
-    public static PK8 ConvertToPK8(this PB8 pb8)
+    public static PK8 ConvertToPK8(this PB8 pb8, PKMRndValues? rndValues)
     {
         var pk8 = new PK8()
         {
@@ -228,7 +232,7 @@ public static class PK8Extensions
             HandlingTrainerLanguage = (byte)pb8.Language,
         };
 
-        pk8.CopyCommonPropertiesFrom(pb8, 8);
+        pk8.CopyCommonPropertiesFrom(pb8, 8, rndValues);
         pk8.CopyIVsFrom(pb8);
         pk8.CopyEVsFrom(pb8);
 
@@ -248,7 +252,8 @@ public static class PK8Extensions
 
         pk8.FixMetLocation([GameVersion.SW, GameVersion.SH]);
 
-        pk8.FixPID(pb8.IsShiny, pb8.Form, pb8.Gender, pb8.Nature);
+        if (rndValues == null)
+            pk8.FixPID(pb8.IsShiny, pb8.Form, pb8.Gender, pb8.Nature);
 
         // for Furfrou and Hoopa
         pk8.FormArgumentRemain = pb8.FormArgumentRemain;
@@ -260,7 +265,7 @@ public static class PK8Extensions
         return pk8;
     }
 
-    public static PK8 ConvertToPK8(this PA8 pa8)
+    public static PK8 ConvertToPK8(this PA8 pa8, PKMRndValues? rndValues)
     {
         var pk8 = new PK8()
         {
@@ -275,7 +280,7 @@ public static class PK8Extensions
             HandlingTrainerLanguage = (byte)pa8.Language,
         };
 
-        pk8.CopyCommonPropertiesFrom(pa8, 8);
+        pk8.CopyCommonPropertiesFrom(pa8, 8, rndValues);
         pk8.CopyIVsFrom(pa8);
         pk8.CopyEVsFrom(pa8);
 
@@ -295,7 +300,8 @@ public static class PK8Extensions
 
         pk8.FixMetLocation([GameVersion.SW, GameVersion.SH]);
 
-        pk8.FixPID(pa8.IsShiny, pa8.Form, pa8.Gender, pa8.Nature);
+        if (rndValues == null)
+            pk8.FixPID(pa8.IsShiny, pa8.Form, pa8.Gender, pa8.Nature);
 
         // for Furfrou and Hoopa
         pk8.FormArgumentRemain = pa8.FormArgumentRemain;

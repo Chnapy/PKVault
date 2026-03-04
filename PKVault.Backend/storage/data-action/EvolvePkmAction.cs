@@ -54,9 +54,9 @@ public class EvolvePkmAction(
         dto = dto with
         {
             Pkm = dto.Pkm.Update(pkm =>
-        {
-            UpdatePkm(pkm, evolveSpecies, evolveByItem);
-        })
+            {
+                UpdatePkm(pkm, evolveSpecies, evolveByItem);
+            })
         };
         saveLoaders.Pkms.WriteDto(dto);
 
