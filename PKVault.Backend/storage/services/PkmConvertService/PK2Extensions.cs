@@ -54,7 +54,7 @@ public static class PK2Extensions
 
         pk3.FixSID();
 
-        pk3.PassHeldItem(pk2.HeldItem, pk2.Context, pk2.Version);
+        pk3.CopyHeldItemFrom(pk2.HeldItem, pk2.Context, pk2.Version);
 
         pk3.FixMetLocation([GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD]);
 
@@ -98,7 +98,7 @@ public static class PK2Extensions
 
         pk3.FixPID(pk2.IsShiny, pk2.Form, pk2.Gender, pk3.Nature);
 
-        pk3.PassMoves(pk2);
+        pk3.CopyMovesFrom(pk2);
 
         return pk3;
     }

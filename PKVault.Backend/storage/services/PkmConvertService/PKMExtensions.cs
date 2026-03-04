@@ -122,14 +122,14 @@ public static class PKMExtensions
         }
     }
 
-    public static void PassHeldItem(this PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
+    public static void CopyHeldItemFrom(this PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
     {
         pkm.HeldItem = ItemConverter.GetItemForFormat(srcHeldItem, srcContext, pkm.Context);
 
-        pkm.PassHeldItemByString(srcHeldItem, srcContext, srcVersion);
+        pkm.CopyHeldItemByStringFrom(srcHeldItem, srcContext, srcVersion);
     }
 
-    public static void PassHeldItemByString(this PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
+    public static void CopyHeldItemByStringFrom(this PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
     {
         if (srcHeldItem > 0 && pkm.HeldItem == 0)
         {
@@ -145,7 +145,7 @@ public static class PKMExtensions
         }
     }
 
-    public static void PassMoves(this PKM pkm, PKM pkmSrc)
+    public static void CopyMovesFrom(this PKM pkm, PKM pkmSrc)
     {
         (ushort Move, int PPUps)[] srcMoves = [
             (pkmSrc.Move1, pkmSrc.Move1_PPUps),
@@ -167,9 +167,9 @@ public static class PKMExtensions
             cleanedMoves.Add((Move: 0, PPUps: 0));
         }
 
-        for (var i = 0; i < srcMoves.Length; i++)
+        for (var i = 0; i < cleanedMoves.Count; i++)
         {
-            var move = srcMoves[i];
+            var move = cleanedMoves[i];
             pkm.SetMove(i, move.Move);
             switch (i)
             {
@@ -218,6 +218,74 @@ public static class PKMExtensions
         }
 
         pkm.FixMoves();
+    }
+
+    public static void CopyCommonPropertiesFrom(this PKM pkm, PKM pkmSrc, byte generation)
+    {
+        if (pkmSrc.Species > pkm.MaxSpeciesID)
+        {
+            throw new InvalidOperationException($"Species incompatible: {pkmSrc.Species} > {pkm.MaxSpeciesID}");
+        }
+
+        var rnd = Util.Rand;
+
+        pkm.Species = pkmSrc.Species;
+        pkm.Gender = pkmSrc.Gender;
+        pkm.Form = pkmSrc.Form;
+
+        pkm.IsNicknamed = pkmSrc.IsNicknamed;
+        pkm.Nickname = pkmSrc.IsNicknamed
+            ? pkmSrc.Nickname
+            : SpeciesName.GetSpeciesNameGeneration(pkmSrc.Species, pkmSrc.Language, generation);
+
+        pkm.Nature = pkmSrc.Nature;
+        pkm.StatNature = pkmSrc.StatNature;
+
+        pkm.PID = pkmSrc.PID;
+        pkm.EncryptionConstant = rnd.Rand32();
+
+        pkm.Ability = pkmSrc.Ability;
+        pkm.AbilityNumber = pkmSrc.AbilityNumber;
+
+        pkm.Ball = pkmSrc.Ball;
+
+        pkm.CurrentLevel = pkmSrc.CurrentLevel;
+        pkm.EXP = pkmSrc.EXP;
+
+        pkm.TID16 = pkmSrc.TID16;
+        pkm.SID16 = pkmSrc.SID16;
+
+        pkm.CurrentHandler = pkmSrc.CurrentHandler;
+        pkm.HandlingTrainerName = pkmSrc.HandlingTrainerName;
+        pkm.HandlingTrainerGender = pkmSrc.HandlingTrainerGender;
+        pkm.HandlingTrainerFriendship = pkmSrc.HandlingTrainerFriendship;
+        pkm.OriginalTrainerName = pkmSrc.OriginalTrainerName;
+        pkm.OriginalTrainerGender = pkmSrc.OriginalTrainerGender;
+        pkm.OriginalTrainerFriendship = pkmSrc.OriginalTrainerFriendship;
+
+        pkm.Language = pkmSrc.Language;
+    }
+
+    public static void CopyIVsFrom(this PKM pkm, PKM pkmSrc)
+    {
+        pkm.IVs = [
+            pkmSrc.IV_HP,
+            pkmSrc.IV_ATK,
+            pkmSrc.IV_DEF,
+            pkmSrc.IV_SPE,
+            pkmSrc.IV_SPA,
+            pkmSrc.IV_SPD,
+        ];
+    }
+
+    public static void CopyEVsFrom(this PKM pkm, PKM pkmSrc)
+    {
+        pkm.EV_HP = pkmSrc.EV_HP;
+        pkm.EV_ATK = pkmSrc.EV_ATK;
+        pkm.EV_DEF = pkmSrc.EV_DEF;
+        pkm.EV_SPA = pkmSrc.EV_SPA;
+        pkm.EV_SPD = pkmSrc.EV_SPD;
+        pkm.EV_SPE = pkmSrc.EV_SPE;
     }
 
     public static void FixPID(this PKM pkm, bool isShiny, byte form, byte gender, Nature nature, bool checkLegality = false)

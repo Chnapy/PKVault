@@ -18,7 +18,7 @@ public static class PK4Extensions
         pk5.OriginalTrainerFriendship = pk4.CurrentFriendship;
         pk5.HandlingTrainerFriendship = pk4.CurrentFriendship;
 
-        pk5.PassMoves(pk4);
+        pk5.CopyMovesFrom(pk4);
 
         return pk5;
     }
@@ -34,7 +34,7 @@ public static class PK4Extensions
 
         bk4.FixPID(pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature);
 
-        bk4.PassMoves(pk4);
+        bk4.CopyMovesFrom(pk4);
 
         return bk4;
     }
@@ -50,15 +50,13 @@ public static class PK4Extensions
 
         rk4.FixPID(pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature);
 
-        rk4.PassMoves(pk4);
+        rk4.CopyMovesFrom(pk4);
 
         return rk4;
     }
 
     public static PK3 ConvertToPK3(this PK4 pk4)
     {
-        var rnd = Util.Rand;
-
         var pk3 = new PK3()
         {
             Version = GameVersion.S,
@@ -68,61 +66,18 @@ public static class PK4Extensions
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
-
-            EncryptionConstant = rnd.Rand32(),
-            Species = pk4.Species,
-            TID16 = pk4.TID16,
-            SID16 = pk4.SID16,
-            CurrentLevel = pk4.CurrentLevel,
-            EXP = pk4.EXP,
-            Nature = pk4.Nature,
-            StatNature = pk4.Nature,
-            PID = pk4.PID,
-            Ball = pk4.Ball,
-
-            Gender = pk4.Gender,
-            IsNicknamed = pk4.IsNicknamed,
-            Form = pk4.Form,
-
-            CurrentHandler = 1,
-            HandlingTrainerName = pk4.OriginalTrainerName,
-            HandlingTrainerGender = pk4.OriginalTrainerGender,
-
-            Language = pk4.Language,
-            Nickname = pk4.IsNicknamed
-                ? pk4.Nickname
-                : SpeciesName.GetSpeciesNameGeneration(pk4.Species, pk4.Language, 3),
-            OriginalTrainerName = pk4.OriginalTrainerName,
-            OriginalTrainerGender = pk4.OriginalTrainerGender,
-            OriginalTrainerFriendship = pk4.OriginalTrainerFriendship,
-            HandlingTrainerFriendship = pk4.HandlingTrainerFriendship,
-
-            Ability = pk4.Ability,
-            AbilityNumber = pk4.AbilityNumber,
-
-            IVs = [
-                pk4.IV_HP,
-                pk4.IV_ATK,
-                pk4.IV_DEF,
-                pk4.IV_SPE,
-                pk4.IV_SPA,
-                pk4.IV_SPD,
-            ],
-
-            EV_HP = pk4.EV_HP,
-            EV_ATK = pk4.EV_ATK,
-            EV_DEF = pk4.EV_DEF,
-            EV_SPA = pk4.EV_SPA,
-            EV_SPD = pk4.EV_SPD,
-            EV_SPE = pk4.EV_SPE,
         };
+
+        pk3.CopyCommonPropertiesFrom(pk4, 3);
+        pk3.CopyIVsFrom(pk4);
+        pk3.CopyEVsFrom(pk4);
 
         pk4.CopyContestStatsTo(pk3);
 
         pk4.CopyRibbonSetCommon3(pk3);
         pk4.CopyRibbonSetEvent3(pk3);
 
-        pk3.PassHeldItem(pk4.HeldItem, pk4.Context, pk4.Version);
+        pk3.CopyHeldItemFrom(pk4.HeldItem, pk4.Context, pk4.Version);
 
         pk3.FixAbility();
 
@@ -130,7 +85,7 @@ public static class PK4Extensions
 
         pk3.FixPID(pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature);
 
-        pk3.PassMoves(pk4);
+        pk3.CopyMovesFrom(pk4);
 
         return pk3;
     }

@@ -5,8 +5,6 @@ public static class PK9Extensions
 {
     public static PA9 ConvertToPA9(this PK9 pk9)
     {
-        var rnd = Util.Rand;
-
         var pa9 = new PA9()
         {
             Version = GameVersion.ZA,
@@ -17,58 +15,15 @@ public static class PK9Extensions
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
 
-            EncryptionConstant = rnd.Rand32(),
-            Species = pk9.Species,
-            TID16 = pk9.TID16,
-            SID16 = pk9.SID16,
-            CurrentLevel = pk9.CurrentLevel,
-            EXP = pk9.EXP,
-            Nature = pk9.Nature,
-            StatNature = pk9.Nature,
-            PID = pk9.PID,
-            Ball = pk9.Ball,
-
-            Gender = pk9.Gender,
-            IsNicknamed = pk9.IsNicknamed,
-            Form = pk9.Form,
-
-            CurrentHandler = 1,
-            HandlingTrainerName = pk9.OriginalTrainerName,
-            HandlingTrainerGender = pk9.OriginalTrainerGender,
-
-            Language = pk9.Language,
-            Nickname = pk9.IsNicknamed
-                ? pk9.Nickname
-                : SpeciesName.GetSpeciesNameGeneration(pk9.Species, pk9.Language, 9),
-            OriginalTrainerName = pk9.OriginalTrainerName,
-            OriginalTrainerGender = pk9.OriginalTrainerGender,
-            OriginalTrainerFriendship = pk9.OriginalTrainerFriendship,
-            HandlingTrainerFriendship = pk9.HandlingTrainerFriendship,
-
-            Ability = pk9.Ability,
-            AbilityNumber = pk9.AbilityNumber,
-
-            IVs = [
-                pk9.IV_HP,
-                pk9.IV_ATK,
-                pk9.IV_DEF,
-                pk9.IV_SPE,
-                pk9.IV_SPA,
-                pk9.IV_SPD,
-            ],
-
-            EV_HP = pk9.EV_HP,
-            EV_ATK = pk9.EV_ATK,
-            EV_DEF = pk9.EV_DEF,
-            EV_SPA = pk9.EV_SPA,
-            EV_SPD = pk9.EV_SPD,
-            EV_SPE = pk9.EV_SPE,
-
             HeightScalar = 0,
             WeightScalar = 0,
 
             ObedienceLevel = pk9.ObedienceLevel,
         };
+
+        pa9.CopyCommonPropertiesFrom(pk9, 9);
+        pa9.CopyIVsFrom(pk9);
+        pa9.CopyEVsFrom(pk9);
 
         for (var i = 0; i < pk9.MarkingCount; i++)
         {
@@ -85,21 +40,19 @@ public static class PK9Extensions
         pk9.CopyRibbonSetMemory6(pa9);
         pk9.CopyRibbonSetCommon7(pa9);
 
-        pa9.PassHeldItem(pk9.HeldItem, pk9.Context, pk9.Version);
+        pa9.CopyHeldItemFrom(pk9.HeldItem, pk9.Context, pk9.Version);
 
         pa9.FixMetLocation([GameVersion.ZA]);
 
         pa9.FixPID(pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
 
-        pa9.PassMoves(pk9);
+        pa9.CopyMovesFrom(pk9);
 
         return pa9;
     }
 
     public static PK8 ConvertToPK8(this PK9 pk9)
     {
-        var rnd = Util.Rand;
-
         var pk8 = new PK8()
         {
             Version = GameVersion.SW,
@@ -110,54 +63,12 @@ public static class PK9Extensions
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
 
-            EncryptionConstant = rnd.Rand32(),
-            Species = pk9.Species,
-            TID16 = pk9.TID16,
-            SID16 = pk9.SID16,
-            CurrentLevel = pk9.CurrentLevel,
-            EXP = pk9.EXP,
-            Nature = pk9.Nature,
-            StatNature = pk9.Nature,
-            PID = pk9.PID,
-            Ball = pk9.Ball,
-
-            Gender = pk9.Gender,
-            IsNicknamed = pk9.IsNicknamed,
-            Form = pk9.Form,
-
-            CurrentHandler = 1,
-            HandlingTrainerName = pk9.OriginalTrainerName,
-            HandlingTrainerGender = pk9.OriginalTrainerGender,
-
-            Language = pk9.Language,
-            Nickname = pk9.IsNicknamed
-                ? pk9.Nickname
-                : SpeciesName.GetSpeciesNameGeneration(pk9.Species, pk9.Language, 8),
-            OriginalTrainerName = pk9.OriginalTrainerName,
-            OriginalTrainerGender = pk9.OriginalTrainerGender,
-            OriginalTrainerFriendship = pk9.OriginalTrainerFriendship,
-            HandlingTrainerFriendship = pk9.HandlingTrainerFriendship,
             HandlingTrainerLanguage = (byte)pk9.Language,
-
-            Ability = pk9.Ability,
-            AbilityNumber = pk9.AbilityNumber,
-
-            IVs = [
-                pk9.IV_HP,
-                pk9.IV_ATK,
-                pk9.IV_DEF,
-                pk9.IV_SPE,
-                pk9.IV_SPA,
-                pk9.IV_SPD,
-            ],
-
-            EV_HP = pk9.EV_HP,
-            EV_ATK = pk9.EV_ATK,
-            EV_DEF = pk9.EV_DEF,
-            EV_SPA = pk9.EV_SPA,
-            EV_SPD = pk9.EV_SPD,
-            EV_SPE = pk9.EV_SPE,
         };
+
+        pk8.CopyCommonPropertiesFrom(pk9, 8);
+        pk8.CopyIVsFrom(pk9);
+        pk8.CopyEVsFrom(pk9);
 
         pk9.CopyContestStatsTo(pk8);
 
@@ -169,7 +80,7 @@ public static class PK9Extensions
         pk9.CopyRibbonSetMemory6(pk8);
         pk9.CopyRibbonSetCommon7(pk8);
 
-        pk8.PassHeldItem(pk9.HeldItem, pk9.Context, pk9.Version);
+        pk8.CopyHeldItemFrom(pk9.HeldItem, pk9.Context, pk9.Version);
 
         pk8.FixAbility();
 
@@ -182,15 +93,13 @@ public static class PK9Extensions
         pk8.FormArgumentElapsed = pk9.FormArgumentElapsed;
         pk8.FormArgumentMaximum = pk9.FormArgumentMaximum;
 
-        pk8.PassMoves(pk9);
+        pk8.CopyMovesFrom(pk9);
 
         return pk8;
     }
 
     public static PK9 ConvertToPK9(this PA9 pa9)
     {
-        var rnd = Util.Rand;
-
         var pk9 = new PK9()
         {
             Version = GameVersion.SL,
@@ -201,53 +110,6 @@ public static class PK9Extensions
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
 
-            EncryptionConstant = rnd.Rand32(),
-            Species = pa9.Species,
-            TID16 = pa9.TID16,
-            SID16 = pa9.SID16,
-            CurrentLevel = pa9.CurrentLevel,
-            EXP = pa9.EXP,
-            Nature = pa9.Nature,
-            StatNature = pa9.Nature,
-            PID = pa9.PID,
-            Ball = pa9.Ball,
-
-            Gender = pa9.Gender,
-            IsNicknamed = pa9.IsNicknamed,
-            Form = pa9.Form,
-
-            CurrentHandler = 1,
-            HandlingTrainerName = pa9.OriginalTrainerName,
-            HandlingTrainerGender = pa9.OriginalTrainerGender,
-
-            Language = pa9.Language,
-            Nickname = pa9.IsNicknamed
-                ? pa9.Nickname
-                : SpeciesName.GetSpeciesNameGeneration(pa9.Species, pa9.Language, 9),
-            OriginalTrainerName = pa9.OriginalTrainerName,
-            OriginalTrainerGender = pa9.OriginalTrainerGender,
-            OriginalTrainerFriendship = pa9.OriginalTrainerFriendship,
-            HandlingTrainerFriendship = pa9.HandlingTrainerFriendship,
-
-            Ability = pa9.Ability,
-            AbilityNumber = pa9.AbilityNumber,
-
-            IVs = [
-                pa9.IV_HP,
-                pa9.IV_ATK,
-                pa9.IV_DEF,
-                pa9.IV_SPE,
-                pa9.IV_SPA,
-                pa9.IV_SPD,
-            ],
-
-            EV_HP = pa9.EV_HP,
-            EV_ATK = pa9.EV_ATK,
-            EV_DEF = pa9.EV_DEF,
-            EV_SPA = pa9.EV_SPA,
-            EV_SPD = pa9.EV_SPD,
-            EV_SPE = pa9.EV_SPE,
-
             HeightScalar = byte.Max(pa9.HeightScalar, 1),
             WeightScalar = byte.Max(pa9.WeightScalar, 1),
 
@@ -255,6 +117,10 @@ public static class PK9Extensions
             TeraTypeOriginal = (MoveType)Tera9RNG.GetTeraTypeFromPersonal(pa9.Species, pa9.Form, 0),
             TeraTypeOverride = (MoveType)Tera9RNG.GetTeraTypeFromPersonal(pa9.Species, pa9.Form, 0),
         };
+
+        pk9.CopyCommonPropertiesFrom(pa9, 9);
+        pk9.CopyIVsFrom(pa9);
+        pk9.CopyEVsFrom(pa9);
 
         for (var i = 0; i < pk9.MarkingCount; i++)
         {
@@ -271,7 +137,7 @@ public static class PK9Extensions
         pa9.CopyRibbonSetMemory6(pk9);
         pa9.CopyRibbonSetCommon7(pk9);
 
-        pk9.PassHeldItem(pa9.HeldItem, pa9.Context, pa9.Version);
+        pk9.CopyHeldItemFrom(pa9.HeldItem, pa9.Context, pa9.Version);
 
         pk9.FixAbility();
 
@@ -279,7 +145,7 @@ public static class PK9Extensions
 
         pk9.FixPID(pa9.IsShiny, pa9.Form, pa9.Gender, pa9.Nature);
 
-        pk9.PassMoves(pa9);
+        pk9.CopyMovesFrom(pa9);
 
         return pk9;
     }

@@ -14,7 +14,7 @@ public static class PK3Extensions
 
         pk4.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
 
-        pk4.PassMoves(pk3);
+        pk4.CopyMovesFrom(pk3);
 
         pk4.OriginalTrainerFriendship = pk3.CurrentFriendship;
         pk4.HandlingTrainerFriendship = pk3.CurrentFriendship;
@@ -33,7 +33,7 @@ public static class PK3Extensions
 
         pk.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
 
-        pk.PassMoves(pk3);
+        pk.CopyMovesFrom(pk3);
 
         return pk;
     }
@@ -49,7 +49,7 @@ public static class PK3Extensions
 
         pk.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
 
-        pk.PassMoves(pk3);
+        pk.CopyMovesFrom(pk3);
 
         return pk;
     }
@@ -92,7 +92,7 @@ public static class PK3Extensions
             HandlingTrainerFriendship = pk3.CurrentFriendship,
         };
 
-        pk2.PassHeldItemByString(pk3.HeldItem, pk3.Context, pk3.Version);
+        pk2.CopyHeldItemByStringFrom(pk3.HeldItem, pk3.Context, pk3.Version);
 
         pk2.FixMetLocation([GameVersion.GD, GameVersion.SI, GameVersion.C]);
 
@@ -126,7 +126,7 @@ public static class PK3Extensions
 
         pk2.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk2.Nature);
 
-        pk2.PassMoves(pk3);
+        pk2.CopyMovesFrom(pk3);
 
         return pk2;
     }
