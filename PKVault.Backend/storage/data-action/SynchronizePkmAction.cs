@@ -5,7 +5,7 @@ public record SynchronizePkmActionInput(
 );
 
 public class SynchronizePkmAction(
-    PkmConvertService pkmConvertService,
+    IPkmConvertService pkmConvertService,
     IPkmVariantLoader pkmVariantLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<SynchronizePkmActionInput>
 {

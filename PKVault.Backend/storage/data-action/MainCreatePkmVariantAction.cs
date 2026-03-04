@@ -9,7 +9,7 @@ public class MainCreatePkmVariantActionInput(string pkmVariantId, byte generatio
 }
 
 public class MainCreatePkmVariantAction(
-    PkmConvertService pkmConvertService, StaticDataService staticDataService,
+    IPkmConvertService pkmConvertService, StaticDataService staticDataService,
     IPkmVariantLoader pkmVariantLoader
 ) : DataAction<MainCreatePkmVariantActionInput>
 {

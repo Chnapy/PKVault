@@ -584,12 +584,12 @@ public class PkmConvertServiceTests
 
         var legality = new LegalityAnalysis(pkm);
 
-        if (!legality.Valid)
-        {
-            Console.WriteLine();
-            Console.WriteLine($"{pkm.GetType().Name} - {pkm.Nickname}");
-            Console.WriteLine(legality.Report());
-        }
+        // if (!legality.Valid)
+        // {
+        //     Console.WriteLine();
+        //     Console.WriteLine($"{pkm.GetType().Name} - {pkm.Nickname}");
+        //     Console.WriteLine(legality.Report());
+        // }
 
         var commonIllegalities = legality.Results.ToList()
             .FindAll(r => !r.Valid)
@@ -605,12 +605,12 @@ public class PkmConvertServiceTests
 
         string[] illegalities = [.. commonIllegalities, .. moveIllegalities, .. relearnIllegalities];
 
-        foreach (var r in illegalities)
-        {
-            Console.WriteLine(r);
-        }
-        if (illegalities.Length > 0)
-            Console.WriteLine();
+        // foreach (var r in illegalities)
+        // {
+        //     Console.WriteLine(r);
+        // }
+        // if (illegalities.Length > 0)
+        //     Console.WriteLine();
 
         if (expectedData.TryGetProperty("illegalities", out var illegalitiesJson))
         {

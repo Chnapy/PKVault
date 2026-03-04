@@ -3,7 +3,7 @@ using PKHeX.Core;
 public record EditPkmVariantActionInput(string pkmVariantId, EditPkmVariantPayload editPayload);
 
 public class EditPkmVariantAction(
-    ActionService actionService, PkmUpdateService pkmUpdateService, PkmConvertService pkmConvertService,
+    ActionService actionService, PkmUpdateService pkmUpdateService, IPkmConvertService pkmConvertService,
     SynchronizePkmAction synchronizePkmAction,
     IPkmVariantLoader pkmVariantLoader
 ) : DataAction<EditPkmVariantActionInput>

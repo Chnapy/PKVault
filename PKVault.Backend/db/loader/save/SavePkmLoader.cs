@@ -18,7 +18,7 @@ public interface ISavePkmLoader
 }
 
 public class SavePkmLoader(
-    PkmConvertService pkmConvertService, string language, Dictionary<ushort, StaticEvolve> evolves,
+    IPkmConvertService pkmConvertService, string language, Dictionary<ushort, StaticEvolve> evolves,
     SaveWrapper save
 ) : ISavePkmLoader
 {

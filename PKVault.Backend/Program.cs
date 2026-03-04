@@ -205,7 +205,7 @@ public class Program
         services.AddSingleton<ISaveService, SaveService>();
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<DataService>();
-        services.AddSingleton<PkmConvertService>();
+        services.AddSingleton<IPkmConvertService, PkmConvertService>();
         services.AddSingleton<PkmUpdateService>();
         services.AddSingleton<PkmLegalityService>();
 

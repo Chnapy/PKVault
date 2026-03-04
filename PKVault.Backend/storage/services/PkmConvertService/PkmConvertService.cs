@@ -1,6 +1,13 @@
 using PKHeX.Core;
 
-public class PkmConvertService(ISettingsService settingsService)
+public interface IPkmConvertService
+{
+    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, uint generation);
+    public ImmutablePKM ConvertToExisting(ImmutablePKM sourcePkm, PKM existingTargetPkm, bool keepMoves);
+    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, PKM blankTargetPkm, PKMRndValues? rndValues);
+}
+
+public class PkmConvertService(ISettingsService settingsService) : IPkmConvertService
 {
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, uint generation)
     {
