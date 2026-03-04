@@ -314,6 +314,9 @@ public static class PKMExtensions
             if (pkm is PK1)
                 return false;
 
+            if (!pkm.PersonalInfo.IsDualGender)
+                return false;
+
             return pkm.Gender != gender;
         }
 
@@ -362,11 +365,12 @@ public static class PKMExtensions
             pkm.PID = EntityPID.GetRandomPID(rnd, pkm.Species, gender, pkm.Version, nature, form, pkm.PID);
             i++;
 
-            if (i > 1_000_000)
+            if (i > 10_000_000)
             {
-                Console.WriteLine($"PID FIX ERROR: {pkm.GetType().Name} {pkm.Nickname} {pkm.Species}");
-                Console.WriteLine($"PID shiny={pkm.IsShiny}/{isShiny} form={pkm.Form}/{form} gender={pkm.Gender}/{gender} nature={pkm.Nature}/{nature} checkLegality={checkLegality}");
-                break;
+                throw new Exception(
+                    $"PID FIX ERROR: {pkm.GetType().Name} {pkm.Nickname} {pkm.Species}"
+                    + $"\nPID shiny={pkm.IsShiny}/{isShiny} form={pkm.Form}/{form} gender={pkm.Gender}/{gender} nature={pkm.Nature}/{nature} checkLegality={checkLegality}"
+                );
             }
         }
 
