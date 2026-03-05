@@ -57,7 +57,9 @@
         <PackageReference Include="NSwag.AspNetCore" Version="14.6.3" />
       </ItemGroup>
       <ItemGroup>
-        <EmbeddedResource Include="pokeapi/generated/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+        <EmbeddedResource Include="pokeapi/generated/api-data/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+        <EmbeddedResource Include="pokeapi/generated/sheets/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+        
         <Content Remove="pokeapi/generated/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
       </ItemGroup>
     </When>

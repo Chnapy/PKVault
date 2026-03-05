@@ -50,6 +50,7 @@ public class GenSpritesheetService(IFileIOService fileIOService)
                             form.SpriteShadow,
                         }
                         .OfType<string>()
+                        .Where(v => v.Length > 0)
                     ))
                     .Distinct()
                 ),
