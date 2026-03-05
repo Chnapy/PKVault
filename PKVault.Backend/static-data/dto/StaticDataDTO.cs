@@ -94,7 +94,7 @@ public record StaticEvolve(
     Dictionary<byte, StaticEvolve.StaticEvolveItem> Trade,
     // item -> version -> (evolved species, min-level)
     Dictionary<string, Dictionary<byte, StaticEvolve.StaticEvolveItem>> TradeWithItem,
-    Dictionary<byte, List<StaticEvolve.StaticEvolveItem>> Other
+    Dictionary<byte, HashSet<StaticEvolve.StaticEvolveItem>> Other
 )
 {
     public record StaticEvolveItem(ushort EvolveSpecies, int MinLevel);

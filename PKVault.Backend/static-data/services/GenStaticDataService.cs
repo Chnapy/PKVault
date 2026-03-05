@@ -1,3 +1,5 @@
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using PKHeX.Core;
 using PokeApiNet;
 
@@ -17,6 +19,10 @@ public class GenStaticDataService(
 
     public static List<string> GetStaticDataPathParts(string lang) => [
         ..GetGeneratedPathParts(), "api-data", $"StaticData_{lang}.json.gz"
+    ];
+
+    public static List<string> GetStaticDataRawPathParts(string lang) => [
+        ..GetGeneratedPathParts(), "raw-data", $"StaticData_{lang}.json"
     ];
 
     public async Task GenerateFiles()
@@ -74,6 +80,17 @@ public class GenStaticDataService(
         var staticDataPath = Path.Combine([.. GetStaticDataPathParts(lang)]);
 
         time = LogUtil.Time($"Write static-data {lang} to {staticDataPath}");
+
+        await fileIOService.WriteJSONFile(
+            Path.Combine([.. GetStaticDataRawPathParts(lang)]),
+            new StaticDataJsonContext(new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            }).StaticDataDTO,
+            dto
+        );
 
         await fileIOService.WriteJSONGZipFile(staticDataPath, StaticDataJsonContext.Default.StaticDataDTO, dto);
 
@@ -165,29 +182,37 @@ public class GenStaticDataService(
                     return (pkmObj, apiForms);
                 }
 
-                StaticSpeciesForm getVarietyForm(byte generation, Pokemon pkmObj, PokemonForm? formObj, int formIndex, StaticSpeciesForm? defaultForm)
+                StaticSpeciesForm getVarietyForm(byte generation, Pokemon pkmObj, PokemonForm[] formObjs, int formIndex, StaticSpeciesForm? defaultForm)
                 {
                     var name = speciesName;
 
-                    // rare cases when pokeapi form data is missing
-                    // like with some ZA pkms (starmie-mega for instance)
-                    formObj ??= new()
-                    {
-                        Id = pkmObj.Id,
-                        Names = [new() {
-                            Name = pkmObj.Name,
-                            Language = new() { Name = SettingsService.DefaultLanguage }
-                        }],
-                        FormNames = [],
-                        FormName = "",
-                        Sprites = new()
+                    var formObj = formObjs.Length > 0
+                        ? formObjs.First()
+                        // rare cases when pokeapi form data is missing
+                        // like with some ZA pkms
+                        : new()
                         {
-                            BackDefault = pkmObj.Sprites.BackDefault,
-                            BackShiny = pkmObj.Sprites.BackShiny,
-                            FrontDefault = pkmObj.Sprites.FrontDefault,
-                            FrontShiny = pkmObj.Sprites.FrontDefault,
-                        }
-                    };
+                            Id = pkmObj.Id,
+                            Names = [new() {
+                                Name = pkmObj.Name,
+                                Language = new() { Name = SettingsService.DefaultLanguage }
+                            }],
+                            FormNames = [],
+                            FormName = "",
+                            Sprites = new()
+                            {
+                                BackDefault = pkmObj.Sprites.BackDefault,
+                                BackShiny = pkmObj.Sprites.BackShiny,
+                                FrontDefault = pkmObj.Sprites.FrontDefault,
+                                FrontShiny = pkmObj.Sprites.FrontDefault,
+                            }
+                        };
+
+                    var hasFemaleForm = formObjs.Any(f => f.Name.Contains("-female"));
+                    var hasMaleForm = formObjs.Any(f => f.Name.Contains("-male"));
+                    var hasAllGenderForms = hasFemaleForm && hasMaleForm;
+
+                    var formName = formObj.FormName;// male/female/mega/alola etc
 
                     try
                     {
@@ -219,11 +244,19 @@ public class GenStaticDataService(
                         Console.WriteLine($"{formObj.Name} - ERROR FORM-NAMES {ex}");
                     }
 
-                    var femaleOnly = formObj.FormName.Contains("female");
-                    var maleOnly = !femaleOnly && formObj.FormName.Contains("male");
+                    if (formName == "male" || formName == "female")
+                    {
+                        name = speciesName;
+                    }
 
-                    var frontDefaultUrl = formObj.Sprites.FrontDefault ?? pkmObj.Sprites.FrontDefault;
-                    var frontShinyUrl = formObj.Sprites.FrontShiny ?? pkmObj.Sprites.FrontShiny;
+                    var frontDefaultUrl = formObj.Sprites.FrontDefault;
+                    var frontShinyUrl = formObj.Sprites.FrontShiny;
+
+                    if (formName != "mega")
+                    {
+                        frontDefaultUrl ??= pkmObj.Sprites.FrontDefault;
+                        frontShinyUrl ??= pkmObj.Sprites.FrontShiny;
+                    }
 
                     string? spriteFemale;
                     // = (maleOnly || !formObj.IsDefault || formObj.IsMega) ? null : (
@@ -234,44 +267,42 @@ public class GenStaticDataService(
                     //     pkmObj.Sprites.FrontShinyFemale != null ? GetGHProxyUrl(pkmObj.Sprites.FrontShinyFemale) : defaultForm?.SpriteShinyFemale
                     // );
                     var spriteDefault = (
-                        frontDefaultUrl != null ? GetPokeapiRelativePath(frontDefaultUrl) : defaultForm?.SpriteDefault
+                        frontDefaultUrl != null ? GetPokeapiRelativePath(frontDefaultUrl) : null
                     );
                     var spriteShiny = (
-                        frontShinyUrl != null ? GetPokeapiRelativePath(frontShinyUrl) : defaultForm?.SpriteShiny
+                        frontShinyUrl != null ? GetPokeapiRelativePath(frontShinyUrl) : null
                     );
 
-                    if (formObj.FormName == "")
+                    if (formName != "mega")
+                    {
+                        spriteDefault ??= defaultForm?.SpriteDefault;
+                        spriteShiny ??= defaultForm?.SpriteShiny;
+                    }
+
+                    if (formName == "")
                     {
                         spriteFemale = pkmObj.Sprites.FrontFemale != null ? GetPokeapiRelativePath(pkmObj.Sprites.FrontFemale) : defaultForm?.SpriteFemale;
                         spriteShinyFemale = pkmObj.Sprites.FrontShinyFemale != null ? GetPokeapiRelativePath(pkmObj.Sprites.FrontShinyFemale) : defaultForm?.SpriteShinyFemale;
                     }
                     else
                     {
-                        spriteFemale = spriteDefault;
-                        spriteShinyFemale = spriteShiny;
+                        spriteFemale = pkmObj.Sprites.FrontFemale != null ? GetPokeapiRelativePath(pkmObj.Sprites.FrontFemale) : spriteDefault;
+                        spriteShinyFemale = pkmObj.Sprites.FrontShinyFemale != null ? GetPokeapiRelativePath(pkmObj.Sprites.FrontShinyFemale) : spriteShiny;
                     }
 
-                    if (maleOnly)
-                    {
-                        spriteFemale = null;
-                        spriteShinyFemale = null;
-                    }
-                    else if (femaleOnly)
-                    {
-                        spriteDefault = spriteFemale;
-                        spriteShiny = spriteShinyFemale;
-                    }
 
-                    if (spriteDefault == null)
+                    if (spriteDefault == null && formName != "mega")
                     {
                         spriteDefault = frontDefaultUrl != null ? GetPokeapiRelativePath(frontDefaultUrl) : defaultForm?.SpriteDefault;
                     }
-                    if (spriteShiny == null)
+                    if (spriteShiny == null && formName != "mega")
                     {
                         spriteShiny = frontShinyUrl != null ? GetPokeapiRelativePath(frontShinyUrl) : defaultForm?.SpriteShiny;
                     }
 
-                    var hasGenderDifferences = generation > 3 && formObj.FormName == "" && pkmSpeciesObj.HasGenderDifferences;
+                    var hasGenderDifferences = generation > 3
+                        // && formObj.FormName == "" && pkmSpeciesObj.HasGenderDifferences;
+                        && spriteDefault != spriteFemale && spriteFemale != null;
 
                     var pkm = new ImmutablePKM(EntityBlank.GetBlank(generation)).Update(pkm =>
                     {
@@ -290,9 +321,9 @@ public class GenStaticDataService(
                     return new StaticSpeciesForm(
                         Id: formObj.Id,
                         Name: name,
-                        SpriteDefault: spriteDefault,
+                        SpriteDefault: spriteDefault ?? "",
                         SpriteFemale: spriteFemale,
-                        SpriteShiny: spriteShiny,
+                        SpriteShiny: spriteShiny ?? "",
                         SpriteShinyFemale: spriteShinyFemale,
                         SpriteShadow: generation == 3 && species == (ushort)Species.Lugia
                             ? GetLugiaShadowSprite()
@@ -315,7 +346,7 @@ public class GenStaticDataService(
                 var defaultForm = getVarietyForm(
                     LAST_ENTITY_CONTEXT.Generation,
                     defaultData.Item1,
-                    defaultData.Item2.ToList().Find(form => !form.IsBattleOnly)!,
+                    [.. defaultData.Item2.Where(form => !form.IsBattleOnly)],
                     0,
                     null
                 );
@@ -478,7 +509,7 @@ public class GenStaticDataService(
 
                     var varietyForms = formListData.ToList()
                         .OfType<(Pokemon, PokemonForm?, int)>()
-                        .Select((data) => getVarietyForm(context.Generation, data.Item1, data.Item2, data.Item3, defaultForm));
+                        .Select((data) => getVarietyForm(context.Generation, data.Item1, data.Item2 == null ? [] : [data.Item2], data.Item3, defaultForm));
 
                     // if (!varietyForms.Any())
                     // {
