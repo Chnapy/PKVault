@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -18,6 +19,11 @@ class Program
 
     private static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
     private static readonly string AssemblyStaticPrefix = "PKVault.Desktop.Resources.wwwroot.";
+
+    private static readonly DesktopMessageJsonContext messageJsonContext = new(new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    });
 
     [STAThread]
     static void Main(string[] args)
@@ -157,7 +163,7 @@ class Program
 
             try
             {
-                var desktopRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.DesktopRequestMessage);
+                var desktopRequest = JsonSerializer.Deserialize(message, messageJsonContext.DesktopRequestMessage);
 
                 string responseSerialized = "";
 
@@ -165,7 +171,7 @@ class Program
                 {
                     case FileExploreRequestMessage.TYPE:
                         {
-                            var fileExploreRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.FileExploreRequestMessage);
+                            var fileExploreRequest = JsonSerializer.Deserialize(message, messageJsonContext.FileExploreRequestMessage);
 
                             async Task<FileExploreResponseMessage> GetDialogResponse()
                             {
@@ -217,12 +223,12 @@ class Program
                             }
 
                             var response = await GetDialogResponse();
-                            responseSerialized = JsonSerializer.Serialize(response, DesktopMessageJsonContext.Default.FileExploreResponseMessage);
+                            responseSerialized = JsonSerializer.Serialize(response, messageJsonContext.FileExploreResponseMessage);
                             break;
                         }
                     case OpenFolderRequestMessage.TYPE:
                         {
-                            var openFolderRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.OpenFolderRequestMessage);
+                            var openFolderRequest = JsonSerializer.Deserialize(message, messageJsonContext.OpenFolderRequestMessage);
 
                             var path = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), openFolderRequest.path))
                                 .Replace('/', '\\');
@@ -285,7 +291,7 @@ class Program
                         }
                     case StartFinishRequestMessage.TYPE:
                         {
-                            // var startFinishRequest = JsonSerializer.Deserialize(message, DesktopMessageJsonContext.Default.StartFinishRequestMessage);
+                            // var startFinishRequest = JsonSerializer.Deserialize(message, messageJsonContext.StartFinishRequestMessage);
                             // fullStartupTime.Dispose();
 
                             break;
