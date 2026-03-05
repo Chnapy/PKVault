@@ -80,12 +80,32 @@ export const usePokedexItems = (): PokedexItems => {
         const species = dexItems[ 0 ]!.species;
         const generation = staticData.species[ species ]?.generation ?? -1;
 
+        const staticForms = staticData.species[ species ]?.forms ?? {};
+
         const allForms = dexItems.flatMap(value => value.forms);
 
-        const groupBy = <K extends keyof Pick<DexItemForm, 'form' | 'gender'>>(groupKeys: K[]) => {
+        const differentForms = [ ...new Set(allForms.map(form => form.form)) ];
+
+        const hasGenderDifferencesByForm = differentForms.reduce<Record<number, boolean>>((acc, formValue) => {
+            const hasGenderDifferences = allForms
+                .some(form => form.form === formValue
+                    && staticForms[ form.context ]?.[ form.form ]?.hasGenderDifferences);
+
+            return {
+                ...acc,
+                [ formValue ]: hasGenderDifferences
+            };
+        }, {});
+
+        const groupBy = <K extends keyof Pick<DexItemForm, 'form' | 'gender'>>(groupKeysRaw: K[]) => {
             return allForms.reduce<{
                 [ key in string ]?: SpeciesFormItem
             }>((acc, form) => {
+
+                const groupKeys = hasGenderDifferencesByForm[ form.form ]
+                    ? groupKeysRaw
+                    : groupKeysRaw.filter(key => key !== 'gender');
+
                 const key = groupKeys.map(groupKey => form[ groupKey ]).join('.');
 
                 const oldGroup = acc[ key ];
@@ -96,7 +116,7 @@ export const usePokedexItems = (): PokedexItems => {
                     context: Math.max(oldGroup?.context ?? -1, form.context) as EntityContext,
                     species,
                     form: Math.min(oldGroup?.form ?? 99, form.form),
-                    genders: [ ...new Set([ form.gender, ...oldGroup?.genders ?? [] ]) ],
+                    genders: [ ...new Set([ form.gender, ...oldGroup?.genders ?? [] ]) ].sort(),
                     isSeen: oldGroup?.isSeen || form.isSeen,
                     isSeenShiny: oldGroup?.isSeenShiny || form.isSeenShiny,
                     isCaught: oldGroup?.isCaught || form.isCaught,
@@ -111,9 +131,7 @@ export const usePokedexItems = (): PokedexItems => {
             }, {});
         };
 
-        const staticForms = staticData.species[ species ]?.forms;
-
-        const hasGenderDifferences = allForms.some(form => staticForms?.[ form.context ]?.[ form.form ]?.hasGenderDifferences);
+        const hasGenderDifferences = Object.values(hasGenderDifferencesByForm).some(v => v);
 
         const showGenders = showGendersRaw && hasGenderDifferences;
 
@@ -141,7 +159,25 @@ export const usePokedexItems = (): PokedexItems => {
             return Object.values(groupsByFormGender).filter(filterIsDefined);
         };
 
-        const itemsToRender = getItemsToRender();
+        const itemsToRender = getItemsToRender()
+            // sort by species
+            // then by form
+            // then by gender
+            .sort((g1, g2) => {
+                if (g1.species !== g2.species)
+                    return (g1.species < g2.species) ? -1 : 1;
+
+                if (g1.form !== g2.form)
+                    return (g1.form < g2.form) ? -1 : 1;
+
+                if (g1.genders.length === 1 && g2.genders.length === 1
+                    && g1.genders[ 0 ] !== g2.genders[ 0 ]
+                )
+                    return (g1.genders[ 0 ]! < g2.genders[ 0 ]!) ? -1 : 1;
+
+                return 0;
+            });
+
         const isSeen = itemsToRender.some(item => item.isSeen);
         const isCaught = itemsToRender.some(item => item.isCaught);
         const isOwned = itemsToRender.some(item => item.isOwned);
