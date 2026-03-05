@@ -60,9 +60,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         return new PkmVariantLoader(fileIOService, sessionService.Object, mockSettings.Object, pkmFileLoader, db, staticDataService);
     }
 
-    // private PkmVersionEntity CreateEntity(string id)
+    // private PkmVariantEntity CreateEntity(string id)
     // {
-    //     return new PkmVersionEntity()
+    //     return new PkmVariantEntity()
     //     {
     //         Id = id,
     //         Generation = 3,
@@ -628,7 +628,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
     }
 
     [Fact]
-    public async Task GetPkmVersionEntityPkm_ShouldHandleMissingFile()
+    public async Task GetPkmVariantEntityPkm_ShouldHandleMissingFile()
     {
         var db = await GetDB();
         var loader = await CreateLoader(db);

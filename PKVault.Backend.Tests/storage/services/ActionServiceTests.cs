@@ -59,7 +59,7 @@ public class ActionServiceTests
 
         return new(
             sp: sp,
-            pkmConvertService: new(pkmLegalityService),
+            pkmUpdateService: new(pkmLegalityService),
             backupService: new(
                 sp: sp,
                 mockTimeProvider.Object,

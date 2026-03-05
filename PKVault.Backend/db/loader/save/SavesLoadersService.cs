@@ -33,7 +33,7 @@ public class SavesLoadersService(
         using var scope = sp.CreateScope();
         var settingsService = scope.ServiceProvider.GetRequiredService<ISettingsService>();
         var staticDataService = scope.ServiceProvider.GetRequiredService<StaticDataService>();
-        var pkmConvertService = scope.ServiceProvider.GetRequiredService<PkmConvertService>();
+        var pkmConvertService = scope.ServiceProvider.GetRequiredService<IPkmConvertService>();
 
         var staticData = await staticDataService.GetStaticData();
 

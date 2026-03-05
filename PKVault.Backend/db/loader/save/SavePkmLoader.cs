@@ -18,7 +18,7 @@ public interface ISavePkmLoader
 }
 
 public class SavePkmLoader(
-    PkmConvertService pkmConvertService, string language, Dictionary<ushort, StaticEvolve> evolves,
+    IPkmConvertService pkmConvertService, string language, Dictionary<ushort, StaticEvolve> evolves,
     SaveWrapper save
 ) : ISavePkmLoader
 {
@@ -245,7 +245,11 @@ public class SavePkmLoader(
 
         var savePkmType = save.PKMType;
 
-        var pkm = pkmConvertService.GetConvertedPkm(dto.Pkm, save.GetBlankPKM().GetMutablePkm());
+        var pkm = pkmConvertService.ConvertToExisting(
+            dto.Pkm,
+            save.GetBlankPKM().GetMutablePkm(),
+            keepMoves: false
+        );
         if (pkm == default)
         {
             throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetType()} to.type={savePkmType}");

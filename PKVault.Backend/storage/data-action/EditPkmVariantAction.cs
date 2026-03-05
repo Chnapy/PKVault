@@ -3,7 +3,7 @@ using PKHeX.Core;
 public record EditPkmVariantActionInput(string pkmVariantId, EditPkmVariantPayload editPayload);
 
 public class EditPkmVariantAction(
-    ActionService actionService, PkmConvertService pkmConvertService,
+    ActionService actionService, PkmUpdateService pkmUpdateService, IPkmConvertService pkmConvertService,
     SynchronizePkmAction synchronizePkmAction,
     IPkmVariantLoader pkmVariantLoader
 ) : DataAction<EditPkmVariantActionInput>
@@ -17,9 +17,9 @@ public class EditPkmVariantAction(
 
         var pkm = pkmVariantPKM.Update(pkm =>
         {
-            EditPkmNickname(pkmConvertService, pkm, input.editPayload.Nickname);
-            EditPkmEVs(pkmConvertService, pkm, input.editPayload.EVs);
-            EditPkmMoves(pkmConvertService, pkm, availableMoves, input.editPayload.Moves);
+            EditPkmNickname(pkmUpdateService, pkm, input.editPayload.Nickname);
+            EditPkmEVs(pkmUpdateService, pkm, input.editPayload.EVs);
+            EditPkmMoves(pkmUpdateService, pkm, availableMoves, input.editPayload.Moves);
 
             // absolutly required before each write
             // TODO make a using write pkm to ensure use of this call
@@ -32,17 +32,17 @@ public class EditPkmVariantAction(
         var relatedPkmVariants = (await pkmVariantLoader.GetEntitiesByBox(pkmVariantEntity.BoxId, pkmVariantEntity.BoxSlot)).Values.ToList()
             .FindAll(value => value.Id != input.pkmVariantId);
 
-        foreach (var versionEntity in relatedPkmVariants)
+        foreach (var variantEntity in relatedPkmVariants)
         {
-            var relatedPkm = (await pkmVariantLoader.GetPKM(versionEntity)).Update(relatedPkm =>
-            {
-                pkmConvertService.PassDynamicsToPkm(pkm, relatedPkm);
+            var relatedPkm = await pkmVariantLoader.GetPKM(variantEntity);
 
-                relatedPkm.ResetPartyStats();
-                relatedPkm.RefreshChecksum();
-            });
+            var convertedPkm = pkmConvertService.ConvertToExisting(
+                pkm,
+                relatedPkm.GetMutablePkm(),
+                keepMoves: true
+            );
 
-            await pkmVariantLoader.UpdateEntity(versionEntity, relatedPkm);
+            await pkmVariantLoader.UpdateEntity(variantEntity, convertedPkm);
         }
 
         if (pkmVariantEntity.AttachedSaveId != null)
@@ -56,7 +56,7 @@ public class EditPkmVariantAction(
         );
     }
 
-    public static void EditPkmNickname(PkmConvertService pkmConvertService, PKM pkm, string nickname)
+    public static void EditPkmNickname(PkmUpdateService pkmUpdateService, PKM pkm, string nickname)
     {
         if (pkm.Nickname == nickname)
         {
@@ -68,10 +68,10 @@ public class EditPkmVariantAction(
             throw new ArgumentException($"Nickname should be <= {pkm.MaxStringLengthNickname} for this generation & language");
         }
 
-        pkmConvertService.ApplyNicknameToPkm(pkm, nickname, true);
+        pkmUpdateService.ApplyNicknameToPkm(pkm, nickname, true);
     }
 
-    public static void EditPkmEVs(PkmConvertService pkmConvertService, PKM pkm, int[] evs)
+    public static void EditPkmEVs(PkmUpdateService pkmUpdateService, PKM pkm, int[] evs)
     {
         if (evs.Count() != 6)
         {
@@ -115,17 +115,17 @@ public class EditPkmVariantAction(
                 throw new ArgumentException($"G7 GG EV cannot be > 200");
             }
 
-            if (pkm.Format <= 2 && ev > 65535)
+            if (pkm.Format <= 2 && ev > ushort.MaxValue)
             {
                 throw new ArgumentException($"G1-2 EV cannot be > 65535");
             }
 
-            if (pkm.Format > 2 && pkm.Format <= 5 && ev > 255)
+            if (pkm.Format > 2 && pkm.Format <= 5 && ev > EffortValues.Max255)
             {
                 throw new ArgumentException($"G3-5 EV cannot be > 255");
             }
 
-            if (pkm.Format > 5 && ev > 252)
+            if (pkm.Format > 5 && ev > EffortValues.Max252)
             {
                 throw new ArgumentException($"G6+ EV cannot be > 252");
             }
@@ -144,10 +144,10 @@ public class EditPkmVariantAction(
             return;
         }
 
-        pkmConvertService.ApplyEVsAVsToPkm(pkm, newEVs);
+        pkmUpdateService.ApplyEVsAVsToPkm(pkm, newEVs);
     }
 
-    public static void EditPkmMoves(PkmConvertService pkmConvertService, PKM pkm, List<MoveItem> availableMoves, Span<ushort> moves)
+    public static void EditPkmMoves(PkmUpdateService pkmUpdateService, PKM pkm, List<MoveItem> availableMoves, Span<ushort> moves)
     {
         var newMoves = moves.ToArray().Where(move => move != 0).ToList();
         var existingMoves = pkm.Moves.Where(move => move != 0);
@@ -175,7 +175,7 @@ public class EditPkmVariantAction(
             }
         });
 
-        pkmConvertService.ApplyMovesToPkm(pkm, moves);
+        pkmUpdateService.ApplyMovesToPkm(pkm, moves);
     }
 }
 

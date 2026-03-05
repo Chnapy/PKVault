@@ -5,12 +5,15 @@ public class SavePkmLoaderTests : IAsyncLifetime
 {
     private Dictionary<ushort, StaticEvolve> evolves;
 
-    private readonly Mock<PkmConvertService> mockConvertService;
+    private readonly Mock<IPkmConvertService> mockConvertService;
     private readonly SaveWrapper mockSave;
 
     public SavePkmLoaderTests()
     {
-        mockConvertService = new Mock<PkmConvertService>(MockBehavior.Strict, null!);
+        mockConvertService = new Mock<IPkmConvertService>();
+        mockConvertService.Setup(x => x
+            .ConvertToExisting(It.IsAny<ImmutablePKM>(), It.IsAny<PKM>(), It.IsAny<bool>())
+        ).Returns((ImmutablePKM pkm, PKM _, bool __) => pkm);
         mockSave = CreateTestSave();
     }
 

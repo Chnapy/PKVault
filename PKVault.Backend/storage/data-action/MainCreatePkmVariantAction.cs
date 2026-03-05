@@ -9,7 +9,7 @@ public class MainCreatePkmVariantActionInput(string pkmVariantId, byte generatio
 }
 
 public class MainCreatePkmVariantAction(
-    PkmConvertService pkmConvertService, StaticDataService staticDataService,
+    IPkmConvertService pkmConvertService, StaticDataService staticDataService,
     IPkmVariantLoader pkmVariantLoader
 ) : DataAction<MainCreatePkmVariantActionInput>
 {
@@ -40,7 +40,7 @@ public class MainCreatePkmVariantAction(
 
         var pkmOrigin = await pkmVariantLoader.GetPKM(pkmVariantOrigin);
 
-        var pkmConverted = input.CreatedPKM ?? pkmConvertService.GetConvertedPkm(pkmOrigin, input.Generation);
+        var pkmConverted = input.CreatedPKM ?? pkmConvertService.ConvertTo(pkmOrigin, input.Generation);
         input.CreatedPKM = pkmConverted;
 
         await pkmVariantLoader.AddEntity(new(

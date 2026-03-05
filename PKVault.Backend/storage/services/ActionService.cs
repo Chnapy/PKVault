@@ -5,7 +5,7 @@ using PKHeX.Core;
  */
 public class ActionService(
     IServiceProvider sp,
-    PkmConvertService pkmConvertService, BackupService backupService, ISettingsService settingsService,
+    PkmUpdateService pkmUpdateService, BackupService backupService, ISettingsService settingsService,
     PkmLegalityService pkmLegalityService, ISessionService sessionService, ISavesLoadersService savesLoadersService
 )
 {
@@ -420,7 +420,7 @@ public class ActionService(
         save ??= new(BlankSaveFile.Get(
             StaticDataService.GetSingleVersion(pkm.Version),
             pkm.OriginalTrainerName,
-            (LanguageID)pkmConvertService.GetPkmLanguage(pkm.GetMutablePkm())
+            (LanguageID)pkmUpdateService.GetPkmLanguage(pkm.GetMutablePkm())
         ));
 
         var filteredSources = new FilteredGameDataSource(save.GetSave(), GameInfo.Sources);

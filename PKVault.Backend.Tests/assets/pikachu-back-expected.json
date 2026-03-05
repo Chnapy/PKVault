@@ -1,0 +1,418 @@
+{
+    "PK1": {
+        "species": 25,
+        "form": 0,
+        "gender": 0,
+        "version": 54,
+        "level": 50,
+        "exp": 125000,
+        "moves": [
+            87,
+            98,
+            86,
+            0
+        ],
+        "shiny": false,
+        "nicknamed": false,
+        "nickname": "PIKACHU",
+        "nature": 0,
+        "ability": -1,
+        "tid": 12345,
+        "ot": "PKHeX",
+        "evs": [
+            257,
+            46003,
+            0,
+            13364,
+            13364,
+            57054
+        ],
+        "ivs": [
+            15,
+            9,
+            1,
+            5,
+            5,
+            11
+        ],
+        "language": 2,
+        "illegalities": []
+    },
+    "PK2": {
+        "species": 25,
+        "form": 0,
+        "gender": 0,
+        "version": 56,
+        "level": 50,
+        "exp": 125000,
+        "moves": [
+            87,
+            98,
+            86,
+            0
+        ],
+        "shiny": false,
+        "nicknamed": false,
+        "nickname": "PIKACHU",
+        "nature": 0,
+        "ability": -1,
+        "tid": 12345,
+        "ot": "PKHeX",
+        "evs": [
+            257,
+            46003,
+            0,
+            13364,
+            13364,
+            57054
+        ],
+        "ivs": [
+            15,
+            9,
+            1,
+            5,
+            5,
+            11
+        ],
+        "language": 2,
+        "illegalities": []
+    },
+    "PK3": {
+        "species": 25,
+        "form": 0,
+        "gender": 0,
+        "version": 1,
+        "level": 50,
+        "exp": 125000,
+        "moves": [
+            87,
+            98,
+            86,
+            0
+        ],
+        "shiny": false,
+        "nicknamed": false,
+        "nickname": "PIKACHU",
+        "ability": 9,
+        "tid": 12345,
+        "sid": 6112,
+        "ot": "PKHeX",
+        "evs": [
+            1,
+            179,
+            0,
+            52,
+            52,
+            222
+        ],
+        "ivs": [
+            31,
+            19,
+            3,
+            11,
+            11,
+            23
+        ],
+        "language": 3,
+        "metLocation": 57,
+        "illegalities": [
+            "Encounter-EggFMetLevel_0",
+            "PID-PIDTypeMismatch"
+        ]
+    },
+    "PK4": {
+        "species": 25,
+        "form": 0,
+        "gender": 0,
+        "version": 10,
+        "level": 50,
+        "exp": 125000,
+        "moves": [
+            87,
+            98,
+            86,
+            435
+        ],
+        "shiny": false,
+        "nicknamed": false,
+        "nickname": "PIKACHU",
+        "ability": 9,
+        "tid": 12345,
+        "sid": 6112,
+        "ot": "PKHeX",
+        "evs": [
+            1,
+            179,
+            0,
+            52,
+            52,
+            222
+        ],
+        "ivs": [
+            31,
+            19,
+            3,
+            11,
+            11,
+            23
+        ],
+        "language": 3,
+        "metLocation": 68,
+        "illegalities": [
+            "PID-PIDTypeMismatch"
+        ]
+    },
+    "PK5": {
+        "species": 25,
+        "form": 0,
+        "gender": 0,
+        "version": 21,
+        "level": 50,
+        "exp": 125000,
+        "moves": [
+            87,
+            98,
+            86,
+            435
+        ],
+        "shiny": false,
+        "nicknamed": false,
+        "nickname": "Pikachu",
+        "ability": 9,
+        "tid": 12345,
+        "sid": 6112,
+        "ot": "PKHeX",
+        "evs": [
+            1,
+            179,
+            0,
+            52,
+            52,
+            222
+        ],
+        "ivs": [
+            31,
+            19,
+            3,
+            11,
+            11,
+            23
+        ],
+        "language": 3,
+        "metLocation": 75,
+        "illegalities": [
+            "Encounter-EncInvalid"
+        ]
+    },
+    "PK6": {
+        "species": 25,
+        "form": 0,
+        "gender": 0,
+        "version": 24,
+        "level": 50,
+        "exp": 125000,
+        "moves": [
+            87,
+            98,
+            86,
+            435
+        ],
+        "shiny": false,
+        "nicknamed": false,
+        "nickname": "Pikachu",
+        "ability": 9,
+        "tid": 12345,
+        "sid": 6112,
+        "ot": "PKHeX",
+        "evs": [
+            1,
+            179,
+            0,
+            52,
+            52,
+            222
+        ],
+        "ivs": [
+            31,
+            19,
+            3,
+            11,
+            11,
+            23
+        ],
+        "language": 3,
+        "metLocation": 14,
+        "illegalities": [
+            "Geography-GeoHardwareInvalid",
+            "Memory-MemoryMissingOT"
+        ]
+    },
+    "PK7": {
+        "species": 25,
+        "form": 0,
+        "gender": 0,
+        "version": 30,
+        "level": 50,
+        "exp": 125000,
+        "moves": [
+            87,
+            98,
+            86,
+            435
+        ],
+        "shiny": false,
+        "nicknamed": false,
+        "nickname": "Pikachu",
+        "ability": 9,
+        "tid": 12345,
+        "sid": 6112,
+        "ot": "PKHeX",
+        "evs": [
+            1,
+            179,
+            0,
+            52,
+            52,
+            222
+        ],
+        "ivs": [
+            31,
+            19,
+            3,
+            11,
+            11,
+            23
+        ],
+        "language": 3,
+        "metLocation": 8,
+        "illegalities": [
+            "Geography-GeoHardwareInvalid"
+        ]
+    },
+    "PK8": {
+        "species": 25,
+        "form": 0,
+        "gender": 0,
+        "version": 44,
+        "level": 50,
+        "exp": 125000,
+        "moves": [
+            87,
+            98,
+            86,
+            435
+        ],
+        "shiny": false,
+        "nicknamed": false,
+        "nickname": "Pikachu",
+        "ability": 9,
+        "tid": 12345,
+        "sid": 6112,
+        "ot": "PKHeX",
+        "evs": [
+            1,
+            179,
+            0,
+            52,
+            52,
+            222
+        ],
+        "ivs": [
+            31,
+            19,
+            3,
+            11,
+            11,
+            23
+        ],
+        "language": 3,
+        "metLocation": 168,
+        "illegalities": [
+            "Misc-PIDTypeMismatch"
+        ]
+    },
+    "PK9": {
+        "species": 25,
+        "form": 0,
+        "gender": 0,
+        "version": 50,
+        "level": 50,
+        "exp": 125000,
+        "moves": [
+            87,
+            98,
+            86,
+            435
+        ],
+        "shiny": false,
+        "nicknamed": false,
+        "nickname": "Pikachu",
+        "ability": 9,
+        "tid": 12345,
+        "sid": 6112,
+        "ot": "PKHeX",
+        "evs": [
+            1,
+            179,
+            0,
+            52,
+            52,
+            222
+        ],
+        "ivs": [
+            31,
+            19,
+            3,
+            11,
+            11,
+            23
+        ],
+        "language": 3,
+        "size": [
+            1,
+            1,
+            0
+        ],
+        "metLocation": 6,
+        "illegalities": []
+    },
+    "PA9": {
+        "species": 25,
+        "form": 0,
+        "gender": 0,
+        "version": 52,
+        "level": 50,
+        "exp": 125000,
+        "moves": [
+            87,
+            98,
+            86,
+            435
+        ],
+        "shiny": false,
+        "nicknamed": false,
+        "nickname": "Pikachu",
+        "ability": 9,
+        "tid": 12345,
+        "sid": 6112,
+        "ot": "PKHeX",
+        "evs": [
+            1,
+            179,
+            0,
+            52,
+            52,
+            222
+        ],
+        "ivs": [
+            31,
+            19,
+            3,
+            11,
+            11,
+            23
+        ],
+        "language": 3,
+        "metLocation": 206
+    }
+}
