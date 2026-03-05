@@ -1,3 +1,5 @@
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using PKHeX.Core;
 using PokeApiNet;
 
@@ -79,7 +81,16 @@ public class GenStaticDataService(
 
         time = LogUtil.Time($"Write static-data {lang} to {staticDataPath}");
 
-        await fileIOService.WriteJSONFile(Path.Combine([.. GetStaticDataRawPathParts(lang)]), StaticDataJsonIndentedContext.Default.StaticDataDTO, dto);
+        await fileIOService.WriteJSONFile(
+            Path.Combine([.. GetStaticDataRawPathParts(lang)]),
+            new StaticDataJsonContext(new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            }).StaticDataDTO,
+            dto
+        );
 
         await fileIOService.WriteJSONGZipFile(staticDataPath, StaticDataJsonContext.Default.StaticDataDTO, dto);
 
