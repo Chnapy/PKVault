@@ -154,7 +154,7 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
                     {t('details.attached-pkm-not-found.2')}
                 </TextContainer>}
 
-                {pkmVariant.isEnabled && pkmLegality && !pkmLegality.isValid && pkmLegality.validityReport && <TextContainer
+                {pkmVariant.isEnabled && pkmLegality && pkmLegality.illegalitiesCount > 0 && pkmLegality.validityReport && <TextContainer
                     bgColor={theme.bg.yellow}
                     maxHeight={200}
                     className={css({
