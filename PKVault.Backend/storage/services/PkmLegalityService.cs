@@ -29,7 +29,8 @@ public class PkmLegalityService(ISettingsService settingsService)
                 SaveId: save?.Id,
                 MovesLegality: [],
                 IsValid: false,
-                ValidityReport: ""
+                ValidityReport: "",
+                IllegalitiesCount: 0
             );
         }
 
@@ -54,7 +55,14 @@ public class PkmLegalityService(ISettingsService settingsService)
             SaveId: save?.Id,
             MovesLegality: [.. la.Info.Moves.Select(r => r.Valid)],
             IsValid: la.Parsed && la.Valid,
-            ValidityReport
+            ValidityReport,
+            IllegalitiesCount: la.Valid
+                ? 0
+                : (
+                    la.Results.Count(r => !r.Valid)
+                    + la.Info.Moves.Count(r => !r.Valid)
+                    + la.Info.Relearn.Count(r => !r.Valid)
+                )
         );
     }
 
