@@ -1191,6 +1191,7 @@ public class GenStaticDataService(
             GameVersion.Any,
             GameVersion.Invalid,
             GameVersion.GO,
+            GameVersion.CP,
         ];
 
         if (ignoredVersions.Contains(version))
