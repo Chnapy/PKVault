@@ -10,17 +10,16 @@ namespace PKVault.Backend;
 
 public class Program
 {
+    // For migration file generation
+    // EF Core uses this method at design time to access the DbContext
+    public static IHostBuilder CreateHostBuilder(string[] args)
+        => Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(
+                webBuilder => webBuilder.UseStartup<Startup>());
+
     public static async Task Main(string[] args)
     {
         LogUtil.Initialize();
-
-#if MODE_GEN_MIGRATION
-        if (!Microsoft.EntityFrameworkCore.EF.IsDesignTime)
-        {
-            await MigrationUtil.AddMigrationTrimmedCompatible(args[0]);
-            return;
-        }
-#endif
 
         var time = LogUtil.Time($"Setup backend load");
 
