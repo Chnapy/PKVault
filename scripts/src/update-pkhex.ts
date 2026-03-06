@@ -6,7 +6,8 @@ import { spawnSync } from 'child_process';
 
 const releaseUrl = 'https://api.github.com/repos/kwsch/PKHeX/releases/latest';
 
-const pkhexVersionFilepath = '../PKHeX.version';
+const pkhexVersionFilepath = '../PKVault.Backend/PKHeX.version';
+const pkhexOutputPath = '../PKVault.Backend';
 
 const pkhexRepoFolder = '../tmp-pkhex';
 
@@ -42,7 +43,7 @@ const act = async () => {
     const pkhexCorePath = path.join(sourcePath, 'PKHeX.Core');
 
     const commandBase = `dotnet`;
-    const commandArgs = `publish ${pkhexCorePath} -o ../`;
+    const commandArgs = `publish ${pkhexCorePath} -o ${pkhexOutputPath}`;
     console.log();
     console.log(commandBase, commandArgs);
 

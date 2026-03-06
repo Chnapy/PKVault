@@ -29,7 +29,7 @@
     <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="22.1.0" />
     <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
 
-    <Reference Include="../PKHeX.Core.dll" />
+    <Reference Include="../PKVault.Backend/PKHeX.Core.dll" />
   </ItemGroup>
 
   <ItemGroup>
