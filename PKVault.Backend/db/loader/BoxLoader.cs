@@ -26,10 +26,12 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         StorageSlotType.FusedNecrozmaS => BoxType.Fused,
         StorageSlotType.FusedNecrozmaM => BoxType.Fused,
         StorageSlotType.FusedCalyrex => BoxType.Fused,
-        StorageSlotType.Misc => BoxType.Misc,
+        StorageSlotType.Underground => BoxType.Underground,
         StorageSlotType.Resort => BoxType.Resort,
         StorageSlotType.Ride => BoxType.Ride,
         StorageSlotType.Shiny => BoxType.Shiny,
+        StorageSlotType.BattleAgency => BoxType.BattleAgency,
+        StorageSlotType.Pokéwalker => BoxType.Pokéwalker,
         _ => throw new NotImplementedException(slotType.ToString()),
     };
 

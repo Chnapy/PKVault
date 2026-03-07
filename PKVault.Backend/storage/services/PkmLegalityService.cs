@@ -105,10 +105,12 @@ public class PkmLegalityService(ISettingsService settingsService)
             (int)BoxType.Daycare => StorageSlotType.Daycare,
             (int)BoxType.GTS => StorageSlotType.GTS,
             // (int)BoxType.Fused => StorageSlotType.Fused,
-            (int)BoxType.Misc => StorageSlotType.Misc,
+            (int)BoxType.Underground => StorageSlotType.Underground,
             (int)BoxType.Resort => StorageSlotType.Resort,
             (int)BoxType.Ride => StorageSlotType.Ride,
             (int)BoxType.Shiny => StorageSlotType.Shiny,
+            (int)BoxType.BattleAgency => StorageSlotType.BattleAgency,
+            (int)BoxType.Pokéwalker => StorageSlotType.Pokéwalker,
             _ => StorageSlotType.Box
         };
 

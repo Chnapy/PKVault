@@ -258,6 +258,9 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
         img: zaImg,
         color: theme.game.za,
       }),
+      [ GameVersion.CP ]: () => ({
+        // color: theme.game.,
+      }),
 
       // Game groupings
 

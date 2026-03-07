@@ -29,8 +29,12 @@ public enum BoxType : int
     /// <summary> Fused Legendary Storage </summary>
     Fused = -5,
 
-    /// <summary> Miscellaneous </summary>
-    Misc = -6,
+    /// <summary> Underground area wild Pokémon cache </summary>
+    /// <remarks>
+    /// <see cref="GameVersion.BD"/>
+    /// <see cref="GameVersion.SP"/>
+    /// </remarks>
+    Underground = -6,
     /// <summary> Poké Pelago (Gen7) </summary>
     Resort = -7,
     /// <summary> Ride Legendary Slot (S/V) </summary>
@@ -38,4 +42,10 @@ public enum BoxType : int
 
     /// <summary> Shiny Overworld Cache </summary>
     Shiny = -9,
+
+    /// <summary> Battle Agency (Gen7) </summary>
+    BattleAgency = -10,
+
+    /// <summary> Gen4 HeartGold/SoulSilver pedometer accessory upload </summary>
+    Pokéwalker = -11,
 }
