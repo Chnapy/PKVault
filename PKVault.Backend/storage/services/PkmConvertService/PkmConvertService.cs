@@ -4,39 +4,50 @@ public interface IPkmConvertService
 {
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, uint generation);
     public ImmutablePKM ConvertToExisting(ImmutablePKM sourcePkm, PKM existingTargetPkm, bool keepMoves);
-    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, PKM blankTargetPkm, PKMRndValues? rndValues);
+    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, PKMRndValues? rndValues);
 }
 
 public class PkmConvertService(ISettingsService settingsService) : IPkmConvertService
 {
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, uint generation)
     {
-        PKM blankPkm = generation switch
+        Console.WriteLine($"Convert {sourcePkm.GetMutablePkm().GetType().Name} -> G{generation}");
+
+        Type targetType = generation switch
         {
-            1 => new PK1(),
-            2 => new PK2(),
-            3 => new PK3(),
-            4 => new PK4(),
-            5 => new PK5(),
-            6 => new PK6(),
-            7 => new PK7(),
-            8 => new PK8(),
-            9 => new PK9(),
+            1 => typeof(PK1),
+            2 => typeof(PK2),
+            3 => typeof(PK3),
+            4 => typeof(PK4),
+            5 => typeof(PK5),
+            6 => typeof(PK6),
+            7 => typeof(PK7),
+            8 => typeof(PK8),
+            9 => typeof(PK9),
             _ => throw new Exception($"PKM case not found for generation={generation}")
         };
 
-        return ConvertTo(sourcePkm, blankPkm, null);
+        return ConvertTo(sourcePkm, targetType, null);
     }
 
     public ImmutablePKM ConvertToExisting(ImmutablePKM sourcePkm, PKM existingTargetPkm, bool keepMoves)
     {
+        Console.WriteLine($"Convert existing {sourcePkm.GetMutablePkm().GetType().Name} -> {existingTargetPkm.GetType().Name} keepMoves={keepMoves}");
+
+        if (existingTargetPkm.Species == 0)
+        {
+            throw new Exception($"Invalid existingTargetPkm = {existingTargetPkm.GetType().Name}");
+        }
+
         var result = ConvertTo(
             sourcePkm,
-            existingTargetPkm,
-            new(
-                PID: existingTargetPkm.PID,
-                EncryptionConstant: existingTargetPkm.EncryptionConstant
-            )
+            existingTargetPkm.GetType(),
+            existingTargetPkm is GBPKM
+                ? null
+                : new(
+                    PID: existingTargetPkm.PID,
+                    EncryptionConstant: existingTargetPkm.EncryptionConstant
+                )
         );
 
         if (keepMoves)
@@ -54,14 +65,16 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
         return result;
     }
 
-    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, PKM blankTargetPkm, PKMRndValues? rndValues)
+    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, PKMRndValues? rndValues)
     {
+        Console.WriteLine($"Convert {sourcePkm.GetMutablePkm().GetType().Name} -> {targetPkmType.Name}");
+
         var fallbackLang = settingsService.GetSettings().GetSafeLanguageID();
 
-        var result = ConvertRecursive(sourcePkm.GetMutablePkm().Clone(), blankTargetPkm.GetType(), fallbackLang, rndValues);
+        var result = ConvertRecursive(sourcePkm.GetMutablePkm().Clone(), targetPkmType, fallbackLang, rndValues);
 
-        if (result.GetType() != blankTargetPkm.GetType())
-            throw new InvalidOperationException($"Failed to convert to {blankTargetPkm.GetType().Name}");
+        if (result.GetType() != targetPkmType)
+            throw new InvalidOperationException($"Failed to convert to {targetPkmType.Name}");
 
         result.FixCommonLegalityIssues();
 
@@ -79,6 +92,8 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
 
     private PKM ConvertRecursive(PKM current, Type targetType, LanguageID fallbackLang, PKMRndValues? rndValues)
     {
+        Console.WriteLine($"Convert recursive {current.GetType().Name} -> {targetType.Name}");
+
         var currentValue = GetPKMTypeWeight(current.GetType());
         var targetValue = GetPKMTypeWeight(targetType);
         var direction = targetValue - currentValue;
@@ -110,6 +125,8 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
 
     private static PKM? TryPKToVariant(PKM source, Type targetType, PKMRndValues? rndValues)
     {
+        Console.WriteLine($"Convert forward {source.GetType().Name} -> {targetType.Name} - PID={rndValues?.PID}");
+
         return (source.GetType().Name, targetType.Name) switch
         {
             // ("PK1", "PK7") => ((PK1)source).ConvertToPK7(),
@@ -142,6 +159,8 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
 
     private static PKM? TryForwardConversion(PKM source, LanguageID fallbackLang, PKMRndValues? rndValues)
     {
+        Console.WriteLine($"Convert forward {source.GetType().Name} - PID={rndValues?.PID}");
+
         if (source is ITrainerInfo sourceTrainer)
         {
             RecentTrainerCache.SetRecentTrainer(sourceTrainer);
@@ -165,7 +184,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
         // Check unexpected nature changes after G2
         if (pkm != null && source.Generation > 2 && source.Nature != pkm.Nature)
         {
-            throw new Exception($"Different nature {source.Nature} / {pkm.Nature}");
+            throw new Exception($"Different nature {source.Nature} / {pkm.Nature} - PID={rndValues?.PID}");
         }
 
         return pkm;
@@ -173,6 +192,8 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
 
     private static PKM? TryBackwardConversion(PKM source, PKMRndValues? rndValues)
     {
+        Console.WriteLine($"Convert backward {source.GetType().Name} - PID={rndValues?.PID}");
+
         if (source is ITrainerInfo sourceTrainer)
         {
             RecentTrainerCache.SetRecentTrainer(sourceTrainer);
@@ -196,7 +217,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
         // Check unexpected nature changes before G2
         if (pkm != null && pkm.Generation > 2 && source.Nature != pkm.Nature)
         {
-            throw new Exception($"Different nature {source.Nature} / {pkm.Nature}");
+            throw new Exception($"Different nature {source.Nature} / {pkm.Nature} - PID={rndValues?.PID}");
         }
 
         return pkm;
@@ -204,6 +225,8 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
 
     private static PKM? TryVariantToPK(PKM source, PKMRndValues? rndValues)
     {
+        Console.WriteLine($"Convert backward {source.GetType().Name} - PID={rndValues?.PID}");
+
         return source.GetType().Name switch
         {
             "SK2" => ((SK2)source).ConvertToPK2(),

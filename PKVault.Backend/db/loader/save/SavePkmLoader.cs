@@ -245,14 +245,19 @@ public class SavePkmLoader(
 
         var savePkmType = save.PKMType;
 
-        var pkm = pkmConvertService.ConvertToExisting(
+        var pkm = pkmConvertService.ConvertTo(
             dto.Pkm,
-            save.GetBlankPKM().GetMutablePkm(),
-            keepMoves: false
+            save.GetBlankPKM().GetMutablePkm().GetType(),
+            dto.Pkm.GetMutablePkm() is GBPKM
+                ? null
+                : new(
+                    PID: dto.Pkm.PID,
+                    EncryptionConstant: dto.Pkm.EncryptionConstant
+                )
         );
         if (pkm == default)
         {
-            throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetType()} to.type={savePkmType}");
+            throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetMutablePkm().GetType()} to.type={savePkmType}");
         }
 
         DeleteDto(dto.Id);

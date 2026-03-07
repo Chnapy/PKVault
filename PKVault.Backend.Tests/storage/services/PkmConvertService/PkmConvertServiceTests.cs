@@ -103,7 +103,7 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(targetTypeName);
 
-        var result = service.ConvertTo(new(sourcePkm), blank, null).GetMutablePkm();
+        var result = service.ConvertTo(new(sourcePkm), blank.GetType(), null).GetMutablePkm();
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
@@ -114,7 +114,7 @@ public class PkmConvertServiceTests
         // check PID predictability
         if (result is not GBPKM && blank is not GBPKM)
         {
-            var result2 = service.ConvertTo(new(sourcePkm), blank, new(
+            var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
                 PID: result.PID,
                 EncryptionConstant: result.EncryptionConstant
             )).GetMutablePkm();
@@ -157,7 +157,7 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(targetTypeName);
 
-        var result = service.ConvertTo(new(sourcePkm), blank, null).GetMutablePkm();
+        var result = service.ConvertTo(new(sourcePkm), blank.GetType(), null).GetMutablePkm();
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
@@ -168,7 +168,7 @@ public class PkmConvertServiceTests
         // check PID predictability
         if (result is not GBPKM && blank is not GBPKM)
         {
-            var result2 = service.ConvertTo(new(sourcePkm), blank, new(
+            var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
                 PID: result.PID,
                 EncryptionConstant: result.EncryptionConstant
             )).GetMutablePkm();
@@ -215,13 +215,13 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(variantTypeName);
 
-        var result1 = service.ConvertTo(new(sourcePkm), blank, null).GetMutablePkm();
+        var result1 = service.ConvertTo(new(sourcePkm), blank.GetType(), null).GetMutablePkm();
 
         Assert.Equal(variantTypeName, result1.GetType().Name);
 
         blank = CreateBlankTarget("PK2");
 
-        var result = service.ConvertTo(new(result1), blank, null).GetMutablePkm();
+        var result = service.ConvertTo(new(result1), blank.GetType(), null).GetMutablePkm();
 
         Assert.Equal("PK2", result.GetType().Name);
 
@@ -232,7 +232,7 @@ public class PkmConvertServiceTests
         // check PID predictability
         if (result is not GBPKM && blank is not GBPKM)
         {
-            var result2 = service.ConvertTo(new(sourcePkm), blank, new(
+            var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
                 PID: result.PID,
                 EncryptionConstant: result.EncryptionConstant
             )).GetMutablePkm();
@@ -287,7 +287,7 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(targetTypeName);
 
-        var result = service.ConvertTo(new(sourcePkm), blank, null).GetMutablePkm();
+        var result = service.ConvertTo(new(sourcePkm), blank.GetType(), null).GetMutablePkm();
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
@@ -298,7 +298,7 @@ public class PkmConvertServiceTests
         // check PID predictability
         if (result is not GBPKM && blank is not GBPKM)
         {
-            var result2 = service.ConvertTo(new(sourcePkm), blank, new(
+            var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
                 PID: result.PID,
                 EncryptionConstant: result.EncryptionConstant
             )).GetMutablePkm();
@@ -351,7 +351,7 @@ public class PkmConvertServiceTests
 
         var blank = CreateBlankTarget(targetTypeName);
 
-        var result = service.ConvertTo(new(sourcePkm), blank, null).GetMutablePkm();
+        var result = service.ConvertTo(new(sourcePkm), blank.GetType(), null).GetMutablePkm();
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
@@ -362,7 +362,7 @@ public class PkmConvertServiceTests
         // check PID predictability
         if (result is not GBPKM && blank is not GBPKM)
         {
-            var result2 = service.ConvertTo(new(sourcePkm), blank, new(
+            var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
                 PID: result.PID,
                 EncryptionConstant: result.EncryptionConstant
             )).GetMutablePkm();
