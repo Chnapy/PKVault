@@ -182,10 +182,10 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
             };
 
         // Check unexpected nature changes after G2
-        if (pkm != null && source.Generation > 2 && source.Nature != pkm.Nature)
-        {
-            throw new Exception($"Different nature {source.Nature} / {pkm.Nature} - PID={rndValues?.PID}");
-        }
+        // if (pkm != null && source.Generation > 2 && source.Nature != pkm.Nature)
+        // {
+        //     throw new Exception($"Different nature {source.Nature} / {pkm.Nature} - PID={rndValues?.PID}");
+        // }
 
         return pkm;
     }
@@ -215,10 +215,10 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
             };
 
         // Check unexpected nature changes before G2
-        if (pkm != null && pkm.Generation > 2 && source.Nature != pkm.Nature)
-        {
-            throw new Exception($"Different nature {source.Nature} / {pkm.Nature} - PID={rndValues?.PID}");
-        }
+        // if (pkm != null && pkm.Generation > 2 && source.Nature != pkm.Nature)
+        // {
+        //     throw new Exception($"Different nature {source.Nature} / {pkm.Nature} - PID={rndValues?.PID}");
+        // }
 
         return pkm;
     }

@@ -11,18 +11,18 @@ import { StorageDetailsForm } from './storage-details-form';
 export type StorageDetailsTitleProps = {
     isEnabled: boolean;
     filepath?: string;
-    version: GameVersion | null;
+    contextVersion: GameVersion | null;
     showVersionName?: boolean;
     canEdit: boolean;
     onRelease?: () => unknown;
     openFile?: () => unknown;
 };
 
-export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ isEnabled, filepath, version, showVersionName, canEdit, onRelease, openFile }) => {
+export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ isEnabled, filepath, contextVersion, showVersionName, canEdit, onRelease, openFile }) => {
     const formContext = StorageDetailsForm.useContext();
 
-    return <DetailsTitle version={version} showVersionName={showVersionName && isEnabled}>
-        {!isEnabled && version === null && filepath
+    return <DetailsTitle contextVersion={contextVersion} showVersionName={showVersionName && isEnabled}>
+        {!isEnabled && contextVersion === null && filepath
             ? <PathLine>{filepath}</PathLine>
             : null}
 

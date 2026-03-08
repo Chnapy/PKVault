@@ -79,7 +79,7 @@ export const PokedexDetails: React.FC = () => {
         {gameSaves.map((save, i) => (
           <DetailsTab
             key={save.id}
-            version={save.version}
+            contextVersion={save.version}
             otName={save.trainerName}
             onClick={() => setSelectedSaveIndex(i)}
             disabled={selectedSaveIndex === i}
@@ -90,7 +90,7 @@ export const PokedexDetails: React.FC = () => {
       <DetailsCardContainer
         bgColor={getGameInfos(selectedSave.version).color}
         title={<DetailsTitle
-          version={selectedSave.version}
+          contextVersion={selectedSave.version}
           generation={selectedForm.generation}
           showVersionName
         />}
