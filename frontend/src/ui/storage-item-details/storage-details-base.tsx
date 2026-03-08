@@ -24,7 +24,7 @@ import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
 
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
-    | 'id' | 'idBase' | 'pid' | 'species' | 'context' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
+    | 'id' | 'idBase' | 'pid' | 'species' | 'context' | 'version' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'levelUpPercent' | 'eggHatchCount' | 'friendship' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
     | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
@@ -33,7 +33,7 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     & Pick<PkmLegalityDTO, 'movesLegality'>
     & {
         filepath?: string;
-        version: GameVersion | null;
+        contextVersion: GameVersion | null;
         saveId?: number;
         reports?: React.ReactNode;
         onRelease?: () => unknown;
@@ -58,11 +58,11 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
     const speciesName = formObj?.name;
 
     return <DetailsCardContainer
-        bgColor={getGameInfos(pkm.version, pkm.isEnabled).color}
+        bgColor={getGameInfos(pkm.contextVersion, pkm.isEnabled).color}
         title={<StorageDetailsTitle
             isEnabled={pkm.isEnabled}
             filepath={filepath}
-            version={pkm.version}
+            contextVersion={pkm.contextVersion}
             showVersionName
             canEdit={pkm.canEdit}
             onRelease={onRelease}
@@ -116,9 +116,9 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 <TextStats
                     nature={pkm.nature}
                     ivs={pkm.iVs}
-                    maxIv={staticData.versions[ pkm.version ?? -1 ]?.maxIV ?? 0}
+                    maxIv={staticData.versions[ pkm.contextVersion ?? -1 ]?.maxIV ?? 0}
                     evs={pkm.eVs}
-                    maxEv={staticData.versions[ pkm.version ?? -1 ]?.maxEV ?? 0}
+                    maxEv={staticData.versions[ pkm.contextVersion ?? -1 ]?.maxEV ?? 0}
                     stats={pkm.stats}
                     hiddenPowerType={pkm.hiddenPowerType}
                     hiddenPowerPower={pkm.hiddenPowerPower}

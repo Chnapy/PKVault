@@ -418,7 +418,7 @@ public class ActionService(
         var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
 
         save ??= new(BlankSaveFile.Get(
-            StaticDataService.GetSingleVersion(pkm.Version),
+            pkm.Context,
             pkm.OriginalTrainerName,
             (LanguageID)pkmUpdateService.GetPkmLanguage(pkm.GetMutablePkm())
         ));

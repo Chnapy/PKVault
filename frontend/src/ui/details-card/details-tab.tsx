@@ -8,14 +8,14 @@ import { css, cx } from '@emotion/css';
 
 export type DetailsTabProps = {
     isEnabled?: boolean;
-    version: GameVersion | null;    // null means pkvault
+    contextVersion: GameVersion | null;    // null means pkvault
     otName: string;
     original?: boolean;
     warning?: boolean;
 } & ButtonProps;
 
-export const DetailsTab: React.FC<DetailsTabProps> = ({ isEnabled = true, version, otName, original, warning, disabled, ...rest }) => {
-    const gameInfos = getGameInfos(version, isEnabled);
+export const DetailsTab: React.FC<DetailsTabProps> = ({ isEnabled = true, contextVersion, otName, original, warning, disabled, ...rest }) => {
+    const gameInfos = getGameInfos(contextVersion, isEnabled);
 
     return <Button
         bgColor={gameInfos.color}

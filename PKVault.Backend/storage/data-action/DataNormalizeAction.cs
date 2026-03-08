@@ -1,3 +1,5 @@
+using PKHeX.Core;
+
 public record DataNormalizeActionInput();
 
 public class DataNormalizeAction(
@@ -206,6 +208,7 @@ public class DataNormalizeAction(
                         Species = e.Species,
                         Form = f.Form,
                         Gender = f.Gender,
+                        Context = f.Version.Context,
                         Version = f.Version,
                         IsCaught = f.IsCaught,
                         IsCaughtShiny = f.IsCaughtShiny,
