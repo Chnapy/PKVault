@@ -253,7 +253,8 @@ public class SavePkmLoader(
                 : new(
                     PID: dto.Pkm.PID,
                     EncryptionConstant: dto.Pkm.EncryptionConstant
-                )
+                ),
+            targetSave: save.GetSave()
         );
         if (pkm == default)
         {

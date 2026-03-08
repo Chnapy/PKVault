@@ -4,7 +4,7 @@ public interface IPkmConvertService
 {
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, uint generation);
     public ImmutablePKM ConvertToExisting(ImmutablePKM sourcePkm, PKM existingTargetPkm, bool keepMoves);
-    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, PKMRndValues? rndValues);
+    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, PKMRndValues? rndValues, SaveFile? targetSave = null);
 }
 
 public class PkmConvertService(ISettingsService settingsService) : IPkmConvertService
@@ -65,7 +65,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
         return result;
     }
 
-    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, PKMRndValues? rndValues)
+    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, PKMRndValues? rndValues, SaveFile? targetSave = null)
     {
         Console.WriteLine($"Convert {sourcePkm.GetMutablePkm().GetType().Name} -> {targetPkmType.Name}");
 
@@ -75,6 +75,12 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
 
         if (result.GetType() != targetPkmType)
             throw new InvalidOperationException($"Failed to convert to {targetPkmType.Name}");
+
+        if (targetSave != null)
+        {
+            result.HandlingTrainerName = targetSave.OT;
+            result.HandlingTrainerGender = targetSave.Gender;
+        }
 
         result.FixCommonLegalityIssues();
 
