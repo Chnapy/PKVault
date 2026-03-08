@@ -12,8 +12,8 @@ public class SavePkmLoaderTests : IAsyncLifetime
     {
         mockConvertService = new Mock<IPkmConvertService>();
         mockConvertService.Setup(x => x
-            .ConvertTo(It.IsAny<ImmutablePKM>(), It.IsAny<Type>(), It.IsAny<PKMRndValues?>())
-        ).Returns((ImmutablePKM pkm, Type _, PKMRndValues? __) => pkm);
+            .ConvertTo(It.IsAny<ImmutablePKM>(), It.IsAny<Type>(), It.IsAny<PKMRndValues?>(), It.IsAny<SaveFile?>())
+        ).Returns((ImmutablePKM pkm, Type _, PKMRndValues? __, SaveFile? ___) => pkm);
         mockSave = CreateTestSave();
     }
 
