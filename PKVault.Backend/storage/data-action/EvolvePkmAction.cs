@@ -76,20 +76,20 @@ public class EvolvePkmAction(
     {
         var staticData = await staticDataService.GetStaticData();
 
-        var entity = await pkmVariantLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-version not found");
+        var entity = await pkmVariantLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-variant not found");
         var entityPkm = await pkmVariantLoader.GetPKM(entity);
 
         var relatedPkmVariants = await Task.WhenAll(
             (await pkmVariantLoader.GetEntitiesByBox(entity.BoxId, entity.BoxSlot)).Values.ToList()
                 .FindAll(value => value.Id != entity.Id)
-                .Select(async entity => (Version: entity, Pkm: await pkmVariantLoader.GetPKM(entity)))
+                .Select(async entity => (Variant: entity, Pkm: await pkmVariantLoader.GetPKM(entity)))
         );
 
         if (
-            relatedPkmVariants.Any(version => entityPkm.Species > version.Pkm.MaxSpeciesID)
+            relatedPkmVariants.Any(variant => entityPkm.Species > variant.Pkm.MaxSpeciesID)
         )
         {
-            throw new ArgumentException($"One of pkm-version cannot evolve, species not compatible with its generation");
+            throw new ArgumentException($"One of pkm-variant cannot evolve, species not compatible with its generation");
         }
 
         var oldName = entityPkm.Nickname;
@@ -106,13 +106,13 @@ public class EvolvePkmAction(
 
         // update related dto pkm
         await Task.WhenAll(
-            relatedPkmVariants.ToList().Select(async (version) =>
+            relatedPkmVariants.ToList().Select(async (variant) =>
             {
-                version.Pkm = version.Pkm.Update(pkm =>
+                variant.Pkm = variant.Pkm.Update(pkm =>
                 {
                     UpdatePkm(pkm, evolveSpecies, false);
                 });
-                await pkmVariantLoader.UpdateEntity(version.Version, version.Pkm);
+                await pkmVariantLoader.UpdateEntity(variant.Variant, variant.Pkm);
             })
         );
 
@@ -135,10 +135,11 @@ public class EvolvePkmAction(
 
         if (staticData.Evolves.TryGetValue(pkm.Species, out var staticEvolve))
         {
+            var version = pkm.Context.GetSingleGameVersion();
             if (pkm.HeldItemPokeapiName != null && staticEvolve.TradeWithItem.TryGetValue(pkm.HeldItemPokeapiName, out var evolveMap))
             {
                 if (
-                    evolveMap.TryGetValue((byte)pkm.Version, out var evolvedSpeciesWithItem)
+                    evolveMap.TryGetValue((byte)version, out var evolvedSpeciesWithItem)
                     && pkm.CurrentLevel >= evolvedSpeciesWithItem.MinLevel
                 )
                 {
@@ -147,7 +148,7 @@ public class EvolvePkmAction(
             }
 
             if (
-                staticEvolve.Trade.TryGetValue((byte)pkm.Version, out var evolvedSpecies)
+                staticEvolve.Trade.TryGetValue((byte)version, out var evolvedSpecies)
                 && pkm.CurrentLevel >= evolvedSpecies.MinLevel
             )
             {

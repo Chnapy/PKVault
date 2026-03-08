@@ -53,7 +53,7 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selected
                     <DetailsTab
                         key={pkmVariant.id}
                         isEnabled={pkmVariant.isEnabled}
-                        version={pkmVariant.isEnabled ? pkmVariant.version : null}
+                        contextVersion={pkmVariant.isEnabled ? pkmVariant.contextVersion : null}
                         otName={`G${pkmVariant.generation}`}
                         original={pkmVariant.isMain}
                         onClick={() => setSelectedIndex(i)}
@@ -110,7 +110,7 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
     return (
         <StorageDetailsBase
             {...pkmVariant}
-            version={pkmVariant.isEnabled ? pkmVariant.version : null}
+            contextVersion={pkmVariant.isEnabled ? pkmVariant.contextVersion : null}
             isValid
             movesLegality={[]}
             {...pkmLegality}

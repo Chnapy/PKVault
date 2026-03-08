@@ -28,6 +28,7 @@ public class DexSyncAction(
                 var languagesHash = string.Join('.', entry.Languages.Select(id => (byte)id).ToArray().Order());
                 return entry.Forms
                     .Select(form => (
+                        form.Context,
                         form.Species,
                         form.Form,
                         form.Gender,
@@ -69,6 +70,7 @@ public class DexSyncAction(
                 }
 
                 return (
+                    baseForm.Context,
                     baseForm.Species,
                     baseForm.Form,
                     baseForm.Gender,
@@ -99,15 +101,32 @@ public class DexSyncAction(
 
                 foreach (var form in ungroupedValues)
                 {
-                    await service.EnableSpeciesForm(
-                        form.Species,
-                        form.Form,
-                        form.Gender,
-                        form.IsSeen,
-                        form.IsSeenShiny,
-                        form.IsCaught,
-                        form.Languages
-                    );
+                    if (service is DexMainService dexMainService)
+                    {
+                        await dexMainService.EnableSpeciesForm(
+                            form.Context,
+                            default,
+                            form.Species,
+                            form.Form,
+                            form.Gender,
+                            form.IsCaught,
+                            false,
+                            form.Languages,
+                            createOnly: false
+                        );
+                    }
+                    else
+                    {
+                        await service.EnableSpeciesForm(
+                            form.Species,
+                            form.Form,
+                            form.Gender,
+                            form.IsSeen,
+                            form.IsSeenShiny,
+                            form.IsCaught,
+                            form.Languages
+                        );
+                    }
                 }
 
                 saveLoader?.Pkms.HasWritten = true;

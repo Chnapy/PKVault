@@ -19,6 +19,9 @@ public abstract record PkmBaseDTO(
     public string BoxKey => BoxId + "." + BoxSlot;
 
     public GameVersion Version => Pkm.Version;
+    public GameVersion ContextVersion => Version.Context == Context
+        ? Version
+        : Context.GetSingleGameVersion();
     public EntityContext Context => Pkm.Context;
     public uint PID => Pkm.PID;
     public bool IsNicknamed => Pkm.IsNicknamed;

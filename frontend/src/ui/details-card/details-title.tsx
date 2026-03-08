@@ -5,21 +5,21 @@ import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { css } from '@emotion/css';
 
 export type DetailsTitleProps = {
-    version: GameVersion | null;    // null means pkvault
+    contextVersion: GameVersion | null;    // null means pkvault
     generation?: number;
     showVersionName?: boolean;
 };
 
-export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> = ({ version, generation, showVersionName, children }) => {
+export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> = ({ contextVersion, generation, showVersionName, children }) => {
     const staticData = useStaticData();
 
-    if (!generation && version) {
-        generation = staticData.versions[ version ]?.generation;
+    if (!generation && contextVersion) {
+        generation = staticData.versions[ contextVersion ]?.generation;
     }
 
     return <>
         <img
-            src={getGameInfos(version).img}
+            src={getGameInfos(contextVersion).img}
             className={css({ height: 28, width: 28 })}
         />
 
@@ -27,9 +27,9 @@ export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> 
             {generation ? <>G{generation}</> : null}
             {showVersionName && <>
                 {' / '}
-                {version
+                {contextVersion
                     ? <>
-                        {staticData.versions[ version ]?.name}
+                        {staticData.versions[ contextVersion ]?.name}
                     </>
                     : 'PKVault'}
             </>}

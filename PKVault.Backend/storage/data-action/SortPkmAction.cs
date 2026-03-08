@@ -90,10 +90,10 @@ public class SortPkmAction(
         if (pkms.Any())
         {
             var filteredPkms = await Task.WhenAll(pkms
-                .Select(async mainVersion =>
+                .Select(async mainVariant =>
                 {
-                    var mainVersionPkm = await pkmVariantLoader.GetPKM(mainVersion);
-                    return (Version: mainVersion, Pkm: mainVersionPkm);
+                    var mainVersionPkm = await pkmVariantLoader.GetPKM(mainVariant);
+                    return (Variant: mainVariant, Pkm: mainVersionPkm);
                 }));
 
             var pkmVariants = GetSortedPkms(
@@ -112,7 +112,7 @@ public class SortPkmAction(
                 pkmSpecies,
                 applyValue: async (entry) =>
                 {
-                    var currentValue = pkmVariants[entry.Index].Version;
+                    var currentValue = pkmVariants[entry.Index].Variant;
                     var currentPkm = await pkmVariantLoader.GetPKM(currentValue);
 
                     var entities = (await pkmVariantLoader.GetEntitiesByBox(currentValue.BoxId, currentValue.BoxSlot)).Values

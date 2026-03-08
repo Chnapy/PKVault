@@ -14,7 +14,7 @@ public class DexMainService(
         var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
         var dexLoader = scope.ServiceProvider.GetRequiredService<IDexLoader>();
 
-        Dictionary<GameVersion, SaveWrapper> savesByVersion = [];
+        Dictionary<EntityContext, SaveWrapper> savesByContext = [];
 
         var formsBySpecies = speciesSet == null
             ? await dexLoader.GetEntitiesBySpecies()
@@ -36,13 +36,12 @@ public class DexMainService(
                     var isOwned = await pkmVariantLoader.HasEntityByForm(species, form.Form, form.Gender);
                     var isOwnedShiny = isOwned && await pkmVariantLoader.HasEntityByFormShiny(species, form.Form, form.Gender);
 
-                    var saveVersion = StaticDataService.GetSingleVersion(form.Version);
-                    if (!savesByVersion.TryGetValue(saveVersion, out var save))
+                    if (!savesByContext.TryGetValue(form.Context, out var save))
                     {
-                        save = new(saveVersion == default
+                        save = new(form.Context == default
                             ? new SAV9ZA()
-                            : BlankSaveFile.Get(saveVersion));
-                        savesByVersion.Add(saveVersion, save);
+                            : BlankSaveFile.Get(form.Context));
+                        savesByContext.Add(form.Context, save);
                     }
 
                     var saveDexService = dexService.GetDexService(save);
@@ -79,6 +78,7 @@ public class DexMainService(
     {
         await EnableSpeciesForm(
             default,
+            default,
             species, form, gender, isCaught, false, languages,
             createOnly: false
         );
@@ -86,16 +86,19 @@ public class DexMainService(
 
     public async Task EnablePKM(ImmutablePKM pk, SaveWrapper? save = null, bool createOnly = false)
     {
+        var context = save?.Context ?? pk.Context;
         var version = save?.Version ?? pk.Version;
 
         await EnableSpeciesForm(
+            context,
             version,
             pk.Species, pk.Form, pk.Gender, true, pk.IsShiny, [pk.LanguageID],
             createOnly
         );
     }
 
-    private async Task EnableSpeciesForm(
+    public async Task EnableSpeciesForm(
+        EntityContext context,
         GameVersion version,
         ushort species, byte form, Gender gender,
         bool isCaught, bool isCaughtShiny, LanguageID[] languages,
@@ -120,12 +123,18 @@ public class DexMainService(
             Id = id,
             Species = species,
             Form = form,
+            Context = default,
             Version = default,
             Gender = gender,
             IsCaught = false,
             IsCaughtShiny = false,
             Languages = []
         };
+
+        if (context != default)
+        {
+            entity.Context = context;
+        }
 
         if (version != default)
         {
