@@ -33,7 +33,9 @@ public abstract record PkmBaseDTO(
     public bool IsAlpha => Pkm.IsAlpha;
     public bool IsNoble => Pkm.IsNoble;
     public bool CanGigantamax => Pkm.CanGigantamax;
-    public int Ball => Pkm.Ball;
+
+    public int Ball => StaticDataService.GetBallPokeApiId((Ball)Pkm.Ball);
+
     public Gender Gender => Pkm.Gender;
     public List<byte> Types => Pkm.Types;
     public byte Level => Pkm.CurrentLevel;
