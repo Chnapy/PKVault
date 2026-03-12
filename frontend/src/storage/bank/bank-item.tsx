@@ -35,7 +35,7 @@ export const BankItem: React.FC<{
   const pkms = boxes.map(boxId => Object.values(pkmsQuery.data?.data.byBox[ boxId ] ?? {}).flat()).flat();
 
   const canEdit = !bank?.isExternal;
-  const canDelete = canEdit && banks.length > 1;
+  const canDelete = banks.length > 1 && (canEdit || pkms.length === 0);
 
   const buttonMainContent = bank && (
     <div

@@ -24,35 +24,17 @@ public class SaveInfosController(
         }
 
         saveService.InvalidateSaves();
-        await sessionService.StartNewSession(checkInitialActions: true);
+        var flags = await sessionService.StartNewSession(checkInitialActions: true);
 
-        return await dataService.CreateDataFromUpdateFlags(new()
-        {
-            Saves = new() { All = true },
-            Dex = new() { All = true },
-            SaveInfos = true,
-            Warnings = true,
-        });
+        flags ??= new();
+
+        flags.Saves.All = true;
+        flags.Dex.All = true;
+        flags.SaveInfos = true;
+        flags.Warnings = true;
+
+        return await dataService.CreateDataFromUpdateFlags(flags);
     }
-
-    // [HttpPost()]
-    // [Consumes("multipart/form-data")]
-    // public async Task<ActionResult<DataDTO>> Upload([BindRequired] IFormFile saveFile)
-    // {
-    //     if (saveFile == null || saveFile.Length == 0)
-    //         return BadRequest("No file received");
-
-    //     byte[] fileBytes;
-    //     using (var ms = new MemoryStream())
-    //     {
-    //         await saveFile.CopyToAsync(ms);
-    //         fileBytes = ms.ToArray();
-    //     }
-
-    //     var flags = await LocalSaveService.UploadNewSave(fileBytes, saveFile.FileName);
-
-    //     return await DataDTO.FromDataUpdateFlags(flags);
-    // }
 
     [HttpGet("{saveId}/download")]
     public async Task<ActionResult> Download(uint saveId)

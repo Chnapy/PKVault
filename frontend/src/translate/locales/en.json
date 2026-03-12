@@ -3,7 +3,7 @@
   "header.storage": "Storage",
   "header.dex": "Pokedex",
   "header.help": "Help",
-  "header.scan-saves": "Scan saves",
+  "header.scan-saves": "Scan all data & saves",
   "header.settings": "Backups & Settings",
   "header.notifications.help": "No notifications",
   "notifications.errors": "{{count}} errors",
@@ -203,7 +203,7 @@
   "storage.save-actions.type.sort-pkm": "Sort pokemons",
   "storage.save-actions.type.dex-sync": "Pokedex synchronize",
   "storage.save-actions.type.data-normalize": "Data files normalize (update, clean)",
-  "storage.save-actions.type.update-external-pkm": "Read {{count}} external PKM files",
+  "storage.save-actions.type.update-external-pkm": "Read {{addCount}} external PKM files / remove {{removeCount}}",
   "storage.actions.release": "Release",
   "notifications.warnings.update": "New PKVault update {{variant}}"
 }

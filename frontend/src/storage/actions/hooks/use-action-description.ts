@@ -90,7 +90,8 @@ export const useActionDescription = () => {
             [ DataActionType.DATA_NORMALIZE ]: () => t('storage.save-actions.type.data-normalize'),
             [ DataActionType.UPDATE_EXTERNAL_PKM ]: () =>
                 t('storage.save-actions.type.update-external-pkm', {
-                    count: Number(parameters[ 0 ]),
+                    addCount: Number(parameters[ 0 ]),
+                    removeCount: Number(parameters[ 1 ]),
                 }),
         })();
     };

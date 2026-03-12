@@ -18,11 +18,11 @@ public class ActionService(
         );
     }
 
-    public async Task<DataUpdateFlags> UpdateExtraPkm(UpdateExtraPkmActionInput input, IServiceScope scope)
+    public async Task<DataUpdateFlags> UpdateExternalPkm(UpdateExternalPkmActionInput input, IServiceScope scope)
     {
         return await AddAction(
             scope,
-            (scope) => scope.ServiceProvider.GetRequiredService<UpdateExtraPkmAction>(),
+            (scope) => scope.ServiceProvider.GetRequiredService<UpdateExternalPkmAction>(),
             input
         );
     }

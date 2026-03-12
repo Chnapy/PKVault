@@ -10,7 +10,7 @@ public interface ISessionService : ISessionServiceMinimal
     public bool HasEmptyActionList();
     public List<DataActionPayload> GetActionPayloadList();
 
-    public Task StartNewSession(bool checkInitialActions);
+    public Task<DataUpdateFlags?> StartNewSession(bool checkInitialActions);
     public Task PersistSession(IServiceScope scope);
 }
 
@@ -41,7 +41,7 @@ public class SessionService(
 
     public DateTime? StartTime { get; private set; }
 
-    private Task? StartTask = null;
+    private Task<DataUpdateFlags?>? StartTask = null;
 
     // bypass DB check if same as DB.ContextId
     private Guid? ByPassContextId = null;
@@ -60,7 +60,7 @@ public class SessionService(
         return Actions.Count == 0;
     }
 
-    public async Task StartNewSession(bool checkInitialActions)
+    public async Task<DataUpdateFlags?> StartNewSession(bool checkInitialActions)
     {
         StartTime = timeProvider.GetUtcNow().DateTime;
 
@@ -83,43 +83,49 @@ public class SessionService(
                 ByPassContextId = scope.ServiceProvider.GetRequiredService<SessionDbContext>()
                     .ContextId.InstanceId;
 
-                var dataNormalized = await CheckDataToNormalize(scope);
+                var dataNormalizedFlags = await CheckDataToNormalize(scope);
 
                 await CheckSaveToSynchronize(scope);
 
-                if (dataNormalized)
+                if (dataNormalizedFlags != null)
                 {
                     await CheckFirstRunAutoSave(scope);
                 }
 
                 ByPassContextId = null;
+
+                return dataNormalizedFlags;
             }
+
+            return null;
         });
 
-        await StartTask;
+        return await StartTask;
     }
 
-    private async Task<bool> CheckDataToNormalize(IServiceScope scope)
+    private async Task<DataUpdateFlags?> CheckDataToNormalize(IServiceScope scope)
     {
         var actionService = scope.ServiceProvider.GetRequiredService<ActionService>();
         var dataNormalizeAction = scope.ServiceProvider.GetRequiredService<DataNormalizeAction>();
-        var updateExtraPkmAction = scope.ServiceProvider.GetRequiredService<UpdateExtraPkmAction>();
+        var updateExternalPkmAction = scope.ServiceProvider.GetRequiredService<UpdateExternalPkmAction>();
 
         var hasDataToNormalize = await dataNormalizeAction.HasDataToNormalize();
 
+        DataUpdateFlags? flags = null;
+
         if (hasDataToNormalize)
         {
-            await actionService.DataNormalize(scope);
+            flags = await actionService.DataNormalize(scope);
         }
 
-        var extraPkmsToUpdateInput = await updateExtraPkmAction.HasExtraPkmsToUpdate();
+        var externalPkmsToUpdateInput = await updateExternalPkmAction.HasExternalPkmsToUpdate();
 
-        if (extraPkmsToUpdateInput.ExtraPkmsToAdd.Length > 0)
+        if (externalPkmsToUpdateInput.ShouldRun)
         {
-            await actionService.UpdateExtraPkm(extraPkmsToUpdateInput, scope);
+            flags = await actionService.UpdateExternalPkm(externalPkmsToUpdateInput, scope);
         }
 
-        return hasDataToNormalize || extraPkmsToUpdateInput.ExtraPkmsToAdd.Length > 0;
+        return flags;
     }
 
     private async Task CheckSaveToSynchronize(IServiceScope scope)
