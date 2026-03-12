@@ -36,6 +36,9 @@
   "settings.form.saves.test.title": "{{count}} Dateien gefunden",
   "settings.form.saves.add-file": "Spielstand hinzufügen",
   "settings.form.saves.add-folder": "Spielstand-Ordner hinzufügen",
+  "settings.form.pkms-external": "Speicherorte externer PKM-Dateien",
+  "settings.form.pkms-external.add-file": "Füge eine PKM-Datei hinzu",
+  "settings.form.pkms-external.add-folder": "Fügen Sie ein PKM-Verzeichnis hinzu",
   "action.cancel": "Abbrechen",
   "action.submit": "Anwenden",
   "action.check-storage": "Lager prüfen",
@@ -90,6 +93,8 @@
   "details.load-error.4": "Dateizugriff verweigert",
   "details.legality.1": "Fragen der Legalität:",
   "details.legality.2": "Diese Probleme lassen sich mit PKHeX lösen.",
+  "details.external-pkm-file.1": "Externe PKM-Datei geladen von",
+  "details.external-pkm-file.2": "Externe Dateien können nicht bearbeitet oder gelöscht werden.",
   "storage.move.attached-pkm": "Verknüpftes Verschieben benötigt einen freien Slot",
   "storage.move.box-cannot": "Box {{name}} kann kein Pokemon aufnehmen",
   "storage.move.pkm-cannot": "Pokemon {{name}} kann nicht verschoben werden",
@@ -198,6 +203,7 @@
   "storage.save-actions.type.sort-pkm": "Pokemons sortieren",
   "storage.save-actions.type.dex-sync": "Pokedex synchronisieren",
   "storage.save-actions.type.data-normalize": "Datendateien normalisieren (aktualisieren, bereinigen)",
+  "storage.save-actions.type.update-external-pkm": "{{count}} externe PKM-Dateien gelesen",
   "storage.actions.release": "Freilassen",
   "notifications.warnings.update": "Neue PKVault-Version verfügbar: {{variant}}"
 }

@@ -5,7 +5,7 @@ import {
   useSaveInfosGetAll
 } from "../../data/sdk/save-infos/save-infos.gen";
 import { withErrorCatcher } from '../../error/with-error-catcher';
-import { useDesktopMessage } from '../../settings/save-globs/hooks/use-desktop-message';
+import { useDesktopMessage } from '../../settings/globs-input/hooks/use-desktop-message';
 import { Button, ButtonExternalLink } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
 import { SaveCardContentFull } from '../../ui/save-card/save-card-content-full';

@@ -10,7 +10,7 @@ import { Container } from '../../ui/container/container';
 import { TitledContainer } from '../../ui/container/titled-container';
 import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
-import { useDesktopMessage } from '../save-globs/hooks/use-desktop-message';
+import { useDesktopMessage } from '../globs-input/hooks/use-desktop-message';
 
 export const Backup: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();

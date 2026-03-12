@@ -1,20 +1,20 @@
+import { css } from '@emotion/css';
 import React from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
-import { useTranslate } from '../../translate/i18n';
 import { theme } from '../../ui/theme';
 import { isDesktop } from './hooks/use-desktop-message';
-import { SaveGlobsAdd } from './save-globs-add';
-import { SaveGlobsItem } from './save-globs-item';
-import { css } from '@emotion/css';
+import { GlobsInputAdd } from './globs-input-add';
+import { GlobsInputItem } from './globs-input-item';
 
-type SaveGlobsListProps = Omit<UseFormRegisterReturn, 'onChange'> & {
+export type GlobsInputListProps = Omit<UseFormRegisterReturn, 'onChange'> & {
+    labelList: React.ReactNode;
+    labelAddFile: React.ReactNode;
+    labelAddFolder: React.ReactNode;
     value: string;
     onChange: (value: string) => void;
 };
 
-export const SaveGlobsList: React.FC<SaveGlobsListProps> = ({ value, onChange, disabled }) => {
-    const { t } = useTranslate();
-
+export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, labelAddFile, labelAddFolder, value, onChange, disabled }) => {
     const splitedValue = value.split('\n').map(value => value.trim()).filter(Boolean);
 
     return <div
@@ -36,7 +36,7 @@ export const SaveGlobsList: React.FC<SaveGlobsListProps> = ({ value, onChange, d
                 textShadow: theme.shadow.textlight,
             })}
         >
-            {t('settings.form.saves')}
+            {labelList}
         </div>
 
         <div
@@ -61,7 +61,7 @@ export const SaveGlobsList: React.FC<SaveGlobsListProps> = ({ value, onChange, d
                     overflow: 'auto',
                 })}
             >
-                {splitedValue.map((value, i) => <SaveGlobsItem key={i}
+                {splitedValue.map((value, i) => <GlobsInputItem key={i}
                     value={value}
                     onEdit={newValue => {
                         const newValues = [ ...splitedValue ];
@@ -87,7 +87,8 @@ export const SaveGlobsList: React.FC<SaveGlobsListProps> = ({ value, onChange, d
             >
                 {isDesktop
                     ? <>
-                        <SaveGlobsAdd
+                        <GlobsInputAdd
+                            label={labelAddFile}
                             type='file'
                             onAdd={newValue => {
                                 const newValues = [ ...splitedValue, ...newValue ];
@@ -95,7 +96,8 @@ export const SaveGlobsList: React.FC<SaveGlobsListProps> = ({ value, onChange, d
                             }}
                             disabled={disabled}
                         />
-                        <SaveGlobsAdd
+                        <GlobsInputAdd
+                            label={labelAddFolder}
                             type='folder'
                             onAdd={newValue => {
                                 const newValues = [ ...splitedValue, ...newValue ];
@@ -104,7 +106,8 @@ export const SaveGlobsList: React.FC<SaveGlobsListProps> = ({ value, onChange, d
                             disabled={disabled}
                         />
                     </>
-                    : <SaveGlobsAdd
+                    : <GlobsInputAdd
+                        label={labelAddFile}
                         type='file'
                         onAdd={newValue => {
                             const newValues = [ ...splitedValue, ...newValue ];

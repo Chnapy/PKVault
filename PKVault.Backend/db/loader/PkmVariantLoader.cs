@@ -5,6 +5,7 @@ public record PkmVariantLoaderAddPayload(
     string BoxId,
     int BoxSlot,
     bool IsMain,
+    bool IsExternal,
     uint? AttachedSaveId,
     string? AttachedSavePkmIdBase,
     byte Generation,
@@ -85,6 +86,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
             BoxId: int.Parse(entity.BoxId),
             BoxSlot: entity.BoxSlot,
             IsMain: entity.IsMain,
+            IsExternal: entity.IsExternal,
             AttachedSaveId: entity.AttachedSaveId,
             AttachedSavePkmIdBase: entity.AttachedSavePkmIdBase,
 
@@ -277,6 +279,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
             BoxId = payload.BoxId,
             BoxSlot = payload.BoxSlot,
             IsMain = payload.IsMain,
+            IsExternal = payload.IsExternal,
             AttachedSaveId = payload.AttachedSaveId,
             AttachedSavePkmIdBase = payload.AttachedSavePkmIdBase,
             Generation = payload.Generation,

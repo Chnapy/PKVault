@@ -36,6 +36,9 @@
   "settings.form.saves.test.title": "{{count}} fichiers",
   "settings.form.saves.add-file": "Ajouter une sauvegarde",
   "settings.form.saves.add-folder": "Ajouter un dossier de sauvegardes",
+  "settings.form.pkms-external": "Emplacements des fichiers PKM externes",
+  "settings.form.pkms-external.add-file": "Ajouter un fichier PKM",
+  "settings.form.pkms-external.add-folder": "Ajouter un dossier PKM",
   "action.cancel": "Annuler",
   "action.submit": "Valider",
   "action.check-storage": "Vérifier le stockage",
@@ -90,6 +93,8 @@
   "details.load-error.4": "Accès au fichier refusé",
   "details.legality.1": "Illégalités:",
   "details.legality.2": "Vous pouvez corriger ces illégalités avec PKHeX.",
+  "details.external-pkm-file.1": "Fichier PKM externe chargé depuis",
+  "details.external-pkm-file.2": "Les fichiers externes ne peuvent pas être modifiés ni supprimés.",
   "storage.move.attached-pkm": "Un déplacement rattaché doit cibler un emplacement vide",
   "storage.move.box-cannot": "La boîte \"{{name}}\" ne peut pas recevoir de pokemon",
   "storage.move.pkm-cannot": "Le pokemon {{name}} ne peut pas être déplacé",
@@ -198,6 +203,7 @@
   "storage.save-actions.type.sort-pkm": "Trier les pokemons",
   "storage.save-actions.type.dex-sync": "Synchroniser les Pokedex",
   "storage.save-actions.type.data-normalize": "Normalisation des fichiers (mise à jour, nettoyage)",
+  "storage.save-actions.type.update-external-pkm": "Lecture de {{count}} fichiers PKM externes",
   "storage.actions.release": "Relacher",
   "notifications.warnings.update": "Nouvelle variant PKVault {{variant}}"
 }

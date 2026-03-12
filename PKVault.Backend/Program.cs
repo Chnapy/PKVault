@@ -210,6 +210,7 @@ public class Program
 
         Console.WriteLine($"Setup services - Actions");
         services.AddScoped<DataNormalizeAction>();
+        services.AddScoped<UpdateExtraPkmAction>();
         services.AddScoped<SynchronizePkmAction>();
         services.AddScoped<MainCreateBoxAction>();
         services.AddScoped<MainUpdateBoxAction>();

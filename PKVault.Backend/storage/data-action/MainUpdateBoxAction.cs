@@ -22,6 +22,12 @@ public class MainUpdateBoxAction(
         }
 
         var box = await boxLoader.GetEntity(input.boxId);
+        var bank = await bankLoader.GetEntity(box.BankId);
+
+        if (bank.IsExternal)
+        {
+            throw new ArgumentException($"Box from bank dedicated to external pkms cannot be edited");
+        }
 
         var order = input.order;
 
@@ -34,7 +40,6 @@ public class MainUpdateBoxAction(
             }
 
             // edit previous bank view: remove this box
-            var bank = await bankLoader.GetEntity(box.BankId);
             if (bank.View.MainBoxIds.Contains(box.IdInt))
             {
                 bank.View = new(

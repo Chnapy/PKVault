@@ -11,6 +11,13 @@ public class EditPkmVariantAction(
     protected override async Task<DataActionPayload> Execute(EditPkmVariantActionInput input, DataUpdateFlags flags)
     {
         var pkmVariantEntity = await pkmVariantLoader.GetEntity(input.pkmVariantId);
+        var dto = await pkmVariantLoader.CreateDTO(pkmVariantEntity);
+
+        if (!dto.CanEdit)
+        {
+            throw new ArgumentException($"PkmVariant cannot be edited: {pkmVariantEntity.Id}");
+        }
+
         var pkmVariantPKM = await pkmVariantLoader.GetPKM(pkmVariantEntity);
 
         var availableMoves = await actionService.GetPkmAvailableMoves(null, input.pkmVariantId);

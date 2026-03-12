@@ -6,6 +6,7 @@ public class PkmVariantEntity : IEntity
     public required string BoxId { get; set; }
     public required int BoxSlot { get; set; }
     public required bool IsMain { get; set; }
+    public required bool IsExternal { get; set; }
     public required uint? AttachedSaveId { get; set; }
     public required string? AttachedSavePkmIdBase { get; set; }
     public required byte Generation { get; set; }

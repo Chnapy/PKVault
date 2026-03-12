@@ -10,14 +10,14 @@ import { PathLine } from '../path-line';
 import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
 import { css } from '@emotion/css';
 
-export type SaveGlobsItemProps = {
+export type GlobsInputItemProps = {
     value: string;
     onEdit: (value: string) => void;
     onRemove: () => void;
     disabled?: boolean;
 };
 
-export const SaveGlobsItem: React.FC<SaveGlobsItemProps> = ({ value, onEdit, onRemove, disabled }) => {
+export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ value, onEdit, onRemove, disabled }) => {
     const { t } = useTranslate();
 
     const desktopMessage = useDesktopMessage();

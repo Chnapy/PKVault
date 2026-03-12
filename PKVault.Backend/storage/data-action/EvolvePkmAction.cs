@@ -77,6 +77,13 @@ public class EvolvePkmAction(
         var staticData = await staticDataService.GetStaticData();
 
         var entity = await pkmVariantLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-variant not found");
+        var dto = await pkmVariantLoader.CreateDTO(entity);
+
+        if (!dto.CanEvolve)
+        {
+            throw new ArgumentException($"PkmVariant cannot evolve: {entity.Id}");
+        }
+
         var entityPkm = await pkmVariantLoader.GetPKM(entity);
 
         var relatedPkmVariants = await Task.WhenAll(

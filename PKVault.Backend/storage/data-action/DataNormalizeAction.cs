@@ -70,6 +70,7 @@ public class DataNormalizeAction(
                 IdInt = 0,
                 Name = "Bank 1",
                 IsDefault = true,
+                IsExternal = false,
                 Order = 0,
                 View = new([], [])
             });
@@ -160,6 +161,7 @@ public class DataNormalizeAction(
                     IdInt = e.IdInt,
                     Name = e.Name,
                     IsDefault = e.IsDefault,
+                    IsExternal = false,
                     Order = e.Order,
                     View = new(e.View.MainBoxIds, [..e.View.Saves.Select(s => new BankEntity.BankViewSave(
                         SaveId: s.SaveId,
@@ -187,6 +189,7 @@ public class DataNormalizeAction(
                     BoxId: e.BoxId.ToString(),
                     BoxSlot: e.BoxSlot,
                     IsMain: e.IsMain,
+                    IsExternal: false,
                     AttachedSaveId: e.AttachedSaveId,
                     AttachedSavePkmIdBase: e.AttachedSavePkmIdBase,
                     Generation: e.Generation,

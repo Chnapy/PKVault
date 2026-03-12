@@ -8,7 +8,7 @@ public record SettingsDTO(
     string SettingsPath,
     bool CanUpdateSettings,
     bool CanScanSaves,
-SettingsMutableDTO SettingsMutable
+    SettingsMutableDTO SettingsMutable
 )
 {
     public string GetStoragePath() => NormalizeSafePath(SettingsMutable.STORAGE_PATH);
@@ -37,6 +37,7 @@ SettingsMutableDTO SettingsMutable
 public record SettingsMutableDTO(
     string DB_PATH,
     string[] SAVE_GLOBS,
+    string[]? PKM_EXTERNAL_GLOBS,
     string STORAGE_PATH,
     string BACKUP_PATH,
     bool? HTTPS_NOCERT = null,

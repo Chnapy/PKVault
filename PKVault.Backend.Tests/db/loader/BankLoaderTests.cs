@@ -53,6 +53,7 @@ public class BankLoaderTests : IAsyncDisposable
             IdInt = 1,
             Name = "Test Bank",
             IsDefault = true,
+            IsExternal = false,
             Order = 0,
             View = new([], [])
         };
@@ -78,6 +79,7 @@ public class BankLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -107,6 +109,7 @@ public class BankLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -135,6 +138,7 @@ public class BankLoaderTests : IAsyncDisposable
                     Id = "1",
                     IdInt = 1,
                     IsDefault = true,
+            IsExternal = false,
                     Name = "Bank 1",
                     Order = 0,
                     View = new([], [])
@@ -144,6 +148,7 @@ public class BankLoaderTests : IAsyncDisposable
                     Id = "2",
                     IdInt = 2,
                     IsDefault = false,
+            IsExternal = false,
                     Name = "Bank 2",
                     Order = 1,
                     View = new([], [])
@@ -177,6 +182,7 @@ public class BankLoaderTests : IAsyncDisposable
                     Id = "1",
                     IdInt = 1,
                     IsDefault = true,
+            IsExternal = false,
                     Name = "Bank 1",
                     Order = 10,
                     View = new([], [])
@@ -186,6 +192,7 @@ public class BankLoaderTests : IAsyncDisposable
                     Id = "2",
                     IdInt = 2,
                     IsDefault = false,
+            IsExternal = false,
                     Name = "Bank 2",
                     Order = 5,
                     View = new([], [])
@@ -195,6 +202,7 @@ public class BankLoaderTests : IAsyncDisposable
                     Id = "3",
                     IdInt = 3,
                     IsDefault = false,
+            IsExternal = false,
                     Name = "Bank 3",
                     Order = 100,
                     View = new([], [])

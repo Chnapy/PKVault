@@ -1,19 +1,17 @@
+import { css } from '@emotion/css';
 import React from 'react';
-import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
 import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
-import { css } from '@emotion/css';
 
-export type SaveGlobsItemProps = {
+export type GlobsInputAddProps = {
+    label: React.ReactNode;
     type: 'file' | 'folder';
     onAdd: (paths: string[]) => void;
     disabled?: boolean;
 };
 
-export const SaveGlobsAdd: React.FC<SaveGlobsItemProps> = ({ type, onAdd, disabled }) => {
-    const { t } = useTranslate();
-
+export const GlobsInputAdd: React.FC<GlobsInputAddProps> = ({ label, type, onAdd, disabled }) => {
     const desktopMessage = useDesktopMessage();
 
     const onAddFn = async () => {
@@ -46,15 +44,15 @@ export const SaveGlobsAdd: React.FC<SaveGlobsItemProps> = ({ type, onAdd, disabl
     >
         <Icon name='plus' solid forButton />
         {!isDesktop
-            ? t('settings.form.saves.add-file')
+            ? label
             : (type === 'file'
                 ? <>
                     <Icon name='file-import' solid forButton />
-                    {t('settings.form.saves.add-file')}
+                    {label}
                 </>
                 : <>
                     <Icon name='folder' solid forButton />
-                    {t('settings.form.saves.add-folder')}
+                    {label}
                 </>)}
     </Button>;
 };

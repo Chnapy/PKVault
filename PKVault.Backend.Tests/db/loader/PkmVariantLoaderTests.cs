@@ -31,7 +31,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         mockSettings.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
             BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "app", SettingsPath: "",
             CanUpdateSettings: false, CanScanSaves: false, SettingsMutable: new(
-                DB_PATH: "mock-db", SAVE_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: "mock-bkp",
+                DB_PATH: "mock-db", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: "mock-bkp",
                 LANGUAGE: "en"
             )
         ));
@@ -104,6 +104,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -128,6 +129,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             BoxId: "1",
             BoxSlot: 0,
             IsMain: true,
+            IsExternal: false,
             AttachedSaveId: null,
             AttachedSavePkmIdBase: null,
             Generation: 3,
@@ -146,6 +148,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             BoxId = "1",
             BoxSlot = 0,
             IsMain = true,
+            IsExternal = false,
             AttachedSaveId = null,
             AttachedSavePkmIdBase = null,
 
@@ -193,6 +196,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -226,6 +230,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 BoxId = "1",
                 BoxSlot = 0,
                 IsMain = true,
+                IsExternal = false,
                 AttachedSaveId = null,
                 AttachedSavePkmIdBase = null,
 
@@ -274,6 +279,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -338,6 +344,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     BoxId = "1",
                     BoxSlot = 0,
                     IsMain = true,
+            IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -356,6 +363,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     BoxId = "1",
                     BoxSlot = 1,
                     IsMain = true,
+            IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -374,6 +382,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     BoxId = "2",
                     BoxSlot = 0,
                     IsMain = true,
+            IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -431,6 +440,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -477,6 +487,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     BoxId = "1",
                     BoxSlot = 0,
                     IsMain = true,
+            IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -495,6 +506,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     BoxId = "1",
                     BoxSlot = 1,
                     IsMain = true,
+            IsExternal = false,
                     AttachedSaveId = 200,
                     AttachedSavePkmIdBase = "foobar",
 
@@ -549,6 +561,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             BoxId = "1",
             BoxSlot = 0,
             IsMain = true,
+            IsExternal = false,
             AttachedSaveId = null,
             AttachedSavePkmIdBase = null,
 
@@ -603,6 +616,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             BoxId = "1",
             BoxSlot = 0,
             IsMain = true,
+            IsExternal = false,
             AttachedSaveId = null,
             AttachedSavePkmIdBase = null,
 
@@ -648,6 +662,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             BoxId = "1",
             BoxSlot = 0,
             IsMain = true,
+            IsExternal = false,
             AttachedSaveId = null,
             AttachedSavePkmIdBase = null,
 
@@ -704,6 +719,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -768,6 +784,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     BoxId = "1",
                     BoxSlot = 0,
                     IsMain = true,
+            IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -786,6 +803,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     BoxId = "1",
                     BoxSlot = 1,
                     IsMain = true,
+            IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -804,6 +822,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     BoxId = "2",
                     BoxSlot = 0,
                     IsMain = true,
+            IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -867,6 +886,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -891,6 +911,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             BoxId: "1",
             BoxSlot: 0,
             IsMain: true,
+            IsExternal: false,
             AttachedSaveId: null,
             AttachedSavePkmIdBase: null,
             Generation: 3,

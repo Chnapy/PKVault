@@ -34,29 +34,47 @@ export const BankItem: React.FC<{
   const boxes = boxesQuery.data?.data.filter(box => box.bankId === bank?.id).map(box => box.idInt) ?? [];
   const pkms = boxes.map(boxId => Object.values(pkmsQuery.data?.data.byBox[ boxId ] ?? {}).flat()).flat();
 
-  const canDelete = banks.length > 1;
+  const canEdit = !bank?.isExternal;
+  const canDelete = canEdit && banks.length > 1;
 
   const buttonMainContent = bank && (
     <div
       className={css({
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         textAlign: 'center',
       })}
     >
-      {bank.isDefault && (
-        <Icon
-          name='star'
-          solid
-          forButton
-          className={css({
-            alignSelf: 'flex-start',
-            marginRight: 4,
-          })}
-        />
-      )}
-      {bank.name}
-      <br />
+      <div className={css({
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 4,
+      })}>
+        <span>
+          {bank.isDefault && (
+            <Icon
+              name='star'
+              solid
+              forButton
+            />
+          )}
+        </span>
+
+        {bank.name}
+
+        <span>
+          {bank.isExternal && (
+            <Icon
+              name='external-link'
+              solid
+              forButton
+            />
+          )}
+        </span>
+      </div>
+
       {t('storage.bank.description', {
         boxCount: boxes.length,
         pkmCount: pkms.length,
@@ -111,6 +129,7 @@ export const BankItem: React.FC<{
         <div>
           <ButtonWithPopover
             panelContent={close => <BankEdit bankId={bankId} close={close} />}
+            disabled={!canEdit}
             loading={isLoading}
             className={css({
               borderTopLeftRadius: 0,

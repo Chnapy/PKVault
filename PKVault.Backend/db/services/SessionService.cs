@@ -103,13 +103,23 @@ public class SessionService(
     {
         var actionService = scope.ServiceProvider.GetRequiredService<ActionService>();
         var dataNormalizeAction = scope.ServiceProvider.GetRequiredService<DataNormalizeAction>();
+        var updateExtraPkmAction = scope.ServiceProvider.GetRequiredService<UpdateExtraPkmAction>();
 
-        if (await dataNormalizeAction.HasDataToNormalize())
+        var hasDataToNormalize = await dataNormalizeAction.HasDataToNormalize();
+
+        if (hasDataToNormalize)
         {
             await actionService.DataNormalize(scope);
-            return true;
         }
-        return false;
+
+        var extraPkmsToUpdateInput = await updateExtraPkmAction.HasExtraPkmsToUpdate();
+
+        if (extraPkmsToUpdateInput.ExtraPkmsToAdd.Length > 0)
+        {
+            await actionService.UpdateExtraPkm(extraPkmsToUpdateInput, scope);
+        }
+
+        return hasDataToNormalize || extraPkmsToUpdateInput.ExtraPkmsToAdd.Length > 0;
     }
 
     private async Task CheckSaveToSynchronize(IServiceScope scope)

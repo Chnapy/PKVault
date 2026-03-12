@@ -20,7 +20,7 @@ export const StorageBoxList: React.FC<{
     help?: React.ReactNode;
 }> = ({ selectedBoxes, boxes, pkms, onBoxChange, editPanelContent, deleteFn, addFn, help }) => {
     const maxBoxSlotCount = Math.max(0, ...boxes.map(box => box.slotCount));
-    const nbrItemsPerLine = SizingUtil.getItemsPerLine(maxBoxSlotCount);
+    const nbrItemsPerLine = Math.max(SizingUtil.getItemsPerLine(maxBoxSlotCount), 2);
 
     return (
         <div
@@ -31,6 +31,7 @@ export const StorageBoxList: React.FC<{
                 alignItems: 'flex-start',
                 flexWrap: 'wrap',
                 gap: SizingUtil.itemsGap,
+                padding: 2,
                 margin: 4,
                 marginTop: 8,
                 overflowY: 'auto',
@@ -53,6 +54,7 @@ export const StorageBoxList: React.FC<{
                         key={box.id}
                         className={css({
                             display: 'inline-flex',
+                            minHeight: 78,
                         })}
                         style={{ order: box.order }}
                     >
@@ -62,7 +64,6 @@ export const StorageBoxList: React.FC<{
                             className={css({
                                 zIndex: 1,
                                 borderTopRightRadius: 0,
-                                borderBottomRightRadius: 0,
                             })}
                         >
                             <div

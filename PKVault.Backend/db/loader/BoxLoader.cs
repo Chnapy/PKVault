@@ -74,6 +74,12 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         var pkmsToRemove = await pkmVariantLoader.GetEntitiesByBox(entity.Id);
         foreach (var pkm in pkmsToRemove.Values.SelectMany(entry => entry.Values))
         {
+            var dto = await pkmVariantLoader.CreateDTO(pkm);
+            if (!dto.CanDelete)
+            {
+                throw new ArgumentException($"PkmVariant cannot be deleted: {dto.Id}");
+            }
+
             await pkmVariantLoader.DeleteEntity(pkm);
         }
 

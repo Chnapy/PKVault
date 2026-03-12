@@ -36,6 +36,7 @@ export const setupTestDataServer = () => {
         name: '',
         order: 0,
         isDefault: false,
+        isExternal: false,
         view: { mainBoxIds: [], saves: [] },
         ...data,
     });
@@ -108,10 +109,12 @@ export const setupTestDataServer = () => {
         canMoveToSave: true,
         canEdit: true,
         canEvolve: true,
+        canCreateVariant: true,
         hasLoadError: false,
         isEnabled: true,
 
         isMain: true,
+        isExternal: false,
         isFilePresent: true,
         filepath: '',
         filepathAbsolute: '',

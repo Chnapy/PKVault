@@ -52,6 +52,7 @@ public class BoxLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -90,6 +91,7 @@ public class BoxLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -130,6 +132,7 @@ public class BoxLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -168,6 +171,7 @@ public class BoxLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -222,6 +226,7 @@ public class BoxLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -287,6 +292,7 @@ public class BoxLoaderTests : IAsyncDisposable
                     Id = "1",
                     IdInt = 1,
                     IsDefault = true,
+            IsExternal = false,
                     Name = "Bank 1",
                     Order = 0,
                     View = new([], [])
@@ -296,6 +302,7 @@ public class BoxLoaderTests : IAsyncDisposable
                     Id = "2",
                     IdInt = 2,
                     IsDefault = true,
+            IsExternal = false,
                     Name = "Bank 2",
                     Order = 0,
                     View = new([], [])

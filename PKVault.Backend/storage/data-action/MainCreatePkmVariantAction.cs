@@ -23,9 +23,11 @@ public class MainCreatePkmVariantAction(
             throw new ArgumentException($"Pkm-version original not found, pkmVariant.id={input.PkmVariantId} generation={input.Generation}");
         }
 
-        if (!pkmVariantOrigin.IsMain)
+        var dto = await pkmVariantLoader.CreateDTO(pkmVariantOrigin);
+
+        if (!dto.CanCreateVariant)
         {
-            throw new ArgumentException($"Pkm-version should have IsMain=true, pkmVariant.id={input.PkmVariantId} generation={input.Generation}");
+            throw new ArgumentException($"PkmVersion cannot create new variant: pkmVariant.id={input.PkmVariantId} generation={input.Generation}");
         }
 
         var pkmVariants = (await pkmVariantLoader.GetEntitiesByBox(pkmVariantOrigin.BoxId, pkmVariantOrigin.BoxSlot)).Values.ToList();
@@ -47,6 +49,7 @@ public class MainCreatePkmVariantAction(
             BoxId: pkmVariantOrigin.BoxId,
             BoxSlot: pkmVariantOrigin.BoxSlot,
             IsMain: false,
+            IsExternal: false,
             AttachedSaveId: null,
             AttachedSavePkmIdBase: null,
             Generation: input.Generation,

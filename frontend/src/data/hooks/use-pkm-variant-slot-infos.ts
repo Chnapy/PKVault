@@ -35,7 +35,7 @@ export const usePkmVariantSlotInfos = (baseVariantId: string | undefined) => {
     const attachedSavePkm = attachedVariant ? pkmSavePkmQuery.data?.data.byIdBase[ attachedVariant.attachedSavePkmIdBase! ]?.[ 0 ] : undefined;
 
     const canCreateVariants =
-        attachedVariant || !mainVariant.isEnabled
+        attachedVariant || !mainVariant.canCreateVariant
             ? []
             : [
                 ...new Set(
