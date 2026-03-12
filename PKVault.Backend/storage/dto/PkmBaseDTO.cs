@@ -71,8 +71,8 @@ public abstract record PkmBaseDTO(
     public virtual bool CanDelete => true;
     public virtual bool CanMoveToSave => IsEnabled && Pkm.Version > 0 && Pkm.Generation > 0 && CanMove;
 
-    public bool CanEdit => IsEnabled && !IsEgg;
-    public bool CanEvolve
+    public virtual bool CanEdit => IsEnabled && !IsEgg;
+    public virtual bool CanEvolve
     {
         get
         {

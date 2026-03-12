@@ -123,7 +123,8 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
                             // remove them can break data
                             const cannotBeRemoved = ([
                                 DataActionType.DATA_NORMALIZE,
-                                DataActionType.PKM_SYNCHRONIZE
+                                DataActionType.PKM_SYNCHRONIZE,
+                                DataActionType.UPDATE_EXTERNAL_PKM,
                             ] as number[]).includes(action.type);
 
                             return <tr key={i}>

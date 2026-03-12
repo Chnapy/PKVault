@@ -33,6 +33,7 @@ public class MainCreateBankAction(
             IdInt = id,
             Name = name,
             IsDefault = false,
+            IsExternal = false,
             Order = order, // normalized just after
             View = new(MainBoxIds: [], Saves: [])
         });

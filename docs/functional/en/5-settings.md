@@ -10,6 +10,10 @@ Once the session is validated, actions affecting saves modify the save files dir
 Language change impacts the display as well as the language used to display static pokemon data (species name, types, moves, etc).
 Language change does not impact the language of your saves.
 
+External pokemon files (`.pk3`, `.pa9`, etc) can be used from outside PKVault environment.
+You can provide multiple paths of files and folders targeting them.
+PKVault will read them at each launch, and create pokemons variants, banks and boxes reflecting file structure of these external files.
+
 Advanced parameters: you can change several paths used by default, defined in [Technical Considerations](./0-technical.md#files-manipulated).
 
 ## Backups

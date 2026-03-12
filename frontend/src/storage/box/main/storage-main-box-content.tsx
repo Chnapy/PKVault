@@ -185,16 +185,20 @@ export const StorageMainBoxContent: React.FC<{
                                     }
                                     setShowBoxes(false);
                                 }}
-                                editPanelContent={(boxId, close) => <StorageBoxEdit boxId={boxId} close={close} />}
-                                deleteFn={boxId => boxDeleteMutation.mutateAsync({ boxId })}
-                                addFn={
-                                    selectedBankBoxes.data &&
-                                    (() =>
+                                editPanelContent={selectedBankBoxes.data?.selectedBank.isExternal
+                                    ? undefined
+                                    : (boxId, close) => <StorageBoxEdit boxId={boxId} close={close} />}
+                                deleteFn={selectedBankBoxes.data?.selectedBank.isExternal
+                                    ? undefined
+                                    : (boxId) => boxDeleteMutation.mutateAsync({ boxId })}
+                                addFn={selectedBankBoxes.data && !selectedBankBoxes.data.selectedBank.isExternal
+                                    ? (() =>
                                         boxCreateMutation.mutateAsync({
                                             params: {
                                                 bankId: selectedBankBoxes.data.selectedBank.id,
                                             },
                                         }))
+                                    : undefined
                                 }
                                 help={<HelpButton slug='3-storage.md#banks-and-boxes' />}
                             />

@@ -88,6 +88,11 @@ export const useActionDescription = () => {
             [ DataActionType.SORT_PKM ]: () => t('storage.save-actions.type.sort-pkm'),
             [ DataActionType.DEX_SYNC ]: () => t('storage.save-actions.type.dex-sync'),
             [ DataActionType.DATA_NORMALIZE ]: () => t('storage.save-actions.type.data-normalize'),
+            [ DataActionType.UPDATE_EXTERNAL_PKM ]: () =>
+                t('storage.save-actions.type.update-external-pkm', {
+                    addCount: Number(parameters[ 0 ]),
+                    removeCount: Number(parameters[ 1 ]),
+                }),
         })();
     };
 };

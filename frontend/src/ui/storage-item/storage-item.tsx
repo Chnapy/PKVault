@@ -26,6 +26,7 @@ export type StorageItemProps =
     isShiny?: boolean;
     isShadow?: boolean;
     isStarter?: boolean;
+    isExternal?: boolean;
     heldItem?: number;
     warning?: boolean;
     level?: number;
@@ -54,6 +55,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   isShiny,
   isShadow,
   isStarter,
+  isExternal,
   heldItem = 0,
   warning,
   level,
@@ -174,6 +176,8 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
             {nbrVariants > 1 && renderBubble(theme.bg.dark, nbrVariants)}
           </div>
           : null}
+
+        {isExternal && renderBubble(theme.bg.dark, <Icon name='external-link' solid forButton />)}
       </div>
 
       <div

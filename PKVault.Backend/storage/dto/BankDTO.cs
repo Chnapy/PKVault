@@ -3,6 +3,7 @@ public record BankDTO(
     int IdInt,
     string Name,
     bool IsDefault,
+    bool IsExternal,
     int Order,
     BankEntity.BankView View
 ) : IWithId;

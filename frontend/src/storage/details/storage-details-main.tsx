@@ -7,7 +7,8 @@ import { usePkmVariantSlotInfos } from '../../data/hooks/use-pkm-variant-slot-in
 import { PKMLoadError } from '../../data/sdk/model';
 import { useStorageMainDeletePkmVariant } from '../../data/sdk/storage/storage.gen';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
-import { useDesktopMessage } from '../../settings/save-globs/hooks/use-desktop-message';
+import { useDesktopMessage } from '../../settings/globs-input/hooks/use-desktop-message';
+import { PathLine } from '../../settings/path-line';
 import { useTranslate } from '../../translate/i18n';
 import { DetailsTab } from '../../ui/details-card/details-tab';
 import { Icon } from '../../ui/icon/icon';
@@ -116,6 +117,21 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
             {...pkmLegality}
             idBase={pkmVariant.id}
             reports={<>
+                {pkmVariant.isExternal && <TextContainer
+                    bgColor={theme.bg.dark}
+                    maxHeight={200}
+                    className={css({
+                        minHeight: '1lh',
+                        flexShrink: 0.1,
+                    })}
+                >
+                    <Icon name='external-link' forButton />{' '}
+                    {t('details.external-pkm-file.1')}
+                    <PathLine>{pkmVariant.filepathAbsolute}</PathLine>
+                    <br />
+                    {t('details.external-pkm-file.2')}
+                </TextContainer>}
+
                 {pkmVariant.loadError && !pkmVariant.isEnabled && <TextContainer
                     bgColor={theme.bg.red}
                     maxHeight={200}

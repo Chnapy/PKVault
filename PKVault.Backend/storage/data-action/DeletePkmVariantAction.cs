@@ -14,6 +14,13 @@ public class DeletePkmVariantAction(
         async Task<DataActionPayload> act(string pkmVariantId)
         {
             var pkmVariant = await pkmVariantLoader.GetEntity(pkmVariantId);
+            var dto = await pkmVariantLoader.CreateDTO(pkmVariant);
+
+            if (!dto.CanDelete)
+            {
+                throw new ArgumentException($"PkmVariant cannot be released: {pkmVariant.Id}");
+            }
+
             var pkm = await pkmVariantLoader.GetPKM(pkmVariant);
 
             await pkmVariantLoader.DeleteEntity(pkmVariant);

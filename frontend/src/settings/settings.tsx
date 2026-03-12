@@ -13,8 +13,8 @@ import { Icon } from '../ui/icon/icon';
 import { SelectStringInput } from '../ui/input/select-input';
 import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
-import { useDesktopMessage } from './save-globs/hooks/use-desktop-message';
-import { SaveGlobsList } from './save-globs/save-globs-list';
+import { GlobsInputList } from './globs-input/globs-input-list';
+import { useDesktopMessage } from './globs-input/hooks/use-desktop-message';
 
 export const Settings: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
@@ -29,12 +29,18 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
     const settings = settingsQuery.data?.data;
     const settingsMutable = settings?.settingsMutable;
 
-    const defaultValue = React.useMemo(() => settingsMutable && ({
+    type SettingsFormData = Omit<SettingsMutableDTO, 'savE_GLOBS' | 'pkM_EXTERNAL_GLOBS'> & {
+        savE_GLOBS: string;
+        pkM_EXTERNAL_GLOBS: string;
+    };
+
+    const defaultValue = React.useMemo((): SettingsFormData | undefined => settingsMutable && ({
         ...settingsMutable,
         savE_GLOBS: settingsMutable.savE_GLOBS.join('\n'),
+        pkM_EXTERNAL_GLOBS: settingsMutable.pkM_EXTERNAL_GLOBS?.join('\n') ?? ''
     }), [ settingsMutable ]);
 
-    const { register, watch, reset, setValue, getValues, handleSubmit, formState } = useForm<Omit<SettingsMutableDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
+    const { register, watch, reset, setValue, getValues, handleSubmit, formState } = useForm<SettingsFormData>({
         defaultValues: defaultValue
     });
 
@@ -46,7 +52,8 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
         await settingsMutation.mutateAsync({
             data: {
                 ...data,
-                savE_GLOBS: data.savE_GLOBS.split('\n').map(value => value.trim()).filter(Boolean)
+                savE_GLOBS: data.savE_GLOBS.split('\n').map(value => value.trim()).filter(Boolean),
+                pkM_EXTERNAL_GLOBS: data.pkM_EXTERNAL_GLOBS.split('\n').map(value => value.trim()).filter(Boolean)
             },
         });
     });
@@ -135,10 +142,30 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                 </div>
             </div>
 
-            <SaveGlobsList
+            <GlobsInputList
+                labelList={t('settings.form.saves')}
+                labelAddFile={t('settings.form.saves.add-file')}
+                labelAddFolder={t('settings.form.saves.add-folder')}
                 {...register('savE_GLOBS')}
                 value={watch('savE_GLOBS')}
                 onChange={(value) => setValue('savE_GLOBS', value)}
+                disabled={!settings.canUpdateSettings}
+            />
+
+            <GlobsInputList
+                labelList={<div className={css({
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                })}>
+                    {t('settings.form.pkms-external')}
+                    <Icon name='external-link' forButton />
+                </div>}
+                labelAddFile={t('settings.form.pkms-external.add-file')}
+                labelAddFolder={t('settings.form.pkms-external.add-folder')}
+                {...register('pkM_EXTERNAL_GLOBS')}
+                value={watch('pkM_EXTERNAL_GLOBS')}
+                onChange={(value) => setValue('pkM_EXTERNAL_GLOBS', value)}
                 disabled={!settings.canUpdateSettings}
             />
 

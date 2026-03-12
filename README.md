@@ -47,6 +47,7 @@ This tool can be used as:
   - edit pokemon moves, EVs & nickname
   - evolve pokemons requiring trade or trade + held-item (ex. Kadabra -> Alakazam)
   - link a save pokemon with all his variants, sharing data like exp & EVs
+  - use of external PKM files, outside PKVault environment
   - backup all saves & storage before any save action
     - backups listing
     - backups restore always possible

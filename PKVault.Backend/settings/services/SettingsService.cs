@@ -117,6 +117,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         settings = new(
             DB_PATH: "./tmp/db",
             SAVE_GLOBS: [],
+            PKM_EXTERNAL_GLOBS: [],
             STORAGE_PATH: "./tmp/storage",
             BACKUP_PATH: "./tmp/backup",
             HTTPS_NOCERT: false
@@ -125,6 +126,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         settings = new(
             DB_PATH: "./db",
             SAVE_GLOBS: [],
+            PKM_EXTERNAL_GLOBS: [],
             STORAGE_PATH: "./storage",
             BACKUP_PATH: "./backup"
         );

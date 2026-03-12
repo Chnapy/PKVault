@@ -14,6 +14,10 @@ Elles permettent également de définir des "vues", de sorte à ce que la sélec
 
 La banque par défaut est sélectionnée lors du lancement de l'app.
 
+Certaines banques peuvent être dédiées aux pokémons externes.
+Ces banques spécifiques ne peuvent pas être éditées manuellement.
+Elles sont gérées par l'arborescence des fichiers externes.
+
 Actions possibles liées aux banques:
 
 <details>
@@ -103,6 +107,12 @@ Ce système trouve son intérêt avec l'utilisation de variantes: lorsqu'une syn
 Il est alors possible d'utiliser un même pokémon dans plusieurs jeux, et le voir progresser au fil des générations.
 
 Un pokemon ne peut être attaché qu'à une sauvegarde à la fois.
+
+## Pokémons externes
+
+Des fichiers pokémon externes (`.pk3`, `.pa9`, etc) peuvent être utilisés depuis l'extérieur de PKVault.
+
+Ces variants particuliers ne peuvent pas être édités ni supprimés depuis PKVault, et les actions possibles sont limitées.
 
 ## Actions sur les pokémons
 

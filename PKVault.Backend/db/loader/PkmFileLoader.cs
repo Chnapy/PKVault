@@ -7,7 +7,7 @@ public interface IPkmFileLoader
     public Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool updated = true, bool checkPkm = true);
     public Task<List<string>> GetEnabledFilepaths();
     public Task WriteToFiles();
-    public Task<ImmutablePKM> CreatePKM(PkmFileEntity entity, byte generation);
+    public ImmutablePKM CreatePKM(PkmFileEntity entity, byte generation);
     public byte[] GetPKMBytes(ImmutablePKM pkm);
     public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves);
 }
@@ -20,6 +20,37 @@ public class PkmFileLoader : IPkmFileLoader
         var speciesName = GameInfo.Strings.Species[pkm.Species].ToUpperInvariant().Replace(":", "");
         var id = pkm.GetPKMIdBase(evolves);
         return $"{pkm.Species:0000}{star} - {speciesName} - {id}.{pkm.Extension}";
+    }
+
+    public static async Task<PkmFileEntity> LoadPkmFile(IFileIOService fileIOService, PkmFileEntity pkmFile)
+    {
+        var filepath = Path.Combine(SettingsService.GetAppDirectory(), pkmFile.Filepath);
+
+        try
+        {
+            var (TooSmall, TooBig) = fileIOService.CheckGameFile(filepath);
+
+            if (TooBig)
+                throw new PKMLoadException(PKMLoadError.TOO_BIG);
+
+            if (TooSmall)
+                throw new PKMLoadException(PKMLoadError.TOO_SMALL);
+
+            pkmFile.Data = await fileIOService.ReadBytes(filepath);
+            pkmFile.Error = null;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+
+            pkmFile.Data = [];
+            pkmFile.Error = GetPKMLoadError(ex);
+        }
+
+        pkmFile.Updated = false;
+        pkmFile.Deleted = false;
+
+        return pkmFile;
     }
 
     public bool EnableLog = true;
@@ -134,7 +165,7 @@ public class PkmFileLoader : IPkmFileLoader
         );
     }
 
-    public async Task<ImmutablePKM> CreatePKM(PkmFileEntity entity, byte generation)
+    public ImmutablePKM CreatePKM(PkmFileEntity entity, byte generation)
     {
         var filepath = entity.Filepath;
 

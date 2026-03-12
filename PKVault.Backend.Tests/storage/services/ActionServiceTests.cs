@@ -137,7 +137,7 @@ public class ActionServiceTests
         mockSettingsService.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
             BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "", SettingsPath: "",
             CanUpdateSettings: false, CanScanSaves: false, SettingsMutable: new(
-                DB_PATH: "mock-db", SAVE_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: backupPath,
+                DB_PATH: "mock-db", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: backupPath,
                 LANGUAGE: "en"
             )
         ));

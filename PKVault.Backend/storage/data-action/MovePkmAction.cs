@@ -359,6 +359,18 @@ public class MovePkmAction(
             throw new ArgumentException($"PkmVariantEntity not found for generation={saveLoaders.Save.Generation}");
         }
 
+        var dto = await pkmVariantLoader.CreateDTO(pkmVariant);
+
+        if (input.attached && !dto.CanMoveAttachedToSave)
+        {
+            throw new ArgumentException($"PkmVariant cannot be moved attached to a save: {pkmVariant.Id}");
+        }
+
+        if (!dto.CanMoveToSave)
+        {
+            throw new ArgumentException($"PkmVariant cannot be moved to a save: {pkmVariant.Id}");
+        }
+
         var attachedPkmVariant = relatedPkmVariants.Find(version => version.AttachedSaveId != default);
         if (attachedPkmVariant != null)
         {
@@ -434,6 +446,7 @@ public class MovePkmAction(
             BoxId: targetBoxId,
             BoxSlot: targetBoxSlot,
             IsMain: true,
+            IsExternal: false,
             AttachedSaveId: input.attached ? sourceSaveId : null,
             AttachedSavePkmIdBase: input.attached ? savePkm.IdBase : null,
             Generation: savePkm.Generation,
