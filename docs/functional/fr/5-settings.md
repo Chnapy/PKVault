@@ -10,6 +10,10 @@ Une fois la session validée, les actions affectant les sauvegardes modifient le
 Le changement de langue impacte l'affichage ainsi la langue utilisée pour afficher les données pokémon statiques (nom d'espèce, types, capacités etc).
 Le changement de langue n'impacte pas la langue de vos sauvegardes.
 
+Des fichiers pokémon externes (`.pk3`, `.pa9`, etc) peuvent être utilisés depuis l'extérieur de PKVault.
+Vous pouvez fournir une liste de fichiers et dossiers les ciblant.
+PKVault les lira à chaque lancement, et créera les variantes de pokémon, banques et boîtes reflétant l'arborescence des fichiers externes.
+
 Paramètres avançées: vous pouvez changer plusieurs chemins utilisés par défaut, définis dans les [Considérations techniques](./0-technical.md#fichiers-manipulés).
 
 ## Backups
