@@ -109,6 +109,7 @@
   "storage.move.save-main-duplicate": "Pokemon {{name}} kann nicht ins Hauptlager verschoben werden, da bereits eine Kopie existiert",
   "storage.move.main-incompatible-version": "Pokemon {{name}} ist nicht mit diesem Spielstand kompatibel",
   "storage.move.pkm-cannot-create-variant": "Pokemon {{name}} benötigt einen freien Slot",
+  "storage.move.bank-external": "Externe Banken können nicht ins Visier genommen werden",
   "storage.bank.description": "{{boxCount}} Boxen / {{pkmCount}} PKMs",
   "storage.bank.edit.is-default": "Standard",
   "storage.bank.edit.order": "Reihenfolge",

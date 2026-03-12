@@ -109,6 +109,7 @@
   "storage.move.save-main-duplicate": "Pokemon {{name}} cannot be moved to main storage, a duplicate already exists",
   "storage.move.main-incompatible-version": "Pokemon {{name}} is not compatible with save",
   "storage.move.pkm-cannot-create-variant": "Pokemon {{name}} should target empty slot",
+  "storage.move.bank-external": "External banks cannot be targeted",
   "storage.bank.description": "{{boxCount}} boxes / {{pkmCount}} pkms",
   "storage.bank.edit.is-default": "Is default",
   "storage.bank.edit.order": "Order",

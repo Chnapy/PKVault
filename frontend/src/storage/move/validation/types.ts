@@ -30,4 +30,5 @@ export type DropRefusalReason =
     | 'save-to-main-variant-already-exist'
     | 'pkm-cannot-move'
     | 'main-to-same-bank'
-    | 'same-pkm-id';
+    | 'same-pkm-id'
+    | 'bank-external';

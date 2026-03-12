@@ -20,5 +20,17 @@ export const validateCommon = (
         };
     }
 
+    if (slotInfos.direction === 'main-to-bank'
+        || slotInfos.direction === 'save-to-bank'
+    ) {
+        if (slotInfos.targetBank.isExternal) {
+            return {
+                canDrop: false,
+                reason: 'bank-external',
+                slotInfos,
+            };
+        }
+    }
+
     return { canDrop: true };
 };

@@ -18,6 +18,11 @@ public class MovePkmBankAction(
         var bank = (await bankLoader.GetEntity(input.bankId))
             ?? throw new ArgumentException($"Bank not found");
 
+        if (bank.IsExternal)
+        {
+            throw new ArgumentException($"External bank cannot be used as move target");
+        }
+
         var mainBoxes = (await boxLoader.GetEntitiesByBank(input.bankId)).Values
             .OrderBy(box => box.Order).ToList();
 

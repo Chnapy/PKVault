@@ -109,6 +109,7 @@
   "storage.move.save-main-duplicate": "Le pokemon {{name}} ne peut pas être déplacé vers le stockage principal, une copie y est déjà présente",
   "storage.move.main-incompatible-version": "Le pokemon {{name}} n'est pas compatible avec la sauvegarde",
   "storage.move.pkm-cannot-create-variant": "Le pokemon {{name}} doit cibler un emplacement vide",
+  "storage.move.bank-external": "Les banques externes ne peuvent pas être ciblées",
   "storage.bank.description": "{{boxCount}} boîtes / {{pkmCount}} pkms",
   "storage.bank.edit.is-default": "Défaut",
   "storage.bank.edit.order": "Ordre",
