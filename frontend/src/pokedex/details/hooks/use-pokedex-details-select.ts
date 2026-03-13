@@ -7,16 +7,16 @@ import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 
 export const usePokedexDetailsSelect = () => {
-    const selectedSpecies = Route.useSearch({
-        select: (search) => search.selected,
-    });
+    const selectedSpecies = Route.useSearch({ select: search => search.selected });
+    const selectedSaveId = Route.useSearch({ select: search => search.selectedSaveId });
+
+    const navigate = Route.useNavigate();
 
     const staticData = useStaticData();
 
     const dexGetAllQuery = useDexGetAll();
     const saveInfosMainQuery = useSaveInfosGetAll();
 
-    const [ selectedSaveIndex, setSelectedSaveIndex ] = React.useState(0);
     const [ selectedFormIndex, setSelectedFormIndex ] = React.useState(0);
     const [ selectedGender, setSelectedGender ] = React.useState<GenderType>(GenderType.Genderless);
     const [ selectedShiny, setSelectedShiny ] = React.useState(false);
@@ -41,7 +41,21 @@ export const usePokedexDetailsSelect = () => {
             : savesRecord[ spec.saveId ])
         .filter(filterIsDefined);
 
-    const selectedSave = gameSaves[ selectedSaveIndex ] ?? gameSaves[ 0 ];
+    const setSelectedSaveId = React.useCallback((saveId: number | undefined) => {
+        navigate({
+            search: (search) => ({
+                ...search,
+                selectedSaveId: saveId,
+            }),
+        });
+    }, [ navigate ]);
+
+    const selectedSaveIfAny = selectedSaveId !== undefined
+        ? gameSaves.find(save => save.id === selectedSaveId)
+        : undefined;
+
+    const selectedSave = selectedSaveIfAny ?? gameSaves[ 0 ];
+
     const selectedSpeciesValue = selectedSave && speciesValues.find(
         (value) => value.saveId === selectedSave.id
     )!;
@@ -62,21 +76,12 @@ export const usePokedexDetailsSelect = () => {
     );
 
     React.useEffect(() => {
-        if (selectedSaveIndex > 0 && !gameSaves[ selectedSaveIndex ]) {
-            setSelectedSaveIndex(0);
-            setSelectedFormIndex(0);
-            setSelectedGender(GenderType.Genderless);
-            setSelectedShiny(false);
-        }
-    }, [ gameSaves, selectedSaveIndex ]);
-
-    React.useEffect(() => {
         if (!selectedForm?.isSeen) {
             setSelectedFormIndex(firstSeenForm ?? 0);
             setSelectedGender(firstSeenGender ?? GenderType.Genderless);
         }
 
-        if (!selectedForm?.isSeenShiny) {
+        if (!selectedForm?.isOwnedShiny) {
             setSelectedShiny(false);
         }
     }, [ firstSeenForm, firstSeenGender, selectedSpecies, selectedForm ]);
@@ -100,12 +105,12 @@ export const usePokedexDetailsSelect = () => {
     }
 
     return {
-        selectedSaveIndex,
+        selectedSaveId,
         selectedFormIndex,
         selectedGender,
         selectedShiny,
 
-        setSelectedSaveIndex,
+        setSelectedSaveId,
         setSelectedFormIndex,
         setSelectedGender,
         setSelectedShiny,

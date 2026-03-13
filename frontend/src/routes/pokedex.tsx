@@ -52,6 +52,8 @@ export const PokedexPage: React.FC = withErrorCatcher('default', () => {
 
 const searchSchema = z.object({
   selected: z.number().optional(),
+  selectedSaveId: z.number().optional(),
+  selectExpanded: z.boolean().optional(),
   filterSpeciesName: z.string().optional(),
   filterTypes: z.array(z.number()).optional(),
   filterSeen: z.boolean().optional(),

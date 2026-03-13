@@ -8,7 +8,7 @@ import { MoveContext } from '../../storage/move/context/move-context';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
-import { DetailsCardContainer } from '../details-card/details-card-container';
+import { DetailsCardContainer, type DetailsCardContainerProps } from '../details-card/details-card-container';
 import { DetailsMainImg } from '../details-card/details-main-img';
 import { ItemImg } from '../details-card/item-img';
 import { Gender } from '../gender/gender';
@@ -31,6 +31,7 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'heldItem' | 'canEdit' | 'isEnabled' | 'hasLoadError'
 >
     & Pick<PkmLegalityDTO, 'movesLegality'>
+    & Pick<DetailsCardContainerProps, 'expanded' | 'toggleExpanded'>
     & {
         filepath?: string;
         contextVersion: GameVersion | null;
@@ -42,7 +43,7 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
         extraContent?: React.ReactNode;
     };
 
-export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath, saveId, reports, onRelease, onSubmit, openFile, extraContent, ...pkm }) => {
+export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath, saveId, reports, onRelease, onSubmit, openFile, extraContent, expanded, toggleExpanded, ...pkm }) => {
     const { t } = useTranslate();
 
     const formContext = StorageDetailsForm.useContext();
@@ -159,9 +160,12 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 selected: undefined,
             }
         })}
-        showFullDetails={!pkm.isEnabled || isMoveDragging
+        expanded={!pkm.isEnabled || isMoveDragging
             ? false
-            : (formContext.editMode ? true : undefined)}
+            : (formContext.editMode ? true : expanded)}
+        toggleExpanded={!pkm.isEnabled || isMoveDragging || formContext.editMode
+            ? undefined
+            : toggleExpanded}
         actions={formContext.editMode && <div className={css({
             display: 'flex',
             gap: 4

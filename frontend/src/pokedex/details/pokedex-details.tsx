@@ -22,23 +22,33 @@ import { getGameInfos } from './util/get-game-infos';
 export const PokedexDetails: React.FC = () => {
   const { t } = useTranslate();
 
+  const selectExpanded = Route.useSearch({ select: search => search.selectExpanded ?? false });
+
   const navigate = Route.useNavigate();
 
   const staticData = useStaticData();
 
   const selectInfos = usePokedexDetailsSelect();
 
+  const toggleSelectExpanded = () => {
+    navigate({
+      search: (search) => ({
+        ...search,
+        selectExpanded: !search.selectExpanded,
+      }),
+    });
+  };
+
   if (!selectInfos) {
     return null;
   }
 
   const {
-    selectedSaveIndex,
     selectedFormIndex,
     selectedGender,
     selectedShiny,
 
-    setSelectedSaveIndex,
+    setSelectedSaveId,
     setSelectedFormIndex,
     setSelectedGender,
     setSelectedShiny,
@@ -76,13 +86,13 @@ export const PokedexDetails: React.FC = () => {
           flexWrap: 'wrap-reverse',
         })}
       >
-        {gameSaves.map((save, i) => (
+        {gameSaves.map(save => (
           <DetailsTab
             key={save.id}
             contextVersion={save.version}
             otName={save.trainerName}
-            onClick={() => setSelectedSaveIndex(i)}
-            disabled={selectedSaveIndex === i}
+            onClick={() => setSelectedSaveId(save.id)}
+            disabled={selectedSave.id === save.id}
           />
         ))}
       </div>
@@ -203,6 +213,8 @@ export const PokedexDetails: React.FC = () => {
             selected: undefined,
           }
         })}
+        expanded={selectExpanded}
+        toggleExpanded={toggleSelectExpanded}
       />
     </div>
   );

@@ -16,7 +16,8 @@ export type DetailsCardContainerProps = {
     extraContent?: React.ReactNode;
     actions: React.ReactNode;
     onClose: () => void;
-    showFullDetails?: boolean;
+    expanded: boolean;
+    toggleExpanded: (() => void) | undefined;
 };
 
 export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
@@ -29,12 +30,9 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
     extraContent,
     actions,
     onClose,
-    showFullDetails
+    expanded,
+    toggleExpanded,
 }) => {
-    const [ showDetails, setShowDetails ] = React.useState(false);
-
-    const finalShowDetails = showFullDetails !== undefined ? showFullDetails : showDetails;
-
     return (
         <Container padding="big" borderRadius="big" className={css({
             display: "flex",
@@ -63,10 +61,10 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                 </div>
 
                 <Button
-                    onClick={() => setShowDetails(value => !value)} disabled={showFullDetails !== undefined}
+                    onClick={toggleExpanded} disabled={toggleExpanded === undefined}
                     className={css({ minWidth: '2lh' })}
                 >
-                    <Icon name={finalShowDetails ? 'angle-down' : 'angle-up'} forButton />
+                    <Icon name={expanded ? 'angle-down' : 'angle-up'} forButton />
                 </Button>
 
                 <Button onClick={onClose}>
@@ -107,7 +105,7 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
 
             {preContent}
 
-            {finalShowDetails && <>
+            {expanded && <>
                 <div
                     className={css({
                         '& > .text-container:first-child:not(:last-child)': {
