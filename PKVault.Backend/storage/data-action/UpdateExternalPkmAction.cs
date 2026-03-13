@@ -289,6 +289,11 @@ public class UpdateExternalPkmAction(
             {
                 await boxLoader.DeleteEntity(box);
             }
+            else if (entities.Count != box.SlotCount)
+            {
+                box.SlotCount = entities.Count;
+                await boxLoader.UpdateEntity(box);
+            }
         }
 
         foreach (var bank in externalBanksToCheck)
