@@ -98,7 +98,7 @@ public class SavePkmLoader(
             }
         }
 
-        if (save is IDaycareStorage saveDaycare)
+        if (save.GetSave() is IDaycareStorage saveDaycare)
         {
             for (var i = 0; i < saveDaycare.DaycareSlotCount; i++)
             {
@@ -134,7 +134,7 @@ public class SavePkmLoader(
                 _ => (int)boxType,
             };
             var boxSlot = extra.Slot.Slot;
-            if (boxType == BoxType.Daycare && save is IDaycareStorage saveDaycare)
+            if (boxType == BoxType.Daycare && save.GetSave() is IDaycareStorage saveDaycare)
             {
                 boxSlot += saveDaycare.DaycareSlotCount;
             }
