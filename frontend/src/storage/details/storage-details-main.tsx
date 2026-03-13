@@ -6,6 +6,7 @@ import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { usePkmVariantSlotInfos } from '../../data/hooks/use-pkm-variant-slot-infos';
 import { PKMLoadError } from '../../data/sdk/model';
 import { useStorageMainDeletePkmVariant } from '../../data/sdk/storage/storage.gen';
+import { Route } from '../../routes/storage';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
 import { useDesktopMessage } from '../../settings/globs-input/hooks/use-desktop-message';
 import { PathLine } from '../../settings/path-line';
@@ -24,7 +25,9 @@ export type StorageDetailsMainProps = {
 };
 
 export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selectedId }) => {
-    const [ selectedIndex, setSelectedIndex ] = React.useState(0);
+    const selectedGeneration = Route.useSearch({ select: search => search.selectedGeneration });
+
+    const navigate = Route.useNavigate();
 
     const variantInfos = usePkmVariantSlotInfos(selectedId);
 
@@ -37,8 +40,18 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selected
 
     const { variants } = variantInfos;
 
-    const finalIndex = variants[ selectedIndex ] ? selectedIndex : 0;
-    const pkmVariant = variants[ finalIndex ];
+    const selectedPkm = selectedGeneration
+        ? variants.find(v => v.generation === selectedGeneration) ?? variants[ 0 ]
+        : variants[ 0 ];
+
+    const selectGeneration = (generation: number) => {
+        navigate({
+            search: (search) => ({
+                ...search,
+                selectedGeneration: generation,
+            }),
+        });
+    };
 
     return (
         <div className={css({ flexGrow: 1 })}>
@@ -50,23 +63,23 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selected
                     flexWrap: 'wrap-reverse',
                 })}
             >
-                {variants.map((pkmVariant, i) => (
+                {variants.map((pkmVariant) => (
                     <DetailsTab
                         key={pkmVariant.id}
                         isEnabled={pkmVariant.isEnabled}
                         contextVersion={pkmVariant.isEnabled ? pkmVariant.contextVersion : null}
                         otName={`G${pkmVariant.generation}`}
                         original={pkmVariant.isMain}
-                        onClick={() => setSelectedIndex(i)}
-                        disabled={finalIndex === i}
+                        onClick={() => selectGeneration(pkmVariant.generation)}
+                        disabled={selectedPkm?.id === pkmVariant.id}
                         warning={!pkmLegalityMap[ pkmVariant.id ]?.isValid}
                     />
                 ))}
             </div>
 
-            {pkmVariant && (
-                <StorageDetailsForm.Provider key={pkmVariant.id} nickname={pkmVariant.nickname} eVs={pkmVariant.eVs} moves={pkmVariant.moves}>
-                    <InnerStorageDetailsMain id={pkmVariant.id} />
+            {selectedPkm && (
+                <StorageDetailsForm.Provider key={selectedPkm.id} nickname={selectedPkm.nickname} eVs={selectedPkm.eVs} moves={selectedPkm.moves}>
+                    <InnerStorageDetailsMain id={selectedPkm.id} />
                 </StorageDetailsForm.Provider>
             )}
         </div>
@@ -75,6 +88,10 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selected
 
 const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
     const { t } = useTranslate();
+
+    const selectExpanded = Route.useSearch({ select: search => search.selectExpanded ?? false });
+
+    const navigate = Route.useNavigate();
 
     const formContext = StorageDetailsForm.useContext();
 
@@ -103,6 +120,15 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
                     path: pkmVariant.filepath,
                 })
             : undefined;
+
+    const toggleSelectExpanded = () => {
+        navigate({
+            search: (search) => ({
+                ...search,
+                selectExpanded: !search.selectExpanded,
+            }),
+        });
+    };
 
     if (!pkmVariant) {
         return null;
@@ -202,6 +228,8 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
             onSubmit={() => formContext.submitForPkmVariant(id)}
             openFile={openFile}
             extraContent={saveCardProps && <SaveCardContentSmall {...saveCardProps} />}
+            expanded={selectExpanded}
+            toggleExpanded={toggleSelectExpanded}
         />
     );
 };

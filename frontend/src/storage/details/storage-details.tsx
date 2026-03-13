@@ -27,7 +27,7 @@ export const StorageDetails: React.FC<StorageDetailsProps> = ({
     {saveId
       ? <StorageDetailsSave
         selectedId={id}
-        saveId={saveId!}
+        saveId={saveId}
       />
       : <StorageDetailsMain
         selectedId={id}
