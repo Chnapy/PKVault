@@ -45,7 +45,7 @@ public record SaveInfosDTO(
             seenCount = caughtCount;
         }
 
-        var DaycareCount = save is IDaycareStorage daycareSave ? daycareSave.DaycareSlotCount : 0;
+        var DaycareCount = save.GetSave() is IDaycareStorage daycareSave ? daycareSave.DaycareSlotCount : 0;
 
         return new SaveInfosDTO(
             Id: save.Id,

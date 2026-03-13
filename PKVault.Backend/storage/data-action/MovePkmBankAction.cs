@@ -185,7 +185,7 @@ public class MovePkmBankAction(
     {
         var saveLoaders = savesLoadersService.GetLoaders(sourceSaveId);
 
-        if (savePkm.Pkm is IShadowCapture savePkmShadow && savePkmShadow.IsShadow)
+        if (savePkm.Pkm.GetMutablePkm() is IShadowCapture savePkmShadow && savePkmShadow.IsShadow)
         {
             throw new ArgumentException($"Action forbidden for PkmSave shadow for id={savePkm.Id}");
         }

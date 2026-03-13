@@ -58,7 +58,7 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
 
         var extraSlots = save.GetSave().GetExtraSlots(true);
 
-        if (save is IDaycareStorage saveDaycare)
+        if (save.GetSave() is IDaycareStorage saveDaycare)
         {
             var id = ((int)BoxType.Daycare).ToString();
             var extraSlotsCount = extraSlots.FindAll(slot => slot.Type == StorageSlotType.Daycare).Count;
@@ -122,7 +122,7 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
             throw new Exception("Not allowed for box type not default");
         }
 
-        if (save is IBoxDetailName saveBoxName)
+        if (save.GetSave() is IBoxDetailName saveBoxName)
         {
             saveBoxName.SetBoxName(dto.IdInt, dto.Name);
             HasWritten = true;
