@@ -6,6 +6,7 @@ import { theme } from '../theme';
 import { Container, type ContainerProps } from './container';
 
 export type TitledContainerProps = Omit<ContainerProps<'div'>, 'title'> & {
+    classNameContent?: string;
     title: React.ReactNode;
     contrasted?: boolean;
     enableExpand?: boolean;
@@ -16,7 +17,7 @@ export type TitledContainerProps = Omit<ContainerProps<'div'>, 'title'> & {
 };
 
 export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerProps>> = ({
-    title, contrasted, enableExpand, initialExpanded = true, expanded: rawExpanded, setExpanded, maxHeight, children, ...containerProps
+    classNameContent, title, contrasted, enableExpand, initialExpanded = true, expanded: rawExpanded, setExpanded, maxHeight, children, ...containerProps
 }) => {
     const isDragging = MoveContext.useValue().state.status === 'dragging';
     const [ expandedRaw, setExpandedRaw ] = React.useState(initialExpanded);
@@ -65,12 +66,16 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
             >{title}</div>}
 
             {children && expanded && <div
-                className={css({
-                    flexGrow: 1,
-                    padding: 8,
-                    overflowY: 'auto',
-                    maxHeight,
-                })}
+                className={cx(
+                    css({
+                        flexGrow: 1,
+                        position: 'relative',
+                        padding: 8,
+                        overflowY: 'auto',
+                        maxHeight,
+                    }),
+                    classNameContent
+                )}
             >
                 {children}
             </div>}

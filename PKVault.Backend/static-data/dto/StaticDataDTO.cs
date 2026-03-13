@@ -109,7 +109,7 @@ public record StaticGeneration(
 
 public record StaticSpritesheets(
     Dictionary<string, SpriteInfo> Species,
-Dictionary<string, SpriteInfo> Items
+    Dictionary<string, SpriteInfo> Items
 );
 
 public record SpriteInfo(string SheetName, int X, int Y, int Width, int Height);

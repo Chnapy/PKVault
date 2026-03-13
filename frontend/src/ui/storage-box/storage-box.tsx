@@ -5,7 +5,7 @@ import { TitledContainer, type TitledContainerProps } from '../container/titled-
 import { Icon } from '../icon/icon';
 import { SizingUtil } from '../util/sizing-util';
 
-export type StorageBoxProps = Pick<TitledContainerProps, 'ref' | 'className'> & {
+export type StorageBoxProps = Pick<TitledContainerProps, 'ref' | 'className' | 'classNameContent'> & {
   header: React.ReactNode;
   loading?: boolean;
   slotCount?: number;
@@ -15,6 +15,7 @@ export type StorageBoxProps = Pick<TitledContainerProps, 'ref' | 'className'> & 
 export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
   ref,
   className,
+  classNameContent,
   header,
   loading,
   slotCount = 30,
@@ -25,6 +26,7 @@ export const StorageBox: React.FC<React.PropsWithChildren<StorageBoxProps>> = ({
     <TitledContainer
       ref={ref}
       className={className}
+      classNameContent={classNameContent}
       title={
         <div
           className={css({
