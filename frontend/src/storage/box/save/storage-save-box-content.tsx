@@ -22,6 +22,7 @@ import { MoveContext } from '../../move/context/move-context';
 import { getSaveOrder } from '../../util/get-save-order';
 import { StorageBoxList } from '../storage-box-list';
 import { StorageHeader } from '../storage-header';
+import { getBoxBackgroundUrl } from '../util/get-box-background-url';
 
 export type StorageSaveBoxContentProps = {
   saveId: number;
@@ -87,7 +88,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
   const allItems = new Array(itemsCount).fill(null).map((_, i): PkmSaveDTO | null => boxPkms[ i ] ?? null);
 
   const backgroundImageUrl = selectedBox.wallpaperName
-    ? `imgs/box_backgrounds/${selectedBox.wallpaperName}`
+    ? getBoxBackgroundUrl(selectedBox.wallpaperName)
     : undefined;
 
   return (
