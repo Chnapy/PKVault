@@ -12,6 +12,7 @@ export const theme = {
     primary: "#334AA6",
     panel: "#F0E5DA",
     light: "#FEF6EE",
+    item: 'rgba(255,250,245,0.8)',
     contrast: "#B6634E",
     contrastdark: "#934E3D",
     app: "#FEF4EA",

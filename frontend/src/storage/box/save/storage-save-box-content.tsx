@@ -2,7 +2,7 @@ import { css, cx } from '@emotion/css';
 import { Popover, PopoverButton } from '@headlessui/react';
 import React from 'react';
 import { usePkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
-import { BoxType, type PkmSaveDTO, type SaveInfosDTO } from '../../../data/sdk/model';
+import { BoxType, type BoxDTO, type PkmSaveDTO, type SaveInfosDTO } from '../../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../../../error/with-error-catcher';
@@ -22,6 +22,7 @@ import { MoveContext } from '../../move/context/move-context';
 import { getSaveOrder } from '../../util/get-save-order';
 import { StorageBoxList } from '../storage-box-list';
 import { StorageHeader } from '../storage-header';
+import { getBoxBackgroundUrl } from '../util/get-box-background-url';
 
 export type StorageSaveBoxContentProps = {
   saveId: number;
@@ -61,15 +62,17 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
 
   const selectedBoxIndex = filteredBoxes.findIndex(box => box.idInt === boxId);
   const selectedBox = filteredBoxes[ selectedBoxIndex ] ??
-  // placeholder box
-  {
-    id: '-99',
-    idInt: -99,
-    name: '',
-    type: BoxType.Box,
-    slotCount: maxBoxSlotCount || 30,
-    canReceivePkm: false,
-  };
+    // placeholder box
+    {
+      id: '-99',
+      idInt: -99,
+      name: '',
+      type: BoxType.Box,
+      slotCount: maxBoxSlotCount || 30,
+      canSaveReceivePkm: false,
+      canSaveWrite: false,
+      order: 0,
+    } satisfies BoxDTO;
 
   const boxSlotCount = selectedBox.slotCount;
   const nbrItemsPerLine = SizingUtil.getItemsPerLine(boxSlotCount);
@@ -84,6 +87,10 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
 
   const allItems = new Array(itemsCount).fill(null).map((_, i): PkmSaveDTO | null => boxPkms[ i ] ?? null);
 
+  const backgroundImageUrl = selectedBox.wallpaperName
+    ? getBoxBackgroundUrl(selectedBox.wallpaperName)
+    : undefined;
+
   return (
     <Popover
       className={css({
@@ -93,6 +100,20 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
       <PopoverButton
         as={StorageBox}
         className={className}
+        classNameContent={cx(
+          css({
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            imageRendering: 'pixelated',
+            borderBottomLeftRadius: 4,
+            borderBottomRightRadius: 4,
+          }),
+          {
+            [ css({
+              backgroundImage: `url("${backgroundImageUrl}")`,
+            }) ]: !!backgroundImageUrl,
+          },
+        )}
         slotCount={selectedBox.slotCount}
         lineSlotCount={nbrItemsPerLine}
         loading={loading}

@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public interface IBoxLoader : IEntityLoader<BoxDTO, BoxEntity>
 {
-    public BoxDTO CreateDTO(BoxEntity entity);
+    public BoxDTO CreateDTO(BoxEntity entity, string? WallpaperName = null);
     public Task<Dictionary<string, BoxEntity>> GetEntitiesByBank(string bankId);
     public Task<int> GetMaxId();
     public Task NormalizeOrders();
@@ -52,7 +52,7 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         pkmVariantLoader = _pkmVariantLoader;
     }
 
-    public BoxDTO CreateDTO(BoxEntity entity)
+    public BoxDTO CreateDTO(BoxEntity entity, string? WallpaperName = null)
     {
         return new(
             Id: entity.Id,
@@ -60,7 +60,8 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
             Name: entity.Name,
             SlotCount: entity.SlotCount,
             Order: entity.Order,
-            BankId: entity.BankId
+            BankId: entity.BankId,
+            WallpaperName
         );
     }
 

@@ -4,7 +4,8 @@ public record BoxDTO(
     string Name,
     int SlotCount,
     int Order,
-    string? BankId
+    string? BankId,
+    string? WallpaperName = null
 ) : IWithId
 {
     public int IdInt => int.Parse(Id);

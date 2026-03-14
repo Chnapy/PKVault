@@ -1,7 +1,8 @@
+import { css, cx } from '@emotion/css';
 import React from "react";
 import { Route } from "../../../routes/storage";
+import { StorageBoxBackgroundsPrefetch } from '../storage-box-backgrounds-prefetch';
 import { StorageSaveBoxContent } from './storage-save-box-content';
-import { css, cx } from '@emotion/css';
 
 export type StorageSaveBoxProps = {
   saveId: number;
@@ -44,6 +45,8 @@ export const StorageSaveBox: React.FC<StorageSaveBoxProps> = ({ saveId }) => {
           : undefined
         }
       />)}
+
+      <StorageBoxBackgroundsPrefetch saveId={saveId} />
     </div>
   );
 };

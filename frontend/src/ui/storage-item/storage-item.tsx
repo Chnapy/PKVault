@@ -102,7 +102,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
         },
       })}
       className={cx(css({
-        backgroundColor: rest.disabled ? 'transparent' : theme.bg.light,
+        backgroundColor: rest.disabled ? 'transparent' : theme.bg.item,
         borderColor: rest.disabled ? undefined : theme.text.default,
         position: 'relative',
         alignSelf: "flex-start",
@@ -120,7 +120,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
             top: 3,
             left: 3,
           }), {
-            [css({ opacity: 0 })]: !checked
+            [ css({ opacity: 0 }) ]: !checked
           })}
         >
           <CheckboxInput

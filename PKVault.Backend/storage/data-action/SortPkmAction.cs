@@ -75,7 +75,7 @@ public class SortPkmAction(
             GetBoxDtoByBank: async (bankId) =>
             {
                 return [.. (await boxLoader.GetEntitiesByBank(bankId)).Values
-                    .Select(boxLoader.CreateDTO)];
+                    .Select(box => boxLoader.CreateDTO(box))];
             }
         );
         var boxesIds = boxes.Select(box => box.IdInt).ToHashSet();
