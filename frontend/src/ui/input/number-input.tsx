@@ -24,6 +24,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
         <input
             type="text"
             value={value}
+            {...rest}
             className={css({
                 width: '100%',
                 color: theme.text.default,
