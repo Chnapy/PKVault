@@ -1,6 +1,8 @@
+import { css } from '@emotion/css';
 import { ListboxOption } from '@headlessui/react';
 import React from 'react';
 import { MoveCategory, type StaticMove } from '../../data/sdk/model';
+import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { useStorageGetPkmAvailableMoves } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
@@ -9,7 +11,6 @@ import { SelectNumberInput } from '../input/select-input';
 import { MoveItem } from '../move-item/move-item';
 import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
-import { css } from '@emotion/css';
 
 export type TextMovesProps = {
     saveId?: number;
@@ -42,8 +43,13 @@ export const TextMoves: React.FC<TextMovesProps> = ({
 
     const staticData = useStaticData();
 
+    const settingsQuery = useSettingsGet();
+    const hideCheats = settingsQuery.data?.data.settingsMutable.hidE_CHEATS ?? false;
+
+    const editModeCheats = editMode && !hideCheats;
+
     const availableMovesQuery = useStorageGetPkmAvailableMoves({ saveId, pkmId }, {
-        query: { enabled: editMode }
+        query: { enabled: editModeCheats }
     });
 
     const getStaticMove = React.useCallback((moveId: number): StaticMove | undefined => {
@@ -110,13 +116,13 @@ export const TextMoves: React.FC<TextMovesProps> = ({
 
     // in edit-mode remove invalid moves
     React.useEffect(() => {
-        if (editMode && availableMoves.length > 0) {
+        if (editModeCheats && availableMoves.length > 0) {
             const fixedMoves = formMoves.map(move => availableMoves.some(moveId => moveId === move) ? move : 0);
             if (fixedMoves.join('.') !== formMoves.join('.')) {
                 setValue('moves', fixedMoves);
             }
         }
-    }, [ availableMoves, editMode, formMoves, setValue ]);
+    }, [ availableMoves, editModeCheats, formMoves, setValue ]);
 
     return <>
         {ability > 0 && <>
@@ -136,7 +142,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                 paddingBottom: 14,
             })}
         >
-            {editMode
+            {editModeCheats
                 ? <>
                     {formMoves.map((move, i) => {
 

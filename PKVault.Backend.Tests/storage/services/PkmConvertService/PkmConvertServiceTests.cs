@@ -36,7 +36,7 @@ public class PkmConvertServiceTests
             BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "", SettingsPath: "",
             CanUpdateSettings: false, CanScanSaves: false, SettingsMutable: new(
                 DB_PATH: "", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "", BACKUP_PATH: "",
-                LANGUAGE: "fr"
+                LANGUAGE: "fr", HIDE_CHEATS: false
             )
         ));
 

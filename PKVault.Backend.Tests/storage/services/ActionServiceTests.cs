@@ -138,7 +138,7 @@ public class ActionServiceTests
             BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "", SettingsPath: "",
             CanUpdateSettings: false, CanScanSaves: false, SettingsMutable: new(
                 DB_PATH: "mock-db", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: backupPath,
-                LANGUAGE: "en"
+                LANGUAGE: "en", HIDE_CHEATS: false
             )
         ));
     }

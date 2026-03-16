@@ -39,6 +39,7 @@
   "settings.form.pkms-external": "Emplacements des fichiers PKM externes",
   "settings.form.pkms-external.add-file": "Ajouter un fichier PKM",
   "settings.form.pkms-external.add-folder": "Ajouter un dossier PKM",
+  "settings.form.hide-cheats": "Masquer la triche dans l'édition de pokémon (EVs, capacités)",
   "action.cancel": "Annuler",
   "action.submit": "Valider",
   "action.check-storage": "Vérifier le stockage",

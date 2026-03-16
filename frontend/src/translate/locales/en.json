@@ -39,6 +39,7 @@
   "settings.form.pkms-external": "External PKM files locations",
   "settings.form.pkms-external.add-file": "Add a PKM file",
   "settings.form.pkms-external.add-folder": "Add a PKM directory",
+  "settings.form.hide-cheats": "Hide cheats in pokemon edit (EVs, moves)",
   "action.cancel": "Cancel",
   "action.submit": "Submit",
   "action.check-storage": "Check storage",
