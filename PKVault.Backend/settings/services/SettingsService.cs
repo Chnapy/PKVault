@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 public interface ISettingsService
 {
-    public Task UpdateSettings(SettingsMutableDTO settingsMutable);
+    public Task<DataUpdateFlags?> UpdateSettings(SettingsMutableDTO settingsMutable);
     public SettingsDTO GetSettings();
 }
 
@@ -22,7 +22,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private SettingsDTO? BaseSettings;
 
-    public async Task UpdateSettings(SettingsMutableDTO settingsMutable)
+    public async Task<DataUpdateFlags?> UpdateSettings(SettingsMutableDTO settingsMutable)
     {
         var sessionService = sp.GetRequiredService<ISessionService>();
 
@@ -35,7 +35,17 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         BaseSettings = ReadBaseSettings();
 
         saveService.InvalidateSaves();
-        await sessionService.StartNewSession(checkInitialActions: true);
+
+        using var scope = sp.CreateScope();
+        var flags = await sessionService.StartNewSession(checkInitialActions: true);
+
+        if (!sessionService.HasEmptyActionList())
+        {
+            await sessionService.PersistSession(scope);
+            await sessionService.StartNewSession(checkInitialActions: false);
+        }
+
+        return flags;
     }
 
     // Full settings
