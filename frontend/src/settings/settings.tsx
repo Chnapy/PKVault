@@ -15,6 +15,7 @@ import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
 import { GlobsInputList } from './globs-input/globs-input-list';
 import { useDesktopMessage } from './globs-input/hooks/use-desktop-message';
+import { CheckboxInput } from '../ui/input/checkbox-input';
 
 export const Settings: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
@@ -273,6 +274,39 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                     </div>
                 </div>
             </details>
+
+            <TitledContainer
+                className={css({
+                    alignSelf: 'flex-start',
+                })}
+                title={null}
+            >
+
+                <div
+                    className={css({
+                        display: 'flex',
+                        gap: 4,
+                        userSelect: 'none',
+                    })}
+                >
+                    <CheckboxInput
+                        id='hide-cheats'
+                        checked={watch('hidE_CHEATS')}
+                        onChange={() => setValue('hidE_CHEATS', !getValues('hidE_CHEATS'))}
+                        disabled={!settings.canUpdateSettings}
+                    />
+
+                    <label
+                        className={css({
+                            cursor: settings.canUpdateSettings ? 'pointer' : 'not-allowed',
+                        })}
+                        htmlFor='hide-cheats'
+                    >
+                        {t('settings.form.hide-cheats')}
+                    </label>
+                </div>
+
+            </TitledContainer>
 
             <div
                 className={css({

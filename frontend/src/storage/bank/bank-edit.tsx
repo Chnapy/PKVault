@@ -117,20 +117,29 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
             {...register('bankName', { setValueAs: (value) => value.trim(), minLength: 2, maxLength: 64 })}
         />
 
-        <label
+        <div
             className={css({
                 display: 'flex',
                 gap: 4,
-                cursor: defaultDisabled ? 'not-allowed' : 'pointer',
                 userSelect: 'none',
             })}
         >
             <CheckboxInput
+                id='is-default'
                 checked={watchIsDefault}
                 onChange={() => setValue('isDefault', !getValues('isDefault'))}
                 disabled={defaultDisabled}
-            /> {t('storage.bank.edit.is-default')}
-        </label>
+            />
+
+            <label
+                className={css({
+                    cursor: defaultDisabled ? 'not-allowed' : 'pointer',
+                })}
+                htmlFor='is-default'
+            >
+                {t('storage.bank.edit.is-default')}
+            </label>
+        </div>
 
         <div
             className={css({
