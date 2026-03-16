@@ -28,6 +28,8 @@ class Program
     [STAThread]
     static void Main(string[] args)
     {
+        LogUtil.Initialize();
+
         var window = new PhotinoWindow();
 
         var staticServerRun = SetupStaticAssetsServer(out var baseUrl);

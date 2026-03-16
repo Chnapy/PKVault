@@ -18,33 +18,34 @@ public class UpdateExternalPkmAction(
     {
         using var _ = LogUtil.Time($"UpdateExternalPkmAction.HasExternalPkmsToUpdate");
 
-        var externalPkmsToRemove = await pkmVariantLoader.GetExternalEntitiesDisabled();
-
-        var emptyAddInput = new UpdateExternalPkmActionInput(ExternalPkmsToAdd: [], ExternalPkmsToRemove: [.. externalPkmsToRemove.Values]);
-
         var pkmExternalGlobs = (settingsService.GetSettings().SettingsMutable.PKM_EXTERNAL_GLOBS ?? [])
             .Select(glob => glob.Trim())
             .Where(glob => glob.Length > 0)
             .ToArray();
-        if (pkmExternalGlobs.Length == 0)
-        {
-            return emptyAddInput;
-        }
+        var searchPaths = MatcherUtil.SearchPaths(pkmExternalGlobs).ToHashSet();
 
-        var searchPaths = MatcherUtil.SearchPaths(pkmExternalGlobs);
-        if (searchPaths.Count == 0)
-        {
-            return emptyAddInput;
-        }
+        var externalPkmsToRemove = await pkmVariantLoader.GetExternalEntitiesDisabledOrNotInPaths(searchPaths);
 
         var (Ids, Filepaths) = await pkmVariantLoader.GetIdsAndFilepathsWithoutExternalDisabled();
 
+        foreach (var pkmToRemove in externalPkmsToRemove.Values)
+        {
+            Ids.Remove(pkmToRemove.Id);
+            Filepaths.Remove(pkmToRemove.Filepath);
+        }
+
+        Lock hashSetLock = new();
+
+        bool AddIdConcurrent(string id)
+        {
+            lock (hashSetLock)
+            {
+                return Ids.Add(id);
+            }
+        }
+
         var searchPathsNotIncluded = searchPaths
             .Where(path => !Filepaths.Contains(path));
-        if (!searchPathsNotIncluded.Any())
-        {
-            return emptyAddInput;
-        }
 
         var evolves = (await staticDataService.GetStaticData()).Evolves;
 
@@ -57,7 +58,7 @@ public class UpdateExternalPkmAction(
                 await semaphore.WaitAsync();
                 try
                 {
-                    var pkmFile = await PkmFileLoader.LoadPkmFile(fileIOService, new()
+                    return await PkmFileLoader.LoadPkmFile(fileIOService, new()
                     {
                         Filepath = filepath,
                         Data = [],
@@ -65,23 +66,6 @@ public class UpdateExternalPkmAction(
                         Updated = false,
                         Deleted = false,
                     });
-
-                    var pkm = pkmFileLoader.CreatePKM(pkmFile, generation: 0);
-                    if (!pkm.IsEnabled)
-                    {
-                        return null;
-                    }
-
-                    var id = pkm.GetPKMIdBase(evolves);
-                    if (Ids.Contains(id))
-                    {
-                        return null;
-                    }
-
-                    return new UpdateExternalPkmData(
-                        PkmFileEntity: pkmFile,
-                        Pkm: pkm
-                    );
                 }
                 finally
                 {
@@ -89,6 +73,26 @@ public class UpdateExternalPkmAction(
                 }
             })
         ))
+        .Select(pkmFile =>
+        {
+            var pkm = pkmFileLoader.CreatePKM(pkmFile, generation: 0);
+            if (!pkm.IsEnabled)
+            {
+                return null;
+            }
+
+            var id = pkm.GetPKMIdBase(evolves);
+            if (Ids.Contains(id))
+            {
+                return null;
+            }
+            AddIdConcurrent(id);
+
+            return new UpdateExternalPkmData(
+                PkmFileEntity: pkmFile,
+                Pkm: pkm
+            );
+        })
         .OfType<UpdateExternalPkmData>()
         .ToArray();
 
@@ -156,7 +160,7 @@ public class UpdateExternalPkmAction(
             var pkmsBoxes = pkmsBanksBoxes.Where(pbb => pbb.BankName == bankName);
             var boxesNames = pkmsBoxes.Select(pb => pb.BoxName).Distinct();
 
-            Console.WriteLine($"{bankName} -> {string.Join(',', boxesNames)}");
+            // Console.WriteLine($"{bankName} -> {string.Join(',', boxesNames)}");
 
             var bank = existingBanks.Find(b => b.IsExternal && b.Name == bankName);
             if (bank == null)
@@ -261,9 +265,10 @@ public class UpdateExternalPkmAction(
             return;
         }
 
+        // careful here to not delete PK files !
         foreach (var pkmVariant in externalPkmsToRemove)
         {
-            await pkmVariantLoader.DeleteEntity(pkmVariant);
+            await pkmVariantLoader.DeleteEntityDBOnly(pkmVariant);
         }
 
         var pkmsBoxes = (await boxLoader.GetEntitiesByIds(

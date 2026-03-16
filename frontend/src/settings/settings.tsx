@@ -151,6 +151,7 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                 value={watch('savE_GLOBS')}
                 onChange={(value) => setValue('savE_GLOBS', value)}
                 disabled={!settings.canUpdateSettings}
+                limit={200}
             />
 
             <GlobsInputList
@@ -168,6 +169,7 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                 value={watch('pkM_EXTERNAL_GLOBS')}
                 onChange={(value) => setValue('pkM_EXTERNAL_GLOBS', value)}
                 disabled={!settings.canUpdateSettings}
+                limit={8000}
             />
 
             <details>

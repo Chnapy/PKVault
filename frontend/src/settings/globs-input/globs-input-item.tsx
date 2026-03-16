@@ -14,10 +14,11 @@ export type GlobsInputItemProps = {
     value: string;
     onEdit: (value: string) => void;
     onRemove: () => void;
+    limit: number;
     disabled?: boolean;
 };
 
-export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ value, onEdit, onRemove, disabled }) => {
+export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ value, onEdit, onRemove, limit, disabled }) => {
     const { t } = useTranslate();
 
     const desktopMessage = useDesktopMessage();
@@ -26,7 +27,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ value, onEdit, o
     const isDirectory = isGlob || value.endsWith('/');
     const isFile = !isDirectory;
 
-    const globResultsQuery = useSettingsGetSaveGlobsResults({ globs: [ value ] });
+    const globResultsQuery = useSettingsGetSaveGlobsResults({ globs: [ value ], limit });
 
     const { isLoading } = globResultsQuery;
     const data = globResultsQuery.data?.data ?? [];
@@ -34,7 +35,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ value, onEdit, o
     const showFiles = isDirectory || data.length !== 1;
 
     const hasHttpError = globResultsQuery.isError;
-    const hasError = !globResultsQuery.isLoading && (globResultsQuery.isError || data.length > 50);
+    const hasError = !globResultsQuery.isLoading && globResultsQuery.isError;
     const hasWarning = !globResultsQuery.isLoading && (hasError || data.length === 0);
 
     return <Container

@@ -118,11 +118,18 @@ public class SessionService(
             flags = await actionService.DataNormalize(scope);
         }
 
-        var externalPkmsToUpdateInput = await updateExternalPkmAction.HasExternalPkmsToUpdate();
-
-        if (externalPkmsToUpdateInput.ShouldRun)
+        try
         {
-            flags = await actionService.UpdateExternalPkm(externalPkmsToUpdateInput, scope);
+            var externalPkmsToUpdateInput = await updateExternalPkmAction.HasExternalPkmsToUpdate();
+
+            if (externalPkmsToUpdateInput.ShouldRun)
+            {
+                flags = await actionService.UpdateExternalPkm(externalPkmsToUpdateInput, scope);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
         }
 
         return flags;

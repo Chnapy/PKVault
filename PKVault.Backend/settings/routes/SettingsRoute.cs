@@ -22,11 +22,11 @@ public class SettingsController(DataService dataService, ISettingsService settin
     }
 
     [HttpGet("test-save-globs")]
-    public ActionResult<List<string>> GetSaveGlobsResults([FromQuery] string[] globs)
+    public ActionResult<List<string>> GetSaveGlobsResults([FromQuery] string[] globs, int limit)
     {
         var results = MatcherUtil.SearchPaths(globs);
 
-        if (results.Count > 200)
+        if (results.Count > limit)
         {
             throw new ArgumentException($"Too much results ({results.Count}) for given globs");
         }
@@ -54,20 +54,21 @@ public class SettingsController(DataService dataService, ISettingsService settin
         {
             SAVE_GLOBS = [.. settingsMutable.SAVE_GLOBS.Select(glob => glob.Trim())]
         };
-        await settingsService.UpdateSettings(settingsMutable);
 
-        return await dataService.CreateDataFromUpdateFlags(new()
-        {
-            StaticData = languageChanged,
-            MainBanks = new() { All = true },
-            MainBoxes = new() { All = true },
-            MainPkmVariants = new() { All = true },
-            Dex = new() { All = true },
-            Saves = new() { All = true },
-            SaveInfos = true,
-            Backups = true,
-            Settings = true,
-            Warnings = true,
-        });
+        var flags = await settingsService.UpdateSettings(settingsMutable);
+        flags ??= new();
+
+        flags.StaticData = languageChanged;
+        flags.MainBanks.All = true;
+        flags.MainBoxes.All = true;
+        flags.MainPkmVariants.All = true;
+        flags.Dex.All = true;
+        flags.Saves.All = true;
+        flags.SaveInfos = true;
+        flags.Backups = true;
+        flags.Settings = true;
+        flags.Warnings = true;
+
+        return await dataService.CreateDataFromUpdateFlags(flags);
     }
 }

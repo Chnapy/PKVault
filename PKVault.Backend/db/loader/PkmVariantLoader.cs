@@ -23,6 +23,7 @@ public interface IPkmVariantLoader : IEntityLoader<PkmVariantDTO, PkmVariantEnti
     public Task<PkmVariantEntity> AddEntity(PkmVariantLoaderAddPayload payload);
     public Task<IEnumerable<PkmVariantEntity>> AddEntities(IEnumerable<PkmVariantLoaderAddPayload> payloads);
     public Task UpdateEntity(PkmVariantEntity entity, ImmutablePKM pkm);
+    public Task DeleteEntityDBOnly(PkmVariantEntity entity);
 
     public Task<Dictionary<int, Dictionary<string, PkmVariantEntity>>> GetEntitiesByBox(int boxId);
     public Task<Dictionary<int, Dictionary<string, PkmVariantEntity>>> GetEntitiesByBox(string boxId);
@@ -31,8 +32,10 @@ public interface IPkmVariantLoader : IEntityLoader<PkmVariantDTO, PkmVariantEnti
     public Task<Dictionary<string, PkmVariantEntity>> GetEntitiesBySave(uint saveId);
     public Task<Dictionary<uint, List<PkmVariantEntity>>> GetEntitiesAttachedGroupedBySave();
     public Task<Dictionary<string, PkmVariantEntity>> GetEntitiesAttached();
-    public Task<Dictionary<string, PkmVariantEntity>> GetExternalEntitiesDisabled();
+
+    public Task<Dictionary<string, PkmVariantEntity>> GetExternalEntitiesDisabledOrNotInPaths(IEnumerable<string> paths);
     public Task<(HashSet<string> Ids, HashSet<string> Filepaths)> GetIdsAndFilepathsWithoutExternalDisabled();
+
     public Task<PkmVariantEntity?> GetEntityBySave(uint saveId, string savePkmIdBase);
     public Task<bool> HasEntityByForm(ushort species, byte form, Gender gender);
     public Task<bool> HasEntityByFormShiny(ushort species, byte form, Gender gender);
@@ -227,17 +230,15 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
             .ToDictionaryAsync(p => p.Id);
     }
 
-    public async Task<Dictionary<string, PkmVariantEntity>> GetExternalEntitiesDisabled()
+    public async Task<Dictionary<string, PkmVariantEntity>> GetExternalEntitiesDisabledOrNotInPaths(IEnumerable<string> paths)
     {
         var dbSet = await GetDbSet();
-
-        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesAttached");
 
         return await dbSet
             .AsNoTracking()
             .Where(p => p.IsExternal)
             .Include(p => p.PkmFile)
-            .Where(p => p.PkmFile!.Error != null)
+            .Where(p => p.PkmFile!.Error != null || !paths.Contains(p.PkmFile!.Filepath))
             .ToDictionaryAsync(p => p.Id);
     }
 
@@ -360,6 +361,11 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
 
         await UpdateEntity(entity);
 
+        await base.DeleteEntity(entity);
+    }
+
+    public async Task DeleteEntityDBOnly(PkmVariantEntity entity)
+    {
         await base.DeleteEntity(entity);
     }
 

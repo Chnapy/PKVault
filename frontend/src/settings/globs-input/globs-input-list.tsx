@@ -12,9 +12,10 @@ export type GlobsInputListProps = Omit<UseFormRegisterReturn, 'onChange'> & {
     labelAddFolder: React.ReactNode;
     value: string;
     onChange: (value: string) => void;
+    limit: number;
 };
 
-export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, labelAddFile, labelAddFolder, value, onChange, disabled }) => {
+export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, labelAddFile, labelAddFolder, value, onChange, limit, disabled }) => {
     const splitedValue = value.split('\n').map(value => value.trim()).filter(Boolean);
 
     return <div
@@ -74,6 +75,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
                         onChange(newValues.join('\n'));
                     }}
                     disabled={disabled}
+                    limit={limit}
                 />)}
             </div>
 
