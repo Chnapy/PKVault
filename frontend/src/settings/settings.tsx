@@ -58,7 +58,7 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
             },
         });
     });
-    console.log(watch('hidE_CHEATS'))
+
     return <TitledContainer title={<div className={css({ display: 'flex', justifyContent: 'space-between' })}>
         <div
             className={css({
