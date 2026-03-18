@@ -192,6 +192,7 @@ public class DataNormalizeAction(
                     IsExternal: false,
                     AttachedSaveId: e.AttachedSaveId,
                     AttachedSavePkmIdBase: e.AttachedSavePkmIdBase,
+                    Context: (EntityContext)e.Generation,
                     Generation: e.Generation,
                     Pkm: legacyPkmVersionLoader.pkmFileLoader.CreatePKM(e.Id, e.Filepath, e.Generation),
 

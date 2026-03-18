@@ -617,7 +617,7 @@ describe('use-move-droppable', () => {
             expect(result.current._disabledReason).toBe<DropRefusalReason>('save-to-pkm-save-cannot-move');
         });
 
-        test('should not be droppable to save if not same generation', async () => {
+        test('should not be droppable to save if not same context', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveDroppable(456, 0, 10),
                 {
@@ -633,7 +633,7 @@ describe('use-move-droppable', () => {
 
             expect(result.current.onClick).toBeUndefined();
             expect(result.current.onPointerUp).toBeUndefined();
-            expect(result.current._disabledReason).toBe<DropRefusalReason>('save-to-save-not-same-generation');
+            expect(result.current._disabledReason).toBe<DropRefusalReason>('save-to-save-not-same-context');
         });
 
         test('should not be droppable to main if egg', async () => {

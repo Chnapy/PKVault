@@ -25,14 +25,14 @@ export const validateSlotPair = (
 
         case 'main-to-save': {
             const relatedPkmVariants = pkmVariantIndexes.byBox[ info.sourcePkm.boxId ]?.[ info.sourcePkm.boxSlot ] ?? [];
-            const generation = info.targetPkm?.generation ?? info.targetSave.generation;
+            const context = info.targetPkm?.context ?? info.targetSave.context;
 
-            const sourceForGeneration = relatedPkmVariants.find(variant => variant.generation === generation);
+            const sourceForContext = relatedPkmVariants.find(variant => variant.context === context);
             const sourceAttached = relatedPkmVariants.find(variant => variant.attachedSaveId);
 
             return validateMainToSave(
                 info,
-                sourceForGeneration,
+                sourceForContext,
                 sourceAttached,
                 attached,
             );

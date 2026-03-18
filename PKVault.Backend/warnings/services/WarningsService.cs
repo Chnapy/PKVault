@@ -87,9 +87,6 @@ public class WarningsService(
                 );
             }
 
-            var save = saveLoader.Save;
-            var generation = save.Generation;
-
             var savePkm = saveLoader.Pkms.GetDtosByIdBase(attachedPkmVariant.AttachedSavePkmIdBase ?? "");
 
             if (savePkm == null)

@@ -47,10 +47,10 @@ export const validateSaveToSave = (
     }
   }
 
-  if (slotInfos.sourceSave.generation !== slotInfos.targetSave.generation) {
+  if (slotInfos.sourceSave.context !== slotInfos.targetSave.context) {
     return {
       canDrop: false,
-      reason: 'save-to-save-not-same-generation',
+      reason: 'save-to-save-not-same-context',
       slotInfos,
     };
   }

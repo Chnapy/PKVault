@@ -9,6 +9,7 @@ public class PkmVariantEntity : IEntity
     public required bool IsExternal { get; set; }
     public required uint? AttachedSaveId { get; set; }
     public required string? AttachedSavePkmIdBase { get; set; }
+    public required EntityContext Context { get; set; }
     public required byte Generation { get; set; }
     public required string Filepath { get; set; }   // FK -> PkmFileEntity
 

@@ -132,14 +132,14 @@ public class ActionService(
         );
     }
 
-    public async Task<DataUpdateFlags> MainCreatePkmVariant(string pkmVariantId, byte generation)
+    public async Task<DataUpdateFlags> MainCreatePkmVariant(string pkmVariantId, EntityContext context)
     {
         using var scope = sp.CreateScope();
 
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<MainCreatePkmVariantAction>(),
-            new(pkmVariantId, generation)
+            new(pkmVariantId, context)
         );
     }
 

@@ -8,6 +8,7 @@ public record PkmVariantLoaderAddPayload(
     bool IsExternal,
     uint? AttachedSaveId,
     string? AttachedSavePkmIdBase,
+    EntityContext Context,
     byte Generation,
     ImmutablePKM Pkm,
 
@@ -316,6 +317,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
             IsExternal = payload.IsExternal,
             AttachedSaveId = payload.AttachedSaveId,
             AttachedSavePkmIdBase = payload.AttachedSavePkmIdBase,
+            Context = payload.Context,
             Generation = payload.Generation,
 
             Species = payload.Pkm.Species,
@@ -379,6 +381,6 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     public async Task<ImmutablePKM> GetPKM(PkmVariantEntity entity)
     {
         ArgumentNullException.ThrowIfNull(entity.PkmFile);
-        return pkmFileLoader.CreatePKM(entity.PkmFile, entity.Generation);
+        return pkmFileLoader.CreatePKM(entity.PkmFile, entity.Context);
     }
 }

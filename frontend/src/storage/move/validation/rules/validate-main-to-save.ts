@@ -4,7 +4,7 @@ import type { DropValidationResult } from '../types';
 
 export const validateMainToSave = (
   slotInfos: Extract<SlotInfosSlot, { direction: 'main-to-save' }>,
-  sourceForGeneration: PkmVariantDTO | undefined,
+  sourceForContext: PkmVariantDTO | undefined,
   sourceAttached: PkmVariantDTO | undefined,
   attached: boolean,
 ): DropValidationResult => {
@@ -32,7 +32,7 @@ export const validateMainToSave = (
     };
   }
 
-  if (sourceForGeneration && !sourceForGeneration.isEnabled) {
+  if (sourceForContext && !sourceForContext.isEnabled) {
     return {
       canDrop: false,
       reason: 'main-disabled-to-save',
@@ -40,7 +40,7 @@ export const validateMainToSave = (
     };
   }
 
-  if (!sourceForGeneration && slotInfos.targetPkm) {
+  if (!sourceForContext && slotInfos.targetPkm) {
     return {
       canDrop: false,
       reason: 'main-no-variant-to-save-occupied',

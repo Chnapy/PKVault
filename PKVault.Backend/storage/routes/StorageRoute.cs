@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using PKHeX.Core;
 
 namespace PKVault.Backend.storage.routes;
 
@@ -135,9 +136,9 @@ public class StorageController(DataService dataService, StorageQueryService stor
     }
 
     [HttpPost("main/pkm-version")]
-    public async Task<ActionResult<DataDTO>> MainCreatePkmVariant([BindRequired] string pkmVariantId, [BindRequired] byte generation)
+    public async Task<ActionResult<DataDTO>> MainCreatePkmVariant([BindRequired] string pkmVariantId, [BindRequired] EntityContext context)
     {
-        var flags = await actionService.MainCreatePkmVariant(pkmVariantId, generation);
+        var flags = await actionService.MainCreatePkmVariant(pkmVariantId, context);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }

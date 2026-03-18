@@ -63,6 +63,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
         title={<StorageDetailsTitle
             isEnabled={pkm.isEnabled}
             filepath={filepath}
+            context={pkm.context}
             contextVersion={pkm.contextVersion}
             showVersionName
             canEdit={pkm.canEdit}

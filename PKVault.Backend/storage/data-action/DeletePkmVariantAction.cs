@@ -38,7 +38,7 @@ public class DeletePkmVariantAction(
 
             return new(
                 type: DataActionType.DELETE_PKM_VERSION,
-                parameters: [pkm.Nickname, pkmVariant.Generation]
+                parameters: [pkm.Nickname, pkmVariant.Context]
             );
         }
 
