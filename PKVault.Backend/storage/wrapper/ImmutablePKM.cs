@@ -272,8 +272,12 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
                 clone.SetIVs(ivs);
             }
         });
+
         var hash = SearchUtil.HashByDetails(clone.GetMutablePkm());
-        var id = $"G{clone.Format}_{hash}_{clone.TID16}";   // note: SID not stored by pk files
+
+        var generationName = clone.Context.ToString()[3..];
+
+        var id = $"G{generationName}_{hash}_{clone.TID16}";   // note: SID not stored by pk files
 
         return id;
     }
