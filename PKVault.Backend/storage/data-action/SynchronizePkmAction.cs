@@ -5,7 +5,7 @@ public record SynchronizePkmActionInput(
 );
 
 public class SynchronizePkmAction(
-    IPkmConvertService pkmConvertService,
+    IPkmSharePropertiesService pkmSharePropertiesService,
     IPkmVariantLoader pkmVariantLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<SynchronizePkmActionInput>
 {
@@ -78,6 +78,8 @@ public class SynchronizePkmAction(
 
         async Task act(string pkmVariantId, string savePkmIdBase)
         {
+            Console.WriteLine($"Synchronize save->variant {savePkmIdBase} -> {pkmVariantId}");
+
             var pkmVariantEntity = await pkmVariantLoader.GetEntity(pkmVariantId);
             var pkmVariantEntities = (await pkmVariantLoader.GetEntitiesByBox(pkmVariantEntity.BoxId, pkmVariantEntity.BoxSlot)).Values.ToList();
 
@@ -96,30 +98,38 @@ public class SynchronizePkmAction(
             var savePkm = savePkms.First().Value;
             foreach (var variant in pkmVariantEntities)
             {
+                Console.WriteLine($"Synchronize save->variant loop - {savePkm.IdBase} -> {variant.Id}");
+
                 var variantPkm = await pkmVariantLoader.GetPKM(variant);
                 if (!variantPkm.IsEnabled)
                 {
-                    return;
+                    Console.WriteLine($"!variantPkm.IsEnabled => {variant.Id}");
+                    continue;
                 }
 
-                var contextSave = BlankSaveFile.Get(variantPkm.Context);
-                var correctSpeciesForm = contextSave.Personal.IsPresentInGame(savePkm.Pkm.Species, savePkm.Pkm.Form)
-                    && savePkm.Pkm.Species >= variantPkm.Species;
+                var versions = Enum.GetValues<GameVersion>().Where(version =>
+                    version.IsValidSavedVersion()
+                    && version.SaveFileType > 0
+                    && version.Context == variantPkm.Context
+                );
+
+                var correctSpeciesForm = savePkm.Pkm.Species >= variantPkm.Species
+                    && versions.Any(version => BlankSaveFile.Get(version).Personal.IsPresentInGame(savePkm.Pkm.Species, savePkm.Pkm.Form));
                 if (!correctSpeciesForm)
                 {
-                    return;
+                    Console.WriteLine($"!correctSpeciesForm => {variant.Id} / {savePkm.Pkm.Species} {savePkm.Pkm.Form} / {savePkm.Pkm.Species} {variantPkm.Species}");
+                    continue;
                 }
 
                 var attachedVariantEntity = await pkmVariantLoader.GetEntityBySave(savePkm.SaveId, savePkm.IdBase);
 
-                var convertedPkm = pkmConvertService.ConvertToExisting(
-                    savePkm.Pkm,
-                    variantPkm.GetMutablePkm(),
-                    keepMoves: attachedVariantEntity?.Id != variant.Id
-                );
+                variantPkm = variantPkm.Update(pkm =>
+                {
+                    pkmSharePropertiesService.SharePropertiesTo(savePkm.Pkm, pkm);
+                });
 
                 var variantEntity = await pkmVariantLoader.GetEntity(variant.Id);
-                await pkmVariantLoader.UpdateEntity(variantEntity, convertedPkm);
+                await pkmVariantLoader.UpdateEntity(variantEntity, variantPkm);
             }
         }
 
@@ -138,6 +148,8 @@ public class SynchronizePkmAction(
 
         async Task act(string pkmVariantId, string savePkmIdBase)
         {
+            Console.WriteLine($"Synchronize variant->save {pkmVariantId} -> {savePkmIdBase}");
+
             var pkmVariantEntity = await pkmVariantLoader.GetEntity(pkmVariantId);
             var pkmVariantEntities = (await pkmVariantLoader.GetEntitiesByBox(pkmVariantEntity.BoxId, pkmVariantEntity.BoxSlot)).Values.ToList();
 
@@ -180,16 +192,15 @@ public class SynchronizePkmAction(
 
             var attachedVariantEntity = await pkmVariantLoader.GetEntityBySave(savePkm.SaveId, savePkm.IdBase);
 
-            var convertedPkm = pkmConvertService.ConvertToExisting(
-                variantPkm,
-                savePkm.Pkm.GetMutablePkm(),
-                keepMoves: attachedVariantEntity?.Id != pkmVariantEntity.Id
-            );
-
-            saveLoaders.Pkms.WriteDto(savePkm with
+            savePkm = savePkm with
             {
-                Pkm = convertedPkm
-            });
+                Pkm = savePkm.Pkm.Update(pkm =>
+                {
+                    pkmSharePropertiesService.SharePropertiesTo(variantPkm, pkm);
+                })
+            };
+
+            saveLoaders.Pkms.WriteDto(savePkm);
         }
 
         foreach (var (pkmVariantId, savePkmIdBase) in input.pkmVariantAndPkmSaveIds)

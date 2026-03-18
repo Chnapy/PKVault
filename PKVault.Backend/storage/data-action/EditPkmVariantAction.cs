@@ -3,7 +3,7 @@ using PKHeX.Core;
 public record EditPkmVariantActionInput(string pkmVariantId, EditPkmVariantPayload editPayload);
 
 public class EditPkmVariantAction(
-    ActionService actionService, PkmUpdateService pkmUpdateService, IPkmConvertService pkmConvertService,
+    ActionService actionService, PkmUpdateService pkmUpdateService, IPkmSharePropertiesService pkmSharePropertiesService,
     SynchronizePkmAction synchronizePkmAction,
     IPkmVariantLoader pkmVariantLoader
 ) : DataAction<EditPkmVariantActionInput>
@@ -43,18 +43,21 @@ public class EditPkmVariantAction(
         {
             var relatedPkm = await pkmVariantLoader.GetPKM(variantEntity);
 
-            var convertedPkm = pkmConvertService.ConvertToExisting(
-                pkm,
-                relatedPkm.GetMutablePkm(),
-                keepMoves: true
-            );
+            relatedPkm = relatedPkm.Update(targetPkm =>
+            {
+                pkmSharePropertiesService.SharePropertiesTo(pkm, targetPkm);
+            });
 
-            await pkmVariantLoader.UpdateEntity(variantEntity, convertedPkm);
+            await pkmVariantLoader.UpdateEntity(variantEntity, relatedPkm);
         }
 
-        if (pkmVariantEntity.AttachedSaveId != null)
+        List<PkmVariantEntity> allVariants = [pkmVariantEntity, .. relatedPkmVariants];
+
+        var attachedVariant = allVariants.Find(variant => variant.AttachedSaveId != null);
+
+        if (attachedVariant != null)
         {
-            await synchronizePkmAction.SynchronizePkmVariantToSave(new([(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!)]));
+            await synchronizePkmAction.SynchronizePkmVariantToSave(new([(attachedVariant.Id, attachedVariant.AttachedSavePkmIdBase!)]));
         }
 
         return new(
