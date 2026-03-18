@@ -3,7 +3,6 @@ using PKHeX.Core;
 public interface IPkmConvertService
 {
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, uint generation);
-    public ImmutablePKM ConvertToExisting(ImmutablePKM sourcePkm, PKM existingTargetPkm, bool keepMoves);
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, PKMRndValues? rndValues, SaveFile? targetSave = null);
 }
 
@@ -28,41 +27,6 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
         };
 
         return ConvertTo(sourcePkm, targetType, null);
-    }
-
-    public ImmutablePKM ConvertToExisting(ImmutablePKM sourcePkm, PKM existingTargetPkm, bool keepMoves)
-    {
-        Console.WriteLine($"Convert existing {sourcePkm.GetMutablePkm().GetType().Name} -> {existingTargetPkm.GetType().Name} keepMoves={keepMoves}");
-
-        if (existingTargetPkm.Species == 0)
-        {
-            throw new Exception($"Invalid existingTargetPkm = {existingTargetPkm.GetType().Name}");
-        }
-
-        var result = ConvertTo(
-            sourcePkm,
-            existingTargetPkm.GetType(),
-            existingTargetPkm is GBPKM
-                ? null
-                : new(
-                    PID: existingTargetPkm.PID,
-                    EncryptionConstant: existingTargetPkm.EncryptionConstant
-                )
-        );
-
-        if (keepMoves)
-        {
-            result = result.Update(pkm =>
-            {
-                pkm.CopyMovesFrom(existingTargetPkm);
-
-                pkm.Heal();
-                pkm.ResetPartyStats();
-                pkm.RefreshChecksum();
-            });
-        }
-
-        return result;
     }
 
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, PKMRndValues? rndValues, SaveFile? targetSave = null)
