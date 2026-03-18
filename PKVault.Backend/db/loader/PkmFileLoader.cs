@@ -232,9 +232,11 @@ public class PkmFileLoader : IPkmFileLoader
             throw new InvalidOperationException($"Get filepath from disabled PKM not allowed");
         }
 
+        var generationName = pkm.Context.ToString()[3..];
+
         return MatcherUtil.NormalizePath(Path.Combine(
             storagePath,
-            pkm.Format.ToString(),
+            generationName,
             GetPKMFilename(pkm, evolves)
         ));
     }
