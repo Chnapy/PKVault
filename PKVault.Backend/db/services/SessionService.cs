@@ -109,13 +109,13 @@ public class SessionService(
         var dataNormalizeAction = scope.ServiceProvider.GetRequiredService<DataNormalizeAction>();
         var updateExternalPkmAction = scope.ServiceProvider.GetRequiredService<UpdateExternalPkmAction>();
 
-        var hasDataToNormalize = await dataNormalizeAction.HasDataToNormalize();
+        var dataToNormalizeInput = await dataNormalizeAction.HasDataToNormalize();
 
         DataUpdateFlags? flags = null;
 
-        if (hasDataToNormalize)
+        if (dataToNormalizeInput.ShouldRun)
         {
-            flags = await actionService.DataNormalize(scope);
+            flags = await actionService.DataNormalize(dataToNormalizeInput, scope);
         }
 
         try

@@ -87,9 +87,9 @@ public class WarningsService(
                 );
             }
 
-            var savePkm = saveLoader.Pkms.GetDtosByIdBase(attachedPkmVariant.AttachedSavePkmIdBase ?? "");
+            var savePkms = saveLoader.Pkms.GetDtosByIdBase(attachedPkmVariant.AttachedSavePkmIdBase ?? "");
 
-            if (savePkm == null)
+            if (savePkms.Count == 0)
             {
                 Console.WriteLine($"Pkm-version warning");
 

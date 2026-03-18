@@ -32,6 +32,8 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
         {
             result.HandlingTrainerName = targetSave.OT;
             result.HandlingTrainerGender = targetSave.Gender;
+
+            result.CurrentHandler = targetSave.IsFromTrainer(result) ? (byte)0 : (byte)1;
         }
 
         result.FixCommonLegalityIssues();

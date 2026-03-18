@@ -225,6 +225,8 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
 
     public bool IsEnabled => !HasLoadError && IsSpeciesValid;
 
+    public static string GetPKMIdPrefix(EntityContext context) => $"G{context.ToString()[3..]}";
+
     /**
      * Generate ID similar to PKHeX one.
      * Note that Species & Form can change over time (evolve),
@@ -275,9 +277,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
 
         var hash = SearchUtil.HashByDetails(clone.GetMutablePkm());
 
-        var generationName = clone.Context.ToString()[3..];
-
-        var id = $"G{generationName}_{hash}_{clone.TID16}";   // note: SID not stored by pk files
+        var id = $"{GetPKMIdPrefix(clone.Context)}_{hash}_{clone.TID16}";   // note: SID not stored by pk files
 
         return id;
     }

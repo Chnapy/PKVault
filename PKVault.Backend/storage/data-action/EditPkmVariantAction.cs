@@ -45,7 +45,7 @@ public class EditPkmVariantAction(
 
             relatedPkm = relatedPkm.Update(targetPkm =>
             {
-                pkmSharePropertiesService.SharePropertiesTo(pkm, targetPkm);
+                pkmSharePropertiesService.SharePropertiesTo(pkm, targetPkm, null);
             });
 
             await pkmVariantLoader.UpdateEntity(variantEntity, relatedPkm);
@@ -104,7 +104,16 @@ public class EditPkmVariantAction(
             evSPD,
         ];
 
-        List<int> existingEVs = [
+        List<int> existingEVs = pkm is PB7 pb7
+        ? [
+            pb7.AV_HP,
+            pb7.AV_ATK,
+            pb7.AV_DEF,
+            pb7.AV_SPE,
+            pb7.AV_SPA,
+            pb7.AV_SPD,
+        ]
+        : [
             pkm.EV_HP,
             pkm.EV_ATK,
             pkm.EV_DEF,
@@ -146,7 +155,7 @@ public class EditPkmVariantAction(
 
         if (newSum != existingSum)
         {
-            throw new ArgumentException("EVs total sum should not change");
+            throw new ArgumentException($"EVs total sum should not change ({newSum} != {existingSum})");
         }
 
         if (string.Join('.', newEVs.ToArray()) == string.Join('.', existingEVs))

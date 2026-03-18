@@ -1,10 +1,17 @@
 using PKHeX.Core;
 
-public record DataNormalizeActionInput();
+public record DataNormalizeActionInput(
+    bool SetupInitialData,
+    PkmVariantEntity[] MigrateVariantIDFrom161
+)
+{
+    public bool ShouldRun => SetupInitialData || MigrateVariantIDFrom161.Length > 0;
+}
 
 public class DataNormalizeAction(
     SessionDbContext db,
     IBankLoader bankLoader, IBoxLoader boxLoader, IPkmVariantLoader pkmVariantLoader, IDexLoader dexLoader,
+    ISavesLoadersService savesLoadersService,
     ISessionService sessionService, IFileIOService fileIOService, ISettingsService settingsService,
     StaticDataService staticDataService, ISaveService saveService
 ) : DataAction<DataNormalizeActionInput>
@@ -17,42 +24,88 @@ public class DataNormalizeAction(
         LegacyDexLoader.GetFilepath(dbPath)
     ];
 
-    public async Task<bool> HasDataToNormalize()
+    public async Task<DataNormalizeActionInput> HasDataToNormalize()
     {
         if (!await bankLoader.Any())
         {
             Console.WriteLine("HasDataToNormalize - No bank");
-            return true;
+            return new(
+                SetupInitialData: true,
+                MigrateVariantIDFrom161: []
+            );
         }
 
         if (!await boxLoader.Any())
         {
             Console.WriteLine("HasDataToNormalize - No box");
-            return true;
+            return new(
+                SetupInitialData: true,
+                MigrateVariantIDFrom161: []
+            );
         }
 
-        if (sessionService.HasMainDb())
+        if (!sessionService.HasMainDb())
         {
-            return false;
+            var settings = settingsService.GetSettings();
+            var dbPath = settings.GetDbPath();
+
+            var hasLegacy = GetLegacyFilepaths(dbPath).Any(fileIOService.Exists);
+            if (hasLegacy)
+            {
+                Console.WriteLine("HasDataToNormalize - Legacy");
+                return new(
+                    SetupInitialData: true,
+                    MigrateVariantIDFrom161: []
+                );
+            }
         }
 
-        var settings = settingsService.GetSettings();
-        var dbPath = settings.GetDbPath();
+        var attachedVariantsBySave = await pkmVariantLoader.GetEntitiesAttachedGroupedBySave();
 
-        var hasLegacy = GetLegacyFilepaths(dbPath).Any(fileIOService.Exists);
-        if (hasLegacy)
+        List<PkmVariantEntity> migrateVariantIDFrom161 = [];
+        foreach (var attachedVariantsPair in attachedVariantsBySave)
         {
-            Console.WriteLine("HasDataToNormalize - Legacy");
-            return true;
+            var saveLoaders = savesLoadersService.GetLoaders(attachedVariantsPair.Key);
+
+            // ignore main games,
+            // no migrate needed here
+            if (saveLoaders == null || (byte)saveLoaders.Save.Context < 10)
+            {
+                continue;
+            }
+
+            var idPrefix = ImmutablePKM.GetPKMIdPrefix(saveLoaders.Save.Context);
+
+            foreach (var variant in attachedVariantsPair.Value)
+            {
+                var attachedId = variant.AttachedSavePkmIdBase;
+                if (attachedId == null || attachedId.StartsWith(idPrefix))
+                {
+                    continue;
+                }
+
+                migrateVariantIDFrom161.Add(variant);
+            }
         }
 
-        return false;
+
+        return new(
+            SetupInitialData: false,
+            MigrateVariantIDFrom161: [.. migrateVariantIDFrom161]
+        );
     }
 
     protected override async Task<DataActionPayload> Execute(DataNormalizeActionInput input, DataUpdateFlags flags)
     {
-        await MigrateJSONLegacyData();
-        await SetupInitialData();
+        if (input.SetupInitialData)
+        {
+            await MigrateJSONLegacyData();
+            await SetupInitialData();
+        }
+        if (input.MigrateVariantIDFrom161.Length > 0)
+        {
+            await MigrateVariantIDFrom161(input.MigrateVariantIDFrom161);
+        }
 
         return new(
             DataActionType.DATA_NORMALIZE,
@@ -231,5 +284,17 @@ public class DataNormalizeAction(
         }
 
         return true;
+    }
+
+    // migrate variants IDs from 1.6.1
+    // only attached IDs should be migrated here
+    private async Task MigrateVariantIDFrom161(PkmVariantEntity[] pkmVariantsToUpdate)
+    {
+        foreach (var variant in pkmVariantsToUpdate)
+        {
+            variant.AttachedSaveId = null;
+            variant.AttachedSavePkmIdBase = null;
+            await pkmVariantLoader.UpdateEntity(variant);
+        }
     }
 }

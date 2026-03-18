@@ -243,8 +243,8 @@ public class SavePkmLoader(
             throw new Exception("Not allowed for pkm in daycare");
         }
 
-        var savePkmType = save.PKMType;
-
+        // no real convert here,
+        // just update pkm for in-save legality concerns
         var pkm = pkmConvertService.ConvertTo(
             dto.Pkm,
             save.GetBlankPKM().GetMutablePkm().GetType(),
@@ -256,13 +256,16 @@ public class SavePkmLoader(
                 ),
             targetSave: save.GetSave()
         );
-        if (pkm == default)
+
+        // stored dto should use updated pkm
+        dto = dto with
         {
-            throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetMutablePkm().GetType()} to.type={savePkmType}");
-        }
+            Pkm = pkm
+        };
 
         DeleteDto(dto.Id);
 
+        // note: can mutate given pkm
         switch (dto.BoxId)
         {
             case (int)BoxType.Party:
