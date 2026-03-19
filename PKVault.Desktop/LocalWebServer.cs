@@ -46,4 +46,11 @@ public class LocalWebServer
         await webHost.StopAsync();
         webHost.Dispose();
     }
+
+    public bool HasEmptyActionList()
+    {
+        if (webHost == null) return true;
+
+        return PKVault.Backend.Program.HasEmptyActionList(webHost);
+    }
 }

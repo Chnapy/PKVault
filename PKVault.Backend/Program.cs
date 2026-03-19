@@ -303,4 +303,9 @@ public class Program
 
         return port;
     }
+
+    public static bool HasEmptyActionList(IHost host)
+    {
+        return host.Services.GetRequiredService<ISessionService>().HasEmptyActionList();
+    }
 }
