@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public interface IPkmSharePropertiesService
 {
-    public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm);
+    public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm, SaveFile? save);
 }
 
 /**
@@ -11,7 +11,7 @@ public interface IPkmSharePropertiesService
  */
 public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : IPkmSharePropertiesService
 {
-    public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm)
+    public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm, SaveFile? save)
     {
         var sourcePkm = source.GetMutablePkm();
 
@@ -32,7 +32,8 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : I
                 : new(
                     PID: targetPkm.PID,
                     EncryptionConstant: targetPkm.EncryptionConstant
-                )
+                ),
+            save
         );
 
         var resultPkm = result.GetMutablePkm();
@@ -251,52 +252,6 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : I
             }
         }
 
-        if (sourcePkm is IScaledSizeReadOnly)
-        {
-            if (
-                targetPkm is IScaledSize targetPkmSize
-                && resultPkm is IScaledSizeReadOnly resultPkmSize
-            )
-            {
-                targetPkmSize.WeightScalar = resultPkmSize.WeightScalar;
-                targetPkmSize.HeightScalar = resultPkmSize.HeightScalar;
-            }
-        }
-
-        if (sourcePkm is IScaledSize3)
-        {
-            if (
-                targetPkm is IScaledSize3 targetPkmScale
-                && resultPkm is IScaledSize3 resultPkmScale
-            )
-            {
-                targetPkmScale.Scale = resultPkmScale.Scale;
-            }
-        }
-
-        if (sourcePkm is IScaledSizeAbsolute)
-        {
-            if (
-                targetPkm is IScaledSizeAbsolute targetPkmSizeAbs
-                && resultPkm is IScaledSizeAbsolute resultPkmSizeAbs
-            )
-            {
-                targetPkmSizeAbs.WeightAbsolute = resultPkmSizeAbs.WeightAbsolute;
-                targetPkmSizeAbs.HeightAbsolute = resultPkmSizeAbs.HeightAbsolute;
-            }
-        }
-
-        if (sourcePkm is ICombatPower)
-        {
-            if (
-                targetPkm is ICombatPower targetPkmCP
-                && resultPkm is ICombatPower resultPkmCP
-            )
-            {
-                targetPkmCP.Stat_CP = resultPkmCP.Stat_CP;
-            }
-        }
-
         targetPkm.TID16 = resultPkm.TID16;
         if (sourcePkm is not GBPKM)
         {
@@ -323,11 +278,62 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : I
         {
             targetPkm.CopyMovesFrom(resultPkm);
 
+            if (sourcePkm is IScaledSizeReadOnly)
+            {
+                if (
+                    targetPkm is IScaledSize targetPkmSize
+                    && resultPkm is IScaledSizeReadOnly resultPkmSize
+                )
+                {
+                    targetPkmSize.WeightScalar = resultPkmSize.WeightScalar;
+                    targetPkmSize.HeightScalar = resultPkmSize.HeightScalar;
+                }
+            }
+
+            if (sourcePkm is IScaledSize3)
+            {
+                if (
+                    targetPkm is IScaledSize3 targetPkmScale
+                    && resultPkm is IScaledSize3 resultPkmScale
+                )
+                {
+                    targetPkmScale.Scale = resultPkmScale.Scale;
+                }
+            }
+
+            if (sourcePkm is IScaledSizeAbsolute)
+            {
+                if (
+                    targetPkm is IScaledSizeAbsolute targetPkmSizeAbs
+                    && resultPkm is IScaledSizeAbsolute resultPkmSizeAbs
+                )
+                {
+                    targetPkmSizeAbs.WeightAbsolute = resultPkmSizeAbs.WeightAbsolute;
+                    targetPkmSizeAbs.HeightAbsolute = resultPkmSizeAbs.HeightAbsolute;
+                }
+            }
+
+            if (sourcePkm is ICombatPower)
+            {
+                if (
+                    targetPkm is ICombatPower targetPkmCP
+                    && resultPkm is ICombatPower resultPkmCP
+                )
+                {
+                    targetPkmCP.Stat_CP = resultPkmCP.Stat_CP;
+                }
+            }
+
             targetPkm.Ball = resultPkm.Ball;
             targetPkm.CurrentHandler = resultPkm.CurrentHandler;
             targetPkm.HandlingTrainerName = resultPkm.HandlingTrainerName;
             targetPkm.HandlingTrainerGender = resultPkm.HandlingTrainerGender;
             targetPkm.HandlingTrainerFriendship = resultPkm.HandlingTrainerFriendship;
+        }
+
+        if (targetPkm is PB7 targetPb7b)
+        {
+            targetPb7b.Stat_CP = targetPb7b.CalcCP;
         }
 
         targetPkm.Heal();

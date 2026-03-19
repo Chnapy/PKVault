@@ -4,8 +4,9 @@ import { usePkmLegality, usePkmLegalityMap } from '../../data/hooks/use-pkm-lega
 import { usePkmVariantAttach } from '../../data/hooks/use-pkm-variant-attach';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { usePkmVariantSlotInfos } from '../../data/hooks/use-pkm-variant-slot-infos';
-import { PKMLoadError } from '../../data/sdk/model';
+import { EntityContext, PKMLoadError } from '../../data/sdk/model';
 import { useStorageMainDeletePkmVariant } from '../../data/sdk/storage/storage.gen';
+import { getEntityContextGenerationName } from '../../data/util/get-entity-context-generation-name';
 import { Route } from '../../routes/storage';
 import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-props';
 import { useDesktopMessage } from '../../settings/globs-input/hooks/use-desktop-message';
@@ -25,7 +26,7 @@ export type StorageDetailsMainProps = {
 };
 
 export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selectedId }) => {
-    const selectedGeneration = Route.useSearch({ select: search => search.selectedGeneration });
+    const selectedContext = Route.useSearch({ select: search => search.selectedContext });
 
     const navigate = Route.useNavigate();
 
@@ -40,15 +41,15 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selected
 
     const { variants } = variantInfos;
 
-    const selectedPkm = selectedGeneration
-        ? variants.find(v => v.generation === selectedGeneration) ?? variants[ 0 ]
+    const selectedPkm = selectedContext
+        ? variants.find(v => v.context === selectedContext) ?? variants[ 0 ]
         : variants[ 0 ];
 
-    const selectGeneration = (generation: number) => {
+    const selectContext = (context: EntityContext) => {
         navigate({
             search: (search) => ({
                 ...search,
-                selectedGeneration: generation,
+                selectedContext: context,
             }),
         });
     };
@@ -68,9 +69,9 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selected
                         key={pkmVariant.id}
                         isEnabled={pkmVariant.isEnabled}
                         contextVersion={pkmVariant.isEnabled ? pkmVariant.contextVersion : null}
-                        otName={`G${pkmVariant.generation}`}
+                        otName={getEntityContextGenerationName(pkmVariant.context, true)}
                         original={pkmVariant.isMain}
-                        onClick={() => selectGeneration(pkmVariant.generation)}
+                        onClick={() => selectContext(pkmVariant.context)}
                         disabled={selectedPkm?.id === pkmVariant.id}
                         warning={!pkmLegalityMap[ pkmVariant.id ]?.isValid}
                     />

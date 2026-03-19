@@ -22,7 +22,7 @@ export type DropRefusalReason =
     | 'main-already-attached-to-save'
     | 'pkm-save-cannot-move'
     | 'save-to-pkm-save-cannot-move'
-    | 'save-to-save-not-same-generation'
+    | 'save-to-save-not-same-context'
     | 'save-to-save-cannot-move'
     | 'save-egg-to-main'
     | 'save-shadow-to-main'

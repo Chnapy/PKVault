@@ -100,8 +100,8 @@ export const PokedexDetails: React.FC = () => {
       <DetailsCardContainer
         bgColor={getGameInfos(selectedSave.version).color}
         title={<DetailsTitle
+          context={selectedSave.context}
           contextVersion={selectedSave.version}
-          generation={selectedForm.generation}
           showVersionName
         />}
         mainImg={

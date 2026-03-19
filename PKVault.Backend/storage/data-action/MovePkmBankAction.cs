@@ -207,6 +207,7 @@ public class MovePkmBankAction(
             IsExternal: false,
             AttachedSaveId: input.attached ? sourceSaveId : null,
             AttachedSavePkmIdBase: input.attached ? savePkm.IdBase : null,
+            Context: savePkm.Context,
             Generation: savePkm.Generation,
             Pkm: savePkm.Pkm
         ));

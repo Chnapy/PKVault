@@ -29,7 +29,10 @@ export const NotificationCardManager: React.FC = () => {
             return <tr key={i}>
                 <td>
                     <details>
-                        <summary className={css({ cursor: 'pointer' })}>{error.message}</summary>
+                        <summary className={css({
+                            whiteSpace: 'break-spaces',
+                            cursor: 'pointer'
+                        })}>{error.message}</summary>
 
                         <code className={css({
                             display: 'flex',

@@ -140,16 +140,6 @@ public class LegacyPkmFileLoader : ILegacyPkmFileLoader
                 throw new Exception($"TryGetPKM gives null pkm, path={filepath} bytes.length={bytes.Length}");
             }
             pkm = pk;
-
-            // pkm ??= pkmVersionEntity.Generation switch
-            // {
-            //     1 => new PK1(bytes),
-            //     2 => new PK2(bytes),
-            //     3 => new PK3(bytes),
-            //     4 => new PK4(bytes),
-            //     5 => new PK5(bytes),
-            //     _ => EntityFormat.GetFromBytes(bytes)!
-            // };
         }
         catch (Exception ex)
         {

@@ -7,7 +7,7 @@ public interface IPkmFileLoader
     public Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool updated = true, bool checkPkm = true);
     public Task<List<string>> GetEnabledFilepaths();
     public Task WriteToFiles();
-    public ImmutablePKM CreatePKM(PkmFileEntity entity, byte generation);
+    public ImmutablePKM CreatePKM(PkmFileEntity entity, EntityContext context);
     public byte[] GetPKMBytes(ImmutablePKM pkm);
     public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves);
 }
@@ -165,7 +165,7 @@ public class PkmFileLoader : IPkmFileLoader
         );
     }
 
-    public ImmutablePKM CreatePKM(PkmFileEntity entity, byte generation)
+    public ImmutablePKM CreatePKM(PkmFileEntity entity, EntityContext context)
     {
         var filepath = entity.Filepath;
 
@@ -180,22 +180,12 @@ public class PkmFileLoader : IPkmFileLoader
         {
             var ext = Path.GetExtension(filepath.AsSpan());
 
-            FileUtil.TryGetPKM(entity.Data, out var pk, ext, new SimpleTrainerInfo() { Context = (EntityContext)generation });
+            FileUtil.TryGetPKM(entity.Data, out var pk, ext, new SimpleTrainerInfo() { Context = context });
             if (pk == null)
             {
                 throw new Exception($"TryGetPKM gives null pkm, path={filepath} bytes.length={entity.Data.Length}");
             }
             pkm = pk;
-
-            // pkm ??= pkmVariantEntity.Generation switch
-            // {
-            //     1 => new PK1(bytes),
-            //     2 => new PK2(bytes),
-            //     3 => new PK3(bytes),
-            //     4 => new PK4(bytes),
-            //     5 => new PK5(bytes),
-            //     _ => EntityFormat.GetFromBytes(bytes)!
-            // };
         }
         catch (Exception ex)
         {
@@ -242,9 +232,11 @@ public class PkmFileLoader : IPkmFileLoader
             throw new InvalidOperationException($"Get filepath from disabled PKM not allowed");
         }
 
+        var generationName = pkm.Context.ToString()[3..];
+
         return MatcherUtil.NormalizePath(Path.Combine(
             storagePath,
-            pkm.Format.ToString(),
+            generationName,
             GetPKMFilename(pkm, evolves)
         ));
     }

@@ -41,7 +41,10 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
             <Icon name='angle-down' forButton />
         </div>}
     >
-        <table className={css({ wordBreak: 'break-word' })}>
+        <table className={css({
+            maxWidth: 600,
+            wordBreak: 'break-word'
+        })}>
             <tbody>
                 {update}
 

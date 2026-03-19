@@ -24,7 +24,7 @@ export type SaveCardContentFullProps = SaveCardContentSmallProps & {
 
 export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
     id,
-    generation,
+    context,
     version,
     lastWriteTime,
     tid,
@@ -56,7 +56,7 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
         >
             <SaveCardContentSmall
                 id={id}
-                generation={generation}
+                context={context}
                 version={version}
                 lastWriteTime={lastWriteTime}
                 tid={tid}

@@ -146,9 +146,9 @@ public class MovePkmAction(
             throw new ArgumentException("Save Pkm cannot move");
         }
 
-        if (sourcePkmDto.Generation != targetSaveLoaders.Save.Generation)
+        if (sourcePkmDto.Context != targetSaveLoaders.Save.Context)
         {
-            throw new ArgumentException($"Save Pkm not compatible with save for id={sourcePkmDto.Id}, generation={sourcePkmDto.Generation}, save.generation={targetSaveLoaders.Save.Generation}");
+            throw new ArgumentException($"Save Pkm not compatible with save for id={sourcePkmDto.Id}, context={sourcePkmDto.Context}, save.context={targetSaveLoaders.Save.Context}");
         }
 
         if (!targetSaveLoaders.Save.IsSpeciesAllowed(sourcePkmDto.Species))
@@ -216,21 +216,21 @@ public class MovePkmAction(
 
         var pkmVariants = (await pkmVariantLoader.GetEntitiesByBox(pkmVariant.BoxId!, pkmVariant.BoxSlot!)).Values.ToList();
 
-        var pkmVariantForGen = pkmVariants.Find(version => version.Generation == saveLoaders.Save.Generation);
+        var pkmVariantForContext = pkmVariants.Find(version => version.Context == saveLoaders.Save.Context);
 
-        // if pkmVariant for generation doesn't exist
+        // if pkmVariant for context doesn't exist
         // create pkmVariant
         // and retry action
-        if (pkmVariantForGen == default)
+        if (pkmVariantForContext == default)
         {
             var mainVariant = pkmVariants.Find(variant => variant.IsMain);
 
             await mainCreatePkmVariantAction.ExecuteWithPayload(new(
                 pkmVariantId: mainVariant.Id,
-                generation: saveLoaders.Save.Generation
+                context: saveLoaders.Save.Context
             ), flags);
 
-            // now pkmVariant for generation is created
+            // now pkmVariant for context is created
             // so retry the action, with attached mode
             return await MainToSave(
                 new(input.pkmIds, input.sourceSaveId, input.targetSaveId, input.targetBoxId, input.targetBoxSlots, true),
@@ -352,11 +352,11 @@ public class MovePkmAction(
             throw new ArgumentException($"Not-attached move from main to save requires a single version");
         }
 
-        var pkmVariant = relatedPkmVariants.Find(version => version.Generation == saveLoaders.Save.Generation);
+        var pkmVariant = relatedPkmVariants.Find(version => version.Context == saveLoaders.Save.Context);
 
         if (pkmVariant == default)
         {
-            throw new ArgumentException($"PkmVariantEntity not found for generation={saveLoaders.Save.Generation}");
+            throw new ArgumentException($"PkmVariantEntity not found for context={saveLoaders.Save.Context}");
         }
 
         var dto = await pkmVariantLoader.CreateDTO(pkmVariant);
@@ -377,9 +377,9 @@ public class MovePkmAction(
             throw new ArgumentException($"PkmVariantEntity already in save, id={attachedPkmVariant.Id}, saveId={attachedPkmVariant.AttachedSaveId}");
         }
 
-        if (pkmVariant.Generation != saveLoaders.Save.Generation)
+        if (pkmVariant.Context != saveLoaders.Save.Context)
         {
-            throw new ArgumentException($"PkmVariantEntity Generation not compatible with save for id={pkmVariant.Id}, generation={pkmVariant.Generation}, save.generation={saveLoaders.Save.Generation}");
+            throw new ArgumentException($"PkmVariantEntity Context not compatible with save for id={pkmVariant.Id}, context={pkmVariant.Context}, save.context={saveLoaders.Save.Context}");
         }
 
         var pkm = await pkmVariantLoader.GetPKM(pkmVariant);
@@ -449,6 +449,7 @@ public class MovePkmAction(
             IsExternal: false,
             AttachedSaveId: input.attached ? sourceSaveId : null,
             AttachedSavePkmIdBase: input.attached ? savePkm.IdBase : null,
+            Context: savePkm.Context,
             Generation: savePkm.Generation,
             Pkm: savePkm.Pkm
         ));

@@ -120,7 +120,7 @@ const searchSchema = z.object({
       editMode: z.boolean().optional(),
     })
     .optional(),
-  selectedGeneration: z.number().optional(),
+  selectedContext: z.number().optional(),
   selectExpanded: z.boolean().optional(),
   saves: z.record(
     z.number().int(),

@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { GameVersion } from '../../data/sdk/model';
+import type { EntityContext, GameVersion } from '../../data/sdk/model';
 import { PathLine } from '../../settings/path-line';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
@@ -11,6 +11,7 @@ import { StorageDetailsForm } from './storage-details-form';
 export type StorageDetailsTitleProps = {
     isEnabled: boolean;
     filepath?: string;
+    context: EntityContext;
     contextVersion: GameVersion | null;
     showVersionName?: boolean;
     canEdit: boolean;
@@ -18,10 +19,10 @@ export type StorageDetailsTitleProps = {
     openFile?: () => unknown;
 };
 
-export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ isEnabled, filepath, contextVersion, showVersionName, canEdit, onRelease, openFile }) => {
+export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ isEnabled, filepath, context, contextVersion, showVersionName, canEdit, onRelease, openFile }) => {
     const formContext = StorageDetailsForm.useContext();
 
-    return <DetailsTitle contextVersion={contextVersion} showVersionName={showVersionName && isEnabled}>
+    return <DetailsTitle context={context} contextVersion={contextVersion} showVersionName={showVersionName && isEnabled}>
         {!isEnabled && contextVersion === null && filepath
             ? <PathLine>{filepath}</PathLine>
             : null}

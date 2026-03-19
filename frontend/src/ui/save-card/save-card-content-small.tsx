@@ -1,18 +1,19 @@
+import { css } from '@emotion/css';
 import type React from "react";
-import type { GameVersion } from '../../data/sdk/model';
+import type { EntityContext, GameVersion } from '../../data/sdk/model';
+import { getEntityContextGenerationName } from '../../data/util/get-entity-context-generation-name';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
 import { SaveCardImg } from './save-card-img';
-import { css } from '@emotion/css';
 
 export type SaveCardContentSmallProps = {
   id: number;
   lastWriteTime: string;
+  context: EntityContext;
   version: GameVersion;
-  generation: number;
   tid: number;
   trainerName: string;
   trainerGenderMale: boolean;
@@ -20,7 +21,7 @@ export type SaveCardContentSmallProps = {
 
 export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErrorCatcher('default', ({
   id,
-  generation,
+  context,
   tid,
   lastWriteTime,
   trainerName,
@@ -62,7 +63,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErr
         <TextContainer noWrap forceScroll className={css({
           paddingBottom: 0,
         })}>
-          <span className={css({ color: theme.text.red })}>{t('save.gen')} {generation}</span>
+          <span className={css({ color: theme.text.red })}>{getEntityContextGenerationName(context, true)}</span>
           {" - "}
           <span className={css({ color: theme.text.primary })}>
             {t('save.pkm')} {staticData.versions[ version ]?.name}

@@ -7,6 +7,7 @@ import {
   useStorageMainDeletePkmVariant,
   useStorageMainPkmDetachSave,
 } from "../../data/sdk/storage/storage.gen";
+import { getEntityContextGenerationName } from '../../data/util/get-entity-context-generation-name';
 import { Route } from "../../routes/storage";
 import { useMoveClickable } from '../../storage/move/hooks/use-move-clickable';
 import { getSaveOrder } from "../../storage/util/get-save-order";
@@ -87,15 +88,15 @@ export const StorageItemMainActions: React.FC = () => {
           </ButtonWithDisabledPopover>
         )}
 
-        {canCreateVariants.map((generation) => (
+        {canCreateVariants.map((context) => (
           <ButtonWithDisabledPopover
-            key={generation}
+            key={context}
             as={Button}
             bgColor={theme.bg.primary}
             onClick={() =>
               mainCreatePkmVariantMutation.mutateAsync({
                 params: {
-                  generation: generation,
+                  context,
                   pkmVariantId: mainVariant.id,
                 },
               })
@@ -103,12 +104,12 @@ export const StorageItemMainActions: React.FC = () => {
             showHelp
             anchor="right start"
             helpTitle={t("storage.actions.create-variant.helpTitle", {
-              generation: generation,
+              generation: getEntityContextGenerationName(context),
             })}
             helpContent={t("storage.actions.create-variant.helpContent")}
           >
             <Icon name="plus" solid forButton />
-            {t("storage.actions.create-variant", { generation: generation })}
+            {t("storage.actions.create-variant", { generation: getEntityContextGenerationName(context, true) })}
           </ButtonWithDisabledPopover>
         ))}
 

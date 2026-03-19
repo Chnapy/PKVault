@@ -41,19 +41,19 @@ export const usePkmVariantSlotInfos = (baseVariantId: string | undefined) => {
                 ...new Set(
                     pageSaves
                         .filter(pageSave => {
-                            const hasPkmForPageSaveGeneration = variants.some(variant => variant.generation === pageSave.generation);
+                            const hasPkmForPageSaveContext = variants.some(variant => variant.context === pageSave.context);
                             const isCompatibleWithPageSave = compatibleWithVersions.includes(pageSave.version);
 
-                            return isCompatibleWithPageSave && !hasPkmForPageSaveGeneration;
+                            return isCompatibleWithPageSave && !hasPkmForPageSaveContext;
                         })
-                        .map(pageSave => pageSave.generation),
+                        .map(pageSave => pageSave.context),
                 ),
             ].sort();
 
     const canEditAll = variants.every(variant => variant.canEdit);
 
     const canMoveAttached =
-        !attachedVariant && pageSaves.some(pageSave => variants.some(variant => variant.canMoveAttachedToSave && variant.generation === pageSave.generation));
+        !attachedVariant && pageSaves.some(pageSave => variants.some(variant => variant.canMoveAttachedToSave && variant.context === pageSave.context));
     const canEvolveVariant = variants.find(variant => variant.canEvolve);
     const canSynchronize = !!attachedSavePkm && !!attachedVariant && attachedSavePkm.dynamicChecksum !== attachedVariant.dynamicChecksum;
 

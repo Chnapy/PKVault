@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next';
+import { getEntityContextGenerationName } from '../../../../data/util/get-entity-context-generation-name';
 import type { DropRefusalReason, SlotInfos } from '../types';
 
 export const getHelpText = (reason: DropRefusalReason, info: SlotInfos | undefined, attached: boolean, t: TFunction<'ns'>): string | undefined => {
@@ -21,10 +22,10 @@ export const getHelpText = (reason: DropRefusalReason, info: SlotInfos | undefin
         case 'save-to-pkm-save-cannot-move': return t('storage.move.pkm-cannot', {
             name: info?.targetPkm?.nickname,
         });
-        case 'save-to-save-not-same-generation': return t('storage.move.save-same-gen', {
-            generation: info?.direction === 'save-to-save'
-                ? info?.sourceSave.generation
-                : info?.sourcePkm.generation,
+        case 'save-to-save-not-same-context': return t('storage.move.save-same-gen', {
+            generation: getEntityContextGenerationName(info?.direction === 'save-to-save'
+                ? info?.sourceSave.context
+                : info?.sourcePkm.context ?? 0),
         });
         case 'save-to-save-cannot-move': return t('storage.move.pkm-cannot', {
             name: info?.targetPkm?.nickname,

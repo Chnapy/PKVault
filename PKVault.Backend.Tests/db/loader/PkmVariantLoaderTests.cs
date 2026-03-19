@@ -133,6 +133,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             AttachedSaveId: null,
             AttachedSavePkmIdBase: null,
             Generation: 3,
+            Context: EntityContext.Gen3,
             Pkm: pkm
         ));
 
@@ -143,6 +144,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var expectedEntity = new PkmVariantEntity()
         {
             Id = idBase,
+            Context = EntityContext.Gen3,
             Generation = 3,
             Filepath = filepath,
             BoxId = "1",
@@ -225,6 +227,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             .AddAsync(new()
             {
                 Id = idBase,
+                Context = EntityContext.Gen3,
                 Generation = 3,
                 Filepath = filepath,
                 BoxId = "1",
@@ -339,6 +342,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase1,
+                Context = EntityContext.Gen3,
                     Generation = 3,
                     Filepath = filepath1,
                     BoxId = "1",
@@ -358,6 +362,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase2,
+                Context = EntityContext.Gen4,
                     Generation = 4,
                     Filepath = filepath2,
                     BoxId = "1",
@@ -377,6 +382,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase3,
+                Context = EntityContext.Gen5,
                     Generation = 5,
                     Filepath = filepath3,
                     BoxId = "2",
@@ -482,12 +488,13 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase1,
+                    Context = EntityContext.Gen3,
                     Generation = 3,
                     Filepath = filepath1,
                     BoxId = "1",
                     BoxSlot = 0,
                     IsMain = true,
-            IsExternal = false,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -501,12 +508,13 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase2,
+                    Context = EntityContext.Gen4,
                     Generation = 4,
                     Filepath = filepath2,
                     BoxId = "1",
                     BoxSlot = 1,
                     IsMain = true,
-            IsExternal = false,
+                    IsExternal = false,
                     AttachedSaveId = 200,
                     AttachedSavePkmIdBase = "foobar",
 
@@ -556,6 +564,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var entity = new PkmVariantEntity()
         {
             Id = idBase,
+            Context = EntityContext.Gen3,
             Generation = 3,
             Filepath = filepath,
             BoxId = "1",
@@ -611,6 +620,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var entity = new PkmVariantEntity()
         {
             Id = idBase,
+            Context = EntityContext.Gen3,
             Generation = 3,
             Filepath = filepath,
             BoxId = "1",
@@ -657,6 +667,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var entity = new PkmVariantEntity()
         {
             Id = idBase,
+            Context = EntityContext.Gen3,
             Generation = 3,
             Filepath = filepath,
             BoxId = "1",
@@ -779,6 +790,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase1,
+                    Context = EntityContext.Gen3,
                     Generation = 3,
                     Filepath = filepath1,
                     BoxId = "1",
@@ -798,6 +810,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase2,
+                    Context = EntityContext.Gen4,
                     Generation = 4,
                     Filepath = filepath2,
                     BoxId = "1",
@@ -817,6 +830,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase3,
+                    Context = EntityContext.Gen5,
                     Generation = 5,
                     Filepath = filepath3,
                     BoxId = "2",
@@ -914,6 +928,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             IsExternal: false,
             AttachedSaveId: null,
             AttachedSavePkmIdBase: null,
+            Context: EntityContext.Gen3,
             Generation: 3,
             Pkm: pkm
         ));

@@ -121,11 +121,9 @@ public class SynchronizePkmAction(
                     continue;
                 }
 
-                var attachedVariantEntity = await pkmVariantLoader.GetEntityBySave(savePkm.SaveId, savePkm.IdBase);
-
                 variantPkm = variantPkm.Update(pkm =>
                 {
-                    pkmSharePropertiesService.SharePropertiesTo(savePkm.Pkm, pkm);
+                    pkmSharePropertiesService.SharePropertiesTo(savePkm.Pkm, pkm, savePkm.Save.GetSave());
                 });
 
                 var variantEntity = await pkmVariantLoader.GetEntity(variant.Id);
@@ -196,7 +194,7 @@ public class SynchronizePkmAction(
             {
                 Pkm = savePkm.Pkm.Update(pkm =>
                 {
-                    pkmSharePropertiesService.SharePropertiesTo(variantPkm, pkm);
+                    pkmSharePropertiesService.SharePropertiesTo(variantPkm, pkm, savePkm.Save.GetSave());
                 })
             };
 

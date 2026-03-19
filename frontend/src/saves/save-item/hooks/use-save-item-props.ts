@@ -16,7 +16,7 @@ export const useSaveItemProps = () => {
 
         return {
             id: item.id,
-            generation: item.generation,
+            context: item.context,
             version: item.version,
             trainerName: item.trainerName,
             trainerGenderMale: item.trainerGender === 0,

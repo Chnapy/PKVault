@@ -1,3 +1,4 @@
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
@@ -8,6 +9,7 @@ public record PkmVariantLoaderAddPayload(
     bool IsExternal,
     uint? AttachedSaveId,
     string? AttachedSavePkmIdBase,
+    EntityContext Context,
     byte Generation,
     ImmutablePKM Pkm,
 
@@ -283,7 +285,28 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var entity = await GetEntityFromAddPayload(payload);
 
-        return await AddEntity(entity);
+        try
+        {
+            return await AddEntity(entity);
+        }
+        catch (DbUpdateException ex)
+        {
+            if (ex.InnerException is SqliteException sqliteEx)
+            {
+                // unique constraint error
+                if (sqliteEx.SqliteExtendedErrorCode == 2067)
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate variant already exists with given data:"
+                        + $"\nID = {entity.Id}"
+                        + $"\nFilepath = {entity.Filepath}",
+                        sqliteEx
+                    );
+                }
+            }
+
+            throw;
+        }
     }
 
     public async Task<IEnumerable<PkmVariantEntity>> AddEntities(IEnumerable<PkmVariantLoaderAddPayload> payloads)
@@ -316,6 +339,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
             IsExternal = payload.IsExternal,
             AttachedSaveId = payload.AttachedSaveId,
             AttachedSavePkmIdBase = payload.AttachedSavePkmIdBase,
+            Context = payload.Context,
             Generation = payload.Generation,
 
             Species = payload.Pkm.Species,
@@ -379,6 +403,6 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     public async Task<ImmutablePKM> GetPKM(PkmVariantEntity entity)
     {
         ArgumentNullException.ThrowIfNull(entity.PkmFile);
-        return pkmFileLoader.CreatePKM(entity.PkmFile, entity.Generation);
+        return pkmFileLoader.CreatePKM(entity.PkmFile, entity.Context);
     }
 }

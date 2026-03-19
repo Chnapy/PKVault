@@ -2,29 +2,17 @@ using PKHeX.Core;
 
 public interface IPkmConvertService
 {
-    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, uint generation);
+    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, EntityContext context);
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, PKMRndValues? rndValues, SaveFile? targetSave = null);
 }
 
 public class PkmConvertService(ISettingsService settingsService) : IPkmConvertService
 {
-    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, uint generation)
+    public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, EntityContext context)
     {
-        Console.WriteLine($"Convert {sourcePkm.GetMutablePkm().GetType().Name} -> G{generation}");
+        Console.WriteLine($"Convert {sourcePkm.GetMutablePkm().GetType().Name} -> context={context}");
 
-        Type targetType = generation switch
-        {
-            1 => typeof(PK1),
-            2 => typeof(PK2),
-            3 => typeof(PK3),
-            4 => typeof(PK4),
-            5 => typeof(PK5),
-            6 => typeof(PK6),
-            7 => typeof(PK7),
-            8 => typeof(PK8),
-            9 => typeof(PK9),
-            _ => throw new Exception($"PKM case not found for generation={generation}")
-        };
+        Type targetType = BlankSaveFile.Get(context).BlankPKM.GetType();
 
         return ConvertTo(sourcePkm, targetType, null);
     }
@@ -44,6 +32,8 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
         {
             result.HandlingTrainerName = targetSave.OT;
             result.HandlingTrainerGender = targetSave.Gender;
+
+            result.CurrentHandler = targetSave.IsFromTrainer(result) ? (byte)0 : (byte)1;
         }
 
         result.FixCommonLegalityIssues();

@@ -1,3 +1,5 @@
+using PKHeX.Core;
+
 public record UpdateExternalPkmActionInput(
     UpdateExternalPkmData[] ExternalPkmsToAdd,
     PkmVariantEntity[] ExternalPkmsToRemove
@@ -75,7 +77,7 @@ public class UpdateExternalPkmAction(
         ))
         .Select(pkmFile =>
         {
-            var pkm = pkmFileLoader.CreatePKM(pkmFile, generation: 0);
+            var pkm = pkmFileLoader.CreatePKM(pkmFile, EntityContext.None);
             if (!pkm.IsEnabled)
             {
                 return null;
@@ -232,6 +234,7 @@ public class UpdateExternalPkmAction(
                         IsExternal: true,
                         AttachedSaveId: null,
                         AttachedSavePkmIdBase: null,
+                        Context: boxPkm.Pkm.Context,
                         Generation: boxPkm.Pkm.Generation,
                         Pkm: boxPkm.Pkm,
                         Filepath: boxPkm.PkmFileEntity.Filepath,
