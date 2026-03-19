@@ -232,6 +232,7 @@ public class Program
         services.AddScoped<DexSyncAction>();
 
         Console.WriteLine($"Setup services - Loaders");
+        services.AddScoped<IMetaLoader, MetaLoader>();
         services.AddScoped<IBankLoader, BankLoader>();
         services.AddScoped<IBoxLoader, BoxLoader>();
         services.AddScoped<IPkmVariantLoader, PkmVariantLoader>();
