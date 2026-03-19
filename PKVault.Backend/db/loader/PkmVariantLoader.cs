@@ -1,3 +1,4 @@
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
@@ -284,7 +285,28 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var entity = await GetEntityFromAddPayload(payload);
 
-        return await AddEntity(entity);
+        try
+        {
+            return await AddEntity(entity);
+        }
+        catch (DbUpdateException ex)
+        {
+            if (ex.InnerException is SqliteException sqliteEx)
+            {
+                // unique constraint error
+                if (sqliteEx.SqliteExtendedErrorCode == 2067)
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate variant already exists with given data:"
+                        + $"\nID = {entity.Id}"
+                        + $"\nFilepath = {entity.Filepath}",
+                        sqliteEx
+                    );
+                }
+            }
+
+            throw;
+        }
     }
 
     public async Task<IEnumerable<PkmVariantEntity>> AddEntities(IEnumerable<PkmVariantLoaderAddPayload> payloads)
