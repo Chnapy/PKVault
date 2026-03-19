@@ -194,14 +194,7 @@ public class SaveWrapper(SaveFile Save)
 
     public bool IsSpeciesAllowed(ushort species)
     {
-        if (Save is SAV7b)
-        {
-            return species <= 151
-                || species == 808
-                || species == 809;
-        }
-
-        return species <= Save.MaxSpeciesID;
+        return species <= Save.MaxSpeciesID && Save.Personal.IsSpeciesInGame(species);
     }
 
     // public ImmutableSave Update(Action<SaveFile> mutator)
