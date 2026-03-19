@@ -2,6 +2,25 @@ using PKHeX.Core;
 
 public class PkmVariantEntity : IEntity
 {
+    public static PkmVariantEntity CreateFrom(PkmVariantEntity entity, string id) => new()
+    {
+        Id = id,
+        BoxId = entity.BoxId,
+        BoxSlot = entity.BoxSlot,
+        IsMain = entity.IsMain,
+        IsExternal = entity.IsExternal,
+        AttachedSaveId = entity.AttachedSaveId,
+        AttachedSavePkmIdBase = entity.AttachedSavePkmIdBase,
+        Context = entity.Context,
+        Generation = entity.Generation,
+        Filepath = entity.Filepath,
+        Species = entity.Species,
+        Form = entity.Form,
+        Gender = entity.Gender,
+        IsShiny = entity.IsShiny,
+        PkmFile = entity.PkmFile
+    };
+
     public override required string Id { get; init; }
     public required string BoxId { get; set; }
     public required int BoxSlot { get; set; }

@@ -13,6 +13,7 @@ public class SessionDbContext(
     public DbSet<PkmVariantEntity> PkmVersions { get; set; }
     public DbSet<DexFormEntity> Pokedex { get; set; }
     public DbSet<PkmFileEntity> PkmFiles { get; set; }
+    public DbSet<MetaEntity> Metas { get; set; }
 
     public DataUpdateFlagsState BanksFlags = new();
     public DataUpdateFlagsState BoxesFlags = new();
@@ -118,6 +119,11 @@ public class SessionDbContext(
             entity.HasIndex(p => p.Species);
             entity.HasIndex(p => p.Form);
             entity.HasIndex(p => p.Gender);
+        });
+
+        modelBuilder.Entity<MetaEntity>(entity =>
+        {
+            entity.HasKey(p => p.Key);
         });
     }
 

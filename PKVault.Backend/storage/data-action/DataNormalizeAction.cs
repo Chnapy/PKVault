@@ -2,16 +2,16 @@ using PKHeX.Core;
 
 public record DataNormalizeActionInput(
     bool SetupInitialData,
-    PkmVariantEntity[] MigrateVariantIDFrom161
+    bool UpdateVersion
 )
 {
-    public bool ShouldRun => SetupInitialData || MigrateVariantIDFrom161.Length > 0;
+    public bool ShouldRun => SetupInitialData || UpdateVersion;
 }
 
 public class DataNormalizeAction(
     SessionDbContext db,
     IBankLoader bankLoader, IBoxLoader boxLoader, IPkmVariantLoader pkmVariantLoader, IDexLoader dexLoader,
-    ISavesLoadersService savesLoadersService,
+    ISavesLoadersService savesLoadersService, IMetaLoader metaLoader,
     ISessionService sessionService, IFileIOService fileIOService, ISettingsService settingsService,
     StaticDataService staticDataService, ISaveService saveService
 ) : DataAction<DataNormalizeActionInput>
@@ -26,72 +26,14 @@ public class DataNormalizeAction(
 
     public async Task<DataNormalizeActionInput> HasDataToNormalize()
     {
-        if (!await bankLoader.Any())
-        {
-            Console.WriteLine("HasDataToNormalize - No bank");
-            return new(
-                SetupInitialData: true,
-                MigrateVariantIDFrom161: []
-            );
-        }
+        var currentVersion = await metaLoader.GetEntity(MetaKey.APP_VERSION);
+        var updateVersion = currentVersion?.Value != settingsService.GetSettings().Version;
 
-        if (!await boxLoader.Any())
-        {
-            Console.WriteLine("HasDataToNormalize - No box");
-            return new(
-                SetupInitialData: true,
-                MigrateVariantIDFrom161: []
-            );
-        }
-
-        if (!sessionService.HasMainDb())
-        {
-            var settings = settingsService.GetSettings();
-            var dbPath = settings.GetDbPath();
-
-            var hasLegacy = GetLegacyFilepaths(dbPath).Any(fileIOService.Exists);
-            if (hasLegacy)
-            {
-                Console.WriteLine("HasDataToNormalize - Legacy");
-                return new(
-                    SetupInitialData: true,
-                    MigrateVariantIDFrom161: []
-                );
-            }
-        }
-
-        var attachedVariantsBySave = await pkmVariantLoader.GetEntitiesAttachedGroupedBySave();
-
-        List<PkmVariantEntity> migrateVariantIDFrom161 = [];
-        foreach (var attachedVariantsPair in attachedVariantsBySave)
-        {
-            var saveLoaders = savesLoadersService.GetLoaders(attachedVariantsPair.Key);
-
-            // ignore main games,
-            // no migrate needed here
-            if (saveLoaders == null || (byte)saveLoaders.Save.Context < 10)
-            {
-                continue;
-            }
-
-            var idPrefix = ImmutablePKM.GetPKMIdPrefix(saveLoaders.Save.Context);
-
-            foreach (var variant in attachedVariantsPair.Value)
-            {
-                var attachedId = variant.AttachedSavePkmIdBase;
-                if (attachedId == null || attachedId.StartsWith(idPrefix))
-                {
-                    continue;
-                }
-
-                migrateVariantIDFrom161.Add(variant);
-            }
-        }
-
+        var setupInitialData = !await bankLoader.Any() || !await boxLoader.Any();
 
         return new(
-            SetupInitialData: false,
-            MigrateVariantIDFrom161: [.. migrateVariantIDFrom161]
+            SetupInitialData: setupInitialData,
+            UpdateVersion: updateVersion
         );
     }
 
@@ -99,12 +41,12 @@ public class DataNormalizeAction(
     {
         if (input.SetupInitialData)
         {
-            await MigrateJSONLegacyData();
             await SetupInitialData();
         }
-        if (input.MigrateVariantIDFrom161.Length > 0)
+
+        if (input.UpdateVersion)
         {
-            await MigrateVariantIDFrom161(input.MigrateVariantIDFrom161);
+            await UpdateVersion();
         }
 
         return new(
@@ -141,6 +83,39 @@ public class DataNormalizeAction(
                 Order = 0,
                 BankId = "0"
             });
+        }
+    }
+
+    private async Task UpdateVersion()
+    {
+        var currentVersion = await metaLoader.GetEntity(MetaKey.APP_VERSION);
+
+        var newVersion = settingsService.GetSettings().Version;
+
+        // --- Data migration
+
+        // <= 1.6.1
+        if (currentVersion == null)
+        {
+            await MigrateJSONLegacyData();
+            await MigrateVariantsFrom161();
+        }
+
+        // --- Update version
+
+        if (currentVersion == null)
+        {
+            await metaLoader.AddEntity(new()
+            {
+                Key = MetaKey.APP_VERSION,
+                Value = newVersion
+            });
+        }
+        else
+        {
+            currentVersion.Value = newVersion;
+
+            await metaLoader.UpdateEntity(currentVersion);
         }
     }
 
@@ -286,15 +261,83 @@ public class DataNormalizeAction(
         return true;
     }
 
-    // migrate variants IDs from 1.6.1
-    // only attached IDs should be migrated here
-    private async Task MigrateVariantIDFrom161(PkmVariantEntity[] pkmVariantsToUpdate)
+    // migrate variants from <=1.6.1, checking:
+    // - wrong context: entity vs PKM
+    // - wrong variant ID
+    // - wrong attached save pkm ID
+    private async Task MigrateVariantsFrom161()
     {
-        foreach (var variant in pkmVariantsToUpdate)
+        var staticData = await staticDataService.GetStaticData();
+
+        var allVariants = await pkmVariantLoader.GetAllEntities();
+
+        foreach (var oldVariant in allVariants.Values)
         {
-            variant.AttachedSaveId = null;
-            variant.AttachedSavePkmIdBase = null;
-            await pkmVariantLoader.UpdateEntity(variant);
+            var variant = oldVariant;
+            bool shouldUpdate = false;
+
+            var pkm = await pkmVariantLoader.GetPKM(variant);
+            if (!pkm.IsEnabled)
+            {
+                continue;
+            }
+
+            var pkmId = pkm.GetPKMIdBase(staticData.Evolves);
+
+            // wrong context
+            if (pkm.Context != variant.Context)
+            {
+                variant.Context = pkm.Context;
+                shouldUpdate = true;
+            }
+
+            // wrong variant ID
+            if (pkmId != variant.Id)
+            {
+                if (!allVariants.ContainsKey(pkmId))
+                    variant = PkmVariantEntity.CreateFrom(oldVariant, pkmId);
+            }
+
+            if (variant.AttachedSaveId != null && variant.AttachedSavePkmIdBase != null)
+            {
+                var saveLoaders = savesLoadersService.GetLoaders((uint)variant.AttachedSaveId);
+
+                // ignore main games
+                if (saveLoaders != null && (byte)saveLoaders.Save.Context > (byte)EntityContext.SplitInvalid)
+                {
+                    var idPrefix = ImmutablePKM.GetPKMIdPrefix(saveLoaders.Save.Context);
+
+                    var attachedId = variant.AttachedSavePkmIdBase;
+
+                    // wrong attached save pkm ID
+                    if (!attachedId.StartsWith(idPrefix))
+                    {
+                        // if same context, id can be fixed
+                        if (variant.Context == saveLoaders.Save.Context)
+                        {
+                            var idSuffix = attachedId[2..];
+                            variant.AttachedSavePkmIdBase = $"{idPrefix}{idSuffix}";
+                        }
+                        // otherwise detach variant from save
+                        else
+                        {
+                            variant.AttachedSaveId = null;
+                            variant.AttachedSavePkmIdBase = null;
+                        }
+                        shouldUpdate = true;
+                    }
+                }
+            }
+
+            if (variant != oldVariant)
+            {
+                await pkmVariantLoader.DeleteEntityDBOnly(oldVariant);
+                await pkmVariantLoader.AddEntity(variant);
+            }
+            else if (shouldUpdate)
+            {
+                await pkmVariantLoader.UpdateEntity(variant);
+            }
         }
     }
 }
