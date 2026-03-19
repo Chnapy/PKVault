@@ -47,6 +47,17 @@ class Program
         });
         window.RegisterWindowClosingHandler((sender, e) =>
         {
+            var emptyActionList = server.HasEmptyActionList();
+
+            if (!emptyActionList)
+            {
+                var result = window.ShowMessage("PKVault", "You have unsaved changes. Are you sure ?", PhotinoDialogButtons.OkCancel);
+                if (result == PhotinoDialogResult.Cancel)
+                {
+                    return true;
+                }
+            }
+
             _ = server.Stop();
 
             return false;

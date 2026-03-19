@@ -28,6 +28,15 @@ const Root: React.FC = () => {
   const hasStorageActions = !!useStorageGetActions().data?.data.length;
   const savesScanMutation = useSaveInfosScan();
 
+  React.useEffect(() => {
+    if (hasStorageActions) {
+      window.onbeforeunload = () => 'You have unsaved changes !';
+    } else {
+      window.onbeforeunload = null;
+    }
+
+  }, [ hasStorageActions ]);
+
   return (
     <HistoryContext.Provider>
       <Frame>
