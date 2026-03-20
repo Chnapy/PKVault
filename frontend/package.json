@@ -60,9 +60,12 @@
     "msw": "^2.12.10",
     "orval": "^7.21.0",
     "prettier": "^3.6.2",
+    "sharp": "^0.34.5",
+    "svgo": "^4.0.1",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.34.1",
     "vite": "^7.0.0",
+    "vite-plugin-image-optimizer": "^2.0.3",
     "vitest": "^4.0.18"
   }
 }

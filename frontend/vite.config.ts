@@ -3,6 +3,7 @@
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig } from "vite";
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import { prepareDocs } from './src/help/prepare-docs';
 
 if (process.env.NODE_ENV === 'development') {
@@ -12,6 +13,7 @@ if (process.env.NODE_ENV === 'development') {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    ViteImageOptimizer(),
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
