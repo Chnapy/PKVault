@@ -114,12 +114,14 @@ public class GenStaticDataService(
 
                 var versionName = GetVersionName(version, lang);
                 var versionRegion = GetVersionRegionName(version, lang);
+                var versionPokedexes = GetVersionPokedexes(version);
 
                 return new StaticVersion(
                     Id: (byte)version,
                     Name: await versionName,
                     Generation: version.Generation,
                     Region: await versionRegion,
+                    Pokedexes: await versionPokedexes,
                     MaxSpeciesId: blankSave?.MaxSpeciesID ?? 0,
                     MaxIV: blankSave?.MaxIV ?? 0,
                     MaxEV: blankSave?.MaxEV ?? 0
@@ -143,13 +145,6 @@ public class GenStaticDataService(
         List<Task<StaticSpecies>> tasks = [];
 
         // List<string> notFound = [];
-
-        var hoennDex = await pokeApiService.GetPokedex(PokeApiPokedexEnum.HOENN);
-        var hoennDexSpeciesSet = hoennDex!.PokemonEntries.Select(entry =>
-        {
-            var url = entry.PokemonSpecies.Url;
-            return int.Parse(url.TrimEnd('/').Split('/')[^1]);
-        }).ToHashSet();
 
         for (ushort i = 1; i < (ushort)Species.MAX_COUNT; i++)
         {
@@ -521,7 +516,11 @@ public class GenStaticDataService(
                     forms.Add((byte)context, [.. varietyForms]);
                 });
 
-                var isInHoennDex = hoennDexSpeciesSet.Contains(species);
+                Dictionary<string, int> pokedexIndexes = pkmSpeciesObj.PokedexNumbers
+                    .ToDictionary(
+                        p => p.Pokedex.Name,
+                        p => p.EntryNumber
+                    );
 
                 return new StaticSpecies(
                     Id: species,
@@ -529,7 +528,7 @@ public class GenStaticDataService(
                     Generation: generation,
                     Genders: genders,
                     Forms: forms,
-                    IsInHoennDex: isInHoennDex
+                    PokedexIndexes: pokedexIndexes
                 );
             }));
         }
@@ -1023,6 +1022,27 @@ public class GenStaticDataService(
                         pokeApiService.GetRegion(region)
                     ));
                     return regions.Select(region => PokeApiService.GetNameForLang(region.Names, lang));
+                })
+            ))
+            .SelectMany(v => v).Distinct()];
+    }
+
+    private async Task<string[]> GetVersionPokedexes(GameVersion version)
+    {
+        var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
+
+        return [.. (await Task.WhenAll(
+            pokeapiVersions
+                .OfType<PokeApiNet.Version>()
+                .Select(async ver =>
+                {
+                    if (ver.Id == 0)
+                    {
+                        return [];
+                    }
+
+                    var versionGroup = await pokeApiService.GetVersionGroup(ver.VersionGroup);
+                    return versionGroup.Pokedexes.Select(pokedex => pokedex.Name);
                 })
             ))
             .SelectMany(v => v).Distinct()];
