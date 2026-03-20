@@ -594,7 +594,7 @@ public class GenStaticDataService(
         var moveNames = GameInfo.GetStrings(lang).Move;
         List<Task<StaticMove>> tasks = [];
 
-        for (var i = 0; i < 919; i++)  // TODO
+        for (var i = 0; i < moveNames.Count; i++)
         {
             var moveId = i;
             var moveName = moveNames[moveId];
@@ -615,13 +615,26 @@ public class GenStaticDataService(
                 }
 
                 var moveObj = await pokeApiService.GetMove(moveId);
+                if (moveObj == null)
+                {
+                    return new StaticMove(
+                        Id: moveId,
+                        Name: moveName,
+                        DataUntilGeneration: [new(
+                            UntilGeneration: 99,
+                            Type: 1,   // normal
+                            Category: MoveCategory.STATUS,
+                            Power: null
+                        )]
+                    );
+                }
+
+                var generation = PokeApiService.GetGenerationValue(moveObj.Generation.Name);
 
                 var type = PokeApiService.GetIdFromUrl(moveObj.Type.Url);
 
                 var category = GetMoveCategory(moveObj.DamageClass.Name);
-                var oldCategory = category == MoveCategory.STATUS ? category : (
-                    type < 10 ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL
-                );
+                var oldCategory = ImmutablePKM.GetMoveCategoryG123(type, category);
 
                 var tmpTypeUrl = moveObj.Type.Url;
                 var tmpPowerUrl = moveObj.Power;
@@ -657,7 +670,9 @@ public class GenStaticDataService(
                     Power: moveObj.Power
                 ));
 
-                if (oldCategory != category && !dataUntilGeneration.Any(data => data.UntilGeneration == 3))
+                if (generation < 4
+                    && oldCategory != category
+                    && !dataUntilGeneration.Any(data => data.UntilGeneration == 3))
                 {
                     var dataPostG3 = dataUntilGeneration.Find(data => data.UntilGeneration > 3);
                     dataUntilGeneration.Add(new(

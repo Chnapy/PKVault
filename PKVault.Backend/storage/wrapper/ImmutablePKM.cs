@@ -22,6 +22,15 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
         return pkm.Form;
     }
 
+    public static MoveCategory GetMoveCategoryG123(int type, MoveCategory? initialCategory = null)
+    {
+        return initialCategory == MoveCategory.STATUS
+            ? (MoveCategory)initialCategory
+            : (
+                type < 10 ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL
+            );
+    }
+
     public string Extension => Pkm.Extension;
     public PersonalInfo PersonalInfo => Pkm.PersonalInfo;
 
@@ -188,7 +197,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public int HiddenPowerPower => Pkm.HPPower;
 
     public MoveCategory HiddenPowerCategory => Generation <= 3
-        ? (HiddenPowerType < 10 ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL) // TODO duplicate with static-data
+        ? GetMoveCategoryG123(HiddenPowerType)
         : MoveCategory.SPECIAL;
 
     public Nature Nature => GetNature();
