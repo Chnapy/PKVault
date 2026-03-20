@@ -21,6 +21,7 @@ byte Id,
 string Name,
 byte Generation,
 string[] Region,
+string[] Pokedexes,
 int MaxSpeciesId,
 int MaxIV,
 int MaxEV
@@ -32,7 +33,7 @@ public record StaticSpecies(
     Gender[] Genders,
     // key is EntityContext
     Dictionary<byte, StaticSpeciesForm[]> Forms,
-    bool IsInHoennDex
+    Dictionary<string, int> PokedexIndexes
 );
 
 public record StaticSpeciesForm(

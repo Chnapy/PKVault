@@ -482,7 +482,7 @@ public class MovePkmAction(
         if (save.GetSave() is SAV3 saveG3RSE && saveG3RSE is IGen3Hoenn && !saveG3RSE.NationalDex)
         {
             var staticData = await staticDataService.GetStaticData();
-            var isInDex = staticData.Species[(ushort)species].IsInHoennDex;
+            var isInDex = staticData.Species[(ushort)species].PokedexIndexes.ContainsKey("hoenn");
 
             if (!isInDex)
             {

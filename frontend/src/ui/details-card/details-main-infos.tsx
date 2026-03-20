@@ -1,5 +1,7 @@
 import { css } from '@emotion/css';
 import type React from 'react';
+import type { GameVersion } from '../../data/sdk/model';
+import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
 import { getSpeciesNO } from '../dex-item/util/get-species-no';
 import { Gauge } from '../gauge/gauge';
@@ -12,6 +14,7 @@ export type DetailsMainInfosProps = {
     pid?: number;
     species: number;
     speciesName: React.ReactNode;
+    version: GameVersion;
     nickname?: React.ReactNode;
     types: number[];
     levelUpPercent?: number;
@@ -19,8 +22,14 @@ export type DetailsMainInfosProps = {
     eggHatchCount?: number;
 };
 
-export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid = 0, species, speciesName, nickname, types, levelUpPercent, level, eggHatchCount = 0 }) => {
+export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid = 0, species, speciesName, version, nickname, types, levelUpPercent, level, eggHatchCount = 0 }) => {
     const { t } = useTranslate();
+
+    const staticData = useStaticData();
+
+    const dexLocalIndex = staticData.species[ species ]?.pokedexIndexes[
+        staticData.versions[ version ?? 0 ]?.pokedexes[ 0 ] ?? ''
+    ] ?? 0;
 
     return <>
         {nickname && <>{nickname}{' - '}</>}
@@ -61,7 +70,7 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid 
             </div>}
         </div>
         <br />
-        {t('details.dex.local')}<span className={css({ color: theme.text.primary })}>TODO</span>{' '}
+        {t('details.dex.local')}<span className={css({ color: theme.text.primary })}>{getSpeciesNO(dexLocalIndex)}</span>{' '}
         {t('details.dex.natio')}<span className={css({ color: theme.text.primary })}>{getSpeciesNO(species)}</span>
         <br />
         {idBase !== undefined ? <>

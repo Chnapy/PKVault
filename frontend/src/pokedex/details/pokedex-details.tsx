@@ -164,6 +164,7 @@ export const PokedexDetails: React.FC = () => {
                 />
               </span>}
             </div>}
+            version={selectedSave.version ?? 0}
             types={selectedForm.types}
           />
         }

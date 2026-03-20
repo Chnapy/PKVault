@@ -95,6 +95,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             pid={pkm.pid}
             species={pkm.species}
             speciesName={speciesName ?? ''}
+            version={pkm.contextVersion ?? 0}
             nickname={pkm.nickname}
             nicknameMaxLength={pkm.nicknameMaxLength}
             levelUpPercent={pkm.levelUpPercent}
