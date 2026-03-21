@@ -29,10 +29,11 @@ export const StorageHeader: React.FC<{
     onNextBoxClick?: () => void;
     onSplitClick?: () => void;
     onClose?: () => void;
+    loading: boolean;
     children?: React.ReactNode;
 }> = ({
     saveId, gameLogo, boxId, boxType, boxName, boxPkmCount, boxSlotCount, totalPkmCount, showBoxes, advancedActions = [],
-    onBoxesDisplay, onPreviousBoxClick, onNextBoxClick, onSplitClick, onClose, children
+    onBoxesDisplay, onPreviousBoxClick, onNextBoxClick, onSplitClick, onClose, loading, children
 }) => {
         const { t } = useTranslate();
 
@@ -55,12 +56,12 @@ export const StorageHeader: React.FC<{
             >
                 <Button
                     onClick={onPreviousBoxClick}
-                    disabled={!onPreviousBoxClick}
+                    disabled={loading || !onPreviousBoxClick}
                 >
                     <Icon name='angle-left' forButton />
                 </Button>
 
-                <Button onClick={onBoxesDisplay} className={css({ minWidth: 120 })}>
+                <Button onClick={onBoxesDisplay} className={css({ minWidth: 120 })} loading={loading}>
                     <BoxName
                         boxType={boxType}
                         boxName={boxName}
@@ -72,7 +73,7 @@ export const StorageHeader: React.FC<{
 
                 <Button
                     onClick={onNextBoxClick}
-                    disabled={!onNextBoxClick}
+                    disabled={loading || !onNextBoxClick}
                 >
                     <Icon name='angle-right' forButton />
                 </Button>
@@ -88,7 +89,7 @@ export const StorageHeader: React.FC<{
                 })}
             >
                 {!showBoxes && <>
-                    <StorageSelectAll saveId={saveId} boxId={boxId} />
+                    <StorageSelectAll saveId={saveId} boxId={boxId} disabled={loading} />
 
                     <div className={css({ display: 'flex', gap: 2, whiteSpace: 'nowrap' })}>
                         <Icon name='folder' solid forButton />
@@ -98,12 +99,14 @@ export const StorageHeader: React.FC<{
 
                     {onSplitClick && <Button
                         onClick={onSplitClick}
+                        disabled={loading}
                     >
                         <Icon name='page-break' forButton title={t('storage.box.split.help')} className={css({ transform: 'rotate(90deg) scale(1.2)' })} />
                     </Button>}
 
                     {advancedActions.length > 0 && <ButtonWithPopover
                         anchor='right start'
+                        disabled={loading}
                         panelContent={() => (
                             <div
                                 className={css({

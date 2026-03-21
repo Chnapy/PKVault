@@ -120,6 +120,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
         header={
           <>
             <StorageHeader
+              loading={loading}
               saveId={saveId}
               gameLogo={
                 <div
