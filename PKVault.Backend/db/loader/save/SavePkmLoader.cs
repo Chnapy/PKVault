@@ -33,6 +33,7 @@ public class SavePkmLoader(
     private Dictionary<string, PkmSaveDTO> dtoByBox = [];
     private Dictionary<string, Dictionary<string, PkmSaveDTO>> dtosByIdBase = [];
     private bool NeedUpdate = true;
+    private bool NeedPartyFlush = false;
 
     private DataUpdateSaveListFlags savesFlags = new();
     private DataUpdateFlagsState dexFlags = new();
@@ -329,11 +330,12 @@ public class SavePkmLoader(
         }
         party[slot] = pkm ?? save.GetBlankPKM();
         SetParty(party);
+        NeedPartyFlush = true;
     }
 
     public void FlushParty()
     {
-        if (!save.HasParty)
+        if (!save.HasParty || !NeedPartyFlush)
         {
             return;
         }
@@ -342,30 +344,44 @@ public class SavePkmLoader(
         .FindAll(pkm => pkm.IsSpeciesValid);
 
         SetParty(party);
+        NeedPartyFlush = false;
+
+        // var expectedPartyChecksum = string.Join(',', party.Select(pkm => pkm.Species));
+        // var currentPartyChecksum = string.Join(',', save.GetPartyData().FindAll(pkm => pkm.IsSpeciesValid).Select(pkm => pkm.Species));
+
+        // if (expectedPartyChecksum != currentPartyChecksum)
+        // {
+        //     throw new Exception($"Wrong party checksum:\nExpected = {expectedPartyChecksum}\nCurrent = {currentPartyChecksum}");
+        // }
     }
 
     private void SetParty(List<ImmutablePKM> party)
     {
         // Console.WriteLine($"SET-PARTY {string.Join('.', party.Select(pk => pk.Species))}");
-        for (var i = 0; i < 6; i++)
+        for (var slot = 0; slot < 6; slot++)
         {
-            if (i < party.Count)
+            if (slot < party.Count)
             {
-                var pkm = party[i];
-                save.SetPartySlotAtIndex(pkm, i);
+                var pkm = party[slot];
+                save.SetPartySlotAtIndex(pkm, slot);
                 if (pkm.IsSpeciesValid)
                 {
-                    var boxSlot = i;
                     SetDTO(
                         CreateDTO(
-                            save, pkm, (int)BoxType.Party, boxSlot
+                            save, pkm, (int)BoxType.Party, slot
                         )
                     );
+                }
+                else
+                {
+                    save.SetPartySlotAtIndex(save.GetBlankPKM(), slot);
+                    RemoveDTO((int)BoxType.Party, slot);
                 }
             }
             else
             {
-                RemoveDTO((int)BoxType.Party, i);
+                save.SetPartySlotAtIndex(save.GetBlankPKM(), slot);
+                RemoveDTO((int)BoxType.Party, slot);
             }
         }
     }

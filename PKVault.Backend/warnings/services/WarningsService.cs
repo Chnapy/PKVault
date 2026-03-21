@@ -91,7 +91,7 @@ public class WarningsService(
 
             if (savePkms.Count == 0)
             {
-                Console.WriteLine($"Pkm-version warning");
+                // Console.WriteLine($"Pkm-version warning");
 
                 return new PkmVariantWarning(
                     PkmVariantId: attachedPkmVariant.Id

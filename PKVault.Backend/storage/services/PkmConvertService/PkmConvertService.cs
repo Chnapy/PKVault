@@ -52,7 +52,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
 
     private PKM ConvertRecursive(PKM current, Type targetType, LanguageID fallbackLang, PKMRndValues? rndValues)
     {
-        Console.WriteLine($"Convert recursive {current.GetType().Name} -> {targetType.Name}");
+        // Console.WriteLine($"Convert recursive {current.GetType().Name} -> {targetType.Name}");
 
         var currentValue = GetPKMTypeWeight(current.GetType());
         var targetValue = GetPKMTypeWeight(targetType);
@@ -85,7 +85,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
 
     private static PKM? TryPKToVariant(PKM source, Type targetType, PKMRndValues? rndValues)
     {
-        Console.WriteLine($"Convert forward {source.GetType().Name} -> {targetType.Name} - PID={rndValues?.PID}");
+        // Console.WriteLine($"Convert forward {source.GetType().Name} -> {targetType.Name} - PID={rndValues?.PID}");
 
         return (source.GetType().Name, targetType.Name) switch
         {
@@ -119,7 +119,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
 
     private static PKM? TryForwardConversion(PKM source, LanguageID fallbackLang, PKMRndValues? rndValues)
     {
-        Console.WriteLine($"Convert forward {source.GetType().Name} - PID={rndValues?.PID}");
+        // Console.WriteLine($"Convert forward {source.GetType().Name} - PID={rndValues?.PID}");
 
         if (source is ITrainerInfo sourceTrainer)
         {
@@ -152,7 +152,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
 
     private static PKM? TryBackwardConversion(PKM source, PKMRndValues? rndValues)
     {
-        Console.WriteLine($"Convert backward {source.GetType().Name} - PID={rndValues?.PID}");
+        // Console.WriteLine($"Convert backward {source.GetType().Name} - PID={rndValues?.PID}");
 
         if (source is ITrainerInfo sourceTrainer)
         {
@@ -185,7 +185,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
 
     private static PKM? TryVariantToPK(PKM source, PKMRndValues? rndValues)
     {
-        Console.WriteLine($"Convert backward {source.GetType().Name} - PID={rndValues?.PID}");
+        // Console.WriteLine($"Convert backward {source.GetType().Name} - PID={rndValues?.PID}");
 
         return source.GetType().Name switch
         {
