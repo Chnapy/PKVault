@@ -1,5 +1,5 @@
 import { css } from '@emotion/css';
-import type React from 'react';
+import React from 'react';
 import type { GameVersion } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
@@ -27,9 +27,14 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid 
 
     const staticData = useStaticData();
 
-    const dexLocalIndex = staticData.species[ species ]?.pokedexIndexes[
-        staticData.versions[ version ?? 0 ]?.pokedexes[ 0 ] ?? ''
-    ] ?? 0;
+    const dexIndexes = staticData.versions[ version ]?.pokedexes
+        .map(dexKey => ({
+            key: dexKey,
+            name: staticData.pokedexes[ dexKey ]?.name,
+            value: staticData.species[ species ]?.pokedexIndexes[ dexKey ] ?? 0
+        }))
+        .filter(dexIndex => dexIndex.value > 0) ?? [];
+    const [ mainDexIndex, ...otherDexIndexes ] = dexIndexes;
 
     return <>
         {nickname && <>{nickname}{' - '}</>}
@@ -70,11 +75,51 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid 
             </div>}
         </div>
         <br />
-        {t('details.dex.local')}<span className={css({ color: theme.text.primary })}>{getSpeciesNO(dexLocalIndex)}</span>{' '}
-        {t('details.dex.natio')}<span className={css({ color: theme.text.primary })}>{getSpeciesNO(species)}</span>
-        <br />
-        {idBase !== undefined ? <>
+        {t('details.dex')}
+        <details className={css({
+            display: 'inline-block',
+            verticalAlign: 'top',
+            marginLeft: 4
+        })}>
+            <summary className={css({
+                cursor: otherDexIndexes.length > 0 ? 'pointer' : undefined,
+                pointerEvents: otherDexIndexes.length === 0 ? 'none' : undefined,
+                height: 19,
+
+                '&::marker': {
+                    fontSize: otherDexIndexes.length > 0 ? '80%' : 0,
+                }
+            })}>
+                {mainDexIndex!.name}
+                <span className={css({
+                    marginLeft: 4,
+                    float: 'right',
+                    color: theme.text.primary
+                })}>
+                    {getSpeciesNO(mainDexIndex!.value)}
+                </span>
+            </summary>
+
+            <div className={css({
+                paddingLeft: 13.44,
+            })}>
+                {otherDexIndexes.map((dexIndex, i) => <React.Fragment key={dexIndex.key}>
+                    {i ? <br /> : null}
+                    {dexIndex.name}
+                    <span className={css({
+                        marginLeft: 4,
+                        float: 'right',
+                        color: theme.text.primary
+                    })}>
+                        {getSpeciesNO(dexIndex.value)}
+                    </span>
+                </React.Fragment>)}
+            </div>
+        </details>
+
+        {idBase !== undefined && <>
+            <br />
             {t('details.id')} <span className={css({ color: theme.text.primary })}>{idBase}</span> {pid > 0 && <>{t('details.pid')} <span className={css({ color: theme.text.primary })}>{pid}</span></>}
-        </> : ' '}
+        </>}
     </>;
 };

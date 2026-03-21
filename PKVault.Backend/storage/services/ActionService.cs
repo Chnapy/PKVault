@@ -209,14 +209,14 @@ public class ActionService(
         );
     }
 
-    public async Task<DataUpdateFlags> SortPkms(uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot)
+    public async Task<DataUpdateFlags> SortPkms(uint? saveId, int fromBoxId, int toBoxId, string pokedexName, bool leaveEmptySlot)
     {
         using var scope = sp.CreateScope();
 
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<SortPkmAction>(),
-            new(saveId, fromBoxId, toBoxId, leaveEmptySlot)
+            new(saveId, fromBoxId, toBoxId, pokedexName, leaveEmptySlot)
         );
     }
 

@@ -2,29 +2,30 @@
 using PKHeX.Core;
 
 public record StaticDataDTO(
-Dictionary<byte, StaticVersion> Versions,
-Dictionary<ushort, StaticSpecies> Species,
-Dictionary<int, StaticStat> Stats,
-Dictionary<int, StaticType> Types,
-Dictionary<int, StaticMove> Moves,
-Dictionary<int, StaticNature> Natures,
-Dictionary<int, StaticAbility> Abilities,
-Dictionary<int, StaticItem> Items,
-Dictionary<ushort, StaticEvolve> Evolves,
-Dictionary<byte, StaticGeneration> Generations,
-StaticSpritesheets Spritesheets,
-string EggSprite
+    Dictionary<byte, StaticVersion> Versions,
+    Dictionary<ushort, StaticSpecies> Species,
+    Dictionary<int, StaticStat> Stats,
+    Dictionary<int, StaticType> Types,
+    Dictionary<int, StaticMove> Moves,
+    Dictionary<int, StaticNature> Natures,
+    Dictionary<int, StaticAbility> Abilities,
+    Dictionary<int, StaticItem> Items,
+    Dictionary<ushort, StaticEvolve> Evolves,
+    Dictionary<byte, StaticGeneration> Generations,
+    Dictionary<string, StaticPokedex> Pokedexes,
+    StaticSpritesheets Spritesheets,
+    string EggSprite
 );
 
 public record StaticVersion(
-byte Id,
-string Name,
-byte Generation,
-string[] Region,
-string[] Pokedexes,
-int MaxSpeciesId,
-int MaxIV,
-int MaxEV
+    byte Id,
+    string Name,
+    byte Generation,
+    string[] Region,
+    string[] Pokedexes,
+    int MaxSpeciesId,
+    int MaxIV,
+    int MaxEV
 );
 
 public record StaticSpecies(
@@ -37,15 +38,15 @@ public record StaticSpecies(
 );
 
 public record StaticSpeciesForm(
-int Id,
-string Name,
-string SpriteDefault,
-string? SpriteFemale,
-string SpriteShiny,
-string? SpriteShinyFemale,
-string? SpriteShadow,
-bool HasGenderDifferences,
-bool IsBattleOnly
+    int Id,
+    string Name,
+    string SpriteDefault,
+    string? SpriteFemale,
+    string SpriteShiny,
+    string? SpriteShinyFemale,
+    string? SpriteShadow,
+    bool HasGenderDifferences,
+    bool IsBattleOnly
 );
 
 public record StaticStat(
@@ -65,17 +66,17 @@ public record StaticMove(
 );
 
 public record StaticMoveGeneration(
-byte UntilGeneration,
-int Type,
-MoveCategory Category,
-int? Power
+    byte UntilGeneration,
+    int Type,
+    MoveCategory Category,
+    int? Power
 );
 
 public record StaticNature(
     int Id,
     string Name,
     int? IncreasedStatIndex,
-int? DecreasedStatIndex
+    int? DecreasedStatIndex
 );
 
 public record StaticAbility(
@@ -114,6 +115,13 @@ public record StaticSpritesheets(
 );
 
 public record SpriteInfo(string SheetName, int X, int Y, int Width, int Height);
+
+public record StaticPokedex(
+    string Key,
+    string Name,
+    byte Order,
+    Dictionary<ushort, int> PokemonIndexes
+);
 
 public enum MoveCategory
 {

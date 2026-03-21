@@ -87,6 +87,21 @@ public class PokeApiService(IFileIOService fileIOService)
         );
     }
 
+    public async Task<Pokedex[]> GetPokedexList()
+    {
+        var pokedexList = await client.GetAsyncUrlList(
+            PokeApiJsonContext.Default.NamedApiResourceListPokedex,
+            PokeApiJsonContext.Default.Pokedex
+        );
+
+        return [.. (await Task.WhenAll(
+            pokedexList.Select(pokedexResource =>
+                client.GetAsync(pokedexResource, PokeApiJsonContext.Default.Pokedex)
+            )
+        ))
+        .OfType<Pokedex>()];
+    }
+
     public async Task<Pokedex?> GetPokedex(PokeApiPokedexEnum pokedex)
     {
         return await client.GetAsync((int)pokedex,
