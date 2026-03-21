@@ -1,5 +1,9 @@
+using System.IO.Compression;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
+using DiffPlex.Renderer;
 using PKHeX.Core;
 using PokeApiNet;
 
@@ -21,9 +25,16 @@ public class GenStaticDataService(
         ..GetGeneratedPathParts(), "api-data", $"StaticData_{lang}.json.gz"
     ];
 
-    public static List<string> GetStaticDataRawPathParts(string lang) => [
-        ..GetGeneratedPathParts(), "raw-data", $"StaticData_{lang}.json"
+    private static List<string> GetStaticDataDiffPathParts(string lang) => [
+        ..GetGeneratedPathParts(), "diff-data", $"StaticData_{lang}.diff"
     ];
+
+    private static JsonTypeInfo<StaticDataDTO> StaticDataIndentedJsonInfo = new StaticDataJsonContext(new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    }).StaticDataDTO;
 
     public async Task GenerateFiles()
     {
@@ -79,24 +90,39 @@ public class GenStaticDataService(
 
         time.Dispose();
 
+        var oldStaticDataString = await GetOldStaticDataString(lang);
+
         var staticDataPath = Path.Combine([.. GetStaticDataPathParts(lang)]);
 
         time = LogUtil.Time($"Write static-data {lang} to {staticDataPath}");
 
-        await fileIOService.WriteJSONFile(
-            Path.Combine([.. GetStaticDataRawPathParts(lang)]),
-            new StaticDataJsonContext(new()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            }).StaticDataDTO,
-            dto
-        );
-
         await fileIOService.WriteJSONGZipFile(staticDataPath, StaticDataJsonContext.Default.StaticDataDTO, dto);
 
+        var newStaticDataString = JsonSerializer.Serialize(dto, StaticDataIndentedJsonInfo);
+
+        var diffFilename = Path.Combine([.. GetStaticDataDiffPathParts(lang)]);
+
+        string unidiff = "--- This file displays changes of static-data compressed file from previous changes\n\n"
+            + UnidiffRenderer.GenerateUnidiff(
+                oldText: oldStaticDataString,
+                newText: newStaticDataString,
+                oldFileName: diffFilename,
+                newFileName: diffFilename
+            );
+
+        await fileIOService.WriteBytes(diffFilename, Encoding.UTF8.GetBytes(unidiff));
+
         time.Dispose();
+    }
+
+    private async Task<string> GetOldStaticDataString(string lang)
+    {
+        using var fileStream = File.OpenRead(Path.Combine([.. GetStaticDataPathParts(lang)]));
+        using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
+
+        var oldStaticData = await JsonSerializer.DeserializeAsync(gzipStream, StaticDataJsonContext.Default.StaticDataDTO);
+
+        return JsonSerializer.Serialize(oldStaticData!, StaticDataIndentedJsonInfo);
     }
 
     public async Task<Dictionary<byte, StaticVersion>> GetStaticVersions(string lang)
