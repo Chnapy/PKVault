@@ -11,7 +11,7 @@ public interface ISavePkmLoader
     public PkmSaveDTO? GetDto(string id);
     public PkmSaveDTO? GetDto(string boxId, int boxSlot);
     public ImmutableDictionary<string, PkmSaveDTO> GetDtosByIdBase(string idBase);
-    public void WriteDto(PkmSaveDTO dto);
+    public void WriteDto(PkmSaveDTO dto, BoxDTO? box = null);
     public void DeleteDto(string id);
     public void FlushParty();
     public void SetFlags(DataUpdateSaveListFlags _savesFlags, DataUpdateFlagsState _dexFlags);
@@ -231,7 +231,7 @@ public class SavePkmLoader(
         return dto;
     }
 
-    public void WriteDto(PkmSaveDTO dto)
+    public void WriteDto(PkmSaveDTO dto, BoxDTO? box = null)
     {
         if (!dto.IsEnabled)
         {
@@ -241,6 +241,19 @@ public class SavePkmLoader(
         if (!BoxLoader.CanIdReceivePkm(dto.BoxId))
         {
             throw new Exception("Not allowed for pkm in daycare");
+        }
+
+        if (box != null)
+        {
+            if (dto.BoxId != box.IdInt)
+            {
+                throw new ArgumentException($"Inconsistent SavePkm {dto.Id} BoxId={dto.BoxId}, expected={box.IdInt}");
+            }
+
+            if (dto.BoxSlot >= box.SlotCount)
+            {
+                throw new ArgumentException($"Wrong SavePkm {dto.Id} BoxSlot={dto.BoxSlot}, should be less than box.SlotCount={box.SlotCount}");
+            }
         }
 
         // no real convert here,

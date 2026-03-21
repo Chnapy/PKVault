@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
 public record PkmVariantLoaderAddPayload(
-    string BoxId,
+    BoxDTO Box,
     int BoxSlot,
     bool IsMain,
     bool IsExternal,
@@ -24,7 +24,8 @@ public interface IPkmVariantLoader : IEntityLoader<PkmVariantDTO, PkmVariantEnti
     public Task<PkmVariantDTO> CreateDTO(PkmVariantEntity entity);
     public Task<PkmVariantEntity> AddEntity(PkmVariantLoaderAddPayload payload);
     public Task<IEnumerable<PkmVariantEntity>> AddEntities(IEnumerable<PkmVariantLoaderAddPayload> payloads);
-    public Task UpdateEntity(PkmVariantEntity entity, ImmutablePKM pkm);
+    public Task UpdateEntity(PkmVariantEntity entity, BoxDTO? box = null);
+    public Task UpdateEntity(PkmVariantEntity entity, ImmutablePKM pkm, BoxDTO? box = null);
     public Task DeleteEntityDBOnly(PkmVariantEntity entity);
 
     public Task<Dictionary<int, Dictionary<string, PkmVariantEntity>>> GetEntitiesByBox(int boxId);
@@ -323,6 +324,13 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
             throw new InvalidOperationException($"Cannot add disabled PkmVariant");
         }
 
+        var box = payload.Box;
+
+        if (payload.BoxSlot >= box.SlotCount)
+        {
+            throw new ArgumentException($"Wrong PkmVariant BoxSlot={payload.BoxSlot}, should be less than box.SlotCount={box.SlotCount}");
+        }
+
         var staticData = await staticDataService.GetStaticData();
 
         var id = payload.Id
@@ -333,7 +341,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
         return new PkmVariantEntity()
         {
             Id = id,
-            BoxId = payload.BoxId,
+            BoxId = box.Id,
             BoxSlot = payload.BoxSlot,
             IsMain = payload.IsMain,
             IsExternal = payload.IsExternal,
@@ -352,7 +360,20 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
         };
     }
 
-    public async Task UpdateEntity(PkmVariantEntity entity, ImmutablePKM pkm)
+    public async Task UpdateEntity(PkmVariantEntity entity, BoxDTO? box = null)
+    {
+        if (box != null)
+        {
+            if (entity.BoxSlot >= box.SlotCount)
+            {
+                throw new ArgumentException($"Wrong PkmVariant {entity.Id} BoxSlot={entity.BoxSlot}, should be less than box.SlotCount={box.SlotCount}");
+            }
+        }
+
+        await base.UpdateEntity(entity);
+    }
+
+    public async Task UpdateEntity(PkmVariantEntity entity, ImmutablePKM pkm, BoxDTO? box = null)
     {
         if (pkm.IsEnabled)
         {
@@ -376,7 +397,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
             entity.IsShiny = pkm.IsShiny;
         }
 
-        await UpdateEntity(entity);
+        await UpdateEntity(entity, box);
     }
 
     public override async Task DeleteEntity(PkmVariantEntity entity)

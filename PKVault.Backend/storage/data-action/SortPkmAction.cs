@@ -28,6 +28,7 @@ public class SortPkmAction(
             GetBoxDtoByBank: async (bankId) => saveLoaders.Boxes.GetAllDtos()
         ))
             .FindAll(box => box.CanSaveReceivePkm);
+        var boxesDict = boxes.ToDictionary(p => p.Id);
 
         var boxesIds = boxes.Select(box => box.IdInt).ToHashSet();
 
@@ -51,10 +52,12 @@ public class SortPkmAction(
                 applyValue: async (entry) =>
                 {
                     var currentValue = savePkms[entry.Index];
+
+                    boxesDict.TryGetValue(entry.BoxId, out var box);
                     saveLoaders.Pkms.WriteDto(saveLoaders.Pkms.CreateDTO(
                         currentValue.Save, currentValue.Pkm,
                         entry.BoxId, entry.BoxSlot
-                    ));
+                    ), box);
                 },
                 onSpaceMissing: async () =>
                 {
@@ -81,6 +84,7 @@ public class SortPkmAction(
                     .Select(box => boxLoader.CreateDTO(box))];
             }
         );
+        var boxesDict = boxes.ToDictionary(p => p.Id);
         var boxesIds = boxes.Select(box => box.IdInt).ToHashSet();
 
         var bankId = boxes[0].BankId;
@@ -120,13 +124,15 @@ public class SortPkmAction(
                     var currentValue = pkmVariants[entry.Index].Variant;
                     var currentPkm = await pkmVariantLoader.GetPKM(currentValue);
 
+                    boxesDict.TryGetValue(entry.BoxId, out var box);
+
                     var entities = (await pkmVariantLoader.GetEntitiesByBox(currentValue.BoxId, currentValue.BoxSlot)).Values
                         .Where(version => !placedVersions.Contains(version.Id));
                     foreach (var entity in entities)
                     {
                         entity.BoxId = entry.BoxId;
                         entity.BoxSlot = entry.BoxSlot;
-                        await pkmVariantLoader.UpdateEntity(entity);
+                        await pkmVariantLoader.UpdateEntity(entity, box);
 
                         placedVersions.Add(entity.Id);
                     }
