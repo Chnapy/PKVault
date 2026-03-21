@@ -314,18 +314,29 @@ public class ActionService(
             return await action.ExecuteWithPayload(input, flags);
         }
 
-        var flags = await AddActionInner(
-            scope,
-            applyFn,
-            null
-        );
+        try
+        {
+            var flags = await AddActionInner(
+                scope,
+                applyFn,
+                null
+            );
 
-        await scope.ServiceProvider.GetRequiredService<SessionDbContext>()
-            .SaveChangesAsync();
+            await scope.ServiceProvider.GetRequiredService<SessionDbContext>()
+                .SaveChangesAsync();
 
-        flags.Warnings = true;
+            flags.Warnings = true;
 
-        return flags;
+            return flags;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+
+            await RemoveDataActionsAndReset(sessionService.Actions.Count);
+
+            throw;
+        }
     }
 
     private async Task<DataUpdateFlags> AddActionInner(
