@@ -48,9 +48,12 @@ export const StorageMainBoxContent: React.FC<{
     const boxDeleteMutation = useStorageDeleteMainBox();
 
     const boxes = boxesQuery.data?.data.filter(box => box.bankId === selectedBankBoxes.data?.selectedBank.id) ?? [];
+    const boxesIds = new Set(boxes.map(box => box.idInt));
+
     const sortedBoxes = boxes.sort((b1, b2) => (b1.order < b2.order ? -1 : 1));
     const filteredBoxes = sortedBoxes.filter(box => !mainBoxIds.includes(box.idInt) || box.idInt === boxId);
-    const pkms = Object.values(pkmsQuery.data?.data.byId ?? {}).filter(pk => pk.isMain);
+
+    const pkms = Object.values(pkmsQuery.data?.data.byId ?? {}).filter(pk => pk.isMain && boxesIds.has(pk.boxId));
 
     const selectedBoxIndex = filteredBoxes.findIndex(box => box.idInt === boxId);
     const selectedBox = filteredBoxes[ selectedBoxIndex ] ?? {
@@ -87,6 +90,7 @@ export const StorageMainBoxContent: React.FC<{
                 header={
                     <>
                         <StorageHeader
+                            loading={loading}
                             gameLogo={
                                 <div
                                     className={css({
