@@ -225,10 +225,12 @@ public class UpdateExternalPkmAction(
                     await boxLoader.UpdateEntity(box);
                 }
 
+                var boxDto = boxLoader.CreateDTO(box);
+
                 foreach (var boxPkm in boxPkmsToAdd)
                 {
                     pkmVariantsToAdd.Add(new(
-                        BoxId: box.Id,
+                        Box: boxDto,
                         BoxSlot: boxSlot,
                         IsMain: true,
                         IsExternal: true,

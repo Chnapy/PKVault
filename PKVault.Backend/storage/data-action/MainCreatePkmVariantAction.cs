@@ -12,7 +12,7 @@ public class MainCreatePkmVariantActionInput(string pkmVariantId, EntityContext 
 
 public class MainCreatePkmVariantAction(
     IPkmConvertService pkmConvertService, StaticDataService staticDataService,
-    IPkmVariantLoader pkmVariantLoader
+    IPkmVariantLoader pkmVariantLoader, IBoxLoader boxLoader
 ) : DataAction<MainCreatePkmVariantActionInput>
 {
     protected override async Task<DataActionPayload> Execute(MainCreatePkmVariantActionInput input, DataUpdateFlags flags)
@@ -47,8 +47,10 @@ public class MainCreatePkmVariantAction(
         var pkmConverted = input.CreatedPKM ?? pkmConvertService.ConvertTo(pkmOrigin, input.Context);
         input.CreatedPKM = pkmConverted;
 
+        var box = await boxLoader.GetDto(pkmVariantOrigin.BoxId);
+
         await pkmVariantLoader.AddEntity(new(
-            BoxId: pkmVariantOrigin.BoxId,
+            Box: box,
             BoxSlot: pkmVariantOrigin.BoxSlot,
             IsMain: false,
             IsExternal: false,

@@ -126,7 +126,14 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var pkm = CreateTestPkm(species: 25, generation: 3);
 
         var result = await loader.AddEntity(new(
-            BoxId: "1",
+            Box: new(
+                Id: "1",
+                Name: "Box 1",
+                Order: 0,
+                Type: BoxType.Box,
+                SlotCount: 30,
+                BankId: "1"
+            ),
             BoxSlot: 0,
             IsMain: true,
             IsExternal: false,
@@ -922,7 +929,14 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var pkm = CreateTestPkm(species: 25, generation: 3);
 
         await loader.AddEntity(new(
-            BoxId: "1",
+            Box: new(
+                Id: "1",
+                Name: "Box 1",
+                Order: 0,
+                Type: BoxType.Box,
+                SlotCount: 30,
+                BankId: "1"
+            ),
             BoxSlot: 0,
             IsMain: true,
             IsExternal: false,

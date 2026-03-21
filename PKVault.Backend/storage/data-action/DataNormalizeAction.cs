@@ -212,9 +212,11 @@ public class DataNormalizeAction(
                 })
             );
 
+            var boxes = await boxLoader.GetAllDtos();
+
             await pkmVariantLoader.AddEntities(
                 legacyPkmVersionLoader.GetAllEntities().Values.Select(e => new PkmVariantLoaderAddPayload(
-                    BoxId: e.BoxId.ToString(),
+                    Box: boxes.Find(box => box.IdInt == e.BoxId)!,
                     BoxSlot: e.BoxSlot,
                     IsMain: e.IsMain,
                     IsExternal: false,

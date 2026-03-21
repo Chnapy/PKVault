@@ -209,14 +209,14 @@ public class ActionService(
         );
     }
 
-    public async Task<DataUpdateFlags> SortPkms(uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot)
+    public async Task<DataUpdateFlags> SortPkms(uint? saveId, int fromBoxId, int toBoxId, string pokedexName, bool leaveEmptySlot)
     {
         using var scope = sp.CreateScope();
 
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<SortPkmAction>(),
-            new(saveId, fromBoxId, toBoxId, leaveEmptySlot)
+            new(saveId, fromBoxId, toBoxId, pokedexName, leaveEmptySlot)
         );
     }
 
@@ -314,18 +314,29 @@ public class ActionService(
             return await action.ExecuteWithPayload(input, flags);
         }
 
-        var flags = await AddActionInner(
-            scope,
-            applyFn,
-            null
-        );
+        try
+        {
+            var flags = await AddActionInner(
+                scope,
+                applyFn,
+                null
+            );
 
-        await scope.ServiceProvider.GetRequiredService<SessionDbContext>()
-            .SaveChangesAsync();
+            await scope.ServiceProvider.GetRequiredService<SessionDbContext>()
+                .SaveChangesAsync();
 
-        flags.Warnings = true;
+            flags.Warnings = true;
 
-        return flags;
+            return flags;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+
+            await RemoveDataActionsAndReset(sessionService.Actions.Count);
+
+            throw;
+        }
     }
 
     private async Task<DataUpdateFlags> AddActionInner(

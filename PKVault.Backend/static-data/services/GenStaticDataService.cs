@@ -59,6 +59,7 @@ public class GenStaticDataService(
         var items = GetStaticItems(lang);
         var evolves = GetStaticEvolves();
         var generations = GetStaticGenerations(lang);
+        var pokedexes = GetStaticPokedexes(lang);
 
         var dto = new StaticDataDTO(
             Versions: await versions,
@@ -71,6 +72,7 @@ public class GenStaticDataService(
             Items: await items,
             Evolves: await evolves,
             Generations: await generations,
+            Pokedexes: await pokedexes,
             Spritesheets: await spritesheets,
             EggSprite: GetEggSprite()
         );
@@ -948,6 +950,26 @@ public class GenStaticDataService(
         return staticGenerations;
     }
 
+    public async Task<Dictionary<string, StaticPokedex>> GetStaticPokedexes(string lang)
+    {
+        var pokedexes = await pokeApiService.GetPokedexList();
+
+        byte order = 0;
+
+        return pokedexes.ToDictionary(
+            p => p.Name,
+            p => new StaticPokedex(
+                Key: p.Name,
+                Name: PokeApiService.GetNameForLang(p.Names, lang),
+                Order: ++order,
+                PokemonIndexes: p.PokemonEntries.ToDictionary(
+                    e => (ushort)PokeApiService.GetIdFromUrl(e.PokemonSpecies.Url),
+                    e => e.EntryNumber
+                )
+            )
+        );
+    }
+
     public static string GetEggSprite()
     {
         return GetPokeapiRelativePath("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png");
@@ -1046,21 +1068,24 @@ public class GenStaticDataService(
     {
         var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
 
-        return [.. (await Task.WhenAll(
-            pokeapiVersions
-                .OfType<PokeApiNet.Version>()
-                .Select(async ver =>
-                {
-                    if (ver.Id == 0)
+        return [
+            "national",
+            .. (await Task.WhenAll(
+                pokeapiVersions
+                    .OfType<PokeApiNet.Version>()
+                    .Select(async ver =>
                     {
-                        return [];
-                    }
+                        if (ver.Id == 0)
+                        {
+                            return [];
+                        }
 
-                    var versionGroup = await pokeApiService.GetVersionGroup(ver.VersionGroup);
-                    return versionGroup.Pokedexes.Select(pokedex => pokedex.Name);
-                })
+                        var versionGroup = await pokeApiService.GetVersionGroup(ver.VersionGroup);
+                        return versionGroup.Pokedexes.Select(pokedex => pokedex.Name);
+                    })
             ))
-            .SelectMany(v => v).Distinct()];
+            .SelectMany(v => v).Distinct()
+        ];
     }
 
     private Task<PokeApiNet.Version?>[] GetPokeApiVersion(GameVersion version)

@@ -76,6 +76,9 @@ public class MovePkmBankAction(
             }
         }
 
+        var boxesDict = (await boxLoader.GetAllDtos())
+            .ToDictionary(p => p.Id);
+
         async Task<DataActionPayload> act(string pkmId)
         {
             var boxId = boxesUnoccupationDict.Keys.First();
@@ -86,12 +89,15 @@ public class MovePkmBankAction(
                 boxesUnoccupationDict.Remove(boxId);
             }
 
+            boxesDict.TryGetValue(boxId, out var targetBox);
+            ArgumentNullException.ThrowIfNull(targetBox);
+
             if (input.sourceSaveId == null)
             {
-                return await MainToMain(input, pkmId, boxId, boxSlot);
+                return await MainToMain(input, pkmId, targetBox, boxSlot);
             }
 
-            return await SaveToMain(input, flags, pkmId, boxId, boxSlot);
+            return await SaveToMain(input, flags, pkmId, targetBox, boxSlot);
         }
 
         // Console.WriteLine($"ENTRIES [{moveDirection}]:\n{string.Join('\n', entries.Select(e => e.Item1 + "_" + e.Item2 + "_" + e.Item3))}");
@@ -105,13 +111,13 @@ public class MovePkmBankAction(
         return payloads[0];
     }
 
-    private async Task<DataActionPayload> MainToMain(MovePkmBankActionInput input, string pkmVariantId, string targetBoxId, int targetBoxSlot)
+    private async Task<DataActionPayload> MainToMain(MovePkmBankActionInput input, string pkmVariantId, BoxDTO targetBox, int targetBoxSlot)
     {
         var baseEntity = (await pkmVariantLoader.GetEntity(pkmVariantId)) ?? throw new KeyNotFoundException("PkmVariant not found");
         var entities = await pkmVariantLoader.GetEntitiesByBox(baseEntity.BoxId, baseEntity.BoxSlot);
         var pkm = await pkmVariantLoader.GetPKM(baseEntity);
 
-        var pkmsAlreadyPresent = (await pkmVariantLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot)).Values;
+        var pkmsAlreadyPresent = (await pkmVariantLoader.GetEntitiesByBox(targetBox.Id, targetBoxSlot)).Values;
         if (pkmsAlreadyPresent.Count != 0)
         {
             throw new Exception("Pkm already present");
@@ -119,20 +125,18 @@ public class MovePkmBankAction(
 
         foreach (var entity in entities.Values)
         {
-            entity.BoxId = targetBoxId;
+            entity.BoxId = targetBox.Id;
             entity.BoxSlot = targetBoxSlot;
-            await pkmVariantLoader.UpdateEntity(entity);
+            await pkmVariantLoader.UpdateEntity(entity, targetBox);
         }
-
-        var boxName = (await boxLoader.GetEntity(targetBoxId.ToString()))?.Name;
 
         return new(
             type: DataActionType.MOVE_PKM,
-            parameters: [pkm.Nickname, null, null, boxName, targetBoxSlot, input.attached]
+            parameters: [pkm.Nickname, null, null, targetBox.Name, targetBoxSlot, input.attached]
         );
     }
 
-    private async Task<DataActionPayload> SaveToMain(MovePkmBankActionInput input, DataUpdateFlags flags, string pkmId, string targetBoxId, int targetBoxSlot)
+    private async Task<DataActionPayload> SaveToMain(MovePkmBankActionInput input, DataUpdateFlags flags, string pkmId, BoxDTO targetBox, int targetBoxSlot)
     {
         var saveLoaders = savesLoadersService.GetLoaders((uint)input.sourceSaveId!);
 
@@ -154,32 +158,30 @@ public class MovePkmBankAction(
             throw new ArgumentException($"Pkm with same ID already exists, id={savePkm.IdBase}");
         }
 
-        var existingSlots = await pkmVariantLoader.GetEntitiesByBox(targetBoxId, targetBoxSlot);
+        var existingSlots = await pkmVariantLoader.GetEntitiesByBox(targetBox.Id, targetBoxSlot);
         if (existingSlots.Count > 0)
         {
             throw new Exception("Pkm already present");
         }
 
         await SaveToMainWithoutCheckTarget(
-                input, flags, (uint)input.sourceSaveId, targetBoxId, targetBoxSlot, savePkm
+                input, flags, (uint)input.sourceSaveId, targetBox, targetBoxSlot, savePkm
             );
 
         saveLoaders.Pkms.FlushParty();
 
         MovePkmAction.IncrementSaveTradeRecord(saveLoaders.Save);
 
-        var boxName = (await boxLoader.GetEntity(targetBoxId.ToString()))?.Name;
-
         return new(
             type: DataActionType.MOVE_PKM,
-            parameters: [savePkm?.Nickname, saveLoaders.Save.Version, null, boxName, targetBoxSlot, input.attached]
+            parameters: [savePkm?.Nickname, saveLoaders.Save.Version, null, targetBox.Name, targetBoxSlot, input.attached]
         );
     }
 
     private async Task SaveToMainWithoutCheckTarget(
         MovePkmBankActionInput input,
         DataUpdateFlags flags,
-        uint sourceSaveId, string targetBoxId, int targetBoxSlot,
+        uint sourceSaveId, BoxDTO targetBox, int targetBoxSlot,
         PkmSaveDTO savePkm
     )
     {
@@ -201,7 +203,7 @@ public class MovePkmBankAction(
 
         // create pkm-version
         pkmVariantEntity ??= await pkmVariantLoader.AddEntity(new(
-            BoxId: targetBoxId,
+            Box: targetBox,
             BoxSlot: targetBoxSlot,
             IsMain: true,
             IsExternal: false,
