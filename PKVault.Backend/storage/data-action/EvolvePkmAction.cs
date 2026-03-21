@@ -192,7 +192,7 @@ public class EvolvePkmAction(
 
         if (!isNicknamed)
         {
-            pkm.Nickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, pkmUpdateService.GetPkmLanguage(pkm), pkm.Format);
+            pkm.ClearNickname();
         }
 
         pkmUpdateService.ApplyNicknameToPkm(pkm, pkm.Nickname, true);

@@ -232,11 +232,9 @@ public static class PKMExtensions
         pkm.Species = pkmSrc.Species;
         pkm.Gender = pkmSrc.Gender;
         pkm.Form = pkmSrc.Form;
+        pkm.Language = pkmSrc.Language;
 
-        pkm.IsNicknamed = pkmSrc.IsNicknamed;
-        pkm.Nickname = pkmSrc.IsNicknamed
-            ? pkmSrc.Nickname
-            : SpeciesName.GetSpeciesNameGeneration(pkmSrc.Species, pkmSrc.Language, generation);
+        pkm.SetNickname(pkmSrc.IsNicknamed ? pkmSrc.Nickname : "");
 
         pkm.Nature = pkmSrc.Nature;
         pkm.StatNature = pkmSrc.StatNature;
@@ -262,8 +260,6 @@ public static class PKMExtensions
         pkm.OriginalTrainerName = pkmSrc.OriginalTrainerName;
         pkm.OriginalTrainerGender = pkmSrc.OriginalTrainerGender;
         pkm.OriginalTrainerFriendship = pkmSrc.OriginalTrainerFriendship;
-
-        pkm.Language = pkmSrc.Language;
     }
 
     public static void CopyIVsFrom(this PKM pkm, PKM pkmSrc)

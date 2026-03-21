@@ -4,7 +4,7 @@ import AdmZip from 'adm-zip';
 import path from 'node:path';
 import { spawnSync } from 'child_process';
 
-const releaseUrl = 'https://api.github.com/repos/kwsch/PKHeX/releases/latest';
+const releaseListUrl = 'https://api.github.com/repos/kwsch/PKHeX/releases';
 
 const pkhexVersionFilepath = '../PKVault.Backend/PKHeX.version';
 const pkhexOutputPath = '../PKVault.Backend';
@@ -16,6 +16,7 @@ type Release = {
     tag_name: string; // "26.02.27"
     draft: boolean;
     prerelease: boolean;
+    published_at: string;
     tarball_url: string;
     zipball_url: string;
 };
@@ -29,7 +30,10 @@ const act = async () => {
         : '';
     console.log('Current PKHeX tag:', currentTag);
 
-    const release = await fetch(releaseUrl).then(res => res.json() as Promise<Release>);
+    const releaseList = await fetch(releaseListUrl).then(res => res.json() as Promise<Release[]>);
+    const release = [ ...releaseList ]
+        .filter(({ draft, prerelease }) => !draft && !prerelease)
+        .sort((r1, r2) => r1.published_at < r2.published_at ? 1 : -1)[ 0 ];
 
     console.log('Release PKHeX tag:', release.tag_name);
 

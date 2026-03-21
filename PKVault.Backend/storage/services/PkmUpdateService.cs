@@ -35,8 +35,7 @@ public class PkmUpdateService(PkmLegalityService pkmLegalityService)
         var isNicknamed = SpeciesName.IsNicknamed(pkm.Species, nickname, language, pkm.Format)
             && !nickname.Equals(defaultNickname, StringComparison.InvariantCultureIgnoreCase);
 
-        pkm.IsNicknamed = isNicknamed;
-        pkm.Nickname = isNicknamed ? nickname : defaultNickname;
+        pkm.SetNickname(isNicknamed ? nickname : "");
 
         // Console.WriteLine($"NICKNAME: {isNicknamed} {pkm.Nickname} expected={nickname} default={defaultNickname}");
     }
