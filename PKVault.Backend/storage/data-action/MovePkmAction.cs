@@ -486,7 +486,7 @@ public class MovePkmAction(
     private async Task CheckG3NationalDex(SaveWrapper save, int species)
     {
         // enable national-dex in G3 RSE if pkm outside of regional-dex
-        if (save.GetSave() is SAV3 saveG3RSE && saveG3RSE is IGen3Hoenn && !saveG3RSE.NationalDex)
+        if (save.GetSave() is SAV3 saveG3RSE && saveG3RSE.LargeBlock is ISaveBlock3LargeHoenn && !saveG3RSE.NationalDex)
         {
             var staticData = await staticDataService.GetStaticData();
             var isInDex = staticData.Species[(ushort)species].PokedexIndexes.ContainsKey("hoenn");
@@ -502,12 +502,10 @@ public class MovePkmAction(
     {
         if (save.GetSave() is SAV3FRLG saveG3FRLG)
         {
-            var records = new Record3(saveG3FRLG);
-
             var pkmTradeIndex = 21;
 
-            var pkmTradeCount = records.GetRecord(pkmTradeIndex);
-            records.SetRecord(pkmTradeIndex, pkmTradeCount + 1);
+            var pkmTradeCount = saveG3FRLG.GetRecord(pkmTradeIndex);
+            saveG3FRLG.SetRecord(pkmTradeIndex, pkmTradeCount + 1);
         }
         else if (save.GetSave() is SAV4HGSS saveG4HGSS)
         {

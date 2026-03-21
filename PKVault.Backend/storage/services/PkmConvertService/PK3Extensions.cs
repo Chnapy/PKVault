@@ -76,13 +76,9 @@ public static class PK3Extensions
             MetLevel = 0,
 
             Gender = pk3.Gender,
-            IsNicknamed = pk3.IsNicknamed,
             Form = pk3.Form,
 
             Language = pk3.Language,
-            Nickname = pk3.IsNicknamed
-                ? pk3.Nickname
-                : SpeciesName.GetSpeciesNameGeneration(pk3.Species, pk3.Language, 2),
 
             CurrentHandler = 1,
             OriginalTrainerName = pk3.OriginalTrainerName,
@@ -92,6 +88,8 @@ public static class PK3Extensions
             HandlingTrainerGender = pk3.OriginalTrainerGender,
             HandlingTrainerFriendship = pk3.CurrentFriendship,
         };
+
+        pk2.SetNickname(pk3.IsNicknamed ? pk3.Nickname : "");
 
         pk2.CopyHeldItemByStringFrom(pk3.HeldItem, pk3.Context, pk3.Version);
 

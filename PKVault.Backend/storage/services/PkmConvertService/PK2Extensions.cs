@@ -30,13 +30,9 @@ public static class PK2Extensions
 
             Version = GameVersion.S,
             Gender = pk2.Gender,
-            IsNicknamed = pk2.IsNicknamed,
             Form = pk2.Form,
 
             Language = language,
-            Nickname = pk2.IsNicknamed
-                ? pk2.Nickname
-                : SpeciesName.GetSpeciesNameGeneration(pk2.Species, language, 3),
 
             CurrentHandler = 1,
             OriginalTrainerName = pk2.GetTransferTrainerName(language),
@@ -50,6 +46,8 @@ public static class PK2Extensions
             AbilityNumber = 1 << ability,
         };
 
+        pk3.SetNickname(pk2.IsNicknamed ? pk2.Nickname : "");
+
         pk3.FixSID();
 
         pk3.CopyHeldItemFrom(pk2.HeldItem, pk2.Context, pk2.Version);
@@ -62,8 +60,9 @@ public static class PK2Extensions
         }
         else if (pk2.IsNicknamedBank())
         {
-            pk3.IsNicknamed = true;
-            pk3.Nickname = pk2.Korean ? pk2.Nickname : StringConverter12Transporter.GetString(pk2.NicknameTrash, pk2.Japanese);
+            pk3.SetNickname(pk2.Korean
+                ? pk2.Nickname
+                : StringConverter12Transporter.GetString(pk2.NicknameTrash, pk2.Japanese));
         }
 
         pk3.SetIVs(ConvertIVsToG3(pk2.GetAllIVs()));
