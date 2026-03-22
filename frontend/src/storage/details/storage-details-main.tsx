@@ -142,6 +142,7 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
             isValid
             movesLegality={[]}
             {...pkmLegality}
+            saveId={undefined}
             idBase={pkmVariant.id}
             reports={<>
                 {pkmVariant.isExternal && <TextContainer
