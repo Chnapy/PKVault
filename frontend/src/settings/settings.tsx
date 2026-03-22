@@ -72,8 +72,11 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
             <HelpButton slug='5-settings.md' />
         </div>
 
-        <div className={css({ marginLeft: 'auto' })}>
-            v{settings?.version} - Build ID = {settings?.buildID} - PKHeX {settings?.pkhexVersion}
+        <div
+            className={css({ marginLeft: 'auto' })}
+            title={`Build ID = ${settings?.buildID}`}
+        >
+            v{settings?.version} - PKHeX {settings?.pkhexVersion}
         </div>
     </div>}>
         <form

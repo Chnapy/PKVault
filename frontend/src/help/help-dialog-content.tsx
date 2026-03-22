@@ -4,6 +4,7 @@ import React from 'react';
 import ReactMarkdown, { type Components, type UrlTransform } from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
+import { LinkWithIcon } from '../ui/link-with-icon/link-with-icon';
 import { theme } from '../ui/theme';
 import { useHelpAnchorScroll } from './hooks/use-help-anchor-scroll';
 
@@ -96,10 +97,9 @@ export const HelpDialogContent: React.FC<HelpDialogContentProps> = ({ selectedEn
 };
 
 const components: Components = {
-    a: (props) => <a
-        {...props}
-        target={props.href?.startsWith('http') ? '__blank' : undefined}
-    />,
+    a: (props) => props.href?.startsWith('http')
+        ? <LinkWithIcon {...props} target={'__blank'} />
+        : <a {...props} />,
 };
 
 const getUrlTransform = (selectedEndPath: string): UrlTransform => url => {

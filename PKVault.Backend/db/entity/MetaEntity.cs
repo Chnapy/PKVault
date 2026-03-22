@@ -7,4 +7,5 @@ public class MetaEntity
 public enum MetaKey
 {
     APP_VERSION,
+    USER_ID
 }

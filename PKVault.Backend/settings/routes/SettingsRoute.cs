@@ -5,18 +5,25 @@ namespace PKVault.Backend.settings.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SettingsController(DataService dataService, ISettingsService settingsService, ISessionService sessionService, IBankLoader bankLoader) : ControllerBase
+public class SettingsController(DataService dataService, ISettingsService settingsService, ISessionService sessionService, IMetaLoader metaLoader) : ControllerBase
 {
-    private static Task? initialSessionTask = null;
+    private static readonly SemaphoreSlim semaphore = new(1);
 
     [HttpGet]
     public async Task<ActionResult<SettingsDTO>> Get()
     {
-        // workaround to avoid rare first-run app crash after language selection
-        // trigger DB use, with DB creation, migration etc
-        initialSessionTask ??= bankLoader.Any();
-        // then wait for DB setup end before continue onboard process
-        await initialSessionTask;
+        await semaphore.WaitAsync();
+        try
+        {
+            // DB use is required to avoid rare first-run app crash after language selection
+            // trigger DB creation, migration etc
+            var userId = await metaLoader.GetUserId();
+            HttpContext.Response.GetTypedHeaders().Append("Userid", userId);
+        }
+        finally
+        {
+            semaphore.Release();
+        }
 
         return settingsService.GetSettings();
     }
