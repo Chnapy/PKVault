@@ -32,7 +32,15 @@ injectGlobal(`
     margin: 0;
   }
 
-  a {
+  a[type="button"], a:not(:hover) {
     text-decoration: none;
+  }
+
+  a:not([type="button"]), a:not([type="button"]):visited {
+    color: ${theme.text.primary};
+  }
+
+  a:not([type="button"]):visited {
+    filter: hue-rotate(25deg);
   }
 `);

@@ -74,6 +74,7 @@ export const Backup: React.FC = withErrorCatcher('default', () => {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 4,
+            whiteSpace: 'break-spaces',
             marginBottom: 4,
         })}>
             <Icon name='info-circle' solid forButton />

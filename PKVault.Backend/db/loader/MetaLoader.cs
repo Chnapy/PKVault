@@ -5,6 +5,8 @@ public interface IMetaLoader
     public Task<MetaEntity?> GetEntity(MetaKey key);
     public Task<MetaEntity> AddEntity(MetaEntity entity);
     public Task UpdateEntity(MetaEntity entity);
+
+    public Task<string> GetUserId();
 }
 
 public class MetaLoader(SessionDbContext db, ISessionServiceMinimal sessionService) : IMetaLoader
@@ -34,6 +36,17 @@ public class MetaLoader(SessionDbContext db, ISessionServiceMinimal sessionServi
         dbSet.Update(entity);
 
         await db.SaveChangesAsync();
+    }
+
+    public async Task<string> GetUserId()
+    {
+        var entity = await GetEntity(MetaKey.USER_ID);
+        entity ??= await AddEntity(new()
+        {
+            Key = MetaKey.USER_ID,
+            Value = Guid.NewGuid().ToString()
+        });
+        return entity.Value;
     }
 
     private async Task<DbSet<MetaEntity>> GetDbSet()

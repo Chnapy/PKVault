@@ -65,6 +65,7 @@ export function ButtonLike<
           flexGrow: 1,
           maxWidth: '100%',
           justifyContent: "center",
+          gap: 4,
           opacity: disabled ? 0.5 : undefined,
         })}
       >
