@@ -33,8 +33,6 @@ public class ActionServiceTests
             mockSessionService.Setup(x => x.PersistSession(It.IsAny<IServiceScope>())).ThrowsAsync(new Exception());
         }
 
-        PkmLegalityService pkmLegalityService = new(mockSettingsService.Object);
-
         Mock<ISaveService> mockSaveService = new();
 
         var saveWrapper = SaveWrapperTests.GetMockSave("mock-save-path", Encoding.ASCII.GetBytes("mock-save-content"));
@@ -59,7 +57,7 @@ public class ActionServiceTests
 
         return new(
             sp: sp,
-            pkmUpdateService: new(pkmLegalityService),
+            pkmUpdateService: new(),
             backupService: new(
                 sp: sp,
                 mockTimeProvider.Object,
@@ -69,7 +67,6 @@ public class ActionServiceTests
                 mockSessionService.Object
             ),
             settingsService: mockSettingsService.Object,
-            pkmLegalityService: pkmLegalityService,
             sessionService: mockSessionService.Object,
             savesLoadersService: savesLoadersService
         );

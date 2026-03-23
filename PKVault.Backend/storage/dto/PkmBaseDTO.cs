@@ -65,6 +65,11 @@ public abstract record PkmBaseDTO(
     public string DynamicChecksum => Pkm.DynamicChecksum;
     public int NicknameMaxLength => Pkm.MaxStringLengthNickname;
 
+    public int PokerusStrain => Pkm.PokerusStrain;
+    public int PokerusDays => Pkm.PokerusDays;
+    public bool IsPokerusInfected => Pkm.IsPokerusInfected;
+    public bool IsPokerusCured => Pkm.IsPokerusCured;
+
     public bool IsShadow => Pkm.IsShadow;
 
     public virtual bool CanMove => true;

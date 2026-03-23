@@ -34,6 +34,8 @@ public static class PK6Extensions
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
+
+            PokerusState = pk6.PokerusState,
         };
 
         pk5.CopyCommonPropertiesFrom(pk6, 5, rndValues);

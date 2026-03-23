@@ -115,6 +115,8 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public uint ID32 => Pkm.ID32;
     public int PokerusStrain => Pkm.PokerusStrain;
     public int PokerusDays => Pkm.PokerusDays;
+    public bool IsPokerusInfected => Pkm.IsPokerusInfected;
+    public bool IsPokerusCured => Pkm.IsPokerusCured;
 
     public uint EncryptionConstant => Pkm.EncryptionConstant;
     public uint PID => Pkm.PID;

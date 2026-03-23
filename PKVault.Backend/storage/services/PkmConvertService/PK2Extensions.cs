@@ -44,6 +44,8 @@ public static class PK2Extensions
 
             Ability = pi.GetAbilityAtIndex(ability),
             AbilityNumber = 1 << ability,
+
+            PokerusState = pk2.PokerusState,
         };
 
         pk3.SetNickname(pk2.IsNicknamed ? pk2.Nickname : "");

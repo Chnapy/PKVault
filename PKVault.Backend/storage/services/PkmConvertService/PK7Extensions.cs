@@ -16,6 +16,8 @@ public static class PK7Extensions
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
 
             HandlingTrainerLanguage = (byte)pk7.Language,
+
+            PokerusState = pk7.PokerusState,
         };
 
         pk8.CopyCommonPropertiesFrom(pk7, 8, rndValues);
@@ -87,6 +89,7 @@ public static class PK7Extensions
             AV_SPD = convertEVToAV(pk7.EV_SPD),
             AV_SPE = convertEVToAV(pk7.EV_SPE),
 
+            PokerusState = 0,
         };
 
         pb7.CopyCommonPropertiesFrom(pk7, 7, rndValues);
@@ -154,6 +157,8 @@ public static class PK7Extensions
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
+
+            PokerusState = pk7.PokerusState,
         };
 
         pk6.CopyCommonPropertiesFrom(pk7, 6, rndValues);
@@ -208,6 +213,8 @@ public static class PK7Extensions
             EV_SPA = convertAVToEV(pb7.AV_SPA),
             EV_SPD = convertAVToEV(pb7.AV_SPD),
             EV_SPE = convertAVToEV(pb7.AV_SPE),
+
+            PokerusState = pb7.PokerusState,
         };
 
         pk7.CopyCommonPropertiesFrom(pb7, 7, rndValues);

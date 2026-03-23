@@ -18,6 +18,8 @@ import { Frame } from '../ui/header/frame';
 import { Header } from '../ui/header/header';
 import { HeaderItem } from "../ui/header/header-item";
 import { Icon } from '../ui/icon/icon';
+import { iconResources } from '../ui/icon/icon-resources';
+import { ImgPrefetch } from '../ui/icon/img-prefetch';
 
 const Root: React.FC = () => {
   const matchRoute = useMatchRoute();
@@ -132,6 +134,13 @@ const Root: React.FC = () => {
           <HelpDialog />
         </ErrorCatcher>
       </Frame>
+
+      <div aria-description='prefetch'>
+        {Object.values(iconResources).flatMap(v => Object.values(v)).map(url => <ImgPrefetch
+          key={url}
+          src={url}
+        />)}
+      </div>
     </HistoryContext.Provider>
   );
 };

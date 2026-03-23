@@ -27,6 +27,7 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'idBase' | 'pid' | 'species' | 'context' | 'version' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'levelUpPercent' | 'eggHatchCount' | 'friendship' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
     | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves'
+    | 'pokerusDays' | 'isPokerusCured'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
     | 'heldItem' | 'canEdit' | 'isEnabled' | 'hasLoadError'
 >
@@ -102,6 +103,8 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             level={pkm.level}
             types={pkm.types}
             eggHatchCount={pkm.eggHatchCount}
+            pokerusDays={pkm.pokerusDays}
+            isPokerusCured={pkm.isPokerusCured}
         />}
         preContent={reports}
         content={pkm.isEnabled && <>

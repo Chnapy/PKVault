@@ -19,6 +19,8 @@ public static class PK9Extensions
             WeightScalar = 0,
 
             ObedienceLevel = pk9.ObedienceLevel,
+
+            PokerusState = pk9.PokerusState,
         };
 
         pa9.CopyCommonPropertiesFrom(pk9, 9, rndValues);
@@ -65,6 +67,8 @@ public static class PK9Extensions
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
 
             HandlingTrainerLanguage = (byte)pk9.Language,
+
+            PokerusState = pk9.PokerusState,
         };
 
         pk8.CopyCommonPropertiesFrom(pk9, 8, rndValues);
@@ -118,6 +122,8 @@ public static class PK9Extensions
             ObedienceLevel = pa9.CurrentLevel,
             TeraTypeOriginal = (MoveType)Tera9RNG.GetTeraTypeFromPersonal(pa9.Species, pa9.Form, 0),
             TeraTypeOverride = (MoveType)Tera9RNG.GetTeraTypeFromPersonal(pa9.Species, pa9.Form, 0),
+
+            PokerusState = pa9.PokerusState,
         };
 
         pk9.CopyCommonPropertiesFrom(pa9, 9, rndValues);

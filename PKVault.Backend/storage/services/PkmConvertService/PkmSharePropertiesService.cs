@@ -137,6 +137,18 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : I
             }
         }
 
+        if (sourcePkm is not PK1)
+        {
+            if (
+                targetPkm is not PK1
+                && resultPkm is not PK1
+            )
+            {
+                targetPkm.PokerusDays = resultPkm.PokerusDays;
+                targetPkm.PokerusStrain = resultPkm.PokerusStrain;
+            }
+        }
+
         if (targetPkm.HeldItem == 0)
         {
             targetPkm.CopyHeldItemFrom(resultPkm.HeldItem, resultPkm.Context, resultPkm.Version);

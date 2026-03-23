@@ -6,7 +6,7 @@ using PKHeX.Core;
 public class ActionService(
     IServiceProvider sp,
     PkmUpdateService pkmUpdateService, BackupService backupService, ISettingsService settingsService,
-    PkmLegalityService pkmLegalityService, ISessionService sessionService, ISavesLoadersService savesLoadersService
+    ISessionService sessionService, ISavesLoadersService savesLoadersService
 )
 {
     public async Task<DataUpdateFlags> DataNormalize(DataNormalizeActionInput input, IServiceScope scope)
@@ -432,7 +432,7 @@ public class ActionService(
 
         var pkm = await GetPkm();
 
-        var legality = pkmLegalityService.GetLegalitySafe(pkm, save);
+        var legality = PkmLegalityService.GetLegalitySafe(pkm, save);
 
         var moveComboSource = new LegalMoveComboSource();
         var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);

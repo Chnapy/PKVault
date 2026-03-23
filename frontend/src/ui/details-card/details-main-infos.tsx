@@ -5,6 +5,7 @@ import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
 import { getSpeciesNO } from '../dex-item/util/get-species-no';
 import { Gauge } from '../gauge/gauge';
+import { PokerusIcon } from '../icon/pokerus-icon';
 import { theme } from '../theme';
 import { TypeItem } from '../type-item/type-item';
 import { DetailsLevel } from './details-level';
@@ -20,9 +21,13 @@ export type DetailsMainInfosProps = {
     levelUpPercent?: number;
     level?: number;
     eggHatchCount?: number;
+    pokerusDays?: number;
+    isPokerusCured?: boolean;
 };
 
-export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid = 0, species, speciesName, version, nickname, types, levelUpPercent, level, eggHatchCount = 0 }) => {
+export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({
+    idBase, pid = 0, species, speciesName, version, nickname, types, levelUpPercent, level, eggHatchCount = 0, pokerusDays = 0, isPokerusCured
+}) => {
     const { t } = useTranslate();
 
     const staticData = useStaticData();
@@ -73,6 +78,11 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({ idBase, pid 
                         <DetailsLevel level={level} />
                     </>}
             </div>}
+        </div>
+        <div className={css({ display: 'flex', justifyContent: 'flex-end' })}>
+            {pokerusDays > 0
+                ? <PokerusIcon title={t('details.pokerus.infected', { days: pokerusDays })} />
+                : (isPokerusCured && <PokerusIcon cured title={t('details.pokerus.cured')} />)}
         </div>
         <br />
         {t('details.dex')}

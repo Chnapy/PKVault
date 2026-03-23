@@ -83,6 +83,8 @@
   "details.stats.spe": "Vit",
   "details.id": "ID",
   "details.pid": "PID",
+  "details.pokerus.infected": "Pokérus infecté: {{days}} jours",
+  "details.pokerus.cured": "Pokérus guéri",
   "details.abilities": "Talents",
   "details.owned-save": "Possédé dans la sauvegarde/le stockage",
   "details.attached-pkm-not-found.1": "Pokemon introuvable dans sa sauvegarde rattachée.",

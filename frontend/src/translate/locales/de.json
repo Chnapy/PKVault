@@ -83,6 +83,8 @@
   "details.stats.spe": "Init",
   "details.id": "ID",
   "details.pid": "PID",
+  "details.pokerus.infected": "Pokérus Infizierter: {{days}} Tage",
+  "details.pokerus.cured": "Pokérus geheilt",
   "details.abilities": "Fähigkeiten",
   "details.owned-save": "Im Spielstand/Lager vorhanden",
   "details.attached-pkm-not-found.1": "Pokemon wurde im verknüpften Spielstand nicht gefunden.",

@@ -1,10 +1,10 @@
-import type React from 'react';
-import alphaIconImg from '../../assets/pkhex/alpha.png';
 import { css, cx } from '@emotion/css';
+import type React from 'react';
+import { iconResources } from './icon-resources';
 
 export const AlphaIcon: React.FC<React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>> = (props) => {
     return <img
-        src={alphaIconImg}
+        src={iconResources.pkhex.alpha}
         alt='alpha-icon'
         {...props}
         className={cx(css({
