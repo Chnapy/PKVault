@@ -20,6 +20,9 @@ export default defineConfig({
     }),
     react(),
   ],
+  build: {
+    assetsInlineLimit: 0
+  },
   test: {
     environment: "jsdom",
   },
