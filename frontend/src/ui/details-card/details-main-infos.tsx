@@ -18,6 +18,7 @@ export type DetailsMainInfosProps = {
     version: GameVersion;
     nickname?: React.ReactNode;
     types: number[];
+    teraType?: number;
     levelUpPercent?: number;
     level?: number;
     eggHatchCount?: number;
@@ -26,7 +27,7 @@ export type DetailsMainInfosProps = {
 };
 
 export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({
-    idBase, pid = 0, species, speciesName, version, nickname, types, levelUpPercent, level, eggHatchCount = 0, pokerusDays = 0, isPokerusCured
+    idBase, pid = 0, species, speciesName, version, nickname, types, teraType, levelUpPercent, level, eggHatchCount = 0, pokerusDays = 0, isPokerusCured
 }) => {
     const { t } = useTranslate();
 
@@ -79,7 +80,11 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({
                     </>}
             </div>}
         </div>
-        <div className={css({ display: 'flex', justifyContent: 'flex-end' })}>
+        <div className={css({ display: 'flex', justifyContent: 'space-between' })}>
+            <div>
+                {typeof teraType === 'number' && <TypeItem tera type={teraType} />}
+            </div>
+
             {pokerusDays > 0
                 ? <PokerusIcon title={t('details.pokerus.infected', { days: pokerusDays })} />
                 : (isPokerusCured && <PokerusIcon cured title={t('details.pokerus.cured')} />)}
