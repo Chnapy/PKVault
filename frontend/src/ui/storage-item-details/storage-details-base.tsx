@@ -27,7 +27,7 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'idBase' | 'pid' | 'species' | 'context' | 'version' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'levelUpPercent' | 'eggHatchCount' | 'friendship' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
     | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves'
-    | 'pokerusDays' | 'isPokerusCured'
+    | 'pokerusDays' | 'isPokerusCured' | 'teraType'
     | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
     | 'heldItem' | 'canEdit' | 'isEnabled' | 'hasLoadError'
 >
@@ -102,6 +102,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             levelUpPercent={pkm.levelUpPercent}
             level={pkm.level}
             types={pkm.types}
+            teraType={pkm.teraType}
             eggHatchCount={pkm.eggHatchCount}
             pokerusDays={pkm.pokerusDays}
             isPokerusCured={pkm.isPokerusCured}

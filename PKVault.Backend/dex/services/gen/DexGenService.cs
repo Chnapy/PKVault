@@ -141,8 +141,10 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
             generation <= 2 ? GetG12Type(pi.Type2) : pi.Type2
         ];
 
-        return [.. types.Distinct().Select(type => (byte)(type + 1))];
+        return [.. types.Distinct().Select(GetType)];
     }
+
+    public static byte GetType(byte type) => (byte)(type + 1);
 
     private static byte GetG12Type(byte type)
     {

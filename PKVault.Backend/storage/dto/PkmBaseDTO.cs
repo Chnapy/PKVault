@@ -38,6 +38,7 @@ public abstract record PkmBaseDTO(
 
     public Gender Gender => Pkm.Gender;
     public List<byte> Types => Pkm.Types;
+    public byte? TeraType => Pkm.TeraType;
     public byte Level => Pkm.CurrentLevel;
     public uint Exp => Pkm.EXP;
     public uint ExpToLevelUp => Pkm.ExpToLevelUp;

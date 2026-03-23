@@ -182,6 +182,9 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public bool IsNoble => Pkm is INoble pkn && pkn.IsNoble;
     public bool CanGigantamax => Pkm is IGigantamaxReadOnly pkg && pkg.CanGigantamax;
     public List<byte> Types => DexGenService.GetTypes(Format, Pkm.PersonalInfo);
+    public byte? TeraType => Pkm is ITeraTypeReadOnly pkmTera
+        ? DexGenService.GetType((byte)pkmTera.TeraType)
+        : null;
     public uint ExpToLevelUp => Experience.GetEXPToLevelUp(Pkm.CurrentLevel, Pkm.PersonalInfo.EXPGrowth);
     public double LevelUpPercent => Experience.GetEXPToLevelUpPercentage(Pkm.CurrentLevel, Pkm.EXP, Pkm.PersonalInfo.EXPGrowth);
     public byte Friendship => Pkm.IsEgg ? (byte)0 : Pkm.CurrentFriendship;
