@@ -87,6 +87,8 @@ public static class PK3Extensions
             HandlingTrainerName = pk3.OriginalTrainerName,
             HandlingTrainerGender = pk3.OriginalTrainerGender,
             HandlingTrainerFriendship = pk3.CurrentFriendship,
+
+            PokerusState = pk3.PokerusState,
         };
 
         pk2.SetNickname(pk3.IsNicknamed ? pk3.Nickname : "");

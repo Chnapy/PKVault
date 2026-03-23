@@ -5,7 +5,7 @@ using PKHeX.Core;
  * Pass (copy) properties from a PKM to another one.
  * Apply properties to a PKM.
  */
-public class PkmUpdateService(PkmLegalityService pkmLegalityService)
+public class PkmUpdateService
 {
     public void ApplyNicknameToPkm(PKM pkm, string nickname, bool sourcePkmIsNicknamed)
     {
@@ -57,7 +57,7 @@ public class PkmUpdateService(PkmLegalityService pkmLegalityService)
 
     public void ApplyAbilityToPkm(PKM pkm)
     {
-        bool hasAbilityOrPidIssue() => pkmLegalityService.GetLegalitySafe(new(pkm)).Results.Any(result =>
+        bool hasAbilityOrPidIssue() => PkmLegalityService.GetLegalitySafe(new(pkm)).Results.Any(result =>
             !result.Valid
             && (result.Identifier == CheckIdentifier.Ability || result.Identifier == CheckIdentifier.PID)
         );

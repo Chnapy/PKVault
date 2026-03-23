@@ -21,6 +21,8 @@ public static class PK8Extensions
             ObedienceLevel = pk8.CurrentLevel,
             TeraTypeOriginal = (MoveType)Tera9RNG.GetTeraTypeFromPersonal(pk8.Species, pk8.Form, 0),
             TeraTypeOverride = (MoveType)Tera9RNG.GetTeraTypeFromPersonal(pk8.Species, pk8.Form, 0),
+
+            PokerusState = pk8.PokerusState,
         };
 
         pk9.CopyCommonPropertiesFrom(pk8, 9, rndValues);
@@ -75,6 +77,8 @@ public static class PK8Extensions
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
+
+            PokerusState = pk8.PokerusState,
         };
 
         pb8.CopyCommonPropertiesFrom(pk8, 8, rndValues);
@@ -128,6 +132,8 @@ public static class PK8Extensions
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
+
+            PokerusState = pk8.PokerusState,
         };
 
         pa8.CopyCommonPropertiesFrom(pk8, 8, rndValues);
@@ -182,6 +188,8 @@ public static class PK8Extensions
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
+
+            PokerusState = pk8.PokerusState,
         };
 
         pk7.CopyCommonPropertiesFrom(pk8, 7, rndValues);
@@ -230,6 +238,8 @@ public static class PK8Extensions
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
 
             HandlingTrainerLanguage = (byte)pb8.Language,
+
+            PokerusState = pb8.PokerusState,
         };
 
         pk8.CopyCommonPropertiesFrom(pb8, 8, rndValues);
@@ -278,6 +288,8 @@ public static class PK8Extensions
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
 
             HandlingTrainerLanguage = (byte)pa8.Language,
+
+            PokerusState = pa8.PokerusState,
         };
 
         pk8.CopyCommonPropertiesFrom(pa8, 8, rndValues);

@@ -6,23 +6,74 @@ public record PKMRndValues(uint PID, uint EncryptionConstant);
 
 public static class PKMExtensions
 {
-    public static void FixCommonLegalityIssues(this PKM pkm)
+    public static void FixCommonLegalityIssues(this PKM pkm, SaveWrapper? save)
     {
-        pkm.FixPID(pkm.IsShiny, pkm.Form, pkm.Gender, pkm.Nature, true);
-        pkm.FixBallLegality();
-        pkm.FixHeldItemLegality();
-        pkm.FixRibbonLegality();
-        pkm.FixContestLegality();
+        pkm.FixPID(pkm.IsShiny, pkm.Form, pkm.Gender, pkm.Nature, true, save);
+        pkm.FixBallLegality(save);
+        pkm.FixHeldItemLegality(save);
+        pkm.FixRibbonLegality(save);
+        pkm.FixContestLegality(save);
+        pkm.FixPokerusLegality(save);
     }
 
-    public static void FixRibbonLegality(this PKM pkm)
+    public static bool FixPokerusLegality(this PKM pkm, SaveWrapper? save = null, int recursive = 0)
+    {
+        if (pkm is PK1 || pkm is PB7)
+        {
+            return true;
+        }
+
+        if (recursive > 16)
+        {
+            return false;
+        }
+
+        var initialPokerusDays = pkm.PokerusDays;
+        var initialPokerusStrain = pkm.PokerusStrain;
+
+        var legality = PkmLegalityService.GetLegalitySafe(new(pkm), save);
+        if (legality.Valid)
+        {
+            return true;
+        }
+
+        var miscIssues = legality.Results.Where(r => !r.Valid && r.Identifier == CheckIdentifier.Misc);
+
+        var daysIssue = miscIssues.FirstOrDefault(r => r.Result == LegalityCheckResultCode.PokerusDaysLEQ_0);
+        var strainIssue = miscIssues.FirstOrDefault(r => r.Result == LegalityCheckResultCode.PokerusStrainUnobtainable_0);
+
+        if (daysIssue != default)
+        {
+            pkm.PokerusDays = (int)daysIssue.Value;
+        }
+
+        var success = true;
+
+        if (strainIssue != default)
+        {
+            pkm.PokerusStrain = (pkm.PokerusStrain + 1) % 16;
+            if (pkm.PokerusStrain == 0)
+                pkm.PokerusStrain = 1;
+            success = pkm.FixPokerusLegality(save, recursive + 1);
+        }
+
+        if (!success && recursive == 0)
+        {
+            pkm.PokerusDays = initialPokerusDays;
+            pkm.PokerusStrain = initialPokerusStrain;
+        }
+
+        return success;
+    }
+
+    public static void FixRibbonLegality(this PKM pkm, SaveWrapper? save = null)
     {
         if (pkm is GBPKM)
         {
             return;
         }
 
-        LegalityAnalysis legality = new(pkm);
+        var legality = PkmLegalityService.GetLegalitySafe(new(pkm), save);
         if (!legality.Valid && legality.Results.Any(r => !r.Valid
             && r.Identifier == CheckIdentifier.Ribbon))
         {
@@ -35,14 +86,14 @@ public static class PKMExtensions
         }
     }
 
-    public static void FixContestLegality(this PKM pkm)
+    public static void FixContestLegality(this PKM pkm, SaveWrapper? save = null)
     {
         if (pkm is not IContestStats contest)
         {
             return;
         }
 
-        LegalityAnalysis legality = new(pkm);
+        var legality = PkmLegalityService.GetLegalitySafe(new(pkm), save);
         if (legality.Valid)
         {
             return;
@@ -66,9 +117,9 @@ public static class PKMExtensions
         }
     }
 
-    public static void FixHeldItemLegality(this PKM pkm)
+    public static void FixHeldItemLegality(this PKM pkm, SaveWrapper? save = null)
     {
-        LegalityAnalysis legality = new(pkm);
+        var legality = PkmLegalityService.GetLegalitySafe(new(pkm), save);
 
         if (!legality.Valid && legality.Results.Any(r =>
             !r.Valid &&
@@ -80,11 +131,11 @@ public static class PKMExtensions
         }
     }
 
-    public static void FixBallLegality(this PKM pkm)
+    public static void FixBallLegality(this PKM pkm, SaveWrapper? save = null)
     {
         bool hasBallIllegality()
         {
-            LegalityAnalysis legality = new(pkm);
+            var legality = PkmLegalityService.GetLegalitySafe(new(pkm), save);
             return !legality.Valid && legality.Results.Any(r =>
                 !r.Valid &&
                 r.Identifier == CheckIdentifier.Ball
@@ -193,7 +244,7 @@ public static class PKMExtensions
 
         // Console.WriteLine($"MOVES = {pkm.Move1}/{pkm.Move2}/{pkm.Move3}/{pkm.Move4}");
 
-        var legality = new LegalityAnalysis(pkm);
+        var legality = PkmLegalityService.GetLegalitySafe(new(pkm));
         var movesLegality = legality.Info.Moves;
         if (!movesLegality.Any(r => !r.Valid))
         {
@@ -284,7 +335,7 @@ public static class PKMExtensions
         pkm.EV_SPE = pkmSrc.EV_SPE;
     }
 
-    public static void FixPID(this PKM pkm, bool isShiny, byte form, byte gender, Nature nature, bool checkLegality = false)
+    public static void FixPID(this PKM pkm, bool isShiny, byte form, byte gender, Nature nature, bool checkLegality = false, SaveWrapper? save = null)
     {
         var rnd = Util.Rand;
         var i = 0;
@@ -331,7 +382,7 @@ public static class PKMExtensions
                 return false;
             }
 
-            LegalityAnalysis legality = new(pkm);
+            var legality = PkmLegalityService.GetLegalitySafe(new(pkm), save);
             return !legality.Valid && legality.Results.Any(r =>
                 r.Identifier == CheckIdentifier.EC && r.Result == LegalityCheckResultCode.TransferEncryptGen6BitFlip
             );
@@ -381,7 +432,7 @@ public static class PKMExtensions
     {
         int countLocationIllegalities()
         {
-            var legality = new LegalityAnalysis(pkm);
+            var legality = PkmLegalityService.GetLegalitySafe(new(pkm));
             return legality.Valid
                 ? 0
                 : legality.Results.ToList().FindAll(r => !r.Valid && (
@@ -430,7 +481,7 @@ public static class PKMExtensions
     {
         bool hasAbilityIssue()
         {
-            var legality = new LegalityAnalysis(pkm);
+            var legality = PkmLegalityService.GetLegalitySafe(new(pkm));
 
             return !legality.Valid && legality.Results.Any(r =>
                 !r.Valid

@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public class PkmLegalityService(ISettingsService settingsService)
 {
-    private readonly Lock legalityLock = new();
+    private static readonly Lock legalityLock = new();
 
     public async Task<PkmLegalityDTO> CreateDTO(PkmVariantEntity pkmVariant, ImmutablePKM pkm, SaveWrapper? attachedSave)
     {
@@ -72,7 +72,7 @@ public class PkmLegalityService(ISettingsService settingsService)
      *
      * If no save passed, some checks won't be done.
      */
-    public LegalityAnalysis GetLegalitySafe(ImmutablePKM pkm, SaveWrapper? save = null, StorageSlotType slotType = StorageSlotType.None)
+    public static LegalityAnalysis GetLegalitySafe(ImmutablePKM pkm, SaveWrapper? save = null, StorageSlotType slotType = StorageSlotType.None)
     {
         // lock required because of ParseSettings static context causing race condition
         lock (legalityLock)

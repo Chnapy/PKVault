@@ -13,8 +13,7 @@ using PokeApiNet;
  * Generates all static data and spritesheets.
  */
 public class GenStaticDataService(
-    PokeApiService pokeApiService, GenSpritesheetService genSpritesheetService, IFileIOService fileIOService,
-    PkmLegalityService pkmLegalityService
+    PokeApiService pokeApiService, GenSpritesheetService genSpritesheetService, IFileIOService fileIOService
 )
 {
     public static readonly EntityContext LAST_ENTITY_CONTEXT = EntityContext.Gen9a;
@@ -334,7 +333,7 @@ public class GenStaticDataService(
                         pkm.RefreshChecksum();
                     });
 
-                    var legality = pkmLegalityService.GetLegalitySafe(pkm);
+                    var legality = PkmLegalityService.GetLegalitySafe(pkm);
                     var battleOnly = legality.Results.Any(result =>
                         result.Identifier == CheckIdentifier.Form
                         && result.Result == LegalityCheckResultCode.FormBattle

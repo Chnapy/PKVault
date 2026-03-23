@@ -36,7 +36,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
             result.CurrentHandler = targetSave.IsFromTrainer(result) ? (byte)0 : (byte)1;
         }
 
-        result.FixCommonLegalityIssues();
+        result.FixCommonLegalityIssues(targetSave != null ? new(targetSave) : null);
 
         result.Heal();
         result.ResetPartyStats();

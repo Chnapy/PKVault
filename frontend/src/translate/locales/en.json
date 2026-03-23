@@ -83,6 +83,8 @@
   "details.stats.spe": "Spe",
   "details.id": "ID",
   "details.pid": "PID",
+  "details.pokerus.infected": "Pokérus infected: {{days}} days",
+  "details.pokerus.cured": "Pokérus cured",
   "details.abilities": "Abilities",
   "details.owned-save": "Owned in save/storage",
   "details.attached-pkm-not-found.1": "Pokemon not found in attached save.",

@@ -582,7 +582,7 @@ public class PkmConvertServiceTests
             }
         }
 
-        var legality = new LegalityAnalysis(pkm);
+        var legality = PkmLegalityService.GetLegalitySafe(new(pkm));
 
         // if (!legality.Valid)
         // {
