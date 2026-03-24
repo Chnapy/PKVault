@@ -141,6 +141,28 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public byte OriginalTrainerFriendship => Pkm.OriginalTrainerFriendship;
     public bool Japanese => Pkm.Japanese;
     public bool Korean => Pkm.Korean;
+    public ulong? HomeTracker => Pkm is IHomeTrack pkmHT ? pkmHT.Tracker : null;
+    public MarkingColorUniversal[]? Markings => GetMarkings();
+    public int[]? Contest => Pkm is IContestStatsReadOnly pkmContest
+        ? [
+            pkmContest.ContestCool,
+            pkmContest.ContestBeauty,
+            pkmContest.ContestCute,
+            pkmContest.ContestSmart,
+            pkmContest.ContestTough,
+            pkmContest.ContestSheen,
+        ]
+        : null;
+    public Dictionary<string, byte>? Ribbons => Format > 2 && Pkm is not PB7
+        ? RibbonInfo.GetRibbonInfo(Pkm)
+            .Where(ribbon => ribbon.HasRibbon)
+            .ToDictionary(
+                p => p.Name,
+                p => p.Type == RibbonValueType.Byte
+                    ? p.RibbonCount
+                    : (byte)1
+            )
+        : null;
 
     // Future Properties
     public DateOnly? MetDate => Pkm.MetDate;
@@ -148,8 +170,10 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public byte MetMonth => Pkm.MetMonth;
     public byte MetDay => Pkm.MetDay;
     public string HandlingTrainerName => Pkm.HandlingTrainerName;
-    public byte HandlingTrainerGender => Pkm.HandlingTrainerGender;
+    public Gender HandlingTrainerGender => (Gender)Pkm.HandlingTrainerGender;
     public byte HandlingTrainerFriendship => Pkm.HandlingTrainerFriendship;
+    public byte CurrentHandler => Pkm.CurrentHandler;
+    public bool IsCurrentHandler => CurrentHandler == 1;
     public int AbilityNumber => Pkm.AbilityNumber;
 
     public int HPPower => Pkm.HPPower;
@@ -212,8 +236,10 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
         : Pkm.Ability;
 
     public List<ushort> Moves => [.. GetMoves()];
+    public List<ushort>? RelearnMoves => GetRelearnMoves();
 
-    public ushort TID => Pkm.TID16;
+    public uint TID => Pkm.DisplayTID;
+    public uint? SID => Pkm.DisplaySID > 0 ? Pkm.DisplaySID : null;
 
     public string OriginTrainerName => Pkm.OriginalTrainerName;
     public Gender OriginTrainerGender => (Gender)Pkm.OriginalTrainerGender;
@@ -303,6 +329,17 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
         return moves;
     }
 
+    public List<ushort>? GetRelearnMoves()
+    {
+        if (Format >= 6)
+        {
+            Span<ushort> relearnMoves = new ushort[4];
+            Pkm.GetRelearnMoves(relearnMoves);
+            return [.. relearnMoves];
+        }
+        return null;
+    }
+
     public int[] GetBaseStats()
     {
         return [
@@ -366,6 +403,39 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
 
     public Nature GetNature() => Pkm is GBPKM gbpkm ? Experience.GetNatureVC(gbpkm.EXP) : Pkm.Nature;
 
+    public MarkingColorUniversal[]? GetMarkings()
+    {
+        if (Pkm is IAppliedMarkings<bool> pkmMarking)
+        {
+            List<MarkingColorUniversal> markings = [];
+            for (var i = 0; i < pkmMarking.MarkingCount; i++)
+            {
+                markings.Add(pkmMarking.GetMarking(i)
+                    ? MarkingColorUniversal.Marked
+                    : MarkingColorUniversal.NotMarked);
+            }
+            return [.. markings];
+        }
+
+        if (Pkm is IAppliedMarkings<MarkingColor> pkmMarkingColors)
+        {
+            List<MarkingColorUniversal> markings = [];
+            for (var i = 0; i < pkmMarkingColors.MarkingCount; i++)
+            {
+                markings.Add(pkmMarkingColors.GetMarking(i) switch
+                {
+                    MarkingColor.None => MarkingColorUniversal.NotMarked,
+                    MarkingColor.Blue => MarkingColorUniversal.MarkedBlue,
+                    MarkingColor.Pink => MarkingColorUniversal.MarkedPink,
+                    _ => throw new NotImplementedException(),
+                });
+            }
+            return [.. markings];
+        }
+
+        return null;
+    }
+
     public PKM GetMutablePkm() => Pkm;
 
     /**
@@ -390,4 +460,12 @@ public enum PKMLoadError
     TOO_SMALL,
     TOO_BIG,
     UNAUTHORIZED
+}
+
+public enum MarkingColorUniversal : byte
+{
+    NotMarked = 0,
+    Marked = 1,
+    MarkedBlue = 2,
+    MarkedPink = 3,
 }

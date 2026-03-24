@@ -9,10 +9,11 @@ export type TypeItemBaseProps = {
     name: string;
     clickable?: boolean;
     tera?: boolean;
+    isNone?: boolean;
 }
     & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
-export const TypeItemBase: React.FC<TypeItemBaseProps> = ({ type, name, clickable, tera, ...rest }) => {
+export const TypeItemBase: React.FC<TypeItemBaseProps> = ({ type, name, clickable, tera, isNone, ...rest }) => {
     const typeImg = getTypeImg(type);
 
     return <div
@@ -23,6 +24,7 @@ export const TypeItemBase: React.FC<TypeItemBaseProps> = ({ type, name, clickabl
             position: 'relative',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
+            opacity: isNone ? 0.5 : undefined,
         }), {
             [ css({
                 cursor: 'pointer',

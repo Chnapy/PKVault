@@ -18,6 +18,8 @@ export type TextMovesProps = {
     ability: number;
     moves: number[];
     movesLegality: boolean[];
+    relearnMoves?: number[];
+    relearnMovesLegality?: boolean[];
     generation: number;
     hiddenPowerType: number;
     hiddenPowerPower: number;
@@ -31,6 +33,8 @@ export const TextMoves: React.FC<TextMovesProps> = ({
     ability,
     moves,
     movesLegality,
+    relearnMoves = [],
+    relearnMovesLegality = [],
     generation,
     hiddenPowerType,
     hiddenPowerPower,
@@ -214,6 +218,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                                 category={forGen.category}
                                 damage={forGen.power}
                                 isValid={movesLegality[ i ] ?? true}
+                                isNone={move === 0}
                                 className={css({
                                     flex: '1 1 0',
                                     minWidth: '35%'
@@ -223,6 +228,41 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                     })}
                 </>}
         </div>
+
+        {relearnMoves.length > 0 && <>
+            <span>{t('details.relearn-moves')}</span>
+            <br />
+            <div
+                className={css({
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 4,
+                    paddingBottom: 14,
+                })}
+            >
+                {relearnMoves.map((move, i) => {
+                    const staticMove = getStaticMove(move);
+                    const forGen = staticMove?.dataUntilGeneration.find(gen => gen.untilGeneration >= generation);
+
+                    return forGen
+                        ? <MoveItem
+                            key={i}
+                            name={staticMove?.name ?? ''}
+                            type={forGen.type}
+                            category={forGen.category}
+                            damage={forGen.power}
+                            isValid={relearnMovesLegality[ i ] ?? true}
+                            isNone={move === 0}
+                            className={css({
+                                flex: '1 1 0',
+                                minWidth: '35%'
+                            })}
+                        />
+                        : null;
+                })}
+            </div>
+        </>}
+
         <div
             className={css({
                 display: 'flex',

@@ -80,8 +80,8 @@ public class SaveWrapper(SaveFile Save)
     public TrainerIDFormat TrainerIDDisplayFormat => Save.TrainerIDDisplayFormat;
     public uint TrainerTID7 => Save.TrainerTID7;
     public uint TrainerSID7 => Save.TrainerSID7;
-    public uint DisplayTID => Save.DisplayTID;
-    public uint DisplaySID => Save.DisplaySID;
+    public uint TID => Save.DisplayTID;
+    public uint? SID => Save.DisplaySID > 0 ? Save.DisplaySID : null;
 
     #endregion
 
@@ -191,6 +191,17 @@ public class SaveWrapper(SaveFile Save)
     public List<ImmutablePKM> GetBoxData(int box) => [.. Save.GetBoxData(box).Select(pkm => new ImmutablePKM(pkm))];
 
     public List<string> GetBoxNames() => [.. BoxUtil.GetBoxNames(Save)];
+
+    public LanguageID GetSafeLanguage()
+    {
+        if (Save is ILangDeviantSave ds)
+        {
+            if (ds.Japanese) return LanguageID.Japanese;
+            if (ds.Korean) return LanguageID.Korean;
+        }
+
+        return (LanguageID)Save.Language;
+    }
 
     public bool IsSpeciesAllowed(ushort species)
     {

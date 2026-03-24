@@ -65,6 +65,7 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({ id,
             {...savePkm}
             isValid
             movesLegality={[]}
+            relearnMovesLegality={[]}
             {...pkmLegality}
             reports={<>
                 {savePkm.isDuplicate && <TextContainer

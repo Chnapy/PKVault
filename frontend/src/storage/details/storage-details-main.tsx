@@ -141,6 +141,7 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
             contextVersion={pkmVariant.isEnabled ? pkmVariant.contextVersion : null}
             isValid
             movesLegality={[]}
+            relearnMovesLegality={[]}
             {...pkmLegality}
             saveId={undefined}
             idBase={pkmVariant.id}

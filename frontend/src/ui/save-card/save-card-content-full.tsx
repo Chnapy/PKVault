@@ -1,4 +1,6 @@
+import { css } from '@emotion/css';
 import type React from 'react';
+import type { LanguageID } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { PathLine } from '../../settings/path-line';
 import { useTranslate } from '../../translate/i18n';
@@ -9,11 +11,11 @@ import { ShinyIcon } from '../icon/shiny-icon';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
 import { SaveCardContentSmall, type SaveCardContentSmallProps } from './save-card-content-small';
-import { css } from '@emotion/css';
 
 export type SaveCardContentFullProps = SaveCardContentSmallProps & {
     path: string;
     playTime: string;
+    language: LanguageID;
     dexSeenCount: number;
     dexCaughtCount: number;
     ownedCount: number;
@@ -28,10 +30,12 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
     version,
     lastWriteTime,
     tid,
+    sid,
     trainerName,
-    trainerGenderMale,
+    trainerGender,
     path,
     playTime,
+    language,
     dexSeenCount,
     dexCaughtCount,
     ownedCount,
@@ -60,8 +64,9 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                 version={version}
                 lastWriteTime={lastWriteTime}
                 tid={tid}
+                sid={sid}
                 trainerName={trainerName}
-                trainerGenderMale={trainerGenderMale}
+                trainerGender={trainerGender}
             />
 
             <div
@@ -72,6 +77,9 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                 <TextContainer>
                     <PathLine>{path}</PathLine>
                     {t('save.time')} <Icon name='clock' solid forButton /> <span className={css({ color: theme.text.primary })}>{playTime}</span>
+                    <span className={css({ float: 'right' })}>
+                        <span className={css({ color: theme.text.primary })}>{staticData.languages[ language ]}</span>
+                    </span>
                     <br />
                     {t('save.dex')} <Icon name='eye' solid forButton /> <span className={css({ color: theme.text.primary })}>{dexSeenCount}</span>{' '}
                     <ItemImg item={staticData.itemPokeball.id} size={'1lh'} className={css({ margin: -4 })} /> <span className={css({ color: theme.text.primary })}>{dexCaughtCount}</span>

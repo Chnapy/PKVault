@@ -13,6 +13,8 @@ public record StaticDataDTO(
     Dictionary<ushort, StaticEvolve> Evolves,
     Dictionary<byte, StaticGeneration> Generations,
     Dictionary<string, StaticPokedex> Pokedexes,
+    Dictionary<string, StaticRibbon> Ribbons,
+    Dictionary<byte, string> Languages,
     StaticSpritesheets Spritesheets,
     string EggSprite
 );
@@ -121,6 +123,12 @@ public record StaticPokedex(
     string Name,
     byte Order,
     Dictionary<ushort, int> PokemonIndexes
+);
+
+public record StaticRibbon(
+    string Key,
+    string SpriteKey,
+    string Name
 );
 
 public enum MoveCategory
