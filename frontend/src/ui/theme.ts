@@ -74,5 +74,16 @@ export const theme = {
     fairy: '#EF70EF',
     stellar: '#F6A516',
     unknown: '#64A894',
+  },
+  contest: {
+    cool: '#EA7254',
+    beauty: '#63B9D6',
+    cute: '#E681B3',
+    smart: '#5DC27B',
+    tough: '#DEC02C',
+  },
+  misc: {
+    markBlue: '#7077E4',
+    markPink: '#F681DD',
   }
 };

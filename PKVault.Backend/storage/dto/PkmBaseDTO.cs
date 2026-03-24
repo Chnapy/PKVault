@@ -54,17 +54,34 @@ public abstract record PkmBaseDTO(
     public MoveCategory HiddenPowerCategory => Pkm.HiddenPowerCategory;
     public Nature Nature => Pkm.Nature;
     public int Ability => Pkm.Ability;
+
     public List<ushort> Moves => Pkm.Moves;
-    public ushort TID => Pkm.TID;
+    public List<ushort>? RelearnMoves => Pkm.RelearnMoves;
+
+    public uint TID => Pkm.TID;
+    public uint? SID => Pkm.SID;
     public string OriginTrainerName => Pkm.OriginTrainerName;
     public Gender OriginTrainerGender => Pkm.OriginTrainerGender;
+    public string HandlingTrainerName => Pkm.HandlingTrainerName;
+    public Gender HandlingTrainerGender => Pkm.HandlingTrainerGender;
+    public byte HandlingTrainerFriendship => Pkm.HandlingTrainerFriendship;
+    public bool IsCurrentHandler => Pkm.IsCurrentHandler;
+
     public DateOnly? OriginMetDate => Pkm.OriginMetDate;
     public string OriginMetLocation => Pkm.GetOriginMetLocation(SettingsLanguage);
     public byte? OriginMetLevel => Pkm.OriginMetLevel;
+    public bool FatefulEncounter => Pkm.FatefulEncounter;
+
     public int HeldItem => Pkm.HeldItem;
     public string? HeldItemPokeapiName => Pkm.HeldItemPokeapiName;
     public string DynamicChecksum => Pkm.DynamicChecksum;
     public int NicknameMaxLength => Pkm.MaxStringLengthNickname;
+    public LanguageID LanguageID => Pkm.LanguageID;
+    public ulong? HomeTracker => Pkm.HomeTracker;
+
+    public MarkingColorUniversal[]? Markings => Pkm.Markings;
+    public int[]? Contest => Pkm.Contest;
+    public Dictionary<string, byte>? Ribbons => Pkm.Ribbons;
 
     public int PokerusStrain => Pkm.PokerusStrain;
     public int PokerusDays => Pkm.PokerusDays;

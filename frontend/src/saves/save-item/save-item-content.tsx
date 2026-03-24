@@ -37,11 +37,13 @@ export const SaveItemContent: React.FC<SaveItemContentProps> = withErrorCatcher(
     context={save.context}
     version={save.version}
     trainerName={save.trainerName}
-    trainerGenderMale={save.trainerGender === 0}
+    trainerGender={save.trainerGender}
     tid={save.tid}
+    sid={save.sid}
     path={save.path}
     lastWriteTime={save.lastWriteTime}
     playTime={save.playTime}
+    language={save.language}
     dexSeenCount={save.dexSeenCount}
     dexCaughtCount={save.dexCaughtCount}
     ownedCount={save.ownedCount}

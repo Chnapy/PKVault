@@ -1,12 +1,14 @@
 import { css } from '@emotion/css';
 import type React from "react";
-import type { EntityContext, GameVersion } from '../../data/sdk/model';
+import type { EntityContext, GameVersion, Gender as GenderType } from '../../data/sdk/model';
 import { getEntityContextGenerationName } from '../../data/util/get-entity-context-generation-name';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
+import { renderTimestamp } from '../util/render-date-time';
+import { DOLine } from './do-line';
 import { SaveCardImg } from './save-card-img';
 
 export type SaveCardContentSmallProps = {
@@ -15,17 +17,19 @@ export type SaveCardContentSmallProps = {
   context: EntityContext;
   version: GameVersion;
   tid: number;
+  sid?: number;
   trainerName: string;
-  trainerGenderMale: boolean;
+  trainerGender: GenderType;
 };
 
 export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErrorCatcher('default', ({
   id,
   context,
   tid,
+  sid,
   lastWriteTime,
   trainerName,
-  trainerGenderMale,
+  trainerGender,
   version,
 }) => {
   const { t } = useTranslate();
@@ -33,13 +37,6 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErr
   const staticData = useStaticData();
 
   const date = new Date(lastWriteTime);
-
-  const normTo2 = (value: number) => `${value < 10 ? "0" : ""}${value}`;
-
-  const renderTimestamp = () =>
-    `${normTo2(date.getDate())}/${normTo2(date.getMonth() + 1)}/${normTo2(date.getFullYear() - 2000)} - ${normTo2(
-      date.getHours()
-    )}:${normTo2(date.getMinutes())}:${normTo2(date.getSeconds())}`;
 
   return (
     <div
@@ -72,15 +69,15 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErr
           <span className={css({ color: theme.text.primary })}>{id}</span>
           <br />
 
-          {tid > 0
-            ? <>
-              {t('save.ot')} {tid} -{" "}
-              <span className={css({ color: theme.text.primary })}>{trainerName}</span>
-            </>
-            : '-'}
+          <DOLine
+            tid={tid}
+            sid={sid}
+            originTrainerName={trainerName}
+            originTrainerGender={trainerGender}
+          />
 
           <br />
-          {t('save.sync')} <span className={css({ color: theme.text.primary })}>{renderTimestamp()}</span>
+          {t('save.sync')} <span className={css({ color: theme.text.primary })}>{renderTimestamp(date)}</span>
         </TextContainer>
       </div>
     </div>

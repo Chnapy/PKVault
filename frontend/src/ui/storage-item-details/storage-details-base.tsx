@@ -19,6 +19,8 @@ import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
 import { StorageDetailsMainInfos } from './storage-details-main-infos';
 import { StorageDetailsTitle } from './storage-details-title';
+import { TextCosmetic } from './text-cosmetic';
+import { TextMisc } from './text-misc';
 import { TextMoves } from './text-moves';
 import { TextOrigin } from './text-origin';
 import { TextStats } from './text-stats';
@@ -26,12 +28,14 @@ import { TextStats } from './text-stats';
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'idBase' | 'pid' | 'species' | 'context' | 'version' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'levelUpPercent' | 'eggHatchCount' | 'friendship' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
-    | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves'
-    | 'pokerusDays' | 'isPokerusCured' | 'teraType'
-    | 'tid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName'
+    | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves' | 'relearnMoves'
+    | 'pokerusDays' | 'isPokerusCured' | 'teraType' | 'homeTracker'
+    | 'markings' | 'contest' | 'ribbons'
+    | 'tid' | 'sid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName' | 'fatefulEncounter' | 'languageID'
+    | 'handlingTrainerName' | 'handlingTrainerGender' | 'isCurrentHandler'
     | 'heldItem' | 'canEdit' | 'isEnabled' | 'hasLoadError'
 >
-    & Pick<PkmLegalityDTO, 'movesLegality'>
+    & Pick<PkmLegalityDTO, 'movesLegality' | 'relearnMovesLegality'>
     & Pick<DetailsCardContainerProps, 'expanded' | 'toggleExpanded'>
     & {
         filepath?: string;
@@ -140,6 +144,8 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                     ability={pkm.ability}
                     moves={pkm.moves}
                     movesLegality={pkm.movesLegality}
+                    relearnMoves={pkm.relearnMoves}
+                    relearnMovesLegality={pkm.relearnMovesLegality}
                     generation={pkm.generation}
                     hiddenPowerType={pkm.hiddenPowerType}
                     hiddenPowerPower={pkm.hiddenPowerPower}
@@ -148,15 +154,35 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 />
             </TextContainer>
 
+            {(pkm.markings || pkm.contest || pkm.ribbons) && <TextContainer>
+                <TextCosmetic
+                    markings={pkm.markings}
+                    contest={pkm.contest}
+                    ribbons={pkm.ribbons}
+                />
+            </TextContainer>}
+
             <TextContainer>
                 <TextOrigin
                     version={pkm.version}
                     tid={pkm.tid}
+                    sid={pkm.sid}
                     originTrainerName={pkm.originTrainerName}
                     originTrainerGender={pkm.originTrainerGender}
-                    originMetDate={pkm.originMetDate}
+                    handlingTrainerName={pkm.handlingTrainerName}
+                    handlingTrainerGender={pkm.handlingTrainerGender}
+                    isCurrentHandler={pkm.isCurrentHandler}
                     originMetLocation={pkm.originMetLocation}
                     originMetLevel={pkm.originMetLevel}
+                    originMetDate={pkm.originMetDate}
+                    fatefulEncounter={pkm.fatefulEncounter}
+                />
+            </TextContainer>
+
+            <TextContainer>
+                <TextMisc
+                    languageID={pkm.languageID}
+                    homeTracker={pkm.homeTracker}
                 />
             </TextContainer>
         </>}

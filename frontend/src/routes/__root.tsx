@@ -135,7 +135,7 @@ const Root: React.FC = () => {
         </ErrorCatcher>
       </Frame>
 
-      <div aria-description='prefetch'>
+      <div aria-description='prefetch' className={css({ width: 0, height: 0 })}>
         {Object.values(iconResources).flatMap(v => Object.values(v)).map(url => <ImgPrefetch
           key={url}
           src={url}

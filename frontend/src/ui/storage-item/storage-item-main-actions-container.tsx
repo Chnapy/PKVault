@@ -18,7 +18,7 @@ export const StorageItemMainActionsContainer: React.FC<
         return null;
     }
 
-    const { nickname, level, isEnabled } = selectedPkm;
+    const { isEgg, nickname, level, isEnabled } = selectedPkm;
 
     const title = isEnabled && (
         <div
@@ -29,7 +29,7 @@ export const StorageItemMainActionsContainer: React.FC<
             })}
         >
             <Icon name='angle-left' solid forButton />
-            {nickname} <DetailsLevel level={level} />
+            {nickname} {!isEgg && <DetailsLevel level={level} />}
 
             {children && <HelpButton
                 slug='3-storage.md#actions-on-pokemons'

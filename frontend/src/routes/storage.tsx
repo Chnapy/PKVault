@@ -77,7 +77,7 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
                   className={css({
                     position: "fixed",
                     bottom: 14,
-                    top: 14,
+                    top: 60,
                     right: 14,
                     width: 350,
                     pointerEvents: 'none',

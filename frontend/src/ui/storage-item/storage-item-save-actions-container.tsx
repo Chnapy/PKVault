@@ -18,7 +18,7 @@ export const StorageItemSaveActionsContainer: React.FC<
         return null;
     }
 
-    const { nickname, level } = selectedPkm;
+    const { isEgg, nickname, level } = selectedPkm;
 
     return (
         <TitledContainer
@@ -33,7 +33,7 @@ export const StorageItemSaveActionsContainer: React.FC<
                     })}
                 >
                     <Icon name='angle-left' solid forButton />
-                    {nickname} <DetailsLevel level={level} />
+                    {nickname} {!isEgg && <DetailsLevel level={level} />}
                 </div>
             }
         >

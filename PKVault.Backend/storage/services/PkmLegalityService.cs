@@ -28,6 +28,7 @@ public class PkmLegalityService(ISettingsService settingsService)
                 Id: id,
                 SaveId: save?.Id,
                 MovesLegality: [],
+                RelearnMovesLegality: [],
                 IsValid: false,
                 ValidityReport: "",
                 IllegalitiesCount: 0
@@ -54,6 +55,7 @@ public class PkmLegalityService(ISettingsService settingsService)
             Id: id,
             SaveId: save?.Id,
             MovesLegality: [.. la.Info.Moves.Select(r => r.Valid)],
+            RelearnMovesLegality: [.. la.Info.Relearn.Select(r => r.Valid)],
             IsValid: la.Parsed && la.Valid,
             ValidityReport,
             IllegalitiesCount: la.Valid

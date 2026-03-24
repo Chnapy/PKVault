@@ -28,12 +28,12 @@ public class GenStaticDataService(
         ..GetGeneratedPathParts(), "diff-data", $"StaticData_{lang}.diff"
     ];
 
-    private static JsonTypeInfo<StaticDataDTO> StaticDataIndentedJsonInfo = new StaticDataJsonContext(new()
+    private static JsonSerializerOptions StaticDataIndentedOptions => new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-    }).StaticDataDTO;
+    };
 
     public async Task GenerateFiles()
     {
@@ -83,6 +83,8 @@ public class GenStaticDataService(
             Evolves: await evolves,
             Generations: await generations,
             Pokedexes: await pokedexes,
+            Ribbons: GetStaticRibbons(lang),
+            Languages: GetStaticLanguages(lang),
             Spritesheets: await spritesheets,
             EggSprite: GetEggSprite()
         );
@@ -97,7 +99,7 @@ public class GenStaticDataService(
 
         await fileIOService.WriteJSONGZipFile(staticDataPath, StaticDataJsonContext.Default.StaticDataDTO, dto);
 
-        var newStaticDataString = JsonSerializer.Serialize(dto, StaticDataIndentedJsonInfo);
+        var newStaticDataString = JsonSerializer.Serialize(dto, new StaticDataJsonContext(StaticDataIndentedOptions).StaticDataDTO);
 
         var diffFilename = Path.Combine([.. GetStaticDataDiffPathParts(lang)]);
 
@@ -119,9 +121,9 @@ public class GenStaticDataService(
         using var fileStream = File.OpenRead(Path.Combine([.. GetStaticDataPathParts(lang)]));
         using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
 
-        var oldStaticData = await JsonSerializer.DeserializeAsync(gzipStream, StaticDataJsonContext.Default.StaticDataDTO);
+        var oldStaticData = await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(gzipStream);
 
-        return JsonSerializer.Serialize(oldStaticData!, StaticDataIndentedJsonInfo);
+        return JsonSerializer.Serialize(oldStaticData, StaticDataIndentedOptions);
     }
 
     public async Task<Dictionary<byte, StaticVersion>> GetStaticVersions(string lang)
@@ -993,6 +995,34 @@ public class GenStaticDataService(
                 )
             )
         );
+    }
+
+    public Dictionary<string, StaticRibbon> GetStaticRibbons(string lang)
+    {
+        var ribbonsTxt = GameInfo.GetStrings(lang).Ribbons;
+
+        return Enum.GetValues<EntityContext>()
+            .Where(e => e.IsValid)
+            .Select(e => BlankSaveFile.Get(e).BlankPKM)
+            .SelectMany(RibbonInfo.GetRibbonInfo)
+            .Select(ribbon => ribbon.Name)
+            .Distinct()
+            .Order()
+            .Select(name => new StaticRibbon(
+                Key: name,
+                SpriteKey: name.Replace("CountG3", "G3").ToLowerInvariant(),
+                Name: ribbonsTxt.GetName(name)
+            ))
+            .ToDictionary(p => p.Key);
+    }
+
+    public Dictionary<byte, string> GetStaticLanguages(string lang)
+    {
+        var languageNames = GameInfo.GetStrings(lang).languageNames;
+
+        return Enum.GetValues<LanguageID>()
+            .Select((languageId, i) => ((byte)languageId, languageNames[i]))
+            .ToDictionary();
     }
 
     public static string GetEggSprite()
