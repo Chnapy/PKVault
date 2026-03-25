@@ -16,12 +16,14 @@ export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> 
 
     const contextGeneration = getEntityContextGenerationName(context, true);
 
-    const title = [
-        contextGeneration,
-        showVersionName && contextVersion
-            ? staticData.versions[ contextVersion ]?.name
-            : 'PKVault'
-    ].filter(Boolean).join(' / ');
+    const title = showVersionName
+        ? [
+            contextGeneration,
+            contextVersion
+                ? staticData.versions[ contextVersion ]?.name
+                : 'PKVault'
+        ].filter(Boolean).join(' / ')
+        : undefined;
 
     return <>
         <img
@@ -29,7 +31,7 @@ export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> 
             className={css({ height: 28, width: 28 })}
         />
 
-        <div className={css({
+        {title && <div className={css({
             flexGrow: 1,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -37,7 +39,7 @@ export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> 
             width: 0,
         })} title={title}>
             {title}
-        </div>
+        </div>}
 
         {children}
     </>;

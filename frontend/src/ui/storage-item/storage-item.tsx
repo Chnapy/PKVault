@@ -119,6 +119,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
             position: 'absolute',
             top: 3,
             left: 3,
+            zIndex: 1,
           }), {
             [ css({ opacity: 0 }) ]: !checked
           })}
