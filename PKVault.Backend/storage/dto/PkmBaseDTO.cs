@@ -57,6 +57,7 @@ public abstract record PkmBaseDTO(
 
     public List<ushort> Moves => Pkm.Moves;
     public List<ushort>? RelearnMoves => Pkm.RelearnMoves;
+    public ushort? AlphaMove => Pkm.AlphaMove;
 
     public uint TID => Pkm.TID;
     public uint? SID => Pkm.SID;

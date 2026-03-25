@@ -237,6 +237,14 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
 
     public List<ushort> Moves => [.. GetMoves()];
     public List<ushort>? RelearnMoves => GetRelearnMoves();
+    public ushort? AlphaMove => IsAlpha
+        ? Pkm switch
+        {
+            PA8 pa8 => pa8.AlphaMove,
+            PA9 pa9 => pa9.PersonalInfo.AlphaMove,
+            _ => null,
+        }
+        : null;
 
     public uint TID => Pkm.DisplayTID;
     public uint? SID => Pkm.DisplaySID > 0 ? Pkm.DisplaySID : null;

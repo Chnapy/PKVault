@@ -20,6 +20,7 @@ export type TextMovesProps = {
     movesLegality: boolean[];
     relearnMoves?: number[];
     relearnMovesLegality?: boolean[];
+    alphaMove?: number;
     generation: number;
     hiddenPowerType: number;
     hiddenPowerPower: number;
@@ -35,6 +36,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
     movesLegality,
     relearnMoves = [],
     relearnMovesLegality = [],
+    alphaMove,
     generation,
     hiddenPowerType,
     hiddenPowerPower,
@@ -173,6 +175,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                                                     category={forGen.category}
                                                     damage={forGen.power}
                                                     clickable={!disabled}
+                                                    isAlpha={move > 0 && alphaMove === move}
                                                 />
                                                 : null,
                                             disabled,
@@ -219,6 +222,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                                 damage={forGen.power}
                                 isValid={movesLegality[ i ] ?? true}
                                 isNone={move === 0}
+                                isAlpha={move > 0 && alphaMove === move}
                                 className={css({
                                     flex: '1 1 0',
                                     minWidth: '35%'
@@ -253,6 +257,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                             damage={forGen.power}
                             isValid={relearnMovesLegality[ i ] ?? true}
                             isNone={move === 0}
+                            isAlpha={move > 0 && alphaMove === move}
                             className={css({
                                 flex: '1 1 0',
                                 minWidth: '35%'

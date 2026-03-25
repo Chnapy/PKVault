@@ -29,7 +29,7 @@ import { TextStats } from './text-stats';
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'idBase' | 'pid' | 'species' | 'context' | 'version' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'levelUpPercent' | 'eggHatchCount' | 'friendship' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
-    | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves' | 'relearnMoves'
+    | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves' | 'relearnMoves' | 'alphaMove'
     | 'pokerusDays' | 'isPokerusCured' | 'teraType' | 'homeTracker'
     | 'markings' | 'contest' | 'ribbons'
     | 'tid' | 'sid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName' | 'fatefulEncounter' | 'languageID'
@@ -187,6 +187,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                     movesLegality={pkm.movesLegality}
                     relearnMoves={pkm.relearnMoves}
                     relearnMovesLegality={pkm.relearnMovesLegality}
+                    alphaMove={pkm.alphaMove}
                     generation={pkm.generation}
                     hiddenPowerType={pkm.hiddenPowerType}
                     hiddenPowerPower={pkm.hiddenPowerPower}
