@@ -14,6 +14,7 @@ import { ItemImg } from '../details-card/item-img';
 import { Gender } from '../gender/gender';
 import { AlphaIcon } from '../icon/alpha-icon';
 import { ShinyIcon } from '../icon/shiny-icon';
+import { Marking } from '../marking/marking';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
@@ -36,7 +37,7 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'heldItem' | 'canEdit' | 'isEnabled' | 'hasLoadError'
 >
     & Pick<PkmLegalityDTO, 'movesLegality' | 'relearnMovesLegality'>
-    & Pick<DetailsCardContainerProps, 'tabs' | 'expanded' | 'setExpanded'>
+    & Pick<DetailsCardContainerProps, 'tabs'>
     & {
         filepath?: string;
         contextVersion: GameVersion | null;
@@ -48,11 +49,26 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
         extraContent?: React.ReactNode;
     };
 
-export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath, saveId, reports, onRelease, onSubmit, openFile, extraContent, tabs, expanded, setExpanded, ...pkm }) => {
+export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath, saveId, reports, onRelease, onSubmit, openFile, extraContent, tabs, ...pkm }) => {
     const { t } = useTranslate();
 
     const formContext = StorageDetailsForm.useContext();
     const isMoveDragging = MoveContext.useValue().state.status === 'dragging';
+
+    const expanded = Route.useSearch({
+        select: search => {
+            const value = search.selectExpanded ?? 'none';
+            if (!pkm.isEnabled || isMoveDragging) {
+                return 'none';
+            }
+
+            if (formContext.editMode && value === 'none') {
+                return 'expanded';
+            }
+
+            return value;
+        }
+    });
 
     const staticData = useStaticData();
     const staticForms = staticData.species[ pkm.species ]?.forms[ pkm.context ];
@@ -63,16 +79,13 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
 
     const speciesName = formObj?.name;
 
-    const getExpanded = (): DetailsExpandedState => {
-        if (!pkm.isEnabled || isMoveDragging) {
-            return 'none';
-        }
-
-        if (formContext.editMode && expanded === 'none') {
-            return 'expanded';
-        }
-
-        return expanded;
+    const setExpanded = (state: DetailsExpandedState) => {
+        navigate({
+            search: (search) => ({
+                ...search,
+                selectExpanded: state,
+            }),
+        });
     };
 
     return <DetailsCardContainer
@@ -108,7 +121,19 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             </>}
             genderPart={<Gender gender={pkm.gender} />}
         />}
-        markings={pkm.markings}
+        mainImgSub={(pkm.markings ?? []).length > 0 && <div className={css({
+            display: 'flex',
+            alignItems: 'center',
+            columnGap: 4,
+            fontSize: 10,
+            justifyContent: 'space-evenly',
+        })}>
+            {pkm.markings?.map((mark, i) => <Marking
+                key={i}
+                index={i}
+                mark={mark}
+            />)}
+        </div>}
         mainInfos={pkm.isEnabled && <StorageDetailsMainInfos
             idBase={pkm.idBase}
             pid={pkm.pid}
@@ -198,14 +223,15 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                     homeTracker={pkm.homeTracker}
                 />
             </TextContainer>
+
+            {extraContent}
         </>}
-        extraContent={extraContent}
         onClose={() => navigate({
             search: {
                 selected: undefined,
             }
         })}
-        expanded={getExpanded()}
+        expanded={expanded}
         setExpanded={!pkm.isEnabled || isMoveDragging || formContext.editMode
             ? undefined
             : setExpanded}

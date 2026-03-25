@@ -12,7 +12,6 @@ import { useSaveItemProps } from '../../saves/save-item/hooks/use-save-item-prop
 import { useDesktopMessage } from '../../settings/globs-input/hooks/use-desktop-message';
 import { PathLine } from '../../settings/path-line';
 import { useTranslate } from '../../translate/i18n';
-import type { DetailsExpandedState } from '../../ui/details-card/details-card-container';
 import { DetailsTab } from '../../ui/details-card/details-tab';
 import { Icon } from '../../ui/icon/icon';
 import { SaveCardContentSmall } from '../../ui/save-card/save-card-content-small';
@@ -85,10 +84,6 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selected
 const InnerStorageDetailsMain: React.FC<{ id: string; tabs: React.ReactNode }> = ({ id, tabs }) => {
     const { t } = useTranslate();
 
-    const selectExpanded = Route.useSearch({ select: search => search.selectExpanded ?? 'none' });
-
-    const navigate = Route.useNavigate();
-
     const formContext = StorageDetailsForm.useContext();
 
     const getSaveItemProps = useSaveItemProps();
@@ -116,15 +111,6 @@ const InnerStorageDetailsMain: React.FC<{ id: string; tabs: React.ReactNode }> =
                     path: pkmVariant.filepath,
                 })
             : undefined;
-
-    const setSelectExpanded = (state: DetailsExpandedState) => {
-        navigate({
-            search: (search) => ({
-                ...search,
-                selectExpanded: state,
-            }),
-        });
-    };
 
     if (!pkmVariant) {
         return null;
@@ -227,8 +213,6 @@ const InnerStorageDetailsMain: React.FC<{ id: string; tabs: React.ReactNode }> =
             onSubmit={() => formContext.submitForPkmVariant(id)}
             openFile={openFile}
             extraContent={saveCardProps && <SaveCardContentSmall {...saveCardProps} />}
-            expanded={selectExpanded}
-            setExpanded={setSelectExpanded}
         />
     );
 };

@@ -16,22 +16,27 @@ export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> 
 
     const contextGeneration = getEntityContextGenerationName(context, true);
 
+    const title = [
+        contextGeneration,
+        showVersionName && contextVersion
+            ? staticData.versions[ contextVersion ]?.name
+            : 'PKVault'
+    ].filter(Boolean).join(' / ');
+
     return <>
         <img
             src={getGameInfos(contextVersion).img}
             className={css({ height: 28, width: 28 })}
         />
 
-        <div className={css({ flexGrow: 1 })}>
-            {contextGeneration ? contextGeneration : null}
-            {showVersionName && <>
-                {' / '}
-                {contextVersion
-                    ? <>
-                        {staticData.versions[ contextVersion ]?.name}
-                    </>
-                    : 'PKVault'}
-            </>}
+        <div className={css({
+            flexGrow: 1,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            width: 0,
+        })} title={title}>
+            {title}
         </div>
 
         {children}
