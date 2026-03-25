@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import type React from 'react';
-import { GameVersion, Gender as GenderType, type PkmLegalityDTO, type PkmSaveDTO } from '../../data/sdk/model';
+import { GameVersion, Gender as GenderType, type PkmLegalityDTO, type PkmSaveDTO, type PkmVariantDTO } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Route } from '../../routes/storage';
@@ -36,6 +36,7 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'handlingTrainerName' | 'handlingTrainerGender' | 'isCurrentHandler'
     | 'heldItem' | 'canEdit' | 'isEnabled' | 'hasLoadError'
 >
+    & Pick<PkmVariantDTO, 'attachedSaveId'>
     & Pick<PkmLegalityDTO, 'movesLegality' | 'relearnMovesLegality'>
     & Pick<DetailsCardContainerProps, 'tabs'>
     & {
@@ -136,6 +137,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
         </div>}
         mainInfos={pkm.isEnabled && <StorageDetailsMainInfos
             idBase={pkm.idBase}
+            saveId={pkm.attachedSaveId ?? saveId}
             pid={pkm.pid}
             species={pkm.species}
             speciesName={speciesName ?? ''}

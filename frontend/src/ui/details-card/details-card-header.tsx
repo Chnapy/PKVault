@@ -19,6 +19,7 @@ export const DetailsCardHeader: React.FC<DetailsCardHeaderProps> = ({ title, exp
             alignItems: 'center',
             gap: 4,
             paddingLeft: 4,
+            paddingRight: 4,
         })}
     >
         <div className={css({

@@ -6,6 +6,7 @@ import { filterIsDefined } from '../../../util/filter-is-defined';
 import { usePokedexFilters } from './use-pokedex-filters';
 
 type PokedexItems = Counts & {
+    isLoading: boolean;
     speciesItemsByGenerationList: SpeciesItemsByGeneration[];
 };
 
@@ -52,7 +53,7 @@ export const usePokedexItems = (): PokedexItems => {
     const showForms = Route.useSearch({ select: (search) => search.showForms ?? false });
     const showGendersRaw = Route.useSearch({ select: (search) => search.showGenders ?? false });
 
-    const { data } = useDexGetAll();
+    const { data, isLoading } = useDexGetAll();
 
     const { isPkmFiltered, filterSpeciesValues } = usePokedexFilters();
 
@@ -225,6 +226,7 @@ export const usePokedexItems = (): PokedexItems => {
     const itemsCount = speciesItemsByGenerationList.reduce((acc, item) => acc + item.itemsCount, 0);
 
     return {
+        isLoading,
         speciesItemsByGenerationList,
         seenCount,
         caughtCount,

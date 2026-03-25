@@ -78,6 +78,7 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                     backgroundColor: bgColor ?? theme.bg.contrast,
                     borderColor: bgColor ?? theme.border.contrast,
                     color: theme.text.light,
+                    paddingRight: 0,
                 })}>
                     <DetailsCardHeader
                         title={title}
@@ -94,6 +95,7 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                             flexDirection: 'column',
                             gap: 4,
                             overflowY: 'auto',
+                            paddingRight: 4,
                         }),
                         {
                             [ css({
