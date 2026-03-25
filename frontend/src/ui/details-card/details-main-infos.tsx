@@ -80,7 +80,7 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({
                     </>}
             </div>}
         </div>
-        <div className={css({ display: 'flex', justifyContent: 'space-between' })}>
+        <div className={css({ display: 'flex', justifyContent: 'space-between', height: '1lh' })}>
             <div>
                 {typeof teraType === 'number' && <TypeItem tera type={teraType} />}
             </div>
@@ -89,7 +89,6 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({
                 ? <PokerusIcon title={t('details.pokerus.infected', { days: pokerusDays })} />
                 : (isPokerusCured && <PokerusIcon cured title={t('details.pokerus.cured')} />)}
         </div>
-        <br />
         {t('details.dex')}
         <details className={css({
             display: 'inline-block',

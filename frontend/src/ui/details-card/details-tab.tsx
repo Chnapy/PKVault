@@ -37,7 +37,9 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ isEnabled = true, contex
                 width: '1lh',
             })}
         />
-        {otName} {original && " (original)"} {warning && isEnabled && <div className={css({
+        <span className={cx({
+            [ css({ borderBottom: '1px solid currentColor' }) ]: original
+        })}>{otName}</span> {warning && isEnabled && <div className={css({
             width: '1lh',
             borderRadius: 99,
             color: theme.text.light,

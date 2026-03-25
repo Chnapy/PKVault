@@ -34,14 +34,19 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, context
         <div
             className={css({
                 position: 'absolute',
-                top: 2,
-                left: 2,
+                top: 4,
+                left: 4,
                 display: 'flex',
                 alignItems: 'center',
+                gap: 4,
                 color: theme.text.default
             })}
         >
-            {ball > 0 && <ItemImg item={ball} />}
+            {ball > 0 && <ItemImg item={ball} className={css({
+                width: 20,
+                height: 20,
+                overflow: 'hidden'
+            })} />}
 
             {isOwned && <Icon name='folder' solid />}
         </div>
@@ -49,8 +54,8 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, context
         <div
             className={css({
                 position: 'absolute',
-                top: 8,
-                right: 8,
+                top: 4,
+                right: 4,
             })}
         >
             {shinyPart}
@@ -59,8 +64,8 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, context
         <div
             className={css({
                 position: 'absolute',
-                bottom: 8,
-                right: 8,
+                bottom: 4,
+                right: 4,
             })}
         >
             {genderPart}

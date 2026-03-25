@@ -1,3 +1,4 @@
+import { css } from '@emotion/css';
 import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import React from "react";
@@ -7,7 +8,7 @@ import { withErrorCatcher } from '../error/with-error-catcher';
 import { PokedexDetails } from "../pokedex/details/pokedex-details";
 import { FiltersCard } from "../pokedex/filters/filters-card";
 import { PokedexList } from "../pokedex/list/pokedex-list";
-import { css } from '@emotion/css';
+import { detailsExpandedStateValues } from '../ui/details-card/details-card-container';
 
 export const PokedexPage: React.FC = withErrorCatcher('default', () => {
   const navigate = Route.useNavigate();
@@ -31,9 +32,24 @@ export const PokedexPage: React.FC = withErrorCatcher('default', () => {
       <div
         className={css({
           position: "fixed",
+          top: 60,
           bottom: 24,
+          left: 14,
           right: 24,
-          width: 350,
+          pointerEvents: 'none',
+          zIndex: 20,
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'flex-end',
+          '&:hover': {
+            zIndex: 25,
+          },
+          '& > *': {
+            maxWidth: '100%',
+            maxHeight: '100%',
+            overflowY: 'auto',
+            pointerEvents: 'initial',
+          }
         })}
       >
         <ErrorCatcher
@@ -53,7 +69,7 @@ export const PokedexPage: React.FC = withErrorCatcher('default', () => {
 const searchSchema = z.object({
   selected: z.number().optional(),
   selectedSaveId: z.number().optional(),
-  selectExpanded: z.boolean().optional(),
+  selectExpanded: z.enum(detailsExpandedStateValues).optional(),
   filterSpeciesName: z.string().optional(),
   filterTypes: z.array(z.number()).optional(),
   filterSeen: z.boolean().optional(),

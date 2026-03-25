@@ -5,7 +5,7 @@ import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from "../../routes/pokedex";
 import { useTranslate } from '../../translate/i18n';
 import { ButtonLike } from '../../ui/button/button-like';
-import { DetailsCardContainer } from '../../ui/details-card/details-card-container';
+import { DetailsCardContainer, type DetailsExpandedState } from '../../ui/details-card/details-card-container';
 import { DetailsMainImg } from '../../ui/details-card/details-main-img';
 import { DetailsMainInfos } from '../../ui/details-card/details-main-infos';
 import { DetailsTab } from '../../ui/details-card/details-tab';
@@ -22,7 +22,7 @@ import { getGameInfos } from './util/get-game-infos';
 export const PokedexDetails: React.FC = () => {
   const { t } = useTranslate();
 
-  const selectExpanded = Route.useSearch({ select: search => search.selectExpanded ?? false });
+  const selectExpanded = Route.useSearch({ select: search => search.selectExpanded ?? 'none' });
 
   const navigate = Route.useNavigate();
 
@@ -30,11 +30,11 @@ export const PokedexDetails: React.FC = () => {
 
   const selectInfos = usePokedexDetailsSelect();
 
-  const toggleSelectExpanded = () => {
+  const setSelectExpanded = (state: DetailsExpandedState) => {
     navigate({
       search: (search) => ({
         ...search,
-        selectExpanded: !search.selectExpanded,
+        selectExpanded: state,
       }),
     });
   };
@@ -77,15 +77,8 @@ export const PokedexDetails: React.FC = () => {
   const cellBaseClassName = css({ padding: 0, textAlign: 'center' });
 
   return (
-    <div>
-      <div
-        className={css({
-          display: 'flex',
-          gap: '0 4px',
-          padding: '0 8px',
-          flexWrap: 'wrap-reverse',
-        })}
-      >
+    <DetailsCardContainer
+      tabs={<>
         {gameSaves.map(save => (
           <DetailsTab
             key={save.id}
@@ -95,128 +88,125 @@ export const PokedexDetails: React.FC = () => {
             disabled={selectedSave.id === save.id}
           />
         ))}
-      </div>
-
-      <DetailsCardContainer
-        bgColor={getGameInfos(selectedSave.version).color}
-        title={<DetailsTitle
-          context={selectedSave.context}
-          contextVersion={selectedSave.version}
-          showVersionName
-        />}
-        mainImg={
-          <DetailsMainImg
-            species={selectedSpecies}
-            context={selectedForm.context}
-            form={selectedFormIndex}
-            isFemale={selectedGender === GenderType.Female}
-            isOwned={owned}
-            isShiny={selectedShiny}
-            ball={caught ? staticData.itemPokeball.id : undefined}
-            shinyPart={selectedForm.generation > 1 && <ButtonLike
-              onClick={() => setSelectedShiny(!selectedShiny)}
-              disabled={!selectedForm.isOwnedShiny}
+      </>}
+      bgColor={getGameInfos(selectedSave.version).color}
+      title={<DetailsTitle
+        context={selectedSave.context}
+        contextVersion={selectedSave.version}
+        showVersionName
+      />}
+      mainImg={
+        <DetailsMainImg
+          species={selectedSpecies}
+          context={selectedForm.context}
+          form={selectedFormIndex}
+          isFemale={selectedGender === GenderType.Female}
+          isOwned={owned}
+          isShiny={selectedShiny}
+          ball={caught ? staticData.itemPokeball.id : undefined}
+          shinyPart={selectedForm.generation > 1 && <ButtonLike
+            onClick={() => setSelectedShiny(!selectedShiny)}
+            disabled={!selectedForm.isOwnedShiny}
+          >
+            <ShinyIcon
+              className={css({
+                width: '1lh',
+                height: '1lh',
+                filter: selectedShiny ? undefined : 'brightness(0) opacity(0.5)',
+              })}
+            />
+          </ButtonLike>}
+          genderPart={selectedFormGenders.length > 1
+            ? <ButtonLike
+              onClick={() => setSelectedGender((selectedGender + 1) % selectedFormGenders.length as GenderType)}
+              disabled={!hasMultipleSeenGenders}
             >
-              <ShinyIcon
+              <Gender gender={selectedGender} className={css({ width: '1lh' })} />
+            </ButtonLike>
+            : <Gender gender={selectedGender} />
+          }
+        />
+      }
+      mainInfos={
+        <DetailsMainInfos
+          species={selectedSpecies}
+          speciesName={<div className={css({ display: 'inline-flex', gap: 4 })}>
+            {staticFormsFiltered.length <= 1 && speciesName}
+            {staticFormsFiltered.length > 1 && <span className={css({
+              display: 'inline-flex',
+              flexDirection: 'row',
+              alignItems: 'flex-end',
+              marginTop: -3
+            })}>
+              <SelectNumberInput
+                data={staticFormsFiltered.map(staticForm => ({
+                  value: staticForm.index,
+                  option: staticForm.name,
+                  disabled: !selectedSpeciesValue.forms.some(form => form.form === staticForm.index && form.isSeen),
+                }))}
+                onChange={setSelectedFormIndex}
+                value={selectedFormIndex}
+                bgColor='transparent'
                 className={css({
-                  width: '1lh',
                   height: '1lh',
-                  filter: selectedShiny ? undefined : 'brightness(0) opacity(0.5)',
+                  color: 'inherit',
+                  borderColor: 'currentcolor',
                 })}
               />
-            </ButtonLike>}
-            genderPart={selectedFormGenders.length > 1
-              ? <ButtonLike
-                onClick={() => setSelectedGender((selectedGender + 1) % selectedFormGenders.length as GenderType)}
-                disabled={!hasMultipleSeenGenders}
-              >
-                <Gender gender={selectedGender} className={css({ width: '1lh' })} />
-              </ButtonLike>
-              : <Gender gender={selectedGender} />
-            }
-          />
+            </span>}
+          </div>}
+          version={selectedSave.version ?? 0}
+          types={selectedForm.types}
+        />
+      }
+      preContent={null}
+      content={<>
+        {selectedForm.abilities.length > 0 && <TextContainer stick>
+          <span className={css({ color: theme.text.primary })}>{t('details.abilities')}</span><br />
+          {selectedForm.abilities.map(ability => <div key={ability}>{
+            staticData.abilities[ ability ]?.name
+          }</div>)}
+        </TextContainer>}
+
+        <TextContainer stick>
+          <table
+            className={css({
+              borderSpacing: '8px 0'
+            })}
+          >
+            <thead>
+              <tr>
+                <td className={cellBaseClassName}></td>
+                <td className={cellBaseClassName}>{t('details.stats.base')}</td>
+              </tr>
+            </thead>
+            <tbody>
+              {[ t('details.stats.hp'), t('details.stats.atk'), t('details.stats.def'), t('details.stats.spa'), t('details.stats.spd'), t('details.stats.spe') ]
+                .map((statName, i) => <tr key={statName}>
+                  <td className={cx(cellBaseClassName, css({ textAlign: 'left' }))}>{statName}</td>
+                  <td className={cellBaseClassName}>{baseStats[ i ]}</td>
+                </tr>)}
+
+              <tr>
+                <td className={cx(cellBaseClassName, css({ textAlign: 'left', textTransform: 'capitalize' }))}>{t('total')}</td>
+                <td className={cellBaseClassName}>{totalBaseStats}</td>
+              </tr>
+            </tbody>
+          </table>
+        </TextContainer>
+
+        {owned && (
+          <PokedexDetailsOwned saveId={selectedSpeciesValue.saveId} species={selectedSpeciesValue.species} />
+        )}
+      </>}
+      actions={null}
+      onClose={() => navigate({
+        search: {
+          selected: undefined,
         }
-        mainInfos={
-          <DetailsMainInfos
-            species={selectedSpecies}
-            speciesName={<div className={css({ display: 'inline-flex', gap: 4 })}>
-              {staticFormsFiltered.length <= 1 && speciesName}
-              {staticFormsFiltered.length > 1 && <span className={css({
-                display: 'inline-flex',
-                flexDirection: 'row',
-                alignItems: 'flex-end',
-                marginTop: -3
-              })}>
-                <SelectNumberInput
-                  data={staticFormsFiltered.map(staticForm => ({
-                    value: staticForm.index,
-                    option: staticForm.name,
-                    disabled: !selectedSpeciesValue.forms.some(form => form.form === staticForm.index && form.isSeen),
-                  }))}
-                  onChange={setSelectedFormIndex}
-                  value={selectedFormIndex}
-                  bgColor='transparent'
-                  className={css({
-                    height: '1lh',
-                    color: 'inherit',
-                    borderColor: 'currentcolor',
-                  })}
-                />
-              </span>}
-            </div>}
-            version={selectedSave.version ?? 0}
-            types={selectedForm.types}
-          />
-        }
-        preContent={null}
-        content={<>
-          {selectedForm.abilities.length > 0 && <TextContainer>
-            <span className={css({ color: theme.text.primary })}>{t('details.abilities')}</span><br />
-            {selectedForm.abilities.map(ability => <div key={ability}>{
-              staticData.abilities[ ability ]?.name
-            }</div>)}
-          </TextContainer>}
-
-          <TextContainer>
-            <table
-              className={css({
-                borderSpacing: '8px 0'
-              })}
-            >
-              <thead>
-                <tr>
-                  <td className={cellBaseClassName}></td>
-                  <td className={cellBaseClassName}>{t('details.stats.base')}</td>
-                </tr>
-              </thead>
-              <tbody>
-                {[ t('details.stats.hp'), t('details.stats.atk'), t('details.stats.def'), t('details.stats.spa'), t('details.stats.spd'), t('details.stats.spe') ]
-                  .map((statName, i) => <tr key={statName}>
-                    <td className={cx(cellBaseClassName, css({ textAlign: 'left' }))}>{statName}</td>
-                    <td className={cellBaseClassName}>{baseStats[ i ]}</td>
-                  </tr>)}
-
-                <tr>
-                  <td className={cx(cellBaseClassName, css({ textAlign: 'left', textTransform: 'capitalize' }))}>{t('total')}</td>
-                  <td className={cellBaseClassName}>{totalBaseStats}</td>
-                </tr>
-              </tbody>
-            </table>
-          </TextContainer>
-
-          {owned && (
-            <PokedexDetailsOwned saveId={selectedSpeciesValue.saveId} species={selectedSpeciesValue.species} />
-          )}
-        </>}
-        actions={null}
-        onClose={() => navigate({
-          search: {
-            selected: undefined,
-          }
-        })}
-        expanded={selectExpanded}
-        toggleExpanded={toggleSelectExpanded}
-      />
-    </div>
+      })}
+      expanded={selectExpanded}
+      setExpanded={setSelectExpanded}
+    />
   );
 };

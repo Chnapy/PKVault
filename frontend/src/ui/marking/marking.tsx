@@ -13,9 +13,11 @@ export const Marking: React.FC<MarkingProps> = ({ index, mark }) => {
     return <span
         className={cx(
             css({
+                flexGrow: 1,
                 aspectRatio: 1,
-                width: 12,
-                height: 12,
+                width: 'auto',
+                height: 'auto',
+                maxWidth: '1lh',
                 backgroundColor: theme.bg.darker,
             }),
             {

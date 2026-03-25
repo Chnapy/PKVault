@@ -8,7 +8,7 @@ import { MoveContext } from '../../storage/move/context/move-context';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
-import { DetailsCardContainer, type DetailsCardContainerProps } from '../details-card/details-card-container';
+import { DetailsCardContainer, type DetailsCardContainerProps, type DetailsExpandedState } from '../details-card/details-card-container';
 import { DetailsMainImg } from '../details-card/details-main-img';
 import { ItemImg } from '../details-card/item-img';
 import { Gender } from '../gender/gender';
@@ -36,7 +36,7 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'heldItem' | 'canEdit' | 'isEnabled' | 'hasLoadError'
 >
     & Pick<PkmLegalityDTO, 'movesLegality' | 'relearnMovesLegality'>
-    & Pick<DetailsCardContainerProps, 'expanded' | 'toggleExpanded'>
+    & Pick<DetailsCardContainerProps, 'tabs' | 'expanded' | 'setExpanded'>
     & {
         filepath?: string;
         contextVersion: GameVersion | null;
@@ -48,7 +48,7 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
         extraContent?: React.ReactNode;
     };
 
-export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath, saveId, reports, onRelease, onSubmit, openFile, extraContent, expanded, toggleExpanded, ...pkm }) => {
+export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath, saveId, reports, onRelease, onSubmit, openFile, extraContent, tabs, expanded, setExpanded, ...pkm }) => {
     const { t } = useTranslate();
 
     const formContext = StorageDetailsForm.useContext();
@@ -63,7 +63,20 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
 
     const speciesName = formObj?.name;
 
+    const getExpanded = (): DetailsExpandedState => {
+        if (!pkm.isEnabled || isMoveDragging) {
+            return 'none';
+        }
+
+        if (formContext.editMode && expanded === 'none') {
+            return 'expanded';
+        }
+
+        return expanded;
+    };
+
     return <DetailsCardContainer
+        tabs={tabs}
         bgColor={getGameInfos(pkm.contextVersion, pkm.isEnabled).color}
         title={<StorageDetailsTitle
             isEnabled={pkm.isEnabled}
@@ -95,6 +108,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             </>}
             genderPart={<Gender gender={pkm.gender} />}
         />}
+        markings={pkm.markings}
         mainInfos={pkm.isEnabled && <StorageDetailsMainInfos
             idBase={pkm.idBase}
             pid={pkm.pid}
@@ -123,7 +137,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 />
             </TextContainer>}
 
-            <TextContainer noWrap>
+            <TextContainer stick noWrap>
                 <TextStats
                     nature={pkm.nature}
                     ivs={pkm.iVs}
@@ -137,7 +151,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 />
             </TextContainer>
 
-            <TextContainer>
+            <TextContainer stick>
                 <TextMoves
                     saveId={saveId}
                     pkmId={pkm.id}
@@ -154,15 +168,14 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 />
             </TextContainer>
 
-            {(pkm.markings || pkm.contest || pkm.ribbons) && <TextContainer>
+            {(pkm.contest || pkm.ribbons) && <TextContainer stick>
                 <TextCosmetic
-                    markings={pkm.markings}
                     contest={pkm.contest}
                     ribbons={pkm.ribbons}
                 />
             </TextContainer>}
 
-            <TextContainer>
+            <TextContainer stick>
                 <TextOrigin
                     version={pkm.version}
                     tid={pkm.tid}
@@ -179,7 +192,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 />
             </TextContainer>
 
-            <TextContainer>
+            <TextContainer stick>
                 <TextMisc
                     languageID={pkm.languageID}
                     homeTracker={pkm.homeTracker}
@@ -192,12 +205,10 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 selected: undefined,
             }
         })}
-        expanded={!pkm.isEnabled || isMoveDragging
-            ? false
-            : (formContext.editMode ? true : expanded)}
-        toggleExpanded={!pkm.isEnabled || isMoveDragging || formContext.editMode
+        expanded={getExpanded()}
+        setExpanded={!pkm.isEnabled || isMoveDragging || formContext.editMode
             ? undefined
-            : toggleExpanded}
+            : setExpanded}
         actions={formContext.editMode && <div className={css({
             display: 'flex',
             gap: 4

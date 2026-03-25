@@ -5,6 +5,7 @@ import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
 import { useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import { useTranslate } from '../../translate/i18n';
+import type { DetailsExpandedState } from '../../ui/details-card/details-card-container';
 import { Icon } from '../../ui/icon/icon';
 import { StorageDetailsBase } from '../../ui/storage-item-details/storage-details-base';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
@@ -35,7 +36,7 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({ selected
 const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({ id, saveId }) => {
     const { t } = useTranslate();
 
-    const selectExpanded = Route.useSearch({ select: search => search.selectExpanded ?? false });
+    const selectExpanded = Route.useSearch({ select: search => search.selectExpanded ?? 'none' });
 
     const navigate = Route.useNavigate();
 
@@ -48,11 +49,11 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({ id,
     const pkmLegalityQuery = usePkmLegality(id, saveId);
     const pkmLegality = pkmLegalityQuery.data?.data;
 
-    const toggleSelectExpanded = () => {
+    const setSelectExpanded = (state: DetailsExpandedState) => {
         navigate({
             search: (search) => ({
                 ...search,
-                selectExpanded: !search.selectExpanded,
+                selectExpanded: state,
             }),
         });
     };
@@ -110,7 +111,7 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({ id,
             }
             onSubmit={() => formContext.submitForPkmSave(saveId, id)}
             expanded={selectExpanded}
-            toggleExpanded={toggleSelectExpanded}
+            setExpanded={setSelectExpanded}
         />
     );
 };

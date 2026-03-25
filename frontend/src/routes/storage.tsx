@@ -13,6 +13,7 @@ import { StorageDetails } from "../storage/details/storage-details";
 import { MoveContext } from '../storage/move/context/move-context';
 import { StorageSaveSelect } from "../storage/storage-save-select";
 import { StorageSearchCheck } from '../storage/storage-search-check';
+import { detailsExpandedStateValues } from '../ui/details-card/details-card-container';
 import { filterIsDefined } from '../util/filter-is-defined';
 
 export const Storage: React.FC = withErrorCatcher('default', () => {
@@ -78,12 +79,13 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
                     position: "fixed",
                     bottom: 14,
                     top: 60,
+                    left: 14,
                     right: 14,
-                    width: 350,
                     pointerEvents: 'none',
                     zIndex: 20,
                     display: 'flex',
                     alignItems: 'flex-end',
+                    justifyContent: 'flex-end',
                     '&:hover': {
                       zIndex: 25,
                     },
@@ -121,7 +123,7 @@ const searchSchema = z.object({
     })
     .optional(),
   selectedContext: z.number().optional(),
-  selectExpanded: z.boolean().optional(),
+  selectExpanded: z.enum(detailsExpandedStateValues).optional(),
   saves: z.record(
     z.number().int(),
     z.object({

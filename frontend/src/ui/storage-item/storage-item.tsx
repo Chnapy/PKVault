@@ -157,7 +157,6 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
         {party !== undefined && renderBubble(theme.bg.green, party + 1)}
 
         {level !== undefined && <div className={css({
-          backgroundColor: 'rgba(255,255,255,0.4)',
           marginBottom: -4
         })}>
           {small ? level : <DetailsLevel level={level} />}
