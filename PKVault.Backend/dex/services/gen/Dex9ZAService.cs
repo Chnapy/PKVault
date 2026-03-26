@@ -14,6 +14,8 @@ public class Dex9ZAService(SAV9ZA save) : DexGenService(save)
         var entry = save.Zukan.GetEntry(species);
 
         var isSeenShiny = isOwnedShiny || entry.GetIsShinySeen(form);
+        var isSeenAlpha = entry.GetIsSeenAlpha();
+        // var isSeenMega = entry.GetIsSeenMega(0) || entry.GetIsSeenMega(1) || entry.GetIsSeenMega(2);
 
         var isSeenM = entry.GetIsGenderSeen(0) || entry.GetIsGenderSeen(2);
         var isSeenF = entry.GetIsGenderSeen(1);
@@ -31,6 +33,7 @@ public class Dex9ZAService(SAV9ZA save) : DexGenService(save)
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
             IsSeenShiny: isSeenShiny,
+            IsSeenAlpha: isSeenAlpha,
             IsCaught: isCaught,
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
@@ -42,56 +45,56 @@ public class Dex9ZAService(SAV9ZA save) : DexGenService(save)
         return AllLanguages.Where((lang) => save.Zukan.GetEntry(species).GetLanguageFlag((int)lang));
     }
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
+    public override async Task EnableSpeciesForm(EnableSpeciesFormPayload payload)
     {
-        if (!save.Personal.IsPresentInGame(species, form))
+        if (!save.Personal.IsPresentInGame(payload.Species, payload.Form))
             return;
 
-        var entry = save.Zukan.GetEntry(species);
+        var entry = save.Zukan.GetEntry(payload.Species);
 
-        if (isSeen)
+        if (payload.IsSeen)
         {
-            entry.SetIsGenderSeen((byte)gender, true);
-            entry.SetIsFormSeen(form, true);
+            entry.SetIsGenderSeen((byte)payload.Gender, true);
+            entry.SetIsFormSeen(payload.Form, true);
 
-            if (FormInfo.IsMegaForm(species, form))
+            if (FormInfo.IsMegaForm(payload.Species, payload.Form))
                 entry.SetIsSeenMega(0, true);
 
-            if (Zukan9a.IsMegaFormXY(species, save.SaveRevision) || Zukan9a.IsMegaFormZA(species, save.SaveRevision))
+            if (Zukan9a.IsMegaFormXY(payload.Species, save.SaveRevision) || Zukan9a.IsMegaFormZA(payload.Species, save.SaveRevision))
                 entry.SetIsSeenMega(1, true);
-            else if (species is (ushort)Species.Magearna or (ushort)Species.Meowstic)
+            else if (payload.Species is (ushort)Species.Magearna or (ushort)Species.Meowstic)
                 entry.SetIsSeenMega(1, true);
-            else if (species == (ushort)Species.Tatsugiri)
-                entry.SetIsSeenMega(form < 3 ? form : (byte)Math.Clamp(form - 3, 0, 3), true);
+            else if (payload.Species == (ushort)Species.Tatsugiri)
+                entry.SetIsSeenMega(payload.Form < 3 ? payload.Form : (byte)Math.Clamp(payload.Form - 3, 0, 3), true);
 
-            // if (isAlpha)
-            //     entry.SetIsSeenAlpha(true);
+            if (payload.IsSeenAlpha)
+                entry.SetIsSeenAlpha(true);
 
-            entry.DisplayForm = form;
-            entry.SetDisplayGender(gender, species, form);
+            entry.DisplayForm = payload.Form;
+            entry.SetDisplayGender(payload.Gender, payload.Species, payload.Form);
 
-            if (Zukan9a.GetFormExtraFlags(species, out var value))
+            if (Zukan9a.GetFormExtraFlags(payload.Species, out var value))
             {
                 entry.SetIsFormsSeen(value);
                 entry.SetIsFormsCaught(value);
             }
         }
 
-        if (isSeenShiny)
+        if (payload.IsSeenShiny)
         {
-            entry.SetIsShinySeen(form, true);
-            if (save.Zukan.GetFormExtraFlagsShinySeen(species, form, out var value))
+            entry.SetIsShinySeen(payload.Form, true);
+            if (save.Zukan.GetFormExtraFlagsShinySeen(payload.Species, payload.Form, out var value))
                 entry.SetIsShinySeen(value);
 
             entry.SetDisplayIsShiny(true);
         }
 
-        if (isCaught)
+        if (payload.IsCaught)
         {
-            entry.SetIsFormCaught(form, true);
+            entry.SetIsFormCaught(payload.Form, true);
         }
 
-        var safeLanguages = languages.Where(AllLanguages.Contains);
+        var safeLanguages = payload.Languages.Where(AllLanguages.Contains);
         if (!safeLanguages.Any())
         {
             safeLanguages = [GetSaveLanguage()];

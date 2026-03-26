@@ -1,3 +1,4 @@
+import { css } from '@emotion/css';
 import type React from 'react';
 import type { EntityContext, GameVersion } from '../../data/sdk/model';
 import { PathLine } from '../../settings/path-line';
@@ -24,7 +25,12 @@ export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ isEnab
 
     return <DetailsTitle context={context} contextVersion={contextVersion} showVersionName={showVersionName && isEnabled}>
         {!isEnabled && contextVersion === null && filepath
-            ? <PathLine>{filepath}</PathLine>
+            ? <div className={css({
+                flexGrow: 1,
+                width: 0,
+            })} title={filepath}>
+                <PathLine>{filepath}</PathLine>
+            </div>
             : null}
 
         {openFile && <Button onClick={openFile}>

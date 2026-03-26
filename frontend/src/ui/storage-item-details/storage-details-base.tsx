@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import type React from 'react';
-import { GameVersion, Gender as GenderType, type PkmLegalityDTO, type PkmSaveDTO } from '../../data/sdk/model';
+import { GameVersion, Gender as GenderType, type PkmLegalityDTO, type PkmSaveDTO, type PkmVariantDTO } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Route } from '../../routes/storage';
@@ -8,12 +8,10 @@ import { MoveContext } from '../../storage/move/context/move-context';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
-import { DetailsCardContainer, type DetailsCardContainerProps } from '../details-card/details-card-container';
+import { DetailsCardContainer, type DetailsCardContainerProps, type DetailsExpandedState } from '../details-card/details-card-container';
 import { DetailsMainImg } from '../details-card/details-main-img';
 import { ItemImg } from '../details-card/item-img';
-import { Gender } from '../gender/gender';
-import { AlphaIcon } from '../icon/alpha-icon';
-import { ShinyIcon } from '../icon/shiny-icon';
+import { Marking } from '../marking/marking';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
@@ -28,15 +26,16 @@ import { TextStats } from './text-stats';
 export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
     | 'id' | 'idBase' | 'pid' | 'species' | 'context' | 'version' | 'generation' | 'form' | 'isAlpha' | 'isShiny' | 'isEgg' | 'isShadow' | 'ball'
     | 'gender' | 'level' | 'levelUpPercent' | 'eggHatchCount' | 'friendship' | 'nickname' | 'nicknameMaxLength' | 'types' | 'nature' | 'iVs' | 'eVs' | 'stats'
-    | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves' | 'relearnMoves'
+    | 'hiddenPowerType' | 'hiddenPowerCategory' | 'hiddenPowerPower' | 'ability' | 'moves' | 'relearnMoves' | 'alphaMove'
     | 'pokerusDays' | 'isPokerusCured' | 'teraType' | 'homeTracker'
     | 'markings' | 'contest' | 'ribbons'
     | 'tid' | 'sid' | 'originMetDate' | 'originMetLevel' | 'originMetLocation' | 'originTrainerGender' | 'originTrainerName' | 'fatefulEncounter' | 'languageID'
     | 'handlingTrainerName' | 'handlingTrainerGender' | 'isCurrentHandler'
     | 'heldItem' | 'canEdit' | 'isEnabled' | 'hasLoadError'
 >
+    & Pick<PkmVariantDTO, 'attachedSaveId'>
     & Pick<PkmLegalityDTO, 'movesLegality' | 'relearnMovesLegality'>
-    & Pick<DetailsCardContainerProps, 'expanded' | 'toggleExpanded'>
+    & Pick<DetailsCardContainerProps, 'tabs'>
     & {
         filepath?: string;
         contextVersion: GameVersion | null;
@@ -48,11 +47,26 @@ export type StorageDetailsBaseProps = Pick<PkmSaveDTO,
         extraContent?: React.ReactNode;
     };
 
-export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath, saveId, reports, onRelease, onSubmit, openFile, extraContent, expanded, toggleExpanded, ...pkm }) => {
+export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath, saveId, reports, onRelease, onSubmit, openFile, extraContent, tabs, ...pkm }) => {
     const { t } = useTranslate();
 
     const formContext = StorageDetailsForm.useContext();
     const isMoveDragging = MoveContext.useValue().state.status === 'dragging';
+
+    const expanded = Route.useSearch({
+        select: search => {
+            const value = search.selectExpanded ?? 'none';
+            if (!pkm.isEnabled || isMoveDragging) {
+                return 'none';
+            }
+
+            if (formContext.editMode && value === 'none') {
+                return 'expanded';
+            }
+
+            return value;
+        }
+    });
 
     const staticData = useStaticData();
     const staticForms = staticData.species[ pkm.species ]?.forms[ pkm.context ];
@@ -63,7 +77,17 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
 
     const speciesName = formObj?.name;
 
+    const setExpanded = (state: DetailsExpandedState) => {
+        navigate({
+            search: (search) => ({
+                ...search,
+                selectExpanded: state,
+            }),
+        });
+    };
+
     return <DetailsCardContainer
+        tabs={tabs}
         bgColor={getGameInfos(pkm.contextVersion, pkm.isEnabled).color}
         title={<StorageDetailsTitle
             isEnabled={pkm.isEnabled}
@@ -79,24 +103,31 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             species={pkm.species}
             context={pkm.context}
             form={pkm.form}
+            gender={pkm.gender}
             isFemale={pkm.gender == GenderType.Female}
             isShiny={pkm.isShiny}
+            isAlpha={pkm.isAlpha}
             isEgg={pkm.isEgg}
             isShadow={pkm.isShadow}
             ball={pkm.ball}
-            shinyPart={<>
-                {pkm.isAlpha && <AlphaIcon />}
-
-                {pkm.isShiny && <ShinyIcon
-                    className={css({
-                        margin: '0 -2px',
-                    })}
-                />}
-            </>}
-            genderPart={<Gender gender={pkm.gender} />}
         />}
+        mainImgSub={(pkm.markings ?? []).length > 0 && <div className={css({
+            display: 'flex',
+            alignItems: 'center',
+            columnGap: 4,
+            fontSize: 10,
+            justifyContent: 'space-evenly',
+            padding: 4,
+        })}>
+            {pkm.markings?.map((mark, i) => <Marking
+                key={i}
+                index={i}
+                mark={mark}
+            />)}
+        </div>}
         mainInfos={pkm.isEnabled && <StorageDetailsMainInfos
             idBase={pkm.idBase}
+            saveId={pkm.attachedSaveId ?? saveId}
             pid={pkm.pid}
             species={pkm.species}
             speciesName={speciesName ?? ''}
@@ -123,7 +154,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 />
             </TextContainer>}
 
-            <TextContainer noWrap>
+            <TextContainer stick noWrap>
                 <TextStats
                     nature={pkm.nature}
                     ivs={pkm.iVs}
@@ -137,7 +168,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 />
             </TextContainer>
 
-            <TextContainer>
+            <TextContainer stick>
                 <TextMoves
                     saveId={saveId}
                     pkmId={pkm.id}
@@ -146,6 +177,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                     movesLegality={pkm.movesLegality}
                     relearnMoves={pkm.relearnMoves}
                     relearnMovesLegality={pkm.relearnMovesLegality}
+                    alphaMove={pkm.alphaMove}
                     generation={pkm.generation}
                     hiddenPowerType={pkm.hiddenPowerType}
                     hiddenPowerPower={pkm.hiddenPowerPower}
@@ -154,15 +186,14 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 />
             </TextContainer>
 
-            {(pkm.markings || pkm.contest || pkm.ribbons) && <TextContainer>
+            {(pkm.contest || pkm.ribbons) && <TextContainer stick>
                 <TextCosmetic
-                    markings={pkm.markings}
                     contest={pkm.contest}
                     ribbons={pkm.ribbons}
                 />
             </TextContainer>}
 
-            <TextContainer>
+            <TextContainer stick>
                 <TextOrigin
                     version={pkm.version}
                     tid={pkm.tid}
@@ -179,25 +210,24 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
                 />
             </TextContainer>
 
-            <TextContainer>
+            <TextContainer stick>
                 <TextMisc
                     languageID={pkm.languageID}
                     homeTracker={pkm.homeTracker}
                 />
             </TextContainer>
+
+            {extraContent}
         </>}
-        extraContent={extraContent}
         onClose={() => navigate({
             search: {
                 selected: undefined,
             }
         })}
-        expanded={!pkm.isEnabled || isMoveDragging
-            ? false
-            : (formContext.editMode ? true : expanded)}
-        toggleExpanded={!pkm.isEnabled || isMoveDragging || formContext.editMode
+        expanded={expanded}
+        setExpanded={!pkm.isEnabled || isMoveDragging || formContext.editMode
             ? undefined
-            : toggleExpanded}
+            : setExpanded}
         actions={formContext.editMode && <div className={css({
             display: 'flex',
             gap: 4

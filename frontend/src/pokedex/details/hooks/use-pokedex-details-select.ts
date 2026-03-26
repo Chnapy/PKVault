@@ -1,10 +1,10 @@
 import React from 'react';
-import { EntityContext, Gender as GenderType } from '../../../data/sdk/model';
+import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
+import { EntityContext, type DexItemForm } from '../../../data/sdk/model';
+import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
+import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from '../../../routes/pokedex';
 import { filterIsDefined } from '../../../util/filter-is-defined';
-import { useStaticData } from '../../../hooks/use-static-data';
-import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
-import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 
 export const usePokedexDetailsSelect = () => {
     const selectedSpecies = Route.useSearch({ select: search => search.selected });
@@ -17,9 +17,7 @@ export const usePokedexDetailsSelect = () => {
     const dexGetAllQuery = useDexGetAll();
     const saveInfosMainQuery = useSaveInfosGetAll();
 
-    const [ selectedFormIndex, setSelectedFormIndex ] = React.useState(0);
-    const [ selectedGender, setSelectedGender ] = React.useState<GenderType>(GenderType.Genderless);
-    const [ selectedShiny, setSelectedShiny ] = React.useState(false);
+    const [ selectedFormId, setSelectedFormId ] = React.useState('');
 
     const savesRecord = saveInfosMainQuery.data?.data ?? {};
     const speciesRecord = dexGetAllQuery.data?.data ?? {};
@@ -65,39 +63,40 @@ export const usePokedexDetailsSelect = () => {
         .map((staticForm, index) => ({ ...staticForm, index }))
         .filter(staticForm => !staticForm.isBattleOnly);
 
-    const firstSeenForm = selectedSpeciesValue?.forms.find(form =>
-        form.isSeen && staticFormsFiltered.some(staticForm => staticForm.index === form.form)
-    )?.form;
-    const firstSeenGender = selectedSpeciesValue?.forms.find(form => form.form === firstSeenForm && form.isSeen)?.gender;
+    const getFormWeight = (f: DexItemForm) =>
+        (f.isOwned ? 100000 : 0)
+        + (f.isCaught ? 10000 : 0)
+        + (f.isSeenShiny ? 1000 : 0)
+        + (f.isSeenAlpha ? 100 : 0);
 
-    const selectedForm = selectedSpeciesValue?.forms.find(form =>
-        form.form === selectedFormIndex
-        && form.gender === selectedGender
-    );
+    const seenForms = selectedSpeciesValue?.forms.filter(form => form.isSeen) ?? [];
 
-    React.useEffect(() => {
-        if (!selectedForm?.isSeen) {
-            setSelectedFormIndex(firstSeenForm ?? 0);
-            setSelectedGender(firstSeenGender ?? GenderType.Genderless);
-        }
+    const getDefaultForm = (formIndex: number) => {
+        const formsSortedByWeight = [ ...seenForms ]
+            .filter(form => form.form === formIndex)
+            .sort((f1, f2) => getFormWeight(f2) - getFormWeight(f1));
+        return formsSortedByWeight[ 0 ];
+    };
 
-        if (!selectedForm?.isOwnedShiny) {
-            setSelectedShiny(false);
-        }
-    }, [ firstSeenForm, firstSeenGender, selectedSpecies, selectedForm ]);
+    const selectedForm = selectedFormId
+        ? seenForms.find(form => form.id === selectedFormId) ?? getDefaultForm(0)
+        : getDefaultForm(0);
 
-    React.useEffect(() => {
-        if (selectedFormIndex > 0 && !selectedForm) {
-            setSelectedFormIndex(firstSeenForm ?? 0);
-            setSelectedGender(firstSeenGender ?? GenderType.Genderless);
-        }
-    }, [ selectedFormIndex, selectedForm, firstSeenGender, firstSeenForm ]);
+    const selectedFormIndexForms = (seenForms ?? [])
+        .filter(form => form.form === selectedForm?.form)
+        .sort((f1, f2) => getFormWeight(f2) - getFormWeight(f1));
+
+    const selectedByFormIndex = (formIndex: number) => {
+        const form = getDefaultForm(formIndex);
+        if (form)
+            setSelectedFormId(form.id);
+    };
 
     if (!selectedSpecies || !gameSaves.length || !selectedSave || !selectedSpeciesValue || !selectedForm) {
         return null;
     }
 
-    const selectedStaticFormWithIndex = staticFormsFiltered.find(sf => sf.index === selectedFormIndex)
+    const selectedStaticFormWithIndex = staticFormsFiltered.find(sf => sf.index === selectedForm.form)
         ?? staticFormsFiltered[ 0 ];
 
     if (!selectedStaticFormWithIndex) {
@@ -106,18 +105,15 @@ export const usePokedexDetailsSelect = () => {
 
     return {
         selectedSaveId,
-        selectedFormIndex,
-        selectedGender,
-        selectedShiny,
-
-        setSelectedSaveId,
-        setSelectedFormIndex,
-        setSelectedGender,
-        setSelectedShiny,
-
         selectedSpecies,
         selectedSave,
         selectedForm,
+
+        setSelectedSaveId,
+        setSelectedFormId,
+        selectedByFormIndex,
+
+        selectedFormIndexForms,
         selectedStaticFormWithIndex,
         selectedSpeciesValue,
 

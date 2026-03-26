@@ -87,13 +87,11 @@ const Root: React.FC = () => {
               {t('header.scan-saves')}
             </ButtonWithDisabledPopover>
 
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                marginLeft: 'auto'
-              }}
-            >
+            <div className={css({
+              display: 'flex',
+              alignItems: 'center',
+              marginLeft: 'auto'
+            })}>
               <HeaderItem
                 search={{ help: 'README.md' satisfies DocsGenEnSlugs }}
               >

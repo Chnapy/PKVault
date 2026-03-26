@@ -1,19 +1,15 @@
 import { css } from '@emotion/css';
 import type React from 'react';
-import { MarkingColorUniversal } from '../../data/sdk/model';
 import { useTranslate } from '../../translate/i18n';
 import { Contest } from '../contest/contest';
-import { Marking } from '../marking/marking';
 import { Ribbon } from '../ribbon/ribbon';
 
 export type TextCosmeticProps = {
-    markings?: MarkingColorUniversal[];
     contest?: number[];
     ribbons?: Record<string, number>;
 };
 
 export const TextCosmetic: React.FC<TextCosmeticProps> = ({
-    markings = [],
     contest = [],
     ribbons = {},
 }) => {
@@ -22,21 +18,7 @@ export const TextCosmetic: React.FC<TextCosmeticProps> = ({
     const ribbonsList = Object.entries(ribbons);
 
     return <>
-        {markings.length > 0 && <div className={css({
-            height: '1lh',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-        })}>
-            {markings.map((mark, i) => <Marking
-                key={i}
-                index={i}
-                mark={mark}
-            />)}
-        </div>}
-
         {contest.length > 0 && <>
-            <br />
             {t('details.contest')}
             <div className={css({
                 display: 'flex',

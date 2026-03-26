@@ -109,8 +109,9 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
                 });
                 var isOwned = ownedPkms.Count > 0;
                 var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
+                var isOwnedAlpha = ownedPkms.Any(pkm => pkm.IsAlpha);
 
-                var itemForm = GetDexItemFormComplete(species, isOwned, isOwnedShiny, form, gender);
+                var itemForm = GetDexItemFormComplete(species, isOwned, isOwnedShiny, isOwnedAlpha, form, gender);
                 forms.Add(itemForm);
             });
         }
@@ -184,12 +185,15 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         ];
     }
 
-    public DexItemForm GetDexItemFormComplete(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
+    public DexItemForm GetDexItemFormComplete(ushort species, bool isOwned, bool isOwnedShiny, bool isOwnedAlpha, byte form, Gender gender)
     {
-        return GetDexItemForm(species, isOwned, isOwnedShiny, form, gender) with
+        var value = GetDexItemForm(species, isOwned, isOwnedShiny, form, gender);
+
+        return value with
         {
             Context = save.Context,
-            Generation = save.Generation
+            Generation = save.Generation,
+            IsSeenAlpha = value.IsSeenAlpha || isOwnedAlpha,
         };
     }
 
@@ -208,5 +212,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
     protected abstract IEnumerable<LanguageID> GetDexLanguages(ushort species);
 
-    public abstract Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages);
+    public abstract Task EnableSpeciesForm(EnableSpeciesFormPayload payload);
 }
+
+public record EnableSpeciesFormPayload(ushort Species, byte Form, Gender Gender, bool IsSeen, bool IsSeenShiny, bool IsSeenAlpha, bool IsCaught, LanguageID[] Languages);

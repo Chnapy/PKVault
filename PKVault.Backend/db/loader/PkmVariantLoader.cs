@@ -42,6 +42,7 @@ public interface IPkmVariantLoader : IEntityLoader<PkmVariantDTO, PkmVariantEnti
     public Task<PkmVariantEntity?> GetEntityBySave(uint saveId, string savePkmIdBase);
     public Task<bool> HasEntityByForm(ushort species, byte form, Gender gender);
     public Task<bool> HasEntityByFormShiny(ushort species, byte form, Gender gender);
+    public Task<bool> HasEntityByFormAlpha(ushort species, byte form, Gender gender);
     public Task<ImmutablePKM> GetPKM(PkmVariantEntity entity);
 }
 
@@ -282,6 +283,14 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
             .AnyAsync(p => p.Species == species && p.Form == form && p.Gender == gender && p.IsShiny);
     }
 
+    public async Task<bool> HasEntityByFormAlpha(ushort species, byte form, Gender gender)
+    {
+        var dbSet = await GetDbSet();
+
+        return await dbSet
+            .AnyAsync(p => p.Species == species && p.Form == form && p.Gender == gender && p.IsAlpha);
+    }
+
     public async Task<PkmVariantEntity> AddEntity(PkmVariantLoaderAddPayload payload)
     {
         var entity = await GetEntityFromAddPayload(payload);
@@ -354,6 +363,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
             Form = payload.Pkm.Form,
             Gender = payload.Pkm.Gender,
             IsShiny = payload.Pkm.IsShiny,
+            IsAlpha = payload.Pkm.IsAlpha,
 
             Filepath = filepath,
             PkmFile = await pkmFileLoader.PrepareEntity(payload.Pkm, filepath, updated: payload.Updated, checkPkm: payload.CheckPkm),
@@ -395,6 +405,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
             entity.Form = pkm.Form;
             entity.Gender = pkm.Gender;
             entity.IsShiny = pkm.IsShiny;
+            entity.IsAlpha = pkm.IsAlpha;
         }
 
         await UpdateEntity(entity, box);

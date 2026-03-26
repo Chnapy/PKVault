@@ -1,5 +1,6 @@
 import { css, cx } from '@emotion/css';
 import type React from 'react';
+import { AlphaIcon } from '../icon/alpha-icon';
 import { iconResources } from '../icon/icon-resources';
 import { theme } from '../theme';
 import { getTypeImg } from './util/get-type-img';
@@ -10,10 +11,11 @@ export type TypeItemBaseProps = {
     clickable?: boolean;
     tera?: boolean;
     isNone?: boolean;
+    isAlpha?: boolean;
 }
     & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
-export const TypeItemBase: React.FC<TypeItemBaseProps> = ({ type, name, clickable, tera, isNone, ...rest }) => {
+export const TypeItemBase: React.FC<TypeItemBaseProps> = ({ type, name, clickable, tera, isNone, isAlpha, ...rest }) => {
     const typeImg = getTypeImg(type);
 
     return <div
@@ -78,6 +80,11 @@ export const TypeItemBase: React.FC<TypeItemBaseProps> = ({ type, name, clickabl
                     })}
                 />
             </span>
+
+            {isAlpha && <AlphaIcon className={css({
+                height: 14,
+                marginLeft: 4,
+            })} />}
 
             <div
                 className={css({

@@ -13,11 +13,11 @@ export const RenderIfVisible: React.FC<
   }>
 > = ({ id, minWidth, minHeight, initialVisible = false, children }) => {
   const ref = React.useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = React.useState(initialVisible);
+  const [ visible, setVisible ] = React.useState(initialVisible);
 
   React.useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
+      ([ entry ]) => {
         setVisible(entry?.isIntersecting ?? false);
       },
       {
@@ -26,16 +26,18 @@ export const RenderIfVisible: React.FC<
       },
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
+    const current = ref.current;
+
+    if (current) {
+      observer.observe(current);
     }
 
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
+      if (current) {
+        observer.unobserve(current);
       }
     };
-  }, [minHeight, id]);
+  }, [ minHeight, id ]);
 
   return (
     <div

@@ -1,133 +1,179 @@
+import { css, cx } from '@emotion/css';
 import React from 'react';
 import { Container } from '../container/container';
-import { Button } from '../button/button';
-import { theme } from '../theme';
 import { TextContainer } from '../text-container/text-container';
-import { Icon } from '../icon/icon';
-import { css } from '@emotion/css';
+import { TextContainerSticker } from '../text-container/text-container-sticker';
+import { theme } from '../theme';
+import { DetailsCardHeader, type DetailsCardHeaderProps } from './details-card-header';
 
-export type DetailsCardContainerProps = {
-    bgColor?: string;
-    title: React.ReactNode;
-    mainImg: React.ReactNode;
-    mainInfos: React.ReactNode;
-    preContent: React.ReactNode;
-    content: React.ReactNode;
-    extraContent?: React.ReactNode;
-    actions: React.ReactNode;
-    onClose: () => void;
-    expanded: boolean;
-    toggleExpanded: (() => void) | undefined;
+export type DetailsExpandedState = 'none' | 'expanded' | 'expanded-max';
+
+export type DetailsCardContainerProps = DetailsCardHeaderProps
+    & {
+        tabs?: React.ReactNode;
+        bgColor?: string;
+        mainImg: React.ReactNode;
+        mainImgSub?: React.ReactNode;
+        mainInfos: React.ReactNode;
+        preContent: React.ReactNode;
+        content: React.ReactNode;
+        actions: React.ReactNode;
+    };
+
+const widths = {
+    reduced: 324,
+    mid: 400,
+    expandedMax: 672,
 };
 
 export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
+    tabs,
     bgColor,
     title,
     mainImg,
+    mainImgSub,
     mainInfos,
     preContent,
     content,
-    extraContent,
     actions,
     onClose,
     expanded,
-    toggleExpanded,
+    setExpanded,
 }) => {
     return (
-        <Container padding="big" borderRadius="big" className={css({
-            display: "flex",
-            flexDirection: 'column',
-            gap: 4,
-            backgroundColor: bgColor ?? theme.bg.contrast,
-            borderColor: bgColor ?? theme.border.contrast,
-            color: theme.text.light,
-        })}>
-            <div
+        <div
+            className={css({
+                maxWidth: '100%',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+            })}
+        >
+            {tabs && <div
                 className={css({
+                    width: 'min-content',
+                    minWidth: '100%',
+
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    paddingLeft: 4,
+                    columnGap: 4,
+                    padding: '0 8px',
+                    flexWrap: 'wrap-reverse',
                 })}
             >
-                <div className={css({
-                    flexGrow: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    overflow: 'hidden'
-                })}>
-                    {title}
-                </div>
-
-                <Button
-                    onClick={toggleExpanded} disabled={toggleExpanded === undefined}
-                    className={css({ minWidth: '2lh' })}
-                >
-                    <Icon name={expanded ? 'angle-down' : 'angle-up'} forButton />
-                </Button>
-
-                <Button onClick={onClose}>
-                    <Icon name='times' forButton />
-                </Button>
-            </div>
-
-            {(mainImg || mainInfos) && <div
-                className={css({
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 4,
-                    borderRadius: 8,
-                    background: theme.bg.blue,
-                })}
-            >
-                <div className={css({
-                    display: "flex",
-                    alignItems: 'stretch',
-                })}>
-                    <div
-                        className={css({
-                            position: 'relative',
-                            padding: 4,
-                            borderRadius: 8,
-                            background: theme.bg.dark,
-                            alignSelf: 'flex-start',
-                        })}
-                    >
-                        {mainImg}
-                    </div>
-
-                    <TextContainer noWrap>
-                        {mainInfos}
-                    </TextContainer>
-                </div>
+                {tabs}
             </div>}
 
-            {preContent}
+            <div className={css({
+                display: 'flex',
+                justifyContent: 'flex-end',
+                overflowY: 'hidden',
+            })}>
+                <Container padding="big" borderRadius="big" className={css({
+                    display: "flex",
+                    flexDirection: 'column',
+                    gap: 4,
+                    backgroundColor: bgColor ?? theme.bg.contrast,
+                    borderColor: bgColor ?? theme.border.contrast,
+                    color: theme.text.light,
+                    paddingRight: 0,
+                })}>
+                    <DetailsCardHeader
+                        title={title}
+                        expanded={expanded}
+                        setExpanded={setExpanded}
+                        onClose={onClose}
+                    />
 
-            {expanded && <>
-                <div
-                    className={css({
-                        '& > .text-container:first-child:not(:last-child)': {
-                            borderBottomLeftRadius: 0,
-                            borderBottomRightRadius: 0,
-                        },
-                        '& > .text-container + .text-container:not(:last-child)': {
-                            paddingTop: 0,
-                            borderRadius: 0,
-                        },
-                        '& > .text-container:last-child:not(:first-child)': {
-                            paddingTop: 0,
-                            borderTopLeftRadius: 0,
-                            borderTopRightRadius: 0,
-                        },
-                    })}
-                >{content}</div>
+                    <div className={cx(
+                        css({
+                            width: widths.reduced,
+                            minWidth: widths.reduced,
+                            display: "flex",
+                            flexDirection: 'column',
+                            gap: 4,
+                            overflowY: 'auto',
+                            paddingRight: 4,
+                        }),
+                        {
+                            [ css({
+                                width: 'initial',
+                                flexWrap: 'wrap',
+                                maxHeight: 'calc(100vh - 150px)',  // required for auto-width
 
-                {extraContent}
-            </>}
+                                '& > *': {
+                                    flexGrow: 0,
+                                    flexShrink: 0,
+                                    maxWidth: widths.mid,
+                                },
+                            }) ]: expanded === 'expanded-max',
+                        }
+                    )}>
 
-            {actions}
-        </Container>
+                        {(mainImg || mainInfos) && <div
+                            className={css({
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 4,
+                                borderRadius: 8,
+                                background: theme.bg.blue,
+                            })}
+                        >
+                            <div className={css({
+                                display: "flex",
+                                alignItems: 'stretch',
+                            })}>
+                                <div className={css({
+                                    width: 104,
+                                    alignSelf: 'flex-start',
+                                    display: "flex",
+                                    flexDirection: 'column',
+                                    background: theme.bg.dark,
+                                    borderRadius: 8,
+                                })}>
+                                    <div
+                                        className={css({
+                                            padding: 4,
+                                            borderRadius: 8,
+                                            alignSelf: 'flex-start',
+                                        })}
+                                    >
+                                        <div
+                                            className={css({
+                                                position: 'relative',
+                                            })}
+                                        >
+                                            {mainImg}
+                                        </div>
+                                    </div>
+
+                                    {mainImgSub && <div className={css({
+                                        margin: 4,
+                                        marginTop: 0,
+                                        borderRadius: 8,
+                                        backgroundColor: theme.bg.default,
+                                    })}>
+                                        {mainImgSub}
+                                    </div>}
+                                </div>
+
+                                <TextContainer noWrap>
+                                    {mainInfos}
+                                </TextContainer>
+                            </div>
+                        </div>}
+
+                        {preContent}
+
+                        {expanded === 'expanded' && <TextContainerSticker gap={4}>
+                            {content}
+                        </TextContainerSticker>}
+
+                        {expanded === 'expanded-max' && content}
+
+                        {actions}
+                    </div>
+                </Container>
+            </div>
+        </div>
     );
 };

@@ -96,7 +96,7 @@ export const TextStats: React.FC<TextStatsProps> = ({
         <div className={css({ display: 'inline-flex', height: '1lh' })}>
             <Button
                 onClick={() => setShowTable(false)}
-                disabled={!showTable}
+                disabled={!showTable || editMode}
                 className={css({
                     height: 26,
                     borderTopRightRadius: 0,
@@ -107,7 +107,7 @@ export const TextStats: React.FC<TextStatsProps> = ({
             </Button>
             <Button
                 onClick={() => setShowTable(true)}
-                disabled={showTable}
+                disabled={showTable || editMode}
                 className={css({
                     height: 26,
                     borderTopLeftRadius: 0,
@@ -122,6 +122,7 @@ export const TextStats: React.FC<TextStatsProps> = ({
             ? (
                 <table
                     className={css({
+                        marginTop: -4,
                         borderSpacing: '8px 0'
                     })}
                 >
@@ -139,11 +140,16 @@ export const TextStats: React.FC<TextStatsProps> = ({
                                 ? <tr key={statName}>
                                     {renderStatNameCell(statName, i)}
                                     <td className={cellBaseClassName}>
-                                        <NumberInput {...register(`eVs.${i}`, {
-                                            valueAsNumber: true,
-                                            min: 0,
-                                            max: formMaxValues[ i ]
-                                        })} rangeMin={0} rangeMax={formMaxValues[ i ]} className={css({ display: 'flex', height: '1lh' })} />
+                                        <NumberInput
+                                            {...register(`eVs.${i}`, {
+                                                valueAsNumber: true,
+                                                min: 0,
+                                                max: formMaxValues[ i ],
+                                                disabled: totalFormEVs === 0,
+                                            })}
+                                            rangeMin={0}
+                                            rangeMax={formMaxValues[ i ]}
+                                            className={css({ display: 'flex', height: '1lh' })} />
                                     </td>
                                 </tr>
                                 : <tr key={statName}>

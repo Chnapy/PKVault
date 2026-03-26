@@ -1,4 +1,5 @@
 import { css } from '@emotion/css';
+import { Link, useMatchRoute } from '@tanstack/react-router';
 import React from 'react';
 import type { GameVersion } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
@@ -12,6 +13,7 @@ import { DetailsLevel } from './details-level';
 
 export type DetailsMainInfosProps = {
     idBase?: string;
+    saveId?: number;
     pid?: number;
     species: number;
     speciesName: React.ReactNode;
@@ -27,9 +29,12 @@ export type DetailsMainInfosProps = {
 };
 
 export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({
-    idBase, pid = 0, species, speciesName, version, nickname, types, teraType, levelUpPercent, level, eggHatchCount = 0, pokerusDays = 0, isPokerusCured
+    idBase, saveId, pid = 0, species, speciesName, version, nickname, types, teraType, levelUpPercent, level, eggHatchCount = 0, pokerusDays = 0, isPokerusCured
 }) => {
     const { t } = useTranslate();
+
+    const matchRoute = useMatchRoute();
+    const isPokedexPage = Boolean(matchRoute({ to: "/pokedex" }) || matchRoute({ to: "/pokedex", pending: true }));
 
     const staticData = useStaticData();
 
@@ -80,7 +85,7 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({
                     </>}
             </div>}
         </div>
-        <div className={css({ display: 'flex', justifyContent: 'space-between' })}>
+        <div className={css({ display: 'flex', justifyContent: 'space-between', height: '1lh' })}>
             <div>
                 {typeof teraType === 'number' && <TypeItem tera type={teraType} />}
             </div>
@@ -89,8 +94,18 @@ export const DetailsMainInfos: React.FC<DetailsMainInfosProps> = ({
                 ? <PokerusIcon title={t('details.pokerus.infected', { days: pokerusDays })} />
                 : (isPokerusCured && <PokerusIcon cured title={t('details.pokerus.cured')} />)}
         </div>
-        <br />
-        {t('details.dex')}
+
+        {isPokedexPage
+            ? t('details.dex')
+            : <Link
+                to='/pokedex'
+                search={{
+                    selectedSaveId: saveId,
+                    selected: species,
+                    selectExpanded: 'expanded',
+                }}
+            >{t('details.dex')}</Link>}
+
         <details className={css({
             display: 'inline-block',
             verticalAlign: 'top',

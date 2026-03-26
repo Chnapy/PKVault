@@ -41,6 +41,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErr
   return (
     <div
       className={css({
+        flexShrink: 0,
         display: "flex",
         borderRadius: 8,
         background: theme.bg.blue,

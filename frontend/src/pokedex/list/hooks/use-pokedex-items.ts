@@ -6,6 +6,7 @@ import { filterIsDefined } from '../../../util/filter-is-defined';
 import { usePokedexFilters } from './use-pokedex-filters';
 
 type PokedexItems = Counts & {
+    isLoading: boolean;
     speciesItemsByGenerationList: SpeciesItemsByGeneration[];
 };
 
@@ -37,6 +38,7 @@ export type SpeciesFormItem = {
     genders: Gender[];
     isSeen: boolean;
     isSeenShiny: boolean;
+    isSeenAlpha: boolean;
     isCaught: boolean;
     isOwned: boolean;
     isOwnedShiny: boolean;
@@ -52,7 +54,7 @@ export const usePokedexItems = (): PokedexItems => {
     const showForms = Route.useSearch({ select: (search) => search.showForms ?? false });
     const showGendersRaw = Route.useSearch({ select: (search) => search.showGenders ?? false });
 
-    const { data } = useDexGetAll();
+    const { data, isLoading } = useDexGetAll();
 
     const { isPkmFiltered, filterSpeciesValues } = usePokedexFilters();
 
@@ -119,6 +121,7 @@ export const usePokedexItems = (): PokedexItems => {
                     genders: [ ...new Set([ form.gender, ...oldGroup?.genders ?? [] ]) ].sort(),
                     isSeen: oldGroup?.isSeen || form.isSeen,
                     isSeenShiny: oldGroup?.isSeenShiny || form.isSeenShiny,
+                    isSeenAlpha: oldGroup?.isSeenAlpha || form.isSeenAlpha,
                     isCaught: oldGroup?.isCaught || form.isCaught,
                     isOwned: oldGroup?.isOwned || form.isOwned,
                     isOwnedShiny: oldGroup?.isOwnedShiny || form.isOwnedShiny,
@@ -225,6 +228,7 @@ export const usePokedexItems = (): PokedexItems => {
     const itemsCount = speciesItemsByGenerationList.reduce((acc, item) => acc + item.itemsCount, 0);
 
     return {
+        isLoading,
         speciesItemsByGenerationList,
         seenCount,
         caughtCount,

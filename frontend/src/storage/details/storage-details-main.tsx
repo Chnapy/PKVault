@@ -54,45 +54,35 @@ export const StorageDetailsMain: React.FC<StorageDetailsMainProps> = ({ selected
         });
     };
 
-    return (
-        <div className={css({ flexGrow: 1 })}>
-            <div
-                className={css({
-                    display: 'flex',
-                    gap: '0 4px',
-                    padding: '0 8px',
-                    flexWrap: 'wrap-reverse',
-                })}
-            >
-                {variants.map((pkmVariant) => (
-                    <DetailsTab
-                        key={pkmVariant.id}
-                        isEnabled={pkmVariant.isEnabled}
-                        contextVersion={pkmVariant.isEnabled ? pkmVariant.contextVersion : null}
-                        otName={getEntityContextGenerationName(pkmVariant.context, true)}
-                        original={pkmVariant.isMain}
-                        onClick={() => selectContext(pkmVariant.context)}
-                        disabled={selectedPkm?.id === pkmVariant.id}
-                        warning={!pkmLegalityMap[ pkmVariant.id ]?.isValid}
-                    />
-                ))}
-            </div>
+    if (!selectedPkm) {
+        return null;
+    }
 
-            {selectedPkm && (
-                <StorageDetailsForm.Provider key={selectedPkm.id} nickname={selectedPkm.nickname} eVs={selectedPkm.eVs} moves={selectedPkm.moves}>
-                    <InnerStorageDetailsMain id={selectedPkm.id} />
-                </StorageDetailsForm.Provider>
-            )}
-        </div>
+    return (
+        <StorageDetailsForm.Provider key={selectedPkm.id} nickname={selectedPkm.nickname} eVs={selectedPkm.eVs} moves={selectedPkm.moves}>
+            <InnerStorageDetailsMain
+                id={selectedPkm.id}
+                tabs={<>
+                    {variants.map((pkmVariant) => (
+                        <DetailsTab
+                            key={pkmVariant.id}
+                            isEnabled={pkmVariant.isEnabled}
+                            contextVersion={pkmVariant.isEnabled ? pkmVariant.contextVersion : null}
+                            otName={getEntityContextGenerationName(pkmVariant.context, true)}
+                            original={pkmVariant.isMain}
+                            onClick={() => selectContext(pkmVariant.context)}
+                            disabled={selectedPkm?.id === pkmVariant.id}
+                            warning={!pkmLegalityMap[ pkmVariant.id ]?.isValid}
+                        />
+                    ))}
+                </>}
+            />
+        </StorageDetailsForm.Provider>
     );
 };
 
-const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
+const InnerStorageDetailsMain: React.FC<{ id: string; tabs: React.ReactNode }> = ({ id, tabs }) => {
     const { t } = useTranslate();
-
-    const selectExpanded = Route.useSearch({ select: search => search.selectExpanded ?? false });
-
-    const navigate = Route.useNavigate();
 
     const formContext = StorageDetailsForm.useContext();
 
@@ -122,21 +112,13 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
                 })
             : undefined;
 
-    const toggleSelectExpanded = () => {
-        navigate({
-            search: (search) => ({
-                ...search,
-                selectExpanded: !search.selectExpanded,
-            }),
-        });
-    };
-
     if (!pkmVariant) {
         return null;
     }
 
     return (
         <StorageDetailsBase
+            tabs={tabs}
             {...pkmVariant}
             contextVersion={pkmVariant.isEnabled ? pkmVariant.contextVersion : null}
             isValid
@@ -231,8 +213,6 @@ const InnerStorageDetailsMain: React.FC<{ id: string }> = ({ id }) => {
             onSubmit={() => formContext.submitForPkmVariant(id)}
             openFile={openFile}
             extraContent={saveCardProps && <SaveCardContentSmall {...saveCardProps} />}
-            expanded={selectExpanded}
-            toggleExpanded={toggleSelectExpanded}
         />
     );
 };

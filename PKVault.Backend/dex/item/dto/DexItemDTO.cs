@@ -19,6 +19,7 @@ public record DexItemForm(
     int[] BaseStats,
     bool IsSeen,
     bool IsSeenShiny,
+    bool IsSeenAlpha,
     bool IsCaught,
     bool IsOwned,
     bool IsOwnedShiny,

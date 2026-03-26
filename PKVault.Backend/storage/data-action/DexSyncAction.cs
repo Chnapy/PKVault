@@ -34,6 +34,7 @@ public class DexSyncAction(
                         form.Gender,
                         form.IsSeen,
                         form.IsSeenShiny,
+                        form.IsSeenAlpha,
                         form.IsCaught,
                         LanguagesHash: languagesHash
                     ));
@@ -52,12 +53,13 @@ public class DexSyncAction(
             {
                 var baseForm = g.First();
 
-                bool IsSeen = false, IsSeenShiny = false, IsCaught = false;
+                bool IsSeen = false, IsSeenShiny = false, IsSeenAlpha = false, IsCaught = false;
                 HashSet<LanguageID> languages = [];
                 foreach (var form in g)
                 {
                     IsSeen |= form.IsSeen;
                     IsSeenShiny |= form.IsSeenShiny;
+                    IsSeenAlpha |= form.IsSeenAlpha;
                     IsCaught |= form.IsCaught;
                     if (form.LanguagesHash.Length > 0)
                     {
@@ -76,6 +78,7 @@ public class DexSyncAction(
                     baseForm.Gender,
                     IsSeen,
                     IsSeenShiny,
+                    IsSeenAlpha,
                     IsCaught,
                     Languages: languages.Order().ToArray()
                 );
@@ -111,21 +114,23 @@ public class DexSyncAction(
                             form.Gender,
                             form.IsCaught,
                             false,
+                            false,
                             form.Languages,
                             createOnly: false
                         );
                     }
                     else
                     {
-                        await service.EnableSpeciesForm(
+                        await service.EnableSpeciesForm(new(
                             form.Species,
                             form.Form,
                             form.Gender,
                             form.IsSeen,
                             form.IsSeenShiny,
+                            form.IsSeenAlpha,
                             form.IsCaught,
                             form.Languages
-                        );
+                        ));
                     }
                 }
 

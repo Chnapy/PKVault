@@ -1,13 +1,14 @@
+import { css } from '@emotion/css';
 import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import React from "react";
 import z from "zod";
-import { ErrorCatcher } from '../error/error-catcher';
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { PokedexDetails } from "../pokedex/details/pokedex-details";
 import { FiltersCard } from "../pokedex/filters/filters-card";
 import { PokedexList } from "../pokedex/list/pokedex-list";
-import { css } from '@emotion/css';
+import { type DetailsExpandedState } from '../ui/details-card/details-card-container';
+import { DetailsCardWrapper } from '../ui/details-card/details-card-wrapper';
 
 export const PokedexPage: React.FC = withErrorCatcher('default', () => {
   const navigate = Route.useNavigate();
@@ -28,24 +29,15 @@ export const PokedexPage: React.FC = withErrorCatcher('default', () => {
         <PokedexList />
       </div>
 
-      <div
-        className={css({
-          position: "fixed",
-          bottom: 24,
-          right: 24,
-          width: 350,
+      <DetailsCardWrapper
+        onClose={() => navigate({
+          search: {
+            selected: undefined,
+          }
         })}
       >
-        <ErrorCatcher
-          onClose={() => navigate({
-            search: {
-              selected: undefined,
-            }
-          })}
-        >
-          <PokedexDetails />
-        </ErrorCatcher>
-      </div>
+        <PokedexDetails />
+      </DetailsCardWrapper>
     </div>
   );
 });
@@ -53,7 +45,7 @@ export const PokedexPage: React.FC = withErrorCatcher('default', () => {
 const searchSchema = z.object({
   selected: z.number().optional(),
   selectedSaveId: z.number().optional(),
-  selectExpanded: z.boolean().optional(),
+  selectExpanded: z.enum([ 'none', 'expanded', 'expanded-max' ] as const satisfies DetailsExpandedState[]).optional(),
   filterSpeciesName: z.string().optional(),
   filterTypes: z.array(z.number()).optional(),
   filterSeen: z.boolean().optional(),

@@ -8,6 +8,7 @@ export type TextContainerProps = {
   forceScroll?: boolean;
   bgColor?: string;
   maxHeight?: number;
+  stick?: boolean;
 }
   & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
@@ -16,6 +17,7 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
   forceScroll,
   bgColor = theme.bg.blue,
   maxHeight,
+  stick,
   children,
   ...rest
 }) => {
@@ -24,6 +26,7 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
       {...rest}
       className={cx(
         'text-container',
+        stick && 'text-container-stick',
         css({
           padding: 4,
           borderRadius: 8,
@@ -31,6 +34,7 @@ export const TextContainer: React.FC<React.PropsWithChildren<TextContainerProps>
           overflow: 'hidden',
           flexGrow: 1,
           display: 'flex',
+          minHeight: 34,
         }),
         rest.className
       )}

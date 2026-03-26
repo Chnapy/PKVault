@@ -40,6 +40,7 @@ public class Dex8BSService(SAV8BS save) : DexGenService(save)
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
             IsSeenShiny: isSeenShiny,
+            IsSeenAlpha: false,
             IsCaught: isCaught,
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
@@ -51,41 +52,41 @@ public class Dex8BSService(SAV8BS save) : DexGenService(save)
         return AllLanguages.Where((_, i) => save.Zukan.GetLanguageFlag(species, i));
     }
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
+    public override async Task EnableSpeciesForm(EnableSpeciesFormPayload payload)
     {
-        if (!save.Personal.IsPresentInGame(species, form))
+        if (!save.Personal.IsPresentInGame(payload.Species, payload.Form))
             return;
 
         var pk = new PK8
         {
-            Species = species,
-            Form = form,
-            Gender = (byte)gender,
+            Species = payload.Species,
+            Form = payload.Form,
+            Gender = (byte)payload.Gender,
             Language = save.Language
         };
-        pk.SetIsShiny(isSeenShiny);
+        pk.SetIsShiny(payload.IsSeenShiny);
 
-        if (isSeen || isCaught)
+        if (payload.IsSeen || payload.IsCaught)
             save.Zukan.SetDex(pk);
 
-        if (isSeen)
-            save.Zukan.SetState(species, ZukanState8b.Seen);
+        if (payload.IsSeen)
+            save.Zukan.SetState(payload.Species, ZukanState8b.Seen);
 
-        if (isCaught)
-            save.Zukan.SetState(species, ZukanState8b.Caught);
+        if (payload.IsCaught)
+            save.Zukan.SetState(payload.Species, ZukanState8b.Caught);
 
-        var formCount = Zukan8b.GetFormCount(species);
+        var formCount = Zukan8b.GetFormCount(payload.Species);
 
         if (formCount > 0)
         {
-            if (isSeen)
-                save.Zukan.SetHasFormFlag(species, form, false, true);
+            if (payload.IsSeen)
+                save.Zukan.SetHasFormFlag(payload.Species, payload.Form, false, true);
 
-            if (isSeenShiny)
-                save.Zukan.SetHasFormFlag(species, form, true, true);
+            if (payload.IsSeenShiny)
+                save.Zukan.SetHasFormFlag(payload.Species, payload.Form, true, true);
         }
 
-        var safeLanguages = languages.Where(AllLanguages.Contains);
+        var safeLanguages = payload.Languages.Where(AllLanguages.Contains);
         if (!safeLanguages.Any())
         {
             safeLanguages = [GetSaveLanguage()];
@@ -94,7 +95,7 @@ public class Dex8BSService(SAV8BS save) : DexGenService(save)
         foreach (var lang in safeLanguages)
         {
             var langIndex = AllLanguages.IndexOf(lang);
-            save.Zukan.SetLanguageFlag(species, langIndex, true);
+            save.Zukan.SetLanguageFlag(payload.Species, langIndex, true);
         }
     }
 }

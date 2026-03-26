@@ -30,11 +30,13 @@ const root = (props: ContainerProps) =>
         (props.componentDescriptor ?? props.type ?? props.as) === "button" && !props.selected
           ? {
             outlineWidth: 1,
+            zIndex: 1,
           }
           : undefined,
     },
     outline: `0 solid ${theme.border.focus}`,
     outlineWidth: props.selected ? 2 : undefined,
+    zIndex: props.selected ? 1 : undefined,
     "&:disabled": {
       opacity: 0.5,
     },
