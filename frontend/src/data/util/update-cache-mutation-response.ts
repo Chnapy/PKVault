@@ -180,13 +180,17 @@ const hasDataDTO = (obj: ResponseBack): obj is ResponseBack<DataDTO> =>
     typeof obj.data === 'object' && obj.data !== null && 'type' in obj.data && obj.data.type === DataDTOType.DATA_DTO;
 
 const applyResponseData = function (client: QueryClient, responseData: DataDTOState, queryKey: readonly unknown[]) {
+    const oldResponse: Partial<{ data?: { id: string }[] }> | undefined = client.getQueryData(queryKey);
+    if (!responseData.all && !oldResponse) {
+        return;
+    }
+
     const getData = () => {
         if (responseData.all) {
             return Object.values(responseData.data ?? {}).filter(filterIsDefined);
         }
 
-        const oldResponse: Partial<{ data?: { id: string }[] }> = client.getQueryData(queryKey) ?? {};
-        const oldData = Object.fromEntries((oldResponse.data ?? []).map(item => [ item.id, item ]));
+        const oldData = Object.fromEntries((oldResponse?.data ?? []).map(item => [ item.id, item ]));
 
         return Object.values({
             ...oldData,
@@ -203,14 +207,17 @@ const applyResponseData = function (client: QueryClient, responseData: DataDTOSt
 
 const applyDex = function (client: QueryClient, responseData: DataDTOState) {
     const queryKey = getDexGetAllQueryKey();
+    const oldResponse: Partial<dexGetAllResponseSuccess> | undefined = client.getQueryData(queryKey);
+    if (!responseData.all && !oldResponse) {
+        return;
+    }
 
     const getData = () => {
         if (responseData.all) {
             return responseData.data ?? {};
         }
 
-        const oldResponse: Partial<dexGetAllResponseSuccess> = client.getQueryData(queryKey) ?? {};
-        const oldData = oldResponse.data ?? {};
+        const oldData = oldResponse?.data ?? {};
 
         return Object.values({
             ...oldData,

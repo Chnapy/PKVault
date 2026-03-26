@@ -1,7 +1,8 @@
 /// <reference types="vitest/config" />
 
+import babel from '@rolldown/plugin-babel';
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
-import react from "@vitejs/plugin-react-swc";
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { defineConfig } from "vite";
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import { prepareDocs } from './src/help/prepare-docs';
@@ -19,6 +20,7 @@ export default defineConfig({
       autoCodeSplitting: true,
     }),
     react(),
+    babel({ presets: [ reactCompilerPreset() ] }),
   ],
   build: {
     assetsInlineLimit: 0

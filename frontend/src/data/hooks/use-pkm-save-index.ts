@@ -68,14 +68,17 @@ export const usePkmSaveIndex = (saveId: number) => {
  * Update react-query cache with given data, after formatting.
  */
 export const updatePkmSaveCache = (client: QueryClient, saveId: number, savePkms: DataDTOStateOfDictionaryOfStringAndPkmSaveDTO) => {
-    const cachedResponse: Partial<QueryData> = client.getQueryData(getStorageGetSavePkmsQueryKey(saveId)) ?? {};
+    const cachedResponse: Partial<QueryData> | undefined = client.getQueryData(getStorageGetSavePkmsQueryKey(saveId));
+    if (!savePkms.all && !cachedResponse) {
+        return;
+    }
 
     const getRawData = (): PkmSaveDTO[] => {
         if (savePkms.all) {
             return Object.values(savePkms.data ?? {}).filter(filterIsDefined);
         }
 
-        const cachedPkms = cachedResponse.data?.byId ?? {};
+        const cachedPkms = cachedResponse?.data?.byId ?? {};
 
         return Object.values({
             ...cachedPkms,

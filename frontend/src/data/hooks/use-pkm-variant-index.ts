@@ -70,14 +70,17 @@ export const usePkmVariantIndex = () => {
  * Update react-query cache with given data, after formatting.
  */
 export const updatePkmVariantCache = (client: QueryClient, pkmVariants: DataDTOStateOfDictionaryOfStringAndPkmVariantDTO) => {
-    const cachedResponse: Partial<QueryData> = client.getQueryData(getStorageGetMainPkmVariantsQueryKey()) ?? {};
+    const cachedResponse: Partial<QueryData> | undefined = client.getQueryData(getStorageGetMainPkmVariantsQueryKey());
+    if (!pkmVariants.all && !cachedResponse) {
+        return;
+    }
 
     const getRawData = (): PkmVariantDTO[] => {
         if (pkmVariants.all) {
             return Object.values(pkmVariants.data ?? {}).filter(filterIsDefined);
         }
 
-        const cachedPkms = cachedResponse.data?.byId ?? {};
+        const cachedPkms = cachedResponse?.data?.byId ?? {};
 
         return Object.values({
             ...cachedPkms,

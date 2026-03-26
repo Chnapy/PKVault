@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { TitledContainer } from '../../ui/container/titled-container';
@@ -18,9 +18,11 @@ export const Feedback: React.FC = () => {
 
     const sendFeedbackMutation = useSendFeedback();
 
-    const { register, watch, reset, handleSubmit, formState } = useForm<{ feedback: string }>({
+    const { register, reset, handleSubmit, formState, control } = useForm<{ feedback: string }>({
         defaultValues: { feedback: '' },
     });
+
+    const [ feedbackValue ] = useWatch({ control, name: [ 'feedback' ] });
 
     React.useEffect(() => {
         if (formState.isSubmitSuccessful) {
@@ -70,7 +72,7 @@ export const Feedback: React.FC = () => {
                     label={t('settings.feedback.feedback')}
                     area
                     style={{
-                        minHeight: 6 + watch('feedback').split('\n').length * 18.5,
+                        minHeight: 6 + feedbackValue.split('\n').length * 18.5,
                     }}
                     minLength={2}
                     maxLength={2000}
@@ -81,7 +83,7 @@ export const Feedback: React.FC = () => {
                 <Button
                     type='submit'
                     loading={formState.isSubmitting}
-                    disabled={!userIdQuery.data || !formState.isValid || !watch('feedback') || formState.isSubmitSuccessful}
+                    disabled={!userIdQuery.data || !formState.isValid || !feedbackValue || formState.isSubmitSuccessful}
                     bgColor={theme.bg.primary}
                 >
                     {t('action.submit')}

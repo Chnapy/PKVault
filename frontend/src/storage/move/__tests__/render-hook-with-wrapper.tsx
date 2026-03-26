@@ -29,7 +29,9 @@ export const renderHookWithWrapper = <Result, Props>(
 
     const useWrapperHook = (initialProps: Props) => {
         const result = useHook(initialProps);
+        // eslint-disable-next-line react-hooks/globals
         moveContextValue = MoveContext.useValue().state;
+        // eslint-disable-next-line react-hooks/globals
         selectContextValue = StorageSelectContext.useValue();
         return result;
     };

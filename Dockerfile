@@ -79,7 +79,7 @@ RUN npm run c:type
 
 RUN npm run test
 
-# RUN npm run c:lint
+RUN npm run c:lint
 
 # frontend publish
 FROM frontend-builder AS frontend-publish

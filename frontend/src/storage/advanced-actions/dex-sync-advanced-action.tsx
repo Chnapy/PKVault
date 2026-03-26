@@ -1,7 +1,7 @@
 import { css } from "@emotion/css";
 import { Listbox, ListboxOption, ListboxOptions } from "@headlessui/react";
 import type React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import type { StorageDexSyncParams } from "../../data/sdk/model";
 import { useSaveInfosGetAll } from "../../data/sdk/save-infos/save-infos.gen";
 import { useStorageDexSync } from "../../data/sdk/storage/storage.gen";
@@ -26,14 +26,14 @@ export const DexSyncAdvancedAction: React.FC<{
 
   const dexSyncMutation = useStorageDexSync();
 
-  const { handleSubmit, watch, setValue, formState } =
+  const { handleSubmit, setValue, formState, control } =
     useForm<StorageDexSyncParams>({
       defaultValues: {
-        saveIds: [saveId],
+        saveIds: [ saveId ],
       },
     });
 
-  const saveIds = watch("saveIds") ?? [];
+  const [ saveIds = [] ] = useWatch({ control, name: [ 'saveIds' ] });
 
   const onSubmit = handleSubmit(async ({ saveIds }) => {
     const result = await dexSyncMutation.mutateAsync({
@@ -106,7 +106,7 @@ export const DexSyncAdvancedAction: React.FC<{
                       width: 14,
                     })}
                   />
-                  {staticData.versions[save.version]?.name} - {save.trainerName}
+                  {staticData.versions[ save.version ]?.name} - {save.trainerName}
                 </>
               ),
               selected: saveIds.includes(save.id),
