@@ -1,5 +1,5 @@
 import { css } from '@emotion/css';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import React from 'react';
 import ReactMarkdown, { type Components, type UrlTransform } from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
@@ -16,13 +16,12 @@ type HelpDialogContentProps = {
 };
 
 export const HelpDialogContent: React.FC<HelpDialogContentProps> = ({ selectedEndPath, finalSelectedPath, anchor, slugs }) => {
-    const persistContent = React.useRef('');
-
     const contentQuery = useQuery({
         queryKey: [ finalSelectedPath ],
         queryFn: () => fetch(finalSelectedPath ?? '')
             .then(res => res.text()),
         enabled: !!finalSelectedPath,
+        placeholderData: keepPreviousData,
     });
 
     const markdownRef = useHelpAnchorScroll({
@@ -32,9 +31,6 @@ export const HelpDialogContent: React.FC<HelpDialogContentProps> = ({ selectedEn
     });
 
     const content = contentQuery.data;
-    if (!contentQuery.isLoading) {
-        persistContent.current = content ?? '';
-    }
 
     return <div
         ref={markdownRef}
@@ -86,12 +82,12 @@ export const HelpDialogContent: React.FC<HelpDialogContentProps> = ({ selectedEn
             },
         })}
     >
-        {persistContent.current && <ReactMarkdown
+        {content && <ReactMarkdown
             rehypePlugins={[ rehypeSlug, rehypeRaw ]}
             urlTransform={getUrlTransform(selectedEndPath)}
             components={components}
         >
-            {persistContent.current}
+            {content}
         </ReactMarkdown>}
     </div>;
 };

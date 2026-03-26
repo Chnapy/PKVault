@@ -20,14 +20,16 @@ export const useHelpAnchorScroll = ({ anchor, slugs, selectedEndPath }: UseHelpA
                 return;
             }
 
-            const element = markdownRef.current.querySelector(`#${CSS.escape(anchor)}`);
+            const anchorCleaned = decodeURI(anchor);
+
+            const element = markdownRef.current.querySelector(`#${CSS.escape(anchorCleaned)}`);
             if (element) {
                 // console.log('scroll to', helpAnchor);
                 return element;
             }
 
             const enItem = menuEn.find(item => item.endPath === selectedEndPath);
-            const slugIndex = enItem?.slugs.indexOf(anchor as never) ?? -1;
+            const slugIndex = enItem?.slugs.indexOf(anchorCleaned as never) ?? -1;
             const newAnchor = slugs[ slugIndex ];
             if (newAnchor) {
                 // console.log('scroll to', newAnchor);

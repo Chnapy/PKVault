@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import type React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import type { BoxDTO, GameVersion, StorageSortPkmsParams } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
@@ -69,7 +69,7 @@ const InnerSortAdvancedAction: React.FC<{
 
     const sortPkmsMutation = useStorageSortPkms();
 
-    const { register, handleSubmit, formState, watch, getValues, setValue } = useForm<Omit<StorageSortPkmsParams, 'saveId'>>({
+    const { register, handleSubmit, formState, setValue, control } = useForm<Omit<StorageSortPkmsParams, 'saveId'>>({
         defaultValues: {
             fromBoxId: selectedBoxId,
             toBoxId: selectedBoxId,
@@ -77,6 +77,8 @@ const InnerSortAdvancedAction: React.FC<{
             leaveEmptySlot: false,
         },
     });
+
+    const [ pokedexName, fromBoxId, toBoxId, leaveEmptySlot ] = useWatch({ control, name: [ 'pokedexName', 'fromBoxId', 'toBoxId', 'leaveEmptySlot' ] });
 
     if (!boxes.length || !versions.length) {
         return null;
@@ -117,10 +119,10 @@ const InnerSortAdvancedAction: React.FC<{
                     pokedexKeys.map(key => ({
                         value: key,
                         option: staticData.pokedexes[ key ]!.name,
-                        disabled: key === watch('pokedexName'),
+                        disabled: key === pokedexName,
                     })) ?? []
                 }
-                value={watch('pokedexName')}
+                value={pokedexName}
                 onChange={value => setValue('pokedexName', value)}
                 disabled={pokedexKeys.length === 1}
             />
@@ -145,10 +147,10 @@ const InnerSortAdvancedAction: React.FC<{
                                 {box.name}
                             </div>
                         ),
-                        disabled: box.idInt === watch('fromBoxId'),
+                        disabled: box.idInt === fromBoxId,
                     })) ?? []
                 }
-                value={watch('fromBoxId')}
+                value={fromBoxId}
                 onChange={value => setValue('fromBoxId', value)}
             />
 
@@ -172,10 +174,10 @@ const InnerSortAdvancedAction: React.FC<{
                                 {box.name}
                             </div>
                         ),
-                        disabled: box.idInt === watch('toBoxId'),
+                        disabled: box.idInt === toBoxId,
                     })) ?? []
                 }
-                value={watch('toBoxId')}
+                value={toBoxId}
                 onChange={value => setValue('toBoxId', value)}
             />
 
@@ -187,7 +189,7 @@ const InnerSortAdvancedAction: React.FC<{
                     userSelect: 'none',
                 })}
             >
-                <CheckboxInput checked={watch('leaveEmptySlot')} onChange={() => setValue('leaveEmptySlot', !getValues('leaveEmptySlot'))} />{' '}
+                <CheckboxInput checked={leaveEmptySlot} onChange={() => setValue('leaveEmptySlot', !leaveEmptySlot)} />{' '}
                 {t('storage.sort.empty-slot')}
             </label>
 

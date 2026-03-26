@@ -7,8 +7,8 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
     const errorsOnMutationResponse = BackendErrorsContext.useOnMutationResponse();
 
     const [ client ] = React.useState(
-        () =>
-            new QueryClient({
+        () => {
+            const client = new QueryClient({
                 defaultOptions: {
                     queries: {
                         gcTime: Infinity,
@@ -26,7 +26,9 @@ export const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                         },
                     },
                 },
-            }),
+            });
+            return client;
+        },
     );
 
     return <QueryClientProvider client={client}>{children}</QueryClientProvider>;

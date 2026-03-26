@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { BoxType, type StorageUpdateMainBoxParams } from '../../data/sdk/model';
 import {
@@ -35,7 +35,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
 
     const minSlotCount = Math.max(0, ...Object.keys(pkmsQuery.data?.data.byBox[ box?.idInt ?? -1 ] ?? {}).map(Number)) + 1;
 
-    const { register, handleSubmit, formState, watch, setValue } = useForm<StorageUpdateMainBoxParams>({
+    const { register, handleSubmit, formState, setValue, control } = useForm<StorageUpdateMainBoxParams>({
         defaultValues: {
             type: box?.type,
             boxName: box?.name,
@@ -45,10 +45,20 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
         },
     });
 
-    const watchType = watch('type');
-    const watchName = watch('boxName');
-    const watchOrder = watch('order');
-    const watchBankId = watch('bankId');
+    const [
+        watchType,
+        watchName,
+        watchOrder,
+        watchBankId
+    ] = useWatch({
+        control,
+        name: [
+            'type',
+            'boxName',
+            'order',
+            'bankId',
+        ]
+    });
 
     const previousBox = [ ...boxes ].reverse().find(b => b.id !== boxId && b.order <= watchOrder);
     const nextBox = boxes.find(b => b.id !== boxId && b.order >= watchOrder);
