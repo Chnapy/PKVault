@@ -18,11 +18,14 @@ public class Dex8LAService(SAV8LA save) : DexGenService(save)
 
         int[] baseGendersIndex = gender == Gender.Female ? [1, 3] : [0, 2];
         int[] shinyGendersIndex = gender == Gender.Female ? [5, 7] : [4, 6];
+        int[] alphaGendersIndex = gender == Gender.Female ? [3, 7] : [2, 6];
 
         var isCaughtShiny = isOwnedShiny || shinyGendersIndex.Any(i => (caughtWild & (1 << i)) != 0) || shinyGendersIndex.Any(i => (obtain & (1 << i)) != 0);
+        var isCaughtAlpha = alphaGendersIndex.Any(i => (caughtWild & (1 << i)) != 0) || alphaGendersIndex.Any(i => (obtain & (1 << i)) != 0);
         var isCaught = isCaughtShiny || isOwned || baseGendersIndex.Any(i => (caughtWild & (1 << i)) != 0) || baseGendersIndex.Any(i => (obtain & (1 << i)) != 0);
 
         var isSeenShiny = isOwnedShiny || isCaughtShiny || shinyGendersIndex.Any(i => (seenWild & (1 << i)) != 0);
+        var isSeenAlpha = isCaughtAlpha || alphaGendersIndex.Any(i => (seenWild & (1 << i)) != 0);
         var isSeen = isSeenShiny || isOwned || isCaught || baseGendersIndex.Any(i => (seenWild & (1 << i)) != 0);
 
         return new DexItemForm(
@@ -35,6 +38,7 @@ public class Dex8LAService(SAV8LA save) : DexGenService(save)
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
             IsSeenShiny: isSeenShiny,
+            IsSeenAlpha: isSeenAlpha,
             IsCaught: isCaught,
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
@@ -46,24 +50,25 @@ public class Dex8LAService(SAV8LA save) : DexGenService(save)
         return [];
     }
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
+    public override async Task EnableSpeciesForm(EnableSpeciesFormPayload payload)
     {
-        if (!save.Personal.IsPresentInGame(species, form))
+        if (!save.Personal.IsPresentInGame(payload.Species, payload.Form))
             return;
 
-        int[] baseGendersIndex = gender == Gender.Female ? [1, 3] : [0, 2];
-        int[] shinyGendersIndex = gender == Gender.Female ? [5, 7] : [4, 6];
+        int[] baseGendersIndex = payload.Gender == Gender.Female ? [1, 3] : [0, 2];
+        int[] shinyGendersIndex = payload.Gender == Gender.Female ? [5, 7] : [4, 6];
+        int[] alphaGendersIndex = payload.Gender == Gender.Female ? [3, 7] : [2, 6];
 
-        if (isSeen)
-            save.Blocks.PokedexSave.SetPokeSeenInWildFlags(species, form, (byte)(1 << baseGendersIndex[0]));
+        if (payload.IsSeen)
+            save.Blocks.PokedexSave.SetPokeSeenInWildFlags(payload.Species, payload.Form, (byte)(1 << baseGendersIndex[0]));
 
-        if (isSeenShiny)
-            save.Blocks.PokedexSave.SetPokeSeenInWildFlags(species, form, (byte)(1 << shinyGendersIndex[0]));
+        if (payload.IsSeenShiny)
+            save.Blocks.PokedexSave.SetPokeSeenInWildFlags(payload.Species, payload.Form, (byte)(1 << shinyGendersIndex[0]));
 
-        if (isCaught)
-            save.Blocks.PokedexSave.SetPokeCaughtInWildFlags(species, form, (byte)(1 << baseGendersIndex[0]));
+        if (payload.IsSeenAlpha)
+            save.Blocks.PokedexSave.SetPokeSeenInWildFlags(payload.Species, payload.Form, (byte)(1 << alphaGendersIndex[0]));
 
-        // TODO isCaughtShiny
-        // TODO alpha
+        if (payload.IsCaught)
+            save.Blocks.PokedexSave.SetPokeCaughtInWildFlags(payload.Species, payload.Form, (byte)(1 << baseGendersIndex[0]));
     }
 }

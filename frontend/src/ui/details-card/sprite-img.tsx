@@ -8,9 +8,10 @@ import type { SpriteInfo } from '../../data/sdk/model';
 export type SpriteImgProps = {
     spriteInfos: SpriteInfo;
     size?: number | '1lh';
+    sourceRealHeight?: number;
 } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
-export const SpriteImg: React.FC<SpriteImgProps> = ({ spriteInfos, size, ...imgProps }) => {
+export const SpriteImg: React.FC<SpriteImgProps> = ({ spriteInfos, size, sourceRealHeight = spriteInfos.height, ...imgProps }) => {
     const settings = useSettingsGet();
 
     const sheetRelativeUrl = spriteInfos && getStaticDataGetSpritesheetImgUrl(spriteInfos.sheetName, {
@@ -18,17 +19,28 @@ export const SpriteImg: React.FC<SpriteImgProps> = ({ spriteInfos, size, ...imgP
     });
     const sheetUrl = getApiFullUrl(sheetRelativeUrl ?? '');
 
+    const sourceRealSizeRatio = sourceRealHeight / spriteInfos.height;
+
+    const sourceRealWidth = spriteInfos.width * sourceRealSizeRatio;
+
+    const heightDiff = spriteInfos.height - sourceRealHeight;
+    const widthDiff = spriteInfos.width - sourceRealWidth;
+
+    const x = spriteInfos.x + widthDiff / 2;
+    const y = spriteInfos.y + heightDiff / 2;
+
     size = size === '1lh' ? 19 : size;
 
-    const scale = size && spriteInfos ? (size / spriteInfos.height) : 1;
+    const scale = size && spriteInfos ? (size / sourceRealHeight) : 1;
 
     return <div
         {...imgProps}
         className={cx(css({
+            flexShrink: 0,
             display: 'inline-flex',
             justifyContent: 'center',
             alignItems: 'center',
-            verticalAlign: 'sub',
+            verticalAlign: 'text-top',
             height: size,
             width: size,
             overflow: 'hidden',
@@ -36,14 +48,14 @@ export const SpriteImg: React.FC<SpriteImgProps> = ({ spriteInfos, size, ...imgP
     >
         <img
             src={sheetUrl}
-            alt={`${spriteInfos.sheetName}-x=${spriteInfos.x}-y=${spriteInfos.y}`}
+            alt={`${spriteInfos.sheetName}-x=${x}-y=${y}`}
             className={css({
                 objectFit: 'none',
-                objectPosition: spriteInfos && `-${spriteInfos.x}px -${spriteInfos.y}px`,
+                objectPosition: spriteInfos && `-${x}px -${y}px`,
                 imageRendering: scale === 1 ? "pixelated" : undefined,
-                height: spriteInfos && spriteInfos.height,
-                width: spriteInfos && spriteInfos.width,
-                transform: `${scale !== 1 ? `scale(${scale})` : ''}`,
+                height: sourceRealHeight,
+                width: sourceRealWidth,
+                transform: scale !== 1 ? `scale(${scale})` : undefined,
             })}
         />
     </div>;

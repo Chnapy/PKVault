@@ -32,6 +32,7 @@ public class DexLoader : EntityLoader<DexItemForm, DexFormEntity>, IDexLoader
         BaseStats: dynamicInfos?.BaseStats ?? [],
         IsSeen: entity.IsCaught,
         IsSeenShiny: entity.IsCaughtShiny,
+        IsSeenAlpha: entity.IsCaughtAlpha,
         IsCaught: entity.IsCaught,
         IsOwned: dynamicInfos?.IsOwned ?? false,
         IsOwnedShiny: dynamicInfos?.IsOwnedShiny ?? false

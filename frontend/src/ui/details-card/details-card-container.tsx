@@ -57,20 +57,17 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                     display: 'flex',
                     columnGap: 4,
                     padding: '0 8px',
-                    marginLeft: 16,
                     flexWrap: 'wrap-reverse',
                 })}
             >
                 {tabs}
             </div>}
 
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    overflowY: 'hidden',
-                }}
-            >
+            <div className={css({
+                display: 'flex',
+                justifyContent: 'flex-end',
+                overflowY: 'hidden',
+            })}>
                 <Container padding="big" borderRadius="big" className={css({
                     display: "flex",
                     flexDirection: 'column',
@@ -126,6 +123,7 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                                 alignItems: 'stretch',
                             })}>
                                 <div className={css({
+                                    width: 104,
                                     alignSelf: 'flex-start',
                                     display: "flex",
                                     flexDirection: 'column',
@@ -151,7 +149,6 @@ export const DetailsCardContainer: React.FC<DetailsCardContainerProps> = ({
                                     {mainImgSub && <div className={css({
                                         margin: 4,
                                         marginTop: 0,
-                                        padding: 4,
                                         borderRadius: 8,
                                         backgroundColor: theme.bg.default,
                                     })}>

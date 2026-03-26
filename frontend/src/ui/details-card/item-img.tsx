@@ -2,7 +2,7 @@ import type React from 'react';
 import { useStaticData } from '../../hooks/use-static-data';
 import { SpriteImg, type SpriteImgProps } from './sprite-img';
 
-type ItemImgProps = {
+export type ItemImgProps = {
     item: number;
 } & Omit<SpriteImgProps, 'spriteInfos'>;
 

@@ -11,9 +11,6 @@ import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { DetailsCardContainer, type DetailsCardContainerProps, type DetailsExpandedState } from '../details-card/details-card-container';
 import { DetailsMainImg } from '../details-card/details-main-img';
 import { ItemImg } from '../details-card/item-img';
-import { Gender } from '../gender/gender';
-import { AlphaIcon } from '../icon/alpha-icon';
-import { ShinyIcon } from '../icon/shiny-icon';
 import { Marking } from '../marking/marking';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
@@ -106,21 +103,13 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             species={pkm.species}
             context={pkm.context}
             form={pkm.form}
+            gender={pkm.gender}
             isFemale={pkm.gender == GenderType.Female}
             isShiny={pkm.isShiny}
+            isAlpha={pkm.isAlpha}
             isEgg={pkm.isEgg}
             isShadow={pkm.isShadow}
             ball={pkm.ball}
-            shinyPart={<>
-                {pkm.isAlpha && <AlphaIcon />}
-
-                {pkm.isShiny && <ShinyIcon
-                    className={css({
-                        margin: '0 -2px',
-                    })}
-                />}
-            </>}
-            genderPart={<Gender gender={pkm.gender} />}
         />}
         mainImgSub={(pkm.markings ?? []).length > 0 && <div className={css({
             display: 'flex',
@@ -128,6 +117,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
             columnGap: 4,
             fontSize: 10,
             justifyContent: 'space-evenly',
+            padding: 4,
         })}>
             {pkm.markings?.map((mark, i) => <Marking
                 key={i}

@@ -1,8 +1,7 @@
 import { css } from "@emotion/css";
 import type React from "react";
-import { useStaticData } from "../../hooks/use-static-data";
 import { useTranslate } from "../../translate/i18n";
-import { ItemImg } from "../../ui/details-card/item-img";
+import { BallImg } from '../../ui/details-card/ball-img';
 import { Icon } from "../../ui/icon/icon";
 import { ShinyIcon } from "../../ui/icon/shiny-icon";
 import { theme } from "../../ui/theme";
@@ -24,8 +23,6 @@ export const PokedexCount: React.FC<PokedexCountProps> = ({
 }) => {
   const { t } = useTranslate();
 
-  const staticData = useStaticData();
-
   return (
     <div
       className={css({
@@ -37,11 +34,7 @@ export const PokedexCount: React.FC<PokedexCountProps> = ({
     >
       <Icon name="eye" solid forButton />{" "}
       <span className={css({ color: theme.text.primary })}>{seenCount}</span>
-      <ItemImg
-        item={staticData.itemPokeball.id}
-        size={"1lh"}
-        className={css({ margin: "0 -2px" })}
-      />
+      <BallImg size={14} />
       <span className={css({ color: theme.text.primary })}>{caughtCount}</span>
       <Icon name="folder" solid forButton />{" "}
       <span className={css({ color: theme.text.primary })}>{ownedCount}</span>

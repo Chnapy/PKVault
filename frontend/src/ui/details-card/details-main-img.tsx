@@ -1,26 +1,29 @@
-import type React from 'react';
-import type { EntityContext } from '../../data/sdk/model';
-import { Icon } from '../icon/icon';
-import { theme } from '../theme';
-import { ItemImg } from './item-img';
-import { SpeciesImg } from './species-img';
 import { css } from '@emotion/css';
+import type React from 'react';
+import { Gender as GenderType, type EntityContext } from '../../data/sdk/model';
+import { Gender } from '../gender/gender';
+import { AlphaIcon } from '../icon/alpha-icon';
+import { Icon } from '../icon/icon';
+import { ShinyIcon } from '../icon/shiny-icon';
+import { theme } from '../theme';
+import { BallImg } from './ball-img';
+import { SpeciesImg } from './species-img';
 
 export type DetailsMainImgProps = {
     species: number;
     context: EntityContext;
     form: number;
+    gender: GenderType;
     isFemale?: boolean;
     isShiny?: boolean;
+    isAlpha?: boolean;
     isEgg?: boolean;
     isShadow?: boolean;
     isOwned?: boolean;
     ball?: number;
-    shinyPart: React.ReactNode;
-    genderPart: React.ReactNode;
 };
 
-export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, context, form, isFemale, isShiny, isEgg, isShadow, isOwned, ball = 0, shinyPart, genderPart }) => {
+export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, context, form, gender, isFemale, isShiny, isAlpha, isEgg, isShadow, isOwned, ball = 0 }) => {
     return <>
         <div
             className={css({
@@ -42,11 +45,7 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, context
                 color: theme.text.default
             })}
         >
-            {ball > 0 && <ItemImg item={ball} className={css({
-                width: 20,
-                height: 20,
-                overflow: 'hidden'
-            })} />}
+            {ball > 0 && <BallImg item={ball} />}
 
             {isOwned && <Icon name='folder' solid />}
         </div>
@@ -58,7 +57,13 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, context
                 right: 4,
             })}
         >
-            {shinyPart}
+            {isAlpha && <AlphaIcon />}
+
+            {isShiny && <ShinyIcon
+                className={css({
+                    margin: '0 -2px',
+                })}
+            />}
         </div>
 
         <div
@@ -68,7 +73,7 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, context
                 right: 4,
             })}
         >
-            {genderPart}
+            <Gender gender={gender} />
         </div>
     </>;
 };

@@ -5,7 +5,7 @@ import { useStaticData } from '../../hooks/use-static-data';
 import { PathLine } from '../../settings/path-line';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
-import { ItemImg } from '../details-card/item-img';
+import { BallImg } from '../details-card/ball-img';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
 import { TextContainer } from '../text-container/text-container';
@@ -82,7 +82,7 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                     </span>
                     <br />
                     {t('save.dex')} <Icon name='eye' solid forButton /> <span className={css({ color: theme.text.primary })}>{dexSeenCount}</span>{' '}
-                    <ItemImg item={staticData.itemPokeball.id} size={'1lh'} className={css({ margin: -4 })} /> <span className={css({ color: theme.text.primary })}>{dexCaughtCount}</span>
+                    <BallImg size={14} /> <span className={css({ color: theme.text.primary })}>{dexCaughtCount}</span>
                     <br />
                     {t('save.storage')} <Icon name='folder' solid forButton /> <span className={css({ color: theme.text.primary })}>{ownedCount}</span>
                     {shinyCount > 0 && <>

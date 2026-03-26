@@ -15,6 +15,8 @@ export const Gender: React.FC<GenderProps> = ({ gender, className }) => {
 
     return <span className={cx(css({
         fontFamily: theme.font.special,
+        lineHeight: 1,
+        paddingLeft: 1,
         color: gender === GenderType.Male ? '#00C6AD' : '#FF4273',
     }), className)}>{gender === GenderType.Male ? '♂' : '♀'}</span>;
 };

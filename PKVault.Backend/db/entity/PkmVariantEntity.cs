@@ -18,6 +18,7 @@ public class PkmVariantEntity : IEntity
         Form = entity.Form,
         Gender = entity.Gender,
         IsShiny = entity.IsShiny,
+        IsAlpha = entity.IsAlpha,
         PkmFile = entity.PkmFile
     };
 
@@ -36,6 +37,7 @@ public class PkmVariantEntity : IEntity
     public required byte Form { get; set; }
     public required Gender Gender { get; set; }
     public required bool IsShiny { get; set; }
+    public required bool IsAlpha { get; set; }
 
     public virtual required PkmFileEntity? PkmFile { get; set; }
 }

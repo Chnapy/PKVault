@@ -34,7 +34,8 @@ public class DexMainService(
                 Forms: [.. await Task.WhenAll(forms.Select(async form =>
                 {
                     var isOwned = await pkmVariantLoader.HasEntityByForm(species, form.Form, form.Gender);
-                    var isOwnedShiny = isOwned && await pkmVariantLoader.HasEntityByFormShiny(species, form.Form, form.Gender);
+                    var isOwnedShiny = isOwned && form.Context.Generation > 1 && await pkmVariantLoader.HasEntityByFormShiny(species, form.Form, form.Gender);
+                    var isOwnedAlpha = isOwned && form.Context.Generation > 7 && await pkmVariantLoader.HasEntityByFormAlpha(species, form.Form, form.Gender);
 
                     if (!savesByContext.TryGetValue(form.Context, out var save))
                     {
@@ -49,6 +50,7 @@ public class DexMainService(
                         species,
                         isOwned,
                         isOwnedShiny,
+                        isOwnedAlpha,
                         form.Form,
                         form.Gender
                     );
@@ -74,12 +76,13 @@ public class DexMainService(
 
     protected override IEnumerable<LanguageID> GetDexLanguages(ushort species) => [];
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
+    // Not used !
+    public override async Task EnableSpeciesForm(EnableSpeciesFormPayload payload)
     {
         await EnableSpeciesForm(
             default,
             default,
-            species, form, gender, isCaught, false, languages,
+            payload.Species, payload.Form, payload.Gender, payload.IsCaught, false, false, payload.Languages,
             createOnly: false
         );
     }
@@ -92,7 +95,9 @@ public class DexMainService(
         await EnableSpeciesForm(
             context,
             version,
-            pk.Species, pk.Form, pk.Gender, true, pk.IsShiny, [pk.LanguageID],
+            pk.Species, pk.Form, pk.Gender,
+            true, pk.IsShiny, pk.IsAlpha,
+            [pk.LanguageID],
             createOnly
         );
     }
@@ -101,7 +106,7 @@ public class DexMainService(
         EntityContext context,
         GameVersion version,
         ushort species, byte form, Gender gender,
-        bool isCaught, bool isCaughtShiny, LanguageID[] languages,
+        bool isCaught, bool isCaughtShiny, bool isCaughtAlpha, LanguageID[] languages,
         bool createOnly
     )
     {
@@ -128,6 +133,7 @@ public class DexMainService(
             Gender = gender,
             IsCaught = false,
             IsCaughtShiny = false,
+            IsCaughtAlpha = false,
             Languages = []
         };
 
@@ -146,6 +152,9 @@ public class DexMainService(
 
         if (isCaughtShiny)
             entity.IsCaughtShiny = true;
+
+        if (isCaughtAlpha)
+            entity.IsCaughtAlpha = true;
 
         // write if caught only
         if (!entity.IsCaught)

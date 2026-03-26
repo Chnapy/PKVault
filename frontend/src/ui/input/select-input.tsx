@@ -1,10 +1,10 @@
+import { css, cx } from '@emotion/css';
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions, type ListboxOptionsProps } from '@headlessui/react';
 import React from 'react';
 import { Button, type ButtonProps } from '../button/button';
 import { TitledContainer } from '../container/titled-container';
 import { Icon } from '../icon/icon';
 import { theme } from '../theme';
-import { css, cx } from '@emotion/css';
 
 export type DataOption<K extends string | number> = { value: K; option: React.ReactNode; disabled?: boolean };
 
@@ -65,7 +65,7 @@ const SelectInput = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<
                     {data.find(item => item.value === value)?.option}
                 </div>
 
-                <Icon name='angle-down' solid forButton />
+                <Icon name='angle-down' solid forButton className={css({ lineHeight: 1 })} />
             </ListboxButton>
 
             <ListboxOptions anchor={anchor} className={css({ zIndex: 30 })}>

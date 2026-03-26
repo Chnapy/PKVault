@@ -4,15 +4,17 @@ import { Gender as GenderType } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from "../../routes/pokedex";
 import { useTranslate } from '../../translate/i18n';
-import { ButtonLike } from '../../ui/button/button-like';
+import { BallImg } from '../../ui/details-card/ball-img';
 import { DetailsCardContainer, type DetailsExpandedState } from '../../ui/details-card/details-card-container';
 import { DetailsMainImg } from '../../ui/details-card/details-main-img';
 import { DetailsMainInfos } from '../../ui/details-card/details-main-infos';
 import { DetailsTab } from '../../ui/details-card/details-tab';
 import { DetailsTitle } from '../../ui/details-card/details-title';
 import { Gender } from '../../ui/gender/gender';
+import { AlphaIcon } from '../../ui/icon/alpha-icon';
+import { Icon } from '../../ui/icon/icon';
 import { ShinyIcon } from '../../ui/icon/shiny-icon';
-import { SelectNumberInput } from '../../ui/input/select-input';
+import { SelectNumberInput, SelectStringInput } from '../../ui/input/select-input';
 import { TextContainer } from '../../ui/text-container/text-container';
 import { theme } from '../../ui/theme';
 import { usePokedexDetailsSelect } from './hooks/use-pokedex-details-select';
@@ -44,18 +46,15 @@ export const PokedexDetails: React.FC = () => {
   }
 
   const {
-    selectedFormIndex,
-    selectedGender,
-    selectedShiny,
-
-    setSelectedSaveId,
-    setSelectedFormIndex,
-    setSelectedGender,
-    setSelectedShiny,
-
     selectedSpecies,
     selectedSave,
     selectedForm,
+
+    setSelectedSaveId,
+    setSelectedFormId,
+    selectedByFormIndex,
+
+    selectedFormIndexForms,
     selectedStaticFormWithIndex,
     selectedSpeciesValue,
 
@@ -63,12 +62,8 @@ export const PokedexDetails: React.FC = () => {
     staticFormsFiltered,
   } = selectInfos;
 
-  const selectedFormSimilars = selectedSpeciesValue.forms.filter(form => form.form === selectedFormIndex);
-  const selectedFormGenders = selectedFormSimilars.map(form => form.gender);
-  const hasMultipleSeenGenders = selectedFormSimilars.filter(form => form.isSeen).length > 1;
-
   const caught = selectedForm.isCaught;
-  const owned = selectedShiny ? selectedForm.isOwnedShiny : selectedForm.isOwned;
+  const owned = selectedForm.isOwned;
 
   const speciesName = selectedStaticFormWithIndex.name;
 
@@ -99,32 +94,60 @@ export const PokedexDetails: React.FC = () => {
         <DetailsMainImg
           species={selectedSpecies}
           context={selectedForm.context}
-          form={selectedFormIndex}
-          isFemale={selectedGender === GenderType.Female}
+          form={selectedForm.form}
+          gender={selectedForm.gender}
+          isFemale={selectedForm.gender === GenderType.Female}
           isOwned={owned}
-          isShiny={selectedShiny}
+          isShiny={selectedForm.isSeenShiny}
+          isAlpha={selectedForm.isSeenAlpha}
           ball={caught ? staticData.itemPokeball.id : undefined}
-          shinyPart={selectedForm.generation > 1 && <ButtonLike
-            onClick={() => setSelectedShiny(!selectedShiny)}
-            disabled={!selectedForm.isOwnedShiny}
-          >
-            <ShinyIcon
-              className={css({
-                width: '1lh',
-                height: '1lh',
-                filter: selectedShiny ? undefined : 'brightness(0) opacity(0.5)',
-              })}
-            />
-          </ButtonLike>}
-          genderPart={selectedFormGenders.length > 1
-            ? <ButtonLike
-              onClick={() => setSelectedGender((selectedGender + 1) % selectedFormGenders.length as GenderType)}
-              disabled={!hasMultipleSeenGenders}
-            >
-              <Gender gender={selectedGender} className={css({ width: '1lh' })} />
-            </ButtonLike>
-            : <Gender gender={selectedGender} />
-          }
+        />
+      }
+      mainImgSub={
+        <SelectStringInput
+          anchor='bottom end'
+          onChange={setSelectedFormId}
+          value={selectedForm.id}
+          disabled={selectedFormIndexForms.length < 2}
+          data={selectedFormIndexForms.map(form => ({
+            value: form.id,
+            disabled: form.id === selectedForm.id,
+            option: <div className={css({
+              width: '100%',
+              minWidth: 70,
+              display: 'flex',
+              // justifyContent: 'flex-end',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: '1rem',
+              padding: 2,
+            })}>
+              {form.isCaught && <BallImg size={16} />}
+
+              {form.isOwned && <Icon name='folder' solid />}
+
+              <Gender gender={form.gender} />
+
+              {form.isSeenAlpha && <AlphaIcon
+                className={css({
+                  height: '1em',
+                })}
+              />}
+
+              {form.isOwnedShiny && <ShinyIcon
+                className={css({
+                  height: '1em',
+                })}
+              />}
+            </div>,
+          }))}
+          bgColor='transparent'
+          className={css({
+            width: '100%',
+
+            color: theme.text.default,
+            borderColor: 'currentcolor',
+          })}
         />
       }
       mainInfos={
@@ -142,10 +165,10 @@ export const PokedexDetails: React.FC = () => {
                 data={staticFormsFiltered.map(staticForm => ({
                   value: staticForm.index,
                   option: staticForm.name,
-                  disabled: !selectedSpeciesValue.forms.some(form => form.form === staticForm.index && form.isSeen),
+                  disabled: !selectedSpeciesValue.forms.find(form => form.form === staticForm.index)?.isSeen,
                 }))}
-                onChange={setSelectedFormIndex}
-                value={selectedFormIndex}
+                onChange={selectedByFormIndex}
+                value={selectedForm.form}
                 bgColor='transparent'
                 className={css({
                   height: '1lh',

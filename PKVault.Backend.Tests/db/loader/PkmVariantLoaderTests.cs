@@ -165,6 +165,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             Form = 0,
             Gender = Gender.Female,
             IsShiny = false,
+            IsAlpha = false,
 
             PkmFile = new PkmFileEntity()
             {
@@ -248,6 +249,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Form = 0,
                 Gender = Gender.Female,
                 IsShiny = false,
+                IsAlpha = false,
 
                 PkmFile = null
             }, TestContext.Current.CancellationToken);
@@ -349,13 +351,13 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase1,
-                Context = EntityContext.Gen3,
+                    Context = EntityContext.Gen3,
                     Generation = 3,
                     Filepath = filepath1,
                     BoxId = "1",
                     BoxSlot = 0,
                     IsMain = true,
-            IsExternal = false,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -363,6 +365,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
@@ -375,7 +378,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     BoxId = "1",
                     BoxSlot = 1,
                     IsMain = true,
-            IsExternal = false,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -383,19 +386,20 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
                 new()
                 {
                     Id = idBase3,
-                Context = EntityContext.Gen5,
+                    Context = EntityContext.Gen5,
                     Generation = 5,
                     Filepath = filepath3,
                     BoxId = "2",
                     BoxSlot = 0,
                     IsMain = true,
-            IsExternal = false,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -403,6 +407,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
@@ -509,6 +514,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
@@ -529,6 +535,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
@@ -585,6 +592,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             Form = 0,
             Gender = Gender.Female,
             IsShiny = false,
+            IsAlpha = false,
 
             PkmFile = new()
             {
@@ -641,6 +649,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             Form = 0,
             Gender = Gender.Female,
             IsShiny = false,
+            IsAlpha = false,
 
             PkmFile = new()
             {
@@ -688,6 +697,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             Form = 0,
             Gender = Gender.Female,
             IsShiny = false,
+            IsAlpha = false,
 
             PkmFile = new()
             {
@@ -803,7 +813,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     BoxId = "1",
                     BoxSlot = 0,
                     IsMain = true,
-            IsExternal = false,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -811,6 +821,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
@@ -823,7 +834,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     BoxId = "1",
                     BoxSlot = 1,
                     IsMain = true,
-            IsExternal = false,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -831,6 +842,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
@@ -843,7 +855,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     BoxId = "2",
                     BoxSlot = 0,
                     IsMain = true,
-            IsExternal = false,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -851,6 +863,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
