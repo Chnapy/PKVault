@@ -158,6 +158,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
                 {
                   label: t('storage.box.advanced.sort'),
                   icon: <Icon name='sort' solid forButton />,
+                  disabled: savePkms.length === 0,
                   panelContent: close => <SortAdvancedAction.Save saveId={saveId} selectedBoxId={selectedBox.idInt} close={close} />,
                 },
                 {

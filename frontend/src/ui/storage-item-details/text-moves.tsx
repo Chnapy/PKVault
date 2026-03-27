@@ -1,6 +1,7 @@
 import { css } from '@emotion/css';
 import { ListboxOption } from '@headlessui/react';
 import React from 'react';
+import { useWatch } from 'react-hook-form';
 import { MoveCategory, type StaticMove } from '../../data/sdk/model';
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { useStorageGetPkmAvailableMoves } from '../../data/sdk/storage/storage.gen';
@@ -45,7 +46,8 @@ export const TextMoves: React.FC<TextMovesProps> = ({
 }) => {
     const { t } = useTranslate();
 
-    const { editMode, register, setValue, watch } = StorageDetailsForm.useContext();
+    const { editMode, register, setValue, control } = StorageDetailsForm.useContext();
+    const [ formMoves ] = useWatch({ control, name: [ 'moves' ] });
 
     const staticData = useStaticData();
 
@@ -100,8 +102,6 @@ export const TextMoves: React.FC<TextMovesProps> = ({
 
         return staticMove;
     }, [ friendship, hiddenPowerCategory, hiddenPowerPower, hiddenPowerType, staticData.moves ]);
-
-    const formMoves = watch(`moves`);
 
     const availableMoves = React.useMemo(() => (availableMovesQuery.data?.data ?? [])
         .map(move => move.id)

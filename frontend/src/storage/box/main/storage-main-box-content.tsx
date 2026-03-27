@@ -53,7 +53,8 @@ export const StorageMainBoxContent: React.FC<{
     const sortedBoxes = boxes.sort((b1, b2) => (b1.order < b2.order ? -1 : 1));
     const filteredBoxes = sortedBoxes.filter(box => !mainBoxIds.includes(box.idInt) || box.idInt === boxId);
 
-    const pkms = Object.values(pkmsQuery.data?.data.byId ?? {}).filter(pk => pk.isMain && boxesIds.has(pk.boxId));
+    const allPkms = Object.values(pkmsQuery.data?.data.byId ?? {});
+    const pkms = allPkms.filter(pk => pk.isMain && boxesIds.has(pk.boxId));
 
     const selectedBoxIndex = filteredBoxes.findIndex(box => box.idInt === boxId);
     const selectedBox = filteredBoxes[ selectedBoxIndex ] ?? {
@@ -119,6 +120,7 @@ export const StorageMainBoxContent: React.FC<{
                                 {
                                     label: t('storage.box.advanced.sort'),
                                     icon: <Icon name='sort' solid forButton />,
+                                    disabled: allPkms.length === 0,
                                     panelContent: close => <SortAdvancedAction.Main selectedBoxId={selectedBox.idInt} close={close} />,
                                 },
                                 {

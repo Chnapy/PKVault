@@ -22,6 +22,7 @@ export const StorageHeader: React.FC<{
     advancedActions?: {
         label: string;
         icon?: React.ReactNode;
+        disabled?: boolean;
         panelContent: ButtonWithPopoverProps[ 'panelContent' ];
     }[];
     onBoxesDisplay: () => void;
@@ -120,6 +121,7 @@ export const StorageHeader: React.FC<{
                                     <ButtonWithPopover
                                         key={i}
                                         anchor='right start'
+                                        disabled={action.disabled}
                                         panelContent={action.panelContent}
                                     >
                                         {action.icon}

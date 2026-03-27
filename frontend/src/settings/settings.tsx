@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { HistoryContext } from '../context/history-context';
 import type { SettingsMutableDTO } from '../data/sdk/model/settingsMutableDTO';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
@@ -41,9 +41,10 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
         pkM_EXTERNAL_GLOBS: settingsMutable.pkM_EXTERNAL_GLOBS?.join('\n') ?? ''
     }), [ settingsMutable ]);
 
-    const { register, watch, reset, setValue, getValues, handleSubmit, formState } = useForm<SettingsFormData>({
+    const { register, reset, setValue, getValues, handleSubmit, formState, control } = useForm<SettingsFormData>({
         defaultValues: defaultValue
     });
+    const [ language, saveGlobs, pkmExternalGlobs, hideCheats ] = useWatch({ control, name: [ 'language', 'savE_GLOBS', 'pkM_EXTERNAL_GLOBS', 'hidE_CHEATS' ] });
 
     if (!settingsMutable) {
         return null;
@@ -105,12 +106,12 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                     <SelectStringInput
                         label={t('settings.form.language')}
                         data={[
-                            { value: 'en', option: 'English', disabled: watch('language') === 'en' },
-                            { value: 'fr', option: 'Français', disabled: watch('language') === 'fr' },
-                            { value: 'de', option: 'Deutsch', disabled: watch('language') === 'de' },
+                            { value: 'en', option: 'English', disabled: language === 'en' },
+                            { value: 'fr', option: 'Français', disabled: language === 'fr' },
+                            { value: 'de', option: 'Deutsch', disabled: language === 'de' },
                         ]}
                         {...register('language')}
-                        value={watch('language')}
+                        value={language}
                         onChange={value => setValue('language', value)}
                         disabled={!settings.canUpdateSettings}
                     />
@@ -151,7 +152,7 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                 labelAddFile={t('settings.form.saves.add-file')}
                 labelAddFolder={t('settings.form.saves.add-folder')}
                 {...register('savE_GLOBS')}
-                value={watch('savE_GLOBS')}
+                value={saveGlobs}
                 onChange={(value) => setValue('savE_GLOBS', value)}
                 disabled={!settings.canUpdateSettings}
                 limit={200}
@@ -169,7 +170,7 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                 labelAddFile={t('settings.form.pkms-external.add-file')}
                 labelAddFolder={t('settings.form.pkms-external.add-folder')}
                 {...register('pkM_EXTERNAL_GLOBS')}
-                value={watch('pkM_EXTERNAL_GLOBS')}
+                value={pkmExternalGlobs}
                 onChange={(value) => setValue('pkM_EXTERNAL_GLOBS', value)}
                 disabled={!settings.canUpdateSettings}
                 limit={8000}
@@ -296,7 +297,7 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                 >
                     <CheckboxInput
                         id='hide-cheats'
-                        checked={watch('hidE_CHEATS')}
+                        checked={hideCheats}
                         onChange={() => setValue('hidE_CHEATS', !getValues('hidE_CHEATS'))}
                         disabled={!settings.canUpdateSettings}
                     />
