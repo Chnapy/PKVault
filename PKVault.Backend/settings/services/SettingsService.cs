@@ -1,9 +1,11 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Primitives;
 
 public interface ISettingsService
 {
     public Task<DataUpdateFlags?> UpdateSettings(SettingsMutableDTO settingsMutable);
+    public Task<SettingsDTO> GetSettingsWithUserId();
     public SettingsDTO GetSettings();
 }
 
@@ -15,6 +17,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
     public static readonly string FilePath = MatcherUtil.NormalizePath(Path.Combine(GetAppDirectory(), "./config/pkvault.json"));
     public static readonly string DefaultLanguage = "en";
     public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr", "de"]; //GameLanguage.AllSupportedLanguages.ToArray();
+    private static readonly SemaphoreSlim semaphore = new(1);
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
     private ISaveService saveService => sp.GetRequiredService<ISaveService>();
@@ -32,7 +35,12 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             settingsMutable
         );
 
-        BaseSettings = ReadBaseSettings();
+        var userId = await sp.GetRequiredService<IMetaLoader>().GetUserId();
+
+        BaseSettings = ReadBaseSettings() with
+        {
+            UserId = userId
+        };
 
         saveService.InvalidateSaves();
 
@@ -48,7 +56,28 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         return flags;
     }
 
-    // Full settings
+    public async Task<SettingsDTO> GetSettingsWithUserId()
+    {
+        await semaphore.WaitAsync();
+        try
+        {
+            // DB use is required to avoid rare first-run app crash after language selection
+            // trigger DB creation, migration etc
+            var userId = await sp.GetRequiredService<IMetaLoader>().GetUserId();
+
+            BaseSettings = GetSettings() with
+            {
+                UserId = userId
+            };
+        }
+        finally
+        {
+            semaphore.Release();
+        }
+
+        return BaseSettings;
+    }
+
     public SettingsDTO GetSettings()
     {
         if (BaseSettings == null)
@@ -113,6 +142,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             PkhexVersion: Assembly.GetAssembly(typeof(PKHeX.Core.PKM))?.GetName().Version?.ToString(3) ?? "",
             AppDirectory: MatcherUtil.NormalizePath(GetAppDirectory()),
             SettingsPath: FilePath,
+            UserId: "", // should be defined later
             CanUpdateSettings: false,
             CanScanSaves: false,
             SettingsMutable: mutableDto

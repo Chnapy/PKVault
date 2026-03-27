@@ -6,6 +6,7 @@ public record SettingsDTO(
     string PkhexVersion,
     string AppDirectory,
     string SettingsPath,
+    string UserId,
     bool CanUpdateSettings,
     bool CanScanSaves,
     SettingsMutableDTO SettingsMutable

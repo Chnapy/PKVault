@@ -90,7 +90,7 @@ public class DataService(
 
         var dto = new DataDTO(
             Warnings: await warningsTask,
-            Settings: settingsService.GetSettings(),
+            Settings: await settingsService.GetSettingsWithUserId(),
             Actions: sessionService.GetActionPayloadList(),
             StaticData: await staticDataTask,
             MainBanks: await mainBanksTask,

@@ -1,6 +1,7 @@
 import { css } from '@emotion/css';
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
+import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { TitledContainer } from '../../ui/container/titled-container';
@@ -8,13 +9,12 @@ import { Icon } from '../../ui/icon/icon';
 import { TextInput } from '../../ui/input/text-input';
 import { LinkWithIcon } from '../../ui/link-with-icon/link-with-icon';
 import { theme } from '../../ui/theme';
-import { useUserId } from '../hooks/use-user-id';
 import { useSendFeedback } from './hooks/use-send-feedback';
 
 export const Feedback: React.FC = () => {
     const { t } = useTranslate();
 
-    const userIdQuery = useUserId();
+    const settingsQuery = useSettingsGet();
 
     const sendFeedbackMutation = useSendFeedback();
 
@@ -34,19 +34,21 @@ export const Feedback: React.FC = () => {
         }
     }, [ formState.isSubmitSuccessful, reset ]);
 
+    const userId = settingsQuery.data?.data.userId;
+
     const submit = handleSubmit(async ({ feedback }) => {
-        if (!userIdQuery.data) {
+        if (!userId) {
             throw new Error('No user-id');
         }
 
         await sendFeedbackMutation.mutateAsync({
-            userId: userIdQuery.data,
+            userId,
             feedback,
         });
     });
 
     return <TitledContainer
-        title={<div title={`User ID = ${userIdQuery.data}`}>
+        title={<div title={`User ID = ${userId}`}>
             {t('settings.feedback.title')}
         </div>}
     >
@@ -83,7 +85,7 @@ export const Feedback: React.FC = () => {
                 <Button
                     type='submit'
                     loading={formState.isSubmitting}
-                    disabled={!userIdQuery.data || !formState.isValid || !feedbackValue || formState.isSubmitSuccessful}
+                    disabled={!userId || !formState.isValid || !feedbackValue || formState.isSubmitSuccessful}
                     bgColor={theme.bg.primary}
                 >
                     {t('action.submit')}
