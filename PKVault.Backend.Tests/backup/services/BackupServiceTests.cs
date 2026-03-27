@@ -31,7 +31,7 @@ public class BackupServiceTests
 
         Mock<ISettingsService> mockSettingsService = new();
         mockSettingsService.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
-            BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "app", SettingsPath: "",
+            BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "app", SettingsPath: "", UserId: "",
             CanUpdateSettings: false, CanScanSaves: false, SettingsMutable: new(
                 DB_PATH: "mock-db", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: "mock-bkp",
                 LANGUAGE: "en", HIDE_CHEATS: false
