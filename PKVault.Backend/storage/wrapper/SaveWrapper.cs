@@ -17,6 +17,8 @@ public class SaveWrapper(SaveFile Save)
             {
                 // var encodeBase = $"{(byte)Save.Version}-{Save.Generation}-{Save.TID16}-{Save.Metadata.FilePath}";
                 var path = Save.Metadata.FilePath;
+                ArgumentException.ThrowIfNullOrWhiteSpace(path);
+
                 byte[] bytes = Encoding.UTF8.GetBytes(path);
                 byte[] hash = SHA1.HashData(bytes);
                 return BitConverter.ToUInt32(hash, 0);

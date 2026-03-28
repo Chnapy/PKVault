@@ -12,7 +12,7 @@ public class DexService(
     {
         var saveLoaders = savesLoadersService.GetAllLoaders();
 
-        if (saveLoaders.Count == 0)
+        if (saveLoaders.Length == 0)
         {
             return [];
         }

@@ -13,12 +13,12 @@ public class SynchronizePkmAction(
     {
         var saveLoaders = savesLoadersService.GetAllLoaders();
 
-        if (saveLoaders.Count == 0)
+        if (saveLoaders.Length == 0)
         {
             return [];
         }
 
-        using var _ = LogUtil.Time($"Check saves to synchronize ({saveLoaders.Count} saves)");
+        using var _ = LogUtil.Time($"Check saves to synchronize ({saveLoaders.Length} saves)");
 
         var pkmVariantsBySaveId = await pkmVariantLoader.GetEntitiesAttachedGroupedBySave();
 

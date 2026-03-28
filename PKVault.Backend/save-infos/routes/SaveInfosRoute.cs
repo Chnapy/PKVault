@@ -6,13 +6,13 @@ namespace PKVault.Backend.saveinfos.routes;
 [ApiController]
 [Route("api/[controller]")]
 public class SaveInfosController(
-    DataService dataService, ISaveService saveService, ISessionService sessionService
+    DataService dataService, ISavesLoadersService savesLoadersService, ISessionService sessionService
 ) : ControllerBase
 {
     [HttpGet()]
-    public async Task<ActionResult<Dictionary<uint, SaveInfosDTO>>> GetAll()
+    public async Task<ActionResult<IDictionary<uint, SaveInfosDTO>>> GetAll()
     {
-        return await saveService.GetAllSaveInfos();
+        return savesLoadersService.GetAllSaveInfos().ToDictionary();
     }
 
     [HttpPut()]
@@ -23,7 +23,7 @@ public class SaveInfosController(
             throw new InvalidOperationException($"Empty action list is required");
         }
 
-        saveService.InvalidateSaves();
+        savesLoadersService.Clear();
         var flags = await sessionService.StartNewSession(checkInitialActions: true);
 
         flags ??= new();
@@ -44,7 +44,7 @@ public class SaveInfosController(
             throw new InvalidOperationException($"Empty action list is required");
         }
 
-        var saveById = await saveService.GetSaveById();
+        var saveById = savesLoadersService.GetSaveById();
 
         var save = saveById[saveId].Clone();
 

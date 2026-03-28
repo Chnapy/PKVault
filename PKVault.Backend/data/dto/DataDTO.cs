@@ -9,7 +9,7 @@ public record DataDTO(
     bool InvalidateAllSaves,
     List<DataActionPayload>? Actions,
     WarningsDTO? Warnings,
-    Dictionary<uint, SaveInfosDTO>? SaveInfos,
+    IDictionary<uint, SaveInfosDTO>? SaveInfos,
     List<BackupDTO>? Backups,
     SettingsDTO? Settings
 )

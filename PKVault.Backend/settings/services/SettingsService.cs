@@ -20,7 +20,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
     private static readonly SemaphoreSlim semaphore = new(1);
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
-    private ISaveService saveService => sp.GetRequiredService<ISaveService>();
+    private ISavesLoadersService savesLoadersService => sp.GetRequiredService<ISavesLoadersService>();
     private ISessionService sessionService => sp.GetRequiredService<ISessionService>();
 
     private SettingsDTO? BaseSettings;
@@ -44,7 +44,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             UserId = userId
         };
 
-        saveService.InvalidateSaves();
+        savesLoadersService.Clear();
 
         var flags = await sessionService.StartNewSession(checkInitialActions: true);
 

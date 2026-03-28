@@ -3,8 +3,7 @@
  */
 public class WarningsService(
     IServiceProvider sp,
-    ISaveService saveService, IFileIOService fileIOService,
-    ISessionService sessionService, ISavesLoadersService savesLoadersService
+    IFileIOService fileIOService, ISessionService sessionService, ISavesLoadersService savesLoadersService
 )
 {
     private WarningsDTO? WarningsDTO = null;
@@ -44,22 +43,17 @@ public class WarningsService(
 
         var savesLoaders = savesLoadersService.GetAllLoaders();
 
-        if (savesLoaders.Count == 0)
+        if (savesLoaders.Length == 0)
         {
             return [];
         }
-
-        var saveByPath = await saveService.GetSaveByPath();
 
         return [.. savesLoaders
             .Where(saveLoaders => saveLoaders.Boxes.HasWritten || saveLoaders.Pkms.HasWritten)
             .Where(saveLoaders =>
             {
-                var path = saveByPath.Keys.ToList().Find(path => saveByPath[path].Id == saveLoaders.Save.Id);
-                if (path == default)
-                {
-                    throw new KeyNotFoundException($"Path not found for given save {saveLoaders.Save.Id}");
-                }
+                var path = saveLoaders.Save.Metadata.FilePath;
+                ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
                 var lastWriteTime = fileIOService.GetLastWriteTimeUtc(path);
                 // Console.WriteLine($"Check save {saveLoaders.Save.ID32} to {path}.\nWrite-time from {lastWriteTime} to {startTime}.");
@@ -105,29 +99,25 @@ public class WarningsService(
             .OfType<PkmVariantWarning>()];
     }
 
-    private async Task<List<SaveDuplicateWarning>> CheckSaveDuplicates()
+    private async Task<SaveDuplicateWarning[]> CheckSaveDuplicates()
     {
         var savesLoaders = savesLoadersService.GetAllLoaders();
 
-        if (savesLoaders.Count == 0)
+        if (savesLoaders.Length == 0)
         {
             return [];
         }
 
-        var saveByPath = await saveService.GetSaveByPath();
+        var savePaths = savesLoadersService.GetSavePaths();
 
-        var tasks = savesLoaders.Select(async (saveLoader) =>
-        {
-            var paths = saveByPath.ToList()
-                .FindAll(entry => entry.Value.Id == saveLoader.Save.Id)
-                .Select(entry => entry.Key);
-
-            return new SaveDuplicateWarning(
-                SaveId: saveLoader.Save.Id,
-                Paths: [.. paths]
-            );
-        });
-
-        return (await Task.WhenAll(tasks)).ToList().FindAll(warn => warn.Paths.Length > 1);
+        return [.. savePaths
+            .Where(entry => entry.Value.Count > 1)
+            .Select(entry =>
+            {
+                return new SaveDuplicateWarning(
+                    SaveId: entry.Key,
+                    Paths: [.. entry.Value]
+                );
+            })];
     }
 }

@@ -1,11 +1,11 @@
 
 public record WarningsDTO(
-List<SaveChangedWarning> SaveChangedWarnings,
-List<PkmVariantWarning> PkmVariantWarnings,
-List<SaveDuplicateWarning> SaveDuplicateWarnings
+    List<SaveChangedWarning> SaveChangedWarnings,
+    List<PkmVariantWarning> PkmVariantWarnings,
+    SaveDuplicateWarning[] SaveDuplicateWarnings
 )
 {
-    public int WarningsCount { get => SaveChangedWarnings.Count + PkmVariantWarnings.Count + SaveDuplicateWarnings.Count; }
+    public int WarningsCount { get => SaveChangedWarnings.Count + PkmVariantWarnings.Count + SaveDuplicateWarnings.Length; }
 }
 
 public record SaveChangedWarning(uint SaveId);

@@ -13,7 +13,7 @@ public class DataNormalizeAction(
     IBankLoader bankLoader, IBoxLoader boxLoader, IPkmVariantLoader pkmVariantLoader, IDexLoader dexLoader,
     ISavesLoadersService savesLoadersService, IMetaLoader metaLoader,
     ISessionService sessionService, IFileIOService fileIOService, ISettingsService settingsService,
-    StaticDataService staticDataService, ISaveService saveService
+    StaticDataService staticDataService
 ) : DataAction<DataNormalizeActionInput>
 {
     public static List<string> GetLegacyFilepaths(string dbPath) => [
@@ -154,7 +154,7 @@ public class DataNormalizeAction(
 
         using var _ = LogUtil.Time("Data normalize - json legacy migration");
 
-        var saveById = await saveService.GetSaveCloneById();
+        var saveById = savesLoadersService.GetSaveById().ToDictionary();
 
         var legacyBankNormalize = new LegacyBankNormalize(legacyBankLoader);
         var legacyBoxNormalize = new LegacyBoxNormalize(legacyBoxLoader);
