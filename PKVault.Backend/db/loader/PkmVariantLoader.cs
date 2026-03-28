@@ -81,7 +81,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var pkm = await GetPKM(entity);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await staticDataService.GetStaticEvolves();
 
         var filepathAbsolute = MatcherUtil.NormalizePath(Path.Combine(appPath, entity.Filepath));
         var isFilePresent = fileIOService.Exists(filepathAbsolute);
@@ -104,7 +104,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
             FilepathAbsolute: filepathAbsolute,
 
             VersionChecker: versionChecker,
-            Evolves: staticData.Evolves
+            Evolves: evolves
         );
 
         return dto;
@@ -340,12 +340,12 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
             throw new ArgumentException($"Wrong PkmVariant BoxSlot={payload.BoxSlot}, should be less than box.SlotCount={box.SlotCount}");
         }
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await staticDataService.GetStaticEvolves();
 
         var id = payload.Id
-            ?? payload.Pkm.GetPKMIdBase(staticData.Evolves);
+            ?? payload.Pkm.GetPKMIdBase(evolves);
         var filepath = payload.Filepath
-            ?? pkmFileLoader.GetPKMFilepath(payload.Pkm, staticData.Evolves);
+            ?? pkmFileLoader.GetPKMFilepath(payload.Pkm, evolves);
 
         return new PkmVariantEntity()
         {
@@ -387,8 +387,8 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         if (pkm.IsEnabled)
         {
-            var staticData = await staticDataService.GetStaticData();
-            var filepath = pkmFileLoader.GetPKMFilepath(pkm, staticData.Evolves);
+            var evolves = await staticDataService.GetStaticEvolves();
+            var filepath = pkmFileLoader.GetPKMFilepath(pkm, evolves);
 
             if (filepath != entity.Filepath || entity.PkmFile == null)
             {

@@ -178,7 +178,6 @@ public class Program
 
 #if MODE_GEN_POKEAPI
         services.AddSingleton<PokeApiService>();
-        services.AddSingleton<GenSpritesheetService>();
         services.AddSingleton<GenStaticDataService>();
 #endif
 

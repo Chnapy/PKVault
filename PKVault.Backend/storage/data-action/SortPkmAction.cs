@@ -172,7 +172,7 @@ public class SortPkmAction(
 
     private async Task<List<P>> GetSortedPkms<P>(List<P> pkms, Func<P, ushort> GetSpecies, Func<P, byte> GetForm, Func<P, Gender> GetGender, string pokedexName)
     {
-        var staticData = await staticDataService.GetStaticData();
+        var staticSpecies = await staticDataService.GetStaticSpecies();
         var staticPokedex = await GetPokedex(pokedexName);
 
         var maxIndex = staticPokedex.PokemonIndexes.Values.Max();
@@ -181,9 +181,9 @@ public class SortPkmAction(
             .OrderBy(pkm => {
                 var species = GetSpecies(pkm);
 
-                return staticData.Species.TryGetValue(species, out var staticSpecies)
+                return staticSpecies.TryGetValue(species, out var speciesData)
                     ? (
-                        staticSpecies.PokedexIndexes.TryGetValue(pokedexName, out var dexIndex)
+                        speciesData.PokedexIndexes.TryGetValue(pokedexName, out var dexIndex)
                             ? dexIndex
                             : ++maxIndex
                     )
@@ -196,9 +196,9 @@ public class SortPkmAction(
 
     private async Task<StaticPokedex> GetPokedex(string pokedexName)
     {
-        var staticData = await staticDataService.GetStaticData();
+        var staticOthers = await staticDataService.GetStaticOthers();
 
-        if (!staticData.Pokedexes.TryGetValue(pokedexName, out var staticPokedex))
+        if (!staticOthers.Pokedexes.TryGetValue(pokedexName, out var staticPokedex))
         {
             throw new ArgumentException($"Pokedex name not found: {pokedexName}");
         }

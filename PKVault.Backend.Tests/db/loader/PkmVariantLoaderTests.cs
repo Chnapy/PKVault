@@ -144,9 +144,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             Pkm: pkm
         ));
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase = pkm.GetPKMIdBase(staticData.Evolves);
+        var idBase = pkm.GetPKMIdBase(evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
         var expectedEntity = new PkmVariantEntity()
         {
@@ -195,9 +195,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         var pkm = CreateTestPkm();
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase = pkm.GetPKMIdBase(staticData.Evolves);
+        var idBase = pkm.GetPKMIdBase(evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
 
         await db.Banks
@@ -274,15 +274,15 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var pkm2 = CreateTestPkm(generation: 4);
         var pkm3 = CreateTestPkm(generation: 5);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase1 = pkm1.GetPKMIdBase(staticData.Evolves);
+        var idBase1 = pkm1.GetPKMIdBase(evolves);
         var filepath1 = $"mock-storage/3/0025 - PIKACHU - {idBase1}.pk3";
 
-        var idBase2 = pkm2.GetPKMIdBase(staticData.Evolves);
+        var idBase2 = pkm2.GetPKMIdBase(evolves);
         var filepath2 = $"mock-storage/4/0025 - PIKACHU - {idBase2}.pk4";
 
-        var idBase3 = pkm3.GetPKMIdBase(staticData.Evolves);
+        var idBase3 = pkm3.GetPKMIdBase(evolves);
         var filepath3 = $"mock-storage/5/0025 - PIKACHU - {idBase3}.pk5";
 
         await db.Banks
@@ -444,12 +444,12 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var pkm1 = CreateTestPkm(generation: 3);
         var pkm2 = CreateTestPkm(generation: 4);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase1 = pkm1.GetPKMIdBase(staticData.Evolves);
+        var idBase1 = pkm1.GetPKMIdBase(evolves);
         var filepath1 = $"mock-storage/3/0025 - PIKACHU - {idBase1}.pk3";
 
-        var idBase2 = pkm2.GetPKMIdBase(staticData.Evolves);
+        var idBase2 = pkm2.GetPKMIdBase(evolves);
         var filepath2 = $"mock-storage/4/0025 - PIKACHU - {idBase2}.pk4";
 
         await db.Banks
@@ -568,9 +568,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         var pkm = CreateTestPkm(species: 25, generation: 3);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase = pkm.GetPKMIdBase(staticData.Evolves);
+        var idBase = pkm.GetPKMIdBase(evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
 
         mockFileSystem.AddFile(Path.Combine(PathUtils.GetExpectedAppDirectory(), $"app", filepath), new MockFileData(pkm.DecryptedPartyData));
@@ -627,9 +627,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         var pkm = CreateTestPkm(species: 25, generation: 3);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase = pkm.GetPKMIdBase(staticData.Evolves);
+        var idBase = pkm.GetPKMIdBase(evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
 
         var entity = new PkmVariantEntity()
@@ -675,9 +675,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         var pkm = CreateTestPkm(species: 25, generation: 3);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase = pkm.GetPKMIdBase(staticData.Evolves);
+        var idBase = pkm.GetPKMIdBase(evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
 
         var entity = new PkmVariantEntity()
@@ -730,15 +730,15 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var pkm2 = CreateTestPkm(generation: 4);
         var pkm3 = CreateTestPkm(generation: 5);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase1 = pkm1.GetPKMIdBase(staticData.Evolves);
+        var idBase1 = pkm1.GetPKMIdBase(evolves);
         var filepath1 = $"mock-storage/3/0025 - PIKACHU - {idBase1}.pk3";
 
-        var idBase2 = pkm2.GetPKMIdBase(staticData.Evolves);
+        var idBase2 = pkm2.GetPKMIdBase(evolves);
         var filepath2 = $"mock-storage/4/0025 - PIKACHU - {idBase2}.pk4";
 
-        var idBase3 = pkm3.GetPKMIdBase(staticData.Evolves);
+        var idBase3 = pkm3.GetPKMIdBase(evolves);
         var filepath3 = $"mock-storage/5/0025 - PIKACHU - {idBase3}.pk5";
 
         await db.Banks
@@ -962,9 +962,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase = pkm.GetPKMIdBase(staticData.Evolves);
+        var idBase = pkm.GetPKMIdBase(evolves);
         var filepath = Path.Combine(PathUtils.GetExpectedAppDirectory(), $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3");
 
         Assert.False(mockFileSystem.FileExists(filepath));

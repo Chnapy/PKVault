@@ -35,7 +35,7 @@ public class SavesLoadersService(
         var staticDataService = scope.ServiceProvider.GetRequiredService<StaticDataService>();
         var pkmConvertService = scope.ServiceProvider.GetRequiredService<IPkmConvertService>();
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await staticDataService.GetStaticEvolves();
 
         var language = settingsService.GetSettings().GetSafeLanguage();
 
@@ -44,7 +44,7 @@ public class SavesLoadersService(
         Loaders = savesById.Values.Select(save =>
         {
             var boxLoader = new SaveBoxLoader(save, sp);
-            var pkmLoader = new SavePkmLoader(pkmConvertService, language, staticData.Evolves, save);
+            var pkmLoader = new SavePkmLoader(pkmConvertService, language, evolves, save);
 
             return new SaveLoadersRecord(save, boxLoader, pkmLoader);
         }).ToImmutableDictionary(

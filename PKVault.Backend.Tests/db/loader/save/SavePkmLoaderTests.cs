@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public class SavePkmLoaderTests : IAsyncLifetime
 {
-    private Dictionary<ushort, StaticEvolve> evolves;
+    private StaticEvolvesData evolves;
 
     private readonly Mock<IPkmConvertService> mockConvertService;
     private readonly SaveWrapper mockSave;
@@ -19,13 +19,7 @@ public class SavePkmLoaderTests : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        var client = new AssemblyClient();
-
-        var staticData = (await client.GetAsyncJsonGz(
-            GenStaticDataService.GetStaticDataPathParts("en"),
-            StaticDataJsonContext.Default.StaticDataDTO
-        ))!;
-        evolves = staticData.Evolves;
+        evolves = await GenStaticEvolves.LoadData();
     }
 
     public async ValueTask DisposeAsync()

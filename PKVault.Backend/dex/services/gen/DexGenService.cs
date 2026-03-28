@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 {
-    public virtual async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData, HashSet<ushort>? speciesSet)
+    public virtual async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticSpeciesData staticSpecies, HashSet<ushort>? speciesSet)
     {
         // var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
 
@@ -44,7 +44,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
             }
 
             pkmBySpecies.TryGetValue(species, out var pkmList);
-            var item = CreateDexItem(species, pkmList ?? [], staticData);
+            var item = CreateDexItem(species, pkmList ?? [], staticSpecies);
             if (!dex.TryGetValue(species, out var arr))
             {
                 arr = [];
@@ -58,7 +58,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         return true;
     }
 
-    private DexItemDTO CreateDexItem(ushort species, List<ImmutablePKM> pkmList, StaticDataDTO staticData)
+    private DexItemDTO CreateDexItem(ushort species, List<ImmutablePKM> pkmList, StaticSpeciesData staticSpecies)
     {
         var forms = new List<DexItemForm>();
 
@@ -69,8 +69,8 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         // var strings = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage());
         // var formList = FormConverter.GetFormList(species, strings.types, strings.forms, GameInfo.GenderSymbolUnicode, save.Context);
 
-        var staticSpecies = staticData.Species[species];
-        var staticForms = staticSpecies.Forms[save.Generation];
+        var speciesData = staticSpecies[species];
+        var staticForms = speciesData.Forms[save.Generation];
 
         for (byte form = 0; form < staticForms.Length; form++)
         {

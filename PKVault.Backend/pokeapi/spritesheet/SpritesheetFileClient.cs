@@ -3,7 +3,7 @@
  */
 public partial class SpritesheetFileClient
 {
-    public static readonly string[] SheetsParts = [.. GenStaticDataService.GetGeneratedPathParts(), "sheets"];
+    public static readonly string[] SheetsParts = [.. StaticDataGenerator<object>.GetGeneratedPathParts(), "sheets"];
 
     private readonly AssemblyClient assemblyClient = new();
 

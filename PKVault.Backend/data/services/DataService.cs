@@ -120,7 +120,7 @@ public class DataService(
             return null;
         }
 
-        return await staticDataService.GetStaticData();
+        return await staticDataService.GetStaticDataDTO();
     }
 
     private async Task<WarningsDTO?> GetPossibleWarnings(bool flag)

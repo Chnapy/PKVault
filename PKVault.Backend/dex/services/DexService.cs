@@ -32,7 +32,7 @@ public class DexService(
             : savesLoadersService.GetLoaders(id).Save
         )];
 
-        var staticData = await staticDataService.GetStaticData();
+        var staticSpecies = await staticDataService.GetStaticSpecies();
 
         var maxSpecies = saves.Max(save => save.MaxSpeciesID);
 
@@ -45,7 +45,7 @@ public class DexService(
             var service = GetDexService(save);
 
             // var time = LogUtil.Time($"Update Dex with save {save.ID32} {save.Version}");
-            var success = service != null && (await service.UpdateDexWithSave(dex, staticData, speciesSet));
+            var success = service != null && (await service.UpdateDexWithSave(dex, staticSpecies, speciesSet));
             // time();
         }
 

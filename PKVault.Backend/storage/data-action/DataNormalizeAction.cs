@@ -139,8 +139,7 @@ public class DataNormalizeAction(
             return false;
         }
 
-        var staticData = await staticDataService.GetStaticData();
-        var evolves = staticData.Evolves;
+        var evolves = await staticDataService.GetStaticEvolves();
 
         var legacyBankLoader = new LegacyBankLoader(fileIOService, dbPath);
         var legacyBoxLoader = new LegacyBoxLoader(fileIOService, dbPath);
@@ -270,7 +269,7 @@ public class DataNormalizeAction(
     // - wrong attached save pkm ID
     private async Task MigrateVariantsFrom161()
     {
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await staticDataService.GetStaticEvolves();
 
         var allVariants = await pkmVariantLoader.GetAllEntities();
 
@@ -285,7 +284,7 @@ public class DataNormalizeAction(
                 continue;
             }
 
-            var pkmId = pkm.GetPKMIdBase(staticData.Evolves);
+            var pkmId = pkm.GetPKMIdBase(evolves);
 
             // wrong context
             if (pkm.Context != variant.Context)

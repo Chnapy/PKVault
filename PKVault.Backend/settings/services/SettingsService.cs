@@ -35,7 +35,9 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             settingsMutable
         );
 
-        var userId = await sp.GetRequiredService<IMetaLoader>().GetUserId();
+        using var scope = sp.CreateScope();
+
+        var userId = await scope.ServiceProvider.GetRequiredService<IMetaLoader>().GetUserId();
 
         BaseSettings = ReadBaseSettings() with
         {
@@ -44,7 +46,6 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
         saveService.InvalidateSaves();
 
-        using var scope = sp.CreateScope();
         var flags = await sessionService.StartNewSession(checkInitialActions: true);
 
         if (!sessionService.HasEmptyActionList())
@@ -61,9 +62,11 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         await semaphore.WaitAsync();
         try
         {
+            var scope = sp.CreateScope();
+
             // DB use is required to avoid rare first-run app crash after language selection
             // trigger DB creation, migration etc
-            var userId = await sp.GetRequiredService<IMetaLoader>().GetUserId();
+            var userId = await scope.ServiceProvider.GetRequiredService<IMetaLoader>().GetUserId();
 
             BaseSettings = GetSettings() with
             {

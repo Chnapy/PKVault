@@ -11,7 +11,7 @@ public class MainCreatePkmVariantActionInput(string pkmVariantId, EntityContext 
 }
 
 public class MainCreatePkmVariantAction(
-    IPkmConvertService pkmConvertService, StaticDataService staticDataService,
+    IPkmConvertService pkmConvertService,
     IPkmVariantLoader pkmVariantLoader, IBoxLoader boxLoader
 ) : DataAction<MainCreatePkmVariantActionInput>
 {
@@ -39,8 +39,6 @@ public class MainCreatePkmVariantAction(
         {
             throw new ArgumentException($"Pkm-version already exists, pkmVariant.id={pkmVariantEntity.Id} context={input.Context}");
         }
-
-        var staticData = await staticDataService.GetStaticData();
 
         var pkmOrigin = await pkmVariantLoader.GetPKM(pkmVariantOrigin);
 

@@ -488,8 +488,8 @@ public class MovePkmAction(
         // enable national-dex in G3 RSE if pkm outside of regional-dex
         if (save.GetSave() is SAV3 saveG3RSE && saveG3RSE.LargeBlock is ISaveBlock3LargeHoenn && !saveG3RSE.NationalDex)
         {
-            var staticData = await staticDataService.GetStaticData();
-            var isInDex = staticData.Species[(ushort)species].PokedexIndexes.ContainsKey("hoenn");
+            var staticSpecies = await staticDataService.GetStaticSpecies();
+            var isInDex = staticSpecies[(ushort)species].PokedexIndexes.ContainsKey("hoenn");
 
             if (!isInDex)
             {
