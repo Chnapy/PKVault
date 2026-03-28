@@ -7,7 +7,7 @@ using System.Text.Json;
  */
 public class BackupService(
     IServiceProvider sp, TimeProvider timeProvider,
-    IFileIOService fileIOService, ISaveService saveService,
+    IFileIOService fileIOService, ISavesLoadersService savesLoadersService,
     ISettingsService settingsService, ISessionService sessionService
 )
 {
@@ -115,16 +115,16 @@ public class BackupService(
     {
         var paths = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
 
-        var savesById = await saveService.GetSaveById();
+        var savesPaths = savesLoadersService.GetSaveById().Values
+            .Select(save => save.Metadata.FilePath);
 
-        if (savesById.Count == 0)
+        if (!savesPaths.Any())
         {
             return paths;
         }
 
-        foreach (var save in savesById.Values)
+        foreach (var path in savesPaths)
         {
-            var path = save.Metadata.FilePath;
             if (string.IsNullOrEmpty(path))
             {
                 continue;
@@ -136,8 +136,10 @@ public class BackupService(
             var newFilename = $"{filename}_{hashCode}{ext}";
             var relativePath = Path.Combine("saves", newFilename);
 
+            var fileContent = await fileIOService.ReadBytes(path);
+
             paths.Add(NormalizePath(relativePath), (
-                TargetPath: NormalizePath(path), FileContent: save.GetSaveFileData()
+                TargetPath: NormalizePath(path), FileContent: fileContent
             ));
         }
 
@@ -304,7 +306,7 @@ public class BackupService(
 
         logtime.Stop();
 
-        saveService.InvalidateSaves();
+        savesLoadersService.Clear();
         await sessionService.StartNewSession(checkInitialActions: true);
     }
 
@@ -320,7 +322,7 @@ public class BackupService(
 
             logtime.Stop();
 
-            saveService.InvalidateSaves();
+            savesLoadersService.Clear();
             await sessionService.StartNewSession(checkInitialActions: false);
         }
         catch (Exception ex)

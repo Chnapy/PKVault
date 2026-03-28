@@ -9,7 +9,7 @@ public class StaticDataController(StaticDataService staticDataService) : Control
     [HttpGet]
     public async Task<ActionResult<StaticDataDTO>> Get()
     {
-        return await staticDataService.GetStaticData();
+        return await staticDataService.GetStaticDataDTO();
     }
 
     [HttpGet("spritesheet/{sheetName}")]

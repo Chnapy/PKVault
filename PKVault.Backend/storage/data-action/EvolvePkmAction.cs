@@ -74,8 +74,6 @@ public class EvolvePkmAction(
 
     private async Task<DataActionPayload> ExecuteForMain(DataUpdateFlags flags, string id)
     {
-        var staticData = await staticDataService.GetStaticData();
-
         var entity = await pkmVariantLoader.GetEntity(id) ?? throw new KeyNotFoundException("Pkm-variant not found");
         var dto = await pkmVariantLoader.CreateDTO(entity);
 
@@ -138,9 +136,9 @@ public class EvolvePkmAction(
 
     private async Task<(ushort evolveSpecies, bool evolveByItem)> GetEvolve(ImmutablePKM pkm)
     {
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await staticDataService.GetStaticEvolves();
 
-        if (staticData.Evolves.TryGetValue(pkm.Species, out var staticEvolve))
+        if (evolves.TryGetValue(pkm.Species, out var staticEvolve))
         {
             var version = pkm.Context.GetSingleGameVersion();
             if (pkm.HeldItemPokeapiName != null && staticEvolve.TradeWithItem.TryGetValue(pkm.HeldItemPokeapiName, out var evolveMap))

@@ -20,31 +20,30 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
     private static readonly SemaphoreSlim semaphore = new(1);
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
-    private ISaveService saveService => sp.GetRequiredService<ISaveService>();
+    private ISavesLoadersService savesLoadersService => sp.GetRequiredService<ISavesLoadersService>();
     private ISessionService sessionService => sp.GetRequiredService<ISessionService>();
 
     private SettingsDTO? BaseSettings;
 
     public async Task<DataUpdateFlags?> UpdateSettings(SettingsMutableDTO settingsMutable)
     {
-        var sessionService = sp.GetRequiredService<ISessionService>();
-
         await fileIOService.WriteJSONFile(
             FilePath,
             SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
             settingsMutable
         );
 
-        var userId = await sp.GetRequiredService<IMetaLoader>().GetUserId();
+        using var scope = sp.CreateScope();
+
+        var userId = await scope.ServiceProvider.GetRequiredService<IMetaLoader>().GetUserId();
 
         BaseSettings = ReadBaseSettings() with
         {
             UserId = userId
         };
 
-        saveService.InvalidateSaves();
+        savesLoadersService.Clear();
 
-        using var scope = sp.CreateScope();
         var flags = await sessionService.StartNewSession(checkInitialActions: true);
 
         if (!sessionService.HasEmptyActionList())
@@ -61,9 +60,11 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         await semaphore.WaitAsync();
         try
         {
+            var scope = sp.CreateScope();
+
             // DB use is required to avoid rare first-run app crash after language selection
             // trigger DB creation, migration etc
-            var userId = await sp.GetRequiredService<IMetaLoader>().GetUserId();
+            var userId = await scope.ServiceProvider.GetRequiredService<IMetaLoader>().GetUserId();
 
             BaseSettings = GetSettings() with
             {

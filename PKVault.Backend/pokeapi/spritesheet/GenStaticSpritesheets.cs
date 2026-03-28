@@ -4,19 +4,54 @@ using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
+public record StaticSpritesheetsData(
+    Dictionary<string, SpriteInfo> Species,
+    Dictionary<string, SpriteInfo> Items
+);
+
+public record SpriteInfo(string SheetName, int X, int Y, int Width, int Height);
+
 /**
  * Generator not used during classic run.
  * 
  * Generates species and items spritesheets.
  */
-public class GenSpritesheetService(IFileIOService fileIOService)
+public class GenStaticSpritesheets(
+    IFileIOService fileIOService,
+    StaticSpeciesData staticSpecies, Dictionary<int, StaticItem> staticItems
+) : StaticDataGenerator<StaticSpritesheetsData>(
+   jsonTypeInfo: StaticDataJsonContext.Default.StaticSpritesheetsData,
+   jsonTypeInfoIndented: new StaticDataJsonContext(JsonIndentedOptions).StaticSpritesheetsData,
+   fileIOService
+)
 {
     private const string SourcePath = "../pokeapi/sprites";
     private const string CustomSourcePath = "./pokeapi/spritesheet";
-    private static readonly string TargetPath = Path.Combine([.. GenStaticDataService.GetGeneratedPathParts(), "sheets"]);
+    private static readonly string TargetPath = Path.Combine([.. StaticDataGenerator<object>.GetGeneratedPathParts(), "sheets"]);
 
-    public async Task<StaticSpritesheets> GenerateAllSpritesheets(
-        Dictionary<ushort, StaticSpecies> staticSpecies,
+    private static readonly string Filename = $"StaticSpritesheets";
+    public static async Task<StaticSpritesheetsData> LoadData()
+    {
+        var client = new AssemblyClient();
+
+        var data = await client.GetAsyncJsonGz(
+            [.. GetDataPathParts(Filename)],
+            StaticDataJsonContext.Default.StaticSpritesheetsData
+        );
+        ArgumentNullException.ThrowIfNull(data);
+
+        return data;
+    }
+
+    protected override async Task<StaticSpritesheetsData> GetData()
+    {
+        return await GenerateAllSpritesheets(staticSpecies, staticItems);
+    }
+
+    protected override string GetFilenameWithoutExtension() => Filename;
+
+    private async Task<StaticSpritesheetsData> GenerateAllSpritesheets(
+        StaticSpeciesData staticSpecies,
         Dictionary<int, StaticItem> staticItems
     )
     {
@@ -32,14 +67,14 @@ public class GenSpritesheetService(IFileIOService fileIOService)
         );
     }
 
-    private async Task<Dictionary<string, SpriteInfo>> GenerateSpeciesSpritesheet(Dictionary<ushort, StaticSpecies> staticSpecies)
+    private async Task<Dictionary<string, SpriteInfo>> GenerateSpeciesSpritesheet(StaticSpeciesData staticSpecies)
     {
         var speciesBySpritesheet = staticSpecies.Values
             .Chunk(100);
 
         var spritesInfosList = await Task.WhenAll(speciesBySpritesheet.Select((speciesList, sheetIndex) => GenerateChunk(
             [
-                .. sheetIndex == 0 ? new string[] { GenStaticDataService.GetEggSprite() } : [],
+                .. sheetIndex == 0 ? new string[] { GenStaticOthers.GetEggSprite() } : [],
                 .. speciesList.SelectMany(staticSp =>
                     staticSp.Forms.Values.SelectMany(gen => gen.SelectMany(form =>
                         new List<string?>() {

@@ -161,7 +161,7 @@ public class SessionService(
         var savesLoaders = scope.ServiceProvider.GetRequiredService<ISavesLoadersService>();
         var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
 
-        var hasAnyData = savesLoaders.GetAllLoaders().Count > 0
+        var hasAnyData = savesLoaders.GetAllLoaders().Length > 0
             || await pkmVariantLoader.Any();
 
         if (!hasAnyData)

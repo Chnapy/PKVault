@@ -49,7 +49,7 @@ public class UpdateExternalPkmAction(
         var searchPathsNotIncluded = searchPaths
             .Where(path => !Filepaths.Contains(path));
 
-        var evolves = (await staticDataService.GetStaticData()).Evolves;
+        var evolves = await staticDataService.GetStaticEvolves();
 
         // avoid CPU spikes
         using var semaphore = new SemaphoreSlim(16);

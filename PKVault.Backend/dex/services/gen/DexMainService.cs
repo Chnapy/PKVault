@@ -4,7 +4,7 @@ public class DexMainService(
     IServiceProvider sp
 ) : DexGenService(FakeSaveFile.Default)
 {
-    public override async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData, HashSet<ushort>? speciesSet)
+    public override async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticSpeciesData staticSpecies, HashSet<ushort>? speciesSet)
     {
         using var _ = LogUtil.Time($"DexMainService.UpdateDexWithSave");
 

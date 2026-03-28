@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Caching.Memory;
 using PKHeX.Core;
 
 /**
@@ -6,27 +7,74 @@ using PKHeX.Core;
  */
 public class StaticDataService(ISettingsService settingsService)
 {
-    public static readonly EntityContext LAST_ENTITY_CONTEXT = GenStaticDataService.LAST_ENTITY_CONTEXT;
-    private readonly ConcurrentDictionary<string, StaticDataDTO> StaticDataDict = [];
+    public static readonly EntityContext LAST_ENTITY_CONTEXT = StaticDataGenerator<object>.LAST_ENTITY_CONTEXT;
+
+    private readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions() { });
 
     private readonly SpritesheetFileClient spritesheetFileClient = new();
 
-    public async Task<StaticDataDTO> GetStaticData() => await GetStaticData(settingsService.GetSettings().GetSafeLanguage());
-
-    public async Task<StaticDataDTO> GetStaticData(string lang)
+    public async Task<StaticDataDTO> GetStaticDataDTO(string? lang = null)
     {
-        if (!StaticDataDict.TryGetValue(lang, out var staticData))
-        {
-            var client = new AssemblyClient();
+        lang ??= settingsService.GetSettings().GetSafeLanguage();
 
-            staticData = (await client.GetAsyncJsonGz(
-                GenStaticDataService.GetStaticDataPathParts(lang),
-                StaticDataJsonContext.Default.StaticDataDTO
-            ))!;
-            StaticDataDict[lang] = staticData;
-        }
+        var spritesheets = GetStaticSpritesheets();
+        var evolves = GetStaticEvolves();
+        var species = GetStaticSpecies(lang);
+        var others = await GetStaticOthers(lang);
 
-        return staticData;
+        return new(
+            Versions: others.Versions,
+            Species: await species,
+            Stats: others.Stats,
+            Types: others.Types,
+            Moves: others.Moves,
+            Natures: others.Natures,
+            Abilities: others.Abilities,
+            Items: others.Items,
+            Evolves: await evolves,
+            Generations: others.Generations,
+            Pokedexes: others.Pokedexes,
+            Ribbons: others.Ribbons,
+            Languages: others.Languages,
+            Spritesheets: await spritesheets,
+            EggSprite: others.EggSprite
+        );
+    }
+
+    public async Task<StaticSpritesheetsData> GetStaticSpritesheets()
+    {
+        return await GetCacheValue(
+            "spritesheets",
+            "",
+            _ => GenStaticSpritesheets.LoadData()
+        );
+    }
+
+    public async Task<StaticEvolvesData> GetStaticEvolves()
+    {
+        return await GetCacheValue(
+            "evolves",
+            "",
+            _ => GenStaticEvolves.LoadData()
+        );
+    }
+
+    public async Task<StaticSpeciesData> GetStaticSpecies(string? lang = null)
+    {
+        return await GetCacheValue(
+            "species",
+            lang ?? settingsService.GetSettings().GetSafeLanguage(),
+            GenStaticSpecies.LoadData
+        );
+    }
+
+    public async Task<StaticOthersData> GetStaticOthers(string? lang = null)
+    {
+        return await GetCacheValue(
+            "others",
+            lang ?? settingsService.GetSettings().GetSafeLanguage(),
+            GenStaticOthers.LoadData
+        );
     }
 
     public async Task<Stream> GetSpritesheetStream(string sheetName)
@@ -34,9 +82,26 @@ public class StaticDataService(ISettingsService settingsService)
         return await spritesheetFileClient.GetAsyncString(sheetName);
     }
 
-    public static GameVersion GetSingleVersion(GameVersion version) => GenStaticDataService.GetSingleVersion(version);
+    private async Task<D> GetCacheValue<D>(string cacheKey, string lang, Func<string, Task<D>> loadFn)
+    {
+        if (!Cache.TryGetValue(cacheKey, out Tuple<string, D>? value) || value?.Item1 != lang)
+        {
+            Console.WriteLine($"Update static cache: {cacheKey}");
 
-    public static string GetPokeapiItemName(string pkhexItemName) => GenStaticDataService.GetPokeapiItemName(pkhexItemName);
+            value = new(lang, await loadFn(lang));
+
+            Cache.Set(cacheKey, value, new MemoryCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromSeconds(20),
+            });
+        }
+
+        return value.Item2;
+    }
+
+    public static GameVersion GetSingleVersion(GameVersion version) => GenStaticOthers.GetSingleVersion(version);
+
+    public static string GetPokeapiItemName(string pkhexItemName) => GenStaticOthers.GetPokeapiItemName(pkhexItemName);
 
     public static int GetBallPokeApiId(Ball ball) => ball switch
     {

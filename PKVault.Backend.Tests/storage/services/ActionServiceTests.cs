@@ -33,14 +33,6 @@ public class ActionServiceTests
             mockSessionService.Setup(x => x.PersistSession(It.IsAny<IServiceScope>())).ThrowsAsync(new Exception());
         }
 
-        Mock<ISaveService> mockSaveService = new();
-
-        var saveWrapper = SaveWrapperTests.GetMockSave("mock-save-path", Encoding.ASCII.GetBytes("mock-save-content"));
-        mockSaveService.Setup(x => x.GetSaveById()).ReturnsAsync(new Dictionary<uint, SaveWrapper>()
-        {
-            {saveWrapper.Object.Id, saveWrapper.Object}
-        });
-
         mockFileSystem.AddFile("mock-pkm-files/123", "mock-data");
 
         var mockPkmFileService = new Mock<IPkmFileLoader>();
@@ -53,7 +45,16 @@ public class ActionServiceTests
 
         var sp = serviceCollection.BuildServiceProvider();
 
-        SavesLoadersService savesLoadersService = new(sp, mockSaveService.Object);
+        Mock<ISavesLoadersService> savesLoadersService = new();
+
+        var mockSavePath = MatcherUtil.NormalizePath(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-save-path"));
+        mockFileSystem.AddFile(mockSavePath, "mock-save-content");
+
+        var saveWrapper = SaveWrapperTests.GetMockSave(mockSavePath, Encoding.ASCII.GetBytes("mock-save-content"));
+        savesLoadersService.Setup(x => x.GetSaveById()).Returns(new Dictionary<uint, SaveWrapper>()
+        {
+            {saveWrapper.Object.Id, saveWrapper.Object}
+        });
 
         return new(
             sp: sp,
@@ -62,13 +63,13 @@ public class ActionServiceTests
                 sp: sp,
                 mockTimeProvider.Object,
                 fileIOService,
-                mockSaveService.Object,
+                savesLoadersService.Object,
                 mockSettingsService.Object,
                 mockSessionService.Object
             ),
             settingsService: mockSettingsService.Object,
             sessionService: mockSessionService.Object,
-            savesLoadersService: savesLoadersService
+            savesLoadersService: savesLoadersService.Object
         );
     }
 

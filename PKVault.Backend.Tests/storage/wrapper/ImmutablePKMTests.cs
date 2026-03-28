@@ -2,17 +2,11 @@ using PKHeX.Core;
 
 public class ImmutablePKMTests : IAsyncLifetime
 {
-    private Dictionary<ushort, StaticEvolve> evolves;
+    private StaticEvolvesData evolves;
 
     public async ValueTask InitializeAsync()
     {
-        var client = new AssemblyClient();
-
-        var staticData = (await client.GetAsyncJsonGz(
-            GenStaticDataService.GetStaticDataPathParts("en"),
-            StaticDataJsonContext.Default.StaticDataDTO
-        ))!;
-        evolves = staticData.Evolves;
+        evolves = await GenStaticEvolves.LoadData();
     }
 
     public async ValueTask DisposeAsync()

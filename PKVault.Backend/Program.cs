@@ -83,10 +83,7 @@ public class Program
 
         return async () =>
         {
-            await Task.WhenAll([
-                host.Services.GetRequiredService<ISaveService>().EnsureInitialized(),
-                host.Services.GetRequiredService<ISessionServiceMinimal>().EnsureSessionCreated(),
-            ]);
+            await host.Services.GetRequiredService<ISessionServiceMinimal>().EnsureSessionCreated();
         };
 #else
         throw new Exception("Mode not defined");
@@ -178,7 +175,6 @@ public class Program
 
 #if MODE_GEN_POKEAPI
         services.AddSingleton<PokeApiService>();
-        services.AddSingleton<GenSpritesheetService>();
         services.AddSingleton<GenStaticDataService>();
 #endif
 
@@ -201,7 +197,6 @@ public class Program
         services.AddSingleton<DexService>();
         services.AddSingleton<WarningsService>();
         services.AddSingleton<BackupService>();
-        services.AddSingleton<ISaveService, SaveService>();
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<DataService>();
         services.AddSingleton<IPkmConvertService, PkmConvertService>();

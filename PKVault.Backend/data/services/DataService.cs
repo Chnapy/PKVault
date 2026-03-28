@@ -3,7 +3,7 @@
  */
 public class DataService(
     ISessionService sessionService, StorageQueryService storageQueryService, StaticDataService staticDataService,
-    WarningsService warningsService, DexService dexService, ISaveService saveService,
+    WarningsService warningsService, DexService dexService, ISavesLoadersService savesLoadersService,
     BackupService backupService, ISettingsService settingsService
 )
 {
@@ -37,7 +37,7 @@ public class DataService(
             );
         }));
 
-        var saveInfosTask = GetPossibleSaveInfos(flags.SaveInfos);
+        var saveInfos = GetPossibleSaveInfos(flags.SaveInfos);
 
         var backups = flags.Backups
             ? backupService.GetBackupList()
@@ -99,7 +99,7 @@ public class DataService(
             MainPkmLegalities: await mainPkmLegalitiesTask,
             Saves: [.. await savesTask],
             InvalidateAllSaves: flags.Saves.All,
-            SaveInfos: await saveInfosTask,
+            SaveInfos: saveInfos,
             Backups: backups,
             Dex: await dexTask
         );
@@ -120,7 +120,7 @@ public class DataService(
             return null;
         }
 
-        return await staticDataService.GetStaticData();
+        return await staticDataService.GetStaticDataDTO();
     }
 
     private async Task<WarningsDTO?> GetPossibleWarnings(bool flag)
@@ -290,13 +290,13 @@ public class DataService(
         return null;
     }
 
-    private async Task<Dictionary<uint, SaveInfosDTO>?> GetPossibleSaveInfos(bool flag)
+    private IDictionary<uint, SaveInfosDTO>? GetPossibleSaveInfos(bool flag)
     {
         if (!flag)
         {
             return null;
         }
 
-        return await saveService.GetAllSaveInfos();
+        return savesLoadersService.GetAllSaveInfos();
     }
 }
