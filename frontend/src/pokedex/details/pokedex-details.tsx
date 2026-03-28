@@ -4,7 +4,7 @@ import { Gender as GenderType } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from "../../routes/pokedex";
 import { useTranslate } from '../../translate/i18n';
-import { BallImg } from '../../ui/details-card/ball-img';
+import { BallImg } from '../../ui/img/ball-img';
 import { DetailsCardContainer, type DetailsExpandedState } from '../../ui/details-card/details-card-container';
 import { DetailsMainImg } from '../../ui/details-card/details-main-img';
 import { DetailsMainInfos } from '../../ui/details-card/details-main-infos';

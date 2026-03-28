@@ -3,7 +3,7 @@ import type React from 'react';
 import type { EntityContext, GameVersion } from '../../data/sdk/model';
 import { getEntityContextGenerationName } from '../../data/util/get-entity-context-generation-name';
 import { useStaticData } from '../../hooks/use-static-data';
-import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
+import { GameImg } from '../img/game-img';
 
 export type DetailsTitleProps = {
     context: EntityContext;
@@ -26,10 +26,7 @@ export const DetailsTitle: React.FC<React.PropsWithChildren<DetailsTitleProps>> 
         : undefined;
 
     return <>
-        <img
-            src={getGameInfos(contextVersion).img}
-            className={css({ height: 28, width: 28 })}
-        />
+        <GameImg version={contextVersion} size={28} />
 
         {title && <div className={css({
             flexGrow: 1,

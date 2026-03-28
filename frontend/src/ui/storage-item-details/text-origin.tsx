@@ -2,10 +2,10 @@ import { css } from '@emotion/css';
 import type React from 'react';
 import type { GameVersion, Gender as GenderType } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
-import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { useTranslate } from '../../translate/i18n';
 import { DetailsLevel } from '../details-card/details-level';
 import { Gender } from '../gender/gender';
+import { GameImg } from '../img/game-img';
 import { DOLine } from '../save-card/do-line';
 import { theme } from '../theme';
 import { renderDate } from '../util/render-date-time';
@@ -43,8 +43,6 @@ export const TextOrigin: React.FC<TextOriginProps> = ({
 
     const { versions } = useStaticData();
 
-    const gameinfos = getGameInfos(version);
-
     return <>
         {isCurrentHandler && <>
             {t('details.ht')} <span className={css({ color: theme.text.primary })}>{handlingTrainerName}</span> <Gender gender={handlingTrainerGender} />
@@ -53,13 +51,9 @@ export const TextOrigin: React.FC<TextOriginProps> = ({
         </>}
         <span className={css({ color: theme.text.primary })}>{t('details.origin')}</span>
         <br />
-        <img
-            src={gameinfos.img}
-            className={css({
-                height: '1lh',
-                width: '1lh',
-                verticalAlign: 'middle'
-            })}
+        <GameImg
+            version={version}
+            size='1lh'
         /> <span className={css({ color: theme.text.primary })}>{t('save.pkm')} {versions[ version ?? -1 ]?.name}</span>
         <br />
         <DOLine

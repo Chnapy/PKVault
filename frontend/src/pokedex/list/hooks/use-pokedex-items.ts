@@ -1,8 +1,9 @@
 import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
-import type { DexItemForm, EntityContext, Gender } from '../../../data/sdk/model';
+import type { DexItemForm, EntityContext, GameVersion, Gender } from '../../../data/sdk/model';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from '../../../routes/pokedex';
 import { filterIsDefined } from '../../../util/filter-is-defined';
+import { getGameInfos } from '../../details/util/get-game-infos';
 import { usePokedexFilters } from './use-pokedex-filters';
 
 type PokedexItems = Counts & {
@@ -12,6 +13,7 @@ type PokedexItems = Counts & {
 
 type SpeciesItemsByGeneration = Counts & {
     generation: number;
+    versionsForImgs: GameVersion[];
     speciesInfos: SpeciesInfos[];
 };
 
@@ -193,9 +195,28 @@ export const usePokedexItems = (): PokedexItems => {
         const totalCount = acc[ generation ]?.totalCount ?? 0;
         const itemsCount = acc[ generation ]?.itemsCount ?? 0;
 
+        const getVersionsForImgs = () => {
+            const versions = Object.values(staticData.versions)
+                .filter(version =>
+                    version.region.some(region => staticData.generations[ generation ]?.regions.includes(region))
+                )
+                .sort((v1, v2) => v1.generation - v2.generation)
+                .map(version => version.id as GameVersion);
+
+            return Object.values(
+                versions.reduce<Record<string, GameVersion>>((acc, version) => ({
+                    ...acc,
+                    [ getGameInfos(version).img ]: version,
+                }), {})
+            );
+        };
+
+        const versionsForImgs = acc[ generation ]?.versionsForImgs ?? getVersionsForImgs();
+
         const itemForGeneration: SpeciesItemsByGeneration = {
             ...acc[ generation ],
             generation,
+            versionsForImgs,
             speciesInfos: [
                 ...acc[ generation ]?.speciesInfos ?? [],
                 {

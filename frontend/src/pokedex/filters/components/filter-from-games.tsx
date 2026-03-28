@@ -1,12 +1,12 @@
+import { css } from '@emotion/css';
 import React from "react";
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
 import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
+import { GameImg } from '../../../ui/img/game-img';
 import { filterIsDefined } from '../../../util/filter-is-defined';
-import { getGameInfos } from '../../details/util/get-game-infos';
-import { css } from '@emotion/css';
 
 export const FilterFromGames: React.FC = () => {
   const { t } = useTranslate();
@@ -29,12 +29,9 @@ export const FilterFromGames: React.FC = () => {
         alignItems: 'center',
         gap: 4,
       })}>
-        <img
-          src={getGameInfos(null).img}
-          className={css({
-            height: 14,
-            width: 14,
-          })}
+        <GameImg
+          version={null}
+          size={14}
         />
         PKVault
       </div>
@@ -51,12 +48,9 @@ export const FilterFromGames: React.FC = () => {
             alignItems: 'center',
             gap: 4,
           })}>
-            <img
-              src={getGameInfos(save.version).img}
-              className={css({
-                height: 14,
-                width: 14,
-              })}
+            <GameImg
+              version={save.version}
+              size={14}
             />
             {name} - {save.trainerName}
           </div>
@@ -78,12 +72,9 @@ export const FilterFromGames: React.FC = () => {
       }}
       options={options}
     >
-      <img
-        src={getGameInfos(null).img}
-        className={css({
-          height: 14,
-          width: 14,
-        })}
+      <GameImg
+        version={null}
+        size={14}
       />
       {t('dex.filters.games')}
     </FilterSelect>

@@ -1,10 +1,11 @@
+import { css, cx } from '@emotion/css';
 import type React from 'react';
 import { GameVersion } from '../../data/sdk/model';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Button, type ButtonProps } from '../button/button';
 import { Icon } from '../icon/icon';
+import { GameImg } from '../img/game-img';
 import { theme } from '../theme';
-import { css, cx } from '@emotion/css';
 
 export type DetailsTabProps = {
     isEnabled?: boolean;
@@ -30,13 +31,7 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({ isEnabled = true, contex
             } : undefined,
         }), rest.className)}
     >
-        <img
-            src={gameInfos.img}
-            className={css({
-                height: '1lh',
-                width: '1lh',
-            })}
-        />
+        <GameImg version={contextVersion} size='1lh' />
         <span className={cx({
             [ css({ borderBottom: '1px solid currentColor' }) ]: original
         })}>{otName}</span> {warning && isEnabled && <div className={css({

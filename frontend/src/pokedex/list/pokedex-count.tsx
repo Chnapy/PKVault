@@ -1,7 +1,7 @@
 import { css } from "@emotion/css";
 import type React from "react";
 import { useTranslate } from "../../translate/i18n";
-import { BallImg } from '../../ui/details-card/ball-img';
+import { BallImg } from '../../ui/img/ball-img';
 import { Icon } from "../../ui/icon/icon";
 import { ShinyIcon } from "../../ui/icon/shiny-icon";
 import { theme } from "../../ui/theme";

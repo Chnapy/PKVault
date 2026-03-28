@@ -6,11 +6,11 @@ import type { StorageDexSyncParams } from "../../data/sdk/model";
 import { useSaveInfosGetAll } from "../../data/sdk/save-infos/save-infos.gen";
 import { useStorageDexSync } from "../../data/sdk/storage/storage.gen";
 import { useStaticData } from "../../hooks/use-static-data";
-import { getGameInfos } from "../../pokedex/details/util/get-game-infos";
 import { useTranslate } from "../../translate/i18n";
 import { Button } from "../../ui/button/button";
 import { FilterLabel } from "../../ui/filter/filter-label/filter-label";
 import { Icon } from "../../ui/icon/icon";
+import { GameImg } from '../../ui/img/game-img';
 import { theme } from "../../ui/theme";
 
 export const DexSyncAdvancedAction: React.FC<{
@@ -82,12 +82,9 @@ export const DexSyncAdvancedAction: React.FC<{
               value: "0",
               label: (
                 <>
-                  <img
-                    src={getGameInfos(null).img}
-                    className={css({
-                      height: 14,
-                      width: 14,
-                    })}
+                  <GameImg
+                    version={null}
+                    size={14}
                   />
                   PKVault
                 </>
@@ -99,12 +96,9 @@ export const DexSyncAdvancedAction: React.FC<{
               value: save.id.toString(),
               label: (
                 <>
-                  <img
-                    src={getGameInfos(save.version).img}
-                    className={css({
-                      height: 14,
-                      width: 14,
-                    })}
+                  <GameImg
+                    version={save.version}
+                    size={14}
                   />
                   {staticData.versions[ save.version ]?.name} - {save.trainerName}
                 </>
