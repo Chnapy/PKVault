@@ -15,7 +15,7 @@ public class BackupServiceTests
         fileIOService = new FileIOService(mockFileSystem);
     }
 
-    private (BackupService backupService, Mock<ISaveService> mockSaveService, Mock<ISessionService> mockSessionService)
+    private (BackupService backupService, Mock<ISavesLoadersService> mockSaveService, Mock<ISessionService> mockSessionService)
         GetService(DateTime now, bool throwOnSessionPersist = false)
     {
         var serviceCollection = new ServiceCollection();
@@ -48,10 +48,13 @@ public class BackupServiceTests
 
         PkmLegalityService pkmLegalityService = new(mockSettingsService.Object);
 
-        Mock<ISaveService> mockSaveService = new();
+        Mock<ISavesLoadersService> mockSaveService = new();
 
-        var saveWrapper = SaveWrapperTests.GetMockSave("mock-save-path", Encoding.ASCII.GetBytes("mock-save-content"));
-        mockSaveService.Setup(x => x.GetSaveById()).ReturnsAsync(new Dictionary<uint, SaveWrapper>()
+        var mockSavePath = MatcherUtil.NormalizePath(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-save-path"));
+        mockFileSystem.AddFile(mockSavePath, "mock-save-content");
+
+        var saveWrapper = SaveWrapperTests.GetMockSave(mockSavePath, Encoding.ASCII.GetBytes("mock-save-content"));
+        mockSaveService.Setup(x => x.GetSaveById()).Returns(new Dictionary<uint, SaveWrapper>()
         {
             {saveWrapper.Object.Id, saveWrapper.Object}
         });
@@ -72,7 +75,7 @@ public class BackupServiceTests
             sp: sp,
             timeProvider: mockTimeProvider.Object,
             fileIOService: fileIOService,
-            saveService: mockSaveService.Object,
+            savesLoadersService: mockSaveService.Object,
             settingsService: mockSettingsService.Object,
             sessionService: mockSessionService.Object
         );
@@ -151,7 +154,7 @@ public class BackupServiceTests
         }
 
         mockSessionService.Setup(x => x.StartNewSession(true)).Verifiable();
-        mockSave.Setup(x => x.InvalidateSaves()).Verifiable();
+        mockSave.Setup(x => x.Clear()).Verifiable();
 
         await backupService.RestoreBackup(
             DateTime.Parse("2013-03-21 13:26:11"),
@@ -176,7 +179,7 @@ public class BackupServiceTests
         });
 
         mockSessionService.Verify(x => x.StartNewSession(true));
-        mockSave.Verify(x => x.InvalidateSaves());
+        mockSave.Verify(x => x.Clear());
     }
 
     [Fact]
@@ -283,7 +286,8 @@ public class BackupServiceTests
             filenamesToCheck.Remove(filename);
         }
 
-        var saveHashCode = string.Format("{0:X}", SaveWrapperTests.GetMockSave("mock-save-path", Encoding.ASCII.GetBytes("mock-save-content")).Object.Metadata.FilePath!.GetHashCode());
+        var mockSavePath = MatcherUtil.NormalizePath(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-save-path"));
+        var saveHashCode = string.Format("{0:X}", mockSavePath.GetHashCode());
 
         AssertArchiveFileContent("_paths.json", JsonSerializer.Serialize(new Dictionary<string, string>()
                 {
@@ -296,7 +300,7 @@ public class BackupServiceTests
                     {"db/pkm-version.json","mock-db/pkm-version.json"},
                     {"db/dex.json","mock-db/dex.json"},
 
-                    {$"saves/mock-save-path_{saveHashCode}","mock-save-path"},
+                    {$"saves/mock-save-path_{saveHashCode}",mockSavePath},
                     {"main/mock-pkm-files/123","mock-pkm-files/123"}
                 }));
 

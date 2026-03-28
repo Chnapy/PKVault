@@ -27,8 +27,6 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     public async Task<DataUpdateFlags?> UpdateSettings(SettingsMutableDTO settingsMutable)
     {
-        var sessionService = sp.GetRequiredService<ISessionService>();
-
         await fileIOService.WriteJSONFile(
             FilePath,
             SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
