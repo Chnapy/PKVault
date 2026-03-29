@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-using Microsoft.Extensions.Caching.Memory;
 using PKHeX.Core;
 
 /**
@@ -9,7 +7,8 @@ public class StaticDataService(ISettingsService settingsService)
 {
     public static readonly EntityContext LAST_ENTITY_CONTEXT = StaticDataGenerator<object>.LAST_ENTITY_CONTEXT;
 
-    private readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions() { });
+    private readonly CacheWithTiming Cache = new();
+    private StaticEvolvesData? StaticEvolves = null;
 
     private readonly SpritesheetFileClient spritesheetFileClient = new();
 
@@ -41,21 +40,19 @@ public class StaticDataService(ISettingsService settingsService)
         );
     }
 
+    public async Task<StaticEvolvesData> GetStaticEvolves()
+    {
+        StaticEvolves ??= await GenStaticEvolves.LoadData();
+
+        return StaticEvolves;
+    }
+
     public async Task<StaticSpritesheetsData> GetStaticSpritesheets()
     {
         return await GetCacheValue(
             "spritesheets",
             "",
             _ => GenStaticSpritesheets.LoadData()
-        );
-    }
-
-    public async Task<StaticEvolvesData> GetStaticEvolves()
-    {
-        return await GetCacheValue(
-            "evolves",
-            "",
-            _ => GenStaticEvolves.LoadData()
         );
     }
 
@@ -84,16 +81,15 @@ public class StaticDataService(ISettingsService settingsService)
 
     private async Task<D> GetCacheValue<D>(string cacheKey, string lang, Func<string, Task<D>> loadFn)
     {
-        if (!Cache.TryGetValue(cacheKey, out Tuple<string, D>? value) || value?.Item1 != lang)
+        var value = await Cache.GetValue<Tuple<string, D>>(
+            cacheKey,
+            async () => new(lang, await loadFn(lang))
+        );
+
+        if (value.Item1 != lang)
         {
-            Console.WriteLine($"Update static cache: {cacheKey}");
-
-            value = new(lang, await loadFn(lang));
-
-            Cache.Set(cacheKey, value, new MemoryCacheEntryOptions
-            {
-                SlidingExpiration = TimeSpan.FromSeconds(20),
-            });
+            Cache.Remove(cacheKey);
+            return await GetCacheValue(cacheKey, lang, loadFn);
         }
 
         return value.Item2;

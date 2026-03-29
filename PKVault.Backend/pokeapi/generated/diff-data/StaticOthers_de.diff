@@ -1,1 +1,751 @@
 --- This file displays changes of StaticOthers_de compressed file from previous changes
+
+--- pokeapi\generated\diff-data\StaticOthers_de.diff
++++ pokeapi\generated\diff-data\StaticOthers_de.diff
+@@ -3,6 +3,8 @@
+     "0": {
+       "id": 0,
+       "name": "",
++      "context": 0,
++      "isGameVersion": false,
+       "generation": 0,
+       "region": [],
+       "pokedexes": [
+@@ -15,6 +17,8 @@
+     "1": {
+       "id": 1,
+       "name": "Saphir",
++      "context": 3,
++      "isGameVersion": true,
+       "generation": 3,
+       "region": [
+         "Hoenn"
+@@ -30,6 +34,8 @@
+     "2": {
+       "id": 2,
+       "name": "Rubin",
++      "context": 3,
++      "isGameVersion": true,
+       "generation": 3,
+       "region": [
+         "Hoenn"
+@@ -45,6 +51,8 @@
+     "3": {
+       "id": 3,
+       "name": "Smaragd",
++      "context": 3,
++      "isGameVersion": true,
+       "generation": 3,
+       "region": [
+         "Hoenn"
+@@ -60,6 +68,8 @@
+     "4": {
+       "id": 4,
+       "name": "Feuerrot",
++      "context": 3,
++      "isGameVersion": true,
+       "generation": 3,
+       "region": [
+         "Kanto"
+@@ -75,6 +85,8 @@
+     "5": {
+       "id": 5,
+       "name": "Blattgrün",
++      "context": 3,
++      "isGameVersion": true,
+       "generation": 3,
+       "region": [
+         "Kanto"
+@@ -90,6 +102,8 @@
+     "7": {
+       "id": 7,
+       "name": "HeartGold",
++      "context": 4,
++      "isGameVersion": true,
+       "generation": 4,
+       "region": [
+         "Kanto",
+@@ -106,6 +120,8 @@
+     "8": {
+       "id": 8,
+       "name": "SoulSilver",
++      "context": 4,
++      "isGameVersion": true,
+       "generation": 4,
+       "region": [
+         "Kanto",
+@@ -122,6 +138,8 @@
+     "10": {
+       "id": 10,
+       "name": "Diamant",
++      "context": 4,
++      "isGameVersion": true,
+       "generation": 4,
+       "region": [
+         "Sinnoh"
+@@ -137,6 +155,8 @@
+     "11": {
+       "id": 11,
+       "name": "Perl",
++      "context": 4,
++      "isGameVersion": true,
+       "generation": 4,
+       "region": [
+         "Sinnoh"
+@@ -152,6 +172,8 @@
+     "12": {
+       "id": 12,
+       "name": "Platin",
++      "context": 4,
++      "isGameVersion": true,
+       "generation": 4,
+       "region": [
+         "Sinnoh"
+@@ -167,6 +189,8 @@
+     "15": {
+       "id": 15,
+       "name": "Colosseum/XD",
++      "context": 3,
++      "isGameVersion": true,
+       "generation": 3,
+       "region": [],
+       "pokedexes": [
+@@ -179,6 +203,8 @@
+     "16": {
+       "id": 16,
+       "name": "Battle Revolution",
++      "context": 4,
++      "isGameVersion": true,
+       "generation": 4,
+       "region": [],
+       "pokedexes": [
+@@ -191,6 +217,8 @@
+     "20": {
+       "id": 20,
+       "name": "Weiß",
++      "context": 5,
++      "isGameVersion": true,
+       "generation": 5,
+       "region": [
+         "Einall"
+@@ -206,6 +234,8 @@
+     "21": {
+       "id": 21,
+       "name": "Schwarz",
++      "context": 5,
++      "isGameVersion": true,
+       "generation": 5,
+       "region": [
+         "Einall"
+@@ -221,6 +251,8 @@
+     "22": {
+       "id": 22,
+       "name": "Weiß 2",
++      "context": 5,
++      "isGameVersion": true,
+       "generation": 5,
+       "region": [
+         "Einall"
+@@ -236,6 +268,8 @@
+     "23": {
+       "id": 23,
+       "name": "Schwarz 2",
++      "context": 5,
++      "isGameVersion": true,
+       "generation": 5,
+       "region": [
+         "Einall"
+@@ -251,6 +285,8 @@
+     "24": {
+       "id": 24,
+       "name": "X",
++      "context": 6,
++      "isGameVersion": true,
+       "generation": 6,
+       "region": [
+         "Kalos"
+@@ -268,6 +304,8 @@
+     "25": {
+       "id": 25,
+       "name": "Y",
++      "context": 6,
++      "isGameVersion": true,
+       "generation": 6,
+       "region": [
+         "Kalos"
+@@ -285,6 +323,8 @@
+     "26": {
+       "id": 26,
+       "name": "Alpha Saphir",
++      "context": 6,
++      "isGameVersion": true,
+       "generation": 6,
+       "region": [
+         "Hoenn"
+@@ -300,6 +340,8 @@
+     "27": {
+       "id": 27,
+       "name": "Omega Rubin",
++      "context": 6,
++      "isGameVersion": true,
+       "generation": 6,
+       "region": [
+         "Hoenn"
+@@ -315,6 +357,8 @@
+     "30": {
+       "id": 30,
+       "name": "Sonne",
++      "context": 7,
++      "isGameVersion": true,
+       "generation": 7,
+       "region": [
+         "Alola"
+@@ -334,6 +378,8 @@
+     "31": {
+       "id": 31,
+       "name": "Mond",
++      "context": 7,
++      "isGameVersion": true,
+       "generation": 7,
+       "region": [
+         "Alola"
+@@ -353,6 +399,8 @@
+     "32": {
+       "id": 32,
+       "name": "Ultrasonne",
++      "context": 7,
++      "isGameVersion": true,
+       "generation": 7,
+       "region": [
+         "Alola"
+@@ -372,6 +420,8 @@
+     "33": {
+       "id": 33,
+       "name": "Ultramond",
++      "context": 7,
++      "isGameVersion": true,
+       "generation": 7,
+       "region": [
+         "Alola"
+@@ -391,6 +441,8 @@
+     "34": {
+       "id": 34,
+       "name": "",
++      "context": 11,
++      "isGameVersion": true,
+       "generation": 0,
+       "region": [],
+       "pokedexes": [
+@@ -403,6 +455,8 @@
+     "35": {
+       "id": 35,
+       "name": "Rot",
++      "context": 1,
++      "isGameVersion": true,
+       "generation": 1,
+       "region": [
+         "Kanto"
+@@ -418,6 +472,8 @@
+     "36": {
+       "id": 36,
+       "name": "Blau",
++      "context": 1,
++      "isGameVersion": true,
+       "generation": 1,
+       "region": [
+         "Kanto"
+@@ -433,6 +489,8 @@
+     "37": {
+       "id": 37,
+       "name": "Blau",
++      "context": 1,
++      "isGameVersion": true,
+       "generation": 1,
+       "region": [
+         "Kanto"
+@@ -448,6 +506,8 @@
+     "38": {
+       "id": 38,
+       "name": "Gelb",
++      "context": 1,
++      "isGameVersion": true,
+       "generation": 1,
+       "region": [
+         "Kanto"
+@@ -463,6 +523,8 @@
+     "39": {
+       "id": 39,
+       "name": "Gold",
++      "context": 2,
++      "isGameVersion": true,
+       "generation": 2,
+       "region": [
+         "Kanto",
+@@ -479,6 +541,8 @@
+     "40": {
+       "id": 40,
+       "name": "Silber",
++      "context": 2,
++      "isGameVersion": true,
+       "generation": 2,
+       "region": [
+         "Kanto",
+@@ -495,6 +559,8 @@
+     "41": {
+       "id": 41,
+       "name": "Kristall",
++      "context": 2,
++      "isGameVersion": true,
+       "generation": 2,
+       "region": [
+         "Kanto",
+@@ -511,6 +577,8 @@
+     "42": {
+       "id": 42,
+       "name": "Let’s Go, Pikachu!",
++      "context": 11,
++      "isGameVersion": true,
+       "generation": 7,
+       "region": [
+         "Kanto"
+@@ -526,6 +594,8 @@
+     "43": {
+       "id": 43,
+       "name": "Let’s Go, Evoli!",
++      "context": 11,
++      "isGameVersion": true,
+       "generation": 7,
+       "region": [
+         "Kanto"
+@@ -541,6 +611,8 @@
+     "44": {
+       "id": 44,
+       "name": "Schwert",
++      "context": 8,
++      "isGameVersion": true,
+       "generation": 8,
+       "region": [
+         "Galar"
+@@ -558,6 +630,8 @@
+     "45": {
+       "id": 45,
+       "name": "Schild",
++      "context": 8,
++      "isGameVersion": true,
+       "generation": 8,
+       "region": [
+         "Galar"
+@@ -575,6 +649,8 @@
+     "47": {
+       "id": 47,
+       "name": "Legenden: Arceus",
++      "context": 12,
++      "isGameVersion": true,
+       "generation": 8,
+       "region": [
+         "Hisui"
+@@ -590,6 +666,8 @@
+     "48": {
+       "id": 48,
+       "name": "Strahlender Diamant",
++      "context": 13,
++      "isGameVersion": true,
+       "generation": 8,
+       "region": [
+         "Sinnoh"
+@@ -605,6 +683,8 @@
+     "49": {
+       "id": 49,
+       "name": "Leuchtende Perle",
++      "context": 13,
++      "isGameVersion": true,
+       "generation": 8,
+       "region": [
+         "Sinnoh"
+@@ -620,6 +700,8 @@
+     "50": {
+       "id": 50,
+       "name": "Karmesin",
++      "context": 9,
++      "isGameVersion": true,
+       "generation": 9,
+       "region": [
+         "Paldea"
+@@ -635,6 +717,8 @@
+     "51": {
+       "id": 51,
+       "name": "Purpur",
++      "context": 9,
++      "isGameVersion": true,
+       "generation": 9,
+       "region": [
+         "Paldea"
+@@ -650,6 +734,8 @@
+     "52": {
+       "id": 52,
+       "name": "Legenden: Z-A",
++      "context": 14,
++      "isGameVersion": true,
+       "generation": 9,
+       "region": [],
+       "pokedexes": [
+@@ -663,6 +749,8 @@
+     "53": {
+       "id": 53,
+       "name": "",
++      "context": 0,
++      "isGameVersion": true,
+       "generation": 0,
+       "region": [],
+       "pokedexes": [
+@@ -675,6 +763,8 @@
+     "54": {
+       "id": 54,
+       "name": "Rot/Blau",
++      "context": 1,
++      "isGameVersion": false,
+       "generation": 1,
+       "region": [
+         "Kanto"
+@@ -690,6 +780,8 @@
+     "55": {
+       "id": 55,
+       "name": "Rot/Blau/Gelb",
++      "context": 1,
++      "isGameVersion": false,
+       "generation": 1,
+       "region": [
+         "Kanto"
+@@ -705,6 +797,8 @@
+     "56": {
+       "id": 56,
+       "name": "Gold/Silber",
++      "context": 2,
++      "isGameVersion": false,
+       "generation": 2,
+       "region": [
+         "Kanto",
+@@ -721,6 +815,8 @@
+     "57": {
+       "id": 57,
+       "name": "Gold/Silber/Kristall",
++      "context": 2,
++      "isGameVersion": false,
+       "generation": 2,
+       "region": [
+         "Kanto",
+@@ -737,6 +833,8 @@
+     "58": {
+       "id": 58,
+       "name": "Rubin/Saphir",
++      "context": 3,
++      "isGameVersion": false,
+       "generation": 3,
+       "region": [
+         "Hoenn"
+@@ -752,6 +850,8 @@
+     "59": {
+       "id": 59,
+       "name": "Rubin/Saphir/Smaragd",
++      "context": 3,
++      "isGameVersion": false,
+       "generation": 3,
+       "region": [
+         "Hoenn"
+@@ -767,6 +867,8 @@
+     "60": {
+       "id": 60,
+       "name": "Feuerrot/Blattgrün",
++      "context": 3,
++      "isGameVersion": false,
+       "generation": 3,
+       "region": [
+         "Kanto"
+@@ -782,6 +884,8 @@
+     "61": {
+       "id": 61,
+       "name": "Box Ruby & Sapphire",
++      "context": 3,
++      "isGameVersion": false,
+       "generation": 3,
+       "region": [],
+       "pokedexes": [
+@@ -794,6 +898,8 @@
+     "62": {
+       "id": 62,
+       "name": "Colosseum",
++      "context": 0,
++      "isGameVersion": false,
+       "generation": 0,
+       "region": [],
+       "pokedexes": [
+@@ -806,6 +912,8 @@
+     "63": {
+       "id": 63,
+       "name": "XD",
++      "context": 0,
++      "isGameVersion": false,
+       "generation": 0,
+       "region": [],
+       "pokedexes": [
+@@ -818,6 +926,8 @@
+     "64": {
+       "id": 64,
+       "name": "Diamant/Perl",
++      "context": 4,
++      "isGameVersion": false,
+       "generation": 4,
+       "region": [
+         "Sinnoh"
+@@ -833,6 +943,8 @@
+     "65": {
+       "id": 65,
+       "name": "Diamant/Perl/Platin",
++      "context": 4,
++      "isGameVersion": false,
+       "generation": 4,
+       "region": [
+         "Sinnoh"
+@@ -849,6 +961,8 @@
+     "66": {
+       "id": 66,
+       "name": "HeartGold/SoulSilver",
++      "context": 4,
++      "isGameVersion": false,
+       "generation": 4,
+       "region": [
+         "Kanto",
+@@ -865,6 +979,8 @@
+     "67": {
+       "id": 67,
+       "name": "Schwarz/Weiß",
++      "context": 5,
++      "isGameVersion": false,
+       "generation": 5,
+       "region": [
+         "Einall"
+@@ -880,6 +996,8 @@
+     "68": {
+       "id": 68,
+       "name": "Schwarz 2/Weiß 2",
++      "context": 5,
++      "isGameVersion": false,
+       "generation": 5,
+       "region": [
+         "Einall"
+@@ -895,6 +1013,8 @@
+     "69": {
+       "id": 69,
+       "name": "X/Y",
++      "context": 6,
++      "isGameVersion": false,
+       "generation": 6,
+       "region": [
+         "Kalos"
+@@ -912,6 +1032,8 @@
+     "70": {
+       "id": 70,
+       "name": "Omega Rubin/Alpha Saphir",
++      "context": 0,
++      "isGameVersion": false,
+       "generation": 0,
+       "region": [
+         "Hoenn"
+@@ -927,6 +1049,8 @@
+     "71": {
+       "id": 71,
+       "name": "Omega Rubin/Alpha Saphir",
++      "context": 6,
++      "isGameVersion": false,
+       "generation": 6,
+       "region": [
+         "Hoenn"
+@@ -942,6 +1066,8 @@
+     "72": {
+       "id": 72,
+       "name": "Sonne/Mond",
++      "context": 7,
++      "isGameVersion": false,
+       "generation": 7,
+       "region": [
+         "Alola"
+@@ -961,6 +1087,8 @@
+     "73": {
+       "id": 73,
+       "name": "Ultrasonne/Ultramond",
++      "context": 7,
++      "isGameVersion": false,
+       "generation": 7,
+       "region": [
+         "Alola"
+@@ -980,6 +1108,8 @@
+     "74": {
+       "id": 74,
+       "name": "Let’s Go, Pikachu!/Let’s Go, Evoli!",
++      "context": 11,
++      "isGameVersion": false,
+       "generation": 7,
+       "region": [
+         "Kanto"
+@@ -995,6 +1125,8 @@
+     "75": {
+       "id": 75,
+       "name": "Schwert/Schild",
++      "context": 8,
++      "isGameVersion": false,
+       "generation": 8,
+       "region": [
+         "Galar"
+@@ -1012,6 +1144,8 @@
+     "76": {
+       "id": 76,
+       "name": "Strahlender Diamant/Leuchtende Perle",
++      "context": 8,
++      "isGameVersion": false,
+       "generation": 8,
+       "region": [
+         "Sinnoh"
+@@ -1027,6 +1161,8 @@
+     "77": {
+       "id": 77,
+       "name": "Karmesin/Purpur",
++      "context": 9,
++      "isGameVersion": false,
+       "generation": 9,
+       "region": [
+         "Paldea"
+@@ -1042,6 +1178,8 @@
+     "78": {
+       "id": 78,
+       "name": "Rot/Blau/Gelb",
++      "context": 1,
++      "isGameVersion": false,
+       "generation": 1,
+       "region": [
+         "Kanto"
+@@ -1057,6 +1195,8 @@
+     "79": {
+       "id": 79,
+       "name": "Gold/Silber/Kristall",
++      "context": 2,
++      "isGameVersion": false,
+       "generation": 2,
+       "region": [
+         "Kanto",
+@@ -1073,6 +1213,8 @@
+     "80": {
+       "id": 80,
+       "name": "Rubin/Saphir/Smaragd/Feuerrot/Blattgrün",
++      "context": 3,
++      "isGameVersion": false,
+       "generation": 3,
+       "region": [
+         "Hoenn",
+@@ -1090,6 +1232,8 @@
+     "81": {
+       "id": 81,
+       "name": "Diamant/Perl/Platin/HeartGold/SoulSilver",
++      "context": 4,
++      "isGameVersion": false,
+       "generation": 4,
+       "region": [
+         "Sinnoh",
+@@ -1109,6 +1253,8 @@
+     "82": {
+       "id": 82,
+       "name": "Schwarz/Weiß/Schwarz 2/Weiß 2",
++      "context": 5,
++      "isGameVersion": false,
+       "generation": 5,
+       "region": [
+         "Einall"
+@@ -1125,6 +1271,8 @@
+     "83": {
+       "id": 83,
+       "name": "X/Y/Omega Rubin/Alpha Saphir",
++      "context": 6,
++      "isGameVersion": false,
+       "generation": 6,
+       "region": [
+         "Kalos",
+@@ -1144,6 +1292,8 @@
+     "84": {
+       "id": 84,
+       "name": "Sonne/Mond/Ultrasonne/Ultramond",
++      "context": 7,
++      "isGameVersion": false,
+       "generation": 7,
+       "region": [
+         "Alola"
+@@ -1168,6 +1318,8 @@
+     "85": {
+       "id": 85,
+       "name": "Let’s Go, Pikachu!/Let’s Go, Evoli!",
++      "context": 11,
++      "isGameVersion": false,
+       "generation": 7,
+       "region": [
+         "Kanto"
+@@ -1183,6 +1335,8 @@
+     "86": {
+       "id": 86,
+       "name": "Schwert/Schild/Strahlender Diamant/Leuchtende Perle/Legenden: Arceus",
++      "context": 0,
++      "isGameVersion": false,
+       "generation": 0,
+       "region": [
+         "Galar",
+@@ -1204,6 +1358,8 @@
+     "87": {
+       "id": 87,
+       "name": "Karmesin/Purpur",
++      "context": 0,
++      "isGameVersion": false,
+       "generation": 0,
+       "region": [
+         "Paldea"
+@@ -1219,6 +1375,8 @@
+     "88": {
+       "id": 88,
+       "name": "Stadium (J)",
++      "context": 0,
++      "isGameVersion": false,
+       "generation": 0,
+       "region": [],
+       "pokedexes": [
+@@ -1231,6 +1389,8 @@
+     "89": {
+       "id": 89,
+       "name": "Stadium",
++      "context": 1,
++      "isGameVersion": false,
+       "generation": 1,
+       "region": [],
+       "pokedexes": [
+@@ -1243,6 +1403,8 @@
+     "90": {
+       "id": 90,
+       "name": "Stadium 2",
++      "context": 2,
++      "isGameVersion": false,
+       "generation": 2,
+       "region": [],
+       "pokedexes": [
+@@ -1255,6 +1417,8 @@
+     "91": {
+       "id": 91,
+       "name": "Smaragd/Feuerrot/Blattgrün",
++      "context": 0,
++      "isGameVersion": false,
+       "generation": 0,
+       "region": [
+         "Hoenn",
+@@ -1272,6 +1436,8 @@
+     "255": {
+       "id": 255,
+       "name": "",
++      "context": 0,
++      "isGameVersion": false,
+       "generation": 0,
+       "region": [],
+       "pokedexes": [

@@ -5,9 +5,9 @@ import { Gender } from '../gender/gender';
 import { AlphaIcon } from '../icon/alpha-icon';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
+import { BallImg } from '../img/ball-img';
+import { SpeciesImg } from '../img/species-img';
 import { theme } from '../theme';
-import { BallImg } from './ball-img';
-import { SpeciesImg } from './species-img';
 
 export type DetailsMainImgProps = {
     species: number;

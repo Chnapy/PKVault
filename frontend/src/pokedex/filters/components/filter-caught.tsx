@@ -1,7 +1,7 @@
 import React from "react";
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
-import { BallImg } from '../../../ui/details-card/ball-img';
+import { BallImg } from '../../../ui/img/ball-img';
 import { FilterCheckbox } from "../../../ui/filter/filter-checkbox/filter-checkbox";
 
 export const FilterCaught: React.FC = () => {

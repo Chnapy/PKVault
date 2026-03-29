@@ -3,12 +3,12 @@ import React from "react";
 import { Gender as GenderType } from "../../data/sdk/model";
 import { withErrorCatcher } from "../../error/with-error-catcher";
 import type { SpeciesFormItem } from "../../pokedex/list/hooks/use-pokedex-items";
-import { BallImg } from '../details-card/ball-img';
-import { SpeciesImg } from "../details-card/species-img";
 import { Gender } from "../gender/gender";
 import { AlphaIcon } from '../icon/alpha-icon';
 import { Icon } from "../icon/icon";
 import { ShinyIcon } from "../icon/shiny-icon";
+import { BallImg } from '../img/ball-img';
+import { SpeciesImg } from "../img/species-img";
 import { theme } from "../theme";
 
 export const DexFormItem: React.FC<Omit<SpeciesFormItem, "id">> =

@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using Microsoft.Extensions.Caching.Memory;
 using PKHeX.Core;
 
 public interface ISavePkmLoader
@@ -28,7 +27,7 @@ public class SavePkmLoader(
         return $"{idBase}B{box}S{slot}"; ;
     }
 
-    private readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions() { });
+    private readonly CacheWithTiming Cache = new();
 
     public bool HasWritten { get; set; } = false;
     private bool NeedPartyFlush = false;
@@ -329,20 +328,7 @@ public class SavePkmLoader(
 
     private DtosIndexes GetDtosIndexes()
     {
-        var cacheKey = $"save-pkms-{save.Id}";
-        if (!Cache.TryGetValue(cacheKey, out DtosIndexes? value))
-        {
-            Console.WriteLine($"Update static cache: {cacheKey}");
-
-            value = PrepareDtos();
-
-            Cache.Set(cacheKey, value, new MemoryCacheEntryOptions
-            {
-                SlidingExpiration = TimeSpan.FromSeconds(20),
-            });
-        }
-
-        return value!;
+        return Cache.GetValue($"save-pkms-{save.Id}", PrepareDtos);
     }
 
     private DtosIndexes PrepareDtos()

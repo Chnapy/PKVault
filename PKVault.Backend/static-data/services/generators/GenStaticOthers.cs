@@ -4,6 +4,8 @@ using PokeApiNet;
 public record StaticVersion(
     byte Id,
     string Name,
+    EntityContext Context,
+    bool IsGameVersion,
     byte Generation,
     string[] Region,
     string[] Pokedexes,
@@ -166,6 +168,8 @@ public class GenStaticOthers(
                 return new StaticVersion(
                     Id: (byte)version,
                     Name: await versionName,
+                    Context: version.Context,
+                    IsGameVersion: version.IsValidSavedVersion(),
                     Generation: version.Generation,
                     Region: await versionRegion,
                     Pokedexes: await versionPokedexes,

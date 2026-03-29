@@ -10,7 +10,7 @@ import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { DetailsCardContainer, type DetailsCardContainerProps, type DetailsExpandedState } from '../details-card/details-card-container';
 import { DetailsMainImg } from '../details-card/details-main-img';
-import { ItemImg } from '../details-card/item-img';
+import { ItemImg } from '../img/item-img';
 import { Marking } from '../marking/marking';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';

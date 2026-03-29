@@ -10,7 +10,7 @@ import { Route } from '../../../routes/storage';
 import { SaveItem } from '../../../saves/save-item/save-item';
 import { useTranslate } from '../../../translate/i18n';
 import { Icon } from '../../../ui/icon/icon';
-import { SaveCardImg } from '../../../ui/save-card/save-card-img';
+import { GameImg } from '../../../ui/img/game-img';
 import { StorageBox } from '../../../ui/storage-box/storage-box';
 import { StorageBoxSaveActions } from '../../../ui/storage-box/storage-box-save-actions';
 import { StorageItemPlaceholder } from '../../../ui/storage-item/storage-item-placeholder';
@@ -131,7 +131,12 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
                     },
                   })}
                 >
-                  {saveInfos && <SaveCardImg version={saveInfos.version} size={24} borderWidth={2} />}
+                  {saveInfos && <GameImg
+                    version={saveInfos.version}
+                    size={24}
+                    borderWidth={2}
+                    showTitle={false}
+                  />}
 
                   <div
                     className={cx('save-item', css({

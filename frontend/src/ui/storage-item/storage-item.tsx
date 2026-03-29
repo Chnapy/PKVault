@@ -5,11 +5,11 @@ import { useTranslate } from '../../translate/i18n';
 import { type ButtonLikeProps } from '../button/button-like';
 import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../button/button-with-disabled-popover';
 import { DetailsLevel } from '../details-card/details-level';
-import { ItemImg } from '../details-card/item-img';
-import { SpeciesImg } from '../details-card/species-img';
 import { AlphaIcon } from '../icon/alpha-icon';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
+import { ItemImg } from '../img/item-img';
+import { SpeciesImg } from '../img/species-img';
 import { CheckboxInput, type CheckboxInputProps } from '../input/checkbox-input';
 import { theme } from '../theme';
 

@@ -5,11 +5,11 @@ import { getEntityContextGenerationName } from '../../data/util/get-entity-conte
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
+import { GameImg } from '../img/game-img';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
 import { renderTimestamp } from '../util/render-date-time';
 import { DOLine } from './do-line';
-import { SaveCardImg } from './save-card-img';
 
 export type SaveCardContentSmallProps = {
   id: number;
@@ -50,7 +50,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErr
         overflow: 'hidden',
       })}
     >
-      <SaveCardImg version={version} />
+      <GameImg version={version} size={64} borderRadius={8} borderWidth={4} />
 
       <div
         className={css({
