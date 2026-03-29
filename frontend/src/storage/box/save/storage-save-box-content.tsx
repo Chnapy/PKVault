@@ -135,6 +135,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
                     version={saveInfos.version}
                     size={24}
                     borderWidth={2}
+                    showTitle={false}
                   />}
 
                   <div

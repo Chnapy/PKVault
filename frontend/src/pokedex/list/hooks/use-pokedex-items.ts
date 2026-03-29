@@ -1,5 +1,5 @@
 import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
-import type { DexItemForm, EntityContext, GameVersion, Gender } from '../../../data/sdk/model';
+import type { DexItemForm, EntityContext, GameVersion, Gender, StaticVersion } from '../../../data/sdk/model';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from '../../../routes/pokedex';
 import { filterIsDefined } from '../../../util/filter-is-defined';
@@ -13,7 +13,7 @@ type PokedexItems = Counts & {
 
 type SpeciesItemsByGeneration = Counts & {
     generation: number;
-    versionsForImgs: GameVersion[];
+    versionsForImgs: GameVersion[][];
     speciesInfos: SpeciesInfos[];
 };
 
@@ -198,17 +198,34 @@ export const usePokedexItems = (): PokedexItems => {
         const getVersionsForImgs = () => {
             const versions = Object.values(staticData.versions)
                 .filter(version =>
-                    version.region.some(region => staticData.generations[ generation ]?.regions.includes(region))
+                    version.isGameVersion
+                    && version.region.some(region => staticData.generations[ generation ]?.regions.includes(region))
                 )
-                .sort((v1, v2) => v1.generation - v2.generation)
-                .map(version => version.id as GameVersion);
+                .sort((v1, v2) => v1.generation - v2.generation);
 
-            return Object.values(
-                versions.reduce<Record<string, GameVersion>>((acc, version) => ({
+            const filteredVersions = Object.values(
+                versions.reduce<Record<string, StaticVersion>>((acc, version) => ({
                     ...acc,
-                    [ getGameInfos(version).img ]: version,
+                    [ getGameInfos(version.id as GameVersion).img ]: version,
                 }), {})
             );
+
+            const splittedVersions = filteredVersions.reduce<StaticVersion[][]>((acc, version) => {
+                const previousArr = acc[ acc.length - 1 ];
+                const previousVersion = previousArr && previousArr[ previousArr.length - 1 ];
+
+                if (previousVersion && previousVersion.context === version.context) {
+                    previousArr.push(version);
+                    return acc;
+                }
+
+                return [
+                    ...acc,
+                    [ version ]
+                ];
+            }, []);
+
+            return splittedVersions.map(versions => versions.map(version => version.id as GameVersion));
         };
 
         const versionsForImgs = acc[ generation ]?.versionsForImgs ?? getVersionsForImgs();

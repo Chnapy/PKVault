@@ -104,19 +104,28 @@ export const PokedexList: React.FC = withErrorCatcher("default", () => {
                 <div
                   style={{
                     display: 'inline-flex',
-                    gap: 4,
+                    gap: 8,
                     alignItems: 'center',
                     verticalAlign: 'middle',
                     marginLeft: 8,
                     marginRight: 8,
                   }}
                 >
-                  {versionsForImgs.map(version => <GameImg
-                    key={version}
-                    version={version}
-                    size={20}
-                    borderWidth={1}
-                  />)}
+                  {versionsForImgs
+                    .map((versions, i) => <div
+                      key={i}
+                      className={css({
+                        display: 'inline-flex',
+                        gap: 4,
+                      })}
+                    >
+                      {versions.map(version => <GameImg
+                        key={version}
+                        version={version}
+                        size={20}
+                        borderWidth={1}
+                      />)}
+                    </div>)}
                 </div>
 
                 <div className={css({ float: "right" })}>
