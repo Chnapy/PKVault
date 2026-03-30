@@ -88,10 +88,21 @@ public class MatcherUtil
 
     private static DirectoryInfoBase GetMatcherDirectory(string rootDir)
     {
+        rootDir = NormalizePath(rootDir);
+
         if (GetAllPaths != null)
         {
             var testFiles = GetAllPaths()
-                .Select(glob => glob[rootDir.Length..])
+                .Select(NormalizePath)
+                .Select(glob =>
+                {
+                    if (IsAbsolute(rootDir) && glob.StartsWith(rootDir))
+                    {
+                        return glob[rootDir.Length..];
+                    }
+
+                    return glob;
+                })
                 .Where(glob => glob.Length > 0);
 
             return new InMemoryDirectoryInfo(rootDir, testFiles);
