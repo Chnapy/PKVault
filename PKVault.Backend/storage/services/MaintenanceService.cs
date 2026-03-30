@@ -47,7 +47,7 @@ public class MaintenanceService(
         if (pathsToClean.Any())
         {
             await scope.ServiceProvider.GetRequiredService<BackupService>()
-                .CreateBackup();
+                .CreateBackup("backup_before_clean");
 
             foreach (var path in pathsToClean)
             {

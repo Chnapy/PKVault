@@ -13,7 +13,7 @@ public class BackupService(
 {
     private static readonly string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
 
-    public async Task<DateTime> CreateBackup()
+    public async Task<DateTime> CreateBackup(string name)
     {
         using var _ = LogUtil.Time("Create backup");
 
@@ -59,7 +59,7 @@ public class BackupService(
             }
 
             var bkpPath = GetBackupsPath();
-            var fileName = GetBackupFilename(startTime);
+            var fileName = GetBackupFilename(startTime, name);
             var bkpZipPath = Path.Combine(bkpPath, fileName);
 
             await fileIOService.WriteBytes(bkpZipPath, memoryStream.ToArray());
@@ -188,9 +188,15 @@ public class BackupService(
         return DateTime.ParseExact(str, dateTimeFormat, CultureInfo.InvariantCulture);
     }
 
-    private static string GetBackupFilename(DateTime createdAt)
+    private static string GetBackupFilename(DateTime createdAt, string name)
     {
-        return $"pkvault_backup_{SerializeDateTime(createdAt)}.zip";
+        return $"{name}{GetBackupFilenameSuffix(createdAt)}";
+    }
+
+    private static string GetBackupFilenameSuffix(DateTime createdAt)
+    {
+        // 2026-03-18T232935-280Z => 22 chars
+        return $"_{SerializeDateTime(createdAt)}.zip";
     }
 
     public List<BackupDTO> GetBackupList()
@@ -199,60 +205,107 @@ public class BackupService(
         var glob = Path.Combine(bkpPath, "*.zip");
         var searchPaths = MatcherUtil.SearchPaths([glob]);
 
-        var result = searchPaths.Select(path =>
-        {
-            try
-            {
-                var filename = Path.GetFileNameWithoutExtension(path);
-                var dateTimeStr = filename.Split('_').Last();
+        var result = searchPaths
+            .Select(GetBackup)
+            .OfType<BackupDTO>().ToList();
 
-                var dateTime = DeserializeDateTime(dateTimeStr);
-
-                return new BackupDTO(
-                    CreatedAt: dateTime,
-                    Filepath: path
-                );
-            }
-            catch (Exception err)
-            {
-                Console.WriteLine(err);
-
-                return null;
-            }
-        }).OfType<BackupDTO>().ToList();
         result.Sort((a, b) => a.CreatedAt > b.CreatedAt ? -1 : 1);
+
         return result;
+    }
+
+    private BackupDTO? GetBackup(string path)
+    {
+        try
+        {
+            var filename = Path.GetFileNameWithoutExtension(path);
+            var filenameParts = filename.Split('_');
+
+            var name = string.Join('_', filenameParts.Take(filenameParts.Length - 1));
+
+            var dateTimeStr = filenameParts.Last();
+            var dateTime = DeserializeDateTime(dateTimeStr);
+
+            return new BackupDTO(
+                CreatedAt: dateTime,
+                Filepath: path,
+                Name: name
+            );
+        }
+        catch (Exception err)
+        {
+            Console.WriteLine(err);
+
+            return null;
+        }
+    }
+
+    private BackupDTO? GetBackup(DateTime createdAt)
+    {
+        var bkpPath = GetBackupsPath();
+        var glob = Path.Combine(bkpPath, $"*{GetBackupFilenameSuffix(createdAt)}");
+        var searchPaths = MatcherUtil.SearchPaths([glob]);
+
+        var backups = searchPaths
+            .Select(GetBackup);
+
+        if (backups.Count() > 1)
+        {
+            throw new Exception($"Multiple backup files found with filename ending with {GetBackupFilenameSuffix(createdAt)}");
+        }
+
+        return backups.FirstOrDefault();
+    }
+
+    public void EditBackup(DateTime createdAt, string newName)
+    {
+        var backup = GetBackup(createdAt);
+        ArgumentNullException.ThrowIfNull(backup);
+
+        if (backup.Name == newName)
+        {
+            return;
+        }
+
+        var invalidChars = Path.GetInvalidFileNameChars().ToHashSet();
+
+        if (newName.Any(invalidChars.Contains))
+        {
+            throw new ArgumentException($"Invalid characters in '{newName}'");
+        }
+
+        var basePath = Path.GetDirectoryName(backup.Filepath);
+
+        var newFilename = GetBackupFilename(createdAt, newName);
+        var newPath = MatcherUtil.NormalizePath(
+            basePath != null
+                ? Path.Combine(basePath, newFilename)
+                : newFilename
+            );
+
+        fileIOService.Move(backup.Filepath, newPath, overwrite: true);
     }
 
     public void DeleteBackup(DateTime createdAt)
     {
-        var bkpPath = GetBackupsPath();
+        var backup = GetBackup(createdAt);
+        ArgumentNullException.ThrowIfNull(backup);
 
-        var fileName = GetBackupFilename(createdAt);
-        var bkpZipPath = Path.Combine(bkpPath, fileName);
-
-        fileIOService.Delete(bkpZipPath);
+        fileIOService.Delete(backup.Filepath);
     }
 
     public async Task RestoreBackup(DateTime createdAt, bool withSafeBackup)
     {
-        var bkpPath = GetBackupsPath();
+        Console.WriteLine($"Backup restore {createdAt}");
 
-        var fileName = GetBackupFilename(createdAt);
-
-        Console.WriteLine($"Backup restore {fileName}");
-
-        var bkpZipPath = Path.Combine(bkpPath, fileName);
-        if (!fileIOService.Exists(bkpZipPath))
-        {
-            throw new Exception($"File does not exist: {bkpZipPath}");
-        }
+        var backup = GetBackup(createdAt)
+            ?? throw new Exception($"Backup file does not exist: {createdAt}");
 
         var logtime = LogUtil.Time("Backup restore");
 
-        using var archive = fileIOService.ReadZip(bkpZipPath);
+        using var archive = fileIOService.ReadZip(backup.Filepath);
 
-        var bkpTmpPathsPath = Path.Combine(bkpPath, "._paths.json");
+        var bkpPath = GetBackupsPath();
 
         var pathsEntry = archive.Entries.ToList().Find(entry => entry.Name == "_paths.json");
         if (pathsEntry == default)
@@ -260,20 +313,16 @@ public class BackupService(
             throw new Exception("Paths entry not found");
         }
 
-        // TODO read in-memory
-        pathsEntry.ExtractToFile(bkpTmpPathsPath, true);
-
-        var paths = await fileIOService.ReadJSONFile(
-            bkpTmpPathsPath,
+        var paths = JsonSerializer.Deserialize(
+            await pathsEntry.GetContent(),
             EntityJsonContext.Default.DictionaryStringString
         );
-
-        ArgumentNullException.ThrowIfNull(paths, bkpTmpPathsPath);
+        ArgumentNullException.ThrowIfNull(paths);
 
         if (withSafeBackup)
         {
             // manual backup, no use of PrepareBackupThenRun to avoid infinite loop
-            await CreateBackup();
+            await CreateBackup("backup_before_restore");
         }
 
         var settings = settingsService.GetSettings();
@@ -302,17 +351,15 @@ public class BackupService(
 
         time.Dispose();
 
-        fileIOService.Delete(bkpTmpPathsPath);
-
         logtime.Stop();
 
         savesLoadersService.Clear();
         await sessionService.StartNewSession(checkInitialActions: true);
     }
 
-    public async Task PrepareBackupThenRun(Func<Task> action)
+    public async Task PrepareBackupThenRun(string backupName, Func<Task> action)
     {
-        var bkpDateTime = await CreateBackup();
+        var bkpDateTime = await CreateBackup(backupName);
 
         try
         {

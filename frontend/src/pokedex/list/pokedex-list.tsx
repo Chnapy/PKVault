@@ -102,14 +102,14 @@ export const PokedexList: React.FC = withErrorCatcher("default", () => {
                 })}
 
                 <div
-                  style={{
+                  className={css({
                     display: 'inline-flex',
                     gap: 8,
                     alignItems: 'center',
                     verticalAlign: 'middle',
                     marginLeft: 8,
                     marginRight: 8,
-                  }}
+                  })}
                 >
                   {versionsForImgs
                     .map((versions, i) => <div

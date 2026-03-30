@@ -251,6 +251,7 @@ public interface IArchiveEntry
     public string Name { get; }
     public string FullName { get; }
 
+    public Task<string> GetContent();
     public void ExtractToFile(string destinationFileName, bool overwrite);
 }
 
@@ -269,6 +270,13 @@ public class ArchiveEntry(ZipArchiveEntry entry, IFileSystem fileSystem) : IArch
 {
     public string Name => entry.Name;
     public string FullName => entry.FullName;
+
+    public async Task<string> GetContent()
+    {
+        using var entryStream = await entry.OpenAsync();
+        using var fileReader = new StreamReader(entryStream);
+        return await fileReader.ReadToEndAsync();
+    }
 
     public void ExtractToFile(string destinationFileName, bool overwrite)
     {

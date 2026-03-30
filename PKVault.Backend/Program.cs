@@ -75,11 +75,11 @@ public class Program
             return null;
         }
 
-        if (args.Length > 0 && args[0] == "test-bkp")
-        {
-            await host.Services.GetRequiredService<BackupService>().CreateBackup();
-            return null;
-        }
+        // if (args.Length > 0 && args[0] == "test-bkp")
+        // {
+        //     await host.Services.GetRequiredService<BackupService>().CreateBackup();
+        //     return null;
+        // }
 
         return async () =>
         {

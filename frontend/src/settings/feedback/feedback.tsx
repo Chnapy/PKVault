@@ -90,10 +90,10 @@ export const Feedback: React.FC = () => {
                 >
                     {t('action.submit')}
                 </Button>
-                {formState.isSubmitSuccessful && <div style={{ textAlign: 'center' }}>
+                {formState.isSubmitSuccessful && <div className={css({ textAlign: 'center' })}>
                     {t('action.success')} <Icon name='check' solid forButton />
                 </div>}
-                {formState.isSubmitted && !formState.isSubmitSuccessful && <div style={{ textAlign: 'center' }}>
+                {formState.isSubmitted && !formState.isSubmitSuccessful && <div className={css({ textAlign: 'center' })}>
                     {t('action.failure')} <Icon name='times' solid forButton />
                 </div>}
             </form>
