@@ -11,67 +11,97 @@ public class MatcherUtil
     {
         List<string> globs = [.. globsNullable
             .OfType<string>()
-            .Select(glob => glob.Trim()).ToList()
-            .FindAll(glob => glob.Length > 0)];
+            .Select(glob => glob.Trim())
+            .Where(glob => glob.Length > 0)];
 
         if (globs.Count == 0)
         {
             return [];
         }
 
-        var testFiles = GetAllPaths == null
-            ? []
-            : GetAllPaths().Select(NormalizePath);
-
         // network globs on Windows, ex: "\\192.168.1.8\data"
         var networkGlobs = globs.FindAll(glob => glob.StartsWith(@"\\") && !glob.Contains('*'));
 
-        // starts with / or \ or x:
-        static bool isAbsolute(string glob) => glob.Length > 0 && (glob[0] == '/' || glob[0] == '\\' || (glob.Length > 2 && glob[1] == ':'));
+        var absoluteGlobs = globs.FindAll(IsAbsolute).FindAll(glob => glob.Length <= 1 || glob[1] != ':');
+        var driveGlobs = globs.FindAll(IsAbsolute).FindAll(glob => glob.Length > 1 && glob[1] == ':');
+        var relativeGlobs = globs.FindAll(glob => !IsAbsolute(glob));
 
-        var absoluteGlobs = globs.FindAll(isAbsolute).FindAll(glob => glob.Length <= 1 || glob[1] != ':');
-        var driveGlobs = globs.FindAll(isAbsolute).FindAll(glob => glob.Length > 1 && glob[1] == ':');
-        var relativeGlobs = globs.FindAll(glob => !isAbsolute(glob));
+        var absoluteMatches = ExecuteMatcher(absoluteGlobs, "/");
+        var absoluteResults = absoluteMatches.Select(path => Path.Combine("/", path));
 
-        var absoluteMatcher = new Matcher();
-        absoluteGlobs.ToList().ForEach(glob => absoluteMatcher.AddInclude(glob));
-        DirectoryInfoBase absoluteDirectoryInfo = GetAllPaths == null || absoluteGlobs.Count == 0
-            ? new DirectoryInfoWrapper(new DirectoryInfo("/"))
-            : new InMemoryDirectoryInfo("/", testFiles);
-        var absoluteMatches = absoluteMatcher.Execute(absoluteDirectoryInfo);
-        var absoluteResults = absoluteMatches.Files.Select(file => Path.Combine("/", file.Path));
-
-        // Console.WriteLine($"ABSOLUTE:\n{string.Join('\n', absoluteGlobs)}---Results:\n{string.Join('\n', absoluteResults)}");
-
-        var driveLetters = driveGlobs.Select(glob => glob.ToUpper()[0]).Distinct().ToList();
+        var driveLetters = driveGlobs.Select(glob => glob.ToUpper()[0]).Distinct();
         var driveResults = driveLetters.SelectMany(drive =>
         {
-            var matcher = new Matcher();
-            var filteredDriveGlobs = driveGlobs.ToList()
-                .FindAll(glob => glob.StartsWith(drive));
-            filteredDriveGlobs.ForEach(glob => matcher.AddInclude(glob[3..]));
+            var filteredDriveGlobs = driveGlobs
+                .Where(glob => glob.StartsWith(drive));
+
             var prefix = $"{drive}:/";
-            DirectoryInfoBase directoryInfo = GetAllPaths == null || filteredDriveGlobs.Count == 0
-                ? new DirectoryInfoWrapper(new DirectoryInfo(prefix))
-                : new InMemoryDirectoryInfo(prefix, testFiles.Select(f => f[3..]).Where(f => f.Length > 0));
-            var matches = matcher.Execute(directoryInfo);
-            var results = matches.Files.Select(file => Path.Combine(prefix, file.Path));
+
+            var matches = ExecuteMatcher(filteredDriveGlobs, prefix);
+            var results = matches.Select(path => Path.Combine(prefix, path));
 
             return results;
         });
 
-        var relativeMatcher = new Matcher();
-        relativeGlobs.ToList().ForEach(glob => relativeMatcher.AddInclude(glob));
-        DirectoryInfoBase relativeDirectoryInfo = GetAllPaths == null || relativeGlobs.Count == 0
-            ? new DirectoryInfoWrapper(new DirectoryInfo(SettingsService.GetAppDirectory()))
-            : new InMemoryDirectoryInfo(SettingsService.GetAppDirectory(), testFiles);
-        var relativeMatches = relativeMatcher.Execute(relativeDirectoryInfo);
-        var relativeResults = relativeMatches.Files.Select(file => Path.Combine(".", file.Path));
+        var relativeMatches = ExecuteMatcher(relativeGlobs, SettingsService.GetAppDirectory());
+        var relativeResults = relativeMatches.Select(path => Path.Combine(".", path));
 
         string[] results = [.. absoluteResults, .. driveResults, .. relativeResults, .. networkGlobs];
 
         return [.. results.Select(NormalizePath)];
     }
+
+    private static string[] ExecuteMatcher(IEnumerable<string> globs, string rootDir)
+    {
+        rootDir = NormalizePath(rootDir);
+
+        globs = globs
+            .Select(NormalizePath)
+            .Select(glob =>
+            {
+                if (IsAbsolute(rootDir) && glob.StartsWith(rootDir))
+                {
+                    return glob[rootDir.Length..];
+                }
+
+                return glob;
+            })
+            .Where(glob => glob.Length > 0);
+
+        if (!globs.Any())
+        {
+            return [];
+        }
+
+        var matcher = new Matcher();
+
+        foreach (var glob in globs)
+        {
+            matcher.AddInclude(glob);
+        }
+
+        var directoryInfo = GetMatcherDirectory(rootDir);
+
+        var matches = matcher.Execute(directoryInfo);
+        return [.. matches.Files.Select(file => file.Path)];
+    }
+
+    private static DirectoryInfoBase GetMatcherDirectory(string rootDir)
+    {
+        if (GetAllPaths != null)
+        {
+            var testFiles = GetAllPaths()
+                .Select(glob => glob[rootDir.Length..])
+                .Where(glob => glob.Length > 0);
+
+            return new InMemoryDirectoryInfo(rootDir, testFiles);
+        }
+
+        return new DirectoryInfoWrapper(new DirectoryInfo(rootDir));
+    }
+
+    // starts with / or \ or x:
+    private static bool IsAbsolute(string glob) => glob.Length > 0 && (glob[0] == '/' || glob[0] == '\\' || (glob.Length > 2 && glob[1] == ':'));
 
     public static string NormalizePath(string path) => path
         .Replace('\\', '/')
