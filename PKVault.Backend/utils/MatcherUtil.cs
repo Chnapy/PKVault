@@ -1,9 +1,12 @@
-
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
+// TODO complete refacto for testability
+// Remove static unsafe usage for tests
 public class MatcherUtil
 {
+    public static Func<string[]>? GetAllPaths = null;
+
     public static List<string> SearchPaths(string?[] globsNullable)
     {
         List<string> globs = [.. globsNullable
@@ -15,6 +18,10 @@ public class MatcherUtil
         {
             return [];
         }
+
+        var testFiles = GetAllPaths == null
+            ? []
+            : GetAllPaths().Select(NormalizePath);
 
         // network globs on Windows, ex: "\\192.168.1.8\data"
         var networkGlobs = globs.FindAll(glob => glob.StartsWith(@"\\") && !glob.Contains('*'));
@@ -28,7 +35,10 @@ public class MatcherUtil
 
         var absoluteMatcher = new Matcher();
         absoluteGlobs.ToList().ForEach(glob => absoluteMatcher.AddInclude(glob));
-        var absoluteMatches = absoluteMatcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo("/")));
+        DirectoryInfoBase absoluteDirectoryInfo = GetAllPaths == null || absoluteGlobs.Count == 0
+            ? new DirectoryInfoWrapper(new DirectoryInfo("/"))
+            : new InMemoryDirectoryInfo("/", testFiles);
+        var absoluteMatches = absoluteMatcher.Execute(absoluteDirectoryInfo);
         var absoluteResults = absoluteMatches.Files.Select(file => Path.Combine("/", file.Path));
 
         // Console.WriteLine($"ABSOLUTE:\n{string.Join('\n', absoluteGlobs)}---Results:\n{string.Join('\n', absoluteResults)}");
@@ -37,11 +47,14 @@ public class MatcherUtil
         var driveResults = driveLetters.SelectMany(drive =>
         {
             var matcher = new Matcher();
-            driveGlobs.ToList()
-                .FindAll(glob => glob.StartsWith(drive))
-                .ForEach(glob => matcher.AddInclude(glob[3..]));
+            var filteredDriveGlobs = driveGlobs.ToList()
+                .FindAll(glob => glob.StartsWith(drive));
+            filteredDriveGlobs.ForEach(glob => matcher.AddInclude(glob[3..]));
             var prefix = $"{drive}:/";
-            var matches = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(prefix)));
+            DirectoryInfoBase directoryInfo = GetAllPaths == null || filteredDriveGlobs.Count == 0
+                ? new DirectoryInfoWrapper(new DirectoryInfo(prefix))
+                : new InMemoryDirectoryInfo(prefix, testFiles.Select(f => f[3..]).Where(f => f.Length > 0));
+            var matches = matcher.Execute(directoryInfo);
             var results = matches.Files.Select(file => Path.Combine(prefix, file.Path));
 
             return results;
@@ -49,7 +62,10 @@ public class MatcherUtil
 
         var relativeMatcher = new Matcher();
         relativeGlobs.ToList().ForEach(glob => relativeMatcher.AddInclude(glob));
-        var relativeMatches = relativeMatcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(SettingsService.GetAppDirectory())));
+        DirectoryInfoBase relativeDirectoryInfo = GetAllPaths == null || relativeGlobs.Count == 0
+            ? new DirectoryInfoWrapper(new DirectoryInfo(SettingsService.GetAppDirectory()))
+            : new InMemoryDirectoryInfo(SettingsService.GetAppDirectory(), testFiles);
+        var relativeMatches = relativeMatcher.Execute(relativeDirectoryInfo);
         var relativeResults = relativeMatches.Files.Select(file => Path.Combine(".", file.Path));
 
         string[] results = [.. absoluteResults, .. driveResults, .. relativeResults, .. networkGlobs];

@@ -299,7 +299,7 @@ public class BackupService(
         Console.WriteLine($"Backup restore {createdAt}");
 
         var backup = GetBackup(createdAt)
-            ?? throw new Exception($"Backup file does not exist: {createdAt}");
+            ?? throw new Exception($"Backup file does not exist: *{GetBackupFilenameSuffix(createdAt)}");
 
         var logtime = LogUtil.Time("Backup restore");
 

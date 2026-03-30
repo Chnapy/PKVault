@@ -13,6 +13,7 @@ public class BackupServiceTests
     public BackupServiceTests()
     {
         fileIOService = new FileIOService(mockFileSystem);
+        MatcherUtil.GetAllPaths = () => [.. mockFileSystem.AllPaths];
     }
 
     private (BackupService backupService, Mock<ISavesLoadersService> mockSaveService, Mock<ISessionService> mockSessionService)
@@ -94,12 +95,12 @@ public class BackupServiceTests
             now: DateTime.Parse("2011-03-21 13:26:11")
         );
 
-        await backupService.CreateBackup();
+        await backupService.CreateBackup("test_backup");
 
         // Console.WriteLine(string.Join('\n', mockFileSystem.AllPaths));
 
-        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "pkvault_backup_2011-03-21T132611-000Z.zip")));
-        var data = mockFileSystem.File.ReadAllBytes(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "pkvault_backup_2011-03-21T132611-000Z.zip"));
+        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "test_backup_2011-03-21T132611-000Z.zip")));
+        var data = mockFileSystem.File.ReadAllBytes(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "test_backup_2011-03-21T132611-000Z.zip"));
         ArchiveMatchContent(data);
     }
 
@@ -110,7 +111,7 @@ public class BackupServiceTests
             now: DateTime.Parse("2011-03-21 13:26:11")
         );
 
-        var expectedPath = Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip");
+        var expectedPath = Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "test_backup_2013-03-21T132611-000Z.zip");
 
         var paths = new Dictionary<string, string>()
             {
@@ -162,8 +163,8 @@ public class BackupServiceTests
         );
 
         // check if backup creation were made
-        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "pkvault_backup_2011-03-21T132611-000Z.zip")));
-        var data = mockFileSystem.File.ReadAllBytes(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "pkvault_backup_2011-03-21T132611-000Z.zip"));
+        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "backup_before_restore_2011-03-21T132611-000Z.zip")));
+        var data = mockFileSystem.File.ReadAllBytes(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "backup_before_restore_2011-03-21T132611-000Z.zip"));
         ArchiveMatchContent(data);
 
         // Console.WriteLine(string.Join('\n', mockFileSystem.AllFiles));
@@ -195,7 +196,7 @@ public class BackupServiceTests
         mockFileSystem.AddEmptyFile("mock-db/pkm-version.json");
         mockFileSystem.AddEmptyFile("mock-db/dex.json");
 
-        var expectedPath = Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip");
+        var expectedPath = Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "test_backup_2013-03-21T132611-000Z.zip");
 
         var paths = new Dictionary<string, string>()
             {
