@@ -97,7 +97,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            return (
+            return Path.GetFullPath(
                 // expected in Docker monolith context
                 Environment.GetEnvironmentVariable("PKVAULT_PATH")
                 // expected in flatpak context
@@ -114,8 +114,8 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
         var exeDirectory = exePath != null ? Path.GetDirectoryName(exePath) : null;
 
-        return exeDirectory
-            ?? AppDomain.CurrentDomain.BaseDirectory;
+        return Path.GetFullPath(exeDirectory
+            ?? AppDomain.CurrentDomain.BaseDirectory);
     }
 
     public static (Guid BuildID, string Version) GetBuildInfo()
