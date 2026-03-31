@@ -13,7 +13,7 @@ public class ActionServiceTests
     public ActionServiceTests()
     {
         fileIOService = new FileIOService(mockFileSystem);
-        MatcherUtil.GetAllPaths = () => [.. mockFileSystem.AllPaths];
+        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllPaths];
     }
 
     private ActionService GetService(DateTime now, bool throwOnSessionPersist = false)

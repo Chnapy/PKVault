@@ -203,7 +203,7 @@ public class BackupService(
     {
         var bkpPath = GetBackupsPath();
         var glob = Path.Combine(bkpPath, "*.zip");
-        var searchPaths = MatcherUtil.SearchPaths([glob]);
+        var searchPaths = fileIOService.Matcher.SearchPaths([glob]);
 
         var result = searchPaths
             .Select(GetBackup)
@@ -244,7 +244,7 @@ public class BackupService(
     {
         var bkpPath = GetBackupsPath();
         var glob = Path.Combine(bkpPath, $"*{GetBackupFilenameSuffix(createdAt)}");
-        var searchPaths = MatcherUtil.SearchPaths([glob]);
+        var searchPaths = fileIOService.Matcher.SearchPaths([glob]);
 
         var backups = searchPaths
             .Select(GetBackup);

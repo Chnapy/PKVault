@@ -173,7 +173,7 @@ public class SavesLoadersService(
         ConcurrentDictionary<uint, HashSet<string>> savePaths = [];
 
         var globs = settingsService.GetSettings().SettingsMutable.SAVE_GLOBS;
-        var searchPaths = MatcherUtil.SearchPaths(globs);
+        var searchPaths = fileIOService.Matcher.SearchPaths(globs);
 
         var evolves = await staticDataService.GetStaticEvolves();
 

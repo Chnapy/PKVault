@@ -10,6 +10,8 @@ using System.IO.Abstractions;
 
 public interface IFileIOService
 {
+    public MatcherUtil Matcher { get; }
+
     public Task<TValue> ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue);
     public Task<TValue?> ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo);
     public TValue ReadJSONFileSync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue);
@@ -34,6 +36,9 @@ public interface IFileIOService
 
 public class FileIOService(IFileSystem fileSystem) : IFileIOService
 {
+    private readonly MatcherUtil _matcher = new();
+    public MatcherUtil Matcher => _matcher;
+
     public TValue ReadJSONFileSync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue)
     {
         path = NormalizePath(path);

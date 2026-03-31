@@ -13,7 +13,7 @@ public class BackupServiceTests
     public BackupServiceTests()
     {
         fileIOService = new FileIOService(mockFileSystem);
-        MatcherUtil.GetAllPaths = () => [.. mockFileSystem.AllPaths];
+        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllPaths];
     }
 
     private (BackupService backupService, Mock<ISavesLoadersService> mockSaveService, Mock<ISessionService> mockSessionService)

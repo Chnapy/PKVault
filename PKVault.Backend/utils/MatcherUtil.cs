@@ -2,12 +2,11 @@ using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
 // TODO complete refacto for testability
-// Remove static unsafe usage for tests
 public class MatcherUtil
 {
-    public static Func<string[]>? GetAllPaths = null;
+    public Func<string[]>? GetAllPaths = null;
 
-    public static List<string> SearchPaths(string?[] globsNullable)
+    public List<string> SearchPaths(string?[] globsNullable)
     {
         List<string> globs = [.. globsNullable
             .OfType<string>()
@@ -51,7 +50,7 @@ public class MatcherUtil
         return [.. results.Select(NormalizePath)];
     }
 
-    private static string[] ExecuteMatcher(IEnumerable<string> globs, string rootDir)
+    private string[] ExecuteMatcher(IEnumerable<string> globs, string rootDir)
     {
         rootDir = NormalizePath(rootDir);
 
@@ -89,7 +88,7 @@ public class MatcherUtil
         return [.. matches.Files.Select(file => file.Path)];
     }
 
-    private static DirectoryInfoBase GetMatcherDirectory(string rootDir)
+    private DirectoryInfoBase GetMatcherDirectory(string rootDir)
     {
         rootDir = NormalizePath(rootDir);
 

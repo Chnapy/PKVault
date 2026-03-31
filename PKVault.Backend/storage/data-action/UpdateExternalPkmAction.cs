@@ -24,7 +24,7 @@ public class UpdateExternalPkmAction(
             .Select(glob => glob.Trim())
             .Where(glob => glob.Length > 0)
             .ToArray();
-        var searchPaths = MatcherUtil.SearchPaths(pkmExternalGlobs).ToHashSet();
+        var searchPaths = fileIOService.Matcher.SearchPaths(pkmExternalGlobs).ToHashSet();
 
         var externalPkmsToRemove = await pkmVariantLoader.GetExternalEntitiesDisabledOrNotInPaths(searchPaths);
 
