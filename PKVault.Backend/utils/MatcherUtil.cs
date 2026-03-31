@@ -73,6 +73,9 @@ public class MatcherUtil
             return [];
         }
 
+        Console.WriteLine($"ROOT_DIR = {rootDir}");
+        Console.WriteLine($"GLOBS = {string.Join('\n', globs)}");
+
         var matcher = new Matcher();
 
         foreach (var glob in globs)
@@ -104,6 +107,8 @@ public class MatcherUtil
                     return glob;
                 })
                 .Where(glob => glob.Length > 0);
+
+            Console.WriteLine($"TEST_FILES = \n{string.Join('\n', testFiles)}");
 
             return new InMemoryDirectoryInfo(rootDir, testFiles);
         }
