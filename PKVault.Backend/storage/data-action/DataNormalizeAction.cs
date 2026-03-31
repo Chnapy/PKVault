@@ -39,14 +39,14 @@ public class DataNormalizeAction(
 
     protected override async Task<DataActionPayload> Execute(DataNormalizeActionInput input, DataUpdateFlags flags)
     {
-        if (input.SetupInitialData)
-        {
-            await SetupInitialData();
-        }
-
         if (input.UpdateVersion)
         {
             await UpdateVersion();
+        }
+
+        if (input.SetupInitialData)
+        {
+            await SetupInitialData();
         }
 
         return new(
