@@ -257,7 +257,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public string GetOriginMetLocation(string language) => GameInfo.GetStrings(language)
         .GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version);
 
-    public int HeldItem => ItemConverter.GetItemForFormat(Pkm.HeldItem, Pkm.Context, StaticDataService.LAST_ENTITY_CONTEXT);
+    public int HeldItem => Pkm.HeldItem;
     public string? HeldItemPokeapiName => HeldItem > 0
         ? (HeldItem < GameInfo.Strings.Item.Count ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[HeldItem]) : "")
         : null;

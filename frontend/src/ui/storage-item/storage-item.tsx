@@ -1,6 +1,6 @@
 import { css, cx } from '@emotion/css';
 import React from "react";
-import type { EntityContext } from '../../data/sdk/model';
+import type { EntityContext, GameVersion } from '../../data/sdk/model';
 import { useTranslate } from '../../translate/i18n';
 import { type ButtonLikeProps } from '../button/button-like';
 import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../button/button-with-disabled-popover';
@@ -18,6 +18,7 @@ export type StorageItemProps =
   & Pick<ButtonWithDisabledPopoverProps<never>, 'anchor' | 'helpTitle'>
   & {
     species: number;
+    version: GameVersion;
     context: EntityContext;
     form: number;
     isFemale?: boolean;
@@ -47,6 +48,7 @@ export type StorageItemProps =
 
 export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   species,
+  version,
   context,
   form,
   isFemale,
@@ -134,6 +136,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
       <SpeciesImg species={species} context={context} form={form} isFemale={isFemale} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} small={small} />
 
       {heldItem > 0 && <ItemImg
+        version={version}
         item={heldItem}
         size={small ? 15 : undefined}
         className={css({

@@ -145,7 +145,10 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
         preContent={reports}
         content={pkm.isEnabled && <>
             {!!pkm.heldItem && <TextContainer>
-                {t('details.held-item')} <span className={css({ color: theme.text.primary })}>{staticData.items[ pkm.heldItem ]?.name}</span> <ItemImg
+                {t('details.held-item')}
+                {' '}<span className={css({ color: theme.text.primary })}>{staticData.getItem(pkm.contextVersion ?? pkm.version, pkm.heldItem)?.name}</span>
+                {' '}<ItemImg
+                    version={pkm.contextVersion ?? pkm.version}
                     item={pkm.heldItem}
                     size={24}
                     className={css({

@@ -50,9 +50,20 @@ public record StaticAbility(
 );
 
 public record StaticItem(
-    int Id,
+    string Id,
     string Name,
     string Sprite
+);
+
+public record StaticVersionsItems(
+    List<byte> Versions,
+    // item value => item key
+    Dictionary<int, string> ComboItems
+);
+
+public record StaticItemsData(
+    List<StaticVersionsItems> VersionItems,
+    Dictionary<string, StaticItem> Items
 );
 
 public record StaticGeneration(
@@ -87,7 +98,7 @@ public record StaticOthersData(
     Dictionary<int, StaticMove> Moves,
     Dictionary<int, StaticNature> Natures,
     Dictionary<int, StaticAbility> Abilities,
-    Dictionary<int, StaticItem> Items,
+    StaticItemsData Items,
     Dictionary<byte, StaticGeneration> Generations,
     Dictionary<string, StaticPokedex> Pokedexes,
     Dictionary<string, StaticRibbon> Ribbons,
@@ -404,30 +415,94 @@ public class GenStaticOthers(
         return dict;
     }
 
-    public async Task<Dictionary<int, StaticItem>> GetStaticItems(string lang)
+    public async Task<StaticItemsData> GetStaticItems(string lang)
     {
         using var _ = LogUtil.Time($"static-data {lang} process items");
-        var itemNames = GameInfo.GetStrings(lang).itemlist;
-        List<Task<StaticItem>> tasks = [];
+
+        List<StaticVersionsItems> VersionItems = [];
+        Dictionary<string, StaticItem> Items = [];
 
         // var notFound = new List<string>();
         // Console.WriteLine(string.Join('\n', GameInfo.Strings.itemlist.ToList().FindAll(item => item.ToLower().Contains("ball"))));
 
-        for (var i = 0; i < itemNames.Length; i++)
+        List<ComboItem> getItemStrings(GameVersion _version, GameStrings strings)
         {
-            var itemId = i;
-            var itemName = itemNames[itemId];
-            var itemNamePokeapi = GetPokeapiItemName(
-                GameInfo.Strings.itemlist[itemId]
-            );
-
-            if (itemNamePokeapi.Trim().Length == 0 || itemNamePokeapi == "???")
+            var version = GetSingleVersion(_version);
+            if (version == default)
             {
-                continue;
+                return _version == GameVersion.Any
+                    ? Util.GetCBList(strings.itemlist)
+                    : [];
             }
 
-            tasks.Add(Task.Run(async () =>
+            var save = BlankSaveFile.Get(version);
+            var items = Util.GetCBList(strings.GetItemStrings(save.Context, save.Version), save.HeldItems);
+            items.RemoveAll(i => i.Value > save.MaxItemID);
+            return items;
+        }
+
+        foreach (var version in Enum.GetValues<GameVersion>())
+        {
+            var itemlist = getItemStrings(version, GameInfo.Strings);
+            var itemlistStr = string.Join('.', itemlist.Select(it => $"{it.Text},{it.Value}"));
+
+            var versionItem = VersionItems.FirstOrDefault(st =>
             {
+                var vers = (GameVersion)st.Versions.FirstOrDefault();
+
+                var itemlist2 = getItemStrings(vers, GameInfo.Strings);
+                return itemlist.Count == itemlist2.Count
+                    && itemlistStr == string.Join('.', itemlist2.Select(it => $"{it.Text},{it.Value}"));
+            });
+
+            if (versionItem == default)
+            {
+                Dictionary<int, string> comboItems = [];
+                foreach (var item in itemlist)
+                {
+                    if (comboItems.TryGetValue(item.Value, out var text))
+                    {
+                        if (text == item.Text)
+                        {
+                            continue;
+                        }
+
+                        throw new Exception($"Key exists, key={item.Value} existingText={text} tryText={item.Text}");
+                    }
+                    comboItems.Add(item.Value, item.Text);
+                }
+
+                versionItem = new(
+                    Versions: [],
+                    ComboItems: comboItems
+                );
+                VersionItems.Add(versionItem);
+            }
+            versionItem.Versions.Add((byte)version);
+        }
+
+        foreach (var (Versions, _) in VersionItems)
+        {
+            var version = (GameVersion)Versions.First();
+            var itemsEn = getItemStrings(version, GameInfo.Strings);
+            var items = getItemStrings(version, GameInfo.GetStrings(lang));
+
+            for (var i = 0; i < items.Count; i++)
+            {
+                var item = items[i];
+
+                var itemEn = itemsEn.First(it => it.Value == item.Value);
+                if (Items.ContainsKey(itemEn.Text))
+                {
+                    continue;
+                }
+
+                var itemNamePokeapi = GetPokeapiItemName(itemEn.Text);
+                if (itemNamePokeapi.Trim().Length == 0 || itemNamePokeapi == "???")
+                {
+                    continue;
+                }
+
                 var itemObj = await pokeApiService.GetItem(itemNamePokeapi);
                 var sprite = itemObj?.Sprites.Default ?? "";
 
@@ -439,21 +514,18 @@ public class GenStaticOthers(
                 // if (itemNameEn.ToLower().Contains("belt"))
                 // Console.WriteLine($"Error with item {itemId} - {itemNameEn} / {PokeApiFileClient.PokeApiNameFromPKHexName(itemNameEn)} / {itemName}");
 
-                return new StaticItem(
-                    Id: itemId,
-                    Name: itemName,
+                Items[itemEn.Text] = new StaticItem(
+                    Id: itemEn.Text,
+                    Name: item.Text,
                     Sprite: GetPokeapiRelativePath(sprite)
                 );
-            }));
+            }
         }
 
-        var dict = new Dictionary<int, StaticItem>();
-        foreach (var value in await Task.WhenAll(tasks))
-        {
-            dict.Add(value.Id, value);
-        }
-
-        return dict;
+        return new(
+            VersionItems,
+            Items
+        );
     }
 
     public async Task<Dictionary<byte, StaticGeneration>> GetStaticGenerations(string lang)

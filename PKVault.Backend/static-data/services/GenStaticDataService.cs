@@ -19,7 +19,7 @@ public class GenStaticDataService(PokeApiService pokeApiService, IFileIOService 
 
         var spritesheets = new GenStaticSpritesheets(fileIOService,
             (await species)[0],
-            (await others)[0].Items
+            [.. (await others)[0].Items.Items.Values]
         ).GenerateFiles();
 
         await Task.WhenAll([
