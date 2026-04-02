@@ -10,6 +10,8 @@ using System.IO.Abstractions;
 
 public interface IFileIOService
 {
+    public MatcherUtil Matcher { get; }
+
     public Task<TValue> ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue);
     public Task<TValue?> ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo);
     public TValue ReadJSONFileSync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue);
@@ -34,6 +36,9 @@ public interface IFileIOService
 
 public class FileIOService(IFileSystem fileSystem) : IFileIOService
 {
+    private readonly MatcherUtil _matcher = new();
+    public MatcherUtil Matcher => _matcher;
+
     public TValue ReadJSONFileSync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue)
     {
         path = NormalizePath(path);
@@ -251,6 +256,7 @@ public interface IArchiveEntry
     public string Name { get; }
     public string FullName { get; }
 
+    public Task<string> GetContent();
     public void ExtractToFile(string destinationFileName, bool overwrite);
 }
 
@@ -269,6 +275,13 @@ public class ArchiveEntry(ZipArchiveEntry entry, IFileSystem fileSystem) : IArch
 {
     public string Name => entry.Name;
     public string FullName => entry.FullName;
+
+    public async Task<string> GetContent()
+    {
+        using var entryStream = await entry.OpenAsync();
+        using var fileReader = new StreamReader(entryStream);
+        return await fileReader.ReadToEndAsync();
+    }
 
     public void ExtractToFile(string destinationFileName, bool overwrite)
     {

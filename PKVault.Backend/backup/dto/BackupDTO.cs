@@ -1,5 +1,6 @@
 
 public record BackupDTO(
     DateTime CreatedAt,
-    string Filepath
+    string Filepath,
+    string Name
 );

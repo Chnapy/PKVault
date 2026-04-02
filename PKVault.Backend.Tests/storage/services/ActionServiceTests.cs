@@ -13,6 +13,7 @@ public class ActionServiceTests
     public ActionServiceTests()
     {
         fileIOService = new FileIOService(mockFileSystem);
+        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllPaths];
     }
 
     private ActionService GetService(DateTime now, bool throwOnSessionPersist = false)
@@ -92,7 +93,7 @@ public class ActionServiceTests
         var flags = await actionService.Save();
 
         Assert.True(mockFileSystem.FileExists(
-                Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip")
+                Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "backup_before_save_2013-03-21T132611-000Z.zip")
             ),
             $"File is missing, list of current files:\n{string.Join('\n', mockFileSystem.AllFiles)}");
     }
@@ -117,7 +118,7 @@ public class ActionServiceTests
 
         await Assert.ThrowsAnyAsync<Exception>(actionService.Save);
 
-        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip")));
+        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "backup_before_save_2013-03-21T132611-000Z.zip")));
 
         Assert.True(mockFileSystem.FileExists("mock-main.db"));
 
