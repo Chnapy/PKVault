@@ -43,7 +43,7 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
                 {saveId === 0 ? (
                     <>
                         {pkmVariantsQuery.isLoading && !pkmVariantsQuery.data && (
-                            <StorageItem small species={species} context={9} form={0} helpTitle={null} loading />
+                            <StorageItem small species={species} version={0} context={9} form={0} helpTitle={null} loading />
                         )}
 
                         {pkmVariantsQuery.data?.data.bySpecies[ species ]
@@ -73,7 +73,7 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
                 ) : (
                     <>
                         {savePkmsQuery.isLoading && !savePkmsQuery.data && (
-                            <StorageItem small species={species} context={9} form={0} helpTitle={null} loading />
+                            <StorageItem small species={species} version={0} context={9} form={0} helpTitle={null} loading />
                         )}
 
                         {savePkmsQuery.data?.data.bySpecies[ species ]?.map(pkm => (

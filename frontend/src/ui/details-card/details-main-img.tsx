@@ -8,6 +8,7 @@ import { ShinyIcon } from '../icon/shiny-icon';
 import { BallImg } from '../img/ball-img';
 import { SpeciesImg } from '../img/species-img';
 import { theme } from '../theme';
+import type { ItemImgProps } from '../img/item-img';
 
 export type DetailsMainImgProps = {
     species: number;
@@ -20,7 +21,7 @@ export type DetailsMainImgProps = {
     isEgg?: boolean;
     isShadow?: boolean;
     isOwned?: boolean;
-    ball?: number;
+    ball?: ItemImgProps[ 'item' ];
 };
 
 export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, context, form, gender, isFemale, isShiny, isAlpha, isEgg, isShadow, isOwned, ball = 0 }) => {
@@ -45,7 +46,7 @@ export const DetailsMainImg: React.FC<DetailsMainImgProps> = ({ species, context
                 color: theme.text.default
             })}
         >
-            {ball > 0 && <BallImg item={ball} />}
+            {ball ? <BallImg item={ball} /> : null}
 
             {isOwned && <Icon name='folder' solid />}
         </div>

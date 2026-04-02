@@ -27,13 +27,14 @@ export const StorageMainItemBase: React.FC<StorageMainItemBaseProps> = React.mem
 
     const { mainVariant, variants, canDetach } = variantInfos;
 
-    const { species, context, form, gender, isAlpha, isShiny, isExternal } = mainVariant;
+    const { species, contextVersion, context, form, gender, isAlpha, isShiny, isExternal } = mainVariant;
 
     return (
         <StorageItem
             {...{
                 ...rest,
                 species,
+                version: contextVersion,
                 context,
                 form,
                 isFemale: gender === GenderType.Female,

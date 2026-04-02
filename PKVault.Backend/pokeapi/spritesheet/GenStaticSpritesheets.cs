@@ -18,7 +18,7 @@ public record SpriteInfo(string SheetName, int X, int Y, int Width, int Height);
  */
 public class GenStaticSpritesheets(
     IFileIOService fileIOService,
-    StaticSpeciesData staticSpecies, Dictionary<int, StaticItem> staticItems
+    StaticSpeciesData staticSpecies, StaticItem[] staticItems
 ) : StaticDataGenerator<StaticSpritesheetsData>(
    jsonTypeInfo: StaticDataJsonContext.Default.StaticSpritesheetsData,
    jsonTypeInfoIndented: new StaticDataJsonContext(JsonIndentedOptions).StaticSpritesheetsData,
@@ -52,7 +52,7 @@ public class GenStaticSpritesheets(
 
     private async Task<StaticSpritesheetsData> GenerateAllSpritesheets(
         StaticSpeciesData staticSpecies,
-        Dictionary<int, StaticItem> staticItems
+        StaticItem[] staticItems
     )
     {
         fileIOService.Delete(TargetPath);
@@ -97,9 +97,9 @@ public class GenStaticSpritesheets(
         return GetSpritesheetAtlas(spritesInfosList);
     }
 
-    private async Task<Dictionary<string, SpriteInfo>> GenerateItemsSpritesheet(Dictionary<int, StaticItem> staticItems)
+    private async Task<Dictionary<string, SpriteInfo>> GenerateItemsSpritesheet(StaticItem[] staticItems)
     {
-        var itemsBySpritesheet = staticItems.Values
+        var itemsBySpritesheet = staticItems
             .Select(item => item.Sprite).Distinct().ToList().FindAll(path => path.Length > 0)
             .Chunk(3600);
 

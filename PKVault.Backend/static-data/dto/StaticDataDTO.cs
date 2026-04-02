@@ -1,6 +1,3 @@
-
-using PKHeX.Core;
-
 public record StaticDataDTO(
     Dictionary<byte, StaticVersion> Versions,
     StaticSpeciesData Species,
@@ -9,7 +6,7 @@ public record StaticDataDTO(
     Dictionary<int, StaticMove> Moves,
     Dictionary<int, StaticNature> Natures,
     Dictionary<int, StaticAbility> Abilities,
-    Dictionary<int, StaticItem> Items,
+    StaticItemsData Items,
     StaticEvolvesData Evolves,
     Dictionary<byte, StaticGeneration> Generations,
     Dictionary<string, StaticPokedex> Pokedexes,
