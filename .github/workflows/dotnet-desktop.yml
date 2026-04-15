@@ -42,8 +42,9 @@ jobs:
       run: |
         dotnet test --no-build --configuration ${{ matrix.configuration }} || echo "No tests found — skipping"
 
-    - name: Upload Build Artifacts
+    - name: Upload Build Artifacts (ignore if none)
       uses: actions/upload-artifact@v4
       with:
         name: PKVault-${{ matrix.configuration }}
         path: PKVault.Desktop/bin/${{ matrix.configuration }}/net8.0-windows
+        if-no-files-found: ignore
