@@ -32,18 +32,19 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    - name: Restore Solution
+    - name: Restore
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=${{ matrix.configuration }}
 
-    - name: Build Solution
+    - name: Build
       run: msbuild $env:Solution_Name /p:Configuration=${{ matrix.configuration }}
 
     - name: Run Tests (ignore if none)
       run: |
         dotnet test --no-build --configuration ${{ matrix.configuration }} || echo "No tests found — skipping"
 
-    - name: Upload Desktop Build Artifacts
+    - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: PKVault-${{ matrix.configuration }}
         path: PKVault.Desktop/bin/${{ matrix.configuration }}/net8.0-windows
+        if-no-files-found: ignore
