@@ -8,7 +8,7 @@ import {
     useStorageGetMainBanks,
     useStorageGetBoxes,
     useStorageUpdateMainBox,
-    type storageGetBoxesResponse200,
+    type storageGetBoxesResponse200ApplicationJson,
 } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
@@ -84,7 +84,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string; close: () => void }> = ({
     // apply some form data to cached data list to view in real-time name & order changes
     React.useEffect(() => {
         if (box && (watchName !== box.name || watchOrder !== box.order)) {
-            queryClient.setQueryData(getStorageGetBoxesQueryKey(), (data: storageGetBoxesResponse200) => {
+            queryClient.setQueryData(getStorageGetBoxesQueryKey(), (data: storageGetBoxesResponse200ApplicationJson) => {
                 return {
                     ...data,
                     data: data?.data.map(b => {
