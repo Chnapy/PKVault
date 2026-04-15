@@ -2,7 +2,7 @@ import { css } from '@emotion/css';
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { HistoryContext } from '../context/history-context';
-import type { SettingsMutableDTO } from '../data/sdk/model/settingsMutableDTO';
+import type { SettingsMutableDTO } from '../data/sdk/model';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { HelpButton } from '../help/help-button';

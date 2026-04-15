@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import type { BankView, StorageUpdateMainBankParams } from '../../data/sdk/model';
-import { getStorageGetMainBanksQueryKey, useStorageGetMainBanks, useStorageUpdateMainBank, type storageGetMainBanksResponse200 } from '../../data/sdk/storage/storage.gen';
+import { getStorageGetMainBanksQueryKey, useStorageGetMainBanks, useStorageUpdateMainBank, type storageGetMainBanksResponse200ApplicationJson } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
@@ -78,7 +78,7 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
     // apply some form data to cached data list to view in real-time name & order changes
     React.useEffect(() => {
         if (bank && (watchName !== bank.name || watchOrder !== bank.order)) {
-            queryClient.setQueryData(getStorageGetMainBanksQueryKey(), (data: storageGetMainBanksResponse200) => {
+            queryClient.setQueryData(getStorageGetMainBanksQueryKey(), (data: storageGetMainBanksResponse200ApplicationJson) => {
                 return {
                     ...data,
                     data: data?.data.map(b => {

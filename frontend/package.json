@@ -60,7 +60,7 @@
     "jsdom": "^28.1.0",
     "json-schema-to-typescript": "^15.0.4",
     "msw": "^2.12.10",
-    "orval": "^7.21.0",
+    "orval": "^8.8.0",
     "prettier": "^3.8.1",
     "sharp": "^0.34.5",
     "svgo": "^4.0.1",
