@@ -7,7 +7,7 @@ using System.Text.Json;
  */
 public class BackupService(
     IServiceProvider sp, TimeProvider timeProvider,
-    IFileIOService fileIOService, ISaveService saveService,
+    IFileIOService fileIOService, ISavesLoadersService savesLoadersService,
     ISettingsService settingsService, ISessionService sessionService
 )
 {
@@ -74,25 +74,27 @@ public class BackupService(
     {
         var dict = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
 
-        var filePath = sessionService.MainDbPath;
-        if (fileIOService.Exists(filePath))
+        var rawDbFilepath = sessionService.MainDbRelativePath;
+        var dbFilepath = sessionService.MainDbPath;
+        if (fileIOService.Exists(dbFilepath))
         {
-            var fileName = Path.GetFileName(filePath);
+            var fileName = Path.GetFileName(dbFilepath);
             var relativePath = Path.Combine("db", fileName);
-            var content = await fileIOService.ReadBytes(filePath);
+            var content = await fileIOService.ReadBytes(dbFilepath);
 
             dict.Add(
                 NormalizePath(relativePath),
-                    (TargetPath: NormalizePath(filePath), FileContent: content)
+                    (TargetPath: NormalizePath(rawDbFilepath), FileContent: content)
             );
         }
 
         var settings = settingsService.GetSettings();
         var dbPath = settings.SettingsMutable.DB_PATH;
 
-        List<string> filepaths = DataNormalizeAction.GetLegacyFilepaths(dbPath);
-        foreach (var filepath in filepaths)
+        List<string> rawFilepaths = DataNormalizeAction.GetLegacyFilepaths(dbPath);
+        foreach (var rawFilepath in rawFilepaths)
         {
+            var filepath = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), rawFilepath));
             if (fileIOService.Exists(filepath))
             {
                 var fileName = Path.GetFileName(filepath);
@@ -101,7 +103,7 @@ public class BackupService(
 
                 dict.Add(
                     NormalizePath(relativePath),
-                        (TargetPath: NormalizePath(filepath), FileContent: content)
+                        (TargetPath: NormalizePath(rawFilepath), FileContent: content)
                 );
             }
         }
@@ -113,16 +115,16 @@ public class BackupService(
     {
         var paths = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
 
-        var savesById = await saveService.GetSaveById();
+        var savesPaths = savesLoadersService.GetSaveById().Values
+            .Select(save => save.Metadata.FilePath);
 
-        if (savesById.Count == 0)
+        if (!savesPaths.Any())
         {
             return paths;
         }
 
-        foreach (var save in savesById.Values)
+        foreach (var path in savesPaths)
         {
-            var path = save.Metadata.FilePath;
             if (string.IsNullOrEmpty(path))
             {
                 continue;
@@ -134,8 +136,10 @@ public class BackupService(
             var newFilename = $"{filename}_{hashCode}{ext}";
             var relativePath = Path.Combine("saves", newFilename);
 
+            var fileContent = await fileIOService.ReadBytes(path);
+
             paths.Add(NormalizePath(relativePath), (
-                TargetPath: NormalizePath(path), FileContent: save.GetSaveFileData()
+                TargetPath: NormalizePath(path), FileContent: fileContent
             ));
         }
 
@@ -273,7 +277,7 @@ public class BackupService(
         }
 
         var settings = settingsService.GetSettings();
-        var dbPath = settings.SettingsMutable.DB_PATH;
+        var dbPath = settings.GetDbPath();
 
         // remove current db file & old JSON files
         // to avoid remaining old data
@@ -286,7 +290,7 @@ public class BackupService(
         foreach (var entry in archive.Entries)
         {
             if (
-                paths!.TryGetValue(entry.FullName, out var path)
+                paths.TryGetValue(entry.FullName, out var path)
                 || paths.TryGetValue(entry.FullName.Replace('/', '\\'), out path)
             )
             {
@@ -302,7 +306,7 @@ public class BackupService(
 
         logtime.Stop();
 
-        saveService.InvalidateSaves();
+        savesLoadersService.Clear();
         await sessionService.StartNewSession(checkInitialActions: true);
     }
 
@@ -318,7 +322,7 @@ public class BackupService(
 
             logtime.Stop();
 
-            saveService.InvalidateSaves();
+            savesLoadersService.Clear();
             await sessionService.StartNewSession(checkInitialActions: false);
         }
         catch (Exception ex)
@@ -333,7 +337,7 @@ public class BackupService(
 
     private string GetBackupsPath()
     {
-        var backupPath = settingsService.GetSettings().SettingsMutable.BACKUP_PATH;
+        var backupPath = settingsService.GetSettings().GetBackupPath();
         fileIOService.CreateDirectory(backupPath);
         return backupPath;
     }

@@ -5,16 +5,25 @@ using PKHeX.Core;
  */
 public class ActionService(
     IServiceProvider sp,
-    PkmConvertService pkmConvertService, BackupService backupService, ISettingsService settingsService,
-    PkmLegalityService pkmLegalityService, ISessionService sessionService, ISavesLoadersService savesLoadersService
+    PkmUpdateService pkmUpdateService, BackupService backupService, ISettingsService settingsService,
+    ISessionService sessionService, ISavesLoadersService savesLoadersService
 )
 {
-    public async Task<DataUpdateFlags> DataNormalize(IServiceScope scope)
+    public async Task<DataUpdateFlags> DataNormalize(DataNormalizeActionInput input, IServiceScope scope)
     {
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<DataNormalizeAction>(),
-            new()
+            input
+        );
+    }
+
+    public async Task<DataUpdateFlags> UpdateExternalPkm(UpdateExternalPkmActionInput input, IServiceScope scope)
+    {
+        return await AddAction(
+            scope,
+            (scope) => scope.ServiceProvider.GetRequiredService<UpdateExternalPkmAction>(),
+            input
         );
     }
 
@@ -123,14 +132,14 @@ public class ActionService(
         );
     }
 
-    public async Task<DataUpdateFlags> MainCreatePkmVariant(string pkmVariantId, byte generation)
+    public async Task<DataUpdateFlags> MainCreatePkmVariant(string pkmVariantId, EntityContext context)
     {
         using var scope = sp.CreateScope();
 
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<MainCreatePkmVariantAction>(),
-            new(pkmVariantId, generation)
+            new(pkmVariantId, context)
         );
     }
 
@@ -200,14 +209,14 @@ public class ActionService(
         );
     }
 
-    public async Task<DataUpdateFlags> SortPkms(uint? saveId, int fromBoxId, int toBoxId, bool leaveEmptySlot)
+    public async Task<DataUpdateFlags> SortPkms(uint? saveId, int fromBoxId, int toBoxId, string pokedexName, bool leaveEmptySlot)
     {
         using var scope = sp.CreateScope();
 
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<SortPkmAction>(),
-            new(saveId, fromBoxId, toBoxId, leaveEmptySlot)
+            new(saveId, fromBoxId, toBoxId, pokedexName, leaveEmptySlot)
         );
     }
 
@@ -305,18 +314,29 @@ public class ActionService(
             return await action.ExecuteWithPayload(input, flags);
         }
 
-        var flags = await AddActionInner(
-            scope,
-            applyFn,
-            null
-        );
+        try
+        {
+            var flags = await AddActionInner(
+                scope,
+                applyFn,
+                null
+            );
 
-        await scope.ServiceProvider.GetRequiredService<SessionDbContext>()
-            .SaveChangesAsync();
+            await scope.ServiceProvider.GetRequiredService<SessionDbContext>()
+                .SaveChangesAsync();
 
-        flags.Warnings = true;
+            flags.Warnings = true;
 
-        return flags;
+            return flags;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+
+            await RemoveDataActionsAndReset(sessionService.Actions.Count);
+
+            throw;
+        }
     }
 
     private async Task<DataUpdateFlags> AddActionInner(
@@ -412,15 +432,15 @@ public class ActionService(
 
         var pkm = await GetPkm();
 
-        var legality = pkmLegalityService.GetLegalitySafe(pkm, save);
+        var legality = PkmLegalityService.GetLegalitySafe(pkm, save);
 
         var moveComboSource = new LegalMoveComboSource();
         var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);
 
         save ??= new(BlankSaveFile.Get(
-            StaticDataService.GetSingleVersion(pkm.Version),
+            pkm.Context,
             pkm.OriginalTrainerName,
-            (LanguageID)pkmConvertService.GetPkmLanguage(pkm.GetMutablePkm())
+            (LanguageID)pkmUpdateService.GetPkmLanguage(pkm.GetMutablePkm())
         ));
 
         var filteredSources = new FilteredGameDataSource(save.GetSave(), GameInfo.Sources);

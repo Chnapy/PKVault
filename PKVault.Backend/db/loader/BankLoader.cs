@@ -32,6 +32,7 @@ public class BankLoader : EntityLoader<BankDTO, BankEntity>, IBankLoader
             IdInt: entity.IdInt,
             Name: entity.Name,
             IsDefault: entity.IsDefault,
+            IsExternal: entity.IsExternal,
             Order: entity.Order,
             View: entity.View
         );

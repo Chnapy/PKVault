@@ -1,16 +1,16 @@
 import { css } from "@emotion/css";
 import { Listbox, ListboxOption, ListboxOptions } from "@headlessui/react";
 import type React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import type { StorageDexSyncParams } from "../../data/sdk/model";
 import { useSaveInfosGetAll } from "../../data/sdk/save-infos/save-infos.gen";
 import { useStorageDexSync } from "../../data/sdk/storage/storage.gen";
 import { useStaticData } from "../../hooks/use-static-data";
-import { getGameInfos } from "../../pokedex/details/util/get-game-infos";
 import { useTranslate } from "../../translate/i18n";
 import { Button } from "../../ui/button/button";
 import { FilterLabel } from "../../ui/filter/filter-label/filter-label";
 import { Icon } from "../../ui/icon/icon";
+import { GameImg } from '../../ui/img/game-img';
 import { theme } from "../../ui/theme";
 
 export const DexSyncAdvancedAction: React.FC<{
@@ -26,14 +26,14 @@ export const DexSyncAdvancedAction: React.FC<{
 
   const dexSyncMutation = useStorageDexSync();
 
-  const { handleSubmit, watch, setValue, formState } =
+  const { handleSubmit, setValue, formState, control } =
     useForm<StorageDexSyncParams>({
       defaultValues: {
-        saveIds: [saveId],
+        saveIds: [ saveId ],
       },
     });
 
-  const saveIds = watch("saveIds") ?? [];
+  const [ saveIds = [] ] = useWatch({ control, name: [ 'saveIds' ] });
 
   const onSubmit = handleSubmit(async ({ saveIds }) => {
     const result = await dexSyncMutation.mutateAsync({
@@ -82,12 +82,9 @@ export const DexSyncAdvancedAction: React.FC<{
               value: "0",
               label: (
                 <>
-                  <img
-                    src={getGameInfos(null).img}
-                    className={css({
-                      height: 14,
-                      width: 14,
-                    })}
+                  <GameImg
+                    version={null}
+                    size={14}
                   />
                   PKVault
                 </>
@@ -99,14 +96,11 @@ export const DexSyncAdvancedAction: React.FC<{
               value: save.id.toString(),
               label: (
                 <>
-                  <img
-                    src={getGameInfos(save.version).img}
-                    className={css({
-                      height: 14,
-                      width: 14,
-                    })}
+                  <GameImg
+                    version={save.version}
+                    size={14}
                   />
-                  {staticData.versions[save.version]?.name} - {save.trainerName}
+                  {staticData.versions[ save.version ]?.name} - {save.trainerName}
                 </>
               ),
               selected: saveIds.includes(save.id),

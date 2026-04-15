@@ -5,15 +5,17 @@ import { usePkmVariantSlotInfos } from '../../data/hooks/use-pkm-variant-slot-in
 import { Route } from '../../routes/storage';
 import type { StorageItemProps } from '../../ui/storage-item/storage-item';
 import { filterIsDefined } from '../../util/filter-is-defined';
-import { StorageMoveContext } from './storage-move-context';
+import { MoveContext } from '../move/context/move-context';
+
+export type StorageSelectContextValue = {
+    saveId?: number;
+    boxId?: number;
+    ids: string[];
+};
 
 type Context = {
-    value: {
-        saveId?: number;
-        boxId?: number;
-        ids: string[];
-    };
-    setValue: (value: Context[ 'value' ]) => void;
+    value: StorageSelectContextValue;
+    setValue: (value: StorageSelectContextValue) => void;
 };
 
 const context = React.createContext<Context>({
@@ -26,9 +28,17 @@ const context = React.createContext<Context>({
  * Scoped to a single box at a time.
  */
 export const StorageSelectContext = {
-    Provider: ({ children }: React.PropsWithChildren) => {
+    Provider: ({ defaultValue, children }: React.PropsWithChildren<{ defaultValue?: StorageSelectContextValue }>) => {
+        return (
+            <StorageSelectContext.SimpleProvider defaultValue={defaultValue}>
+                <StorageSelectContext.SanityCheck />
+                {children}
+            </StorageSelectContext.SimpleProvider>
+        );
+    },
+    SimpleProvider: ({ defaultValue, children }: React.PropsWithChildren<{ defaultValue?: StorageSelectContextValue }>) => {
         const [ value, setValue ] = React.useState<Context>({
-            value: { ids: [] },
+            value: { ids: [], ...defaultValue },
             setValue: value =>
                 setValue(context => ({
                     ...context,
@@ -38,7 +48,6 @@ export const StorageSelectContext = {
 
         return (
             <context.Provider value={value}>
-                <StorageSelectContext.SanityCheck />
                 {children}
             </context.Provider>
         );
@@ -133,7 +142,7 @@ export const StorageSelectContext = {
      */
     useCheck: (saveId: number | undefined, pkmId: string): Pick<StorageItemProps, 'checked' | 'onCheck'> => {
         const selectContext = StorageSelectContext.useValue();
-        const movingIds = StorageMoveContext.useValue().selected?.ids;
+        const isMoveIdle = MoveContext.useValue().state.status === 'idle';
 
         const mainPkmsQuery = usePkmVariantIndex();
         const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);
@@ -167,7 +176,7 @@ export const StorageSelectContext = {
         return {
             checked,
             onCheck:
-                pkm && (!movingIds || movingIds.includes(pkmId))
+                pkm && isMoveIdle
                     ? e => {
                         if (selectContext.hasPkm(saveId, pkmId)) {
                             selectContext.removeId(pkmIds);

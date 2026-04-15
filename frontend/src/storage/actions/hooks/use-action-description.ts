@@ -1,4 +1,5 @@
-import { DataActionType, type DataActionPayload } from '../../../data/sdk/model';
+import { DataActionType, EntityContext, type DataActionPayload } from '../../../data/sdk/model';
+import { getEntityContextGenerationName } from '../../../data/util/get-entity-context-generation-name';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { useTranslate } from '../../../translate/i18n';
 import { switchUtil } from '../../../util/switch-util';
@@ -25,7 +26,7 @@ export const useActionDescription = () => {
             [ DataActionType.MAIN_CREATE_PKM_VERSION ]: () =>
                 t('storage.save-actions.type.create-pkm-variant', {
                     name: parameters[ 0 ],
-                    generation: parameters[ 1 ],
+                    generation: getEntityContextGenerationName(parameters[ 1 ] as EntityContext, true),
                 }),
             [ DataActionType.MOVE_PKM ]: () =>
                 t('storage.save-actions.type.move-pkm', {
@@ -44,7 +45,7 @@ export const useActionDescription = () => {
             [ DataActionType.EDIT_PKM_VERSION ]: () =>
                 t('storage.save-actions.type.main-edit-pkm', {
                     name: parameters[ 0 ],
-                    generation: parameters[ 1 ],
+                    generation: getEntityContextGenerationName(parameters[ 1 ] as EntityContext, true),
                 }),
             [ DataActionType.EDIT_PKM_SAVE ]: () =>
                 t('storage.save-actions.type.save-edit-pkm', {
@@ -54,7 +55,7 @@ export const useActionDescription = () => {
             [ DataActionType.DELETE_PKM_VERSION ]: () =>
                 t('storage.save-actions.type.main-delete-pkm', {
                     name: parameters[ 0 ],
-                    generation: parameters[ 1 ],
+                    generation: getEntityContextGenerationName(parameters[ 1 ] as EntityContext, true),
                 }),
             [ DataActionType.SAVE_DELETE_PKM ]: () =>
                 t('storage.save-actions.type.save-delete-pkm', {
@@ -88,6 +89,11 @@ export const useActionDescription = () => {
             [ DataActionType.SORT_PKM ]: () => t('storage.save-actions.type.sort-pkm'),
             [ DataActionType.DEX_SYNC ]: () => t('storage.save-actions.type.dex-sync'),
             [ DataActionType.DATA_NORMALIZE ]: () => t('storage.save-actions.type.data-normalize'),
+            [ DataActionType.UPDATE_EXTERNAL_PKM ]: () =>
+                t('storage.save-actions.type.update-external-pkm', {
+                    addCount: Number(parameters[ 0 ]),
+                    removeCount: Number(parameters[ 1 ]),
+                }),
         })();
     };
 };

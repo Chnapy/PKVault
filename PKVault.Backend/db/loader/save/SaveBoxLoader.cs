@@ -58,7 +58,7 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
 
         var extraSlots = save.GetSave().GetExtraSlots(true);
 
-        if (save is IDaycareStorage saveDaycare)
+        if (save.GetSave() is IDaycareStorage saveDaycare)
         {
             var id = ((int)BoxType.Daycare).ToString();
             var extraSlotsCount = extraSlots.FindAll(slot => slot.Type == StorageSlotType.Daycare).Count;
@@ -107,13 +107,72 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
         using var scope = sp.CreateScope();
         var boxLoader = scope.ServiceProvider.GetRequiredService<IBoxLoader>();
 
-        return boxes.Select(entry => (entry.Key, boxLoader.CreateDTO(entry.Value))).ToDictionary();
+        return boxes.Select(entry => (
+            entry.Key,
+            boxLoader.CreateDTO(entry.Value, GetWallpaperName(entry.Value.IdInt))
+        )).ToDictionary();
     }
 
     public List<BoxDTO> GetAllDtos()
     {
         return [.. GetAllEntities().Values];
     }
+
+    private string? GetWallpaperName(int box)
+    {
+        if (box < 0)
+        {
+            return null;
+        }
+
+        if (save.GetSave() is IBoxDetailWallpaper wp)
+        {
+            if (save.GetSave() is SAV9ZA)
+            {
+                return GetWallpaperResourceName(EntityContext.Gen8b.GetSingleGameVersion(), 1);
+            }
+
+            var wallpaper = wp.GetBoxWallpaper(box);
+            return GetWallpaperResourceName(save.Version, wallpaper);
+        }
+
+        return null;
+    }
+
+    private static string GetWallpaperResourceName(GameVersion version, int index)
+    {
+        index++; // start indexes at 1
+        var suffix = GetResourceSuffix(version, index);
+        var variant = version switch
+        {
+            GameVersion.SL when index is 20 => "_n", // Naranja
+            GameVersion.VL when index is 20 => "_u", // Uva
+            _ => string.Empty,
+        };
+
+        return MatcherUtil.NormalizePath(
+            Path.Combine(suffix, $"box_wp{index:00}{suffix}{variant}.png")
+        );
+    }
+
+    private static string GetResourceSuffix(GameVersion version, int index) => version.Context switch
+    {
+        EntityContext.Gen3 when version == GameVersion.E => "e",
+        EntityContext.Gen3 when GameVersion.FRLG.Contains(version) && index > 12 => "frlg",
+        EntityContext.Gen3 => "rs",
+
+        EntityContext.Gen4 when index <= 16 => "dp",
+        EntityContext.Gen4 when version == GameVersion.Pt => "pt",
+        EntityContext.Gen4 when GameVersion.HGSS.Contains(version) => "hgss",
+
+        EntityContext.Gen5 => GameVersion.B2W2.Contains(version) && index > 16 ? "b2w2" : "bw",
+        EntityContext.Gen6 => GameVersion.ORAS.Contains(version) && index > 16 ? "ao" : "xy",
+        EntityContext.Gen7 => "xy", // roughly equivalent, only use X/Y's because they don't force checker-boxes.
+        EntityContext.Gen8b => "bdsp",
+        EntityContext.Gen8 => "swsh",
+        EntityContext.Gen9 => "sv",
+        _ => string.Empty,
+    };
 
     public void WriteDto(BoxDTO dto)
     {
@@ -122,7 +181,7 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
             throw new Exception("Not allowed for box type not default");
         }
 
-        if (save is IBoxDetailName saveBoxName)
+        if (save.GetSave() is IBoxDetailName saveBoxName)
         {
             saveBoxName.SetBoxName(dto.IdInt, dto.Name);
             HasWritten = true;

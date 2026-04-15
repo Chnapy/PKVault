@@ -22,6 +22,15 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
         return pkm.Form;
     }
 
+    public static MoveCategory GetMoveCategoryG123(int type, MoveCategory? initialCategory = null)
+    {
+        return initialCategory == MoveCategory.STATUS
+            ? (MoveCategory)initialCategory
+            : (
+                type < 10 ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL
+            );
+    }
+
     public string Extension => Pkm.Extension;
     public PersonalInfo PersonalInfo => Pkm.PersonalInfo;
 
@@ -106,6 +115,8 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public uint ID32 => Pkm.ID32;
     public int PokerusStrain => Pkm.PokerusStrain;
     public int PokerusDays => Pkm.PokerusDays;
+    public bool IsPokerusInfected => Pkm.IsPokerusInfected;
+    public bool IsPokerusCured => Pkm.IsPokerusCured;
 
     public uint EncryptionConstant => Pkm.EncryptionConstant;
     public uint PID => Pkm.PID;
@@ -130,6 +141,28 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public byte OriginalTrainerFriendship => Pkm.OriginalTrainerFriendship;
     public bool Japanese => Pkm.Japanese;
     public bool Korean => Pkm.Korean;
+    public ulong? HomeTracker => Pkm is IHomeTrack pkmHT ? pkmHT.Tracker : null;
+    public MarkingColorUniversal[]? Markings => GetMarkings();
+    public int[]? Contest => Pkm is IContestStatsReadOnly pkmContest
+        ? [
+            pkmContest.ContestCool,
+            pkmContest.ContestBeauty,
+            pkmContest.ContestCute,
+            pkmContest.ContestSmart,
+            pkmContest.ContestTough,
+            pkmContest.ContestSheen,
+        ]
+        : null;
+    public Dictionary<string, byte>? Ribbons => Format > 2 && Pkm is not PB7
+        ? RibbonInfo.GetRibbonInfo(Pkm)
+            .Where(ribbon => ribbon.HasRibbon)
+            .ToDictionary(
+                p => p.Name,
+                p => p.Type == RibbonValueType.Byte
+                    ? p.RibbonCount
+                    : (byte)1
+            )
+        : null;
 
     // Future Properties
     public DateOnly? MetDate => Pkm.MetDate;
@@ -137,8 +170,10 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public byte MetMonth => Pkm.MetMonth;
     public byte MetDay => Pkm.MetDay;
     public string HandlingTrainerName => Pkm.HandlingTrainerName;
-    public byte HandlingTrainerGender => Pkm.HandlingTrainerGender;
+    public Gender HandlingTrainerGender => (Gender)Pkm.HandlingTrainerGender;
     public byte HandlingTrainerFriendship => Pkm.HandlingTrainerFriendship;
+    public byte CurrentHandler => Pkm.CurrentHandler;
+    public bool IsCurrentHandler => CurrentHandler == 1;
     public int AbilityNumber => Pkm.AbilityNumber;
 
     public int HPPower => Pkm.HPPower;
@@ -171,6 +206,9 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public bool IsNoble => Pkm is INoble pkn && pkn.IsNoble;
     public bool CanGigantamax => Pkm is IGigantamaxReadOnly pkg && pkg.CanGigantamax;
     public List<byte> Types => DexGenService.GetTypes(Format, Pkm.PersonalInfo);
+    public byte? TeraType => Pkm is ITeraTypeReadOnly pkmTera
+        ? DexGenService.GetType((byte)pkmTera.TeraType)
+        : null;
     public uint ExpToLevelUp => Experience.GetEXPToLevelUp(Pkm.CurrentLevel, Pkm.PersonalInfo.EXPGrowth);
     public double LevelUpPercent => Experience.GetEXPToLevelUpPercentage(Pkm.CurrentLevel, Pkm.EXP, Pkm.PersonalInfo.EXPGrowth);
     public byte Friendship => Pkm.IsEgg ? (byte)0 : Pkm.CurrentFriendship;
@@ -188,7 +226,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public int HiddenPowerPower => Pkm.HPPower;
 
     public MoveCategory HiddenPowerCategory => Generation <= 3
-        ? (HiddenPowerType < 10 ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL) // TODO duplicate with static-data
+        ? GetMoveCategoryG123(HiddenPowerType)
         : MoveCategory.SPECIAL;
 
     public Nature Nature => GetNature();
@@ -198,8 +236,18 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
         : Pkm.Ability;
 
     public List<ushort> Moves => [.. GetMoves()];
+    public List<ushort>? RelearnMoves => GetRelearnMoves();
+    public ushort? AlphaMove => IsAlpha
+        ? Pkm switch
+        {
+            PA8 pa8 => pa8.AlphaMove,
+            PA9 pa9 => pa9.PersonalInfo.AlphaMove,
+            _ => null,
+        }
+        : null;
 
-    public ushort TID => Pkm.TID16;
+    public uint TID => Pkm.DisplayTID;
+    public uint? SID => Pkm.DisplaySID > 0 ? Pkm.DisplaySID : null;
 
     public string OriginTrainerName => Pkm.OriginalTrainerName;
     public Gender OriginTrainerGender => (Gender)Pkm.OriginalTrainerGender;
@@ -209,7 +257,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public string GetOriginMetLocation(string language) => GameInfo.GetStrings(language)
         .GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version);
 
-    public int HeldItem => ItemConverter.GetItemForFormat(Pkm.HeldItem, Pkm.Context, StaticDataService.LAST_ENTITY_CONTEXT);
+    public int HeldItem => Pkm.HeldItem;
     public string? HeldItemPokeapiName => HeldItem > 0
         ? (HeldItem < GameInfo.Strings.Item.Count ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[HeldItem]) : "")
         : null;
@@ -224,6 +272,8 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public bool HasLoadError => loadError != null;
 
     public bool IsEnabled => !HasLoadError && IsSpeciesValid;
+
+    public static string GetPKMIdPrefix(EntityContext context) => $"G{context.ToString()[3..]}";
 
     /**
      * Generate ID similar to PKHeX one.
@@ -272,8 +322,10 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
                 clone.SetIVs(ivs);
             }
         });
+
         var hash = SearchUtil.HashByDetails(clone.GetMutablePkm());
-        var id = $"G{clone.Format}_{hash}_{clone.TID16}";   // note: SID not stored by pk files
+
+        var id = $"{GetPKMIdPrefix(clone.Context)}_{hash}_{clone.TID16}";   // note: SID not stored by pk files
 
         return id;
     }
@@ -283,6 +335,17 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
         Span<ushort> moves = new ushort[4];
         Pkm.GetMoves(moves);
         return moves;
+    }
+
+    public List<ushort>? GetRelearnMoves()
+    {
+        if (Format >= 6)
+        {
+            Span<ushort> relearnMoves = new ushort[4];
+            Pkm.GetRelearnMoves(relearnMoves);
+            return [.. relearnMoves];
+        }
+        return null;
     }
 
     public int[] GetBaseStats()
@@ -348,6 +411,39 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
 
     public Nature GetNature() => Pkm is GBPKM gbpkm ? Experience.GetNatureVC(gbpkm.EXP) : Pkm.Nature;
 
+    public MarkingColorUniversal[]? GetMarkings()
+    {
+        if (Pkm is IAppliedMarkings<bool> pkmMarking)
+        {
+            List<MarkingColorUniversal> markings = [];
+            for (var i = 0; i < pkmMarking.MarkingCount; i++)
+            {
+                markings.Add(pkmMarking.GetMarking(i)
+                    ? MarkingColorUniversal.Marked
+                    : MarkingColorUniversal.NotMarked);
+            }
+            return [.. markings];
+        }
+
+        if (Pkm is IAppliedMarkings<MarkingColor> pkmMarkingColors)
+        {
+            List<MarkingColorUniversal> markings = [];
+            for (var i = 0; i < pkmMarkingColors.MarkingCount; i++)
+            {
+                markings.Add(pkmMarkingColors.GetMarking(i) switch
+                {
+                    MarkingColor.None => MarkingColorUniversal.NotMarked,
+                    MarkingColor.Blue => MarkingColorUniversal.MarkedBlue,
+                    MarkingColor.Pink => MarkingColorUniversal.MarkedPink,
+                    _ => throw new NotImplementedException(),
+                });
+            }
+            return [.. markings];
+        }
+
+        return null;
+    }
+
     public PKM GetMutablePkm() => Pkm;
 
     /**
@@ -372,4 +468,12 @@ public enum PKMLoadError
     TOO_SMALL,
     TOO_BIG,
     UNAUTHORIZED
+}
+
+public enum MarkingColorUniversal : byte
+{
+    NotMarked = 0,
+    Marked = 1,
+    MarkedBlue = 2,
+    MarkedPink = 3,
 }

@@ -1,11 +1,15 @@
 import { css } from '@emotion/css';
 import { createRootRoute, Outlet, useMatchRoute } from "@tanstack/react-router";
+import { fallback, zodValidator } from '@tanstack/zod-adapter';
 import React from "react";
+import z from 'zod';
 import { HistoryContext } from '../context/history-context';
 import { useSaveInfosScan } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { useStorageGetActions } from '../data/sdk/storage/storage.gen';
 import { ErrorCatcher } from '../error/error-catcher';
+import { HelpDialog } from '../help/help-dialog';
+import type { DocsGenEnSlugs } from '../help/hooks/use-help-navigate';
 import { NotificationButton } from '../notification/notification-button';
 import { useTranslate } from '../translate/i18n';
 import { Button } from '../ui/button/button';
@@ -14,6 +18,8 @@ import { Frame } from '../ui/header/frame';
 import { Header } from '../ui/header/header';
 import { HeaderItem } from "../ui/header/header-item";
 import { Icon } from '../ui/icon/icon';
+import { iconResources } from '../ui/icon/icon-resources';
+import { ImgPrefetch } from '../ui/icon/img-prefetch';
 
 const Root: React.FC = () => {
   const matchRoute = useMatchRoute();
@@ -23,6 +29,15 @@ const Root: React.FC = () => {
   const settings = useSettingsGet().data?.data;
   const hasStorageActions = !!useStorageGetActions().data?.data.length;
   const savesScanMutation = useSaveInfosScan();
+
+  React.useEffect(() => {
+    if (hasStorageActions) {
+      window.onbeforeunload = () => 'You have unsaved changes !';
+    } else {
+      window.onbeforeunload = null;
+    }
+
+  }, [ hasStorageActions ]);
 
   return (
     <HistoryContext.Provider>
@@ -72,18 +87,30 @@ const Root: React.FC = () => {
               {t('header.scan-saves')}
             </ButtonWithDisabledPopover>
 
-            <HeaderItem
-              selected={Boolean(
-                matchRoute({ to: "/settings" }) ||
-                matchRoute({ to: "/settings", pending: true })
-              )}
-              to={"/settings"}
-              endPosition
-            >
-              {t('header.settings')}
-            </HeaderItem>
+            <div className={css({
+              display: 'flex',
+              alignItems: 'center',
+              marginLeft: 'auto'
+            })}>
+              <HeaderItem
+                search={{ help: 'README.md' satisfies DocsGenEnSlugs }}
+              >
+                <Icon name="info-circle" forButton />
+                {t('header.help')}
+              </HeaderItem>
 
-            <NotificationButton />
+              <HeaderItem
+                selected={Boolean(
+                  matchRoute({ to: "/settings" }) ||
+                  matchRoute({ to: "/settings", pending: true })
+                )}
+                to={"/settings"}
+              >
+                {t('header.settings')}
+              </HeaderItem>
+
+              <NotificationButton />
+            </div>
           </Header>
 
           <div
@@ -101,12 +128,27 @@ const Root: React.FC = () => {
               <Outlet />
             </ErrorCatcher>
           </div>
+
+          <HelpDialog />
         </ErrorCatcher>
       </Frame>
+
+      <div aria-description='prefetch' className={css({ width: 0, height: 0 })}>
+        {Object.values(iconResources).flatMap(v => Object.values(v)).map(url => <ImgPrefetch
+          key={url}
+          src={url}
+        />)}
+      </div>
     </HistoryContext.Provider>
   );
 };
 
+const searchSchema = z.object({
+  // /docs/{lang}/file.md#section
+  help: z.string().optional(),
+});
+
 export const Route = createRootRoute({
   component: Root,
+  validateSearch: zodValidator(fallback(searchSchema, {})),
 });

@@ -1,7 +1,7 @@
 public record EditPkmSaveActionInput(uint saveId, string pkmSaveId, EditPkmVariantPayload editPayload);
 
 public class EditPkmSaveAction(
-    ActionService actionService, PkmConvertService pkmConvertService,
+    ActionService actionService, PkmUpdateService pkmUpdateService,
     SynchronizePkmAction synchronizePkmAction,
     IPkmVariantLoader pkmVariantLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<EditPkmSaveActionInput>
@@ -15,9 +15,9 @@ public class EditPkmSaveAction(
 
         var pkm = pkmSave!.Pkm.Update(pkm =>
         {
-            EditPkmVariantAction.EditPkmNickname(pkmConvertService, pkm, input.editPayload.Nickname);
-            EditPkmVariantAction.EditPkmEVs(pkmConvertService, pkm, input.editPayload.EVs);
-            EditPkmVariantAction.EditPkmMoves(pkmConvertService, pkm, availableMoves, input.editPayload.Moves);
+            EditPkmVariantAction.EditPkmNickname(pkmUpdateService, pkm, input.editPayload.Nickname);
+            EditPkmVariantAction.EditPkmEVs(pkmUpdateService, pkm, input.editPayload.EVs);
+            EditPkmVariantAction.EditPkmMoves(pkmUpdateService, pkm, availableMoves, input.editPayload.Moves);
 
             // absolutly required before each write
             // TODO make a using write pkm to ensure use of this call

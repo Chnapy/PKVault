@@ -1,9 +1,10 @@
+import { css } from '@emotion/css';
 import { createFileRoute } from "@tanstack/react-router";
 import type React from "react";
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { Backup } from '../settings/backup/backup';
+import { Feedback } from '../settings/feedback/feedback';
 import { Settings } from '../settings/settings';
-import { css } from '@emotion/css';
 
 const SettingsPage: React.FC = withErrorCatcher('default', () => {
 
@@ -21,6 +22,8 @@ const SettingsPage: React.FC = withErrorCatcher('default', () => {
       })}
     >
       <Settings />
+
+      <Feedback />
 
       <Backup />
     </div>

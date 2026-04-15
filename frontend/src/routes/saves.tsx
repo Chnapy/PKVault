@@ -1,7 +1,9 @@
+import { css } from '@emotion/css';
 import { createFileRoute } from "@tanstack/react-router";
 import type React from "react";
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
+import type { DocsGenEnSlugs } from '../help/hooks/use-help-navigate';
 import { useStaticData } from '../hooks/use-static-data';
 import { SaveItem } from "../saves/save-item/save-item";
 import { useTranslate } from '../translate/i18n';
@@ -11,7 +13,6 @@ import { TitledContainer } from '../ui/container/titled-container';
 import { Icon } from '../ui/icon/icon';
 import { theme } from '../ui/theme';
 import { filterIsDefined } from '../util/filter-is-defined';
-import { css } from '@emotion/css';
 
 const Saves: React.FC = withErrorCatcher('default', () => {
   const { t } = useTranslate();
@@ -83,8 +84,17 @@ const Saves: React.FC = withErrorCatcher('default', () => {
       })}>
         <Icon name='info-circle' solid forButton />
         {t('saves.not-see')}
+
         <ButtonLink to={'/settings'}>
           {t('action.check-settings')}
+        </ButtonLink>
+
+        <ButtonLink
+          to={'.'}
+          search={{ help: '1-quick-start.md' satisfies DocsGenEnSlugs }}
+        >
+          <Icon name='info-circle' solid />
+          {t('action.quick-start')}
         </ButtonLink>
       </Container>
     </div>

@@ -24,6 +24,7 @@ public class Dex7bService(SAV7b save) : DexGenService(save)
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
             IsSeenShiny: isSeenShiny,
+            IsSeenAlpha: false,
             IsCaught: isSeen && save.GetCaught(species),
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
@@ -35,21 +36,21 @@ public class Dex7bService(SAV7b save) : DexGenService(save)
         return AllLanguages.Where((_, i) => save.Zukan.GetLanguageFlag(species - 1, i));
     }
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
+    public override async Task EnableSpeciesForm(EnableSpeciesFormPayload payload)
     {
-        if (!save.Personal.IsPresentInGame(species, form))
+        if (!save.Personal.IsPresentInGame(payload.Species, payload.Form))
             return;
 
-        if (isSeen)
-            save.Zukan.SetSeen(species, gender == Gender.Female ? 1 : 0, true);
+        if (payload.IsSeen)
+            save.Zukan.SetSeen(payload.Species, payload.Gender == Gender.Female ? 1 : 0, true);
 
-        if (isSeenShiny)
-            save.Zukan.SetSeen(species, gender == Gender.Female ? 3 : 2, true);
+        if (payload.IsSeenShiny)
+            save.Zukan.SetSeen(payload.Species, payload.Gender == Gender.Female ? 3 : 2, true);
 
-        if (isCaught)
-            save.Zukan.SetCaught(species, true);
+        if (payload.IsCaught)
+            save.Zukan.SetCaught(payload.Species, true);
 
-        var safeLanguages = languages.Where(AllLanguages.Contains);
+        var safeLanguages = payload.Languages.Where(AllLanguages.Contains);
         if (!safeLanguages.Any())
         {
             safeLanguages = [GetSaveLanguage()];
@@ -58,7 +59,7 @@ public class Dex7bService(SAV7b save) : DexGenService(save)
         foreach (var lang in safeLanguages)
         {
             var langIndex = AllLanguages.IndexOf(lang);
-            save.Zukan.SetLanguageFlag(species - 1, langIndex, true);
+            save.Zukan.SetLanguageFlag(payload.Species - 1, langIndex, true);
         }
     }
 }

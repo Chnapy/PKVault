@@ -26,6 +26,9 @@ namespace PKVault.Backend.Migrations
                     b.Property<bool>("IsDefault")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsExternal")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -79,6 +82,9 @@ namespace PKVault.Backend.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<byte>("Context")
+                        .HasColumnType("INTEGER");
+
                     b.Property<byte>("Form")
                         .HasColumnType("INTEGER");
 
@@ -86,6 +92,9 @@ namespace PKVault.Backend.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsCaught")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsCaughtAlpha")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsCaughtShiny")
@@ -110,6 +119,20 @@ namespace PKVault.Backend.Migrations
                     b.HasIndex("Species");
 
                     b.ToTable("Pokedex");
+                });
+
+            modelBuilder.Entity("MetaEntity", b =>
+                {
+                    b.Property<int>("Key")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("Metas");
                 });
 
             modelBuilder.Entity("PkmFileEntity", b =>
@@ -153,6 +176,9 @@ namespace PKVault.Backend.Migrations
                     b.Property<int>("BoxSlot")
                         .HasColumnType("INTEGER");
 
+                    b.Property<byte>("Context")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Filepath")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -164,6 +190,12 @@ namespace PKVault.Backend.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<byte>("Generation")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsAlpha")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsExternal")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsMain")

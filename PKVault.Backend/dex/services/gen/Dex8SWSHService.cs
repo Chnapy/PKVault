@@ -16,6 +16,8 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
         var isSeenForm = Dex.GetSeenRegion(species, form, gender == Gender.Female ? 1 : 0);
         var isSeenShinyForm = Dex.GetSeenRegion(species, form, gender == Gender.Female ? 3 : 2);
 
+        // var isCaughtGigantamax = Dex.GetCaughtGigantamax1(species) || Dex.GetCaughtGigantamaxed(species);
+
         var isSeenShiny = isOwnedShiny || isSeenShinyForm;
         var isSeen = isOwned || isSeenShiny || isSeenForm;
 
@@ -29,6 +31,7 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
             IsSeenShiny: isSeenShiny,
+            IsSeenAlpha: false,
             IsCaught: isSeen && (isOwned || Dex.GetCaught(species)),
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
@@ -40,28 +43,28 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
         return AllLanguages.Where((lang) => save.Blocks.Zukan.GetIsLanguageObtained(species, (int)lang));
     }
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
+    public override async Task EnableSpeciesForm(EnableSpeciesFormPayload payload)
     {
-        if (!save.Personal.IsPresentInGame(species, form))
+        if (!save.Personal.IsPresentInGame(payload.Species, payload.Form))
             return;
 
-        if (isSeen)
+        if (payload.IsSeen)
         {
-            save.Blocks.Zukan.SetSeenRegion(species, form, gender == Gender.Female ? 1 : 0, true);
-            save.Blocks.Zukan.SetFormDisplayed(species, form);
-            save.Blocks.Zukan.SetGenderDisplayed(species, gender == Gender.Female ? (uint)1 : 0);
+            save.Blocks.Zukan.SetSeenRegion(payload.Species, payload.Form, payload.Gender == Gender.Female ? 1 : 0, true);
+            save.Blocks.Zukan.SetFormDisplayed(payload.Species, payload.Form);
+            save.Blocks.Zukan.SetGenderDisplayed(payload.Species, payload.Gender == Gender.Female ? (uint)1 : 0);
         }
 
-        if (isSeenShiny)
+        if (payload.IsSeenShiny)
         {
-            save.Blocks.Zukan.SetSeenRegion(species, form, gender == Gender.Female ? 3 : 2, true);
-            save.Blocks.Zukan.SetDisplayShiny(species);
+            save.Blocks.Zukan.SetSeenRegion(payload.Species, payload.Form, payload.Gender == Gender.Female ? 3 : 2, true);
+            save.Blocks.Zukan.SetDisplayShiny(payload.Species);
         }
 
-        if (isCaught)
-            save.Blocks.Zukan.SetCaught(species, true);
+        if (payload.IsCaught)
+            save.Blocks.Zukan.SetCaught(payload.Species, true);
 
-        var safeLanguages = languages.Where(AllLanguages.Contains);
+        var safeLanguages = payload.Languages.Where(AllLanguages.Contains);
         if (!safeLanguages.Any())
         {
             safeLanguages = [GetSaveLanguage()];
@@ -69,7 +72,7 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
 
         foreach (var lang in safeLanguages)
         {
-            save.Blocks.Zukan.SetIsLanguageObtained(species, (int)lang);
+            save.Blocks.Zukan.SetIsLanguageObtained(payload.Species, (int)lang);
         }
     }
 }

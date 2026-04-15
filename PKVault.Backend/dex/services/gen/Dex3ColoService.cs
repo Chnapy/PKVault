@@ -31,7 +31,8 @@ public class Dex3ColoService(SAV3Colosseum save) : DexGenService(save)
             Abilities: GetAbilities(pi),
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
-            IsSeenShiny: false,
+            IsSeenShiny: isOwnedShiny,
+            IsSeenAlpha: false,
             IsCaught: isOwned || save.GetCaught(species),
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
@@ -43,15 +44,15 @@ public class Dex3ColoService(SAV3Colosseum save) : DexGenService(save)
         return [];
     }
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
+    public override async Task EnableSpeciesForm(EnableSpeciesFormPayload payload)
     {
-        if (!save.Personal.IsPresentInGame(species, form))
+        if (!save.Personal.IsPresentInGame(payload.Species, payload.Form))
             return;
 
-        if (isSeen)
-            save.SetSeen(species, true);
+        if (payload.IsSeen)
+            save.SetSeen(payload.Species, true);
 
-        if (isCaught)
-            save.SetCaught(species, true);
+        if (payload.IsCaught)
+            save.SetCaught(payload.Species, true);
     }
 }

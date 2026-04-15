@@ -2,7 +2,7 @@ import { css, cx } from '@emotion/css';
 import { Popover, PopoverButton } from '@headlessui/react';
 import React from 'react';
 import { usePkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
-import { BoxType, type PkmSaveDTO, type SaveInfosDTO } from '../../../data/sdk/model';
+import { BoxType, type BoxDTO, type PkmSaveDTO, type SaveInfosDTO } from '../../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../../../error/with-error-catcher';
@@ -10,18 +10,19 @@ import { Route } from '../../../routes/storage';
 import { SaveItem } from '../../../saves/save-item/save-item';
 import { useTranslate } from '../../../translate/i18n';
 import { Icon } from '../../../ui/icon/icon';
-import { SaveCardImg } from '../../../ui/save-card/save-card-img';
+import { GameImg } from '../../../ui/img/game-img';
 import { StorageBox } from '../../../ui/storage-box/storage-box';
 import { StorageBoxSaveActions } from '../../../ui/storage-box/storage-box-save-actions';
 import { StorageItemPlaceholder } from '../../../ui/storage-item/storage-item-placeholder';
-import { StorageMoveContext } from '../../actions/storage-move-context';
+import { SizingUtil } from '../../../ui/util/sizing-util';
 import { DexSyncAdvancedAction } from '../../advanced-actions/dex-sync-advanced-action';
 import { SortAdvancedAction } from '../../advanced-actions/sort-advanced-action';
+import { StorageSaveItem } from '../../item/save/storage-save-item';
+import { MoveContext } from '../../move/context/move-context';
+import { getSaveOrder } from '../../util/get-save-order';
 import { StorageBoxList } from '../storage-box-list';
 import { StorageHeader } from '../storage-header';
-import { StorageSaveItem } from '../../item/save/storage-save-item';
-import { getSaveOrder } from '../../util/get-save-order';
-import { SizingUtil } from '../../../ui/util/sizing-util';
+import { getBoxBackgroundUrl } from '../util/get-box-background-url';
 
 export type StorageSaveBoxContentProps = {
   saveId: number;
@@ -42,7 +43,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
 
   const getSaveBoxIds = (value: number) => saveBoxIds.map((id, i) => (i === boxIndex ? value : id));
 
-  const moveContext = StorageMoveContext.useValue();
+  const moveState = MoveContext.useValue().state;
 
   const saveInfosQuery = useSaveInfosGetAll();
   const saveInfos = saveInfosQuery.data?.data[ saveId ] as SaveInfosDTO | undefined;
@@ -61,15 +62,17 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
 
   const selectedBoxIndex = filteredBoxes.findIndex(box => box.idInt === boxId);
   const selectedBox = filteredBoxes[ selectedBoxIndex ] ??
-  // placeholder box
-  {
-    id: '-99',
-    idInt: -99,
-    name: '',
-    type: BoxType.Box,
-    slotCount: maxBoxSlotCount || 30,
-    canReceivePkm: false,
-  };
+    // placeholder box
+    {
+      id: '-99',
+      idInt: -99,
+      name: '',
+      type: BoxType.Box,
+      slotCount: maxBoxSlotCount || 30,
+      canSaveReceivePkm: false,
+      canSaveWrite: false,
+      order: 0,
+    } satisfies BoxDTO;
 
   const boxSlotCount = selectedBox.slotCount;
   const nbrItemsPerLine = SizingUtil.getItemsPerLine(boxSlotCount);
@@ -84,6 +87,10 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
 
   const allItems = new Array(itemsCount).fill(null).map((_, i): PkmSaveDTO | null => boxPkms[ i ] ?? null);
 
+  const backgroundImageUrl = selectedBox.wallpaperName
+    ? getBoxBackgroundUrl(selectedBox.wallpaperName)
+    : undefined;
+
   return (
     <Popover
       className={css({
@@ -93,12 +100,27 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
       <PopoverButton
         as={StorageBox}
         className={className}
+        classNameContent={cx(
+          css({
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            imageRendering: 'pixelated',
+            borderBottomLeftRadius: 4,
+            borderBottomRightRadius: 4,
+          }),
+          {
+            [ css({
+              backgroundImage: `url("${backgroundImageUrl}")`,
+            }) ]: !!backgroundImageUrl,
+          },
+        )}
         slotCount={selectedBox.slotCount}
         lineSlotCount={nbrItemsPerLine}
         loading={loading}
         header={
           <>
             <StorageHeader
+              loading={loading}
               saveId={saveId}
               gameLogo={
                 <div
@@ -109,7 +131,12 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
                     },
                   })}
                 >
-                  {saveInfos && <SaveCardImg version={saveInfos.version} size={24} borderWidth={2} />}
+                  {saveInfos && <GameImg
+                    version={saveInfos.version}
+                    size={24}
+                    borderWidth={2}
+                    showTitle={false}
+                  />}
 
                   <div
                     className={cx('save-item', css({
@@ -136,6 +163,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
                 {
                   label: t('storage.box.advanced.sort'),
                   icon: <Icon name='sort' solid forButton />,
+                  disabled: savePkms.length === 0,
                   panelContent: close => <SortAdvancedAction.Save saveId={saveId} selectedBoxId={selectedBox.idInt} close={close} />,
                 },
                 {
@@ -251,18 +279,21 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
               return (
                 <div key={i} className={css({ order: i, display: 'flex' })}>
                   {!pkm ||
-                    (moveContext.selected?.saveId === saveId && !moveContext.selected.target && moveContext.selected.ids.includes(pkm.id)) ? (
-                    <StorageItemPlaceholder saveId={saveId} boxId={selectedBox.idInt} boxSlot={i} pkmId={pkm?.id} />
-                  ) : (
-                    <StorageSaveItem key={i} saveId={saveId} pkmId={pkm.id} />
-                  )}
+                    (moveState.status === 'dragging' &&
+                      moveState.source.saveId === saveId &&
+                      moveState.source.ids.includes(pkm.id))
+                    ? (
+                      <StorageItemPlaceholder saveId={saveId} boxId={selectedBox.idInt} boxSlot={i} pkmId={pkm?.id} />
+                    ) : (
+                      <StorageSaveItem key={i} saveId={saveId} pkmId={pkm.id} />
+                    )}
                 </div>
               );
             })}
 
-            {moveContext.selected?.saveId === saveId &&
-              !moveContext.selected.target &&
-              moveContext.selected.ids.map(id => <StorageSaveItem key={id} saveId={saveId} pkmId={id} />)}
+            {moveState.status === 'dragging' &&
+              moveState.source.saveId === saveId &&
+              moveState.source.ids.map(id => <StorageSaveItem key={id} saveId={saveId} pkmId={id} />)}
           </>
         )}
       </PopoverButton>

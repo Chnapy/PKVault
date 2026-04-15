@@ -10,13 +10,14 @@ public interface ISessionService : ISessionServiceMinimal
     public bool HasEmptyActionList();
     public List<DataActionPayload> GetActionPayloadList();
 
-    public Task StartNewSession(bool checkInitialActions);
+    public Task<DataUpdateFlags?> StartNewSession(bool checkInitialActions);
     public Task PersistSession(IServiceScope scope);
 }
 
 public interface ISessionServiceMinimal
 {
     public string MainDbPath { get; }
+    public string MainDbRelativePath { get; }
     public string SessionDbPath { get; }
 
     public Task EnsureSessionCreated(Guid? byPassContextId = null);
@@ -33,13 +34,14 @@ public class SessionService(
         DataActionPayload Payload
     );
 
-    private string DbFolderPath => settingsService.GetSettings().SettingsMutable.DB_PATH;
+    private string DbFolderPath => settingsService.GetSettings().GetDbPath();
     public string MainDbPath => Path.Combine(DbFolderPath, "pkvault.db");
+    public string MainDbRelativePath => Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "pkvault.db");
     public string SessionDbPath => Path.Combine(DbFolderPath, "pkvault-session.db");
 
     public DateTime? StartTime { get; private set; }
 
-    private Task? StartTask = null;
+    private Task<DataUpdateFlags?>? StartTask = null;
 
     // bypass DB check if same as DB.ContextId
     private Guid? ByPassContextId = null;
@@ -58,7 +60,7 @@ public class SessionService(
         return Actions.Count == 0;
     }
 
-    public async Task StartNewSession(bool checkInitialActions)
+    public async Task<DataUpdateFlags?> StartNewSession(bool checkInitialActions)
     {
         StartTime = timeProvider.GetUtcNow().DateTime;
 
@@ -81,33 +83,56 @@ public class SessionService(
                 ByPassContextId = scope.ServiceProvider.GetRequiredService<SessionDbContext>()
                     .ContextId.InstanceId;
 
-                var dataNormalized = await CheckDataToNormalize(scope);
+                var dataNormalizedFlags = await CheckDataToNormalize(scope);
 
                 await CheckSaveToSynchronize(scope);
 
-                if (dataNormalized)
+                if (dataNormalizedFlags != null)
                 {
                     await CheckFirstRunAutoSave(scope);
                 }
 
                 ByPassContextId = null;
+
+                return dataNormalizedFlags;
             }
+
+            return null;
         });
 
-        await StartTask;
+        return await StartTask;
     }
 
-    private async Task<bool> CheckDataToNormalize(IServiceScope scope)
+    private async Task<DataUpdateFlags?> CheckDataToNormalize(IServiceScope scope)
     {
         var actionService = scope.ServiceProvider.GetRequiredService<ActionService>();
         var dataNormalizeAction = scope.ServiceProvider.GetRequiredService<DataNormalizeAction>();
+        var updateExternalPkmAction = scope.ServiceProvider.GetRequiredService<UpdateExternalPkmAction>();
 
-        if (await dataNormalizeAction.HasDataToNormalize())
+        var dataToNormalizeInput = await dataNormalizeAction.HasDataToNormalize();
+
+        DataUpdateFlags? flags = null;
+
+        if (dataToNormalizeInput.ShouldRun)
         {
-            await actionService.DataNormalize(scope);
-            return true;
+            flags = await actionService.DataNormalize(dataToNormalizeInput, scope);
         }
-        return false;
+
+        try
+        {
+            var externalPkmsToUpdateInput = await updateExternalPkmAction.HasExternalPkmsToUpdate();
+
+            if (externalPkmsToUpdateInput.ShouldRun)
+            {
+                flags = await actionService.UpdateExternalPkm(externalPkmsToUpdateInput, scope);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+        }
+
+        return flags;
     }
 
     private async Task CheckSaveToSynchronize(IServiceScope scope)
@@ -136,7 +161,7 @@ public class SessionService(
         var savesLoaders = scope.ServiceProvider.GetRequiredService<ISavesLoadersService>();
         var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
 
-        var hasAnyData = savesLoaders.GetAllLoaders().Count > 0
+        var hasAnyData = savesLoaders.GetAllLoaders().Length > 0
             || await pkmVariantLoader.Any();
 
         if (!hasAnyData)

@@ -1,6 +1,7 @@
 import { css } from "@emotion/css";
 import type React from "react";
 import { withErrorCatcher } from '../../error/with-error-catcher';
+import { HelpButton } from '../../help/help-button';
 import { Container } from "../../ui/container/container";
 import { FilterCaught } from "./components/filter-caught";
 import { FilterFromGames } from "./components/filter-from-games";
@@ -78,6 +79,8 @@ export const FiltersCard: React.FC = withErrorCatcher('default', () => {
         <ShowGenders />
 
       </div>
+
+      <HelpButton slug='4-pokedex.md' />
     </Container>
   );
 });

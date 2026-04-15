@@ -5,30 +5,34 @@ import React from "react";
 import z from "zod";
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { ActionsPanel } from '../storage/actions/actions-panel';
-import { StorageMoveContext } from '../storage/actions/storage-move-context';
 import { StorageSelectContext } from '../storage/actions/storage-select-context';
 import { BankList } from '../storage/bank/bank-list';
-import { StorageDetails } from "../storage/details/storage-details";
 import { StorageMainBox } from "../storage/box/main/storage-main-box";
 import { StorageSaveBox } from "../storage/box/save/storage-save-box";
+import { StorageDetails } from "../storage/details/storage-details";
+import { MoveContext } from '../storage/move/context/move-context';
 import { StorageSaveSelect } from "../storage/storage-save-select";
 import { StorageSearchCheck } from '../storage/storage-search-check';
+import { type DetailsExpandedState } from '../ui/details-card/details-card-container';
+import { DetailsCardWrapper } from '../ui/details-card/details-card-wrapper';
 import { filterIsDefined } from '../util/filter-is-defined';
 
 export const Storage: React.FC = withErrorCatcher('default', () => {
   const selected = Route.useSearch({ select: (search) => search.selected });
   const saves = Route.useSearch({ select: (search) => search.saves }) ?? {};
 
+  const navigate = Route.useNavigate();
+
   return (
     <StorageSearchCheck>
       <StorageSelectContext.Provider>
-        <StorageMoveContext.Provider>
+        <MoveContext.Provider>
           <div className={css({
             display: 'flex',
             justifyContent: 'space-between',
           })}>
             <div
-              id={StorageMoveContext.containerId}
+              id={MoveContext.containerId}
               className={css({
                 display: 'flex',
                 justifyContent: "center",
@@ -73,25 +77,10 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
               </div>
 
               {selected && (
-                <div
-                  className={css({
-                    position: "fixed",
-                    bottom: 14,
-                    top: 14,
-                    right: 14,
-                    width: 350,
-                    pointerEvents: 'none',
-                    zIndex: 20,
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    '&:hover': {
-                      zIndex: 25,
-                    },
-                    '& > *': {
-                      maxWidth: '100%',
-                      maxHeight: '100%',
-                      overflowY: 'auto',
-                      pointerEvents: 'initial',
+                <DetailsCardWrapper
+                  onClose={() => navigate({
+                    search: {
+                      selected: undefined,
                     }
                   })}
                 >
@@ -100,11 +89,11 @@ export const Storage: React.FC = withErrorCatcher('default', () => {
                     id={selected.id}
                     saveId={selected.saveId}
                   />
-                </div>
+                </DetailsCardWrapper>
               )}
             </div>
           </div>
-        </StorageMoveContext.Provider>
+        </MoveContext.Provider>
       </StorageSelectContext.Provider>
     </StorageSearchCheck>
   );
@@ -120,6 +109,8 @@ const searchSchema = z.object({
       editMode: z.boolean().optional(),
     })
     .optional(),
+  selectedContext: z.number().optional(),
+  selectExpanded: z.enum([ 'none', 'expanded', 'expanded-max' ] as const satisfies DetailsExpandedState[]).optional(),
   saves: z.record(
     z.number().int(),
     z.object({

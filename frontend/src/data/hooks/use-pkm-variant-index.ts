@@ -3,7 +3,7 @@ import { filterIsDefined } from '../../util/filter-is-defined';
 import type { DataDTOStateOfDictionaryOfStringAndPkmVariantDTO, PkmVariantDTO } from '../sdk/model';
 import { getStorageGetMainPkmVariantsQueryKey, storageGetMainPkmVariants } from '../sdk/storage/storage.gen';
 
-type PkmVariantIndexes = {
+export type PkmVariantIndexes = {
     byId: Record<PkmVariantDTO[ 'id' ], PkmVariantDTO>;
     byBox: Record<PkmVariantDTO[ 'boxId' ], Record<PkmVariantDTO[ 'boxSlot' ], PkmVariantDTO[]>>;
     byAttachedSave: Record<NonNullable<PkmVariantDTO[ 'attachedSaveId' ]>, Record<NonNullable<PkmVariantDTO[ 'attachedSavePkmIdBase' ]>, PkmVariantDTO>>;
@@ -11,7 +11,7 @@ type PkmVariantIndexes = {
 };
 
 const buildIndexes = (data: PkmVariantDTO[]) => {
-    console.time('Build PkmVariant indexes');
+    // console.time('Build PkmVariant indexes');
 
     const indexes: PkmVariantIndexes = {
         byId: {},
@@ -36,7 +36,7 @@ const buildIndexes = (data: PkmVariantDTO[]) => {
         indexes.bySpecies[ pkmVariant.species ]!.push(pkmVariant);
     });
 
-    console.timeEnd('Build PkmVariant indexes');
+    // console.timeEnd('Build PkmVariant indexes');
 
     return indexes;
 };
@@ -70,14 +70,17 @@ export const usePkmVariantIndex = () => {
  * Update react-query cache with given data, after formatting.
  */
 export const updatePkmVariantCache = (client: QueryClient, pkmVariants: DataDTOStateOfDictionaryOfStringAndPkmVariantDTO) => {
-    const cachedResponse: Partial<QueryData> = client.getQueryData(getStorageGetMainPkmVariantsQueryKey()) ?? {};
+    const cachedResponse: Partial<QueryData> | undefined = client.getQueryData(getStorageGetMainPkmVariantsQueryKey());
+    if (!pkmVariants.all && !cachedResponse) {
+        return;
+    }
 
     const getRawData = (): PkmVariantDTO[] => {
         if (pkmVariants.all) {
             return Object.values(pkmVariants.data ?? {}).filter(filterIsDefined);
         }
 
-        const cachedPkms = cachedResponse.data?.byId ?? {};
+        const cachedPkms = cachedResponse?.data?.byId ?? {};
 
         return Object.values({
             ...cachedPkms,

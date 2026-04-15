@@ -7,7 +7,7 @@ export type NumberInputProps = {
     rangeMin?: number;
     rangeMax?: number;
 }
-    & React.HTMLAttributes<HTMLInputElement>;
+    & React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, rangeMax, ...rest }) => {
     return <div
@@ -19,11 +19,14 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, rangeMin, range
             filter: theme.shadow.filter,
             overflow: 'hidden',
             verticalAlign: 'middle',
+            opacity: rest.disabled ? 0.5 : undefined,
+            pointerEvents: rest.disabled ? 'none' : undefined,
         }), rest.className)}
     >
         <input
             type="text"
             value={value}
+            {...rest}
             className={css({
                 width: '100%',
                 color: theme.text.default,

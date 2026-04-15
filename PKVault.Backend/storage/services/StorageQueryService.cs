@@ -106,13 +106,17 @@ public class StorageQueryService(
             {
                 pkmVariants.TryGetValue(id, out var pkmVariant);
 
+                var attachedSave = pkmVariant?.AttachedSaveId == null
+                    ? null
+                    : savesLoadersService.GetLoaders((uint)pkmVariant.AttachedSaveId)?.Save;
+
                 return (id, pkmVariant == null
                     ? null
-                    : await pkmLegalityService.CreateDTO(pkmVariant, await pkmVariantLoader.GetPKM(pkmVariant))
+                    : await pkmLegalityService.CreateDTO(pkmVariant, await pkmVariantLoader.GetPKM(pkmVariant), attachedSave)
                 );
             }
 
-            var pkmSave = savesLoadersService.GetLoaders((uint)saveId).Pkms.GetDto(id);
+            var pkmSave = savesLoadersService.GetLoaders((uint)saveId)?.Pkms.GetDto(id);
             return (id, pkmSave == null ? null : pkmLegalityService.CreateDTO(pkmSave));
         }))).ToDictionary();
     }

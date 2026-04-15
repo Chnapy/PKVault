@@ -4,12 +4,14 @@ import { withErrorCatcher } from "../../error/with-error-catcher";
 import { useStaticData } from "../../hooks/use-static-data";
 import { useTranslate } from "../../translate/i18n";
 import { TitledContainer } from "../../ui/container/titled-container";
+import { DexFormItem } from "../../ui/dex-item/dex-form-item";
+import { Icon } from '../../ui/icon/icon';
+import { GameImg } from '../../ui/img/game-img';
+import { RenderIfVisible } from "../../ui/render-if-visible/render-if-visible";
 import { SizingUtil } from "../../ui/util/sizing-util";
 import { usePokedexItems } from "./hooks/use-pokedex-items";
 import { PokedexCount } from "./pokedex-count";
 import { PokedexItem } from "./pokedex-item";
-import { RenderIfVisible } from "../../ui/render-if-visible/render-if-visible";
-import { DexFormItem } from "../../ui/dex-item/dex-form-item";
 
 export const PokedexList: React.FC = withErrorCatcher("default", () => {
   const { t } = useTranslate();
@@ -17,6 +19,7 @@ export const PokedexList: React.FC = withErrorCatcher("default", () => {
   const staticData = useStaticData();
 
   const {
+    isLoading,
     speciesItemsByGenerationList,
     seenCount,
     caughtCount,
@@ -55,10 +58,28 @@ export const PokedexList: React.FC = withErrorCatcher("default", () => {
         totalCount={totalCount}
       />
 
+      {isLoading && <Icon
+        name='spinner-third'
+        className={css({
+          alignSelf: 'center',
+          animation: 'spin 1s linear infinite',
+
+          '@keyframes spin': {
+            '0%': {
+              transform: 'rotate(0deg)',
+            },
+            '100%': {
+              transform: 'rotate(360deg)',
+            },
+          },
+        })}
+      />}
+
       {speciesItemsByGenerationList.map(
         (
           {
             generation,
+            versionsForImgs,
             speciesInfos,
             seenCount,
             caughtCount,
@@ -77,8 +98,35 @@ export const PokedexList: React.FC = withErrorCatcher("default", () => {
                 {t("dex.list.title", {
                   generation,
                   regions:
-                    staticData.generations[generation]?.regions.join(", "),
+                    staticData.generations[ generation ]?.regions.join(", "),
                 })}
+
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    gap: 8,
+                    alignItems: 'center',
+                    verticalAlign: 'middle',
+                    marginLeft: 8,
+                    marginRight: 8,
+                  }}
+                >
+                  {versionsForImgs
+                    .map((versions, i) => <div
+                      key={i}
+                      className={css({
+                        display: 'inline-flex',
+                        gap: 4,
+                      })}
+                    >
+                      {versions.map(version => <GameImg
+                        key={version}
+                        version={version}
+                        size={20}
+                        borderWidth={1}
+                      />)}
+                    </div>)}
+                </div>
 
                 <div className={css({ float: "right" })}>
                   <PokedexCount

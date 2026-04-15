@@ -1,30 +1,35 @@
+import { css } from '@emotion/css';
 import type React from "react";
-import type { GameVersion } from '../../data/sdk/model';
+import type { EntityContext, GameVersion, Gender as GenderType } from '../../data/sdk/model';
+import { getEntityContextGenerationName } from '../../data/util/get-entity-context-generation-name';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
+import { GameImg } from '../img/game-img';
 import { TextContainer } from "../text-container/text-container";
 import { theme } from "../theme";
-import { SaveCardImg } from './save-card-img';
-import { css } from '@emotion/css';
+import { renderTimestamp } from '../util/render-date-time';
+import { DOLine } from './do-line';
 
 export type SaveCardContentSmallProps = {
   id: number;
   lastWriteTime: string;
+  context: EntityContext;
   version: GameVersion;
-  generation: number;
   tid: number;
+  sid?: number;
   trainerName: string;
-  trainerGenderMale: boolean;
+  trainerGender: GenderType;
 };
 
 export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErrorCatcher('default', ({
   id,
-  generation,
+  context,
   tid,
+  sid,
   lastWriteTime,
   trainerName,
-  trainerGenderMale,
+  trainerGender,
   version,
 }) => {
   const { t } = useTranslate();
@@ -33,16 +38,10 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErr
 
   const date = new Date(lastWriteTime);
 
-  const normTo2 = (value: number) => `${value < 10 ? "0" : ""}${value}`;
-
-  const renderTimestamp = () =>
-    `${normTo2(date.getDate())}/${normTo2(date.getMonth() + 1)}/${normTo2(date.getFullYear() - 2000)} - ${normTo2(
-      date.getHours()
-    )}:${normTo2(date.getMinutes())}:${normTo2(date.getSeconds())}`;
-
   return (
     <div
       className={css({
+        flexShrink: 0,
         display: "flex",
         borderRadius: 8,
         background: theme.bg.blue,
@@ -51,7 +50,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErr
         overflow: 'hidden',
       })}
     >
-      <SaveCardImg version={version} />
+      <GameImg version={version} size={64} borderRadius={8} borderWidth={4} />
 
       <div
         className={css({
@@ -62,7 +61,7 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErr
         <TextContainer noWrap forceScroll className={css({
           paddingBottom: 0,
         })}>
-          <span className={css({ color: theme.text.red })}>{t('save.gen')} {generation}</span>
+          <span className={css({ color: theme.text.red })}>{getEntityContextGenerationName(context, true)}</span>
           {" - "}
           <span className={css({ color: theme.text.primary })}>
             {t('save.pkm')} {staticData.versions[ version ]?.name}
@@ -71,15 +70,15 @@ export const SaveCardContentSmall: React.FC<SaveCardContentSmallProps> = withErr
           <span className={css({ color: theme.text.primary })}>{id}</span>
           <br />
 
-          {tid > 0
-            ? <>
-              {t('save.ot')} {tid} -{" "}
-              <span className={css({ color: theme.text.primary })}>{trainerName}</span>
-            </>
-            : '-'}
+          <DOLine
+            tid={tid}
+            sid={sid}
+            originTrainerName={trainerName}
+            originTrainerGender={trainerGender}
+          />
 
           <br />
-          {t('save.sync')} <span className={css({ color: theme.text.primary })}>{renderTimestamp()}</span>
+          {t('save.sync')} <span className={css({ color: theme.text.primary })}>{renderTimestamp(date)}</span>
         </TextContainer>
       </div>
     </div>

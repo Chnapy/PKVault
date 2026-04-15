@@ -11,14 +11,14 @@ public interface ISavePkmLoader
     public PkmSaveDTO? GetDto(string id);
     public PkmSaveDTO? GetDto(string boxId, int boxSlot);
     public ImmutableDictionary<string, PkmSaveDTO> GetDtosByIdBase(string idBase);
-    public void WriteDto(PkmSaveDTO dto);
+    public void WriteDto(PkmSaveDTO dto, BoxDTO? box = null);
     public void DeleteDto(string id);
     public void FlushParty();
     public void SetFlags(DataUpdateSaveListFlags _savesFlags, DataUpdateFlagsState _dexFlags);
 }
 
 public class SavePkmLoader(
-    PkmConvertService pkmConvertService, string language, Dictionary<ushort, StaticEvolve> evolves,
+    IPkmConvertService pkmConvertService, string language, Dictionary<ushort, StaticEvolve> evolves,
     SaveWrapper save
 ) : ISavePkmLoader
 {
@@ -27,12 +27,10 @@ public class SavePkmLoader(
         return $"{idBase}B{box}S{slot}"; ;
     }
 
-    public bool HasWritten { get; set; } = false;
+    private readonly CacheWithTiming Cache = new();
 
-    private Dictionary<string, PkmSaveDTO> dtoById = [];
-    private Dictionary<string, PkmSaveDTO> dtoByBox = [];
-    private Dictionary<string, Dictionary<string, PkmSaveDTO>> dtosByIdBase = [];
-    private bool NeedUpdate = true;
+    public bool HasWritten { get; set; } = false;
+    private bool NeedPartyFlush = false;
 
     private DataUpdateSaveListFlags savesFlags = new();
     private DataUpdateFlagsState dexFlags = new();
@@ -59,130 +57,22 @@ public class SavePkmLoader(
         return dto;
     }
 
-    private void UpdateDtos()
-    {
-        var dtoList = new List<PkmSaveDTO>();
-
-        if (save.HasParty)
-        {
-            var i = 0;
-            var partyList = save.GetPartyData();
-            partyList.ForEach((pkm) =>
-            {
-                if (pkm.IsSpeciesValid)
-                {
-                    var boxSlot = i;
-                    dtoList.Add(CreateDTO(
-                        save, pkm, (int)BoxType.Party, boxSlot
-                    ));
-                }
-                i++;
-            });
-        }
-
-        for (var i = 0; i < save.BoxCount; i++)
-        {
-            var pkms = save.GetBoxData(i);
-            var j = 0;
-            foreach (var pkm in pkms)
-            {
-                if (pkm.IsSpeciesValid)
-                {
-                    var box = i;
-                    var boxSlot = j;
-                    dtoList.Add(CreateDTO(
-                        save, pkm, box, boxSlot
-                    ));
-                }
-                j++;
-            }
-        }
-
-        if (save is IDaycareStorage saveDaycare)
-        {
-            for (var i = 0; i < saveDaycare.DaycareSlotCount; i++)
-            {
-                if (!saveDaycare.IsDaycareOccupied(i))
-                {
-                    continue;
-                }
-
-                var slot = new SlotInfoMisc(saveDaycare.GetDaycareSlot(i), i) { Type = StorageSlotType.Daycare };
-                var pkm = new ImmutablePKM(slot.Read(save.GetSave()));
-                if (pkm != default && pkm.IsSpeciesValid)
-                {
-                    var boxSlot = i;
-                    dtoList.Add(CreateDTO(
-                        save, pkm, (int)BoxType.Daycare, boxSlot
-                    ));
-                }
-            }
-        }
-
-        var extraSlots = save.GetExtraSlots(true);
-        var extraPkms = extraSlots.Select(slot => (
-            Pkm: new ImmutablePKM(slot.Read(save.GetSave())),
-            Slot: slot
-        )).ToList().FindAll(extra => extra.Pkm.IsSpeciesValid);
-
-        extraPkms.ForEach((extra) =>
-        {
-            var boxType = BoxLoader.GetTypeFromStorageSlotType(extra.Slot.Type);
-            int box = boxType switch
-            {
-                BoxType.Box => throw new NotImplementedException(),
-                _ => (int)boxType,
-            };
-            var boxSlot = extra.Slot.Slot;
-            if (boxType == BoxType.Daycare && save is IDaycareStorage saveDaycare)
-            {
-                boxSlot += saveDaycare.DaycareSlotCount;
-            }
-            dtoList.Add(CreateDTO(
-                save, extra.Pkm, box, boxSlot
-            ));
-        });
-
-        var dictById = new Dictionary<string, PkmSaveDTO>();
-        var dictByBox = new Dictionary<string, PkmSaveDTO>();
-
-        var duplicatesDictByIdBase = new Dictionary<string, Dictionary<string, PkmSaveDTO>>();
-
-        foreach (var dto in dtoList)
-        {
-            dictById.Add(dto.Id, dto);
-            dictByBox.Add(GetDTOByBoxKey(dto.BoxId.ToString(), dto.BoxSlot), dto);
-
-            if (!duplicatesDictByIdBase.TryGetValue(dto.IdBase, out var duplicateDict))
-            {
-                duplicateDict = [];
-                duplicatesDictByIdBase.Add(dto.IdBase, duplicateDict);
-            }
-            duplicateDict.Add(dto.Id, dto);
-        }
-
-        dtoById = dictById;
-        dtoByBox = dictByBox;
-        dtosByIdBase = duplicatesDictByIdBase;
-        NeedUpdate = false;
-    }
+    private record DtosIndexes(
+        Dictionary<string, PkmSaveDTO> DtoById,
+        Dictionary<string, PkmSaveDTO> DtoByBox,
+        Dictionary<string, Dictionary<string, PkmSaveDTO>> DtosByIdBase
+    );
 
     public List<PkmSaveDTO> GetAllDtos()
     {
-        if (NeedUpdate)
-        {
-            UpdateDtos();
-        }
+        var (dtoById, _, _) = GetDtosIndexes();
 
         return [.. dtoById.Values.Select(DTOWithDuplicateCheck)];
     }
 
     public PkmSaveDTO? GetDto(string id)
     {
-        if (NeedUpdate)
-        {
-            UpdateDtos();
-        }
+        var (dtoById, _, _) = GetDtosIndexes();
 
         if (dtoById.TryGetValue(id, out var dto))
         {
@@ -194,10 +84,7 @@ public class SavePkmLoader(
 
     public PkmSaveDTO? GetDto(string boxId, int boxSlot)
     {
-        if (NeedUpdate)
-        {
-            UpdateDtos();
-        }
+        var (_, dtoByBox, _) = GetDtosIndexes();
 
         if (dtoByBox.TryGetValue(GetDTOByBoxKey(boxId, boxSlot), out var dto))
         {
@@ -209,10 +96,7 @@ public class SavePkmLoader(
 
     public ImmutableDictionary<string, PkmSaveDTO> GetDtosByIdBase(string idBase)
     {
-        if (NeedUpdate)
-        {
-            UpdateDtos();
-        }
+        var (_, _, dtosByIdBase) = GetDtosIndexes();
 
         if (dtosByIdBase.TryGetValue(idBase, out var dtoDict))
         {
@@ -224,6 +108,8 @@ public class SavePkmLoader(
 
     private PkmSaveDTO DTOWithDuplicateCheck(PkmSaveDTO dto)
     {
+        var (_, _, dtosByIdBase) = GetDtosIndexes();
+
         if (dtosByIdBase.TryGetValue(dto.IdBase, out var dtoDict) && dtoDict.Count > 1)
         {
             return dto with { IsDuplicate = true };
@@ -231,7 +117,7 @@ public class SavePkmLoader(
         return dto;
     }
 
-    public void WriteDto(PkmSaveDTO dto)
+    public void WriteDto(PkmSaveDTO dto, BoxDTO? box = null)
     {
         if (!dto.IsEnabled)
         {
@@ -243,16 +129,42 @@ public class SavePkmLoader(
             throw new Exception("Not allowed for pkm in daycare");
         }
 
-        var savePkmType = save.PKMType;
-
-        var pkm = pkmConvertService.GetConvertedPkm(dto.Pkm, save.GetBlankPKM().GetMutablePkm());
-        if (pkm == default)
+        if (box != null)
         {
-            throw new Exception($"PkmSaveDTO.Pkm convert failed, id={dto.Id} from.type={dto.Pkm.GetType()} to.type={savePkmType}");
+            if (dto.BoxId != box.IdInt)
+            {
+                throw new ArgumentException($"Inconsistent SavePkm {dto.Id} BoxId={dto.BoxId}, expected={box.IdInt}");
+            }
+
+            if (dto.BoxSlot >= box.SlotCount)
+            {
+                throw new ArgumentException($"Wrong SavePkm {dto.Id} BoxSlot={dto.BoxSlot}, should be less than box.SlotCount={box.SlotCount}");
+            }
         }
+
+        // no real convert here,
+        // just update pkm for in-save legality concerns
+        var pkm = pkmConvertService.ConvertTo(
+            dto.Pkm,
+            save.GetBlankPKM().GetMutablePkm().GetType(),
+            dto.Pkm.GetMutablePkm() is GBPKM
+                ? null
+                : new(
+                    PID: dto.Pkm.PID,
+                    EncryptionConstant: dto.Pkm.EncryptionConstant
+                ),
+            targetSave: save.GetSave()
+        );
+
+        // stored dto should use updated pkm
+        dto = dto with
+        {
+            Pkm = pkm
+        };
 
         DeleteDto(dto.Id);
 
+        // note: can mutate given pkm
         switch (dto.BoxId)
         {
             case (int)BoxType.Party:
@@ -303,11 +215,12 @@ public class SavePkmLoader(
         }
         party[slot] = pkm ?? save.GetBlankPKM();
         SetParty(party);
+        NeedPartyFlush = true;
     }
 
     public void FlushParty()
     {
-        if (!save.HasParty)
+        if (!save.HasParty || !NeedPartyFlush)
         {
             return;
         }
@@ -316,30 +229,44 @@ public class SavePkmLoader(
         .FindAll(pkm => pkm.IsSpeciesValid);
 
         SetParty(party);
+        NeedPartyFlush = false;
+
+        // var expectedPartyChecksum = string.Join(',', party.Select(pkm => pkm.Species));
+        // var currentPartyChecksum = string.Join(',', save.GetPartyData().FindAll(pkm => pkm.IsSpeciesValid).Select(pkm => pkm.Species));
+
+        // if (expectedPartyChecksum != currentPartyChecksum)
+        // {
+        //     throw new Exception($"Wrong party checksum:\nExpected = {expectedPartyChecksum}\nCurrent = {currentPartyChecksum}");
+        // }
     }
 
     private void SetParty(List<ImmutablePKM> party)
     {
         // Console.WriteLine($"SET-PARTY {string.Join('.', party.Select(pk => pk.Species))}");
-        for (var i = 0; i < 6; i++)
+        for (var slot = 0; slot < 6; slot++)
         {
-            if (i < party.Count)
+            if (slot < party.Count)
             {
-                var pkm = party[i];
-                save.SetPartySlotAtIndex(pkm, i);
+                var pkm = party[slot];
+                save.SetPartySlotAtIndex(pkm, slot);
                 if (pkm.IsSpeciesValid)
                 {
-                    var boxSlot = i;
                     SetDTO(
                         CreateDTO(
-                            save, pkm, (int)BoxType.Party, boxSlot
+                            save, pkm, (int)BoxType.Party, slot
                         )
                     );
+                }
+                else
+                {
+                    save.SetPartySlotAtIndex(save.GetBlankPKM(), slot);
+                    RemoveDTO((int)BoxType.Party, slot);
                 }
             }
             else
             {
-                RemoveDTO((int)BoxType.Party, i);
+                save.SetPartySlotAtIndex(save.GetBlankPKM(), slot);
+                RemoveDTO((int)BoxType.Party, slot);
             }
         }
     }
@@ -353,6 +280,8 @@ public class SavePkmLoader(
     private void SetDTO(PkmSaveDTO dto)
     {
         RemoveDTO(dto.BoxId, dto.BoxSlot);
+
+        var (dtoById, dtoByBox, dtosByIdBase) = GetDtosIndexes();
 
         if (!dtosByIdBase.TryGetValue(dto.IdBase, out var dtoDict))
         {
@@ -370,6 +299,8 @@ public class SavePkmLoader(
 
     private void RemoveDTO(int boxId, int boxSlot)
     {
+        var (_, dtoByBox, _) = GetDtosIndexes();
+
         var boxKey = GetDTOByBoxKey(boxId.ToString(), boxSlot);
         if (dtoByBox.TryGetValue(boxKey, out var value))
         {
@@ -379,6 +310,8 @@ public class SavePkmLoader(
 
     private void RemoveDTO(PkmSaveDTO dto)
     {
+        var (dtoById, dtoByBox, dtosByIdBase) = GetDtosIndexes();
+
         dtoById.Remove(dto.Id);
         dtoByBox.Remove(GetDTOByBoxKey(dto.BoxId.ToString(), dto.BoxSlot));
 
@@ -392,4 +325,114 @@ public class SavePkmLoader(
     }
 
     private string GetDTOByBoxKey(string boxId, int boxSlot) => boxId + "." + boxSlot;
+
+    private DtosIndexes GetDtosIndexes()
+    {
+        return Cache.GetValue($"save-pkms-{save.Id}", PrepareDtos);
+    }
+
+    private DtosIndexes PrepareDtos()
+    {
+        var dtoList = new List<PkmSaveDTO>();
+
+        if (save.HasParty)
+        {
+            var i = 0;
+            var partyList = save.GetPartyData();
+            partyList.ForEach((pkm) =>
+            {
+                if (pkm.IsSpeciesValid)
+                {
+                    var boxSlot = i;
+                    dtoList.Add(CreateDTO(
+                        save, pkm, (int)BoxType.Party, boxSlot
+                    ));
+                }
+                i++;
+            });
+        }
+
+        for (var i = 0; i < save.BoxCount; i++)
+        {
+            var pkms = save.GetBoxData(i);
+            var j = 0;
+            foreach (var pkm in pkms)
+            {
+                if (pkm.IsSpeciesValid)
+                {
+                    var box = i;
+                    var boxSlot = j;
+                    dtoList.Add(CreateDTO(
+                        save, pkm, box, boxSlot
+                    ));
+                }
+                j++;
+            }
+        }
+
+        if (save.GetSave() is IDaycareStorage saveDaycare)
+        {
+            for (var i = 0; i < saveDaycare.DaycareSlotCount; i++)
+            {
+                if (!saveDaycare.IsDaycareOccupied(i))
+                {
+                    continue;
+                }
+
+                var slot = new SlotInfoMisc(saveDaycare.GetDaycareSlot(i), i) { Type = StorageSlotType.Daycare };
+                var pkm = new ImmutablePKM(slot.Read(save.GetSave()));
+                if (pkm != default && pkm.IsSpeciesValid)
+                {
+                    var boxSlot = i;
+                    dtoList.Add(CreateDTO(
+                        save, pkm, (int)BoxType.Daycare, boxSlot
+                    ));
+                }
+            }
+        }
+
+        var extraSlots = save.GetExtraSlots(true);
+        var extraPkms = extraSlots.Select(slot => (
+            Pkm: new ImmutablePKM(slot.Read(save.GetSave())),
+            Slot: slot
+        )).ToList().FindAll(extra => extra.Pkm.IsSpeciesValid);
+
+        extraPkms.ForEach((extra) =>
+        {
+            var boxType = BoxLoader.GetTypeFromStorageSlotType(extra.Slot.Type);
+            int box = boxType switch
+            {
+                BoxType.Box => throw new NotImplementedException(),
+                _ => (int)boxType,
+            };
+            var boxSlot = extra.Slot.Slot;
+            if (boxType == BoxType.Daycare && save.GetSave() is IDaycareStorage saveDaycare)
+            {
+                boxSlot += saveDaycare.DaycareSlotCount;
+            }
+            dtoList.Add(CreateDTO(
+                save, extra.Pkm, box, boxSlot
+            ));
+        });
+
+        var dictById = new Dictionary<string, PkmSaveDTO>();
+        var dictByBox = new Dictionary<string, PkmSaveDTO>();
+
+        var duplicatesDictByIdBase = new Dictionary<string, Dictionary<string, PkmSaveDTO>>();
+
+        foreach (var dto in dtoList)
+        {
+            dictById.Add(dto.Id, dto);
+            dictByBox.Add(GetDTOByBoxKey(dto.BoxId.ToString(), dto.BoxSlot), dto);
+
+            if (!duplicatesDictByIdBase.TryGetValue(dto.IdBase, out var duplicateDict))
+            {
+                duplicateDict = [];
+                duplicatesDictByIdBase.Add(dto.IdBase, duplicateDict);
+            }
+            duplicateDict.Add(dto.Id, dto);
+        }
+
+        return new(dictById, dictByBox, duplicatesDictByIdBase);
+    }
 }

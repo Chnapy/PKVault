@@ -1,0 +1,11 @@
+[Application]
+name=org.chnapy.pkvault
+runtime=org.gnome.Platform/x86_64/48
+sdk=org.gnome.Sdk/x86_64/48
+command=PKVault
+
+[Context]
+shared=ipc;network;
+sockets=x11;wayland;
+devices=dri;
+filesystems=home;

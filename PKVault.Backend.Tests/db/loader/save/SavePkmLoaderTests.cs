@@ -3,26 +3,23 @@ using PKHeX.Core;
 
 public class SavePkmLoaderTests : IAsyncLifetime
 {
-    private Dictionary<ushort, StaticEvolve> evolves;
+    private StaticEvolvesData evolves;
 
-    private readonly Mock<PkmConvertService> mockConvertService;
+    private readonly Mock<IPkmConvertService> mockConvertService;
     private readonly SaveWrapper mockSave;
 
     public SavePkmLoaderTests()
     {
-        mockConvertService = new Mock<PkmConvertService>(MockBehavior.Strict, null!);
+        mockConvertService = new Mock<IPkmConvertService>();
+        mockConvertService.Setup(x => x
+            .ConvertTo(It.IsAny<ImmutablePKM>(), It.IsAny<Type>(), It.IsAny<PKMRndValues?>(), It.IsAny<SaveFile?>())
+        ).Returns((ImmutablePKM pkm, Type _, PKMRndValues? __, SaveFile? ___) => pkm);
         mockSave = CreateTestSave();
     }
 
     public async ValueTask InitializeAsync()
     {
-        var client = new AssemblyClient();
-
-        var staticData = (await client.GetAsyncJsonGz(
-            GenStaticDataService.GetStaticDataPathParts("en"),
-            StaticDataJsonContext.Default.StaticDataDTO
-        ))!;
-        evolves = staticData.Evolves;
+        evolves = await GenStaticEvolves.LoadData();
     }
 
     public async ValueTask DisposeAsync()

@@ -33,4 +33,5 @@ public enum DataActionType
     SORT_PKM,
     DEX_SYNC,
     DATA_NORMALIZE,
+    UPDATE_EXTERNAL_PKM,
 }

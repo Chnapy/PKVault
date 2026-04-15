@@ -1,15 +1,11 @@
 import React from "react";
-import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
-import { ItemImg } from '../../../ui/details-card/item-img';
+import { BallImg } from '../../../ui/img/ball-img';
 import { FilterCheckbox } from "../../../ui/filter/filter-checkbox/filter-checkbox";
-import { css } from '@emotion/css';
 
 export const FilterCaught: React.FC = () => {
   const { t } = useTranslate();
-
-  const staticData = useStaticData();
 
   const navigate = Route.useNavigate();
   const searchValue = Route.useSearch({
@@ -32,11 +28,7 @@ export const FilterCaught: React.FC = () => {
         })
       }
     >
-      <ItemImg
-        item={staticData.itemPokeball.id}
-        size={'1lh'}
-        className={css({ margin: '0 -4px' })}
-      />
+      <BallImg size={14} />
 
       {searchValue === undefined
         ? t('dex.filters.caught.unselect')

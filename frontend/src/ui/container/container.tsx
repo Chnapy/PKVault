@@ -23,18 +23,20 @@ const root = (props: ContainerProps) =>
       : `drop-shadow(${props.padding === "big" ? 2 : 1}px ${props.padding === "big" ? 2 : 1}px 0 rgba(0,0,0,.2))`,
     "&:not(:disabled)": {
       cursor:
-        (props.componentDescriptor ?? props.as) === "button" && !props.selected
+        (props.componentDescriptor ?? props.type ?? props.as) === "button" && !props.selected
           ? "pointer"
           : undefined,
       "&:hover:not(:active)":
-        (props.componentDescriptor ?? props.as) === "button" && !props.selected
+        (props.componentDescriptor ?? props.type ?? props.as) === "button" && !props.selected
           ? {
             outlineWidth: 1,
+            zIndex: 1,
           }
           : undefined,
     },
     outline: `0 solid ${theme.border.focus}`,
     outlineWidth: props.selected ? 2 : undefined,
+    zIndex: props.selected ? 1 : undefined,
     "&:disabled": {
       opacity: 0.5,
     },

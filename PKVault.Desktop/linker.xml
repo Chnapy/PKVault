@@ -1,0 +1,13 @@
+<linker>
+  <!-- allow use of reflection when required -->
+  <assembly fullname="Microsoft.AspNetCore.Http.Abstractions" preserve="all"/>
+  <assembly fullname="Microsoft.AspNetCore.Http.Features" preserve="all"/>
+  <assembly fullname="Microsoft.AspNetCore.Mvc.Core" preserve="all"/>
+  <assembly fullname="Microsoft.AspNetCore.Mvc.Abstractions" preserve="all"/>
+  <assembly fullname="Microsoft.EntityFrameworkCore" preserve="all"/>
+  <assembly fullname="Microsoft.EntityFrameworkCore.Relational" preserve="all" />
+  <assembly fullname="Microsoft.EntityFrameworkCore.Sqlite" preserve="all" />
+  <assembly fullname="PKVault.Backend">
+    <type fullname="PKVault.Backend.*" preserve="all"/>
+  </assembly>
+</linker>

@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import type { BankView, StorageUpdateMainBankParams } from '../../data/sdk/model';
 import { getStorageGetMainBanksQueryKey, useStorageGetMainBanks, useStorageUpdateMainBank, type storageGetMainBanksResponse200 } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
@@ -30,7 +30,7 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
 
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();
 
-    const { register, handleSubmit, formState, watch, getValues, setValue } = useForm<StorageUpdateMainBankParams & { view?: BankView }>({
+    const { register, handleSubmit, formState, getValues, setValue, control } = useForm<StorageUpdateMainBankParams & { view?: BankView }>({
         defaultValues: {
             bankName: bank?.name,
             isDefault: bank?.isDefault,
@@ -38,11 +38,7 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
             view: bank?.view,
         }
     });
-
-    const watchName = watch('bankName');
-    const watchIsDefault = watch('isDefault');
-    const watchOrder = watch('order');
-    const watchView = watch('view');
+    const [ watchName, watchIsDefault, watchOrder, watchView ] = useWatch({ control, name: [ 'bankName', 'isDefault', 'order', 'view' ] });
 
     const previousBank = [ ...banks ].reverse().find(b => b.id !== bankId && b.order <= watchOrder);
     const nextBank = banks.find(b => b.id !== bankId && b.order >= watchOrder);
@@ -117,20 +113,29 @@ export const BankEdit: React.FC<{ bankId: string; close: () => void; }> = ({ ban
             {...register('bankName', { setValueAs: (value) => value.trim(), minLength: 2, maxLength: 64 })}
         />
 
-        <label
+        <div
             className={css({
                 display: 'flex',
                 gap: 4,
-                cursor: defaultDisabled ? 'not-allowed' : 'pointer',
                 userSelect: 'none',
             })}
         >
             <CheckboxInput
+                id='is-default'
                 checked={watchIsDefault}
                 onChange={() => setValue('isDefault', !getValues('isDefault'))}
                 disabled={defaultDisabled}
-            /> {t('storage.bank.edit.is-default')}
-        </label>
+            />
+
+            <label
+                className={css({
+                    cursor: defaultDisabled ? 'not-allowed' : 'pointer',
+                })}
+                htmlFor='is-default'
+            >
+                {t('storage.bank.edit.is-default')}
+            </label>
+        </div>
 
         <div
             className={css({

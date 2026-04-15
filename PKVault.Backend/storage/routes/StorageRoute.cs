@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using PKHeX.Core;
 
 namespace PKVault.Backend.storage.routes;
 
@@ -135,9 +136,9 @@ public class StorageController(DataService dataService, StorageQueryService stor
     }
 
     [HttpPost("main/pkm-version")]
-    public async Task<ActionResult<DataDTO>> MainCreatePkmVariant([BindRequired] string pkmVariantId, [BindRequired] byte generation)
+    public async Task<ActionResult<DataDTO>> MainCreatePkmVariant([BindRequired] string pkmVariantId, [BindRequired] EntityContext context)
     {
-        var flags = await actionService.MainCreatePkmVariant(pkmVariantId, generation);
+        var flags = await actionService.MainCreatePkmVariant(pkmVariantId, context);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -183,9 +184,9 @@ public class StorageController(DataService dataService, StorageQueryService stor
     }
 
     [HttpPut("pkm/sort")]
-    public async Task<ActionResult<DataDTO>> SortPkms(uint? saveId, [BindRequired] int fromBoxId, [BindRequired] int toBoxId, [BindRequired] bool leaveEmptySlot)
+    public async Task<ActionResult<DataDTO>> SortPkms(uint? saveId, [BindRequired] int fromBoxId, [BindRequired] int toBoxId, [BindRequired] string pokedexName, [BindRequired] bool leaveEmptySlot)
     {
-        var flags = await actionService.SortPkms(saveId, fromBoxId, toBoxId, leaveEmptySlot);
+        var flags = await actionService.SortPkms(saveId, fromBoxId, toBoxId, pokedexName, leaveEmptySlot);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }

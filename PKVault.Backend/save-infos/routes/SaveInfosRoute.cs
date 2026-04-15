@@ -6,13 +6,13 @@ namespace PKVault.Backend.saveinfos.routes;
 [ApiController]
 [Route("api/[controller]")]
 public class SaveInfosController(
-    DataService dataService, ISaveService saveService, ISessionService sessionService
+    DataService dataService, ISavesLoadersService savesLoadersService, ISessionService sessionService
 ) : ControllerBase
 {
     [HttpGet()]
-    public async Task<ActionResult<Dictionary<uint, SaveInfosDTO>>> GetAll()
+    public async Task<ActionResult<IDictionary<uint, SaveInfosDTO>>> GetAll()
     {
-        return await saveService.GetAllSaveInfos();
+        return savesLoadersService.GetAllSaveInfos().ToDictionary();
     }
 
     [HttpPut()]
@@ -23,36 +23,18 @@ public class SaveInfosController(
             throw new InvalidOperationException($"Empty action list is required");
         }
 
-        saveService.InvalidateSaves();
-        await sessionService.StartNewSession(checkInitialActions: true);
+        savesLoadersService.Clear();
+        var flags = await sessionService.StartNewSession(checkInitialActions: true);
 
-        return await dataService.CreateDataFromUpdateFlags(new()
-        {
-            Saves = new() { All = true },
-            Dex = new() { All = true },
-            SaveInfos = true,
-            Warnings = true,
-        });
+        flags ??= new();
+
+        flags.Saves.All = true;
+        flags.Dex.All = true;
+        flags.SaveInfos = true;
+        flags.Warnings = true;
+
+        return await dataService.CreateDataFromUpdateFlags(flags);
     }
-
-    // [HttpPost()]
-    // [Consumes("multipart/form-data")]
-    // public async Task<ActionResult<DataDTO>> Upload([BindRequired] IFormFile saveFile)
-    // {
-    //     if (saveFile == null || saveFile.Length == 0)
-    //         return BadRequest("No file received");
-
-    //     byte[] fileBytes;
-    //     using (var ms = new MemoryStream())
-    //     {
-    //         await saveFile.CopyToAsync(ms);
-    //         fileBytes = ms.ToArray();
-    //     }
-
-    //     var flags = await LocalSaveService.UploadNewSave(fileBytes, saveFile.FileName);
-
-    //     return await DataDTO.FromDataUpdateFlags(flags);
-    // }
 
     [HttpGet("{saveId}/download")]
     public async Task<ActionResult> Download(uint saveId)
@@ -62,7 +44,7 @@ public class SaveInfosController(
             throw new InvalidOperationException($"Empty action list is required");
         }
 
-        var saveById = await saveService.GetSaveById();
+        var saveById = savesLoadersService.GetSaveById();
 
         var save = saveById[saveId].Clone();
 

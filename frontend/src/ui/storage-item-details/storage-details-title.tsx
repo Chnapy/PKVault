@@ -1,5 +1,6 @@
+import { css } from '@emotion/css';
 import type React from 'react';
-import type { GameVersion } from '../../data/sdk/model';
+import type { EntityContext, GameVersion } from '../../data/sdk/model';
 import { PathLine } from '../../settings/path-line';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
@@ -11,19 +12,25 @@ import { StorageDetailsForm } from './storage-details-form';
 export type StorageDetailsTitleProps = {
     isEnabled: boolean;
     filepath?: string;
-    version: GameVersion | null;
+    context: EntityContext;
+    contextVersion: GameVersion | null;
     showVersionName?: boolean;
     canEdit: boolean;
     onRelease?: () => unknown;
     openFile?: () => unknown;
 };
 
-export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ isEnabled, filepath, version, showVersionName, canEdit, onRelease, openFile }) => {
+export const StorageDetailsTitle: React.FC<StorageDetailsTitleProps> = ({ isEnabled, filepath, context, contextVersion, showVersionName, canEdit, onRelease, openFile }) => {
     const formContext = StorageDetailsForm.useContext();
 
-    return <DetailsTitle version={version} showVersionName={showVersionName && isEnabled}>
-        {!isEnabled && version === null && filepath
-            ? <PathLine>{filepath}</PathLine>
+    return <DetailsTitle context={context} contextVersion={contextVersion} showVersionName={showVersionName && isEnabled}>
+        {!isEnabled && contextVersion === null && filepath
+            ? <div className={css({
+                flexGrow: 1,
+                width: 0,
+            })} title={filepath}>
+                <PathLine>{filepath}</PathLine>
+            </div>
             : null}
 
         {openFile && <Button onClick={openFile}>

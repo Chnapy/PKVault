@@ -405,13 +405,14 @@ FodyWeavers.xsd
 # PKHeX.Web
 plugins/
 
-tmp/
 temp/
 temp_*/
 
 TODO.md
-PKVault.Desktop/
 Toto/
 
 # from docker container
 pkvault-data/
+pkvault-saves/
+
+tmp-pkhex/

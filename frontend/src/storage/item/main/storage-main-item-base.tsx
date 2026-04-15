@@ -27,13 +27,14 @@ export const StorageMainItemBase: React.FC<StorageMainItemBaseProps> = React.mem
 
     const { mainVariant, variants, canDetach } = variantInfos;
 
-    const { species, context, form, gender, isAlpha, isShiny } = mainVariant;
+    const { species, contextVersion, context, form, gender, isAlpha, isShiny, isExternal } = mainVariant;
 
     return (
         <StorageItem
             {...{
                 ...rest,
                 species,
+                version: contextVersion,
                 context,
                 form,
                 isFemale: gender === GenderType.Female,
@@ -41,6 +42,7 @@ export const StorageMainItemBase: React.FC<StorageMainItemBaseProps> = React.mem
                 isAlpha,
                 isShiny,
                 isShadow: false,
+                isExternal,
                 warning: pkmLegalityMap.some(value => !value.isValid),
                 nbrVariants: variants.length,
                 hasDisabledVariant: variants.some(pk => !pk.isEnabled),

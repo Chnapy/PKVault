@@ -3,8 +3,8 @@ import { PopoverPanel, type PopoverPanelProps } from '@headlessui/react';
 import type React from 'react';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { useStorageEvolvePkms, useStorageMainDeletePkmVariant, useStorageMainPkmDetachSave } from '../../data/sdk/storage/storage.gen';
-import { StorageMoveContext } from '../../storage/actions/storage-move-context';
 import { StorageSelectContext } from '../../storage/actions/storage-select-context';
+import { useMoveClickable } from '../../storage/move/hooks/use-move-clickable';
 import { useTranslate } from '../../translate/i18n';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { Button } from '../button/button';
@@ -23,7 +23,7 @@ export const StorageBoxMainActions: React.FC<Required<Pick<PopoverPanelProps, 'a
 
   const pkms = ids.map(id => mainPkmVariantQuery.data?.data.byId[ id ]).filter(filterIsDefined);
 
-  const moveClickable = StorageMoveContext.useClickable(
+  const moveClickable = useMoveClickable(
     pkms.map(pkm => pkm.id),
     undefined,
   );
@@ -76,17 +76,17 @@ export const StorageBoxMainActions: React.FC<Required<Pick<PopoverPanelProps, 'a
               minWidth: 140,
             })}
           >
-            {moveClickable.onClick && (
-              <Button onClick={moveClickable.onClick}>
+            {moveClickable.startDrag && (
+              <Button onClick={moveClickable.startDrag}>
                 <Icon name='logout' solid forButton />
                 {t('storage.actions.move')} ({moveClickable.moveCount})
               </Button>
             )}
 
-            {moveClickable.onClickAttached && (
+            {moveClickable.startDragAttached && (
               <ButtonWithDisabledPopover
                 as={Button}
-                onClick={moveClickable.onClickAttached}
+                onClick={moveClickable.startDragAttached}
                 showHelp
                 anchor='right start'
                 helpTitle={t('storage.actions.move-attached-main.helpTitle')}

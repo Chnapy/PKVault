@@ -10,6 +10,7 @@ public record PkmVariantDTO(
     int BoxId,
     int BoxSlot,
     bool IsMain,
+    bool IsExternal,
     uint? AttachedSaveId,
     string? AttachedSavePkmIdBase,
 
@@ -31,6 +32,13 @@ public record PkmVariantDTO(
 )
 {
     public bool CanMoveAttachedToSave => CanMoveToSave && AttachedSaveId == null;
+
+    public override bool CanDelete => !IsExternal && base.CanDelete;
+    public override bool CanMoveToSave => !IsExternal && base.CanMoveToSave;
+
+    public override bool CanEdit => !IsExternal && base.CanEdit;
+    public override bool CanEvolve => !IsExternal && base.CanEvolve;
+    public bool CanCreateVariant => !IsExternal && IsMain && IsEnabled;
 
     public IReadOnlyList<GameVersion> CompatibleWithVersions => VersionChecker.GetCompatibleVersionsForSpecies(Pkm.Species);
 }

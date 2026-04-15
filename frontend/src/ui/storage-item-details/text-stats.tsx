@@ -1,6 +1,8 @@
+import { css, cx } from '@emotion/css';
 import React from 'react';
 import { useWatch } from 'react-hook-form';
 import type { MoveCategory } from '../../data/sdk/model';
+import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
@@ -10,7 +12,6 @@ import { MoveItem } from '../move-item/move-item';
 import { RadarChart } from '../radar-chart/radar-chart';
 import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
-import { css, cx } from '@emotion/css';
 
 export type TextStatsProps = {
     nature?: number;
@@ -40,7 +41,12 @@ export const TextStats: React.FC<TextStatsProps> = ({
 
     const staticData = useStaticData();
 
+    const settingsQuery = useSettingsGet();
+    const hideCheats = settingsQuery.data?.data.settingsMutable.hidE_CHEATS ?? false;
+
     const { editMode, getValues, register, control } = StorageDetailsForm.useContext();
+
+    const editModeCheats = editMode && !hideCheats;
 
     const natureObj = nature === undefined ? undefined : staticData.natures[ nature ];
 
@@ -90,7 +96,7 @@ export const TextStats: React.FC<TextStatsProps> = ({
         <div className={css({ display: 'inline-flex', height: '1lh' })}>
             <Button
                 onClick={() => setShowTable(false)}
-                disabled={!showTable}
+                disabled={!showTable || editMode}
                 className={css({
                     height: 26,
                     borderTopRightRadius: 0,
@@ -101,7 +107,7 @@ export const TextStats: React.FC<TextStatsProps> = ({
             </Button>
             <Button
                 onClick={() => setShowTable(true)}
-                disabled={showTable}
+                disabled={showTable || editMode}
                 className={css({
                     height: 26,
                     borderTopLeftRadius: 0,
@@ -112,32 +118,38 @@ export const TextStats: React.FC<TextStatsProps> = ({
             </Button>
         </div>
 
-        {showTable
+        {showTable || editModeCheats
             ? (
                 <table
                     className={css({
+                        marginTop: -4,
                         borderSpacing: '8px 0'
                     })}
                 >
                     <thead>
                         <tr>
                             <td className={cellBaseClassName}></td>
-                            {!editMode && <td className={cellBaseClassName}>{t('details.stats.ivs')}</td>}
+                            {!editModeCheats && <td className={cellBaseClassName}>{t('details.stats.ivs')}</td>}
                             <td className={cellBaseClassName}>{t('details.stats.evs')}</td>
-                            {!editMode && <td className={cellBaseClassName}>{t('details.stats.name')}</td>}
+                            {!editModeCheats && <td className={cellBaseClassName}>{t('details.stats.name')}</td>}
                         </tr>
                     </thead>
                     <tbody>
                         {[ t('details.stats.hp'), t('details.stats.atk'), t('details.stats.def'), t('details.stats.spa'), t('details.stats.spd'), t('details.stats.spe') ]
-                            .map((statName, i) => editMode
+                            .map((statName, i) => editModeCheats
                                 ? <tr key={statName}>
                                     {renderStatNameCell(statName, i)}
                                     <td className={cellBaseClassName}>
-                                        <NumberInput {...register(`eVs.${i}`, {
-                                            valueAsNumber: true,
-                                            min: 0,
-                                            max: formMaxValues[ i ]
-                                        })} rangeMin={0} rangeMax={formMaxValues[ i ]} className={css({ display: 'flex', height: '1lh' })} />
+                                        <NumberInput
+                                            {...register(`eVs.${i}`, {
+                                                valueAsNumber: true,
+                                                min: 0,
+                                                max: formMaxValues[ i ],
+                                                disabled: totalFormEVs === 0,
+                                            })}
+                                            rangeMin={0}
+                                            rangeMax={formMaxValues[ i ]}
+                                            className={css({ display: 'flex', height: '1lh' })} />
                                     </td>
                                 </tr>
                                 : <tr key={statName}>
@@ -147,7 +159,7 @@ export const TextStats: React.FC<TextStatsProps> = ({
                                     <td className={cellBaseClassName}>{stats[ i ]}</td>
                                 </tr>)}
 
-                        {editMode
+                        {editModeCheats
                             ? <tr>
                                 <td className={cx(cellBaseClassName, css({ textAlign: 'left', textTransform: 'capitalize' }))}>{t('total')}</td>
                                 <td className={cellBaseClassName}>{totalFormEVs} / {totalEVs}</td>

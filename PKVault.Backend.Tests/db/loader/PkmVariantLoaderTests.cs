@@ -29,10 +29,10 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         mockSettings = new();
         mockSettings.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
-            BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "app", SettingsPath: "",
+            BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "app", SettingsPath: "", UserId: "",
             CanUpdateSettings: false, CanScanSaves: false, SettingsMutable: new(
-                DB_PATH: "mock-db", SAVE_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: "mock-bkp",
-                LANGUAGE: "en"
+                DB_PATH: "mock-db", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: "mock-bkp",
+                LANGUAGE: "en", HIDE_CHEATS: false
             )
         ));
 
@@ -60,9 +60,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         return new PkmVariantLoader(fileIOService, sessionService.Object, mockSettings.Object, pkmFileLoader, db, staticDataService);
     }
 
-    // private PkmVersionEntity CreateEntity(string id)
+    // private PkmVariantEntity CreateEntity(string id)
     // {
-    //     return new PkmVersionEntity()
+    //     return new PkmVariantEntity()
     //     {
     //         Id = id,
     //         Generation = 3,
@@ -104,6 +104,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -125,27 +126,38 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var pkm = CreateTestPkm(species: 25, generation: 3);
 
         var result = await loader.AddEntity(new(
-            BoxId: "1",
+            Box: new(
+                Id: "1",
+                Name: "Box 1",
+                Order: 0,
+                Type: BoxType.Box,
+                SlotCount: 30,
+                BankId: "1"
+            ),
             BoxSlot: 0,
             IsMain: true,
+            IsExternal: false,
             AttachedSaveId: null,
             AttachedSavePkmIdBase: null,
             Generation: 3,
+            Context: EntityContext.Gen3,
             Pkm: pkm
         ));
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase = pkm.GetPKMIdBase(staticData.Evolves);
+        var idBase = pkm.GetPKMIdBase(evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
         var expectedEntity = new PkmVariantEntity()
         {
             Id = idBase,
+            Context = EntityContext.Gen3,
             Generation = 3,
             Filepath = filepath,
             BoxId = "1",
             BoxSlot = 0,
             IsMain = true,
+            IsExternal = false,
             AttachedSaveId = null,
             AttachedSavePkmIdBase = null,
 
@@ -153,6 +165,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             Form = 0,
             Gender = Gender.Female,
             IsShiny = false,
+            IsAlpha = false,
 
             PkmFile = new PkmFileEntity()
             {
@@ -182,9 +195,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         var pkm = CreateTestPkm();
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase = pkm.GetPKMIdBase(staticData.Evolves);
+        var idBase = pkm.GetPKMIdBase(evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
 
         await db.Banks
@@ -193,6 +206,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -221,11 +235,13 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             .AddAsync(new()
             {
                 Id = idBase,
+                Context = EntityContext.Gen3,
                 Generation = 3,
                 Filepath = filepath,
                 BoxId = "1",
                 BoxSlot = 0,
                 IsMain = true,
+                IsExternal = false,
                 AttachedSaveId = null,
                 AttachedSavePkmIdBase = null,
 
@@ -233,6 +249,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Form = 0,
                 Gender = Gender.Female,
                 IsShiny = false,
+                IsAlpha = false,
 
                 PkmFile = null
             }, TestContext.Current.CancellationToken);
@@ -257,15 +274,15 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var pkm2 = CreateTestPkm(generation: 4);
         var pkm3 = CreateTestPkm(generation: 5);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase1 = pkm1.GetPKMIdBase(staticData.Evolves);
+        var idBase1 = pkm1.GetPKMIdBase(evolves);
         var filepath1 = $"mock-storage/3/0025 - PIKACHU - {idBase1}.pk3";
 
-        var idBase2 = pkm2.GetPKMIdBase(staticData.Evolves);
+        var idBase2 = pkm2.GetPKMIdBase(evolves);
         var filepath2 = $"mock-storage/4/0025 - PIKACHU - {idBase2}.pk4";
 
-        var idBase3 = pkm3.GetPKMIdBase(staticData.Evolves);
+        var idBase3 = pkm3.GetPKMIdBase(evolves);
         var filepath3 = $"mock-storage/5/0025 - PIKACHU - {idBase3}.pk5";
 
         await db.Banks
@@ -274,6 +291,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -333,11 +351,13 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase1,
+                    Context = EntityContext.Gen3,
                     Generation = 3,
                     Filepath = filepath1,
                     BoxId = "1",
                     BoxSlot = 0,
                     IsMain = true,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -345,17 +365,20 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
                 new()
                 {
                     Id = idBase2,
+                Context = EntityContext.Gen4,
                     Generation = 4,
                     Filepath = filepath2,
                     BoxId = "1",
                     BoxSlot = 1,
                     IsMain = true,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -363,17 +386,20 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
                 new()
                 {
                     Id = idBase3,
+                    Context = EntityContext.Gen5,
                     Generation = 5,
                     Filepath = filepath3,
                     BoxId = "2",
                     BoxSlot = 0,
                     IsMain = true,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -381,6 +407,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
@@ -417,12 +444,12 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var pkm1 = CreateTestPkm(generation: 3);
         var pkm2 = CreateTestPkm(generation: 4);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase1 = pkm1.GetPKMIdBase(staticData.Evolves);
+        var idBase1 = pkm1.GetPKMIdBase(evolves);
         var filepath1 = $"mock-storage/3/0025 - PIKACHU - {idBase1}.pk3";
 
-        var idBase2 = pkm2.GetPKMIdBase(staticData.Evolves);
+        var idBase2 = pkm2.GetPKMIdBase(evolves);
         var filepath2 = $"mock-storage/4/0025 - PIKACHU - {idBase2}.pk4";
 
         await db.Banks
@@ -431,6 +458,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -472,11 +500,13 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase1,
+                    Context = EntityContext.Gen3,
                     Generation = 3,
                     Filepath = filepath1,
                     BoxId = "1",
                     BoxSlot = 0,
                     IsMain = true,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -484,17 +514,20 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
                 new()
                 {
                     Id = idBase2,
+                    Context = EntityContext.Gen4,
                     Generation = 4,
                     Filepath = filepath2,
                     BoxId = "1",
                     BoxSlot = 1,
                     IsMain = true,
+                    IsExternal = false,
                     AttachedSaveId = 200,
                     AttachedSavePkmIdBase = "foobar",
 
@@ -502,6 +535,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
@@ -534,21 +568,23 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         var pkm = CreateTestPkm(species: 25, generation: 3);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase = pkm.GetPKMIdBase(staticData.Evolves);
+        var idBase = pkm.GetPKMIdBase(evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
 
-        mockFileSystem.AddFile(Path.Combine($"app", filepath), new MockFileData(pkm.DecryptedPartyData));
+        mockFileSystem.AddFile(Path.Combine(PathUtils.GetExpectedAppDirectory(), $"app", filepath), new MockFileData(pkm.DecryptedPartyData));
 
         var entity = new PkmVariantEntity()
         {
             Id = idBase,
+            Context = EntityContext.Gen3,
             Generation = 3,
             Filepath = filepath,
             BoxId = "1",
             BoxSlot = 0,
             IsMain = true,
+            IsExternal = false,
             AttachedSaveId = null,
             AttachedSavePkmIdBase = null,
 
@@ -556,6 +592,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             Form = 0,
             Gender = Gender.Female,
             IsShiny = false,
+            IsAlpha = false,
 
             PkmFile = new()
             {
@@ -572,7 +609,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         Assert.Equal(idBase, dto.Id);
         Assert.Equal(3, dto.Generation);
         Assert.Equal(filepath, dto.Filepath);
-        Assert.Equal(Path.Combine("app", filepath), dto.FilepathAbsolute);
+        Assert.Equal(MatcherUtil.NormalizePath(Path.Combine("app", filepath)), dto.FilepathAbsolute);
         Assert.Equal(25, dto.Species);
         Assert.True(dto.IsMain);
         Assert.True(dto.IsFilePresent);
@@ -590,19 +627,21 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         var pkm = CreateTestPkm(species: 25, generation: 3);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase = pkm.GetPKMIdBase(staticData.Evolves);
+        var idBase = pkm.GetPKMIdBase(evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
 
         var entity = new PkmVariantEntity()
         {
             Id = idBase,
+            Context = EntityContext.Gen3,
             Generation = 3,
             Filepath = filepath,
             BoxId = "1",
             BoxSlot = 0,
             IsMain = true,
+            IsExternal = false,
             AttachedSaveId = null,
             AttachedSavePkmIdBase = null,
 
@@ -610,6 +649,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             Form = 0,
             Gender = Gender.Female,
             IsShiny = false,
+            IsAlpha = false,
 
             PkmFile = new()
             {
@@ -628,26 +668,28 @@ public class PkmVariantLoaderTests : IAsyncDisposable
     }
 
     [Fact]
-    public async Task GetPkmVersionEntityPkm_ShouldHandleMissingFile()
+    public async Task GetPkmVariantEntityPkm_ShouldHandleMissingFile()
     {
         var db = await GetDB();
         var loader = await CreateLoader(db);
 
         var pkm = CreateTestPkm(species: 25, generation: 3);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase = pkm.GetPKMIdBase(staticData.Evolves);
+        var idBase = pkm.GetPKMIdBase(evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
 
         var entity = new PkmVariantEntity()
         {
             Id = idBase,
+            Context = EntityContext.Gen3,
             Generation = 3,
             Filepath = filepath,
             BoxId = "1",
             BoxSlot = 0,
             IsMain = true,
+            IsExternal = false,
             AttachedSaveId = null,
             AttachedSavePkmIdBase = null,
 
@@ -655,6 +697,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             Form = 0,
             Gender = Gender.Female,
             IsShiny = false,
+            IsAlpha = false,
 
             PkmFile = new()
             {
@@ -687,15 +730,15 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var pkm2 = CreateTestPkm(generation: 4);
         var pkm3 = CreateTestPkm(generation: 5);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase1 = pkm1.GetPKMIdBase(staticData.Evolves);
+        var idBase1 = pkm1.GetPKMIdBase(evolves);
         var filepath1 = $"mock-storage/3/0025 - PIKACHU - {idBase1}.pk3";
 
-        var idBase2 = pkm2.GetPKMIdBase(staticData.Evolves);
+        var idBase2 = pkm2.GetPKMIdBase(evolves);
         var filepath2 = $"mock-storage/4/0025 - PIKACHU - {idBase2}.pk4";
 
-        var idBase3 = pkm3.GetPKMIdBase(staticData.Evolves);
+        var idBase3 = pkm3.GetPKMIdBase(evolves);
         var filepath3 = $"mock-storage/5/0025 - PIKACHU - {idBase3}.pk5";
 
         await db.Banks
@@ -704,6 +747,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -763,11 +807,13 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase1,
+                    Context = EntityContext.Gen3,
                     Generation = 3,
                     Filepath = filepath1,
                     BoxId = "1",
                     BoxSlot = 0,
                     IsMain = true,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -775,17 +821,20 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
                 new()
                 {
                     Id = idBase2,
+                    Context = EntityContext.Gen4,
                     Generation = 4,
                     Filepath = filepath2,
                     BoxId = "1",
                     BoxSlot = 1,
                     IsMain = true,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -793,17 +842,20 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
                 new()
                 {
                     Id = idBase3,
+                    Context = EntityContext.Gen5,
                     Generation = 5,
                     Filepath = filepath3,
                     BoxId = "2",
                     BoxSlot = 0,
                     IsMain = true,
+                    IsExternal = false,
                     AttachedSaveId = null,
                     AttachedSavePkmIdBase = null,
 
@@ -811,6 +863,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                     Form = 0,
                     Gender = Gender.Female,
                     IsShiny = false,
+                    IsAlpha = false,
 
                     PkmFile = null
                 },
@@ -867,6 +920,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 Id = "1",
                 IdInt = 1,
                 IsDefault = true,
+                IsExternal = false,
                 Name = "Bank 1",
                 Order = 0,
                 View = new([], [])
@@ -888,21 +942,30 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var pkm = CreateTestPkm(species: 25, generation: 3);
 
         await loader.AddEntity(new(
-            BoxId: "1",
+            Box: new(
+                Id: "1",
+                Name: "Box 1",
+                Order: 0,
+                Type: BoxType.Box,
+                SlotCount: 30,
+                BankId: "1"
+            ),
             BoxSlot: 0,
             IsMain: true,
+            IsExternal: false,
             AttachedSaveId: null,
             AttachedSavePkmIdBase: null,
+            Context: EntityContext.Gen3,
             Generation: 3,
             Pkm: pkm
         ));
 
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var staticData = await staticDataService.GetStaticData();
+        var evolves = await GenStaticEvolves.LoadData();
 
-        var idBase = pkm.GetPKMIdBase(staticData.Evolves);
-        var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
+        var idBase = pkm.GetPKMIdBase(evolves);
+        var filepath = Path.Combine(PathUtils.GetExpectedAppDirectory(), $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3");
 
         Assert.False(mockFileSystem.FileExists(filepath));
 

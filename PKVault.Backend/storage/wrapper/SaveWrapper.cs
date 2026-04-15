@@ -17,6 +17,8 @@ public class SaveWrapper(SaveFile Save)
             {
                 // var encodeBase = $"{(byte)Save.Version}-{Save.Generation}-{Save.TID16}-{Save.Metadata.FilePath}";
                 var path = Save.Metadata.FilePath;
+                ArgumentException.ThrowIfNullOrWhiteSpace(path);
+
                 byte[] bytes = Encoding.UTF8.GetBytes(path);
                 byte[] hash = SHA1.HashData(bytes);
                 return BitConverter.ToUInt32(hash, 0);
@@ -80,8 +82,8 @@ public class SaveWrapper(SaveFile Save)
     public TrainerIDFormat TrainerIDDisplayFormat => Save.TrainerIDDisplayFormat;
     public uint TrainerTID7 => Save.TrainerTID7;
     public uint TrainerSID7 => Save.TrainerSID7;
-    public uint DisplayTID => Save.DisplayTID;
-    public uint DisplaySID => Save.DisplaySID;
+    public uint TID => Save.DisplayTID;
+    public uint? SID => Save.DisplaySID > 0 ? Save.DisplaySID : null;
 
     #endregion
 
@@ -192,16 +194,20 @@ public class SaveWrapper(SaveFile Save)
 
     public List<string> GetBoxNames() => [.. BoxUtil.GetBoxNames(Save)];
 
-    public bool IsSpeciesAllowed(ushort species)
+    public LanguageID GetSafeLanguage()
     {
-        if (Save is SAV7b)
+        if (Save is ILangDeviantSave ds)
         {
-            return species <= 151
-                || species == 808
-                || species == 809;
+            if (ds.Japanese) return LanguageID.Japanese;
+            if (ds.Korean) return LanguageID.Korean;
         }
 
-        return species <= Save.MaxSpeciesID;
+        return (LanguageID)Save.Language;
+    }
+
+    public bool IsSpeciesAllowed(ushort species)
+    {
+        return species <= Save.MaxSpeciesID && Save.Personal.IsSpeciesInGame(species);
     }
 
     // public ImmutableSave Update(Action<SaveFile> mutator)

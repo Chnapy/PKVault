@@ -1,8 +1,11 @@
 using System.Reflection;
+using System.Runtime.InteropServices;
+using Microsoft.Extensions.Primitives;
 
 public interface ISettingsService
 {
-    public Task UpdateSettings(SettingsMutableDTO settingsMutable);
+    public Task<DataUpdateFlags?> UpdateSettings(SettingsMutableDTO settingsMutable);
+    public Task<SettingsDTO> GetSettingsWithUserId();
     public SettingsDTO GetSettings();
 }
 
@@ -11,33 +14,71 @@ public interface ISettingsService
  */
 public class SettingsService(IServiceProvider sp) : ISettingsService
 {
-    public static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "./config/pkvault.json");
+    public static readonly string FilePath = MatcherUtil.NormalizePath(Path.Combine(GetAppDirectory(), "./config/pkvault.json"));
     public static readonly string DefaultLanguage = "en";
-    public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr"]; //GameLanguage.AllSupportedLanguages.ToArray();
+    public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr", "de"]; //GameLanguage.AllSupportedLanguages.ToArray();
+    private static readonly SemaphoreSlim semaphore = new(1);
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
-    private ISaveService saveService => sp.GetRequiredService<ISaveService>();
+    private ISavesLoadersService savesLoadersService => sp.GetRequiredService<ISavesLoadersService>();
     private ISessionService sessionService => sp.GetRequiredService<ISessionService>();
 
     private SettingsDTO? BaseSettings;
 
-    public async Task UpdateSettings(SettingsMutableDTO settingsMutable)
+    public async Task<DataUpdateFlags?> UpdateSettings(SettingsMutableDTO settingsMutable)
     {
-        var sessionService = sp.GetRequiredService<ISessionService>();
-
         await fileIOService.WriteJSONFile(
             FilePath,
             SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
             settingsMutable
         );
 
-        BaseSettings = ReadBaseSettings();
+        using var scope = sp.CreateScope();
 
-        saveService.InvalidateSaves();
-        await sessionService.StartNewSession(checkInitialActions: true);
+        var userId = await scope.ServiceProvider.GetRequiredService<IMetaLoader>().GetUserId();
+
+        BaseSettings = ReadBaseSettings() with
+        {
+            UserId = userId
+        };
+
+        savesLoadersService.Clear();
+
+        var flags = await sessionService.StartNewSession(checkInitialActions: true);
+
+        if (!sessionService.HasEmptyActionList())
+        {
+            await sessionService.PersistSession(scope);
+            await sessionService.StartNewSession(checkInitialActions: false);
+        }
+
+        return flags;
     }
 
-    // Full settings
+    public async Task<SettingsDTO> GetSettingsWithUserId()
+    {
+        await semaphore.WaitAsync();
+        try
+        {
+            var scope = sp.CreateScope();
+
+            // DB use is required to avoid rare first-run app crash after language selection
+            // trigger DB creation, migration etc
+            var userId = await scope.ServiceProvider.GetRequiredService<IMetaLoader>().GetUserId();
+
+            BaseSettings = GetSettings() with
+            {
+                UserId = userId
+            };
+        }
+        finally
+        {
+            semaphore.Release();
+        }
+
+        return BaseSettings;
+    }
+
     public SettingsDTO GetSettings()
     {
         if (BaseSettings == null)
@@ -50,6 +91,31 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             CanUpdateSettings = sessionService.HasEmptyActionList(),
             CanScanSaves = sessionService.HasEmptyActionList()
         };
+    }
+
+    public static string GetAppDirectory()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            return (
+                // expected in Docker monolith context
+                Environment.GetEnvironmentVariable("PKVAULT_PATH")
+                // expected in flatpak context
+                ?? Environment.GetEnvironmentVariable("XDG_DATA_HOME")
+                // expected in all other linux contexts
+                ?? Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                    ?? "~/",
+                    "pkvault"
+                )
+            );
+        }
+
+        var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+        var exeDirectory = exePath != null ? Path.GetDirectoryName(exePath) : null;
+
+        return exeDirectory
+            ?? AppDomain.CurrentDomain.BaseDirectory;
     }
 
     public static (Guid BuildID, string Version) GetBuildInfo()
@@ -75,8 +141,9 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             BuildID,
             Version,
             PkhexVersion: Assembly.GetAssembly(typeof(PKHeX.Core.PKM))?.GetName().Version?.ToString(3) ?? "",
-            AppDirectory: MatcherUtil.NormalizePath(AppDomain.CurrentDomain.BaseDirectory),
+            AppDirectory: MatcherUtil.NormalizePath(GetAppDirectory()),
             SettingsPath: FilePath,
+            UserId: "", // should be defined later
             CanUpdateSettings: false,
             CanScanSaves: false,
             SettingsMutable: mutableDto
@@ -91,16 +158,20 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         settings = new(
             DB_PATH: "./tmp/db",
             SAVE_GLOBS: [],
+            PKM_EXTERNAL_GLOBS: [],
             STORAGE_PATH: "./tmp/storage",
             BACKUP_PATH: "./tmp/backup",
+            HIDE_CHEATS: false,
             HTTPS_NOCERT: false
         );
 #else
         settings = new(
             DB_PATH: "./db",
             SAVE_GLOBS: [],
+            PKM_EXTERNAL_GLOBS: [],
             STORAGE_PATH: "./storage",
-            BACKUP_PATH: "./backup"
+            BACKUP_PATH: "./backup",
+            HIDE_CHEATS: false
         );
 #endif
 

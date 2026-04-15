@@ -20,7 +20,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
       padding="big"
       className={css({
         backgroundColor: onClick
-          ? theme.bg.light
+          ? theme.bg.item
           : theme.bg.panel,
         borderColor: onClick
           ? theme.text.default

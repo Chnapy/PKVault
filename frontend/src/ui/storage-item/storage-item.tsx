@@ -1,15 +1,15 @@
 import { css, cx } from '@emotion/css';
 import React from "react";
-import type { EntityContext } from '../../data/sdk/model';
+import type { EntityContext, GameVersion } from '../../data/sdk/model';
 import { useTranslate } from '../../translate/i18n';
 import { type ButtonLikeProps } from '../button/button-like';
 import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../button/button-with-disabled-popover';
 import { DetailsLevel } from '../details-card/details-level';
-import { ItemImg } from '../details-card/item-img';
-import { SpeciesImg } from '../details-card/species-img';
 import { AlphaIcon } from '../icon/alpha-icon';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
+import { ItemImg } from '../img/item-img';
+import { SpeciesImg } from '../img/species-img';
 import { CheckboxInput, type CheckboxInputProps } from '../input/checkbox-input';
 import { theme } from '../theme';
 
@@ -18,6 +18,7 @@ export type StorageItemProps =
   & Pick<ButtonWithDisabledPopoverProps<never>, 'anchor' | 'helpTitle'>
   & {
     species: number;
+    version: GameVersion;
     context: EntityContext;
     form: number;
     isFemale?: boolean;
@@ -26,6 +27,7 @@ export type StorageItemProps =
     isShiny?: boolean;
     isShadow?: boolean;
     isStarter?: boolean;
+    isExternal?: boolean;
     heldItem?: number;
     warning?: boolean;
     level?: number;
@@ -46,6 +48,7 @@ export type StorageItemProps =
 
 export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   species,
+  version,
   context,
   form,
   isFemale,
@@ -54,6 +57,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   isShiny,
   isShadow,
   isStarter,
+  isExternal,
   heldItem = 0,
   warning,
   level,
@@ -100,7 +104,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
         },
       })}
       className={cx(css({
-        backgroundColor: rest.disabled ? 'transparent' : theme.bg.light,
+        backgroundColor: rest.disabled ? 'transparent' : theme.bg.item,
         borderColor: rest.disabled ? undefined : theme.text.default,
         position: 'relative',
         alignSelf: "flex-start",
@@ -117,8 +121,9 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
             position: 'absolute',
             top: 3,
             left: 3,
+            zIndex: 1,
           }), {
-            [css({ opacity: 0 })]: !checked
+            [ css({ opacity: 0 }) ]: !checked
           })}
         >
           <CheckboxInput
@@ -131,6 +136,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
       <SpeciesImg species={species} context={context} form={form} isFemale={isFemale} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} small={small} />
 
       {heldItem > 0 && <ItemImg
+        version={version}
         item={heldItem}
         size={small ? 15 : undefined}
         className={css({
@@ -155,7 +161,6 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
         {party !== undefined && renderBubble(theme.bg.green, party + 1)}
 
         {level !== undefined && <div className={css({
-          backgroundColor: 'rgba(255,255,255,0.4)',
           marginBottom: -4
         })}>
           {small ? level : <DetailsLevel level={level} />}
@@ -174,6 +179,8 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
             {nbrVariants > 1 && renderBubble(theme.bg.dark, nbrVariants)}
           </div>
           : null}
+
+        {isExternal && renderBubble(theme.bg.dark, <Icon name='external-link' solid forButton />)}
       </div>
 
       <div

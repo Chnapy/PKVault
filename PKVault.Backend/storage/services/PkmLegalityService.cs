@@ -2,11 +2,11 @@ using PKHeX.Core;
 
 public class PkmLegalityService(ISettingsService settingsService)
 {
-    private readonly Lock legalityLock = new();
+    private static readonly Lock legalityLock = new();
 
-    public async Task<PkmLegalityDTO> CreateDTO(PkmVariantEntity pkmVariant, ImmutablePKM pkm)
+    public async Task<PkmLegalityDTO> CreateDTO(PkmVariantEntity pkmVariant, ImmutablePKM pkm, SaveWrapper? attachedSave)
     {
-        return CreateDTO(pkmVariant.Id, pkm, null);
+        return CreateDTO(pkmVariant.Id, pkm, attachedSave);
     }
 
     public PkmLegalityDTO CreateDTO(PkmSaveDTO pkmSave)
@@ -28,8 +28,10 @@ public class PkmLegalityService(ISettingsService settingsService)
                 Id: id,
                 SaveId: save?.Id,
                 MovesLegality: [],
+                RelearnMovesLegality: [],
                 IsValid: false,
-                ValidityReport: ""
+                ValidityReport: "",
+                IllegalitiesCount: 0
             );
         }
 
@@ -53,8 +55,16 @@ public class PkmLegalityService(ISettingsService settingsService)
             Id: id,
             SaveId: save?.Id,
             MovesLegality: [.. la.Info.Moves.Select(r => r.Valid)],
+            RelearnMovesLegality: [.. la.Info.Relearn.Select(r => r.Valid)],
             IsValid: la.Parsed && la.Valid,
-            ValidityReport
+            ValidityReport,
+            IllegalitiesCount: la.Valid
+                ? 0
+                : (
+                    la.Results.Count(r => !r.Valid)
+                    + la.Info.Moves.Count(r => !r.Valid)
+                    + la.Info.Relearn.Count(r => !r.Valid)
+                )
         );
     }
 
@@ -64,7 +74,7 @@ public class PkmLegalityService(ISettingsService settingsService)
      *
      * If no save passed, some checks won't be done.
      */
-    public LegalityAnalysis GetLegalitySafe(ImmutablePKM pkm, SaveWrapper? save = null, StorageSlotType slotType = StorageSlotType.None)
+    public static LegalityAnalysis GetLegalitySafe(ImmutablePKM pkm, SaveWrapper? save = null, StorageSlotType slotType = StorageSlotType.None)
     {
         // lock required because of ParseSettings static context causing race condition
         lock (legalityLock)
@@ -97,10 +107,12 @@ public class PkmLegalityService(ISettingsService settingsService)
             (int)BoxType.Daycare => StorageSlotType.Daycare,
             (int)BoxType.GTS => StorageSlotType.GTS,
             // (int)BoxType.Fused => StorageSlotType.Fused,
-            (int)BoxType.Misc => StorageSlotType.Misc,
+            (int)BoxType.Underground => StorageSlotType.Underground,
             (int)BoxType.Resort => StorageSlotType.Resort,
             (int)BoxType.Ride => StorageSlotType.Ride,
             (int)BoxType.Shiny => StorageSlotType.Shiny,
+            (int)BoxType.BattleAgency => StorageSlotType.BattleAgency,
+            (int)BoxType.Pokéwalker => StorageSlotType.Pokéwalker,
             _ => StorageSlotType.Box
         };
 

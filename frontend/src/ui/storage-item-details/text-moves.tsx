@@ -1,6 +1,9 @@
+import { css } from '@emotion/css';
 import { ListboxOption } from '@headlessui/react';
 import React from 'react';
+import { useWatch } from 'react-hook-form';
 import { MoveCategory, type StaticMove } from '../../data/sdk/model';
+import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { useStorageGetPkmAvailableMoves } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
@@ -9,7 +12,6 @@ import { SelectNumberInput } from '../input/select-input';
 import { MoveItem } from '../move-item/move-item';
 import { theme } from '../theme';
 import { StorageDetailsForm } from './storage-details-form';
-import { css } from '@emotion/css';
 
 export type TextMovesProps = {
     saveId?: number;
@@ -17,6 +19,9 @@ export type TextMovesProps = {
     ability: number;
     moves: number[];
     movesLegality: boolean[];
+    relearnMoves?: number[];
+    relearnMovesLegality?: boolean[];
+    alphaMove?: number;
     generation: number;
     hiddenPowerType: number;
     hiddenPowerPower: number;
@@ -30,6 +35,9 @@ export const TextMoves: React.FC<TextMovesProps> = ({
     ability,
     moves,
     movesLegality,
+    relearnMoves = [],
+    relearnMovesLegality = [],
+    alphaMove,
     generation,
     hiddenPowerType,
     hiddenPowerPower,
@@ -38,12 +46,18 @@ export const TextMoves: React.FC<TextMovesProps> = ({
 }) => {
     const { t } = useTranslate();
 
-    const { editMode, register, setValue, watch } = StorageDetailsForm.useContext();
+    const { editMode, register, setValue, control } = StorageDetailsForm.useContext();
+    const [ formMoves ] = useWatch({ control, name: [ 'moves' ] });
 
     const staticData = useStaticData();
 
+    const settingsQuery = useSettingsGet();
+    const hideCheats = settingsQuery.data?.data.settingsMutable.hidE_CHEATS ?? false;
+
+    const editModeCheats = editMode && !hideCheats;
+
     const availableMovesQuery = useStorageGetPkmAvailableMoves({ saveId, pkmId }, {
-        query: { enabled: editMode }
+        query: { enabled: editModeCheats }
     });
 
     const getStaticMove = React.useCallback((moveId: number): StaticMove | undefined => {
@@ -89,8 +103,6 @@ export const TextMoves: React.FC<TextMovesProps> = ({
         return staticMove;
     }, [ friendship, hiddenPowerCategory, hiddenPowerPower, hiddenPowerType, staticData.moves ]);
 
-    const formMoves = watch(`moves`);
-
     const availableMoves = React.useMemo(() => (availableMovesQuery.data?.data ?? [])
         .map(move => move.id)
         .sort((a, b) => {
@@ -110,13 +122,13 @@ export const TextMoves: React.FC<TextMovesProps> = ({
 
     // in edit-mode remove invalid moves
     React.useEffect(() => {
-        if (editMode && availableMoves.length > 0) {
+        if (editModeCheats && availableMoves.length > 0) {
             const fixedMoves = formMoves.map(move => availableMoves.some(moveId => moveId === move) ? move : 0);
             if (fixedMoves.join('.') !== formMoves.join('.')) {
                 setValue('moves', fixedMoves);
             }
         }
-    }, [ availableMoves, editMode, formMoves, setValue ]);
+    }, [ availableMoves, editModeCheats, formMoves, setValue ]);
 
     return <>
         {ability > 0 && <>
@@ -136,7 +148,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                 paddingBottom: 14,
             })}
         >
-            {editMode
+            {editModeCheats
                 ? <>
                     {formMoves.map((move, i) => {
 
@@ -163,6 +175,7 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                                                     category={forGen.category}
                                                     damage={forGen.power}
                                                     clickable={!disabled}
+                                                    isAlpha={move > 0 && alphaMove === move}
                                                 />
                                                 : null,
                                             disabled,
@@ -208,6 +221,8 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                                 category={forGen.category}
                                 damage={forGen.power}
                                 isValid={movesLegality[ i ] ?? true}
+                                isNone={move === 0}
+                                isAlpha={move > 0 && alphaMove === move}
                                 className={css({
                                     flex: '1 1 0',
                                     minWidth: '35%'
@@ -217,6 +232,42 @@ export const TextMoves: React.FC<TextMovesProps> = ({
                     })}
                 </>}
         </div>
+
+        {relearnMoves.length > 0 && <>
+            <span>{t('details.relearn-moves')}</span>
+            <br />
+            <div
+                className={css({
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 4,
+                    paddingBottom: 14,
+                })}
+            >
+                {relearnMoves.map((move, i) => {
+                    const staticMove = getStaticMove(move);
+                    const forGen = staticMove?.dataUntilGeneration.find(gen => gen.untilGeneration >= generation);
+
+                    return forGen
+                        ? <MoveItem
+                            key={i}
+                            name={staticMove?.name ?? ''}
+                            type={forGen.type}
+                            category={forGen.category}
+                            damage={forGen.power}
+                            isValid={relearnMovesLegality[ i ] ?? true}
+                            isNone={move === 0}
+                            isAlpha={move > 0 && alphaMove === move}
+                            className={css({
+                                flex: '1 1 0',
+                                minWidth: '35%'
+                            })}
+                        />
+                        : null;
+                })}
+            </div>
+        </>}
+
         <div
             className={css({
                 display: 'flex',

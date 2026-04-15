@@ -1,7 +1,7 @@
 
-prepare-winform:
+prepare-desktop:
 	cd frontend && \
-	VITE_SERVER_URL=http://localhost:5000 VITE_DESKTOP=1 npm run build && \
+	npm run build && \
 	cd .. && \
-	rm -rf ./PKVault.WinForm/wwwroot && \
-	cp -r ./frontend/dist ./PKVault.WinForm/wwwroot
+	rm -rf ./PKVault.Desktop/Resources/wwwroot && \
+	cp -r ./frontend/dist ./PKVault.Desktop/Resources/wwwroot

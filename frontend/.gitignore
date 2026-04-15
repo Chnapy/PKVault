@@ -23,7 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
+coverage/
+
 *.gen.*
 src/data/sdk*
 
 tmp/
+
+public/docs/

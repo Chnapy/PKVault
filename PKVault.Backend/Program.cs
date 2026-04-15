@@ -10,17 +10,16 @@ namespace PKVault.Backend;
 
 public class Program
 {
+    // For migration file generation
+    // EF Core uses this method at design time to access the DbContext
+    public static IHostBuilder CreateHostBuilder(string[] args)
+        => Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(
+                webBuilder => webBuilder.UseStartup<Startup>());
+
     public static async Task Main(string[] args)
     {
         LogUtil.Initialize();
-
-#if MODE_GEN_MIGRATION
-        if (!Microsoft.EntityFrameworkCore.EF.IsDesignTime)
-        {
-            await MigrationUtil.AddMigrationTrimmedCompatible(args[0]);
-            return;
-        }
-#endif
 
         var time = LogUtil.Time($"Setup backend load");
 
@@ -84,10 +83,7 @@ public class Program
 
         return async () =>
         {
-            await Task.WhenAll([
-                host.Services.GetRequiredService<ISaveService>().EnsureInitialized(),
-                host.Services.GetRequiredService<ISessionServiceMinimal>().EnsureSessionCreated(),
-            ]);
+            await host.Services.GetRequiredService<ISessionServiceMinimal>().EnsureSessionCreated();
         };
 #else
         throw new Exception("Mode not defined");
@@ -179,7 +175,6 @@ public class Program
 
 #if MODE_GEN_POKEAPI
         services.AddSingleton<PokeApiService>();
-        services.AddSingleton<GenSpritesheetService>();
         services.AddSingleton<GenStaticDataService>();
 #endif
 
@@ -202,14 +197,16 @@ public class Program
         services.AddSingleton<DexService>();
         services.AddSingleton<WarningsService>();
         services.AddSingleton<BackupService>();
-        services.AddSingleton<ISaveService, SaveService>();
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<DataService>();
-        services.AddSingleton<PkmConvertService>();
+        services.AddSingleton<IPkmConvertService, PkmConvertService>();
+        services.AddSingleton<IPkmSharePropertiesService, PkmSharePropertiesService>();
+        services.AddSingleton<PkmUpdateService>();
         services.AddSingleton<PkmLegalityService>();
 
         Console.WriteLine($"Setup services - Actions");
         services.AddScoped<DataNormalizeAction>();
+        services.AddScoped<UpdateExternalPkmAction>();
         services.AddScoped<SynchronizePkmAction>();
         services.AddScoped<MainCreateBoxAction>();
         services.AddScoped<MainUpdateBoxAction>();
@@ -230,6 +227,7 @@ public class Program
         services.AddScoped<DexSyncAction>();
 
         Console.WriteLine($"Setup services - Loaders");
+        services.AddScoped<IMetaLoader, MetaLoader>();
         services.AddScoped<IBankLoader, BankLoader>();
         services.AddScoped<IBoxLoader, BoxLoader>();
         services.AddScoped<IPkmVariantLoader, PkmVariantLoader>();
@@ -299,5 +297,10 @@ public class Program
         listener.Stop();
 
         return port;
+    }
+
+    public static bool HasEmptyActionList(IHost host)
+    {
+        return host.Services.GetRequiredService<ISessionService>().HasEmptyActionList();
     }
 }

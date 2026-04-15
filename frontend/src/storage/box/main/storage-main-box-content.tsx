@@ -5,20 +5,21 @@ import { usePkmVariantIndex } from '../../../data/hooks/use-pkm-variant-index';
 import { BoxType, type PkmVariantDTO } from '../../../data/sdk/model';
 import { useStorageCreateMainBox, useStorageDeleteMainBox, useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../../../error/with-error-catcher';
+import { HelpButton } from '../../../help/help-button';
 import { Route } from '../../../routes/storage';
 import { useTranslate } from '../../../translate/i18n';
 import { Icon } from '../../../ui/icon/icon';
 import { StorageBox } from '../../../ui/storage-box/storage-box';
 import { StorageBoxMainActions } from '../../../ui/storage-box/storage-box-main-actions';
 import { StorageItemPlaceholder } from '../../../ui/storage-item/storage-item-placeholder';
-import { StorageMoveContext } from '../../actions/storage-move-context';
 import { DexSyncAdvancedAction } from '../../advanced-actions/dex-sync-advanced-action';
 import { SortAdvancedAction } from '../../advanced-actions/sort-advanced-action';
 import { BankContext } from '../../bank/bank-context';
+import { StorageMainItem } from '../../item/main/storage-main-item';
+import { MoveContext } from '../../move/context/move-context';
 import { StorageBoxEdit } from '../storage-box-edit';
 import { StorageBoxList } from '../storage-box-list';
 import { StorageHeader } from '../storage-header';
-import { StorageMainItem } from '../../item/main/storage-main-item';
 
 export const StorageMainBoxContent: React.FC<{
     boxId: number;
@@ -36,7 +37,7 @@ export const StorageMainBoxContent: React.FC<{
 
     const getMainBoxIds = (value: number) => mainBoxIds.map((id, i) => (i === boxIndex ? value : id));
 
-    const moveContext = StorageMoveContext.useValue();
+    const moveState = MoveContext.useValue().state;
 
     const boxesQuery = useStorageGetBoxes();
     const pkmsQuery = usePkmVariantIndex();
@@ -47,9 +48,13 @@ export const StorageMainBoxContent: React.FC<{
     const boxDeleteMutation = useStorageDeleteMainBox();
 
     const boxes = boxesQuery.data?.data.filter(box => box.bankId === selectedBankBoxes.data?.selectedBank.id) ?? [];
+    const boxesIds = new Set(boxes.map(box => box.idInt));
+
     const sortedBoxes = boxes.sort((b1, b2) => (b1.order < b2.order ? -1 : 1));
     const filteredBoxes = sortedBoxes.filter(box => !mainBoxIds.includes(box.idInt) || box.idInt === boxId);
-    const pkms = Object.values(pkmsQuery.data?.data.byId ?? {}).filter(pk => pk.isMain);
+
+    const allPkms = Object.values(pkmsQuery.data?.data.byId ?? {});
+    const pkms = allPkms.filter(pk => pk.isMain && boxesIds.has(pk.boxId));
 
     const selectedBoxIndex = filteredBoxes.findIndex(box => box.idInt === boxId);
     const selectedBox = filteredBoxes[ selectedBoxIndex ] ?? {
@@ -86,6 +91,7 @@ export const StorageMainBoxContent: React.FC<{
                 header={
                     <>
                         <StorageHeader
+                            loading={loading}
                             gameLogo={
                                 <div
                                     className={css({
@@ -114,6 +120,7 @@ export const StorageMainBoxContent: React.FC<{
                                 {
                                     label: t('storage.box.advanced.sort'),
                                     icon: <Icon name='sort' solid forButton />,
+                                    disabled: allPkms.length === 0,
                                     panelContent: close => <SortAdvancedAction.Main selectedBoxId={selectedBox.idInt} close={close} />,
                                 },
                                 {
@@ -184,17 +191,22 @@ export const StorageMainBoxContent: React.FC<{
                                     }
                                     setShowBoxes(false);
                                 }}
-                                editPanelContent={(boxId, close) => <StorageBoxEdit boxId={boxId} close={close} />}
-                                deleteFn={boxId => boxDeleteMutation.mutateAsync({ boxId })}
-                                addFn={
-                                    selectedBankBoxes.data &&
-                                    (() =>
+                                editPanelContent={selectedBankBoxes.data?.selectedBank.isExternal
+                                    ? undefined
+                                    : (boxId, close) => <StorageBoxEdit boxId={boxId} close={close} />}
+                                deleteFn={selectedBankBoxes.data?.selectedBank.isExternal
+                                    ? undefined
+                                    : (boxId) => boxDeleteMutation.mutateAsync({ boxId })}
+                                addFn={selectedBankBoxes.data && !selectedBankBoxes.data.selectedBank.isExternal
+                                    ? (() =>
                                         boxCreateMutation.mutateAsync({
                                             params: {
                                                 bankId: selectedBankBoxes.data.selectedBank.id,
                                             },
                                         }))
+                                    : undefined
                                 }
+                                help={<HelpButton slug='3-storage.md#banks-and-boxes' />}
                             />
                         )}
                     </>
@@ -206,10 +218,9 @@ export const StorageMainBoxContent: React.FC<{
                             return (
                                 <div key={i} className={css({ order: i, display: 'flex' })}>
                                     {!pkm ||
-                                        (moveContext.selected &&
-                                            !moveContext.selected.saveId &&
-                                            !moveContext.selected.target &&
-                                            moveContext.selected.ids.includes(pkm.id)) ? (
+                                        (moveState.status === 'dragging' &&
+                                            !moveState.source.saveId &&
+                                            moveState.source.ids.includes(pkm.id)) ? (
                                         <StorageItemPlaceholder boxId={selectedBox.idInt} boxSlot={i} pkmId={pkm?.id} />
                                     ) : (
                                         <StorageMainItem pkmId={pkm.id} />
@@ -218,10 +229,9 @@ export const StorageMainBoxContent: React.FC<{
                             );
                         })}
 
-                        {moveContext.selected &&
-                            !moveContext.selected.saveId &&
-                            !moveContext.selected.target &&
-                            moveContext.selected.ids.map(id => <StorageMainItem key={id} pkmId={id} />)}
+                        {moveState.status === 'dragging' &&
+                            !moveState.source.saveId &&
+                            moveState.source.ids.map(id => <StorageMainItem key={id} pkmId={id} />)}
                     </>
                 )}
             </PopoverButton>

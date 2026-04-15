@@ -7,7 +7,8 @@ import { StorageSelectContext } from './actions/storage-select-context';
 export const StorageSelectAll: React.FC<{
     saveId?: number;
     boxId: number;
-}> = ({ saveId, boxId }) => {
+    disabled?: boolean;
+}> = ({ saveId, boxId, disabled }) => {
     const selectContext = StorageSelectContext.useValue();
 
     const mainPkmsQuery = usePkmVariantIndex();
@@ -34,6 +35,7 @@ export const StorageSelectAll: React.FC<{
                     );
                 }
             }}
+            disabled={disabled}
         />
     );
 };

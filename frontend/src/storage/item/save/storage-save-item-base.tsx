@@ -39,6 +39,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
         <StorageItem
             {...rest}
             species={species}
+            version={savePkm.contextVersion}
             context={savePkm.context}
             form={form}
             isFemale={gender == GenderType.Female}

@@ -1,6 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
-public abstract class EntityLoader<DTO, E> : IEntityLoader<DTO, E> where DTO : IWithId where E : IEntity
+public abstract class EntityLoader<
+    DTO,
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] E
+> : IEntityLoader<DTO, E> where DTO : IWithId where E : IEntity
 {
     protected ISessionServiceMinimal sessionService;
     protected SessionDbContext db;

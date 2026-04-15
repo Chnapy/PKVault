@@ -2,6 +2,8 @@ public record PkmLegalityDTO(
     string Id,
     uint? SaveId,
     List<bool> MovesLegality,
+    List<bool> RelearnMovesLegality,
     bool IsValid,
-    string ValidityReport
+    string ValidityReport,
+    int IllegalitiesCount
 ) : IWithId;

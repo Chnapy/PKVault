@@ -8,6 +8,7 @@ public class BankEntity : IEntity
     public required int IdInt { get; init; }
     public required string Name { get; set; }
     public required bool IsDefault { get; set; }
+    public required bool IsExternal { get; set; }
     public required int Order { get; set; }
     public required BankView View { get; set; }
 }

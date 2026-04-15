@@ -11,7 +11,7 @@ import { css } from '@emotion/css';
  * If first start, ask for app language.
  */
 export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
-    const appStartTime = React.useRef(Date.now());
+    const [ appStartTime ] = React.useState(() => Date.now());
 
     const settingsQuery = useSettingsGet();
     const settingsEditMutation = useSettingsEdit();
@@ -34,7 +34,7 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
     }
 
     if (language) {
-        return <SplashData appStartTime={appStartTime.current}>{children}</SplashData>;
+        return <SplashData appStartTime={appStartTime}>{children}</SplashData>;
     }
 
     return <Splash>
@@ -63,6 +63,12 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
                     language: 'fr',
                 }
             })}>Français</Button>
+            <Button big onClick={() => settingsEditMutation.mutateAsync({
+                data: {
+                    ...settingsMutable,
+                    language: 'de',
+                }
+            })}>Deutsch</Button>
         </div>
     </Splash>;
 };

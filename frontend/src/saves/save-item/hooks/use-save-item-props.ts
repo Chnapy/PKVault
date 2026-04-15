@@ -16,11 +16,13 @@ export const useSaveItemProps = () => {
 
         return {
             id: item.id,
-            generation: item.generation,
+            context: item.context,
             version: item.version,
             trainerName: item.trainerName,
-            trainerGenderMale: item.trainerGender === 0,
+            trainerGender: item.trainerGender,
             tid: item.tid,
+            sid: item.sid,
+            language: item.language,
             path: item.path,
             lastWriteTime: item.lastWriteTime,
             playTime: item.playTime,

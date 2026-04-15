@@ -1,11 +1,12 @@
+import { css, cx } from '@emotion/css';
 import React from 'react';
 import { ErrorCatcher } from '../../error/error-catcher';
-import { StorageMoveContext } from '../../storage/actions/storage-move-context';
+import { MoveContext } from '../../storage/move/context/move-context';
 import { theme } from '../theme';
 import { Container, type ContainerProps } from './container';
-import { css, cx } from '@emotion/css';
 
 export type TitledContainerProps = Omit<ContainerProps<'div'>, 'title'> & {
+    classNameContent?: string;
     title: React.ReactNode;
     contrasted?: boolean;
     enableExpand?: boolean;
@@ -16,10 +17,9 @@ export type TitledContainerProps = Omit<ContainerProps<'div'>, 'title'> & {
 };
 
 export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerProps>> = ({
-    title, contrasted, enableExpand, initialExpanded = true, expanded: rawExpanded, setExpanded, maxHeight, children, ...containerProps
+    classNameContent, title, contrasted, enableExpand, initialExpanded = true, expanded: rawExpanded, setExpanded, maxHeight, children, ...containerProps
 }) => {
-    const moveContext = StorageMoveContext.useValue();
-    const isDragging = !!moveContext.selected && !moveContext.selected.target;
+    const isDragging = MoveContext.useValue().state.status === 'dragging';
     const [ expandedRaw, setExpandedRaw ] = React.useState(initialExpanded);
 
     let expanded = (!isDragging || !enableExpand)
@@ -45,7 +45,7 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
                 : theme.text.default,
             scrollbarColor: contrasted
                 ? `${theme.bg.contrastdark} ${theme.bg.contrast}`
-                : undefined,
+                : 'initial',
             display: 'flex',
             flexDirection: 'column',
         }), containerProps.className)}
@@ -66,12 +66,16 @@ export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerPr
             >{title}</div>}
 
             {children && expanded && <div
-                className={css({
-                    flexGrow: 1,
-                    padding: 8,
-                    overflowY: 'auto',
-                    maxHeight,
-                })}
+                className={cx(
+                    css({
+                        flexGrow: 1,
+                        position: 'relative',
+                        padding: 8,
+                        overflowY: 'auto',
+                        maxHeight,
+                    }),
+                    classNameContent
+                )}
             >
                 {children}
             </div>}

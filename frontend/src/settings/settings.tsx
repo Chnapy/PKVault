@@ -1,9 +1,11 @@
+import { css } from '@emotion/css';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { HistoryContext } from '../context/history-context';
 import type { SettingsMutableDTO } from '../data/sdk/model/settingsMutableDTO';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
+import { HelpButton } from '../help/help-button';
 import { useTranslate } from '../translate/i18n';
 import { Button, ButtonLink } from '../ui/button/button';
 import { TitledContainer } from '../ui/container/titled-container';
@@ -11,9 +13,9 @@ import { Icon } from '../ui/icon/icon';
 import { SelectStringInput } from '../ui/input/select-input';
 import { TextInput } from '../ui/input/text-input';
 import { theme } from '../ui/theme';
-import { useDesktopMessage } from './save-globs/hooks/use-desktop-message';
-import { SaveGlobsList } from './save-globs/save-globs-list';
-import { css } from '@emotion/css';
+import { GlobsInputList } from './globs-input/globs-input-list';
+import { useDesktopMessage } from './globs-input/hooks/use-desktop-message';
+import { CheckboxInput } from '../ui/input/checkbox-input';
 
 export const Settings: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
@@ -28,14 +30,21 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
     const settings = settingsQuery.data?.data;
     const settingsMutable = settings?.settingsMutable;
 
-    const defaultValue = React.useMemo(() => settingsMutable && ({
+    type SettingsFormData = Omit<SettingsMutableDTO, 'savE_GLOBS' | 'pkM_EXTERNAL_GLOBS'> & {
+        savE_GLOBS: string;
+        pkM_EXTERNAL_GLOBS: string;
+    };
+
+    const defaultValue = React.useMemo((): SettingsFormData | undefined => settingsMutable && ({
         ...settingsMutable,
         savE_GLOBS: settingsMutable.savE_GLOBS.join('\n'),
+        pkM_EXTERNAL_GLOBS: settingsMutable.pkM_EXTERNAL_GLOBS?.join('\n') ?? ''
     }), [ settingsMutable ]);
 
-    const { register, watch, reset, setValue, getValues, handleSubmit, formState } = useForm<Omit<SettingsMutableDTO, 'savE_GLOBS'> & { savE_GLOBS: string }>({
+    const { register, reset, setValue, getValues, handleSubmit, formState, control } = useForm<SettingsFormData>({
         defaultValues: defaultValue
     });
+    const [ language, saveGlobs, pkmExternalGlobs, hideCheats ] = useWatch({ control, name: [ 'language', 'savE_GLOBS', 'pkM_EXTERNAL_GLOBS', 'hidE_CHEATS' ] });
 
     if (!settingsMutable) {
         return null;
@@ -45,16 +54,30 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
         await settingsMutation.mutateAsync({
             data: {
                 ...data,
-                savE_GLOBS: data.savE_GLOBS.split('\n').map(value => value.trim()).filter(Boolean)
+                savE_GLOBS: data.savE_GLOBS.split('\n').map(value => value.trim()).filter(Boolean),
+                pkM_EXTERNAL_GLOBS: data.pkM_EXTERNAL_GLOBS.split('\n').map(value => value.trim()).filter(Boolean)
             },
         });
     });
 
     return <TitledContainer title={<div className={css({ display: 'flex', justifyContent: 'space-between' })}>
-        {t('settings.title')}
+        <div
+            className={css({
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+            })}
+        >
+            {t('settings.title')}
 
-        <div className={css({ marginLeft: 'auto' })}>
-            v{settings?.version} - Build ID = {settings?.buildID} - PKHeX {settings?.pkhexVersion}
+            <HelpButton slug='5-settings.md' />
+        </div>
+
+        <div
+            className={css({ marginLeft: 'auto' })}
+            title={`Build ID = ${settings?.buildID}`}
+        >
+            v{settings?.version} - PKHeX {settings?.pkhexVersion}
         </div>
     </div>}>
         <form
@@ -83,11 +106,12 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                     <SelectStringInput
                         label={t('settings.form.language')}
                         data={[
-                            { value: 'en', option: 'English', disabled: watch('language') === 'en' },
-                            { value: 'fr', option: 'Français', disabled: watch('language') === 'fr' },
+                            { value: 'en', option: 'English', disabled: language === 'en' },
+                            { value: 'fr', option: 'Français', disabled: language === 'fr' },
+                            { value: 'de', option: 'Deutsch', disabled: language === 'de' },
                         ]}
                         {...register('language')}
-                        value={watch('language')}
+                        value={language}
                         onChange={value => setValue('language', value)}
                         disabled={!settings.canUpdateSettings}
                     />
@@ -109,7 +133,6 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                                     role='button'
                                     onClick={() => desktopMessage.openFile({
                                         type: 'open-folder',
-                                        id: 'settingsPath',
                                         isDirectory: false,
                                         path: settings.settingsPath,
                                     })}>
@@ -124,11 +147,33 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                 </div>
             </div>
 
-            <SaveGlobsList
+            <GlobsInputList
+                labelList={t('settings.form.saves')}
+                labelAddFile={t('settings.form.saves.add-file')}
+                labelAddFolder={t('settings.form.saves.add-folder')}
                 {...register('savE_GLOBS')}
-                value={watch('savE_GLOBS')}
+                value={saveGlobs}
                 onChange={(value) => setValue('savE_GLOBS', value)}
                 disabled={!settings.canUpdateSettings}
+                limit={200}
+            />
+
+            <GlobsInputList
+                labelList={<div className={css({
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                })}>
+                    {t('settings.form.pkms-external')}
+                    <Icon name='external-link' forButton />
+                </div>}
+                labelAddFile={t('settings.form.pkms-external.add-file')}
+                labelAddFolder={t('settings.form.pkms-external.add-folder')}
+                {...register('pkM_EXTERNAL_GLOBS')}
+                value={pkmExternalGlobs}
+                onChange={(value) => setValue('pkM_EXTERNAL_GLOBS', value)}
+                disabled={!settings.canUpdateSettings}
+                limit={8000}
             />
 
             <details>
@@ -171,7 +216,6 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                                             role='button'
                                             onClick={() => desktopMessage.openFile({
                                                 type: 'open-folder',
-                                                id: 'dB_PATH',
                                                 isDirectory: false,
                                                 path: getValues('dB_PATH'),
                                             })}>
@@ -192,7 +236,6 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                                             role='button'
                                             onClick={() => desktopMessage.openFile({
                                                 type: 'open-folder',
-                                                id: 'backuP_PATH',
                                                 isDirectory: false,
                                                 path: getValues('backuP_PATH'),
                                             })}>
@@ -222,7 +265,6 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                                             role='button'
                                             onClick={() => desktopMessage.openFile({
                                                 type: 'open-folder',
-                                                id: 'storagE_PATH',
                                                 isDirectory: false,
                                                 path: getValues('storagE_PATH'),
                                             })}>
@@ -238,6 +280,39 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                     </div>
                 </div>
             </details>
+
+            <TitledContainer
+                className={css({
+                    alignSelf: 'flex-start',
+                })}
+                title={null}
+            >
+
+                <div
+                    className={css({
+                        display: 'flex',
+                        gap: 4,
+                        userSelect: 'none',
+                    })}
+                >
+                    <CheckboxInput
+                        id='hide-cheats'
+                        checked={hideCheats}
+                        onChange={() => setValue('hidE_CHEATS', !getValues('hidE_CHEATS'))}
+                        disabled={!settings.canUpdateSettings}
+                    />
+
+                    <label
+                        className={css({
+                            cursor: settings.canUpdateSettings ? 'pointer' : 'not-allowed',
+                        })}
+                        htmlFor='hide-cheats'
+                    >
+                        {t('settings.form.hide-cheats')}
+                    </label>
+                </div>
+
+            </TitledContainer>
 
             <div
                 className={css({

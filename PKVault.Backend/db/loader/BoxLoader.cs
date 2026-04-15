@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public interface IBoxLoader : IEntityLoader<BoxDTO, BoxEntity>
 {
-    public BoxDTO CreateDTO(BoxEntity entity);
+    public BoxDTO CreateDTO(BoxEntity entity, string? WallpaperName = null);
     public Task<Dictionary<string, BoxEntity>> GetEntitiesByBank(string bankId);
     public Task<int> GetMaxId();
     public Task NormalizeOrders();
@@ -21,15 +21,21 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         StorageSlotType.Party => BoxType.Party,
         StorageSlotType.BattleBox => BoxType.BattleBox,
         StorageSlotType.Daycare => BoxType.Daycare,
+        StorageSlotType.Scripted => BoxType.Scripted,
         StorageSlotType.GTS => BoxType.GTS,
+        StorageSlotType.PGL => BoxType.PGL,
+        StorageSlotType.SurpriseTrade => BoxType.SurpriseTrade,
+        StorageSlotType.Fused => BoxType.Fused,
         StorageSlotType.FusedKyurem => BoxType.Fused,
         StorageSlotType.FusedNecrozmaS => BoxType.Fused,
         StorageSlotType.FusedNecrozmaM => BoxType.Fused,
         StorageSlotType.FusedCalyrex => BoxType.Fused,
-        StorageSlotType.Misc => BoxType.Misc,
+        StorageSlotType.Underground => BoxType.Underground,
         StorageSlotType.Resort => BoxType.Resort,
         StorageSlotType.Ride => BoxType.Ride,
         StorageSlotType.Shiny => BoxType.Shiny,
+        StorageSlotType.BattleAgency => BoxType.BattleAgency,
+        StorageSlotType.Pokéwalker => BoxType.Pokéwalker,
         _ => throw new NotImplementedException(slotType.ToString()),
     };
 
@@ -46,7 +52,7 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         pkmVariantLoader = _pkmVariantLoader;
     }
 
-    public BoxDTO CreateDTO(BoxEntity entity)
+    public BoxDTO CreateDTO(BoxEntity entity, string? WallpaperName = null)
     {
         return new(
             Id: entity.Id,
@@ -54,7 +60,8 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
             Name: entity.Name,
             SlotCount: entity.SlotCount,
             Order: entity.Order,
-            BankId: entity.BankId
+            BankId: entity.BankId,
+            WallpaperName
         );
     }
 
@@ -68,6 +75,12 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         var pkmsToRemove = await pkmVariantLoader.GetEntitiesByBox(entity.Id);
         foreach (var pkm in pkmsToRemove.Values.SelectMany(entry => entry.Values))
         {
+            var dto = await pkmVariantLoader.CreateDTO(pkm);
+            if (!dto.CanDelete)
+            {
+                throw new ArgumentException($"PkmVariant cannot be deleted: {dto.Id}");
+            }
+
             await pkmVariantLoader.DeleteEntity(pkm);
         }
 

@@ -61,6 +61,7 @@ public class Dex9SVService(SAV9SV save) : DexGenService(save)
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
             IsSeenShiny: isSeenShiny,
+            IsSeenAlpha: false,
             IsCaught: isCaught,
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
@@ -84,41 +85,41 @@ public class Dex9SVService(SAV9SV save) : DexGenService(save)
         }
     }
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
+    public override async Task EnableSpeciesForm(EnableSpeciesFormPayload payload)
     {
-        if (!save.Personal.IsPresentInGame(species, form) || species > save.MaxSpeciesID)
+        if (!save.Personal.IsPresentInGame(payload.Species, payload.Form) || payload.Species > save.MaxSpeciesID)
             return;
 
-        byte formToUse = species == (ushort)Species.Alcremie
-            ? (byte)(form / 7)
-            : form;
+        byte formToUse = payload.Species == (ushort)Species.Alcremie
+            ? (byte)(payload.Form / 7)
+            : payload.Form;
 
         if (save.SaveRevision == 0)
         // paldea
         {
-            var entry = save.Zukan.DexPaldea.Get(species);
+            var entry = save.Zukan.DexPaldea.Get(payload.Species);
             if (!entry.IsKnown)
                 entry.SetDisplayIsNew();
 
-            if (isSeen)
+            if (payload.IsSeen)
             {
                 entry.SetSeen(true);
                 entry.SetIsFormSeen(formToUse, true);
-                entry.SetIsGenderSeen((byte)gender, true);
+                entry.SetIsGenderSeen((byte)payload.Gender, true);
                 entry.SetDisplayForm(formToUse);
-                entry.SetDisplayGender((byte)gender);
+                entry.SetDisplayGender((byte)payload.Gender);
             }
 
-            if (isSeenShiny)
+            if (payload.IsSeenShiny)
             {
                 entry.SetDisplayIsShiny();
                 entry.SetSeenIsShiny();
             }
 
-            if (isCaught)
+            if (payload.IsCaught)
                 entry.SetCaught(true);
 
-            var safeLanguages = languages.Where(AllLanguages.Contains);
+            var safeLanguages = payload.Languages.Where(AllLanguages.Contains);
             if (!safeLanguages.Any())
             {
                 safeLanguages = [GetSaveLanguage()];
@@ -132,22 +133,22 @@ public class Dex9SVService(SAV9SV save) : DexGenService(save)
         // kitami
         else
         {
-            var entry = save.Zukan.DexKitakami.Get(species);
+            var entry = save.Zukan.DexKitakami.Get(payload.Species);
 
-            if (isSeen)
+            if (payload.IsSeen)
             {
                 entry.SetSeenForm(formToUse, true);
                 entry.SetHeardForm(formToUse, true);
-                entry.SetIsGenderSeen((byte)gender, true);
+                entry.SetIsGenderSeen((byte)payload.Gender, true);
             }
 
-            if (isSeenShiny)
+            if (payload.IsSeenShiny)
                 entry.SetIsModelSeen(true, true);
 
-            if (isCaught)
+            if (payload.IsCaught)
                 entry.SetObtainedForm(formToUse, true);
 
-            var safeLanguages = languages.Where(AllLanguages.Contains);
+            var safeLanguages = payload.Languages.Where(AllLanguages.Contains);
             if (!safeLanguages.Any())
             {
                 safeLanguages = [GetSaveLanguage()];

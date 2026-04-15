@@ -1,15 +1,16 @@
+import { css } from '@emotion/css';
 import type React from 'react';
 import { useBackupDelete, useBackupGetAll, useBackupRestore } from '../../data/sdk/backup/backup.gen';
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../../error/with-error-catcher';
+import { HelpButton } from '../../help/help-button';
 import { useTranslate } from '../../translate/i18n';
 import { ButtonWithConfirm } from '../../ui/button/button-with-confirm';
 import { Container } from '../../ui/container/container';
 import { TitledContainer } from '../../ui/container/titled-container';
 import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
-import { useDesktopMessage } from '../save-globs/hooks/use-desktop-message';
-import { css } from '@emotion/css';
+import { useDesktopMessage } from '../globs-input/hooks/use-desktop-message';
 
 export const Backup: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
@@ -36,33 +37,44 @@ export const Backup: React.FC = withErrorCatcher('default', () => {
 
     const title = t('settings.backups.title', { count: backupQuery.data.data.length });
 
-    return <TitledContainer title={desktopMessage
-        ? <div
-            role='button'
-            onClick={() => settings && desktopMessage.openFile({
-                type: 'open-folder',
-                id: 'backups',
-                isDirectory: true,
-                path: settings.settingsMutable.backuP_PATH
-            })}
+    return <TitledContainer title={
+        <div
             className={css({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
-                cursor: 'pointer',
             })}
         >
-            {title}
+            {desktopMessage
+                ? <div
+                    role='button'
+                    onClick={() => settings && desktopMessage.openFile({
+                        type: 'open-folder',
+                        isDirectory: true,
+                        path: settings.settingsMutable.backuP_PATH
+                    })}
+                    className={css({
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        cursor: 'pointer',
+                    })}
+                >
+                    {title}
 
-            <Icon name='folder' solid forButton />
-        </div>
-        : title}>
+                    <Icon name='folder' solid forButton />
+                </div>
+                : title}
+
+            <HelpButton slug='5-settings.md#backups' />
+        </div>}>
 
         <div className={css({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 4,
+            whiteSpace: 'break-spaces',
             marginBottom: 4,
         })}>
             <Icon name='info-circle' solid forButton />
@@ -109,7 +121,6 @@ export const Backup: React.FC = withErrorCatcher('default', () => {
                             onClick={desktopMessage
                                 ? (() => desktopMessage.openFile({
                                     type: 'open-folder',
-                                    id: 'backups',
                                     isDirectory: true,
                                     path: backup.filepath,
                                 }))

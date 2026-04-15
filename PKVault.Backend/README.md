@@ -32,13 +32,14 @@ Then you can use swagger: `http://localhost:5000/swagger`
 
 ### DB migration
 
-Since PKVault.WinForm is using PublishTrimmed property, reflection is disabled all over the project.
+Since PKVault.Desktop is using PublishTrimmed property, reflection is disabled all over the project.
 Because of this constraint, EF Core generated migrations cannot work by themselves.
 
-To avoid this issue migration should be generated using this command.
+To avoid this issue migration should be generated using this script from root `/scripts` folder.
 
-```
-dotnet run -p:Mode=gen-migration MigrationName
+```sh
+# /scripts
+npm run generate:migration MigrationName
 ```
 
 ### Generate static-data & spritesheets
@@ -48,6 +49,15 @@ This process picks only the data used by the app & compress it as `.json.gz` fil
 
 ```
 dotnet run -p:Mode=gen-pokeapi
+```
+
+### Update PKHeX version
+
+Update PKHeX to latest release using this script from root `/scripts` folder.
+
+```sh
+# /scripts
+npm run update:pkhex
 ```
 
 ## Build

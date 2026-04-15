@@ -3,7 +3,7 @@ import type { DataDTOStateOfDictionaryOfStringAndPkmSaveDTO, PkmSaveDTO } from '
 import { getStorageGetSavePkmsQueryKey, storageGetSavePkms } from '../sdk/storage/storage.gen';
 import { filterIsDefined } from '../../util/filter-is-defined';
 
-type PkmSaveIndexes = {
+export type PkmSaveIndexes = {
     byId: Record<PkmSaveDTO[ 'id' ], PkmSaveDTO>;
     byIdBase: Record<PkmSaveDTO[ 'idBase' ], PkmSaveDTO[]>;
     byBox: Record<PkmSaveDTO[ 'boxId' ], Record<PkmSaveDTO[ 'boxSlot' ], PkmSaveDTO>>;
@@ -11,7 +11,7 @@ type PkmSaveIndexes = {
 };
 
 const buildIndexes = (saveId: number, data: PkmSaveDTO[]) => {
-    console.time(`Build PkmSave indexes, saveId=${saveId}`);
+    // console.time(`Build PkmSave indexes, saveId=${saveId}`);
 
     const indexes: PkmSaveIndexes = {
         byId: {},
@@ -33,7 +33,7 @@ const buildIndexes = (saveId: number, data: PkmSaveDTO[]) => {
         indexes.bySpecies[ pkmSave.species ]!.push(pkmSave);
     });
 
-    console.timeEnd(`Build PkmSave indexes, saveId=${saveId}`);
+    // console.timeEnd(`Build PkmSave indexes, saveId=${saveId}`);
 
     return indexes;
 };
@@ -68,14 +68,17 @@ export const usePkmSaveIndex = (saveId: number) => {
  * Update react-query cache with given data, after formatting.
  */
 export const updatePkmSaveCache = (client: QueryClient, saveId: number, savePkms: DataDTOStateOfDictionaryOfStringAndPkmSaveDTO) => {
-    const cachedResponse: Partial<QueryData> = client.getQueryData(getStorageGetSavePkmsQueryKey(saveId)) ?? {};
+    const cachedResponse: Partial<QueryData> | undefined = client.getQueryData(getStorageGetSavePkmsQueryKey(saveId));
+    if (!savePkms.all && !cachedResponse) {
+        return;
+    }
 
     const getRawData = (): PkmSaveDTO[] => {
         if (savePkms.all) {
             return Object.values(savePkms.data ?? {}).filter(filterIsDefined);
         }
 
-        const cachedPkms = cachedResponse.data?.byId ?? {};
+        const cachedPkms = cachedResponse?.data?.byId ?? {};
 
         return Object.values({
             ...cachedPkms,

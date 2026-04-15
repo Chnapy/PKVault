@@ -1,10 +1,19 @@
-public record DataNormalizeActionInput();
+using PKHeX.Core;
+
+public record DataNormalizeActionInput(
+    bool SetupInitialData,
+    bool UpdateVersion
+)
+{
+    public bool ShouldRun => SetupInitialData || UpdateVersion;
+}
 
 public class DataNormalizeAction(
     SessionDbContext db,
     IBankLoader bankLoader, IBoxLoader boxLoader, IPkmVariantLoader pkmVariantLoader, IDexLoader dexLoader,
+    ISavesLoadersService savesLoadersService, IMetaLoader metaLoader,
     ISessionService sessionService, IFileIOService fileIOService, ISettingsService settingsService,
-    StaticDataService staticDataService, ISaveService saveService
+    StaticDataService staticDataService
 ) : DataAction<DataNormalizeActionInput>
 {
     public static List<string> GetLegacyFilepaths(string dbPath) => [
@@ -15,42 +24,30 @@ public class DataNormalizeAction(
         LegacyDexLoader.GetFilepath(dbPath)
     ];
 
-    public async Task<bool> HasDataToNormalize()
+    public async Task<DataNormalizeActionInput> HasDataToNormalize()
     {
-        if (!await bankLoader.Any())
-        {
-            Console.WriteLine("HasDataToNormalize - No bank");
-            return true;
-        }
+        var currentVersion = await metaLoader.GetEntity(MetaKey.APP_VERSION);
+        var updateVersion = currentVersion?.Value != settingsService.GetSettings().Version;
 
-        if (!await boxLoader.Any())
-        {
-            Console.WriteLine("HasDataToNormalize - No box");
-            return true;
-        }
+        var setupInitialData = !await bankLoader.Any() || !await boxLoader.Any();
 
-        if (sessionService.HasMainDb())
-        {
-            return false;
-        }
-
-        var settings = settingsService.GetSettings();
-        var dbPath = settings.SettingsMutable.DB_PATH;
-
-        var hasLegacy = GetLegacyFilepaths(dbPath).Any(fileIOService.Exists);
-        if (hasLegacy)
-        {
-            Console.WriteLine("HasDataToNormalize - Legacy");
-            return true;
-        }
-
-        return false;
+        return new(
+            SetupInitialData: setupInitialData,
+            UpdateVersion: updateVersion
+        );
     }
 
     protected override async Task<DataActionPayload> Execute(DataNormalizeActionInput input, DataUpdateFlags flags)
     {
-        await MigrateJSONLegacyData();
-        await SetupInitialData();
+        if (input.UpdateVersion)
+        {
+            await UpdateVersion();
+        }
+
+        if (input.SetupInitialData)
+        {
+            await SetupInitialData();
+        }
 
         return new(
             DataActionType.DATA_NORMALIZE,
@@ -68,6 +65,7 @@ public class DataNormalizeAction(
                 IdInt = 0,
                 Name = "Bank 1",
                 IsDefault = true,
+                IsExternal = false,
                 Order = 0,
                 View = new([], [])
             });
@@ -88,6 +86,39 @@ public class DataNormalizeAction(
         }
     }
 
+    private async Task UpdateVersion()
+    {
+        var currentVersion = await metaLoader.GetEntity(MetaKey.APP_VERSION);
+
+        var newVersion = settingsService.GetSettings().Version;
+
+        // --- Data migration
+
+        // <= 1.6.1
+        if (currentVersion == null)
+        {
+            await MigrateJSONLegacyData();
+            await MigrateVariantsFrom161();
+        }
+
+        // --- Update version
+
+        if (currentVersion == null)
+        {
+            await metaLoader.AddEntity(new()
+            {
+                Key = MetaKey.APP_VERSION,
+                Value = newVersion
+            });
+        }
+        else
+        {
+            currentVersion.Value = newVersion;
+
+            await metaLoader.UpdateEntity(currentVersion);
+        }
+    }
+
     private async Task<bool> MigrateJSONLegacyData()
     {
         var isAlreadyUsingSqlite = sessionService.HasMainDb();
@@ -98,8 +129,8 @@ public class DataNormalizeAction(
         }
 
         var settings = settingsService.GetSettings();
-        var dbPath = settings.SettingsMutable.DB_PATH;
-        var storagePath = settings.SettingsMutable.STORAGE_PATH;
+        var dbPath = settings.GetDbPath();
+        var storagePath = settings.GetStoragePath();
         var languageId = settings.GetSafeLanguageID();
 
         var hasLegacy = GetLegacyFilepaths(dbPath).Any(fileIOService.Exists);
@@ -108,8 +139,7 @@ public class DataNormalizeAction(
             return false;
         }
 
-        var staticData = await staticDataService.GetStaticData();
-        var evolves = staticData.Evolves;
+        var evolves = await staticDataService.GetStaticEvolves();
 
         var legacyBankLoader = new LegacyBankLoader(fileIOService, dbPath);
         var legacyBoxLoader = new LegacyBoxLoader(fileIOService, dbPath);
@@ -124,7 +154,7 @@ public class DataNormalizeAction(
 
         using var _ = LogUtil.Time("Data normalize - json legacy migration");
 
-        var saveById = await saveService.GetSaveCloneById();
+        var saveById = savesLoadersService.GetSaveById().ToDictionary();
 
         var legacyBankNormalize = new LegacyBankNormalize(legacyBankLoader);
         var legacyBoxNormalize = new LegacyBoxNormalize(legacyBoxLoader);
@@ -158,6 +188,7 @@ public class DataNormalizeAction(
                     IdInt = e.IdInt,
                     Name = e.Name,
                     IsDefault = e.IsDefault,
+                    IsExternal = false,
                     Order = e.Order,
                     View = new(e.View.MainBoxIds, [..e.View.Saves.Select(s => new BankEntity.BankViewSave(
                         SaveId: s.SaveId,
@@ -180,13 +211,17 @@ public class DataNormalizeAction(
                 })
             );
 
+            var boxes = await boxLoader.GetAllDtos();
+
             await pkmVariantLoader.AddEntities(
                 legacyPkmVersionLoader.GetAllEntities().Values.Select(e => new PkmVariantLoaderAddPayload(
-                    BoxId: e.BoxId.ToString(),
+                    Box: boxes.Find(box => box.IdInt == e.BoxId)!,
                     BoxSlot: e.BoxSlot,
                     IsMain: e.IsMain,
+                    IsExternal: false,
                     AttachedSaveId: e.AttachedSaveId,
                     AttachedSavePkmIdBase: e.AttachedSavePkmIdBase,
+                    Context: (EntityContext)e.Generation,
                     Generation: e.Generation,
                     Pkm: legacyPkmVersionLoader.pkmFileLoader.CreatePKM(e.Id, e.Filepath, e.Generation),
 
@@ -206,9 +241,11 @@ public class DataNormalizeAction(
                         Species = e.Species,
                         Form = f.Form,
                         Gender = f.Gender,
+                        Context = f.Version.Context,
                         Version = f.Version,
                         IsCaught = f.IsCaught,
                         IsCaughtShiny = f.IsCaughtShiny,
+                        IsCaughtAlpha = false,
                         Languages = [languageId]    // pkm language is lost here, so we use app language as fallback
                     }))
             );
@@ -224,5 +261,85 @@ public class DataNormalizeAction(
         }
 
         return true;
+    }
+
+    // migrate variants from <=1.6.1, checking:
+    // - wrong context: entity vs PKM
+    // - wrong variant ID
+    // - wrong attached save pkm ID
+    private async Task MigrateVariantsFrom161()
+    {
+        var evolves = await staticDataService.GetStaticEvolves();
+
+        var allVariants = await pkmVariantLoader.GetAllEntities();
+
+        foreach (var oldVariant in allVariants.Values)
+        {
+            var variant = oldVariant;
+            bool shouldUpdate = false;
+
+            var pkm = await pkmVariantLoader.GetPKM(variant);
+            if (!pkm.IsEnabled)
+            {
+                continue;
+            }
+
+            var pkmId = pkm.GetPKMIdBase(evolves);
+
+            // wrong context
+            if (pkm.Context != variant.Context)
+            {
+                variant.Context = pkm.Context;
+                shouldUpdate = true;
+            }
+
+            // wrong variant ID
+            if (pkmId != variant.Id)
+            {
+                if (!allVariants.ContainsKey(pkmId))
+                    variant = PkmVariantEntity.CreateFrom(oldVariant, pkmId);
+            }
+
+            if (variant.AttachedSaveId != null && variant.AttachedSavePkmIdBase != null)
+            {
+                var saveLoaders = savesLoadersService.GetLoaders((uint)variant.AttachedSaveId);
+
+                // ignore main games
+                if (saveLoaders != null && (byte)saveLoaders.Save.Context > (byte)EntityContext.SplitInvalid)
+                {
+                    var idPrefix = ImmutablePKM.GetPKMIdPrefix(saveLoaders.Save.Context);
+
+                    var attachedId = variant.AttachedSavePkmIdBase;
+
+                    // wrong attached save pkm ID
+                    if (!attachedId.StartsWith(idPrefix))
+                    {
+                        // if same context, id can be fixed
+                        if (variant.Context == saveLoaders.Save.Context)
+                        {
+                            var idSuffix = attachedId[2..];
+                            variant.AttachedSavePkmIdBase = $"{idPrefix}{idSuffix}";
+                        }
+                        // otherwise detach variant from save
+                        else
+                        {
+                            variant.AttachedSaveId = null;
+                            variant.AttachedSavePkmIdBase = null;
+                        }
+                        shouldUpdate = true;
+                    }
+                }
+            }
+
+            if (variant != oldVariant)
+            {
+                await pkmVariantLoader.DeleteEntityDBOnly(oldVariant);
+                await pkmVariantLoader.AddEntity(variant);
+            }
+            else if (shouldUpdate)
+            {
+                await pkmVariantLoader.UpdateEntity(variant);
+            }
+        }
     }
 }

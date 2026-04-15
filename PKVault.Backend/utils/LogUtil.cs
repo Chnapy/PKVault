@@ -22,9 +22,12 @@ public class LogUtil
 
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-        Directory.CreateDirectory("logs");
+        var logDirectoryPath = Path.Combine(SettingsService.GetAppDirectory(), "logs");
+        var logFilepath = Path.Combine(logDirectoryPath, $"pkvault-{BackupService.SerializeDateTime(DateTime.UtcNow)}.log");
 
-        logWriter = new StreamWriter($"logs/pkvault-{BackupService.SerializeDateTime(DateTime.UtcNow)}.log", append: true)
+        Directory.CreateDirectory(logDirectoryPath);
+
+        logWriter = new StreamWriter(logFilepath, append: true)
         {
             AutoFlush = true
         };

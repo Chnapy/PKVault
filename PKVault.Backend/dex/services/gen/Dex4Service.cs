@@ -24,7 +24,8 @@ public class Dex4Service(SAV4 save) : DexGenService(save)
             Abilities: GetAbilities(pi),
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
-            IsSeenShiny: false,
+            IsSeenShiny: isOwnedShiny,
+            IsSeenAlpha: false,
             IsCaught: isSeen && (isOwned || save.GetCaught(species)),
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
@@ -38,35 +39,35 @@ public class Dex4Service(SAV4 save) : DexGenService(save)
             : [];
     }
 
-    public override async Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages)
+    public override async Task EnableSpeciesForm(EnableSpeciesFormPayload payload)
     {
-        if (!save.Personal.IsPresentInGame(species, form))
+        if (!save.Personal.IsPresentInGame(payload.Species, payload.Form))
             return;
 
-        if (isSeen)
+        if (payload.IsSeen)
         {
-            save.Dex.SetSeen(species, true);
-            save.Dex.SetSeenGender(species, (byte)gender);
+            save.Dex.SetSeen(payload.Species, true);
+            save.Dex.SetSeenGender(payload.Species, (byte)payload.Gender);
         }
 
-        if (isCaught)
-            save.Dex.SetCaught(species, true);
+        if (payload.IsCaught)
+            save.Dex.SetCaught(payload.Species, true);
 
-        var forms = save.Dex.GetForms(species);
-        if (!forms.Contains(form) && isSeen)
+        var forms = save.Dex.GetForms(payload.Species);
+        if (!forms.Contains(payload.Form) && payload.IsSeen)
         {
-            forms = [.. forms, form];
+            forms = [.. forms, payload.Form];
             // forms array should be cleaned (remove 255 values and duplicates)
             forms = [.. forms.Where(f => f != byte.MaxValue).Distinct().Order()];
-            save.Dex.SetForms(species, forms);
+            save.Dex.SetForms(payload.Species, forms);
         }
 
-        if (isSeen)
+        if (payload.IsSeen)
         {
-            SetDexForms(species, form, (byte)gender);
+            SetDexForms(payload.Species, payload.Form, (byte)payload.Gender);
         }
 
-        var safeLanguages = languages.Where(AllLanguages.Contains);
+        var safeLanguages = payload.Languages.Where(AllLanguages.Contains);
         if (!safeLanguages.Any())
         {
             safeLanguages = [GetSaveLanguage()];
@@ -75,7 +76,7 @@ public class Dex4Service(SAV4 save) : DexGenService(save)
         foreach (var lang in safeLanguages)
         {
             var langIndex = AllLanguages.IndexOf(lang);
-            save.Dex.SetLanguage(species, langIndex);
+            save.Dex.SetLanguage(payload.Species, langIndex);
         }
     }
 

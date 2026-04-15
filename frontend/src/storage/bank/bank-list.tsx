@@ -1,11 +1,12 @@
+import { css } from '@emotion/css';
 import type React from 'react';
 import { useStorageCreateMainBank, useStorageGetMainBanks } from '../../data/sdk/storage/storage.gen';
+import { HelpButton } from '../../help/help-button';
 import { Button } from '../../ui/button/button';
 import { Container } from '../../ui/container/container';
 import { Icon } from '../../ui/icon/icon';
 import { theme } from '../../ui/theme';
 import { BankItem } from './bank-item';
-import { css } from '@emotion/css';
 
 export const BankList: React.FC = () => {
     const banksQuery = useStorageGetMainBanks();
@@ -55,7 +56,11 @@ export const BankList: React.FC = () => {
         </div>
 
         <div className={css({
+            display: 'flex',
+            alignItems: 'center',
             minWidth: 24,
-        })} />
+        })}>
+            <HelpButton slug='3-storage.md#banks-and-boxes' />
+        </div>
     </Container>;
 };

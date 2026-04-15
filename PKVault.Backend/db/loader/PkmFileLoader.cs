@@ -7,7 +7,7 @@ public interface IPkmFileLoader
     public Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool updated = true, bool checkPkm = true);
     public Task<List<string>> GetEnabledFilepaths();
     public Task WriteToFiles();
-    public Task<ImmutablePKM> CreatePKM(PkmFileEntity entity, byte generation);
+    public ImmutablePKM CreatePKM(PkmFileEntity entity, EntityContext context);
     public byte[] GetPKMBytes(ImmutablePKM pkm);
     public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves);
 }
@@ -20,6 +20,37 @@ public class PkmFileLoader : IPkmFileLoader
         var speciesName = GameInfo.Strings.Species[pkm.Species].ToUpperInvariant().Replace(":", "");
         var id = pkm.GetPKMIdBase(evolves);
         return $"{pkm.Species:0000}{star} - {speciesName} - {id}.{pkm.Extension}";
+    }
+
+    public static async Task<PkmFileEntity> LoadPkmFile(IFileIOService fileIOService, PkmFileEntity pkmFile)
+    {
+        var filepath = Path.Combine(SettingsService.GetAppDirectory(), pkmFile.Filepath);
+
+        try
+        {
+            var (TooSmall, TooBig) = fileIOService.CheckGameFile(filepath);
+
+            if (TooBig)
+                throw new PKMLoadException(PKMLoadError.TOO_BIG);
+
+            if (TooSmall)
+                throw new PKMLoadException(PKMLoadError.TOO_SMALL);
+
+            pkmFile.Data = await fileIOService.ReadBytes(filepath);
+            pkmFile.Error = null;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+
+            pkmFile.Data = [];
+            pkmFile.Error = GetPKMLoadError(ex);
+        }
+
+        pkmFile.Updated = false;
+        pkmFile.Deleted = false;
+
+        return pkmFile;
     }
 
     public bool EnableLog = true;
@@ -106,7 +137,8 @@ public class PkmFileLoader : IPkmFileLoader
 
         pkmFilesToDelete.ForEach(pkmFileToDelete =>
         {
-            fileIOService.Delete(pkmFileToDelete.Filepath);
+            var filepath = Path.Combine(SettingsService.GetAppDirectory(), pkmFileToDelete.Filepath);
+            fileIOService.Delete(filepath);
         });
 
         var pkmFilesToUpdate = await dbSet
@@ -118,7 +150,8 @@ public class PkmFileLoader : IPkmFileLoader
 
         pkmFilesToUpdate.ForEach(pkmFileToUpdate =>
         {
-            fileIOService.WriteBytes(pkmFileToUpdate.Filepath, pkmFileToUpdate.Data);
+            var filepath = Path.Combine(SettingsService.GetAppDirectory(), pkmFileToUpdate.Filepath);
+            fileIOService.WriteBytes(filepath, pkmFileToUpdate.Data);
         });
 
         dbSet.RemoveRange(pkmFilesToDelete);
@@ -132,7 +165,7 @@ public class PkmFileLoader : IPkmFileLoader
         );
     }
 
-    public async Task<ImmutablePKM> CreatePKM(PkmFileEntity entity, byte generation)
+    public ImmutablePKM CreatePKM(PkmFileEntity entity, EntityContext context)
     {
         var filepath = entity.Filepath;
 
@@ -147,22 +180,12 @@ public class PkmFileLoader : IPkmFileLoader
         {
             var ext = Path.GetExtension(filepath.AsSpan());
 
-            FileUtil.TryGetPKM(entity.Data, out var pk, ext, new SimpleTrainerInfo() { Context = (EntityContext)generation });
+            FileUtil.TryGetPKM(entity.Data, out var pk, ext, new SimpleTrainerInfo() { Context = context });
             if (pk == null)
             {
                 throw new Exception($"TryGetPKM gives null pkm, path={filepath} bytes.length={entity.Data.Length}");
             }
             pkm = pk;
-
-            // pkm ??= pkmVariantEntity.Generation switch
-            // {
-            //     1 => new PK1(bytes),
-            //     2 => new PK2(bytes),
-            //     3 => new PK3(bytes),
-            //     4 => new PK4(bytes),
-            //     5 => new PK5(bytes),
-            //     _ => EntityFormat.GetFromBytes(bytes)!
-            // };
         }
         catch (Exception ex)
         {
@@ -209,9 +232,11 @@ public class PkmFileLoader : IPkmFileLoader
             throw new InvalidOperationException($"Get filepath from disabled PKM not allowed");
         }
 
+        var generationName = pkm.Context.ToString()[3..];
+
         return MatcherUtil.NormalizePath(Path.Combine(
             storagePath,
-            pkm.Format.ToString(),
+            generationName,
             GetPKMFilename(pkm, evolves)
         ));
     }

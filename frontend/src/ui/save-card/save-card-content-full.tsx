@@ -1,19 +1,21 @@
+import { css } from '@emotion/css';
 import type React from 'react';
+import type { LanguageID } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { PathLine } from '../../settings/path-line';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
-import { ItemImg } from '../details-card/item-img';
 import { Icon } from '../icon/icon';
 import { ShinyIcon } from '../icon/shiny-icon';
+import { BallImg } from '../img/ball-img';
 import { TextContainer } from '../text-container/text-container';
 import { theme } from '../theme';
 import { SaveCardContentSmall, type SaveCardContentSmallProps } from './save-card-content-small';
-import { css } from '@emotion/css';
 
 export type SaveCardContentFullProps = SaveCardContentSmallProps & {
     path: string;
     playTime: string;
+    language: LanguageID;
     dexSeenCount: number;
     dexCaughtCount: number;
     ownedCount: number;
@@ -24,14 +26,16 @@ export type SaveCardContentFullProps = SaveCardContentSmallProps & {
 
 export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
     id,
-    generation,
+    context,
     version,
     lastWriteTime,
     tid,
+    sid,
     trainerName,
-    trainerGenderMale,
+    trainerGender,
     path,
     playTime,
+    language,
     dexSeenCount,
     dexCaughtCount,
     ownedCount,
@@ -56,12 +60,13 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
         >
             <SaveCardContentSmall
                 id={id}
-                generation={generation}
+                context={context}
                 version={version}
                 lastWriteTime={lastWriteTime}
                 tid={tid}
+                sid={sid}
                 trainerName={trainerName}
-                trainerGenderMale={trainerGenderMale}
+                trainerGender={trainerGender}
             />
 
             <div
@@ -72,9 +77,12 @@ export const SaveCardContentFull: React.FC<SaveCardContentFullProps> = ({
                 <TextContainer>
                     <PathLine>{path}</PathLine>
                     {t('save.time')} <Icon name='clock' solid forButton /> <span className={css({ color: theme.text.primary })}>{playTime}</span>
+                    <span className={css({ float: 'right' })}>
+                        <span className={css({ color: theme.text.primary })}>{staticData.languages[ language ]}</span>
+                    </span>
                     <br />
                     {t('save.dex')} <Icon name='eye' solid forButton /> <span className={css({ color: theme.text.primary })}>{dexSeenCount}</span>{' '}
-                    <ItemImg item={staticData.itemPokeball.id} size={'1lh'} className={css({ margin: -4 })} /> <span className={css({ color: theme.text.primary })}>{dexCaughtCount}</span>
+                    <BallImg size={14} /> <span className={css({ color: theme.text.primary })}>{dexCaughtCount}</span>
                     <br />
                     {t('save.storage')} <Icon name='folder' solid forButton /> <span className={css({ color: theme.text.primary })}>{ownedCount}</span>
                     {shinyCount > 0 && <>

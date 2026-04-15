@@ -1,27 +1,45 @@
-import type { UseQueryResult } from '@tanstack/react-query';
+import { css } from '@emotion/css';
 import type React from 'react';
-import { useForm } from 'react-hook-form';
-import type { StorageSortPkmsParams } from '../../data/sdk/model';
-import { useStorageGetBoxes, useStorageSortPkms, type storageGetBoxesResponse200 } from '../../data/sdk/storage/storage.gen';
+import { useForm, useWatch } from 'react-hook-form';
+import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
+import type { BoxDTO, GameVersion, StorageSortPkmsParams } from '../../data/sdk/model';
+import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import { useStorageGetBoxes, useStorageSortPkms } from '../../data/sdk/storage/storage.gen';
+import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
 import { CheckboxInput } from '../../ui/input/checkbox-input';
-import { SelectNumberInput } from '../../ui/input/select-input';
+import { SelectNumberInput, SelectStringInput } from '../../ui/input/select-input';
 import { theme } from '../../ui/theme';
 import { BoxTypeIcon } from '../box/box-type-icon';
-import { css } from '@emotion/css';
 
 export const SortAdvancedAction = {
     Main: ({ selectedBoxId, close }: { selectedBoxId: number; close: () => void }) => {
         const boxesQuery = useStorageGetBoxes();
 
-        return <InnerSortAdvancedAction selectedBoxId={selectedBoxId} close={close} boxesQuery={boxesQuery} />;
+        const pkmVariantsQuery = usePkmVariantIndex();
+        const pkmVersions = [ ...new Set(Object.values(pkmVariantsQuery.data?.data.byId ?? {}).map(pkm => pkm.contextVersion)) ];
+
+        return <InnerSortAdvancedAction
+            selectedBoxId={selectedBoxId}
+            close={close}
+            boxes={boxesQuery.data?.data ?? []}
+            versions={pkmVersions}
+        />;
     },
     Save: ({ saveId, selectedBoxId, close }: { saveId: number; selectedBoxId: number; close: () => void }) => {
         const boxesQuery = useStorageGetBoxes({ saveId });
 
-        return <InnerSortAdvancedAction saveId={saveId} selectedBoxId={selectedBoxId} close={close} boxesQuery={boxesQuery} />;
+        const save = useSaveInfosGetAll().data?.data[ saveId ];
+
+        return <InnerSortAdvancedAction
+            saveId={saveId}
+            selectedBoxId={selectedBoxId}
+            close={close}
+            boxes={boxesQuery.data?.data ?? []}
+            versions={save ? [ save.version ] : []}
+        />;
     },
 };
 
@@ -30,33 +48,49 @@ const InnerSortAdvancedAction: React.FC<{
     saveId?: number;
     selectedBoxId: number;
     close: () => void;
-    boxesQuery: UseQueryResult<storageGetBoxesResponse200, unknown>;
-}> = ({ saveId, selectedBoxId, close, boxesQuery }) => {
+    boxes: BoxDTO[];
+    versions: GameVersion[];
+}> = ({ saveId, selectedBoxId, close, boxes, versions }) => {
     const { t } = useTranslate();
 
-    const bankId = boxesQuery.data?.data.find(box => box.idInt === selectedBoxId)?.bankId;
-    const boxes =
-        boxesQuery.data?.data
-            .filter(box => box.bankId === bankId)
-            .filter(box => !saveId || box.canSaveReceivePkm)
-            .sort((box1, box2) => (box1.order < box2.order ? -1 : 1)) ?? [];
+    const bankId = boxes.find(box => box.idInt === selectedBoxId)?.bankId;
+
+    const filteredBoxes = boxes
+        .filter(box => box.bankId === bankId)
+        .filter(box => !saveId || box.canSaveReceivePkm)
+        .sort((box1, box2) => (box1.order < box2.order ? -1 : 1)) ?? [];
+
+    const staticData = useStaticData();
+
+    const pokedexKeys = [ ...new Set(
+        versions.flatMap(version => staticData.versions[ version ]?.pokedexes ?? [])
+    ) ]
+        .sort((key1, key2) => staticData.pokedexes[ key1 ]!.order - staticData.pokedexes[ key2 ]!.order);
 
     const sortPkmsMutation = useStorageSortPkms();
 
-    const { register, handleSubmit, formState, watch, getValues, setValue } = useForm<Omit<StorageSortPkmsParams, 'saveId'>>({
+    const { register, handleSubmit, formState, setValue, control } = useForm<Omit<StorageSortPkmsParams, 'saveId'>>({
         defaultValues: {
             fromBoxId: selectedBoxId,
             toBoxId: selectedBoxId,
+            pokedexName: pokedexKeys[ 0 ],
             leaveEmptySlot: false,
         },
     });
 
-    const onSubmit = handleSubmit(async ({ fromBoxId, toBoxId, leaveEmptySlot }) => {
+    const [ pokedexName, fromBoxId, toBoxId, leaveEmptySlot ] = useWatch({ control, name: [ 'pokedexName', 'fromBoxId', 'toBoxId', 'leaveEmptySlot' ] });
+
+    if (!boxes.length || !versions.length) {
+        return null;
+    }
+
+    const onSubmit = handleSubmit(async ({ fromBoxId, toBoxId, pokedexName, leaveEmptySlot }) => {
         const result = await sortPkmsMutation.mutateAsync({
             params: {
                 saveId,
                 fromBoxId,
                 toBoxId,
+                pokedexName,
                 leaveEmptySlot,
             },
         });
@@ -78,11 +112,26 @@ const InnerSortAdvancedAction: React.FC<{
                 gap: 8,
             })}
         >
+            <SelectStringInput
+                {...register('pokedexName')}
+                label={t('storage.sort.pokedex')}
+                data={
+                    pokedexKeys.map(key => ({
+                        value: key,
+                        option: staticData.pokedexes[ key ]!.name,
+                        disabled: key === pokedexName,
+                    })) ?? []
+                }
+                value={pokedexName}
+                onChange={value => setValue('pokedexName', value)}
+                disabled={pokedexKeys.length === 1}
+            />
+
             <SelectNumberInput
                 {...register('fromBoxId', { valueAsNumber: true })}
                 label={t('storage.sort.from-box')}
                 data={
-                    boxes.map(box => ({
+                    filteredBoxes.map(box => ({
                         value: box.idInt,
                         option: (
                             <div
@@ -98,10 +147,10 @@ const InnerSortAdvancedAction: React.FC<{
                                 {box.name}
                             </div>
                         ),
-                        disabled: box.idInt === watch('fromBoxId'),
+                        disabled: box.idInt === fromBoxId,
                     })) ?? []
                 }
-                value={watch('fromBoxId')}
+                value={fromBoxId}
                 onChange={value => setValue('fromBoxId', value)}
             />
 
@@ -109,7 +158,7 @@ const InnerSortAdvancedAction: React.FC<{
                 {...register('toBoxId', { valueAsNumber: true })}
                 label={t('storage.sort.to-box')}
                 data={
-                    boxes.map(box => ({
+                    filteredBoxes.map(box => ({
                         value: box.idInt,
                         option: (
                             <div
@@ -125,10 +174,10 @@ const InnerSortAdvancedAction: React.FC<{
                                 {box.name}
                             </div>
                         ),
-                        disabled: box.idInt === watch('toBoxId'),
+                        disabled: box.idInt === toBoxId,
                     })) ?? []
                 }
-                value={watch('toBoxId')}
+                value={toBoxId}
                 onChange={value => setValue('toBoxId', value)}
             />
 
@@ -140,7 +189,7 @@ const InnerSortAdvancedAction: React.FC<{
                     userSelect: 'none',
                 })}
             >
-                <CheckboxInput checked={watch('leaveEmptySlot')} onChange={() => setValue('leaveEmptySlot', !getValues('leaveEmptySlot'))} />{' '}
+                <CheckboxInput checked={leaveEmptySlot} onChange={() => setValue('leaveEmptySlot', !leaveEmptySlot)} />{' '}
                 {t('storage.sort.empty-slot')}
             </label>
 
@@ -150,7 +199,13 @@ const InnerSortAdvancedAction: React.FC<{
                 {saveId ? t('storage.sort.description.2') : t('storage.sort.description.3')}
             </div>
 
-            <Button type='submit' big bgColor={theme.bg.primary} disabled={!formState.isValid}>
+            <Button
+                type='submit'
+                big
+                bgColor={theme.bg.primary}
+                loading={formState.isSubmitting}
+                disabled={!formState.isValid}
+            >
                 <Icon name='sort' solid forButton />
                 {t('action.submit')}
             </Button>

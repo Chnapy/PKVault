@@ -26,21 +26,12 @@ public class ActionServiceTests
         DataNormalizeAction.GetLegacyFilepaths("legacy")
             .ForEach(legacyPath => mockFileSystem.AddFile(legacyPath, "mock-legacy-data"));
 
-        mockSessionService.Setup(x => x.MainDbPath).Returns("mock-main.db");
+        mockSessionService.Setup(x => x.MainDbPath).Returns(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-main.db"));
+        mockSessionService.Setup(x => x.MainDbRelativePath).Returns("mock-main.db");
         if (throwOnSessionPersist)
         {
             mockSessionService.Setup(x => x.PersistSession(It.IsAny<IServiceScope>())).ThrowsAsync(new Exception());
         }
-
-        PkmLegalityService pkmLegalityService = new(mockSettingsService.Object);
-
-        Mock<ISaveService> mockSaveService = new();
-
-        var saveWrapper = SaveWrapperTests.GetMockSave("mock-save-path", Encoding.ASCII.GetBytes("mock-save-content"));
-        mockSaveService.Setup(x => x.GetSaveById()).ReturnsAsync(new Dictionary<uint, SaveWrapper>()
-        {
-            {saveWrapper.Object.Id, saveWrapper.Object}
-        });
 
         mockFileSystem.AddFile("mock-pkm-files/123", "mock-data");
 
@@ -54,23 +45,31 @@ public class ActionServiceTests
 
         var sp = serviceCollection.BuildServiceProvider();
 
-        SavesLoadersService savesLoadersService = new(sp, mockSaveService.Object);
+        Mock<ISavesLoadersService> savesLoadersService = new();
+
+        var mockSavePath = MatcherUtil.NormalizePath(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-save-path"));
+        mockFileSystem.AddFile(mockSavePath, "mock-save-content");
+
+        var saveWrapper = SaveWrapperTests.GetMockSave(mockSavePath, Encoding.ASCII.GetBytes("mock-save-content"));
+        savesLoadersService.Setup(x => x.GetSaveById()).Returns(new Dictionary<uint, SaveWrapper>()
+        {
+            {saveWrapper.Object.Id, saveWrapper.Object}
+        });
 
         return new(
             sp: sp,
-            pkmConvertService: new(pkmLegalityService),
+            pkmUpdateService: new(),
             backupService: new(
                 sp: sp,
                 mockTimeProvider.Object,
                 fileIOService,
-                mockSaveService.Object,
+                savesLoadersService.Object,
                 mockSettingsService.Object,
                 mockSessionService.Object
             ),
             settingsService: mockSettingsService.Object,
-            pkmLegalityService: pkmLegalityService,
             sessionService: mockSessionService.Object,
-            savesLoadersService: savesLoadersService
+            savesLoadersService: savesLoadersService.Object
         );
     }
 
@@ -93,7 +92,7 @@ public class ActionServiceTests
         var flags = await actionService.Save();
 
         Assert.True(mockFileSystem.FileExists(
-                Path.Combine("mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip")
+                Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip")
             ),
             $"File is missing, list of current files:\n{string.Join('\n', mockFileSystem.AllFiles)}");
     }
@@ -118,14 +117,14 @@ public class ActionServiceTests
 
         await Assert.ThrowsAnyAsync<Exception>(actionService.Save);
 
-        Assert.True(mockFileSystem.FileExists(Path.Combine("mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip")));
+        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "pkvault_backup_2013-03-21T132611-000Z.zip")));
 
         Assert.True(mockFileSystem.FileExists("mock-main.db"));
 
         DataNormalizeAction.GetLegacyFilepaths("legacy")
             .ForEach(legacyPath => Assert.True(mockFileSystem.FileExists(legacyPath)));
 
-        Assert.True(mockFileSystem.FileExists("mock-save-path"));
+        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-save-path")), string.Join('\n', mockFileSystem.AllFiles));
         Assert.True(mockFileSystem.FileExists(Path.Combine("mock-pkm-files", "123")));
     }
 
@@ -134,10 +133,10 @@ public class ActionServiceTests
     )
     {
         mockSettingsService.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
-            BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "", SettingsPath: "",
+            BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "", SettingsPath: "", UserId: "",
             CanUpdateSettings: false, CanScanSaves: false, SettingsMutable: new(
-                DB_PATH: "mock-db", SAVE_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: backupPath,
-                LANGUAGE: "en"
+                DB_PATH: "mock-db", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: backupPath,
+                LANGUAGE: "en", HIDE_CHEATS: false
             )
         ));
     }

@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 {
-    public virtual async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticDataDTO staticData, HashSet<ushort>? speciesSet)
+    public virtual async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticSpeciesData staticSpecies, HashSet<ushort>? speciesSet)
     {
         // var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
 
@@ -44,7 +44,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
             }
 
             pkmBySpecies.TryGetValue(species, out var pkmList);
-            var item = CreateDexItem(species, pkmList ?? [], staticData);
+            var item = CreateDexItem(species, pkmList ?? [], staticSpecies);
             if (!dex.TryGetValue(species, out var arr))
             {
                 arr = [];
@@ -58,7 +58,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         return true;
     }
 
-    private DexItemDTO CreateDexItem(ushort species, List<ImmutablePKM> pkmList, StaticDataDTO staticData)
+    private DexItemDTO CreateDexItem(ushort species, List<ImmutablePKM> pkmList, StaticSpeciesData staticSpecies)
     {
         var forms = new List<DexItemForm>();
 
@@ -69,8 +69,8 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         // var strings = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage());
         // var formList = FormConverter.GetFormList(species, strings.types, strings.forms, GameInfo.GenderSymbolUnicode, save.Context);
 
-        var staticSpecies = staticData.Species[species];
-        var staticForms = staticSpecies.Forms[save.Generation];
+        var speciesData = staticSpecies[species];
+        var staticForms = speciesData.Forms[save.Generation];
 
         for (byte form = 0; form < staticForms.Length; form++)
         {
@@ -109,8 +109,9 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
                 });
                 var isOwned = ownedPkms.Count > 0;
                 var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
+                var isOwnedAlpha = ownedPkms.Any(pkm => pkm.IsAlpha);
 
-                var itemForm = GetDexItemFormComplete(species, isOwned, isOwnedShiny, form, gender);
+                var itemForm = GetDexItemFormComplete(species, isOwned, isOwnedShiny, isOwnedAlpha, form, gender);
                 forms.Add(itemForm);
             });
         }
@@ -141,8 +142,10 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
             generation <= 2 ? GetG12Type(pi.Type2) : pi.Type2
         ];
 
-        return [.. types.Distinct().Select(type => (byte)(type + 1))];
+        return [.. types.Distinct().Select(GetType)];
     }
+
+    public static byte GetType(byte type) => (byte)(type + 1);
 
     private static byte GetG12Type(byte type)
     {
@@ -182,12 +185,15 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         ];
     }
 
-    public DexItemForm GetDexItemFormComplete(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
+    public DexItemForm GetDexItemFormComplete(ushort species, bool isOwned, bool isOwnedShiny, bool isOwnedAlpha, byte form, Gender gender)
     {
-        return GetDexItemForm(species, isOwned, isOwnedShiny, form, gender) with
+        var value = GetDexItemForm(species, isOwned, isOwnedShiny, form, gender);
+
+        return value with
         {
             Context = save.Context,
-            Generation = save.Generation
+            Generation = save.Generation,
+            IsSeenAlpha = value.IsSeenAlpha || isOwnedAlpha,
         };
     }
 
@@ -206,5 +212,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
     protected abstract IEnumerable<LanguageID> GetDexLanguages(ushort species);
 
-    public abstract Task EnableSpeciesForm(ushort species, byte form, Gender gender, bool isSeen, bool isSeenShiny, bool isCaught, LanguageID[] languages);
+    public abstract Task EnableSpeciesForm(EnableSpeciesFormPayload payload);
 }
+
+public record EnableSpeciesFormPayload(ushort Species, byte Form, Gender Gender, bool IsSeen, bool IsSeenShiny, bool IsSeenAlpha, bool IsCaught, LanguageID[] Languages);

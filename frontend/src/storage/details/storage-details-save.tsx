@@ -1,10 +1,14 @@
+import { css } from '@emotion/css';
 import React from 'react';
 import { usePkmLegality } from '../../data/hooks/use-pkm-legality';
 import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
 import { useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
+import { Icon } from '../../ui/icon/icon';
 import { StorageDetailsBase } from '../../ui/storage-item-details/storage-details-base';
 import { StorageDetailsForm } from '../../ui/storage-item-details/storage-details-form';
+import { TextContainer } from '../../ui/text-container/text-container';
+import { theme } from '../../ui/theme';
 
 export type StorageDetailsSaveProps = {
     selectedId: string;
@@ -29,6 +33,7 @@ export const StorageDetailsSave: React.FC<StorageDetailsSaveProps> = ({ selected
 
 const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({ id, saveId }) => {
     const { t } = useTranslate();
+
     const formContext = StorageDetailsForm.useContext();
 
     const savePkmDeleteMutation = useStorageSaveDeletePkms();
@@ -46,8 +51,38 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({ id,
             {...savePkm}
             isValid
             movesLegality={[]}
+            relearnMovesLegality={[]}
             {...pkmLegality}
-            validityReport={[ savePkm.isDuplicate && t('details.is-duplicate'), pkmLegality?.validityReport ].filter(Boolean).join('\n---\n')}
+            reports={<>
+                {savePkm.isDuplicate && <TextContainer
+                    bgColor={theme.bg.yellow}
+                    maxHeight={200}
+                    className={css({
+                        minHeight: '1lh',
+                        flexShrink: 0.1,
+                    })}
+                >
+                    {t('details.is-duplicate')}
+                </TextContainer>}
+
+                {pkmLegality && pkmLegality.illegalitiesCount > 0 && pkmLegality.validityReport && <TextContainer
+                    bgColor={theme.bg.yellow}
+                    maxHeight={200}
+                    className={css({
+                        minHeight: '1lh',
+                        flexShrink: 0.1,
+                    })}
+                >
+                    <Icon name='exclamation-triangle' forButton />{' '}
+                    {t('details.legality.1')}
+                    <br />
+                    <br />
+                    {pkmLegality.validityReport}
+                    <br />
+                    <br />
+                    {t('details.legality.2')}
+                </TextContainer>}
+            </>}
             onRelease={
                 savePkm.canDelete
                     ? () =>

@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: PKVault
+Source: https://github.com/Chnapy/PKVault
+
+Files: *
+Copyright: 2026 Richard Haddad
+License: GPLv3
+

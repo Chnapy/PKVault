@@ -1,0 +1,10 @@
+Source: pkvault
+Section: utils
+Priority: optional
+Maintainer: Richard Haddad
+Package: pkvault
+Version: (VERSION)
+Architecture: amd64
+Depends: libc6 (>= 2.31), gir1.2-gtk-3.0 (>= 3.24), libwebkit2gtk-4.1-0 (>= 2.42), xdg-utils, desktop-file-utils
+Description: Pokemon storage and save manipulation tool based on PKHeX.
+Homepage: https://github.com/Chnapy/PKVault
