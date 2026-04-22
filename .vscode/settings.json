@@ -10,14 +10,10 @@
     "**/wwwroot": true,
     "**/tmp": true
   },
-  "i18n-ally.localesPaths": [
-    "frontend/src/translate/locales"
-  ],
-  "i18n-ally.enabledFrameworks": [
-    "react-i18next"
-  ],
-  "i18n-ally.enabledParsers": [
-    "json"
-  ],
-  "i18n-ally.keystyle": "flat"
+  "i18n-ally.localesPaths": ["frontend/src/translate/locales"],
+  "i18n-ally.enabledFrameworks": ["react-i18next"],
+  "i18n-ally.enabledParsers": ["json"],
+  "i18n-ally.keystyle": "flat",
+  "js/ts.experimental.useTsgo": true,
+  "typescript.native-preview.tsdk": "frontend/node_modules/@typescript/native-preview"
 }

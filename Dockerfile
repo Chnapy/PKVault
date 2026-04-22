@@ -50,6 +50,10 @@ FROM node:22-alpine AS frontend-builder
 
 WORKDIR /app
 
+# pinned version required
+# https://github.com/npm/cli/issues/9151
+RUN npm i -g npm@11.10.0
+
 COPY frontend/package.json frontend/package-lock.json ./
 
 RUN npm ci

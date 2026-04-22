@@ -19,5 +19,10 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // TODO not critical rules, but should be fixed
+      'react-hooks/set-state-in-effect': ['warn'],
+      'react-refresh/only-export-components': ['warn'],
+    },
   },
 ]);
