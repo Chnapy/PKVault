@@ -1,25 +1,25 @@
 
 using PKHeX.Core;
 
-public static class PK5Extensions
+public class PK5Converter(PKMConverterUtils utils)
 {
-    public static PK6 ConvertToPK6Fixed(this PK5 pk5, PKMRndValues? rndValues)
+    public PK6 ConvertToPK6Fixed(PK5 pk5, PKMRndValues? rndValues)
     {
         var pk6 = pk5.ConvertToPK6();
 
-        pk6.FixMetLocation([
+        utils.FixMetLocation(pk6, [
             GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
             GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG,
             GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2,
             GameVersion.X, GameVersion.Y, GameVersion.OR, GameVersion.AS
         ]);
 
-        pk6.CopyHeldItemFrom(pk5.HeldItem, pk5.Context, pk5.Version);
+        utils.CopyHeldItemFrom(pk6, pk5.HeldItem, pk5.Context, pk5.Version);
 
         if (rndValues == null)
-            pk6.FixPID(pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);
+            utils.FixPID(pk6, pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);
 
-        pk6.CopyMovesFrom(pk5);
+        utils.CopyMovesFrom(pk6, pk5);
 
         pk6.OriginalTrainerFriendship = pk5.CurrentFriendship;
         pk6.HandlingTrainerFriendship = pk5.CurrentFriendship;
@@ -27,7 +27,7 @@ public static class PK5Extensions
         return pk6;
     }
 
-    public static PK4 ConvertToPK4(this PK5 pk5, PKMRndValues? rndValues)
+    public PK4 ConvertToPK4(PK5 pk5, PKMRndValues? rndValues)
     {
         var pk4 = new PK4()
         {
@@ -42,9 +42,9 @@ public static class PK5Extensions
             PokerusState = pk5.PokerusState,
         };
 
-        pk4.CopyCommonPropertiesFrom(pk5, 4, rndValues);
-        pk4.CopyIVsFrom(pk5);
-        pk4.CopyEVsFrom(pk5);
+        utils.CopyCommonPropertiesFrom(pk4, pk5, 4, rndValues);
+        utils.CopyIVsFrom(pk4, pk5);
+        utils.CopyEVsFrom(pk4, pk5);
 
         pk5.CopyContestStatsTo(pk4);
 
@@ -53,16 +53,16 @@ public static class PK5Extensions
         pk5.CopyRibbonSetCommon4(pk4);
         pk5.CopyRibbonSetEvent4(pk4);
 
-        pk4.CopyHeldItemFrom(pk5.HeldItem, pk5.Context, pk5.Version);
+        utils.CopyHeldItemFrom(pk4, pk5.HeldItem, pk5.Context, pk5.Version);
 
-        pk4.FixAbility();
+        utils.FixAbility(pk4);
 
-        pk4.FixMetLocation([GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.HG, GameVersion.SS]);
+        utils.FixMetLocation(pk4, [GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.HG, GameVersion.SS]);
 
         if (rndValues == null)
-            pk4.FixPID(pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);
+            utils.FixPID(pk4, pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);
 
-        pk4.CopyMovesFrom(pk5);
+        utils.CopyMovesFrom(pk4, pk5);
 
         return pk4;
     }

@@ -9,8 +9,10 @@ public interface IPkmSharePropertiesService
  * Share properties from a PKM source to a PKM target,
  * handling all convert requirements and contexts differences.
  */
-public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : IPkmSharePropertiesService
+public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILegalityAnalysisService legalityAnalysisService) : IPkmSharePropertiesService
 {
+    private readonly PKMConverterUtils utils = new(legalityAnalysisService);
+
     public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm, SaveFile? save)
     {
         var sourcePkm = source.GetMutablePkm();
@@ -70,8 +72,8 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : I
 
         targetPkm.Language = resultPkm.Language;
 
-        var resultIVs = resultPkm.GetAllIVs();
-        var targetIVs = targetPkm.GetAllIVs();
+        var resultIVs = utils.GetAllIVs(resultPkm);
+        var targetIVs = utils.GetAllIVs(targetPkm);
         var passIVs = true;
         for (var i = 0; i < resultIVs.Length; i++)
         {
@@ -83,7 +85,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : I
         }
         if (passIVs)
         {
-            targetPkm.CopyIVsFrom(resultPkm);
+            utils.CopyIVsFrom(targetPkm, resultPkm);
         }
 
         targetPkm.IsNicknamed = resultPkm.IsNicknamed;
@@ -122,7 +124,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : I
         }
         else
         {
-            targetPkm.CopyEVsFrom(resultPkm);
+            utils.CopyEVsFrom(targetPkm, resultPkm);
         }
 
         if (sourcePkm is ITeraType)
@@ -151,7 +153,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : I
 
         if (targetPkm.HeldItem == 0)
         {
-            targetPkm.CopyHeldItemFrom(resultPkm.HeldItem, resultPkm.Context, resultPkm.Version);
+            utils.CopyHeldItemFrom(targetPkm, resultPkm.HeldItem, resultPkm.Context, resultPkm.Version);
         }
 
         if (sourcePkm is IAppliedMarkings)
@@ -288,7 +290,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : I
 
         if (noConvertNeeded)
         {
-            targetPkm.CopyMovesFrom(resultPkm);
+            utils.CopyMovesFrom(targetPkm, resultPkm);
 
             if (sourcePkm is IScaledSizeReadOnly)
             {

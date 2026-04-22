@@ -1,21 +1,21 @@
 
 using PKHeX.Core;
 
-public static class PK3Extensions
+public class PK3Converter(PKMConverterUtils utils)
 {
-    public static PK4 ConvertToPK4Fixed(this PK3 pk3, PKMRndValues? rndValues)
+    public PK4 ConvertToPK4Fixed(PK3 pk3, PKMRndValues? rndValues)
     {
         var pk4 = pk3.ConvertToPK4();
 
-        pk4.FixMetLocation([
+        utils.FixMetLocation(pk4, [
             GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
             GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG
         ]);
 
         if (rndValues == null)
-            pk4.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
+            utils.FixPID(pk4, pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
 
-        pk4.CopyMovesFrom(pk3);
+        utils.CopyMovesFrom(pk4, pk3);
 
         pk4.OriginalTrainerFriendship = pk3.CurrentFriendship;
         pk4.HandlingTrainerFriendship = pk3.CurrentFriendship;
@@ -23,7 +23,7 @@ public static class PK3Extensions
         return pk4;
     }
 
-    public static XK3 ConvertToXK3Fixed(this PK3 pk3, PKMRndValues? rndValues)
+    public XK3 ConvertToXK3Fixed(PK3 pk3, PKMRndValues? rndValues)
     {
         var pk = pk3.ConvertToXK3();
 
@@ -33,14 +33,14 @@ public static class PK3Extensions
         }
 
         if (rndValues == null)
-            pk.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
+            utils.FixPID(pk, pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
 
-        pk.CopyMovesFrom(pk3);
+        utils.CopyMovesFrom(pk, pk3);
 
         return pk;
     }
 
-    public static CK3 ConvertToCK3Fixed(this PK3 pk3, PKMRndValues? rndValues)
+    public CK3 ConvertToCK3Fixed(PK3 pk3, PKMRndValues? rndValues)
     {
         var pk = pk3.ConvertToCK3();
 
@@ -50,14 +50,14 @@ public static class PK3Extensions
         }
 
         if (rndValues == null)
-            pk.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
+            utils.FixPID(pk, pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
 
-        pk.CopyMovesFrom(pk3);
+        utils.CopyMovesFrom(pk, pk3);
 
         return pk;
     }
 
-    public static PK2 ConvertToPK2(this PK3 pk3, PKMRndValues? rndValues)
+    public PK2 ConvertToPK2(PK3 pk3, PKMRndValues? rndValues)
     {
         var pk2 = new PK2()
         {
@@ -93,11 +93,11 @@ public static class PK3Extensions
 
         pk2.SetNickname(pk3.IsNicknamed ? pk3.Nickname : "");
 
-        pk2.CopyHeldItemByStringFrom(pk3.HeldItem, pk3.Context, pk3.Version);
+        utils.CopyHeldItemByStringFrom(pk2, pk3.HeldItem, pk3.Context, pk3.Version);
 
-        pk2.FixMetLocation([GameVersion.GD, GameVersion.SI, GameVersion.C]);
+        utils.FixMetLocation(pk2, [GameVersion.GD, GameVersion.SI, GameVersion.C]);
 
-        pk2.SetIVs(ConvertIVsToG2(pk3.GetAllIVs()));
+        pk2.SetIVs(ConvertIVsToG2(utils.GetAllIVs(pk3)));
 
         Span<int> evs = [
             ConvertEVG3ToG2(pk3.EV_HP),
@@ -118,14 +118,14 @@ public static class PK3Extensions
         pk2.SetEVs(evs);
 
         if (rndValues == null)
-            pk2.FixPID(pk3.IsShiny, pk3.Form, pk3.Gender, pk2.Nature);
+            utils.FixPID(pk2, pk3.IsShiny, pk3.Form, pk3.Gender, pk2.Nature);
 
-        pk2.CopyMovesFrom(pk3);
+        utils.CopyMovesFrom(pk2, pk3);
 
         return pk2;
     }
 
-    public static int[] ConvertIVsToG2(int[] ivs)
+    public int[] ConvertIVsToG2(int[] ivs)
     {
         return [.. ivs.Select(ConvertIVG3ToG2)];
     }

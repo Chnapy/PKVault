@@ -4,19 +4,19 @@ using PKHeX.Core;
 
 public record PKMRndValues(uint PID, uint EncryptionConstant);
 
-public static class PKMExtensions
+public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 {
-    public static void FixCommonLegalityIssues(this PKM pkm, SaveWrapper? save)
+    public void FixCommonLegalityIssues(PKM pkm, SaveWrapper? save)
     {
-        pkm.FixPID(pkm.IsShiny, pkm.Form, pkm.Gender, pkm.Nature, true, save);
-        pkm.FixBallLegality(save);
-        pkm.FixHeldItemLegality(save);
-        pkm.FixRibbonLegality(save);
-        pkm.FixContestLegality(save);
-        pkm.FixPokerusLegality(save);
+        FixPID(pkm, pkm.IsShiny, pkm.Form, pkm.Gender, pkm.Nature, true, save);
+        FixBallLegality(pkm, save);
+        FixHeldItemLegality(pkm, save);
+        FixRibbonLegality(pkm, save);
+        FixContestLegality(pkm, save);
+        FixPokerusLegality(pkm, save);
     }
 
-    public static bool FixPokerusLegality(this PKM pkm, SaveWrapper? save = null, int recursive = 0)
+    public bool FixPokerusLegality(PKM pkm, SaveWrapper? save = null, int recursive = 0)
     {
         if (pkm is PK1 || pkm is PB7)
         {
@@ -31,7 +31,7 @@ public static class PKMExtensions
         var initialPokerusDays = pkm.PokerusDays;
         var initialPokerusStrain = pkm.PokerusStrain;
 
-        var legality = PkmLegalityService.GetLegalitySafe(new(pkm), save);
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
         if (legality.Valid)
         {
             return true;
@@ -54,7 +54,7 @@ public static class PKMExtensions
             pkm.PokerusStrain = (pkm.PokerusStrain + 1) % 16;
             if (pkm.PokerusStrain == 0)
                 pkm.PokerusStrain = 1;
-            success = pkm.FixPokerusLegality(save, recursive + 1);
+            success = FixPokerusLegality(pkm, save, recursive + 1);
         }
 
         if (!success && recursive == 0)
@@ -66,34 +66,36 @@ public static class PKMExtensions
         return success;
     }
 
-    public static void FixRibbonLegality(this PKM pkm, SaveWrapper? save = null)
+    public void FixRibbonLegality(PKM pkm, SaveWrapper? save = null)
     {
         if (pkm is GBPKM)
         {
             return;
         }
 
-        var legality = PkmLegalityService.GetLegalitySafe(new(pkm), save);
-        if (!legality.Valid && legality.Results.Any(r => !r.Valid
-            && r.Identifier == CheckIdentifier.Ribbon))
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+        if (!legality.Valid
+            && legality.Results.Any(r => !r.Valid && r.Identifier == CheckIdentifier.Ribbon)
+            && legality.la != null
+        )
         {
             var args = new RibbonVerifierArguments(
-                legality.Info.Entity,
-                legality.EncounterMatch,
-                legality.Info.EvoChainsAllGens
+                legality.la.Info.Entity,
+                legality.la.EncounterMatch,
+                legality.la.Info.EvoChainsAllGens
             );
             RibbonApplicator.FixInvalidRibbons(args);
         }
     }
 
-    public static void FixContestLegality(this PKM pkm, SaveWrapper? save = null)
+    public void FixContestLegality(PKM pkm, SaveWrapper? save = null)
     {
         if (pkm is not IContestStats contest)
         {
             return;
         }
 
-        var legality = PkmLegalityService.GetLegalitySafe(new(pkm), save);
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
         if (legality.Valid)
         {
             return;
@@ -117,9 +119,9 @@ public static class PKMExtensions
         }
     }
 
-    public static void FixHeldItemLegality(this PKM pkm, SaveWrapper? save = null)
+    public void FixHeldItemLegality(PKM pkm, SaveWrapper? save = null)
     {
-        var legality = PkmLegalityService.GetLegalitySafe(new(pkm), save);
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
 
         if (!legality.Valid && legality.Results.Any(r =>
             !r.Valid &&
@@ -131,11 +133,11 @@ public static class PKMExtensions
         }
     }
 
-    public static void FixBallLegality(this PKM pkm, SaveWrapper? save = null)
+    public void FixBallLegality(PKM pkm, SaveWrapper? save = null)
     {
         bool hasBallIllegality()
         {
-            var legality = PkmLegalityService.GetLegalitySafe(new(pkm), save);
+            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
             return !legality.Valid && legality.Results.Any(r =>
                 !r.Valid &&
                 r.Identifier == CheckIdentifier.Ball
@@ -175,14 +177,14 @@ public static class PKMExtensions
         }
     }
 
-    public static void CopyHeldItemFrom(this PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
+    public void CopyHeldItemFrom(PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
     {
         pkm.HeldItem = ItemConverter.GetItemForFormat(srcHeldItem, srcContext, pkm.Context);
 
-        pkm.CopyHeldItemByStringFrom(srcHeldItem, srcContext, srcVersion);
+        CopyHeldItemByStringFrom(pkm, srcHeldItem, srcContext, srcVersion);
     }
 
-    public static void CopyHeldItemByStringFrom(this PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
+    public void CopyHeldItemByStringFrom(PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
     {
         if (srcHeldItem > 0 && pkm.HeldItem == 0)
         {
@@ -198,8 +200,10 @@ public static class PKMExtensions
         }
     }
 
-    public static void CopyMovesFrom(this PKM pkm, PKM pkmSrc)
+    public void CopyMovesFrom(PKM pkm, PKM pkmSrc)
     {
+        var srcLegality = legalityAnalysisService.GetLegalitySafe(new(pkmSrc));
+
         (ushort Move, int PPUps)[] srcMoves = [
             (pkmSrc.Move1, pkmSrc.Move1_PPUps),
             (pkmSrc.Move2, pkmSrc.Move2_PPUps),
@@ -244,18 +248,22 @@ public static class PKMExtensions
 
         // Console.WriteLine($"MOVES = {pkm.Move1}/{pkm.Move2}/{pkm.Move3}/{pkm.Move4}");
 
-        var legality = PkmLegalityService.GetLegalitySafe(new(pkm));
-        var movesLegality = legality.Info.Moves;
-        if (!movesLegality.Any(r => !r.Valid))
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm));
+        if (legality.la == null || legality.MovesValid.All(r => r))
         {
             return;
         }
 
-        for (var i = 0; i < movesLegality.Length; i++)
+        for (var i = 0; i < legality.MovesValid.Length; i++)
         {
-            var r = movesLegality[i];
-            if (r.Valid)
+            if (legality.MovesValid[i])
                 continue;
+
+            // if move was already invalid, keep it like that
+            if (!srcLegality.MovesValid[i])
+                continue;
+
+            var r = legality.la.Info.Moves[i];
 
             if (r.Info.Method == LearnMethod.Unobtainable)
             {
@@ -273,7 +281,7 @@ public static class PKMExtensions
         pkm.FixMoves();
     }
 
-    public static void CopyCommonPropertiesFrom(this PKM pkm, PKM pkmSrc, byte generation, PKMRndValues? rndValues)
+    public void CopyCommonPropertiesFrom(PKM pkm, PKM pkmSrc, byte generation, PKMRndValues? rndValues)
     {
         if (pkmSrc.Species > pkm.MaxSpeciesID)
         {
@@ -313,7 +321,7 @@ public static class PKMExtensions
         pkm.OriginalTrainerFriendship = pkmSrc.OriginalTrainerFriendship;
     }
 
-    public static void CopyIVsFrom(this PKM pkm, PKM pkmSrc)
+    public void CopyIVsFrom(PKM pkm, PKM pkmSrc)
     {
         pkm.IVs = [
             pkmSrc.IV_HP,
@@ -325,7 +333,7 @@ public static class PKMExtensions
         ];
     }
 
-    public static void CopyEVsFrom(this PKM pkm, PKM pkmSrc)
+    public void CopyEVsFrom(PKM pkm, PKM pkmSrc)
     {
         pkm.EV_HP = pkmSrc.EV_HP;
         pkm.EV_ATK = pkmSrc.EV_ATK;
@@ -335,7 +343,7 @@ public static class PKMExtensions
         pkm.EV_SPE = pkmSrc.EV_SPE;
     }
 
-    public static void FixPID(this PKM pkm, bool isShiny, byte form, byte gender, Nature nature, bool checkLegality = false, SaveWrapper? save = null)
+    public void FixPID(PKM pkm, bool isShiny, byte form, byte gender, Nature nature, bool checkLegality = false, SaveWrapper? save = null)
     {
         var rnd = Util.Rand;
         var i = 0;
@@ -382,7 +390,7 @@ public static class PKMExtensions
                 return false;
             }
 
-            var legality = PkmLegalityService.GetLegalitySafe(new(pkm), save);
+            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
             return !legality.Valid && legality.Results.Any(r =>
                 r.Identifier == CheckIdentifier.EC && r.Result == LegalityCheckResultCode.TransferEncryptGen6BitFlip
             );
@@ -428,11 +436,11 @@ public static class PKMExtensions
 
     }
 
-    public static void FixMetLocation(this PKM pkm, GameVersion[] versionsToTry)
+    public void FixMetLocation(PKM pkm, GameVersion[] versionsToTry)
     {
         int countLocationIllegalities()
         {
-            var legality = PkmLegalityService.GetLegalitySafe(new(pkm));
+            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm));
             return legality.Valid
                 ? 0
                 : legality.Results.ToList().FindAll(r => !r.Valid && (
@@ -477,11 +485,11 @@ public static class PKMExtensions
         }
     }
 
-    public static void FixAbility(this PKM pkm)
+    public void FixAbility(PKM pkm)
     {
         bool hasAbilityIssue()
         {
-            var legality = PkmLegalityService.GetLegalitySafe(new(pkm));
+            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm));
 
             return !legality.Valid && legality.Results.Any(r =>
                 !r.Valid
@@ -497,7 +505,7 @@ public static class PKMExtensions
         }
     }
 
-    public static void FixSID(this PKM pkm)
+    public void FixSID(PKM pkm)
     {
         if (pkm.SID16 == 0)
         {
@@ -510,7 +518,7 @@ public static class PKMExtensions
         }
     }
 
-    public static int[] GetAllIVs(this PKM pkm)
+    public int[] GetAllIVs(PKM pkm)
     {
         return [
             pkm.IV_HP,
@@ -522,7 +530,7 @@ public static class PKMExtensions
         ];
     }
 
-    public static void SetSuggestedMetLocation(PKM pkm)
+    public void SetSuggestedMetLocation(PKM pkm)
     {
         var encounter = EncounterSuggestion.GetSuggestedMetInfo(pkm);
         if (encounter == null) return;

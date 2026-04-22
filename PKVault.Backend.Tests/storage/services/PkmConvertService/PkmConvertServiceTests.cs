@@ -36,11 +36,11 @@ public class PkmConvertServiceTests
             BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "", SettingsPath: "", UserId: "",
             CanUpdateSettings: false, CanScanSaves: false, SettingsMutable: new(
                 DB_PATH: "", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "", BACKUP_PATH: "",
-                LANGUAGE: "fr", HIDE_CHEATS: false
+                LANGUAGE: "fr", HIDE_CHEATS: false, SKIP_LEGALITY_CHECKS: false
             )
         ));
 
-        return new(mockSettingsService.Object);
+        return new(mockSettingsService.Object, new LegalityAnalysisService(mockSettingsService.Object));
     }
 
     private void SetupPKDirectory(string folderName)
@@ -582,7 +582,7 @@ public class PkmConvertServiceTests
             }
         }
 
-        var legality = PkmLegalityService.GetLegalitySafe(new(pkm));
+        var legality = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm));
 
         // if (!legality.Valid)
         // {

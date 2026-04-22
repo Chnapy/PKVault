@@ -6,8 +6,18 @@ public interface IPkmConvertService
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, PKMRndValues? rndValues, SaveFile? targetSave = null);
 }
 
-public class PkmConvertService(ISettingsService settingsService) : IPkmConvertService
+public class PkmConvertService(ISettingsService settingsService, ILegalityAnalysisService legalityAnalysisService) : IPkmConvertService
 {
+    private readonly PKMConverterUtils pkmConverterUtils = new(legalityAnalysisService);
+    private readonly PK2Converter pk2Converter = new(new(legalityAnalysisService));
+    private readonly PK3Converter pk3Converter = new(new(legalityAnalysisService));
+    private readonly PK4Converter pk4Converter = new(new(legalityAnalysisService));
+    private readonly PK5Converter pk5Converter = new(new(legalityAnalysisService));
+    private readonly PK6Converter pk6Converter = new(new(legalityAnalysisService));
+    private readonly PK7Converter pk7Converter = new(new(legalityAnalysisService));
+    private readonly PK8Converter pk8Converter = new(new(legalityAnalysisService));
+    private readonly PK9Converter pk9Converter = new(new(legalityAnalysisService));
+
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, EntityContext context)
     {
         Console.WriteLine($"Convert {sourcePkm.GetMutablePkm().GetType().Name} -> context={context}");
@@ -36,7 +46,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
             result.CurrentHandler = targetSave.IsFromTrainer(result) ? (byte)0 : (byte)1;
         }
 
-        result.FixCommonLegalityIssues(targetSave != null ? new(targetSave) : null);
+        pkmConverterUtils.FixCommonLegalityIssues(result, targetSave != null ? new(targetSave) : null);
 
         result.Heal();
         result.ResetPartyStats();
@@ -83,7 +93,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
         throw new InvalidOperationException($"No conversion path from {current.GetType().Name} to {targetType.Name}");
     }
 
-    private static PKM? TryPKToVariant(PKM source, Type targetType, PKMRndValues? rndValues)
+    private PKM? TryPKToVariant(PKM source, Type targetType, PKMRndValues? rndValues)
     {
         // Console.WriteLine($"Convert forward {source.GetType().Name} -> {targetType.Name} - PID={rndValues?.PID}");
 
@@ -96,28 +106,28 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
             ("PK2", "SK2") => ((PK2)source).ConvertToSK2(),
 
             // G3  
-            ("PK3", "CK3") => ((PK3)source).ConvertToCK3Fixed(rndValues),
-            ("PK3", "XK3") => ((PK3)source).ConvertToXK3Fixed(rndValues),
+            ("PK3", "CK3") => pk3Converter.ConvertToCK3Fixed((PK3)source, rndValues),
+            ("PK3", "XK3") => pk3Converter.ConvertToXK3Fixed((PK3)source, rndValues),
 
             // G4
-            ("PK4", "BK4") => ((PK4)source).ConvertToBK4Fixed(rndValues),
-            ("PK4", "RK4") => ((PK4)source).ConvertToRK4Fixed(rndValues),
+            ("PK4", "BK4") => pk4Converter.ConvertToBK4Fixed((PK4)source, rndValues),
+            ("PK4", "RK4") => pk4Converter.ConvertToRK4Fixed((PK4)source, rndValues),
 
             // G7
-            ("PK7", "PB7") => ((PK7)source).ConvertToPB7(rndValues),
+            ("PK7", "PB7") => pk7Converter.ConvertToPB7((PK7)source, rndValues),
 
             // G8
-            ("PK8", "PB8") => ((PK8)source).ConvertToPB8(rndValues),
-            ("PK8", "PA8") => ((PK8)source).ConvertToPA8(rndValues),
+            ("PK8", "PB8") => pk8Converter.ConvertToPB8((PK8)source, rndValues),
+            ("PK8", "PA8") => pk8Converter.ConvertToPA8((PK8)source, rndValues),
 
             // G9
-            ("PK9", "PA9") => ((PK9)source).ConvertToPA9(rndValues),
+            ("PK9", "PA9") => pk9Converter.ConvertToPA9((PK9)source, rndValues),
 
             _ => null
         };
     }
 
-    private static PKM? TryForwardConversion(PKM source, LanguageID fallbackLang, PKMRndValues? rndValues)
+    private PKM? TryForwardConversion(PKM source, LanguageID fallbackLang, PKMRndValues? rndValues)
     {
         // Console.WriteLine($"Convert forward {source.GetType().Name} - PID={rndValues?.PID}");
 
@@ -130,13 +140,13 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
             ?? source.GetType().Name switch
             {
                 "PK1" => ((PK1)source).ConvertToPK2(),
-                "PK2" => ((PK2)source).ConvertToPK3(fallbackLang, rndValues),
-                "PK3" => ((PK3)source).ConvertToPK4Fixed(rndValues),
-                "PK4" => ((PK4)source).ConvertToPK5Fixed(rndValues),
-                "PK5" => ((PK5)source).ConvertToPK6Fixed(rndValues),
-                "PK6" => ((PK6)source).ConvertToPK7Fixed(rndValues),
-                "PK7" => ((PK7)source).ConvertToPK8(rndValues),
-                "PK8" => ((PK8)source).ConvertToPK9(rndValues),
+                "PK2" => pk2Converter.ConvertToPK3((PK2)source, fallbackLang, rndValues),
+                "PK3" => pk3Converter.ConvertToPK4Fixed((PK3)source, rndValues),
+                "PK4" => pk4Converter.ConvertToPK5Fixed((PK4)source, rndValues),
+                "PK5" => pk5Converter.ConvertToPK6Fixed((PK5)source, rndValues),
+                "PK6" => pk6Converter.ConvertToPK7Fixed((PK6)source, rndValues),
+                "PK7" => pk7Converter.ConvertToPK8((PK7)source, rndValues),
+                "PK8" => pk8Converter.ConvertToPK9((PK8)source, rndValues),
 
                 _ => null
             };
@@ -150,7 +160,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
         return pkm;
     }
 
-    private static PKM? TryBackwardConversion(PKM source, PKMRndValues? rndValues)
+    private PKM? TryBackwardConversion(PKM source, PKMRndValues? rndValues)
     {
         // Console.WriteLine($"Convert backward {source.GetType().Name} - PID={rndValues?.PID}");
 
@@ -162,13 +172,13 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
         var pkm = TryVariantToPK(source, rndValues)
             ?? source.GetType().Name switch
             {
-                "PK9" => ((PK9)source).ConvertToPK8(rndValues),
-                "PK8" => ((PK8)source).ConvertToPK7(rndValues),
-                "PK7" => ((PK7)source).ConvertToPK6(rndValues),
-                "PK6" => ((PK6)source).ConvertToPK5(rndValues),
-                "PK5" => ((PK5)source).ConvertToPK4(rndValues),
-                "PK4" => ((PK4)source).ConvertToPK3(rndValues),
-                "PK3" => ((PK3)source).ConvertToPK2(rndValues),
+                "PK9" => pk9Converter.ConvertToPK8((PK9)source, rndValues),
+                "PK8" => pk8Converter.ConvertToPK7((PK8)source, rndValues),
+                "PK7" => pk7Converter.ConvertToPK6((PK7)source, rndValues),
+                "PK6" => pk6Converter.ConvertToPK5((PK6)source, rndValues),
+                "PK5" => pk5Converter.ConvertToPK4((PK5)source, rndValues),
+                "PK4" => pk4Converter.ConvertToPK3((PK4)source, rndValues),
+                "PK3" => pk3Converter.ConvertToPK2((PK3)source, rndValues),
                 "PK2" => ((PK2)source).ConvertToPK1(),
 
                 _ => null
@@ -183,7 +193,7 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
         return pkm;
     }
 
-    private static PKM? TryVariantToPK(PKM source, PKMRndValues? rndValues)
+    private PKM? TryVariantToPK(PKM source, PKMRndValues? rndValues)
     {
         // Console.WriteLine($"Convert backward {source.GetType().Name} - PID={rndValues?.PID}");
 
@@ -194,10 +204,10 @@ public class PkmConvertService(ISettingsService settingsService) : IPkmConvertSe
             "XK3" => ((XK3)source).ConvertToPK3(),
             "BK4" => ((BK4)source).ConvertToPK4(),
             "RK4" => ((RK4)source).ConvertToPK4(),
-            "PB7" => ((PB7)source).ConvertToPK7(rndValues),
-            "PB8" => ((PB8)source).ConvertToPK8(rndValues),
-            "PA8" => ((PA8)source).ConvertToPK8(rndValues),
-            "PA9" => ((PA9)source).ConvertToPK9(rndValues),
+            "PB7" => pk7Converter.ConvertToPK7((PB7)source, rndValues),
+            "PB8" => pk8Converter.ConvertToPK8((PB8)source, rndValues),
+            "PA8" => pk8Converter.ConvertToPK8((PA8)source, rndValues),
+            "PA9" => pk9Converter.ConvertToPK9((PA9)source, rndValues),
 
             _ => null
         };

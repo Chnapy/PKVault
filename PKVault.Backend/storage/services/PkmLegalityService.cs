@@ -1,9 +1,7 @@
 using PKHeX.Core;
 
-public class PkmLegalityService(ISettingsService settingsService)
+public class PkmLegalityService(ISettingsService settingsService, ILegalityAnalysisService legalityAnalysisService)
 {
-    private static readonly Lock legalityLock = new();
-
     public async Task<PkmLegalityDTO> CreateDTO(PkmVariantEntity pkmVariant, ImmutablePKM pkm, SaveWrapper? attachedSave)
     {
         return CreateDTO(pkmVariant.Id, pkm, attachedSave);
@@ -35,7 +33,7 @@ public class PkmLegalityService(ISettingsService settingsService)
             );
         }
 
-        var la = GetLegalitySafe(pkm, save, slotType);
+        var la = legalityAnalysisService.GetLegalitySafe(pkm, save, slotType);
 
         string ValidityReport;
         try
@@ -54,48 +52,18 @@ public class PkmLegalityService(ISettingsService settingsService)
         return new(
             Id: id,
             SaveId: save?.Id,
-            MovesLegality: [.. la.Info.Moves.Select(r => r.Valid)],
-            RelearnMovesLegality: [.. la.Info.Relearn.Select(r => r.Valid)],
+            MovesLegality: [.. la.MovesValid],
+            RelearnMovesLegality: [.. la.RelearnValid],
             IsValid: la.Parsed && la.Valid,
             ValidityReport,
             IllegalitiesCount: la.Valid
                 ? 0
                 : (
                     la.Results.Count(r => !r.Valid)
-                    + la.Info.Moves.Count(r => !r.Valid)
-                    + la.Info.Relearn.Count(r => !r.Valid)
+                    + la.MovesValid.Count(r => !r)
+                    + la.RelearnValid.Count(r => !r)
                 )
         );
-    }
-
-    /**
-     * Check legality with correct global settings.
-     * Required to expect same result as in PKHeX.
-     *
-     * If no save passed, some checks won't be done.
-     */
-    public static LegalityAnalysis GetLegalitySafe(ImmutablePKM pkm, SaveWrapper? save = null, StorageSlotType slotType = StorageSlotType.None)
-    {
-        // lock required because of ParseSettings static context causing race condition
-        lock (legalityLock)
-        {
-            if (save != null)
-            {
-                ParseSettings.InitFromSaveFileData(save.GetSave());
-            }
-            else
-            {
-                ParseSettings.ClearActiveTrainer();
-            }
-
-            var la = save != null && pkm.GetType() == save.PKMType // quick sanity check
-                ? new LegalityAnalysis(pkm.GetMutablePkm(), save.Personal, slotType)
-                : new LegalityAnalysis(pkm.GetMutablePkm(), pkm.PersonalInfo, slotType);
-
-            ParseSettings.ClearActiveTrainer();
-
-            return la;
-        }
     }
 
     private StorageSlotType GetPkmStorageType(PkmSaveDTO pkmSave)

@@ -1,13 +1,13 @@
 
 using PKHeX.Core;
 
-public static class PK6Extensions
+public class PK6Converter(PKMConverterUtils utils)
 {
-    public static PK7 ConvertToPK7Fixed(this PK6 pk6, PKMRndValues? rndValues)
+    public PK7 ConvertToPK7Fixed(PK6 pk6, PKMRndValues? rndValues)
     {
         var pk7 = pk6.ConvertToPK7();
 
-        pk7.FixMetLocation([
+        utils.FixMetLocation(pk7, [
             GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
             GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG,
             GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2,
@@ -16,14 +16,14 @@ public static class PK6Extensions
         ]);
 
         if (rndValues == null)
-            pk7.FixPID(pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature);
+            utils.FixPID(pk7, pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature);
 
-        pk7.CopyMovesFrom(pk6);
+        utils.CopyMovesFrom(pk7, pk6);
 
         return pk7;
     }
 
-    public static PK5 ConvertToPK5(this PK6 pk6, PKMRndValues? rndValues)
+    public PK5 ConvertToPK5(PK6 pk6, PKMRndValues? rndValues)
     {
         var pk5 = new PK5()
         {
@@ -38,9 +38,9 @@ public static class PK6Extensions
             PokerusState = pk6.PokerusState,
         };
 
-        pk5.CopyCommonPropertiesFrom(pk6, 5, rndValues);
-        pk5.CopyIVsFrom(pk6);
-        pk5.CopyEVsFrom(pk6);
+        utils.CopyCommonPropertiesFrom(pk5, pk6, 5, rndValues);
+        utils.CopyIVsFrom(pk5, pk6);
+        utils.CopyEVsFrom(pk5, pk6);
 
         pk6.CopyContestStatsTo(pk5);
 
@@ -49,16 +49,16 @@ public static class PK6Extensions
         pk6.CopyRibbonSetCommon4(pk5);
         pk6.CopyRibbonSetEvent4(pk5);
 
-        pk5.CopyHeldItemFrom(pk6.HeldItem, pk6.Context, pk6.Version);
+        utils.CopyHeldItemFrom(pk5, pk6.HeldItem, pk6.Context, pk6.Version);
 
-        pk5.FixAbility();
+        utils.FixAbility(pk5);
 
-        pk5.FixMetLocation([GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2]);
+        utils.FixMetLocation(pk5, [GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2]);
 
         if (rndValues == null)
-            pk5.FixPID(pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature);
+            utils.FixPID(pk5, pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature);
 
-        pk5.CopyMovesFrom(pk6);
+        utils.CopyMovesFrom(pk5, pk6);
 
         return pk5;
     }
