@@ -432,7 +432,7 @@ public class ActionService(
 
         var pkm = await GetPkm();
 
-        var legality = PkmLegalityService.GetLegalitySafe(pkm, save);
+        var legality = LegalityAnalysisService.GetLegalitySafeRaw(pkm, save);
 
         var moveComboSource = new LegalMoveComboSource();
         var moveSource = new LegalMoveSource<ComboItem>(moveComboSource);

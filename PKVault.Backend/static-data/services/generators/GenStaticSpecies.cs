@@ -214,7 +214,7 @@ public class GenStaticSpecies(
                         pkm.RefreshChecksum();
                     });
 
-                    var legality = PkmLegalityService.GetLegalitySafe(pkm);
+                    var legality = LegalityAnalysisService.GetLegalitySafeRaw(pkm);
                     var battleOnly = legality.Results.Any(result =>
                         result.Identifier == CheckIdentifier.Form
                         && result.Result == LegalityCheckResultCode.FormBattle

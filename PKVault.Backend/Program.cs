@@ -198,6 +198,7 @@ public class Program
         services.AddSingleton<WarningsService>();
         services.AddSingleton<BackupService>();
         services.AddSingleton<ISettingsService, SettingsService>();
+        services.AddSingleton<ILegalityAnalysisService, LegalityAnalysisService>();
         services.AddSingleton<DataService>();
         services.AddSingleton<IPkmConvertService, PkmConvertService>();
         services.AddSingleton<IPkmSharePropertiesService, PkmSharePropertiesService>();

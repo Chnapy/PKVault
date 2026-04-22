@@ -162,6 +162,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             STORAGE_PATH: "./tmp/storage",
             BACKUP_PATH: "./tmp/backup",
             HIDE_CHEATS: false,
+            SKIP_LEGALITY_CHECKS: false,
             HTTPS_NOCERT: false
         );
 #else
@@ -171,7 +172,8 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             PKM_EXTERNAL_GLOBS: [],
             STORAGE_PATH: "./storage",
             BACKUP_PATH: "./backup",
-            HIDE_CHEATS: false
+            HIDE_CHEATS: false,
+            SKIP_LEGALITY_CHECKS: false
         );
 #endif
 

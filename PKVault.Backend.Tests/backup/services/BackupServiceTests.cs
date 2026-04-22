@@ -35,7 +35,7 @@ public class BackupServiceTests
             BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "app", SettingsPath: "", UserId: "",
             CanUpdateSettings: false, CanScanSaves: false, SettingsMutable: new(
                 DB_PATH: "mock-db", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: "mock-bkp",
-                LANGUAGE: "en", HIDE_CHEATS: false
+                LANGUAGE: "en", HIDE_CHEATS: false, SKIP_LEGALITY_CHECKS: false
             )
         ));
 
@@ -47,7 +47,9 @@ public class BackupServiceTests
             mockSessionService.Setup(x => x.PersistSession(It.IsAny<IServiceScope>())).ThrowsAsync(new Exception());
         }
 
-        PkmLegalityService pkmLegalityService = new(mockSettingsService.Object);
+        var legalityAnalysisService = new LegalityAnalysisService(mockSettingsService.Object);
+
+        PkmLegalityService pkmLegalityService = new(mockSettingsService.Object, legalityAnalysisService);
 
         Mock<ISavesLoadersService> mockSaveService = new();
 

@@ -44,7 +44,7 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
     const { register, reset, setValue, getValues, handleSubmit, formState, control } = useForm<SettingsFormData>({
         defaultValues: defaultValue
     });
-    const [ language, saveGlobs, pkmExternalGlobs, hideCheats ] = useWatch({ control, name: [ 'language', 'savE_GLOBS', 'pkM_EXTERNAL_GLOBS', 'hidE_CHEATS' ] });
+    const [ language, saveGlobs, pkmExternalGlobs, hideCheats, skipLegality ] = useWatch({ control, name: [ 'language', 'savE_GLOBS', 'pkM_EXTERNAL_GLOBS', 'hidE_CHEATS', 'skiP_LEGALITY_CHECKS' ] });
 
     if (!settingsMutable) {
         return null;
@@ -287,31 +287,61 @@ export const Settings: React.FC = withErrorCatcher('default', () => {
                 })}
                 title={null}
             >
+                <div className={css({
+                    display: 'flex',
+                    flexDirection: 'column',
+                    rowGap: 8,
+                })}>
 
-                <div
-                    className={css({
-                        display: 'flex',
-                        gap: 4,
-                        userSelect: 'none',
-                    })}
-                >
-                    <CheckboxInput
-                        id='hide-cheats'
-                        checked={hideCheats}
-                        onChange={() => setValue('hidE_CHEATS', !getValues('hidE_CHEATS'))}
-                        disabled={!settings.canUpdateSettings}
-                    />
-
-                    <label
+                    <div
                         className={css({
-                            cursor: settings.canUpdateSettings ? 'pointer' : 'not-allowed',
+                            display: 'flex',
+                            gap: 4,
+                            userSelect: 'none',
                         })}
-                        htmlFor='hide-cheats'
                     >
-                        {t('settings.form.hide-cheats')}
-                    </label>
-                </div>
+                        <CheckboxInput
+                            id='hide-cheats'
+                            checked={hideCheats}
+                            onChange={() => setValue('hidE_CHEATS', !getValues('hidE_CHEATS'))}
+                            disabled={!settings.canUpdateSettings}
+                        />
 
+                        <label
+                            className={css({
+                                cursor: settings.canUpdateSettings ? 'pointer' : 'not-allowed',
+                            })}
+                            htmlFor='hide-cheats'
+                        >
+                            {t('settings.form.hide-cheats')}
+                        </label>
+                    </div>
+
+                    <div
+                        className={css({
+                            display: 'flex',
+                            gap: 4,
+                            userSelect: 'none',
+                        })}
+                    >
+                        <CheckboxInput
+                            id='skip-legality'
+                            checked={skipLegality}
+                            onChange={() => setValue('skiP_LEGALITY_CHECKS', !getValues('skiP_LEGALITY_CHECKS'))}
+                            disabled={!settings.canUpdateSettings}
+                        />
+
+                        <label
+                            className={css({
+                                cursor: settings.canUpdateSettings ? 'pointer' : 'not-allowed',
+                            })}
+                            htmlFor='skip-legality'
+                        >
+                            {t('settings.form.skip-legality')}
+                        </label>
+                    </div>
+
+                </div>
             </TitledContainer>
 
             <div

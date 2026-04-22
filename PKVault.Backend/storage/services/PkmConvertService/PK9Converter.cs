@@ -1,9 +1,9 @@
 
 using PKHeX.Core;
 
-public static class PK9Extensions
+public class PK9Converter(PKMConverterUtils utils)
 {
-    public static PA9 ConvertToPA9(this PK9 pk9, PKMRndValues? rndValues)
+    public PA9 ConvertToPA9(PK9 pk9, PKMRndValues? rndValues)
     {
         var pa9 = new PA9()
         {
@@ -23,9 +23,9 @@ public static class PK9Extensions
             PokerusState = pk9.PokerusState,
         };
 
-        pa9.CopyCommonPropertiesFrom(pk9, 9, rndValues);
-        pa9.CopyIVsFrom(pk9);
-        pa9.CopyEVsFrom(pk9);
+        utils.CopyCommonPropertiesFrom(pa9, pk9, 9, rndValues);
+        utils.CopyIVsFrom(pa9, pk9);
+        utils.CopyEVsFrom(pa9, pk9);
 
         for (var i = 0; i < pk9.MarkingCount; i++)
         {
@@ -42,19 +42,19 @@ public static class PK9Extensions
         pk9.CopyRibbonSetMemory6(pa9);
         pk9.CopyRibbonSetCommon7(pa9);
 
-        pa9.CopyHeldItemFrom(pk9.HeldItem, pk9.Context, pk9.Version);
+        utils.CopyHeldItemFrom(pa9, pk9.HeldItem, pk9.Context, pk9.Version);
 
-        pa9.FixMetLocation([GameVersion.ZA]);
+        utils.FixMetLocation(pa9, [GameVersion.ZA]);
 
         if (rndValues == null)
-            pa9.FixPID(pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
+            utils.FixPID(pa9, pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
 
-        pa9.CopyMovesFrom(pk9);
+        utils.CopyMovesFrom(pa9, pk9);
 
         return pa9;
     }
 
-    public static PK8 ConvertToPK8(this PK9 pk9, PKMRndValues? rndValues)
+    public PK8 ConvertToPK8(PK9 pk9, PKMRndValues? rndValues)
     {
         var pk8 = new PK8()
         {
@@ -71,9 +71,9 @@ public static class PK9Extensions
             PokerusState = pk9.PokerusState,
         };
 
-        pk8.CopyCommonPropertiesFrom(pk9, 8, rndValues);
-        pk8.CopyIVsFrom(pk9);
-        pk8.CopyEVsFrom(pk9);
+        utils.CopyCommonPropertiesFrom(pk8, pk9, 8, rndValues);
+        utils.CopyIVsFrom(pk8, pk9);
+        utils.CopyEVsFrom(pk8, pk9);
 
         pk9.CopyContestStatsTo(pk8);
 
@@ -85,26 +85,26 @@ public static class PK9Extensions
         pk9.CopyRibbonSetMemory6(pk8);
         pk9.CopyRibbonSetCommon7(pk8);
 
-        pk8.CopyHeldItemFrom(pk9.HeldItem, pk9.Context, pk9.Version);
+        utils.CopyHeldItemFrom(pk8, pk9.HeldItem, pk9.Context, pk9.Version);
 
-        pk8.FixAbility();
+        utils.FixAbility(pk8);
 
-        pk8.FixMetLocation([GameVersion.SW, GameVersion.SH]);
+        utils.FixMetLocation(pk8, [GameVersion.SW, GameVersion.SH]);
 
         if (rndValues == null)
-            pk8.FixPID(pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
+            utils.FixPID(pk8, pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
 
         // for Furfrou and Hoopa
         pk8.FormArgumentRemain = pk9.FormArgumentRemain;
         pk8.FormArgumentElapsed = pk9.FormArgumentElapsed;
         pk8.FormArgumentMaximum = pk9.FormArgumentMaximum;
 
-        pk8.CopyMovesFrom(pk9);
+        utils.CopyMovesFrom(pk8, pk9);
 
         return pk8;
     }
 
-    public static PK9 ConvertToPK9(this PA9 pa9, PKMRndValues? rndValues)
+    public PK9 ConvertToPK9(PA9 pa9, PKMRndValues? rndValues)
     {
         var pk9 = new PK9()
         {
@@ -126,9 +126,9 @@ public static class PK9Extensions
             PokerusState = pa9.PokerusState,
         };
 
-        pk9.CopyCommonPropertiesFrom(pa9, 9, rndValues);
-        pk9.CopyIVsFrom(pa9);
-        pk9.CopyEVsFrom(pa9);
+        utils.CopyCommonPropertiesFrom(pk9, pa9, 9, rndValues);
+        utils.CopyIVsFrom(pk9, pa9);
+        utils.CopyEVsFrom(pk9, pa9);
 
         for (var i = 0; i < pk9.MarkingCount; i++)
         {
@@ -145,16 +145,16 @@ public static class PK9Extensions
         pa9.CopyRibbonSetMemory6(pk9);
         pa9.CopyRibbonSetCommon7(pk9);
 
-        pk9.CopyHeldItemFrom(pa9.HeldItem, pa9.Context, pa9.Version);
+        utils.CopyHeldItemFrom(pk9, pa9.HeldItem, pa9.Context, pa9.Version);
 
-        pk9.FixAbility();
+        utils.FixAbility(pk9);
 
-        pk9.FixMetLocation([GameVersion.SL, GameVersion.VL]);
+        utils.FixMetLocation(pk9, [GameVersion.SL, GameVersion.VL]);
 
         if (rndValues == null)
-            pk9.FixPID(pa9.IsShiny, pa9.Form, pa9.Gender, pa9.Nature);
+            utils.FixPID(pk9, pa9.IsShiny, pa9.Form, pa9.Gender, pa9.Nature);
 
-        pk9.CopyMovesFrom(pa9);
+        utils.CopyMovesFrom(pk9, pa9);
 
         return pk9;
     }

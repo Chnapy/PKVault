@@ -39,6 +39,7 @@
   "settings.form.pkms-external.add-file": "Füge eine PKM-Datei hinzu",
   "settings.form.pkms-external.add-folder": "Fügen Sie ein PKM-Verzeichnis hinzu",
   "settings.form.hide-cheats": "Cheats in Pokémon-Bearbeitung ausblenden (EVs, Attacken)",
+  "settings.form.skip-legality": "Legalitätsprüfungen ignorieren",
   "action.cancel": "Abbrechen",
   "action.submit": "Anwenden",
   "action.success": "Eingereicht",

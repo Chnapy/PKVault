@@ -42,6 +42,7 @@ public record SettingsMutableDTO(
     string STORAGE_PATH,
     string BACKUP_PATH,
     bool HIDE_CHEATS,
+    bool SKIP_LEGALITY_CHECKS,
     bool? HTTPS_NOCERT = null,
     string? HTTPS_CERT_PEM_PATH = null,
     string? HTTPS_KEY_PEM_PATH = null,
