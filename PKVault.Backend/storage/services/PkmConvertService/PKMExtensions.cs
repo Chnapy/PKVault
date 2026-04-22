@@ -200,6 +200,9 @@ public static class PKMExtensions
 
     public static void CopyMovesFrom(this PKM pkm, PKM pkmSrc)
     {
+        var srcLegality = PkmLegalityService.GetLegalitySafe(new(pkmSrc));
+        var srcMovesLegality = srcLegality.Info.Moves;
+
         (ushort Move, int PPUps)[] srcMoves = [
             (pkmSrc.Move1, pkmSrc.Move1_PPUps),
             (pkmSrc.Move2, pkmSrc.Move2_PPUps),
@@ -255,6 +258,10 @@ public static class PKMExtensions
         {
             var r = movesLegality[i];
             if (r.Valid)
+                continue;
+
+            // if move was already invalid, keep it like that
+            if (!srcMovesLegality[i].Valid)
                 continue;
 
             if (r.Info.Method == LearnMethod.Unobtainable)
