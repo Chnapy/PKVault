@@ -1,5 +1,3 @@
 {
-    "recommendations": [
-        "qwtel.sqlite-viewer"
-    ]
+  "recommendations": ["qwtel.sqlite-viewer", "typescriptteam.native-preview"]
 }
