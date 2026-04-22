@@ -2,13 +2,16 @@ import React from 'react';
 import { theme } from '../theme';
 import { css, cx } from '@emotion/css';
 
+type InputProps = { area?: false } & React.InputHTMLAttributes<HTMLInputElement>;
+
+type TextareaProps = { area: true } & React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+
 export type TextInputProps = {
     value?: string;
     label?: React.ReactNode;
-    area?: boolean;
     disabled?: boolean;
 }
-    & React.HTMLAttributes<HTMLInputElement | HTMLTextAreaElement>;
+    & (InputProps | TextareaProps);
 
 export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onChange, label, area, ...rest }, ref) => {
     const inputClassName = css({
@@ -57,7 +60,7 @@ export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onCha
                 onChange={onChange}
                 readOnly={!onChange}
                 spellCheck={false}
-                {...rest}
+                {...rest as TextareaProps}
                 className={inputClassName}
             />
             : <input
@@ -67,7 +70,7 @@ export const TextInput = React.forwardRef<never, TextInputProps>(({ value, onCha
                 onChange={onChange}
                 readOnly={!onChange}
                 spellCheck={false}
-                {...rest}
+                {...rest as InputProps}
                 className={inputClassName}
             />
         }

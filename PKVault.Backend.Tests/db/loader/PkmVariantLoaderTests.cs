@@ -22,6 +22,8 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         mockFileSystem = new MockFileSystem();
         fileIOService = new FileIOService(mockFileSystem);
+        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllPaths];
+
         sessionService = new();
         dbSeedingService = new(fileIOService);
 

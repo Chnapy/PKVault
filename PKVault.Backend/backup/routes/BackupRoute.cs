@@ -13,6 +13,14 @@ public class BackupController(BackupService backupService, DataService dataServi
         return backupService.GetBackupList();
     }
 
+    [HttpPut()]
+    public async Task<ActionResult<DataDTO>> Edit([BindRequired] DateTime createdAt, [BindRequired] string name)
+    {
+        backupService.EditBackup(createdAt, name);
+
+        return await dataService.CreateDataFromUpdateFlags(new() { Backups = true });
+    }
+
     [HttpDelete()]
     public async Task<ActionResult<DataDTO>> Delete([BindRequired] DateTime createdAt)
     {

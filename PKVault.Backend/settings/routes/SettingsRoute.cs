@@ -5,7 +5,7 @@ namespace PKVault.Backend.settings.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SettingsController(DataService dataService, ISettingsService settingsService, ISessionService sessionService) : ControllerBase
+public class SettingsController(DataService dataService, ISettingsService settingsService, IFileIOService fileIOService, ISessionService sessionService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<SettingsDTO>> Get()
@@ -16,7 +16,7 @@ public class SettingsController(DataService dataService, ISettingsService settin
     [HttpGet("test-save-globs")]
     public ActionResult<List<string>> GetSaveGlobsResults([FromQuery] string[] globs, int limit)
     {
-        var results = MatcherUtil.SearchPaths(globs);
+        var results = fileIOService.Matcher.SearchPaths(globs);
 
         if (results.Count > limit)
         {
