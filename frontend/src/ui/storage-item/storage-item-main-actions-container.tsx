@@ -1,10 +1,10 @@
-import type React from 'react';
+import { css } from '@emotion/css';
+import React from 'react';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
-import { TitledContainer } from '../container/titled-container';
+import { HelpButton } from '../../help/help-button';
 import { DetailsLevel } from '../details-card/details-level';
 import { Icon } from '../icon/icon';
-import { css } from '@emotion/css';
-import { HelpButton } from '../../help/help-button';
+import { StorageActionsContainer } from './storage-actions-container';
 
 export const StorageItemMainActionsContainer: React.FC<
     React.PropsWithChildren<{
@@ -45,9 +45,9 @@ export const StorageItemMainActionsContainer: React.FC<
 
     return (
         (title || children) && (
-            <TitledContainer contrasted expanded title={title}>
+            <StorageActionsContainer type='item' title={title}>
                 {children}
-            </TitledContainer>
+            </StorageActionsContainer>
         )
     );
 };

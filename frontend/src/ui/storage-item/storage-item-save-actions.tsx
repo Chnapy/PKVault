@@ -48,149 +48,140 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
 
   return (
     <StorageItemSaveActionsContainer saveId={saveId} pkmId={selectedPkm.id}>
-      <div
-        className={css({
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 4,
-          maxWidth: 170,
-        })}
-      >
-        {moveClickable.startDrag && (
-          <Button onClick={moveClickable.startDrag}>
-            <Icon name='logout' solid forButton />
-            {t('storage.actions.move')}
-          </Button>
-        )}
+      {moveClickable.startDrag && (
+        <Button onClick={moveClickable.startDrag}>
+          <Icon name='logout' solid forButton />
+          {t('storage.actions.move')}
+        </Button>
+      )}
 
-        {(moveClickable.startDragAttached || selectedPkm.isDuplicate) && (
-          <ButtonWithDisabledPopover
-            as={Button}
-            onClick={moveClickable.startDragAttached}
-            showHelp
-            anchor='right start'
-            helpTitle={selectedPkm.isDuplicate ? t('details.is-duplicate') : t('storage.actions.move-attached-save.helpTitle')}
-            helpContent={selectedPkm.isDuplicate ? undefined : t('storage.actions.move-attached-save.helpContent')}
-            disabled={!moveClickable.startDragAttached}
-          >
-            {selectedPkm.isDuplicate
-              ? <div className={css({
-                color: theme.bg.yellow,
-                display: 'flex',
-              })}>
-                <Icon name='copy' solid forButton />
-              </div>
-              : <>
-                <Icon name='link' solid forButton />
-                <Icon name='logout' solid forButton />
-              </>}
-            {t('storage.actions.move-attached-save')}
-          </ButtonWithDisabledPopover>
-        )}
+      {(moveClickable.startDragAttached || selectedPkm.isDuplicate) && (
+        <ButtonWithDisabledPopover
+          as={Button}
+          onClick={moveClickable.startDragAttached}
+          showHelp
+          anchor='right start'
+          helpTitle={selectedPkm.isDuplicate ? t('details.is-duplicate') : t('storage.actions.move-attached-save.helpTitle')}
+          helpContent={selectedPkm.isDuplicate ? undefined : t('storage.actions.move-attached-save.helpContent')}
+          disabled={!moveClickable.startDragAttached}
+        >
+          {selectedPkm.isDuplicate
+            ? <div className={css({
+              color: theme.bg.yellow,
+              display: 'flex',
+            })}>
+              <Icon name='copy' solid forButton />
+            </div>
+            : <>
+              <Icon name='link' solid forButton />
+              <Icon name='logout' solid forButton />
+            </>}
+          {t('storage.actions.move-attached-save')}
+        </ButtonWithDisabledPopover>
+      )}
 
-        {canGoToMain && attachedPkmVariant && (
-          <ButtonWithDisabledPopover
-            as={Button}
-            onClick={() =>
+      {canGoToMain && attachedPkmVariant && (
+        <ButtonWithDisabledPopover
+          as={Button}
+          onClick={() =>
+            navigate({
+              search: ({ saves }) => ({
+                mainBoxIds: attachedPkmVariant && [ attachedPkmVariant.boxId ],
+                selected: {
+                  id: attachedPkmVariant.id,
+                },
+                saves: {
+                  ...saves,
+                  [ selectedPkm.saveId ]: {
+                    saveId: selectedPkm.saveId,
+                    saveBoxIds: [ selectedPkm.boxId ],
+                    order: getSaveOrder(saves, selectedPkm.saveId),
+                  },
+                },
+              }),
+            })
+          }
+          showHelp
+          anchor='right start'
+          helpTitle={t('storage.actions.go-save.helpTitle')}
+        >
+          <Icon name='link' solid forButton />
+          {t('storage.actions.go-save')}
+        </ButtonWithDisabledPopover>
+      )}
+
+      {canEdit && <Button onClick={formEditMode.startEdit} disabled={formEditMode.editMode}>
+        <Icon name='pen' solid forButton />
+        {t('storage.actions.edit')}
+      </Button>}
+
+      {canEvolve && (
+        <ButtonWithConfirm
+          anchor='right'
+          bgColor={theme.bg.primary}
+          onClick={async () => {
+            const mutateResult = await evolvePkmsMutation.mutateAsync({
+              params: {
+                saveId: selectedPkm.saveId,
+                ids: [ selectedPkm.id ],
+              },
+            });
+            const savePkms = Object.values(mutateResult.data.saves?.find(save => save.saveId === saveId)?.savePkms?.data ?? {});
+            const newId = savePkms.find(pkm => pkm.boxId === selectedPkm.boxId && pkm.boxSlot === selectedPkm.boxSlot)?.id;
+            if (newId) {
               navigate({
-                search: ({ saves }) => ({
-                  mainBoxIds: attachedPkmVariant && [ attachedPkmVariant.boxId ],
+                search: {
                   selected: {
-                    id: attachedPkmVariant.id,
+                    id: newId,
+                    saveId,
                   },
-                  saves: {
-                    ...saves,
-                    [ selectedPkm.saveId ]: {
-                      saveId: selectedPkm.saveId,
-                      saveBoxIds: [ selectedPkm.boxId ],
-                      order: getSaveOrder(saves, selectedPkm.saveId),
-                    },
-                  },
-                }),
-              })
-            }
-            showHelp
-            anchor='right start'
-            helpTitle={t('storage.actions.go-save.helpTitle')}
-          >
-            <Icon name='link' solid forButton />
-            {t('storage.actions.go-save')}
-          </ButtonWithDisabledPopover>
-        )}
-
-        {canEdit && <Button onClick={formEditMode.startEdit} disabled={formEditMode.editMode}>
-          <Icon name='pen' solid forButton />
-          {t('storage.actions.edit')}
-        </Button>}
-
-        {canEvolve && (
-          <ButtonWithConfirm
-            anchor='right'
-            bgColor={theme.bg.primary}
-            onClick={async () => {
-              const mutateResult = await evolvePkmsMutation.mutateAsync({
-                params: {
-                  saveId: selectedPkm.saveId,
-                  ids: [ selectedPkm.id ],
                 },
               });
-              const savePkms = Object.values(mutateResult.data.saves?.find(save => save.saveId === saveId)?.savePkms?.data ?? {});
-              const newId = savePkms.find(pkm => pkm.boxId === selectedPkm.boxId && pkm.boxSlot === selectedPkm.boxSlot)?.id;
-              if (newId) {
-                navigate({
-                  search: {
-                    selected: {
-                      id: newId,
-                      saveId,
-                    },
-                  },
-                });
-              }
-            }}
-          >
-            <Icon name='sparkles' solid forButton />
-            {t('storage.actions.evolve')}
-          </ButtonWithConfirm>
-        )}
-
-        {canDetach && attachedPkmVariant && (
-          <ButtonWithDisabledPopover
-            as={Button}
-            onClick={() =>
-              mainPkmDetachSaveMutation.mutateAsync({
-                params: {
-                  pkmVariantIds: [ attachedPkmVariant.id ],
-                },
-              })
             }
-            showHelp
-            anchor='right start'
-            helpTitle={t('storage.actions.detach-save.helpTitle')}
-            helpContent={t('storage.actions.detach-save.helpContent')}
-          >
-            <Icon name='link' solid forButton />
-            {t('storage.actions.detach-save')}
-          </ButtonWithDisabledPopover>
-        )}
+          }}
+        >
+          <Icon name='sparkles' solid forButton />
+          {t('storage.actions.evolve')}
+        </ButtonWithConfirm>
+      )}
 
-        {canRemovePkm && (
-          <ButtonWithConfirm
-            anchor='right'
-            bgColor={theme.bg.red}
-            onClick={() =>
-              savePkmsDeleteMutation.mutateAsync({
-                saveId,
-                params: {
-                  pkmIds: [ selectedPkm.id ],
-                },
-              })
-            }
-          >
-            <Icon name='trash' solid forButton />
-            {t('storage.actions.release')}
-          </ButtonWithConfirm>
-        )}
-      </div>
+      {canDetach && attachedPkmVariant && (
+        <ButtonWithDisabledPopover
+          as={Button}
+          onClick={() =>
+            mainPkmDetachSaveMutation.mutateAsync({
+              params: {
+                pkmVariantIds: [ attachedPkmVariant.id ],
+              },
+            })
+          }
+          showHelp
+          anchor='right start'
+          helpTitle={t('storage.actions.detach-save.helpTitle')}
+          helpContent={t('storage.actions.detach-save.helpContent')}
+        >
+          <Icon name='link' solid forButton />
+          {t('storage.actions.detach-save')}
+        </ButtonWithDisabledPopover>
+      )}
+
+      {canRemovePkm && (
+        <ButtonWithConfirm
+          anchor='right'
+          bgColor={theme.bg.red}
+          onClick={() =>
+            savePkmsDeleteMutation.mutateAsync({
+              saveId,
+              params: {
+                pkmIds: [ selectedPkm.id ],
+              },
+            })
+          }
+        >
+          <Icon name='trash' solid forButton />
+          {t('storage.actions.release')}
+        </ButtonWithConfirm>
+      )}
     </StorageItemSaveActionsContainer>
   );
 };

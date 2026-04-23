@@ -1,9 +1,9 @@
-import type React from 'react';
+import { css } from '@emotion/css';
+import React from 'react';
 import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
-import { TitledContainer } from '../container/titled-container';
 import { DetailsLevel } from '../details-card/details-level';
 import { Icon } from '../icon/icon';
-import { css } from '@emotion/css';
+import { StorageActionsContainer } from './storage-actions-container';
 
 export const StorageItemSaveActionsContainer: React.FC<
     React.PropsWithChildren<{
@@ -21,9 +21,8 @@ export const StorageItemSaveActionsContainer: React.FC<
     const { isEgg, nickname, level } = selectedPkm;
 
     return (
-        <TitledContainer
-            contrasted
-            enableExpand
+        <StorageActionsContainer
+            type='item'
             title={
                 <div
                     className={css({
@@ -38,6 +37,6 @@ export const StorageItemSaveActionsContainer: React.FC<
             }
         >
             {children}
-        </TitledContainer>
+        </StorageActionsContainer>
     );
 };
