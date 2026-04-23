@@ -29,6 +29,8 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
 
         const { heldItem } = mainVariant;
 
+        const canCreateVariant = canCreateVariants.length > 0;
+
         return (
             <StorageItemPopover
                 pkmId={pkmId}
@@ -43,8 +45,8 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
                             ...props,
                             pkmId,
                             heldItem,
-                            canCreateVariant: canCreateVariants.length > 0,
-                            canMoveOutside: canMoveAttached,
+                            canCreateVariant,
+                            canMoveOutside: canMoveAttached || canCreateVariant,
                             canEvolve: !!canEvolveVariant,
                             needSynchronize: canSynchronize,
                             onClick:

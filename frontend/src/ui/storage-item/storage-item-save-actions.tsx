@@ -62,17 +62,27 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
           </Button>
         )}
 
-        {moveClickable.startDragAttached && (
+        {(moveClickable.startDragAttached || selectedPkm.isDuplicate) && (
           <ButtonWithDisabledPopover
             as={Button}
             onClick={moveClickable.startDragAttached}
             showHelp
             anchor='right start'
-            helpTitle={t('storage.actions.move-attached-save.helpTitle')}
-            helpContent={t('storage.actions.move-attached-save.helpContent')}
+            helpTitle={selectedPkm.isDuplicate ? t('details.is-duplicate') : t('storage.actions.move-attached-save.helpTitle')}
+            helpContent={selectedPkm.isDuplicate ? undefined : t('storage.actions.move-attached-save.helpContent')}
+            disabled={!moveClickable.startDragAttached}
           >
-            <Icon name='link' solid forButton />
-            <Icon name='logout' solid forButton />
+            {selectedPkm.isDuplicate
+              ? <div className={css({
+                color: theme.bg.yellow,
+                display: 'flex',
+              })}>
+                <Icon name='copy' solid forButton />
+              </div>
+              : <>
+                <Icon name='link' solid forButton />
+                <Icon name='logout' solid forButton />
+              </>}
             {t('storage.actions.move-attached-save')}
           </ButtonWithDisabledPopover>
         )}

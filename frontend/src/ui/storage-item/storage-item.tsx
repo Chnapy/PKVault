@@ -28,6 +28,7 @@ export type StorageItemProps =
     isShadow?: boolean;
     isStarter?: boolean;
     isExternal?: boolean;
+    isDuplicate?: boolean;
     heldItem?: number;
     warning?: boolean;
     level?: number;
@@ -58,6 +59,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   isShadow,
   isStarter,
   isExternal,
+  isDuplicate,
   heldItem = 0,
   warning,
   level,
@@ -209,6 +211,8 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
           <Icon name='link' solid forButton />)}
 
         {canCreateVariant && renderBubble(theme.bg.primary, <Icon name='plus' solid forButton />)}
+
+        {isDuplicate && renderBubble(undefined, <Icon name='copy' solid forButton style={{ color: theme.bg.yellow }} />)}
 
         {warning && renderBubble(theme.bg.yellow, <Icon name='exclaimation' solid forButton />)}
       </div>
