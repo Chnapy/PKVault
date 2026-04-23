@@ -6,7 +6,8 @@ public class Dex123Service(SaveFile save) : DexGenService(save)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
-        var isSeen = isOwned || save.GetSeen(species);
+        var isCaught = isOwned || save.GetCaught(species);
+        var isSeen = isCaught || save.GetSeen(species);
 
         return new DexItemForm(
             Id: DexLoader.GetId(species, form, gender),
@@ -19,7 +20,7 @@ public class Dex123Service(SaveFile save) : DexGenService(save)
             IsSeen: isSeen,
             IsSeenShiny: isOwnedShiny,
             IsSeenAlpha: false,
-            IsCaught: isOwned || save.GetCaught(species),
+            IsCaught: isCaught,
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
         );

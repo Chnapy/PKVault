@@ -13,7 +13,8 @@ public class Dex4Service(SAV4 save) : DexGenService(save)
         var speciesSeen = save.Dex.GetSeen(species);
         var formSeen = forms.Where(f => speciesSeen && f != byte.MaxValue && f < forms.Length).Distinct().ToArray();
 
-        var isSeen = isOwned || (forms.Length > 0 ? formSeen.Contains(form) : speciesSeen);
+        var isCaught = isOwned || save.GetCaught(species);
+        var isSeen = isCaught || (forms.Length > 0 ? formSeen.Contains(form) : speciesSeen);
 
         return new DexItemForm(
             Id: DexLoader.GetId(species, form, gender),
@@ -26,7 +27,7 @@ public class Dex4Service(SAV4 save) : DexGenService(save)
             IsSeen: isSeen,
             IsSeenShiny: isOwnedShiny,
             IsSeenAlpha: false,
-            IsCaught: isSeen && (isOwned || save.GetCaught(species)),
+            IsCaught: isCaught,
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
         );

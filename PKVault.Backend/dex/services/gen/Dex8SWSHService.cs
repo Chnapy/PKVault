@@ -17,9 +17,10 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
         var isSeenShinyForm = Dex.GetSeenRegion(species, form, gender == Gender.Female ? 3 : 2);
 
         // var isCaughtGigantamax = Dex.GetCaughtGigantamax1(species) || Dex.GetCaughtGigantamaxed(species);
-
+        
+        var isCaught = isOwned || Dex.GetCaught(species);
         var isSeenShiny = isOwnedShiny || isSeenShinyForm;
-        var isSeen = isOwned || isSeenShiny || isSeenForm;
+        var isSeen = isCaught || isSeenShiny || isSeenForm;
 
         return new DexItemForm(
             Id: DexLoader.GetId(species, form, gender),
@@ -32,7 +33,7 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
             IsSeen: isSeen,
             IsSeenShiny: isSeenShiny,
             IsSeenAlpha: false,
-            IsCaught: isSeen && (isOwned || Dex.GetCaught(species)),
+            IsCaught: isCaught,
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
         );

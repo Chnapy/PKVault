@@ -25,10 +25,10 @@ public class Dex8BSService(SAV8BS save) : DexGenService(save)
         var isSeenForm = formCount > 0 && dex.GetHasFormFlag(species, form, false);
         var isSeenShinyForm = formCount > 0 && dex.GetHasFormFlag(species, form, true);
 
-        var isSeenShiny = isOwnedShiny || (formCount > 0 ? isSeenShinyForm : isSeenShinyBase);
-        var isSeen = isSeenShiny || isOwned || (formCount > 0 ? isSeenForm : isSeenBase);
+        var isCaught = isOwned || state == ZukanState8b.Caught;
 
-        var isCaught = isSeen && state == ZukanState8b.Caught;
+        var isSeenShiny = isOwnedShiny || (formCount > 0 ? isSeenShinyForm : isSeenShinyBase);
+        var isSeen = isSeenShiny || isCaught || (formCount > 0 ? isSeenForm : isSeenBase);
 
         return new DexItemForm(
             Id: DexLoader.GetId(species, form, gender),

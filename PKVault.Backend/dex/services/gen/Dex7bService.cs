@@ -11,8 +11,9 @@ public class Dex7bService(SAV7b save) : DexGenService(save)
     {
         var pi = save.Personal.GetFormEntry(species, form);
 
+        var isCaught = isOwned || save.GetCaught(species);
         var isSeenShiny = isOwnedShiny || save.Zukan.GetSeen(species, gender == Gender.Female ? 3 : 2);
-        var isSeen = isSeenShiny || isOwned || save.Zukan.GetSeen(species, gender == Gender.Female ? 1 : 0);
+        var isSeen = isSeenShiny || isCaught || save.Zukan.GetSeen(species, gender == Gender.Female ? 1 : 0);
 
         return new DexItemForm(
             Id: DexLoader.GetId(species, form, gender),
@@ -25,7 +26,7 @@ public class Dex7bService(SAV7b save) : DexGenService(save)
             IsSeen: isSeen,
             IsSeenShiny: isSeenShiny,
             IsSeenAlpha: false,
-            IsCaught: isSeen && save.GetCaught(species),
+            IsCaught: isCaught,
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
         );
