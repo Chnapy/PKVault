@@ -126,7 +126,7 @@ public class SavePkmLoader(
 
         if (!BoxLoader.CanIdReceivePkm(dto.BoxId))
         {
-            throw new Exception("Not allowed for pkm in daycare");
+            throw new Exception("Not allowed for pkm in readonly box");
         }
 
         if (box != null)

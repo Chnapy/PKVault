@@ -15,7 +15,7 @@ public abstract record PkmBaseDTO(
     [property: JsonIgnore] Dictionary<ushort, StaticEvolve> Evolves
 ) : IWithId
 {
-    public string IdBase => Pkm.GetPKMIdBase(Evolves);
+    public virtual string IdBase => Pkm.GetPKMIdBase(Evolves);
     public string BoxKey => BoxId + "." + BoxSlot;
 
     public GameVersion Version => Pkm.Version;
@@ -100,7 +100,7 @@ public abstract record PkmBaseDTO(
     {
         get
         {
-            if (!IsEnabled || IsEgg || IsShadow)
+            if (!CanEdit || IsShadow)
                 return false;
 
             if (!Evolves.TryGetValue(Species, out var staticEvolves))

@@ -40,6 +40,7 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
 
   const attachedPkmVariant = pkmVariantIndex.data?.data.byAttachedSave[ selectedPkm.saveId ]?.[ selectedPkm.idBase ];
 
+  const canEdit = selectedPkm.canEdit;
   const canEvolve = selectedPkm.canEvolve;
   const canDetach = !!attachedPkmVariant;
   const canGoToMain = !!attachedPkmVariant;
@@ -117,10 +118,10 @@ export const StorageItemSaveActions: React.FC<{ saveId: number }> = ({ saveId })
           </ButtonWithDisabledPopover>
         )}
 
-        <Button onClick={formEditMode.startEdit} disabled={formEditMode.editMode}>
+        {canEdit && <Button onClick={formEditMode.startEdit} disabled={formEditMode.editMode}>
           <Icon name='pen' solid forButton />
           {t('storage.actions.edit')}
-        </Button>
+        </Button>}
 
         {canEvolve && (
           <ButtonWithConfirm

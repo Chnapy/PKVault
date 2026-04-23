@@ -15,6 +15,12 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
 
     public static bool CanIdReceivePkm(int boxId) => boxId == (int)BoxType.Party || boxId >= (int)BoxType.Box;
 
+    /**
+     * Scoped box cannot interact with non-scoped boxes.
+     * This allows duplicates between scoped and non-scoped, since there is strong delimitation between them.
+     */
+    public static bool IsScopedBox(int boxId) => !CanIdReceivePkm(boxId) && boxId != (int)BoxType.Daycare;
+
     public static BoxType GetTypeFromStorageSlotType(StorageSlotType slotType) => slotType switch
     {
         StorageSlotType.Box => BoxType.Box,

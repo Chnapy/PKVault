@@ -12,7 +12,7 @@ public record PkmSaveDTO(
     [property: JsonIgnore] SaveWrapper Save,
     Dictionary<ushort, StaticEvolve> Evolves
 ) : PkmBaseDTO(
-    SavePkmLoader.GetPKMId(Pkm.GetPKMIdBase(Evolves), BoxId, BoxSlot),
+    SavePkmLoader.GetPKMId(Pkm.GetPKMIdBase(Evolves, BoxId), BoxId, BoxSlot),
     Save.Generation,
     BoxId,
     BoxSlot,
@@ -22,6 +22,7 @@ public record PkmSaveDTO(
     Evolves
 )
 {
+    public override string IdBase => Pkm.GetPKMIdBase(Evolves, BoxId);
     public uint SaveId => Save.Id;
 
     public int Team => BoxSlotFlags.IsBattleTeam();
@@ -31,6 +32,7 @@ public record PkmSaveDTO(
 
     public override bool CanMove => base.CanMove && !IsLocked && BoxLoader.CanIdReceivePkm(BoxId);
     public override bool CanDelete => base.CanDelete && !IsLocked && BoxLoader.CanIdReceivePkm(BoxId);
+    public override bool CanEdit => base.CanEdit && !IsLocked && BoxLoader.CanIdReceivePkm(BoxId);
     public override bool CanMoveToSave => base.CanMoveToSave && !IsLocked;
     public bool CanMoveToMain => IsEnabled && Pkm.Version > 0 && Pkm.Generation > 0 && CanDelete && !IsShadow && !IsEgg && !IsLocked && Party == -1;
     public bool CanMoveAttachedToMain => CanMoveToMain && !IsDuplicate;
