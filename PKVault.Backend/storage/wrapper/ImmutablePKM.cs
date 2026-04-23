@@ -280,7 +280,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
      * Note that Species & Form can change over time (evolve),
      * so only first species of evolution group is used.
      */
-    public string GetPKMIdBase(Dictionary<ushort, StaticEvolve> evolves)
+    public string GetPKMIdBase(Dictionary<ushort, StaticEvolve> evolves, int boxId = (int)BoxType.Box)
     {
         ushort GetBaseSpecies(ushort species)
         {
@@ -325,7 +325,11 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
 
         var hash = SearchUtil.HashByDetails(clone.GetMutablePkm());
 
-        var id = $"{GetPKMIdPrefix(clone.Context)}_{hash}_{clone.TID16}";   // note: SID not stored by pk files
+        var scopedBox = BoxLoader.IsScopedBox(boxId)
+            ? $"_{boxId}"
+            : "";
+
+        var id = $"{GetPKMIdPrefix(clone.Context)}_{hash}_{clone.TID16}{scopedBox}";   // note: SID not stored by pk files
 
         return id;
     }

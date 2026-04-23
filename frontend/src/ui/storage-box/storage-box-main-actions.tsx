@@ -10,8 +10,8 @@ import { filterIsDefined } from '../../util/filter-is-defined';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
 import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popover';
-import { TitledContainer } from '../container/titled-container';
 import { Icon } from '../icon/icon';
+import { StorageActionsContainer } from '../storage-item/storage-actions-container';
 import { theme } from '../theme';
 
 export const StorageBoxMainActions: React.FC<Required<Pick<PopoverPanelProps, 'anchor'>> & { boxId: number }> = ({ boxId, anchor }) => {
@@ -53,9 +53,8 @@ export const StorageBoxMainActions: React.FC<Required<Pick<PopoverPanelProps, 'a
       })}
     >
       <div className={css({ maxWidth: 350, whiteSpace: 'break-spaces' })}>
-        <TitledContainer
-          contrasted
-          enableExpand
+        <StorageActionsContainer
+          type='box'
           title={
             <div
               className={css({
@@ -68,91 +67,82 @@ export const StorageBoxMainActions: React.FC<Required<Pick<PopoverPanelProps, 'a
             </div>
           }
         >
-          <div
-            className={css({
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 4,
-              minWidth: 140,
-            })}
-          >
-            {moveClickable.startDrag && (
-              <Button onClick={moveClickable.startDrag}>
-                <Icon name='logout' solid forButton />
-                {t('storage.actions.move')} ({moveClickable.moveCount})
-              </Button>
-            )}
+          {moveClickable.startDrag && (
+            <Button onClick={moveClickable.startDrag}>
+              <Icon name='logout' solid forButton />
+              {t('storage.actions.move')} ({moveClickable.moveCount})
+            </Button>
+          )}
 
-            {moveClickable.startDragAttached && (
-              <ButtonWithDisabledPopover
-                as={Button}
-                onClick={moveClickable.startDragAttached}
-                showHelp
-                anchor='right start'
-                helpTitle={t('storage.actions.move-attached-main.helpTitle')}
-                helpContent={t('storage.actions.move-attached-main.helpContent')}
-              >
-                <Icon name='link' solid forButton />
-                <Icon name='logout' solid forButton />
-                {t('storage.actions.move-attached-main')} ({moveClickable.moveAttachedCount})
-              </ButtonWithDisabledPopover>
-            )}
+          {moveClickable.startDragAttached && (
+            <ButtonWithDisabledPopover
+              as={Button}
+              onClick={moveClickable.startDragAttached}
+              showHelp
+              anchor='right start'
+              helpTitle={t('storage.actions.move-attached-main.helpTitle')}
+              helpContent={t('storage.actions.move-attached-main.helpContent')}
+            >
+              <Icon name='link' solid forButton />
+              <Icon name='logout' solid forButton />
+              {t('storage.actions.move-attached-main')} ({moveClickable.moveAttachedCount})
+            </ButtonWithDisabledPopover>
+          )}
 
-            {canEvolvePkms.length > 0 && (
-              <ButtonWithConfirm
-                anchor='right'
-                bgColor={theme.bg.primary}
-                onClick={async () => {
-                  await evolvePkmsMutation.mutateAsync({
-                    params: {
-                      ids: canEvolvePkms.map(pkm => pkm.id),
-                    },
-                  });
-                }}
-              >
-                <Icon name='sparkles' solid forButton />
-                {t('storage.actions.evolve')} ({canEvolvePkms.length})
-              </ButtonWithConfirm>
-            )}
+          {canEvolvePkms.length > 0 && (
+            <ButtonWithConfirm
+              anchor='right'
+              bgColor={theme.bg.primary}
+              onClick={async () => {
+                await evolvePkmsMutation.mutateAsync({
+                  params: {
+                    ids: canEvolvePkms.map(pkm => pkm.id),
+                  },
+                });
+              }}
+            >
+              <Icon name='sparkles' solid forButton />
+              {t('storage.actions.evolve')} ({canEvolvePkms.length})
+            </ButtonWithConfirm>
+          )}
 
-            {canDetachPkms.length > 0 && (
-              <ButtonWithDisabledPopover
-                as={Button}
-                onClick={() =>
-                  mainPkmDetachSaveMutation.mutateAsync({
-                    params: {
-                      pkmVariantIds: canDetachPkms.map(pkm => pkm.id),
-                    },
-                  })
-                }
-                showHelp
-                anchor='right start'
-                helpTitle={t('storage.actions.detach-main.helpTitle')}
-                helpContent={t('storage.actions.detach-main.helpContent')}
-              >
-                <Icon name='link' solid forButton />
-                {t('storage.actions.detach-main')} ({canDetachPkms.length})
-              </ButtonWithDisabledPopover>
-            )}
+          {canDetachPkms.length > 0 && (
+            <ButtonWithDisabledPopover
+              as={Button}
+              onClick={() =>
+                mainPkmDetachSaveMutation.mutateAsync({
+                  params: {
+                    pkmVariantIds: canDetachPkms.map(pkm => pkm.id),
+                  },
+                })
+              }
+              showHelp
+              anchor='right start'
+              helpTitle={t('storage.actions.detach-main.helpTitle')}
+              helpContent={t('storage.actions.detach-main.helpContent')}
+            >
+              <Icon name='link' solid forButton />
+              {t('storage.actions.detach-main')} ({canDetachPkms.length})
+            </ButtonWithDisabledPopover>
+          )}
 
-            {canRemovePkms.length > 0 && (
-              <ButtonWithConfirm
-                anchor='right'
-                bgColor={theme.bg.red}
-                onClick={async () => {
-                  await mainPkmVariantDeleteMutation.mutateAsync({
-                    params: {
-                      pkmVariantIds: canRemovePkms.map(pkmVariant => pkmVariant.id),
-                    },
-                  });
-                }}
-              >
-                <Icon name='trash' solid forButton />
-                {t('storage.actions.release')} ({canRemovePkms.length})
-              </ButtonWithConfirm>
-            )}
-          </div>
-        </TitledContainer>
+          {canRemovePkms.length > 0 && (
+            <ButtonWithConfirm
+              anchor='right'
+              bgColor={theme.bg.red}
+              onClick={async () => {
+                await mainPkmVariantDeleteMutation.mutateAsync({
+                  params: {
+                    pkmVariantIds: canRemovePkms.map(pkmVariant => pkmVariant.id),
+                  },
+                });
+              }}
+            >
+              <Icon name='trash' solid forButton />
+              {t('storage.actions.release')} ({canRemovePkms.length})
+            </ButtonWithConfirm>
+          )}
+        </StorageActionsContainer>
       </div>
     </PopoverPanel>
   );
