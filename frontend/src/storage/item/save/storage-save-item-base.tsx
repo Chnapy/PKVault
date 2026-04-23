@@ -48,6 +48,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
             isShiny={isShiny}
             isShadow={isShadow}
             isStarter={savePkm.isStarter}
+            isDuplicate={savePkm.isDuplicate}
             heldItem={savePkm.heldItem}
             warning={!!pkmLegality && !pkmLegality.isValid}
             level={savePkm.level}

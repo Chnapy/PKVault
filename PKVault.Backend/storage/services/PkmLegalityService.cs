@@ -9,8 +9,7 @@ public class PkmLegalityService(ISettingsService settingsService, ILegalityAnaly
 
     public PkmLegalityDTO CreateDTO(PkmSaveDTO pkmSave)
     {
-        var dto = CreateDTO(pkmSave.Id, pkmSave.Pkm, pkmSave.Save, GetPkmStorageType(pkmSave));
-        return dto with { IsValid = dto.IsValid && !pkmSave.IsDuplicate };
+        return CreateDTO(pkmSave.Id, pkmSave.Pkm, pkmSave.Save, GetPkmStorageType(pkmSave));
     }
 
     private PkmLegalityDTO CreateDTO(

@@ -54,17 +54,6 @@ const InnerStorageDetailsSave: React.FC<{ id: string; saveId: number }> = ({ id,
             relearnMovesLegality={[]}
             {...pkmLegality}
             reports={<>
-                {savePkm.isDuplicate && <TextContainer
-                    bgColor={theme.bg.yellow}
-                    maxHeight={200}
-                    className={css({
-                        minHeight: '1lh',
-                        flexShrink: 0.1,
-                    })}
-                >
-                    {t('details.is-duplicate')}
-                </TextContainer>}
-
                 {pkmLegality && pkmLegality.illegalitiesCount > 0 && pkmLegality.validityReport && <TextContainer
                     bgColor={theme.bg.yellow}
                     maxHeight={200}
