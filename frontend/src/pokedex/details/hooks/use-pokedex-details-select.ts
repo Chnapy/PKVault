@@ -79,8 +79,8 @@ export const usePokedexDetailsSelect = () => {
     };
 
     const selectedForm = selectedFormId
-        ? seenForms.find(form => form.id === selectedFormId) ?? getDefaultForm(0)
-        : getDefaultForm(0);
+        ? seenForms.find(form => form.id === selectedFormId) ?? getDefaultForm(seenForms?.[0]?.form ?? 0)
+        : getDefaultForm(seenForms?.[0]?.form ?? 0);
 
     const selectedFormIndexForms = (seenForms ?? [])
         .filter(form => form.form === selectedForm?.form)

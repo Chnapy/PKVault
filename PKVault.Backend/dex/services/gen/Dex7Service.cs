@@ -9,12 +9,15 @@ public class Dex7Service(SAV7 save) : DexGenService(save)
 
     protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
     {
+        var index = save.Zukan.GetEntryIndex(species, form);
+        var indexSpecies = (ushort)(index + 1);
+
         var pi = save.Personal.GetFormEntry(species, form);
 
-        var isCaught = isOwned || save.GetCaught(species);
+        var isCaught = isOwned || save.GetCaught(indexSpecies);
 
-        var isSeenShiny = isOwnedShiny || save.Zukan.GetSeen(species, gender == Gender.Female ? 3 : 2);
-        var isSeen = isSeenShiny || isCaught || save.Zukan.GetSeen(species, gender == Gender.Female ? 1 : 0);
+        var isSeenShiny = isOwnedShiny || save.Zukan.GetSeen(indexSpecies, gender == Gender.Female ? 3 : 2);
+        var isSeen = isSeenShiny || isCaught || save.Zukan.GetSeen(indexSpecies, gender == Gender.Female ? 1 : 0);
 
         return new DexItemForm(
             Id: DexLoader.GetId(species, form, gender),
@@ -43,20 +46,23 @@ public class Dex7Service(SAV7 save) : DexGenService(save)
         if (!save.Personal.IsPresentInGame(payload.Species, payload.Form))
             return;
 
+        var index = save.Zukan.GetEntryIndex(payload.Species, payload.Form);
+        var indexSpecies = (ushort)(index + 1);
+
         if (payload.IsSeen)
         {
-            save.Zukan.SetSeen(payload.Species, payload.Gender == Gender.Female ? 1 : 0, true);
-            save.Zukan.SetDisplayed(payload.Species - 1, payload.Gender == Gender.Female ? 1 : 0, true);
+            save.Zukan.SetSeen(indexSpecies, payload.Gender == Gender.Female ? 1 : 0, true);
+            save.Zukan.SetDisplayed(indexSpecies - 1, payload.Gender == Gender.Female ? 1 : 0, true);
         }
 
         if (payload.IsSeenShiny)
         {
-            save.Zukan.SetSeen(payload.Species, payload.Gender == Gender.Female ? 3 : 2, true);
-            save.Zukan.SetDisplayed(payload.Species - 1, payload.Gender == Gender.Female ? 3 : 2, true);
+            save.Zukan.SetSeen(indexSpecies, payload.Gender == Gender.Female ? 3 : 2, true);
+            save.Zukan.SetDisplayed(indexSpecies - 1, payload.Gender == Gender.Female ? 3 : 2, true);
         }
 
         if (payload.IsCaught)
-            save.Zukan.SetCaught(payload.Species, true);
+            save.Zukan.SetCaught(indexSpecies, true);
 
         var safeLanguages = payload.Languages.Where(AllLanguages.Contains);
         if (!safeLanguages.Any())
@@ -67,7 +73,7 @@ public class Dex7Service(SAV7 save) : DexGenService(save)
         foreach (var lang in safeLanguages)
         {
             var langIndex = AllLanguages.IndexOf(lang);
-            save.Zukan.SetLanguageFlag(payload.Species - 1, langIndex, true);
+            save.Zukan.SetLanguageFlag(indexSpecies - 1, langIndex, true);
         }
     }
 }
