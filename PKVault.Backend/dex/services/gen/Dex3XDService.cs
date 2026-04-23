@@ -22,7 +22,8 @@ public class Dex3XDService(SAV3XD save) : DexGenService(save)
 
         // var entry = memo.GetEntry(species);
 
-        var isSeen = isOwned || save.GetSeen(species);
+        var isCaught = isOwned || save.GetCaught(species);
+        var isSeen = isCaught || save.GetSeen(species);
 
         return new DexItemForm(
             Id: DexLoader.GetId(species, form, gender),
@@ -35,7 +36,7 @@ public class Dex3XDService(SAV3XD save) : DexGenService(save)
             IsSeen: isSeen,
             IsSeenShiny: isOwnedShiny,
             IsSeenAlpha: false,
-            IsCaught: isOwned || save.GetCaught(species),
+            IsCaught: isCaught,
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
         );

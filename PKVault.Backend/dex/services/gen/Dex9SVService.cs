@@ -30,9 +30,9 @@ public class Dex9SVService(SAV9SV save) : DexGenService(save)
             var isSeenM = entry.GetIsGenderSeen(0) || entry.GetIsGenderSeen(2);
             var isSeenF = entry.GetIsGenderSeen(1);
 
+            isCaught = isOwned || save.GetCaught(species);
             isSeenShiny = isOwnedShiny || entry.GetSeenIsShiny();
-            isSeen = isOwned || isSeenShiny || (isFormSeen && (gender == Gender.Female ? isSeenF : isSeenM));
-            isCaught = isSeen && (isOwned || save.GetCaught(species));
+            isSeen = isCaught || isSeenShiny || (isFormSeen && (gender == Gender.Female ? isSeenF : isSeenM));
         }
         // kitami
         else
@@ -46,9 +46,9 @@ public class Dex9SVService(SAV9SV save) : DexGenService(save)
             var isSeenM = entry.GetIsGenderSeen(0) || entry.GetIsGenderSeen(2);
             var isSeenF = entry.GetIsGenderSeen(1);
 
+            isCaught = isOwned || isFormCaught;
             isSeenShiny = isOwnedShiny || entry.GetIsModelSeen(true);
-            isSeen = isOwned || isSeenShiny || (isFormSeen && (gender == Gender.Female ? isSeenF : isSeenM));
-            isCaught = isSeen && (isOwned || isFormCaught);
+            isSeen = isCaught || isSeenShiny || (isFormSeen && (gender == Gender.Female ? isSeenF : isSeenM));
         }
 
         return new DexItemForm(

@@ -26,7 +26,7 @@ public class Dex8LAService(SAV8LA save) : DexGenService(save)
 
         var isSeenShiny = isOwnedShiny || isCaughtShiny || shinyGendersIndex.Any(i => (seenWild & (1 << i)) != 0);
         var isSeenAlpha = isCaughtAlpha || alphaGendersIndex.Any(i => (seenWild & (1 << i)) != 0);
-        var isSeen = isSeenShiny || isOwned || isCaught || baseGendersIndex.Any(i => (seenWild & (1 << i)) != 0);
+        var isSeen = isSeenShiny || isCaught || baseGendersIndex.Any(i => (seenWild & (1 << i)) != 0);
 
         return new DexItemForm(
             Id: DexLoader.GetId(species, form, gender),

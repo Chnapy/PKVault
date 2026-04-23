@@ -17,9 +17,10 @@ public class Dex6XYService(SAV6XY save) : DexGenService(save)
 
         var isSeenForm = formCount > 0 && dex.GetFormFlag(formIndex + form, 0);
         var isSeenShinyForm = formCount > 0 && dex.GetFormFlag(formIndex + form, 1);
-
+        
+        var isCaught = isOwned || save.GetCaught(species);
         var isSeenShiny = isOwnedShiny || (formCount > 0 ? isSeenShinyForm : isSeenShinyBase);
-        var isSeen = isSeenShiny || isOwned || (formCount > 0 ? isSeenForm : isSeenBase);
+        var isSeen = isSeenShiny || isCaught || (formCount > 0 ? isSeenForm : isSeenBase);
 
         return new DexItemForm(
             Id: DexLoader.GetId(species, form, gender),
@@ -32,7 +33,7 @@ public class Dex6XYService(SAV6XY save) : DexGenService(save)
             IsSeen: isSeen,
             IsSeenShiny: isSeenShiny,
             IsSeenAlpha: false,
-            IsCaught: isSeen && save.GetCaught(species),
+            IsCaught: isCaught,
             IsOwned: isOwned,
             IsOwnedShiny: isOwnedShiny
         );

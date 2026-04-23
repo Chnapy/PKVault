@@ -20,8 +20,8 @@ public class Dex9ZAService(SAV9ZA save) : DexGenService(save)
         var isSeenM = entry.GetIsGenderSeen(0) || entry.GetIsGenderSeen(2);
         var isSeenF = entry.GetIsGenderSeen(1);
 
-        var isSeen = isOwned || isSeenShiny || (entry.GetIsFormSeen(form) && (gender == Gender.Female ? isSeenF : isSeenM));
-        var isCaught = isSeen && (isOwned || entry.GetIsFormCaught(form));
+        var isCaught = isOwned || entry.GetIsFormCaught(form);
+        var isSeen = isCaught || isSeenShiny || (entry.GetIsFormSeen(form) && (gender == Gender.Female ? isSeenF : isSeenM));
 
         return new DexItemForm(
             Id: DexLoader.GetId(species, form, gender),
