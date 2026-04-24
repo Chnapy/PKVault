@@ -71,8 +71,7 @@ public class GenStaticEvolves(
                         }
 
                         var blankSave = new SaveWrapper(BlankSaveFile.Get(saveVersion));
-                        var speciesAllowed = blankSave.IsSpeciesAllowed(evolveSpecies);
-                        if (!speciesAllowed)
+                        if (!blankSave.IsSpeciesAllowed(evolveSpecies) || !blankSave.IsSpeciesAllowed(species))
                         {
                             // log.LogInformation($"EVOLVE TRADE NOT ALLOWED {species}->{evolveSpecies} v={version}");
                             continue;
@@ -122,6 +121,33 @@ public class GenStaticEvolves(
 
                 actChain(evolveTo);
             });
+
+            /**
+             * Meltan#808 special case:
+             * - evolve only in GO with consumables
+             * - pokeapi evolve chain empty
+             */
+            if (species == (ushort)Species.Meltan)
+            {
+                var evolveSpecies = (ushort)Species.Melmetal;
+
+                foreach (var version in Enum.GetValues<GameVersion>())
+                {
+                    var saveVersion = GenStaticOthers.GetSingleVersion(version);
+                    if (saveVersion == default)
+                    {
+                        continue;
+                    }
+
+                    var blankSave = new SaveWrapper(BlankSaveFile.Get(saveVersion));
+                    if (!blankSave.IsSpeciesAllowed(evolveSpecies) || !blankSave.IsSpeciesAllowed(species))
+                    {
+                        continue;
+                    }
+
+                    speciesEvolve.Trade.Add((byte)version, new(evolveSpecies, 1));
+                }
+            }
 
             staticEvolves.Add(species, speciesEvolve);
         }
