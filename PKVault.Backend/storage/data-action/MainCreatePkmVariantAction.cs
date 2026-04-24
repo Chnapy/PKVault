@@ -11,13 +11,14 @@ public class MainCreatePkmVariantActionInput(string pkmVariantId, EntityContext 
 }
 
 public class MainCreatePkmVariantAction(
+    ILogger<MainCreatePkmVariantAction> log,
     IPkmConvertService pkmConvertService,
     IPkmVariantLoader pkmVariantLoader, IBoxLoader boxLoader
 ) : DataAction<MainCreatePkmVariantActionInput>
 {
     protected override async Task<DataActionPayload> Execute(MainCreatePkmVariantActionInput input, DataUpdateFlags flags)
     {
-        Console.WriteLine($"Create PKM version, pkmVariantId={input.PkmVariantId}, context={input.Context}");
+        log.LogInformation($"Create PKM version, pkmVariantId={input.PkmVariantId}, context={input.Context}");
 
         var pkmVariantOrigin = await pkmVariantLoader.GetEntity(input.PkmVariantId);
         if (pkmVariantOrigin == default)

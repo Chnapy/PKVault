@@ -18,8 +18,10 @@ public record StaticEvolve(
 }
 
 public class GenStaticEvolves(
+    ILogger log,
     PokeApiService pokeApiService, IFileIOService fileIOService
     ) : StaticDataGenerator<StaticEvolvesData>(
+    log,
     jsonTypeInfo: StaticDataJsonContext.Default.StaticEvolvesData,
     jsonTypeInfoIndented: new StaticDataJsonContext(JsonIndentedOptions).StaticEvolvesData,
     fileIOService
@@ -72,7 +74,7 @@ public class GenStaticEvolves(
                         var speciesAllowed = blankSave.IsSpeciesAllowed(evolveSpecies);
                         if (!speciesAllowed)
                         {
-                            // Console.WriteLine($"EVOLVE TRADE NOT ALLOWED {species}->{evolveSpecies} v={version}");
+                            // log.LogInformation($"EVOLVE TRADE NOT ALLOWED {species}->{evolveSpecies} v={version}");
                             continue;
                         }
 
@@ -96,7 +98,7 @@ public class GenStaticEvolves(
                         if (details.HeldItem == null)
                         {
                             speciesEvolve.Trade.Add((byte)version, new(evolveSpecies, details.MinLevel ?? 1));
-                            // Console.WriteLine($"EVOLVE TRADE {species}->{evolveSpecies} v={version}");
+                            // log.LogInformation($"EVOLVE TRADE {species}->{evolveSpecies} v={version}");
                         }
                         else
                         {
@@ -106,7 +108,7 @@ public class GenStaticEvolves(
                                 speciesEvolve.TradeWithItem.Add(details.HeldItem.Name, versionTradeDict);
                             }
                             versionTradeDict.Add((byte)version, new(evolveSpecies, details.MinLevel ?? 1));
-                            // Console.WriteLine($"EVOLVE TRADE {species}->{evolveSpecies} item={details.HeldItem.Name} v={version}");
+                            // log.LogInformation($"EVOLVE TRADE {species}->{evolveSpecies} item={details.HeldItem.Name} v={version}");
                         }
                     }
                 });

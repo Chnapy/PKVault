@@ -5,6 +5,7 @@ public record SynchronizePkmActionInput(
 );
 
 public class SynchronizePkmAction(
+    ILogger<SynchronizePkmAction> log,
     IPkmSharePropertiesService pkmSharePropertiesService,
     IPkmVariantLoader pkmVariantLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<SynchronizePkmActionInput>
@@ -18,7 +19,7 @@ public class SynchronizePkmAction(
             return [];
         }
 
-        using var _ = LogUtil.Time($"Check saves to synchronize ({saveLoaders.Length} saves)");
+        using var _ = log.Time($"Check saves to synchronize ({saveLoaders.Length} saves)");
 
         var pkmVariantsBySaveId = await pkmVariantLoader.GetEntitiesAttachedGroupedBySave();
 
@@ -78,7 +79,7 @@ public class SynchronizePkmAction(
 
         async Task act(string pkmVariantId, string savePkmIdBase)
         {
-            Console.WriteLine($"Synchronize save->variant {savePkmIdBase} -> {pkmVariantId}");
+            log.LogInformation($"Synchronize save->variant {savePkmIdBase} -> {pkmVariantId}");
 
             var pkmVariantEntity = await pkmVariantLoader.GetEntity(pkmVariantId);
             var pkmVariantEntities = (await pkmVariantLoader.GetEntitiesByBox(pkmVariantEntity.BoxId, pkmVariantEntity.BoxSlot)).Values.ToList();
@@ -98,12 +99,12 @@ public class SynchronizePkmAction(
             var savePkm = savePkms.First().Value;
             foreach (var variant in pkmVariantEntities)
             {
-                Console.WriteLine($"Synchronize save->variant loop - {savePkm.IdBase} -> {variant.Id}");
+                log.LogDebug($"Synchronize save->variant loop - {savePkm.IdBase} -> {variant.Id}");
 
                 var variantPkm = await pkmVariantLoader.GetPKM(variant);
                 if (!variantPkm.IsEnabled)
                 {
-                    Console.WriteLine($"!variantPkm.IsEnabled => {variant.Id}");
+                    log.LogDebug($"!variantPkm.IsEnabled => {variant.Id}");
                     continue;
                 }
 
@@ -117,7 +118,7 @@ public class SynchronizePkmAction(
                     && versions.Any(version => BlankSaveFile.Get(version).Personal.IsPresentInGame(savePkm.Pkm.Species, savePkm.Pkm.Form));
                 if (!correctSpeciesForm)
                 {
-                    Console.WriteLine($"!correctSpeciesForm => {variant.Id} / {savePkm.Pkm.Species} {savePkm.Pkm.Form} / {savePkm.Pkm.Species} {variantPkm.Species}");
+                    log.LogDebug($"!correctSpeciesForm => {variant.Id} / {savePkm.Pkm.Species} {savePkm.Pkm.Form} / {savePkm.Pkm.Species} {variantPkm.Species}");
                     continue;
                 }
 
@@ -146,7 +147,7 @@ public class SynchronizePkmAction(
 
         async Task act(string pkmVariantId, string savePkmIdBase)
         {
-            Console.WriteLine($"Synchronize variant->save {pkmVariantId} -> {savePkmIdBase}");
+            log.LogInformation($"Synchronize variant->save {pkmVariantId} -> {savePkmIdBase}");
 
             var pkmVariantEntity = await pkmVariantLoader.GetEntity(pkmVariantId);
             var pkmVariantEntities = (await pkmVariantLoader.GetEntitiesByBox(pkmVariantEntity.BoxId, pkmVariantEntity.BoxSlot)).Values.ToList();
@@ -166,7 +167,7 @@ public class SynchronizePkmAction(
             var savePkm = savePkms.First().Value;
             if (savePkm == null)
             {
-                Console.WriteLine($"Attached save pkm not found for pkmVariant.Id={pkmVariantId}");
+                log.LogDebug($"Attached save pkm not found for pkmVariant.Id={pkmVariantId}");
                 return;
             }
 

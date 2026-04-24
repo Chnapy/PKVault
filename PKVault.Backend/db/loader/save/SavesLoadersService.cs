@@ -19,6 +19,7 @@ public interface ISavesLoadersService
 
 public class SavesLoadersService(
     IServiceProvider sp,
+    ILogger<SavesLoadersService> log,
     IFileIOService fileIOService,
     ISettingsService settingsService,
     IPkmConvertService pkmConvertService,
@@ -112,7 +113,7 @@ public class SavesLoadersService(
 
     public async Task WriteToFiles()
     {
-        using var _ = LogUtil.Time($"SavesLoadersService.WriteToFiles");
+        using var _ = log.Time($"SavesLoadersService.WriteToFiles");
 
         List<Task> tasks = [];
 
@@ -139,7 +140,7 @@ public class SavesLoadersService(
 
         UpdateGlobalsWithSave(Loaders, SavePaths, save, path, evolves);
 
-        Console.WriteLine($"Writed save {save.Id} to {path}");
+        log.LogInformation($"Writed save {save.Id} to {path}");
     }
 
     public void Clear()
@@ -161,7 +162,7 @@ public class SavesLoadersService(
 
         var memoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
-        Console.WriteLine($"(timed check done - memory used: {memoryUsedMB} MB)");
+        log.LogDebug($"(timed check done - memory used: {memoryUsedMB} MB)");
     }
 
     private async Task<(
@@ -189,7 +190,7 @@ public class SavesLoadersService(
         IDictionary<uint, HashSet<string>> savePaths,
         string path, StaticEvolvesData evolves)
     {
-        // Console.WriteLine($"UPDATE SAVE {path}");
+        // log.LogInformation($"UPDATE SAVE {path}");
 
         try
         {
@@ -212,7 +213,7 @@ public class SavesLoadersService(
 
             UpdateGlobalsWithSave(loaders, savePaths, save, path, evolves);
 
-            Console.WriteLine($"Save {save.Id} {save.Id} {save.Id} - G{save.Generation} - Version {save.Version} - play-time {save.PlayTimeString}");
+            log.LogDebug($"Save {save.Id} {save.Id} {save.Id} - G{save.Generation} - Version {save.Version} - play-time {save.PlayTimeString}");
         }
         catch (Exception ex)
         {
@@ -236,7 +237,7 @@ public class SavesLoadersService(
         var language = settingsService.GetSettings().GetSafeLanguage();
 
         var boxLoader = new SaveBoxLoader(save, sp);
-        var pkmLoader = new SavePkmLoader(pkmConvertService, language, evolves, save);
+        var pkmLoader = new SavePkmLoader(log, pkmConvertService, language, evolves, save);
 
         loaders[save.Id] = new(save, boxLoader, pkmLoader);
     }

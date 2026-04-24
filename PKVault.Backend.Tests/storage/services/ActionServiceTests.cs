@@ -61,8 +61,10 @@ public class ActionServiceTests
 
         return new(
             sp: sp,
-            pkmUpdateService: new(legalityAnalysisService),
+            log: LoggerUtils.GetLogger<ActionService>(),
+            pkmUpdateService: new(LoggerUtils.GetLogger<PkmUpdateService>(), legalityAnalysisService),
             backupService: new(
+                log: LoggerUtils.GetLogger<BackupService>(),
                 sp: sp,
                 mockTimeProvider.Object,
                 fileIOService,

@@ -44,9 +44,9 @@ public abstract class EntityLoader<
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(E)} - GetAllEntities");
+        // using var _ = log.Time($"{typeof(E)} - GetAllEntities");
 
-        // Console.WriteLine($"{typeof(E).Name} - GetAllEntities - ContextId={db.ContextId}");
+        // log.LogInformation($"{typeof(E).Name} - GetAllEntities - ContextId={db.ContextId}");
         return await dbSet
             .AsNoTracking()
             .ToDictionaryAsync(e => e.Id);
@@ -56,7 +56,7 @@ public abstract class EntityLoader<
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(E)} - GetEntitiesByIds");
+        // using var _ = log.Time($"{typeof(E)} - GetEntitiesByIds");
 
         var found = await dbSet
             .Where(p => ids.Contains(p.Id))
@@ -82,7 +82,7 @@ public abstract class EntityLoader<
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(E)} - GetEntity");
+        // using var _ = log.Time($"{typeof(E)} - GetEntity");
 
         return await dbSet.FindAsync(id);
     }
@@ -91,26 +91,26 @@ public abstract class EntityLoader<
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(E)} - DeleteEntity");
+        // using var _ = log.Time($"{typeof(E)} - DeleteEntity");
 
         dbSet.Remove(entity);
 
         // required to remove entity from future queries
         await db.SaveChangesAsync();
 
-        // Console.WriteLine($"Deleted {typeof(E)} id={entity.Id}");
+        // log.LogInformation($"Deleted {typeof(E)} id={entity.Id}");
     }
 
     public virtual async Task<E> AddEntity(E entity)
     {
-        // Console.WriteLine($"{entity.GetType().Name} - Add id={entity.Id} - ContextId={db.ContextId}");
+        // log.LogInformation($"{entity.GetType().Name} - Add id={entity.Id} - ContextId={db.ContextId}");
 
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(E)} - AddEntity");
+        // using var _ = log.Time($"{typeof(E)} - AddEntity");
 
         await dbSet.AddAsync(entity);
-        // Console.WriteLine($"Context={db.ContextId}");
+        // log.LogInformation($"Context={db.ContextId}");
         await db.SaveChangesAsync();
 
         return entity;
@@ -123,11 +123,11 @@ public abstract class EntityLoader<
             return entities;
         }
 
-        // Console.WriteLine($"{typeof(E).Name} - Add multiple ({entities.Count()}) - ContextId={db.ContextId}");
+        // log.LogInformation($"{typeof(E).Name} - Add multiple ({entities.Count()}) - ContextId={db.ContextId}");
 
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(E)} - AddEntities");
+        // using var _ = log.Time($"{typeof(E)} - AddEntities");
 
         await dbSet.AddRangeAsync(entities);
         await db.SaveChangesAsync();
@@ -137,14 +137,14 @@ public abstract class EntityLoader<
 
     public virtual async Task UpdateEntity(E entity)
     {
-        // Console.WriteLine($"{entity.GetType().Name} - Update id={entity.Id} - ContextId={db.ContextId}");
+        // log.LogInformation($"{entity.GetType().Name} - Update id={entity.Id} - ContextId={db.ContextId}");
 
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(E)} - UpdateEntity");
+        // using var _ = log.Time($"{typeof(E)} - UpdateEntity");
 
         dbSet.Update(entity);
-        // Console.WriteLine($"Context={db.ContextId}");
+        // log.LogInformation($"Context={db.ContextId}");
         await db.SaveChangesAsync();
     }
 
@@ -155,11 +155,11 @@ public abstract class EntityLoader<
     //         return;
     //     }
 
-    //     Console.WriteLine($"{typeof(E).Name} - Update multiple ({entities.Length}) - ContextId={db.ContextId}");
+    //     log.LogInformation($"{typeof(E).Name} - Update multiple ({entities.Length}) - ContextId={db.ContextId}");
 
     //     var dbSet = await GetDbSet();
 
-    //     // using var _ = LogUtil.Time($"{typeof(E)} - UpdateEntities");
+    //     // using var _ = log.Time($"{typeof(E)} - UpdateEntities");
 
     //     dbSet.UpdateRange(entities);
 
@@ -173,7 +173,7 @@ public abstract class EntityLoader<
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(E)} - Any");
+        // using var _ = log.Time($"{typeof(E)} - Any");
 
         return await dbSet.AnyAsync();
     }
@@ -182,7 +182,7 @@ public abstract class EntityLoader<
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(E)} - First");
+        // using var _ = log.Time($"{typeof(E)} - First");
 
         return await dbSet.FirstOrDefaultAsync();
     }
@@ -191,7 +191,7 @@ public abstract class EntityLoader<
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(E)} - Count");
+        // using var _ = log.Time($"{typeof(E)} - Count");
 
         return await dbSet.CountAsync();
     }

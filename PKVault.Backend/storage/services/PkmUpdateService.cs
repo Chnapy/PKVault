@@ -5,7 +5,7 @@ using PKHeX.Core;
  * Pass (copy) properties from a PKM to another one.
  * Apply properties to a PKM.
  */
-public class PkmUpdateService(ILegalityAnalysisService legalityAnalysisService)
+public class PkmUpdateService(ILogger<PkmUpdateService> log, ILegalityAnalysisService legalityAnalysisService)
 {
     public void ApplyNicknameToPkm(PKM pkm, string nickname, bool sourcePkmIsNicknamed)
     {
@@ -19,7 +19,7 @@ public class PkmUpdateService(ILegalityAnalysisService legalityAnalysisService)
         var defaultNickname = SpeciesName.GetSpeciesNameGeneration(pkm.Species, language, pkm.Format);
         if (defaultNickname.Length == 0)
         {
-            Console.WriteLine($"defaultNickname EMPTY for SPECIES={pkm.Species} LANG={language} FORMAT={pkm.Format} NICKNAME={nickname}");
+            log.LogWarning($"defaultNickname EMPTY for SPECIES={pkm.Species} LANG={language} FORMAT={pkm.Format} NICKNAME={nickname}");
         }
 
         if (nickname.Trim().Length == 0)
@@ -37,7 +37,7 @@ public class PkmUpdateService(ILegalityAnalysisService legalityAnalysisService)
 
         pkm.SetNickname(isNicknamed ? nickname : "");
 
-        // Console.WriteLine($"NICKNAME: {isNicknamed} {pkm.Nickname} expected={nickname} default={defaultNickname}");
+        // log.LogInformation($"NICKNAME: {isNicknamed} {pkm.Nickname} expected={nickname} default={defaultNickname}");
     }
 
     public void ApplyEVsAVsToPkm(PKM pkm, Span<int> evs)

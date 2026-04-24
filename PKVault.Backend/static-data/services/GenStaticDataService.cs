@@ -3,21 +3,21 @@
  * 
  * Generates all static data and spritesheets.
  */
-public class GenStaticDataService(PokeApiService pokeApiService, IFileIOService fileIOService)
+public class GenStaticDataService(ILogger<GenStaticDataService> log, PokeApiService pokeApiService, IFileIOService fileIOService)
 {
     public async Task GenerateFiles()
     {
-        using var _ = LogUtil.Time("-- Generate PokeApi static-data & spritesheets");
+        using var _ = log.Time("-- Generate PokeApi static-data & spritesheets");
 
-        var evolves = new GenStaticEvolves(pokeApiService, fileIOService).GenerateFiles();
+        var evolves = new GenStaticEvolves(log, pokeApiService, fileIOService).GenerateFiles();
 
         var species = Task.WhenAll(SettingsService.AllowedLanguages.Select(lang =>
-            new GenStaticSpecies(lang, pokeApiService, fileIOService).GenerateFiles()));
+            new GenStaticSpecies(log, lang, pokeApiService, fileIOService).GenerateFiles()));
 
         var others = Task.WhenAll(SettingsService.AllowedLanguages.Select(lang =>
-            new GenStaticOthers(lang, pokeApiService, fileIOService).GenerateFiles()));
+            new GenStaticOthers(log, lang, pokeApiService, fileIOService).GenerateFiles()));
 
-        var spritesheets = new GenStaticSpritesheets(fileIOService,
+        var spritesheets = new GenStaticSpritesheets(log, fileIOService,
             (await species)[0],
             [.. (await others)[0].Items.Items.Values]
         ).GenerateFiles();

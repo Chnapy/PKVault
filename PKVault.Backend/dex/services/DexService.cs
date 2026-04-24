@@ -4,7 +4,7 @@ using PKHeX.Core;
  * Gives Pokedex data for PKVault and saves.
  */
 public class DexService(
-    IServiceProvider sp,
+    IServiceProvider sp, ILogger<DexService> log,
     StaticDataService staticDataService, ISavesLoadersService savesLoadersService
 )
 {
@@ -36,7 +36,7 @@ public class DexService(
 
         var maxSpecies = saves.Max(save => save.MaxSpeciesID);
 
-        using var _ = LogUtil.Time($"Update Dex with {saves.Count} saves (max-species={maxSpecies})");
+        using var _ = log.Time($"Update Dex with {saves.Count} saves (max-species={maxSpecies})");
 
         Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex = [];
 
@@ -44,7 +44,7 @@ public class DexService(
         {
             var service = GetDexService(save);
 
-            // var time = LogUtil.Time($"Update Dex with save {save.ID32} {save.Version}");
+            // var time = log.Time($"Update Dex with save {save.ID32} {save.Version}");
             var success = service != null && (await service.UpdateDexWithSave(dex, staticSpecies, speciesSet));
             // time();
         }
@@ -54,9 +54,9 @@ public class DexService(
 
     public DexGenService? GetDexService(SaveWrapper save)
     {
-        static DexGenService? notHandled(SaveWrapper save)
+        DexGenService? notHandled(SaveWrapper save)
         {
-            Console.WriteLine("Save version/gen not handled: " + save.Version + "/" + save.Generation);
+            log.LogWarning("Save version/gen not handled: " + save.Version + "/" + save.Generation);
             return null;
         }
 

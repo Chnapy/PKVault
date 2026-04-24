@@ -107,9 +107,11 @@ public record StaticOthersData(
 );
 
 public class GenStaticOthers(
+    ILogger log,
     string lang,
     PokeApiService pokeApiService, IFileIOService fileIOService
     ) : StaticDataGenerator<StaticOthersData>(
+    log,
     jsonTypeInfo: StaticDataJsonContext.Default.StaticOthersData,
     jsonTypeInfoIndented: new StaticDataJsonContext(JsonIndentedOptions).StaticOthersData,
     fileIOService
@@ -159,7 +161,7 @@ public class GenStaticOthers(
 
     public async Task<Dictionary<byte, StaticVersion>> GetStaticVersions(string lang)
     {
-        using var _ = LogUtil.Time("static-data process versions");
+        using var _ = log.Time("static-data process versions");
         List<Task<StaticVersion>> tasks = [];
         var staticVersions = new Dictionary<int, StaticVersion>();
 
@@ -202,7 +204,7 @@ public class GenStaticOthers(
 
     public async Task<Dictionary<int, StaticStat>> GetStaticStats(string lang)
     {
-        using var _ = LogUtil.Time("static-data process stats");
+        using var _ = log.Time("static-data process stats");
         List<Task<StaticStat>> tasks = [];
 
         for (var i = 1; i <= 6; i++)
@@ -248,7 +250,7 @@ public class GenStaticOthers(
 
     public async Task<Dictionary<int, StaticMove>> GetStaticMoves(string lang)
     {
-        using var _ = LogUtil.Time($"static-data {lang} process moves");
+        using var _ = log.Time($"static-data {lang} process moves");
         var moveNames = GameInfo.GetStrings(lang).Move;
         List<Task<StaticMove>> tasks = [];
 
@@ -362,7 +364,7 @@ public class GenStaticOthers(
 
     public async Task<Dictionary<int, StaticNature>> GetStaticNatures(string lang)
     {
-        using var _ = LogUtil.Time($"static-data {lang} process natures");
+        using var _ = log.Time($"static-data {lang} process natures");
         var naturesNames = GameInfo.GetStrings(lang).Natures;
         List<Task<StaticNature>> tasks = [];
 
@@ -417,13 +419,13 @@ public class GenStaticOthers(
 
     public async Task<StaticItemsData> GetStaticItems(string lang)
     {
-        using var _ = LogUtil.Time($"static-data {lang} process items");
+        using var _ = log.Time($"static-data {lang} process items");
 
         List<StaticVersionsItems> VersionItems = [];
         Dictionary<string, StaticItem> Items = [];
 
         // var notFound = new List<string>();
-        // Console.WriteLine(string.Join('\n', GameInfo.Strings.itemlist.ToList().FindAll(item => item.ToLower().Contains("ball"))));
+        // log.LogInformation(string.Join('\n', GameInfo.Strings.itemlist.ToList().FindAll(item => item.ToLower().Contains("ball"))));
 
         List<ComboItem> getItemStrings(GameVersion _version, GameStrings strings)
         {
@@ -508,11 +510,11 @@ public class GenStaticOthers(
 
                 // if (itemObj == null)
                 // {
-                //     Console.WriteLine($"Item not found: {itemId} - {itemNamePokeapi}");
+                //     log.LogInformation($"Item not found: {itemId} - {itemNamePokeapi}");
                 // }
 
                 // if (itemNameEn.ToLower().Contains("belt"))
-                // Console.WriteLine($"Error with item {itemId} - {itemNameEn} / {PokeApiFileClient.PokeApiNameFromPKHexName(itemNameEn)} / {itemName}");
+                // log.LogInformation($"Error with item {itemId} - {itemNameEn} / {PokeApiFileClient.PokeApiNameFromPKHexName(itemNameEn)} / {itemName}");
 
                 Items[itemEn.Text] = new StaticItem(
                     Id: itemEn.Text,

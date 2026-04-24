@@ -30,6 +30,7 @@ public class SavePkmLoaderTests : IAsyncLifetime
     private SavePkmLoader CreateLoader()
     {
         return new SavePkmLoader(
+            LoggerUtils.GetLogger(),
             mockConvertService.Object,
             language: "en", evolves,
             mockSave

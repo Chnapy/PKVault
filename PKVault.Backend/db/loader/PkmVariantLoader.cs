@@ -114,7 +114,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntity");
+        // using var _ = log.Time($"{typeof(PkmVariantEntity)} - GetEntity");
 
         return await dbSet
             .Include(p => p.PkmFile)
@@ -125,7 +125,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetAllEntities");
+        // using var _ = log.Time($"{typeof(PkmVariantEntity)} - GetAllEntities");
 
         return await dbSet
             .Include(p => p.PkmFile)
@@ -136,7 +136,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesByIds");
+        // using var _ = log.Time($"{typeof(PkmVariantEntity)} - GetEntitiesByIds");
 
         var found = await dbSet
             .Where(p => ids.Contains(p.Id))
@@ -162,7 +162,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesByBox");
+        // using var _ = log.Time($"{typeof(PkmVariantEntity)} - GetEntitiesByBox");
 
         return await dbSet.Where(p => p.BoxId == boxId)
             .Include(p => p.PkmFile)
@@ -182,7 +182,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesByBox + Slot");
+        // using var _ = log.Time($"{typeof(PkmVariantEntity)} - GetEntitiesByBox + Slot");
 
         return await dbSet.Where(p => p.BoxId == boxId && p.BoxSlot == boxSlot)
             .Include(p => p.PkmFile)
@@ -193,7 +193,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesBySave");
+        // using var _ = log.Time($"{typeof(PkmVariantEntity)} - GetEntitiesBySave");
 
         return await dbSet.Where(p => p.AttachedSaveId == saveId)
             .Include(p => p.PkmFile)
@@ -204,7 +204,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntityBySave");
+        // using var _ = log.Time($"{typeof(PkmVariantEntity)} - GetEntityBySave");
 
         return await dbSet.Where(p => p.AttachedSaveId == saveId && p.AttachedSavePkmIdBase == savePkmIdBase)
             .Include(p => p.PkmFile)
@@ -215,7 +215,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesAttachedGroupedBySave");
+        // using var _ = log.Time($"{typeof(PkmVariantEntity)} - GetEntitiesAttachedGroupedBySave");
 
         return await dbSet.Where(p => p.AttachedSaveId != null)
             .Include(p => p.PkmFile)
@@ -227,7 +227,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - GetEntitiesAttached");
+        // using var _ = log.Time($"{typeof(PkmVariantEntity)} - GetEntitiesAttached");
 
         return await dbSet.Where(p => p.AttachedSaveId != null)
             .Include(p => p.PkmFile)
@@ -267,7 +267,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - HasEntityByForm");
+        // using var _ = log.Time($"{typeof(PkmVariantEntity)} - HasEntityByForm");
 
         return await dbSet
             .AnyAsync(p => p.Species == species && p.Form == form && p.Gender == gender);
@@ -277,7 +277,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         var dbSet = await GetDbSet();
 
-        // using var _ = LogUtil.Time($"{typeof(PkmVariantEntity)} - HasEntityByFormShiny");
+        // using var _ = log.Time($"{typeof(PkmVariantEntity)} - HasEntityByFormShiny");
 
         return await dbSet
             .AnyAsync(p => p.Species == species && p.Form == form && p.Gender == gender && p.IsShiny);

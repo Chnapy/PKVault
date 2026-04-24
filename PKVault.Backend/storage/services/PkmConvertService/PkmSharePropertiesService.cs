@@ -9,7 +9,7 @@ public interface IPkmSharePropertiesService
  * Share properties from a PKM source to a PKM target,
  * handling all convert requirements and contexts differences.
  */
-public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILegalityAnalysisService legalityAnalysisService) : IPkmSharePropertiesService
+public class PkmSharePropertiesService(ILogger<PkmSharePropertiesService> log, IPkmConvertService pkmConvertService, ILegalityAnalysisService legalityAnalysisService) : IPkmSharePropertiesService
 {
     private readonly PKMConverterUtils utils = new(legalityAnalysisService);
 
@@ -17,7 +17,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILe
     {
         var sourcePkm = source.GetMutablePkm();
 
-        Console.WriteLine($"Convert existing {sourcePkm.GetType().Name} -> {targetPkm.GetType().Name}");
+        log.LogDebug($"Convert existing {sourcePkm.GetType().Name} -> {targetPkm.GetType().Name}");
 
         if (targetPkm.Species == 0)
         {

@@ -76,6 +76,7 @@ public class BackupServiceTests
 
         BackupService backupService = new(
             sp: sp,
+            log: LoggerUtils.GetLogger<BackupService>(),
             timeProvider: mockTimeProvider.Object,
             fileIOService: fileIOService,
             savesLoadersService: mockSaveService.Object,

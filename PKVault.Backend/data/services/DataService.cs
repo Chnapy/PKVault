@@ -2,6 +2,7 @@
  * Data response after action, providing only data mutated.
  */
 public class DataService(
+    ILogger<DataService> log,
     ISessionService sessionService, StorageQueryService storageQueryService, StaticDataService staticDataService,
     WarningsService warningsService, DexService dexService, ISavesLoadersService savesLoadersService,
     BackupService backupService, ISettingsService settingsService
@@ -9,7 +10,7 @@ public class DataService(
 {
     public async Task<DataDTO> CreateDataFromUpdateFlags(DataUpdateFlags flags)
     {
-        using var _ = LogUtil.Time("Prepare global data payload");
+        using var _ = log.Time("Prepare global data payload");
 
         var staticDataTask = GetPossibleStaticData(flags.StaticData);
 
@@ -43,47 +44,47 @@ public class DataService(
             ? backupService.GetBackupList()
             : null;
 
-        // using (var w = LogUtil.Time("warningsTask"))
+        // using (var w = log.Time("warningsTask"))
         // {
         //     await warningsTask;
         // }
 
-        // using (var w = LogUtil.Time("staticDataTask"))
+        // using (var w = log.Time("staticDataTask"))
         // {
         //     await staticDataTask;
         // }
 
-        // using (var w = LogUtil.Time("mainBanksTask"))
+        // using (var w = log.Time("mainBanksTask"))
         // {
         //     await mainBanksTask;
         // }
 
-        // using (var w = LogUtil.Time("mainBoxesTask"))
+        // using (var w = log.Time("mainBoxesTask"))
         // {
         //     await mainBoxesTask;
         // }
 
-        // using (var w = LogUtil.Time("mainPkmVariantsTask"))
+        // using (var w = log.Time("mainPkmVariantsTask"))
         // {
         //     await mainPkmVariantsTask;
         // }
 
-        // using (var w = LogUtil.Time("mainPkmLegalitiesTask"))
+        // using (var w = log.Time("mainPkmLegalitiesTask"))
         // {
         //     await mainPkmLegalitiesTask;
         // }
 
-        // using (var w = LogUtil.Time("savesTask"))
+        // using (var w = log.Time("savesTask"))
         // {
         //     await savesTask;
         // }
 
-        // using (var w = LogUtil.Time("saveInfosTask"))
+        // using (var w = log.Time("saveInfosTask"))
         // {
         //     await saveInfosTask;
         // }
 
-        // using (var w = LogUtil.Time("dexTask"))
+        // using (var w = log.Time("dexTask"))
         // {
         //     await dexTask;
         // }
@@ -104,11 +105,11 @@ public class DataService(
             Dex: await dexTask
         );
 
-        // time = LogUtil.Time("Response serialization");
+        // time = log.Time("Response serialization");
         // var json = System.Text.Json.JsonSerializer.Serialize(dto);
         // time();
 
-        // Console.WriteLine($"Response counts, MainBoxes={dto.MainBoxes?.Count} MainPkms={dto.MainPkms?.Count} MainPkmVariants={dto.MainPkmVariants?.Count} Dex={dto.Dex?.Count}");
+        // log.LogInformation($"Response counts, MainBoxes={dto.MainBoxes?.Count} MainPkms={dto.MainPkms?.Count} MainPkmVariants={dto.MainPkmVariants?.Count} Dex={dto.Dex?.Count}");
 
         return dto;
     }

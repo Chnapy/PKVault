@@ -25,9 +25,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllPaths];
 
         sessionService = new();
-        dbSeedingService = new(fileIOService);
+        dbSeedingService = new(LoggerUtils.GetLogger<DbSeedingService>(), fileIOService);
 
-        _db = new(sessionService.Object, dbSeedingService.Object);
+        _db = new(LoggerUtils.GetLogger<SessionDbContext>(), sessionService.Object, dbSeedingService.Object);
 
         mockSettings = new();
         mockSettings.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
@@ -38,11 +38,11 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             )
         ));
 
-        staticDataService = new(mockSettings.Object);
+        staticDataService = new(LoggerUtils.GetLogger<StaticDataService>(), mockSettings.Object);
 
         sessionService.Setup(s => s.SessionDbPath).Returns(dbPath);
 
-        pkmFileLoader = new PkmFileLoader(fileIOService, sessionService.Object, mockSettings.Object, _db);
+        pkmFileLoader = new PkmFileLoader(LoggerUtils.GetLogger<PkmFileLoader>(), fileIOService, sessionService.Object, mockSettings.Object, _db);
     }
 
     public async ValueTask DisposeAsync()

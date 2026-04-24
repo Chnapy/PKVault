@@ -246,7 +246,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         }
         pkm.FixMoves();
 
-        // Console.WriteLine($"MOVES = {pkm.Move1}/{pkm.Move2}/{pkm.Move3}/{pkm.Move4}");
+        // log.LogInformation($"MOVES = {pkm.Move1}/{pkm.Move2}/{pkm.Move3}/{pkm.Move4}");
 
         var legality = legalityAnalysisService.GetLegalitySafe(new(pkm));
         if (legality.la == null || legality.MovesValid.All(r => r))

@@ -6,6 +6,7 @@ using System.Text.Json;
  * Backups creation, restore, remove and listing.
  */
 public class BackupService(
+    ILogger<BackupService> log,
     IServiceProvider sp, TimeProvider timeProvider,
     IFileIOService fileIOService, ISavesLoadersService savesLoadersService,
     ISettingsService settingsService, ISessionService sessionService
@@ -15,21 +16,21 @@ public class BackupService(
 
     public async Task<DateTime> CreateBackup(string name)
     {
-        using var _ = LogUtil.Time("Create backup");
+        using var _ = log.Time("Create backup");
 
         var startTime = timeProvider.GetUtcNow().DateTime;
 
-        var steptime = LogUtil.Time($"Create backup - DB");
+        var steptime = log.Time($"Create backup - DB");
         var dbPaths = await CreateDbBackup();
-        steptime.Stop();
+        steptime.Dispose();
 
-        steptime = LogUtil.Time($"Create backup - Saves");
+        steptime = log.Time($"Create backup - Saves");
         var savesPaths = await CreateSavesBackup();
-        steptime.Stop();
+        steptime.Dispose();
 
-        steptime = LogUtil.Time($"Create backup - Storage");
+        steptime = log.Time($"Create backup - Storage");
         var mainPaths = await CreateMainBackup();
-        steptime.Stop();
+        steptime.Dispose();
 
         var files = new Dictionary<string, (string TargetPath, byte[] FileContent)>()
             .Concat(dbPaths)
@@ -44,7 +45,7 @@ public class BackupService(
             FileContent: JsonSerializer.SerializeToUtf8Bytes(paths, EntityJsonContext.Default.DictionaryStringString)
         ));
 
-        steptime = LogUtil.Time($"Create backup - Compress");
+        steptime = log.Time($"Create backup - Compress");
         using (var memoryStream = new MemoryStream())
         {
             using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
@@ -63,9 +64,9 @@ public class BackupService(
             var bkpZipPath = Path.Combine(bkpPath, fileName);
 
             await fileIOService.WriteBytes(bkpZipPath, memoryStream.ToArray());
-            Console.WriteLine($"Write backup to {bkpZipPath}");
+            log.LogInformation($"Write backup to {bkpZipPath}");
         }
-        steptime.Stop();
+        steptime.Dispose();
 
         return startTime;
     }
@@ -234,7 +235,7 @@ public class BackupService(
         }
         catch (Exception err)
         {
-            Console.WriteLine(err);
+            log.LogError(err, null);
 
             return null;
         }
@@ -296,12 +297,12 @@ public class BackupService(
 
     public async Task RestoreBackup(DateTime createdAt, bool withSafeBackup)
     {
-        Console.WriteLine($"Backup restore {createdAt}");
+        log.LogInformation($"Backup restore {createdAt}");
 
         var backup = GetBackup(createdAt)
             ?? throw new Exception($"Backup file does not exist: *{GetBackupFilenameSuffix(createdAt)}");
 
-        var logtime = LogUtil.Time("Backup restore");
+        var logtime = log.Time("Backup restore");
 
         using var archive = fileIOService.ReadZip(backup.Filepath);
 
@@ -334,7 +335,7 @@ public class BackupService(
         DataNormalizeAction.GetLegacyFilepaths(dbPath)
             .ForEach(filepath => fileIOService.Delete(filepath));
 
-        var time = LogUtil.Time($"Extracting {archive.Entries.Count} files");
+        var time = log.Time($"Extracting {archive.Entries.Count} files");
 
         foreach (var entry in archive.Entries)
         {
@@ -343,7 +344,7 @@ public class BackupService(
                 || paths.TryGetValue(entry.FullName.Replace('/', '\\'), out path)
             )
             {
-                // Console.WriteLine($"Extract {entry.FullName} to {path}");
+                // log.LogInformation($"Extract {entry.FullName} to {path}");
 
                 entry.ExtractToFile(path, true);
             }
@@ -351,7 +352,7 @@ public class BackupService(
 
         time.Dispose();
 
-        logtime.Stop();
+        logtime.Dispose();
 
         savesLoadersService.Clear();
         await sessionService.StartNewSession(checkInitialActions: true);
@@ -363,11 +364,11 @@ public class BackupService(
 
         try
         {
-            var logtime = LogUtil.Time("Action run with backup fallback");
+            var logtime = log.Time("Action run with backup fallback");
 
             await action();
 
-            logtime.Stop();
+            logtime.Dispose();
 
             savesLoadersService.Clear();
             await sessionService.StartNewSession(checkInitialActions: false);

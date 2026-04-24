@@ -87,7 +87,7 @@ public class MovePkmAction(
             }
         }
 
-        // Console.WriteLine($"ENTRIES [{moveDirection}]:\n{string.Join('\n', entries.Select(e => e.Item1 + "_" + e.Item2 + "_" + e.Item3))}");
+        // log.LogInformation($"ENTRIES [{moveDirection}]:\n{string.Join('\n', entries.Select(e => e.Item1 + "_" + e.Item2 + "_" + e.Item3))}");
 
         List<DataActionPayload> payloads = [];
         for (var i = 0; i < entries.Count; i++)
