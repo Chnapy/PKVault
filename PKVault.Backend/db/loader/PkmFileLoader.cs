@@ -204,7 +204,7 @@ public class PkmFileLoader : IPkmFileLoader
 
     public byte[] GetPKMBytes(ImmutablePKM pkm)
     {
-        return [.. pkm.DecryptedPartyData];
+        return pkm.GetDecryptedDataParty();
     }
 
     private PKM GetPlaceholderPKM()

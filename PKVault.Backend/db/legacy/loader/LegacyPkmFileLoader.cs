@@ -13,7 +13,7 @@ public class LegacyPkmFileLoader : ILegacyPkmFileLoader
 {
     private static byte[] GetPKMBytes(ImmutablePKM pkm)
     {
-        return [.. pkm.DecryptedPartyData];
+        return pkm.GetDecryptedDataParty();
     }
 
     private static string GetPKMFilename(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves)

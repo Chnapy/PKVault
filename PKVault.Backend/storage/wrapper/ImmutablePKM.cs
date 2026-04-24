@@ -36,10 +36,12 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
 
     // public ReadOnlySpan<byte> Data => Pkm.Data;
 
-    public byte[] EncryptedPartyData => Pkm.EncryptedPartyData;
-    public byte[] EncryptedBoxData => Pkm.EncryptedBoxData;
-    public byte[] DecryptedPartyData => Pkm.DecryptedPartyData;
-    public byte[] DecryptedBoxData => Pkm.DecryptedBoxData;
+    public byte[] GetDecryptedDataParty()
+    {
+        Span<byte> data = stackalloc byte[Pkm.SIZE_PARTY];
+        Pkm.WriteDecryptedDataParty(data);
+        return data.ToArray();
+    }
 
     // Trash Bytes
     // public ReadOnlySpan<byte> NicknameTrash => Pkm.NicknameTrash;
