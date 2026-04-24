@@ -25,6 +25,7 @@ public class LogUtil
             // .Enrich.WithThreadName()
             .WriteTo.Console(
                 restrictedToMinimumLevel: LogEventLevel.Verbose
+                // theme: AnsiConsoleTheme.Code
                 // outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
             )
             .WriteTo.File(logFilepath,
@@ -54,7 +55,8 @@ public static class LoggerExtension
             log: (logLevel, message, args) => logger.Write((LogEventLevel)logLevel, message, args),
             messageTemplate, 
             args, 
-            LogLevel.Information
+            LogLevel.Information,
+            TimeSpan.FromMilliseconds(150)
         ).Begin();
     }
     
@@ -65,7 +67,8 @@ public static class LoggerExtension
             log: (logLevel, message, args) => logger.Log(logLevel, message, args),
             messageTemplate, 
             args, 
-            LogLevel.Information
+            LogLevel.Information,
+            TimeSpan.FromMilliseconds(150)
         ).Begin();
     }
 }
@@ -73,11 +76,11 @@ public static class LoggerExtension
 public class Operation(
     Action<LogLevel, string, object[]> log,
      string messageTemplate, object[] args,
-    LogLevel completionLevel, TimeSpan? warningThreshold = null
+    LogLevel completionLevel, TimeSpan warningThreshold
 ) : IDisposable
 {
     private static readonly string stopwatchEmoji = char.ConvertFromUtf32(0x23F1) + char.ConvertFromUtf32(0xFE0F) + " ";
-    public static string GetBeginMessage(string messageTemplate) => $"{stopwatchEmoji} {messageTemplate} {{{"started"}}}";
+    public static string GetBeginMessage(string messageTemplate) => $"{stopwatchEmoji} {messageTemplate} {{started}}";
     public static string GetEndMessage(string messageTemplate) => $"{stopwatchEmoji} {messageTemplate}";
 
     public enum Properties
@@ -121,7 +124,7 @@ public class Operation(
         log(
             completionLevel,
             GetBeginMessage(messageTemplate), 
-            args
+            [..args, "started"]
         );
         return this;
     }
@@ -150,7 +153,7 @@ public class Operation(
 
         var elapsed = Elapsed.TotalMilliseconds;
 
-        level = elapsed > warningThreshold?.TotalMilliseconds && level < LogLevel.Warning
+        level = elapsed > warningThreshold.TotalMilliseconds && level < LogLevel.Warning
             ? LogLevel.Warning
             : level;
 

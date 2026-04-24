@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging.Testing;
 using Moq;
 using PKHeX.Core;
 
@@ -31,7 +30,7 @@ public class SavePkmLoaderTests : IAsyncLifetime
     private SavePkmLoader CreateLoader()
     {
         return new SavePkmLoader(
-            new FakeLogger(),
+            LoggerUtils.GetLogger(),
             mockConvertService.Object,
             language: "en", evolves,
             mockSave

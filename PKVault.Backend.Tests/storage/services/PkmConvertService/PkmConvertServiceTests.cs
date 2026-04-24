@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Microsoft.Extensions.Logging.Testing;
 using Moq;
 using PKHeX.Core;
 
@@ -41,7 +40,7 @@ public class PkmConvertServiceTests
             )
         ));
 
-        return new(new FakeLogger<PkmConvertService>(), mockSettingsService.Object, new LegalityAnalysisService(mockSettingsService.Object));
+        return new(LoggerUtils.GetLogger<PkmConvertService>(), mockSettingsService.Object, new LegalityAnalysisService(mockSettingsService.Object));
     }
 
     private void SetupPKDirectory(string folderName)
