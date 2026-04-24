@@ -172,7 +172,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             PkmFile = new PkmFileEntity()
             {
                 Filepath = filepath,
-                Data = [.. pkm.DecryptedPartyData],
+                Data = pkm.GetDecryptedDataParty(),
                 Error = null,
                 Updated = true,
                 Deleted = false
@@ -228,7 +228,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             .AddAsync(new()
             {
                 Filepath = filepath,
-                Data = [.. pkm.DecryptedPartyData],
+                Data = [.. pkm.GetDecryptedDataParty()],
                 Error = null,
                 Updated = false,
                 Deleted = false
@@ -326,7 +326,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Filepath = filepath1,
-                    Data = [.. pkm1.DecryptedPartyData],
+                    Data = [.. pkm1.GetDecryptedDataParty()],
                     Error = null,
                     Updated = false,
                     Deleted = false
@@ -334,7 +334,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Filepath = filepath2,
-                    Data = [.. pkm2.DecryptedPartyData],
+                    Data = [.. pkm2.GetDecryptedDataParty()],
                     Error = null,
                     Updated = false,
                     Deleted = false
@@ -342,7 +342,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Filepath = filepath3,
-                    Data = [.. pkm3.DecryptedPartyData],
+                    Data = [.. pkm3.GetDecryptedDataParty()],
                     Error = null,
                     Updated = false,
                     Deleted = false
@@ -483,7 +483,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Filepath = filepath1,
-                    Data = [.. pkm1.DecryptedPartyData],
+                    Data = [.. pkm1.GetDecryptedDataParty()],
                     Error = null,
                     Updated = false,
                     Deleted = false
@@ -491,7 +491,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Filepath = filepath2,
-                    Data = [.. pkm2.DecryptedPartyData],
+                    Data = [.. pkm2.GetDecryptedDataParty()],
                     Error = null,
                     Updated = false,
                     Deleted = false
@@ -575,7 +575,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var idBase = pkm.GetPKMIdBase(evolves);
         var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
 
-        mockFileSystem.AddFile(Path.Combine(PathUtils.GetExpectedAppDirectory(), $"app", filepath), new MockFileData(pkm.DecryptedPartyData));
+        mockFileSystem.AddFile(Path.Combine(PathUtils.GetExpectedAppDirectory(), $"app", filepath), new MockFileData(pkm.GetDecryptedDataParty()));
 
         var entity = new PkmVariantEntity()
         {
@@ -599,7 +599,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             PkmFile = new()
             {
                 Filepath = filepath,
-                Data = [.. pkm.DecryptedPartyData],
+                Data = [.. pkm.GetDecryptedDataParty()],
                 Error = null,
                 Updated = false,
                 Deleted = false
@@ -656,7 +656,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             PkmFile = new()
             {
                 Filepath = filepath,
-                Data = [.. pkm.DecryptedPartyData],
+                Data = [.. pkm.GetDecryptedDataParty()],
                 Error = null,
                 Updated = false,
                 Deleted = false
@@ -782,7 +782,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Filepath = filepath1,
-                    Data = [.. pkm1.DecryptedPartyData],
+                    Data = [.. pkm1.GetDecryptedDataParty()],
                     Error = null,
                     Updated = false,
                     Deleted = false
@@ -790,7 +790,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Filepath = filepath2,
-                    Data = [.. pkm2.DecryptedPartyData],
+                    Data = [.. pkm2.GetDecryptedDataParty()],
                     Error = null,
                     Updated = false,
                     Deleted = false
@@ -798,7 +798,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Filepath = filepath3,
-                    Data = [.. pkm3.DecryptedPartyData],
+                    Data = [.. pkm3.GetDecryptedDataParty()],
                     Error = null,
                     Updated = false,
                     Deleted = false
