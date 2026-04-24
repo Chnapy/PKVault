@@ -212,6 +212,16 @@ public class BackupService(
 
         result.Sort((a, b) => a.CreatedAt > b.CreatedAt ? -1 : 1);
 
+        var fileCountLimit = EnvUtil.BACKUP_FILE_COUNT_LIMIT ?? 0;
+        if (fileCountLimit > 0 && result.Count > fileCountLimit)
+        {
+            foreach(var bkp in result.Skip(fileCountLimit))
+            {
+                DeleteBackup(bkp.Filepath);
+            }
+            result = [.. result.Take(fileCountLimit)];
+        }
+
         return result;
     }
 
@@ -241,27 +251,29 @@ public class BackupService(
         }
     }
 
-    private BackupDTO? GetBackup(DateTime createdAt)
+    private BackupDTO GetBackup(DateTime createdAt)
     {
         var bkpPath = GetBackupsPath();
         var glob = Path.Combine(bkpPath, $"*{GetBackupFilenameSuffix(createdAt)}");
         var searchPaths = fileIOService.Matcher.SearchPaths([glob]);
 
         var backups = searchPaths
-            .Select(GetBackup);
+            .Select(GetBackup)
+            .Where(bkp => bkp != null);
 
         if (backups.Count() > 1)
         {
             throw new Exception($"Multiple backup files found with filename ending with {GetBackupFilenameSuffix(createdAt)}");
         }
 
-        return backups.FirstOrDefault();
+        var bkp = backups.FirstOrDefault();
+        ArgumentNullException.ThrowIfNull(bkp, $"Backup not found for glob={glob}");
+        return bkp;
     }
 
     public void EditBackup(DateTime createdAt, string newName)
     {
         var backup = GetBackup(createdAt);
-        ArgumentNullException.ThrowIfNull(backup);
 
         if (backup.Name == newName)
         {
@@ -290,7 +302,14 @@ public class BackupService(
     public void DeleteBackup(DateTime createdAt)
     {
         var backup = GetBackup(createdAt);
-        ArgumentNullException.ThrowIfNull(backup);
+
+        DeleteBackup(backup.Filepath);
+    }
+
+    public void DeleteBackup(string path)
+    {
+        var backup = GetBackup(path);
+        ArgumentNullException.ThrowIfNull(backup, $"Backup not found for path={path}");
 
         fileIOService.Delete(backup.Filepath);
     }
@@ -299,8 +318,7 @@ public class BackupService(
     {
         log.LogInformation($"Backup restore {createdAt}");
 
-        var backup = GetBackup(createdAt)
-            ?? throw new Exception($"Backup file does not exist: *{GetBackupFilenameSuffix(createdAt)}");
+        var backup = GetBackup(createdAt);
 
         var logtime = log.Time("Backup restore");
 

@@ -31,7 +31,7 @@ public class LogUtil
             .WriteTo.File(logFilepath,
                 rollingInterval: RollingInterval.Day,
                 rollOnFileSizeLimit: true,
-                retainedFileCountLimit: 10,
+                retainedFileCountLimit: EnvUtil.LOG_FILE_COUNT_LIMIT ?? 10,
                 fileSizeLimitBytes: 10_485_760, // 10MB
                 flushToDiskInterval: TimeSpan.FromSeconds(5)
                 // outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
