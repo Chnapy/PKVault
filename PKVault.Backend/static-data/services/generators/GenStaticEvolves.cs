@@ -97,8 +97,15 @@ public class GenStaticEvolves(
 
                         if (details.HeldItem == null)
                         {
+                            if (speciesEvolve.Trade.TryGetValue((byte)version, out var existing)
+                                && existing.EvolveSpecies == evolveSpecies
+                                && existing.MinLevel == (details.MinLevel ?? 1)
+                            )
+                            {
+                                continue;
+                            }
+
                             speciesEvolve.Trade.Add((byte)version, new(evolveSpecies, details.MinLevel ?? 1));
-                            // log.LogInformation($"EVOLVE TRADE {species}->{evolveSpecies} v={version}");
                         }
                         else
                         {

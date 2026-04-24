@@ -1,2 +1,169 @@
 --- This file displays changes of StaticEvolves compressed file from previous changes
 
+--- pokeapi\generated\diff-data\StaticEvolves.diff
++++ pokeapi\generated\diff-data\StaticEvolves.diff
+@@ -612,6 +612,10 @@
+           "evolveSpecies": 186,
+           "minLevel": 1
+         },
++        "53": {
++          "evolveSpecies": 186,
++          "minLevel": 1
++        },
+         "56": {
+           "evolveSpecies": 186,
+           "minLevel": 1
+@@ -1593,6 +1597,10 @@
+         "evolveSpecies": 76,
+         "minLevel": 1
+       },
++      "53": {
++        "evolveSpecies": 76,
++        "minLevel": 1
++      },
+       "54": {
+         "evolveSpecies": 76,
+         "minLevel": 1
+@@ -1914,6 +1922,10 @@
+           "evolveSpecies": 199,
+           "minLevel": 1
+         },
++        "53": {
++          "evolveSpecies": 199,
++          "minLevel": 1
++        },
+         "56": {
+           "evolveSpecies": 199,
+           "minLevel": 1
+@@ -2305,6 +2317,10 @@
+         "minLevel": 1
+       },
+       "52": {
++        "evolveSpecies": 94,
++        "minLevel": 1
++      },
++      "53": {
+         "evolveSpecies": 94,
+         "minLevel": 1
+       },
+@@ -2971,6 +2987,10 @@
+           "evolveSpecies": 464,
+           "minLevel": 1
+         },
++        "53": {
++          "evolveSpecies": 464,
++          "minLevel": 1
++        },
+         "64": {
+           "evolveSpecies": 464,
+           "minLevel": 1
+@@ -3234,6 +3254,10 @@
+           "minLevel": 1
+         },
+         "51": {
++          "evolveSpecies": 230,
++          "minLevel": 1
++        },
++        "53": {
+           "evolveSpecies": 230,
+           "minLevel": 1
+         },
+@@ -3573,6 +3597,10 @@
+           "evolveSpecies": 212,
+           "minLevel": 1
+         },
++        "53": {
++          "evolveSpecies": 212,
++          "minLevel": 1
++        },
+         "56": {
+           "evolveSpecies": 212,
+           "minLevel": 1
+@@ -3821,6 +3849,10 @@
+           "minLevel": 1
+         },
+         "51": {
++          "evolveSpecies": 466,
++          "minLevel": 1
++        },
++        "53": {
+           "evolveSpecies": 466,
+           "minLevel": 1
+         },
+@@ -4016,6 +4048,10 @@
+           "evolveSpecies": 467,
+           "minLevel": 1
+         },
++        "53": {
++          "evolveSpecies": 467,
++          "minLevel": 1
++        },
+         "64": {
+           "evolveSpecies": 467,
+           "minLevel": 1
+@@ -4314,6 +4350,10 @@
+           "minLevel": 1
+         },
+         "52": {
++          "evolveSpecies": 474,
++          "minLevel": 1
++        },
++        "53": {
+           "evolveSpecies": 474,
+           "minLevel": 1
+         },
+@@ -4536,6 +4576,10 @@
+           "minLevel": 1
+         },
+         "52": {
++          "evolveSpecies": 233,
++          "minLevel": 1
++        },
++        "53": {
+           "evolveSpecies": 233,
+           "minLevel": 1
+         },
+@@ -6319,6 +6363,10 @@
+           "evolveSpecies": 350,
+           "minLevel": 1
+         },
++        "53": {
++          "evolveSpecies": 350,
++          "minLevel": 1
++        },
+         "58": {
+           "evolveSpecies": 350,
+           "minLevel": 1
+@@ -6568,6 +6616,10 @@
+           "evolveSpecies": 477,
+           "minLevel": 1
+         },
++        "53": {
++          "evolveSpecies": 477,
++          "minLevel": 1
++        },
+         "64": {
+           "evolveSpecies": 477,
+           "minLevel": 1
+@@ -8242,6 +8294,10 @@
+         "minLevel": 1
+       },
+       "51": {
++        "evolveSpecies": 534,
++        "minLevel": 1
++      },
++      "53": {
+         "evolveSpecies": 534,
+         "minLevel": 1
+       },
+@@ -9937,6 +9993,10 @@
+         "minLevel": 1
+       },
+       "52": {
++        "evolveSpecies": 709,
++        "minLevel": 1
++      },
++      "53": {
+         "evolveSpecies": 709,
+         "minLevel": 1
+       },
