@@ -72,14 +72,29 @@ You can use a plug'n'play docker image, compatible `Linux x86_64` and `Linux ARM
 services:
   pkvault:
     image: ghcr.io/chnapy/pkvault:latest # or specific version, like 1.5.1
+    restart: unless-stopped
     ports:
       - "3000:3000"
+    environment:
+      - LOG_FILE_COUNT_LIMIT=10     # removes extra log files, default: 10
+      - BACKUP_FILE_COUNT_LIMIT=30  # removes extra backup files, default: no limit
     volumes:
-      - ./your-data:/pkvault
+      - ./path/to/pkvault/data:/pkvault
 
-      # you must add in app settings save paths: /pkvault/saves/
-      - ./your-saves:/pkvault/saves
+      # save paths sample
+      - ./path/to/saves:/data/saves
+      - ./path/to/other/saves:/data/other-saves
+      
+      # external-pkms path sample (optional)
+      - ./path/to/external-pkms:/data/external-pkms
 ```
+
+> Note: with this config sample, you can use in PKVault settings:
+> - Saves files locations:
+>   - /data/saves/ (or any subpath)
+>   - /data/other-saves/ (or any subpath)
+> - External PKM files locations:
+>   - /data/external-pkms/ (or any subpath)
 
 Perfect for homelab context.
 
@@ -88,8 +103,8 @@ Or using basic docker run:
 ```
 docker run \
   -p 3000:3000 \
-  -v ./your-data:/pkvault \
-  -v ./your-saves:/pkvault/saves \
+  -v ./path/to/pkvault/data:/pkvault \
+  -v ./path/to/saves:/data/saves \
   ghcr.io/chnapy/pkvault:latest
 ```
 
