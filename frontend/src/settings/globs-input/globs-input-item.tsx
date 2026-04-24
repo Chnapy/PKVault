@@ -25,18 +25,41 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ value, onEdit, o
 
     const isGlob = value.includes('*');
     const isDirectory = isGlob || value.endsWith('/');
-    const isFile = !isDirectory;
+    const isExclude = value.startsWith('!');
 
-    const globResultsQuery = useSettingsGetSaveGlobsResults({ globs: [ value ], limit });
+    const globResultsQuery = useSettingsGetSaveGlobsResults({
+        globs: [ value ],
+        limit,
+    }, {
+        query: {
+            enabled: !isExclude,
+        },
+    });
 
     const { isLoading } = globResultsQuery;
     const data = globResultsQuery.data?.data ?? [];
 
-    const showFiles = isDirectory || data.length !== 1;
+    const showFiles = !isExclude && (isDirectory || data.length !== 1);
 
     const hasHttpError = globResultsQuery.isError;
     const hasError = !globResultsQuery.isLoading && globResultsQuery.isError;
     const hasWarning = !globResultsQuery.isLoading && (hasError || data.length === 0);
+
+    const symbol = isExclude
+        ? <span className={css({ color: theme.text.red, fontSize: '120%' })}>-</span>
+        : <span className={css({ color: theme.text.primary, fontSize: '120%' })}>+</span>;
+
+    const getIcon = () => {
+        if (isExclude) {
+            return 'exclaimation';
+        }
+
+        if (isDirectory) {
+            return 'folder';
+        }
+
+        return 'file-import';
+    };
 
     return <Container
         className={css({
@@ -65,10 +88,12 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ value, onEdit, o
                     cursor: showFiles && data.length > 0 ? 'pointer' : undefined,
                 })}
             >
-                <Icon name={!isFile ? 'folder' : 'file-import'} solid forButton />
+                <Icon name={getIcon()} solid forButton />
+
+                {symbol}
 
                 <div className={css({ flexGrow: 1, lineBreak: 'anywhere' })}>
-                    {isDesktop
+                    {isDesktop && !isExclude
                         ? value
                         : <TextInput
                             value={value}
@@ -78,7 +103,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ value, onEdit, o
                         />}
                 </div>
 
-                {(showFiles || isLoading || globResultsQuery.isError) && <div
+                {!isExclude && (showFiles || isLoading || globResultsQuery.isError) && <div
                     className={css({
                         display: 'flex',
                         gap: 4,
@@ -94,7 +119,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ value, onEdit, o
                             : t('settings.form.saves.test.title', { count: data.length })}
                 </div>}
 
-                {desktopMessage && !isGlob && <Button
+                {desktopMessage && !isExclude && !isGlob && <Button
                     onClick={() => desktopMessage.openFile({
                         type: 'open-folder',
                         isDirectory,
@@ -121,7 +146,15 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ value, onEdit, o
                 padding: 4,
                 margin: 0,
             })}>
-                {!isLoading && data.map(path => <PathLine key={path}>{path}</PathLine>)}
+                {!isLoading && data.map(path => <div
+                    key={path}
+                    className={css({
+                        display: 'flex',
+                    })}
+                >
+                    {symbol}
+                    <PathLine>{path}</PathLine>
+                </div>)}
             </pre>}
         </details>
     </Container>;

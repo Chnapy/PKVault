@@ -11,12 +11,17 @@ public class MatcherUtil
         List<string> globs = [.. globsNullable
             .OfType<string>()
             .Select(glob => glob.Trim())
-            .Where(glob => glob.Length > 0)];
+            .Where(glob => glob.Length > 0 && glob[0] != '!')];
 
         if (globs.Count == 0)
         {
             return [];
         }
+        
+        List<string> excludeGlobs = [.. globsNullable
+            .OfType<string>()
+            .Select(glob => glob.Trim())
+            .Where(glob => glob.Length > 0 && glob[0] == '!')];
 
         // network globs on Windows, ex: "\\192.168.1.8\data"
         var networkGlobs = globs.FindAll(glob => glob.StartsWith(@"\\") && !glob.Contains('*'));
@@ -25,7 +30,7 @@ public class MatcherUtil
         var driveGlobs = globs.FindAll(IsAbsolute).FindAll(glob => glob.Length > 1 && glob[1] == ':');
         var relativeGlobs = globs.FindAll(glob => !IsAbsolute(glob));
 
-        var absoluteMatches = ExecuteMatcher(absoluteGlobs, "/");
+        var absoluteMatches = ExecuteMatcher(absoluteGlobs, excludeGlobs, "/");
         var absoluteResults = absoluteMatches.Select(path => Path.Combine("/", path));
 
         var driveLetters = driveGlobs.Select(glob => glob.ToUpper()[0]).Distinct();
@@ -36,13 +41,13 @@ public class MatcherUtil
 
             var prefix = $"{drive}:/";
 
-            var matches = ExecuteMatcher(filteredDriveGlobs, prefix);
+            var matches = ExecuteMatcher(filteredDriveGlobs, excludeGlobs, prefix);
             var results = matches.Select(path => Path.Combine(prefix, path));
 
             return results;
         });
 
-        var relativeMatches = ExecuteMatcher(relativeGlobs, SettingsService.GetAppDirectory());
+        var relativeMatches = ExecuteMatcher(relativeGlobs, excludeGlobs, SettingsService.GetAppDirectory());
         var relativeResults = relativeMatches.Select(path => Path.Combine(".", path));
 
         string[] results = [.. absoluteResults, .. driveResults, .. relativeResults, .. networkGlobs];
@@ -50,7 +55,7 @@ public class MatcherUtil
         return [.. results.Select(NormalizePath)];
     }
 
-    private string[] ExecuteMatcher(IEnumerable<string> globs, string rootDir)
+    private string[] ExecuteMatcher(IEnumerable<string> globs, IEnumerable<string> excludeGlobs, string rootDir)
     {
         rootDir = NormalizePath(rootDir);
 
@@ -72,11 +77,30 @@ public class MatcherUtil
             return [];
         }
 
+        excludeGlobs = excludeGlobs
+            .Select(glob => glob[0] == '!' ? glob[1..] : glob)
+            .Select(NormalizePath)
+            .Select(glob =>
+            {
+                if (IsAbsolute(rootDir) && glob.StartsWith(rootDir))
+                {
+                    return glob[rootDir.Length..];
+                }
+
+                return glob;
+            })
+            .Where(glob => glob.Length > 0);
+
         var matcher = new Matcher();
 
         foreach (var glob in globs)
         {
             matcher.AddInclude(glob);
+        }
+
+        foreach (var glob in excludeGlobs)
+        {
+            matcher.AddExclude(glob);
         }
 
         var directoryInfo = GetMatcherDirectory(rootDir);

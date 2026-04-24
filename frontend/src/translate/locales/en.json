@@ -38,6 +38,8 @@
   "settings.form.pkms-external": "External PKM files locations",
   "settings.form.pkms-external.add-file": "Add a PKM file",
   "settings.form.pkms-external.add-folder": "Add a PKM directory",
+  "settings.form.globs.add-exclude": "Add a exclude glob",
+  "settings.form.globs.results": "All results",
   "settings.form.hide-cheats": "Hide cheats in pokemon edit (EVs, moves)",
   "settings.form.skip-legality": "Skip legality checks",
   "action.cancel": "Cancel",
