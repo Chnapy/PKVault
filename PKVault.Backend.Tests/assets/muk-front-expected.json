@@ -387,7 +387,9 @@
             "RibbonChampionG3": 1,
             "RibbonEffort": 1
         },
-        "illegalities": []
+        "illegalities": [
+            "Misc-Error"
+        ]
     },
     "PK5": {
         "species": 89,

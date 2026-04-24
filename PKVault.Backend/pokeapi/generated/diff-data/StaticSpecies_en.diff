@@ -1,2 +1,1899 @@
 --- This file displays changes of StaticSpecies_en compressed file from previous changes
 
+--- pokeapi\generated\diff-data\StaticSpecies_en.diff
++++ pokeapi\generated\diff-data\StaticSpecies_en.diff
+@@ -610,7 +610,8 @@
+       "letsgo-kanto": 3,
+       "isle-of-armor": 70,
+       "blueberry": 166,
+-      "lumiose-city": 150
++      "lumiose-city": 150,
++      "champions": 3
+     }
+   },
+   "4": {
+@@ -1271,7 +1272,8 @@
+       "letsgo-kanto": 6,
+       "galar": 380,
+       "blueberry": 169,
+-      "lumiose-city": 153
++      "lumiose-city": 153,
++      "champions": 6
+     }
+   },
+   "7": {
+@@ -1885,7 +1887,8 @@
+       "letsgo-kanto": 9,
+       "isle-of-armor": 73,
+       "blueberry": 172,
+-      "lumiose-city": 156
++      "lumiose-city": 156,
++      "champions": 9
+     }
+   },
+   "10": {
+@@ -3076,7 +3079,8 @@
+       "conquest-gallery": 177,
+       "kalos-central": 28,
+       "letsgo-kanto": 15,
+-      "lumiose-city": 20
++      "lumiose-city": 20,
++      "champions": 15
+     }
+   },
+   "16": {
+@@ -3684,7 +3688,8 @@
+       "updated-johto": 12,
+       "kalos-central": 19,
+       "letsgo-kanto": 18,
+-      "lumiose-city": 23
++      "lumiose-city": 23,
++      "champions": 18
+     }
+   },
+   "19": {
+@@ -5017,7 +5022,8 @@
+       "updated-melemele": 62,
+       "letsgo-kanto": 24,
+       "kitakami": 19,
+-      "lumiose-city": 61
++      "lumiose-city": 61,
++      "champions": 24
+     }
+   },
+   "25": {
+@@ -5945,7 +5951,8 @@
+       "hisui": 56,
+       "paldea": 74,
+       "kitakami": 21,
+-      "lumiose-city": 53
++      "lumiose-city": 53,
++      "champions": 25
+     }
+   },
+   "26": {
+@@ -6246,7 +6253,8 @@
+       "hisui": 57,
+       "paldea": 75,
+       "kitakami": 22,
+-      "lumiose-city": 54
++      "lumiose-city": 54,
++      "champions": 26
+     }
+   },
+   "27": {
+@@ -8323,7 +8331,8 @@
+       "crown-tundra": 45,
+       "hisui": 201,
+       "kitakami": 153,
+-      "lumiose-city": 57
++      "lumiose-city": 57,
++      "champions": 36
+     }
+   },
+   "37": {
+@@ -8871,7 +8880,8 @@
+       "galar": 69,
+       "hisui": 169,
+       "kitakami": 38,
+-      "blueberry": 158
++      "blueberry": 158,
++      "champions": 38
+     }
+   },
+   "39": {
+@@ -14706,7 +14716,8 @@
+       "letsgo-kanto": 65,
+       "isle-of-armor": 33,
+       "hisui": 60,
+-      "lumiose-city": 64
++      "lumiose-city": 64,
++      "champions": 65
+     }
+   },
+   "66": {
+@@ -15309,7 +15320,8 @@
+       "letsgo-kanto": 68,
+       "galar": 140,
+       "hisui": 156,
+-      "lumiose-city": 127
++      "lumiose-city": 127,
++      "champions": 68
+     }
+   },
+   "69": {
+@@ -15887,7 +15899,8 @@
+       "kalos-mountain": 28,
+       "letsgo-kanto": 71,
+       "kitakami": 25,
+-      "lumiose-city": 76
++      "lumiose-city": 76,
++      "champions": 71
+     }
+   },
+   "72": {
+@@ -18204,7 +18217,8 @@
+       "isle-of-armor": 2,
+       "paldea": 325,
+       "blueberry": 76,
+-      "lumiose-city": 138
++      "lumiose-city": 138,
++      "champions": 80
+     }
+   },
+   "81": {
+@@ -21197,7 +21211,8 @@
+       "hisui": 138,
+       "paldea": 70,
+       "kitakami": 120,
+-      "lumiose-city": 67
++      "lumiose-city": 67,
++      "champions": 94
+     }
+   },
+   "95": {
+@@ -25612,7 +25627,8 @@
+       "updated-akala": 100,
+       "letsgo-kanto": 115,
+       "isle-of-armor": 172,
+-      "lumiose-city": 223
++      "lumiose-city": 223,
++      "champions": 115
+     }
+   },
+   "116": {
+@@ -26793,7 +26809,8 @@
+       "updated-akala": 125,
+       "letsgo-kanto": 121,
+       "isle-of-armor": 99,
+-      "lumiose-city": 37
++      "lumiose-city": 37,
++      "champions": 121
+     }
+   },
+   "122": {
+@@ -28062,7 +28079,8 @@
+       "updated-poni": 78,
+       "letsgo-kanto": 127,
+       "isle-of-armor": 120,
+-      "lumiose-city": 178
++      "lumiose-city": 178,
++      "champions": 127
+     }
+   },
+   "128": {
+@@ -28323,7 +28341,8 @@
+       "letsgo-kanto": 128,
+       "isle-of-armor": 116,
+       "paldea": 223,
+-      "blueberry": 22
++      "blueberry": 22,
++      "champions": 128
+     }
+   },
+   "129": {
+@@ -28785,7 +28804,8 @@
+       "hisui": 81,
+       "paldea": 135,
+       "kitakami": 44,
+-      "lumiose-city": 33
++      "lumiose-city": 33,
++      "champions": 130
+     }
+   },
+   "131": {
+@@ -29175,7 +29195,8 @@
+       "letsgo-kanto": 132,
+       "galar": 373,
+       "isle-of-armor": 207,
+-      "paldea": 212
++      "paldea": 212,
++      "champions": 132
+     }
+   },
+   "133": {
+@@ -29584,7 +29605,8 @@
+       "crown-tundra": 75,
+       "hisui": 26,
+       "paldea": 180,
+-      "lumiose-city": 101
++      "lumiose-city": 101,
++      "champions": 134
+     }
+   },
+   "135": {
+@@ -29783,7 +29805,8 @@
+       "crown-tundra": 76,
+       "hisui": 27,
+       "paldea": 181,
+-      "lumiose-city": 102
++      "lumiose-city": 102,
++      "champions": 135
+     }
+   },
+   "136": {
+@@ -29982,7 +30005,8 @@
+       "crown-tundra": 77,
+       "hisui": 28,
+       "paldea": 182,
+-      "lumiose-city": 103
++      "lumiose-city": 103,
++      "champions": 136
+     }
+   },
+   "137": {
+@@ -31169,7 +31193,8 @@
+       "updated-poni": 129,
+       "letsgo-kanto": 142,
+       "crown-tundra": 127,
+-      "lumiose-city": 192
++      "lumiose-city": 192,
++      "champions": 142
+     }
+   },
+   "143": {
+@@ -31367,7 +31392,8 @@
+       "galar": 261,
+       "crown-tundra": 173,
+       "hisui": 52,
+-      "kitakami": 103
++      "kitakami": 103,
++      "champions": 143
+     }
+   },
+   "144": {
+@@ -32690,7 +32716,8 @@
+       "letsgo-kanto": 149,
+       "crown-tundra": 196,
+       "paldea": 349,
+-      "lumiose-city": 147
++      "lumiose-city": 147,
++      "champions": 149
+     }
+   },
+   "150": {
+@@ -33681,7 +33708,8 @@
+       "original-johto": 3,
+       "updated-johto": 3,
+       "blueberry": 175,
+-      "lumiose-city": 3
++      "lumiose-city": 3,
++      "champions": 154
+     }
+   },
+   "155": {
+@@ -34255,7 +34283,8 @@
+       "original-johto": 6,
+       "updated-johto": 6,
+       "hisui": 6,
+-      "blueberry": 178
++      "blueberry": 178,
++      "champions": 157
+     }
+   },
+   "158": {
+@@ -34785,7 +34814,8 @@
+       "original-johto": 9,
+       "updated-johto": 9,
+       "blueberry": 181,
+-      "lumiose-city": 9
++      "lumiose-city": 9,
++      "champions": 160
+     }
+   },
+   "161": {
+@@ -36203,7 +36233,8 @@
+       "updated-melemele": 23,
+       "updated-ulaula": 11,
+       "kitakami": 2,
+-      "lumiose-city": 59
++      "lumiose-city": 59,
++      "champions": 168
+     }
+   },
+   "169": {
+@@ -38598,7 +38629,8 @@
+       "updated-alola": 164,
+       "updated-akala": 65,
+       "paldea": 103,
+-      "lumiose-city": 26
++      "lumiose-city": 26,
++      "champions": 181
+     }
+   },
+   "182": {
+@@ -39132,7 +39164,8 @@
+       "kalos-central": 43,
+       "updated-hoenn": 57,
+       "isle-of-armor": 141,
+-      "paldea": 48
++      "paldea": 48,
++      "champions": 184
+     }
+   },
+   "185": {
+@@ -39496,7 +39529,8 @@
+       "updated-akala": 86,
+       "updated-ulaula": 77,
+       "isle-of-armor": 145,
+-      "kitakami": 42
++      "kitakami": 42,
++      "champions": 186
+     }
+   },
+   "187": {
+@@ -41277,7 +41311,8 @@
+       "crown-tundra": 79,
+       "hisui": 29,
+       "paldea": 183,
+-      "lumiose-city": 104
++      "lumiose-city": 104,
++      "champions": 196
+     }
+   },
+   "197": {
+@@ -41461,7 +41496,8 @@
+       "crown-tundra": 78,
+       "hisui": 30,
+       "paldea": 184,
+-      "lumiose-city": 105
++      "lumiose-city": 105,
++      "champions": 197
+     }
+   },
+   "198": {
+@@ -41878,7 +41914,8 @@
+       "isle-of-armor": 3,
+       "paldea": 326,
+       "blueberry": 77,
+-      "lumiose-city": 139
++      "lumiose-city": 139,
++      "champions": 199
+     }
+   },
+   "200": {
+@@ -46475,7 +46512,8 @@
+       "conquest-gallery": 57,
+       "updated-alola": 269,
+       "updated-ulaula": 90,
+-      "paldea": 259
++      "paldea": 259,
++      "champions": 205
+     }
+   },
+   "206": {
+@@ -47052,7 +47090,8 @@
+       "kalos-coastal": 54,
+       "galar": 179,
+       "hisui": 119,
+-      "lumiose-city": 198
++      "lumiose-city": 198,
++      "champions": 208
+     }
+   },
+   "209": {
+@@ -47865,7 +47904,8 @@
+       "hisui": 74,
+       "paldea": 261,
+       "blueberry": 20,
+-      "lumiose-city": 177
++      "lumiose-city": 177,
++      "champions": 212
+     }
+   },
+   "213": {
+@@ -48268,7 +48308,8 @@
+       "hisui": 75,
+       "paldea": 262,
+       "kitakami": 49,
+-      "lumiose-city": 179
++      "lumiose-city": 179,
++      "champions": 214
+     }
+   },
+   "215": {
+@@ -50718,7 +50759,8 @@
+       "updated-poni": 85,
+       "isle-of-armor": 153,
+       "blueberry": 113,
+-      "lumiose-city": 216
++      "lumiose-city": 216,
++      "champions": 227
+     }
+   },
+   "228": {
+@@ -51118,7 +51160,8 @@
+       "updated-ulaula": 111,
+       "paldea": 26,
+       "kitakami": 124,
+-      "lumiose-city": 92
++      "lumiose-city": 92,
++      "champions": 229
+     }
+   },
+   "230": {
+@@ -54508,7 +54551,8 @@
+       "galar": 385,
+       "crown-tundra": 141,
+       "paldea": 318,
+-      "lumiose-city": 208
++      "lumiose-city": 208,
++      "champions": 248
+     }
+   },
+   "249": {
+@@ -59781,7 +59825,8 @@
+       "updated-poni": 19,
+       "galar": 63,
+       "isle-of-armor": 49,
+-      "paldea": 133
++      "paldea": 133,
++      "champions": 279
+     }
+   },
+   "280": {
+@@ -60326,7 +60371,8 @@
+       "hisui": 103,
+       "paldea": 64,
+       "kitakami": 59,
+-      "lumiose-city": 89
++      "lumiose-city": 89,
++      "champions": 282
+     }
+   },
+   "283": {
+@@ -63616,7 +63662,8 @@
+       "galar": 294,
+       "crown-tundra": 174,
+       "paldea": 297,
+-      "lumiose-city": 132
++      "lumiose-city": 132,
++      "champions": 302
+     }
+   },
+   "303": {
+@@ -64357,7 +64404,8 @@
+       "kalos-mountain": 101,
+       "updated-hoenn": 74,
+       "crown-tundra": 193,
+-      "lumiose-city": 201
++      "lumiose-city": 201,
++      "champions": 306
+     }
+   },
+   "307": {
+@@ -64727,7 +64775,8 @@
+       "kalos-central": 144,
+       "updated-hoenn": 79,
+       "paldea": 162,
+-      "lumiose-city": 84
++      "lumiose-city": 84,
++      "champions": 308
+     }
+   },
+   "309": {
+@@ -65097,7 +65146,8 @@
+       "updated-alola": 294,
+       "updated-ulaula": 115,
+       "galar": 67,
+-      "lumiose-city": 86
++      "lumiose-city": 86,
++      "champions": 310
+     }
+   },
+   "311": {
+@@ -66596,7 +66646,8 @@
+       "updated-alola": 346,
+       "updated-poni": 93,
+       "isle-of-armor": 112,
+-      "lumiose-city": 141
++      "lumiose-city": 141,
++      "champions": 319
+     }
+   },
+   "320": {
+@@ -67296,7 +67347,8 @@
+       "updated-hoenn": 107,
+       "paldea": 152,
+       "blueberry": 126,
+-      "lumiose-city": 117
++      "lumiose-city": 117,
++      "champions": 323
+     }
+   },
+   "324": {
+@@ -67463,7 +67515,8 @@
+       "galar": 300,
+       "isle-of-armor": 173,
+       "paldea": 150,
+-      "blueberry": 86
++      "blueberry": 86,
++      "champions": 324
+     }
+   },
+   "325": {
+@@ -69142,7 +69195,8 @@
+       "crown-tundra": 36,
+       "paldea": 220,
+       "blueberry": 115,
+-      "lumiose-city": 94
++      "lumiose-city": 94,
++      "champions": 334
+     }
+   },
+   "335": {
+@@ -71774,7 +71828,8 @@
+       "galar": 153,
+       "crown-tundra": 189,
+       "kitakami": 159,
+-      "hyperspace": 49
++      "hyperspace": 49,
++      "champions": 350
+     }
+   },
+   "351": {
+@@ -72304,7 +72359,8 @@
+       "updated-alola": 220,
+       "updated-akala": 121,
+       "updated-ulaula": 84,
+-      "updated-poni": 82
++      "updated-poni": 82,
++      "champions": 351
+     }
+   },
+   "352": {
+@@ -72838,7 +72894,8 @@
+       "updated-alola": 317,
+       "updated-ulaula": 138,
+       "paldea": 299,
+-      "lumiose-city": 112
++      "lumiose-city": 112,
++      "champions": 354
+     }
+   },
+   "355": {
+@@ -73503,7 +73560,8 @@
+       "updated-hoenn": 158,
+       "hisui": 196,
+       "kitakami": 143,
+-      "hyperspace": 51
++      "hyperspace": 51,
++      "champions": 358
+     }
+   },
+   "359": {
+@@ -73725,7 +73783,8 @@
+       "updated-alola": 322,
+       "updated-ulaula": 143,
+       "crown-tundra": 107,
+-      "lumiose-city": 134
++      "lumiose-city": 134,
++      "champions": 359
+     }
+   },
+   "360": {
+@@ -74269,7 +74328,8 @@
+       "hisui": 206,
+       "paldea": 358,
+       "kitakami": 173,
+-      "lumiose-city": 170
++      "lumiose-city": 170,
++      "champions": 362
+     }
+   },
+   "363": {
+@@ -79261,7 +79321,8 @@
+       "original-sinnoh": 3,
+       "extended-sinnoh": 3,
+       "hisui": 132,
+-      "blueberry": 193
++      "blueberry": 193,
++      "champions": 389
+     }
+   },
+   "390": {
+@@ -79705,7 +79766,8 @@
+       "extended-sinnoh": 6,
+       "conquest-gallery": 117,
+       "hisui": 63,
+-      "blueberry": 196
++      "blueberry": 196,
++      "champions": 392
+     }
+   },
+   "393": {
+@@ -80149,7 +80211,8 @@
+       "extended-sinnoh": 9,
+       "conquest-gallery": 135,
+       "hisui": 163,
+-      "blueberry": 199
++      "blueberry": 199,
++      "champions": 395
+     }
+   },
+   "396": {
+@@ -81655,7 +81718,8 @@
+       "isle-of-armor": 27,
+       "hisui": 17,
+       "paldea": 96,
+-      "kitakami": 111
++      "kitakami": 111,
++      "champions": 405
+     }
+   },
+   "406": {
+@@ -81957,7 +82021,8 @@
+       "updated-hoenn": 99,
+       "galar": 61,
+       "hisui": 91,
+-      "lumiose-city": 31
++      "lumiose-city": 31,
++      "champions": 407
+     }
+   },
+   "408": {
+@@ -82259,7 +82324,8 @@
+       "updated-alola": 236,
+       "updated-akala": 137,
+       "hisui": 209,
+-      "blueberry": 108
++      "blueberry": 108,
++      "champions": 409
+     }
+   },
+   "410": {
+@@ -82563,7 +82629,8 @@
+       "updated-alola": 238,
+       "updated-akala": 139,
+       "hisui": 211,
+-      "blueberry": 110
++      "blueberry": 110,
++      "champions": 411
+     }
+   },
+   "412": {
+@@ -88255,7 +88322,8 @@
+       "conquest-gallery": 187,
+       "crown-tundra": 47,
+       "hisui": 139,
+-      "paldea": 302
++      "paldea": 302,
++      "champions": 442
+     }
+   },
+   "443": {
+@@ -88778,7 +88846,8 @@
+       "hisui": 189,
+       "paldea": 128,
+       "kitakami": 166,
+-      "lumiose-city": 130
++      "lumiose-city": 130,
++      "champions": 445
+     }
+   },
+   "446": {
+@@ -89304,7 +89373,8 @@
+       "hisui": 224,
+       "paldea": 164,
+       "kitakami": 65,
+-      "lumiose-city": 136
++      "lumiose-city": 136,
++      "champions": 448
+     }
+   },
+   "449": {
+@@ -89604,7 +89674,8 @@
+       "galar": 315,
+       "hisui": 108,
+       "paldea": 266,
+-      "lumiose-city": 119
++      "lumiose-city": 119,
++      "champions": 450
+     }
+   },
+   "451": {
+@@ -90210,7 +90281,8 @@
+       "galar": 223,
+       "isle-of-armor": 83,
+       "hisui": 100,
+-      "paldea": 176
++      "paldea": 176,
++      "champions": 454
+     }
+   },
+   "455": {
+@@ -91176,7 +91248,8 @@
+       "hisui": 218,
+       "paldea": 353,
+       "blueberry": 160,
+-      "lumiose-city": 173
++      "lumiose-city": 173,
++      "champions": 460
+     }
+   },
+   "461": {
+@@ -91333,7 +91406,8 @@
+       "crown-tundra": 29,
+       "hisui": 204,
+       "paldea": 231,
+-      "kitakami": 171
++      "kitakami": 171,
++      "lumiose-city": 461
+     }
+   },
+   "462": {
+@@ -91791,7 +91865,8 @@
+       "galar": 266,
+       "isle-of-armor": 185,
+       "hisui": 122,
+-      "blueberry": 7
++      "blueberry": 7,
++      "champions": 464
+     }
+   },
+   "465": {
+@@ -92694,7 +92769,8 @@
+       "crown-tundra": 81,
+       "hisui": 31,
+       "paldea": 185,
+-      "lumiose-city": 106
++      "lumiose-city": 106,
++      "champions": 470
+     }
+   },
+   "471": {
+@@ -92850,7 +92926,8 @@
+       "crown-tundra": 80,
+       "hisui": 32,
+       "paldea": 186,
+-      "lumiose-city": 107
++      "lumiose-city": 107,
++      "champions": 471
+     }
+   },
+   "472": {
+@@ -92998,7 +93075,8 @@
+       "updated-unova": 222,
+       "kalos-mountain": 116,
+       "hisui": 186,
+-      "kitakami": 122
++      "kitakami": 122,
++      "champions": 472
+     }
+   },
+   "473": {
+@@ -93149,7 +93227,8 @@
+       "galar": 77,
+       "crown-tundra": 9,
+       "hisui": 214,
+-      "kitakami": 52
++      "kitakami": 52,
++      "champions": 473
+     }
+   },
+   "474": {
+@@ -93496,7 +93575,8 @@
+       "hisui": 104,
+       "paldea": 65,
+       "kitakami": 60,
+-      "lumiose-city": 90
++      "lumiose-city": 90,
++      "champions": 475
+     }
+   },
+   "476": {
+@@ -93964,7 +94044,8 @@
+       "hisui": 207,
+       "paldea": 359,
+       "kitakami": 174,
+-      "lumiose-city": 171
++      "lumiose-city": 171,
++      "champions": 478
+     }
+   },
+   "479": {
+@@ -94663,7 +94744,8 @@
+       "hisui": 194,
+       "paldea": 310,
+       "blueberry": 41,
+-      "hyperspace": 22
++      "hyperspace": 22,
++      "champions": 479
+     }
+   },
+   "480": {
+@@ -99427,7 +99509,8 @@
+       "original-unova": 3,
+       "updated-unova": 3,
+       "conquest-gallery": 120,
+-      "blueberry": 202
++      "blueberry": 202,
++      "champions": 497
+     }
+   },
+   "498": {
+@@ -99843,7 +99926,8 @@
+       "updated-unova": 6,
+       "conquest-gallery": 123,
+       "blueberry": 205,
+-      "lumiose-city": 6
++      "lumiose-city": 6,
++      "champions": 500
+     }
+   },
+   "501": {
+@@ -100303,7 +100387,8 @@
+       "updated-unova": 9,
+       "conquest-gallery": 108,
+       "hisui": 9,
+-      "blueberry": 208
++      "blueberry": 208,
++      "champions": 503
+     }
+   },
+   "504": {
+@@ -100571,7 +100656,8 @@
+       "original-unova": 11,
+       "updated-unova": 11,
+       "kalos-mountain": 47,
+-      "lumiose-city": 28
++      "lumiose-city": 28,
++      "champions": 505
+     }
+   },
+   "506": {
+@@ -101252,7 +101338,8 @@
+       "updated-unova": 13,
+       "kalos-mountain": 43,
+       "galar": 45,
+-      "hyperspace": 54
++      "hyperspace": 54,
++      "champions": 510
+     }
+   },
+   "511": {
+@@ -101522,7 +101609,8 @@
+       "updated-unova": 38,
+       "conquest-gallery": 137,
+       "kalos-central": 30,
+-      "lumiose-city": 78
++      "lumiose-city": 78,
++      "champions": 512
+     }
+   },
+   "513": {
+@@ -101792,7 +101880,8 @@
+       "updated-unova": 40,
+       "conquest-gallery": 139,
+       "kalos-central": 32,
+-      "lumiose-city": 80
++      "lumiose-city": 80,
++      "champions": 514
+     }
+   },
+   "515": {
+@@ -102062,7 +102151,8 @@
+       "updated-unova": 42,
+       "conquest-gallery": 141,
+       "kalos-central": 34,
+-      "lumiose-city": 82
++      "lumiose-city": 82,
++      "champions": 516
+     }
+   },
+   "517": {
+@@ -103978,7 +104068,8 @@
+       "conquest-gallery": 153,
+       "galar": 167,
+       "blueberry": 100,
+-      "lumiose-city": 121
++      "lumiose-city": 121,
++      "champions": 530
+     }
+   },
+   "531": {
+@@ -104158,7 +104249,8 @@
+       "conquest-gallery": 185,
+       "kalos-central": 123,
+       "crown-tundra": 21,
+-      "lumiose-city": 95
++      "lumiose-city": 95,
++      "champions": 531
+     }
+   },
+   "532": {
+@@ -104569,7 +104661,8 @@
+       "kalos-mountain": 95,
+       "galar": 173,
+       "crown-tundra": 59,
+-      "kitakami": 87
++      "kitakami": 87,
++      "champions": 534
+     }
+   },
+   "535": {
+@@ -106345,7 +106438,8 @@
+       "updated-poni": 50,
+       "galar": 263,
+       "crown-tundra": 169,
+-      "blueberry": 57
++      "blueberry": 57,
++      "champions": 547
+     }
+   },
+   "548": {
+@@ -107421,7 +107515,8 @@
+       "isle-of-armor": 178,
+       "paldea": 269,
+       "blueberry": 29,
+-      "lumiose-city": 124
++      "lumiose-city": 124,
++      "champions": 553
+     }
+   },
+   "554": {
+@@ -109106,7 +109201,8 @@
+       "original-unova": 69,
+       "updated-unova": 125,
+       "galar": 329,
+-      "hyperspace": 60
++      "hyperspace": 60,
++      "champions": 563
+     }
+   },
+   "564": {
+@@ -109932,7 +110028,8 @@
+       "updated-alola": 265,
+       "updated-ulaula": 86,
+       "galar": 158,
+-      "lumiose-city": 50
++      "lumiose-city": 50,
++      "champions": 569
+     }
+   },
+   "570": {
+@@ -110322,7 +110419,8 @@
+       "updated-poni": 13,
+       "isle-of-armor": 88,
+       "hisui": 220,
+-      "paldea": 229
++      "paldea": 229,
++      "champions": 571
+     }
+   },
+   "572": {
+@@ -111418,7 +111516,8 @@
+       "kalos-coastal": 117,
+       "galar": 272,
+       "crown-tundra": 56,
+-      "blueberry": 150
++      "blueberry": 150,
++      "champions": 579
+     }
+   },
+   "580": {
+@@ -112106,7 +112205,8 @@
+       "updated-ulaula": 155,
+       "galar": 74,
+       "crown-tundra": 24,
+-      "lumiose-city": 115
++      "lumiose-city": 115,
++      "champions": 584
+     }
+   },
+   "585": {
+@@ -113108,7 +113208,8 @@
+       "updated-alola": 364,
+       "updated-poni": 111,
+       "isle-of-armor": 102,
+-      "lumiose-city": 180
++      "lumiose-city": 180,
++      "champions": 587
+     }
+   },
+   "588": {
+@@ -116115,7 +116216,8 @@
+       "galar": 289,
+       "crown-tundra": 50,
+       "kitakami": 148,
+-      "lumiose-city": 191
++      "lumiose-city": 191,
++      "champions": 609
+     }
+   },
+   "610": {
+@@ -116802,7 +116904,8 @@
+       "galar": 280,
+       "crown-tundra": 122,
+       "paldea": 356,
+-      "blueberry": 154
++      "blueberry": 154,
++      "champions": 614
+     }
+   },
+   "615": {
+@@ -117399,7 +117502,8 @@
+       "updated-unova": 231,
+       "kalos-mountain": 39,
+       "galar": 226,
+-      "lumiose-city": 157
++      "lumiose-city": 157,
++      "champions": 618
+     }
+   },
+   "619": {
+@@ -118097,7 +118201,8 @@
+       "galar": 89,
+       "crown-tundra": 154,
+       "blueberry": 124,
+-      "hyperspace": 72
++      "hyperspace": 72,
++      "champions": 623
+     }
+   },
+   "624": {
+@@ -119814,7 +119919,8 @@
+       "kalos-mountain": 144,
+       "galar": 388,
+       "crown-tundra": 138,
+-      "paldea": 372
++      "paldea": 372,
++      "champions": 635
+     }
+   },
+   "636": {
+@@ -120088,7 +120194,8 @@
+       "updated-alola": 204,
+       "updated-akala": 105,
+       "isle-of-armor": 187,
+-      "paldea": 275
++      "paldea": 275,
++      "champions": 637
+     }
+   },
+   "638": {
+@@ -123135,7 +123242,8 @@
+       "national": 652,
+       "kalos-central": 3,
+       "blueberry": 211,
+-      "lumiose-city": 215
++      "lumiose-city": 215,
++      "champions": 652
+     }
+   },
+   "653": {
+@@ -123506,7 +123614,8 @@
+       "national": 655,
+       "kalos-central": 6,
+       "blueberry": 214,
+-      "lumiose-city": 219
++      "lumiose-city": 219,
++      "champions": 655
+     }
+   },
+   "656": {
+@@ -124009,7 +124118,8 @@
+       "national": 658,
+       "kalos-central": 9,
+       "blueberry": 217,
+-      "lumiose-city": 211
++      "lumiose-city": 211,
++      "champions": 658
+     }
+   },
+   "659": {
+@@ -124249,7 +124359,8 @@
+       "national": 660,
+       "kalos-central": 11,
+       "galar": 49,
+-      "lumiose-city": 14
++      "lumiose-city": 14,
++      "champions": 660
+     }
+   },
+   "661": {
+@@ -124627,7 +124738,8 @@
+       "isle-of-armor": 24,
+       "paldea": 21,
+       "blueberry": 89,
+-      "lumiose-city": 12
++      "lumiose-city": 12,
++      "champions": 663
+     }
+   },
+   "664": {
+@@ -130003,7 +130115,8 @@
+       "national": 666,
+       "kalos-central": 22,
+       "paldea": 37,
+-      "lumiose-city": 17
++      "lumiose-city": 17,
++      "champions": 666
+     }
+   },
+   "667": {
+@@ -131265,7 +131378,8 @@
+       "updated-ulaula": 46,
+       "updated-poni": 45,
+       "paldea": 146,
+-      "lumiose-city": 39
++      "lumiose-city": 39,
++      "champions": 670
+     }
+   },
+   "671": {
+@@ -131740,7 +131854,8 @@
+       "updated-ulaula": 47,
+       "updated-poni": 46,
+       "paldea": 147,
+-      "lumiose-city": 40
++      "lumiose-city": 40,
++      "champions": 671
+     }
+   },
+   "672": {
+@@ -132228,7 +132343,8 @@
+       "updated-alola": 285,
+       "updated-ulaula": 106,
+       "galar": 112,
+-      "lumiose-city": 48
++      "lumiose-city": 48,
++      "champions": 675
+     }
+   },
+   "676": {
+@@ -133142,7 +133258,8 @@
+       "updated-alola": 30,
+       "updated-melemele": 30,
+       "updated-poni": 14,
+-      "lumiose-city": 158
++      "lumiose-city": 158,
++      "champions": 676
+     }
+   },
+   "677": {
+@@ -133472,7 +133589,8 @@
+       "kalos-central": 115,
+       "galar": 209,
+       "blueberry": 105,
+-      "lumiose-city": 44
++      "lumiose-city": 44,
++      "champions": 678
+     }
+   },
+   "679": {
+@@ -133920,7 +134038,8 @@
+       "national": 681,
+       "kalos-central": 119,
+       "galar": 332,
+-      "lumiose-city": 73
++      "lumiose-city": 73,
++      "champions": 681
+     }
+   },
+   "682": {
+@@ -134160,7 +134279,8 @@
+       "national": 683,
+       "kalos-central": 130,
+       "galar": 213,
+-      "lumiose-city": 97
++      "lumiose-city": 97,
++      "champions": 683
+     }
+   },
+   "684": {
+@@ -134400,7 +134520,8 @@
+       "national": 685,
+       "kalos-central": 132,
+       "galar": 211,
+-      "lumiose-city": 99
++      "lumiose-city": 99,
++      "champions": 685
+     }
+   },
+   "686": {
+@@ -135415,7 +135536,8 @@
+       "updated-poni": 97,
+       "isle-of-armor": 197,
+       "paldea": 340,
+-      "lumiose-city": 164
++      "lumiose-city": 164,
++      "champions": 693
+     }
+   },
+   "694": {
+@@ -135655,7 +135777,8 @@
+       "national": 695,
+       "kalos-coastal": 47,
+       "galar": 319,
+-      "lumiose-city": 203
++      "lumiose-city": 203,
++      "champions": 695
+     }
+   },
+   "696": {
+@@ -135899,7 +136022,8 @@
+       "updated-alola": 244,
+       "updated-akala": 145,
+       "crown-tundra": 84,
+-      "lumiose-city": 194
++      "lumiose-city": 194,
++      "champions": 697
+     }
+   },
+   "698": {
+@@ -136143,7 +136267,8 @@
+       "updated-alola": 246,
+       "updated-akala": 147,
+       "crown-tundra": 86,
+-      "lumiose-city": 196
++      "lumiose-city": 196,
++      "champions": 699
+     }
+   },
+   "700": {
+@@ -136270,7 +136395,8 @@
+       "crown-tundra": 82,
+       "hisui": 33,
+       "paldea": 187,
+-      "lumiose-city": 108
++      "lumiose-city": 108,
++      "champions": 700
+     }
+   },
+   "701": {
+@@ -136404,7 +136530,8 @@
+       "updated-melemele": 96,
+       "galar": 320,
+       "paldea": 301,
+-      "lumiose-city": 181
++      "lumiose-city": 181,
++      "champions": 701
+     }
+   },
+   "702": {
+@@ -136527,7 +136654,8 @@
+       "updated-ulaula": 112,
+       "isle-of-armor": 103,
+       "paldea": 200,
+-      "lumiose-city": 51
++      "lumiose-city": 51,
++      "champions": 702
+     }
+   },
+   "703": {
+@@ -137159,7 +137287,8 @@
+       "hisui": 117,
+       "paldea": 174,
+       "kitakami": 180,
+-      "lumiose-city": 167
++      "lumiose-city": 167,
++      "champions": 706
+     }
+   },
+   "707": {
+@@ -137284,7 +137413,8 @@
+       "updated-ulaula": 135,
+       "isle-of-armor": 28,
+       "paldea": 240,
+-      "lumiose-city": 188
++      "lumiose-city": 188,
++      "champions": 707
+     }
+   },
+   "708": {
+@@ -137536,7 +137666,8 @@
+       "galar": 339,
+       "crown-tundra": 34,
+       "kitakami": 69,
+-      "lumiose-city": 183
++      "lumiose-city": 183,
++      "champions": 709
+     }
+   },
+   "710": {
+@@ -138304,7 +138435,8 @@
+       "national": 711,
+       "kalos-mountain": 64,
+       "galar": 192,
+-      "lumiose-city": 205
++      "lumiose-city": 205,
++      "champions": 711
+     }
+   },
+   "712": {
+@@ -138616,7 +138748,8 @@
+       "crown-tundra": 143,
+       "hisui": 216,
+       "paldea": 364,
+-      "lumiose-city": 175
++      "lumiose-city": 175,
++      "champions": 713
+     }
+   },
+   "714": {
+@@ -138868,7 +139001,8 @@
+       "crown-tundra": 182,
+       "paldea": 304,
+       "kitakami": 89,
+-      "lumiose-city": 187
++      "lumiose-city": 187,
++      "champions": 715
+     }
+   },
+   "716": {
+@@ -140521,7 +140655,8 @@
+       "updated-alola": 3,
+       "updated-melemele": 3,
+       "hisui": 3,
+-      "blueberry": 220
++      "blueberry": 220,
++      "champions": 724
+     }
+   },
+   "725": {
+@@ -140848,7 +140983,8 @@
+       "original-melemele": 6,
+       "updated-alola": 6,
+       "updated-melemele": 6,
+-      "blueberry": 223
++      "blueberry": 223,
++      "champions": 727
+     }
+   },
+   "728": {
+@@ -141175,7 +141311,8 @@
+       "original-melemele": 9,
+       "updated-alola": 9,
+       "updated-melemele": 9,
+-      "blueberry": 226
++      "blueberry": 226,
++      "champions": 730
+     }
+   },
+   "731": {
+@@ -141520,7 +141657,8 @@
+       "updated-akala": 3,
+       "updated-ulaula": 3,
+       "updated-poni": 3,
+-      "blueberry": 49
++      "blueberry": 49,
++      "champions": 733
+     }
+   },
+   "734": {
+@@ -142359,7 +142497,8 @@
+       "updated-poni": 25,
+       "paldea": 119,
+       "blueberry": 73,
+-      "hyperspace": 88
++      "hyperspace": 88,
++      "champions": 740
+     }
+   },
+   "741": {
+@@ -143403,7 +143542,8 @@
+       "updated-poni": 66,
+       "isle-of-armor": 158,
+       "paldea": 90,
+-      "kitakami": 71
++      "kitakami": 71,
++      "champions": 745
+     }
+   },
+   "746": {
+@@ -143820,7 +143960,8 @@
+       "updated-akala": 46,
+       "galar": 308,
+       "isle-of-armor": 128,
+-      "paldea": 345
++      "paldea": 345,
++      "champions": 748
+     }
+   },
+   "749": {
+@@ -144050,7 +144191,8 @@
+       "updated-poni": 72,
+       "galar": 85,
+       "paldea": 273,
+-      "kitakami": 130
++      "kitakami": 130,
++      "champions": 750
+     }
+   },
+   "751": {
+@@ -144287,7 +144429,8 @@
+       "updated-ulaula": 69,
+       "galar": 215,
+       "crown-tundra": 92,
+-      "blueberry": 91
++      "blueberry": 91,
++      "champions": 752
+     }
+   },
+   "753": {
+@@ -144976,7 +145119,8 @@
+       "galar": 245,
+       "isle-of-armor": 160,
+       "paldea": 121,
+-      "kitakami": 169
++      "kitakami": 169,
++      "champions": 758
+     }
+   },
+   "759": {
+@@ -145525,7 +145669,8 @@
+       "updated-alola": 209,
+       "updated-akala": 110,
+       "galar": 54,
+-      "paldea": 83
++      "paldea": 83,
++      "champions": 763
+     }
+   },
+   "764": {
+@@ -145746,7 +145891,8 @@
+       "updated-akala": 116,
+       "galar": 342,
+       "isle-of-armor": 89,
+-      "paldea": 313
++      "paldea": 313,
++      "champions": 765
+     }
+   },
+   "766": {
+@@ -145857,7 +146003,8 @@
+       "updated-akala": 117,
+       "galar": 343,
+       "isle-of-armor": 90,
+-      "paldea": 314
++      "paldea": 314,
++      "champions": 766
+     }
+   },
+   "767": {
+@@ -149594,7 +149741,8 @@
+       "crown-tundra": 46,
+       "paldea": 239,
+       "kitakami": 189,
+-      "hyperspace": 68
++      "hyperspace": 68,
++      "champions": 778
+     }
+   },
+   "779": {
+@@ -149825,7 +149973,8 @@
+       "updated-alola": 321,
+       "updated-ulaula": 142,
+       "galar": 346,
+-      "lumiose-city": 224
++      "lumiose-city": 224,
++      "champions": 780
+     }
+   },
+   "781": {
+@@ -150278,7 +150427,8 @@
+       "updated-poni": 110,
+       "galar": 394,
+       "isle-of-armor": 167,
+-      "kitakami": 133
++      "kitakami": 133,
++      "champions": 784
+     }
+   },
+   "785": {
+@@ -154294,7 +154444,8 @@
+       "galar": 23,
+       "crown-tundra": 165,
+       "paldea": 42,
+-      "hyperspace": 75
++      "hyperspace": 75,
++      "champions": 823
+     }
+   },
+   "824": {
+@@ -155745,7 +155896,8 @@
+       "galar": 206,
+       "isle-of-armor": 20,
+       "paldea": 109,
+-      "kitakami": 34
++      "kitakami": 34,
++      "champions": 841
+     }
+   },
+   "842": {
+@@ -155827,7 +155979,8 @@
+       "galar": 207,
+       "isle-of-armor": 21,
+       "paldea": 110,
+-      "kitakami": 35
++      "kitakami": 35,
++      "champions": 842
+     }
+   },
+   "843": {
+@@ -155989,7 +156142,8 @@
+       "national": 844,
+       "galar": 313,
+       "isle-of-armor": 175,
+-      "paldea": 271
++      "paldea": 271,
++      "champions": 844
+     }
+   },
+   "845": {
+@@ -157155,7 +157309,8 @@
+       "galar": 336,
+       "crown-tundra": 133,
+       "paldea": 238,
+-      "blueberry": 128
++      "blueberry": 128,
++      "champions": 855
+     }
+   },
+   "856": {
+@@ -157398,7 +157553,8 @@
+       "galar": 243,
+       "crown-tundra": 42,
+       "paldea": 284,
+-      "kitakami": 94
++      "kitakami": 94,
++      "champions": 858
+     }
+   },
+   "859": {
+@@ -158041,7 +158197,8 @@
+       "national": 866,
+       "galar": 366,
+       "crown-tundra": 12,
+-      "hyperspace": 110
++      "hyperspace": 110,
++      "champions": 866
+     }
+   },
+   "867": {
+@@ -158121,7 +158278,8 @@
+     "pokedexIndexes": {
+       "national": 867,
+       "galar": 328,
+-      "hyperspace": 61
++      "hyperspace": 61,
++      "champions": 867
+     }
+   },
+   "868": {
+@@ -161689,7 +161847,8 @@
+     "pokedexIndexes": {
+       "national": 869,
+       "galar": 186,
+-      "blueberry": 43
++      "blueberry": 43,
++      "champions": 869
+     }
+   },
+   "870": {
+@@ -162517,7 +162676,8 @@
+       "isle-of-armor": 104,
+       "crown-tundra": 157,
+       "kitakami": 95,
+-      "hyperspace": 70
++      "hyperspace": 70,
++      "champions": 877
+     }
+   },
+   "878": {
+@@ -163314,7 +163474,8 @@
+       "national": 887,
+       "galar": 397,
+       "crown-tundra": 112,
+-      "paldea": 307
++      "paldea": 307,
++      "champions": 887
+     }
+   },
+   "888": {
+@@ -164616,7 +164777,8 @@
+     },
+     "pokedexIndexes": {
+       "national": 899,
+-      "hisui": 50
++      "hisui": 50,
++      "champions": 899
+     }
+   },
+   "900": {
+@@ -164730,7 +164892,8 @@
+       "national": 900,
+       "hisui": 73,
+       "blueberry": 21,
+-      "hyperspace": 69
++      "hyperspace": 69,
++      "champions": 900
+     }
+   },
+   "901": {
+@@ -164967,7 +165130,8 @@
+     "pokedexIndexes": {
+       "national": 902,
+       "hisui": 167,
+-      "kitakami": 195
++      "kitakami": 195,
++      "champions": 902
+     }
+   },
+   "903": {
+@@ -165046,7 +165210,8 @@
+     },
+     "pokedexIndexes": {
+       "national": 903,
+-      "hisui": 203
++      "hisui": 203,
++      "champions": 903
+     }
+   },
+   "904": {
+@@ -165380,7 +165545,8 @@
+     },
+     "pokedexIndexes": {
+       "national": 908,
+-      "paldea": 3
++      "paldea": 3,
++      "champions": 908
+     }
+   },
+   "909": {
+@@ -165500,7 +165666,8 @@
+     },
+     "pokedexIndexes": {
+       "national": 911,
+-      "paldea": 6
++      "paldea": 6,
++      "champions": 911
+     }
+   },
+   "912": {
+@@ -165620,7 +165787,8 @@
+     },
+     "pokedexIndexes": {
+       "national": 914,
+-      "paldea": 9
++      "paldea": 9,
++      "champions": 914
+     }
+   },
+   "915": {
+@@ -166103,7 +166271,8 @@
+     "pokedexIndexes": {
+       "national": 925,
+       "paldea": 72,
+-      "kitakami": 98
++      "kitakami": 98,
++      "champions": 925
+     }
+   },
+   "926": {
+@@ -166535,7 +166704,8 @@
+     "pokedexIndexes": {
+       "national": 934,
+       "paldea": 131,
+-      "hyperspace": 91
++      "hyperspace": 91,
++      "champions": 934
+     }
+   },
+   "935": {
+@@ -166617,7 +166787,8 @@
+     "pokedexIndexes": {
+       "national": 936,
+       "paldea": 166,
+-      "hyperspace": 98
++      "hyperspace": 98,
++      "champions": 936
+     }
+   },
+   "937": {
+@@ -166658,7 +166829,8 @@
+     "pokedexIndexes": {
+       "national": 937,
+       "paldea": 167,
+-      "hyperspace": 99
++      "hyperspace": 99,
++      "champions": 937
+     }
+   },
+   "938": {
+@@ -166738,7 +166910,8 @@
+     },
+     "pokedexIndexes": {
+       "national": 939,
+-      "paldea": 171
++      "paldea": 171,
++      "champions": 939
+     }
+   },
+   "940": {
+@@ -167277,7 +167450,8 @@
+     "pokedexIndexes": {
+       "national": 952,
+       "paldea": 251,
+-      "hyperspace": 15
++      "hyperspace": 15,
++      "champions": 952
+     }
+   },
+   "953": {
+@@ -167439,7 +167613,8 @@
+     },
+     "pokedexIndexes": {
+       "national": 956,
+-      "paldea": 264
++      "paldea": 264,
++      "champions": 956
+     }
+   },
+   "957": {
+@@ -167559,7 +167734,8 @@
+     "pokedexIndexes": {
+       "national": 959,
+       "paldea": 281,
+-      "hyperspace": 18
++      "hyperspace": 18,
++      "champions": 959
+     }
+   },
+   "960": {
+@@ -167782,7 +167958,8 @@
+     },
+     "pokedexIndexes": {
+       "national": 964,
+-      "paldea": 292
++      "paldea": 292,
++      "champions": 964
+     }
+   },
+   "965": {
+@@ -167944,7 +168121,8 @@
+     "pokedexIndexes": {
+       "national": 968,
+       "paldea": 296,
+-      "kitakami": 96
++      "kitakami": 96,
++      "champions": 968
+     }
+   },
+   "969": {
+@@ -168039,7 +168217,8 @@
+       "national": 970,
+       "paldea": 309,
+       "kitakami": 157,
+-      "hyperspace": 21
++      "hyperspace": 21,
++      "champions": 970
+     }
+   },
+   "971": {
+@@ -168531,7 +168710,8 @@
+     "pokedexIndexes": {
+       "national": 981,
+       "paldea": 193,
+-      "blueberry": 26
++      "blueberry": 26,
++      "champions": 981
+     }
+   },
+   "982": {
+@@ -168635,7 +168815,8 @@
+     "pokedexIndexes": {
+       "national": 983,
+       "paldea": 369,
+-      "kitakami": 188
++      "kitakami": 188,
++      "champions": 983
+     }
+   },
+   "984": {
+@@ -169912,7 +170093,8 @@
+     "id": 1011,
+     "generation": 9,
+     "genders": [
+-      2
++      0,
++      1
+     ],
+     "forms": {
+       "9": [
+@@ -170066,14 +170248,15 @@
+     },
+     "pokedexIndexes": {
+       "national": 1013,
+-      "kitakami": 77
++      "kitakami": 77,
++      "champions": 1013
+     }
+   },
+   "1014": {
+     "id": 1014,
+     "generation": 9,
+     "genders": [
+-      2
++      0
+     ],
+     "forms": {
+       "9": [
+@@ -170112,7 +170295,7 @@
+     "id": 1015,
+     "generation": 9,
+     "genders": [
+-      2
++      0
+     ],
+     "forms": {
+       "9": [
+@@ -170151,7 +170334,7 @@
+     "id": 1016,
+     "generation": 9,
+     "genders": [
+-      2
++      0
+     ],
+     "forms": {
+       "9": [
+@@ -170190,7 +170373,7 @@
+     "id": 1017,
+     "generation": 9,
+     "genders": [
+-      2
++      1
+     ],
+     "forms": {
+       "9": [
+@@ -170328,7 +170511,8 @@
+     },
+     "pokedexIndexes": {
+       "national": 1018,
+-      "blueberry": 162
++      "blueberry": 162,
++      "champions": 1018
+     }
+   },
+   "1019": {
+@@ -170368,7 +170552,8 @@
+     },
+     "pokedexIndexes": {
+       "national": 1019,
+-      "blueberry": 163
++      "blueberry": 163,
++      "champions": 1019
+     }
+   },
+   "1020": {
+@@ -170531,7 +170716,8 @@
+     "id": 1024,
+     "generation": 9,
+     "genders": [
+-      2
++      0,
++      1
+     ],
+     "forms": {
+       "9": [

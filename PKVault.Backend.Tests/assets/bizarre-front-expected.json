@@ -342,7 +342,7 @@
         "language": 3,
         "illegalities": [
             "PID-PIDTypeMismatch",
-            "Level-LevelMetBelow"
+            "Misc-Error"
         ]
     },
     "PK5": {

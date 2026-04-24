@@ -107,7 +107,7 @@ public class PkmConvertServiceTests
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
-        File.WriteAllBytes(Path.Combine("./pkm-files", "pikachu-front", result.FileName), result.DecryptedPartyData);
+        File.WriteAllBytes(Path.Combine("./pkm-files", "pikachu-front", result.FileName), new ImmutablePKM(result).GetDecryptedDataParty());
 
         AssertExpectedData(result, (JsonElement)pikachuForwardExpectedData[targetTypeName]);
 
@@ -161,7 +161,7 @@ public class PkmConvertServiceTests
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
-        File.WriteAllBytes(Path.Combine("./pkm-files", "pikachu-back", result.FileName), result.DecryptedPartyData);
+        File.WriteAllBytes(Path.Combine("./pkm-files", "pikachu-back", result.FileName), new ImmutablePKM(result).GetDecryptedDataParty());
 
         AssertExpectedData(result, (JsonElement)pikachuBackwardExpectedData[targetTypeName]);
 
@@ -225,7 +225,7 @@ public class PkmConvertServiceTests
 
         Assert.Equal("PK2", result.GetType().Name);
 
-        File.WriteAllBytes(Path.Combine("./pkm-files", "bizarre-back-variant", $"{variantTypeName}-{result.FileName}"), result.DecryptedPartyData);
+        File.WriteAllBytes(Path.Combine("./pkm-files", "bizarre-back-variant", $"{variantTypeName}-{result.FileName}"), new ImmutablePKM(result).GetDecryptedDataParty());
 
         AssertExpectedData(result, (JsonElement)bizarreVariantBackwardExpectedData[$"{variantTypeName}->PK2"]);
 
@@ -291,7 +291,7 @@ public class PkmConvertServiceTests
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
-        File.WriteAllBytes(Path.Combine("./pkm-files", "bizarre-front", result.FileName), result.DecryptedPartyData);
+        File.WriteAllBytes(Path.Combine("./pkm-files", "bizarre-front", result.FileName), new ImmutablePKM(result).GetDecryptedDataParty());
 
         AssertExpectedData(result, (JsonElement)bizarreForwardExpectedData[targetTypeName]);
 
@@ -355,7 +355,7 @@ public class PkmConvertServiceTests
 
         Assert.Equal(targetTypeName, result.GetType().Name);
 
-        File.WriteAllBytes(Path.Combine("./pkm-files", "muk-front", result.FileName), result.DecryptedPartyData);
+        File.WriteAllBytes(Path.Combine("./pkm-files", "muk-front", result.FileName), new ImmutablePKM(result).GetDecryptedDataParty());
 
         AssertExpectedData(result, (JsonElement)mukForwardExpectedData[targetTypeName]);
 
@@ -584,12 +584,12 @@ public class PkmConvertServiceTests
 
         var legality = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm));
 
-        // if (!legality.Valid)
-        // {
-        //     Console.WriteLine();
-        //     Console.WriteLine($"{pkm.GetType().Name} - {pkm.Nickname}");
-        //     Console.WriteLine(legality.Report());
-        // }
+        if (!legality.Valid)
+        {
+            Console.WriteLine();
+            Console.WriteLine($"{pkm.GetType().Name} - {pkm.Nickname}");
+            Console.WriteLine(legality.Report());
+        }
 
         var commonIllegalities = legality.Results.ToList()
             .FindAll(r => !r.Valid)
@@ -605,12 +605,12 @@ public class PkmConvertServiceTests
 
         string[] illegalities = [.. commonIllegalities, .. moveIllegalities, .. relearnIllegalities];
 
-        // foreach (var r in illegalities)
-        // {
-        //     Console.WriteLine(r);
-        // }
-        // if (illegalities.Length > 0)
-        //     Console.WriteLine();
+        foreach (var r in illegalities)
+        {
+            Console.WriteLine(r);
+        }
+        if (illegalities.Length > 0)
+            Console.WriteLine();
 
         if (expectedData.TryGetProperty("illegalities", out var illegalitiesJson))
         {
