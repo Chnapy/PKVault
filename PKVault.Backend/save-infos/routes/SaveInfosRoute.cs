@@ -6,6 +6,7 @@ namespace PKVault.Backend.saveinfos.routes;
 [ApiController]
 [Route("api/[controller]")]
 public class SaveInfosController(
+    ISettingsService settingsService,
     DataService dataService, ISavesLoadersService savesLoadersService, ISessionService sessionService
 ) : ControllerBase
 {
@@ -22,6 +23,8 @@ public class SaveInfosController(
         {
             throw new InvalidOperationException($"Empty action list is required");
         }
+
+        settingsService.RefreshSettings();
 
         savesLoadersService.Clear();
         var flags = await sessionService.StartNewSession(checkInitialActions: true);

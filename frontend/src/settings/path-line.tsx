@@ -22,7 +22,7 @@ export const PathLine: React.FC<{ children: string }> = ({ children }) => {
                     opacity: 0.5,
                     textOverflow: 'ellipsis',
                     overflow: 'hidden',
-                    minWidth: 10,
+                    minWidth: !firstPartsStr || firstPartsStr === '.' ? undefined : 10,
                 })}
             >
                 {firstPartsStr}

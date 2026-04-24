@@ -199,17 +199,51 @@ class Program
                         {
                             var fileExploreRequest = JsonSerializer.Deserialize(message, messageJsonContext.FileExploreRequestMessage);
 
+                            var appBasePath = MatcherUtil
+                                    .NormalizePath(SettingsService.GetAppDirectory())
+                                    .Replace('/', '\\');
+
+                            string? GetDefaultPath()
+                            {
+                                if (fileExploreRequest.basePath == default)
+                                {
+                                    return null;
+                                }
+
+                                return MatcherUtil
+                                    .NormalizePath(Path.Combine(appBasePath, fileExploreRequest.basePath))
+                                    .Replace('/', '\\');
+                            }
+
+                            string ToRelative(string path)
+                            {
+                                path = MatcherUtil
+                                    .NormalizePath(path)
+                                    .Replace('/', '\\');
+
+                                if (path.StartsWith(appBasePath))
+                                {
+                                    var pathWithoutBase = MatcherUtil.NormalizePath(path[appBasePath.Length..]);
+                                    if (pathWithoutBase[0] == '/')
+                                    {
+                                        pathWithoutBase = pathWithoutBase[1..];
+                                    }
+                                    return MatcherUtil.NormalizePath(
+                                        Path.Combine(".", pathWithoutBase)
+                                    );
+                                }
+
+                                return MatcherUtil.NormalizePath(path);
+                            }
+
                             async Task<FileExploreResponseMessage> GetDialogResponse()
                             {
                                 if (fileExploreRequest.directoryOnly)
                                 {
                                     Log.Logger.Debug($"Directory only");
                                     var dirResults = await window.ShowOpenFolderAsync(
-                                        title: "TEST TITLE",
-                                        defaultPath: fileExploreRequest.basePath != default
-                                            ? MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), fileExploreRequest.basePath))
-                                                .Replace('/', '\\')
-                                            : null,
+                                        // title: "TEST TITLE",
+                                        defaultPath: GetDefaultPath(),
                                         multiSelect: fileExploreRequest.multiselect
                                     );
 
@@ -217,17 +251,14 @@ class Program
                                         type: fileExploreRequest.type,
                                         id: fileExploreRequest.id,
                                         directoryOnly: true,
-                                        values: [.. dirResults.Select(MatcherUtil.NormalizePath)]
+                                        values: [.. dirResults.Select(ToRelative)]
                                     );
                                 }
 
                                 Log.Logger.Debug($"File only");
                                 var fileResults = await window.ShowOpenFileAsync(
-                                    title: "TEST TITLE",
-                                    defaultPath: fileExploreRequest.basePath != default
-                                        ? MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), fileExploreRequest.basePath))
-                                            .Replace('/', '\\')
-                                        : null,
+                                    // title: "TEST TITLE",
+                                    defaultPath: GetDefaultPath(),
                                     multiSelect: fileExploreRequest.multiselect
                                 );
 
@@ -244,7 +275,7 @@ class Program
                                     type: fileExploreRequest.type,
                                     id: fileExploreRequest.id,
                                     directoryOnly: true,
-                                    values: [.. fileResults.Select(MatcherUtil.NormalizePath)]
+                                    values: [.. fileResults.Select(ToRelative)]
                                 );
                             }
 

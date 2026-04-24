@@ -7,6 +7,7 @@ public interface ISettingsService
     public Task<DataUpdateFlags?> UpdateSettings(SettingsMutableDTO settingsMutable);
     public Task<SettingsDTO> GetSettingsWithUserId();
     public SettingsDTO GetSettings();
+    public SettingsDTO RefreshSettings();
 }
 
 /**
@@ -83,8 +84,19 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
     {
         if (BaseSettings == null)
         {
-            BaseSettings = ReadBaseSettings();
+            return RefreshSettings();
         }
+
+        return BaseSettings with
+        {
+            CanUpdateSettings = sessionService.HasEmptyActionList(),
+            CanScanSaves = sessionService.HasEmptyActionList()
+        };
+    }
+
+    public SettingsDTO RefreshSettings()
+    {
+        BaseSettings = ReadBaseSettings();
 
         return BaseSettings with
         {
