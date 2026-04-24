@@ -1,6 +1,7 @@
 using System.IO.Abstractions.TestingHelpers;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Testing;
 using Moq;
 
 public class ActionServiceTests
@@ -61,8 +62,10 @@ public class ActionServiceTests
 
         return new(
             sp: sp,
-            pkmUpdateService: new(legalityAnalysisService),
+            log: new FakeLogger<ActionService>(),
+            pkmUpdateService: new(new FakeLogger<PkmUpdateService>(), legalityAnalysisService),
             backupService: new(
+                log: new FakeLogger<BackupService>(),
                 sp: sp,
                 mockTimeProvider.Object,
                 fileIOService,

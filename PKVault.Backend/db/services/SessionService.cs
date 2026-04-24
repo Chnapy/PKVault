@@ -24,6 +24,7 @@ public interface ISessionServiceMinimal
 }
 
 public class SessionService(
+    ILogger<SessionService> log,
     IServiceProvider sp, TimeProvider timeProvider,
     IFileIOService fileIOService, ISettingsService settingsService,
     ISavesLoadersService savesLoadersService
@@ -64,7 +65,7 @@ public class SessionService(
     {
         StartTime = timeProvider.GetUtcNow().DateTime;
 
-        using var _ = LogUtil.Time("Starting new session");
+        using var _ = log.Time("Starting new session");
 
         Actions.Clear();
 
@@ -166,7 +167,7 @@ public class SessionService(
 
         if (!hasAnyData)
         {
-            Console.WriteLine($"Fresh start detected - Session persisting & retarting");
+            log.LogInformation($"Fresh start detected - Session persisting & retarting");
             await PersistSession(scope);
             await StartNewSession(checkInitialActions: false);
         }
@@ -176,7 +177,7 @@ public class SessionService(
     {
         if (StartTask == null)
         {
-            Console.WriteLine($"Session no created - Start new one");
+            log.LogInformation($"Session no created - Start new one");
             await StartNewSession(checkInitialActions: true);
         }
         // bypass check
@@ -192,7 +193,7 @@ public class SessionService(
 
     public async Task PersistSession(IServiceScope scope)
     {
-        using var _ = LogUtil.Time($"Persist session with copy session to main");
+        using var _ = log.Time($"Persist session with copy session to main");
 
         // before copy to main:
         // - persist PKM files
@@ -208,7 +209,7 @@ public class SessionService(
         await CloseConnection();
         StartTask = null;
 
-        Console.WriteLine($"Move session DB to main");
+        log.LogDebug($"Move session DB to main");
         fileIOService.Move(SessionDbPath, MainDbPath, overwrite: true);
 
         StartTime = null;
@@ -226,14 +227,14 @@ public class SessionService(
             fileIOService.Delete(SessionDbPath + "-shm");
             fileIOService.Delete(SessionDbPath + "-wal");
 
-            Console.WriteLine($"DB session deleted={deleted1}/{deleted2}");
+            log.LogDebug($"DB session deleted={deleted1}/{deleted2}");
         }
 
         if (fileIOService.Exists(MainDbPath))
         {
             fileIOService.Copy(MainDbPath, SessionDbPath, overwrite: true);
 
-            Console.WriteLine($"DB main copied to session");
+            log.LogDebug($"DB main copied to session");
         }
 
         await RunDbMigrations();
@@ -241,12 +242,12 @@ public class SessionService(
 
     private async Task RunDbMigrations()
     {
-        using var _ = LogUtil.Time("Data Migration + Clean + Seeding");
+        using var _ = log.Time("Data Migration + Clean + Seeding");
 
         using var scope = sp.CreateScope();
         using var db = scope.ServiceProvider.GetRequiredService<SessionDbContext>();
 
-        // Console.WriteLine($"CONTEXT ID = {db.ContextId.InstanceId}");
+        // log.LogInformation($"CONTEXT ID = {db.ContextId.InstanceId}");
 
         var migrations = db.Database.GetMigrations();
         if (!migrations.Any())
@@ -256,8 +257,8 @@ public class SessionService(
 
         var pendingMigrations = await db.Database.GetPendingMigrationsAsync();
 
-        Console.WriteLine($"{pendingMigrations.Count()} pending migrations");
-        Console.WriteLine($"{string.Join('\n', pendingMigrations)}");
+        log.LogDebug($"{pendingMigrations.Count()} pending migrations");
+        log.LogDebug($"{string.Join('\n', pendingMigrations)}");
 
         // DB creation requires its directory to be created
         fileIOService.CreateDirectoryIfAny(MainDbPath);
@@ -268,12 +269,12 @@ public class SessionService(
 
         var appliedMigrations = await db.Database.GetAppliedMigrationsAsync();
 
-        Console.WriteLine($"{appliedMigrations.Count()} applied migrations");
+        log.LogInformation($"{appliedMigrations.Count()} applied migrations");
     }
 
     private async Task CloseConnection()
     {
-        using var _ = LogUtil.Time($"SessionService.CloseConnection");
+        using var _ = log.Time($"SessionService.CloseConnection");
 
         using var scope = sp.CreateScope();
         using var db = scope.ServiceProvider.GetRequiredService<SessionDbContext>();
@@ -286,6 +287,6 @@ public class SessionService(
 
         await db.Database.CloseConnectionAsync();
 
-        Console.WriteLine($"DB session connection closed");
+        log.LogInformation($"DB session connection closed");
     }
 }

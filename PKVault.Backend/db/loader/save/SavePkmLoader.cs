@@ -18,6 +18,7 @@ public interface ISavePkmLoader
 }
 
 public class SavePkmLoader(
+    ILogger log,
     IPkmConvertService pkmConvertService, string language, Dictionary<ushort, StaticEvolve> evolves,
     SaveWrapper save
 ) : ISavePkmLoader
@@ -27,7 +28,7 @@ public class SavePkmLoader(
         return $"{idBase}B{box}S{slot}"; ;
     }
 
-    private readonly CacheWithTiming Cache = new();
+    private readonly CacheWithTiming Cache = new(log);
 
     public bool HasWritten { get; set; } = false;
     private bool NeedPartyFlush = false;
@@ -242,7 +243,7 @@ public class SavePkmLoader(
 
     private void SetParty(List<ImmutablePKM> party)
     {
-        // Console.WriteLine($"SET-PARTY {string.Join('.', party.Select(pk => pk.Species))}");
+        // log.LogInformation($"SET-PARTY {string.Join('.', party.Select(pk => pk.Species))}");
         for (var slot = 0; slot < 6; slot++)
         {
             if (slot < party.Count)

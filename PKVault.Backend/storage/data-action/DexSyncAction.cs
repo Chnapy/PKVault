@@ -3,6 +3,7 @@ using PKHeX.Core;
 public record DexSyncActionInput(uint[] saveIds);
 
 public class DexSyncAction(
+    ILogger<DexSyncAction> log,
     DexService dexService,
     ISavesLoadersService savesLoadersService
 ) : DataAction<DexSyncActionInput>
@@ -84,13 +85,13 @@ public class DexSyncAction(
                 );
             });
 
-        Console.WriteLine("\n\n");
-        Console.WriteLine($"All values = {allValues.Count()}");
-        Console.WriteLine($"Unique values = {uniqueValues.Count}");
-        Console.WriteLine($"Filtered values = {filteredValues.Count()}");
-        Console.WriteLine($"Grouped values = {groupedValues.Count()}");
-        Console.WriteLine($"Ungrouped values = {ungroupedValues.Count()}");
-        Console.WriteLine("\n\n");
+        log.LogDebug("\n\n");
+        log.LogDebug($"All values = {allValues.Count()}");
+        log.LogDebug($"Unique values = {uniqueValues.Count}");
+        log.LogDebug($"Filtered values = {filteredValues.Count()}");
+        log.LogDebug($"Grouped values = {groupedValues.Count()}");
+        log.LogDebug($"Ungrouped values = {ungroupedValues.Count()}");
+        log.LogDebug("\n\n");
 
         // TODO improve perfs, avoiding n complexity with thousand DB calls
         await Task.WhenAll(

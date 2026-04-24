@@ -9,6 +9,7 @@ public record DataNormalizeActionInput(
 }
 
 public class DataNormalizeAction(
+    ILogger<DataNormalizeAction> log,
     SessionDbContext db,
     IBankLoader bankLoader, IBoxLoader boxLoader, IPkmVariantLoader pkmVariantLoader, IDexLoader dexLoader,
     ISavesLoadersService savesLoadersService, IMetaLoader metaLoader,
@@ -124,7 +125,7 @@ public class DataNormalizeAction(
         var isAlreadyUsingSqlite = sessionService.HasMainDb();
         if (isAlreadyUsingSqlite)
         {
-            Console.WriteLine("Already on sqlite, no json migration");
+            log.LogInformation("Already on sqlite, no json migration");
             return false;
         }
 
@@ -152,14 +153,14 @@ public class DataNormalizeAction(
         );
         var legacyDexLoader = new LegacyDexLoader(fileIOService, dbPath);
 
-        using var _ = LogUtil.Time("Data normalize - json legacy migration");
+        using var _ = log.Time("Data normalize - json legacy migration");
 
         var saveById = savesLoadersService.GetSaveById().ToDictionary();
 
         var legacyBankNormalize = new LegacyBankNormalize(legacyBankLoader);
         var legacyBoxNormalize = new LegacyBoxNormalize(legacyBoxLoader);
-        var legacyPkmNormalize = new LegacyPkmNormalize(legacyPkmLoader, evolves);
-        var legacyPkmVersionNormalize = new LegacyPkmVersionNormalize(legacyPkmVersionLoader, evolves);
+        var legacyPkmNormalize = new LegacyPkmNormalize(log, legacyPkmLoader, evolves);
+        var legacyPkmVersionNormalize = new LegacyPkmVersionNormalize(log, legacyPkmVersionLoader, evolves);
         var legacyDexNormalize = new LegacyDexNormalize(legacyDexLoader);
 
         legacyPkmNormalize.CleanData(legacyPkmVersionLoader);
@@ -171,11 +172,11 @@ public class DataNormalizeAction(
         legacyPkmVersionNormalize.MigrateGlobalEntities();
         legacyDexNormalize.MigrateGlobalEntities();
 
-        Console.WriteLine("Json migration inserts:");
-        Console.WriteLine($"- {legacyBankLoader.GetAllEntities().Count} banks");
-        Console.WriteLine($"- {legacyBoxLoader.GetAllEntities().Count} boxes");
-        Console.WriteLine($"- {legacyPkmVersionLoader.GetAllEntities().Count} pkmVersions");
-        Console.WriteLine($"- {legacyDexLoader.GetAllEntities().Count} dex");
+        log.LogInformation("Json migration inserts:");
+        log.LogInformation($"- {legacyBankLoader.GetAllEntities().Count} banks");
+        log.LogInformation($"- {legacyBoxLoader.GetAllEntities().Count} boxes");
+        log.LogInformation($"- {legacyPkmVersionLoader.GetAllEntities().Count} pkmVersions");
+        log.LogInformation($"- {legacyDexLoader.GetAllEntities().Count} dex");
 
         await using var transaction = await db.Database.BeginTransactionAsync();
 

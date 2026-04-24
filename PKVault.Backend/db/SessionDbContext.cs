@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 public class SessionDbContext(
+    ILogger<SessionDbContext> log,
     ISessionServiceMinimal sessionService, IDbSeedingService dbSeedingService
 ) : DbContext
 {
@@ -26,7 +27,7 @@ public class SessionDbContext(
     {
         options
             .UseSqlite($"Data Source={sessionService.SessionDbPath}")
-            .LogTo(Console.WriteLine, LogUtil.DBLogLevel)
+            .LogTo(str => log.LogDebug(str), LogUtil.DBLogLevel)
             // ignore not relevant warning "PRAGMA foreign_keys = 0" in migrations
             .ConfigureWarnings(w => w.Ignore(RelationalEventId.NonTransactionalMigrationOperationWarning))
             .EnableDetailedErrors()
@@ -36,16 +37,16 @@ public class SessionDbContext(
 
         // contexts.TryAdd(ContextId.InstanceId, ContextId);
 
-        // Console.WriteLine($"ADD DB CONTEXT = {ContextId}");
-        // Console.WriteLine($"REMAINS = {string.Join('\n', contexts)}");
+        // log.LogInformation($"ADD DB CONTEXT = {ContextId}");
+        // log.LogInformation($"REMAINS = {string.Join('\n', contexts)}");
     }
 
     // public override void Dispose()
     // {
     //     contexts.Remove(ContextId.InstanceId, out _);
 
-    //     Console.WriteLine($"REMOVE DB CONTEXT = {ContextId}");
-    //     Console.WriteLine($"REMAINS = {string.Join('\n', contexts)}");
+    //     log.LogInformation($"REMOVE DB CONTEXT = {ContextId}");
+    //     log.LogInformation($"REMAINS = {string.Join('\n', contexts)}");
 
     //     base.Dispose();
     // }

@@ -4,9 +4,11 @@ public class DexMainService(
     IServiceProvider sp
 ) : DexGenService(FakeSaveFile.Default)
 {
+    private readonly ILogger<DexMainService> log = sp.GetRequiredService<ILogger<DexMainService>>();
+
     public override async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticSpeciesData staticSpecies, HashSet<ushort>? speciesSet)
     {
-        using var _ = LogUtil.Time($"DexMainService.UpdateDexWithSave");
+        using var _ = log.Time($"DexMainService.UpdateDexWithSave");
 
         using var scope = sp.CreateScope();
 

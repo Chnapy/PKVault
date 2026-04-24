@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text;
 using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Testing;
 
 public class BackupServiceTests
 {
@@ -76,6 +77,7 @@ public class BackupServiceTests
 
         BackupService backupService = new(
             sp: sp,
+            log: new FakeLogger<BackupService>(),
             timeProvider: mockTimeProvider.Object,
             fileIOService: fileIOService,
             savesLoadersService: mockSaveService.Object,

@@ -7,6 +7,7 @@ using DiffPlex.Renderer;
 using PKHeX.Core;
 
 public abstract class StaticDataGenerator<D>(
+    ILogger log,
     JsonTypeInfo<D> jsonTypeInfo, JsonTypeInfo<D> jsonTypeInfoIndented, IFileIOService fileIOService
 )
 {
@@ -25,7 +26,7 @@ public abstract class StaticDataGenerator<D>(
     {
         var filename = GetFilenameWithoutExtension();
 
-        var time = LogUtil.Time($"{filename} process");
+        var time = log.Time($"{filename} process");
 
         var data = await GetData();
 
@@ -35,7 +36,7 @@ public abstract class StaticDataGenerator<D>(
 
         var dataPath = Path.Combine(GetDataPathParts(filename));
 
-        time = LogUtil.Time($"Write {filename} to {dataPath}");
+        time = log.Time($"Write {filename} to {dataPath}");
 
         await fileIOService.WriteJSONGZipFile(dataPath, jsonTypeInfo, data);
 

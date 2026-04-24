@@ -1,4 +1,5 @@
 public class LegacyPkmVersionNormalize(
+    ILogger log,
     LegacyPkmVersionLoader loader, Dictionary<ushort, StaticEvolve> evolves
 )
 {
@@ -38,14 +39,14 @@ public class LegacyPkmVersionNormalize(
     {
         // Most part is done in LegacyPkmLoader for strong couplage reasons
 
-        using var _ = LogUtil.Time($"PkmVersion normalize: MigrateV0ToV1");
+        using var _ = log.Time($"PkmVersion normalize: MigrateV0ToV1");
 
         loader.GetAllEntities().Values.ToList().ForEach(entity => loader.WriteEntity(entity with { SchemaVersion = 1 }));
     }
 
     public void CleanData()
     {
-        using var _ = LogUtil.Time($"PkmVersion normalize: CleanData rename pk filename if needed");
+        using var _ = log.Time($"PkmVersion normalize: CleanData rename pk filename if needed");
         // rename pk filename if needed
         loader.GetAllEntities().Values.ToList().ForEach(entity =>
         {
@@ -61,7 +62,7 @@ public class LegacyPkmVersionNormalize(
             // update pk file
             if (expectedFilepath != oldFilepath)
             {
-                // Console.WriteLine($"Wrong filepath rename:\n- wrong filepath={oldFilepath}\n- expected filepath={expectedFilepath}");
+                // log.LogInformation($"Wrong filepath rename:\n- wrong filepath={oldFilepath}\n- expected filepath={expectedFilepath}");
 
                 entity = loader.WriteEntity(entity with { Filepath = expectedFilepath }, pkm);
             }
@@ -72,7 +73,7 @@ public class LegacyPkmVersionNormalize(
             // if filepath is not normalized
             if (oldFilepath != expectedFilepath)
             {
-                // Console.WriteLine($"Normalize filepath rename:\n- wrong filepath={oldFilepath}\n- expected filepath={expectedFilepath}");
+                // log.LogInformation($"Normalize filepath rename:\n- wrong filepath={oldFilepath}\n- expected filepath={expectedFilepath}");
 
                 entity = loader.WriteEntity(entity with { Filepath = expectedFilepath }, pkm);
             }

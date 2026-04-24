@@ -1,6 +1,7 @@
 using PKHeX.Core;
 
 public class LegacyPkmNormalize(
+    ILogger log,
     LegacyPkmLoader loader, Dictionary<ushort, StaticEvolve> evolves
 )
 {
@@ -40,7 +41,7 @@ public class LegacyPkmNormalize(
 
     private void MigrateV0ToV1(LegacyPkmVersionLoader pkmVersionLoader, Dictionary<uint, SaveWrapper> savesDict)
     {
-        using var _ = LogUtil.Time($"Pkm normalize: MigrateV0ToV1");
+        using var _ = log.Time($"Pkm normalize: MigrateV0ToV1");
         /**
          * Convert entities with old/wrong ID format to new one.
          * It checks:
@@ -109,7 +110,7 @@ public class LegacyPkmNormalize(
 
     private void MigrateV1ToV2(LegacyPkmVersionLoader pkmVersionLoader, Dictionary<uint, SaveWrapper> savesDict)
     {
-        using var _ = LogUtil.Time($"Pkm normalize: MigrateV1ToV2");
+        using var _ = log.Time($"Pkm normalize: MigrateV1ToV2");
         /**
          * Convert Shedinja pkm entities with old ID format to new one.
          * It checks:
@@ -182,7 +183,7 @@ public class LegacyPkmNormalize(
 
     private void MigrateV2ToV3(LegacyPkmVersionLoader pkmVersionLoader, Dictionary<uint, SaveWrapper> savesDict)
     {
-        using var _ = LogUtil.Time($"Pkm normalize: MigrateV2ToV3");
+        using var _ = log.Time($"Pkm normalize: MigrateV2ToV3");
         /**
          * 
          */
@@ -223,7 +224,7 @@ public class LegacyPkmNormalize(
 
     public void CleanData(LegacyPkmVersionLoader pkmVersionLoader)
     {
-        using var _ = LogUtil.Time($"Pkm normalize: CleanData remove pkms with no pkmVersions");
+        using var _ = log.Time($"Pkm normalize: CleanData remove pkms with no pkmVersions");
         // remove pkms with no pkmVersions
         loader.GetAllEntities().Values.ToList().ForEach(pkmEntity =>
         {

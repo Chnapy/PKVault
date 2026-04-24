@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 public class LocalWebServer
 {
@@ -11,7 +12,7 @@ public class LocalWebServer
     {
         try
         {
-            Console.WriteLine($"LocalWebServer build for {HOST_URL}");
+            Log.Logger.Information($"LocalWebServer build for {HOST_URL}");
 
             webHost = Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(webBuilder =>
@@ -24,7 +25,7 @@ public class LocalWebServer
         }
         catch (Exception err)
         {
-            Console.WriteLine(err);
+            Log.Logger.Error(err, "");
         }
     }
 
@@ -32,7 +33,7 @@ public class LocalWebServer
     {
         if (webHost == null) return null;
 
-        Console.WriteLine($"LocalWebServer start for {HOST_URL}");
+        Log.Logger.Information($"LocalWebServer start for {HOST_URL}");
 
         _ = Task.Run(() => webHost.Run());
 

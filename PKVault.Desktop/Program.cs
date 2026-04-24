@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.StaticFiles;
 using Photino.NET;
 using Photino.NET.Server;
+using Serilog;
 
 namespace PKVault.Desktop;
 
@@ -30,49 +31,61 @@ class Program
     {
         LogUtil.Initialize();
 
-        var window = new PhotinoWindow();
+        try {
+            Backend.Program.Copyright();
 
-        var staticServerRun = SetupStaticAssetsServer(out var baseUrl);
-        _ = staticServerRun();
+            var window = new PhotinoWindow();
 
-        var server = new LocalWebServer();
+            var staticServerRun = SetupStaticAssetsServer(out var baseUrl);
+            _ = staticServerRun();
 
-        window.RegisterWindowCreatedHandler(async (sender, e) =>
-        {
-            Console.WriteLine("CREATED");
+            var server = new LocalWebServer();
 
-            var backendServerPostRun = await SetupBackendServer(server, args);
-            await backendServerPostRun();
-
-        });
-        window.RegisterWindowClosingHandler((sender, e) =>
-        {
-            var emptyActionList = server.HasEmptyActionList();
-
-            if (!emptyActionList)
+            window.RegisterWindowCreatedHandler(async (sender, e) =>
             {
-                var result = window.ShowMessage("PKVault", "You have unsaved changes. Are you sure ?", PhotinoDialogButtons.OkCancel);
-                if (result == PhotinoDialogResult.Cancel)
+                Log.Logger.Debug("CREATED");
+
+                var backendServerPostRun = await SetupBackendServer(server, args);
+                await backendServerPostRun();
+
+            });
+            window.RegisterWindowClosingHandler((sender, e) =>
+            {
+                var emptyActionList = server.HasEmptyActionList();
+
+                if (!emptyActionList)
                 {
-                    return true;
+                    var result = window.ShowMessage("PKVault", "You have unsaved changes. Are you sure ?", PhotinoDialogButtons.OkCancel);
+                    if (result == PhotinoDialogResult.Cancel)
+                    {
+                        return true;
+                    }
                 }
-            }
 
-            _ = server.Stop();
+                _ = server.Stop();
 
-            return false;
-        });
-        // window.RegisterWindowCreatingHandler((sender, e) =>
-        // {
-        //     Console.WriteLine("CREATING");
+                return false;
+            });
+            // window.RegisterWindowCreatingHandler((sender, e) =>
+            // {
+            //     log.LogInformation("CREATING");
 
-        // });
+            // });
 
-        SetupWindow(window, baseUrl);
+            SetupWindow(window, baseUrl);
 
-        InjectIntoFrontend(window);
+            InjectIntoFrontend(window);
 
-        window.WaitForClose();
+            window.WaitForClose();
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "An unhandled exception occurred during startup");
+        }
+        finally
+        {
+            LogUtil.Dispose();
+        }
     }
 
     private static async Task<Func<Task>> SetupBackendServer(LocalWebServer server, string[] args)
@@ -91,14 +104,14 @@ class Program
 
         server.Map("{**catchAll}", async context =>
         {
-            // Console.WriteLine("GET => " + context.Request.Path.Value);
-            // Console.WriteLine(context.Request.GetDisplayUrl());
-            // Console.WriteLine(context.Request.GetEncodedUrl());
+            // log.LogInformation("GET => " + context.Request.Path.Value);
+            // log.LogInformation(context.Request.GetDisplayUrl());
+            // log.LogInformation(context.Request.GetEncodedUrl());
 
             // http://localhost:8000/api/storage/main/pkm-version
             // http://localhost:8000/index.html?server=http://localhost:57471
             var uri = context.Request.GetDisplayUrl();
-            // Console.WriteLine($"DEBUG {uri}");
+            // log.LogInformation($"DEBUG {uri}");
 
             var uriParts = uri.Split('?')[0].Split('/');
 
@@ -150,7 +163,7 @@ class Program
             .SetIconFile(tmpIconFilepath)
             // .RegisterCustomSchemeHandler("app", (sender, scheme, url, out contentType) =>
             // {
-            //     Console.WriteLine("APP => " + url);
+            //     log.LogInformation("APP => " + url);
 
             //     contentType = "text/html";
             //     return new MemoryStream(Encoding.UTF8.GetBytes(@"<html>foo</html>"));
@@ -168,7 +181,7 @@ class Program
     {
         window.RegisterWebMessageReceivedHandler(async (sender, message) =>
         {
-            Console.WriteLine($"Message received: {message}");
+            Log.Logger.Debug($"Message received: {message}");
             if (string.IsNullOrEmpty(message))
             {
                 return;
@@ -190,7 +203,7 @@ class Program
                             {
                                 if (fileExploreRequest.directoryOnly)
                                 {
-                                    Console.WriteLine($"Directory only");
+                                    Log.Logger.Debug($"Directory only");
                                     var dirResults = await window.ShowOpenFolderAsync(
                                         title: "TEST TITLE",
                                         defaultPath: fileExploreRequest.basePath != default
@@ -208,7 +221,7 @@ class Program
                                     );
                                 }
 
-                                Console.WriteLine($"File only");
+                                Log.Logger.Debug($"File only");
                                 var fileResults = await window.ShowOpenFileAsync(
                                     title: "TEST TITLE",
                                     defaultPath: fileExploreRequest.basePath != default
@@ -259,7 +272,7 @@ class Program
                                     UseShellExecute = false
                                 };
 
-                                Console.WriteLine($"RUN explorer.exe {arg}");
+                                Log.Logger.Debug($"RUN explorer.exe {arg}");
 
                                 Process.Start(psi)?.WaitForInputIdle();
                             }
@@ -279,7 +292,7 @@ class Program
                                     UseShellExecute = false
                                 };
 
-                                Console.WriteLine($"RUN xdg-open {arg}");
+                                Log.Logger.Debug($"RUN xdg-open {arg}");
                                 try
                                 {
                                     // Careful: WaitForInputIdle() causes crash on Linux
@@ -325,7 +338,7 @@ class Program
 
                 await window.SendWebMessageAsync(data);
 
-                Console.WriteLine($"Response = {data}");
+                Log.Logger.Debug($"Response = {data}");
             }
             catch (JsonException ex)
             {

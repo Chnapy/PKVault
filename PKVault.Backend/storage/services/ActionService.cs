@@ -4,7 +4,7 @@ using PKHeX.Core;
  * Action mutation for current session.
  */
 public class ActionService(
-    IServiceProvider sp,
+    IServiceProvider sp, ILogger<ActionService> log,
     PkmUpdateService pkmUpdateService, BackupService backupService, ISettingsService settingsService,
     ISessionService sessionService, ISavesLoadersService savesLoadersService
 )
@@ -240,7 +240,7 @@ public class ActionService(
             return flags;
         }
 
-        Console.WriteLine("SAVING IN PROGRESS");
+        log.LogInformation("SAVING IN PROGRESS");
 
         await backupService.PrepareBackupThenRun("backup_before_save", async () =>
         {
@@ -309,7 +309,7 @@ public class ActionService(
         {
             var action = getScopedAction(scope);
 
-            using var _ = LogUtil.Time($"Apply action - {action.GetType()}");
+            using var _ = log.Time($"Apply action - {action.GetType()}");
 
             return await action.ExecuteWithPayload(input, flags);
         }
@@ -402,7 +402,7 @@ public class ActionService(
 
         var payload = await actionFn(scope, flags);
 
-        // Console.WriteLine($"Context={db.ContextId}");
+        // log.LogInformation($"Context={db.ContextId}");
 
         return new SessionService.ActionRecord(actionFn, payload);
     }

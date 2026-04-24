@@ -100,7 +100,7 @@ public class MovePkmBankAction(
             return await SaveToMain(input, flags, pkmId, targetBox, boxSlot);
         }
 
-        // Console.WriteLine($"ENTRIES [{moveDirection}]:\n{string.Join('\n', entries.Select(e => e.Item1 + "_" + e.Item2 + "_" + e.Item3))}");
+        // log.LogInformation($"ENTRIES [{moveDirection}]:\n{string.Join('\n', entries.Select(e => e.Item1 + "_" + e.Item2 + "_" + e.Item3))}");
 
         List<DataActionPayload> payloads = [];
         foreach (var pkmId in input.pkmIds)

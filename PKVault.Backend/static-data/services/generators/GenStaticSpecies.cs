@@ -25,9 +25,11 @@ public record StaticSpeciesForm(
 );
 
 public class GenStaticSpecies(
+    ILogger log,
     string lang,
     PokeApiService pokeApiService, IFileIOService fileIOService
     ) : StaticDataGenerator<StaticSpeciesData>(
+    log,
     jsonTypeInfo: StaticDataJsonContext.Default.StaticSpeciesData,
     jsonTypeInfoIndented: new StaticDataJsonContext(JsonIndentedOptions).StaticSpeciesData,
     fileIOService
@@ -126,7 +128,7 @@ public class GenStaticSpecies(
                     }
                     catch
                     {
-                        // Console.WriteLine($"{formUrl.Url} - ERROR NAMES {ex}");
+                        // log.LogInformation($"{formUrl.Url} - ERROR NAMES {ex}");
                     }
 
                     try
@@ -144,7 +146,7 @@ public class GenStaticSpecies(
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"{formObj.Name} - ERROR FORM-NAMES {ex}");
+                        log.LogError($"{formObj.Name} - ERROR FORM-NAMES {ex}");
                     }
 
                     if (formName == "male" || formName == "female")
@@ -368,13 +370,13 @@ public class GenStaticSpecies(
 
                             if (result == null)
                             {
-                                Console.WriteLine($"FORM NOT FOUND for {defaultData.Item1.Name} // {context} // {formApiName} -> {string.Join(',', allDatas
+                                log.LogError($"FORM NOT FOUND for {defaultData.Item1.Name} // {context} // {formApiName} -> {string.Join(',', allDatas
                                     .Select(data => data.Item2.Select(form => form.FormName))
                                     .SelectMany(list => list).Distinct()
                                 )}");
                                 // if(defaultData.Item1.Name == "starmie") {
-                                // Console.WriteLine(string.Join(',', allDatas.Select(d => string.Join('-', d.Item1.Name))));
-                                // Console.WriteLine(string.Join(',', allDatas.Select(d => string.Join('-', d.Item2.Select(i => i.FormName)))));
+                                // log.LogInformation(string.Join(',', allDatas.Select(d => string.Join('-', d.Item1.Name))));
+                                // log.LogInformation(string.Join(',', allDatas.Select(d => string.Join('-', d.Item2.Select(i => i.FormName)))));
                                 // }
                                     // notFound.Add($"{defaultData.Item1.Name} // {context} // {formApiName} -> {string.Join(',', allDatas
                                     //     .Select(data => data.Item2.Select(form => form.FormName))
@@ -416,7 +418,7 @@ public class GenStaticSpecies(
 
                     // if (!varietyForms.Any())
                     // {
-                    //     Console.WriteLine($"FORMS EMTY FOR {species}-{defaultData.Item1.Name} // {context} // formListEn={string.Join(',', formListEn)} -> {string.Join(',', formListData
+                    //     log.LogInformation($"FORMS EMTY FOR {species}-{defaultData.Item1.Name} // {context} // formListEn={string.Join(',', formListEn)} -> {string.Join(',', formListData
                     //     .OfType<(Pokemon, PokemonForm)>().ToList()
                     //     .Select(entry => $"form.{entry.Item2.Id}-{entry.Item2.Name}"))}");
                     // }

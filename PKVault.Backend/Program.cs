@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.ResponseCompression;
+using Serilog;
 
 namespace PKVault.Backend;
 
@@ -21,34 +22,42 @@ public class Program
     {
         LogUtil.Initialize();
 
-        var time = LogUtil.Time($"Setup backend load");
+        try {
+            Copyright();
 
-        Copyright();
+            var time = Log.Logger.Time($"Setup backend load");
 
-        var app = await PrepareWebApp(5000);
-        var setupPostRun = await SetupData(app, args);
-        time.Stop();
+            var app = await PrepareWebApp(5000);
+            var setupPostRun = await SetupData(app, args);
+            time.Dispose();
 
-        if (setupPostRun != null)
-        {
-            var appTask = app.RunAsync();
+            if (setupPostRun != null)
+            {
+                var appTask = app.RunAsync();
 
-            var setupPostRunTime = LogUtil.Time($"Setup post-run");
+                var setupPostRunTime = Log.Logger.Time($"Setup post-run");
 
-            await setupPostRun();
+                await setupPostRun();
 
-            setupPostRunTime.Stop();
+                setupPostRunTime.Dispose();
 
-            await appTask;
+                await appTask;
+            }
         }
-
-        LogUtil.Dispose();
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "An unhandled exception occurred during startup");
+        }
+        finally
+        {
+            LogUtil.Dispose();
+        }
     }
 
     public static void Copyright()
     {
         var (BuildID, Version) = SettingsService.GetBuildInfo();
-        Console.WriteLine("PKVault Copyright (C) 2026  Richard Haddad"
+        Log.Information("PKVault Copyright (C) 2026  Richard Haddad"
         + "\nThis program comes with ABSOLUTELY NO WARRANTY."
         + "\nThis is free software, and you are welcome to redistribute it under certain conditions."
         + "\nFull license can be accessed here: https://github.com/Chnapy/PKVault/blob/main/LICENSE"
@@ -67,13 +76,13 @@ public class Program
 
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 
-        Console.WriteLine($"Memory checks: initial={initialMemoryUsedMB} MB setuped={setupedMemoryUsedMB} MB diff={setupedMemoryUsedMB - initialMemoryUsedMB} MB");
+        Log.Information($"Memory checks: initial={initialMemoryUsedMB} MB setuped={setupedMemoryUsedMB} MB diff={setupedMemoryUsedMB - initialMemoryUsedMB} MB");
 
-        if (args.Length > 0 && args[0] == "clean")
-        {
-            await host.Services.GetRequiredService<MaintenanceService>().CleanMainStorageFiles();
-            return null;
-        }
+        // if (args.Length > 0 && args[0] == "clean")
+        // {
+        //     await host.Services.GetRequiredService<MaintenanceService>().CleanMainStorageFiles();
+        //     return null;
+        // }
 
         // if (args.Length > 0 && args[0] == "test-bkp")
         // {
@@ -93,13 +102,6 @@ public class Program
     public static async Task<WebApplication> PrepareWebApp(int port)
     {
         var builder = WebApplication.CreateBuilder([]);
-
-        builder.Logging.ClearProviders();
-        builder.Logging.AddConsole();
-        LogUtil.BuilderLoggingFilters.ForEach(filter =>
-        {
-            builder.Logging.AddFilter(filter.category, filter.level);
-        });
 
         ConfigureServices(builder.Services);
 
@@ -173,6 +175,8 @@ public class Program
                 options.JsonSerializerOptions.TypeInfoResolver = RouteJsonContext.Default;
             });
 
+        services.AddSerilog();
+
 #if MODE_GEN_POKEAPI
         services.AddSingleton<PokeApiService>();
         services.AddSingleton<GenStaticDataService>();
@@ -180,20 +184,20 @@ public class Program
 
         services.AddSingleton(TimeProvider.System);
 
-        Console.WriteLine($"Setup services - DB");
+        Log.Information($"Setup services - DB");
         services.AddDbContext<SessionDbContext>();
 
         services.AddSingleton<ISessionService, SessionService>();
         services.AddSingleton<ISessionServiceMinimal, ISessionService>(sp => sp.GetRequiredService<ISessionService>());   // use same instance as ISessionService
         services.AddSingleton<IDbSeedingService, DbSeedingService>();
 
-        Console.WriteLine($"Setup services - Main");
+        Log.Information($"Setup services - Main");
         services.AddSingleton<IFileSystem>(new FileSystem());
         services.AddSingleton<IFileIOService, FileIOService>();
         services.AddSingleton<StaticDataService>();
         services.AddSingleton<StorageQueryService>();
         services.AddSingleton<ActionService>();
-        services.AddSingleton<MaintenanceService>();
+        // services.AddSingleton<MaintenanceService>();
         services.AddSingleton<DexService>();
         services.AddSingleton<WarningsService>();
         services.AddSingleton<BackupService>();
@@ -205,7 +209,7 @@ public class Program
         services.AddSingleton<PkmUpdateService>();
         services.AddSingleton<PkmLegalityService>();
 
-        Console.WriteLine($"Setup services - Actions");
+        Log.Information($"Setup services - Actions");
         services.AddScoped<DataNormalizeAction>();
         services.AddScoped<UpdateExternalPkmAction>();
         services.AddScoped<SynchronizePkmAction>();
@@ -227,7 +231,7 @@ public class Program
         services.AddScoped<SortPkmAction>();
         services.AddScoped<DexSyncAction>();
 
-        Console.WriteLine($"Setup services - Loaders");
+        Log.Information($"Setup services - Loaders");
         services.AddScoped<IMetaLoader, MetaLoader>();
         services.AddScoped<IBankLoader, BankLoader>();
         services.AddScoped<IBoxLoader, BoxLoader>();
@@ -258,11 +262,13 @@ public class Program
         });
 #endif
 
-        Console.WriteLine($"Setup services - Finished");
+        Log.Information($"Setup services - Finished");
     }
 
     public static void ConfigureAppBuilder(IApplicationBuilder app, bool useHttps)
     {
+        app.UseSerilogRequestLogging();
+
         app.UseResponseCompression();
 
         if (useHttps)

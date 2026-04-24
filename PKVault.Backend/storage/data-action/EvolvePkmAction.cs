@@ -4,6 +4,7 @@ public record EvolvePkmActionInput(uint? saveId, string[] ids);
 
 public class EvolvePkmAction(
     IServiceProvider sp,
+    ILogger<EvolvePkmAction> log,
     PkmUpdateService pkmUpdateService, StaticDataService staticDataService,
     SynchronizePkmAction synchronizePkmAction,
     IPkmVariantLoader pkmVariantLoader, ISavesLoadersService savesLoadersService
@@ -49,7 +50,7 @@ public class EvolvePkmAction(
 
         var (evolveSpecies, evolveByItem) = await GetEvolve(dto.Pkm);
 
-        Console.WriteLine($"Evolve from {oldSpecies} to {evolveSpecies} using item? {evolveByItem}");
+        log.LogInformation($"Evolve from {oldSpecies} to {evolveSpecies} using item? {evolveByItem}");
 
         dto = dto with
         {
@@ -166,7 +167,7 @@ public class EvolvePkmAction(
 
     private void UpdatePkm(PKM pkm, ushort evolveSpecies, bool evolveByItem)
     {
-        // Console.WriteLine($"EVOLVE TO {evolveSpecies}");
+        // log.LogInformation($"EVOLVE TO {evolveSpecies}");
 
         if (evolveSpecies == 0)
         {

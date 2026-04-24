@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Testing;
 using Moq;
 
 public class BoxLoaderTests : IAsyncDisposable
@@ -17,7 +18,7 @@ public class BoxLoaderTests : IAsyncDisposable
         dbSeedingService = new();
 
         sessionService.Setup(s => s.SessionDbPath).Returns(dbPath);
-        _db = new(sessionService.Object, dbSeedingService.Object);
+        _db = new(new FakeLogger<SessionDbContext>(), sessionService.Object, dbSeedingService.Object);
     }
 
     public async ValueTask DisposeAsync()

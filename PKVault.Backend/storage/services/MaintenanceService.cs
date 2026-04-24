@@ -6,13 +6,13 @@ using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
  */
 public class MaintenanceService(
     // Direct use of service-provider because of circular dependencies
-    IServiceProvider sp,
+    IServiceProvider sp, ILogger log,
     IFileIOService fileIOService, ISettingsService settingsService
 )
 {
     public async Task CleanMainStorageFiles()
     {
-        using var _ = LogUtil.Time($"Storage obsolete files clean up");
+        using var _ = log.Time($"Storage obsolete files clean up");
 
         using var scope = sp.CreateScope();
 
@@ -35,9 +35,9 @@ public class MaintenanceService(
 
         var pkmVariantFilesToDelete = pkmVariantsFilepaths.Count - (matches.Files.Count() - pathsToClean.Count());
 
-        Console.WriteLine($"Total files count = {matches.Files.Count()}");
-        Console.WriteLine($"PkmVariant count = {pkmVariantsFilepaths.Count}");
-        Console.WriteLine($"Paths to clean count = {pathsToClean.Count()}");
+        log.LogInformation($"Total files count = {matches.Files.Count()}");
+        log.LogInformation($"PkmVariant count = {pkmVariantsFilepaths.Count}");
+        log.LogInformation($"Paths to clean count = {pathsToClean.Count()}");
 
         if (pkmVariantFilesToDelete != 0)
         {
@@ -51,13 +51,13 @@ public class MaintenanceService(
 
             foreach (var path in pathsToClean)
             {
-                Console.WriteLine($"Clean obsolete file {path}");
+                log.LogInformation($"Clean obsolete file {path}");
                 fileIOService.Delete(path);
             }
 
-            Console.WriteLine($"Total files count = {matches.Files.Count()}");
-            Console.WriteLine($"PkmVariant count = {pkmVariantsFilepaths.Count}");
-            Console.WriteLine($"Paths to clean count = {pathsToClean.Count()}");
+            log.LogInformation($"Total files count = {matches.Files.Count()}");
+            log.LogInformation($"PkmVariant count = {pkmVariantsFilepaths.Count}");
+            log.LogInformation($"Paths to clean count = {pathsToClean.Count()}");
         }
     }
 }

@@ -6,7 +6,7 @@ public interface IPkmConvertService
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, PKMRndValues? rndValues, SaveFile? targetSave = null);
 }
 
-public class PkmConvertService(ISettingsService settingsService, ILegalityAnalysisService legalityAnalysisService) : IPkmConvertService
+public class PkmConvertService(ILogger<PkmConvertService> log, ISettingsService settingsService, ILegalityAnalysisService legalityAnalysisService) : IPkmConvertService
 {
     private readonly PKMConverterUtils pkmConverterUtils = new(legalityAnalysisService);
     private readonly PK2Converter pk2Converter = new(new(legalityAnalysisService));
@@ -20,7 +20,7 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
 
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, EntityContext context)
     {
-        Console.WriteLine($"Convert {sourcePkm.GetMutablePkm().GetType().Name} -> context={context}");
+        log.LogDebug($"Convert {sourcePkm.GetMutablePkm().GetType().Name} -> context={context}");
 
         Type targetType = BlankSaveFile.Get(context).BlankPKM.GetType();
 
@@ -29,7 +29,7 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
 
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, PKMRndValues? rndValues, SaveFile? targetSave = null)
     {
-        Console.WriteLine($"Convert {sourcePkm.GetMutablePkm().GetType().Name} -> {targetPkmType.Name}");
+        log.LogDebug($"Convert {sourcePkm.GetMutablePkm().GetType().Name} -> {targetPkmType.Name}");
 
         var fallbackLang = settingsService.GetSettings().GetSafeLanguageID();
 
@@ -62,7 +62,7 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
 
     private PKM ConvertRecursive(PKM current, Type targetType, LanguageID fallbackLang, PKMRndValues? rndValues)
     {
-        // Console.WriteLine($"Convert recursive {current.GetType().Name} -> {targetType.Name}");
+        // log.LogInformation($"Convert recursive {current.GetType().Name} -> {targetType.Name}");
 
         var currentValue = GetPKMTypeWeight(current.GetType());
         var targetValue = GetPKMTypeWeight(targetType);
@@ -95,7 +95,7 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
 
     private PKM? TryPKToVariant(PKM source, Type targetType, PKMRndValues? rndValues)
     {
-        // Console.WriteLine($"Convert forward {source.GetType().Name} -> {targetType.Name} - PID={rndValues?.PID}");
+        // log.LogInformation($"Convert forward {source.GetType().Name} -> {targetType.Name} - PID={rndValues?.PID}");
 
         return (source.GetType().Name, targetType.Name) switch
         {
@@ -129,7 +129,7 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
 
     private PKM? TryForwardConversion(PKM source, LanguageID fallbackLang, PKMRndValues? rndValues)
     {
-        // Console.WriteLine($"Convert forward {source.GetType().Name} - PID={rndValues?.PID}");
+        // log.LogInformation($"Convert forward {source.GetType().Name} - PID={rndValues?.PID}");
 
         if (source is ITrainerInfo sourceTrainer)
         {
@@ -162,7 +162,7 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
 
     private PKM? TryBackwardConversion(PKM source, PKMRndValues? rndValues)
     {
-        // Console.WriteLine($"Convert backward {source.GetType().Name} - PID={rndValues?.PID}");
+        // log.LogInformation($"Convert backward {source.GetType().Name} - PID={rndValues?.PID}");
 
         if (source is ITrainerInfo sourceTrainer)
         {
@@ -195,7 +195,7 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
 
     private PKM? TryVariantToPK(PKM source, PKMRndValues? rndValues)
     {
-        // Console.WriteLine($"Convert backward {source.GetType().Name} - PID={rndValues?.PID}");
+        // log.LogInformation($"Convert backward {source.GetType().Name} - PID={rndValues?.PID}");
 
         return source.GetType().Name switch
         {

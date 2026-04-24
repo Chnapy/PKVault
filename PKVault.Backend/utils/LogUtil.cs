@@ -1,111 +1,165 @@
-
+using Serilog;
+using Serilog.Events;
+using Serilog.Core;
+using Serilog.Context;
 using System.Diagnostics;
+
 
 public class LogUtil
 {
-    public static readonly List<(string category, LogLevel level)> BuilderLoggingFilters = [
-        ("Microsoft", LogLevel.Warning),
-        ("Microsoft.AspNetCore", LogLevel.Warning),
-        // ("Microsoft.AspNetCore.Mvc", LogLevel.Warning)
-    ];
     public static readonly LogLevel DBLogLevel = LogLevel.Warning;
-
-    private static readonly string stopwatchEmoji = char.ConvertFromUtf32(0x23F1) + char.ConvertFromUtf32(0xFE0F) + " ";
-    private static StreamWriter? logWriter;
 
     public static void Initialize()
     {
-        if (logWriter != null)
-        {
-            return;
-        }
-
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
-
         var logDirectoryPath = Path.Combine(SettingsService.GetAppDirectory(), "logs");
-        var logFilepath = Path.Combine(logDirectoryPath, $"pkvault-{BackupService.SerializeDateTime(DateTime.UtcNow)}.log");
+        var logFilepath = Path.Combine(logDirectoryPath, $"pkvault-.log");
 
-        Directory.CreateDirectory(logDirectoryPath);
-
-        logWriter = new StreamWriter(logFilepath, append: true)
-        {
-            AutoFlush = true
-        };
-
-        var consoleOut = Console.Out;
-        var consoleErr = Console.Error;
-
-        var dualOut = new DualWriter(consoleOut, logWriter);
-        var dualErr = new DualWriter(consoleErr, logWriter);
-
-        Console.SetOut(dualOut);
-        Console.SetError(dualErr);
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+            // .MinimumLevel.Override("Microsoft.AspNetCore.Mvc", LogEventLevel.Warning)
+            .Enrich.FromLogContext()
+            // .Enrich.WithMachineName()
+            // .Enrich.WithThreadId()
+            // .Enrich.WithThreadName()
+            .WriteTo.Console(
+                restrictedToMinimumLevel: LogEventLevel.Verbose
+                // outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+            )
+            .WriteTo.File(logFilepath,
+                rollingInterval: RollingInterval.Day,
+                rollOnFileSizeLimit: true,
+                retainedFileCountLimit: 10,
+                fileSizeLimitBytes: 10_485_760, // 10MB
+                flushToDiskInterval: TimeSpan.FromSeconds(5)
+                // outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+            )
+            .CreateLogger();
     }
 
     public static void Dispose()
     {
-        Console.WriteLine("Log file gracefully disposed.");
-        logWriter?.Dispose();
-        logWriter = null;
-    }
-
-    public static LogTimeDisposable Time(string message)
-    {
-        return Time(message, (100, 500));
-    }
-
-    public static LogTimeDisposable Time(string message, (int warningMs, int errorMs) timings)
-    {
-        return new LogTimeDisposable($"{stopwatchEmoji} {message}", timings);
+        Log.Logger.Information("Log file gracefully disposed.");
+        Log.CloseAndFlush();
     }
 }
 
-public class LogTimeDisposable : IDisposable
+public static class LoggerExtension
 {
-    private readonly string message;
-    private readonly (int warningMs, int errorMs) timings;
-
-    public readonly Stopwatch sw;
-
-    public LogTimeDisposable(string _message, (int warningMs, int errorMs) _timings)
+    [MessageTemplateFormatMethod("messageTemplate")]
+    public static IDisposable Time(this Serilog.ILogger logger, string messageTemplate, params object[] args)
     {
-        message = _message;
-        timings = _timings;
+        return new Operation(
+            log: (logLevel, message, args) => logger.Write((LogEventLevel)logLevel, message, args),
+            messageTemplate, 
+            args, 
+            LogLevel.Information
+        ).Begin();
+    }
+    
+    [MessageTemplateFormatMethod("messageTemplate")]
+    public static IDisposable Time(this Microsoft.Extensions.Logging.ILogger logger, string messageTemplate, params object[] args)
+    {
+        return new Operation(
+            log: (logLevel, message, args) => logger.Log(logLevel, message, args),
+            messageTemplate, 
+            args, 
+            LogLevel.Information
+        ).Begin();
+    }
+}
 
-        Console.WriteLine($"{message} ...");
+public class Operation(
+    Action<LogLevel, string, object[]> log,
+     string messageTemplate, object[] args,
+    LogLevel completionLevel, TimeSpan? warningThreshold = null
+) : IDisposable
+{
+    private static readonly string stopwatchEmoji = char.ConvertFromUtf32(0x23F1) + char.ConvertFromUtf32(0xFE0F) + " ";
+    public static string GetBeginMessage(string messageTemplate) => $"{stopwatchEmoji} {messageTemplate} {{{"started"}}}";
+    public static string GetEndMessage(string messageTemplate) => $"{stopwatchEmoji} {messageTemplate}";
 
-        sw = new();
-        sw.Start();
+    public enum Properties
+    {
+        Elapsed,
+        Outcome,
+        OperationId
+    };
+
+    const string OutcomeCompleted = "completed";
+    static readonly double StopwatchToTimeSpanTicks = (double)Stopwatch.Frequency / TimeSpan.TicksPerSecond;
+
+    readonly long start = GetTimestamp();
+    long? _stop;
+
+    readonly IDisposable _popContext = LogContext.PushProperty(nameof(Properties.OperationId), Guid.NewGuid());
+
+    static long GetTimestamp()
+    {
+        return unchecked((long)(Stopwatch.GetTimestamp() / StopwatchToTimeSpanTicks));
     }
 
-    public long Stop()
+    public TimeSpan Elapsed
     {
-        sw.Stop();
-
-        Console.Write($"{message} done in ");
-
-        if (sw.ElapsedMilliseconds > timings.errorMs)
+        get
         {
-            Console.BackgroundColor = ConsoleColor.DarkRed;
-        }
-        else if (sw.ElapsedMilliseconds > timings.warningMs)
-        {
-            Console.BackgroundColor = ConsoleColor.DarkYellow;
-        }
-        else
-        {
-            Console.BackgroundColor = ConsoleColor.DarkGreen;
-        }
-        Console.Write(sw.Elapsed);
-        Console.ResetColor();
-        Console.WriteLine();
+            var stop = _stop ?? GetTimestamp();
+            var elapsedTicks = stop - start;
 
-        return sw.ElapsedMilliseconds;
+            if (elapsedTicks < 0)
+            {
+                return TimeSpan.Zero;
+            }
+
+            return TimeSpan.FromTicks(elapsedTicks);
+        }
+    }
+
+    public Operation Begin()
+    {
+        log(
+            completionLevel,
+            GetBeginMessage(messageTemplate), 
+            args
+        );
+        return this;
     }
 
     public void Dispose()
     {
-        Stop();
-        GC.SuppressFinalize(this);
+        Write(completionLevel);
+
+        PopLogContext();
+    }
+
+    void StopTiming()
+    {
+        _stop ??= GetTimestamp();
+    }
+
+    void PopLogContext()
+    {
+        _popContext.Dispose();
+    }
+
+    void Write(LogLevel level)
+    {
+        var outcome = OutcomeCompleted;
+        StopTiming();
+
+        var elapsed = Elapsed.TotalMilliseconds;
+
+        level = elapsed > warningThreshold?.TotalMilliseconds && level < LogLevel.Warning
+            ? LogLevel.Warning
+            : level;
+
+        log(
+            level,
+            $"{GetEndMessage(messageTemplate)} {{{nameof(Properties.Outcome)}}} in {{{nameof(Properties.Elapsed)}:0.0}} ms", 
+            [.. args, outcome, elapsed]
+        );
+
+        PopLogContext();
     }
 }

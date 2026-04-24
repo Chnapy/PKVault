@@ -55,18 +55,21 @@ public class PkmFileLoader : IPkmFileLoader
 
     public bool EnableLog = true;
 
+    private ILogger<PkmFileLoader> log;
     private IFileIOService fileIOService;
     private ISessionServiceMinimal sessionService;
     private string storagePath;
     private SessionDbContext db;
 
     public PkmFileLoader(
+        ILogger<PkmFileLoader> _log,
         IFileIOService _fileIOService,
         ISessionServiceMinimal _sessionService,
         ISettingsService settingsService,
         SessionDbContext _db
     )
     {
+        log = _log;
         fileIOService = _fileIOService;
         sessionService = _sessionService;
         storagePath = settingsService.GetSettings().SettingsMutable.STORAGE_PATH;
@@ -126,14 +129,14 @@ public class PkmFileLoader : IPkmFileLoader
     {
         var dbSet = await GetDbSet();
 
-        using var _ = LogUtil.Time($"PkmFileLoader.WriteToFiles");
+        using var _ = log.Time($"PkmFileLoader.WriteToFiles");
 
         var pkmFilesToDelete = await dbSet
             // .AsNoTracking()
             .Where(pkmFile => pkmFile.Deleted)
             .ToListAsync();
 
-        Console.WriteLine($"Pkm files to delete: {pkmFilesToDelete.Count}");
+        log.LogDebug($"Pkm files to delete: {pkmFilesToDelete.Count}");
 
         pkmFilesToDelete.ForEach(pkmFileToDelete =>
         {
@@ -146,7 +149,7 @@ public class PkmFileLoader : IPkmFileLoader
             .Where(pkmFile => pkmFile.Updated && !pkmFile.Deleted)
             .ToListAsync();
 
-        Console.WriteLine($"Pkm files to update: {pkmFilesToUpdate.Count}");
+        log.LogDebug($"Pkm files to update: {pkmFilesToUpdate.Count}");
 
         pkmFilesToUpdate.ForEach(pkmFileToUpdate =>
         {

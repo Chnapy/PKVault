@@ -4,7 +4,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 {
     public virtual async Task<bool> UpdateDexWithSave(Dictionary<ushort, Dictionary<uint, DexItemDTO>> dex, StaticSpeciesData staticSpecies, HashSet<ushort>? speciesSet)
     {
-        // var logtime = LogUtil.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
+        // var logtime = log.Time($"Update Dex with save {save.ID32} (save-type={save.GetType().Name}) (max-species={save.MaxSpeciesID})");
 
         var pkmBySpecies = new Dictionary<ushort, List<ImmutablePKM>>();
 
@@ -64,7 +64,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
         // if (species == 201)
         // {
-        //     Console.WriteLine($"FOOOOOOOOOO {pi.FormCount} {save.ID32} {save.Generation} {foo.Length}");
+        //     log.LogInformation($"FOOOOOOOOOO {pi.FormCount} {save.ID32} {save.Generation} {foo.Length}");
         // }
         // var strings = GameInfo.GetStrings(SettingsService.AppSettings.GetSafeLanguage());
         // var formList = FormConverter.GetFormList(species, strings.types, strings.forms, GameInfo.GenderSymbolUnicode, save.Context);

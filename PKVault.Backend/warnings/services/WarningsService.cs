@@ -2,7 +2,7 @@
  * Warnings checks in current session data.
  */
 public class WarningsService(
-    IServiceProvider sp,
+    IServiceProvider sp, ILogger<WarningsService> log,
     IFileIOService fileIOService, ISessionService sessionService, ISavesLoadersService savesLoadersService
 )
 {
@@ -20,7 +20,7 @@ public class WarningsService(
 
     public async Task<WarningsDTO> CheckWarnings()
     {
-        using var _ = LogUtil.Time($"Warnings check");
+        using var _ = log.Time($"Warnings check");
 
         var saveChangedWarnings = CheckSaveChangedWarnings();
         var pkmVariantWarnings = CheckPkmVariantWarnings();
@@ -56,7 +56,7 @@ public class WarningsService(
                 ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
                 var lastWriteTime = fileIOService.GetLastWriteTimeUtc(path);
-                // Console.WriteLine($"Check save {saveLoaders.Save.ID32} to {path}.\nWrite-time from {lastWriteTime} to {startTime}.");
+                // log.LogInformation($"Check save {saveLoaders.Save.ID32} to {path}.\nWrite-time from {lastWriteTime} to {startTime}.");
                 return lastWriteTime > startTime;
             })
             .Select(saveLoaders => new SaveChangedWarning( SaveId: saveLoaders.Save.Id ))];
@@ -85,7 +85,7 @@ public class WarningsService(
 
             if (savePkms.Count == 0)
             {
-                // Console.WriteLine($"Pkm-version warning");
+                // log.LogInformation($"Pkm-version warning");
 
                 return new PkmVariantWarning(
                     PkmVariantId: attachedPkmVariant.Id

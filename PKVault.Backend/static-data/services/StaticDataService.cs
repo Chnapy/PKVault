@@ -3,11 +3,11 @@ using PKHeX.Core;
 /**
  * Gives static-data, including pokeapi data and spritesheets.
  */
-public class StaticDataService(ISettingsService settingsService)
+public class StaticDataService(ILogger<StaticDataService> log, ISettingsService settingsService)
 {
     public static readonly EntityContext LAST_ENTITY_CONTEXT = StaticDataGenerator<object>.LAST_ENTITY_CONTEXT;
 
-    private readonly CacheWithTiming Cache = new();
+    private readonly CacheWithTiming Cache = new(log);
     private StaticEvolvesData? StaticEvolves = null;
 
     private readonly SpritesheetFileClient spritesheetFileClient = new();

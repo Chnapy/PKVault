@@ -17,9 +17,11 @@ public record SpriteInfo(string SheetName, int X, int Y, int Width, int Height);
  * Generates species and items spritesheets.
  */
 public class GenStaticSpritesheets(
+    ILogger log,
     IFileIOService fileIOService,
     StaticSpeciesData staticSpecies, StaticItem[] staticItems
 ) : StaticDataGenerator<StaticSpritesheetsData>(
+   log,
    jsonTypeInfo: StaticDataJsonContext.Default.StaticSpritesheetsData,
    jsonTypeInfoIndented: new StaticDataJsonContext(JsonIndentedOptions).StaticSpritesheetsData,
    fileIOService
@@ -134,7 +136,7 @@ public class GenStaticSpritesheets(
             }
             catch
             {
-                Console.WriteLine($"Error source file {finalUrl}");
+                log.LogError($"Error source file {finalUrl}");
                 throw;
             }
         }
@@ -179,7 +181,7 @@ public class GenStaticSpritesheets(
             //     SkipMetadata = true,
             // }
         );
-        Console.WriteLine($"Saved spritesheet with {images.Count} sprites to {sheetPath}");
+        log.LogInformation($"Saved spritesheet with {images.Count} sprites to {sheetPath}");
 
         return allSpriteInfo;
     }

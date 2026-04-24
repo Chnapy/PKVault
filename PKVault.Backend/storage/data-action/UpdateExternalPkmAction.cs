@@ -11,6 +11,7 @@ public record UpdateExternalPkmActionInput(
 public record UpdateExternalPkmData(PkmFileEntity PkmFileEntity, ImmutablePKM Pkm);
 
 public class UpdateExternalPkmAction(
+    ILogger<UpdateExternalPkmAction> log,
     StaticDataService staticDataService,
     IPkmVariantLoader pkmVariantLoader, IPkmFileLoader pkmFileLoader, IBankLoader bankLoader, IBoxLoader boxLoader,
     IFileIOService fileIOService, ISettingsService settingsService
@@ -18,7 +19,7 @@ public class UpdateExternalPkmAction(
 {
     public async Task<UpdateExternalPkmActionInput> HasExternalPkmsToUpdate()
     {
-        using var _ = LogUtil.Time($"UpdateExternalPkmAction.HasExternalPkmsToUpdate");
+        using var _ = log.Time($"UpdateExternalPkmAction.HasExternalPkmsToUpdate");
 
         var pkmExternalGlobs = (settingsService.GetSettings().SettingsMutable.PKM_EXTERNAL_GLOBS ?? [])
             .Select(glob => glob.Trim())
@@ -106,7 +107,7 @@ public class UpdateExternalPkmAction(
 
     protected override async Task<DataActionPayload> Execute(UpdateExternalPkmActionInput input, DataUpdateFlags flags)
     {
-        using var _ = LogUtil.Time($"UpdateExternalPkmAction.Execute Adds={input.ExternalPkmsToAdd.Length} Deletes={input.ExternalPkmsToRemove.Length}");
+        using var _ = log.Time($"UpdateExternalPkmAction.Execute Adds={input.ExternalPkmsToAdd.Length} Deletes={input.ExternalPkmsToRemove.Length}");
 
         await RemoveDisabledPkms(input.ExternalPkmsToRemove, flags);
 
@@ -120,10 +121,10 @@ public class UpdateExternalPkmAction(
 
     private async Task AddExternalPkms(UpdateExternalPkmData[] externalPkmsToAdd, DataUpdateFlags flags)
     {
-        // Console.WriteLine($"Update external pkms ({externalPkmsToAdd.Length})");
+        // log.LogInformation($"Update external pkms ({externalPkmsToAdd.Length})");
 
         // foreach (var pkm in externalPkmsToAdd)
-        //     Console.WriteLine(pkm.PkmFileEntity.Filepath);
+        //     log.LogInformation(pkm.PkmFileEntity.Filepath);
 
         List<PkmVariantLoaderAddPayload> pkmVariantsToAdd = [];
 
@@ -162,7 +163,7 @@ public class UpdateExternalPkmAction(
             var pkmsBoxes = pkmsBanksBoxes.Where(pbb => pbb.BankName == bankName);
             var boxesNames = pkmsBoxes.Select(pb => pb.BoxName).Distinct();
 
-            // Console.WriteLine($"{bankName} -> {string.Join(',', boxesNames)}");
+            // log.LogInformation($"{bankName} -> {string.Join(',', boxesNames)}");
 
             var bank = existingBanks.Find(b => b.IsExternal && b.Name == bankName);
             if (bank == null)
@@ -263,7 +264,7 @@ public class UpdateExternalPkmAction(
 
     private async Task RemoveDisabledPkms(PkmVariantEntity[] externalPkmsToRemove, DataUpdateFlags flags)
     {
-        // Console.WriteLine($"Remove external pkms ({externalPkmsToRemove.Length})");
+        // log.LogInformation($"Remove external pkms ({externalPkmsToRemove.Length})");
 
         if (externalPkmsToRemove.Length == 0)
         {

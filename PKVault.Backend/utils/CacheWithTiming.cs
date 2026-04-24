@@ -5,7 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
  * Cache time-based with sliding expiration.
  * Use MemoryCache with cleanup logic for memory concerns.
  */
-public class CacheWithTiming : IDisposable
+public class CacheWithTiming(ILogger log) : IDisposable
 {
     private readonly MemoryCache Cache = new(new MemoryCacheOptions());
     private readonly ConcurrentDictionary<string, DateTime> LastAccessUtc = [];
@@ -74,7 +74,7 @@ public class CacheWithTiming : IDisposable
 
     public void SetValue<D>(string cacheKey, D value)
     {
-        Console.WriteLine($"Update cache: {cacheKey}");
+        log.LogDebug($"Update cache: {cacheKey}");
 
         LastAccessUtc[cacheKey] = DateTime.UtcNow;
 
@@ -98,7 +98,7 @@ public class CacheWithTiming : IDisposable
 
     public void Remove(string cacheKey)
     {
-        Console.WriteLine($"Remove cache: {cacheKey}");
+        log.LogDebug($"Remove cache: {cacheKey}");
 
         LastAccessUtc.TryRemove(cacheKey, out _);
         Semaphores.TryRemove(cacheKey, out _);

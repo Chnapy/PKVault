@@ -8,7 +8,7 @@ public class Dex8LAService(SAV8LA save) : DexGenService(save)
 
         // if (species == 76)
         // {
-        //     Console.WriteLine($"GROLEM {species}/{form}/{gender} types={pi.Type1}/{pi.Type2} forms.count={save.Personal[species].FormCount}");
+        //     log.LogInformation($"GROLEM {species}/{form}/{gender} types={pi.Type1}/{pi.Type2} forms.count={save.Personal[species].FormCount}");
         // }
 
         var dex = save.Blocks.PokedexSave;

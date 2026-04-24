@@ -5,11 +5,11 @@ public interface IDbSeedingService
     public Task Seed(DbContext db, bool _, CancellationToken cancelToken);
 }
 
-public class DbSeedingService(IFileIOService fileIOService) : IDbSeedingService
+public class DbSeedingService(ILogger<DbSeedingService> log, IFileIOService fileIOService) : IDbSeedingService
 {
     public async Task Seed(DbContext db, bool _, CancellationToken cancelToken)
     {
-        using var __ = LogUtil.Time("DB seeding");
+        using var __ = log.Time("DB seeding");
 
         await SeedPkmFilesData(db, cancelToken);
     }
@@ -18,7 +18,7 @@ public class DbSeedingService(IFileIOService fileIOService) : IDbSeedingService
     {
         var pkmFilesDb = db.Set<PkmFileEntity>();
 
-        using var _ = LogUtil.Time("Seed PKM files migration");
+        using var _ = log.Time("Seed PKM files migration");
 
         var pkmFiles = await pkmFilesDb
             .ToListAsync(cancelToken);

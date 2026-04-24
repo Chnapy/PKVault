@@ -59,7 +59,7 @@ public abstract class LegacyEntityLoader<E> where E : ILegacyEntity
         var deleted = GetAllEntities().Remove(id);
         if (deleted)
         {
-            // Console.WriteLine($"Deleted id={id}");
+            // log.LogInformation($"Deleted id={id}");
         }
 
         return deleted;
@@ -67,7 +67,7 @@ public abstract class LegacyEntityLoader<E> where E : ILegacyEntity
 
     public virtual E WriteEntity(E entity)
     {
-        // Console.WriteLine($"{entity.GetType().Name} - Write id={entity.Id}");
+        // log.LogInformation($"{entity.GetType().Name} - Write id={entity.Id}");
 
         GetAllEntities()[entity.Id] = entity;
 
