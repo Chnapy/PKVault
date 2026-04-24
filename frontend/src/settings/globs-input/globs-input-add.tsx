@@ -6,7 +6,7 @@ import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
 
 export type GlobsInputAddProps = {
     label: React.ReactNode;
-    type: 'file' | 'folder';
+    type: 'file' | 'folder' | 'exclude';
     onAdd: (paths: string[]) => void;
     disabled?: boolean;
 };
@@ -14,16 +14,51 @@ export type GlobsInputAddProps = {
 export const GlobsInputAdd: React.FC<GlobsInputAddProps> = ({ label, type, onAdd, disabled }) => {
     const desktopMessage = useDesktopMessage();
 
+    const getTypeInfos = () => {
+        if (type === 'file')
+            return {
+                id: -1,
+                icon: 'file-import',
+                directoryOnly: false,
+                placeholder: './path/to/file',
+                getFinalPaths: (values: string[]) => values,
+            };
+
+        if (type === 'folder')
+            return {
+                id: -2,
+                icon: 'folder',
+                directoryOnly: true,
+                placeholder: './path/to/folder',
+                getFinalPaths: (values: string[]) => values.map(path => path.endsWith('/') ? path : path + '/'),
+            };
+
+        return {
+            id: -3,
+            icon: 'exclaimation',
+            directoryOnly: false,
+            placeholder: '!**/files-to-exclude',
+            getFinalPaths: (values: string[]) => values,
+        };
+    };
+
+    const typeInfos = getTypeInfos();
+
     const onAddFn = async () => {
+        if (type === 'exclude') {
+            onAdd([ typeInfos.placeholder ]);
+            return;
+        }
+
         if (!desktopMessage) {
-            onAdd([ './placeholder' ]);
+            onAdd([ typeInfos.placeholder ]);
             return;
         }
 
         const response = await desktopMessage.fileExplore({
             type: 'file-explore',
-            id: type === 'file' ? -1 : -2,
-            directoryOnly: type === 'folder',
+            id: typeInfos.id,
+            directoryOnly: typeInfos.directoryOnly,
             basePath: '',
             multiselect: false,
         });
@@ -32,9 +67,7 @@ export const GlobsInputAdd: React.FC<GlobsInputAddProps> = ({ label, type, onAdd
             return;
         }
 
-        onAdd(type === 'folder'
-            ? response.values.map(path => path.endsWith('/') ? path : path + '/')
-            : response.values);
+        onAdd(typeInfos.getFinalPaths(response.values));
     };
 
     return <Button
@@ -45,14 +78,9 @@ export const GlobsInputAdd: React.FC<GlobsInputAddProps> = ({ label, type, onAdd
         <Icon name='plus' solid forButton />
         {!isDesktop
             ? label
-            : (type === 'file'
-                ? <>
-                    <Icon name='file-import' solid forButton />
-                    {label}
-                </>
-                : <>
-                    <Icon name='folder' solid forButton />
-                    {label}
-                </>)}
+            : <>
+                <Icon name={typeInfos.icon} solid forButton />
+                {label}
+            </>}
     </Button>;
 };

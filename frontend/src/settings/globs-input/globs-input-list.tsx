@@ -1,10 +1,12 @@
 import { css } from '@emotion/css';
 import React from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
+import { useTranslate } from '../../translate/i18n';
 import { theme } from '../../ui/theme';
-import { isDesktop } from './hooks/use-desktop-message';
 import { GlobsInputAdd } from './globs-input-add';
 import { GlobsInputItem } from './globs-input-item';
+import { GlobsInputResults } from './globs-input-results';
+import { isDesktop } from './hooks/use-desktop-message';
 
 export type GlobsInputListProps = Omit<UseFormRegisterReturn, 'onChange'> & {
     labelList: React.ReactNode;
@@ -16,7 +18,17 @@ export type GlobsInputListProps = Omit<UseFormRegisterReturn, 'onChange'> & {
 };
 
 export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, labelAddFile, labelAddFolder, value, onChange, limit, disabled }) => {
+    const { t } = useTranslate();
+
     const splitedValue = value.split('\n').map(value => value.trim()).filter(Boolean);
+
+    const addCommonProps = {
+        onAdd: (newValue: string[]) => {
+            const newValues = [ ...splitedValue, ...newValue ];
+            onChange(newValues.join('\n'));
+        },
+        disabled,
+    };
 
     return <div
         className={css({
@@ -58,7 +70,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
                     gap: 4,
                     padding: 4,
                     minHeight: 47,
-                    maxHeight: 340,
+                    maxHeight: 600,
                     overflow: 'auto',
                 })}
             >
@@ -92,31 +104,49 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
                         <GlobsInputAdd
                             label={labelAddFile}
                             type='file'
-                            onAdd={newValue => {
-                                const newValues = [ ...splitedValue, ...newValue ];
-                                onChange(newValues.join('\n'));
-                            }}
-                            disabled={disabled}
+                            {...addCommonProps}
                         />
                         <GlobsInputAdd
                             label={labelAddFolder}
                             type='folder'
-                            onAdd={newValue => {
-                                const newValues = [ ...splitedValue, ...newValue ];
-                                onChange(newValues.join('\n'));
-                            }}
-                            disabled={disabled}
+                            {...addCommonProps}
+                        />
+                        <GlobsInputAdd
+                            label={t('settings.form.globs.add-exclude')}
+                            type='exclude'
+                            {...addCommonProps}
                         />
                     </>
-                    : <GlobsInputAdd
-                        label={labelAddFile}
-                        type='file'
-                        onAdd={newValue => {
-                            const newValues = [ ...splitedValue, ...newValue ];
-                            onChange(newValues.join('\n'));
-                        }}
-                        disabled={disabled}
-                    />}
+                    : <>
+                        <GlobsInputAdd
+                            label={labelAddFile}
+                            type='file'
+                            {...addCommonProps}
+                        />
+                        <GlobsInputAdd
+                            label={t('settings.form.globs.add-exclude')}
+                            type='exclude'
+                            {...addCommonProps}
+                        />
+                    </>}
+            </div>
+
+            <div
+                className={css({
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                    padding: 4,
+                    paddingTop: 0,
+                    maxHeight: 340,
+                    overflow: 'auto',
+                })}
+            >
+                <GlobsInputResults
+                    values={splitedValue}
+                    limit={limit * 2}
+                />
             </div>
         </div>
     </div>;
