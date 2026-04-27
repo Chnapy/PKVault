@@ -1,5 +1,4 @@
 using PKHeX.Core;
-using PokeApiNet;
 
 public record StaticVersion(
     byte Id,
@@ -301,7 +300,7 @@ public class GenStaticOthers(
 
                 List<StaticMoveGeneration> dataUntilGeneration = [.. await Task.WhenAll(
                     moveObj.PastValues
-                        .Reverse<PastMoveStatValues>()
+                        .Reverse()
                         .Select(async pastValue =>
                         {
                             var typeUrl = pastValue.Type?.Url ?? tmpTypeUrl;
@@ -673,7 +672,7 @@ public class GenStaticOthers(
         var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
 
         return string.Join('/', pokeapiVersions
-            .OfType<PokeApiNet.Version>()
+            .OfType<PokeApi.Models.Version>()
             .Select(ver =>
             {
                 return PokeApiService.GetNameForLang(ver.Names, lang);
@@ -686,7 +685,7 @@ public class GenStaticOthers(
 
         return [.. (await Task.WhenAll(
             pokeapiVersions
-                .OfType<PokeApiNet.Version>()
+                .OfType<PokeApi.Models.Version>()
                 .Select(async ver =>
                 {
                     if (ver.Id == 0)
@@ -712,7 +711,7 @@ public class GenStaticOthers(
             "national",
             .. (await Task.WhenAll(
                 pokeapiVersions
-                    .OfType<PokeApiNet.Version>()
+                    .OfType<PokeApi.Models.Version>()
                     .Select(async ver =>
                     {
                         if (ver.Id == 0)
@@ -728,7 +727,7 @@ public class GenStaticOthers(
         ];
     }
 
-    private Task<PokeApiNet.Version?>[] GetPokeApiVersion(GameVersion version)
+    private Task<PokeApi.Models.Version?>[] GetPokeApiVersion(GameVersion version)
     {
         return version switch
         {
@@ -813,10 +812,10 @@ public class GenStaticOthers(
             GameVersion.RSE => [.. GetPokeApiVersion(GameVersion.RS), .. GetPokeApiVersion(GameVersion.E)],
             GameVersion.FRLG => [.. GetPokeApiVersion(GameVersion.FR), .. GetPokeApiVersion(GameVersion.LG)],
             GameVersion.RSBOX => [
-                Task.FromResult<PokeApiNet.Version?>(new() {
+                Task.FromResult<PokeApi.Models.Version?>(new() {
                     Names = [
-                        new() { Name = "Box Ruby & Sapphire", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } },
-                        new() { Name = "Box Rubis & Saphir", Language = new() { Name = "fr", Url = "https://pokeapi.co/api/v2/language/5/" } },
+                        new() { Name1 = "Box Ruby & Sapphire", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } },
+                        new() { Name1 = "Box Rubis & Saphir", Language = new() { Name = "fr", Url = "https://pokeapi.co/api/v2/language/5/" } },
                     ]
                 })
             ],
@@ -826,9 +825,9 @@ public class GenStaticOthers(
             GameVersion.DPPt => [.. GetPokeApiVersion(GameVersion.DP), .. GetPokeApiVersion(GameVersion.Pt)],
             GameVersion.HGSS => [.. GetPokeApiVersion(GameVersion.HG), .. GetPokeApiVersion(GameVersion.SS)],
             GameVersion.BATREV => [
-                Task.FromResult<PokeApiNet.Version?>(new() {
+                Task.FromResult<PokeApi.Models.Version?>(new() {
                     Names = [
-                        new() { Name = "Battle Revolution", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } }
+                        new() { Name1 = "Battle Revolution", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } }
                     ]
                 })
             ],
@@ -857,23 +856,23 @@ public class GenStaticOthers(
             GameVersion.Gen9 => [.. GetPokeApiVersion(GameVersion.SV)],
 
             GameVersion.StadiumJ => [
-                Task.FromResult<PokeApiNet.Version?>(new() {
+                Task.FromResult<PokeApi.Models.Version?>(new() {
                     Names = [
-                        new() { Name = "Stadium (J)", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } }
+                        new() { Name1 = "Stadium (J)", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } }
                     ]
                 })
             ],
             GameVersion.Stadium => [
-                Task.FromResult<PokeApiNet.Version?>(new() {
+                Task.FromResult<PokeApi.Models.Version?>(new() {
                     Names = [
-                        new() { Name = "Stadium", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } }
+                        new() { Name1 = "Stadium", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } }
                     ]
                 })
             ],
             GameVersion.Stadium2 => [
-                Task.FromResult<PokeApiNet.Version?>(new() {
+                Task.FromResult<PokeApi.Models.Version?>(new() {
                     Names = [
-                        new() { Name = "Stadium 2", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } }
+                        new() { Name1 = "Stadium 2", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } }
                     ]
                 })
             ],

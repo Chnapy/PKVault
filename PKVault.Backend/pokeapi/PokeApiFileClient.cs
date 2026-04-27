@@ -1,76 +1,67 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
-using PokeApiNet;
+using PokeApi.Models;
 
 public partial class PokeApiFileClient(IFileIOService fileIOService)
 {
-    public async Task<T?> GetAsync<T>(UrlNavigation<T> urlResource, JsonTypeInfo<T> jsonContext) where T : ResourceBase
+    public async Task<T?> GetAsync<T>(NamedApiResource urlResource, JsonTypeInfo<T> jsonContext)
     {
         return await GetAsyncByUrl(urlResource.Url, jsonContext);
     }
 
-    public async Task<T?> GetAsync<T>(string name, JsonTypeInfo<NamedApiResourceList<T>> jsonContextList, JsonTypeInfo<T> jsonContext) where T : NamedApiResource
+    public async Task<T?> GetAsync<T>(ApiResource urlResource, JsonTypeInfo<T> jsonContext)
+    {
+        return await GetAsyncByUrl(urlResource.Url, jsonContext);
+    }
+
+    public async Task<T?> GetAsync<T>(string name, JsonTypeInfo<NamedApiResourceList> jsonContextList, JsonTypeInfo<T> jsonContext)
     {
         if (name.Contains('★'))
         {
-            return null;
+            return default;
         }
 
         var formattedName = PokeApiNameFromPKHexName(name);
 
         var results = await GetAsyncList(jsonContextList, jsonContext);
 
-        var namedApi = results.Find(resource => resource.Name.Equals(formattedName, StringComparison.CurrentCultureIgnoreCase));
+        var namedApi = results.FirstOrDefault(resource => resource.Name.Equals(formattedName, StringComparison.CurrentCultureIgnoreCase));
         if (namedApi == null)
         {
-            return null;
+            return default;
         }
 
         return await GetAsync(namedApi, jsonContext);
     }
 
-    public async Task<List<NamedApiResource<T>>> GetAsyncList<T>(JsonTypeInfo<NamedApiResourceList<T>> jsonContextList, JsonTypeInfo<T> jsonContext) where T : NamedApiResource
-    {
-        string url = GetApiEndpointString(jsonContext.Type);
-
-        NamedApiResourceList<T>? page = await GetAsyncByPathname(url, jsonContextList);
-
-        return page!.Results;
-    }
-
-    public async Task<List<ApiResource<T>>> GetAsyncUrlList<T>(JsonTypeInfo<ApiResourceList<T>> jsonContextList, JsonTypeInfo<T> jsonContext) where T : ApiResource
-    {
-        string url = GetApiEndpointString(jsonContext.Type);
-
-        ApiResourceList<T>? page = await GetAsyncByPathname(url, jsonContextList);
-
-        return page!.Results;
-    }
-
-    public async Task<List<NamedApiResource<T>>> GetAsyncUrlList<T>(JsonTypeInfo<NamedApiResourceList<T>> jsonContextList, JsonTypeInfo<T> jsonContext) where T : NamedApiResource
-    {
-        string url = GetApiEndpointString(jsonContext.Type);
-
-        NamedApiResourceList<T>? page = await GetAsyncByPathname(url, jsonContextList);
-
-        return page!.Results;
-    }
-
     public async Task<T?> GetAsync<T>(int apiParam, JsonTypeInfo<T> jsonContext)
     {
-        string text = IsApiEndpointCaseSensitive(jsonContext.Type) ? apiParam.ToString() : apiParam.ToString().ToLowerInvariant();
-        string apiEndpointString = GetApiEndpointString(jsonContext.Type);
+        string apiEndpointString = GetApiEndpointString(jsonContext.Type, list: false, apiParam.ToString());
 
-        return await GetAsyncByPathname($"{apiEndpointString}/{text}", jsonContext);
+        return await GetAsyncByUrl(apiEndpointString, jsonContext);
     }
 
-    private async Task<T?> GetAsyncByPathname<T>(string pathname, JsonTypeInfo<T> jsonContext)
+    public async Task<ICollection<ApiResource>> GetAsyncList<T>(JsonTypeInfo<ApiResourceList> jsonContextList, JsonTypeInfo<T> jsonContext)
     {
-        return await GetAsyncByUrl($"/api/v2/{pathname}", jsonContext);
+        string url = GetApiEndpointString(jsonContext.Type, list: true);
+
+        var page = await GetAsyncByUrl(url, jsonContextList);
+        ArgumentNullException.ThrowIfNull(page);
+
+        return page.Results;
+    }
+
+    public async Task<ICollection<NamedApiResource>> GetAsyncList<T>(JsonTypeInfo<NamedApiResourceList> jsonContextList, JsonTypeInfo<T> jsonContext)
+    {
+        string url = GetApiEndpointString(jsonContext.Type, list: true);
+
+        var page = await GetAsyncByUrl(url, jsonContextList);
+        ArgumentNullException.ThrowIfNull(page);
+
+        return page.Results;
     }
 
     private async Task<T?> GetAsyncByUrl<T>(string url, JsonTypeInfo<T> jsonContext)
@@ -85,7 +76,12 @@ public partial class PokeApiFileClient(IFileIOService fileIOService)
             throw new Exception($"{pokeapiDataDirPath} doesn't exist. Did you pull pokeapi submodules ?");
         }
 
-        var path = Path.Combine(pokeapiDataDirPath, string.Join('/', uriParts), "index.json");
+        if (!uriParts.Last().Contains('.'))
+        {
+            uriParts.Add("index.json");
+        }
+
+        var path = Path.Combine(pokeapiDataDirPath, string.Join('/', uriParts));
 
         var result = await fileIOService.ReadJSONFile(path, jsonContext);
 
@@ -98,24 +94,19 @@ public partial class PokeApiFileClient(IFileIOService fileIOService)
     }
 
     public string GetApiEndpointString(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        System.Type jsonType)
+        // [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        System.Type jsonType,
+        bool list,
+        string? param = null
+    )
     {
-        return jsonType?.GetProperty("ApiEndpoint", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null)?.ToString()
-            ?? throw new Exception($"ApiEndpoint not found for type {jsonType}");
-    }
+        var propertyName = list ? "FileEndpointList" : "FileEndpoint";
+        
+        var endpoint = jsonType.GetField(propertyName, BindingFlags.Static | BindingFlags.Public)?.GetValue(null)?.ToString();
 
-    private bool IsApiEndpointCaseSensitive(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        System.Type jsonType)
-    {
-        PropertyInfo? property = jsonType.GetProperty("IsApiEndpointCaseSensitive", BindingFlags.Static | BindingFlags.NonPublic);
-        if (!(property == null))
-        {
-            return (bool)property.GetValue(null)!;
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, $"Endpoint missing using property {propertyName} for type {jsonType}");
 
-        return false;
+        return endpoint.Replace("$id", param);
     }
 
     public static string PokeApiNameFromPKHexName(string pkhexName)
@@ -161,9 +152,3 @@ public partial class PokeApiFileClient(IFileIOService fileIOService)
     [GeneratedRegex(@"[\.’'`´]+")]
     private static partial Regex PonctuRegex();
 }
-
-public enum PokeApiPokedexEnum
-{
-    HOENN = 4,
-}
-

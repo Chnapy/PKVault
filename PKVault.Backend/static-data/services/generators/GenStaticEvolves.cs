@@ -1,5 +1,5 @@
 using PKHeX.Core;
-using PokeApiNet;
+using PokeApi.Models;
 
 public class StaticEvolvesData : Dictionary<ushort, StaticEvolve>;
 
@@ -45,7 +45,7 @@ public class GenStaticEvolves(
     {
         var staticEvolves = new StaticEvolvesData();
 
-        void actChain(ChainLink chain)
+        void actChain(EvolutionChainEvolvesTo chain)
         {
             var species = ushort.Parse(chain.Species.Url.TrimEnd('/').Split('/')[^1]);
 
@@ -56,11 +56,11 @@ public class GenStaticEvolves(
                 Other: []
             );
 
-            chain.EvolvesTo.ForEach(evolveTo =>
+            chain.EvolvesTo.ToList().ForEach(evolveTo =>
             {
                 var evolveSpecies = ushort.Parse(evolveTo.Species.Url.TrimEnd('/').Split('/')[^1]);
 
-                evolveTo.EvolutionDetails.ForEach(details =>
+                evolveTo.EvolutionDetails.ToList().ForEach(details =>
                 {
                     foreach (var version in Enum.GetValues<GameVersion>())
                     {
@@ -76,8 +76,9 @@ public class GenStaticEvolves(
                             // log.LogInformation($"EVOLVE TRADE NOT ALLOWED {species}->{evolveSpecies} v={version}");
                             continue;
                         }
-
-                        if (species == (ushort)Species.Finizen && details.Trigger.Name == "other")
+                        
+                        // Needs multiplayer, but no trade (currently: Finizen (#963))
+                        if (details.NeedsMultiplayer)
                         {
                             speciesEvolve.Trade.Add((byte)version, new(evolveSpecies, details.MinLevel ?? 1));
                             continue;
@@ -108,10 +109,11 @@ public class GenStaticEvolves(
                         }
                         else
                         {
-                            if (!speciesEvolve.TradeWithItem.TryGetValue(details.HeldItem.Name, out var versionTradeDict))
+                            var key = details.HeldItem.Name;
+                            if (!speciesEvolve.TradeWithItem.TryGetValue(key, out var versionTradeDict))
                             {
                                 versionTradeDict = [];
-                                speciesEvolve.TradeWithItem.Add(details.HeldItem.Name, versionTradeDict);
+                                speciesEvolve.TradeWithItem.Add(key, versionTradeDict);
                             }
                             versionTradeDict.Add((byte)version, new(evolveSpecies, details.MinLevel ?? 1));
                             // log.LogInformation($"EVOLVE TRADE {species}->{evolveSpecies} item={details.HeldItem.Name} v={version}");
@@ -154,7 +156,14 @@ public class GenStaticEvolves(
 
         var evolutionChains = await pokeApiService.GetEvolutionChains();
 
-        evolutionChains.ForEach(evolutionChain => actChain(evolutionChain.Chain));
+        evolutionChains.ForEach(evolutionChain => actChain(new EvolutionChainEvolvesTo()
+        {
+            Species = evolutionChain.Chain.Species,
+            IsBaby = evolutionChain.Chain.IsBaby,
+            EvolutionDetails = [.. evolutionChain.Chain.EvolutionDetails.OfType<EvolutionChainEvolutionDetails>()],
+            EvolvesTo = evolutionChain.Chain.EvolvesTo,
+            AdditionalProperties = evolutionChain.Chain.AdditionalProperties
+        }));
 
         foreach (var staticEvolve in staticEvolves.Values)
         {

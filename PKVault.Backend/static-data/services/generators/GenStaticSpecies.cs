@@ -1,5 +1,5 @@
 using PKHeX.Core;
-using PokeApiNet;
+using PokeApi.Models;
 
 public class StaticSpeciesData : Dictionary<ushort, StaticSpecies>;
 
@@ -78,7 +78,7 @@ public class GenStaticSpecies(
 
                 var forms = new Dictionary<byte, StaticSpeciesForm[]>();
 
-                async Task<(Pokemon, PokemonForm[])> getVarietyFormsData(PokemonSpeciesVariety pkmVariety)
+                async Task<(Pokemon, PokemonForm[])> getVarietyFormsData(PokemonSpeciesVarieties pkmVariety)
                 {
                     var pkmObj = await pokeApiService.GetPokemon(pkmVariety.Pokemon);
                     var apiForms = await Task.WhenAll(pkmObj.Forms.Select((formUrl) => pokeApiService.GetPokemonForms(formUrl)));
@@ -99,7 +99,7 @@ public class GenStaticSpecies(
                         {
                             Id = pkmObj.Id,
                             Names = [new() {
-                                Name = pkmObj.Name,
+                                Name1 = pkmObj.Name,
                                 Language = new() { Name = SettingsService.DefaultLanguage }
                             }],
                             FormNames = [],
@@ -238,8 +238,8 @@ public class GenStaticSpecies(
                     );
                 }
 
-                var defaultVariety = pkmSpeciesObj.Varieties.Find(variety => variety.IsDefault);
-                var otherVarieties = pkmSpeciesObj.Varieties.FindAll(variety => !variety.IsDefault);
+                var defaultVariety = pkmSpeciesObj.Varieties.FirstOrDefault(variety => variety.IsDefault);
+                var otherVarieties = pkmSpeciesObj.Varieties.Where(variety => !variety.IsDefault);
 
                 var defaultDataTask = getVarietyFormsData(defaultVariety);
                 var otherDatasTask = otherVarieties.Select(variety => getVarietyFormsData(variety));

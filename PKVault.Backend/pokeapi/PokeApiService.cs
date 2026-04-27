@@ -1,4 +1,4 @@
-using PokeApiNet;
+using PokeApi.Models;
 
 /**
  * Data fetcher not used during classic run.
@@ -38,10 +38,11 @@ public class PokeApiService(IFileIOService fileIOService)
 
     public async Task<List<EvolutionChain>> GetEvolutionChains()
     {
-        var evolutionChainsUrls = await client.GetAsyncUrlList(
-            PokeApiJsonContext.Default.ApiResourceListEvolutionChain,
+        var evolutionChainsUrls = await client.GetAsyncList(
+            PokeApiJsonContext.Default.ApiResourceList,
             PokeApiJsonContext.Default.EvolutionChain
         );
+
         return [.. (await Task.WhenAll(evolutionChainsUrls
             .Select(apiResource => client.GetAsync(apiResource,
                 PokeApiJsonContext.Default.EvolutionChain
@@ -49,7 +50,7 @@ public class PokeApiService(IFileIOService fileIOService)
         )).OfType<EvolutionChain>()];
     }
 
-    public async Task<PokemonForm?> GetPokemonForms(NamedApiResource<PokemonForm> namedPokemonForm)
+    public async Task<PokemonForm?> GetPokemonForms(NamedApiResource namedPokemonForm)
     {
         return await client.GetAsync(namedPokemonForm,
             PokeApiJsonContext.Default.PokemonForm
@@ -72,7 +73,7 @@ public class PokeApiService(IFileIOService fileIOService)
     //     );
     // }
 
-    public async Task<Pokemon?> GetPokemon(NamedApiResource<Pokemon> namedPokemon)
+    public async Task<Pokemon?> GetPokemon(NamedApiResource namedPokemon)
     {
         return await client.GetAsync(namedPokemon,
             PokeApiJsonContext.Default.Pokemon
@@ -82,15 +83,15 @@ public class PokeApiService(IFileIOService fileIOService)
     public async Task<Nature?> GetNature(string natureName)
     {
         return await client.GetAsync(natureName,
-            PokeApiJsonContext.Default.NamedApiResourceListNature,
+            PokeApiJsonContext.Default.NamedApiResourceList,
             PokeApiJsonContext.Default.Nature
         );
     }
 
     public async Task<Pokedex[]> GetPokedexList()
     {
-        var pokedexList = await client.GetAsyncUrlList(
-            PokeApiJsonContext.Default.NamedApiResourceListPokedex,
+        var pokedexList = await client.GetAsyncList(
+            PokeApiJsonContext.Default.NamedApiResourceList,
             PokeApiJsonContext.Default.Pokedex
         );
 
@@ -100,13 +101,6 @@ public class PokeApiService(IFileIOService fileIOService)
             )
         ))
         .OfType<Pokedex>()];
-    }
-
-    public async Task<Pokedex?> GetPokedex(PokeApiPokedexEnum pokedex)
-    {
-        return await client.GetAsync((int)pokedex,
-            PokeApiJsonContext.Default.Pokedex
-        );
     }
 
     // public static async Task<Item?> GetItem(int id)
@@ -119,7 +113,7 @@ public class PokeApiService(IFileIOService fileIOService)
     public async Task<Item?> GetItem(string name)
     {
         return await client.GetAsync(name,
-            PokeApiJsonContext.Default.NamedApiResourceListItem,
+            PokeApiJsonContext.Default.NamedApiResourceList,
             PokeApiJsonContext.Default.Item
         );
     }
@@ -138,14 +132,14 @@ public class PokeApiService(IFileIOService fileIOService)
         );
     }
 
-    public async Task<VersionGroup?> GetVersionGroup(NamedApiResource<VersionGroup> namedVersionGroup)
+    public async Task<VersionGroup?> GetVersionGroup(NamedApiResource namedVersionGroup)
     {
         return await client.GetAsync(namedVersionGroup,
             PokeApiJsonContext.Default.VersionGroup
         );
     }
 
-    public async Task<PokeApiNet.Version?> GetVersion(int id)
+    public async Task<PokeApi.Models.Version?> GetVersion(int id)
     {
         return await client.GetAsync(id,
             PokeApiJsonContext.Default.Version
@@ -159,7 +153,7 @@ public class PokeApiService(IFileIOService fileIOService)
         );
     }
 
-    public async Task<Region?> GetRegion(NamedApiResource<Region> namedRegion)
+    public async Task<Region?> GetRegion(NamedApiResource namedRegion)
     {
         return await client.GetAsync(namedRegion,
             PokeApiJsonContext.Default.Region
@@ -188,10 +182,10 @@ public class PokeApiService(IFileIOService fileIOService)
         return int.Parse(url.TrimEnd('/').Split('/')[^1]);
     }
 
-    public static string GetNameForLang(List<Names> names, string lang)
+    public static string GetNameForLang(ICollection<Name> names, string lang)
     {
-        return names.Find(name => name.Language.Name == lang)?.Name
-            ?? names.Find(name => name.Language.Name == SettingsService.DefaultLanguage)?.Name
+        return names.FirstOrDefault(name => name.Language.Name == lang)?.Name1
+            ?? names.FirstOrDefault(name => name.Language.Name == SettingsService.DefaultLanguage)?.Name1
             ?? throw new Exception($"Language not handled: {lang}");
     }
 }

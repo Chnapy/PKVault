@@ -123,7 +123,6 @@ Your can use this app for your own projects following license restrictions.
 
 - Backend / Desktop
   - [PKHeX (Core part)](https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core) - License GPLv3
-  - PokeApiNet - License MIT
   - Versions & all others dependencies can be found into `*.csproj` files
 
 - Frontend
