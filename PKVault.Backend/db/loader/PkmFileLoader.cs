@@ -5,7 +5,6 @@ using PKHeX.Core;
 public interface IPkmFileLoader
 {
     public Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool updated = true, bool checkPkm = true);
-    public Task<List<string>> GetEnabledFilepaths();
     public Task WriteToFiles();
     public ImmutablePKM CreatePKM(PkmFileEntity entity, EntityContext context);
     public byte[] GetPKMBytes(ImmutablePKM pkm);
@@ -74,17 +73,6 @@ public class PkmFileLoader : IPkmFileLoader
         sessionService = _sessionService;
         storagePath = settingsService.GetSettings().SettingsMutable.STORAGE_PATH;
         db = _db;
-    }
-
-    public async Task<List<string>> GetEnabledFilepaths()
-    {
-        var dbSet = await GetDbSet();
-
-        return await dbSet
-            .AsNoTracking()
-            .Where(p => p.Error == null)
-            .Select(p => p.Filepath)
-            .ToListAsync();
     }
 
     public async Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool updated = true, bool checkPkm = true)

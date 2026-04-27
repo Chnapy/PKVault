@@ -38,6 +38,7 @@ public interface IPkmVariantLoader : IEntityLoader<PkmVariantDTO, PkmVariantEnti
 
     public Task<Dictionary<string, PkmVariantEntity>> GetExternalEntitiesDisabledOrNotInPaths(IEnumerable<string> paths);
     public Task<(HashSet<string> Ids, HashSet<string> Filepaths)> GetIdsAndFilepathsWithoutExternalDisabled();
+    public Task<List<string>> GetEnabledFilepaths();
 
     public Task<PkmVariantEntity?> GetEntityBySave(uint saveId, string savePkmIdBase);
     public Task<bool> HasEntityByForm(ushort species, byte form, Gender gender);
@@ -261,6 +262,18 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
         var filepaths = data.Select(x => x.Filepath).ToHashSet();
 
         return (ids, filepaths);
+    }
+
+    public async Task<List<string>> GetEnabledFilepaths()
+    {
+        var dbSet = await GetDbSet();
+
+        return await dbSet
+            .AsNoTracking()
+            .Include(p => p.PkmFile)
+            .Where(p => p.PkmFile!.Error == null)
+            .Select(p => p.Filepath)
+            .ToListAsync();
     }
 
     public async Task<bool> HasEntityByForm(ushort species, byte form, Gender gender)

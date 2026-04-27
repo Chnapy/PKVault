@@ -150,11 +150,13 @@ public class BackupService(
     private async Task<Dictionary<string, (string TargetPath, byte[] FileContent)>> CreateMainBackup()
     {
         using var scope = sp.CreateScope();
-        var pkmFileLoader = scope.ServiceProvider.GetRequiredService<IPkmFileLoader>();
+        var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
 
         var paths = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
 
-        var allFilepaths = await pkmFileLoader.GetEnabledFilepaths();
+        // get all filepaths
+        // but only ones linked to PkmVariant
+        var allFilepaths = await pkmVariantLoader.GetEnabledFilepaths();
 
         var filesInfos = await Task.WhenAll(allFilepaths
             .Where(fileIOService.Exists)
