@@ -2,62 +2,29 @@
 
 --- pokeapi\generated\diff-data\StaticEvolves.diff
 +++ pokeapi\generated\diff-data\StaticEvolves.diff
-@@ -10806,7 +10806,48 @@
+@@ -11876,7 +11876,24 @@
    },
-   "808": {
-     "species": 808,
+   "963": {
+     "species": 963,
 -    "trade": {},
 +    "trade": {
-+      "34": {
-+        "evolveSpecies": 809,
-+        "minLevel": 1
++      "50": {
++        "evolveSpecies": 964,
++        "minLevel": 38
 +      },
-+      "42": {
-+        "evolveSpecies": 809,
-+        "minLevel": 1
++      "51": {
++        "evolveSpecies": 964,
++        "minLevel": 38
 +      },
-+      "43": {
-+        "evolveSpecies": 809,
-+        "minLevel": 1
++      "53": {
++        "evolveSpecies": 964,
++        "minLevel": 38
 +      },
-+      "44": {
-+        "evolveSpecies": 809,
-+        "minLevel": 1
-+      },
-+      "45": {
-+        "evolveSpecies": 809,
-+        "minLevel": 1
-+      },
-+      "52": {
-+        "evolveSpecies": 809,
-+        "minLevel": 1
-+      },
-+      "74": {
-+        "evolveSpecies": 809,
-+        "minLevel": 1
-+      },
-+      "75": {
-+        "evolveSpecies": 809,
-+        "minLevel": 1
-+      },
-+      "85": {
-+        "evolveSpecies": 809,
-+        "minLevel": 1
-+      },
-+      "87": {
-+        "evolveSpecies": 809,
-+        "minLevel": 1
++      "77": {
++        "evolveSpecies": 964,
++        "minLevel": 38
 +      }
 +    },
      "tradeWithItem": {},
      "other": {},
      "previousSpecies": null
-@@ -10816,7 +10857,7 @@
-     "trade": {},
-     "tradeWithItem": {},
-     "other": {},
--    "previousSpecies": null
-+    "previousSpecies": 808
-   },
-   "812": {
-     "species": 812,
