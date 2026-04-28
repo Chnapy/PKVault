@@ -61,14 +61,19 @@ public class UpdateExternalPkmAction(
                 await semaphore.WaitAsync();
                 try
                 {
-                    return await PkmFileLoader.LoadPkmFile(fileIOService, new()
-                    {
-                        Filepath = filepath,
-                        Data = [],
-                        Error = null,
-                        Updated = false,
-                        Deleted = false,
-                    });
+                    return await PkmFileLoader.LoadPkmFile(
+                        fileIOService, 
+                        new()
+                        {
+                            Filepath = filepath,
+                            Data = [],
+                            Error = null,
+                            Updated = false,
+                            Deleted = false,
+                        },
+                        // we may expect big files
+                        checkBeforeLoad: true
+                    );
                 }
                 finally
                 {

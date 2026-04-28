@@ -129,7 +129,7 @@ class Program
             var stream = Assembly.GetManifestResourceStream(streamKey);
             if (stream == null)
             {
-                Console.Error.WriteLine($"Stream not found for key {streamKey}");
+                Log.Error($"Stream not found for key {streamKey}");
                 // args.Response = webView.CoreWebView2.Environment.CreateWebResourceResponse(stream, 404, "Not Found", "");
                 return;
             }
@@ -373,7 +373,7 @@ class Program
             }
             catch (JsonException ex)
             {
-                Console.Error.WriteLine(ex);
+                Log.Error(ex.ToString());
             }
         });
     }

@@ -17,19 +17,23 @@ public class DbSeedingService(ILogger<DbSeedingService> log, IFileIOService file
     private async Task SeedPkmFilesData(DbContext db, CancellationToken cancelToken)
     {
         var pkmFilesDb = db.Set<PkmFileEntity>();
-        var pkmVariantsDb = db.Set<PkmVariantEntity>();
 
         using var _ = log.Time("Seed PKM files migration");
 
-        // get all PkmFile
-        // but only ones linked to PkmVariant
-        var pkmFiles = await pkmVariantsDb
+        // get all PkmFile without distinction
+        var pkmFiles = await pkmFilesDb
             .AsNoTracking()
-            .Include(p => p.PkmFile)
-            .Select(p => p.PkmFile!)
             .ToListAsync(cancelToken);
 
-        var updatedPkmFiles = await Task.WhenAll(pkmFiles.Select(pkmFile => PkmFileLoader.LoadPkmFile(fileIOService, pkmFile)));
+        var updatedPkmFiles = new List<PkmFileEntity>(pkmFiles.Count);
+        // less performant than Task.WhenAll (1000pkm: 500ms vs 400ms)
+        // but avoids CPU spikes
+        foreach (var pkmFile in pkmFiles)
+        {
+            updatedPkmFiles.Add(
+                await PkmFileLoader.LoadPkmFile(fileIOService, pkmFile, checkBeforeLoad: false)
+            );
+        }
 
         pkmFilesDb.UpdateRange(updatedPkmFiles);
 

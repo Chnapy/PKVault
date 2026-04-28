@@ -130,7 +130,7 @@ public class SessionService(
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine(ex);
+            log.LogError(ex.ToString());
         }
 
         return flags;

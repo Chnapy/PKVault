@@ -36,13 +36,13 @@ public class ActionServiceTests
 
         mockFileSystem.AddFile("mock-pkm-files/123", "mock-data");
 
-        var mockPkmVariantService = new Mock<IPkmVariantLoader>();
-        mockPkmVariantService.Setup(x => x.GetEnabledFilepaths()).ReturnsAsync([
+        var mockPkmFileService = new Mock<IPkmFileLoader>();
+        mockPkmFileService.Setup(x => x.GetEnabledFilepaths()).ReturnsAsync([
             "mock-pkm-files/123",
             "mock-pkm-files/456",
         ]);
 
-        serviceCollection.AddSingleton(mockPkmVariantService.Object);
+        serviceCollection.AddSingleton(mockPkmFileService.Object);
 
         var sp = serviceCollection.BuildServiceProvider();
 

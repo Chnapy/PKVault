@@ -1,10 +1,12 @@
 
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
+using Serilog;
 
 public interface IPkmFileLoader
 {
     public Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool updated = true, bool checkPkm = true);
+    public Task<List<string>> GetEnabledFilepaths();
     public Task WriteToFiles();
     public ImmutablePKM CreatePKM(PkmFileEntity entity, EntityContext context);
     public byte[] GetPKMBytes(ImmutablePKM pkm);
@@ -21,26 +23,42 @@ public class PkmFileLoader : IPkmFileLoader
         return $"{pkm.Species:0000}{star} - {speciesName} - {id}.{pkm.Extension}";
     }
 
-    public static async Task<PkmFileEntity> LoadPkmFile(IFileIOService fileIOService, PkmFileEntity pkmFile)
+    public static async Task<PkmFileEntity> LoadPkmFile(IFileIOService fileIOService, PkmFileEntity pkmFile, bool checkBeforeLoad)
     {
         var filepath = Path.Combine(SettingsService.GetAppDirectory(), pkmFile.Filepath);
 
         try
         {
-            var (TooSmall, TooBig) = fileIOService.CheckGameFile(filepath);
+            bool TooSmall, TooBig;
 
-            if (TooBig)
-                throw new PKMLoadException(PKMLoadError.TOO_BIG);
+            // useful if we may expect big slow files
+            // downside: specific file access
+            if (checkBeforeLoad)
+            {
+                (TooSmall, TooBig) = fileIOService.CheckGameFile(filepath);
 
-            if (TooSmall)
-                throw new PKMLoadException(PKMLoadError.TOO_SMALL);
+                if (TooBig)
+                    throw new PKMLoadException(PKMLoadError.TOO_BIG, filepath);
+
+                if (TooSmall)
+                    throw new PKMLoadException(PKMLoadError.TOO_SMALL, filepath);
+            }
 
             pkmFile.Data = await fileIOService.ReadBytes(filepath);
             pkmFile.Error = null;
+            
+            // optimistic check, to avoid multiple file access
+            (TooSmall, TooBig) = fileIOService.CheckGameFile(pkmFile.Data.Length);
+
+            if (TooBig)
+                throw new PKMLoadException(PKMLoadError.TOO_BIG, filepath);
+
+            if (TooSmall)
+                throw new PKMLoadException(PKMLoadError.TOO_SMALL, filepath);
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine(ex);
+            Log.Warning(ex.ToString());
 
             pkmFile.Data = [];
             pkmFile.Error = GetPKMLoadError(ex);
@@ -73,6 +91,17 @@ public class PkmFileLoader : IPkmFileLoader
         sessionService = _sessionService;
         storagePath = settingsService.GetSettings().SettingsMutable.STORAGE_PATH;
         db = _db;
+    }
+
+    public async Task<List<string>> GetEnabledFilepaths()
+    {
+        var dbSet = await GetDbSet();
+
+        return await dbSet
+            .AsNoTracking()
+            .Where(p => p.Error == null)
+            .Select(p => p.Filepath)
+            .ToListAsync();
     }
 
     public async Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool updated = true, bool checkPkm = true)
@@ -180,8 +209,8 @@ public class PkmFileLoader : IPkmFileLoader
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"PKM file load failure with PkmFileEntity.Filepath=${filepath}");
-            Console.Error.WriteLine(ex);
+            Log.Error($"PKM file load failure with PkmFileEntity.Filepath=${filepath}");
+            Log.Error(ex.ToString());
 
             pkm = GetPlaceholderPKM();
             loadError = GetPKMLoadError(ex);
@@ -240,7 +269,7 @@ public class PkmFileLoader : IPkmFileLoader
     }
 }
 
-public class PKMLoadException(PKMLoadError error) : IOException($"PKM load error occured: {error}")
+public class PKMLoadException(PKMLoadError error, string path) : IOException($"PKM load error occured: {error} for path: {path}")
 {
     public readonly PKMLoadError Error = error;
 }
