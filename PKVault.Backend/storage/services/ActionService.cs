@@ -331,7 +331,7 @@ public class ActionService(
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine(ex);
+            log.LogError(ex.ToString());
 
             await RemoveDataActionsAndReset(sessionService.Actions.Count);
 

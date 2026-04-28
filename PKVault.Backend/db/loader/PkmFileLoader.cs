@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
+using Serilog;
 
 public interface IPkmFileLoader
 {
@@ -57,7 +58,7 @@ public class PkmFileLoader : IPkmFileLoader
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine(ex);
+            Log.Warning(ex.ToString());
 
             pkmFile.Data = [];
             pkmFile.Error = GetPKMLoadError(ex);
@@ -208,8 +209,8 @@ public class PkmFileLoader : IPkmFileLoader
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"PKM file load failure with PkmFileEntity.Filepath=${filepath}");
-            Console.Error.WriteLine(ex);
+            Log.Error($"PKM file load failure with PkmFileEntity.Filepath=${filepath}");
+            Log.Error(ex.ToString());
 
             pkm = GetPlaceholderPKM();
             loadError = GetPKMLoadError(ex);

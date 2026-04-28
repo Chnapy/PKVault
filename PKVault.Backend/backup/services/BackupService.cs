@@ -410,7 +410,7 @@ public class BackupService(
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine(ex);
+            log.LogError(ex.ToString());
 
             await RestoreBackup(bkpDateTime, withSafeBackup: false);
 

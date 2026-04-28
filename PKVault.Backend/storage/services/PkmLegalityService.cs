@@ -1,4 +1,5 @@
 using PKHeX.Core;
+using Serilog;
 
 public class PkmLegalityService(ISettingsService settingsService, ILegalityAnalysisService legalityAnalysisService)
 {
@@ -43,8 +44,8 @@ public class PkmLegalityService(ISettingsService settingsService, ILegalityAnaly
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"ValidityReport exception, id={id}");
-            Console.Error.WriteLine(ex);
+            Log.Error($"ValidityReport exception, id={id}");
+            Log.Error(ex.ToString());
             ValidityReport = ex.ToString();
         }
 

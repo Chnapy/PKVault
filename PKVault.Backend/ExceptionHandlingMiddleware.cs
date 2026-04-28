@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Primitives;
+using Serilog;
 
 public partial class ExceptionHandlingMiddleware(RequestDelegate next)
 {
@@ -18,7 +19,7 @@ public partial class ExceptionHandlingMiddleware(RequestDelegate next)
 
     private static async Task WriteExceptionResponse(HttpContext context, Exception ex)
     {
-        Console.Error.WriteLine(ex);
+        Log.Error(ex.ToString());
         var response = context.Response;
         if (response.HasStarted)
         {
