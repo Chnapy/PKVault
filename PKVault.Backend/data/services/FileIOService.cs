@@ -24,6 +24,7 @@ public interface IFileIOService
     public Task WriteJSONGZipFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value);
     public Task<Image<Rgba32>> ReadImage(string path);
     public (bool TooSmall, bool TooBig) CheckGameFile(string path);
+    public (bool TooSmall, bool TooBig) CheckGameFile(long length);
     public bool Exists(string path);
     public DateTime GetLastWriteTime(string path);
     public DateTime GetLastWriteTimeUtc(string path);
@@ -154,9 +155,14 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
 
         var fi = fileSystem.FileInfo.New(path);
 
+        return CheckGameFile(fi.Length);
+    }
+
+    public (bool TooSmall, bool TooBig) CheckGameFile(long length)
+    {
         return (
-            TooSmall: FileUtil.IsFileTooSmall(fi.Length),
-            TooBig: FileUtil.IsFileTooBig(fi.Length)
+            TooSmall: FileUtil.IsFileTooSmall(length),
+            TooBig: FileUtil.IsFileTooBig(length)
         );
     }
 

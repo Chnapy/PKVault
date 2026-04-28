@@ -22,22 +22,38 @@ public class PkmFileLoader : IPkmFileLoader
         return $"{pkm.Species:0000}{star} - {speciesName} - {id}.{pkm.Extension}";
     }
 
-    public static async Task<PkmFileEntity> LoadPkmFile(IFileIOService fileIOService, PkmFileEntity pkmFile)
+    public static async Task<PkmFileEntity> LoadPkmFile(IFileIOService fileIOService, PkmFileEntity pkmFile, bool checkBeforeLoad)
     {
         var filepath = Path.Combine(SettingsService.GetAppDirectory(), pkmFile.Filepath);
 
         try
         {
-            var (TooSmall, TooBig) = fileIOService.CheckGameFile(filepath);
+            bool TooSmall, TooBig;
 
-            if (TooBig)
-                throw new PKMLoadException(PKMLoadError.TOO_BIG);
+            // useful if we may expect big slow files
+            // downside: specific file access
+            if (checkBeforeLoad)
+            {
+                (TooSmall, TooBig) = fileIOService.CheckGameFile(filepath);
 
-            if (TooSmall)
-                throw new PKMLoadException(PKMLoadError.TOO_SMALL);
+                if (TooBig)
+                    throw new PKMLoadException(PKMLoadError.TOO_BIG, filepath);
+
+                if (TooSmall)
+                    throw new PKMLoadException(PKMLoadError.TOO_SMALL, filepath);
+            }
 
             pkmFile.Data = await fileIOService.ReadBytes(filepath);
             pkmFile.Error = null;
+            
+            // optimistic check, to avoid multiple file access
+            (TooSmall, TooBig) = fileIOService.CheckGameFile(pkmFile.Data.Length);
+
+            if (TooBig)
+                throw new PKMLoadException(PKMLoadError.TOO_BIG, filepath);
+
+            if (TooSmall)
+                throw new PKMLoadException(PKMLoadError.TOO_SMALL, filepath);
         }
         catch (Exception ex)
         {
@@ -252,7 +268,7 @@ public class PkmFileLoader : IPkmFileLoader
     }
 }
 
-public class PKMLoadException(PKMLoadError error) : IOException($"PKM load error occured: {error}")
+public class PKMLoadException(PKMLoadError error, string path) : IOException($"PKM load error occured: {error} for path: {path}")
 {
     public readonly PKMLoadError Error = error;
 }

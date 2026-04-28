@@ -22,9 +22,18 @@ public class DbSeedingService(ILogger<DbSeedingService> log, IFileIOService file
 
         // get all PkmFile without distinction
         var pkmFiles = await pkmFilesDb
+            .AsNoTracking()
             .ToListAsync(cancelToken);
 
-        var updatedPkmFiles = await Task.WhenAll(pkmFiles.Select(pkmFile => PkmFileLoader.LoadPkmFile(fileIOService, pkmFile)));
+        var updatedPkmFiles = new List<PkmFileEntity>(pkmFiles.Count);
+        // less performant than Task.WhenAll (1000pkm: 500ms vs 400ms)
+        // but avoids CPU spikes
+        foreach (var pkmFile in pkmFiles)
+        {
+            updatedPkmFiles.Add(
+                await PkmFileLoader.LoadPkmFile(fileIOService, pkmFile, checkBeforeLoad: false)
+            );
+        }
 
         pkmFilesDb.UpdateRange(updatedPkmFiles);
 
