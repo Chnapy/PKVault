@@ -150,31 +150,46 @@ public class BackupService(
     private async Task<Dictionary<string, (string TargetPath, byte[] FileContent)>> CreateMainBackup()
     {
         using var scope = sp.CreateScope();
-        var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
+        var pkmFileLoader = scope.ServiceProvider.GetRequiredService<IPkmFileLoader>();
+
+        using var _ = log.Time($"Prepare storage PKM files backup");
 
         var paths = new Dictionary<string, (string TargetPath, byte[] FileContent)>();
 
-        // get all filepaths
-        // but only ones linked to PkmVariant
-        var allFilepaths = await pkmVariantLoader.GetEnabledFilepaths();
+        // get all PkmFile without distinction
+        var allFilepaths = await pkmFileLoader.GetEnabledFilepaths();
 
-        var filesInfos = await Task.WhenAll(allFilepaths
-            .Where(fileIOService.Exists)
-            .Select(async filepath =>
+        foreach(var filepath in allFilepaths)
+        {
+            var filename = Path.GetFileName(filepath);
+            var dirname = new DirectoryInfo(Path.GetDirectoryName(filepath)!).Name;
+            var relativeDirPath = Path.Combine("main", dirname);
+
+            var backupPath = NormalizePath(Path.Combine(relativeDirPath, filename));
+
+            // possible duplicates between relative/absolute paths
+            if (paths.ContainsKey(backupPath))
             {
-                var filename = Path.GetFileName(filepath);
-                var dirname = new DirectoryInfo(Path.GetDirectoryName(filepath)!).Name;
-                var relativeDirPath = Path.Combine("main", dirname);
-
-                var fileContent = await fileIOService.ReadBytes(filepath);
-
-                return (
-                    NormalizePath(Path.Combine(relativeDirPath, filename)),
-                    (TargetPath: filepath, FileContent: fileContent)
+                log.LogWarning(
+                    "Filepath already in current backup creation, skipping."
+                    + $"\n\tBackup path (key) = {backupPath}"
+                    + $"\n\tTarget path (new value) = {filepath}"
+                    + $"\n\tTarget path (existing value) = {(paths.TryGetValue(backupPath, out var existing) ? existing.TargetPath : null)}"
                 );
-            }));
+                continue;
+            }
 
-        filesInfos.ToList().ForEach(infos => paths.Add(infos.Item1, infos.Item2));
+            try {
+                var fileContent = await fileIOService.ReadBytes(filepath);
+                var targetPayload = (TargetPath: filepath, FileContent: fileContent);
+            
+                paths.Add(backupPath, targetPayload);
+
+            // it avoids to use fileIOService.Exists, performance reasons
+            } catch(FileNotFoundException)
+            {
+            }
+        }
 
         return paths;
     }
