@@ -1,13 +1,14 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.Primitives;
+using PKHeX.Core;
 
 public interface ISettingsService
 {
-    public Task<DataUpdateFlags?> UpdateSettings(SettingsMutableDTO settingsMutable);
+    public Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, DataUpdateFlags flags);
     public Task<SettingsDTO> GetSettingsWithUserId();
     public SettingsDTO GetSettings();
-    public SettingsDTO RefreshSettings();
+    public SettingsDTO RefreshSettings(DataUpdateFlags flags);
+    public bool GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags);
 }
 
 /**
@@ -26,34 +27,98 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private SettingsDTO? BaseSettings;
 
-    public async Task<DataUpdateFlags?> UpdateSettings(SettingsMutableDTO settingsMutable)
+    public async Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, DataUpdateFlags flags)
     {
         await fileIOService.WriteJSONFile(
             FilePath,
             SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
             settingsMutable
         );
+        flags.Settings = true;
 
         using var scope = sp.CreateScope();
 
-        var userId = await scope.ServiceProvider.GetRequiredService<IMetaLoader>().GetUserId();
+        var userId = string.IsNullOrEmpty(BaseSettings?.UserId)
+            ? await scope.ServiceProvider.GetRequiredService<IMetaLoader>().GetUserId()
+            : BaseSettings.UserId;
 
         BaseSettings = ReadBaseSettings() with
         {
             UserId = userId
         };
 
-        savesLoadersService.Clear();
-
-        var flags = await sessionService.StartNewSession(checkInitialActions: true);
-
-        if (!sessionService.HasEmptyActionList())
+        if (restartSession)
         {
-            await sessionService.PersistSession(scope);
-            await sessionService.StartNewSession(checkInitialActions: false);
+            savesLoadersService.Clear();
+
+            await sessionService.StartNewSession(checkInitialActions: true, flags);
+
+            if (!sessionService.HasEmptyActionList())
+            {
+                await sessionService.PersistSession(scope);
+                await sessionService.StartNewSession(checkInitialActions: false, flags);
+            }
+        }
+    }
+
+    /**
+     * Make a diff between current settings and updated ones.
+     * Update flags following changed settings.
+     * 
+     * Returns true if session should be restarted.
+     */
+    public bool GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags)
+    {
+        var currentSettingsMutable = ReadBaseSettings().SettingsMutable;
+
+        static string GetArrayChecksum(string[]? arr) => string.Join('|', (arr ?? []).ToArray().Order());
+        
+        static string GetSaveVersionOverridesChecksum(IDictionary<uint, GameVersion>? saveVersionOverrides) => GetArrayChecksum([
+            ..saveVersionOverrides?.Keys.Order().Select(k => k.ToString()) ?? [],
+            ..saveVersionOverrides?.Values.Order().Select(v => ((byte)v).ToString()) ?? [],
+        ]);
+
+        bool restartSession = false;
+
+        var hasPathChanges = currentSettingsMutable.DB_PATH != updatedSettingsMutable.DB_PATH
+            || currentSettingsMutable.STORAGE_PATH != updatedSettingsMutable.STORAGE_PATH
+            || currentSettingsMutable.BACKUP_PATH != updatedSettingsMutable.BACKUP_PATH
+            || GetArrayChecksum(currentSettingsMutable.SAVE_GLOBS) != GetArrayChecksum(updatedSettingsMutable.SAVE_GLOBS)
+            || GetArrayChecksum(currentSettingsMutable.PKM_EXTERNAL_GLOBS) != GetArrayChecksum(updatedSettingsMutable.PKM_EXTERNAL_GLOBS);
+
+        var hasFirstLanguageChange = currentSettingsMutable.LANGUAGE == null && updatedSettingsMutable.LANGUAGE != null;
+
+        if (hasPathChanges || hasFirstLanguageChange)
+        {
+            restartSession = true;
         }
 
-        return flags;
+        var hasLanguageChange = currentSettingsMutable.LANGUAGE != updatedSettingsMutable.LANGUAGE;
+
+        if (hasLanguageChange)
+        {
+            flags.StaticData = true;
+            flags.MainPkmVariants.All = true;
+            flags.Saves.All = true;
+        }
+
+        var hasLegalityChanges = currentSettingsMutable.SKIP_LEGALITY_CHECKS != updatedSettingsMutable.SKIP_LEGALITY_CHECKS;
+
+        if (hasLegalityChanges)
+        {
+            flags.MainPkmVariants.All = true;
+            flags.Saves.All = true;
+        }
+
+        var hasSaveVersionOverridesChange = GetSaveVersionOverridesChecksum(currentSettingsMutable.SAVE_VERSION_OVERRIDES)
+            != GetSaveVersionOverridesChecksum(updatedSettingsMutable.SAVE_VERSION_OVERRIDES);
+
+        if (hasSaveVersionOverridesChange)
+        {
+            flags.SaveInfos = true;
+        }
+
+        return restartSession;
     }
 
     public async Task<SettingsDTO> GetSettingsWithUserId()
@@ -94,9 +159,9 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         };
     }
 
-    public SettingsDTO RefreshSettings()
+    public SettingsDTO RefreshSettings(DataUpdateFlags? flags = null)
     {
-        BaseSettings = ReadBaseSettings();
+        BaseSettings = ReadBaseSettings(flags);
 
         return BaseSettings with
         {
@@ -139,13 +204,15 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         );
     }
 
-    private SettingsDTO ReadBaseSettings()
+    private SettingsDTO ReadBaseSettings(DataUpdateFlags? flags = null)
     {
         var mutableDto = fileIOService.ReadJSONFileSync(
             FilePath,
             SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
             GetDefaultSettingsMutable()
         );
+
+        flags?.Settings = true;
 
         var (BuildID, Version) = GetBuildInfo();
 

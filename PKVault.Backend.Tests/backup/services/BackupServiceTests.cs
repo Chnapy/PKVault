@@ -98,7 +98,7 @@ public class BackupServiceTests
             now: DateTime.Parse("2011-03-21 13:26:11")
         );
 
-        await backupService.CreateBackup("test_backup");
+        await backupService.CreateBackup("test_backup", new());
 
         // Console.WriteLine(string.Join('\n', mockFileSystem.AllPaths));
 
@@ -157,12 +157,13 @@ public class BackupServiceTests
             await mockFileSystem.File.WriteAllBytesAsync(expectedPath, memoryStream.ToArray(), TestContext.Current.CancellationToken);
         }
 
-        mockSessionService.Setup(x => x.StartNewSession(true)).Verifiable();
+        mockSessionService.Setup(x => x.StartNewSession(true, new())).Verifiable();
         mockSave.Setup(x => x.Clear()).Verifiable();
 
         await backupService.RestoreBackup(
             DateTime.Parse("2013-03-21 13:26:11"),
-            withSafeBackup: true
+            withSafeBackup: true,
+            new()
         );
 
         // check if backup creation were made
@@ -182,7 +183,7 @@ public class BackupServiceTests
             Assert.Equal(fileContent, expectedContent);
         });
 
-        mockSessionService.Verify(x => x.StartNewSession(true));
+        mockSessionService.Verify(x => x.StartNewSession(true, It.IsAny<DataUpdateFlags>()));
         mockSave.Verify(x => x.Clear());
     }
 
@@ -236,7 +237,8 @@ public class BackupServiceTests
 
         await backupService.RestoreBackup(
             DateTime.Parse("2013-03-21 13:26:11"),
-            withSafeBackup: true
+            withSafeBackup: true,
+            new()
         );
 
         // Console.WriteLine(string.Join('\n', mockFileSystem.AllFiles));

@@ -4,6 +4,7 @@ using PKHeX.Core;
 public record SaveInfosDTO(
     uint Id,
     DateTime LastWriteTime,
+    GameVersion DisplayedVersion,
     GameVersion Version,
     EntityContext Context,
     byte Generation,
@@ -24,7 +25,7 @@ public record SaveInfosDTO(
     string Path
 )
 {
-    public static SaveInfosDTO FromSave(SaveWrapper save, DateTime lastWriteTime)
+    public static SaveInfosDTO FromSave(SaveWrapper save, GameVersion? displayedVersion, DateTime lastWriteTime)
     {
         var seenCount = save.SeenCount;
         var caughtCount = save.CaughtCount;
@@ -50,6 +51,7 @@ public record SaveInfosDTO(
         return new SaveInfosDTO(
             Id: save.Id,
             LastWriteTime: lastWriteTime,
+            DisplayedVersion: displayedVersion ?? save.Version,
             Version: save.Version,
             Context: save.Context,
             Generation: save.Generation,

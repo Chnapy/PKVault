@@ -10,7 +10,7 @@ public interface ISessionService : ISessionServiceMinimal
     public bool HasEmptyActionList();
     public List<DataActionPayload> GetActionPayloadList();
 
-    public Task<DataUpdateFlags?> StartNewSession(bool checkInitialActions);
+    public Task StartNewSession(bool checkInitialActions, DataUpdateFlags? flags);
     public Task PersistSession(IServiceScope scope);
 }
 
@@ -42,7 +42,7 @@ public class SessionService(
 
     public DateTime? StartTime { get; private set; }
 
-    private Task<DataUpdateFlags?>? StartTask = null;
+    private Task<DataUpdateFlags>? StartTask = null;
 
     // bypass DB check if same as DB.ContextId
     private Guid? ByPassContextId = null;
@@ -61,7 +61,7 @@ public class SessionService(
         return Actions.Count == 0;
     }
 
-    public async Task<DataUpdateFlags?> StartNewSession(bool checkInitialActions)
+    public async Task StartNewSession(bool checkInitialActions, DataUpdateFlags? flags)
     {
         StartTime = timeProvider.GetUtcNow().DateTime;
 
@@ -71,9 +71,11 @@ public class SessionService(
 
         StartTask = Task.Run(async () =>
         {
+            flags ??= new();
+
             await Task.WhenAll(
-                ResetDbSession(),
-                savesLoadersService.Setup()
+                ResetDbSession(flags),
+                savesLoadersService.Setup(flags)
             );
 
             if (checkInitialActions)
@@ -84,27 +86,25 @@ public class SessionService(
                 ByPassContextId = scope.ServiceProvider.GetRequiredService<SessionDbContext>()
                     .ContextId.InstanceId;
 
-                var dataNormalizedFlags = await CheckDataToNormalize(scope);
+                var hadDataToNormalize = await CheckDataToNormalize(scope, flags);
 
-                await CheckSaveToSynchronize(scope);
+                await CheckSaveToSynchronize(scope, flags);
 
-                if (dataNormalizedFlags != null)
+                if (hadDataToNormalize)
                 {
-                    await CheckFirstRunAutoSave(scope);
+                    await CheckFirstRunAutoSave(scope, flags);
                 }
 
                 ByPassContextId = null;
-
-                return dataNormalizedFlags;
             }
 
-            return null;
+            return flags;
         });
 
-        return await StartTask;
+        await StartTask;
     }
 
-    private async Task<DataUpdateFlags?> CheckDataToNormalize(IServiceScope scope)
+    private async Task<bool> CheckDataToNormalize(IServiceScope scope, DataUpdateFlags flags)
     {
         var actionService = scope.ServiceProvider.GetRequiredService<ActionService>();
         var dataNormalizeAction = scope.ServiceProvider.GetRequiredService<DataNormalizeAction>();
@@ -112,11 +112,9 @@ public class SessionService(
 
         var dataToNormalizeInput = await dataNormalizeAction.HasDataToNormalize();
 
-        DataUpdateFlags? flags = null;
-
         if (dataToNormalizeInput.ShouldRun)
         {
-            flags = await actionService.DataNormalize(dataToNormalizeInput, scope);
+            await actionService.DataNormalize(dataToNormalizeInput, scope, flags);
         }
 
         try
@@ -125,18 +123,19 @@ public class SessionService(
 
             if (externalPkmsToUpdateInput.ShouldRun)
             {
-                flags = await actionService.UpdateExternalPkm(externalPkmsToUpdateInput, scope);
+                await actionService.UpdateExternalPkm(externalPkmsToUpdateInput, scope, flags);
             }
+
+            return externalPkmsToUpdateInput.ShouldRun;
         }
         catch (Exception ex)
         {
             log.LogError(ex.ToString());
         }
-
-        return flags;
+        return false;
     }
 
-    private async Task CheckSaveToSynchronize(IServiceScope scope)
+    private async Task CheckSaveToSynchronize(IServiceScope scope, DataUpdateFlags flags)
     {
         var actionService = scope.ServiceProvider.GetRequiredService<ActionService>();
         var synchronizePkmAction = scope.ServiceProvider.GetRequiredService<SynchronizePkmAction>();
@@ -147,7 +146,7 @@ public class SessionService(
         {
             if (data.pkmVariantAndPkmSaveIds.Length > 0)
             {
-                await actionService.SynchronizePkm(data, scope);
+                await actionService.SynchronizePkm(data, scope, flags);
             }
         }
     }
@@ -157,7 +156,7 @@ public class SessionService(
      * persist session data then restart new one, for conveniance,
      * avoiding the need to save initial data
      */
-    private async Task CheckFirstRunAutoSave(IServiceScope scope)
+    private async Task CheckFirstRunAutoSave(IServiceScope scope, DataUpdateFlags flags)
     {
         var savesLoaders = scope.ServiceProvider.GetRequiredService<ISavesLoadersService>();
         var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
@@ -169,7 +168,7 @@ public class SessionService(
         {
             log.LogInformation($"Fresh start detected - Session persisting & retarting");
             await PersistSession(scope);
-            await StartNewSession(checkInitialActions: false);
+            await StartNewSession(checkInitialActions: false, flags);
         }
     }
 
@@ -178,7 +177,7 @@ public class SessionService(
         if (StartTask == null)
         {
             log.LogInformation($"Session no created - Start new one");
-            await StartNewSession(checkInitialActions: true);
+            await StartNewSession(checkInitialActions: true, null);
         }
         // bypass check
         else if (byPassContextId != null && byPassContextId == ByPassContextId)
@@ -215,7 +214,7 @@ public class SessionService(
         StartTime = null;
     }
 
-    private async Task ResetDbSession()
+    private async Task ResetDbSession(DataUpdateFlags flags)
     {
         if (fileIOService.Exists(SessionDbPath))
         {
@@ -238,6 +237,12 @@ public class SessionService(
         }
 
         await RunDbMigrations();
+
+        flags.MainBanks.All = true;
+        flags.MainBoxes.All = true;
+        flags.MainPkmVariants.All = true;
+        flags.Dex.All = true;
+        flags.Warnings = true;
     }
 
     private async Task RunDbMigrations()

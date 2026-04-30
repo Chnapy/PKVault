@@ -148,7 +148,7 @@ export const StorageSaveBoxContent: React.FC<StorageSaveBoxContentProps> = withE
                       pointerEvents: 'none',
                     }))}
                   >
-                    <SaveItem saveId={saveId} />
+                    <SaveItem saveId={saveId} hideEdit />
                   </div>
                 </div>
               }

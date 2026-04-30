@@ -5,6 +5,7 @@ public record StaticVersion(
     string Name,
     EntityContext Context,
     bool IsGameVersion,
+    IEnumerable<GameVersion> Children,
     byte Generation,
     string[] Region,
     string[] Pokedexes,
@@ -177,11 +178,23 @@ public class GenStaticOthers(
                 var versionRegion = GetVersionRegionName(version, lang);
                 var versionPokedexes = GetVersionPokedexes(version);
 
+                GameVersion[] extraValidVersions = [
+                    GameVersion.Stadium, GameVersion.StadiumJ, GameVersion.Stadium2,
+                    GameVersion.COLO, GameVersion.XD,
+                ];
+                    
+                bool isGameVersion(GameVersion v) => v.IsValidSavedVersion()
+                    || extraValidVersions.Contains(v);
+
+                var versionChildren = Enum.GetValues<GameVersion>()
+                    .Where(v => isGameVersion(v) && version.ContainsFromLumped(v));
+
                 return new StaticVersion(
                     Id: (byte)version,
                     Name: await versionName,
                     Context: version.Context,
-                    IsGameVersion: version.IsValidSavedVersion(),
+                    IsGameVersion: isGameVersion(version),
+                    Children: versionChildren,
                     Generation: version.Generation,
                     Region: await versionRegion,
                     Pokedexes: await versionPokedexes,
@@ -675,7 +688,13 @@ public class GenStaticOthers(
             .OfType<PokeApi.Models.Version>()
             .Select(ver =>
             {
-                return PokeApiService.GetNameForLang(ver.Names, lang);
+                var name = PokeApiService.GetNameForLang(ver.Names, lang);
+                // blue-japan, duplicate name with blue
+                if (ver.Id == 46)
+                {
+                    return $"{name} (J)";
+                }
+                return name;
             }).Distinct());
     }
 

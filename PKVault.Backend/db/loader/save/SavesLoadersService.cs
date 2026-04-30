@@ -14,7 +14,7 @@ public interface ISavesLoadersService
     public Task WriteToFiles();
 
     public void Clear();
-    public Task Setup();
+    public Task Setup(DataUpdateFlags flags);
 }
 
 public class SavesLoadersService(
@@ -84,16 +84,22 @@ public class SavesLoadersService(
             throw new Exception("Save loaders not initialized");
         }
 
+        var settings = settingsService.GetSettings().SettingsMutable.SAVE_VERSION_OVERRIDES;
+
         var record = new Dictionary<uint, SaveInfosDTO>();
 
-        Loaders.Values.ToList().ForEach(loader =>
+        foreach(var loader in Loaders.Values)
         {
             var mainSave = loader.Save;
             ArgumentException.ThrowIfNullOrWhiteSpace(mainSave.Metadata.FilePath);
             var mainSaveLastWriteTime = fileIOService.GetLastWriteTime(mainSave.Metadata.FilePath);
 
-            record.TryAdd(mainSave.Id, SaveInfosDTO.FromSave(mainSave, mainSaveLastWriteTime));
-        });
+            GameVersion? displayedVersion = settings != null && settings.TryGetValue(mainSave.Id, out var v)
+                ? v
+                : null;
+
+            record.TryAdd(mainSave.Id, SaveInfosDTO.FromSave(mainSave, displayedVersion, mainSaveLastWriteTime));
+        }
 
         return record;
     }
@@ -150,7 +156,7 @@ public class SavesLoadersService(
         SavePaths.Clear();
     }
 
-    public async Task Setup()
+    public async Task Setup(DataUpdateFlags flags)
     {
         Clear();
 
@@ -159,6 +165,9 @@ public class SavesLoadersService(
         Loaders = loaders;
         SavePaths = savePaths;
         Initialized = true;
+
+        flags.SaveInfos = true;
+        flags.Saves.All = true;
 
         var memoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
 

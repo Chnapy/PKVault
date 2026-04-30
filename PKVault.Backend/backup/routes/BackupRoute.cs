@@ -32,18 +32,10 @@ public class BackupController(BackupService backupService, DataService dataServi
     [HttpPost("restore")]
     public async Task<ActionResult<DataDTO>> Restore([BindRequired] DateTime createdAt)
     {
-        await backupService.RestoreBackup(createdAt, withSafeBackup: true);
+        DataUpdateFlags flags = new();
 
-        return await dataService.CreateDataFromUpdateFlags(new()
-        {
-            MainBanks = new() { All = true },
-            MainBoxes = new() { All = true },
-            MainPkmVariants = new() { All = true },
-            Dex = new() { All = true },
-            Saves = new() { All = true },
-            SaveInfos = true,
-            Backups = true,
-            Warnings = true,
-        });
+        await backupService.RestoreBackup(createdAt, withSafeBackup: true, flags);
+
+        return await dataService.CreateDataFromUpdateFlags(flags);
     }
 }
