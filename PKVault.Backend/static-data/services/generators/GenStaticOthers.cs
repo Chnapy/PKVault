@@ -688,7 +688,13 @@ public class GenStaticOthers(
             .OfType<PokeApi.Models.Version>()
             .Select(ver =>
             {
-                return PokeApiService.GetNameForLang(ver.Names, lang);
+                var name = PokeApiService.GetNameForLang(ver.Names, lang);
+                // blue-japan, duplicate name with blue
+                if (ver.Id == 46)
+                {
+                    return $"{name} (J)";
+                }
+                return name;
             }).Distinct());
     }
 
