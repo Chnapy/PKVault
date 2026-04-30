@@ -44,6 +44,7 @@ const SelectInput = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<
             color: theme.text.light,
             backgroundColor: label ? theme.bg.darker : undefined,
             borderRadius: 4,
+            padding: 1,
             filter: theme.shadow.filter,
             overflow: 'hidden',
             verticalAlign: 'middle',
@@ -60,7 +61,7 @@ const SelectInput = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<
         </div>}
 
         <Listbox value={value} onChange={onChange}>
-            <ListboxButton as={Button} ref={ref} {...rest}>
+            <ListboxButton as={Button} ref={ref} {...rest} className={cx(css({ maxHeight: '100%' }), rest.className)}>
                 <div className={css({ flexGrow: 1, margin: '-2px -4px', marginRight: 0, overflow: 'hidden' })}>
                     {data.find(item => item.value === value)?.option}
                 </div>

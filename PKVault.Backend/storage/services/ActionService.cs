@@ -9,30 +9,33 @@ public class ActionService(
     ISessionService sessionService, ISavesLoadersService savesLoadersService
 )
 {
-    public async Task<DataUpdateFlags> DataNormalize(DataNormalizeActionInput input, IServiceScope scope)
+    public async Task<DataUpdateFlags> DataNormalize(DataNormalizeActionInput input, IServiceScope scope, DataUpdateFlags? flags = null)
     {
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<DataNormalizeAction>(),
-            input
+            input,
+            flags
         );
     }
 
-    public async Task<DataUpdateFlags> UpdateExternalPkm(UpdateExternalPkmActionInput input, IServiceScope scope)
+    public async Task<DataUpdateFlags> UpdateExternalPkm(UpdateExternalPkmActionInput input, IServiceScope scope, DataUpdateFlags? flags = null)
     {
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<UpdateExternalPkmAction>(),
-            input
+            input,
+            flags
         );
     }
 
-    public async Task<DataUpdateFlags> SynchronizePkm(SynchronizePkmActionInput input, IServiceScope scope)
+    public async Task<DataUpdateFlags> SynchronizePkm(SynchronizePkmActionInput input, IServiceScope scope, DataUpdateFlags? flags = null)
     {
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<SynchronizePkmAction>(),
-            input
+            input,
+            flags
         );
     }
 
@@ -242,16 +245,12 @@ public class ActionService(
 
         log.LogInformation("SAVING IN PROGRESS");
 
-        await backupService.PrepareBackupThenRun("backup_before_save", async () =>
+        await backupService.PrepareBackupThenRun("backup_before_save", flags, async () =>
         {
             using var scope = sp.CreateScope();
 
             await sessionService.PersistSession(scope);
         });
-
-        flags.SaveInfos = true;
-        flags.Backups = true;
-        flags.Warnings = true;
 
         return flags;
     }
@@ -260,19 +259,11 @@ public class ActionService(
     {
         List<SessionService.ActionRecord> previousActions = [.. sessionService.Actions];
 
-        await sessionService.StartNewSession(checkInitialActions: false);
+        DataUpdateFlags flags = new();
+
+        await sessionService.StartNewSession(checkInitialActions: false, flags);
 
         using var scope = sp.CreateScope();
-
-        var flags = new DataUpdateFlags
-        {
-            MainBanks = new() { All = true },
-            MainBoxes = new() { All = true },
-            MainPkmVariants = new() { All = true },
-            Dex = new() { All = true },
-            Saves = new() { All = true },
-            Warnings = true,
-        };
 
         for (var i = 0; i < previousActions.Count; i++)
         {
@@ -302,7 +293,8 @@ public class ActionService(
     private async Task<DataUpdateFlags> AddAction<I>(
         IServiceScope scope,
         Func<IServiceScope, DataAction<I>> getScopedAction,
-        I input
+        I input,
+        DataUpdateFlags? _flags = null
     )
     {
         async Task<DataActionPayload> applyFn(IServiceScope scope, DataUpdateFlags flags)
@@ -319,7 +311,7 @@ public class ActionService(
             var flags = await AddActionInner(
                 scope,
                 applyFn,
-                null
+                _flags
             );
 
             await scope.ServiceProvider.GetRequiredService<SessionDbContext>()

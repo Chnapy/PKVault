@@ -14,7 +14,7 @@ public class BackupService(
 {
     private static readonly string dateTimeFormat = "yyyy-MM-ddTHHmmss-fffZ";
 
-    public async Task<DateTime> CreateBackup(string name)
+    public async Task<DateTime> CreateBackup(string name, DataUpdateFlags flags)
     {
         using var _ = log.Time("Create backup");
 
@@ -67,6 +67,8 @@ public class BackupService(
             log.LogInformation($"Write backup to {bkpZipPath}");
         }
         steptime.Dispose();
+
+        flags.Backups = true;
 
         return startTime;
     }
@@ -333,7 +335,7 @@ public class BackupService(
         fileIOService.Delete(backup.Filepath);
     }
 
-    public async Task RestoreBackup(DateTime createdAt, bool withSafeBackup)
+    public async Task RestoreBackup(DateTime createdAt, bool withSafeBackup, DataUpdateFlags flags)
     {
         log.LogInformation($"Backup restore {createdAt}");
 
@@ -360,7 +362,7 @@ public class BackupService(
         if (withSafeBackup)
         {
             // manual backup, no use of PrepareBackupThenRun to avoid infinite loop
-            await CreateBackup("backup_before_restore");
+            await CreateBackup("backup_before_restore", flags);
         }
 
         var settings = settingsService.GetSettings();
@@ -392,12 +394,12 @@ public class BackupService(
         logtime.Dispose();
 
         savesLoadersService.Clear();
-        await sessionService.StartNewSession(checkInitialActions: true);
+        await sessionService.StartNewSession(checkInitialActions: true, flags);
     }
 
-    public async Task PrepareBackupThenRun(string backupName, Func<Task> action)
+    public async Task PrepareBackupThenRun(string backupName, DataUpdateFlags flags, Func<Task> action)
     {
-        var bkpDateTime = await CreateBackup(backupName);
+        var bkpDateTime = await CreateBackup(backupName, flags);
 
         try
         {
@@ -408,13 +410,13 @@ public class BackupService(
             logtime.Dispose();
 
             savesLoadersService.Clear();
-            await sessionService.StartNewSession(checkInitialActions: false);
+            await sessionService.StartNewSession(checkInitialActions: false, flags);
         }
         catch (Exception ex)
         {
             log.LogError(ex.ToString());
 
-            await RestoreBackup(bkpDateTime, withSafeBackup: false);
+            await RestoreBackup(bkpDateTime, withSafeBackup: false, flags);
 
             throw;
         }

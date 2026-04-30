@@ -29,8 +29,17 @@ public class SettingsController(DataService dataService, ISettingsService settin
     [HttpPost]
     public async Task<ActionResult<DataDTO>> Edit([BindRequired] SettingsMutableDTO settingsMutable)
     {
-        var currentSettings = settingsService.GetSettings();
-        if (!sessionService.HasEmptyActionList() && currentSettings.SettingsMutable.LANGUAGE != null)
+        settingsMutable = settingsMutable with
+        {
+            SAVE_GLOBS = [.. settingsMutable.SAVE_GLOBS.Select(glob => glob.Trim())],
+            PKM_EXTERNAL_GLOBS = [.. (settingsMutable.PKM_EXTERNAL_GLOBS ?? []).Select(glob => glob.Trim())],
+        };
+
+        DataUpdateFlags flags = new();
+
+        var restartSession = settingsService.GetUpdateDiff(settingsMutable, flags);
+
+        if (restartSession && !sessionService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }
@@ -40,26 +49,7 @@ public class SettingsController(DataService dataService, ISettingsService settin
             throw new ArgumentException($"Language value not allowed: {settingsMutable.LANGUAGE}");
         }
 
-        var languageChanged = currentSettings.SettingsMutable.LANGUAGE != settingsMutable.LANGUAGE;
-
-        settingsMutable = settingsMutable with
-        {
-            SAVE_GLOBS = [.. settingsMutable.SAVE_GLOBS.Select(glob => glob.Trim())]
-        };
-
-        var flags = await settingsService.UpdateSettings(settingsMutable);
-        flags ??= new();
-
-        flags.StaticData = languageChanged;
-        flags.MainBanks.All = true;
-        flags.MainBoxes.All = true;
-        flags.MainPkmVariants.All = true;
-        flags.Dex.All = true;
-        flags.Saves.All = true;
-        flags.SaveInfos = true;
-        flags.Backups = true;
-        flags.Settings = true;
-        flags.Warnings = true;
+        await settingsService.UpdateSettings(settingsMutable, restartSession, flags);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }

@@ -43,6 +43,7 @@ public record SettingsMutableDTO(
     string BACKUP_PATH,
     bool HIDE_CHEATS,
     bool SKIP_LEGALITY_CHECKS,
+    IDictionary<uint, GameVersion>? SAVE_VERSION_OVERRIDES = null,
     bool? HTTPS_NOCERT = null,
     string? HTTPS_CERT_PEM_PATH = null,
     string? HTTPS_KEY_PEM_PATH = null,

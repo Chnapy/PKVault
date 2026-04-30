@@ -35,7 +35,7 @@ export const SaveItemContent: React.FC<SaveItemContentProps> = withErrorCatcher(
   return <SaveCardContentFull
     id={save.id}
     context={save.context}
-    version={save.version}
+    version={save.displayedVersion}
     trainerName={save.trainerName}
     trainerGender={save.trainerGender}
     tid={save.tid}

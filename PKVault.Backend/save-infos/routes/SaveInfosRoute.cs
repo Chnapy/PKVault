@@ -11,9 +11,10 @@ public class SaveInfosController(
 ) : ControllerBase
 {
     [HttpGet()]
-    public async Task<ActionResult<IDictionary<uint, SaveInfosDTO>>> GetAll()
+    public ActionResult<IDictionary<uint, SaveInfosDTO>> GetAll()
     {
-        return savesLoadersService.GetAllSaveInfos().ToDictionary();
+        var saveInfos = savesLoadersService.GetAllSaveInfos();
+        return saveInfos.ToDictionary();
     }
 
     [HttpPut()]
@@ -24,17 +25,12 @@ public class SaveInfosController(
             throw new InvalidOperationException($"Empty action list is required");
         }
 
-        settingsService.RefreshSettings();
+        DataUpdateFlags flags = new();
+
+        settingsService.RefreshSettings(flags);
 
         savesLoadersService.Clear();
-        var flags = await sessionService.StartNewSession(checkInitialActions: true);
-
-        flags ??= new();
-
-        flags.Saves.All = true;
-        flags.Dex.All = true;
-        flags.SaveInfos = true;
-        flags.Warnings = true;
+        await sessionService.StartNewSession(checkInitialActions: true, flags);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
