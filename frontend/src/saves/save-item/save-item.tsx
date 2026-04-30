@@ -3,18 +3,20 @@ import React from "react";
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Container } from "../../ui/container/container";
-import { SaveItemEdit } from '../../ui/save-card/save-item-edit';
+import { SaveItemEdit } from './save-item-edit';
 import { theme } from '../../ui/theme';
 import { SaveItemContent, type SaveItemContentProps } from './save-item-content';
 
 export type SaveItemProps = SaveItemContentProps & {
   width?: number | string;
   onClick?: () => void;
+  hideEdit?: boolean;
 };
 
 export const SaveItem: React.FC<SaveItemProps> = ({
   width = 350,
   onClick,
+  hideEdit,
   ...saveItemContentProps
 }) => {
   const staticData = useStaticData();
@@ -51,7 +53,7 @@ export const SaveItem: React.FC<SaveItemProps> = ({
         <SaveItemContent {...saveItemContentProps} />
       </Container>
 
-      {!versionObj.isGameVersion && <div className={css({
+      {!hideEdit && !versionObj.isGameVersion && <div className={css({
         position: 'absolute',
         top: 4,
         left: 4,

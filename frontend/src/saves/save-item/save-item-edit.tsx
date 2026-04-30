@@ -5,9 +5,9 @@ import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useSettingsEdit, useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
-import { Button } from '../button/button';
-import { ButtonWithPopover } from '../button/button-with-popover';
-import { Icon } from '../icon/icon';
+import { Button } from '../../ui/button/button';
+import { ButtonWithPopover } from '../../ui/button/button-with-popover';
+import { Icon } from '../../ui/icon/icon';
 
 export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
     const { t } = useTranslate();
