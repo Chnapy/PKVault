@@ -11,9 +11,9 @@
     <!-- <PublishSingleFile>true</PublishSingleFile> -->
     <!-- <SelfContained>true</SelfContained> -->
 
-    <Version>1.7.5</Version>
-    <ApplicationDisplayVersion>1.7.5</ApplicationDisplayVersion>
-    <ApplicationVersion>1.7.5</ApplicationVersion>
+    <Version>1.7.6</Version>
+    <ApplicationDisplayVersion>1.7.6</ApplicationDisplayVersion>
+    <ApplicationVersion>1.7.6</ApplicationVersion>
     <NeutralLanguage>en</NeutralLanguage>
     <Product>PKVault</Product>
     <Authors>Richard Haddad</Authors>
