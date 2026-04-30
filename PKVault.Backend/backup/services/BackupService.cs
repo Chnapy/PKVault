@@ -188,6 +188,8 @@ public class BackupService(
             // it avoids to use fileIOService.Exists, performance reasons
             } catch(FileNotFoundException)
             {
+            } catch(DirectoryNotFoundException)
+            {
             }
         }
 
