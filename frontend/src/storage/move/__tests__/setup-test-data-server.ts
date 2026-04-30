@@ -9,6 +9,7 @@ export const setupTestDataServer = () => {
     const createSaveInfos = (data: Partial<SaveInfosDTO>): SaveInfosDTO => ({
         id: -1,
         lastWriteTime: '',
+        displayedVersion: 1,
         version: 1,
         context: 3,
         generation: 3,
