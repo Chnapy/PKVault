@@ -64,7 +64,7 @@ public class EvolvePkmAction(
         var pkmVariant = await pkmVariantLoader.GetEntityBySave(dto.SaveId, dto.IdBase);
         if (pkmVariant != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariant.Id, dto.IdBase)]));
+            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariant.Id, dto.IdBase)], forceHeldItem: evolveByItem));
         }
 
         return new(
@@ -103,6 +103,8 @@ public class EvolvePkmAction(
 
         var (evolveSpecies, evolveByItem) = await GetEvolve(entityPkm);
 
+        var convertedHeldItem = evolveByItem ? entityPkm.GetConvertedHeldItem() : 0;
+
         // update pkm
         entityPkm = entityPkm.Update(pkm =>
         {
@@ -114,17 +116,23 @@ public class EvolvePkmAction(
         await Task.WhenAll(
             relatedPkmVariants.ToList().Select(async (variant) =>
             {
+                // remove item only if evolve-by-item and held-item is the one for evolve
+                var eraseItem = evolveByItem && variant.Pkm.GetConvertedHeldItem() == convertedHeldItem;
                 variant.Pkm = variant.Pkm.Update(pkm =>
                 {
-                    UpdatePkm(pkm, evolveSpecies, false);
+                    UpdatePkm(pkm, evolveSpecies, eraseItem);
                 });
                 await pkmVariantLoader.UpdateEntity(variant.Variant, variant.Pkm);
             })
         );
 
-        if (entity.AttachedSaveId != null)
+        var attachedEntity = entity.AttachedSaveId != null
+            ? entity
+            : relatedPkmVariants.FirstOrDefault(entry => entry.Variant.AttachedSaveId != null).Variant;
+
+        if (attachedEntity != null)
         {
-            await synchronizePkmAction.SynchronizePkmVariantToSave(new([(entity.Id, entity.AttachedSavePkmIdBase!)]));
+            await synchronizePkmAction.SynchronizePkmVariantToSave(new([(attachedEntity.Id, attachedEntity.AttachedSavePkmIdBase!)], forceHeldItem: evolveByItem));
         }
 
         await new DexMainService(sp).EnablePKM(entityPkm);

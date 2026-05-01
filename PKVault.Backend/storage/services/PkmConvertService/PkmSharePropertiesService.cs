@@ -2,7 +2,7 @@ using PKHeX.Core;
 
 public interface IPkmSharePropertiesService
 {
-    public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm, SaveFile? save);
+    public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm, SaveFile? save, bool forceHeldItem = false);
 }
 
 /**
@@ -13,11 +13,11 @@ public class PkmSharePropertiesService(ILogger<PkmSharePropertiesService> log, I
 {
     private readonly PKMConverterUtils utils = new(legalityAnalysisService);
 
-    public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm, SaveFile? save)
+    public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm, SaveFile? save, bool forceHeldItem = false)
     {
         var sourcePkm = source.GetMutablePkm();
 
-        log.LogDebug($"Convert existing {sourcePkm.GetType().Name} -> {targetPkm.GetType().Name}");
+        log.LogDebug($"Convert existing {sourcePkm.GetType().Name} -> {targetPkm.GetType().Name} [forceHeldItem={forceHeldItem}]");
 
         if (targetPkm.Species == 0)
         {
@@ -151,7 +151,7 @@ public class PkmSharePropertiesService(ILogger<PkmSharePropertiesService> log, I
             }
         }
 
-        if (targetPkm.HeldItem == 0)
+        if (targetPkm.HeldItem == 0 || forceHeldItem)
         {
             utils.CopyHeldItemFrom(targetPkm, resultPkm.HeldItem, resultPkm.Context, resultPkm.Version);
         }

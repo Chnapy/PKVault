@@ -261,9 +261,11 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
 
     public int HeldItem => Pkm.HeldItem;
 
+    public int GetConvertedHeldItem() => ItemConverter.GetItemForFormat(HeldItem, Context, StaticDataService.LAST_ENTITY_CONTEXT);
+
     public string GetHeldItemPokeapiName()
     {
-        var convertedHeldItem = ItemConverter.GetItemForFormat(HeldItem, Context, StaticDataService.LAST_ENTITY_CONTEXT);
+        var convertedHeldItem = GetConvertedHeldItem();
         return convertedHeldItem > 0 && convertedHeldItem < GameInfo.Strings.Item.Count
             ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[convertedHeldItem])
             : "";
