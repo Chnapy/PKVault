@@ -11,8 +11,8 @@
     "c:type:classic": "tsc -b",
     "c:lint": "eslint .",
     "gen:routes": "tsr generate",
-    "gen:sdk": "rm -rf src/data/sdk* && cross-env VITE_OPENAPI_PATH=http://localhost:5000/swagger/v1/swagger.json npm run gen:sdk:basic && prettier -w src/data/sdk*/**/*.ts",
-    "gen:sdk:basic": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 orval",
+    "gen:sdk": "cross-env VITE_OPENAPI_PATH=http://localhost:5000/swagger/v1/swagger.json npm run gen:sdk:basic",
+    "gen:sdk:basic": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 node ./generate-sdk.ts",
     "gen:docs": "node ./generate-docs.ts"
   },
   "dependencies": {
