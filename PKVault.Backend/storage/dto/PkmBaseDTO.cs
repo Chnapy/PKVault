@@ -74,7 +74,6 @@ public abstract record PkmBaseDTO(
     public bool FatefulEncounter => Pkm.FatefulEncounter;
 
     public int HeldItem => Pkm.HeldItem;
-    public string? HeldItemPokeapiName => Pkm.HeldItemPokeapiName;
     public string DynamicChecksum => Pkm.DynamicChecksum;
     public int NicknameMaxLength => Pkm.MaxStringLengthNickname;
     public LanguageID LanguageID => Pkm.LanguageID;
@@ -113,7 +112,9 @@ public abstract record PkmBaseDTO(
                 return Level >= tradeEvolveSpecies.MinLevel;
             }
 
-            if (!staticEvolves.TradeWithItem.TryGetValue(HeldItemPokeapiName ?? "", out var tradeWithItemEvolveSpecies))
+            var heldItemPokeapiName = Pkm.GetHeldItemPokeapiName();
+
+            if (!staticEvolves.TradeWithItem.TryGetValue(heldItemPokeapiName, out var tradeWithItemEvolveSpecies))
             {
                 return false;
             }

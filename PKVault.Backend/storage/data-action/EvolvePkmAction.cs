@@ -142,7 +142,8 @@ public class EvolvePkmAction(
         if (evolves.TryGetValue(pkm.Species, out var staticEvolve))
         {
             var version = pkm.Context.GetSingleGameVersion();
-            if (pkm.HeldItemPokeapiName != null && staticEvolve.TradeWithItem.TryGetValue(pkm.HeldItemPokeapiName, out var evolveMap))
+            var heldItemPokeapiName = pkm.GetHeldItemPokeapiName();
+            if (staticEvolve.TradeWithItem.TryGetValue(heldItemPokeapiName, out var evolveMap))
             {
                 if (
                     evolveMap.TryGetValue((byte)version, out var evolvedSpeciesWithItem)
