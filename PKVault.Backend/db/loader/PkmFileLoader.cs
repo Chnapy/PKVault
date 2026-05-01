@@ -116,30 +116,38 @@ public class PkmFileLoader : IPkmFileLoader
             : [];
         var error = pkm.LoadError;
 
-        var entity = new PkmFileEntity()
-        {
-            Filepath = filepath,
-            Data = data,
-            Error = error,
-            Updated = updated,
-            Deleted = false
-        };
-
-        await AttachEntity(entity);
+        var entity = await GetAttachedEntity(filepath);
+        
+        entity.Data = data;
+        entity.Error = error;
+        entity.Updated = updated;
+        entity.Deleted = false;
 
         return entity;
     }
 
-    private async Task AttachEntity(PkmFileEntity entity)
+    private async Task<PkmFileEntity> GetAttachedEntity(string filepath)
     {
         var dbSet = await GetDbSet();
 
-        var exists = await dbSet.AnyAsync(e => e.Filepath == entity.Filepath);
+        var existing = await dbSet.FindAsync(filepath);
+        if (existing != null)
+            return existing;
 
-        db.PkmFiles.Attach(entity);
-        db.Entry(entity).State = exists
-            ? EntityState.Modified
-            : EntityState.Added;
+        var newEntity = new PkmFileEntity()
+        {
+            Filepath = filepath,
+            // default values
+            Data = [],
+            Error = null,
+            Updated = false,
+            Deleted = false,
+        };
+
+        db.PkmFiles.Attach(newEntity);
+        db.Entry(newEntity).State = EntityState.Added;
+
+        return newEntity;
     }
 
     public async Task WriteToFiles()
