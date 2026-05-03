@@ -260,9 +260,16 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
         .GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version);
 
     public int HeldItem => Pkm.HeldItem;
-    public string? HeldItemPokeapiName => HeldItem > 0
-        ? (HeldItem < GameInfo.Strings.Item.Count ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[HeldItem]) : "")
-        : null;
+
+    public int GetConvertedHeldItem() => ItemConverter.GetItemForFormat(HeldItem, Context, StaticDataService.LAST_ENTITY_CONTEXT);
+
+    public string GetHeldItemPokeapiName()
+    {
+        var convertedHeldItem = GetConvertedHeldItem();
+        return convertedHeldItem > 0 && convertedHeldItem < GameInfo.Strings.Item.Count
+            ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[convertedHeldItem])
+            : "";
+    }
 
     // Data used here is considered to be mutable over pkm lifetime
     public string DynamicChecksum => $"{Species}.{Form}.{Nickname}.{CurrentLevel}.{EXP}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}";

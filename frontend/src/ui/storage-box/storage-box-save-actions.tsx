@@ -4,7 +4,6 @@ import type React from 'react';
 import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { useStorageEvolvePkms, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
-import { useStaticData } from '../../hooks/use-static-data';
 import { StorageSelectContext } from '../../storage/actions/storage-select-context';
 import { useMoveClickable } from '../../storage/move/hooks/use-move-clickable';
 import { useTranslate } from '../../translate/i18n';
@@ -26,8 +25,6 @@ export const StorageBoxSaveActions: React.FC<
 
   const { ids, hasBox } = StorageSelectContext.useValue();
 
-  const staticData = useStaticData();
-
   const pkmSavePkmQuery = usePkmSaveIndex(saveId);
 
   const pkms = ids.map(id => pkmSavePkmQuery.data?.data.byId[ id ]).filter(filterIsDefined);
@@ -47,11 +44,7 @@ export const StorageBoxSaveActions: React.FC<
     return null;
   }
 
-  const canEvolvePkms = pkms.filter(pkm => {
-    const staticEvolves = staticData.evolves[ pkm.species ];
-    const evolveSpecies = staticEvolves?.trade[ pkm.contextVersion ] ?? staticEvolves?.tradeWithItem[ pkm.heldItemPokeapiName ?? '' ]?.[ pkm.contextVersion ];
-    return !!evolveSpecies && pkm.level >= evolveSpecies.minLevel;
-  });
+  const canEvolvePkms = pkms.filter(pkm => pkm.canEvolve);
 
   const canDetachPkms = pkms.map(pkm => pkmVariantIndex.data?.data.byAttachedSave[ pkm.saveId ]?.[ pkm.idBase ]).filter(filterIsDefined);
 
