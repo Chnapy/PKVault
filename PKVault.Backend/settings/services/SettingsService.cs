@@ -4,11 +4,11 @@ using PKHeX.Core;
 
 public interface ISettingsService
 {
-    public Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, DataUpdateFlags flags);
+    public Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool persistSession, DataUpdateFlags flags);
     public Task<SettingsDTO> GetSettingsWithUserId();
     public SettingsDTO GetSettings();
     public SettingsDTO RefreshSettings(DataUpdateFlags flags);
-    public bool GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags);
+    public (bool RestartSession, bool PersistSession) GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags);
 }
 
 /**
@@ -22,12 +22,11 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
     private static readonly SemaphoreSlim semaphore = new(1);
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
-    private ISavesLoadersService savesLoadersService => sp.GetRequiredService<ISavesLoadersService>();
     private ISessionService sessionService => sp.GetRequiredService<ISessionService>();
 
     private SettingsDTO? BaseSettings;
 
-    public async Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, DataUpdateFlags flags)
+    public async Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool persistSession, DataUpdateFlags flags)
     {
         await fileIOService.WriteJSONFile(
             FilePath,
@@ -47,10 +46,14 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             UserId = userId
         };
 
+        if (persistSession && !sessionService.HasEmptyActionList())
+        {
+            await sessionService.PersistSession(scope);
+            await sessionService.StartNewSession(checkInitialActions: false, flags);
+        }
+
         if (restartSession)
         {
-            savesLoadersService.Clear();
-
             await sessionService.StartNewSession(checkInitialActions: true, flags);
 
             if (!sessionService.HasEmptyActionList())
@@ -65,9 +68,9 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
      * Make a diff between current settings and updated ones.
      * Update flags following changed settings.
      * 
-     * Returns true if session should be restarted.
+     * Returns if session should be restarted or persisted.
      */
-    public bool GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags)
+    public (bool RestartSession, bool PersistSession) GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags)
     {
         var currentSettingsMutable = ReadBaseSettings().SettingsMutable;
 
@@ -79,6 +82,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         ]);
 
         bool restartSession = false;
+        bool persistSession = false;
 
         var hasPathChanges = currentSettingsMutable.DB_PATH != updatedSettingsMutable.DB_PATH
             || currentSettingsMutable.STORAGE_PATH != updatedSettingsMutable.STORAGE_PATH
@@ -87,8 +91,12 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             || GetArrayChecksum(currentSettingsMutable.PKM_EXTERNAL_GLOBS) != GetArrayChecksum(updatedSettingsMutable.PKM_EXTERNAL_GLOBS);
 
         var hasFirstLanguageChange = currentSettingsMutable.LANGUAGE == null && updatedSettingsMutable.LANGUAGE != null;
+        if (hasFirstLanguageChange)
+        {
+            persistSession = true;
+        }
 
-        if (hasPathChanges || hasFirstLanguageChange)
+        if (hasPathChanges)
         {
             restartSession = true;
         }
@@ -118,7 +126,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             flags.SaveInfos = true;
         }
 
-        return restartSession;
+        return (restartSession, persistSession);
     }
 
     public async Task<SettingsDTO> GetSettingsWithUserId()
