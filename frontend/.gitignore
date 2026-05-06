@@ -31,3 +31,5 @@ src/data/sdk*
 tmp/
 
 public/docs/
+
+storybook-static
