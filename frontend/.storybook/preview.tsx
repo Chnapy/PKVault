@@ -1,6 +1,6 @@
 import type { Preview, StoryContext } from '@storybook/react-vite';
 import { createMemoryHistory, createRootRoute, createRoute, createRouter, RouterProvider } from '@tanstack/react-router';
-import { AppTheme } from '../src/ui-new/theme';
+import { AppTheme } from '../src/ui-new/AppTheme';
 
 function withRouter(Story: any, { parameters }: StoryContext) {
   const { initialEntries = [ '/' ], initialIndex, routes = [ '/' ] } = parameters?.router || {};

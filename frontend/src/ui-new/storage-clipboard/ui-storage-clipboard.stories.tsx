@@ -8,7 +8,6 @@ import { UIStorageClipboard } from './ui-storage-clipboard';
 const meta = {
     title: 'UI/UIStorageClipboard',
     component: UIStorageClipboard,
-    tags: [ 'autodocs' ],
     parameters: {
         layout: 'centered'
     },

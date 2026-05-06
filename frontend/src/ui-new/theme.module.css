@@ -1,0 +1,13 @@
+
+[data-mantine-color-scheme='light'] .paper {
+    background-color: var(--mantine-color-white-4);
+}
+
+.tabs[data-variant='outline'][data-active='true'] {
+    background-color: light-dark(var(--mantine-color-white-4), var(--mantine-color-dark-6));
+}
+
+[data-mantine-color-scheme='light'] .button[data-variant='white'] {
+    /* stylelint-disable-next-line declaration-no-important */
+    --button-hover: var(--mantine-color-gray-0) !important;
+}

@@ -1,8 +1,8 @@
-import { css } from '@emotion/css';
 import { ActionIcon, Flex, Group, OverflowList, Tabs, Text } from '@mantine/core';
 import { ChevronDown, MoreVertical, Plus } from 'pixelarticons/react';
 import type React from 'react';
-import { uiFrameBgClassname } from './ui-frame-bg-classname';
+import classes from './ui-bank-list.module.css';
+import { uiFrameBg } from '../frame/ui-frame-bg.module.css';
 
 // TODO
 type Data = { value: string; label: string; selected?: boolean };
@@ -25,14 +25,10 @@ export const UIBankList: React.FC<UIBankListProps> = ({ data }) => {
                     gap={4}
                     data={data}
                     renderItem={(item) => <Flex
-                        className={css({
-                            '&:hover > .mantine-ActionIcon-root': {
-                                opacity: '1 !important',
-                            },
-                        })}
+                        className={classes.uiBankItem}
                     >
                         <Tabs.Tab
-                            className={item.selected ? undefined : uiFrameBgClassname}
+                            className={item.selected ? undefined : uiFrameBg}
                             value={item.value}
                             p='xs'
                             py={0}
@@ -43,19 +39,19 @@ export const UIBankList: React.FC<UIBankListProps> = ({ data }) => {
                             </Text>
                         </Tabs.Tab>
 
-                        <ActionIcon className={uiFrameBgClassname} size='xs' c='inherit' opacity={item.selected ? undefined : 0}>
+                        <ActionIcon className={uiFrameBg} size='xs' c='inherit' opacity={item.selected ? undefined : 0}>
                             {/* dropdown with edit/remove actions */}
                             <MoreVertical />
                         </ActionIcon>
                     </Flex>}
-                    renderOverflow={(items) => <ActionIcon className={uiFrameBgClassname} size='xs' style={{ flexGrow: 1 }}>
+                    renderOverflow={(items) => <ActionIcon className={uiFrameBg} size='xs' style={{ flexGrow: 1 }}>
                         <ChevronDown />
                     </ActionIcon>}
                 />
             </Tabs.List>
         </Tabs>
 
-        <ActionIcon className={uiFrameBgClassname} size='xs'>
+        <ActionIcon className={uiFrameBg} size='xs'>
             <Plus />
         </ActionIcon>
     </Group>;

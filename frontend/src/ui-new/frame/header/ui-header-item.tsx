@@ -1,9 +1,9 @@
 import { Button, Text } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import type React from "react";
-import { HistoryContext } from '../../context/history-context';
-import { type FileRouteTypes } from "../../routeTree.gen";
-import { uiFrameBgClassname } from './ui-frame-bg-classname';
+import { HistoryContext } from '../../../context/history-context';
+import { type FileRouteTypes } from "../../../routeTree.gen";
+import { uiFrameBg } from '../ui-frame-bg.module.css';
 
 export type UIHeaderItemProps = {
   selected?: boolean;
@@ -25,7 +25,7 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
   return (
     <Button
       component={Link}
-      className={uiFrameBgClassname}
+      className={uiFrameBg}
       variant='filled'
       radius='sm'
       py='xs'

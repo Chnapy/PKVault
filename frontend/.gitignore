@@ -33,3 +33,4 @@ tmp/
 public/docs/
 
 storybook-static
+*.css.d.ts

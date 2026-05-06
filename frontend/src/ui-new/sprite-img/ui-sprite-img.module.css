@@ -1,0 +1,16 @@
+.ui-sprite-img {
+    flex-shrink: 0;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    vertical-align: text-top;
+    overflow: hidden;
+}
+
+.ui-sprite-img .shadow {
+    filter: drop-shadow(#704 0 0 6px);
+}
+
+.ui-sprite-img[data-disabled="true"] {
+    opacity: 0.25;
+}

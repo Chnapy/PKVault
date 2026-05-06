@@ -12,7 +12,6 @@ import { UIStoragePanelGameList } from './ui-storage-panel-game-list';
 const meta = {
     title: 'UI/UIStoragePanel',
     component: UIStoragePanel,
-    tags: [ 'autodocs' ],
     parameters: {
         layout: 'padded',
     },

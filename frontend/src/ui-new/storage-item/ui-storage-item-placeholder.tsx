@@ -1,7 +1,6 @@
-import { css } from '@emotion/css';
 import { Box, Button } from '@mantine/core';
 import type React from 'react';
-import { SizingUtil } from '../../ui/util/sizing-util';
+import { SizingUtil } from '../util/sizing-util';
 
 export type UIStorageItemPlaceholderProps = {
     small?: boolean;
@@ -13,14 +12,12 @@ export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> =
 
     return <Box>
         <Button
-            className={css({
+            variant='light'
+            p={0}
+            style={{
                 height: size,
                 width: size,
-                padding: 0,
-                // borderStyle: 'dashed',
-                // backgroundColor: 'transparent',
-            })}
-            variant='light'
+            }}
         >
         </Button>
     </Box>

@@ -1,7 +1,8 @@
-import { css, cx } from '@emotion/css';
+import { clsx } from 'clsx';
 import type React from 'react';
-import { SizingUtil } from '../../ui/util/sizing-util';
+import { SizingUtil } from '../util/sizing-util';
 import { UISpriteImg, type UISpriteImgProps } from './ui-sprite-img';
+import classes from './ui-sprite-img.module.css';
 
 type UISpeciesImgProps = {
     species: number;
@@ -18,11 +19,12 @@ export const UISpeciesImg: React.FC<UISpeciesImgProps> = ({ spriteInfos, species
     return spriteInfos && <UISpriteImg
         spriteInfos={spriteInfos}
         size={small ? SizingUtil.itemSize / 2 : SizingUtil.itemSize}
-        className={cx(css({
-            filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
-            opacity: disabled ? 0.25 : undefined,
-        }), imgProps.className)}
+        className={clsx(
+            isShadow && classes.shadow,
+            imgProps.className
+        )}
         data-speciesid={species}
+        disabled={disabled}
         {...imgProps}
     />;
 };

@@ -8,11 +8,14 @@ import { playwright } from '@vitest/browser-playwright';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from "vite";
+import { patchCssModules } from 'vite-css-modules';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import { prepareDocs } from './src/help/prepare-docs';
+import { prepareCssvar } from './src/ui-new/prepare-cssvar';
 
 if (process.env.NODE_ENV === 'development') {
   prepareDocs('../docs/functional');
+  prepareCssvar();
 }
 
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
@@ -21,6 +24,10 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 export default defineConfig({
   plugins: [
     ViteImageOptimizer(),
+    patchCssModules({
+      generateSourceTypes: true,
+      declarationMap: true
+    }),
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
@@ -28,6 +35,12 @@ export default defineConfig({
     react(),
     babel({ presets: [ reactCompilerPreset() ] }),
   ],
+  css: {
+    modules: {
+      localsConvention: 'camelCaseOnly',
+
+    },
+  },
   build: {
     assetsInlineLimit: 0
   },

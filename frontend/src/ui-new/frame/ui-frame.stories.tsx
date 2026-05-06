@@ -1,19 +1,15 @@
+import { Box, Button, Card, Container, Grid, Stack, ThemeIcon } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-import { ActionIcon, Box, Button, Card, Container, Grid, Stack, ThemeIcon } from '@mantine/core';
-import { Primary as StorageClipboard } from '../storage-mid-panel/ui-storage-clipboard.stories';
+import { Primary as StorageClipboard } from '../storage-clipboard/ui-storage-clipboard.stories';
 import { UIStoragePanel } from '../storage-panel/ui-storage-panel';
 import { Primary as StoragePanelPrimary } from '../storage-panel/ui-storage-panel.stories';
+import { UIHeader } from './header/ui-header';
+import { UIHeaderItem } from './header/ui-header-item';
 import { UIFrame } from './ui-frame';
-import { UIHeader } from './ui-header';
-import { UIHeaderItem } from './ui-header-item';
-// import { UIIconWrapper } from './ui-icon-wrapper';
 import { SortHorizontal } from 'pixelarticons/react';
-import { UIStorageClipboard } from '../storage-mid-panel/ui-storage-clipboard';
-import { UIBankList } from './ui-bank-list';
-// import { UISpeciesImg } from './ui-species-img';
+import { UIBankList } from '../bank/ui-bank-list';
+import { UIStorageClipboard } from '../storage-clipboard/ui-storage-clipboard';
 
-// More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
     title: 'UI/UIFrame',
     component: UIFrame,
@@ -22,7 +18,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const WithHeader: Story = {
     args: {
         children: <>

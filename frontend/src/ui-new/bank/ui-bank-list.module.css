@@ -1,0 +1,6 @@
+
+/* stylelint-disable-next-line selector-class-pattern */
+.ui-bank-item:hover > :global(.mantine-ActionIcon-root) {
+    /* stylelint-disable-next-line declaration-no-important */
+    opacity: 1 !important;
+}

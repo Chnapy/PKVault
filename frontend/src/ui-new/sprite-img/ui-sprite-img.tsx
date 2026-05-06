@@ -1,15 +1,17 @@
-import { css, cx } from '@emotion/css';
+import { clsx } from 'clsx';
 import type React from 'react';
 import type { SpriteInfo } from '../../data/sdk/model';
+import classes from './ui-sprite-img.module.css';
 
 export type UISpriteImgProps = {
     spriteInfos: SpriteInfo;
     sheetUrl: string;
     size?: number | '1lh';
     sourceRealHeight?: number;
+    disabled?: boolean;
 } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
-export const UISpriteImg: React.FC<UISpriteImgProps> = ({ spriteInfos, sheetUrl, size, sourceRealHeight = spriteInfos.height, ...imgProps }) => {
+export const UISpriteImg: React.FC<UISpriteImgProps> = ({ spriteInfos, sheetUrl, size, sourceRealHeight = spriteInfos.height, disabled, ...imgProps }) => {
     const sourceRealSizeRatio = sourceRealHeight / spriteInfos.height;
 
     const sourceRealWidth = spriteInfos.width * sourceRealSizeRatio;
@@ -26,28 +28,24 @@ export const UISpriteImg: React.FC<UISpriteImgProps> = ({ spriteInfos, sheetUrl,
 
     return <div
         {...imgProps}
-        className={cx(css({
-            flexShrink: 0,
-            display: 'inline-flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            verticalAlign: 'text-top',
+        data-disabled={disabled || undefined}
+        className={clsx(classes.uiSpriteImg, imgProps.className)}
+        style={{
             height: size,
             width: size,
-            overflow: 'hidden',
-        }), imgProps.className)}
+        }}
     >
         <img
             src={sheetUrl}
             alt={`${spriteInfos.sheetName}-x=${x}-y=${y}`}
-            className={css({
+            style={{
                 objectFit: 'none',
                 objectPosition: spriteInfos && `-${x}px -${y}px`,
                 imageRendering: scale === 1 ? "pixelated" : undefined,
                 height: sourceRealHeight,
                 width: sourceRealWidth,
                 transform: scale !== 1 ? `scale(${scale})` : undefined,
-            })}
+            }}
         />
     </div>;
 };

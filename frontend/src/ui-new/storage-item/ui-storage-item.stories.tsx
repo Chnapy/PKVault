@@ -1,16 +1,15 @@
 import { Group } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { UIAlphaIcon } from '../icon/ui-alpha-icon';
+import { UIIconWrapper } from '../icon/ui-icon-wrapper';
+import { UIShinyIcon } from '../icon/ui-shiny-icon';
+import { UISpeciesImg } from '../sprite-img/ui-species-img';
 import spritesheet0 from "../stories/assets/spritesheet_species_0.webp";
-import { UIAlphaIcon } from './ui-alpha-icon';
-import { UIIconWrapper } from './ui-icon-wrapper';
-import { UIShinyIcon } from './ui-shiny-icon';
-import { UISpeciesImg } from './ui-species-img';
 import { UIStorageItem } from './ui-storage-item';
 
 const meta = {
     title: 'UI/UIStorageItem',
     component: UIStorageItem,
-    tags: [ 'autodocs' ],
 } satisfies Meta<typeof UIStorageItem>;
 
 export default meta;

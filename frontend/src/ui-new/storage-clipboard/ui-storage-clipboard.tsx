@@ -1,6 +1,6 @@
 import { Card, Stack, Text } from '@mantine/core';
 import type React from 'react';
-import { SizingUtil } from '../../ui/util/sizing-util';
+import { SizingUtil } from '../util/sizing-util';
 
 type UIStorageClipboardProps = {
     children: React.ReactNode;

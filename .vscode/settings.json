@@ -16,5 +16,16 @@
   "i18n-ally.keystyle": "flat",
   "js/ts.experimental.useTsgo": true,
   "typescript.native-preview.tsdk": "frontend/node_modules/@typescript/native-preview",
-  "editor.defaultFormatter": "TypeScriptTeam.native-preview"
+  "editor.defaultFormatter": "TypeScriptTeam.native-preview",
+  "cssVariables.lookupFiles": [
+    "**/*.css",
+    "**/*.scss",
+    "**/*.sass",
+    "**/*.less",
+    "frontend/node_modules/@mantine/core/styles.css",
+    "frontend/variables.gen.css",
+  ],
+  "cssVariables.languages": [
+    "css",
+  ],
 }

@@ -4,7 +4,6 @@ import { UIStorageItemPlaceholder } from './ui-storage-item-placeholder';
 const meta = {
     title: 'UI/UIStorageItemPlaceholder',
     component: UIStorageItemPlaceholder,
-    tags: [ 'autodocs' ],
 } satisfies Meta<typeof UIStorageItemPlaceholder>;
 
 export default meta;

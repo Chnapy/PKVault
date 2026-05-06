@@ -1,7 +1,7 @@
-import { css } from '@emotion/css';
 import { ActionIcon, Checkbox, Divider, Group, OverflowList, Space, Tabs, Text } from '@mantine/core';
-import { MoreVertical, Box as BoxIcon, ChevronDown } from 'pixelarticons/react';
+import { Box as BoxIcon, ChevronDown, MoreVertical } from 'pixelarticons/react';
 import type React from 'react';
+import classes from './ui-storage-panel-box-list.module.css';
 
 // TODO
 type Data = { value: string; label: string; selected?: boolean };
@@ -18,11 +18,7 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ da
             variant='pills'
         >
             <Tabs.List
-                className={css`
-                    [data-mantine-color-scheme='dark'] & {
-                        --tab-hover-color: var(--mantine-color-dark-7);
-                    }
-                `}
+                className={classes.uiStoragePanelBoxList}
             >
                 <OverflowList<Data>
                     data={data}

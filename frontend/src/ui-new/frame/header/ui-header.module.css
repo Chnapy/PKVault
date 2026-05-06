@@ -1,0 +1,69 @@
+.ui-header {
+    color-scheme: light;
+    margin-bottom: 0;
+    align-items: flex-start;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.ui-header .left {
+    display: flex;
+    padding: 8px;
+    padding-top: 0;
+    padding-left: 0;
+    gap: 16px;
+    z-index: 2;
+}
+
+.ui-header .logo {
+    height: 48px;
+    width: 48px;
+}
+
+.ui-header .bubble {
+    border-radius: 99px;
+    width: 12px;
+    height: 12px;
+}
+
+.ui-header .artifact-wrapper {
+    overflow: hidden;
+    padding-left: 1px;
+    margin-left: -1px;
+    margin-right: -150px;
+    align-self: stretch;
+    flex-shrink: 0;
+    z-index: 2;
+    pointer-events: none;
+    height: 56px;
+}
+
+.ui-header .artifact {
+    height: 100%;
+    width: 150px;
+    transform: rotate(-45deg);
+    transform-origin: bottom left;
+    pointer-events: none;
+}
+
+.ui-header .main {
+    flex-grow: 1;
+    padding-left: 140px;
+    box-shadow: 0 2px 0 rgb(0 0 0 / 20%), inset rgb(0 0 0 / 20%) -2px 2px 0;
+}
+
+.ui-header .first-line {
+    flex-grow: 1;
+    display: flex;
+    padding-left: 60px;
+    padding-top: 2px;
+    padding-right: 2px;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 0 rgb(0 0 0 / 20%);
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-color: var(--mantine-color-primary-7) var(--mantine-color-primary-6);
+    z-index: 1;
+}
