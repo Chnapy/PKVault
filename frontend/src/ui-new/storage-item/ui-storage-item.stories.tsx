@@ -52,7 +52,7 @@ export const Small: Story = {
             </UIIconWrapper>
         </Group>,
         children: <UISpeciesImg
-            small
+            size='small'
             sheetUrl={spritesheet0}
             species={68}
             spriteInfos={{

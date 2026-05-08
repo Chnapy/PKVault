@@ -7,8 +7,12 @@
     overflow: hidden;
 }
 
-.ui-sprite-img .shadow {
+.ui-sprite-img.shadow img {
     filter: drop-shadow(#704 0 0 6px);
+}
+
+.ui-sprite-img.big:not(.shadow) img {
+    filter: drop-shadow(4px 4px 0 #0002);
 }
 
 .ui-sprite-img[data-disabled="true"] {

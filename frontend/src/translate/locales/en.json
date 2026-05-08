@@ -75,7 +75,7 @@
   "dex.filters.show-genders.no": "Show genders ?",
   "total": "total",
   "dex.list.title": "Generation {{generation}} ({{regions}})",
-  "details.level": "L.",
+  "details.level": "Lv.",
   "details.dex": "Pokedex",
   "details.stats.base": "Base stats",
   "details.stats.hp": "HP",

@@ -1,0 +1,38 @@
+.ui-marking-list {
+    column-gap: 4px;
+    font-size: 10px;
+    padding: 4px;
+}
+
+.ui-marking {
+    flex-grow: 1;
+    aspect-ratio: 1;
+    width: auto;
+    height: auto;
+    max-width: 1lh;
+    background-color: var(--mantine-color-text);
+}
+
+.ui-marking.not-marked {
+    background-color: var(--mantine-color-gray-2);
+}
+
+.ui-marking.circle {
+    border-radius: 99px;
+}
+
+.ui-marking.triangle {
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%, 0% 100%);
+}
+
+.ui-marking.heart {
+    clip-path: shape(from 50% 91%, line to 90% 50%, arc to 50% 9%  of 1%, arc to 10% 50% of 1%);
+}
+
+.ui-marking.star {
+    clip-path: polygon(50% 0%, 66% 32%, 100% 38%, 78% 64%, 83% 100%, 50% 83%, 17% 100%, 22% 64%, 0 38%, 34% 32%);
+}
+
+.ui-marking.diamond {
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}

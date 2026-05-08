@@ -2,3 +2,11 @@
 .ui-icon {
     height: 16px;
 }
+
+.ui-icon.small {
+    height: 12px;
+}
+
+.ui-icon.big {
+    height: 20px;
+}

@@ -1,0 +1,26 @@
+.ui-gender {
+    font-family: var(--mantine-font-family-monospace);
+}
+
+.ui-gender.male {
+    color: #00C6AD;
+}
+
+.ui-gender.female {
+    color: #FF4273;
+}
+
+.ui-gender.small {
+    font-size: 16px;
+    line-height: 12px;
+}
+
+.ui-gender.medium {
+    font-size: 20px;
+    line-height: 16px;
+}
+
+.ui-gender.big {
+    font-size: 22px;
+    line-height: 20px;
+}

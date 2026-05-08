@@ -1,0 +1,31 @@
+@font-face {
+  font-family: "Pixel Operator Small Caps";
+  src:
+    url("regular/pixel-operator-sc.woff") format("woff"),
+    url("regular/pixel-operator-sc.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* bold */
+@font-face {
+  font-family: "Pixel Operator Small Caps";
+  src:
+    url("bold/pixel-operator-sc-bold.woff") format("woff"),
+    url("bold/pixel-operator-sc-bold.woff2") format("woff2");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* half-bold */
+@font-face {
+  font-family: "Pixel Operator Small Caps";
+  src:
+    url("half-bold/pixel-operator-hb-sc.woff") format("woff"),
+    url("half-bold/pixel-operator-hb-sc.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}

@@ -1,0 +1,11 @@
+
+.ui-game-img {
+    display: inline-block;
+    border-style: solid;
+    border-width: 1px;
+    vertical-align: middle;
+}
+
+.ui-game-img.save {
+    background-color: #FFF;
+}

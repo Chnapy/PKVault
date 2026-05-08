@@ -22,7 +22,7 @@ export const UISpriteImg: React.FC<UISpriteImgProps> = ({ spriteInfos, sheetUrl,
     const x = spriteInfos.x + widthDiff / 2;
     const y = spriteInfos.y + heightDiff / 2;
 
-    size = size === '1lh' ? 19 : size;
+    size = size === '1lh' ? 24 : size;
 
     const scale = size && spriteInfos ? (size / sourceRealHeight) : 1;
 
@@ -41,7 +41,7 @@ export const UISpriteImg: React.FC<UISpriteImgProps> = ({ spriteInfos, sheetUrl,
             style={{
                 objectFit: 'none',
                 objectPosition: spriteInfos && `-${x}px -${y}px`,
-                imageRendering: scale === 1 ? "pixelated" : undefined,
+                imageRendering: Number.isInteger(scale) ? "pixelated" : undefined,
                 height: sourceRealHeight,
                 width: sourceRealWidth,
                 transform: scale !== 1 ? `scale(${scale})` : undefined,

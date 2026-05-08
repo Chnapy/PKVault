@@ -30,7 +30,7 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ da
                         py={0}
                         rightSection={item.selected && <Checkbox size='xs' />}
                     >
-                        <Text fw={item.selected ? 'bold' : undefined}>{item.label}</Text>
+                        <Text component={item.selected ? 'b' : undefined}>{item.label}</Text>
                     </Tabs.Tab>}
                     renderOverflow={(items) => <ActionIcon variant='subtle' size='sm'>
                         <ChevronDown />

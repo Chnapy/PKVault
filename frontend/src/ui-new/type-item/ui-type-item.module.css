@@ -1,0 +1,28 @@
+
+.ui-type-item {
+    color-scheme: light;
+    padding: 0 2px;
+    box-shadow: var(--mantine-shadow-sm);
+}
+
+.ui-type-item.none {
+    opacity: 0.5;
+}
+
+.ui-type-item.clickable {
+    cursor: pointer;
+}
+
+.ui-type-item.clickable:hover {
+    text-decoration: underline;
+}
+
+.ui-type-item .icon {
+    height: 20px;
+    width: 20px;
+    color: var(--badge-color);
+}
+
+.ui-type-item .label:not(:empty) {
+    padding-right: 4px;
+}

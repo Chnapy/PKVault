@@ -1,0 +1,21 @@
+/* stylelint-disable selector-class-pattern */
+@import url('../assets/fonts/font-face.css');
+
+:root {
+    scrollbar-width: thin;
+}
+
+:root, button {
+    text-shadow: 1px 1px 0 light-dark(#0002, #FFF2);
+}
+
+:root strong,
+:root b,
+:root th,
+:root .mantine-Badge-label {
+  text-shadow: none;
+}
+
+:root strong, :root b {
+    font-weight: bold;
+}
