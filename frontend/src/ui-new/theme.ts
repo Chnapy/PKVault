@@ -1,4 +1,5 @@
 import { Button, Card, createTheme, mergeThemeOverrides, Paper, Tabs } from '@mantine/core';
+import { clsx } from 'clsx';
 import { baseTheme, cssVariablesResolver } from './base-theme';
 import classes from './theme.module.css';
 
@@ -8,7 +9,10 @@ export const theme = mergeThemeOverrides(
     components: {
       Paper: Paper.extend({
         classNames: (theme, props) => ({
-          root: classes.paper,
+          root: clsx(
+            classes.paper,
+            props.withBorder && classes.paperBorder
+          ),
         }),
       }),
       Card: Card.extend({

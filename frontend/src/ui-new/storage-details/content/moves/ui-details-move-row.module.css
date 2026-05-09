@@ -2,6 +2,8 @@
 .ui-details-content-move {
     border-collapse: separate;
     border-spacing: 0 var(--mantine-spacing-md);
+    margin-top: calc(var(--mantine-spacing-md) * -1);
+    margin-bottom: calc(var(--mantine-spacing-md) * -1);
 }
 
 .ui-details-move-row {

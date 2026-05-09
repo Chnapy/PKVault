@@ -1,0 +1,4 @@
+
+.ui-details-content-cosmetic tr > *:not(:nth-child(2)) {
+    width: 0;
+}

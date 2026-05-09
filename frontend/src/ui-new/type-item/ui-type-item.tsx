@@ -1,4 +1,4 @@
-import { Badge } from '@mantine/core';
+import { Badge, type BadgeProps } from '@mantine/core';
 import { clsx } from 'clsx';
 import type React from 'react';
 import classes from './ui-type-item.module.css';
@@ -11,7 +11,7 @@ export type UITypeItemProps = {
     isNone?: boolean;
     alpha?: React.ReactNode;
 }
-    & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+    & BadgeProps;
 
 export const UITypeItem: React.FC<UITypeItemProps> = ({ type, name, clickable, isNone, alpha, ...rest }) => {
     const typeImg = getTypeImg(type);
@@ -19,7 +19,6 @@ export const UITypeItem: React.FC<UITypeItemProps> = ({ type, name, clickable, i
     return <Badge
         data-mantine-color-scheme="light"
         variant='filled'
-        size='lg'
         radius='sm'
         color={typeImg.color}
         // autoContrast

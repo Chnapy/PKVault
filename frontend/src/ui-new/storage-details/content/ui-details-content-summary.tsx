@@ -1,4 +1,4 @@
-import { SimpleGrid } from '@mantine/core';
+import { Grid } from '@mantine/core';
 import type React from 'react';
 
 export type UIDetailsContentSummaryProps = {
@@ -12,33 +12,33 @@ export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = (
     heldItem, nature, ability, pid
 }) => {
 
-    return <SimpleGrid cols={2} verticalSpacing='sm'>
-        <div>
+    return <Grid>
+        <Grid.Col span={4}>
             Held item
-        </div>
-        <div>
+        </Grid.Col>
+        <Grid.Col span={8}>
             {heldItem ?? '-'}
-        </div>
+        </Grid.Col>
 
-        <div>
+        <Grid.Col span={4}>
             Nature
-        </div>
-        <div>
+        </Grid.Col>
+        <Grid.Col span={8}>
             {nature ?? '-'}
-        </div>
+        </Grid.Col>
 
-        <div>
+        <Grid.Col span={4}>
             Ability
-        </div>
-        <div>
+        </Grid.Col>
+        <Grid.Col span={8}>
             {ability ?? '-'}
-        </div>
+        </Grid.Col>
 
-        <div>
+        <Grid.Col span={4}>
             PID
-        </div>
-        <div>
+        </Grid.Col>
+        <Grid.Col span={8}>
             {pid ?? '-'}
-        </div>
-    </SimpleGrid>;
+        </Grid.Col>
+    </Grid>;
 };

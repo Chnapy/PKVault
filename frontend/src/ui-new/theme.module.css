@@ -3,8 +3,16 @@
     background-color: var(--mantine-color-white-4);
 }
 
+.paper.paper-border {
+    border-width: calc(0.0625rem * var(--mantine-scale) * 2);
+}
+
 .tabs[data-variant='outline'][data-active='true'] {
     background-color: light-dark(var(--mantine-color-white-4), var(--mantine-color-dark-6));
+}
+
+.tabs[data-variant='default'] {
+    --tab-border-width: 0 0 calc(var(--tabs-list-border-width) * 2) 0;
 }
 
 [data-mantine-color-scheme='light'] .button[data-variant='white'] {

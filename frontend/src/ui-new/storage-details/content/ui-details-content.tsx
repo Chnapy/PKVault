@@ -5,10 +5,12 @@ export type UIDetailsContentProps = {
     summary?: React.ReactNode;
     stats?: React.ReactNode;
     moves?: React.ReactNode;
+    contest?: React.ReactNode;
     origin?: React.ReactNode;
+    misc?: React.ReactNode;
 };
 
-export const UIDetailsContent: React.FC<UIDetailsContentProps> = ({ summary, stats, moves, origin }) => {
+export const UIDetailsContent: React.FC<UIDetailsContentProps> = ({ summary, stats, moves, contest, origin, misc }) => {
 
     return <>
         <Tabs defaultValue='summary'>
@@ -23,8 +25,14 @@ export const UIDetailsContent: React.FC<UIDetailsContentProps> = ({ summary, sta
                     {moves && <Tabs.Tab value='moves'>
                         <Text>Moves</Text>
                     </Tabs.Tab>}
+                    {contest && <Tabs.Tab value='contest'>
+                        <Text>Contest</Text>
+                    </Tabs.Tab>}
                     {origin && <Tabs.Tab value='origin'>
                         <Text>Origin</Text>
+                    </Tabs.Tab>}
+                    {misc && <Tabs.Tab value='misc'>
+                        <Text>Misc</Text>
                     </Tabs.Tab>}
                 </Scroller>
             </Tabs.List>
@@ -39,8 +47,14 @@ export const UIDetailsContent: React.FC<UIDetailsContentProps> = ({ summary, sta
                 {moves && <Tabs.Panel value="moves">
                     {moves}
                 </Tabs.Panel>}
+                {contest && <Tabs.Panel value="contest">
+                    {contest}
+                </Tabs.Panel>}
                 {origin && <Tabs.Panel value="origin">
                     {origin}
+                </Tabs.Panel>}
+                {misc && <Tabs.Panel value="misc">
+                    {misc}
                 </Tabs.Panel>}
             </Box>
         </Tabs>

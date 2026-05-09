@@ -23,14 +23,14 @@ export const UIDetailsMoveRow: React.FC<UIDetailsMoveRowProps> = ({
         </Table.Td>
 
         <Table.Td>
-            <Text>{name}</Text>
+            <Text lh={1}>{name}</Text>
         </Table.Td>
 
         <Table.Td>
             <Badge
                 // variant='default'
                 color='dark.4'
-                radius='xs'
+                radius='sm'
                 px={'xs'}
                 styles={{
                     label: {

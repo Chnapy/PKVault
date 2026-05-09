@@ -1,5 +1,7 @@
-import { Group, Scroller, Tabs } from '@mantine/core';
+import { Button, Group, Scroller, Tabs } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { ArrowRight, ArrowRightBox, Delete, PenSquare } from 'pixelarticons/react';
+import { fn } from 'storybook/test';
 import gameXImg from '../../assets/game_icons/x.png';
 import { GameVersion, Gender, MarkingColorUniversal, MoveCategory } from '../../data/sdk/model';
 import { UIBallImg } from '../sprite-img/ui-ball-img';
@@ -9,6 +11,10 @@ import { UISpeciesImg } from '../sprite-img/ui-species-img';
 import spritesheetItem0 from '../stories/assets/spritesheet_items_0.webp';
 import spritesheet0 from "../stories/assets/spritesheet_species_0.webp";
 import { UITypeItem } from '../type-item/ui-type-item';
+import { UIContest } from './content/cosmetic/ui-contest';
+import { UIDetailsContentCosmetic } from './content/cosmetic/ui-details-content-cosmetic';
+import { UIRibbon, type UIRibbonProps } from './content/cosmetic/ui-ribbon';
+import { UIDetailsContentMisc } from './content/misc/ui-details-content-misc';
 import { UIDetailsContentMove } from './content/moves/ui-details-content-moves';
 import { UIDetailsMoveRow, type UIDetailsMoveRowProps } from './content/moves/ui-details-move-row';
 import { UIDetailsContentOrigin } from './content/origin/ui-details-content-origin';
@@ -25,7 +31,7 @@ const meta = {
     title: 'UI/UIStorageDetails',
     component: UIStorageDetails,
     decorators: [
-        Story => <div style={{ width: 330, margin: 16 }}>
+        Story => <div style={{ width: 300, margin: 16 }}>
             <Story />
         </div>,
     ],
@@ -36,12 +42,12 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
     args: {
-        header: <Tabs defaultValue='1'>
+        header: <Tabs defaultValue='5' miw={0}>
             <Tabs.List>
                 <Scroller>
                     {[
-                        { value: 1, imgSrc: '/logo.svg', label: 'PKVault', selected: true },
-                        { value: 5, imgSrc: gameXImg, label: 'G1' },
+                        // { value: 1, imgSrc: '/logo.svg', label: 'PKVault', selected: true },
+                        { value: 5, imgSrc: gameXImg, label: 'G1', selected: true },
                         { value: 6, imgSrc: gameXImg, label: 'G5' },
                         { value: 2, imgSrc: gameXImg, label: 'G6' },
                         { value: 3, imgSrc: gameXImg, label: 'G7' },
@@ -208,6 +214,21 @@ export const Primary: Story = {
                     // } satisfies UIDetailsMoveRowProps,
                 ].map(props => <UIDetailsMoveRow key={props.name} {...props} />)}
             </UIDetailsContentMove>}
+            contest={<UIDetailsContentCosmetic
+                contest={[ 45, 0, 0, 255, 147, 0 ].map((value, i) => <UIContest key={i} index={i} value={value} />)}
+                ribbons={[
+                    {
+                        spriteKey: 'ribbonalert',
+                        name: 'Foobar',
+                        count: 1
+                    } satisfies UIRibbonProps,
+                    {
+                        spriteKey: 'ribbonearth',
+                        name: 'Barfoo',
+                        count: 3
+                    } satisfies UIRibbonProps,
+                ].map(props => <UIRibbon key={props.name} {...props} />)}
+            />}
             origin={<UIDetailsContentOrigin
                 game={<Group>
                     <UIGameImg
@@ -227,6 +248,33 @@ export const Primary: Story = {
                 originMetDate={'2025-10-17'}
                 fatefulEncounter
             />}
+            misc={<UIDetailsContentMisc
+                language='English'
+                homeTracker={0}
+            />}
         />,
+        actions: <>
+            <Button
+                size='compact-sm'
+                leftSection={<ArrowRight height={16} />}
+            >Move</Button>
+            <Button
+                size='compact-sm'
+                leftSection={<ArrowRightBox height={16} />}
+            >Move attached</Button>
+            <Button
+                variant='filled'
+                color='blue'
+                size='compact-sm'
+                leftSection={<PenSquare height={16} />}
+            >Edit</Button>
+            <Button
+                variant='filled'
+                color='red'
+                size='compact-sm'
+                leftSection={<Delete height={16} />}
+            >Release</Button>
+        </>,
+        onClose: fn(),
     },
 };
