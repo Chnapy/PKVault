@@ -13,7 +13,7 @@ export type UIStorageItemProps = {
 export const UIStorageItem: React.FC<UIStorageItemProps> = ({ label, checked = false, onCheck, icons, children }) => {
 
     return <Box className={classes.uiStorageItem}>
-        <Tooltip label={label} withArrow position="bottom" py={2}>
+        <Tooltip label={label} withArrow position="bottom">
             <Button
                 variant='light'
                 className={classes.button}
@@ -27,7 +27,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({ label, checked = f
 
         <Checkbox
             className={classes.checkbox}
-            style={{ opacity: checked ? undefined : 0 }}
+            // style={{ opacity: checked ? undefined : 0 }}
             size='sm'
             checked={checked}
             onClick={onCheck}

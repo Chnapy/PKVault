@@ -27,8 +27,6 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
       component={Link}
       className={uiFrameBg}
       variant='filled'
-      radius='sm'
-      py='xs'
       to={to!}
       search={(oldSearch) => {
         // remove all search params
@@ -40,7 +38,7 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
         } as never;
       }}
     >
-      <Text size='md' fw='bold'>
+      <Text fw='bold'>
         {children}
       </Text>
     </Button>

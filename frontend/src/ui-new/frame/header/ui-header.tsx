@@ -67,7 +67,7 @@ export const UIHeader: React.FC<{
 
                 <Box
                     mx='md'
-                    p='xs'
+                    p='sm'
                     pl={30}
                     bg='primary.7'
                     c='inherit'

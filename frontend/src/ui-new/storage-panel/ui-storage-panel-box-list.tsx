@@ -12,7 +12,7 @@ export type UIStoragePanelBoxListProps = {
 
 export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ data }) => {
 
-    return <Group align='center' gap='xs' wrap='nowrap'>
+    return <Group align='center' wrap='nowrap'>
         <Tabs
             defaultValue='1'
             variant='pills'
@@ -26,7 +26,7 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ da
                     style={{ alignItems: 'center' }}
                     renderItem={(item) => <Tabs.Tab
                         value={item.value}
-                        p='xs'
+                        p='sm'
                         py={0}
                         rightSection={item.selected && <Checkbox size='xs' />}
                     >

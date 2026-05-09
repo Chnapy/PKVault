@@ -8,7 +8,7 @@ export type UIStoragePanelFooterProps = {
 };
 
 export const UIStoragePanelFooter: React.FC<UIStoragePanelFooterProps> = ({ boxSize, pkmCount, pkmTotalCount }) => {
-    return <Text component="div" size='md'>
+    return <Text component="div">
         <Group justify='space-between'>
             <div />
             {/* <Button variant='default'>

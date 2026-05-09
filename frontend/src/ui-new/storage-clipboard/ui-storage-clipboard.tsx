@@ -7,12 +7,12 @@ type UIStorageClipboardProps = {
 };
 
 export const UIStorageClipboard: React.FC<UIStorageClipboardProps> = ({ children }) => {
-    return <Card p='xs' mah='100%' style={{ overflowY: 'auto' }}>
-        <Text size='md' mx='auto'>
+    return <Card p='sm' mah='100%' style={{ overflowY: 'auto' }}>
+        <Text mx='auto'>
             Clipboard
         </Text>
 
-        <Stack gap={SizingUtil.itemsGap / 2} mx='auto'>
+        <Stack gap={SizingUtil.itemsGap} mx='auto'>
             {children}
         </Stack>
     </Card>;

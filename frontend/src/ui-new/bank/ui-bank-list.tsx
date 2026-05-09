@@ -14,7 +14,7 @@ export type UIBankListProps = {
 export const UIBankList: React.FC<UIBankListProps> = ({ data }) => {
 
     return <Group wrap='nowrap' gap='xs'>
-        <Tabs variant="pills" value='1' color='white'
+        <Tabs variant="pills" value='1'
             // className={css`
             //   --tab-hover-color: var(--mantine-color-primary-6) !important;
             // `}
@@ -22,7 +22,6 @@ export const UIBankList: React.FC<UIBankListProps> = ({ data }) => {
             <Tabs.List>
                 <OverflowList<Data>
                     style={{ flexGrow: 1 }}
-                    gap={4}
                     data={data}
                     renderItem={(item) => <Flex
                         className={classes.uiBankItem}
@@ -30,16 +29,20 @@ export const UIBankList: React.FC<UIBankListProps> = ({ data }) => {
                         <Tabs.Tab
                             className={item.selected ? undefined : uiFrameBg}
                             value={item.value}
-                            p='xs'
+                            p='sm'
                             py={0}
                         >
-                            <Text size='sm' display='flex' style={{ alignItems: 'center' }}>
+                            <Text
+                                size='sm'
+                                display='flex' style={{ alignItems: 'center' }}>
                                 {item.label}
                                 {/* | 5 <UIAlphaIcon /><Space w='4px' />5 <UIShinyIcon /> */}
                             </Text>
                         </Tabs.Tab>
 
-                        <ActionIcon className={uiFrameBg} size='xs' c='inherit' opacity={item.selected ? undefined : 0}>
+                        <ActionIcon className={uiFrameBg}
+                            size='xs'
+                            c='inherit' opacity={item.selected ? undefined : 0}>
                             {/* dropdown with edit/remove actions */}
                             <MoreVertical />
                         </ActionIcon>

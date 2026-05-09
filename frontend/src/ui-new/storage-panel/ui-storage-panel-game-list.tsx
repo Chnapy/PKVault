@@ -9,10 +9,10 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
 
     return <>
         <Tabs defaultValue='pkvault' variant='outline'>
-            <Tabs.List p={4} pb={0}>
+            <Tabs.List p='sm' pb={0}>
                 {data.map((item, i) => (
                     <Tabs.Tab key={i} value={item.value} leftSection={<img src={item.imgSrc} height={16} />} py={4}>
-                        <Text component={item.selected ? 'b' : undefined} size='md'>{item.label}</Text>
+                        <Text component={item.selected ? 'b' : undefined}>{item.label}</Text>
                     </Tabs.Tab>
                 ))}
 

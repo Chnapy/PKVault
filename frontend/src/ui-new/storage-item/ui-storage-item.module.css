@@ -19,8 +19,9 @@
     position: absolute;
     left: 4px;
     top: 4px;
+    opacity: 0;
 }
 
-.ui-storage-item:hover > .checkbox {
+.ui-storage-item:hover .checkbox {
     opacity: 1;
 }

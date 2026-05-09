@@ -1,4 +1,4 @@
-import { Card, CardSection, CloseButton, Flex, Group } from '@mantine/core';
+import { Card, CardSection, CloseButton, Flex, Group, type CardProps } from '@mantine/core';
 import type React from 'react';
 
 export type UIStorageDetailsProps = {
@@ -7,13 +7,13 @@ export type UIStorageDetailsProps = {
     content: React.ReactNode;
     actions: React.ReactNode;
     onClose: () => void;
-};
+} & CardProps;
 
 export const UIStorageDetails: React.FC<UIStorageDetailsProps> = ({
-    header, main, content, actions, onClose,
+    header, main, content, actions, onClose, ...rest
 }) => {
 
-    return <Card>
+    return <Card {...rest}>
         <CardSection p={0}>
             <Flex>
                 {header}

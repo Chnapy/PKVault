@@ -1,14 +1,14 @@
 import { Box, Button, Card, Container, Grid, Stack, ThemeIcon } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Primary as StorageClipboard } from '../storage-clipboard/ui-storage-clipboard.stories';
-import { UIStoragePanel } from '../storage-panel/ui-storage-panel';
-import { Primary as StoragePanelPrimary } from '../storage-panel/ui-storage-panel.stories';
-import { UIHeader } from './header/ui-header';
-import { UIHeaderItem } from './header/ui-header-item';
-import { UIFrame } from './ui-frame';
 import { SortHorizontal } from 'pixelarticons/react';
 import { UIBankList } from '../bank/ui-bank-list';
 import { UIStorageClipboard } from '../storage-clipboard/ui-storage-clipboard';
+import { Primary as StorageClipboard } from '../storage-clipboard/ui-storage-clipboard.stories';
+import { UIStoragePanelWrapperDetails } from '../storage-panel/ui-storage-panel-wrapper-details';
+import { Primary as StoragePanelWrapperDetailsStory } from '../storage-panel/ui-storage-panel-wrapper-details.stories';
+import { UIHeader } from './header/ui-header';
+import { UIHeaderItem } from './header/ui-header-item';
+import { UIFrame } from './ui-frame';
 
 const meta = {
     title: 'UI/UIFrame',
@@ -55,17 +55,17 @@ export const Full: Story = {
             {WithHeader.args?.children}
 
             <Container fluid style={{ overflow: 'auto' }}>
-                <Stack gap='xs' mah='100%'>
+                <Stack mah='100%'>
                     <Grid grow display='flex' mih={0}>
                         <Grid.Col span="auto" mah='100%'>
-                            <UIStoragePanel
-                                {...StoragePanelPrimary.args}
+                            <UIStoragePanelWrapperDetails
+                                {...StoragePanelWrapperDetailsStory.args}
                             />
                         </Grid.Col>
 
                         <Grid.Col span="content" mah='100%' maw='fit-content'>
-                            <Stack gap='xs' mah='100%' w='fit-content'>
-                                <Card p='xs' style={{ flexShrink: 0 }}>
+                            <Stack mah='100%' w='fit-content'>
+                                <Card p='sm' style={{ flexShrink: 0 }}>
                                     <Button size='compact-sm'>
                                         <ThemeIcon variant='transparent' size='xs'> <SortHorizontal /></ThemeIcon>
                                     </Button>
@@ -78,8 +78,8 @@ export const Full: Story = {
                         </Grid.Col>
 
                         <Grid.Col span="auto" mah='100%'>
-                            <UIStoragePanel
-                                {...StoragePanelPrimary.args}
+                            <UIStoragePanelWrapperDetails
+                                {...StoragePanelWrapperDetailsStory.args}
                             />
                         </Grid.Col>
                     </Grid>

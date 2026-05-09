@@ -1,4 +1,4 @@
-import { Box, Card, Group, Stack, useMantineColorScheme } from '@mantine/core';
+import { Box, Card, Group, useMantineColorScheme, type CardProps } from '@mantine/core';
 import type React from 'react';
 import { SizingUtil } from '../util/sizing-util';
 
@@ -7,36 +7,32 @@ export type UIStoragePanelProps = {
     header: React.ReactNode;
     children: React.ReactNode;
     footer: React.ReactNode;
-};
+} & CardProps;
 
-export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header, children, footer }) => {
+export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header, children, footer, ...rest }) => {
     const isLight = useMantineColorScheme().colorScheme === 'light';
 
-    return <Stack gap={0} mah='100%'>
+    return <Card withBorder mah='100%' {...rest}>
+        <Card.Section mb='md'
+            bg={isLight ? 'white.6' : 'dark.7'}
+        >
+            {gameTabs}
+        </Card.Section>
 
-        <Card shadow='sm' withBorder>
+        <Box mb='md'>
+            {header}
+        </Box>
 
-            <Card.Section mb='xs'
-                bg={isLight ? 'white.6' : 'dark.7'}
-            >
-                {gameTabs}
-            </Card.Section>
+        <Card.Section inheritPadding py='md' withBorder style={{ overflow: 'auto' }}>
+            <Group gap={SizingUtil.itemsGap} wrap='wrap' miw={(SizingUtil.itemFullSize + SizingUtil.itemsGap) * 5 - SizingUtil.itemsGap}>
+                {children}
+            </Group>
+        </Card.Section>
 
-            <Box mb='xs'>
-                {header}
-            </Box>
-
-            <Card.Section inheritPadding py='xs' withBorder style={{ overflow: 'auto' }}>
-                <Group gap={SizingUtil.itemsGap} wrap='wrap' miw={(SizingUtil.itemFullSize + SizingUtil.itemsGap) * 5 - SizingUtil.itemsGap}>
-                    {children}
-                </Group>
-            </Card.Section>
-
-            <Card.Section inheritPadding
-                bg={isLight ? 'white.6' : 'dark.7'}
-            >
-                {footer}
-            </Card.Section>
-        </Card>
-    </Stack>;
+        <Card.Section inheritPadding
+            bg={isLight ? 'white.6' : 'dark.7'}
+        >
+            {footer}
+        </Card.Section>
+    </Card>;
 };

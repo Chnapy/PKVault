@@ -15,6 +15,10 @@
     --tab-border-width: 0 0 calc(var(--tabs-list-border-width) * 2) 0;
 }
 
+.button {
+    box-shadow: var(--mantine-shadow-sm);
+}
+
 [data-mantine-color-scheme='light'] .button[data-variant='white'] {
     /* stylelint-disable-next-line declaration-no-important */
     --button-hover: var(--mantine-color-gray-0) !important;
