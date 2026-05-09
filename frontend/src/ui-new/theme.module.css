@@ -3,6 +3,14 @@
     background-color: var(--mantine-color-white-4);
 }
 
+.scroller .scroller-control, .scroller .scroller-control:hover, .scroller .scroller-control .scroller-chevron {
+    color: inherit;
+}
+
+.scroller {
+    --scroller-background-color: light-dark(var(--mantine-color-white-4), var(--mantine-color-dark-6));
+}
+
 .paper.paper-border {
     border-width: calc(0.0625rem * var(--mantine-scale) * 2);
 }

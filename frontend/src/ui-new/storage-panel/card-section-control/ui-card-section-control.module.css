@@ -1,0 +1,5 @@
+
+/* stylelint-disable-next-line selector-class-pattern */
+.ui-card-section-control :global(.mantine-Scroller-root) {
+    --scroller-background-color: light-dark(var(--mantine-color-white-5), var(--mantine-color-dark-7));
+}

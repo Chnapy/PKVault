@@ -1,6 +1,6 @@
 import { Box, Button, Card, Container, Grid, Stack, ThemeIcon } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { SortHorizontal } from 'pixelarticons/react';
+import { ArrowLeftRightIcon } from 'lucide-react';
 import { UIBankList } from '../bank/ui-bank-list';
 import { UIStorageClipboard } from '../storage-clipboard/ui-storage-clipboard';
 import { Primary as StorageClipboard } from '../storage-clipboard/ui-storage-clipboard.stories';
@@ -67,7 +67,7 @@ export const Full: Story = {
                             <Stack mah='100%' w='fit-content'>
                                 <Card p='sm' style={{ flexShrink: 0 }}>
                                     <Button size='compact-sm'>
-                                        <ThemeIcon variant='transparent' size='xs'> <SortHorizontal /></ThemeIcon>
+                                        <ThemeIcon variant='transparent' size='xs'> <ArrowLeftRightIcon /></ThemeIcon>
                                     </Button>
                                 </Card>
 

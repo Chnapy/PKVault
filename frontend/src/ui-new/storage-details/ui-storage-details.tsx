@@ -1,5 +1,6 @@
-import { Card, CardSection, CloseButton, Flex, Group, type CardProps } from '@mantine/core';
+import { Card, CloseButton, Flex, Group, type CardProps } from '@mantine/core';
 import type React from 'react';
+import { UICardSectionControl } from '../storage-panel/card-section-control/ui-card-section-control';
 
 export type UIStorageDetailsProps = {
     header: React.ReactNode;
@@ -14,25 +15,25 @@ export const UIStorageDetails: React.FC<UIStorageDetailsProps> = ({
 }) => {
 
     return <Card {...rest}>
-        <CardSection p={0}>
-            <Flex>
+        <Card.Section component={UICardSectionControl} p={0}>
+            <Flex align='center'>
                 {header}
                 <CloseButton onClick={onClose} />
             </Flex>
-        </CardSection>
+        </Card.Section>
 
-        <CardSection inheritPadding py='inherit'>
+        <Card.Section inheritPadding py='inherit'>
             {main}
-        </CardSection>
+        </Card.Section>
 
-        <CardSection withBorder>
+        <Card.Section withBorder>
             {content}
-        </CardSection>
+        </Card.Section>
 
-        <CardSection inheritPadding py='inherit' withBorder>
+        <Card.Section component={UICardSectionControl} inheritPadding py='inherit' withBorder>
             <Group>
                 {actions}
             </Group>
-        </CardSection>
+        </Card.Section>
     </Card>;
 };

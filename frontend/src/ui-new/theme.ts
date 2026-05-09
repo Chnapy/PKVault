@@ -1,4 +1,4 @@
-import { Button, Card, createTheme, mergeThemeOverrides, Paper, Tabs } from '@mantine/core';
+import { Button, Card, createTheme, mergeThemeOverrides, Paper, Scroller, Tabs } from '@mantine/core';
 import { clsx } from 'clsx';
 import { baseTheme, cssVariablesResolver } from './base-theme';
 import classes from './theme.module.css';
@@ -20,6 +20,13 @@ export const theme = mergeThemeOverrides(
           shadow: 'sm',
           withBorder: true,
         },
+      }),
+      Scroller: Scroller.extend({
+        classNames: (theme, props) => ({
+          root: classes.scroller,
+          control: classes.scrollerControl,
+          chevron: classes.scrollerChevron,
+        }),
       }),
       Tabs: Tabs.extend({
         classNames: (theme, props) => ({

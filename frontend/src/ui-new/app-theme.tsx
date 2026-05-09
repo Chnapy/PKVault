@@ -4,6 +4,7 @@ import { cssVariablesResolver, theme } from './theme';
 
 import '@mantine/core/styles.css';
 import './global.css';
+import { LucideProvider } from 'lucide-react';
 
 export const AppTheme: React.FC<Omit<MantineProviderProps, 'theme' | 'cssVariablesResolver'>> = ({ children, ...props }) => <MantineProvider
   theme={theme}
@@ -12,5 +13,7 @@ export const AppTheme: React.FC<Omit<MantineProviderProps, 'theme' | 'cssVariabl
 >
   <ColorSchemeScript />
 
-  {children}
+  <LucideProvider>
+    {children}
+  </LucideProvider>
 </MantineProvider>;

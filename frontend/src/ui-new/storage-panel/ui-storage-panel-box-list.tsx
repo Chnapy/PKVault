@@ -1,5 +1,5 @@
-import { ActionIcon, Checkbox, Divider, Group, OverflowList, Space, Tabs, Text } from '@mantine/core';
-import { Box as BoxIcon, ChevronDown, MoreVertical } from 'pixelarticons/react';
+import { ActionIcon, Checkbox, Divider, Group, Scroller, Space, Tabs, Text } from '@mantine/core';
+import { ChevronDownIcon, EllipsisVerticalIcon } from 'lucide-react';
 import type React from 'react';
 import classes from './ui-storage-panel-box-list.module.css';
 
@@ -16,26 +16,22 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ da
         <Tabs
             defaultValue='1'
             variant='pills'
+            miw={0}
         >
             <Tabs.List
                 className={classes.uiStoragePanelBoxList}
             >
-                <OverflowList<Data>
-                    data={data}
-                    display={'flex'}
-                    style={{ alignItems: 'center' }}
-                    renderItem={(item) => <Tabs.Tab
+                <Scroller>
+                    {data.map(item => <Tabs.Tab
+                        key={item.label}
                         value={item.value}
                         p='sm'
                         py={0}
                         rightSection={item.selected && <Checkbox size='xs' />}
                     >
                         <Text component={item.selected ? 'b' : undefined}>{item.label}</Text>
-                    </Tabs.Tab>}
-                    renderOverflow={(items) => <ActionIcon variant='subtle' size='sm'>
-                        <ChevronDown />
-                    </ActionIcon>}
-                />
+                    </Tabs.Tab>)}
+                </Scroller>
             </Tabs.List>
         </Tabs>
 
@@ -43,14 +39,14 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ da
 
         <ActionIcon variant='subtle' size='sm'>
             {/* dropdown with all boxes */}
-            <BoxIcon />
+            <ChevronDownIcon />
         </ActionIcon>
 
         <Divider orientation="vertical" />
 
         <ActionIcon variant='subtle' size='sm'>
             {/* dropdown with advanced actions */}
-            <MoreVertical />
+            <EllipsisVerticalIcon />
         </ActionIcon>
     </Group>;
 };

@@ -1,6 +1,6 @@
-import { Button, Group, Scroller, Tabs } from '@mantine/core';
+import { Button, Flex, Group, Scroller, Tabs } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ArrowRight, ArrowRightBox, Delete, PenSquare } from 'pixelarticons/react';
+import { LinkIcon, MoveIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import { fn } from 'storybook/test';
 import gameXImg from '../../assets/game_icons/x.png';
 import { GameVersion, Gender, MarkingColorUniversal, MoveCategory } from '../../data/sdk/model';
@@ -256,23 +256,26 @@ export const Primary: Story = {
         actions: <>
             <Button
                 size='compact-sm'
-                leftSection={<ArrowRight height={16} />}
+                leftSection={<MoveIcon size={16} />}
             >Move</Button>
             <Button
                 size='compact-sm'
-                leftSection={<ArrowRightBox height={16} />}
+                leftSection={<Flex>
+                    <MoveIcon size={16} />
+                    <LinkIcon size={16} />
+                </Flex>}
             >Move attached</Button>
             <Button
                 variant='filled'
                 color='blue'
                 size='compact-sm'
-                leftSection={<PenSquare height={16} />}
+                leftSection={<PencilIcon size={16} />}
             >Edit</Button>
             <Button
                 variant='filled'
                 color='red'
                 size='compact-sm'
-                leftSection={<Delete height={16} />}
+                leftSection={<TrashIcon size={16} />}
             >Release</Button>
         </>,
         onClose: fn(),

@@ -56,7 +56,7 @@ export const UIHeader: React.FC<{
                 </div>
             </Flex>
 
-            <Stack className={classes.main} gap={0}>
+            <Stack className={classes.main} gap={0} maw='100%'>
                 <Box className={classes.firstLine}>
                     {left}
 
@@ -65,18 +65,16 @@ export const UIHeader: React.FC<{
                     </Box>
                 </Box>
 
-                <Box
+                <Flex
                     mx='md'
                     p='sm'
                     pl={30}
                     bg='primary.7'
                     c='inherit'
-                    style={{
-                        alignSelf: 'flex-start',
-                    }}
+                    miw={0}
                 >
                     {sub}
-                </Box>
+                </Flex>
             </Stack>
         </Flex>
     );
