@@ -1,5 +1,6 @@
 import { Grid } from '@mantine/core';
 import type React from 'react';
+import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 
 export type UIDetailsContentSummaryProps = {
     heldItem?: React.ReactNode;
@@ -16,9 +17,13 @@ export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = (
         <Grid.Col span={4}>
             Held item
         </Grid.Col>
-        <Grid.Col span={8}>
+        <UISpriteSizeWrapper<typeof Grid.Col>
+            itemSize='1lh'
+            component={Grid.Col}
+            span={8}
+        >
             {heldItem ?? '-'}
-        </Grid.Col>
+        </UISpriteSizeWrapper>
 
         <Grid.Col span={4}>
             Nature

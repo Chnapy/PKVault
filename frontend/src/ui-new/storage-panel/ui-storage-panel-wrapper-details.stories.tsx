@@ -1,10 +1,10 @@
+import { Box } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { UIStorageDetails } from '../storage-details/ui-storage-details';
 import { Primary as StorageDetailsStory } from '../storage-details/ui-storage-details.stories';
 import { UIStoragePanel } from './ui-storage-panel';
 import { UIStoragePanelWrapperDetails } from './ui-storage-panel-wrapper-details';
-import { Primary as StoragePanelStory } from './ui-storage-panel.stories';
-import { Box } from '@mantine/core';
+import { EmptyData as StoragePanelEmptyStory, Primary as StoragePanelStory } from './ui-storage-panel.stories';
 
 const meta = {
     title: 'UI/UIStoragePanelWrapperDetails',
@@ -29,6 +29,17 @@ export const Primary: Story = {
         />,
         children: <UIStoragePanel
             {...StoragePanelStory.args}
+        />
+    },
+};
+
+export const EmptyData: Story = {
+    args: {
+        details: <UIStorageDetails
+            {...StorageDetailsStory.args}
+        />,
+        children: <UIStoragePanel
+            {...StoragePanelEmptyStory.args}
         />
     },
 };

@@ -162,7 +162,23 @@ export const baseTheme = createTheme({
 });
 
 export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
-  variables: {},
+  variables: {
+    '--storage-item-sprite-size-sm': rem(48).toString(),
+    '--storage-item-sprite-rendering-sm': 'auto',
+    '--storage-item-sprite-size-md': rem(96).toString(),
+    '--storage-item-sprite-size-lg': rem(192).toString(),
+    
+    '--storage-item-sprite-size': 'var(--storage-item-sprite-size-md)',
+
+    '--storage-item-size': 'calc(var(--storage-item-sprite-size) + var(--storage-item-border-width) * 2)',
+    '--storage-item-border-width': '0',
+    
+    '--storage-item-item-size-1lh': '1lh',
+    '--storage-item-item-rendering-1lh': 'auto',
+    '--storage-item-item-size-md': rem(30).toString(),
+    '--storage-item-item-size-lg': rem(60).toString(),
+    
+  },
   light: {
     '--button-hover': 'var(--mantine-color-gray-0)',
     // '--mantine-color-body': '#f4f4f5',

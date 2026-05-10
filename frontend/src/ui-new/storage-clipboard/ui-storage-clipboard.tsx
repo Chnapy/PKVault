@@ -1,19 +1,28 @@
 import { Card, Stack, Text } from '@mantine/core';
 import type React from 'react';
-import { SizingUtil } from '../util/sizing-util';
+import { UISpriteSizeWrapper } from '../sprite-img/ui-sprite-size-wrapper';
 
 type UIStorageClipboardProps = {
     children: React.ReactNode;
 };
 
 export const UIStorageClipboard: React.FC<UIStorageClipboardProps> = ({ children }) => {
-    return <Card p='sm' mah='100%' style={{ overflowY: 'auto' }}>
+    return <Card
+        p='sm'
+        mah='100%'
+        style={{ flexGrow: 1, overflowY: 'auto' }}
+    >
         <Text mx='auto'>
             Clipboard
         </Text>
 
-        <Stack gap={SizingUtil.itemsGap} mx='auto'>
+        <UISpriteSizeWrapper<typeof Stack>
+            speciesSize='sm'
+            component={Stack}
+            gap='sm'
+            mx='auto'
+        >
             {children}
-        </Stack>
+        </UISpriteSizeWrapper>
     </Card>;
 };

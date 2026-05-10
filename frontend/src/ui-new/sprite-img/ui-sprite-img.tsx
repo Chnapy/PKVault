@@ -4,48 +4,34 @@ import type { SpriteInfo } from '../../data/sdk/model';
 import classes from './ui-sprite-img.module.css';
 
 export type UISpriteImgProps = {
-    spriteInfos: SpriteInfo;
     sheetUrl: string;
-    size?: number | '1lh';
+    spriteInfos: Pick<SpriteInfo, 'x' | 'y' | 'width' | 'height'>;
     sourceRealHeight?: number;
     disabled?: boolean;
+    dropShadow?: boolean;
 } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
-export const UISpriteImg: React.FC<UISpriteImgProps> = ({ spriteInfos, sheetUrl, size, sourceRealHeight = spriteInfos.height, disabled, ...imgProps }) => {
-    const sourceRealSizeRatio = sourceRealHeight / spriteInfos.height;
-
-    const sourceRealWidth = spriteInfos.width * sourceRealSizeRatio;
-
-    const heightDiff = spriteInfos.height - sourceRealHeight;
-    const widthDiff = spriteInfos.width - sourceRealWidth;
-
-    const x = spriteInfos.x + widthDiff / 2;
-    const y = spriteInfos.y + heightDiff / 2;
-
-    size = size === '1lh' ? 24 : size;
-
-    const scale = size && spriteInfos ? (size / sourceRealHeight) : 1;
-
+export const UISpriteImg: React.FC<UISpriteImgProps> = ({ sheetUrl, spriteInfos, sourceRealHeight, disabled, dropShadow, className, ...imgProps }) => {
     return <div
         {...imgProps}
         data-disabled={disabled || undefined}
-        className={clsx(classes.uiSpriteImg, imgProps.className)}
+        className={clsx(
+            classes.uiSpriteImg,
+            dropShadow && classes.dropShadow,
+            className,
+        )}
         style={{
-            height: size,
-            width: size,
-        }}
+            '--sprite-infos-x-px': spriteInfos.x + 'px',
+            '--sprite-infos-y-px': spriteInfos.y + 'px',
+            '--sprite-infos-height-px': spriteInfos.height + 'px',
+            '--sprite-infos-width-px': spriteInfos.width + 'px',
+            '--source-real-height-px': sourceRealHeight && (sourceRealHeight + 'px'),
+            // '--sprite-rendering': ,
+        } as React.CSSProperties}
     >
         <img
             src={sheetUrl}
-            alt={`${spriteInfos.sheetName}-x=${x}-y=${y}`}
-            style={{
-                objectFit: 'none',
-                objectPosition: spriteInfos && `-${x}px -${y}px`,
-                imageRendering: Number.isInteger(scale) ? "pixelated" : undefined,
-                height: sourceRealHeight,
-                width: sourceRealWidth,
-                transform: scale !== 1 ? `scale(${scale})` : undefined,
-            }}
+            alt={`sprite`}
         />
     </div>;
 };

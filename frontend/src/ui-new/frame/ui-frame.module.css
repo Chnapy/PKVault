@@ -1,23 +1,11 @@
 .ui-frame {
-    /* scrollbar depends on browser */
-    --scrollbar-width: 10px;
+    --scrollbar-width: 4px;
 
     position: relative;
     height: 100vh;
-    overflow: scroll;
-    scrollbar-color: var(--mantine-color-primary-7) var(--mantine-color-primary-6);
     border-width: var(--scrollbar-width);
     border-style: solid;
     border-color: var(--mantine-color-primary-6);
-    border-right: none;
-    border-bottom: none;
-
-}
-
-@supports  (-moz-appearance:none)  {
-    .ui-frame {
-        --scrollbar-width: 8;
-    }
 }
 
 .ui-frame::before {
@@ -31,5 +19,4 @@
 
 .ui-frame .content {
     height: 100%;
-    scrollbar-color: initial;
 }

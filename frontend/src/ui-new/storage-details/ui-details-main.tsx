@@ -4,6 +4,7 @@ import type { Gender } from '../../data/sdk/model';
 import { UIAlphaIcon } from '../icon/ui-alpha-icon';
 import { UIGender } from '../icon/ui-gender';
 import { UIShinyIcon } from '../icon/ui-shiny-icon';
+import { UISpriteSizeWrapper } from '../sprite-img/ui-sprite-size-wrapper';
 import { UIDetailsLevel } from './ui-details-level';
 
 export type UIDetailsMainProps = {
@@ -52,7 +53,11 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
             {isShiny && <UIShinyIcon size='big' />}
         </Group>
 
-        <Group grow align='stretch' gap='xs'>
+        <UISpriteSizeWrapper
+            speciesSize='lg'
+            itemSize='lg'
+            component={Group}
+            grow align='stretch' gap='xs'>
             <Stack>
                 {types}
 
@@ -63,6 +68,6 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
             <Stack>
                 {markings}
             </Stack>
-        </Group>
+        </UISpriteSizeWrapper>
     </Stack>;
 };

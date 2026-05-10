@@ -5,13 +5,46 @@
     align-items: center;
     vertical-align: text-top;
     overflow: hidden;
+
+    /*
+    Variables expected as input:
+
+    in rem:
+    --sprite-size-rem;
+
+    in px:
+    --sprite-infos-x-px; 
+    --sprite-infos-y-px; 
+    --sprite-infos-height-px; 
+    --sprite-infos-width-px; 
+    --source-real-height-px; (optional)
+
+    --sprite-rendering; (optional)
+     */
+
+    --source-real-height-px: var(--sprite-infos-height-px);
+    --source-real-size-ratio-px: calc(var(--source-real-height-px) / var(--sprite-infos-height-px));
+    --source-real-width-px: calc(var(--sprite-infos-width-px) * var(--source-real-size-ratio-px));
+    --height-diff-px: calc(var(--sprite-infos-height-px) - var(--source-real-height-px));
+    --width-diff-px: calc(var(--sprite-infos-width-px) - var(--source-real-width-px));
+    --x-px: calc(var(--sprite-infos-x-px) + var(--width-diff-px) / 2);
+    --y-px: calc(var(--sprite-infos-y-px) + var(--height-diff-px) / 2);
+    --scale: calc(var(--sprite-size-rem) / var(--source-real-height-px));
+    
+    width: var(--sprite-size-rem);
+    height: var(--sprite-size-rem);
 }
 
-.ui-sprite-img.shadow img {
-    filter: drop-shadow(#704 0 0 6px);
+.ui-sprite-img img {
+    object-fit: none;
+    object-position: calc(var(--x-px) * -1) calc(var(--y-px) * -1);
+    image-rendering: var(--sprite-rendering, pixelated);
+    height: var(--source-real-height-px);
+    width: var(--source-real-width-px);
+    transform: scale(var(--scale));
 }
 
-.ui-sprite-img.big:not(.shadow) img {
+.ui-sprite-img.drop-shadow img {
     filter: drop-shadow(4px 4px 0 #0002);
 }
 

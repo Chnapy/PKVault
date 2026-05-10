@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, Tooltip } from '@mantine/core';
+import { Box, Button, Checkbox, Tooltip, type BoxProps } from '@mantine/core';
 import type React from 'react';
 import classes from './ui-storage-item.module.css';
 
@@ -8,15 +8,16 @@ export type UIStorageItemProps = {
     onCheck?: () => void;
     icons: React.ReactNode;
     children: React.ReactNode;
-};
+} & BoxProps;
 
-export const UIStorageItem: React.FC<UIStorageItemProps> = ({ label, checked = false, onCheck, icons, children }) => {
+export const UIStorageItem: React.FC<UIStorageItemProps> = ({ label, checked = false, onCheck, icons, children, ...rest }) => {
 
-    return <Box className={classes.uiStorageItem}>
+    return <Box className={classes.uiStorageItem} {...rest}>
         <Tooltip label={label} withArrow position="bottom">
             <Button
                 variant='light'
                 className={classes.button}
+                bd='none'
             >
                 {children}
                 <Box className={classes.icons}>

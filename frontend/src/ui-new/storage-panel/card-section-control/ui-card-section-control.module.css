@@ -1,5 +1,5 @@
+.ui-card-section-control {
+    --mantine-color-body: light-dark(var(--mantine-color-white-5), var(--mantine-color-dark-7));
 
-/* stylelint-disable-next-line selector-class-pattern */
-.ui-card-section-control :global(.mantine-Scroller-root) {
-    --scroller-background-color: light-dark(var(--mantine-color-white-5), var(--mantine-color-dark-7));
+    background-color: var(--mantine-color-body);
 }

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import gameXImg from '../../assets/game_icons/x.png';
+import { UISpriteSizeWrapper } from '../sprite-img/ui-sprite-size-wrapper';
 import { UIStorageItem } from '../storage-item/ui-storage-item';
 import { UIStorageItemPlaceholder } from '../storage-item/ui-storage-item-placeholder';
 import { Primary as StorageItemPlaceholder } from '../storage-item/ui-storage-item-placeholder.stories';
@@ -53,4 +54,37 @@ export const Primary: Story = {
             pkmTotalCount={142}
         />,
     },
+};
+
+export const EmptyData: Story = {
+    args: {
+        gameTabs: <UIStoragePanelGameList
+            data={[
+                { value: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault', selected: true },
+            ]}
+        />,
+        header: <UIStoragePanelBoxList
+            data={[
+                { value: '1', label: 'Box 1', selected: true },
+            ]}
+        />,
+        children: null,
+        footer: <UIStoragePanelFooter
+            boxSize={30}
+            pkmCount={0}
+            pkmTotalCount={0}
+        />,
+    },
+};
+
+export const Small: Story = {
+    args: {
+        ...Primary.args,
+    },
+    decorators: Story => <UISpriteSizeWrapper
+        component='div'
+        speciesSize='sm'
+    >
+        <Story />
+    </UISpriteSizeWrapper>,
 };

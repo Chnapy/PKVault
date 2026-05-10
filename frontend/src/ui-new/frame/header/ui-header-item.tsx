@@ -27,6 +27,8 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
       component={Link}
       className={uiFrameBg}
       variant='filled'
+      size='compact-md'
+      h='auto'
       to={to!}
       search={(oldSearch) => {
         // remove all search params

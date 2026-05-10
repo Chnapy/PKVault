@@ -6,8 +6,8 @@ import gameXImg from '../../assets/game_icons/x.png';
 import { GameVersion, Gender, MarkingColorUniversal, MoveCategory } from '../../data/sdk/model';
 import { UIBallImg } from '../sprite-img/ui-ball-img';
 import { UIGameImg } from '../sprite-img/ui-game-img';
-import { UIItemImg } from '../sprite-img/ui-item-img';
-import { UISpeciesImg } from '../sprite-img/ui-species-img';
+import { UIItemImg } from '../sprite-img/item-img/ui-item-img';
+import { UISpeciesImg } from '../sprite-img/species-img/ui-species-img';
 import spritesheetItem0 from '../stories/assets/spritesheet_items_0.webp';
 import spritesheet0 from "../stories/assets/spritesheet_species_0.webp";
 import { UITypeItem } from '../type-item/ui-type-item';
@@ -75,16 +75,15 @@ export const Primary: Story = {
             </>}
             // teraType={}
             heldItem={<UIItemImg
-                size='big'
                 item={209}
                 sheetUrl={spritesheetItem0}
                 spriteInfos={{
                     height: 30,
                     width: 30,
-                    sheetName: 'spritesheet_items_0',
                     x: 992,
                     y: 192,
                 }}
+                dropShadow
             />}
             markings={<UIMarkingList markings={[
                 MarkingColorUniversal.Marked,
@@ -99,7 +98,6 @@ export const Primary: Story = {
                 sheetUrl={spritesheetItem0}
                 spriteInfos={{
                     height: 30,
-                    sheetName: "spritesheet_items_0.webp",
                     width: 30,
                     x: 1504,
                     y: 96
@@ -112,28 +110,25 @@ export const Primary: Story = {
             // isPokerusCured={}
             children={<UISpeciesImg
                 species={68}
-                size='big'
                 sheetUrl={spritesheet0}
                 spriteInfos={{
                     height: 96,
-                    sheetName: "spritesheet_species_0.webp",
                     width: 96,
                     x: 1536,
                     y: 1408,
                 }}
+                dropShadow
             />}
         />,
         content: <UIDetailsContent
             summary={<UIDetailsContentSummary
                 heldItem={<Group gap={4}>
                     <UIItemImg
-                        size='1lh'
                         item={209}
                         sheetUrl={spritesheetItem0}
                         spriteInfos={{
                             height: 30,
                             width: 30,
-                            sheetName: 'spritesheet_items_0',
                             x: 992,
                             y: 192,
                         }}

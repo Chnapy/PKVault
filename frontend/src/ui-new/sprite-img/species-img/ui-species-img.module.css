@@ -1,0 +1,8 @@
+.ui-species-img {
+    --sprite-size-rem: var(--storage-item-sprite-size);
+    --sprite-rendering: var(--storage-item-sprite-rendering);
+}
+
+.ui-species-img.shadow img {
+    filter: drop-shadow(#704 0 0 6px);
+}

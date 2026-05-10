@@ -24,3 +24,9 @@ export const Primary: Story = {
                 : <UIStorageItem key={i} {...StorageItemSmall.args} />),
     },
 };
+
+export const EmptyData: Story = {
+    args: {
+        children: null,
+    },
+};

@@ -1,14 +1,13 @@
 
-[data-mantine-color-scheme='light'] .paper {
-    background-color: var(--mantine-color-white-4);
+.paper {
+    --mantine-color-white: var(--mantine-color-white-4);
+    --mantine-color-body: light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
+
+    background-color: var(--mantine-color-body);
 }
 
 .scroller .scroller-control, .scroller .scroller-control:hover, .scroller .scroller-control .scroller-chevron {
     color: inherit;
-}
-
-.scroller {
-    --scroller-background-color: light-dark(var(--mantine-color-white-4), var(--mantine-color-dark-6));
 }
 
 .paper.paper-border {
