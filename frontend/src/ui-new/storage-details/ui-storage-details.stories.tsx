@@ -1,13 +1,13 @@
-import { Button, Flex, Group, Scroller, Tabs } from '@mantine/core';
+import { Button, Group } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { LinkIcon, MoveIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import { fn } from 'storybook/test';
 import gameXImg from '../../assets/game_icons/x.png';
 import { GameVersion, Gender, MarkingColorUniversal, MoveCategory } from '../../data/sdk/model';
-import { UIBallImg } from '../sprite-img/ui-ball-img';
-import { UIGameImg } from '../sprite-img/ui-game-img';
 import { UIItemImg } from '../sprite-img/item-img/ui-item-img';
 import { UISpeciesImg } from '../sprite-img/species-img/ui-species-img';
+import { UIBallImg } from '../sprite-img/ui-ball-img';
+import { UIGameImg } from '../sprite-img/ui-game-img';
 import spritesheetItem0 from '../stories/assets/spritesheet_items_0.webp';
 import spritesheet0 from "../stories/assets/spritesheet_species_0.webp";
 import { UITypeItem } from '../type-item/ui-type-item';
@@ -24,7 +24,7 @@ import { UIDetailsContent } from './content/ui-details-content';
 import { UIDetailsContentSummary } from './content/ui-details-content-summary';
 import { UIMarkingList } from './marking/ui-marking-list';
 import { UIDetailsMain } from './ui-details-main';
-import { UISaveTab } from './ui-save-tab';
+import { UIDetailsSaves } from './ui-details-saves';
 import { UIStorageDetails } from './ui-storage-details';
 
 const meta = {
@@ -42,27 +42,19 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
     args: {
-        header: <Tabs defaultValue='5' miw={0}>
-            <Tabs.List>
-                <Scroller>
-                    {[
-                        // { value: 1, imgSrc: '/logo.svg', label: 'PKVault', selected: true },
-                        { value: 5, imgSrc: gameXImg, label: 'G1', selected: true },
-                        { value: 6, imgSrc: gameXImg, label: 'G5' },
-                        { value: 2, imgSrc: gameXImg, label: 'G6' },
-                        { value: 3, imgSrc: gameXImg, label: 'G7' },
-                        { value: 7, imgSrc: gameXImg, label: 'G7b' },
-                        { value: 4, imgSrc: gameXImg, label: 'G9a' },
-                    ].map(item => <UISaveTab
-                        key={item.value}
-                        saveId={item.value}
-                        imgSrc={item.imgSrc}
-                        label={item.label}
-                        selected={item.selected}
-                    />)}
-                </Scroller>
-            </Tabs.List>
-        </Tabs>,
+        header: closeBtn => <UIDetailsSaves
+            value='5'
+            data={[
+                // { id: '1', imgSrc: '/logo.svg', label: 'PKVault' },
+                { id: '5', imgSrc: gameXImg, label: 'G1' },
+                { id: '6', imgSrc: gameXImg, label: 'G5' },
+                { id: '2', imgSrc: gameXImg, label: 'G6' },
+                { id: '3', imgSrc: gameXImg, label: 'G7' },
+                { id: '7', imgSrc: gameXImg, label: 'G7b' },
+                { id: '4', imgSrc: gameXImg, label: 'G9a' },
+            ]}
+            actions={closeBtn}
+        />,
         main: <UIDetailsMain
             species={68}
             speciesName={'Machamp'}
@@ -250,26 +242,26 @@ export const Primary: Story = {
         />,
         actions: <>
             <Button
-                size='compact-sm'
+                size='compact-md'
                 leftSection={<MoveIcon size={16} />}
             >Move</Button>
             <Button
-                size='compact-sm'
-                leftSection={<Flex>
+                size='compact-md'
+                leftSection={<Group gap='sm'>
                     <MoveIcon size={16} />
                     <LinkIcon size={16} />
-                </Flex>}
+                </Group>}
             >Move attached</Button>
             <Button
                 variant='filled'
                 color='blue'
-                size='compact-sm'
+                size='compact-md'
                 leftSection={<PencilIcon size={16} />}
             >Edit</Button>
             <Button
                 variant='filled'
                 color='red'
-                size='compact-sm'
+                size='compact-md'
                 leftSection={<TrashIcon size={16} />}
             >Release</Button>
         </>,

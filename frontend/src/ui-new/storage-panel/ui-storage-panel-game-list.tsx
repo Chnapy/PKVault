@@ -1,21 +1,20 @@
-import { Scroller, Tabs, Text } from '@mantine/core';
+import { Tabs, Text } from '@mantine/core';
 import type React from 'react';
+import { UIExpandableTabs } from '../expandable-tabs/ui-expandable-tabs';
 
 export type UIStoragePanelGameListProps = {
-    data: { imgSrc: string; value: string; label: string; selected?: boolean }[];
+    value: string;
+    data: { id: string; label: string; imgSrc: string }[];
 };
 
-export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ data }) => {
+export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data }) => {
 
-    return <Tabs defaultValue='pkvault'>
-        <Tabs.List>
-            <Scroller>
-                {data.map((item, i) => (
-                    <Tabs.Tab key={i} value={item.value} leftSection={<img src={item.imgSrc} height={16} />} py={4}>
-                        <Text component={item.selected ? 'b' : undefined}>{item.label}</Text>
-                    </Tabs.Tab>
-                ))}
-            </Scroller>
-        </Tabs.List>
-    </Tabs>;
+    return <UIExpandableTabs
+        value={value}
+        data={data}
+        renderTab={({ item, selected }) => <Tabs.Tab key={item.id} value={item.id} leftSection={<img src={item.imgSrc} height={16} />} py={4}>
+            <Text component={selected ? 'b' : undefined}>{item.label}</Text>
+        </Tabs.Tab>}
+        renderExpandedTab={() => null}
+    />;
 };

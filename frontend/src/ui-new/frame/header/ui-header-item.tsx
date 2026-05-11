@@ -3,7 +3,6 @@ import { Link } from '@tanstack/react-router';
 import type React from "react";
 import { HistoryContext } from '../../../context/history-context';
 import { type FileRouteTypes } from "../../../routeTree.gen";
-import { uiFrameBg } from '../ui-frame-bg.module.css';
 
 export type UIHeaderItemProps = {
   selected?: boolean;
@@ -25,7 +24,7 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
   return (
     <Button
       component={Link}
-      className={uiFrameBg}
+      color='primary.7'
       variant='filled'
       size='compact-md'
       h='auto'

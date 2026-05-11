@@ -6,12 +6,12 @@ import { UIFrame } from '../ui-frame';
 type UIAppLayoutProps = {
     header: React.ReactNode;
     left: React.ReactNode;
-    middle: React.ReactNode;
     right: React.ReactNode;
+    // middle: React.ReactNode;
     bottom: React.ReactNode;
 };
 
-export const UIAppLayout: React.FC<UIAppLayoutProps> = ({ header, left, middle, right, bottom }) => {
+export const UIAppLayout: React.FC<UIAppLayoutProps> = ({ header, left, right, bottom }) => {
     return <UIFrame>
         {header}
 
@@ -20,9 +20,9 @@ export const UIAppLayout: React.FC<UIAppLayoutProps> = ({ header, left, middle, 
             speciesSize='md'
             fluid style={{ overflow: 'auto', flexGrow: 1 }} w='100%' p='md'>
             <Stack h='100%'>
-                <Group grow preventGrowOverflow={false} wrap='nowrap' align='stretch' mih={0} style={{ flexGrow: 1 }}>
+                <Group grow wrap='nowrap' align='stretch' mih={0} style={{ flexGrow: 1 }}>
                     {left}
-                    {middle}
+                    {/* {middle} */}
                     {right}
                 </Group>
 

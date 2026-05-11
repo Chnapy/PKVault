@@ -1,13 +1,9 @@
-import { Button, Card, Stack, ThemeIcon } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ArrowLeftRightIcon } from 'lucide-react';
 import { DataActionType } from '../../data/sdk/model';
 import { UIActionsPanel } from '../actions-panel/ui-actions-panel';
 import { UIAppLayout } from '../frame/app-layout/ui-app-layout';
 import { UIHeader } from '../frame/header/ui-header';
 import { WithBanks as UIHeaderBanksStory, WithSingleBank as UIHeaderSingleBankStory } from '../frame/header/ui-header.stories';
-import { UIStorageClipboard } from '../storage-clipboard/ui-storage-clipboard';
-import { EmptyData as StorageClipboardEmptyStory, Primary as StorageClipboardStory } from '../storage-clipboard/ui-storage-clipboard.stories';
 import { UIStoragePanelWrapperDetails } from '../storage-panel/ui-storage-panel-wrapper-details';
 import { EmptyData as StoragePanelWrapperEmptyStory, Primary as StoragePanelWrapperStory } from '../storage-panel/ui-storage-panel-wrapper-details.stories';
 
@@ -27,17 +23,17 @@ export const StoragePage: Story = {
         right={<UIStoragePanelWrapperDetails
             {...StoragePanelWrapperStory.args}
         />}
-        middle={<Stack mah='100%' w='fit-content' style={{ flexGrow: 0 }}>
-            <Card p='sm' style={{ flexShrink: 0 }}>
-                <Button size='compact-sm'>
-                    <ThemeIcon variant='transparent' size='xs'> <ArrowLeftRightIcon /></ThemeIcon>
-                </Button>
-            </Card>
+        // middle={<Stack mah='100%' w='fit-content' style={{ flexGrow: 0 }}>
+        //     <Card p='sm' style={{ flexShrink: 0 }}>
+        //         <Button size='compact-sm'>
+        //             <ThemeIcon variant='transparent' size='xs'> <ArrowLeftRightIcon /></ThemeIcon>
+        //         </Button>
+        //     </Card>
 
-            <UIStorageClipboard
-                {...StorageClipboardStory.args}
-            />
-        </Stack>}
+        //     <UIStorageClipboard
+        //         {...StorageClipboardStory.args}
+        //     />
+        // </Stack>}
         bottom={<UIActionsPanel
             data={[
                 {
@@ -69,17 +65,17 @@ export const StoragePageEmpty: Story = {
         right={<UIStoragePanelWrapperDetails
             {...StoragePanelWrapperEmptyStory.args}
         />}
-        middle={<Stack mah='100%' w='fit-content' style={{ flexGrow: 0 }}>
-            <Card p='sm' style={{ flexShrink: 0 }}>
-                <Button size='compact-sm'>
-                    <ThemeIcon variant='transparent' size='xs'> <ArrowLeftRightIcon /></ThemeIcon>
-                </Button>
-            </Card>
+        // middle={<Stack mah='100%' w='fit-content' style={{ flexGrow: 0 }}>
+        //     <Card p='sm' style={{ flexShrink: 0 }}>
+        //         <Button size='compact-sm'>
+        //             <ThemeIcon variant='transparent' size='xs'> <ArrowLeftRightIcon /></ThemeIcon>
+        //         </Button>
+        //     </Card>
 
-            <UIStorageClipboard
-                {...StorageClipboardEmptyStory.args}
-            />
-        </Stack>}
+        //     <UIStorageClipboard
+        //         {...StorageClipboardEmptyStory.args}
+        //     />
+        // </Stack>}
         bottom={<UIActionsPanel
             data={[]}
         />}

@@ -36,7 +36,7 @@ export const WithSingleBank: Story = {
         ...Primary.args,
         sub: <UIBankList
             data={[
-                { value: '1', label: 'Bank 1', selected: true },
+                { id: '1', label: 'Bank 1' },
             ]}
         />,
     },
@@ -47,15 +47,15 @@ export const WithBanks: Story = {
         ...Primary.args,
         sub: <UIBankList
             data={[
-                { value: '1', label: 'Bank 1', selected: true },
-                { value: '2', label: 'Bank 2' },
-                { value: '3', label: 'Bank 3' },
-                { value: '4', label: 'Bank 4' },
-                { value: '5', label: 'Bank 5' },
-                { value: '6', label: 'Bank 6' },
-                { value: '7', label: 'Bank 7' },
-                { value: '8', label: 'Bank 8' },
-                { value: '9', label: 'Bank 9' },
+                { id: '1', label: 'Bank 1' },
+                { id: '2', label: 'Bank 2' },
+                { id: '3', label: 'Bank 3' },
+                { id: '4', label: 'Bank 4' },
+                { id: '5', label: 'Bank 5' },
+                { id: '6', label: 'Bank 6' },
+                { id: '7', label: 'Bank 7' },
+                { id: '8', label: 'Bank 8' },
+                { id: '9', label: 'Bank 9' },
             ]}
         />,
     },

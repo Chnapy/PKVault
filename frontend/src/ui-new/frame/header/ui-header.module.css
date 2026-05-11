@@ -55,12 +55,9 @@
 
 .ui-header .first-line {
     flex-grow: 1;
-    display: flex;
     padding-left: 60px;
     padding-top: 2px;
     padding-right: 2px;
-    align-items: center;
-    gap: 16px;
     box-shadow: 0 2px 0 rgb(0 0 0 / 20%);
     overflow-x: auto;
     white-space: nowrap;

@@ -33,7 +33,7 @@ export const UIAction: React.FC<UIActionProps> = ({ type }) => {
         }
     };
 
-    return <Badge variant='dot' color={getColor(type)}>{getTypeStr()}</Badge>;
+    return <Badge variant='dot' color={getColor(type)} size='lg' fz='md' fw='normal' tt='initial'>{getTypeStr()}</Badge>;
 };
 
 const getColor = (type: DataActionType): NonNullable<BadgeProps[ 'color' ]> => {
@@ -64,5 +64,3 @@ const getColor = (type: DataActionType): NonNullable<BadgeProps[ 'color' ]> => {
             return 'red';
     }
 };
-
-

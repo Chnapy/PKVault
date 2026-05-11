@@ -1,4 +1,5 @@
 import { Button, Card, Divider, Group, OverflowList, Title } from '@mantine/core';
+import { SaveIcon } from 'lucide-react';
 import type React from 'react';
 import { UIAction, type UIActionProps } from './ui-action';
 
@@ -14,7 +15,7 @@ export const UIActionsPanel: React.FC<UIActionsPanelProps> = ({ data }) => {
         pl='md'
     >
         <Group wrap='nowrap' style={{ flexGrow: 1 }}>
-            <Title order={6} lh={1}>Actions<br />to save</Title>
+            <Title order={5} lh={1}>Actions<br />to save</Title>
 
             <Divider orientation='vertical' mr='auto' />
 
@@ -37,8 +38,10 @@ export const UIActionsPanel: React.FC<UIActionsPanelProps> = ({ data }) => {
                 variant='filled'
                 color='primary'
                 size='compact-md'
-                px='xl'
+                pl='md'
+                pr='lg'
                 disabled={data.length === 0}
+                leftSection={<SaveIcon height={16} />}
             >
                 Save
             </Button>

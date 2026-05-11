@@ -46,7 +46,7 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
 
         <Group>
             <Text component='b' size='lg'>#{species}</Text>
-            <Text size='xl' tt='uppercase'>{speciesName}</Text>
+            <Text size='lg' tt='uppercase'>{speciesName}</Text>
 
             <Space ml='auto' />
             {isAlpha && <UIAlphaIcon size='big' />}

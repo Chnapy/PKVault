@@ -140,10 +140,17 @@ export const baseTheme = createTheme({
       '#cd9688',
       '#B6634E',
       '#934E3D',
-      '#4b271e',
+      '#814435',
       '#150905'
     ],
   },
+	fontSizes: {
+		xs: rem(12),
+		sm: rem(14),
+		md: rem(16),
+		lg: rem(20),
+		xl: rem(24),
+	},
   shadows: {
     xs: `0 ${rem(1)} 0 rgba(0, 0, 0, 0.05)`,
     sm: `0 ${rem(2)} 0 rgba(0, 0, 0, 0.05)`,
@@ -158,36 +165,35 @@ export const baseTheme = createTheme({
 		lg: rem(16),
 		xl: rem(32)
   },
+  radius: {
+		xs: rem(2),
+		sm: rem(4),
+		md: rem(6),
+		lg: rem(10),
+		xl: rem(20),
+  },
   other: customTheme,
 });
 
 export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
   variables: {
-    '--storage-item-sprite-size-sm': rem(48).toString(),
+    '--storage-item-sprite-size-sm': rem(48),
     '--storage-item-sprite-rendering-sm': 'auto',
-    '--storage-item-sprite-size-md': rem(96).toString(),
-    '--storage-item-sprite-size-lg': rem(192).toString(),
+    '--storage-item-sprite-size-md': rem(96),
+    '--storage-item-sprite-size-lg': rem(192),
     
     '--storage-item-sprite-size': 'var(--storage-item-sprite-size-md)',
 
-    '--storage-item-size': 'calc(var(--storage-item-sprite-size) + var(--storage-item-border-width) * 2)',
-    '--storage-item-border-width': '0',
-    
     '--storage-item-item-size-1lh': '1lh',
     '--storage-item-item-rendering-1lh': 'auto',
-    '--storage-item-item-size-md': rem(30).toString(),
-    '--storage-item-item-size-lg': rem(60).toString(),
+    '--storage-item-item-size-md': rem(30),
+    '--storage-item-item-size-lg': rem(60),
     
+    '--storage-item-item-size': 'var(--storage-item-item-size-md)'
   },
   light: {
     '--button-hover': 'var(--mantine-color-gray-0)',
-    // '--mantine-color-body': '#f4f4f5',
-    // '--mantine-color-default': '#ffffff',
-    // '--mantine-color-default-border': '#d4d4d8',
   },
   dark: {
-    // '--mantine-color-body': '#111113',
-    // '--mantine-color-default': '#1c1c1f',
-    // '--mantine-color-default-border': '#3f3f46',
   },
 });

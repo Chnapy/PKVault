@@ -14,7 +14,7 @@
 }
 
 .ui-marking.not-marked {
-    background-color: var(--mantine-color-gray-2);
+    background-color: light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-3));
 }
 
 .ui-marking.circle {

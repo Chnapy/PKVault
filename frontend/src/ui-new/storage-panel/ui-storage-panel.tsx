@@ -1,6 +1,7 @@
 import { Box, Card, Group, type CardProps } from '@mantine/core';
 import React from 'react';
 import { UICardSectionControl } from './card-section-control/ui-card-section-control';
+import { getBoxColumns } from './get-box-columns';
 
 export type UIStoragePanelProps = {
     gameTabs: React.ReactNode;
@@ -12,18 +13,7 @@ export type UIStoragePanelProps = {
 export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header, children, footer, ...rest }) => {
     const childrenCount = React.Children.count(children);
 
-    const getCols = () => {
-        switch (childrenCount) {
-            case 30:
-                return 6;
-            case 25:
-                return 5;
-            case 20:
-                return 4;
-        }
-    };
-
-    const cols = getCols();
+    const cols = getBoxColumns(childrenCount);
 
     return <Card
         withBorder
@@ -31,18 +21,18 @@ export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header
         style={{ flexGrow: 1 }}
         {...rest}
     >
-        <Card.Section component={UICardSectionControl} mb='md'>
+        <Card.Section component={UICardSectionControl}>
             {gameTabs}
         </Card.Section>
 
-        <Box mb='md'>
+        <Box my='sm'>
             {header}
         </Box>
 
         <Card.Section inheritPadding py='md' withBorder style={{ flexGrow: 1, overflow: 'auto' }}>
             <Group
                 maw={cols
-                    ? `calc(${cols} * (var(--storage-item-size) + var(--group-gap)) - var(--group-gap))`
+                    ? `calc(${cols} * (var(--storage-item-sprite-size) + var(--group-gap)) - var(--group-gap))`
                     : undefined}
                 gap='sm'
                 wrap='wrap'

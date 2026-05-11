@@ -6,7 +6,7 @@ import { UIStorageItemPlaceholder } from '../storage-item/ui-storage-item-placeh
 import { Primary as StorageItemPlaceholder } from '../storage-item/ui-storage-item-placeholder.stories';
 import { Primary as StorageItemPrimary } from '../storage-item/ui-storage-item.stories';
 import { UIStoragePanel } from './ui-storage-panel';
-import { UIStoragePanelBoxList } from './ui-storage-panel-box-list';
+import { UIStoragePanelBoxList } from './box-list/ui-storage-panel-box-list';
 import { UIStoragePanelFooter } from './ui-storage-panel-footer';
 import { UIStoragePanelGameList } from './ui-storage-panel-game-list';
 
@@ -24,24 +24,25 @@ type Story = StoryObj<typeof meta>;
 export const Primary: Story = {
     args: {
         gameTabs: <UIStoragePanelGameList
+            value='pkvault'
             data={[
-                { value: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault', selected: true },
-                { value: 'x', imgSrc: gameXImg, label: 'Pokemon X' },
-                { value: 'x', imgSrc: gameXImg, label: 'Pokemon X' },
-                { value: 'x', imgSrc: gameXImg, label: 'Pokemon X' },
+                { id: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault' },
+                { id: 'x1', imgSrc: gameXImg, label: 'Pokemon X' },
+                { id: 'x2', imgSrc: gameXImg, label: 'Pokemon X' },
+                { id: 'x3', imgSrc: gameXImg, label: 'Pokemon X' },
             ]}
         />,
         header: <UIStoragePanelBoxList
             data={[
-                { value: '1', label: 'Box 1', selected: true },
-                { value: '2', label: 'Box 2' },
-                { value: '3', label: 'Box 3' },
-                { value: '4', label: 'Box 4' },
-                { value: '5', label: 'Box 5' },
-                { value: '6', label: 'Box 6' },
-                { value: '7', label: 'Box 7' },
-                { value: '8', label: 'Box 8' },
-                { value: '9', label: 'Box 9' },
+                { id: '1', label: 'Party', slotsStates: new Array(6).fill(0).map((_, i) => !(i % 2)) },
+                { id: '2', label: 'Box 2', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 2)) },
+                { id: '3', label: 'Box 3', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 3)) },
+                { id: '4', label: 'Box 4', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 4)) },
+                { id: '5', label: 'Box 5', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 5)) },
+                { id: '6', label: 'Box 6', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 6)) },
+                { id: '7', label: 'Box 7', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 7)) },
+                { id: '8', label: 'Box 8', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 8)) },
+                { id: '9', label: 'Box 9', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 9)) },
             ]}
         />,
         children: new Array(30).fill(0).map((_, i) =>
@@ -59,13 +60,14 @@ export const Primary: Story = {
 export const EmptyData: Story = {
     args: {
         gameTabs: <UIStoragePanelGameList
+            value='pkvault'
             data={[
-                { value: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault', selected: true },
+                { id: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault' },
             ]}
         />,
         header: <UIStoragePanelBoxList
             data={[
-                { value: '1', label: 'Box 1', selected: true },
+                { id: '1', label: 'Box 1', slotsStates: [] },
             ]}
         />,
         children: null,
