@@ -1,8 +1,8 @@
 import { ActionIcon, Checkbox, Divider, Group, Tabs, Text } from '@mantine/core';
-import { EllipsisVerticalIcon } from 'lucide-react';
+import { BoxIcon, CirclePlusIcon, EllipsisVerticalIcon } from 'lucide-react';
 import React from 'react';
 import { UIExpandableTabs } from '../../expandable-tabs/ui-expandable-tabs';
-import { UIStorageBoxDetailsTab } from './ui-storage-box-details-tab';
+import { UIBoxExpanded } from './ui-box-expanded';
 import classes from './ui-storage-panel-box-list.module.css';
 
 // TODO
@@ -13,16 +13,21 @@ type Data = {
 };
 
 export type UIStoragePanelBoxListProps = {
+    value: string;
     data: Data[];
+    onSelect: (id: string) => void;
+    onDelete: (id: string) => void;
 };
 
-export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ data }) => {
+export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ value, data, onSelect, onDelete }) => {
 
     return <Group align='flex-start' wrap='nowrap'>
         <UIExpandableTabs
             variant='pills'
-            value='1'
+            value={value}
             data={data}
+            onChange={onSelect}
+            left={<BoxIcon />}
             renderTab={({ item, selected }) => <Tabs.Tab
                 key={item.id}
                 value={item.id}
@@ -33,15 +38,28 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ da
             >
                 <Text component={selected ? 'b' : undefined}>{item.label}</Text>
             </Tabs.Tab>}
-            renderExpandedTab={({ item, selected }, reduce) => <UIStorageBoxDetailsTab
-                key={item.id}
-                id={item.id}
-                label={item.label}
-                selected={selected}
-                onClick={reduce}
-                slotsStates={item.slotsStates}
-            />}
-            actions={<>
+            renderExpanded={(data, { reduce }) => <Group>
+                {data.map(({ item, selected }) => <UIBoxExpanded
+                    key={item.id}
+                    id={item.id}
+                    label={item.label}
+                    slotsStates={item.slotsStates}
+                    selected={selected}
+                    onSelect={() => {
+                        onSelect(item.id);
+                        reduce();
+                    }}
+                    onDelete={() => onDelete(item.id)}
+                />)}
+
+                <ActionIcon
+                    variant='default'
+                    size='xl'
+                >
+                    <CirclePlusIcon />
+                </ActionIcon>
+            </Group>}
+            right={<>
                 <Divider orientation="vertical" h='1lh' />
 
                 <ActionIcon variant='subtle' size='sm' p='xs' color='currentcolor'>

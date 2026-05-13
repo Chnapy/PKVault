@@ -11,7 +11,7 @@ export type UISpriteImgProps = {
     dropShadow?: boolean;
 } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
-export const UISpriteImg: React.FC<UISpriteImgProps> = ({ sheetUrl, spriteInfos, sourceRealHeight, disabled, dropShadow, className, ...imgProps }) => {
+export const UISpriteImg: React.FC<UISpriteImgProps> = ({ sheetUrl, spriteInfos, sourceRealHeight, disabled, dropShadow, className, style, ...imgProps }) => {
     return <div
         {...imgProps}
         data-disabled={disabled || undefined}
@@ -26,12 +26,12 @@ export const UISpriteImg: React.FC<UISpriteImgProps> = ({ sheetUrl, spriteInfos,
             '--sprite-infos-height-px': spriteInfos.height + 'px',
             '--sprite-infos-width-px': spriteInfos.width + 'px',
             '--source-real-height-px': sourceRealHeight && (sourceRealHeight + 'px'),
-            // '--sprite-rendering': ,
+            ...style,
         } as React.CSSProperties}
     >
-        <img
+        {sheetUrl && <img
             src={sheetUrl}
             alt={`sprite`}
-        />
+        />}
     </div>;
 };

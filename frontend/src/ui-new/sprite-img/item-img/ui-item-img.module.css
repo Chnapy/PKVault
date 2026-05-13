@@ -1,4 +1,4 @@
 .ui-item-img {
-    --sprite-size-rem: var(--storage-item-item-size);
-    --sprite-rendering: var(--storage-item-item-rendering);
+    --sprite-size-multiplier: var(--sprite-item-size-multiplier);
+    --sprite-rendering: var(--sprite-item-rendering);
 }

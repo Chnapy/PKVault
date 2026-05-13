@@ -1,23 +1,36 @@
-import { ActionIcon, Tabs, Text } from '@mantine/core';
-import { CirclePlusIcon } from 'lucide-react';
+import { ActionIcon, Group, Tabs, Text } from '@mantine/core';
+import { CirclePlusIcon, LandmarkIcon } from 'lucide-react';
 import type React from 'react';
 import { UIExpandableTabs } from '../expandable-tabs/ui-expandable-tabs';
+import { UIBankExpanded } from './ui-bank-expanded';
 import classes from './ui-bank-list.module.css';
 
-// TODO
-type Data = { id: string; label: string };
-
-export type UIBankListProps = {
-    data: Data[];
+type Data = {
+    id: string;
+    label: string;
+    boxCount: number;
+    pkmCount: number;
 };
 
-export const UIBankList: React.FC<UIBankListProps> = ({ data }) => {
+export type UIBankListProps = {
+    value: string;
+    data: Data[];
+    onSelect: (id: string) => void;
+    onDelete: (id: string) => void;
+};
+
+export const UIBankList: React.FC<UIBankListProps> = ({ value, data, onSelect, onDelete }) => {
 
     return <UIExpandableTabs
         variant="pills"
-        value='1'
+        value={value}
         data={data}
+        onChange={onSelect}
         grow={false}
+        __vars={{
+            '--mantine-color-body': 'var(--mantine-color-primary-7)',
+        }}
+        left={<LandmarkIcon />}
         renderTab={({ item }) => <Tabs.Tab
             key={item.id}
             className={classes.uiBankItem}
@@ -25,22 +38,26 @@ export const UIBankList: React.FC<UIBankListProps> = ({ data }) => {
             value={item.id}
             py={0}
         >
-            <Text
-                display='flex' style={{ alignItems: 'center' }}>
+            <Text display='flex' style={{ alignItems: 'center' }}>
                 {item.label}
-                {/* | 5 <UIAlphaIcon /><Space w='4px' />5 <UIShinyIcon /> */}
             </Text>
         </Tabs.Tab>}
-        renderExpandedTab={() => null}
-        actions={
+        renderExpanded={(data, { reduce }) => <Group>
+            {data.map(({ item, selected }) => <UIBankExpanded
+                key={item.id}
+                {...item}
+                selected={selected}
+                onSelect={reduce}
+                onDelete={() => onDelete(item.id)}
+            />)}
+
             <ActionIcon
                 variant='subtle'
-                size='sm'
-                p='xs'
+                size='xl'
                 color='currentcolor'
             >
                 <CirclePlusIcon />
             </ActionIcon>
-        }
+        </Group>}
     />;
 };

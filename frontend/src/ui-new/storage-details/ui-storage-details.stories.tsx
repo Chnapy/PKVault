@@ -6,7 +6,7 @@ import gameXImg from '../../assets/game_icons/x.png';
 import { GameVersion, Gender, MarkingColorUniversal, MoveCategory } from '../../data/sdk/model';
 import { UIItemImg } from '../sprite-img/item-img/ui-item-img';
 import { UISpeciesImg } from '../sprite-img/species-img/ui-species-img';
-import { UIBallImg } from '../sprite-img/ui-ball-img';
+import { UIBallImg } from '../sprite-img/item-img/ui-ball-img';
 import { UIGameImg } from '../sprite-img/ui-game-img';
 import spritesheetItem0 from '../stories/assets/spritesheet_items_0.webp';
 import spritesheet0 from "../stories/assets/spritesheet_species_0.webp";
@@ -24,7 +24,7 @@ import { UIDetailsContent } from './content/ui-details-content';
 import { UIDetailsContentSummary } from './content/ui-details-content-summary';
 import { UIMarkingList } from './marking/ui-marking-list';
 import { UIDetailsMain } from './ui-details-main';
-import { UIDetailsSaves } from './ui-details-saves';
+import { UIDetailsSaves } from './saves/ui-details-saves';
 import { UIStorageDetails } from './ui-storage-details';
 
 const meta = {
@@ -53,6 +53,7 @@ export const Primary: Story = {
                 { id: '7', imgSrc: gameXImg, label: 'G7b' },
                 { id: '4', imgSrc: gameXImg, label: 'G9a' },
             ]}
+            onSelect={fn()}
             actions={closeBtn}
         />,
         main: <UIDetailsMain
@@ -243,26 +244,26 @@ export const Primary: Story = {
         actions: <>
             <Button
                 size='compact-md'
-                leftSection={<MoveIcon size={16} />}
+                leftSection={<MoveIcon />}
             >Move</Button>
             <Button
                 size='compact-md'
                 leftSection={<Group gap='sm'>
-                    <MoveIcon size={16} />
-                    <LinkIcon size={16} />
+                    <MoveIcon />
+                    <LinkIcon />
                 </Group>}
             >Move attached</Button>
             <Button
                 variant='filled'
                 color='blue'
                 size='compact-md'
-                leftSection={<PencilIcon size={16} />}
+                leftSection={<PencilIcon />}
             >Edit</Button>
             <Button
                 variant='filled'
                 color='red'
                 size='compact-md'
-                leftSection={<TrashIcon size={16} />}
+                leftSection={<TrashIcon />}
             >Release</Button>
         </>,
         onClose: fn(),

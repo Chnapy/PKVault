@@ -1,4 +1,5 @@
 import type React from 'react';
+import { switchUtil } from '../../util/switch-util';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReactTag = keyof React.JSX.IntrinsicElements | React.JSXElementConstructor<{ style: any }>;
@@ -14,11 +15,27 @@ export function UISpriteSizeWrapper<T extends ReactTag>({ component: Component, 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         {...rest as any}
         style={{
-            '--storage-item-sprite-size': speciesSize && `var(--storage-item-sprite-size-${speciesSize})`,
-            '--storage-item-sprite-rendering': speciesSize && `var(--storage-item-sprite-rendering-${speciesSize})`,
+            '--sprite-species-size-multiplier': speciesSize && switchUtil(speciesSize, {
+                sm: 0.5,
+                md: 1,
+                lg: 2,
+            }),
+            '--sprite-species-rendering': speciesSize && switchUtil(speciesSize, {
+                sm: 'auto',
+                md: undefined,
+                lg: undefined,
+            }),
 
-            '--storage-item-item-size': itemSize && `var(--storage-item-item-size-${itemSize})`,
-            '--storage-item-item-rendering': itemSize && `var(--storage-item-item-rendering-${itemSize})`,
+            '--sprite-item-size-multiplier': itemSize && switchUtil(itemSize, {
+                '1lh': 0.827,
+                md: 1,
+                lg: 2,
+            }),
+            '--sprite-item-rendering': itemSize && switchUtil(itemSize, {
+                '1lh': 'auto',
+                md: undefined,
+                lg: undefined,
+            }),
 
             ...style,
         } as React.CSSProperties}

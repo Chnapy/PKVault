@@ -1,28 +1,34 @@
+/*
+Variables expected as input:
+
+in rem:
+--sprite-size-rem;
+
+in px:
+--sprite-infos-x-px; 
+--sprite-infos-y-px; 
+--sprite-infos-height-px; 
+--sprite-infos-width-px; 
+--source-real-height-px; (optional)
+
+--sprite-rendering; (optional)
+*/
+
 .ui-sprite-img {
+    --source-real-height-px: var(--sprite-infos-height-px);
+    --sprite-size-rem: calc(var(--sprite-size-multiplier, 1) * var(--source-real-height-px));
+
     flex-shrink: 0;
     display: inline-flex;
     justify-content: center;
     align-items: center;
     vertical-align: text-top;
     overflow: hidden;
+    width: var(--sprite-size-rem);
+    height: var(--sprite-size-rem);
+}
 
-    /*
-    Variables expected as input:
-
-    in rem:
-    --sprite-size-rem;
-
-    in px:
-    --sprite-infos-x-px; 
-    --sprite-infos-y-px; 
-    --sprite-infos-height-px; 
-    --sprite-infos-width-px; 
-    --source-real-height-px; (optional)
-
-    --sprite-rendering; (optional)
-     */
-
-    --source-real-height-px: var(--sprite-infos-height-px);
+.ui-sprite-img img {
     --source-real-size-ratio-px: calc(var(--source-real-height-px) / var(--sprite-infos-height-px));
     --source-real-width-px: calc(var(--sprite-infos-width-px) * var(--source-real-size-ratio-px));
     --height-diff-px: calc(var(--sprite-infos-height-px) - var(--source-real-height-px));
@@ -30,12 +36,7 @@
     --x-px: calc(var(--sprite-infos-x-px) + var(--width-diff-px) / 2);
     --y-px: calc(var(--sprite-infos-y-px) + var(--height-diff-px) / 2);
     --scale: calc(var(--sprite-size-rem) / var(--source-real-height-px));
-    
-    width: var(--sprite-size-rem);
-    height: var(--sprite-size-rem);
-}
 
-.ui-sprite-img img {
     object-fit: none;
     object-position: calc(var(--x-px) * -1) calc(var(--y-px) * -1);
     image-rendering: var(--sprite-rendering, pixelated);

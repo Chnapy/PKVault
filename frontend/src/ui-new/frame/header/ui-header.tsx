@@ -1,4 +1,4 @@
-import { Flex, Group, Paper, Stack, Title } from '@mantine/core';
+import { Box, Flex, Group, Paper, Stack, Title } from '@mantine/core';
 import React from 'react';
 import { theme } from '../../../ui/theme';
 import classes from './ui-header.module.css';
@@ -57,10 +57,10 @@ export const UIHeader: React.FC<{
             </Flex>
 
             <Stack className={classes.main} gap={0} maw='100%'>
-                <Group className={classes.firstLine}>
+                <Group className={classes.firstLine} wrap='nowrap'>
                     {left}
 
-                    <Group ml='auto'>
+                    <Group ml='auto' wrap='nowrap'>
                         {right}
                     </Group>
                 </Group>
@@ -73,6 +73,8 @@ export const UIHeader: React.FC<{
                     c='inherit'
                     miw={0}
                 >
+                    <Box component='span' h='1lh' />
+
                     {sub}
                 </Flex>
             </Stack>

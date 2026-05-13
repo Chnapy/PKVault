@@ -1,14 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import gameXImg from '../../assets/game_icons/x.png';
+import { Gender } from '../../data/sdk/model';
 import { UISpriteSizeWrapper } from '../sprite-img/ui-sprite-size-wrapper';
 import { UIStorageItem } from '../storage-item/ui-storage-item';
 import { UIStorageItemPlaceholder } from '../storage-item/ui-storage-item-placeholder';
 import { Primary as StorageItemPlaceholder } from '../storage-item/ui-storage-item-placeholder.stories';
 import { Primary as StorageItemPrimary } from '../storage-item/ui-storage-item.stories';
-import { UIStoragePanel } from './ui-storage-panel';
 import { UIStoragePanelBoxList } from './box-list/ui-storage-panel-box-list';
+import { UIStoragePanelGameList } from './game-list/ui-storage-panel-game-list';
+import { UIStoragePanel } from './ui-storage-panel';
 import { UIStoragePanelFooter } from './ui-storage-panel-footer';
-import { UIStoragePanelGameList } from './ui-storage-panel-game-list';
 
 const meta = {
     title: 'UI/UIStoragePanel',
@@ -26,13 +28,15 @@ export const Primary: Story = {
         gameTabs: <UIStoragePanelGameList
             value='pkvault'
             data={[
-                { id: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault' },
-                { id: 'x1', imgSrc: gameXImg, label: 'Pokemon X' },
-                { id: 'x2', imgSrc: gameXImg, label: 'Pokemon X' },
-                { id: 'x3', imgSrc: gameXImg, label: 'Pokemon X' },
+                { id: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault', ot: 'Chnapy', otGender: Gender.Male, tid: 54123, lastSync: '2026-04-28', path: 'C:/foo/bar/save.bin' },
+                { id: 'x1', imgSrc: gameXImg, label: 'Pokemon X', ot: 'Chnapy', otGender: Gender.Male, tid: 54123, lastSync: '2026-04-28', path: 'C:/foo/bar/save.bin' },
+                { id: 'x2', imgSrc: gameXImg, label: 'Pokemon X', ot: 'Chnapy', otGender: Gender.Male, tid: 54123, lastSync: '2026-04-28', path: 'C:/foo/bar/save.bin' },
+                { id: 'x3', imgSrc: gameXImg, label: 'Pokemon X', ot: 'Chnapy', otGender: Gender.Male, tid: 54123, lastSync: '2026-04-28', path: 'C:/foo/bar/save.bin' },
             ]}
+            onChange={fn()}
         />,
         header: <UIStoragePanelBoxList
+            value='1'
             data={[
                 { id: '1', label: 'Party', slotsStates: new Array(6).fill(0).map((_, i) => !(i % 2)) },
                 { id: '2', label: 'Box 2', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 2)) },
@@ -44,6 +48,8 @@ export const Primary: Story = {
                 { id: '8', label: 'Box 8', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 8)) },
                 { id: '9', label: 'Box 9', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 9)) },
             ]}
+            onSelect={fn()}
+            onDelete={fn()}
         />,
         children: new Array(30).fill(0).map((_, i) =>
             i % 7 === 0
@@ -62,13 +68,17 @@ export const EmptyData: Story = {
         gameTabs: <UIStoragePanelGameList
             value='pkvault'
             data={[
-                { id: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault' },
+                { id: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault', ot: 'Chnapy', otGender: Gender.Male, tid: 54123, lastSync: '2026-04-28', path: 'C:/foo/bar/save.bin' },
             ]}
+            onChange={fn()}
         />,
         header: <UIStoragePanelBoxList
+            value='1'
             data={[
                 { id: '1', label: 'Box 1', slotsStates: [] },
             ]}
+            onSelect={fn()}
+            onDelete={fn()}
         />,
         children: null,
         footer: <UIStoragePanelFooter

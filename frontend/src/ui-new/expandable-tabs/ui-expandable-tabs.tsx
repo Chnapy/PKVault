@@ -1,4 +1,4 @@
-import { ActionIcon, Group, Scroller, Stack, Tabs, type TabsProps } from '@mantine/core';
+import { ActionIcon, Scroller, Stack, Tabs, type TabsProps } from '@mantine/core';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import React from 'react';
 
@@ -11,26 +11,39 @@ type Params<D extends Data> = {
     item: D;
     i: number;
     selected: boolean;
+    select: () => void;
 };
 
-type UIExpandableTabsProps<D extends Data> = {
+type Options = {
+    expand: () => void;
+    reduce: () => void;
+};
+
+type UIExpandableTabsOwnProps<D extends Data> = {
     value: D[ 'id' ];
     data: D[];
-    renderTab: (params: Params<D>, expand: () => void) => React.ReactNode;
-    renderExpandedTab: (params: Params<D>, reduce: () => void) => React.ReactNode;
-    actions?: React.ReactNode;
+    onChange: (id: D[ 'id' ]) => void;
+    renderTab: (params: Params<D>, opt: Options) => React.ReactNode;
+    renderExpanded: (params: Params<D>[], opt: Options) => React.ReactNode;
+    left?: React.ReactNode;
+    right?: React.ReactNode;
     grow?: boolean;
-} & TabsProps;
+}
+
+type UIExpandableTabsProps<D extends Data> =
+    UIExpandableTabsOwnProps<D>
+    & Omit<TabsProps, keyof UIExpandableTabsOwnProps<D>>;
 
 export function UIExpandableTabs<D extends Data = Data>({
-    value, data, renderTab, renderExpandedTab,
-    actions, grow = true,
+    value, data, onChange, renderTab, renderExpanded,
+    left, right, grow = true,
     ...tabsProps
 }: UIExpandableTabsProps<D>) {
     const [ expanded, setExpanded ] = React.useState(false);
 
     return <Tabs
         value={value.toString()}
+        onChange={id => id && onChange(id)}
         miw={0}
         {...tabsProps}
         style={{
@@ -39,15 +52,30 @@ export function UIExpandableTabs<D extends Data = Data>({
         }}
     >
         <Stack>
-            <Tabs.List style={{ flexGrow: 1, alignItems: 'center', flexWrap: 'nowrap' }}>
-                <Scroller>
+            <Tabs.List
+                style={{
+                    flexGrow: 1,
+                    alignItems: 'center',
+                    flexWrap: 'nowrap',
+                    gap: 'var(--mantine-spacing-md)',
+                }}
+            >
+                {left}
+
+                <Scroller
+                    opacity={expanded ? 0.5 : undefined}
+                >
                     {data.map((item, i) => renderTab(
                         {
                             item,
                             i,
                             selected: item.id === value,
+                            select: () => onChange(item.id),
                         },
-                        () => setExpanded(true),
+                        {
+                            expand: () => setExpanded(true),
+                            reduce: () => setExpanded(false),
+                        },
                     ))}
                 </Scroller>
 
@@ -56,7 +84,7 @@ export function UIExpandableTabs<D extends Data = Data>({
                     size='sm'
                     p='xs'
                     mih='1lh'
-                    ml='auto'
+                    ml={grow ? 'auto' : undefined}
                     onClick={() => setExpanded(value => !value)}
                     color='currentcolor'
                 >
@@ -65,19 +93,21 @@ export function UIExpandableTabs<D extends Data = Data>({
                         : <ChevronDownIcon />}
                 </ActionIcon>
 
-                {actions}
+                {right}
             </Tabs.List>
 
-            {expanded && <Group>
-                {data.map((item, i) => renderExpandedTab(
-                    {
-                        item,
-                        i,
-                        selected: item.id === value,
-                    },
-                    () => setExpanded(false),
-                ))}
-            </Group>}
+            {expanded && renderExpanded(
+                data.map((item, i) => ({
+                    item,
+                    i,
+                    selected: item.id === value,
+                    select: () => onChange(item.id),
+                })),
+                {
+                    expand: () => setExpanded(true),
+                    reduce: () => setExpanded(false),
+                },
+            )}
         </Stack>
     </Tabs>;
 };

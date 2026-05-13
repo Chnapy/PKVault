@@ -1,4 +1,4 @@
-import { Box, Group, Text } from '@mantine/core';
+import { Box, Group, NumberFormatter, Text } from '@mantine/core';
 import type React from 'react';
 
 export type UIStoragePanelFooterProps = {
@@ -11,14 +11,11 @@ export const UIStoragePanelFooter: React.FC<UIStoragePanelFooterProps> = ({ boxS
     return <Text component="div" size='sm'>
         <Group justify='space-between'>
             <div />
-            {/* <Button variant='default'>
-                        Foobar
-                    </Button> */}
             <Box>
-                {pkmCount}/{boxSize}
+                <NumberFormatter value={pkmCount} />/<NumberFormatter value={boxSize} />
             </Box>
             <Box>
-                total {pkmTotalCount}
+                total <NumberFormatter value={pkmTotalCount} />
             </Box>
         </Group>
     </Text>;

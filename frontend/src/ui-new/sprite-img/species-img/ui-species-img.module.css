@@ -1,6 +1,6 @@
 .ui-species-img {
-    --sprite-size-rem: var(--storage-item-sprite-size);
-    --sprite-rendering: var(--storage-item-sprite-rendering);
+    --sprite-size-multiplier: var(--sprite-species-size-multiplier);
+    --sprite-rendering: var(--sprite-species-rendering);
 }
 
 .ui-species-img.shadow img {

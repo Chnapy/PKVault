@@ -143,6 +143,30 @@ export const baseTheme = createTheme({
       '#814435',
       '#150905'
     ],
+    red: [
+      "#ffeeea",
+      "#f9ddd9",
+      "#e9bab3",
+      "#da958a",
+      "#cd7668",
+      "#c96b5c",
+      "#c35746",
+      "#ac4737",
+      "#9a3e2f",
+      "#883226"
+    ],
+    blue: [
+      "#eaf5ff",
+      "#dae7f6",
+      "#b8cbe3",
+      "#92aed1",
+      "#7395c2",
+      "#5c84b8",
+      "#527eb6",
+      "#426ca1",
+      "#376091",
+      "#275382"
+    ],
   },
 	fontSizes: {
 		xs: rem(12),
@@ -177,19 +201,6 @@ export const baseTheme = createTheme({
 
 export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
   variables: {
-    '--storage-item-sprite-size-sm': rem(48),
-    '--storage-item-sprite-rendering-sm': 'auto',
-    '--storage-item-sprite-size-md': rem(96),
-    '--storage-item-sprite-size-lg': rem(192),
-    
-    '--storage-item-sprite-size': 'var(--storage-item-sprite-size-md)',
-
-    '--storage-item-item-size-1lh': '1lh',
-    '--storage-item-item-rendering-1lh': 'auto',
-    '--storage-item-item-size-md': rem(30),
-    '--storage-item-item-size-lg': rem(60),
-    
-    '--storage-item-item-size': 'var(--storage-item-item-size-md)'
   },
   light: {
     '--button-hover': 'var(--mantine-color-gray-0)',

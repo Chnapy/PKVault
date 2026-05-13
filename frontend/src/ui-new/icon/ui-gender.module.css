@@ -1,4 +1,6 @@
 .ui-gender {
+    display: inline-flex;
+    vertical-align: middle;
     font-family: var(--mantine-font-family-monospace);
 }
 

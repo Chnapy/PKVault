@@ -41,7 +41,7 @@ export const UIActionsPanel: React.FC<UIActionsPanelProps> = ({ data }) => {
                 pl='md'
                 pr='lg'
                 disabled={data.length === 0}
-                leftSection={<SaveIcon height={16} />}
+                leftSection={<SaveIcon />}
             >
                 Save
             </Button>

@@ -25,3 +25,8 @@
 :root strong, :root b {
     font-weight: bold;
 }
+
+svg.lucide {
+    width: 1em;
+    height: 1em;
+}

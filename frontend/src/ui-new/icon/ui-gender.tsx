@@ -15,7 +15,7 @@ export const UIGender: React.FC<UIGenderProps> = ({ gender, size = 'medium' }) =
     }
 
     return <Text
-
+        span
         className={clsx(
             classes.uiGender,
             gender === Gender.Male && classes.male,

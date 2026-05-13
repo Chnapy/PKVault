@@ -21,22 +21,26 @@ export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header
         style={{ flexGrow: 1 }}
         {...rest}
     >
-        <Card.Section component={UICardSectionControl}>
+        <Card.Section component={UICardSectionControl} mah='100%' style={{ overflowY: 'auto' }}>
             {gameTabs}
         </Card.Section>
 
-        <Box my='sm'>
+        <Box my='sm' mah='100%' style={{ overflowY: 'auto' }}>
             {header}
         </Box>
 
-        <Card.Section inheritPadding py='md' withBorder style={{ flexGrow: 1, overflow: 'auto' }}>
+        <Card.Section inheritPadding py='md' withBorder style={{ flexGrow: 1, flexShrink: 999, overflow: 'auto' }}>
             <Group
-                maw={cols
-                    ? `calc(${cols} * (var(--storage-item-sprite-size) + var(--group-gap)) - var(--group-gap))`
-                    : undefined}
                 gap='sm'
                 wrap='wrap'
                 mx='auto'
+                style={cols
+                    ? {
+                        display: 'grid',
+                        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+                        width: 'fit-content',
+                    }
+                    : undefined}
             >
                 {children}
             </Group>

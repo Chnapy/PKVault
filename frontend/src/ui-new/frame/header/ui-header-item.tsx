@@ -28,6 +28,7 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
       variant='filled'
       size='compact-md'
       h='auto'
+      style={{ flexShrink: 0 }}
       to={to!}
       search={(oldSearch) => {
         // remove all search params
