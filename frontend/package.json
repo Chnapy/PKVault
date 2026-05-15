@@ -26,6 +26,8 @@
     "@headlessui/react": "^2.2.4",
     "@mantine/core": "^9.1.1",
     "@mantine/hooks": "^9.1.1",
+    "@noriginmedia/norigin-spatial-navigation-core": "^3.1.0",
+    "@noriginmedia/norigin-spatial-navigation-react": "^3.1.0",
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-router": "^1.127.1",
     "@tanstack/react-router-devtools": "^1.127.1",

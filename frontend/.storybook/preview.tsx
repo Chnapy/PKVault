@@ -1,6 +1,9 @@
 import type { Preview, StoryContext } from '@storybook/react-vite';
 import { createMemoryHistory, createRootRoute, createRoute, createRouter, RouterProvider } from '@tanstack/react-router';
 import { AppTheme } from '../src/ui-new/app-theme';
+import { initFocus } from '../src/ui-new/focus/init-focus';
+
+initFocus();
 
 function withRouter(Story: any, { parameters }: StoryContext) {
   const { initialEntries = [ '/' ], initialIndex, routes = [ '/' ] } = parameters?.router || {};
