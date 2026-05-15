@@ -16,13 +16,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const FakePanel: React.FC<{ id: string; autoFocus?: boolean; children: React.ReactNode }> = ({ id, autoFocus, children }) => {
+    // console.log('render panel', id);
     const scopeId = 'storage-grid-' + id;
 
     const { enterScope, exitScope } = useFocusScope(scopeId, {
         autoFocus,
     });
 
-    const { ref, focused } = useFocusNode<HTMLDivElement>({
+    const { ref, focused, active } = useFocusNode<HTMLDivElement>({
         scopeNodeId: id,
         autoFocus,
     });
@@ -50,6 +51,7 @@ const FakePanel: React.FC<{ id: string; autoFocus?: boolean; children: React.Rea
 
     return <Card
         ref={ref}
+        title={`panel id=${id} scopeId=${scopeId} active=${active} autoFocus=${autoFocus}`}
         style={{
             outline: focused ? '2px solid red' : undefined,
         }}
@@ -67,6 +69,7 @@ const FakeItem: React.FC<{
     onClick?: () => void;
     children?: React.ReactNode;
 }> = ({ id, autoFocus, target, onClick, children }) => {
+    // console.log('render item', id);
     const scopeId = useFocusScopeContext();
 
     const { exitScope } = useFocusScope(scopeId, {
@@ -78,7 +81,7 @@ const FakeItem: React.FC<{
         onClick = () => pushScope(target);
     }
 
-    const { ref, focused } = useFocusNode<HTMLButtonElement>({
+    const { ref, active, focused } = useFocusNode<HTMLButtonElement>({
         scopeNodeId: id,
         autoFocus,
     });
@@ -106,7 +109,10 @@ const FakeItem: React.FC<{
 
     return <Button
         ref={ref}
+        title={`item id=${id} scopeId=${scopeId} active=${active} autoFocus=${autoFocus}`}
+        // disabled={!active}
         style={{
+            color: focused ? undefined : '#FFFA',
             outline: focused ? '2px solid red' : undefined,
         }}
         onClick={onClick}

@@ -6,7 +6,6 @@ export const useFocusScope = (scopeId: string, options?: {
 }) => {
   const { autoFocus } = options ?? {};
 
-  const isScopeActive = Focus.useIsScopeActive();
   const { pushScope, popScope } = Focus.usePushPopScope();
 
   React.useEffect(() => {
@@ -16,7 +15,6 @@ export const useFocusScope = (scopeId: string, options?: {
   }, [autoFocus, pushScope, scopeId]);
 
   return {
-    active: isScopeActive(scopeId),
     enterScope: () => {
       pushScope(scopeId);
     },

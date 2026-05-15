@@ -13,17 +13,17 @@ export type FocusNodeData = {
 
 export type FocusScopeData = {
   id: FocusScopeId;
-  parentScopeId?: FocusScopeId;
   restoreMode: RestoreMode;
   lastFocusedNodeId?: FocusNodeId;
 };
 
-// scope stack, like a list of layers
-export const focusScopeStackContext = React.createContext<FocusScopeId[] | null>(null);
+export type FocusDataContext = {
+    scopes: Map<FocusScopeId, FocusScopeData>;
+    nodes: Map<FocusNodeId, FocusNodeData>;
+    scopeStackRef: React.RefObject<FocusScopeId[]>;
+    setScopeStack: React.Dispatch<React.SetStateAction<FocusScopeId[]>>;
+    scopeListeners: Map<FocusScopeId, Set<() => void>>;
+};
 
 // static functions, doesn't change over time
-export const focusRefsContext = React.createContext<{
-    scopesRef: React.RefObject<Map<string, FocusScopeData>>;
-    nodesRef: React.RefObject<Map<string, FocusNodeData>>;
-    setScopeStack: React.Dispatch<React.SetStateAction<string[]>>;
-} | null>(null);
+export const focusRefsContext = React.createContext<FocusDataContext | null>(null);

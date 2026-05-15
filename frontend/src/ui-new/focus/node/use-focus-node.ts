@@ -8,15 +8,13 @@ export const useFocusNode = <E extends HTMLElement>({ scopeNodeId, autoFocus, ..
   scopeNodeId: FocusNodeId;
   autoFocus?: boolean;
 } & UseFocusableConfig<unknown>) => {
-  const isScopeActive = Focus.useIsScopeActive();
-  const { registerNode, unregisterNode, setLastFocusedNode } = Focus.useRegister();
-
   const scopeId = useFocusScopeContext();
+
+  const active = Focus.useIsScopeActive(scopeId);
+  const { registerNode, unregisterNode, setLastFocusedNode } = Focus.useRegister();
 
   // nodeId prefixed by scopeId to avoid conflicts
   const nodeId = `${scopeId}_${scopeNodeId}`;
-
-  const active = isScopeActive(scopeId);
 
   const { ref, focused, focusSelf } = useFocusable<unknown, E>({
     focusKey: nodeId,
