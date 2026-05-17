@@ -1,14 +1,17 @@
-import { useFocusable, type UseFocusableConfig } from '@noriginmedia/norigin-spatial-navigation-react';
+import { useFocusable } from '@noriginmedia/norigin-spatial-navigation-react';
 import React from 'react';
 import type { FocusNodeId } from '../provider/focus-context';
 import { Focus } from '../provider/use-focus-context';
-import { useFocusScopeContext } from '../scope/focus-scope-context';
+import { useFocusScopeContext, useFocusScopeSelect } from '../scope/use-focus-scope-context';
 
-export const useFocusNode = <E extends HTMLElement>({ scopeNodeId, autoFocus, ...rest }: {
+export type UseFocusNodeParams = {
   scopeNodeId: FocusNodeId;
-  autoFocus?: boolean;
-} & UseFocusableConfig<unknown>) => {
-  const scopeId = useFocusScopeContext();
+  focusOnMount?: boolean;
+};
+
+export const useFocusNode = <E extends HTMLElement>({ scopeNodeId, focusOnMount }: UseFocusNodeParams) => {
+  const { scopeId } = useFocusScopeContext();
+  const selectScope = useFocusScopeSelect();
 
   const active = Focus.useIsScopeActive(scopeId);
   const { registerNode, unregisterNode, setLastFocusedNode } = Focus.useRegister();
@@ -23,7 +26,7 @@ export const useFocusNode = <E extends HTMLElement>({ scopeNodeId, autoFocus, ..
     trackChildren: false,
     isFocusBoundary: false,
     preferredChildFocusKey: undefined,
-    ...rest,
+    // onFocus: () => console.log('focused', nodeId),
   });
 
   React.useEffect(() => {
@@ -41,20 +44,29 @@ export const useFocusNode = <E extends HTMLElement>({ scopeNodeId, autoFocus, ..
   React.useEffect(() => {
     if (focused) {
       setLastFocusedNode(scopeId, nodeId);
+
+      selectScope();
     }
-  }, [ focused, scopeId, nodeId, setLastFocusedNode ]);
-  
+  }, [focused, nodeId, scopeId, selectScope, setLastFocusedNode]);
+
   React.useEffect(() => {
-      if (autoFocus) {
-          focusSelf();
-      }
-  }, [ autoFocus, focusSelf ]);
+    if (focusOnMount) {
+      focusSelf();
+    }
+  }, [ focusOnMount, focusSelf ]);
+
+  const focusProps = {
+    'data-focus-key': nodeId,
+    'data-focus-active': active || undefined,
+  };
 
   return {
     ref,
     nodeId,
+    scopeId,
     focused,
     active,
     focusSelf,
+    focusProps,
   };
 };

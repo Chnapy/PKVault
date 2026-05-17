@@ -1,14 +1,16 @@
 import React from 'react';
-import type { RestoreMode } from '../provider/focus-context';
+import type { FocusNodeId, RestoreMode } from '../provider/focus-context';
 import { Focus } from '../provider/use-focus-context';
-import { FocusScopeProvider } from './focus-scope-context';
+import { FocusScopeProvider } from './focus-scope-provider';
 
 export const FocusScope: React.FC<{
     id: string;
+    parentNodeId?: FocusNodeId;
     restoreMode?: RestoreMode;
     children: React.ReactNode;
 }> = ({
     id,
+    parentNodeId,
     restoreMode = 'last-focused',
     children,
 }) => {
@@ -17,15 +19,16 @@ export const FocusScope: React.FC<{
         React.useEffect(() => {
             registerScope({
                 id,
+                parentNodeId,
                 restoreMode,
             });
 
             return () => {
                 unregisterScope(id);
             };
-        }, [ id, restoreMode, registerScope, unregisterScope ]);
+        }, [ id, restoreMode, registerScope, unregisterScope, parentNodeId ]);
 
-        return <FocusScopeProvider value={id}>
+        return <FocusScopeProvider scopeId={id}>
             {children}
         </FocusScopeProvider>;
     };

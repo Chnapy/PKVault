@@ -1,12 +1,16 @@
-import { Button, Card, Group, Popover, Stack } from '@mantine/core';
+import { Badge, Button, Card, Group, Popover, Stack } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import React from 'react';
+import { getBackControl } from '../controls/common-controls/back-controls';
+import { getMoveControl } from '../controls/common-controls/move-controls';
+import { getSelectControl } from '../controls/common-controls/select-controls';
+import { ControlsProvider } from '../controls/provider/controls-provider';
+import { useAllCurrentControls } from '../controls/use-all-current-controls';
+import { useControls } from '../controls/use-controls';
 import { useFocusNode } from './node/use-focus-node';
 import { FocusProvider } from './provider/focus-provider';
 import { Focus } from './provider/use-focus-context';
 import { FocusScope } from './scope/focus-scope';
-import { useFocusScopeContext } from './scope/focus-scope-context';
-import { useFocusScope } from './scope/use-focus-scope';
 
 const meta = {
     title: 'UX/Focus',
@@ -15,48 +19,45 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const FakePanel: React.FC<{ id: string; autoFocus?: boolean; children: React.ReactNode }> = ({ id, autoFocus, children }) => {
+const FakePanel: React.FC<{ id: string; focusOnMount?: boolean; children: React.ReactNode }> = ({ id, focusOnMount, children }) => {
     // console.log('render panel', id);
     const scopeId = 'storage-grid-' + id;
 
-    const { enterScope, exitScope } = useFocusScope(scopeId, {
-        autoFocus,
-    });
+    const { pushScope, popScope } = Focus.usePushPopScope();
 
-    const { ref, focused, active } = useFocusNode<HTMLDivElement>({
+    const { ref, nodeId, focused, active } = useFocusNode<HTMLDivElement>({
         scopeNodeId: id,
-        autoFocus,
+        focusOnMount,
     });
 
-    React.useEffect(() => {
-        const listener = (e: KeyboardEvent) => {
-            switch (e.key) {
-                case 'a':
-                    enterScope();
-                    break;
-                case 'q':
-                    exitScope();
-                    break;
-            }
-        };
-
-        if (focused) {
-            window.addEventListener('keydown', listener);
+    const controlProps = useControls(nodeId,
+        [
+            getMoveControl({
+                label: 'Move',
+            }),
+            getSelectControl({
+                label: 'Select',
+                action: () => pushScope(scopeId),
+            }),
+            getBackControl({
+                label: 'Back',
+                action: () => popScope(),
+            }),
+        ],
+        {
+            enabled: focused,
         }
-
-        return () => {
-            window.removeEventListener('keydown', listener);
-        };
-    }, [ enterScope, exitScope, focused ]);
+    );
 
     return <Card
         ref={ref}
-        title={`panel id=${id} scopeId=${scopeId} active=${active} autoFocus=${autoFocus}`}
+        title={`panel id=${id} scopeId=${scopeId} active=${active} focusOnMount=${focusOnMount}`}
         style={{
             outline: focused ? '2px solid red' : undefined,
         }}
+        {...controlProps}
     >
-        <FocusScope id={scopeId}>
+        <FocusScope id={scopeId} parentNodeId={nodeId}>
             {children}
         </FocusScope>
     </Card>;
@@ -64,172 +65,199 @@ const FakePanel: React.FC<{ id: string; autoFocus?: boolean; children: React.Rea
 
 const FakeItem: React.FC<{
     id: string;
-    autoFocus?: boolean;
     target?: string;
     onClick?: () => void;
+    openModal?: boolean;
+    focusOnMount?: boolean;
     children?: React.ReactNode;
-}> = ({ id, autoFocus, target, onClick, children }) => {
+}> = ({ id, target, onClick, openModal, focusOnMount, children }) => {
     // console.log('render item', id);
-    const scopeId = useFocusScopeContext();
 
-    const { exitScope } = useFocusScope(scopeId, {
-        autoFocus,
-    });
-    const { pushScope } = Focus.usePushPopScope();
+    const { pushScope, popScope } = Focus.usePushPopScope();
 
-    if (target) {
-        onClick = () => pushScope(target);
-    }
-
-    const { ref, active, focused } = useFocusNode<HTMLButtonElement>({
+    const { ref, nodeId, active, focused, focusProps } = useFocusNode<HTMLButtonElement>({
         scopeNodeId: id,
-        autoFocus,
+        focusOnMount,
     });
 
-    React.useEffect(() => {
-        const listener = (e: KeyboardEvent) => {
-            switch (e.key) {
-                case 'a':
-                    ref.current?.click();
-                    break;
-                case 'q':
-                    exitScope();
-                    break;
-            }
-        };
-
-        if (focused) {
-            window.addEventListener('keydown', listener);
+    const controlProps = useControls(nodeId,
+        [
+            getMoveControl({
+                label: 'Move',
+            }),
+            onClick && getSelectControl({
+                label: 'Select',
+                action: onClick,
+            }),
+            // eslint-disable-next-line react-hooks/refs
+            openModal && getSelectControl({
+                label: 'Open modal',
+                action: () => ref.current?.click(),
+            }),
+            getBackControl({
+                label: 'Back',
+                action: () => popScope(),
+            }),
+            target && {
+                label: 'Target ' + target,
+                triggers: {
+                    keyboard: {
+                        type: 'keyboard',
+                        icon: 'E',
+                        values: [ 'e' ],
+                    },
+                    gamepad: {
+                        type: 'gamepad',
+                        icon: 'X',
+                        values: [ 'X' ],
+                    },
+                },
+                action: () => pushScope(target),
+            },
+        ],
+        {
+            enabled: focused,
         }
-
-        return () => {
-            window.removeEventListener('keydown', listener);
-        };
-    }, [ exitScope, focused, ref ]);
+    );
 
     return <Button
         ref={ref}
-        title={`item id=${id} scopeId=${scopeId} active=${active} autoFocus=${autoFocus}`}
-        // disabled={!active}
+        title={`item id=${id} active=${active}`}
         style={{
             color: focused ? undefined : '#FFFA',
             outline: focused ? '2px solid red' : undefined,
         }}
-        onClick={onClick}
+        {...focusProps}
+        {...controlProps}
     >
         {children ?? id}{target && ` -> ${target}`}
     </Button>;
 };
 
+const FakeFooter: React.FC = () => {
+    const getControls = useAllCurrentControls();
+
+    return <Card>
+        <Group>
+            {getControls().map(c => <Badge key={c.label} leftSection={c.trigger.icon} size='xl'>
+                {c.label}
+            </Badge>)}
+        </Group>
+    </Card>;
+};
+
 export const Primary: Story = {
     render: () => {
-
         const [ renderRightPart, setRenderRightPart ] = React.useState(true);
         const [ renderAllItems, setRenderAllItems ] = React.useState(true);
         const [ renderFooter, setRenderFooter ] = React.useState(true);
 
-        return <FocusProvider initialScope='panels'>
-            <FocusScope id="panels">
-                <Stack align='center' p='xl'>
+        return <ControlsProvider>
+            <FocusProvider>
+                <FocusScope id="panels">
+                    <Stack align='center' p='xl'>
 
-                    <FakePanel id='header'>
-                        <Group>
-                            <FakeItem id='1' />
-                            <FakeItem id='2' />
-                            <FakeItem id='3' />
-                        </Group>
-                    </FakePanel>
+                        <FakePanel id='header'>
+                            <Group>
+                                <FakeItem id='1' />
+                                <FakeItem id='2' />
+                                <FakeItem id='3' />
+                            </Group>
+                        </FakePanel>
 
-                    <FakePanel id='1' autoFocus>
-                        <Group>
-                            {/* test when focused item unmount */}
-                            {renderRightPart && <Card>
-                                <FakeItem id='7' />
-                                <FakeItem id='8' onClick={() => setRenderRightPart(false)} />
-                                <FakeItem id='9' />
-                            </Card>}
+                        <FakePanel id='1'>
+                            <Group>
+                                {/* test when focused item unmount */}
+                                {renderRightPart && <Card>
+                                    <FakeItem id='7' />
+                                    <FakeItem id='8' onClick={() => setRenderRightPart(false)} />
+                                    <FakeItem id='9' />
+                                </Card>}
 
-                            <Card>
-                                <FakeItem id='4' />
-                                <FakeItem id='5' />
-                                <FakeItem id='6' />
-                            </Card>
-                        </Group>
-                    </FakePanel>
+                                <Card>
+                                    <FakeItem id='4' />
+                                    <FakeItem id='5' />
+                                    <FakeItem id='6' />
+                                </Card>
+                            </Group>
+                        </FakePanel>
 
-                    <FakePanel id='2'>
-                        <Group>
-                            <Card>
-                                <FakeItem id='4a' />
-                                <FakeItem id='5a' />
-                                <FakeItem id='6a' />
+                        <FakePanel id='2'>
+                            <Group>
+                                <Card>
+                                    <FakeItem id='4a' />
+                                    <FakeItem id='5a' />
+                                    <FakeItem id='6a' />
 
-                                <FakePanel id='2b'>
-                                    <FakeItem id='5b' />
-                                    <FakeItem id='6b' />
-                                </FakePanel>
+                                    <FakePanel id='2b'>
+                                        <FakeItem id='5b' />
+                                        <FakeItem id='6b' />
+                                    </FakePanel>
 
-                                {/* test programmatic focus on click */}
-                                <FakeItem id='t1' target='storage-grid-2b' />
-                            </Card>
+                                    {/* test programmatic focus on click */}
+                                    <FakeItem id='t1' target='storage-grid-2b' />
+                                </Card>
 
-                            <Card>
-                                <FakeItem id='7a' />
-                                <FakeItem id='8a' />
-                                <Popover>
-                                    <Popover.Target>
-                                        <div>
-                                            <FakeItem id='9a' />
-                                        </div>
-                                    </Popover.Target>
+                                <Card>
+                                    <FakeItem id='7a' />
+                                    <FakeItem id='8a' />
+                                    <Popover>
+                                        <Popover.Target>
+                                            <div>
+                                                <FakeItem id='9a' openModal />
+                                            </div>
+                                        </Popover.Target>
 
-                                    <Popover.Dropdown>
-                                        <FakePanel id='popover-1' autoFocus>
-                                            <FakeItem id='p1' />
-                                            <FakeItem id='p2' />
+                                        <Popover.Dropdown>
+                                            <FocusScope id='popover-1'>
+                                                <FakeItem id='p1' />
+                                                <FakeItem id='p2' focusOnMount />
 
-                                            <Popover>
-                                                <Popover.Target>
-                                                    <div>
-                                                        <FakeItem id='p3' />
-                                                    </div>
-                                                </Popover.Target>
+                                                <Popover withinPortal={false}>
+                                                    <Popover.Target>
+                                                        <div>
+                                                            <FakeItem id='p3' openModal />
+                                                        </div>
+                                                    </Popover.Target>
 
-                                                <Popover.Dropdown>
-                                                    <FakePanel id='popover-2' autoFocus>
-                                                        <FakeItem id='pp1' />
-                                                        <FakeItem id='pp2' />
-                                                        <FakeItem id='pp3' />
-                                                    </FakePanel>
-                                                </Popover.Dropdown>
-                                            </Popover>
-                                        </FakePanel>
-                                    </Popover.Dropdown>
-                                </Popover>
-                            </Card>
-                        </Group>
-                    </FakePanel>
+                                                    <Popover.Dropdown>
+                                                        <FocusScope id='popover-2'>
+                                                            <FakeItem id='pp1' />
+                                                            <FakeItem id='pp2' focusOnMount />
+                                                            <FakeItem id='pp3' />
+                                                        </FocusScope>
+                                                    </Popover.Dropdown>
+                                                </Popover>
+                                            </FocusScope>
+                                        </Popover.Dropdown>
+                                    </Popover>
+                                </Card>
+                            </Group>
+                        </FakePanel>
 
-                    <FakePanel id='3'>
-                        {/* test when all items unmount */}
-                        {renderAllItems && <Group>
-                            <FakeItem id='10' />
-                            <FakeItem id='11' onClick={() => setRenderAllItems(false)} />
-                            <FakeItem id='12' />
-                        </Group>}
+                        <FakePanel id='3'>
+                            {/* test when all items unmount */}
+                            {renderAllItems && <Group>
+                                <FakeItem id='10' />
+                                <FakeItem id='11' onClick={() => setRenderAllItems(false)} />
+                                <FakeItem id='12' />
+                            </Group>}
 
-                    </FakePanel>
+                        </FakePanel>
 
-                    {/* test when the whole panel unmount */}
-                    {renderFooter && <FakePanel id='footer'>
-                        <Group>
-                            <FakeItem id='13' />
-                            <FakeItem id='14' onClick={() => setRenderFooter(false)} />
-                            <FakeItem id='15' />
-                        </Group>
-                    </FakePanel>}
-                </Stack>
-            </FocusScope>
-        </FocusProvider>;
+                        {/* test when the whole panel unmount */}
+                        {renderFooter && <FakePanel id='footer'>
+                            <Group>
+                                <FakeItem id='13' />
+                                <FakeItem id='14' onClick={() => setRenderFooter(false)} />
+                                <FakeItem id='15' />
+                            </Group>
+                        </FakePanel>}
+
+                        <FakeFooter />
+                    </Stack>
+                </FocusScope>
+            </FocusProvider>
+        </ControlsProvider>;
     },
 };

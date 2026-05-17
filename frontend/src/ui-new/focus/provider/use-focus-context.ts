@@ -10,15 +10,33 @@ const useRefsContext = () => {
   return context;
 };
 
+const normalizeScopesLastFocusedNode = (
+  scopeStack: FocusScopeId[],
+  scopes: Map<FocusScopeId, FocusScopeData>,
+) => {
+  for (let i = 0; i < scopeStack.length - 1; i++) {
+    const parentScope = scopes.get(scopeStack[i] ?? '');
+    if (!parentScope) continue;
+
+    const childScope = scopes.get(scopeStack[i + 1] ?? '');
+    if (!childScope?.parentNodeId) continue;
+
+    parentScope.lastFocusedNodeId = childScope.parentNodeId;
+  }
+};
+
 // register/unregister scopes and nodes
 const useRegister = () => {
-  const { scopes, nodes } = useRefsContext();
+  const { scopeStackRef, scopes, nodes } = useRefsContext();
   const { popScope } = usePushPopScope();
 
   const registerScope = React.useCallback((scope: FocusScopeData) => {
-    // console.log('register scope', scope.id);
+    // console.log('register scope', scope.id, scopeStackRef.current);
     scopes.set(scope.id, scope);
-  }, [ scopes ]);
+
+    normalizeScopesLastFocusedNode(scopeStackRef.current, scopes);
+
+  }, [scopeStackRef, scopes]);
 
   const unregisterScope = React.useCallback((scopeId: FocusScopeId) => {
     // console.log('unregister scope', scopeId);
@@ -36,7 +54,7 @@ const useRegister = () => {
 
     const focused = getCurrentFocusKey() === nodeId;
 
-    // console.log('unregister node', nodeId, node, focused);
+    // console.log('unregister node', nodeId);
     nodes.delete(nodeId);
 
     if (focused) {
@@ -71,20 +89,14 @@ const useRegister = () => {
 
 // handle push and pop on scope stack 
 const usePushPopScope = () => {
-  const { scopes, nodes, setScopeStack } = useRefsContext();
+  const { scopes, nodes, scopeStackRef, setScopeStack } = useRefsContext();
   const restoreScopeFocus = useRestoreScopeFocus();
 
-  const pushScope = React.useCallback((scopeId: FocusScopeId) => {
-    const hasScopeNodes = [ ...nodes.values() ].some(n => n.scopeId === scopeId);
-    if (!hasScopeNodes)
-      return;
+  const hasScopeNodes = React.useCallback((scopeId: FocusScopeId | undefined): scopeId is FocusScopeId => 
+    !!scopeId && [ ...nodes.values() ].some(n => n.scopeId === scopeId),
+  [nodes]);
 
-    setScopeStack(prev => prev.at(-1) === scopeId
-      ? prev
-      : [
-        ...prev,
-        scopeId,
-      ]);
+  const focusScope = React.useCallback((scopeId: FocusScopeId) => {
     const scope = scopes.get(scopeId);
     if (scope?.lastFocusedNodeId) {
       nodes.get(scope.lastFocusedNodeId)?.focusSelf();
@@ -93,16 +105,64 @@ const usePushPopScope = () => {
         restoreScopeFocus(scopeId);
       });
     }
-  }, [ nodes, restoreScopeFocus, scopes, setScopeStack ]);
+  }, [nodes, restoreScopeFocus, scopes]);
+
+  const normalizeScope = React.useCallback((stack: FocusScopeId[]) => {
+    const lastScopeId = stack[stack.length - 1];
+    if (!lastScopeId || scopeStackRef.current[ scopeStackRef.current.length - 1 ] === lastScopeId)
+      return;
+
+    if (scopeStackRef.current.includes(lastScopeId))
+      return;
+
+    if (!hasScopeNodes(lastScopeId))
+      return;
+
+    // const scopeIdIndex = scopeStackRef.current.lastIndexOf(lastScopeId);
+    // console.log(scopeIdIndex)
+    // if (scopeIdIndex >= 0) {
+    //   return;
+    //   // stack = stack.slice(0,scopeIdIndex + 1);
+    // }
+
+    setScopeStack(stack);
+    
+    normalizeScopesLastFocusedNode(stack, scopes);
+
+    focusScope(lastScopeId);
+  }, [focusScope, hasScopeNodes, scopeStackRef, scopes, setScopeStack]);
+
+  const pushScope = React.useCallback((scopeId: FocusScopeId) => {
+    // console.log('pushScope');
+    if (!hasScopeNodes(scopeId))
+      return;
+
+    setScopeStack(prev => prev.at(-1) === scopeId
+      ? prev
+      : [
+        ...prev,
+        scopeId,
+      ]);
+
+    focusScope(scopeId);
+  }, [focusScope, hasScopeNodes, setScopeStack]);
 
   const popScope = React.useCallback(() => {
     setScopeStack(prev => {
-      if (prev.length <= 1) {
-        return prev;
-      }
+      const getNextStack = (stack: FocusScopeId[]): FocusScopeId[] => {
+        if (stack.length <= 1)
+          return stack;
 
-      // const current = prev.at(-1);
-      const next = prev.slice(0, -1);
+        const next = stack.slice(0, -1);
+        const previous = next.at(-1);
+
+        if (!hasScopeNodes(previous))
+          return getNextStack(next);
+
+        return next;
+      };
+
+      const next = getNextStack(prev);
       const previous = next.at(-1);
 
       queueMicrotask(() => {
@@ -113,9 +173,10 @@ const usePushPopScope = () => {
 
       return next;
     });
-  }, [ restoreScopeFocus, setScopeStack ]);
+  }, [hasScopeNodes, restoreScopeFocus, setScopeStack]);
 
   return {
+    normalizeScope,
     pushScope,
     popScope,
   };

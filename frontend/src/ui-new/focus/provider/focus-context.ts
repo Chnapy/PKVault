@@ -14,6 +14,7 @@ export type FocusNodeData = {
 export type FocusScopeData = {
   id: FocusScopeId;
   restoreMode: RestoreMode;
+  parentNodeId?: FocusNodeId;
   lastFocusedNodeId?: FocusNodeId;
 };
 

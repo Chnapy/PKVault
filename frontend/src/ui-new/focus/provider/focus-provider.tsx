@@ -1,8 +1,8 @@
 import React from 'react';
 import { type FocusDataContext, type FocusScopeId, focusRefsContext } from './focus-context';
 
-export const FocusProvider: React.FC<{ initialScope?: string; children: React.ReactNode }> = ({ initialScope, children }) => {
-  const scopeStackRef = React.useRef(initialScope ? [ initialScope ] : []);
+export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const scopeStackRef = React.useRef<FocusScopeId[]>([]);
 
   const data = React.useMemo((): FocusDataContext => {
     const setScopeStack: React.Dispatch<React.SetStateAction<FocusScopeId[]>> = (value) => {
@@ -11,6 +11,8 @@ export const FocusProvider: React.FC<{ initialScope?: string; children: React.Re
       }
 
       if (scopeStackRef.current !== value) {
+
+        // console.warn('update scope-stack', value, scopeStackRef.current, ctx);
 
         const scopeIdsToUpdate = [ ...new Set([ scopeStackRef.current, value ]
           .map(stack => stack[ stack.length - 1 ])
