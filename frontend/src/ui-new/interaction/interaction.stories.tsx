@@ -2,19 +2,19 @@ import { Badge, Button, Card, Group, Stack } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import React from 'react';
-import { getControlIcon } from '../controls/icons/get-control-icon';
-import { useAllCurrentControls } from '../controls/use-all-current-controls';
-import { getBackControl } from '../focus-controls/common-controls/back-controls';
-import { getMoveControl } from '../focus-controls/common-controls/move-controls';
-import { getSelectControl } from '../focus-controls/common-controls/select-controls';
-import { PopoverWithControls, type PopoverTargetChildProps } from '../focus-controls/components/popover/popover-with-controls';
-import { FocusControlsProvider } from '../focus-controls/provider/focus-controls-provider';
-import { useFocusControls } from '../focus-controls/use-focus-controls';
-import { Focus } from './provider/use-focus-context';
-import { FocusScope } from './scope/focus-scope';
+import { getControlIcon } from './controls/icons/get-control-icon';
+import { useAllCurrentControls } from './controls/use-all-current-controls';
+import { getBackControl } from './focus-controls/common-controls/back-controls';
+import { getMoveControl } from './focus-controls/common-controls/move-controls';
+import { getSelectControl } from './focus-controls/common-controls/select-controls';
+import { PopoverWithControls, type PopoverTargetChildProps } from './focus-controls/components/popover/popover-with-controls';
+import { FocusControlsProvider } from './focus-controls/provider/focus-controls-provider';
+import { useFocusControls } from './focus-controls/use-focus-controls';
+import { Focus } from './focus/provider/use-focus-context';
+import { FocusScope } from './focus/scope/focus-scope';
 
 const meta = {
-    title: 'UX/Focus',
+    title: 'Interaction',
 } satisfies Meta;
 
 export default meta;

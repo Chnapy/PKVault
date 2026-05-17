@@ -1,7 +1,7 @@
 import type { Preview, StoryContext } from '@storybook/react-vite';
 import { createMemoryHistory, createRootRoute, createRoute, createRouter, RouterProvider } from '@tanstack/react-router';
 import { AppTheme } from '../src/ui-new/app-theme';
-import { initFocus } from '../src/ui-new/focus/init-focus';
+import { initFocus } from '../src/ui-new/interaction/focus/init-focus';
 
 initFocus();
 
