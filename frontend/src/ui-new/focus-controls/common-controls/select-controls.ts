@@ -1,23 +1,21 @@
-import type { ControlAction } from '../provider/controls-context';
+import type { ControlActionInput } from '../../controls/provider/controls-context';
 
-export const getSelectControl = (partial: Pick<ControlAction, 'label' | 'action'>): ControlAction => ({
+export const getSelectControl = (partial: Omit<ControlActionInput, 'name' | 'triggers' | 'spread'>): ControlActionInput => ({
     ...partial,
     name: 'select',
     triggers: {
         keyboard: {
             type: 'keyboard',
-            icon: 'Space',
             values: [ 'Space' ],
         },
         mouse: {
             type: 'mouse',
-            icon: 'ML',
             values: [ 'left-click' ],
         },
         gamepad: {
             type: 'gamepad',
-            icon: 'A',
             values: [ 'A' ],
         },
     },
+    spread: false,
 });

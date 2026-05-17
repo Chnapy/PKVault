@@ -11,7 +11,7 @@ export const sendGamepadEvent = (gamepadId: string, type: GamepadMappingType, va
     const button = getGamepadMapping(gamepadId, type, value);
 
     if (!button) {
-        console.log('Gamepad mapping not found for:', {
+        console.warn('Gamepad mapping not found for:', {
             gamepadId,
             type,
             value,

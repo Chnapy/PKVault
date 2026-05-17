@@ -56,12 +56,12 @@ export const useFocusNode = <E extends HTMLElement>({ scopeNodeId, focusOnMount 
   }, [ focusOnMount, focusSelf ]);
 
   const focusProps = {
+    ref,
     'data-focus-key': nodeId,
     'data-focus-active': active || undefined,
   };
 
   return {
-    ref,
     nodeId,
     scopeId,
     focused,

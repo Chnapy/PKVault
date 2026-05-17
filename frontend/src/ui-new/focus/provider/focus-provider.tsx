@@ -14,9 +14,10 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
         // console.warn('update scope-stack', value, scopeStackRef.current, ctx);
 
-        const scopeIdsToUpdate = [ ...new Set([ scopeStackRef.current, value ]
-          .map(stack => stack[ stack.length - 1 ])
-          .filter(scopeId => typeof scopeId === 'string')) ];
+        const scopeIdsToUpdate = [ ...new Set([ ...scopeStackRef.current, ...value ]
+          // .map(stack => stack[ stack.length - 1 ])
+          .filter(scopeId => typeof scopeId === 'string')
+        ) ];
 
         scopeStackRef.current = value;
 

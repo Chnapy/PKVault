@@ -1,7 +1,7 @@
 import React from 'react';
 import type { GamepadMappingsAllButton } from '../gamepad/gamepad-mapper';
 
-type ControlTriggerValues = {
+export type ControlTriggerValues = {
     mouse: 'move' | 'left-click' | 'right-click' | 'middle-click' | 'scroll';
     keyboard: string;//'a' | 'b' | 'Enter' | 'Backspace' | 'Space';
     gamepad: GamepadMappingsAllButton;
@@ -9,10 +9,9 @@ type ControlTriggerValues = {
 
 export type ControlTriggerType = keyof ControlTriggerValues;
 
-export type ControlTrigger<T extends ControlTriggerType> = {
+export type ControlTrigger<T extends ControlTriggerType = ControlTriggerType> = {
     type: T;
     values: ControlTriggerValues[T][];
-    icon: React.ReactNode;
     allowPressedSuite?: boolean;
 };
 
@@ -20,12 +19,19 @@ export type ControlAction = {
     name: string;
     triggers: { [trigger in ControlTriggerType]?: ControlTrigger<trigger> };
     label: string;
+    focused: boolean;
+    // spread to children, if not overriden by them
+    spread: boolean;
+    // override lowest order, for same trigger values only
+    order: number;
     action: <T extends ControlTriggerType>(trigger: T, value: ControlTriggerValues[T]) => void;
 };
 
+export type ControlActionInput = Omit<ControlAction, 'focused' | 'order'>;
+
 type Falsy = false | undefined | null | '' | 0; 
 
-export type ControlsWithFalsy = (ControlAction | Falsy)[];
+export type ControlsWithFalsy = (ControlActionInput | Falsy)[];
 export type Controls = ControlAction[];
 
 export type ControlId = string;

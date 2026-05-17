@@ -241,9 +241,38 @@ const useIsScopeActive = (scopeId: FocusScopeId) => {
   return active;
 };
 
+const useIsInScopeStack = (scopeId: FocusScopeId | undefined) => {
+  const { scopeStackRef, scopeListeners } = useRefsContext();
+
+  const isInStack = React.useSyncExternalStore(
+    React.useCallback((trigger) => {
+      if (scopeId) {
+        let listeners = scopeListeners.get(scopeId);
+        if (!listeners) {
+          listeners = new Set();
+          scopeListeners.set(scopeId, listeners);
+        }
+        listeners.add(trigger);
+      }
+
+      return () => {
+        if (scopeId) {
+          scopeListeners.get(scopeId)?.delete(trigger);
+        }
+      };
+    }, [scopeId, scopeListeners]),
+    React.useCallback(() => !!scopeId && scopeStackRef.current.includes(scopeId), [scopeId, scopeStackRef]),
+  );
+  
+  // console.log(active, scopeId, scopeStackRef.current)
+
+  return isInStack;
+};
+
 export const Focus = {
   useRegister,
   usePushPopScope,
   useRestoreScopeFocus,
   useIsScopeActive,
+  useIsInScopeStack,
 };

@@ -1,24 +1,23 @@
 import { navigateByDirection } from '@noriginmedia/norigin-spatial-navigation-core';
-import type { GamepadMappingsAllButton } from '../gamepad/gamepad-mapper';
-import type { ControlAction } from '../provider/controls-context';
+import type { GamepadMappingsAllButton } from '../../controls/gamepad/gamepad-mapper';
+import type { ControlActionInput } from '../../controls/provider/controls-context';
 
-export const getMoveControl = (partial: Pick<ControlAction, 'label'>): ControlAction => ({
+export const getMoveControl = (partial: Omit<ControlActionInput, 'name' | 'triggers' | 'action' | 'spread'>): ControlActionInput => ({
     ...partial,
     name: 'move',
     triggers: {
         keyboard: {
             type: 'keyboard',
-            icon: 'MV',
             values: [ 'move' ],
             allowPressedSuite: true,
         },
         gamepad: {
             type: 'gamepad',
-            icon: 'D-pad',
             values: [ 'DPadLeft', 'DPadRight', 'DPadUp', 'DPadDown', 'LStickLeft', 'LStickRight', 'LStickUp', 'LStickDown' ],
             allowPressedSuite: true,
         },
     },
+    spread: true,
     action: function (state, value) {
         switch (state) {
             case 'gamepad':

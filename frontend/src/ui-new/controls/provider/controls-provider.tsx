@@ -1,4 +1,3 @@
-import { getCurrentFocusKey, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import React from 'react';
 import { addGamepadEventListener } from '../gamepad/gamepad-event';
 import { gamepadLoop } from '../gamepad/gamepad-loop';
@@ -26,22 +25,27 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     React.useEffect(() => {
         const updateState = (state: ControlTriggerType) => {
             if (controlsState.current === state) return;
-            console.log('update', controlsState.current, '->', state)
+            console.info('update controls state', controlsState.current, '->', state);
             controlsState.current = state;
             controlsListeners.current.forEach(l => l());
         };
 
-        const focusIfNone = () => {
-            if (!getCurrentFocusKey()) {
-                const focusableEl = document.querySelector<HTMLElement>('[data-focus-key]');
-                setFocus(focusableEl!.dataset.focusKey!);
-            }
+        // sort & filter based on order + spread
+        const getSortedFilteredControls = () => {
+            const sortedControls = [ ...controlsRef.current.values() ].flat()
+                .sort((c1, c2) => c2.order - c1.order);
+
+            // currentOrder can be undefined even with focused element
+            // if no controls are passed from it
+            const currentOrder = sortedControls.find(c => c.focused)?.order;
+
+            return sortedControls.filter(c => c.order === currentOrder || c.spread);
         };
 
         const keydownListener = (e: KeyboardEvent) => {
             updateState('keyboard');
 
-            for (const control of [ ...controlsRef.current.values() ].flat()) {
+            for (const control of getSortedFilteredControls()) {
                 const keys = control.triggers.keyboard?.values ?? [];
 
                 for (const key of keys) {
@@ -50,8 +54,6 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     }
                 }
             }
-
-            focusIfNone();
         };
 
         window.addEventListener('keydown', keydownListener);
@@ -61,18 +63,16 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
             if (e.detail.button) {
 
-                console.log('pressed', e.detail.button, e.detail.pressedSuite);
-
-                const control = [ ...controlsRef.current.values() ].flat()
+                const control = getSortedFilteredControls()
                     // take first control, avoiding conflicts
                     .find(c => c.triggers.gamepad?.values.includes(e.detail.button!)
                         && (e.detail.pressedSuite <= 1 || c.triggers.gamepad.allowPressedSuite)
                     );
 
+                console.info('gamepad pressed', e.detail.button, e.detail.pressedSuite, { control });
+
                 control?.action(controlsState.current, e.detail.button);
             }
-
-            focusIfNone();
         });
 
         const cancelGamepadLoop = gamepadLoop();
