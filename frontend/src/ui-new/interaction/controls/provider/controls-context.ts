@@ -1,4 +1,5 @@
 import React from 'react';
+import { create } from 'zustand';
 import type { GamepadMappingsAllButton } from '../gamepad/gamepad-mapper';
 
 export type ControlTriggerValues = {
@@ -24,7 +25,7 @@ export type ControlAction = {
     spread: boolean;
     // override lowest order, for same trigger values only
     order: number;
-    action: <T extends ControlTriggerType>(trigger: T, value: ControlTriggerValues[T]) => void;
+    action: <T extends ControlTriggerType = ControlTriggerType>(trigger: T, value: ControlTriggerValues[T]) => void;
 };
 
 export type ControlActionInput = Omit<ControlAction, 'focused' | 'order'>;
@@ -37,11 +38,41 @@ export type Controls = ControlAction[];
 export type ControlId = string;
 
 export type ControlsContext = {
-    controlsRef: React.RefObject<Map<ControlId, Controls>>;
-    controlsState: React.RefObject<ControlTriggerType>;
-    controlsListeners: React.RefObject<Set<(id?: ControlId) => void>>;
+    useControlsStore: ReturnType<typeof createControlsStore>;
+};
+
+export const controlsContext = React.createContext<ControlsContext | null>(null);
+
+type ControlsStore = {
+    controls: Map<ControlId, Controls>;
+    currentType: ControlTriggerType;
     registerControls: (id: ControlId, controls: Controls) => void;
     unregisterControls: (id: ControlId) => void;
 };
 
-export const controlsContext = React.createContext<ControlsContext | null>(null);
+export const createControlsStore = () => create<ControlsStore>()((set) => ({
+    controls: new Map(),
+    currentType: 'mouse',
+
+    registerControls: (id: ControlId, controlItems: Controls) => set(s => {
+        const controls = new Map(s.controls);
+        controls.set(id, controlItems);
+
+        return {
+            ...s,
+            controls,
+        };
+    }),
+    unregisterControls: (id: ControlId) => set(s => {
+        if (!s.controls.has(id))
+            return s;
+
+        const controls = new Map(s.controls);
+        controls.delete(id);
+
+        return {
+            ...s,
+            controls,
+        };
+    }),
+}));

@@ -14,7 +14,7 @@ type ControlsProps = {
 };
 
 export const useControls = (id: ControlId, focused: boolean, order: number, controls: ControlsWithFalsy, { enabled }: Options): ControlsProps => {
-    const { registerControls, unregisterControls } = useControlsContext();
+    const { useControlsStore } = useControlsContext();
 
     const controlsRef = React.useRef(controls);
 
@@ -24,6 +24,8 @@ export const useControls = (id: ControlId, focused: boolean, order: number, cont
 
     React.useEffect(() => {
         if (!enabled) return;
+
+        const { registerControls, unregisterControls } = useControlsStore.getState();
 
         registerControls(
             id,
@@ -39,7 +41,7 @@ export const useControls = (id: ControlId, focused: boolean, order: number, cont
         return () => {
             unregisterControls(id);
         };
-    }, [ enabled, focused, id, order, registerControls, unregisterControls ]);
+    }, [enabled, focused, id, order, useControlsStore]);
 
     const onClick = React.useCallback<React.MouseEventHandler>(() => {
         const clickAction = controlsRef.current.find((c): c is ControlAction =>

@@ -169,11 +169,11 @@ const FakeItemWithGlobalControl: React.FC<{
 };
 
 const FakeFooter: React.FC = () => {
-    const getControls = useAllCurrentControls();
+    const allControls = useAllCurrentControls();
 
     return <Card>
         <Stack>
-            {Object.entries(getControls()).map(([ controlId, controls ]) => <Card key={controlId}>
+            {Object.entries(allControls).map(([ controlId, controls ]) => <Card key={controlId}>
                 <Group>
                     {controlId}<br />
                     {controls.map(c => <Badge

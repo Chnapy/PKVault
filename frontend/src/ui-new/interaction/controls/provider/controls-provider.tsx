@@ -1,38 +1,31 @@
 import React from 'react';
 import { addGamepadEventListener } from '../gamepad/gamepad-event';
 import { gamepadLoop } from '../gamepad/gamepad-loop';
-import { controlsContext, type ControlId, type Controls, type ControlsContext, type ControlTriggerType } from './controls-context';
+import { controlsContext, createControlsStore, type ControlsContext, type ControlTriggerType } from './controls-context';
 
 export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const controlsRef = React.useRef(new Map<ControlId, Controls>());
-    const controlsState = React.useRef<ControlTriggerType>('mouse');
-    const controlsListeners = React.useRef<Set<(id?: ControlId) => void>>(new Set());
-
-    const methods = React.useMemo((): ControlsContext => ({
-        controlsRef,
-        controlsState,
-        controlsListeners,
-        registerControls: (id: ControlId, controls: Controls) => {
-            controlsRef.current.set(id, controls);
-            controlsListeners.current.forEach(l => l(id));
-        },
-        unregisterControls: (id: ControlId) => {
-            controlsRef.current.delete(id);
-            controlsListeners.current.forEach(l => l(id));
-        },
-    }), []);
+    const [ methods ] = React.useState((): ControlsContext => ({
+        useControlsStore: createControlsStore(),
+    }));
 
     React.useEffect(() => {
-        const updateState = (state: ControlTriggerType) => {
-            if (controlsState.current === state) return;
-            console.info('update controls state', controlsState.current, '->', state);
-            controlsState.current = state;
-            controlsListeners.current.forEach(l => l());
-        };
+        const getState = methods.useControlsStore.getState;
+        const setState = methods.useControlsStore.setState;
+
+        const updateState = (state: ControlTriggerType) => setState(s => {
+            const currentType = s.currentType;
+            if (currentType === state) return s;
+
+            console.info('update controls state', currentType, '->', state);
+            return {
+                ...s,
+                currentType: state,
+            };
+        });
 
         // sort & filter based on order + spread
         const getSortedFilteredControls = () => {
-            const sortedControls = [ ...controlsRef.current.values() ].flat()
+            const sortedControls = [ ...getState().controls.values() ].flat()
                 .sort((c1, c2) => c2.order - c1.order);
 
             // currentOrder can be undefined even with focused element
@@ -50,7 +43,7 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
                 for (const key of keys) {
                     if (e.key === key) {
-                        control.action(controlsState.current, key);
+                        control.action(getState().currentType, key);
                     }
                 }
             }
@@ -71,7 +64,7 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
                 console.info('gamepad pressed', e.detail.button, e.detail.pressedSuite, { control });
 
-                control?.action(controlsState.current, e.detail.button);
+                control?.action(getState().currentType, e.detail.button);
             }
         });
 
@@ -83,7 +76,7 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
             window.removeEventListener('keydown', keydownListener);
         };
-    }, []);
+    }, [ methods.useControlsStore ]);
 
     return <controlsContext.Provider value={methods}>
         {children}

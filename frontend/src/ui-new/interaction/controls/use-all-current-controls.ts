@@ -7,72 +7,44 @@ type CurrentControlAction = Omit<ControlAction, 'triggers'> & {
 };
 
 export const useAllCurrentControls = () => {
-    const { controlsRef, controlsState, controlsListeners } = useControlsContext();
+    const { useControlsStore } = useControlsContext();
+    
+    const controls = useControlsStore(s => s.controls);
+    const currentType = useControlsStore(s => s.currentType);
 
-    // used to trigger rerender only when needed
-    const hash = React.useSyncExternalStore(
-        React.useCallback(trigger => {
-            controlsListeners.current.add(trigger);
+    return React.useMemo(() => [ ...controls.entries() ]
+        .sort((entry1, entry2) => {
+            const order1 = entry1[ 1 ]?.[ 0 ]?.order;
+            const order2 = entry2[ 1 ]?.[ 0 ]?.order;
 
-            return () => {
-                controlsListeners.current.delete(trigger);
-            };
-        }, [ controlsListeners ]),
-        React.useCallback(() => {
-            const controlsHash = [ ...controlsRef.current.values() ].flat()
-                .filter(c => c.triggers[ controlsState.current ])
+            if (order1 === undefined || order2 === undefined)
+                return 0;
+            return order2 - order1;
+        })
+        .map(([ controlId, controls ]) => [
+            controlId,
+            controls.filter(c => c.focused || c.spread),
+        ] as const)
+        .reduce<Record<ControlId, CurrentControlAction[]>>((acc, [ controlId, controls ]) => {
+
+            const accControls = Object.values(acc).flat();
+            const currentControls = controls
+                .filter(c => c.triggers[ currentType ])
                 .map(({ triggers, ...c }): CurrentControlAction => ({
                     ...c,
-                    trigger: triggers[ controlsState.current ]!,
-                }))
-                .map(c => [
-                    c.name,
-                    c.order,
-                    c.label,
-                    c.trigger.type,
-                    c.trigger.values.join('.'),
-                ].join('.'))
-                .sort().join('-');
+                    trigger: triggers[ currentType ]!,
+                }));
 
-            return [ controlsState.current, controlsHash ].join('_');
-        }, [ controlsRef, controlsState ]),
+            const controlsFiltered = currentControls.filter(c1 => !accControls.some(c2 =>
+                c1.trigger.values.join() === c2.trigger.values.join()));
+
+            return controlsFiltered.length > 0
+                ? {
+                    ...acc,
+                    [ controlId ]: controlsFiltered
+                }
+                : acc;
+        }, {}),
+        [controls, currentType]
     );
-
-    return React.useCallback(() => {
-        hash.toString();
-
-        return [ ...controlsRef.current.entries() ]
-            .sort((entry1, entry2) => {
-                const order1 = entry1[ 1 ]?.[ 0 ]?.order;
-                const order2 = entry2[ 1 ]?.[ 0 ]?.order;
-
-                if (order1 === undefined || order2 === undefined)
-                    return 0;
-                return order2 - order1;
-            })
-            .map(([ controlId, controls ]) => [
-                controlId,
-                controls.filter(c => c.focused || c.spread),
-            ] as const)
-            .reduce<Record<ControlId, CurrentControlAction[]>>((acc, [ controlId, controls ]) => {
-
-                const accControls = Object.values(acc).flat();
-                const currentControls = controls
-                    .filter(c => c.triggers[ controlsState.current ])
-                    .map(({ triggers, ...c }): CurrentControlAction => ({
-                        ...c,
-                        trigger: triggers[ controlsState.current ]!,
-                    }));
-
-                const controlsFiltered = currentControls.filter(c1 => !accControls.some(c2 =>
-                    c1.trigger.values.join() === c2.trigger.values.join()));
-
-                return controlsFiltered.length > 0
-                    ? {
-                        ...acc,
-                        [ controlId ]: controlsFiltered
-                    }
-                    : acc;
-            }, {});
-    }, [ hash, controlsRef, controlsState ]);
 };

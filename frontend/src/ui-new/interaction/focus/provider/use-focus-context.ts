@@ -15,10 +15,10 @@ const normalizeScopesLastFocusedNode = (
   scopes: Map<FocusScopeId, FocusScopeData>,
 ) => {
   for (let i = 0; i < scopeStack.length - 1; i++) {
-    const parentScope = scopes.get(scopeStack[i] ?? '');
+    const parentScope = scopes.get(scopeStack[ i ] ?? '');
     if (!parentScope) continue;
 
-    const childScope = scopes.get(scopeStack[i + 1] ?? '');
+    const childScope = scopes.get(scopeStack[ i + 1 ] ?? '');
     if (!childScope?.parentNodeId) continue;
 
     parentScope.lastFocusedNodeId = childScope.parentNodeId;
@@ -27,28 +27,36 @@ const normalizeScopesLastFocusedNode = (
 
 // register/unregister scopes and nodes
 const useRegister = () => {
-  const { scopeStackRef, scopes, nodes } = useRefsContext();
+  const { useFocusStore } = useRefsContext();
   const { popScope } = usePushPopScope();
 
   const registerScope = React.useCallback((scope: FocusScopeData) => {
     // console.log('register scope', scope.id, scopeStackRef.current);
+    const { scopes, scopeStack } = useFocusStore.getState();
+
     scopes.set(scope.id, scope);
 
-    normalizeScopesLastFocusedNode(scopeStackRef.current, scopes);
+    normalizeScopesLastFocusedNode(scopeStack, scopes);
 
-  }, [scopeStackRef, scopes]);
+  }, [ useFocusStore ]);
 
   const unregisterScope = React.useCallback((scopeId: FocusScopeId) => {
     // console.log('unregister scope', scopeId);
+    const { scopes } = useFocusStore.getState();
+
     scopes.delete(scopeId);
-  }, [ scopes ]);
+  }, [ useFocusStore ]);
 
   const registerNode = React.useCallback((node: FocusNodeData) => {
     // console.log('register node', node.id, node.scopeId);
+    const { nodes } = useFocusStore.getState();
+
     nodes.set(node.id, node);
-  }, [ nodes ]);
+  }, [ useFocusStore ]);
 
   const unregisterNode = React.useCallback((nodeId: FocusNodeId) => {
+    const { nodes } = useFocusStore.getState();
+
     const node = nodes.get(nodeId);
     if (!node) return;
 
@@ -69,14 +77,16 @@ const useRegister = () => {
         }
       });
     }
-  }, [ nodes, popScope ]);
+  }, [ popScope, useFocusStore ]);
 
   const setLastFocusedNode = React.useCallback((scopeId: FocusScopeId, nodeId: FocusNodeId) => {
+    const { scopes } = useFocusStore.getState();
+
     const scope = scopes.get(scopeId);
     if (!scope) return;
 
     scope.lastFocusedNodeId = nodeId;
-  }, [ scopes ]);
+  }, [ useFocusStore ]);
 
   return {
     registerScope,
@@ -89,14 +99,16 @@ const useRegister = () => {
 
 // handle push and pop on scope stack 
 const usePushPopScope = () => {
-  const { scopes, nodes, scopeStackRef, setScopeStack } = useRefsContext();
+  const { useFocusStore } = useRefsContext();
   const restoreScopeFocus = useRestoreScopeFocus();
 
-  const hasScopeNodes = React.useCallback((scopeId: FocusScopeId | undefined): scopeId is FocusScopeId => 
-    !!scopeId && [ ...nodes.values() ].some(n => n.scopeId === scopeId),
-  [nodes]);
+  const hasScopeNodes = React.useCallback((scopeId: FocusScopeId | undefined): scopeId is FocusScopeId =>
+    !!scopeId && [ ...useFocusStore.getState().nodes.values() ].some(n => n.scopeId === scopeId),
+    [ useFocusStore ]);
 
   const focusScope = React.useCallback((scopeId: FocusScopeId) => {
+    const { scopes, nodes } = useFocusStore.getState();
+
     const scope = scopes.get(scopeId);
     if (scope?.lastFocusedNodeId) {
       nodes.get(scope.lastFocusedNodeId)?.focusSelf();
@@ -105,14 +117,16 @@ const usePushPopScope = () => {
         restoreScopeFocus(scopeId);
       });
     }
-  }, [nodes, restoreScopeFocus, scopes]);
+  }, [ restoreScopeFocus, useFocusStore ]);
 
   const normalizeScope = React.useCallback((stack: FocusScopeId[]) => {
-    const lastScopeId = stack[stack.length - 1];
-    if (!lastScopeId || scopeStackRef.current[ scopeStackRef.current.length - 1 ] === lastScopeId)
+    const { scopes, scopeStack } = useFocusStore.getState();
+
+    const lastScopeId = stack[ stack.length - 1 ];
+    if (!lastScopeId || scopeStack[ scopeStack.length - 1 ] === lastScopeId)
       return;
 
-    if (scopeStackRef.current.includes(lastScopeId))
+    if (scopeStack.includes(lastScopeId))
       return;
 
     if (!hasScopeNodes(lastScopeId))
@@ -125,30 +139,38 @@ const usePushPopScope = () => {
     //   // stack = stack.slice(0,scopeIdIndex + 1);
     // }
 
-    setScopeStack(stack);
-    
+    useFocusStore.setState(s => ({
+      ...s,
+      scopeStack: stack,
+    }));
+
     normalizeScopesLastFocusedNode(stack, scopes);
 
     focusScope(lastScopeId);
-  }, [focusScope, hasScopeNodes, scopeStackRef, scopes, setScopeStack]);
+  }, [ focusScope, hasScopeNodes, useFocusStore ]);
 
   const pushScope = React.useCallback((scopeId: FocusScopeId) => {
     // console.log('pushScope');
     if (!hasScopeNodes(scopeId))
       return;
 
-    setScopeStack(prev => prev.at(-1) === scopeId
-      ? prev
-      : [
-        ...prev,
-        scopeId,
-      ]);
+    useFocusStore.setState(s => s.scopeStack.at(-1) === scopeId
+      ? s
+      : {
+        ...s,
+        scopeStack: [
+          ...s.scopeStack,
+          scopeId,
+        ],
+      });
 
     focusScope(scopeId);
-  }, [focusScope, hasScopeNodes, setScopeStack]);
+  }, [focusScope, hasScopeNodes, useFocusStore]);
 
   const popScope = React.useCallback(() => {
-    setScopeStack(prev => {
+    useFocusStore.setState(s => {
+      const prev = s.scopeStack;
+
       const getNextStack = (stack: FocusScopeId[]): FocusScopeId[] => {
         if (stack.length <= 1)
           return stack;
@@ -171,9 +193,12 @@ const usePushPopScope = () => {
         }
       });
 
-      return next;
+      return {
+        ...s,
+        scopeStack: next,
+      };
     });
-  }, [hasScopeNodes, restoreScopeFocus, setScopeStack]);
+  }, [hasScopeNodes, restoreScopeFocus, useFocusStore]);
 
   return {
     normalizeScope,
@@ -184,14 +209,16 @@ const usePushPopScope = () => {
 
 // restore focus on saved last focused node
 const useRestoreScopeFocus = () => {
-  const { scopes, nodes } = useRefsContext();
+  const { useFocusStore } = useRefsContext();
 
   const getFirstScopeNode = React.useCallback((scopeId: FocusScopeId) => {
-    return Array.from(nodes.values())
+    return Array.from(useFocusStore.getState().nodes.values())
       .find(node => node.scopeId === scopeId);
-  }, [ nodes ]);
+  }, [useFocusStore]);
 
   return React.useCallback((scopeId: FocusScopeId) => {
+    const {scopes, nodes} = useFocusStore.getState();
+
     const scope = scopes.get(scopeId);
     if (!scope) return;
 
@@ -216,57 +243,19 @@ const useRestoreScopeFocus = () => {
         return;
       }
     }
-  }, [ getFirstScopeNode, nodes, scopes ]);
+  }, [getFirstScopeNode, useFocusStore]);
 };
 
 const useIsScopeActive = (scopeId: FocusScopeId) => {
-  const { scopeStackRef, scopeListeners } = useRefsContext();
+  const { useFocusStore } = useRefsContext();
 
-  const active = React.useSyncExternalStore(
-    (trigger) => {
-      let listeners = scopeListeners.get(scopeId);
-      if (!listeners) {
-        listeners = new Set();
-        scopeListeners.set(scopeId, listeners);
-      }
-      listeners.add(trigger);
-
-      return () => {
-        scopeListeners.get(scopeId)?.delete(trigger);
-      };
-    },
-    () => scopeStackRef.current.at(-1) === scopeId,
-  );
-
-  return active;
+  return useFocusStore(s => s.scopeStack.at(-1) === scopeId);
 };
 
 const useIsInScopeStack = (scopeId: FocusScopeId | undefined) => {
-  const { scopeStackRef, scopeListeners } = useRefsContext();
+  const { useFocusStore } = useRefsContext();
 
-  const isInStack = React.useSyncExternalStore(
-    React.useCallback((trigger) => {
-      if (scopeId) {
-        let listeners = scopeListeners.get(scopeId);
-        if (!listeners) {
-          listeners = new Set();
-          scopeListeners.set(scopeId, listeners);
-        }
-        listeners.add(trigger);
-      }
-
-      return () => {
-        if (scopeId) {
-          scopeListeners.get(scopeId)?.delete(trigger);
-        }
-      };
-    }, [scopeId, scopeListeners]),
-    React.useCallback(() => !!scopeId && scopeStackRef.current.includes(scopeId), [scopeId, scopeStackRef]),
-  );
-  
-  // console.log(active, scopeId, scopeStackRef.current)
-
-  return isInStack;
+  return useFocusStore(s => !!scopeId && s.scopeStack.includes(scopeId));
 };
 
 export const Focus = {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { create } from 'zustand';
 
 export type FocusScopeId = string;
 export type FocusNodeId = string;
@@ -19,12 +20,19 @@ export type FocusScopeData = {
 };
 
 export type FocusDataContext = {
-    scopes: Map<FocusScopeId, FocusScopeData>;
-    nodes: Map<FocusNodeId, FocusNodeData>;
-    scopeStackRef: React.RefObject<FocusScopeId[]>;
-    setScopeStack: React.Dispatch<React.SetStateAction<FocusScopeId[]>>;
-    scopeListeners: Map<FocusScopeId, Set<() => void>>;
+  useFocusStore: ReturnType<typeof createFocusStore>;
 };
 
-// static functions, doesn't change over time
 export const focusRefsContext = React.createContext<FocusDataContext | null>(null);
+
+type FocusStore = {
+  scopes: Map<FocusScopeId, FocusScopeData>;
+  nodes: Map<FocusNodeId, FocusNodeData>;
+  scopeStack: FocusScopeId[];
+};
+
+export const createFocusStore = () => create<FocusStore>()(() => ({
+  scopes: new Map(),
+  nodes: new Map(),
+  scopeStack: [],
+}));
