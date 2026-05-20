@@ -2,20 +2,18 @@ import { setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import React from 'react';
 import type { ControlsWithFalsy } from '../controls/provider/controls-context';
 import { useControls } from '../controls/use-controls';
-import { useFocusNode } from '../focus/node/use-focus-node';
+import { useFocusNode, type UseFocusNodeParams } from '../focus/node/use-focus-node';
 import { Focus } from '../focus/provider/use-focus-context';
 import { useFocusScopeContext } from '../focus/scope/use-focus-scope-context';
 
-type Params = {
-    scopeNodeId: string;
+type Params = UseFocusNodeParams & {
     childScopeId?: string;
-    focusOnMount?: boolean;
     controls: ControlsWithFalsy;
     controlsEnable?: 'ifInScopeStack' | 'always';
 };
 
 export const useFocusControls = <E extends HTMLElement>({
-    scopeNodeId, childScopeId, focusOnMount,
+    scopeNodeId, childScopeId, focusOnMount, onFocus,
     controls, controlsEnable = 'ifInScopeStack'
 }: Params) => {
     const parentScope = useFocusScopeContext();
@@ -26,6 +24,7 @@ export const useFocusControls = <E extends HTMLElement>({
     const { nodeId, focused, focusProps, ...focusRest } = useFocusNode<E>({
         scopeNodeId,
         focusOnMount,
+        onFocus,
     });
 
     const getControlsEnable = () => {
@@ -35,7 +34,10 @@ export const useFocusControls = <E extends HTMLElement>({
         }
     };
 
-    const { onClick: controlOnClick, ...controlPropsRest } = useControls(
+    const {
+        onClick: controlOnClick,
+        ...controlPropsRest
+    } = useControls(
         nodeId,
         focused,
         order,

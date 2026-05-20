@@ -3,21 +3,26 @@ import { useMoveContext } from '../context/use-move-context';
 /**
  * Is submitting move action.
  */
-export const useDragSubmitting = <C>(containerValue: C, targetId?: string) => {
+export const useDragSubmitting = <C>(containerValue: C, pos: number, id?: string) => {
     const { getContainerHash, useMoveStore } = useMoveContext();
 
-    return useMoveStore(({state}) => {
+    return useMoveStore(({ state }) => {
         if (state.status !== 'loading')
             return false;
 
-        const { source } = state;
+        const { source, target } = state;
 
-        // Is targetId in source
-        if (targetId !== undefined) {
-            return source.containerId === getContainerHash(containerValue)
-                && source.ids.has(targetId);
-        }
+        const containerHash = getContainerHash(containerValue);
 
-        return false;
+        const isIdInSource = id !== undefined
+            && source.containerId === containerHash
+            && source.ids.has(id);
+        if (isIdInSource)
+            return true;
+
+        const isPosInTarget = target.targetContainerId === containerHash
+            && Object.values(target.targetAllPositions).includes(pos);
+
+        return isPosInTarget;
     });
 };

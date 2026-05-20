@@ -1,56 +1,43 @@
+import type { MoveTargetInput } from '../context/move-context';
 import { useMoveContext } from '../context/use-move-context';
-import type { MoveSource } from '../state/move-state';
 
 export type UseMoveDroppableReturn = {
-    isDragging: boolean;
-    onClick?: () => Promise<void>;
-    onPointerUp?: () => Promise<void>;
+    isDroppable: boolean;
+    onClick?: () => Promise<unknown>;
+    onPointerUp?: () => Promise<unknown>;
 };
 
 /**
  * Estimate if given position can receive currently moving entity.
  * If no moving entity, do nothing.
  */
-export const useDroppable = <T>(
-    target: T,
-    onDropSuccess?: (source: MoveSource) => Promise<unknown>,
-): UseMoveDroppableReturn => {
-    const { useMoveStore } = useMoveContext();
+export const useDroppable = <C>(target: MoveTargetInput<C>): UseMoveDroppableReturn => {
+    const { useMoveStore, drop } = useMoveContext<C>();
 
-    const dispatch = useMoveStore(({ dispatch }) => dispatch);
-    const isDragging = useMoveStore(({ state }) =>
-        state.status === 'dragging'
-        && state.source.ids.size > 0);
+    const isDroppable = useMoveStore(({ state }) =>
+        state.status === 'dragging' 
+        && state.source.ids.size > 0
+        && (
+            !target.targetId
+            || state.source.sourceId !== target.targetId
+        ));
 
-    if (!isDragging) {
+    const clickable = useMoveStore(({ state }) =>
+        state.status === 'dragging' && state.trigger !== 'drag');
+
+    if (!isDroppable) {
         return {
-            isDragging: false,
+            isDroppable: false,
         };
     }
 
-    const onDrop = onDropSuccess
-        ? async () => {
-            const state = useMoveStore.getState().state;
-            if (state.status !== 'dragging')
-                throw new Error('Invalid status');
+    const pointerUp = !clickable;
 
-            dispatch({
-                type: 'DROP',
-                target,
-            });
-
-            await onDropSuccess(state.source)
-                .finally(() => {
-                    dispatch({
-                        type: 'COMPLETE',
-                    });
-                });
-        }
-        : undefined;
+    const onDrop = () => drop(target);
 
     return {
-        isDragging: true,
-        onClick: onDrop,
-        onPointerUp: onDrop,
+        isDroppable: true,
+        onClick: clickable ? onDrop : undefined,
+        onPointerUp: pointerUp ? onDrop : undefined,
     };
 };

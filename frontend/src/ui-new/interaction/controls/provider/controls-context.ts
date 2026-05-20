@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import type { GamepadMappingsAllButton } from '../gamepad/gamepad-mapper';
 
 export type ControlTriggerValues = {
-    mouse: 'move' | 'left-click' | 'right-click' | 'middle-click' | 'scroll';
+    mouse: 'move' | 'drag' | 'left-click' | 'right-click' | 'middle-click' | 'scroll';
     keyboard: string;//'a' | 'b' | 'Enter' | 'Backspace' | 'Space';
     gamepad: GamepadMappingsAllButton;
 };
@@ -25,7 +25,7 @@ export type ControlAction = {
     spread: boolean;
     // override lowest order, for same trigger values only
     order: number;
-    action: <T extends ControlTriggerType = ControlTriggerType>(trigger: T, value: ControlTriggerValues[T]) => void;
+    action: <T extends ControlTriggerType = ControlTriggerType>(e: Event | React.BaseSyntheticEvent , trigger: T, value: ControlTriggerValues[T]) => void;
 };
 
 export type ControlActionInput = Omit<ControlAction, 'focused' | 'order'>;

@@ -4,10 +4,10 @@ import React, { type HTMLProps } from 'react';
 import type { SelectContext } from '../select/context/select-context';
 import { SelectProvider } from '../select/context/select-provider';
 import { useSelectContextActions, useSelectHasValue } from '../select/context/use-select-context';
+import type { MoveTargetInput, MoveTargetOutput } from './context/move-context';
 import { MoveProvider } from './context/move-provider';
 import { getDropPositions } from './hooks/get-drop-positions';
 import { useDragSubmitting } from './hooks/use-drag-submitting';
-import { useDraggable } from './hooks/use-draggable';
 import { useDragging } from './hooks/use-dragging';
 import { useDroppable } from './hooks/use-droppable';
 import type { MoveSource } from './state/move-state';
@@ -20,6 +20,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 type ContainerValue = {
+    type: 'slot' | 'bank';
+    bankId: string;
     box: number;
 };
 
@@ -29,25 +31,32 @@ const FakeItemDraggable: React.FC<{
     name: string;
     children?: React.ReactNode;
 }> = ({ box, pos, name, children }) => {
-    console.log('render drag', box, pos);
+    // console.log('render drag', box, pos);
 
-    const container: ContainerValue = { box };
+    const container: ContainerValue = {
+        type: 'slot',
+        bankId: '',
+        box,
+    };
 
     const checked = useSelectHasValue<ContainerValue>(container, [ name ]);
     const { addId, removeId } = useSelectContextActions<ContainerValue>();
 
-    const { startDrag, onPointerMove } = useDraggable<ContainerValue>(
-        container,
-        [ name ],
-    );
+    const dragging = useDragging<ContainerValue>(name, container);
 
-    const dragging = useDragging<ContainerValue>(
-        name,
-        container,
-        (index) => [ index * 80, 0 ],
-    );
+    const targetContainer: ContainerValue = {
+        type: 'slot',
+        bankId: '',
+        box,
+    };
 
-    const submitting = useDragSubmitting<ContainerValue>(container, name);
+    const droppable = useDroppable<ContainerValue>({
+        targetContainer,
+        targetPosition: pos,
+        targetId: name,
+    });
+
+    const submitting = useDragSubmitting<ContainerValue>(container, pos, name);
 
     const getRender = (props: ButtonProps & HTMLProps<HTMLButtonElement>) => <Button
         variant='filled'
@@ -60,8 +69,10 @@ const FakeItemDraggable: React.FC<{
     return <>
         <Button.Group>
             {getRender({
-                onClick: startDrag,
-                onPointerMove: onPointerMove,
+                ref: dragging.ref,
+                onClick: droppable.onClick ?? dragging.toggleDragByClick,
+                onPointerDown: dragging.onPointerDown,
+                onPointerUp: droppable.onPointerUp,
                 disabled: dragging.isDragging || submitting,
                 loading: submitting,
             })}
@@ -90,27 +101,31 @@ const FakeItemDraggable: React.FC<{
 const FakeSlotDroppable: React.FC<{
     box: number;
     pos: number;
-    onDrop: (source: MoveSource, pos: number) => Promise<unknown>,
     children?: React.ReactNode;
-}> = ({ box, pos, onDrop, children }) => {
-    console.log('render drop', box, pos);
+}> = ({ box, pos, children }) => {
+    // console.log('render drop', box, pos);
 
-    const container: ContainerValue = { box };
+    const targetContainer: ContainerValue = {
+        type: 'slot',
+        bankId: '',
+        box,
+    };
 
-    const { isDragging, onClick, onPointerUp } = useDroppable<null>(
-        null,
-        (source) => onDrop(source, pos),
-    );
+    const { isDroppable, onClick, onPointerUp } = useDroppable<ContainerValue>({
+        targetContainer,
+        targetPosition: pos,
+        targetId: undefined,
+    });
 
-    const submitting = useDragSubmitting<ContainerValue>(container);
+    const submitting = useDragSubmitting<ContainerValue>(targetContainer, pos);
 
     return <Button
         loading={submitting}
-        disabled={!isDragging || submitting}
+        disabled={!isDroppable}
         onClick={onClick}
         onPointerUp={onPointerUp}
     >
-        {children ?? pos}
+        {children ?? pos}{submitting && '...'}
     </Button>;
 };
 
@@ -134,9 +149,6 @@ export const Primary: Story = {
 
         const getBoxItems = (box: number) => new Array(20).fill(0).map((_, i) => {
             const name = getNameByPos(box, i);
-            // const boxPositions = Object.fromEntries<number>(Object.entries(positions)
-            //     .filter(e => e[ 1 ].box === box)
-            //     .map(e => [ e[ 0 ], e[ 1 ].pos ]));
 
             return name
                 ? <FakeItemDraggable
@@ -149,48 +161,68 @@ export const Primary: Story = {
                     key={i}
                     box={box}
                     pos={i}
-                    onDrop={async (source, dropPos) => {
-                        await new Promise(r => setTimeout(r, 500));
-
-                        console.log(source, dropPos);
-
-                        setPositions(positions => {
-                            const sourceIds = [ ...source.ids ];
-
-                            const sourceIdsCurrentPositions = sourceIds.reduce<Record<string, number>>((acc, id) => {
-                                return {
-                                    ...acc,
-                                    [ id ]: positions[ id ]!.pos,
-                                };
-                            }, {});
-
-                            const dropPositions = getDropPositions(dropPos, sourceIds, sourceIdsCurrentPositions);
-
-                            return sourceIds.reduce((acc, id) => {
-                                return {
-                                    ...acc,
-                                    [ id ]: {
-                                        box,
-                                        pos: dropPositions[ id ]!,
-                                    },
-                                };
-                            }, { ...positions });
-                        });
-                    }}
                 />;
         });
 
-        const containerFns: Pick<SelectContext<ContainerValue>, 'getContainerHash' | 'getContainerValue'> = {
-            getContainerHash: value => value.box ? String(value.box) : '',
-            getContainerValue: hash => ({ box: Number(hash) }),
+        const onDrop = async (source: MoveSource, target: MoveTargetOutput<ContainerValue>) => {
+            await new Promise(r => setTimeout(r, 500));
+
+            // console.log(source, target);
+
+            setPositions(positions => {
+                const sourceIds = [ ...source.ids ];
+
+                const sourceIdsCurrentPositions = sourceIds.reduce<Record<string, number>>((acc, id) => {
+                    return {
+                        ...acc,
+                        [ id ]: positions[ id ]!.pos,
+                    };
+                }, {});
+
+                const dropPositions = getDropPositions(target.targetPosition, sourceIds, sourceIdsCurrentPositions);
+
+                return sourceIds.reduce((acc, id) => {
+                    return {
+                        ...acc,
+                        [ id ]: {
+                            box: target.targetContainer.box,
+                            pos: dropPositions[ id ]!,
+                        },
+                    };
+                }, { ...positions });
+            });
         };
 
-        return <MoveProvider<ContainerValue>
-            moveContainerId='move-container'
+        const getTargetAllPositions = (source: MoveSource, target: MoveTargetInput<ContainerValue>) => {
+            const sourceIds = [ ...source.ids ];
+
+            const sourceIdsCurrentPositions = sourceIds.reduce<Record<string, number>>((acc, id) => {
+                return {
+                    ...acc,
+                    [ id ]: positions[ id ]!.pos,
+                };
+            }, {});
+
+            return getDropPositions(target.targetPosition, [ ...source.ids ], sourceIdsCurrentPositions);
+        };
+
+        const containerFns: Pick<SelectContext<ContainerValue>, 'getContainerHash' | 'getContainerValue'> = {
+            getContainerHash: value => value.box ? String(value.box) : '',
+            getContainerValue: hash => ({
+                type: 'slot',
+                bankId: '',
+                box: Number(hash),
+            }),
+        };
+
+        return <SelectProvider<ContainerValue>
             {...containerFns}
         >
-            <SelectProvider<ContainerValue>
+            <MoveProvider<ContainerValue>
                 {...containerFns}
+                moveContainerId='move-container'
+                getTargetAllPositions={getTargetAllPositions}
+                onDrop={onDrop}
             >
                 <Stack
                     id='move-container' pos='relative'
@@ -206,7 +238,7 @@ export const Primary: Story = {
                         {getBoxItems(2)}
                     </Group>
                 </Stack>
-            </SelectProvider>
-        </MoveProvider>;
+            </MoveProvider>
+        </SelectProvider>;
     },
 };

@@ -8,6 +8,7 @@ type Options = {
 
 type ControlsProps = {
     onClick?: React.MouseEventHandler;
+    onPointerDown?: React.PointerEventHandler;
     'data-controls': string;
     'data-controls-order': number;
     'data-controls-enabled'?: boolean;
@@ -43,16 +44,25 @@ export const useControls = (id: ControlId, focused: boolean, order: number, cont
         };
     }, [enabled, focused, id, order, useControlsStore]);
 
-    const onClick = React.useCallback<React.MouseEventHandler>(() => {
+    const onClick = React.useCallback<React.MouseEventHandler>(e => {
         const clickAction = controlsRef.current.find((c): c is ControlAction =>
             !!c && !!c?.triggers.mouse?.values.includes('left-click')
         )?.action;
 
-        clickAction?.('mouse', 'left-click');
+        clickAction?.(e, 'mouse', 'left-click');
+    }, []);
+
+    const onPointerDown = React.useCallback<React.PointerEventHandler>(e => {
+        const clickAction = controlsRef.current.find((c): c is ControlAction =>
+            !!c && !!c?.triggers.mouse?.values.includes('drag')
+        )?.action;
+
+        clickAction?.(e, 'mouse', 'drag');
     }, []);
 
     return {
         onClick,
+        onPointerDown,
         'data-controls': controls.map(c => c && c.name).filter(Boolean).join('-'),
         'data-controls-order': order,
         'data-controls-enabled': enabled || undefined,

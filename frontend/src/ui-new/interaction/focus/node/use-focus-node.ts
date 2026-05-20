@@ -1,15 +1,15 @@
-import { useFocusable } from '@noriginmedia/norigin-spatial-navigation-react';
+import { useFocusable, type UseFocusableConfig } from '@noriginmedia/norigin-spatial-navigation-react';
 import React from 'react';
 import type { FocusNodeId } from '../provider/focus-context';
 import { Focus } from '../provider/use-focus-context';
 import { useFocusScopeContext, useFocusScopeSelect } from '../scope/use-focus-scope-context';
 
-export type UseFocusNodeParams = {
+export type UseFocusNodeParams = Pick<UseFocusableConfig<unknown>, 'onFocus'> & {
   scopeNodeId: FocusNodeId;
   focusOnMount?: boolean;
 };
 
-export const useFocusNode = <E extends HTMLElement>({ scopeNodeId, focusOnMount }: UseFocusNodeParams) => {
+export const useFocusNode = <E extends HTMLElement>({ scopeNodeId, focusOnMount, onFocus }: UseFocusNodeParams) => {
   const { scopeId } = useFocusScopeContext();
   const selectScope = useFocusScopeSelect();
 
@@ -26,7 +26,7 @@ export const useFocusNode = <E extends HTMLElement>({ scopeNodeId, focusOnMount 
     trackChildren: false,
     isFocusBoundary: false,
     preferredChildFocusKey: undefined,
-    // onFocus: () => console.log('focused', nodeId),
+    onFocus,
   });
 
   React.useEffect(() => {

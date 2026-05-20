@@ -18,7 +18,7 @@ export const getMoveControl = (partial: Omit<ControlActionInput, 'name' | 'trigg
         },
     },
     spread: true,
-    action: function (state, value) {
+    action: function (e, state, value) {
         switch (state) {
             case 'gamepad':
                 switch (value as GamepadMappingsAllButton) {

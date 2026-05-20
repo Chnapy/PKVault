@@ -43,7 +43,7 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
                 for (const key of keys) {
                     if (e.key === key) {
-                        control.action(getState().currentType, key);
+                        control.action(e, getState().currentType, key);
                     }
                 }
             }
@@ -64,7 +64,7 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
                 console.info('gamepad pressed', e.detail.button, e.detail.pressedSuite, { control });
 
-                control?.action(getState().currentType, e.detail.button);
+                control?.action(e, getState().currentType, e.detail.button);
             }
         });
 
