@@ -1,5 +1,4 @@
 import { useMoveContext } from '../context/use-move-context';
-import { useDragRender } from './dragging/use-drag-render';
 import { useDragTriggers } from './dragging/use-drag-triggers';
 
 export type UseDraggingReturn = ReturnType<typeof useDragging>;
@@ -19,12 +18,10 @@ export const useDragging = function <C>(entityId: string, containerValue: C) {
         && state.source.ids.has(entityId));
 
     const { ref, ...triggers } = useDragTriggers(entityId, containerValue, isDragging);
-    const renderDragItem = useDragRender(ref, isDragging);
 
     return {
         ref,
         ...triggers,
         isDragging,
-        renderDragItem,
     };
 };

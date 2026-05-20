@@ -13,6 +13,7 @@ import { FocusControlsProvider } from './focus-controls/provider/focus-controls-
 import { useFocusControls } from './focus-controls/use-focus-controls';
 import { Focus } from './focus/provider/use-focus-context';
 import { FocusScope } from './focus/scope/focus-scope';
+import { DragRender } from './move/components/drag-render';
 import type { MoveTargetInput } from './move/context/move-context';
 import { MoveProvider } from './move/context/move-provider';
 import { useDragSubmitting } from './move/hooks/use-drag-submitting';
@@ -172,9 +173,9 @@ const FakeItem: React.FC<{
             onClick={() => checked ? removeId([ name ]) : addId(container, [ name ])}
         />
 
-        {dragging.renderDragItem(
-            renderBtn({})
-        )}
+        {dragging.isDragging && <DragRender>
+            {renderBtn({})}
+        </DragRender>}
     </Group>;
 };
 
@@ -260,8 +261,7 @@ const FakeFooter: React.FC = () => {
                     {controlId}<br />
                     {controls.map(c => <Badge
                         key={c.label}
-                        leftSection={c.trigger.values.map(value =>
-                            getControlIcon(c.trigger.type, value))}
+                        leftSection={getControlIcon(c.trigger.type, c.trigger.values)}
                         size='lg'
                     >
                         {c.label}

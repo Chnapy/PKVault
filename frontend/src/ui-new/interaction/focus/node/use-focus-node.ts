@@ -26,7 +26,11 @@ export const useFocusNode = <E extends HTMLElement>({ scopeNodeId, focusOnMount,
     trackChildren: false,
     isFocusBoundary: false,
     preferredChildFocusKey: undefined,
-    onFocus,
+    onFocus: (layout, props, details) => {
+      layout.node.focus();
+
+      onFocus?.(layout, props, details);
+    },
   });
 
   React.useEffect(() => {

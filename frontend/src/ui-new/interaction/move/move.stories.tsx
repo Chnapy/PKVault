@@ -4,6 +4,7 @@ import React, { type HTMLProps } from 'react';
 import type { SelectContext } from '../select/context/select-context';
 import { SelectProvider } from '../select/context/select-provider';
 import { useSelectContextActions, useSelectHasValue } from '../select/context/use-select-context';
+import { DragRender } from './components/drag-render';
 import type { MoveTargetInput, MoveTargetOutput } from './context/move-context';
 import { MoveProvider } from './context/move-provider';
 import { getDropPositions } from './hooks/get-drop-positions';
@@ -39,22 +40,23 @@ const FakeItemDraggable: React.FC<{
         box,
     };
 
-    const checked = useSelectHasValue<ContainerValue>(container, [ name ]);
-    const { addId, removeId } = useSelectContextActions<ContainerValue>();
-
-    const dragging = useDragging<ContainerValue>(name, container);
-
     const targetContainer: ContainerValue = {
         type: 'slot',
         bankId: '',
         box,
     };
 
+    const checked = useSelectHasValue<ContainerValue>(container, [ name ]);
+    const { addId, removeId } = useSelectContextActions<ContainerValue>();
+
+    const dragging = useDragging<ContainerValue>(name, container);
+
     const droppable = useDroppable<ContainerValue>({
         targetContainer,
         targetPosition: pos,
         targetId: name,
     });
+    // console.log('render drag', box, pos, droppable);
 
     const submitting = useDragSubmitting<ContainerValue>(container, pos, name);
 
@@ -66,6 +68,8 @@ const FakeItemDraggable: React.FC<{
         {children ?? pos} = {name}
     </Button>;
 
+    const disabled = dragging.isDragging || submitting;
+
     return <>
         <Button.Group>
             {getRender({
@@ -73,8 +77,9 @@ const FakeItemDraggable: React.FC<{
                 onClick: droppable.onClick ?? dragging.toggleDragByClick,
                 onPointerDown: dragging.onPointerDown,
                 onPointerUp: droppable.onPointerUp,
-                disabled: dragging.isDragging || submitting,
+                disabled,
                 loading: submitting,
+                style: { pointerEvents: disabled ? 'none' : undefined }
             })}
 
             <Button
@@ -92,9 +97,9 @@ const FakeItemDraggable: React.FC<{
             </Button>
         </Button.Group>
 
-        {dragging.renderDragItem(
-            getRender({})
-        )}
+        {dragging.isDragging && <DragRender>
+            {getRender({})}
+        </DragRender>}
     </>;
 };
 
@@ -167,7 +172,7 @@ export const Primary: Story = {
         const onDrop = async (source: MoveSource, target: MoveTargetOutput<ContainerValue>) => {
             await new Promise(r => setTimeout(r, 500));
 
-            // console.log(source, target);
+            console.log('drop', source, target);
 
             setPositions(positions => {
                 const sourceIds = [ ...source.ids ];

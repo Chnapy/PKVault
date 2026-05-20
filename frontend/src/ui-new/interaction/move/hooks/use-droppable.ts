@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/shallow';
 import type { MoveTargetInput } from '../context/move-context';
 import { useMoveContext } from '../context/use-move-context';
 
@@ -14,24 +15,27 @@ export type UseMoveDroppableReturn = {
 export const useDroppable = <C>(target: MoveTargetInput<C>): UseMoveDroppableReturn => {
     const { useMoveStore, drop } = useMoveContext<C>();
 
-    const isDroppable = useMoveStore(({ state }) =>
-        state.status === 'dragging' 
-        && state.source.ids.size > 0
-        && (
-            !target.targetId
-            || state.source.sourceId !== target.targetId
-        ));
+    const { isDroppable, clickable, pointerUp } = useMoveStore(useShallow(({ state }) => {
 
-    const clickable = useMoveStore(({ state }) =>
-        state.status === 'dragging' && state.trigger !== 'drag');
+        const isDroppable = state.status === 'dragging' 
+            && state.source.ids.size > 0
+            && (
+                !target.targetId
+                || state.source.sourceId !== target.targetId
+            );
+        
+        return ({
+            isDroppable,
+            clickable: isDroppable && state.trigger !== 'drag',
+            pointerUp: isDroppable && state.trigger === 'drag',
+        });
+    }));
 
     if (!isDroppable) {
         return {
             isDroppable: false,
         };
     }
-
-    const pointerUp = !clickable;
 
     const onDrop = () => drop(target);
 

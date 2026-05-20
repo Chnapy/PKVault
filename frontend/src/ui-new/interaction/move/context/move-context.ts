@@ -1,3 +1,4 @@
+import type { Vector2 } from '@use-gesture/react';
 import React from 'react';
 import { create } from 'zustand';
 import { moveReducer } from '../state/move-reducer';
@@ -16,10 +17,18 @@ export type MoveTargetOutput<C> = MoveTargetInput<C> & {
     targetId: string | undefined;
 };
 
+export type MovePositions = {
+    scroll: Vector2;
+    pointer: Vector2;
+    pointerInitial: Vector2;
+    drag: Vector2;
+}; 
+
 export type MoveContext<C> = {
     moveContainerId: string;
     getContainerValue: (containerHash: string) => C;
     getContainerHash: (containerValue: C) => string;
+    positionsRef: React.RefObject<MovePositions>;
     useMoveStore: ReturnType<typeof createMoveStore>;
     drop: (target: MoveTargetInput<C>) => Promise<unknown>;
 };

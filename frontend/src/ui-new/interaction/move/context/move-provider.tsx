@@ -1,7 +1,7 @@
 import { useGesture, useScroll } from '@use-gesture/react';
 import React from 'react';
 import type { MoveSource, MoveStateLoading } from '../state/move-state';
-import { createMoveStore, moveContext, type MoveContext, type MoveTargetInput, type MoveTargetOutput } from './move-context';
+import { createMoveStore, moveContext, type MoveContext, type MovePositions, type MoveTargetInput, type MoveTargetOutput } from './move-context';
 
 type MoveProviderProps<C> = Pick<MoveContext<C>, 'moveContainerId' | 'getContainerHash' | 'getContainerValue'> & {
     getTargetAllPositions: (source: MoveSource, target: MoveTargetInput<C>) => Record<string, number>;
@@ -14,6 +14,13 @@ export const MoveProvider = function <C>({
     onDrop: onDropSuccess, getTargetAllPositions,
     children
 }: MoveProviderProps<C>) {
+    const positionsRef = React.useRef<MovePositions>({
+        scroll: [ window.scrollX, window.scrollY ],
+        pointer: [ 0, 0 ],
+        pointerInitial: [ 0, 0 ],
+        drag: [ 0, 0 ],
+    });
+
     const [ value ] = React.useState((): MoveContext<C> => {
 
         const useMoveStore = createMoveStore();
@@ -57,6 +64,7 @@ export const MoveProvider = function <C>({
             moveContainerId,
             getContainerHash,
             getContainerValue,
+            positionsRef,
             useMoveStore,
             drop,
         };
@@ -65,24 +73,22 @@ export const MoveProvider = function <C>({
     const dispatch = value.useMoveStore.getState().dispatch;
 
     useScroll(({ initial, movement }) => {
-        dispatch({
-            type: 'UPDATE_SCROLL',
-            position: [
-                initial[ 0 ] + movement[ 0 ],
-                initial[ 1 ] + movement[ 1 ],
-            ],
-        });
+        positionsRef.current.scroll = [
+            initial[ 0 ] + movement[ 0 ],
+            initial[ 1 ] + movement[ 1 ],
+        ];
     }, {
         target: window,
     });
 
     useGesture({
         onPointerMove: ({ event }) => {
-            dispatch({
-                type: 'UPDATE_POINTER',
-                position: [ event.clientX, event.clientY ],
-                scrollPosition: [ window.scrollX, window.scrollY ],
-            });
+            positionsRef.current.pointer = [ event.clientX, event.clientY ];
+
+            if (!positionsRef.current.pointerInitial[ 0 ] && !positionsRef.current.pointerInitial[ 1 ])
+                positionsRef.current.pointerInitial = positionsRef.current.pointer;
+
+            // positionsRef.current.scroll = [ window.scrollX, window.scrollY ];
         },
         onClick: () => {
             dispatch({ type: 'CANCEL' });
