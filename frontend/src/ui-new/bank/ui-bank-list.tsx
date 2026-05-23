@@ -28,6 +28,7 @@ export const UIBankList: React.FC<UIBankListProps> = ({ value, data, onSelect, o
         level={2}
         controlsEnabled={isInCurrentPanel}
         controlsLabel='Change bank'
+        controlsDetailsLabel='See all banks'
         variant="pills"
         value={value}
         data={data}

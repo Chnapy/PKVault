@@ -76,16 +76,18 @@ const loop = (delta: number, states: GamepadStates) => {
                 if (state.pressedSuite === 0) {
                     state.pressedSuite++;
                     // trigger
-                    sendGamepadEvent(gp.id, state.type, state.value, state.pressedSuite);
+                    sendGamepadEvent(gp.id, 'down', state.type, state.value, state.pressedSuite);
                 } else {
                     if (state.timeStack - secondPressDelay > nextPressDelay) {
                         state.timeStack = secondPressDelay;
                         state.pressedSuite++;
                         // trigger
-                        sendGamepadEvent(gp.id, state.type, state.value, state.pressedSuite);
+                        sendGamepadEvent(gp.id, 'down', state.type, state.value, state.pressedSuite);
                     }
                 }
-            } else {
+            } else if (state.pressed) {
+                // trigger
+                sendGamepadEvent(gp.id, 'up', state.type, state.value, state.pressedSuite);
                 state.pressed = false;
                 state.pressedSuite = 0;
                 state.timeStack = 0;

@@ -16,6 +16,8 @@ import gpDPadLeft from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad
 import gpDPadRight from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad_right.svg?react';
 import gpDPadUp from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad_up.svg?react';
 
+import keepPress from '../../assets/input_icons/Flairs/Vector/flair_circle_red_3.svg?react';
+
 export type InputIcon = typeof gpA;
 
 export const inputIconResources = {
@@ -39,5 +41,8 @@ export const inputIconResources = {
         DPadDown: gpDPadDown,
         DPadLeft: gpDPadLeft,
         DPadRight: gpDPadRight,
+    },
+    misc: {
+        keepPress,
     },
 };

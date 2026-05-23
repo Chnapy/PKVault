@@ -21,6 +21,7 @@ export const UIDetailsSaves: React.FC<UIDetailsSavesProps> = ({ value, data, onS
         level={2}
         controlsEnabled={scopeActive}
         controlsLabel='Change variant'
+        controlsDetailsLabel='See all variants'
         value={value}
         data={data}
         onChange={onSelect}

@@ -34,6 +34,7 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ va
             level={1}
             controlsEnabled={scopeActive && isInCurrentPanel}
             controlsLabel='Change box'
+            controlsDetailsLabel='See all boxes'
             variant='pills'
             value={value}
             data={data}

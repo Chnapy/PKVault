@@ -65,17 +65,47 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const removeGamepadListener = addGamepadEventListener(e => {
             updateState('gamepad');
 
-            if (e.detail.button) {
+            if (!e.detail.button)
+                return;
 
-                const control = getSortedFilteredControls()
-                    // take first control, avoiding conflicts
-                    .find(c => c.triggers.gamepad?.values.includes(e.detail.button!)
-                        && (e.detail.pressedSuite <= 1 || c.triggers.gamepad.allowPressedSuite)
-                    );
+            const controls = getSortedFilteredControls()
+                .filter(c => c.triggers.gamepad?.values.includes(e.detail.button!));
 
-                console.info('gamepad pressed', e.detail.button, e.detail.pressedSuite, { control });
+            const controlWithPressedSuite = controls
+                .find(c => c.triggers.gamepad?.allowPressedSuite);
 
-                control?.action(e as never, getState().currentType, e.detail.button);
+            if (e.detail.trigger === 'down' && controlWithPressedSuite) {
+                const interval = controlWithPressedSuite.triggers.gamepad?.allowPressedSuite ?? 0;
+                const shouldTrigger = !(e.detail.pressedSuite % interval);
+                if (!shouldTrigger)
+                    return;
+
+                console.info('gamepad pressing', e.detail.button, e.detail.pressedSuite, shouldTrigger, { controlWithPressedSuite });
+
+                controlWithPressedSuite.action(e as never, getState().currentType, e.detail.button);
+            }
+
+            else if (e.detail.pressedSuite <= 1) {
+
+                const controlBasic = controls
+                    .find(c => !c.triggers.gamepad?.allowPressedSuite);
+                if (!controlBasic)
+                    return;
+
+                const triggerBasicPress = controlBasic.triggers.gamepad?.allowOnFocus
+                    ? e.detail.trigger === 'down'
+                    // Mostly use 'up' to avoid cases when controls change between down & up
+                    : e.detail.trigger === 'up';
+                // const triggerBasicPress = controlWithPressedSuite
+                //     ? e.detail.trigger === 'up'
+                //     : e.detail.trigger === 'down';
+
+                if (!triggerBasicPress)
+                    return;
+
+                console.info('gamepad pressed', e.detail.button, { controlBasic });
+
+                controlBasic.action(e as never, getState().currentType, e.detail.button);
             }
         });
 

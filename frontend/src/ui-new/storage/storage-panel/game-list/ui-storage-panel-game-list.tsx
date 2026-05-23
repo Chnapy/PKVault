@@ -24,6 +24,7 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
         level={2}
         controlsEnabled={scopeActive && isInCurrentPanel}
         controlsLabel='Change game'
+        controlsDetailsLabel='See all games'
         value={value}
         data={data}
         onChange={onChange}

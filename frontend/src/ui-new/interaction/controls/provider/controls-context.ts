@@ -19,7 +19,7 @@ export type ControlListenerAttributes = Pick<React.DOMAttributes<any>, ControlLi
 export type ControlTrigger<T extends ControlTriggerType = ControlTriggerType> = {
     type: T;
     values: ControlTriggerValues[T][];
-    allowPressedSuite?: boolean;
+    allowPressedSuite?: number;
     allowOnFocus?: boolean;
     listeners?: ControlListenerName[];
 };

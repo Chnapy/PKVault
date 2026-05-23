@@ -1,6 +1,9 @@
 import { ActionIcon, Stack, Tabs, type TabsProps } from '@mantine/core';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import React from 'react';
+import type { GamepadMappingsAllButton } from '../interaction/controls/gamepad/gamepad-mapper';
+import { useControls } from '../interaction/controls/use-controls';
+import { useFocusScopeContext } from '../interaction/focus/scope/use-focus-scope-context';
 import { ScrollerControlled, type ScrollerControlledProps } from '../scroller-controlled/scroller-controlled';
 
 type Data = {
@@ -34,17 +37,56 @@ type UIExpandableTabsOwnProps<D extends Data> = {
 type UIExpandableTabsProps<D extends Data> =
     UIExpandableTabsOwnProps<D>
     & Pick<ScrollerControlledProps, 'id' | 'level' | 'controlsEnabled' | 'controlsLabel'>
-    & Omit<TabsProps, keyof UIExpandableTabsOwnProps<D>>;
+    & Omit<TabsProps, keyof UIExpandableTabsOwnProps<D>>
+    & {
+        controlsDetailsLabel: string;
+    };
 
 export function UIExpandableTabs<D extends Data = Data>({
-    id, level, controlsEnabled, controlsLabel,
+    id, level, controlsEnabled, controlsLabel, controlsDetailsLabel,
     value, data, onChange, renderTab, renderExpanded,
     left, right, grow = true,
     ...tabsProps
 }: UIExpandableTabsProps<D>) {
     const [ expanded, setExpanded ] = React.useState(false);
 
+    const parentScope = useFocusScopeContext();
+    const order = parentScope.parentsIds.length;
+
+    const enabled = controlsEnabled;
+
+    // console.log('scroller', id, parentScope);
+
+    const gamepadValues: [ GamepadMappingsAllButton, GamepadMappingsAllButton ] = level === 1
+        ? [ 'LB', 'RB' ]
+        : [ 'LT', 'RT' ];
+
+    const controlsProps = useControls(
+        id + '-detailed',
+        true,
+        order,
+        [
+            {
+                name: 'tabs-detailed-' + id,
+                label: controlsDetailsLabel,
+                triggers: {
+                    gamepad: {
+                        type: 'gamepad',
+                        values: gamepadValues,
+                        allowPressedSuite: 4,
+                    },
+                },
+                spread: false,
+                action: () => {
+                    setExpanded(value => !value)
+                },
+            }
+        ],
+        { enabled },
+    );
+
     return <Tabs
+        {...controlsProps}
         value={value.toString()}
         onChange={tabId => tabId && onChange(tabId)}
         miw={0}

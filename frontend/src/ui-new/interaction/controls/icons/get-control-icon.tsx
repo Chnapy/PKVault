@@ -4,9 +4,12 @@ import type { GamepadMappingsAllButton } from '../gamepad/gamepad-mapper';
 import type { ControlTriggerType, ControlTriggerValues, MouseMappings } from '../provider/controls-context';
 import classes from './control-icon.module.css';
 
-const inputIcon = (Icon: InputIcon, i?: number) => <Icon key={i} viewBox="0 0 64 64" className={classes.controlIcon} />;
+const inputIcon = (Icon: InputIcon, i?: number, props?: React.SVGProps<SVGSVGElement>) => <Icon key={i} viewBox="0 0 64 64" className={classes.controlIcon} {...props} />;
 
-export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values: ControlTriggerValues[ T ][]) => {
+export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values: ControlTriggerValues[ T ][], allowPressedSuite: number = 0) => {
+
+    const keepPressed = allowPressedSuite > 1;
+
     // TODO
     switch (trigger) {
         case 'mouse':
@@ -43,7 +46,18 @@ export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values:
                     gpIcons.push(gpIcon);
             });
 
-            return gpIcons.map(inputIcon);
+            return gpIcons.map((icon, i) => inputIcon(icon, i)).map((icon, i) => keepPressed
+                ? <div key={i} style={{ display: 'flex', position: 'relative' }}>
+                    {icon}
+
+                    {inputIcon(inputIconResources.misc.keepPress, undefined, {
+                        style: {
+                            position: 'absolute',
+                            color: 'var(--mantine-color-gray-4)',
+                        }
+                    })}
+                </div>
+                : icon)
         }
     }
 };

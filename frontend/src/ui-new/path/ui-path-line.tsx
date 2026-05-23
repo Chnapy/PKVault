@@ -1,4 +1,5 @@
 import { Tooltip } from '@mantine/core';
+import classes from './ui-path-line.module.css';
 
 export const UIPathLine: React.FC<{ children: string }> = ({ children }) => {
     const parts = children.split('/');
@@ -8,21 +9,11 @@ export const UIPathLine: React.FC<{ children: string }> = ({ children }) => {
     const firstPartsStr = parts.join('/');
 
     return <Tooltip label={children}>
-        <span
-            style={{
-                maxWidth: '100%',
-                display: 'inline-flex',
-                alignItems: 'center',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-            }}
-        >
+        <span className={classes.uiPathLine}>
             {firstPartsStr && <>
                 <span
+                    className={classes.firstPart}
                     style={{
-                        opacity: 0.5,
-                        textOverflow: 'ellipsis',
-                        overflow: 'hidden',
                         minWidth: !firstPartsStr || firstPartsStr === '.' ? undefined : 10,
                     }}
                 >

@@ -74,7 +74,7 @@ const FakeItemDraggable: React.FC<{
         <Button.Group>
             {getRender({
                 ref: dragging.ref,
-                onClick: droppable.onClick ?? dragging.toggleDragByClick,
+                onClick: e => (droppable.onClick ?? dragging.toggleDragByClick)(e as never, null),
                 onPointerDown: dragging.onPointerDown,
                 onPointerUp: droppable.onPointerUp,
                 disabled,

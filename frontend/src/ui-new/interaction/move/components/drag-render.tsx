@@ -2,6 +2,7 @@ import type { Vector2 } from '@use-gesture/react';
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { useMoveContext } from '../context/use-move-context';
+import classes from './drag-render.module.css';
 
 type DragRenderProps = {
     elementRef: React.RefObject<HTMLButtonElement | null>;
@@ -78,12 +79,7 @@ export const DragRender: React.FC<DragRenderProps> = ({ elementRef, children }) 
     return createPortal(
         <div
             ref={dragRef}
-            style={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                pointerEvents: 'none',
-            }}
+            className={classes.dragRender}
         >
             {children}
         </div>,

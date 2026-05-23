@@ -31,7 +31,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
         positionsRef.current.drag = position;
     };
 
-    const startDrag = (e: PossibleEvent | undefined, trigger: DraggingTrigger, position: Vector2) => {
+    const startDrag = <P>(e: PossibleEvent | undefined, trigger: DraggingTrigger, position: Vector2, params: P) => {
         // pointerUp often triggers click event with exact same timeStamp
         if (e?.timeStamp && dragEndTimestampRef.current
             && e.timeStamp - dragEndTimestampRef.current < 50
@@ -53,24 +53,25 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
                 containerId: containerHash,
                 sourceId: entityId,
                 ids: getAllIds(),
+                params,
             },
             trigger,
         });
     };
 
-    const startDragByDrag = (e: PossibleEvent | undefined, position: Vector2) => startDrag(e, 'drag', position);
+    const startDragByDrag = (e: PossibleEvent | undefined, position: Vector2) => startDrag(e, 'drag', position, null);
 
-    const startDragByClick = (e: PossibleEvent | undefined, position: Vector2) => {
+    const startDragByClick = <P>(e: PossibleEvent | undefined, position: Vector2, params: P) => {
 
         positionsRef.current.pointerInitial = position;
         positionsRef.current.pointer = position;
 
-        startDrag(e, 'click', position);
+        startDrag(e, 'click', position, params);
     };
 
-    const startDragByFocus = (e: PossibleEvent | undefined, position: Vector2) => startDrag(e, 'focus', position);
+    const startDragByFocus = <P>(e: PossibleEvent | undefined, position: Vector2, params: P) => startDrag(e, 'focus', position, params);
 
-    const toggleDragByClick = (e: PossibleEvent | undefined) => {
+    const toggleDragByClick = <P>(e: PossibleEvent | undefined, params: P) => {
         if (!ref.current) return;
 
         e?.stopPropagation?.();
@@ -84,11 +85,11 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
         } else {
             const { left, top } = ref.current.getBoundingClientRect();
 
-            startDragByClick(e, [ left, top ]);
+            startDragByClick(e, [ left, top ], params);
         }
     };
 
-    const toggleDragByFocus = (e: PossibleEvent | undefined) => {
+    const toggleDragByFocus = <P>(e: PossibleEvent | undefined, params: P) => {
         if (!ref.current) return;
 
         e?.stopPropagation?.();
@@ -102,7 +103,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
         } else {
             const { left, top } = ref.current.getBoundingClientRect();
 
-            startDragByFocus(e, [ left, top ]);
+            startDragByFocus(e, [ left, top ], params);
         }
     };
 

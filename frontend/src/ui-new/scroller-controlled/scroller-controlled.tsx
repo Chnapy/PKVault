@@ -41,7 +41,8 @@ export const ScrollerControlled: React.FC<ScrollerControlledProps> = ({ id, leve
                     gamepad: {
                         type: 'gamepad',
                         values: gamepadValues,
-                        allowPressedSuite: true,
+                        // allowPressedSuite: true,
+                        // TODO keep pressing should open detailed view
                     },
                 },
                 spread: false,

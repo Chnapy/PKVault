@@ -35,8 +35,11 @@ export const useAllCurrentControls = () => {
                     trigger: triggers[ currentType ]!,
                 }));
 
-            const controlsFiltered = currentControls.filter(c1 => !accControls.some(c2 =>
-                c1.trigger.values.join() === c2.trigger.values.join()));
+            const controlsFiltered = currentControls.filter(c1 => {
+                const c1Hash = c1.trigger.values.join() + (c1.trigger.allowPressedSuite ?? 0);
+
+                return !accControls.some(c2 => c1Hash === c2.trigger.values.join() + (c2.trigger.allowPressedSuite ?? 0))
+            });
 
             return controlsFiltered.length > 0
                 ? {

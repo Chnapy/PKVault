@@ -2,12 +2,15 @@ import { getGamepadMapping, type GamepadMappingsAllButton, type GamepadMappingTy
 
 const eventType = 'gamepad_pressed';
 
+type EventTrigger = 'down' | 'up';
+
 type GamepadEvent = CustomEvent<{
     button: GamepadMappingsAllButton | undefined;
+    trigger: EventTrigger;
     pressedSuite: number;
 }>;
 
-export const sendGamepadEvent = (gamepadId: string, type: GamepadMappingType, value: number, pressedSuite: number) => {
+export const sendGamepadEvent = (gamepadId: string, trigger: EventTrigger, type: GamepadMappingType, value: number, pressedSuite: number) => {
     const button = getGamepadMapping(gamepadId, type, value);
 
     if (!button) {
@@ -21,6 +24,7 @@ export const sendGamepadEvent = (gamepadId: string, type: GamepadMappingType, va
     const event: GamepadEvent = new CustomEvent(eventType, {
         detail: {
             button,
+            trigger,
             pressedSuite,
         },
     });

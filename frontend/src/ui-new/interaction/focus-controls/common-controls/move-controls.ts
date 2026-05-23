@@ -13,12 +13,12 @@ export const getMoveControl = (partial: Omit<ControlActionInput, 'name' | 'trigg
         keyboard: {
             type: 'keyboard',
             values: [ 'move' ],
-            allowPressedSuite: true,
+            allowPressedSuite: 1,
         },
         gamepad: {
             type: 'gamepad',
             values: [ 'DPadLeft', 'DPadRight', 'DPadUp', 'DPadDown', 'LStickLeft', 'LStickRight', 'LStickUp', 'LStickDown' ],
-            allowPressedSuite: true,
+            allowPressedSuite: 1,
         },
     },
     spread: true,

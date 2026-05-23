@@ -257,7 +257,7 @@ const FakeFooter: React.FC = () => {
                 gap='lg'
             >
                 {controls.map(c => <Group key={c.name}>
-                    {getControlIcon(c.trigger.type, c.trigger.values)}
+                    {getControlIcon(c.trigger.type, c.trigger.values, c.trigger.allowPressedSuite)}
                     {c.label}
                 </Group>)}
             </Group>)}

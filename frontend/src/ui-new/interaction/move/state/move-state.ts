@@ -1,8 +1,9 @@
 
-export type MoveSource = {
+export type MoveSource<P = unknown> = {
     containerId: string;
     sourceId: string;
     ids: Set<string>;
+    params: P;
 };
 
 type MoveTarget = {

@@ -24,7 +24,7 @@ export const UIFooter: React.FC = () => {
         >
             {controls.map(c => <Group key={c.name} gap='sm'>
                 <Group gap='xs'>
-                    {getControlIcon(c.trigger.type, c.trigger.values)}
+                    {getControlIcon(c.trigger.type, c.trigger.values, c.trigger.allowPressedSuite)}
                 </Group>
                 {c.label}
             </Group>)}
