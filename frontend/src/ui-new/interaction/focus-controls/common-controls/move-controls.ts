@@ -6,6 +6,10 @@ export const getMoveControl = (partial: Omit<ControlActionInput, 'name' | 'trigg
     ...partial,
     name: 'move',
     triggers: {
+        mouse: {
+            type: 'mouse',
+            values: [ 'move' ],
+        },
         keyboard: {
             type: 'keyboard',
             values: [ 'move' ],

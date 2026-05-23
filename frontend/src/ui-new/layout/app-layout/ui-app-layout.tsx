@@ -1,5 +1,6 @@
 import { Container, Grid, Stack } from '@mantine/core';
 import type React from 'react';
+import { useControlsCurrentType } from '../../interaction/controls/use-controls-current-type';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import { UIFrame } from '../frame/ui-frame';
 
@@ -11,7 +12,11 @@ type UIAppLayoutProps = {
 };
 
 export const UIAppLayout: React.FC<UIAppLayoutProps> = ({ header, bottom, footer, children }) => {
-    return <UIFrame>
+    const controlsCurrentType = useControlsCurrentType();
+
+    return <UIFrame
+        data-controls-type={controlsCurrentType}
+    >
         {header}
 
         <UISpriteSizeWrapper<typeof Container>

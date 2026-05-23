@@ -2,6 +2,9 @@ import { ActionIcon, Checkbox, Divider, Group, Tabs, Text } from '@mantine/core'
 import { BoxIcon, CirclePlusIcon, EllipsisVerticalIcon } from 'lucide-react';
 import React from 'react';
 import { UIExpandableTabs } from '../../../expandable-tabs/ui-expandable-tabs';
+import { Focus } from '../../../interaction/focus/provider/use-focus-context';
+import { useFocusScopeContext } from '../../../interaction/focus/scope/use-focus-scope-context';
+import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
 import { UIBoxExpanded } from './ui-box-expanded';
 import classes from './ui-storage-panel-box-list.module.css';
 
@@ -20,9 +23,17 @@ export type UIStoragePanelBoxListProps = {
 };
 
 export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ value, data, onSelect, onDelete }) => {
+    const parentScope = useFocusScopeContext();
+    const scopeActive = Focus.useIsScopeActive(parentScope.scopeId);
+
+    const { isInCurrentPanel } = useCurrentPanel();
 
     return <Group align='flex-start' wrap='nowrap'>
         <UIExpandableTabs
+            id='boxes'
+            level={1}
+            controlsEnabled={scopeActive && isInCurrentPanel}
+            controlsLabel='Change box'
             variant='pills'
             value={value}
             data={data}

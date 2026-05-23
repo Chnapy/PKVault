@@ -102,6 +102,7 @@
     "vite": "^8.0.3",
     "vite-css-modules": "^1.16.0",
     "vite-plugin-image-optimizer": "^2.0.3",
+    "vite-plugin-svgr": "^5.2.0",
     "vitest": "^4.1.2"
   }
 }

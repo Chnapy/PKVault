@@ -4,7 +4,7 @@ import classes from './ui-icon.module.css';
 
 export type UIIconProps = {
     size?: 'small' | 'medium' | 'big';
-} & React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
+} & Omit<React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>, 'height' | 'width'>;
 
 export const UIIcon: React.FC<UIIconProps> = ({ size, className, ...rest }) => {
     return <img

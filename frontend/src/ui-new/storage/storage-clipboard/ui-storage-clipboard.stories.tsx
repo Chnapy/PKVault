@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Small as StorageItemPlaceholderSmall } from '../storage-item/placeholder/ui-storage-item-placeholder.stories';
 import { UIStorageItem } from '../storage-item/ui-storage-item';
-import { UIStorageItemPlaceholder } from '../storage-item/ui-storage-item-placeholder';
-import { Small as StorageItemPlaceholderSmall } from '../storage-item/ui-storage-item-placeholder.stories';
+import { UIStorageItemPlaceholder } from '../storage-item/placeholder/ui-storage-item-placeholder';
 import { Small as StorageItemSmall } from '../storage-item/ui-storage-item.stories';
 import { UIStorageClipboard } from './ui-storage-clipboard';
 

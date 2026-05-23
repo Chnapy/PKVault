@@ -7,9 +7,9 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }));
 
   // debug logging
-  // React.useEffect(() => {
-  //   console.log('focus', data);
-  // }, [ data ]);
+  React.useEffect(() => {
+    data.useFocusStore.subscribe(s => console.log('scopeStack', s.scopeStack))
+  }, [ data ]);
 
   return (
     <focusRefsContext.Provider value={data}>

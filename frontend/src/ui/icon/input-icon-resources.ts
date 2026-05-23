@@ -1,20 +1,29 @@
+import mouseLeft from '../../assets/input_icons/KeyboardMouse/Vector/mouse_left.svg?react';
+import mouseRight from '../../assets/input_icons/KeyboardMouse/Vector/mouse_right.svg?react';
+import mouseMove from '../../assets/input_icons/KeyboardMouse/Vector/mouse_move.svg?react';
 
-import gpA from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_a.svg';
-import gpB from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_b.svg';
-import gpL1 from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_l1.svg';
-import gpL2 from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_l2.svg';
-import gpR1 from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_r1.svg';
-import gpR2 from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_r2.svg';
-import gpX from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_x.svg';
-import gpY from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_y.svg';
-import gpDPad from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad.svg';
-import gpDPadDown from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad_down.svg';
-import gpDPadLeft from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad_left.svg';
-import gpDPadRight from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad_right.svg';
-import gpDPadUp from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad_up.svg';
+import gpA from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_a.svg?react';
+import gpB from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_b.svg?react';
+import gpL1 from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_l1.svg?react';
+import gpL2 from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_l2.svg?react';
+import gpR1 from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_r1.svg?react';
+import gpR2 from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_r2.svg?react';
+import gpX from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_x.svg?react';
+import gpY from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_y.svg?react';
+import gpDPad from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad.svg?react';
+import gpDPadDown from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad_down.svg?react';
+import gpDPadLeft from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad_left.svg?react';
+import gpDPadRight from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad_right.svg?react';
+import gpDPadUp from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad_up.svg?react';
+
+export type InputIcon = typeof gpA;
 
 export const inputIconResources = {
-    mouse: {},
+    mouse: {
+        leftClick: mouseLeft,
+        rightClick: mouseRight,
+        move: mouseMove,
+    },
     keyboard: {},
     gamepad: {
         A: gpA,

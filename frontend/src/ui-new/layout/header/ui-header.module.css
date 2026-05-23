@@ -59,8 +59,10 @@
     padding-top: 2px;
     padding-right: 2px;
     box-shadow: 0 2px 0 rgb(0 0 0 / 20%);
-    overflow-x: auto;
     white-space: nowrap;
-    scrollbar-color: var(--mantine-color-primary-7) var(--mantine-color-primary-6);
     z-index: 1;
+}
+
+.ui-header [data-variant="pills"] {
+    --tab-hover-color: var(--mantine-color-primary-8);
 }

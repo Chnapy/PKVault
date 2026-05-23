@@ -1,37 +1,58 @@
-import { Box, Button, Checkbox, Tooltip, type BoxProps } from '@mantine/core';
+import { Box, Button, Checkbox, Tooltip, type BoxProps, type ElementProps } from '@mantine/core';
 import type React from 'react';
 import classes from './ui-storage-item.module.css';
 
-export type UIStorageItemProps = {
-    label: string;
-    checked?: boolean;
-    onCheck?: () => void;
-    icons: React.ReactNode;
-    children: React.ReactNode;
-} & BoxProps;
+export type UIStorageItemProps = Pick<Button.Props, 'loading' | 'disabled'>
+    & Pick<ElementProps<'button'>, 'ref' | 'onClick' | 'onPointerDown' | 'onPointerUp' | 'children'>
+    & {
+        label: string;
+        checked?: boolean;
+        onCheck?: () => void;
+        icons: React.ReactNode;
+        dragging?: boolean;
+    } & BoxProps;
 
-export const UIStorageItem: React.FC<UIStorageItemProps> = ({ label, checked = false, onCheck, icons, children, ...rest }) => {
+export const UIStorageItem: React.FC<UIStorageItemProps> = ({
+    ref, label, onClick, onPointerDown, onPointerUp,
+    checked = false, onCheck,
+    icons, loading, disabled, dragging,
+    children, ...rest
+}) => {
 
-    return <Box className={classes.uiStorageItem} {...rest}>
-        <Tooltip label={label} withArrow position="bottom">
-            <Button
-                variant='light'
-                className={classes.button}
-                bd='none'
-            >
-                {children}
-                <Box className={classes.icons}>
-                    {icons}
-                </Box>
-            </Button>
-        </Tooltip>
+    const button = <Button
+        ref={ref}
+        variant='light'
+        className={classes.button}
+        onClick={onClick}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        loading={loading}
+        disabled={disabled}
+        bd='none'
+        opacity={dragging ? 0.75 : undefined}
+    >
+        {children}
+        <Box className={classes.icons}>
+            {icons}
+        </Box>
+    </Button>;
 
-        <Checkbox
+
+    return <Box
+        className={classes.uiStorageItem}
+        {...rest}
+    >
+        {dragging
+            ? button
+            : <Tooltip label={label} withArrow position="bottom">
+                {button}
+            </Tooltip>}
+
+        {!loading && !disabled && !dragging && <Checkbox
             className={classes.checkbox}
-            // style={{ opacity: checked ? undefined : 0 }}
             size='sm'
             checked={checked}
             onClick={onCheck}
-        />
+        />}
     </Box>
 };

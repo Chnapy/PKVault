@@ -1,10 +1,11 @@
-import { Button, Text } from '@mantine/core';
+import { Tabs, Text } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import type React from "react";
 import { HistoryContext } from '../../../context/history-context';
 import { type FileRouteTypes } from "../../../routeTree.gen";
 
 export type UIHeaderItemProps = {
+  id: string;
   selected?: boolean;
   to?: FileRouteTypes[ "to" ];
   search?: Record<string, unknown>;
@@ -12,6 +13,7 @@ export type UIHeaderItemProps = {
 };
 
 export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
+  id,
   selected,
   to,
   search: defaultSearch,
@@ -22,27 +24,30 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
   const search = { ...defaultSearch, ...historyValue?.search };
 
   return (
-    <Button
-      component={Link}
-      color='primary.7'
-      variant='filled'
-      size='compact-md'
-      h='auto'
-      style={{ flexShrink: 0 }}
-      to={to!}
-      search={(oldSearch) => {
-        // remove all search params
-        const clearedSearch = Object.fromEntries(Object.keys(oldSearch).map(key => [ key, undefined ]));
+    <Tabs.Tab
+      renderRoot={props => (
+        <Link
+          to={to!}
+          search={(oldSearch) => {
+            // remove all search params
+            const clearedSearch = Object.fromEntries(Object.keys(oldSearch).map(key => [ key, undefined ]));
 
-        return {
-          ...clearedSearch,
-          ...search,
-        } as never;
-      }}
+            return {
+              ...clearedSearch,
+              ...search,
+            } as never;
+          }}
+          {...props}
+        />
+      )}
+      value={id}
+      size='compact-sm'
+      h={27}
+      style={{ flexShrink: 0 }}
     >
       <Text fw='bold'>
         {children}
       </Text>
-    </Button>
+    </Tabs.Tab>
   );
 };

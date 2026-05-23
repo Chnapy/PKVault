@@ -4,6 +4,7 @@ import { addGamepadEventListener } from '../../controls/gamepad/gamepad-event';
 import { ControlsProvider } from '../../controls/provider/controls-provider';
 import { FocusProvider } from '../../focus/provider/focus-provider';
 import { FocusScope } from '../../focus/scope/focus-scope';
+import { ControlsGlobals } from '../components/controls-globals/controls-globals';
 
 export const FocusControlsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     React.useEffect(() => {
@@ -33,6 +34,8 @@ export const FocusControlsProvider: React.FC<{ children: React.ReactNode }> = ({
     return <ControlsProvider>
         <FocusProvider>
             <FocusScope id="root">
+                <ControlsGlobals />
+
                 {children}
             </FocusScope>
         </FocusProvider>

@@ -1,10 +1,17 @@
-import { Stack } from '@mantine/core';
+import { Stack, type ElementProps } from '@mantine/core';
+import { clsx } from 'clsx';
 import type React from 'react';
 import classes from './ui-frame.module.css';
 
-export const UIFrame: React.FC<React.PropsWithChildren> = ({ children }) => {
+type UIFrameProps = ElementProps<'div'>;
 
-    return <div data-move-root className={classes.uiFrame}>
+export const UIFrame: React.FC<UIFrameProps> = ({ className, children, ...rest }) => {
+
+    return <div
+        {...rest}
+        data-move-root
+        className={clsx(classes.uiFrame, className)}
+    >
         <Stack justify='flex-start' className={classes.content} gap={0}>
             {children}
         </Stack>

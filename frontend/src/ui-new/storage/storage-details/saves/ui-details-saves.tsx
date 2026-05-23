@@ -1,6 +1,8 @@
 import { Group, Tabs, Text } from '@mantine/core';
 import type React from 'react';
 import { UIExpandableTabs } from '../../../expandable-tabs/ui-expandable-tabs';
+import { Focus } from '../../../interaction/focus/provider/use-focus-context';
+import { useFocusScopeContext } from '../../../interaction/focus/scope/use-focus-scope-context';
 import { UIDetailsSaveExpanded, type UIDetailsSaveData } from './ui-details-save-expanded';
 
 type UIDetailsSavesProps = {
@@ -11,7 +13,14 @@ type UIDetailsSavesProps = {
 };
 
 export const UIDetailsSaves: React.FC<UIDetailsSavesProps> = ({ value, data, onSelect, actions }) => {
+    const parentScope = useFocusScopeContext();
+    const scopeActive = Focus.useIsScopeActive(parentScope.scopeId);
+
     return <UIExpandableTabs
+        id='saves'
+        level={2}
+        controlsEnabled={scopeActive}
+        controlsLabel='Change variant'
         value={value}
         data={data}
         onChange={onSelect}

@@ -2,18 +2,26 @@ import React from 'react';
 import { create } from 'zustand';
 import type { GamepadMappingsAllButton } from '../gamepad/gamepad-mapper';
 
+export type MouseMappings = 'move' | 'drag' | 'left-click' | 'right-click' | 'middle-click' | 'scroll';
+
 export type ControlTriggerValues = {
-    mouse: 'move' | 'drag' | 'left-click' | 'right-click' | 'middle-click' | 'scroll';
+    mouse: MouseMappings;
     keyboard: string;//'a' | 'b' | 'Enter' | 'Backspace' | 'Space';
     gamepad: GamepadMappingsAllButton;
 };
 
 export type ControlTriggerType = keyof ControlTriggerValues;
 
+export type ControlListenerName = Extract<keyof React.DOMAttributes<never>, `on${string}`>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ControlListenerAttributes = Pick<React.DOMAttributes<any>, ControlListenerName>;
+
 export type ControlTrigger<T extends ControlTriggerType = ControlTriggerType> = {
     type: T;
     values: ControlTriggerValues[T][];
     allowPressedSuite?: boolean;
+    allowOnFocus?: boolean;
+    listeners?: ControlListenerName[];
 };
 
 export type ControlAction = {
@@ -25,7 +33,7 @@ export type ControlAction = {
     spread: boolean;
     // override lowest order, for same trigger values only
     order: number;
-    action: <T extends ControlTriggerType = ControlTriggerType>(e: Event | React.BaseSyntheticEvent , trigger: T, value: ControlTriggerValues[T]) => void;
+    action: <T extends ControlTriggerType = ControlTriggerType>(e: never, trigger: T, value: ControlTriggerValues[T]) => void;
 };
 
 export type ControlActionInput = Omit<ControlAction, 'focused' | 'order'>;
@@ -50,9 +58,9 @@ type ControlsStore = {
     unregisterControls: (id: ControlId) => void;
 };
 
-export const createControlsStore = () => create<ControlsStore>()((set) => ({
+export const createControlsStore = (currentType?: ControlTriggerType) => create<ControlsStore>()((set) => ({
     controls: new Map(),
-    currentType: 'mouse',
+    currentType: currentType ?? 'mouse',
 
     registerControls: (id: ControlId, controlItems: Controls) => set(s => {
         const controls = new Map(s.controls);

@@ -1,23 +1,22 @@
-import { type Vector2, useDrag } from '@use-gesture/react';
+import { useDrag, type Vector2 } from '@use-gesture/react';
 import React from 'react';
 import { useSelectContextNullable } from '../../../select/context/use-select-context';
 import { useMoveContext } from '../../context/use-move-context';
 import type { DraggingTrigger } from '../../state/move-state';
-
-type PossibleEvent = Partial<Pick<React.BaseSyntheticEvent, 'stopPropagation' | 'timeStamp'>>;
+import { useDragUtils, type PossibleEvent } from '../use-drag-utils';
 
 export const useDragTriggers = <C>(entityId: string, containerValue: C, isDragging: boolean) => {
     const ref = React.useRef<HTMLButtonElement>(null);
 
-    const dragEndTimestampRef = React.useRef(0);
-
-    const { getContainerHash, useMoveStore, positionsRef } = useMoveContext<C>();
+    const { getContainerHash, useMoveStore, positionsRef, dragEndTimestampRef } = useMoveContext<C>();
 
     const containerHash = getContainerHash(containerValue);
 
     const selectCtx = useSelectContextNullable();
 
     const dispatch = useMoveStore(({ dispatch }) => dispatch);
+
+    const dragUtils = useDragUtils();
 
     const getAllIds = () => {
         const set = new Set<string>([ entityId ]);
@@ -38,6 +37,13 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
             && e.timeStamp - dragEndTimestampRef.current < 50
         )
             return;
+
+        const bounds = ref.current?.getBoundingClientRect();
+
+        positionsRef.current.target = [
+            bounds?.left ?? 0,
+            bounds?.top ?? 0,
+        ];
 
         updateDragPosition(position);
 
@@ -64,11 +70,6 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
 
     const startDragByFocus = (e: PossibleEvent | undefined, position: Vector2) => startDrag(e, 'focus', position);
 
-    const stopDrag = (e: PossibleEvent | undefined) => {
-        dragEndTimestampRef.current = e?.timeStamp ?? 0;
-        dispatch({ type: 'CANCEL' });
-    };
-
     const toggleDragByClick = (e: PossibleEvent | undefined) => {
         if (!ref.current) return;
 
@@ -79,7 +80,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
         const state = useMoveStore.getState().state;
 
         if (state.status === 'dragging') {
-            stopDrag(e);
+            dragUtils.stopDrag(e);
         } else {
             const { left, top } = ref.current.getBoundingClientRect();
 
@@ -97,7 +98,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
         const state = useMoveStore.getState().state;
 
         if (state.status === 'dragging') {
-            stopDrag(e);
+            dragUtils.stopDrag(e);
         } else {
             const { left, top } = ref.current.getBoundingClientRect();
 
@@ -125,7 +126,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
                 if (active)
                     updateDragPosition(position);
                 else
-                    stopDrag(event);
+                    dragUtils.stopDrag(event);
                 return;
             case 'idle':
                 if (active)
@@ -147,26 +148,15 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
         },
     });
 
-    const focusNode = (node: Element) => {
-        const { left, top, width, height } = node.getBoundingClientRect();
-
-        const position: Vector2 = [ left + width, top + height ];
-
-        updateDragPosition(position);
-
-        dispatch({ type: 'UPDATE_FOCUS' });
-    };
-
     const dragListeners = drag();
 
     return {
         ref,
         onPointerDown: dragListeners.onPointerDown,
-        focusNode,
         startDragByClick,
         startDragByFocus,
         toggleDragByClick,
         toggleDragByFocus,
-        stopDrag,
+        ...dragUtils,
     };
 };

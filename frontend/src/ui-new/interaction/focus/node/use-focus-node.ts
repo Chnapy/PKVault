@@ -9,17 +9,19 @@ export type UseFocusNodeParams = Pick<UseFocusableConfig<unknown>, 'onFocus'> & 
   focusOnMount?: boolean;
 };
 
-export const useFocusNode = <E extends HTMLElement>({ scopeNodeId, focusOnMount, onFocus }: UseFocusNodeParams) => {
+export const useFocusNode = ({ scopeNodeId, focusOnMount, onFocus }: UseFocusNodeParams) => {
   const { scopeId } = useFocusScopeContext();
   const selectScope = useFocusScopeSelect();
 
+  // TODO trigger lot of rerenders
   const active = Focus.useIsScopeActive(scopeId);
+
   const { registerNode, unregisterNode, setLastFocusedNode } = Focus.useRegister();
 
   // nodeId prefixed by scopeId to avoid conflicts
   const nodeId = `${scopeId}_${scopeNodeId}`;
 
-  const { ref, focused, focusSelf } = useFocusable<unknown, E>({
+  const { ref, focused, focusSelf } = useFocusable({
     focusKey: nodeId,
     focusable: active,
     saveLastFocusedChild: false,
@@ -60,7 +62,8 @@ export const useFocusNode = <E extends HTMLElement>({ scopeNodeId, focusOnMount,
   }, [ focusOnMount, focusSelf ]);
 
   const focusProps = {
-    ref,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ref: ref as React.RefObject<any>,
     'data-focus-key': nodeId,
     'data-focus-active': active || undefined,
   };

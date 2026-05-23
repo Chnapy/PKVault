@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
 import { UIBankList } from '../../bank/ui-bank-list';
 import { UIFrame } from '../frame/ui-frame';
 import { UIHeader } from './ui-header';
@@ -21,13 +20,13 @@ type Story = StoryObj<typeof meta>;
 export const Primary: Story = {
     args: {
         left: <>
-            <UIHeaderItem to='/saves'>SAVES</UIHeaderItem>
-            <UIHeaderItem to='/storage' selected>STORAGE</UIHeaderItem>
-            <UIHeaderItem to='/pokedex'>POKEDEX</UIHeaderItem>
+            <UIHeaderItem id='saves' to='/saves'>SAVES</UIHeaderItem>
+            <UIHeaderItem id='storage' to='/storage' selected>STORAGE</UIHeaderItem>
+            <UIHeaderItem id='pokedex' to='/pokedex'>POKEDEX</UIHeaderItem>
         </>,
         right: <>
-            <UIHeaderItem to='/'>HELP</UIHeaderItem>
-            <UIHeaderItem to='/settings'>BACKUPS & SETTINGS</UIHeaderItem>
+            <UIHeaderItem id='help' to='/'>HELP</UIHeaderItem>
+            <UIHeaderItem id='settings' to='/settings'>BACKUPS & SETTINGS</UIHeaderItem>
         </>,
     },
 };
@@ -40,8 +39,8 @@ export const WithSingleBank: Story = {
             data={[
                 { id: '1', label: 'Bank 1', boxCount: 1, pkmCount: 0 },
             ]}
-            onSelect={fn()}
-            onDelete={fn()}
+            onSelect={console.log}
+            onDelete={console.log}
         />,
     },
 };
@@ -62,8 +61,8 @@ export const WithBanks: Story = {
                 { id: '8', label: 'Bank 8', boxCount: 1, pkmCount: 0 },
                 { id: '9', label: 'Bank 9', boxCount: 1, pkmCount: 0 },
             ]}
-            onSelect={fn()}
-            onDelete={fn()}
+            onSelect={console.log}
+            onDelete={console.log}
         />,
     },
 };

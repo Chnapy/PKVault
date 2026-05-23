@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from "vite";
 import { patchCssModules } from 'vite-css-modules';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
+import svgr from "vite-plugin-svgr";
 import { prepareDocs } from './src/help/prepare-docs';
 import { prepareCssvar } from './src/ui-new/prepare-cssvar';
 
@@ -32,6 +33,7 @@ export default defineConfig({
       target: "react",
       autoCodeSplitting: true,
     }),
+    svgr(),
     react(),
     babel({ presets: [ reactCompilerPreset() ] }),
   ],

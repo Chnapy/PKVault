@@ -1,16 +1,16 @@
-import { Button, Group } from '@mantine/core';
+import { Group } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { LinkIcon, MoveIcon, PencilIcon, TrashIcon } from 'lucide-react';
-import { fn } from 'storybook/test';
 import gameXImg from '../../../assets/game_icons/x.png';
 import { GameVersion, Gender, MarkingColorUniversal, MoveCategory } from '../../../data/sdk/model';
+import { UIBallImg } from '../../sprite-img/item-img/ui-ball-img';
 import { UIItemImg } from '../../sprite-img/item-img/ui-item-img';
 import { UISpeciesImg } from '../../sprite-img/species-img/ui-species-img';
-import { UIBallImg } from '../../sprite-img/item-img/ui-ball-img';
 import { UIGameImg } from '../../sprite-img/ui-game-img';
 import spritesheetItem0 from '../../stories/assets/spritesheet_items_0.webp';
 import spritesheet0 from "../../stories/assets/spritesheet_species_0.webp";
 import { UITypeItem } from '../../type-item/ui-type-item';
+import { UIDetailsAction } from './actions/ui-details-action';
 import { UIContest } from './content/cosmetic/ui-contest';
 import { UIDetailsContentCosmetic } from './content/cosmetic/ui-details-content-cosmetic';
 import { UIRibbon, type UIRibbonProps } from './content/cosmetic/ui-ribbon';
@@ -23,8 +23,8 @@ import { UIDetailsStatsRow, type UIDetailsStatsRowProps } from './content/stats/
 import { UIDetailsContent } from './content/ui-details-content';
 import { UIDetailsContentSummary } from './content/ui-details-content-summary';
 import { UIMarkingList } from './marking/ui-marking-list';
-import { UIDetailsMain } from './ui-details-main';
 import { UIDetailsSaves } from './saves/ui-details-saves';
+import { UIDetailsMain } from './ui-details-main';
 import { UIStorageDetails } from './ui-storage-details';
 
 const meta = {
@@ -53,7 +53,7 @@ export const Primary: Story = {
                 { id: '7', imgSrc: gameXImg, label: 'G7b' },
                 { id: '4', imgSrc: gameXImg, label: 'G9a' },
             ]}
-            onSelect={fn()}
+            onSelect={console.log}
             actions={closeBtn}
         />,
         main: <UIDetailsMain
@@ -242,30 +242,45 @@ export const Primary: Story = {
             />}
         />,
         actions: <>
-            <Button
+            <UIDetailsAction
+                name='move'
+                label='Move'
+                onClick={console.log}
                 size='compact-md'
                 leftSection={<MoveIcon />}
-            >Move</Button>
-            <Button
+                focusOnMount
+                gamepadValue='X'
+            />
+            <UIDetailsAction
+                name='move-attached'
+                label='Move attached'
+                onClick={console.log}
                 size='compact-md'
                 leftSection={<Group gap='sm'>
                     <MoveIcon />
                     <LinkIcon />
                 </Group>}
-            >Move attached</Button>
-            <Button
+            />
+            <UIDetailsAction
+                name='edit'
+                label='Edit'
+                onClick={console.log}
                 variant='filled'
                 color='blue'
                 size='compact-md'
                 leftSection={<PencilIcon />}
-            >Edit</Button>
-            <Button
+                gamepadValue='Y'
+            />
+            <UIDetailsAction
+                name='release'
+                label='Release'
+                onClick={console.log}
                 variant='filled'
                 color='red'
                 size='compact-md'
                 leftSection={<TrashIcon />}
-            >Release</Button>
+            />
         </>,
-        onClose: fn(),
+        onClose: console.log,
     },
 };

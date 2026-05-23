@@ -12,7 +12,6 @@ export type UIStoragePanelProps = {
 
 export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header, children, footer, ...rest }) => {
     const childrenCount = React.Children.count(children);
-
     const cols = getBoxColumns(childrenCount);
 
     return <Card

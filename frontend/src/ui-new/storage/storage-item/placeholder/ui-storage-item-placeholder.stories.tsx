@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { UIStorageItemPlaceholder } from './ui-storage-item-placeholder';
-import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import { Card } from '@mantine/core';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { UISpriteSizeWrapper } from '../../../sprite-img/ui-sprite-size-wrapper';
+import { UIStorageItemPlaceholder } from './ui-storage-item-placeholder';
 
 const meta = {
     title: 'UI/UIStorageItemPlaceholder',

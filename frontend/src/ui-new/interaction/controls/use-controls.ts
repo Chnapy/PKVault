@@ -1,14 +1,13 @@
 import React from 'react';
-import { type ControlAction, type ControlId, type ControlsWithFalsy } from './provider/controls-context';
+import { useMoveContextNullable } from '../move/context/use-move-context';
+import { type ControlId, type ControlListenerAttributes, type ControlsWithFalsy } from './provider/controls-context';
 import { useControlsContext } from './provider/use-controls-context';
 
 type Options = {
     enabled: boolean;
 };
 
-type ControlsProps = {
-    onClick?: React.MouseEventHandler;
-    onPointerDown?: React.PointerEventHandler;
+type ControlsProps = ControlListenerAttributes & {
     'data-controls': string;
     'data-controls-order': number;
     'data-controls-enabled'?: boolean;
@@ -17,11 +16,7 @@ type ControlsProps = {
 export const useControls = (id: ControlId, focused: boolean, order: number, controls: ControlsWithFalsy, { enabled }: Options): ControlsProps => {
     const { useControlsStore } = useControlsContext();
 
-    const controlsRef = React.useRef(controls);
-
-    React.useEffect(() => {
-        controlsRef.current = controls;
-    }, [ controls ]);
+    const dragEndTimestampRef = useMoveContextNullable()?.dragEndTimestampRef;
 
     React.useEffect(() => {
         if (!enabled) return;
@@ -30,7 +25,7 @@ export const useControls = (id: ControlId, focused: boolean, order: number, cont
 
         registerControls(
             id,
-            controlsRef.current
+            controls
                 .filter(c => !!c)
                 .map(c => ({
                     ...c,
@@ -42,27 +37,42 @@ export const useControls = (id: ControlId, focused: boolean, order: number, cont
         return () => {
             unregisterControls(id);
         };
-    }, [enabled, focused, id, order, useControlsStore]);
+    }, [controls, enabled, focused, id, order, useControlsStore]);
 
-    const onClick = React.useCallback<React.MouseEventHandler>(e => {
-        const clickAction = controlsRef.current.find((c): c is ControlAction =>
-            !!c && !!c?.triggers.mouse?.values.includes('left-click')
-        )?.action;
+    const listenerList = controls.flatMap(c => {
+        if (!c || !c.triggers.mouse)
+            return [];
+        
+        const listeners = c.triggers.mouse.listeners ?? ['onClick'];
+        const values = c.triggers.mouse.values;
 
-        clickAction?.(e, 'mouse', 'left-click');
-    }, []);
+        return listeners.map(name => {
+            return [name, c.action, values] as const;
+        });
+    });
 
-    const onPointerDown = React.useCallback<React.PointerEventHandler>(e => {
-        const clickAction = controlsRef.current.find((c): c is ControlAction =>
-            !!c && !!c?.triggers.mouse?.values.includes('drag')
-        )?.action;
+    const listeners = listenerList.reduce<ControlListenerAttributes>((acc, [name, fn, values]) => {
+        const currentFn = acc[name];
 
-        clickAction?.(e, 'mouse', 'drag');
-    }, []);
+        type AnyEvent = Parameters<NonNullable<typeof currentFn>>[0];
+
+        return {
+            ...acc,
+            [name]: (e: AnyEvent) => {
+                if (name === 'onClick') {
+                    if (dragEndTimestampRef
+                        && e.timeStamp - dragEndTimestampRef.current < 50)
+                        return;
+                }
+
+                currentFn?.(e as never);
+                fn(e as never, 'mouse', values[0]!);
+            },
+        };
+    }, {});
 
     return {
-        onClick,
-        onPointerDown,
+        ...listeners,
         'data-controls': controls.map(c => c && c.name).filter(Boolean).join('-'),
         'data-controls-order': order,
         'data-controls-enabled': enabled || undefined,

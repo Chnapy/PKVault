@@ -2,6 +2,9 @@ import { ActionIcon, Group, Tabs, Text } from '@mantine/core';
 import { CirclePlusIcon } from 'lucide-react';
 import type React from 'react';
 import { UIExpandableTabs } from '../../../expandable-tabs/ui-expandable-tabs';
+import { Focus } from '../../../interaction/focus/provider/use-focus-context';
+import { useFocusScopeContext } from '../../../interaction/focus/scope/use-focus-scope-context';
+import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
 import { UIGameExpanded, type UIGameData } from './ui-game-expanded';
 
 export type UIStoragePanelGameListProps = {
@@ -11,8 +14,16 @@ export type UIStoragePanelGameListProps = {
 };
 
 export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange }) => {
+    const parentScope = useFocusScopeContext();
+    const scopeActive = Focus.useIsScopeActive(parentScope.scopeId);
+
+    const { isInCurrentPanel } = useCurrentPanel();
 
     return <UIExpandableTabs
+        id='games'
+        level={2}
+        controlsEnabled={scopeActive && isInCurrentPanel}
+        controlsLabel='Change game'
         value={value}
         data={data}
         onChange={onChange}

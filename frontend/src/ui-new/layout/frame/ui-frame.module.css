@@ -6,6 +6,7 @@
     border-width: var(--scrollbar-width);
     border-style: solid;
     border-color: var(--mantine-color-primary-6);
+    border-bottom-width: 0;
 }
 
 .ui-frame::before {
@@ -13,6 +14,7 @@
     position: fixed;
     inset: var(--scrollbar-width) var(--scrollbar-width) var(--scrollbar-width) var(--scrollbar-width);
     border: 2px solid rgb(0 0 0 / 20%);
+    border-bottom-width: 0;
     z-index: 10;
     pointer-events: none;
 }

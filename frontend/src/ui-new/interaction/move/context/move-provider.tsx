@@ -18,8 +18,11 @@ export const MoveProvider = function <C>({
         scroll: [ window.scrollX, window.scrollY ],
         pointer: [ 0, 0 ],
         pointerInitial: [ 0, 0 ],
+        target: [ 0, 0 ],
         drag: [ 0, 0 ],
     });
+
+    const dragEndTimestampRef = React.useRef(0);
 
     const [ value ] = React.useState((): MoveContext<C> => {
 
@@ -30,7 +33,7 @@ export const MoveProvider = function <C>({
         const drop = async function (target: MoveTargetInput<C>) {
             const initialState = useMoveStore.getState().state;
             if (initialState.status !== 'dragging')
-                throw new Error('Invalid status');
+                throw new Error('Invalid status ' + JSON.stringify(initialState, undefined, 2));
 
             const targetAllPositions = getTargetAllPositions(initialState.source, target);
 
@@ -65,6 +68,7 @@ export const MoveProvider = function <C>({
             getContainerHash,
             getContainerValue,
             positionsRef,
+            dragEndTimestampRef,
             useMoveStore,
             drop,
         };

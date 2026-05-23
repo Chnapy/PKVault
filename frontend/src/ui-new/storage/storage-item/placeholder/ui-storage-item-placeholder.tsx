@@ -1,11 +1,13 @@
 import { Box, Button } from '@mantine/core';
 import type React from 'react';
-import { UISpeciesImg } from '../../sprite-img/species-img/ui-species-img';
+import { UISpeciesImg } from '../../../sprite-img/species-img/ui-species-img';
 
-export type UIStorageItemPlaceholderProps = {
-};
+export type UIStorageItemPlaceholderProps = Pick<Button.Props, 'loading' | 'disabled'>
+    & React.ComponentProps<'button'>;
 
-export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> = ({ }) => {
+export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> = ({
+    ...buttonProps
+}) => {
 
     return <Box>
         <Button
@@ -13,6 +15,7 @@ export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> =
             p={0}
             bd='none'
             h='auto'
+            {...buttonProps}
         >
             <UISpeciesImg
                 sheetUrl=''

@@ -21,6 +21,7 @@ export type MovePositions = {
     scroll: Vector2;
     pointer: Vector2;
     pointerInitial: Vector2;
+    target: Vector2;
     drag: Vector2;
 }; 
 
@@ -29,6 +30,7 @@ export type MoveContext<C> = {
     getContainerValue: (containerHash: string) => C;
     getContainerHash: (containerValue: C) => string;
     positionsRef: React.RefObject<MovePositions>;
+    dragEndTimestampRef: React.RefObject<number>;
     useMoveStore: ReturnType<typeof createMoveStore>;
     drop: (target: MoveTargetInput<C>) => Promise<unknown>;
 };

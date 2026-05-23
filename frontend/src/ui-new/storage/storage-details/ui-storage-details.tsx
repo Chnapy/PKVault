@@ -1,5 +1,5 @@
-import { Card, CloseButton, Group, type CardProps } from '@mantine/core';
-import type React from 'react';
+import { Card, CloseButton, Group } from '@mantine/core';
+import React from 'react';
 import { UICardSectionControl } from '../storage-panel/card-section-control/ui-card-section-control';
 
 export type UIStorageDetailsProps = {
@@ -8,13 +8,13 @@ export type UIStorageDetailsProps = {
     content: React.ReactNode;
     actions: React.ReactNode;
     onClose: () => void;
-} & CardProps;
+};
 
 export const UIStorageDetails: React.FC<UIStorageDetailsProps> = ({
-    header, main, content, actions, onClose, ...rest
+    header, main, content, actions, onClose
 }) => {
 
-    return <Card {...rest}>
+    return <Card>
         <Card.Section component={UICardSectionControl} p={0}>
             {header(
                 <CloseButton onClick={onClose} />

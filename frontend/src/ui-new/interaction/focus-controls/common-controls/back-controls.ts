@@ -4,13 +4,13 @@ export const getBackControl = (partial: Omit<ControlActionInput, 'name' | 'trigg
     ...partial,
     name: 'back',
     triggers: {
+        // mouse: {
+        //     type: 'mouse',
+        //     values: [ 'right-click' ],
+        // },
         keyboard: {
             type: 'keyboard',
             values: [ 'Backspace' ],
-        },
-        mouse: {
-            type: 'mouse',
-            values: [ 'right-click' ],
         },
         gamepad: {
             type: 'gamepad',

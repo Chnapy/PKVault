@@ -1,5 +1,8 @@
-import { Box, Scroller, Tabs, Text } from '@mantine/core';
+import { Box, Tabs, Text } from '@mantine/core';
 import type React from 'react';
+import { Focus } from '../../../interaction/focus/provider/use-focus-context';
+import { useFocusScopeContext } from '../../../interaction/focus/scope/use-focus-scope-context';
+import { ScrollerControlled } from '../../../scroller-controlled/scroller-controlled';
 
 export type UIDetailsContentProps = {
     summary?: React.ReactNode;
@@ -11,11 +14,13 @@ export type UIDetailsContentProps = {
 };
 
 export const UIDetailsContent: React.FC<UIDetailsContentProps> = ({ summary, stats, moves, contest, origin, misc }) => {
+    const parentScope = useFocusScopeContext();
+    const scopeActive = Focus.useIsScopeActive(parentScope.scopeId);
 
     return <>
         <Tabs defaultValue='summary'>
             <Tabs.List grow>
-                <Scroller>
+                <ScrollerControlled id='details-content' level={1} controlsEnabled={scopeActive} controlsLabel='Change details content'>
                     {summary && <Tabs.Tab value='summary'>
                         <Text>Summary</Text>
                     </Tabs.Tab>}
@@ -34,7 +39,7 @@ export const UIDetailsContent: React.FC<UIDetailsContentProps> = ({ summary, sta
                     {misc && <Tabs.Tab value='misc'>
                         <Text>Misc</Text>
                     </Tabs.Tab>}
-                </Scroller>
+                </ScrollerControlled>
             </Tabs.List>
 
             <Box p='md'>

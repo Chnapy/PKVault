@@ -31,7 +31,7 @@ const useRegister = () => {
   const { popScope } = usePushPopScope();
 
   const registerScope = React.useCallback((scope: FocusScopeData) => {
-    // console.log('register scope', scope.id, scopeStackRef.current);
+    // console.log('register scope', scope.id);
     const { scopes, scopeStack } = useFocusStore.getState();
 
     scopes.set(scope.id, scope);
@@ -45,6 +45,13 @@ const useRegister = () => {
     const { scopes } = useFocusStore.getState();
 
     scopes.delete(scopeId);
+
+    useFocusStore.setState(s => s.scopeStack.includes(scopeId)
+      ? {
+        ...s,
+        scopeStack: s.scopeStack.filter(scope => scope !== scopeId),
+      }
+      : s);
   }, [ useFocusStore ]);
 
   const registerNode = React.useCallback((node: FocusNodeData) => {
@@ -73,7 +80,7 @@ const useRegister = () => {
         if (nextNode) {
           nextNode?.focusSelf();
         } else {
-          popScope();
+          popScope(scopeId);
         }
       });
     }
@@ -133,7 +140,7 @@ const usePushPopScope = () => {
       return;
 
     // const scopeIdIndex = scopeStackRef.current.lastIndexOf(lastScopeId);
-    // console.log(scopeIdIndex)
+    // console.log('normalize', stack)
     // if (scopeIdIndex >= 0) {
     //   return;
     //   // stack = stack.slice(0,scopeIdIndex + 1);
@@ -167,12 +174,16 @@ const usePushPopScope = () => {
     focusScope(scopeId);
   }, [focusScope, hasScopeNodes, useFocusStore]);
 
-  const popScope = React.useCallback(() => {
+  const popScope = React.useCallback((scopeIdToPop?: string) => {
+    // console.warn('pop-scope')
     useFocusStore.setState(s => {
       const prev = s.scopeStack;
 
       const getNextStack = (stack: FocusScopeId[]): FocusScopeId[] => {
         if (stack.length <= 1)
+          return stack;
+
+        if (scopeIdToPop && s.scopeStack[s.scopeStack.length - 1] !== scopeIdToPop)
           return stack;
 
         const next = stack.slice(0, -1);
@@ -248,6 +259,8 @@ const useRestoreScopeFocus = () => {
 
 const useIsScopeActive = (scopeId: FocusScopeId) => {
   const { useFocusStore } = useRefsContext();
+
+  // console.log(useFocusStore.getState().scopeStack)
 
   return useFocusStore(s => s.scopeStack.at(-1) === scopeId);
 };

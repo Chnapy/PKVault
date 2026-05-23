@@ -20,6 +20,7 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
 
     return <Group gap='xs' align='stretch' style={{ alignSelf: 'stretch' }}>
         <Button
+            style={{ gap: 4 }}
             variant='default'
             disabled={selected}
             onClick={onSelect}

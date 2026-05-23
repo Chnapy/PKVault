@@ -1,0 +1,9 @@
+
+.control-icon {
+    width: 1lh;
+    height: 1lh; 
+}
+
+.control-icon [fill="#FFFFFF"] {
+    fill: currentcolor;
+}

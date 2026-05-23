@@ -4,10 +4,11 @@ import { createPortal } from 'react-dom';
 import { useMoveContext } from '../context/use-move-context';
 
 type DragRenderProps = {
+    elementRef: React.RefObject<HTMLButtonElement | null>;
     children: React.ReactNode;
 };
 
-export const DragRender: React.FC<DragRenderProps> = ({ children }) => {
+export const DragRender: React.FC<DragRenderProps> = ({ elementRef, children }) => {
     const { moveContainerId, useMoveStore, positionsRef } = useMoveContext();
 
     const dragRef = React.useRef<HTMLDivElement>(null);
@@ -16,7 +17,7 @@ export const DragRender: React.FC<DragRenderProps> = ({ children }) => {
         let rafId = -1;
 
         const translateElement = () => {
-            if (!dragRef.current) return;
+            if (!dragRef.current || !elementRef.current) return;
 
             const state = useMoveStore.getState().state;
 
@@ -26,7 +27,19 @@ export const DragRender: React.FC<DragRenderProps> = ({ children }) => {
                 return;
             }
 
-            const { scroll, pointer, pointerInitial, drag } = positionsRef.current;
+            const { scroll, pointer, pointerInitial, target, drag } = positionsRef.current;
+
+            const elementBounds = elementRef.current.getBoundingClientRect();
+
+            const element: Vector2 = [
+                elementBounds.left,
+                elementBounds.top,
+            ];
+
+            const baseDiff: Vector2 = [
+                element[ 0 ] - target[ 0 ],
+                element[ 1 ] - target[ 1 ],
+            ];
 
             const pointerDiff: Vector2 = state.trigger === 'click'
                 ? [
@@ -40,8 +53,8 @@ export const DragRender: React.FC<DragRenderProps> = ({ children }) => {
                 : scroll;
 
             const position = [
-                drag[ 0 ] + pointerDiff[ 0 ] + scrollDiff[ 0 ],
-                drag[ 1 ] + pointerDiff[ 1 ] + scrollDiff[ 1 ],
+                baseDiff[ 0 ] + drag[ 0 ] + pointerDiff[ 0 ] + scrollDiff[ 0 ],
+                baseDiff[ 1 ] + drag[ 1 ] + pointerDiff[ 1 ] + scrollDiff[ 1 ],
             ];
 
             const [ x, y ] = position;
@@ -58,7 +71,7 @@ export const DragRender: React.FC<DragRenderProps> = ({ children }) => {
         return () => {
             cancelAnimationFrame(rafId);
         };
-    }, [ positionsRef, useMoveStore ]);
+    }, [ positionsRef, elementRef, useMoveStore ]);
 
     // console.log('render-portal');
 

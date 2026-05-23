@@ -2,15 +2,15 @@ import type { ControlActionInput } from '../../controls/provider/controls-contex
 
 export const getSelectControl = (partial: Omit<ControlActionInput, 'name' | 'triggers' | 'spread'>): ControlActionInput => ({
     ...partial,
-    name: 'select',
+    name: 'open',
     triggers: {
-        keyboard: {
-            type: 'keyboard',
-            values: [ 'Space' ],
-        },
         mouse: {
             type: 'mouse',
             values: [ 'left-click' ],
+        },
+        keyboard: {
+            type: 'keyboard',
+            values: [ 'Space' ],
         },
         gamepad: {
             type: 'gamepad',

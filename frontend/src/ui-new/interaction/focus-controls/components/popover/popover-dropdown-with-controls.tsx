@@ -4,7 +4,7 @@ import type { FocusScopeId } from '../../../focus/provider/focus-context';
 import { FocusScope } from '../../../focus/scope/focus-scope';
 import { useFocusScopeContext } from '../../../focus/scope/use-focus-scope-context';
 import { getBackControl } from '../../common-controls/back-controls';
-import { usePopoverClose } from './hooks/use-popover-close';
+import { usePopover } from './hooks/use-popover';
 
 type PopoverDropdownWithControlsProps = {
     scopeId: FocusScopeId;
@@ -15,7 +15,7 @@ export const PopoverDropdownWithControls: React.FC<PopoverDropdownWithControlsPr
     const parentScope = useFocusScopeContext();
     const order = parentScope.parentsIds.length;
 
-    const close = usePopoverClose();
+    const setPopover = usePopover();
 
     useControls(
         `${scopeId}_dropdown`,
@@ -24,7 +24,11 @@ export const PopoverDropdownWithControls: React.FC<PopoverDropdownWithControlsPr
         [
             getBackControl({
                 label: 'Close',
-                action: close,
+                action: () => {
+                    setPopover!(() => ({
+                        opened: false,
+                    }));
+                },
             }),
         ],
         {

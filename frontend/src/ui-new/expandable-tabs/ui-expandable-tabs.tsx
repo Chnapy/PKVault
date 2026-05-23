@@ -1,6 +1,7 @@
-import { ActionIcon, Scroller, Stack, Tabs, type TabsProps } from '@mantine/core';
+import { ActionIcon, Stack, Tabs, type TabsProps } from '@mantine/core';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import React from 'react';
+import { ScrollerControlled, type ScrollerControlledProps } from '../scroller-controlled/scroller-controlled';
 
 type Data = {
     id: string;
@@ -28,13 +29,15 @@ type UIExpandableTabsOwnProps<D extends Data> = {
     left?: React.ReactNode;
     right?: React.ReactNode;
     grow?: boolean;
-}
+};
 
 type UIExpandableTabsProps<D extends Data> =
     UIExpandableTabsOwnProps<D>
+    & Pick<ScrollerControlledProps, 'id' | 'level' | 'controlsEnabled' | 'controlsLabel'>
     & Omit<TabsProps, keyof UIExpandableTabsOwnProps<D>>;
 
 export function UIExpandableTabs<D extends Data = Data>({
+    id, level, controlsEnabled, controlsLabel,
     value, data, onChange, renderTab, renderExpanded,
     left, right, grow = true,
     ...tabsProps
@@ -43,7 +46,7 @@ export function UIExpandableTabs<D extends Data = Data>({
 
     return <Tabs
         value={value.toString()}
-        onChange={id => id && onChange(id)}
+        onChange={tabId => tabId && onChange(tabId)}
         miw={0}
         {...tabsProps}
         style={{
@@ -62,7 +65,9 @@ export function UIExpandableTabs<D extends Data = Data>({
             >
                 {left}
 
-                <Scroller
+                <ScrollerControlled
+                    id={id} level={level} controlsEnabled={controlsEnabled}
+                    controlsLabel={controlsLabel}
                     opacity={expanded ? 0.5 : undefined}
                 >
                     {data.map((item, i) => renderTab(
@@ -77,7 +82,7 @@ export function UIExpandableTabs<D extends Data = Data>({
                             reduce: () => setExpanded(false),
                         },
                     ))}
-                </Scroller>
+                </ScrollerControlled>
 
                 <ActionIcon
                     variant='subtle'

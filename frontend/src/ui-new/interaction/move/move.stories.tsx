@@ -97,7 +97,7 @@ const FakeItemDraggable: React.FC<{
             </Button>
         </Button.Group>
 
-        {dragging.isDragging && <DragRender>
+        {dragging.isDragging && <DragRender elementRef={dragging.ref}>
             {getRender({})}
         </DragRender>}
     </>;
@@ -231,8 +231,12 @@ export const Primary: Story = {
             >
                 <Stack
                     id='move-container' pos='relative'
-                    align='center' gap='xl' p={100}
+                    align='center' gap='xl'
+                    py={100} maw={200} m='auto'
                 >
+                    <div>
+                        Move with selection
+                    </div>
                     <Group wrap='wrap'>
                         Box 1
                         {getBoxItems(1)}

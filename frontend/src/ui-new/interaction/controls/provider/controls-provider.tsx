@@ -5,7 +5,9 @@ import { controlsContext, createControlsStore, type ControlsContext, type Contro
 
 export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [ methods ] = React.useState((): ControlsContext => ({
-        useControlsStore: createControlsStore(),
+        useControlsStore: createControlsStore(
+            navigator.getGamepads().some(v => v) ? 'gamepad' : undefined,
+        ),
     }));
 
     React.useEffect(() => {
@@ -39,17 +41,26 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             updateState('keyboard');
 
             for (const control of getSortedFilteredControls()) {
+                const listeners = control.triggers.keyboard?.listeners ?? [ 'onKeyDown' ];
                 const keys = control.triggers.keyboard?.values ?? [];
 
-                for (const key of keys) {
-                    if (e.key === key) {
-                        control.action(e, getState().currentType, key);
+                if (listeners.includes('onKeyDown')) {
+                    for (const key of keys) {
+                        if (e.key === key) {
+                            control.action(e as never, getState().currentType, key);
+                        }
                     }
                 }
             }
         };
 
+        const mouseListener = () => {
+            updateState('mouse');
+        };
+
         window.addEventListener('keydown', keydownListener);
+        window.addEventListener('mousedown', mouseListener);
+        window.addEventListener('mousemove', mouseListener);
 
         const removeGamepadListener = addGamepadEventListener(e => {
             updateState('gamepad');
@@ -64,7 +75,7 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
                 console.info('gamepad pressed', e.detail.button, e.detail.pressedSuite, { control });
 
-                control?.action(e, getState().currentType, e.detail.button);
+                control?.action(e as never, getState().currentType, e.detail.button);
             }
         });
 
@@ -74,6 +85,8 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             cancelGamepadLoop();
             removeGamepadListener();
 
+            window.removeEventListener('mousemove', mouseListener);
+            window.removeEventListener('mousedown', mouseListener);
             window.removeEventListener('keydown', keydownListener);
         };
     }, [ methods.useControlsStore ]);

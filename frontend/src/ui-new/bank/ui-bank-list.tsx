@@ -2,6 +2,7 @@ import { ActionIcon, Group, Tabs, Text } from '@mantine/core';
 import { CirclePlusIcon, LandmarkIcon } from 'lucide-react';
 import type React from 'react';
 import { UIExpandableTabs } from '../expandable-tabs/ui-expandable-tabs';
+import { useCurrentPanel } from '../storage/storage-content/context/ui-panel-context';
 import { UIBankExpanded } from './ui-bank-expanded';
 import classes from './ui-bank-list.module.css';
 
@@ -20,8 +21,13 @@ export type UIBankListProps = {
 };
 
 export const UIBankList: React.FC<UIBankListProps> = ({ value, data, onSelect, onDelete }) => {
+    const { isInCurrentPanel } = useCurrentPanel();
 
     return <UIExpandableTabs
+        id='banks'
+        level={2}
+        controlsEnabled={isInCurrentPanel}
+        controlsLabel='Change bank'
         variant="pills"
         value={value}
         data={data}

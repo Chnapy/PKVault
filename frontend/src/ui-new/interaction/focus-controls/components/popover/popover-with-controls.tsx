@@ -1,6 +1,7 @@
 import { getSingleElementChild, Popover } from '@mantine/core';
 import React from 'react';
 import type { FocusScopeId } from '../../../focus/provider/focus-context';
+import { createPopoverStore, popoverContext, type PopoverContext } from './context/popover-context';
 import { PopoverDropdownWithControls } from './popover-dropdown-with-controls';
 
 // @see https://github.com/mantinedev/mantine/blob/master/packages/%40mantine/core/src/components/Popover/PopoverTarget/PopoverTarget.tsx
@@ -17,12 +18,19 @@ export type PopoverTargetChildProps = {
 type PopoverWithControlsProps = {
     nested?: boolean;
     // target props are passed by mantine
-    target: React.ReactElement<PopoverTargetChildProps>;
+    target: React.ReactElement;
     dropdown: React.ReactNode;
-};
+    dropdownProps?: Popover.Dropdown.Props;
+} & Omit<Popover.Props, 'opened' | 'withinPortal'>;
 
-export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ nested, target, dropdown }) => {
+export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ nested, target, dropdown, dropdownProps, ...rest }) => {
+    const [ ctx ] = React.useState((): PopoverContext => ({
+        usePopoverStore: createPopoverStore(),
+    }));
+
     const [ scopeId ] = React.useState((): FocusScopeId => `popover_${self.crypto.randomUUID()}`);
+
+    const opened = ctx.usePopoverStore(s => s.opened);
 
     const targetEl = getSingleElementChild(target);
     if (targetEl
@@ -32,15 +40,17 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ nested
         throw new Error(`Popover Target child should not have props "id" [id='${targetEl.props.id}'], value will be overidden.`);
     }
 
-    return <Popover withinPortal={nested}>
-        <Popover.Target>
-            {target}
-        </Popover.Target>
+    return <popoverContext.Provider value={ctx}>
+        <Popover opened={opened} withinPortal={nested}  {...rest}>
+            <Popover.Target>
+                {target}
+            </Popover.Target>
 
-        <Popover.Dropdown>
-            <PopoverDropdownWithControls scopeId={scopeId}>
-                {dropdown}
-            </PopoverDropdownWithControls>
-        </Popover.Dropdown>
-    </Popover>;
+            <Popover.Dropdown {...dropdownProps}>
+                <PopoverDropdownWithControls scopeId={scopeId}>
+                    {dropdown}
+                </PopoverDropdownWithControls>
+            </Popover.Dropdown>
+        </Popover>
+    </popoverContext.Provider>;
 };

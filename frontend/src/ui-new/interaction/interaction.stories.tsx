@@ -1,13 +1,12 @@
-import { Badge, Button, Card, Checkbox, Group, Stack, type ButtonProps } from '@mantine/core';
+import { Button, Card, Checkbox, Group, Stack, type ButtonProps } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import React, { type HTMLAttributes } from 'react';
 import { getControlIcon } from './controls/icons/get-control-icon';
 import { useAllCurrentControls } from './controls/use-all-current-controls';
-import { getBackControl } from './focus-controls/common-controls/back-controls';
 import { getDragControls } from './focus-controls/common-controls/drag-controls';
-import { getMoveControl } from './focus-controls/common-controls/move-controls';
 import { getSelectControl } from './focus-controls/common-controls/select-controls';
+import { usePopover } from './focus-controls/components/popover/hooks/use-popover';
 import { PopoverWithControls, type PopoverTargetChildProps } from './focus-controls/components/popover/popover-with-controls';
 import { FocusControlsProvider } from './focus-controls/provider/focus-controls-provider';
 import { useFocusControls } from './focus-controls/use-focus-controls';
@@ -25,7 +24,7 @@ import { SelectProvider } from './select/context/select-provider';
 import { useSelectContextActions, useSelectHasValue } from './select/context/use-select-context';
 
 const meta = {
-    title: 'Interaction',
+    title: 'Interaction/All',
 } satisfies Meta;
 
 export default meta;
@@ -39,23 +38,16 @@ const FakePanel: React.FC<{ name: string; focusOnMount?: boolean; children: Reac
 
     const isInScopeStack = Focus.useIsInScopeStack(childScopeId);
 
-    const { pushScope, popScope } = Focus.usePushPopScope();
+    const { pushScope } = Focus.usePushPopScope();
 
-    const { focusControlProps, nodeId, focused, active } = useFocusControls<HTMLDivElement>({
+    const { focusControlProps, nodeId, focused, active } = useFocusControls({
         scopeNodeId: name,
         childScopeId,
         focusOnMount,
         controls: [
-            getMoveControl({
-                label: 'Move',
-            }),
             getSelectControl({
                 label: 'Select',
                 action: () => pushScope(childScopeId),
-            }),
-            getBackControl({
-                label: 'Back',
-                action: () => popScope(),
             }),
         ],
     });
@@ -89,6 +81,8 @@ const FakeItem: React.FC<{
 } & PopoverTargetChildProps> = ({ name, box, pos, target, onClick, openModal, focusOnMount, children, ...popoverProps }) => {
     // console.log('render item', id);
 
+    const popover = usePopover();
+
     const { pushScope } = Focus.usePushPopScope();
 
     const container: ContainerValue = { box };
@@ -103,7 +97,7 @@ const FakeItem: React.FC<{
     // console.log(dragging.dragProps)
     const submitting = useDragSubmitting<ContainerValue>(container, pos, name);
 
-    const { focusControlProps, focused, active } = useFocusControls<HTMLButtonElement>({
+    const { focusControlProps, focused, active } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,
         onFocus: ({ node }) => {
@@ -116,10 +110,12 @@ const FakeItem: React.FC<{
                 label: 'Select',
                 action: onClick,
             }),
-            getDragControls(dragging),
+            ...getDragControls({ dragging }),
             openModal && getSelectControl({
                 label: 'Open modal',
-                action: () => focusControlProps.ref.current?.click(),
+                action: () => popover?.(s => ({
+                    opened: !s.opened,
+                })),
             }),
             target && {
                 name: 'target',
@@ -158,7 +154,7 @@ const FakeItem: React.FC<{
         {renderBtn({
             title: `item name=${name} active=${active}`,
             style: {
-                color: focused ? undefined : '#FFFA',
+                fontWeight: focused ? 'bold' : 'normal',
                 outline: focused ? '2px solid red' : undefined,
             },
             disabled: dragging.isDragging,
@@ -173,7 +169,7 @@ const FakeItem: React.FC<{
             onClick={() => checked ? removeId([ name ]) : addId(container, [ name ])}
         />
 
-        {dragging.isDragging && <DragRender>
+        {dragging.isDragging && <DragRender elementRef={dragging.ref}>
             {renderBtn({})}
         </DragRender>}
     </Group>;
@@ -215,7 +211,7 @@ const FakeItemWithGlobalControl: React.FC<{
 
     const [ special, setSpecial ] = React.useState(false);
 
-    const { focusControlProps, active, focused } = useFocusControls<HTMLButtonElement>({
+    const { focusControlProps, active, focused } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,
         controls: [
@@ -242,7 +238,7 @@ const FakeItemWithGlobalControl: React.FC<{
     return <Button
         title={`item name=${name} active=${active}`}
         style={{
-            color: focused ? undefined : '#FFFA',
+            fontWeight: focused ? 'bold' : 'normal',
             outline: focused ? '2px solid red' : undefined,
         }}
         {...focusControlProps}
@@ -256,18 +252,15 @@ const FakeFooter: React.FC = () => {
 
     return <Card>
         <Stack>
-            {Object.entries(allControls).map(([ controlId, controls ]) => <Card key={controlId}>
-                <Group>
-                    {controlId}<br />
-                    {controls.map(c => <Badge
-                        key={c.label}
-                        leftSection={getControlIcon(c.trigger.type, c.trigger.values)}
-                        size='lg'
-                    >
-                        {c.label}
-                    </Badge>)}
-                </Group>
-            </Card>)}
+            {Object.entries(allControls).map(([ controlId, controls ]) => <Group
+                key={controlId}
+                gap='lg'
+            >
+                {controls.map(c => <Group key={c.name}>
+                    {getControlIcon(c.trigger.type, c.trigger.values)}
+                    {c.label}
+                </Group>)}
+            </Group>)}
         </Stack>
     </Card>;
 };
@@ -299,6 +292,10 @@ export const Primary: Story = {
                         id='move-container' pos='relative'
                         align='center' p='xl'
                     >
+                        <div>
+                            All interactions
+                            <br />Focus - Controls - Move - Select
+                        </div>
 
                         <FakePanel name='header'>
                             <Group>
