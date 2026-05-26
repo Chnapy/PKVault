@@ -13,7 +13,8 @@ export type UseFocusControlsParams = UseFocusNodeParams & {
     controlsEnable?: 'ifInScopeStack' | 'always';
 };
 
-export const useFocusControls = ({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const useFocusControls = <E = any>({
     scopeNodeId, childScopeId, focusOnMount, onFocus,
     controls, controlsEnable = 'ifInScopeStack'
 }: UseFocusControlsParams) => {
@@ -22,7 +23,7 @@ export const useFocusControls = ({
 
     const focusInChildScope = Focus.useIsInScopeStack(childScopeId);
 
-    const { nodeId, focused, focusProps, ...focusRest } = useFocusNode({
+    const { nodeId, focused, focusProps, ...focusRest } = useFocusNode<E>({
         scopeNodeId,
         focusOnMount,
         onFocus: (layout, props, details) => {

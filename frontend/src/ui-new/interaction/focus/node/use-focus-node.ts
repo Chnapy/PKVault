@@ -9,7 +9,8 @@ export type UseFocusNodeParams = Pick<UseFocusableConfig<unknown>, 'onFocus'> & 
   focusOnMount?: boolean;
 };
 
-export const useFocusNode = ({ scopeNodeId, focusOnMount, onFocus }: UseFocusNodeParams) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const useFocusNode = <E = any>({ scopeNodeId, focusOnMount, onFocus }: UseFocusNodeParams) => {
   const { scopeId } = useFocusScopeContext();
   const selectScope = useFocusScopeSelect();
 
@@ -21,7 +22,7 @@ export const useFocusNode = ({ scopeNodeId, focusOnMount, onFocus }: UseFocusNod
   // nodeId prefixed by scopeId to avoid conflicts
   const nodeId = `${scopeId}_${scopeNodeId}`;
 
-  const { ref, focused, focusSelf } = useFocusable({
+  const { ref, focused, focusSelf } = useFocusable<unknown, E>({
     focusKey: nodeId,
     focusable: active,
     saveLastFocusedChild: false,
@@ -29,7 +30,8 @@ export const useFocusNode = ({ scopeNodeId, focusOnMount, onFocus }: UseFocusNod
     isFocusBoundary: false,
     preferredChildFocusKey: undefined,
     onFocus: (layout, props, details) => {
-      layout.node.focus();
+      if (!(layout.node instanceof HTMLInputElement) || layout.node.type !== 'text')
+        layout.node.focus();
 
       onFocus?.(layout, props, details);
     },
@@ -62,8 +64,7 @@ export const useFocusNode = ({ scopeNodeId, focusOnMount, onFocus }: UseFocusNod
   }, [ focusOnMount, focusSelf ]);
 
   const focusProps = {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ref: ref as React.RefObject<any>,
+    ref,
     'data-focus-key': nodeId,
     'data-focus-active': active || undefined,
   };

@@ -15,7 +15,8 @@ export type PopoverTargetChildProps = {
     'aria-controls'?: string;
 };
 
-type PopoverWithControlsProps = {
+export type PopoverWithControlsProps = {
+    context?: PopoverContext;
     nested?: boolean;
     // target props are passed by mantine
     target: React.ReactElement;
@@ -23,8 +24,8 @@ type PopoverWithControlsProps = {
     dropdownProps?: Popover.Dropdown.Props;
 } & Omit<Popover.Props, 'opened' | 'withinPortal'>;
 
-export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ nested, target, dropdown, dropdownProps, ...rest }) => {
-    const [ ctx ] = React.useState((): PopoverContext => ({
+export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ context, nested, target, dropdown, dropdownProps, ...rest }) => {
+    const [ ctx ] = React.useState((): PopoverContext => context ?? ({
         usePopoverStore: createPopoverStore(),
     }));
 
@@ -41,7 +42,12 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ nested
     }
 
     return <popoverContext.Provider value={ctx}>
-        <Popover opened={opened} withinPortal={nested}  {...rest}>
+        <Popover
+            opened={opened}
+            onChange={value => ctx.usePopoverStore.setState(s => ({ ...s, opened: value }))}
+            withinPortal={nested}
+            {...rest}
+        >
             <Popover.Target>
                 {target}
             </Popover.Target>
