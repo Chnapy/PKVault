@@ -1,6 +1,7 @@
 import type { Preview, StoryContext } from '@storybook/react-vite';
 import { createMemoryHistory, createRootRoute, createRoute, createRouter, RouterProvider } from '@tanstack/react-router';
 import { AppTheme } from '../src/ui-new/app-theme';
+import { FocusControlsProvider } from '../src/ui-new/interaction/focus-controls/provider/focus-controls-provider';
 import { initFocus } from '../src/ui-new/interaction/focus/init-focus';
 
 initFocus();
@@ -64,10 +65,15 @@ const preview: Preview = {
   decorators: [
     (Story, ctx) => {
       const scheme = (ctx.globals.theme || 'light') as 'light' | 'dark';
+
       return (
         <AppTheme forceColorScheme={scheme}>
-          {/* <Story /> */}
-          {withRouter(Story, ctx)}
+          <FocusControlsProvider>
+
+            {/* <Story /> */}
+            {withRouter(Story, ctx)}
+
+          </FocusControlsProvider>
         </AppTheme>
       );
     }

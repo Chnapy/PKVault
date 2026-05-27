@@ -2,9 +2,9 @@ import { navigateByDirection } from '@noriginmedia/norigin-spatial-navigation-co
 import type { GamepadMappingsAllButton } from '../../controls/gamepad/gamepad-mapper';
 import type { ControlActionInput } from '../../controls/provider/controls-context';
 
-export const getMoveControl = (partial: Omit<ControlActionInput, 'name' | 'triggers' | 'action' | 'spread'>): ControlActionInput => ({
+export const getMoveControl = (partial: Omit<ControlActionInput, 'name' | 'triggers' | 'action' | 'spread'>) => ({
     ...partial,
-    name: 'move',
+    name: 'move' as const,
     triggers: {
         mouse: {
             type: 'mouse',
@@ -43,4 +43,4 @@ export const getMoveControl = (partial: Omit<ControlActionInput, 'name' | 'trigg
             // note: keyboard is handled by default by norigin-spatial-navigation
         }
     },
-});
+} satisfies ControlActionInput);

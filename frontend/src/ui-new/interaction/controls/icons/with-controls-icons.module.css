@@ -1,0 +1,34 @@
+
+.with-controls-icons {
+    display: inline-flex;
+    position: relative;
+    height: fit-content;
+}
+
+.icons-wrapper {
+    display: inline-flex;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+.icon {
+    position: relative;
+    display: inline-flex;
+    z-index: 1;
+}
+
+.out .icon {
+    transform: translate(50%, 50%);
+}
+
+.icon::before {
+    content: '';
+    position: absolute;
+    inset: 0.3rem;
+    background-color: var(--mantine-color-body);
+    z-index: -1;
+    border-radius: 99px;
+}

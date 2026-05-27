@@ -7,13 +7,22 @@ import { UISpeciesImg } from '../../sprite-img/species-img/ui-species-img';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import spritesheet0 from "../../stories/assets/spritesheet_species_0.webp";
 import { UIStorageItem } from './ui-storage-item';
+import { SelectProvider } from '../../interaction/select/context/select-provider';
+import { MoveProvider } from '../../interaction/move/context/move-provider';
 
 const meta = {
     title: 'UI/UIStorageItem',
     component: UIStorageItem,
-    decorators: Story => <Card display='inline-flex'>
-        <Story />
-    </Card>,
+    decorators: Story => <SelectProvider getContainerHash={() => ''} getContainerValue={() => null}>
+        <MoveProvider moveContainerId='content'
+            getContainerHash={() => ''} getContainerValue={() => null}
+            getTargetAllPositions={() => ({})} onDrop={async () => null}
+        >
+            <Card id='content' display='inline-flex'>
+                <Story />
+            </Card>
+        </MoveProvider>
+    </SelectProvider>,
 } satisfies Meta<typeof UIStorageItem>;
 
 export default meta;
@@ -21,6 +30,11 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
     args: {
+        id: '1',
+        bank: '1',
+        box: 1,
+        saveId: null,
+        slot: 1,
         label: 'Machamp Lv.50',
         icons: <Group justify='flex-end' gap={2} >
             <UIIconWrapper>

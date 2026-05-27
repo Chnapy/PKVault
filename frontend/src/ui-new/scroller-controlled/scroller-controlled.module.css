@@ -1,0 +1,13 @@
+
+.content {
+    display: flex;
+}
+
+.control {
+    transition: none;
+}
+
+[data-controls-type="gamepad"] .container {
+    padding-left: 1lh;
+    padding-right: 1lh;
+}

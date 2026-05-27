@@ -1,6 +1,8 @@
 import { Accordion, ActionIcon, Box, Group, TextInput, type DefaultMantineColor, type StyleProp } from '@mantine/core';
 import { FileMinusIcon, FilePlusIcon, FolderIcon, FolderMinusIcon, FolderPlusIcon, MinusIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
+import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
+import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 import { UIPathLine } from '../../path/ui-path-line';
 
@@ -39,25 +41,20 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
 
     const textInputRef = React.useRef<HTMLInputElement>(null);
 
-    const { focusControlProps, focused } = useFocusControls<HTMLInputElement>({
+    const renderTextInput = !isDesktop || isExclude;
+
+    const { focusControlProps, controlsIcons } = useFocusControls({
         scopeNodeId: name,
         controls: [
-            {
-                name: name + '-select',
+            // eslint-disable-next-line react-hooks/refs
+            renderTextInput && getSelectControl({
                 label: 'Select',
-                triggers: {
-                    gamepad: {
-                        type: 'gamepad',
-                        values: [ 'A' ],
-                    }
-                },
-                spread: false,
-                action: (e, trigger, value) => {
+                action: () => {
                     textInputRef.current?.focus();
                 },
-            },
+            }),
             {
-                name: name + '-delete',
+                name: 'delete' as const,
                 label: 'Delete',
                 triggers: {
                     gamepad: {
@@ -66,7 +63,7 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
                     }
                 },
                 spread: false,
-                action: (e, trigger, value) => {
+                action: () => {
                     onRemove();
                 },
             },
@@ -86,15 +83,17 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
                     </Box>
 
                     <div style={{ flexGrow: 1, lineBreak: 'anywhere' }}>
-                        {isDesktop && !isExclude
-                            ? value
-                            : <TextInput
-                                ref={textInputRef}
-                                value={value}
-                                onChange={({ currentTarget }) => onEdit(currentTarget.value)}
-                                disabled={disabled}
-                                size='xs'
-                            />}
+                        {renderTextInput
+                            ? <WithControlsIcons placement='out' icons={controlsIcons.open}>
+                                <TextInput
+                                    ref={textInputRef}
+                                    value={value}
+                                    onChange={({ currentTarget }) => onEdit(currentTarget.value)}
+                                    disabled={disabled}
+                                    size='xs'
+                                />
+                            </WithControlsIcons>
+                            : value}
                     </div>
 
                     {!isExclude && <Group
@@ -117,13 +116,15 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
                 <FolderIcon />
             </ActionIcon>}
 
-            <ActionIcon
-                size="lg" variant="subtle" color="gray"
-                onClick={onRemove}
-                disabled={disabled}
-            >
-                <TrashIcon />
-            </ActionIcon>
+            <WithControlsIcons placement='out' icons={controlsIcons.delete}>
+                <ActionIcon
+                    size="lg" variant="subtle" color="gray"
+                    onClick={onRemove}
+                    disabled={disabled}
+                >
+                    <TrashIcon />
+                </ActionIcon>
+            </WithControlsIcons>
         </Group>
 
         {results.length > 0 && <Accordion.Panel>

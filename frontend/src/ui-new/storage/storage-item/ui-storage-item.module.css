@@ -21,10 +21,14 @@
     position: absolute;
     left: 4px;
     top: 4px;
+}
+
+.ui-storage-item .checkbox > * {
     opacity: 0;
 }
 
-.ui-storage-item:hover .checkbox,
-.checkbox[data-checked='true'] {
+.ui-storage-item:hover .checkbox > *,
+.ui-storage-item .button[data-focused="true"] + .checkbox > *,
+.checkbox [data-checked='true'] {
     opacity: 1;
 }

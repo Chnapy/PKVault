@@ -7,17 +7,17 @@ import { useFocusNode, type UseFocusNodeParams } from '../focus/node/use-focus-n
 import { Focus } from '../focus/provider/use-focus-context';
 import { useFocusScopeContext } from '../focus/scope/use-focus-scope-context';
 
-export type UseFocusControlsParams = UseFocusNodeParams & {
+export type UseFocusControlsParams<N extends string = string> = UseFocusNodeParams & {
     childScopeId?: string;
-    controls: ControlsWithFalsy;
+    controls: ControlsWithFalsy<N>;
     controlsEnable?: 'ifInScopeStack' | 'always';
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useFocusControls = <E = any>({
+export const useFocusControls = <E = any, N extends string = string>({
     scopeNodeId, childScopeId, focusOnMount, onFocus,
     controls, controlsEnable = 'ifInScopeStack'
-}: UseFocusControlsParams) => {
+}: UseFocusControlsParams<N>) => {
     const parentScope = useFocusScopeContext();
     const order = parentScope.parentsIds.length;
 
@@ -49,10 +49,7 @@ export const useFocusControls = <E = any>({
         }
     };
 
-    const {
-        onClick: controlOnClick,
-        ...controlPropsRest
-    } = useControls(
+    const { controlsProps, controlsIcons } = useControls<N>(
         nodeId,
         focused,
         order,
@@ -61,6 +58,8 @@ export const useFocusControls = <E = any>({
             enabled: getControlsEnable(),
         }
     );
+
+    const { onClick: controlOnClick, ...controlPropsRest } = controlsProps;
 
     const onClick: typeof controlOnClick = React.useCallback<React.MouseEventHandler>((e) => {
         const getFocusableElement = () => {
@@ -91,11 +90,12 @@ export const useFocusControls = <E = any>({
     const focusControlProps = {
         ...focusProps,
         ...controlPropsRest,
-        onClick,
+        onClick: controlOnClick && onClick,
     };
 
     return {
         focusControlProps,
+        controlsIcons,
         nodeId,
         focused,
         order,

@@ -2,13 +2,15 @@ import { ActionIcon, Button, Divider, Flex, Group, NumberFormatter, Popover, Sta
 import { BoxIcon, PenIcon, TrashIcon } from 'lucide-react';
 import type React from 'react';
 import { UIBallIcon } from '../icon/ui-ball-icon';
-import classes from './ui-bank-list.module.css';
 
-type UIBankExpandedProps = {
+export type UIBankData = {
     id: string;
     label: string;
     boxCount: number;
     pkmCount: number;
+};
+
+type UIBankExpandedProps = UIBankData & {
     selected?: boolean;
     onSelect: () => void;
     onDelete: () => void;
@@ -20,7 +22,6 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
 }) => {
     return <Group gap='xs'>
         <Tabs.Tab
-            className={classes.uiBankItem}
             color='primary.6'
             value={id}
             py='md'

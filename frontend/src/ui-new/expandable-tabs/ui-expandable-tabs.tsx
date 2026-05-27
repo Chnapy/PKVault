@@ -6,12 +6,12 @@ import { useControls } from '../interaction/controls/use-controls';
 import { useFocusScopeContext } from '../interaction/focus/scope/use-focus-scope-context';
 import { ScrollerControlled, type ScrollerControlledProps } from '../scroller-controlled/scroller-controlled';
 
-type Data = {
+export type UIExpandableTabsData = {
     id: string;
     label: string;
 };
 
-type Params<D extends Data> = {
+type Params<D extends UIExpandableTabsData> = {
     item: D;
     i: number;
     selected: boolean;
@@ -23,26 +23,26 @@ type Options = {
     reduce: () => void;
 };
 
-type UIExpandableTabsOwnProps<D extends Data> = {
+type UIExpandableTabsOwnProps<D extends UIExpandableTabsData> = {
     value: D[ 'id' ];
     data: D[];
     onChange: (id: D[ 'id' ]) => void;
     renderTab: (params: Params<D>, opt: Options) => React.ReactNode;
-    renderExpanded: (params: Params<D>[], opt: Options) => React.ReactNode;
+    renderExpanded?: (params: Params<D>[], opt: Options) => React.ReactNode;
     left?: React.ReactNode;
     right?: React.ReactNode;
     grow?: boolean;
 };
 
-type UIExpandableTabsProps<D extends Data> =
+export type UIExpandableTabsProps<D extends UIExpandableTabsData> =
     UIExpandableTabsOwnProps<D>
     & Pick<ScrollerControlledProps, 'id' | 'level' | 'controlsEnabled' | 'controlsLabel'>
     & Omit<TabsProps, keyof UIExpandableTabsOwnProps<D>>
     & {
-        controlsDetailsLabel: string;
+        controlsDetailsLabel?: string;
     };
 
-export function UIExpandableTabs<D extends Data = Data>({
+export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTabsData>({
     id, level, controlsEnabled, controlsLabel, controlsDetailsLabel,
     value, data, onChange, renderTab, renderExpanded,
     left, right, grow = true,
@@ -53,7 +53,7 @@ export function UIExpandableTabs<D extends Data = Data>({
     const parentScope = useFocusScopeContext();
     const order = parentScope.parentsIds.length;
 
-    const enabled = controlsEnabled;
+    const expandEnabled = controlsEnabled && !!controlsDetailsLabel && !!renderExpanded;
 
     // console.log('scroller', id, parentScope);
 
@@ -61,12 +61,12 @@ export function UIExpandableTabs<D extends Data = Data>({
         ? [ 'LB', 'RB' ]
         : [ 'LT', 'RT' ];
 
-    const controlsProps = useControls(
+    const { controlsProps } = useControls(
         id + '-detailed',
         true,
         order,
         [
-            {
+            controlsDetailsLabel && {
                 name: 'tabs-detailed-' + id,
                 label: controlsDetailsLabel,
                 triggers: {
@@ -82,7 +82,7 @@ export function UIExpandableTabs<D extends Data = Data>({
                 },
             }
         ],
-        { enabled },
+        { enabled: expandEnabled },
     );
 
     return <Tabs
@@ -126,7 +126,7 @@ export function UIExpandableTabs<D extends Data = Data>({
                     ))}
                 </ScrollerControlled>
 
-                <ActionIcon
+                {renderExpanded && <ActionIcon
                     variant='subtle'
                     size='sm'
                     p='xs'
@@ -138,12 +138,12 @@ export function UIExpandableTabs<D extends Data = Data>({
                     {expanded
                         ? <ChevronUpIcon />
                         : <ChevronDownIcon />}
-                </ActionIcon>
+                </ActionIcon>}
 
                 {right}
             </Tabs.List>
 
-            {expanded && renderExpanded(
+            {expanded && renderExpanded?.(
                 data.map((item, i) => ({
                     item,
                     i,

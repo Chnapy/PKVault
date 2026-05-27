@@ -7,7 +7,7 @@ type Params = {
     droppable?: Pick<UseDroppableReturn, 'isDroppable' | 'stopDrag' | 'onDrop'>;
 };
 
-export const getDragControls = ({ dragging, droppable }: Params): ControlsWithFalsy => {
+export const getDragControls = ({ dragging, droppable }: Params) => {
     const stopDrag = dragging?.stopDrag ?? droppable?.stopDrag;
 
     const isDragging = dragging?.isDragging;
@@ -15,7 +15,7 @@ export const getDragControls = ({ dragging, droppable }: Params): ControlsWithFa
 
     return [
         droppable?.onDrop && {
-            name: 'drop',
+            name: 'drop' as const,
             label: 'Drop',
             triggers: {
                 mouse: {
@@ -38,7 +38,7 @@ export const getDragControls = ({ dragging, droppable }: Params): ControlsWithFa
             spread: false,
         },
         stopDrag && (isDragging || isDroppable) && {
-            name: 'drag-cancel',
+            name: 'drag-cancel' as const,
             label: 'Cancel',
             triggers: {
                 // mouse: {
@@ -61,7 +61,7 @@ export const getDragControls = ({ dragging, droppable }: Params): ControlsWithFa
             spread: false,
         },
         dragging && !droppable?.onDrop && !isDragging && {
-            name: 'drag',
+            name: 'drag' as const,
             label: 'Move',
             triggers: {
                 mouse: {
@@ -93,7 +93,7 @@ export const getDragControls = ({ dragging, droppable }: Params): ControlsWithFa
             spread: false,
         },
         dragging && !droppable?.onDrop && !isDragging && {
-            name: 'drag-attached',
+            name: 'drag-attached' as const,
             label: 'Move attached',
             triggers: {
                 // mouse: {
@@ -116,5 +116,5 @@ export const getDragControls = ({ dragging, droppable }: Params): ControlsWithFa
             },
             spread: false,
         },
-    ];
+    ] satisfies ControlsWithFalsy;
 };

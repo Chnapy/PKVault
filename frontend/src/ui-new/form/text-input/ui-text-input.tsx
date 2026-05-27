@@ -2,6 +2,8 @@ import { ActionIcon, Group, TextInput } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import { SendIcon, XIcon } from 'lucide-react';
 import type React from 'react';
+import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
+import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 import { Focus } from '../../interaction/focus/provider/use-focus-context';
 
@@ -15,26 +17,18 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
 
     const { popScope } = Focus.usePushPopScope();
 
-    const { focusControlProps } = useFocusControls<HTMLInputElement>({
+    const { focusControlProps, controlsIcons } = useFocusControls({
         scopeNodeId: name,
         // focusOnMount: true,
         controls: [
-            {
-                name: name + '-focus',
+            getSelectControl({
                 label: 'Focus',
-                triggers: {
-                    gamepad: {
-                        type: 'gamepad',
-                        values: [ 'A' ],
-                    }
-                },
-                spread: false,
-                action: (e, trigger, value) => {
+                action: () => {
                     focusControlProps.ref.current.focus();
                 },
-            },
+            }),
             onSubmit && {
-                name: name + '-submit',
+                name: 'submit' as const,
                 label: 'Submit',
                 triggers: {
                     gamepad: {
@@ -43,13 +37,13 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
                     }
                 },
                 spread: false,
-                action: (e, trigger, value) => {
+                action: () => {
                     onSubmit();
                     popScope();
                 },
             },
             onCancel && {
-                name: name + '-cancel',
+                name: 'cancel' as const,
                 label: 'Cancel',
                 triggers: {
                     gamepad: {
@@ -58,7 +52,7 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
                     }
                 },
                 spread: false,
-                action: (e, trigger, value) => {
+                action: () => {
                     onCancel();
                     popScope();
                 },
@@ -71,34 +65,40 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
         rest.ref,
     );
 
-    return <TextInput
-        // label='Label'
-        // description='Description'
-        rightSectionWidth='auto'
-        rightSection={(onCancel || onSubmit) && <Group gap='xs' wrap='nowrap'>
-            {onCancel && <ActionIcon size='sm' variant='subtle' onClick={onCancel}>
-                <XIcon />
-            </ActionIcon>}
+    return <WithControlsIcons placement='out' icons={controlsIcons.open}>
+        <TextInput
+            // label='Label'
+            // description='Description'
+            rightSectionWidth='auto'
+            rightSection={(onCancel || onSubmit) && <Group gap='xs' wrap='nowrap'>
+                {onCancel && <WithControlsIcons placement='out' icons={controlsIcons.cancel}>
+                    <ActionIcon size='sm' variant='subtle' onClick={onCancel}>
+                        <XIcon />
+                    </ActionIcon>
+                </WithControlsIcons>}
 
-            {onSubmit && <ActionIcon size='sm' variant='subtle' color='blue' onClick={onSubmit}>
-                <SendIcon />
-            </ActionIcon>}
-        </Group>}
-        {...focusControlProps}
-        {...rest}
-        ref={ref}
-        styles={{
-            ...rest.styles,
-            input: {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                ...(rest.styles as any)?.input,
-                paddingRight: (onCancel || onSubmit) && `${onCancel && onSubmit ? 2 : 1}lh`,
-            },
-        }}
-    // styles={{
-    //     input: isGamepad ? {
-    //         textAlign: 'center',
-    //     } : undefined,
-    // }}
-    />;
+                {onSubmit && <WithControlsIcons placement='out' icons={controlsIcons.submit}>
+                    <ActionIcon size='sm' variant='subtle' color='blue' onClick={onSubmit}>
+                        <SendIcon />
+                    </ActionIcon>
+                </WithControlsIcons>}
+            </Group>}
+            {...focusControlProps}
+            {...rest}
+            ref={ref}
+            styles={{
+                ...rest.styles,
+                input: {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    ...(rest.styles as any)?.input,
+                    paddingRight: (onCancel || onSubmit) && `${onCancel && onSubmit ? 2 : 1}lh`,
+                },
+            }}
+        // styles={{
+        //     input: isGamepad ? {
+        //         textAlign: 'center',
+        //     } : undefined,
+        // }}
+        />
+    </WithControlsIcons>;
 };

@@ -1,8 +1,8 @@
 import type { ControlActionInput } from '../../controls/provider/controls-context';
 
-export const getSelectControl = (partial: Omit<ControlActionInput, 'name' | 'triggers' | 'spread'>): ControlActionInput => ({
+export const getSelectControl = (partial: Omit<ControlActionInput, 'name' | 'triggers' | 'spread'>) => ({
     ...partial,
-    name: 'open',
+    name: 'open' as const,
     triggers: {
         mouse: {
             type: 'mouse',
@@ -18,4 +18,4 @@ export const getSelectControl = (partial: Omit<ControlActionInput, 'name' | 'tri
         },
     },
     spread: false,
-});
+} satisfies ControlActionInput);

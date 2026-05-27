@@ -10,12 +10,12 @@ import { SelectProvider } from '../../interaction/select/context/select-provider
 import { UIAppLayout } from '../../layout/app-layout/ui-app-layout';
 import { UIFooter } from '../../layout/footer/ui-footer';
 import { UIHeader } from '../../layout/header/ui-header';
-import { WithBanks as UIHeaderBanksStory, WithSingleBank as UIHeaderSingleBankStory } from '../../layout/header/ui-header.stories';
+import { WithStorageBanks as UIHeaderBanksStory, WithSingleBank as UIHeaderSingleBankStory } from '../../layout/header/ui-header.stories';
 import { UIStorageContent } from '../../storage/storage-content/ui-storage-content';
 import { UIStoragePanel } from '../../storage/storage-panel/ui-storage-panel';
 import { UIStoragePanelWrapperDetails } from '../../storage/storage-panel/ui-storage-panel-wrapper-details';
 import { EmptyData as StoragePanelWrapperEmptyStory, Primary as StoragePanelWrapperStory } from '../../storage/storage-panel/ui-storage-panel-wrapper-details.stories';
-import { getPanelInteractiveChildren, EmptyData as StoragePanelEmptyStory, Primary as StoragePanelStory } from '../../storage/storage-panel/ui-storage-panel.stories';
+import { getPanelChildren, EmptyData as StoragePanelEmptyStory, Primary as StoragePanelStory } from '../../storage/storage-panel/ui-storage-panel.stories';
 
 type ContainerValue = { box: number; };
 
@@ -81,14 +81,14 @@ export const Primary: Story = {
                 {...StoragePanelWrapperStory.args}
                 children={<UIStoragePanel
                     {...StoragePanelStory.args}
-                    children={getPanelInteractiveChildren(1)}
+                    children={getPanelChildren(1)}
                 />}
             />}
             right={<UIStoragePanelWrapperDetails
                 {...StoragePanelWrapperStory.args}
                 children={<UIStoragePanel
                     {...StoragePanelStory.args}
-                    children={getPanelInteractiveChildren(2)}
+                    children={getPanelChildren(2)}
                 />}
             />}
         />}

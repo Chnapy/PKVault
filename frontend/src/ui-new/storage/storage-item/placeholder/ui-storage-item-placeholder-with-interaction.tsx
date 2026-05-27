@@ -1,5 +1,6 @@
 import { useMergedRef } from '@mantine/hooks';
 import type React from 'react';
+import { WithControlsIcons } from '../../../interaction/controls/icons/with-controls-icons';
 import { getDragControls } from '../../../interaction/focus-controls/common-controls/drag-controls';
 import { useFocusControls } from '../../../interaction/focus-controls/use-focus-controls';
 import { useDragSubmitting } from '../../../interaction/move/hooks/use-drag-submitting';
@@ -36,7 +37,7 @@ export const UIStorageItemPlaceholderWithInteraction: React.FC<UIStorageItemPlac
 
     const scopeNodeId = [ bank, saveId, box, slot ].join('-');
 
-    const { focusControlProps } = useFocusControls({
+    const { focusControlProps, controlsIcons } = useFocusControls({
         scopeNodeId,
         onFocus: ({ node }) => {
             droppable.focusNode(node);
@@ -55,10 +56,12 @@ export const UIStorageItemPlaceholderWithInteraction: React.FC<UIStorageItemPlac
 
     const submitting = useDragSubmitting<ContainerValue>(targetContainer, slot);
 
-    return <UIStorageItemPlaceholder
-        loading={submitting}
-        // disabled={!isDroppable}
-        {...focusControlProps}
-        ref={ref}
-    />;
+    return <WithControlsIcons placement='out' icons={controlsIcons.drop}>
+        <UIStorageItemPlaceholder
+            loading={submitting}
+            // disabled={!isDroppable}
+            {...focusControlProps}
+            ref={ref}
+        />
+    </WithControlsIcons>;
 };

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { UIBankList } from '../../bank/ui-bank-list';
+import { UISettingsCategories } from '../../settings/categories/ui-settings-categories';
 import { UIFrame } from '../frame/ui-frame';
 import { UIHeader } from './ui-header';
 import { UIHeaderItem } from './ui-header-item';
@@ -39,13 +40,13 @@ export const WithSingleBank: Story = {
             data={[
                 { id: '1', label: 'Bank 1', boxCount: 1, pkmCount: 0 },
             ]}
-            onSelect={console.log}
+            onChange={console.log}
             onDelete={console.log}
         />,
     },
 };
 
-export const WithBanks: Story = {
+export const WithStorageBanks: Story = {
     args: {
         ...Primary.args,
         sub: <UIBankList
@@ -61,8 +62,32 @@ export const WithBanks: Story = {
                 { id: '8', label: 'Bank 8', boxCount: 1, pkmCount: 0 },
                 { id: '9', label: 'Bank 9', boxCount: 1, pkmCount: 0 },
             ]}
-            onSelect={console.log}
+            onChange={console.log}
             onDelete={console.log}
+        />,
+    },
+};
+
+export const WithSettingsCategories: Story = {
+    args: {
+        ...Primary.args,
+        sub: <UISettingsCategories
+            value='main'
+            onChange={console.log}
+            data={[
+                {
+                    id: 'main',
+                    label: 'Main',
+                },
+                {
+                    id: 'external-pkms',
+                    label: 'External pkms',
+                },
+                {
+                    id: 'backups',
+                    label: 'Backups',
+                },
+            ]}
         />,
     },
 };

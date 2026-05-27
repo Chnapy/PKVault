@@ -18,7 +18,7 @@ export const usePanelControls = (name: string, focusControlsParams?: Params) => 
         scopeNodeId: name,
         childScopeId,
         controls: [
-            getSelectControl({
+            !isInScopeStack && getSelectControl({
                 label: 'Select',
                 action: () => pushScope(childScopeId),
             }),

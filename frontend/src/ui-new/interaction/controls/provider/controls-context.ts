@@ -24,8 +24,8 @@ export type ControlTrigger<T extends ControlTriggerType = ControlTriggerType> = 
     listeners?: ControlListenerName[];
 };
 
-export type ControlAction = {
-    name: string;
+export type ControlAction<N extends string = string> = {
+    name: N;
     triggers: { [trigger in ControlTriggerType]?: ControlTrigger<trigger> };
     label: string;
     focused: boolean;
@@ -36,11 +36,11 @@ export type ControlAction = {
     action: <T extends ControlTriggerType = ControlTriggerType>(e: never, trigger: T, value: ControlTriggerValues[T]) => void;
 };
 
-export type ControlActionInput = Omit<ControlAction, 'focused' | 'order'>;
+export type ControlActionInput<N extends string = string> = Omit<ControlAction<N>, 'focused' | 'order'>;
 
 type Falsy = false | undefined | null | '' | 0; 
 
-export type ControlsWithFalsy = (ControlActionInput | Falsy)[];
+export type ControlsWithFalsy<N extends string = string> = (ControlActionInput<N> | Falsy)[];
 export type Controls = ControlAction[];
 
 export type ControlId = string;

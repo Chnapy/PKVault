@@ -5,6 +5,7 @@ import { getControlIcon } from '../interaction/controls/icons/get-control-icon';
 import { useControls } from '../interaction/controls/use-controls';
 import { useControlsCurrentType } from '../interaction/controls/use-controls-current-type';
 import { useFocusScopeContext } from '../interaction/focus/scope/use-focus-scope-context';
+import classes from './scroller-controlled.module.css';
 
 export type ScrollerControlledProps = {
     id: string;
@@ -29,7 +30,7 @@ export const ScrollerControlled: React.FC<ScrollerControlledProps> = ({ id, leve
         ? [ 'LB', 'RB' ]
         : [ 'LT', 'RT' ];
 
-    const controlsProps = useControls(
+    const { controlsProps } = useControls(
         id,
         true,
         order,
@@ -94,17 +95,10 @@ export const ScrollerControlled: React.FC<ScrollerControlledProps> = ({ id, leve
         controlSize='1lh'
         {...controlsProps}
         {...rest}
-        styles={{
-            container: {
-                paddingLeft: isGamepad ? '1lh' : undefined,
-                paddingRight: isGamepad ? '1lh' : undefined,
-            },
-            content: {
-                display: 'flex',
-            },
-            control: {
-                transition: 'none',
-            },
+        classNames={{
+            container: classes.container,
+            content: classes.content,
+            control: classes.control,
         }}
     />;
 };

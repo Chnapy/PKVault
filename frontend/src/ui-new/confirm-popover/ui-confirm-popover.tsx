@@ -1,6 +1,7 @@
 import { Button, getSingleElementChild, Stack } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import React from 'react';
+import { WithControlsIcons } from '../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../interaction/focus-controls/common-controls/select-controls';
 import { usePopover } from '../interaction/focus-controls/components/popover/hooks/use-popover';
 import { PopoverWithControls, type PopoverTargetChildProps } from '../interaction/focus-controls/components/popover/popover-with-controls';
@@ -52,7 +53,7 @@ const TargetOpenPopover: React.FC<PopoverTargetChildProps & { children: React.Re
 const Dropdown: React.FC<Pick<UIConfirmPopoverProps, 'label' | 'action'>> = ({ label, action }) => {
     const setPopover = usePopover()!;
 
-    const { focusControlProps } = useFocusControls({
+    const { focusControlProps, controlsIcons } = useFocusControls({
         scopeNodeId: `confirm_dropdown`,
         focusOnMount: true,
         controls: [
@@ -71,8 +72,12 @@ const Dropdown: React.FC<Pick<UIConfirmPopoverProps, 'label' | 'action'>> = ({ l
     return <Stack>
         {label}
 
-        <Button
-            {...focusControlProps}
-        >Confirm ?</Button>
+        <WithControlsIcons placement='in' icons={controlsIcons.open}>
+            <Button
+                {...focusControlProps}
+            >
+                Confirm ?
+            </Button>
+        </WithControlsIcons>
     </Stack>
 };

@@ -3,6 +3,7 @@ import { Button, type ElementProps } from '@mantine/core';
 import type React from 'react';
 import type { GamepadMappingsAllButton } from '../../../interaction/controls/gamepad/gamepad-mapper';
 import { getControlIcon } from '../../../interaction/controls/icons/get-control-icon';
+import { WithControlsIcons } from '../../../interaction/controls/icons/with-controls-icons';
 import { useControls } from '../../../interaction/controls/use-controls';
 import { useControlsCurrentType } from '../../../interaction/controls/use-controls-current-type';
 import { getSelectControl } from '../../../interaction/focus-controls/common-controls/select-controls';
@@ -17,8 +18,8 @@ type UIDetailsActionProps = {
 
 export const UIDetailsAction: React.FC<UIDetailsActionProps> = ({ name, label, gamepadValue, focusOnMount, onClick, ...rest }) => {
 
-    const { focusControlProps, order, active } = useFocusControls({
-        scopeNodeId: 'details-' + name,
+    const { focusControlProps, order, active, controlsIcons } = useFocusControls({
+        scopeNodeId: name,
         focusOnMount,
         controls: [
             onClick && getSelectControl({
@@ -28,17 +29,13 @@ export const UIDetailsAction: React.FC<UIDetailsActionProps> = ({ name, label, g
         ],
     });
 
-    useControls(
-        'details-2-' + name,
+    const controls = useControls(
+        name + '-active',
         true,
         order,
         [
-            onClick && getSelectControl({
-                label: 'Select',
-                action: onClick,
-            }),
             onClick && gamepadValue && {
-                name: 'details-' + name,
+                name: 'active-action',
                 label,
                 triggers: {
                     // keyboard: {
@@ -61,11 +58,16 @@ export const UIDetailsAction: React.FC<UIDetailsActionProps> = ({ name, label, g
 
     const icons = gamepadValue && getControlIcon(controlsCurrentType, [ gamepadValue ]);
 
-    return <Button
-        {...rest}
-        {...focusControlProps}
-        leftSection={icons ?? rest.leftSection}
-    >
-        {label}
-    </Button>;
+    return <WithControlsIcons placement='out' icons={[
+        controlsIcons.open,
+        controls.controlsIcons[ 'active-action' ]
+    ]}>
+        <Button
+            {...rest}
+            {...focusControlProps}
+            leftSection={icons ?? rest.leftSection}
+        >
+            {label}
+        </Button>
+    </WithControlsIcons>;
 };

@@ -16,9 +16,9 @@ export const useCurrentPanel = () => {
     const panel = React.use(panelContext);
 
     return {
-        isInCurrentPanel: currentPanel.value === panel,
+        isInCurrentPanel: currentPanel?.value === panel,
         normalizeCurrentPanel: () => {
-            if (currentPanel.value !== panel)
+            if (currentPanel && currentPanel.value !== panel)
                 currentPanel.setValue(panel);
         },
     };

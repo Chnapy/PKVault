@@ -1,5 +1,7 @@
 import { Switch } from '@mantine/core';
 import type React from 'react';
+import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
+import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 
 type UISwitchProps = {
@@ -9,30 +11,24 @@ type UISwitchProps = {
 
 export const UISwitch: React.FC<UISwitchProps> = ({ name, controlLabel, ...rest }) => {
 
-    const { focusControlProps, focused } = useFocusControls<HTMLInputElement>({
+    const { focusControlProps, controlsIcons } = useFocusControls({
         scopeNodeId: name,
         // focusOnMount: true,
         controls: [
-            {
-                name: name + '-change',
+            getSelectControl({
                 label: controlLabel,
-                triggers: {
-                    gamepad: {
-                        type: 'gamepad',
-                        values: [ 'A' ],
-                    }
-                },
-                spread: false,
-                action: (e, trigger, value) => {
+                action: () => {
                     focusControlProps.ref.current.click();
                 },
-            },
+            }),
         ],
     });
 
-    return <Switch
-        id={name}
-        {...focusControlProps}
-        {...rest}
-    />;
+    return <WithControlsIcons placement='out' icons={controlsIcons.open} display='inline-flex' h='fit-content'>
+        <Switch
+            id={name}
+            {...focusControlProps}
+            {...rest}
+        />
+    </WithControlsIcons>;
 };
