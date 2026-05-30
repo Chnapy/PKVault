@@ -17,7 +17,7 @@ type ControlsProps = ControlListenerAttributes & {
 
 type UseControlsReturn<N extends string = string> = {
     controlsProps: ControlsProps;
-    controlsIcons: Record<N, React.ReactNode>;
+    controlsIcons: Record<N, React.ReactNode[]>;
 };
 
 export const useControls = <N extends string>(id: ControlId, focused: boolean, order: number, controls: ControlsWithFalsy<N>, { enabled }: Options): UseControlsReturn<N> => {
@@ -80,7 +80,7 @@ export const useControls = <N extends string>(id: ControlId, focused: boolean, o
 
     const controlsCurrentType = useControlsCurrentType();
 
-    const controlsIcons = controls.reduce<Record<N, React.ReactNode>>((acc, item) => {
+    const controlsIcons = controls.reduce<Record<N, React.ReactNode[]>>((acc, item) => {
         if (!item) return acc;
         if (!enabled) return acc;
 

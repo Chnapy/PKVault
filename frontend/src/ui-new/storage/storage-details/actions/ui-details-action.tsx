@@ -65,7 +65,7 @@ export const UIDetailsAction: React.FC<UIDetailsActionProps> = ({ name, label, g
         <Button
             {...rest}
             {...focusControlProps}
-            leftSection={icons ?? rest.leftSection}
+            leftSection={icons?.length ? icons : rest.leftSection}
         >
             {label}
         </Button>

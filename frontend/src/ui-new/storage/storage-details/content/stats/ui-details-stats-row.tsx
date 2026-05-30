@@ -31,8 +31,8 @@ const statsInfos = {
 export type UIDetailsStatsRowProps = {
     stat: keyof typeof statsInfos;
     value: number;
-    iv: number;
-    ev: number;
+    iv?: number;
+    ev?: number;
 };
 
 export const UIDetailsStatsRow: React.FC<UIDetailsStatsRowProps> = ({ stat, value, iv, ev }) => {
@@ -57,7 +57,7 @@ export const UIDetailsStatsRow: React.FC<UIDetailsStatsRowProps> = ({ stat, valu
         <Table.Td>
             {value}
         </Table.Td>
-        <Table.Td>
+        {iv !== undefined && <Table.Td>
             <Badge
                 variant='outline'
                 color={`rgb(${255 - (255 * iv / 31)},${255 * iv / 31},0)`}
@@ -72,8 +72,8 @@ export const UIDetailsStatsRow: React.FC<UIDetailsStatsRowProps> = ({ stat, valu
             >
                 {iv}
             </Badge>
-        </Table.Td>
-        <Table.Td>
+        </Table.Td>}
+        {ev !== undefined && <Table.Td>
             <Badge
                 variant='outline'
                 color={`rgb(${255 - (255 * ev / 252)},${255 * ev / 252},0)`}
@@ -88,6 +88,6 @@ export const UIDetailsStatsRow: React.FC<UIDetailsStatsRowProps> = ({ stat, valu
             >
                 {ev}
             </Badge>
-        </Table.Td>
+        </Table.Td>}
     </Table.Tr>;
 };

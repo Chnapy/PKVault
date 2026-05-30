@@ -18,7 +18,8 @@
 :root h4,
 :root h5,
 :root h6,
-:root .mantine-Badge-label {
+:root .mantine-Badge-label,
+:root .mantine-SegmentedControl-label {
   text-shadow: none;
 }
 

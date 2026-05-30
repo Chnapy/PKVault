@@ -1,4 +1,4 @@
-import { NativeSelect, type ComboboxData } from '@mantine/core';
+import { NativeSelect } from '@mantine/core';
 import type React from 'react';
 import type { GamepadMappingsAllButton } from '../../interaction/controls/gamepad/gamepad-mapper';
 import { getControlIcon } from '../../interaction/controls/icons/get-control-icon';
@@ -8,16 +8,15 @@ import { useFocusControls } from '../../interaction/focus-controls/use-focus-con
 type UISelectProps = {
     name: string;
     controlLabel: string;
-    data: ComboboxData;
-};
+} & NativeSelect.Props;
 
-export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data }) => {
+export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ...rest }) => {
 
     const isGamepad = useControlsCurrentType() === 'gamepad';
 
     const { focusControlProps, focused } = useFocusControls<HTMLSelectElement>({
         scopeNodeId: name,
-        focusOnMount: true,
+        // focusOnMount: true,
         controls: [
             {
                 name: name + '-change',
@@ -65,5 +64,6 @@ export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data }) 
                 textAlign: 'center',
             } : undefined,
         }}
+        {...rest}
     />;
 };

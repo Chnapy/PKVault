@@ -1,0 +1,28 @@
+
+.ui-pokedex-item {
+    touch-action: none;
+    position: relative;
+}
+
+.ui-pokedex-item .button {
+    touch-action: none;
+    position: relative;
+    height: auto;
+    padding: 0;
+
+    /* font-size: 1rem; */
+}
+
+.species {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-bottom-right-radius: var(--mantine-radius-default);
+    background-color: var(--button-hover);
+}
+
+.ui-pokedex-item .icons {
+    position: absolute;
+    inset: 0;
+    padding: 4px;
+}

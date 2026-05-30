@@ -20,6 +20,7 @@ export const UISettingsContent: React.FC<UISettingsContentProps> = ({ left, righ
         <WithControlsIcons placement='out' icons={controlsIcons.open}
             display='flex'
             mah='100%'
+            bdrs='md'
             style={{ flexGrow: 1, flexDirection: 'column', flexWrap: 'nowrap', }}
             {...panelProps}
         >

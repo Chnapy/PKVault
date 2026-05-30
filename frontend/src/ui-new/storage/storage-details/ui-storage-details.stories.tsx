@@ -132,7 +132,7 @@ export const Primary: Story = {
                 ability='Guts'
                 pid='51853507'
             />}
-            stats={<UIDetailsContentStats>
+            stats={<UIDetailsContentStats iv ev>
                 {[
                     {
                         stat: 'hp',

@@ -21,7 +21,7 @@ export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values:
                     case 'move': return inputIcon(inputIconResources.mouse.move, i);
                     case 'drag': return <HandIcon key={i} />;
                 }
-            });
+            }).filter(Boolean);
         case 'keyboard':
             return [];
         case 'gamepad': {
@@ -58,7 +58,7 @@ export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values:
                         }
                     })}
                 </div>
-                : icon)
+                : icon).filter(Boolean)
         }
     }
 };
