@@ -1,5 +1,6 @@
 import { Container, Grid, Stack } from '@mantine/core';
 import type React from 'react';
+import { ErrorCatcher } from '../../../error/error-catcher';
 import { useControlsCurrentType } from '../../interaction/controls/use-controls-current-type';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import { UIFrame } from '../frame/ui-frame';
@@ -17,23 +18,25 @@ export const UIAppLayout: React.FC<UIAppLayoutProps> = ({ header, bottom, footer
     return <UIFrame
         data-controls-type={controlsCurrentType}
     >
-        {header}
+        <ErrorCatcher>
+            {header}
 
-        <UISpriteSizeWrapper<typeof Container>
-            component={Container}
-            speciesSize='md'
-            fluid style={{ overflow: 'hidden', flexGrow: 1 }} w='100%' p='md'>
-            <Stack h='100%'>
-                {children}
+            <UISpriteSizeWrapper<typeof Container>
+                component={Container}
+                speciesSize='md'
+                fluid style={{ overflow: 'hidden', flexGrow: 1 }} w='100%' p='md'>
+                <Stack h='100%'>
+                    {children}
 
-                <Grid grow>
-                    <Grid.Col span='auto'>
-                        {bottom}
-                    </Grid.Col>
-                </Grid>
-            </Stack>
-        </UISpriteSizeWrapper>
+                    <Grid grow>
+                        <Grid.Col span='auto'>
+                            {bottom}
+                        </Grid.Col>
+                    </Grid>
+                </Stack>
+            </UISpriteSizeWrapper>
 
-        {footer}
+            {footer}
+        </ErrorCatcher>
     </UIFrame>;
 };

@@ -2,7 +2,7 @@ import type { Vector2 } from '@use-gesture/react';
 import React from 'react';
 import { create } from 'zustand';
 import { moveReducer } from '../state/move-reducer';
-import type { MoveAction, MoveState } from '../state/move-state';
+import type { MoveAction, MoveSource, MoveState } from '../state/move-state';
 
 export type MoveTargetInput<C> = {
     targetContainer: C;
@@ -25,25 +25,26 @@ export type MovePositions = {
     drag: Vector2;
 }; 
 
-export type MoveContext<C> = {
+export type MoveContext<C, P = unknown> = {
     moveContainerId: string;
     getContainerValue: (containerHash: string) => C;
     getContainerHash: (containerValue: C) => string;
     positionsRef: React.RefObject<MovePositions>;
     dragEndTimestampRef: React.RefObject<number>;
-    useMoveStore: ReturnType<typeof createMoveStore>;
+    useMoveStore: ReturnType<typeof createMoveStore<P>>;
     drop: (target: MoveTargetInput<C>) => Promise<unknown>;
+    filterStartDragIds: (source: MoveSource<P>) => Set<string>;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const moveContext = React.createContext<MoveContext<any> | null>(null);
+export const moveContext = React.createContext<MoveContext<any, any> | null>(null);
 
-export type MoveStore = {
-    state: MoveState;
+export type MoveStore<P> = {
+    state: MoveState<P>;
     dispatch: React.ActionDispatch<[ MoveAction ]>;
 };
 
-export const createMoveStore = () => create<MoveStore>()((set) => ({
+export const createMoveStore = <P>() => create<MoveStore<P>>()((set) => ({
     state: { status: 'idle' },
     dispatch: (action) => set(s => ({ state: moveReducer(s.state, action) })),
 }));

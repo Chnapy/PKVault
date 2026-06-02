@@ -1,53 +1,44 @@
 import React from 'react';
-import { usePkmLegalityMap } from '../../../data/hooks/use-pkm-legality';
 import { usePkmVariantSlotInfos } from '../../../data/hooks/use-pkm-variant-slot-infos';
-import { Gender as GenderType } from '../../../data/sdk/model';
-import type { ButtonLikeProps } from '../../../ui/button/button-like';
+import { Gender } from '../../../data/sdk/model';
 import { StorageItem, type StorageItemProps } from '../../../ui/storage-item/storage-item';
+import { BankContext } from '../../bank/bank-context';
 
-export type StorageMainItemBaseProps = ButtonLikeProps &
-    Pick<
-        StorageItemProps,
-        'anchor' | 'helpTitle' | 'small' | 'checked' | 'onCheck' | 'heldItem' | 'canCreateVariant' | 'canMoveOutside' | 'canEvolve' | 'needSynchronize'
-    > & {
+export type StorageMainItemBaseProps =
+    & Pick<StorageItemProps, 'label' | 'onClick' | 'icons'>
+    & {
         pkmId: string;
     };
 
 export const StorageMainItemBase: React.FC<StorageMainItemBaseProps> = React.memo(({ pkmId, ...rest }) => {
     const variantInfos = usePkmVariantSlotInfos(pkmId);
 
-    const variantsIds = variantInfos?.variants.map(variant => variant.id) ?? [];
+    const selectedBankBoxes = BankContext.useSelectedBankBoxes();
+    const bank = selectedBankBoxes.data?.selectedBank.id;
 
-    const pkmLegalityMapQuery = usePkmLegalityMap(variantsIds);
-    const pkmLegalityMap = Object.values(pkmLegalityMapQuery.data?.data ?? {});
-
-    if (!variantInfos) {
+    if (!variantInfos || !bank) {
         return null;
     }
 
-    const { mainVariant, variants, canDetach } = variantInfos;
+    const { mainVariant } = variantInfos;
 
-    const { species, contextVersion, context, form, gender, isAlpha, isShiny, isExternal } = mainVariant;
+    const { id, species, boxId, boxSlot, context, form, gender, isEgg, isShiny, isShadow } = mainVariant;
 
     return (
         <StorageItem
-            {...{
-                ...rest,
-                species,
-                version: contextVersion,
-                context,
-                form,
-                isFemale: gender === GenderType.Female,
-                isEgg: false,
-                isAlpha,
-                isShiny,
-                isShadow: false,
-                isExternal,
-                warning: pkmLegalityMap.some(value => !value.isValid),
-                nbrVariants: variants.length,
-                hasDisabledVariant: variants.some(pk => !pk.isEnabled),
-                attached: canDetach,
-            }}
+            {...rest}
+            id={id}
+            species={species}
+            bank={bank}
+            box={boxId}
+            slot={boxSlot}
+            saveId={null}
+            context={context}
+            form={form}
+            isFemale={gender === Gender.Female}
+            isEgg={isEgg}
+            isShiny={isShiny}
+            isShadow={isShadow}
         />
     );
 });

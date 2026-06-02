@@ -9,12 +9,7 @@
     position: relative;
     height: auto;
     padding: 0;
-}
-
-.ui-storage-item .icons {
-    position: absolute;
-    inset: 0;
-    padding: 4px;
+    box-shadow: none;
 }
 
 .ui-storage-item .checkbox {

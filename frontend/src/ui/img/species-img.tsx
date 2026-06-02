@@ -1,11 +1,13 @@
-import { css, cx } from '@emotion/css';
 import type React from 'react';
+import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import { EntityContext } from '../../data/sdk/model';
+import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
+import { getStaticDataGetSpritesheetImgUrl } from '../../data/sdk/static-data/static-data.gen';
 import { useStaticData } from '../../hooks/use-static-data';
-import { SpriteImg, type SpriteImgProps } from './sprite-img';
-import { SizingUtil } from '../util/sizing-util';
+import { UISpeciesImg } from '../../ui-new/sprite-img/species-img/ui-species-img';
+import { type SpriteImgProps } from './sprite-img';
 
-type SpeciesImgProps = {
+export type SpeciesImgProps = {
     species: number;
     context: EntityContext;
     form: number;
@@ -13,29 +15,25 @@ type SpeciesImgProps = {
     isShiny?: boolean;
     isEgg?: boolean;
     isShadow?: boolean;
-    small?: boolean;
 } & Omit<SpriteImgProps, 'spriteInfos' | 'size'>;
 
-export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, isFemale, isShiny, isEgg, isShadow, small, ...imgProps }) => {
+export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, isFemale, isShiny, isEgg, isShadow, ...imgProps }) => {
     const staticData = useStaticData();
+    const settings = useSettingsGet();
 
-    const disabled = species === 0;
-    if (disabled) {
+    if (species === 0)
         species = 1;
-    }
 
     const staticForms = staticData.species[ species ]?.forms[ context ];
 
-    if (!staticForms?.[ form ]) {
+    if (!staticForms?.[ form ])
         console.log('UNKNOWN FORM -', species, context, form);
-    }
 
     const staticForm = staticForms?.[ form ] ?? staticForms?.[ 0 ];
-    if (!staticForm) {
+    if (!staticForm)
         return null;
-    }
 
-    const { name, spriteDefault, spriteFemale, spriteShiny, spriteShinyFemale, spriteShadow } = staticForm;
+    const { spriteDefault, spriteFemale, spriteShiny, spriteShinyFemale, spriteShadow } = staticForm;
 
     const getSpriteUrl = (): string | null => {
         if (isEgg) {
@@ -55,18 +53,18 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, 
 
     const spriteKey = getSpriteUrl();
     const spriteInfos = typeof spriteKey === 'string' ? staticData.spritesheets.species[ spriteKey ] : undefined;
-    if (!spriteInfos) {
-        console.log('No sprite -', name, species, context, form, staticForms);
-    }
+    if (!spriteInfos)
+        console.log('No sprite -', staticForm.name, species, context, form, staticForms);
 
-    return spriteInfos && <SpriteImg
+    const sheetRelativeUrl = spriteInfos && getStaticDataGetSpritesheetImgUrl(spriteInfos.sheetName, {
+        buildID: settings.data?.data.buildID,
+    });
+    const sheetUrl = getApiFullUrl(sheetRelativeUrl ?? '');
+
+    return spriteInfos && <UISpeciesImg
+        sheetUrl={sheetUrl}
         spriteInfos={spriteInfos}
-        size={small ? SizingUtil.itemSize / 2 : SizingUtil.itemSize}
-        className={cx(css({
-            filter: isShadow ? 'drop-shadow(#770044 0px 0px 6px)' : undefined,
-            opacity: disabled ? 0.25 : undefined,
-        }), imgProps.className)}
-        data-speciesid={species}
+        species={species}
         {...imgProps}
     />;
 };

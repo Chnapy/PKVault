@@ -2,13 +2,13 @@ import { useDrag, type Vector2 } from '@use-gesture/react';
 import React from 'react';
 import { useSelectContextNullable } from '../../../select/context/use-select-context';
 import { useMoveContext } from '../../context/use-move-context';
-import type { DraggingTrigger } from '../../state/move-state';
+import type { DraggingTrigger, MoveSource } from '../../state/move-state';
 import { useDragUtils, type PossibleEvent } from '../use-drag-utils';
 
 export const useDragTriggers = <C>(entityId: string, containerValue: C, isDragging: boolean) => {
     const ref = React.useRef<HTMLButtonElement>(null);
 
-    const { getContainerHash, useMoveStore, positionsRef, dragEndTimestampRef } = useMoveContext<C>();
+    const { getContainerHash, useMoveStore, filterStartDragIds, positionsRef, dragEndTimestampRef } = useMoveContext<C>();
 
     const containerHash = getContainerHash(containerValue);
 
@@ -21,7 +21,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
     const getAllIds = () => {
         const set = new Set<string>([ entityId ]);
         const selectState = selectCtx?.useSelectStore.getState();
-        if (selectState && selectState.container === getContainerHash(containerValue)) {
+        if (selectState && selectState.ids.has(entityId) && selectState.container === getContainerHash(containerValue)) {
             selectState.ids.forEach(id => set.add(id));
         }
         return set;
@@ -47,19 +47,26 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
 
         updateDragPosition(position);
 
+        const source: MoveSource = {
+            containerId: containerHash,
+            sourceId: entityId,
+            ids: getAllIds(),
+            params,
+        };
+
+        source.ids = filterStartDragIds(source);
+
+        if (source.ids.size === 0)
+            return;
+
         dispatch({
             type: 'START_DRAG',
-            source: {
-                containerId: containerHash,
-                sourceId: entityId,
-                ids: getAllIds(),
-                params,
-            },
+            source,
             trigger,
         });
     };
 
-    const startDragByDrag = (e: PossibleEvent | undefined, position: Vector2) => startDrag(e, 'drag', position, null);
+    const startDragByDrag = (e: PossibleEvent | undefined, position: Vector2) => startDrag(e, 'drag', position, undefined);
 
     const startDragByClick = <P>(e: PossibleEvent | undefined, position: Vector2, params: P) => {
 

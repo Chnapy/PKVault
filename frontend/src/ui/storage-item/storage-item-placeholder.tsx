@@ -1,56 +1,35 @@
-import { css, cx } from '@emotion/css';
-import type React from "react";
+import React from "react";
 import { withErrorCatcher } from '../../error/with-error-catcher';
-import { useMoveDroppable } from '../../storage/move/hooks/use-move-droppable';
-import { useMoveLoading } from '../../storage/move/hooks/use-move-loading';
-import { ButtonWithDisabledPopover } from '../button/button-with-disabled-popover';
-import { theme } from '../theme';
-import { SizingUtil } from '../util/sizing-util';
+import { useDroppableValidation } from '../../storage/move/hooks/use-droppable-validation';
+import type { MoveContainerValue } from '../../storage/move/state/move-select-impl-provider';
+import { UIStorageItemPlaceholderWithInteraction, type UIStorageItemPlaceholderWithInteractionProps } from '../../ui-new/storage/storage-item/placeholder/ui-storage-item-placeholder-with-interaction';
 
-export type StorageItemPlaceholderProps = {
-  saveId?: number;
-  boxId: number;
-  boxSlot: number;
-  pkmId?: string; // for move drop/loading only
-};
+export type StorageItemPlaceholderProps = Pick<UIStorageItemPlaceholderWithInteractionProps, 'nodeId' | 'slot'>
+  & MoveContainerValue;
 
 export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = withErrorCatcher('item', ({
-  saveId,
-  boxId,
-  boxSlot,
-  pkmId,
+  type, bankId, saveId, boxId,
+  ...rest
 }) => {
-  const moveDroppable = useMoveDroppable(saveId, boxId, boxSlot, pkmId);
+  const container = React.useMemo((): MoveContainerValue => ({
+    type,
+    bankId,
+    saveId,
+    boxId,
+  }), [ bankId, boxId, saveId, type ]);
 
-  const moveLoading = useMoveLoading(saveId, boxId, boxSlot, pkmId);
+  const getValidation = useDroppableValidation();
 
-  return (
-    <ButtonWithDisabledPopover
-      className={cx(
-        css({
-          backgroundColor: 'transparent',//theme.bg.light,
-          alignSelf: "flex-start",
-          padding: 0,
-          width: SizingUtil.itemSize,
-          height: SizingUtil.itemSize,
-          boxSizing: 'content-box',
-        }),
-        moveDroppable.onClick && css({
-          backgroundColor: theme.bg.item,
-          borderColor: theme.text.default,
-          '&:hover': {
-            outlineWidth: 2,
-          }
-        })
-      )}
-      disabled={!moveDroppable.onClick}
-      loading={moveLoading}
-      onClick={moveDroppable.onClick}
-      onPointerUp={moveDroppable.onPointerUp}
-      noDropshadow
-      anchor='top'
-      showHelp={!!moveDroppable.helpText}
-      helpTitle={moveDroppable.helpText}
-    />
-  );
+  // if (rest.slot === 0)
+  //   console.log(getValidation(rest.slot, rest.container));
+
+  const validation = getValidation(rest.slot, container);
+
+  return <UIStorageItemPlaceholderWithInteraction
+    key={rest.nodeId}
+    container={container}
+    label={validation.helpText}
+    disabled={validation.canDrop === false}
+    {...rest}
+  />;
 });

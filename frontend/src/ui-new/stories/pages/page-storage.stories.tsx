@@ -29,7 +29,7 @@ const meta = {
                 getContainerValue: hash => ({ box: Number(hash) }),
             };
 
-            const onDrop = async (source: MoveSource, target: MoveTargetInput<ContainerValue>) => console.log(source, target);
+            const onDrop = async (source: MoveSource, target: MoveTargetInput<ContainerValue>) => console.log('drop', source, target);
 
             return <FocusControlsProvider>
                 <SelectProvider<ContainerValue>

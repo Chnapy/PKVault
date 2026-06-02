@@ -1,6 +1,7 @@
 import { Button, Card, Divider, Group, OverflowList, Title } from '@mantine/core';
 import { SaveIcon } from 'lucide-react';
 import type React from 'react';
+import { useTranslate } from '../../translate/i18n';
 import { WithControlsIcons } from '../interaction/controls/icons/with-controls-icons';
 import { FocusScope } from '../interaction/focus/scope/focus-scope';
 import { usePanelControls } from '../layout/hooks/use-panel-controls';
@@ -8,9 +9,11 @@ import { UIAction, type UIActionProps } from './ui-action';
 
 export type UIActionsPanelProps = {
     data: UIActionProps[];
+    onSave: () => void;
 };
 
-export const UIActionsPanel: React.FC<UIActionsPanelProps> = ({ data }) => {
+export const UIActionsPanel: React.FC<UIActionsPanelProps> = ({ data, onSave }) => {
+    const { t } = useTranslate();
 
     const { panelProps, nodeId, childScopeId, controlsIcons } = usePanelControls('actions');
 
@@ -51,8 +54,9 @@ export const UIActionsPanel: React.FC<UIActionsPanelProps> = ({ data }) => {
                         pr='lg'
                         disabled={data.length === 0}
                         leftSection={<SaveIcon />}
+                        onClick={onSave}
                     >
-                        Save
+                        {t('action.save')}
                     </Button>
                 </Group>
             </FocusScope>

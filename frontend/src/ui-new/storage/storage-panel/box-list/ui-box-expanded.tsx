@@ -18,7 +18,7 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
 }) => {
     const cols = getBoxColumns(slotsStates.length);
 
-    return <Group gap='xs' align='stretch' style={{ alignSelf: 'stretch' }}>
+    return <Group gap='xs' align='stretch' style={{ alignSelf: 'flex-start' }}>
         <Button
             style={{ gap: 4 }}
             variant='default'
@@ -36,6 +36,8 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
                     cols={cols ?? 6}
                     spacing={2}
                     p='sm'
+                    w='fit-content'
+                    mx='auto'
                 >
                     {slotsStates.map((state, i) => <span
                         key={i}

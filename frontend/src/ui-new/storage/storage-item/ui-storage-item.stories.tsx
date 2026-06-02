@@ -1,14 +1,12 @@
-import { Card, Group } from '@mantine/core';
+import { Card } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
-import { UIIconWrapper } from '../../icon/ui-icon-wrapper';
-import { UIShinyIcon } from '../../icon/ui-shiny-icon';
+import { MoveProvider } from '../../interaction/move/context/move-provider';
+import { SelectProvider } from '../../interaction/select/context/select-provider';
 import { UISpeciesImg } from '../../sprite-img/species-img/ui-species-img';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import spritesheet0 from "../../stories/assets/spritesheet_species_0.webp";
 import { UIStorageItem } from './ui-storage-item';
-import { SelectProvider } from '../../interaction/select/context/select-provider';
-import { MoveProvider } from '../../interaction/move/context/move-provider';
+import { UIStorageItemIcons } from './ui-storage-item-icons';
 
 const meta = {
     title: 'UI/UIStorageItem',
@@ -36,14 +34,22 @@ export const Primary: Story = {
         saveId: null,
         slot: 1,
         label: 'Machamp Lv.50',
-        icons: <Group justify='flex-end' gap={2} >
-            <UIIconWrapper>
-                <UIShinyIcon />
-            </UIIconWrapper>
-            <UIIconWrapper>
-                <UIAlphaIcon />
-            </UIIconWrapper>
-        </Group>,
+        icons: <UIStorageItemIcons
+            heldItem={null}
+            isStarter
+            party={6}
+            isAlpha
+            isShiny
+            level={50}
+            nbrVariants={2}
+            hasDisabledVariant
+            isExternal
+            canEvolve
+            attached
+            needSynchronize={false}
+            isDuplicate
+            warning
+        />,
         children: <UISpeciesImg
             sheetUrl={spritesheet0}
             species={68}

@@ -6,7 +6,6 @@ import { type FileRouteTypes } from "../../../routeTree.gen";
 
 export type UIHeaderItemProps = {
   id: string;
-  selected?: boolean;
   to?: FileRouteTypes[ "to" ];
   search?: Record<string, unknown>;
   children: React.ReactNode;
@@ -14,7 +13,6 @@ export type UIHeaderItemProps = {
 
 export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
   id,
-  selected,
   to,
   search: defaultSearch,
   children,

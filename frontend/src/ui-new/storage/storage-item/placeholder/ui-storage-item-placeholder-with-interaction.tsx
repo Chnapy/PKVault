@@ -8,37 +8,29 @@ import { useDroppable } from '../../../interaction/move/hooks/use-droppable';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
 import { UIStorageItemPlaceholder, type UIStorageItemPlaceholderProps } from './ui-storage-item-placeholder';
 
-type ContainerValue = {
-    bank: string;
-    saveId: number | null;
-    box: number;
-};
-
-export type UIStorageItemPlaceholderWithInteractionProps = Pick<UIStorageItemPlaceholderProps, 'ref'>
-    & ContainerValue
+export type UIStorageItemPlaceholderWithInteractionProps<C = unknown> = UIStorageItemPlaceholderProps
     & {
+        nodeId: string;
+        container: C;
         slot: number;
     };
 
 export const UIStorageItemPlaceholderWithInteraction: React.FC<UIStorageItemPlaceholderWithInteractionProps> = ({
-    ref: refRoot,
-    bank, saveId, box,
+    nodeId,
+    container,
     slot,
+    ...rest
 }) => {
     const panel = useCurrentPanel();
 
-    const targetContainer: ContainerValue = { bank, saveId, box };
-
-    const droppable = useDroppable<ContainerValue>({
-        targetContainer,
+    const droppable = useDroppable({
+        targetContainer: container,
         targetPosition: slot,
         targetId: undefined,
     });
 
-    const scopeNodeId = [ bank, saveId, box, slot ].join('-');
-
     const { focusControlProps, controlsIcons } = useFocusControls({
-        scopeNodeId,
+        scopeNodeId: nodeId,
         onFocus: ({ node }) => {
             droppable.focusNode(node);
 
@@ -51,16 +43,17 @@ export const UIStorageItemPlaceholderWithInteraction: React.FC<UIStorageItemPlac
 
     const ref = useMergedRef(
         focusControlProps.ref,
-        refRoot,
+        rest.ref,
     );
 
-    const submitting = useDragSubmitting<ContainerValue>(targetContainer, slot);
+    const submitting = useDragSubmitting(container, slot);
 
     return <WithControlsIcons placement='out' icons={controlsIcons.drop}>
         <UIStorageItemPlaceholder
             loading={submitting}
             // disabled={!isDroppable}
             {...focusControlProps}
+            {...rest}
             ref={ref}
         />
     </WithControlsIcons>;

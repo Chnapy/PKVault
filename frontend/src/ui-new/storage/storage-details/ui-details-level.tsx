@@ -5,7 +5,7 @@ export const UIDetailsLevel: React.FC<{ level: number }> = ({ level }) => {
     const { t } = useTranslate();
 
     return <span>
-        {t('details.level')}
+        <span style={{ fontSize: '80%' }}>{t('details.level')}</span>
         {level}
     </span>;
 };

@@ -8,8 +8,7 @@ import { useCurrentPanel } from '../../storage-content/context/ui-panel-context'
 import { UIBoxExpanded } from './ui-box-expanded';
 import classes from './ui-storage-panel-box-list.module.css';
 
-// TODO
-type Data = {
+export type UIBoxData = {
     id: string;
     label: string;
     slotsStates: boolean[];
@@ -17,7 +16,7 @@ type Data = {
 
 export type UIStoragePanelBoxListProps = {
     value: string;
-    data: Data[];
+    data: UIBoxData[];
     onSelect: (id: string) => void;
     onDelete: (id: string) => void;
 };
@@ -39,7 +38,7 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ va
             value={value}
             data={data}
             onChange={onSelect}
-            left={<BoxIcon />}
+            left={<BoxIcon style={{ flexShrink: 0 }} />}
             renderTab={({ item, selected }) => <Tabs.Tab
                 key={item.id}
                 value={item.id}

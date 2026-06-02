@@ -51,23 +51,29 @@ export const buildSlotInfosSlot = (
     dropBoxSlot: number,
     firstSourceSlot: number,
     sourceId: string,
-    sourceSaveId: number | undefined,
-    targetSaveId: number | undefined,
-    pkmVariantIndexes: PkmVariantIndexes,
-    sourcePkmSaveIndexes: PkmSaveIndexes,
-    targetPkmSaveIndexes: PkmSaveIndexes,
-    savesById: Record<number, SaveInfosDTO>,
-    sourceBoxes: Record<number, BoxDTO>,
-    targetBoxes: Record<number, BoxDTO>,
+    sourceSaveId: number | null | undefined,
+    targetSaveId: number | null | undefined,
+    getPkmVariantIndexes: () => PkmVariantIndexes | undefined,
+    getSourcePkmSaveIndexes: () => PkmSaveIndexes | undefined,
+    getTargetPkmSaveIndexes: () => PkmSaveIndexes | undefined,
+    getSavesById: () => Record<number, SaveInfosDTO>,
+    getSourceBoxes: () => Record<number, BoxDTO>,
+    getTargetBoxes: () => Record<number, BoxDTO>,
 ): SlotInfosSlot[] => {
     const direction = getMoveDirection(sourceSaveId, targetSaveId);
 
     switch (direction) {
         case 'main-to-main': {
-            const sourcePkm = pkmVariantIndexes.byId[ sourceId ];
+            const pkmVariantIndexes = getPkmVariantIndexes();
+
+            const sourcePkm = pkmVariantIndexes?.byId[ sourceId ];
             if (!sourcePkm) {
                 return [];
             }
+            
+            const sourceBoxes = getSourceBoxes();
+            const targetBoxes = getTargetBoxes();
+
             const sourceBox = sourceBoxes[ sourcePkm.boxId ];
 
             const targetSlot = dropBoxSlot + (sourcePkm.boxSlot - firstSourceSlot);
@@ -91,16 +97,24 @@ export const buildSlotInfosSlot = (
             }));
         };
         case 'main-to-save': {
-            const sourcePkm = pkmVariantIndexes.byId[ sourceId ];
+            const pkmVariantIndexes = getPkmVariantIndexes();
+
+            const sourcePkm = pkmVariantIndexes?.byId[ sourceId ];
             if (!sourcePkm) {
                 return [];
             }
+            
+            const sourceBoxes = getSourceBoxes();
+            const targetBoxes = getTargetBoxes();
+            const savesById = getSavesById();
+            const targetPkmSaveIndexes = getTargetPkmSaveIndexes();
+
             const sourceBox = sourceBoxes[ sourcePkm.boxId ];
 
             const targetSlot = dropBoxSlot + (sourcePkm.boxSlot - firstSourceSlot);
             const targetSave = savesById[ targetSaveId! ];
             const targetBox = targetBoxes[ dropBoxId ];
-            const targetPkm = targetPkmSaveIndexes.byBox[ dropBoxId ]?.[ targetSlot ];
+            const targetPkm = targetPkmSaveIndexes?.byBox[ dropBoxId ]?.[ targetSlot ];
 
             if (!sourceBox || !targetSave || !targetBox) {
                 return [];
@@ -118,10 +132,17 @@ export const buildSlotInfosSlot = (
             } ];
         };
         case 'save-to-main': {
-            const sourcePkm = sourcePkmSaveIndexes.byId[ sourceId ];
+            const sourcePkmSaveIndexes = getSourcePkmSaveIndexes();
+
+            const sourcePkm = sourcePkmSaveIndexes?.byId[ sourceId ];
             if (!sourcePkm || !sourceSaveId) {
                 return [];
             }
+            
+            const sourceBoxes = getSourceBoxes();
+            const targetBoxes = getTargetBoxes();
+            const savesById = getSavesById();
+
             const sourceBox = sourceBoxes[ sourcePkm.boxId ];
             const sourceSave = savesById[ sourceSaveId ];
 
@@ -131,8 +152,10 @@ export const buildSlotInfosSlot = (
             if (!sourceBox || !sourceSave || !targetBox) {
                 return [];
             }
+            
+            const pkmVariantIndexes = getPkmVariantIndexes();
 
-            const targetPkmVariants = pkmVariantIndexes.byBox[ dropBoxId ]?.[ targetSlot ] ?? [];
+            const targetPkmVariants = pkmVariantIndexes?.byBox[ dropBoxId ]?.[ targetSlot ] ?? [];
             const normalizedTargetPkmMains = targetPkmVariants.length === 0 ? [ undefined ] : targetPkmVariants;
 
             return normalizedTargetPkmMains.map(targetPkm => ({
@@ -147,17 +170,25 @@ export const buildSlotInfosSlot = (
             }));
         };
         case 'save-to-save': {
-            const sourcePkm = sourcePkmSaveIndexes.byId[ sourceId ];
+            const sourcePkmSaveIndexes = getSourcePkmSaveIndexes();
+
+            const sourcePkm = sourcePkmSaveIndexes?.byId[ sourceId ];
             if (!sourcePkm || !sourceSaveId || !targetSaveId) {
                 return [];
             }
+            
+            const sourceBoxes = getSourceBoxes();
+            const targetBoxes = getTargetBoxes();
+            const savesById = getSavesById();
+            const targetPkmSaveIndexes = getTargetPkmSaveIndexes();
+
             const sourceBox = sourceBoxes[ sourcePkm.boxId ];
             const sourceSave = savesById[ sourceSaveId ];
 
             const targetSlot = dropBoxSlot + (sourcePkm.boxSlot - firstSourceSlot);
             const targetSave = savesById[ targetSaveId ];
             const targetBox = targetBoxes[ dropBoxId ];
-            const targetPkm = targetPkmSaveIndexes.byBox[ dropBoxId ]?.[ targetSlot ];
+            const targetPkm = targetPkmSaveIndexes?.byBox[ dropBoxId ]?.[ targetSlot ];
 
             if (!sourceBox || !sourceSave || !targetBox || !targetSave) {
                 return [];
@@ -178,7 +209,7 @@ export const buildSlotInfosSlot = (
     }
 };
 
-const getMoveDirection = (sourceSaveId: number | undefined, targetSaveId: number | undefined): MoveDirectionSlot => {
+export const getMoveDirection = (sourceSaveId: number | null | undefined, targetSaveId: number | null | undefined): MoveDirectionSlot => {
     const fromSave = !!sourceSaveId;
     const toSave = !!targetSaveId;
 

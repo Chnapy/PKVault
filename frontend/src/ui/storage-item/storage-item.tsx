@@ -1,221 +1,38 @@
-import { css, cx } from '@emotion/css';
 import React from "react";
-import type { EntityContext, GameVersion } from '../../data/sdk/model';
-import { useTranslate } from '../../translate/i18n';
-import { type ButtonLikeProps } from '../button/button-like';
-import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../button/button-with-disabled-popover';
-import { DetailsLevel } from '../details-card/details-level';
-import { AlphaIcon } from '../icon/alpha-icon';
-import { Icon } from '../icon/icon';
-import { ShinyIcon } from '../icon/shiny-icon';
-import { ItemImg } from '../img/item-img';
-import { SpeciesImg } from '../img/species-img';
-import { CheckboxInput, type CheckboxInputProps } from '../input/checkbox-input';
-import { theme } from '../theme';
+import { useDroppableValidation } from '../../storage/move/hooks/use-droppable-validation';
+import type { MoveContainerValue } from '../../storage/move/state/move-select-impl-provider';
+import { UIStorageItem, type UIStorageItemProps } from '../../ui-new/storage/storage-item/ui-storage-item';
+import { SpeciesImg, type SpeciesImgProps } from '../img/species-img';
 
 export type StorageItemProps =
-  & ButtonLikeProps
-  & Pick<ButtonWithDisabledPopoverProps<never>, 'anchor' | 'helpTitle'>
-  & {
-    species: number;
-    version: GameVersion;
-    context: EntityContext;
-    form: number;
-    isFemale?: boolean;
-    isEgg?: boolean;
-    isAlpha?: boolean;
-    isShiny?: boolean;
-    isShadow?: boolean;
-    isStarter?: boolean;
-    isExternal?: boolean;
-    isDuplicate?: boolean;
-    heldItem?: number;
-    warning?: boolean;
-    level?: number;
-    party?: number;
-    nbrVariants?: number;
-    hasDisabledVariant?: boolean;
-    small?: boolean;
-    checked?: boolean;
-    onCheck?: CheckboxInputProps[ 'onChange' ];
-
-    // actions
-    canCreateVariant?: boolean;
-    canMoveOutside?: boolean;
-    canEvolve?: boolean;
-    attached?: boolean;
-    needSynchronize?: boolean;
-  };
+  & Pick<UIStorageItemProps<MoveContainerValue>, 'id' | 'nodeId' | 'container' | 'name' | 'level' | 'slot' | 'onClick' | 'icons'>
+  & Pick<SpeciesImgProps, 'species' | 'context' | 'form' | 'isFemale' | 'isShiny' | 'isEgg' | 'isShadow'>;
 
 export const StorageItem: React.FC<StorageItemProps> = React.memo(({
   species,
-  version,
   context,
   form,
   isFemale,
   isEgg,
-  isAlpha,
   isShiny,
   isShadow,
-  isStarter,
-  isExternal,
-  isDuplicate,
-  heldItem = 0,
-  warning,
-  level,
-  party,
-  nbrVariants = 1,
-  hasDisabledVariant,
-  anchor,
-  helpTitle,
-  small,
-  checked = false,
-  onCheck,
-
-  canCreateVariant,
-  canMoveOutside = true,
-  canEvolve,
-  attached,
-  needSynchronize,
 
   ...rest
 }) => {
-  const { t } = useTranslate();
+  const getValidation = useDroppableValidation();
 
-  const renderBubble = (bgColor: string | undefined, children: React.ReactNode) => <div className={css({
-    width: 20,
-    height: 20,
-    borderRadius: 99,
-    color: bgColor ? theme.text.light : undefined,
-    backgroundColor: bgColor,
-    fontSize: bgColor ? '80%' : undefined,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 'bold'
-  })}>{children}</div>;
+  // if (rest.slot === 0)
+  //   console.log(getValidation(rest.slot, rest.container));
+
+  const validation = getValidation(rest.slot, rest.container);
 
   return (
-    <ButtonWithDisabledPopover
-      componentDescriptor='button'
+    <UIStorageItem
       {...rest}
-      noDropshadow={!rest.onClick}
-      rootClassName={css({
-        '&:hover .checkbox': {
-          opacity: 1,
-        },
-      })}
-      className={cx(css({
-        backgroundColor: rest.disabled ? 'transparent' : theme.bg.item,
-        borderColor: rest.disabled ? undefined : theme.text.default,
-        position: 'relative',
-        alignSelf: "flex-start",
-        padding: 0,
-        overflow: 'hidden',
-      }), rest.className)}
-      anchor={anchor}
-      showHelp={!!helpTitle}
-      helpTitle={helpTitle}
-      extraContent={
-        onCheck && !rest.disabled && !rest.loading && <div
-          title={t('storage.actions.select.help')}
-          className={cx('checkbox', css({
-            position: 'absolute',
-            top: 3,
-            left: 3,
-            zIndex: 1,
-          }), {
-            [ css({ opacity: 0 }) ]: !checked
-          })}
-        >
-          <CheckboxInput
-            checked={checked}
-            onChange={onCheck}
-          />
-        </div>
-      }
+      label={validation.helpText}
+      disabled={validation.canDrop === false}
     >
-      <SpeciesImg species={species} context={context} form={form} isFemale={isFemale} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} small={small} />
-
-      {heldItem > 0 && <ItemImg
-        version={version}
-        item={heldItem}
-        size={small ? 15 : undefined}
-        className={css({
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-        })}
-      />}
-
-      <div className={css({
-        position: 'absolute',
-        bottom: 2,
-        right: 2,
-        textAlign: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        gap: 2
-      })}>
-        {isStarter && renderBubble(theme.bg.red, <Icon name='heart' solid forButton />)}
-
-        {party !== undefined && renderBubble(theme.bg.green, party + 1)}
-
-        {level !== undefined && <div className={css({
-          marginBottom: -4
-        })}>
-          {small ? level : <DetailsLevel level={level} />}
-        </div>}
-
-        {hasDisabledVariant || nbrVariants > 1
-          ? <div className={css({
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-          })}>
-            {hasDisabledVariant && renderBubble(undefined, <span className={css({ color: theme.text.red })}>
-              <Icon name='folder' solid forButton />
-              <Icon name='exclaimation' solid forButton />
-            </span>)}
-            {nbrVariants > 1 && renderBubble(theme.bg.dark, nbrVariants)}
-          </div>
-          : null}
-
-        {isExternal && renderBubble(theme.bg.dark, <Icon name='external-link' solid forButton />)}
-      </div>
-
-      <div
-        className={css({
-          position: 'absolute',
-          top: 2,
-          right: 2,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          textAlign: 'center',
-          maxWidth: 72,
-          flexWrap: 'wrap',
-          justifyContent: 'flex-end',
-        })}
-      >
-        {isAlpha && <AlphaIcon className={small ? css({ height: 15 }) : undefined} />}
-
-        {isShiny && <ShinyIcon className={small ? css({ height: 15 }) : undefined} />}
-
-        {!canMoveOutside && renderBubble(theme.bg.red, <Icon name='logout' solid forButton />)}
-
-        {canEvolve && renderBubble(theme.bg.primary, <Icon name='sparkles' solid forButton />)}
-
-        {attached && renderBubble(needSynchronize ? theme.bg.yellow : undefined,
-          <Icon name='link' solid forButton />)}
-
-        {canCreateVariant && renderBubble(theme.bg.primary, <Icon name='plus' solid forButton />)}
-
-        {isDuplicate && renderBubble(undefined, <Icon name='copy' solid forButton style={{ color: theme.bg.yellow }} />)}
-
-        {warning && renderBubble(theme.bg.yellow, <Icon name='exclaimation' solid forButton />)}
-      </div>
-    </ButtonWithDisabledPopover>
+      <SpeciesImg species={species} context={context} form={form} isFemale={isFemale} isShiny={isShiny} isEgg={isEgg} isShadow={isShadow} />
+    </UIStorageItem>
   );
 });

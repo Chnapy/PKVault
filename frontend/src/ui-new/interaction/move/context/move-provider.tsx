@@ -3,17 +3,18 @@ import React from 'react';
 import type { MoveSource, MoveStateLoading } from '../state/move-state';
 import { createMoveStore, moveContext, type MoveContext, type MovePositions, type MoveTargetInput, type MoveTargetOutput } from './move-context';
 
-type MoveProviderProps<C> = Pick<MoveContext<C>, 'moveContainerId' | 'getContainerHash' | 'getContainerValue'> & {
-    getTargetAllPositions: (source: MoveSource, target: MoveTargetInput<C>) => Record<string, number>;
-    onDrop: (source: MoveSource, target: MoveTargetOutput<C>) => Promise<unknown>;
+type MoveProviderProps<C, P> = Pick<MoveContext<C>, 'moveContainerId' | 'getContainerHash' | 'getContainerValue'> & {
+    filterStartDragIds: (source: MoveSource<P>) => Set<string>;
+    getTargetAllPositions: (source: MoveSource<P>, target: MoveTargetInput<C>) => Record<string, number>;
+    onDrop: (source: MoveSource<P>, target: MoveTargetOutput<C>) => Promise<unknown>;
     children: React.ReactNode;
 };
 
-export const MoveProvider = function <C>({
+export const MoveProvider = function <C, P>({
     moveContainerId, getContainerHash, getContainerValue,
-    onDrop: onDropSuccess, getTargetAllPositions,
+    onDrop: onDropSuccess, getTargetAllPositions, filterStartDragIds,
     children
-}: MoveProviderProps<C>) {
+}: MoveProviderProps<C, P>) {
     const positionsRef = React.useRef<MovePositions>({
         scroll: [ window.scrollX, window.scrollY ],
         pointer: [ 0, 0 ],
@@ -24,9 +25,9 @@ export const MoveProvider = function <C>({
 
     const dragEndTimestampRef = React.useRef(0);
 
-    const [ value ] = React.useState((): MoveContext<C> => {
+    const [ value ] = React.useState((): MoveContext<C, P> => {
 
-        const useMoveStore = createMoveStore();
+        const useMoveStore = createMoveStore<P>();
 
         const innerDispatch = useMoveStore.getState().dispatch;
 
@@ -47,7 +48,7 @@ export const MoveProvider = function <C>({
                 },
             });
 
-            const state = useMoveStore.getState().state as MoveStateLoading;
+            const state = useMoveStore.getState().state as MoveStateLoading<P>;
             const targetOutput: MoveTargetOutput<C> = {
                 targetContainer: target.targetContainer,
                 targetPosition: state.target.targetPosition,
@@ -71,6 +72,7 @@ export const MoveProvider = function <C>({
             dragEndTimestampRef,
             useMoveStore,
             drop,
+            filterStartDragIds,
         };
     });
 

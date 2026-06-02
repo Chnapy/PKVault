@@ -11,9 +11,9 @@ export type UISpriteImgProps = {
     dropShadow?: boolean;
 } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
-export const UISpriteImg: React.FC<UISpriteImgProps> = ({ sheetUrl, spriteInfos, sourceRealHeight, disabled, dropShadow, className, style, ...imgProps }) => {
+export const UISpriteImg: React.FC<UISpriteImgProps> = ({ sheetUrl, spriteInfos, sourceRealHeight, disabled, dropShadow, className, style, ...rest }) => {
     return <div
-        {...imgProps}
+        {...rest}
         data-disabled={disabled || undefined}
         className={clsx(
             classes.uiSpriteImg,

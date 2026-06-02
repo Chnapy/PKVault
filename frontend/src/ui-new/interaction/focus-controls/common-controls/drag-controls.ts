@@ -1,3 +1,4 @@
+import type { MoveParams } from '../../../../storage/move/state/move-select-impl-provider';
 import type { ControlsWithFalsy } from '../../controls/provider/controls-context';
 import type { UseDraggingReturn } from '../../move/hooks/use-dragging';
 import type { UseDroppableReturn } from '../../move/hooks/use-droppable';
@@ -85,7 +86,7 @@ export const getDragControls = ({ dragging, droppable }: Params) => {
                         break;
                     }
                     default: {
-                        dragging.toggleDragByFocus(e, null);
+                        dragging.toggleDragByFocus<MoveParams>(e, { attached: false });
                         break;
                     }
                 }
@@ -112,7 +113,7 @@ export const getDragControls = ({ dragging, droppable }: Params) => {
                 },
             },
             action: (e) => {
-                dragging.toggleDragByFocus(e, { attached: true });
+                dragging.toggleDragByFocus<MoveParams>(e, { attached: true });
             },
             spread: false,
         },

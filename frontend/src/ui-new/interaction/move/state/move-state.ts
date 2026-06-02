@@ -3,7 +3,7 @@ export type MoveSource<P = unknown> = {
     containerId: string;
     sourceId: string;
     ids: Set<string>;
-    params: P;
+    params?: P;
 };
 
 type MoveTarget = {
@@ -15,22 +15,22 @@ type MoveTarget = {
 
 export type DraggingTrigger = 'drag' | 'click' | 'focus';
 
-export type MoveStateDragging = {
+export type MoveStateDragging<P> = {
     status: 'dragging';
-    source: MoveSource;
+    source: MoveSource<P>;
     trigger: DraggingTrigger;
 };
 
-export type MoveStateLoading = {
+export type MoveStateLoading<P> = {
     status: 'loading';
-    source: MoveSource;
+    source: MoveSource<P>;
     target: MoveTarget;
 };
 
-export type MoveState =
+export type MoveState<P> =
     | { status: 'idle' }
-    | MoveStateDragging
-    | MoveStateLoading;
+    | MoveStateDragging<P>
+    | MoveStateLoading<P>;
 
 export type MoveAction =
     | {

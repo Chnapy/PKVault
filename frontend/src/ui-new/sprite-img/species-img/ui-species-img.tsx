@@ -8,7 +8,7 @@ type UISpeciesImgProps = {
     isShadow?: boolean;
 } & UISpriteImgProps;
 
-export const UISpeciesImg: React.FC<UISpeciesImgProps> = ({ species, isShadow, className, ...imgProps }) => {
+export const UISpeciesImg: React.FC<UISpeciesImgProps> = ({ species, isShadow, className, ...spriteProps }) => {
     const disabled = species === 0;
     if (disabled) {
         species = 1;
@@ -22,6 +22,6 @@ export const UISpeciesImg: React.FC<UISpeciesImgProps> = ({ species, isShadow, c
             className
         )}
         disabled={disabled}
-        {...imgProps}
+        {...spriteProps}
     />;
 };

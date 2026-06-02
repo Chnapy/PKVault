@@ -1,4 +1,4 @@
-import "./ui/global-style.ts";
+import { AppTheme } from './ui-new/app-theme.tsx';
 
 import { createHashHistory, createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
@@ -7,6 +7,8 @@ import { BackendErrorsContext } from './data/backend-errors-context.tsx';
 import { DataProvider } from "./data/data-provider.tsx";
 import { routeTree } from "./routeTree.gen";
 import { SplashMain } from './splash/splash-main.tsx';
+import { FocusControlsProvider } from './ui-new/interaction/focus-controls/provider/focus-controls-provider.tsx';
+import { initFocus } from './ui-new/interaction/focus/init-focus.ts';
 
 const router = createRouter({
   routeTree,
@@ -20,14 +22,20 @@ declare module "@tanstack/react-router" {
   }
 }
 
+initFocus();
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BackendErrorsContext.Provider>
-      <DataProvider>
-        <SplashMain>
-          <RouterProvider router={router} />
-        </SplashMain>
-      </DataProvider>
+      <AppTheme>
+        <FocusControlsProvider>
+          <DataProvider>
+            <SplashMain>
+              <RouterProvider router={router} />
+            </SplashMain>
+          </DataProvider>
+        </FocusControlsProvider>
+      </AppTheme>
     </BackendErrorsContext.Provider>
   </StrictMode>
 );

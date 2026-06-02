@@ -1,7 +1,7 @@
-import { QueryClient, useQuery } from '@tanstack/react-query';
+import { QueryClient, useQuery, type UseQueryOptions } from '@tanstack/react-query';
+import { filterIsDefined } from '../../util/filter-is-defined';
 import type { DataDTOStateOfDictionaryOfStringAndPkmSaveDTO, PkmSaveDTO } from '../sdk/model';
 import { getStorageGetSavePkmsQueryKey, storageGetSavePkms } from '../sdk/storage/storage.gen';
-import { filterIsDefined } from '../../util/filter-is-defined';
 
 export type PkmSaveIndexes = {
     byId: Record<PkmSaveDTO[ 'id' ], PkmSaveDTO>;
@@ -47,7 +47,7 @@ type QueryData = {
 /**
  * Fetch save pkms with caching & indexing.
  */
-export const usePkmSaveIndex = (saveId: number) => {
+export const usePkmSaveIndex = (saveId: number, options?: Omit<UseQueryOptions, 'queryKey' | 'queryFn'>) => {
     const queryKey = getStorageGetSavePkmsQueryKey(saveId);
 
     return useQuery({
@@ -61,14 +61,19 @@ export const usePkmSaveIndex = (saveId: number) => {
             } satisfies QueryData;
         },
         enabled: !!saveId,
+        ...(options as object),
     });
+};
+
+export const getCachedPkmSaveIndex = (client: QueryClient, saveId: number) => {
+    return client.getQueryData<Partial<QueryData>>(getStorageGetSavePkmsQueryKey(saveId));
 };
 
 /**
  * Update react-query cache with given data, after formatting.
  */
 export const updatePkmSaveCache = (client: QueryClient, saveId: number, savePkms: DataDTOStateOfDictionaryOfStringAndPkmSaveDTO) => {
-    const cachedResponse: Partial<QueryData> | undefined = client.getQueryData(getStorageGetSavePkmsQueryKey(saveId));
+    const cachedResponse = getCachedPkmSaveIndex(client, saveId);
     if (!savePkms.all && !cachedResponse) {
         return;
     }

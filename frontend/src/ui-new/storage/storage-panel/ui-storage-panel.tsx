@@ -17,6 +17,7 @@ export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header
     return <Card
         withBorder
         mah='100%'
+        maw='50%'
         style={{ flexGrow: 1 }}
         {...rest}
     >
@@ -24,9 +25,9 @@ export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header
             {gameTabs}
         </Card.Section>
 
-        <Box my='sm' mah='100%' style={{ overflowY: 'auto' }}>
+        {header && <Box my='sm' mah='100%' style={{ overflowY: 'auto' }}>
             {header}
-        </Box>
+        </Box>}
 
         <Card.Section inheritPadding py='md' withBorder style={{ flexGrow: 1, flexShrink: 999, overflow: 'auto' }}>
             <Group
@@ -45,8 +46,8 @@ export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header
             </Group>
         </Card.Section>
 
-        <Card.Section component={UICardSectionControl} inheritPadding>
+        {footer && <Card.Section component={UICardSectionControl} inheritPadding>
             {footer}
-        </Card.Section>
+        </Card.Section>}
     </Card>;
 };

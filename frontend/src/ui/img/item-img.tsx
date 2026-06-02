@@ -1,7 +1,11 @@
 import type React from 'react';
-import { useStaticData } from '../../hooks/use-static-data';
-import { SpriteImg, type SpriteImgProps } from './sprite-img';
+import { getApiFullUrl } from '../../data/mutator/custom-instance';
 import type { GameVersion } from '../../data/sdk/model';
+import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
+import { getStaticDataGetSpritesheetImgUrl } from '../../data/sdk/static-data/static-data.gen';
+import { useStaticData } from '../../hooks/use-static-data';
+import { UIItemImg } from '../../ui-new/sprite-img/item-img/ui-item-img';
+import { type SpriteImgProps } from './sprite-img';
 
 export type ItemImgProps = {
     item: number | string;  // value or id
@@ -10,6 +14,7 @@ export type ItemImgProps = {
 
 export const ItemImg: React.FC<ItemImgProps> = ({ item, version, ...imgProps }) => {
     const staticData = useStaticData();
+    const settings = useSettingsGet();
 
     let staticForm = staticData.getItem(version, item);;
 
@@ -21,9 +26,15 @@ export const ItemImg: React.FC<ItemImgProps> = ({ item, version, ...imgProps }) 
     const spriteKey = staticForm.sprite;
     const spriteInfos = staticData.spritesheets.items[ spriteKey ];
 
-    return spriteInfos && <SpriteImg
+    const sheetRelativeUrl = spriteInfos && getStaticDataGetSpritesheetImgUrl(spriteInfos.sheetName, {
+        buildID: settings.data?.data.buildID,
+    });
+    const sheetUrl = getApiFullUrl(sheetRelativeUrl ?? '');
+
+    return spriteInfos && <UIItemImg
+        sheetUrl={sheetUrl}
         spriteInfos={spriteInfos}
-        data-itemid={item}
+        item={item}
         {...imgProps}
     />;
 };

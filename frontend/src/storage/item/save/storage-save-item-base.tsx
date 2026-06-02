@@ -3,14 +3,15 @@ import { usePkmLegality } from '../../../data/hooks/use-pkm-legality';
 import { usePkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
 import { usePkmVariantIndex } from '../../../data/hooks/use-pkm-variant-index';
 import { Gender as GenderType } from '../../../data/sdk/model';
-import type { ButtonLikeProps } from '../../../ui/button/button-like';
 import { StorageItem, type StorageItemProps } from '../../../ui/storage-item/storage-item';
 
-export type StorageSaveItemBaseProps = ButtonLikeProps &
-    Pick<StorageItemProps, 'anchor' | 'helpTitle' | 'small' | 'checked' | 'onCheck'> & {
-        saveId: number;
-        pkmId: string;
-    };
+export type StorageSaveItemBaseProps = Pick<
+    StorageItemProps,
+    'label' | 'heldItem' | 'canCreateVariant' | 'canMoveOutside' | 'canEvolve' | 'needSynchronize' | 'onClick'
+> & {
+    saveId: number;
+    pkmId: string;
+};
 
 export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.memo(({ saveId, pkmId, ...rest }) => {
     const savePkmsQuery = usePkmSaveIndex(saveId);
@@ -26,7 +27,7 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
         return null;
     }
 
-    const { species, form, gender, isAlpha, isShiny, isEgg, isShadow, canEvolve } = savePkm;
+    const { id, species, boxId, boxSlot, form, gender, isAlpha, isShiny, isEgg, isShadow, canEvolve } = savePkm;
 
     const attachedPkmVariant = pkmVariantIndex.data?.data.byAttachedSave[ savePkm.saveId ]?.[ savePkm.idBase ];
     const saveSynchronized = savePkm.dynamicChecksum === attachedPkmVariant?.dynamicChecksum;
@@ -38,7 +39,12 @@ export const StorageSaveItemBase: React.FC<StorageSaveItemBaseProps> = React.mem
     return (
         <StorageItem
             {...rest}
+            id={id}
             species={species}
+            bank=''
+            saveId={saveId}
+            box={boxId}
+            slot={boxSlot}
             version={savePkm.contextVersion}
             context={savePkm.context}
             form={form}

@@ -10,10 +10,11 @@ import { usePanelControls } from '../hooks/use-panel-controls';
 import classes from './ui-header.module.css';
 
 export const UIHeader: React.FC<{
+    value: string;
     left: React.ReactNode;
     right: React.ReactNode;
     sub?: React.ReactNode;
-}> = ({ left, right, sub }) => {
+}> = ({ value, left, right, sub }) => {
 
     const { panelProps, nodeId, childScopeId, focused } = usePanelControls('header');
 
@@ -71,7 +72,7 @@ export const UIHeader: React.FC<{
                         <Stack className={classes.main} gap={0} maw='100%'>
                             <Tabs
                                 className={classes.firstLine}
-                                value={'storage'}
+                                value={value}
                                 onChange={tabId => console.log(tabId)}
                                 variant='pills'
                                 miw={0}

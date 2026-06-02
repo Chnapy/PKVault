@@ -1,4 +1,4 @@
-import { QueryClient, useQuery } from '@tanstack/react-query';
+import { QueryClient, useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import type { DataDTOStateOfDictionaryOfStringAndPkmVariantDTO, PkmVariantDTO } from '../sdk/model';
 import { getStorageGetMainPkmVariantsQueryKey, storageGetMainPkmVariants } from '../sdk/storage/storage.gen';
@@ -50,7 +50,7 @@ type QueryData = {
 /**
  * Fetch save pkms with caching & indexing.
  */
-export const usePkmVariantIndex = () => {
+export const usePkmVariantIndex = (options?: Omit<UseQueryOptions, 'queryKey' | 'queryFn'>) => {
     const queryKey = getStorageGetMainPkmVariantsQueryKey();
 
     return useQuery({
@@ -63,14 +63,19 @@ export const usePkmVariantIndex = () => {
                 data: buildIndexes(response.data),
             } satisfies QueryData;
         },
+        ...(options as object),
     });
+};
+
+export const getCachedPkmVariantIndex = (client: QueryClient) => {
+    return client.getQueryData<Partial<QueryData>>(getStorageGetMainPkmVariantsQueryKey());
 };
 
 /**
  * Update react-query cache with given data, after formatting.
  */
 export const updatePkmVariantCache = (client: QueryClient, pkmVariants: DataDTOStateOfDictionaryOfStringAndPkmVariantDTO) => {
-    const cachedResponse: Partial<QueryData> | undefined = client.getQueryData(getStorageGetMainPkmVariantsQueryKey());
+    const cachedResponse = getCachedPkmVariantIndex(client);
     if (!pkmVariants.all && !cachedResponse) {
         return;
     }

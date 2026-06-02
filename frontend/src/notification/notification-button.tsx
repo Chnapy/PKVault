@@ -36,7 +36,8 @@ export const NotificationButton: React.FC = () => {
         <Popover
             className={css({
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                height: '1lh',
             })}
         >
             <PopoverButton
@@ -45,6 +46,7 @@ export const NotificationButton: React.FC = () => {
                 showHelp={!hasErrors}
                 helpTitle={t('header.notifications.help')}
                 onClick={() => setOpenNotif(value => !value)}
+
             >
                 <Icon name='bell' solid forButton />
             </PopoverButton>

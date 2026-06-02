@@ -20,6 +20,8 @@ export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, ri
 
     return (
         <WithControlsIcons placement='out' icons={controlsIcons.open}
+            mah='100%'
+            mih={0}
             display='flex'
             style={{ flexGrow: 1, }}
         >

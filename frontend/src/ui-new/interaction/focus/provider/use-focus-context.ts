@@ -76,6 +76,9 @@ const useRegister = () => {
       const scopeId = node.scopeId;
 
       queueMicrotask(() => {
+        if (nodes.get(nodeId))
+          return;
+
         const nextNode = [ ...nodes.values() ].find(n => n.scopeId === scopeId);
         if (nextNode) {
           nextNode?.focusSelf();
