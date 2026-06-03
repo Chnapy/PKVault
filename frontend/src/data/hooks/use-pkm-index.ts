@@ -1,8 +1,7 @@
-import type { QueryClient } from '@tanstack/react-query';
-import React from 'react';
+import { useQuery, type QueryClient, type UseQueryOptions } from '@tanstack/react-query';
 import { filterIsDefined } from '../../util/filter-is-defined';
-import { getCachedPkmSaveIndex, usePkmSaveIndex, type PkmSaveIndexes } from './use-pkm-save-index';
-import { getCachedPkmVariantIndex, usePkmVariantIndex, type PkmVariantIndexes } from './use-pkm-variant-index';
+import { getCachedPkmSaveIndex, getPkmSaveIndexOptions, type PkmSaveIndexes, type PkmSaveIndexQueryData } from './use-pkm-save-index';
+import { getCachedPkmVariantIndex, getPkmVariantIndexOptions, type PkmVariantIndexes, type PkmVariantIndexQueryData } from './use-pkm-variant-index';
 
 const createMixedIndex = (
     pkmMainIndex: PkmVariantIndexes | undefined, 
@@ -56,28 +55,40 @@ export const getCachedPkmIndex = (client: QueryClient, saveId: number | null) =>
     };
 };
 
-export const usePkmIndex = (saveId: number | null) => {
-    const pkmMainIndex = usePkmVariantIndex({
-        enabled: saveId === null,
-    });
-    const pkmSaveIndex = usePkmSaveIndex(saveId ?? 0, {
-        enabled: saveId !== null,
-    });
+export const usePkmIndex = <D>(
+    saveId: number | null,
+    selectFn?: (data: PkmVariantIndexQueryData | PkmSaveIndexQueryData) => D,
+    options?: Omit<UseQueryOptions<PkmVariantIndexQueryData | PkmSaveIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>
+) => {
+    const query = useQuery({
+        select: selectFn,
+        ...saveId === null
+            ? getPkmVariantIndexOptions(options as never)
+            : getPkmSaveIndexOptions(saveId, options as never),
+    } as UseQueryOptions<PkmVariantIndexQueryData | PkmSaveIndexQueryData, Error, D>);
 
-    const query = saveId ? pkmSaveIndex : pkmMainIndex;
-
-    const data = React.useMemo(() => 
-        createMixedIndex(pkmMainIndex.data?.data, pkmSaveIndex.data?.data, saveId),
-        [pkmMainIndex.data?.data, pkmSaveIndex.data?.data, saveId]
-    );
+    // const data = React.useMemo(() => 
+    //     createMixedIndex(
+    //         params.saveId ? undefined : (query as UseQueryResult<PkmVariantIndexQueryData>).data?.data,
+    //         params.saveId ? (query as UseQueryResult<PkmSaveIndexQueryData>).data?.data : undefined,
+    //         params.saveId
+    //     ),
+    //     [query, params.saveId]
+    // );
 
     return {
         ...query,
-        data: query.data && {
-            ...query.data,
-            data,
-        },
+        // data: query.data && {
+        //     ...query.data,
+        //     data,
+        // },
     };
 };
 
-// usePkmIndex().data?.data.
+// export const useQuerySelect = <TQueryFnData = unknown, TData = TQueryFnData>(selectFn: (data: TQueryFnData) => TData) => {
+//     const selectRef = React.useRef(selectFn);
+//     // eslint-disable-next-line react-hooks/refs
+//     selectRef.current = selectFn;
+
+//     return React.useCallback<typeof selectFn>((data) => selectRef.current(data), []);
+// };

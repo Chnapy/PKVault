@@ -1,21 +1,29 @@
 import { Card } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { UISpriteSizeWrapper } from '../../../sprite-img/ui-sprite-size-wrapper';
-import { UIStorageItemPlaceholder } from './ui-storage-item-placeholder';
+import { UIStorageItemPlaceholderWithInteraction } from './ui-storage-item-placeholder-with-interaction';
 
 const meta = {
     title: 'UI/UIStorageItemPlaceholder',
-    component: UIStorageItemPlaceholder,
+    component: UIStorageItemPlaceholderWithInteraction,
     decorators: Story => <Card display='inline-flex'>
         <Story />
     </Card>,
-} satisfies Meta<typeof UIStorageItemPlaceholder>;
+} satisfies Meta<typeof UIStorageItemPlaceholderWithInteraction>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
-    args: {},
+    args: {
+        nodeId: '1',
+        container: {
+            bank: 1,
+            saveId: null,
+            box: '1',
+        },
+        slot: 1,
+    },
     decorators: Story => <UISpriteSizeWrapper
         component='div'
         speciesSize='md'
@@ -25,7 +33,9 @@ export const Primary: Story = {
 };
 
 export const Small: Story = {
-    args: {},
+    args: {
+        ...Primary.args,
+    },
     decorators: Story => <UISpriteSizeWrapper
         component='div'
         speciesSize='sm'
@@ -35,7 +45,9 @@ export const Small: Story = {
 };
 
 export const Large: Story = {
-    args: {},
+    args: {
+        ...Primary.args,
+    },
     decorators: Story => <UISpriteSizeWrapper
         component='div'
         speciesSize='lg'

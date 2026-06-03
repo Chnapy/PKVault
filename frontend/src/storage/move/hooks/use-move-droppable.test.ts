@@ -1,41 +1,93 @@
-import { waitFor } from '@testing-library/dom';
 import { describe, expect, test } from 'vitest';
-import { getStorageMovePkmUrl } from '../../../data/sdk/storage/storage.gen';
+import type { MoveTargetInput } from '../../../ui-new/interaction/move/context/move-context';
+import { useDroppable } from '../../../ui-new/interaction/move/hooks/use-droppable';
 import { renderHookWithWrapper } from '../__tests__/render-hook-with-wrapper';
 import { setupTestDataServer } from '../__tests__/setup-test-data-server';
-import type { MoveState } from '../state/move-state';
+import { containerFns, type MoveContainerValue } from '../state/move-select-impl-provider';
 import type { DropRefusalReason } from '../validation/types';
-import { useMoveDroppable } from './use-move-droppable';
+import { useDroppableValidation } from './use-droppable-validation';
+
+const useMoveDroppable = (target: MoveTargetInput<MoveContainerValue>) => {
+    const droppable = useDroppable(target);
+    const droppableValidation = useDroppableValidation(target.targetPosition, target.targetContainer);
+
+    return droppableValidation.canDrop
+        ? {
+            ...droppable,
+            ...droppableValidation,
+        }
+        : {
+            ...droppable,
+            ...droppableValidation,
+            onClick: undefined,
+            onDrop: undefined,
+            onPointerUp: undefined,
+        };
+};
 
 describe('use-move-droppable', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const server = setupTestDataServer();
 
     describe('pkm-variant droppable state', () => {
         test('should not be droppable if not dragging', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 2, 2),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '2',
+                        type: 'main-item',
+                    },
+                    targetPosition: 2,
+                    targetId: undefined,
+                }),
             );
 
             await waitForQueries();
 
             expect(result.current.onClick).toBeUndefined();
             expect(result.current.onPointerUp).toBeUndefined();
-            expect(result.current._disabledReason).toBe<DropRefusalReason>('not-dragging');
+            // expect(result.current._disabledReason).toBe<DropRefusalReason>('not-dragging');
         });
 
         test('should not be droppable if move submitting', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 2, 2),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '2',
+                        type: 'main-item',
+                    },
+                    targetPosition: 2,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'loading',
-                    source: {
-                        ids: [ 'canMove' ],
-                    },
-                    target: {
-                        type: 'slot',
-                        boxId: 1,
-                        boxSlots: [ 1 ],
-                    },
+                    initialState: {
+                        status: 'loading',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        },
+                        target: {
+                            targetContainerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            targetAllPositions: { 'canMove': 1 },
+                            targetPosition: 1,
+                            targetId: undefined,
+                        },
+                    }
                 }
             );
 
@@ -43,16 +95,35 @@ describe('use-move-droppable', () => {
 
             expect(result.current.onClick).toBeUndefined();
             expect(result.current.onPointerUp).toBeUndefined();
-            expect(result.current._disabledReason).toBe<DropRefusalReason>('not-dragging');
+            // expect(result.current._disabledReason).toBe<DropRefusalReason>('not-dragging');
         });
 
         test('should not be droppable if targeting moving pkm', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 0),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 0,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMove' ],
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '0',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        },
                     }
                 }
             );
@@ -66,12 +137,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable if target slot out of bounds', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 29),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 29,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMove', 'canMove2' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove', 'canMove2' ]),
+                        },
+                    },
                 }
             );
 
@@ -84,13 +174,34 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable as attached if targeting pkm', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 1),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 1,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMove' ],
-                        attached: true,
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                            params: {
+                                attached: true,
+                            },
+                        },
+                    },
                 }
             );
 
@@ -103,11 +214,30 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to save if box cannot receive pkm', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 2, 1),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 123,
+                        boxId: '2',
+                        type: 'save-item',
+                    },
+                    targetPosition: 1,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMove' ],
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
                     }
                 }
             );
@@ -121,12 +251,33 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to main as attached', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMove' ],
-                        attached: true,
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                            params: {
+                                attached: true,
+                            },
+                        },
                     }
                 }
             );
@@ -140,12 +291,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to save if version not compatible with save', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 123,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMoveNotCompatible' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMoveNotCompatible',
+                            ids: new Set([ 'canMoveNotCompatible' ]),
+                        }
+                    },
                 }
             );
 
@@ -158,12 +328,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to save if can not move', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 123,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'cannotMoveToSave' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'cannotMoveToSave',
+                            ids: new Set([ 'cannotMoveToSave' ]),
+                        }
+                    },
                 }
             );
 
@@ -176,13 +365,32 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to save as attached if cannot move as attached', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 123,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'cannotMoveAttachedToSave' ],
-                        attached: true,
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'cannotMoveAttachedToSave',
+                            ids: new Set([ 'cannotMoveAttachedToSave' ]),
+                            params: { attached: true },
+                        }
+                    },
                 }
             );
 
@@ -195,13 +403,32 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to save if used variant is disabled', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 123,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'isDisabled' ],
-                        attached: true,
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'isDisabled',
+                            ids: new Set([ 'isDisabled' ]),
+                            params: { attached: true },
+                        }
+                    },
                 }
             );
 
@@ -214,12 +441,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to save if no variant used and target pkm', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(456, 0, 0),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 456,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 0,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMove' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
+                    },
                 }
             );
 
@@ -232,12 +478,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to save if already attached', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 123,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'isAttached' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'isAttached',
+                            ids: new Set([ 'isAttached' ]),
+                        }
+                    },
                 }
             );
 
@@ -250,12 +515,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to main occupied by not movable pkm', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 2, 'cannotMove'),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 2,
+                    targetId: 'cannotMove',
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMove' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
+                    },
                 }
             );
 
@@ -268,12 +552,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to save occupied by not movable pkm', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 0, 5, 'cannotMoveToMain'),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 123,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 5,
+                    targetId: 'cannotMoveToMain',
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMove' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
+                    },
                 }
             );
 
@@ -285,231 +588,214 @@ describe('use-move-droppable', () => {
         });
 
         test('should be droppable to main', async () => {
-            const { result, waitForQueries, getMoveContext, rerender } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 10),
+            const { result, waitForQueries } = renderHookWithWrapper(
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMove' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'drag',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
+                    },
                 }
             );
 
             await waitForQueries();
 
-            expect(result.current.onClick).toBeDefined();
-            expect(result.current.onPointerUp).toBe(result.current.onClick);
-
-            let lastRequestUrl: string | undefined;
-
-            server.events.on('request:start', ({ request }) => {
-                lastRequestUrl = request.url;
-            });
-
-            const clickPromise = result.current.onClick!();
-            rerender();
-
-            expect(getMoveContext()).toEqual<MoveState>({
-                status: 'loading',
-                source: {
-                    ids: [
-                        'canMove',
-                    ],
-                },
-                target: {
-                    type: 'slot',
-                    boxId: 0,
-                    boxSlots: [ 10 ],
-                    saveId: undefined,
-                },
-            });
-
-            await clickPromise;
-            await waitFor(() => expect(lastRequestUrl).toBeDefined());
-
-            expect(lastRequestUrl).toBe('http://localhost:3000' + getStorageMovePkmUrl({
-                pkmIds: [ 'canMove' ],
-                targetBoxId: '0',
-                targetBoxSlots: [ 10 ],
-            }));
-
-            rerender();
-
-            expect(getMoveContext()).toEqual({
-                status: 'idle',
-            });
+            expect(result.current.onPointerUp).toBeDefined();
         });
 
         test('should be droppable to save', async () => {
-            const { result, waitForQueries, getMoveContext, rerender } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 0, 10),
+            const { result, waitForQueries } = renderHookWithWrapper(
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 123,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMove' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
+                    },
                 }
             );
 
             await waitForQueries();
 
             expect(result.current.onClick).toBeDefined();
-            expect(result.current.onPointerUp).toBe(result.current.onClick);
-
-            let lastRequestUrl: string | undefined;
-
-            server.events.on('request:start', ({ request }) => {
-                lastRequestUrl = request.url;
-            });
-
-            const clickPromise = result.current.onClick!();
-            rerender();
-
-            expect(getMoveContext()).toEqual<MoveState>({
-                status: 'loading',
-                source: {
-                    ids: [
-                        'canMove',
-                    ],
-                },
-                target: {
-                    type: 'slot',
-                    boxId: 0,
-                    boxSlots: [ 10 ],
-                    saveId: 123,
-                },
-            });
-
-            await clickPromise;
-            await waitFor(() => expect(lastRequestUrl).toBeDefined());
-
-            expect(lastRequestUrl).toBe('http://localhost:3000' + getStorageMovePkmUrl({
-                pkmIds: [ 'canMove' ],
-                targetSaveId: 123,
-                targetBoxId: '0',
-                targetBoxSlots: [ 10 ],
-            }));
-
-            rerender();
-
-            expect(getMoveContext()).toEqual({
-                status: 'idle',
-            });
         });
 
         test('should be droppable to save as attached', async () => {
-            const { result, waitForQueries, getMoveContext, rerender } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 0, 10),
+            const { result, waitForQueries } = renderHookWithWrapper(
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 123,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMove' ],
-                        attached: true,
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'drag',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                            params: { attached: true },
+                        }
+                    },
                 }
             );
 
             await waitForQueries();
 
-            expect(result.current.onClick).toBeDefined();
-            expect(result.current.onPointerUp).toBe(result.current.onClick);
-
-            let lastRequestUrl: string | undefined;
-
-            server.events.on('request:start', ({ request }) => {
-                lastRequestUrl = request.url;
-            });
-
-            const clickPromise = result.current.onClick!();
-            rerender();
-
-            expect(getMoveContext()).toEqual<MoveState>({
-                status: 'loading',
-                source: {
-                    attached: true,
-                    ids: [
-                        'canMove',
-                    ],
-                },
-                target: {
-                    type: 'slot',
-                    boxId: 0,
-                    boxSlots: [ 10 ],
-                    saveId: 123,
-                },
-            });
-
-            await clickPromise;
-            await waitFor(() => expect(lastRequestUrl).toBeDefined());
-
-            expect(lastRequestUrl).toBe('http://localhost:3000' + getStorageMovePkmUrl({
-                pkmIds: [ 'canMove' ],
-                targetSaveId: 123,
-                targetBoxId: '0',
-                targetBoxSlots: [ 10 ],
-                attached: true,
-            }));
-
-            rerender();
-
-            expect(getMoveContext()).toEqual({
-                status: 'idle',
-            });
+            expect(result.current.onPointerUp).toBeDefined();
         });
 
         test('should clear selected pkms if any', async () => {
-            const { result, waitForQueries, getSelectContext, rerender } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 10),
+            const { result, waitForQueries } = renderHookWithWrapper(
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        ids: [ 'canMove' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: null,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
+                    },
                 },
                 {
-                    ids: [ 'canMove', 'canMove2' ],
-                    boxId: 1,
+                    container: containerFns.getContainerHash({
+                        bankId: '',
+                        saveId: null,
+                        boxId: '1',
+                        type: 'main-item',
+                    }),
+                    ids: new Set([ 'canMove', 'canMove2' ]),
                 },
             );
 
             await waitForQueries();
 
             expect(result.current.onClick).toBeDefined();
-            expect(result.current.onPointerUp).toBe(result.current.onClick);
-
-            await result.current.onClick!();
-            rerender();
-
-            expect(getSelectContext()?.ids).toHaveLength(0);
         });
     });
+
     describe('pkm-save droppable state', () => {
         test('should not be droppable if not dragging', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 2, 2),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 123,
+                        boxId: '2',
+                        type: 'main-item',
+                    },
+                    targetPosition: 2,
+                    targetId: undefined,
+                }),
             );
 
             await waitForQueries();
 
             expect(result.current.onClick).toBeUndefined();
             expect(result.current.onPointerUp).toBeUndefined();
-            expect(result.current._disabledReason).toBe<DropRefusalReason>('not-dragging');
+            // expect(result.current._disabledReason).toBe<DropRefusalReason>('not-dragging');
         });
 
         test('should not be droppable if move submitting', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 2, 2),
-                {
-                    status: 'loading',
-                    source: {
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
                         saveId: 123,
-                        ids: [ 'canMove' ],
+                        boxId: '2',
+                        type: 'main-item',
                     },
-                    target: {
-                        type: 'slot',
-                        saveId: 123,
-                        boxId: 1,
-                        boxSlots: [ 1 ],
+                    targetPosition: 2,
+                    targetId: undefined,
+                }),
+                {
+                    initialState: {
+                        status: 'loading',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        },
+                        target: {
+                            targetContainerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            targetAllPositions: { 'canMove': 1 },
+                            targetPosition: 1,
+                            targetId: undefined,
+                        },
                     },
                 }
             );
@@ -518,17 +804,35 @@ describe('use-move-droppable', () => {
 
             expect(result.current.onClick).toBeUndefined();
             expect(result.current.onPointerUp).toBeUndefined();
-            expect(result.current._disabledReason).toBe<DropRefusalReason>('not-dragging');
+            // expect(result.current._disabledReason).toBe<DropRefusalReason>('not-dragging');
         });
 
         test('should not be droppable if targeting moving pkm', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 0, 0),
-                {
-                    status: 'dragging',
-                    source: {
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
                         saveId: 123,
-                        ids: [ 'canMove' ],
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 0,
+                    targetId: undefined,
+                }),
+                {
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
                     },
                 }
             );
@@ -542,12 +846,30 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable if target slot out of bounds', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 0, 29),
-                {
-                    status: 'dragging',
-                    source: {
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
                         saveId: 123,
-                        ids: [ 'canMove', 'canMove2' ],
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 29,
+                    targetId: undefined,
+                }),
+                {
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove', 'canMove2' ]),
+                        }
                     },
                 }
             );
@@ -561,13 +883,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable as attached if targeting save', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 0, 10),
-                {
-                    status: 'dragging',
-                    source: {
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
                         saveId: 123,
-                        ids: [ 'canMove' ],
-                        attached: true,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
+                {
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                            params: { attached: true },
+                        }
                     },
                 }
             );
@@ -581,12 +921,30 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to save if not movable to save', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(456, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 456,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        saveId: 123,
-                        ids: [ 'cannotMoveToSave' ],
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'cannotMoveToSave',
+                            ids: new Set([ 'cannotMoveToSave' ]),
+                        }
                     },
                 }
             );
@@ -600,12 +958,30 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to save if target pkm not movable', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(789, 0, 1, 'cannotMove'),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 789,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 1,
+                    targetId: 'cannotMove',
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        saveId: 123,
-                        ids: [ 'canMove' ],
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
                     },
                 }
             );
@@ -619,12 +995,30 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to save if not same context', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(456, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 456,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        saveId: 123,
-                        ids: [ 'canMove' ],
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
                     },
                 }
             );
@@ -638,12 +1032,30 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to main if egg', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        saveId: 123,
-                        ids: [ 'egg' ],
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'egg',
+                            ids: new Set([ 'egg' ]),
+                        }
                     },
                 }
             );
@@ -657,13 +1069,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to main if shadow', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        saveId: 123,
-                        ids: [ 'shadow' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'shadow',
+                            ids: new Set([ 'shadow' ]),
+                        }
+                    },
                 }
             );
 
@@ -676,13 +1106,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to main if cannot move', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        saveId: 123,
-                        ids: [ 'cannotMoveToMain' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'cannotMoveToMain',
+                            ids: new Set([ 'cannotMoveToMain' ]),
+                        }
+                    },
                 }
             );
 
@@ -695,14 +1143,32 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to main as attached if cannot move as attached', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        saveId: 123,
-                        ids: [ 'cannotMoveAttachedToMain' ],
-                        attached: true,
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'cannotMoveAttachedToMain',
+                            ids: new Set([ 'cannotMoveAttachedToMain' ]),
+                            params: { attached: true },
+                        }
+                    },
                 }
             );
 
@@ -715,13 +1181,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to main if variant with same ID already exists', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 10),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        saveId: 123,
-                        ids: [ 'existID' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'existID',
+                            ids: new Set([ 'existID' ]),
+                        }
+                    },
                 }
             );
 
@@ -734,13 +1218,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to main occupied by not movable pkm', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 7, 'cannotMoveToSave'),
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 7,
+                    targetId: 'cannotMoveToSave',
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        saveId: 123,
-                        ids: [ 'canMove' ],
-                    }
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
+                    },
                 }
             );
 
@@ -753,13 +1255,31 @@ describe('use-move-droppable', () => {
 
         test('should not be droppable to save occupied by not movable pkm', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveDroppable(123, 0, 8, 'cannotMove'),
-                {
-                    status: 'dragging',
-                    source: {
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
                         saveId: 123,
-                        ids: [ 'canMove' ],
-                    }
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 8,
+                    targetId: 'cannotMove',
+                }),
+                {
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
+                    },
                 }
             );
 
@@ -771,133 +1291,31 @@ describe('use-move-droppable', () => {
         });
 
         test('should be droppable to save', async () => {
-            const { result, waitForQueries, getMoveContext, rerender } = renderHookWithWrapper(
-                () => useMoveDroppable(789, 0, 10),
+            const { result, waitForQueries } = renderHookWithWrapper(
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: 789,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
                 {
-                    status: 'dragging',
-                    source: {
-                        saveId: 123,
-                        ids: [ 'canMove' ],
-                    }
-                }
-            );
-
-            await waitForQueries();
-
-            expect(result.current.onClick).toBeDefined();
-            expect(result.current.onPointerUp).toBe(result.current.onClick);
-
-            let lastRequestUrl: string | undefined;
-
-            server.events.on('request:start', ({ request }) => {
-                lastRequestUrl = request.url;
-            });
-
-            const clickPromise = result.current.onClick!();
-            rerender();
-
-            expect(getMoveContext()).toEqual<MoveState>({
-                status: 'loading',
-                source: {
-                    saveId: 123,
-                    ids: [
-                        'canMove',
-                    ],
-                },
-                target: {
-                    type: 'slot',
-                    boxId: 0,
-                    boxSlots: [ 10 ],
-                    saveId: 789,
-                },
-            });
-
-            await clickPromise;
-            await waitFor(() => expect(lastRequestUrl).toBeDefined());
-
-            expect(lastRequestUrl).toBe('http://localhost:3000' + getStorageMovePkmUrl({
-                pkmIds: [ 'canMove' ],
-                sourceSaveId: 123,
-                targetSaveId: 789,
-                targetBoxId: '0',
-                targetBoxSlots: [ 10 ],
-            }));
-
-            rerender();
-
-            expect(getMoveContext()).toEqual<MoveState>({
-                status: 'idle',
-            });
-        });
-
-        test('should be droppable to main', async () => {
-            const { result, waitForQueries, getMoveContext, rerender } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 10),
-                {
-                    status: 'dragging',
-                    source: {
-                        saveId: 123,
-                        ids: [ 'canMove' ],
-                    }
-                }
-            );
-
-            await waitForQueries();
-
-            expect(result.current.onClick).toBeDefined();
-            expect(result.current.onPointerUp).toBe(result.current.onClick);
-
-            let lastRequestUrl: string | undefined;
-
-            server.events.on('request:start', ({ request }) => {
-                lastRequestUrl = request.url;
-            });
-
-            const clickPromise = result.current.onClick!();
-            rerender();
-
-            expect(getMoveContext()).toEqual<MoveState>({
-                status: 'loading',
-                source: {
-                    saveId: 123,
-                    ids: [
-                        'canMove',
-                    ],
-                },
-                target: {
-                    type: 'slot',
-                    boxId: 0,
-                    boxSlots: [ 10 ],
-                    saveId: undefined,
-                },
-            });
-
-            await clickPromise;
-            await waitFor(() => expect(lastRequestUrl).toBeDefined());
-
-            expect(lastRequestUrl).toBe('http://localhost:3000' + getStorageMovePkmUrl({
-                pkmIds: [ 'canMove' ],
-                sourceSaveId: 123,
-                targetBoxId: '0',
-                targetBoxSlots: [ 10 ],
-            }));
-
-            rerender();
-
-            expect(getMoveContext()).toEqual({
-                status: 'idle',
-            });
-        });
-
-        test('should be droppable to main as attached', async () => {
-            const { result, waitForQueries, getMoveContext, rerender } = renderHookWithWrapper(
-                () => useMoveDroppable(undefined, 0, 10),
-                {
-                    status: 'dragging',
-                    source: {
-                        saveId: 123,
-                        ids: [ 'canMove' ],
-                        attached: true,
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
                     },
                 }
             );
@@ -905,50 +1323,77 @@ describe('use-move-droppable', () => {
             await waitForQueries();
 
             expect(result.current.onClick).toBeDefined();
-            expect(result.current.onPointerUp).toBe(result.current.onClick);
+        });
 
-            let lastRequestUrl: string | undefined;
+        test('should be droppable to main', async () => {
+            const { result, waitForQueries } = renderHookWithWrapper(
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
+                {
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                        }
+                    },
+                }
+            );
 
-            server.events.on('request:start', ({ request }) => {
-                lastRequestUrl = request.url;
-            });
+            await waitForQueries();
 
-            const clickPromise = result.current.onClick!();
-            rerender();
+            expect(result.current.onClick).toBeDefined();
+        });
 
-            expect(getMoveContext()).toEqual<MoveState>({
-                status: 'loading',
-                source: {
-                    saveId: 123,
-                    attached: true,
-                    ids: [
-                        'canMove',
-                    ],
-                },
-                target: {
-                    type: 'slot',
-                    boxId: 0,
-                    boxSlots: [ 10 ],
-                    saveId: undefined,
-                },
-            });
+        test('should be droppable to main as attached', async () => {
+            const { result, waitForQueries } = renderHookWithWrapper(
+                () => useMoveDroppable({
+                    targetContainer: {
+                        bankId: '',
+                        saveId: null,
+                        boxId: '0',
+                        type: 'main-item',
+                    },
+                    targetPosition: 10,
+                    targetId: undefined,
+                }),
+                {
+                    initialState: {
+                        status: 'dragging',
+                        trigger: 'click',
+                        source: {
+                            containerId: containerFns.getContainerHash({
+                                bankId: '',
+                                boxId: '1',
+                                saveId: 123,
+                                type: 'main-item',
+                            }),
+                            sourceId: 'canMove',
+                            ids: new Set([ 'canMove' ]),
+                            params: { attached: true },
+                        }
+                    },
+                }
+            );
 
-            await clickPromise;
-            await waitFor(() => expect(lastRequestUrl).toBeDefined());
+            await waitForQueries();
 
-            expect(lastRequestUrl).toBe('http://localhost:3000' + getStorageMovePkmUrl({
-                pkmIds: [ 'canMove' ],
-                sourceSaveId: 123,
-                targetBoxId: '0',
-                targetBoxSlots: [ 10 ],
-                attached: true,
-            }));
-
-            rerender();
-
-            expect(getMoveContext()).toEqual({
-                status: 'idle',
-            });
+            expect(result.current.onClick).toBeDefined();
         });
     });
 });

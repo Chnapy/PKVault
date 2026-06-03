@@ -2,7 +2,7 @@ import type { Vector2 } from '@use-gesture/react';
 import React from 'react';
 import { create } from 'zustand';
 import { moveReducer } from '../state/move-reducer';
-import type { MoveAction, MoveSource, MoveState } from '../state/move-state';
+import type { MoveAction, MoveState } from '../state/move-state';
 
 export type MoveTargetInput<C> = {
     targetContainer: C;
@@ -33,7 +33,7 @@ export type MoveContext<C, P = unknown> = {
     dragEndTimestampRef: React.RefObject<number>;
     useMoveStore: ReturnType<typeof createMoveStore<P>>;
     drop: (target: MoveTargetInput<C>) => Promise<unknown>;
-    filterStartDragIds: (source: MoveSource<P>) => Set<string>;
+    useFilterStartDragIds: (container: C, sourceIds: string[]) => (params?: P) => Set<string>;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,7 +44,7 @@ export type MoveStore<P> = {
     dispatch: React.ActionDispatch<[ MoveAction ]>;
 };
 
-export const createMoveStore = <P>() => create<MoveStore<P>>()((set) => ({
-    state: { status: 'idle' },
+export const createMoveStore = <P>(initialState?: MoveState<P>) => create<MoveStore<P>>()((set) => ({
+    state: initialState ?? { status: 'idle' },
     dispatch: (action) => set(s => ({ state: moveReducer(s.state, action) })),
 }));

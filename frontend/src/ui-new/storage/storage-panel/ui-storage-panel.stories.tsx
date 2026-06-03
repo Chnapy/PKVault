@@ -53,6 +53,7 @@ export const getMoveSelectDecorator = (Story: any) => {
     return <SelectProvider {...containerFns}>
         <MoveProvider moveContainerId='move-container'
             {...containerFns}
+            useFilterStartDragIds={(container, sourceIds) => () => new Set(sourceIds)}
             getTargetAllPositions={() => ({})} onDrop={onDrop}
         >
             <Box
@@ -69,18 +70,24 @@ export const getPanelChildren = (box: number) => new Array(30).fill(0).map((_, i
         ? <UIStorageItemPlaceholderWithInteraction
             key={i}
             {...StorageItemPlaceholder.args}
-            bank='1'
-            saveId={null}
-            box={box}
+            nodeId={i + ''}
+            container={{
+                bank: 1,
+                saveId: null,
+                box: box,
+            }}
             slot={i}
         />
         : <UIStorageItem
             key={i}
             {...StorageItemPrimary.args}
+            nodeId={i + ''}
             id={`item-${box}-${i}`}
-            bank='1'
-            saveId={null}
-            box={box}
+            container={{
+                bank: 1,
+                saveId: null,
+                box: box,
+            }}
             slot={i}
             onClick={() => console.log('click', i)}
         />);

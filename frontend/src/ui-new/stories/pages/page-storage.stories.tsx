@@ -35,9 +35,10 @@ const meta = {
                 <SelectProvider<ContainerValue>
                     {...containerFns}
                 >
-                    <MoveProvider<ContainerValue>
+                    <MoveProvider<ContainerValue, unknown>
                         {...containerFns}
                         moveContainerId='move-container'
+                        useFilterStartDragIds={(container, sourceIds) => () => new Set(sourceIds)}
                         getTargetAllPositions={() => ({})}
                         onDrop={onDrop}
                     >
@@ -73,6 +74,7 @@ export const Primary: Story = {
                     type: DataActionType.MAIN_DELETE_BANK,
                 },
             ]}
+            onSave={console.log}
         />}
         footer={<UIFooter />}
         children={<UIStorageContent
@@ -100,6 +102,7 @@ export const EmptyData: Story = {
         header={<UIHeader {...UIHeaderSingleBankStory.args} />}
         bottom={<UIActionsPanel
             data={[]}
+            onSave={console.log}
         />}
         footer={<UIFooter />}
         children={<UIStorageContent

@@ -1,6 +1,7 @@
 import { Box, Button, Checkbox, Group, Tooltip, type BoxProps, type ElementProps } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import React from 'react';
+import type { MoveParams } from '../../../storage/move/state/move-select-impl-provider';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getDragControls } from '../../interaction/focus-controls/common-controls/drag-controls';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
@@ -48,12 +49,18 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
     const { addId, removeId } = useSelectContextActions();
 
     const dragging = useDragging(id, container);
+    const draggingMove = dragging.useDrag();
+    const draggingMoveAttached = dragging.useDrag<MoveParams>({ attached: true });
 
     const droppable = useDroppable({
         targetContainer: container,
         targetPosition: slot,
         targetId: id,
     });
+
+    const isDraggingState = dragging.isDragging || droppable.isDroppable;
+
+    disabled ||= (isDraggingState && !droppable.isDroppable);
 
     const submitting = useDragSubmitting(container, slot, id);
 
@@ -74,7 +81,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
                     onClick?.(e);
                 },
             }),
-            ...getDragControls({ dragging, droppable }),
+            ...getDragControls({ dragging, draggingMove, draggingMoveAttached, droppable }),
             !dragging.isDragging && !droppable.isDroppable && {
                 name: 'select',
                 label: 'Select',
@@ -126,6 +133,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
                         loading={submitting}
                         disabled={disabled}
                         bd='none'
+                        opacity={dragging.isDragging ? 0.5 : undefined}
                     >
                         {children}
                         {icons}

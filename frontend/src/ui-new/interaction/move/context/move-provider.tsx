@@ -1,18 +1,18 @@
 import { useGesture, useScroll } from '@use-gesture/react';
 import React from 'react';
-import type { MoveSource, MoveStateLoading } from '../state/move-state';
+import type { MoveSource, MoveState, MoveStateLoading } from '../state/move-state';
 import { createMoveStore, moveContext, type MoveContext, type MovePositions, type MoveTargetInput, type MoveTargetOutput } from './move-context';
 
-type MoveProviderProps<C, P> = Pick<MoveContext<C>, 'moveContainerId' | 'getContainerHash' | 'getContainerValue'> & {
-    filterStartDragIds: (source: MoveSource<P>) => Set<string>;
+export type MoveProviderProps<C, P> = Pick<MoveContext<C, P>, 'moveContainerId' | 'getContainerHash' | 'getContainerValue' | 'useFilterStartDragIds'> & {
+    initialState?: MoveState<P>;
     getTargetAllPositions: (source: MoveSource<P>, target: MoveTargetInput<C>) => Record<string, number>;
     onDrop: (source: MoveSource<P>, target: MoveTargetOutput<C>) => Promise<unknown>;
     children: React.ReactNode;
 };
 
 export const MoveProvider = function <C, P>({
-    moveContainerId, getContainerHash, getContainerValue,
-    onDrop: onDropSuccess, getTargetAllPositions, filterStartDragIds,
+    moveContainerId, getContainerHash, getContainerValue, initialState,
+    onDrop: onDropSuccess, getTargetAllPositions, useFilterStartDragIds,
     children
 }: MoveProviderProps<C, P>) {
     const positionsRef = React.useRef<MovePositions>({
@@ -27,7 +27,7 @@ export const MoveProvider = function <C, P>({
 
     const [ value ] = React.useState((): MoveContext<C, P> => {
 
-        const useMoveStore = createMoveStore<P>();
+        const useMoveStore = createMoveStore<P>(initialState);
 
         const innerDispatch = useMoveStore.getState().dispatch;
 
@@ -72,7 +72,7 @@ export const MoveProvider = function <C, P>({
             dragEndTimestampRef,
             useMoveStore,
             drop,
-            filterStartDragIds,
+            useFilterStartDragIds,
         };
     });
 

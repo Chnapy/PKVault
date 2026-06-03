@@ -1,4 +1,4 @@
-import type React from 'react';
+import React from 'react';
 import { usePkmIndex } from '../../../data/hooks/use-pkm-index';
 import { useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
 import { Route } from '../../../routes/storage';
@@ -15,19 +15,27 @@ export const StoragePanelFooter: React.FC = () => {
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();
 
     const boxesQuery = useStorageGetBoxes({ saveId: saveId ?? undefined });
-    const pkmsQuery = usePkmIndex(saveId);
-
-    const pkmIndex = pkmsQuery.data?.data;
 
     const boxes = (boxesQuery.data?.data ?? [])
         .filter(box => !box.bankId || box.bankId === selectedBankBoxes.data?.selectedBank.id);
 
     const boxId = Route.useSearch({ select: (search) => getStorage(search.storages)?.boxId }) ?? boxes[ 0 ]?.idInt;
+
+    const pkmCountQuery = usePkmIndex(
+        saveId,
+        data => Object.keys(data.data.byBox[ boxId ?? -1 ] ?? {}).length,
+    );
+
+    const pkmTotalCountQuery = usePkmIndex(
+        saveId,
+        React.useCallback(data => Object.values(data.data.byBox).reduce((acc, box) => acc + Object.keys(box).length, 0), []),
+    );
+
     const box = boxes.find(b => b.idInt === boxId);
 
     return <UIStoragePanelFooter
         boxSize={box?.slotCount ?? 0}
-        pkmCount={pkmIndex?.getBoxLength(boxId ?? -1) ?? 0}
-        pkmTotalCount={pkmIndex?.getTotalLength() ?? 0}
+        pkmCount={pkmCountQuery.data ?? 0}
+        pkmTotalCount={pkmTotalCountQuery.data ?? 0}
     />;
 };

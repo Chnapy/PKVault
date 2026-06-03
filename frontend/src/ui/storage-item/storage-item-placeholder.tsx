@@ -18,18 +18,13 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = wit
     boxId,
   }), [ bankId, boxId, saveId, type ]);
 
-  const getValidation = useDroppableValidation();
-
-  // if (rest.slot === 0)
-  //   console.log(getValidation(rest.slot, rest.container));
-
-  const validation = getValidation(rest.slot, container);
+  const validation = useDroppableValidation(rest.slot, container);
 
   return <UIStorageItemPlaceholderWithInteraction
     key={rest.nodeId}
     container={container}
     label={validation.helpText}
-    disabled={validation.canDrop === false}
+    disabled={!validation.canDrop}
     {...rest}
   />;
 });

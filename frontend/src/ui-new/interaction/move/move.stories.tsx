@@ -50,6 +50,7 @@ const FakeItemDraggable: React.FC<{
     const { addId, removeId } = useSelectContextActions<ContainerValue>();
 
     const dragging = useDragging<ContainerValue>(name, container);
+    const draggingMove = dragging.useDrag();
 
     const droppable = useDroppable<ContainerValue>({
         targetContainer,
@@ -74,7 +75,7 @@ const FakeItemDraggable: React.FC<{
         <Button.Group>
             {getRender({
                 ref: dragging.ref,
-                onClick: e => (droppable.onClick ?? dragging.toggleDragByClick)(e as never, null),
+                onClick: e => (droppable.onClick ?? draggingMove.toggleDragByClick)?.(e as never),
                 onPointerDown: dragging.onPointerDown,
                 onPointerUp: droppable.onPointerUp,
                 disabled,
@@ -223,9 +224,10 @@ export const Primary: Story = {
         return <SelectProvider<ContainerValue>
             {...containerFns}
         >
-            <MoveProvider<ContainerValue>
+            <MoveProvider<ContainerValue, unknown>
                 {...containerFns}
                 moveContainerId='move-container'
+                useFilterStartDragIds={(container, sourceIds) => () => new Set(sourceIds)}
                 getTargetAllPositions={getTargetAllPositions}
                 onDrop={onDrop}
             >

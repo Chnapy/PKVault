@@ -1,4 +1,4 @@
-import { QueryClient, useQuery, type UseQueryOptions } from '@tanstack/react-query';
+import { QueryClient, queryOptions, useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import type { DataDTOStateOfDictionaryOfStringAndPkmSaveDTO, PkmSaveDTO } from '../sdk/model';
 import { getStorageGetSavePkmsQueryKey, storageGetSavePkms } from '../sdk/storage/storage.gen';
@@ -38,19 +38,17 @@ const buildIndexes = (saveId: number, data: PkmSaveDTO[]) => {
     return indexes;
 };
 
-type QueryData = {
+export type PkmSaveIndexQueryData = {
     data: PkmSaveIndexes;
     status: 200;
     headers: Headers;
 };
 
-/**
- * Fetch save pkms with caching & indexing.
- */
-export const usePkmSaveIndex = (saveId: number, options?: Omit<UseQueryOptions, 'queryKey' | 'queryFn'>) => {
+export const getPkmSaveIndexOptions = <D>(saveId: number, options?: Omit<UseQueryOptions<PkmSaveIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>) => {
     const queryKey = getStorageGetSavePkmsQueryKey(saveId);
 
-    return useQuery({
+    
+    return queryOptions({
         queryKey,
         queryFn: async ({ signal }) => {
             const response = await storageGetSavePkms(saveId, { signal });
@@ -58,15 +56,22 @@ export const usePkmSaveIndex = (saveId: number, options?: Omit<UseQueryOptions, 
             return {
                 ...response,
                 data: buildIndexes(saveId, response.data),
-            } satisfies QueryData;
+            } satisfies PkmSaveIndexQueryData;
         },
         enabled: !!saveId,
-        ...(options as object),
+        ...options,
     });
 };
 
+/**
+ * Fetch save pkms with caching & indexing.
+ */
+export const usePkmSaveIndex = (saveId: number, options?: Omit<UseQueryOptions<PkmSaveIndexQueryData, Error, PkmSaveIndexQueryData>, 'queryKey' | 'queryFn'>) => {
+    return useQuery(getPkmSaveIndexOptions(saveId, options));
+};
+
 export const getCachedPkmSaveIndex = (client: QueryClient, saveId: number) => {
-    return client.getQueryData<Partial<QueryData>>(getStorageGetSavePkmsQueryKey(saveId));
+    return client.getQueryData<Partial<PkmSaveIndexQueryData>>(getStorageGetSavePkmsQueryKey(saveId));
 };
 
 /**
@@ -95,7 +100,7 @@ export const updatePkmSaveCache = (client: QueryClient, saveId: number, savePkms
 
     const data = buildIndexes(saveId, rawData);
 
-    const buildData: QueryData = {
+    const buildData: PkmSaveIndexQueryData = {
         status: 200,
         headers: new Headers(),
         ...cachedResponse,

@@ -1,9 +1,8 @@
-import { useQueryClient } from '@tanstack/react-query';
-import { getCachedPkmIndex } from '../../../data/hooks/use-pkm-index';
-import { getCachedPkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
-import { getCachedPkmVariantIndex } from '../../../data/hooks/use-pkm-variant-index';
-import { getSaveInfosGetAllQueryKey, type saveInfosGetAllResponseSuccess } from '../../../data/sdk/save-infos/save-infos.gen';
-import { getStorageGetBoxesQueryKey, type storageGetBoxesResponseSuccess } from '../../../data/sdk/storage/storage.gen';
+import { usePkmIndex } from '../../../data/hooks/use-pkm-index';
+import { usePkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
+import { usePkmVariantIndex } from '../../../data/hooks/use-pkm-variant-index';
+import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
+import { useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../../translate/i18n';
 import { useMoveContext } from '../../../ui-new/interaction/move/context/use-move-context';
 import type { MoveContainerValue, MoveParams } from '../state/move-select-impl-provider';
@@ -12,14 +11,13 @@ import type { DropRefusalReason } from '../validation/types';
 import { getHelpText } from '../validation/utils/get-help-text';
 import { validateDrop } from '../validation/validate-drop';
 
-export type UseDroppableValidationReturn = (targetSlot: number, targetContainer: MoveContainerValue) => {
+export type UseDroppableValidationReturn = {
     canDrop?: boolean;
     _disabledReason?: DropRefusalReason;
     helpText?: string;
 };
 
-export const useDroppableValidation = (): UseDroppableValidationReturn => {
-    const queryClient = useQueryClient();
+export const useDroppableValidation = (targetSlot: number, targetContainer: MoveContainerValue): UseDroppableValidationReturn => {
     const { useMoveStore, getContainerValue } = useMoveContext<MoveContainerValue, MoveParams>();
 
     const { t } = useTranslate();
@@ -28,60 +26,74 @@ export const useDroppableValidation = (): UseDroppableValidationReturn => {
         ? state.source
         : undefined);
 
-    return (targetSlot: number, targetContainer: MoveContainerValue) => {
-        if (!source)
-            return {};
+    const sourceContainer = source && getContainerValue(source.containerId);
 
-        const sourceContainer = getContainerValue(source.containerId);
-        const attached = source.params?.attached ?? false;
+    const sourceIds = [ ...source?.ids ?? [] ];
+    const firstId = sourceIds[ 0 ];
 
-        const sourcePkmIndex = getCachedPkmIndex(queryClient, sourceContainer.saveId)?.data;
+    const saveInfosAll = useSaveInfosGetAll();
 
-        const slotInfos = buildSlotInfosSlot(
+    const pkmVariantIndex = usePkmVariantIndex();
+    const sourcePkmSaveIndex = usePkmSaveIndex(sourceContainer?.saveId ?? 0);
+    const targetPkmSaveIndex = usePkmSaveIndex(targetContainer?.saveId ?? 0);
+    const sourceBoxesQuery = useStorageGetBoxes({ saveId: sourceContainer?.saveId ?? undefined });
+    const targetBoxesQuery = useStorageGetBoxes({ saveId: targetContainer?.saveId ?? undefined });
+
+    const firstSourceSlot = usePkmIndex(
+        sourceContainer?.saveId ?? null,
+        data => firstId
+            ? data.data.byId[firstId]?.boxSlot
+            : undefined,
+    );
+
+    if (!source || !pkmVariantIndex.data || !sourceContainer)
+        return {};
+
+    const slotInfosList = sourceIds.flatMap(sourceId => {
+        return buildSlotInfosSlot(
             Number(targetContainer.boxId),
             targetSlot,
-            sourcePkmIndex?.getById(source.sourceId)?.boxSlot ?? -1,
-            source.sourceId,
+            firstSourceSlot.data ?? -1,
+            sourceId,
             sourceContainer.saveId,
             targetContainer.saveId,
-            () => getCachedPkmVariantIndex(queryClient)?.data,
-            () => sourceContainer.saveId ? getCachedPkmSaveIndex(queryClient, sourceContainer.saveId)?.data : undefined,
-            () => targetContainer.saveId ? getCachedPkmSaveIndex(queryClient, targetContainer.saveId)?.data : undefined,
-            () => queryClient.getQueryData<saveInfosGetAllResponseSuccess>(
-                getSaveInfosGetAllQueryKey())?.data ?? {},
+            () => pkmVariantIndex.data?.data,
+            () => sourceContainer.saveId ? sourcePkmSaveIndex.data?.data : undefined,
+            () => targetContainer.saveId ? targetPkmSaveIndex.data?.data : undefined,
+            () => saveInfosAll.data?.data ?? {},
             () => Object.fromEntries(
-                queryClient.getQueryData<storageGetBoxesResponseSuccess>(
-                getStorageGetBoxesQueryKey({ saveId: sourceContainer.saveId ?? undefined }))?.data
-                .map(box => [box.idInt, box]) ?? []
+                sourceBoxesQuery.data?.data
+                    .map(box => [ box.idInt, box ]) ?? []
             ),
             () => Object.fromEntries(
-                queryClient.getQueryData<storageGetBoxesResponseSuccess>(
-                getStorageGetBoxesQueryKey({ saveId: targetContainer.saveId ?? undefined }))?.data
-                .map(box => [box.idInt, box]) ?? []
+                targetBoxesQuery.data?.data
+                    .map(box => [ box.idInt, box ]) ?? []
             ),
         );
+    });
 
-        const validation = validateDrop(
-            {
-                status: 'dragging',
-                source: {
-                    ids: [ ...source.ids ],
-                    saveId: sourceContainer.saveId ?? undefined,
-                    attached,
-                },
+    const attached = source.params?.attached ?? false;
+
+    const validation = validateDrop(
+        {
+            status: 'dragging',
+            source: {
+                ids: [ ...source.ids ],
+                saveId: sourceContainer.saveId ?? undefined,
+                attached,
             },
-            slotInfos,
-            getCachedPkmVariantIndex(queryClient)!.data!,
-        );
+        },
+        slotInfosList,
+        pkmVariantIndex.data.data,
+    );
 
-        const helpText = validation.canDrop
-            ? undefined
-            : getHelpText(validation.reason, validation.slotInfos, attached, t);
+    const helpText = validation.canDrop
+        ? undefined
+        : getHelpText(validation.reason, validation.slotInfos, attached, t);
 
-        return {
-            canDrop: validation.canDrop,
-            _disabledReason: !validation.canDrop ? validation.reason : undefined,
-            helpText,
-        };
+    return {
+        canDrop: validation.canDrop,
+        _disabledReason: !validation.canDrop ? validation.reason : undefined,
+        helpText,
     };
 };

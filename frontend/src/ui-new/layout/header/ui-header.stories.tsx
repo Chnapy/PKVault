@@ -20,9 +20,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
     args: {
+        value: 'storage',
         left: <>
             <UIHeaderItem id='saves' to='/saves'>SAVES</UIHeaderItem>
-            <UIHeaderItem id='storage' to='/storage' selected>STORAGE</UIHeaderItem>
+            <UIHeaderItem id='storage' to='/storage'>STORAGE</UIHeaderItem>
             <UIHeaderItem id='pokedex' to='/pokedex'>POKEDEX</UIHeaderItem>
         </>,
         right: <>
@@ -40,6 +41,7 @@ export const WithSingleBank: Story = {
             data={[
                 { id: '1', label: 'Bank 1', boxCount: 1, pkmCount: 0 },
             ]}
+            onCreate={console.log}
             onChange={console.log}
             onDelete={console.log}
         />,
@@ -62,6 +64,7 @@ export const WithStorageBanks: Story = {
                 { id: '8', label: 'Bank 8', boxCount: 1, pkmCount: 0 },
                 { id: '9', label: 'Bank 9', boxCount: 1, pkmCount: 0 },
             ]}
+            onCreate={console.log}
             onChange={console.log}
             onDelete={console.log}
         />,

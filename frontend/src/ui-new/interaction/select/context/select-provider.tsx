@@ -1,15 +1,16 @@
 import React from 'react';
-import { createSelectStore, selectContext, type SelectContext } from './select-context';
+import { createSelectStore, selectContext, type SelectContext, type SelectStore } from './select-context';
 
-type SelectProviderProps<C> = Pick<SelectContext<C>, 'getContainerHash' | 'getContainerValue'> & {
+export type SelectProviderProps<C> = Pick<SelectContext<C>, 'getContainerHash' | 'getContainerValue'> & {
+    initialValue?: SelectStore;
     children: React.ReactNode;
 };
 
-export function SelectProvider<C>({ getContainerHash, getContainerValue, children }: SelectProviderProps<C>) {
+export function SelectProvider<C>({ getContainerHash, getContainerValue, initialValue, children }: SelectProviderProps<C>) {
     const [ value ] = React.useState((): SelectContext<C> => ({
         getContainerHash,
         getContainerValue,
-        useSelectStore: createSelectStore(),
+        useSelectStore: createSelectStore(initialValue),
     }));
 
     return (

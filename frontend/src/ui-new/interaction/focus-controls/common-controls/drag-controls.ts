@@ -1,14 +1,15 @@
-import type { MoveParams } from '../../../../storage/move/state/move-select-impl-provider';
 import type { ControlsWithFalsy } from '../../controls/provider/controls-context';
 import type { UseDraggingReturn } from '../../move/hooks/use-dragging';
 import type { UseDroppableReturn } from '../../move/hooks/use-droppable';
 
 type Params = {
-    dragging?: Pick<UseDraggingReturn, 'isDragging' | 'stopDrag' | 'onPointerDown' | 'toggleDragByFocus'>;
+    dragging?: Pick<UseDraggingReturn, 'isDragging' | 'stopDrag' | 'onPointerDown'>;
+    draggingMove?: ReturnType<UseDraggingReturn['useDrag']>;
+    draggingMoveAttached?: ReturnType<UseDraggingReturn['useDrag']>;
     droppable?: Pick<UseDroppableReturn, 'isDroppable' | 'stopDrag' | 'onDrop'>;
 };
 
-export const getDragControls = ({ dragging, droppable }: Params) => {
+export const getDragControls = ({ dragging, draggingMove, draggingMoveAttached, droppable }: Params) => {
     const stopDrag = dragging?.stopDrag ?? droppable?.stopDrag;
 
     const isDragging = dragging?.isDragging;
@@ -61,7 +62,7 @@ export const getDragControls = ({ dragging, droppable }: Params) => {
             },
             spread: false,
         },
-        dragging && !droppable?.onDrop && !isDragging && {
+        dragging && draggingMove && !droppable?.onDrop && !isDragging && draggingMove.toggleDragByFocus && {
             name: 'drag' as const,
             label: 'Move',
             triggers: {
@@ -86,14 +87,14 @@ export const getDragControls = ({ dragging, droppable }: Params) => {
                         break;
                     }
                     default: {
-                        dragging.toggleDragByFocus<MoveParams>(e, { attached: false });
+                        draggingMove.toggleDragByFocus?.(e);
                         break;
                     }
                 }
             },
             spread: false,
         },
-        dragging && !droppable?.onDrop && !isDragging && {
+        dragging && draggingMoveAttached && !droppable?.onDrop && !isDragging && draggingMoveAttached.toggleDragByFocus && {
             name: 'drag-attached' as const,
             label: 'Move attached',
             triggers: {
@@ -113,7 +114,7 @@ export const getDragControls = ({ dragging, droppable }: Params) => {
                 },
             },
             action: (e) => {
-                dragging.toggleDragByFocus<MoveParams>(e, { attached: true });
+                draggingMoveAttached.toggleDragByFocus?.(e);
             },
             spread: false,
         },

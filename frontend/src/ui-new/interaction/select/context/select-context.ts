@@ -10,12 +10,12 @@ export type SelectContext<C> = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const selectContext = React.createContext<SelectContext<any> | null>(null);
 
-type SelectStore = {
+export type SelectStore = {
     container: string;
     ids: Set<string>;
 };
 
-export const createSelectStore = () => create<SelectStore>()(() => ({
+export const createSelectStore = (initialState?: SelectStore) => create<SelectStore>()(() => initialState ?? ({
     container: '',
     ids: new Set(),
 }));

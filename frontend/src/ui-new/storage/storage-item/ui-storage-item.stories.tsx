@@ -14,6 +14,7 @@ const meta = {
     decorators: Story => <SelectProvider getContainerHash={() => ''} getContainerValue={() => null}>
         <MoveProvider moveContainerId='content'
             getContainerHash={() => ''} getContainerValue={() => null}
+            useFilterStartDragIds={(container, sourceIds) => () => new Set(sourceIds)}
             getTargetAllPositions={() => ({})} onDrop={async () => null}
         >
             <Card id='content' display='inline-flex'>
@@ -28,12 +29,16 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
     args: {
+        nodeId: '1',
         id: '1',
-        bank: '1',
-        box: 1,
-        saveId: null,
+        container: {
+            bank: '1',
+            box: 1,
+            saveId: null,
+        },
+        level: 50,
+        name: 'Machamp',
         slot: 1,
-        label: 'Machamp Lv.50',
         icons: <UIStorageItemIcons
             heldItem={null}
             isStarter

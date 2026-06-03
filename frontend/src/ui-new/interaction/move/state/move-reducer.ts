@@ -1,6 +1,6 @@
-import type { MoveAction, MoveState } from './move-state';
+import type { MoveAction, MoveSource, MoveState } from './move-state';
 
-export const moveReducer = (state: MoveState, action: MoveAction): MoveState => {
+export const moveReducer = <P>(state: MoveState<P>, action: MoveAction): MoveState<P> => {
     // console.log(action.type)
     switch (action.type) {
         case 'START_DRAG':
@@ -8,7 +8,7 @@ export const moveReducer = (state: MoveState, action: MoveAction): MoveState => 
 
             return {
                 status: 'dragging',
-                source: action.source,
+                source: action.source as MoveSource<P>,
                 trigger: action.trigger,
             };
 

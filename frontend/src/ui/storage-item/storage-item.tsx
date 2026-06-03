@@ -19,12 +19,7 @@ export const StorageItem: React.FC<StorageItemProps> = React.memo(({
 
   ...rest
 }) => {
-  const getValidation = useDroppableValidation();
-
-  // if (rest.slot === 0)
-  //   console.log(getValidation(rest.slot, rest.container));
-
-  const validation = getValidation(rest.slot, rest.container);
+  const validation = useDroppableValidation(rest.slot, rest.container);
 
   return (
     <UIStorageItem
