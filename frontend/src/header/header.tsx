@@ -6,7 +6,7 @@ import { useSaveInfosScan } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import type { DocsGenEnSlugs } from '../help/hooks/use-help-navigate';
 import { NotificationButton } from '../notification/notification-button';
-import { BankList } from '../storage/bank-list/bank-list';
+import { BankList } from '../storage/bank/bank-list';
 import { useTranslate } from '../translate/i18n';
 import { UIButton } from '../ui-new/form/button/ui-button';
 import { UIHeader } from '../ui-new/layout/header/ui-header';
@@ -24,7 +24,7 @@ export const Header: React.FC = () => {
     const savesScanMutation = useSaveInfosScan();
 
     const value = matches
-        .filter(match => match.fullPath[ 0 ] === '/')
+        .filter(match => match.routeId !== '__root__' && match.fullPath[ 0 ] === '/')
         .map(match => match.fullPath.slice(1) as RemoveFirstChar<typeof match.fullPath>)[ 0 ]
         ?? '';
 
@@ -81,7 +81,7 @@ export const Header: React.FC = () => {
                 id='help'
                 search={{ help: 'README.md' satisfies DocsGenEnSlugs }}
             >
-                <InfoIcon style={{ verticalAlign: 'text-bottom' }} />
+                <InfoIcon style={{ verticalAlign: 'text-bottom', marginRight: 4 }} />
                 {t('header.help')}
             </UIHeaderItem>
 

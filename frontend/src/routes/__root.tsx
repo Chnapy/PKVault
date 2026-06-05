@@ -8,6 +8,7 @@ import { useStorageGetActions } from '../data/sdk/storage/storage.gen';
 import { Header } from '../header/header';
 import { HelpDialog } from '../help/help-dialog';
 import { ActionsPanel } from '../storage/actions/actions-panel';
+import { MoveSelectImplProvider } from '../storage/move/state/move-select-impl-provider';
 import { UIAppLayout } from '../ui-new/layout/app-layout/ui-app-layout';
 import { UIFooter } from '../ui-new/layout/footer/ui-footer';
 import { iconResources } from '../ui/icon/icon-resources';
@@ -27,15 +28,17 @@ const Root: React.FC = () => {
 
   return (
     <HistoryContext.Provider>
-      <UIAppLayout
-        header={<Header />}
-        bottom={<ActionsPanel />}
-        footer={<UIFooter />}
-      >
-        <Outlet />
+      <MoveSelectImplProvider>
+        <UIAppLayout
+          header={<Header />}
+          bottom={<ActionsPanel />}
+          footer={<UIFooter />}
+        >
+          <Outlet />
 
-        <HelpDialog />
-      </UIAppLayout>
+          <HelpDialog />
+        </UIAppLayout>
+      </MoveSelectImplProvider>
 
       <div aria-description='prefetch' className={css({ width: 0, height: 0 })}>
         {Object.values(iconResources).flatMap(v => Object.values(v)).map(url => <ImgPrefetch

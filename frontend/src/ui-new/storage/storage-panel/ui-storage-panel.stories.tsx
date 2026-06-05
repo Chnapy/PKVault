@@ -8,7 +8,7 @@ import type { MoveSource } from '../../interaction/move/state/move-state';
 import type { SelectContext } from '../../interaction/select/context/select-context';
 import { SelectProvider } from '../../interaction/select/context/select-provider';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
-import { UIStorageItemPlaceholderWithInteraction } from '../storage-item/placeholder/ui-storage-item-placeholder-with-interaction';
+import { UIStorageItemPlaceholder } from '../storage-item/placeholder/ui-storage-item-placeholder';
 import { Primary as StorageItemPlaceholder } from '../storage-item/placeholder/ui-storage-item-placeholder.stories';
 import { UIStorageItem } from '../storage-item/ui-storage-item';
 import { Primary as StorageItemPrimary } from '../storage-item/ui-storage-item.stories';
@@ -67,7 +67,7 @@ export const getMoveSelectDecorator = (Story: any) => {
 
 export const getPanelChildren = (box: number) => new Array(30).fill(0).map((_, i) =>
     i % 7 === 0
-        ? <UIStorageItemPlaceholderWithInteraction
+        ? <UIStorageItemPlaceholder
             key={i}
             {...StorageItemPlaceholder.args}
             nodeId={i + ''}
@@ -107,23 +107,22 @@ export const Primary: Story = {
         header: <UIStoragePanelBoxList
             value='1'
             data={[
-                { id: '1', label: 'Party', slotsStates: new Array(6).fill(0).map((_, i) => !(i % 2)) },
-                { id: '2', label: 'Box 2', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 2)) },
-                { id: '3', label: 'Box 3', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 3)) },
-                { id: '4', label: 'Box 4', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 4)) },
-                { id: '5', label: 'Box 5', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 5)) },
-                { id: '6', label: 'Box 6', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 6)) },
-                { id: '7', label: 'Box 7', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 7)) },
-                { id: '8', label: 'Box 8', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 8)) },
-                { id: '9', label: 'Box 9', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 9)) },
-                { id: '10', label: 'Box 10', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 2)) },
-                { id: '11', label: 'Box 11', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 2)) },
-                { id: '12', label: 'Box 12', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 2)) },
-                { id: '13', label: 'Box 13', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 3)) },
-                { id: '14', label: 'Box 14', slotsStates: new Array(30).fill(0).map((_, i) => !!(i % 4)) },
+                { id: '1', label: 'Party' },
+                { id: '2', label: 'Box 2' },
+                { id: '3', label: 'Box 3' },
+                { id: '4', label: 'Box 4' },
+                { id: '5', label: 'Box 5' },
+                { id: '6', label: 'Box 6' },
+                { id: '7', label: 'Box 7' },
+                { id: '8', label: 'Box 8' },
+                { id: '9', label: 'Box 9' },
+                { id: '10', label: 'Box 10' },
+                { id: '11', label: 'Box 11' },
+                { id: '12', label: 'Box 12' },
+                { id: '13', label: 'Box 13' },
+                { id: '14', label: 'Box 14' },
             ]}
             onSelect={console.log}
-            onDelete={console.log}
         />,
         children: getPanelChildren(1),
         footer: <UIStoragePanelFooter
@@ -146,10 +145,9 @@ export const EmptyData: Story = {
         header: <UIStoragePanelBoxList
             value='1'
             data={[
-                { id: '1', label: 'Box 1', slotsStates: [] },
+                { id: '1', label: 'Box 1' },
             ]}
             onSelect={console.log}
-            onDelete={console.log}
         />,
         children: null,
         footer: <UIStoragePanelFooter

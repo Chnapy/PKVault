@@ -1,4 +1,5 @@
 import { NativeSelect } from '@mantine/core';
+import { useMergedRef } from '@mantine/hooks';
 import type React from 'react';
 import type { GamepadMappingsAllButton } from '../../interaction/controls/gamepad/gamepad-mapper';
 import { getControlIcon } from '../../interaction/controls/icons/get-control-icon';
@@ -50,6 +51,11 @@ export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ..
         ],
     });
 
+    const ref = useMergedRef(
+        focusControlProps.ref,
+        rest.ref,
+    );
+
     return <NativeSelect
         data={data}
         {...focusControlProps}
@@ -65,5 +71,6 @@ export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ..
             } : undefined,
         }}
         {...rest}
+        ref={ref}
     />;
 };

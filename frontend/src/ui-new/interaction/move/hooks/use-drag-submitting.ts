@@ -21,7 +21,7 @@ export const useDragSubmitting = <C>(containerValue: C, pos: number, id?: string
             return true;
 
         const isPosInTarget = target.targetContainerId === containerHash
-            && Object.values(target.targetAllPositions).includes(pos);
+            && (pos === -1 || Object.values(target.targetAllPositions).includes(pos));
 
         return isPosInTarget;
     });

@@ -1,11 +1,21 @@
 import { useSearch } from '@tanstack/react-router';
-import { useStorageGetMainBanks, useStorageGetBoxes } from '../../data/sdk/storage/storage.gen';
+import { useStorageGetBoxes, useStorageGetMainBanks } from '../../data/sdk/storage/storage.gen';
 import type { Route } from '../../routes/storage';
 import { filterIsDefined } from '../../util/filter-is-defined';
+import { StorageBankView } from './util/storages-bank-view';
+
+type SearchInput = (typeof Route)[ 'types' ][ 'searchSchemaInput' ];
 
 export const BankContext = {
     useSelectedBankBoxes: () => {
-        const mainBoxIds = useSearch({ from: '/storage', select: search => search.mainBoxIds, shouldThrow: false }) ?? [];
+        const getSelectStorage = (index: number) => (search: SearchInput) => {
+            const storage = search.storages?.[ index ];
+            return storage?.saveId ? undefined : storage?.boxId;
+        };
+
+        const mainBoxId1 = useSearch({ from: '/storage', select: getSelectStorage(0), shouldThrow: false });
+        const mainBoxId2 = useSearch({ from: '/storage', select: getSelectStorage(1), shouldThrow: false });
+        const mainBoxIds = [ mainBoxId1, mainBoxId2 ].filter(filterIsDefined);
 
         const bankQuery = useStorageGetMainBanks();
         const boxesQuery = useStorageGetBoxes();
@@ -52,19 +62,18 @@ export const BankContext = {
             }
         }
 
-        type SearchInput = (typeof Route)[ 'types' ][ 'searchSchemaInput' ];
-
         return {
             ...payload,
             data: {
                 selectedBank,
-                selectedSearch:
-                    selectedBoxes.length > 0
-                        ? ({
-                            mainBoxIds: selectedBoxes.map(box => box.idInt),
-                            saves: Object.fromEntries(selectedBank.view.saves.map(save => [ save.saveId, save ])),
-                        } satisfies SearchInput)
-                        : undefined,
+                selectedBoxes,
+                // selectedSearch:
+                //     selectedBoxes.length > 0
+                //         ? ({
+                //             mainBoxIds: selectedBoxes.map(box => box.idInt),
+                //             saves: Object.fromEntries(selectedBank.view.saves.map(save => [ save.saveId, save ])),
+                //         } satisfies SearchInput)
+                //         : undefined,
             },
         };
     },
@@ -78,19 +87,16 @@ export const BankContext = {
                 return;
             }
 
-            const mainBoxIds: number[] = [ ...bank.view.mainBoxIds ];
-            if (mainBoxIds.length === 0) {
-                mainBoxIds.push(...[ boxesQuery.data?.data.find(box => box.bankId === bank.id)?.idInt ].filter(filterIsDefined));
-            }
-
-            const saves = Object.fromEntries(bank.view.saves.map(save => [ save.saveId, save ]));
+            const storages = StorageBankView.getStoragesFromBankView(
+                bank.view,
+                boxesQuery.data?.data.find(box => box.bankId === bank.id)?.idInt,
+            );
 
             return {
                 to: '/storage' as const satisfies (typeof Route)[ 'to' ],
                 search: {
-                    mainBoxIds,
-                    saves,
-                } satisfies (typeof Route)[ 'types' ][ 'searchSchemaInput' ],
+                    storages,
+                } satisfies SearchInput,
             };
         };
     },

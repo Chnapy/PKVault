@@ -43,7 +43,7 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
       h={27}
       style={{ flexShrink: 0 }}
     >
-      <Text fw='bold'>
+      <Text fw='bold' tt='uppercase'>
         {children}
       </Text>
     </Tabs.Tab>

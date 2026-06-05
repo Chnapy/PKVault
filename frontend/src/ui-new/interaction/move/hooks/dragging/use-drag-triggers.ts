@@ -18,16 +18,17 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
 
     const dragUtils = useDragUtils();
 
+    const selectIds = selectCtx?.useSelectStore(s => s.ids.has(entityId) && s.container === containerHash
+        ? s.ids
+        : undefined);
+
     const getAllIds = () => {
         const set = new Set<string>([ entityId ]);
-        const selectState = selectCtx?.useSelectStore.getState();
-        if (selectState && selectState.ids.has(entityId) && selectState.container === getContainerHash(containerValue)) {
-            selectState.ids.forEach(id => set.add(id));
-        }
+        selectIds?.forEach(id => set.add(id));
         return set;
     };
 
-    const filterStartDragIds = useFilterStartDragIds(containerValue, [...getAllIds()]);
+    const filterStartDragIds = useFilterStartDragIds(containerValue, [ ...getAllIds() ]);
 
     const enabled = filterStartDragIds().size > 0;
 
@@ -49,7 +50,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
             params,
         };
 
-        source.ids = filterStartDragIds(source);
+        source.ids = filterStartDragIds(params);
 
         if (source.ids.size === 0) {
             return false;
@@ -126,7 +127,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
     const useDragFn = <P>(params?: P) => {
         const filteredIds = useFilterStartDragIds(
             containerValue,
-            [...getAllIds()]
+            [ ...getAllIds() ]
         )(params);
 
         const enabled = filteredIds.size > 0;

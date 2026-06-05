@@ -1,28 +1,19 @@
-import React from 'react';
-import type { StorageSearchSchema } from '../../routes/storage';
-
-type SearchStorages = NonNullable<StorageSearchSchema[ 'storages' ]>;
-
-type SearchStorage = SearchStorages[ number ];
-
-export type StoragePanelContext = {
-    storageIndex: number;
-    defaultStorage?: SearchStorage;
-};
-
-const storagePanelContext = React.createContext<StoragePanelContext>({ storageIndex: -1 });
-
-export const StoragePanelProvider = storagePanelContext.Provider;
+import type { StorageSearchStorage } from '../../routes/storage';
+import { usePanel } from '../../ui-new/storage/storage-content/context/ui-panel-context';
 
 export const useCurrentStorage = () => {
-    const { storageIndex, defaultStorage } = React.use(storagePanelContext);
+    const currentPanel = usePanel();
+    const storageIndex = currentPanel === 'left' ? 0 : 1;
+    const defaultStorage: StorageSearchStorage | undefined = currentPanel === 'left'
+        ? { saveId: null }
+        : undefined;
 
-    const getStorage = (searchStorages: SearchStorages | undefined) => {
-        const storage = searchStorages?.[storageIndex];
+    const getStorage = (searchStorages: StorageSearchStorage[] | undefined) => {
+        const storage = searchStorages?.[ storageIndex ];
 
         if (!storage)
             return defaultStorage;
-        
+
         if (storage.saveId === defaultStorage?.saveId
             && storage.boxId === defaultStorage.boxId)
             return defaultStorage;
@@ -40,7 +31,7 @@ export const useCurrentStorage = () => {
     //         saveId: null,
     //     };
     // };
-    
+
     // const getSaveStorage = (searchStorages: SearchStorages | undefined) => {
     //     const storage = getStorage(searchStorages);
     //     if (!storage || storage.saveId === null)
@@ -51,11 +42,11 @@ export const useCurrentStorage = () => {
     //         saveId: storage.saveId!
     //     };
     // };
-    
-    const setStorage = (searchStorages: SearchStorages | undefined, newStorage: Partial<SearchStorage>): SearchStorages => {
+
+    const setStorage = (searchStorages: StorageSearchStorage[] | undefined, newStorage: Partial<StorageSearchStorage>): StorageSearchStorage[] => {
         const storage = getStorage(searchStorages);
-        
-        const newSearchStorages = [...searchStorages ?? []];
+
+        const newSearchStorages = [ ...searchStorages ?? [] ];
 
         const nextStorage = { ...storage, ...newStorage };
         if (nextStorage.saveId === undefined)
@@ -67,7 +58,7 @@ export const useCurrentStorage = () => {
         if (nextStorage.saveId === storage?.saveId && nextStorage.boxId === storage.boxId)
             return searchStorages!;
 
-        newSearchStorages[storageIndex] = nextStorage as SearchStorage;
+        newSearchStorages[ storageIndex ] = nextStorage as StorageSearchStorage;
 
         return newSearchStorages;
     };

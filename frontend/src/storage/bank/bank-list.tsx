@@ -1,66 +1,45 @@
-import { css } from '@emotion/css';
 import type React from 'react';
 import { useStorageCreateMainBank, useStorageGetMainBanks } from '../../data/sdk/storage/storage.gen';
-import { HelpButton } from '../../help/help-button';
-import { Button } from '../../ui/button/button';
-import { Container } from '../../ui/container/container';
-import { Icon } from '../../ui/icon/icon';
-import { theme } from '../../ui/theme';
-import { BankItem } from './bank-item';
+import { UIBankList, type UIBankTabData } from '../../ui-new/bank/ui-bank-list';
+import { BankContext } from './bank-context';
+import type { MoveContainerValue } from '../move/state/move-select-impl-provider';
+import { BankExpanded } from './bank-expanded';
 
 export const BankList: React.FC = () => {
     const banksQuery = useStorageGetMainBanks();
+
     const bankCreateMutation = useStorageCreateMainBank();
 
-    const bankList = banksQuery.data?.data ?? [];
+    const selectedBankBoxes = BankContext.useSelectedBankBoxes();
+    const selectBankProps = BankContext.useSelectBankProps();
 
-    return <Container
-        className={css({
-            width: 'calc(100vw - 20px)',
-            position: 'relative',
-            top: -28,
-            display: 'flex',
-            gap: 16,
-            padding: 24,
-            paddingBottom: 16,
-            backgroundColor: theme.bg.light,
-            borderRadius: 0,
-            borderLeft: 0,
-            borderRight: 0,
-            borderTop: 0,
+    const bankList = [ ...banksQuery.data?.data ?? [] ].sort((b1, b2) => b1.order < b2.order ? -1 : 1);
+
+    return <UIBankList
+        value={selectedBankBoxes.data?.selectedBank.id ?? ''}
+        data={bankList.map(({ id, name, isDefault, isExternal }): UIBankTabData<MoveContainerValue> => {
+            return {
+                id,
+                container: {
+                    type: 'bank',
+                    bankId: id,
+                    saveId: null,
+                    boxId: '',
+                },
+                label: name,
+                isDefault,
+                isExternal,
+                ...selectBankProps(id),
+            };
         })}
-    >
-        <div className={css({
-            fontSize: '150%',
-            marginTop: 16,
-            textAlign: 'right',
-        })}>
-            <Icon name='bank' solid />
-        </div>
-
-        <div className={css({
-            flexGrow: 1,
-            display: 'flex',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            gap: 16,
-        })}>
-            {bankList.map(bank => <BankItem
-                key={bank.id}
-                bankId={bank.id}
+        onCreate={() => bankCreateMutation.mutateAsync()}
+        onChange={console.log}
+        renderExpanded={(data, { reduce }) =>
+            data.map(({ item, selected }) => <BankExpanded
+                key={item.id}
+                {...item}
+                selected={selected}
+                onSelect={reduce}
             />)}
-
-            <Button bgColor={theme.bg.primary} big onClick={() => bankCreateMutation.mutateAsync()} className={css({ minHeight: 56, order: 999 })}>
-                <Icon name='plus' solid forButton />
-            </Button>
-        </div>
-
-        <div className={css({
-            display: 'flex',
-            alignItems: 'center',
-            minWidth: 24,
-        })}>
-            <HelpButton slug='3-storage.md#banks-and-boxes' />
-        </div>
-    </Container>;
+    />;
 };

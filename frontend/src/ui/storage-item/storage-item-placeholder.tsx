@@ -2,9 +2,9 @@ import React from "react";
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useDroppableValidation } from '../../storage/move/hooks/use-droppable-validation';
 import type { MoveContainerValue } from '../../storage/move/state/move-select-impl-provider';
-import { UIStorageItemPlaceholderWithInteraction, type UIStorageItemPlaceholderWithInteractionProps } from '../../ui-new/storage/storage-item/placeholder/ui-storage-item-placeholder-with-interaction';
+import { UIStorageItemPlaceholder, type UIStorageItemPlaceholderProps } from '../../ui-new/storage/storage-item/placeholder/ui-storage-item-placeholder';
 
-export type StorageItemPlaceholderProps = Pick<UIStorageItemPlaceholderWithInteractionProps, 'nodeId' | 'slot'>
+export type StorageItemPlaceholderProps = Pick<UIStorageItemPlaceholderProps, 'nodeId' | 'slot'>
   & MoveContainerValue;
 
 export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = withErrorCatcher('item', ({
@@ -20,7 +20,7 @@ export const StorageItemPlaceholder: React.FC<StorageItemPlaceholderProps> = wit
 
   const validation = useDroppableValidation(rest.slot, container);
 
-  return <UIStorageItemPlaceholderWithInteraction
+  return <UIStorageItemPlaceholder
     key={rest.nodeId}
     container={container}
     label={validation.helpText}

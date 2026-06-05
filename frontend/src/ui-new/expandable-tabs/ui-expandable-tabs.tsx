@@ -8,7 +8,7 @@ import { ScrollerControlled, type ScrollerControlledProps } from '../scroller-co
 
 export type UIExpandableTabsData = {
     id: string;
-    label: string;
+    label: React.ReactNode;
 };
 
 type Params<D extends UIExpandableTabsData> = {

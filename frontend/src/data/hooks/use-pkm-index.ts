@@ -4,8 +4,8 @@ import { getCachedPkmSaveIndex, getPkmSaveIndexOptions, type PkmSaveIndexes, typ
 import { getCachedPkmVariantIndex, getPkmVariantIndexOptions, type PkmVariantIndexes, type PkmVariantIndexQueryData } from './use-pkm-variant-index';
 
 const createMixedIndex = (
-    pkmMainIndex: PkmVariantIndexes | undefined, 
-    pkmSaveIndex: PkmSaveIndexes | undefined, 
+    pkmMainIndex: PkmVariantIndexes | undefined,
+    pkmSaveIndex: PkmSaveIndexes | undefined,
     saveId: number | null
 ) => {
     const data = {
@@ -55,7 +55,7 @@ export const getCachedPkmIndex = (client: QueryClient, saveId: number | null) =>
     };
 };
 
-export const usePkmIndex = <D>(
+export const usePkmIndex = <D = PkmVariantIndexQueryData | PkmSaveIndexQueryData>(
     saveId: number | null,
     selectFn?: (data: PkmVariantIndexQueryData | PkmSaveIndexQueryData) => D,
     options?: Omit<UseQueryOptions<PkmVariantIndexQueryData | PkmSaveIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>

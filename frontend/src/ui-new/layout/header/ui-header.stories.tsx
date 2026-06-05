@@ -39,11 +39,10 @@ export const WithSingleBank: Story = {
         sub: <UIBankList
             value='1'
             data={[
-                { id: '1', label: 'Bank 1', boxCount: 1, pkmCount: 0 },
+                { id: '1', label: 'Bank 1', container: '' },
             ]}
             onCreate={console.log}
             onChange={console.log}
-            onDelete={console.log}
         />,
     },
 };
@@ -54,19 +53,18 @@ export const WithStorageBanks: Story = {
         sub: <UIBankList
             value='1'
             data={[
-                { id: '1', label: 'Bank 1', boxCount: 1, pkmCount: 0 },
-                { id: '2', label: 'Bank 2', boxCount: 1, pkmCount: 2145 },
-                { id: '3', label: 'Bank 3', boxCount: 1, pkmCount: 0 },
-                { id: '4', label: 'Bank 4', boxCount: 1, pkmCount: 0 },
-                { id: '5', label: 'Bank 5', boxCount: 1, pkmCount: 0 },
-                { id: '6', label: 'Bank 6', boxCount: 1, pkmCount: 0 },
-                { id: '7', label: 'Bank 7', boxCount: 1, pkmCount: 0 },
-                { id: '8', label: 'Bank 8', boxCount: 1, pkmCount: 0 },
-                { id: '9', label: 'Bank 9', boxCount: 1, pkmCount: 0 },
+                { id: '1', label: 'Bank 1', container: '' },
+                { id: '2', label: 'Bank 2', container: '' },
+                { id: '3', label: 'Bank 3', container: '' },
+                { id: '4', label: 'Bank 4', container: '' },
+                { id: '5', label: 'Bank 5', container: '' },
+                { id: '6', label: 'Bank 6', container: '' },
+                { id: '7', label: 'Bank 7', container: '' },
+                { id: '8', label: 'Bank 8', container: '' },
+                { id: '9', label: 'Bank 9', container: '' },
             ]}
             onCreate={console.log}
             onChange={console.log}
-            onDelete={console.log}
         />,
     },
 };

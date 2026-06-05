@@ -1,15 +1,15 @@
 import { Card } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { UISpriteSizeWrapper } from '../../../sprite-img/ui-sprite-size-wrapper';
-import { UIStorageItemPlaceholderWithInteraction } from './ui-storage-item-placeholder-with-interaction';
+import { UIStorageItemPlaceholder } from './ui-storage-item-placeholder';
 
 const meta = {
     title: 'UI/UIStorageItemPlaceholder',
-    component: UIStorageItemPlaceholderWithInteraction,
+    component: UIStorageItemPlaceholder,
     decorators: Story => <Card display='inline-flex'>
         <Story />
     </Card>,
-} satisfies Meta<typeof UIStorageItemPlaceholderWithInteraction>;
+} satisfies Meta<typeof UIStorageItemPlaceholder>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

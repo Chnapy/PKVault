@@ -18,7 +18,7 @@ type PolymorphicComponent<DefaultElement extends React.ElementType, Props = {}> 
 
 export type WithControlsIconsExtraProps = BoxProps & ElementProps<'div'>;
 
-type WithControlsIconsProps = WithControlsIconsExtraProps & {
+export type WithControlsIconsProps = WithControlsIconsExtraProps & {
     placement: 'in' | 'out';
     icons: React.ReactNode;
 };

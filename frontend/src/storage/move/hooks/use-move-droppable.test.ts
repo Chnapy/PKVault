@@ -87,7 +87,7 @@ describe('use-move-droppable', () => {
                             targetPosition: 1,
                             targetId: undefined,
                         },
-                    }
+                    },
                 }
             );
 
@@ -124,7 +124,7 @@ describe('use-move-droppable', () => {
                             sourceId: 'canMove',
                             ids: new Set([ 'canMove' ]),
                         },
-                    }
+                    },
                 }
             );
 

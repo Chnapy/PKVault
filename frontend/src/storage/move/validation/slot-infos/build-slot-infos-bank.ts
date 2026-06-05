@@ -30,9 +30,9 @@ type MoveDirectionBank = SlotInfosBank[ 'direction' ];
 export const buildSlotInfosBank = (
     dropBankId: string,
     sourceId: string,
-    sourceSaveId: number | undefined,
+    sourceSaveId: number | undefined | null,
     pkmVariantIndexes: PkmVariantIndexes,
-    sourcePkmSaveIndexes: PkmSaveIndexes,
+    sourcePkmSaveIndexes: PkmSaveIndexes | undefined,
     savesById: Record<number, SaveInfosDTO>,
     sourceBoxes: Record<number, BoxDTO>,
     targetBanks: Record<string, BankDTO>,
@@ -62,7 +62,7 @@ export const buildSlotInfosBank = (
             } ];
         };
         case 'save-to-bank': {
-            const sourcePkm = sourcePkmSaveIndexes.byId[ sourceId ];
+            const sourcePkm = sourcePkmSaveIndexes?.byId[ sourceId ];
             if (!sourcePkm || !sourceSaveId) {
                 return [];
             }
@@ -87,7 +87,7 @@ export const buildSlotInfosBank = (
     }
 };
 
-const getMoveDirection = (sourceSaveId: number | undefined): MoveDirectionBank => {
+const getMoveDirection = (sourceSaveId: number | undefined | null): MoveDirectionBank => {
     const fromSave = !!sourceSaveId;
 
     if (!fromSave) return 'main-to-bank';

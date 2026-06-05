@@ -8,9 +8,10 @@ export type UIStoragePanelProps = {
     header: React.ReactNode;
     children: React.ReactNode;
     footer: React.ReactNode;
+    backgroundImageUrl?: string;
 } & CardProps;
 
-export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header, children, footer, ...rest }) => {
+export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header, children, footer, backgroundImageUrl, ...rest }) => {
     const childrenCount = React.Children.count(children);
     const cols = getBoxColumns(childrenCount);
 
@@ -29,7 +30,7 @@ export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header
             {header}
         </Box>}
 
-        <Card.Section inheritPadding py='md' withBorder style={{ flexGrow: 1, flexShrink: 999, overflow: 'auto' }}>
+        <Card.Section inheritPadding py='md' withBorder style={{ flexGrow: 1, flexShrink: 999, overflow: 'auto', backgroundImage: `url("${backgroundImageUrl}")` }}>
             <Group
                 gap='sm'
                 wrap='wrap'

@@ -282,9 +282,10 @@ export const Primary: Story = {
             <SelectProvider<ContainerValue>
                 {...containerFns}
             >
-                <MoveProvider<ContainerValue>
+                <MoveProvider<ContainerValue, unknown>
                     {...containerFns}
                     moveContainerId='move-container'
+                    useFilterStartDragIds={(_, ids) => () => new Set(ids)}
                     getTargetAllPositions={() => ({})}
                     onDrop={onDrop}
                 >

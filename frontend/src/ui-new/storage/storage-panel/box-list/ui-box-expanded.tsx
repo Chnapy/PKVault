@@ -1,29 +1,62 @@
-import { ActionIcon, Button, Group, Popover, SimpleGrid, Stack, Text } from '@mantine/core';
+import { ActionIcon, Button, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { PenIcon, TrashIcon } from 'lucide-react';
 import type React from 'react';
+import { UIConfirmPopover } from '../../../confirm-popover/ui-confirm-popover';
+import { UIPopover } from '../../../confirm-popover/ui-popover';
+import type { UIExpandableTabsData } from '../../../expandable-tabs/ui-expandable-tabs';
+import { WithControlsIcons } from '../../../interaction/controls/icons/with-controls-icons';
+import { getSelectControl } from '../../../interaction/focus-controls/common-controls/select-controls';
+import { useFocusControls } from '../../../interaction/focus-controls/use-focus-controls';
 import { getBoxColumns } from '../get-box-columns';
 import classes from './ui-box-expanded.module.css';
 
-type UIBoxExpandedProps = {
-    id: string | number;
-    label: string;
+export type UIBoxExpandedProps = UIExpandableTabsData & {
     slotsStates: boolean[];
     selected: boolean;
     onSelect: () => void;
-    onDelete: () => void;
+    onDelete?: () => void;
+    editDropdown: React.ReactNode;
 };
 
 export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
-    id, label, selected, slotsStates, onSelect, onDelete
+    id, label, selected, slotsStates, onSelect, onDelete, editDropdown
 }) => {
     const cols = getBoxColumns(slotsStates.length);
+
+    const nodeId = `box-expanded-${id}`;
+
+    const { focusControlProps, controlsIcons } = useFocusControls({
+        scopeNodeId: nodeId,
+        controls: [
+            getSelectControl({
+                label: 'Select',
+                action: () => {
+                    onSelect();
+                },
+            }),
+            {
+                name: 'delete' as const,
+                label: 'Delete',
+                triggers: {
+                    gamepad: {
+                        type: 'gamepad',
+                        values: [ 'Y' ],
+                    },
+                },
+                spread: false,
+                action: () => {
+                    // TODO trigger click on action-icon
+                },
+            },
+        ],
+    });
 
     return <Group gap='xs' align='stretch' style={{ alignSelf: 'flex-start' }}>
         <Button
             style={{ gap: 4 }}
             variant='default'
             disabled={selected}
-            onClick={onSelect}
+            {...focusControlProps}
             h='auto'
             p='md'
             pt={0}
@@ -48,27 +81,24 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
         </Button>
 
         <ActionIcon.Group orientation="vertical">
-            <ActionIcon color='blue'>
-                <PenIcon />
-            </ActionIcon>
+            <UIPopover
+                dropdown={editDropdown}
+            >
+                <ActionIcon color='blue' disabled={!editDropdown}>
+                    <PenIcon />
+                </ActionIcon>
+            </UIPopover>
 
-            <Popover withArrow position='right-start'>
-                <Popover.Target>
-                    <ActionIcon color='red' disabled={selected}>
+            <UIConfirmPopover
+                label='Delete'
+                action={onDelete}
+            >
+                <WithControlsIcons placement='out' icons={controlsIcons.delete}>
+                    <ActionIcon color='red' disabled={selected || !onDelete}>
                         <TrashIcon />
                     </ActionIcon>
-                </Popover.Target>
-
-                <Popover.Dropdown>
-                    <Button
-                        variant='outline'
-                        color='red'
-                        onClick={onDelete}
-                    >
-                        Confirm
-                    </Button>
-                </Popover.Dropdown>
-            </Popover>
+                </WithControlsIcons>
+            </UIConfirmPopover>
         </ActionIcon.Group>
     </Group>;
 };

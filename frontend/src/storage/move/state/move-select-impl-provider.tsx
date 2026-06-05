@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { getCachedPkmIndex } from '../../../data/hooks/use-pkm-index';
-import { storageMovePkm } from '../../../data/sdk/storage/storage.gen';
+import { storageMovePkm, storageMovePkmBank } from '../../../data/sdk/storage/storage.gen';
 import { updateCacheMutationResponse } from '../../../data/util/update-cache-mutation-response';
 import { MoveProvider, type MoveProviderProps } from '../../../ui-new/interaction/move/context/move-provider';
 import { getDropPositions } from '../../../ui-new/interaction/move/hooks/get-drop-positions';
@@ -52,6 +52,9 @@ const useTargetAllPositions = (): MoveProviderProps<MoveContainerValue, MovePara
     const queryClient = useQueryClient();
 
     return React.useCallback((source, target) => {
+        if (target.targetContainer.type === 'bank')
+            return {};
+
         const sourceContainer = getContainerValue(source.containerId);
 
         const sourcePkmIndex = getCachedPkmIndex(queryClient, sourceContainer.saveId)?.data;
@@ -89,24 +92,42 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
             return;
         }
 
-        const targetBoxSlots = pkmIds
-            .map(id => target.targetAllPositions[ id ])
-            .filter(filterIsDefined);
+        switch (target.targetContainer.type) {
+            case 'bank': {
+                if (sourceContainer.bankId === target.targetContainer.bankId)
+                    return;
 
-        if (targetBoxSlots.length !== pkmIds.length) {
-            console.log('diff pkm-ids <-> target-slots', pkmIds.length, targetBoxSlots.length)
-            return;
+                const response = await storageMovePkmBank({
+                    pkmIds,
+                    bankId: target.targetContainer.bankId,
+                    sourceSaveId: sourceContainer.saveId ?? undefined,
+                    attached: source.params?.attached,
+                });
+                updateCacheMutationResponse(queryClient, response);
+                break;
+            };
+            default: {
+                const targetBoxSlots = pkmIds
+                    .map(id => target.targetAllPositions[ id ])
+                    .filter(filterIsDefined);
+
+                if (targetBoxSlots.length !== pkmIds.length) {
+                    console.log('diff pkm-ids <-> target-slots', pkmIds.length, targetBoxSlots.length)
+                    return;
+                }
+
+                const response = await storageMovePkm({
+                    pkmIds,
+                    sourceSaveId: sourceContainer.saveId ?? undefined,
+                    targetSaveId: target.targetContainer.saveId ?? undefined,
+                    targetBoxId: target.targetContainer.boxId,
+                    targetBoxSlots,
+                    attached: source.params?.attached,
+                });
+                updateCacheMutationResponse(queryClient, response);
+                break;
+            };
         }
-
-        const response = await storageMovePkm({
-            pkmIds,
-            sourceSaveId: sourceContainer.saveId ?? undefined,
-            targetSaveId: target.targetContainer.saveId ?? undefined,
-            targetBoxId: target.targetContainer.boxId,
-            targetBoxSlots,
-            attached: source.params?.attached,
-        });
-        updateCacheMutationResponse(queryClient, response);
     }, [ queryClient ]);
 };
 

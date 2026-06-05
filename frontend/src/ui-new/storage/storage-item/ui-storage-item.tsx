@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, Group, Tooltip, type BoxProps, type ElementProps } from '@mantine/core';
+import { Checkbox } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import React from 'react';
 import type { MoveParams } from '../../../storage/move/state/move-select-impl-provider';
@@ -14,32 +14,27 @@ import { useDroppable } from '../../interaction/move/hooks/use-droppable';
 import { useSelectContextActions, useSelectHasValue } from '../../interaction/select/context/use-select-context';
 import { useCurrentPanel } from '../storage-content/context/ui-panel-context';
 import { UIDetailsLevel } from '../storage-details/ui-details-level';
+import type { UIStorageItemPlaceholderProps } from './placeholder/ui-storage-item-placeholder';
+import { UIStorageItemBase } from './base/ui-storage-item-base';
 import classes from './ui-storage-item.module.css';
 
 export type UIStorageItemProps<C = unknown> =
+    & UIStorageItemPlaceholderProps<C>
     & {
         id: string;
-        nodeId: string;
-        container: C;
-        slot: number;
         name: string;
         level: number;
-        label?: React.ReactNode;
         icons?: React.ReactNode;
-    }
-    & Pick<Button.Props, 'loading' | 'disabled'>
-    & Pick<ElementProps<'button'>, 'ref' | 'onClick' | 'children'>
-    & BoxProps;
+    };
 
 export const UIStorageItem: React.FC<UIStorageItemProps> = ({
     ref: refRoot, id, nodeId, slot, icons,
     container,
-    name, level, label, onClick,
-    disabled,
-    children, ...boxProps
+    name, level, label,
+    loading, disabled, onClick,
+    children, ...buttonProps
 }) => {
     // console.log('item', box, id)
-    // const { pushScope } = Focus.usePushPopScope();
 
     const panel = useCurrentPanel();
 
@@ -105,65 +100,46 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
     );
 
     return <>
-        <WithControlsIcons placement='out' icons={[
-            controlsIcons.open,
-            controlsIcons.drag,
-            controlsIcons[ 'drag-attached' ],
-            controlsIcons.drop,
-        ]}>
-            <Box
-                className={classes.uiStorageItem}
-                {...boxProps}
+        <WithControlsIcons
+            placement='out' icons={[
+                controlsIcons.open,
+                controlsIcons.drag,
+                controlsIcons[ 'drag-attached' ],
+                controlsIcons.drop,
+            ]}
+            className={classes.uiStorageItem}
+        >
+            <UIStorageItemBase
+                label={label ?? <>
+                    {name}
+                    <UIDetailsLevel level={level} />
+                </>}
+                loading={loading || submitting}
+                disabled={disabled}
+                opacity={dragging.isDragging ? 0.5 : undefined}
+                {...focusControlProps}
+                {...buttonProps}
+                ref={ref}
             >
-                <Tooltip
-                    position="bottom"
-                    withArrow
-                    label={<Group fz='md' gap='sm' px='sm'>
-                        {label ?? <>
-                            {name}
-                            <UIDetailsLevel level={level} />
-                        </>}
-                    </Group>}
-                >
-                    <Button
-                        {...focusControlProps}
-                        ref={ref}
-                        variant='light'
-                        className={classes.button}
-                        loading={submitting}
-                        disabled={disabled}
-                        bd='none'
-                        opacity={dragging.isDragging ? 0.5 : undefined}
-                    >
-                        {children}
-                        {icons}
-                    </Button>
-                </Tooltip>
+                {children}
+                {icons}
+            </UIStorageItemBase>
 
-                {!submitting && !disabled && <WithControlsIcons className={classes.checkbox} placement='out' icons={controlsIcons.select}>
-                    <Checkbox
-                        size='sm'
-                        checked={checked}
-                        onClick={() => checked ? removeId([ id ]) : addId(container, [ id ])}
-                    />
-                </WithControlsIcons>}
-            </Box>
+            {!submitting && !disabled && <WithControlsIcons className={classes.checkbox} placement='out' icons={controlsIcons.select}>
+                <Checkbox
+                    size='sm'
+                    checked={checked}
+                    onClick={() => checked ? removeId([ id ]) : addId(container, [ id ])}
+                />
+            </WithControlsIcons>}
         </WithControlsIcons>
 
         {dragging.isDragging && <DragRender elementRef={dragging.ref}>
-            <Box
-                className={classes.uiStorageItem}
-                {...boxProps}
+            <UIStorageItemBase
+                opacity={0.75}
             >
-                <Button
-                    variant='light'
-                    className={classes.button}
-                    bd='none'
-                    opacity={0.75}
-                >
-                    {children}
-                </Button>
-            </Box>
+                {children}
+            </UIStorageItemBase>
         </DragRender>}
     </>;
 };

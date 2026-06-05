@@ -1,8 +1,10 @@
 import React from 'react';
 
-const panelContext = React.createContext('');
+const panelContext = React.createContext<'left' | 'right' | 'header'>('left');
 
 export const PanelProvider = panelContext.Provider;
+
+export const usePanel = () => React.use(panelContext);
 
 export type CurrentPanelContext = {
     value: string;
@@ -13,7 +15,7 @@ export const currentPanelContext = React.createContext<CurrentPanelContext | nul
 
 export const useCurrentPanel = () => {
     const currentPanel = React.use(currentPanelContext)!;
-    const panel = React.use(panelContext);
+    const panel = usePanel();
 
     return {
         isInCurrentPanel: currentPanel?.value === panel,

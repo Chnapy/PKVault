@@ -1,29 +1,20 @@
-
 .ui-storage-item {
-    touch-action: none;
-    position: relative;
-}
-
-.ui-storage-item .button {
-    touch-action: none;
-    position: relative;
-    height: auto;
-    padding: 0;
-    box-shadow: none;
+  touch-action: none;
+  position: relative;
 }
 
 .ui-storage-item .checkbox {
-    position: absolute;
-    left: 4px;
-    top: 4px;
+  position: absolute;
+  left: 4px;
+  top: 4px;
 }
 
 .ui-storage-item .checkbox > * {
-    opacity: 0;
+  opacity: 0;
 }
 
 .ui-storage-item:hover .checkbox > *,
-.ui-storage-item .button[data-focused="true"] + .checkbox > *,
-.checkbox [data-checked='true'] {
-    opacity: 1;
+.ui-storage-item button[data-focused="true"] + .checkbox > *,
+.checkbox [data-checked="true"] {
+  opacity: 1;
 }

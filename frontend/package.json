@@ -74,8 +74,8 @@
     "@types/react-dom": "^19.1.6",
     "@typescript/native-preview": "^7.0.0-dev.20260421.2",
     "@vitejs/plugin-react": "^6.0.1",
-    "@vitest/browser-playwright": "^4.1.2",
-    "@vitest/coverage-v8": "^4.1.2",
+    "@vitest/browser-playwright": "^4.1.8",
+    "@vitest/coverage-v8": "^4.1.8",
     "babel-plugin-react-compiler": "^1.0.0",
     "cross-env": "^10.0.0",
     "eslint": "^10.2.1",
@@ -106,6 +106,6 @@
     "vite-css-modules": "^1.16.0",
     "vite-plugin-image-optimizer": "^2.0.3",
     "vite-plugin-svgr": "^5.2.0",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.8"
   }
 }

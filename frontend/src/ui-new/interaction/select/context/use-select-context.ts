@@ -47,7 +47,7 @@ export const useSelectContextActions = <C>() => {
                 container: containerHash,
                 ids: new Set(updatedIds),
             });
-        }, [getContainerHash, useSelectStore]),
+        }, [ getContainerHash, useSelectStore ]),
         removeId: React.useCallback((ids: string[]) => {
             if (ids.length === 0)
                 return;
@@ -64,7 +64,7 @@ export const useSelectContextActions = <C>() => {
                 ...value,
                 ids: valueCopy,
             });
-        }, [useSelectStore]),
+        }, [ useSelectStore ]),
         clear: React.useCallback(() => {
             const value = useSelectStore.getState();
 
@@ -75,6 +75,6 @@ export const useSelectContextActions = <C>() => {
                 ...value,
                 ids: new Set(),
             });
-        }, [useSelectStore]),
+        }, [ useSelectStore ]),
     };
 };

@@ -1,7 +1,7 @@
 import { SettingsIcon } from 'lucide-react';
 import type React from 'react';
 import type { UIExpandableTabsData } from '../../expandable-tabs/ui-expandable-tabs';
-import { UISubHeader, type UISubHeaderProps } from '../../layout/header/ui-sub-header';
+import { UISubHeader, type UISubHeaderProps } from '../../layout/header/sub-header/ui-sub-header';
 
 type Data = UIExpandableTabsData;
 

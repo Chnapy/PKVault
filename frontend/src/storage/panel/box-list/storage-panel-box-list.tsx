@@ -1,28 +1,26 @@
 import React from 'react';
-import { useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
+import { useStorageCreateMainBox, useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
 import { Route } from '../../../routes/storage';
 import { UIStoragePanelBoxList, type UIBoxData } from '../../../ui-new/storage/storage-panel/box-list/ui-storage-panel-box-list';
 import { BankContext } from '../../bank/bank-context';
 import { useCurrentStorage } from '../storage-panel-context';
+import { BoxExpanded } from './box-expanded';
 
 export const StoragePanelBoxList: React.FC = () => {
-
     const { getStorage, setStorage } = useCurrentStorage();
     const saveId = Route.useSearch({ select: (search) => getStorage(search.storages)?.saveId ?? null });
     const navigate = Route.useNavigate();
 
-    // console.log('render box list ' + saveId);
+    const boxCreateMutation = useStorageCreateMainBox();
 
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();
+    const bankId = selectedBankBoxes.data?.selectedBank.id;
 
     const boxesQuery = useStorageGetBoxes({ saveId: saveId ?? undefined });
-    // const pkmsQuery = usePkmIndex(
-    //     saveId,
-    //     data => 
-    // );
 
     const boxes = (boxesQuery.data?.data ?? [])
-        .filter(box => !box.bankId || box.bankId === selectedBankBoxes.data?.selectedBank.id);
+        .filter(box => !box.bankId || box.bankId === selectedBankBoxes.data?.selectedBank.id)
+        .sort((b1, b2) => b1.order < b2.order ? -1 : 1);
 
     const boxId = Route.useSearch({ select: (search) => getStorage(search.storages)?.boxId?.toString() }) ?? boxes[ 0 ]?.id;
 
@@ -30,26 +28,37 @@ export const StoragePanelBoxList: React.FC = () => {
     if (isLoading || !boxId)
         return null;
 
-    // const pkmIndex = pkmsQuery.data?.data;
+    const onSelect = (id: string) => {
+        navigate({
+            search: search => {
+                return {
+                    ...search,
+                    storages: setStorage(search.storages, { boxId: Number(id) }),
+                };
+            },
+        });
+    };
 
     return <UIStoragePanelBoxList
         value={boxId}
-        data={boxes.map(({ id, idInt, name, slotCount }): UIBoxData => ({
+        data={boxes.map(({ id, name }): UIBoxData => ({
             id,
             label: name,
-            slotsStates: [],//new Array(slotCount).fill(0).map((_, i) => !!pkmIndex?.getByBoxSlot(idInt, i).length),
         }))}
-        onSelect={id => {
-            console.log('navigate to box', id)
-            navigate({
-                search: search => {
-                    return {
-                        ...search,
-                        storages: setStorage(search.storages, { boxId: Number(id) }),
-                    };
-                },
-            });
-        }}
-        onDelete={console.log}
+        onSelect={onSelect}
+        onCreate={saveId || !bankId
+            ? undefined
+            : (() => boxCreateMutation.mutateAsync({ params: { bankId } }))
+        }
+        renderExpanded={(data, { reduce }) => data.map(({ item, selected }) => <BoxExpanded
+            key={item.id}
+            id={item.id}
+            label={item.label}
+            selected={selected}
+            onSelect={() => {
+                onSelect(item.id);
+                reduce();
+            }}
+        />)}
     />;
 };

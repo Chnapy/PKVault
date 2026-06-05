@@ -1,6 +1,16 @@
 import { describe, expect, test } from 'vitest';
+import { useDragSubmitting } from '../../../ui-new/interaction/move/hooks/use-drag-submitting';
 import { renderHookWithWrapper } from '../__tests__/render-hook-with-wrapper';
-import { useMoveLoadingBank } from './use-move-loading-bank';
+import { containerFns, type MoveContainerValue } from '../state/move-select-impl-provider';
+
+const useMoveLoadingBank = (bankId: string) => {
+    return useDragSubmitting<MoveContainerValue>({
+        bankId,
+        saveId: null,
+        boxId: '',
+        type: 'bank',
+    }, -1);
+};
 
 describe('use-move-loading-bank', () => {
 
@@ -8,13 +18,29 @@ describe('use-move-loading-bank', () => {
         const { result, waitForQueries } = renderHookWithWrapper(
             () => useMoveLoadingBank('1'),
             {
-                status: 'loading',
-                source: {
-                    ids: [ 'canMove' ],
-                },
-                target: {
-                    type: 'bank',
-                    bankId: '2',
+                initialState: {
+                    status: 'loading',
+                    source: {
+                        containerId: containerFns.getContainerHash({
+                            bankId: '',
+                            boxId: '1',
+                            saveId: null,
+                            type: 'main-item',
+                        }),
+                        sourceId: 'canMove',
+                        ids: new Set([ 'canMove' ]),
+                    },
+                    target: {
+                        targetContainerId: containerFns.getContainerHash({
+                            bankId: '2',
+                            boxId: '',
+                            saveId: null,
+                            type: 'bank',
+                        }),
+                        targetAllPositions: {},
+                        targetPosition: -1,
+                        targetId: undefined,
+                    },
                 },
             }
         );
@@ -28,13 +54,29 @@ describe('use-move-loading-bank', () => {
         const { result, waitForQueries } = renderHookWithWrapper(
             () => useMoveLoadingBank('1'),
             {
-                status: 'loading',
-                source: {
-                    ids: [ 'canMove' ],
-                },
-                target: {
-                    type: 'bank',
-                    bankId: '1',
+                initialState: {
+                    status: 'loading',
+                    source: {
+                        containerId: containerFns.getContainerHash({
+                            bankId: '',
+                            boxId: '1',
+                            saveId: null,
+                            type: 'main-item',
+                        }),
+                        sourceId: 'canMove',
+                        ids: new Set([ 'canMove' ]),
+                    },
+                    target: {
+                        targetContainerId: containerFns.getContainerHash({
+                            bankId: '1',
+                            boxId: '',
+                            saveId: null,
+                            type: 'bank',
+                        }),
+                        targetAllPositions: {},
+                        targetPosition: -1,
+                        targetId: undefined,
+                    },
                 },
             }
         );

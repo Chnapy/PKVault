@@ -9,21 +9,21 @@ export const useCanMove = (container: MoveContainerValue, sourceIds: string[]) =
         React.useCallback(data => Object.fromEntries(
             sourceIds.map(id => [
                 id,
-                data.data.byId[id],
+                data.data.byId[ id ],
             ])
-        ), [sourceIds]),
+        ), [ sourceIds ]),
     );
 
     return (attached: boolean) => {
         return new Set(Object.keys(pkmQuery.data ?? {}).filter(id => {
-            const pkm = pkmQuery.data?.[id];
+            const pkm = pkmQuery.data?.[ id ];
             if (!pkm) {
-                // throw new Error('foobar ' + source.sourceId + ' ' + !!pkmIndex)
+                // console.log(id, '!pkm');
                 return false;
             }
 
             if (!pkm.canMove) {
-                // throw new Error('!canMove')
+                // console.log(id, '!pkm.canMove');
                 return false;
             }
 
@@ -32,7 +32,7 @@ export const useCanMove = (container: MoveContainerValue, sourceIds: string[]) =
                     ? !(pkm as PkmSaveDTO).canMoveAttachedToMain
                     : !(pkm as PkmVariantDTO).canMoveAttachedToSave
                 ) {
-                // throw new Error('!attached')
+                    // console.warn(id, '!pkm.canMoveAttachedToSave', attached);
                     return false;
                 }
             }

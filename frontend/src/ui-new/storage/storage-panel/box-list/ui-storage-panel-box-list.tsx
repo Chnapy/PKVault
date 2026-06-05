@@ -1,27 +1,23 @@
 import { ActionIcon, Checkbox, Divider, Group, Tabs, Text } from '@mantine/core';
 import { BoxIcon, CirclePlusIcon, EllipsisVerticalIcon } from 'lucide-react';
 import React from 'react';
-import { UIExpandableTabs } from '../../../expandable-tabs/ui-expandable-tabs';
+import { UIExpandableTabs, type UIExpandableTabsData, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
 import { Focus } from '../../../interaction/focus/provider/use-focus-context';
 import { useFocusScopeContext } from '../../../interaction/focus/scope/use-focus-scope-context';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
-import { UIBoxExpanded } from './ui-box-expanded';
 import classes from './ui-storage-panel-box-list.module.css';
 
-export type UIBoxData = {
+export type UIBoxData = UIExpandableTabsData & {
     id: string;
     label: string;
-    slotsStates: boolean[];
 };
 
-export type UIStoragePanelBoxListProps = {
-    value: string;
-    data: UIBoxData[];
+export type UIStoragePanelBoxListProps = Pick<UIExpandableTabsProps<UIExpandableTabsData>, 'value' | 'data' | 'renderExpanded'> & {
     onSelect: (id: string) => void;
-    onDelete: (id: string) => void;
+    onCreate?: () => void;
 };
 
-export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ value, data, onSelect, onDelete }) => {
+export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ value, data, renderExpanded, onSelect, onCreate }) => {
     const parentScope = useFocusScopeContext();
     const scopeActive = Focus.useIsScopeActive(parentScope.scopeId);
 
@@ -49,26 +45,16 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ va
             >
                 <Text component={selected ? 'b' : undefined}>{item.label}</Text>
             </Tabs.Tab>}
-            renderExpanded={(data, { reduce }) => <Group>
-                {data.map(({ item, selected }) => <UIBoxExpanded
-                    key={item.id}
-                    id={item.id}
-                    label={item.label}
-                    slotsStates={item.slotsStates}
-                    selected={selected}
-                    onSelect={() => {
-                        onSelect(item.id);
-                        reduce();
-                    }}
-                    onDelete={() => onDelete(item.id)}
-                />)}
+            renderExpanded={(data, opt) => <Group>
+                {renderExpanded?.(data, opt)}
 
-                <ActionIcon
+                {onCreate && <ActionIcon
                     variant='default'
                     size='xl'
+                    onClick={onCreate}
                 >
                     <CirclePlusIcon />
-                </ActionIcon>
+                </ActionIcon>}
             </Group>}
             right={<>
                 <Divider orientation="vertical" h='1lh' />
