@@ -3,7 +3,7 @@ import React from 'react';
 import { useTranslate } from '../../../../../translate/i18n';
 
 export type UIDetailsContentMiscProps = {
-    language: string;
+    language: string | undefined;
     homeTracker?: number;
 };
 
@@ -17,7 +17,7 @@ export const UIDetailsContentMisc: React.FC<UIDetailsContentMiscProps> = ({
             Language
         </Grid.Col>
         <Grid.Col span={8}>
-            {language}
+            {language ?? '-'}
         </Grid.Col>
 
         <Grid.Col span={4}>

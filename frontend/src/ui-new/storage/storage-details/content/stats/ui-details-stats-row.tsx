@@ -28,8 +28,10 @@ const statsInfos = {
     },
 };
 
+export type UIDetailsStatName = keyof typeof statsInfos;
+
 export type UIDetailsStatsRowProps = {
-    stat: keyof typeof statsInfos;
+    stat: UIDetailsStatName;
     value: number;
     iv?: number;
     ev?: number;

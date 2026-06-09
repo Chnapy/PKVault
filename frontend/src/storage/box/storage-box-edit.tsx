@@ -17,15 +17,17 @@ export const StorageBoxEdit: React.FC<{ boxId: string }> = ({ boxId }) => {
     const boxUpdateMutation = useStorageUpdateMainBox();
     const banksQuery = useStorageGetMainBanks();
     const boxesQuery = useStorageGetBoxes();
-    const pkmsQuery = usePkmVariantIndex();
+
+    const minSlotCountQuery = usePkmVariantIndex(data =>
+        Math.max(0, ...Object.keys(data.data.byBox[ box?.idInt ?? -1 ] ?? {}).map(Number)) + 1
+    );
+    const minSlotCount = minSlotCountQuery.data ?? 0;
 
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();
     const selected = selectedBankBoxes.data?.selectedBoxes?.some(box => box.id === boxId) ?? false;
 
     const box = boxesQuery.data?.data.find(box => box.id === boxId);
     const boxes = [ ...(boxesQuery.data?.data ?? []) ].filter(b => b.bankId === box?.bankId).sort((b1, b2) => (b1.order < b2.order ? -1 : 1));
-
-    const minSlotCount = Math.max(0, ...Object.keys(pkmsQuery.data?.data.byBox[ box?.idInt ?? -1 ] ?? {}).map(Number)) + 1;
 
     return box && <UIBoxEdit
         boxId={boxId}

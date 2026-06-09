@@ -88,6 +88,11 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
             ref={ref}
             styles={{
                 ...rest.styles,
+                root: {
+                    flexGrow: 1,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    ...(rest.styles as any)?.root,
+                },
                 input: {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     ...(rest.styles as any)?.input,

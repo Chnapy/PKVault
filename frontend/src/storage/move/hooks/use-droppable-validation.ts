@@ -1,11 +1,12 @@
-import { usePkmIndex } from '../../../data/hooks/use-pkm-index';
-import { usePkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
-import { usePkmVariantIndex } from '../../../data/hooks/use-pkm-variant-index';
-import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
-import { useStorageGetBoxes, useStorageGetMainBanks } from '../../../data/sdk/storage/storage.gen';
+import { useQueryClient, type UseQueryOptions } from '@tanstack/react-query';
+import { getPkmSaveIndexOptions } from '../../../data/hooks/use-pkm-save-index';
+import { getPkmVariantIndexOptions } from '../../../data/hooks/use-pkm-variant-index';
+import { getSaveInfosGetAllQueryOptions } from '../../../data/sdk/save-infos/save-infos.gen';
+import { getStorageGetBoxesQueryOptions, getStorageGetMainBanksQueryOptions } from '../../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../../translate/i18n';
 import { useMoveContext } from '../../../ui-new/interaction/move/context/use-move-context';
-import type { MoveContainerValue, MoveParams } from '../state/move-select-impl-provider';
+import { useSelectCallback } from '../../../util/use-select-callback';
+import type { MoveContainerValue, MoveParams } from '../move-container-fns';
 import { buildSlotInfosBank } from '../validation/slot-infos/build-slot-infos-bank';
 import { buildSlotInfosSlot } from '../validation/slot-infos/build-slot-infos-slot';
 import type { DropRefusalReason, SlotInfos } from '../validation/types';
@@ -18,104 +19,144 @@ export type UseDroppableValidationReturn = {
     helpText?: string;
 };
 
+/**
+ * Gives drop validation - if current dragging pkm can be dropped to given target.
+ * 
+ * This hook expect data to be already fetched, for performance concerns.
+ * Its trigger is done only when move state pass from idle to dragging.
+ */
 export const useDroppableValidation = (targetSlot: number, targetContainer: MoveContainerValue): UseDroppableValidationReturn => {
+    const queryClient = useQueryClient();
+
     const { useMoveStore, getContainerValue } = useMoveContext<MoveContainerValue, MoveParams>();
 
     const { t } = useTranslate();
 
-    const source = useMoveStore(({ state }) => state.status === 'dragging'
-        ? state.source
-        : undefined);
+    return useMoveStore(
+        useSelectCallback(({ state }): UseDroppableValidationReturn => {
+            if (state.status !== 'dragging')
+                return {};
 
-    const sourceContainer = source && getContainerValue(source.containerId);
+            const source = state.source;
 
-    const sourceIds = [ ...source?.ids ?? [] ];
-    const firstId = sourceIds[ 0 ];
+            const sourceContainer = source && getContainerValue(source.containerId);
+            const sourceSaveId = sourceContainer?.saveId;
 
-    const saveInfosAll = useSaveInfosGetAll();
+            const attached = source?.params?.attached ?? false;
 
-    const pkmVariantIndex = usePkmVariantIndex();
-    const sourcePkmSaveIndex = usePkmSaveIndex(sourceContainer?.saveId ?? 0);
-    const targetPkmSaveIndex = usePkmSaveIndex(targetContainer?.saveId ?? 0);
-    const sourceBoxesQuery = useStorageGetBoxes({ saveId: sourceContainer?.saveId ?? undefined });
-    const targetBoxesQuery = useStorageGetBoxes({ saveId: targetContainer?.saveId ?? undefined });
-    const banksQuery = useStorageGetMainBanks();
+            const sourceIds = [ ...source?.ids ?? [] ];
+            const firstId = sourceIds[ 0 ];
+            if (!firstId)
+                return {};
 
-    const firstSourceSlot = usePkmIndex(
-        sourceContainer?.saveId ?? null,
-        data => firstId
-            ? data.data.byId[ firstId ]?.boxSlot
-            : undefined,
-    );
+            const queriesOptions = [
+                getPkmVariantIndexOptions(),
+                getPkmSaveIndexOptions(sourceSaveId ?? 0, {
+                    enabled: !!sourceSaveId,
+                }),
+                getSaveInfosGetAllQueryOptions(),
+                getStorageGetBoxesQueryOptions({ saveId: sourceContainer?.saveId ?? undefined }, {
+                    query: { enabled: !!sourceContainer }
+                }),
+                getStorageGetMainBanksQueryOptions(),
+                getPkmSaveIndexOptions(targetContainer.saveId ?? 0, {
+                    enabled: !!targetContainer.saveId,
+                }),
+                getStorageGetBoxesQueryOptions({ saveId: targetContainer.saveId ?? undefined }),
+            ] as const;
 
-    if (!source || !pkmVariantIndex.data || !sourceContainer)
-        return {};
+            // this part is required for testing
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            queriesOptions.forEach((queryOptions: UseQueryOptions<any, any>) => {
+                if (queryOptions.enabled !== false)
+                    queryClient.prefetchQuery(queryOptions);
+            });
 
-    const slotInfosList = sourceIds.flatMap((sourceId): SlotInfos[] => {
-        switch (targetContainer.type) {
-            case 'bank':
-                return buildSlotInfosBank(
-                    targetContainer.bankId,
-                    sourceId,
-                    sourceContainer.saveId ?? undefined,
-                    pkmVariantIndex.data?.data,
-                    sourceContainer.saveId ? sourcePkmSaveIndex.data?.data : undefined,
-                    saveInfosAll.data?.data ?? {},
-                    Object.fromEntries(
-                        sourceBoxesQuery.data?.data
-                            .map(box => [ box.idInt, box ]) ?? []
-                    ),
-                    Object.fromEntries(
-                        banksQuery.data?.data
-                            .map(bank => [ bank.idInt, bank ]) ?? []
-                    ),
-                );
-            default:
-                return buildSlotInfosSlot(
-                    Number(targetContainer.boxId),
-                    targetSlot,
-                    firstSourceSlot.data ?? -1,
-                    sourceId,
-                    sourceContainer.saveId,
-                    targetContainer.saveId,
-                    () => pkmVariantIndex.data?.data,
-                    () => sourceContainer.saveId ? sourcePkmSaveIndex.data?.data : undefined,
-                    () => targetContainer.saveId ? targetPkmSaveIndex.data?.data : undefined,
-                    () => saveInfosAll.data?.data ?? {},
-                    () => Object.fromEntries(
-                        sourceBoxesQuery.data?.data
-                            .map(box => [ box.idInt, box ]) ?? []
-                    ),
-                    () => Object.fromEntries(
-                        targetBoxesQuery.data?.data
-                            .map(box => [ box.idInt, box ]) ?? []
-                    ),
-                );
-        }
-    });
+            const pkmVariantIndex = queryClient.getQueryData(getPkmVariantIndexOptions().queryKey);
+            const sourcePkmSaveIndex = sourceSaveId
+                ? queryClient.getQueryData(getPkmSaveIndexOptions(sourceSaveId).queryKey)
+                : null;
+            const saveInfosAll = queryClient.getQueryData(getSaveInfosGetAllQueryOptions().queryKey);
+            const sourceBoxes = queryClient.getQueryData(getStorageGetBoxesQueryOptions({ saveId: sourceSaveId ?? undefined }).queryKey);
+            const banks = queryClient.getQueryData(getStorageGetMainBanksQueryOptions().queryKey);
+            const targetPkmSaveIndex = targetContainer.saveId
+                ? queryClient.getQueryData(getPkmSaveIndexOptions(targetContainer.saveId).queryKey)
+                : null;
+            const targetBoxes = queryClient.getQueryData(getStorageGetBoxesQueryOptions({ saveId: targetContainer.saveId ?? undefined }).queryKey);
 
-    const attached = source.params?.attached ?? false;
+            const hasMissingRequiredData = [ pkmVariantIndex, sourcePkmSaveIndex, saveInfosAll, sourceBoxes, banks, targetPkmSaveIndex, targetBoxes ]
+                .some(d => d === undefined);
 
-    const validation = validateDrop(
-        {
-            status: 'dragging',
-            source: {
-                ids: [ ...source.ids ],
-                saveId: sourceContainer.saveId ?? undefined,
-                attached,
-            },
-        },
-        slotInfosList,
-        pkmVariantIndex.data.data,
-    );
+            if (hasMissingRequiredData) {
+                // console.log('missing', hasMissingRequiredData)
+                return {};
+            }
 
-    const helpText = validation.canDrop
-        ? undefined
-        : getHelpText(validation.reason, validation.slotInfos, attached, t);
+            const firstSourceSlot = (sourceSaveId
+                ? sourcePkmSaveIndex?.data.byId[ firstId ]
+                : pkmVariantIndex?.data.byId[ firstId ]
+            )?.boxSlot;
+            if (firstSourceSlot === undefined) {
+                // console.log('no-first-slot')
+                return {};
+            }
 
-    return {
-        canDrop: validation.canDrop,
-        _disabledReason: !validation.canDrop ? validation.reason : undefined,
-        helpText,
-    };
+            const slotInfosList = sourceIds.flatMap((sourceId): SlotInfos[] => {
+                switch (targetContainer.type) {
+                    case 'bank':
+                        return buildSlotInfosBank(
+                            targetContainer.bankId,
+                            sourceId,
+                            sourceSaveId,
+                            pkmVariantIndex!.data,
+                            sourceSaveId ? sourcePkmSaveIndex!.data : undefined,
+                            saveInfosAll!.data,
+                            Object.fromEntries(
+                                sourceBoxes!.data.map(box => [ box.idInt, box ]) ?? []
+                            ),
+                            Object.fromEntries(
+                                banks!.data.map(bank => [ bank.idInt, bank ]) ?? []
+                            ),
+                        );
+                    default:
+                        return buildSlotInfosSlot(
+                            Number(targetContainer.boxId),
+                            targetSlot,
+                            firstSourceSlot,
+                            sourceId,
+                            sourceSaveId,
+                            targetContainer.saveId,
+                            pkmVariantIndex!.data,
+                            sourceSaveId ? sourcePkmSaveIndex!.data : undefined,
+                            targetContainer.saveId ? targetPkmSaveIndex?.data : undefined,
+                            saveInfosAll!.data ?? {},
+                            Object.fromEntries(
+                                sourceBoxes!.data.map(box => [ box.idInt, box ]) ?? []
+                            ),
+                            Object.fromEntries(
+                                targetBoxes!.data.map(box => [ box.idInt, box ]) ?? []
+                            ),
+                        );
+                }
+            });
+
+            const data = validateDrop(
+                { attached },
+                slotInfosList,
+                pkmVariantIndex!.data,
+            );
+
+            // console.log('RESULT', data)
+            return data.canDrop
+                ? {
+                    canDrop: true,
+                    _disabledReason: undefined,
+                    helpText: undefined,
+                }
+                : {
+                    canDrop: false,
+                    _disabledReason: data.reason,
+                    helpText: getHelpText(data.reason, data.slotInfos, attached, t),
+                };
+        }, [ getContainerValue, queryClient, t, targetContainer.bankId, targetContainer.boxId, targetContainer.saveId, targetContainer.type, targetSlot ]));
 };

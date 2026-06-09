@@ -2,6 +2,7 @@ import { useQuery, type QueryClient, type UseQueryOptions } from '@tanstack/reac
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { getCachedPkmSaveIndex, getPkmSaveIndexOptions, type PkmSaveIndexes, type PkmSaveIndexQueryData } from './use-pkm-save-index';
 import { getCachedPkmVariantIndex, getPkmVariantIndexOptions, type PkmVariantIndexes, type PkmVariantIndexQueryData } from './use-pkm-variant-index';
+import React from 'react';
 
 const createMixedIndex = (
     pkmMainIndex: PkmVariantIndexes | undefined,
@@ -66,6 +67,28 @@ export const usePkmIndex = <D = PkmVariantIndexQueryData | PkmSaveIndexQueryData
             ? getPkmVariantIndexOptions(options as never)
             : getPkmSaveIndexOptions(saveId, options as never),
     } as UseQueryOptions<PkmVariantIndexQueryData | PkmSaveIndexQueryData, Error, D>);
+
+    if (import.meta.env.DEV) {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const checkSelectQuery = useQuery({
+            ...saveId === null
+                ? getPkmVariantIndexOptions(options as never)
+                : getPkmSaveIndexOptions(saveId, options as never),
+        } as UseQueryOptions<PkmVariantIndexQueryData | PkmSaveIndexQueryData, Error, D>);
+
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        React.useEffect(() => {
+            const data = checkSelectQuery.data;
+            if (!data || !selectFn)
+                return;
+
+            const res1 = selectFn(data as never);
+            const res2 = selectFn(data as never);
+            if (res1 !== res2) {
+                console.warn('query.select result reference changes over calls, memoization broken', { selectResult: res1, data });
+            }
+        }, [ checkSelectQuery.data, selectFn ]);
+    }
 
     // const data = React.useMemo(() => 
     //     createMixedIndex(

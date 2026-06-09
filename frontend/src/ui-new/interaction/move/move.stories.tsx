@@ -150,7 +150,6 @@ export const Primary: Story = {
             '6': { box: 2, pos: 8 },
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const getNameByPos = (b: number, p: number) => Object.entries(positions).find(([ _, { box, pos } ]) => box === b && pos === p)?.[ 0 ];
 
         const getBoxItems = (box: number) => new Array(20).fill(0).map((_, i) => {

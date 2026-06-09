@@ -28,7 +28,7 @@ export const StoragePanelFooter: React.FC = () => {
 
     const pkmTotalCountQuery = usePkmIndex(
         saveId,
-        React.useCallback(data => Object.values(data.data.byBox).reduce((acc, box) => acc + Object.keys(box).length, 0), []),
+        data => Object.values<Record<number, unknown>>(data.data.byBox).reduce<number>((acc, box) => acc + Object.keys(box).length, 0),
     );
 
     const box = boxes.find(b => b.idInt === boxId);

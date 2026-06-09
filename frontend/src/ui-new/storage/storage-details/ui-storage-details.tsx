@@ -1,4 +1,4 @@
-import { Card, CloseButton, Group } from '@mantine/core';
+import { Card, CloseButton } from '@mantine/core';
 import React from 'react';
 import { UICardSectionControl } from '../storage-panel/card-section-control/ui-card-section-control';
 
@@ -30,9 +30,7 @@ export const UIStorageDetails: React.FC<UIStorageDetailsProps> = ({
         </Card.Section>
 
         <Card.Section component={UICardSectionControl} inheritPadding py='inherit' withBorder>
-            <Group>
-                {actions}
-            </Group>
+            {actions}
         </Card.Section>
     </Card>;
 };

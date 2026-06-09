@@ -8,7 +8,10 @@ import { Route } from '../../../routes/storage';
 import { UIStorageItemIcons } from '../../../ui-new/storage/storage-item/ui-storage-item-icons';
 import { ItemImg } from '../../../ui/img/item-img';
 import { StorageItem, type StorageItemProps } from '../../../ui/storage-item/storage-item';
-import type { MoveContainerValue } from '../../move/state/move-select-impl-provider';
+import { pick } from '../../../util/pick';
+import { useSelectCallback } from '../../../util/use-select-callback';
+import type { MoveContainerValue } from '../../move/move-container-fns';
+import { useCurrentStorage } from '../../panel/storage-panel-context';
 
 type StorageSaveItemProps = Pick<StorageItemProps, 'nodeId'> & {
     saveId: number;
@@ -18,17 +21,46 @@ type StorageSaveItemProps = Pick<StorageItemProps, 'nodeId'> & {
 export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
     'item',
     React.memo(({ saveId, pkmId, nodeId }) => {
-        const selected = Route.useSearch({ select: search => search.selected });
+        const { storageIndex } = useCurrentStorage();
         const navigate = Route.useNavigate();
 
-        const savePkmsQuery = usePkmSaveIndex(saveId);
+        const savePkmsQuery = usePkmSaveIndex(saveId,
+            useSelectCallback(data => {
+                const pkm = data.data.byId[ pkmId ];
+                if (!pkm)
+                    return;
 
-        const pkmVariantIndex = usePkmVariantIndex();
+                return pick(pkm, [
+                    'id', 'idBase', 'saveId', 'context', 'species', 'nickname', 'level', 'boxId', 'boxSlot',
+                    'dynamicChecksum', 'form', 'gender', 'contextVersion', 'heldItem',
+                    'isAlpha', 'isShiny', 'isEgg', 'isShadow', 'isStarter', 'isDuplicate', 'party',
+                    'canEvolve',
+                ]);
+            }, [ pkmId ])
+        );
+
+        const canSynchronizeQuery = usePkmVariantIndex(
+            useSelectCallback(data => {
+                const savePkm = savePkmsQuery.data;
+                if (!savePkm)
+                    return;
+
+                const attachedPkmVariant = data.data.byAttachedSave[ savePkm.saveId ]?.[ savePkm.idBase ];
+                if (!attachedPkmVariant)
+                    return;
+
+                return {
+                    isAttached: true,
+                    canSynchronize: savePkm.dynamicChecksum !== attachedPkmVariant.dynamicChecksum,
+                };
+            }, [ savePkmsQuery.data ])
+        );
+        const { isAttached, canSynchronize } = canSynchronizeQuery.data ?? {};
 
         const pkmLegalityQuery = usePkmLegality(pkmId, saveId);
         const pkmLegality = pkmLegalityQuery.data?.data;
 
-        const savePkm = savePkmsQuery.data?.data.byId[ pkmId ];
+        const savePkm = savePkmsQuery.data;
 
         const container = React.useMemo((): MoveContainerValue => ({
             type: 'save-item',
@@ -42,12 +74,6 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
         }
 
         const { id, species, nickname, level, boxSlot, form, gender, contextVersion, isAlpha, isShiny, isEgg, isShadow, canEvolve } = savePkm;
-
-        const attachedPkmVariant = pkmVariantIndex.data?.data.byAttachedSave[ savePkm.saveId ]?.[ savePkm.idBase ];
-        const saveSynchronized = savePkm.dynamicChecksum === attachedPkmVariant?.dynamicChecksum;
-
-        const canDetach = !!attachedPkmVariant;
-        const canSynchronize = !!attachedPkmVariant && !saveSynchronized;
 
         return <StorageItem
             id={id}
@@ -64,14 +90,21 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
             name={nickname}
             level={level}
             onClick={() => navigate({
-                search: {
-                    selected:
-                        !!selected?.saveId && selected.id === pkmId
+                search: search => {
+                    const alreadySelected = search.selected
+                        && !!search.selected.saveId
+                        && search.selected.storage === storageIndex
+                        && search.selected.id === pkmId;
+
+                    return {
+                        selected: alreadySelected
                             ? undefined
                             : {
+                                storage: storageIndex,
                                 saveId,
                                 id: pkmId,
                             },
+                    };
                 },
             })}
             icons={<UIStorageItemIcons
@@ -87,7 +120,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
                 level={savePkm.level}
                 party={savePkm.party >= 0 ? savePkm.party : undefined}
                 canEvolve={canEvolve}
-                attached={canDetach}
+                attached={isAttached}
                 needSynchronize={canSynchronize}
             />}
         />;

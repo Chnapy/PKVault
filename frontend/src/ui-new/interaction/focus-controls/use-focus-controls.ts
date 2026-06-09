@@ -27,14 +27,14 @@ export const useFocusControls = <E = any, N extends string = string>({
         scopeNodeId,
         focusOnMount,
         onFocus: (layout, props, details) => {
-            onFocus?.(layout,props,details);
+            onFocus?.(layout, props, details);
 
             // allow multi-select keeping Y pressed over navigate
             const buttons = getGamepadPressedButtons();
             controls.forEach(c => {
                 if (!c || !c.triggers.gamepad?.allowOnFocus)
                     return;
-                
+
                 const value = c.triggers.gamepad.values.find(v => buttons.includes(v));
                 if (value)
                     c.action(details.event as never, 'gamepad', value);
@@ -63,15 +63,15 @@ export const useFocusControls = <E = any, N extends string = string>({
 
     const onClick: typeof controlOnClick = React.useCallback<React.MouseEventHandler>((e) => {
         const getFocusableElement = () => {
-            if (!(e.target instanceof HTMLElement)) {
+            if (!(e.currentTarget instanceof HTMLElement)) {
                 return;
             }
 
-            if (e.target.dataset.focusKey !== undefined) {
-                return e.target;
+            if (e.currentTarget.dataset.focusKey !== undefined) {
+                return e.currentTarget;
             }
 
-            return e.target.closest<HTMLElement>('[data-focus-key]');
+            return e.currentTarget.closest<HTMLElement>('[data-focus-key]');
         };
 
         const focusableEl = getFocusableElement();
@@ -84,6 +84,8 @@ export const useFocusControls = <E = any, N extends string = string>({
             // console.log('focus', id, focusableEl.dataset.focusKey)
 
             controlOnClick?.(e);
+        } else {
+            console.warn('Focusable element not found', focusableEl, e);
         }
     }, [ nodeId, controlOnClick ]);
 

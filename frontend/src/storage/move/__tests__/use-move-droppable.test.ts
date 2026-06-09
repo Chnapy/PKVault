@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'vitest';
 import type { MoveTargetInput } from '../../../ui-new/interaction/move/context/move-context';
 import { useDroppable } from '../../../ui-new/interaction/move/hooks/use-droppable';
-import { renderHookWithWrapper } from '../__tests__/render-hook-with-wrapper';
-import { setupTestDataServer } from '../__tests__/setup-test-data-server';
-import { containerFns, type MoveContainerValue } from '../state/move-select-impl-provider';
+import { renderHookWithWrapper } from './utils/render-hook-with-wrapper';
+import { setupTestDataServer } from './utils/setup-test-data-server';
+import { containerFns, type MoveContainerValue } from '../move-container-fns';
 import type { DropRefusalReason } from '../validation/types';
-import { useDroppableValidation } from './use-droppable-validation';
+import { useDroppableValidation } from '../hooks/use-droppable-validation';
 
 const useMoveDroppable = (target: MoveTargetInput<MoveContainerValue>) => {
     const droppable = useDroppable(target);
@@ -26,7 +26,6 @@ const useMoveDroppable = (target: MoveTargetInput<MoveContainerValue>) => {
 };
 
 describe('use-move-droppable', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const server = setupTestDataServer();
 
     describe('pkm-variant droppable state', () => {

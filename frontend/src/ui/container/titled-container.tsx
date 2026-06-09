@@ -1,7 +1,6 @@
 import { css, cx } from '@emotion/css';
 import React from 'react';
 import { ErrorCatcher } from '../../error/error-catcher';
-import { MoveContext } from '../../storage/move/context/move-context';
 import { theme } from '../theme';
 import { Container, type ContainerProps } from './container';
 
@@ -19,7 +18,7 @@ export type TitledContainerProps = Omit<ContainerProps<'div'>, 'title'> & {
 export const TitledContainer: React.FC<React.PropsWithChildren<TitledContainerProps>> = ({
     classNameContent, title, contrasted, enableExpand, initialExpanded = true, expanded: rawExpanded, setExpanded, maxHeight, children, ...containerProps
 }) => {
-    const isDragging = MoveContext.useValue().state.status === 'dragging';
+    const isDragging = false;//MoveContext.useValue().state.status === 'dragging';
     const [ expandedRaw, setExpandedRaw ] = React.useState(initialExpanded);
 
     let expanded = (!isDragging || !enableExpand)

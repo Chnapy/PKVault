@@ -1,49 +1,28 @@
-import type React from 'react';
-import type { MoveCategory } from '../../data/sdk/model';
-import { Icon } from '../icon/icon';
-import { theme } from '../theme';
-import { TypeItemBase, type TypeItemBaseProps } from '../type-item/type-item-base';
-import { getMoveCategoryImg } from './util/get-move-category-img';
-import { css } from '@emotion/css';
+import React from 'react';
+import { UIDetailsMoveRow, type UIDetailsMoveRowProps } from '../../ui-new/storage/storage-details/content/moves/ui-details-move-row';
+import { useStaticMove } from './hooks/use-static-move';
 
-export type MoveItemProps = TypeItemBaseProps & {
-    category: MoveCategory;
-    damage?: number;
-    isValid?: boolean;
+export type MoveItemProps = Pick<UIDetailsMoveRowProps, 'nameWidth' | 'onClick'> & {
+    pkmId: string;
+    saveId: number | null;
+    move: number;
 };
 
-export const MoveItem: React.FC<MoveItemProps> = ({ category, damage, isValid = true, ...rest }) => {
-    const categoryImg = getMoveCategoryImg(category);
+export const MoveItem: React.FC<MoveItemProps> = ({ pkmId, saveId, move, ...rest }) => {
+    const getStaticMove = useStaticMove(saveId, pkmId);
 
-    return <TypeItemBase {...rest}>
-        {!isValid && <div className={css({
-            width: '0.8lh',
-            height: '0.8lh',
-            borderRadius: 99,
-            color: theme.text.light,
-            backgroundColor: theme.bg.yellow,
-            fontSize: '70%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 'bold',
-            flexShrink: 0
-        })}>
-            <Icon name='exclaimation' solid forButton />
-        </div>}
+    const { staticMove, forGen } = React.useMemo(() => getStaticMove(move), [ getStaticMove, move ]);
 
-        <div
-            className={css({
-                width: 25,
-                color: theme.text.default,
-                backgroundImage: `url("${categoryImg}")`,
-                backgroundSize: 'cover',
-                textAlign: 'center',
-                flexShrink: 0,
-                alignSelf: 'normal',
-            })}
-        >
-            {damage}
-        </div>
-    </TypeItemBase>;
+    if (!staticMove || !forGen)
+        return null;
+
+    // TODO add accuracy / isValid / isAlpha
+    return <UIDetailsMoveRow
+        type={forGen.type}
+        category={forGen.category}
+        name={staticMove.name}
+        power={forGen.power}
+        // accuracy={}
+        {...rest}
+    />;
 };

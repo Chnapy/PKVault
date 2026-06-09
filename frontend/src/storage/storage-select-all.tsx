@@ -2,14 +2,14 @@ import React from 'react';
 import { usePkmSaveIndex } from '../data/hooks/use-pkm-save-index';
 import { usePkmVariantIndex } from '../data/hooks/use-pkm-variant-index';
 import { CheckboxInput } from '../ui/input/checkbox-input';
-import { StorageSelectContext } from './actions/storage-select-context';
 
 export const StorageSelectAll: React.FC<{
     saveId?: number;
     boxId: number;
     disabled?: boolean;
 }> = ({ saveId, boxId, disabled }) => {
-    const selectContext = StorageSelectContext.useValue();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const selectContext = {} as any;//StorageSelectContext.useValue();
 
     const mainPkmsQuery = usePkmVariantIndex();
     const savePkmsQuery = usePkmSaveIndex(saveId ?? 0);

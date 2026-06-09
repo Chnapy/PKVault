@@ -15,7 +15,7 @@ export type UIDetailsMainProps = {
     isAlpha?: boolean;
     types: React.ReactNode;
     markings: React.ReactNode;
-    teraType?: number;
+    teraType?: React.ReactNode;
     ball: React.ReactNode;
     nickname: string;
     level: number;

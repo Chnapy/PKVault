@@ -11,6 +11,11 @@ type UISpriteSizeWrapperProps<T extends ReactTag = ReactTag> = {
 } & Omit<React.ComponentProps<T>, 'component'>;
 
 export function UISpriteSizeWrapper<T extends ReactTag>({ component: Component, speciesSize, itemSize, style, ...rest }: UISpriteSizeWrapperProps<T>) {
+    // if pixel ratio is not an integer (ex: 1.25), pixelated rendering looks bad
+    const irregularPixelRatioRendering = devicePixelRatio.toString().split('.')[ 1 ]
+        ? 'auto'
+        : undefined;
+
     return <Component
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         {...rest as any}
@@ -22,7 +27,7 @@ export function UISpriteSizeWrapper<T extends ReactTag>({ component: Component, 
             }),
             '--sprite-species-rendering': speciesSize && switchUtil(speciesSize, {
                 sm: 'auto',
-                md: undefined,
+                md: irregularPixelRatioRendering,
                 lg: undefined,
             }),
 
@@ -33,7 +38,7 @@ export function UISpriteSizeWrapper<T extends ReactTag>({ component: Component, 
             }),
             '--sprite-item-rendering': itemSize && switchUtil(itemSize, {
                 '1lh': 'auto',
-                md: undefined,
+                md: irregularPixelRatioRendering,
                 lg: undefined,
             }),
 

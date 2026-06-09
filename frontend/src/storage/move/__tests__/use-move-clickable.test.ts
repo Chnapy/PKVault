@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'vitest';
 import { useDragging } from '../../../ui-new/interaction/move/hooks/use-dragging';
-import { renderHookWithWrapper } from '../__tests__/render-hook-with-wrapper';
-import { setupTestDataServer } from '../__tests__/setup-test-data-server';
-import { containerFns, type MoveContainerValue, type MoveParams } from '../state/move-select-impl-provider';
+import { renderHookWithWrapper } from './utils/render-hook-with-wrapper';
+import { setupTestDataServer } from './utils/setup-test-data-server';
+import { containerFns, type MoveContainerValue, type MoveParams } from '../move-container-fns';
 
-const useMoveClickable = ([pkmId]: [string], container: MoveContainerValue) => {
+const useMoveClickable = ([ pkmId ]: [ string ], container: MoveContainerValue) => {
     const dragging = useDragging(pkmId, container);
 
     const dragMove = dragging.useDrag<MoveParams>({ attached: false });
@@ -20,13 +20,12 @@ const useMoveClickable = ([pkmId]: [string], container: MoveContainerValue) => {
 };
 
 describe('use-move-clickable', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const server = setupTestDataServer();
 
     describe('pkm-variant clickable state', () => {
         test('should be clickable if is movable', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveClickable(['canMove'], {
+                () => useMoveClickable([ 'canMove' ], {
                     type: 'main-item',
                     bankId: '',
                     saveId: null,
@@ -36,7 +35,7 @@ describe('use-move-clickable', () => {
                     initialState: {
                         status: 'idle',
                     },
-                    onDrop: async () => {},
+                    onDrop: async () => { },
                 }
             );
 
@@ -49,7 +48,7 @@ describe('use-move-clickable', () => {
 
         test('should not be clickable if is not movable', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveClickable(['cannotMove'], {
+                () => useMoveClickable([ 'cannotMove' ], {
                     type: 'main-item',
                     bankId: '',
                     saveId: null,
@@ -66,7 +65,7 @@ describe('use-move-clickable', () => {
 
         test('should be clickable as attached if is movable as attached', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveClickable(['canMove'], {
+                () => useMoveClickable([ 'canMove' ], {
                     type: 'main-item',
                     bankId: '',
                     saveId: null,
@@ -82,7 +81,7 @@ describe('use-move-clickable', () => {
 
         test('should use selected pkms if any', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
-                () => useMoveClickable(['canMove'], {
+                () => useMoveClickable([ 'canMove' ], {
                     type: 'main-item',
                     bankId: '',
                     saveId: null,

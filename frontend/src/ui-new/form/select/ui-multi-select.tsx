@@ -12,9 +12,10 @@ import { FocusScope } from '../../interaction/focus/scope/focus-scope';
 export type UIMultiSelectProps = {
     name: string;
     controlLabel: string;
+    pillsNoWrap?: boolean;
 } & MultiSelect.Props;
 
-export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel, className, style, ...rest }) => {
+export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel, pillsNoWrap, className, style, ...rest }) => {
     const [ scopeId ] = React.useState((): FocusScopeId => `dropdown_${self.crypto.randomUUID()}`);
 
     const { popScope } = Focus.usePushPopScope();
@@ -48,7 +49,9 @@ export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel
                     {...item}
                     focusOnMount={rest.data!.indexOf(item.option.value) === 0}
                     back={optionBack}
-                />}
+                >
+                    {rest.renderOption?.(item)}
+                </OptionComponent>}
                 wrapperProps={{
                     ...focusControlProps,
                     style: { borderRadius: 'var(--mantine-radius-default)' }
@@ -57,9 +60,9 @@ export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel
                     root: {
                         flexGrow: 1,
                     },
-                    pillsList: {
+                    pillsList: pillsNoWrap ? {
                         flexWrap: 'nowrap',
-                    },
+                    } : undefined,
                 }}
             />
         </FocusScope>
@@ -69,7 +72,8 @@ export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel
 const OptionComponent: React.FC<ComboboxLikeRenderOptionInput<ComboboxItem<string>> & {
     focusOnMount: boolean;
     back: () => void;
-}> = ({ option, checked, focusOnMount, back }) => {
+    children?: React.ReactNode;
+}> = ({ option, checked, focusOnMount, back, children }) => {
     const { focusControlProps, controlsIcons } = useFocusControls({
         scopeNodeId: option.value,
         focusOnMount,
@@ -100,7 +104,9 @@ const OptionComponent: React.FC<ComboboxLikeRenderOptionInput<ComboboxItem<strin
             paddingRight: 4,
         }}
     >
-        {checked && <CheckIcon />}
-        {option.label}
+        {children ?? <>
+            {checked && <CheckIcon />}
+            {option.label}
+        </>}
     </WithControlsIcons>;
 };

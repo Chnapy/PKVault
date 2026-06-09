@@ -43,7 +43,7 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({ va
                 style={{ gap: 4 }}
                 rightSection={selected && <Checkbox size='xs' />}
             >
-                <Text component={selected ? 'b' : undefined}>{item.label}</Text>
+                <Text component={selected ? 'b' : undefined} textWrap='nowrap'>{item.label}</Text>
             </Tabs.Tab>}
             renderExpanded={(data, opt) => <Group>
                 {renderExpanded?.(data, opt)}

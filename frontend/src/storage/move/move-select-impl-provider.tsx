@@ -1,49 +1,17 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
-import { getCachedPkmIndex } from '../../../data/hooks/use-pkm-index';
-import { storageMovePkm, storageMovePkmBank } from '../../../data/sdk/storage/storage.gen';
-import { updateCacheMutationResponse } from '../../../data/util/update-cache-mutation-response';
-import { MoveProvider, type MoveProviderProps } from '../../../ui-new/interaction/move/context/move-provider';
-import { getDropPositions } from '../../../ui-new/interaction/move/hooks/get-drop-positions';
-import { SelectProvider, type SelectProviderProps } from '../../../ui-new/interaction/select/context/select-provider';
-import { filterIsDefined } from '../../../util/filter-is-defined';
-import { useCanMove } from '../hooks/use-can-move';
-
-export type MoveContainerValue = {
-    type: 'main-item' | 'save-item' | 'bank';
-    bankId: string;
-    saveId: number | null;
-    boxId: string;
-};
-
-export type MoveParams = {
-    attached: boolean;
-};
-
-const getContainerHash = ({ type, bankId, saveId, boxId }: MoveContainerValue): string => [ type, bankId, saveId, boxId ].join('---');
-
-const getContainerValue = (hash: string): MoveContainerValue => {
-    const [ type, bankId = '', saveIdRaw = '', boxId = '' ] = hash.split('---');
-
-    const saveId = saveIdRaw === ''
-        ? null
-        : Number(saveIdRaw);
-
-    return {
-        type: type as MoveContainerValue[ 'type' ],
-        bankId,
-        saveId,
-        boxId,
-    };
-};
-
-export const containerFns = {
-    getContainerHash,
-    getContainerValue,
-};
+import { getCachedPkmIndex } from '../../data/hooks/use-pkm-index';
+import { storageMovePkm, storageMovePkmBank } from '../../data/sdk/storage/storage.gen';
+import { updateCacheMutationResponse } from '../../data/util/update-cache-mutation-response';
+import { MoveProvider, type MoveProviderProps } from '../../ui-new/interaction/move/context/move-provider';
+import { getDropPositions } from '../../ui-new/interaction/move/hooks/get-drop-positions';
+import { SelectProvider, type SelectProviderProps } from '../../ui-new/interaction/select/context/select-provider';
+import { filterIsDefined } from '../../util/filter-is-defined';
+import { useCanMove } from './hooks/use-can-move';
+import { type MoveContainerValue, type MoveParams, containerFns } from './move-container-fns';
 
 const useFilterStartDragIds: MoveProviderProps<MoveContainerValue, MoveParams>[ 'useFilterStartDragIds' ] = (container, ids) => {
-    const canMoveFn = useCanMove(container, ids);
+    const canMoveFn = useCanMove(container.saveId, ids);
 
     return params => canMoveFn(params?.attached ?? false);
 };
@@ -55,7 +23,7 @@ const useTargetAllPositions = (): MoveProviderProps<MoveContainerValue, MovePara
         if (target.targetContainer.type === 'bank')
             return {};
 
-        const sourceContainer = getContainerValue(source.containerId);
+        const sourceContainer = containerFns.getContainerValue(source.containerId);
 
         const sourcePkmIndex = getCachedPkmIndex(queryClient, sourceContainer.saveId)?.data;
 
@@ -81,7 +49,7 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
     const queryClient = useQueryClient();
 
     return React.useCallback(async (source, target) => {
-        const sourceContainer = getContainerValue(source.containerId);
+        const sourceContainer = containerFns.getContainerValue(source.containerId);
 
         console.log('drop', sourceContainer, source, target)
 

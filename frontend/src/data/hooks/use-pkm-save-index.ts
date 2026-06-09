@@ -44,10 +44,10 @@ export type PkmSaveIndexQueryData = {
     headers: Headers;
 };
 
-export const getPkmSaveIndexOptions = <D>(saveId: number, options?: Omit<UseQueryOptions<PkmSaveIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>) => {
+export const getPkmSaveIndexOptions = <D = PkmSaveIndexQueryData>(saveId: number, options?: Omit<UseQueryOptions<PkmSaveIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>) => {
     const queryKey = getStorageGetSavePkmsQueryKey(saveId);
 
-    
+
     return queryOptions({
         queryKey,
         queryFn: async ({ signal }) => {
@@ -66,8 +66,15 @@ export const getPkmSaveIndexOptions = <D>(saveId: number, options?: Omit<UseQuer
 /**
  * Fetch save pkms with caching & indexing.
  */
-export const usePkmSaveIndex = (saveId: number, options?: Omit<UseQueryOptions<PkmSaveIndexQueryData, Error, PkmSaveIndexQueryData>, 'queryKey' | 'queryFn'>) => {
-    return useQuery(getPkmSaveIndexOptions(saveId, options));
+export const usePkmSaveIndex = <D = PkmSaveIndexQueryData>(
+    saveId: number,
+    selectFn?: (data: PkmSaveIndexQueryData) => D,
+    options?: Omit<UseQueryOptions<PkmSaveIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>
+) => {
+    return useQuery({
+        select: selectFn,
+        ...getPkmSaveIndexOptions(saveId, options),
+    });
 };
 
 export const getCachedPkmSaveIndex = (client: QueryClient, saveId: number) => {

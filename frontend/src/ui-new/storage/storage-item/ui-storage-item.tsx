@@ -1,7 +1,7 @@
 import { Checkbox } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import React from 'react';
-import type { MoveParams } from '../../../storage/move/state/move-select-impl-provider';
+import type { MoveParams } from '../../../storage/move/move-container-fns';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getDragControls } from '../../interaction/focus-controls/common-controls/drag-controls';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
@@ -14,8 +14,8 @@ import { useDroppable } from '../../interaction/move/hooks/use-droppable';
 import { useSelectContextActions, useSelectHasValue } from '../../interaction/select/context/use-select-context';
 import { useCurrentPanel } from '../storage-content/context/ui-panel-context';
 import { UIDetailsLevel } from '../storage-details/ui-details-level';
-import type { UIStorageItemPlaceholderProps } from './placeholder/ui-storage-item-placeholder';
 import { UIStorageItemBase } from './base/ui-storage-item-base';
+import type { UIStorageItemPlaceholderProps } from './placeholder/ui-storage-item-placeholder';
 import classes from './ui-storage-item.module.css';
 
 export type UIStorageItemProps<C = unknown> =

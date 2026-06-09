@@ -7,7 +7,7 @@ export type UseDraggingReturn = ReturnType<typeof useDragging>;
  * Translate item rendering following given entity moving state.
  * If entity is not moving, do nothing.
  */
-export const useDragging = function <C>(entityId: string, containerValue: C) {
+export const useDragging = function <C>(entityId: string, containerValue: C, isCurrentTarget: boolean = true) {
     const { getContainerHash, useMoveStore } = useMoveContext<C>();
 
     const containerHash = getContainerHash(containerValue);
@@ -17,7 +17,7 @@ export const useDragging = function <C>(entityId: string, containerValue: C) {
         && state.source.containerId === containerHash
         && state.source.ids.has(entityId));
 
-    const { ref, ...triggers } = useDragTriggers(entityId, containerValue, isDragging);
+    const { ref, ...triggers } = useDragTriggers(entityId, containerValue, isCurrentTarget, isDragging);
 
     return {
         ref,

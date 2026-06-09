@@ -3,13 +3,16 @@ import { clsx } from 'clsx';
 import React from 'react';
 import classes from './with-controls-icons.module.css';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 type PolymorphicComponentProps<T extends React.ElementType, Props = {}> = Props & {
     as?: T;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     renderRoot?: (props: Record<string, any>) => React.ReactNode;
 } & React.ComponentPropsWithoutRef<T>;
 
 type PolymorphicRef<T extends React.ElementType> = React.ComponentPropsWithRef<T>[ 'ref' ];
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 type PolymorphicComponent<DefaultElement extends React.ElementType, Props = {}> = <
     T extends React.ElementType = DefaultElement,
 >(

@@ -3,6 +3,7 @@ import { usePkmIndex } from '../../../data/hooks/use-pkm-index';
 import { useStorageDeleteMainBox, useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
 import { Route } from '../../../routes/storage';
 import { UIBoxExpanded, type UIBoxExpandedProps } from '../../../ui-new/storage/storage-panel/box-list/ui-box-expanded';
+import { useSelectCallback } from '../../../util/use-select-callback';
 import { StorageBoxEdit } from '../../box/storage-box-edit';
 import { useCurrentStorage } from '../storage-panel-context';
 
@@ -21,7 +22,14 @@ export const BoxExpanded: React.FC<BoxExpandedProps> = ({ id, label, selected, o
 
     const pkmsQuery = usePkmIndex(
         saveId,
-        React.useCallback(data => box && data.data.byBox[ box.idInt ], [ box ]),
+        useSelectCallback(data => {
+            if (!box?.idInt)
+                return;
+
+            return Object.fromEntries(
+                Object.entries(data.data.byBox[ box.idInt ] ?? {}).map(([ slot, pkm ]) => [ slot, !!pkm ])
+            );
+        }, [ box?.idInt ]),
     );
 
     const boxPkms = pkmsQuery.data;

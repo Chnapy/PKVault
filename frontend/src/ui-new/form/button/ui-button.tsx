@@ -8,18 +8,28 @@ import { useFocusControls } from '../../interaction/focus-controls/use-focus-con
 type UIButtonProps = {
     name: string;
     controlLabel: string;
+    controlIcons?: React.ReactNode[];
+    focusOnMount?: boolean;
+    onFocusSelect?: (e: Event) => void;
 } & Button.Props & ElementProps<'button'>;
 
-export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, onClick, ...rest }) => {
+export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlIcons = [], focusOnMount, onClick, onFocusSelect = onClick, ...rest }) => {
 
     const { focusControlProps, controlsIcons } = useFocusControls({
         scopeNodeId: name,
-        // focusOnMount: true,
+        focusOnMount,
         controls: [
             getSelectControl({
                 label: controlLabel,
-                action: (e) => {
-                    onClick?.(e);
+                action: (e, trigger) => {
+                    switch (trigger) {
+                        case 'mouse':
+                            onClick?.(e);
+                            break;
+                        default:
+                            onFocusSelect?.(e);
+                            break;
+                    }
                 },
             }),
         ],
@@ -30,7 +40,7 @@ export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, onClick,
         rest.ref,
     );
 
-    return <WithControlsIcons placement='out' icons={controlsIcons.open} display='inline-flex' h='fit-content'>
+    return <WithControlsIcons placement='out' icons={[ controlsIcons.open, ...controlIcons ]} display='inline-flex' h='fit-content'>
         <Button
             {...focusControlProps}
             {...rest}

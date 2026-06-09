@@ -1,11 +1,13 @@
-import type { StorageSearchStorage } from '../../routes/storage';
+import type { StorageSearchSelected, StorageSearchStorage } from '../../routes/storage';
 import { usePanel } from '../../ui-new/storage/storage-content/context/ui-panel-context';
+
+const defaultMainStorage: StorageSearchStorage = { saveId: null };
 
 export const useCurrentStorage = () => {
     const currentPanel = usePanel();
     const storageIndex = currentPanel === 'left' ? 0 : 1;
     const defaultStorage: StorageSearchStorage | undefined = currentPanel === 'left'
-        ? { saveId: null }
+        ? defaultMainStorage
         : undefined;
 
     const getStorage = (searchStorages: StorageSearchStorage[] | undefined) => {
@@ -19,6 +21,13 @@ export const useCurrentStorage = () => {
             return defaultStorage;
 
         return storage;
+    };
+
+    const getSelected = (searchSelected: StorageSearchSelected | undefined) => {
+        if (searchSelected?.storage !== storageIndex)
+            return;
+
+        return searchSelected;
     };
 
     // const getMainStorage = (searchStorages: SearchStorages | undefined) => {
@@ -66,6 +75,7 @@ export const useCurrentStorage = () => {
     return {
         storageIndex,
         getStorage,
+        getSelected,
         // getMainStorage,
         // getSaveStorage,
         setStorage,

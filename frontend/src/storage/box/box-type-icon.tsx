@@ -9,7 +9,6 @@ export const BoxTypeIcon: React.FC<{
 
     const typeLetter = boxType === BoxType.Box
         ? undefined
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         : Object.entries(BoxType).find(([ _, value ]) => value === boxType)?.[ 0 ][ 0 ]?.toUpperCase();
 
     return typeLetter && <span className={css({

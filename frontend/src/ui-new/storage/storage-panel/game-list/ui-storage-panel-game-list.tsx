@@ -29,7 +29,7 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
         data={data}
         onChange={onChange}
         renderTab={({ item, selected }) => <Tabs.Tab key={item.id} value={item.id} leftSection={<img src={item.imgSrc} height={16} />} py={4}>
-            <Text component={selected ? 'b' : undefined}>{item.label}</Text>
+            <Text component={selected ? 'b' : undefined} textWrap='nowrap'>{item.label}</Text>
         </Tabs.Tab>}
         renderExpanded={(data, { reduce }) => <Group
             p='md'

@@ -1,12 +1,12 @@
-import type { Preview, StoryContext } from '@storybook/react-vite';
-import { createMemoryHistory, createRootRoute, createRoute, createRouter, RouterProvider } from '@tanstack/react-router';
+import type { Meta, Preview, StoryContext } from '@storybook/react-vite';
+import { createMemoryHistory, createRootRoute, createRoute, createRouter, RouteComponent, RouterProvider } from '@tanstack/react-router';
 import { AppTheme } from '../src/ui-new/app-theme';
 import { FocusControlsProvider } from '../src/ui-new/interaction/focus-controls/provider/focus-controls-provider';
 import { initFocus } from '../src/ui-new/interaction/focus/init-focus';
 
 initFocus();
 
-function withRouter(Story: any, { parameters }: StoryContext) {
+function withRouter(Story: RouteComponent, { parameters }: StoryContext) {
   const { initialEntries = [ '/' ], initialIndex, routes = [ '/' ] } = parameters?.router || {};
 
   const rootRoute = createRootRoute();
@@ -30,12 +30,11 @@ function withRouter(Story: any, { parameters }: StoryContext) {
 };
 
 const preview: Preview = {
-
   parameters: {
     layout: 'fullscreen',
     options: {
       showPanel: false,
-      storySort: (a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }),
+      storySort: (a, b) => (a.title ?? '').localeCompare(b.title ?? '', undefined, { numeric: true }),
     },
     backgrounds: { disable: true },
 

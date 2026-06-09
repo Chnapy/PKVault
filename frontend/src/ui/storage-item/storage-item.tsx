@@ -1,6 +1,6 @@
 import React from "react";
 import { useDroppableValidation } from '../../storage/move/hooks/use-droppable-validation';
-import type { MoveContainerValue } from '../../storage/move/state/move-select-impl-provider';
+import type { MoveContainerValue } from '../../storage/move/move-container-fns';
 import { UIStorageItem, type UIStorageItemProps } from '../../ui-new/storage/storage-item/ui-storage-item';
 import { SpeciesImg, type SpeciesImgProps } from '../img/species-img';
 

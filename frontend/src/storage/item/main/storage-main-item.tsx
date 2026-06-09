@@ -1,14 +1,18 @@
 import React from 'react';
 import { usePkmLegalityMap } from '../../../data/hooks/use-pkm-legality';
-import { usePkmVariantSlotInfos } from '../../../data/hooks/use-pkm-variant-slot-infos';
+import { usePkmVariantIndex } from '../../../data/hooks/use-pkm-variant-index';
 import { Gender } from '../../../data/sdk/model';
 import { withErrorCatcher } from '../../../error/with-error-catcher';
 import { Route } from '../../../routes/storage';
 import { UIStorageItemIcons } from '../../../ui-new/storage/storage-item/ui-storage-item-icons';
 import { ItemImg } from '../../../ui/img/item-img';
 import { StorageItem, type StorageItemProps } from '../../../ui/storage-item/storage-item';
+import { pick } from '../../../util/pick';
+import { useSelectCallback } from '../../../util/use-select-callback';
 import { BankContext } from '../../bank/bank-context';
-import type { MoveContainerValue } from '../../move/state/move-select-impl-provider';
+import type { MoveContainerValue } from '../../move/move-container-fns';
+import { useCurrentStorage } from '../../panel/storage-panel-context';
+import { usePkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
 
 type StorageMainItemProps = Pick<StorageItemProps, 'nodeId'> & {
     pkmId: string;
@@ -17,13 +21,58 @@ type StorageMainItemProps = Pick<StorageItemProps, 'nodeId'> & {
 export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
     'item',
     React.memo(({ nodeId, pkmId }) => {
-        const selected = Route.useSearch({ select: search => search.selected });
+        const { storageIndex } = useCurrentStorage();
         const navigate = Route.useNavigate();
 
         const selectedBankBoxes = BankContext.useSelectedBankBoxes();
         const bank = selectedBankBoxes.data?.selectedBank.id;
 
-        const variantInfos = usePkmVariantSlotInfos(pkmId);
+        const variantsQuery = usePkmVariantIndex(
+            useSelectCallback(data => {
+                const baseVariant = data.data.byId[ pkmId ];
+                if (!baseVariant)
+                    return;
+
+                const variants = data.data.byBox[ baseVariant.boxId ]?.[ baseVariant.boxSlot ] ?? [];
+                const mainVariant = variants.find(v => v.isMain);
+                if (!mainVariant)
+                    return;
+
+                const attachedVariant = variants.find(variant => variant.attachedSaveId);
+
+                const canEvolve = variants.some(variant => variant.canEvolve);
+                const hasDisabledVariant = variants.some(variant => !variant.isEnabled);
+
+                return {
+                    variants: variants.map(pkm =>
+                        pick(pkm, [ 'id', 'context', 'isMain' ])
+                    ),
+                    mainVariant: mainVariant && pick(mainVariant, [
+                        'id', 'species', 'nickname', 'level', 'boxId', 'boxSlot', 'contextVersion', 'context',
+                        'form', 'gender', 'isEgg', 'isAlpha', 'isShiny', 'isShadow', 'isExternal', 'heldItem',
+                    ]),
+                    attachedVariant: attachedVariant && pick(attachedVariant, [ 'attachedSaveId', 'attachedSavePkmIdBase', 'dynamicChecksum' ]),
+                    canEvolve,
+                    hasDisabledVariant,
+                };
+            }, [ pkmId ])
+        );
+        const variantInfos = variantsQuery.data;
+
+        const canSynchronizeQuery = usePkmSaveIndex(variantInfos?.attachedVariant?.attachedSaveId ?? 0,
+            useSelectCallback(data => {
+                const attachedVariant = variantInfos?.attachedVariant;
+                if (!attachedVariant?.attachedSavePkmIdBase)
+                    return false;
+
+                const attachedSavePkms = data.data.byIdBase[ attachedVariant.attachedSavePkmIdBase ] ?? [];
+                if (attachedSavePkms.length === 0)
+                    return false;
+
+                return attachedSavePkms.every(pkm => pkm.dynamicChecksum !== attachedVariant.dynamicChecksum);
+            }, [ variantInfos?.attachedVariant ])
+        );
+        const canSynchronize = canSynchronizeQuery.data ?? false;
 
         const variantsIds = variantInfos?.variants.map(variant => variant.id) ?? [];
 
@@ -41,7 +90,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
             return null;
         }
 
-        const { mainVariant, variants, canDetach, canEvolveVariant, canSynchronize } = variantInfos;
+        const { mainVariant, variants, attachedVariant, hasDisabledVariant, canEvolve } = variantInfos;
 
         const { id, species, nickname, level, boxSlot, contextVersion, context, form, gender, isEgg, isAlpha, isShiny, isShadow, isExternal, heldItem } = mainVariant;
 
@@ -65,24 +114,35 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
                 isExternal={isExternal}
                 warning={pkmLegalityMap.some(value => !value.isValid)}
                 nbrVariants={variants.length}
-                hasDisabledVariant={variants.some(pk => !pk.isEnabled)}
-                attached={canDetach}
+                hasDisabledVariant={hasDisabledVariant}
+                attached={!!attachedVariant}
                 heldItem={heldItem > 0 && <ItemImg
                     version={contextVersion}
                     item={heldItem}
                 />}
-                canEvolve={!!canEvolveVariant}
+                canEvolve={canEvolve}
                 needSynchronize={canSynchronize}
             />}
             onClick={() => navigate({
-                search: {
-                    selected:
-                        selected && !selected.saveId && selected.id === pkmId
-                            ? undefined
-                            : {
-                                saveId: undefined,
-                                id: pkmId,
-                            },
+                search: search => {
+                    const alreadySelected = search.selected
+                        && !search.selected.saveId
+                        && search.selected.storage === storageIndex
+                        && variants.some(variant => variant.id === search.selected!.id);
+                    if (alreadySelected)
+                        return {
+                            selected: undefined,
+                        };
+
+                    const variant = variants.find(variant => variant.context === search.selectedContext) ?? mainVariant;
+
+                    return {
+                        selected: {
+                            storage: storageIndex,
+                            saveId: undefined,
+                            id: variant.id,
+                        },
+                    };
                 },
             })}
         />;

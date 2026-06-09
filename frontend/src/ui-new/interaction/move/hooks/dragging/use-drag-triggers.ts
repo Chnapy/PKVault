@@ -5,7 +5,7 @@ import { useMoveContext } from '../../context/use-move-context';
 import type { DraggingTrigger, MoveSource } from '../../state/move-state';
 import { useDragUtils, type PossibleEvent } from '../use-drag-utils';
 
-export const useDragTriggers = <C>(entityId: string, containerValue: C, isDragging: boolean) => {
+export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurrentTarget: boolean, isDragging: boolean) => {
     const ref = React.useRef<HTMLButtonElement>(null);
 
     const { getContainerHash, useMoveStore, useFilterStartDragIds, positionsRef, dragEndTimestampRef } = useMoveContext<C>();
@@ -22,13 +22,13 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
         ? s.ids
         : undefined);
 
-    const getAllIds = () => {
+    const getAllIds = React.useCallback(() => {
         const set = new Set<string>([ entityId ]);
         selectIds?.forEach(id => set.add(id));
         return set;
-    };
+    }, [ entityId, selectIds ]);
 
-    const filterStartDragIds = useFilterStartDragIds(containerValue, [ ...getAllIds() ]);
+    const filterStartDragIds = useFilterStartDragIds(containerValue, React.useMemo(() => [ ...getAllIds() ], [ getAllIds ]));
 
     const enabled = filterStartDragIds().size > 0;
 
@@ -37,6 +37,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
     };
 
     const startDrag = <P>(e: PossibleEvent | undefined, trigger: DraggingTrigger, position: Vector2, params: P): boolean => {
+        // console.log(trigger, position, params);
         // pointerUp often triggers click event with exact same timeStamp
         if (e?.timeStamp && dragEndTimestampRef.current
             && e.timeStamp - dragEndTimestampRef.current < 50
@@ -46,24 +47,28 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
         const source: MoveSource = {
             containerId: containerHash,
             sourceId: entityId,
-            ids: getAllIds(),
+            ids: filterStartDragIds(params),
             params,
         };
-
-        source.ids = filterStartDragIds(params);
 
         if (source.ids.size === 0) {
             return false;
         }
 
-        const bounds = ref.current?.getBoundingClientRect();
+        if (isCurrentTarget && ref.current) {
+            const bounds = ref.current.getBoundingClientRect();
 
-        positionsRef.current.target = [
-            bounds?.left ?? 0,
-            bounds?.top ?? 0,
-        ];
+            positionsRef.current.target = [
+                bounds.left,
+                bounds.top,
+            ];
+        } else {
+            positionsRef.current.target = [ 0, 0 ];
+        }
 
         updateDragPosition(position);
+
+        // console.log(JSON.stringify(positionsRef.current, undefined, 2))
 
         dispatch({
             type: 'START_DRAG',
@@ -127,12 +132,18 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
     const useDragFn = <P>(params?: P) => {
         const filteredIds = useFilterStartDragIds(
             containerValue,
-            [ ...getAllIds() ]
+            React.useMemo(() => [ ...getAllIds() ], [])
         )(params);
 
         const enabled = filteredIds.size > 0;
 
-        const startDragByClick = (e: PossibleEvent | undefined, position: Vector2) => {
+        const startDragByClick = (e: PossibleEvent | undefined) => {
+            if (!ref.current) return;
+
+            e?.stopPropagation?.();
+
+            const { left, top } = ref.current.getBoundingClientRect();
+            const position: Vector2 = [ left, top ];
 
             positionsRef.current.pointerInitial = position;
             positionsRef.current.pointer = position;
@@ -140,11 +151,18 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
             return startDrag(e, 'click', position, params);
         };
 
-        const startDragByFocus = (e: PossibleEvent | undefined, position: Vector2) => startDrag(e, 'focus', position, params);
-
-        const toggleDragByClick = (e: PossibleEvent | undefined) => {
+        const startDragByFocus = (e: PossibleEvent | undefined) => {
             if (!ref.current) return;
 
+            e?.stopPropagation?.();
+
+            const { left, top } = ref.current.getBoundingClientRect();
+            const position: Vector2 = [ left, top ];
+
+            return startDrag(e, 'focus', position, params);
+        };
+
+        const toggleDragByClick = (e: PossibleEvent | undefined) => {
             e?.stopPropagation?.();
 
             // console.log('drag - click')
@@ -154,15 +172,11 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
             if (state.status === 'dragging') {
                 dragUtils.stopDrag(e);
             } else {
-                const { left, top } = ref.current.getBoundingClientRect();
-
-                startDragByClick(e, [ left, top ]);
+                startDragByClick(e);
             }
         };
 
         const toggleDragByFocus = (e: PossibleEvent | undefined) => {
-            if (!ref.current) return;
-
             e?.stopPropagation?.();
 
             // console.log('drag - focus')
@@ -172,9 +186,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
             if (state.status === 'dragging') {
                 dragUtils.stopDrag(e);
             } else {
-                const { left, top } = ref.current.getBoundingClientRect();
-
-                startDragByFocus(e, [ left, top ]);
+                startDragByFocus(e);
             }
         };
 
@@ -193,6 +205,17 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isDraggi
             ...listeners,
         };
     };
+
+    React.useEffect(() => {
+        if (isDragging && ref.current && !positionsRef.current.target[ 0 ] && !positionsRef.current.target[ 1 ]) {
+            const bounds = ref.current.getBoundingClientRect();
+
+            positionsRef.current.target = [
+                bounds.left,
+                bounds.top,
+            ];
+        }
+    }, [ isDragging, positionsRef ]);
 
     return {
         ref,

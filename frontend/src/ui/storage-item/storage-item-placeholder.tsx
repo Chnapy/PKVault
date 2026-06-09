@@ -1,7 +1,7 @@
 import React from "react";
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useDroppableValidation } from '../../storage/move/hooks/use-droppable-validation';
-import type { MoveContainerValue } from '../../storage/move/state/move-select-impl-provider';
+import type { MoveContainerValue } from '../../storage/move/move-container-fns';
 import { UIStorageItemPlaceholder, type UIStorageItemPlaceholderProps } from '../../ui-new/storage/storage-item/placeholder/ui-storage-item-placeholder';
 
 export type StorageItemPlaceholderProps = Pick<UIStorageItemPlaceholderProps, 'nodeId' | 'slot'>

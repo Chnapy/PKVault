@@ -1,48 +1,16 @@
 import type { PkmSaveIndexes } from '../../../../data/hooks/use-pkm-save-index';
 import type { PkmVariantIndexes } from '../../../../data/hooks/use-pkm-variant-index';
-import type { BoxDTO, PkmSaveDTO, PkmVariantDTO, SaveInfosDTO } from '../../../../data/sdk/model';
+import type { BoxDTO, SaveInfosDTO } from '../../../../data/sdk/model';
+import type { ValidateMainToMainSlot } from '../rules/validate-main-to-main';
+import type { ValidateMainToSaveSlot } from '../rules/validate-main-to-save';
+import type { ValidateSaveToMainSlot } from '../rules/validate-save-to-main';
+import type { ValidateSaveToSaveSlot } from '../rules/validate-save-to-save';
 
 export type SlotInfosSlot =
-    | {
-        direction: 'main-to-main';
-        sourceType: 'main';
-        sourcePkm: PkmVariantDTO;
-        sourceBox: BoxDTO;
-        targetBox: BoxDTO;
-        targetSlot: number;
-        targetPkm?: PkmVariantDTO;
-    }
-    | {
-        direction: 'main-to-save';
-        sourceType: 'main';
-        sourcePkm: PkmVariantDTO;
-        sourceBox: BoxDTO;
-        targetSave: SaveInfosDTO;
-        targetBox: BoxDTO;
-        targetSlot: number;
-        targetPkm?: PkmSaveDTO;
-    }
-    | {
-        direction: 'save-to-main';
-        sourceType: 'save';
-        sourcePkm: PkmSaveDTO;
-        sourceSave: SaveInfosDTO;
-        sourceBox: BoxDTO;
-        targetBox: BoxDTO;
-        targetSlot: number;
-        targetPkm?: PkmVariantDTO;
-    }
-    | {
-        direction: 'save-to-save';
-        sourceType: 'save';
-        sourcePkm: PkmSaveDTO;
-        sourceSave: SaveInfosDTO;
-        sourceBox: BoxDTO;
-        targetSave: SaveInfosDTO;
-        targetBox: BoxDTO;
-        targetSlot: number;
-        targetPkm?: PkmSaveDTO;
-    };
+    | ValidateMainToMainSlot
+    | ValidateMainToSaveSlot
+    | ValidateSaveToMainSlot
+    | ValidateSaveToSaveSlot;
 
 type MoveDirectionSlot = SlotInfosSlot[ 'direction' ];
 
@@ -53,26 +21,21 @@ export const buildSlotInfosSlot = (
     sourceId: string,
     sourceSaveId: number | null | undefined,
     targetSaveId: number | null | undefined,
-    getPkmVariantIndexes: () => PkmVariantIndexes | undefined,
-    getSourcePkmSaveIndexes: () => PkmSaveIndexes | undefined,
-    getTargetPkmSaveIndexes: () => PkmSaveIndexes | undefined,
-    getSavesById: () => Record<number, SaveInfosDTO>,
-    getSourceBoxes: () => Record<number, BoxDTO>,
-    getTargetBoxes: () => Record<number, BoxDTO>,
+    pkmVariantIndexes: PkmVariantIndexes | undefined,
+    sourcePkmSaveIndexes: PkmSaveIndexes | undefined,
+    targetPkmSaveIndexes: PkmSaveIndexes | undefined,
+    savesById: Record<number, SaveInfosDTO>,
+    sourceBoxes: Record<number, BoxDTO>,
+    targetBoxes: Record<number, BoxDTO>,
 ): SlotInfosSlot[] => {
     const direction = getMoveDirection(sourceSaveId, targetSaveId);
 
     switch (direction) {
         case 'main-to-main': {
-            const pkmVariantIndexes = getPkmVariantIndexes();
-
             const sourcePkm = pkmVariantIndexes?.byId[ sourceId ];
             if (!sourcePkm) {
                 return [];
             }
-            
-            const sourceBoxes = getSourceBoxes();
-            const targetBoxes = getTargetBoxes();
 
             const sourceBox = sourceBoxes[ sourcePkm.boxId ];
 
@@ -88,7 +51,6 @@ export const buildSlotInfosSlot = (
 
             return normalizedTargetPkmMains.map(targetPkm => ({
                 direction: 'main-to-main',
-                sourceType: 'main',
                 sourcePkm,
                 sourceBox,
                 targetBox,
@@ -97,17 +59,10 @@ export const buildSlotInfosSlot = (
             }));
         };
         case 'main-to-save': {
-            const pkmVariantIndexes = getPkmVariantIndexes();
-
             const sourcePkm = pkmVariantIndexes?.byId[ sourceId ];
             if (!sourcePkm) {
                 return [];
             }
-            
-            const sourceBoxes = getSourceBoxes();
-            const targetBoxes = getTargetBoxes();
-            const savesById = getSavesById();
-            const targetPkmSaveIndexes = getTargetPkmSaveIndexes();
 
             const sourceBox = sourceBoxes[ sourcePkm.boxId ];
 
@@ -122,7 +77,6 @@ export const buildSlotInfosSlot = (
 
             return [ {
                 direction: 'main-to-save',
-                sourceType: 'main',
                 sourcePkm,
                 sourceBox,
                 targetSave,
@@ -132,16 +86,10 @@ export const buildSlotInfosSlot = (
             } ];
         };
         case 'save-to-main': {
-            const sourcePkmSaveIndexes = getSourcePkmSaveIndexes();
-
             const sourcePkm = sourcePkmSaveIndexes?.byId[ sourceId ];
             if (!sourcePkm || !sourceSaveId) {
                 return [];
             }
-            
-            const sourceBoxes = getSourceBoxes();
-            const targetBoxes = getTargetBoxes();
-            const savesById = getSavesById();
 
             const sourceBox = sourceBoxes[ sourcePkm.boxId ];
             const sourceSave = savesById[ sourceSaveId ];
@@ -152,15 +100,12 @@ export const buildSlotInfosSlot = (
             if (!sourceBox || !sourceSave || !targetBox) {
                 return [];
             }
-            
-            const pkmVariantIndexes = getPkmVariantIndexes();
 
             const targetPkmVariants = pkmVariantIndexes?.byBox[ dropBoxId ]?.[ targetSlot ] ?? [];
             const normalizedTargetPkmMains = targetPkmVariants.length === 0 ? [ undefined ] : targetPkmVariants;
 
             return normalizedTargetPkmMains.map(targetPkm => ({
                 direction: 'save-to-main',
-                sourceType: 'save',
                 sourceSave,
                 sourcePkm,
                 sourceBox,
@@ -170,17 +115,10 @@ export const buildSlotInfosSlot = (
             }));
         };
         case 'save-to-save': {
-            const sourcePkmSaveIndexes = getSourcePkmSaveIndexes();
-
             const sourcePkm = sourcePkmSaveIndexes?.byId[ sourceId ];
             if (!sourcePkm || !sourceSaveId || !targetSaveId) {
                 return [];
             }
-            
-            const sourceBoxes = getSourceBoxes();
-            const targetBoxes = getTargetBoxes();
-            const savesById = getSavesById();
-            const targetPkmSaveIndexes = getTargetPkmSaveIndexes();
 
             const sourceBox = sourceBoxes[ sourcePkm.boxId ];
             const sourceSave = savesById[ sourceSaveId ];
@@ -196,14 +134,13 @@ export const buildSlotInfosSlot = (
 
             return [ {
                 direction: 'save-to-save',
-                sourceType: 'save',
                 sourceSave,
                 sourcePkm,
                 sourceBox,
                 targetSave,
                 targetBox,
-                targetSlot,
                 targetPkm,
+                targetSlot,
             } ];
         };
     }

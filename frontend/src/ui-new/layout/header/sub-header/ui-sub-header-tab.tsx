@@ -34,7 +34,7 @@ export const UISubHeaderTab: React.FC<UISubHeaderTabProps> = ({ to, search, id, 
         pos='relative'
         {...rest}
     >
-        {children ?? <Text component='div' display='flex' style={{ alignItems: 'center' }}>
+        {children ?? <Text component='div' display='flex' textWrap='nowrap' style={{ alignItems: 'center' }}>
             {label}
         </Text>}
 

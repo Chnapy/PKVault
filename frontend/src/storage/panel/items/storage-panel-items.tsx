@@ -4,6 +4,7 @@ import { useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
 import { Route } from '../../../routes/storage';
 import { StorageItemPlaceholder } from '../../../ui/storage-item/storage-item-placeholder';
 import { filterIsDefined } from '../../../util/filter-is-defined';
+import { useSelectCallback } from '../../../util/use-select-callback';
 import { BankContext } from '../../bank/bank-context';
 import { StorageMainItem } from '../../item/main/storage-main-item';
 import { StorageSaveItem } from '../../item/save/storage-save-item';
@@ -25,7 +26,7 @@ export const StoragePanelItems: React.FC = () => {
 
     const pkmsQuery = usePkmIndex(
         saveId,
-        React.useCallback(data => {
+        useSelectCallback(data => {
             const pkms = data.data.byBox[ boxId ] ?? {};
 
             return new Array(selectedBox?.slotCount ?? 0).fill(0).map((_, i) => {
@@ -39,7 +40,7 @@ export const StoragePanelItems: React.FC = () => {
                     : variants.find(variant => 'isMain' in variant && variant.isMain) ?? firstVariant;
 
                 return mainVariant.id;
-            }).join('---');
+            });
         }, [ boxId, selectedBox?.slotCount ]),
     );
 
@@ -47,9 +48,9 @@ export const StoragePanelItems: React.FC = () => {
     if (isLoading)
         return null;
 
-    const pkmIds = pkmsQuery.data?.split('---');
+    const pkmIds = pkmsQuery.data ?? [];
 
-    return pkmIds?.map((id, i) => {
+    return pkmIds.map((id, i) => {
         const nodeId = `storage-item-${storageIndex}-${i}`;
 
         if (!id)

@@ -23,9 +23,7 @@
     "**/*.sass",
     "**/*.less",
     "frontend/node_modules/@mantine/core/styles.css",
-    "frontend/variables.gen.css",
+    "frontend/variables.gen.css"
   ],
-  "cssVariables.languages": [
-    "css",
-  ],
+  "cssVariables.languages": ["css"]
 }

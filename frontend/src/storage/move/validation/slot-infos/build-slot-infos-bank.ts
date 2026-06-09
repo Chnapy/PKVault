@@ -1,29 +1,12 @@
 import type { PkmSaveIndexes } from '../../../../data/hooks/use-pkm-save-index';
 import type { PkmVariantIndexes } from '../../../../data/hooks/use-pkm-variant-index';
-import type { BankDTO, BoxDTO, PkmSaveDTO, PkmVariantDTO, SaveInfosDTO } from '../../../../data/sdk/model';
+import type { BankDTO, BoxDTO, SaveInfosDTO } from '../../../../data/sdk/model';
+import type { ValidateMainToMainBank } from '../rules/validate-main-to-main';
+import type { ValidateSaveToMainBank } from '../rules/validate-save-to-main';
 
 export type SlotInfosBank =
-    | {
-        direction: 'main-to-bank';
-        sourceType: 'main';
-        sourcePkm: PkmVariantDTO;
-        sourceBox: BoxDTO;
-        targetBank: BankDTO;
-        targetBox?: undefined;
-        targetSlot?: undefined;
-        targetPkm?: undefined;
-    }
-    | {
-        direction: 'save-to-bank';
-        sourceType: 'save';
-        sourcePkm: PkmSaveDTO;
-        sourceSave: SaveInfosDTO;
-        sourceBox: BoxDTO;
-        targetBank: BankDTO;
-        targetBox?: undefined;
-        targetSlot?: undefined;
-        targetPkm?: undefined;
-    };
+    | ValidateMainToMainBank
+    | ValidateSaveToMainBank;
 
 type MoveDirectionBank = SlotInfosBank[ 'direction' ];
 
@@ -31,7 +14,7 @@ export const buildSlotInfosBank = (
     dropBankId: string,
     sourceId: string,
     sourceSaveId: number | undefined | null,
-    pkmVariantIndexes: PkmVariantIndexes,
+    pkmVariantIndexes: PkmVariantIndexes | undefined,
     sourcePkmSaveIndexes: PkmSaveIndexes | undefined,
     savesById: Record<number, SaveInfosDTO>,
     sourceBoxes: Record<number, BoxDTO>,
@@ -41,7 +24,7 @@ export const buildSlotInfosBank = (
 
     switch (direction) {
         case 'main-to-bank': {
-            const sourcePkm = pkmVariantIndexes.byId[ sourceId ];
+            const sourcePkm = pkmVariantIndexes?.byId[ sourceId ];
             if (!sourcePkm) {
                 return [];
             }
@@ -55,7 +38,6 @@ export const buildSlotInfosBank = (
 
             return [ {
                 direction: 'main-to-bank',
-                sourceType: 'main',
                 sourcePkm,
                 sourceBox,
                 targetBank,
@@ -77,7 +59,6 @@ export const buildSlotInfosBank = (
 
             return [ {
                 direction: 'save-to-bank',
-                sourceType: 'save',
                 sourceSave,
                 sourcePkm,
                 sourceBox,

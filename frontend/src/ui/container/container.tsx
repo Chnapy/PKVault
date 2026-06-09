@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { css, cx } from "@emotion/css";
 import React from "react";
 import { switchUtil } from "../../util/switch-util";

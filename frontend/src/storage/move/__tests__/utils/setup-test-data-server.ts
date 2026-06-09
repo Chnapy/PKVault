@@ -1,9 +1,9 @@
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll } from 'vitest';
-import { BoxType, type BankDTO, type BoxDTO, type PkmSaveDTO, type PkmVariantDTO, type SaveInfosDTO } from '../../../data/sdk/model';
-import { getSaveInfosGetAllUrl, type saveInfosGetAllResponse200ApplicationJson } from '../../../data/sdk/save-infos/save-infos.gen';
-import { getStorageGetBoxesUrl, getStorageGetMainBanksUrl, getStorageGetMainPkmVariantsUrl, getStorageGetSavePkmsUrl, getStorageMovePkmBankUrl, getStorageMovePkmUrl, type storageGetBoxesResponse200ApplicationJson, type storageGetMainBanksResponse200ApplicationJson, type storageGetMainPkmVariantsResponse200ApplicationJson, type storageGetSavePkmsResponse200ApplicationJson } from '../../../data/sdk/storage/storage.gen';
+import { BoxType, type BankDTO, type BoxDTO, type PkmSaveDTO, type PkmVariantDTO, type SaveInfosDTO } from '../../../../data/sdk/model';
+import { getSaveInfosGetAllUrl, type saveInfosGetAllResponse200ApplicationJson } from '../../../../data/sdk/save-infos/save-infos.gen';
+import { getStorageGetBoxesUrl, getStorageGetMainBanksUrl, getStorageGetMainPkmVariantsUrl, getStorageGetSavePkmsUrl, getStorageMovePkmBankUrl, getStorageMovePkmUrl, type storageGetBoxesResponse200ApplicationJson, type storageGetMainBanksResponse200ApplicationJson, type storageGetMainPkmVariantsResponse200ApplicationJson, type storageGetSavePkmsResponse200ApplicationJson } from '../../../../data/sdk/storage/storage.gen';
 
 export const setupTestDataServer = () => {
     const createSaveInfos = (data: Partial<SaveInfosDTO>): SaveInfosDTO => ({

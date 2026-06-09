@@ -11,7 +11,6 @@ export const BoxName: React.FC<{
 
     const typeLetter = boxType === BoxType.Box
         ? undefined
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         : Object.entries(BoxType).find(([ _, value ]) => value === boxType)?.[ 0 ][ 0 ]?.toUpperCase();
 
     const hasDetails = !!typeLetter || !!icon;

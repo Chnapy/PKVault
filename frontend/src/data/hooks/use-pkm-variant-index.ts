@@ -47,7 +47,7 @@ export type PkmVariantIndexQueryData = {
     headers: Headers;
 };
 
-export const getPkmVariantIndexOptions = <D>(options?: Omit<UseQueryOptions<PkmVariantIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>) => {
+export const getPkmVariantIndexOptions = <D = PkmVariantIndexQueryData>(options?: Omit<UseQueryOptions<PkmVariantIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>) => {
     const queryKey = getStorageGetMainPkmVariantsQueryKey();
 
     return queryOptions({
@@ -67,8 +67,14 @@ export const getPkmVariantIndexOptions = <D>(options?: Omit<UseQueryOptions<PkmV
 /**
  * Fetch save pkms with caching & indexing.
  */
-export const usePkmVariantIndex = (options?: Omit<UseQueryOptions<PkmVariantIndexQueryData, Error, PkmVariantIndexQueryData>, 'queryKey' | 'queryFn'>) => {
-    return useQuery(getPkmVariantIndexOptions(options));
+export const usePkmVariantIndex = <D = PkmVariantIndexQueryData>(
+    selectFn?: (data: PkmVariantIndexQueryData) => D,
+    options?: Omit<UseQueryOptions<PkmVariantIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>
+) => {
+    return useQuery({
+        select: selectFn,
+        ...getPkmVariantIndexOptions(options),
+    });
 };
 
 export const getCachedPkmVariantIndex = (client: QueryClient) => {

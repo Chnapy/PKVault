@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { renderHookWithWrapper } from '../__tests__/render-hook-with-wrapper';
+import { renderHookWithWrapper } from './utils/render-hook-with-wrapper';
 import { useDragSubmitting } from '../../../ui-new/interaction/move/hooks/use-drag-submitting';
-import { containerFns, type MoveContainerValue } from '../state/move-select-impl-provider';
+import { containerFns, type MoveContainerValue } from '../move-container-fns';
 
 const useMoveLoading = (saveId: number | null, boxId: number, boxSlot: number, pkmId?: string) => {
     return useDragSubmitting<MoveContainerValue>(

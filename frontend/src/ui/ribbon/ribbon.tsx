@@ -1,6 +1,6 @@
-import { css } from '@emotion/css';
 import type React from 'react';
 import { useStaticData } from '../../hooks/use-static-data';
+import { UIRibbon } from '../../ui-new/storage/storage-details/content/cosmetic/ui-ribbon';
 
 type RibbonProps = {
     name: string;
@@ -10,11 +10,13 @@ type RibbonProps = {
 export const Ribbon: React.FC<RibbonProps> = ({ name, count }) => {
     const staticData = useStaticData();
 
-    return <img
-        className={css({
-            maxHeight: 30,
-        })}
-        src={`/imgs/ribbons/${staticData.ribbons[ name ]?.spriteKey}.png`}
-        title={staticData.ribbons[ name ]?.name + (count > 1 ? `(${count})` : '')}
+    const ribbon = staticData.ribbons[ name ];
+    if (!ribbon)
+        return null;
+
+    return <UIRibbon
+        spriteKey={ribbon.spriteKey}
+        name={ribbon.name}
+        count={count}
     />;
 };

@@ -1,51 +1,48 @@
-import { css, cx } from '@emotion/css';
 import type React from 'react';
-import { GameVersion } from '../../data/sdk/model';
+import { usePkmIndex } from '../../data/hooks/use-pkm-index';
+import { getEntityContextGenerationName } from '../../data/util/get-entity-context-generation-name';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
-import { Button, type ButtonProps } from '../button/button';
-import { Icon } from '../icon/icon';
-import { GameImg } from '../img/game-img';
-import { theme } from '../theme';
+import type { UIExpandableTabsData } from '../../ui-new/expandable-tabs/ui-expandable-tabs';
+import { UIDetailsSaveTab } from '../../ui-new/storage/storage-details/saves/ui-details-save-tab';
+import { pick } from '../../util/pick';
+import { useSelectCallback } from '../../util/use-select-callback';
 
-export type DetailsTabProps = {
-    isEnabled?: boolean;
-    contextVersion: GameVersion | null;    // null means pkvault
-    otName: string;
-    original?: boolean;
+export type DetailsTabProps = UIExpandableTabsData & {
+    saveId: number | null;
+    selected?: boolean;
     warning?: boolean;
-} & ButtonProps;
+};
 
-export const DetailsTab: React.FC<DetailsTabProps> = ({ isEnabled = true, contextVersion, otName, original, warning, disabled, ...rest }) => {
+export const DetailsTab: React.FC<DetailsTabProps> = ({ id, saveId, warning, selected = false }) => {
+    const pkmIndexQuery = usePkmIndex(saveId,
+        useSelectCallback(data => {
+            const pkm = data.data.byId[ id ];
+            if (!pkm)
+                return;
+
+            return {
+                ...pick(pkm, [ 'isEnabled', 'context', 'contextVersion' ]),
+                isMain: 'isMain' in pkm ? pkm.isMain : true,
+            };
+        }, [ id ])
+    );
+
+    const pkmIndex = pkmIndexQuery?.data;
+
+    const isEnabled = pkmIndex?.isEnabled ?? true;
+    const contextVersion = pkmIndex?.isEnabled ? pkmIndex.contextVersion : null;
+    const contextName = pkmIndex && getEntityContextGenerationName(pkmIndex.context, true);
+
     const gameInfos = getGameInfos(contextVersion, isEnabled);
 
-    return <Button
-        bgColor={gameInfos.color}
-        {...rest}
-        className={cx(css({
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-            borderBottom: 'none',
-            ...disabled ? {
-                backgroundColor: gameInfos.color,
-                pointerEvents: 'none',
-            } : undefined,
-        }), rest.className)}
-    >
-        <GameImg version={contextVersion} size='1lh' />
-        <span className={cx({
-            [ css({ borderBottom: '1px solid currentColor' }) ]: original
-        })}>{otName}</span> {warning && isEnabled && <div className={css({
-            width: '1lh',
-            borderRadius: 99,
-            color: theme.text.light,
-            backgroundColor: theme.bg.yellow,
-        })}>
-            <Icon name='exclaimation' forButton />
-        </div>}
-
-        {!isEnabled && <span className={css({ display: 'flex', color: theme.text.red })}>
-            <Icon name='folder' solid forButton />
-            <Icon name='exclaimation' solid forButton />
-        </span>}
-    </Button>;
+    return <UIDetailsSaveTab
+        id={id}
+        version={contextVersion}
+        color={gameInfos.color}
+        selected={selected}
+        label={contextName}
+        isEnabled={isEnabled}
+        isMain={!!pkmIndex && pkmIndex.isMain}
+        warning={warning}
+    />;
 };

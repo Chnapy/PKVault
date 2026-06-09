@@ -138,6 +138,7 @@ export const Primary: Story = {
                         'Fire',
                     ]}
                     onChange={console.log}
+                    pillsNoWrap
                     renderPill={({ value = '' }) => value[ 0 ]}
                     style={{ flexGrow: 1 }}
                 />
@@ -152,6 +153,7 @@ export const Primary: Story = {
                         'Pokemon Blue',
                     ]}
                     onChange={console.log}
+                    pillsNoWrap
                     renderPill={({ value = '' }) => value[ 0 ]}
                 // size='xs'
                 // w={140}
@@ -166,6 +168,7 @@ export const Primary: Story = {
                         'Generation 2',
                     ]}
                     onChange={console.log}
+                    pillsNoWrap
                     renderPill={({ value = '' }) => value[ 0 ]}
                 // size='xs'
                 // w={140}

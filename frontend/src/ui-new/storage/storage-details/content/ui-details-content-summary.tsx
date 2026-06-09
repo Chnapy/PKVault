@@ -6,7 +6,7 @@ export type UIDetailsContentSummaryProps = {
     heldItem?: React.ReactNode;
     nature?: string;
     ability?: string;
-    pid?: string;
+    pid?: number;
 };
 
 export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = ({

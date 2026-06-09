@@ -4,7 +4,7 @@ import type { GameVersion } from '../../data/sdk/model';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import classes from './ui-game-img.module.css';
 
-type UIGameImgProps = {
+export type UIGameImgProps = {
     version: GameVersion | null;
     name?: string;
     size?: '1lh';

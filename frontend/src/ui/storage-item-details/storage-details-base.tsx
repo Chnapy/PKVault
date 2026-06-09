@@ -4,7 +4,6 @@ import { GameVersion, Gender as GenderType, type PkmLegalityDTO, type PkmSaveDTO
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { Route } from '../../routes/storage';
-import { MoveContext } from '../../storage/move/context/move-context';
 import { useTranslate } from '../../translate/i18n';
 import { Button } from '../button/button';
 import { ButtonWithConfirm } from '../button/button-with-confirm';
@@ -51,7 +50,7 @@ export const StorageDetailsBase: React.FC<StorageDetailsBaseProps> = ({ filepath
     const { t } = useTranslate();
 
     const formContext = StorageDetailsForm.useContext();
-    const isMoveDragging = MoveContext.useValue().state.status === 'dragging';
+    const isMoveDragging = false;//MoveContext.useValue().state.status === 'dragging';
 
     const expanded = Route.useSearch({
         select: search => {

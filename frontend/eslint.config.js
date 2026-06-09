@@ -7,7 +7,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
-  globalIgnores(["dist", "src/data/sdk"]),
+  globalIgnores(["dist", "src/data/sdk", "coverage", "storybook-static"]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
@@ -22,10 +22,16 @@ export default defineConfig([
     },
     rules: {
       // TODO not critical rules, but should be fixed
-      'react-hooks/set-state-in-effect': ['warn'],
-      'react-refresh/only-export-components': ['warn'],
+      "react-hooks/set-state-in-effect": ["warn"],
+      "react-refresh/only-export-components": ["warn"],
+      "@typescript-eslint/no-unused-vars": ["off"],
+    },
+    settings: {
+      "react-hooks": {
+        additionalEffectHooks: "(useMyEffect|useSelectCallback)",
+      },
     },
   },
   // @see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-  ...storybook.configs["flat/recommended"]
+  ...storybook.configs["flat/recommended"],
 ]);

@@ -1,7 +1,7 @@
 import type { MoveAction, MoveSource, MoveState } from './move-state';
 
 export const moveReducer = <P>(state: MoveState<P>, action: MoveAction): MoveState<P> => {
-    // console.log(action.type)
+    // console.log(action.type, action)
     switch (action.type) {
         case 'START_DRAG':
             if (state.status !== 'idle') return state;

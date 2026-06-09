@@ -1,20 +1,14 @@
 import type React from 'react';
 import { useStaticData } from '../../hooks/use-static-data';
-import { TypeItemBase, type TypeItemBaseProps } from './type-item-base';
-import { css } from '@emotion/css';
+import { UITypeItem, type UITypeItemProps } from '../../ui-new/type-item/ui-type-item';
 
-export type TypeItemProps = Pick<TypeItemBaseProps, 'type' | 'tera'>;
+export type TypeItemProps = Pick<UITypeItemProps, 'type'>;
 
-export const TypeItem: React.FC<TypeItemProps> = ({ type, tera }) => {
+export const TypeItem: React.FC<TypeItemProps> = ({ type }) => {
     const { types } = useStaticData();
 
-    return <TypeItemBase
+    return <UITypeItem
         type={type}
         name={types[ type ]?.name ?? ''}
-        tera={tera}
-        className={css({
-            display: 'inline-block',
-            verticalAlign: 'top'
-        })}
     />;
 };
