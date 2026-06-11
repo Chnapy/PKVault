@@ -8,10 +8,11 @@ import { getDropPositions } from '../../ui-new/interaction/move/hooks/get-drop-p
 import { SelectProvider, type SelectProviderProps } from '../../ui-new/interaction/select/context/select-provider';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { useCanMove } from './hooks/use-can-move';
+import { useDroppableValidation } from './hooks/use-droppable-validation';
 import { type MoveContainerValue, type MoveParams, containerFns } from './move-container-fns';
 
 const useFilterStartDragIds: MoveProviderProps<MoveContainerValue, MoveParams>[ 'useFilterStartDragIds' ] = (container, ids) => {
-    const canMoveFn = useCanMove(container.saveId, ids);
+    const canMoveFn = useCanMove(container.saveId ?? null, ids);
 
     return params => canMoveFn(params?.attached ?? false);
 };
@@ -25,7 +26,7 @@ const useTargetAllPositions = (): MoveProviderProps<MoveContainerValue, MovePara
 
         const sourceContainer = containerFns.getContainerValue(source.containerId);
 
-        const sourcePkmIndex = getCachedPkmIndex(queryClient, sourceContainer.saveId)?.data;
+        const sourcePkmIndex = getCachedPkmIndex(queryClient, sourceContainer.saveId ?? null)?.data;
 
         const sourceIds = Array.from(source.ids);
 
@@ -103,13 +104,14 @@ export type MoveSelectImplProviderProps = {
     selectCtx?: SelectProviderProps<MoveContainerValue>[ 'initialValue' ];
     moveCtx?: Partial<Pick<
         MoveProviderProps<MoveContainerValue, MoveParams>,
-        'initialState' | 'useFilterStartDragIds' | 'getTargetAllPositions' | 'onDrop'
+        'initialState' | 'useFilterStartDragIds' | 'getTargetAllPositions' | 'dragStartComputeSlotStates' | 'onDrop'
     >>;
     children: React.ReactNode;
 };
 
 export const MoveSelectImplProvider: React.FC<MoveSelectImplProviderProps> = ({ selectCtx, moveCtx, children }) => {
     const getTargetAllPositions = useTargetAllPositions();
+    const dragStartComputeSlotStates = useDroppableValidation().validate;
     const onDrop = useOnDrop();
 
     return <SelectProvider<MoveContainerValue>
@@ -121,6 +123,7 @@ export const MoveSelectImplProvider: React.FC<MoveSelectImplProviderProps> = ({ 
             moveContainerId='move-container'
             useFilterStartDragIds={useFilterStartDragIds}
             getTargetAllPositions={getTargetAllPositions}
+            dragStartComputeSlotStates={dragStartComputeSlotStates}
             onDrop={onDrop}
             {...moveCtx}
         >

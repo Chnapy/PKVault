@@ -3,7 +3,7 @@ import React from 'react';
 import type { MoveSource, MoveState, MoveStateLoading } from '../state/move-state';
 import { createMoveStore, moveContext, type MoveContext, type MovePositions, type MoveTargetInput, type MoveTargetOutput } from './move-context';
 
-export type MoveProviderProps<C, P> = Pick<MoveContext<C, P>, 'moveContainerId' | 'getContainerHash' | 'getContainerValue' | 'useFilterStartDragIds'> & {
+export type MoveProviderProps<C, P> = Pick<MoveContext<C, P>, 'moveContainerId' | 'getContainerHash' | 'getContainerValue' | 'useFilterStartDragIds' | 'dragStartComputeSlotStates'> & {
     initialState?: MoveState<P>;
     getTargetAllPositions: (source: MoveSource<P>, target: MoveTargetInput<C>) => Record<string, number>;
     onDrop: (source: MoveSource<P>, target: MoveTargetOutput<C>) => Promise<unknown>;
@@ -12,7 +12,7 @@ export type MoveProviderProps<C, P> = Pick<MoveContext<C, P>, 'moveContainerId' 
 
 export const MoveProvider = function <C, P>({
     moveContainerId, getContainerHash, getContainerValue, initialState,
-    onDrop: onDropSuccess, getTargetAllPositions, useFilterStartDragIds,
+    onDrop: onDropSuccess, getTargetAllPositions, useFilterStartDragIds, dragStartComputeSlotStates,
     children
 }: MoveProviderProps<C, P>) {
     const positionsRef = React.useRef<MovePositions>({
@@ -71,6 +71,7 @@ export const MoveProvider = function <C, P>({
             positionsRef,
             dragEndTimestampRef,
             useMoveStore,
+            dragStartComputeSlotStates,
             drop,
             useFilterStartDragIds,
         };

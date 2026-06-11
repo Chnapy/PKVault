@@ -40,6 +40,10 @@ const meta = {
                         moveContainerId='move-container'
                         useFilterStartDragIds={(container, sourceIds) => () => new Set(sourceIds)}
                         getTargetAllPositions={() => ({})}
+                        dragStartComputeSlotStates={source => ({
+                            rootItems: {},
+                            items: {},
+                        })}
                         onDrop={onDrop}
                     >
                         <Story />

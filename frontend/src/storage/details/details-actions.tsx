@@ -16,7 +16,6 @@ import { useDragging } from '../../ui-new/interaction/move/hooks/use-dragging';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { pick } from '../../util/pick';
 import { useSelectCallback } from '../../util/use-select-callback';
-import { BankContext } from '../bank/bank-context';
 import type { MoveContainerValue, MoveParams } from '../move/move-container-fns';
 import { useCurrentStorage } from '../panel/storage-panel-context';
 import { DetailsEdit } from './details-edit';
@@ -31,9 +30,6 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
 
     const parentScope = useFocusScopeContext();
     const order = parentScope.parentsIds.length;
-
-    const selectedBankBoxes = BankContext.useSelectedBankBoxes();
-    const bank = selectedBankBoxes.data?.selectedBank.id;
 
     const pkmIndexQuery = usePkmIndex(saveId ?? null,
         useSelectCallback(data => {
@@ -66,12 +62,16 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
     const savePkmDeleteMutation = useStorageSaveDeletePkms();
     const evolvePkmsMutation = useStorageEvolvePkms();
 
-    const container = React.useMemo((): MoveContainerValue => ({
-        type: saveId ? 'save-item' : 'main-item',
-        bankId: saveId ? '' : bank ?? '',
-        saveId: saveId ?? null,
-        boxId: boxId?.toString() ?? '',
-    }), [ bank, boxId, saveId ]);
+    const container = React.useMemo((): MoveContainerValue => saveId
+        ? {
+            type: 'save-item',
+            saveId,
+            boxId: boxId?.toString() ?? '',
+        }
+        : {
+            type: 'main-item',
+            boxId: boxId?.toString() ?? '',
+        }, [ boxId, saveId ]);
 
     const pkmToMove = pkms[ 0 ];
 

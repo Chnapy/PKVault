@@ -7,7 +7,7 @@ import { containerFns, type MoveContainerValue, type MoveParams } from '../move-
 const useMoveClickable = ([ pkmId ]: [ string ], container: MoveContainerValue) => {
     const dragging = useDragging(pkmId, container);
 
-    const dragMove = dragging.useDrag<MoveParams>({ attached: false });
+    const dragMove = dragging.useDrag();
     const dragMoveAttached = dragging.useDrag<MoveParams>({ attached: true });
 
     return {
@@ -27,8 +27,6 @@ describe('use-move-clickable', () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveClickable([ 'canMove' ], {
                     type: 'main-item',
-                    bankId: '',
-                    saveId: null,
                     boxId: '0',
                 }),
                 {
@@ -50,8 +48,6 @@ describe('use-move-clickable', () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveClickable([ 'cannotMove' ], {
                     type: 'main-item',
-                    bankId: '',
-                    saveId: null,
                     boxId: '',
                 }),
             );
@@ -67,8 +63,6 @@ describe('use-move-clickable', () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveClickable([ 'canMove' ], {
                     type: 'main-item',
-                    bankId: '',
-                    saveId: null,
                     boxId: '',
                 }),
             );
@@ -83,16 +77,13 @@ describe('use-move-clickable', () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveClickable([ 'canMove' ], {
                     type: 'main-item',
-                    bankId: '',
-                    saveId: null,
                     boxId: '1',
                 }),
+                undefined,
                 undefined,
                 {
                     container: containerFns.getContainerHash({
                         type: 'main-item',
-                        bankId: '',
-                        saveId: null,
                         boxId: '1',
                     }),
                     ids: new Set([ 'canMove', 'canMove2' ]),
@@ -111,10 +102,9 @@ describe('use-move-clickable', () => {
         test('should be clickable if is movable', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveClickable([ 'canMove' ], {
-                    bankId: '',
+                    type: 'save-item',
                     saveId: 123,
                     boxId: '',
-                    type: 'save-item',
                 }),
             );
 
@@ -128,10 +118,9 @@ describe('use-move-clickable', () => {
         test('should not be clickable if is not movable', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveClickable([ 'cannotMove' ], {
-                    bankId: '',
+                    type: 'save-item',
                     saveId: 123,
                     boxId: '',
-                    type: 'save-item',
                 }),
             );
 
@@ -145,10 +134,9 @@ describe('use-move-clickable', () => {
         test('should be clickable as attached if is movable as attached', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveClickable([ 'canMove' ], {
-                    bankId: '',
+                    type: 'save-item',
                     saveId: 123,
                     boxId: '',
-                    type: 'save-item',
                 }),
             );
 
@@ -161,10 +149,9 @@ describe('use-move-clickable', () => {
         test('should not be clickable as attached if is not movable as attached', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveClickable([ 'cannotMove' ], {
-                    bankId: '',
+                    type: 'save-item',
                     saveId: 123,
                     boxId: '',
-                    type: 'save-item',
                 }),
             );
 

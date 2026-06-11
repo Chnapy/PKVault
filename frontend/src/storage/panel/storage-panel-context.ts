@@ -1,16 +1,19 @@
+import React from 'react';
 import type { StorageSearchSelected, StorageSearchStorage } from '../../routes/storage';
 import { usePanel } from '../../ui-new/storage/storage-content/context/ui-panel-context';
 
 const defaultMainStorage: StorageSearchStorage = { saveId: null };
 
-export const useCurrentStorage = () => {
-    const currentPanel = usePanel();
+export const useCurrentStorage = (fallbackPanel?: ReturnType<typeof usePanel>) => {
+    const ctxPanel = usePanel();
+    const currentPanel = fallbackPanel ?? ctxPanel;
     const storageIndex = currentPanel === 'left' ? 0 : 1;
-    const defaultStorage: StorageSearchStorage | undefined = currentPanel === 'left'
-        ? defaultMainStorage
-        : undefined;
 
-    const getStorage = (searchStorages: StorageSearchStorage[] | undefined) => {
+    const getStorage = React.useCallback((searchStorages: StorageSearchStorage[] | undefined) => {
+        const defaultStorage: StorageSearchStorage | undefined = currentPanel === 'left'
+            ? defaultMainStorage
+            : undefined;
+
         const storage = searchStorages?.[ storageIndex ];
 
         if (!storage)
@@ -21,7 +24,7 @@ export const useCurrentStorage = () => {
             return defaultStorage;
 
         return storage;
-    };
+    }, [ currentPanel, storageIndex ]);
 
     const getSelected = (searchSelected: StorageSearchSelected | undefined) => {
         if (searchSelected?.storage !== storageIndex)

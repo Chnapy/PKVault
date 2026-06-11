@@ -1,85 +1,53 @@
 import { describe, expect, test } from 'vitest';
-import type { MoveTargetInput } from '../../../ui-new/interaction/move/context/move-context';
-import { useDroppable } from '../../../ui-new/interaction/move/hooks/use-droppable';
-import { renderHookWithWrapper } from './utils/render-hook-with-wrapper';
-import { setupTestDataServer } from './utils/setup-test-data-server';
-import { containerFns, type MoveContainerValue } from '../move-container-fns';
 import type { DropRefusalReason } from '../validation/types';
-import { useDroppableValidation } from '../hooks/use-droppable-validation';
-
-const useMoveDroppableBank = (bankId: string) => {
-    const target: MoveTargetInput<MoveContainerValue> = {
-        targetContainer: {
-            type: 'bank',
-            bankId,
-            saveId: null,
-            boxId: '',
-        },
-        targetPosition: -1,
-        targetId: undefined,
-    };
-
-    const droppable = useDroppable(target);
-    const droppableValidation = useDroppableValidation(target.targetPosition, target.targetContainer);
-
-    return droppableValidation.canDrop
-        ? {
-            ...droppable,
-            ...droppableValidation,
-        }
-        : {
-            ...droppable,
-            ...droppableValidation,
-            onClick: undefined,
-            onDrop: undefined,
-            onPointerUp: undefined,
-        };
-};
+import { renderDroppable } from './use-move-droppable.test';
+import { setupTestDataServer } from './utils/setup-test-data-server';
 
 describe('use-move-droppable-bank', () => {
     const server = setupTestDataServer();
 
     test('should not be droppable if not dragging', async () => {
-        const { result, waitForQueries } = renderHookWithWrapper(
-            () => useMoveDroppableBank('1'),
-        );
-
-        await waitForQueries();
+        const { result } = await renderDroppable({
+            source: {
+                container: {
+                    type: 'main-item',
+                    boxId: '0',
+                },
+                ids: [ 'canMove' ],
+            },
+            target: {
+                container: {
+                    type: 'bank',
+                    bankId: '1',
+                },
+                slot: -1,
+            },
+        });
 
         expect(result.current.onClick).toBeUndefined();
         expect(result.current.onPointerUp).toBeUndefined();
     });
 
     test('should not be droppable if move submitting', async () => {
-        const { result, waitForQueries } = renderHookWithWrapper(
-            () => useMoveDroppableBank('1'),
-            {
-                initialState: {
-                    status: 'loading',
-                    source: {
-                        containerId: containerFns.getContainerHash({
-                            bankId: '',
-                            boxId: '1',
-                            saveId: null,
-                            type: 'main-item',
-                        }),
-                        sourceId: 'canMove',
-                        ids: new Set([ 'canMove' ]),
-                    },
-                    target: {
-                        targetContainerId: containerFns.getContainerHash({
-                            type: 'bank',
-                            bankId: '1',
-                            saveId: null,
-                            boxId: '',
-                        }),
-                        targetAllPositions: {},
-                        targetId: undefined,
-                        targetPosition: -1,
-                    },
+        const { result, waitForQueries } = await renderDroppable({
+            source: {
+                container: {
+                    type: 'main-item',
+                    boxId: '1',
                 },
-            }
-        );
+                ids: [ 'canMove' ],
+            },
+            target: {
+                container: {
+                    type: 'bank',
+                    bankId: '1',
+                },
+                slot: -1,
+            },
+            initialState: 'loading',
+        });
+
+        result.current.dragMove.startDragByClick!();
 
         await waitForQueries();
 
@@ -88,25 +56,24 @@ describe('use-move-droppable-bank', () => {
     });
 
     test('should not be droppable if same bank', async () => {
-        const { result, waitForQueries } = renderHookWithWrapper(
-            () => useMoveDroppableBank('0'),
-            {
-                initialState: {
-                    status: 'dragging',
-                    trigger: 'click',
-                    source: {
-                        containerId: containerFns.getContainerHash({
-                            bankId: '',
-                            boxId: '1',
-                            saveId: null,
-                            type: 'main-item',
-                        }),
-                        sourceId: 'canMove',
-                        ids: new Set([ 'canMove' ]),
-                    },
+        const { result, waitForQueries } = await renderDroppable({
+            source: {
+                container: {
+                    type: 'main-item',
+                    boxId: '0',
                 },
-            }
-        );
+                ids: [ 'canMove' ],
+            },
+            target: {
+                container: {
+                    type: 'bank',
+                    bankId: '0',
+                },
+                slot: -1,
+            },
+        });
+
+        result.current.dragMove.startDragByClick!();
 
         await waitForQueries();
 
@@ -116,25 +83,25 @@ describe('use-move-droppable-bank', () => {
     });
 
     test('should not be droppable if egg', async () => {
-        const { result, waitForQueries } = renderHookWithWrapper(
-            () => useMoveDroppableBank('1'),
-            {
-                initialState: {
-                    status: 'dragging',
-                    trigger: 'click',
-                    source: {
-                        containerId: containerFns.getContainerHash({
-                            bankId: '',
-                            boxId: '1',
-                            saveId: 123,
-                            type: 'main-item',
-                        }),
-                        sourceId: 'egg',
-                        ids: new Set([ 'egg' ]),
-                    },
+        const { result, waitForQueries } = await renderDroppable({
+            source: {
+                container: {
+                    type: 'save-item',
+                    saveId: 123,
+                    boxId: '1',
                 },
-            }
-        );
+                ids: [ 'egg' ],
+            },
+            target: {
+                container: {
+                    type: 'bank',
+                    bankId: '1',
+                },
+                slot: -1,
+            },
+        });
+
+        result.current.dragMove.startDragByClick!();
 
         await waitForQueries();
 
@@ -144,25 +111,25 @@ describe('use-move-droppable-bank', () => {
     });
 
     test('should not be droppable to main if shadow', async () => {
-        const { result, waitForQueries } = renderHookWithWrapper(
-            () => useMoveDroppableBank('1'),
-            {
-                initialState: {
-                    status: 'dragging',
-                    trigger: 'click',
-                    source: {
-                        containerId: containerFns.getContainerHash({
-                            bankId: '',
-                            boxId: '1',
-                            saveId: 123,
-                            type: 'main-item',
-                        }),
-                        sourceId: 'shadow',
-                        ids: new Set([ 'shadow' ]),
-                    },
+        const { result, waitForQueries } = await renderDroppable({
+            source: {
+                container: {
+                    type: 'save-item',
+                    saveId: 123,
+                    boxId: '1',
                 },
-            }
-        );
+                ids: [ 'shadow' ],
+            },
+            target: {
+                container: {
+                    type: 'bank',
+                    bankId: '1',
+                },
+                slot: -1,
+            },
+        });
+
+        result.current.dragMove.startDragByClick!();
 
         await waitForQueries();
 
@@ -172,25 +139,25 @@ describe('use-move-droppable-bank', () => {
     });
 
     test('should not be droppable to main if cannot move', async () => {
-        const { result, waitForQueries } = renderHookWithWrapper(
-            () => useMoveDroppableBank('1'),
-            {
-                initialState: {
-                    status: 'dragging',
-                    trigger: 'click',
-                    source: {
-                        containerId: containerFns.getContainerHash({
-                            bankId: '',
-                            boxId: '1',
-                            saveId: 123,
-                            type: 'main-item',
-                        }),
-                        sourceId: 'cannotMoveToMain',
-                        ids: new Set([ 'cannotMoveToMain' ]),
-                    },
+        const { result, waitForQueries } = await renderDroppable({
+            source: {
+                container: {
+                    type: 'save-item',
+                    saveId: 123,
+                    boxId: '1',
                 },
-            }
-        );
+                ids: [ 'cannotMoveToMain' ],
+            },
+            target: {
+                container: {
+                    type: 'bank',
+                    bankId: '1',
+                },
+                slot: -1,
+            },
+        });
+
+        result.current.dragMove.startDragByClick!();
 
         await waitForQueries();
 
@@ -200,54 +167,49 @@ describe('use-move-droppable-bank', () => {
     });
 
     test('should not be droppable to main as attached if cannot move as attached', async () => {
-        const { result, waitForQueries } = renderHookWithWrapper(
-            () => useMoveDroppableBank('1'),
-            {
-                initialState: {
-                    status: 'dragging',
-                    trigger: 'click',
-                    source: {
-                        containerId: containerFns.getContainerHash({
-                            bankId: '',
-                            boxId: '1',
-                            saveId: 123,
-                            type: 'main-item',
-                        }),
-                        sourceId: 'cannotMoveAttachedToMain',
-                        ids: new Set([ 'cannotMoveAttachedToMain' ]),
-                        params: { attached: true },
-                    },
+        const { result, waitForQueries } = await renderDroppable({
+            source: {
+                container: {
+                    type: 'save-item',
+                    saveId: 123,
+                    boxId: '1',
                 },
-            }
-        );
+                ids: [ 'cannotMoveAttachedToMain' ],
+            },
+            target: {
+                container: {
+                    type: 'bank',
+                    bankId: '1',
+                },
+                slot: -1,
+            },
+        });
 
         await waitForQueries();
 
-        expect(result.current.onClick).toBeUndefined();
-        expect(result.current.onPointerUp).toBeUndefined();
-        expect(result.current._disabledReason).toBe<DropRefusalReason>('save-cannot-move-main-to-main');
+        expect(result.current.dragMoveAttached.startDragByClick).toBeUndefined();
     });
 
     test('should not be droppable to main if variant with same ID already exists', async () => {
-        const { result, waitForQueries } = renderHookWithWrapper(
-            () => useMoveDroppableBank('1'),
-            {
-                initialState: {
-                    status: 'dragging',
-                    trigger: 'click',
-                    source: {
-                        containerId: containerFns.getContainerHash({
-                            bankId: '',
-                            boxId: '1',
-                            saveId: 123,
-                            type: 'main-item',
-                        }),
-                        sourceId: 'existID',
-                        ids: new Set([ 'existID' ]),
-                    },
+        const { result, waitForQueries } = await renderDroppable({
+            source: {
+                container: {
+                    type: 'save-item',
+                    saveId: 123,
+                    boxId: '1',
                 },
-            }
-        );
+                ids: [ 'existID' ],
+            },
+            target: {
+                container: {
+                    type: 'bank',
+                    bankId: '1',
+                },
+                slot: -1,
+            },
+        });
+
+        result.current.dragMove.startDragByClick!();
 
         await waitForQueries();
 
@@ -257,25 +219,24 @@ describe('use-move-droppable-bank', () => {
     });
 
     test('should be droppable', async () => {
-        const { result, waitForQueries } = renderHookWithWrapper(
-            () => useMoveDroppableBank('1'),
-            {
-                initialState: {
-                    status: 'dragging',
-                    trigger: 'click',
-                    source: {
-                        containerId: containerFns.getContainerHash({
-                            bankId: '',
-                            boxId: '1',
-                            saveId: null,
-                            type: 'main-item',
-                        }),
-                        sourceId: 'canMove',
-                        ids: new Set([ 'canMove' ]),
-                    },
+        const { result, waitForQueries } = await renderDroppable({
+            source: {
+                container: {
+                    type: 'main-item',
+                    boxId: '1',
                 },
-            }
-        );
+                ids: [ 'canMove' ],
+            },
+            target: {
+                container: {
+                    type: 'bank',
+                    bankId: '1',
+                },
+                slot: -1,
+            },
+        });
+
+        result.current.dragMove.startDragByClick!();
 
         await waitForQueries();
 
@@ -283,61 +244,51 @@ describe('use-move-droppable-bank', () => {
     });
 
     test('should be droppable as attached', async () => {
-        const { result, waitForQueries } = renderHookWithWrapper(
-            () => useMoveDroppableBank('1'),
-            {
-                initialState: {
-                    status: 'dragging',
-                    trigger: 'click',
-                    source: {
-                        containerId: containerFns.getContainerHash({
-                            bankId: '',
-                            boxId: '1',
-                            saveId: 123,
-                            type: 'main-item',
-                        }),
-                        sourceId: 'canMove',
-                        ids: new Set([ 'canMove' ]),
-                        params: { attached: true },
-                    },
+        const { result, waitForQueries } = await renderDroppable({
+            source: {
+                container: {
+                    type: 'save-item',
+                    saveId: 123,
+                    boxId: '1',
                 },
-            }
-        );
+                ids: [ 'canMove' ],
+            },
+            target: {
+                container: {
+                    type: 'bank',
+                    bankId: '1',
+                },
+                slot: -1,
+            },
+        });
+
+        result.current.dragMoveAttached.startDragByClick!();
 
         await waitForQueries();
 
         expect(result.current.onClick).toBeDefined();
     });
 
+    // TODO this test does not check selection
     test('should clear selected pkms if any', async () => {
-        const { result, waitForQueries } = renderHookWithWrapper(
-            () => useMoveDroppableBank('1'),
-            {
-                initialState: {
-                    status: 'dragging',
-                    trigger: 'click',
-                    source: {
-                        containerId: containerFns.getContainerHash({
-                            bankId: '',
-                            boxId: '1',
-                            saveId: null,
-                            type: 'main-item',
-                        }),
-                        sourceId: 'canMove',
-                        ids: new Set([ 'canMove' ]),
-                    },
-                },
-            },
-            {
-                container: containerFns.getContainerHash({
-                    bankId: '',
-                    saveId: null,
-                    boxId: '1',
+        const { result, waitForQueries } = await renderDroppable({
+            source: {
+                container: {
                     type: 'main-item',
-                }),
-                ids: new Set([ 'canMove', 'canMove2' ]),
+                    boxId: '1',
+                },
+                ids: [ 'canMove', 'canMove2' ],
             },
-        );
+            target: {
+                container: {
+                    type: 'bank',
+                    bankId: '1',
+                },
+                slot: -1,
+            },
+        });
+
+        result.current.dragMove.startDragByClick!();
 
         await waitForQueries();
 

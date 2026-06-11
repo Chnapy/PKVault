@@ -1,5 +1,5 @@
 import { useSearch } from '@tanstack/react-router';
-import { useStorageGetBoxes, useStorageGetMainBanks } from '../../data/sdk/storage/storage.gen';
+import { useStorageGetBoxes, useStorageGetMainBanks, type storageGetBoxesResponseSuccess, type storageGetMainBanksResponseSuccess } from '../../data/sdk/storage/storage.gen';
 import type { Route } from '../../routes/storage';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { StorageBankView } from './util/storages-bank-view';
@@ -7,6 +7,53 @@ import { StorageBankView } from './util/storages-bank-view';
 type SearchInput = (typeof Route)[ 'types' ][ 'searchSchemaInput' ];
 
 export const BankContext = {
+    getSelectedBankBoxes: (
+        mainBoxId1: number | undefined,
+        mainBoxId2: number | undefined,
+        banksData: storageGetMainBanksResponseSuccess | undefined,
+        boxesData: storageGetBoxesResponseSuccess | undefined
+    ) => {
+        const mainBoxIds = [ mainBoxId1, mainBoxId2 ].filter(filterIsDefined);
+
+        const defaultBank = banksData?.data.find(bank => bank.isDefault);
+        if (!defaultBank) {
+            console.log('no-default-bank');
+            return;
+        }
+
+        const selectedBoxes = mainBoxIds.map(boxId => boxesData?.data.find(box => box.idInt === boxId)).filter(filterIsDefined);
+
+        const selectedBankId = selectedBoxes[ 0 ]?.bankId ?? defaultBank.id;
+        const selectedBank = banksData?.data.find(bank => bank.id === selectedBankId);
+        if (!selectedBank) {
+            console.log('no-selected-bank');
+            return;
+        }
+
+        if (selectedBoxes.length === 0) {
+            selectedBoxes.push(...selectedBank.view.mainBoxIds.map(boxId => boxesData?.data.find(box => box.idInt === boxId)).filter(filterIsDefined));
+
+            if (selectedBoxes.length === 0) {
+                selectedBoxes.push(...[ boxesData?.data.find(box => box.bankId === selectedBankId) ].filter(filterIsDefined));
+            }
+
+            if (selectedBoxes.length === 0) {
+                console.log('no-selected-boxes');
+            }
+        }
+
+        return {
+            selectedBank,
+            selectedBoxes,
+            // selectedSearch:
+            //     selectedBoxes.length > 0
+            //         ? ({
+            //             mainBoxIds: selectedBoxes.map(box => box.idInt),
+            //             saves: Object.fromEntries(selectedBank.view.saves.map(save => [ save.saveId, save ])),
+            //         } satisfies SearchInput)
+            //         : undefined,
+        };
+    },
     useSelectedBankBoxes: () => {
         const getSelectStorage = (index: number) => (search: SearchInput) => {
             const storage = search.storages?.[ index ];
@@ -15,7 +62,6 @@ export const BankContext = {
 
         const mainBoxId1 = useSearch({ from: '/storage', select: getSelectStorage(0), shouldThrow: false });
         const mainBoxId2 = useSearch({ from: '/storage', select: getSelectStorage(1), shouldThrow: false });
-        const mainBoxIds = [ mainBoxId1, mainBoxId2 ].filter(filterIsDefined);
 
         const bankQuery = useStorageGetMainBanks();
         const boxesQuery = useStorageGetBoxes();
@@ -35,46 +81,14 @@ export const BankContext = {
             return payload;
         }
 
-        const defaultBank = bankQuery.data?.data.find(bank => bank.isDefault);
-        if (!defaultBank) {
-            console.log('no-default-bank');
-            return payload;
-        }
-
-        const selectedBoxes = mainBoxIds.map(boxId => boxesQuery.data?.data.find(box => box.idInt === boxId)).filter(filterIsDefined);
-
-        const selectedBankId = selectedBoxes[ 0 ]?.bankId ?? defaultBank.id;
-        const selectedBank = bankQuery.data?.data.find(bank => bank.id === selectedBankId);
-        if (!selectedBank) {
-            console.log('no-selected-bank');
-            return payload;
-        }
-
-        if (selectedBoxes.length === 0) {
-            selectedBoxes.push(...selectedBank.view.mainBoxIds.map(boxId => boxesQuery.data?.data.find(box => box.idInt === boxId)).filter(filterIsDefined));
-
-            if (selectedBoxes.length === 0) {
-                selectedBoxes.push(...[ boxesQuery.data?.data.find(box => box.bankId === selectedBankId) ].filter(filterIsDefined));
-            }
-
-            if (selectedBoxes.length === 0) {
-                console.log('no-selected-boxes');
-            }
-        }
-
         return {
             ...payload,
-            data: {
-                selectedBank,
-                selectedBoxes,
-                // selectedSearch:
-                //     selectedBoxes.length > 0
-                //         ? ({
-                //             mainBoxIds: selectedBoxes.map(box => box.idInt),
-                //             saves: Object.fromEntries(selectedBank.view.saves.map(save => [ save.saveId, save ])),
-                //         } satisfies SearchInput)
-                //         : undefined,
-            },
+            data: BankContext.getSelectedBankBoxes(
+                mainBoxId1,
+                mainBoxId2,
+                bankQuery.data,
+                boxesQuery.data,
+            ),
         };
     },
     useSelectBankProps: () => {

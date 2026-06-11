@@ -81,10 +81,8 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
 
         const container = React.useMemo((): MoveContainerValue => ({
             type: 'main-item',
-            bankId: bank ?? '',
-            saveId: null,
             boxId: variantInfos?.mainVariant.boxId.toString() ?? '',
-        }), [ bank, variantInfos?.mainVariant.boxId ]);
+        }), [ variantInfos?.mainVariant.boxId ]);
 
         if (!variantInfos) {
             return null;

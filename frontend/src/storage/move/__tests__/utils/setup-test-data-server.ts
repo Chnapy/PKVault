@@ -240,6 +240,7 @@ export const setupTestDataServer = () => {
                 createBank({
                     id: '0',
                     idInt: 0,
+                    isDefault: true,
                 }),
                 createBank({
                     id: '1',

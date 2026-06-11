@@ -54,7 +54,8 @@ export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> =
 
     return <WithControlsIcons placement='out' icons={controlsIcons.drop}>
         <UIStorageItemBase
-            label={label}
+            label={droppable.helpText}
+            disabled={!droppable.canDrop}
             loading={loading || submitting}
             {...focusControlProps}
             {...buttonProps}

@@ -1,30 +1,53 @@
 
-export type MoveContainerValue = {
-    type: 'main-item' | 'save-item' | 'bank';
-    bankId: string;
-    saveId: number | null;
-    boxId: string;
-};
+export type MoveContainerValue =
+    | {
+        type: 'main-item';
+        saveId?: undefined;
+        boxId: string;
+        bankId?: undefined;
+    }
+    | {
+        type: 'save-item';
+        saveId: number;
+        boxId: string;
+        bankId?: undefined;
+    }
+    | {
+        type: 'bank';
+        saveId?: undefined;
+        boxId?: undefined;
+        bankId: string;
+    };
 
 export type MoveParams = {
     attached: boolean;
 };
 
-const getContainerHash = ({ type, bankId, saveId, boxId }: MoveContainerValue): string => [ type, bankId, saveId, boxId ].join('---');
+const getContainerHash = ({ type, saveId, boxId, bankId }: MoveContainerValue): string => {
+    return [ type, saveId, boxId, bankId ].join('---');
+};
 
 const getContainerValue = (hash: string): MoveContainerValue => {
-    const [ type, bankId = '', saveIdRaw = '', boxId = '' ] = hash.split('---');
+    const [ type, saveId, boxId = '', bankId = '' ] = hash.split('---');
 
-    const saveId = saveIdRaw === ''
-        ? null
-        : Number(saveIdRaw);
-
-    return {
-        type: type as MoveContainerValue[ 'type' ],
-        bankId,
-        saveId,
-        boxId,
-    };
+    switch (type as MoveContainerValue[ 'type' ]) {
+        case 'main-item':
+            return {
+                type: 'main-item',
+                boxId,
+            };
+        case 'save-item':
+            return {
+                type: 'save-item',
+                saveId: Number(saveId),
+                boxId,
+            };
+        case 'bank':
+            return {
+                type: 'bank',
+                bankId,
+            };
+    }
 };
 
 export const containerFns = {

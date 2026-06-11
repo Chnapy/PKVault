@@ -8,7 +8,7 @@ import { useDragUtils, type PossibleEvent } from '../use-drag-utils';
 export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurrentTarget: boolean, isDragging: boolean) => {
     const ref = React.useRef<HTMLButtonElement>(null);
 
-    const { getContainerHash, useMoveStore, useFilterStartDragIds, positionsRef, dragEndTimestampRef } = useMoveContext<C>();
+    const { getContainerHash, useMoveStore, useFilterStartDragIds, dragStartComputeSlotStates, positionsRef, dragEndTimestampRef } = useMoveContext<C>();
 
     const containerHash = getContainerHash(containerValue);
 
@@ -44,6 +44,10 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
         )
             return false;
 
+        // next steps can be heavy, so avoid useless compute
+        if (useMoveStore.getState().state.status !== 'idle')
+            return false;
+
         const source: MoveSource = {
             containerId: containerHash,
             sourceId: entityId,
@@ -66,7 +70,8 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
             positionsRef.current.target = [ 0, 0 ];
         }
 
-        updateDragPosition(position);
+        if (position[ 0 ] && position[ 1 ])
+            updateDragPosition(position);
 
         // console.log(JSON.stringify(positionsRef.current, undefined, 2))
 
@@ -74,6 +79,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
             type: 'START_DRAG',
             source,
             trigger,
+            slotsStates: dragStartComputeSlotStates(source),
         });
         return true;
     };
@@ -136,22 +142,24 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
         )(params);
 
         const enabled = filteredIds.size > 0;
+        // console.log('enabled', enabled, getAllIds())
 
-        const startDragByClick = (e: PossibleEvent | undefined) => {
-            if (!ref.current) return;
-
+        const startDragByClick = (e?: PossibleEvent) => {
             e?.stopPropagation?.();
+            // console.log('click')
+            const position: Vector2 = [ 0, 0 ];
+            if (ref.current) {
+                const { left, top } = ref.current.getBoundingClientRect();
+                const position: Vector2 = [ left, top ];
 
-            const { left, top } = ref.current.getBoundingClientRect();
-            const position: Vector2 = [ left, top ];
-
-            positionsRef.current.pointerInitial = position;
-            positionsRef.current.pointer = position;
+                positionsRef.current.pointerInitial = position;
+                positionsRef.current.pointer = position;
+            }
 
             return startDrag(e, 'click', position, params);
         };
 
-        const startDragByFocus = (e: PossibleEvent | undefined) => {
+        const startDragByFocus = (e?: PossibleEvent) => {
             if (!ref.current) return;
 
             e?.stopPropagation?.();
@@ -162,7 +170,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
             return startDrag(e, 'focus', position, params);
         };
 
-        const toggleDragByClick = (e: PossibleEvent | undefined) => {
+        const toggleDragByClick = (e?: PossibleEvent) => {
             e?.stopPropagation?.();
 
             // console.log('drag - click')
@@ -176,7 +184,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
             }
         };
 
-        const toggleDragByFocus = (e: PossibleEvent | undefined) => {
+        const toggleDragByFocus = (e?: PossibleEvent) => {
             e?.stopPropagation?.();
 
             // console.log('drag - focus')

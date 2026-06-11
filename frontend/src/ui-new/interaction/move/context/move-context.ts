@@ -2,7 +2,7 @@ import type { Vector2 } from '@use-gesture/react';
 import React from 'react';
 import { create } from 'zustand';
 import { moveReducer } from '../state/move-reducer';
-import type { MoveAction, MoveState } from '../state/move-state';
+import type { DraggingSlotsStates, MoveAction, MoveSource, MoveState } from '../state/move-state';
 
 export type MoveTargetInput<C> = {
     targetContainer: C;
@@ -23,7 +23,7 @@ export type MovePositions = {
     pointerInitial: Vector2;
     target: Vector2;
     drag: Vector2;
-}; 
+};
 
 export type MoveContext<C, P = unknown> = {
     moveContainerId: string;
@@ -32,6 +32,7 @@ export type MoveContext<C, P = unknown> = {
     positionsRef: React.RefObject<MovePositions>;
     dragEndTimestampRef: React.RefObject<number>;
     useMoveStore: ReturnType<typeof createMoveStore<P>>;
+    dragStartComputeSlotStates: (source: MoveSource<P>) => DraggingSlotsStates;
     drop: (target: MoveTargetInput<C>) => Promise<unknown>;
     useFilterStartDragIds: (container: C, sourceIds: string[]) => (params?: P) => Set<string>;
 };

@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createMemoryHistory, createRootRoute, createRouter, Outlet, RouterContextProvider } from '@tanstack/react-router';
 import { waitFor } from '@testing-library/dom';
 import { renderHook } from '@testing-library/react';
 import { expect } from 'vitest';
@@ -12,6 +13,7 @@ import { MoveSelectImplProvider, type MoveSelectImplProviderProps } from '../../
 
 export const renderHookWithWrapper = <Result, Props>(
     useHook: (initialProps: Props) => Result,
+    searchParams?: object,
     moveDefaultValue?: MoveSelectImplProviderProps[ 'moveCtx' ],
     selectDefaultValue?: MoveSelectImplProviderProps[ 'selectCtx' ],
 ) => {
@@ -42,13 +44,27 @@ export const renderHookWithWrapper = <Result, Props>(
 
     const renderResults = renderHook(useWrapperHook, {
         wrapper: ({ children }) => {
+            const routeTree = createRootRoute({
+                component: () => <Outlet />,
+            });
+
+            const router = createRouter({
+                routeTree,
+                history: createMemoryHistory({
+                    initialEntries: [ '/' ],
+                }),
+                parseSearch: searchParams && (() => searchParams),
+            });
+
             return <QueryClientProvider client={queryClient}>
-                <MoveSelectImplProvider
-                    selectCtx={selectDefaultValue}
-                    moveCtx={moveDefaultValue}
-                >
-                    {children}
-                </MoveSelectImplProvider>
+                <RouterContextProvider router={router}>
+                    <MoveSelectImplProvider
+                        selectCtx={selectDefaultValue}
+                        moveCtx={moveDefaultValue}
+                    >
+                        {children}
+                    </MoveSelectImplProvider>
+                </RouterContextProvider>
             </QueryClientProvider>;
         },
     });
@@ -58,12 +74,6 @@ export const renderHookWithWrapper = <Result, Props>(
 
     const waitForQueries = () => waitFor(() => {
         expect(queryClient.isFetching()).toBeFalsy();
-
-        // trigger store selector with new fetched data
-        moveContext?.useMoveStore.setState(s => ({
-            ...s,
-            _r: Math.random(),
-        }))
     });
 
     return {

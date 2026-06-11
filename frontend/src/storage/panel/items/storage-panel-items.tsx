@@ -57,10 +57,8 @@ export const StoragePanelItems: React.FC = () => {
             return <StorageItemPlaceholder
                 key={nodeId}
                 nodeId={nodeId}
-                type={saveId ? 'save-item' : 'main-item'}
-                bankId={selectedBankBoxes.data?.selectedBank.id ?? ''}
-                boxId={boxId.toString()}
                 saveId={saveId}
+                boxId={boxId.toString()}
                 slot={i}
             />;
 

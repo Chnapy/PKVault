@@ -15,10 +15,22 @@ type MoveTarget = {
 
 export type DraggingTrigger = 'drag' | 'click' | 'focus';
 
+export type SlotsStates = Record<string, {
+    canDrop: boolean;
+    helpText?: string;
+    _disabledReason?: unknown;
+}>;
+
+export type DraggingSlotsStates = {
+    rootItems: SlotsStates;
+    items: Record<string, SlotsStates>;
+};
+
 export type MoveStateDragging<P> = {
     status: 'dragging';
-    source: MoveSource<P>;
     trigger: DraggingTrigger;
+    source: MoveSource<P>;
+    slotsStates: DraggingSlotsStates;
 };
 
 export type MoveStateLoading<P> = {
@@ -35,8 +47,9 @@ export type MoveState<P> =
 export type MoveAction =
     | {
         type: 'START_DRAG';
-        source: MoveSource;
         trigger: DraggingTrigger;
+        source: MoveSource;
+        slotsStates: DraggingSlotsStates;
     }
     | { type: 'UPDATE_FOCUS' }
     | {

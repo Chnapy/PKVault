@@ -5,12 +5,16 @@ import { containerFns, type MoveContainerValue } from '../move-container-fns';
 
 const useMoveLoading = (saveId: number | null, boxId: number, boxSlot: number, pkmId?: string) => {
     return useDragSubmitting<MoveContainerValue>(
-        {
-            bankId: '',
-            saveId,
-            boxId: boxId + '',
-            type: 'main-item',
-        },
+        saveId
+            ? {
+                type: 'save-item',
+                saveId,
+                boxId: boxId + '',
+            }
+            : {
+                type: 'main-item',
+                boxId: boxId + '',
+            },
         boxSlot,
         pkmId,
     );
@@ -22,20 +26,20 @@ describe('use-move-loading', () => {
         test('should not be loading if not move submitting', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveLoading(null, 2, 2),
+                undefined,
                 {
                     initialState: {
                         status: 'dragging',
                         trigger: 'click',
                         source: {
                             containerId: containerFns.getContainerHash({
-                                bankId: '',
-                                boxId: '0',
-                                saveId: null,
                                 type: 'main-item',
+                                boxId: '0',
                             }),
                             sourceId: 'canMove',
                             ids: new Set([ 'canMove' ]),
                         },
+                        slotsStates: { rootItems: {}, items: {} },
                     },
                 }
             );
@@ -48,25 +52,22 @@ describe('use-move-loading', () => {
         test('should be loading if move submitting', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveLoading(null, 2, 2),
+                undefined,
                 {
                     initialState: {
                         status: 'loading',
                         source: {
                             containerId: containerFns.getContainerHash({
-                                bankId: '',
-                                boxId: '1',
-                                saveId: null,
                                 type: 'main-item',
+                                boxId: '1',
                             }),
                             sourceId: 'canMove',
                             ids: new Set([ 'canMove' ]),
                         },
                         target: {
                             targetContainerId: containerFns.getContainerHash({
-                                bankId: '',
-                                boxId: '2',
-                                saveId: null,
                                 type: 'main-item',
+                                boxId: '2',
                             }),
                             targetAllPositions: { 'canMove': 2 },
                             targetPosition: 2,
@@ -81,24 +82,26 @@ describe('use-move-loading', () => {
             expect(result.current).toBeTruthy();
         });
     });
+
     describe('pkm-save loading state', () => {
         test('should not be loading if not move submitting', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveLoading(123, 2, 2),
+                undefined,
                 {
                     initialState: {
                         status: 'dragging',
                         trigger: 'click',
                         source: {
                             containerId: containerFns.getContainerHash({
-                                bankId: '',
-                                boxId: '0',
+                                type: 'save-item',
                                 saveId: 123,
-                                type: 'main-item',
+                                boxId: '0',
                             }),
                             sourceId: 'canMove',
                             ids: new Set([ 'canMove' ]),
                         },
+                        slotsStates: { rootItems: {}, items: {} },
                     },
                 }
             );
@@ -111,25 +114,24 @@ describe('use-move-loading', () => {
         test('should be loading if move submitting', async () => {
             const { result, waitForQueries } = renderHookWithWrapper(
                 () => useMoveLoading(123, 2, 2),
+                undefined,
                 {
                     initialState: {
                         status: 'loading',
                         source: {
                             containerId: containerFns.getContainerHash({
-                                bankId: '',
-                                boxId: '1',
+                                type: 'save-item',
                                 saveId: 123,
-                                type: 'main-item',
+                                boxId: '1',
                             }),
                             sourceId: 'canMove',
                             ids: new Set([ 'canMove' ]),
                         },
                         target: {
                             targetContainerId: containerFns.getContainerHash({
-                                bankId: '',
-                                boxId: '2',
+                                type: 'save-item',
                                 saveId: 123,
-                                type: 'main-item',
+                                boxId: '2',
                             }),
                             targetAllPositions: { 'canMove': 2 },
                             targetPosition: 2,

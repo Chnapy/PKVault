@@ -12,7 +12,7 @@ export type UIBankItemProps<C = unknown> = UISubHeaderTabsData & {
 };
 
 export const UIBankItem: React.FC<UIBankItemProps> = ({ container, isDefault, isExternal, ...rest }) => {
-    const { onClick, onPointerUp } = useDroppable({
+    const { onClick, onPointerUp, canDrop } = useDroppable({
         targetContainer: container,
         targetPosition: -1,
         targetId: undefined,
@@ -29,6 +29,7 @@ export const UIBankItem: React.FC<UIBankItemProps> = ({ container, isDefault, is
         </Group>}
         onClick={onClick}
         onPointerUp={onPointerUp}
+        disabled={canDrop === false}
         loading={submitting}
     />;
 };

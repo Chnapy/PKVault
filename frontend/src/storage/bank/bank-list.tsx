@@ -23,8 +23,6 @@ export const BankList: React.FC = () => {
                 container: {
                     type: 'bank',
                     bankId: id,
-                    saveId: null,
-                    boxId: '',
                 },
                 label: name,
                 isDefault,

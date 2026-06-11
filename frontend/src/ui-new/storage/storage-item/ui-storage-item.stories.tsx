@@ -16,6 +16,10 @@ const meta = {
             getContainerHash={() => ''} getContainerValue={() => null}
             useFilterStartDragIds={(container, sourceIds) => () => new Set(sourceIds)}
             getTargetAllPositions={() => ({})} onDrop={async () => null}
+            dragStartComputeSlotStates={source => ({
+                rootItems: {},
+                items: {},
+            })}
         >
             <Card id='content' display='inline-flex'>
                 <Story />

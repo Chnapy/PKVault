@@ -29,7 +29,8 @@ export const validateMainToMain = (
             slotInfos,
         };
     }
-
+    // if (slotInfos.targetSlot === 0 && slotInfos.sourcePkm.id === 'canMove')
+    //     console.log('FOOO', slotInfos.sourcePkm, slotInfos.targetPkm)
     if (slotInfos.sourcePkm.id === slotInfos.targetPkm?.id) {
         return {
             canDrop: false,

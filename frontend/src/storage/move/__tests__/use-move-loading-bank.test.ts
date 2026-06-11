@@ -5,10 +5,8 @@ import { containerFns, type MoveContainerValue } from '../move-container-fns';
 
 const useMoveLoadingBank = (bankId: string) => {
     return useDragSubmitting<MoveContainerValue>({
-        bankId,
-        saveId: null,
-        boxId: '',
         type: 'bank',
+        bankId,
     }, -1);
 };
 
@@ -17,25 +15,22 @@ describe('use-move-loading-bank', () => {
     test('should not be loading if move submitting not with current bank', async () => {
         const { result, waitForQueries } = renderHookWithWrapper(
             () => useMoveLoadingBank('1'),
+            undefined,
             {
                 initialState: {
                     status: 'loading',
                     source: {
                         containerId: containerFns.getContainerHash({
-                            bankId: '',
-                            boxId: '1',
-                            saveId: null,
                             type: 'main-item',
+                            boxId: '1',
                         }),
                         sourceId: 'canMove',
                         ids: new Set([ 'canMove' ]),
                     },
                     target: {
                         targetContainerId: containerFns.getContainerHash({
-                            bankId: '2',
-                            boxId: '',
-                            saveId: null,
                             type: 'bank',
+                            bankId: '2',
                         }),
                         targetAllPositions: {},
                         targetPosition: -1,
@@ -53,25 +48,22 @@ describe('use-move-loading-bank', () => {
     test('should be loading if move submitting with current bank', async () => {
         const { result, waitForQueries } = renderHookWithWrapper(
             () => useMoveLoadingBank('1'),
+            undefined,
             {
                 initialState: {
                     status: 'loading',
                     source: {
                         containerId: containerFns.getContainerHash({
-                            bankId: '',
-                            boxId: '1',
-                            saveId: null,
                             type: 'main-item',
+                            boxId: '1',
                         }),
                         sourceId: 'canMove',
                         ids: new Set([ 'canMove' ]),
                     },
                     target: {
                         targetContainerId: containerFns.getContainerHash({
-                            bankId: '1',
-                            boxId: '',
-                            saveId: null,
                             type: 'bank',
+                            bankId: '1',
                         }),
                         targetAllPositions: {},
                         targetPosition: -1,

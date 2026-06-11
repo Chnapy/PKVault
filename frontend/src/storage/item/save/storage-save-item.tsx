@@ -64,7 +64,6 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
 
         const container = React.useMemo((): MoveContainerValue => ({
             type: 'save-item',
-            bankId: '',
             saveId,
             boxId: savePkm?.boxId.toString() ?? '',
         }), [ saveId, savePkm?.boxId ]);

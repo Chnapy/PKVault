@@ -10,6 +10,7 @@ export const moveReducer = <P>(state: MoveState<P>, action: MoveAction): MoveSta
                 status: 'dragging',
                 source: action.source as MoveSource<P>,
                 trigger: action.trigger,
+                slotsStates: action.slotsStates,
             };
 
         case 'UPDATE_FOCUS':

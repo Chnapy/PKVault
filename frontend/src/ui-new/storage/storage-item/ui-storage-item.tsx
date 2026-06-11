@@ -110,12 +110,12 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
             className={classes.uiStorageItem}
         >
             <UIStorageItemBase
-                label={label ?? <>
+                label={droppable.helpText ?? <>
                     {name}
                     <UIDetailsLevel level={level} />
                 </>}
+                disabled={(droppable.canDrop === false) || disabled}
                 loading={loading || submitting}
-                disabled={disabled}
                 opacity={dragging.isDragging ? 0.5 : undefined}
                 {...focusControlProps}
                 {...buttonProps}

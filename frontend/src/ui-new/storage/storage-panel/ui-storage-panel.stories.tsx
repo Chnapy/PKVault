@@ -55,6 +55,10 @@ export const getMoveSelectDecorator = (Story: any) => {
             {...containerFns}
             useFilterStartDragIds={(container, sourceIds) => () => new Set(sourceIds)}
             getTargetAllPositions={() => ({})} onDrop={onDrop}
+            dragStartComputeSlotStates={source => ({
+                rootItems: {},
+                items: {},
+            })}
         >
             <Box
                 id='move-container' pos='relative'

@@ -228,6 +228,10 @@ export const Primary: Story = {
                 moveContainerId='move-container'
                 useFilterStartDragIds={(container, sourceIds) => () => new Set(sourceIds)}
                 getTargetAllPositions={getTargetAllPositions}
+                dragStartComputeSlotStates={source => ({
+                    rootItems: {},
+                    items: {},
+                })}
                 onDrop={onDrop}
             >
                 <Stack
