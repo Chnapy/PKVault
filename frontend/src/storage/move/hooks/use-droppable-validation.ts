@@ -1,10 +1,10 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, type UseQueryOptions } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
 import React from 'react';
 import { getPkmSaveIndexOptions } from '../../../data/hooks/use-pkm-save-index';
 import { getPkmVariantIndexOptions } from '../../../data/hooks/use-pkm-variant-index';
 import { getSaveInfosGetAllQueryOptions } from '../../../data/sdk/save-infos/save-infos.gen';
-import { getStorageGetBoxesQueryOptions, getStorageGetMainBanksQueryOptions } from '../../../data/sdk/storage/storage.gen';
+import { getStorageGetBoxesQueryOptions, getStorageGetMainBanksQueryOptions, type storageGetBoxesResponseSuccess, type storageGetMainBanksResponseSuccess } from '../../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../../translate/i18n';
 import type { DraggingSlotsStates, MoveSource, SlotsStates } from '../../../ui-new/interaction/move/state/move-state';
 import { filterIsDefined } from '../../../util/filter-is-defined';
@@ -38,80 +38,127 @@ export const useDroppableValidation = () => {
 
     const { t } = useTranslate();
 
-    // TODO mutualize with validate fn
-    const prefetchQueries = async (source: MoveSource<MoveParams>) => {
-        // console.log('call')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    type QuerySelectData<O> = O extends UseQueryOptions<any, any, infer D>
+        ? D
+        : never;
+
+    const getCommonData = React.useCallback((source: MoveSource<MoveParams>) => {
         const sourceContainer = source && containerFns.getContainerValue(source.containerId);
         const sourceSaveId = sourceContainer?.saveId;
 
-        const queries = await Promise.all(([
-            queryClient.fetchQuery(getPkmVariantIndexOptions()),
-            queryClient.fetchQuery(getStorageGetBoxesQueryOptions()),
-            sourceSaveId ? queryClient.fetchQuery(getPkmSaveIndexOptions(sourceSaveId ?? 0)) : Promise.resolve(),
-            queryClient.fetchQuery(getSaveInfosGetAllQueryOptions()),
-            sourceContainer ? queryClient.fetchQuery(getStorageGetBoxesQueryOptions({ saveId: sourceContainer?.saveId ?? undefined })) : Promise.resolve(),
-            queryClient.fetchQuery(getStorageGetMainBanksQueryOptions()),
+        const queriesOptions = {
+            pkmVariantIndex: getPkmVariantIndexOptions(),
+            mainBoxes: getStorageGetBoxesQueryOptions(),
+            sourcePkmSaveIndex: sourceSaveId
+                ? getPkmSaveIndexOptions(sourceSaveId)
+                : null,
+            saveInfosAll: getSaveInfosGetAllQueryOptions(),
+            sourceBoxes: getStorageGetBoxesQueryOptions({ saveId: sourceSaveId ?? undefined }),
+            banks: getStorageGetMainBanksQueryOptions(),
+        } as const;
 
-            // getPkmSaveIndexOptions(targetContainer.saveId ?? 0, {
-            //     enabled: !!targetContainer.saveId,
-            // }),
-            // getStorageGetBoxesQueryOptions({ saveId: targetContainer.saveId ?? undefined }),
-        ] as const));
+        const getItemsContainers = (
+            banks: storageGetMainBanksResponseSuccess | undefined,
+            mainBoxes: storageGetBoxesResponseSuccess | undefined
+        ) => {
+            const search = router.latestLocation.search;
 
-        const mainBoxes = queries[ 1 ];
-        const banks = queries[ 5 ];
+            const storageLeft = getStorageLeft(search.storages);
+            const storageRight = getStorageRight(search.storages);
 
-        const search = router.latestLocation.search;
-        // console.log('search', search)
-        const storageLeft = getStorageLeft(search.storages);
-        const storageRight = getStorageRight(search.storages);
+            const selectedBankBoxes = BankContext.getSelectedBankBoxes(
+                storageLeft?.saveId ? undefined : storageLeft?.boxId,
+                storageRight?.saveId ? undefined : storageRight?.boxId,
+                banks,
+                mainBoxes,
+            );
 
-        const selectedBankBoxes = BankContext.getSelectedBankBoxes(
-            storageLeft?.saveId ? undefined : storageLeft?.boxId,
-            storageRight?.saveId ? undefined : storageRight?.boxId,
-            banks,
-            mainBoxes,
+            return [ storageLeft, storageRight ]
+                .filter(filterIsDefined)
+                .map((storage, i) => {
+                    if (storage.saveId !== null || storage.boxId !== undefined || !selectedBankBoxes?.selectedBoxes.length)
+                        return storage;
+
+                    const boxId = selectedBankBoxes.selectedBoxes.length > 1
+                        ? selectedBankBoxes.selectedBoxes[ i ]?.idInt
+                        : selectedBankBoxes.selectedBoxes[ 0 ]?.idInt;
+                    if (boxId === undefined)
+                        return storage;
+
+                    return {
+                        ...storage,
+                        boxId,
+                    };
+                })
+                .filter((storage): storage is { saveId: number | null; boxId: number } => storage.boxId !== undefined)
+                .map(({ saveId, boxId }): MoveContainerValue => saveId
+                    ? {
+                        type: 'save-item',
+                        saveId,
+                        boxId: String(boxId),
+                    }
+                    : {
+                        type: 'main-item',
+                        boxId: String(boxId),
+                    })
+                .map(targetContainer => [
+                    targetContainer,
+                    {
+                        targetPkmSaveIndex: targetContainer.saveId
+                            ? getPkmSaveIndexOptions(targetContainer.saveId)
+                            : null,
+                        targetBoxes: getStorageGetBoxesQueryOptions({ saveId: targetContainer.saveId ?? undefined }),
+                    } as const,
+                ] as const);
+        };
+
+        return {
+            sourceSaveId,
+            queriesOptions,
+            getItemsContainers,
+        };
+    }, [ getStorageLeft, getStorageRight, router ]);
+
+    type QueriesOptions = ReturnType<typeof getCommonData>[ 'queriesOptions' ];
+    type QueriesDataMap = {
+        [ key in keyof QueriesOptions ]: null extends QueriesOptions[ key ]
+        ? QuerySelectData<QueriesOptions[ key ]> | null
+        : QuerySelectData<QueriesOptions[ key ]>
+    };
+
+    /**
+     * For testing purpose
+     */
+    const prefetchQueries = async (source: MoveSource<MoveParams>) => {
+        const {
+            queriesOptions,
+            getItemsContainers,
+        } = getCommonData(source);
+
+        const { mainBoxes, banks } = Object.fromEntries(await Promise.all(
+            Object.entries(queriesOptions).map(async ([ key, options ]) => [
+                key,
+                options
+                    ? await queryClient.fetchQuery(options as never)
+                    : Promise.resolve(null),
+            ])
+        )) as QueriesDataMap;
+
+        await Promise.all(
+            getItemsContainers(banks, mainBoxes).flatMap(([ targetContainer, options ]) => [
+                options.targetPkmSaveIndex ? queryClient.fetchQuery(options.targetPkmSaveIndex) : Promise.resolve(),
+                queryClient.fetchQuery(options.targetBoxes),
+            ])
         );
-
-        const itemContainers = [ storageLeft, storageRight ]
-            .filter(filterIsDefined)
-            .map((storage, i) => {
-                if (storage.saveId !== null || storage.boxId !== undefined || !selectedBankBoxes?.selectedBoxes.length)
-                    return storage;
-
-                const boxId = selectedBankBoxes.selectedBoxes.length > 1
-                    ? selectedBankBoxes.selectedBoxes[ i ]?.idInt
-                    : selectedBankBoxes.selectedBoxes[ 0 ]?.idInt;
-                if (boxId === undefined)
-                    return storage;
-
-                return {
-                    ...storage,
-                    boxId,
-                };
-            })
-            .filter((storage): storage is { saveId: number | null; boxId: number } => storage.boxId !== undefined)
-            .map(({ saveId, boxId }): MoveContainerValue => saveId
-                ? {
-                    type: 'save-item',
-                    saveId,
-                    boxId: String(boxId),
-                }
-                : {
-                    type: 'main-item',
-                    boxId: String(boxId),
-                });
-
-        await Promise.all(itemContainers.flatMap(targetContainer => [
-            targetContainer.saveId ? queryClient.fetchQuery(getPkmSaveIndexOptions(targetContainer.saveId ?? 0)) : Promise.resolve(),
-            queryClient.fetchQuery(getStorageGetBoxesQueryOptions({ saveId: targetContainer.saveId ?? undefined })),
-        ]));
     };
 
     const validate = React.useCallback((source: MoveSource<MoveParams>): DraggingSlotsStates => {
-        // console.log('call')
-        const sourceContainer = source && containerFns.getContainerValue(source.containerId);
-        const sourceSaveId = sourceContainer?.saveId;
+        const {
+            sourceSaveId,
+            queriesOptions,
+            getItemsContainers,
+        } = getCommonData(source);
 
         const attached = source?.params?.attached ?? false;
 
@@ -120,19 +167,32 @@ export const useDroppableValidation = () => {
         if (!firstId)
             return emptySlotStates;
 
-        const pkmVariantIndex = queryClient.getQueryData(getPkmVariantIndexOptions().queryKey);
-        const mainBoxes = queryClient.getQueryData(getStorageGetBoxesQueryOptions().queryKey);
-        const sourcePkmSaveIndex = sourceSaveId
-            ? queryClient.getQueryData(getPkmSaveIndexOptions(sourceSaveId).queryKey)
-            : null;
-        const saveInfosAll = queryClient.getQueryData(getSaveInfosGetAllQueryOptions().queryKey);
-        const sourceBoxes = queryClient.getQueryData(getStorageGetBoxesQueryOptions({ saveId: sourceSaveId ?? undefined }).queryKey);
-        const banks = queryClient.getQueryData(getStorageGetMainBanksQueryOptions().queryKey);
+        const data = Object.fromEntries(
+            Object.entries(queriesOptions).map(([ key, options ]) => [
+                key,
+                options
+                    ? queryClient.getQueryData(options.queryKey)
+                    : null,
+            ])
+        ) as QueriesDataMap;
 
-        const hasMissingRequiredSourceData = [ pkmVariantIndex, mainBoxes, sourcePkmSaveIndex, saveInfosAll, sourceBoxes, banks ]
-            .some(d => d === undefined);
+        const {
+            pkmVariantIndex,
+            mainBoxes,
+            sourcePkmSaveIndex,
+            saveInfosAll,
+            sourceBoxes,
+            banks,
+        } = data;
+
+        if (!pkmVariantIndex)
+            throw new Error('NO PKM-VARIANT');
+
+        const hasMissingRequiredSourceData = Object.values(data).some(d => d === undefined);
         if (hasMissingRequiredSourceData) {
-            console.log('missing', [ pkmVariantIndex, mainBoxes, sourcePkmSaveIndex, saveInfosAll, sourceBoxes, banks ].map(Boolean))
+            console.error('drop-validation - Missing required source data', Object.fromEntries(
+                Object.entries(data).map(([ key, data ]) => [ key, !!data ])
+            ));
             return emptySlotStates;
         }
 
@@ -142,50 +202,11 @@ export const useDroppableValidation = () => {
 
         const firstSourceSlot = sourcePkmIndex?.data.byId[ firstId ]?.boxSlot;
         if (firstSourceSlot === undefined) {
-            console.log('no-first-slot')
+            console.error('drop-validation - no-first-slot')
             return emptySlotStates;
         }
 
-        const search = router.latestLocation.search;
-        // console.log('search', search)
-        const storageLeft = getStorageLeft(search.storages);
-        const storageRight = getStorageRight(search.storages);
-
-        const selectedBankBoxes = BankContext.getSelectedBankBoxes(
-            storageLeft?.saveId ? undefined : storageLeft?.boxId,
-            storageRight?.saveId ? undefined : storageRight?.boxId,
-            banks,
-            mainBoxes,
-        );
-
-        const itemContainers = [ storageLeft, storageRight ]
-            .filter(filterIsDefined)
-            .map((storage, i) => {
-                if (storage.saveId !== null || storage.boxId !== undefined || !selectedBankBoxes?.selectedBoxes.length)
-                    return storage;
-
-                const boxId = selectedBankBoxes.selectedBoxes.length > 1
-                    ? selectedBankBoxes.selectedBoxes[ i ]?.idInt
-                    : selectedBankBoxes.selectedBoxes[ 0 ]?.idInt;
-                if (boxId === undefined)
-                    return storage;
-
-                return {
-                    ...storage,
-                    boxId,
-                };
-            })
-            .filter((storage): storage is { saveId: number | null; boxId: number } => storage.boxId !== undefined)
-            .map(({ saveId, boxId }): MoveContainerValue => saveId
-                ? {
-                    type: 'save-item',
-                    saveId,
-                    boxId: String(boxId),
-                }
-                : {
-                    type: 'main-item',
-                    boxId: String(boxId),
-                });
+        const itemContainers = getItemsContainers(banks, mainBoxes);
 
         const bankContainers = banks?.data.map((bank): Extract<MoveContainerValue, { type: 'bank' }> => ({
             type: 'bank',
@@ -229,27 +250,24 @@ export const useDroppableValidation = () => {
         );
 
         const itemSlotStates: DraggingSlotsStates[ 'items' ] = Object.fromEntries(
-            itemContainers.map(targetContainer => {
+            itemContainers.map(([ targetContainer, options ]) => {
                 const containerHash = containerFns.getContainerHash(targetContainer);
 
-                const targetPkmSaveIndex = targetContainer.saveId
-                    ? queryClient.getQueryData(getPkmSaveIndexOptions(targetContainer.saveId).queryKey)
+                const targetPkmSaveIndex = options.targetPkmSaveIndex
+                    ? queryClient.getQueryData(options.targetPkmSaveIndex.queryKey)
                     : null;
-                const targetBoxes = queryClient.getQueryData(getStorageGetBoxesQueryOptions({ saveId: targetContainer.saveId ?? undefined }).queryKey);
+                const targetBoxes = queryClient.getQueryData(options.targetBoxes.queryKey);
 
-                const hasMissingRequiredData = [ targetPkmSaveIndex, targetBoxes ]
-                    .some(d => d === undefined);
+                const hasMissingRequiredData = [ targetPkmSaveIndex, targetBoxes ].some(d => d === undefined);
                 if (hasMissingRequiredData) {
-                    // console.log('missing', hasMissingRequiredData)
+                    console.error('drop-validation - Missing required target data', targetContainer, Object.fromEntries(
+                        Object.entries({ targetPkmSaveIndex, targetBoxes }).map(([ key, data ]) => [ key, !!data ])
+                    ));
                     return [ containerHash, {} ];
                 }
 
                 const targetBox = targetBoxes?.data.find(box => box.id === targetContainer.boxId);
                 const targetBoxSlotCount = targetBox?.slotCount ?? 0;
-
-                // const targetPkmIndex = targetContainer.saveId
-                //     ? targetPkmSaveIndex
-                //     : pkmVariantIndex;
 
                 const allTargetSlots = new Array(targetBoxSlotCount).fill(0).map((_, i) => i);
 
@@ -296,23 +314,15 @@ export const useDroppableValidation = () => {
                 return [ containerHash, slotsStates ] as const;
             })
         );
-        // console.log('foo', itemSlotStates)
+
         return {
             rootItems: bankSlotStates,
             items: itemSlotStates,
         };
-    }, [ getStorageLeft, getStorageRight, queryClient, router, t ]);
-
-    const validateMonitored = React.useCallback<typeof validate>((...params) => {
-        console.time('drop validate call');
-        const result = validate(...params);
-        console.timeEnd('drop validate call');
-
-        return result;
-    }, [ validate ]);
+    }, [ getCommonData, queryClient, t ]);
 
     return {
-        validate: validateMonitored,
+        validate,
         prefetchQueries,
     };
 };

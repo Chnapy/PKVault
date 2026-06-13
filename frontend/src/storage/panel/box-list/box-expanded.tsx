@@ -16,7 +16,6 @@ export const BoxExpanded: React.FC<BoxExpandedProps> = ({ id, label, selected, o
     const boxDeleteMutation = useStorageDeleteMainBox();
 
     const boxesQuery = useStorageGetBoxes({ saveId: saveId ?? undefined });
-
     const boxes = boxesQuery.data?.data ?? [];
     const box = boxes.find(box => box.id === id);
 

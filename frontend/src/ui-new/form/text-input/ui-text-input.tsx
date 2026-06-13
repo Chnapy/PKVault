@@ -69,6 +69,7 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
         <TextInput
             // label='Label'
             // description='Description'
+            name={name}
             rightSectionWidth='auto'
             rightSection={(onCancel || onSubmit) && <Group gap='xs' wrap='nowrap'>
                 {onCancel && <WithControlsIcons placement='out' icons={controlsIcons.cancel}>

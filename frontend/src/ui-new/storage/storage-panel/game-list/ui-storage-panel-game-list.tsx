@@ -1,19 +1,21 @@
-import { ActionIcon, Group, Tabs, Text } from '@mantine/core';
+import { Group, Tabs, Text } from '@mantine/core';
 import { CirclePlusIcon } from 'lucide-react';
 import type React from 'react';
-import { UIExpandableTabs } from '../../../expandable-tabs/ui-expandable-tabs';
+import { UIExpandableTabs, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
+import { UIActionIcon } from '../../../form/button/ui-action-icon';
 import { Focus } from '../../../interaction/focus/provider/use-focus-context';
 import { useFocusScopeContext } from '../../../interaction/focus/scope/use-focus-scope-context';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
-import { UIGameExpanded, type UIGameData } from './ui-game-expanded';
 
-export type UIStoragePanelGameListProps = {
-    value: string;
-    data: UIGameData[];
-    onChange: (id: string) => void;
+export type UIGameData = {
+    id: string;
+    label: string;
+    imgSrc: string;
 };
 
-export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange }) => {
+export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>, 'value' | 'data' | 'onChange' | 'renderExpanded'>;
+
+export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange, renderExpanded }) => {
     const parentScope = useFocusScopeContext();
     const scopeActive = Focus.useIsScopeActive(parentScope.scopeId);
 
@@ -31,26 +33,21 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
         renderTab={({ item, selected }) => <Tabs.Tab key={item.id} value={item.id} leftSection={<img src={item.imgSrc} height={16} />} py={4}>
             <Text component={selected ? 'b' : undefined} textWrap='nowrap'>{item.label}</Text>
         </Tabs.Tab>}
-        renderExpanded={(data, { reduce }) => <Group
+        renderExpanded={(data, opt) => <Group
+            align='flex-start'
             p='md'
             pt={0}
         >
-            {data.map(({ item, selected }) => <UIGameExpanded
-                key={item.id}
-                {...item}
-                selected={selected}
-                onSelect={() => {
-                    onChange(item.id);
-                    reduce();
-                }}
-            />)}
+            {renderExpanded?.(data, opt)}
 
-            <ActionIcon
+            <UIActionIcon
+                name='add-game'
+                controlLabel='Add game'
                 variant='default'
                 size='xl'
             >
                 <CirclePlusIcon />
-            </ActionIcon>
+            </UIActionIcon>
         </Group>}
     />;
 };

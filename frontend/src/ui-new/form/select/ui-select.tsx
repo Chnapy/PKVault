@@ -57,6 +57,7 @@ export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ..
     );
 
     return <NativeSelect
+        name={name}
         data={data}
         {...focusControlProps}
         leftSection={isGamepad

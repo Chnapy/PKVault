@@ -1,4 +1,5 @@
-
-[data-mantine-color-scheme='dark'] .ui-storage-panel-box-list[data-variant="pills"] {
-    --tab-hover-color: var(--mantine-color-dark-7);
+[data-mantine-color-scheme="dark"]
+  .ui-storage-panel-box-list
+  :global(.mantine-Tabs-tab)[data-variant="pills"] {
+  --tab-hover-color: var(--mantine-color-dark-7);
 }

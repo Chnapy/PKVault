@@ -71,6 +71,15 @@ export const useDroppable = <C>(target: MoveTargetInput<C>): UseDroppableReturn 
         };
     }
 
+    if (!canDrop)
+        return {
+            ...dragUtils,
+            isDroppable: true,
+            canDrop: false,
+            helpText,
+            _disabledReason,
+        };
+
     const onDrop = () => {
         return drop(target);
     };
@@ -78,9 +87,7 @@ export const useDroppable = <C>(target: MoveTargetInput<C>): UseDroppableReturn 
     return {
         ...dragUtils,
         isDroppable: true,
-        canDrop,
-        helpText,
-        _disabledReason,
+        canDrop: true,
         onDrop,
         onClick: clickable ? onDrop : undefined,
         onPointerUp: pointerUp ? onDrop : undefined,

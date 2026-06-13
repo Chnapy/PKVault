@@ -1,59 +1,44 @@
-import { css } from '@emotion/css';
+import { Box, Stack, type ComboboxItem } from '@mantine/core';
+import { SortDescIcon } from 'lucide-react';
 import type React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
-import type { BoxDTO, GameVersion, StorageSortPkmsParams } from '../../data/sdk/model';
+import type { StorageSortPkmsParams } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageGetBoxes, useStorageSortPkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
-import { Button } from '../../ui/button/button';
-import { Icon } from '../../ui/icon/icon';
-import { CheckboxInput } from '../../ui/input/checkbox-input';
-import { SelectNumberInput, SelectStringInput } from '../../ui/input/select-input';
-import { theme } from '../../ui/theme';
-import { BoxTypeIcon } from '../box/box-type-icon';
+import { UIButton } from '../../ui-new/form/button/ui-button';
+import { UISelect } from '../../ui-new/form/select/ui-select';
+import { UISwitch } from '../../ui-new/form/switch/ui-switch';
+import { usePopover } from '../../ui-new/interaction/focus-controls/components/popover/hooks/use-popover';
 
-export const SortAdvancedAction = {
-    Main: ({ selectedBoxId, close }: { selectedBoxId: number; close: () => void }) => {
-        const boxesQuery = useStorageGetBoxes();
-
-        const pkmVariantsQuery = usePkmVariantIndex();
-        const pkmVersions = [ ...new Set(Object.values(pkmVariantsQuery.data?.data.byId ?? {}).map(pkm => pkm.contextVersion)) ];
-
-        return <InnerSortAdvancedAction
-            selectedBoxId={selectedBoxId}
-            close={close}
-            boxes={boxesQuery.data?.data ?? []}
-            versions={pkmVersions}
-        />;
-    },
-    Save: ({ saveId, selectedBoxId, close }: { saveId: number; selectedBoxId: number; close: () => void }) => {
-        const boxesQuery = useStorageGetBoxes({ saveId });
-
-        const save = useSaveInfosGetAll().data?.data[ saveId ];
-
-        return <InnerSortAdvancedAction
-            saveId={saveId}
-            selectedBoxId={selectedBoxId}
-            close={close}
-            boxes={boxesQuery.data?.data ?? []}
-            versions={save ? [ save.version ] : []}
-        />;
-    },
-};
-
-// eslint-disable-next-line react-refresh/only-export-components
-const InnerSortAdvancedAction: React.FC<{
-    saveId?: number;
-    selectedBoxId: number;
-    close: () => void;
-    boxes: BoxDTO[];
-    versions: GameVersion[];
-}> = ({ saveId, selectedBoxId, close, boxes, versions }) => {
+export const SortAdvancedAction: React.FC<{
+    saveId: number | null;
+    boxId: number;
+}> = ({ saveId, boxId }) => {
     const { t } = useTranslate();
 
-    const bankId = boxes.find(box => box.idInt === selectedBoxId)?.bankId;
+    const popover = usePopover();
+
+    const saveInfos = useSaveInfosGetAll();
+    const save = saveId ? saveInfos.data?.data[ saveId ] : undefined;
+
+    const boxesQuery = useStorageGetBoxes({ saveId: saveId ?? undefined });
+    const boxes = boxesQuery.data?.data ?? [];
+
+    const versionsQuery = usePkmVariantIndex(data => {
+        if (save)
+            return [ save.version ];
+
+        return [ ...new Set(Object.values(data.data.byId)
+            .map(pkm => pkm.contextVersion)
+        ) ];
+    });
+
+    const versions = versionsQuery.data ?? [];
+
+    const bankId = boxes.find(box => box.idInt === boxId)?.bankId;
 
     const filteredBoxes = boxes
         .filter(box => box.bankId === bankId)
@@ -71,8 +56,8 @@ const InnerSortAdvancedAction: React.FC<{
 
     const { register, handleSubmit, formState, setValue, control } = useForm<Omit<StorageSortPkmsParams, 'saveId'>>({
         defaultValues: {
-            fromBoxId: selectedBoxId,
-            toBoxId: selectedBoxId,
+            fromBoxId: boxId,
+            toBoxId: boxId,
             pokedexName: pokedexKeys[ 0 ],
             leaveEmptySlot: false,
         },
@@ -87,7 +72,7 @@ const InnerSortAdvancedAction: React.FC<{
     const onSubmit = handleSubmit(async ({ fromBoxId, toBoxId, pokedexName, leaveEmptySlot }) => {
         const result = await sortPkmsMutation.mutateAsync({
             params: {
-                saveId,
+                saveId: saveId ?? undefined,
                 fromBoxId,
                 toBoxId,
                 pokedexName,
@@ -99,116 +84,86 @@ const InnerSortAdvancedAction: React.FC<{
             return;
         }
 
-        close();
+        popover?.setOpened(false);
     });
 
     return (
-        <form
+        <Stack
+            component='form'
             onSubmit={onSubmit}
-            className={css({
-                maxWidth: 350,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 8,
-            })}
+            maw={350}
         >
-            <SelectStringInput
+            <UISelect
                 {...register('pokedexName')}
+                controlLabel='Pokedex name'
                 label={t('storage.sort.pokedex')}
                 data={
-                    pokedexKeys.map(key => ({
+                    pokedexKeys.map((key): ComboboxItem => ({
                         value: key,
-                        option: staticData.pokedexes[ key ]!.name,
+                        label: staticData.pokedexes[ key ]!.name,
                         disabled: key === pokedexName,
                     })) ?? []
                 }
-                value={pokedexName}
-                onChange={value => setValue('pokedexName', value)}
+                // value={pokedexName}
+                // onChange={value => setValue('pokedexName', value)}
                 disabled={pokedexKeys.length === 1}
             />
 
-            <SelectNumberInput
-                {...register('fromBoxId', { valueAsNumber: true })}
+            <UISelect
+                {...register('fromBoxId')}
+                controlLabel='From box'
                 label={t('storage.sort.from-box')}
                 data={
-                    filteredBoxes.map(box => ({
-                        value: box.idInt,
-                        option: (
-                            <div
-                                className={css({
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: 4,
-                                    paddingLeft: 4,
-                                })}
-                            >
-                                <BoxTypeIcon boxType={box.type} />
-                                {box.name}
-                            </div>
-                        ),
+                    filteredBoxes.map((box): ComboboxItem => ({
+                        value: box.id,
+                        label: box.name,
                         disabled: box.idInt === fromBoxId,
                     })) ?? []
                 }
-                value={fromBoxId}
-                onChange={value => setValue('fromBoxId', value)}
+                value={fromBoxId.toString()}
+                onChange={e => setValue('fromBoxId', +e.currentTarget.value)}
             />
 
-            <SelectNumberInput
-                {...register('toBoxId', { valueAsNumber: true })}
+            <UISelect
+                {...register('toBoxId')}
+                controlLabel='To box'
                 label={t('storage.sort.to-box')}
                 data={
-                    filteredBoxes.map(box => ({
-                        value: box.idInt,
-                        option: (
-                            <div
-                                className={css({
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: 4,
-                                    paddingLeft: 4,
-                                })}
-                            >
-                                <BoxTypeIcon boxType={box.type} />
-                                {box.name}
-                            </div>
-                        ),
+                    filteredBoxes.map((box): ComboboxItem => ({
+                        value: box.id,
+                        label: box.name,
                         disabled: box.idInt === toBoxId,
                     })) ?? []
                 }
-                value={toBoxId}
-                onChange={value => setValue('toBoxId', value)}
+                value={toBoxId.toString()}
+                onChange={e => setValue('toBoxId', +e.currentTarget.value)}
             />
 
-            <label
-                className={css({
-                    display: 'flex',
-                    gap: 4,
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                })}
-            >
-                <CheckboxInput checked={leaveEmptySlot} onChange={() => setValue('leaveEmptySlot', !leaveEmptySlot)} />{' '}
-                {t('storage.sort.empty-slot')}
-            </label>
+            <UISwitch
+                name='leaveEmptySlot'
+                controlLabel='Leave empty slots'
+                label={t('storage.sort.empty-slot')}
+                checked={leaveEmptySlot}
+                onChange={() => setValue('leaveEmptySlot', !leaveEmptySlot)}
+            />
 
-            <div>
+            <Box>
                 {t('storage.sort.description.1')}
                 <br />
                 {saveId ? t('storage.sort.description.2') : t('storage.sort.description.3')}
-            </div>
+            </Box>
 
-            <Button
+            <UIButton
+                name='submit'
+                controlLabel='Submit'
                 type='submit'
-                big
-                bgColor={theme.bg.primary}
+                color='blue'
                 loading={formState.isSubmitting}
                 disabled={!formState.isValid}
+                leftSection={<SortDescIcon />}
             >
-                <Icon name='sort' solid forButton />
                 {t('action.submit')}
-            </Button>
-        </form>
+            </UIButton>
+        </Stack>
     );
 };

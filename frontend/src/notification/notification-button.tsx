@@ -1,66 +1,75 @@
-import { css } from '@emotion/css';
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
+import { ActionIcon, Tooltip } from '@mantine/core';
+import { BellIcon } from 'lucide-react';
 import React from 'react';
 import { BackendErrorsContext } from '../data/backend-errors-context';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
 import { useTranslate } from '../translate/i18n';
-import { Button } from '../ui/button/button';
-import { ButtonWithDisabledPopover, type ButtonWithDisabledPopoverProps } from '../ui/button/button-with-disabled-popover';
-import { Icon } from '../ui/icon/icon';
+import type { PopoverContext } from '../ui-new/interaction/focus-controls/components/popover/context/popover-context';
+import { PopoverWithControls } from '../ui-new/interaction/focus-controls/components/popover/popover-with-controls';
 import { useCheckUpdate } from './hooks/use-check-update';
 import { NotificationCardManager } from './notification-card-manager';
 
-export const NotificationButton: React.FC = () => {
-    const { t } = useTranslate();
+const useOpened = () => {
+    const [ notifsCountState, setNotifsCountState ] = React.useState(0);
 
     const hasUpdate = !!useCheckUpdate();
     const warnings = useWarningsGetWarnings().data?.data;
 
-    const [ openNotif, setOpenNotif ] = React.useState(false);
-    const hasWarnings = !!warnings && warnings.warningsCount > 0;
-    const hasErrors = BackendErrorsContext.useValue().errors.length > 0 || hasWarnings || hasUpdate;
+    const notifsCount = BackendErrorsContext.useValue().errors.length
+        + (warnings?.warningsCount ?? 0)
+        + (hasUpdate ? 1 : 0);
 
-    React.useEffect(() => {
-        if (openNotif && !hasErrors) {
-            setOpenNotif(false);
-        }
-    }, [ hasErrors, openNotif ]);
+    const opened = notifsCount !== notifsCountState;
 
-    React.useEffect(() => {
-        if (hasErrors) {
-            setOpenNotif(true);
-        }
-    }, [ hasErrors ]);
+    const ctx: PopoverContext = {
+        opened,
+        setOpened: React.useCallback(nextOpened => {
+            if (typeof nextOpened === 'function')
+                nextOpened = nextOpened(opened);
 
-    return (
-        <Popover
-            className={css({
-                display: 'flex',
-                flexDirection: 'column',
-                height: '1lh',
-            })}
-        >
-            <PopoverButton
-                as={NotifButtonWithDisabledPopover}
-                disabled={!hasErrors}
-                showHelp={!hasErrors}
-                helpTitle={t('header.notifications.help')}
-                onClick={() => setOpenNotif(value => !value)}
+            setNotifsCountState(nextOpened
+                ? 0
+                : notifsCount);
+        }, [ notifsCount, opened ]),
+    };
 
-            >
-                <Icon name='bell' solid forButton />
-            </PopoverButton>
-
-            {openNotif && <PopoverPanel
-                static
-                anchor='bottom end'
-                className={css({ zIndex: 30 })}
-            >
-                <NotificationCardManager />
-            </PopoverPanel>}
-        </Popover>
-    );
+    return {
+        ...ctx,
+        hasNotifs: notifsCount > 0,
+    };
 };
 
-const NotifButtonWithDisabledPopover = (props: ButtonWithDisabledPopoverProps<typeof Button>) =>
-    <ButtonWithDisabledPopover as={Button} {...props} />;
+export const NotificationButton: React.FC = () => {
+    const { t } = useTranslate();
+
+    const { hasNotifs, opened, setOpened } = useOpened();
+
+    return (
+        <PopoverWithControls
+            opened={opened}
+            setOpened={setOpened}
+            position='bottom-end'
+            target={<Tooltip
+                label={t('header.notifications.help')}
+                disabled={hasNotifs}
+            >
+                <ActionIcon
+                    // variant='subtle'
+                    onClick={() => setOpened(value => !value)}
+                    disabled={!hasNotifs}
+                >
+                    <BellIcon />
+                </ActionIcon>
+            </Tooltip>}
+            dropdown={<NotificationCardManager />}
+            dropdownProps={{
+                p: 0,
+                maw: 600,
+                mah: 300,
+                style: {
+                    border: 'none',
+                },
+            }}
+        />
+    );
+};

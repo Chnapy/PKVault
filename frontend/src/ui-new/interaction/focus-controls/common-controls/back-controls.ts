@@ -10,7 +10,7 @@ export const getBackControl = (partial: Omit<ControlActionInput, 'name' | 'trigg
         // },
         keyboard: {
             type: 'keyboard',
-            values: [ 'Backspace' ],
+            values: [ 'Escape' ],
         },
         gamepad: {
             type: 'gamepad',

@@ -1,8 +1,8 @@
 import { ActionIcon, Button, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { PenIcon, TrashIcon } from 'lucide-react';
 import type React from 'react';
-import { UIConfirmPopover } from '../../../confirm-popover/ui-confirm-popover';
-import { UIPopover } from '../../../confirm-popover/ui-popover';
+import { UIConfirmPopover } from '../../../popover/ui-confirm-popover';
+import { UIPopover } from '../../../popover/ui-popover';
 import type { UIExpandableTabsData } from '../../../expandable-tabs/ui-expandable-tabs';
 import { WithControlsIcons } from '../../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../../interaction/focus-controls/common-controls/select-controls';

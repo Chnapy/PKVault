@@ -1,5 +1,5 @@
-import { css } from "@emotion/css";
-import { Listbox, ListboxOption, ListboxOptions } from "@headlessui/react";
+import { Group, Stack, type ComboboxItem } from '@mantine/core';
+import { AlertTriangleIcon, CalendarSyncIcon } from 'lucide-react';
 import type React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type { StorageDexSyncParams } from "../../data/sdk/model";
@@ -7,22 +7,22 @@ import { useSaveInfosGetAll } from "../../data/sdk/save-infos/save-infos.gen";
 import { useStorageDexSync } from "../../data/sdk/storage/storage.gen";
 import { useStaticData } from "../../hooks/use-static-data";
 import { useTranslate } from "../../translate/i18n";
-import { Button } from "../../ui/button/button";
-import { FilterLabel } from "../../ui/filter/filter-label/filter-label";
-import { Icon } from "../../ui/icon/icon";
+import { UIButton } from '../../ui-new/form/button/ui-button';
+import { UIMultiSelect } from '../../ui-new/form/select/ui-multi-select';
+import { usePopover } from '../../ui-new/interaction/focus-controls/components/popover/hooks/use-popover';
 import { GameImg } from '../../ui/img/game-img';
-import { theme } from "../../ui/theme";
 
 export const DexSyncAdvancedAction: React.FC<{
   saveId: number;
-  close: () => void;
-}> = ({ saveId, close }) => {
+}> = ({ saveId }) => {
   const { t } = useTranslate();
+
+  const popover = usePopover();
 
   const staticData = useStaticData();
 
   const saveInfosQuery = useSaveInfosGetAll();
-  const saveInfos = Object.values(saveInfosQuery.data?.data ?? {});
+  const saveInfos = saveInfosQuery.data?.data ?? {};
 
   const dexSyncMutation = useStorageDexSync();
 
@@ -46,113 +46,69 @@ export const DexSyncAdvancedAction: React.FC<{
       return;
     }
 
-    close();
+    popover?.setOpened(false);
   });
 
   return (
-    <form
+    <Stack
+      component='form'
       onSubmit={onSubmit}
-      className={css({
-        maxWidth: 350,
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-      })}
+      maw={350}
     >
-      <div>{t("storage.dex-sync.title")}</div>
-
-      <Listbox
-        multiple
+      <UIMultiSelect
+        name='saveIds'
+        controlLabel='Select Pokedexes'
+        label={t("storage.dex-sync.title")}
         value={saveIds.map(String)}
-        onChange={(newIds) => {
-          setValue("saveIds", newIds.map(Number));
-        }}
-      >
-        <ListboxOptions
-          static
-          className={css({
-            maxHeight: 210,
-            overflowY: "auto",
-            userSelect: "none",
-          })}
-        >
-          {[
-            // pkvault storage
-            {
-              value: "0",
-              label: (
-                <>
-                  <GameImg
-                    version={null}
-                    size={14}
-                  />
-                  PKVault
-                </>
-              ),
-              selected: saveIds.includes(0),
-              disabled: 0 === saveId,
-            },
-            ...saveInfos.map((save) => ({
-              value: save.id.toString(),
-              label: (
-                <>
-                  <GameImg
-                    version={save.version}
-                    size={14}
-                  />
-                  {staticData.versions[ save.version ]?.name} - {save.trainerName}
-                </>
-              ),
-              selected: saveIds.includes(save.id),
-              disabled: save.id === saveId,
-            })),
-          ].map(({ value, label, selected, disabled }, i) => (
-            <ListboxOption
-              key={value}
-              value={value}
-              className={css({
-                marginTop: i ? 2 : 0,
-                opacity: disabled ? 0.75 : undefined,
-                pointerEvents: disabled ? "none" : undefined,
-              })}
-              disabled={disabled}
-            >
-              <FilterLabel
-                className={css({
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                })}
-                enabled={selected}
-              >
-                {label}
-              </FilterLabel>
-            </ListboxOption>
-          ))}
-        </ListboxOptions>
-      </Listbox>
+        onChange={value => setValue('saveIds', value.map(Number))}
+        data={[
+          {
+            value: '0',
+            label: 'PKVault',
+            disabled: saveId === 0,
+          },
+          ...Object.values(saveInfos).map((save): ComboboxItem => ({
+            value: save.id.toString(),
+            label: `${staticData.versions[ save.version ]?.name} - ${save.trainerName}`,
+            // selected: saveIds.includes(save.id),
+            disabled: save.id === saveId,
+          })),
+        ]}
+        // renderPill={({ option, onRemove }) => }
+        renderOption={({ option, checked = false }) => option && <Group>
+          <GameImg
+            version={option.value === '0' ? null : saveInfos[ +option.value ]!.version}
+            size={14}
+          />
+          {option.label}
+        </Group>}
+        searchable
+        comboboxProps={{ withinPortal: false, position: 'right-start', floatingHeight: "viewport" }}
+        floatingHeight="viewport"
+      />
 
       <div>{t("storage.dex-sync.description")}</div>
 
       <div
-        className={css({
+        style={{
           whiteSpace: "pre-line",
-        })}
+        }}
       >
-        <Icon name="exclamation-triangle" solid forButton />{" "}
+        <AlertTriangleIcon />{" "}
         {t("storage.actions.unsafe")}
       </div>
 
-      <Button
+      <UIButton
+        name='submit'
+        controlLabel='Submit'
         type="submit"
-        big
-        bgColor={theme.bg.primary}
+        color='blue'
         loading={formState.isSubmitting}
         disabled={saveIds.length < 2}
+        leftSection={<CalendarSyncIcon />}
       >
-        <Icon name="table" solid forButton />
         {t("action.submit")}
-      </Button>
-    </form>
+      </UIButton>
+    </Stack>
   );
 };

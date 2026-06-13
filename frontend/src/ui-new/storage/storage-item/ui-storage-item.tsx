@@ -38,7 +38,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
 
     const panel = useCurrentPanel();
 
-    const setPopover = usePopover();
+    const popover = usePopover();
 
     const checked = useSelectHasValue(container, [ id ]);
     const { addId, removeId } = useSelectContextActions();
@@ -70,9 +70,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
             getSelectControl({
                 label: 'Open',
                 action: e => {
-                    setPopover?.(s => ({
-                        opened: !s.opened,
-                    }));
+                    popover?.setOpened(opened => !opened);
                     onClick?.(e);
                 },
             }),

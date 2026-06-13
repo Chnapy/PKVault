@@ -1,7 +1,7 @@
 import { Group, NumberInput, Stack } from '@mantine/core';
 import { ChevronLeftIcon, ChevronRightIcon, SaveIcon } from 'lucide-react';
 import React from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch, type UseFormRegisterReturn } from 'react-hook-form';
 import { BoxType, type BankDTO, type BoxDTO, type StorageUpdateMainBoxParams } from '../../../../data/sdk/model';
 import { useTranslate } from '../../../../translate/i18n';
 import { UIButton } from '../../../form/button/ui-button';
@@ -25,14 +25,14 @@ type UIBoxEditProps = {
 export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultValues, boxList, bankList, minSlotCount, onOrderChange, onSubmit: onSubmitRaw }) => {
     const { t } = useTranslate();
 
-    const setPopover = usePopover();
+    const popover = usePopover();
 
     const boxes = [ ...boxList ].sort((b1, b2) => b1.order < b2.order ? -1 : 1);
 
     const { register, handleSubmit, formState, setValue, control } = useForm({
         defaultValues,
     });
-    const [ watchType, watchName, watchOrder, watchBankId ] = useWatch({ control, name: [ 'type', 'boxName', 'order', 'bankId' ] });
+    const [ watchType, watchName, watchOrder, watchBankId, watchSlotCount ] = useWatch({ control, name: [ 'type', 'boxName', 'order', 'bankId', 'slotCount' ] });
 
     const previousBox = [ ...boxes ].reverse().find(b => b.id !== boxId && b.order <= watchOrder);
     const nextBox = boxes.find(b => b.id !== boxId && b.order >= watchOrder);
@@ -44,9 +44,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
 
     const onSubmit = handleSubmit(async (data) => {
         await onSubmitRaw(data);
-        setPopover?.(() => ({
-            opened: false,
-        }));
+        popover?.setOpened(false);
     });
 
     return <Stack
@@ -77,12 +75,12 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
             {...register('slotCount', {
                 valueAsNumber: true,
                 min: minSlotCount,
-                // min: 0,
                 max: 300,
-            })}
+            }) as Omit<UseFormRegisterReturn<"slotCount">, 'min' | 'max'>}
             label={t('storage.box.edit.slotCount')}
             description={`${minSlotCount} - ${300}`}
-            onChange={value => value}
+            value={watchSlotCount}
+            onChange={value => setValue('slotCount', +value)}
         />
 
         <Group>

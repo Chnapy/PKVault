@@ -1,7 +1,7 @@
 import { ActionIcon, Table, Text, Tooltip } from '@mantine/core';
 import { ArchiveRestoreIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
-import { UIConfirmPopover } from '../../confirm-popover/ui-confirm-popover';
+import { UIConfirmPopover } from '../../popover/ui-confirm-popover';
 import { UITextInput } from '../../form/text-input/ui-text-input';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';

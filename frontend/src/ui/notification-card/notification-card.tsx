@@ -1,8 +1,7 @@
-import { css } from '@emotion/css';
+import { Card, Center, Divider, Group, Table } from '@mantine/core';
+import { ChevronDownIcon } from 'lucide-react';
 import React from 'react';
 import { useTranslate } from '../../translate/i18n';
-import { TitledContainer } from '../container/titled-container';
-import { Icon } from '../icon/icon';
 
 export type NotificationCardProps = {
     warningsCount: number;
@@ -26,36 +25,36 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
         errorsCount > 0 && t('notifications.errors', { count: errorsCount }),
     ].filter(Boolean).join(' / ');
 
-    return <TitledContainer
-        contrasted
-        maxHeight={300}
-        title={title && <div
-            className={css({
-                display: 'flex',
-                justifyContent: 'center',
-                gap: 4,
-            })}
-        >
-            <Icon name='angle-down' forButton />
-            {title}
-            <Icon name='angle-down' forButton />
-        </div>}
-    >
-        <table className={css({
-            maxWidth: 600,
-            wordBreak: 'break-word'
-        })}>
-            <tbody>
-                {update}
+    return <Card>
+        <Card.Section inheritPadding>
+            <Center>
+                <Group>
+                    <ChevronDownIcon />
+                    {title}
+                    <ChevronDownIcon />
+                </Group>
+            </Center>
+        </Card.Section>
 
-                {saveDuplicateWarnings}
-                {pkmVariantWarnings}
-                {saveChangedWarnings}
+        <Card.Section inheritPadding>
+            <Table
+                // maw={600}
+                style={{ wordBreak: 'break-word' }}
+            >
+                <Table.Tbody>
+                    {update}
 
-                {hasErrorsAndWarnings && <tr><td><hr /></td></tr>}
+                    {saveDuplicateWarnings}
+                    {pkmVariantWarnings}
+                    {saveChangedWarnings}
 
-                {errors}
-            </tbody>
-        </table>
-    </TitledContainer>
+                    {hasErrorsAndWarnings && <Table.Tr><Table.Td>
+                        <Divider />
+                    </Table.Td></Table.Tr>}
+
+                    {errors}
+                </Table.Tbody>
+            </Table>
+        </Card.Section>
+    </Card>;
 };

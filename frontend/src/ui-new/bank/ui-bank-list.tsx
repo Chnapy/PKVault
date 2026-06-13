@@ -1,6 +1,7 @@
-import { ActionIcon, Group } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { CirclePlusIcon, LandmarkIcon } from 'lucide-react';
 import type React from 'react';
+import { UIActionIcon } from '../form/button/ui-action-icon';
 import { UISubHeader, type UISubHeaderProps, type UISubHeaderTabsData } from '../layout/header/sub-header/ui-sub-header';
 import { UIBankItem, type UIBankItemProps } from './ui-bank-item';
 
@@ -24,14 +25,16 @@ export const UIBankList: React.FC<UIBankListProps> = ({ onCreate, renderExpanded
         renderExpanded={(data, opt) => <Group>
             {renderExpanded?.(data, opt)}
 
-            <ActionIcon
+            <UIActionIcon
+                name='bank-create'
+                controlLabel='Create bank'
                 variant='subtle'
                 size='xl'
                 color='currentcolor'
                 onClick={onCreate}
             >
                 <CirclePlusIcon />
-            </ActionIcon>
+            </UIActionIcon>
         </Group>}
         {...rest}
     />;

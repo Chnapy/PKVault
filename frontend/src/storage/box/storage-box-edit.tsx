@@ -11,8 +11,15 @@ import {
 import { UIBoxEdit } from '../../ui-new/storage/storage-panel/box-list/ui-box-edit';
 import { BankContext } from '../bank/bank-context';
 
+const queryKeys = [
+    getStorageGetBoxesQueryKey(),
+    getStorageGetBoxesQueryKey({ saveId: undefined })
+];
+
 export const StorageBoxEdit: React.FC<{ boxId: string }> = ({ boxId }) => {
     const queryClient = useQueryClient();
+
+    const queryDataRef = React.useRef<storageGetBoxesResponseSuccess>(null);
 
     const boxUpdateMutation = useStorageUpdateMainBox();
     const banksQuery = useStorageGetMainBanks();
@@ -29,6 +36,16 @@ export const StorageBoxEdit: React.FC<{ boxId: string }> = ({ boxId }) => {
     const box = boxesQuery.data?.data.find(box => box.id === boxId);
     const boxes = [ ...(boxesQuery.data?.data ?? []) ].filter(b => b.bankId === box?.bankId).sort((b1, b2) => (b1.order < b2.order ? -1 : 1));
 
+    React.useEffect(() => {
+        return () => {
+            if (queryDataRef.current) {
+                queryKeys.forEach(queryKey =>
+                    queryClient.setQueryData(queryKey, queryDataRef.current)
+                );
+            }
+        };
+    }, [ queryClient ]);
+
     return box && <UIBoxEdit
         boxId={boxId}
         selected={selected}
@@ -43,10 +60,10 @@ export const StorageBoxEdit: React.FC<{ boxId: string }> = ({ boxId }) => {
         bankList={banksQuery.data?.data.map(({ id, name }) => ({ id, name })) ?? []}
         minSlotCount={minSlotCount}
         onOrderChange={order => {
-            [
-                getStorageGetBoxesQueryKey(),
-                getStorageGetBoxesQueryKey({ saveId: undefined })
-            ].forEach(queryKey => queryClient.setQueryData(queryKey, (data: storageGetBoxesResponseSuccess) => {
+            queryKeys.forEach(queryKey => queryClient.setQueryData(queryKey, (data: storageGetBoxesResponseSuccess) => {
+                if (!data)
+                    queryDataRef.current = data;
+
                 return {
                     ...data,
                     data: data?.data.map(b => {

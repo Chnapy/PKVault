@@ -4,16 +4,16 @@ import { WithControlsIcons } from '../interaction/controls/icons/with-controls-i
 import { getSelectControl } from '../interaction/focus-controls/common-controls/select-controls';
 import { usePopover } from '../interaction/focus-controls/components/popover/hooks/use-popover';
 import { useFocusControls } from '../interaction/focus-controls/use-focus-controls';
-import { UIPopover } from './ui-popover';
+import { UIPopover, type UIPopoverProps } from './ui-popover';
 
-type UIConfirmPopoverProps = {
+type UIConfirmPopoverProps = Pick<UIPopoverProps, 'popoverRef' | 'children'> & {
     label: string;
     action?: () => void;
-    children: React.ReactElement;
 };
 
-export const UIConfirmPopover: React.FC<UIConfirmPopoverProps> = ({ label, action, children }) => {
+export const UIConfirmPopover: React.FC<UIConfirmPopoverProps> = ({ label, action, popoverRef, children }) => {
     return <UIPopover
+        popoverRef={popoverRef}
         dropdown={<Dropdown label={label} action={action} />}
     >
         {children}
@@ -21,7 +21,7 @@ export const UIConfirmPopover: React.FC<UIConfirmPopoverProps> = ({ label, actio
 };
 
 const Dropdown: React.FC<Pick<UIConfirmPopoverProps, 'label' | 'action'>> = ({ label, action }) => {
-    const setPopover = usePopover()!;
+    const popover = usePopover()!;
 
     const { focusControlProps, controlsIcons } = useFocusControls({
         scopeNodeId: `confirm_dropdown`,
@@ -31,9 +31,7 @@ const Dropdown: React.FC<Pick<UIConfirmPopoverProps, 'label' | 'action'>> = ({ l
                 label: 'Confirm',
                 action: () => {
                     action?.();
-                    setPopover!(() => ({
-                        opened: false,
-                    }));
+                    popover.setOpened(false);
                 },
             }),
         ],

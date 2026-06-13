@@ -35,7 +35,7 @@ export const UIPokedexItem: React.FC<UIPokedexItemProps> = ({
     isSeen, isSeenAlpha, isCaught, isOwned, isOwnedShiny,
     label, children
 }) => {
-    const setPopover = usePopover();
+    const popover = usePopover();
 
     const { focusControlProps, controlsIcons } = useFocusControls({
         scopeNodeId: id,
@@ -43,9 +43,7 @@ export const UIPokedexItem: React.FC<UIPokedexItemProps> = ({
             getSelectControl({
                 label: 'Open',
                 action: e => {
-                    setPopover?.(s => ({
-                        opened: !s.opened,
-                    }));
+                    popover?.setOpened(opened => !opened);
                     // onClick?.(e);
                 },
             }),

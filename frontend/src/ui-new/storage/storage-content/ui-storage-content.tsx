@@ -1,4 +1,4 @@
-import { Group } from '@mantine/core';
+import { Grid } from '@mantine/core';
 import type React from 'react';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { FocusScope } from '../../interaction/focus/scope/focus-scope';
@@ -25,31 +25,34 @@ export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, ri
             display='flex'
             style={{ flexGrow: 1, }}
         >
-            <Group
-                id={id}
-                grow
-                wrap='nowrap'
-                align='stretch'
-                mih={0}
-                bdrs='md'
-                {...panelProps}
-                w='100%'
-                style={{
-                    flexGrow: 1,
-                }}
-            >
-                <FocusScope id={childScopeId} parentNodeId={nodeId}>
+            <FocusScope id={childScopeId} parentNodeId={nodeId}>
+                <Grid
+                    id={id}
+                    w='100%'
+                    bdrs='md'
+                    {...panelProps}
+                    styles={{
+                        inner: {
+                            height: '100%',
+                            flexWrap: 'nowrap',
+                        }
+                    }}
+                >
                     <CurrentPanelProvider initialValue='left'>
-                        <PanelProvider value='left'>
-                            {left}
-                        </PanelProvider>
-                        {/* {middle} */}
-                        <PanelProvider value='right'>
-                            {right}
-                        </PanelProvider>
+                        <Grid.Col span={6}>
+                            <PanelProvider value='left'>
+                                {left}
+                            </PanelProvider>
+                        </Grid.Col>
+
+                        <Grid.Col span={6}>
+                            <PanelProvider value='right'>
+                                {right}
+                            </PanelProvider>
+                        </Grid.Col>
                     </CurrentPanelProvider>
-                </FocusScope>
-            </Group>
+                </Grid>
+            </FocusScope>
         </WithControlsIcons>
     );
 };

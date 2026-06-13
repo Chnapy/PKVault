@@ -1,16 +1,14 @@
-import { css } from '@emotion/css';
+import { ActionIcon, Table } from '@mantine/core';
+import { TrashIcon } from 'lucide-react';
 import React from 'react';
 import { BackendErrorsContext } from '../data/backend-errors-context';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
-import { HasUpdateWarning } from './warnings/has-update-warning';
+import { NotificationCard } from '../ui/notification-card/notification-card';
 import { useCheckUpdate } from './hooks/use-check-update';
+import { HasUpdateWarning } from './warnings/has-update-warning';
 import { PkmVariantWarning } from './warnings/pkm-variant-warning';
 import { SaveChangedWarning } from './warnings/save-changed-warning';
 import { SaveDuplicateWarning } from './warnings/save-duplicate-warning';
-import { Button } from '../ui/button/button';
-import { Icon } from '../ui/icon/icon';
-import { theme } from '../ui/theme';
-import { NotificationCard } from '../ui/notification-card/notification-card';
 
 export const NotificationCardManager: React.FC = () => {
     const { errors, removeIndex } = BackendErrorsContext.useValue();
@@ -26,32 +24,36 @@ export const NotificationCardManager: React.FC = () => {
         pkmVariantWarnings={warnings?.pkmVariantWarnings.map((warn, i) => <PkmVariantWarning key={i} {...warn} />)}
         saveChangedWarnings={warnings?.saveChangedWarnings.map((warn, i) => <SaveChangedWarning key={i} {...warn} />)}
         errors={errors.map((error, i) => {
-            return <tr key={i}>
-                <td>
+            return <Table.Tr key={i}>
+                <Table.Td>
                     <details>
-                        <summary className={css({
+                        <summary style={{
                             whiteSpace: 'break-spaces',
                             cursor: 'pointer'
-                        })}>{error.message}</summary>
+                        }}>{error.message}</summary>
 
-                        <code className={css({
+                        <code style={{
                             display: 'flex',
                             fontSize: '75%',
-                            backgroundColor: theme.bg.contrastdark,
+                            // backgroundColor: theme.bg.contrastdark,
                             padding: 4,
                             maxHeight: 200,
                             overflowY: 'auto',
-                        })}>
+                        }}>
                             {error.stack}
                         </code>
                     </details>
-                </td>
-                <td className={css({ verticalAlign: 'top' })}>
-                    <Button onClick={() => removeIndex(i)}>
-                        <Icon name='times' forButton />
-                    </Button>
-                </td>
-            </tr>;
+                </Table.Td>
+                <Table.Td valign='top'>
+                    <ActionIcon
+                        variant='default'
+                        onClick={() => removeIndex(i)}
+                        size='sm'
+                    >
+                        <TrashIcon fontSize='1lh' />
+                    </ActionIcon>
+                </Table.Td>
+            </Table.Tr>;
         })}
     />;
 };

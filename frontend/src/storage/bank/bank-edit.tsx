@@ -11,6 +11,8 @@ export const BankEdit: React.FC<{ bankId: string; }> = ({ bankId }) => {
 
     const queryClient = useQueryClient();
 
+    const queryDataRef = React.useRef<storageGetMainBanksResponseSuccess>(null);
+
     const banksQuery = useStorageGetMainBanks();
     const banks = [ ...banksQuery.data?.data ?? [] ].sort((b1, b2) => b1.order < b2.order ? -1 : 1);
     const bank = banks.find(bank => bank.id === bankId);
@@ -21,6 +23,14 @@ export const BankEdit: React.FC<{ bankId: string; }> = ({ bankId }) => {
     const currentBankView = StorageBankView.getBankViewFromStorages(storages);
 
     const selected = selectedBankBoxes.data?.selectedBank.id === bankId;
+
+    React.useEffect(() => {
+        return () => {
+            if (queryDataRef.current) {
+                queryClient.setQueryData(getStorageGetMainBanksQueryKey(), queryDataRef.current);
+            }
+        };
+    }, [ queryClient ]);
 
     return bank && <UIBankEdit
         bankId={bankId}
@@ -35,6 +45,9 @@ export const BankEdit: React.FC<{ bankId: string; }> = ({ bankId }) => {
         currentBankView={currentBankView}
         onOrderChange={order => {
             queryClient.setQueryData(getStorageGetMainBanksQueryKey(), (data: storageGetMainBanksResponseSuccess) => {
+                if (!queryDataRef.current)
+                    queryDataRef.current = data;
+
                 return {
                     ...data,
                     data: data?.data

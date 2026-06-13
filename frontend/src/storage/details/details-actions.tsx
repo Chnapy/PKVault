@@ -5,12 +5,12 @@ import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import type { PkmSaveDTO } from '../../data/sdk/model';
 import { useStorageEvolvePkms, useStorageMainDeletePkmVariant, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
-import { UIConfirmPopover } from '../../ui-new/confirm-popover/ui-confirm-popover';
-import { UIPopover } from '../../ui-new/confirm-popover/ui-popover';
+import { UIConfirmPopover } from '../../ui-new/popover/ui-confirm-popover';
+import { UIPopover } from '../../ui-new/popover/ui-popover';
 import { UIButton } from '../../ui-new/form/button/ui-button';
 import { useControls } from '../../ui-new/interaction/controls/use-controls';
 import { getDragControls } from '../../ui-new/interaction/focus-controls/common-controls/drag-controls';
-import type { UsePopoverValue } from '../../ui-new/interaction/focus-controls/components/popover/hooks/use-popover';
+import type { PopoverContext } from '../../ui-new/interaction/focus-controls/components/popover/context/popover-context';
 import { useFocusScopeContext } from '../../ui-new/interaction/focus/scope/use-focus-scope-context';
 import { useDragging } from '../../ui-new/interaction/move/hooks/use-dragging';
 import { filterIsDefined } from '../../util/filter-is-defined';
@@ -84,7 +84,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
     const canEvolveList = pkms.filter(pkm => pkm.canEvolve);
     const canReleaseList = pkms.filter(pkm => pkm.canDelete);
 
-    const editPopoverRef = React.useRef<UsePopoverValue>(undefined);
+    const editPopoverRef = React.useRef<PopoverContext[ 'setOpened' ]>(null);
 
     const nodeId = `storage-item-${storageIndex}-${pkmToMove?.boxSlot}`;
 
@@ -104,7 +104,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
                     },
                 },
                 spread: false,
-                action: () => editPopoverRef.current?.(({ opened }) => ({ opened: !opened })),
+                action: () => editPopoverRef.current?.(opened => !opened),
             },
         ],
         { enabled: true }

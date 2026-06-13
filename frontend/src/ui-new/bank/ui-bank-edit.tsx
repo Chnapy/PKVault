@@ -24,7 +24,7 @@ type UIBankEditProps = {
 export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaultValues, bankList, currentBankView, onOrderChange, onSubmit: onSubmitRaw }) => {
     const { t } = useTranslate();
 
-    const setPopover = usePopover();
+    const popover = usePopover();
 
     const banks = [ ...bankList ].sort((b1, b2) => b1.order < b2.order ? -1 : 1);
 
@@ -52,9 +52,7 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
             view: view ?? defaultValues.view,
             ...rest,
         });
-        setPopover?.(() => ({
-            opened: false,
-        }));
+        popover?.setOpened(false);
     });
 
     return <Stack

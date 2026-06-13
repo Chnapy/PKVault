@@ -33,7 +33,7 @@ const useTargetAllPositions = (): MoveProviderProps<MoveContainerValue, MovePara
         const sourcePositions = Object.fromEntries(
             sourceIds.map(id => [
                 id,
-                sourcePkmIndex?.getById(id)?.boxSlot,
+                sourcePkmIndex?.byId[ id ]?.boxSlot,
             ] as const)
                 .filter((entry): entry is [ string, number ] => filterIsDefined(entry[ 1 ])),
         );

@@ -1,18 +1,18 @@
-import { getSingleElementChild, Popover } from '@mantine/core';
+import { getSingleElementChild, Menu } from '@mantine/core';
 import React from 'react';
 import type { FocusScopeId } from '../../../focus/provider/focus-context';
 import { popoverContext, type PopoverContext } from './context/popover-context';
 import { usePopover } from './hooks/use-popover';
 import { PopoverDropdownWithControls } from './popover-dropdown-with-controls';
 
-export type PopoverWithControlsProps = Partial<PopoverContext> & {
+export type MenuWithControlsProps = Partial<PopoverContext> & {
     // target props are passed by mantine
     target: React.ReactElement;
     dropdown: React.ReactNode;
-    dropdownProps?: Popover.Dropdown.Props;
-} & Omit<Popover.Props, 'opened' | 'withinPortal'>;
+    dropdownProps?: Menu.Dropdown.Props;
+} & Omit<Menu.Props, 'opened' | 'withinPortal'>;
 
-export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, ...rest }) => {
+export const MenuWithControls: React.FC<MenuWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, ...rest }) => {
     const [ innerOpened, setInnerOpened ] = React.useState(false);
 
     const ctx = React.useMemo((): PopoverContext => opened !== undefined && setOpened
@@ -35,21 +35,21 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened
     }
 
     return <popoverContext.Provider value={ctx}>
-        <Popover
+        <Menu
             opened={ctx.opened}
             onChange={ctx.setOpened}
             withinPortal={!nested}
             {...rest}
         >
-            <Popover.Target>
+            <Menu.Target>
                 {target}
-            </Popover.Target>
+            </Menu.Target>
 
-            <Popover.Dropdown {...dropdownProps}>
+            <Menu.Dropdown {...dropdownProps}>
                 <PopoverDropdownWithControls scopeId={scopeId}>
                     {dropdown}
                 </PopoverDropdownWithControls>
-            </Popover.Dropdown>
-        </Popover>
+            </Menu.Dropdown>
+        </Menu>
     </popoverContext.Provider>;
 };

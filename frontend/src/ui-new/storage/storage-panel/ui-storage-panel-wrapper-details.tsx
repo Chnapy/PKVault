@@ -1,16 +1,16 @@
 import type React from 'react';
 import { PopoverWithControls, type PopoverWithControlsProps } from '../../interaction/focus-controls/components/popover/popover-with-controls';
 
-export type UIStoragePanelWrapperDetailsProps = Pick<PopoverWithControlsProps, 'context'> & {
+export type UIStoragePanelWrapperDetailsProps = Pick<PopoverWithControlsProps, 'opened' | 'setOpened'> & {
     seeThrough?: boolean;
     details: React.ReactNode;
     children: React.ReactElement;
 };
 
-export const UIStoragePanelWrapperDetails: React.FC<UIStoragePanelWrapperDetailsProps> = ({ context, seeThrough = false, details, children }) => {
-
+export const UIStoragePanelWrapperDetails: React.FC<UIStoragePanelWrapperDetailsProps> = ({ opened, setOpened, seeThrough = false, details, children }) => {
     return <PopoverWithControls
-        context={context}
+        opened={opened}
+        setOpened={setOpened}
         target={children}
         dropdown={details}
         dropdownProps={{

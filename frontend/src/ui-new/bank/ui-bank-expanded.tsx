@@ -1,12 +1,13 @@
 import { ActionIcon, Divider, Flex, Group, NumberFormatter, Stack, Text } from '@mantine/core';
 import { BoxIcon, ExternalLinkIcon, PenIcon, StarIcon, TrashIcon } from 'lucide-react';
-import type React from 'react';
-import { UIConfirmPopover } from '../confirm-popover/ui-confirm-popover';
-import { UIPopover } from '../confirm-popover/ui-popover';
+import React from 'react';
+import { UIConfirmPopover } from '../popover/ui-confirm-popover';
+import { UIPopover } from '../popover/ui-popover';
 import { UIBallIcon } from '../icon/ui-ball-icon';
 import { WithControlsIcons } from '../interaction/controls/icons/with-controls-icons';
 import { getDragControls } from '../interaction/focus-controls/common-controls/drag-controls';
 import { getSelectControl } from '../interaction/focus-controls/common-controls/select-controls';
+import type { PopoverContext } from '../interaction/focus-controls/components/popover/context/popover-context';
 import { useFocusControls } from '../interaction/focus-controls/use-focus-controls';
 import { useDragSubmitting } from '../interaction/move/hooks/use-drag-submitting';
 import { useDroppable } from '../interaction/move/hooks/use-droppable';
@@ -31,6 +32,9 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
     selected, loading, onSelect, onDelete,
     editDropdown,
 }) => {
+    const editPopoverRef = React.useRef<PopoverContext[ 'setOpened' ]>(null);
+    const deletePopoverRef = React.useRef<PopoverContext[ 'setOpened' ]>(null);
+
     const droppable = useDroppable({
         targetContainer: container,
         targetPosition: -1,
@@ -52,6 +56,20 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
                 },
             }),
             {
+                name: 'edit' as const,
+                label: 'Edit',
+                triggers: {
+                    gamepad: {
+                        type: 'gamepad',
+                        values: [ 'X' ],
+                    },
+                },
+                spread: false,
+                action: () => {
+                    editPopoverRef.current?.(true);
+                },
+            },
+            {
                 name: 'delete' as const,
                 label: 'Delete',
                 triggers: {
@@ -62,7 +80,7 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
                 },
                 spread: false,
                 action: () => {
-                    // TODO trigger click on action-icon
+                    deletePopoverRef.current?.(true);
                 },
             },
             ...getDragControls({ droppable }),
@@ -116,21 +134,29 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
 
         <ActionIcon.Group orientation="vertical">
             <UIPopover
+                popoverRef={editPopoverRef}
                 dropdown={editDropdown}
             >
-                <ActionIcon color='blue' disabled={!editDropdown} opacity={!editDropdown ? 0.5 : undefined}>
+                <WithControlsIcons
+                    placement='in' icons={controlsIcons.edit}
+                    as={ActionIcon<'button'>}
+                    color='blue' disabled={!editDropdown} opacity={!editDropdown ? 0.5 : undefined}
+                >
                     <PenIcon />
-                </ActionIcon>
+                </WithControlsIcons>
             </UIPopover>
 
             <UIConfirmPopover
+                popoverRef={deletePopoverRef}
                 label='Delete'
                 action={onDelete}
             >
-                <WithControlsIcons placement='out' icons={controlsIcons.delete}>
-                    <ActionIcon color='red' disabled={selected || !onDelete} opacity={selected || !onDelete ? 0.5 : undefined}>
-                        <TrashIcon />
-                    </ActionIcon>
+                <WithControlsIcons
+                    placement='in' icons={controlsIcons.delete}
+                    as={ActionIcon<'button'>}
+                    color='red' disabled={selected || !onDelete} opacity={selected || !onDelete ? 0.5 : undefined}
+                >
+                    <TrashIcon />
                 </WithControlsIcons>
             </UIConfirmPopover>
         </ActionIcon.Group>

@@ -1,25 +1,13 @@
 import React from 'react';
 import { usePkmIndex } from '../../../data/hooks/use-pkm-index';
-import { useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
-import { Route } from '../../../routes/storage';
 import { UIStoragePanelFooter } from '../../../ui-new/storage/storage-panel/ui-storage-panel-footer';
-import { BankContext } from '../../bank/bank-context';
-import { useCurrentStorage } from '../storage-panel-context';
+import { useCurrentStorageWithFallback } from '../hooks/use-current-storage-with-fallback';
 
 export const StoragePanelFooter: React.FC = () => {
-    const { getStorage } = useCurrentStorage();
-    const saveId = Route.useSearch({ select: (search) => getStorage(search.storages)?.saveId ?? null });
+    const storage = useCurrentStorageWithFallback();
+    const { saveId = null, boxId, box } = storage.data ?? {};
 
     // console.log('render box list ' + saveId);
-
-    const selectedBankBoxes = BankContext.useSelectedBankBoxes();
-
-    const boxesQuery = useStorageGetBoxes({ saveId: saveId ?? undefined });
-
-    const boxes = (boxesQuery.data?.data ?? [])
-        .filter(box => !box.bankId || box.bankId === selectedBankBoxes.data?.selectedBank.id);
-
-    const boxId = Route.useSearch({ select: (search) => getStorage(search.storages)?.boxId }) ?? boxes[ 0 ]?.idInt;
 
     const pkmCountQuery = usePkmIndex(
         saveId,
@@ -30,8 +18,6 @@ export const StoragePanelFooter: React.FC = () => {
         saveId,
         data => Object.values<Record<number, unknown>>(data.data.byBox).reduce<number>((acc, box) => acc + Object.keys(box).length, 0),
     );
-
-    const box = boxes.find(b => b.idInt === boxId);
 
     return <UIStoragePanelFooter
         boxSize={box?.slotCount ?? 0}

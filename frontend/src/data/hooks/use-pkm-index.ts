@@ -1,59 +1,48 @@
 import { useQuery, type QueryClient, type UseQueryOptions } from '@tanstack/react-query';
-import { filterIsDefined } from '../../util/filter-is-defined';
-import { getCachedPkmSaveIndex, getPkmSaveIndexOptions, type PkmSaveIndexes, type PkmSaveIndexQueryData } from './use-pkm-save-index';
-import { getCachedPkmVariantIndex, getPkmVariantIndexOptions, type PkmVariantIndexes, type PkmVariantIndexQueryData } from './use-pkm-variant-index';
 import React from 'react';
+import { getCachedPkmSaveIndex, getPkmSaveIndexOptions, type PkmSaveIndexQueryData } from './use-pkm-save-index';
+import { getCachedPkmVariantIndex, getPkmVariantIndexOptions, type PkmVariantIndexQueryData } from './use-pkm-variant-index';
 
-const createMixedIndex = (
-    pkmMainIndex: PkmVariantIndexes | undefined,
-    pkmSaveIndex: PkmSaveIndexes | undefined,
-    saveId: number | null
-) => {
-    const data = {
-        getById: (id: string) => {
-            if (saveId)
-                return pkmSaveIndex?.byId[ id ];
-            return pkmMainIndex?.byId[ id ];
-        },
-        getByBoxSlot: (box: number, slot: number) => {
-            if (saveId)
-                return [ pkmSaveIndex?.byBox[ box ]?.[ slot ] ].filter(filterIsDefined);
-            return pkmMainIndex?.byBox[ box ]?.[ slot ] ?? [];
-        },
-        getBySpecies: (species: number) => {
-            if (saveId)
-                return pkmSaveIndex?.bySpecies[ species ] ?? [];
-            return pkmMainIndex?.bySpecies[ species ] ?? [];
-        },
-        getBoxLength: (box: number) => {
-            if (saveId)
-                return Object.values(pkmSaveIndex?.byBox[ box ] ?? {}).length;
-            return Object.values(pkmMainIndex?.byBox[ box ] ?? {}).length;
-        },
-        getTotalLength: () => {
-            if (saveId)
-                return Object.values(pkmSaveIndex?.byId ?? {}).length;
-            return Object.keys(pkmMainIndex?.byBox ?? {})
-                .reduce((acc, box) => acc + data.getBoxLength(Number(box)), 0);
-        },
-    };
-    return data;
-};
+// const createMixedIndex = (
+//     pkmMainIndex: PkmVariantIndexes | undefined,
+//     pkmSaveIndex: PkmSaveIndexes | undefined,
+//     saveId: number | null
+// ) => {
+//     const data = {
+//         getById: (id: string) => {
+//             if (saveId)
+//                 return pkmSaveIndex?.byId[ id ];
+//             return pkmMainIndex?.byId[ id ];
+//         },
+//         getByBoxSlot: (box: number, slot: number) => {
+//             if (saveId)
+//                 return [ pkmSaveIndex?.byBox[ box ]?.[ slot ] ].filter(filterIsDefined);
+//             return pkmMainIndex?.byBox[ box ]?.[ slot ] ?? [];
+//         },
+//         getBySpecies: (species: number) => {
+//             if (saveId)
+//                 return pkmSaveIndex?.bySpecies[ species ] ?? [];
+//             return pkmMainIndex?.bySpecies[ species ] ?? [];
+//         },
+//         getBoxLength: (box: number) => {
+//             if (saveId)
+//                 return Object.values(pkmSaveIndex?.byBox[ box ] ?? {}).length;
+//             return Object.values(pkmMainIndex?.byBox[ box ] ?? {}).length;
+//         },
+//         getTotalLength: () => {
+//             if (saveId)
+//                 return Object.values(pkmSaveIndex?.byId ?? {}).length;
+//             return Object.keys(pkmMainIndex?.byBox ?? {})
+//                 .reduce((acc, box) => acc + data.getBoxLength(Number(box)), 0);
+//         },
+//     };
+//     return data;
+// };
 
 export const getCachedPkmIndex = (client: QueryClient, saveId: number | null) => {
-    const pkmMainIndex = saveId === null
-        ? getCachedPkmVariantIndex(client)
-        : undefined;
-    const pkmSaveIndex = saveId !== null
+    return saveId
         ? getCachedPkmSaveIndex(client, saveId)
-        : undefined;
-
-    const cachedIndex = saveId ? pkmSaveIndex : pkmMainIndex;
-
-    return cachedIndex && {
-        ...cachedIndex,
-        data: createMixedIndex(pkmMainIndex?.data, pkmSaveIndex?.data, saveId),
-    };
+        : getCachedPkmVariantIndex(client);
 };
 
 export const usePkmIndex = <D = PkmVariantIndexQueryData | PkmSaveIndexQueryData>(

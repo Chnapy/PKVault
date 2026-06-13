@@ -15,7 +15,7 @@ export const PopoverDropdownWithControls: React.FC<PopoverDropdownWithControlsPr
     const parentScope = useFocusScopeContext();
     const order = parentScope.parentsIds.length;
 
-    const setPopover = usePopover();
+    const popover = usePopover()!;
 
     useControls(
         `${scopeId}_dropdown`,
@@ -25,9 +25,7 @@ export const PopoverDropdownWithControls: React.FC<PopoverDropdownWithControlsPr
             getBackControl({
                 label: 'Close',
                 action: () => {
-                    setPopover!(() => ({
-                        opened: false,
-                    }));
+                    popover.setOpened(false);
                 },
             }),
         ],

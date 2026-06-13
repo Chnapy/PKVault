@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import type { DropRefusalReason } from '../validation/types';
-import { renderDroppable } from './use-move-droppable.test';
+import { renderDroppable } from './utils/render-droppable';
 import { setupTestDataServer } from './utils/setup-test-data-server';
 
 describe('use-move-droppable-bank', () => {

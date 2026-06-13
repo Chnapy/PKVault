@@ -1,7 +1,6 @@
-import { Box, Card, Group, type CardProps } from '@mantine/core';
+import { Box, Card, type CardProps } from '@mantine/core';
 import React from 'react';
 import { UICardSectionControl } from './card-section-control/ui-card-section-control';
-import { getBoxColumns } from './get-box-columns';
 
 export type UIStoragePanelProps = {
     gameTabs: React.ReactNode;
@@ -12,13 +11,10 @@ export type UIStoragePanelProps = {
 } & CardProps;
 
 export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header, children, footer, backgroundImageUrl, ...rest }) => {
-    const childrenCount = React.Children.count(children);
-    const cols = getBoxColumns(childrenCount);
 
     return <Card
         withBorder
-        mah='100%'
-        maw='50%'
+        h='100%'
         style={{ flexGrow: 1 }}
         {...rest}
     >
@@ -31,20 +27,7 @@ export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header
         </Box>}
 
         <Card.Section inheritPadding py='md' withBorder style={{ flexGrow: 1, flexShrink: 999, overflow: 'auto', backgroundImage: `url("${backgroundImageUrl}")` }}>
-            <Group
-                gap='sm'
-                wrap='wrap'
-                mx='auto'
-                style={cols
-                    ? {
-                        display: 'grid',
-                        gridTemplateColumns: `repeat(${cols}, 1fr)`,
-                        width: 'fit-content',
-                    }
-                    : undefined}
-            >
-                {children}
-            </Group>
+            {children}
         </Card.Section>
 
         {footer && <Card.Section component={UICardSectionControl} inheritPadding>

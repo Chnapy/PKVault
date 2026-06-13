@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePkmLegalityMap } from '../../../data/hooks/use-pkm-legality';
+import { usePkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
 import { usePkmVariantIndex } from '../../../data/hooks/use-pkm-variant-index';
 import { Gender } from '../../../data/sdk/model';
 import { withErrorCatcher } from '../../../error/with-error-catcher';
@@ -9,10 +10,8 @@ import { ItemImg } from '../../../ui/img/item-img';
 import { StorageItem, type StorageItemProps } from '../../../ui/storage-item/storage-item';
 import { pick } from '../../../util/pick';
 import { useSelectCallback } from '../../../util/use-select-callback';
-import { BankContext } from '../../bank/bank-context';
 import type { MoveContainerValue } from '../../move/move-container-fns';
 import { useCurrentStorage } from '../../panel/storage-panel-context';
-import { usePkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
 
 type StorageMainItemProps = Pick<StorageItemProps, 'nodeId'> & {
     pkmId: string;
@@ -23,9 +22,6 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
     React.memo(({ nodeId, pkmId }) => {
         const { storageIndex } = useCurrentStorage();
         const navigate = Route.useNavigate();
-
-        const selectedBankBoxes = BankContext.useSelectedBankBoxes();
-        const bank = selectedBankBoxes.data?.selectedBank.id;
 
         const variantsQuery = usePkmVariantIndex(
             useSelectCallback(data => {

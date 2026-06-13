@@ -28,7 +28,7 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
 }) => {
     const { t } = useTranslate();
 
-    const setPopover = usePopover();
+    const popover = usePopover();
 
     const { register, handleSubmit, formState, setValue, control } = useForm({
         defaultValues,
@@ -42,9 +42,7 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
 
     const onSubmit = handleSubmit(async (data) => {
         await onSubmitRaw(data);
-        setPopover?.(() => ({
-            opened: false,
-        }));
+        popover?.setOpened(false);
     });
 
     return <Stack

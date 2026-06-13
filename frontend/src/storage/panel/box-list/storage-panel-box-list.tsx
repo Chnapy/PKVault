@@ -1,31 +1,31 @@
+import { Tabs, Text } from '@mantine/core';
 import React from 'react';
 import { useStorageCreateMainBox, useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
 import { Route } from '../../../routes/storage';
 import { UIStoragePanelBoxList, type UIBoxData } from '../../../ui-new/storage/storage-panel/box-list/ui-storage-panel-box-list';
-import { BankContext } from '../../bank/bank-context';
+import { DexSyncAdvancedAction } from '../../advanced-actions/dex-sync-advanced-action';
+import { SortAdvancedAction } from '../../advanced-actions/sort-advanced-action';
+import { StorageSelectCheckbox } from '../../storage-select-checkbox';
+import { useCurrentStorageWithFallback } from '../hooks/use-current-storage-with-fallback';
 import { useCurrentStorage } from '../storage-panel-context';
 import { BoxExpanded } from './box-expanded';
 
 export const StoragePanelBoxList: React.FC = () => {
-    const { getStorage, setStorage } = useCurrentStorage();
-    const saveId = Route.useSearch({ select: (search) => getStorage(search.storages)?.saveId ?? null });
+    const { setStorage } = useCurrentStorage();
+    const storage = useCurrentStorageWithFallback();
+    const { saveId = null, boxId, bankId } = storage.data ?? {};
     const navigate = Route.useNavigate();
 
     const boxCreateMutation = useStorageCreateMainBox();
 
-    const selectedBankBoxes = BankContext.useSelectedBankBoxes();
-    const bankId = selectedBankBoxes.data?.selectedBank.id;
-
     const boxesQuery = useStorageGetBoxes({ saveId: saveId ?? undefined });
 
     const boxes = (boxesQuery.data?.data ?? [])
-        .filter(box => !box.bankId || box.bankId === selectedBankBoxes.data?.selectedBank.id)
+        .filter(box => !box.bankId || box.bankId === bankId)
         .sort((b1, b2) => b1.order < b2.order ? -1 : 1);
 
-    const boxId = Route.useSearch({ select: (search) => getStorage(search.storages)?.boxId?.toString() }) ?? boxes[ 0 ]?.id;
-
-    const isLoading = [ selectedBankBoxes, boxesQuery ].some(query => query.isLoading);
-    if (isLoading || !boxId)
+    const isLoading = [ storage, boxesQuery ].some(query => query.isLoading);
+    if (isLoading || boxId === undefined)
         return null;
 
     const onSelect = (id: string) => {
@@ -40,7 +40,7 @@ export const StoragePanelBoxList: React.FC = () => {
     };
 
     return <UIStoragePanelBoxList
-        value={boxId}
+        value={boxId.toString()}
         data={boxes.map(({ id, name }): UIBoxData => ({
             id,
             label: name,
@@ -50,6 +50,19 @@ export const StoragePanelBoxList: React.FC = () => {
             ? undefined
             : (() => boxCreateMutation.mutateAsync({ params: { bankId } }))
         }
+        renderTab={({ item, selected }) => <Tabs.Tab
+            key={item.id}
+            value={item.id}
+            py={0}
+            style={{ gap: 4 }}
+            rightSection={selected && <StorageSelectCheckbox
+                saveId={saveId}
+                boxId={boxId}
+                size='xs'
+            />}
+        >
+            <Text component={selected ? 'b' : undefined} textWrap='nowrap'>{item.label}</Text>
+        </Tabs.Tab>}
         renderExpanded={(data, { reduce }) => data.map(({ item, selected }) => <BoxExpanded
             key={item.id}
             id={item.id}
@@ -60,5 +73,7 @@ export const StoragePanelBoxList: React.FC = () => {
                 reduce();
             }}
         />)}
+        advancedActionSort={<SortAdvancedAction saveId={saveId} boxId={boxId} />}
+        advancedDexSync={<DexSyncAdvancedAction saveId={saveId ?? 0} />}
     />;
 };

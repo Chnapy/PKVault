@@ -2,12 +2,13 @@ import { Button, Card, Checkbox, Group, Stack, type ButtonProps } from '@mantine
 import { useMergedRef } from '@mantine/hooks';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import React, { type HTMLAttributes } from 'react';
+import type { PopoverTargetChildProps } from '../popover/target-open-popover';
 import { getControlIcon } from './controls/icons/get-control-icon';
 import { useAllCurrentControls } from './controls/use-all-current-controls';
 import { getDragControls } from './focus-controls/common-controls/drag-controls';
 import { getSelectControl } from './focus-controls/common-controls/select-controls';
 import { usePopover } from './focus-controls/components/popover/hooks/use-popover';
-import { PopoverWithControls, type PopoverTargetChildProps } from './focus-controls/components/popover/popover-with-controls';
+import { PopoverWithControls } from './focus-controls/components/popover/popover-with-controls';
 import { FocusControlsProvider } from './focus-controls/provider/focus-controls-provider';
 import { useFocusControls } from './focus-controls/use-focus-controls';
 import { Focus } from './focus/provider/use-focus-context';
@@ -113,9 +114,7 @@ const FakeItem: React.FC<{
             ...getDragControls({ dragging }),
             openModal && getSelectControl({
                 label: 'Open modal',
-                action: () => popover?.(s => ({
-                    opened: !s.opened,
-                })),
+                action: () => popover?.setOpened(opened => !opened),
             }),
             target && {
                 name: 'target',
@@ -363,7 +362,6 @@ export const Primary: Story = {
                                             <FakeItem box={3} pos={2} name='p2' focusOnMount />
 
                                             <PopoverWithControls
-                                                nested
                                                 target={<FakeItem box={3} pos={3} name='p3' />}
                                                 dropdown={<>
                                                     <FakeItem box={3} pos={4} name='pp1' />

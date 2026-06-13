@@ -5,7 +5,7 @@ export const useSelectContextNullable = <C>() => {
     return React.use<SelectContext<C> | null>(selectContext);
 };
 
-const useSelectContext = <C>() => {
+export const useSelectContext = <C>() => {
     const ctx = useSelectContextNullable<C>();
     if (!ctx) {
         throw new Error('Should be used inside SelectProvider');
