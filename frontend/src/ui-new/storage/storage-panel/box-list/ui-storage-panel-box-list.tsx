@@ -47,14 +47,15 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
             onChange={onSelect}
             left={<BoxIcon style={{ flexShrink: 0 }} />}
             renderTab={renderTab}
-            renderExpanded={(data, opt) => <Group>
+            renderExpanded={(data, opt) => <Group pt='md'>
                 {renderExpanded?.(data, opt)}
 
                 {onCreate && <UIActionIcon
                     name='create-box'
                     controlLabel='Create box'
-                    variant='default'
+                    variant='light'
                     size='xl'
+                    w='100%'
                     onClick={onCreate}
                 >
                     <CirclePlusIcon />
@@ -69,6 +70,7 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
                         <UIPopover
                             position='right-start'
                             dropdown={advancedActionSort}
+                            nested
                         >
                             <Menu.Item leftSection={<SortDescIcon />}>
                                 <Text>
@@ -80,6 +82,7 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
                         <UIPopover
                             position='right-start'
                             dropdown={advancedDexSync}
+                            nested
                         >
                             <Menu.Item leftSection={<CalendarSyncIcon />}>
                                 <Text>

@@ -21,10 +21,11 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, 
     const staticData = useStaticData();
     const settings = useSettingsGet();
 
-    if (species === 0)
-        species = 1;
+    const usedSpecies = species === 0
+        ? 1
+        : species;
 
-    const staticForms = staticData.species[ species ]?.forms[ context ];
+    const staticForms = staticData.species[ usedSpecies ]?.forms[ context ];
 
     if (!staticForms?.[ form ])
         console.log('UNKNOWN FORM -', species, context, form);

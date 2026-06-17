@@ -112,6 +112,12 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
 
     const refProps = { ref: dragging.ref };
 
+    const renderCount = (count: number) => {
+        if (count < 2)
+            return null;
+        return <>({count})</>;
+    };
+
     return <Group>
         <UIButton
             name='move'
@@ -141,7 +147,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
                 size='compact-md'
                 leftSection={<UnlinkIcon />}
             >
-                Detach ({attachedVariantIds.length})
+                Detach {renderCount(attachedVariantIds.length)}
             </UIButton>
             : <UIButton
                 name='move-attached'
@@ -217,7 +223,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
                 size='compact-md'
                 leftSection={<SparklesIcon />}
             >
-                Evolve ({canEvolveList.length})
+                Evolve {renderCount(canEvolveList.length)}
             </UIButton>
         </UIConfirmPopover>}
 
@@ -253,7 +259,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
                 leftSection={<TrashIcon />}
                 disabled={canReleaseList.length === 0}
             >
-                Release ({canReleaseList.length})
+                Release {renderCount(canReleaseList.length)}
             </UIButton>
         </UIConfirmPopover>
     </Group>;

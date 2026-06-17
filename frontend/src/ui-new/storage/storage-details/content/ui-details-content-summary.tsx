@@ -3,6 +3,7 @@ import type React from 'react';
 import { UISpriteSizeWrapper } from '../../../sprite-img/ui-sprite-size-wrapper';
 
 export type UIDetailsContentSummaryProps = {
+    id: string;
     heldItem?: React.ReactNode;
     nature?: string;
     ability?: string;
@@ -10,7 +11,7 @@ export type UIDetailsContentSummaryProps = {
 };
 
 export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = ({
-    heldItem, nature, ability, pid
+    id, heldItem, nature, ability, pid
 }) => {
 
     return <Grid>
@@ -44,6 +45,13 @@ export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = (
         </Grid.Col>
         <Grid.Col span={8}>
             {pid ?? '-'}
+        </Grid.Col>
+
+        <Grid.Col span={4}>
+            ID
+        </Grid.Col>
+        <Grid.Col span={8}>
+            {id}
         </Grid.Col>
     </Grid>;
 };

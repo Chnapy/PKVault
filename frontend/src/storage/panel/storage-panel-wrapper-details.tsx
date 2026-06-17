@@ -14,7 +14,7 @@ import { useCurrentStorage } from './storage-panel-context';
 
 const useOpened = () => {
     const storage = useCurrentStorageWithFallback();
-    const { saveId = null, boxId } = storage.data ?? {};
+    const { saveId = null, box } = storage.data ?? {};
 
     const { getSelected } = useCurrentStorage();
 
@@ -25,9 +25,21 @@ const useOpened = () => {
         if (s.ids.size === 0)
             return false;
 
-        const container = selectCtx.getContainerValue(s.container);
-        return container.saveId === saveId
-            && Number(container.boxId) === boxId;
+        if (!box)
+            return false;
+
+        const currentContainer = selectCtx.getContainerHash(saveId
+            ? {
+                type: 'save-item',
+                saveId,
+                boxId: box.id,
+            }
+            : {
+                type: 'main-item',
+                boxId: box.id,
+            });
+
+        return s.container === currentContainer;
     }) ?? false;
 
     const opened = selectOpened || multiSelectOpened;
@@ -66,7 +78,7 @@ export const StoragePanelWrapperDetails: React.FC = () => {
         setOpened={setOpened}
         // eslint-disable-next-line react-hooks/refs
         seeThrough={seeThrough}
-        details={<Stack>
+        details={<Stack maw='100%'>
             {multiSelectOpened && <MultiSelectActions enabled={!selectOpened} />}
 
             {selectOpened && <StorageDetails />}

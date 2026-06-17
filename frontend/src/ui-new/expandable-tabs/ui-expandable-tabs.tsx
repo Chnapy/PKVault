@@ -5,6 +5,7 @@ import type { GamepadMappingsAllButton } from '../interaction/controls/gamepad/g
 import { useControls } from '../interaction/controls/use-controls';
 import { useFocusScopeContext } from '../interaction/focus/scope/use-focus-scope-context';
 import { ScrollerControlled, type ScrollerControlledProps } from '../scroller-controlled/scroller-controlled';
+import { useMergedRef } from '@mantine/hooks';
 
 export type UIExpandableTabsData = {
     id: string;
@@ -40,15 +41,18 @@ export type UIExpandableTabsProps<D extends UIExpandableTabsData> =
     & Omit<TabsProps, keyof UIExpandableTabsOwnProps<D>>
     & {
         controlsDetailsLabel?: string;
+        defaultExpanded?: boolean;
     };
 
 export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTabsData>({
-    id, level, controlsEnabled, controlsLabel, controlsDetailsLabel,
+    id, level, controlsEnabled, controlsLabel, controlsDetailsLabel, defaultExpanded = false,
     value, data, onChange, renderTab, renderExpanded,
     left, right, grow = true,
     ...tabsProps
 }: UIExpandableTabsProps<D>) {
-    const [ expanded, setExpanded ] = React.useState(false);
+    const [ expanded, setExpanded ] = React.useState(defaultExpanded);
+
+    const tabsRef = React.useRef<HTMLDivElement>(null);
 
     const parentScope = useFocusScopeContext();
     const order = parentScope.parentsIds.length;
@@ -85,18 +89,34 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
         { enabled: expandEnabled },
     );
 
+    const ref = useMergedRef(
+        tabsRef,
+        tabsProps.ref
+    );
+
+    React.useEffect(() => {
+        const selectedTab = tabsRef.current?.querySelector<HTMLButtonElement>('button[role="tab"][data-active="true"]');
+
+        selectedTab?.scrollIntoView({
+            behavior: 'instant',
+            block: 'center',
+            inline: 'center',
+        });
+    }, [ value ]);
+
     return <Tabs
         {...controlsProps}
         value={value.toString()}
         onChange={tabId => tabId && onChange(tabId)}
         miw={0}
         {...tabsProps}
+        ref={ref}
         style={{
             flexGrow: grow ? 1 : undefined,
             ...tabsProps.style,
         }}
     >
-        <Stack>
+        <Stack gap={0}>
             <Tabs.List
                 style={{
                     flexGrow: 1,

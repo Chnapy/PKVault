@@ -25,7 +25,7 @@ export const UIStorageDetails: React.FC<UIStorageDetailsProps> = ({
             {main}
         </Card.Section>
 
-        <Card.Section withBorder>
+        <Card.Section withBorder mih={0}>
             {content}
         </Card.Section>
 

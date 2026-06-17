@@ -11,6 +11,7 @@ export type UIDetailsMainProps = {
     species: number;
     speciesName: string;
     gender: Gender;
+    isEnabled: boolean;
     isShiny?: boolean;
     isAlpha?: boolean;
     types: React.ReactNode;
@@ -27,31 +28,33 @@ export type UIDetailsMainProps = {
 };
 
 export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
-    ball, nickname, gender, isShiny, isAlpha,
+    ball, nickname, gender, isEnabled, isShiny, isAlpha,
     species, speciesName, level,
     types, heldItem, markings,
     children,
 }) => {
     return <Stack gap='xs'>
-        <Group>
-            {ball}
-            <Text size='xl'>{nickname}</Text>
-            <UIGender gender={gender} size='big' />
+        {isEnabled && <>
+            <Group>
+                {ball}
+                <Text size='xl'>{nickname}</Text>
+                <UIGender gender={gender} size='big' />
 
-            <Space ml='auto' />
-            <Text size='lg'>
-                <UIDetailsLevel level={level} />
-            </Text>
-        </Group>
+                <Space ml='auto' />
+                <Text size='lg'>
+                    <UIDetailsLevel level={level} />
+                </Text>
+            </Group>
 
-        <Group>
-            <Text component='b' size='lg'>#{species}</Text>
-            <Text size='lg' tt='uppercase'>{speciesName}</Text>
+            <Group>
+                <Text component='b' size='lg'>#{species}</Text>
+                <Text size='lg' tt='uppercase'>{speciesName}</Text>
 
-            <Space ml='auto' />
-            {isAlpha && <UIAlphaIcon size='big' />}
-            {isShiny && <UIShinyIcon size='big' />}
-        </Group>
+                <Space ml='auto' />
+                {isAlpha && <UIAlphaIcon size='big' />}
+                {isShiny && <UIShinyIcon size='big' />}
+            </Group>
+        </>}
 
         <UISpriteSizeWrapper
             speciesSize='lg'
@@ -59,10 +62,12 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
             component={Group}
             grow align='stretch' gap='xs'>
             <Stack>
-                {types}
+                {isEnabled && <>
+                    {types}
 
-                <Space mt='auto' />
-                {heldItem}
+                    <Space mt='auto' />
+                    {heldItem}
+                </>}
             </Stack>
             <Center>{children}</Center>
             <Stack>

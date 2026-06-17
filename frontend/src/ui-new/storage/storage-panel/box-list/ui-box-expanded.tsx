@@ -54,7 +54,7 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
     return <Group gap='xs' align='stretch' style={{ alignSelf: 'flex-start' }}>
         <Button
             style={{ gap: 4 }}
-            variant='default'
+            variant='light'
             disabled={selected}
             {...focusControlProps}
             h='auto'

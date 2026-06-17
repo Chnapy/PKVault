@@ -1,4 +1,4 @@
-import { Button, Card, createTheme, mergeThemeOverrides, NumberFormatter, Paper, Scroller, Tabs, Text } from '@mantine/core';
+import { ActionIcon, Alert, Button, Card, createTheme, mergeThemeOverrides, NumberFormatter, Paper, Scroller, Tabs, Text } from '@mantine/core';
 import { clsx } from 'clsx';
 import { baseTheme, cssVariablesResolver } from './base-theme';
 import classes from './theme.module.css';
@@ -42,6 +42,11 @@ export const theme = mergeThemeOverrides(
           section: classes.buttonSection,
         }),
       }),
+      ActionIcon: ActionIcon.extend({
+        classNames: (theme, props) => ({
+          root: classes.actionIcon,
+        }),
+      }),
       Text: Text.extend({
         classNames: (theme, props) => ({
           root: classes.text,
@@ -51,6 +56,12 @@ export const theme = mergeThemeOverrides(
         defaultProps: {
           thousandSeparator: "'",
         },
+      }),
+      Alert: Alert.extend({
+        classNames: (theme, props) => ({
+          title: classes.alertTitle,
+          message: classes.alertMessage,
+        }),
       }),
     },
   }),

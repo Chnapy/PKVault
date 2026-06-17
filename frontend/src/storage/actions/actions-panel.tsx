@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStorageGetActions, useStorageSave } from '../../data/sdk/storage/storage.gen';
+import { useStorageDeleteActions, useStorageGetActions, useStorageSave } from '../../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import type { UIActionProps } from '../../ui-new/actions-panel/ui-action';
 import { UIActionsPanel } from '../../ui-new/actions-panel/ui-actions-panel';
@@ -9,6 +9,7 @@ import { UIActionsPanel } from '../../ui-new/actions-panel/ui-actions-panel';
  */
 export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
     const actionsQuery = useStorageGetActions();
+    const deleteActionsMutation = useStorageDeleteActions();
     const saveMutation = useStorageSave();
 
     const actions = actionsQuery.data?.data ?? [];
@@ -18,6 +19,11 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
             return {
                 type: action.type,
             };
+        })}
+        onDelete={(index: number) => deleteActionsMutation.mutateAsync({
+            params: {
+                actionIndexToRemoveFrom: index,
+            },
         })}
         onSave={() => saveMutation.mutateAsync()}
     />;

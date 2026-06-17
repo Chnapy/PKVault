@@ -140,7 +140,7 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
                 <WithControlsIcons
                     placement='in' icons={controlsIcons.edit}
                     as={ActionIcon<'button'>}
-                    color='blue' disabled={!editDropdown} opacity={!editDropdown ? 0.5 : undefined}
+                    color='blue' disabled={!editDropdown}
                 >
                     <PenIcon />
                 </WithControlsIcons>
@@ -154,7 +154,7 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
                 <WithControlsIcons
                     placement='in' icons={controlsIcons.delete}
                     as={ActionIcon<'button'>}
-                    color='red' disabled={selected || !onDelete} opacity={selected || !onDelete ? 0.5 : undefined}
+                    color='red' disabled={selected || !onDelete}
                 >
                     <TrashIcon />
                 </WithControlsIcons>

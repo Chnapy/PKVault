@@ -23,7 +23,6 @@ export const UIDetailsSaves: React.FC<UIDetailsSavesProps> = ({ onSelect, action
         onChange={onSelect}
         renderExpanded={(data, { reduce }) => <Group
             p='md'
-            pt={0}
         >
             {data.map(({ item, selected }) => <UIDetailsSaveExpanded
                 key={item.id}

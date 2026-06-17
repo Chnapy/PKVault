@@ -32,6 +32,7 @@ export const DetailsMain: React.FC = () => {
         species={pkm.species}
         speciesName={speciesName}
         gender={pkm.gender}
+        isEnabled={pkm.isEnabled}
         isShiny={pkm.isShiny}
         isAlpha={pkm.isAlpha}
         types={pkm.types.map(type => <TypeItem key={type} type={type} />)}

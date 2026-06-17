@@ -60,6 +60,7 @@ export const StoragePanelGameList: React.FC = () => {
             })),
         ]}
         onChange={onChange}
+        defaultExpanded={value === ''}
         renderExpanded={(data, { reduce }) => data.map(({ item, selected }) =>
             item.id === 'pkvault'
                 ? <GamePkvaultExpanded

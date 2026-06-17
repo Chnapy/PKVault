@@ -13,7 +13,7 @@ type UIActionIconProps = {
     onFocusSelect?: (e: Event) => void;
 } & ActionIcon.Props & ElementProps<'button'>;
 
-export const UIActionIcon: React.FC<UIActionIconProps> = ({ name, controlLabel, controlIcons = [], focusOnMount, onClick, onFocusSelect = onClick, ...rest }) => {
+export const UIActionIcon: React.FC<UIActionIconProps> = ({ name, controlLabel, controlIcons = [], focusOnMount, onClick, onFocusSelect = onClick, h, w, mt, ...rest }) => {
 
     const { focusControlProps, controlsIcons } = useFocusControls({
         scopeNodeId: name,
@@ -40,11 +40,15 @@ export const UIActionIcon: React.FC<UIActionIconProps> = ({ name, controlLabel, 
         rest.ref,
     );
 
-    return <WithControlsIcons placement='out' icons={[ controlsIcons.open, ...controlIcons ]} display='inline-flex' h='fit-content' w='fit-content'>
+    return <WithControlsIcons placement='out' icons={[ controlsIcons.open, ...controlIcons ]} display='inline-flex' h={h ?? 'fit-content'} w={w ?? 'fit-content'} mt={mt}>
         <ActionIcon
             {...focusControlProps}
             {...rest}
             ref={ref}
+            style={{
+                flexGrow: 1,
+                ...rest.style,
+            }}
         />
     </WithControlsIcons>;
 };

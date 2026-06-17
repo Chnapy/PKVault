@@ -1,4 +1,5 @@
-import { Box, Tabs, Text } from '@mantine/core';
+import { Box, Group, Tabs, Text } from '@mantine/core';
+import { AlertTriangleIcon } from 'lucide-react';
 import React from 'react';
 import { Focus } from '../../../interaction/focus/provider/use-focus-context';
 import { useFocusScopeContext } from '../../../interaction/focus/scope/use-focus-scope-context';
@@ -20,6 +21,14 @@ export const UIDetailsContent: React.FC<UIDetailsContentProps> = ({ issues, summ
 
     const ref = React.useRef<HTMLDivElement>(null);
 
+    const onTabClick: React.MouseEventHandler<HTMLButtonElement> = e => {
+        e.currentTarget.scrollIntoView({
+            behavior: 'instant',
+            block: 'center',
+            inline: 'center',
+        });
+    };
+
     React.useEffect(() => {
         if (!ref.current || ref.current.querySelector('button[role="tab"][data-active="true"]'))
             return;
@@ -28,34 +37,37 @@ export const UIDetailsContent: React.FC<UIDetailsContentProps> = ({ issues, summ
         firstTab?.click();
     });
 
-    return <Tabs defaultValue={issues ? 'issues' : 'summary'}>
+    return <Tabs defaultValue={issues ? 'issues' : 'summary'} mah='100%' style={{
+        display: 'flex',
+        flexDirection: 'column',
+    }}>
         <Tabs.List ref={ref} grow>
             <ScrollerControlled id='details-content' level={1} controlsEnabled={scopeActive} controlsLabel='Change details content'>
-                {issues && <Tabs.Tab value='issues'>
-                    <Text>Issues</Text>
+                {issues && <Tabs.Tab value='issues' onClick={onTabClick}>
+                    <Text component={Group} wrap='nowrap' gap='sm'><AlertTriangleIcon /> Issues</Text>
                 </Tabs.Tab>}
-                {summary && <Tabs.Tab value='summary'>
+                {summary && <Tabs.Tab value='summary' onClick={onTabClick}>
                     <Text>Summary</Text>
                 </Tabs.Tab>}
-                {stats && <Tabs.Tab value='stats'>
+                {stats && <Tabs.Tab value='stats' onClick={onTabClick}>
                     <Text>Stats</Text>
                 </Tabs.Tab>}
-                {moves && <Tabs.Tab value='moves'>
+                {moves && <Tabs.Tab value='moves' onClick={onTabClick}>
                     <Text>Moves</Text>
                 </Tabs.Tab>}
-                {contest && <Tabs.Tab value='contest'>
+                {contest && <Tabs.Tab value='contest' onClick={onTabClick}>
                     <Text>Contest</Text>
                 </Tabs.Tab>}
-                {origin && <Tabs.Tab value='origin'>
+                {origin && <Tabs.Tab value='origin' onClick={onTabClick}>
                     <Text>Origin</Text>
                 </Tabs.Tab>}
-                {misc && <Tabs.Tab value='misc'>
+                {misc && <Tabs.Tab value='misc' onClick={onTabClick}>
                     <Text>Misc</Text>
                 </Tabs.Tab>}
             </ScrollerControlled>
         </Tabs.List>
 
-        <Box p='md'>
+        <Box p='md' style={{ overflow: 'auto' }}>
             {issues && <Tabs.Panel value="issues">
                 {issues}
             </Tabs.Panel>}

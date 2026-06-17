@@ -47,6 +47,21 @@ export const useDroppableValidation = () => {
         const sourceContainer = source && containerFns.getContainerValue(source.containerId);
         const sourceSaveId = sourceContainer?.saveId;
 
+        const search = router.latestLocation.search;
+
+        const storageLeft = getStorageLeft(search.storages);
+        const storageRight = getStorageRight(search.storages);
+
+        const storages = [ storageLeft, storageRight ].filter(filterIsDefined);
+
+        const storagesOptions = storages
+            .map(({ saveId }) => ({
+                targetPkmSaveIndex: saveId
+                    ? getPkmSaveIndexOptions(saveId)
+                    : null,
+                targetBoxes: getStorageGetBoxesQueryOptions({ saveId: saveId ?? undefined }),
+            } as const));
+
         const queriesOptions = {
             pkmVariantIndex: getPkmVariantIndexOptions(),
             mainBoxes: getStorageGetBoxesQueryOptions(),
@@ -56,17 +71,17 @@ export const useDroppableValidation = () => {
             saveInfosAll: getSaveInfosGetAllQueryOptions(),
             sourceBoxes: getStorageGetBoxesQueryOptions({ saveId: sourceSaveId ?? undefined }),
             banks: getStorageGetMainBanksQueryOptions(),
+
+            storageLeftPkmSaveIndex: storagesOptions[0]?.targetPkmSaveIndex,
+            storageLeftBoxes: storagesOptions[0]?.targetBoxes,
+            storageRightPkmSaveIndex: storagesOptions[1]?.targetPkmSaveIndex,
+            storageRightBoxes: storagesOptions[1]?.targetBoxes,
         } as const;
 
         const getItemsContainers = (
             banks: storageGetMainBanksResponseSuccess | undefined,
             mainBoxes: storageGetBoxesResponseSuccess | undefined
         ) => {
-            const search = router.latestLocation.search;
-
-            const storageLeft = getStorageLeft(search.storages);
-            const storageRight = getStorageRight(search.storages);
-
             const selectedBankBoxes = BankContext.getSelectedBankBoxes(
                 storageLeft?.saveId ? undefined : storageLeft?.boxId,
                 storageRight?.saveId ? undefined : storageRight?.boxId,
@@ -74,9 +89,14 @@ export const useDroppableValidation = () => {
                 mainBoxes,
             );
 
-            return [ storageLeft, storageRight ]
-                .filter(filterIsDefined)
+            return storages
                 .map((storage, i) => {
+                    if (storage.saveId && storage.boxId === undefined)
+                        return {
+                            ...storage,
+                            boxId: queryClient.getQueryData(storagesOptions[i]!.targetBoxes.queryKey)?.data[0]?.idInt,
+                        };
+
                     if (storage.saveId !== null || storage.boxId !== undefined || !selectedBankBoxes?.selectedBoxes.length)
                         return storage;
 
@@ -91,7 +111,6 @@ export const useDroppableValidation = () => {
                         boxId,
                     };
                 })
-                .filter((storage): storage is { saveId: number | null; boxId: number } => storage.boxId !== undefined)
                 .map(({ saveId, boxId }): MoveContainerValue => saveId
                     ? {
                         type: 'save-item',
@@ -102,14 +121,9 @@ export const useDroppableValidation = () => {
                         type: 'main-item',
                         boxId: String(boxId),
                     })
-                .map(targetContainer => [
+                .map((targetContainer, i) => [
                     targetContainer,
-                    {
-                        targetPkmSaveIndex: targetContainer.saveId
-                            ? getPkmSaveIndexOptions(targetContainer.saveId)
-                            : null,
-                        targetBoxes: getStorageGetBoxesQueryOptions({ saveId: targetContainer.saveId ?? undefined }),
-                    } as const,
+                    storagesOptions[i]!,
                 ] as const);
         };
 
@@ -118,7 +132,7 @@ export const useDroppableValidation = () => {
             queriesOptions,
             getItemsContainers,
         };
-    }, [ getStorageLeft, getStorageRight, router ]);
+    }, [getStorageLeft, getStorageRight, queryClient, router]);
 
     type QueriesOptions = ReturnType<typeof getCommonData>[ 'queriesOptions' ];
     type QueriesDataMap = {
@@ -131,24 +145,14 @@ export const useDroppableValidation = () => {
      * For testing purpose
      */
     const prefetchQueries = async (source: MoveSource<MoveParams>) => {
-        const {
-            queriesOptions,
-            getItemsContainers,
-        } = getCommonData(source);
+        const { queriesOptions } = getCommonData(source);
 
-        const { mainBoxes, banks } = Object.fromEntries(await Promise.all(
+        await Promise.all(
             Object.entries(queriesOptions).map(async ([ key, options ]) => [
                 key,
                 options
                     ? await queryClient.fetchQuery(options as never)
                     : Promise.resolve(null),
-            ])
-        )) as QueriesDataMap;
-
-        await Promise.all(
-            getItemsContainers(banks, mainBoxes).flatMap(([ targetContainer, options ]) => [
-                options.targetPkmSaveIndex ? queryClient.fetchQuery(options.targetPkmSaveIndex) : Promise.resolve(),
-                queryClient.fetchQuery(options.targetBoxes),
             ])
         );
     };

@@ -31,7 +31,7 @@ export const StoragePanel: React.FC<PopoverTargetChildProps> = (popoverProps) =>
             <StoragePanelBoxList />
             {saveId && <StorageBoxBackgroundsPrefetch saveId={saveId} />}
         </>}
-        footer={<StoragePanelFooter />}
+        footer={hasStorage && <StoragePanelFooter />}
         backgroundImageUrl={backgroundImageUrl}
         {...popoverProps}
     >

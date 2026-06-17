@@ -13,9 +13,9 @@ export type UIGameData = {
     imgSrc: string;
 };
 
-export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>, 'value' | 'data' | 'onChange' | 'renderExpanded'>;
+export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>, 'value' | 'data' | 'onChange' | 'renderExpanded' | 'defaultExpanded'>;
 
-export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange, renderExpanded }) => {
+export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange, renderExpanded, defaultExpanded }) => {
     const parentScope = useFocusScopeContext();
     const scopeActive = Focus.useIsScopeActive(parentScope.scopeId);
 
@@ -30,21 +30,23 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
         value={value}
         data={data}
         onChange={onChange}
+        defaultExpanded={defaultExpanded}
         renderTab={({ item, selected }) => <Tabs.Tab key={item.id} value={item.id} leftSection={<img src={item.imgSrc} height={16} />} py={4}>
             <Text component={selected ? 'b' : undefined} textWrap='nowrap'>{item.label}</Text>
         </Tabs.Tab>}
         renderExpanded={(data, opt) => <Group
             align='flex-start'
             p='md'
-            pt={0}
+            bg='var(--mantine-color-body-default)'
         >
             {renderExpanded?.(data, opt)}
 
             <UIActionIcon
                 name='add-game'
                 controlLabel='Add game'
-                variant='default'
+                variant='light'
                 size='xl'
+                w='100%'
             >
                 <CirclePlusIcon />
             </UIActionIcon>

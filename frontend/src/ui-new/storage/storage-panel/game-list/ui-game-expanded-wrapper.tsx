@@ -21,7 +21,7 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
     title, label, imgSrc, secondaryLine, tertiaryLine, path,
     selected, onSelect, editDropdown,
 }) => {
-    return <Group w={290} gap='xs' align='flex-start' wrap='nowrap'>
+    return <Group w={288} gap='xs' align='flex-start' wrap='nowrap'>
 
         <Stack gap='xs'>
             <Image
@@ -44,7 +44,7 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
         </Stack>
 
         <Button
-            variant='default'
+            variant='light'
             disabled={selected}
             onClick={onSelect}
             title={title}

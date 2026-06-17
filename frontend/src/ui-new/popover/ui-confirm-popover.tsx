@@ -43,6 +43,7 @@ const Dropdown: React.FC<Pick<UIConfirmPopoverProps, 'label' | 'action'>> = ({ l
         <WithControlsIcons placement='in' icons={controlsIcons.open}>
             <Button
                 {...focusControlProps}
+                fullWidth
             >
                 Confirm ?
             </Button>

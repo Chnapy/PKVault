@@ -1,4 +1,4 @@
-import { getSingleElementChild, Menu } from '@mantine/core';
+import { getSingleElementChild, Menu, Paper } from '@mantine/core';
 import React from 'react';
 import type { FocusScopeId } from '../../../focus/provider/focus-context';
 import { popoverContext, type PopoverContext } from './context/popover-context';
@@ -45,7 +45,7 @@ export const MenuWithControls: React.FC<MenuWithControlsProps> = ({ opened, setO
                 {target}
             </Menu.Target>
 
-            <Menu.Dropdown {...dropdownProps}>
+            <Menu.Dropdown component={Paper} {...dropdownProps}>
                 <PopoverDropdownWithControls scopeId={scopeId}>
                     {dropdown}
                 </PopoverDropdownWithControls>

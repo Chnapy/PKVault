@@ -1,5 +1,5 @@
-import { Box, Group } from '@mantine/core';
-import { AlertTriangleIcon, ExternalLinkIcon } from 'lucide-react';
+import { Alert, Box, Group, Stack } from '@mantine/core';
+import { AlertCircleIcon, AlertTriangleIcon, ExternalLinkIcon, InfoIcon } from 'lucide-react';
 import React from 'react';
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { usePkmLegality } from '../../data/hooks/use-pkm-legality';
@@ -44,35 +44,37 @@ export const DetailsContent: React.FC = () => {
     const pkmLegalityQuery = usePkmLegality(selectedId, selectedSaveId ?? undefined);
     const pkmLegality = pkmLegalityQuery.data?.data;
 
-    if (!pkm)
+    if (!pkm || !pkmLegality)
         return null;
 
     const issues: React.ReactNode[] = [
-        isVariant(pkm) && pkm.isExternal && <Box
-            // bgColor={theme.bg.dark}
-            // mah={200}
-            style={{
-                minHeight: '1lh',
-                flexShrink: 0.1,
-            }}
+        isVariant(pkm) && pkm.isExternal && <Alert
+            variant='default' title={<Group>
+                <InfoIcon />
+                External PKM file
+            </Group>}
         >
             <ExternalLinkIcon />{' '}
             {t('details.external-pkm-file.1')}
             <UIPathLine>{pkm.filepathAbsolute}</UIPathLine>
             <br />
             {t('details.external-pkm-file.2')}
-        </Box>,
-        isVariant(pkm) && pkm.loadError && !pkm.isEnabled && <Box
-            // bgColor={theme.bg.red}
-            // mah={200}
-            style={{
-                minHeight: '1lh',
-                flexShrink: 0.1,
-            }}
+        </Alert>,
+        !pkm.isEnabled && <Alert variant='outline' color='red'
+            title={<Group>
+                <AlertCircleIcon />
+                Disabled PKM
+            </Group>}
         >
-            {!pkm.isEnabled && t('details.is-disabled')}
-            <br />
-            <br />
+            {t('details.is-disabled')}
+        </Alert>,
+        isVariant(pkm) && pkm.loadError && <Alert
+            variant='outline' color='red'
+            title={<Group>
+                <AlertCircleIcon />
+                File loading error
+            </Group>}
+        >
             {pkm.loadError && t('details.load-error', {
                 loadError: switchUtilRequired(pkm.loadError, {
                     [ PKMLoadError.UNKNOWN ]: t('details.load-error.0'),
@@ -84,48 +86,42 @@ export const DetailsContent: React.FC = () => {
                 }),
                 filepath: pkm.filepath,
             })}
-        </Box>,
-        isVariant(pkm) && pkm.isEnabled && !getPkmVariantAttach(pkm, pkm.id).isAttachedValid && <Box
-            // bgColor={theme.bg.yellow}
-            // mah={200}
-            style={{
-                minHeight: '1lh',
-                flexShrink: 0.1,
-            }}
+        </Alert>,
+        isVariant(pkm) && pkm.isEnabled && !getPkmVariantAttach(pkm, pkm.id).isAttachedValid && <Alert
+            variant='outline' color='orange'
+            title={<Group>
+                <AlertTriangleIcon />
+                {t('details.attached-pkm-not-found.1')}
+            </Group>}
         >
             {t('details.attached-pkm-not-found.1')}
             <br />
             <br />
             {t('details.attached-pkm-not-found.2')}
-        </Box>,
-        pkm.isEnabled && pkmLegality && pkmLegality.illegalitiesCount > 0 && pkmLegality.validityReport && <Box
-            // bgColor={theme.bg.yellow}
-            // mah={200}
-            style={{
-                minHeight: '1lh',
-                flexShrink: 0.1,
-            }}
+        </Alert>,
+        pkm.isEnabled && pkmLegality && pkmLegality.illegalitiesCount > 0 && pkmLegality.validityReport && <Alert
+            variant='outline' color='orange'
+            title={<Group>
+                <AlertTriangleIcon />
+                {t('details.legality.1')}
+            </Group>}
         >
-            <AlertTriangleIcon />{' '}
-            {t('details.legality.1')}
-            <br />
-            <br />
-            {pkmLegality.validityReport}
-            <br />
+            <Box style={{ whiteSpace: 'break-spaces' }}>
+                {pkmLegality.validityReport}
+            </Box>
             <br />
             {t('details.legality.2')}
-        </Box>,
+        </Alert>,
     ].filter(Boolean);
 
     return <UIDetailsContent
-        issues={issues.length > 0 && <Box
-            style={{ whiteSpace: 'break-spaces' }}
-        >
+        issues={issues.length > 0 && <Stack>
             {issues.map((issue, i) => <React.Fragment key={i}>
                 {issue}
             </React.Fragment>)}
-        </Box>}
-        summary={<UIDetailsContentSummary
+        </Stack>}
+        summary={pkm.isEnabled && <UIDetailsContentSummary
+            id={pkm.id}
             heldItem={pkm.heldItem > 0
                 ? <Group gap={4}>
                     <ItemImg item={pkm.heldItem} version={pkm.contextVersion} />
@@ -136,7 +132,7 @@ export const DetailsContent: React.FC = () => {
             ability={staticData.abilities[ pkm.ability ]?.name}
             pid={pkm.pid}
         />}
-        stats={<UIDetailsContentStats iv ev>
+        stats={pkm.isEnabled && <UIDetailsContentStats iv ev>
             {([ 'hp', 'atk', 'def', 'spa', 'spd', 'spe' ] satisfies UIDetailsStatName[])
                 .map((stat, i): UIDetailsStatsRowProps => ({
                     stat,
@@ -146,7 +142,7 @@ export const DetailsContent: React.FC = () => {
                 }))
                 .map((props) => <UIDetailsStatsRow key={props.stat} {...props} />)}
         </UIDetailsContentStats>}
-        moves={<UIDetailsContentMove>
+        moves={pkm.isEnabled && <UIDetailsContentMove>
             {pkm.moves.map((move, i) => {
                 return <MoveItem
                     key={i}
@@ -156,12 +152,12 @@ export const DetailsContent: React.FC = () => {
                 />;
             })}
         </UIDetailsContentMove>}
-        contest={<UIDetailsContentCosmetic
+        contest={pkm.isEnabled && (pkm.contest || pkm.ribbons) && <UIDetailsContentCosmetic
             contest={pkm.contest?.map((value, i) => <UIContest key={i} index={i} value={value} />)}
             ribbons={pkm.ribbons && Object.entries(pkm.ribbons)
                 .map(([ name, count ]) => <Ribbon key={name} name={name} count={count} />)}
         />}
-        origin={<UIDetailsContentOrigin
+        origin={pkm.isEnabled && <UIDetailsContentOrigin
             game={<Group>
                 <UIGameImg
                     size='1lh'
@@ -181,7 +177,7 @@ export const DetailsContent: React.FC = () => {
             originMetDate={pkm.originMetDate}
             fatefulEncounter={pkm.fatefulEncounter}
         />}
-        misc={<UIDetailsContentMisc
+        misc={pkm.isEnabled && <UIDetailsContentMisc
             language={staticData.languages[ pkm.languageID ]}
             homeTracker={pkm.homeTracker}
         />}

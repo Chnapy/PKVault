@@ -1,4 +1,4 @@
-import { getSingleElementChild, Popover } from '@mantine/core';
+import { getSingleElementChild, Paper, Popover } from '@mantine/core';
 import React from 'react';
 import type { FocusScopeId } from '../../../focus/provider/focus-context';
 import { popoverContext, type PopoverContext } from './context/popover-context';
@@ -10,9 +10,10 @@ export type PopoverWithControlsProps = Partial<PopoverContext> & {
     target: React.ReactElement;
     dropdown: React.ReactNode;
     dropdownProps?: Popover.Dropdown.Props;
+    nested?: boolean;
 } & Omit<Popover.Props, 'opened' | 'withinPortal'>;
 
-export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, ...rest }) => {
+export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, nested, ...rest }) => {
     const [ innerOpened, setInnerOpened ] = React.useState(false);
 
     const ctx = React.useMemo((): PopoverContext => opened !== undefined && setOpened
@@ -22,7 +23,7 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened
             setOpened: setInnerOpened,
         }, [ innerOpened, opened, setOpened ]);
 
-    const nested = !!usePopover()?.opened;
+    // const nested = false//!!usePopover()?.opened;
 
     const [ scopeId ] = React.useState((): FocusScopeId => `popover_${self.crypto.randomUUID()}`);
 
@@ -45,7 +46,15 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened
                 {target}
             </Popover.Target>
 
-            <Popover.Dropdown {...dropdownProps}>
+            <Popover.Dropdown
+                component={Paper}
+                p='md' mah='calc(100vh - 1rem)' display='flex'
+                {...dropdownProps}
+                style={{
+                    overflow: 'hidden',
+                    ...dropdownProps?.style,
+                }}
+            >
                 <PopoverDropdownWithControls scopeId={scopeId}>
                     {dropdown}
                 </PopoverDropdownWithControls>

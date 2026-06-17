@@ -1,29 +1,35 @@
 import { Card, Group, Text } from '@mantine/core';
 import { SquareCheckIcon } from 'lucide-react';
 import type React from 'react';
-import { Route } from '../../routes/storage';
 import { useSelectContextNullable } from '../../ui-new/interaction/select/context/use-select-context';
 import { UICardSectionControl } from '../../ui-new/storage/storage-panel/card-section-control/ui-card-section-control';
 import type { MoveContainerValue } from '../move/move-container-fns';
-import { useCurrentStorage } from '../panel/storage-panel-context';
+import { useCurrentStorageWithFallback } from '../panel/hooks/use-current-storage-with-fallback';
 import { DetailsActions } from './details-actions';
 
 export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) => {
-    const { getStorage } = useCurrentStorage();
-    const saveId = Route.useSearch({ select: search => getStorage(search.storages)?.saveId });
-    const boxId = Route.useSearch({ select: search => getStorage(search.storages)?.boxId });
+    const { saveId, box } = useCurrentStorageWithFallback().data ?? {};
 
     const selectCtx = useSelectContextNullable<MoveContainerValue>();
     const multiSelectIds = selectCtx?.useSelectStore(s => {
         if (s.ids.size === 0)
             return;
 
-        const container = selectCtx.getContainerValue(s.container);
+        if (!box)
+            return false;
 
-        const enabled = container.saveId === saveId
-            && Number(container.boxId) === boxId;
+        const currentContainer = selectCtx.getContainerHash(saveId
+            ? {
+                type: 'save-item',
+                saveId,
+                boxId: box.id,
+            }
+            : {
+                type: 'main-item',
+                boxId: box.id,
+            });
 
-        return enabled
+        return s.container === currentContainer
             ? s.ids
             : undefined;
     });

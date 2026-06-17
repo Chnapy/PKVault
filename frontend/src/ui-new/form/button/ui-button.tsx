@@ -13,7 +13,7 @@ type UIButtonProps = {
     onFocusSelect?: (e: Event) => void;
 } & Button.Props & ElementProps<'button'>;
 
-export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlIcons = [], focusOnMount, onClick, onFocusSelect = onClick, ...rest }) => {
+export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlIcons = [], focusOnMount, onClick, onFocusSelect = onClick, mt, style, ...rest }) => {
 
     const { focusControlProps, controlsIcons } = useFocusControls({
         scopeNodeId: name,
@@ -40,7 +40,7 @@ export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlI
         rest.ref,
     );
 
-    return <WithControlsIcons placement='out' icons={[ controlsIcons.open, ...controlIcons ]} display='inline-flex' h='fit-content'>
+    return <WithControlsIcons placement='out' icons={[ controlsIcons.open, ...controlIcons ]} display='inline-flex' h='fit-content' mt={mt} style={style}>
         <Button
             {...focusControlProps}
             {...rest}

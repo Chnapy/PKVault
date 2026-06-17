@@ -115,6 +115,7 @@ export const Primary: Story = {
         />,
         content: <UIDetailsContent
             summary={<UIDetailsContentSummary
+                id='ID'
                 heldItem={<Group gap={4}>
                     <UIItemImg
                         item={209}
@@ -130,7 +131,7 @@ export const Primary: Story = {
                 </Group>}
                 nature='Impish'
                 ability='Guts'
-                pid='51853507'
+                pid={51853507}
             />}
             stats={<UIDetailsContentStats iv ev>
                 {[

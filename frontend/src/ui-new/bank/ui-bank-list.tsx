@@ -22,7 +22,7 @@ export const UIBankList: React.FC<UIBankListProps> = ({ onCreate, renderExpanded
             key={item.id}
             {...item}
         />}
-        renderExpanded={(data, opt) => <Group>
+        renderExpanded={(data, opt) => <Group pt='sm'>
             {renderExpanded?.(data, opt)}
 
             <UIActionIcon
