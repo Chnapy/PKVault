@@ -49,66 +49,64 @@ export const DexSyncAdvancedAction: React.FC<{
     popover?.setOpened(false);
   });
 
-  return (
-    <Stack
-      component='form'
-      onSubmit={onSubmit}
-      maw={350}
+  return <Stack
+    component='form'
+    onSubmit={onSubmit}
+    maw={350}
+  >
+    <UIMultiSelect
+      name='saveIds'
+      controlLabel='Select Pokedexes'
+      label={t("storage.dex-sync.title")}
+      value={saveIds.map(String)}
+      onChange={value => setValue('saveIds', value.map(Number))}
+      data={[
+        {
+          value: '0',
+          label: 'PKVault',
+          disabled: saveId === 0,
+        },
+        ...Object.values(saveInfos).map((save): ComboboxItem => ({
+          value: save.id.toString(),
+          label: `${staticData.versions[ save.version ]?.name} - ${save.trainerName}`,
+          // selected: saveIds.includes(save.id),
+          disabled: save.id === saveId,
+        })),
+      ]}
+      // renderPill={({ option, onRemove }) => }
+      renderOption={({ option, checked = false }) => option && <Group>
+        <GameImg
+          version={option.value === '0' ? null : saveInfos[ +option.value ]!.version}
+          size={14}
+        />
+        {option.label}
+      </Group>}
+      searchable
+      comboboxProps={{ withinPortal: false, position: 'right-start', floatingHeight: "viewport" }}
+      floatingHeight="viewport"
+    />
+
+    <div>{t("storage.dex-sync.description")}</div>
+
+    <div
+      style={{
+        whiteSpace: "pre-line",
+      }}
     >
-      <UIMultiSelect
-        name='saveIds'
-        controlLabel='Select Pokedexes'
-        label={t("storage.dex-sync.title")}
-        value={saveIds.map(String)}
-        onChange={value => setValue('saveIds', value.map(Number))}
-        data={[
-          {
-            value: '0',
-            label: 'PKVault',
-            disabled: saveId === 0,
-          },
-          ...Object.values(saveInfos).map((save): ComboboxItem => ({
-            value: save.id.toString(),
-            label: `${staticData.versions[ save.version ]?.name} - ${save.trainerName}`,
-            // selected: saveIds.includes(save.id),
-            disabled: save.id === saveId,
-          })),
-        ]}
-        // renderPill={({ option, onRemove }) => }
-        renderOption={({ option, checked = false }) => option && <Group>
-          <GameImg
-            version={option.value === '0' ? null : saveInfos[ +option.value ]!.version}
-            size={14}
-          />
-          {option.label}
-        </Group>}
-        searchable
-        comboboxProps={{ withinPortal: false, position: 'right-start', floatingHeight: "viewport" }}
-        floatingHeight="viewport"
-      />
+      <AlertTriangleIcon />{" "}
+      {t("storage.actions.unsafe")}
+    </div>
 
-      <div>{t("storage.dex-sync.description")}</div>
-
-      <div
-        style={{
-          whiteSpace: "pre-line",
-        }}
-      >
-        <AlertTriangleIcon />{" "}
-        {t("storage.actions.unsafe")}
-      </div>
-
-      <UIButton
-        name='submit'
-        controlLabel='Submit'
-        type="submit"
-        color='blue'
-        loading={formState.isSubmitting}
-        disabled={saveIds.length < 2}
-        leftSection={<CalendarSyncIcon />}
-      >
-        {t("action.submit")}
-      </UIButton>
-    </Stack>
-  );
+    <UIButton
+      name='submit'
+      controlLabel='Submit'
+      type="submit"
+      color='blue'
+      loading={formState.isSubmitting}
+      disabled={saveIds.length < 2}
+      leftSection={<CalendarSyncIcon />}
+    >
+      {t("action.submit")}
+    </UIButton>
+  </Stack>;
 };

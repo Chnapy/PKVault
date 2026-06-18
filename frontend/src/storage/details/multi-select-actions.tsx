@@ -37,7 +37,10 @@ export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) 
     if (!multiSelectIds)
         return null;
 
-    return <Card>
+    return <Card mih={0} style={{
+        position: 'initial',
+        overflow: 'initial',
+    }}>
         <Card.Section inheritPadding withBorder>
             <Group gap='sm'>
                 <SquareCheckIcon />

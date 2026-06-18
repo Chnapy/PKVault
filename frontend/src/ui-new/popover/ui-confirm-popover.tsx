@@ -48,5 +48,5 @@ const Dropdown: React.FC<Pick<UIConfirmPopoverProps, 'label' | 'action'>> = ({ l
                 Confirm ?
             </Button>
         </WithControlsIcons>
-    </Stack>
+    </Stack>;
 };

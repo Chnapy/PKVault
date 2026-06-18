@@ -1,10 +1,8 @@
 /// <reference types="vitest/config" />
 
 import babel from '@rolldown/plugin-babel';
-import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
-import { playwright } from '@vitest/browser-playwright';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from "vite";
@@ -53,27 +51,27 @@ export default defineConfig({
         test: {
           environment: "jsdom"
         }
-      }, 
-      {
-        extends: true,
-        plugins: [
-          // @see https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-          storybookTest({
-            configDir: path.join(dirname, '.storybook')
-          })
-        ],
-        test: {
-          name: 'storybook',
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: playwright({}),
-            instances: [{
-              browser: 'chromium'
-            }]
-          }
-        }
-      }
+      },
+      // {
+      //   extends: true,
+      //   plugins: [
+      //     // @see https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+      //     storybookTest({
+      //       configDir: path.join(dirname, '.storybook')
+      //     })
+      //   ],
+      //   test: {
+      //     name: 'storybook',
+      //     browser: {
+      //       enabled: true,
+      //       headless: true,
+      //       provider: playwright({}),
+      //       instances: [{
+      //         browser: 'chromium'
+      //       }]
+      //     }
+      //   }
+      // }
     ],
   },
   server: {

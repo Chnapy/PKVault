@@ -1,10 +1,11 @@
 import React from 'react';
 import { usePkmIndex } from '../../../data/hooks/use-pkm-index';
-import { useStorageDeleteMainBox, useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
+import { useStorageDeleteMainBox } from '../../../data/sdk/storage/storage.gen';
 import { Route } from '../../../routes/storage';
 import { UIBoxExpanded, type UIBoxExpandedProps } from '../../../ui-new/storage/storage-panel/box-list/ui-box-expanded';
 import { useSelectCallback } from '../../../util/use-select-callback';
 import { StorageBoxEdit } from '../../box/storage-box-edit';
+import { useFilteredBoxes } from '../hooks/use-filtered-boxes';
 import { useCurrentStorage } from '../storage-panel-context';
 
 export type BoxExpandedProps = Pick<UIBoxExpandedProps, 'id' | 'label' | 'selected' | 'onSelect'>;
@@ -15,7 +16,7 @@ export const BoxExpanded: React.FC<BoxExpandedProps> = ({ id, label, selected, o
 
     const boxDeleteMutation = useStorageDeleteMainBox();
 
-    const boxesQuery = useStorageGetBoxes({ saveId: saveId ?? undefined });
+    const boxesQuery = useFilteredBoxes(saveId);
     const boxes = boxesQuery.data?.data ?? [];
     const box = boxes.find(box => box.id === id);
 

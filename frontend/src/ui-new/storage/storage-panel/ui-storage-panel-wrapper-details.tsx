@@ -14,18 +14,15 @@ export const UIStoragePanelWrapperDetails: React.FC<UIStoragePanelWrapperDetails
         target={children}
         dropdown={details}
         dropdownProps={{
-            p: 0,
             w: 300,
-            style: {
-                border: 'none',
-                ...seeThrough
-                    ? {
-                        opacity: 0.1,
-                        pointerEvents: 'none',
-                    }
-                    : {},
-            },
+            style: seeThrough
+                ? {
+                    opacity: 0.1,
+                    pointerEvents: 'none',
+                }
+                : undefined,
         }}
+        transparent
         position='right-start'
         closeOnClickOutside={false}
         transitionProps={{

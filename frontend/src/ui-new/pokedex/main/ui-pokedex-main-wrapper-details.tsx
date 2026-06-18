@@ -12,10 +12,9 @@ export const UIPokedexMainWrapperDetails: React.FC<UIPokedexMainWrapperDetailsPr
         target={children}
         dropdown={details}
         dropdownProps={{
-            p: 0,
             w: 300,
-            style: { border: 'none' },
         }}
+        transparent
         position='left-start'
         closeOnClickOutside={false}
         transitionProps={{

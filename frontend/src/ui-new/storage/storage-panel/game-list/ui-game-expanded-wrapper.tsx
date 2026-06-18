@@ -6,7 +6,7 @@ import { UIPopover } from '../../../popover/ui-popover';
 
 export type UIGameExpandedWrapperProps = {
     selected?: boolean;
-    onSelect: () => void;
+    onSelect?: () => void;
     editDropdown?: React.ReactNode;
 
     title?: string;
@@ -44,12 +44,12 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
         </Stack>
 
         <Button
-            variant='light'
-            disabled={selected}
+            variant='default'
+            disabled={selected || !onSelect}
             onClick={onSelect}
             title={title}
             h='auto'
-            style={{ flexGrow: 1 }}
+            style={{ flexGrow: 1, flexShrink: 1 }}
         >
             <Stack w='100%' align='stretch' gap={0}>
                 <Text>

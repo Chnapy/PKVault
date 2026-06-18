@@ -13,7 +13,7 @@ import classes from './ui-box-expanded.module.css';
 export type UIBoxExpandedProps = UIExpandableTabsData & {
     slotsStates: boolean[];
     selected: boolean;
-    onSelect: () => void;
+    onSelect?: () => void;
     onDelete?: () => void;
     editDropdown: React.ReactNode;
 };
@@ -28,7 +28,7 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
     const { focusControlProps, controlsIcons } = useFocusControls({
         scopeNodeId: nodeId,
         controls: [
-            getSelectControl({
+            onSelect && getSelectControl({
                 label: 'Select',
                 action: () => {
                     onSelect();
@@ -54,8 +54,8 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
     return <Group gap='xs' align='stretch' style={{ alignSelf: 'flex-start' }}>
         <Button
             style={{ gap: 4 }}
-            variant='light'
-            disabled={selected}
+            variant='default'
+            disabled={selected || !onSelect}
             {...focusControlProps}
             h='auto'
             p='md'

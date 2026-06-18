@@ -11,11 +11,12 @@ export type UIGameData = {
     id: string;
     label: string;
     imgSrc: string;
+    disabled?: boolean;
 };
 
-export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>, 'value' | 'data' | 'onChange' | 'renderExpanded' | 'defaultExpanded'>;
+export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>, 'value' | 'data' | 'onChange' | 'renderExpanded' | 'expanded'>;
 
-export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange, renderExpanded, defaultExpanded }) => {
+export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange, renderExpanded, expanded }) => {
     const parentScope = useFocusScopeContext();
     const scopeActive = Focus.useIsScopeActive(parentScope.scopeId);
 
@@ -30,8 +31,10 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
         value={value}
         data={data}
         onChange={onChange}
-        defaultExpanded={defaultExpanded}
-        renderTab={({ item, selected }) => <Tabs.Tab key={item.id} value={item.id} leftSection={<img src={item.imgSrc} height={16} />} py={4}>
+        expanded={expanded}
+        renderTab={({ item, selected }, { reduce }) => <Tabs.Tab key={item.id}
+            value={item.id} onClick={reduce} disabled={item.disabled} leftSection={<img src={item.imgSrc} height={16} />} py={4}
+        >
             <Text component={selected ? 'b' : undefined} textWrap='nowrap'>{item.label}</Text>
         </Tabs.Tab>}
         renderExpanded={(data, opt) => <Group
@@ -44,7 +47,7 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
             <UIActionIcon
                 name='add-game'
                 controlLabel='Add game'
-                variant='light'
+                variant='default'
                 size='xl'
                 w='100%'
             >

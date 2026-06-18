@@ -40,6 +40,8 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
     const remainingEVs = Math.max(totalEVs - totalFormEVs, 0);
     const formMaxValues = watchEvs.map(ev => Math.min(ev + remainingEVs, maxEv));
 
+    const formDisabled = !formState.isValid || remainingEVs > 0;
+
     const onSubmit = handleSubmit(async (data) => {
         await onSubmitRaw(data);
         popover?.setOpened(false);
@@ -85,8 +87,9 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
                     renderOption={({ option, checked = false }) => option && renderMoveItemOption(Number(option.value), checked, watchMoves.length === 4)}
                     searchable
                     maw={300}
-                    comboboxProps={{ withinPortal: false, position: 'left-start', floatingHeight: "viewport" }}
+                    comboboxProps={{ withinPortal: false, position: 'right-start', floatingHeight: "viewport" }}
                     floatingHeight="viewport"
+                // dropdownOpened
                 />
             </Stack>
 
@@ -95,14 +98,16 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
             >
                 <Stack>
                     {([ 'hp', 'atk', 'def', 'spa', 'spd', 'spe' ] satisfies UIDetailsStatName[]).map((stat, i) => {
+                        const value = watchEvs[ i ];
                         const commonParams = {
                             valueAsNumber: true,
                             min: minEv,
                             max: formMaxValues[ i ],
-                            disabled: totalFormEVs === 0,
+                            disabled: totalFormEVs === 0
+                                || (remainingEVs === 0 && value === 0),
                         };
                         const commonProps = {
-                            value: watchEvs[ i ],
+                            value,
                             onChange: (value: string | number) => setValue(`eVs.${i}`, Number(value)),
                             min: minEv,
                             max: formMaxValues[ i ],
@@ -140,7 +145,7 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
             name='submit'
             controlLabel='Submit'
             type='submit'
-            disabled={!formState.isValid}
+            disabled={formDisabled}
             variant='filled'
             color='primary'
         >

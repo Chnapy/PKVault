@@ -53,7 +53,7 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
                 {onCreate && <UIActionIcon
                     name='create-box'
                     controlLabel='Create box'
-                    variant='light'
+                    variant='default'
                     size='xl'
                     w='100%'
                     onClick={onCreate}

@@ -63,13 +63,10 @@ export const NotificationButton: React.FC = () => {
             </Tooltip>}
             dropdown={<NotificationCardManager />}
             dropdownProps={{
-                p: 0,
                 maw: 600,
                 mah: 300,
-                style: {
-                    border: 'none',
-                },
             }}
+            transparent
         />
     );
 };

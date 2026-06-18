@@ -47,6 +47,8 @@ export const DetailsContent: React.FC = () => {
     if (!pkm || !pkmLegality)
         return null;
 
+    const natureObj = pkm.nature === undefined ? undefined : staticData.natures[ pkm.nature ];
+
     const issues: React.ReactNode[] = [
         isVariant(pkm) && pkm.isExternal && <Alert
             variant='default' title={<Group>
@@ -134,24 +136,39 @@ export const DetailsContent: React.FC = () => {
         />}
         stats={pkm.isEnabled && <UIDetailsContentStats iv ev>
             {([ 'hp', 'atk', 'def', 'spa', 'spd', 'spe' ] satisfies UIDetailsStatName[])
-                .map((stat, i): UIDetailsStatsRowProps => ({
-                    stat,
-                    value: pkm.stats[ i ] ?? 0,
-                    iv: pkm.iVs[ i ] ?? 0,
-                    ev: pkm.eVs[ i ] ?? 0,
-                }))
+                .map((stat, i): UIDetailsStatsRowProps => {
+                    return {
+                        stat,
+                        value: pkm.stats[ i ] ?? 0,
+                        natureEffect: natureObj?.decreasedStatIndex === i + 1
+                            ? 'decrease'
+                            : (natureObj?.increasedStatIndex === i + 1
+                                ? 'increase'
+                                : undefined),
+                        iv: pkm.iVs[ i ] ?? 0,
+                        ev: pkm.eVs[ i ] ?? 0,
+                    };
+                })
                 .map((props) => <UIDetailsStatsRow key={props.stat} {...props} />)}
         </UIDetailsContentStats>}
-        moves={pkm.isEnabled && <UIDetailsContentMove>
-            {pkm.moves.map((move, i) => {
-                return <MoveItem
+        moves={pkm.isEnabled && <UIDetailsContentMove
+            moves={pkm.moves.map((move, i) => (
+                <MoveItem
                     key={i}
                     pkmId={pkm.id}
                     saveId={selectedSaveId}
                     move={move}
-                />;
-            })}
-        </UIDetailsContentMove>}
+                />
+            ))}
+            relearnMoves={pkm.relearnMoves && pkm.relearnMoves.map((move, i) => (
+                <MoveItem
+                    key={i}
+                    pkmId={pkm.id}
+                    saveId={selectedSaveId}
+                    move={move}
+                />
+            ))}
+        />}
         contest={pkm.isEnabled && (pkm.contest || pkm.ribbons) && <UIDetailsContentCosmetic
             contest={pkm.contest?.map((value, i) => <UIContest key={i} index={i} value={value} />)}
             ribbons={pkm.ribbons && Object.entries(pkm.ribbons)
@@ -178,6 +195,9 @@ export const DetailsContent: React.FC = () => {
             fatefulEncounter={pkm.fatefulEncounter}
         />}
         misc={pkm.isEnabled && <UIDetailsContentMisc
+            isEgg={pkm.isEgg}
+            eggHatchCount={pkm.eggHatchCount}
+            friendship={pkm.friendship}
             language={staticData.languages[ pkm.languageID ]}
             homeTracker={pkm.homeTracker}
         />}

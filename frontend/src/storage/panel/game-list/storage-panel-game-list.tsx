@@ -5,9 +5,12 @@ import { getGameInfos } from '../../../pokedex/details/util/get-game-infos';
 import { Route } from '../../../routes/storage';
 import { UIStoragePanelGameList, type UIGameData } from '../../../ui-new/storage/storage-panel/game-list/ui-storage-panel-game-list';
 import { filterIsDefined } from '../../../util/filter-is-defined';
-import { useCurrentStorage } from '../storage-panel-context';
+import { useFilteredBoxes } from '../hooks/use-filtered-boxes';
+import { useCurrentStorage, useOtherStorage } from '../storage-panel-context';
 import { GameExpanded } from './game-expanded';
 import { GamePkvaultExpanded } from './game-pkvault-expanded';
+
+const pkvaultStorageId = 'pkvault';
 
 export const StoragePanelGameList: React.FC = () => {
     //   const { t } = useTranslate();
@@ -15,10 +18,19 @@ export const StoragePanelGameList: React.FC = () => {
     const staticData = useStaticData();
 
     const { getStorage, setStorage } = useCurrentStorage();
+    const otherStorage = useOtherStorage();
     const saveId = Route.useSearch({ select: (search) => getStorage(search.storages)?.saveId });
     const navigate = Route.useNavigate();
 
     const saveInfosQuery = useSaveInfosGetAll();
+
+    const pkvaultBoxesQuery = useFilteredBoxes(null);
+
+    const disabledPkvault = Route.useSearch({
+        select: (search) => {
+            return otherStorage.getStorage(search.storages)?.saveId === null && pkvaultBoxesQuery.data?.data.length === 1;
+        }
+    });
 
     if (!saveInfosQuery.data) {
         return null;
@@ -29,11 +41,11 @@ export const StoragePanelGameList: React.FC = () => {
         .sort((a, b) => a.lastWriteTime > b.lastWriteTime ? -1 : 1);
 
     const value = saveId !== undefined
-        ? saveId?.toString() ?? 'pkvault'
+        ? saveId?.toString() ?? pkvaultStorageId
         : '';
 
     const onChange = (id: string) => {
-        const saveId = id === 'pkvault' ? null : Number(id);
+        const saveId = id === pkvaultStorageId ? null : Number(id);
 
         navigate({
             search: (search) => {
@@ -49,9 +61,10 @@ export const StoragePanelGameList: React.FC = () => {
         value={value}
         data={[
             {
-                id: 'pkvault',
+                id: pkvaultStorageId,
                 imgSrc: '/logo.svg',
                 label: 'PKVault',
+                disabled: disabledPkvault,
             },
             ...saveInfos.map(({ id, displayedVersion }): UIGameData => ({
                 id: id.toString(),
@@ -60,26 +73,30 @@ export const StoragePanelGameList: React.FC = () => {
             })),
         ]}
         onChange={onChange}
-        defaultExpanded={value === ''}
+        expanded={value === '' ? true : undefined}
         renderExpanded={(data, { reduce }) => data.map(({ item, selected }) =>
-            item.id === 'pkvault'
+            item.id === pkvaultStorageId
                 ? <GamePkvaultExpanded
                     key={item.id}
                     {...item}
                     selected={selected}
-                    onSelect={() => {
-                        onChange(item.id);
-                        reduce();
-                    }}
+                    onSelect={item.disabled
+                        ? undefined
+                        : (() => {
+                            onChange(item.id);
+                            reduce();
+                        })}
                 />
                 : <GameExpanded
                     key={item.id}
                     {...item}
                     selected={selected}
-                    onSelect={() => {
-                        onChange(item.id);
-                        reduce();
-                    }}
+                    onSelect={item.disabled
+                        ? undefined
+                        : (() => {
+                            onChange(item.id);
+                            reduce();
+                        })}
                 />)}
     />;
 };

@@ -1,4 +1,5 @@
-import { Badge, Progress, Table } from '@mantine/core';
+import { Badge, Group, Progress, Table } from '@mantine/core';
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import type React from 'react';
 
 const statsInfos = {
@@ -33,11 +34,12 @@ export type UIDetailsStatName = keyof typeof statsInfos;
 export type UIDetailsStatsRowProps = {
     stat: UIDetailsStatName;
     value: number;
+    natureEffect?: 'increase' | 'decrease';
     iv?: number;
     ev?: number;
 };
 
-export const UIDetailsStatsRow: React.FC<UIDetailsStatsRowProps> = ({ stat, value, iv, ev }) => {
+export const UIDetailsStatsRow: React.FC<UIDetailsStatsRowProps> = ({ stat, value, natureEffect, iv, ev }) => {
     const { name, color } = statsInfos[ stat ];
 
     const level = 50;
@@ -48,7 +50,13 @@ export const UIDetailsStatsRow: React.FC<UIDetailsStatsRowProps> = ({ stat, valu
     const progressValue = value / maxStatsRatio * 100;
 
     return <Table.Tr>
-        <Table.Th>{name}</Table.Th>
+        <Table.Th>
+            <Group wrap='nowrap' gap='xs'>
+                {name}
+                {natureEffect === 'decrease' && <ChevronDownIcon strokeWidth={3} color='var(--mantine-color-blue-filled)' style={{ marginLeft: 'auto' }} />}
+                {natureEffect === 'increase' && <ChevronUpIcon strokeWidth={3} color='var(--mantine-color-red-filled)' style={{ marginLeft: 'auto' }} />}
+            </Group>
+        </Table.Th>
         <Table.Td>
             <Progress
                 value={progressValue}

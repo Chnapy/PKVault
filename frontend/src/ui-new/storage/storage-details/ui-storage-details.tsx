@@ -14,7 +14,10 @@ export const UIStorageDetails: React.FC<UIStorageDetailsProps> = ({
     header, main, content, actions, onClose
 }) => {
 
-    return <Card>
+    return <Card mih={0} style={{
+        position: 'initial',
+        overflow: 'initial',
+    }}>
         <Card.Section component={UICardSectionControl} p={0}>
             {header(
                 <CloseButton onClick={onClose} />

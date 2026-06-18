@@ -9,6 +9,7 @@ import { useTranslate } from '../../../translate/i18n';
 import type { DraggingSlotsStates, MoveSource, SlotsStates } from '../../../ui-new/interaction/move/state/move-state';
 import { filterIsDefined } from '../../../util/filter-is-defined';
 import { BankContext } from '../../bank/bank-context';
+import { getFinalBox } from '../../panel/hooks/utils/get-final-box';
 import { useCurrentStorage } from '../../panel/storage-panel-context';
 import { containerFns, type MoveContainerValue, type MoveParams } from '../move-container-fns';
 import { buildSlotInfosBank } from '../validation/slot-infos/build-slot-infos-bank';
@@ -72,10 +73,10 @@ export const useDroppableValidation = () => {
             sourceBoxes: getStorageGetBoxesQueryOptions({ saveId: sourceSaveId ?? undefined }),
             banks: getStorageGetMainBanksQueryOptions(),
 
-            storageLeftPkmSaveIndex: storagesOptions[0]?.targetPkmSaveIndex,
-            storageLeftBoxes: storagesOptions[0]?.targetBoxes,
-            storageRightPkmSaveIndex: storagesOptions[1]?.targetPkmSaveIndex,
-            storageRightBoxes: storagesOptions[1]?.targetBoxes,
+            storageLeftPkmSaveIndex: storagesOptions[ 0 ]?.targetPkmSaveIndex,
+            storageLeftBoxes: storagesOptions[ 0 ]?.targetBoxes,
+            storageRightPkmSaveIndex: storagesOptions[ 1 ]?.targetPkmSaveIndex,
+            storageRightBoxes: storagesOptions[ 1 ]?.targetBoxes,
         } as const;
 
         const getItemsContainers = (
@@ -91,24 +92,18 @@ export const useDroppableValidation = () => {
 
             return storages
                 .map((storage, i) => {
-                    if (storage.saveId && storage.boxId === undefined)
-                        return {
-                            ...storage,
-                            boxId: queryClient.getQueryData(storagesOptions[i]!.targetBoxes.queryKey)?.data[0]?.idInt,
-                        };
-
-                    if (storage.saveId !== null || storage.boxId !== undefined || !selectedBankBoxes?.selectedBoxes.length)
-                        return storage;
-
-                    const boxId = selectedBankBoxes.selectedBoxes.length > 1
-                        ? selectedBankBoxes.selectedBoxes[ i ]?.idInt
-                        : selectedBankBoxes.selectedBoxes[ 0 ]?.idInt;
-                    if (boxId === undefined)
-                        return storage;
+                    const otherStorage = storages[ (i + 1) % 2 ];
+                    const box = getFinalBox(
+                        i,
+                        storage,
+                        otherStorage,
+                        queryClient.getQueryData(storagesOptions[ i ]!.targetBoxes.queryKey),
+                        selectedBankBoxes?.selectedBoxes ?? [],
+                    );
 
                     return {
                         ...storage,
-                        boxId,
+                        boxId: box?.idInt,
                     };
                 })
                 .map(({ saveId, boxId }): MoveContainerValue => saveId
@@ -123,7 +118,7 @@ export const useDroppableValidation = () => {
                     })
                 .map((targetContainer, i) => [
                     targetContainer,
-                    storagesOptions[i]!,
+                    storagesOptions[ i ]!,
                 ] as const);
         };
 
@@ -132,7 +127,7 @@ export const useDroppableValidation = () => {
             queriesOptions,
             getItemsContainers,
         };
-    }, [getStorageLeft, getStorageRight, queryClient, router]);
+    }, [ getStorageLeft, getStorageRight, queryClient, router ]);
 
     type QueriesOptions = ReturnType<typeof getCommonData>[ 'queriesOptions' ];
     type QueriesDataMap = {

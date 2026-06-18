@@ -1,12 +1,13 @@
 import { Tabs, Text } from '@mantine/core';
 import React from 'react';
-import { useStorageCreateMainBox, useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
+import { useStorageCreateMainBox } from '../../../data/sdk/storage/storage.gen';
 import { Route } from '../../../routes/storage';
 import { UIStoragePanelBoxList, type UIBoxData } from '../../../ui-new/storage/storage-panel/box-list/ui-storage-panel-box-list';
 import { DexSyncAdvancedAction } from '../../advanced-actions/dex-sync-advanced-action';
 import { SortAdvancedAction } from '../../advanced-actions/sort-advanced-action';
 import { StorageSelectCheckbox } from '../../storage-select-checkbox';
 import { useCurrentStorageWithFallback } from '../hooks/use-current-storage-with-fallback';
+import { useFilteredBoxes } from '../hooks/use-filtered-boxes';
 import { useCurrentStorage } from '../storage-panel-context';
 import { BoxExpanded } from './box-expanded';
 
@@ -18,11 +19,9 @@ export const StoragePanelBoxList: React.FC = () => {
 
     const boxCreateMutation = useStorageCreateMainBox();
 
-    const boxesQuery = useStorageGetBoxes({ saveId: saveId ?? undefined });
+    const boxesQuery = useFilteredBoxes(saveId);
 
-    const boxes = (boxesQuery.data?.data ?? [])
-        .filter(box => !box.bankId || box.bankId === bankId)
-        .sort((b1, b2) => b1.order < b2.order ? -1 : 1);
+    const boxes = (boxesQuery.data?.data ?? []).sort((b1, b2) => b1.order < b2.order ? -1 : 1);
 
     const isLoading = [ storage, boxesQuery ].some(query => query.isLoading);
     if (isLoading || boxId === undefined)
@@ -50,9 +49,11 @@ export const StoragePanelBoxList: React.FC = () => {
             ? undefined
             : (() => boxCreateMutation.mutateAsync({ params: { bankId } }))
         }
-        renderTab={({ item, selected }) => <Tabs.Tab
+        renderTab={({ item, selected }, { reduce }) => <Tabs.Tab
             key={item.id}
             value={item.id}
+            onClick={reduce}
+            disabled={storage.data?.disabledBoxId === item.id}
             py={0}
             style={{ gap: 4 }}
             rightSection={selected && <StorageSelectCheckbox
@@ -68,10 +69,12 @@ export const StoragePanelBoxList: React.FC = () => {
             id={item.id}
             label={item.label}
             selected={selected}
-            onSelect={() => {
-                onSelect(item.id);
-                reduce();
-            }}
+            onSelect={storage.data?.disabledBoxId === item.id
+                ? undefined
+                : (() => {
+                    onSelect(item.id);
+                    reduce();
+                })}
         />)}
         advancedActionSort={<SortAdvancedAction saveId={saveId} boxId={boxId} />}
         advancedDexSync={<DexSyncAdvancedAction saveId={saveId ?? 0} />}

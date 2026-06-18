@@ -9,7 +9,7 @@ export const useCurrentStorage = (fallbackPanel?: ReturnType<typeof usePanel>) =
     const currentPanel = fallbackPanel ?? ctxPanel;
     const storageIndex = currentPanel === 'left' ? 0 : 1;
 
-    const getStorage = React.useCallback((searchStorages: StorageSearchStorage[] | undefined) => {
+    const getStorage = React.useCallback((searchStorages: StorageSearchStorage[] | undefined): StorageSearchStorage | undefined => {
         const defaultStorage: StorageSearchStorage | undefined = currentPanel === 'left'
             ? defaultMainStorage
             : undefined;
@@ -83,4 +83,9 @@ export const useCurrentStorage = (fallbackPanel?: ReturnType<typeof usePanel>) =
         // getSaveStorage,
         setStorage,
     };
+};
+
+export const useOtherStorage = () => {
+    const ctxPanel = usePanel();
+    return useCurrentStorage(ctxPanel === 'left' ? 'right' : 'left');
 };

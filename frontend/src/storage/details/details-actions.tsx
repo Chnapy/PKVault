@@ -165,6 +165,8 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
 
         {canEditList.length < 2 && <UIPopover
             popoverRef={editPopoverRef}
+            position='left'
+            nested
             dropdown={canEditList[ 0 ] && <DetailsEdit
                 pkmId={canEditList[ 0 ].id}
                 saveId={saveId}

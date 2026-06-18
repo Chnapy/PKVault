@@ -1,42 +1,65 @@
-import { useStorageGetBoxes } from '../../../data/sdk/storage/storage.gen';
 import { Route } from '../../../routes/storage';
 import { BankContext } from '../../bank/bank-context';
-import { useCurrentStorage } from '../storage-panel-context';
+import { useCurrentStorage, useOtherStorage } from '../storage-panel-context';
+import { useFilteredBoxes } from './use-filtered-boxes';
+import { getFinalBox } from './utils/get-final-box';
 
 export const useCurrentStorageWithFallback = () => {
     const { storageIndex, getStorage } = useCurrentStorage();
+    const otherStorage = useOtherStorage();
+
     const saveId = Route.useSearch({ select: (search) => getStorage(search.storages)?.saveId });
-    const boxIdRaw = Route.useSearch({ select: (search) => getStorage(search.storages)?.boxId });
 
     const selectedBankBoxes = BankContext.useSelectedBankBoxes();
     const selectedBoxes = selectedBankBoxes.data?.selectedBoxes ?? [];
 
-    const boxesQuery = useStorageGetBoxes({ saveId: saveId ?? undefined });
+    const boxesQuery = useFilteredBoxes(saveId ?? null);
 
-    const isLoading = [ selectedBankBoxes, boxesQuery ].some(q => q.isLoading);
+    const isLoading = [ selectedBankBoxes, boxesQuery ].some(q => q.isLoading || !q.data);
 
-    const getBox = () => {
-        if (boxIdRaw !== undefined)
-            return boxesQuery.data?.data.find(box => box.idInt === boxIdRaw);
+    const boxId = Route.useSearch({
+        select: (search) => {
+            const storage = getStorage(search.storages);
+            if (storage?.saveId === undefined)
+                return;
 
-        if (saveId)
-            return boxesQuery.data?.data[ 0 ];
+            return getFinalBox(
+                storageIndex,
+                storage,
+                otherStorage.getStorage(search.storages),
+                boxesQuery.data,
+                selectedBoxes
+            )?.id;
+        }
+    });
 
-        return selectedBoxes.length > 1
-            ? selectedBankBoxes.data?.selectedBoxes[ storageIndex ]
-            : selectedBankBoxes.data?.selectedBoxes[ 0 ];
-    };
+    const disabledBoxId = Route.useSearch({
+        select: (search) => {
+            const storage = otherStorage.getStorage(search.storages);
+            if (storage?.saveId === undefined || storage.saveId !== saveId)
+                return;
+
+            return getFinalBox(
+                (storageIndex + 1) % 2,
+                storage,
+                getStorage(search.storages),
+                boxesQuery.data,
+                selectedBoxes
+            )?.id;
+        }
+    });
 
     const getData = () => {
         if (saveId === undefined)
             return;
 
-        const box = getBox();
+        const box = boxesQuery.data?.data.find(b => b.id === boxId);
 
         return {
             saveId,
             boxId: box?.idInt,
             box,
+            disabledBoxId,
             bankId: selectedBankBoxes.data?.selectedBank.id,
             bank: selectedBankBoxes.data?.selectedBank,
         };
@@ -45,5 +68,6 @@ export const useCurrentStorageWithFallback = () => {
     return {
         isLoading,
         data: getData(),
+        storageIndex,
     };
 };

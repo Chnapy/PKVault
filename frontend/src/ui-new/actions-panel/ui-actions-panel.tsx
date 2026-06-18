@@ -120,7 +120,7 @@ export const UIActionsPanel: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
                                     }}
                                 >
                                     <UIActionIcon
-                                        variant='light'
+                                        variant='filled'
                                         color='red'
                                         p={0}
                                         name={`action-${i}`}

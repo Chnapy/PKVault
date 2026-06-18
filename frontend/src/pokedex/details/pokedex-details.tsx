@@ -7,14 +7,13 @@ import { useTranslate } from '../../translate/i18n';
 import { BallImg } from '../../ui/img/ball-img';
 import { DetailsCardContainer, type DetailsExpandedState } from '../../ui/details-card/details-card-container';
 import { DetailsMainImg } from '../../ui/details-card/details-main-img';
-import { DetailsMainInfos } from '../../ui/details-card/details-main-infos';
 import { DetailsTab } from '../../ui/details-card/details-tab';
 import { DetailsTitle } from '../../ui/details-card/details-title';
 import { Gender } from '../../ui/gender/gender';
 import { AlphaIcon } from '../../ui/icon/alpha-icon';
 import { Icon } from '../../ui/icon/icon';
 import { ShinyIcon } from '../../ui/icon/shiny-icon';
-import { SelectNumberInput, SelectStringInput } from '../../ui/input/select-input';
+import { SelectStringInput } from '../../ui/input/select-input';
 import { TextContainer } from '../../ui/text-container/text-container';
 import { theme } from '../../ui/theme';
 import { usePokedexDetailsSelect } from './hooks/use-pokedex-details-select';
@@ -150,38 +149,7 @@ export const PokedexDetails: React.FC = () => {
           })}
         />
       }
-      mainInfos={
-        <DetailsMainInfos
-          species={selectedSpecies}
-          speciesName={<div className={css({ display: 'inline-flex', gap: 4 })}>
-            {staticFormsFiltered.length <= 1 && speciesName}
-            {staticFormsFiltered.length > 1 && <span className={css({
-              display: 'inline-flex',
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-              marginTop: -3
-            })}>
-              <SelectNumberInput
-                data={staticFormsFiltered.map(staticForm => ({
-                  value: staticForm.index,
-                  option: staticForm.name,
-                  disabled: !selectedSpeciesValue.forms.find(form => form.form === staticForm.index)?.isSeen,
-                }))}
-                onChange={selectedByFormIndex}
-                value={selectedForm.form}
-                bgColor='transparent'
-                className={css({
-                  height: '1lh',
-                  color: 'inherit',
-                  borderColor: 'currentcolor',
-                })}
-              />
-            </span>}
-          </div>}
-          version={selectedSave.version ?? 0}
-          types={selectedForm.types}
-        />
-      }
+      mainInfos={null}
       preContent={null}
       content={<>
         {selectedForm.abilities.length > 0 && <TextContainer stick>

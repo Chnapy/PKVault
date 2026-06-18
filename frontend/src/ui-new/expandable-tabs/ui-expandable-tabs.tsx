@@ -41,16 +41,18 @@ export type UIExpandableTabsProps<D extends UIExpandableTabsData> =
     & Omit<TabsProps, keyof UIExpandableTabsOwnProps<D>>
     & {
         controlsDetailsLabel?: string;
-        defaultExpanded?: boolean;
+        expanded?: boolean;
     };
 
 export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTabsData>({
-    id, level, controlsEnabled, controlsLabel, controlsDetailsLabel, defaultExpanded = false,
+    id, level, controlsEnabled, controlsLabel, controlsDetailsLabel, expanded: forcedExpanded,
     value, data, onChange, renderTab, renderExpanded,
     left, right, grow = true,
     ...tabsProps
 }: UIExpandableTabsProps<D>) {
-    const [ expanded, setExpanded ] = React.useState(defaultExpanded);
+    const [ expandedInner, setExpanded ] = React.useState(false);
+
+    const expanded = forcedExpanded ?? expandedInner;
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
 
@@ -154,6 +156,7 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
                     ml={grow ? 'auto' : undefined}
                     onClick={() => setExpanded(value => !value)}
                     color='currentcolor'
+                    disabled={forcedExpanded !== undefined}
                 >
                     {expanded
                         ? <ChevronUpIcon />

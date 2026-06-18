@@ -11,9 +11,10 @@ export type PopoverWithControlsProps = Partial<PopoverContext> & {
     dropdown: React.ReactNode;
     dropdownProps?: Popover.Dropdown.Props;
     nested?: boolean;
+    transparent?: boolean;
 } & Omit<Popover.Props, 'opened' | 'withinPortal'>;
 
-export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, nested, ...rest }) => {
+export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, nested, transparent, ...rest }) => {
     const [ innerOpened, setInnerOpened ] = React.useState(false);
 
     const ctx = React.useMemo((): PopoverContext => opened !== undefined && setOpened
@@ -47,11 +48,16 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened
             </Popover.Target>
 
             <Popover.Dropdown
-                component={Paper}
-                p='md' mah='calc(100vh - 1rem)' display='flex'
+                component={Paper} p={transparent ? 0 : 'md'}
+                mah='calc(100vh - 1rem)' display='flex'
                 {...dropdownProps}
                 style={{
-                    overflow: 'hidden',
+                    ...transparent
+                        ? {
+                            background: 'transparent',
+                            border: 'none',
+                        }
+                        : undefined,
                     ...dropdownProps?.style,
                 }}
             >

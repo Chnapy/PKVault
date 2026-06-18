@@ -4,9 +4,9 @@ import { UIGamePkvaultExpanded } from '../../../ui-new/storage/storage-panel/gam
 import { usePkmVariantIndex } from '../../../data/hooks/use-pkm-variant-index';
 import { useSettingsGet } from '../../../data/sdk/settings/settings.gen';
 
-export type GamePkvaultExpandedProps = Pick<UIGameExpandedProps, 'id' | 'label' | 'imgSrc' | 'selected' | 'onSelect'>;
+export type GamePkvaultExpandedProps = Pick<UIGameExpandedProps, 'label' | 'imgSrc' | 'selected' | 'onSelect'>;
 
-export const GamePkvaultExpanded: React.FC<GamePkvaultExpandedProps> = ({ id, label, imgSrc, onSelect, selected }) => {
+export const GamePkvaultExpanded: React.FC<GamePkvaultExpandedProps> = ({ label, imgSrc, onSelect, selected }) => {
     const settingsQuery = useSettingsGet();
 
     const ownedCountQuery = usePkmVariantIndex(

@@ -5,7 +5,6 @@ import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { Route } from '../../routes';
 import { BankContext } from '../../storage/bank/bank-context';
 import { StorageSaveItemBase } from '../../storage/item/save/storage-save-item-base';
-import { getSaveOrder } from '../../storage/util/get-save-order';
 import { useTranslate } from '../../translate/i18n';
 import { StorageItem } from '../../ui/storage-item/storage-item';
 import { TextContainer } from '../../ui/text-container/text-container';
@@ -93,7 +92,6 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
                                                 [ saveId ]: {
                                                     saveId,
                                                     saveBoxIds: [ pkm.boxId ],
-                                                    order: getSaveOrder(storageSearch?.saves, saveId),
                                                 },
                                             },
                                             selected: {
