@@ -1,4 +1,4 @@
-import type { BoxDTO, PkmVariantDTO, SaveInfosDTO } from '../../../../data/sdk/model';
+import type { BoxDTO, PkmVariantDTO } from '../../../../data/sdk/model';
 import type { DropValidationResult } from '../types';
 import type { ValidateRootSlot } from './validate-root';
 import type { ValidateSaveToMainSlot } from './validate-save-to-main';

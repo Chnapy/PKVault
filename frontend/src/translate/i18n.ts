@@ -4,8 +4,8 @@ import en from './locales/en.json';
 import fr from './locales/fr.json';
 import de from './locales/de.json';
 
-const assertFrIsEn: typeof en = fr, assertEnIsFr: typeof fr = en;
-const assertDeIsEn: typeof en = de, assertEnIsDe: typeof de = en;
+const _assertFrIsEn: typeof en = fr, _assertEnIsFr: typeof fr = en;
+const _assertDeIsEn: typeof en = de, _assertEnIsDe: typeof de = en;
 
 export const defaultNS = "ns";
 export const resources = {

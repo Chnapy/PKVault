@@ -1,13 +1,12 @@
 import { Group, InputWrapper, NumberInput, Slider, Stack, Text } from '@mantine/core';
-import { SaveIcon } from 'lucide-react';
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { type EditPkmVariantPayload } from '../../../../data/sdk/model';
 import { useTranslate } from '../../../../translate/i18n';
-import { UIButton } from '../../../form/button/ui-button';
 import { UIMultiSelect } from '../../../form/select/ui-multi-select';
 import { UITextInput } from '../../../form/text-input/ui-text-input';
 import { usePopover } from '../../../interaction/focus-controls/components/popover/hooks/use-popover';
+import { UIFormCard } from '../../../popover/popover-card/ui-form-card';
 import type { UIDetailsStatName } from '../content/stats/ui-details-stats-row';
 
 type DataInput = EditPkmVariantPayload;
@@ -47,9 +46,10 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
         popover?.setOpened(false);
     });
 
-    return <Stack
-        component='form'
+    return <UIFormCard
         onSubmit={onSubmit}
+        title={<>Edit {defaultValues.nickname}</>}
+        disabled={formDisabled}
     >
         <Group align='flex-start'>
             <Stack>
@@ -89,7 +89,6 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
                     maw={300}
                     comboboxProps={{ withinPortal: false, position: 'right-start', floatingHeight: "viewport" }}
                     floatingHeight="viewport"
-                // dropdownOpened
                 />
             </Stack>
 
@@ -140,17 +139,5 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
             </InputWrapper>
 
         </Group>
-
-        <UIButton
-            name='submit'
-            controlLabel='Submit'
-            type='submit'
-            disabled={formDisabled}
-            variant='filled'
-            color='primary'
-        >
-            <SaveIcon />
-            {t('action.submit')}
-        </UIButton>
-    </Stack>;
+    </UIFormCard>;
 };

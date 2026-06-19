@@ -66,7 +66,6 @@ export const NotificationButton: React.FC = () => {
                 maw: 600,
                 mah: 300,
             }}
-            transparent
         />
     );
 };

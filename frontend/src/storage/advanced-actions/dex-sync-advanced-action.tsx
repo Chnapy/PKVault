@@ -1,4 +1,4 @@
-import { Group, Stack, type ComboboxItem } from '@mantine/core';
+import { Alert, Group, type ComboboxItem } from '@mantine/core';
 import { AlertTriangleIcon, CalendarSyncIcon } from 'lucide-react';
 import type React from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -7,9 +7,9 @@ import { useSaveInfosGetAll } from "../../data/sdk/save-infos/save-infos.gen";
 import { useStorageDexSync } from "../../data/sdk/storage/storage.gen";
 import { useStaticData } from "../../hooks/use-static-data";
 import { useTranslate } from "../../translate/i18n";
-import { UIButton } from '../../ui-new/form/button/ui-button';
 import { UIMultiSelect } from '../../ui-new/form/select/ui-multi-select';
 import { usePopover } from '../../ui-new/interaction/focus-controls/components/popover/hooks/use-popover';
+import { UIFormCard } from '../../ui-new/popover/popover-card/ui-form-card';
 import { GameImg } from '../../ui/img/game-img';
 
 export const DexSyncAdvancedAction: React.FC<{
@@ -26,7 +26,7 @@ export const DexSyncAdvancedAction: React.FC<{
 
   const dexSyncMutation = useStorageDexSync();
 
-  const { handleSubmit, setValue, formState, control } =
+  const { handleSubmit, setValue, control } =
     useForm<StorageDexSyncParams>({
       defaultValues: {
         saveIds: [ saveId ],
@@ -49,10 +49,12 @@ export const DexSyncAdvancedAction: React.FC<{
     popover?.setOpened(false);
   });
 
-  return <Stack
-    component='form'
+  return <UIFormCard
     onSubmit={onSubmit}
-    maw={350}
+    icon={<CalendarSyncIcon />}
+    title={t('storage.box.advanced.dex-sync')}
+    description={t("storage.dex-sync.description")}
+    disabled={saveIds.length < 2}
   >
     <UIMultiSelect
       name='saveIds'
@@ -86,27 +88,8 @@ export const DexSyncAdvancedAction: React.FC<{
       floatingHeight="viewport"
     />
 
-    <div>{t("storage.dex-sync.description")}</div>
-
-    <div
-      style={{
-        whiteSpace: "pre-line",
-      }}
-    >
-      <AlertTriangleIcon />{" "}
+    <Alert variant='outline' color='orange' icon={<AlertTriangleIcon />} style={{ whiteSpace: "pre-line" }}>
       {t("storage.actions.unsafe")}
-    </div>
-
-    <UIButton
-      name='submit'
-      controlLabel='Submit'
-      type="submit"
-      color='blue'
-      loading={formState.isSubmitting}
-      disabled={saveIds.length < 2}
-      leftSection={<CalendarSyncIcon />}
-    >
-      {t("action.submit")}
-    </UIButton>
-  </Stack>;
+    </Alert>
+  </UIFormCard>;
 };

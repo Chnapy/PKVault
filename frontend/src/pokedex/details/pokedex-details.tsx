@@ -51,20 +51,20 @@ export const PokedexDetails: React.FC = () => {
 
     setSelectedSaveId,
     setSelectedFormId,
-    selectedByFormIndex,
+    // selectedByFormIndex,
 
     selectedFormIndexForms,
-    selectedStaticFormWithIndex,
+    // selectedStaticFormWithIndex,
     selectedSpeciesValue,
 
     gameSaves,
-    staticFormsFiltered,
+    // staticFormsFiltered,
   } = selectInfos;
 
   const caught = selectedForm.isCaught;
   const owned = selectedForm.isOwned;
 
-  const speciesName = selectedStaticFormWithIndex.name;
+  // const speciesName = selectedStaticFormWithIndex.name;
 
   const baseStats = selectedForm.baseStats;
   const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);

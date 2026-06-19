@@ -4,7 +4,7 @@ import { renderDroppable } from './utils/render-droppable';
 import { setupTestDataServer } from './utils/setup-test-data-server';
 
 describe('use-move-droppable-bank', () => {
-    const server = setupTestDataServer();
+    const _server = setupTestDataServer();
 
     test('should not be droppable if not dragging', async () => {
         const { result } = await renderDroppable({

@@ -1,4 +1,5 @@
 import type React from 'react';
+import { withErrorCatcher } from '../../../../../error/with-error-catcher';
 import { useControls } from '../../../controls/use-controls';
 import type { FocusScopeId } from '../../../focus/provider/focus-context';
 import { FocusScope } from '../../../focus/scope/focus-scope';
@@ -11,7 +12,7 @@ type PopoverDropdownWithControlsProps = {
     children: React.ReactNode;
 };
 
-export const PopoverDropdownWithControls: React.FC<PopoverDropdownWithControlsProps> = ({ scopeId, children }) => {
+export const PopoverDropdownWithControls: React.FC<PopoverDropdownWithControlsProps> = withErrorCatcher('default', ({ scopeId, children }) => {
     const parentScope = useFocusScopeContext();
     const order = parentScope.parentsIds.length;
 
@@ -38,4 +39,4 @@ export const PopoverDropdownWithControls: React.FC<PopoverDropdownWithControlsPr
     return <FocusScope id={scopeId}>
         {children}
     </FocusScope>;
-};
+});

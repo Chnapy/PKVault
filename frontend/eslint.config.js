@@ -21,10 +21,17 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      // TODO not critical rules, but should be fixed
-      "react-hooks/set-state-in-effect": ["warn"],
-      "react-refresh/only-export-components": ["warn"],
-      "@typescript-eslint/no-unused-vars": ["off"],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          args: "none",
+          caughtErrors: "all",
+          caughtErrorsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
     },
     settings: {
       "react-hooks": {

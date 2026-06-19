@@ -5,6 +5,7 @@ import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { usePkmLegality } from '../../data/hooks/use-pkm-legality';
 import { usePkmVariantAttach } from '../../data/hooks/use-pkm-variant-attach';
 import { PKMLoadError, type PkmSaveDTO, type PkmVariantDTO } from '../../data/sdk/model';
+import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
 import { useTranslate } from '../../translate/i18n';
@@ -27,7 +28,7 @@ import { useCurrentStorage } from '../panel/storage-panel-context';
 
 const isVariant = (pkm: PkmVariantDTO | PkmSaveDTO) => 'filepath' in pkm;
 
-export const DetailsContent: React.FC = () => {
+export const DetailsContent: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
 
     const staticData = useStaticData();
@@ -202,4 +203,4 @@ export const DetailsContent: React.FC = () => {
             homeTracker={pkm.homeTracker}
         />}
     />;
-};
+});

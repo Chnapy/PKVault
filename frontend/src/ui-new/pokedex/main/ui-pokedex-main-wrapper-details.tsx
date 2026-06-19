@@ -14,7 +14,6 @@ export const UIPokedexMainWrapperDetails: React.FC<UIPokedexMainWrapperDetailsPr
         dropdownProps={{
             w: 300,
         }}
-        transparent
         position='left-start'
         closeOnClickOutside={false}
         transitionProps={{

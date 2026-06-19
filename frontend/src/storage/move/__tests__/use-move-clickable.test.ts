@@ -20,7 +20,7 @@ const useMoveClickable = ([ pkmId ]: [ string ], container: MoveContainerValue) 
 };
 
 describe('use-move-clickable', () => {
-    const server = setupTestDataServer();
+    const _server = setupTestDataServer();
 
     describe('pkm-variant clickable state', () => {
         test('should be clickable if is movable', async () => {

@@ -2,7 +2,6 @@ import { getSingleElementChild, Menu, Paper } from '@mantine/core';
 import React from 'react';
 import type { FocusScopeId } from '../../../focus/provider/focus-context';
 import { popoverContext, type PopoverContext } from './context/popover-context';
-import { usePopover } from './hooks/use-popover';
 import { PopoverDropdownWithControls } from './popover-dropdown-with-controls';
 
 export type MenuWithControlsProps = Partial<PopoverContext> & {
@@ -10,9 +9,10 @@ export type MenuWithControlsProps = Partial<PopoverContext> & {
     target: React.ReactElement;
     dropdown: React.ReactNode;
     dropdownProps?: Menu.Dropdown.Props;
+    nested?: boolean;
 } & Omit<Menu.Props, 'opened' | 'withinPortal'>;
 
-export const MenuWithControls: React.FC<MenuWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, ...rest }) => {
+export const MenuWithControls: React.FC<MenuWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, nested, ...rest }) => {
     const [ innerOpened, setInnerOpened ] = React.useState(false);
 
     const ctx = React.useMemo((): PopoverContext => opened !== undefined && setOpened
@@ -21,8 +21,6 @@ export const MenuWithControls: React.FC<MenuWithControlsProps> = ({ opened, setO
             opened: innerOpened,
             setOpened: setInnerOpened,
         }, [ innerOpened, opened, setOpened ]);
-
-    const nested = !!usePopover()?.opened;
 
     const [ scopeId ] = React.useState((): FocusScopeId => `popover_${self.crypto.randomUUID()}`);
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
+import { withErrorCatcher } from '../../error/with-error-catcher';
 import { Route } from '../../routes/storage';
 import { UIStorageDetails } from '../../ui-new/storage/storage-details/ui-storage-details';
 import { useCurrentStorage } from '../panel/storage-panel-context';
@@ -8,7 +9,7 @@ import { DetailsContent } from './details-content';
 import { DetailsMain } from './details-main';
 import { DetailsSaves } from './details-saves';
 
-export const StorageDetails: React.FC = () => {
+export const StorageDetails: React.FC = withErrorCatcher('default', () => {
   const navigate = Route.useNavigate();
 
   const { getSelected } = useCurrentStorage();
@@ -41,4 +42,4 @@ export const StorageDetails: React.FC = () => {
     />}
     onClose={unselect}
   />;
-};
+});

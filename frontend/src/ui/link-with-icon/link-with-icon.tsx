@@ -1,4 +1,5 @@
 import { css } from '@emotion/css';
+import { Anchor } from '@mantine/core';
 import type { JSX } from 'react';
 
 export const LinkWithIcon: React.FC<JSX.IntrinsicElements[ 'a' ]> = ({ children, ...props }) => {
@@ -22,10 +23,10 @@ export const LinkWithIcon: React.FC<JSX.IntrinsicElements[ 'a' ]> = ({ children,
         src={origin && `${origin}/favicon.ico`}
     />;
 
-    return <a
+    return <Anchor
         {...props}
     >
         {icon}
         {children}
-    </a>;
+    </Anchor>;
 };

@@ -22,7 +22,6 @@ export const UIStoragePanelWrapperDetails: React.FC<UIStoragePanelWrapperDetails
                 }
                 : undefined,
         }}
-        transparent
         position='right-start'
         closeOnClickOutside={false}
         transitionProps={{

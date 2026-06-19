@@ -1,10 +1,8 @@
 import { ActionIcon, Table } from '@mantine/core';
+import { ExternalLinkIcon } from 'lucide-react';
 import type React from 'react';
 import { useTranslate } from '../../translate/i18n';
-import { ButtonExternalLink } from '../../ui/button/button';
-import { Icon } from '../../ui/icon/icon';
 import { useCheckUpdate } from '../hooks/use-check-update';
-import { ExternalLinkIcon } from 'lucide-react';
 
 export const HasUpdateWarning: React.FC = () => {
     const { t } = useTranslate();

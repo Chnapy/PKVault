@@ -1,5 +1,5 @@
-import { Group, Stack, Tooltip } from '@mantine/core';
-import { ChevronLeftIcon, ChevronRightIcon, SaveIcon, ScanEyeIcon } from 'lucide-react';
+import { Group, Tooltip } from '@mantine/core';
+import { ChevronLeftIcon, ChevronRightIcon, ScanEyeIcon } from 'lucide-react';
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import type { BankDTO, BankView, StorageUpdateMainBankParams } from '../../data/sdk/model';
@@ -8,6 +8,7 @@ import { UIButton } from '../form/button/ui-button';
 import { UISwitch } from '../form/switch/ui-switch';
 import { UITextInput } from '../form/text-input/ui-text-input';
 import { usePopover } from '../interaction/focus-controls/components/popover/hooks/use-popover';
+import { UIFormCard } from '../popover/popover-card/ui-form-card';
 
 type DataInput = StorageUpdateMainBankParams & { view: BankView };
 
@@ -55,9 +56,10 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
         popover?.setOpened(false);
     });
 
-    return <Stack
-        component='form'
+    return <UIFormCard
         onSubmit={onSubmit}
+        title={<>Edit {defaultValues.bankName}</>}
+        disabled={watchName.length === 0 || !formState.isValid}
     >
         <UITextInput
             {...register('bankName', { setValueAs: (value) => value.trim(), minLength: 2, maxLength: 64 })}
@@ -106,15 +108,5 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
                 {t('storage.bank.edit.view')}
             </UIButton>
         </Tooltip>
-
-        <UIButton
-            name='submit'
-            controlLabel='Submit'
-            type='submit'
-            disabled={watchName.length === 0 || !formState.isValid}
-        >
-            <SaveIcon />
-            {t('action.submit')}
-        </UIButton>
-    </Stack>;
+    </UIFormCard>;
 };

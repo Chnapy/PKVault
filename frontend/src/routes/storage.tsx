@@ -1,23 +1,8 @@
 import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
-import React from "react";
 import z from "zod";
-import { withErrorCatcher } from '../error/with-error-catcher';
-import { StoragePanelWrapperDetails } from '../storage/panel/storage-panel-wrapper-details';
-import { UIStorageContent } from '../ui-new/storage/storage-content/ui-storage-content';
+import { StoragePage } from '../pages/storage';
 import { type DetailsExpandedState } from '../ui/details-card/details-card-container';
-
-export const Storage: React.FC = withErrorCatcher('default', () => {
-  console.log('page storage')
-
-  return (
-    <UIStorageContent
-      id='move-container'
-      left={<StoragePanelWrapperDetails />}
-      right={<StoragePanelWrapperDetails />}
-    />
-  );
-});
 
 export type StorageSearchSchema = z.infer<typeof searchSchema>;
 
@@ -43,7 +28,7 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/storage")({
-  component: Storage,
+  component: StoragePage,
   validateSearch: zodValidator(fallback(searchSchema, {})),
   search: {
     middlewares: [ retainSearchParams(true) ],

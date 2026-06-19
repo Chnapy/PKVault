@@ -1,5 +1,5 @@
-import { Group, NumberInput, Stack } from '@mantine/core';
-import { ChevronLeftIcon, ChevronRightIcon, SaveIcon } from 'lucide-react';
+import { Group, NumberInput } from '@mantine/core';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import React from 'react';
 import { useForm, useWatch, type UseFormRegisterReturn } from 'react-hook-form';
 import { BoxType, type BankDTO, type BoxDTO, type StorageUpdateMainBoxParams } from '../../../../data/sdk/model';
@@ -8,6 +8,7 @@ import { UIButton } from '../../../form/button/ui-button';
 import { UISelect } from '../../../form/select/ui-select';
 import { UITextInput } from '../../../form/text-input/ui-text-input';
 import { usePopover } from '../../../interaction/focus-controls/components/popover/hooks/use-popover';
+import { UIFormCard } from '../../../popover/popover-card/ui-form-card';
 
 type DataInput = StorageUpdateMainBoxParams;
 
@@ -47,9 +48,10 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
         popover?.setOpened(false);
     });
 
-    return <Stack
-        component='form'
+    return <UIFormCard
         onSubmit={onSubmit}
+        title={<>Edit {defaultValues.boxName}</>}
+        disabled={watchName.length === 0 || !formState.isValid}
     >
         <UITextInput
             {...register('boxName', {
@@ -115,15 +117,5 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
             onChange={e => setValue('bankId', e.target.value)}
             disabled={boxes.length <= 1}
         />
-
-        <UIButton
-            name='submit'
-            controlLabel='Submit'
-            type='submit'
-            disabled={watchName.length === 0 || !formState.isValid}
-        >
-            <SaveIcon />
-            {t('action.submit')}
-        </UIButton>
-    </Stack>;
+    </UIFormCard>;
 };

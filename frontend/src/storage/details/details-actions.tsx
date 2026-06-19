@@ -188,11 +188,12 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
 
         {canEvolveList.length > 0 && <UIConfirmPopover
             label='Evolve'
+            color='blue'
             action={async () => {
                 if (canEvolveList.length === 0)
                     return;
 
-                const mutateResult = await evolvePkmsMutation.mutateAsync({
+                await evolvePkmsMutation.mutateAsync({
                     params: {
                         saveId: saveId ?? undefined,
                         ids: canEvolveList.map(pkm => pkm.id),
@@ -231,6 +232,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
 
         <UIConfirmPopover
             label='Release'
+            color='red'
             action={async () => {
                 if (canReleaseList.length === 0)
                     return;

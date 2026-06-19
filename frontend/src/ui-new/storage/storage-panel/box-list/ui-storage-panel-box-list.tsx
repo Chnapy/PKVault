@@ -47,7 +47,7 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
             onChange={onSelect}
             left={<BoxIcon style={{ flexShrink: 0 }} />}
             renderTab={renderTab}
-            renderExpanded={(data, opt) => <Group pt='md'>
+            renderExpanded={(data, opt) => <Group py='md' px='xs'>
                 {renderExpanded?.(data, opt)}
 
                 {onCreate && <UIActionIcon
@@ -65,14 +65,17 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
                 <Divider orientation="vertical" h='1lh' />
 
                 <UIMenu
-                    position="bottom-end" closeOnItemClick={false}
+                    position="bottom-end"
+                    closeOnItemClick={false}
+                    closeOnClickOutside
                     dropdown={<>
                         <UIPopover
                             position='right-start'
                             dropdown={advancedActionSort}
+                            dropdownProps={{ w: 350 }}
                             nested
                         >
-                            <Menu.Item leftSection={<SortDescIcon />}>
+                            <Menu.Item leftSection={<SortDescIcon />} fz='md'>
                                 <Text>
                                     {t('storage.box.advanced.sort')}
                                 </Text>
@@ -82,9 +85,10 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
                         <UIPopover
                             position='right-start'
                             dropdown={advancedDexSync}
+                            dropdownProps={{ w: 350 }}
                             nested
                         >
-                            <Menu.Item leftSection={<CalendarSyncIcon />}>
+                            <Menu.Item leftSection={<CalendarSyncIcon />} fz='md'>
                                 <Text>
                                     {t('storage.box.advanced.dex-sync')}
                                 </Text>

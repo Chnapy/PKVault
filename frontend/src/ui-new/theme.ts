@@ -1,7 +1,9 @@
-import { ActionIcon, Alert, Button, Card, createTheme, mergeThemeOverrides, NumberFormatter, Paper, Scroller, Tabs, Text } from '@mantine/core';
+import { ActionIcon, Alert, Button, Card, createTheme, Menu, mergeThemeOverrides, NumberFormatter, Paper, Popover, Scroller, Tabs, Text } from '@mantine/core';
 import { clsx } from 'clsx';
 import { baseTheme, cssVariablesResolver } from './base-theme';
 import classes from './theme.module.css';
+
+const defaultClickOutsideEvents = [ 'pointerdown', 'touchstart' ];
 
 export const theme = mergeThemeOverrides(
   baseTheme,
@@ -62,6 +64,18 @@ export const theme = mergeThemeOverrides(
           title: classes.alertTitle,
           message: classes.alertMessage,
         }),
+      }),
+      Popover: Popover.extend({
+        defaultProps: {
+          // default value 'mousedown' doesn't work with disabled buttons
+          clickOutsideEvents: defaultClickOutsideEvents,
+        },
+      }),
+      Menu: Menu.extend({
+        defaultProps: {
+          // default value 'mousedown' doesn't work with disabled buttons
+          clickOutsideEvents: defaultClickOutsideEvents,
+        },
       }),
     },
   }),

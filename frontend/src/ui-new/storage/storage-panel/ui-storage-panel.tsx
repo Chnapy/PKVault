@@ -22,7 +22,7 @@ export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header
             {gameTabs}
         </Card.Section>
 
-        {header && <Box my='sm' mah='100%' style={{ overflowY: 'auto' }}>
+        {header && <Box my='sm' mah='100%' style={{ flexShrink: 0, overflowY: 'auto' }}>
             {header}
         </Box>}
 

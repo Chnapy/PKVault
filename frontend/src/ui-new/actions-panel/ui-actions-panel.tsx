@@ -1,6 +1,7 @@
 import { Button, Card, Divider, Drawer, Group, Indicator, OverflowList, Stack, Timeline, Title } from '@mantine/core';
 import { SaveIcon, SortDescIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
+import { DataActionType } from '../../data/sdk/model';
 import { useTranslate } from '../../translate/i18n';
 import { UIActionIcon } from '../form/button/ui-action-icon';
 import { UIButton } from '../form/button/ui-button';
@@ -112,7 +113,9 @@ export const UIActionsPanel: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
                                 <Divider style={{ flexGrow: 1 }} />
 
                                 <UIConfirmPopover
-                                    label={'Delete this action and more recent ones'}
+                                    label={'Delete'}
+                                    description={'Delete this action and all next ones'}
+                                    color='red'
                                     action={async () => {
                                         await onDelete(i);
                                         if (i === 0)
@@ -125,6 +128,10 @@ export const UIActionsPanel: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
                                         p={0}
                                         name={`action-${i}`}
                                         controlLabel={`Action ${i}`}
+                                        disabled={([
+                                            DataActionType.DATA_NORMALIZE,
+                                            DataActionType.UPDATE_EXTERNAL_PKM,
+                                        ] as DataActionType[]).includes(type)}
                                         h='1rem'
                                         mt={-8}
                                     >

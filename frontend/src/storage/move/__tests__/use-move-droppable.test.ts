@@ -4,7 +4,7 @@ import { renderDroppable } from './utils/render-droppable';
 import { setupTestDataServer } from './utils/setup-test-data-server';
 
 describe('use-move-droppable', () => {
-    const server = setupTestDataServer();
+    const _server = setupTestDataServer();
 
     describe('pkm-variant droppable state', () => {
         test('should not be droppable if not dragging', async () => {

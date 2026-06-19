@@ -1,6 +1,5 @@
 import { Grid, Progress } from '@mantine/core';
 import React from 'react';
-import { useTranslate } from '../../../../../translate/i18n';
 
 export type UIDetailsContentMiscProps = {
     isEgg?: boolean;
@@ -13,7 +12,7 @@ export type UIDetailsContentMiscProps = {
 export const UIDetailsContentMisc: React.FC<UIDetailsContentMiscProps> = ({
     isEgg, eggHatchCount, friendship, language, homeTracker
 }) => {
-    const { t } = useTranslate();
+    // const { t } = useTranslate();
 
     return <Grid>
         <Grid.Col span={4}>

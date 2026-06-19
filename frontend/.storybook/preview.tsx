@@ -1,4 +1,4 @@
-import type { Meta, Preview, StoryContext } from '@storybook/react-vite';
+import type { Preview, StoryContext } from '@storybook/react-vite';
 import { createMemoryHistory, createRootRoute, createRoute, createRouter, RouteComponent, RouterProvider } from '@tanstack/react-router';
 import { AppTheme } from '../src/ui-new/app-theme';
 import { FocusControlsProvider } from '../src/ui-new/interaction/focus-controls/provider/focus-controls-provider';

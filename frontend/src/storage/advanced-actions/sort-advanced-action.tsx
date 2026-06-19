@@ -1,4 +1,4 @@
-import { Box, Stack, type ComboboxItem } from '@mantine/core';
+import { type ComboboxItem } from '@mantine/core';
 import { SortDescIcon } from 'lucide-react';
 import type React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -8,10 +8,10 @@ import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageSortPkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
-import { UIButton } from '../../ui-new/form/button/ui-button';
 import { UISelect } from '../../ui-new/form/select/ui-select';
 import { UISwitch } from '../../ui-new/form/switch/ui-switch';
 import { usePopover } from '../../ui-new/interaction/focus-controls/components/popover/hooks/use-popover';
+import { UIFormCard } from '../../ui-new/popover/popover-card/ui-form-card';
 import { useFilteredBoxes } from '../panel/hooks/use-filtered-boxes';
 
 export const SortAdvancedAction: React.FC<{
@@ -88,10 +88,12 @@ export const SortAdvancedAction: React.FC<{
         popover?.setOpened(false);
     });
 
-    return <Stack
-        component='form'
+    return <UIFormCard
         onSubmit={onSubmit}
-        maw={350}
+        icon={<SortDescIcon />}
+        title={t('storage.box.advanced.sort')}
+        description={t('storage.sort.description.1')}
+        disabled={!formState.isValid}
     >
         <UISelect
             {...register('pokedexName')}
@@ -143,26 +145,10 @@ export const SortAdvancedAction: React.FC<{
             name='leaveEmptySlot'
             controlLabel='Leave empty slots'
             label={t('storage.sort.empty-slot')}
+            description={saveId ? t('storage.sort.description.2') : t('storage.sort.description.3')}
             checked={leaveEmptySlot}
             onChange={() => setValue('leaveEmptySlot', !leaveEmptySlot)}
         />
 
-        <Box>
-            {t('storage.sort.description.1')}
-            <br />
-            {saveId ? t('storage.sort.description.2') : t('storage.sort.description.3')}
-        </Box>
-
-        <UIButton
-            name='submit'
-            controlLabel='Submit'
-            type='submit'
-            color='blue'
-            loading={formState.isSubmitting}
-            disabled={!formState.isValid}
-            leftSection={<SortDescIcon />}
-        >
-            {t('action.submit')}
-        </UIButton>
-    </Stack>;
+    </UIFormCard>;
 };

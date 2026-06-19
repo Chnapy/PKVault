@@ -149,6 +149,7 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
             <UIConfirmPopover
                 popoverRef={deletePopoverRef}
                 label='Delete'
+                color='red'
                 action={onDelete}
             >
                 <WithControlsIcons

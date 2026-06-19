@@ -2,10 +2,10 @@ import type { BoxDTO, PkmBaseDTO } from '../../../../data/sdk/model';
 import type { DropValidationResult } from '../types';
 
 export type ValidateRootSlot = {
-    sourceBox?: Pick<BoxDTO, 'slotCount'>;
-    sourcePkm: Pick<PkmBaseDTO, 'boxSlot' | 'canMove'>;
-    targetBox?: Pick<BoxDTO, 'slotCount'>;
-    targetPkm?: Pick<PkmBaseDTO, 'boxSlot' | 'canMove'>;
+    sourceBox?: Pick<BoxDTO, 'name' | 'slotCount'>;
+    sourcePkm: Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context'>;
+    targetBox?: Pick<BoxDTO, 'name' | 'slotCount'>;
+    targetPkm?: Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context'>;
     targetSlot?: number;
 };
 

@@ -3,7 +3,6 @@ import { createMemoryHistory, createRootRoute, createRouter, Outlet, RouterConte
 import { waitFor } from '@testing-library/dom';
 import { renderHook } from '@testing-library/react';
 import { expect } from 'vitest';
-import type { MoveContext } from '../../../../ui-new/interaction/move/context/move-context';
 import { useMoveContext } from '../../../../ui-new/interaction/move/context/use-move-context';
 import type { MoveState } from '../../../../ui-new/interaction/move/state/move-state';
 import type { SelectContext } from '../../../../ui-new/interaction/select/context/select-context';
@@ -30,13 +29,13 @@ export const renderHookWithWrapper = <Result, Props>(
         },
     });
 
-    let moveContext: MoveContext<MoveContainerValue, MoveParams> | undefined;
+    // let moveContext: MoveContext<MoveContainerValue, MoveParams> | undefined;
     let moveContextValue: MoveState<MoveParams> | undefined;
     let selectContextValue: SelectContext<MoveContainerValue> | undefined;
 
     const useWrapperHook = (initialProps: Props) => {
         const result = useHook(initialProps);
-        moveContext = useMoveContext<MoveContainerValue, MoveParams>();
+        // moveContext = useMoveContext<MoveContainerValue, MoveParams>();
         moveContextValue = useMoveContext<MoveContainerValue, MoveParams>().useMoveStore().state;
         selectContextValue = useSelectContextNullable() ?? undefined;
         return result;

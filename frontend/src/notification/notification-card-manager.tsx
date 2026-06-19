@@ -1,4 +1,4 @@
-import { ActionIcon, Table } from '@mantine/core';
+import { ActionIcon, Code, ScrollArea, Table } from '@mantine/core';
 import { TrashIcon } from 'lucide-react';
 import React from 'react';
 import { BackendErrorsContext } from '../data/backend-errors-context';
@@ -32,19 +32,14 @@ export const NotificationCardManager: React.FC = () => {
                             cursor: 'pointer'
                         }}>{error.message}</summary>
 
-                        <code style={{
-                            display: 'flex',
-                            fontSize: '75%',
-                            // backgroundColor: theme.bg.contrastdark,
-                            padding: 4,
-                            maxHeight: 200,
-                            overflowY: 'auto',
-                        }}>
-                            {error.stack}
-                        </code>
+                        <ScrollArea maw={500}>
+                            <Code block p='md'>
+                                {error.stack}
+                            </Code>
+                        </ScrollArea>
                     </details>
                 </Table.Td>
-                <Table.Td valign='top'>
+                <Table.Td valign='top' w={0}>
                     <ActionIcon
                         variant='default'
                         onClick={() => removeIndex(i)}

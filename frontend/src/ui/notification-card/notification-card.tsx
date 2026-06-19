@@ -1,7 +1,8 @@
-import { Card, Center, Divider, Group, Table } from '@mantine/core';
-import { ChevronDownIcon } from 'lucide-react';
+import { Divider, Table } from '@mantine/core';
+import { AlertCircleIcon } from 'lucide-react';
 import React from 'react';
 import { useTranslate } from '../../translate/i18n';
+import { UIPopoverCard } from '../../ui-new/popover/popover-card/ui-popover-card';
 
 export type NotificationCardProps = {
     warningsCount: number;
@@ -25,36 +26,28 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
         errorsCount > 0 && t('notifications.errors', { count: errorsCount }),
     ].filter(Boolean).join(' / ');
 
-    return <Card>
-        <Card.Section inheritPadding>
-            <Center>
-                <Group>
-                    <ChevronDownIcon />
-                    {title}
-                    <ChevronDownIcon />
-                </Group>
-            </Center>
-        </Card.Section>
+    return <UIPopoverCard
+        icon={<AlertCircleIcon />}
+        title={title}
+        miw={300}
+    >
+        <Table
+            // maw={600}
+            style={{ wordBreak: 'break-word' }}
+        >
+            <Table.Tbody>
+                {update}
 
-        <Card.Section inheritPadding>
-            <Table
-                // maw={600}
-                style={{ wordBreak: 'break-word' }}
-            >
-                <Table.Tbody>
-                    {update}
+                {saveDuplicateWarnings}
+                {pkmVariantWarnings}
+                {saveChangedWarnings}
 
-                    {saveDuplicateWarnings}
-                    {pkmVariantWarnings}
-                    {saveChangedWarnings}
+                {hasErrorsAndWarnings && <Table.Tr><Table.Td>
+                    <Divider />
+                </Table.Td></Table.Tr>}
 
-                    {hasErrorsAndWarnings && <Table.Tr><Table.Td>
-                        <Divider />
-                    </Table.Td></Table.Tr>}
-
-                    {errors}
-                </Table.Tbody>
-            </Table>
-        </Card.Section>
-    </Card>;
+                {errors}
+            </Table.Tbody>
+        </Table>
+    </UIPopoverCard>;
 };

@@ -1,8 +1,7 @@
-import { getSingleElementChild, Paper, Popover } from '@mantine/core';
+import { getSingleElementChild, Popover } from '@mantine/core';
 import React from 'react';
 import type { FocusScopeId } from '../../../focus/provider/focus-context';
 import { popoverContext, type PopoverContext } from './context/popover-context';
-import { usePopover } from './hooks/use-popover';
 import { PopoverDropdownWithControls } from './popover-dropdown-with-controls';
 
 export type PopoverWithControlsProps = Partial<PopoverContext> & {
@@ -11,10 +10,9 @@ export type PopoverWithControlsProps = Partial<PopoverContext> & {
     dropdown: React.ReactNode;
     dropdownProps?: Popover.Dropdown.Props;
     nested?: boolean;
-    transparent?: boolean;
 } & Omit<Popover.Props, 'opened' | 'withinPortal'>;
 
-export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, nested, transparent, ...rest }) => {
+export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, nested, ...rest }) => {
     const [ innerOpened, setInnerOpened ] = React.useState(false);
 
     const ctx = React.useMemo((): PopoverContext => opened !== undefined && setOpened
@@ -41,6 +39,7 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened
             opened={ctx.opened}
             onChange={ctx.setOpened}
             withinPortal={!nested}
+            shadow='xl'
             {...rest}
         >
             <Popover.Target>
@@ -48,16 +47,13 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened
             </Popover.Target>
 
             <Popover.Dropdown
-                component={Paper} p={transparent ? 0 : 'md'}
-                mah='calc(100vh - 1rem)' display='flex'
+                mah='calc(100vh - 1rem)'
+                display='flex'
+                p={0}
                 {...dropdownProps}
                 style={{
-                    ...transparent
-                        ? {
-                            background: 'transparent',
-                            border: 'none',
-                        }
-                        : undefined,
+                    background: 'transparent',
+                    border: 'none',
                     ...dropdownProps?.style,
                 }}
             >

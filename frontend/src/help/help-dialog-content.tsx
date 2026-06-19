@@ -1,11 +1,11 @@
 import { css } from '@emotion/css';
+import { Anchor, Code, Text, Title } from '@mantine/core';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import React from 'react';
 import ReactMarkdown, { type Components, type UrlTransform } from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 import { LinkWithIcon } from '../ui/link-with-icon/link-with-icon';
-import { theme } from '../ui/theme';
 import { useHelpAnchorScroll } from './hooks/use-help-anchor-scroll';
 
 type HelpDialogContentProps = {
@@ -35,31 +35,13 @@ export const HelpDialogContent: React.FC<HelpDialogContentProps> = ({ selectedEn
     return <div
         ref={markdownRef}
         className={css({
-            'h1,h2,h3': {
-                borderBottomWidth: 1,
-                borderBottomStyle: 'solid',
-                borderBottomColor: 'rgba(0,0,0,0.1)',
-                textShadow: 'none',
-            },
-            h1: {
-                fontSize: '1.8em',
-                margin: 0,
-            },
-            a: {
-                color: theme.text.primary,
+            // a: {
+            //     color: theme.text.primary,
 
-                '&:hover': {
-                    textDecoration: 'underline',
-                },
-            },
-            code: {
-                fontSize: '0.8em',
-                backgroundColor: 'rgba(0,0,0,0.05)',
-                textShadow: 'none',
-                borderRadius: 3,
-                padding: '0 .4em',
-                whiteSpace: 'break-spaces',
-            },
+            //     '&:hover': {
+            //         textDecoration: 'underline',
+            //     },
+            // },
             summary: {
                 cursor: 'pointer',
 
@@ -93,9 +75,17 @@ export const HelpDialogContent: React.FC<HelpDialogContentProps> = ({ selectedEn
 };
 
 const components: Components = {
+    h1: (props) => <Title order={1} {...props} />,
+    h2: (props) => <Title order={2} {...props} />,
+    h3: (props) => <Title order={3} {...props} />,
+    h4: (props) => <Title order={4} {...props} />,
+    h5: (props) => <Title order={5} {...props} />,
+    h6: (props) => <Title order={6} {...props} />,
+    p: props => <Text {...props} />,
     a: (props) => props.href?.startsWith('http')
         ? <LinkWithIcon {...props} target={'__blank'} />
-        : <a {...props} />,
+        : <Anchor {...props} />,
+    code: (props) => <Code {...props} />,
 };
 
 const getUrlTransform = (selectedEndPath: string): UrlTransform => url => {
