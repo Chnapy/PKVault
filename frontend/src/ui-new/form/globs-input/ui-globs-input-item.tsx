@@ -43,17 +43,18 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
 
     const renderTextInput = !isDesktop || isExclude;
 
-    const { focusControlProps, controlsIcons } = useFocusControls({
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         controls: [
             // eslint-disable-next-line react-hooks/refs
-            renderTextInput && getSelectControl({
+            renderTextInput && !disabled && getSelectControl({
+                main: false,
                 label: 'Select',
                 action: () => {
                     textInputRef.current?.focus();
                 },
             }),
-            {
+            !disabled && {
                 name: 'delete' as const,
                 label: 'Delete',
                 triggers: {
@@ -72,7 +73,7 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
 
     return <Accordion.Item
         value={value}
-        {...focusControlProps}
+        {...focusProps}
     >
 
         <Group wrap='nowrap' gap='sm'>
@@ -84,13 +85,13 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
 
                     <div style={{ flexGrow: 1, lineBreak: 'anywhere' }}>
                         {renderTextInput
-                            ? <WithControlsIcons placement='out' icons={controlsIcons.open}>
+                            ? <WithControlsIcons placement='out' icons={controlIcons('open')}>
                                 <TextInput
                                     ref={textInputRef}
                                     value={value}
                                     onChange={({ currentTarget }) => onEdit(currentTarget.value)}
-                                    disabled={disabled}
                                     size='xs'
+                                    {...controlProps('open')}
                                 />
                             </WithControlsIcons>
                             : value}
@@ -116,11 +117,11 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
                 <FolderIcon />
             </ActionIcon>}
 
-            <WithControlsIcons placement='out' icons={controlsIcons.delete}>
+            <WithControlsIcons placement='out' icons={controlIcons('delete')}>
                 <ActionIcon
                     size="lg" variant="subtle" color="gray"
                     onClick={onRemove}
-                    disabled={disabled}
+                    {...controlProps('delete')}
                 >
                     <TrashIcon />
                 </ActionIcon>

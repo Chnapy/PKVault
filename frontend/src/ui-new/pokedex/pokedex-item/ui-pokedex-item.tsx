@@ -37,7 +37,7 @@ export const UIPokedexItem: React.FC<UIPokedexItemProps> = ({
 }) => {
     const popover = usePopover();
 
-    const { focusControlProps, controlsIcons } = useFocusControls({
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: id,
         controls: [
             getSelectControl({
@@ -54,12 +54,13 @@ export const UIPokedexItem: React.FC<UIPokedexItemProps> = ({
         {icon}
     </ThemeIcon>;
 
-    return <WithControlsIcons placement='out' icons={controlsIcons.open}
+    return <WithControlsIcons placement='out' icons={controlIcons('open')}
         className={classes.uiPokedexItem}
     >
         <Tooltip label={label} withArrow position="bottom">
             <Button
-                {...focusControlProps}
+                {...focusProps}
+                {...controlProps('open')}
                 variant='light'
                 className={classes.button}
                 bd='none'

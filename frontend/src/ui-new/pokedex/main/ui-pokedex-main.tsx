@@ -18,7 +18,7 @@ export const UIPokedexMain: React.FC<UIPokedexMainProps> = ({ children, ...rest 
 
     const { pushScope } = Focus.usePushPopScope();
 
-    const { focusControlProps, nodeId, controlsIcons } = useFocusControls({
+    const { focusProps, nodeId, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         childScopeId,
         controls: [
@@ -31,8 +31,9 @@ export const UIPokedexMain: React.FC<UIPokedexMainProps> = ({ children, ...rest 
 
     return <FocusScope id={name} parentNodeId={nodeId}>
         <WithControlsIcons
-            placement='out' icons={controlsIcons.open}
-            {...focusControlProps}
+            placement='out' icons={controlIcons('open')}
+            {...focusProps}
+            {...controlProps('open')}
             {...rest}
         >
             <Card mah='100%' style={{

@@ -20,8 +20,15 @@ type StorageMainItemProps = Pick<StorageItemProps, 'nodeId'> & {
 export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
     'item',
     React.memo(({ nodeId, pkmId }) => {
-        const { storageIndex } = useCurrentStorage();
+        const { storageIndex, getSelected } = useCurrentStorage();
         const navigate = Route.useNavigate();
+
+        const selected = Route.useSearch({
+            select: search => {
+                const sltd = getSelected(search.selected);
+                return !sltd?.saveId && sltd?.id === pkmId;
+            },
+        });
 
         const variantsQuery = usePkmVariantIndex(
             useSelectCallback(data => {
@@ -91,6 +98,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
         return <StorageItem
             id={id}
             nodeId={nodeId}
+            selected={selected}
             container={container}
             species={species}
             slot={boxSlot}

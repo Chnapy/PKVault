@@ -4,7 +4,6 @@ import React from 'react';
 import type { UIExpandableTabsData } from '../../../expandable-tabs/ui-expandable-tabs';
 import { WithControlsIcons } from '../../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../../interaction/focus-controls/common-controls/select-controls';
-import type { PopoverContext } from '../../../interaction/focus-controls/components/popover/context/popover-context';
 import { useFocusControls } from '../../../interaction/focus-controls/use-focus-controls';
 import { UIConfirmPopover } from '../../../popover/ui-confirm-popover';
 import { UIPopover } from '../../../popover/ui-popover';
@@ -22,57 +21,61 @@ export type UIBoxExpandedProps = UIExpandableTabsData & {
 export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
     id, label, selected, slotsStates, onSelect, onDelete, editDropdown
 }) => {
-    const editRef = React.useRef<PopoverContext[ 'setOpened' ]>(null);
-    const deleteRef = React.useRef<PopoverContext[ 'setOpened' ]>(null);
-
     const cols = getBoxColumns(slotsStates.length);
 
-    const { focusControlProps, controlsIcons } = useFocusControls({
+    const selectDisabled = selected || !onSelect;
+    const editDisabled = !editDropdown;
+    const deleteDisabled = selected || !onDelete;
+
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: `box-expanded-${id}-actions`,
+        focusOnMount: selected,
         controls: [
-            onSelect && getSelectControl({
+            !selectDisabled && getSelectControl({
                 label: 'Select',
                 action: () => {
                     onSelect();
                 },
             }),
-            {
+            !editDisabled && {
                 name: 'edit' as const,
                 label: 'Edit',
                 triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
                     gamepad: {
                         type: 'gamepad',
                         values: [ 'X' ],
                     },
                 },
                 spread: false,
-                action: () => {
-                    editRef.current?.(true);
-                },
             },
-            {
+            !deleteDisabled && {
                 name: 'delete' as const,
                 label: 'Delete',
                 triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
                     gamepad: {
                         type: 'gamepad',
                         values: [ 'Y' ],
                     },
                 },
                 spread: false,
-                action: () => {
-                    deleteRef.current?.(true);
-                },
             },
         ],
     });
 
     return <Group gap='xs' align='stretch' style={{ alignSelf: 'flex-start' }}>
-        <WithControlsIcons placement='out' icons={controlsIcons.open}>
+        <WithControlsIcons placement='out' icons={controlIcons('open')}>
             <Button
                 variant='default'
-                disabled={selected || !onSelect}
-                {...focusControlProps}
+                {...focusProps}
+                {...controlProps('open')}
                 h='auto'
                 p='md'
                 pt={0}
@@ -101,10 +104,9 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
         <ActionIcon.Group orientation="vertical">
             <UIPopover
                 dropdown={editDropdown}
-                popoverRef={editRef}
             >
-                <WithControlsIcons placement='out' icons={controlsIcons.edit}>
-                    <ActionIcon color='blue' disabled={!editDropdown}>
+                <WithControlsIcons placement='out' icons={controlIcons('edit')}>
+                    <ActionIcon color='blue' {...controlProps('edit')}>
                         <PenIcon />
                     </ActionIcon>
                 </WithControlsIcons>
@@ -114,10 +116,9 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
                 label='Delete'
                 color='red'
                 action={onDelete}
-                popoverRef={deleteRef}
             >
-                <WithControlsIcons placement='out' icons={controlsIcons.delete}>
-                    <ActionIcon color='red' disabled={selected || !onDelete} style={{
+                <WithControlsIcons placement='out' icons={controlIcons('delete')}>
+                    <ActionIcon color='red' {...controlProps('delete')} style={{
                         borderTopLeftRadius: 0,
                         borderTopRightRadius: 0,
                     }}>

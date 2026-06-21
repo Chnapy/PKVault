@@ -59,7 +59,7 @@ export const UIStorageItemIcons: React.FC<UIStorageItemIconsProps> = ({
                 : null}
         </Stack>
 
-        <Group pos='absolute' top={4} right={4} gap={2}>
+        <Group pos='absolute' top={4} right={4} justify='flex-end' gap={2}>
             {isAlpha && <UIIconWrapper variant='transparent'>
                 <UIAlphaIcon />
             </UIIconWrapper>}

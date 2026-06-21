@@ -6,9 +6,9 @@ import type { UIBankTabData } from '../../ui-new/bank/ui-bank-list';
 import { BankEdit } from './bank-edit';
 import type { MoveContainerValue } from '../move/move-container-fns';
 
-type BankExpandedProps = Pick<UIBankExpandedProps, keyof UIBankTabData<MoveContainerValue> | 'onSelect' | 'selected'>;
+type BankExpandedProps = Pick<UIBankExpandedProps, keyof UIBankTabData<MoveContainerValue> | 'selected'>;
 
-export const BankExpanded: React.FC<BankExpandedProps> = ({ id, selected, onSelect, ...rest }) => {
+export const BankExpanded: React.FC<BankExpandedProps> = ({ id, selected, ...rest }) => {
     const banksQuery = useStorageGetMainBanks();
     const bankDeleteMutation = useStorageDeleteMainBank();
     const boxesQuery = useStorageGetBoxes();
@@ -34,7 +34,6 @@ export const BankExpanded: React.FC<BankExpandedProps> = ({ id, selected, onSele
         {...rest}
         selected={selected}
         loading={loading}
-        onSelect={onSelect}
         onDelete={canDelete
             ? (() => bankDeleteMutation.mutateAsync({ bankId: id }))
             : undefined}

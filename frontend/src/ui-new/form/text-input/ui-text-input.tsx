@@ -17,14 +17,14 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
 
     const { popScope } = Focus.usePushPopScope();
 
-    const { focusControlProps, controlsIcons } = useFocusControls({
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         // focusOnMount: true,
         controls: [
             getSelectControl({
                 label: 'Focus',
                 action: () => {
-                    focusControlProps.ref.current.focus();
+                    focusProps.ref.current.focus();
                 },
             }),
             onSubmit && {
@@ -61,30 +61,31 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
     });
 
     const ref = useMergedRef(
-        focusControlProps.ref,
+        focusProps.ref,
         rest.ref,
     );
 
-    return <WithControlsIcons placement='out' icons={controlsIcons.open}>
+    return <WithControlsIcons placement='out' icons={controlIcons('open')}>
         <TextInput
             // label='Label'
             // description='Description'
             name={name}
             rightSectionWidth='auto'
             rightSection={(onCancel || onSubmit) && <Group gap='xs' wrap='nowrap'>
-                {onCancel && <WithControlsIcons placement='out' icons={controlsIcons.cancel}>
-                    <ActionIcon size='sm' variant='subtle' onClick={onCancel}>
+                {onCancel && <WithControlsIcons placement='out' icons={controlIcons('cancel')}>
+                    <ActionIcon size='sm' variant='subtle' {...controlProps('cancel')}>
                         <XIcon />
                     </ActionIcon>
                 </WithControlsIcons>}
 
-                {onSubmit && <WithControlsIcons placement='out' icons={controlsIcons.submit}>
-                    <ActionIcon size='sm' variant='subtle' color='blue' onClick={onSubmit}>
+                {onSubmit && <WithControlsIcons placement='out' icons={controlIcons('submit')}>
+                    <ActionIcon size='sm' variant='subtle' color='blue' {...controlProps('submit')}>
                         <SendIcon />
                     </ActionIcon>
                 </WithControlsIcons>}
             </Group>}
-            {...focusControlProps}
+            {...focusProps}
+            {...controlProps('open')}
             {...rest}
             ref={ref}
             styles={{

@@ -2,6 +2,7 @@ import { Box, Flex, Paper, Stack, Tabs, Title } from '@mantine/core';
 import { clsx } from 'clsx';
 import React from 'react';
 import { theme } from '../../../ui/theme';
+import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { FocusScope } from '../../interaction/focus/scope/focus-scope';
 import { ScrollerControlled } from '../../scroller-controlled/scroller-controlled';
 import { CurrentPanelProvider } from '../../storage/storage-content/context/ui-current-panel-provider';
@@ -16,17 +17,17 @@ export const UIHeader: React.FC<{
     sub?: React.ReactNode;
 }> = ({ value, left, right, sub }) => {
 
-    const { panelProps, nodeId, childScopeId, focused } = usePanelControls('header');
+    const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('header');
 
     return (
-        <Flex
+        <WithControlsIcons placement='in' icons={controlIcons('open')}
             data-mantine-color-scheme="light"
             c='white'
             bg='primary.7'
             {...panelProps}
             className={clsx(classes.uiHeader, panelProps.className)}
         >
-            <CurrentPanelProvider value={focused ? 'header' : ''}>
+            <CurrentPanelProvider value={'header'}>
                 <PanelProvider value='header'>
                     <FocusScope id={childScopeId} parentNodeId={nodeId}>
                         <Flex style={{
@@ -91,7 +92,7 @@ export const UIHeader: React.FC<{
                                     }}
                                 >
                                     <ScrollerControlled
-                                        id='header-items' level={1} controlsEnabled={focused}
+                                        id='header-items' level={1} controlsEnabled
                                         controlsLabel='Change page'
                                         style={{ flexGrow: 1 }}
                                     >
@@ -120,6 +121,6 @@ export const UIHeader: React.FC<{
                     </FocusScope>
                 </PanelProvider>
             </CurrentPanelProvider>
-        </Flex>
+        </WithControlsIcons>
     );
 };

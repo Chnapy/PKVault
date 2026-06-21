@@ -10,31 +10,32 @@ export type UIAutocompleteProps = Autocomplete.Props & {
 };
 
 export const UIAutocomplete: React.FC<UIAutocompleteProps> = ({ name, ...rest }) => {
-    const { focusControlProps, controlsIcons } = useFocusControls({
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         // focusOnMount: true,
         controls: [
             getSelectControl({
                 label: 'Focus',
                 action: () => {
-                    focusControlProps.ref.current.focus();
+                    focusProps.ref.current.focus();
                 },
             }),
         ],
     });
 
     const ref = useMergedRef(
-        focusControlProps.ref,
+        focusProps.ref,
         rest.ref,
     );
 
-    return <WithControlsIcons placement='out' icons={controlsIcons.open}>
+    return <WithControlsIcons placement='out' icons={controlIcons('open')}>
         <Autocomplete
-            {...focusControlProps}
+            {...focusProps}
+            {...controlProps('open')}
             {...rest}
             ref={ref}
             onChange={value => {
-                focusControlProps.onChange?.(value as never);
+                controlProps('open').onChange?.(value as never);
                 rest.onChange?.(value);
             }}
         />

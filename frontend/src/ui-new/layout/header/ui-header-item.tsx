@@ -1,8 +1,11 @@
 import { Tabs, Text } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
-import type React from "react";
+import React from "react";
 import { HistoryContext } from '../../../context/history-context';
 import { type FileRouteTypes } from "../../../routeTree.gen";
+import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
+import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
+import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 
 export type UIHeaderItemProps = {
   id: string;
@@ -21,7 +24,19 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
   const historyValue = to ? historyContext[ to ] : undefined;
   const search = { ...defaultSearch, ...historyValue?.search };
 
-  return (
+  const { focusProps, controlProps, controlIcons } = useFocusControls({
+    scopeNodeId: id,
+    controls: [
+      getSelectControl({
+        label: 'Select',
+      }),
+    ],
+  });
+
+  return <WithControlsIcons placement='out' icons={controlIcons('open')}
+    my={2}
+    style={{ flexShrink: 0 }}
+  >
     <Tabs.Tab
       renderRoot={props => (
         <Link
@@ -40,12 +55,13 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
       )}
       value={id}
       size='compact-sm'
-      h={27}
-      style={{ flexShrink: 0 }}
+      h={24}
+      {...focusProps}
+      {...controlProps('open')}
     >
       <Text fw='bold' tt='uppercase'>
         {children}
       </Text>
     </Tabs.Tab>
-  );
+  </WithControlsIcons>;
 };

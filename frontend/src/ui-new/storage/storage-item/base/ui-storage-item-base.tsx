@@ -8,11 +8,13 @@ export type UIStorageItemBaseProps =
     & ElementProps<'button'>
     & {
         label?: React.ReactNode;
+        selected?: boolean;
     };
 
 export const UIStorageItemBase: React.FC<UIStorageItemBaseProps> = ({
     className,
     label,
+    selected,
     children,
     ...buttonProps
 }) => {
@@ -26,6 +28,7 @@ export const UIStorageItemBase: React.FC<UIStorageItemBaseProps> = ({
             </Group>}
         >
             <Button
+                data-selected={selected || undefined}
                 className={clsx(classes.uiStorageItemBase, className)}
                 variant='light'
                 {...buttonProps}

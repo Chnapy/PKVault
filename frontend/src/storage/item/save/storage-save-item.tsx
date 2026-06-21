@@ -21,8 +21,15 @@ type StorageSaveItemProps = Pick<StorageItemProps, 'nodeId'> & {
 export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
     'item',
     React.memo(({ saveId, pkmId, nodeId }) => {
-        const { storageIndex } = useCurrentStorage();
+        const { storageIndex, getSelected } = useCurrentStorage();
         const navigate = Route.useNavigate();
+
+        const selected = Route.useSearch({
+            select: search => {
+                const sltd = getSelected(search.selected);
+                return sltd?.saveId === saveId && sltd.id === pkmId;
+            },
+        });
 
         const savePkmsQuery = usePkmSaveIndex(saveId,
             useSelectCallback(data => {
@@ -77,6 +84,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
         return <StorageItem
             id={id}
             nodeId={nodeId}
+            selected={selected}
             species={species}
             container={container}
             slot={boxSlot}

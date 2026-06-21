@@ -1,12 +1,13 @@
 /* stylelint-disable selector-class-pattern */
-@import url('../assets/fonts/font-face.css');
+@import url("../assets/fonts/font-face.css");
 
 * {
-    scrollbar-width: thin;
+  scrollbar-width: thin;
 }
 
-:root, button {
-    text-shadow: 1px 1px 0 light-dark(#0002, #FFF2);
+:root,
+button {
+  text-shadow: 1px 1px 0 light-dark(#0002, #fff2);
 }
 
 :root strong,
@@ -23,16 +24,47 @@
   text-shadow: none;
 }
 
-:root strong, :root b {
-    font-weight: bold;
+:root strong,
+:root b {
+  font-weight: bold;
 }
 
 svg.lucide {
-    width: 1em;
-    height: 1em;
-    flex-shrink: 0;
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
 }
 
-[data-focused="true"] {
-    outline: 2px solid var(--mantine-color-primary-6);
+:root {
+  --focus-width: 4px;
+  --focus-color-1: var(--mantine-color-primary-6);
+  --focus-color-2: var(--mantine-color-primary-3);
+}
+
+[data-focus-key] {
+  transition: 0.4s outline-color;
+}
+
+[data-controls-type="keyboard"] [data-focused="true"],
+[data-controls-type="gamepad"] [data-focused="true"] {
+  outline-width: var(--focus-width);
+  outline-style: solid;
+  outline-color: var(--focus-color-1);
+  animation: 0.4s linear 0s infinite alternate focusOutline;
+}
+
+[data-controls-type="keyboard"]
+  .mantine-focus-auto:not([data-focused="true"]):focus-visible,
+[data-controls-type="gamepad"]
+  .mantine-focus-auto:not([data-focused="true"]):focus-visible {
+  outline: none;
+}
+
+@keyframes focusOutline {
+  0% {
+    outline-color: var(--focus-color-1);
+  }
+  100% {
+    outline-color: var(--focus-color-2);
+  }
 }

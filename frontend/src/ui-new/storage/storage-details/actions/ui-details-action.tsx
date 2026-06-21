@@ -1,5 +1,6 @@
 
 import { Button, type ElementProps } from '@mantine/core';
+import { useMergedRef } from '@mantine/hooks';
 import type React from 'react';
 import type { GamepadMappingsAllButton } from '../../../interaction/controls/gamepad/gamepad-mapper';
 import { getControlIcon } from '../../../interaction/controls/icons/get-control-icon';
@@ -18,7 +19,7 @@ type UIDetailsActionProps = {
 
 export const UIDetailsAction: React.FC<UIDetailsActionProps> = ({ name, label, gamepadValue, focusOnMount, onClick, ...rest }) => {
 
-    const { focusControlProps, order, active, controlsIcons } = useFocusControls({
+    const { focusProps, order, active, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,
         controls: [
@@ -38,6 +39,10 @@ export const UIDetailsAction: React.FC<UIDetailsActionProps> = ({ name, label, g
                 name: 'active-action',
                 label,
                 triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
                     // keyboard: {
                     //     type: 'keyboard',
                     //     values: [],
@@ -58,14 +63,18 @@ export const UIDetailsAction: React.FC<UIDetailsActionProps> = ({ name, label, g
 
     const icons = gamepadValue && getControlIcon(controlsCurrentType, [ gamepadValue ]);
 
-    return <WithControlsIcons placement='out' icons={[
-        controlsIcons.open,
-        controls.controlsIcons[ 'active-action' ]
-    ]}>
+    const ref = useMergedRef(
+        controlProps('open').ref,
+        controls.controlProps('active-action').ref,
+    );
+
+    return <WithControlsIcons placement='out' icons={[ controlIcons('open'), controls.controlIcons('active-action') ]}>
         <Button
             {...rest}
-            {...focusControlProps}
+            {...focusProps}
+            {...controlProps('open')}
             leftSection={icons?.length ? icons : rest.leftSection}
+            ref={ref}
         >
             {label}
         </Button>

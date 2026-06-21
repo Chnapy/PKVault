@@ -47,6 +47,7 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
                 <UIButton
                     name={`version-${item.value}`}
                     controlLabel='Set version'
+                    focusOnMount={item.value === save.displayedVersion}
                     disabled={settingsEdit.isPending || item.value === save.displayedVersion}
                     onClick={async () => {
                         const version = item.value;

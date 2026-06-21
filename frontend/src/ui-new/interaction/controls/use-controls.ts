@@ -1,4 +1,6 @@
+import type { ButtonProps } from '@mantine/core';
 import React from 'react';
+import { removeUndefinedValues } from '../../../util/remove-undefined-values';
 import { useMoveContextNullable } from '../move/context/use-move-context';
 import { getControlIcon } from './icons/get-control-icon';
 import { type ControlId, type ControlListenerAttributes, type ControlsWithFalsy } from './provider/controls-context';
@@ -9,33 +11,59 @@ type Options = {
     enabled: boolean;
 };
 
-type ControlsProps = ControlListenerAttributes & {
-    'data-controls': string;
-    'data-controls-order': number;
-    'data-controls-enabled'?: boolean;
-};
+type ControlsProps = ControlListenerAttributes
+    & Pick<ButtonProps, 'disabled'>
+    & {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ref?: React.RefObject<any>;
+        'data-controls': string;
+        'data-controls-order': number;
+    };
 
 type UseControlsReturn<N extends string = string> = {
-    controlsProps: ControlsProps;
-    controlsIcons: Record<N, React.ReactNode[]>;
+    controlProps: (...names: N[]) => ControlsProps;
+    controlIcons: (...names: N[]) => React.ReactNode[];
 };
 
-export const useControls = <N extends string>(id: ControlId, focused: boolean, order: number, controls: ControlsWithFalsy<N>, { enabled }: Options): UseControlsReturn<N> => {
+export const useControls = <N extends string>(id: ControlId, focused: boolean, order: number, controls: ControlsWithFalsy<N>, { enabled: enabledRaw }: Options): UseControlsReturn<N> => {
     const { useControlsStore } = useControlsContext();
 
     const dragEndTimestampRef = useMoveContextNullable()?.dragEndTimestampRef;
 
-    const filteredRenamedControls = React.useMemo(() => controls
+    const controlsRefs = React.useRef<{ [ name in N ]?: ControlsProps[ 'ref' ] }>({});
+
+    const controlsCurrentType = useControlsCurrentType();
+
+    const filteredRefedControls = React.useMemo(() => controls
         .filter(c => !!c)
+        // eslint-disable-next-line react-hooks/refs
+        .map(c => {
+            const ref: ControlsProps[ 'ref' ] = c.ref ?? controlsRefs.current[ c.name ] ?? { current: null };
+            return {
+                ...c,
+                ref,
+            };
+        }), [ controls ]);
+
+    const filteredRenamedControls = React.useMemo(() => filteredRefedControls
         .map(c => ({
             ...c,
             name: `${id}--${c.name}`,
             focused,
             order,
-        })), [controls, focused, id, order]);
+        })), [ filteredRefedControls, focused, id, order ]);
+
+    const enabled = enabledRaw && filteredRenamedControls.length > 0;
 
     React.useEffect(() => {
-        if (!enabled || filteredRenamedControls.length === 0) return;
+        controlsRefs.current = {};
+        filteredRefedControls.forEach(c => {
+            controlsRefs.current[ c.name as N ] = c.ref;
+        });
+    }, [ filteredRefedControls ]);
+
+    React.useEffect(() => {
+        if (!enabled) return;
 
         const { registerControls, unregisterControls } = useControlsStore.getState();
 
@@ -46,64 +74,76 @@ export const useControls = <N extends string>(id: ControlId, focused: boolean, o
         };
     }, [ filteredRenamedControls, enabled, id, useControlsStore ]);
 
-    const listenerList = filteredRenamedControls.flatMap(c => {
-        if (!c.triggers.mouse)
-            return [];
+    const controlIcons: UseControlsReturn<N>[ 'controlIcons' ] = (...names) => {
+        return names.map(name => {
+            const item = controls.find(c => c && c.name === name);
+            if (!item)
+                return;
 
-        const listeners = c.triggers.mouse.listeners ?? [ 'onClick' ];
-        const values = c.triggers.mouse.values;
+            if (!enabled)
+                return;
 
-        return listeners.map(name => {
-            return [ name, c.action, values ] as const;
+            const values = item.triggers[ controlsCurrentType ]?.values ?? [];
+
+            return getControlIcon(controlsCurrentType, values, item.triggers[ controlsCurrentType ]?.allowPressedSuite);
         });
-    });
+    };
 
-    const listeners = listenerList.reduce<ControlListenerAttributes>((acc, [ name, fn, values ]) => {
-        const currentFn = acc[ name ];
+    const controlProps: UseControlsReturn<N>[ 'controlProps' ] = (...names) => {
+        const allControls = filteredRefedControls.filter(c => names.includes(c.name));
 
-        type AnyEvent = Parameters<NonNullable<typeof currentFn>>[ 0 ];
+        if (allControls.length === 0)
+            return {
+                disabled: true,
+                'data-controls': names.join('-'),
+                'data-controls-order': order,
+            };
 
-        return {
-            ...acc,
-            [ name ]: (e: AnyEvent) => {
-                if (name === 'onClick') {
-                    if (dragEndTimestampRef
-                        && e.timeStamp - dragEndTimestampRef.current < 50)
-                        return;
-                }
+        const ref = allControls.sort(c => c.main ? -1 : 0).find(c => c.ref)?.ref;
 
-                currentFn?.(e as never);
-                fn(e as never, 'mouse', values[ 0 ]!);
-            },
-        };
-    }, {});
+        const mouseListeners = allControls.flatMap(c => {
+            if (!c.triggers.mouse)
+                return [];
 
-    const controlsCurrentType = useControlsCurrentType();
+            const listeners = c.triggers.mouse.listeners ?? [ 'onClick' ];
+            const values = c.triggers.mouse.values;
 
-    const controlsIcons = controls.reduce<Record<N, React.ReactNode[]>>((acc, item) => {
-        if (!item) return acc;
-        if (!enabled) return acc;
+            return listeners.map(name => {
+                return [ name, c.action, values ] as const;
+            });
+        }).reduce<ControlListenerAttributes>((acc, [ name, fn, values ]) => {
+            if (!fn)
+                return acc;
 
-        if (controlsCurrentType === 'mouse') return acc;
+            const currentFn = acc[ name ];
 
-        const values = item.triggers[ controlsCurrentType ]?.values ?? [];
-        if (values.length === 0) return acc;
+            type AnyEvent = Parameters<NonNullable<typeof currentFn>>[ 0 ];
 
-        return {
-            ...acc,
-            [ item.name ]: getControlIcon(controlsCurrentType, values, item.triggers[ controlsCurrentType ]?.allowPressedSuite),
-        };
-    }, {} as never);
+            return {
+                ...acc,
+                [ name ]: (e: AnyEvent) => {
+                    if (name === 'onClick') {
+                        if (dragEndTimestampRef
+                            && e.timeStamp - dragEndTimestampRef.current < 50)
+                            return;
+                    }
 
-    const controlsProps = {
-        ...listeners,
-        'data-controls': controls.map(c => c && c.name).filter(Boolean).join('-'),
-        'data-controls-order': order,
-        'data-controls-enabled': enabled || undefined,
+                    currentFn?.(e as never);
+                    fn(e as never, 'mouse', values[ 0 ]!);
+                },
+            };
+        }, {});
+
+        return removeUndefinedValues({
+            ...mouseListeners,
+            ref,
+            'data-controls': names.join('-'),
+            'data-controls-order': order,
+        });
     };
 
     return {
-        controlsProps,
-        controlsIcons,
+        controlIcons,
+        controlProps,
     };
 };

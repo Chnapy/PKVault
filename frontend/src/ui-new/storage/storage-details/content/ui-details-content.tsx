@@ -33,7 +33,7 @@ export const UIDetailsContent: React.FC<UIDetailsContentProps> = ({ issues, summ
         if (!ref.current || ref.current.querySelector('button[role="tab"][data-active="true"]'))
             return;
 
-        const firstTab = ref.current.querySelector<HTMLButtonElement>('button[role="tab"]');
+        const firstTab = ref.current.querySelector<HTMLButtonElement>('button[role="tab"]:not([data-disabled="true"])');
         firstTab?.click();
     });
 

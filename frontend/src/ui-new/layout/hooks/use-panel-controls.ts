@@ -14,7 +14,7 @@ export const usePanelControls = (name: string, focusControlsParams?: Params) => 
 
     const { pushScope } = Focus.usePushPopScope();
 
-    const { focusControlProps, ...restFocus } = useFocusControls({
+    const { focusProps, controlProps, ...restFocus } = useFocusControls({
         scopeNodeId: name,
         childScopeId,
         controls: [
@@ -28,7 +28,8 @@ export const usePanelControls = (name: string, focusControlsParams?: Params) => 
 
     return {
         panelProps: {
-            ...focusControlProps,
+            ...focusProps,
+            ...controlProps('open'),
             'data-focus-in-scope': isInScopeStack || undefined,
             className: classes.panelControlled,
         },

@@ -4,7 +4,7 @@ import { UIStorageItem, type UIStorageItemProps } from '../../ui-new/storage/sto
 import { SpeciesImg, type SpeciesImgProps } from '../img/species-img';
 
 export type StorageItemProps =
-  & Pick<UIStorageItemProps<MoveContainerValue>, 'id' | 'nodeId' | 'container' | 'name' | 'level' | 'slot' | 'onClick' | 'icons'>
+  & Pick<UIStorageItemProps<MoveContainerValue>, 'id' | 'nodeId' | 'selected' | 'container' | 'name' | 'level' | 'slot' | 'onClick' | 'icons'>
   & Pick<SpeciesImgProps, 'species' | 'context' | 'form' | 'isFemale' | 'isShiny' | 'isEgg' | 'isShadow'>;
 
 export const StorageItem: React.FC<StorageItemProps> = React.memo(({

@@ -1,6 +1,9 @@
 .ui-species-img {
     --sprite-size-multiplier: var(--sprite-species-size-multiplier);
     --sprite-rendering: var(--sprite-species-rendering);
+
+    /* override sprite final size to ensure it follows 96px sizing, some sprites beint 128px */
+    --sprite-size-rem: calc(var(--sprite-size-multiplier, 1) * 96px);
 }
 
 .ui-species-img.shadow img {

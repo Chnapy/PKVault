@@ -3,7 +3,6 @@ import { PenIcon } from 'lucide-react';
 import React from 'react';
 import { WithControlsIcons } from '../../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../../interaction/focus-controls/common-controls/select-controls';
-import type { PopoverContext } from '../../../interaction/focus-controls/components/popover/context/popover-context';
 import { useFocusControls } from '../../../interaction/focus-controls/use-focus-controls';
 import { UIPathLine } from '../../../path/ui-path-line';
 import { UIPopover } from '../../../popover/ui-popover';
@@ -25,30 +24,30 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
     title, label, imgSrc, secondaryLine, tertiaryLine, path,
     selected, onSelect, editDropdown,
 }) => {
-    const editRef = React.useRef<PopoverContext[ 'setOpened' ]>(null);
-
-    const { focusControlProps, controlsIcons } = useFocusControls({
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: `game_${path}`,
+        focusOnMount: selected,
         controls: [
-            onSelect && getSelectControl({
+            !selected && onSelect && getSelectControl({
                 label: 'Select',
                 action: () => {
                     onSelect();
                 },
             }),
-            {
+            !!editDropdown && {
                 name: 'edit' as const,
                 label: 'Edit',
                 triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
                     gamepad: {
                         type: 'gamepad',
                         values: [ 'X' ],
                     },
                 },
                 spread: false,
-                action: () => {
-                    editRef.current?.(true);
-                },
             },
         ],
     });
@@ -65,12 +64,13 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
             {editDropdown && <UIPopover
                 dropdown={editDropdown}
             >
-                <WithControlsIcons placement='out' icons={controlsIcons.edit}>
+                <WithControlsIcons placement='out' icons={controlIcons('edit')}>
                     <Button
                         variant='filled'
                         color='blue'
                         size='compact-xs'
                         fullWidth
+                        {...controlProps('edit')}
                     >
                         <PenIcon />
                     </Button>
@@ -78,11 +78,11 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
             </UIPopover>}
         </Stack>
 
-        <WithControlsIcons placement='out' icons={controlsIcons.edit} miw={0} style={{ flexGrow: 1 }}>
+        <WithControlsIcons placement='out' icons={controlIcons('open')} miw={0} style={{ flexGrow: 1 }}>
             <Button
                 variant='default'
-                disabled={selected || !onSelect}
-                {...focusControlProps}
+                {...focusProps}
+                {...controlProps('open')}
                 title={title}
                 h='auto'
                 style={{ flexGrow: 1, flexShrink: 1 }}

@@ -15,12 +15,13 @@ export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ..
 
     const isGamepad = useControlsCurrentType() === 'gamepad';
 
-    const { focusControlProps, focused } = useFocusControls<HTMLSelectElement>({
+    const { focusProps, focused, controlProps } = useFocusControls<HTMLSelectElement, 'change'>({
         scopeNodeId: name,
         // focusOnMount: true,
         controls: [
             {
-                name: name + '-change',
+                name: 'change',
+                main: true,
                 label: controlLabel,
                 triggers: {
                     gamepad: {
@@ -30,7 +31,7 @@ export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ..
                 },
                 spread: false,
                 action: (e, trigger, value) => {
-                    const options = focusControlProps.ref.current.options;
+                    const options = focusProps.ref.current.options;
                     const selectedIndex = options.selectedIndex;
                     let nextIndex = -1;
                     switch (value as GamepadMappingsAllButton) {
@@ -52,14 +53,15 @@ export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ..
     });
 
     const ref = useMergedRef(
-        focusControlProps.ref,
+        focusProps.ref,
         rest.ref,
     );
 
     return <NativeSelect
         name={name}
         data={data}
-        {...focusControlProps}
+        {...focusProps}
+        {...controlProps('change')}
         leftSection={isGamepad
             ? focused && getControlIcon('gamepad', [ 'LB' ]) || <span />
             : undefined}

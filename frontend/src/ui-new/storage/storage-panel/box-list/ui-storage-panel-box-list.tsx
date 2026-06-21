@@ -4,8 +4,6 @@ import React from 'react';
 import { useTranslate } from '../../../../translate/i18n';
 import { UIExpandableTabs, type UIExpandableTabsData, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
 import { UIActionIcon } from '../../../form/button/ui-action-icon';
-import { Focus } from '../../../interaction/focus/provider/use-focus-context';
-import { useFocusScopeContext } from '../../../interaction/focus/scope/use-focus-scope-context';
 import { UIMenu } from '../../../popover/ui-menu';
 import { UIPopover } from '../../../popover/ui-popover';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
@@ -18,7 +16,7 @@ export type UIBoxData = UIExpandableTabsData & {
 
 export type UIStoragePanelBoxListProps = Pick<UIExpandableTabsProps<UIExpandableTabsData>, 'value' | 'data' | 'renderTab' | 'renderExpanded'> & {
     onSelect: (id: string) => void;
-    onCreate?: () => void;
+    onCreate?: () => unknown;
     advancedActionSort: React.ReactNode;
     advancedDexSync: React.ReactNode;
 };
@@ -28,16 +26,13 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
 }) => {
     const { t } = useTranslate();
 
-    const parentScope = useFocusScopeContext();
-    const scopeActive = Focus.useIsScopeActive(parentScope.scopeId);
-
     const { isInCurrentPanel } = useCurrentPanel();
 
     return <Group align='flex-start' wrap='nowrap'>
         <UIExpandableTabs
             id='boxes'
             level={1}
-            controlsEnabled={scopeActive && isInCurrentPanel}
+            controlsEnabled={isInCurrentPanel}
             controlsLabel='Change box'
             controlsDetailsLabel='See all boxes'
             className={classes.uiStoragePanelBoxList}

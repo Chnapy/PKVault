@@ -34,7 +34,16 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             // if no controls are passed from it
             const currentOrder = sortedControls.find(c => c.focused)?.order;
 
-            return sortedControls.filter(c => c.order === currentOrder || c.spread);
+            // console.log('SELECT TOUCH', currentOrder,
+            //     sortedControls
+            //         .filter(c => c.order === currentOrder || c.spread)
+            //         .sort((c1, c2) => c1.order === currentOrder ? -1 : 0),
+            //     sortedControls
+            // )
+
+            return sortedControls
+                .filter(c => c.order === currentOrder || c.spread)
+                .sort((c1, c2) => c1.order === currentOrder ? -1 : 0);
         };
 
         const keydownListener = (e: KeyboardEvent) => {
@@ -47,7 +56,7 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 if (listeners.includes('onKeyDown')) {
                     for (const key of keys) {
                         if (e.key === key) {
-                            control.action(e as never, getState().currentType, key);
+                            control.action?.(e as never, getState().currentType, key);
                         }
                     }
                 }
@@ -82,7 +91,7 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
                 console.info('gamepad pressing', e.detail.button, e.detail.pressedSuite, shouldTrigger, { controlWithPressedSuite });
 
-                controlWithPressedSuite.action(e as never, getState().currentType, e.detail.button);
+                controlWithPressedSuite.action?.(e as never, getState().currentType, e.detail.button);
             }
 
             else if (e.detail.pressedSuite <= 1) {
@@ -103,9 +112,15 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 if (!triggerBasicPress)
                     return;
 
-                console.info('gamepad pressed', e.detail.button, { controlBasic });
+                const triggerClick = !!controlBasic.ref?.current && !!controlBasic.triggers.mouse?.values.includes('left-click');
 
-                controlBasic.action(e as never, getState().currentType, e.detail.button);
+                console.info('gamepad pressed', e.detail.button, { controlBasic, triggerClick });
+
+                if (triggerClick) {
+                    controlBasic.ref?.current.click();
+                } else {
+                    controlBasic.action?.(e as never, getState().currentType, e.detail.button);
+                }
             }
         });
 

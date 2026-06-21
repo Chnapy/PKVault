@@ -3,8 +3,6 @@ import { CirclePlusIcon } from 'lucide-react';
 import type React from 'react';
 import { UIExpandableTabs, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
 import { UIActionIcon } from '../../../form/button/ui-action-icon';
-import { Focus } from '../../../interaction/focus/provider/use-focus-context';
-import { useFocusScopeContext } from '../../../interaction/focus/scope/use-focus-scope-context';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
 
 export type UIGameData = {
@@ -17,15 +15,12 @@ export type UIGameData = {
 export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>, 'value' | 'data' | 'onChange' | 'renderExpanded' | 'expanded'>;
 
 export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange, renderExpanded, expanded }) => {
-    const parentScope = useFocusScopeContext();
-    const scopeActive = Focus.useIsScopeActive(parentScope.scopeId);
-
     const { isInCurrentPanel } = useCurrentPanel();
 
     return <UIExpandableTabs
         id='games'
         level={2}
-        controlsEnabled={scopeActive && isInCurrentPanel}
+        controlsEnabled={isInCurrentPanel}
         controlsLabel='Change game'
         controlsDetailsLabel='See all games'
         value={value}

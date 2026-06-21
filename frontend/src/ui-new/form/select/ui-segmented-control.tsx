@@ -17,12 +17,13 @@ export const UISegmentedControl: React.FC<UISegmentedControlProps> = ({ name, co
 
     const isGamepad = useControlsCurrentType() === 'gamepad';
 
-    const { focusControlProps, controlsIcons } = useFocusControls({
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,
         controls: [
             {
                 name: 'change' as const,
+                main: true,
                 label: controlLabel,
                 triggers: {
                     gamepad: {
@@ -69,7 +70,7 @@ export const UISegmentedControl: React.FC<UISegmentedControlProps> = ({ name, co
     });
 
     const ref = useMergedRef(
-        focusControlProps.ref,
+        focusProps.ref,
         rest.ref,
     );
 
@@ -80,15 +81,15 @@ export const UISegmentedControl: React.FC<UISegmentedControlProps> = ({ name, co
         wrap='nowrap'
         align='center'
     >
-        {controlsIcons.change?.[ 0 ]
-            ?? (isGamepad && <Box w='1lh' />)
-        }
+        {controlIcons('change')[ 0 ]
+            ?? (isGamepad && <Box w='1lh' />)}
         <SegmentedControl
-            {...focusControlProps}
+            {...focusProps}
+            {...controlProps('change')}
             {...rest}
             ref={ref}
             onChange={value => {
-                focusControlProps.onChange?.(value as never);
+                controlProps('change').onChange?.(value as never);
                 rest.onChange?.(value);
             }}
             style={{ flexGrow: 1 }}
@@ -104,8 +105,7 @@ export const UISegmentedControl: React.FC<UISegmentedControlProps> = ({ name, co
                 },
             }}
         />
-        {controlsIcons.change?.[ 1 ]
-            ?? (isGamepad && <Box w='1lh' />)
-        }
+        {controlIcons('change')[ 1 ]
+            ?? (isGamepad && <Box w='1lh' />)}
     </Group>;
 };

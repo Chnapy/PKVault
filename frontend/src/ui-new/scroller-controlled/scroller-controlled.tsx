@@ -1,9 +1,11 @@
 import { Box, Scroller } from '@mantine/core';
+import { useMergedRef } from '@mantine/hooks';
 import React from 'react';
 import type { GamepadMappingsAllButton } from '../interaction/controls/gamepad/gamepad-mapper';
 import { getControlIcon } from '../interaction/controls/icons/get-control-icon';
 import { useControls } from '../interaction/controls/use-controls';
 import { useControlsCurrentType } from '../interaction/controls/use-controls-current-type';
+import { Focus } from '../interaction/focus/provider/use-focus-context';
 import { useFocusScopeContext } from '../interaction/focus/scope/use-focus-scope-context';
 import classes from './scroller-controlled.module.css';
 
@@ -15,12 +17,12 @@ export type ScrollerControlledProps = {
 } & Scroller.Props;
 
 export const ScrollerControlled: React.FC<ScrollerControlledProps> = ({ id, level, controlsEnabled, controlsLabel, ...rest }) => {
-    const ref = React.useRef<HTMLDivElement>(null);
+    const refInner = React.useRef<HTMLDivElement>(null);
 
     const parentScope = useFocusScopeContext();
     const order = parentScope.parentsIds.length;
 
-    const enabled = controlsEnabled;
+    const enabled = Focus.useIsScopeActive(parentScope.scopeId) && controlsEnabled;
 
     const isGamepad = useControlsCurrentType() === 'gamepad';
 
@@ -30,13 +32,15 @@ export const ScrollerControlled: React.FC<ScrollerControlledProps> = ({ id, leve
         ? [ 'LB', 'RB' ]
         : [ 'LT', 'RT' ];
 
-    const { controlsProps } = useControls(
+    const tabsName = 'tabs-' + id;
+
+    const { controlProps } = useControls(
         id,
         true,
         order,
         [
             {
-                name: 'tabs-' + id,
+                name: tabsName,
                 label: controlsLabel,
                 triggers: {
                     gamepad: {
@@ -50,7 +54,7 @@ export const ScrollerControlled: React.FC<ScrollerControlledProps> = ({ id, leve
                 action: (e, trigger, value) => {
                     console.log('trigger', id, level, value, parentScope);
 
-                    const tabs = [ ...ref.current?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [] ];
+                    const tabs = [ ...refInner.current?.querySelectorAll<HTMLElement>('[role="tab"]:not([data-disabled="true"])') ?? [] ];
                     let nextIndex = 0;
 
                     const selectedIndex = [ ...tabs ].findIndex(tab => tab.dataset.active === 'true');
@@ -86,15 +90,21 @@ export const ScrollerControlled: React.FC<ScrollerControlledProps> = ({ id, leve
         </Box>)
         : [];
 
+    const ref = useMergedRef(
+        refInner,
+        controlProps(tabsName).ref,
+        rest.ref,
+    );
+
     return <Scroller
-        ref={ref}
         startControlIcon={icons[ 0 ]}
         endControlIcon={icons[ 1 ]}
         showStartControl={showGamepadIcons}
         showEndControl={showGamepadIcons}
         controlSize='1lh'
-        {...controlsProps}
+        {...controlProps(tabsName)}
         {...rest}
+        ref={ref}
         classNames={{
             container: classes.container,
             content: classes.content,

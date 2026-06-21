@@ -11,3 +11,7 @@
   opacity: 0.5;
   cursor: default;
 }
+
+.ui-storage-item-base[data-selected="true"] {
+  outline: 4px solid var(--focus-color-1);
+}

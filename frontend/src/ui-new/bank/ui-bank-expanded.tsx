@@ -1,24 +1,22 @@
 import { ActionIcon, Divider, Flex, Group, NumberFormatter, Stack, Text } from '@mantine/core';
 import { BoxIcon, ExternalLinkIcon, PenIcon, StarIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
-import { UIConfirmPopover } from '../popover/ui-confirm-popover';
-import { UIPopover } from '../popover/ui-popover';
 import { UIBallIcon } from '../icon/ui-ball-icon';
 import { WithControlsIcons } from '../interaction/controls/icons/with-controls-icons';
 import { getDragControls } from '../interaction/focus-controls/common-controls/drag-controls';
 import { getSelectControl } from '../interaction/focus-controls/common-controls/select-controls';
-import type { PopoverContext } from '../interaction/focus-controls/components/popover/context/popover-context';
 import { useFocusControls } from '../interaction/focus-controls/use-focus-controls';
 import { useDragSubmitting } from '../interaction/move/hooks/use-drag-submitting';
 import { useDroppable } from '../interaction/move/hooks/use-droppable';
 import { UISubHeaderTab } from '../layout/header/sub-header/ui-sub-header-tab';
+import { UIConfirmPopover } from '../popover/ui-confirm-popover';
+import { UIPopover } from '../popover/ui-popover';
 import type { UIBankItemProps } from './ui-bank-item';
 
 export type UIBankExpandedProps = UIBankItemProps
     & {
         selected?: boolean;
         loading?: boolean;
-        onSelect: () => void;
         onDelete?: () => void;
         boxCount: number;
         pkmCount: number;
@@ -29,12 +27,9 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
     to, search,
     id, container, isDefault, isExternal,
     label, boxCount, pkmCount,
-    selected, loading, onSelect, onDelete,
+    selected, loading, onDelete,
     editDropdown,
 }) => {
-    const editPopoverRef = React.useRef<PopoverContext[ 'setOpened' ]>(null);
-    const deletePopoverRef = React.useRef<PopoverContext[ 'setOpened' ]>(null);
-
     const droppable = useDroppable({
         targetContainer: container,
         targetPosition: -1,
@@ -43,45 +38,45 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
 
     const nodeId = `bank-expanded-${id}`;
 
-    const { focusControlProps, controlsIcons } = useFocusControls({
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: nodeId,
+        focusOnMount: selected,
         onFocus: ({ node }) => {
             droppable.focusNode(node);
         },
         controls: [
-            getSelectControl({
+            !selected && getSelectControl({
                 label: 'Select',
-                action: () => {
-                    onSelect();
-                },
             }),
-            {
+            !!editDropdown && {
                 name: 'edit' as const,
                 label: 'Edit',
                 triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
                     gamepad: {
                         type: 'gamepad',
                         values: [ 'X' ],
                     },
                 },
                 spread: false,
-                action: () => {
-                    editPopoverRef.current?.(true);
-                },
             },
-            {
+            !selected && onDelete && {
                 name: 'delete' as const,
                 label: 'Delete',
                 triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
                     gamepad: {
                         type: 'gamepad',
                         values: [ 'Y' ],
                     },
                 },
                 spread: false,
-                action: () => {
-                    deletePopoverRef.current?.(true);
-                },
             },
             ...getDragControls({ droppable }),
         ],
@@ -91,10 +86,7 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
     loading ||= submitting;
 
     return <WithControlsIcons
-        placement='out' icons={[
-            controlsIcons.open,
-            controlsIcons.drop
-        ]}
+        placement='out' icons={[ controlIcons('open', 'drop') ]}
         as={Group} gap='xs'
     >
         <UISubHeaderTab
@@ -103,9 +95,10 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
             to={to}
             search={search}
             py='md'
-            {...focusControlProps}
+            {...focusProps}
+            {...controlProps('open', 'drop')}
             onClick={droppable.onClick} // override focusControl onClick to keep link enabled
-            onPointerUp={droppable.onPointerUp ?? focusControlProps.onPointerUp}
+            onPointerUp={droppable.onPointerUp ?? controlProps('drop').onPointerUp}
             loading={loading}
         >
             <Stack>
@@ -134,28 +127,28 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
 
         <ActionIcon.Group orientation="vertical">
             <UIPopover
-                popoverRef={editPopoverRef}
                 dropdown={editDropdown}
             >
                 <WithControlsIcons
-                    placement='in' icons={controlsIcons.edit}
+                    placement='in' icons={controlIcons('edit')}
                     as={ActionIcon<'button'>}
-                    color='blue' disabled={!editDropdown}
+                    color='blue'
+                    {...controlProps('edit')}
                 >
                     <PenIcon />
                 </WithControlsIcons>
             </UIPopover>
 
             <UIConfirmPopover
-                popoverRef={deletePopoverRef}
                 label='Delete'
                 color='red'
                 action={onDelete}
             >
                 <WithControlsIcons
-                    placement='in' icons={controlsIcons.delete}
+                    placement='in' icons={controlIcons('delete')}
                     as={ActionIcon<'button'>}
-                    color='red' disabled={selected || !onDelete}
+                    color='red'
+                    {...controlProps('delete')}
                 >
                     <TrashIcon />
                 </WithControlsIcons>

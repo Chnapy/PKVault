@@ -32,12 +32,11 @@ export const BankList: React.FC = () => {
         })}
         onCreate={() => bankCreateMutation.mutateAsync()}
         onChange={console.log}
-        renderExpanded={(data, { reduce }) =>
+        renderExpanded={(data) =>
             data.map(({ item, selected }) => <BankExpanded
                 key={item.id}
                 {...item}
                 selected={selected}
-                onSelect={reduce}
             />)}
     />;
 };

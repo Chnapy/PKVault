@@ -12,12 +12,12 @@ type UISettingsContentProps = {
 
 export const UISettingsContent: React.FC<UISettingsContentProps> = ({ left, right, bottom }) => {
 
-    const { panelProps, nodeId, childScopeId, controlsIcons } = usePanelControls('storage-content', {
+    const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('storage-content', {
         focusOnMount: true,
     });
 
     return <FocusScope id={childScopeId} parentNodeId={nodeId}>
-        <WithControlsIcons placement='out' icons={controlsIcons.open}
+        <WithControlsIcons placement='out' icons={controlIcons('open')}
             display='flex'
             mah='100%'
             bdrs='md'

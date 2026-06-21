@@ -4,20 +4,22 @@ import type { UseDroppableReturn } from '../../move/hooks/use-droppable';
 
 type Params = {
     dragging?: Pick<UseDraggingReturn, 'isDragging' | 'stopDrag' | 'onPointerDown'>;
-    draggingMove?: ReturnType<UseDraggingReturn['useDrag']>;
-    draggingMoveAttached?: ReturnType<UseDraggingReturn['useDrag']>;
-    droppable?: Pick<UseDroppableReturn, 'isDroppable' | 'stopDrag' | 'onDrop'>;
+    draggingMove?: ReturnType<UseDraggingReturn[ 'useDrag' ]>;
+    draggingMoveAttached?: ReturnType<UseDraggingReturn[ 'useDrag' ]>;
+    droppable?: Pick<UseDroppableReturn, 'isDroppable' | 'stopDrag' | 'onDrop' | 'canDrop'>;
+    droppableMain?: boolean;
 };
 
-export const getDragControls = ({ dragging, draggingMove, draggingMoveAttached, droppable }: Params) => {
+export const getDragControls = ({ dragging, draggingMove, draggingMoveAttached, droppable, droppableMain }: Params) => {
     const stopDrag = dragging?.stopDrag ?? droppable?.stopDrag;
 
     const isDragging = dragging?.isDragging;
     const isDroppable = droppable?.isDroppable;
 
     return [
-        droppable?.onDrop && {
+        droppable?.onDrop && droppable.canDrop && {
             name: 'drop' as const,
+            main: droppableMain,
             label: 'Drop',
             triggers: {
                 mouse: {

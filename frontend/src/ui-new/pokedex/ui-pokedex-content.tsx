@@ -8,12 +8,12 @@ type UIPokedexContentProps = {
 };
 
 export const UIPokedexContent: React.FC<UIPokedexContentProps> = ({ children }) => {
-    const { panelProps, nodeId, childScopeId, controlsIcons } = usePanelControls('pokedex-content', {
+    const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('pokedex-content', {
         focusOnMount: true,
     });
 
     return <FocusScope id={childScopeId} parentNodeId={nodeId}>
-        <WithControlsIcons placement='out' icons={controlsIcons.open}
+        <WithControlsIcons placement='out' icons={controlIcons('open')}
             display='flex'
             mah='100%'
             bdrs='md'

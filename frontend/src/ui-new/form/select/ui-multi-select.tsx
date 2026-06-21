@@ -20,13 +20,13 @@ export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel
 
     const { popScope } = Focus.usePushPopScope();
 
-    const { focusControlProps, nodeId, controlsIcons } = useFocusControls({
+    const { focusProps, nodeId, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         controls: [
             getSelectControl({
                 label: controlLabel,
                 action: () => {
-                    (focusControlProps.ref as React.RefObject<HTMLInputElement>).current?.querySelector('input')?.click();
+                    (focusProps.ref as React.RefObject<HTMLInputElement>).current?.querySelector('input')?.click();
                 },
             }),
         ],
@@ -34,15 +34,15 @@ export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel
 
     const optionBack = () => {
         popScope(scopeId);
-        focusControlProps.ref.current?.click();
+        focusProps.ref.current?.click();
     };
 
-    return <WithControlsIcons placement='out' icons={controlsIcons.open} className={className} style={style}>
+    return <WithControlsIcons placement='out' icons={controlIcons('open')} className={className} style={style}>
         <FocusScope id={scopeId} parentNodeId={nodeId}>
             <MultiSelect
                 {...rest}
                 onChange={(value) => {
-                    focusControlProps.onChange?.(value as never);
+                    controlProps('open').onChange?.(value as never);
                     rest.onChange?.(value);
                 }}
                 renderOption={item => <OptionComponent
@@ -53,7 +53,8 @@ export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel
                     {rest.renderOption?.(item)}
                 </OptionComponent>}
                 wrapperProps={{
-                    ...focusControlProps,
+                    ...focusProps,
+                    ...controlProps('open'),
                     style: { borderRadius: 'var(--mantine-radius-default)' }
                 }}
                 styles={{
@@ -74,14 +75,14 @@ const OptionComponent: React.FC<ComboboxLikeRenderOptionInput<ComboboxItem<strin
     back: () => void;
     children?: React.ReactNode;
 }> = ({ option, checked, focusOnMount, back, children }) => {
-    const { focusControlProps, controlsIcons } = useFocusControls({
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: option.value,
         focusOnMount,
         controls: [
             getSelectControl({
                 label: 'Select',
                 action: () => {
-                    focusControlProps.ref.current?.click();
+                    focusProps.ref.current?.click();
                 },
             }),
             getBackControl({
@@ -93,7 +94,9 @@ const OptionComponent: React.FC<ComboboxLikeRenderOptionInput<ComboboxItem<strin
         ],
     });
 
-    return <WithControlsIcons placement='out' icons={controlsIcons.open} {...focusControlProps}
+    return <WithControlsIcons placement='out' icons={controlIcons('open')}
+        {...focusProps}
+        {...controlProps('open', 'back')}
         bdrs='xs'
         style={{
             flexGrow: 1,

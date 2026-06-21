@@ -27,14 +27,11 @@ export const UIBackupItem: React.FC<UIBackupItemProps> = ({ createdAt, path, fil
 
     const name = splitBy_.join('_');
 
-    const restoreRef = React.useRef<HTMLButtonElement>(null);
-    const deleteRef = React.useRef<HTMLButtonElement>(null);
-
     const { pushScope } = Focus.usePushPopScope();
 
     const inputScopeId = filename + '-input-scope';
 
-    const { focusControlProps, controlsIcons, nodeId } = useFocusControls({
+    const { focusProps, controlProps, controlIcons, nodeId } = useFocusControls({
         scopeNodeId: filename,
         controls: [
             getSelectControl({
@@ -47,35 +44,38 @@ export const UIBackupItem: React.FC<UIBackupItemProps> = ({ createdAt, path, fil
                 name: 'restore' as const,
                 label: 'Restore',
                 triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
                     gamepad: {
                         type: 'gamepad',
                         values: [ 'X' ],
                     }
                 },
                 spread: false,
-                action: () => {
-                    restoreRef.current?.click();
-                },
             },
             {
                 name: 'delete' as const,
                 label: 'Delete',
                 triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
                     gamepad: {
                         type: 'gamepad',
                         values: [ 'Y' ],
                     }
                 },
                 spread: false,
-                action: () => {
-                    deleteRef.current?.click();
-                },
             },
         ],
     });
 
     return <Table.Tr
-        {...focusControlProps}
+        {...focusProps}
+        {...controlProps('open')}
         bdrs='md'
     >
         <Table.Th>
@@ -83,7 +83,7 @@ export const UIBackupItem: React.FC<UIBackupItemProps> = ({ createdAt, path, fil
         </Table.Th>
 
         <Table.Td>
-            <WithControlsIcons placement='out' icons={controlsIcons.open}>
+            <WithControlsIcons placement='out' icons={controlIcons('open')}>
                 <FocusScope id={inputScopeId} parentNodeId={nodeId}>
                     <UITextInput
                         name={filename + '-input'}
@@ -112,8 +112,8 @@ export const UIBackupItem: React.FC<UIBackupItemProps> = ({ createdAt, path, fil
 
         <Table.Td>
             <UIConfirmPopover label='Restore backup' color='blue' action={onRestore}>
-                <WithControlsIcons placement='out' icons={controlsIcons.restore}>
-                    <ActionIcon ref={restoreRef} variant='subtle' color='blue'>
+                <WithControlsIcons placement='out' icons={controlIcons('restore')}>
+                    <ActionIcon variant='subtle' color='blue' {...controlProps('restore')}>
                         <ArchiveRestoreIcon />
                     </ActionIcon>
                 </WithControlsIcons>
@@ -121,8 +121,8 @@ export const UIBackupItem: React.FC<UIBackupItemProps> = ({ createdAt, path, fil
         </Table.Td>
         <Table.Td>
             <UIConfirmPopover label='Delete backup' color='red' action={onDelete}>
-                <WithControlsIcons placement='out' icons={controlsIcons.delete}>
-                    <ActionIcon ref={deleteRef} variant='subtle' color='red'>
+                <WithControlsIcons placement='out' icons={controlIcons('delete')}>
+                    <ActionIcon variant='subtle' color='red' {...controlProps('delete')}>
                         <TrashIcon />
                     </ActionIcon>
                 </WithControlsIcons>

@@ -1,5 +1,5 @@
 import { setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
-import React from 'react';
+import { removeUndefinedValues } from '../../../util/remove-undefined-values';
 import { getGamepadPressedButtons } from '../controls/gamepad/gamepad-event';
 import type { ControlsWithFalsy } from '../controls/provider/controls-context';
 import { useControls } from '../controls/use-controls';
@@ -14,7 +14,7 @@ export type UseFocusControlsParams<N extends string = string> = UseFocusNodePara
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useFocusControls = <E = any, N extends string = string>({
+export const useFocusControls = <E extends Pick<HTMLButtonElement, 'click'> = any, N extends string = string>({
     scopeNodeId, childScopeId, focusOnMount, onFocus,
     controls, controlsEnable = 'ifInScopeStack'
 }: UseFocusControlsParams<N>) => {
@@ -37,7 +37,7 @@ export const useFocusControls = <E = any, N extends string = string>({
 
                 const value = c.triggers.gamepad.values.find(v => buttons.includes(v));
                 if (value)
-                    c.action(details.event as never, 'gamepad', value);
+                    c.action?.(details.event as never, 'gamepad', value);
             });
         },
     });
@@ -49,55 +49,73 @@ export const useFocusControls = <E = any, N extends string = string>({
         }
     };
 
-    const { controlsProps, controlsIcons } = useControls<N>(
+    const controlsWithFocusRef = controls.map(c => {
+        if (!c || !c.main)
+            return c;
+
+        return {
+            ...c,
+            ref: focusProps.ref,
+        };
+    });
+
+    const { controlProps: controlPropsRaw, controlIcons } = useControls<N>(
         nodeId,
         focused,
         order,
-        controls,
+        controlsWithFocusRef,
         {
             enabled: getControlsEnable(),
         }
     );
 
-    const { onClick: controlOnClick, ...controlPropsRest } = controlsProps;
+    const controlProps: typeof controlPropsRaw = (...names) => {
+        const props = controlPropsRaw(...names);
 
-    const onClick: typeof controlOnClick = React.useCallback<React.MouseEventHandler>((e) => {
-        const getFocusableElement = () => {
-            if (!(e.currentTarget instanceof HTMLElement)) {
-                return;
+        const isMain = controls.some(c => c && names.includes(c.name) && c.main);
+        if (!isMain)
+            return props;
+
+        const oldOnClick = props.onClick;
+
+        const onClick: typeof oldOnClick = oldOnClick && ((e) => {
+            const getFocusableElement = () => {
+                if (!(e.currentTarget instanceof HTMLElement)) {
+                    return;
+                }
+
+                if (e.currentTarget.dataset.focusKey !== undefined) {
+                    return e.currentTarget;
+                }
+
+                return e.currentTarget.closest<HTMLElement>('[data-focus-key]');
+            };
+
+            const focusableEl = getFocusableElement();
+
+            // required:
+            // - avoid propagation to parent focus containers
+            // - keep propagation to modal, popover etc
+            if (focusableEl?.dataset.focusKey === nodeId) {
+                setFocus(nodeId);
+                // console.log('focus', id, focusableEl.dataset.focusKey)
+
+                oldOnClick(e);
+            } else {
+                console.warn('Focusable element not found', focusableEl, e);
             }
+        });
 
-            if (e.currentTarget.dataset.focusKey !== undefined) {
-                return e.currentTarget;
-            }
-
-            return e.currentTarget.closest<HTMLElement>('[data-focus-key]');
-        };
-
-        const focusableEl = getFocusableElement();
-
-        // required:
-        // - avoid propagation to parent focus containers
-        // - keep propagation to modal, popover etc
-        if (focusableEl?.dataset.focusKey === nodeId) {
-            setFocus(nodeId);
-            // console.log('focus', id, focusableEl.dataset.focusKey)
-
-            controlOnClick?.(e);
-        } else {
-            console.warn('Focusable element not found', focusableEl, e);
-        }
-    }, [ nodeId, controlOnClick ]);
-
-    const focusControlProps = {
-        ...focusProps,
-        ...controlPropsRest,
-        onClick: controlOnClick && onClick,
+        return removeUndefinedValues({
+            ...props,
+            onClick,
+        });
     };
 
     return {
-        focusControlProps,
-        controlsIcons,
+        focusProps,
+        controlProps,
+        controlIcons,
         nodeId,
         focused,
         order,

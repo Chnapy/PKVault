@@ -1,11 +1,14 @@
 import { ActionIcon, Stack, Tabs, type TabsProps } from '@mantine/core';
+import { useMergedRef } from '@mantine/hooks';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import React from 'react';
-import type { GamepadMappingsAllButton } from '../interaction/controls/gamepad/gamepad-mapper';
 import { useControls } from '../interaction/controls/use-controls';
+import { getBackControl } from '../interaction/focus-controls/common-controls/back-controls';
+import type { FocusScopeId } from '../interaction/focus/provider/focus-context';
+import { Focus } from '../interaction/focus/provider/use-focus-context';
+import { FocusScope } from '../interaction/focus/scope/focus-scope';
 import { useFocusScopeContext } from '../interaction/focus/scope/use-focus-scope-context';
 import { ScrollerControlled, type ScrollerControlledProps } from '../scroller-controlled/scroller-controlled';
-import { useMergedRef } from '@mantine/hooks';
 
 export type UIExpandableTabsData = {
     id: string;
@@ -52,6 +55,8 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
 }: UIExpandableTabsProps<D>) {
     const [ expandedInner, setExpanded ] = React.useState(false);
 
+    const [ scopeId ] = React.useState((): FocusScopeId => `expandable-tabs_${self.crypto.randomUUID()}`);
+
     const expanded = forcedExpanded ?? expandedInner;
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
@@ -59,40 +64,53 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
     const parentScope = useFocusScopeContext();
     const order = parentScope.parentsIds.length;
 
+    const currentScopeActive = Focus.useIsScopeActive(parentScope.scopeId);
+    const expandedScopeActive = Focus.useIsScopeActive(scopeId);
+
+    controlsEnabled &&= currentScopeActive;
     const expandEnabled = controlsEnabled && !!controlsDetailsLabel && !!renderExpanded;
 
-    // console.log('scroller', id, parentScope);
+    // console.log('scroller', id, parentScope, expandEnabled, controlsEnabled, !!controlsDetailsLabel, !!renderExpanded);
 
-    const gamepadValues: [ GamepadMappingsAllButton, GamepadMappingsAllButton ] = level === 1
-        ? [ 'LB', 'RB' ]
-        : [ 'LT', 'RT' ];
+    const tabsDetailedName = 'tabs-detailed-' + id;
 
-    const { controlsProps } = useControls(
+    const { controlProps } = useControls(
         id + '-detailed',
         true,
         order,
-        [
+        React.useMemo(() => [
+            expandedInner && getBackControl({
+                label: 'Back',
+                action: () => {
+                    setExpanded(false);
+                },
+            }),
             controlsDetailsLabel && {
-                name: 'tabs-detailed-' + id,
+                name: tabsDetailedName,
                 label: controlsDetailsLabel,
                 triggers: {
                     gamepad: {
                         type: 'gamepad',
-                        values: gamepadValues,
+                        values: level === 1
+                            ? [ 'LB', 'RB' ]
+                            : [ 'LT', 'RT' ],
                         allowPressedSuite: 4,
                     },
                 },
-                spread: false,
+                spread: true,
                 action: () => {
                     setExpanded(value => !value)
                 },
             }
-        ],
-        { enabled: expandEnabled },
+        ], [ controlsDetailsLabel, expandedInner, level, tabsDetailedName ]),
+        {
+            enabled: expandEnabled || expandedScopeActive,
+        },
     );
 
     const ref = useMergedRef(
         tabsRef,
+        controlProps(tabsDetailedName, 'back').ref,
         tabsProps.ref
     );
 
@@ -107,7 +125,7 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
     }, [ value ]);
 
     return <Tabs
-        {...controlsProps}
+        {...controlProps(tabsDetailedName, 'back')}
         value={value.toString()}
         onChange={tabId => tabId && onChange(tabId)}
         miw={0}
@@ -166,18 +184,20 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
                 {right}
             </Tabs.List>
 
-            {expanded && renderExpanded?.(
-                data.map((item, i) => ({
-                    item,
-                    i,
-                    selected: item.id === value,
-                    select: () => onChange(item.id),
-                })),
-                {
-                    expand: () => setExpanded(true),
-                    reduce: () => setExpanded(false),
-                },
-            )}
+            {expanded && renderExpanded && <FocusScope id={scopeId}>
+                {renderExpanded(
+                    data.map((item, i) => ({
+                        item,
+                        i,
+                        selected: item.id === value,
+                        select: () => onChange(item.id),
+                    })),
+                    {
+                        expand: () => setExpanded(true),
+                        reduce: () => setExpanded(false),
+                    },
+                )}
+            </FocusScope>}
         </Stack>
     </Tabs>;
 };

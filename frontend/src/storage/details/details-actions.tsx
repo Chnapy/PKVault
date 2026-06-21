@@ -1,18 +1,18 @@
 import { Group } from '@mantine/core';
+import { useMergedRef } from '@mantine/hooks';
 import { LinkIcon, MoveIcon, PencilIcon, SparklesIcon, TrashIcon, UnlinkIcon } from 'lucide-react';
 import React from 'react';
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import type { PkmSaveDTO } from '../../data/sdk/model';
 import { useStorageEvolvePkms, useStorageMainDeletePkmVariant, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
-import { UIConfirmPopover } from '../../ui-new/popover/ui-confirm-popover';
-import { UIPopover } from '../../ui-new/popover/ui-popover';
 import { UIButton } from '../../ui-new/form/button/ui-button';
 import { useControls } from '../../ui-new/interaction/controls/use-controls';
 import { getDragControls } from '../../ui-new/interaction/focus-controls/common-controls/drag-controls';
-import type { PopoverContext } from '../../ui-new/interaction/focus-controls/components/popover/context/popover-context';
 import { useFocusScopeContext } from '../../ui-new/interaction/focus/scope/use-focus-scope-context';
 import { useDragging } from '../../ui-new/interaction/move/hooks/use-dragging';
+import { UIConfirmPopover } from '../../ui-new/popover/ui-confirm-popover';
+import { UIPopover } from '../../ui-new/popover/ui-popover';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { pick } from '../../util/pick';
 import { useSelectCallback } from '../../util/use-select-callback';
@@ -84,33 +84,37 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
     const canEvolveList = pkms.filter(pkm => pkm.canEvolve);
     const canReleaseList = pkms.filter(pkm => pkm.canDelete);
 
-    const editPopoverRef = React.useRef<PopoverContext[ 'setOpened' ]>(null);
-
     const nodeId = `storage-item-${storageIndex}-${pkmToMove?.boxSlot}`;
 
-    const { controlsIcons } = useControls(
+    const { controlProps, controlIcons } = useControls(
         nodeId,
         true,
         order,
         [
             ...getDragControls({ dragging, draggingMove }),
-            {
+            canEditList.length === 1 && {
                 name: 'edit' as const,
                 label: 'Edit',
                 triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
                     gamepad: {
                         type: 'gamepad',
                         values: [ 'Y' ],
                     },
                 },
                 spread: false,
-                action: () => editPopoverRef.current?.(opened => !opened),
             },
         ],
         { enabled: true }
     );
 
-    const refProps = { ref: dragging.ref };
+    const moveRef = useMergedRef(
+        dragging.ref,
+        controlProps('drag').ref,
+    );
 
     const renderCount = (count: number) => {
         if (count < 2)
@@ -122,13 +126,13 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
         <UIButton
             name='move'
             controlLabel='Move'
-            controlIcons={[ controlsIcons.drag ]}
+            controlIcons={[ controlIcons('drag') ]}
             onClick={draggingMove.toggleDragByClick}
             onFocusSelect={draggingMove.toggleDragByFocus}
             size='compact-md'
             leftSection={<MoveIcon />}
             focusOnMount
-            {...refProps}
+            ref={moveRef}
         >
             Move
         </UIButton>
@@ -164,7 +168,6 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
             </UIButton>}
 
         {canEditList.length < 2 && <UIPopover
-            popoverRef={editPopoverRef}
             position='left'
             nested
             dropdown={canEditList[ 0 ] && <DetailsEdit
@@ -175,12 +178,12 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
             <UIButton
                 name='edit'
                 controlLabel='Edit'
-                controlIcons={[ controlsIcons.edit ]}
-                disabled={canEditList.length === 0}
+                controlIcons={[ controlIcons('edit') ]}
                 variant='filled'
                 color='blue'
                 size='compact-md'
                 leftSection={<PencilIcon />}
+                {...controlProps('edit')}
             >
                 Edit
             </UIButton>

@@ -13,7 +13,7 @@ type UIButtonProps = {
     onFocusSelect?: (e: Event) => void;
 } & Button.Props & ElementProps<'button'>;
 
-export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlIcons = [], focusOnMount, onClick: onClickInner, onFocusSelect: onFocusSelectInner, w, miw, mt, style, ...rest }) => {
+export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner, onFocusSelect: onFocusSelectInner, w, miw, mt, style, ...rest }) => {
     const [ loadingInner, setLoading ] = React.useState(false);
 
     const loading = loadingInner || rest.loading;
@@ -36,11 +36,11 @@ export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlI
         }
     });
 
-    const { focusControlProps, controlsIcons } = useFocusControls({
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,
         controls: [
-            getSelectControl({
+            !rest.disabled && !rest.loading && (onClick || onFocusSelect) && getSelectControl({
                 label: controlLabel,
                 action: (e, trigger) => {
                     switch (trigger) {
@@ -54,17 +54,17 @@ export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlI
                 },
             }),
         ],
-        // controlsEnable: rest.disabled ? false : undefined,
     });
 
     const ref = useMergedRef(
-        focusControlProps.ref,
+        focusProps.ref,
         rest.ref,
     );
 
-    return <WithControlsIcons placement='out' icons={[ controlsIcons.open, ...controlIcons ]} display='inline-flex' h='fit-content' w={w} miw={miw} mt={mt} style={style}>
+    return <WithControlsIcons placement='out' icons={[ controlIcons('open'), ...extraControlIcons ]} display='inline-flex' h='fit-content' w={w} miw={miw} mt={mt} style={style}>
         <Button
-            {...focusControlProps}
+            {...focusProps}
+            {...controlProps('open')}
             {...rest}
             ref={ref}
             loading={loading}

@@ -1,9 +1,10 @@
-import { ActionIcon, Tooltip } from '@mantine/core';
+import { Tooltip } from '@mantine/core';
 import { BellIcon } from 'lucide-react';
 import React from 'react';
 import { BackendErrorsContext } from '../data/backend-errors-context';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
 import { useTranslate } from '../translate/i18n';
+import { UIActionIcon } from '../ui-new/form/button/ui-action-icon';
 import type { PopoverContext } from '../ui-new/interaction/focus-controls/components/popover/context/popover-context';
 import { PopoverWithControls } from '../ui-new/interaction/focus-controls/components/popover/popover-with-controls';
 import { useCheckUpdate } from './hooks/use-check-update';
@@ -53,13 +54,16 @@ export const NotificationButton: React.FC = () => {
                 label={t('header.notifications.help')}
                 disabled={hasNotifs}
             >
-                <ActionIcon
+                <UIActionIcon
+                    name='notif-btn'
+                    controlLabel='Open notifications'
                     // variant='subtle'
-                    onClick={() => setOpened(value => !value)}
-                    disabled={!hasNotifs}
+                    onClick={hasNotifs
+                        ? (() => setOpened(value => !value))
+                        : undefined}
                 >
                     <BellIcon />
-                </ActionIcon>
+                </UIActionIcon>
             </Tooltip>}
             dropdown={<NotificationCardManager />}
             dropdownProps={{

@@ -11,23 +11,24 @@ type UISwitchProps = {
 
 export const UISwitch: React.FC<UISwitchProps> = ({ name, controlLabel, ...rest }) => {
 
-    const { focusControlProps, controlsIcons } = useFocusControls({
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         // focusOnMount: true,
         controls: [
             getSelectControl({
                 label: controlLabel,
                 action: () => {
-                    focusControlProps.ref.current.click();
+                    focusProps.ref.current.click();
                 },
             }),
         ],
     });
 
-    return <WithControlsIcons placement='out' icons={controlsIcons.open} display='inline-flex' h='fit-content'>
+    return <WithControlsIcons placement='out' icons={controlIcons('open')} display='inline-flex' h='fit-content'>
         <Switch
             id={name}
-            {...focusControlProps}
+            {...focusProps}
+            {...controlProps('open')}
             {...rest}
         />
     </WithControlsIcons>;

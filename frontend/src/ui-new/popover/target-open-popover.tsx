@@ -42,13 +42,19 @@ export const TargetOpenPopover: React.FC<TargetOpenPopoverProps> = ({ popoverRef
         return null;
     }
 
+    const disabled = !!childProps.disabled || !!childProps.loading;
+
+    const onClick = disabled
+        ? undefined
+        : ((e: React.MouseEvent<HTMLElement>) => {
+            setOpened(opened => !opened);
+            childProps.onClick?.(e);
+        });
+
     return React.cloneElement(child, {
         ...childProps,
         ...rest,
         ref,
-        onClick: (e: React.MouseEvent<HTMLElement>) => {
-            setOpened(opened => !opened);
-            childProps.onClick?.(e);
-        },
+        onClick,
     });
 };

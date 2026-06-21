@@ -1,5 +1,5 @@
 import { Container, Grid, Stack } from '@mantine/core';
-import type React from 'react';
+import React from 'react';
 import { ErrorCatcher } from '../../../error/error-catcher';
 import { useControlsCurrentType } from '../../interaction/controls/use-controls-current-type';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
@@ -15,9 +15,13 @@ type UIAppLayoutProps = {
 export const UIAppLayout: React.FC<UIAppLayoutProps> = ({ header, bottom, footer, children }) => {
     const controlsCurrentType = useControlsCurrentType();
 
-    return <UIFrame
-        data-controls-type={controlsCurrentType}
-    >
+    React.useEffect(() => {
+        const previousValue = document.body.dataset.controlsType;
+        if (previousValue !== controlsCurrentType)
+            document.body.dataset.controlsType = controlsCurrentType;
+    }, [ controlsCurrentType ]);
+
+    return <UIFrame>
         <ErrorCatcher>
             {header}
 

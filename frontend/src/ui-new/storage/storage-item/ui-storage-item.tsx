@@ -23,13 +23,14 @@ export type UIStorageItemProps<C = unknown> =
     & {
         id: string;
         name: string;
+        selected?: boolean;
         level: number;
         icons?: React.ReactNode;
     };
 
 export const UIStorageItem: React.FC<UIStorageItemProps> = ({
     ref: refRoot, id, nodeId, slot, icons,
-    container,
+    container, selected,
     name, level, label,
     loading, disabled, onClick,
     children, ...buttonProps
@@ -55,11 +56,12 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
 
     const isDraggingState = dragging.isDragging || droppable.isDroppable;
 
-    disabled ||= (isDraggingState && !droppable.isDroppable);
-
     const submitting = useDragSubmitting(container, slot, id);
 
-    const { focusControlProps, controlsIcons } = useFocusControls({
+    disabled ||= (isDraggingState && !droppable.isDroppable) || droppable.canDrop === false;
+    loading ||= submitting;
+
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: nodeId,
         onFocus: ({ node }) => {
             dragging.focusNode(node);
@@ -67,18 +69,24 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
             panel.normalizeCurrentPanel();
         },
         controls: [
-            getSelectControl({
+            !disabled && !loading && getSelectControl({
                 label: 'Open',
                 action: e => {
                     popover?.setOpened(opened => !opened);
                     onClick?.(e);
                 },
             }),
-            ...getDragControls({ dragging, draggingMove, draggingMoveAttached, droppable }),
-            !dragging.isDragging && !droppable.isDroppable && {
+            ...(disabled || loading)
+                ? []
+                : getDragControls({ dragging, draggingMove, draggingMoveAttached, droppable }),
+            !dragging.isDragging && !droppable.isDroppable && !disabled && !loading && {
                 name: 'select',
                 label: 'Select',
                 triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
                     gamepad: {
                         type: 'gamepad',
                         values: [ 'Y' ],
@@ -93,18 +101,13 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
 
     const ref = useMergedRef(
         dragging.ref,
-        focusControlProps.ref,
+        focusProps.ref,
         refRoot,
     );
 
     return <>
         <WithControlsIcons
-            placement='out' icons={[
-                controlsIcons.open,
-                controlsIcons.drag,
-                controlsIcons[ 'drag-attached' ],
-                controlsIcons.drop,
-            ]}
+            placement='out' icons={controlIcons('open', 'drag', 'drag-attached', 'drop')}
             className={classes.uiStorageItem}
         >
             <UIStorageItemBase
@@ -112,10 +115,11 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
                     {name}
                     <UIDetailsLevel level={level} />
                 </>}
-                disabled={(droppable.canDrop === false) || disabled}
-                loading={loading || submitting}
+                selected={selected}
+                loading={loading}
                 opacity={dragging.isDragging ? 0.5 : undefined}
-                {...focusControlProps}
+                {...focusProps}
+                {...controlProps('open', 'drag', 'drag-attached', 'drop')}
                 {...buttonProps}
                 ref={ref}
             >
@@ -123,11 +127,11 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
                 {icons}
             </UIStorageItemBase>
 
-            {!submitting && !disabled && <WithControlsIcons className={classes.checkbox} placement='out' icons={controlsIcons.select}>
+            {controlProps('select').onClick && <WithControlsIcons className={classes.checkbox} placement='out' icons={controlIcons('select')}>
                 <Checkbox
                     size='sm'
                     checked={checked}
-                    onClick={() => checked ? removeId([ id ]) : addId(container, [ id ])}
+                    {...controlProps('select')}
                 />
             </WithControlsIcons>}
         </WithControlsIcons>

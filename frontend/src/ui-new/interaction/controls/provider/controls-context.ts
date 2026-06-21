@@ -18,7 +18,7 @@ export type ControlListenerAttributes = Pick<React.DOMAttributes<any>, ControlLi
 
 export type ControlTrigger<T extends ControlTriggerType = ControlTriggerType> = {
     type: T;
-    values: ControlTriggerValues[T][];
+    values: ControlTriggerValues[ T ][];
     allowPressedSuite?: number;
     allowOnFocus?: boolean;
     listeners?: ControlListenerName[];
@@ -26,19 +26,21 @@ export type ControlTrigger<T extends ControlTriggerType = ControlTriggerType> = 
 
 export type ControlAction<N extends string = string> = {
     name: N;
-    triggers: { [trigger in ControlTriggerType]?: ControlTrigger<trigger> };
+    triggers: { [ trigger in ControlTriggerType ]?: ControlTrigger<trigger> };
     label: string;
     focused: boolean;
     // spread to children, if not overriden by them
     spread: boolean;
     // override lowest order, for same trigger values only
     order: number;
-    action: <T extends ControlTriggerType = ControlTriggerType>(e: never, trigger: T, value: ControlTriggerValues[T]) => void;
+    main?: boolean;
+    ref?: React.RefObject<Pick<HTMLButtonElement, 'click'>>;
+    action?: <T extends ControlTriggerType = ControlTriggerType>(e: never, trigger: T, value: ControlTriggerValues[ T ]) => void;
 };
 
 export type ControlActionInput<N extends string = string> = Omit<ControlAction<N>, 'focused' | 'order'>;
 
-type Falsy = false | undefined | null | '' | 0; 
+type Falsy = false | undefined | null | '' | 0;
 
 export type ControlsWithFalsy<N extends string = string> = (ControlActionInput<N> | Falsy)[];
 export type Controls = ControlAction[];
@@ -66,6 +68,8 @@ export const createControlsStore = (currentType?: ControlTriggerType) => create<
         const controls = new Map(s.controls);
         controls.set(id, controlItems);
 
+        // console.log('REGISTER', id, controlItems)
+
         return {
             ...s,
             controls,
@@ -75,6 +79,7 @@ export const createControlsStore = (currentType?: ControlTriggerType) => create<
         if (!s.controls.has(id))
             return s;
 
+        // console.log('UNREGISTER', id, s.controls.get(id))
         const controls = new Map(s.controls);
         controls.delete(id);
 

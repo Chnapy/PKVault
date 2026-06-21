@@ -19,7 +19,7 @@ export const UIPokedexFilters: React.FC<UIPokedexFiltersProps> = ({ views, child
 
     const { pushScope } = Focus.usePushPopScope();
 
-    const { focusControlProps, nodeId, controlsIcons } = useFocusControls({
+    const { focusProps, nodeId, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         childScopeId,
         controls: [
@@ -31,8 +31,8 @@ export const UIPokedexFilters: React.FC<UIPokedexFiltersProps> = ({ views, child
     });
 
     return <FocusScope id={name} parentNodeId={nodeId}>
-        <WithControlsIcons placement='out' icons={controlsIcons.open} {...rest}>
-            <Card {...focusControlProps} w='100%' mah='100%' pt='sm'>
+        <WithControlsIcons placement='out' icons={controlIcons('open')} {...rest}>
+            <Card {...focusProps} {...controlProps('open')} w='100%' mah='100%' pt='sm'>
                 <Stack>
                     {views}
 
