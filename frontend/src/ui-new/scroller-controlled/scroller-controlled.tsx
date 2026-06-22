@@ -14,15 +14,17 @@ export type ScrollerControlledProps = {
     level: 1 | 2;
     controlsEnabled: boolean;
     controlsLabel: string;
+    extraScopeId?: string;
 } & Scroller.Props;
 
-export const ScrollerControlled: React.FC<ScrollerControlledProps> = ({ id, level, controlsEnabled, controlsLabel, ...rest }) => {
+export const ScrollerControlled: React.FC<ScrollerControlledProps> = ({ id, level, controlsEnabled, controlsLabel, extraScopeId, ...rest }) => {
     const refInner = React.useRef<HTMLDivElement>(null);
 
     const parentScope = useFocusScopeContext();
     const order = parentScope.parentsIds.length;
 
-    const enabled = Focus.useIsScopeActive(parentScope.scopeId) && controlsEnabled;
+    const extraScopeEnabled = Focus.useIsScopeActive(extraScopeId ?? '');
+    const enabled = (Focus.useIsScopeActive(parentScope.scopeId) || extraScopeEnabled) && controlsEnabled;
 
     const isGamepad = useControlsCurrentType() === 'gamepad';
 
@@ -50,7 +52,7 @@ export const ScrollerControlled: React.FC<ScrollerControlledProps> = ({ id, leve
                         // TODO keep pressing should open detailed view
                     },
                 },
-                spread: false,
+                spread: true,
                 action: (e, trigger, value) => {
                     console.log('trigger', id, level, value, parentScope);
 

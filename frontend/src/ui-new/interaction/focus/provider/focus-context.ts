@@ -9,6 +9,7 @@ export type RestoreMode = 'last-focused' | 'first-child';
 export type FocusNodeData = {
   id: FocusNodeId;
   scopeId: FocusScopeId;
+  order: number;
   focusSelf: () => void;
 };
 

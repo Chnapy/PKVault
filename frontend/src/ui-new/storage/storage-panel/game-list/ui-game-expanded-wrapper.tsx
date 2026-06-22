@@ -6,6 +6,7 @@ import { getSelectControl } from '../../../interaction/focus-controls/common-con
 import { useFocusControls } from '../../../interaction/focus-controls/use-focus-controls';
 import { UIPathLine } from '../../../path/ui-path-line';
 import { UIPopover } from '../../../popover/ui-popover';
+import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
 
 export type UIGameExpandedWrapperProps = {
     selected?: boolean;
@@ -24,9 +25,14 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
     title, label, imgSrc, secondaryLine, tertiaryLine, path,
     selected, onSelect, editDropdown,
 }) => {
+    const panel = useCurrentPanel();
+
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: `game_${path}`,
         focusOnMount: selected,
+        onFocus: () => {
+            panel.normalizeCurrentPanel();
+        },
         controls: [
             !selected && onSelect && getSelectControl({
                 label: 'Select',

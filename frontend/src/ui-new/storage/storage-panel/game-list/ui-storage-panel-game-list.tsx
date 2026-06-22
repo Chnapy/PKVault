@@ -27,6 +27,7 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
         data={data}
         onChange={onChange}
         expanded={expanded}
+        scoped={expanded !== true}
         renderTab={({ item, selected }, { reduce }) => <Tabs.Tab key={item.id}
             value={item.id} onClick={reduce} disabled={item.disabled} leftSection={<img src={item.imgSrc} height={16} />} py={4}
         >

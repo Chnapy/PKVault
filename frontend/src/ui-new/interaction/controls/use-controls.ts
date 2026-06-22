@@ -75,12 +75,12 @@ export const useControls = <N extends string>(id: ControlId, focused: boolean, o
     }, [ filteredRenamedControls, enabled, id, useControlsStore ]);
 
     const controlIcons: UseControlsReturn<N>[ 'controlIcons' ] = (...names) => {
+        if (!enabled || controlsCurrentType === 'mouse')
+            return [];
+
         return names.map(name => {
             const item = controls.find(c => c && c.name === name);
             if (!item)
-                return;
-
-            if (!enabled)
                 return;
 
             const values = item.triggers[ controlsCurrentType ]?.values ?? [];

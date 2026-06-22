@@ -7,6 +7,7 @@ import { getSelectControl } from '../../../interaction/focus-controls/common-con
 import { useFocusControls } from '../../../interaction/focus-controls/use-focus-controls';
 import { UIConfirmPopover } from '../../../popover/ui-confirm-popover';
 import { UIPopover } from '../../../popover/ui-popover';
+import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
 import { getBoxColumns } from '../get-box-columns';
 import classes from './ui-box-expanded.module.css';
 
@@ -21,6 +22,8 @@ export type UIBoxExpandedProps = UIExpandableTabsData & {
 export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
     id, label, selected, slotsStates, onSelect, onDelete, editDropdown
 }) => {
+    const panel = useCurrentPanel();
+
     const cols = getBoxColumns(slotsStates.length);
 
     const selectDisabled = selected || !onSelect;
@@ -30,6 +33,9 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: `box-expanded-${id}-actions`,
         focusOnMount: selected,
+        onFocus: () => {
+            panel.normalizeCurrentPanel();
+        },
         controls: [
             !selectDisabled && getSelectControl({
                 label: 'Select',

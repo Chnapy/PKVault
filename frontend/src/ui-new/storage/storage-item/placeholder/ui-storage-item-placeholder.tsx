@@ -15,6 +15,7 @@ export type UIStorageItemPlaceholderProps<C = unknown> =
         nodeId: string;
         container: C;
         slot: number;
+        globalOrder: number;
     };
 
 export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> = ({
@@ -22,6 +23,7 @@ export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> =
     nodeId,
     container,
     slot,
+    globalOrder,
     loading,
     ...buttonProps
 }) => {
@@ -35,6 +37,7 @@ export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> =
 
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: nodeId,
+        order: globalOrder,
         onFocus: ({ node }) => {
             droppable.focusNode(node);
 

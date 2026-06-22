@@ -7,10 +7,11 @@ import { useFocusScopeContext, useFocusScopeSelect } from '../scope/use-focus-sc
 export type UseFocusNodeParams = Pick<UseFocusableConfig<unknown>, 'onFocus'> & {
   scopeNodeId: FocusNodeId;
   focusOnMount?: boolean;
+  order?: number;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useFocusNode = <E = any>({ scopeNodeId, focusOnMount, onFocus }: UseFocusNodeParams) => {
+export const useFocusNode = <E = any>({ scopeNodeId, focusOnMount, order = 0, onFocus }: UseFocusNodeParams) => {
   const { scopeId } = useFocusScopeContext();
   const selectScope = useFocusScopeSelect();
 
@@ -41,13 +42,14 @@ export const useFocusNode = <E = any>({ scopeNodeId, focusOnMount, onFocus }: Us
     registerNode({
       id: nodeId,
       scopeId,
+      order,
       focusSelf,
     });
 
     return () => {
       unregisterNode(nodeId);
     };
-  }, [ nodeId, scopeId, focusSelf, registerNode, unregisterNode ]);
+  }, [ nodeId, scopeId, order, focusSelf, registerNode, unregisterNode ]);
 
   React.useEffect(() => {
     if (focused) {
@@ -55,7 +57,7 @@ export const useFocusNode = <E = any>({ scopeNodeId, focusOnMount, onFocus }: Us
 
       selectScope();
     }
-  }, [focused, nodeId, scopeId, selectScope, setLastFocusedNode]);
+  }, [ focused, nodeId, scopeId, selectScope, setLastFocusedNode ]);
 
   React.useEffect(() => {
     if (focusOnMount) {

@@ -15,17 +15,18 @@ export type UseFocusControlsParams<N extends string = string> = UseFocusNodePara
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useFocusControls = <E extends Pick<HTMLButtonElement, 'click'> = any, N extends string = string>({
-    scopeNodeId, childScopeId, focusOnMount, onFocus,
+    scopeNodeId, childScopeId, focusOnMount, order, onFocus,
     controls, controlsEnable = 'ifInScopeStack'
 }: UseFocusControlsParams<N>) => {
     const parentScope = useFocusScopeContext();
-    const order = parentScope.parentsIds.length;
+    const controlOrder = parentScope.parentsIds.length;
 
     const focusInChildScope = Focus.useIsInScopeStack(childScopeId);
 
     const { nodeId, focused, focusProps, ...focusRest } = useFocusNode<E>({
         scopeNodeId,
         focusOnMount,
+        order,
         onFocus: (layout, props, details) => {
             onFocus?.(layout, props, details);
 
@@ -62,7 +63,7 @@ export const useFocusControls = <E extends Pick<HTMLButtonElement, 'click'> = an
     const { controlProps: controlPropsRaw, controlIcons } = useControls<N>(
         nodeId,
         focused,
-        order,
+        controlOrder,
         controlsWithFocusRef,
         {
             enabled: getControlsEnable(),
@@ -118,7 +119,7 @@ export const useFocusControls = <E extends Pick<HTMLButtonElement, 'click'> = an
         controlIcons,
         nodeId,
         focused,
-        order,
+        controlOrder,
         ...focusRest,
     };
 };

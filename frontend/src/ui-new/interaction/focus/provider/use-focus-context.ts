@@ -79,9 +79,24 @@ const useRegister = () => {
         if (nodes.get(nodeId))
           return;
 
-        const nextNode = [ ...nodes.values() ].find(n => n.scopeId === scopeId);
+        const getNextNode = () => {
+          const scopeNodes = [ ...nodes.values() ].filter(n => n.scopeId === scopeId);
+
+          const nextAvailableNodes = scopeNodes
+            .filter(n => n.order <= node.order)
+            .sort((n1, n2) => n2.order - n1.order);
+
+          const nextNode = nextAvailableNodes[ 0 ];
+          const fallbackNode = scopeNodes[ 0 ];
+
+          return nextNode ?? fallbackNode;
+        };
+
+        const nextNode = getNextNode();
+
         if (nextNode) {
-          nextNode?.focusSelf();
+          // console.log('FOCUS FALLBACK', nextNode, node.order, nextAvailableNodes);
+          nextNode.focusSelf();
         } else {
           popScope(scopeId);
         }
@@ -175,7 +190,7 @@ const usePushPopScope = () => {
       });
 
     focusScope(scopeId);
-  }, [focusScope, hasScopeNodes, useFocusStore]);
+  }, [ focusScope, hasScopeNodes, useFocusStore ]);
 
   const popScope = React.useCallback((scopeIdToPop?: string) => {
     // console.warn('pop-scope')
@@ -186,7 +201,7 @@ const usePushPopScope = () => {
         if (stack.length <= 1)
           return stack;
 
-        if (scopeIdToPop && s.scopeStack[s.scopeStack.length - 1] !== scopeIdToPop)
+        if (scopeIdToPop && s.scopeStack[ s.scopeStack.length - 1 ] !== scopeIdToPop)
           return stack;
 
         const next = stack.slice(0, -1);
@@ -212,7 +227,7 @@ const usePushPopScope = () => {
         scopeStack: next,
       };
     });
-  }, [hasScopeNodes, restoreScopeFocus, useFocusStore]);
+  }, [ hasScopeNodes, restoreScopeFocus, useFocusStore ]);
 
   return {
     normalizeScope,
@@ -228,10 +243,10 @@ const useRestoreScopeFocus = () => {
   const getFirstScopeNode = React.useCallback((scopeId: FocusScopeId) => {
     return Array.from(useFocusStore.getState().nodes.values())
       .find(node => node.scopeId === scopeId);
-  }, [useFocusStore]);
+  }, [ useFocusStore ]);
 
   return React.useCallback((scopeId: FocusScopeId) => {
-    const {scopes, nodes} = useFocusStore.getState();
+    const { scopes, nodes } = useFocusStore.getState();
 
     const scope = scopes.get(scopeId);
     if (!scope) return;
@@ -257,7 +272,7 @@ const useRestoreScopeFocus = () => {
         return;
       }
     }
-  }, [getFirstScopeNode, useFocusStore]);
+  }, [ getFirstScopeNode, useFocusStore ]);
 };
 
 const useIsScopeActive = (scopeId: FocusScopeId) => {

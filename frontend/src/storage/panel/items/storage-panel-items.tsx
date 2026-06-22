@@ -15,15 +15,29 @@ export const StoragePanelItems: React.FC = () => {
     const storage = useCurrentStorageWithFallback();
     const { saveId = null, boxId, box } = storage.data ?? {};
 
+    // always keep slotCount value so focus is never lost
+    const slotCountRef = React.useRef(1);
+
+    const getNodeId = (i: number) => `storage-item-${storageIndex}-${i}`;
+
+    const getSlotCount = React.useCallback(() => box?.slotCount ?? slotCountRef.current, [ box?.slotCount ]);
+
+    /**
+     * Persist slotCount over box/game changes to avoid losing focus.
+     */
+    React.useEffect(() => {
+        if (box)
+            slotCountRef.current = box.slotCount;
+    }, [ box ]);
+
     const pkmsQuery = usePkmIndex(
         saveId,
         useSelectCallback(data => {
-            if (boxId === undefined)
-                return [];
+            const pkms = boxId !== undefined
+                ? data.data.byBox[ boxId ] ?? {}
+                : {};
 
-            const pkms = data.data.byBox[ boxId ] ?? {};
-
-            return new Array(box?.slotCount ?? 0).fill(0).map((_, i) => {
+            return new Array(getSlotCount()).fill(0).map((_, i) => {
                 const variants = Array.isArray(pkms[ i ]) ? pkms[ i ] : [ pkms[ i ] ].filter(filterIsDefined);
                 const firstVariant = variants[ 0 ];
                 if (!firstVariant)
@@ -35,27 +49,23 @@ export const StoragePanelItems: React.FC = () => {
 
                 return mainVariant.id;
             });
-        }, [ boxId, box?.slotCount ]),
+        }, [ boxId, getSlotCount ]),
     );
 
-    if (boxId === undefined)
-        return null;
+    // const isLoading = [ storage, pkmsQuery ].some(query => query.isLoading);
 
-    const isLoading = [ storage, pkmsQuery ].some(query => query.isLoading);
-    if (isLoading)
-        return null;
-
-    const pkmIds = pkmsQuery.data ?? [];
+    // eslint-disable-next-line react-hooks/refs
+    const pkmIds = pkmsQuery.data ?? new Array<string>(getSlotCount()).fill('');
 
     const items = pkmIds.map((id, i) => {
-        const nodeId = `storage-item-${storageIndex}-${i}`;
+        const nodeId = getNodeId(i);
 
         if (!id)
             return <StorageItemPlaceholder
                 key={nodeId}
                 nodeId={nodeId}
                 saveId={saveId}
-                boxId={boxId.toString()}
+                boxId={boxId?.toString() ?? ''}
                 slot={i}
             />;
 

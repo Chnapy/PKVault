@@ -45,17 +45,19 @@ export type UIExpandableTabsProps<D extends UIExpandableTabsData> =
     & {
         controlsDetailsLabel?: string;
         expanded?: boolean;
+        scoped?: boolean;
     };
 
 export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTabsData>({
     id, level, controlsEnabled, controlsLabel, controlsDetailsLabel, expanded: forcedExpanded,
-    value, data, onChange, renderTab, renderExpanded,
+    value, data, onChange, renderTab, renderExpanded, scoped = true,
     left, right, grow = true,
     ...tabsProps
 }: UIExpandableTabsProps<D>) {
     const [ expandedInner, setExpanded ] = React.useState(false);
 
-    const [ scopeId ] = React.useState((): FocusScopeId => `expandable-tabs_${self.crypto.randomUUID()}`);
+    const [ scopeIdRaw ] = React.useState((): FocusScopeId => `expandable-tabs_${self.crypto.randomUUID()}`);
+    const scopeId = scoped ? scopeIdRaw : '';
 
     const expanded = forcedExpanded ?? expandedInner;
 
@@ -67,7 +69,7 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
     const currentScopeActive = Focus.useIsScopeActive(parentScope.scopeId);
     const expandedScopeActive = Focus.useIsScopeActive(scopeId);
 
-    controlsEnabled &&= currentScopeActive;
+    controlsEnabled &&= (currentScopeActive || expandedScopeActive);
     const expandEnabled = controlsEnabled && !!controlsDetailsLabel && !!renderExpanded;
 
     // console.log('scroller', id, parentScope, expandEnabled, controlsEnabled, !!controlsDetailsLabel, !!renderExpanded);
@@ -124,6 +126,15 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
         });
     }, [ value ]);
 
+    const renderScopedExpanded = (expandedContent: React.ReactNode) => {
+        if (!scoped)
+            return expandedContent;
+
+        return <FocusScope id={scopeId}>
+            {expandedContent}
+        </FocusScope>;
+    };
+
     return <Tabs
         {...controlProps(tabsDetailedName, 'back')}
         value={value.toString()}
@@ -150,6 +161,7 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
                 <ScrollerControlled
                     id={id} level={level} controlsEnabled={controlsEnabled}
                     controlsLabel={controlsLabel}
+                    extraScopeId={scopeIdRaw}
                     opacity={expanded ? 0.5 : undefined}
                 >
                     {data.map((item, i) => renderTab(
@@ -184,8 +196,8 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
                 {right}
             </Tabs.List>
 
-            {expanded && renderExpanded && <FocusScope id={scopeId}>
-                {renderExpanded(
+            {expanded && renderExpanded && renderScopedExpanded(
+                renderExpanded(
                     data.map((item, i) => ({
                         item,
                         i,
@@ -196,8 +208,8 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
                         expand: () => setExpanded(true),
                         reduce: () => setExpanded(false),
                     },
-                )}
-            </FocusScope>}
+                )
+            )}
         </Stack>
     </Tabs>;
 };

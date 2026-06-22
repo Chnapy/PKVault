@@ -39,7 +39,7 @@ export const StoragePanel: React.FC<PopoverTargetChildProps> = (popoverProps) =>
             });
     }, [ navigate, storageWithoutBox, storage.storageIndex ]);
 
-    console.log('render panel')
+    // console.log('render panel')
 
     return <UIStoragePanel
         gameTabs={<StoragePanelGameList

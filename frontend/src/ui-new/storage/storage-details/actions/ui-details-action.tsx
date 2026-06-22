@@ -19,7 +19,7 @@ type UIDetailsActionProps = {
 
 export const UIDetailsAction: React.FC<UIDetailsActionProps> = ({ name, label, gamepadValue, focusOnMount, onClick, ...rest }) => {
 
-    const { focusProps, order, active, controlProps, controlIcons } = useFocusControls({
+    const { focusProps, controlOrder, active, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,
         controls: [
@@ -33,7 +33,7 @@ export const UIDetailsAction: React.FC<UIDetailsActionProps> = ({ name, label, g
     const controls = useControls(
         name + '-active',
         true,
-        order,
+        controlOrder,
         [
             onClick && gamepadValue && {
                 name: 'active-action',

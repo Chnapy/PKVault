@@ -14,14 +14,15 @@ export type CurrentPanelContext = {
 export const currentPanelContext = React.createContext<CurrentPanelContext | null>(null);
 
 export const useCurrentPanel = () => {
-    const currentPanel = React.use(currentPanelContext)!;
+    const currentPanel = React.use(currentPanelContext);
     const panel = usePanel();
+
+    const setValue = currentPanel?.setValue;
 
     return {
         isInCurrentPanel: currentPanel?.value === panel,
-        normalizeCurrentPanel: () => {
-            if (currentPanel && currentPanel.value !== panel)
-                currentPanel.setValue(panel);
-        },
+        normalizeCurrentPanel: React.useCallback(() => {
+            setValue?.(panel);
+        }, [ panel, setValue ]),
     };
 };

@@ -29,7 +29,7 @@ export type UIStorageItemProps<C = unknown> =
     };
 
 export const UIStorageItem: React.FC<UIStorageItemProps> = ({
-    ref: refRoot, id, nodeId, slot, icons,
+    ref: refRoot, id, nodeId, slot, globalOrder, icons,
     container, selected,
     name, level, label,
     loading, disabled, onClick,
@@ -63,6 +63,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
 
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: nodeId,
+        order: globalOrder,
         onFocus: ({ node }) => {
             dragging.focusNode(node);
 
