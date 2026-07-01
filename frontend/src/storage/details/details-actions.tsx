@@ -1,15 +1,12 @@
 import { Group } from '@mantine/core';
-import { useMergedRef } from '@mantine/hooks';
 import { LinkIcon, MoveIcon, PencilIcon, SparklesIcon, TrashIcon, UnlinkIcon } from 'lucide-react';
 import React from 'react';
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import type { PkmSaveDTO } from '../../data/sdk/model';
 import { useStorageEvolvePkms, useStorageMainDeletePkmVariant, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
-import { UIButton } from '../../ui-new/form/button/ui-button';
-import { useControls } from '../../ui-new/interaction/controls/use-controls';
-import { getDragControls } from '../../ui-new/interaction/focus-controls/common-controls/drag-controls';
-import { useFocusScopeContext } from '../../ui-new/interaction/focus/scope/use-focus-scope-context';
+import { UIButton, type UIButtonProps } from '../../ui-new/form/button/ui-button';
+import { useControlsCurrentType } from '../../ui-new/interaction/controls/use-controls-current-type';
 import { useDragging } from '../../ui-new/interaction/move/hooks/use-dragging';
 import { UIConfirmPopover } from '../../ui-new/popover/ui-confirm-popover';
 import { UIPopover } from '../../ui-new/popover/ui-popover';
@@ -17,20 +14,14 @@ import { filterIsDefined } from '../../util/filter-is-defined';
 import { pick } from '../../util/pick';
 import { useSelectCallback } from '../../util/use-select-callback';
 import type { MoveContainerValue, MoveParams } from '../move/move-container-fns';
-import { useCurrentStorage } from '../panel/storage-panel-context';
 import { DetailsEdit } from './details-edit';
 
-type DetailsActionsProps = {
+type DetailsActionsProps = Pick<UIButtonProps, 'focusOnMount'> & {
     pkmIds: string[];
     saveId: number | null;
 };
 
-export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }) => {
-    const { storageIndex } = useCurrentStorage();
-
-    const parentScope = useFocusScopeContext();
-    const order = parentScope.parentsIds.length;
-
+export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pkmIds, saveId }) => {
     const pkmIndexQuery = usePkmIndex(saveId ?? null,
         useSelectCallback(data => {
             return pkmIds.map(id => data.data.byId[ id ]).filter(filterIsDefined)
@@ -76,7 +67,9 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
     const pkmToMove = pkms[ 0 ];
 
     const dragging = useDragging(pkmToMove?.id ?? '', container, false);
+    // eslint-disable-next-line react-hooks/refs
     const draggingMove = dragging.useDrag();
+    // eslint-disable-next-line react-hooks/refs
     const draggingMoveAttached = dragging.useDrag<MoveParams>({ attached: true });
 
     const attachedVariantIds = attachedVariantIdsQuery.data ?? [];
@@ -84,37 +77,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
     const canEvolveList = pkms.filter(pkm => pkm.canEvolve);
     const canReleaseList = pkms.filter(pkm => pkm.canDelete);
 
-    const nodeId = `storage-item-${storageIndex}-${pkmToMove?.boxSlot}`;
-
-    const { controlProps, controlIcons } = useControls(
-        nodeId,
-        true,
-        order,
-        [
-            ...getDragControls({ dragging, draggingMove }),
-            canEditList.length === 1 && {
-                name: 'edit' as const,
-                label: 'Edit',
-                triggers: {
-                    mouse: {
-                        type: 'mouse',
-                        values: [ 'left-click' ],
-                    },
-                    gamepad: {
-                        type: 'gamepad',
-                        values: [ 'Y' ],
-                    },
-                },
-                spread: false,
-            },
-        ],
-        { enabled: true }
-    );
-
-    const moveRef = useMergedRef(
-        dragging.ref,
-        controlProps('drag').ref,
-    );
+    const controlsType = useControlsCurrentType();
 
     const renderCount = (count: number) => {
         if (count < 2)
@@ -122,17 +85,24 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
         return <>({count})</>;
     };
 
+    const onClickMove: UIButtonProps[ 'onClick' ] = controlsType === 'mouse'
+        ? draggingMove.toggleDragByClick
+        : draggingMove.toggleDragByFocus;
+
+    const onClickMoveAttached: UIButtonProps[ 'onClick' ] = controlsType === 'mouse'
+        ? draggingMoveAttached.toggleDragByClick
+        : draggingMoveAttached.toggleDragByFocus;
+
     return <Group>
         <UIButton
             name='move'
             controlLabel='Move'
-            controlIcons={[ controlIcons('drag') ]}
-            onClick={draggingMove.toggleDragByClick}
-            onFocusSelect={draggingMove.toggleDragByFocus}
+            onClick={onClickMove}
             size='compact-md'
             leftSection={<MoveIcon />}
-            focusOnMount
-            ref={moveRef}
+            focusOnMount={focusOnMount}
+            // eslint-disable-next-line react-hooks/refs
+            ref={dragging.ref}
         >
             Move
         </UIButton>
@@ -156,8 +126,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
             : <UIButton
                 name='move-attached'
                 controlLabel='Move attached'
-                onClick={draggingMoveAttached.toggleDragByClick}
-                onFocusSelect={draggingMoveAttached.toggleDragByFocus}
+                onClick={onClickMoveAttached}
                 size='compact-md'
                 leftSection={<Group gap='sm'>
                     <MoveIcon />
@@ -178,12 +147,10 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ pkmIds, saveId }
             <UIButton
                 name='edit'
                 controlLabel='Edit'
-                controlIcons={[ controlIcons('edit') ]}
                 variant='filled'
                 color='blue'
                 size='compact-md'
                 leftSection={<PencilIcon />}
-                {...controlProps('edit')}
             >
                 Edit
             </UIButton>

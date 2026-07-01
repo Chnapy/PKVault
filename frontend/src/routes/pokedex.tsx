@@ -7,7 +7,7 @@ import { type DetailsExpandedState } from '../ui/details-card/details-card-conta
 const searchSchema = z.object({
   selected: z.number().optional(),
   selectedSaveId: z.number().optional(),
-  selectExpanded: z.enum([ 'none', 'expanded', 'expanded-max' ] as const satisfies DetailsExpandedState[]).optional(),
+  selectExpanded: z.enum([ 'none', 'expanded' ] as const satisfies DetailsExpandedState[]).optional(),
   filterSpeciesName: z.string().optional(),
   filterTypes: z.array(z.number()).optional(),
   filterSeen: z.boolean().optional(),

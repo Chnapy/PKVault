@@ -33,7 +33,6 @@ const Dropdown: React.FC<Pick<UIConfirmPopoverProps, 'label' | 'description' | '
         <UIButton
             name='confirm_dropdown'
             controlLabel='Confirm'
-            focusOnMount
             fullWidth
             variant='filled'
             color={color}

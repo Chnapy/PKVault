@@ -33,7 +33,7 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
     types, heldItem, markings,
     children,
 }) => {
-    return <Stack gap='xs'>
+    return <Stack gap='xs' w={280} maw='100%'>
         {isEnabled && <>
             <Group>
                 {ball}

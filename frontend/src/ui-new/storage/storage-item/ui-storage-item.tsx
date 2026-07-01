@@ -70,7 +70,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
             panel.normalizeCurrentPanel();
         },
         controls: [
-            !disabled && !loading && getSelectControl({
+            !isDraggingState && !disabled && !loading && getSelectControl({
                 label: 'Open',
                 action: e => {
                     popover?.setOpened(opened => !opened);
@@ -80,7 +80,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
             ...(disabled || loading)
                 ? []
                 : getDragControls({ dragging, draggingMove, draggingMoveAttached, droppable }),
-            !dragging.isDragging && !droppable.isDroppable && !disabled && !loading && {
+            !isDraggingState && !disabled && !loading && {
                 name: 'select',
                 label: 'Select',
                 triggers: {
@@ -91,10 +91,9 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
                     gamepad: {
                         type: 'gamepad',
                         values: [ 'Y' ],
-                        allowOnFocus: true,
                     },
                 },
-                spread: false,
+                spread: true,
                 action: () => checked ? removeId([ id ]) : addId(container, [ id ]),
             },
         ],

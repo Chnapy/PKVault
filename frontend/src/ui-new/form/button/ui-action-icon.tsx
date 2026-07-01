@@ -10,26 +10,15 @@ type UIActionIconProps = {
     controlLabel: string;
     controlIcons?: React.ReactNode[];
     focusOnMount?: boolean;
-    onFocusSelect?: (e: Event) => void;
 } & ActionIcon.Props & ElementProps<'button'>;
 
-export const UIActionIcon: React.FC<UIActionIconProps> = ({ name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner, onFocusSelect: onFocusSelectInner, h, w, mt, style, ...rest }) => {
+export const UIActionIcon: React.FC<UIActionIconProps> = ({ name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner, h, w, mt, style, ...rest }) => {
     const [ loadingInner, setLoading ] = React.useState(false);
 
     const loading = loadingInner || rest.loading;
 
-    onFocusSelectInner ??= onClickInner as typeof onFocusSelectInner;
-
     const onClick: typeof onClickInner = onClickInner && (e => {
         const result: unknown = onClickInner(e);
-        if (result instanceof Promise) {
-            setLoading(true);
-            result.finally(() => setLoading(false));
-        }
-    });
-
-    const onFocusSelect: typeof onFocusSelectInner = onFocusSelectInner && (e => {
-        const result: unknown = onFocusSelectInner(e);
         if (result instanceof Promise) {
             setLoading(true);
             result.finally(() => setLoading(false));
@@ -42,16 +31,6 @@ export const UIActionIcon: React.FC<UIActionIconProps> = ({ name, controlLabel, 
         controls: [
             !rest.disabled && !rest.loading && getSelectControl({
                 label: controlLabel,
-                action: (e, trigger) => {
-                    switch (trigger) {
-                        case 'mouse':
-                            onClick?.(e);
-                            break;
-                        default:
-                            onFocusSelect?.(e);
-                            break;
-                    }
-                },
             }),
         ],
     });
@@ -66,6 +45,7 @@ export const UIActionIcon: React.FC<UIActionIconProps> = ({ name, controlLabel, 
             {...focusProps}
             {...controlProps('open')}
             {...rest}
+            onClick={onClick}
             ref={ref}
             loading={loading}
             style={{

@@ -36,7 +36,6 @@ export const UIActionsDrawerContent: React.FC<UIActionsDrawerContentProps> = ({ 
         <UIButton
             name='actions-save'
             controlLabel='Save actions'
-            focusOnMount
             variant='filled'
             color='primary'
             fullWidth

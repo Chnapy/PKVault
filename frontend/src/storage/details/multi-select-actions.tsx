@@ -1,6 +1,11 @@
 import { Card, Group, Text } from '@mantine/core';
 import { SquareCheckIcon } from 'lucide-react';
 import type React from 'react';
+import { WithControlsIcons } from '../../ui-new/interaction/controls/icons/with-controls-icons';
+import { useControls } from '../../ui-new/interaction/controls/use-controls';
+import { getBackControl } from '../../ui-new/interaction/focus-controls/common-controls/back-controls';
+import { Focus } from '../../ui-new/interaction/focus/provider/use-focus-context';
+import { useFocusScopeContext } from '../../ui-new/interaction/focus/scope/use-focus-scope-context';
 import { useSelectContextNullable } from '../../ui-new/interaction/select/context/use-select-context';
 import { UICardSectionControl } from '../../ui-new/storage/storage-panel/card-section-control/ui-card-section-control';
 import type { MoveContainerValue } from '../move/move-container-fns';
@@ -9,6 +14,9 @@ import { DetailsActions } from './details-actions';
 
 export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) => {
     const { saveId, box } = useCurrentStorageWithFallback().data ?? {};
+
+    const parentScope = useFocusScopeContext();
+    const order = parentScope.parentsIds.length;
 
     const selectCtx = useSelectContextNullable<MoveContainerValue>();
     const multiSelectIds = selectCtx?.useSelectStore(s => {
@@ -34,24 +42,70 @@ export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) 
             : undefined;
     });
 
+    // console.log(
+    //     parentScope,
+    //     Focus.useIsInScopeStack(parentScope.scopeId),
+    //     Focus.useIsScopeActive(parentScope.scopeId),
+    // );
+
+    const { pushScope, popScope } = Focus.usePushPopScope();
+
+    const wasInPopover = Focus.useIsInScopeStack(parentScope.scopeId);
+    const isInPopover = Focus.useIsScopeActive(parentScope.scopeId);
+    const isInPanel = Focus.useIsScopeActive('storage-content');    // TODO use variable (value from ui-storage-content.tsx)
+    const controlsEnabled = enabled && (isInPopover || isInPanel);
+
+    const { controlProps, controlIcons } = useControls(
+        'multi-select-panel',
+        controlsEnabled && isInPopover,
+        order,
+        [
+            !wasInPopover && {
+                name: 'focus',
+                label: 'Focus',
+                triggers: {
+                    gamepad: {
+                        type: 'gamepad',
+                        values: [ 'Y' ],
+                        allowPressedSuite: 4,
+                    },
+                },
+                spread: true,
+                action: () => {
+                    pushScope(parentScope.scopeId);
+                },
+            },
+            isInPopover && getBackControl({
+                label: 'Back to panel',
+                action: () => {
+                    popScope(parentScope.scopeId);
+                },
+            }),
+        ],
+        { enabled: controlsEnabled }
+    );
+
     if (!multiSelectIds)
         return null;
 
-    return <Card mih={0} style={{
-        position: 'initial',
-        overflow: 'initial',
-    }}>
-        <Card.Section inheritPadding withBorder>
-            <Group gap='sm'>
-                <SquareCheckIcon />
-                <Text>{multiSelectIds.size} pokemons selected</Text>
-            </Group>
-        </Card.Section>
-        {enabled && <Card.Section component={UICardSectionControl} inheritPadding py='inherit' withBorder>
-            <DetailsActions
-                pkmIds={[ ...multiSelectIds ]}
-                saveId={saveId ?? null}
-            />
-        </Card.Section>}
-    </Card>;
+    return <WithControlsIcons placement='in' icons={controlIcons('focus')}>
+        <Card {...controlProps('focus')} mih={0} style={{
+            flexGrow: 1,
+            position: 'initial',
+            overflow: 'initial',
+        }}>
+            <Card.Section inheritPadding withBorder>
+                <Group gap='sm'>
+                    <SquareCheckIcon />
+                    <Text>{multiSelectIds.size} pokemons selected</Text>
+                </Group>
+            </Card.Section>
+            {enabled && <Card.Section component={UICardSectionControl} inheritPadding py='inherit' withBorder>
+                <DetailsActions
+                    pkmIds={[ ...multiSelectIds ]}
+                    saveId={saveId ?? null}
+                />
+            </Card.Section>}
+        </Card>
+    </WithControlsIcons>;
 };

@@ -827,7 +827,7 @@ describe('use-move-droppable', () => {
         });
 
         test('should not be droppable to main as attached if cannot move as attached', async () => {
-            const { result, waitForQueries } = await renderDroppable({
+            const { result } = await renderDroppable({
                 source: {
                     container: {
                         type: 'save-item',

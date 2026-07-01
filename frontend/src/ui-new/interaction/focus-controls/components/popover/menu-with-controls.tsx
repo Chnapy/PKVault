@@ -9,10 +9,11 @@ export type MenuWithControlsProps = Partial<PopoverContext> & {
     target: React.ReactElement;
     dropdown: React.ReactNode;
     dropdownProps?: Menu.Dropdown.Props;
+    focusOnMount?: boolean;
     nested?: boolean;
 } & Omit<Menu.Props, 'opened' | 'withinPortal'>;
 
-export const MenuWithControls: React.FC<MenuWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, nested, ...rest }) => {
+export const MenuWithControls: React.FC<MenuWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, focusOnMount, nested, ...rest }) => {
     const [ innerOpened, setInnerOpened ] = React.useState(false);
 
     const ctx = React.useMemo((): PopoverContext => opened !== undefined && setOpened
@@ -44,7 +45,7 @@ export const MenuWithControls: React.FC<MenuWithControlsProps> = ({ opened, setO
             </Menu.Target>
 
             <Menu.Dropdown component={Paper} {...dropdownProps}>
-                <PopoverDropdownWithControls scopeId={scopeId}>
+                <PopoverDropdownWithControls scopeId={scopeId} focusOnMount={focusOnMount}>
                     {dropdown}
                 </PopoverDropdownWithControls>
             </Menu.Dropdown>

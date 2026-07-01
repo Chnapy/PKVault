@@ -4,28 +4,25 @@ import { SendIcon, XIcon } from 'lucide-react';
 import type React from 'react';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
-import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
+import { useFocusControls, type UseFocusControlsParams } from '../../interaction/focus-controls/use-focus-controls';
 import { Focus } from '../../interaction/focus/provider/use-focus-context';
 
-export type UITextInputProps = TextInput.Props & {
+export type UITextInputProps = TextInput.Props & Pick<UseFocusControlsParams, 'focusOnMount'> & {
     name: string;
     onSubmit?: () => void;
     onCancel?: () => void;
 };
 
-export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCancel, ...rest }) => {
+export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCancel, focusOnMount, ...rest }) => {
 
     const { popScope } = Focus.usePushPopScope();
 
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
-        // focusOnMount: true,
+        focusOnMount,
         controls: [
             getSelectControl({
                 label: 'Focus',
-                action: () => {
-                    focusProps.ref.current.focus();
-                },
             }),
             onSubmit && {
                 name: 'submit' as const,

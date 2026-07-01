@@ -175,7 +175,7 @@ const usePushPopScope = () => {
   }, [ focusScope, hasScopeNodes, useFocusStore ]);
 
   const pushScope = React.useCallback((scopeId: FocusScopeId) => {
-    // console.log('pushScope');
+    // console.log('pushScope', scopeId);
     if (!hasScopeNodes(scopeId))
       return;
 

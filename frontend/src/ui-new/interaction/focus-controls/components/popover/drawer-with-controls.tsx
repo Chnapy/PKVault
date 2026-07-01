@@ -8,10 +8,11 @@ export type DrawerWithControlsProps = Partial<PopoverContext> & {
     target: React.ReactElement;
     dropdown: React.ReactNode;
     dropdownProps?: Popover.Dropdown.Props;
+    focusOnMount?: boolean;
     nested?: boolean;
 } & Omit<DrawerProps, 'opened' | 'withinPortal' | 'onClose'>;
 
-export const DrawerWithControls: React.FC<DrawerWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, nested, ...rest }) => {
+export const DrawerWithControls: React.FC<DrawerWithControlsProps> = ({ opened, setOpened, target, dropdown, dropdownProps, focusOnMount, nested, ...rest }) => {
     const [ innerOpened, setInnerOpened ] = React.useState(false);
 
     const ctx = React.useMemo((): PopoverContext => opened !== undefined && setOpened
@@ -35,7 +36,7 @@ export const DrawerWithControls: React.FC<DrawerWithControlsProps> = ({ opened, 
             shadow='xl'
             {...rest}
         >
-            <PopoverDropdownWithControls scopeId={scopeId}>
+            <PopoverDropdownWithControls scopeId={scopeId} focusOnMount={focusOnMount}>
                 {dropdown}
             </PopoverDropdownWithControls>
         </Drawer>

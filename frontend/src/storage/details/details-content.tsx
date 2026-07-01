@@ -18,13 +18,15 @@ import { UIDetailsContentMove } from '../../ui-new/storage/storage-details/conte
 import { UIDetailsContentOrigin } from '../../ui-new/storage/storage-details/content/origin/ui-details-content-origin';
 import { UIDetailsContentStats } from '../../ui-new/storage/storage-details/content/stats/ui-details-content-stats';
 import { UIDetailsStatsRow, type UIDetailsStatName, type UIDetailsStatsRowProps } from '../../ui-new/storage/storage-details/content/stats/ui-details-stats-row';
-import { UIDetailsContent } from '../../ui-new/storage/storage-details/content/ui-details-content';
+import { UIDetailsContent, type UIDetailsContentProps } from '../../ui-new/storage/storage-details/content/ui-details-content';
+import { UIDetailsContentExpanded } from '../../ui-new/storage/storage-details/content/ui-details-content-expanded';
 import { UIDetailsContentSummary } from '../../ui-new/storage/storage-details/content/ui-details-content-summary';
 import { ItemImg } from '../../ui/img/item-img';
 import { MoveItem } from '../../ui/move-item/move-item';
 import { Ribbon } from '../../ui/ribbon/ribbon';
 import { switchUtilRequired } from '../../util/switch-util';
 import { useCurrentStorage } from '../panel/storage-panel-context';
+import { useSelectExpanded } from './hooks/use-select-expanded';
 
 const isVariant = (pkm: PkmVariantDTO | PkmSaveDTO) => 'filepath' in pkm;
 
@@ -32,6 +34,8 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
     const { t } = useTranslate();
 
     const staticData = useStaticData();
+
+    const { expanded } = useSelectExpanded();
 
     const { getSelected } = useCurrentStorage();
     const selectedSaveId = Route.useSearch({ select: search => getSelected(search.selected)?.saveId }) ?? null;
@@ -117,90 +121,122 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         </Alert>,
     ].filter(Boolean);
 
-    return <UIDetailsContent
-        issues={issues.length > 0 && <Stack>
-            {issues.map((issue, i) => <React.Fragment key={i}>
-                {issue}
-            </React.Fragment>)}
-        </Stack>}
-        summary={pkm.isEnabled && <UIDetailsContentSummary
-            id={pkm.id}
-            heldItem={pkm.heldItem > 0
-                ? <Group gap={4}>
-                    <ItemImg item={pkm.heldItem} version={pkm.contextVersion} />
-                    {staticData.getItem(pkm.contextVersion, pkm.heldItem)?.name}
-                </Group>
-                : null}
-            nature={staticData.natures[ pkm.nature ]?.name}
-            ability={staticData.abilities[ pkm.ability ]?.name}
-            pid={pkm.pid}
-        />}
-        stats={pkm.isEnabled && <UIDetailsContentStats iv ev>
-            {([ 'hp', 'atk', 'def', 'spa', 'spd', 'spe' ] satisfies UIDetailsStatName[])
-                .map((stat, i): UIDetailsStatsRowProps => {
-                    return {
-                        stat,
-                        value: pkm.stats[ i ] ?? 0,
-                        natureEffect: natureObj?.decreasedStatIndex === i + 1
-                            ? 'decrease'
-                            : (natureObj?.increasedStatIndex === i + 1
-                                ? 'increase'
-                                : undefined),
-                        iv: pkm.iVs[ i ] ?? 0,
-                        ev: pkm.eVs[ i ] ?? 0,
-                    };
-                })
-                .map((props) => <UIDetailsStatsRow key={props.stat} {...props} />)}
-        </UIDetailsContentStats>}
-        moves={pkm.isEnabled && <UIDetailsContentMove
-            moves={pkm.moves.map((move, i) => (
-                <MoveItem
-                    key={i}
-                    pkmId={pkm.id}
-                    saveId={selectedSaveId}
-                    move={move}
-                />
-            ))}
-            relearnMoves={pkm.relearnMoves && pkm.relearnMoves.map((move, i) => (
-                <MoveItem
-                    key={i}
-                    pkmId={pkm.id}
-                    saveId={selectedSaveId}
-                    move={move}
-                />
-            ))}
-        />}
-        contest={pkm.isEnabled && (pkm.contest || pkm.ribbons) && <UIDetailsContentCosmetic
-            contest={pkm.contest?.map((value, i) => <UIContest key={i} index={i} value={value} />)}
-            ribbons={pkm.ribbons && Object.entries(pkm.ribbons)
-                .map(([ name, count ]) => <Ribbon key={name} name={name} count={count} />)}
-        />}
-        origin={pkm.isEnabled && <UIDetailsContentOrigin
-            game={<Group>
-                <UIGameImg
-                    size='1lh'
-                    version={pkm.version}
-                    name={staticData.versions[ pkm.version ]?.name}
-                />
-                {staticData.versions[ pkm.version ]?.name}
-            </Group>}
-            ot={pkm.originTrainerName}
-            otGender={pkm.originTrainerGender}
-            ht={pkm.handlingTrainerName}
-            htGender={pkm.handlingTrainerGender}
-            tid={pkm.tid}
-            sid={pkm.sid}
-            originMetLocation={pkm.originMetLocation}
-            originMetLevel={pkm.originMetLevel}
-            originMetDate={pkm.originMetDate}
-            fatefulEncounter={pkm.fatefulEncounter}
-        />}
-        misc={pkm.isEnabled && <UIDetailsContentMisc
-            isEgg={pkm.isEgg}
-            eggHatchCount={pkm.eggHatchCount}
-            friendship={pkm.friendship}
-            language={staticData.languages[ pkm.languageID ]}
-            homeTracker={pkm.homeTracker}
-        />}
-    />;
+    const content: UIDetailsContentProps[ 'content' ] = [
+        issues.length > 0 && {
+            name: 'issue',
+            label: <><AlertTriangleIcon /> Issues</>,
+            content: <Stack>
+                {issues.map((issue, i) => <React.Fragment key={i}>
+                    {issue}
+                </React.Fragment>)}
+            </Stack>,
+        },
+        pkm.isEnabled && {
+            name: 'summary',
+            label: 'Summary',
+            content: <UIDetailsContentSummary
+                id={pkm.id}
+                heldItem={pkm.heldItem > 0
+                    ? <Group gap={4}>
+                        <ItemImg item={pkm.heldItem} version={pkm.contextVersion} />
+                        {staticData.getItem(pkm.contextVersion, pkm.heldItem)?.name}
+                    </Group>
+                    : null}
+                nature={staticData.natures[ pkm.nature ]?.name}
+                ability={staticData.abilities[ pkm.ability ]?.name}
+                pid={pkm.pid}
+            />,
+        },
+        pkm.isEnabled && {
+            name: 'stats',
+            label: 'Stats',
+            content: <UIDetailsContentStats iv ev>
+                {([ 'hp', 'atk', 'def', 'spa', 'spd', 'spe' ] satisfies UIDetailsStatName[])
+                    .map((stat, i): UIDetailsStatsRowProps => {
+                        return {
+                            stat,
+                            value: pkm.stats[ i ] ?? 0,
+                            natureEffect: natureObj?.decreasedStatIndex === i + 1
+                                ? 'decrease'
+                                : (natureObj?.increasedStatIndex === i + 1
+                                    ? 'increase'
+                                    : undefined),
+                            iv: pkm.iVs[ i ] ?? 0,
+                            ev: pkm.eVs[ i ] ?? 0,
+                        };
+                    })
+                    .map((props) => <UIDetailsStatsRow key={props.stat} {...props} />)}
+            </UIDetailsContentStats>,
+        },
+        pkm.isEnabled && {
+            name: 'moves',
+            label: 'Moves',
+            content: <UIDetailsContentMove
+                moves={pkm.moves.map((move, i) => (
+                    <MoveItem
+                        key={i}
+                        pkmId={pkm.id}
+                        saveId={selectedSaveId}
+                        move={move}
+                    />
+                ))}
+                relearnMoves={pkm.relearnMoves && pkm.relearnMoves.map((move, i) => (
+                    <MoveItem
+                        key={i}
+                        pkmId={pkm.id}
+                        saveId={selectedSaveId}
+                        move={move}
+                    />
+                ))}
+            />,
+        },
+        pkm.isEnabled && (pkm.contest || pkm.ribbons) && {
+            name: 'contest',
+            label: 'Contest',
+            content: <UIDetailsContentCosmetic
+                contest={pkm.contest?.map((value, i) => <UIContest key={i} index={i} value={value} />)}
+                ribbons={pkm.ribbons && Object.entries(pkm.ribbons)
+                    .map(([ name, count ]) => <Ribbon key={name} name={name} count={count} />)}
+            />,
+        },
+        pkm.isEnabled && {
+            name: 'origin',
+            label: 'Origin',
+            content: <UIDetailsContentOrigin
+                game={<Group>
+                    <UIGameImg
+                        size='1lh'
+                        version={pkm.version}
+                        name={staticData.versions[ pkm.version ]?.name}
+                    />
+                    {staticData.versions[ pkm.version ]?.name}
+                </Group>}
+                ot={pkm.originTrainerName}
+                otGender={pkm.originTrainerGender}
+                ht={pkm.handlingTrainerName}
+                htGender={pkm.handlingTrainerGender}
+                tid={pkm.tid}
+                sid={pkm.sid}
+                originMetLocation={pkm.originMetLocation}
+                originMetLevel={pkm.originMetLevel}
+                originMetDate={pkm.originMetDate}
+                fatefulEncounter={pkm.fatefulEncounter}
+            />,
+        },
+        pkm.isEnabled && {
+            name: 'misc',
+            label: 'Misc',
+            content: <UIDetailsContentMisc
+                isEgg={pkm.isEgg}
+                eggHatchCount={pkm.eggHatchCount}
+                friendship={pkm.friendship}
+                language={staticData.languages[ pkm.languageID ]}
+                homeTracker={pkm.homeTracker}
+            />,
+        },
+    ].filter(item => typeof item === 'object');
+
+    return expanded
+        ? <UIDetailsContentExpanded content={content} />
+        : <UIDetailsContent content={content} />;
 });

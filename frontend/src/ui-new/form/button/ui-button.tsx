@@ -5,31 +5,20 @@ import { WithControlsIcons } from '../../interaction/controls/icons/with-control
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 
-type UIButtonProps = {
+export type UIButtonProps = {
     name: string;
     controlLabel: string;
     controlIcons?: React.ReactNode[];
     focusOnMount?: boolean;
-    onFocusSelect?: (e: Event) => void;
 } & Button.Props & ElementProps<'button'>;
 
-export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner, onFocusSelect: onFocusSelectInner, w, miw, mt, style, ...rest }) => {
+export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner, w, miw, mt, style, ...rest }) => {
     const [ loadingInner, setLoading ] = React.useState(false);
 
     const loading = loadingInner || rest.loading;
 
-    onFocusSelectInner ??= onClickInner as typeof onFocusSelectInner;
-
     const onClick: typeof onClickInner = onClickInner && (e => {
         const result: unknown = onClickInner(e);
-        if (result instanceof Promise) {
-            setLoading(true);
-            result.finally(() => setLoading(false));
-        }
-    });
-
-    const onFocusSelect: typeof onFocusSelectInner = onFocusSelectInner && (e => {
-        const result: unknown = onFocusSelectInner(e);
         if (result instanceof Promise) {
             setLoading(true);
             result.finally(() => setLoading(false));
@@ -40,18 +29,8 @@ export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlI
         scopeNodeId: name,
         focusOnMount,
         controls: [
-            !rest.disabled && !rest.loading && (onClick || onFocusSelect) && getSelectControl({
+            !rest.disabled && !rest.loading && getSelectControl({
                 label: controlLabel,
-                action: (e, trigger) => {
-                    switch (trigger) {
-                        case 'mouse':
-                            onClick?.(e);
-                            break;
-                        default:
-                            onFocusSelect?.(e);
-                            break;
-                    }
-                },
             }),
         ],
     });
@@ -66,6 +45,7 @@ export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlI
             {...focusProps}
             {...controlProps('open')}
             {...rest}
+            onClick={onClick}
             ref={ref}
             loading={loading}
             w='100%'

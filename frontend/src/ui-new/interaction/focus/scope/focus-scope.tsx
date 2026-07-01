@@ -7,14 +7,17 @@ export const FocusScope: React.FC<{
     id: string;
     parentNodeId?: FocusNodeId;
     restoreMode?: RestoreMode;
+    focusOnMount?: boolean;
     children: React.ReactNode;
 }> = ({
     id,
     parentNodeId,
     restoreMode = 'last-focused',
+    focusOnMount = false,
     children,
 }) => {
         const { registerScope, unregisterScope } = Focus.useRegister();
+        const { pushScope } = Focus.usePushPopScope();
 
         React.useEffect(() => {
             registerScope({
@@ -23,10 +26,13 @@ export const FocusScope: React.FC<{
                 restoreMode,
             });
 
+            if (focusOnMount)
+                pushScope(id);
+
             return () => {
                 unregisterScope(id);
             };
-        }, [ id, restoreMode, registerScope, unregisterScope, parentNodeId ]);
+        }, [ id, restoreMode, registerScope, unregisterScope, parentNodeId, focusOnMount, pushScope ]);
 
         return <FocusScopeProvider scopeId={id}>
             {children}

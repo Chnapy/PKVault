@@ -8,9 +8,12 @@ import { DetailsActions } from './details-actions';
 import { DetailsContent } from './details-content';
 import { DetailsMain } from './details-main';
 import { DetailsSaves } from './details-saves';
+import { useSelectExpanded } from './hooks/use-select-expanded';
 
 export const StorageDetails: React.FC = withErrorCatcher('default', () => {
   const navigate = Route.useNavigate();
+
+  const { expanded, toggleExpanded } = useSelectExpanded();
 
   const { getSelected } = useCurrentStorage();
   const selectedSaveId = Route.useSearch({ select: search => getSelected(search.selected)?.saveId });
@@ -33,13 +36,16 @@ export const StorageDetails: React.FC = withErrorCatcher('default', () => {
   }, [ unselect, noPkmsFound ]);
 
   return <UIStorageDetails
-    header={closeBtn => <DetailsSaves actions={closeBtn} />}
+    expanded={expanded}
+    header={actions => <DetailsSaves actions={actions} />}
     main={<DetailsMain />}
     content={<DetailsContent />}
     actions={!!selectedId && <DetailsActions
+      focusOnMount
       pkmIds={[ selectedId ]}
       saveId={selectedSaveId ?? null}
     />}
+    onExpand={toggleExpanded}
     onClose={unselect}
   />;
 });

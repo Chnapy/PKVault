@@ -47,6 +47,7 @@ export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel
                 }}
                 renderOption={item => <OptionComponent
                     {...item}
+                    // TODO maybe can be removed now
                     focusOnMount={rest.data!.indexOf(item.option.value) === 0}
                     back={optionBack}
                 >

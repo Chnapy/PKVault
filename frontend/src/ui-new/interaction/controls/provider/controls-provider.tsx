@@ -100,6 +100,7 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     .find(c => !c.triggers.gamepad?.allowPressedSuite);
                 if (!controlBasic)
                     return;
+                // return console.log('BAR', controls, getState().controls.values());
 
                 const triggerBasicPress = controlBasic.triggers.gamepad?.allowOnFocus
                     ? e.detail.trigger === 'down'
@@ -118,6 +119,8 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
                 if (triggerClick) {
                     controlBasic.ref?.current.click();
+                    if (controlBasic.ref?.current instanceof HTMLElement)
+                        controlBasic.ref.current.focus();
                 } else {
                     controlBasic.action?.(e as never, getState().currentType, e.detail.button);
                 }
