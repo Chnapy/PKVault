@@ -23,6 +23,7 @@ export const Primary: Story = {
             box: '1',
         },
         slot: 1,
+        globalOrder: 0,
     },
     decorators: Story => <UISpriteSizeWrapper
         component='div'

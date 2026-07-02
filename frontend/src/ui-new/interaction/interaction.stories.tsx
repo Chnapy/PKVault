@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import React, { type HTMLAttributes } from 'react';
 import type { PopoverTargetChildProps } from '../popover/target-open-popover';
 import { getControlIcon } from './controls/icons/get-control-icon';
+import { WithControlsIcons } from './controls/icons/with-controls-icons';
 import { useAllCurrentControls } from './controls/use-all-current-controls';
 import { getDragControls } from './focus-controls/common-controls/drag-controls';
 import { getSelectControl } from './focus-controls/common-controls/select-controls';
@@ -41,7 +42,7 @@ const FakePanel: React.FC<{ name: string; focusOnMount?: boolean; children: Reac
 
     const { pushScope } = Focus.usePushPopScope();
 
-    const { focusControlProps, nodeId, focused, active } = useFocusControls({
+    const { nodeId, focused, active, focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         childScopeId,
         focusOnMount,
@@ -53,21 +54,25 @@ const FakePanel: React.FC<{ name: string; focusOnMount?: boolean; children: Reac
         ],
     });
 
-    return <Card
-        title={`panel name=${name} scopeId=${childScopeId} active=${active} focusOnMount=${focusOnMount}`}
-        style={{
-            outline: focused
-                ? '2px solid red'
-                : isInScopeStack
-                    ? '2px solid #800'
-                    : undefined,
-        }}
-        {...focusControlProps}
-    >
-        <FocusScope id={childScopeId} parentNodeId={nodeId}>
-            {children}
-        </FocusScope>
-    </Card>;
+    return <WithControlsIcons placement='in' icons={controlIcons('open')}>
+        <Card
+            title={`panel name=${name} scopeId=${childScopeId} active=${active} focusOnMount=${focusOnMount}`}
+            style={{
+                flexGrow: 1,
+                outline: focused
+                    ? '2px solid red'
+                    : isInScopeStack
+                        ? '2px solid #800'
+                        : undefined,
+            }}
+            {...focusProps}
+            {...controlProps('open')}
+        >
+            <FocusScope id={childScopeId} parentNodeId={nodeId}>
+                {children}
+            </FocusScope>
+        </Card>
+    </WithControlsIcons>;
 };
 
 const FakeItem: React.FC<{
@@ -95,10 +100,11 @@ const FakeItem: React.FC<{
         name,
         container,
     );
+    const draggingMove = dragging.useDrag();
     // console.log(dragging.dragProps)
     const submitting = useDragSubmitting<ContainerValue>(container, pos, name);
 
-    const { focusControlProps, focused, active } = useFocusControls({
+    const { focusProps, controlProps, controlIcons, focused, active } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,
         onFocus: ({ node }) => {
@@ -111,7 +117,7 @@ const FakeItem: React.FC<{
                 label: 'Select',
                 action: onClick,
             }),
-            ...getDragControls({ dragging }),
+            ...getDragControls({ dragging, draggingMove }),
             openModal && getSelectControl({
                 label: 'Open modal',
                 action: () => popover?.setOpened(opened => !opened),
@@ -137,7 +143,8 @@ const FakeItem: React.FC<{
 
     const ref = useMergedRef(
         dragging.ref,
-        focusControlProps.ref,
+        focusProps.ref,
+        controlProps('open', 'drag', 'drag-attached', 'drop', 'target').ref,
         popoverProps.ref
     );
 
@@ -150,18 +157,22 @@ const FakeItem: React.FC<{
     // console.log(dragging.dragProps, focusControlProps, popoverProps);
 
     return <Group>
-        {renderBtn({
-            title: `item name=${name} active=${active}`,
-            style: {
-                fontWeight: focused ? 'bold' : 'normal',
-                outline: focused ? '2px solid red' : undefined,
-            },
-            disabled: dragging.isDragging,
-            loading: submitting,
-            ...focusControlProps,
-            ...popoverProps,
-            ref,
-        })}
+        <WithControlsIcons placement='out' icons={controlIcons('open', 'drag', 'drag-attached', 'drop', 'target')}>
+            {renderBtn({
+                title: `item name=${name} active=${active}`,
+                style: {
+                    fontWeight: focused ? 'bold' : 'normal',
+                    outline: focused ? '2px solid red' : undefined,
+                },
+                disabled: dragging.isDragging,
+                loading: submitting,
+                ...focusProps,
+                ...controlProps('open', 'drag', 'drag-attached', 'drop', 'target'),
+                ...popoverProps,
+                ref,
+            })}
+        </WithControlsIcons>
+
         <Checkbox
             disabled={dragging.isDragging || submitting}
             checked={checked}
@@ -210,7 +221,7 @@ const FakeItemWithGlobalControl: React.FC<{
 
     const [ special, setSpecial ] = React.useState(false);
 
-    const { focusControlProps, active, focused } = useFocusControls({
+    const { focusProps, controlProps, controlIcons, active, focused } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,
         controls: [
@@ -234,16 +245,25 @@ const FakeItemWithGlobalControl: React.FC<{
         controlsEnable: 'always',
     });
 
-    return <Button
-        title={`item name=${name} active=${active}`}
-        style={{
-            fontWeight: focused ? 'bold' : 'normal',
-            outline: focused ? '2px solid red' : undefined,
-        }}
-        {...focusControlProps}
-    >
-        {children ?? name}{special && ' special pressed'}
-    </Button>;
+    const ref = useMergedRef(
+        focusProps.ref,
+        controlProps('special').ref,
+    );
+
+    return <WithControlsIcons placement='out' icons={controlIcons('special')}>
+        <Button
+            title={`item name=${name} active=${active}`}
+            style={{
+                fontWeight: focused ? 'bold' : 'normal',
+                outline: focused ? '2px solid red' : undefined,
+            }}
+            {...focusProps}
+            {...controlProps('special')}
+            ref={ref}
+        >
+            {children ?? name}{special && ' special pressed'}
+        </Button>
+    </WithControlsIcons>;
 };
 
 const FakeFooter: React.FC = () => {
@@ -301,7 +321,7 @@ export const Primary: Story = {
                             <br />Focus - Controls - Move - Select
                         </div>
 
-                        <FakePanel name='header'>
+                        <FakePanel name='header' focusOnMount>
                             <Group>
                                 <FakeItem box={0} pos={1} name='1' />
                                 <FakeItem box={0} pos={2} name='2' />
@@ -359,13 +379,13 @@ export const Primary: Story = {
                                         target={<FakeItem box={3} pos={9} name='9a' openModal />}
                                         dropdown={<>
                                             <FakeItem box={3} pos={1} name='p1' />
-                                            <FakeItem box={3} pos={2} name='p2' focusOnMount />
+                                            <FakeItem box={3} pos={2} name='p2' />
 
                                             <PopoverWithControls
                                                 target={<FakeItem box={3} pos={3} name='p3' />}
                                                 dropdown={<>
                                                     <FakeItem box={3} pos={4} name='pp1' />
-                                                    <FakeItem box={3} pos={5} name='pp2' focusOnMount />
+                                                    <FakeItem box={3} pos={5} name='pp2' />
                                                     <FakeItem box={3} pos={6} name='pp3' />
                                                 </>}
                                             />

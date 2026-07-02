@@ -43,6 +43,7 @@ export const Primary: Story = {
         level: 50,
         name: 'Machamp',
         slot: 1,
+        globalOrder: 0,
         icons: <UIStorageItemIcons
             heldItem={null}
             isStarter

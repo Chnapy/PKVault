@@ -24,7 +24,7 @@ export const UIDetailsSaveTab: React.FC<UIDetailsSaveTabProps> = ({ id, label, v
             <UIGameImg version={version} size='1lh' />
         </Group>}
     >
-        <Group gap='xs'>
+        <Group gap='xs' wrap='nowrap'>
             <Text component={selected ? 'b' : undefined} td={isMain ? 'underline' : undefined}>{label}</Text>
             {!isEnabled && <AlertCircleIcon />}
             {warning && isEnabled && <AlertTriangleIcon />}

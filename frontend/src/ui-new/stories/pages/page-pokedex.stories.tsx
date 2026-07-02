@@ -48,7 +48,8 @@ export const Primary: Story = {
                     type: DataActionType.MAIN_DELETE_BANK,
                 },
             ]}
-            onSave={console.log}
+            onDelete={index => Promise.resolve(console.log(index))}
+            onSave={() => Promise.resolve(console.log('save'))}
         />}
         footer={<UIFooter />}
         children={<UIPokedexContent>

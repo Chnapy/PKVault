@@ -1,8 +1,8 @@
 import { Group } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FolderIcon } from 'lucide-react';
-import gameXImg from '../../../assets/game_icons/x.png';
-import { Gender } from '../../../data/sdk/model';
+import { GameVersion, Gender } from '../../../data/sdk/model';
+import { getGameInfos } from '../../../pokedex/details/util/get-game-infos';
 import { UIButton } from '../../form/button/ui-button';
 import { UISegmentedControl } from '../../form/select/ui-segmented-control';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
@@ -12,6 +12,7 @@ import { UIShinyIcon } from '../../icon/ui-shiny-icon';
 import { UISpeciesImg } from '../../sprite-img/species-img/ui-species-img';
 import { UIDetailsContentStats } from '../../storage/storage-details/content/stats/ui-details-content-stats';
 import { UIDetailsStatsRow, type UIDetailsStatsRowProps } from '../../storage/storage-details/content/stats/ui-details-stats-row';
+import { UIDetailsSaveTab } from '../../storage/storage-details/saves/ui-details-save-tab';
 import { UIDetailsSaves } from '../../storage/storage-details/saves/ui-details-saves';
 import spritesheet0 from "../../stories/assets/spritesheet_species_0.webp";
 import { UITypeItem } from '../../type-item/ui-type-item';
@@ -22,31 +23,41 @@ import { UIPokedexDetailsMain } from './ui-pokedex-details-main';
 const meta = {
     title: 'UI/UIPokedexDetails',
     component: UIPokedexDetails,
-    decorators: [
-        Story => <div style={{ width: 300, margin: 16 }}>
-            <Story />
-        </div>,
-    ],
 } satisfies Meta<typeof UIPokedexDetails>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
+    decorators: [
+        Story => <div style={{ width: 300, margin: 16 }}>
+            <Story />
+        </div>,
+    ],
     args: {
         header: closeBtn => <UIDetailsSaves
             value='5'
             data={[
                 // { id: '1', imgSrc: '/logo.svg', label: 'PKVault' },
-                { id: '5', imgSrc: gameXImg, label: 'G1' },
-                { id: '6', imgSrc: gameXImg, label: 'G5' },
-                { id: '2', imgSrc: gameXImg, label: 'G6' },
-                { id: '3', imgSrc: gameXImg, label: 'G7' },
-                { id: '7', imgSrc: gameXImg, label: 'G7b' },
-                { id: '4', imgSrc: gameXImg, label: 'G9a' },
+                { id: '5', imgSrc: getGameInfos(GameVersion.X).img, label: 'G1' },
+                { id: '6', imgSrc: getGameInfos(GameVersion.X).img, label: 'G5' },
+                { id: '2', imgSrc: getGameInfos(GameVersion.X).img, label: 'G6' },
+                { id: '3', imgSrc: getGameInfos(GameVersion.X).img, label: 'G7' },
+                { id: '7', imgSrc: getGameInfos(GameVersion.X).img, label: 'G7b' },
+                { id: '4', imgSrc: getGameInfos(GameVersion.X).img, label: 'G9a' },
             ]}
             onSelect={console.log}
             actions={closeBtn}
+            renderTab={({ item, i, selected }) => <UIDetailsSaveTab
+                id={item.id}
+                version={GameVersion.X}
+                color={getGameInfos(GameVersion.X).color}
+                selected={selected}
+                label={item.label}
+                isEnabled={i !== 4}
+                isMain={!i}
+                warning={i === 5}
+            />}
         />,
         main: <UIPokedexDetailsMain
             species={68}

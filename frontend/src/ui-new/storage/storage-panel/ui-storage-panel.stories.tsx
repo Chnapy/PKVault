@@ -1,4 +1,4 @@
-import { Box } from '@mantine/core';
+import { Box, Checkbox, Tabs, Text } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import gameXImg from '../../../assets/game_icons/x.png';
 import { Gender } from '../../../data/sdk/model';
@@ -12,7 +12,9 @@ import { UIStorageItemPlaceholder } from '../storage-item/placeholder/ui-storage
 import { Primary as StorageItemPlaceholder } from '../storage-item/placeholder/ui-storage-item-placeholder.stories';
 import { UIStorageItem } from '../storage-item/ui-storage-item';
 import { Primary as StorageItemPrimary } from '../storage-item/ui-storage-item.stories';
+import { UIBoxExpanded } from './box-list/ui-box-expanded';
 import { UIStoragePanelBoxList } from './box-list/ui-storage-panel-box-list';
+import { UIGameExpanded } from './game-list/ui-game-expanded';
 import { UIStoragePanelGameList } from './game-list/ui-storage-panel-game-list';
 import { UIStoragePanel } from './ui-storage-panel';
 import { UIStoragePanelFooter } from './ui-storage-panel-footer';
@@ -101,12 +103,27 @@ export const Primary: Story = {
         gameTabs: <UIStoragePanelGameList
             value='pkvault'
             data={[
-                { id: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault', ot: 'Chnapy', otGender: Gender.Male, tid: 54123, lastSync: '2026-04-28', path: 'C:/foo/bar/save.bin' },
-                { id: 'x1', imgSrc: gameXImg, label: 'Pokemon X', ot: 'Chnapy', otGender: Gender.Male, tid: 54123, lastSync: '2026-04-28', path: 'C:/foo/bar/save.bin' },
-                { id: 'x2', imgSrc: gameXImg, label: 'Pokemon X', ot: 'Chnapy', otGender: Gender.Male, tid: 54123, lastSync: '2026-04-28', path: 'C:/foo/bar/save.bin' },
-                { id: 'x3', imgSrc: gameXImg, label: 'Pokemon X', ot: 'Chnapy', otGender: Gender.Male, tid: 54123, lastSync: '2026-04-28', path: 'C:/foo/bar/save.bin' },
+                { id: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault' },
+                { id: 'x1', imgSrc: gameXImg, label: 'Pokemon X' },
+                { id: 'x2', imgSrc: gameXImg, label: 'Pokemon X' },
+                { id: 'x3', imgSrc: gameXImg, label: 'Pokemon X' },
             ]}
             onChange={console.log}
+            renderExpanded={(data, { reduce }) => data.map(({ item, selected }) =>
+                <UIGameExpanded
+                    key={item.id}
+                    {...item}
+                    selected={selected}
+                    onSelect={reduce}
+                    generation='G5'
+                    language='ENG'
+                    ot='CHNAPY'
+                    otGender={Gender.Male}
+                    ownedCount={45}
+                    path='./foo/bar.sav'
+                    playTime='12:14:20'
+                    tid={12345}
+                />)}
         />,
         header: <UIStoragePanelBoxList
             value='1'
@@ -127,6 +144,31 @@ export const Primary: Story = {
                 { id: '14', label: 'Box 14' },
             ]}
             onSelect={console.log}
+            renderTab={({ item, i, selected }, { reduce }) => <Tabs.Tab
+                key={item.id}
+                value={item.id}
+                onClick={reduce}
+                disabled={i === 5}
+                py={0}
+                style={{ gap: 4 }}
+                rightSection={selected && <Checkbox
+                    size='xs'
+                />}
+            >
+                <Text component={selected ? 'b' : undefined} textWrap='nowrap'>{item.label}</Text>
+            </Tabs.Tab>}
+            renderExpanded={(data, { reduce }) => data.map(({ item, selected }) => <UIBoxExpanded
+                key={item.id}
+                id={item.id}
+                label={item.label}
+                selected={selected}
+                onSelect={reduce}
+                slotsStates={[ true, true, false, false, false, true ]}
+                editDropdown='edit'
+                onDelete={console.log}
+            />)}
+            advancedActionSort='advancedActionSort'
+            advancedDexSync='advancedDexSync'
         />,
         children: getPanelChildren(1),
         footer: <UIStoragePanelFooter
@@ -142,9 +184,24 @@ export const EmptyData: Story = {
         gameTabs: <UIStoragePanelGameList
             value='pkvault'
             data={[
-                { id: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault', ot: 'Chnapy', otGender: Gender.Male, tid: 54123, lastSync: '2026-04-28', path: 'C:/foo/bar/save.bin' },
+                { id: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault' },
             ]}
             onChange={console.log}
+            renderExpanded={(data, { reduce }) => data.map(({ item, selected }) =>
+                <UIGameExpanded
+                    key={item.id}
+                    {...item}
+                    selected={selected}
+                    onSelect={reduce}
+                    generation='G5'
+                    language='ENG'
+                    ot='CHNAPY'
+                    otGender={Gender.Male}
+                    ownedCount={45}
+                    path='./foo/bar.sav'
+                    playTime='12:14:20'
+                    tid={12345}
+                />)}
         />,
         header: <UIStoragePanelBoxList
             value='1'
@@ -152,6 +209,31 @@ export const EmptyData: Story = {
                 { id: '1', label: 'Box 1' },
             ]}
             onSelect={console.log}
+            renderTab={({ item, i, selected }, { reduce }) => <Tabs.Tab
+                key={item.id}
+                value={item.id}
+                onClick={reduce}
+                disabled={i === 5}
+                py={0}
+                style={{ gap: 4 }}
+                rightSection={selected && <Checkbox
+                    size='xs'
+                />}
+            >
+                <Text component={selected ? 'b' : undefined} textWrap='nowrap'>{item.label}</Text>
+            </Tabs.Tab>}
+            renderExpanded={(data, { reduce }) => data.map(({ item, selected }) => <UIBoxExpanded
+                key={item.id}
+                id={item.id}
+                label={item.label}
+                selected={selected}
+                onSelect={reduce}
+                slotsStates={[ true, true, false, false, false, true ]}
+                editDropdown='edit'
+                onDelete={console.log}
+            />)}
+            advancedActionSort='advancedActionSort'
+            advancedDexSync='advancedDexSync'
         />,
         children: null,
         footer: <UIStoragePanelFooter
