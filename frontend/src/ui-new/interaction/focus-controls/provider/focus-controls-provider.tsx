@@ -11,7 +11,10 @@ export const FocusControlsProvider: React.FC<{ children: React.ReactNode }> = ({
         const focusIfNone = () => {
             if (!getCurrentFocusKey()) {
                 const focusableEl = document.querySelector<HTMLElement>('[data-focus-key]');
-                setFocus(focusableEl!.dataset.focusKey!);
+                if (focusableEl?.dataset.focusKey)
+                    setFocus(focusableEl.dataset.focusKey);
+                else
+                    console.warn('focusable element not found', focusableEl)
             }
         };
 

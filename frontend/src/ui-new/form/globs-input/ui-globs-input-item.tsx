@@ -1,6 +1,7 @@
 import { Accordion, ActionIcon, Box, Group, TextInput, type DefaultMantineColor, type StyleProp } from '@mantine/core';
-import { FileMinusIcon, FilePlusIcon, FolderIcon, FolderMinusIcon, FolderPlusIcon, MinusIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { AlertTriangleIcon, FileMinusIcon, FilePlusIcon, FolderIcon, FolderMinusIcon, FolderPlusIcon, MinusIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
+import { useTranslate } from '../../../translate/i18n';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
@@ -23,6 +24,8 @@ export type UIGlobsInputItemProps = {
 export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
     name, value, onEdit, onRemove, results, disabled, isDesktop, isLoading, hasWarning, hasError, openFolder
 }) => {
+    const { t } = useTranslate();
+
     const isGlob = value.includes('*');
     const isDirectory = isGlob || value.endsWith('/');
     const isExclude = value.startsWith('!');
@@ -72,10 +75,9 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
     });
 
     return <Accordion.Item
-        value={value}
+        value={name}
         {...focusProps}
     >
-
         <Group wrap='nowrap' gap='sm'>
             <Accordion.Control>
                 <Group align='center' pr='md'>
@@ -85,12 +87,13 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
 
                     <div style={{ flexGrow: 1, lineBreak: 'anywhere' }}>
                         {renderTextInput
-                            ? <WithControlsIcons placement='out' icons={controlIcons('open')}>
+                            ? <WithControlsIcons placement='out' icons={controlIcons('open')} w='100%'>
                                 <TextInput
                                     ref={textInputRef}
                                     value={value}
                                     onChange={({ currentTarget }) => onEdit(currentTarget.value)}
                                     size='xs'
+                                    style={{ flexGrow: 1 }}
                                     {...controlProps('open')}
                                 />
                             </WithControlsIcons>
@@ -100,12 +103,12 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
                     {!isExclude && <Group
                         color={hasError ? 'red' : undefined}
                     >
-                        {/* {hasWarning && <Icon name='exclamation-triangle' solid forButton />} */}
+                        {hasWarning && <AlertTriangleIcon />}
                         {isLoading
                             ? '...'
                             : hasError
                                 ? 'error'
-                                : `${results.length} files found`}
+                                : t('settings.form.saves.test.title', { count: results.length })}
                     </Group>}
                 </Group>
             </Accordion.Control>

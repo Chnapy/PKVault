@@ -1,20 +1,37 @@
 import { css } from '@emotion/css';
 import { Accordion, Group } from '@mantine/core';
-import { ListIcon } from 'lucide-react';
+import { AlertCircleIcon, ListIcon } from 'lucide-react';
 import React from 'react';
+import { useTranslate } from '../../../translate/i18n';
+import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
+import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
+import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 import { UIPathLine } from '../../path/ui-path-line';
 
 export type UIGlobsInputResultsProps = {
+    name: string;
     data: string[];
     showFiles: boolean;
     isLoading?: boolean;
     hasError?: boolean;
 };
 
-export const UIGlobsInputResults: React.FC<UIGlobsInputResultsProps> = ({ data, showFiles, isLoading, hasError }) => {
+export const UIGlobsInputResults: React.FC<UIGlobsInputResultsProps> = ({ name, data, showFiles, isLoading, hasError }) => {
+    const { t } = useTranslate();
 
-    return <Accordion.Item value='results'>
-        <Accordion.Control>
+    const { focusProps, controlProps, controlIcons } = useFocusControls({
+        scopeNodeId: name,
+        controls: [
+            data.length > 0 && getSelectControl({
+                main: false,
+                label: 'Select',
+            }),
+        ],
+    });
+
+    return <Accordion.Item {...focusProps} value='results'>
+        <WithControlsIcons placement='out' icons={controlIcons('open')}
+            as={Accordion.Control} {...controlProps('open')}>
             <Group wrap='nowrap' pr='md'>
                 <ListIcon />
 
@@ -27,15 +44,15 @@ export const UIGlobsInputResults: React.FC<UIGlobsInputResultsProps> = ({ data, 
                     wrap='nowrap'
                     ml='auto'
                 >
-                    {/* {hasError && <Icon name='exclamation-triangle' solid forButton />} */}
+                    {hasError && <AlertCircleIcon />}
                     {isLoading
                         ? '...'
                         : hasError
                             ? 'error'
-                            : `${data.length} files found`}
+                            : t('settings.form.saves.test.title', { count: data.length })}
                 </Group>
             </Group>
-        </Accordion.Control>
+        </WithControlsIcons>
 
         {showFiles && data.length > 0 && <Accordion.Panel>
             <pre style={{

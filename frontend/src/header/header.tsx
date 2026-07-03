@@ -6,6 +6,7 @@ import { useSaveInfosScan } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import type { DocsGenEnSlugs } from '../help/hooks/use-help-navigate';
 import { NotificationButton } from '../notification/notification-button';
+import { SettingsSubMenu } from '../settings/settings-sub-menu';
 import { BankList } from '../storage/bank/bank-list';
 import { useTranslate } from '../translate/i18n';
 import { UIButton } from '../ui-new/form/button/ui-button';
@@ -98,7 +99,7 @@ export const Header: React.FC = () => {
             'storage': () => <BankList />,
             'pokedex': () => null,
             'saves': () => null,
-            'settings': () => null,
+            'settings': () => <SettingsSubMenu />,
             '': () => null,
         })()}
     />;

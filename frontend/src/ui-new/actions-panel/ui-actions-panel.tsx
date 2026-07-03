@@ -101,7 +101,7 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
                 style={{ flexGrow: 1 }}
             >
                 <OverflowList
-                    data={data}
+                    data={[ ...data ].reverse()}
                     {...focusProps}
                     {...controlProps('open')}
                     display='flex'
@@ -110,7 +110,6 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
                     bdrs='xl'
                     style={{
                         flexGrow: 1,
-                        flexDirection: 'row-reverse',
                         alignItems: 'center',
                         cursor: 'pointer',
                     }}
@@ -142,6 +141,7 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
             pr='lg'
             leftSection={<SaveIcon />}
             onClick={onSaveAndClose}
+            disabled={!hasActions}
         >
             {t('action.save')}
         </UIButton>

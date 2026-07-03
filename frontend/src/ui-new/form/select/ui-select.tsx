@@ -19,7 +19,7 @@ export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ..
         scopeNodeId: name,
         // focusOnMount: true,
         controls: [
-            {
+            !rest.disabled && {
                 name: 'change',
                 main: true,
                 label: controlLabel,
@@ -47,6 +47,10 @@ export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ..
                             break;
                     }
                     options.selectedIndex = nextIndex;
+                    rest.onChange?.({
+                        currentTarget: focusProps.ref.current,
+                        target: focusProps.ref.current,
+                    } as never);
                 },
             },
         ],
@@ -62,10 +66,10 @@ export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ..
         data={data}
         {...focusProps}
         {...controlProps('change')}
-        leftSection={isGamepad
+        leftSection={isGamepad && !rest.disabled
             ? focused && getControlIcon('gamepad', [ 'LB' ]) || <span />
             : undefined}
-        rightSection={isGamepad
+        rightSection={isGamepad && !rest.disabled
             ? focused && getControlIcon('gamepad', [ 'RB' ]) || <span />
             : undefined}
         styles={{

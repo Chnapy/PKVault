@@ -14,9 +14,7 @@ type UIStorageContentProps = {
 
 export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, right }) => {
 
-    const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('storage-content', {
-        focusOnMount: true,
-    });
+    const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('storage-content');
 
     return (
         <WithControlsIcons placement='out' icons={controlIcons('open')}

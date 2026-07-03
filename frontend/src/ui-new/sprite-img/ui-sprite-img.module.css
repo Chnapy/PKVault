@@ -26,6 +26,7 @@ in px:
     overflow: hidden;
     width: var(--sprite-size-rem);
     height: var(--sprite-size-rem);
+    pointer-events: none;
 }
 
 .ui-sprite-img img {

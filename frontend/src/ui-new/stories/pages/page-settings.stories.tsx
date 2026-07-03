@@ -8,6 +8,7 @@ import { UIGlobsInputList } from '../../form/globs-input/ui-globs-input-list';
 import { UIGlobsInputResults } from '../../form/globs-input/ui-globs-input-results';
 import { UISelect } from '../../form/select/ui-select';
 import { UISwitch } from '../../form/switch/ui-switch';
+import { UITextInput } from '../../form/text-input/ui-text-input';
 import { UIInputLabel } from '../../form/ui-input-label';
 import { UIBallIcon } from '../../icon/ui-ball-icon';
 import { UIAppLayout } from '../../layout/app-layout/ui-app-layout';
@@ -112,6 +113,7 @@ export const Primary: Story = {
                         onAdd={async (...params) => console.log(...params)}
                         isDesktop//={false}
                         results={<UIGlobsInputResults
+                            name='results'
                             data={generatePaths('c:/abc/def/', 100)}
                             showFiles
                         />}
@@ -234,14 +236,53 @@ export const Backups: Story = {
             >
                 {new Array(15).fill(0).map((_, i) => <UIBackupItem
                     key={i}
+                    order={i}
                     createdAt={`2026-05-25T14:35:${i < 10 ? 0 : ''}${i}.496+00:00`}
                     filename={`backup_before_save_bkp_2026-04-25T1259${i < 10 ? 0 : ''}${i}-832Z.zip`}
                     path={`C:/foo/bar/backups/backup_before_save_bkp_2026-04-25T1259${i < 10 ? 0 : ''}${i}-832Z.zip`}
                     onRestore={() => console.log('restore', i)}
                     onDelete={() => console.log('delete', i)}
-                />)}
+                >
+                    <UITextInput
+                        name={`2026-05-25T14:35:${i < 10 ? 0 : ''}${i}.496+00:00-input`}
+                        value={'backup_before_save'}
+                        onChange={console.log}
+                        // maw={200}
+                        styles={{
+                            input: {
+                                height: 'auto',
+                                minHeight: 0,
+                                lineHeight: 'inherit',
+                            },
+                        }}
+                        onSubmit={console.log}
+                        onCancel={console.log}
+                    />
+                </UIBackupItem>)}
             </UIBackupList>}
-            bottom={null}
+            bottom={<Center>
+                <Card>
+                    <Group wrap='nowrap'>
+                        <Button
+                            size='compact-md'
+                        >
+                            Cancel
+                        </Button>
+
+                        <Button
+                            variant='filled'
+                            color='primary'
+                            size='compact-md'
+                            pl='md'
+                            pr='lg'
+                            // disabled={}
+                            leftSection={<SaveIcon />}
+                        >
+                            Save
+                        </Button>
+                    </Group>
+                </Card>
+            </Center>}
         />}
     />,
 };

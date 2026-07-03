@@ -4,24 +4,22 @@ import { WithControlsIcons } from '../interaction/controls/icons/with-controls-i
 import { FocusScope } from '../interaction/focus/scope/focus-scope';
 import { usePanelControls } from '../layout/hooks/use-panel-controls';
 
-type UISettingsContentProps = {
+type UISettingsContentProps = Pick<React.DOMAttributes<HTMLFormElement>, 'onSubmit'> & {
     left: React.ReactNode;
     right: React.ReactNode;
     bottom: React.ReactNode;
 };
 
-export const UISettingsContent: React.FC<UISettingsContentProps> = ({ left, right, bottom }) => {
+export const UISettingsContent: React.FC<UISettingsContentProps> = ({ left, right, bottom, onSubmit }) => {
 
-    const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('storage-content', {
-        focusOnMount: true,
-    });
+    const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('settings-content');
 
     return <FocusScope id={childScopeId} parentNodeId={nodeId}>
         <WithControlsIcons placement='out' icons={controlIcons('open')}
+            as='form' onSubmit={onSubmit as never}
             display='flex'
             mah='100%'
-            bdrs='md'
-            style={{ flexGrow: 1, flexDirection: 'column', flexWrap: 'nowrap', }}
+            style={{ flexGrow: 1, flexDirection: 'column', flexWrap: 'nowrap', borderRadius: 'var(--mantine-radius-md)' }}
             {...panelProps}
         >
             <Grid

@@ -9,11 +9,14 @@ import { Focus } from '../../interaction/focus/provider/use-focus-context';
 
 export type UITextInputProps = TextInput.Props & Pick<UseFocusControlsParams, 'focusOnMount'> & {
     name: string;
-    onSubmit?: () => void;
-    onCancel?: () => void;
+    onSubmit?: () => unknown;
+    onCancel?: () => unknown;
+    submitDisabled?: boolean;
+    submitLoading?: boolean;
+    cancelDisabled?: boolean;
 };
 
-export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCancel, focusOnMount, ...rest }) => {
+export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCancel, submitDisabled, submitLoading, cancelDisabled, focusOnMount, ...rest }) => {
 
     const { popScope } = Focus.usePushPopScope();
 
@@ -24,7 +27,7 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
             getSelectControl({
                 label: 'Focus',
             }),
-            onSubmit && {
+            onSubmit && !submitDisabled && {
                 name: 'submit' as const,
                 label: 'Submit',
                 triggers: {
@@ -35,11 +38,13 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
                 },
                 spread: false,
                 action: () => {
-                    onSubmit();
+                    const result = onSubmit();
+                    if (result instanceof Promise)
+                        return result.then(popScope);
                     popScope();
                 },
             },
-            onCancel && {
+            onCancel && !cancelDisabled && {
                 name: 'cancel' as const,
                 label: 'Cancel',
                 triggers: {
@@ -50,7 +55,9 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
                 },
                 spread: false,
                 action: () => {
-                    onCancel();
+                    const result = onCancel();
+                    if (result instanceof Promise)
+                        return result.then(popScope);
                     popScope();
                 },
             },
@@ -62,24 +69,20 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
         rest.ref,
     );
 
-    return <WithControlsIcons placement='out' icons={controlIcons('open')}>
+    return <WithControlsIcons placement='out' icons={controlIcons('open', 'cancel', 'submit')}>
         <TextInput
             // label='Label'
             // description='Description'
             name={name}
             rightSectionWidth='auto'
             rightSection={(onCancel || onSubmit) && <Group gap='xs' wrap='nowrap'>
-                {onCancel && <WithControlsIcons placement='out' icons={controlIcons('cancel')}>
-                    <ActionIcon size='sm' variant='subtle' {...controlProps('cancel')}>
-                        <XIcon />
-                    </ActionIcon>
-                </WithControlsIcons>}
+                {onCancel && <ActionIcon size='sm' variant='subtle' {...controlProps('cancel')}>
+                    <XIcon />
+                </ActionIcon>}
 
-                {onSubmit && <WithControlsIcons placement='out' icons={controlIcons('submit')}>
-                    <ActionIcon size='sm' variant='subtle' color='blue' {...controlProps('submit')}>
-                        <SendIcon />
-                    </ActionIcon>
-                </WithControlsIcons>}
+                {onSubmit && <ActionIcon size='sm' variant='subtle' color='blue' loading={submitLoading} {...controlProps('submit')}>
+                    <SendIcon />
+                </ActionIcon>}
             </Group>}
             {...focusProps}
             {...controlProps('open')}

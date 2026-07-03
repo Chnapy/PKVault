@@ -1,15 +1,15 @@
-import { Button } from '@mantine/core';
 import { FilePlusIcon, FolderPlusIcon, MinusCircleIcon } from 'lucide-react';
 import React from 'react';
+import { UIButton, type UIButtonProps } from '../button/ui-button';
 
-export type UIGlobsInputAddProps = {
-    label: React.ReactNode;
+export type UIGlobsInputAddProps = Pick<UIButtonProps, 'name'> & {
+    label: string;
     type: 'file' | 'folder' | 'exclude';
-    onAdd: (paths: string[]) => Promise<void>;
+    onAdd: (paths: string[]) => void;
     disabled?: boolean;
 };
 
-export const UIGlobsInputAdd: React.FC<UIGlobsInputAddProps> = ({ label, type, onAdd, disabled }) => {
+export const UIGlobsInputAdd: React.FC<UIGlobsInputAddProps> = ({ name, label, type, onAdd, disabled }) => {
     const getTypeInfos = () => {
         if (type === 'file')
             return {
@@ -40,11 +40,11 @@ export const UIGlobsInputAdd: React.FC<UIGlobsInputAddProps> = ({ label, type, o
 
     const typeInfos = getTypeInfos();
 
-    const onAddFn = async () => {
-        await onAdd([ typeInfos.placeholder ]);
-    };
+    const onAddFn = () => onAdd([ typeInfos.placeholder ]);
 
-    return <Button
+    return <UIButton
+        name={name}
+        controlLabel={label}
         variant='filled'
         color={type === 'exclude' ? 'red' : 'blue'}
         onClick={onAddFn}
@@ -60,5 +60,5 @@ export const UIGlobsInputAdd: React.FC<UIGlobsInputAddProps> = ({ label, type, o
         }
     >
         {label}
-    </Button>;
+    </UIButton>;
 };

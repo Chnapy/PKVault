@@ -1,4 +1,5 @@
 import { Switch } from '@mantine/core';
+import { useMergedRef } from '@mantine/hooks';
 import type React from 'react';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
@@ -17,19 +18,23 @@ export const UISwitch: React.FC<UISwitchProps> = ({ name, controlLabel, ...rest 
         controls: [
             getSelectControl({
                 label: controlLabel,
-                action: () => {
-                    focusProps.ref.current.click();
-                },
             }),
         ],
     });
 
+    const ref = useMergedRef(
+        focusProps.ref,
+        rest.ref,
+    );
+
     return <WithControlsIcons placement='out' icons={controlIcons('open')} display='inline-flex' h='fit-content'>
         <Switch
             id={name}
+            name={name}
             {...focusProps}
             {...controlProps('open')}
             {...rest}
+            ref={ref}
         />
     </WithControlsIcons>;
 };

@@ -7,7 +7,7 @@ type UIInputLabelProps = {
 } & InputWrapperProps;
 
 export const UIInputLabel: React.FC<UIInputLabelProps> = ({ forInput, leftSection, ...rest }) => {
-    return <Group>
+    return <Group wrap='nowrap'>
         {leftSection}
 
         <InputWrapper

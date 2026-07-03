@@ -1,6 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
+import { fallback, zodValidator } from "@tanstack/zod-adapter";
+import z from "zod";
 import { SettingsPage } from '../pages/settings';
+
+export type StorageSearchSchema = z.infer<typeof searchSchema>;
+
+export type SettingsSubMenuValue = 'main' | 'external-pkms' | 'backups';
+
+const searchSchema = z.object({
+  subMenu: z.enum([ 'main', 'external-pkms', 'backups' ] as const satisfies SettingsSubMenuValue[]).optional(),
+});
 
 export const Route = createFileRoute("/settings")({
   component: SettingsPage,
+  validateSearch: zodValidator(fallback(searchSchema, {})),
+  search: {
+    middlewares: [ retainSearchParams(true) ],
+  }
 });
