@@ -1,7 +1,7 @@
 import React from "react";
 import { Route } from "../../../routes/pokedex";
-import { FilterInput } from "../../../ui/filter/filter-input/filter-input";
 import { useTranslate } from '../../../translate/i18n';
+import { UIAutocomplete } from '../../../ui-new/form/select/ui-autocomplete';
 
 export const FilterSpecies: React.FC = () => {
   const { t } = useTranslate();
@@ -14,27 +14,32 @@ export const FilterSpecies: React.FC = () => {
 
   const [ value, setValue ] = React.useState(searchValue);
 
-  return (
-    <FilterInput
-      value={value}
-      onChange={(e) => {
-        setValue(e.target.value);
+  return <UIAutocomplete
+    name='filter-species'
+    label={t('dex.filters.name')}
+    value={value}
+    onChange={(value) => {
+      setValue(value);
 
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
 
-        timeoutRef.current = setTimeout(() => {
-          navigate({
-            search: {
-              filterSpeciesName: e.target.value,
-            },
-          });
-        }, 500);
-      }}
-      enabled={value.length > 0}
-    >
-      {t('dex.filters.name')}
-    </FilterInput>
-  );
+      timeoutRef.current = setTimeout(() => {
+        navigate({
+          search: {
+            filterSpeciesName: value,
+          },
+        });
+      }, 500);
+    }}
+    // size='xs'
+    data={[ 'foo', 'bar' ]}
+    limit={5}
+    selectFirstOptionOnChange
+    comboboxProps={{
+      position: 'right-start'
+    }}
+    w='100%'
+  />;
 };

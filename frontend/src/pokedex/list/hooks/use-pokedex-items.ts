@@ -28,6 +28,7 @@ type Counts = {
 
 type SpeciesInfos = {
     species: number;
+    speciesName: string;
     itemsToRender: SpeciesFormItem[];
     isSeen: boolean;
 };
@@ -85,6 +86,8 @@ export const usePokedexItems = (): PokedexItems => {
         const generation = staticData.species[ species ]?.generation ?? -1;
 
         const staticForms = staticData.species[ species ]?.forms ?? {};
+
+        const speciesName = Object.values(staticForms)[ 0 ]?.[ 0 ]?.name ?? '';
 
         const allForms = dexItems.flatMap(value => value.forms);
 
@@ -238,6 +241,7 @@ export const usePokedexItems = (): PokedexItems => {
                 ...acc[ generation ]?.speciesInfos ?? [],
                 {
                     species,
+                    speciesName,
                     itemsToRender,
                     isSeen,
                 },

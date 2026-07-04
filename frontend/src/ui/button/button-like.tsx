@@ -2,7 +2,6 @@ import { css, cx } from "@emotion/css";
 import React from "react";
 import { Container, type ContainerProps, type ReactTag } from "../container/container";
 import { Icon } from '../icon/icon';
-import { createLink } from '@tanstack/react-router';
 
 export type ButtonLikeProps<
   AS extends ReactTag = ReactTag,
@@ -94,6 +93,3 @@ export function ButtonLike<
     </Container>
   );
 }
-
-export const ButtonLikeExternalLink: typeof ButtonLike<'a'> = props => <ButtonLike<'a'> {...props} as='a' />;
-export const ButtonLikeLink = createLink(ButtonLikeExternalLink);

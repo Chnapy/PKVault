@@ -10,7 +10,7 @@ import { useTranslate } from "../../translate/i18n";
 import { UIMultiSelect } from '../../ui-new/form/select/ui-multi-select';
 import { usePopover } from '../../ui-new/interaction/focus-controls/components/popover/hooks/use-popover';
 import { UIFormCard } from '../../ui-new/popover/popover-card/ui-form-card';
-import { GameImg } from '../../ui/img/game-img';
+import { UIGameImg } from '../../ui-new/sprite-img/ui-game-img';
 
 export const DexSyncAdvancedAction: React.FC<{
   saveId: number;
@@ -77,9 +77,9 @@ export const DexSyncAdvancedAction: React.FC<{
       ]}
       // renderPill={({ option, onRemove }) => }
       renderOption={({ option, checked = false }) => option && <Group>
-        <GameImg
+        <UIGameImg
           version={option.value === '0' ? null : saveInfos[ +option.value ]!.version}
-          size={14}
+          size='1lh'
         />
         {option.label}
       </Group>}

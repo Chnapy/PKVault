@@ -5,7 +5,7 @@ import type { PopoverContext } from '../../ui-new/interaction/focus-controls/com
 import { useMoveContext } from '../../ui-new/interaction/move/context/use-move-context';
 import { useSelectContextNullable } from '../../ui-new/interaction/select/context/use-select-context';
 import { UIStoragePanelWrapperDetails } from '../../ui-new/storage/storage-panel/ui-storage-panel-wrapper-details';
-import { useSelectExpanded } from '../details/hooks/use-select-expanded';
+import { useStorageSelectExpanded } from '../details/hooks/use-storage-select-expanded';
 import { MultiSelectActions } from '../details/multi-select-actions';
 import { StorageDetails } from '../details/storage-details';
 import type { MoveContainerValue } from '../move/move-container-fns';
@@ -56,7 +56,7 @@ export const StoragePanelWrapperDetails: React.FC = () => {
 
     const navigate = Route.useNavigate();
 
-    const { expanded } = useSelectExpanded();
+    const { expanded } = useStorageSelectExpanded();
 
     const stateRef = React.useRef({ opened });
 

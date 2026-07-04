@@ -2,7 +2,7 @@ import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import z from "zod";
 import { PokedexPage } from '../pages/pokedex';
-import { type DetailsExpandedState } from '../ui/details-card/details-card-container';
+import type { DetailsExpandedState } from './storage';
 
 const searchSchema = z.object({
   selected: z.number().optional(),

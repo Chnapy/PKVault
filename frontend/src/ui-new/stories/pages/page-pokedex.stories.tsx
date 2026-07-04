@@ -65,11 +65,12 @@ export const Primary: Story = {
                     />}
                 >
                     <Stack h='100%' style={{ flexGrow: 1 }}>
-                        <UIPokedexMain mah='100%' style={{ flexGrow: 1 }}>
+                        <UIPokedexMain mah='100%'>
                             <Card.Section inheritPadding withBorder>
                                 <UIPokedexMainSectionHeader
                                     generation='Generation 1'
                                     regions={[ 'Kanto' ]}
+                                    games={null}
                                     seenCount={151}
                                     caughtCount={142}
                                     ownedCount={96}
@@ -91,6 +92,29 @@ export const Primary: Story = {
                                 <UIPokedexMainSectionHeader
                                     generation='Generation 2'
                                     regions={[ 'Johto' ]}
+                                    games={null}
+                                    seenCount={151}
+                                    caughtCount={142}
+                                    ownedCount={96}
+                                    shinyCount={2}
+                                    totalCount={151}
+                                />
+                            </Card.Section>
+                            <Card.Section inheritPadding withBorder>
+                                <UIPokedexMainSection>
+                                    {new Array(30).fill(0).map((_, i) => <UIPokedexItem
+                                        key={i}
+                                        {...UIPokedexItemStory.args}
+                                        id={`item-${40 + i}`}
+                                    />)}
+                                </UIPokedexMainSection>
+                            </Card.Section>
+
+                            <Card.Section inheritPadding withBorder>
+                                <UIPokedexMainSectionHeader
+                                    generation='Generation 2'
+                                    regions={[ 'Johto' ]}
+                                    games={null}
                                     seenCount={151}
                                     caughtCount={142}
                                     ownedCount={96}

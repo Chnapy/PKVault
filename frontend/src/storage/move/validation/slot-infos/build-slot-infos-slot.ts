@@ -146,7 +146,7 @@ export const buildSlotInfosSlot = (
     }
 };
 
-export const getMoveDirection = (sourceSaveId: number | null | undefined, targetSaveId: number | null | undefined): MoveDirectionSlot => {
+const getMoveDirection = (sourceSaveId: number | null | undefined, targetSaveId: number | null | undefined): MoveDirectionSlot => {
     const fromSave = !!sourceSaveId;
     const toSave = !!targetSaveId;
 

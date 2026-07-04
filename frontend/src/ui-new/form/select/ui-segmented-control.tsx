@@ -1,23 +1,30 @@
-import { Box, Group, SegmentedControl } from '@mantine/core';
+import { Group, SegmentedControl } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
-import type React from 'react';
+import React from 'react';
 import type { GamepadMappingsAllButton } from '../../interaction/controls/gamepad/gamepad-mapper';
+import { getControlIcon } from '../../interaction/controls/icons/get-control-icon';
 import { useControlsCurrentType } from '../../interaction/controls/use-controls-current-type';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 
-export type UISegmentedControlProps = SegmentedControl.Props & {
+export type UISegmentedControlProps<V extends string = string> = SegmentedControl.Props<V> & {
     name: string;
     controlLabel: string;
     focusOnMount?: boolean;
+    wrap?: boolean;
+    gamepadControls?: [ GamepadMappingsAllButton, GamepadMappingsAllButton ];
 };
 
 const isOptionDisabled = (opt: SegmentedControl.Props[ 'data' ][ number ] | undefined) => typeof opt === 'object' && !!opt.disabled;
 
-export const UISegmentedControl: React.FC<UISegmentedControlProps> = ({ name, controlLabel, focusOnMount, className, style, ...rest }) => {
+export const UISegmentedControl = function <V extends string = string>({ name, controlLabel, focusOnMount, wrap, gamepadControls, className, style, ...rest }: UISegmentedControlProps<V>) {
+
+    const tabsRef = React.useRef<HTMLDivElement>(null);
 
     const isGamepad = useControlsCurrentType() === 'gamepad';
 
-    const { focusProps, controlProps, controlIcons } = useFocusControls({
+    gamepadControls ??= [ 'LB', 'RB' ];
+
+    const { focusProps, controlProps, focused } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,
         controls: [
@@ -28,7 +35,7 @@ export const UISegmentedControl: React.FC<UISegmentedControlProps> = ({ name, co
                 triggers: {
                     gamepad: {
                         type: 'gamepad',
-                        values: [ 'LB', 'RB' ],
+                        values: gamepadControls,
                     }
                 },
                 spread: false,
@@ -39,17 +46,17 @@ export const UISegmentedControl: React.FC<UISegmentedControlProps> = ({ name, co
 
                     const selectedIndex = options
                         .map(opt => typeof opt === 'object' ? opt.value : opt)
-                        .indexOf(rest.value ?? '');
+                        .indexOf(rest.value ?? '' as V);
                     let nextIndex = selectedIndex;
                     switch (value as GamepadMappingsAllButton) {
-                        case 'LB':
+                        case gamepadControls[ 0 ]:
                             do {
                                 nextIndex = nextIndex - 1;
                                 // if (nextIndex < 0)
                                 //     nextIndex = options.length - 1;
                             } while (isOptionDisabled(options[ nextIndex ]));
                             break;
-                        case 'RB':
+                        case gamepadControls[ 1 ]:
                             do {
                                 nextIndex = nextIndex + 1;
                                 // if (nextIndex > options.length - 1)
@@ -69,7 +76,18 @@ export const UISegmentedControl: React.FC<UISegmentedControlProps> = ({ name, co
         ],
     });
 
+    React.useEffect(() => {
+        const selectedTab = tabsRef.current?.querySelector<HTMLDivElement>('div[data-active="true"]');
+
+        selectedTab?.scrollIntoView({
+            behavior: 'instant',
+            block: 'center',
+            inline: 'center',
+        });
+    }, [ rest.value ]);
+
     const ref = useMergedRef(
+        tabsRef,
         focusProps.ref,
         rest.ref,
     );
@@ -81,8 +99,9 @@ export const UISegmentedControl: React.FC<UISegmentedControlProps> = ({ name, co
         wrap='nowrap'
         align='center'
     >
-        {controlIcons('change')[ 0 ]
-            ?? (isGamepad && <Box w='1lh' />)}
+        {isGamepad && !rest.disabled
+            ? focused && getControlIcon('gamepad', [ gamepadControls[ 0 ] ]) || <span />
+            : undefined}
         <SegmentedControl
             {...focusProps}
             {...controlProps('change')}
@@ -92,7 +111,12 @@ export const UISegmentedControl: React.FC<UISegmentedControlProps> = ({ name, co
                 controlProps('change').onChange?.(value as never);
                 rest.onChange?.(value);
             }}
-            style={{ flexGrow: 1 }}
+            style={{
+                flexGrow: 1,
+                flexWrap: wrap ? 'wrap' : undefined,
+                maxHeight: 90,
+                overflow: 'auto',
+            }}
             styles={{
                 label: {
                     height: '100%',
@@ -105,7 +129,8 @@ export const UISegmentedControl: React.FC<UISegmentedControlProps> = ({ name, co
                 },
             }}
         />
-        {controlIcons('change')[ 1 ]
-            ?? (isGamepad && <Box w='1lh' />)}
+        {isGamepad && !rest.disabled
+            ? focused && getControlIcon('gamepad', [ gamepadControls[ 1 ] ]) || <span />
+            : undefined}
     </Group>;
 };

@@ -7,6 +7,7 @@ import { UIShinyIcon } from '../../../icon/ui-shiny-icon';
 type UIPokedexMainSectionHeaderProps = {
     generation: string;
     regions: string[];
+    games: React.ReactNode;
     seenCount: number;
     caughtCount: number;
     ownedCount: number;
@@ -15,12 +16,14 @@ type UIPokedexMainSectionHeaderProps = {
 };
 
 export const UIPokedexMainSectionHeader: React.FC<UIPokedexMainSectionHeaderProps> = ({
-    generation, regions, seenCount, caughtCount, ownedCount, shinyCount, totalCount
+    generation, regions, games, seenCount, caughtCount, ownedCount, shinyCount, totalCount
 }) => {
     return <Group justify='space-between' py='sm'>
         <Group>
             {generation}
             {regions.map(region => <Badge key={region} variant='default'>{region}</Badge>)}
+            <Divider orientation='vertical' />
+            {games}
         </Group>
 
         <Group>

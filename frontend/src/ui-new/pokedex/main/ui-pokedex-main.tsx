@@ -30,16 +30,15 @@ export const UIPokedexMain: React.FC<UIPokedexMainProps> = ({ children, ...rest 
     });
 
     return <FocusScope id={name} parentNodeId={nodeId}>
-        <WithControlsIcons
-            placement='out' icons={controlIcons('open')}
-            {...focusProps}
-            {...controlProps('open')}
+        <WithControlsIcons placement='out' icons={controlIcons('open')}
             {...rest}
         >
             <Card mah='100%' style={{
                 flexGrow: 1,
                 overflow: 'auto',
-            }}>
+            }}
+                {...focusProps}
+                {...controlProps('open')}>
                 {children}
             </Card>
         </WithControlsIcons>

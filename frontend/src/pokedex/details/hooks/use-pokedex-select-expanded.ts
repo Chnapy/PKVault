@@ -1,8 +1,8 @@
 import React from 'react';
-import { Route } from '../../../routes/storage';
+import { Route } from '../../../routes/pokedex';
 import { useControlsCurrentType } from '../../../ui-new/interaction/controls/use-controls-current-type';
 
-export const useSelectExpanded = () => {
+export const usePokedexSelectExpanded = () => {
     const controlsGamepad = useControlsCurrentType() === 'gamepad';
 
     const navigate = Route.useNavigate();

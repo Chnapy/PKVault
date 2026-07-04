@@ -26,7 +26,7 @@ import { MoveItem } from '../../ui/move-item/move-item';
 import { Ribbon } from '../../ui/ribbon/ribbon';
 import { switchUtilRequired } from '../../util/switch-util';
 import { useCurrentStorage } from '../panel/storage-panel-context';
-import { useSelectExpanded } from './hooks/use-select-expanded';
+import { useStorageSelectExpanded } from './hooks/use-storage-select-expanded';
 
 const isVariant = (pkm: PkmVariantDTO | PkmSaveDTO) => 'filepath' in pkm;
 
@@ -35,7 +35,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
 
     const staticData = useStaticData();
 
-    const { expanded } = useSelectExpanded();
+    const { expanded } = useStorageSelectExpanded();
 
     const { getSelected } = useCurrentStorage();
     const selectedSaveId = Route.useSearch({ select: search => getSelected(search.selected)?.saveId }) ?? null;

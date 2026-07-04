@@ -41,6 +41,7 @@ export const Primary: Story = {
             onAdd={async (...params) => console.log(...params)}
             isDesktop//={false}
             results={<UIGlobsInputResults
+                name='results'
                 data={generatePaths('c:/abc/def/', 100)}
                 showFiles
             />}

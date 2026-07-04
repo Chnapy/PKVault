@@ -12,11 +12,12 @@ import { UIShinyIcon } from '../../icon/ui-shiny-icon';
 import { UISpeciesImg } from '../../sprite-img/species-img/ui-species-img';
 import { UIDetailsContentStats } from '../../storage/storage-details/content/stats/ui-details-content-stats';
 import { UIDetailsStatsRow, type UIDetailsStatsRowProps } from '../../storage/storage-details/content/stats/ui-details-stats-row';
+import { UIDetailsContent, type UIDetailsContentProps } from '../../storage/storage-details/content/ui-details-content';
+import { UIDetailsContentExpanded } from '../../storage/storage-details/content/ui-details-content-expanded';
 import { UIDetailsSaveTab } from '../../storage/storage-details/saves/ui-details-save-tab';
 import { UIDetailsSaves } from '../../storage/storage-details/saves/ui-details-saves';
 import spritesheet0 from "../../stories/assets/spritesheet_species_0.webp";
 import { UITypeItem } from '../../type-item/ui-type-item';
-import { UIPokedexDetailsContent } from './content/ui-pokedex-details-content';
 import { UIPokedexDetails } from './ui-pokedex-details';
 import { UIPokedexDetailsMain } from './ui-pokedex-details-main';
 
@@ -28,6 +29,61 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const getContent = (): UIDetailsContentProps[ 'content' ] => [
+    {
+        name: 'stats',
+        label: 'Stats',
+        content: <UIDetailsContentStats>
+            {[
+                {
+                    stat: 'hp',
+                    value: 55,
+                } satisfies UIDetailsStatsRowProps,
+                {
+                    stat: 'atk',
+                    value: 50,
+                } satisfies UIDetailsStatsRowProps,
+                {
+                    stat: 'def',
+                    value: 45,
+                } satisfies UIDetailsStatsRowProps,
+                {
+                    stat: 'spa',
+                    value: 135,
+                } satisfies UIDetailsStatsRowProps,
+                {
+                    stat: 'spd',
+                    value: 95,
+                } satisfies UIDetailsStatsRowProps,
+                {
+                    stat: 'spe',
+                    value: 120,
+                } satisfies UIDetailsStatsRowProps,
+            ].map((props) => <UIDetailsStatsRow key={props.stat} {...props} />)}
+        </UIDetailsContentStats>,
+    },
+    {
+        name: 'moves',
+        label: 'Moves',
+        content: 'WIP',
+    },
+    {
+        name: 'evolutions',
+        label: 'Evolutions',
+        content: 'WIP',
+    },
+    {
+        name: 'locations',
+        label: 'Locations',
+        content: 'WIP',
+    },
+    {
+        name: 'misc',
+        label: 'Misc',
+        content: 'WIP',
+    },
+];
+
 export const Primary: Story = {
     decorators: [
         Story => <div style={{ width: 300, margin: 16 }}>
@@ -35,6 +91,7 @@ export const Primary: Story = {
         </div>,
     ],
     args: {
+        expanded: false,
         header: closeBtn => <UIDetailsSaves
             value='5'
             data={[
@@ -137,40 +194,16 @@ export const Primary: Story = {
                 </UIButton>)}
             </Group>
         </>,
-        content: <UIPokedexDetailsContent
-            stats={<UIDetailsContentStats>
-                {[
-                    {
-                        stat: 'hp',
-                        value: 55,
-                    } satisfies UIDetailsStatsRowProps,
-                    {
-                        stat: 'atk',
-                        value: 50,
-                    } satisfies UIDetailsStatsRowProps,
-                    {
-                        stat: 'def',
-                        value: 45,
-                    } satisfies UIDetailsStatsRowProps,
-                    {
-                        stat: 'spa',
-                        value: 135,
-                    } satisfies UIDetailsStatsRowProps,
-                    {
-                        stat: 'spd',
-                        value: 95,
-                    } satisfies UIDetailsStatsRowProps,
-                    {
-                        stat: 'spe',
-                        value: 120,
-                    } satisfies UIDetailsStatsRowProps,
-                ].map((props) => <UIDetailsStatsRow key={props.stat} {...props} />)}
-            </UIDetailsContentStats>}
-            moves={'TODO'}
-            evolutions={'TODO'}
-            locations={'TODO'}
-            misc={'TODO'}
-        />,
+        content: <UIDetailsContent content={getContent()} />,
+        onExpand: console.log,
         onClose: console.log,
+    },
+};
+
+export const Expanded: Story = {
+    args: {
+        ...Primary.args,
+        expanded: true,
+        content: <UIDetailsContentExpanded content={getContent()} />,
     },
 };

@@ -5,7 +5,6 @@ import type { MoveParams } from '../../../storage/move/move-container-fns';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getDragControls } from '../../interaction/focus-controls/common-controls/drag-controls';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
-import { usePopover } from '../../interaction/focus-controls/components/popover/hooks/use-popover';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 import { DragRender } from '../../interaction/move/components/drag-render';
 import { useDragSubmitting } from '../../interaction/move/hooks/use-drag-submitting';
@@ -39,8 +38,6 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
 
     const panel = useCurrentPanel();
 
-    const popover = usePopover();
-
     const checked = useSelectHasValue(container, [ id ]);
     const { addId, removeId } = useSelectContextActions();
 
@@ -73,7 +70,6 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
             !isDraggingState && !disabled && !loading && getSelectControl({
                 label: 'Open',
                 action: e => {
-                    popover?.setOpened(opened => !opened);
                     onClick?.(e);
                 },
             }),

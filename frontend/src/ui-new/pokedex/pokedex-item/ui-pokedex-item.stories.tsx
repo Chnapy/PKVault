@@ -4,6 +4,7 @@ import { Gender } from '../../../data/sdk/model';
 import { UISpeciesImg } from '../../sprite-img/species-img/ui-species-img';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import spritesheet0 from "../../stories/assets/spritesheet_species_0.webp";
+import { UIPokedexFormItem } from './ui-pokedex-form-item';
 import { UIPokedexItem } from './ui-pokedex-item';
 
 const meta = {
@@ -22,22 +23,26 @@ export const Primary: Story = {
         id: '1',
         species: 68,
         form: 'alola',
-        genders: [ Gender.Male, Gender.Female ],
-        isSeen: true,
-        isSeenAlpha: true,
-        isCaught: true,
-        isOwned: true,
         label: 'Machamp',
-        children: <UISpeciesImg
-            sheetUrl={spritesheet0}
-            species={68}
-            spriteInfos={{
-                height: 96,
-                width: 96,
-                x: 1536,
-                y: 1408,
-            }}
-        />
+        onClick: console.log,
+        children: <UIPokedexFormItem
+            genders={[ Gender.Male, Gender.Female ]}
+            isSeen
+            isSeenAlpha
+            isCaught
+            isOwned
+        >
+            <UISpeciesImg
+                sheetUrl={spritesheet0}
+                species={68}
+                spriteInfos={{
+                    height: 96,
+                    width: 96,
+                    x: 1536,
+                    y: 1408,
+                }}
+            />
+        </UIPokedexFormItem>
     },
     decorators: Story => <UISpriteSizeWrapper
         component='div'

@@ -1,44 +1,48 @@
-import { css, cx } from '@emotion/css';
+import { Group } from '@mantine/core';
+import { FolderIcon } from 'lucide-react';
 import React from "react";
 import { Gender as GenderType } from '../../data/sdk/model';
-import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from "../../routes/pokedex";
-import { useTranslate } from '../../translate/i18n';
-import { BallImg } from '../../ui/img/ball-img';
-import { DetailsCardContainer, type DetailsExpandedState } from '../../ui/details-card/details-card-container';
-import { DetailsMainImg } from '../../ui/details-card/details-main-img';
-import { DetailsTab } from '../../ui/details-card/details-tab';
-import { DetailsTitle } from '../../ui/details-card/details-title';
-import { Gender } from '../../ui/gender/gender';
-import { AlphaIcon } from '../../ui/icon/alpha-icon';
-import { Icon } from '../../ui/icon/icon';
-import { ShinyIcon } from '../../ui/icon/shiny-icon';
-import { SelectStringInput } from '../../ui/input/select-input';
-import { TextContainer } from '../../ui/text-container/text-container';
-import { theme } from '../../ui/theme';
+import { UIButton } from '../../ui-new/form/button/ui-button';
+import { UISegmentedControl } from '../../ui-new/form/select/ui-segmented-control';
+import { UIAlphaIcon } from '../../ui-new/icon/ui-alpha-icon';
+import { UIBallIcon } from '../../ui-new/icon/ui-ball-icon';
+import { UIGender } from '../../ui-new/icon/ui-gender';
+import { UIShinyIcon } from '../../ui-new/icon/ui-shiny-icon';
+import { UIPokedexDetails } from '../../ui-new/pokedex/pokedex-details/ui-pokedex-details';
+import { UIPokedexDetailsMain } from '../../ui-new/pokedex/pokedex-details/ui-pokedex-details-main';
+import { UIDetailsContentStats } from '../../ui-new/storage/storage-details/content/stats/ui-details-content-stats';
+import { UIDetailsStatsRow, type UIDetailsStatsRowProps } from '../../ui-new/storage/storage-details/content/stats/ui-details-stats-row';
+import { UIDetailsContent, type UIDetailsContentProps } from '../../ui-new/storage/storage-details/content/ui-details-content';
+import { UIDetailsContentExpanded } from '../../ui-new/storage/storage-details/content/ui-details-content-expanded';
+import type { UIDetailsSaveData } from '../../ui-new/storage/storage-details/saves/ui-details-save-expanded';
+import { UIDetailsSaveTab } from '../../ui-new/storage/storage-details/saves/ui-details-save-tab';
+import { UIDetailsSaves } from '../../ui-new/storage/storage-details/saves/ui-details-saves';
+import { SpeciesImg } from '../../ui/img/species-img';
+import { TypeItem } from '../../ui/type-item/type-item';
 import { usePokedexDetailsSelect } from './hooks/use-pokedex-details-select';
-import { PokedexDetailsOwned } from './pokedex-details-owned';
+import { usePokedexSelectExpanded } from './hooks/use-pokedex-select-expanded';
 import { getGameInfos } from './util/get-game-infos';
 
 export const PokedexDetails: React.FC = () => {
-  const { t } = useTranslate();
+  // const { t } = useTranslate();
 
-  const selectExpanded = Route.useSearch({ select: search => search.selectExpanded ?? 'none' });
+  const { expanded, toggleExpanded } = usePokedexSelectExpanded();
 
   const navigate = Route.useNavigate();
 
-  const staticData = useStaticData();
+  // const staticData = useStaticData();
 
   const selectInfos = usePokedexDetailsSelect();
 
-  const setSelectExpanded = (state: DetailsExpandedState) => {
-    navigate({
-      search: (search) => ({
-        ...search,
-        selectExpanded: state,
-      }),
-    });
-  };
+  // const setSelectExpanded = (state: DetailsExpandedState) => {
+  //   navigate({
+  //     search: (search) => ({
+  //       ...search,
+  //       selectExpanded: state,
+  //     }),
+  //   });
+  // };
 
   if (!selectInfos) {
     return null;
@@ -51,153 +55,160 @@ export const PokedexDetails: React.FC = () => {
 
     setSelectedSaveId,
     setSelectedFormId,
-    // selectedByFormIndex,
+    selectedByFormIndex,
 
     selectedFormIndexForms,
-    // selectedStaticFormWithIndex,
+    selectedStaticFormWithIndex,
     selectedSpeciesValue,
 
     gameSaves,
-    // staticFormsFiltered,
+    staticFormsFiltered,
   } = selectInfos;
 
-  const caught = selectedForm.isCaught;
-  const owned = selectedForm.isOwned;
-
-  // const speciesName = selectedStaticFormWithIndex.name;
-
   const baseStats = selectedForm.baseStats;
-  const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);
-  const cellBaseClassName = css({ padding: 0, textAlign: 'center' });
+  // const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);
 
-  return (
-    <DetailsCardContainer
-      tabs={<>
-        {gameSaves.map(save => (
-          <DetailsTab
-            key={save.id}
-            contextVersion={save.version}
-            otName={save.trainerName}
-            onClick={() => setSelectedSaveId(save.id)}
-            disabled={selectedSave.id === save.id}
-          />
-        ))}
-      </>}
-      bgColor={getGameInfos(selectedSave.version).color}
-      title={<DetailsTitle
-        context={selectedSave.context}
-        contextVersion={selectedSave.version}
-        showVersionName
+  const content: UIDetailsContentProps[ 'content' ] = [
+    {
+      name: 'stats',
+      label: 'Stats',
+      content: <UIDetailsContentStats>
+        {([ 'hp', 'atk', 'def', 'spa', 'spd', 'spe' ] satisfies UIDetailsStatsRowProps[ 'stat' ][])
+          .map((stat, i) => <UIDetailsStatsRow key={stat} stat={stat} value={baseStats[ i ]!} />)}
+      </UIDetailsContentStats>,
+    },
+    {
+      name: 'moves',
+      label: 'Moves',
+      content: 'WIP',
+    },
+    {
+      name: 'evolutions',
+      label: 'Evolutions',
+      content: 'WIP',
+    },
+    {
+      name: 'locations',
+      label: 'Locations',
+      content: 'WIP',
+    },
+    {
+      name: 'misc',
+      label: 'Misc',
+      content: 'WIP',
+    },
+  ];
+
+  return <UIPokedexDetails
+    expanded={expanded}
+    onExpand={toggleExpanded}
+    header={closeBtn => <UIDetailsSaves
+      value={selectedSave.id.toString()}
+      data={gameSaves.map((save): UIDetailsSaveData => ({
+        id: save.id.toString(),
+        imgSrc: getGameInfos(save.displayedVersion).img,
+        label: save.trainerName,
+      }))}
+      onSelect={(id) => setSelectedSaveId(+id)}
+      actions={closeBtn}
+      renderTab={({ item, selected }) => {
+        const save = gameSaves.find(s => s.id === +item.id);
+        if (!save)
+          return null;
+
+        return <UIDetailsSaveTab
+          key={item.id}
+          id={item.id}
+          version={save.displayedVersion}
+          color={getGameInfos(save.displayedVersion).color}
+          selected={selected}
+          label={item.label}
+        />;
+      }}
+    />}
+    main={<UIPokedexDetailsMain
+      species={selectedSpecies}
+      speciesName={staticFormsFiltered[ 0 ]?.name ?? ''}
+      form={selectedStaticFormWithIndex.name}
+      gender={selectedForm.gender}
+      isShiny={selectedForm.isSeenShiny}
+      isAlpha={selectedForm.isSeenAlpha}
+      isSeen={selectedForm.isSeen}
+      isCaught={selectedForm.isCaught}
+      isOwned={selectedForm.isOwned}
+      types={selectedForm.types.map(type => <TypeItem key={type} type={type} />)}
+      children={<SpeciesImg
+        species={selectedSpecies}
+        context={selectedForm.context}
+        form={selectedForm.form}
+        isFemale={selectedForm.gender === GenderType.Female}
+        isShiny={selectedForm.isSeenShiny}
       />}
-      mainImg={
-        <DetailsMainImg
-          species={selectedSpecies}
-          context={selectedForm.context}
-          form={selectedForm.form}
-          gender={selectedForm.gender}
-          isFemale={selectedForm.gender === GenderType.Female}
-          isOwned={owned}
-          isShiny={selectedForm.isSeenShiny}
-          isAlpha={selectedForm.isSeenAlpha}
-          ball={caught ? staticData.itemPokeball.id : undefined}
-        />
-      }
-      mainImgSub={
-        <SelectStringInput
-          anchor='bottom end'
-          onChange={setSelectedFormId}
-          value={selectedForm.id}
-          disabled={selectedFormIndexForms.length < 2}
-          data={selectedFormIndexForms.map(form => ({
-            value: form.id,
-            disabled: form.id === selectedForm.id,
-            option: <div className={css({
-              width: '100%',
-              minWidth: 70,
-              display: 'flex',
-              // justifyContent: 'flex-end',
-              alignItems: 'center',
-              gap: 4,
-              fontSize: '1rem',
-              padding: 2,
-            })}>
-              {form.isCaught && <BallImg size={16} />}
+    />}
+    items={<>
+      {staticFormsFiltered.length > 1 && <UISegmentedControl
+        name='forms'
+        controlLabel='Change form'
+        data={staticFormsFiltered.map(staticForm => ({
+          value: staticForm.index.toString(),
+          label: staticForm.name,
+          disabled: !selectedSpeciesValue.forms.find(form => form.form === staticForm.index)?.isSeen,
+        }))}
+        value={selectedForm.form.toString()}
+        onChange={index => selectedByFormIndex(+index)}
+        focusOnMount
+        wrap
+        gamepadControls={[ 'DPadLeft', 'DPadRight' ]}
+      // bdrs={0}
+      />}
 
-              {form.isOwned && <Icon name='folder' solid />}
-
-              <Gender gender={form.gender} />
-
-              {form.isSeenAlpha && <AlphaIcon
-                className={css({
-                  height: '1em',
-                })}
-              />}
-
-              {form.isOwnedShiny && <ShinyIcon
-                className={css({
-                  height: '1em',
-                })}
-              />}
-            </div>,
-          }))}
-          bgColor='transparent'
-          className={css({
-            width: '100%',
-
-            color: theme.text.default,
-            borderColor: 'currentcolor',
+      <Group p='md'>
+        {selectedFormIndexForms
+          .filter(form => form.form === selectedForm.form)
+          .map(form => {
+            return <UIButton
+              key={form.id}
+              name={form.id}
+              controlLabel='Change form'
+              size='xs'
+              onClick={() => setSelectedFormId(form.id)}
+              disabled={selectedForm.id === form.id}
+            >
+              <Group wrap='nowrap' gap='sm'>
+                <UIGender gender={form.gender} />
+                {form.isCaught && <UIBallIcon />}
+                {form.isOwned && <FolderIcon />}
+                {form.isSeenShiny && <UIShinyIcon />}
+                {form.isSeenAlpha && <UIAlphaIcon />}
+              </Group>
+            </UIButton>;
           })}
-        />
+      </Group>
+    </>}
+    content={expanded
+      ? <UIDetailsContentExpanded content={content} />
+      : <UIDetailsContent content={content} />}
+    onClose={() => navigate({
+      search: {
+        selected: undefined,
       }
-      mainInfos={null}
-      preContent={null}
-      content={<>
-        {selectedForm.abilities.length > 0 && <TextContainer stick>
-          <span className={css({ color: theme.text.primary })}>{t('details.abilities')}</span><br />
-          {selectedForm.abilities.map(ability => <div key={ability}>{
-            staticData.abilities[ ability ]?.name
-          }</div>)}
-        </TextContainer>}
+    })}
+  />;
 
-        <TextContainer stick>
-          <table
-            className={css({
-              borderSpacing: '8px 0'
-            })}
-          >
-            <thead>
-              <tr>
-                <td className={cellBaseClassName}></td>
-                <td className={cellBaseClassName}>{t('details.stats.base')}</td>
-              </tr>
-            </thead>
-            <tbody>
-              {[ t('details.stats.hp'), t('details.stats.atk'), t('details.stats.def'), t('details.stats.spa'), t('details.stats.spd'), t('details.stats.spe') ]
-                .map((statName, i) => <tr key={statName}>
-                  <td className={cx(cellBaseClassName, css({ textAlign: 'left' }))}>{statName}</td>
-                  <td className={cellBaseClassName}>{baseStats[ i ]}</td>
-                </tr>)}
+  // return (
+  //   <DetailsCardContainer
+  //     content={<>
+  //       {selectedForm.abilities.length > 0 && <TextContainer stick>
+  //         <span className={css({ color: theme.text.primary })}>{t('details.abilities')}</span><br />
+  //         {selectedForm.abilities.map(ability => <div key={ability}>{
+  //           staticData.abilities[ ability ]?.name
+  //         }</div>)}
+  //       </TextContainer>}
 
-              <tr>
-                <td className={cx(cellBaseClassName, css({ textAlign: 'left', textTransform: 'capitalize' }))}>{t('total')}</td>
-                <td className={cellBaseClassName}>{totalBaseStats}</td>
-              </tr>
-            </tbody>
-          </table>
-        </TextContainer>
-
-        {owned && (
-          <PokedexDetailsOwned saveId={selectedSpeciesValue.saveId} species={selectedSpeciesValue.species} />
-        )}
-      </>}
-      actions={null}
-      onClose={() => navigate({
-        search: {
-          selected: undefined,
-        }
-      })}
-      expanded={selectExpanded}
-      setExpanded={setSelectExpanded}
-    />
-  );
+  //       {owned && (
+  //         <PokedexDetailsOwned saveId={selectedSpeciesValue.saveId} species={selectedSpeciesValue.species} />
+  //       )}
+  //     </>}
+  //   />
+  // );
 };

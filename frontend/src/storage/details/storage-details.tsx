@@ -8,12 +8,12 @@ import { DetailsActions } from './details-actions';
 import { DetailsContent } from './details-content';
 import { DetailsMain } from './details-main';
 import { DetailsSaves } from './details-saves';
-import { useSelectExpanded } from './hooks/use-select-expanded';
+import { useStorageSelectExpanded } from './hooks/use-storage-select-expanded';
 
 export const StorageDetails: React.FC = withErrorCatcher('default', () => {
   const navigate = Route.useNavigate();
 
-  const { expanded, toggleExpanded } = useSelectExpanded();
+  const { expanded, toggleExpanded } = useStorageSelectExpanded();
 
   const { getSelected } = useCurrentStorage();
   const selectedSaveId = Route.useSearch({ select: search => getSelected(search.selected)?.saveId });

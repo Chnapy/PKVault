@@ -1,6 +1,7 @@
 import { Center, Group, Space, Stack, Text } from '@mantine/core';
 import type React from 'react';
 import type { Gender } from '../../../data/sdk/model';
+import { getSpeciesNO } from '../../../ui/dex-item/util/get-species-no';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
 import { UIGender } from '../../icon/ui-gender';
 import { UIShinyIcon } from '../../icon/ui-shiny-icon';
@@ -47,7 +48,7 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
             </Group>
 
             <Group>
-                <Text component='b' size='lg'>#{species}</Text>
+                <Text component='b' size='lg'>#{getSpeciesNO(species)}</Text>
                 <Text size='lg' tt='uppercase'>{speciesName}</Text>
 
                 <Space ml='auto' />

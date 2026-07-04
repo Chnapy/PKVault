@@ -2,6 +2,7 @@ import { Badge, Center, Group, Space, Stack, Text, ThemeIcon } from '@mantine/co
 import { EyeIcon, FolderIcon } from 'lucide-react';
 import type React from 'react';
 import type { Gender } from '../../../data/sdk/model';
+import { getSpeciesNO } from '../../../ui/dex-item/util/get-species-no';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
 import { UIBallIcon } from '../../icon/ui-ball-icon';
 import { UIGender } from '../../icon/ui-gender';
@@ -31,9 +32,9 @@ export const UIPokedexDetailsMain: React.FC<UIPokedexDetailsMainProps> = ({
         {icon}
     </ThemeIcon>;
 
-    return <Stack gap='xs'>
+    return <Stack gap='xs' w={280} maw='100%'>
         <Group>
-            <Text component='b' size='lg'>#{species}</Text>
+            <Text component='b' size='lg'>#{getSpeciesNO(species)}</Text>
             <Text size='lg' tt='uppercase'>{speciesName}</Text>
             {form && <Badge variant='default'>{form}</Badge>}
             <UIGender gender={gender} size='big' />

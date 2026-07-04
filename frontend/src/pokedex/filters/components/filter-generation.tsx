@@ -3,7 +3,7 @@ import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
-import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
+import { UIMultiSelect } from '../../../ui-new/form/select/ui-multi-select';
 import { filterIsDefined } from '../../../util/filter-is-defined';
 
 export const FilterGeneration: React.FC = () => {
@@ -25,21 +25,21 @@ export const FilterGeneration: React.FC = () => {
     label: t('dex.filters.generations.option', { generation, regions: staticData.generations[ generation ]?.regions.join(', ') }),
   }));
 
-  return (
-    <FilterSelect
-      enabled={searchValue.length > 0}
-      multiple
-      value={searchValue.map(String)}
-      onChange={(values) => {
-        navigate({
-          search: {
-            filterGenerations: values.map(Number),
-          },
-        });
-      }}
-      options={options}
-    >
-      {t('dex.filters.generations')}
-    </FilterSelect>
-  );
+  return <UIMultiSelect
+    name='filter-generation'
+    controlLabel='Filter by generation'
+    label={t('dex.filters.generations')}
+    placeholder='Filter by generation'
+    data={options}
+    value={searchValue.map(String)}
+    onChange={(values) => navigate({
+      search: {
+        filterGenerations: values.map(Number),
+      },
+    })}
+    pillsNoWrap
+    renderPill={({ value = '' }) => value[ 0 ]}
+  // size='xs'
+  // w={140}
+  />;
 };
