@@ -29,6 +29,7 @@ export const Primary: Story = {
     render: () => <UIAppLayout
         header={<UIHeader
             {...UIHeaderStory.args}
+            value='pokedex'
         />}
         bottom={<UIActionsPanel
             data={[

@@ -6,9 +6,9 @@ import { useStaticData } from '../../../hooks/use-static-data';
 import { SaveItemEdit } from '../../../saves/save-item/save-item-edit';
 import { UIGameExpanded, type UIGameExpandedProps } from '../../../ui-new/storage/storage-panel/game-list/ui-game-expanded';
 
-export type GameExpandedProps = Pick<UIGameExpandedProps, 'id' | 'label' | 'imgSrc' | 'selected' | 'onSelect'>;
+export type GameExpandedProps = Pick<UIGameExpandedProps, 'id' | 'label' | 'imgSrc' | 'selected' | 'onSelect' | 'actions'>;
 
-export const GameExpanded: React.FC<GameExpandedProps> = ({ id, label, imgSrc, onSelect, selected }) => {
+export const GameExpanded: React.FC<GameExpandedProps> = ({ id, label, imgSrc, onSelect, selected, actions }) => {
     const staticData = useStaticData();
 
     const saveInfosQuery = useSaveInfosGetAll();
@@ -40,5 +40,6 @@ export const GameExpanded: React.FC<GameExpandedProps> = ({ id, label, imgSrc, o
         language={staticData.languages[ language ] ?? ''}
         path={path}
         editDropdown={versionObj && !versionObj.isGameVersion && <SaveItemEdit saveId={save.id} />}
+        actions={actions}
     />;
 };

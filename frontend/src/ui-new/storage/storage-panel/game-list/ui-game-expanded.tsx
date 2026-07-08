@@ -5,7 +5,7 @@ import type { Gender } from '../../../../data/sdk/model';
 import { UIGender } from '../../../icon/ui-gender';
 import { UIGameExpandedWrapper, type UIGameExpandedWrapperProps } from './ui-game-expanded-wrapper';
 
-export type UIGameExpandedProps = Pick<UIGameExpandedWrapperProps, 'selected' | 'onSelect' | 'editDropdown' | 'label' | 'imgSrc' | 'path'>
+export type UIGameExpandedProps = Pick<UIGameExpandedWrapperProps, 'selected' | 'onSelect' | 'editDropdown' | 'actions' | 'label' | 'imgSrc' | 'path'>
     & {
         id: string;
         generation: string;

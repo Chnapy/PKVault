@@ -59,7 +59,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
     render: () => <UIAppLayout
-        header={<UIHeader {...UIHeaderBanksStory.args} />}
+        header={<UIHeader
+            {...UIHeaderBanksStory.args}
+            value='storage'
+        />}
         bottom={<UIActionsPanel
             data={[
                 {

@@ -41,7 +41,7 @@ const root = (props: ContainerProps) =>
     },
   });
 
-export type ContainerOwnProps = {
+type ContainerOwnProps = {
   ref?: React.Ref<never>;
   componentDescriptor?: React.HTMLElementType;
   className?: string;

@@ -12,6 +12,7 @@ export type UIGameExpandedWrapperProps = {
     selected?: boolean;
     onSelect?: () => void;
     editDropdown?: React.ReactNode;
+    actions?: React.ReactNode;
 
     title?: string;
     label: React.ReactNode;
@@ -23,7 +24,7 @@ export type UIGameExpandedWrapperProps = {
 
 export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
     title, label, imgSrc, secondaryLine, tertiaryLine, path,
-    selected, onSelect, editDropdown,
+    selected, onSelect, editDropdown, actions,
 }) => {
     const panel = useCurrentPanel();
 
@@ -82,6 +83,8 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
                     </Button>
                 </WithControlsIcons>
             </UIPopover>}
+
+            {actions}
         </Stack>
 
         <WithControlsIcons placement='out' icons={controlIcons('open')} miw={0} style={{ flexGrow: 1 }}>

@@ -1,20 +1,27 @@
-import { css } from '@emotion/css';
+import { Badge, Button, Card, Divider, Group } from '@mantine/core';
+import { DownloadIcon, FolderIcon } from 'lucide-react';
 import type React from "react";
-import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
+import { HistoryContext } from '../context/history-context';
+import { getApiFullUrl } from '../data/mutator/custom-instance';
+import { getSaveInfosDownloadUrl, useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
-import type { DocsGenEnSlugs } from '../help/hooks/use-help-navigate';
 import { useStaticData } from '../hooks/use-static-data';
-import { SaveItem } from "../saves/save-item/save-item";
+import { getGameInfos } from '../pokedex/details/util/get-game-infos';
+import { Route } from '../routes/saves';
+import { useDesktopMessage } from '../settings/globs-input/hooks/use-desktop-message';
+import { GameExpanded } from '../storage/panel/game-list/game-expanded';
 import { useTranslate } from '../translate/i18n';
-import { ButtonLink } from '../ui/button/button';
-import { Container } from '../ui/container/container';
-import { TitledContainer } from '../ui/container/titled-container';
-import { Icon } from '../ui/icon/icon';
-import { theme } from '../ui/theme';
+import { UISavesContent } from '../ui-new/saves/ui-saves-content';
 import { filterIsDefined } from '../util/filter-is-defined';
 
 export const SavesPage: React.FC = withErrorCatcher('default', () => {
   const { t } = useTranslate();
+
+  const navigate = Route.useNavigate();
+
+  const storageHistoryValue = HistoryContext.useValue()[ '/storage' ];
+
+  const desktopMessage = useDesktopMessage();
 
   const staticData = useStaticData();
   const saveInfosQuery = useSaveInfosGetAll();
@@ -31,71 +38,105 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
       return a.lastWriteTime > b.lastWriteTime ? -1 : 1;
     });
 
-  return (
-    <div
-      className={css({
-        display: "flex",
-        flexDirection: 'column',
-        alignItems: "center",
-        gap: 16,
-        maxWidth: 900,
-        marginLeft: 'auto',
-        marginRight: 'auto',
+  return <UISavesContent>
+    <Card style={{ overflow: 'auto' }}>
+      {generations.map(generation => {
+        const saves = saveInfos.filter(save => save.generation === generation);
+        if (saves.length === 0) {
+          return null;
+        }
+
+        const maxSpecies = Math.max(...saves.map(save => staticData.versions[ save.version ]?.maxSpeciesId ?? 0));
+
+        const regions = staticData.generations[ generation ]?.regions ?? [];
+
+        return [
+          <Card.Section key={generation} inheritPadding withBorder>
+            <Group py='sm'>
+              <span>
+                Generation {generation}
+              </span>
+              {regions.map(region => <Badge key={region} variant='default'>{region}</Badge>)}
+              <Divider orientation='vertical' />
+              <span>
+                {maxSpecies} species
+              </span>
+            </Group>
+          </Card.Section>,
+          <Card.Section key={generation * 100} inheritPadding withBorder py='inherit'>
+            <Group>
+              {saves.map(save => <GameExpanded
+                key={save.id}
+                id={save.id.toString()}
+                imgSrc={getGameInfos(save.displayedVersion).img}
+                label={staticData.versions[ save.displayedVersion ]?.name}
+                onSelect={() => navigate({
+                  to: '/storage',
+                  search: {
+                    storages: [
+                      storageHistoryValue?.search.storages?.[ 0 ] ?? { saveId: null },
+                      {
+                        saveId: save.id,
+                      }
+                    ],
+                  },
+                })}
+                actions={<>
+                  {desktopMessage
+                    ? <Button
+                      variant='default'
+                      size='compact-xs'
+                      fullWidth
+                      onClick={() => desktopMessage.openFile({
+                        type: 'open-folder',
+                        isDirectory: false,
+                        path: save.path
+                      })}
+                    >
+                      <FolderIcon />
+                    </Button>
+                    : <Button
+                      variant='default'
+                      size='compact-xs'
+                      fullWidth
+                      component='a'
+                      target='__blank'
+                      type='button'
+                      href={getApiFullUrl(getSaveInfosDownloadUrl(save.id))}
+                    >
+                      <DownloadIcon />
+                    </Button>}
+                </>}
+              />)}
+            </Group>
+          </Card.Section>,
+        ];
       })}
-    >
-      <div
-        className={css({
-          display: 'flex',
-          gap: 16,
-          alignItems: 'flex-start',
-          flexWrap: 'wrap'
-        })}
-      >
-        {generations.map(generation => {
-          const saves = saveInfos.filter(save => save.generation === generation);
-          if (saves.length === 0) {
-            return null;
-          }
+    </Card>
+  </UISavesContent>;
 
-          const maxSpecies = Math.max(...saves.map(save => staticData.versions[ save.version ]?.maxSpeciesId ?? 0));
+  //     <Container className={css({
+  //       display: 'flex',
+  //       alignItems: 'center',
+  //       gap: 4,
+  //       backgroundColor: theme.bg.panel,
+  //       padding: '8px 16px',
+  //     })}>
+  //       <Icon name='info-circle' solid forButton />
+  //       {t('saves.not-see')}
 
-          return <TitledContainer key={generation} title={t('saves.title', { generation, regions: staticData.generations[ generation ]?.regions.join(', '), maxSpecies })}>
-            <div
-              className={css({
-                display: 'flex',
-                gap: 8,
-                alignItems: 'flex-start',
-                flexWrap: 'wrap'
-              })}
-            >
-              {saves.map(save => <SaveItem key={save.id} saveId={save.id} showDelete />)}
-            </div>
-          </TitledContainer>;
-        })}
-      </div>
+  //       <ButtonLink to={'/settings'}>
+  //         {t('action.check-settings')}
+  //       </ButtonLink>
 
-      <Container className={css({
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-        backgroundColor: theme.bg.panel,
-        padding: '8px 16px',
-      })}>
-        <Icon name='info-circle' solid forButton />
-        {t('saves.not-see')}
-
-        <ButtonLink to={'/settings'}>
-          {t('action.check-settings')}
-        </ButtonLink>
-
-        <ButtonLink
-          to={'.'}
-          search={{ help: '1-quick-start.md' satisfies DocsGenEnSlugs }}
-        >
-          <Icon name='info-circle' solid />
-          {t('action.quick-start')}
-        </ButtonLink>
-      </Container>
-    </div>
-  );
+  //       <ButtonLink
+  //         to={'.'}
+  //         search={{ help: '1-quick-start.md' satisfies DocsGenEnSlugs }}
+  //       >
+  //         <Icon name='info-circle' solid />
+  //         {t('action.quick-start')}
+  //       </ButtonLink>
+  //     </Container>
+  //   </div>
+  // );
 });
