@@ -1,111 +1,79 @@
+import { Group } from '@mantine/core';
 import type React from 'react';
 import { HistoryContext } from '../../context/history-context';
-import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
-import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
+import { usePkmIndex } from '../../data/hooks/use-pkm-index';
+import { Gender, type PkmBaseDTO } from '../../data/sdk/model';
 import { Route } from '../../routes';
-import { BankContext } from '../../storage/bank/bank-context';
-import { StorageSaveItemBase } from '../../storage/item/save/storage-save-item-base';
-import { useTranslate } from '../../translate/i18n';
-import { StorageItem } from '../../ui/storage-item/storage-item';
-import { TextContainer } from '../../ui/text-container/text-container';
-import { SizingUtil } from '../../ui/util/sizing-util';
-import { css } from '@emotion/css';
+import { UISpriteSizeWrapper } from '../../ui-new/sprite-img/ui-sprite-size-wrapper';
+import { UIDetailsLevel } from '../../ui-new/storage/storage-details/ui-details-level';
+import { UIStorageItemBase, type UIStorageItemBaseProps } from '../../ui-new/storage/storage-item/base/ui-storage-item-base';
+import { SpeciesImg } from '../../ui/img/species-img';
 
 export type PokedexDetailsOwnedProps = {
-    saveId: number;
+    saveId: number | null;
     species: number;
 };
 
 export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId, species }) => {
-    const { t } = useTranslate();
     const navigate = Route.useNavigate();
 
     const storageHistoryValue = HistoryContext.useValue()[ '/storage' ];
-    const selectedBankBoxes = BankContext.useSelectedBankBoxes();
-    const storageSearch = storageHistoryValue?.search ?? selectedBankBoxes.data?.selectedSearch;
 
-    const savePkmsQuery = usePkmSaveIndex(saveId);
-    const pkmVariantsQuery = usePkmVariantIndex();
+    const pkmsQuery = usePkmIndex(saveId, data => data.data.bySpecies[ species ]);
 
-    return (
-        <TextContainer maxHeight={300}>
-            <div>{t('details.owned-save')}</div>
+    const renderItem = (pkm: PkmBaseDTO, onClick: UIStorageItemBaseProps[ 'onClick' ]) => <UIStorageItemBase
+        key={pkm.id}
+        label={<>
+            {pkm.nickname}
+            <UIDetailsLevel level={pkm.level} />
+        </>}
+        onClick={onClick}
+    >
+        <SpeciesImg species={species} context={pkm.context} form={pkm.form} isFemale={pkm.gender === Gender.Female}
+            isShiny={pkm.isShiny} isEgg={pkm.isEgg} isShadow={pkm.isShadow} />
+    </UIStorageItemBase>;
 
-            <div
-                className={css({
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: SizingUtil.itemsGap,
-                })}
-            >
-                {saveId === 0 ? (
-                    <>
-                        {pkmVariantsQuery.isLoading && !pkmVariantsQuery.data && (
-                            <StorageItem small species={species} version={0} context={9} form={0} helpTitle={null} loading />
-                        )}
+    return <UISpriteSizeWrapper component={Group}
+        speciesSize='sm'
+        itemSize='1lh'
+    >
+        {pkmsQuery.data
+            ?.filter(pkm => !('isMain' in pkm) || pkm.isMain)
+            .map(pkm => {
+                const onClick = saveId && 'saveId' in pkm
+                    ? (() => navigate({
+                        to: '/storage',
+                        search: {
+                            storages: [
+                                storageHistoryValue?.search.storages?.[ 0 ] ?? { saveId: null },
+                                { saveId, boxId: pkm.boxId },
+                            ],
+                            selected: {
+                                storage: 1,
+                                saveId,
+                                id: pkm.id,
+                            },
+                        },
+                    }))
+                    : (() => navigate({
+                        to: '/storage',
+                        search: {
+                            storages: [
+                                {
+                                    saveId: null,
+                                    boxId: pkm.boxId,
+                                },
+                                storageHistoryValue?.search.storages?.[ 1 ],
+                            ].filter(v => typeof v !== 'undefined'),
+                            selected: {
+                                storage: 0,
+                                saveId: undefined,
+                                id: pkm.id,
+                            },
+                        },
+                    }));
 
-                        {pkmVariantsQuery.data?.data.bySpecies[ species ]
-                            ?.filter(pkm => pkm.isMain)
-                            ?.map(pkmVariant => (
-                                null
-                                // <StorageMainItemBase
-                                //     key={pkmVariant.id}
-                                //     pkmId={pkmVariant.id}
-                                //     helpTitle={null}
-                                //     small
-                                //     onClick={() =>
-                                //         navigate({
-                                //             to: '/storage',
-                                //             search: {
-                                //                 ...storageSearch,
-                                //                 mainBoxIds: [ pkmVariant?.boxId ?? 0 ],
-                                //                 selected: {
-                                //                     saveId: undefined,
-                                //                     id: pkmVariant.id,
-                                //                 },
-                                //             },
-                                //         })
-                                //     }
-                                // />
-                            ))}
-                    </>
-                ) : (
-                    <>
-                        {savePkmsQuery.isLoading && !savePkmsQuery.data && (
-                            <StorageItem small species={species} version={0} context={9} form={0} helpTitle={null} loading />
-                        )}
-
-                        {savePkmsQuery.data?.data.bySpecies[ species ]?.map(pkm => (
-                            <StorageSaveItemBase
-                                key={pkm.id}
-                                saveId={pkm.saveId}
-                                pkmId={pkm.id}
-                                helpTitle={null}
-                                small
-                                onClick={() =>
-                                    navigate({
-                                        to: '/storage',
-                                        search: {
-                                            ...storageSearch,
-                                            saves: {
-                                                ...storageSearch?.saves,
-                                                [ saveId ]: {
-                                                    saveId,
-                                                    saveBoxIds: [ pkm.boxId ],
-                                                },
-                                            },
-                                            selected: {
-                                                saveId,
-                                                id: pkm.id,
-                                            },
-                                        },
-                                    })
-                                }
-                            />
-                        ))}
-                    </>
-                )}
-            </div>
-        </TextContainer>
-    );
+                return renderItem(pkm, onClick);
+            })}
+    </UISpriteSizeWrapper>;
 };

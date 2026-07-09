@@ -67,18 +67,23 @@ export const Primary: Story = {
             data={[
                 {
                     type: DataActionType.DATA_NORMALIZE,
+                    description: 'Description',
                 },
                 {
                     type: DataActionType.MOVE_PKM,
+                    description: 'Description',
                 },
                 {
                     type: DataActionType.MAIN_CREATE_BOX,
+                    description: 'Description',
                 },
                 {
                     type: DataActionType.EVOLVE_PKM,
+                    description: 'Description',
                 },
                 {
                     type: DataActionType.MAIN_DELETE_BANK,
+                    description: 'Description',
                 },
             ]}
             onDelete={index => Promise.resolve(console.log(index))}

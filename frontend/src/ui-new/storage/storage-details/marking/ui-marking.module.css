@@ -2,14 +2,12 @@
     column-gap: 4px;
     font-size: 10px;
     padding: 4px;
+    flex-wrap: nowrap;
 }
 
 .ui-marking {
-    flex-grow: 1;
     aspect-ratio: 1;
-    width: auto;
-    height: auto;
-    max-width: 1lh;
+    width: 1lh;
     background-color: var(--mantine-color-text);
 }
 

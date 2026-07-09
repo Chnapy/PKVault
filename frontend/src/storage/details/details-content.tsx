@@ -18,6 +18,7 @@ import { UIDetailsContentMove } from '../../ui-new/storage/storage-details/conte
 import { UIDetailsContentOrigin } from '../../ui-new/storage/storage-details/content/origin/ui-details-content-origin';
 import { UIDetailsContentStats } from '../../ui-new/storage/storage-details/content/stats/ui-details-content-stats';
 import { UIDetailsStatsRow, type UIDetailsStatName, type UIDetailsStatsRowProps } from '../../ui-new/storage/storage-details/content/stats/ui-details-stats-row';
+import { UIDetailsStatsTotalRow } from '../../ui-new/storage/storage-details/content/stats/ui-details-stats-total-row';
 import { UIDetailsContent, type UIDetailsContentProps } from '../../ui-new/storage/storage-details/content/ui-details-content';
 import { UIDetailsContentExpanded } from '../../ui-new/storage/storage-details/content/ui-details-content-expanded';
 import { UIDetailsContentSummary } from '../../ui-new/storage/storage-details/content/ui-details-content-summary';
@@ -53,6 +54,10 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         return null;
 
     const natureObj = pkm.nature === undefined ? undefined : staticData.natures[ pkm.nature ];
+
+    const totalStats = pkm.stats.reduce((acc, stat) => acc + stat, 0);
+    const totalIvs = pkm.iVs.reduce((acc, iv) => acc + iv, 0);
+    const totalEvs = pkm.eVs.reduce((acc, ev) => acc + ev, 0);
 
     const issues: React.ReactNode[] = [
         isVariant(pkm) && pkm.isExternal && <Alert
@@ -155,6 +160,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
                     .map((stat, i): UIDetailsStatsRowProps => {
                         return {
                             stat,
+                            level: pkm.level,
                             value: pkm.stats[ i ] ?? 0,
                             natureEffect: natureObj?.decreasedStatIndex === i + 1
                                 ? 'decrease'
@@ -166,6 +172,12 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
                         };
                     })
                     .map((props) => <UIDetailsStatsRow key={props.stat} {...props} />)}
+                <UIDetailsStatsTotalRow
+                    total={totalStats}
+                    level={pkm.level}
+                    iv={totalIvs}
+                    ev={totalEvs}
+                />
             </UIDetailsContentStats>,
         },
         pkm.isEnabled && {

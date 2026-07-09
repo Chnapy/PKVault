@@ -4,6 +4,7 @@ import type { Gender } from '../../../data/sdk/model';
 import { getSpeciesNO } from '../../../ui/dex-item/util/get-species-no';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
 import { UIGender } from '../../icon/ui-gender';
+import { UIPokerusIcon } from '../../icon/ui-pokerus-icon';
 import { UIShinyIcon } from '../../icon/ui-shiny-icon';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import { UIDetailsLevel } from './ui-details-level';
@@ -17,11 +18,11 @@ export type UIDetailsMainProps = {
     isAlpha?: boolean;
     types: React.ReactNode;
     markings: React.ReactNode;
-    teraType?: React.ReactNode;
+    teraType?: React.ReactNode; // TODO
     ball: React.ReactNode;
     nickname: string;
     level: number;
-    eggHatchCount?: number;
+    // eggHatchCount?: number;
     pokerusDays?: number;
     isPokerusCured?: boolean;
     heldItem?: React.ReactNode;
@@ -30,7 +31,7 @@ export type UIDetailsMainProps = {
 
 export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
     ball, nickname, gender, isEnabled, isShiny, isAlpha,
-    species, speciesName, level,
+    species, speciesName, level, pokerusDays = 0, isPokerusCured,
     types, heldItem, markings,
     children,
 }) => {
@@ -71,8 +72,12 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
                 </>}
             </Stack>
             <Center>{children}</Center>
-            <Stack>
+            <Stack align='flex-end'>
                 {markings}
+                {(pokerusDays || isPokerusCured) && <UIPokerusIcon
+                    cured={isPokerusCured}
+                    size='big'
+                />}
             </Stack>
         </UISpriteSizeWrapper>
     </Stack>;

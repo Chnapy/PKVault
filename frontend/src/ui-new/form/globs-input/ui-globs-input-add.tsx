@@ -1,46 +1,25 @@
 import { FilePlusIcon, FolderPlusIcon, MinusCircleIcon } from 'lucide-react';
 import React from 'react';
+import { switchUtil } from '../../../util/switch-util';
 import { UIButton, type UIButtonProps } from '../button/ui-button';
+
+export type UIGlobType = 'file' | 'folder' | 'exclude';
 
 export type UIGlobsInputAddProps = Pick<UIButtonProps, 'name'> & {
     label: string;
-    type: 'file' | 'folder' | 'exclude';
-    onAdd: (paths: string[]) => void;
+    type: UIGlobType;
+    onAdd: (type: UIGlobType, paths: string[]) => void;
     disabled?: boolean;
 };
 
 export const UIGlobsInputAdd: React.FC<UIGlobsInputAddProps> = ({ name, label, type, onAdd, disabled }) => {
-    const getTypeInfos = () => {
-        if (type === 'file')
-            return {
-                id: -1,
-                icon: 'file-import',
-                directoryOnly: false,
-                placeholder: './path/to/file',
-                getFinalPaths: (values: string[]) => values,
-            };
+    const placeholder = switchUtil(type, {
+        file: './path/to/file',
+        folder: './path/to/folder',
+        exclude: '!**/files-to-exclude',
+    });
 
-        if (type === 'folder')
-            return {
-                id: -2,
-                icon: 'folder',
-                directoryOnly: true,
-                placeholder: './path/to/folder',
-                getFinalPaths: (values: string[]) => values.map(path => path.endsWith('/') ? path : path + '/'),
-            };
-
-        return {
-            id: -3,
-            icon: 'exclaimation',
-            directoryOnly: false,
-            placeholder: '!**/files-to-exclude',
-            getFinalPaths: (values: string[]) => values,
-        };
-    };
-
-    const typeInfos = getTypeInfos();
-
-    const onAddFn = () => onAdd([ typeInfos.placeholder ]);
+    const onAddFn = () => onAdd(type, [ placeholder ]);
 
     return <UIButton
         name={name}

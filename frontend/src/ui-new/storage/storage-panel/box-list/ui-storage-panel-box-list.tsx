@@ -1,6 +1,7 @@
 import { ActionIcon, Divider, Group, Menu, Text } from '@mantine/core';
 import { BoxIcon, CalendarSyncIcon, CirclePlusIcon, EllipsisVerticalIcon, SortDescIcon } from 'lucide-react';
 import React from 'react';
+import type { BoxType } from '../../../../data/sdk/model';
 import { useTranslate } from '../../../../translate/i18n';
 import { UIExpandableTabs, type UIExpandableTabsData, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
 import { UIActionIcon } from '../../../form/button/ui-action-icon';
@@ -10,11 +11,10 @@ import { useCurrentPanel } from '../../storage-content/context/ui-panel-context'
 import classes from './ui-storage-panel-box-list.module.css';
 
 export type UIBoxData = UIExpandableTabsData & {
-    id: string;
-    label: string;
+    type: BoxType;
 };
 
-export type UIStoragePanelBoxListProps = Pick<UIExpandableTabsProps<UIExpandableTabsData>, 'value' | 'data' | 'renderTab' | 'renderExpanded'> & {
+export type UIStoragePanelBoxListProps = Pick<UIExpandableTabsProps<UIBoxData>, 'value' | 'data' | 'renderTab' | 'renderExpanded'> & {
     onSelect: (id: string) => void;
     onCreate?: () => unknown;
     advancedActionSort: React.ReactNode;
@@ -29,7 +29,7 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
     const { isInCurrentPanel } = useCurrentPanel();
 
     return <Group align='flex-start' wrap='nowrap'>
-        <UIExpandableTabs
+        <UIExpandableTabs<UIBoxData>
             id='boxes'
             level={1}
             controlsEnabled={isInCurrentPanel}

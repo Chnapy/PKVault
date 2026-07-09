@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Group, SimpleGrid, Stack, Text } from '@mantine/core';
+import { ActionIcon, Button, Group, SimpleGrid, Stack, Text, type ButtonProps } from '@mantine/core';
 import { PenIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 import type { UIExpandableTabsData } from '../../../expandable-tabs/ui-expandable-tabs';
@@ -16,11 +16,12 @@ export type UIBoxExpandedProps = UIExpandableTabsData & {
     selected: boolean;
     onSelect?: () => void;
     onDelete?: () => void;
+    color?: ButtonProps[ 'color' ];
     editDropdown: React.ReactNode;
 };
 
 export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
-    id, label, selected, slotsStates, onSelect, onDelete, editDropdown
+    id, label, selected, slotsStates, onSelect, onDelete, color, editDropdown
 }) => {
     const panel = useCurrentPanel();
 
@@ -80,6 +81,8 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
         <WithControlsIcons placement='out' icons={controlIcons('open')}>
             <Button
                 variant='default'
+                c={color}
+                bd={color && '1px solid currentcolor'}
                 {...focusProps}
                 {...controlProps('open')}
                 h='auto'

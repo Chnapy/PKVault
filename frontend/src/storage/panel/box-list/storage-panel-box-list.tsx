@@ -10,6 +10,7 @@ import { useCurrentStorageWithFallback } from '../hooks/use-current-storage-with
 import { useFilteredBoxes } from '../hooks/use-filtered-boxes';
 import { useCurrentStorage } from '../storage-panel-context';
 import { BoxExpanded } from './box-expanded';
+import { getBoxTypeColor } from './utils/get-box-type-color';
 
 export const StoragePanelBoxList: React.FC = () => {
     const { setStorage } = useCurrentStorage();
@@ -40,9 +41,10 @@ export const StoragePanelBoxList: React.FC = () => {
 
     return <UIStoragePanelBoxList
         value={boxId.toString()}
-        data={boxes.map(({ id, name }): UIBoxData => ({
+        data={boxes.map(({ id, name, type }): UIBoxData => ({
             id,
             label: name,
+            type,
         }))}
         onSelect={onSelect}
         onCreate={saveId || !bankId
@@ -54,6 +56,7 @@ export const StoragePanelBoxList: React.FC = () => {
             value={item.id}
             onClick={reduce}
             disabled={storage.data?.disabledBoxId === item.id}
+            color={getBoxTypeColor(item.type)}
             py={0}
             style={{ gap: 4 }}
             rightSection={selected && <StorageSelectCheckbox

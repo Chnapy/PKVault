@@ -10,11 +10,12 @@ import { getActionColor } from '../utils/get-action-color';
 
 export type UITimelineActionProps = {
     type: DataActionType;
+    description: string;
     index: number;
     onDelete: (index: number) => Promise<unknown>;
 };
 
-export const UITimelineAction: React.FC<UITimelineActionProps> = ({ type, index, onDelete }) => {
+export const UITimelineAction: React.FC<UITimelineActionProps> = ({ type, description, index, onDelete }) => {
     const popover = usePopover();
     const getLabel = useActionLabel();
 
@@ -53,5 +54,6 @@ export const UITimelineAction: React.FC<UITimelineActionProps> = ({ type, index,
         </Group>}
         bullet={<Indicator inline processing color={getActionColor(type)} />}
     >
+        {description}
     </Timeline.Item>;
 };

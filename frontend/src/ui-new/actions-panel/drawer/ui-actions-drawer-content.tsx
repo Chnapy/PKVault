@@ -3,11 +3,10 @@ import { SaveIcon, SortDescIcon } from 'lucide-react';
 import type React from 'react';
 import { useTranslate } from '../../../translate/i18n';
 import { UIButton } from '../../form/button/ui-button';
-import type { UIActionProps } from '../ui-action';
 import { UITimelineAction, type UITimelineActionProps } from './ui-timeline-action';
 
 export type UIActionsDrawerContentProps = {
-    data: UIActionProps[];
+    data: Pick<UITimelineActionProps, 'type' | 'description'>[];
     onDelete: UITimelineActionProps[ 'onDelete' ];
     onSave?: () => Promise<unknown>;
 };
@@ -19,10 +18,10 @@ export const UIActionsDrawerContent: React.FC<UIActionsDrawerContentProps> = ({ 
         <Timeline bulletSize={16} lineWidth={2} color='red' py='md' style={{
             overflow: 'auto'
         }}>
-            {data.map(({ type }, i) => (
+            {data.map((props, i) => (
                 <UITimelineAction
                     key={i}
-                    type={type}
+                    {...props}
                     index={i}
                     onDelete={onDelete}
                 />

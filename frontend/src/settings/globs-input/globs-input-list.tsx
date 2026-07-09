@@ -3,7 +3,8 @@ import type { UseFormRegisterReturn } from 'react-hook-form';
 import { UIGlobsInputList, type UIGlobsInputListProps } from '../../ui-new/form/globs-input/ui-globs-input-list';
 import { GlobsInputItem } from './globs-input-item';
 import { GlobsInputResults } from './globs-input-results';
-import { isDesktop } from './hooks/use-desktop-message';
+import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
+import type { UIGlobType } from '../../ui-new/form/globs-input/ui-globs-input-add';
 
 export type GlobsInputListProps = Omit<UseFormRegisterReturn, 'onChange'>
     & Pick<UIGlobsInputListProps, 'labelList' | 'labelAddFile' | 'labelAddFolder'>
@@ -15,13 +16,56 @@ export type GlobsInputListProps = Omit<UseFormRegisterReturn, 'onChange'>
     };
 
 export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, labelAddFile, labelAddFolder, name, value, onChange, limit, disabled, ...rest }) => {
+    const desktopMessage = useDesktopMessage();
+
     const splitedValue = value.split('\n').map(value => value.trim()).filter(Boolean);
+
+    const getTypeInfos = (type: UIGlobType) => {
+        if (type === 'file')
+            return {
+                id: -1,
+                directoryOnly: false,
+                getFinalPaths: (values: string[]) => values,
+            };
+
+        if (type === 'folder')
+            return {
+                id: -2,
+                directoryOnly: true,
+                getFinalPaths: (values: string[]) => values.map(path => path.endsWith('/') ? path : path + '/'),
+            };
+
+        return {
+            id: -3,
+            directoryOnly: false,
+            getFinalPaths: (values: string[]) => values,
+        };
+    };
 
     return <UIGlobsInputList
         labelList={labelList}
         labelAddFile={labelAddFile}
         labelAddFolder={labelAddFolder}
-        onAdd={(newValue: string[]) => {
+        onAdd={async (type, newValue) => {
+
+            if (desktopMessage) {
+                const typeInfos = getTypeInfos(type);
+
+                const response = await desktopMessage.fileExplore({
+                    type: 'file-explore',
+                    id: typeInfos.id,
+                    directoryOnly: typeInfos.directoryOnly,
+                    basePath: '',
+                    multiselect: false,
+                });
+
+                if (!response.values[ 0 ]) {
+                    return;
+                }
+
+                newValue = typeInfos.getFinalPaths(response.values);
+            }
+
             const newValues = [ ...splitedValue, ...newValue ];
             onChange(newValues.join('\n'));
         }}

@@ -1,8 +1,10 @@
-import { Group } from '@mantine/core';
+import { Grid, Group, Text } from '@mantine/core';
 import { FolderIcon } from 'lucide-react';
 import React from "react";
 import { Gender as GenderType } from '../../data/sdk/model';
+import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from "../../routes/pokedex";
+import { useTranslate } from '../../translate/i18n';
 import { UIButton } from '../../ui-new/form/button/ui-button';
 import { UISegmentedControl } from '../../ui-new/form/select/ui-segmented-control';
 import { UIAlphaIcon } from '../../ui-new/icon/ui-alpha-icon';
@@ -13,6 +15,7 @@ import { UIPokedexDetails } from '../../ui-new/pokedex/pokedex-details/ui-pokede
 import { UIPokedexDetailsMain } from '../../ui-new/pokedex/pokedex-details/ui-pokedex-details-main';
 import { UIDetailsContentStats } from '../../ui-new/storage/storage-details/content/stats/ui-details-content-stats';
 import { UIDetailsStatsRow, type UIDetailsStatsRowProps } from '../../ui-new/storage/storage-details/content/stats/ui-details-stats-row';
+import { UIDetailsStatsTotalRow } from '../../ui-new/storage/storage-details/content/stats/ui-details-stats-total-row';
 import { UIDetailsContent, type UIDetailsContentProps } from '../../ui-new/storage/storage-details/content/ui-details-content';
 import { UIDetailsContentExpanded } from '../../ui-new/storage/storage-details/content/ui-details-content-expanded';
 import type { UIDetailsSaveData } from '../../ui-new/storage/storage-details/saves/ui-details-save-expanded';
@@ -22,16 +25,17 @@ import { SpeciesImg } from '../../ui/img/species-img';
 import { TypeItem } from '../../ui/type-item/type-item';
 import { usePokedexDetailsSelect } from './hooks/use-pokedex-details-select';
 import { usePokedexSelectExpanded } from './hooks/use-pokedex-select-expanded';
+import { PokedexDetailsOwned } from './pokedex-details-owned';
 import { getGameInfos } from './util/get-game-infos';
 
 export const PokedexDetails: React.FC = () => {
-  // const { t } = useTranslate();
+  const { t } = useTranslate();
 
   const { expanded, toggleExpanded } = usePokedexSelectExpanded();
 
   const navigate = Route.useNavigate();
 
-  // const staticData = useStaticData();
+  const staticData = useStaticData();
 
   const selectInfos = usePokedexDetailsSelect();
 
@@ -66,15 +70,47 @@ export const PokedexDetails: React.FC = () => {
   } = selectInfos;
 
   const baseStats = selectedForm.baseStats;
-  // const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);
+  const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);
+
+  // return (
+  //   <DetailsCardContainer
+  //     content={<>
+  //       {owned && (
+  //         <PokedexDetailsOwned saveId={selectedSpeciesValue.saveId} species={selectedSpeciesValue.species} />
+  //       )}
+  //     </>}
+  //   />
+  // );
 
   const content: UIDetailsContentProps[ 'content' ] = [
+    {
+      name: 'summary',
+      label: 'Summary',
+      content: <Grid>
+        <Grid.Col span={4}>
+          {t('details.abilities')}
+        </Grid.Col>
+        <Grid.Col span={8}>
+          <Group gap='sm'>
+            {selectedForm.abilities.map(ability => <Text key={ability} w='100%'>
+              {staticData.abilities[ ability ]?.name}
+            </Text>)}
+          </Group>
+        </Grid.Col>
+      </Grid>,
+    },
+    {
+      name: 'owned',
+      label: <><FolderIcon /> Owned</>,
+      content: <PokedexDetailsOwned saveId={selectedSpeciesValue.saveId || null} species={selectedSpeciesValue.species} />,
+    },
     {
       name: 'stats',
       label: 'Stats',
       content: <UIDetailsContentStats>
         {([ 'hp', 'atk', 'def', 'spa', 'spd', 'spe' ] satisfies UIDetailsStatsRowProps[ 'stat' ][])
-          .map((stat, i) => <UIDetailsStatsRow key={stat} stat={stat} value={baseStats[ i ]!} />)}
+          .map((stat, i) => <UIDetailsStatsRow key={stat} stat={stat} value={baseStats[ i ]!} level={50} />)}
+        <UIDetailsStatsTotalRow total={totalBaseStats} level={50} />
       </UIDetailsContentStats>,
     },
     {
@@ -194,21 +230,4 @@ export const PokedexDetails: React.FC = () => {
       }
     })}
   />;
-
-  // return (
-  //   <DetailsCardContainer
-  //     content={<>
-  //       {selectedForm.abilities.length > 0 && <TextContainer stick>
-  //         <span className={css({ color: theme.text.primary })}>{t('details.abilities')}</span><br />
-  //         {selectedForm.abilities.map(ability => <div key={ability}>{
-  //           staticData.abilities[ ability ]?.name
-  //         }</div>)}
-  //       </TextContainer>}
-
-  //       {owned && (
-  //         <PokedexDetailsOwned saveId={selectedSpeciesValue.saveId} species={selectedSpeciesValue.species} />
-  //       )}
-  //     </>}
-  //   />
-  // );
 };

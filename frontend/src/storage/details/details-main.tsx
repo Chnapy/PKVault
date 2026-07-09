@@ -41,7 +41,7 @@ export const DetailsMain: React.FC = () => {
         ball={<BallImg item={pkm.ball} />}
         nickname={pkm.nickname}
         level={pkm.level}
-        eggHatchCount={pkm.eggHatchCount}
+        // eggHatchCount={pkm.eggHatchCount}
         pokerusDays={pkm.pokerusDays}
         isPokerusCured={pkm.isPokerusCured}
         heldItem={pkm.heldItem > 0
