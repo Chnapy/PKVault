@@ -47,7 +47,8 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         };
 
         const keydownListener = (e: KeyboardEvent) => {
-            updateState('keyboard');
+            if (!document.activeElement || document.activeElement.nodeName !== 'INPUT')
+                updateState('keyboard');
 
             for (const control of getSortedFilteredControls()) {
                 const listeners = control.triggers.keyboard?.listeners ?? [ 'onKeyDown' ];

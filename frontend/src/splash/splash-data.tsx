@@ -4,10 +4,10 @@ import { useBackupGetAll } from '../data/sdk/backup/backup.gen';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { useStaticDataGet } from '../data/sdk/static-data/static-data.gen';
-import { useStorageGetMainBanks, useStorageGetBoxes } from '../data/sdk/storage/storage.gen';
+import { useStorageGetBoxes, useStorageGetMainBanks } from '../data/sdk/storage/storage.gen';
 import { Fallback } from '../error/fallback';
 import { useDesktopMessage } from '../settings/globs-input/hooks/use-desktop-message';
-import { Splash } from '../ui/splash/splash';
+import { UISplash } from '../ui/splash/ui-splash';
 
 /**
  * Display splash screen until whole data is loaded without error.
@@ -51,5 +51,5 @@ export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number
         return children;
     }
 
-    return <Splash>{error && <Fallback.default error={error} resetErrorBoundary={() => null} />}</Splash>;
+    return <UISplash>{error && <Fallback.default error={error} resetErrorBoundary={() => null} />}</UISplash>;
 };

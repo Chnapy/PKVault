@@ -31,7 +31,8 @@ class Program
     {
         LogUtil.Initialize();
 
-        try {
+        try
+        {
             Backend.Program.Copyright();
 
             var window = new PhotinoWindow();
@@ -157,7 +158,7 @@ class Program
             // Windows only: resize to a percentage of the main monitor work area
             .SetUseOsDefaultSize(WindowsOS)
             // Linux only: static initial size
-            .SetSize(1360, 800)
+            .SetSize(1280, 800)
             .Center()
             .SetResizable(true)
             .SetIconFile(tmpIconFilepath)

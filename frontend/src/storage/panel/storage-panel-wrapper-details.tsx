@@ -4,7 +4,7 @@ import { Route } from '../../routes/storage';
 import type { PopoverContext } from '../../ui-new/interaction/focus-controls/components/popover/context/popover-context';
 import { useMoveContext } from '../../ui-new/interaction/move/context/use-move-context';
 import { useSelectContextNullable } from '../../ui-new/interaction/select/context/use-select-context';
-import { UIStoragePanelWrapperDetails } from '../../ui-new/storage/storage-panel/ui-storage-panel-wrapper-details';
+import { UIStoragePanelWrapperDetails, type UIStoragePanelWrapperDetailsProps } from '../../ui-new/storage/storage-panel/ui-storage-panel-wrapper-details';
 import { useStorageSelectExpanded } from '../details/hooks/use-storage-select-expanded';
 import { MultiSelectActions } from '../details/multi-select-actions';
 import { StorageDetails } from '../details/storage-details';
@@ -58,6 +58,10 @@ export const StoragePanelWrapperDetails: React.FC = () => {
 
     const { expanded } = useStorageSelectExpanded();
 
+    const position: UIStoragePanelWrapperDetailsProps[ 'position' ] = useCurrentStorage().storageIndex
+        ? 'left-start'
+        : 'right-start';
+
     const stateRef = React.useRef({ opened });
 
     React.useEffect(() => {
@@ -79,6 +83,7 @@ export const StoragePanelWrapperDetails: React.FC = () => {
     return <UIStoragePanelWrapperDetails
         opened={opened}
         setOpened={setOpened}
+        position={position}
         expanded={expanded}
         // eslint-disable-next-line react-hooks/refs
         seeThrough={seeThrough}

@@ -85,7 +85,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
             onChange={value => setValue('slotCount', +value)}
         />
 
-        <Group>
+        <Group justify='space-between'>
             <UIButton
                 name='order-left'
                 controlLabel='Change order - left'

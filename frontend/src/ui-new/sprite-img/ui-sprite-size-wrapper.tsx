@@ -6,7 +6,7 @@ export type ReactTag = keyof React.JSX.IntrinsicElements | React.JSXElementConst
 
 type UISpriteSizeWrapperProps<T extends ReactTag = ReactTag> = {
     component: T;
-    speciesSize?: 'sm' | 'md' | 'lg';
+    speciesSize?: 'xs' | 'sm' | 'md' | 'lg';
     itemSize?: '1lh' | 'md' | 'lg';
 } & Omit<React.ComponentProps<T>, 'component'>;
 
@@ -21,11 +21,13 @@ export function UISpriteSizeWrapper<T extends ReactTag>({ component: Component, 
         {...rest as any}
         style={{
             '--sprite-species-size-multiplier': speciesSize && switchUtil(speciesSize, {
+                xs: 0.25,
                 sm: 0.5,
                 md: 1,
                 lg: 2,
             }),
             '--sprite-species-rendering': speciesSize && switchUtil(speciesSize, {
+                xs: 'auto',
                 sm: 'auto',
                 md: irregularPixelRatioRendering,
                 lg: undefined,

@@ -2,29 +2,9 @@ import { Badge, Group, Progress, Table } from '@mantine/core';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import type React from 'react';
 import { useTranslate } from '../../../../../translate/i18n';
+import { baseTheme } from '../../../../base-theme';
 
-const statsInfos = {
-    hp: {
-        color: '#4caf70',
-    },
-    atk: {
-        color: '#f08030',
-    },
-    def: {
-        color: '#f0c030',
-    },
-    spa: {
-        color: '#6890f0',
-    },
-    spd: {
-        color: '#78c850',
-    },
-    spe: {
-        color: '#f85888',
-    },
-};
-
-export type UIDetailsStatName = keyof typeof statsInfos;
+export type UIDetailsStatName = keyof typeof baseTheme.other.stats;
 
 export type UIDetailsStatsRowProps = {
     stat: UIDetailsStatName;
@@ -38,7 +18,7 @@ export type UIDetailsStatsRowProps = {
 export const UIDetailsStatsRow: React.FC<UIDetailsStatsRowProps> = ({ stat, value, level, natureEffect, iv, ev }) => {
     const { t } = useTranslate();
 
-    const { color } = statsInfos[ stat ];
+    const color = baseTheme.other.stats[ stat ];
 
     const name = t(`details.stats.${stat}`);
 

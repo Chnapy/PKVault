@@ -1,4 +1,3 @@
-import { css } from '@emotion/css';
 import { Accordion, Group } from '@mantine/core';
 import { AlertCircleIcon, ListIcon } from 'lucide-react';
 import React from 'react';
@@ -35,7 +34,7 @@ export const UIGlobsInputResults: React.FC<UIGlobsInputResultsProps> = ({ name, 
             <Group wrap='nowrap' pr='md'>
                 <ListIcon />
 
-                <div className={css({ flexGrow: 1, lineBreak: 'anywhere' })}>
+                <div style={{ flexGrow: 1, lineBreak: 'anywhere' }}>
                     All results
                 </div>
 

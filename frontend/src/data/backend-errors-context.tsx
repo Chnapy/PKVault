@@ -43,8 +43,8 @@ export const BackendErrorsContext = {
         return (data: unknown, error: Error | null) => {
             if (error instanceof QueryError) {
                 context.addError({
-                    message: error.errorMessage ?? undefined,
-                    stack: error.errorStack ?? undefined,
+                    message: error.errorMessage ?? error.statusText ?? undefined,
+                    stack: error.errorStack ?? error.stack ?? undefined,
                     status: error.status,
                 });
             }

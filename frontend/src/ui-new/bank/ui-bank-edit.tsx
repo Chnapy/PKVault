@@ -74,7 +74,7 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
             disabled={defaultDisabled}
         />
 
-        <Group>
+        <Group justify='space-between'>
             <UIButton
                 name='order-left'
                 controlLabel='Change order - left'

@@ -1,39 +1,6 @@
-import { createTheme, rem, type CSSVariablesResolver } from '@mantine/core';
+import { rem, type CSSVariablesResolver, type MantineThemeOverride } from '@mantine/core';
 
 const customTheme = {
-  bg: {
-    default: "#FFFFFF",
-    dark: "#393B43",
-    filter: "#FFBD18",
-
-    darker: "#101821",
-    yellow: "#FFBD18",
-    blue: "#418EC0",
-    green: "#26BA66",
-    red: "#C53E45",
-    primary: "#334AA6",
-    panel: "#F0E5DA",
-    light: "#FEF6EE",
-    item: 'rgba(255,250,245,0.8)',
-    contrast: "#B6634E",
-    contrastdark: "#934E3D",
-    app: "#FEF4EA",
-    appdark: "#F4EAE0",
-  },
-  text: {
-    default: "#101821",
-    light: "#FFFFFF",
-    primary: "#3050C8",
-    primaryLight: "#C0C0F8",
-
-    red: "#F43F46",
-  },
-  border: {
-    default: "#96979B",
-    contrast: "#934E3D",
-    focus: "#F43F46",
-    lines: "#E5E6E7",
-  },
   game: {
     blue: "#2446A1",
     red: "#A14624",
@@ -45,15 +12,6 @@ const customTheme = {
     emerald: "#457865",
     ruby: "#781810",
     za: "#32796B",
-  },
-  font: {
-    default: "Pixel Operator",
-    special: "Pokemon Emerald",
-  },
-  shadow: {
-    text: "1px 1px 0px rgba(0,0,0,0.2)",
-    textlight: "1px 1px 0px rgba(255,255,255,0.2)",
-    filter: `drop-shadow(1px 1px 0 rgba(0,0,0,.2))`,
   },
   type: {
     normal: '#9FA19F',
@@ -77,6 +35,14 @@ const customTheme = {
     stellar: '#F6A516',
     unknown: '#64A894',
   },
+  stats: {
+    hp: '#4caf70',
+    atk: '#f08030',
+    def: '#f0c030',
+    spa: '#6890f0',
+    spd: '#78c850',
+    spe: '#f85888',
+  },
   contest: {
     cool: '#EA7254',
     beauty: '#63B9D6',
@@ -85,6 +51,8 @@ const customTheme = {
     tough: '#DEC02C',
   },
   misc: {
+    genderMale: '#00C6AD',
+    genderFemale: '#FF4273',
     markBlue: '#7077E4',
     markPink: '#F681DD',
   },
@@ -98,7 +66,7 @@ declare module '@mantine/core' {
   }
 }
 
-export const baseTheme = createTheme({
+export const baseTheme = {
   fontFamily: "'Pixel Operator', sans-serif",
   primaryShade: { light: 6, dark: 6 },
   primaryColor: 'primary',
@@ -168,13 +136,13 @@ export const baseTheme = createTheme({
       "#275382"
     ],
   },
-	fontSizes: {
-		xs: rem(12),
-		sm: rem(14),
-		md: rem(16),
-		lg: rem(20),
-		xl: rem(24),
-	},
+  fontSizes: {
+    xs: rem(12),
+    sm: rem(14),
+    md: rem(16),
+    lg: rem(20),
+    xl: rem(24),
+  },
   shadows: {
     xs: `0 ${rem(1)} 0 rgba(0, 0, 0, 0.05)`,
     sm: `0 ${rem(2)} 0 rgba(0, 0, 0, 0.05)`,
@@ -183,21 +151,21 @@ export const baseTheme = createTheme({
     xl: `0 ${rem(5)} 0 rgba(0, 0, 0, 0.05)`,
   },
   spacing: {
-		xs: rem(2),
-		sm: rem(4),
-		md: rem(10),
-		lg: rem(16),
-		xl: rem(32)
+    xs: rem(2),
+    sm: rem(4),
+    md: rem(10),
+    lg: rem(16),
+    xl: rem(32)
   },
   radius: {
-		xs: rem(2),
-		sm: rem(4),
-		md: rem(6),
-		lg: rem(10),
-		xl: rem(20),
+    xs: rem(2),
+    sm: rem(4),
+    md: rem(6),
+    lg: rem(10),
+    xl: rem(20),
   },
   other: customTheme,
-});
+} satisfies MantineThemeOverride;
 
 export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
   variables: {

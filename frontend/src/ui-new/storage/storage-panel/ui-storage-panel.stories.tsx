@@ -1,7 +1,7 @@
 import { Box, Checkbox, Tabs, Text } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import gameXImg from '../../../assets/game_icons/x.png';
-import { Gender } from '../../../data/sdk/model';
+import { BoxType, Gender } from '../../../data/sdk/model';
 import type { MoveTargetInput } from '../../interaction/move/context/move-context';
 import { MoveProvider } from '../../interaction/move/context/move-provider';
 import type { MoveSource } from '../../interaction/move/state/move-state';
@@ -128,20 +128,20 @@ export const Primary: Story = {
         header: <UIStoragePanelBoxList
             value='1'
             data={[
-                { id: '1', label: 'Party' },
-                { id: '2', label: 'Box 2' },
-                { id: '3', label: 'Box 3' },
-                { id: '4', label: 'Box 4' },
-                { id: '5', label: 'Box 5' },
-                { id: '6', label: 'Box 6' },
-                { id: '7', label: 'Box 7' },
-                { id: '8', label: 'Box 8' },
-                { id: '9', label: 'Box 9' },
-                { id: '10', label: 'Box 10' },
-                { id: '11', label: 'Box 11' },
-                { id: '12', label: 'Box 12' },
-                { id: '13', label: 'Box 13' },
-                { id: '14', label: 'Box 14' },
+                { id: '1', label: 'Party', type: BoxType.Party },
+                { id: '2', label: 'Box 2', type: BoxType.Box },
+                { id: '3', label: 'Box 3', type: BoxType.Box },
+                { id: '4', label: 'Box 4', type: BoxType.Box },
+                { id: '5', label: 'Box 5', type: BoxType.Box },
+                { id: '6', label: 'Box 6', type: BoxType.Box },
+                { id: '7', label: 'Box 7', type: BoxType.Box },
+                { id: '8', label: 'Box 8', type: BoxType.Box },
+                { id: '9', label: 'Box 9', type: BoxType.Box },
+                { id: '10', label: 'Box 10', type: BoxType.Box },
+                { id: '11', label: 'Box 11', type: BoxType.Box },
+                { id: '12', label: 'Box 12', type: BoxType.Box },
+                { id: '13', label: 'Box 13', type: BoxType.Box },
+                { id: '14', label: 'Box 14', type: BoxType.Box },
             ]}
             onSelect={console.log}
             renderTab={({ item, i, selected }, { reduce }) => <Tabs.Tab
@@ -206,7 +206,7 @@ export const EmptyData: Story = {
         header: <UIStoragePanelBoxList
             value='1'
             data={[
-                { id: '1', label: 'Box 1' },
+                { id: '1', label: 'Box 1', type: BoxType.Box },
             ]}
             onSelect={console.log}
             renderTab={({ item, i, selected }, { reduce }) => <Tabs.Tab

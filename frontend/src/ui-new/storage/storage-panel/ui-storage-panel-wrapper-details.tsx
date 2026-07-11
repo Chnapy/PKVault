@@ -1,14 +1,14 @@
 import type React from 'react';
 import { PopoverWithControls, type PopoverWithControlsProps } from '../../interaction/focus-controls/components/popover/popover-with-controls';
 
-export type UIStoragePanelWrapperDetailsProps = Pick<PopoverWithControlsProps, 'opened' | 'setOpened'> & {
+export type UIStoragePanelWrapperDetailsProps = Pick<PopoverWithControlsProps, 'opened' | 'setOpened' | 'position'> & {
     expanded?: boolean;
     seeThrough?: boolean;
     details: React.ReactNode;
     children: React.ReactElement;
 };
 
-export const UIStoragePanelWrapperDetails: React.FC<UIStoragePanelWrapperDetailsProps> = ({ opened, setOpened, expanded, seeThrough = false, details, children }) => {
+export const UIStoragePanelWrapperDetails: React.FC<UIStoragePanelWrapperDetailsProps> = ({ opened, setOpened, position, expanded, seeThrough = false, details, children }) => {
     return <PopoverWithControls
         opened={opened}
         setOpened={setOpened}
@@ -24,7 +24,7 @@ export const UIStoragePanelWrapperDetails: React.FC<UIStoragePanelWrapperDetails
                 : undefined,
         }}
         focusOnMount={false}
-        position='right-start'
+        position={position}
         closeOnClickOutside={false}
         transitionProps={{
             duration: 0,

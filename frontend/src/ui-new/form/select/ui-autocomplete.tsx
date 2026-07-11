@@ -16,9 +16,6 @@ export const UIAutocomplete: React.FC<UIAutocompleteProps> = ({ name, ...rest })
         controls: [
             getSelectControl({
                 label: 'Focus',
-                action: () => {
-                    focusProps.ref.current.focus();
-                },
             }),
         ],
     });

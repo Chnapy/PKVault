@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import type React from 'react';
 import { MarkingColorUniversal } from '../../../../data/sdk/model';
-import { theme } from '../../../../ui/theme';
+import { baseTheme } from '../../../base-theme';
 import classes from './ui-marking.module.css';
 
 type UIMarkingProps = {
@@ -22,8 +22,8 @@ export const UIMarking: React.FC<UIMarkingProps> = ({ index, mark }) => {
             index === 5 && classes.diamond,
         )}
         style={{
-            backgroundColor: mark === MarkingColorUniversal.MarkedBlue ? theme.misc.markBlue
-                : mark === MarkingColorUniversal.MarkedPink ? theme.misc.markPink
+            backgroundColor: mark === MarkingColorUniversal.MarkedBlue ? baseTheme.other.misc.markBlue
+                : mark === MarkingColorUniversal.MarkedPink ? baseTheme.other.misc.markPink
                     : undefined,
         }}
     />;

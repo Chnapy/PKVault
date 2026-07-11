@@ -46,8 +46,13 @@ export const SettingsPage: React.FC = withErrorCatcher('default', () => {
   }), [ settingsMutable ]);
 
   const form = useForm<SettingsFormData>({
-    defaultValues: defaultValue
+    defaultValues: defaultValue,
   });
+
+  React.useEffect(() => {
+    if (form.formState.isDirty)
+      form.reset(defaultValue, { keepDefaultValues: false });
+  }, [ defaultValue, form ]);
 
   if (!settingsMutable) {
     return null;
@@ -105,7 +110,7 @@ export const SettingsPage: React.FC = withErrorCatcher('default', () => {
                 color='blue'
                 leftSection={<SaveIcon />}
                 loading={settingsMutation.isPending}
-                disabled={!settings.canUpdateSettings || !form.formState.isDirty || !form.formState.isValid}
+                disabled={!settings.canUpdateSettings || !form.formState.isDirty}
               >
                 {t('action.submit')}
               </UIButton>

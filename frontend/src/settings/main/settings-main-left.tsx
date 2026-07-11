@@ -57,6 +57,7 @@ export const SettingsMainLeft: React.FC = () => {
                 <UIInputLabel leftSection={<PenOffIcon />} forInput='hidE_CHEATS' label={t('settings.form.hide-cheats')} />
                 <UISwitch
                     {...form.register('hidE_CHEATS')}
+                    defaultChecked={form.getValues('hidE_CHEATS')}
                     controlLabel={t('settings.form.hide-cheats')}
                     disabled={!settings?.canUpdateSettings}
                     ml='auto'
@@ -65,6 +66,7 @@ export const SettingsMainLeft: React.FC = () => {
                 <UIInputLabel leftSection={<ShieldOff />} forInput='skiP_LEGALITY_CHECKS' label={t('settings.form.skip-legality')} />
                 <UISwitch
                     {...form.register('skiP_LEGALITY_CHECKS')}
+                    defaultChecked={form.getValues('skiP_LEGALITY_CHECKS')}
                     controlLabel={t('settings.form.skip-legality')}
                     disabled={!settings?.canUpdateSettings}
                     ml='auto'

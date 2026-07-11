@@ -1,7 +1,7 @@
 import { Progress, Table } from '@mantine/core';
 import type React from 'react';
 import { useTranslate } from '../../../../../translate/i18n';
-import { theme } from '../../../../theme';
+import { baseTheme } from '../../../../base-theme';
 
 type ContestProps = {
     index: number;
@@ -14,23 +14,23 @@ export const UIContest: React.FC<ContestProps> = ({ index, value }) => {
     const getContestInfo = (index: number) => {
         switch (index) {
             case 0: return {
-                color: theme.other?.contest?.cool,
+                color: baseTheme.other.contest.cool,
                 label: t('details.contest.cool'),
             };
             case 1: return {
-                color: theme.other?.contest?.beauty,
+                color: baseTheme.other.contest.beauty,
                 label: t('details.contest.beauty'),
             };
             case 2: return {
-                color: theme.other?.contest?.cute,
+                color: baseTheme.other.contest.cute,
                 label: t('details.contest.cute'),
             };
             case 3: return {
-                color: theme.other?.contest?.smart,
+                color: baseTheme.other.contest.smart,
                 label: t('details.contest.smart'),
             };
             case 4: return {
-                color: theme.other?.contest?.tough,
+                color: baseTheme.other.contest.tough,
                 label: t('details.contest.tough'),
             };
             case 5: return {

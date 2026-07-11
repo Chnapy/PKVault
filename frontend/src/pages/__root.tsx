@@ -1,9 +1,11 @@
 import { Outlet } from "@tanstack/react-router";
 import React from "react";
 import { HistoryContext } from '../context/history-context';
+import { GameVersion } from '../data/sdk/model';
 import { useStorageGetActions } from '../data/sdk/storage/storage.gen';
 import { Header } from '../header/header';
 import { HelpDialog } from '../help/help-dialog';
+import { getGameInfos } from '../pokedex/details/util/get-game-infos';
 import { ActionsPanel } from '../storage/actions/actions-panel';
 import { MoveSelectImplProvider } from '../storage/move/move-select-impl-provider';
 import { UIAppLayout } from '../ui-new/layout/app-layout/ui-app-layout';
@@ -11,7 +13,10 @@ import { UIFooter } from '../ui-new/layout/footer/ui-footer';
 import { iconResources } from '../ui/icon/icon-resources';
 import { ImgPrefetch } from '../ui/icon/img-prefetch';
 
+const versionsImgs = [ ...new Set(Object.values(GameVersion).map(version => getGameInfos(version).img)) ].filter(Boolean);
+
 export const RootPage: React.FC = () => {
+
   const hasStorageActions = !!useStorageGetActions().data?.data.length;
 
   React.useEffect(() => {
@@ -22,6 +27,11 @@ export const RootPage: React.FC = () => {
     }
 
   }, [ hasStorageActions ]);
+
+  const imgsToPrefetch = [
+    ...Object.values(iconResources).flatMap(v => Object.values(v)),
+    ...versionsImgs,
+  ];
 
   return (
     <HistoryContext.Provider>
@@ -38,7 +48,7 @@ export const RootPage: React.FC = () => {
       </MoveSelectImplProvider>
 
       <div aria-description='prefetch' style={{ width: 0, height: 0 }}>
-        {Object.values(iconResources).flatMap(v => Object.values(v)).map(url => <ImgPrefetch
+        {imgsToPrefetch.map(url => <ImgPrefetch
           key={url}
           src={url}
         />)}

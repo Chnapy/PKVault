@@ -1,12 +1,12 @@
 import { GameVersion } from "../../../data/sdk/model";
-import { theme } from "../../../ui/theme";
 import { switchUtil } from "../../../util/switch-util";
 
+import type { MantineColor } from '@mantine/core';
 import alphaSapphireImg from '../../../assets/game_icons/alpha-sapphire.png';
+import battleRevImg from '../../../assets/game_icons/battle-rev.png';
 import blackImg from '../../../assets/game_icons/black.png';
 import black2Img from '../../../assets/game_icons/black2.png';
 import blueImg from '../../../assets/game_icons/blue.png';
-import battleRevImg from '../../../assets/game_icons/battle-rev.png';
 import boxRSImg from '../../../assets/game_icons/box-rs.png';
 import brillantDiamondImg from '../../../assets/game_icons/brillant-diamond.png';
 import colosseumImg from '../../../assets/game_icons/colosseum.png';
@@ -20,6 +20,7 @@ import goldImg from '../../../assets/game_icons/gold.png';
 import heartgoldImg from '../../../assets/game_icons/heartgold.png';
 import leafgreenImg from '../../../assets/game_icons/leafgreen.png';
 import legendImg from '../../../assets/game_icons/legend-arceus.png';
+import zaImg from '../../../assets/game_icons/legend-za.png';
 import letsgoevoliImg from '../../../assets/game_icons/letsgoevoli.png';
 import letsgopikachuImg from '../../../assets/game_icons/letsgopikachu.png';
 import moonImg from '../../../assets/game_icons/moon.png';
@@ -45,16 +46,16 @@ import xImg from '../../../assets/game_icons/x.png';
 import xdImg from '../../../assets/game_icons/xd.png';
 import yImg from '../../../assets/game_icons/y.png';
 import yellowImg from '../../../assets/game_icons/yellow.png';
-import zaImg from '../../../assets/game_icons/legend-za.png';
+import { baseTheme } from '../../../ui-new/base-theme';
 
 export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = true): {
   img: string;
-  color: string;
+  color: MantineColor;
 } => {
   if (!isEnabled) {
     return {
       img: getGameInfos(null).img,
-      color: theme.bg.dark,
+      color: 'dark',
     };
   }
 
@@ -62,7 +63,7 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
   if (!version) {
     return {
       img: '/logo.svg',
-      color: theme.bg.contrast,
+      color: 'primary',
     };
   }
 
@@ -82,342 +83,342 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
     >(version, {
       [ GameVersion.S ]: () => ({
         img: sapphireImg,
-        color: theme.game.saphir,
+        color: baseTheme.other.game.saphir,
       }),
       [ GameVersion.R ]: () => ({
         img: rubyImg,
-        color: theme.game.ruby,
+        color: baseTheme.other.game.ruby,
       }),
       [ GameVersion.E ]: () => ({
         img: emeraldImg,
-        color: theme.game.emerald,
+        color: baseTheme.other.game.emerald,
       }),
       [ GameVersion.FR ]: () => ({
         img: fireredImg,
-        color: theme.game.red,
+        color: baseTheme.other.game.red,
       }),
       [ GameVersion.LG ]: () => ({
         img: leafgreenImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
 
       [ GameVersion.HG ]: () => ({
         img: heartgoldImg,
-        color: theme.game.gold,
+        color: baseTheme.other.game.gold,
       }),
       [ GameVersion.SS ]: () => ({
         img: soulsilverImg,
-        color: theme.game.silver,
+        color: baseTheme.other.game.silver,
       }),
 
       [ GameVersion.D ]: () => ({
         img: diamondImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.P ]: () => ({
         img: pearlImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Pt ]: () => ({
         img: platinumImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
 
       [ GameVersion.CXD ]: () => ({
         img: colosseumImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
 
       [ GameVersion.BATREV ]: () => ({
         img: battleRevImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
 
       [ GameVersion.W ]: () => ({
         img: whiteImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.B ]: () => ({
         img: blackImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.W2 ]: () => ({
         img: white2Img,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.B2 ]: () => ({
         img: black2Img,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
 
       [ GameVersion.X ]: () => ({
         img: xImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Y ]: () => ({
         img: yImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.AS ]: () => ({
         img: alphaSapphireImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.OR ]: () => ({
         img: omegaRubyImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
 
       [ GameVersion.SN ]: () => ({
         img: sunImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.MN ]: () => ({
         img: moonImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.US ]: () => ({
         img: ultraSunImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.UM ]: () => ({
         img: ultraMoonImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
 
       [ GameVersion.GO ]: () => ({
         img: goImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
 
       [ GameVersion.RD ]: () => ({
         img: redImg,
-        color: theme.game.red,
+        color: baseTheme.other.game.red,
       }),
       [ GameVersion.GN ]: () => ({
         img: blueImg,
-        color: theme.game.blue,
+        color: baseTheme.other.game.blue,
       }),
       [ GameVersion.BU ]: () => ({
         img: blueImg,
-        color: theme.game.blue,
+        color: baseTheme.other.game.blue,
       }),
       [ GameVersion.YW ]: () => ({
         img: yellowImg,
-        color: theme.game.yellow,
+        color: baseTheme.other.game.yellow,
       }),
       [ GameVersion.GD ]: () => ({
         img: goldImg,
-        color: theme.game.gold,
+        color: baseTheme.other.game.gold,
       }),
       [ GameVersion.SI ]: () => ({
         img: silverImg,
-        color: theme.game.silver,
+        color: baseTheme.other.game.silver,
       }),
       [ GameVersion.C ]: () => ({
         img: crystalImg,
-        color: theme.game.crystal,
+        color: baseTheme.other.game.crystal,
       }),
 
       [ GameVersion.GP ]: () => ({
         img: letsgopikachuImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.GE ]: () => ({
         img: letsgoevoliImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.SW ]: () => ({
         img: swordImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.SH ]: () => ({
         img: shieldImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.PLA ]: () => ({
         img: legendImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.BD ]: () => ({
         img: brillantDiamondImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.SP ]: () => ({
         img: shiningPearlImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.SL ]: () => ({
         img: scarletImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.VL ]: () => ({
         img: violetImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.ZA ]: () => ({
         img: zaImg,
-        color: theme.game.za,
+        color: baseTheme.other.game.za,
       }),
       [ GameVersion.CP ]: () => ({
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
 
       // Game groupings
 
       [ GameVersion.RB ]: () => ({
         img: blueImg,
-        color: theme.game.blue,
+        color: baseTheme.other.game.blue,
       }),
       [ GameVersion.RBY ]: () => ({
         img: yellowImg,
-        color: theme.game.yellow,
+        color: baseTheme.other.game.yellow,
       }),
 
       [ GameVersion.GS ]: () => ({
         img: silverImg,
-        color: theme.game.silver,
+        color: baseTheme.other.game.silver,
       }),
       [ GameVersion.GSC ]: () => ({
         img: crystalImg,
-        color: theme.game.crystal,
+        color: baseTheme.other.game.crystal,
       }),
 
       [ GameVersion.RS ]: () => ({
         img: sapphireImg,
-        color: theme.game.saphir,
+        color: baseTheme.other.game.saphir,
       }),
       [ GameVersion.RSE ]: () => ({
         img: emeraldImg,
-        color: theme.game.emerald,
+        color: baseTheme.other.game.emerald,
       }),
 
       [ GameVersion.FRLG ]: () => ({
         img: fireredImg,
-        color: theme.game.red,
+        color: baseTheme.other.game.red,
       }),
       [ GameVersion.RSBOX ]: () => ({
         img: boxRSImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.COLO ]: () => ({
         img: colosseumImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.XD ]: () => ({
         img: xdImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.DP ]: () => ({
         img: diamondImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.DPPt ]: () => ({
         img: platinumImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.HGSS ]: () => ({
         img: soulsilverImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       // [ GameVersion.]: () => ({
-      //   // color: theme.game.,
+      //   // color: baseTheme.other.game.,
       // }),
       [ GameVersion.BW ]: () => ({
         img: blackImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.B2W2 ]: () => ({
         img: black2Img,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.XY ]: () => ({
         img: xImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.ORASDEMO ]: () => ({
         img: omegaRubyImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.ORAS ]: () => ({
         img: omegaRubyImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.SM ]: () => ({
         img: sunImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.USUM ]: () => ({
         img: ultraSunImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.GG ]: () => ({
         img: letsgopikachuImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.SWSH ]: () => ({
         img: swordImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.BDSP ]: () => ({
         img: brillantDiamondImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.SV ]: () => ({
         img: scarletImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Gen1 ]: () => ({
         img: yellowImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Gen2 ]: () => ({
         img: crystalImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Gen3 ]: () => ({
         img: emeraldImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Gen4 ]: () => ({
         img: platinumImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Gen5 ]: () => ({
         img: blackImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Gen6 ]: () => ({
         img: xImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Gen7 ]: () => ({
         img: sunImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Gen7b ]: () => ({
         img: letsgopikachuImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Gen8 ]: () => ({
         img: swordImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Gen9 ]: () => ({
         img: scarletImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.StadiumJ ]: () => ({
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Stadium ]: () => ({
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.Stadium2 ]: () => ({
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
       [ GameVersion.EFL ]: () => ({
         img: emeraldImg,
-        // color: theme.game.,
+        // color: baseTheme.other.game.,
       }),
     }) ??
     (() => ({
@@ -429,6 +430,6 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
   return {
     ...gameData,
     img: gameData.img ?? defaultImg,
-    color: gameData.color ?? theme.bg.dark,
+    color: gameData.color ?? 'dark',
   } satisfies typeof gameData;
 };

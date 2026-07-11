@@ -38,26 +38,32 @@ const getContent = (): UIDetailsContentProps[ 'content' ] => [
                 {
                     stat: 'hp',
                     value: 55,
+                    level: 50,
                 } satisfies UIDetailsStatsRowProps,
                 {
                     stat: 'atk',
                     value: 50,
+                    level: 50,
                 } satisfies UIDetailsStatsRowProps,
                 {
                     stat: 'def',
                     value: 45,
+                    level: 50,
                 } satisfies UIDetailsStatsRowProps,
                 {
                     stat: 'spa',
                     value: 135,
+                    level: 50,
                 } satisfies UIDetailsStatsRowProps,
                 {
                     stat: 'spd',
                     value: 95,
+                    level: 50,
                 } satisfies UIDetailsStatsRowProps,
                 {
                     stat: 'spe',
                     value: 120,
+                    level: 50,
                 } satisfies UIDetailsStatsRowProps,
             ].map((props) => <UIDetailsStatsRow key={props.stat} {...props} />)}
         </UIDetailsContentStats>,

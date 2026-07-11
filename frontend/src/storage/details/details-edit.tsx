@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import type { EditPkmVariantPayload } from '../../data/sdk/model';
+import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { useStorageGetPkmAvailableMoves, useStorageMainEditPkmVariant, useStorageSaveEditPkm } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { UIDetailsContentMoveTable } from '../../ui-new/storage/storage-details/content/moves/ui-details-content-moves-table';
@@ -14,6 +15,9 @@ export const DetailsEdit: React.FC<{ pkmId: string; saveId: number | null }> = (
     const staticData = useStaticData();
 
     const getStaticMove = useStaticMove(saveId, pkmId);
+
+    const settingsQuery = useSettingsGet();
+    const settingsMutable = settingsQuery.data?.data.settingsMutable;
 
     const availableMovesQuery = useStorageGetPkmAvailableMoves({
         saveId: saveId ?? undefined,
@@ -71,6 +75,7 @@ export const DetailsEdit: React.FC<{ pkmId: string; saveId: number | null }> = (
 
     return <UIDetailsEdit
         defaultValues={defaultValue}
+        hideCheats={!!settingsMutable?.hidE_CHEATS}
         nicknameMaxLength={pkm.nicknameMaxLength}
         minEv={0}
         maxEv={maxEV}

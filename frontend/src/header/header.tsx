@@ -57,7 +57,7 @@ export const Header: React.FC = () => {
 
             <Tooltip
                 label={t('action.not-possible')}
-                disabled={!settings?.canScanSaves}
+                disabled={settings?.canScanSaves}
             >
                 <UIButton
                     name='refresh-data'
@@ -70,6 +70,7 @@ export const Header: React.FC = () => {
                     fw='normal'
                     color='white'
                     variant='outline'
+                    mx='auto'
                     style={{ alignSelf: 'center' }}
                 >
                     {t('header.scan-saves')}

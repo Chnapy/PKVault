@@ -1,7 +1,7 @@
-import { Box, Flex, Paper, Stack, Tabs, Title } from '@mantine/core';
+import { Box, Flex, Group, Paper, Stack, Tabs, Title } from '@mantine/core';
 import { clsx } from 'clsx';
 import React from 'react';
-import { theme } from '../../../ui/theme';
+import { baseTheme } from '../../base-theme';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { FocusScope } from '../../interaction/focus/scope/focus-scope';
 import { ScrollerControlled } from '../../scroller-controlled/scroller-controlled';
@@ -48,9 +48,9 @@ export const UIHeader: React.FC<{
 
                                 <div>
                                     <Flex gap={12}>
-                                        <div className={classes.bubble} style={{ backgroundColor: theme.game.red }} />
-                                        <div className={classes.bubble} style={{ backgroundColor: theme.game.yellow }} />
-                                        <div className={classes.bubble} style={{ backgroundColor: theme.game.emerald }} />
+                                        <div className={classes.bubble} style={{ backgroundColor: baseTheme.other.game.red }} />
+                                        <div className={classes.bubble} style={{ backgroundColor: baseTheme.other.game.yellow }} />
+                                        <div className={classes.bubble} style={{ backgroundColor: baseTheme.other.game.emerald }} />
                                     </Flex>
                                     <Title order={2}>
                                         PKVault
@@ -96,11 +96,13 @@ export const UIHeader: React.FC<{
                                         controlsLabel='Change page'
                                         style={{ flexGrow: 1 }}
                                     >
-                                        {left}
+                                        <Group gap='sm' style={{ flexGrow: 1 }}>
+                                            {left}
 
-                                        <Box ml='auto' />
+                                            <Box ml='auto' />
 
-                                        {right}
+                                            {right}
+                                        </Group>
                                     </ScrollerControlled>
                                 </Tabs.List>
                             </Tabs>

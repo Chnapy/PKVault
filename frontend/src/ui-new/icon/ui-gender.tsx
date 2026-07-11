@@ -3,6 +3,7 @@ import { clsx } from 'clsx';
 import type React from 'react';
 import { Gender } from '../../data/sdk/model';
 import classes from './ui-gender.module.css';
+import { baseTheme } from '../base-theme';
 
 export type UIGenderProps = {
     gender: Gender;
@@ -18,12 +19,13 @@ export const UIGender: React.FC<UIGenderProps> = ({ gender, size = 'medium' }) =
         span
         className={clsx(
             classes.uiGender,
-            gender === Gender.Male && classes.male,
-            gender === Gender.Female && classes.female,
             size === 'small' && classes.small,
             size === 'medium' && classes.medium,
             size === 'big' && classes.big,
         )}
+        color={gender === Gender.Male
+            ? baseTheme.other.misc.genderMale
+            : baseTheme.other.misc.genderFemale}
     >
         {gender === Gender.Male ? '♂' : '♀'}
     </Text>;

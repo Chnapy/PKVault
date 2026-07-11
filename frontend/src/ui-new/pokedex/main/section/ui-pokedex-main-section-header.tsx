@@ -1,4 +1,4 @@
-import { Badge, Divider, Group } from '@mantine/core';
+import { Badge, Box, Divider, Group } from '@mantine/core';
 import { EyeIcon, FolderIcon, ListIcon } from 'lucide-react';
 import type React from 'react';
 import { UIBallIcon } from '../../../icon/ui-ball-icon';
@@ -18,6 +18,12 @@ type UIPokedexMainSectionHeaderProps = {
 export const UIPokedexMainSectionHeader: React.FC<UIPokedexMainSectionHeaderProps> = ({
     generation, regions, games, seenCount, caughtCount, ownedCount, shinyCount, totalCount
 }) => {
+    const renderCount = (icon: React.ReactNode, count: number) => <Badge variant='default' leftSection={icon} fz='md' px='sm'>
+        <Box pl='sm'>
+            {count}
+        </Box>
+    </Badge>;
+
     return <Group justify='space-between' py='sm'>
         <Group>
             {generation}
@@ -27,12 +33,12 @@ export const UIPokedexMainSectionHeader: React.FC<UIPokedexMainSectionHeaderProp
         </Group>
 
         <Group>
-            <Badge variant='default' leftSection={<EyeIcon />} fz='md'>{seenCount}</Badge>
-            <Badge variant='default' leftSection={<UIBallIcon />} fz='md'>{caughtCount}</Badge>
-            <Badge variant='default' leftSection={<FolderIcon />} fz='md'>{ownedCount}</Badge>
-            <Badge variant='default' leftSection={<UIShinyIcon />} fz='md'>{shinyCount}</Badge>
+            {renderCount(<EyeIcon />, seenCount)}
+            {renderCount(<UIBallIcon />, caughtCount)}
+            {renderCount(<FolderIcon />, ownedCount)}
+            {renderCount(<UIShinyIcon />, shinyCount)}
             <Divider orientation='vertical' />
-            <Badge variant='default' leftSection={<ListIcon />} fz='md'>{totalCount}</Badge>
+            {renderCount(<ListIcon />, totalCount)}
         </Group>
     </Group>;
 };

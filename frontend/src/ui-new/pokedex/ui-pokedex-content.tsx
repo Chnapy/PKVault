@@ -16,6 +16,7 @@ export const UIPokedexContent: React.FC<UIPokedexContentProps> = ({ children }) 
         <WithControlsIcons placement='out' icons={controlIcons('open')}
             display='flex'
             mah='100%'
+            mih={0}
             bdrs='md'
             style={{ flexGrow: 1, flexDirection: 'column', flexWrap: 'nowrap', }}
             {...panelProps}

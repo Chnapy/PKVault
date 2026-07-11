@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
-import { useTranslate } from '../translate/i18n';
-import { Button } from '../ui/button/button';
-import { Splash } from '../ui/splash/splash';
+import { languages, useTranslate } from '../translate/i18n';
+import { UIButton } from '../ui-new/form/button/ui-button';
+import { UISplash } from '../ui/splash/ui-splash';
+import { UISplashMain } from '../ui/splash/ui-splash-main';
 import { SplashData } from './splash-data';
-import { css } from '@emotion/css';
 
 /**
  * Display splash screen until whole data is loaded without error.
@@ -30,45 +30,26 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
     }, [ shouldUpdateLanguage, i18n, language ]);
 
     if (settingsQuery.isLoading || !settingsMutable) {
-        return <Splash />;
+        return <UISplash />;
     }
 
     if (language) {
         return <SplashData appStartTime={appStartTime}>{children}</SplashData>;
     }
 
-    return <Splash>
-        <div
-            className={css({
-                textAlign: 'center',
-            })}
-        >Choose prefered language</div>
-        <div
-            className={css({
-                marginTop: 8,
-                display: 'flex',
-                justifyContent: 'center',
-                gap: 8,
-            })}
-        >
-            <Button big onClick={() => settingsEditMutation.mutateAsync({
-                data: {
-                    ...settingsMutable,
-                    language: 'en',
-                }
-            })}>English</Button>
-            <Button big onClick={() => settingsEditMutation.mutateAsync({
-                data: {
-                    ...settingsMutable,
-                    language: 'fr',
-                }
-            })}>Français</Button>
-            <Button big onClick={() => settingsEditMutation.mutateAsync({
-                data: {
-                    ...settingsMutable,
-                    language: 'de',
-                }
-            })}>Deutsch</Button>
-        </div>
-    </Splash>;
+    return <UISplash>
+        <UISplashMain>
+            {Object.entries(languages).map(([ language, name ]) => <UIButton
+                key={language}
+                name={language}
+                controlLabel={name}
+                onClick={() => settingsEditMutation.mutateAsync({
+                    data: {
+                        ...settingsMutable,
+                        language,
+                    }
+                })}
+            >{name}</UIButton>)}
+        </UISplashMain>
+    </UISplash>;
 };

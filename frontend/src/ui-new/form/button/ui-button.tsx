@@ -12,7 +12,7 @@ export type UIButtonProps = {
     focusOnMount?: boolean;
 } & Button.Props & ElementProps<'button'>;
 
-export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner, w, miw, mt, style, ...rest }) => {
+export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner, w, miw, mx, mt, style, ...rest }) => {
     const [ loadingInner, setLoading ] = React.useState(false);
 
     const loading = loadingInner || rest.loading;
@@ -40,7 +40,7 @@ export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlI
         rest.ref,
     );
 
-    return <WithControlsIcons placement='out' icons={[ controlIcons('open'), ...extraControlIcons ]} display='inline-flex' h='fit-content' w={w} miw={miw} mt={mt} style={style}>
+    return <WithControlsIcons placement='out' icons={[ controlIcons('open'), ...extraControlIcons ]} display='inline-flex' h='fit-content' w={w} miw={miw} mx={mx} mt={mt} style={style}>
         <Button
             {...focusProps}
             {...controlProps('open')}

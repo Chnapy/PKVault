@@ -1,4 +1,3 @@
-import { css } from '@emotion/css';
 import { Anchor } from '@mantine/core';
 import type { JSX } from 'react';
 
@@ -14,12 +13,12 @@ export const LinkWithIcon: React.FC<JSX.IntrinsicElements[ 'a' ]> = ({ children,
     const origin = getOrigin();
 
     const icon = <img
-        className={css({
+        style={{
             verticalAlign: 'text-bottom',
             marginRight: 4,
             width: 16,
             height: 16,
-        })}
+        }}
         src={origin && `${origin}/favicon.ico`}
     />;
 

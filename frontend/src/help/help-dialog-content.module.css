@@ -1,0 +1,22 @@
+.help-dialog-content :global(summary) {
+  cursor: pointer;
+}
+
+.help-dialog-content :global(summary):hover {
+  text-decoration: underline;
+}
+
+.help-dialog-content :global(details) {
+  padding: 4px;
+  margin: 2px 0;
+  transition: background-color 0.2s;
+}
+
+.help-dialog-content :global(details)[open],
+.help-dialog-content :global(details):hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.help-dialog-content :global(details) > p {
+  margin-left: 1em;
+}

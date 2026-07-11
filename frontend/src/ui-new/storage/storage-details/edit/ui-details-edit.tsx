@@ -1,4 +1,5 @@
-import { Group, InputWrapper, NumberInput, Slider, Stack, Text } from '@mantine/core';
+import { Alert, Group, InputWrapper, NumberInput, Slider, Stack, Text } from '@mantine/core';
+import { InfoIcon } from 'lucide-react';
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { type EditPkmVariantPayload } from '../../../../data/sdk/model';
@@ -13,6 +14,7 @@ type DataInput = EditPkmVariantPayload;
 
 type UIDetailsEditProps = {
     defaultValues: DataInput;
+    hideCheats: boolean;
     nicknameMaxLength: number;
     minEv: number;
     maxEv: number;
@@ -23,7 +25,7 @@ type UIDetailsEditProps = {
 };
 
 export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
-    defaultValues, nicknameMaxLength, minEv, maxEv, availableMoves, renderMoveItemPill, renderMoveItemOption, onSubmit: onSubmitRaw
+    defaultValues, hideCheats, nicknameMaxLength, minEv, maxEv, availableMoves, renderMoveItemPill, renderMoveItemOption, onSubmit: onSubmitRaw
 }) => {
     const { t } = useTranslate();
 
@@ -52,7 +54,7 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
         disabled={formDisabled}
     >
         <Group align='flex-start'>
-            <Stack>
+            <Stack style={{ flexGrow: 1 }}>
                 <UITextInput
                     {...register('nickname', {
                         setValueAs: value => value.trim(),
@@ -61,7 +63,7 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
                     label='Nickname'
                 />
 
-                <UIMultiSelect
+                {!hideCheats && <UIMultiSelect
                     name='moves'
                     controlLabel='Moves'
                     label='Moves'
@@ -89,10 +91,10 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
                     maw={300}
                     comboboxProps={{ withinPortal: false, position: 'right-start', floatingHeight: "viewport" }}
                     floatingHeight="viewport"
-                />
+                />}
             </Stack>
 
-            <InputWrapper
+            {!hideCheats && <InputWrapper
                 label='EVs'
             >
                 <Stack>
@@ -102,14 +104,14 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
                             valueAsNumber: true,
                             min: minEv,
                             max: formMaxValues[ i ],
-                            disabled: totalFormEVs === 0
-                                || (remainingEVs === 0 && value === 0),
                         };
                         const commonProps = {
                             value,
                             onChange: (value: string | number) => setValue(`eVs.${i}`, Number(value)),
                             min: minEv,
                             max: formMaxValues[ i ],
+                            disabled: totalFormEVs === 0
+                                || (remainingEVs === 0 && value === 0),
                         };
 
                         return <Group key={stat}>
@@ -136,8 +138,12 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
                         </Text>
                     </Group>
                 </Stack>
-            </InputWrapper>
+            </InputWrapper>}
 
         </Group>
+
+        {hideCheats && <Alert icon={<InfoIcon />} variant='outline' color='blue'>
+            Cheats are disabled in settings
+        </Alert>}
     </UIFormCard>;
 };

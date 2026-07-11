@@ -23,8 +23,6 @@
     "knip": "knip"
   },
   "dependencies": {
-    "@emotion/css": "^11.13.5",
-    "@hackernoon/pixel-icon-library": "^1.0.6",
     "@mantine/core": "^9.3.0",
     "@mantine/hooks": "^9.3.0",
     "@noriginmedia/norigin-spatial-navigation-core": "^3.1.0",

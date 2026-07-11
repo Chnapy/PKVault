@@ -19,6 +19,7 @@ export const UISettingsContent: React.FC<UISettingsContentProps> = ({ left, righ
             as='form' onSubmit={onSubmit as never}
             display='flex'
             mah='100%'
+            mih={0}
             style={{ flexGrow: 1, flexDirection: 'column', flexWrap: 'nowrap', borderRadius: 'var(--mantine-radius-md)' }}
             {...panelProps}
         >

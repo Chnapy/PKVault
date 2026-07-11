@@ -14,6 +14,12 @@ export const resources = {
     de: { ns: de },
 } as const;
 
+export const languages: Record<keyof typeof resources, string> = {
+    en: 'English',
+    fr: 'Français',
+    de: 'Deutsch',
+};
+
 i18n.use(initReactI18next).init({
     lng: "en",
     fallbackLng: "en",

@@ -1,5 +1,5 @@
 import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
-import { fallback, zodValidator } from "@tanstack/zod-adapter";
+import { fallback } from "@tanstack/zod-adapter";
 import z from "zod";
 import { SettingsPage } from '../pages/settings';
 
@@ -13,7 +13,9 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/settings")({
   component: SettingsPage,
-  validateSearch: zodValidator(fallback(searchSchema, {})),
+  validateSearch: fallback(searchSchema, {
+    subMenu: undefined,
+  }),
   search: {
     middlewares: [ retainSearchParams(true) ],
   }

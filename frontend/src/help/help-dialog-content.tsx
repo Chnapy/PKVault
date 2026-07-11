@@ -1,4 +1,3 @@
-import { css } from '@emotion/css';
 import { Anchor, Code, Text, Title } from '@mantine/core';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import React from 'react';
@@ -6,6 +5,7 @@ import ReactMarkdown, { type Components, type UrlTransform } from 'react-markdow
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 import { LinkWithIcon } from '../ui/link-with-icon/link-with-icon';
+import classes from './help-dialog-content.module.css';
 import { useHelpAnchorScroll } from './hooks/use-help-anchor-scroll';
 
 type HelpDialogContentProps = {
@@ -34,35 +34,7 @@ export const HelpDialogContent: React.FC<HelpDialogContentProps> = ({ selectedEn
 
     return <div
         ref={markdownRef}
-        className={css({
-            // a: {
-            //     color: theme.text.primary,
-
-            //     '&:hover': {
-            //         textDecoration: 'underline',
-            //     },
-            // },
-            summary: {
-                cursor: 'pointer',
-
-                '&:hover': {
-                    textDecoration: 'underline',
-                },
-            },
-            details: {
-                padding: 4,
-                margin: '2px 0',
-                transition: 'background-color .2s',
-
-                '&[open], &:hover': {
-                    backgroundColor: 'rgba(0,0,0,0.02)'
-                },
-
-                '> p': {
-                    marginLeft: '1em',
-                }
-            },
-        })}
+        className={classes.helpDialogContent}
     >
         {content && <ReactMarkdown
             rehypePlugins={[ rehypeSlug, rehypeRaw ]}

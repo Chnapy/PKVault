@@ -1,5 +1,5 @@
 import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
-import { fallback, zodValidator } from "@tanstack/zod-adapter";
+import { fallback } from "@tanstack/zod-adapter";
 import z from "zod";
 import { PokedexPage } from '../pages/pokedex';
 import type { DetailsExpandedState } from './storage';
@@ -22,7 +22,21 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/pokedex")({
   component: PokedexPage,
-  validateSearch: zodValidator(fallback(searchSchema, {})),
+  validateSearch: fallback(searchSchema, {
+    selected: undefined,
+    selectedSaveId: undefined,
+    selectExpanded: undefined,
+    filterSpeciesName: undefined,
+    filterTypes: undefined,
+    filterSeen: undefined,
+    filterCaught: undefined,
+    filterOwned: undefined,
+    filterOwnedShiny: undefined,
+    filterFromGames: undefined,
+    filterGenerations: undefined,
+    showForms: undefined,
+    showGenders: undefined,
+  }),
   search: {
     middlewares: [ retainSearchParams(true) ],
   }
