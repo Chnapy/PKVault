@@ -74,6 +74,23 @@ export const StoragePanelGameList: React.FC = () => {
         ]}
         onChange={onChange}
         expanded={value === '' ? true : undefined}
+        renderHoverCard={({ item, selected }, { reduce }) => item.id === pkvaultStorageId
+            ? <GamePkvaultExpanded
+                {...item}
+                onSelect={() => {
+                    if (!selected)
+                        onChange(item.id);
+                    reduce();
+                }}
+            />
+            : <GameExpanded
+                {...item}
+                onSelect={() => {
+                    if (!selected)
+                        onChange(item.id);
+                    reduce();
+                }}
+            />}
         renderExpanded={(data, { reduce }) => data.map(({ item, selected }) =>
             item.id === pkvaultStorageId
                 ? <GamePkvaultExpanded

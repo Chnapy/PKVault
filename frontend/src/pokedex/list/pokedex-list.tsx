@@ -61,7 +61,7 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
             <UIPokedexMainSection>
               {speciesInfos.map(({ species, speciesName, isSeen, itemsToRender }, i) => (
                 <PokedexItem
-                  key={i}
+                  key={species}
                   species={species}
                   speciesName={speciesName}
                   isSeen={isSeen}

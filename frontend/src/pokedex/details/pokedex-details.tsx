@@ -1,5 +1,4 @@
 import { Grid, Group, Text } from '@mantine/core';
-import { FolderIcon } from 'lucide-react';
 import React from "react";
 import { Gender as GenderType } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
@@ -7,10 +6,8 @@ import { Route } from "../../routes/pokedex";
 import { useTranslate } from '../../translate/i18n';
 import { UIButton } from '../../ui-new/form/button/ui-button';
 import { UISegmentedControl } from '../../ui-new/form/select/ui-segmented-control';
-import { UIAlphaIcon } from '../../ui-new/icon/ui-alpha-icon';
-import { UIBallIcon } from '../../ui-new/icon/ui-ball-icon';
 import { UIGender } from '../../ui-new/icon/ui-gender';
-import { UIShinyIcon } from '../../ui-new/icon/ui-shiny-icon';
+import { UIPokedexIcons } from '../../ui-new/pokedex/icons/ui-pokedex-icons';
 import { UIPokedexDetails } from '../../ui-new/pokedex/pokedex-details/ui-pokedex-details';
 import { UIPokedexDetailsMain } from '../../ui-new/pokedex/pokedex-details/ui-pokedex-details-main';
 import { UIDetailsContentStats } from '../../ui-new/storage/storage-details/content/stats/ui-details-content-stats';
@@ -69,6 +66,8 @@ export const PokedexDetails: React.FC = () => {
     staticFormsFiltered,
   } = selectInfos;
 
+  const speciesName = staticFormsFiltered[ 0 ]?.name ?? '';
+
   const baseStats = selectedForm.baseStats;
   const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);
 
@@ -99,9 +98,9 @@ export const PokedexDetails: React.FC = () => {
         </Grid.Col>
       </Grid>,
     },
-    {
+    selectedForm.isOwned && {
       name: 'owned',
-      label: <><FolderIcon /> Owned</>,
+      label: <><UIPokedexIcons.Owned size='xs' /> Owned</>,
       content: <PokedexDetailsOwned saveId={selectedSpeciesValue.saveId || null} species={selectedSpeciesValue.species} />,
     },
     {
@@ -133,7 +132,7 @@ export const PokedexDetails: React.FC = () => {
       label: 'Misc',
       content: 'WIP',
     },
-  ];
+  ].filter(v => typeof v === 'object');
 
   return <UIPokedexDetails
     expanded={expanded}
@@ -164,8 +163,10 @@ export const PokedexDetails: React.FC = () => {
     />}
     main={<UIPokedexDetailsMain
       species={selectedSpecies}
-      speciesName={staticFormsFiltered[ 0 ]?.name ?? ''}
-      form={selectedStaticFormWithIndex.name}
+      speciesName={speciesName}
+      form={selectedStaticFormWithIndex.name.toLowerCase() === speciesName.toLowerCase()
+        ? undefined
+        : selectedStaticFormWithIndex.name}
       gender={selectedForm.gender}
       isShiny={selectedForm.isSeenShiny}
       isAlpha={selectedForm.isSeenAlpha}
@@ -212,10 +213,10 @@ export const PokedexDetails: React.FC = () => {
             >
               <Group wrap='nowrap' gap='sm'>
                 <UIGender gender={form.gender} />
-                {form.isCaught && <UIBallIcon />}
-                {form.isOwned && <FolderIcon />}
-                {form.isSeenShiny && <UIShinyIcon />}
-                {form.isSeenAlpha && <UIAlphaIcon />}
+                {form.isCaught && <UIPokedexIcons.Caught size='xs' />}
+                {form.isOwned && <UIPokedexIcons.Owned size='xs' />}
+                {form.isSeenShiny && <UIPokedexIcons.Shiny size='xs' />}
+                {form.isSeenAlpha && <UIPokedexIcons.Alpha size='xs' />}
               </Group>
             </UIButton>;
           })}

@@ -1,4 +1,4 @@
-import { Group, Tooltip } from '@mantine/core';
+import { Group, Text, Tooltip } from '@mantine/core';
 import { ChevronLeftIcon, ChevronRightIcon, ScanEyeIcon } from 'lucide-react';
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -16,13 +16,15 @@ type UIBankEditProps = {
     bankId: string;
     selected?: boolean;
     defaultValues: DataInput;
+    bankViewNames: string[];
+    currentViewNames: string[];
     bankList: Pick<BankDTO, 'id' | 'order' | 'isDefault'>[];
     currentBankView: BankView;
     onOrderChange: (order: number) => void;
     onSubmit: (data: DataInput) => Promise<void>;
 };
 
-export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaultValues, bankList, currentBankView, onOrderChange, onSubmit: onSubmitRaw }) => {
+export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaultValues, bankViewNames, currentViewNames, bankList, currentBankView, onOrderChange, onSubmit: onSubmitRaw }) => {
     const { t } = useTranslate();
 
     const popover = usePopover();
@@ -39,7 +41,10 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
 
     const defaultDisabled = watchIsDefault && banks.filter(b => b.id !== bankId && b.isDefault).length === 0;
     const viewHelpEnable = !selected;
-    const viewDisabled = viewHelpEnable || JSON.stringify(watchView) === JSON.stringify(currentBankView);
+    const isCurrentView = JSON.stringify(watchView) === JSON.stringify(currentBankView);
+    const viewDisabled = viewHelpEnable || isCurrentView;
+
+    const selectedView = isCurrentView ? currentViewNames : bankViewNames;
 
     const setOrder = (order: number) => {
         setValue('order', order);
@@ -93,6 +98,10 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
                 <ChevronRightIcon />
             </UIButton>
         </Group>
+
+        <Text>
+            Default view: {selectedView[ 0 ] ?? '-'} / {selectedView[ 1 ] ?? '-'}
+        </Text>
 
         <Tooltip
             label={t('storage.bank.edit.view.help')}

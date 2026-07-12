@@ -12,6 +12,7 @@ export const usePokedexFilters = () => {
   const filterCaught = Route.useSearch({ select: (search) => search.filterCaught });
   const filterOwned = Route.useSearch({ select: (search) => search.filterOwned });
   const filterOwnedShiny = Route.useSearch({ select: (search) => search.filterOwnedShiny });
+  const filterAlpha = Route.useSearch({ select: (search) => search.filterAlpha });
   const filterFromGames = Route.useSearch({ select: (search) => search.filterFromGames });
   const filterGenerations = Route.useSearch({ select: (search) => search.filterGenerations });
 
@@ -28,6 +29,7 @@ export const usePokedexFilters = () => {
     const caught = speciesValues.some((spec) => spec.forms.some(form => form.isCaught));
     const owned = speciesValues.some((spec) => spec.forms.some(form => form.isOwned));
     const ownedShiny = speciesValues.some((spec) => spec.forms.some(form => form.isOwnedShiny));
+    const alpha = speciesValues.some((spec) => spec.forms.some(form => form.isSeenAlpha));
 
     if (filterSpeciesName) {
       const name = staticData.species[ speciesValues[ 0 ].species ]?.forms[ 9 ]?.[ 0 ]?.name;
@@ -67,6 +69,12 @@ export const usePokedexFilters = () => {
 
     if (filterOwnedShiny !== undefined) {
       if ((filterOwnedShiny && !ownedShiny) || (!filterOwnedShiny && ownedShiny)) {
+        return true;
+      }
+    }
+
+    if (filterAlpha !== undefined) {
+      if ((filterAlpha && !alpha) || (!filterAlpha && alpha)) {
         return true;
       }
     }

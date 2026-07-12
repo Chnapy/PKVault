@@ -1,5 +1,5 @@
 import { Group, type ComboboxItem, type OptionsFilter } from '@mantine/core';
-import React from "react";
+import React, { startTransition } from "react";
 import { EntityContext } from '../../../data/sdk/model';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
@@ -69,11 +69,11 @@ export const FilterSpecies: React.FC = () => {
       }
 
       timeoutRef.current = setTimeout(() => {
-        navigate({
+        startTransition(() => navigate({
           search: {
             filterSpeciesName: value,
           },
-        });
+        }));
       }, 500);
     }}
     data={data}

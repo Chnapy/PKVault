@@ -1,13 +1,12 @@
-import { Badge, Center, Group, Space, Stack, Text, ThemeIcon } from '@mantine/core';
-import { EyeIcon, FolderIcon } from 'lucide-react';
+import { Badge, Center, Group, Space, Stack, Text } from '@mantine/core';
 import type React from 'react';
 import type { Gender } from '../../../data/sdk/model';
 import { getSpeciesNO } from '../../../ui/dex-item/util/get-species-no';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
-import { UIBallIcon } from '../../icon/ui-ball-icon';
 import { UIGender } from '../../icon/ui-gender';
 import { UIShinyIcon } from '../../icon/ui-shiny-icon';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
+import { UIPokedexIcons } from '../icons/ui-pokedex-icons';
 
 export type UIPokedexDetailsMainProps = {
     species: number;
@@ -28,20 +27,20 @@ export const UIPokedexDetailsMain: React.FC<UIPokedexDetailsMainProps> = ({
     isSeen, isCaught, isOwned, isShiny, isAlpha,
     types, children,
 }) => {
-    const wrapIcon = (icon: React.ReactNode) => <ThemeIcon variant='default'>
-        {icon}
-    </ThemeIcon>;
-
     return <Stack gap='xs' w={280} maw='100%'>
-        <Group>
+        <Group wrap='nowrap'>
             <Text component='b' size='lg'>#{getSpeciesNO(species)}</Text>
             <Text size='lg' tt='uppercase'>{speciesName}</Text>
             {form && <Badge variant='default'>{form}</Badge>}
             <UIGender gender={gender} size='big' />
 
             <Space ml='auto' />
-            {isAlpha && <UIAlphaIcon size='big' />}
-            {isShiny && <UIShinyIcon size='big' />}
+            {isAlpha && <UIPokedexIcons.Alpha>
+                <UIAlphaIcon size='big' />
+            </UIPokedexIcons.Alpha>}
+            {isShiny && <UIPokedexIcons.Shiny>
+                <UIShinyIcon size='big' />
+            </UIPokedexIcons.Shiny>}
         </Group>
 
         <UISpriteSizeWrapper
@@ -56,10 +55,10 @@ export const UIPokedexDetailsMain: React.FC<UIPokedexDetailsMainProps> = ({
                 {heldItem} */}
             </Stack>
             <Center>{children}</Center>
-            <Stack align='flex-end' gap='sm'>
-                {isSeen && wrapIcon(<EyeIcon />)}
-                {isCaught && wrapIcon(<UIBallIcon />)}
-                {isOwned && wrapIcon(<FolderIcon />)}
+            <Stack align='flex-end' gap='xs'>
+                {isSeen && <UIPokedexIcons.Seen />}
+                {isCaught && <UIPokedexIcons.Caught />}
+                {isOwned && <UIPokedexIcons.Owned />}
             </Stack>
         </UISpriteSizeWrapper>
     </Stack>;

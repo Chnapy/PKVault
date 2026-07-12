@@ -18,7 +18,7 @@ export type UIMultiSelectProps = {
 export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel, pillsNoWrap, className, style, ...rest }) => {
     const [ scopeId ] = React.useState((): FocusScopeId => `dropdown_${self.crypto.randomUUID()}`);
 
-    const { popScope } = Focus.usePushPopScope();
+    const { pushScope, popScope } = Focus.usePushPopScope();
 
     const { focusProps, nodeId, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
@@ -32,23 +32,25 @@ export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel
         ],
     });
 
-    const optionBack = () => {
-        popScope(scopeId);
-        focusProps.ref.current?.click();
-    };
+    const optionEnter = React.useCallback(() => pushScope(scopeId), [ pushScope, scopeId ]);
+    const optionBack = () => focusProps.ref.current?.click();
 
     return <WithControlsIcons placement='out' icons={controlIcons('open')} className={className} style={style}>
         <FocusScope id={scopeId} parentNodeId={nodeId}>
             <MultiSelect
                 {...rest}
+                // onDropdownOpen is not used for scope pushing
+                // because it is called before options rendered
+                onDropdownClose={() => {
+                    popScope(scopeId);
+                }}
                 onChange={(value) => {
                     controlProps('open').onChange?.(value as never);
                     rest.onChange?.(value);
                 }}
                 renderOption={item => <OptionComponent
                     {...item}
-                    // TODO maybe can be removed now
-                    focusOnMount={rest.data!.indexOf(item.option.value) === 0}
+                    enter={optionEnter}
                     back={optionBack}
                 >
                     {rest.renderOption?.(item)}
@@ -72,19 +74,15 @@ export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel
 };
 
 const OptionComponent: React.FC<ComboboxLikeRenderOptionInput<ComboboxItem<string>> & {
-    focusOnMount: boolean;
+    enter: () => void;
     back: () => void;
     children?: React.ReactNode;
-}> = ({ option, checked, focusOnMount, back, children }) => {
+}> = ({ option, checked, enter, back, children }) => {
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: option.value,
-        focusOnMount,
         controls: [
             getSelectControl({
                 label: 'Select',
-                action: () => {
-                    focusProps.ref.current?.click();
-                },
             }),
             getBackControl({
                 label: 'Back',
@@ -94,6 +92,10 @@ const OptionComponent: React.FC<ComboboxLikeRenderOptionInput<ComboboxItem<strin
             }),
         ],
     });
+
+    React.useEffect(() => {
+        enter()
+    }, [ enter ])
 
     return <WithControlsIcons placement='out' icons={controlIcons('open')}
         {...focusProps}

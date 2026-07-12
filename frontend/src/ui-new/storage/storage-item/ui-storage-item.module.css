@@ -14,7 +14,7 @@
 }
 
 .ui-storage-item:hover .checkbox > *,
-.ui-storage-item button[data-focused="true"] + .checkbox > *,
+[data-show-focus] .ui-storage-item button[data-focused="true"] + .checkbox > *,
 .checkbox [data-checked="true"] {
   opacity: 1;
 }

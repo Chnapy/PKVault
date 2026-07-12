@@ -1,13 +1,17 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
+import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { getStorageGetMainBanksQueryKey, useStorageGetMainBanks, useStorageUpdateMainBank, type storageGetMainBanksResponseSuccess } from '../../data/sdk/storage/storage.gen';
-import { Route } from '../../routes/storage';
+import { useStaticData } from '../../hooks/use-static-data';
+import { Route, type StorageSearchStorage } from '../../routes/storage';
 import { UIBankEdit } from '../../ui-new/bank/ui-bank-edit';
 import { BankContext } from './bank-context';
 import { StorageBankView } from './util/storages-bank-view';
 
 export const BankEdit: React.FC<{ bankId: string; }> = ({ bankId }) => {
     const storages = Route.useSearch({ select: search => search.storages }) ?? [];
+
+    const staticData = useStaticData();
 
     const queryClient = useQueryClient();
 
@@ -23,6 +27,24 @@ export const BankEdit: React.FC<{ bankId: string; }> = ({ bankId }) => {
     const currentBankView = StorageBankView.getBankViewFromStorages(storages);
 
     const selected = selectedBankBoxes.data?.selectedBank.id === bankId;
+
+    const bankViewStorages = bank && StorageBankView.getStoragesFromBankView(bank.view);
+
+    const saveInfosQuery = useSaveInfosGetAll();
+
+    const getViewName = (storage: StorageSearchStorage) => {
+        if (!storage.saveId)
+            return 'PKVault';
+
+        const save = saveInfosQuery.data?.data[ storage.saveId ];
+        if (!save)
+            return '-';
+
+        return `${staticData.versions[ save.version ]?.name} (${save.trainerName})`;
+    };
+
+    const bankViewNames = (bankViewStorages ?? []).map(getViewName);
+    const currentViewNames = storages.map(getViewName);
 
     React.useEffect(() => {
         return () => {
@@ -42,6 +64,8 @@ export const BankEdit: React.FC<{ bankId: string; }> = ({ bankId }) => {
             view: bank.view,
         }}
         bankList={banks}
+        bankViewNames={bankViewNames}
+        currentViewNames={currentViewNames}
         currentBankView={currentBankView}
         onOrderChange={order => {
             queryClient.setQueryData(getStorageGetMainBanksQueryKey(), (data: storageGetMainBanksResponseSuccess) => {

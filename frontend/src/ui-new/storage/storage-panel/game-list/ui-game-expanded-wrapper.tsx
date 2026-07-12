@@ -19,11 +19,12 @@ export type UIGameExpandedWrapperProps = {
     imgSrc: string;
     secondaryLine: React.ReactNode;
     tertiaryLine: React.ReactNode;
+    fourthLine?: React.ReactNode;
     path: string;
 };
 
 export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
-    title, label, imgSrc, secondaryLine, tertiaryLine, path,
+    title, label, imgSrc, secondaryLine, tertiaryLine, fourthLine, path,
     selected, onSelect, editDropdown, actions,
 }) => {
     const panel = useCurrentPanel();
@@ -109,7 +110,6 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
 
                     <Group
                         component={Text}
-                        gap='sm'
                         wrap='nowrap'
                         mx='auto'
                         style={{
@@ -119,6 +119,19 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
                     >
                         {tertiaryLine}
                     </Group>
+
+                    {fourthLine && <Group
+                        component={Text}
+                        gap='sm'
+                        wrap='nowrap'
+                        mx='auto'
+                        style={{
+                            textWrap: 'nowrap',
+                            textOverflow: 'ellipsis',
+                        }}
+                    >
+                        {fourthLine}
+                    </Group>}
 
                     <Divider my='xs' />
 

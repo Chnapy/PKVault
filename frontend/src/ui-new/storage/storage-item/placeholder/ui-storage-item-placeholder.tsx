@@ -5,7 +5,7 @@ import { getDragControls } from '../../../interaction/focus-controls/common-cont
 import { useFocusControls } from '../../../interaction/focus-controls/use-focus-controls';
 import { useDragSubmitting } from '../../../interaction/move/hooks/use-drag-submitting';
 import { useDroppable } from '../../../interaction/move/hooks/use-droppable';
-import { UISpeciesImg } from '../../../sprite-img/species-img/ui-species-img';
+import { UISpeciesImgSkeleton } from '../../../sprite-img/species-img/ui-species-img-skeleton';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
 import { UIStorageItemBase, type UIStorageItemBaseProps } from '../base/ui-storage-item-base';
 
@@ -64,16 +64,7 @@ export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> =
             {...buttonProps}
             ref={ref}
         >
-            <UISpeciesImg
-                sheetUrl=''
-                species={0}
-                spriteInfos={{
-                    height: 96,
-                    width: 96,
-                    x: 0,
-                    y: 0,
-                }}
-            />
+            <UISpeciesImgSkeleton />
         </UIStorageItemBase>
     </WithControlsIcons>;
 };

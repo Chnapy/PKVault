@@ -61,6 +61,7 @@ export const NotificationButton: React.FC = () => {
                     onClick={hasNotifs
                         ? (() => setOpened(value => !value))
                         : undefined}
+                    disabled={!hasNotifs}
                 >
                     <BellIcon />
                 </UIActionIcon>

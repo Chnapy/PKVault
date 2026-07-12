@@ -26,7 +26,13 @@ export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header
             {header}
         </Box>}
 
-        {children && <Card.Section inheritPadding py='md' withBorder style={{ flexGrow: 1, flexShrink: 999, overflow: 'auto', backgroundImage: `url("${backgroundImageUrl}")` }}>
+        {children && <Card.Section inheritPadding py='md' withBorder style={{
+            flexGrow: 1,
+            flexShrink: 999,
+            overflowY: 'scroll',
+            paddingRight: 0,
+            backgroundImage: backgroundImageUrl && `url("${backgroundImageUrl}")`,
+        }}>
             {children}
         </Card.Section>}
 

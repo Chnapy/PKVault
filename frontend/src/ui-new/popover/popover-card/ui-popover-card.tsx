@@ -42,7 +42,7 @@ export const UIPopoverCard = function <C>({
                 : null}
         </Card.Section>
         <Card.Section inheritPadding withBorder py='md' mih={0} mah='100%'>
-            <Stack mih={0} mah='100%' style={{ overflow: 'auto' }}>
+            <Stack mih={0} mah='100%'>
                 {children}
             </Stack>
         </Card.Section>

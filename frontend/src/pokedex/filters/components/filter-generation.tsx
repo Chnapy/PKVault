@@ -1,4 +1,4 @@
-import React from "react";
+import React, { startTransition } from "react";
 import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
@@ -32,13 +32,13 @@ export const FilterGeneration: React.FC = () => {
     placeholder='Filter by generation'
     data={options}
     value={searchValue.map(String)}
-    onChange={(values) => navigate({
+    onChange={(values) => startTransition(() => navigate({
       search: {
         filterGenerations: values.map(Number),
       },
-    })}
+    }))}
     pillsNoWrap
-    renderPill={({ value = '' }) => value[ 0 ]}
+    renderPill={({ value = '' }) => <span>G{value}</span>}
   // size='xs'
   // w={140}
   />;

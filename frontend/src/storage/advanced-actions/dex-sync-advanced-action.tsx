@@ -84,7 +84,11 @@ export const DexSyncAdvancedAction: React.FC<{
         {option.label}
       </Group>}
       searchable
-      comboboxProps={{ withinPortal: false, position: 'right-start', floatingHeight: "viewport" }}
+      comboboxProps={{
+        withinPortal: false,
+        position: 'left-start',
+        floatingHeight: "viewport"
+      }}
       floatingHeight="viewport"
     />
 

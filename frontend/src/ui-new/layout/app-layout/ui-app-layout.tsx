@@ -17,8 +17,14 @@ export const UIAppLayout: React.FC<UIAppLayoutProps> = ({ header, bottom, footer
 
     React.useEffect(() => {
         const previousValue = document.body.dataset.controlsType;
-        if (previousValue !== controlsCurrentType)
+        if (previousValue !== controlsCurrentType) {
             document.body.dataset.controlsType = controlsCurrentType;
+
+            if (controlsCurrentType !== 'mouse')
+                document.body.dataset.showFocus = 'true';
+            else
+                delete document.body.dataset.showFocus
+        }
     }, [ controlsCurrentType ]);
 
     return <UIFrame>

@@ -1,4 +1,4 @@
-import { Group, Tabs, Text } from '@mantine/core';
+import { Group, HoverCard, Tabs, Text } from '@mantine/core';
 import { CirclePlusIcon } from 'lucide-react';
 import type React from 'react';
 import { UIExpandableTabs, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
@@ -12,9 +12,11 @@ export type UIGameData = {
     disabled?: boolean;
 };
 
-export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>, 'value' | 'data' | 'onChange' | 'renderExpanded' | 'expanded'>;
+export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>, 'value' | 'data' | 'onChange' | 'renderExpanded' | 'expanded'> & {
+    renderHoverCard: UIExpandableTabsProps<UIGameData>[ 'renderTab' ];
+};
 
-export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange, renderExpanded, expanded }) => {
+export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange, renderExpanded, renderHoverCard, expanded }) => {
     const { isInCurrentPanel } = useCurrentPanel();
 
     return <UIExpandableTabs
@@ -28,11 +30,19 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
         onChange={onChange}
         expanded={expanded}
         scoped={expanded !== true}
-        renderTab={({ item, selected }, { reduce }) => <Tabs.Tab key={item.id}
-            value={item.id} onClick={reduce} disabled={item.disabled} leftSection={<img src={item.imgSrc} height={16} />} py={4}
-        >
-            <Text component={selected ? 'b' : undefined} textWrap='nowrap'>{item.label}</Text>
-        </Tabs.Tab>}
+        renderTab={(params, opt) => <HoverCard>
+            <HoverCard.Target>
+                <Tabs.Tab key={params.item.id}
+                    value={params.item.id} onClick={opt.reduce} disabled={params.item.disabled}
+                    leftSection={<img src={params.item.imgSrc} height={16} />} py={4}
+                >
+                    <Text component={params.selected ? 'b' : undefined} textWrap='nowrap'>{params.item.label}</Text>
+                </Tabs.Tab>
+            </HoverCard.Target>
+            <HoverCard.Dropdown>
+                {renderHoverCard(params, opt)}
+            </HoverCard.Dropdown>
+        </HoverCard>}
         renderExpanded={(data, opt) => <Group
             align='flex-start'
             p='md'

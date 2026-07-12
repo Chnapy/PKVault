@@ -1,11 +1,8 @@
-import { Box, Group, Stack, ThemeIcon } from '@mantine/core';
-import { FolderIcon } from 'lucide-react';
+import { Box, Group, Stack } from '@mantine/core';
 import React from "react";
 import type { Gender } from '../../../data/sdk/model';
-import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
-import { UIBallIcon } from '../../icon/ui-ball-icon';
 import { UIGender } from '../../icon/ui-gender';
-import { UIShinyIcon } from '../../icon/ui-shiny-icon';
+import { UIPokedexIcons } from '../icons/ui-pokedex-icons';
 
 type UIPokedexFormItemProps = {
   genders: Gender[];
@@ -16,10 +13,6 @@ type UIPokedexFormItemProps = {
   isOwnedShiny?: boolean;
   children: React.ReactNode;
 };
-
-const wrapIcon = (icon: React.ReactNode) => <ThemeIcon variant='default' size='sm' opacity={0.75}>
-  {icon}
-</ThemeIcon>;
 
 export const UIPokedexFormItem: React.FC<UIPokedexFormItemProps> = ({
   genders,
@@ -43,14 +36,14 @@ export const UIPokedexFormItem: React.FC<UIPokedexFormItemProps> = ({
     </Box>
 
     <Group pos='absolute' top={0} right={0} gap='xs' p='sm'>
-      {isOwned && wrapIcon(<FolderIcon />)}
+      {isOwned && <UIPokedexIcons.Owned size='sm' />}
 
-      {isCaught && wrapIcon(<UIBallIcon />)}
+      {isCaught && <UIPokedexIcons.Caught size='sm' />}
     </Group>
-    <Stack pos='absolute' bottom={0} right={0} gap='sm' p='sm'>
-      {isSeenAlpha && wrapIcon(<UIAlphaIcon />)}
+    <Stack pos='absolute' bottom={0} right={0} align='flex-end' gap='sm' p='sm'>
+      {isSeenAlpha && <UIPokedexIcons.Alpha size='sm' />}
 
-      {isOwnedShiny && wrapIcon(<UIShinyIcon />)}
+      {isOwnedShiny && <UIPokedexIcons.Shiny size='sm' />}
 
       <Group gap='xs'>
         {genders.map(gender => <UIGender key={gender} gender={gender} size='small' />)}

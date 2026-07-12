@@ -1,8 +1,9 @@
 import { CircleOff } from 'lucide-react';
-import React from "react";
+import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
 import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui-new/form/select/ui-segmented-control';
 import { UIBallIcon } from '../../../ui-new/icon/ui-ball-icon';
+import { UIPokedexIcons } from '../../../ui-new/pokedex/icons/ui-pokedex-icons';
 import { switchUtil } from '../../../util/switch-util';
 
 export const FilterCaught: React.FC = () => {
@@ -12,7 +13,7 @@ export const FilterCaught: React.FC = () => {
 
   const data = [
     { value: 'all', label: 'All' },
-    { value: 'caught', label: <UIBallIcon fontSize='1rem' /> },
+    { value: 'caught', label: <UIPokedexIcons.Caught size='xs' fz='1rem' /> },
     { value: 'not-caught', label: <CircleOff fontSize='1rem' opacity={0.75}><UIBallIcon /></CircleOff> },
   ] as const satisfies UISegmentedControlProps[ 'data' ];
 
@@ -35,7 +36,7 @@ export const FilterCaught: React.FC = () => {
     controlLabel='Filter by caught'
     value={currentValue}
     data={data}
-    onChange={(value) => navigate({
+    onChange={(value) => startTransition(() => navigate({
       search: {
         filterCaught: switchUtil(value, {
           'all': undefined,
@@ -43,7 +44,8 @@ export const FilterCaught: React.FC = () => {
           'not-caught': false,
         }),
       },
-    })}
+    }))}
+    size='sm'
     style={{ flexGrow: 1 }}
   />;
 };

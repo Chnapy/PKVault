@@ -23,7 +23,7 @@ export const UIGender: React.FC<UIGenderProps> = ({ gender, size = 'medium' }) =
             size === 'medium' && classes.medium,
             size === 'big' && classes.big,
         )}
-        color={gender === Gender.Male
+        c={gender === Gender.Male
             ? baseTheme.other.misc.genderMale
             : baseTheme.other.misc.genderFemale}
     >

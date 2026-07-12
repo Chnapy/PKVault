@@ -1,6 +1,6 @@
 import { Group } from '@mantine/core';
 import { CheckIcon } from 'lucide-react';
-import React from "react";
+import React, { startTransition } from "react";
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
@@ -32,11 +32,11 @@ export const FilterFromGames: React.FC = () => {
     placeholder='Filter by game'
     value={currentValue}
     data={options}
-    onChange={(storages) => navigate({
+    onChange={(storages) => startTransition(() => navigate({
       search: {
         filterFromGames: storages.map(Number),
       },
-    })}
+    }))}
     pillsNoWrap
     renderOption={({ option, checked }) => {
       if (!saveInfosQuery.data)

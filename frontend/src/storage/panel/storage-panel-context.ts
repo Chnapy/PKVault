@@ -9,12 +9,10 @@ export const useCurrentStorage = (fallbackPanel?: ReturnType<typeof usePanel>) =
     const currentPanel = fallbackPanel ?? ctxPanel;
     const storageIndex = currentPanel === 'left' ? 0 : 1;
 
-    const getStorage = React.useCallback((searchStorages: StorageSearchStorage[] | undefined): StorageSearchStorage | undefined => {
-        const defaultStorage: StorageSearchStorage | undefined = currentPanel === 'left'
+    const getStorageForPanel = React.useCallback((storage: StorageSearchStorage | undefined, panel: typeof currentPanel): StorageSearchStorage | undefined => {
+        const defaultStorage: StorageSearchStorage | undefined = panel === 'left'
             ? defaultMainStorage
             : undefined;
-
-        const storage = searchStorages?.[ storageIndex ];
 
         if (!storage)
             return defaultStorage;
@@ -24,7 +22,13 @@ export const useCurrentStorage = (fallbackPanel?: ReturnType<typeof usePanel>) =
             return defaultStorage;
 
         return storage;
-    }, [ currentPanel, storageIndex ]);
+    }, []);
+
+    const getStorage = React.useCallback((searchStorages: StorageSearchStorage[] | undefined): StorageSearchStorage | undefined => {
+        const storage = searchStorages?.[ storageIndex ];
+
+        return getStorageForPanel(storage, currentPanel);
+    }, [currentPanel, getStorageForPanel, storageIndex]);
 
     const getSelected = (searchSelected: StorageSearchSelected | undefined) => {
         if (searchSelected?.storage !== storageIndex)
@@ -58,7 +62,10 @@ export const useCurrentStorage = (fallbackPanel?: ReturnType<typeof usePanel>) =
     const setStorage = (searchStorages: StorageSearchStorage[] | undefined, newStorage: Partial<StorageSearchStorage>): StorageSearchStorage[] => {
         const storage = getStorage(searchStorages);
 
-        const newSearchStorages = [ ...searchStorages ?? [] ];
+        const newSearchStorages = [ 
+            getStorageForPanel(searchStorages?.[0], 'left'),
+            getStorageForPanel(searchStorages?.[1], 'right'),
+        ].filter(v => typeof v !== 'undefined');
 
         const nextStorage = { ...storage, ...newStorage };
         if (nextStorage.saveId === undefined)

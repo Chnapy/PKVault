@@ -3,6 +3,8 @@ import type React from 'react';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
+import { UISpeciesImgSkeleton } from '../../sprite-img/species-img/ui-species-img-skeleton';
+import { useVisibilityContext } from '../../visibility/visibility-context';
 import classes from './ui-pokedex-item.module.css';
 
 export type UIPokedexItemProps = {
@@ -16,7 +18,15 @@ export type UIPokedexItemProps = {
     children: React.ReactNode;
 };
 
-export const UIPokedexItem: React.FC<UIPokedexItemProps> = ({
+export const UIPokedexItem: React.FC<UIPokedexItemProps> = props => {
+    const visible = useVisibilityContext() ?? true;
+
+    return visible
+        ? <UIPokedexItemInner {...props} />
+        : <UISpeciesImgSkeleton />;
+};
+
+const UIPokedexItemInner: React.FC<UIPokedexItemProps> = ({
     id, species, form,
     label, selected, onClick, children
 }) => {

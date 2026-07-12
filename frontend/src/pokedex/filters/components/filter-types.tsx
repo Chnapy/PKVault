@@ -1,12 +1,11 @@
-import { CheckIcon, Group } from '@mantine/core';
-import React from "react";
-import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
+import { Group, Image } from '@mantine/core';
+import { CheckIcon } from 'lucide-react';
+import React, { startTransition } from "react";
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
 import { UIMultiSelect } from '../../../ui-new/form/select/ui-multi-select';
 import { getTypeImg } from '../../../ui-new/type-item/util/get-type-img';
-import { filterIsDefined } from '../../../util/filter-is-defined';
 
 export const FilterTypes: React.FC = () => {
   const { t } = useTranslate();
@@ -16,10 +15,7 @@ export const FilterTypes: React.FC = () => {
 
   const staticData = useStaticData();
 
-  const dexAll = useDexGetAll().data?.data ?? {};
-  const allTypes = [ ...new Set(
-    Object.values(dexAll).flatMap(value => Object.values(value)).flatMap(value => value.forms).flatMap(value => value.types)
-  ) ].map(type => staticData.types[ type ]).filter(filterIsDefined);
+  const allTypes = Object.values(staticData.types);
 
   return <UIMultiSelect
     name='filter-type'
@@ -31,25 +27,25 @@ export const FilterTypes: React.FC = () => {
       label: type.name,
     }))}
     value={searchValue.map(String)}
-    onChange={(types) => navigate({
+    onChange={(types) => startTransition(() => navigate({
       search: {
         filterTypes: types.slice(types.length - 2).map(Number),
       },
-    })}
+    }))}
     pillsNoWrap
     renderOption={({ option, checked }) => {
       const type = +option.value;
 
       return <Group>
-        {checked && <CheckIcon />}
-        <img src={getTypeImg(type).img} />
+        {checked && <CheckIcon height='1lh' />}
+        <Image src={getTypeImg(type).img} h='1lh' w='auto' bdrs='md' />
         {option.label}
       </Group>;
     }}
     renderPill={({ value }) => {
       const type = +(value ?? '0');
 
-      return <img src={getTypeImg(type).img} />;
+      return <Image src={getTypeImg(type).img} h='1lh' w='auto' bdrs='md' />;
     }}
     style={{ flexGrow: 1 }}
   />;

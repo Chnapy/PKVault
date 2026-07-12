@@ -13,9 +13,7 @@ export type PokedexItemProps = {
 export const PokedexItem: React.FC<PokedexItemProps> = withErrorCatcher("item", React.memo(({ species, speciesName, isSeen, children }) => {
   const navigate = Route.useNavigate();
 
-  const selectedPkm = Route.useSearch({ select: (search) => search.selected });
-
-  const selected = species === selectedPkm;
+  const selected = Route.useSearch({ select: (search) => search.selected === species });
 
   const onClick = React.useMemo(() => isSeen
     ? () =>

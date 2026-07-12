@@ -1,5 +1,5 @@
 import { Checkbox, Group } from '@mantine/core';
-import React from "react";
+import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
 import { UIButton } from '../../../ui-new/form/button/ui-button';
@@ -18,12 +18,12 @@ export const FilterViews: React.FC = () => {
 
   return <Checkbox.Group
     value={value}
-    onChange={(values) => navigate({
+    onChange={(values) => startTransition(() => navigate({
       search: {
         showForms: values.includes('display-forms') || undefined,
         showGenders: values.includes('display-genders') || undefined,
       },
-    })}
+    }))}
     label="Views"
   >
     <Group grow wrap='nowrap'>

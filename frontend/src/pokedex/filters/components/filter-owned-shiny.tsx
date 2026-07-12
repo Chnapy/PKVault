@@ -1,4 +1,4 @@
-import React from "react";
+import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
 import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui-new/form/select/ui-segmented-control';
 import { UIShinyIcon } from '../../../ui-new/icon/ui-shiny-icon';
@@ -34,7 +34,7 @@ export const FilterOwnedShiny: React.FC = () => {
     controlLabel='Filter by shiny'
     value={currentValue}
     data={data}
-    onChange={(value) => navigate({
+    onChange={(value) => startTransition(() => navigate({
       search: {
         filterOwnedShiny: switchUtil(value, {
           'all': undefined,
@@ -42,7 +42,8 @@ export const FilterOwnedShiny: React.FC = () => {
           'not-shiny': false,
         }),
       },
-    })}
+    }))}
+    size='sm'
     style={{ flexGrow: 1 }}
   />;
 };

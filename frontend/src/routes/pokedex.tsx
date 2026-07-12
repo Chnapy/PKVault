@@ -14,6 +14,7 @@ const searchSchema = z.object({
   filterCaught: z.boolean().optional(),
   filterOwned: z.boolean().optional(),
   filterOwnedShiny: z.boolean().optional(),
+  filterAlpha: z.boolean().optional(),
   filterFromGames: z.array(z.number()).optional(), // saveIDs
   filterGenerations: z.array(z.number()).optional(), // generation.name
   showForms: z.boolean().optional(),
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/pokedex")({
     filterCaught: undefined,
     filterOwned: undefined,
     filterOwnedShiny: undefined,
+    filterAlpha: undefined,
     filterFromGames: undefined,
     filterGenerations: undefined,
     showForms: undefined,

@@ -1,7 +1,8 @@
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
-import React from "react";
+import { EyeOffIcon } from 'lucide-react';
+import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
 import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui-new/form/select/ui-segmented-control';
+import { UIPokedexIcons } from '../../../ui-new/pokedex/icons/ui-pokedex-icons';
 import { switchUtil } from '../../../util/switch-util';
 
 export const FilterSeen: React.FC = () => {
@@ -11,7 +12,7 @@ export const FilterSeen: React.FC = () => {
 
   const data = [
     { value: 'all', label: 'All' },
-    { value: 'seen', label: <EyeIcon fontSize='1rem' /> },
+    { value: 'seen', label: <UIPokedexIcons.Seen size='xs' fz='1rem' /> },
     { value: 'not-seen', label: <EyeOffIcon fontSize='1rem' opacity={0.75} /> },
   ] as const satisfies UISegmentedControlProps[ 'data' ];
 
@@ -34,7 +35,7 @@ export const FilterSeen: React.FC = () => {
     controlLabel='Filter by seen'
     value={currentValue}
     data={data}
-    onChange={(value) => navigate({
+    onChange={(value) => startTransition(() => navigate({
       search: {
         filterSeen: switchUtil(value, {
           'all': undefined,
@@ -42,7 +43,8 @@ export const FilterSeen: React.FC = () => {
           'not-seen': false,
         }),
       },
-    })}
+    }))}
+    size='sm'
     style={{ flexGrow: 1 }}
   />;
 };
