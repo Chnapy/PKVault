@@ -1,4 +1,4 @@
-import { Group } from '@mantine/core';
+import { Group, Tooltip } from '@mantine/core';
 import { CirclePlusIcon, LandmarkIcon } from 'lucide-react';
 import type React from 'react';
 import { UIActionIcon } from '../form/button/ui-action-icon';
@@ -25,16 +25,18 @@ export const UIBankList: React.FC<UIBankListProps> = ({ onCreate, renderExpanded
         renderExpanded={(data, opt) => <Group pt='sm'>
             {renderExpanded?.(data, opt)}
 
-            <UIActionIcon
-                name='bank-create'
-                controlLabel='Create bank'
-                variant='subtle'
-                size='xl'
-                color='currentcolor'
-                onClick={onCreate}
-            >
-                <CirclePlusIcon />
-            </UIActionIcon>
+            <Tooltip label='Create new bank'>
+                <UIActionIcon
+                    name='bank-create'
+                    controlLabel='Create bank'
+                    variant='subtle'
+                    size='xl'
+                    color='currentcolor'
+                    onClick={onCreate}
+                >
+                    <CirclePlusIcon />
+                </UIActionIcon>
+            </Tooltip>
         </Group>}
         {...rest}
     />;

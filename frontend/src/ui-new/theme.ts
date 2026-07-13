@@ -1,4 +1,4 @@
-import { ActionIcon, Alert, Badge, Button, Card, createTheme, Menu, mergeThemeOverrides, NumberFormatter, Paper, Popover, Scroller, Tabs, Text } from '@mantine/core';
+import { ActionIcon, Alert, Badge, Button, Card, createTheme, Menu, mergeThemeOverrides, NumberFormatter, Paper, Popover, Scroller, Tabs, Text, Tooltip } from '@mantine/core';
 import { clsx } from 'clsx';
 import { baseTheme, cssVariablesResolver } from './base-theme';
 import classes from './theme.module.css';
@@ -80,6 +80,16 @@ export const theme = mergeThemeOverrides(
         defaultProps: {
           // default value 'mousedown' doesn't work with disabled buttons
           clickOutsideEvents: defaultClickOutsideEvents,
+        },
+      }),
+      Tooltip: Tooltip.extend({
+        defaultProps: {
+          fz: 'md',
+          px: 'md',
+          py: 'sm',
+          lh: 'xs',
+          maw: 300,
+          style: { whiteSpace: 'break-spaces' }
         },
       }),
     },

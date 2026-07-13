@@ -56,8 +56,11 @@ export const Header: React.FC = () => {
             </UIHeaderItem>
 
             <Tooltip
-                label={t('action.not-possible')}
-                disabled={settings?.canScanSaves}
+                multiline
+                label={[
+                    'Reload all data to be up-to-date',
+                    !settings?.canScanSaves && t('action.not-possible'),
+                ].filter(Boolean).join('\n')}
             >
                 <UIButton
                     name='refresh-data'
@@ -67,6 +70,7 @@ export const Header: React.FC = () => {
                     disabled={!settings?.canScanSaves}
                     leftSection={<RefreshCwIcon />}
                     size='compact-xs'
+                    fz='sm'
                     fw='normal'
                     color='white'
                     variant='outline'

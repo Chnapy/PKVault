@@ -1,5 +1,5 @@
 import { Group, Text, Tooltip } from '@mantine/core';
-import { ChevronLeftIcon, ChevronRightIcon, ScanEyeIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, ScanEyeIcon, StarIcon } from 'lucide-react';
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import type { BankDTO, BankView, StorageUpdateMainBankParams } from '../../data/sdk/model';
@@ -73,7 +73,10 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
         <UISwitch
             name='is-default'
             controlLabel='Set default'
-            label={t('storage.bank.edit.is-default')}
+            label={<Group gap='sm'>
+                {t('storage.bank.edit.is-default')}
+                <StarIcon />
+            </Group>}
             checked={watchIsDefault}
             onChange={() => setValue('isDefault', !getValues('isDefault'))}
             disabled={defaultDisabled}

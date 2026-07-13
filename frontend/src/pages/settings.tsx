@@ -22,6 +22,12 @@ export type SettingsFormData = Omit<SettingsMutableDTO, 'savE_GLOBS' | 'pkM_EXTE
   pkM_EXTERNAL_GLOBS: string;
 };
 
+const settingsToFormData = (settingsMutable: SettingsMutableDTO) => ({
+  ...settingsMutable,
+  savE_GLOBS: settingsMutable.savE_GLOBS.join('\n'),
+  pkM_EXTERNAL_GLOBS: settingsMutable.pkM_EXTERNAL_GLOBS?.join('\n') ?? ''
+});
+
 export const SettingsPage: React.FC = withErrorCatcher('default', () => {
   console.log('page settings');
 
@@ -39,33 +45,29 @@ export const SettingsPage: React.FC = withErrorCatcher('default', () => {
   const settings = settingsQuery.data?.data;
   const settingsMutable = settings?.settingsMutable;
 
-  const defaultValue = React.useMemo((): SettingsFormData | undefined => settingsMutable && ({
-    ...settingsMutable,
-    savE_GLOBS: settingsMutable.savE_GLOBS.join('\n'),
-    pkM_EXTERNAL_GLOBS: settingsMutable.pkM_EXTERNAL_GLOBS?.join('\n') ?? ''
-  }), [ settingsMutable ]);
+  const defaultValue = React.useMemo((): SettingsFormData | undefined => settingsMutable
+    && settingsToFormData(settingsMutable), [ settingsMutable ]);
 
   const form = useForm<SettingsFormData>({
     defaultValues: defaultValue,
   });
-
-  React.useEffect(() => {
-    if (form.formState.isDirty)
-      form.reset(defaultValue, { keepDefaultValues: false });
-  }, [ defaultValue, form ]);
 
   if (!settingsMutable) {
     return null;
   }
 
   const submit = form.handleSubmit(async (data) => {
-    await settingsMutation.mutateAsync({
+    const result = await settingsMutation.mutateAsync({
       data: {
         ...data,
         savE_GLOBS: data.savE_GLOBS.split('\n').map(value => value.trim()).filter(Boolean),
         pkM_EXTERNAL_GLOBS: data.pkM_EXTERNAL_GLOBS.split('\n').map(value => value.trim()).filter(Boolean)
       },
     });
+
+    const nextSettingsMutable = result.data.settings?.settingsMutable;
+    if (nextSettingsMutable)
+      form.reset(settingsToFormData(nextSettingsMutable), { keepDefaultValues: false });
   });
 
   const { left, right } = switchUtil(subMenu, {

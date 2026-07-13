@@ -20,7 +20,7 @@ export const StorageDetails: React.FC = withErrorCatcher('default', () => {
   const selectedId = Route.useSearch({ select: search => getSelected(search.selected)?.id }) ?? '';
 
   const pkmIndexQuery = usePkmIndex(selectedSaveId ?? null, data => !!data.data.byId[ selectedId ]);
-  const noPkmsFound = !!selectedId && pkmIndexQuery.data === false && !pkmIndexQuery.isLoading;
+  const noPkmsFound = !!selectedId && pkmIndexQuery.data === false;
 
   const unselect = React.useCallback(() => navigate({
     search: {

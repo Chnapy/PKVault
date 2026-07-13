@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePkmVariantIndex } from '../data/hooks/use-pkm-variant-index';
 import { useBackupGetAll } from '../data/sdk/backup/backup.gen';
+import { useDexGetAll } from '../data/sdk/dex/dex.gen';
 import { useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { useStaticDataGet } from '../data/sdk/static-data/static-data.gen';
@@ -21,16 +22,12 @@ export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number
         useStorageGetMainBanks(),
         useStorageGetBoxes(),
         usePkmVariantIndex(),
+        useDexGetAll(),
     ] as const;
 
     const desktopMessage = useDesktopMessage();
 
-    const isLoading = queries.some(
-        query =>
-            query.isLoading ||
-            // for some reason isLoading can be false and data still not loaded
-            query.data === undefined,
-    );
+    const isLoading = queries.some(query => query.isPending && query.isEnabled);
 
     const error = queries.find(query => query.isError)?.error;
 

@@ -51,9 +51,9 @@ export const BackupLineForm: React.FC<BackupLineFormProps> = ({ createdAt, name 
                 lineHeight: 'inherit',
             },
         }}
-        onSubmit={submit}
-        onCancel={() => setValue('name', name)}
-        loading={formState.isSubmitting}
+        onSubmit={formState.isDirty ? submit : undefined}
+        onCancel={formState.isDirty ? (() => setValue('name', name)) : undefined}
+        disabled={formState.isSubmitting}
         cancelDisabled={formState.isSubmitting}
         submitLoading={formState.isSubmitting}
         submitDisabled={!formState.isValid || !nameValue}

@@ -1,4 +1,4 @@
-import { Button, Divider, Group, Image, Stack, Text } from '@mantine/core';
+import { Button, Divider, Group, Image, Stack, Text, Tooltip } from '@mantine/core';
 import { PenIcon } from 'lucide-react';
 import React from 'react';
 import { WithControlsIcons } from '../../../interaction/controls/icons/with-controls-icons';
@@ -10,6 +10,7 @@ import { useCurrentPanel } from '../../storage-content/context/ui-panel-context'
 
 export type UIGameExpandedWrapperProps = {
     selected?: boolean;
+    loading?: boolean;
     onSelect?: () => void;
     editDropdown?: React.ReactNode;
     actions?: React.ReactNode;
@@ -25,7 +26,7 @@ export type UIGameExpandedWrapperProps = {
 
 export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
     title, label, imgSrc, secondaryLine, tertiaryLine, fourthLine, path,
-    selected, onSelect, editDropdown, actions,
+    selected, loading, onSelect, editDropdown, actions,
 }) => {
     const panel = useCurrentPanel();
 
@@ -69,28 +70,34 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
                 radius='md'
             />
 
-            {editDropdown && <UIPopover
-                dropdown={editDropdown}
-            >
-                <WithControlsIcons placement='out' icons={controlIcons('edit')}>
-                    <Button
-                        variant='filled'
-                        color='blue'
-                        size='compact-xs'
-                        fullWidth
-                        {...controlProps('edit')}
-                    >
-                        <PenIcon />
-                    </Button>
-                </WithControlsIcons>
-            </UIPopover>}
+            {!loading && <>
 
-            {actions}
+                {editDropdown && <UIPopover
+                    dropdown={editDropdown}
+                >
+                    <Tooltip label='Change detected save game'>
+                        <WithControlsIcons placement='out' icons={controlIcons('edit')}>
+                            <Button
+                                variant='filled'
+                                color='blue'
+                                size='compact-xs'
+                                fullWidth
+                                {...controlProps('edit')}
+                            >
+                                <PenIcon />
+                            </Button>
+                        </WithControlsIcons>
+                    </Tooltip>
+                </UIPopover>}
+
+                {actions}
+            </>}
         </Stack>
 
         <WithControlsIcons placement='out' icons={controlIcons('open')} miw={0} style={{ flexGrow: 1 }}>
             <Button
                 variant='default'
+                loading={loading}
                 {...focusProps}
                 {...controlProps('open')}
                 title={title}

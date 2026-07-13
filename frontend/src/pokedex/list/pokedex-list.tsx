@@ -1,4 +1,5 @@
-import { Card, Group, Stack } from '@mantine/core';
+import { Card, EmptyState, Group, Skeleton, Stack } from '@mantine/core';
+import { RectangleEllipsisIcon } from 'lucide-react';
 import React from "react";
 import { withErrorCatcher } from "../../error/with-error-catcher";
 import { useStaticData } from "../../hooks/use-static-data";
@@ -6,6 +7,7 @@ import { UIPokedexMainSection } from '../../ui-new/pokedex/main/section/ui-poked
 import { UIPokedexMainSectionHeader } from '../../ui-new/pokedex/main/section/ui-pokedex-main-section-header';
 import { UIPokedexMain } from '../../ui-new/pokedex/main/ui-pokedex-main';
 import type { PopoverTargetChildProps } from '../../ui-new/popover/target-open-popover';
+import { UISpeciesImgSkeleton } from '../../ui-new/sprite-img/species-img/ui-species-img-skeleton';
 import { UIGameImg } from '../../ui-new/sprite-img/ui-game-img';
 import { DexFormItem } from "../../ui/dex-item/dex-form-item";
 import { usePokedexItems } from "./hooks/use-pokedex-items";
@@ -17,7 +19,7 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
   const staticData = useStaticData();
 
   const {
-    // isLoading,
+    isPending,
     speciesItemsByGenerationList,
     // seenCount,
     // caughtCount,
@@ -28,6 +30,21 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
 
   return <Stack h='100%' style={{ flexGrow: 1 }} {...popoverProps}>
     <UIPokedexMain mah='100%'>
+      {!isPending && speciesItemsByGenerationList.length === 0 && <EmptyState
+        size='sm'
+        icon={<RectangleEllipsisIcon />}
+        title='Pokedex is empty with given filters'
+      />}
+
+      {isPending && <>
+        <Skeleton h={24} />
+        <UIPokedexMainSection>
+          {new Array(54).fill(0).map((_, i) => <Skeleton key={i} w='fit-content' h='fit-content'>
+            <UISpeciesImgSkeleton />
+          </Skeleton>)}
+        </UIPokedexMainSection>
+      </>}
+
       {speciesItemsByGenerationList.map(({
         generation,
         versionsForImgs,

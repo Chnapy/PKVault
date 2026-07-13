@@ -1,4 +1,4 @@
-import { Card, Divider, Stack, Title } from '@mantine/core';
+import { Card, Stack, Title } from '@mantine/core';
 import type React from 'react';
 import { WithControlsIcons, type WithControlsIconsExtraProps } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
@@ -32,16 +32,21 @@ export const UIPokedexFilters: React.FC<UIPokedexFiltersProps> = ({ views, child
 
     return <FocusScope id={name} parentNodeId={nodeId}>
         <WithControlsIcons placement='out' icons={controlIcons('open')} {...rest}>
-            <Card {...focusProps} {...controlProps('open')} w='100%' mah='100%' pt='sm'>
-                <Stack>
-                    {views}
+            <Card {...focusProps} {...controlProps('open')} w='100%' mah='100%'>
+                <Card.Section withBorder inheritPadding pt='sm' pb='inherit'>
+                    <Stack>
+                        <Title order={5} ta='center'>Views</Title>
 
-                    <Divider />
+                        {views}
+                    </Stack>
+                </Card.Section>
+                <Card.Section withBorder inheritPadding pt='sm' pb='inherit'>
+                    <Title order={5} ta='center'>Filters</Title>
 
-                    <Title order={5}>Filters</Title>
-
-                    {children}
-                </Stack>
+                    <Stack>
+                        {children}
+                    </Stack>
+                </Card.Section>
             </Card>
         </WithControlsIcons>
     </FocusScope>;

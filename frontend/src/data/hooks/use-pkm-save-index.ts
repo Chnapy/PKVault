@@ -58,8 +58,8 @@ export const getPkmSaveIndexOptions = <D = PkmSaveIndexQueryData>(saveId: number
                 data: buildIndexes(saveId, response.data),
             } satisfies PkmSaveIndexQueryData;
         },
-        enabled: !!saveId,
         ...options,
+        enabled: options?.enabled !== false && !!saveId,
     });
 };
 

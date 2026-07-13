@@ -10,12 +10,12 @@ export type GlobsInputResultsProps = {
 export const GlobsInputResults: React.FC<GlobsInputResultsProps> = ({ values, limit }) => {
     const globResultsQuery = useSettingsGetSaveGlobsResults({ globs: values, limit });
 
-    const { isLoading } = globResultsQuery;
     const data = globResultsQuery.data?.data ?? [];
 
     const showFiles = data.length > 0;
 
-    const hasError = !globResultsQuery.isLoading && globResultsQuery.isError;
+    const isLoading = globResultsQuery.isPending && globResultsQuery.isEnabled;
+    const hasError = !isLoading && globResultsQuery.isError;
 
     return <UIGlobsInputResults
         name='results'

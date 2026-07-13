@@ -51,7 +51,7 @@ export const UIDetailsStatsRow: React.FC<UIDetailsStatsRowProps> = ({ stat, valu
                 variant='outline'
                 color={`rgb(${255 - (255 * iv / 31)},${255 * iv / 31},0)`}
                 c='inherit'
-                radius='sm'
+                bdrs='xl'
                 miw='100%'
                 styles={{
                     label: {
@@ -67,7 +67,7 @@ export const UIDetailsStatsRow: React.FC<UIDetailsStatsRowProps> = ({ stat, valu
                 variant='outline'
                 color={`rgb(${255 - (255 * ev / 252)},${255 * ev / 252},0)`}
                 c='inherit'
-                radius='sm'
+                bdrs='xl'
                 miw='100%'
                 styles={{
                     label: {

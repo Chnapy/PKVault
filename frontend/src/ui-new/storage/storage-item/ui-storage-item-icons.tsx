@@ -1,9 +1,10 @@
 import { Box, Group, Stack } from '@mantine/core';
-import { CopyIcon, ExternalLinkIcon, FileXIcon, HeartIcon, LinkIcon, SparklesIcon, TriangleAlertIcon } from 'lucide-react';
+import { CopyIcon, ExternalLinkIcon, FileXIcon, HeartIcon, LinkIcon, SparklesIcon } from 'lucide-react';
 import type React from 'react';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
 import { UIIconWrapper } from '../../icon/ui-icon-wrapper';
 import { UIShinyIcon } from '../../icon/ui-shiny-icon';
+import { UIPokedexIcons } from '../../pokedex/icons/ui-pokedex-icons';
 import { UIDetailsLevel } from '../storage-details/ui-details-level';
 import classes from './ui-storage-item-icons.module.css';
 
@@ -43,7 +44,7 @@ export const UIStorageItemIcons: React.FC<UIStorageItemIconsProps> = ({
                 {party}
             </UIIconWrapper>}
 
-            {hasDisabledVariant || nbrVariants > 1
+            {hasDisabledVariant || nbrVariants > 1 || isExternal
                 ? <Group gap='sm' wrap='nowrap'>
                     {level !== undefined && <UIDetailsLevel level={level} />}
                     {hasDisabledVariant && <UIIconWrapper variant='transparent' color='red'>
@@ -84,9 +85,7 @@ export const UIStorageItemIcons: React.FC<UIStorageItemIconsProps> = ({
                 <CopyIcon />
             </UIIconWrapper>}
 
-            {warning && <UIIconWrapper variant='transparent' color='yellow'>
-                <TriangleAlertIcon />
-            </UIIconWrapper>}
+            {warning && <UIPokedexIcons.Warn size='sm' />}
         </Group>
     </Box>;
 };

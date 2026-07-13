@@ -68,7 +68,7 @@ export const usePkmLegalityMap = (pkmIds: string[], saveId?: number) => {
                 isRefetching: acc.isRefetching || query.isRefetching,
                 isStale: acc.isStale && query.isStale,
                 isEnabled: acc.isEnabled && query.isEnabled,
-                status: query.status,
+                status: acc.status === 'pending' ? acc.status : query.status,
                 fetchStatus: query.fetchStatus,
                 data: acc.data && query.data && {
                     ...query.data,

@@ -7,4 +7,5 @@
   background-color: #fff;
   border-style: solid;
   border-width: 1px;
+  border-radius: var(--mantine-radius-sm);
 }

@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Divider, Group } from '@mantine/core';
+import { Badge, Button, Card, Divider, Group, Tooltip } from '@mantine/core';
 import { DownloadIcon, FolderIcon } from 'lucide-react';
 import type React from "react";
 import { HistoryContext } from '../context/history-context';
@@ -83,29 +83,33 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
                 })}
                 actions={<>
                   {desktopMessage
-                    ? <Button
-                      variant='default'
-                      size='compact-xs'
-                      fullWidth
-                      onClick={() => desktopMessage.openFile({
-                        type: 'open-folder',
-                        isDirectory: false,
-                        path: save.path
-                      })}
-                    >
-                      <FolderIcon />
-                    </Button>
-                    : <Button
-                      variant='default'
-                      size='compact-xs'
-                      fullWidth
-                      component='a'
-                      target='__blank'
-                      type='button'
-                      href={getApiFullUrl(getSaveInfosDownloadUrl(save.id))}
-                    >
-                      <DownloadIcon />
-                    </Button>}
+                    ? <Tooltip label='Open save folder'>
+                      <Button
+                        variant='default'
+                        size='compact-xs'
+                        fullWidth
+                        onClick={() => desktopMessage.openFile({
+                          type: 'open-folder',
+                          isDirectory: false,
+                          path: save.path
+                        })}
+                      >
+                        <FolderIcon />
+                      </Button>
+                    </Tooltip>
+                    : <Tooltip label='Download save file'>
+                      <Button
+                        variant='default'
+                        size='compact-xs'
+                        fullWidth
+                        component='a'
+                        target='__blank'
+                        type='button'
+                        href={getApiFullUrl(getSaveInfosDownloadUrl(save.id))}
+                      >
+                        <DownloadIcon />
+                      </Button>
+                    </Tooltip>}
                 </>}
               />)}
             </Group>

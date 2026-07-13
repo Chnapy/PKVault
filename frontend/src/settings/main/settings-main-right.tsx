@@ -21,7 +21,8 @@ export const SettingsMainRight: React.FC = () => {
             labelList={t('settings.form.saves')}
             labelAddFile={t('settings.form.saves.add-file')}
             labelAddFolder={t('settings.form.saves.add-folder')}
-            {...form.register('savE_GLOBS')}
+            // {...form.register('savE_GLOBS')}
+            name='savE_GLOBS'
             value={saveGlobs}
             onChange={(value) => form.setValue('savE_GLOBS', value, { shouldDirty: true })}
             disabled={!settings?.canUpdateSettings}

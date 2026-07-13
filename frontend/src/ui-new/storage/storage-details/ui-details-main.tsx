@@ -1,6 +1,6 @@
 import { Center, Group, Space, Stack, Text } from '@mantine/core';
 import type React from 'react';
-import type { Gender } from '../../../data/sdk/model';
+import { type Gender } from '../../../data/sdk/model';
 import { getSpeciesNO } from '../../../ui/dex-item/util/get-species-no';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
 import { UIGender } from '../../icon/ui-gender';
@@ -26,13 +26,14 @@ export type UIDetailsMainProps = {
     pokerusDays?: number;
     isPokerusCured?: boolean;
     heldItem?: React.ReactNode;
+    attachedBtn?: React.ReactNode;
     children: React.ReactNode;
 };
 
 export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
     ball, nickname, gender, isEnabled, isShiny, isAlpha,
     species, speciesName, level, pokerusDays = 0, isPokerusCured,
-    types, heldItem, markings,
+    types, heldItem, markings, attachedBtn,
     children,
 }) => {
     return <Stack gap='xs' w={280} maw='100%'>
@@ -78,6 +79,8 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
                     cured={isPokerusCured}
                     size='big'
                 />}
+
+                {attachedBtn}
             </Stack>
         </UISpriteSizeWrapper>
     </Stack>;

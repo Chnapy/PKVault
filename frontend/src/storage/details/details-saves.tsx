@@ -158,6 +158,7 @@ export const DetailsSaves: React.FC<DetailsSavesProps> = ({ actions }) => {
                     key={item.id}
                     context={canCreateVariantContext}
                     version={otherStorageSave!.displayedVersion}
+                    loading={mainCreatePkmVariantMutation.isPending}
                 />
                 : <DetailsTab
                     key={item.id}

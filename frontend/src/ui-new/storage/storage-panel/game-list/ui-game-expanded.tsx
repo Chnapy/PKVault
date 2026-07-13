@@ -6,7 +6,7 @@ import { UIGender } from '../../../icon/ui-gender';
 import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
 import { UIGameExpandedWrapper, type UIGameExpandedWrapperProps } from './ui-game-expanded-wrapper';
 
-export type UIGameExpandedProps = Pick<UIGameExpandedWrapperProps, 'selected' | 'onSelect' | 'editDropdown' | 'actions' | 'label' | 'imgSrc' | 'path'>
+export type UIGameExpandedProps = Pick<UIGameExpandedWrapperProps, 'selected' | 'loading' | 'onSelect' | 'editDropdown' | 'actions' | 'label' | 'imgSrc' | 'path'>
     & {
         id: string;
         generation: string;
@@ -14,13 +14,13 @@ export type UIGameExpandedProps = Pick<UIGameExpandedWrapperProps, 'selected' | 
         otGender: Gender;
         tid: number;
         caughtCount?: number;
-        ownedCount?: number;
+        ownedCount: number;
         shinyCount?: number;
         playTime: string;
         language: string;
     };
 
-const renderCount = (icon: React.ReactNode, count: number) => <Group wrap='nowrap' gap='sm' style={{ flexShrink: 0 }}>
+const renderCount = (icon: React.ReactNode, count: number) => <Group component='span' wrap='nowrap' gap='sm' style={{ flexShrink: 0 }}>
     {icon} <span>{count}</span>
 </Group>;
 

@@ -1,7 +1,8 @@
 import { Box, Checkbox, Tabs, Text } from '@mantine/core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import gameXImg from '../../../assets/game_icons/x.png';
-import { BoxType, Gender } from '../../../data/sdk/model';
+import { BoxType, GameVersion, Gender } from '../../../data/sdk/model';
+import { getGameInfos } from '../../../pokedex/details/util/get-game-infos';
 import type { MoveTargetInput } from '../../interaction/move/context/move-context';
 import { MoveProvider } from '../../interaction/move/context/move-provider';
 import type { MoveSource } from '../../interaction/move/state/move-state';
@@ -124,6 +125,21 @@ export const Primary: Story = {
                     playTime='12:14:20'
                     tid={12345}
                 />)}
+            renderHoverCard={() => <UIGameExpanded
+                id={'1'}
+                generation={'G1'}
+                ot={'CHNAPY'}
+                otGender={Gender.Male}
+                tid={12345}
+                ownedCount={142}
+                playTime={'120:16:10'}
+                language={'FRE'}
+                onSelect={console.log}
+                editDropdown={'foo'}
+                label={'Pokemon Blue'}
+                imgSrc={getGameInfos(GameVersion.BU).img}
+                path={'/foo/bar/path.srm'}
+            />}
         />,
         header: <UIStoragePanelBoxList
             value='1'
@@ -202,6 +218,21 @@ export const EmptyData: Story = {
                     playTime='12:14:20'
                     tid={12345}
                 />)}
+            renderHoverCard={() => <UIGameExpanded
+                id={'1'}
+                generation={'G1'}
+                ot={'CHNAPY'}
+                otGender={Gender.Male}
+                tid={12345}
+                ownedCount={142}
+                playTime={'120:16:10'}
+                language={'FRE'}
+                onSelect={console.log}
+                editDropdown={'foo'}
+                label={'Pokemon Blue'}
+                imgSrc={getGameInfos(GameVersion.BU).img}
+                path={'/foo/bar/path.srm'}
+            />}
         />,
         header: <UIStoragePanelBoxList
             value='1'

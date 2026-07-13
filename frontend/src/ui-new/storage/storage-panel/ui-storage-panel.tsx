@@ -18,7 +18,7 @@ export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header
         style={{ flexGrow: 1 }}
         {...rest}
     >
-        <Card.Section component={UICardSectionControl} mah='100%' style={{ flexShrink: 0, overflowY: 'auto' }}>
+        <Card.Section component={UICardSectionControl} mah='100%' style={{ flexShrink: 1, overflowY: 'auto' }}>
             {gameTabs}
         </Card.Section>
 

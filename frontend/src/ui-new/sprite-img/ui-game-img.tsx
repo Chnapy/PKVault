@@ -7,7 +7,7 @@ import classes from './ui-game-img.module.css';
 export type UIGameImgProps = {
     version: GameVersion | null;
     name?: string;
-    size?: '1lh';
+    size?: '1lh' | number;
 } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLImageElement>, HTMLImageElement>;
 
 export const UIGameImg: React.FC<UIGameImgProps> = ({ version, name, size, ...rest }) => {

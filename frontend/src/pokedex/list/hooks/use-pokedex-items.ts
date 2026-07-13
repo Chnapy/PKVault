@@ -7,7 +7,7 @@ import { getGameInfos } from '../../details/util/get-game-infos';
 import { usePokedexFilters } from './use-pokedex-filters';
 
 type PokedexItems = Counts & {
-    isLoading: boolean;
+    isPending: boolean;
     speciesItemsByGenerationList: SpeciesItemsByGeneration[];
 };
 
@@ -57,7 +57,7 @@ export const usePokedexItems = (): PokedexItems => {
     const showForms = Route.useSearch({ select: (search) => search.showForms ?? false });
     const showGendersRaw = Route.useSearch({ select: (search) => search.showGenders ?? false });
 
-    const { data, isLoading } = useDexGetAll();
+    const { data, isPending } = useDexGetAll();
 
     const { isPkmFiltered, filterSpeciesValues } = usePokedexFilters();
 
@@ -270,7 +270,7 @@ export const usePokedexItems = (): PokedexItems => {
     const itemsCount = speciesItemsByGenerationList.reduce((acc, item) => acc + item.itemsCount, 0);
 
     return {
-        isLoading,
+        isPending,
         speciesItemsByGenerationList,
         seenCount,
         caughtCount,

@@ -15,7 +15,7 @@ export const useCurrentStorageWithFallback = () => {
 
     const boxesQuery = useFilteredBoxes(saveId ?? null);
 
-    const isLoading = [ selectedBankBoxes, boxesQuery ].some(q => q.isLoading || !q.data);
+    const isPending = [ selectedBankBoxes, boxesQuery ].some(q => q.isPending && q.isEnabled);
 
     const boxId = Route.useSearch({
         select: (search) => {
@@ -66,7 +66,8 @@ export const useCurrentStorageWithFallback = () => {
     };
 
     return {
-        isLoading,
+        isPending,
+        isEnabled: true,
         data: getData(),
         storageIndex,
     };

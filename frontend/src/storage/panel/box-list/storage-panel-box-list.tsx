@@ -24,7 +24,7 @@ export const StoragePanelBoxList: React.FC = () => {
 
     const boxes = (boxesQuery.data?.data ?? []).sort((b1, b2) => b1.order < b2.order ? -1 : 1);
 
-    const isLoading = [ storage, boxesQuery ].some(query => query.isLoading);
+    const isLoading = [ storage, boxesQuery ].some(q => q.isPending && q.isEnabled);
     if (isLoading || boxId === undefined)
         return null;
 

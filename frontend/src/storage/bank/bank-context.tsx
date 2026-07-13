@@ -68,16 +68,17 @@ export const BankContext = {
 
         const queries = [ bankQuery, boxesQuery ];
 
-        const isLoading = queries.some(query => query.isLoading);
+        const isPending = queries.some(q => q.isPending && q.isEnabled);
         const isError = queries.some(query => query.isError || (query.data && query.data.status >= 400));
 
         const payload = {
-            isLoading,
+            isPending,
+            isEnabled: true,
             isError,
             data: undefined,
         };
 
-        if (isLoading || isError) {
+        if (isPending || isError) {
             return payload;
         }
 

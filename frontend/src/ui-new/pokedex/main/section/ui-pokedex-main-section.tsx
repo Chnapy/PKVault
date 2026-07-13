@@ -10,7 +10,7 @@ export const UIPokedexMainSection: React.FC<UIPokedexMainSectionProps> = ({ chil
     const ref = React.useRef<HTMLDivElement>(null);
 
     return <Group ref={ref} gap='sm' py='md'>
-        <VisibilityObserver ref={ref} margin='200px'>
+        <VisibilityObserver ref={ref} margin='600px'>
             {children}
         </VisibilityObserver>
     </Group>;

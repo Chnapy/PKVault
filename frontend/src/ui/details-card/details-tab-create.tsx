@@ -7,9 +7,10 @@ import { UIDetailsSaveTab } from '../../ui-new/storage/storage-details/saves/ui-
 export type DetailsTabCreateProps = {
     context: EntityContext;
     version: GameVersion;
+    loading?: boolean;
 };
 
-export const DetailsTabCreate: React.FC<DetailsTabCreateProps> = ({ context, version }) => {
+export const DetailsTabCreate: React.FC<DetailsTabCreateProps> = ({ context, version, loading }) => {
     const contextName = getEntityContextGenerationName(context, true);
 
     const gameInfos = getGameInfos(version, true);
@@ -22,5 +23,6 @@ export const DetailsTabCreate: React.FC<DetailsTabCreateProps> = ({ context, ver
         create
         label={contextName}
         isEnabled
+        loading={loading}
     />;
 };

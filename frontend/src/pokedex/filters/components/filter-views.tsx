@@ -24,7 +24,6 @@ export const FilterViews: React.FC = () => {
         showGenders: values.includes('display-genders') || undefined,
       },
     }))}
-    label="Views"
   >
     <Group grow wrap='nowrap'>
       <Checkbox.Card

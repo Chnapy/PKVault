@@ -10,6 +10,7 @@ import { ItemImg } from '../../ui/img/item-img';
 import { SpeciesImg } from '../../ui/img/species-img';
 import { TypeItem } from '../../ui/type-item/type-item';
 import { useCurrentStorage } from '../panel/storage-panel-context';
+import { DetailsAttachedButton } from './details-attached-button';
 
 export const DetailsMain: React.FC = () => {
     const staticData = useStaticData();
@@ -47,6 +48,7 @@ export const DetailsMain: React.FC = () => {
         heldItem={pkm.heldItem > 0
             ? <ItemImg item={pkm.heldItem} version={pkm.contextVersion} />
             : null}
+        attachedBtn={<DetailsAttachedButton />}
     >
         <SpeciesImg
             species={pkm.species}

@@ -31,6 +31,10 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
                 name: 'submit' as const,
                 label: 'Submit',
                 triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
                     gamepad: {
                         type: 'gamepad',
                         values: [ 'X' ],
@@ -48,6 +52,10 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
                 name: 'cancel' as const,
                 label: 'Cancel',
                 triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
                     gamepad: {
                         type: 'gamepad',
                         values: [ 'B' ],

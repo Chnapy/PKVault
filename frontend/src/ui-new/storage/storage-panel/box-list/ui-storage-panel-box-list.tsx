@@ -1,4 +1,4 @@
-import { ActionIcon, Divider, Group, Menu, Text } from '@mantine/core';
+import { ActionIcon, Divider, Group, Menu, Text, Tooltip } from '@mantine/core';
 import { BoxIcon, CalendarSyncIcon, CirclePlusIcon, EllipsisVerticalIcon, SortDescIcon } from 'lucide-react';
 import React from 'react';
 import type { BoxType } from '../../../../data/sdk/model';
@@ -45,16 +45,18 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
             renderExpanded={(data, opt) => <Group py='md' px='xs'>
                 {renderExpanded?.(data, opt)}
 
-                {onCreate && <UIActionIcon
-                    name='create-box'
-                    controlLabel='Create box'
-                    variant='default'
-                    size='xl'
-                    w='100%'
-                    onClick={onCreate}
-                >
-                    <CirclePlusIcon />
-                </UIActionIcon>}
+                {onCreate && <Tooltip label='Create new box'>
+                    <UIActionIcon
+                        name='create-box'
+                        controlLabel='Create box'
+                        variant='default'
+                        size='xl'
+                        w='100%'
+                        onClick={onCreate}
+                    >
+                        <CirclePlusIcon />
+                    </UIActionIcon>
+                </Tooltip>}
             </Group>}
             right={<>
                 <Divider orientation="vertical" h='1lh' />

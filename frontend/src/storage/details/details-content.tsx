@@ -1,5 +1,5 @@
 import { Alert, Box, Group, Stack } from '@mantine/core';
-import { AlertCircleIcon, AlertTriangleIcon, ExternalLinkIcon, InfoIcon } from 'lucide-react';
+import { AlertCircleIcon, ExternalLinkIcon, InfoIcon } from 'lucide-react';
 import React from 'react';
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { usePkmLegality } from '../../data/hooks/use-pkm-legality';
@@ -10,6 +10,7 @@ import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
 import { useTranslate } from '../../translate/i18n';
 import { UIPathLine } from '../../ui-new/path/ui-path-line';
+import { UIPokedexIcons } from '../../ui-new/pokedex/icons/ui-pokedex-icons';
 import { UIGameImg } from '../../ui-new/sprite-img/ui-game-img';
 import { UIContest } from '../../ui-new/storage/storage-details/content/cosmetic/ui-contest';
 import { UIDetailsContentCosmetic } from '../../ui-new/storage/storage-details/content/cosmetic/ui-details-content-cosmetic';
@@ -102,7 +103,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         isVariant(pkm) && pkm.isEnabled && !getPkmVariantAttach(pkm, pkm.id).isAttachedValid && <Alert
             variant='outline' color='orange'
             title={<Group>
-                <AlertTriangleIcon />
+                <UIPokedexIcons.Warn size='xs' />
                 {t('details.attached-pkm-not-found.1')}
             </Group>}
         >
@@ -114,7 +115,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         pkm.isEnabled && pkmLegality && pkmLegality.illegalitiesCount > 0 && pkmLegality.validityReport && <Alert
             variant='outline' color='orange'
             title={<Group>
-                <AlertTriangleIcon />
+                <UIPokedexIcons.Warn size='xs' />
                 {t('details.legality.1')}
             </Group>}
         >
@@ -129,7 +130,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
     const content: UIDetailsContentProps[ 'content' ] = [
         issues.length > 0 && {
             name: 'issue',
-            label: <><AlertTriangleIcon /> Issues</>,
+            label: <><UIPokedexIcons.Warn size='xs' /> Issues</>,
             content: <Stack>
                 {issues.map((issue, i) => <React.Fragment key={i}>
                     {issue}

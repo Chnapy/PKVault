@@ -29,7 +29,7 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
         }
     }, [ shouldUpdateLanguage, i18n, language ]);
 
-    if (settingsQuery.isLoading || !settingsMutable) {
+    if ((settingsQuery.isPending && settingsQuery.isEnabled) || !settingsMutable) {
         return <UISplash />;
     }
 

@@ -1,10 +1,11 @@
-import { Group } from '@mantine/core';
+import { Group, Tooltip } from '@mantine/core';
 import { LinkIcon, MoveIcon, PencilIcon, SparklesIcon, TrashIcon, UnlinkIcon } from 'lucide-react';
 import React from 'react';
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import type { PkmSaveDTO } from '../../data/sdk/model';
 import { useStorageEvolvePkms, useStorageMainDeletePkmVariant, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
+import { useTranslate } from '../../translate/i18n';
 import { UIButton, type UIButtonProps } from '../../ui-new/form/button/ui-button';
 import { useControlsCurrentType } from '../../ui-new/interaction/controls/use-controls-current-type';
 import { useDragging } from '../../ui-new/interaction/move/hooks/use-dragging';
@@ -22,6 +23,8 @@ type DetailsActionsProps = Pick<UIButtonProps, 'focusOnMount'> & {
 };
 
 export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pkmIds, saveId }) => {
+    const { t } = useTranslate();
+
     const pkmIndexQuery = usePkmIndex(saveId ?? null,
         useSelectCallback(data => {
             return pkmIds.map(id => data.data.byId[ id ]).filter(filterIsDefined)
@@ -104,37 +107,53 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
             // eslint-disable-next-line react-hooks/refs
             ref={dragging.ref}
         >
-            Move
+            {t('storage.actions.move')}
         </UIButton>
 
         {attachedVariantIds.length > 0
-            ? <UIButton
-                name='detach'
-                controlLabel='Detach'
-                onClick={() =>
-                    mainPkmDetachSaveMutation.mutateAsync({
-                        params: {
-                            pkmVariantIds: attachedVariantIds,
-                        },
-                    })
-                }
-                size='compact-md'
-                leftSection={<UnlinkIcon />}
-            >
-                Detach {renderCount(attachedVariantIds.length)}
-            </UIButton>
-            : <UIButton
-                name='move-attached'
-                controlLabel='Move attached'
-                onClick={onClickMoveAttached}
-                size='compact-md'
-                leftSection={<Group gap='sm'>
-                    <MoveIcon />
-                    <LinkIcon />
-                </Group>}
-            >
-                Move attached
-            </UIButton>}
+            ? <Tooltip
+                multiline
+                w={300}
+                label={(saveId
+                    ? [ t('storage.actions.detach-save.helpTitle'), t('storage.actions.detach-save.helpContent') ]
+                    : [ t('storage.actions.detach-main.helpTitle'), t('storage.actions.detach-main.helpContent') ]
+                ).join('\n\n')}>
+                <UIButton
+                    name='detach'
+                    controlLabel='Detach'
+                    onClick={() =>
+                        mainPkmDetachSaveMutation.mutateAsync({
+                            params: {
+                                pkmVariantIds: attachedVariantIds,
+                            },
+                        })
+                    }
+                    size='compact-md'
+                    leftSection={<UnlinkIcon />}
+                >
+                    {saveId ? t('storage.actions.detach-save') : t('storage.actions.detach-main')} {renderCount(attachedVariantIds.length)}
+                </UIButton>
+            </Tooltip>
+            : <Tooltip
+                multiline
+                w={300}
+                label={(saveId
+                    ? [ t('storage.actions.move-attached-save.helpTitle'), t('storage.actions.move-attached-save.helpContent') ]
+                    : [ t('storage.actions.move-attached-main.helpTitle'), t('storage.actions.move-attached-main.helpContent') ]
+                ).join('\n\n')}>
+                <UIButton
+                    name='move-attached'
+                    controlLabel='Move attached'
+                    onClick={onClickMoveAttached}
+                    size='compact-md'
+                    leftSection={<Group gap='sm'>
+                        <MoveIcon />
+                        <LinkIcon />
+                    </Group>}
+                >
+                    {t('storage.actions.move-attached-main')}
+                </UIButton>
+            </Tooltip>}
 
         {canEditList.length < 2 && <UIPopover
             position='left'
@@ -152,7 +171,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
                 size='compact-md'
                 leftSection={<PencilIcon />}
             >
-                Edit
+                {t('storage.actions.edit')}
             </UIButton>
         </UIPopover>}
 
@@ -196,7 +215,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
                 size='compact-md'
                 leftSection={<SparklesIcon />}
             >
-                Evolve {renderCount(canEvolveList.length)}
+                {t('storage.actions.evolve')} {renderCount(canEvolveList.length)}
             </UIButton>
         </UIConfirmPopover>}
 
@@ -233,7 +252,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
                 leftSection={<TrashIcon />}
                 disabled={canReleaseList.length === 0}
             >
-                Release {renderCount(canReleaseList.length)}
+                {t('storage.actions.release')} {renderCount(canReleaseList.length)}
             </UIButton>
         </UIConfirmPopover>
     </Group>;

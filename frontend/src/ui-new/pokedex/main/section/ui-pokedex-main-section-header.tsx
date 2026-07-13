@@ -1,4 +1,4 @@
-import { Badge, Divider, Group } from '@mantine/core';
+import { Badge, Divider, Group, ThemeIcon } from '@mantine/core';
 import { ListIcon } from 'lucide-react';
 import type React from 'react';
 import { UIPokedexIcons } from '../../icons/ui-pokedex-icons';
@@ -35,7 +35,9 @@ export const UIPokedexMainSectionHeader: React.FC<UIPokedexMainSectionHeaderProp
             {renderCount(<UIPokedexIcons.Owned size='sm' />, ownedCount)}
             {renderCount(<UIPokedexIcons.Shiny size='sm' />, shinyCount)}
             <Divider orientation='vertical' />
-            {renderCount(<ListIcon />, totalCount)}
+            {renderCount(<ThemeIcon variant='transparent' size='sm'>
+                <ListIcon />
+            </ThemeIcon>, totalCount)}
         </Group>
     </Group>;
 };

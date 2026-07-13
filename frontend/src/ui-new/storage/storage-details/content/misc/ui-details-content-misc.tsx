@@ -22,7 +22,7 @@ export const UIDetailsContentMisc: React.FC<UIDetailsContentMiscProps> = ({
             <Progress
                 value={
                     (isEgg ? eggHatchCount : friendship)
-                    * 1 / 255
+                    / 255 * 100
                 }
                 // color={color}
                 style={{ flexGrow: 1 }}

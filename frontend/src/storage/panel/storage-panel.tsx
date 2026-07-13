@@ -25,7 +25,7 @@ export const StoragePanel: React.FC<PopoverTargetChildProps> = (popoverProps) =>
         ? getBoxBackgroundUrl(saveBox.wallpaperName)
         : undefined;
 
-    const storageWithoutBox = !storage.isLoading && saveId !== undefined && boxId === undefined;
+    const storageWithoutBox = !(storage.isPending && storage.isEnabled) && saveId !== undefined && boxId === undefined;
 
     React.useEffect(() => {
         if (storageWithoutBox)

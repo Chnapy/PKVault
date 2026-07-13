@@ -1,4 +1,4 @@
-import { Group, HoverCard, Tabs, Text } from '@mantine/core';
+import { Group, Tabs, Text, Tooltip } from '@mantine/core';
 import { CirclePlusIcon } from 'lucide-react';
 import type React from 'react';
 import { UIExpandableTabs, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
@@ -30,19 +30,14 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
         onChange={onChange}
         expanded={expanded}
         scoped={expanded !== true}
-        renderTab={(params, opt) => <HoverCard>
-            <HoverCard.Target>
-                <Tabs.Tab key={params.item.id}
-                    value={params.item.id} onClick={opt.reduce} disabled={params.item.disabled}
-                    leftSection={<img src={params.item.imgSrc} height={16} />} py={4}
-                >
-                    <Text component={params.selected ? 'b' : undefined} textWrap='nowrap'>{params.item.label}</Text>
-                </Tabs.Tab>
-            </HoverCard.Target>
-            <HoverCard.Dropdown>
-                {renderHoverCard(params, opt)}
-            </HoverCard.Dropdown>
-        </HoverCard>}
+        renderTab={(params, opt) => <Tooltip key={params.item.id} label={renderHoverCard(params, opt)} color='transparent'>
+            <Tabs.Tab
+                value={params.item.id} onClick={opt.reduce} disabled={params.item.disabled}
+                leftSection={<img src={params.item.imgSrc} height={16} />} py={4}
+            >
+                <Text component={params.selected ? 'b' : undefined} textWrap='nowrap'>{params.item.label}</Text>
+            </Tabs.Tab>
+        </Tooltip>}
         renderExpanded={(data, opt) => <Group
             align='flex-start'
             p='md'
@@ -50,15 +45,17 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
         >
             {renderExpanded?.(data, opt)}
 
-            <UIActionIcon
-                name='add-game'
-                controlLabel='Add game'
-                variant='default'
-                size='xl'
-                w='100%'
-            >
-                <CirclePlusIcon />
-            </UIActionIcon>
+            <Tooltip label='Add saves in settings'>
+                <UIActionIcon
+                    name='add-game'
+                    controlLabel='Add game'
+                    variant='default'
+                    size='xl'
+                    w='100%'
+                >
+                    <CirclePlusIcon />
+                </UIActionIcon>
+            </Tooltip>
         </Group>}
     />;
 };

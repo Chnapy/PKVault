@@ -23,11 +23,11 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onE
         },
     });
 
-    const { isLoading } = globResultsQuery;
     const data = globResultsQuery.data?.data ?? [];
 
-    const hasError = !globResultsQuery.isLoading && globResultsQuery.isError;
-    const hasWarning = !globResultsQuery.isLoading && (hasError || data.length === 0);
+    const isLoading = globResultsQuery.isPending && globResultsQuery.isEnabled;
+    const hasError = !isLoading && globResultsQuery.isError;
+    const hasWarning = !isLoading && (hasError || data.length === 0);
 
     return <UIGlobsInputItem
         name={name}

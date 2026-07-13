@@ -23,7 +23,7 @@ export const BankExpanded: React.FC<BankExpandedProps> = ({ id, selected, ...res
     });
     const pkmsCount = pkmsCountQuery.data ?? 0;
 
-    const loading = [ banksQuery, boxesQuery, pkmsCountQuery ].some(query => query.isLoading);
+    const loading = [ banksQuery, boxesQuery, pkmsCountQuery ].some(query => query.isPending && query.isEnabled);
 
     const canEdit = !!bank && !bank.isExternal;
     const canDelete = bankList.length > 1 && (canEdit || pkmsCount === 0);
