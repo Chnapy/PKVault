@@ -29,7 +29,6 @@ export const FilterFromGames: React.FC = () => {
     name='filter-game'
     controlLabel='Filter by game'
     label='Storages'
-    placeholder='Filter by game'
     value={currentValue}
     data={options}
     onChange={(storages) => startTransition(() => navigate({
@@ -37,7 +36,6 @@ export const FilterFromGames: React.FC = () => {
         filterFromGames: storages.map(Number),
       },
     }))}
-    pillsNoWrap
     renderOption={({ option, checked }) => {
       if (!saveInfosQuery.data)
         return null;
@@ -46,7 +44,7 @@ export const FilterFromGames: React.FC = () => {
       const save = saveInfosQuery.data.data[ saveId ];
       const name = save && versions[ save.version ]?.name;
 
-      return <Group>
+      return <Group wrap='nowrap'>
         {checked && <CheckIcon />}
         <UIGameImg
           version={save?.version ?? null}

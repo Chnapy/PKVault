@@ -52,6 +52,7 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
         onSubmit={onSubmit}
         title={<>Edit {defaultValues.nickname}</>}
         disabled={formDisabled}
+        miw={hideCheats ? 150 : 475}
     >
         <Group align='flex-start'>
             <Stack style={{ flexGrow: 1 }}>

@@ -33,7 +33,6 @@ export const Primary: Story = {
     render: () => <UIAppLayout
         header={<UIHeader
             {...UIHeaderSettingsStory.args}
-            value='settings'
         />}
         bottom={<UIActionsPanel
             data={[

@@ -1,5 +1,5 @@
 import { Alert, Group, type ComboboxItem } from '@mantine/core';
-import { AlertTriangleIcon, CalendarSyncIcon } from 'lucide-react';
+import { AlertTriangleIcon, CalendarSyncIcon, CheckIcon } from 'lucide-react';
 import type React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type { StorageDexSyncParams } from "../../data/sdk/model";
@@ -55,6 +55,7 @@ export const DexSyncAdvancedAction: React.FC<{
     title={t('storage.box.advanced.dex-sync')}
     description={t("storage.dex-sync.description")}
     disabled={saveIds.length < 2}
+    miw={350}
   >
     <UIMultiSelect
       name='saveIds'
@@ -75,14 +76,37 @@ export const DexSyncAdvancedAction: React.FC<{
           disabled: save.id === saveId,
         })),
       ]}
-      // renderPill={({ option, onRemove }) => }
-      renderOption={({ option, checked = false }) => option && <Group>
-        <UIGameImg
-          version={option.value === '0' ? null : saveInfos[ +option.value ]!.version}
+      renderOption={({ option, checked }) => {
+        if (!saveInfosQuery.data)
+          return null;
+
+        const saveId = +option.value;
+        const save = saveInfosQuery.data.data[ saveId ];
+        const name = save && staticData.versions[ save.version ]?.name;
+
+        return <Group wrap='nowrap'>
+          {checked && <CheckIcon />}
+          <UIGameImg
+            version={save?.version ?? null}
+            size='1lh'
+          />
+          {save
+            ? <>{name} - {save.trainerName}</>
+            : 'PKVault'}
+        </Group>;
+      }}
+      renderPill={({ value }) => {
+        if (!saveInfosQuery.data || !value)
+          return null;
+
+        const saveId = +value;
+        const save = saveInfosQuery.data.data[ saveId ];
+
+        return <UIGameImg
+          version={save?.version ?? null}
           size='1lh'
-        />
-        {option.label}
-      </Group>}
+        />;
+      }}
       searchable
       comboboxProps={{
         withinPortal: false,

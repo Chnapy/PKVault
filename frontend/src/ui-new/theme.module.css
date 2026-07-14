@@ -1,7 +1,11 @@
 
+:root[data-mantine-color-scheme='dark'], :host([data-mantine-color-scheme='dark']) {
+    --mantine-color-body: var(--mantine-color-dark-9);
+}
+
 .paper {
     --mantine-color-white: var(--mantine-color-white-4);
-    --mantine-color-body-default: light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
+    --mantine-color-body-default: light-dark(var(--mantine-color-white), var(--mantine-color-dark-8));
     --mantine-color-body: var(--mantine-color-body-default);
 
     background-color: var(--mantine-color-body);
@@ -28,8 +32,6 @@
 }
 
 .button {
-    --mantine-color-primary-light: light-dark(var(--mantine-color-primary-1), var(--mantine-color-dark-8));
-
     flex-shrink: 0;
     box-shadow: var(--mantine-shadow-sm);
 }
@@ -47,15 +49,14 @@
     flex-shrink: 0;
 }
 
-.button[data-disabled="true"],
-.action-icon[data-disabled="true"] {
-    opacity: 0.5;
-}
-
 .text:not(strong, b, th):is([data-size='lg'], [data-size='xl']) {
     text-shadow: 2px 2px 0 light-dark(#0002, #FFF2);
 }
 
 .alert-title, .alert-message {
     font-size: var(--mantine-font-size-md);
+}
+
+[data-mantine-color-scheme='dark'] .segmented-control {
+    background-color: var(--mantine-color-dark-9);
 }

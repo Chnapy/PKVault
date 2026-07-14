@@ -5,7 +5,7 @@ import { WithControlsIcons } from '../../interaction/controls/icons/with-control
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 
-type UIActionIconProps = {
+export type UIActionIconProps = {
     name: string;
     controlLabel: string;
     controlIcons?: React.ReactNode[];

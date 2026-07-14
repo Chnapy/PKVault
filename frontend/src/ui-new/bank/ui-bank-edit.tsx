@@ -65,6 +65,7 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
         onSubmit={onSubmit}
         title={<>Edit {defaultValues.bankName}</>}
         disabled={watchName.length === 0 || !formState.isValid}
+        miw={250}
     >
         <UITextInput
             {...register('bankName', { setValueAs: (value) => value.trim(), minLength: 2, maxLength: 64 })}

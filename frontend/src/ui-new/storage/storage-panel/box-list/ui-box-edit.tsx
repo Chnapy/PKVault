@@ -52,6 +52,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
         onSubmit={onSubmit}
         title={<>Edit {defaultValues.boxName}</>}
         disabled={watchName.length === 0 || !formState.isValid}
+        miw={250}
     >
         <UITextInput
             {...register('boxName', {

@@ -61,7 +61,6 @@ export const Primary: Story = {
     render: () => <UIAppLayout
         header={<UIHeader
             {...UIHeaderBanksStory.args}
-            value='storage'
         />}
         bottom={<UIActionsPanel
             data={[

@@ -29,7 +29,6 @@ export const FilterGeneration: React.FC = () => {
     name='filter-generation'
     controlLabel='Filter by generation'
     label={t('dex.filters.generations')}
-    placeholder='Filter by generation'
     data={options}
     value={searchValue.map(String)}
     onChange={(values) => startTransition(() => navigate({

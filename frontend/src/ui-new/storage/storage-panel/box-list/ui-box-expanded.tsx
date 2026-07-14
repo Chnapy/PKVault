@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Group, SimpleGrid, Stack, Text, Tooltip, type ButtonProps } from '@mantine/core';
+import { ActionIcon, Button, Group, SimpleGrid, Stack, Text, type ButtonProps } from '@mantine/core';
 import { PenIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 import type { UIExpandableTabsData } from '../../../expandable-tabs/ui-expandable-tabs';
@@ -114,13 +114,14 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
             <UIPopover
                 dropdown={editDropdown}
             >
-                <Tooltip label='This feature is planned' disabled={!editDisabled}>
-                    <WithControlsIcons placement='out' icons={controlIcons('edit')}>
-                        <ActionIcon color='blue' {...controlProps('edit')}>
-                            <PenIcon />
-                        </ActionIcon>
-                    </WithControlsIcons>
-                </Tooltip>
+                <WithControlsIcons placement='out' icons={controlIcons('edit')}>
+                    <ActionIcon color='blue' {...controlProps('edit')} style={{
+                        borderBottomLeftRadius: 0,
+                        borderBottomRightRadius: 0,
+                    }}>
+                        <PenIcon />
+                    </ActionIcon>
+                </WithControlsIcons>
             </UIPopover>
 
             <UIConfirmPopover

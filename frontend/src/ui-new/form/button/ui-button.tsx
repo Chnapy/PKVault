@@ -1,18 +1,23 @@
-import { Button, type ElementProps } from '@mantine/core';
+import { Button, type ElementProps, type PolymorphicComponentProps } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import React from 'react';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 
-export type UIButtonProps = {
+export type UIButtonProps<C = 'button'> = {
     name: string;
     controlLabel: string;
     controlIcons?: React.ReactNode[];
     focusOnMount?: boolean;
-} & Button.Props & ElementProps<'button'>;
+}
+    & Pick<ElementProps<'button'>, 'onClick' | 'ref'>
+    & PolymorphicComponentProps<C, Button.Props>;
 
-export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner, w, miw, mx, mt, style, ...rest }) => {
+export const UIButton = function <C = 'button'>({
+    name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner,
+    component, w, miw, mx, mt, style, ...rest
+}: UIButtonProps<C>) {
     const [ loadingInner, setLoading ] = React.useState(false);
 
     const loading = loadingInner || rest.loading;
@@ -42,6 +47,7 @@ export const UIButton: React.FC<UIButtonProps> = ({ name, controlLabel, controlI
 
     return <WithControlsIcons placement='out' icons={[ controlIcons('open'), ...extraControlIcons ]} display='inline-flex' h='fit-content' w={w} miw={miw} mx={mx} mt={mt} style={style}>
         <Button
+            component={component as never}
             {...focusProps}
             {...controlProps('open')}
             {...rest}

@@ -20,7 +20,7 @@ export const UIPokedexIcons = {
     Alpha: ({ children, ...rest }: ThemeIconProps) => <ThemeIcon component='span' variant='transparent' {...rest}>
         {children ?? <UIAlphaIcon />}
     </ThemeIcon>,
-    Warn: ({ children, ...rest }: ThemeIconProps) => <ThemeIcon component='span' variant='transparent' color='yellow' {...rest}>
+    Warn: ({ children, ...rest }: ThemeIconProps) => <ThemeIcon component='span' variant='transparent' c='yellow.8' {...rest}>
         <TriangleAlertIcon />
     </ThemeIcon>,
 };

@@ -1,4 +1,4 @@
-import { Center, Group, Space, Stack, Text } from '@mantine/core';
+import { Center, Group, Space, Stack, Text, Tooltip } from '@mantine/core';
 import type React from 'react';
 import { type Gender } from '../../../data/sdk/model';
 import { getSpeciesNO } from '../../../ui/dex-item/util/get-species-no';
@@ -75,10 +75,15 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
             <Center>{children}</Center>
             <Stack align='flex-end'>
                 {markings}
-                {(pokerusDays || isPokerusCured) && <UIPokerusIcon
-                    cured={isPokerusCured}
-                    size='big'
-                />}
+                {(pokerusDays || isPokerusCured) && <Tooltip label={isPokerusCured
+                    ? 'Pokerus cured'
+                    : `Pokerus infected (${pokerusDays} days)`}
+                >
+                    <UIPokerusIcon
+                        cured={isPokerusCured}
+                        size='big'
+                    />
+                </Tooltip>}
 
                 {attachedBtn}
             </Stack>

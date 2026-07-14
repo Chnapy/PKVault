@@ -7,6 +7,8 @@
     z-index: 10;
 
     --focus-width: 2px;
+    --mantine-color-disabled: var(--mantine-color-primary-8);
+    --mantine-color-disabled-color: var(--mantine-color-primary-4);
 }
 
 .ui-header .left {

@@ -12,7 +12,7 @@ export const FilterOwnedShiny: React.FC = () => {
   const data = [
     { value: 'all', label: 'All' },
     { value: 'shiny', label: <UIShinyIcon /> },
-    { value: 'not-shiny', label: <UIShinyIcon style={{ opacity: 0.5, filter: 'brightness(0)' }} /> },
+    { value: 'not-shiny', label: <UIShinyIcon disabled /> },
   ] as const satisfies UISegmentedControlProps[ 'data' ];
 
   type Value = typeof data[ number ][ 'value' ];

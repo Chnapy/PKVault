@@ -21,7 +21,6 @@ export const Primary: Story = {
     render: () => <UIAppLayout
         header={<UIHeader
             {...UIHeaderStory.args}
-            value='saves'
         />}
         bottom={<UIActionsPanel
             data={[

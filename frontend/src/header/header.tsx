@@ -32,11 +32,12 @@ export const Header: React.FC = () => {
     type HeaderValue = typeof value;
 
     return <UIHeader
-        value={value}
         left={<>
             <UIHeaderItem
                 id={'saves' satisfies HeaderValue}
                 to={"/saves"}
+                selected={value === 'saves'}
+                label={t('header.saves')}
             >
                 {t('header.saves')}
             </UIHeaderItem>
@@ -44,6 +45,8 @@ export const Header: React.FC = () => {
             <UIHeaderItem
                 id={'storage' satisfies HeaderValue}
                 to={"/storage"}
+                selected={value === 'storage'}
+                label={t('header.storage')}
             >
                 {t('header.storage')}
             </UIHeaderItem>
@@ -51,6 +54,8 @@ export const Header: React.FC = () => {
             <UIHeaderItem
                 id={'pokedex' satisfies HeaderValue}
                 to={"/pokedex"}
+                selected={value === 'pokedex'}
+                label={t('header.dex')}
             >
                 {t('header.dex')}
             </UIHeaderItem>
@@ -86,6 +91,7 @@ export const Header: React.FC = () => {
             <UIHeaderItem
                 id='help'
                 search={{ help: 'README.md' satisfies DocsGenEnSlugs }}
+                label={t('header.help')}
             >
                 <InfoIcon style={{ verticalAlign: 'text-bottom', marginRight: 4 }} />
                 {t('header.help')}
@@ -94,6 +100,8 @@ export const Header: React.FC = () => {
             <UIHeaderItem
                 id={'settings' satisfies HeaderValue}
                 to={"/settings"}
+                selected={value === 'settings'}
+                label={t('header.settings')}
             >
                 {t('header.settings')}
             </UIHeaderItem>

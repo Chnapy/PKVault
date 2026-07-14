@@ -2,6 +2,7 @@
 @import url("../assets/fonts/font-face.css");
 
 * {
+  scrollbar-color: var(--mantine-color-dark-2) transparent;
   scrollbar-width: thin;
 }
 

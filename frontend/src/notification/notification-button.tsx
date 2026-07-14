@@ -62,6 +62,8 @@ export const NotificationButton: React.FC = () => {
                         ? (() => setOpened(value => !value))
                         : undefined}
                     disabled={!hasNotifs}
+                    size='1lh'
+                    lh='inherit'
                 >
                     <BellIcon />
                 </UIActionIcon>

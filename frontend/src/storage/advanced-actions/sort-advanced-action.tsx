@@ -94,6 +94,7 @@ export const SortAdvancedAction: React.FC<{
         title={t('storage.box.advanced.sort')}
         description={t('storage.sort.description.1')}
         disabled={!formState.isValid}
+        miw={350}
     >
         <UISelect
             {...register('pokedexName')}

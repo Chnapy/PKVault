@@ -12,7 +12,7 @@ export const FilterAlpha: React.FC = () => {
   const data = [
     { value: 'all', label: 'All' },
     { value: 'alpha', label: <UIAlphaIcon /> },
-    { value: 'not-alpha', label: <UIAlphaIcon style={{ opacity: 0.5, filter: 'brightness(0)' }} /> },
+    { value: 'not-alpha', label: <UIAlphaIcon disabled /> },
   ] as const satisfies UISegmentedControlProps[ 'data' ];
 
   type Value = typeof data[ number ][ 'value' ];

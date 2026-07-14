@@ -20,15 +20,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
     args: {
-        value: 'storage',
         left: <>
-            <UIHeaderItem id='saves' to='/saves'>SAVES</UIHeaderItem>
-            <UIHeaderItem id='storage' to='/storage'>STORAGE</UIHeaderItem>
-            <UIHeaderItem id='pokedex' to='/pokedex'>POKEDEX</UIHeaderItem>
+            <UIHeaderItem id='saves' to='/saves' label='Saves'>SAVES</UIHeaderItem>
+            <UIHeaderItem id='storage' to='/storage' label='Storage' selected>STORAGE</UIHeaderItem>
+            <UIHeaderItem id='pokedex' to='/pokedex' label='Pokedex'>POKEDEX</UIHeaderItem>
         </>,
         right: <>
-            <UIHeaderItem id='help' to='/'>HELP</UIHeaderItem>
-            <UIHeaderItem id='settings' to='/settings'>BACKUPS & SETTINGS</UIHeaderItem>
+            <UIHeaderItem id='help' to='/' label='Help'>HELP</UIHeaderItem>
+            <UIHeaderItem id='settings' to='/settings' label='Backups & settings'>BACKUPS & SETTINGS</UIHeaderItem>
         </>,
     },
 };

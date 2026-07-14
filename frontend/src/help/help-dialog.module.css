@@ -1,3 +1,18 @@
+
+.help-dialog-inner-content {
+  display: flex;
+  flex-direction: column;
+  
+  --mantine-color-body: light-dark(var(--mantine-color-white-5), var(--mantine-color-dark-5));
+}
+
+.help-dialog-inner-body {
+  position: relative;
+  flex-grow: 1;
+  padding-right: 0;
+  overflow-y: scroll;
+}
+
 .help-dialog-content :global(summary) {
   cursor: pointer;
 }
@@ -14,7 +29,7 @@
 
 .help-dialog-content :global(details)[open],
 .help-dialog-content :global(details):hover {
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: light-dark(var(--mantine-color-white-5), var(--mantine-color-dark-5));
 }
 
 .help-dialog-content :global(details) > p {

@@ -11,3 +11,12 @@
 .ui-icon.big {
     height: 20px;
 }
+
+[data-mantine-color-scheme='light'] .ui-icon.disabled {
+    opacity: 0.4;
+    filter: brightness(0);
+}
+
+[data-mantine-color-scheme='dark'] .ui-icon.disabled {
+    filter: brightness(0) contrast(0);
+}

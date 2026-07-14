@@ -94,8 +94,9 @@ const OptionComponent: React.FC<ComboboxLikeRenderOptionInput<ComboboxItem<strin
     });
 
     React.useEffect(() => {
-        enter()
-    }, [ enter ])
+        if ((focusProps.ref.current as HTMLElement).checkVisibility())
+            enter()
+    })
 
     return <WithControlsIcons placement='out' icons={controlIcons('open')}
         {...focusProps}

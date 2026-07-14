@@ -5,7 +5,7 @@ import ReactMarkdown, { type Components, type UrlTransform } from 'react-markdow
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 import { LinkWithIcon } from '../ui/link-with-icon/link-with-icon';
-import classes from './help-dialog-content.module.css';
+import classes from './help-dialog.module.css';
 import { useHelpAnchorScroll } from './hooks/use-help-anchor-scroll';
 
 type HelpDialogContentProps = {

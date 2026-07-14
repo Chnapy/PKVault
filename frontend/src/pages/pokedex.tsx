@@ -9,7 +9,7 @@ import { UIPokedexContent } from '../ui-new/pokedex/ui-pokedex-content';
 export const PokedexPage: React.FC = withErrorCatcher('default', () => {
   return <UIPokedexContent>
     <Group mah='100%' align='flex-start' wrap='nowrap'>
-      <FiltersCard mah='100%' miw={300} />
+      <FiltersCard mah='100%' w={300} style={{ flexShrink: 0 }} />
 
       <PokedexMainWrapperDetails>
         <PokedexList />

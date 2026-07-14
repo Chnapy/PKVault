@@ -50,7 +50,7 @@ const UIPokedexItemInner: React.FC<UIPokedexItemProps> = ({
                 {...focusProps}
                 {...controlProps('open')}
                 data-selected={selected || undefined}
-                variant='light'
+                variant='default'
                 className={classes.button}
                 bd='none'
                 maw='100%'

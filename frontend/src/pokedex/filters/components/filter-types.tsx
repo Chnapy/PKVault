@@ -21,7 +21,6 @@ export const FilterTypes: React.FC = () => {
     name='filter-type'
     controlLabel='Filter by type'
     label={t('dex.filters.types')}
-    placeholder='Filter by type'
     data={allTypes.map((type) => ({
       value: type.id.toString(),
       label: type.name,

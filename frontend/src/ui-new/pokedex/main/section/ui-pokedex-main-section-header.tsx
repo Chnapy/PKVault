@@ -29,7 +29,7 @@ export const UIPokedexMainSectionHeader: React.FC<UIPokedexMainSectionHeaderProp
             {games}
         </Group>
 
-        <Group>
+        <Group pr='md'>
             {renderCount(<UIPokedexIcons.Seen size='sm' />, seenCount)}
             {renderCount(<UIPokedexIcons.Caught size='sm' />, caughtCount)}
             {renderCount(<UIPokedexIcons.Owned size='sm' />, ownedCount)}

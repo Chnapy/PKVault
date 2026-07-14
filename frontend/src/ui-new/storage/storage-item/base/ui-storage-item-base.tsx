@@ -30,7 +30,7 @@ export const UIStorageItemBase: React.FC<UIStorageItemBaseProps> = ({
             <Button
                 data-selected={selected || undefined}
                 className={clsx(classes.uiStorageItemBase, className)}
-                variant='light'
+                variant='default'
                 {...buttonProps}
             >
                 {children}

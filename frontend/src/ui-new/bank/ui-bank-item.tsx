@@ -22,7 +22,7 @@ export const UIBankItem: React.FC<UIBankItemProps> = ({ container, isDefault, is
 
     return <UISubHeaderTab
         {...rest}
-        label={<Group>
+        label={<Group wrap='nowrap'>
             {rest.label}
             {isDefault && <StarIcon />}
             {isExternal && <ExternalLinkIcon />}

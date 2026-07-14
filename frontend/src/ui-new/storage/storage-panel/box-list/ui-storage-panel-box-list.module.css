@@ -1,5 +1,6 @@
 [data-mantine-color-scheme="dark"]
   .ui-storage-panel-box-list
+  /* stylelint-disable-next-line selector-class-pattern */
   :global(.mantine-Tabs-tab)[data-variant="pills"] {
   --tab-hover-color: var(--mantine-color-dark-7);
 }

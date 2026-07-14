@@ -111,7 +111,7 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
                     style={{
                         flexGrow: 1,
                         alignItems: 'center',
-                        cursor: 'pointer',
+                        cursor: data.length > 0 ? 'pointer' : undefined,
                     }}
                     renderItem={(props, i) => <UIAction key={i} {...props} />}
                     renderOverflow={(items) => <Button

@@ -1,5 +1,5 @@
-import { Badge, Button, Card, Divider, Group, Tooltip } from '@mantine/core';
-import { DownloadIcon, FolderIcon } from 'lucide-react';
+import { Badge, Button, Card, Divider, EmptyState, Group, Tooltip } from '@mantine/core';
+import { CirclePlusIcon, DownloadIcon, FolderIcon, RectangleEllipsisIcon } from 'lucide-react';
 import type React from "react";
 import { HistoryContext } from '../context/history-context';
 import { getApiFullUrl } from '../data/mutator/custom-instance';
@@ -11,6 +11,7 @@ import { Route } from '../routes/saves';
 import { useDesktopMessage } from '../settings/globs-input/hooks/use-desktop-message';
 import { GameExpanded } from '../storage/panel/game-list/game-expanded';
 import { useTranslate } from '../translate/i18n';
+import { UIActionIcon } from '../ui-new/form/button/ui-action-icon';
 import { UISavesContent } from '../ui-new/saves/ui-saves-content';
 import { filterIsDefined } from '../util/filter-is-defined';
 
@@ -26,20 +27,24 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
   const staticData = useStaticData();
   const saveInfosQuery = useSaveInfosGetAll();
 
-  if (!saveInfosQuery.data) {
-    return null;
-  }
+  const isLoading = saveInfosQuery.isPending || saveInfosQuery.isEnabled;
 
   const generations = [ ...new Set(Object.values(staticData.versions).map(version => version.generation)) ].sort();
 
-  const saveInfos = Object.values(saveInfosQuery.data.data)
+  const saveInfos = Object.values(saveInfosQuery.data?.data ?? {})
     .filter(filterIsDefined)
     .sort((a, b) => {
       return a.lastWriteTime > b.lastWriteTime ? -1 : 1;
     });
 
   return <UISavesContent>
-    <Card style={{ overflow: 'auto' }}>
+    <Card pr={0} style={{ overflowY: 'scroll' }}>
+      {!isLoading && saveInfos.length === 0 && <EmptyState
+        size='sm'
+        icon={<RectangleEllipsisIcon />}
+        title='Save list is empty'
+      />}
+
       {generations.map(generation => {
         const saves = saveInfos.filter(save => save.generation === generation);
         if (saves.length === 0) {
@@ -116,6 +121,20 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
           </Card.Section>,
         ];
       })}
+
+      <Card.Section inheritPadding withBorder py='inherit'>
+        <Tooltip label='Add saves in settings'>
+          <UIActionIcon
+            name='add-game'
+            controlLabel='Add game'
+            variant='default'
+            size='xl'
+            w='100%'
+          >
+            <CirclePlusIcon />
+          </UIActionIcon>
+        </Tooltip>
+      </Card.Section>
     </Card>
   </UISavesContent>;
 

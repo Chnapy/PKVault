@@ -50,7 +50,7 @@ export const UIStorageItemIcons: React.FC<UIStorageItemIconsProps> = ({
                     {hasDisabledVariant && <UIIconWrapper variant='transparent' color='red'>
                         <FileXIcon />
                     </UIIconWrapper>}
-                    {nbrVariants > 1 && <UIIconWrapper variant='filled' color='dark'>
+                    {nbrVariants > 1 && <UIIconWrapper variant='filled' color='dark.5'>
                         {nbrVariants}
                     </UIIconWrapper>}
                     {isExternal && <UIIconWrapper variant='filled' color='dark'>
@@ -75,13 +75,13 @@ export const UIStorageItemIcons: React.FC<UIStorageItemIconsProps> = ({
                 <SparklesIcon />
             </UIIconWrapper>}
 
-            {attached && <UIIconWrapper variant='transparent' color={needSynchronize ? 'yellow' : undefined}>
+            {attached && <UIIconWrapper variant='transparent' c={needSynchronize ? 'yellow.8' : undefined}>
                 <LinkIcon />
             </UIIconWrapper>}
 
             {/* {canCreateVariant && renderBubble(theme.bg.primary, <Icon name='plus' solid forButton />)} */}
 
-            {isDuplicate && <UIIconWrapper variant='transparent' color='yellow'>
+            {isDuplicate && <UIIconWrapper variant='transparent' c='yellow.8'>
                 <CopyIcon />
             </UIIconWrapper>}
 

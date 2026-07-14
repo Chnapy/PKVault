@@ -33,6 +33,8 @@ export const DrawerWithControls: React.FC<DrawerWithControlsProps> = ({ opened, 
                 ctx.setOpened(false);
             }}
             withinPortal={!nested}
+            offset={10}
+            radius='md'
             shadow='xl'
             {...rest}
         >

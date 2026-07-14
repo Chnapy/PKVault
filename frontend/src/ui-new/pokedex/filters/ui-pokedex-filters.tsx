@@ -32,7 +32,7 @@ export const UIPokedexFilters: React.FC<UIPokedexFiltersProps> = ({ views, child
 
     return <FocusScope id={name} parentNodeId={nodeId}>
         <WithControlsIcons placement='out' icons={controlIcons('open')} {...rest}>
-            <Card {...focusProps} {...controlProps('open')} w='100%' mah='100%'>
+            <Card {...focusProps} {...controlProps('open')} w='100%' mah='100%' pr={0} style={{ overflowY: 'scroll' }}>
                 <Card.Section withBorder inheritPadding pt='sm' pb='inherit'>
                     <Stack>
                         <Title order={5} ta='center'>Views</Title>

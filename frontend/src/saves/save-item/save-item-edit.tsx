@@ -32,6 +32,7 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
     }
 
     return <UIPopoverCard
+        miw={200}
         icon={<PencilIcon />}
         title='Edit save version'
     >

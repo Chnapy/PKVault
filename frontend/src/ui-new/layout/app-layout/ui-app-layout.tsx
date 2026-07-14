@@ -1,7 +1,8 @@
 import { Container, Grid, Stack } from '@mantine/core';
+import { doesFocusableExist, getCurrentFocusKey } from '@noriginmedia/norigin-spatial-navigation-core';
 import React from 'react';
 import { ErrorCatcher } from '../../../error/error-catcher';
-import { useControlsCurrentType } from '../../interaction/controls/use-controls-current-type';
+import { Focus } from '../../interaction/focus/provider/use-focus-context';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import { UIFrame } from '../frame/ui-frame';
 
@@ -13,19 +14,14 @@ type UIAppLayoutProps = {
 };
 
 export const UIAppLayout: React.FC<UIAppLayoutProps> = ({ header, bottom, footer, children }) => {
-    const controlsCurrentType = useControlsCurrentType();
+    const restoreFocus = Focus.useRestoreScopeFocus();
 
     React.useEffect(() => {
-        const previousValue = document.body.dataset.controlsType;
-        if (previousValue !== controlsCurrentType) {
-            document.body.dataset.controlsType = controlsCurrentType;
-
-            if (controlsCurrentType !== 'mouse')
-                document.body.dataset.showFocus = 'true';
-            else
-                delete document.body.dataset.showFocus
+        const currentKey = getCurrentFocusKey();
+        if (!currentKey || !doesFocusableExist(currentKey)) {
+            restoreFocus('root');
         }
-    }, [ controlsCurrentType ]);
+    }, [ header, bottom, footer, children, restoreFocus ]);
 
     return <UIFrame>
         <ErrorCatcher>

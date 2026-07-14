@@ -20,7 +20,7 @@ export type UIGameExpandedProps = Pick<UIGameExpandedWrapperProps, 'selected' | 
         language: string;
     };
 
-const renderCount = (icon: React.ReactNode, count: number) => <Group component='span' wrap='nowrap' gap='sm' style={{ flexShrink: 0 }}>
+const renderCount = (icon: React.ReactNode, count: number) => <Group component='span' wrap='nowrap' gap='xs' style={{ flexShrink: 0 }}>
     {icon} <span>{count}</span>
 </Group>;
 

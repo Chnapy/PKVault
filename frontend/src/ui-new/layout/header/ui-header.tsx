@@ -1,21 +1,20 @@
-import { Box, Flex, Group, Paper, Stack, Tabs, Title } from '@mantine/core';
+import { Box, Flex, Group, Paper, Stack, Title } from '@mantine/core';
 import { clsx } from 'clsx';
 import React from 'react';
 import { baseTheme } from '../../base-theme';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { FocusScope } from '../../interaction/focus/scope/focus-scope';
-import { ScrollerControlled } from '../../scroller-controlled/scroller-controlled';
 import { CurrentPanelProvider } from '../../storage/storage-content/context/ui-current-panel-provider';
 import { PanelProvider } from '../../storage/storage-content/context/ui-panel-context';
 import { usePanelControls } from '../hooks/use-panel-controls';
+import { UIToggleColorScheme } from './sub-header/ui-toggle-color-scheme';
 import classes from './ui-header.module.css';
 
 export const UIHeader: React.FC<{
-    value: string;
     left: React.ReactNode;
     right: React.ReactNode;
     sub?: React.ReactNode;
-}> = ({ value, left, right, sub }) => {
+}> = ({ left, right, sub }) => {
 
     const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('header');
 
@@ -71,44 +70,16 @@ export const UIHeader: React.FC<{
                         </Flex>
 
                         <Stack className={classes.main} gap={0} maw='100%'>
-                            <Tabs
-                                className={classes.firstLine}
-                                value={value}
-                                onChange={tabId => console.log(tabId)}
-                                variant='pills'
-                                miw={0}
-                                style={{
-                                }}
-                                __vars={{
-                                    '--mantine-color-body': 'var(--mantine-color-primary-7)',
-                                }}
-                            >
-                                <Tabs.List
-                                    style={{
-                                        flexGrow: 1,
-                                        alignItems: 'center',
-                                        flexWrap: 'nowrap',
-                                        gap: 'var(--mantine-spacing-md)',
-                                    }}
-                                >
-                                    <ScrollerControlled
-                                        id='header-items' level={1} controlsEnabled
-                                        controlsLabel='Change page'
-                                        style={{ flexGrow: 1 }}
-                                    >
-                                        <Group gap='sm' style={{ flexGrow: 1 }}>
-                                            {left}
+                            <Group className={classes.firstLine} gap='sm' pr='sm'>
+                                {left}
 
-                                            <Box ml='auto' />
+                                <Box ml='auto' />
 
-                                            {right}
-                                        </Group>
-                                    </ScrollerControlled>
-                                </Tabs.List>
-                            </Tabs>
+                                {right}
+                            </Group>
 
                             <Flex
-                                mx='md'
+                                ml='md'
                                 p='sm'
                                 pl={30}
                                 bg='primary.7'
@@ -118,6 +89,13 @@ export const UIHeader: React.FC<{
                                 <Box component='span' h='1lh' />
 
                                 {sub}
+
+                                <Box component='span' h='1lh' ml='auto' />
+
+                                <UIToggleColorScheme
+                                    size='1lh'
+                                    lh='inherit'
+                                />
                             </Flex>
                         </Stack>
                     </FocusScope>

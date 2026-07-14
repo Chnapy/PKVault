@@ -33,9 +33,9 @@ export const UIPokedexMain: React.FC<UIPokedexMainProps> = ({ children, ...rest 
         <WithControlsIcons placement='out' icons={controlIcons('open')}
             {...rest}
         >
-            <Card mah='100%' style={{
+            <Card mah='100%' pr={0} style={{
                 flexGrow: 1,
-                overflow: 'auto',
+                overflowY: 'scroll',
             }}
                 {...focusProps}
                 {...controlProps('open')}>
