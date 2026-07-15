@@ -1,5 +1,7 @@
+import { Tooltip } from '@mantine/core';
 import type React from 'react';
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
+import { usePkmLegality } from '../../data/hooks/use-pkm-legality';
 import { Gender } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
@@ -20,14 +22,19 @@ export const DetailsMain: React.FC = () => {
     const selectedId = Route.useSearch({ select: search => getSelected(search.selected)?.id });
 
     const pkmIndexQuery = usePkmIndex(selectedSaveId ?? null, data => data.data.byId[ selectedId ?? '' ]);
-
     const pkm = pkmIndexQuery.data;
+
+    const pkmLegalityQuery = usePkmLegality(selectedId, selectedSaveId ?? undefined);
+    const pkmLegality = pkmLegalityQuery.data?.data;
+
     if (!pkm)
         return null;
 
     const staticForms = staticData.species[ pkm.species ]?.forms[ pkm.context ];
     const formObj = staticForms?.[ pkm.form ] ?? staticForms?.[ 0 ];
     const speciesName = formObj?.name ?? '';
+
+    const ballName = staticData.getItem(pkm.version, pkm.ball)?.name;
 
     return <UIDetailsMain
         species={pkm.species}
@@ -39,12 +46,17 @@ export const DetailsMain: React.FC = () => {
         types={pkm.types.map(type => <TypeItem key={type} type={type} />)}
         markings={pkm.markings && <UIMarkingList markings={pkm.markings} />}
         teraType={pkm.teraType !== undefined ? <TypeItem type={pkm.teraType} /> : null}
-        ball={<BallImg item={pkm.ball} />}
+        ball={<Tooltip label={ballName} disabled={!ballName}>
+            <BallImg item={pkm.ball} />
+        </Tooltip>}
         nickname={pkm.nickname}
         level={pkm.level}
         // eggHatchCount={pkm.eggHatchCount}
         pokerusDays={pkm.pokerusDays}
         isPokerusCured={pkm.isPokerusCured}
+        canEvolve={pkm.canEvolve}
+        isDuplicate={pkm.isDuplicate}
+        warning={!!pkmLegality && !pkmLegality.isValid}
         heldItem={pkm.heldItem > 0
             ? <ItemImg item={pkm.heldItem} version={pkm.contextVersion} />
             : null}

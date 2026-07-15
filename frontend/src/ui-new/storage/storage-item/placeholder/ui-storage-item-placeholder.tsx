@@ -64,7 +64,7 @@ export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> =
             {...buttonProps}
             ref={ref}
         >
-            <UISpeciesImgSkeleton />
+            <UISpeciesImgSkeleton visible={false} />
         </UIStorageItemBase>
     </WithControlsIcons>;
 };

@@ -61,6 +61,7 @@ export const SettingsMainLeft: React.FC = () => {
                     controlLabel={t('settings.form.hide-cheats')}
                     disabled={!settings?.canUpdateSettings}
                     ml='auto'
+                    my='sm'
                 />
 
                 <UIInputLabel leftSection={<ShieldOff />} forInput='skiP_LEGALITY_CHECKS' label={t('settings.form.skip-legality')} />
@@ -70,6 +71,7 @@ export const SettingsMainLeft: React.FC = () => {
                     controlLabel={t('settings.form.skip-legality')}
                     disabled={!settings?.canUpdateSettings}
                     ml='auto'
+                    mt='sm'
                 />
             </SimpleGrid>
         </Card>

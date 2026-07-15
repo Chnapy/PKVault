@@ -138,7 +138,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
     const useDragFn = <P>(params?: P) => {
         const filteredIds = useFilterStartDragIds(
             containerValue,
-            React.useMemo(() => [ ...getAllIds() ], [])
+            [ ...getAllIds()],
         )(params);
 
         const enabled = filteredIds.size > 0;

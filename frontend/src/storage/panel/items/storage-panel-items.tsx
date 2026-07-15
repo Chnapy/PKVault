@@ -1,4 +1,5 @@
-import { Group } from '@mantine/core';
+import { EmptyState, Group } from '@mantine/core';
+import { RectangleEllipsisIcon } from 'lucide-react';
 import React from 'react';
 import { usePkmIndex } from '../../../data/hooks/use-pkm-index';
 import { getBoxColumns } from '../../../ui-new/storage/storage-panel/get-box-columns';
@@ -16,7 +17,7 @@ export const StoragePanelItems: React.FC = () => {
     const { saveId = null, boxId, box } = storage.data ?? {};
 
     // always keep slotCount value so focus is never lost
-    const slotCountRef = React.useRef(1);
+    const slotCountRef = React.useRef(30);
 
     const getNodeId = (i: number) => `storage-item-${storageIndex}-${i}`;
 
@@ -52,7 +53,7 @@ export const StoragePanelItems: React.FC = () => {
         }, [ boxId, getSlotCount ]),
     );
 
-    // const isLoading = [ storage, pkmsQuery ].some(query => query.isLoading);
+    const isPending = [ storage, pkmsQuery ].some(query => query.isPending);
 
     // eslint-disable-next-line react-hooks/refs
     const pkmIds = pkmsQuery.data ?? new Array<string>(getSlotCount()).fill('');
@@ -67,6 +68,7 @@ export const StoragePanelItems: React.FC = () => {
                 saveId={saveId}
                 boxId={boxId?.toString() ?? ''}
                 slot={i}
+                loading={isPending}
             />;
 
         return saveId
@@ -83,12 +85,15 @@ export const StoragePanelItems: React.FC = () => {
             />;
     });
 
+    const emptyBox = pkmIds.every(id => !id);
+
     const cols = getBoxColumns(items.length);
 
     return <Group
         gap='sm'
         wrap='wrap'
         mx='auto'
+        pos='relative'
         style={cols
             ? {
                 display: 'grid',
@@ -98,5 +103,19 @@ export const StoragePanelItems: React.FC = () => {
             : undefined}
     >
         {items}
+
+        {!isPending && emptyBox && <EmptyState
+            size='sm'
+            icon={<RectangleEllipsisIcon />}
+            title='Box is empty'
+            opacity={0.75}
+            style={{
+                position: 'absolute',
+                left: '50%',
+                top: 245,
+                transform: 'translate(-50%,-50%)',
+                pointerEvents: 'none',
+            }}
+        />}
     </Group>
 };

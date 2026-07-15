@@ -1,4 +1,4 @@
-import { Tooltip } from '@mantine/core';
+import { Group, Tooltip } from '@mantine/core';
 import { useMatches } from '@tanstack/react-router';
 import { InfoIcon, RefreshCwIcon } from 'lucide-react';
 import type React from 'react';
@@ -10,6 +10,7 @@ import { SettingsSubMenu } from '../settings/settings-sub-menu';
 import { BankList } from '../storage/bank/bank-list';
 import { useTranslate } from '../translate/i18n';
 import { UIButton } from '../ui-new/form/button/ui-button';
+import { UISpriteSizingButton } from '../ui-new/layout/header/sub-header/ui-sprite-sizing-button';
 import { UIHeader } from '../ui-new/layout/header/ui-header';
 import { UIHeaderItem } from '../ui-new/layout/header/ui-header-item';
 import { switchUtil } from '../util/switch-util';
@@ -109,8 +110,19 @@ export const Header: React.FC = () => {
             <NotificationButton />
         </>}
         sub={switchUtil(value, {
-            'storage': () => <BankList />,
-            'pokedex': () => null,
+            'storage': () => <Group wrap='nowrap' align='flex-start' gap='sm' style={{ flexGrow: 1 }}>
+                <BankList />
+                <UISpriteSizingButton
+                    localStorageKey='storage-sprite-size'
+                    ml='auto'
+                />
+            </Group>,
+            'pokedex': () => <Group wrap='nowrap' align='flex-start' gap='sm' style={{ flexGrow: 1 }}>
+                <UISpriteSizingButton
+                    localStorageKey='pokedex-sprite-size'
+                    ml='auto'
+                />
+            </Group>,
             'saves': () => null,
             'settings': () => <SettingsSubMenu />,
             '': () => null,

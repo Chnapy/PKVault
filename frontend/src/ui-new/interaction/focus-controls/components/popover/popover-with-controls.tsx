@@ -41,6 +41,7 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened
             onChange={ctx.setOpened}
             withinPortal={!nested}
             shadow='xl'
+            zIndex={100}
             {...rest}
         >
             <Popover.Target>

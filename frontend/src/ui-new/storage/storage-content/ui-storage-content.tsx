@@ -3,6 +3,8 @@ import type React from 'react';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { FocusScope } from '../../interaction/focus/scope/focus-scope';
 import { usePanelControls } from '../../layout/hooks/use-panel-controls';
+import { useSpriteSizeLocalStorage } from '../../local-storage/use-storage-size-local-storage';
+import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import { CurrentPanelProvider } from './context/ui-current-panel-provider';
 import { PanelProvider } from './context/ui-panel-context';
 
@@ -16,6 +18,8 @@ export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, ri
 
     const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('storage-content');
 
+    const [ speciesSize ] = useSpriteSizeLocalStorage('storage-sprite-size');
+
     return (
         <WithControlsIcons placement='out' icons={controlIcons('open')}
             mah='100%'
@@ -24,7 +28,9 @@ export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, ri
             style={{ flexGrow: 1, }}
         >
             <FocusScope id={childScopeId} parentNodeId={nodeId}>
-                <Grid
+                <UISpriteSizeWrapper
+                    speciesSize={speciesSize}
+                    component={Grid}
                     id={id}
                     w='100%'
                     bdrs='md'
@@ -49,7 +55,7 @@ export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, ri
                             </PanelProvider>
                         </Grid.Col>
                     </CurrentPanelProvider>
-                </Grid>
+                </UISpriteSizeWrapper>
             </FocusScope>
         </WithControlsIcons>
     );

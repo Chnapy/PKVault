@@ -12,7 +12,10 @@ export type UIActionIconProps = {
     focusOnMount?: boolean;
 } & ActionIcon.Props & ElementProps<'button'>;
 
-export const UIActionIcon: React.FC<UIActionIconProps> = ({ name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner, h, w, mt, style, ...rest }) => {
+export const UIActionIcon: React.FC<UIActionIconProps> = ({
+    name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner,
+    h, w, mt, ml, style, ...rest
+}) => {
     const [ loadingInner, setLoading ] = React.useState(false);
 
     const loading = loadingInner || rest.loading;
@@ -40,7 +43,9 @@ export const UIActionIcon: React.FC<UIActionIconProps> = ({ name, controlLabel, 
         rest.ref,
     );
 
-    return <WithControlsIcons placement='out' icons={[ controlIcons('open'), ...extraControlIcons ]} display='inline-flex' h={h ?? 'fit-content'} w={w ?? 'fit-content'} mt={mt} style={style}>
+    return <WithControlsIcons placement='out' icons={[ controlIcons('open'), ...extraControlIcons ]}
+        display='inline-flex' h={h ?? 'fit-content'} w={w ?? 'fit-content'} mt={mt} ml={ml} style={style}
+    >
         <ActionIcon
             {...focusProps}
             {...controlProps('open')}

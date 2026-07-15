@@ -9,6 +9,7 @@ import { useTranslate } from '../../translate/i18n';
 import { UIButton, type UIButtonProps } from '../../ui-new/form/button/ui-button';
 import { useControlsCurrentType } from '../../ui-new/interaction/controls/use-controls-current-type';
 import { useDragging } from '../../ui-new/interaction/move/hooks/use-dragging';
+import { UIPokedexIcons } from '../../ui-new/pokedex/icons/ui-pokedex-icons';
 import { UIConfirmPopover } from '../../ui-new/popover/ui-confirm-popover';
 import { UIPopover } from '../../ui-new/popover/ui-popover';
 import { filterIsDefined } from '../../util/filter-is-defined';
@@ -29,7 +30,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
         useSelectCallback(data => {
             return pkmIds.map(id => data.data.byId[ id ]).filter(filterIsDefined)
                 .map(pkm => ({
-                    ...pick(pkm, [ 'id', 'boxId', 'boxSlot', 'canEdit', 'canEvolve', 'canDelete' ]),
+                    ...pick(pkm, [ 'id', 'boxId', 'boxSlot', 'canEdit', 'canEvolve', 'canDelete', 'isDuplicate' ]),
                     idBase: saveId ? (pkm as PkmSaveDTO).idBase : '',
                 }));
         }, [ pkmIds, saveId ]));
@@ -79,6 +80,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
     const canEditList = pkms.filter(pkm => pkm.canEdit);
     const canEvolveList = pkms.filter(pkm => pkm.canEvolve);
     const canReleaseList = pkms.filter(pkm => pkm.canDelete);
+    const hasDuplicate = pkms.some(pkm => pkm.isDuplicate);
 
     const controlsType = useControlsCurrentType();
 
@@ -137,10 +139,12 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
             : <Tooltip
                 multiline
                 w={300}
-                label={(saveId
-                    ? [ t('storage.actions.move-attached-save.helpTitle'), t('storage.actions.move-attached-save.helpContent') ]
-                    : [ t('storage.actions.move-attached-main.helpTitle'), t('storage.actions.move-attached-main.helpContent') ]
-                ).join('\n\n')}>
+                label={hasDuplicate
+                    ? t('details.is-duplicate')
+                    : (saveId
+                        ? [ t('storage.actions.move-attached-save.helpTitle'), t('storage.actions.move-attached-save.helpContent') ]
+                        : [ t('storage.actions.move-attached-main.helpTitle'), t('storage.actions.move-attached-main.helpContent') ]
+                    ).join('\n\n')}>
                 <UIButton
                     name='move-attached'
                     controlLabel='Move attached'
@@ -150,6 +154,8 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
                         <MoveIcon />
                         <LinkIcon />
                     </Group>}
+                    rightSection={hasDuplicate && <UIPokedexIcons.Duplicate />}
+                    disabled={hasDuplicate}
                 >
                     {t('storage.actions.move-attached-main')}
                 </UIButton>

@@ -91,8 +91,9 @@ export const theme = mergeThemeOverrides(
           maw: 300,
           style: {
             whiteSpace: 'pre-wrap',
-            wordBreak: 'break-all',
-          }
+            wordBreak: 'break-word',
+          },
+          events: { hover: true, focus: true, touch: true },
         },
       }),
       SegmentedControl: SegmentedControl.extend({

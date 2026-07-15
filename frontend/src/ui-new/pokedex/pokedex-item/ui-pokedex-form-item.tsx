@@ -36,14 +36,14 @@ export const UIPokedexFormItem: React.FC<UIPokedexFormItemProps> = ({
     </Box>
 
     <Group pos='absolute' top={0} right={0} gap='xs' p='sm'>
-      {isOwned && <UIPokedexIcons.Owned size='sm' />}
+      {isOwned && <UIPokedexIcons.Owned size='xs' />}
 
-      {isCaught && <UIPokedexIcons.Caught size='sm' />}
+      {isCaught && <UIPokedexIcons.Caught size='xs' />}
     </Group>
     <Stack pos='absolute' bottom={0} right={0} align='flex-end' gap='sm' p='sm'>
-      {isSeenAlpha && <UIPokedexIcons.Alpha size='sm' />}
+      {isSeenAlpha && <UIPokedexIcons.Alpha size='xs' />}
 
-      {isOwnedShiny && <UIPokedexIcons.Shiny size='sm' />}
+      {isOwnedShiny && <UIPokedexIcons.Shiny size='xs' />}
 
       <Group gap='xs'>
         {genders.map(gender => <UIGender key={gender} gender={gender} size='small' />)}

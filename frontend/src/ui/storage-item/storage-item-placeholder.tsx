@@ -4,7 +4,7 @@ import { type MoveContainerValue } from '../../storage/move/move-container-fns';
 import { useCurrentStorage } from '../../storage/panel/storage-panel-context';
 import { UIStorageItemPlaceholder, type UIStorageItemPlaceholderProps } from '../../ui-new/storage/storage-item/placeholder/ui-storage-item-placeholder';
 
-export type StorageItemPlaceholderProps = Pick<UIStorageItemPlaceholderProps, 'nodeId' | 'slot'>
+export type StorageItemPlaceholderProps = Pick<UIStorageItemPlaceholderProps, 'nodeId' | 'slot' | 'loading'>
   & {
     saveId: number | null;
     boxId: string;

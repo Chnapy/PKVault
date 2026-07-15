@@ -1,5 +1,5 @@
 import { Text } from '@mantine/core';
-import { Link } from '@tanstack/react-router';
+import { Link, useLocation } from '@tanstack/react-router';
 import React from "react";
 import { HistoryContext } from '../../../context/history-context';
 import { type FileRouteTypes } from "../../../routeTree.gen";
@@ -25,8 +25,13 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
   selected,
   children,
 }) => {
+  const location = useLocation();
+
   const historyContext = HistoryContext.useValue();
-  const historyValue = to ? historyContext[ to ] : undefined;
+  const historyValue = to ? historyContext[ to ] : {
+    to: location.pathname as never,
+    search: location.search,
+  } satisfies typeof historyContext[ keyof typeof historyContext ];
   const search = { ...defaultSearch, ...historyValue?.search };
 
   const { focusProps, controlProps, controlIcons } = useFocusControls({

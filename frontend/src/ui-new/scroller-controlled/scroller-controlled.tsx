@@ -112,5 +112,18 @@ export const ScrollerControlled: React.FC<ScrollerControlledProps> = ({ id, leve
             content: classes.content,
             control: classes.control,
         }}
+        onWheel={e => {
+            const delta = e.deltaX || e.deltaY;
+            if (Math.abs(delta) < 10)
+                return;
+
+            const srcElement = (e.target as HTMLElement).closest<HTMLElement>('.mantine-Scroller-root');
+
+            const button = srcElement?.querySelector<HTMLElement>(
+                `.mantine-Scroller-control[data-position="${delta > 0 ? 'end' : 'start'}"]:not([data-hidden="true"])`
+            );
+
+            button?.click();
+        }}
     />;
 };

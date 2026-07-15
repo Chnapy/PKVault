@@ -78,25 +78,22 @@ export const UIHeader: React.FC<{
                                 {right}
                             </Group>
 
-                            <Flex
+                            <Group
                                 ml='md'
                                 p='sm'
                                 pl={30}
                                 bg='primary.7'
                                 c='inherit'
                                 miw={0}
+                                align='flex-start'
+                                gap='sm'
                             >
-                                <Box component='span' h='1lh' />
-
                                 {sub}
 
-                                <Box component='span' h='1lh' ml='auto' />
-
                                 <UIToggleColorScheme
-                                    size='1lh'
-                                    lh='inherit'
+                                    ml='auto'
                                 />
-                            </Flex>
+                            </Group>
                         </Stack>
                     </FocusScope>
                 </PanelProvider>

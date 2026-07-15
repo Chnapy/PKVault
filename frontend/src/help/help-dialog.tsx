@@ -16,14 +16,14 @@ import { useHelpNavigate } from './hooks/use-help-navigate';
 export const HelpDialog: React.FC = () => {
     const { t } = useTranslate();
 
-    const helpPath = Route.useSearch({ select: search => search.help ?? '' });
+    const opened = Route.useSearch({ select: search => !!search.help });
     const helpNavigate = useHelpNavigate();
 
     const onClose = () => helpNavigate(undefined);
 
     return (
         <Modal
-            opened={!!helpPath}
+            opened={opened}
             keepMounted={false}
             onClose={onClose}
             size='xl'
@@ -44,8 +44,16 @@ export const HelpDialog: React.FC = () => {
 };
 
 const HelpDialogInner: React.FC = () => {
-    const helpPath = Route.useSearch({ select: search => search.help ?? '' });
+    const helpPathFallback = React.useRef('');
+    const helpPath = Route.useSearch({ select: search => search.help ?? helpPathFallback.current });
     const helpNavigate = useHelpNavigate();
+
+    // when dialog is closing,
+    // avoid redirect to first page
+    React.useEffect(() => {
+        if (helpPath)
+            helpPathFallback.current = helpPath;
+    }, [ helpPath ]);
 
     const [ helpHash, helpAnchor ] = helpPath.split('#');
 

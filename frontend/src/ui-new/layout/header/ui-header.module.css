@@ -9,6 +9,7 @@
     --focus-width: 2px;
     --mantine-color-disabled: var(--mantine-color-primary-8);
     --mantine-color-disabled-color: var(--mantine-color-primary-4);
+    --mantine-color-primary-filled-hover: var(--mantine-color-primary-8);
 }
 
 .ui-header .left {

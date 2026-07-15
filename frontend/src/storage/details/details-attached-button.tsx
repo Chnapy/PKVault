@@ -1,5 +1,4 @@
 import { Group } from '@mantine/core';
-import { LinkIcon } from 'lucide-react';
 import type React from 'react';
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { usePkmSaveIndex } from '../../data/hooks/use-pkm-save-index';
@@ -9,6 +8,7 @@ import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
 import { UIButton } from '../../ui-new/form/button/ui-button';
+import { UIPokedexIcons } from '../../ui-new/pokedex/icons/ui-pokedex-icons';
 import { UIGameImg } from '../../ui-new/sprite-img/ui-game-img';
 import { pick } from '../../util/pick';
 import { useSelectCallback } from '../../util/use-select-callback';
@@ -114,7 +114,7 @@ export const DetailsAttachedButton: React.FC = () => {
         onClick={onClick}
         leftSection={
             <Group wrap='nowrap' gap='sm'>
-                <LinkIcon />
+                <UIPokedexIcons.Attached size='xs' />
                 <UIGameImg version={attachedSave?.displayedVersion ?? null} size={20} />
             </Group>
         }

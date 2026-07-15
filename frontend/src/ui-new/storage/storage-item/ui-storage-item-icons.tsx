@@ -1,5 +1,5 @@
 import { Box, Group, Stack } from '@mantine/core';
-import { CopyIcon, ExternalLinkIcon, FileXIcon, HeartIcon, LinkIcon, SparklesIcon } from 'lucide-react';
+import { ExternalLinkIcon, FileXIcon, HeartIcon } from 'lucide-react';
 import type React from 'react';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
 import { UIIconWrapper } from '../../icon/ui-icon-wrapper';
@@ -53,7 +53,7 @@ export const UIStorageItemIcons: React.FC<UIStorageItemIconsProps> = ({
                     {nbrVariants > 1 && <UIIconWrapper variant='filled' color='dark.5'>
                         {nbrVariants}
                     </UIIconWrapper>}
-                    {isExternal && <UIIconWrapper variant='filled' color='dark'>
+                    {isExternal && <UIIconWrapper variant='filled' color='dark.5'>
                         <ExternalLinkIcon />
                     </UIIconWrapper>}
                 </Group>
@@ -71,21 +71,15 @@ export const UIStorageItemIcons: React.FC<UIStorageItemIconsProps> = ({
 
             {/* {!canMoveOutside && renderBubble(theme.bg.red, <Icon name='logout' solid forButton />)} */}
 
-            {canEvolve && <UIIconWrapper variant='transparent' color='blue'>
-                <SparklesIcon />
-            </UIIconWrapper>}
+            {canEvolve && <UIPokedexIcons.Evolve size='xs' />}
 
-            {attached && <UIIconWrapper variant='transparent' c={needSynchronize ? 'yellow.8' : undefined}>
-                <LinkIcon />
-            </UIIconWrapper>}
+            {attached && <UIPokedexIcons.Attached size='xs' needSynchronize={needSynchronize} />}
 
             {/* {canCreateVariant && renderBubble(theme.bg.primary, <Icon name='plus' solid forButton />)} */}
 
-            {isDuplicate && <UIIconWrapper variant='transparent' c='yellow.8'>
-                <CopyIcon />
-            </UIIconWrapper>}
+            {isDuplicate && <UIPokedexIcons.Duplicate size='xs' />}
 
-            {warning && <UIPokedexIcons.Warn size='sm' />}
+            {warning && <UIPokedexIcons.Warn size='xs' />}
         </Group>
     </Box>;
 };

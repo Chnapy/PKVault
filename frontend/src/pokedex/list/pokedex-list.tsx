@@ -13,7 +13,7 @@ import { DexFormItem } from "../../ui/dex-item/dex-form-item";
 import { usePokedexItems } from "./hooks/use-pokedex-items";
 import { PokedexItem } from "./pokedex-item";
 
-export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("default", (popoverProps) => {
+export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("default", React.memo((popoverProps) => {
   // const { t } = useTranslate();
 
   const staticData = useStaticData();
@@ -93,4 +93,4 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
         ])}
     </UIPokedexMain>
   </Stack>;
-});
+}));

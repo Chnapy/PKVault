@@ -1,24 +1,28 @@
 import { Card, SimpleGrid } from '@mantine/core';
+import { ExternalLinkIcon, FolderTreeIcon, ShieldCheckIcon } from 'lucide-react';
 import type React from "react";
 import { UIInputLabel } from '../../ui-new/form/ui-input-label';
-import { UIBallIcon } from '../../ui-new/icon/ui-ball-icon';
 
 export const SettingsExternalLeft: React.FC = () => {
     // const { t } = useTranslate();
 
-    // const settingsQuery = useSettingsGet();
-    // const settingsMutation = useSettingsEdit();
-
-    // const settings = settingsQuery.data?.data;
-    // const settingsMutable = settings?.settingsMutable;
-
-    // const form = useFormContext<SettingsFormData>();
-
     return <>
         <Card>
             <SimpleGrid cols={2}>
-                <UIInputLabel leftSection={<UIBallIcon />} label='Foo' />
-                <div>bar</div>
+                <UIInputLabel leftSection={<ExternalLinkIcon />} label='External PKM files' align='flex-start' />
+                <div>
+                    PKM files (.pk*) from your own storage.
+                </div>
+
+                <UIInputLabel leftSection={<FolderTreeIcon />} label='Data generation' align='flex-start' />
+                <div>
+                    Generate banks, boxes and pkms on PKVault start (or data reload) from your file tree structure.
+                </div>
+
+                <UIInputLabel leftSection={<ShieldCheckIcon />} label='Safety' align='flex-start' />
+                <div>
+                    External PKM files are read only, your files cannot be changed from PKVault.
+                </div>
             </SimpleGrid>
         </Card>
     </>;

@@ -6,6 +6,7 @@ import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
 import { UIGender } from '../../icon/ui-gender';
 import { UIPokerusIcon } from '../../icon/ui-pokerus-icon';
 import { UIShinyIcon } from '../../icon/ui-shiny-icon';
+import { UIPokedexIcons } from '../../pokedex/icons/ui-pokedex-icons';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import { UIDetailsLevel } from './ui-details-level';
 
@@ -25,6 +26,9 @@ export type UIDetailsMainProps = {
     // eggHatchCount?: number;
     pokerusDays?: number;
     isPokerusCured?: boolean;
+    canEvolve?: boolean;
+    isDuplicate?: boolean;
+    warning?: boolean;
     heldItem?: React.ReactNode;
     attachedBtn?: React.ReactNode;
     children: React.ReactNode;
@@ -33,6 +37,7 @@ export type UIDetailsMainProps = {
 export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
     ball, nickname, gender, isEnabled, isShiny, isAlpha,
     species, speciesName, level, pokerusDays = 0, isPokerusCured,
+    canEvolve, isDuplicate, warning,
     types, heldItem, markings, attachedBtn,
     children,
 }) => {
@@ -75,6 +80,7 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
             <Center>{children}</Center>
             <Stack align='flex-end'>
                 {markings}
+
                 {(pokerusDays || isPokerusCured) && <Tooltip label={isPokerusCured
                     ? 'Pokerus cured'
                     : `Pokerus infected (${pokerusDays} days)`}
@@ -84,6 +90,18 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
                         size='big'
                     />
                 </Tooltip>}
+
+                <Group justify='flex-end' gap='xs'>
+                    {canEvolve && <Tooltip label='Evolve is possible'>
+                        <UIPokedexIcons.Evolve size='sm' />
+                    </Tooltip>}
+                    {isDuplicate && <Tooltip label='Duplicates are present in save'>
+                        <UIPokedexIcons.Duplicate size='sm' />
+                    </Tooltip>}
+                    {warning && <Tooltip label='Issues are present'>
+                        <UIPokedexIcons.Warn size='sm' />
+                    </Tooltip>}
+                </Group>
 
                 {attachedBtn}
             </Stack>

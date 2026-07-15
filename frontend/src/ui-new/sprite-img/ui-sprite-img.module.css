@@ -26,7 +26,6 @@ in px:
     overflow: hidden;
     width: var(--sprite-size-rem);
     height: var(--sprite-size-rem);
-    pointer-events: none;
 }
 
 .ui-sprite-img img {
@@ -44,6 +43,7 @@ in px:
     height: var(--source-real-height-px);
     width: var(--source-real-width-px);
     transform: scale(var(--scale));
+    pointer-events: none;
 }
 
 .ui-sprite-img.drop-shadow img {
