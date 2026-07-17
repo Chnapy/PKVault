@@ -14,6 +14,7 @@ export type UIStorageItemBaseProps =
 export const UIStorageItemBase: React.FC<UIStorageItemBaseProps> = ({
     className,
     label,
+    disabled,
     selected,
     children,
     ...buttonProps
@@ -31,6 +32,7 @@ export const UIStorageItemBase: React.FC<UIStorageItemBaseProps> = ({
                 data-selected={selected || undefined}
                 className={clsx(classes.uiStorageItemBase, className)}
                 variant='default'
+                data-disabled={disabled || undefined}
                 {...buttonProps}
             >
                 {children}

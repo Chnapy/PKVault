@@ -6,20 +6,18 @@ import { usePopover } from '../interaction/focus-controls/components/popover/hoo
 import { UIPopoverCard } from './popover-card/ui-popover-card';
 import { UIPopover, type UIPopoverProps } from './ui-popover';
 
-type UIConfirmPopoverProps = Pick<UIPopoverProps, 'popoverRef' | 'children'> & {
+type UIConfirmPopoverProps = Pick<UIPopoverProps, 'popoverRef' | 'nested' | 'children'> & {
     label: string;
     description?: string;
     color?: Button.Props[ 'color' ];
     action?: () => unknown;
 };
 
-export const UIConfirmPopover: React.FC<UIConfirmPopoverProps> = ({ label, description, color, action, popoverRef, children }) => {
+export const UIConfirmPopover: React.FC<UIConfirmPopoverProps> = ({ label, description, color, action, ...rest }) => {
     return <UIPopover
-        popoverRef={popoverRef}
         dropdown={<Dropdown label={label} description={description} color={color} action={action} />}
-    >
-        {children}
-    </UIPopover>;
+        {...rest}
+    />;
 };
 
 const Dropdown: React.FC<Pick<UIConfirmPopoverProps, 'label' | 'description' | 'color' | 'action'>> = ({ label, description, color, action }) => {

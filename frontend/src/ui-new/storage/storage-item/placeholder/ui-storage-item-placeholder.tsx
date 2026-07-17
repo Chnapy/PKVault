@@ -35,6 +35,9 @@ export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> =
         targetId: undefined,
     });
 
+    const submitting = useDragSubmitting(container, slot);
+    loading ||= submitting;
+
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: nodeId,
         order: globalOrder,
@@ -44,7 +47,11 @@ export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> =
             panel.normalizeCurrentPanel();
         },
         controls: [
-            ...getDragControls({ droppable, droppableMain: true }),
+            ...getDragControls({
+                droppable,
+                droppableMain: true,
+                disabled: loading,
+            }),
         ],
     });
 
@@ -53,12 +60,10 @@ export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> =
         buttonProps.ref,
     );
 
-    const submitting = useDragSubmitting(container, slot);
-
     return <WithControlsIcons placement='out' icons={controlIcons('drop')}>
         <UIStorageItemBase
             label={droppable.helpText}
-            loading={loading || submitting}
+            loading={loading}
             {...focusProps}
             {...controlProps('drop')}
             {...buttonProps}

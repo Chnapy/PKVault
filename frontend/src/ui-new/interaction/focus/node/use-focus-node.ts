@@ -31,6 +31,8 @@ export const useFocusNode = <E = any>({ scopeNodeId, focusOnMount, order = 0, on
     isFocusBoundary: false,
     preferredChildFocusKey: undefined,
     onFocus: (layout, props, details) => {
+      (document.activeElement as HTMLElement | null)?.blur();
+      
       if (!(layout.node instanceof HTMLInputElement) || layout.node.type !== 'text')
         layout.node.focus();
 

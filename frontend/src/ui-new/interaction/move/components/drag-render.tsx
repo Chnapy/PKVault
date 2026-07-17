@@ -17,6 +17,24 @@ export const DragRender: React.FC<DragRenderProps> = ({ elementRef, children }) 
     React.useEffect(() => {
         let rafId = -1;
 
+        const container = document.body.querySelector(`#${moveContainerId}`)!;
+        const containerBounds = container.getBoundingClientRect();
+
+        const getScrollPosition = (element: HTMLElement): Vector2 => {
+            const parentPos: Vector2 = element.parentElement && element.parentElement.id !== moveContainerId
+                ? getScrollPosition(element.parentElement)
+                : [ 0, 0 ];
+
+            return [
+                element.scrollLeft + parentPos[ 0 ],
+                element.scrollTop + parentPos[ 1 ],
+            ];
+        };
+
+        const initialScroll: Vector2 = elementRef.current?.parentElement
+            ? getScrollPosition(elementRef.current.parentElement)
+            : [ 0, 0 ];
+
         const translateElement = () => {
             if (!dragRef.current || !elementRef.current) return;
 
@@ -28,7 +46,7 @@ export const DragRender: React.FC<DragRenderProps> = ({ elementRef, children }) 
                 return;
             }
 
-            const { scroll, pointer, pointerInitial, target, drag } = positionsRef.current;
+            const { pointer, pointerInitial, target, drag } = positionsRef.current;
 
             const elementBounds = elementRef.current.getBoundingClientRect();
 
@@ -49,13 +67,11 @@ export const DragRender: React.FC<DragRenderProps> = ({ elementRef, children }) 
                 ]
                 : [ 0, 0 ];
 
-            const scrollDiff: Vector2 = state.trigger === 'focus'
-                ? [ 0, 0 ]
-                : scroll;
+            const scrollDiff: Vector2 = getScrollPosition(elementRef.current.parentElement!);
 
             const position = [
-                baseDiff[ 0 ] + drag[ 0 ] + pointerDiff[ 0 ] + scrollDiff[ 0 ],
-                baseDiff[ 1 ] + drag[ 1 ] + pointerDiff[ 1 ] + scrollDiff[ 1 ],
+                baseDiff[ 0 ] + drag[ 0 ] + pointerDiff[ 0 ] + scrollDiff[ 0 ] - initialScroll[ 0 ] - containerBounds.x,
+                baseDiff[ 1 ] + drag[ 1 ] + pointerDiff[ 1 ] + scrollDiff[ 1 ] - initialScroll[ 1 ] - containerBounds.y,
             ];
 
             const [ x, y ] = position;
@@ -72,7 +88,7 @@ export const DragRender: React.FC<DragRenderProps> = ({ elementRef, children }) 
         return () => {
             cancelAnimationFrame(rafId);
         };
-    }, [ positionsRef, elementRef, useMoveStore ]);
+    }, [ positionsRef, elementRef, useMoveStore, moveContainerId ]);
 
     // console.log('render-portal');
 

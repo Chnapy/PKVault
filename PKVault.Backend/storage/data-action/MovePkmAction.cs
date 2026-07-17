@@ -135,7 +135,7 @@ public class MovePkmAction(
 
         return new(
             type: DataActionType.MOVE_PKM,
-            parameters: [pkm.Nickname, null, null, targetBox.Name, targetBoxSlot, input.attached]
+            parameters: [pkm.Nickname, null, null, targetBox.Name, targetBoxSlot, input.attached, pkm.Species]
         );
     }
 
@@ -210,7 +210,7 @@ public class MovePkmAction(
 
         return new(
             type: DataActionType.MOVE_PKM,
-            parameters: [sourcePkmDto.Nickname, sourceSaveLoaders.Save.Version, targetSaveLoaders.Save.Version, targetBox.Name, targetBoxSlot, input.attached]
+            parameters: [sourcePkmDto.Nickname, sourceSaveLoaders.Save.Version, targetSaveLoaders.Save.Version, targetBox.Name, targetBoxSlot, input.attached, sourcePkmDto.Species]
         );
     }
 
@@ -292,7 +292,7 @@ public class MovePkmAction(
 
         return new(
             type: DataActionType.MOVE_PKM,
-            parameters: [pkm.Nickname, null, saveLoaders.Save.Version, targetBox.Name, targetBoxSlot, input.attached]
+            parameters: [pkm.Nickname, null, saveLoaders.Save.Version, targetBox.Name, targetBoxSlot, input.attached, pkm.Species]
         );
     }
 
@@ -341,7 +341,7 @@ public class MovePkmAction(
 
         return new(
             type: DataActionType.MOVE_PKM,
-            parameters: [savePkm?.Nickname, saveLoaders.Save.Version, null, targetBox.Name, targetBoxSlot, input.attached]
+            parameters: [savePkm.Nickname, saveLoaders.Save.Version, null, targetBox.Name, targetBoxSlot, input.attached, savePkm.Species]
         );
     }
 

@@ -62,7 +62,7 @@ public class EditPkmVariantAction(
 
         return new(
             type: DataActionType.EDIT_PKM_VERSION,
-            parameters: [pkmVariantPKM.Nickname, pkmVariantPKM.Context]
+            parameters: [pkmVariantPKM.Nickname, pkmVariantPKM.Context, pkmVariantPKM.Species]
         );
     }
 

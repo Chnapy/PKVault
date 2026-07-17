@@ -1,5 +1,7 @@
-import { useGesture, useScroll } from '@use-gesture/react';
+import { useGesture } from '@use-gesture/react';
 import React from 'react';
+import { useSelectContextNullable } from '../../select/context/use-select-context';
+import { MoveControlsGlobals } from '../components/move-controls-global';
 import type { MoveSource, MoveState, MoveStateLoading } from '../state/move-state';
 import { createMoveStore, moveContext, type MoveContext, type MovePositions, type MoveTargetInput, type MoveTargetOutput } from './move-context';
 
@@ -16,7 +18,6 @@ export const MoveProvider = function <C, P>({
     children
 }: MoveProviderProps<C, P>) {
     const positionsRef = React.useRef<MovePositions>({
-        scroll: [ window.scrollX, window.scrollY ],
         pointer: [ 0, 0 ],
         pointerInitial: [ 0, 0 ],
         target: [ 0, 0 ],
@@ -24,6 +25,8 @@ export const MoveProvider = function <C, P>({
     });
 
     const dragEndTimestampRef = React.useRef(0);
+
+    const selectCtx = useSelectContextNullable();
 
     const [ value ] = React.useState((): MoveContext<C, P> => {
 
@@ -57,6 +60,19 @@ export const MoveProvider = function <C, P>({
             };
 
             await onDropSuccess(state.source, targetOutput)
+                // unselect all, if was moved
+                .then(() => {
+                    const selectState = selectCtx?.useSelectStore.getState();
+
+                    if (selectState?.container === state.source.containerId
+                        && [ ...state.source.ids ].some(id => selectState.ids.has(id))
+                    ) {
+                        selectCtx?.useSelectStore.setState({
+                            container: '',
+                            ids: new Set(),
+                        });
+                    }
+                })
                 .finally(() => {
                     innerDispatch({
                         type: 'COMPLETE',
@@ -79,15 +95,6 @@ export const MoveProvider = function <C, P>({
 
     const dispatch = value.useMoveStore.getState().dispatch;
 
-    useScroll(({ initial, movement }) => {
-        positionsRef.current.scroll = [
-            initial[ 0 ] + movement[ 0 ],
-            initial[ 1 ] + movement[ 1 ],
-        ];
-    }, {
-        target: window,
-    });
-
     useGesture({
         onPointerMove: ({ event }) => {
             positionsRef.current.pointer = [ event.clientX, event.clientY ];
@@ -104,5 +111,9 @@ export const MoveProvider = function <C, P>({
         target: document,
     });
 
-    return <moveContext.Provider value={value}>{children}</moveContext.Provider>;
+    return <moveContext.Provider value={value}>
+        <MoveControlsGlobals />
+
+        {children}
+    </moveContext.Provider>;
 };

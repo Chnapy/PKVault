@@ -24,9 +24,7 @@ export const StoragePanelBoxList: React.FC = () => {
 
     const boxes = (boxesQuery.data?.data ?? []).sort((b1, b2) => b1.order < b2.order ? -1 : 1);
 
-    const isLoading = [ storage, boxesQuery ].some(q => q.isPending && q.isEnabled);
-    if (isLoading || boxId === undefined)
-        return null;
+    // const isPending = [ storage, boxesQuery ].some(q => q.isPending && q.isEnabled);
 
     const onSelect = (id: string) => {
         navigate({
@@ -40,7 +38,7 @@ export const StoragePanelBoxList: React.FC = () => {
     };
 
     return <UIStoragePanelBoxList
-        value={boxId.toString()}
+        value={boxId?.toString() ?? ''}
         data={boxes.map(({ id, name, type }): UIBoxData => ({
             id,
             label: name,
@@ -59,7 +57,7 @@ export const StoragePanelBoxList: React.FC = () => {
             color={getBoxTypeColor(item.type)}
             py={0}
             style={{ gap: 4 }}
-            rightSection={selected && <StorageSelectCheckbox
+            rightSection={selected && boxId !== undefined && <StorageSelectCheckbox
                 saveId={saveId}
                 boxId={boxId}
                 size='xs'
@@ -79,7 +77,7 @@ export const StoragePanelBoxList: React.FC = () => {
                     reduce();
                 })}
         />)}
-        advancedActionSort={<SortAdvancedAction saveId={saveId} boxId={boxId} />}
+        advancedActionSort={boxId !== undefined && <SortAdvancedAction saveId={saveId} boxId={boxId} />}
         advancedDexSync={<DexSyncAdvancedAction saveId={saveId ?? 0} />}
     />;
 };

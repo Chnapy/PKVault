@@ -1,5 +1,5 @@
-import { Button, Card, Divider, Group, OverflowList, Title } from '@mantine/core';
-import { SaveIcon } from 'lucide-react';
+import { Button, Card, Divider, Group, OverflowList, Text, Title } from '@mantine/core';
+import { SaveIcon, SortDescIcon } from 'lucide-react';
 import React from 'react';
 import { useTranslate } from '../../translate/i18n';
 import { UIButton } from '../form/button/ui-button';
@@ -76,6 +76,8 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
         ],
     });
 
+    const reversedData = data.reverse();
+
     return <Group wrap='nowrap' style={{ flexGrow: 1 }}>
         <Title order={5} lh={1}>Actions<br />to save</Title>
 
@@ -85,7 +87,21 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
             opened={opened}
             setOpened={setOpened}
             position='right'
-            title='12 actions to save'
+            title={<>
+                <Group>
+                    <SaveIcon />
+                    <Text size='lg'>
+                        12 actions to save
+                    </Text>
+                </Group>
+                <Text component='div' c='dimmed' lh={1.1}>
+                    <Group>
+                        <SortDescIcon />
+                        Most recent first
+                    </Group>
+                </Text>
+            </>}
+            closeButtonProps={{ style: { alignSelf: 'flex-start' } }}
             styles={{
                 content: {
                     display: 'flex',
@@ -101,7 +117,7 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
                 style={{ flexGrow: 1 }}
             >
                 <OverflowList
-                    data={[ ...data ].reverse()}
+                    data={reversedData}
                     {...focusProps}
                     {...controlProps('open')}
                     display='flex'
@@ -122,7 +138,7 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
                 />
             </WithControlsIcons>}
             dropdown={<UIActionsDrawerContent
-                data={data}
+                data={reversedData}
                 onDelete={onDelete}
                 onSave={onSaveAndClose}
             />}

@@ -5,23 +5,20 @@ import { DataActionType } from '../../../data/sdk/model';
 import { UIActionIcon } from '../../form/button/ui-action-icon';
 import { usePopover } from '../../interaction/focus-controls/components/popover/hooks/use-popover';
 import { UIConfirmPopover } from '../../popover/ui-confirm-popover';
-import { useActionLabel } from '../hooks/use-action-label';
+import type { UIActionProps } from '../ui-action';
 import { getActionColor } from '../utils/get-action-color';
 
-export type UITimelineActionProps = {
-    type: DataActionType;
-    description: string;
+export type UITimelineActionProps = UIActionProps & {
     index: number;
     onDelete: (index: number) => Promise<unknown>;
 };
 
-export const UITimelineAction: React.FC<UITimelineActionProps> = ({ type, description, index, onDelete }) => {
+export const UITimelineAction: React.FC<UITimelineActionProps> = ({ type, label, description, index, onDelete }) => {
     const popover = usePopover();
-    const getLabel = useActionLabel();
 
     return <Timeline.Item
         title={<Group>
-            {getLabel(type)}
+            {label}
 
             <Divider style={{ flexGrow: 1 }} />
 
@@ -34,6 +31,7 @@ export const UITimelineAction: React.FC<UITimelineActionProps> = ({ type, descri
                     if (index === 0)
                         popover?.setOpened(false);
                 }}
+                nested
             >
                 <UIActionIcon
                     variant='filled'

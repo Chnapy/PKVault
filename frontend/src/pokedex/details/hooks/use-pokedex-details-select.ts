@@ -5,6 +5,7 @@ import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen'
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from '../../../routes/pokedex';
 import { filterIsDefined } from '../../../util/filter-is-defined';
+import { useSelectCallback } from '../../../util/use-select-callback';
 
 export const usePokedexDetailsSelect = () => {
     const selectedSpecies = Route.useSearch({ select: search => search.selected });
@@ -14,17 +15,20 @@ export const usePokedexDetailsSelect = () => {
 
     const staticData = useStaticData();
 
-    const dexGetAllQuery = useDexGetAll();
+    const speciesValuesQuery = useDexGetAll({
+        query: {
+            select: useSelectCallback(
+                data => data.data[ selectedSpecies + "" ],
+                [ selectedSpecies ]
+            ),
+        },
+    });
     const saveInfosMainQuery = useSaveInfosGetAll();
 
     const [ selectedFormId, setSelectedFormId ] = React.useState('');
 
     const savesRecord = saveInfosMainQuery.data?.data ?? {};
-    const speciesRecord = dexGetAllQuery.data?.data ?? {};
-
-    const speciesValues = Object.values(
-        speciesRecord[ selectedSpecies + "" ] ?? {}
-    );
+    const speciesValues = Object.values(speciesValuesQuery.data ?? {});
 
     const gameSaves = speciesValues
         .filter((spec) => spec.forms.some(form => form.isSeen))

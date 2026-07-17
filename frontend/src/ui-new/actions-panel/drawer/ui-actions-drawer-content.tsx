@@ -1,12 +1,15 @@
-import { Group, Stack, Timeline } from '@mantine/core';
-import { SaveIcon, SortDescIcon } from 'lucide-react';
+import { Stack, Timeline } from '@mantine/core';
+import { SaveIcon } from 'lucide-react';
 import type React from 'react';
 import { useTranslate } from '../../../translate/i18n';
 import { UIButton } from '../../form/button/ui-button';
+import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import { UITimelineAction, type UITimelineActionProps } from './ui-timeline-action';
 
 export type UIActionsDrawerContentProps = {
-    data: Pick<UITimelineActionProps, 'type' | 'description'>[];
+    data: (Pick<UITimelineActionProps, 'type' | 'label' | 'description'> & {
+        index: number;
+    })[];
     onDelete: UITimelineActionProps[ 'onDelete' ];
     onSave?: () => Promise<unknown>;
 };
@@ -15,22 +18,22 @@ export const UIActionsDrawerContent: React.FC<UIActionsDrawerContentProps> = ({ 
     const { t } = useTranslate();
 
     return <Stack h='100%' style={{ overflow: 'hidden' }}>
-        <Timeline bulletSize={16} lineWidth={2} color='red' py='md' style={{
-            overflow: 'auto'
-        }}>
-            {data.map((props, i) => (
+        <UISpriteSizeWrapper
+            speciesSize='xs'
+            component={Timeline}
+            bulletSize={16} lineWidth={2} color='red' py='md' style={{
+                overflow: 'auto'
+            }}
+        >
+            {data.map(({ index, ...rest }) => (
                 <UITimelineAction
-                    key={i}
-                    {...props}
-                    index={i}
+                    key={index}
+                    {...rest}
+                    index={index}
                     onDelete={onDelete}
                 />
             ))}
-        </Timeline>
-        <Group>
-            <SortDescIcon />
-            Most recent last
-        </Group>
+        </UISpriteSizeWrapper>
 
         <UIButton
             name='actions-save'

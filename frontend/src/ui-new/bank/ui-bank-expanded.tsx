@@ -38,6 +38,9 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
 
     const nodeId = `bank-expanded-${id}`;
 
+    const submitting = useDragSubmitting(container, -1);
+    loading ||= submitting;
+
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: nodeId,
         focusOnMount: selected,
@@ -78,12 +81,12 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
                 },
                 spread: false,
             },
-            ...getDragControls({ droppable }),
+            ...getDragControls({
+                droppable,
+                disabled: loading,
+            }),
         ],
     });
-
-    const submitting = useDragSubmitting(container, -1);
-    loading ||= submitting;
 
     return <WithControlsIcons
         placement='out' icons={[ controlIcons('open', 'drop') ]}

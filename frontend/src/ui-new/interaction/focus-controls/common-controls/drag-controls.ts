@@ -8,16 +8,14 @@ type Params = {
     draggingMoveAttached?: ReturnType<UseDraggingReturn[ 'useDrag' ]>;
     droppable?: Pick<UseDroppableReturn, 'isDroppable' | 'stopDrag' | 'onDrop' | 'canDrop'>;
     droppableMain?: boolean;
+    disabled?: boolean;
 };
 
-export const getDragControls = ({ dragging, draggingMove, draggingMoveAttached, droppable, droppableMain }: Params) => {
-    const stopDrag = dragging?.stopDrag ?? droppable?.stopDrag;
-
+export const getDragControls = ({ dragging, draggingMove, draggingMoveAttached, droppable, droppableMain, disabled }: Params) => {
     const isDragging = dragging?.isDragging;
-    const isDroppable = droppable?.isDroppable;
 
     return [
-        droppable?.onDrop && droppable.canDrop && {
+        !disabled && droppable?.onDrop && droppable.canDrop && {
             name: 'drop' as const,
             main: droppableMain,
             label: 'Drop',
@@ -41,30 +39,7 @@ export const getDragControls = ({ dragging, draggingMove, draggingMoveAttached, 
             },
             spread: false,
         },
-        stopDrag && (isDragging || isDroppable) && {
-            name: 'drag-cancel' as const,
-            label: 'Cancel',
-            triggers: {
-                // mouse: {
-                //     type: 'mouse',
-                //     values: [ 'right-click' ],
-                //     listeners: ['onClick'],
-                // },
-                keyboard: {
-                    type: 'keyboard',
-                    values: [ 'b' ],
-                },
-                gamepad: {
-                    type: 'gamepad',
-                    values: [ 'B' ],
-                },
-            },
-            action: (e) => {
-                stopDrag?.(e);
-            },
-            spread: false,
-        },
-        dragging && draggingMove && !droppable?.onDrop && !isDragging && draggingMove.toggleDragByFocus && {
+        !disabled && dragging && draggingMove && !droppable?.onDrop && !isDragging && draggingMove.toggleDragByFocus && {
             name: 'drag' as const,
             label: 'Move',
             triggers: {
@@ -96,7 +71,7 @@ export const getDragControls = ({ dragging, draggingMove, draggingMoveAttached, 
             },
             spread: false,
         },
-        dragging && draggingMoveAttached && !droppable?.onDrop && !isDragging && draggingMoveAttached.toggleDragByFocus && {
+        !disabled && dragging && draggingMoveAttached && !droppable?.onDrop && !isDragging && draggingMoveAttached.toggleDragByFocus && {
             name: 'drag-attached' as const,
             label: 'Move attached',
             triggers: {

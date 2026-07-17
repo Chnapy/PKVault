@@ -18,6 +18,7 @@
     position: relative;
     display: inline-flex;
     z-index: 1;
+    color: var(--mantine-color-text);
 }
 
 .out .icon {

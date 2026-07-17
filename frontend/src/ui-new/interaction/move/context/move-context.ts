@@ -18,7 +18,6 @@ export type MoveTargetOutput<C> = MoveTargetInput<C> & {
 };
 
 export type MovePositions = {
-    scroll: Vector2;
     pointer: Vector2;
     pointerInitial: Vector2;
     target: Vector2;

@@ -94,6 +94,7 @@ export const theme = mergeThemeOverrides(
             wordBreak: 'break-word',
           },
           events: { hover: true, focus: true, touch: true },
+          transitionProps: { duration: 0 },
         },
       }),
       SegmentedControl: SegmentedControl.extend({

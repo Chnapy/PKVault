@@ -55,7 +55,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
 
     const submitting = useDragSubmitting(container, slot, id);
 
-    disabled ||= (isDraggingState && !droppable.isDroppable) || droppable.canDrop === false;
+    disabled ||= droppable.canDrop === false;
     loading ||= submitting;
 
     const { focusProps, controlProps, controlIcons } = useFocusControls({
@@ -73,9 +73,13 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
                     onClick?.(e);
                 },
             }),
-            ...(disabled || loading)
-                ? []
-                : getDragControls({ dragging, draggingMove, draggingMoveAttached, droppable }),
+            ...getDragControls({
+                dragging,
+                draggingMove,
+                draggingMoveAttached,
+                droppable,
+                disabled: disabled || loading,
+            }),
             !isDraggingState && !disabled && !loading && {
                 name: 'select',
                 label: 'Select',
@@ -101,6 +105,17 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
         refRoot,
     );
 
+    React.useEffect(() => {
+        if (selected)
+            dragging.ref.current?.scrollIntoView({
+                behavior: 'instant',
+                block: 'center',
+                inline: 'center',
+            });
+    },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        []);
+
     return <>
         <WithControlsIcons
             placement='out' icons={controlIcons('open', 'drag', 'drag-attached', 'drop')}
@@ -113,7 +128,6 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
                 </>}
                 selected={selected}
                 loading={loading}
-                opacity={dragging.isDragging ? 0.5 : undefined}
                 {...focusProps}
                 {...controlProps('open', 'drag', 'drag-attached', 'drop')}
                 {...buttonProps}
@@ -123,7 +137,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
                 {icons}
             </UIStorageItemBase>
 
-            {controlProps('select').onClick && <WithControlsIcons className={classes.checkbox} placement='out' icons={controlIcons('select')}>
+            {(controlProps('select').onClick || checked) && <WithControlsIcons className={classes.checkbox} placement='out' icons={controlIcons('select')}>
                 <Checkbox
                     size='sm'
                     checked={checked}

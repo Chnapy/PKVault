@@ -35,7 +35,7 @@ public class EditPkmSaveAction(
 
         return new(
             type: DataActionType.EDIT_PKM_SAVE,
-            parameters: [saveLoaders.Save.Version, pkmSave.Nickname]
+            parameters: [saveLoaders.Save.Version, pkmSave.Nickname, pkmSave.Species]
         );
     }
 }
