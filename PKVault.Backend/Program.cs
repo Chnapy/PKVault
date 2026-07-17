@@ -3,6 +3,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.ResponseCompression;
 using Serilog;
@@ -147,6 +148,38 @@ public class Program
 
     public static void ConfigureServices(IServiceCollection services)
     {
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+            {
+                var method = httpContext.Request.Method;
+                bool isMutation = HttpMethods.IsPost(method)
+                    || HttpMethods.IsPut(method)
+                    || HttpMethods.IsDelete(method);
+
+                if (!isMutation)
+                    return RateLimitPartition.GetNoLimiter("no-limit");
+
+                return RateLimitPartition.GetConcurrencyLimiter("mutations", _ => new ConcurrencyLimiterOptions
+                {
+                    PermitLimit = 1,
+                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                    QueueLimit = 5
+                });
+            });
+
+            options.OnRejected = (context, _) =>
+            {
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("RateLimiter");
+                logger.LogWarning($"Mutation rejected (queue is full) on {context.HttpContext.Request.Path}");
+                return ValueTask.CompletedTask;
+            };
+        });
+
         services.AddResponseCompression(opts =>
         {
             opts.Providers.Add<BrotliCompressionProvider>();
@@ -267,6 +300,8 @@ public class Program
 
     public static void ConfigureAppBuilder(IApplicationBuilder app, bool useHttps)
     {
+        app.UseRateLimiter();
+
         app.UseSerilogRequestLogging();
 
         app.UseResponseCompression();

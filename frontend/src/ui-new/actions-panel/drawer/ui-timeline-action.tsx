@@ -24,7 +24,7 @@ export const UITimelineAction: React.FC<UITimelineActionProps> = ({ type, label,
 
             <UIConfirmPopover
                 label={'Delete'}
-                description={'Delete this action and all next ones'}
+                description={'Delete this action and all previous ones'}
                 color='red'
                 action={async () => {
                     await onDelete(index);

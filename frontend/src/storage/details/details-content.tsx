@@ -168,6 +168,8 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
                                 : (natureObj?.increasedStatIndex === i + 1
                                     ? 'increase'
                                     : undefined),
+                            maxIv: staticData.versions[ pkm.contextVersion ]?.maxIV,
+                            maxEv: staticData.versions[ pkm.contextVersion ]?.maxEV,
                             iv: pkm.iVs[ i ] ?? 0,
                             ev: pkm.eVs[ i ] ?? 0,
                         };
@@ -176,6 +178,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
                 <UIDetailsStatsTotalRow
                     total={totalStats}
                     level={pkm.level}
+                    maxIv={staticData.versions[ pkm.contextVersion ]?.maxIV}
                     iv={totalIvs}
                     ev={totalEvs}
                 />

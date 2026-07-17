@@ -1,18 +1,20 @@
-import { Badge, Group, Progress, Table } from '@mantine/core';
+import { Box, Group, Progress, Table } from '@mantine/core';
 import type React from 'react';
 import { useTranslate } from '../../../../../translate/i18n';
+import classes from './ui-details-content-stats.module.css';
 
 export type UIDetailsStatsTotalRowProps = {
     total: number;
     level: number;
+    maxIv?: number;
     iv?: number;
     ev?: number;
 };
 
-export const UIDetailsStatsTotalRow: React.FC<UIDetailsStatsTotalRowProps> = ({ total, level, iv, ev }) => {
+export const UIDetailsStatsTotalRow: React.FC<UIDetailsStatsTotalRowProps> = ({ total, level, maxIv, iv, ev }) => {
     const { t } = useTranslate();
 
-    const maxStats = 500 * 6;
+    const maxStats = 400 * 6;
     const minStats = 5 * 6;
 
     const maxStatsRatio = minStats + (maxStats - minStats) * (level / 100);
@@ -36,37 +38,29 @@ export const UIDetailsStatsTotalRow: React.FC<UIDetailsStatsTotalRowProps> = ({ 
         <Table.Td>
             {total}
         </Table.Td>
-        {iv !== undefined && <Table.Td>
-            <Badge
-                variant='outline'
-                color={`rgb(${255 - (255 * iv / (31 * 6))},${255 * iv / (31 * 6)},0)`}
-                c='inherit'
-                radius='sm'
-                miw='100%'
-                styles={{
-                    label: {
-                        minWidth: 'fit-content',
-                    }
-                }}
-            >
+        {iv !== undefined && maxIv !== undefined && <Table.Td>
+            <Box className={classes.ivEv}>
                 {iv}
-            </Badge>
+                <Progress
+                    className={classes.ivEvBar}
+                    color='green'
+                    value={100 * iv / (maxIv * 6)}
+                    size={4}
+                    animated={iv >= (maxIv * 6)}
+                />
+            </Box>
         </Table.Td>}
         {ev !== undefined && <Table.Td>
-            <Badge
-                variant='outline'
-                color={`rgb(${255 - (255 * ev / (252 * 6))},${255 * ev / (252 * 6)},0)`}
-                c='inherit'
-                radius='sm'
-                miw='100%'
-                styles={{
-                    label: {
-                        minWidth: 'fit-content',
-                    }
-                }}
-            >
+            <Box className={classes.ivEv}>
                 {ev}
-            </Badge>
+                <Progress
+                    className={classes.ivEvBar}
+                    color='blue'
+                    value={100 * ev / 510}
+                    size={4}
+                    animated={ev >= 510}
+                />
+            </Box>
         </Table.Td>}
     </Table.Tr>;
 };

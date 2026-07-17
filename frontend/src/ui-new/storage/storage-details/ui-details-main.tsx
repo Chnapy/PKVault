@@ -50,7 +50,7 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
 
                 <Space ml='auto' />
                 <Text size='lg'>
-                    <UIDetailsLevel level={level} />
+                    <UIDetailsLevel level={level} showBar />
                 </Text>
             </Group>
 

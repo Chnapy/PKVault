@@ -25,11 +25,12 @@ export const UIDetailsContentMisc: React.FC<UIDetailsContentMiscProps> = ({
                     / 255 * 100
                 }
                 // color={color}
+                animated={friendship >= 255}
                 style={{ flexGrow: 1 }}
             />
         </Grid.Col>
         <Grid.Col span={2}>
-            {friendship}
+            {isEgg ? eggHatchCount : friendship}
         </Grid.Col>
 
         <Grid.Col span={4}>

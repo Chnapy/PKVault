@@ -4,6 +4,7 @@ import { HistoryContext } from '../../context/history-context';
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { Gender, type PkmBaseDTO } from '../../data/sdk/model';
 import { Route } from '../../routes';
+import { UISpeciesImgSkeleton } from '../../ui-new/sprite-img/species-img/ui-species-img-skeleton';
 import { UISpriteSizeWrapper } from '../../ui-new/sprite-img/ui-sprite-size-wrapper';
 import { UIDetailsLevel } from '../../ui-new/storage/storage-details/ui-details-level';
 import { UIStorageItemBase, type UIStorageItemBaseProps } from '../../ui-new/storage/storage-item/base/ui-storage-item-base';
@@ -25,7 +26,7 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
         key={pkm.id}
         label={<>
             {pkm.nickname}
-            <UIDetailsLevel level={pkm.level} />
+            <UIDetailsLevel level={pkm.level} showBar />
         </>}
         onClick={onClick}
     >
@@ -37,6 +38,10 @@ export const PokedexDetailsOwned: React.FC<PokedexDetailsOwnedProps> = ({ saveId
         speciesSize='sm'
         itemSize='1lh'
     >
+        {pkmsQuery.isPending && <UIStorageItemBase loading>
+            <UISpeciesImgSkeleton />
+        </UIStorageItemBase>}
+
         {pkmsQuery.data
             ?.filter(pkm => !('isMain' in pkm) || pkm.isMain)
             .map(pkm => {

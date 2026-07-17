@@ -44,20 +44,18 @@ export const UIStorageItemIcons: React.FC<UIStorageItemIconsProps> = ({
                 {party}
             </UIIconWrapper>}
 
-            {hasDisabledVariant || nbrVariants > 1 || isExternal
-                ? <Group gap='sm' wrap='nowrap'>
-                    {level !== undefined && <UIDetailsLevel level={level} />}
-                    {hasDisabledVariant && <UIIconWrapper variant='transparent' color='red'>
-                        <FileXIcon />
-                    </UIIconWrapper>}
-                    {nbrVariants > 1 && <UIIconWrapper variant='filled' color='dark.5'>
-                        {nbrVariants}
-                    </UIIconWrapper>}
-                    {isExternal && <UIIconWrapper variant='filled' color='dark.5'>
-                        <ExternalLinkIcon />
-                    </UIIconWrapper>}
-                </Group>
-                : null}
+            <Group gap='sm' wrap='nowrap' fw='initial'>
+                {level !== undefined && <UIDetailsLevel level={level} />}
+                {hasDisabledVariant && <UIIconWrapper variant='transparent' color='red'>
+                    <FileXIcon />
+                </UIIconWrapper>}
+                {nbrVariants > 1 && <UIIconWrapper variant='filled' color='dark.5'>
+                    {nbrVariants}
+                </UIIconWrapper>}
+                {isExternal && <UIIconWrapper variant='filled' color='dark.5'>
+                    <ExternalLinkIcon />
+                </UIIconWrapper>}
+            </Group>
         </Stack>
 
         <Group pos='absolute' top={4} right={4} justify='flex-end' gap={2}>

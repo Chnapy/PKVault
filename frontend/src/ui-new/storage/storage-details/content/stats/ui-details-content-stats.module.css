@@ -2,3 +2,16 @@
 .ui-details-content-stats tr > *:not(:nth-child(2)) {
     width: 0;
 }
+
+.iv-ev {
+    position: relative;
+    min-width: 26px;
+    text-align: center;
+}
+
+.iv-ev-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

@@ -124,7 +124,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
             <UIStorageItemBase
                 label={droppable.helpText ?? <>
                     {name}
-                    <UIDetailsLevel level={level} />
+                    <UIDetailsLevel level={level} showBar />
                 </>}
                 selected={selected}
                 loading={loading}

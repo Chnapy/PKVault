@@ -34,7 +34,7 @@ export const UIContest: React.FC<ContestProps> = ({ index, value }) => {
                 label: t('details.contest.tough'),
             };
             case 5: return {
-                color: 'dark',
+                color: 'currentColor',
                 label: t('details.contest.sheen'),
             };
             default: return {};
