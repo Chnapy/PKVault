@@ -16,11 +16,18 @@ export const UISettingsContent: React.FC<UISettingsContentProps> = ({ left, righ
 
     return <FocusScope id={childScopeId} parentNodeId={nodeId}>
         <WithControlsIcons placement='out' icons={controlIcons('open')}
-            as='form' onSubmit={onSubmit as never}
-            display='flex'
-            mah='100%'
-            mih={0}
-            style={{ flexGrow: 1, flexDirection: 'column', flexWrap: 'nowrap', borderRadius: 'var(--mantine-radius-md)' }}
+            as='form'
+            onSubmit={onSubmit as never}
+            style={{
+                flexGrow: 1,
+                maxHeight: '100%',
+                minHeight: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                flexWrap: 'nowrap',
+                gap: 'var(--mantine-spacing-md)',
+                borderRadius: 'var(--mantine-radius-md)',
+            }}
             {...panelProps}
         >
             <Grid

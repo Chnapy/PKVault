@@ -26,6 +26,6 @@ export const LinkWithIcon: React.FC<JSX.IntrinsicElements[ 'a' ]> = ({ children,
         {...props}
     >
         {icon}
-        {children}
+        {children ?? props.href}
     </Anchor>;
 };

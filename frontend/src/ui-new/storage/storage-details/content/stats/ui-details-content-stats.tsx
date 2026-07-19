@@ -5,10 +5,11 @@ import classes from './ui-details-content-stats.module.css';
 export type UIDetailsContentStatsProps = {
     iv?: boolean;
     ev?: boolean;
+    asDv?: boolean;
     children: React.ReactNode;
 };
 
-export const UIDetailsContentStats: React.FC<UIDetailsContentStatsProps> = ({ iv, ev, children }) => {
+export const UIDetailsContentStats: React.FC<UIDetailsContentStatsProps> = ({ iv, ev, asDv, children }) => {
     return <Table
         className={classes.uiDetailsContentStats}
         withRowBorders={false}
@@ -19,7 +20,9 @@ export const UIDetailsContentStats: React.FC<UIDetailsContentStatsProps> = ({ iv
             <Table.Tr>
                 <Table.Th></Table.Th>
                 <Table.Th colSpan={2} ta='center'>Stat</Table.Th>
-                {iv && <Table.Th ta='center'>IV</Table.Th>}
+                {iv && <Table.Th ta='center'>
+                    {asDv ? 'DV' : 'IV'}
+                </Table.Th>}
                 {ev && <Table.Th ta='center'>EV</Table.Th>}
             </Table.Tr>
         </Table.Thead>

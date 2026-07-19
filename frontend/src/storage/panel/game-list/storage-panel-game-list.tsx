@@ -115,5 +115,8 @@ export const StoragePanelGameList: React.FC = () => {
                             reduce();
                         })}
                 />)}
+        onCreate={() => navigate({
+            to: '/settings'
+        })}
     />;
 };

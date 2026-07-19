@@ -13,10 +13,11 @@ export type UIGameData = {
 };
 
 export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>, 'value' | 'data' | 'onChange' | 'renderExpanded' | 'expanded'> & {
+    onCreate: () => unknown;
     renderHoverCard: UIExpandableTabsProps<UIGameData>[ 'renderTab' ];
 };
 
-export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange, renderExpanded, renderHoverCard, expanded }) => {
+export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange, renderExpanded, renderHoverCard, expanded, onCreate }) => {
     const { isInCurrentPanel } = useCurrentPanel();
 
     return <UIExpandableTabs
@@ -52,6 +53,7 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
                     variant='default'
                     size='xl'
                     w='100%'
+                    onClick={onCreate}
                 >
                     <CirclePlusIcon />
                 </UIActionIcon>

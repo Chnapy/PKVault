@@ -17,7 +17,7 @@ export const SettingsExternalRight: React.FC = () => {
 
     const [ pkmExternalGlobs ] = useWatch({ control: form.control, name: [ 'pkM_EXTERNAL_GLOBS' ] });
 
-    return <Card>
+    return <Card style={{ overflow: 'auto' }}>
         <GlobsInputList
             labelList={<Group>
                 {t('settings.form.pkms-external')}

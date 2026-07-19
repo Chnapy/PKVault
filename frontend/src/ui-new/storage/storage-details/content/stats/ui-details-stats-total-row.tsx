@@ -1,4 +1,4 @@
-import { Box, Group, Progress, Table } from '@mantine/core';
+import { Box, Group, NumberFormatter, Progress, Table } from '@mantine/core';
 import type React from 'react';
 import { useTranslate } from '../../../../../translate/i18n';
 import classes from './ui-details-content-stats.module.css';
@@ -7,11 +7,12 @@ export type UIDetailsStatsTotalRowProps = {
     total: number;
     level: number;
     maxIv?: number;
+    maxEvTotal?: number;
     iv?: number;
     ev?: number;
 };
 
-export const UIDetailsStatsTotalRow: React.FC<UIDetailsStatsTotalRowProps> = ({ total, level, maxIv, iv, ev }) => {
+export const UIDetailsStatsTotalRow: React.FC<UIDetailsStatsTotalRowProps> = ({ total, level, maxIv, maxEvTotal, iv, ev }) => {
     const { t } = useTranslate();
 
     const maxStats = 400 * 6;
@@ -36,7 +37,7 @@ export const UIDetailsStatsTotalRow: React.FC<UIDetailsStatsTotalRowProps> = ({ 
             />
         </Table.Td>
         <Table.Td>
-            {total}
+            <NumberFormatter value={total} />
         </Table.Td>
         {iv !== undefined && maxIv !== undefined && <Table.Td>
             <Box className={classes.ivEv}>
@@ -50,15 +51,15 @@ export const UIDetailsStatsTotalRow: React.FC<UIDetailsStatsTotalRowProps> = ({ 
                 />
             </Box>
         </Table.Td>}
-        {ev !== undefined && <Table.Td>
+        {ev !== undefined && maxEvTotal !== undefined && <Table.Td>
             <Box className={classes.ivEv}>
-                {ev}
+                <NumberFormatter value={ev} />
                 <Progress
                     className={classes.ivEvBar}
                     color='blue'
-                    value={100 * ev / 510}
+                    value={100 * ev / maxEvTotal}
                     size={4}
-                    animated={ev >= 510}
+                    animated={ev >= maxEvTotal}
                 />
             </Box>
         </Table.Td>}

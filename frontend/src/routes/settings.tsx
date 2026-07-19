@@ -5,10 +5,10 @@ import { SettingsPage } from '../pages/settings';
 
 export type StorageSearchSchema = z.infer<typeof searchSchema>;
 
-export type SettingsSubMenuValue = 'main' | 'external-pkms' | 'backups';
+export type SettingsSubMenuValue = 'main' | 'external-pkms' | 'backups' | 'about';
 
 const searchSchema = z.object({
-  subMenu: z.enum([ 'main', 'external-pkms', 'backups' ] as const satisfies SettingsSubMenuValue[]).optional(),
+  subMenu: z.enum([ 'main', 'external-pkms', 'backups', 'about' ] as const satisfies SettingsSubMenuValue[]).optional(),
 });
 
 export const Route = createFileRoute("/settings")({

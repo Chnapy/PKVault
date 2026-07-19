@@ -6,6 +6,8 @@ import type { SettingsMutableDTO } from '../data/sdk/model';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { Route } from '../routes/settings';
+import { SettingsAboutLeft } from '../settings/about/settings-about-left';
+import { SettingsAboutRight } from '../settings/about/settings-about-right';
 import { SettingsBackupLeft } from '../settings/backup/settings-backup-left';
 import { SettingsBackupRight } from '../settings/backup/settings-backup-right';
 import { SettingsExternalLeft } from '../settings/external/settings-external-left';
@@ -83,6 +85,10 @@ export const SettingsPage: React.FC = withErrorCatcher('default', () => {
       left: <SettingsBackupLeft />,
       right: <SettingsBackupRight />,
     }),
+    about: () => ({
+      left: <SettingsAboutLeft />,
+      right: <SettingsAboutRight />,
+    }),
   })();
 
   return <FormProvider {...form}>
@@ -91,7 +97,7 @@ export const SettingsPage: React.FC = withErrorCatcher('default', () => {
       onSubmit={submit}
       left={left}
       right={right}
-      bottom={<Center>
+      bottom={subMenu !== 'about' && <Center>
         <Card>
           <Stack align='center'>
             <Group wrap='nowrap'>

@@ -1,12 +1,16 @@
 import { Group } from '@mantine/core';
 import React from 'react';
-import { getControlIcon } from '../../interaction/controls/icons/get-control-icon';
+import { inputIconResources } from '../../../ui/icon/input-icon-resources';
+import { getControlIcon, inputIcon } from '../../interaction/controls/icons/get-control-icon';
 import { useAllCurrentControls } from '../../interaction/controls/use-all-current-controls';
+import { useControlsCurrentType } from '../../interaction/controls/use-controls-current-type';
 import classes from './ui-footer.module.css';
 
 export const UIFooter: React.FC = () => {
     // TODO perf issues (re-renders)
     const allControls = useAllCurrentControls();
+
+    const controlsType = useControlsCurrentType();
 
     // console.log({ allControls: JSON.parse(JSON.stringify(allControls)) })
 
@@ -15,19 +19,28 @@ export const UIFooter: React.FC = () => {
         data-mantine-color-scheme="light"
         c='white'
         bg='primary.6'
-        p='xs'
+        px='md'
+        py='xs'
         gap='lg'
     >
-        {Object.entries(allControls).map(([ controlId, controls ]) => <Group
-            key={controlId}
+        {inputIcon(inputIconResources.type[ controlsType ])}
+
+        <Group
+            justify='center'
             gap='lg'
+            style={{ flexGrow: 1 }}
         >
-            {controls.map(c => <Group key={c.name} gap='sm'>
-                <Group gap='xs'>
-                    {getControlIcon(c.trigger.type, c.trigger.values, c.trigger.allowPressedSuite)}
-                </Group>
-                {c.label}
+            {Object.entries(allControls).map(([ controlId, controls ]) => <Group
+                key={controlId}
+                gap='lg'
+            >
+                {controls.map(c => <Group key={c.name} gap='sm'>
+                    <Group gap='xs'>
+                        {getControlIcon(c.trigger.type, c.trigger.values, c.trigger.allowPressedSuite)}
+                    </Group>
+                    {c.label}
+                </Group>)}
             </Group>)}
-        </Group>)}
+        </Group>
     </Group>;
 };

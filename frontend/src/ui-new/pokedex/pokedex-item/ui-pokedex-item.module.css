@@ -26,3 +26,7 @@
     inset: 0;
     padding: 4px;
 }
+
+.ui-pokedex-item .button[data-selected="true"] {
+    outline: 4px solid var(--focus-color-1);
+}

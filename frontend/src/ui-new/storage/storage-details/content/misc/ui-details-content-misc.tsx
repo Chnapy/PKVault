@@ -37,7 +37,7 @@ export const UIDetailsContentMisc: React.FC<UIDetailsContentMiscProps> = ({
             Language
         </Grid.Col>
         <Grid.Col span={8}>
-            {language ?? '-'}
+            {language || '-'}
         </Grid.Col>
 
         <Grid.Col span={4}>

@@ -1,7 +1,10 @@
 import { Center, Group, Space, Stack, Text, Tooltip } from '@mantine/core';
 import type React from 'react';
 import { type Gender } from '../../../data/sdk/model';
+import { Route as PokedexRoute } from '../../../routes/pokedex';
+import { Route as StorageRoute } from '../../../routes/storage';
 import { getSpeciesNO } from '../../../ui/dex-item/util/get-species-no';
+import { UIButton } from '../../form/button/ui-button';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
 import { UIGender } from '../../icon/ui-gender';
 import { UIPokerusIcon } from '../../icon/ui-pokerus-icon';
@@ -11,6 +14,7 @@ import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import { UIDetailsLevel } from './ui-details-level';
 
 export type UIDetailsMainProps = {
+    saveId?: number;
     species: number;
     speciesName: string;
     gender: Gender;
@@ -35,6 +39,7 @@ export type UIDetailsMainProps = {
 };
 
 export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
+    saveId,
     ball, nickname, gender, isEnabled, isShiny, isAlpha,
     species, speciesName, level, pokerusDays = 0, isPokerusCured,
     canEvolve, isDuplicate, warning,
@@ -49,7 +54,7 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
                 <UIGender gender={gender} size='big' />
 
                 <Space ml='auto' />
-                <Text size='lg'>
+                <Text component='div' size='lg'>
                     <UIDetailsLevel level={level} showBar />
                 </Text>
             </Group>
@@ -58,7 +63,27 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
                 <Text component='b' size='lg'>#{getSpeciesNO(species)}</Text>
                 <Text size='lg' tt='uppercase'>{speciesName}</Text>
 
-                <Space ml='auto' />
+                <UIButton
+                    component={StorageRoute.Link}
+                    to={PokedexRoute.to}
+                    search={(oldSearch: Record<string, unknown>) => {
+                        // remove all search params
+                        const clearedSearch = Object.fromEntries(Object.keys(oldSearch).map(key => [ key, undefined ]));
+
+                        return {
+                            ...clearedSearch,
+                            selected: species,
+                            selectedSaveId: saveId ?? 0,
+                        } satisfies typeof PokedexRoute[ 'types' ][ 'searchSchemaInput' ];
+                    }}
+                    name='pokedex-link'
+                    controlLabel='Go to Pokedex'
+                    size='compact-xs'
+                    mr='auto'
+                >
+                    Pokedex
+                </UIButton>
+
                 {isAlpha && <UIAlphaIcon size='big' />}
                 {isShiny && <UIShinyIcon size='big' />}
             </Group>

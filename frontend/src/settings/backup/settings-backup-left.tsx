@@ -3,6 +3,7 @@ import { FileArchiveIcon, FolderArchiveIcon, FolderTreeIcon, RefreshCcwIcon } fr
 import type React from "react";
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { UIInputLabel } from '../../ui-new/form/ui-input-label';
+import { UIPathLine } from '../../ui-new/path/ui-path-line';
 
 export const SettingsBackupLeft: React.FC = () => {
     // const { t } = useTranslate();
@@ -19,7 +20,7 @@ export const SettingsBackupLeft: React.FC = () => {
         <Card>
             <SimpleGrid cols={2}>
                 <UIInputLabel leftSection={<FolderArchiveIcon />} label='Backups directory' />
-                <div>{settings?.settingsMutable.backuP_PATH}</div>
+                <UIPathLine>{settings?.settingsMutable.backuP_PATH ?? '-'}</UIPathLine>
 
                 <UIInputLabel leftSection={<FolderTreeIcon />} label='Backup content' />
                 <div>All saves + all storage</div>

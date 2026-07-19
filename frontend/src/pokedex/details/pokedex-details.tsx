@@ -91,9 +91,11 @@ export const PokedexDetails: React.FC = () => {
         </Grid.Col>
         <Grid.Col span={8}>
           <Group gap='sm'>
-            {selectedForm.abilities.map(ability => <Text key={ability} w='100%'>
-              {staticData.abilities[ ability ]?.name}
-            </Text>)}
+            {selectedForm.abilities.length > 0
+              ? selectedForm.abilities.map(ability => <Text key={ability} w='100%'>
+                {staticData.abilities[ ability ]?.name}
+              </Text>)
+              : '-'}
           </Group>
         </Grid.Col>
       </Grid>,

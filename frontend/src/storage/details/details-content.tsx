@@ -142,21 +142,24 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
             label: 'Summary',
             content: <UIDetailsContentSummary
                 id={pkm.id}
-                heldItem={pkm.heldItem > 0
-                    ? <Group gap={4}>
-                        <ItemImg item={pkm.heldItem} version={pkm.contextVersion} />
-                        {staticData.getItem(pkm.contextVersion, pkm.heldItem)?.name}
-                    </Group>
+                heldItem={pkm.generation > 1
+                    ? (pkm.heldItem > 0
+                        ? <Group gap={4}>
+                            <ItemImg item={pkm.heldItem} version={pkm.contextVersion} />
+                            {staticData.getItem(pkm.contextVersion, pkm.heldItem)?.name}
+                        </Group>
+                        : '-')
                     : null}
-                nature={staticData.natures[ pkm.nature ]?.name}
-                ability={staticData.abilities[ pkm.ability ]?.name}
+                nature={pkm.generation > 2 ? staticData.natures[ pkm.nature ]?.name : undefined}
+                ability={pkm.ability > 0 ? staticData.abilities[ pkm.ability ]?.name : undefined}
+                specialAbility={pkm.generation === 3}
                 pid={pkm.pid}
             />,
         },
         pkm.isEnabled && {
             name: 'stats',
             label: 'Stats',
-            content: <UIDetailsContentStats iv ev>
+            content: <UIDetailsContentStats iv ev asDv={pkm.generation < 3}>
                 {([ 'hp', 'atk', 'def', 'spa', 'spd', 'spe' ] satisfies UIDetailsStatName[])
                     .map((stat, i): UIDetailsStatsRowProps => {
                         return {
@@ -179,6 +182,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
                     total={totalStats}
                     level={pkm.level}
                     maxIv={staticData.versions[ pkm.contextVersion ]?.maxIV}
+                    maxEvTotal={pkm.generation > 2 ? 510 : 65535 * 6}
                     iv={totalIvs}
                     ev={totalEvs}
                 />

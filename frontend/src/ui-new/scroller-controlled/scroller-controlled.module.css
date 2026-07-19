@@ -8,6 +8,6 @@
 }
 
 [data-controls-type="gamepad"] .container {
-    padding-left: 1lh;
-    padding-right: 1lh;
+    margin-left: 1lh;
+    margin-right: 1lh;
 }

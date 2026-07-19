@@ -1,7 +1,10 @@
+import keyboard from '../../assets/input_icons/KeyboardMouse/Vector/keyboard.svg?react';
+import mouse from '../../assets/input_icons/KeyboardMouse/Vector/mouse.svg?react';
 import mouseLeft from '../../assets/input_icons/KeyboardMouse/Vector/mouse_left.svg?react';
-import mouseRight from '../../assets/input_icons/KeyboardMouse/Vector/mouse_right.svg?react';
 import mouseMove from '../../assets/input_icons/KeyboardMouse/Vector/mouse_move.svg?react';
+import mouseRight from '../../assets/input_icons/KeyboardMouse/Vector/mouse_right.svg?react';
 
+import steamdeck from '../../assets/input_icons/SteamDeck/Vector/controller_steamdeck.svg?react';
 import gpA from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_a.svg?react';
 import gpB from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_b.svg?react';
 import gpL1 from '../../assets/input_icons/SteamDeck/Vector/steamdeck_button_l1.svg?react';
@@ -18,9 +21,16 @@ import gpDPadUp from '../../assets/input_icons/SteamDeck/Vector/steamdeck_dpad_u
 
 import keepPress from '../../assets/input_icons/Flairs/Vector/flair_circle_red_3.svg?react';
 
+import type { ControlTriggerType } from '../../ui-new/interaction/controls/provider/controls-context';
+
 export type InputIcon = typeof gpA;
 
 export const inputIconResources = {
+    type: {
+        mouse,
+        keyboard,
+        gamepad: steamdeck,
+    } satisfies Record<ControlTriggerType, unknown>,
     mouse: {
         leftClick: mouseLeft,
         rightClick: mouseRight,

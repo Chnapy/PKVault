@@ -18,16 +18,20 @@ export const SettingsSubMenu: React.FC = () => {
         }}
         data={[
             {
-                id: 'main',
+                id: 'main' satisfies typeof currentValue,
                 label: 'Main',
             },
             {
-                id: 'external-pkms',
+                id: 'external-pkms' satisfies typeof currentValue,
                 label: 'External pkms',
             },
             {
-                id: 'backups',
+                id: 'backups' satisfies typeof currentValue,
                 label: 'Backups',
+            },
+            {
+                id: 'about' satisfies typeof currentValue,
+                label: 'About',
             },
         ]}
     />;

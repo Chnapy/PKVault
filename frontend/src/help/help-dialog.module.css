@@ -12,26 +12,3 @@
   padding-right: 0;
   overflow-y: scroll;
 }
-
-.help-dialog-content :global(summary) {
-  cursor: pointer;
-}
-
-.help-dialog-content :global(summary):hover {
-  text-decoration: underline;
-}
-
-.help-dialog-content :global(details) {
-  padding: 4px;
-  margin: 2px 0;
-  transition: background-color 0.2s;
-}
-
-.help-dialog-content :global(details)[open],
-.help-dialog-content :global(details):hover {
-  background-color: light-dark(var(--mantine-color-white-5), var(--mantine-color-dark-5));
-}
-
-.help-dialog-content :global(details) > p {
-  margin-left: 1em;
-}

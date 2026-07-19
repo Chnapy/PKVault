@@ -1,4 +1,4 @@
-import { Box, Group, Progress, Table } from '@mantine/core';
+import { Box, Group, NumberFormatter, Progress, Table } from '@mantine/core';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import type React from 'react';
 import { useTranslate } from '../../../../../translate/i18n';
@@ -63,7 +63,7 @@ export const UIDetailsStatsRow: React.FC<UIDetailsStatsRowProps> = ({ stat, valu
         </Table.Td>}
         {ev !== undefined && maxEv !== undefined && <Table.Td>
             <Box className={classes.ivEv}>
-                {ev}
+                <NumberFormatter value={ev} />
                 <Progress
                     className={classes.ivEvBar}
                     color='blue'

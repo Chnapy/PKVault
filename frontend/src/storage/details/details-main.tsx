@@ -37,6 +37,7 @@ export const DetailsMain: React.FC = () => {
     const ballName = staticData.getItem(pkm.version, pkm.ball)?.name;
 
     return <UIDetailsMain
+        saveId={selectedSaveId}
         species={pkm.species}
         speciesName={speciesName}
         gender={pkm.gender}
