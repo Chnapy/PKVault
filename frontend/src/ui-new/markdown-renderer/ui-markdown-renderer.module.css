@@ -21,3 +21,17 @@
 .ui-markdown-renderer :global(details) > p {
   margin-left: 1em;
 }
+
+.ui-markdown-renderer img {
+  max-width: 100%;
+  border-radius: 6px;
+  box-shadow: 0 0 4px rgb(0 0 0 / 20%);
+}
+
+.ui-markdown-renderer img[align="left"] {
+  margin-right: 20px;
+}
+
+.ui-markdown-renderer img[align="right"] {
+  margin-left: 20px;
+}

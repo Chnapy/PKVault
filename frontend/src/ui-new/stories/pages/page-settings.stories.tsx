@@ -114,8 +114,6 @@ export const Primary: Story = {
                             controlLabel='Skip legality checks'
                             ml='auto'
                         />
-
-                        TODO: item sizing
                     </SimpleGrid>
                 </Card>
             </>}

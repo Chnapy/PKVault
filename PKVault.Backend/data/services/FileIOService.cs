@@ -240,7 +240,7 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
         }
     }
 
-    private string NormalizePath(string path)
+    public static string NormalizePath(string path)
     {
 #if MODE_GEN_POKEAPI
         return path;

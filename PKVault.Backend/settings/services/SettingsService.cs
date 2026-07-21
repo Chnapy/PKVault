@@ -237,6 +237,8 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         );
     }
 
+    public static readonly string DefaultSavePath = "./pokemon-emerald-sample.sav";
+
     private static SettingsMutableDTO GetDefaultSettingsMutable()
     {
         SettingsMutableDTO settings;
@@ -244,7 +246,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 #if DEBUG
         settings = new(
             DB_PATH: "./tmp/db",
-            SAVE_GLOBS: [],
+            SAVE_GLOBS: [DefaultSavePath],
             PKM_EXTERNAL_GLOBS: [],
             STORAGE_PATH: "./tmp/storage",
             BACKUP_PATH: "./tmp/backup",
@@ -255,7 +257,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 #else
         settings = new(
             DB_PATH: "./db",
-            SAVE_GLOBS: [],
+            SAVE_GLOBS: [DefaultSavePath],
             PKM_EXTERNAL_GLOBS: [],
             STORAGE_PATH: "./storage",
             BACKUP_PATH: "./backup",

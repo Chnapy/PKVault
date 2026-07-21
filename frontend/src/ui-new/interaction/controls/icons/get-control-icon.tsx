@@ -42,6 +42,19 @@ export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values:
                 gpIcons.push(inputIconResources.gamepad.DPad);
             }
 
+            const rstick = gpValues.has('RStickDown')
+                && gpValues.has('RStickUp')
+                && gpValues.has('RStickLeft')
+                && gpValues.has('RStickRight');
+
+            if (rstick) {
+                gpValues.delete('RStickDown');
+                gpValues.delete('RStickUp');
+                gpValues.delete('RStickLeft');
+                gpValues.delete('RStickRight');
+                gpIcons.push(inputIconResources.gamepad.RStick);
+            }
+
             gpValues.forEach(value => {
                 const gpIcon = inputIconResources.gamepad[ value as keyof typeof inputIconResources.gamepad ];
                 if (gpIcon)

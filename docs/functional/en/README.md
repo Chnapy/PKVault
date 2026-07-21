@@ -1,42 +1,193 @@
-# PKVault - Features
+# PKVault - Feature showcase
+<br/>
 
-PKVault is a free open-source centralized Pokémon management application, including storage, pokedex, pokemon manipulation and saves.
-It allows you to:
+<div align="center">
+    <img src="../img/centralized-storage.png" alt="PKVault storage" />
+    <p align="center">
+        <b>Centralized storage</b> where you can put any pokemon from any generation.
+    </p>
+</div>
 
-- import Pokemon saves (Nintendo Switch, Game Boy, 3DS, etc.)
-- organize pokemons in banks and boxes
-- safely manage save modifications (session before save)
-- consult a complete Pokedex with all pokemons
-- protect data with automatic backups
+<br/>
+<br/>
 
-It is designed to work 100% offline, single-user, and compatible with all generations, from the first to the most recent.
+<img align="left" src="../img/saves-storage.png" alt="Saves list" />
 
-## Table of Contents
+Access storages from your own **save files**.
 
-1. [Technical Considerations](./0-technical.md)
-1. [Quick Start](./1-quick-start.md)
-1. [Session](./2-session.md)
-1. [Storage](./3-storage.md)
-1. [Pokédex](./4-pokedex.md)
-1. [Settings and Backups](./5-settings.md)
-1. [Issues, Feedback and Contribute](./6-issues.md)
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 
-## Scope and Limitations
+<img align="right" src="../img/banks-boxes.png" alt="Banks & boxes" />
 
-PKVault uses PKHeX internally for pokémon and save manipulation, but is not intended to offer the same features.
+PKVault storage is scoped by **banks & boxes**.
 
-Beyond PKVault's primary features, the app may offer secondary comfort features: trade evolution, move changes, etc. But PKVault will not offer editing options that go beyond classic & daily usage.
 
-PKVault does not encourage cheating beyond comfort options.
+<br/>
+<br/>
 
-PKVault can:
+---
 
-- read saves
-- modify and move pokemons
-- create pokemon variants
+## Actions
+<br/>
 
-PKVault cannot:
+<img align="left" src="../img/move-action.png" alt="Move action" />
 
-- modify pokemon stats/IVs
-- intentionally create illegal pokemons
-- directly modify the games themselves
+**Move** pokemons between boxes and storages.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="right" src="../img/move-attached.png" alt="Move attached" />
+
+**Move as attached**, making a copy synchronizing between PKVault storage and save after any change (level up, move changes, etc).
+
+<br/>
+<br/>
+<br/>
+
+<img align="left" src="../img/edit-action.png" alt="Edit action" />
+
+**Edit** pokemons nickname, moves and EVs balance.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="right" src="../img/evolve-action.png" alt="Evolve action" />
+
+**Evolve** pokemons when trade is required.
+<br/>
+Held item may be required.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="left" src="../img/multi-select.png" alt="Multi-select" />
+
+**Select** multiple pokemons before move, edit, etc.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="right" src="../img/sort-action.png" alt="Sort action" />
+
+**Sort** pokemons on multiple boxes with given pokedex.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+---
+
+## Pokedex
+<br/>
+
+<div align="center">
+    <img src="../img/centralized-pokedex.png" alt="Centralized Pokedex" />
+    <p align="center">
+        <b>Centralized Pokedex</b>.
+    </p>
+</div>
+
+<br/>
+<br/>
+
+<img align="left" src="../img/pokedex-saves.png" alt="Saves Pokedex" />
+
+Pokedex data from your **save files**.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="right" src="../img/synchro-pokedex.png" alt="Synchronize Pokedex" />
+
+**Synchronize** Pokedexes between your saves, sharing pokemons seen & caught.
+
+<br/>
+<br/>
+
+---
+
+## Misc
+<br/>
+
+<img align="left" src="../img/backups.png" alt="Data safety" />
+
+**Auto-backup** of data & saves on save action.
+<br/>You cannot lose your data !
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="right" src="../img/parameters.png" alt="Parameters" />
+
+You can **hide cheats** in pokemon edit, or **skip legality checks**.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="left" src="../img/dark-mode.png" alt="Dark mode" />
+
+**Dark mode** for better lisibility.
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="right" src="../img/sprite-sizing.png" alt="Sprite sizing" />
+
+Change **sprite sizing** at your will.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="left" src="../img/controllers.png" alt="Controller support" />
+
+**Gamepad** and **SteamDeck** are supported.

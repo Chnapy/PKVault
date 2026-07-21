@@ -6,7 +6,7 @@ import rehypeSlug from 'rehype-slug';
 import { LinkWithIcon } from '../../ui/link-with-icon/link-with-icon';
 import classes from './ui-markdown-renderer.module.css';
 
-type UIMarkdownRendererProps = {
+export type UIMarkdownRendererProps = {
     ref?: React.Ref<HTMLDivElement>;
     baseUrl?: string;
     linkWithIcon?: boolean;
@@ -49,6 +49,14 @@ const getUrlTransform = (selectedEndPath: string): UrlTransform => url => {
     // https://...
     if (url.startsWith('http')) {
         return url;
+    }
+
+    if (url.startsWith('/docs/')) {
+        return url.replaceAll('/docs/functional/img/', '/docs/img/');
+    }
+
+    if (url.startsWith('../img/')) {
+        return url.replaceAll('../img/', '/docs/img/');
     }
 
     // /.github/...

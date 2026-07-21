@@ -91,6 +91,26 @@ public class Program
         //     return null;
         // }
 
+        var settingsService = host.Services.GetRequiredService<ISettingsService>();
+        var fileSystem = host.Services.GetRequiredService<IFileSystem>();
+
+        var saveGlobs = settingsService.GetSettings().SettingsMutable.SAVE_GLOBS;
+
+        var defaultSavePath = FileIOService.NormalizePath(SettingsService.DefaultSavePath);
+
+        if (saveGlobs.Contains(SettingsService.DefaultSavePath) && !fileSystem.File.Exists(defaultSavePath))
+        {
+            using var _ = Log.Logger.Time($"Default save file in save globs and is missing. Writing file to {SettingsService.DefaultSavePath}");
+
+            var assembly = new AssemblyClient();
+            using var defaultSaveStream = await assembly.GetAsync([
+                "default_files",
+                "pokemon_emerald_sample.sav",
+            ]);
+            using var fileStream = fileSystem.File.Create(defaultSavePath);
+            defaultSaveStream.CopyTo(fileStream);
+        }
+
         return async () =>
         {
             await host.Services.GetRequiredService<ISessionServiceMinimal>().EnsureSessionCreated();

@@ -54,7 +54,10 @@ export const SettingsMainLeft: React.FC = () => {
 
         <Card>
             <SimpleGrid cols={2}>
-                <UIInputLabel leftSection={<PenOffIcon />} forInput='hidE_CHEATS' label={t('settings.form.hide-cheats')} />
+                <UIInputLabel leftSection={<PenOffIcon />} forInput='hidE_CHEATS'
+                    label={t('settings.form.hide-cheats')}
+                    description='Remove moves & EVs from pokemon edit'
+                />
                 <UISwitch
                     {...form.register('hidE_CHEATS')}
                     defaultChecked={form.getValues('hidE_CHEATS')}
@@ -64,7 +67,10 @@ export const SettingsMainLeft: React.FC = () => {
                     my='sm'
                 />
 
-                <UIInputLabel leftSection={<ShieldOff />} forInput='skiP_LEGALITY_CHECKS' label={t('settings.form.skip-legality')} />
+                <UIInputLabel leftSection={<ShieldOff />} forInput='skiP_LEGALITY_CHECKS'
+                    label={t('settings.form.skip-legality')}
+                    description='If not concerned by online usage'
+                />
                 <UISwitch
                     {...form.register('skiP_LEGALITY_CHECKS')}
                     defaultChecked={form.getValues('skiP_LEGALITY_CHECKS')}

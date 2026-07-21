@@ -1,4 +1,5 @@
 import { Tabs } from '@mantine/core';
+import { DatabaseBackupIcon } from 'lucide-react';
 import type React from 'react';
 import { Focus } from '../../interaction/focus/provider/use-focus-context';
 import { ScrollerControlled } from '../../scroller-controlled/scroller-controlled';
@@ -17,7 +18,17 @@ export const UIBackupsTabList: React.FC<UIBackupsTabListProps> = ({ value, onSel
         value={value}
         onChange={tab => tab && onSelect(tab)}
     >
-        <Tabs.List>
+        <Tabs.List
+            pl='md'
+            style={{
+                flexGrow: 1,
+                alignItems: 'center',
+                flexWrap: 'nowrap',
+                gap: 'var(--mantine-spacing-md)',
+            }}
+        >
+            <DatabaseBackupIcon />
+
             <ScrollerControlled id='backups' controlsLabel='Change backups' controlsEnabled={isInScope} level={1}>
                 {children}
             </ScrollerControlled>

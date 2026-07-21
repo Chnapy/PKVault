@@ -5,6 +5,7 @@ import { GameVersion } from '../data/sdk/model';
 import { useStorageGetActions } from '../data/sdk/storage/storage.gen';
 import { Header } from '../header/header';
 import { HelpDialog } from '../help/help-dialog';
+import { WelcomeDialog } from '../help/welcome-dialog';
 import { getGameInfos } from '../pokedex/details/util/get-game-infos';
 import { ActionsPanel } from '../storage/actions/actions-panel';
 import { MoveSelectImplProvider } from '../storage/move/move-select-impl-provider';
@@ -44,6 +45,7 @@ export const RootPage: React.FC = () => {
           <Outlet />
 
           <HelpDialog />
+          <WelcomeDialog />
         </UIAppLayout>
       </MoveSelectImplProvider>
 

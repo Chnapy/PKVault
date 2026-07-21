@@ -26,7 +26,7 @@ export const HelpDialog: React.FC = () => {
             opened={opened}
             keepMounted={false}
             onClose={onClose}
-            size='xl'
+            size={900}
             title={<Group gap='sm'>
                 <InfoIcon />
                 <Text size='xl'>

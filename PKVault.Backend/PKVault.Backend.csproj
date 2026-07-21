@@ -64,6 +64,7 @@
       <ItemGroup>
         <EmbeddedResource Include="pokeapi/generated/api-data/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
         <EmbeddedResource Include="pokeapi/generated/sheets/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+        <EmbeddedResource Include="default-files/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
         
         <Content Remove="pokeapi/generated/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
       </ItemGroup>
