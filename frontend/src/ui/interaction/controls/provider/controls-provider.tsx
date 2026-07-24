@@ -6,7 +6,7 @@ import { controlsContext, createControlsStore, type ControlsContext, type Contro
 export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [ methods ] = React.useState((): ControlsContext => ({
         useControlsStore: createControlsStore(
-            navigator.getGamepads().some(v => v) ? 'gamepad' : undefined,
+            navigator.getGamepads?.().some(v => v) ? 'gamepad' : undefined,
         ),
     }));
 

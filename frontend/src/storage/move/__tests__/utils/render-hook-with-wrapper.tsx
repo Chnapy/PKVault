@@ -3,6 +3,7 @@ import { createMemoryHistory, createRootRoute, createRouter, Outlet, RouterConte
 import { waitFor } from '@testing-library/dom';
 import { renderHook } from '@testing-library/react';
 import { expect } from 'vitest';
+import { ControlsProvider } from '../../../../ui/interaction/controls/provider/controls-provider';
 import { useMoveContext } from '../../../../ui/interaction/move/context/use-move-context';
 import type { MoveState } from '../../../../ui/interaction/move/state/move-state';
 import type { SelectContext } from '../../../../ui/interaction/select/context/select-context';
@@ -57,12 +58,14 @@ export const renderHookWithWrapper = <Result, Props>(
 
             return <QueryClientProvider client={queryClient}>
                 <RouterContextProvider router={router}>
-                    <MoveSelectImplProvider
-                        selectCtx={selectDefaultValue}
-                        moveCtx={moveDefaultValue}
-                    >
-                        {children}
-                    </MoveSelectImplProvider>
+                    <ControlsProvider>
+                        <MoveSelectImplProvider
+                            selectCtx={selectDefaultValue}
+                            moveCtx={moveDefaultValue}
+                        >
+                            {children}
+                        </MoveSelectImplProvider>
+                    </ControlsProvider>
                 </RouterContextProvider>
             </QueryClientProvider>;
         },

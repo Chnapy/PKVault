@@ -36,13 +36,13 @@ type State = {
 };
 
 type GamepadStates = {
-    [id in string]?: {
+    [ id in string ]?: {
         timeStack: number;
         axes: {
-            [value in number]?: State;
+            [ value in number ]?: State;
         };
         buttons: {
-            [value in number]?: State;
+            [ value in number ]?: State;
         };
     };
 };
@@ -53,19 +53,19 @@ const nextPressDelay = 200;
 const loop = (delta: number, states: GamepadStates) => {
     // console.log(delta);
 
-    const gamepads = navigator.getGamepads();
+    const gamepads = navigator.getGamepads?.() ?? [];
 
     for (const gp of gamepads) {
         if (!gp) continue;
 
-        if (!states[gp.id]) {
-            states[gp.id] = {
+        if (!states[ gp.id ]) {
+            states[ gp.id ] = {
                 timeStack: 0,
                 axes: {},
                 buttons: {},
             };
         }
-        const gpState = states[gp.id]!;
+        const gpState = states[ gp.id ]!;
         gpState.timeStack += delta;
 
         const act = (state: State, pressed: boolean) => {
@@ -95,10 +95,10 @@ const loop = (delta: number, states: GamepadStates) => {
         };
 
         gp.axes
-            .flatMap(axe => [axe, axe])
+            .flatMap(axe => [ axe, axe ])
             .forEach((axe, i) => {
-                if (!gpState.axes[i]) {
-                    gpState.axes[i] = {
+                if (!gpState.axes[ i ]) {
+                    gpState.axes[ i ] = {
                         type: 'axis',
                         value: i,
                         pressed: false,
@@ -111,12 +111,12 @@ const loop = (delta: number, states: GamepadStates) => {
                     ? axe >= 1
                     : axe <= -1;
 
-                act(gpState.axes[i], pressed);
+                act(gpState.axes[ i ], pressed);
             });
 
         gp.buttons.forEach((button, i) => {
-            if (!gpState.buttons[i]) {
-                gpState.buttons[i] = {
+            if (!gpState.buttons[ i ]) {
+                gpState.buttons[ i ] = {
                     type: 'button',
                     value: i,
                     pressed: false,
@@ -124,8 +124,8 @@ const loop = (delta: number, states: GamepadStates) => {
                     timeStack: 0,
                 };
             }
-            
-            act(gpState.buttons[i], button.pressed);
+
+            act(gpState.buttons[ i ], button.pressed);
         });
     }
 };
