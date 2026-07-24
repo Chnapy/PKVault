@@ -1,8 +1,8 @@
 import { Group, ThemeIcon } from '@mantine/core';
 import { BoxIcon, CalendarSyncIcon, ChevronsRight, Database, ImportIcon, LandmarkIcon, LinkIcon, MoveIcon, PenIcon, PlusCircleIcon, RefreshCcw, SortDescIcon, TrashIcon, UnlinkIcon } from 'lucide-react';
 import { DataActionType, EntityContext, type DataActionPayload } from '../../data/sdk/model';
-import { UIBallIcon } from '../../ui-new/icon/ui-ball-icon';
-import { SpeciesImg } from '../../ui/img/species-img';
+import { UIBallIcon } from '../../ui/icon/ui-ball-icon';
+import { SpeciesImg } from '../../img/species-img';
 import type React from 'react';
 import { switchUtil } from '../../util/switch-util';
 

@@ -1,10 +1,10 @@
 import { Tabs } from '@mantine/core';
 import React from "react";
 import { useBackupDelete, useBackupGetAll, useBackupRestore } from '../../data/sdk/backup/backup.gen';
-import { UIBackupItem } from '../../ui-new/settings/backups/ui-backup-item';
-import { UIBackupList } from '../../ui-new/settings/backups/ui-backup-list';
-import { UIBackupsTabList } from '../../ui-new/settings/backups/ui-backups-tab-list';
-import { renderDate, renderTime } from '../../ui/util/render-date-time';
+import { UIBackupItem } from '../../ui/settings/backups/ui-backup-item';
+import { UIBackupList } from '../../ui/settings/backups/ui-backup-list';
+import { UIBackupsTabList } from '../../ui/settings/backups/ui-backups-tab-list';
+import { renderDate, renderTime } from '../../util/render-date-time';
 import { BackupLineForm } from './backup-line-form';
 
 export const SettingsBackupRight: React.FC = () => {

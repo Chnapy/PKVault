@@ -2,8 +2,8 @@ import { Card, SimpleGrid } from '@mantine/core';
 import { FileArchiveIcon, FolderArchiveIcon, FolderTreeIcon, RefreshCcwIcon } from 'lucide-react';
 import type React from "react";
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
-import { UIInputLabel } from '../../ui-new/form/ui-input-label';
-import { UIPathLine } from '../../ui-new/path/ui-path-line';
+import { UIInputLabel } from '../../ui/form/ui-input-label';
+import { UIPathLine } from '../../ui/path/ui-path-line';
 
 export const SettingsBackupLeft: React.FC = () => {
     // const { t } = useTranslate();

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { useDragging } from '../../../ui-new/interaction/move/hooks/use-dragging';
+import { useDragging } from '../../../ui/interaction/move/hooks/use-dragging';
 import { renderHookWithWrapper } from './utils/render-hook-with-wrapper';
 import { setupTestDataServer } from './utils/setup-test-data-server';
 import { containerFns, type MoveContainerValue, type MoveParams } from '../move-container-fns';

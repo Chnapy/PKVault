@@ -2,8 +2,8 @@ import { Anchor, Avatar, Card, Divider, Group, SimpleGrid, Stack, Text } from '@
 import { CircleUserRoundIcon, CodeXmlIcon, CopyrightIcon, MessagesSquareIcon } from 'lucide-react';
 import type React from "react";
 import { useTranslate } from '../../translate/i18n';
-import { UIInputLabel } from '../../ui-new/form/ui-input-label';
-import { LinkWithIcon } from '../../ui/link-with-icon/link-with-icon';
+import { UIInputLabel } from '../../ui/form/ui-input-label';
+import { UILinkWithIcon } from '../../ui/link-with-icon/ui-link-with-icon';
 
 export const SettingsAboutLeft: React.FC = () => {
     const { t } = useTranslate();
@@ -12,9 +12,9 @@ export const SettingsAboutLeft: React.FC = () => {
         <Card>
             <SimpleGrid cols={2}>
                 <UIInputLabel leftSection={<CodeXmlIcon />} label='Source code' />
-                <LinkWithIcon href='https://github.com/Chnapy/PKVault' target='__blank'>
+                <UILinkWithIcon href='https://github.com/Chnapy/PKVault' target='__blank'>
                     GitHub repository
-                </LinkWithIcon>
+                </UILinkWithIcon>
 
                 <UIInputLabel leftSection={<CircleUserRoundIcon />} label='Author' />
                 <Group>
@@ -28,13 +28,13 @@ export const SettingsAboutLeft: React.FC = () => {
 
                 <UIInputLabel leftSection={<CopyrightIcon />} label='Licenses' />
                 <Group>
-                    <LinkWithIcon href='https://github.com/Chnapy/PKVault/blob/main/LICENSE' target='__blank'>
+                    <UILinkWithIcon href='https://github.com/Chnapy/PKVault/blob/main/LICENSE' target='__blank'>
                         GPLv3
-                    </LinkWithIcon>
+                    </UILinkWithIcon>
                     -
-                    <LinkWithIcon href='https://github.com/Chnapy/PKVault/blob/main/README.md#licenses' target='__blank'>
+                    <UILinkWithIcon href='https://github.com/Chnapy/PKVault/blob/main/README.md#licenses' target='__blank'>
                         3rd-party
-                    </LinkWithIcon>
+                    </UILinkWithIcon>
                 </Group>
             </SimpleGrid>
         </Card>
@@ -43,12 +43,12 @@ export const SettingsAboutLeft: React.FC = () => {
             <SimpleGrid cols={2}>
                 <UIInputLabel leftSection={<MessagesSquareIcon />} label='Feedback & bug report' align='flex-start' />
                 <Stack gap='sm'>
-                    <LinkWithIcon href='https://github.com/Chnapy/PKVault/issues' target='__blank'>
+                    <UILinkWithIcon href='https://github.com/Chnapy/PKVault/issues' target='__blank'>
                         GitHub issues
-                    </LinkWithIcon>
-                    <LinkWithIcon href='https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app' target='__blank'>
+                    </UILinkWithIcon>
+                    <UILinkWithIcon href='https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app' target='__blank'>
                         Project Pokemon discussion
-                    </LinkWithIcon>
+                    </UILinkWithIcon>
                 </Stack>
             </SimpleGrid>
 

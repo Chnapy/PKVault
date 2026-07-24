@@ -1,7 +1,7 @@
 import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
-import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui-new/form/select/ui-segmented-control';
-import { UIAlphaIcon } from '../../../ui-new/icon/ui-alpha-icon';
+import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui/form/select/ui-segmented-control';
+import { UIAlphaIcon } from '../../../ui/icon/ui-alpha-icon';
 import { switchUtil } from '../../../util/switch-util';
 
 export const FilterAlpha: React.FC = () => {

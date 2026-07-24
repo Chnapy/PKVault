@@ -1,7 +1,7 @@
 import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
-import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui-new/form/select/ui-segmented-control';
-import { UIShinyIcon } from '../../../ui-new/icon/ui-shiny-icon';
+import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui/form/select/ui-segmented-control';
+import { UIShinyIcon } from '../../../ui/icon/ui-shiny-icon';
 import { switchUtil } from '../../../util/switch-util';
 
 export const FilterOwnedShiny: React.FC = () => {

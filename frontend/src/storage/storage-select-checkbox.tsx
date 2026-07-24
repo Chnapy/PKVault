@@ -4,7 +4,7 @@ import React from 'react';
 import { getCachedPkmIndex } from '../data/hooks/use-pkm-index';
 import { getCachedPkmSaveIndex } from '../data/hooks/use-pkm-save-index';
 import { getCachedPkmVariantIndex } from '../data/hooks/use-pkm-variant-index';
-import { useSelectContext, useSelectContextActions } from '../ui-new/interaction/select/context/use-select-context';
+import { useSelectContext, useSelectContextActions } from '../ui/interaction/select/context/use-select-context';
 import { filterIsDefined } from '../util/filter-is-defined';
 import type { MoveContainerValue } from './move/move-container-fns';
 

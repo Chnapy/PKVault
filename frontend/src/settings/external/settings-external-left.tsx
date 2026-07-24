@@ -1,7 +1,7 @@
 import { Card, SimpleGrid } from '@mantine/core';
 import { ExternalLinkIcon, FolderTreeIcon, ShieldCheckIcon } from 'lucide-react';
 import type React from "react";
-import { UIInputLabel } from '../../ui-new/form/ui-input-label';
+import { UIInputLabel } from '../../ui/form/ui-input-label';
 
 export const SettingsExternalLeft: React.FC = () => {
     // const { t } = useTranslate();

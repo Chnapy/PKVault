@@ -6,12 +6,12 @@ import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import type { PkmSaveDTO } from '../../data/sdk/model';
 import { useStorageEvolvePkms, useStorageMainDeletePkmVariant, useStorageMainPkmDetachSave, useStorageSaveDeletePkms } from '../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../translate/i18n';
-import { UIButton, type UIButtonProps } from '../../ui-new/form/button/ui-button';
-import { useControlsCurrentType } from '../../ui-new/interaction/controls/use-controls-current-type';
-import { useDragging } from '../../ui-new/interaction/move/hooks/use-dragging';
-import { UIPokedexIcons } from '../../ui-new/pokedex/icons/ui-pokedex-icons';
-import { UIConfirmPopover } from '../../ui-new/popover/ui-confirm-popover';
-import { UIPopover } from '../../ui-new/popover/ui-popover';
+import { UIButton, type UIButtonProps } from '../../ui/form/button/ui-button';
+import { useControlsCurrentType } from '../../ui/interaction/controls/use-controls-current-type';
+import { useDragging } from '../../ui/interaction/move/hooks/use-dragging';
+import { UIPokedexIcons } from '../../ui/pokedex/icons/ui-pokedex-icons';
+import { UIConfirmPopover } from '../../ui/popover/ui-confirm-popover';
+import { UIPopover } from '../../ui/popover/ui-popover';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { pick } from '../../util/pick';
 import { useSelectCallback } from '../../util/use-select-callback';
@@ -150,7 +150,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
                     controlLabel='Move attached'
                     onClick={onClickMoveAttached}
                     size='compact-md'
-                    leftSection={<Group gap='sm'>
+                    leftSection={<Group gap='sm' wrap='nowrap'>
                         <MoveIcon />
                         <LinkIcon />
                     </Group>}

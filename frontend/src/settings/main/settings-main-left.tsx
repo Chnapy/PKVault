@@ -5,11 +5,11 @@ import { useFormContext } from 'react-hook-form';
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import type { SettingsFormData } from '../../pages/settings';
 import { useTranslate } from '../../translate/i18n';
-import { UISelect } from '../../ui-new/form/select/ui-select';
-import { UISwitch } from '../../ui-new/form/switch/ui-switch';
-import { UIInputLabel } from '../../ui-new/form/ui-input-label';
-import { UIBallIcon } from '../../ui-new/icon/ui-ball-icon';
-import { UIPathLine } from '../../ui-new/path/ui-path-line';
+import { UISelect } from '../../ui/form/select/ui-select';
+import { UISwitch } from '../../ui/form/switch/ui-switch';
+import { UIInputLabel } from '../../ui/form/ui-input-label';
+import { UIBallIcon } from '../../ui/icon/ui-ball-icon';
+import { UIPathLine } from '../../ui/path/ui-path-line';
 
 export const SettingsMainLeft: React.FC = () => {
     const { t } = useTranslate();

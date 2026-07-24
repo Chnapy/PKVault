@@ -1,10 +1,10 @@
 import { Stack } from '@mantine/core';
 import React from 'react';
 import { Route } from '../../routes/storage';
-import type { PopoverContext } from '../../ui-new/interaction/focus-controls/components/popover/context/popover-context';
-import { useMoveContext } from '../../ui-new/interaction/move/context/use-move-context';
-import { useSelectContextNullable } from '../../ui-new/interaction/select/context/use-select-context';
-import { UIStoragePanelWrapperDetails, type UIStoragePanelWrapperDetailsProps } from '../../ui-new/storage/storage-panel/ui-storage-panel-wrapper-details';
+import type { PopoverContext } from '../../ui/interaction/focus-controls/components/popover/context/popover-context';
+import { useMoveContext } from '../../ui/interaction/move/context/use-move-context';
+import { useSelectContextNullable } from '../../ui/interaction/select/context/use-select-context';
+import { UIStoragePanelWrapperDetails, type UIStoragePanelWrapperDetailsProps } from '../../ui/storage/storage-panel/ui-storage-panel-wrapper-details';
 import { useStorageSelectExpanded } from '../details/hooks/use-storage-select-expanded';
 import { MultiSelectActions } from '../details/multi-select-actions';
 import { StorageDetails } from '../details/storage-details';

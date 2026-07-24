@@ -70,6 +70,8 @@ ENV VITE_OPENAPI_PATH=$VITE_OPENAPI_PATH
 
 RUN npm run gen:sdk:basic
 
+RUN npm run gen:css:dts
+
 COPY ./docs/functional ./_docs
 
 ENV DOCS_PATH=./_docs

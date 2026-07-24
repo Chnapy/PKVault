@@ -4,9 +4,9 @@ import { withErrorCatcher } from '../error/with-error-catcher';
 import { PokedexMainWrapperDetails } from '../pokedex/details/pokedex-main-wrapper-details';
 import { FiltersCard } from "../pokedex/filters/filters-card";
 import { PokedexList } from "../pokedex/list/pokedex-list";
-import { useSpriteSizeLocalStorage } from '../ui-new/local-storage/use-storage-size-local-storage';
-import { UIPokedexContent } from '../ui-new/pokedex/ui-pokedex-content';
-import { UISpriteSizeWrapper } from '../ui-new/sprite-img/ui-sprite-size-wrapper';
+import { useSpriteSizeLocalStorage } from '../ui/local-storage/use-storage-size-local-storage';
+import { UIPokedexContent } from '../ui/pokedex/ui-pokedex-content';
+import { UISpriteSizeWrapper } from '../ui/sprite-img/ui-sprite-size-wrapper';
 
 export const PokedexPage: React.FC = withErrorCatcher('default', () => {
   const [ speciesSize ] = useSpriteSizeLocalStorage('pokedex-sprite-size');

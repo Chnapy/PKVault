@@ -1,7 +1,7 @@
 import React from 'react';
 import { useStorageDeleteActions, useStorageGetActions, useStorageSave } from '../../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../../error/with-error-catcher';
-import { UIActionsPanel } from '../../ui-new/actions-panel/ui-actions-panel';
+import { UIActionsPanel } from '../../ui/actions-panel/ui-actions-panel';
 import { ActionLabel } from './action-label';
 import { useActionDescription } from './hooks/use-action-description';
 

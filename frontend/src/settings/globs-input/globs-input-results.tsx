@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSettingsGetSaveGlobsResults } from '../../data/sdk/settings/settings.gen';
-import { UIGlobsInputResults } from '../../ui-new/form/globs-input/ui-globs-input-results';
+import { UIGlobsInputResults } from '../../ui/form/globs-input/ui-globs-input-results';
 
 export type GlobsInputResultsProps = {
     values: string[];

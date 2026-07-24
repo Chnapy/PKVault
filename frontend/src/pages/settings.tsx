@@ -15,8 +15,8 @@ import { SettingsExternalRight } from '../settings/external/settings-external-ri
 import { SettingsMainLeft } from '../settings/main/settings-main-left';
 import { SettingsMainRight } from '../settings/main/settings-main-right';
 import { useTranslate } from '../translate/i18n';
-import { UIButton } from '../ui-new/form/button/ui-button';
-import { UISettingsContent } from '../ui-new/settings/ui-settings-content';
+import { UIButton } from '../ui/form/button/ui-button';
+import { UISettingsContent } from '../ui/settings/ui-settings-content';
 import { switchUtil } from '../util/switch-util';
 
 export type SettingsFormData = Omit<SettingsMutableDTO, 'savE_GLOBS' | 'pkM_EXTERNAL_GLOBS'> & {

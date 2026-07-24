@@ -4,7 +4,7 @@ import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { getStorageGetMainBanksQueryKey, useStorageGetMainBanks, useStorageUpdateMainBank, type storageGetMainBanksResponseSuccess } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route, type StorageSearchStorage } from '../../routes/storage';
-import { UIBankEdit } from '../../ui-new/bank/ui-bank-edit';
+import { UIBankEdit } from '../../ui/bank/ui-bank-edit';
 import { BankContext } from './bank-context';
 import { StorageBankView } from './util/storages-bank-view';
 

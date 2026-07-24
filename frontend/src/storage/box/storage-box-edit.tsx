@@ -8,7 +8,7 @@ import {
     useStorageUpdateMainBox,
     type storageGetBoxesResponseSuccess
 } from '../../data/sdk/storage/storage.gen';
-import { UIBoxEdit } from '../../ui-new/storage/storage-panel/box-list/ui-box-edit';
+import { UIBoxEdit } from '../../ui/storage/storage-panel/box-list/ui-box-edit';
 import { BankContext } from '../bank/bank-context';
 
 const queryKeys = [

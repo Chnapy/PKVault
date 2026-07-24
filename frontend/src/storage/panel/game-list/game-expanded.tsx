@@ -6,7 +6,7 @@ import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen'
 import { getEntityContextGenerationName } from '../../../data/util/get-entity-context-generation-name';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { SaveItemEdit } from '../../../saves/save-item/save-item-edit';
-import { UIGameExpanded, type UIGameExpandedProps } from '../../../ui-new/storage/storage-panel/game-list/ui-game-expanded';
+import { UIGameExpanded, type UIGameExpandedProps } from '../../../ui/storage/storage-panel/game-list/ui-game-expanded';
 
 export type GameExpandedProps = Pick<UIGameExpandedProps, 'id' | 'label' | 'imgSrc' | 'selected' | 'onSelect' | 'actions'>;
 

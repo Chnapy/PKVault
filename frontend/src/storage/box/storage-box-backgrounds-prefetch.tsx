@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useStorageGetBoxes } from '../../data/sdk/storage/storage.gen';
-import { ImgPrefetch } from '../../ui/icon/img-prefetch';
+import { ImgPrefetch } from '../../ui/icon/resources/img-prefetch';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { getBoxBackgroundUrl } from './util/get-box-background-url';
 

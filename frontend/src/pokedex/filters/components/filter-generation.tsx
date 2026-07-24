@@ -2,7 +2,7 @@ import React, { startTransition } from "react";
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
-import { UIMultiSelect } from '../../../ui-new/form/select/ui-multi-select';
+import { UIMultiSelect } from '../../../ui/form/select/ui-multi-select';
 
 export const FilterGeneration: React.FC = () => {
   const { t } = useTranslate();

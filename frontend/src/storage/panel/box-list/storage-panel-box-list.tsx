@@ -2,7 +2,7 @@ import { Tabs, Text } from '@mantine/core';
 import React from 'react';
 import { useStorageCreateMainBox } from '../../../data/sdk/storage/storage.gen';
 import { Route } from '../../../routes/storage';
-import { UIStoragePanelBoxList, type UIBoxData } from '../../../ui-new/storage/storage-panel/box-list/ui-storage-panel-box-list';
+import { UIStoragePanelBoxList, type UIBoxData } from '../../../ui/storage/storage-panel/box-list/ui-storage-panel-box-list';
 import { DexSyncAdvancedAction } from '../../advanced-actions/dex-sync-advanced-action';
 import { SortAdvancedAction } from '../../advanced-actions/sort-advanced-action';
 import { StorageSelectCheckbox } from '../../storage-select-checkbox';

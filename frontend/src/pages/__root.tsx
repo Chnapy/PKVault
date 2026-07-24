@@ -9,10 +9,10 @@ import { WelcomeDialog } from '../help/welcome-dialog';
 import { getGameInfos } from '../pokedex/details/util/get-game-infos';
 import { ActionsPanel } from '../storage/actions/actions-panel';
 import { MoveSelectImplProvider } from '../storage/move/move-select-impl-provider';
-import { UIAppLayout } from '../ui-new/layout/app-layout/ui-app-layout';
-import { UIFooter } from '../ui-new/layout/footer/ui-footer';
-import { iconResources } from '../ui/icon/icon-resources';
-import { ImgPrefetch } from '../ui/icon/img-prefetch';
+import { UIAppLayout } from '../ui/layout/app-layout/ui-app-layout';
+import { UIFooter } from '../ui/layout/footer/ui-footer';
+import { iconResources } from '../ui/icon/resources/icon-resources';
+import { ImgPrefetch } from '../ui/icon/resources/img-prefetch';
 
 const versionsImgs = [ ...new Set(Object.values(GameVersion).map(version => getGameInfos(version).img)) ].filter(Boolean);
 

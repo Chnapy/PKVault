@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { useDragSubmitting } from '../../../ui-new/interaction/move/hooks/use-drag-submitting';
+import { useDragSubmitting } from '../../../ui/interaction/move/hooks/use-drag-submitting';
 import { renderHookWithWrapper } from './utils/render-hook-with-wrapper';
 import { containerFns, type MoveContainerValue } from '../move-container-fns';
 

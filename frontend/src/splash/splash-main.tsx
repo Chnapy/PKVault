@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { languages, useTranslate } from '../translate/i18n';
-import { UIButton } from '../ui-new/form/button/ui-button';
+import { UIButton } from '../ui/form/button/ui-button';
 import { UISplash } from '../ui/splash/ui-splash';
 import { UISplashMain } from '../ui/splash/ui-splash-main';
 import { SplashData } from './splash-data';

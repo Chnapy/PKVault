@@ -1,7 +1,7 @@
 import React from "react";
 import { withErrorCatcher } from "../../error/with-error-catcher";
 import { Route } from "../../routes/pokedex";
-import { UIPokedexItem } from '../../ui-new/pokedex/pokedex-item/ui-pokedex-item';
+import { UIPokedexItem } from '../../ui/pokedex/pokedex-item/ui-pokedex-item';
 
 export type PokedexItemProps = {
   species: number;

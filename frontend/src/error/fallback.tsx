@@ -1,7 +1,7 @@
 import { Alert, Anchor, Box, Code, Container, Stack } from '@mantine/core';
 import { AlertTriangleIcon, XIcon } from 'lucide-react';
 import { type FallbackProps } from 'react-error-boundary';
-import { UIActionIcon } from '../ui-new/form/button/ui-action-icon';
+import { UIActionIcon } from '../ui/form/button/ui-action-icon';
 
 export type FallbackExtraProps = {
     className?: string;

@@ -1,8 +1,8 @@
 import { InputWrapper, Stack } from '@mantine/core';
 import type React from "react";
 import { withErrorCatcher } from '../../error/with-error-catcher';
-import type { WithControlsIconsExtraProps } from '../../ui-new/interaction/controls/icons/with-controls-icons';
-import { UIPokedexFilters } from '../../ui-new/pokedex/filters/ui-pokedex-filters';
+import type { WithControlsIconsExtraProps } from '../../ui/interaction/controls/icons/with-controls-icons';
+import { UIPokedexFilters } from '../../ui/pokedex/filters/ui-pokedex-filters';
 import { FilterAlpha } from './components/filter-alpha';
 import { FilterCaught } from "./components/filter-caught";
 import { FilterFromGames } from "./components/filter-from-games";

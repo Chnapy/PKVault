@@ -1,6 +1,6 @@
 import type React from 'react';
 import { Route } from '../routes/settings';
-import { UISettingsCategories } from '../ui-new/settings/categories/ui-settings-categories';
+import { UISettingsCategories } from '../ui/settings/categories/ui-settings-categories';
 
 export const SettingsSubMenu: React.FC = () => {
     const navigate = Route.useNavigate();

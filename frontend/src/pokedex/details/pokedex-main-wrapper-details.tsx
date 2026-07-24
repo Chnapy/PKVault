@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route } from '../../routes/pokedex';
-import type { PopoverContext } from '../../ui-new/interaction/focus-controls/components/popover/context/popover-context';
-import { UIPokedexMainWrapperDetails, type UIPokedexMainWrapperDetailsProps } from '../../ui-new/pokedex/main/ui-pokedex-main-wrapper-details';
+import type { PopoverContext } from '../../ui/interaction/focus-controls/components/popover/context/popover-context';
+import { UIPokedexMainWrapperDetails, type UIPokedexMainWrapperDetailsProps } from '../../ui/pokedex/main/ui-pokedex-main-wrapper-details';
 import { usePokedexSelectExpanded } from './hooks/use-pokedex-select-expanded';
 import { PokedexDetails } from './pokedex-details';
 

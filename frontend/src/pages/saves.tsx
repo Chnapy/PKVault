@@ -11,8 +11,8 @@ import { Route } from '../routes/saves';
 import { useDesktopMessage } from '../settings/globs-input/hooks/use-desktop-message';
 import { GameExpanded } from '../storage/panel/game-list/game-expanded';
 import { useTranslate } from '../translate/i18n';
-import { UIActionIcon } from '../ui-new/form/button/ui-action-icon';
-import { UISavesContent } from '../ui-new/saves/ui-saves-content';
+import { UIActionIcon } from '../ui/form/button/ui-action-icon';
+import { UISavesContent } from '../ui/saves/ui-saves-content';
 import { filterIsDefined } from '../util/filter-is-defined';
 
 export const SavesPage: React.FC = withErrorCatcher('default', () => {

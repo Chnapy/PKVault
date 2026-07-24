@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useStorageCreateMainBank, useStorageGetMainBanks } from '../../data/sdk/storage/storage.gen';
-import { UIBankList, type UIBankTabData } from '../../ui-new/bank/ui-bank-list';
+import { UIBankList, type UIBankTabData } from '../../ui/bank/ui-bank-list';
 import { BankContext } from './bank-context';
 import type { MoveContainerValue } from '../move/move-container-fns';
 import { BankExpanded } from './bank-expanded';

@@ -9,10 +9,10 @@ import { NotificationButton } from '../notification/notification-button';
 import { SettingsSubMenu } from '../settings/settings-sub-menu';
 import { BankList } from '../storage/bank/bank-list';
 import { useTranslate } from '../translate/i18n';
-import { UIButton } from '../ui-new/form/button/ui-button';
-import { UISpriteSizingButton } from '../ui-new/layout/header/sub-header/ui-sprite-sizing-button';
-import { UIHeader } from '../ui-new/layout/header/ui-header';
-import { UIHeaderItem } from '../ui-new/layout/header/ui-header-item';
+import { UIButton } from '../ui/form/button/ui-button';
+import { UISpriteSizingButton } from '../ui/layout/header/sub-header/ui-sprite-sizing-button';
+import { UIHeader } from '../ui/layout/header/ui-header';
+import { UIHeaderItem } from '../ui/layout/header/ui-header-item';
 import { switchUtil } from '../util/switch-util';
 
 type RemoveFirstChar<V extends string> = V extends `${string}${infer Rest}` ? Rest : '';

@@ -1,9 +1,9 @@
 import { CircleOff } from 'lucide-react';
 import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
-import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui-new/form/select/ui-segmented-control';
-import { UIBallIcon } from '../../../ui-new/icon/ui-ball-icon';
-import { UIPokedexIcons } from '../../../ui-new/pokedex/icons/ui-pokedex-icons';
+import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui/form/select/ui-segmented-control';
+import { UIBallIcon } from '../../../ui/icon/ui-ball-icon';
+import { UIPokedexIcons } from '../../../ui/pokedex/icons/ui-pokedex-icons';
 import { switchUtil } from '../../../util/switch-util';
 
 export const FilterCaught: React.FC = () => {

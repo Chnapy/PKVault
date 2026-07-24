@@ -3,11 +3,11 @@ import { useLocalStorage } from '@mantine/hooks';
 import { InfoIcon } from 'lucide-react';
 import type React from 'react';
 import { useTranslate } from '../translate/i18n';
-import { UIButton } from '../ui-new/form/button/ui-button';
-import { useControls } from '../ui-new/interaction/controls/use-controls';
-import { getBackControl } from '../ui-new/interaction/focus-controls/common-controls/back-controls';
-import { FocusScope } from '../ui-new/interaction/focus/scope/focus-scope';
-import { useFocusScopeContext } from '../ui-new/interaction/focus/scope/use-focus-scope-context';
+import { UIButton } from '../ui/form/button/ui-button';
+import { useControls } from '../ui/interaction/controls/use-controls';
+import { getBackControl } from '../ui/interaction/focus-controls/common-controls/back-controls';
+import { FocusScope } from '../ui/interaction/focus/scope/focus-scope';
+import { useFocusScopeContext } from '../ui/interaction/focus/scope/use-focus-scope-context';
 import { HelpDialogContent } from './help-dialog-content';
 import { useHelpMenuItems } from './hooks/use-help-menu-items';
 

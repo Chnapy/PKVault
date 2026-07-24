@@ -3,7 +3,7 @@ import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen'
 import { useStaticData } from '../../../hooks/use-static-data';
 import { getGameInfos } from '../../../pokedex/details/util/get-game-infos';
 import { Route } from '../../../routes/storage';
-import { UIStoragePanelGameList, type UIGameData } from '../../../ui-new/storage/storage-panel/game-list/ui-storage-panel-game-list';
+import { UIStoragePanelGameList, type UIGameData } from '../../../ui/storage/storage-panel/game-list/ui-storage-panel-game-list';
 import { filterIsDefined } from '../../../util/filter-is-defined';
 import { useFilteredBoxes } from '../hooks/use-filtered-boxes';
 import { useCurrentStorage, useOtherStorage } from '../storage-panel-context';

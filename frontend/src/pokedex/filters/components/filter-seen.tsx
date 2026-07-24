@@ -1,8 +1,8 @@
 import { EyeOffIcon } from 'lucide-react';
 import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
-import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui-new/form/select/ui-segmented-control';
-import { UIPokedexIcons } from '../../../ui-new/pokedex/icons/ui-pokedex-icons';
+import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui/form/select/ui-segmented-control';
+import { UIPokedexIcons } from '../../../ui/pokedex/icons/ui-pokedex-icons';
 import { switchUtil } from '../../../util/switch-util';
 
 export const FilterSeen: React.FC = () => {

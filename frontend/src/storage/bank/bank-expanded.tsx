@@ -1,8 +1,8 @@
 import type React from 'react';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import { useStorageDeleteMainBank, useStorageGetBoxes, useStorageGetMainBanks } from '../../data/sdk/storage/storage.gen';
-import { UIBankExpanded, type UIBankExpandedProps } from '../../ui-new/bank/ui-bank-expanded';
-import type { UIBankTabData } from '../../ui-new/bank/ui-bank-list';
+import { UIBankExpanded, type UIBankExpandedProps } from '../../ui/bank/ui-bank-expanded';
+import type { UIBankTabData } from '../../ui/bank/ui-bank-list';
 import { BankEdit } from './bank-edit';
 import type { MoveContainerValue } from '../move/move-container-fns';
 

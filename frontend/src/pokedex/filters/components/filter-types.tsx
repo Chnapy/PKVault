@@ -4,8 +4,8 @@ import React, { startTransition } from "react";
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
-import { UIMultiSelect } from '../../../ui-new/form/select/ui-multi-select';
-import { getTypeImg } from '../../../ui-new/type-item/util/get-type-img';
+import { UIMultiSelect } from '../../../ui/form/select/ui-multi-select';
+import { getTypeImg } from '../../../ui/type-item/util/get-type-img';
 
 export const FilterTypes: React.FC = () => {
   const { t } = useTranslate();

@@ -4,11 +4,11 @@ import { HistoryContext } from '../../context/history-context';
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { Gender, type PkmBaseDTO } from '../../data/sdk/model';
 import { Route } from '../../routes';
-import { UISpeciesImgSkeleton } from '../../ui-new/sprite-img/species-img/ui-species-img-skeleton';
-import { UISpriteSizeWrapper } from '../../ui-new/sprite-img/ui-sprite-size-wrapper';
-import { UIDetailsLevel } from '../../ui-new/storage/storage-details/ui-details-level';
-import { UIStorageItemBase, type UIStorageItemBaseProps } from '../../ui-new/storage/storage-item/base/ui-storage-item-base';
-import { SpeciesImg } from '../../ui/img/species-img';
+import { UISpeciesImgSkeleton } from '../../ui/sprite-img/species-img/ui-species-img-skeleton';
+import { UISpriteSizeWrapper } from '../../ui/sprite-img/ui-sprite-size-wrapper';
+import { UIDetailsLevel } from '../../ui/storage/storage-details/ui-details-level';
+import { UIStorageItemBase, type UIStorageItemBaseProps } from '../../ui/storage/storage-item/base/ui-storage-item-base';
+import { SpeciesImg } from '../../img/species-img';
 
 export type PokedexDetailsOwnedProps = {
     saveId: number | null;

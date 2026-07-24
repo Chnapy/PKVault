@@ -1,8 +1,8 @@
 import React from 'react';
 import { useStorageGetBoxes } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
-import type { PopoverTargetChildProps } from '../../ui-new/popover/target-open-popover';
-import { UIStoragePanel } from '../../ui-new/storage/storage-panel/ui-storage-panel';
+import type { PopoverTargetChildProps } from '../../ui/popover/target-open-popover';
+import { UIStoragePanel } from '../../ui/storage/storage-panel/ui-storage-panel';
 import { StorageBoxBackgroundsPrefetch } from '../box/storage-box-backgrounds-prefetch';
 import { getBoxBackgroundUrl } from '../box/util/get-box-background-url';
 import { StoragePanelBoxList } from './box-list/storage-panel-box-list';

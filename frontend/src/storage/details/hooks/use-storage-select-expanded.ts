@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route } from '../../../routes/storage';
-import { useControlsCurrentType } from '../../../ui-new/interaction/controls/use-controls-current-type';
+import { useControlsCurrentType } from '../../../ui/interaction/controls/use-controls-current-type';
 
 export const useStorageSelectExpanded = () => {
     const controlsGamepad = useControlsCurrentType() === 'gamepad';

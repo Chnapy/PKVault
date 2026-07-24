@@ -8,10 +8,10 @@ import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageSortPkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { useTranslate } from '../../translate/i18n';
-import { UISelect } from '../../ui-new/form/select/ui-select';
-import { UISwitch } from '../../ui-new/form/switch/ui-switch';
-import { usePopover } from '../../ui-new/interaction/focus-controls/components/popover/hooks/use-popover';
-import { UIFormCard } from '../../ui-new/popover/popover-card/ui-form-card';
+import { UISelect } from '../../ui/form/select/ui-select';
+import { UISwitch } from '../../ui/form/switch/ui-switch';
+import { usePopover } from '../../ui/interaction/focus-controls/components/popover/hooks/use-popover';
+import { UIFormCard } from '../../ui/popover/popover-card/ui-form-card';
 import { useFilteredBoxes } from '../panel/hooks/use-filtered-boxes';
 
 export const SortAdvancedAction: React.FC<{

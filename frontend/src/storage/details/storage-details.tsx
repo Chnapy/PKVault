@@ -2,7 +2,7 @@ import React from "react";
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { Route } from '../../routes/storage';
-import { UIStorageDetails } from '../../ui-new/storage/storage-details/ui-storage-details';
+import { UIStorageDetails } from '../../ui/storage/storage-details/ui-storage-details';
 import { useCurrentStorage } from '../panel/storage-panel-context';
 import { DetailsActions } from './details-actions';
 import { DetailsContent } from './details-content';

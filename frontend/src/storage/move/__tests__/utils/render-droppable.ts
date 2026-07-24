@@ -1,6 +1,6 @@
-import { useDragging } from '../../../../ui-new/interaction/move/hooks/use-dragging';
-import { useDroppable } from '../../../../ui-new/interaction/move/hooks/use-droppable';
-import type { MoveSource } from '../../../../ui-new/interaction/move/state/move-state';
+import { useDragging } from '../../../../ui/interaction/move/hooks/use-dragging';
+import { useDroppable } from '../../../../ui/interaction/move/hooks/use-droppable';
+import type { MoveSource } from '../../../../ui/interaction/move/state/move-state';
 import { useDroppableValidation } from '../../hooks/use-droppable-validation';
 import { containerFns, type MoveContainerValue, type MoveParams } from '../../move-container-fns';
 import { renderHookWithWrapper } from '../utils/render-hook-with-wrapper';

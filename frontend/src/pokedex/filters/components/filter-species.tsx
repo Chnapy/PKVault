@@ -4,9 +4,9 @@ import { EntityContext } from '../../../data/sdk/model';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
-import { UIAutocomplete } from '../../../ui-new/form/select/ui-autocomplete';
-import { UISpriteSizeWrapper } from '../../../ui-new/sprite-img/ui-sprite-size-wrapper';
-import { SpeciesImg } from '../../../ui/img/species-img';
+import { UIAutocomplete } from '../../../ui/form/select/ui-autocomplete';
+import { UISpriteSizeWrapper } from '../../../ui/sprite-img/ui-sprite-size-wrapper';
+import { SpeciesImg } from '../../../img/species-img';
 
 export const FilterSpecies: React.FC = () => {
   const { t } = useTranslate();

@@ -2,8 +2,8 @@ import React from 'react';
 import { usePkmVariantIndex } from '../../../data/hooks/use-pkm-variant-index';
 import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
 import { useSettingsGet } from '../../../data/sdk/settings/settings.gen';
-import { type UIGameExpandedProps } from '../../../ui-new/storage/storage-panel/game-list/ui-game-expanded';
-import { UIGamePkvaultExpanded } from '../../../ui-new/storage/storage-panel/game-list/ui-game-pkvault-expanded';
+import { type UIGameExpandedProps } from '../../../ui/storage/storage-panel/game-list/ui-game-expanded';
+import { UIGamePkvaultExpanded } from '../../../ui/storage/storage-panel/game-list/ui-game-pkvault-expanded';
 
 export type GamePkvaultExpandedProps = Pick<UIGameExpandedProps, 'label' | 'imgSrc' | 'selected' | 'onSelect'>;
 

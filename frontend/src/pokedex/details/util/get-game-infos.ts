@@ -46,7 +46,7 @@ import xImg from '../../../assets/game_icons/x.png';
 import xdImg from '../../../assets/game_icons/xd.png';
 import yImg from '../../../assets/game_icons/y.png';
 import yellowImg from '../../../assets/game_icons/yellow.png';
-import { baseTheme } from '../../../ui-new/base-theme';
+import { baseTheme } from '../../../ui/base-theme';
 
 export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = true): {
   img: string;

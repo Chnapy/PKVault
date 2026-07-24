@@ -4,8 +4,8 @@ import React, { startTransition } from "react";
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
-import { UIMultiSelect } from '../../../ui-new/form/select/ui-multi-select';
-import { UIGameImg } from '../../../ui-new/sprite-img/ui-game-img';
+import { UIMultiSelect } from '../../../ui/form/select/ui-multi-select';
+import { UIGameImg } from '../../../ui/sprite-img/ui-game-img';
 import { filterIsDefined } from '../../../util/filter-is-defined';
 
 export const FilterFromGames: React.FC = () => {

@@ -7,10 +7,10 @@ import { useSaveInfosGetAll } from "../../data/sdk/save-infos/save-infos.gen";
 import { useStorageDexSync } from "../../data/sdk/storage/storage.gen";
 import { useStaticData } from "../../hooks/use-static-data";
 import { useTranslate } from "../../translate/i18n";
-import { UIMultiSelect } from '../../ui-new/form/select/ui-multi-select';
-import { usePopover } from '../../ui-new/interaction/focus-controls/components/popover/hooks/use-popover';
-import { UIFormCard } from '../../ui-new/popover/popover-card/ui-form-card';
-import { UIGameImg } from '../../ui-new/sprite-img/ui-game-img';
+import { UIMultiSelect } from '../../ui/form/select/ui-multi-select';
+import { usePopover } from '../../ui/interaction/focus-controls/components/popover/hooks/use-popover';
+import { UIFormCard } from '../../ui/popover/popover-card/ui-form-card';
+import { UIGameImg } from '../../ui/sprite-img/ui-game-img';
 
 export const DexSyncAdvancedAction: React.FC<{
   saveId: number;

@@ -3,10 +3,10 @@ import { createMemoryHistory, createRootRoute, createRouter, Outlet, RouterConte
 import { waitFor } from '@testing-library/dom';
 import { renderHook } from '@testing-library/react';
 import { expect } from 'vitest';
-import { useMoveContext } from '../../../../ui-new/interaction/move/context/use-move-context';
-import type { MoveState } from '../../../../ui-new/interaction/move/state/move-state';
-import type { SelectContext } from '../../../../ui-new/interaction/select/context/select-context';
-import { useSelectContextNullable } from '../../../../ui-new/interaction/select/context/use-select-context';
+import { useMoveContext } from '../../../../ui/interaction/move/context/use-move-context';
+import type { MoveState } from '../../../../ui/interaction/move/state/move-state';
+import type { SelectContext } from '../../../../ui/interaction/select/context/select-context';
+import { useSelectContextNullable } from '../../../../ui/interaction/select/context/use-select-context';
 import type { MoveContainerValue, MoveParams } from '../../move-container-fns';
 import { MoveSelectImplProvider, type MoveSelectImplProviderProps } from '../../move-select-impl-provider';
 

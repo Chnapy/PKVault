@@ -6,7 +6,7 @@ import { getPkmVariantIndexOptions } from '../../../data/hooks/use-pkm-variant-i
 import { getSaveInfosGetAllQueryOptions } from '../../../data/sdk/save-infos/save-infos.gen';
 import { getStorageGetBoxesQueryOptions, getStorageGetMainBanksQueryOptions, type storageGetBoxesResponseSuccess, type storageGetMainBanksResponseSuccess } from '../../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../../translate/i18n';
-import type { DraggingSlotsStates, MoveSource, SlotsStates } from '../../../ui-new/interaction/move/state/move-state';
+import type { DraggingSlotsStates, MoveSource, SlotsStates } from '../../../ui/interaction/move/state/move-state';
 import { filterIsDefined } from '../../../util/filter-is-defined';
 import { BankContext } from '../../bank/bank-context';
 import { getFinalBox } from '../../panel/hooks/utils/get-final-box';

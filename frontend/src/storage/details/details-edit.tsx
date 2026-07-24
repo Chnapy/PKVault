@@ -4,10 +4,10 @@ import type { EditPkmVariantPayload } from '../../data/sdk/model';
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { useStorageGetPkmAvailableMoves, useStorageMainEditPkmVariant, useStorageSaveEditPkm } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
-import { UIDetailsContentMoveTable } from '../../ui-new/storage/storage-details/content/moves/ui-details-content-moves-table';
-import { UIDetailsEdit } from '../../ui-new/storage/storage-details/edit/ui-details-edit';
-import { useStaticMove } from '../../ui/move-item/hooks/use-static-move';
-import { MoveItem } from '../../ui/move-item/move-item';
+import { UIDetailsContentMoveTable } from '../../ui/storage/storage-details/content/moves/ui-details-content-moves-table';
+import { UIDetailsEdit } from '../../ui/storage/storage-details/edit/ui-details-edit';
+import { useStaticMove } from './move-item/hooks/use-static-move';
+import { MoveItem } from './move-item/move-item';
 import { pick } from '../../util/pick';
 import { useSelectCallback } from '../../util/use-select-callback';
 

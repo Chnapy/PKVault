@@ -5,12 +5,12 @@ import { usePkmLegality } from '../../data/hooks/use-pkm-legality';
 import { Gender } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
-import { UIMarkingList } from '../../ui-new/storage/storage-details/marking/ui-marking-list';
-import { UIDetailsMain } from '../../ui-new/storage/storage-details/ui-details-main';
-import { BallImg } from '../../ui/img/ball-img';
-import { ItemImg } from '../../ui/img/item-img';
-import { SpeciesImg } from '../../ui/img/species-img';
-import { TypeItem } from '../../ui/type-item/type-item';
+import { UIMarkingList } from '../../ui/storage/storage-details/marking/ui-marking-list';
+import { UIDetailsMain } from '../../ui/storage/storage-details/ui-details-main';
+import { BallImg } from '../../img/ball-img';
+import { ItemImg } from '../../img/item-img';
+import { SpeciesImg } from '../../img/species-img';
+import { TypeItem } from './type-item/type-item';
 import { useCurrentStorage } from '../panel/storage-panel-context';
 import { DetailsAttachedButton } from './details-attached-button';
 

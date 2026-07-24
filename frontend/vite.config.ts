@@ -8,7 +8,7 @@ import { patchCssModules } from 'vite-css-modules';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import svgr from "vite-plugin-svgr";
 import { prepareDocs } from './src/help/prepare-docs';
-import { prepareCssvar } from './src/ui-new/prepare-cssvar';
+import { prepareCssvar } from './src/ui/prepare-cssvar';
 
 if (process.env.NODE_ENV === 'development') {
   prepareDocs('../docs/functional');

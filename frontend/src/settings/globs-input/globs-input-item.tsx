@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSettingsGetSaveGlobsResults } from '../../data/sdk/settings/settings.gen';
-import { UIGlobsInputItem, type UIGlobsInputItemProps } from '../../ui-new/form/globs-input/ui-globs-input-item';
+import { UIGlobsInputItem, type UIGlobsInputItemProps } from '../../ui/form/globs-input/ui-globs-input-item';
 import { useDesktopMessage } from './hooks/use-desktop-message';
 
 export type GlobsInputItemProps = Pick<UIGlobsInputItemProps, 'name' | 'value' | 'onEdit' | 'onRemove' | 'disabled'> & {

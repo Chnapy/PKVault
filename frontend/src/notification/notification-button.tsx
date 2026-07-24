@@ -4,9 +4,9 @@ import React from 'react';
 import { BackendErrorsContext } from '../data/backend-errors-context';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
 import { useTranslate } from '../translate/i18n';
-import { UIActionIcon } from '../ui-new/form/button/ui-action-icon';
-import type { PopoverContext } from '../ui-new/interaction/focus-controls/components/popover/context/popover-context';
-import { PopoverWithControls } from '../ui-new/interaction/focus-controls/components/popover/popover-with-controls';
+import { UIActionIcon } from '../ui/form/button/ui-action-icon';
+import type { PopoverContext } from '../ui/interaction/focus-controls/components/popover/context/popover-context';
+import { PopoverWithControls } from '../ui/interaction/focus-controls/components/popover/popover-with-controls';
 import { useCheckUpdate } from './hooks/use-check-update';
 import { NotificationCardManager } from './notification-card-manager';
 

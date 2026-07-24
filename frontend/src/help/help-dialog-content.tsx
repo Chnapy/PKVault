@@ -1,7 +1,7 @@
 import { Skeleton } from '@mantine/core';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { UIMarkdownRenderer, type UIMarkdownRendererProps } from '../ui-new/markdown-renderer/ui-markdown-renderer';
+import { UIMarkdownRenderer, type UIMarkdownRendererProps } from '../ui/markdown-renderer/ui-markdown-renderer';
 import { useHelpAnchorScroll } from './hooks/use-help-anchor-scroll';
 
 type HelpDialogContentProps = Pick<UIMarkdownRendererProps, 'titleReduce'> & {

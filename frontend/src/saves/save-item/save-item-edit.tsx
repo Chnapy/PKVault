@@ -7,10 +7,10 @@ import { useSettingsEdit, useSettingsGet } from '../../data/sdk/settings/setting
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { useTranslate } from '../../translate/i18n';
-import { UIButton } from '../../ui-new/form/button/ui-button';
-import { usePopover } from '../../ui-new/interaction/focus-controls/components/popover/hooks/use-popover';
-import { UIPopoverCard } from '../../ui-new/popover/popover-card/ui-popover-card';
-import { UIGameImg } from '../../ui-new/sprite-img/ui-game-img';
+import { UIButton } from '../../ui/form/button/ui-button';
+import { usePopover } from '../../ui/interaction/focus-controls/components/popover/hooks/use-popover';
+import { UIPopoverCard } from '../../ui/popover/popover-card/ui-popover-card';
+import { UIGameImg } from '../../ui/sprite-img/ui-game-img';
 
 export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
     const { t } = useTranslate();

@@ -1,9 +1,9 @@
 import { NavLink, Text } from '@mantine/core';
 import type React from 'react';
 import { Route } from '../routes/__root';
-import { WithControlsIcons } from '../ui-new/interaction/controls/icons/with-controls-icons';
-import { getSelectControl } from '../ui-new/interaction/focus-controls/common-controls/select-controls';
-import { useFocusControls } from '../ui-new/interaction/focus-controls/use-focus-controls';
+import { WithControlsIcons } from '../ui/interaction/controls/icons/with-controls-icons';
+import { getSelectControl } from '../ui/interaction/focus-controls/common-controls/select-controls';
+import { useFocusControls } from '../ui/interaction/focus-controls/use-focus-controls';
 
 type HelpDialogMenuItemProps = {
     endPath: string;

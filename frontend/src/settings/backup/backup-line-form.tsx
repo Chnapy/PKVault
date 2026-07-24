@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useBackupEdit } from '../../data/sdk/backup/backup.gen';
 import type { BackupDTO } from '../../data/sdk/model';
-import { UITextInput } from '../../ui-new/form/text-input/ui-text-input';
+import { UITextInput } from '../../ui/form/text-input/ui-text-input';
 
 type BackupLineFormProps = Pick<BackupDTO, 'createdAt' | 'name'>;
 

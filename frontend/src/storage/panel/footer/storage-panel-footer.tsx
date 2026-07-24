@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePkmIndex } from '../../../data/hooks/use-pkm-index';
-import { UIStoragePanelFooter } from '../../../ui-new/storage/storage-panel/ui-storage-panel-footer';
+import { UIStoragePanelFooter } from '../../../ui/storage/storage-panel/ui-storage-panel-footer';
 import { useCurrentStorageWithFallback } from '../hooks/use-current-storage-with-fallback';
 
 export const StoragePanelFooter: React.FC = () => {

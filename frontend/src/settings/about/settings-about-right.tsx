@@ -5,10 +5,10 @@ import type React from "react";
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { getReleaseVersionState } from '../../notification/hooks/use-check-update';
 import { useTranslate } from '../../translate/i18n';
-import { UIButton } from '../../ui-new/form/button/ui-button';
-import { UIMarkdownRenderer } from '../../ui-new/markdown-renderer/ui-markdown-renderer';
-import { UICardSectionControl } from '../../ui-new/storage/storage-panel/card-section-control/ui-card-section-control';
-import { renderDate } from '../../ui/util/render-date-time';
+import { UIButton } from '../../ui/form/button/ui-button';
+import { UIMarkdownRenderer } from '../../ui/markdown-renderer/ui-markdown-renderer';
+import { UICardSectionControl } from '../../ui/storage/storage-panel/card-section-control/ui-card-section-control';
+import { renderDate } from '../../util/render-date-time';
 import { switchUtil } from '../../util/switch-util';
 
 export const SettingsAboutRight: React.FC = () => {

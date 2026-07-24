@@ -1,8 +1,8 @@
 import type { Preview, StoryContext } from '@storybook/react-vite';
 import { createMemoryHistory, createRootRoute, createRoute, createRouter, RouteComponent, RouterProvider } from '@tanstack/react-router';
-import { AppTheme } from '../src/ui-new/app-theme';
-import { FocusControlsProvider } from '../src/ui-new/interaction/focus-controls/provider/focus-controls-provider';
-import { initFocus } from '../src/ui-new/interaction/focus/init-focus';
+import { AppTheme } from '../src/ui/app-theme';
+import { FocusControlsProvider } from '../src/ui/interaction/focus-controls/provider/focus-controls-provider';
+import { initFocus } from '../src/ui/interaction/focus/init-focus';
 
 initFocus();
 

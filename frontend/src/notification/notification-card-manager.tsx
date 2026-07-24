@@ -3,7 +3,7 @@ import { InfoIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 import { BackendErrorsContext } from '../data/backend-errors-context';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
-import { NotificationCard } from '../ui/notification-card/notification-card';
+import { UINotificationCard } from '../ui/notification-card/ui-notification-card';
 import { useCheckUpdate } from './hooks/use-check-update';
 import { HasUpdateWarning } from './warnings/has-update-warning';
 import { PkmVariantWarning } from './warnings/pkm-variant-warning';
@@ -16,7 +16,7 @@ export const NotificationCardManager: React.FC = () => {
     const hasUpdate = !!useCheckUpdate();
     const warnings = useWarningsGetWarnings().data?.data;
 
-    return <NotificationCard
+    return <UINotificationCard
         warningsCount={warnings?.warningsCount ?? 0}
         errorsCount={errors.length}
         update={hasUpdate && <HasUpdateWarning />}

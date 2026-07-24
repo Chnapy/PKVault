@@ -3,7 +3,7 @@ import { usePkmIndex } from '../../../data/hooks/use-pkm-index';
 import { BoxType } from '../../../data/sdk/model';
 import { useStorageDeleteMainBox } from '../../../data/sdk/storage/storage.gen';
 import { Route } from '../../../routes/storage';
-import { UIBoxExpanded, type UIBoxExpandedProps } from '../../../ui-new/storage/storage-panel/box-list/ui-box-expanded';
+import { UIBoxExpanded, type UIBoxExpandedProps } from '../../../ui/storage/storage-panel/box-list/ui-box-expanded';
 import { useSelectCallback } from '../../../util/use-select-callback';
 import { StorageBoxEdit } from '../../box/storage-box-edit';
 import { useFilteredBoxes } from '../hooks/use-filtered-boxes';

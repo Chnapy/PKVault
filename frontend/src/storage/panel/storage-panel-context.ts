@@ -1,6 +1,6 @@
 import React from 'react';
 import type { StorageSearchSelected, StorageSearchStorage } from '../../routes/storage';
-import { usePanel } from '../../ui-new/storage/storage-content/context/ui-panel-context';
+import { usePanel } from '../../ui/storage/storage-content/context/ui-panel-context';
 
 const defaultMainStorage: StorageSearchStorage = { saveId: null };
 
@@ -28,7 +28,7 @@ export const useCurrentStorage = (fallbackPanel?: ReturnType<typeof usePanel>) =
         const storage = searchStorages?.[ storageIndex ];
 
         return getStorageForPanel(storage, currentPanel);
-    }, [currentPanel, getStorageForPanel, storageIndex]);
+    }, [ currentPanel, getStorageForPanel, storageIndex ]);
 
     const getSelected = (searchSelected: StorageSearchSelected | undefined) => {
         if (searchSelected?.storage !== storageIndex)
@@ -62,9 +62,9 @@ export const useCurrentStorage = (fallbackPanel?: ReturnType<typeof usePanel>) =
     const setStorage = (searchStorages: StorageSearchStorage[] | undefined, newStorage: Partial<StorageSearchStorage>): StorageSearchStorage[] => {
         const storage = getStorage(searchStorages);
 
-        const newSearchStorages = [ 
-            getStorageForPanel(searchStorages?.[0], 'left'),
-            getStorageForPanel(searchStorages?.[1], 'right'),
+        const newSearchStorages = [
+            getStorageForPanel(searchStorages?.[ 0 ], 'left'),
+            getStorageForPanel(searchStorages?.[ 1 ], 'right'),
         ].filter(v => typeof v !== 'undefined');
 
         const nextStorage = { ...storage, ...newStorage };

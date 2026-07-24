@@ -2,7 +2,7 @@ import { Checkbox, Group } from '@mantine/core';
 import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
-import { UIButton } from '../../../ui-new/form/button/ui-button';
+import { UIButton } from '../../../ui/form/button/ui-button';
 
 export const FilterViews: React.FC = () => {
   const { t } = useTranslate();
