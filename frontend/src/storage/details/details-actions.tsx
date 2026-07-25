@@ -157,7 +157,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
                     rightSection={hasDuplicate && <UIPokedexIcons.Duplicate />}
                     disabled={hasDuplicate}
                 >
-                    {t('storage.actions.move-attached-main')}
+                    {t('storage.actions.move-attached')}
                 </UIButton>
             </Tooltip>}
 

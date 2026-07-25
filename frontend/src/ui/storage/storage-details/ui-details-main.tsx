@@ -12,6 +12,7 @@ import { UIShinyIcon } from '../../icon/ui-shiny-icon';
 import { UIPokedexIcons } from '../../pokedex/icons/ui-pokedex-icons';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import { UIDetailsLevel } from './ui-details-level';
+import { useTranslate } from '../../../translate/i18n';
 
 export type UIDetailsMainProps = {
     saveId?: number;
@@ -46,6 +47,8 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
     types, heldItem, markings, attachedBtn,
     children,
 }) => {
+    const { t } = useTranslate();
+
     return <Stack gap='xs' w={280} maw='100%'>
         {isEnabled && <>
             <Group>
@@ -77,11 +80,11 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
                         } satisfies typeof PokedexRoute[ 'types' ][ 'searchSchemaInput' ];
                     }}
                     name='pokedex-link'
-                    controlLabel='Go to Pokedex'
+                    controlLabel={t('details.dex.go')}
                     size='compact-xs'
                     mr='auto'
                 >
-                    Pokedex
+                    {t('details.dex')}
                 </UIButton>
 
                 {isAlpha && <UIAlphaIcon size='big' />}
@@ -107,8 +110,8 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
                 {markings}
 
                 {(pokerusDays || isPokerusCured) && <Tooltip label={isPokerusCured
-                    ? 'Pokerus cured'
-                    : `Pokerus infected (${pokerusDays} days)`}
+                    ? t('details.pokerus.cured')
+                    : t('details.pokerus.infected', { days: pokerusDays })}
                 >
                     <UIPokerusIcon
                         cured={isPokerusCured}
@@ -117,13 +120,13 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
                 </Tooltip>}
 
                 <Group justify='flex-end' gap='xs'>
-                    {canEvolve && <Tooltip label='Evolve is possible'>
+                    {canEvolve && <Tooltip label={t('storage.actions.evolve.description')}>
                         <UIPokedexIcons.Evolve size='sm' />
                     </Tooltip>}
-                    {isDuplicate && <Tooltip label='Duplicates are present in save'>
+                    {isDuplicate && <Tooltip label={t('details.duplicate.description')}>
                         <UIPokedexIcons.Duplicate size='sm' />
                     </Tooltip>}
-                    {warning && <Tooltip label='Issues are present'>
+                    {warning && <Tooltip label={t('details.issues.description')}>
                         <UIPokedexIcons.Warn size='sm' />
                     </Tooltip>}
                 </Group>

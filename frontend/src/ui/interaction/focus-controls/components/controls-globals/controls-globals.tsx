@@ -1,4 +1,5 @@
 import type React from 'react';
+import { useTranslate } from '../../../../../translate/i18n';
 import { useControls } from '../../../controls/use-controls';
 import { Focus } from '../../../focus/provider/use-focus-context';
 import { getBackControl } from '../../common-controls/back-controls';
@@ -6,6 +7,8 @@ import { getMoveControl } from '../../common-controls/move-controls';
 import { getScrollControl } from '../../common-controls/scroll-controls';
 
 export const ControlsGlobals: React.FC = () => {
+    const { t } = useTranslate();
+
     const { popScope } = Focus.usePushPopScope();
 
     useControls(
@@ -14,13 +17,13 @@ export const ControlsGlobals: React.FC = () => {
         0,
         [
             getMoveControl({
-                label: 'Navigate',
+                label: t('action.navigate'),
             }),
             getScrollControl({
-                label: 'Scroll',
+                label: t('action.scroll'),
             }),
             getBackControl({
-                label: 'Back',
+                label: t('action.back'),
                 action: () => popScope(),
             }),
         ],

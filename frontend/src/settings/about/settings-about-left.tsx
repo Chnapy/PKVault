@@ -11,12 +11,12 @@ export const SettingsAboutLeft: React.FC = () => {
     return <>
         <Card>
             <SimpleGrid cols={2}>
-                <UIInputLabel leftSection={<CodeXmlIcon />} label='Source code' />
+                <UIInputLabel leftSection={<CodeXmlIcon />} label={t('settings.about.1.label')} />
                 <UILinkWithIcon href='https://github.com/Chnapy/PKVault' target='__blank'>
-                    GitHub repository
+                    {t('settings.about.1.description')}
                 </UILinkWithIcon>
 
-                <UIInputLabel leftSection={<CircleUserRoundIcon />} label='Author' />
+                <UIInputLabel leftSection={<CircleUserRoundIcon />} label={t('settings.about.2.label')} />
                 <Group>
                     <Anchor href='https://github.com/Chnapy' target='__blank'>
                         <Group component='span' gap='sm'>
@@ -26,14 +26,14 @@ export const SettingsAboutLeft: React.FC = () => {
                     </Anchor>
                 </Group>
 
-                <UIInputLabel leftSection={<CopyrightIcon />} label='Licenses' />
+                <UIInputLabel leftSection={<CopyrightIcon />} label={t('settings.about.3.label')} />
                 <Group>
                     <UILinkWithIcon href='https://github.com/Chnapy/PKVault/blob/main/LICENSE' target='__blank'>
                         GPLv3
                     </UILinkWithIcon>
                     -
                     <UILinkWithIcon href='https://github.com/Chnapy/PKVault/blob/main/README.md#licenses' target='__blank'>
-                        3rd-party
+                        {t('settings.about.3.description')}
                     </UILinkWithIcon>
                 </Group>
             </SimpleGrid>
@@ -41,13 +41,13 @@ export const SettingsAboutLeft: React.FC = () => {
 
         <Card>
             <SimpleGrid cols={2}>
-                <UIInputLabel leftSection={<MessagesSquareIcon />} label='Feedback & bug report' align='flex-start' />
+                <UIInputLabel leftSection={<MessagesSquareIcon />} label={t('settings.about.4.label')} align='flex-start' />
                 <Stack gap='sm'>
                     <UILinkWithIcon href='https://github.com/Chnapy/PKVault/issues' target='__blank'>
-                        GitHub issues
+                        {t('settings.about.4.description.1')}
                     </UILinkWithIcon>
                     <UILinkWithIcon href='https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app' target='__blank'>
-                        Project Pokemon discussion
+                        {t('settings.about.4.description.2')}
                     </UILinkWithIcon>
                 </Stack>
             </SimpleGrid>
@@ -55,9 +55,9 @@ export const SettingsAboutLeft: React.FC = () => {
             <Divider my='md' />
 
             <Text lh='sm'>
-                PKVault is an open-source project.
-                <br />You can contribute by giving feedbacks, bug reports, or with pull requests.
-                <br />Thank you for using PKVault !
+                {t('settings.about.5.description.1')}
+                <br />{t('settings.about.5.description.2')}
+                <br />{t('settings.about.5.description.3')}
             </Text>
         </Card>
     </>;

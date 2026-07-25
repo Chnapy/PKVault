@@ -2,6 +2,7 @@
 import { Button, type ElementProps } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import type React from 'react';
+import { useTranslate } from '../../../../translate/i18n';
 import type { GamepadMappingsAllButton } from '../../../interaction/controls/gamepad/gamepad-mapper';
 import { getControlIcon } from '../../../interaction/controls/icons/get-control-icon';
 import { WithControlsIcons } from '../../../interaction/controls/icons/with-controls-icons';
@@ -18,13 +19,14 @@ type UIDetailsActionProps = {
 } & Button.Props & ElementProps<'button'>;
 
 export const UIDetailsAction: React.FC<UIDetailsActionProps> = ({ name, label, gamepadValue, focusOnMount, onClick, ...rest }) => {
+    const { t } = useTranslate();
 
     const { focusProps, controlOrder, active, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,
         controls: [
             onClick && getSelectControl({
-                label: 'Select',
+                label: t('action.select'),
                 action: onClick,
             }),
         ],

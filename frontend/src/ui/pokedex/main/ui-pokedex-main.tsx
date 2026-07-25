@@ -5,12 +5,15 @@ import { getSelectControl } from '../../interaction/focus-controls/common-contro
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 import { Focus } from '../../interaction/focus/provider/use-focus-context';
 import { FocusScope } from '../../interaction/focus/scope/focus-scope';
+import { useTranslate } from '../../../translate/i18n';
 
 type UIPokedexMainProps = {
     children: React.ReactNode;
 } & Card.Props;
 
 export const UIPokedexMain: React.FC<UIPokedexMainProps> = ({ children, ...rest }) => {
+    const { t } = useTranslate();
+
     const name = 'pokedex-main';
     const childScopeId = name;
 
@@ -23,7 +26,7 @@ export const UIPokedexMain: React.FC<UIPokedexMainProps> = ({ children, ...rest 
         childScopeId,
         controls: [
             !isInScopeStack && getSelectControl({
-                label: 'Select',
+                label: t('action.select'),
                 action: () => pushScope(childScopeId),
             }),
         ],

@@ -42,7 +42,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
       {!isLoading && saveInfos.length === 0 && <EmptyState
         size='sm'
         icon={<RectangleEllipsisIcon />}
-        title='Save list is empty'
+        title={t('settings.form.saves.empty')}
       />}
 
       {generations.map(generation => {

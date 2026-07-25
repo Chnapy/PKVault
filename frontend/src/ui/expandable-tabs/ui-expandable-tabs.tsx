@@ -2,6 +2,7 @@ import { ActionIcon, Stack, Tabs, type TabsProps } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import React from 'react';
+import { useTranslate } from '../../translate/i18n';
 import { useControls } from '../interaction/controls/use-controls';
 import { getBackControl } from '../interaction/focus-controls/common-controls/back-controls';
 import type { FocusScopeId } from '../interaction/focus/provider/focus-context';
@@ -54,6 +55,8 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
     left, right, grow = true,
     ...tabsProps
 }: UIExpandableTabsProps<D>) {
+    const { t } = useTranslate();
+
     const [ expandedInner, setExpanded ] = React.useState(false);
 
     const [ scopeIdRaw ] = React.useState((): FocusScopeId => `expandable-tabs_${self.crypto.randomUUID()}`);
@@ -82,7 +85,7 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
         order,
         React.useMemo(() => [
             expandedInner && getBackControl({
-                label: 'Back',
+                label: t('action.back'),
                 action: () => {
                     setExpanded(false);
                 },
@@ -104,7 +107,7 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
                     setExpanded(value => !value)
                 },
             }
-        ], [ controlsDetailsLabel, expandedInner, level, tabsDetailedName ]),
+        ], [ controlsDetailsLabel, expandedInner, level, t, tabsDetailedName ]),
         {
             enabled: expandEnabled || expandedScopeActive,
         },

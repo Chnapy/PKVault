@@ -23,7 +23,7 @@ export const UIGlobsInputResults: React.FC<UIGlobsInputResultsProps> = ({ name, 
         controls: [
             data.length > 0 && getSelectControl({
                 main: false,
-                label: 'Select',
+                label: t('action.select'),
             }),
         ],
     });
@@ -35,7 +35,7 @@ export const UIGlobsInputResults: React.FC<UIGlobsInputResultsProps> = ({ name, 
                 <ListIcon />
 
                 <div style={{ flexGrow: 1, lineBreak: 'anywhere' }}>
-                    All results
+                    {t('settings.form.globs.results')}
                 </div>
 
                 <Group

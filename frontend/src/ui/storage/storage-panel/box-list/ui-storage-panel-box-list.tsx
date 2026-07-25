@@ -33,8 +33,8 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
             id='boxes'
             level={1}
             controlsEnabled={isInCurrentPanel}
-            controlsLabel='Change box'
-            controlsDetailsLabel='See all boxes'
+            controlsLabel={t('storage.box.controls-label')}
+            controlsDetailsLabel={t('storage.box.controls-label-details')}
             className={classes.uiStoragePanelBoxList}
             variant='pills'
             value={value}
@@ -45,10 +45,10 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
             renderExpanded={(data, opt) => <Group py='md' px='xs'>
                 {renderExpanded?.(data, opt)}
 
-                {onCreate && <Tooltip label='Create new box'>
+                {onCreate && <Tooltip label={t('storage.box.create')}>
                     <UIActionIcon
                         name='create-box'
-                        controlLabel='Create box'
+                        controlLabel={t('storage.box.create')}
                         variant='default'
                         size='xl'
                         w='100%'

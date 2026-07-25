@@ -2,6 +2,7 @@ import { ActionIcon, Group, TextInput } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import { SendIcon, XIcon } from 'lucide-react';
 import type React from 'react';
+import { useTranslate } from '../../../translate/i18n';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls, type UseFocusControlsParams } from '../../interaction/focus-controls/use-focus-controls';
@@ -17,6 +18,7 @@ export type UITextInputProps = TextInput.Props & Pick<UseFocusControlsParams, 'f
 };
 
 export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCancel, submitDisabled, submitLoading, cancelDisabled, focusOnMount, ...rest }) => {
+    const { t } = useTranslate();
 
     const { popScope } = Focus.usePushPopScope();
 
@@ -25,11 +27,11 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
         focusOnMount,
         controls: [
             getSelectControl({
-                label: 'Focus',
+                label: t('action.focus'),
             }),
             onSubmit && !submitDisabled && {
                 name: 'submit' as const,
-                label: 'Submit',
+                label: t('action.submit'),
                 triggers: {
                     mouse: {
                         type: 'mouse',
@@ -50,7 +52,7 @@ export const UITextInput: React.FC<UITextInputProps> = ({ name, onSubmit, onCanc
             },
             onCancel && !cancelDisabled && {
                 name: 'cancel' as const,
-                label: 'Cancel',
+                label: t('action.cancel'),
                 triggers: {
                     mouse: {
                         type: 'mouse',

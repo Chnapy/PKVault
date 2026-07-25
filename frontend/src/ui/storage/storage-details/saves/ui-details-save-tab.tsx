@@ -1,7 +1,6 @@
 import { Group, Loader, Tabs, Text } from '@mantine/core';
 import { AlertCircleIcon, PlusIcon } from 'lucide-react';
 import type React from 'react';
-import { useTranslate } from '../../../../translate/i18n';
 import type { UIExpandableTabsData } from '../../../expandable-tabs/ui-expandable-tabs';
 import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
 import { UIGameImg, type UIGameImgProps } from '../../../sprite-img/ui-game-img';
@@ -20,8 +19,6 @@ type UIDetailsSaveTabProps = UIExpandableTabsData
     };
 
 export const UIDetailsSaveTab: React.FC<UIDetailsSaveTabProps> = ({ id, label, version, selected, create, color, isEnabled = true, isMain = false, warning = false, loading, ref }) => {
-    const { t } = useTranslate();
-
     return <Tabs.Tab
         ref={ref}
         value={id}

@@ -1,6 +1,7 @@
 import { Grid } from '@mantine/core';
 import type React from 'react';
 import { UISpriteSizeWrapper } from '../../../sprite-img/ui-sprite-size-wrapper';
+import { useTranslate } from '../../../../translate/i18n';
 
 export type UIDetailsContentSummaryProps = {
     id: string;
@@ -14,11 +15,12 @@ export type UIDetailsContentSummaryProps = {
 export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = ({
     id, heldItem, nature, ability, specialAbility, pid = 0
 }) => {
+    const { t } = useTranslate();
 
     return <Grid>
         {heldItem && <>
             <Grid.Col span={4}>
-                Held item
+                {t('details.held-item')}
             </Grid.Col>
             <UISpriteSizeWrapper<typeof Grid.Col>
                 itemSize='1lh'
@@ -31,7 +33,7 @@ export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = (
 
         {nature && <>
             <Grid.Col span={4}>
-                Nature
+                {t('details.nature')}
             </Grid.Col>
             <Grid.Col span={8}>
                 {nature}
@@ -41,8 +43,8 @@ export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = (
         {ability && <>
             <Grid.Col span={4}>
                 {specialAbility
-                    ? 'Special ability'
-                    : 'Ability'}
+                    ? t('details.ability.old')
+                    : t('details.ability')}
             </Grid.Col>
             <Grid.Col span={8}>
                 {ability}
@@ -51,7 +53,7 @@ export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = (
 
         {pid > 0 && <>
             <Grid.Col span={4}>
-                PID
+                {t('details.pid')}
             </Grid.Col>
             <Grid.Col span={8}>
                 {pid ?? '-'}
@@ -59,7 +61,7 @@ export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = (
         </>}
 
         <Grid.Col span={4}>
-            ID
+            {t('details.id')}
         </Grid.Col>
         <Grid.Col span={8}>
             {id}

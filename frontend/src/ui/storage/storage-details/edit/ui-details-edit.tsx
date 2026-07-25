@@ -50,7 +50,7 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
 
     return <UIFormCard
         onSubmit={onSubmit}
-        title={<>Edit {defaultValues.nickname}</>}
+        title={t('storage.bank.edit.title', { name: defaultValues.nickname })}
         disabled={formDisabled}
         miw={hideCheats ? 150 : 475}
     >
@@ -61,13 +61,13 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
                         setValueAs: value => value.trim(),
                         maxLength: nicknameMaxLength,
                     })}
-                    label='Nickname'
+                    label={t('details.edit.nickname')}
                 />
 
                 {!hideCheats && <UIMultiSelect
                     name='moves'
-                    controlLabel='Moves'
-                    label='Moves'
+                    controlLabel={t('details.moves')}
+                    label={t('details.moves')}
                     value={watchMoves.map(String)}
                     onChange={value => {
                         if (value.length < 1 || value.length > 4)
@@ -96,7 +96,7 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
             </Stack>
 
             {!hideCheats && <InputWrapper
-                label='EVs'
+                label={t('details.stats.evs')}
             >
                 <Stack>
                     {([ 'hp', 'atk', 'def', 'spa', 'spd', 'spe' ] satisfies UIDetailsStatName[]).map((stat, i) => {
@@ -135,7 +135,7 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
 
                     <Group>
                         <Text ml='auto'>
-                            Remaining: {remainingEVs} / {totalEVs}
+                            {t('details.edit.evs.remaining')}: {remainingEVs} / {totalEVs}
                         </Text>
                     </Group>
                 </Stack>
@@ -144,7 +144,7 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
         </Group>
 
         {hideCheats && <Alert icon={<InfoIcon />} variant='outline' color='blue'>
-            Cheats are disabled in settings
+            {t('details.edit.no-cheats')}
         </Alert>}
     </UIFormCard>;
 };

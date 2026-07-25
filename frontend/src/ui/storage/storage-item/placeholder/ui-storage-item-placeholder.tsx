@@ -1,7 +1,7 @@
 import { useMergedRef } from '@mantine/hooks';
 import type React from 'react';
 import { WithControlsIcons } from '../../../interaction/controls/icons/with-controls-icons';
-import { getDragControls } from '../../../interaction/focus-controls/common-controls/drag-controls';
+import { useDragControls } from '../../../interaction/focus-controls/common-controls/drag-controls';
 import { useFocusControls } from '../../../interaction/focus-controls/use-focus-controls';
 import { useDragSubmitting } from '../../../interaction/move/hooks/use-drag-submitting';
 import { useDroppable } from '../../../interaction/move/hooks/use-droppable';
@@ -38,6 +38,12 @@ export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> =
     const submitting = useDragSubmitting(container, slot);
     loading ||= submitting;
 
+    const dragControls = useDragControls({
+        droppable,
+        droppableMain: true,
+        disabled: loading,
+    });
+
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: nodeId,
         order: globalOrder,
@@ -47,11 +53,7 @@ export const UIStorageItemPlaceholder: React.FC<UIStorageItemPlaceholderProps> =
             panel.normalizeCurrentPanel();
         },
         controls: [
-            ...getDragControls({
-                droppable,
-                droppableMain: true,
-                disabled: loading,
-            }),
+            ...dragControls,
         ],
     });
 

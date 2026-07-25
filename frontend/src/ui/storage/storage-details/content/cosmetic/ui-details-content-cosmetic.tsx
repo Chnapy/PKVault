@@ -1,5 +1,6 @@
 import { Group, Stack, Table } from '@mantine/core';
 import React from 'react';
+import { useTranslate } from '../../../../../translate/i18n';
 import classes from './ui-details-content-cosmetic.module.css';
 
 export type UIDetailsContentCosmeticProps = {
@@ -10,6 +11,8 @@ export type UIDetailsContentCosmeticProps = {
 export const UIDetailsContentCosmetic: React.FC<UIDetailsContentCosmeticProps> = ({
     contest, ribbons,
 }) => {
+    const { t } = useTranslate();
+
     return <Stack>
         <Table
             className={classes.uiDetailsContentCosmetic}
@@ -19,7 +22,7 @@ export const UIDetailsContentCosmetic: React.FC<UIDetailsContentCosmeticProps> =
         >
             <Table.Thead>
                 <Table.Tr>
-                    <Table.Th colSpan={3} ta='center'>Contest</Table.Th>
+                    <Table.Th colSpan={3} ta='center'>{t('details.contest')}</Table.Th>
                 </Table.Tr>
             </Table.Thead>
             <Table.Tbody>

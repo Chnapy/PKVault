@@ -2,6 +2,7 @@ import { Box, Divider, Group } from '@mantine/core';
 import { TimerIcon } from 'lucide-react';
 import type React from 'react';
 import type { Gender } from '../../../../data/sdk/model';
+import { useTranslate } from '../../../../translate/i18n';
 import { UIGender } from '../../../icon/ui-gender';
 import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
 import { UIGameExpandedWrapper, type UIGameExpandedWrapperProps } from './ui-game-expanded-wrapper';
@@ -28,6 +29,8 @@ export const UIGameExpanded: React.FC<UIGameExpandedProps> = ({
     id, generation, label, ot, otGender, tid, caughtCount, ownedCount, shinyCount, playTime, language,
     ...rest
 }) => {
+    const { t } = useTranslate();
+
     return <UIGameExpandedWrapper
         {...rest}
         title={id}
@@ -35,7 +38,7 @@ export const UIGameExpanded: React.FC<UIGameExpandedProps> = ({
             <Box component='span' c='blue'>{generation}</Box> - {label}
         </>}
         secondaryLine={<>
-            OT {ot} <UIGender gender={otGender} /> - TID {tid}
+            {t('save.ot')} {ot} <UIGender gender={otGender} /> - {t('details.tid')} {tid}
         </>}
         tertiaryLine={<>
             {caughtCount !== undefined && renderCount(<UIPokedexIcons.Caught size='sm' />, caughtCount)}

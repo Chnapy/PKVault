@@ -1,3 +1,4 @@
+import { useTranslate } from '../../../translate/i18n';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls, type UseFocusControlsParams } from '../../interaction/focus-controls/use-focus-controls';
 import { Focus } from '../../interaction/focus/provider/use-focus-context';
@@ -8,6 +9,8 @@ type Params = Partial<
 >;
 
 export const usePanelControls = (name: string, focusControlsParams?: Params) => {
+    const { t } = useTranslate();
+
     const childScopeId = name;
 
     const isInScopeStack = Focus.useIsInScopeStack(childScopeId);
@@ -19,7 +22,7 @@ export const usePanelControls = (name: string, focusControlsParams?: Params) => 
         childScopeId,
         controls: [
             !isInScopeStack && getSelectControl({
-                label: 'Select',
+                label: t('action.select'),
                 action: () => pushScope(childScopeId),
             }),
         ],

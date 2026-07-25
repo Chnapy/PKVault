@@ -7,6 +7,7 @@ import { useFocusControls } from '../../../interaction/focus-controls/use-focus-
 import { UIPathLine } from '../../../path/ui-path-line';
 import { UIPopover } from '../../../popover/ui-popover';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
+import { useTranslate } from '../../../../translate/i18n';
 
 export type UIGameExpandedWrapperProps = {
     selected?: boolean;
@@ -28,6 +29,8 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
     title, label, imgSrc, secondaryLine, tertiaryLine, fourthLine, path,
     selected, loading, onSelect, editDropdown, actions,
 }) => {
+    const { t } = useTranslate();
+
     const panel = useCurrentPanel();
 
     const { focusProps, controlProps, controlIcons } = useFocusControls({
@@ -38,14 +41,14 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
         },
         controls: [
             !selected && onSelect && getSelectControl({
-                label: 'Select',
+                label: t('action.select'),
                 action: () => {
                     onSelect();
                 },
             }),
             !!editDropdown && {
                 name: 'edit' as const,
-                label: 'Edit',
+                label: t('storage.actions.edit'),
                 triggers: {
                     mouse: {
                         type: 'mouse',
@@ -75,7 +78,7 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
                 {editDropdown && <UIPopover
                     dropdown={editDropdown}
                 >
-                    <Tooltip label='Change detected save game'>
+                    <Tooltip label={t('save.detected.change')}>
                         <WithControlsIcons placement='out' icons={controlIcons('edit')}>
                             <Button
                                 variant='filled'

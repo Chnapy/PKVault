@@ -4,6 +4,7 @@ import type React from 'react';
 import { UIActionIcon } from '../form/button/ui-action-icon';
 import { UISubHeader, type UISubHeaderProps, type UISubHeaderTabsData } from '../layout/header/sub-header/ui-sub-header';
 import { UIBankItem, type UIBankItemProps } from './ui-bank-item';
+import { useTranslate } from '../../translate/i18n';
 
 export type UIBankTabData<C = unknown> = UIBankItemProps<C> & UISubHeaderTabsData;;
 
@@ -14,9 +15,11 @@ export type UIBankListProps =
     };
 
 export const UIBankList: React.FC<UIBankListProps> = ({ onCreate, renderExpanded, ...rest }) => {
+    const { t } = useTranslate();
+
     return <UISubHeader<UIBankTabData>
-        controlsLabel='Change bank'
-        controlsDetailsLabel='See all banks'
+        controlsLabel={t('storage.bank.controls-label')}
+        controlsDetailsLabel={t('storage.bank.controls-label-details')}
         left={<LandmarkIcon />}
         renderTab={({ item }) => <UIBankItem
             key={item.id}
@@ -25,10 +28,10 @@ export const UIBankList: React.FC<UIBankListProps> = ({ onCreate, renderExpanded
         renderExpanded={(data, opt) => <Group pt='sm'>
             {renderExpanded?.(data, opt)}
 
-            <Tooltip label='Create new bank'>
+            <Tooltip label={t('storage.bank.create.label')}>
                 <UIActionIcon
                     name='bank-create'
-                    controlLabel='Create bank'
+                    controlLabel={t('storage.bank.create.label')}
                     variant='subtle'
                     size='xl'
                     color='currentcolor'

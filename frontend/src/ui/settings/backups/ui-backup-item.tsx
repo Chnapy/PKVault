@@ -1,6 +1,7 @@
 import { ActionIcon, Table, Text, Tooltip } from '@mantine/core';
 import { ArchiveRestoreIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
+import { useTranslate } from '../../../translate/i18n';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
@@ -20,6 +21,7 @@ type UIBackupItemProps = {
 };
 
 export const UIBackupItem: React.FC<UIBackupItemProps> = ({ order, createdAt, path, filename, onRestore, onDelete, children }) => {
+    const { t } = useTranslate();
 
     const splitBy_ = filename.split('_');
     splitBy_.pop();
@@ -35,7 +37,7 @@ export const UIBackupItem: React.FC<UIBackupItemProps> = ({ order, createdAt, pa
         order,
         controls: [
             getSelectControl({
-                label: 'Edit name',
+                label: t('settings.backups.name.edit'),
                 action: () => {
                     if (focused)
                         pushScope(inputScopeId);
@@ -43,7 +45,7 @@ export const UIBackupItem: React.FC<UIBackupItemProps> = ({ order, createdAt, pa
             }),
             {
                 name: 'restore' as const,
-                label: 'Restore',
+                label: t('settings.backups.restore'),
                 triggers: {
                     mouse: {
                         type: 'mouse',
@@ -58,7 +60,7 @@ export const UIBackupItem: React.FC<UIBackupItemProps> = ({ order, createdAt, pa
             },
             {
                 name: 'delete' as const,
-                label: 'Delete',
+                label: t('action.delete'),
                 triggers: {
                     mouse: {
                         type: 'mouse',
@@ -99,7 +101,7 @@ export const UIBackupItem: React.FC<UIBackupItemProps> = ({ order, createdAt, pa
         </Table.Td>
 
         <Table.Td>
-            <UIConfirmPopover label='Restore backup' color='blue' action={onRestore}>
+            <UIConfirmPopover label={t('settings.backups.restore')} color='blue' action={onRestore}>
                 <Tooltip label='Restore backup'>
                     <WithControlsIcons placement='out' icons={controlIcons('restore')}>
                         <ActionIcon variant='subtle' color='blue' {...controlProps('restore')}>
@@ -110,7 +112,7 @@ export const UIBackupItem: React.FC<UIBackupItemProps> = ({ order, createdAt, pa
             </UIConfirmPopover>
         </Table.Td>
         <Table.Td>
-            <UIConfirmPopover label='Delete backup' color='red' action={onDelete}>
+            <UIConfirmPopover label={t('action.delete')} color='red' action={onDelete}>
                 <WithControlsIcons placement='out' icons={controlIcons('delete')}>
                     <ActionIcon variant='subtle' color='red' {...controlProps('delete')}>
                         <TrashIcon />

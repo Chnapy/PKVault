@@ -63,7 +63,7 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
 
     return <UIFormCard
         onSubmit={onSubmit}
-        title={<>Edit {defaultValues.bankName}</>}
+        title={t('storage.bank.edit.title', { name: defaultValues.bankName })}
         disabled={watchName.length === 0 || !formState.isValid}
         miw={250}
     >
@@ -73,7 +73,7 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
 
         <UISwitch
             name='is-default'
-            controlLabel='Set default'
+            controlLabel={t('storage.bank.edit.is-default.controls-label')}
             label={<Group gap='sm'>
                 {t('storage.bank.edit.is-default')}
                 <StarIcon />
@@ -86,7 +86,7 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
         <Group justify='space-between'>
             <UIButton
                 name='order-left'
-                controlLabel='Change order - left'
+                controlLabel={t('storage.bank.edit.order.controls-label.1')}
                 onClick={() => previousBank && setOrder(previousBank.order - 5)}
                 disabled={!previousBank}
             >
@@ -95,7 +95,7 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
             {t('storage.bank.edit.order')}
             <UIButton
                 name='order-right'
-                controlLabel='Change order - right'
+                controlLabel={t('storage.bank.edit.order.controls-label.2')}
                 onClick={() => nextBank && setOrder(nextBank.order + 5)}
                 disabled={!nextBank}
             >
@@ -104,7 +104,7 @@ export const UIBankEdit: React.FC<UIBankEditProps> = ({ bankId, selected, defaul
         </Group>
 
         <Text>
-            Default view: {selectedView[ 0 ] ?? '-'} / {selectedView[ 1 ] ?? '-'}
+            {t('storage.bank.edit.view-default')}: {selectedView[ 0 ] ?? '-'} / {selectedView[ 1 ] ?? '-'}
         </Text>
 
         <Tooltip

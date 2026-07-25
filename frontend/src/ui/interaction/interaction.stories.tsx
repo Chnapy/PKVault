@@ -6,7 +6,7 @@ import type { PopoverTargetChildProps } from '../popover/target-open-popover';
 import { getControlIcon } from './controls/icons/get-control-icon';
 import { WithControlsIcons } from './controls/icons/with-controls-icons';
 import { useAllCurrentControls } from './controls/use-all-current-controls';
-import { getDragControls } from './focus-controls/common-controls/drag-controls';
+import { useDragControls } from './focus-controls/common-controls/drag-controls';
 import { getSelectControl } from './focus-controls/common-controls/select-controls';
 import { usePopover } from './focus-controls/components/popover/hooks/use-popover';
 import { PopoverWithControls } from './focus-controls/components/popover/popover-with-controls';
@@ -104,6 +104,8 @@ const FakeItem: React.FC<{
     // console.log(dragging.dragProps)
     const submitting = useDragSubmitting<ContainerValue>(container, pos, name);
 
+    const dragControls = useDragControls({ dragging, draggingMove });
+
     const { focusProps, controlProps, controlIcons, focused, active } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,
@@ -117,7 +119,7 @@ const FakeItem: React.FC<{
                 label: 'Select',
                 action: onClick,
             }),
-            ...getDragControls({ dragging, draggingMove }),
+            ...dragControls,
             openModal && getSelectControl({
                 label: 'Open modal',
                 action: () => popover?.setOpened(opened => !opened),

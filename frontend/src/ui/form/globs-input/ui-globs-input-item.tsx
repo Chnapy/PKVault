@@ -52,14 +52,14 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
             // eslint-disable-next-line react-hooks/refs
             renderTextInput && !disabled && getSelectControl({
                 main: false,
-                label: 'Select',
+                label: t('action.select'),
                 action: () => {
                     textInputRef.current?.focus();
                 },
             }),
             !disabled && {
                 name: 'delete' as const,
-                label: 'Delete',
+                label: t('action.delete'),
                 triggers: {
                     gamepad: {
                         type: 'gamepad',

@@ -15,7 +15,6 @@ export const SettingsAboutRight: React.FC = () => {
     const { t } = useTranslate();
 
     const settingsQuery = useSettingsGet();
-    // const settings = settingsQuery.data?.data;
 
     const settingsVersion = settingsQuery.data?.data.version;
 
@@ -51,11 +50,11 @@ export const SettingsAboutRight: React.FC = () => {
             <Group gap='sm'>
                 <ScrollTextIcon />
                 <Text size='lg'>
-                    Changelog
+                    {t('settings.about.changelog.title')}
                 </Text>
             </Group>
             <Text c='dimmed' lh={1.1}>
-                From GitHub repository
+                {t('settings.about.changelog.title.sub')}
             </Text>
         </Card.Section>
 

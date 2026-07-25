@@ -5,6 +5,7 @@ import { getSelectControl } from '../../interaction/focus-controls/common-contro
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 import { Focus } from '../../interaction/focus/provider/use-focus-context';
 import { FocusScope } from '../../interaction/focus/scope/focus-scope';
+import { useTranslate } from '../../../translate/i18n';
 
 type UIPokedexFiltersProps = {
     views: React.ReactNode;
@@ -12,6 +13,8 @@ type UIPokedexFiltersProps = {
 } & WithControlsIconsExtraProps;
 
 export const UIPokedexFilters: React.FC<UIPokedexFiltersProps> = ({ views, children, ...rest }) => {
+    const { t } = useTranslate();
+
     const name = 'pokedex-filters';
     const childScopeId = name;
 
@@ -24,7 +27,7 @@ export const UIPokedexFilters: React.FC<UIPokedexFiltersProps> = ({ views, child
         childScopeId,
         controls: [
             !isInScopeStack && getSelectControl({
-                label: 'Select',
+                label: t('action.select'),
                 action: () => pushScope(childScopeId),
             }),
         ],
@@ -35,13 +38,13 @@ export const UIPokedexFilters: React.FC<UIPokedexFiltersProps> = ({ views, child
             <Card {...focusProps} {...controlProps('open')} w='100%' mah='100%' pr={0} style={{ overflowY: 'scroll' }}>
                 <Card.Section withBorder inheritPadding pt='sm' pb='inherit'>
                     <Stack>
-                        <Title order={5} ta='center'>Views</Title>
+                        <Title order={5} ta='center'>{t('dex.filters.views')}</Title>
 
                         {views}
                     </Stack>
                 </Card.Section>
                 <Card.Section withBorder inheritPadding pt='sm' pb='inherit'>
-                    <Title order={5} ta='center'>Filters</Title>
+                    <Title order={5} ta='center'>{t('dex.filters.title')}</Title>
 
                     <Stack>
                         {children}

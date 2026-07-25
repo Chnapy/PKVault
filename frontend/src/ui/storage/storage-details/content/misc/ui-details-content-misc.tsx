@@ -1,5 +1,6 @@
 import { Grid, Progress } from '@mantine/core';
 import React from 'react';
+import { useTranslate } from '../../../../../translate/i18n';
 
 export type UIDetailsContentMiscProps = {
     isEgg?: boolean;
@@ -12,7 +13,7 @@ export type UIDetailsContentMiscProps = {
 export const UIDetailsContentMisc: React.FC<UIDetailsContentMiscProps> = ({
     isEgg, eggHatchCount, friendship, language, homeTracker
 }) => {
-    // const { t } = useTranslate();
+    const { t } = useTranslate();
 
     return <Grid>
         <Grid.Col span={4}>
@@ -34,14 +35,14 @@ export const UIDetailsContentMisc: React.FC<UIDetailsContentMiscProps> = ({
         </Grid.Col>
 
         <Grid.Col span={4}>
-            Language
+            {t('details.language')}
         </Grid.Col>
         <Grid.Col span={8}>
             {language || '-'}
         </Grid.Col>
 
         <Grid.Col span={4}>
-            Home tracker
+            {t('details.home-tracker')}
         </Grid.Col>
         <Grid.Col span={8}>
             {homeTracker ?? '-'}

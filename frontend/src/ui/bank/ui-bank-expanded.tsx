@@ -3,7 +3,7 @@ import { BoxIcon, ExternalLinkIcon, PenIcon, StarIcon, TrashIcon } from 'lucide-
 import React from 'react';
 import { UIBallIcon } from '../icon/ui-ball-icon';
 import { WithControlsIcons } from '../interaction/controls/icons/with-controls-icons';
-import { getDragControls } from '../interaction/focus-controls/common-controls/drag-controls';
+import { useDragControls } from '../interaction/focus-controls/common-controls/drag-controls';
 import { getSelectControl } from '../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../interaction/focus-controls/use-focus-controls';
 import { useDragSubmitting } from '../interaction/move/hooks/use-drag-submitting';
@@ -12,6 +12,7 @@ import { UISubHeaderTab } from '../layout/header/sub-header/ui-sub-header-tab';
 import { UIConfirmPopover } from '../popover/ui-confirm-popover';
 import { UIPopover } from '../popover/ui-popover';
 import type { UIBankItemProps } from './ui-bank-item';
+import { useTranslate } from '../../translate/i18n';
 
 export type UIBankExpandedProps = UIBankItemProps
     & {
@@ -30,6 +31,8 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
     selected, loading, onDelete,
     editDropdown,
 }) => {
+    const { t } = useTranslate();
+
     const droppable = useDroppable({
         targetContainer: container,
         targetPosition: -1,
@@ -40,6 +43,11 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
 
     const submitting = useDragSubmitting(container, -1);
     loading ||= submitting;
+
+    const dragControls = useDragControls({
+        droppable,
+        disabled: loading,
+    });
 
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: nodeId,
@@ -81,10 +89,7 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
                 },
                 spread: false,
             },
-            ...getDragControls({
-                droppable,
-                disabled: loading,
-            }),
+            ...dragControls,
         ],
     });
 
@@ -143,7 +148,7 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
             </UIPopover>
 
             <UIConfirmPopover
-                label='Delete'
+                label={t('action.delete')}
                 color='red'
                 action={onDelete}
             >

@@ -1,6 +1,7 @@
 import { MultiSelect, type ComboboxItem, type ComboboxLikeRenderOptionInput } from '@mantine/core';
 import { CheckIcon } from 'lucide-react';
 import React from 'react';
+import { useTranslate } from '../../../translate/i18n';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getBackControl } from '../../interaction/focus-controls/common-controls/back-controls';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
@@ -78,14 +79,16 @@ const OptionComponent: React.FC<ComboboxLikeRenderOptionInput<ComboboxItem<strin
     back: () => void;
     children?: React.ReactNode;
 }> = ({ option, checked, enter, back, children }) => {
+    const { t } = useTranslate();
+
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: option.value,
         controls: [
             getSelectControl({
-                label: 'Select',
+                label: t('action.select'),
             }),
             getBackControl({
-                label: 'Back',
+                label: t('action.back'),
                 action: () => {
                     back();
                 },

@@ -2,6 +2,7 @@ import { EmptyState } from '@mantine/core';
 import { RectangleEllipsisIcon } from 'lucide-react';
 import React from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
+import { useTranslate } from '../../translate/i18n';
 import type { UIGlobType } from '../../ui/form/globs-input/ui-globs-input-add';
 import { UIGlobsInputList, type UIGlobsInputListProps } from '../../ui/form/globs-input/ui-globs-input-list';
 import { GlobsInputItem } from './globs-input-item';
@@ -18,6 +19,8 @@ export type GlobsInputListProps = Partial<Omit<UseFormRegisterReturn, 'onChange'
     };
 
 export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, labelAddFile, labelAddFolder, name, value, onChange, limit, disabled, ...rest }) => {
+    const { t } = useTranslate();
+
     const desktopMessage = useDesktopMessage();
 
     const splitedValue = value.split('\n').map(value => value.trim()).filter(Boolean);
@@ -99,7 +102,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
         {splitedValue.length === 0 && <EmptyState
             size='sm'
             icon={<RectangleEllipsisIcon />}
-            title='List is empty'
+            title={t('settings.form.saves.empty')}
         />}
     </UIGlobsInputList>;
 };

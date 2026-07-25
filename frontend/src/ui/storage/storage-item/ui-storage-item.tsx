@@ -2,8 +2,9 @@ import { Checkbox } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import React from 'react';
 import type { MoveParams } from '../../../storage/move/move-container-fns';
+import { useTranslate } from '../../../translate/i18n';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
-import { getDragControls } from '../../interaction/focus-controls/common-controls/drag-controls';
+import { useDragControls } from '../../interaction/focus-controls/common-controls/drag-controls';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 import { DragRender } from '../../interaction/move/components/drag-render';
@@ -34,7 +35,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
     loading, disabled, onClick,
     children, ...buttonProps
 }) => {
-    // console.log('item', box, id)
+    const { t } = useTranslate();
 
     const panel = useCurrentPanel();
 
@@ -58,6 +59,14 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
     disabled ||= droppable.canDrop === false;
     loading ||= submitting;
 
+    const dragControls = useDragControls({
+        dragging,
+        draggingMove,
+        draggingMoveAttached,
+        droppable,
+        disabled: disabled || loading,
+    });
+
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: nodeId,
         order: globalOrder,
@@ -68,21 +77,15 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
         },
         controls: [
             !isDraggingState && !disabled && !loading && getSelectControl({
-                label: 'Open',
+                label: t('action.open'),
                 action: e => {
                     onClick?.(e);
                 },
             }),
-            ...getDragControls({
-                dragging,
-                draggingMove,
-                draggingMoveAttached,
-                droppable,
-                disabled: disabled || loading,
-            }),
+            ...dragControls,
             !isDraggingState && !disabled && !loading && {
                 name: 'select',
-                label: 'Select',
+                label: t('action.select'),
                 triggers: {
                     mouse: {
                         type: 'mouse',

@@ -1,3 +1,4 @@
+import { useTranslate } from '../../../../translate/i18n';
 import type { ControlsWithFalsy } from '../../controls/provider/controls-context';
 import type { UseDraggingReturn } from '../../move/hooks/use-dragging';
 import type { UseDroppableReturn } from '../../move/hooks/use-droppable';
@@ -11,14 +12,16 @@ type Params = {
     disabled?: boolean;
 };
 
-export const getDragControls = ({ dragging, draggingMove, draggingMoveAttached, droppable, droppableMain, disabled }: Params) => {
+export const useDragControls = ({ dragging, draggingMove, draggingMoveAttached, droppable, droppableMain, disabled }: Params) => {
+    const { t } = useTranslate();
+
     const isDragging = dragging?.isDragging;
 
     return [
         !disabled && droppable?.onDrop && droppable.canDrop && {
             name: 'drop' as const,
             main: droppableMain,
-            label: 'Drop',
+            label: t('storage.actions.drop'),
             triggers: {
                 mouse: {
                     type: 'mouse',
@@ -41,7 +44,7 @@ export const getDragControls = ({ dragging, draggingMove, draggingMoveAttached, 
         },
         !disabled && dragging && draggingMove && !droppable?.onDrop && !isDragging && draggingMove.toggleDragByFocus && {
             name: 'drag' as const,
-            label: 'Move',
+            label: t('storage.actions.move'),
             triggers: {
                 mouse: {
                     type: 'mouse',
@@ -73,7 +76,7 @@ export const getDragControls = ({ dragging, draggingMove, draggingMoveAttached, 
         },
         !disabled && dragging && draggingMoveAttached && !droppable?.onDrop && !isDragging && draggingMoveAttached.toggleDragByFocus && {
             name: 'drag-attached' as const,
-            label: 'Move attached',
+            label: t('storage.actions.move-attached'),
             triggers: {
                 // mouse: {
                 //     type: 'mouse',

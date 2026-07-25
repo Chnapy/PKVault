@@ -1,6 +1,7 @@
 import { Badge, Box, Button, Group, Tooltip } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import React from 'react';
+import { useTranslate } from '../../../translate/i18n';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
@@ -45,11 +46,13 @@ const UIPokedexItemInner: React.FC<UIPokedexItemProps & {
     ref: refRoot, id, species, form,
     label, selected, onClick, children
 }) => {
+        const { t } = useTranslate();
+
         const { focusProps, controlProps, controlIcons } = useFocusControls({
             scopeNodeId: id,
             controls: [
                 onClick && getSelectControl({
-                    label: 'Open',
+                    label: t('action.open'),
                     action: e => {
                         onClick();
                     },

@@ -1,5 +1,6 @@
 import { Box, Group, NumberFormatter, Text } from '@mantine/core';
 import type React from 'react';
+import { useTranslate } from '../../../translate/i18n';
 
 export type UIStoragePanelFooterProps = {
     boxSize: number;
@@ -8,6 +9,8 @@ export type UIStoragePanelFooterProps = {
 };
 
 export const UIStoragePanelFooter: React.FC<UIStoragePanelFooterProps> = ({ boxSize, pkmCount, pkmTotalCount }) => {
+    const { t } = useTranslate();
+
     return <Text component="div" size='sm'>
         <Group justify='space-between'>
             <div />
@@ -15,7 +18,7 @@ export const UIStoragePanelFooter: React.FC<UIStoragePanelFooterProps> = ({ boxS
                 <NumberFormatter value={pkmCount} />/<NumberFormatter value={boxSize} />
             </Box>
             <Box>
-                total <NumberFormatter value={pkmTotalCount} />
+                {t('total')} <NumberFormatter value={pkmTotalCount} />
             </Box>
         </Group>
     </Text>;

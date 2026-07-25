@@ -50,7 +50,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
 
     return <UIFormCard
         onSubmit={onSubmit}
-        title={<>Edit {defaultValues.boxName}</>}
+        title={t('storage.bank.edit.title', { name: defaultValues.boxName })}
         disabled={watchName.length === 0 || !formState.isValid}
         miw={250}
     >
@@ -64,7 +64,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
 
         <UISelect
             {...register('type')}
-            controlLabel='Set box type'
+            controlLabel={t('storage.box.edit.type')}
             label={t('storage.box.edit.type')}
             data={Object.entries(BoxType).map(([ key, value ]) => ({
                 value: value.toString(),
@@ -89,7 +89,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
         <Group justify='space-between'>
             <UIButton
                 name='order-left'
-                controlLabel='Change order - left'
+                controlLabel={t('storage.bank.edit.order.controls-label.1')}
                 onClick={() => previousBox && setOrder(previousBox.order - 5)}
                 disabled={!previousBox}
             >
@@ -98,7 +98,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
             {t('storage.bank.edit.order')}
             <UIButton
                 name='order-right'
-                controlLabel='Change order - right'
+                controlLabel={t('storage.bank.edit.order.controls-label.2')}
                 onClick={() => nextBox && setOrder(nextBox.order + 5)}
                 disabled={!nextBox}
             >
@@ -109,7 +109,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
         <UISelect
             {...register('bankId')}
             label={t('storage.box.edit.bank')}
-            controlLabel='Change bank'
+            controlLabel={t('storage.box.edit.bank')}
             data={bankList.map(bank => ({
                 value: bank.id,
                 label: bank.name,

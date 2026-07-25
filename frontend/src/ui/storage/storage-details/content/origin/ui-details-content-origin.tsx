@@ -29,7 +29,7 @@ export const UIDetailsContentOrigin: React.FC<UIDetailsContentOriginProps> = ({
 
     return <Grid>
         <Grid.Col span={4}>
-            Game
+            {t('details.game')}
         </Grid.Col>
         <Grid.Col span={8}>
             {game}
@@ -37,7 +37,7 @@ export const UIDetailsContentOrigin: React.FC<UIDetailsContentOriginProps> = ({
 
         {ht && <>
             <Grid.Col span={4}>
-                HT
+                {t('details.ht')}
             </Grid.Col>
             <Grid.Col span={8}>
                 <Group>
@@ -48,7 +48,7 @@ export const UIDetailsContentOrigin: React.FC<UIDetailsContentOriginProps> = ({
         </>}
 
         <Grid.Col span={4}>
-            OT
+            {t('save.ot')}
         </Grid.Col>
         <Grid.Col span={8}>
             <Group>
@@ -58,21 +58,21 @@ export const UIDetailsContentOrigin: React.FC<UIDetailsContentOriginProps> = ({
         </Grid.Col>
 
         <Grid.Col span={4}>
-            TID
+            {t('details.tid')}
         </Grid.Col>
         <Grid.Col span={8}>
             {tid}
         </Grid.Col>
 
         <Grid.Col span={4}>
-            SID
+            {t('details.sid')}
         </Grid.Col>
         <Grid.Col span={8}>
             {sid ?? '-'}
         </Grid.Col>
 
         <Grid.Col span={4}>
-            Location
+            {t('details.location')}
         </Grid.Col>
         <Grid.Col span={8}>
             {[

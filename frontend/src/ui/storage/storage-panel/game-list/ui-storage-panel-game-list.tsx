@@ -4,6 +4,7 @@ import type React from 'react';
 import { UIExpandableTabs, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
 import { UIActionIcon } from '../../../form/button/ui-action-icon';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
+import { useTranslate } from '../../../../translate/i18n';
 
 export type UIGameData = {
     id: string;
@@ -18,14 +19,16 @@ export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>
 };
 
 export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange, renderExpanded, renderHoverCard, expanded, onCreate }) => {
+    const { t } = useTranslate();
+
     const { isInCurrentPanel } = useCurrentPanel();
 
     return <UIExpandableTabs
         id='games'
         level={2}
         controlsEnabled={isInCurrentPanel}
-        controlsLabel='Change game'
-        controlsDetailsLabel='See all games'
+        controlsLabel={t('save.controls-label')}
+        controlsDetailsLabel={t('save.controls-label-details')}
         value={value}
         data={data}
         onChange={onChange}
@@ -49,7 +52,7 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
             <Tooltip label='Add saves in settings'>
                 <UIActionIcon
                     name='add-game'
-                    controlLabel='Add game'
+                    controlLabel={t('save.add')}
                     variant='default'
                     size='xl'
                     w='100%'

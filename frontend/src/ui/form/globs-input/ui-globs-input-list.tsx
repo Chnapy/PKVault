@@ -25,7 +25,7 @@ export const UIGlobsInputList: React.FC<UIGlobsInputListProps> = ({
     return <Stack {...rest}>
         <InputWrapper
             label={labelList}
-            description={'Files are read and modified in place — no upload or download required, and no copies to manage.'}
+            description={t('settings.form.globs.help')}
         />
 
         <Accordion variant='contained'>

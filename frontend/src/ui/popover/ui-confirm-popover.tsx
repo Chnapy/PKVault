@@ -5,6 +5,7 @@ import { UIButton } from '../form/button/ui-button';
 import { usePopover } from '../interaction/focus-controls/components/popover/hooks/use-popover';
 import { UIPopoverCard } from './popover-card/ui-popover-card';
 import { UIPopover, type UIPopoverProps } from './ui-popover';
+import { useTranslate } from '../../translate/i18n';
 
 type UIConfirmPopoverProps = Pick<UIPopoverProps, 'popoverRef' | 'nested' | 'children'> & {
     label: string;
@@ -21,6 +22,8 @@ export const UIConfirmPopover: React.FC<UIConfirmPopoverProps> = ({ label, descr
 };
 
 const Dropdown: React.FC<Pick<UIConfirmPopoverProps, 'label' | 'description' | 'color' | 'action'>> = ({ label, description, color, action }) => {
+    const { t } = useTranslate();
+
     const popover = usePopover()!;
 
     return <UIPopoverCard
@@ -30,7 +33,7 @@ const Dropdown: React.FC<Pick<UIConfirmPopoverProps, 'label' | 'description' | '
     >
         <UIButton
             name='confirm_dropdown'
-            controlLabel='Confirm'
+            controlLabel={t('action.confirm')}
             fullWidth
             variant='filled'
             color={color}

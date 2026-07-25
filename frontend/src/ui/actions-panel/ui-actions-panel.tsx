@@ -79,7 +79,7 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
     const reversedData = data.reverse();
 
     return <Group wrap='nowrap' style={{ flexGrow: 1 }}>
-        <Title order={5} lh={1}>Actions<br />to save</Title>
+        <Title order={5} lh={1}>{t('storage.save-actions.title')}</Title>
 
         <Divider orientation='vertical' />
 
@@ -91,13 +91,13 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
                 <Group>
                     <SaveIcon />
                     <Text size='lg'>
-                        12 actions to save
+                        {t('storage.save-actions.drawer.title', { count: data.length })}
                     </Text>
                 </Group>
                 <Text component='div' c='dimmed' lh={1.1}>
                     <Group>
                         <SortDescIcon />
-                        Most recent first
+                        {t('storage.save-actions.drawer.sort')}
                     </Group>
                 </Text>
             </>}
@@ -133,7 +133,7 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
                     renderOverflow={(items) => <Button
                         size='compact-md'
                     >
-                        + {items.length} actions
+                        {t('storage.save-actions.extra.label', { count: items.length })}
                     </Button>}
                 />
             </WithControlsIcons>}

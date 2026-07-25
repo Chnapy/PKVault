@@ -8,15 +8,10 @@ import { renderDate, renderTime } from '../../util/render-date-time';
 import { BackupLineForm } from './backup-line-form';
 
 export const SettingsBackupRight: React.FC = () => {
-    // const { t } = useTranslate();
-
-    // const settings = useSettingsGet().data?.data;
     const backupQuery = useBackupGetAll();
 
     const backupRestoreMutation = useBackupRestore();
     const backupDeleteMutation = useBackupDelete();
-
-    // const desktopMessage = useDesktopMessage();
 
     const sortedBackups = [ ...backupQuery.data?.data ?? [] ]
         .sort((a, b) => a.createdAt < b.createdAt ? 1 : -1)

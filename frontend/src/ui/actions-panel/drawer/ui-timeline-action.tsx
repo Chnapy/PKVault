@@ -2,6 +2,7 @@ import { Divider, Group, Indicator, Timeline } from '@mantine/core';
 import { TrashIcon } from 'lucide-react';
 import type React from 'react';
 import { DataActionType } from '../../../data/sdk/model';
+import { useTranslate } from '../../../translate/i18n';
 import { UIActionIcon } from '../../form/button/ui-action-icon';
 import { usePopover } from '../../interaction/focus-controls/components/popover/hooks/use-popover';
 import { UIConfirmPopover } from '../../popover/ui-confirm-popover';
@@ -14,6 +15,8 @@ export type UITimelineActionProps = UIActionProps & {
 };
 
 export const UITimelineAction: React.FC<UITimelineActionProps> = ({ type, label, description, index, onDelete }) => {
+    const { t } = useTranslate();
+
     const popover = usePopover();
 
     return <Timeline.Item
@@ -23,8 +26,8 @@ export const UITimelineAction: React.FC<UITimelineActionProps> = ({ type, label,
             <Divider style={{ flexGrow: 1 }} />
 
             <UIConfirmPopover
-                label={'Delete'}
-                description={'Delete this action and all previous ones'}
+                label={t('action.delete')}
+                description={t('storage.save-actions.actions.delete')}
                 color='red'
                 action={async () => {
                     await onDelete(index);

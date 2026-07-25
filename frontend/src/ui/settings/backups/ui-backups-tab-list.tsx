@@ -1,6 +1,7 @@
 import { Tabs } from '@mantine/core';
 import { DatabaseBackupIcon } from 'lucide-react';
 import type React from 'react';
+import { useTranslate } from '../../../translate/i18n';
 import { Focus } from '../../interaction/focus/provider/use-focus-context';
 import { ScrollerControlled } from '../../scroller-controlled/scroller-controlled';
 
@@ -12,6 +13,8 @@ type UIBackupsTabListProps = {
 };
 
 export const UIBackupsTabList: React.FC<UIBackupsTabListProps> = ({ value, onSelect, scopeId, children }) => {
+    const { t } = useTranslate();
+
     const isInScope = Focus.useIsInScopeStack(scopeId);
 
     return <Tabs
@@ -29,7 +32,7 @@ export const UIBackupsTabList: React.FC<UIBackupsTabListProps> = ({ value, onSel
         >
             <DatabaseBackupIcon />
 
-            <ScrollerControlled id='backups' controlsLabel='Change backups' controlsEnabled={isInScope} level={1}>
+            <ScrollerControlled id='backups' controlsLabel={t('settings.backups.controls-label')} controlsEnabled={isInScope} level={1}>
                 {children}
             </ScrollerControlled>
         </Tabs.List>

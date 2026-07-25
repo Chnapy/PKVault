@@ -6,29 +6,32 @@ import { UIButton, type UIButtonProps } from '../../../form/button/ui-button';
 import { useSpriteSizeLocalStorage, type SpriteSizeLocalStorageKey } from '../../../local-storage/use-storage-size-local-storage';
 import { UIPopover } from '../../../popover/ui-popover';
 import { UICardSectionControl } from '../../../storage/storage-panel/card-section-control/ui-card-section-control';
+import { useTranslate } from '../../../../translate/i18n';
 
 type UISpriteSizingButtonProps = {
     localStorageKey: SpriteSizeLocalStorageKey;
 } & Partial<UIButtonProps>;
 
-const getCtxName = (localStorageKey: SpriteSizeLocalStorageKey) => switchUtil(localStorageKey, {
-    'storage-sprite-size': 'storage',
-    'pokedex-sprite-size': 'pokedex',
-});
-
 export const UISpriteSizingButton: React.FC<UISpriteSizingButtonProps> = ({ localStorageKey, ...rest }) => {
+    const { t } = useTranslate();
+
     const [ rawValue ] = useSpriteSizeLocalStorage(localStorageKey);
     const value = rawValue * 100;
+
+    const label = switchUtil(localStorageKey, {
+        'storage-sprite-size': t('header.sub.sprite-sizing.storage'),
+        'pokedex-sprite-size': t('header.sub.sprite-sizing.dex'),
+    });
 
     return <UIPopover
         dropdown={<DropdownContent
             localStorageKey={localStorageKey}
         />}
     >
-        <Tooltip label={`Change sprite size on ${getCtxName(localStorageKey)}`}>
+        <Tooltip label={label}>
             <UIButton
                 name='sprite-sizing'
-                controlLabel=''
+                controlLabel={label}
                 variant='filled'
                 color='primary'
                 size='compact-sm'
@@ -43,6 +46,8 @@ export const UISpriteSizingButton: React.FC<UISpriteSizingButtonProps> = ({ loca
 };
 
 const DropdownContent: React.FC<Pick<UISpriteSizingButtonProps, 'localStorageKey'>> = ({ localStorageKey }) => {
+    const { t } = useTranslate();
+
     const [ rawValue, setRawValue ] = useSpriteSizeLocalStorage(localStorageKey);
     const value = rawValue * 100;
     const setValue = (value: number) => React.startTransition(() => setRawValue(value / 100));
@@ -69,7 +74,10 @@ const DropdownContent: React.FC<Pick<UISpriteSizingButtonProps, 'localStorageKey
             <Group gap='sm'>
                 <ScalingIcon />
                 <Text size='lg'>
-                    Sprite sizing for {getCtxName(localStorageKey)}
+                    {switchUtil(localStorageKey, {
+                        'storage-sprite-size': t('header.sub.sprite-sizing.title.storage'),
+                        'pokedex-sprite-size': t('header.sub.sprite-sizing.title.dex'),
+                    })}
                 </Text>
             </Group>
         </Card.Section>

@@ -1,5 +1,6 @@
 import { Group } from '@mantine/core';
 import type React from 'react';
+import { useTranslate } from '../../../../translate/i18n';
 import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
 import { UIGameExpandedWrapper, type UIGameExpandedWrapperProps } from './ui-game-expanded-wrapper';
 
@@ -18,11 +19,11 @@ export const UIGamePkvaultExpanded: React.FC<UIGamePkvaultExpandedProps> = ({
     caughtCount, ownedCount, shinyCount,
     ...rest
 }) => {
+    const { t } = useTranslate();
+
     return <UIGameExpandedWrapper
         {...rest}
-        secondaryLine={<>
-            Centralized storage
-        </>}
+        secondaryLine={t('pkvault.description')}
         tertiaryLine={<>
             {caughtCount !== undefined && renderCount(<UIPokedexIcons.Caught size='sm' />, caughtCount)}
             {ownedCount !== undefined && renderCount(<UIPokedexIcons.Owned size='sm' />, ownedCount)}

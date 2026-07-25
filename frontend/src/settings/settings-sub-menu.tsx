@@ -1,8 +1,11 @@
 import type React from 'react';
 import { Route } from '../routes/settings';
+import { useTranslate } from '../translate/i18n';
 import { UISettingsCategories } from '../ui/settings/categories/ui-settings-categories';
 
 export const SettingsSubMenu: React.FC = () => {
+    const { t } = useTranslate();
+
     const navigate = Route.useNavigate();
 
     const currentValue = Route.useSearch({ select: search => search.subMenu ?? 'main' });
@@ -19,19 +22,19 @@ export const SettingsSubMenu: React.FC = () => {
         data={[
             {
                 id: 'main' satisfies typeof currentValue,
-                label: 'Main',
+                label: t('settings.sub.main'),
             },
             {
                 id: 'external-pkms' satisfies typeof currentValue,
-                label: 'External pkms',
+                label: t('settings.sub.external'),
             },
             {
                 id: 'backups' satisfies typeof currentValue,
-                label: 'Backups',
+                label: t('settings.sub.backups'),
             },
             {
                 id: 'about' satisfies typeof currentValue,
-                label: 'About',
+                label: t('settings.sub.about'),
             },
         ]}
     />;

@@ -10,6 +10,7 @@ import { UIPopover } from '../../../popover/ui-popover';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
 import { getBoxColumns } from '../get-box-columns';
 import classes from './ui-box-expanded.module.css';
+import { useTranslate } from '../../../../translate/i18n';
 
 export type UIBoxExpandedProps = UIExpandableTabsData & {
     slotsStates: boolean[];
@@ -23,6 +24,8 @@ export type UIBoxExpandedProps = UIExpandableTabsData & {
 export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
     id, label, selected, slotsStates, onSelect, onDelete, color, editDropdown
 }) => {
+    const { t } = useTranslate();
+
     const panel = useCurrentPanel();
 
     const cols = getBoxColumns(slotsStates.length);
@@ -39,14 +42,14 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
         },
         controls: [
             !selectDisabled && getSelectControl({
-                label: 'Select',
+                label: t('action.select'),
                 action: () => {
                     onSelect();
                 },
             }),
             !editDisabled && {
                 name: 'edit' as const,
-                label: 'Edit',
+                label: t('storage.actions.edit'),
                 triggers: {
                     mouse: {
                         type: 'mouse',
@@ -61,7 +64,7 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
             },
             !deleteDisabled && {
                 name: 'delete' as const,
-                label: 'Delete',
+                label: t('action.delete'),
                 triggers: {
                     mouse: {
                         type: 'mouse',
@@ -125,7 +128,7 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
             </UIPopover>
 
             <UIConfirmPopover
-                label='Delete'
+                label={t('action.delete')}
                 color='red'
                 action={onDelete}
             >

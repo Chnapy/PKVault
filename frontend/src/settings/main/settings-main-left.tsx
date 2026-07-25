@@ -4,7 +4,7 @@ import type React from "react";
 import { useFormContext } from 'react-hook-form';
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import type { SettingsFormData } from '../../pages/settings';
-import { useTranslate } from '../../translate/i18n';
+import { languages, useTranslate } from '../../translate/i18n';
 import { UISelect } from '../../ui/form/select/ui-select';
 import { UISwitch } from '../../ui/form/switch/ui-switch';
 import { UIInputLabel } from '../../ui/form/ui-input-label';
@@ -26,12 +26,12 @@ export const SettingsMainLeft: React.FC = () => {
         <Card>
             <SimpleGrid cols={2}>
                 <UIInputLabel leftSection={<UIBallIcon />} label='PKVault' />
-                <div>v{settings?.version} - SteamDeck - Flatpak</div>
+                <div>v{settings?.version}</div>
                 <UIInputLabel leftSection={<img src="https://projectpokemon.org/favicon.ico" />} label='PKHeX' />
                 <div>{settings?.pkhexVersion}</div>
-                <UIInputLabel leftSection={<FolderIcon />} label='PKVault path' />
+                <UIInputLabel leftSection={<FolderIcon />} label={t('settings.relative-paths')} />
                 <UIPathLine>{settings?.appDirectory ?? '-'}</UIPathLine>
-                <UIInputLabel leftSection={<FileIcon />} label='Config path' />
+                <UIInputLabel leftSection={<FileIcon />} label={t('settings.form.config')} />
                 <UIPathLine>{settings?.settingsPath ?? '-'}</UIPathLine>
             </SimpleGrid>
         </Card>
@@ -42,11 +42,8 @@ export const SettingsMainLeft: React.FC = () => {
                 <UISelect
                     {...form.register('language')}
                     controlLabel={t('settings.form.language')}
-                    data={[
-                        { value: 'en', label: 'English' },
-                        { value: 'fr', label: 'Français' },
-                        { value: 'de', label: 'Deutsch' },
-                    ]}
+                    data={Object.entries(languages)
+                        .map(([ value, label ]) => ({ value, label }))}
                     disabled={!settings?.canUpdateSettings}
                 />
             </SimpleGrid>
@@ -56,7 +53,7 @@ export const SettingsMainLeft: React.FC = () => {
             <SimpleGrid cols={2}>
                 <UIInputLabel leftSection={<PenOffIcon />} forInput='hidE_CHEATS'
                     label={t('settings.form.hide-cheats')}
-                    description='Remove moves & EVs from pokemon edit'
+                    description={t('settings.form.hide-cheats.description')}
                 />
                 <UISwitch
                     {...form.register('hidE_CHEATS')}
@@ -69,7 +66,7 @@ export const SettingsMainLeft: React.FC = () => {
 
                 <UIInputLabel leftSection={<ShieldOff />} forInput='skiP_LEGALITY_CHECKS'
                     label={t('settings.form.skip-legality')}
-                    description='If not concerned by online usage'
+                    description={t('settings.form.skip-legality.description')}
                 />
                 <UISwitch
                     {...form.register('skiP_LEGALITY_CHECKS')}
