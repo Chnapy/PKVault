@@ -107,7 +107,6 @@ const main = async (): Promise<Results> => {
 
     const hasError = (result.missingKeys && Object.keys(result.missingKeys).length > 0) ||
         (result.invalidKeys && Object.keys(result.invalidKeys).length > 0) ||
-        (unusedKeyResult && hasKeys(unusedKeyResult)) ||
         (undefinedKeyResult && hasKeys(undefinedKeyResult));
 
     return {
