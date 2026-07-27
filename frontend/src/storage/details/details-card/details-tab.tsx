@@ -7,7 +7,7 @@ import { UIDetailsSaveTab } from '../../../ui/storage/storage-details/saves/ui-d
 import { pick } from '../../../util/pick';
 import { useSelectCallback } from '../../../util/use-select-callback';
 
-export type DetailsTabProps = UIExpandableTabsData & {
+export type DetailsTabProps = Pick<UIExpandableTabsData, 'id'> & {
     saveId: number | null;
     selected?: boolean;
     warning?: boolean;

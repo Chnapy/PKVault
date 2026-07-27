@@ -57,11 +57,11 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
         },
         controls: [
             !selected && getSelectControl({
-                label: 'Select',
+                label: t('action.select'),
             }),
             !!editDropdown && {
                 name: 'edit' as const,
-                label: 'Edit',
+                label: t('storage.actions.edit'),
                 triggers: {
                     mouse: {
                         type: 'mouse',
@@ -76,7 +76,7 @@ export const UIBankExpanded: React.FC<UIBankExpandedProps> = ({
             },
             !selected && onDelete && {
                 name: 'delete' as const,
-                label: 'Delete',
+                label: t('action.delete'),
                 triggers: {
                     mouse: {
                         type: 'mouse',

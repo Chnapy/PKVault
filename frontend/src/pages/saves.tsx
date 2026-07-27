@@ -59,12 +59,12 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
           <Card.Section key={generation} inheritPadding withBorder>
             <Group py='sm'>
               <span>
-                Generation {generation}
+                {t('saves.title', { generation })}
               </span>
               {regions.map(region => <Badge key={region} variant='default'>{region}</Badge>)}
               <Divider orientation='vertical' />
               <span>
-                {maxSpecies} species
+                {t('saves.title.species', { maxSpecies })}
               </span>
             </Group>
           </Card.Section>,
@@ -88,7 +88,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
                 })}
                 actions={<>
                   {desktopMessage
-                    ? <Tooltip label='Open save folder'>
+                    ? <Tooltip label={t('saves.action.open')}>
                       <Button
                         variant='default'
                         size='compact-xs'
@@ -102,7 +102,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
                         <FolderIcon />
                       </Button>
                     </Tooltip>
-                    : <Tooltip label='Download save file'>
+                    : <Tooltip label={t('saves.action.download')}>
                       <Button
                         variant='default'
                         size='compact-xs'
@@ -123,10 +123,13 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
       })}
 
       <Card.Section inheritPadding withBorder py='inherit'>
-        <Tooltip label='Add saves in settings'>
+        <Tooltip label={t('saves.action.add')}>
           <UIActionIcon
             name='add-game'
-            controlLabel='Add game'
+            controlLabel={t('saves.action.add.controls-label')}
+            onClick={() => navigate({
+              to: '/settings'
+            })}
             variant='default'
             size='xl'
             w='100%'
@@ -137,29 +140,4 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
       </Card.Section>
     </Card>
   </UISavesContent>;
-
-  //     <Container className={css({
-  //       display: 'flex',
-  //       alignItems: 'center',
-  //       gap: 4,
-  //       backgroundColor: theme.bg.panel,
-  //       padding: '8px 16px',
-  //     })}>
-  //       <Icon name='info-circle' solid forButton />
-  //       {t('saves.not-see')}
-
-  //       <ButtonLink to={'/settings'}>
-  //         {t('action.check-settings')}
-  //       </ButtonLink>
-
-  //       <ButtonLink
-  //         to={'.'}
-  //         search={{ help: '1-quick-start.md' satisfies DocsGenEnSlugs }}
-  //       >
-  //         <Icon name='info-circle' solid />
-  //         {t('action.quick-start')}
-  //       </ButtonLink>
-  //     </Container>
-  //   </div>
-  // );
 });

@@ -36,15 +36,6 @@ export const PokedexDetails: React.FC = () => {
 
   const selectInfos = usePokedexDetailsSelect();
 
-  // const setSelectExpanded = (state: DetailsExpandedState) => {
-  //   navigate({
-  //     search: (search) => ({
-  //       ...search,
-  //       selectExpanded: state,
-  //     }),
-  //   });
-  // };
-
   if (!selectInfos) {
     return null;
   }
@@ -71,20 +62,10 @@ export const PokedexDetails: React.FC = () => {
   const baseStats = selectedForm.baseStats;
   const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);
 
-  // return (
-  //   <DetailsCardContainer
-  //     content={<>
-  //       {owned && (
-  //         <PokedexDetailsOwned saveId={selectedSpeciesValue.saveId} species={selectedSpeciesValue.species} />
-  //       )}
-  //     </>}
-  //   />
-  // );
-
   const content: UIDetailsContentProps[ 'content' ] = [
     {
       name: 'summary',
-      label: 'Summary',
+      label: t('details.summary.title'),
       content: <Grid>
         <Grid.Col span={4}>
           {t('details.abilities')}
@@ -102,12 +83,12 @@ export const PokedexDetails: React.FC = () => {
     },
     selectedForm.isOwned && {
       name: 'owned',
-      label: <><UIPokedexIcons.Owned size='xs' /> Owned</>,
+      label: <><UIPokedexIcons.Owned size='xs' /> {t('details.owned.title')}</>,
       content: <PokedexDetailsOwned saveId={selectedSpeciesValue.saveId || null} species={selectedSpeciesValue.species} />,
     },
     {
       name: 'stats',
-      label: 'Stats',
+      label: t('details.stats.title'),
       content: <UIDetailsContentStats>
         {([ 'hp', 'atk', 'def', 'spa', 'spd', 'spe' ] satisfies UIDetailsStatsRowProps[ 'stat' ][])
           .map((stat, i) => <UIDetailsStatsRow key={stat} stat={stat} value={baseStats[ i ]!} level={50} />)}
@@ -116,22 +97,22 @@ export const PokedexDetails: React.FC = () => {
     },
     {
       name: 'moves',
-      label: 'Moves',
+      label: t('details.moves.title'),
       content: 'WIP',
     },
     {
       name: 'evolutions',
-      label: 'Evolutions',
+      label: t('details.evolutions.title'),
       content: 'WIP',
     },
     {
       name: 'locations',
-      label: 'Locations',
+      label: t('details.locations.title'),
       content: 'WIP',
     },
     {
       name: 'misc',
-      label: 'Misc',
+      label: t('details.misc.title'),
       content: 'WIP',
     },
   ].filter(v => typeof v === 'object');
@@ -187,7 +168,7 @@ export const PokedexDetails: React.FC = () => {
     items={<>
       {staticFormsFiltered.length > 1 && <UISegmentedControl
         name='forms'
-        controlLabel='Change form'
+        controlLabel={t('details.form.change')}
         data={staticFormsFiltered.map(staticForm => ({
           value: staticForm.index.toString(),
           label: staticForm.name,
@@ -208,7 +189,7 @@ export const PokedexDetails: React.FC = () => {
             return <UIButton
               key={form.id}
               name={form.id}
-              controlLabel='Change form'
+              controlLabel={t('details.form.change')}
               size='xs'
               onClick={() => setSelectedFormId(form.id)}
               disabled={selectedForm.id === form.id}

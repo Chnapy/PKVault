@@ -84,7 +84,6 @@ export const DetailsSaves: React.FC<DetailsSavesProps> = ({ actions }) => {
             renderTab: ({ item, selected }) => <DetailsTab
                 key={item.id}
                 id={item.id}
-                label=''
                 saveId={saveId}
                 selected={selected}
             />,
@@ -163,7 +162,6 @@ export const DetailsSaves: React.FC<DetailsSavesProps> = ({ actions }) => {
                 : <DetailsTab
                     key={item.id}
                     id={item.id}
-                    label=''
                     saveId={null}
                     selected={selected}
                     warning={!!pkmLegalityMap[ item.id ] && !pkmLegalityMap[ item.id ]!.isValid}

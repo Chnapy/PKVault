@@ -1,17 +1,18 @@
 import { FolderXIcon } from 'lucide-react';
 import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
+import { useTranslate } from '../../../translate/i18n';
 import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui/form/select/ui-segmented-control';
 import { UIPokedexIcons } from '../../../ui/pokedex/icons/ui-pokedex-icons';
 import { switchUtil } from '../../../util/switch-util';
 
 export const FilterOwned: React.FC = () => {
-  // const { t } = useTranslate();
+  const { t } = useTranslate();
 
   const navigate = Route.useNavigate();
 
   const data = [
-    { value: 'all', label: 'All' },
+    { value: 'all', label: t('all') },
     { value: 'owned', label: <UIPokedexIcons.Owned size='xs' fz='1rem' /> },
     { value: 'not-owned', label: <FolderXIcon fontSize='1rem' opacity={0.75} /> },
   ] as const satisfies UISegmentedControlProps[ 'data' ];
@@ -32,7 +33,7 @@ export const FilterOwned: React.FC = () => {
 
   return <UISegmentedControl
     name='owned'
-    controlLabel='Filter by owned'
+    controlLabel={t('dex.filters.owned')}
     value={currentValue}
     data={data}
     onChange={(value) => startTransition(() => navigate({

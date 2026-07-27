@@ -59,7 +59,7 @@ export const FilterSpecies: React.FC = () => {
 
   return <UIAutocomplete
     name='filter-species'
-    label={t('dex.filters.name')}
+    label={t('dex.filters.species')}
     value={value}
     onChange={(value) => {
       setValue(value);

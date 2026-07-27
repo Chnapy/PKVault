@@ -34,7 +34,7 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
     return <UIPopoverCard
         miw={200}
         icon={<PencilIcon />}
-        title='Edit save version'
+        title={t('save.edit.title')}
     >
         {[ ...new Set([ save.version, ...versionObj.children ]) ].map(vers => ({
             value: vers,
@@ -47,7 +47,7 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
 
                 <UIButton
                     name={`version-${item.value}`}
-                    controlLabel='Set version'
+                    controlLabel={t('save.edit.version')}
                     focusOnMount={item.value === save.displayedVersion}
                     disabled={settingsEdit.isPending || item.value === save.displayedVersion}
                     onClick={async () => {

@@ -4,6 +4,7 @@ import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { type EditPkmVariantPayload } from '../../../../data/sdk/model';
 import { useTranslate } from '../../../../translate/i18n';
+import { switchUtil } from '../../../../util/switch-util';
 import { UIMultiSelect } from '../../../form/select/ui-multi-select';
 import { UITextInput } from '../../../form/text-input/ui-text-input';
 import { usePopover } from '../../../interaction/focus-controls/components/popover/hooks/use-popover';
@@ -116,7 +117,14 @@ export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({
                         };
 
                         return <Group key={stat}>
-                            <Text miw={22}>{t(`details.stats.${stat}`)}</Text>
+                            <Text miw={22}>{switchUtil(stat, {
+                                'hp': t('details.stats.hp'),
+                                'atk': t('details.stats.atk'),
+                                'def': t('details.stats.def'),
+                                'spa': t('details.stats.spa'),
+                                'spd': t('details.stats.spd'),
+                                'spe': t('details.stats.spe'),
+                            })}</Text>
                             <Slider
                                 {...register(`eVs.${i}`, commonParams)}
                                 {...commonProps}

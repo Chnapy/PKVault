@@ -1,16 +1,17 @@
 import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
+import { useTranslate } from '../../../translate/i18n';
 import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui/form/select/ui-segmented-control';
 import { UIShinyIcon } from '../../../ui/icon/ui-shiny-icon';
 import { switchUtil } from '../../../util/switch-util';
 
 export const FilterOwnedShiny: React.FC = () => {
-  // const { t } = useTranslate();
+  const { t } = useTranslate();
 
   const navigate = Route.useNavigate();
 
   const data = [
-    { value: 'all', label: 'All' },
+    { value: 'all', label: t('all') },
     { value: 'shiny', label: <UIShinyIcon /> },
     { value: 'not-shiny', label: <UIShinyIcon disabled /> },
   ] as const satisfies UISegmentedControlProps[ 'data' ];
@@ -31,7 +32,7 @@ export const FilterOwnedShiny: React.FC = () => {
 
   return <UISegmentedControl
     name='shiny'
-    controlLabel='Filter by shiny'
+    controlLabel={t('dex.filters.owned-shiny')}
     value={currentValue}
     data={data}
     onChange={(value) => startTransition(() => navigate({

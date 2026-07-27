@@ -18,6 +18,8 @@
     "gen:css:dts": "vite-css-modules",
     "gen:docs": "node ./generate-docs.ts",
     "gen:cssvar": "node ./generate-cssvar.ts",
+    "c:translate": "node ./parse-translations.ts",
+    "c:translate:fix": "node ./parse-translations.ts --fix",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "knip": "knip"
@@ -51,6 +53,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^5.1.2",
     "@eslint/js": "^9.39.4",
+    "@lingual/i18n-check": "^0.9.5",
     "@rolldown/plugin-babel": "^0.2.2",
     "@storybook/addon-a11y": "^10.3.6",
     "@storybook/addon-docs": "^10.3.6",

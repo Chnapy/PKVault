@@ -98,7 +98,7 @@ export const SortAdvancedAction: React.FC<{
     >
         <UISelect
             {...register('pokedexName')}
-            controlLabel='Pokedex name'
+            controlLabel={t('storage.sort.pokedex')}
             label={t('storage.sort.pokedex')}
             data={
                 pokedexKeys.map((key): ComboboxItem => ({
@@ -114,7 +114,7 @@ export const SortAdvancedAction: React.FC<{
 
         <UISelect
             {...register('fromBoxId')}
-            controlLabel='From box'
+            controlLabel={t('storage.sort.from-box')}
             label={t('storage.sort.from-box')}
             data={
                 filteredBoxes.map((box): ComboboxItem => ({
@@ -129,7 +129,7 @@ export const SortAdvancedAction: React.FC<{
 
         <UISelect
             {...register('toBoxId')}
-            controlLabel='To box'
+            controlLabel={t('storage.sort.to-box')}
             label={t('storage.sort.to-box')}
             data={
                 filteredBoxes.map((box): ComboboxItem => ({
@@ -144,7 +144,7 @@ export const SortAdvancedAction: React.FC<{
 
         <UISwitch
             name='leaveEmptySlot'
-            controlLabel='Leave empty slots'
+            controlLabel={t('storage.sort.empty-slot')}
             label={t('storage.sort.empty-slot')}
             description={saveId ? t('storage.sort.description.2') : t('storage.sort.description.3')}
             checked={leaveEmptySlot}

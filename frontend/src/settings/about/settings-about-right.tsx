@@ -80,7 +80,7 @@ export const SettingsAboutRight: React.FC = () => {
                             href={r.html_url}
                             target='__blank'
                             name={`release-link-${r.name}`}
-                            controlLabel=''
+                            controlLabel={t('action.open')}
                             leftSection={<ExternalLinkIcon />}
                             variant={releaseState === 'new' ? 'filled' : 'default'}
                             color='blue'

@@ -56,7 +56,7 @@ export const NotificationButton: React.FC = () => {
             >
                 <UIActionIcon
                     name='notif-btn'
-                    controlLabel='Open notifications'
+                    controlLabel={t('header.notifications.controls-label')}
                     // variant='subtle'
                     onClick={hasNotifs
                         ? (() => setOpened(value => !value))

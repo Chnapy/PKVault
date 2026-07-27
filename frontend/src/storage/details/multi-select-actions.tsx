@@ -1,6 +1,7 @@
 import { Card, Group, Text } from '@mantine/core';
 import { SquareCheckIcon } from 'lucide-react';
 import type React from 'react';
+import { useTranslate } from '../../translate/i18n';
 import { WithControlsIcons } from '../../ui/interaction/controls/icons/with-controls-icons';
 import { useControls } from '../../ui/interaction/controls/use-controls';
 import { getBackControl } from '../../ui/interaction/focus-controls/common-controls/back-controls';
@@ -13,6 +14,8 @@ import { useCurrentStorageWithFallback } from '../panel/hooks/use-current-storag
 import { DetailsActions } from './details-actions';
 
 export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) => {
+    const { t } = useTranslate();
+
     const { saveId, box } = useCurrentStorageWithFallback().data ?? {};
 
     const parentScope = useFocusScopeContext();
@@ -62,7 +65,7 @@ export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) 
         [
             !wasInPopover && {
                 name: 'focus',
-                label: 'Focus',
+                label: t('action.focus'),
                 triggers: {
                     gamepad: {
                         type: 'gamepad',
@@ -76,7 +79,7 @@ export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) 
                 },
             },
             isInPopover && getBackControl({
-                label: 'Back to panel',
+                label: t('action.back'),
                 action: () => {
                     popScope(parentScope.scopeId);
                 },
@@ -97,7 +100,9 @@ export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) 
             <Card.Section inheritPadding withBorder>
                 <Group gap='sm'>
                     <SquareCheckIcon />
-                    <Text>{multiSelectIds.size} pokemons selected</Text>
+                    <Text>
+                        {t('storage.actions.select-title', { count: multiSelectIds.size })}
+                    </Text>
                 </Group>
             </Card.Section>
             {enabled && <Card.Section component={UICardSectionControl} inheritPadding py='inherit' withBorder>

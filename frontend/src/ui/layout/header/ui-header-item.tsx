@@ -3,6 +3,7 @@ import { Link, useLocation } from '@tanstack/react-router';
 import React from "react";
 import { HistoryContext } from '../../../context/history-context';
 import { type FileRouteTypes } from "../../../routeTree.gen";
+import { useTranslate } from '../../../translate/i18n';
 import { UIButton } from '../../form/button/ui-button';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
@@ -25,6 +26,8 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
   selected,
   children,
 }) => {
+  const { t } = useTranslate();
+
   const location = useLocation();
 
   const historyContext = HistoryContext.useValue();
@@ -38,7 +41,7 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
     scopeNodeId: id,
     controls: [
       getSelectControl({
-        label: 'Select',
+        label: t('action.select'),
       }),
     ],
   });

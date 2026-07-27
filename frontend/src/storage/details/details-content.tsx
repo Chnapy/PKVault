@@ -64,7 +64,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         isVariant(pkm) && pkm.isExternal && <Alert
             variant='default' title={<Group>
                 <InfoIcon />
-                External PKM file
+                {t('details.external-pkm-file.title')}
             </Group>}
         >
             <ExternalLinkIcon />{' '}
@@ -76,7 +76,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         !pkm.isEnabled && <Alert variant='outline' color='red'
             title={<Group>
                 <AlertCircleIcon />
-                Disabled PKM
+                {t('details.is-disabled.title')}
             </Group>}
         >
             {t('details.is-disabled')}
@@ -85,7 +85,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
             variant='outline' color='red'
             title={<Group>
                 <AlertCircleIcon />
-                File loading error
+                {t('details.load-error.title')}
             </Group>}
         >
             {pkm.loadError && t('details.load-error', {
@@ -130,7 +130,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
     const content: UIDetailsContentProps[ 'content' ] = [
         issues.length > 0 && {
             name: 'issue',
-            label: <><UIPokedexIcons.Warn size='xs' /> Issues</>,
+            label: <><UIPokedexIcons.Warn size='xs' /> {t('details.issues.title')}</>,
             content: <Stack>
                 {issues.map((issue, i) => <React.Fragment key={i}>
                     {issue}
@@ -139,7 +139,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         },
         pkm.isEnabled && {
             name: 'summary',
-            label: 'Summary',
+            label: t('details.summary.title'),
             content: <UIDetailsContentSummary
                 id={pkm.id}
                 heldItem={pkm.generation > 1
@@ -158,7 +158,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         },
         pkm.isEnabled && {
             name: 'stats',
-            label: 'Stats',
+            label: t('details.stats.title'),
             content: <UIDetailsContentStats iv ev asDv={pkm.generation < 3}>
                 {([ 'hp', 'atk', 'def', 'spa', 'spd', 'spe' ] satisfies UIDetailsStatName[])
                     .map((stat, i): UIDetailsStatsRowProps => {
@@ -190,7 +190,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         },
         pkm.isEnabled && {
             name: 'moves',
-            label: 'Moves',
+            label: t('details.moves.title'),
             content: <UIDetailsContentMove
                 moves={pkm.moves.map((move, i) => (
                     <MoveItem
@@ -212,7 +212,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         },
         pkm.isEnabled && (pkm.contest || pkm.ribbons) && {
             name: 'contest',
-            label: 'Contest',
+            label: t('details.contest'),
             content: <UIDetailsContentCosmetic
                 contest={pkm.contest?.map((value, i) => <UIContest key={i} index={i} value={value} />)}
                 ribbons={pkm.ribbons && Object.entries(pkm.ribbons)
@@ -221,7 +221,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         },
         pkm.isEnabled && {
             name: 'origin',
-            label: 'Origin',
+            label: t('details.origin'),
             content: <UIDetailsContentOrigin
                 game={<Group>
                     <UIGameImg
@@ -245,7 +245,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         },
         pkm.isEnabled && {
             name: 'misc',
-            label: 'Misc',
+            label: t('details.misc.title'),
             content: <UIDetailsContentMisc
                 isEgg={pkm.isEgg}
                 eggHatchCount={pkm.eggHatchCount}

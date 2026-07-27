@@ -59,7 +59,7 @@ export const DexSyncAdvancedAction: React.FC<{
   >
     <UIMultiSelect
       name='saveIds'
-      controlLabel='Select Pokedexes'
+      controlLabel={t('storage.dex-sync.controls-label')}
       label={t("storage.dex-sync.title")}
       value={saveIds.map(String)}
       onChange={value => setValue('saveIds', value.map(Number))}

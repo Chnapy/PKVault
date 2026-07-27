@@ -30,7 +30,7 @@ export const WelcomeDialog: React.FC = () => {
             title={<Group gap='sm'>
                 <InfoIcon />
                 <Text size='xl'>
-                    First launch - Welcome !
+                    {t('welcome.title')}
                 </Text>
             </Group>}
         >
@@ -40,6 +40,8 @@ export const WelcomeDialog: React.FC = () => {
 };
 
 const WelcomeDialogInner: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+    const { t } = useTranslate();
+
     const { language, menuItems } = useHelpMenuItems();
 
     const parentScope = useFocusScopeContext();
@@ -51,7 +53,7 @@ const WelcomeDialogInner: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         order + 1,
         [
             getBackControl({
-                label: 'Back',
+                label: t('action.back'),
                 action: onClose,
             }),
         ],
@@ -67,9 +69,9 @@ const WelcomeDialogInner: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     return <FocusScope id='welcome-dialog' focusOnMount>
         <Stack {...controlProps('back')}>
             <Card>
-                PKVault helps you manage your Pokemon games saves & data.
-                <br />A save file is present as sample for testing the app, before adding your own saves & data.
-                <br />I hope this app will answer your needs. Consider giving your feedback !
+                {t('welcome.head.1')}
+                <br />{t('welcome.head.2')}
+                <br />{t('welcome.head.3')}
             </Card>
 
             <HelpDialogContent
@@ -80,11 +82,11 @@ const WelcomeDialogInner: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
             <UIButton
                 name='welcome-dialog-start'
-                controlLabel=''
+                controlLabel={t('welcome.footer.play')}
                 onClick={onClose}
                 fullWidth
             >
-                It's time to play !
+                {t('welcome.footer.play')}
             </UIButton>
         </Stack>
     </FocusScope>;

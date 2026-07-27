@@ -28,6 +28,9 @@ export const UIActionIcon: React.FC<UIActionIconProps> = ({
         }
     });
 
+    if (!controlLabel)
+        console.warn('controlLabel is empty', { name })
+
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,

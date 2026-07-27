@@ -4,12 +4,13 @@ import React, { startTransition } from "react";
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
+import { useTranslate } from '../../../translate/i18n';
 import { UIMultiSelect } from '../../../ui/form/select/ui-multi-select';
 import { UIGameImg } from '../../../ui/sprite-img/ui-game-img';
 import { filterIsDefined } from '../../../util/filter-is-defined';
 
 export const FilterFromGames: React.FC = () => {
-  // const { t } = useTranslate();
+  const { t } = useTranslate();
 
   const navigate = Route.useNavigate();
   const currentValue = Route.useSearch({ select: (search) => search.filterFromGames })?.map(String) ?? [];
@@ -27,8 +28,8 @@ export const FilterFromGames: React.FC = () => {
 
   return <UIMultiSelect
     name='filter-game'
-    controlLabel='Filter by game'
-    label='Storages'
+    controlLabel={t('dex.filters.storages.controls-label')}
+    label={t('dex.filters.storages')}
     value={currentValue}
     data={options}
     onChange={(storages) => startTransition(() => navigate({

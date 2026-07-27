@@ -22,7 +22,7 @@ export const FilterGeneration: React.FC = () => {
 
   return <UIMultiSelect
     name='filter-generation'
-    controlLabel='Filter by generation'
+    controlLabel={t('dex.filters.generations.controls-label')}
     label={t('dex.filters.generations')}
     data={options}
     value={searchValue.map(String)}

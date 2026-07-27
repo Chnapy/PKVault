@@ -122,7 +122,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
                 ).join('\n\n')}>
                 <UIButton
                     name='detach'
-                    controlLabel='Detach'
+                    controlLabel={saveId ? t('storage.actions.detach-save') : t('storage.actions.detach-main')}
                     onClick={() =>
                         mainPkmDetachSaveMutation.mutateAsync({
                             params: {
@@ -147,7 +147,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
                     ).join('\n\n')}>
                 <UIButton
                     name='move-attached'
-                    controlLabel='Move attached'
+                    controlLabel={t('storage.actions.move-attached')}
                     onClick={onClickMoveAttached}
                     size='compact-md'
                     leftSection={<Group gap='sm' wrap='nowrap'>
@@ -171,7 +171,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
         >
             <UIButton
                 name='edit'
-                controlLabel='Edit'
+                controlLabel={t('storage.actions.edit')}
                 variant='filled'
                 color='blue'
                 size='compact-md'
@@ -182,7 +182,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
         </UIPopover>}
 
         {canEvolveList.length > 0 && <UIConfirmPopover
-            label='Evolve'
+            label={t('storage.actions.evolve')}
             color='blue'
             action={async () => {
                 if (canEvolveList.length === 0)
@@ -226,7 +226,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
         </UIConfirmPopover>}
 
         <UIConfirmPopover
-            label='Release'
+            label={t('storage.actions.release')}
             color='red'
             action={async () => {
                 if (canReleaseList.length === 0)
@@ -251,7 +251,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
         >
             <UIButton
                 name='release'
-                controlLabel='Release'
+                controlLabel={t('storage.actions.release')}
                 variant='filled'
                 color='red'
                 size='compact-md'

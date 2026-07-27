@@ -7,6 +7,7 @@ import type { PkmVariantDTO } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
+import { useTranslate } from '../../translate/i18n';
 import { UIButton } from '../../ui/form/button/ui-button';
 import { UIPokedexIcons } from '../../ui/pokedex/icons/ui-pokedex-icons';
 import { UIGameImg } from '../../ui/sprite-img/ui-game-img';
@@ -15,6 +16,8 @@ import { useSelectCallback } from '../../util/use-select-callback';
 import { useCurrentStorage, useOtherStorage } from '../panel/storage-panel-context';
 
 export const DetailsAttachedButton: React.FC = () => {
+    const { t } = useTranslate();
+
     const staticData = useStaticData();
 
     const navigate = Route.useNavigate();
@@ -109,7 +112,7 @@ export const DetailsAttachedButton: React.FC = () => {
 
     return <UIButton
         name='attached'
-        controlLabel='Go to attached'
+        controlLabel={t('storage.actions.go-attached')}
         loading={attachedLoading}
         onClick={onClick}
         leftSection={

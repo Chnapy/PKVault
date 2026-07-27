@@ -37,7 +37,7 @@ export const UIActionsPanel: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
 };
 
 const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, onSave }) => {
-    const { t } = useTranslate();
+    const { t, i18n } = useTranslate();
 
     const hasActions = data.length > 0;
 
@@ -54,14 +54,14 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
         scopeNodeId: 'actions-panel',
         controls: [
             hasActions && getSelectControl({
-                label: 'See all actions',
+                label: t('storage.save-actions.actions.controls-label-details'),
                 action: () => {
                     setOpened(true);
                 },
             }),
             onSaveAndClose && {
                 name: 'save',
-                label: 'Save',
+                label: t('action.save'),
                 spread: false,
                 triggers: {
                     gamepad: {
@@ -79,7 +79,13 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
     const reversedData = data.reverse();
 
     return <Group wrap='nowrap' style={{ flexGrow: 1 }}>
-        <Title order={5} lh={1}>{t('storage.save-actions.title')}</Title>
+        <Title
+            order={5}
+            lh={1}
+            w='min-content'
+            miw={i18n.language === 'de' ? 94 : undefined}
+            ta='center'
+        >{t('storage.save-actions.title')}</Title>
 
         <Divider orientation='vertical' />
 
@@ -148,7 +154,7 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
 
         <UIButton
             name='save-2'
-            controlLabel='Save'
+            controlLabel={t('action.save')}
             controlIcons={[ controlIcons('save') ]}
             variant='filled'
             color='primary'

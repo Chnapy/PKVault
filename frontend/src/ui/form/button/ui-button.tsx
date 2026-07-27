@@ -30,6 +30,9 @@ export const UIButton = function <C = 'button'>({
         }
     });
 
+    if (!controlLabel)
+        console.warn('controlLabel is empty', { name })
+
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,
         focusOnMount,

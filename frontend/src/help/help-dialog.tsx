@@ -44,6 +44,8 @@ export const HelpDialog: React.FC = () => {
 };
 
 const HelpDialogInner: React.FC = () => {
+    const { t } = useTranslate();
+
     const helpPathFallback = React.useRef('');
     const helpPath = Route.useSearch({ select: search => search.help ?? helpPathFallback.current });
     const helpNavigate = useHelpNavigate();
@@ -70,7 +72,7 @@ const HelpDialogInner: React.FC = () => {
         order + 1,
         [
             getBackControl({
-                label: 'Back',
+                label: t('action.back'),
                 action: onClose,
             }),
         ],

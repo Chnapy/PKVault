@@ -1,16 +1,17 @@
 import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
+import { useTranslate } from '../../../translate/i18n';
 import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui/form/select/ui-segmented-control';
 import { UIAlphaIcon } from '../../../ui/icon/ui-alpha-icon';
 import { switchUtil } from '../../../util/switch-util';
 
 export const FilterAlpha: React.FC = () => {
-  // const { t } = useTranslate();
+  const { t } = useTranslate();
 
   const navigate = Route.useNavigate();
 
   const data = [
-    { value: 'all', label: 'All' },
+    { value: 'all', label: t('all') },
     { value: 'alpha', label: <UIAlphaIcon /> },
     { value: 'not-alpha', label: <UIAlphaIcon disabled /> },
   ] as const satisfies UISegmentedControlProps[ 'data' ];
@@ -31,7 +32,7 @@ export const FilterAlpha: React.FC = () => {
 
   return <UISegmentedControl
     name='alpha'
-    controlLabel='Filter by alpha'
+    controlLabel={t('dex.filters.alpha')}
     value={currentValue}
     data={data}
     onChange={(value) => startTransition(() => navigate({

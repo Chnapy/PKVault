@@ -29,7 +29,7 @@ export const FilterViews: React.FC = () => {
       <Checkbox.Card
         renderRoot={props => <UIButton
           name={allValues[ 0 ]}
-          controlLabel={t('dex.filters.show-forms.yes')}
+          controlLabel={t('dex.filters.forms')}
           leftSection={<Checkbox.Indicator />}
           styles={{
             label: {
@@ -40,13 +40,13 @@ export const FilterViews: React.FC = () => {
         />}
         value={allValues[ 0 ]}
       >
-        Forms
+        {t('dex.filters.forms')}
       </Checkbox.Card>
 
       <Checkbox.Card
         renderRoot={props => <UIButton
           name={allValues[ 1 ]}
-          controlLabel={t('dex.filters.show-genders.yes')}
+          controlLabel={t('dex.filters.genders')}
           leftSection={<Checkbox.Indicator />}
           styles={{
             label: {
@@ -57,7 +57,7 @@ export const FilterViews: React.FC = () => {
         />}
         value={allValues[ 1 ]}
       >
-        Genders
+        {t('dex.filters.genders')}
       </Checkbox.Card>
     </Group>
   </Checkbox.Group>;

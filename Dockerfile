@@ -87,6 +87,8 @@ RUN npm run test
 
 RUN npm run c:lint
 
+RUN npm run c:translate
+
 # frontend publish
 FROM frontend-builder AS frontend-publish
 

@@ -64,13 +64,13 @@ export const Header: React.FC = () => {
             <Tooltip
                 multiline
                 label={[
-                    'Reload all data to be up-to-date',
+                    t('header.reload.description'),
                     !settings?.canScanSaves && t('action.not-possible'),
                 ].filter(Boolean).join('\n')}
             >
                 <UIButton
                     name='refresh-data'
-                    controlLabel='Refresh data'
+                    controlLabel={t('header.reload.controls-label')}
                     onClick={() => savesScanMutation.mutateAsync()}
                     loading={savesScanMutation.isPending}
                     disabled={!settings?.canScanSaves}
@@ -83,7 +83,7 @@ export const Header: React.FC = () => {
                     mx='auto'
                     style={{ alignSelf: 'center' }}
                 >
-                    {t('header.scan-saves')}
+                    {t('header.reload')}
                 </UIButton>
             </Tooltip>
 

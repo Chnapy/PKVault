@@ -19,7 +19,7 @@ export const FilterTypes: React.FC = () => {
 
   return <UIMultiSelect
     name='filter-type'
-    controlLabel='Filter by type'
+    controlLabel={t('dex.filters.types.controls-label')}
     label={t('dex.filters.types')}
     data={allTypes.map((type) => ({
       value: type.id.toString(),

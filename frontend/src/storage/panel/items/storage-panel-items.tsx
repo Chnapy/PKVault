@@ -2,16 +2,19 @@ import { EmptyState, Group } from '@mantine/core';
 import { RectangleEllipsisIcon } from 'lucide-react';
 import React from 'react';
 import { usePkmIndex } from '../../../data/hooks/use-pkm-index';
+import { useTranslate } from '../../../translate/i18n';
 import { getBoxColumns } from '../../../ui/storage/storage-panel/get-box-columns';
-import { StorageItemPlaceholder } from '../../item/storage-item-placeholder';
 import { filterIsDefined } from '../../../util/filter-is-defined';
 import { useSelectCallback } from '../../../util/use-select-callback';
 import { StorageMainItem } from '../../item/main/storage-main-item';
 import { StorageSaveItem } from '../../item/save/storage-save-item';
+import { StorageItemPlaceholder } from '../../item/storage-item-placeholder';
 import { useCurrentStorageWithFallback } from '../hooks/use-current-storage-with-fallback';
 import { useCurrentStorage } from '../storage-panel-context';
 
 export const StoragePanelItems: React.FC = () => {
+    const { t } = useTranslate();
+
     const { storageIndex } = useCurrentStorage();
     const storage = useCurrentStorageWithFallback();
     const { saveId = null, boxId, box } = storage.data ?? {};
@@ -107,7 +110,7 @@ export const StoragePanelItems: React.FC = () => {
         {!isPending && emptyBox && <EmptyState
             size='sm'
             icon={<RectangleEllipsisIcon />}
-            title='Box is empty'
+            title={t('storage.box.empty')}
             opacity={0.75}
             style={{
                 position: 'absolute',

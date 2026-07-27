@@ -3,6 +3,7 @@ import { RectangleEllipsisIcon } from 'lucide-react';
 import React from "react";
 import { withErrorCatcher } from "../../error/with-error-catcher";
 import { useStaticData } from "../../hooks/use-static-data";
+import { useTranslate } from '../../translate/i18n';
 import { UIPokedexMainSection } from '../../ui/pokedex/main/section/ui-pokedex-main-section';
 import { UIPokedexMainSectionHeader } from '../../ui/pokedex/main/section/ui-pokedex-main-section-header';
 import { UIPokedexMain } from '../../ui/pokedex/main/ui-pokedex-main';
@@ -14,7 +15,7 @@ import { usePokedexItems } from "./hooks/use-pokedex-items";
 import { PokedexItem } from "./pokedex-item";
 
 export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("default", React.memo((popoverProps) => {
-  // const { t } = useTranslate();
+  const { t } = useTranslate();
 
   const staticData = useStaticData();
 
@@ -33,7 +34,7 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
       {!isPending && speciesItemsByGenerationList.length === 0 && <EmptyState
         size='sm'
         icon={<RectangleEllipsisIcon />}
-        title='Pokedex is empty with given filters'
+        title={t('dex.list.empty')}
       />}
 
       {isPending && <>
@@ -58,7 +59,7 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
       }, i) => [
           <Card.Section key={i} inheritPadding withBorder>
             <UIPokedexMainSectionHeader
-              generation={`Generation ${generation}`}
+              generation={t('dex.list.title', { generation })}
               regions={staticData.generations[ generation ]?.regions ?? []}
               games={versionsForImgs.map((versions, i) => <Group key={i} gap='xs'>
                 {versions.map(version => <UIGameImg

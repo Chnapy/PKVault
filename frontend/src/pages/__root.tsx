@@ -9,25 +9,28 @@ import { WelcomeDialog } from '../help/welcome-dialog';
 import { getGameInfos } from '../pokedex/details/util/get-game-infos';
 import { ActionsPanel } from '../storage/actions/actions-panel';
 import { MoveSelectImplProvider } from '../storage/move/move-select-impl-provider';
-import { UIAppLayout } from '../ui/layout/app-layout/ui-app-layout';
-import { UIFooter } from '../ui/layout/footer/ui-footer';
+import { useTranslate } from '../translate/i18n';
 import { iconResources } from '../ui/icon/resources/icon-resources';
 import { ImgPrefetch } from '../ui/icon/resources/img-prefetch';
+import { UIAppLayout } from '../ui/layout/app-layout/ui-app-layout';
+import { UIFooter } from '../ui/layout/footer/ui-footer';
 
 const versionsImgs = [ ...new Set(Object.values(GameVersion).map(version => getGameInfos(version).img)) ].filter(Boolean);
 
 export const RootPage: React.FC = () => {
+  const { t } = useTranslate();
 
   const hasStorageActions = !!useStorageGetActions().data?.data.length;
 
   React.useEffect(() => {
     if (hasStorageActions) {
-      window.onbeforeunload = () => 'You have unsaved changes !';
+      const txt = t('before-unload.alert');
+      window.onbeforeunload = () => txt;
     } else {
       window.onbeforeunload = null;
     }
 
-  }, [ hasStorageActions ]);
+  }, [ hasStorageActions, t ]);
 
   const imgsToPrefetch = [
     ...Object.values(iconResources).flatMap(v => Object.values(v)),
