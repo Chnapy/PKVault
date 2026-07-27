@@ -11,6 +11,8 @@ import { UIAppLayout } from '../../layout/app-layout/ui-app-layout';
 import { UIFooter } from '../../layout/footer/ui-footer';
 import { UIHeader } from '../../layout/header/ui-header';
 import { WithStorageBanks as UIHeaderBanksStory, WithSingleBank as UIHeaderSingleBankStory } from '../../layout/header/ui-header.stories';
+import { UISplitButton } from '../../storage/storage-content/middle/ui-split-button';
+import { UIStorageContentMiddle } from '../../storage/storage-content/middle/ui-storage-content-middle';
 import { UIStorageContent } from '../../storage/storage-content/ui-storage-content';
 import { UIStoragePanel } from '../../storage/storage-panel/ui-storage-panel';
 import { UIStoragePanelWrapperDetails } from '../../storage/storage-panel/ui-storage-panel-wrapper-details';
@@ -115,6 +117,10 @@ export const Primary: Story = {
                     children={getPanelChildren(2)}
                 />}
             />}
+            middle={<UIStorageContentMiddle>
+                <UISplitButton direction='right' />
+                <UISplitButton direction='left' />
+            </UIStorageContentMiddle>}
         />}
     />,
 };
@@ -142,6 +148,10 @@ export const EmptyData: Story = {
                     {...StoragePanelEmptyStory.args}
                 />}
             />}
+            middle={<UIStorageContentMiddle>
+                <UISplitButton direction='right' />
+                <UISplitButton direction='left' />
+            </UIStorageContentMiddle>}
         />}
     />,
 };

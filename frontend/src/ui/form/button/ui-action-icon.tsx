@@ -14,7 +14,7 @@ export type UIActionIconProps = {
 
 export const UIActionIcon: React.FC<UIActionIconProps> = ({
     name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner,
-    h, w, mt, ml, style, ...rest
+    w, mt, ml, style, ...rest
 }) => {
     const [ loadingInner, setLoading ] = React.useState(false);
 
@@ -47,7 +47,7 @@ export const UIActionIcon: React.FC<UIActionIconProps> = ({
     );
 
     return <WithControlsIcons placement='out' icons={[ controlIcons('open'), ...extraControlIcons ]}
-        display='inline-flex' h={h ?? 'fit-content'} w={w ?? 'fit-content'} mt={mt} ml={ml} style={style}
+        display='inline-flex' h={'fit-content'} w={w ?? 'fit-content'} mt={mt} ml={ml} style={style}
     >
         <ActionIcon
             {...focusProps}

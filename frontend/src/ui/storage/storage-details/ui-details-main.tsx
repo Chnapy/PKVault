@@ -24,7 +24,7 @@ export type UIDetailsMainProps = {
     isAlpha?: boolean;
     types: React.ReactNode;
     markings: React.ReactNode;
-    teraType?: React.ReactNode; // TODO
+    teraType?: React.ReactNode;
     ball: React.ReactNode;
     nickname: string;
     level: number;
@@ -44,7 +44,7 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
     ball, nickname, gender, isEnabled, isShiny, isAlpha,
     species, speciesName, level, pokerusDays = 0, isPokerusCured,
     canEvolve, isDuplicate, warning,
-    types, heldItem, markings, attachedBtn,
+    types, teraType, heldItem, markings, attachedBtn,
     children,
 }) => {
     const { t } = useTranslate();
@@ -62,9 +62,17 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
                 </Text>
             </Group>
 
-            <Group>
+            <Group wrap='nowrap'>
                 <Text component='b' size='lg'>#{getSpeciesNO(species)}</Text>
-                <Text size='lg' tt='uppercase'>{speciesName}</Text>
+                <Text
+                    size='lg'
+                    tt='uppercase'
+                    style={{
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                    }}
+                >{speciesName}</Text>
 
                 <UIButton
                     component={StorageRoute.Link}
@@ -100,6 +108,11 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
             <Stack>
                 {isEnabled && <>
                     {types}
+
+                    {teraType && <Stack gap='xs'>
+                        <Text c='dimmed' size='sm'>{t('details.teratype')}</Text>
+                        {teraType}
+                    </Stack>}
 
                     <Space mt='auto' />
                     {heldItem}

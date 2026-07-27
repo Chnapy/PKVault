@@ -198,6 +198,8 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
                         pkmId={pkm.id}
                         saveId={selectedSaveId}
                         move={move}
+                        isAlpha={pkm.alphaMove === move}
+                        isValid={pkmLegality.movesLegality[ i ]}
                     />
                 ))}
                 relearnMoves={pkm.relearnMoves && pkm.relearnMoves.map((move, i) => (
@@ -206,6 +208,8 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
                         pkmId={pkm.id}
                         saveId={selectedSaveId}
                         move={move}
+                        isAlpha={pkm.alphaMove === move}
+                        isValid={pkmLegality.relearnMovesLegality[ i ]}
                     />
                 ))}
             />,

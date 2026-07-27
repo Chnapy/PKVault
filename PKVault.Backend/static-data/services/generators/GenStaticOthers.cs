@@ -34,7 +34,8 @@ public record StaticMoveGeneration(
     byte UntilGeneration,
     int Type,
     MoveCategory Category,
-    int? Power
+    int? Power,
+    int? Accuracy
 );
 
 public record StaticNature(
@@ -281,7 +282,8 @@ public class GenStaticOthers(
                             UntilGeneration: 99,
                             Type: 1,   // normal
                             Category: MoveCategory.STATUS,
-                            Power: null
+                            Power: null,
+                            Accuracy: null
                         )]
                     );
                 }
@@ -296,7 +298,8 @@ public class GenStaticOthers(
                             UntilGeneration: 99,
                             Type: 1,   // normal
                             Category: MoveCategory.STATUS,
-                            Power: null
+                            Power: null,
+                            Accuracy: null
                         )]
                     );
                 }
@@ -310,6 +313,7 @@ public class GenStaticOthers(
 
                 var tmpTypeUrl = moveObj.Type.Url;
                 var tmpPowerUrl = moveObj.Power;
+                var tmpAccuracyUrl = moveObj.Accuracy;
 
                 List<StaticMoveGeneration> dataUntilGeneration = [.. await Task.WhenAll(
                     moveObj.PastValues
@@ -318,9 +322,11 @@ public class GenStaticOthers(
                         {
                             var typeUrl = pastValue.Type?.Url ?? tmpTypeUrl;
                             var power = pastValue.Power ?? tmpPowerUrl;
+                            var accuracy = pastValue.Accuracy ?? tmpAccuracyUrl;
 
                             tmpTypeUrl = typeUrl;
                             tmpPowerUrl = power;
+                            tmpAccuracyUrl = accuracy;
 
                             var versionGroup = await pokeApiService.GetVersionGroup(pastValue.VersionGroup);
                             byte untilGeneration = (byte) (PokeApiService.GetGenerationValue(versionGroup.Generation.Name) - 1);
@@ -329,7 +335,8 @@ public class GenStaticOthers(
                                 UntilGeneration: untilGeneration,
                                 Type: PokeApiService.GetIdFromUrl(typeUrl),
                                 Category: untilGeneration <= 3 ? oldCategory : category,
-                                Power: power
+                                Power: power,
+                                Accuracy: accuracy
                             );
                         })
                         .Reverse()
@@ -339,7 +346,8 @@ public class GenStaticOthers(
                     UntilGeneration: 99,
                     Type: PokeApiService.GetIdFromUrl(moveObj.Type.Url),
                     Category: category,
-                    Power: moveObj.Power
+                    Power: moveObj.Power,
+                    Accuracy: moveObj.Accuracy
                 ));
 
                 if (generation < 4
@@ -351,7 +359,8 @@ public class GenStaticOthers(
                         UntilGeneration: 3,
                         Type: dataPostG3.Type,
                         Category: oldCategory,
-                        Power: dataPostG3.Power
+                        Power: dataPostG3.Power,
+                        Accuracy: dataPostG3.Accuracy
                     ));
                 }
 

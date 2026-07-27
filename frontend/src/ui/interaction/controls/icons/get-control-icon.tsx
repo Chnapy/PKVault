@@ -19,12 +19,18 @@ export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values:
                     case 'right-click': return inputIcon(inputIconResources.mouse.rightClick, i);
                     case 'move': return inputIcon(inputIconResources.mouse.move, i);
                     case 'drag': return <HandIcon key={i} />;
-                    // TODO scroll
+                    case 'scroll': return inputIcon(inputIconResources.mouse.scroll, i);
                 }
             }).filter(Boolean);
         case 'keyboard':
-            // TODO
-            return [];
+            return (values).map((value, i) => {
+                switch (value) {
+                    case 'Escape': return inputIcon(inputIconResources.keyboard.escape, i);
+                    case 'Scape': return inputIcon(inputIconResources.keyboard.space, i);
+                    case 'move': return inputIcon(inputIconResources.keyboard.arrows, i);
+                    case 'x': return inputIcon(inputIconResources.keyboard.x, i);
+                }
+            }).filter(Boolean);
         case 'gamepad': {
             const gpValues = new Set([ ...values ] as GamepadMappingsAllButton[]);
             const gpIcons = [];

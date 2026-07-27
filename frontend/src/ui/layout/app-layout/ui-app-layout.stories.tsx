@@ -28,7 +28,7 @@ export const Storage: Story = {
         children: <UIStorageContent
             left={<Paper w='100%' h='100%' miw={200} mih={200} bg='gray' />}
             right={<Paper w='100%' h='100%' miw={200} mih={200} bg='gray' />}
-        // middle: <Paper w={60} h='100%' mih={200} bg='gray' />,
+            middle={<Paper w='100%' h='100%' mih={200} bg='gray' />}
         />,
     },
 };

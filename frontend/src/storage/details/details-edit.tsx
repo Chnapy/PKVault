@@ -33,7 +33,7 @@ export const DetailsEdit: React.FC<{ pkmId: string; saveId: number | null }> = (
             if (!pkm)
                 return undefined;
 
-            return pick(pkm, [ 'id', 'context', 'contextVersion', 'nickname', 'nicknameMaxLength', 'moves', 'eVs', 'canEdit' ]);
+            return pick(pkm, [ 'id', 'context', 'contextVersion', 'nickname', 'nicknameMaxLength', 'moves', 'eVs', 'canEdit', 'alphaMove' ]);
         }, [ pkmId ]));
 
     const pkm = pkmIndexQuery.data;
@@ -87,6 +87,7 @@ export const DetailsEdit: React.FC<{ pkmId: string; saveId: number | null }> = (
                 move={move}
                 nameWidth={100}
                 onClick={onRemove}
+                isAlpha={pkm.alphaMove === move}
             />
         </UIDetailsContentMoveTable>}
         renderMoveItemOption={(move, selected, full) => <UIDetailsContentMoveTable>
@@ -95,6 +96,7 @@ export const DetailsEdit: React.FC<{ pkmId: string; saveId: number | null }> = (
                 saveId={saveId}
                 move={move}
                 nameWidth={100}
+                isAlpha={pkm.alphaMove === move}
             />
         </UIDetailsContentMoveTable>}
         onSubmit={async data => {

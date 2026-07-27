@@ -1,7 +1,9 @@
-import { Badge, Table, Text } from '@mantine/core';
+import { Badge, Group, Table, Text } from '@mantine/core';
 import type React from 'react';
 import type { MoveCategory } from '../../../../../data/sdk/model';
+import { UIAlphaIcon } from '../../../../icon/ui-alpha-icon';
 import { UIMoveCategoryIcon } from '../../../../icon/ui-move-category-icon';
+import { UIPokedexIcons } from '../../../../pokedex/icons/ui-pokedex-icons';
 import { UITypeItem } from '../../../../type-item/ui-type-item';
 import classes from './ui-details-move-row.module.css';
 
@@ -12,10 +14,12 @@ export type UIDetailsMoveRowProps = Pick<Table.Tr.Props, 'onClick'> & {
     category: MoveCategory;
     power?: number;
     accuracy?: number;
+    isAlpha?: boolean;
+    isValid?: boolean;
 };
 
 export const UIDetailsMoveRow: React.FC<UIDetailsMoveRowProps> = ({
-    type, name, nameWidth, category, power, accuracy, onClick
+    type, name, nameWidth, category, power, accuracy, onClick, isAlpha, isValid = true
 }) => {
 
     return <Table.Tr className={classes.uiDetailsMoveRow} onClick={onClick} data-clickable={!!onClick || undefined}>
@@ -24,7 +28,17 @@ export const UIDetailsMoveRow: React.FC<UIDetailsMoveRowProps> = ({
         </Table.Td>
 
         <Table.Td w={nameWidth}>
-            <Text lh={1}>{name}</Text>
+            <Group gap='xs' wrap='nowrap' miw={100}>
+                {isAlpha && <UIAlphaIcon />}
+
+                <Text
+                    lh={1}
+                    ta='center'
+                    style={{ flexGrow: 1 }}
+                >{name}</Text>
+
+                {!isValid && <UIPokedexIcons.Warn />}
+            </Group>
         </Table.Td>
 
         <Table.Td>
@@ -36,7 +50,8 @@ export const UIDetailsMoveRow: React.FC<UIDetailsMoveRowProps> = ({
                 styles={{
                     label: {
                         display: 'flex',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        overflow: 'initial',
                     },
                 }}
             >

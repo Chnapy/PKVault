@@ -3,4 +3,18 @@
     flex-shrink: 0;
     z-index: 10;
     box-shadow: 0 -2px 0 rgb(0 0 0 / 20%);
+    overflow: hidden;
+}
+
+.controls {
+    animation: sliding 16s linear 4s infinite alternate-reverse;
+}
+
+@keyframes sliding {
+    0%, 25% {
+        transform: translateX(0);
+    }
+    75%, 100% {
+        transform: translateX(calc(var(--width-diff) * -1));
+    }
 }

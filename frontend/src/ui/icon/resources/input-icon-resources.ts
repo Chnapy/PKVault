@@ -1,8 +1,14 @@
 import keyboard from '../../../assets/input_icons/KeyboardMouse/Vector/keyboard.svg?react';
+import keyEscape from '../../../assets/input_icons/KeyboardMouse/Vector/keyboard_escape.svg?react';
+import keySpace from '../../../assets/input_icons/KeyboardMouse/Vector/keyboard_space.svg?react';
+import keyArrows from '../../../assets/input_icons/KeyboardMouse/Vector/keyboard_arrows.svg?react';
+import keyX from '../../../assets/input_icons/KeyboardMouse/Vector/keyboard_x.svg?react';
+
 import mouse from '../../../assets/input_icons/KeyboardMouse/Vector/mouse.svg?react';
 import mouseLeft from '../../../assets/input_icons/KeyboardMouse/Vector/mouse_left.svg?react';
 import mouseMove from '../../../assets/input_icons/KeyboardMouse/Vector/mouse_move.svg?react';
 import mouseRight from '../../../assets/input_icons/KeyboardMouse/Vector/mouse_right.svg?react';
+import mouseScroll from '../../../assets/input_icons/KeyboardMouse/Vector/mouse_scroll_vertical.svg?react';
 
 import steamdeck from '../../../assets/input_icons/SteamDeck/Vector/controller_steamdeck.svg?react';
 import gpA from '../../../assets/input_icons/SteamDeck/Vector/steamdeck_button_a.svg?react';
@@ -36,8 +42,14 @@ export const inputIconResources = {
         leftClick: mouseLeft,
         rightClick: mouseRight,
         move: mouseMove,
+        scroll: mouseScroll,
     },
-    keyboard: {},
+    keyboard: {
+        escape: keyEscape,
+        space: keySpace,
+        arrows: keyArrows,
+        x: keyX,
+    },
     gamepad: {
         A: gpA,
         B: gpB,

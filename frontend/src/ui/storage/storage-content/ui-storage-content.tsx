@@ -1,4 +1,4 @@
-import { Grid } from '@mantine/core';
+import { Box, Grid } from '@mantine/core';
 import type React from 'react';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { FocusScope } from '../../interaction/focus/scope/focus-scope';
@@ -12,9 +12,10 @@ type UIStorageContentProps = {
     id?: string;
     left: React.ReactNode;
     right: React.ReactNode;
+    middle: React.ReactNode;
 };
 
-export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, right }) => {
+export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, right, middle }) => {
 
     const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('storage-content');
 
@@ -48,6 +49,10 @@ export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, ri
                                 {left}
                             </PanelProvider>
                         </Grid.Col>
+
+                        <Box w='calc(var(--grid-column-gap) * 2)' py='md' mx='calc(var(--grid-column-gap) * -1)'>
+                            {middle}
+                        </Box>
 
                         <Grid.Col span={6}>
                             <PanelProvider value='right'>

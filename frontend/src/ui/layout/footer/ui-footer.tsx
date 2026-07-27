@@ -14,6 +14,31 @@ export const UIFooter: React.FC = () => {
 
     // console.log({ allControls: JSON.parse(JSON.stringify(allControls)) })
 
+    const controlsCount = Object.values(allControls).flatMap(controls => controls).length;
+
+    const movingRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        if (!movingRef.current)
+            return;
+
+        const el = movingRef.current;
+        const parent = el.parentElement!;
+
+        const elWidth = el.clientWidth;
+        const parentWidth = parent.clientWidth;
+        const diff = elWidth - parentWidth;
+
+        if (diff > 0) {
+            el.classList.add(classes.controls);
+            el.style.setProperty('--width-diff', `${diff}px`);
+        } else {
+            el.style.removeProperty('--width-diff');
+            el.classList.remove(classes.controls);
+        }
+
+    }, [ controlsCount ]);
+
     return <Group
         className={classes.uiFooter}
         data-mantine-color-scheme="light"
@@ -22,25 +47,38 @@ export const UIFooter: React.FC = () => {
         px='md'
         py='xs'
         gap='lg'
+        wrap='nowrap'
     >
         {inputIcon(inputIconResources.type[ controlsType ])}
 
         <Group
-            justify='center'
-            gap='lg'
-            style={{ flexGrow: 1 }}
+            justify='flex-start'
+            wrap='nowrap'
+            style={{
+                flexGrow: 1,
+                overflow: 'hidden',
+            }}
         >
-            {Object.entries(allControls).map(([ controlId, controls ]) => <Group
-                key={controlId}
+            <Group
+                ref={movingRef}
+                justify='center'
                 gap='lg'
+                wrap='nowrap'
+                mx='auto'
             >
-                {controls.map(c => <Group key={c.name} gap='sm'>
-                    <Group gap='xs'>
-                        {getControlIcon(c.trigger.type, c.trigger.values, c.trigger.allowPressedSuite)}
-                    </Group>
-                    {c.label}
+                {Object.entries(allControls).map(([ controlId, controls ]) => <Group
+                    key={controlId}
+                    gap='lg'
+                    wrap='nowrap'
+                >
+                    {controls.map(c => <Group key={c.name} gap='sm' wrap='nowrap' style={{ whiteSpace: 'nowrap' }}>
+                        <Group gap='xs' wrap='nowrap'>
+                            {getControlIcon(c.trigger.type, c.trigger.values, c.trigger.allowPressedSuite)}
+                        </Group>
+                        {c.label}
+                    </Group>)}
                 </Group>)}
-            </Group>)}
+            </Group>
         </Group>
     </Group>;
 };

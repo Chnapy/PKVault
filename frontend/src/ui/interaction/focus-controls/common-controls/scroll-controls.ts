@@ -6,10 +6,10 @@ export const getScrollControl = (partial: Pick<ControlActionInput, 'label'>) => 
     ...partial,
     name: 'scroll' as const,
     triggers: {
-        // mouse: {
-        //     type: 'mouse',
-        //     values: [  ],
-        // },
+        mouse: {
+            type: 'mouse',
+            values: [ 'scroll' ],
+        },
         // keyboard: {
         //     type: 'keyboard',
         //     values: [  ],
