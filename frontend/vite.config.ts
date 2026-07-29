@@ -8,11 +8,11 @@ import { patchCssModules } from 'vite-css-modules';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import svgr from "vite-plugin-svgr";
 import { prepareDocs } from './src/help/prepare-docs';
-import { prepareCssvar } from './src/ui/prepare-cssvar';
+import { prepareCssVar } from './src/ui/prepare-css-var';
 
 if (process.env.NODE_ENV === 'development') {
   prepareDocs('../docs/functional');
-  prepareCssvar();
+  prepareCssVar();
 }
 
 // const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));

@@ -25,8 +25,8 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
 
         const selected = Route.useSearch({
             select: search => {
-                const sltd = getSelected(search.selected);
-                return !sltd?.saveId && sltd?.id === pkmId;
+                const value = getSelected(search.selected);
+                return !value?.saveId && value?.id === pkmId;
             },
         });
 

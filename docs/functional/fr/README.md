@@ -56,7 +56,7 @@ Le stockage PKVault est découpé par **banques & boîtes**.
 
 <img align="left" src="../img/edit-action.png" alt="Edit action" />
 
-**Editez** les pokemons: surnom, capacités et balance des EVs.
+**Editez** les pokémons: surnom, capacités et balance des EVs.
 
 <br/>
 <br/>
@@ -109,22 +109,22 @@ Le port d'un objet peut être requis.
 
 ---
 
-## Pokedex
+## Pokédex
 <br/>
 
 <div align="center">
-    <img src="../img/centralized-pokedex.png" alt="Centralized Pokedex" />
+    <img src="../img/centralized-pokedex.png" alt="Centralized Pokédex" />
     <p align="center">
-        <b>Pokedex centralisé</b>.
+        <b>Pokédex centralisé</b>.
     </p>
 </div>
 
 <br/>
 <br/>
 
-<img align="left" src="../img/pokedex-saves.png" alt="Saves Pokedex" />
+<img align="left" src="../img/pokedex-saves.png" alt="Saves Pokédex" />
 
-Données des Pokedex depuis vos **fichiers de sauvegarde**.
+Données des Pokédex depuis vos **fichiers de sauvegarde**.
 
 <br/>
 <br/>
@@ -132,9 +132,9 @@ Données des Pokedex depuis vos **fichiers de sauvegarde**.
 <br/>
 <br/>
 
-<img align="right" src="../img/synchro-pokedex.png" alt="Synchronize Pokedex" />
+<img align="right" src="../img/synchro-pokedex.png" alt="Synchronize Pokédex" />
 
-**Synchronisez** les Pokedex entre vos sauvegardes, partageant les pokémons vus & capturés.
+**Synchronisez** les Pokédex entre vos sauvegardes, partageant les pokémons vus & capturés.
 
 <br/>
 <br/>

@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import { baseTheme } from './base-theme.ts';
 
-export const prepareCssvar = () => {
+export const prepareCssVar = () => {
     console.log('- Generate css theme variables -');
 
     const content = `/* Generated file, for VSCode CSS Variable Autocomplete only */

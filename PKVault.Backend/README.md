@@ -10,7 +10,7 @@ PKVault backend is based on .NET 10, and is using C# 14.
 
 Database is using EF Core with SQLite (previously JSON, now legacy).
 
-Pokemon files & saves are manipulated using PKHeX.Core.
+Pokémon files & saves are manipulated using PKHeX.Core.
 
 ## Flowcharts
 
@@ -44,7 +44,7 @@ npm run generate:migration MigrationName
 
 ### Generate static-data & spritesheets
 
-Generate PokeApi data & spritesheets.
+Generate PokéApi data & spritesheets.
 This process picks only the data used by the app & compress it as `.json.gz` files, and generates spritesheets.
 
 ```

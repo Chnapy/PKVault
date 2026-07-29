@@ -26,8 +26,8 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
 
         const selected = Route.useSearch({
             select: search => {
-                const sltd = getSelected(search.selected);
-                return sltd?.saveId === saveId && sltd.id === pkmId;
+                const value = getSelected(search.selected);
+                return value?.saveId === saveId && value.id === pkmId;
             },
         });
 

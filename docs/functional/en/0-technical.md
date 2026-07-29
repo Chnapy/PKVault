@@ -1,6 +1,6 @@
 # 0 - Technical considerations
 
-PKVault runs on Windows for its desktop version. A dedicated Linux/Steamdeck version is planned.
+PKVault runs on Windows & Linux for its desktop version. A Steamdeck version exists (flatpak).
 
 Like PKHeX, PKVault depends on .NET 10 to run. Since the application is multi-platform and based on web technologies, PKVault also depends on web controls depending on current OS:
 
@@ -8,7 +8,7 @@ Like PKHeX, PKVault depends on .NET 10 to run. Since the application is multi-pl
 - WebKitGTK+2 for Linux,
 - WKWebView for Mac
 
-Currently, the interface is designed for use on large screens with keyboard/mouse only.
+The app is designed to be used on screen with minimal size of 1280x800 (resolution of SteamDeck), with usage of mouse/keyboard or gamepad supported.
 
 ## Files Manipulated
 

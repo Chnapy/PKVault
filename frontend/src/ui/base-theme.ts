@@ -8,7 +8,7 @@ const customTheme = {
     gold: "#9C8B65",
     silver: "#747A78",
     crystal: "#6B4777",
-    saphir: "#104070",
+    sapphire: "#104070",
     emerald: "#457865",
     ruby: "#781810",
     za: "#32796B",

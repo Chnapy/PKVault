@@ -26,7 +26,7 @@ export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values:
             return (values).map((value, i) => {
                 switch (value) {
                     case 'Escape': return inputIcon(inputIconResources.keyboard.escape, i);
-                    case 'Scape': return inputIcon(inputIconResources.keyboard.space, i);
+                    case 'Space': return inputIcon(inputIconResources.keyboard.space, i);
                     case 'move': return inputIcon(inputIconResources.keyboard.arrows, i);
                     case 'x': return inputIcon(inputIconResources.keyboard.x, i);
                 }
@@ -48,12 +48,12 @@ export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values:
                 gpIcons.push(inputIconResources.gamepad.DPad);
             }
 
-            const rstick = gpValues.has('RStickDown')
+            const rStick = gpValues.has('RStickDown')
                 && gpValues.has('RStickUp')
                 && gpValues.has('RStickLeft')
                 && gpValues.has('RStickRight');
 
-            if (rstick) {
+            if (rStick) {
                 gpValues.delete('RStickDown');
                 gpValues.delete('RStickUp');
                 gpValues.delete('RStickLeft');

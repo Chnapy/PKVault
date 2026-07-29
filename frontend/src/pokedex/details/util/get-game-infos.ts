@@ -8,21 +8,21 @@ import blackImg from '../../../assets/game_icons/black.png';
 import black2Img from '../../../assets/game_icons/black2.png';
 import blueImg from '../../../assets/game_icons/blue.png';
 import boxRSImg from '../../../assets/game_icons/box-rs.png';
-import brillantDiamondImg from '../../../assets/game_icons/brillant-diamond.png';
+import brilliantDiamondImg from '../../../assets/game_icons/brilliant-diamond.png';
 import colosseumImg from '../../../assets/game_icons/colosseum.png';
 import crystalImg from '../../../assets/game_icons/crystal.png';
 import defaultImg from '../../../assets/game_icons/default.png';
 import diamondImg from '../../../assets/game_icons/diamond.png';
 import emeraldImg from '../../../assets/game_icons/emerald.png';
-import fireredImg from '../../../assets/game_icons/firered.png';
+import fireRedImg from '../../../assets/game_icons/fire-red.png';
 import goImg from '../../../assets/game_icons/go.png';
 import goldImg from '../../../assets/game_icons/gold.png';
-import heartgoldImg from '../../../assets/game_icons/heartgold.png';
-import leafgreenImg from '../../../assets/game_icons/leafgreen.png';
+import heartGoldImg from '../../../assets/game_icons/heart-gold.png';
+import leafGreenImg from '../../../assets/game_icons/leaf-green.png';
 import legendImg from '../../../assets/game_icons/legend-arceus.png';
 import zaImg from '../../../assets/game_icons/legend-za.png';
-import letsgoevoliImg from '../../../assets/game_icons/letsgoevoli.png';
-import letsgopikachuImg from '../../../assets/game_icons/letsgopikachu.png';
+import letsGoEvoliImg from '../../../assets/game_icons/lets-go-evoli.png';
+import letsGoPikachuImg from '../../../assets/game_icons/lets-go-pikachu.png';
 import moonImg from '../../../assets/game_icons/moon.png';
 import omegaRubyImg from '../../../assets/game_icons/omega-ruby.png';
 import pearlImg from '../../../assets/game_icons/pearl.png';
@@ -34,7 +34,7 @@ import scarletImg from '../../../assets/game_icons/scarlet.png';
 import shieldImg from '../../../assets/game_icons/shield.png';
 import shiningPearlImg from '../../../assets/game_icons/shining-pearl.png';
 import silverImg from '../../../assets/game_icons/silver.png';
-import soulsilverImg from '../../../assets/game_icons/soulsilver.png';
+import soulSilverImg from '../../../assets/game_icons/soul-silver.png';
 import sunImg from '../../../assets/game_icons/sun.png';
 import swordImg from '../../../assets/game_icons/sword.png';
 import ultraMoonImg from '../../../assets/game_icons/ultra-moon.png';
@@ -83,7 +83,7 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
     >(version, {
       [ GameVersion.S ]: () => ({
         img: sapphireImg,
-        color: baseTheme.other.game.saphir,
+        color: baseTheme.other.game.sapphire,
       }),
       [ GameVersion.R ]: () => ({
         img: rubyImg,
@@ -94,20 +94,20 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
         color: baseTheme.other.game.emerald,
       }),
       [ GameVersion.FR ]: () => ({
-        img: fireredImg,
+        img: fireRedImg,
         color: baseTheme.other.game.red,
       }),
       [ GameVersion.LG ]: () => ({
-        img: leafgreenImg,
+        img: leafGreenImg,
         // color: baseTheme.other.game.,
       }),
 
       [ GameVersion.HG ]: () => ({
-        img: heartgoldImg,
+        img: heartGoldImg,
         color: baseTheme.other.game.gold,
       }),
       [ GameVersion.SS ]: () => ({
-        img: soulsilverImg,
+        img: soulSilverImg,
         color: baseTheme.other.game.silver,
       }),
 
@@ -220,11 +220,11 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
       }),
 
       [ GameVersion.GP ]: () => ({
-        img: letsgopikachuImg,
+        img: letsGoPikachuImg,
         // color: baseTheme.other.game.,
       }),
       [ GameVersion.GE ]: () => ({
-        img: letsgoevoliImg,
+        img: letsGoEvoliImg,
         // color: baseTheme.other.game.,
       }),
       [ GameVersion.SW ]: () => ({
@@ -240,7 +240,7 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
         // color: baseTheme.other.game.,
       }),
       [ GameVersion.BD ]: () => ({
-        img: brillantDiamondImg,
+        img: brilliantDiamondImg,
         // color: baseTheme.other.game.,
       }),
       [ GameVersion.SP ]: () => ({
@@ -285,7 +285,7 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
 
       [ GameVersion.RS ]: () => ({
         img: sapphireImg,
-        color: baseTheme.other.game.saphir,
+        color: baseTheme.other.game.sapphire,
       }),
       [ GameVersion.RSE ]: () => ({
         img: emeraldImg,
@@ -293,7 +293,7 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
       }),
 
       [ GameVersion.FRLG ]: () => ({
-        img: fireredImg,
+        img: fireRedImg,
         color: baseTheme.other.game.red,
       }),
       [ GameVersion.RSBOX ]: () => ({
@@ -317,7 +317,7 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
         // color: baseTheme.other.game.,
       }),
       [ GameVersion.HGSS ]: () => ({
-        img: soulsilverImg,
+        img: soulSilverImg,
         // color: baseTheme.other.game.,
       }),
       // [ GameVersion.]: () => ({
@@ -352,7 +352,7 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
         // color: baseTheme.other.game.,
       }),
       [ GameVersion.GG ]: () => ({
-        img: letsgopikachuImg,
+        img: letsGoPikachuImg,
         // color: baseTheme.other.game.,
       }),
       [ GameVersion.SWSH ]: () => ({
@@ -360,7 +360,7 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
         // color: baseTheme.other.game.,
       }),
       [ GameVersion.BDSP ]: () => ({
-        img: brillantDiamondImg,
+        img: brilliantDiamondImg,
         // color: baseTheme.other.game.,
       }),
       [ GameVersion.SV ]: () => ({
@@ -396,7 +396,7 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
         // color: baseTheme.other.game.,
       }),
       [ GameVersion.Gen7b ]: () => ({
-        img: letsgopikachuImg,
+        img: letsGoPikachuImg,
         // color: baseTheme.other.game.,
       }),
       [ GameVersion.Gen8 ]: () => ({

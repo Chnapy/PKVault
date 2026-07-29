@@ -28,12 +28,12 @@ export const Fallback = {
                 <XIcon />
             </UIActionIcon>}
 
-            <Alert variant='filled' color='red' icon={<AlertTriangleIcon />} title='Woop woop an error happened !'>
+            <Alert variant='filled' color='red' icon={<AlertTriangleIcon />} title='An error happened !'>
                 Please report these next logs to <Anchor
                     c='blue.2'
                     href="https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app"
                     target="_blank"
-                >projectpokemon discussion</Anchor>.<br />
+                >Project Pokémon discussion</Anchor>.<br />
                 Also consider sharing files from folder <Code color='red.7'>logs</Code>.
             </Alert>
 

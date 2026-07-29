@@ -11,16 +11,16 @@ import { useCheckUpdate } from './hooks/use-check-update';
 import { NotificationCardManager } from './notification-card-manager';
 
 const useOpened = () => {
-    const [ notifsCountState, setNotifsCountState ] = React.useState(0);
+    const [ alertsCountState, setAlertsCountState ] = React.useState(0);
 
     const hasUpdate = !!useCheckUpdate();
     const warnings = useWarningsGetWarnings().data?.data;
 
-    const notifsCount = BackendErrorsContext.useValue().errors.length
+    const alertsCount = BackendErrorsContext.useValue().errors.length
         + (warnings?.warningsCount ?? 0)
         + (hasUpdate ? 1 : 0);
 
-    const opened = notifsCount !== notifsCountState;
+    const opened = alertsCount !== alertsCountState;
 
     const ctx: PopoverContext = {
         opened,
@@ -28,22 +28,22 @@ const useOpened = () => {
             if (typeof nextOpened === 'function')
                 nextOpened = nextOpened(opened);
 
-            setNotifsCountState(nextOpened
+            setAlertsCountState(nextOpened
                 ? 0
-                : notifsCount);
-        }, [ notifsCount, opened ]),
+                : alertsCount);
+        }, [ alertsCount, opened ]),
     };
 
     return {
         ...ctx,
-        hasNotifs: notifsCount > 0,
+        hasAlerts: alertsCount > 0,
     };
 };
 
 export const NotificationButton: React.FC = () => {
     const { t } = useTranslate();
 
-    const { hasNotifs, opened, setOpened } = useOpened();
+    const { hasAlerts, opened, setOpened } = useOpened();
 
     return (
         <PopoverWithControls
@@ -52,16 +52,16 @@ export const NotificationButton: React.FC = () => {
             position='bottom-end'
             target={<Tooltip
                 label={t('header.notifications.help')}
-                disabled={hasNotifs}
+                disabled={hasAlerts}
             >
                 <UIActionIcon
-                    name='notif-btn'
+                    name='alerts-btn'
                     controlLabel={t('header.notifications.controls-label')}
                     // variant='subtle'
-                    onClick={hasNotifs
+                    onClick={hasAlerts
                         ? (() => setOpened(value => !value))
                         : undefined}
-                    disabled={!hasNotifs}
+                    disabled={!hasAlerts}
                     size='1lh'
                     lh='inherit'
                 >

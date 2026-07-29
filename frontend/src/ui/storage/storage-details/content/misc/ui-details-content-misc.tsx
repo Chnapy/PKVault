@@ -17,7 +17,7 @@ export const UIDetailsContentMisc: React.FC<UIDetailsContentMiscProps> = ({
 
     return <Grid>
         <Grid.Col span={4}>
-            {isEgg ? 'Hatchcount' : 'Friendship'}
+            {isEgg ? t('details.hatch-count') : t('details.friendship')}
         </Grid.Col>
         <Grid.Col span={6} display='flex' align='center'>
             <Progress

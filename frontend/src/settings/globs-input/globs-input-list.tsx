@@ -23,7 +23,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
 
     const desktopMessage = useDesktopMessage();
 
-    const splitedValue = value.split('\n').map(value => value.trim()).filter(Boolean);
+    const splittedValue = value.split('\n').map(value => value.trim()).filter(Boolean);
 
     const getTypeInfos = (type: UIGlobType) => {
         if (type === 'file')
@@ -71,27 +71,27 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
                 newValue = typeInfos.getFinalPaths(response.values);
             }
 
-            const newValues = [ ...splitedValue, ...newValue ];
+            const newValues = [ ...splittedValue, ...newValue ];
             onChange(newValues.join('\n'));
         }}
         disabled={disabled}
         isDesktop={isDesktop}
         results={<GlobsInputResults
-            values={splitedValue}
+            values={splittedValue}
             limit={limit * 2}
         />}
         {...rest}
     >
-        {splitedValue.map((value, i) => <GlobsInputItem key={i}
+        {splittedValue.map((value, i) => <GlobsInputItem key={i}
             name={`${name}-${i}`}
             value={value}
             onEdit={newValue => {
-                const newValues = [ ...splitedValue ];
+                const newValues = [ ...splittedValue ];
                 newValues[ i ] = newValue;
                 onChange(newValues.join('\n'));
             }}
             onRemove={() => {
-                const newValues = [ ...splitedValue ];
+                const newValues = [ ...splittedValue ];
                 delete newValues[ i ];
                 onChange(newValues.join('\n'));
             }}
@@ -99,7 +99,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
             limit={limit}
         />)}
 
-        {splitedValue.length === 0 && <EmptyState
+        {splittedValue.length === 0 && <EmptyState
             size='sm'
             icon={<RectangleEllipsisIcon />}
             title={t('settings.form.saves.empty')}

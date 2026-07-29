@@ -13,7 +13,7 @@ When submitting an issue please provide these data:
 - Related files if any (save files, PK files, PKVault files)
 - PKVault logs if relevant (in `logs/` folder)
 
-If it's about a question, feature request or something else, consider using [ProjectPokemon discussion](https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app).
+If it's about a question, feature request or something else, consider using [ProjectPokémon discussion](https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app).
 Don't be shy, all feedbacks are very welcomed !
 
 ## Pull requests
@@ -27,4 +27,4 @@ There is no "absolute" rules to follow, just several suggestions:
 - Keep in mind: new feature == new maintenance work
 - Try to stay on common code conventions, including ones from tech used (C#, TS, etc)
 
-Also if you want to pass some time working on PKVault, consider asking questions & feedbacks here or on [ProjectPokemon discussion](https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app), you may receive some help !
+Also if you want to pass some time working on PKVault, consider asking questions & feedbacks here or on [ProjectPokémon discussion](https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app), you may receive some help !

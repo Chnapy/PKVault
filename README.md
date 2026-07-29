@@ -16,8 +16,8 @@
     <a href="https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app"><b>PROJECT POKEMON DISCUSSION PAGE</b></a>
 </h6>
 
-PKVault is a Pokemon storage & save manipulation tool based on [PKHeX](https://github.com/kwsch/PKHeX).
-Similar to Pokemon Home, offline as online.
+PKVault is a Pokémon storage & save manipulation tool based on [PKHeX](https://github.com/kwsch/PKHeX).
+Similar to Pokémon Home, offline as online.
 
 This tool can be used as:
 
@@ -42,20 +42,20 @@ This tool can be used as:
 ## Bulk features
 
 - Storage & save manipulation
-  - compatible with all pokemon games, from first generation to **Pokemon Legends: Z-A**
-  - move pokemons between saves
-  - convert pokemon to any generation (ex. G7 to G2)
-  - store pokemons outside saves using banks & boxes
-  - allow use of multiple "variants" for stored pokemons
+  - compatible with all pokémon games, from first generation to **Pokémon Legends: Z-A**
+  - move pokémons between saves
+  - convert pokémon to any generation (ex. G7 to G2)
+  - store pokémons outside saves using banks & boxes
+  - allow use of multiple "variants" for stored pokémons
   - move/delete actions
-  - edit pokemon moves, EVs & nickname
-  - evolve pokemons requiring trade or trade + held-item (ex. Kadabra -> Alakazam)
-  - link a save pokemon with all his variants, sharing data like exp & EVs
+  - edit pokémon moves, EVs & nickname
+  - evolve pokémons requiring trade or trade + held-item (ex. Kadabra -> Alakazam)
+  - link a save pokémon with all his variants, sharing data like exp & EVs
   - use of external PKM files, outside PKVault environment
   - backup all saves & storage before any save action
     - backups listing
     - backups restore always possible
-- Centralized Pokedex based on all listed saves
+- Centralized Pokédex based on all listed saves
   - views with forms & genders
   - multiple filters: species name, seen/caught/owned, types, ...
     - possible living dex
@@ -131,4 +131,4 @@ Your can use this app for your own projects following license restrictions.
   - [HackerNoon's Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) - License MIT
   - Versions & all others dependencies can be found into [frontend/package.json](./frontend/package.json).
 
-All image contents of game-icons, pokemons, types, items, move-categories are Copyright The Pokémon Company.
+All image contents of game-icons, pokémons, types, items, move-categories are Copyright The Pokémon Company.

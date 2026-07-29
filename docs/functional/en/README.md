@@ -4,7 +4,7 @@
 <div align="center">
     <img src="../img/centralized-storage.png" alt="PKVault storage" />
     <p align="center">
-        <b>Centralized storage</b> where you can put any pokemon from any generation.
+        <b>Centralized storage</b> where you can put any pokémon from any generation.
     </p>
 </div>
 
@@ -38,7 +38,7 @@ PKVault storage is scoped by **banks & boxes**.
 
 <img align="left" src="../img/move-action.png" alt="Move action" />
 
-**Move** pokemons between boxes and storages.
+**Move** pokémons between boxes and storages.
 
 <br/>
 <br/>
@@ -56,7 +56,7 @@ PKVault storage is scoped by **banks & boxes**.
 
 <img align="left" src="../img/edit-action.png" alt="Edit action" />
 
-**Edit** pokemons nickname, moves and EVs balance.
+**Edit** pokémons nickname, moves and EVs balance.
 
 <br/>
 <br/>
@@ -72,7 +72,7 @@ PKVault storage is scoped by **banks & boxes**.
 
 <img align="right" src="../img/evolve-action.png" alt="Evolve action" />
 
-**Evolve** pokemons when trade is required.
+**Evolve** pokémons when trade is required.
 <br/>
 Held item may be required.
 
@@ -86,7 +86,7 @@ Held item may be required.
 
 <img align="left" src="../img/multi-select.png" alt="Multi-select" />
 
-**Select** multiple pokemons before move, edit, etc.
+**Select** multiple pokémons before move, edit, etc.
 
 <br/>
 <br/>
@@ -96,7 +96,7 @@ Held item may be required.
 
 <img align="right" src="../img/sort-action.png" alt="Sort action" />
 
-**Sort** pokemons on multiple boxes with given pokedex.
+**Sort** pokémons on multiple boxes with given Pokédex.
 
 <br/>
 <br/>
@@ -109,22 +109,22 @@ Held item may be required.
 
 ---
 
-## Pokedex
+## Pokédex
 <br/>
 
 <div align="center">
-    <img src="../img/centralized-pokedex.png" alt="Centralized Pokedex" />
+    <img src="../img/centralized-pokedex.png" alt="Centralized Pokédex" />
     <p align="center">
-        <b>Centralized Pokedex</b>.
+        <b>Centralized Pokédex</b>.
     </p>
 </div>
 
 <br/>
 <br/>
 
-<img align="left" src="../img/pokedex-saves.png" alt="Saves Pokedex" />
+<img align="left" src="../img/pokedex-saves.png" alt="Saves Pokédex" />
 
-Pokedex data from your **save files**.
+Pokédex data from your **save files**.
 
 <br/>
 <br/>
@@ -132,9 +132,9 @@ Pokedex data from your **save files**.
 <br/>
 <br/>
 
-<img align="right" src="../img/synchro-pokedex.png" alt="Synchronize Pokedex" />
+<img align="right" src="../img/synchro-pokedex.png" alt="Synchronize Pokédex" />
 
-**Synchronize** Pokedexes between your saves, sharing pokemons seen & caught.
+**Synchronize** Pokédexes between your saves, sharing pokémons seen & caught.
 
 <br/>
 <br/>
@@ -158,7 +158,7 @@ Pokedex data from your **save files**.
 
 <img align="right" src="../img/parameters.png" alt="Parameters" />
 
-You can **hide cheats** in pokemon edit, or **skip legality checks**.
+You can **hide cheats** in pokémon edit, or **skip legality checks**.
 
 <br/>
 <br/>
@@ -168,7 +168,7 @@ You can **hide cheats** in pokemon edit, or **skip legality checks**.
 
 <img align="left" src="../img/dark-mode.png" alt="Dark mode" />
 
-**Dark mode** for better lisibility.
+**Dark mode** for better readability.
 
 <br/>
 <br/>

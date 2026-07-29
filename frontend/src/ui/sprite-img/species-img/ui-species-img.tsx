@@ -15,7 +15,7 @@ export const UISpeciesImg: React.FC<UISpeciesImgProps> = ({ species, isShadow, c
     }
 
     return <UISpriteImg
-        data-speciesid={species}
+        data-species-id={species}
         className={clsx(
             classes.uiSpeciesImg,
             isShadow && classes.shadow,

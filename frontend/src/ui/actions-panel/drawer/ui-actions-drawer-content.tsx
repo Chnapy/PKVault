@@ -1,5 +1,5 @@
-import { Stack, Timeline } from '@mantine/core';
-import { SaveIcon } from 'lucide-react';
+import { Stack, Text, Timeline } from '@mantine/core';
+import { SaveIcon, ShieldCheckIcon } from 'lucide-react';
 import type React from 'react';
 import { useTranslate } from '../../../translate/i18n';
 import { UIButton } from '../../form/button/ui-button';
@@ -22,7 +22,8 @@ export const UIActionsDrawerContent: React.FC<UIActionsDrawerContentProps> = ({ 
             speciesSize='xs'
             component={Timeline}
             bulletSize={16} lineWidth={2} color='red' py='md' style={{
-                overflow: 'auto'
+                flexGrow: 1,
+                overflow: 'auto',
             }}
         >
             {data.map(({ index, ...rest }) => (
@@ -35,13 +36,20 @@ export const UIActionsDrawerContent: React.FC<UIActionsDrawerContentProps> = ({ 
             ))}
         </UISpriteSizeWrapper>
 
+        <Text c='dimmed' mx='auto'>
+            <ShieldCheckIcon style={{
+                verticalAlign: 'text-bottom',
+                marginRight: 4,
+            }} />
+            {t('storage.save-actions.save.help')}
+        </Text>
+
         <UIButton
             name='actions-save'
             controlLabel={t('action.save')}
             variant='filled'
             color='primary'
             fullWidth
-            mt='auto'
             leftSection={<SaveIcon />}
             onClick={onSave}
         >

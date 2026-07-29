@@ -1,5 +1,5 @@
 #!/bin/node
 
-import { prepareCssvar } from './src/ui/prepare-cssvar.ts';
+import { prepareCssVar } from './src/ui/prepare-css-var.ts';
 
-prepareCssvar();
+prepareCssVar();

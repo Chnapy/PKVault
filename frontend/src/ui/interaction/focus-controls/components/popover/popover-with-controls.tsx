@@ -32,7 +32,7 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened
         && targetEl.props && typeof targetEl.props === 'object'
         && 'id' in targetEl.props && typeof targetEl.props.id === 'string'
     ) {
-        throw new Error(`Popover Target child should not have props "id" [id='${targetEl.props.id}'], value will be overidden.`);
+        throw new Error(`Popover Target child should not have props "id" [id='${targetEl.props.id}'], value will be overridden.`);
     }
 
     return <popoverContext.Provider value={ctx}>

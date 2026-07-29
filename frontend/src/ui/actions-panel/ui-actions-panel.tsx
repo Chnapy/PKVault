@@ -1,5 +1,5 @@
-import { Button, Card, Divider, Group, OverflowList, Text, Title } from '@mantine/core';
-import { SaveIcon, SortDescIcon } from 'lucide-react';
+import { Button, Card, Divider, Group, OverflowList, Text, Title, Tooltip } from '@mantine/core';
+import { SaveIcon, ShieldCheckIcon, SortDescIcon } from 'lucide-react';
 import React from 'react';
 import { useTranslate } from '../../translate/i18n';
 import { UIButton } from '../form/button/ui-button';
@@ -152,20 +152,28 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
 
         <Divider orientation='vertical' />
 
-        <UIButton
-            name='save-2'
-            controlLabel={t('action.save')}
-            controlIcons={[ controlIcons('save') ]}
-            variant='filled'
-            color='primary'
-            size='compact-md'
-            pl='md'
-            pr='lg'
-            leftSection={<SaveIcon />}
-            onClick={onSaveAndClose}
-            disabled={!hasActions}
-        >
-            {t('action.save')}
-        </UIButton>
+        <Tooltip label={<>
+            <ShieldCheckIcon style={{
+                verticalAlign: 'text-bottom',
+                marginRight: 4,
+            }} />
+            {t('storage.save-actions.save.help')}
+        </>}>
+            <UIButton
+                name='save-2'
+                controlLabel={t('action.save')}
+                controlIcons={[ controlIcons('save') ]}
+                variant='filled'
+                color='primary'
+                size='compact-md'
+                pl='md'
+                pr='lg'
+                leftSection={<SaveIcon />}
+                onClick={onSaveAndClose}
+                disabled={!hasActions}
+            >
+                {t('action.save')}
+            </UIButton>
+        </Tooltip>
     </Group>;
 };

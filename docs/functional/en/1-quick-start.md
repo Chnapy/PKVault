@@ -6,8 +6,8 @@ A quick start of PKVault can be done in a few steps:
 - From the storage page, select one of your saves
 - Your save's storage is then displayed
   - Select a box from the storage
-  - Select one of the pokemon
-  - Move the pokemon from the save to the PKVault storage
+  - Select one of the pokémon
+  - Move the pokémon from the save to the PKVault storage
   - Save
 
 From here you have a good starting point to use PKVault !

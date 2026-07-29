@@ -29,7 +29,7 @@ export type ControlAction<N extends string = string> = {
     triggers: { [ trigger in ControlTriggerType ]?: ControlTrigger<trigger> };
     label: string;
     focused: boolean;
-    // spread to children, if not overriden by them
+    // spread to children, if not overridden by them
     spread: boolean;
     // override lowest order, for same trigger values only
     order: number;
