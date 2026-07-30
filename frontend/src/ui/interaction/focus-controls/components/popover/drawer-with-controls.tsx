@@ -22,7 +22,7 @@ export const DrawerWithControls: React.FC<DrawerWithControlsProps> = ({ opened, 
             setOpened: setInnerOpened,
         }, [ innerOpened, opened, setOpened ]);
 
-    const [ scopeId ] = React.useState((): FocusScopeId => `popover_${self.crypto.randomUUID()}`);
+    const [ scopeId ] = React.useState((): FocusScopeId => `drawer_${Math.random()}`);
 
     return <popoverContext.Provider value={ctx}>
         {target}

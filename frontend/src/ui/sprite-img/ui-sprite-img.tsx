@@ -23,9 +23,12 @@ export const UISpriteImg: React.FC<UISpriteImgProps> = ({ sheetUrl, spriteInfos,
         style={{
             '--sprite-infos-x-px': spriteInfos.x + 'px',
             '--sprite-infos-y-px': spriteInfos.y + 'px',
-            '--sprite-infos-height-px': spriteInfos.height + 'px',
+            '--sprite-infos-height': spriteInfos.height,
             '--sprite-infos-width-px': spriteInfos.width + 'px',
             '--source-real-height-px': sourceRealHeight && (sourceRealHeight + 'px'),
+
+            // should be done in JS because of firefox not compatible with css compute (unit not supported)
+            '--source-real-size-ratio-px': (sourceRealHeight || spriteInfos.height) / spriteInfos.height,
             ...style,
         } as React.CSSProperties}
     >

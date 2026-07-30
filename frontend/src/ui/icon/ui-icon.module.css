@@ -1,7 +1,7 @@
 
 .ui-icon {
     height: 16px;
-    width: fit-content;
+    width: auto;
 }
 
 .ui-icon.small {

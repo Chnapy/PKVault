@@ -1,6 +1,7 @@
 
 .ui-details-content-stats tr > *:not(:nth-child(2)) {
-    width: 0;
+    /* 0 not working in linux */
+    width: 1px;
 }
 
 .iv-ev {

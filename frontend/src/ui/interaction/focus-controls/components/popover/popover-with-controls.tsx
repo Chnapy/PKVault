@@ -25,7 +25,7 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened
 
     // const nested = false//!!usePopover()?.opened;
 
-    const [ scopeId ] = React.useState((): FocusScopeId => `popover_${self.crypto.randomUUID()}`);
+    const [ scopeId ] = React.useState((): FocusScopeId => `popover_${Math.random()}`);
 
     const targetEl = getSingleElementChild(target);
     if (targetEl

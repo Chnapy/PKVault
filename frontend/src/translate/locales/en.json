@@ -113,7 +113,7 @@
   "dex.filters.views": "Views",
   "dex.list.empty": "Pokédex is empty with given filters",
   "dex.list.title": "Generation {{generation}}",
-  "header.dex": "Pokédex",
+  "header.dex": "Pokedex",
   "header.help": "Help",
   "header.notifications.controls-label": "Open notifications",
   "header.notifications.help": "No notifications",

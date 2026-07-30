@@ -7,16 +7,20 @@ in rem:
 in px:
 --sprite-infos-x-px; 
 --sprite-infos-y-px; 
---sprite-infos-height-px; 
+--sprite-infos-height; (no unit)
 --sprite-infos-width-px; 
 --source-real-height-px; (optional)
+--source-real-size-ratio-px; (no unit)
 
 --sprite-rendering; (optional)
 */
 
 .ui-sprite-img {
-    --source-real-height-px: var(--sprite-infos-height-px);
-    --sprite-size-rem: calc(var(--sprite-size-multiplier, 1) * var(--source-real-height-px));
+    --sprite-infos-height-px: calc(var(--sprite-infos-height) * 1px);
+    --source-real-height: var(--sprite-infos-height);
+    --source-real-height-px: calc(var(--source-real-height) * 1px);
+    --sprite-size: calc(var(--sprite-size-multiplier, 1) * var(--source-real-height));
+    --sprite-size-rem: calc(var(--sprite-size) * 1px);
 
     flex-shrink: 0;
     display: inline-flex;
@@ -29,13 +33,12 @@ in px:
 }
 
 .ui-sprite-img img {
-    --source-real-size-ratio-px: calc(var(--source-real-height-px) / var(--sprite-infos-height-px));
     --source-real-width-px: calc(var(--sprite-infos-width-px) * var(--source-real-size-ratio-px));
     --height-diff-px: calc(var(--sprite-infos-height-px) - var(--source-real-height-px));
     --width-diff-px: calc(var(--sprite-infos-width-px) - var(--source-real-width-px));
     --x-px: calc(var(--sprite-infos-x-px) + var(--width-diff-px) / 2);
     --y-px: calc(var(--sprite-infos-y-px) + var(--height-diff-px) / 2);
-    --scale: calc(var(--sprite-size-rem) / var(--source-real-height-px));
+    --scale: calc(var(--sprite-size) / var(--source-real-height));
 
     object-fit: none;
     object-position: calc(var(--x-px) * -1) calc(var(--y-px) * -1);

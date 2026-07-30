@@ -113,7 +113,7 @@
   "dex.filters.views": "Vues",
   "dex.list.empty": "Pokédex vide avec les filtres présents",
   "dex.list.title": "Génération {{generation}}",
-  "header.dex": "Pokédex",
+  "header.dex": "Pokedex",
   "header.help": "Aide",
   "header.notifications.controls-label": "Ouvrir les notifications",
   "header.notifications.help": "Pas de notifications",

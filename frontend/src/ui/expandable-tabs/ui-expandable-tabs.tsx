@@ -59,8 +59,8 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
 
     const [ expandedInner, setExpanded ] = React.useState(false);
 
-    const [ scopeIdRaw ] = React.useState((): FocusScopeId => `expandable-tabs_${self.crypto.randomUUID()}`);
-    const scopeId = scoped ? scopeIdRaw : '';
+    const scopeIdRaw: FocusScopeId = `expandable-tabs_${id}`;
+    const scopeId: FocusScopeId = scoped ? scopeIdRaw : '';
 
     const expanded = forcedExpanded ?? expandedInner;
 

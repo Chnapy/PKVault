@@ -1,3 +1,4 @@
+import { getGamepads } from './gamepad-loop';
 import { getGamepadMapping, type GamepadMappingsAllButton, type GamepadMappingType } from './gamepad-mapper';
 
 const eventType = 'gamepad_pressed';
@@ -42,7 +43,7 @@ export const addGamepadEventListener = (listener: (e: GamepadEvent) => void) => 
 
 export const getGamepadPressedButtons = () => {
 
-    const gamepads = navigator.getGamepads?.() ?? [];
+    const gamepads = getGamepads();
 
     return gamepads.flatMap(gp => {
         if (!gp) return [];

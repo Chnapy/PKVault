@@ -1,12 +1,12 @@
 import React from 'react';
 import { addGamepadEventListener } from '../gamepad/gamepad-event';
-import { gamepadLoop } from '../gamepad/gamepad-loop';
+import { gamepadLoop, getGamepads } from '../gamepad/gamepad-loop';
 import { controlsContext, createControlsStore, type ControlsContext, type ControlTriggerType } from './controls-context';
 
 export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [ methods ] = React.useState((): ControlsContext => ({
         useControlsStore: createControlsStore(
-            navigator.getGamepads?.().some(v => v) ? 'gamepad' : undefined,
+            getGamepads().some(v => v) ? 'gamepad' : undefined,
         ),
     }));
 

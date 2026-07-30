@@ -17,7 +17,7 @@ export type UIMultiSelectProps = {
 } & MultiSelect.Props;
 
 export const UIMultiSelect: React.FC<UIMultiSelectProps> = ({ name, controlLabel, pillsNoWrap, className, style, ...rest }) => {
-    const [ scopeId ] = React.useState((): FocusScopeId => `dropdown_${self.crypto.randomUUID()}`);
+    const scopeId: FocusScopeId = `multi-select_${name}`;
 
     const { pushScope, popScope } = Focus.usePushPopScope();
 

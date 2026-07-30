@@ -142,6 +142,7 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
                 {!isLoading && results.map(path => <Group
                     key={path}
                     align='center'
+                    wrap='nowrap'
                 >
                     <Box display='inline-flex' c={actionsInfos.color}>
                         <actionsInfos.Symbol />

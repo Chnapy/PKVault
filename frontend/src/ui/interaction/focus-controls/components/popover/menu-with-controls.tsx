@@ -23,7 +23,7 @@ export const MenuWithControls: React.FC<MenuWithControlsProps> = ({ opened, setO
             setOpened: setInnerOpened,
         }, [ innerOpened, opened, setOpened ]);
 
-    const [ scopeId ] = React.useState((): FocusScopeId => `popover_${self.crypto.randomUUID()}`);
+    const [ scopeId ] = React.useState((): FocusScopeId => `menu_${Math.random()}`);
 
     const targetEl = getSingleElementChild(target);
     if (targetEl

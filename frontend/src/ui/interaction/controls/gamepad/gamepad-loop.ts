@@ -1,8 +1,13 @@
 import { sendGamepadEvent } from './gamepad-event';
 import { type GamepadMappingType } from './gamepad-mapper';
 
+export const getGamepads = () => navigator?.getGamepads?.() ?? [];
+
 export const gamepadLoop = () => {
     const gamepadStates: GamepadStates = {};
+
+    if (!navigator?.getGamepads)
+        console.warn('navigator?.getGamepads is undefined, gamepad controls wont be available.');
 
     let id = -1;
 
@@ -53,7 +58,7 @@ const nextPressDelay = 200;
 const loop = (delta: number, states: GamepadStates) => {
     // console.log(delta);
 
-    const gamepads = navigator.getGamepads?.() ?? [];
+    const gamepads = getGamepads();
 
     for (const gp of gamepads) {
         if (!gp) continue;
