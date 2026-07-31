@@ -1,6 +1,8 @@
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using PKHeX.Core;
+using Serilog;
 
 public interface ISettingsService
 {
@@ -75,7 +77,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         var currentSettingsMutable = ReadBaseSettings().SettingsMutable;
 
         static string GetArrayChecksum(string[]? arr) => string.Join('|', (arr ?? []).ToArray().Order());
-        
+
         static string GetSaveVersionOverridesChecksum(IDictionary<uint, GameVersion>? saveVersionOverrides) => GetArrayChecksum([
             ..saveVersionOverrides?.Keys.Order().Select(k => k.ToString()) ?? [],
             ..saveVersionOverrides?.Values.Order().Select(v => ((byte)v).ToString()) ?? [],
@@ -226,6 +228,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
         return new(
             BuildID,
+            RuntimeSystem: GetRuntimeSystem(),
             Version,
             PkhexVersion: Assembly.GetAssembly(typeof(PKHeX.Core.PKM))?.GetName().Version?.ToString(3) ?? "",
             AppDirectory: MatcherUtil.NormalizePath(GetAppDirectory()),
@@ -237,6 +240,81 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         );
     }
 
+    private static RuntimeSystem GetRuntimeSystem()
+    {
+        if (!string.IsNullOrEmpty(EnvUtil.PKVAULT_PATH))
+            return RuntimeSystem.DOCKER;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            return RuntimeSystem.WINDOWS;
+
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            return RuntimeSystem.UNKNOWN;
+
+        static bool IsSteamDeck()
+        {
+            try
+            {
+                var osReleasePath = "/etc/os-release";
+                if (!File.Exists(osReleasePath))
+                {
+                    // fallback
+                    osReleasePath = "/usr/lib/os-release";
+                    if (!File.Exists(osReleasePath))
+                        return false;
+                }
+
+                foreach (var line in File.ReadLines(osReleasePath))
+                {
+                    if (line.StartsWith("ID="))
+                    {
+                        var id = line.Split('=')[1].Trim('"');
+                        if (id == "steamos")
+                            return true;
+                    }
+
+                    if (line.StartsWith("NAME="))
+                    {
+                        var name = line.Split('=')[1].Trim('"');
+                        if (name == "SteamOS")
+                            return true;
+                    }
+
+                    if (line.StartsWith("VERSION_ID="))
+                    {
+                        var version = line.Split('=')[1].Trim('"');
+                        if (version.Contains("steamdeck"))
+                            return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+
+            try
+            {
+                var hostname = Dns.GetHostName().ToLower();
+                if (hostname.Contains("steamdeck"))
+                    return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+
+            return false;
+        }
+
+        if (IsSteamDeck())
+            return RuntimeSystem.STEAMDECK;
+
+        return RuntimeSystem.LINUX;
+    }
+
+    public static readonly string DefaultSavePath = "./pokemon-emerald-sample.sav";
+
     private static SettingsMutableDTO GetDefaultSettingsMutable()
     {
         SettingsMutableDTO settings;
@@ -244,7 +322,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 #if DEBUG
         settings = new(
             DB_PATH: "./tmp/db",
-            SAVE_GLOBS: [],
+            SAVE_GLOBS: [DefaultSavePath],
             PKM_EXTERNAL_GLOBS: [],
             STORAGE_PATH: "./tmp/storage",
             BACKUP_PATH: "./tmp/backup",
@@ -255,7 +333,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 #else
         settings = new(
             DB_PATH: "./db",
-            SAVE_GLOBS: [],
+            SAVE_GLOBS: [DefaultSavePath],
             PKM_EXTERNAL_GLOBS: [],
             STORAGE_PATH: "./storage",
             BACKUP_PATH: "./backup",

@@ -1,89 +1,115 @@
-export const theme = {
-  bg: {
-    default: "#FFFFFF",
-    dark: "#393B43",
-    filter: "#FFBD18",
+import { ActionIcon, Alert, Badge, Button, Card, createTheme, EmptyState, Menu, mergeThemeOverrides, NumberFormatter, Paper, Popover, Scroller, SegmentedControl, Tabs, Text, Tooltip } from '@mantine/core';
+import { clsx } from 'clsx';
+import { baseTheme, cssVariablesResolver } from './base-theme';
+import classes from './theme.module.css';
 
-    darker: "#101821",
-    yellow: "#FFBD18",
-    blue: "#418EC0",
-    green: "#26BA66",
-    red: "#C53E45",
-    primary: "#334AA6",
-    panel: "#F0E5DA",
-    light: "#FEF6EE",
-    item: 'rgba(255,250,245,0.8)',
-    contrast: "#B6634E",
-    contrastdark: "#934E3D",
-    app: "#FEF4EA",
-    appdark: "#F4EAE0",
-  },
-  text: {
-    default: "#101821",
-    light: "#FFFFFF",
-    primary: "#3050C8",
-    primaryLight: "#C0C0F8",
+const defaultClickOutsideEvents = [ 'pointerdown', 'touchstart' ];
 
-    red: "#F43F46",
-  },
-  border: {
-    default: "#96979B",
-    contrast: "#934E3D",
-    focus: "#F43F46",
-    lines: "#E5E6E7",
-  },
-  game: {
-    blue: "#2446A1",
-    red: "#A14624",
-    yellow: "#EAB000",
-    gold: "#9C8B65",
-    silver: "#747A78",
-    crystal: "#6B4777",
-    saphir: "#104070",
-    emerald: "#457865",
-    ruby: "#781810",
-    za: "#32796B",
-  },
-  font: {
-    default: "Pixel Operator",
-    special: "Pokemon Emerald",
-  },
-  shadow: {
-    text: "1px 1px 0px rgba(0,0,0,0.2)",
-    textlight: "1px 1px 0px rgba(255,255,255,0.2)",
-    filter: `drop-shadow(1px 1px 0 rgba(0,0,0,.2))`,
-  },
-  type: {
-    normal: '#9FA19F',
-    fighting: '#FF8000',
-    fly: '#81B9EF',
-    poison: '#9141CB',
-    ground: '#915121',
-    rock: '#AFA981',
-    bug: '#91A119',
-    ghost: '#704170',
-    steel: '#60A1B8',
-    fire: '#E62829',
-    water: '#2980EF',
-    grass: '#3FA129',
-    electric: '#FAC000',
-    psychic: '#EF4179',
-    ice: '#3FD8FF',
-    dragon: '#5060E1',
-    dark: '#50413F',
-    fairy: '#EF70EF',
-    stellar: '#F6A516',
-    unknown: '#64A894',
-  },
-  contest: {
-    cool: '#EA7254',
-    beauty: '#63B9D6',
-    cute: '#E681B3',
-    smart: '#5DC27B',
-    tough: '#DEC02C',
-  },
-  misc: {
-    markBlue: '#7077E4',
-    markPink: '#F681DD',
-  }
-};
+export const theme = mergeThemeOverrides(
+  baseTheme,
+  createTheme({
+    components: {
+      Paper: Paper.extend({
+        classNames: (theme, props) => ({
+          root: clsx(
+            classes.paper,
+            props.withBorder && classes.paperBorder
+          ),
+        }),
+      }),
+      Card: Card.extend({
+        defaultProps: {
+          shadow: 'sm',
+          withBorder: true,
+        },
+      }),
+      Scroller: Scroller.extend({
+        classNames: (theme, props) => ({
+          root: classes.scroller,
+          control: classes.scrollerControl,
+          chevron: classes.scrollerChevron,
+        }),
+      }),
+      Tabs: Tabs.extend({
+        classNames: (theme, props) => ({
+          tab: classes.tabs,
+        }),
+      }),
+      Button: Button.extend({
+        defaultProps: {
+          variant: 'default',
+        },
+        classNames: (theme, props) => ({
+          root: classes.button,
+          section: classes.buttonSection,
+        }),
+      }),
+      ActionIcon: ActionIcon.extend({
+        classNames: (theme, props) => ({
+          root: classes.actionIcon,
+        }),
+      }),
+      Badge: Badge.extend({
+        defaultProps: {
+          bdrs: 'md',
+        },
+      }),
+      Text: Text.extend({
+        classNames: (theme, props) => ({
+          root: classes.text,
+        }),
+      }),
+      NumberFormatter: NumberFormatter.extend({
+        defaultProps: {
+          thousandSeparator: "'",
+        },
+      }),
+      Alert: Alert.extend({
+        classNames: (theme, props) => ({
+          title: classes.alertTitle,
+          message: classes.alertMessage,
+        }),
+      }),
+      Popover: Popover.extend({
+        defaultProps: {
+          // default value 'mousedown' doesn't work with disabled buttons
+          clickOutsideEvents: defaultClickOutsideEvents,
+        },
+      }),
+      Menu: Menu.extend({
+        defaultProps: {
+          // default value 'mousedown' doesn't work with disabled buttons
+          clickOutsideEvents: defaultClickOutsideEvents,
+        },
+      }),
+      Tooltip: Tooltip.extend({
+        defaultProps: {
+          fz: 'md',
+          px: 'md',
+          py: 'sm',
+          lh: 'xs',
+          maw: 300,
+          style: {
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+          },
+          events: { hover: true, focus: true, touch: true },
+          transitionProps: { duration: 0 },
+        },
+      }),
+      SegmentedControl: SegmentedControl.extend({
+        classNames: (theme, props) => ({
+          root: classes.segmentedControl,
+        }),
+      }),
+      EmptyState: EmptyState.extend({
+        classNames: (theme, props) => ({
+          root: classes.emptyState,
+          title: classes.emptyStateTitle,
+        }),
+      }),
+    },
+  }),
+);
+
+export { cssVariablesResolver };

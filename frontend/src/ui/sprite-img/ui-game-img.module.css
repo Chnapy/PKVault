@@ -1,0 +1,11 @@
+.ui-game-img {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.ui-game-img.save {
+  background-color: #fff;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: var(--mantine-radius-sm);
+}

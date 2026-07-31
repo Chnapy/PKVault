@@ -125,7 +125,7 @@ public class SavePkmLoader(
             throw new InvalidOperationException($"Write disabled PkmSaveDTO not allowed");
         }
 
-        if (!BoxLoader.CanIdReceivePkm(dto.BoxId))
+        if (!BoxLoader.CanIdReceivePkm(dto.BoxId, save.Version))
         {
             throw new Exception("Not allowed for pkm in readonly box");
         }
@@ -186,7 +186,7 @@ public class SavePkmLoader(
         var dto = GetDto(id);
         if (dto != default)
         {
-            if (!BoxLoader.CanIdReceivePkm(dto.BoxId))
+            if (!BoxLoader.CanIdReceivePkm(dto.BoxId, save.Version))
             {
                 throw new Exception("Not allowed for pkm in daycare");
             }

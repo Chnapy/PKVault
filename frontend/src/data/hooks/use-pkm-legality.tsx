@@ -1,4 +1,4 @@
-import { useQueries, useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { queryOptions, useQueries, useQuery, type UseQueryResult } from "@tanstack/react-query";
 import * as batshit from "@yornaath/batshit";
 import type { PkmLegalityDTO } from '../sdk/model';
 import { getStorageGetPkmsLegalityQueryKey, storageGetPkmsLegality } from '../sdk/storage/storage.gen';
@@ -26,14 +26,15 @@ const getBatcherBySave = (saveId?: number) => {
 
 export type PkmLegalityQueryData = ReturnType<typeof usePkmLegality>[ 'data' ];
 
-export const getPkmLegalityQueryKey = (pkmId: string, saveId?: number): unknown[] => [ ...getStorageGetPkmsLegalityQueryKey(), saveId ?? 0, pkmId ];
+export const getPkmLegalityQueryKey = (pkmId: string | undefined, saveId?: number): unknown[] => [ ...getStorageGetPkmsLegalityQueryKey(), saveId ?? 0, pkmId ];
 
-const getQueryOptions = (pkmId: string, saveId?: number) => ({
+const getQueryOptions = (pkmId: string | undefined, saveId?: number) => queryOptions({
     queryKey: getPkmLegalityQueryKey(pkmId, saveId),
-    queryFn: () => getBatcherBySave(saveId).fetch(pkmId),
+    queryFn: () => getBatcherBySave(saveId).fetch(pkmId!),
+    enabled: !!pkmId,
 });
 
-export const usePkmLegality = (pkmId: string, saveId?: number) => {
+export const usePkmLegality = (pkmId: string | undefined, saveId?: number) => {
     return useQuery(getQueryOptions(pkmId, saveId));
 };
 
@@ -67,7 +68,7 @@ export const usePkmLegalityMap = (pkmIds: string[], saveId?: number) => {
                 isRefetching: acc.isRefetching || query.isRefetching,
                 isStale: acc.isStale && query.isStale,
                 isEnabled: acc.isEnabled && query.isEnabled,
-                status: query.status,
+                status: acc.status === 'pending' ? acc.status : query.status,
                 fetchStatus: query.fetchStatus,
                 data: acc.data && query.data && {
                     ...query.data,

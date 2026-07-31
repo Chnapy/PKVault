@@ -1,7 +1,6 @@
-import { css } from '@emotion/css';
 import type React from 'react';
 import { useStorageGetBoxes } from '../../data/sdk/storage/storage.gen';
-import { ImgPrefetch } from '../../ui/icon/img-prefetch';
+import { ImgPrefetch } from '../../ui/icon/resources/img-prefetch';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { getBoxBackgroundUrl } from './util/get-box-background-url';
 
@@ -13,7 +12,7 @@ export const StorageBoxBackgroundsPrefetch: React.FC<{ saveId?: number }> = ({ s
         .filter(filterIsDefined)) ]
         .map(wallpaperName => getBoxBackgroundUrl(wallpaperName));
 
-    return <div aria-description='prefetch' className={css({ width: 0, height: 0 })}>
+    return <div aria-description='prefetch' style={{ width: 0, height: 0 }}>
         {wallpaperUrls.map((wallpaperUrl, i) => <ImgPrefetch
             key={wallpaperUrl}
             src={wallpaperUrl}

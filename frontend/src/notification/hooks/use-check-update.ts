@@ -1,6 +1,26 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 
+export const getReleaseVersionState = (releaseName: string, settingsVersion: string): 'new' | 'old' | 'same' => {
+    const settingsVersionParts = settingsVersion.split('.').map(Number);
+    const releaseVersionParts = releaseName.split('.').map(Number);
+
+    for (let i = 0; i < settingsVersionParts.length; i++) {
+        const settingsPart = settingsVersionParts[ i ] ?? 0;
+        const releasePart = releaseVersionParts[ i ] ?? 0;
+
+        if (releasePart === settingsPart) {
+            continue;
+        }
+
+        return releasePart > settingsPart
+            ? 'new'
+            : 'old';
+    }
+
+    return 'same';
+};
+
 /**
  * Check any app new release from github.
  */
@@ -12,7 +32,7 @@ export const useCheckUpdate = (): string | undefined => {
             .then<{
                 name: string;
                 draft: boolean;
-                prerelase: boolean;
+                prerelease: boolean;
             }>(res => res.json()),
     });
 
@@ -20,32 +40,15 @@ export const useCheckUpdate = (): string | undefined => {
         return;
     }
 
-    const { name, draft, prerelase } = updateQuery.data;
+    const { name, draft, prerelease } = updateQuery.data;
 
-    if (draft || prerelase) {
+    if (draft || prerelease) {
         return;
     }
 
-    const settingsVersion = settingsQuery.data.data.version.split('.').map(Number);
+    const releaseState = getReleaseVersionState(name.substring(1), settingsQuery.data.data.version);
 
-    const nextVersion = name.substring(1).split('.').map(Number);
-
-    const canUpdate = (): boolean => {
-        for (let i = 0; i < settingsVersion.length; i++) {
-            const settingsPart = settingsVersion[ i ] ?? 0;
-            const nextPart = nextVersion[ i ] ?? 0;
-
-            if (nextPart === settingsPart) {
-                continue;
-            }
-
-            return nextPart > settingsPart;
-        }
-
-        return false;
-    };
-
-    if (canUpdate()) {
-        return name;
-    }
+    return releaseState === 'new'
+        ? name
+        : undefined;
 };

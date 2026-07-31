@@ -112,7 +112,6 @@ export class QueryError extends Error {
     private static getHeaderContent(value: string | null): string | null {
         try {
             return JSON.parse(value!);
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (_) {
             return value;
         }
@@ -120,7 +119,6 @@ export class QueryError extends Error {
 }
 
 // override the return error type
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type ErrorType<_> = QueryError;
 
 // // In case you want to wrap the body type (optional)

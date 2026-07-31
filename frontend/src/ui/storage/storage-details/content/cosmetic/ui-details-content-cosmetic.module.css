@@ -1,0 +1,5 @@
+
+.ui-details-content-cosmetic tr > *:not(:nth-child(2)) {
+    /* 0 not working in linux */
+    width: 1px;
+}

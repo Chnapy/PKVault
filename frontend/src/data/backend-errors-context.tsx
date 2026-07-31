@@ -17,7 +17,7 @@ export const BackendErrorsContext = {
 
         return <context.Provider value={{
             errors: backendErrors,
-            addError: error => setBackendErrors(errors => {
+            addError: React.useCallback(error => setBackendErrors(errors => {
                 const alreadyExists = errors.some(err => err.stack === error.stack);
                 if (alreadyExists) {
                     return errors;
@@ -28,7 +28,7 @@ export const BackendErrorsContext = {
                     message: error.message ?? '',
                     stack: error.stack ?? '',
                 } satisfies BackendError ];
-            }),
+            }), []),
             removeIndex: index => setBackendErrors(
                 backendErrors.filter((_, i) => i !== index)
             )
@@ -38,16 +38,16 @@ export const BackendErrorsContext = {
     },
     useValue: () => React.useContext(context),
     useOnMutationResponse: () => {
-        const context = BackendErrorsContext.useValue();
+        const { addError } = BackendErrorsContext.useValue();
 
-        return (data: unknown, error: Error | null) => {
+        return React.useCallback((data: unknown, error: Error | null) => {
             if (error instanceof QueryError) {
-                context.addError({
-                    message: error.errorMessage ?? undefined,
-                    stack: error.errorStack ?? undefined,
+                addError({
+                    message: error.errorMessage ?? error.statusText ?? undefined,
+                    stack: error.errorStack ?? error.stack ?? undefined,
                     status: error.status,
                 });
             }
-        };
+        }, [ addError ]);
     },
 };

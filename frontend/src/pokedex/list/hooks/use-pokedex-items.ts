@@ -7,7 +7,7 @@ import { getGameInfos } from '../../details/util/get-game-infos';
 import { usePokedexFilters } from './use-pokedex-filters';
 
 type PokedexItems = Counts & {
-    isLoading: boolean;
+    isPending: boolean;
     speciesItemsByGenerationList: SpeciesItemsByGeneration[];
 };
 
@@ -28,6 +28,7 @@ type Counts = {
 
 type SpeciesInfos = {
     species: number;
+    speciesName: string;
     itemsToRender: SpeciesFormItem[];
     isSeen: boolean;
 };
@@ -56,7 +57,7 @@ export const usePokedexItems = (): PokedexItems => {
     const showForms = Route.useSearch({ select: (search) => search.showForms ?? false });
     const showGendersRaw = Route.useSearch({ select: (search) => search.showGenders ?? false });
 
-    const { data, isLoading } = useDexGetAll();
+    const { data, isPending } = useDexGetAll();
 
     const { isPkmFiltered, filterSpeciesValues } = usePokedexFilters();
 
@@ -85,6 +86,8 @@ export const usePokedexItems = (): PokedexItems => {
         const generation = staticData.species[ species ]?.generation ?? -1;
 
         const staticForms = staticData.species[ species ]?.forms ?? {};
+
+        const speciesName = Object.values(staticForms)[ 0 ]?.[ 0 ]?.name ?? '';
 
         const allForms = dexItems.flatMap(value => value.forms);
 
@@ -238,6 +241,7 @@ export const usePokedexItems = (): PokedexItems => {
                 ...acc[ generation ]?.speciesInfos ?? [],
                 {
                     species,
+                    speciesName,
                     itemsToRender,
                     isSeen,
                 },
@@ -266,7 +270,7 @@ export const usePokedexItems = (): PokedexItems => {
     const itemsCount = speciesItemsByGenerationList.reduce((acc, item) => acc + item.itemsCount, 0);
 
     return {
-        isLoading,
+        isPending,
         speciesItemsByGenerationList,
         seenCount,
         caughtCount,

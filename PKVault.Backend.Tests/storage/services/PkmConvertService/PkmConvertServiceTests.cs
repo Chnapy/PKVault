@@ -33,7 +33,7 @@ public class PkmConvertServiceTests
     {
         Mock<ISettingsService> mockSettingsService = new();
         mockSettingsService.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
-            BuildID: default, Version: "", PkhexVersion: "", AppDirectory: "", SettingsPath: "", UserId: "",
+            BuildID: default, RuntimeSystem: RuntimeSystem.LINUX, Version: "", PkhexVersion: "", AppDirectory: "", SettingsPath: "", UserId: "",
             CanUpdateSettings: false, CanScanSaves: false, SettingsMutable: new(
                 DB_PATH: "", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "", BACKUP_PATH: "",
                 LANGUAGE: "fr", HIDE_CHEATS: false, SKIP_LEGALITY_CHECKS: false

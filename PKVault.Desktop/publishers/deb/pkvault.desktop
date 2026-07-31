@@ -2,7 +2,7 @@
 Type=Application
 Name=PKVault
 Categories=Utility;
-Comment=PKVault is a Pokemon storage and save manipulation tool based on PKHeX.
+Comment=Pokemon storage and save manipulation tool based on PKHeX.
 Exec=/usr/bin/pkvault
 Icon=pkvault
 Terminal=false

@@ -31,25 +31,25 @@
   <icon type="stock">org.chnapy.pkvault</icon>
 
   <screenshots>
-    <screenshot type="default" width="1398" height="1030">
-      <image width="1398" height="1030" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_1.png?raw=true</image>
+    <screenshot type="default" width="1216" height="760">
+      <image width="1216" height="760" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_storage.png?raw=true</image>
       <caption>Collection view</caption>
     </screenshot>
-    <screenshot type="default" width="1398" height="1030">
-      <image width="1398" height="1030" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_2.png?raw=true</image>
-      <caption>Pokemon edit</caption>
+    <screenshot type="default" width="1216" height="760">
+      <image width="1216" height="760" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_storage_dark.png?raw=true</image>
+      <caption>Dark mode</caption>
     </screenshot>
-    <screenshot type="default" width="1398" height="1030">
-      <image width="1398" height="1030" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_3.png?raw=true</image>
-      <caption>Pokedex</caption>
+    <screenshot type="default" width="1216" height="760">
+      <image width="1216" height="760" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_storage_details.png?raw=true</image>
+      <caption>Pokémon edit</caption>
     </screenshot>
-    <screenshot type="default" width="1398" height="1030">
-      <image width="1398" height="1030" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_4.png?raw=true</image>
+    <screenshot type="default" width="1216" height="760">
+      <image width="1216" height="760" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_dex.png?raw=true</image>
+      <caption>Pokédex</caption>
+    </screenshot>
+    <screenshot type="default" width="1216" height="760">
+      <image width="1216" height="760" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_saves.png?raw=true</image>
       <caption>Saves view</caption>
-    </screenshot>
-    <screenshot type="default" width="1398" height="1030">
-      <image width="1398" height="1030" hicolor="true">https://github.com/Chnapy/PKVault/blob/main/img/snap_5.png?raw=true</image>
-      <caption>Settings</caption>
     </screenshot>
   </screenshots>
 

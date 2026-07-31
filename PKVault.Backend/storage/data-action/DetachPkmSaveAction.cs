@@ -30,7 +30,7 @@ public class DetachPkmSaveAction(
 
             return new(
                 type: DataActionType.DETACH_PKM_SAVE,
-                parameters: [saveLoaders?.Save.Version, pkmNickname]
+                parameters: [saveLoaders?.Save.Version, pkmNickname, pkm.Species]
             );
         }
 

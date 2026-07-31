@@ -109,7 +109,11 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
 
         return boxes.Select(entry => (
             entry.Key,
-            boxLoader.CreateDTO(entry.Value, GetWallpaperName(entry.Value.IdInt))
+            boxLoader.CreateDTO(
+                entry.Value,
+                GetWallpaperName(entry.Value.IdInt),
+                Version: save.Version
+            )
         )).ToDictionary();
     }
 

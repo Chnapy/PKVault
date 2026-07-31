@@ -1,0 +1,73 @@
+.ui-header {
+    color-scheme: light;
+    margin-bottom: 0;
+    align-items: flex-start;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    --focus-width: 2px;
+    --mantine-color-disabled: var(--mantine-color-primary-8);
+    --mantine-color-disabled-color: var(--mantine-color-primary-4);
+    --mantine-color-primary-filled-hover: var(--mantine-color-primary-8);
+}
+
+.ui-header .left {
+    display: flex;
+    padding: 8px;
+    padding-top: 6px;
+    padding-left: 6px;
+    gap: 16px;
+    z-index: 2;
+}
+
+.ui-header .logo {
+    height: 48px;
+    width: 48px;
+}
+
+.ui-header .bubble {
+    border-radius: 99px;
+    width: 12px;
+    height: 12px;
+}
+
+.ui-header .artifact-wrapper {
+    overflow: hidden;
+    padding-left: 1px;
+    margin-left: -1px;
+    margin-right: -150px;
+    align-self: stretch;
+    flex-shrink: 0;
+    z-index: 2;
+    pointer-events: none;
+    height: 62px;
+}
+
+.ui-header .artifact {
+    height: 100%;
+    width: 150px;
+    transform: rotate(-45deg);
+    transform-origin: bottom left;
+    pointer-events: none;
+}
+
+.ui-header .main {
+    flex-grow: 1;
+    padding-left: 150px;
+    box-shadow: 0 2px 0 rgb(0 0 0 / 20%), inset rgb(0 0 0 / 20%) -2px 2px 0;
+}
+
+.ui-header .first-line {
+    flex-grow: 1;
+    padding-left: 60px;
+    padding-top: 2px;
+    padding-right: 2px;
+    box-shadow: 0 2px 0 rgb(0 0 0 / 20%);
+    white-space: nowrap;
+    z-index: 1;
+}
+
+.ui-header [data-variant="pills"] {
+    --tab-hover-color: var(--mantine-color-primary-8);
+}

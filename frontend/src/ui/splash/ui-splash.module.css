@@ -1,0 +1,14 @@
+
+.ui-splash-loader {
+  animation: 2s linear 0s infinite alternate loader;
+}
+
+@keyframes loader {
+    0%, 10% {
+        transform: rotate(0);
+    }
+
+    90%, 100% {
+        transform: rotate(360deg);
+    }
+}

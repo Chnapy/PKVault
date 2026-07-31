@@ -1,0 +1,84 @@
+
+import { Button, type ElementProps } from '@mantine/core';
+import { useMergedRef } from '@mantine/hooks';
+import type React from 'react';
+import { useTranslate } from '../../../../translate/i18n';
+import type { GamepadMappingsAllButton } from '../../../interaction/controls/gamepad/gamepad-mapper';
+import { getControlIcon } from '../../../interaction/controls/icons/get-control-icon';
+import { WithControlsIcons } from '../../../interaction/controls/icons/with-controls-icons';
+import { useControls } from '../../../interaction/controls/use-controls';
+import { useControlsCurrentType } from '../../../interaction/controls/use-controls-current-type';
+import { getSelectControl } from '../../../interaction/focus-controls/common-controls/select-controls';
+import { useFocusControls } from '../../../interaction/focus-controls/use-focus-controls';
+
+type UIDetailsActionProps = {
+    name: string;
+    label: string;
+    gamepadValue?: GamepadMappingsAllButton;
+    focusOnMount?: boolean;
+} & Button.Props & ElementProps<'button'>;
+
+export const UIDetailsAction: React.FC<UIDetailsActionProps> = ({ name, label, gamepadValue, focusOnMount, onClick, ...rest }) => {
+    const { t } = useTranslate();
+
+    const { focusProps, controlOrder, active, controlProps, controlIcons } = useFocusControls({
+        scopeNodeId: name,
+        focusOnMount,
+        controls: [
+            onClick && getSelectControl({
+                label: t('action.select'),
+                action: onClick,
+            }),
+        ],
+    });
+
+    const controls = useControls(
+        name + '-active',
+        true,
+        controlOrder,
+        [
+            onClick && gamepadValue && {
+                name: 'active-action',
+                label,
+                triggers: {
+                    mouse: {
+                        type: 'mouse',
+                        values: [ 'left-click' ],
+                    },
+                    // keyboard: {
+                    //     type: 'keyboard',
+                    //     values: [],
+                    // },
+                    gamepad: {
+                        type: 'gamepad',
+                        values: [ gamepadValue ],
+                    },
+                },
+                spread: true,
+                action: onClick,
+            }
+        ],
+        { enabled: active },
+    );
+
+    const controlsCurrentType = useControlsCurrentType();
+
+    const icons = gamepadValue && getControlIcon(controlsCurrentType, [ gamepadValue ]);
+
+    const ref = useMergedRef(
+        controlProps('open').ref,
+        controls.controlProps('active-action').ref,
+    );
+
+    return <WithControlsIcons placement='out' icons={[ controlIcons('open'), controls.controlIcons('active-action') ]}>
+        <Button
+            {...rest}
+            {...focusProps}
+            {...controlProps('open')}
+            leftSection={icons?.length ? icons : rest.leftSection}
+            ref={ref}
+        >
+            {label}
+        </Button>
+    </WithControlsIcons>;
+};

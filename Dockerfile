@@ -70,6 +70,8 @@ ENV VITE_OPENAPI_PATH=$VITE_OPENAPI_PATH
 
 RUN npm run gen:sdk:basic
 
+RUN npm run gen:css:dts
+
 COPY ./docs/functional ./_docs
 
 ENV DOCS_PATH=./_docs
@@ -84,6 +86,8 @@ RUN npm run c:type
 RUN npm run test
 
 RUN npm run c:lint
+
+RUN npm run c:translate
 
 # frontend publish
 FROM frontend-builder AS frontend-publish

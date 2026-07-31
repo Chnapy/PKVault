@@ -7,7 +7,7 @@ export const usePkmVariantAttach = () => {
     return (pkm: Pick<PkmVariantDTO, 'id' | 'attachedSaveId'>, pkmVariantId: string) => {
         const isAttachedValid =
             pkm.attachedSaveId == null ||
-            warningsQuery.isLoading ||
+            (warningsQuery.isPending && warningsQuery.isEnabled) ||
             !warningsQuery.data?.data.pkmVariantWarnings.some((warn) => warn.pkmVariantId == pkmVariantId);
 
         return {

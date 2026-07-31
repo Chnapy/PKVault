@@ -1,0 +1,15 @@
+.slots-container {
+    justify-self: center;
+    background-color: #0002;
+    border-radius: var(--mantine-radius-sm);
+}
+
+.slots-container > * {
+    width: 4px;
+    height: 4px;
+    border-radius: var(--mantine-radius-xl);
+}
+
+.slots-container > *:is([data-enabled]) {
+    background-color: currentcolor;
+}

@@ -1,0 +1,39 @@
+
+.ui-pokedex-item {
+    touch-action: none;
+    position: relative;
+}
+
+.ui-pokedex-item .button {
+    touch-action: none;
+    position: relative;
+    height: auto;
+    padding: 0;
+
+    /* font-size: 1rem; */
+}
+
+.species {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-bottom-right-radius: var(--mantine-radius-default);
+    background-color: var(--button-hover);
+}
+
+.ui-pokedex-item .icons {
+    position: absolute;
+    inset: 0;
+    padding: 4px;
+}
+
+.ui-pokedex-item .button[data-selected="true"] {
+    outline: 4px solid var(--focus-color-1);
+}
+
+.ui-pokedex-item .button[data-selected="true"]:not([data-disabled="true"]),
+.ui-pokedex-item .button[data-focused="true"]:not([data-disabled="true"]),
+.ui-pokedex-item .button:not([data-disabled="true"]):hover {
+  transform: scale(1.02);
+  z-index: 1;
+}

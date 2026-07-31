@@ -1,42 +1,193 @@
-# PKVault - Fonctionnalités
+# PKVault - Feature showcase
+<br/>
 
-PKVault est une application gratuite open-source de gestion centralisée Pokémon, incluant stockage, pokédex, manipulation de pokémon et sauvegardes.
-Elle permet de:
+<div align="center">
+    <img src="../img/centralized-storage.png" alt="PKVault storage" />
+    <p align="center">
+        <b>Stockage centralisé</b> où vous pouvez déposer chaque pokémon de chaque génération.
+    </p>
+</div>
 
-- importer les sauvegardes Pokémon (Nintendo Switch, Game Boy, 3DS, etc.)
-- organiser les pokémons dans des banques et boîtes
-- gérer les altérations de sauvegarde en toute sécurité (session avant sauvegarde)
-- consulter un Pokédex complet avec tous les pokemons
-- protéger les données avec backups automatiques
+<br/>
+<br/>
 
-Elle a vocation à fonctionner 100% offline, en mono-utilisateur, et compatible avec toutes les générations, de la première à la plus récente.
+<img align="left" src="../img/saves-storage.png" alt="Saves list" />
 
-## Table des matières
+Accédez aux stockages de vos **fichiers de sauvegardes**.
 
-1. [Considérations techniques](./0-technical.md)
-1. [Démarrage rapide](./1-quick-start.md)
-1. [Session](./2-session.md)
-1. [Stockage](./3-storage.md)
-1. [Pokédex](./4-pokedex.md)
-1. [Paramètres et backups](./5-settings.md)
-1. [Bugs, retours et contribution](./6-issues.md)
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 
-## Cadre et limitations
+<img align="right" src="../img/banks-boxes.png" alt="Banks & boxes" />
 
-PKVault utilise PKHeX en interne pour les manipulations de pokemons et sauvegardes, mais n'a pas vocation à offrir les mêmes fonctionnalités.
+Le stockage PKVault est découpé par **banques & boîtes**.
 
-Au delà des fonctionnalités primaires de PKVault, l'app peut proposer des fonctionnalités secondaires de confort: évolution par échange, changement de capacités, etc. Mais PKVault ne proposera pas d'option d'édition allant en dehors d'un usage classique & quotidien.
 
-PKVault n'incite pas à la triche en dehors des options de confort.
+<br/>
+<br/>
 
-PKVault peut :
+---
 
-- lire les sauvegardes
-- modifier et déplacer les pokemons
-- créer des variantes de pokemons
+## Actions
+<br/>
 
-PKVault ne peut pas :
+<img align="left" src="../img/move-action.png" alt="Move action" />
 
-- modifier les stats/IV des pokemons
-- créer volontairement des pokemons illégaux
-- modifier directement les jeux eux-même
+**Déplacez** les pokémons entre les boîtes et stockages.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="right" src="../img/move-attached.png" alt="Move attached" />
+
+**Déplacez rattaché**, créant une copie synchronisée entre le stockage PKVault et la sauvegarde après le moindre changement (level up, changement de capacité, etc)
+
+<br/>
+<br/>
+<br/>
+
+<img align="left" src="../img/edit-action.png" alt="Edit action" />
+
+**Editez** les pokémons: surnom, capacités et balance des EVs.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="right" src="../img/evolve-action.png" alt="Evolve action" />
+
+**Evoluez** les pokémons qui requierent un échange.
+<br/>
+Le port d'un objet peut être requis.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="left" src="../img/multi-select.png" alt="Multi-select" />
+
+**Sélectionnez** plusieurs pokémons avant de déplacer, éditer, etc.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="right" src="../img/sort-action.png" alt="Sort action" />
+
+**Triez** les pokémons sur plusieurs boîtes en suivant un Pokédex donné.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+---
+
+## Pokédex
+<br/>
+
+<div align="center">
+    <img src="../img/centralized-pokedex.png" alt="Centralized Pokédex" />
+    <p align="center">
+        <b>Pokédex centralisé</b>.
+    </p>
+</div>
+
+<br/>
+<br/>
+
+<img align="left" src="../img/pokedex-saves.png" alt="Saves Pokédex" />
+
+Données des Pokédex depuis vos **fichiers de sauvegarde**.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="right" src="../img/synchro-pokedex.png" alt="Synchronize Pokédex" />
+
+**Synchronisez** les Pokédex entre vos sauvegardes, partageant les pokémons vus & capturés.
+
+<br/>
+<br/>
+
+---
+
+## Misc
+<br/>
+
+<img align="left" src="../img/backups.png" alt="Data safety" />
+
+**Auto-backup** des données & sauvegardes lors de la sauvegarde de vos actions.
+<br/>Vous ne pouvez pas perdre vos données !
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="right" src="../img/parameters.png" alt="Parameters" />
+
+Vous pouvez **masquer la triche** dans l'édition de pokémon, ou **éviter les vérifications de legalité**.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="left" src="../img/dark-mode.png" alt="Dark mode" />
+
+**Mode sombre** pour une meilleure lisibilité.
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="right" src="../img/sprite-sizing.png" alt="Sprite sizing" />
+
+Changez **la taille des sprites** comme vous l'entendez.
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<img align="left" src="../img/controllers.png" alt="Controller support" />
+
+**Manette** et **SteamDeck** sont supportés.

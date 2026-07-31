@@ -1,16 +1,21 @@
-import { css } from '@emotion/css';
+import { Divider, Group } from '@mantine/core';
+import { PencilIcon } from 'lucide-react';
 import React from 'react';
 import type { GameVersion } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useSettingsEdit, useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { useStaticData } from '../../hooks/use-static-data';
+import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
 import { useTranslate } from '../../translate/i18n';
-import { Button } from '../../ui/button/button';
-import { ButtonWithPopover } from '../../ui/button/button-with-popover';
-import { Icon } from '../../ui/icon/icon';
+import { UIButton } from '../../ui/form/button/ui-button';
+import { usePopover } from '../../ui/interaction/focus-controls/components/popover/hooks/use-popover';
+import { UIPopoverCard } from '../../ui/popover/popover-card/ui-popover-card';
+import { UIGameImg } from '../../ui/sprite-img/ui-game-img';
 
 export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
     const { t } = useTranslate();
+
+    const popover = usePopover();
 
     const staticData = useStaticData();
     const saveInfosQuery = useSaveInfosGetAll();
@@ -26,22 +31,25 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
         return null;
     }
 
-    return <ButtonWithPopover
-        anchor='right start'
-        panelContent={close => <div
-            className={css({
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 4,
-            })}
-        >
-            {[ ...new Set([ save.version, ...versionObj.children ]) ].map(vers => ({
-                value: vers,
-                option: <>{t('save.pkm')} {staticData.versions[ vers ]?.name}</>,
-            })).map(item => <React.Fragment key={item.value}>
-                <Button
-                    value={item.value}
-                    disabled={item.value === save.displayedVersion}
+    return <UIPopoverCard
+        miw={200}
+        icon={<PencilIcon />}
+        title={t('save.edit.title')}
+    >
+        {[ ...new Set([ save.version, ...versionObj.children ]) ].map(vers => ({
+            value: vers,
+            option: <>{t('save.pkm')} {staticData.versions[ vers ]?.name}</>,
+        })).map(item => <React.Fragment key={item.value}>
+            <Group>
+                <UIGameImg
+                    version={item.value}
+                />
+
+                <UIButton
+                    name={`version-${item.value}`}
+                    controlLabel={t('save.edit.version')}
+                    focusOnMount={item.value === save.displayedVersion}
+                    disabled={settingsEdit.isPending || item.value === save.displayedVersion}
                     onClick={async () => {
                         const version = item.value;
                         if (version === save.displayedVersion) {
@@ -63,19 +71,18 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
                             },
                         });
 
-                        close();
+                        popover?.setOpened(false);
                     }}
+                    color={getGameInfos(item.value).color}
+                    variant='filled'
+                    autoContrast
+                    style={{ flexGrow: 1 }}
                 >
                     {item.option}
-                </Button>
+                </UIButton>
+            </Group>
 
-                {item.value === save.version && <hr className={css({
-                    width: '80%',
-                    borderTop: 'none',
-                })} />}
-            </React.Fragment>)}
-        </div>}
-    >
-        <Icon name='pen' forButton />
-    </ButtonWithPopover>;
+            {item.value === save.version && <Divider />}
+        </React.Fragment>)}
+    </UIPopoverCard>;
 };

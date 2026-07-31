@@ -1,0 +1,348 @@
+import { Group } from '@mantine/core';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { LinkIcon, MoveIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import { GameVersion, Gender, MarkingColorUniversal, MoveCategory } from '../../../data/sdk/model';
+import { getGameInfos } from '../../../pokedex/details/util/get-game-infos';
+import { UIBallImg } from '../../sprite-img/item-img/ui-ball-img';
+import { UIItemImg } from '../../sprite-img/item-img/ui-item-img';
+import { UISpeciesImg } from '../../sprite-img/species-img/ui-species-img';
+import { UIGameImg } from '../../sprite-img/ui-game-img';
+import spritesheetItem0 from '../../stories/assets/spritesheet_items_0.webp';
+import spritesheet0 from "../../stories/assets/spritesheet_species_0.webp";
+import { UITypeItem } from '../../type-item/ui-type-item';
+import { UIDetailsAction } from './actions/ui-details-action';
+import { UIContest } from './content/cosmetic/ui-contest';
+import { UIDetailsContentCosmetic } from './content/cosmetic/ui-details-content-cosmetic';
+import { UIRibbon, type UIRibbonProps } from './content/cosmetic/ui-ribbon';
+import { UIDetailsContentMisc } from './content/misc/ui-details-content-misc';
+import { UIDetailsContentMove } from './content/moves/ui-details-content-moves';
+import { UIDetailsMoveRow, type UIDetailsMoveRowProps } from './content/moves/ui-details-move-row';
+import { UIDetailsContentOrigin } from './content/origin/ui-details-content-origin';
+import { UIDetailsContentStats } from './content/stats/ui-details-content-stats';
+import { UIDetailsStatsRow, type UIDetailsStatsRowProps } from './content/stats/ui-details-stats-row';
+import { UIDetailsContent } from './content/ui-details-content';
+import { UIDetailsContentExpanded } from './content/ui-details-content-expanded';
+import { UIDetailsContentSummary } from './content/ui-details-content-summary';
+import { UIMarkingList } from './marking/ui-marking-list';
+import { UIDetailsSaveTab } from './saves/ui-details-save-tab';
+import { UIDetailsSaves } from './saves/ui-details-saves';
+import { UIDetailsMain } from './ui-details-main';
+import { UIStorageDetails } from './ui-storage-details';
+
+const meta = {
+    title: 'UI/UIStorageDetails',
+    component: UIStorageDetails,
+} satisfies Meta<typeof UIStorageDetails>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+const getContent = () => [
+    {
+        name: 'summary',
+        label: 'Summary',
+        content: <UIDetailsContentSummary
+            id='ID'
+            heldItem={<Group gap={4}>
+                <UIItemImg
+                    item={209}
+                    sheetUrl={spritesheetItem0}
+                    spriteInfos={{
+                        height: 30,
+                        width: 30,
+                        x: 992,
+                        y: 192,
+                    }}
+                />
+                Mystic Water
+            </Group>}
+            nature='Impish'
+            ability='Guts'
+            pid={51853507}
+        />,
+    },
+    {
+        name: 'stats',
+        label: 'Stats',
+        content: <UIDetailsContentStats iv ev>
+            {[
+                {
+                    stat: 'hp',
+                    value: 55,
+                    level: 50,
+                    iv: 23,
+                    ev: 6,
+                } satisfies UIDetailsStatsRowProps,
+                {
+                    stat: 'atk',
+                    value: 50,
+                    level: 50,
+                    iv: 0,
+                    ev: 0,
+                } satisfies UIDetailsStatsRowProps,
+                {
+                    stat: 'def',
+                    value: 45,
+                    level: 50,
+                    iv: 12,
+                    ev: 0,
+                } satisfies UIDetailsStatsRowProps,
+                {
+                    stat: 'spa',
+                    value: 135,
+                    level: 50,
+                    iv: 31,
+                    ev: 252,
+                } satisfies UIDetailsStatsRowProps,
+                {
+                    stat: 'spd',
+                    value: 95,
+                    level: 50,
+                    iv: 28,
+                    ev: 0,
+                } satisfies UIDetailsStatsRowProps,
+                {
+                    stat: 'spe',
+                    value: 120,
+                    level: 50,
+                    iv: 5,
+                    ev: 252,
+                } satisfies UIDetailsStatsRowProps,
+            ].map((props) => <UIDetailsStatsRow key={props.stat} {...props} />)}
+        </UIDetailsContentStats>,
+    },
+    {
+        name: 'moves',
+        label: 'Moves',
+        content: <UIDetailsContentMove
+            moves={[
+                {
+                    type: 5,
+                    name: 'Bomb-beurk',
+                    category: MoveCategory.SPECIAL,
+                    power: 95,
+                    accuracy: 100,
+                } satisfies UIDetailsMoveRowProps,
+                {
+                    type: 8,
+                    name: 'Foobar',
+                    category: MoveCategory.PHYSICAL,
+                    power: 140,
+                    accuracy: 70,
+                } satisfies UIDetailsMoveRowProps,
+                {
+                    type: 10,
+                    name: 'Toto',
+                    category: MoveCategory.STATUS,
+                } satisfies UIDetailsMoveRowProps,
+                // {
+                //     type: 5,
+                //     name: 'Bomb-beurk',
+                //     category: MoveCategory.SPECIAL,
+                //     power: 95,
+                //     accuracy: 100,
+                // } satisfies UIDetailsMoveRowProps,
+            ].map(props => <UIDetailsMoveRow key={props.name} {...props} />)}
+        />,
+    },
+    {
+        name: 'contest',
+        label: 'Contest',
+        content: <UIDetailsContentCosmetic
+            contest={[ 45, 0, 0, 255, 147, 0 ].map((value, i) => <UIContest key={i} index={i} value={value} />)}
+            ribbons={[
+                {
+                    spriteKey: 'ribbonalert',
+                    name: 'Foobar',
+                    count: 1
+                } satisfies UIRibbonProps,
+                {
+                    spriteKey: 'ribbonearth',
+                    name: 'Barfoo',
+                    count: 3
+                } satisfies UIRibbonProps,
+            ].map(props => <UIRibbon key={props.name} {...props} />)}
+        />,
+    },
+    {
+        name: 'origin',
+        label: 'Origin',
+        content: <UIDetailsContentOrigin
+            game={<Group>
+                <UIGameImg
+                    size='1lh'
+                    version={GameVersion.ZA}
+                    name='Pokemon Legends ZA'
+                />
+                Pokemon Legends Z-A
+            </Group>}
+            ot='CHNAPY'
+            otGender={Gender.Male}
+            ht='ZOOBA'
+            htGender={Gender.Female}
+            tid={54128}
+            originMetLocation='Wild Zone 4'
+            originMetLevel={17}
+            originMetDate={'2025-10-17'}
+            fatefulEncounter
+        />,
+    },
+    {
+        name: 'misc',
+        label: 'Misc',
+        content: <UIDetailsContentMisc
+            eggHatchCount={0}
+            friendship={75}
+            language='English'
+            homeTracker={0}
+        />,
+    },
+];
+
+export const Primary: Story = {
+    decorators: [
+        Story => <div style={{ width: 300, margin: 16 }}>
+            <Story />
+        </div>,
+    ],
+    args: {
+        expanded: false,
+        header: closeBtn => <UIDetailsSaves
+            value='5'
+            data={[
+                // { id: '1', imgSrc: '/logo.svg', label: 'PKVault' },
+                { id: '5', imgSrc: getGameInfos(GameVersion.X).img, label: 'G1' },
+                { id: '6', imgSrc: getGameInfos(GameVersion.X).img, label: 'G5' },
+                { id: '2', imgSrc: getGameInfos(GameVersion.X).img, label: 'G6' },
+                { id: '3', imgSrc: getGameInfos(GameVersion.X).img, label: 'G7' },
+                { id: '7', imgSrc: getGameInfos(GameVersion.X).img, label: 'G7b' },
+                { id: '4', imgSrc: getGameInfos(GameVersion.X).img, label: 'G9a' },
+            ]}
+            onSelect={console.log}
+            actions={closeBtn}
+            renderTab={({ item, i, selected }) => <UIDetailsSaveTab
+                id={item.id}
+                version={GameVersion.X}
+                color={getGameInfos(GameVersion.X).color}
+                selected={selected}
+                label={item.label}
+                isEnabled={i !== 4}
+                isMain={!i}
+                warning={i === 5}
+            />}
+        />,
+        main: <UIDetailsMain
+            species={68}
+            speciesName={'Machamp'}
+            gender={Gender.Male}
+            isEnabled
+            isShiny={true}
+            // isAlpha={}
+            types={<>
+                <UITypeItem type={2} name='Fighting' />
+                <UITypeItem type={3} name='Flight' />
+            </>}
+            // teraType={}
+            heldItem={<UIItemImg
+                item={209}
+                sheetUrl={spritesheetItem0}
+                spriteInfos={{
+                    height: 30,
+                    width: 30,
+                    x: 992,
+                    y: 192,
+                }}
+                dropShadow
+            />}
+            markings={<UIMarkingList markings={[
+                MarkingColorUniversal.Marked,
+                MarkingColorUniversal.MarkedBlue,
+                MarkingColorUniversal.MarkedPink,
+                MarkingColorUniversal.NotMarked,
+                MarkingColorUniversal.NotMarked,
+                MarkingColorUniversal.NotMarked,
+            ]} />}
+            ball={<UIBallImg
+                item={2}
+                sheetUrl={spritesheetItem0}
+                spriteInfos={{
+                    height: 30,
+                    width: 30,
+                    x: 1504,
+                    y: 96
+                }}
+            />}
+            nickname={'Bipboup'}
+            level={50}
+            // eggHatchCount={}
+            pokerusDays={2}
+            // isPokerusCured={}
+            children={<UISpeciesImg
+                species={68}
+                sheetUrl={spritesheet0}
+                spriteInfos={{
+                    height: 96,
+                    width: 96,
+                    x: 1536,
+                    y: 1408,
+                }}
+                dropShadow
+            />}
+        />,
+        content: <UIDetailsContent
+            content={getContent()}
+        />,
+        actions: <Group>
+            <UIDetailsAction
+                name='move'
+                label='Move'
+                onClick={console.log}
+                size='compact-md'
+                leftSection={<MoveIcon />}
+                focusOnMount
+                gamepadValue='X'
+            />
+            <UIDetailsAction
+                name='move-attached'
+                label='Move attached'
+                onClick={console.log}
+                size='compact-md'
+                leftSection={<Group gap='sm'>
+                    <MoveIcon />
+                    <LinkIcon />
+                </Group>}
+            />
+            <UIDetailsAction
+                name='edit'
+                label='Edit'
+                onClick={console.log}
+                variant='filled'
+                color='blue'
+                size='compact-md'
+                leftSection={<PencilIcon />}
+                gamepadValue='Y'
+            />
+            <UIDetailsAction
+                name='release'
+                label='Release'
+                onClick={console.log}
+                variant='filled'
+                color='red'
+                size='compact-md'
+                leftSection={<TrashIcon />}
+            />
+        </Group>,
+        onExpand: console.log,
+        onClose: console.log,
+    },
+};
+
+export const Expanded: Story = {
+    args: {
+        ...Primary.args,
+        expanded: true,
+        content: <UIDetailsContentExpanded
+            content={getContent()}
+        />,
+    },
+};

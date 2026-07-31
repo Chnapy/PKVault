@@ -1,0 +1,14 @@
+
+.help-dialog-inner-content {
+  display: flex;
+  flex-direction: column;
+  
+  --mantine-color-body: light-dark(var(--mantine-color-white-5), var(--mantine-color-dark-5));
+}
+
+.help-dialog-inner-body {
+  position: relative;
+  flex-grow: 1;
+  padding-right: 0;
+  overflow-y: scroll;
+}

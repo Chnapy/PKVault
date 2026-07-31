@@ -1,39 +1,51 @@
-import React from "react";
+import { FolderXIcon } from 'lucide-react';
+import React, { startTransition } from "react";
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
-import { FilterCheckbox } from "../../../ui/filter/filter-checkbox/filter-checkbox";
-import { Icon } from '../../../ui/icon/icon';
+import { UISegmentedControl, type UISegmentedControlProps } from '../../../ui/form/select/ui-segmented-control';
+import { UIPokedexIcons } from '../../../ui/pokedex/icons/ui-pokedex-icons';
+import { switchUtil } from '../../../util/switch-util';
 
 export const FilterOwned: React.FC = () => {
   const { t } = useTranslate();
 
   const navigate = Route.useNavigate();
-  const searchValue = Route.useSearch({
-    select: (search) => search.filterOwned,
+
+  const data = [
+    { value: 'all', label: t('all') },
+    { value: 'owned', label: <UIPokedexIcons.Owned size='xs' fz='1rem' /> },
+    { value: 'not-owned', label: <FolderXIcon fontSize='1rem' opacity={0.75} /> },
+  ] as const satisfies UISegmentedControlProps[ 'data' ];
+
+  type Value = typeof data[ number ][ 'value' ];
+
+  const currentValue = Route.useSearch({
+    select: (search): Value => {
+      if (search.filterOwned === undefined)
+        return 'all';
+
+      if (search.filterOwned)
+        return 'owned';
+
+      return 'not-owned';
+    }
   });
 
-  return (
-    <FilterCheckbox
-      enabled={searchValue !== undefined}
-      checked={searchValue !== undefined}
-      onClick={() =>
-        navigate({
-          search: {
-            filterOwned: searchValue
-              ? false
-              : searchValue === false
-                ? undefined
-                : true,
-          },
-        })
-      }
-    >
-      <Icon name='folder' forButton />
-      {searchValue === undefined
-        ? t('dex.filters.owned.unselect')
-        : searchValue
-          ? t('dex.filters.owned.yes')
-          : t('dex.filters.owned.no')}
-    </FilterCheckbox>
-  );
+  return <UISegmentedControl
+    name='owned'
+    controlLabel={t('dex.filters.owned')}
+    value={currentValue}
+    data={data}
+    onChange={(value) => startTransition(() => navigate({
+      search: {
+        filterOwned: switchUtil(value, {
+          'all': undefined,
+          'owned': true,
+          'not-owned': false,
+        }),
+      },
+    }))}
+    size='sm'
+    style={{ flexGrow: 1 }}
+  />;
 };

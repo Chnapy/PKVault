@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using PKHeX.Core;
 
 public class BoxLoaderTests : IAsyncDisposable
 {
@@ -417,10 +418,10 @@ public class BoxLoaderTests : IAsyncDisposable
     public void CanIdReceivePkm_ShouldReturnCorrectly()
     {
         // Assert
-        Assert.True(BoxLoader.CanIdReceivePkm((int)BoxType.Box));
-        Assert.True(BoxLoader.CanIdReceivePkm((int)BoxType.Party));
-        Assert.False(BoxLoader.CanIdReceivePkm((int)BoxType.Daycare));
-        Assert.False(BoxLoader.CanIdReceivePkm((int)BoxType.BattleBox));
+        Assert.True(BoxLoader.CanIdReceivePkm((int)BoxType.Box, GameVersion.Any));
+        Assert.True(BoxLoader.CanIdReceivePkm((int)BoxType.Party, GameVersion.Any));
+        Assert.False(BoxLoader.CanIdReceivePkm((int)BoxType.Daycare, GameVersion.Any));
+        Assert.False(BoxLoader.CanIdReceivePkm((int)BoxType.BattleBox, GameVersion.Any));
     }
 
     #endregion

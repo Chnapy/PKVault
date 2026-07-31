@@ -1,0 +1,5 @@
+.ui-card-section-control {
+    --mantine-color-body: light-dark(var(--mantine-color-white-5), var(--mantine-color-dark-7));
+
+    background-color: var(--mantine-color-body);
+}

@@ -62,7 +62,7 @@ public class MainCreatePkmVariantAction(
 
         return new(
             type: DataActionType.MAIN_CREATE_PKM_VERSION,
-            parameters: [pkmOrigin.Nickname, input.Context]
+            parameters: [pkmOrigin.Nickname, input.Context, pkmOrigin.Species]
         );
     }
 }

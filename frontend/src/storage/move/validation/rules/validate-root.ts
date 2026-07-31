@@ -1,6 +1,15 @@
-import type { DropValidationResult, SlotInfos } from '../types';
+import type { BoxDTO, PkmBaseDTO } from '../../../../data/sdk/model';
+import type { DropValidationResult } from '../types';
 
-export const validateRoot = (slotInfosList: SlotInfos[]): DropValidationResult => {
+export type ValidateRootSlot = {
+    sourceBox?: Pick<BoxDTO, 'name' | 'slotCount'>;
+    sourcePkm: Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context'>;
+    targetBox?: Pick<BoxDTO, 'name' | 'slotCount'>;
+    targetPkm?: Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context'>;
+    targetSlot?: number;
+};
+
+export const validateRoot = (slotInfosList: ValidateRootSlot[]): DropValidationResult => {
     if (slotInfosList.length === 0) {
         return { canDrop: false, reason: 'empty-slot-infos', slotInfos: undefined };
     }

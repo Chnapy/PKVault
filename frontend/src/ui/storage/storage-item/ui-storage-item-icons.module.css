@@ -1,0 +1,8 @@
+
+.ui-storage-item-icons {
+    position: absolute;
+    inset: 0;
+    padding: 4px;
+
+    /* pointer-events: none; */
+}

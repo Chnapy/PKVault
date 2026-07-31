@@ -1,16 +1,14 @@
-import { css } from '@emotion/css';
+import { ActionIcon, Code, Group, ScrollArea, Table } from '@mantine/core';
+import { InfoIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 import { BackendErrorsContext } from '../data/backend-errors-context';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
-import { HasUpdateWarning } from './warnings/has-update-warning';
+import { UINotificationCard } from '../ui/notification-card/ui-notification-card';
 import { useCheckUpdate } from './hooks/use-check-update';
+import { HasUpdateWarning } from './warnings/has-update-warning';
 import { PkmVariantWarning } from './warnings/pkm-variant-warning';
 import { SaveChangedWarning } from './warnings/save-changed-warning';
 import { SaveDuplicateWarning } from './warnings/save-duplicate-warning';
-import { Button } from '../ui/button/button';
-import { Icon } from '../ui/icon/icon';
-import { theme } from '../ui/theme';
-import { NotificationCard } from '../ui/notification-card/notification-card';
 
 export const NotificationCardManager: React.FC = () => {
     const { errors, removeIndex } = BackendErrorsContext.useValue();
@@ -18,7 +16,7 @@ export const NotificationCardManager: React.FC = () => {
     const hasUpdate = !!useCheckUpdate();
     const warnings = useWarningsGetWarnings().data?.data;
 
-    return <NotificationCard
+    return <UINotificationCard
         warningsCount={warnings?.warningsCount ?? 0}
         errorsCount={errors.length}
         update={hasUpdate && <HasUpdateWarning />}
@@ -26,32 +24,35 @@ export const NotificationCardManager: React.FC = () => {
         pkmVariantWarnings={warnings?.pkmVariantWarnings.map((warn, i) => <PkmVariantWarning key={i} {...warn} />)}
         saveChangedWarnings={warnings?.saveChangedWarnings.map((warn, i) => <SaveChangedWarning key={i} {...warn} />)}
         errors={errors.map((error, i) => {
-            return <tr key={i}>
-                <td>
+            return <Table.Tr key={i}>
+                <Table.Td>
                     <details>
-                        <summary className={css({
+                        <summary style={{
                             whiteSpace: 'break-spaces',
                             cursor: 'pointer'
-                        })}>{error.message}</summary>
+                        }}>
+                            <Group display='inline-flex' gap='sm' c='red' style={{ verticalAlign: 'top' }}>
+                                <InfoIcon />
+                                {error.message}
+                            </Group>
+                        </summary>
 
-                        <code className={css({
-                            display: 'flex',
-                            fontSize: '75%',
-                            backgroundColor: theme.bg.contrastdark,
-                            padding: 4,
-                            maxHeight: 200,
-                            overflowY: 'auto',
-                        })}>
-                            {error.stack}
-                        </code>
+                        <ScrollArea maw={500}>
+                            <Code block p='md'>
+                                {error.stack}
+                            </Code>
+                        </ScrollArea>
                     </details>
-                </td>
-                <td className={css({ verticalAlign: 'top' })}>
-                    <Button onClick={() => removeIndex(i)}>
-                        <Icon name='times' forButton />
-                    </Button>
-                </td>
-            </tr>;
+                </Table.Td>
+                <Table.Td valign='top' w={0}>
+                    <ActionIcon
+                        color='red'
+                        onClick={() => removeIndex(i)}
+                    >
+                        <TrashIcon fontSize='1lh' />
+                    </ActionIcon>
+                </Table.Td>
+            </Table.Tr>;
         })}
     />;
 };

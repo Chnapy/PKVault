@@ -45,7 +45,7 @@ Supprime une banque ainsi que toutes ses boîtes (et leurs pokémons).
 
 Les boîtes sont affichées au niveau de chaque stockage (PKVault et sauvegardes).
 
-Elles représentent un conteneur pour des pokémons, comme dans les jeux Pokemon.
+Elles représentent un conteneur pour des pokémons, comme dans les jeux Pokémon.
 
 Actions possibles liées aux boites:
 
@@ -74,12 +74,12 @@ Supprime la boîte et tous ses pokémons.
 
 ## Stockage PKVault et variantes de pokémons
 
-Le stockage PKVault (aussi dit stockage principal) stocke un ensemble de pokemons.
+Le stockage PKVault (aussi dit stockage principal) stocke un ensemble de pokémons.
 
-Afin de pouvoir utiliser un pokemon dans une autre génération que celle d'où il provient, un système de variant par génération est utilisé.
+Afin de pouvoir utiliser un pokémon dans une autre génération que celle d'où il provient, un système de variant par génération est utilisé.
 
-Ainsi chaque pokemon dans le stockage peut posséder plusieurs variantes.
-Par exemple un Pikachu de génération 3 peut avoir une variante de génération 1 afin de pouvoir être utilisé dans une sauvegarde Pokemon Bleu.
+Ainsi chaque pokémon dans le stockage peut posséder plusieurs variantes.
+Par exemple un Pikachu de génération 3 peut avoir une variante de génération 1 afin de pouvoir être utilisé dans une sauvegarde Pokémon Bleu.
 
 Chaque variante peut être modifiée ou supprimée.
 
@@ -106,7 +106,7 @@ Ce système trouve son intérêt avec l'utilisation de variantes: lorsqu'une syn
 
 Il est alors possible d'utiliser un même pokémon dans plusieurs jeux, et le voir progresser au fil des générations.
 
-Un pokemon ne peut être attaché qu'à une sauvegarde à la fois.
+Un pokémon ne peut être attaché qu'à une sauvegarde à la fois.
 
 ## Pokémons externes
 
@@ -147,7 +147,7 @@ S'il s'agit d'une variante, ne supprime que la variante ciblée.
 <summary>Détacher un pokémon</summary>
 
 Détache un pokémon attaché.
-Qu'il s'agisse d'une variante par rapport au pokemon dans sa sauvegarde, ou l'inverse.
+Qu'il s'agisse d'une variante par rapport au pokémon dans sa sauvegarde, ou l'inverse.
 
 </details>
 
@@ -184,7 +184,7 @@ Actions avancées:
 <details>
 <summary>Trier les pokémons</summary>
 
-Trie les pokémons sur une ou plusieurs boîtes, avec pour référence le pokédex national.
+Trie les pokémons sur une ou plusieurs boîtes, avec pour référence le Pokédex national.
 
 Possibilité de laisser des slots vides pour les espèces manquantes.
 Si manque de place, l'action peut créer de nouvelles boîtes.
@@ -192,15 +192,13 @@ Si manque de place, l'action peut créer de nouvelles boîtes.
 </details>
 
 <details>
-<summary>Synchroniser les pokédex</summary>
+<summary>Synchroniser les Pokédex</summary>
 
-Synchronise les pokédex de l'ensemble des stockages sélectionnés.
-Les pokémons vus ou attrapés sont propagés sur l'ensemble des pokédex, prenant en compte les formes, genres et shiny.
+Synchronise les Pokédex de l'ensemble des stockages sélectionnés.
+Les pokémons vus ou attrapés sont propagés sur l'ensemble des Pokédex, prenant en compte les formes, genres et shiny.
 
 </details>
 
 ## Multi-sélection
 
 Plusieurs pokémons peuvent être sélectionnés afin d'effectuer une action groupée, par exemple déplacer tout ou partie d'une boîte vers une autre boîte.
-
-La sélection peut être facilitée en gardant la touche Maj. enfoncée.

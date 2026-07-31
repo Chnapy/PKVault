@@ -1,0 +1,78 @@
+/* stylelint-disable selector-class-pattern */
+@import url("../assets/fonts/font-face.css");
+
+* {
+  scrollbar-color: var(--mantine-color-dark-2) transparent;
+  scrollbar-width: thin;
+}
+
+:root,
+button {
+  text-shadow: 1px 1px 0 light-dark(#0002, #fff2);
+}
+
+:root strong,
+:root b,
+:root th,
+:root h1,
+:root h2,
+:root h3,
+:root h4,
+:root h5,
+:root h6,
+:root .mantine-Badge-label,
+:root .mantine-SegmentedControl-label {
+  text-shadow: none;
+}
+
+:root strong,
+:root b {
+  font-weight: bold;
+}
+
+svg.lucide {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+
+:root {
+  --focus-width: 4px;
+  --focus-color-1: var(--mantine-color-primary-6);
+  --focus-color-2: var(--mantine-color-primary-3);
+}
+
+[data-focus-key] {
+  transition: 0.4s outline-color;
+}
+
+[data-show-focus] [data-focused="true"] {
+  outline: var(--focus-color-1) solid var(--focus-width);
+  animation: 0.4s linear 0s infinite alternate focus-outline;
+}
+
+[data-show-focus] [data-focus-move-fail] {
+  animation:
+    0.4s linear 0s infinite alternate focus-outline,
+    focus-shake 0.1s linear 2 alternate;
+}
+
+[data-show-focus] .mantine-focus-auto:not([data-focused="true"]):focus-visible {
+  outline: none;
+}
+
+@keyframes focus-outline {
+  0% {
+    outline-color: var(--focus-color-1);
+  }
+
+  100% {
+    outline-color: var(--focus-color-2);
+  }
+}
+
+@keyframes focus-shake {
+  100% {
+    transform: var(--move-fail-transform);
+  }
+}

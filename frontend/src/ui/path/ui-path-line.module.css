@@ -1,0 +1,14 @@
+
+.ui-path-line {
+    max-width: 100%;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.ui-path-line .first-part {
+    opacity: 0.5;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}

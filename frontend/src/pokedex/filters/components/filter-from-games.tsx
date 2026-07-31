@@ -1,82 +1,74 @@
-import { css } from '@emotion/css';
-import React from "react";
+import { Group } from '@mantine/core';
+import { CheckIcon } from 'lucide-react';
+import React, { startTransition } from "react";
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
-import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
-import { GameImg } from '../../../ui/img/game-img';
+import { UIMultiSelect } from '../../../ui/form/select/ui-multi-select';
+import { UIGameImg } from '../../../ui/sprite-img/ui-game-img';
 import { filterIsDefined } from '../../../util/filter-is-defined';
 
 export const FilterFromGames: React.FC = () => {
   const { t } = useTranslate();
 
   const navigate = Route.useNavigate();
-  const searchValue =
-    Route.useSearch({ select: (search) => search.filterFromGames })?.map(
-      String
-    ) ?? [];
+  const currentValue = Route.useSearch({ select: (search) => search.filterFromGames })?.map(String) ?? [];
 
   const { versions } = useStaticData();
 
   const saveInfosQuery = useSaveInfosGetAll();
 
   const options = [
-    {
-      value: '0',
-      label: <div className={css({
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-      })}>
-        <GameImg
-          version={null}
-          size={14}
-        />
-        PKVault
-      </div>
-    },
+    '0',
     ...Object.values(saveInfosQuery.data?.data ?? {})
       .filter(filterIsDefined)
-      .map((save) => {
-        const name = versions[ save.version ]?.name;
-
-        return {
-          value: save.id + "",
-          label: <div className={css({
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-          })}>
-            <GameImg
-              version={save.version}
-              size={14}
-            />
-            {name} - {save.trainerName}
-          </div>
-        };
-      })
+      .map((save) => save.id + '')
   ];
 
-  return (
-    <FilterSelect
-      enabled={searchValue.length > 0}
-      multiple
-      value={searchValue}
-      onChange={(fromGames) => {
-        navigate({
-          search: {
-            filterFromGames: fromGames.map(Number),
-          },
-        });
-      }}
-      options={options}
-    >
-      <GameImg
-        version={null}
-        size={14}
-      />
-      {t('dex.filters.games')}
-    </FilterSelect>
-  );
+  return <UIMultiSelect
+    name='filter-game'
+    controlLabel={t('dex.filters.storages.controls-label')}
+    label={t('dex.filters.storages')}
+    value={currentValue}
+    data={options}
+    onChange={(storages) => startTransition(() => navigate({
+      search: {
+        filterFromGames: storages.map(Number),
+      },
+    }))}
+    renderOption={({ option, checked }) => {
+      if (!saveInfosQuery.data)
+        return null;
+
+      const saveId = +option.value;
+      const save = saveInfosQuery.data.data[ saveId ];
+      const name = save && versions[ save.version ]?.name;
+
+      return <Group wrap='nowrap'>
+        {checked && <CheckIcon />}
+        <UIGameImg
+          version={save?.version ?? null}
+          size='1lh'
+        />
+        {save
+          ? <>{name} - {save.trainerName}</>
+          : 'PKVault'}
+      </Group>;
+    }}
+    renderPill={({ value }) => {
+      if (!saveInfosQuery.data || !value)
+        return null;
+
+      const saveId = +value;
+      const save = saveInfosQuery.data.data[ saveId ];
+
+      return <UIGameImg
+        version={save?.version ?? null}
+        size='1lh'
+      />;
+    }}
+  // size='xs'
+  // w={140}
+  />;
 };

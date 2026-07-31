@@ -1,7 +1,7 @@
-import { QueryClient, useQuery } from '@tanstack/react-query';
+import { QueryClient, queryOptions, useQuery, type UseQueryOptions } from '@tanstack/react-query';
+import { filterIsDefined } from '../../util/filter-is-defined';
 import type { DataDTOStateOfDictionaryOfStringAndPkmSaveDTO, PkmSaveDTO } from '../sdk/model';
 import { getStorageGetSavePkmsQueryKey, storageGetSavePkms } from '../sdk/storage/storage.gen';
-import { filterIsDefined } from '../../util/filter-is-defined';
 
 export type PkmSaveIndexes = {
     byId: Record<PkmSaveDTO[ 'id' ], PkmSaveDTO>;
@@ -38,19 +38,17 @@ const buildIndexes = (saveId: number, data: PkmSaveDTO[]) => {
     return indexes;
 };
 
-type QueryData = {
+export type PkmSaveIndexQueryData = {
     data: PkmSaveIndexes;
     status: 200;
     headers: Headers;
 };
 
-/**
- * Fetch save pkms with caching & indexing.
- */
-export const usePkmSaveIndex = (saveId: number) => {
+export const getPkmSaveIndexOptions = <D = PkmSaveIndexQueryData>(saveId: number, options?: Omit<UseQueryOptions<PkmSaveIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>) => {
     const queryKey = getStorageGetSavePkmsQueryKey(saveId);
 
-    return useQuery({
+
+    return queryOptions({
         queryKey,
         queryFn: async ({ signal }) => {
             const response = await storageGetSavePkms(saveId, { signal });
@@ -58,17 +56,36 @@ export const usePkmSaveIndex = (saveId: number) => {
             return {
                 ...response,
                 data: buildIndexes(saveId, response.data),
-            } satisfies QueryData;
+            } satisfies PkmSaveIndexQueryData;
         },
-        enabled: !!saveId,
+        ...options,
+        enabled: options?.enabled !== false && !!saveId,
     });
+};
+
+/**
+ * Fetch save pkms with caching & indexing.
+ */
+export const usePkmSaveIndex = <D = PkmSaveIndexQueryData>(
+    saveId: number,
+    selectFn?: (data: PkmSaveIndexQueryData) => D,
+    options?: Omit<UseQueryOptions<PkmSaveIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>
+) => {
+    return useQuery({
+        select: selectFn,
+        ...getPkmSaveIndexOptions(saveId, options),
+    });
+};
+
+export const getCachedPkmSaveIndex = (client: QueryClient, saveId: number) => {
+    return client.getQueryData<Partial<PkmSaveIndexQueryData>>(getStorageGetSavePkmsQueryKey(saveId));
 };
 
 /**
  * Update react-query cache with given data, after formatting.
  */
 export const updatePkmSaveCache = (client: QueryClient, saveId: number, savePkms: DataDTOStateOfDictionaryOfStringAndPkmSaveDTO) => {
-    const cachedResponse: Partial<QueryData> | undefined = client.getQueryData(getStorageGetSavePkmsQueryKey(saveId));
+    const cachedResponse = getCachedPkmSaveIndex(client, saveId);
     if (!savePkms.all && !cachedResponse) {
         return;
     }
@@ -90,7 +107,7 @@ export const updatePkmSaveCache = (client: QueryClient, saveId: number, savePkms
 
     const data = buildIndexes(saveId, rawData);
 
-    const buildData: QueryData = {
+    const buildData: PkmSaveIndexQueryData = {
         status: 200,
         headers: new Headers(),
         ...cachedResponse,

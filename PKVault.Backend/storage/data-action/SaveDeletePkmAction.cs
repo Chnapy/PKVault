@@ -34,7 +34,7 @@ public class SaveDeletePkmAction(
 
             return new(
                 type: DataActionType.SAVE_DELETE_PKM,
-                parameters: [saveLoaders.Save.Version, dto.Nickname]
+                parameters: [saveLoaders.Save.Version, dto.Nickname, dto.Species]
             );
         }
 

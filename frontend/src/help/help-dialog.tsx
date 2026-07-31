@@ -1,25 +1,83 @@
-import { css } from '@emotion/css';
-import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
+import { Card, Group, Modal, Text } from '@mantine/core';
+import { InfoIcon } from 'lucide-react';
 import React from 'react';
 import { Route } from '../routes/__root';
 import { useTranslate } from '../translate/i18n';
-import { ButtonLike } from '../ui/button/button-like';
-import { TitledContainer } from '../ui/container/titled-container';
-import { Icon } from '../ui/icon/icon';
+import { useControls } from '../ui/interaction/controls/use-controls';
+import { getBackControl } from '../ui/interaction/focus-controls/common-controls/back-controls';
+import { FocusScope } from '../ui/interaction/focus/scope/focus-scope';
+import { useFocusScopeContext } from '../ui/interaction/focus/scope/use-focus-scope-context';
 import { HelpDialogContent } from './help-dialog-content';
 import { HelpDialogMenu } from './help-dialog-menu';
+import classes from './help-dialog.module.css';
 import { useHelpMenuItems } from './hooks/use-help-menu-items';
 import { useHelpNavigate } from './hooks/use-help-navigate';
 
 export const HelpDialog: React.FC = () => {
     const { t } = useTranslate();
 
-    const helpPath = Route.useSearch({ select: search => search.help ?? '' });
+    const opened = Route.useSearch({ select: search => !!search.help });
     const helpNavigate = useHelpNavigate();
+
+    const onClose = () => helpNavigate(undefined);
+
+    return (
+        <Modal
+            opened={opened}
+            keepMounted={false}
+            onClose={onClose}
+            size={900}
+            title={<Group gap='sm'>
+                <InfoIcon />
+                <Text size='xl'>
+                    {t('header.help')}
+                </Text>
+            </Group>}
+            classNames={{
+                content: classes.helpDialogInnerContent,
+                body: classes.helpDialogInnerBody,
+            }}
+        >
+            <HelpDialogInner />
+        </Modal>
+    );
+};
+
+const HelpDialogInner: React.FC = () => {
+    const { t } = useTranslate();
+
+    const helpPathFallback = React.useRef('');
+    const helpPath = Route.useSearch({ select: search => search.help ?? helpPathFallback.current });
+    const helpNavigate = useHelpNavigate();
+
+    // when dialog is closing,
+    // avoid redirect to first page
+    React.useEffect(() => {
+        if (helpPath)
+            helpPathFallback.current = helpPath;
+    }, [ helpPath ]);
 
     const [ helpHash, helpAnchor ] = helpPath.split('#');
 
     const { language, menuItems } = useHelpMenuItems();
+
+    const onClose = () => helpNavigate(undefined);
+
+    const parentScope = useFocusScopeContext();
+    const order = parentScope.parentsIds.length;
+
+    const { controlProps } = useControls(
+        'help-dialog',
+        true,
+        order + 1,
+        [
+            getBackControl({
+                label: t('action.back'),
+                action: onClose,
+            }),
+        ],
+        { enabled: true },
+    );
 
     const menuItem = menuItems.find(item => item.endPath === helpHash) ?? menuItems[ 0 ]!;
 
@@ -27,107 +85,37 @@ export const HelpDialog: React.FC = () => {
 
     const finalSelectedPath = `/docs/${language}/${selectedEndPath}`;
 
-    const onClose = () => helpNavigate(undefined);
-
-    return (
-        <Dialog
-            className={css({
-                position: 'relative',
-                zIndex: 50,
-            })}
-            open={!!helpPath}
-            // unmount={false}
-            onClose={onClose}
+    return <FocusScope id='help-dialog' focusOnMount>
+        <div
+            {...controlProps('back')}
+            style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                height: '100%',
+                gap: 8,
+            }}
         >
-            <DialogBackdrop
-                className={css({
-                    position: 'fixed',
-                    inset: 0,
-                    backgroundColor: 'rgba(0,0,0,0.25)'
-                })}
-            />
-
             <div
-                className={css({
-                    zIndex: 10,
-                    position: 'fixed',
-                    width: '100%',
-                    inset: 0,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: 16,
-                })}
+                style={{
+                    position: 'sticky',
+                    top: 0,
+                    flexShrink: 0,
+                    width: 200,
+                }}
             >
-                <DialogPanel
-                    className={css({
-                        width: 768,
-                        height: 600,
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        display: 'flex',
-                    })}
-                >
-                    <TitledContainer
-                        contrasted
-                        className={css({
-                            flexGrow: 1,
-                        })}
-                        title={<div
-                            className={css({
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                paddingLeft: 4,
-                            })}
-                        >
-                            {t('header.help')}
-
-                            <ButtonLike
-                                onClick={onClose}>
-                                <Icon name='times' />
-                            </ButtonLike>
-                        </div>}
-                    >
-                        <div
-                            className={css({
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                height: '100%',
-                                gap: 8,
-                            })}
-                        >
-                            <div
-                                className={css({
-                                    position: 'sticky',
-                                    top: 0,
-                                    flexShrink: 0,
-                                    width: 200,
-                                })}
-                            >
-                                <HelpDialogMenu
-                                    finalSelectedPath={finalSelectedPath}
-                                />
-                            </div>
-
-                            <TitledContainer
-                                className={css({
-                                    flexGrow: 1,
-                                    height: '100%',
-                                })}
-                                title={null}
-                            >
-                                <HelpDialogContent
-                                    selectedEndPath={selectedEndPath}
-                                    finalSelectedPath={finalSelectedPath}
-                                    anchor={helpAnchor}
-                                    slugs={[ ...menuItem.slugs ]}
-                                />
-                            </TitledContainer>
-                        </div>
-                    </TitledContainer>
-                </DialogPanel>
+                <HelpDialogMenu
+                    finalSelectedPath={finalSelectedPath}
+                />
             </div>
-        </Dialog>
-    );
+
+            <Card h='stretch' style={{ flexGrow: 1 }}>
+                <HelpDialogContent
+                    selectedEndPath={selectedEndPath}
+                    finalSelectedPath={finalSelectedPath}
+                    anchor={helpAnchor}
+                    slugs={[ ...menuItem.slugs ]}
+                />
+            </Card>
+        </div>
+    </FocusScope>;
 };

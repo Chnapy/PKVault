@@ -132,7 +132,7 @@ public class MovePkmBankAction(
 
         return new(
             type: DataActionType.MOVE_PKM,
-            parameters: [pkm.Nickname, null, null, targetBox.Name, targetBoxSlot, input.attached]
+            parameters: [pkm.Nickname, null, null, targetBox.Name, targetBoxSlot, input.attached, pkm.Species]
         );
     }
 
@@ -174,7 +174,7 @@ public class MovePkmBankAction(
 
         return new(
             type: DataActionType.MOVE_PKM,
-            parameters: [savePkm?.Nickname, saveLoaders.Save.Version, null, targetBox.Name, targetBoxSlot, input.attached]
+            parameters: [savePkm.Nickname, saveLoaders.Save.Version, null, targetBox.Name, targetBoxSlot, input.attached, savePkm.Species]
         );
     }
 
