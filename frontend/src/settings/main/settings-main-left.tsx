@@ -2,6 +2,7 @@ import { Card, SimpleGrid } from '@mantine/core';
 import { FileIcon, FolderIcon, GlobeIcon, PenOffIcon, ShieldOff } from 'lucide-react';
 import type React from "react";
 import { useFormContext } from 'react-hook-form';
+import { RuntimeSystem } from '../../data/sdk/model';
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import type { SettingsFormData } from '../../pages/settings';
 import { languages, useTranslate } from '../../translate/i18n';
@@ -10,15 +11,13 @@ import { UISwitch } from '../../ui/form/switch/ui-switch';
 import { UIInputLabel } from '../../ui/form/ui-input-label';
 import { UIBallIcon } from '../../ui/icon/ui-ball-icon';
 import { UIPathLine } from '../../ui/path/ui-path-line';
+import { switchUtil } from '../../util/switch-util';
 
 export const SettingsMainLeft: React.FC = () => {
     const { t } = useTranslate();
 
     const settingsQuery = useSettingsGet();
-    // const settingsMutation = useSettingsEdit();
-
     const settings = settingsQuery.data?.data;
-    // const settingsMutable = settings?.settingsMutable;
 
     const form = useFormContext<SettingsFormData>();
 
@@ -26,7 +25,13 @@ export const SettingsMainLeft: React.FC = () => {
         <Card>
             <SimpleGrid cols={2}>
                 <UIInputLabel leftSection={<UIBallIcon />} label='PKVault' />
-                <div>v{settings?.version}</div>
+                <div>v{settings?.version} - {switchUtil(settings?.runtimeSystem ?? 0, {
+                    [ RuntimeSystem.UNKNOWN ]: t('settings.system.unknown'),
+                    [ RuntimeSystem.DOCKER ]: 'Docker',
+                    [ RuntimeSystem.WINDOWS ]: t('settings.system.windows'),
+                    [ RuntimeSystem.LINUX ]: t('settings.system.linux'),
+                    [ RuntimeSystem.STEAMDECK ]: t('settings.system.steamdeck'),
+                })}</div>
                 <UIInputLabel leftSection={<img src="https://projectpokemon.org/favicon.ico" />} label='PKHeX' />
                 <div>{settings?.pkhexVersion}</div>
                 <UIInputLabel leftSection={<FolderIcon />} label={t('settings.relative-paths')} />

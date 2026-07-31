@@ -23,7 +23,10 @@ This tool can be used as:
 
 - 📥 Desktop app
   - Windows -> [PKVault.exe](https://github.com/Chnapy/PKVault/releases/latest)
-  - Linux & SteamDeck -> [pkvault.AppImage](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault.deb](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault.flatpak](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault](https://github.com/Chnapy/PKVault/releases/latest)
+  - Linux -> [pkvault.AppImage](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault.deb](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault.flatpak](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault](https://github.com/Chnapy/PKVault/releases/latest)
+
+- 🎮 SteamDeck
+  - [pkvault.flatpak](https://github.com/Chnapy/PKVault/releases/latest)
 
 - 🐳 Docker web-app
   - `image: ghcr.io/chnapy/pkvault` -> check [below for usage](#docker-usage)
@@ -32,11 +35,11 @@ This tool can be used as:
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
 <p align="center">
-    <img src="img/snap_1.png" alt="PKVault snapshot 1" />
-    <img src="img/snap_2.png" alt="PKVault snapshot 2" style="display: inline-block; width: 24%" />
-    <img src="img/snap_3.png" alt="PKVault snapshot 3" style="display: inline-block; width: 24%" />
-    <img src="img/snap_4.png" alt="PKVault snapshot 4" style="display: inline-block; width: 24%" />
-    <img src="img/snap_5.png" alt="PKVault snapshot 5" style="display: inline-block; width: 24%" />
+    <img src="img/snap_storage.png" alt="PKVault snapshot 1" />
+    <img src="img/snap_storage_dark.png" alt="PKVault snapshot 2" style="display: inline-block; width: 24%" />
+    <img src="img/snap_storage_details.png" alt="PKVault snapshot 3" style="display: inline-block; width: 24%" />
+    <img src="img/snap_dex.png" alt="PKVault snapshot 4" style="display: inline-block; width: 24%" />
+    <img src="img/snap_saves.png" alt="PKVault snapshot 5" style="display: inline-block; width: 24%" />
 </p>
 
 ## Bulk features
@@ -57,10 +60,11 @@ This tool can be used as:
     - backups restore always possible
 - Centralized Pokédex based on all listed saves
   - views with forms & genders
-  - multiple filters: species name, seen/caught/owned, types, ...
+  - multiple filters: species name, seen/caught/owned/shiny/alpha, types, ...
     - possible living dex
     - possible shiny dex
 - Dynamic saves listing based on paths & globs
+- Dark mode & sprite sizing
 
 ## Docker usage
 
@@ -128,7 +132,6 @@ Your can use this app for your own projects following license restrictions.
 - Frontend
   - Font "Pixel Operator" - from [onlinewebfonts](http://www.onlinewebfonts.com) - License CC BY 4.0
   - Font "Pokemon Emerald" - from [fontstruct](https://fontstruct.com/fontstructions/show/1975556) by "aztecwarrior28" - License CC BY-SA 3.0
-  - [HackerNoon's Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) - License MIT
   - Versions & all others dependencies can be found into [frontend/package.json](./frontend/package.json).
 
 All image contents of game-icons, pokémons, types, items, move-categories are Copyright The Pokémon Company.

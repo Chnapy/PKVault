@@ -2,6 +2,7 @@ using PKHeX.Core;
 
 public record SettingsDTO(
     Guid BuildID,
+    RuntimeSystem RuntimeSystem,
     string Version,
     string PkhexVersion,
     string AppDirectory,
@@ -49,3 +50,12 @@ public record SettingsMutableDTO(
     string? HTTPS_KEY_PEM_PATH = null,
     string? LANGUAGE = null
 );
+
+public enum RuntimeSystem
+{
+    UNKNOWN,
+    DOCKER,
+    WINDOWS,
+    LINUX,
+    STEAMDECK,
+}
