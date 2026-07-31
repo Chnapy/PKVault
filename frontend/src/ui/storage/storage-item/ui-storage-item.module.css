@@ -7,6 +7,7 @@
   position: absolute;
   left: 4px;
   top: 4px;
+  z-index: 2;
 }
 
 .ui-storage-item .checkbox > * {

@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
+import { BackendErrorsContext } from '../../data/backend-errors-context';
 import { getCachedPkmIndex } from '../../data/hooks/use-pkm-index';
 import { storageMovePkm, storageMovePkmBank } from '../../data/sdk/storage/storage.gen';
 import { updateCacheMutationResponse } from '../../data/util/update-cache-mutation-response';
@@ -48,6 +49,7 @@ const useTargetAllPositions = (): MoveProviderProps<MoveContainerValue, MovePara
 
 const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop' ] => {
     const queryClient = useQueryClient();
+    const errorsOnMutationResponse = BackendErrorsContext.useOnMutationResponse();
 
     return React.useCallback(async (source, target) => {
         const sourceContainer = containerFns.getContainerValue(source.containerId);
@@ -66,13 +68,17 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
                 if (sourceContainer.bankId === target.targetContainer.bankId)
                     return;
 
-                const response = await storageMovePkmBank({
-                    pkmIds,
-                    bankId: target.targetContainer.bankId,
-                    sourceSaveId: sourceContainer.saveId ?? undefined,
-                    attached: source.params?.attached,
-                });
-                updateCacheMutationResponse(queryClient, response);
+                try {
+                    const response = await storageMovePkmBank({
+                        pkmIds,
+                        bankId: target.targetContainer.bankId,
+                        sourceSaveId: sourceContainer.saveId ?? undefined,
+                        attached: source.params?.attached,
+                    });
+                    updateCacheMutationResponse(queryClient, response);
+                } catch (err) {
+                    errorsOnMutationResponse(undefined, err as Error);
+                }
                 break;
             };
             default: {
@@ -85,19 +91,23 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
                     return;
                 }
 
-                const response = await storageMovePkm({
-                    pkmIds,
-                    sourceSaveId: sourceContainer.saveId ?? undefined,
-                    targetSaveId: target.targetContainer.saveId ?? undefined,
-                    targetBoxId: target.targetContainer.boxId,
-                    targetBoxSlots,
-                    attached: source.params?.attached,
-                });
-                updateCacheMutationResponse(queryClient, response);
+                try {
+                    const response = await storageMovePkm({
+                        pkmIds,
+                        sourceSaveId: sourceContainer.saveId ?? undefined,
+                        targetSaveId: target.targetContainer.saveId ?? undefined,
+                        targetBoxId: target.targetContainer.boxId,
+                        targetBoxSlots,
+                        attached: source.params?.attached,
+                    });
+                    updateCacheMutationResponse(queryClient, response);
+                } catch (err) {
+                    errorsOnMutationResponse(undefined, err as Error);
+                }
                 break;
             };
         }
-    }, [ queryClient ]);
+    }, [ errorsOnMutationResponse, queryClient ]);
 };
 
 export type MoveSelectImplProviderProps = {

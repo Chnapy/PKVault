@@ -30,6 +30,9 @@ export const UINotificationCard: React.FC<UINotificationCardProps> = ({
         icon={<AlertCircleIcon />}
         title={title}
         miw={300}
+        style={{
+            overflowY: 'auto',
+        }}
     >
         <Table
             // maw={600}
