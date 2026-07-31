@@ -19,20 +19,12 @@
 PKVault is a Pokémon storage & save manipulation tool based on [PKHeX](https://github.com/kwsch/PKHeX).
 Similar to Pokémon Home, offline as online.
 
-This tool can be used as:
+<img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/microsoft-windows.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/linux.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/steam-deck-light.png" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/docker.png" width="100" /> |
+|:---:|:---:|:---:|:---:|
+| [![Download for Windows](https://img.shields.io/badge/Windows-Download-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Download for Linux](https://img.shields.io/badge/Linux-Download-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Download for SteamDeck](https://img.shields.io/badge/SteamDeck-Download-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Docker usage](https://img.shields.io/badge/Docker-Setup-purple)](#docker-usage) |
+| PKVault.exe | pkvault.flatpak<br/>pkvault.AppImage<br/>pkvault.deb<br/>pkvault | pkvault.flatpak | `ghcr.io/chnapy/pkvault` |
 
-- 💻 Desktop app
-  - Windows -> [PKVault.exe](https://github.com/Chnapy/PKVault/releases/latest)
-  - Linux -> [pkvault.AppImage](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault.deb](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault.flatpak](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault](https://github.com/Chnapy/PKVault/releases/latest)
-
-- 🎮 SteamDeck
-  - [pkvault.flatpak](https://github.com/Chnapy/PKVault/releases/latest)
-
-- 🐳 Docker web-app
-  - `image: ghcr.io/chnapy/pkvault` -> check [below for usage](#docker-usage)
-
-![Platforms](https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20SteamDeck%20|%20Docker-informational)
-![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
+![License](https://img.shields.io/badge/License-GPLv3-green.svg)
 
 <p align="center">
     <img src="img/snap_storage.png" alt="PKVault snapshot 1" />
