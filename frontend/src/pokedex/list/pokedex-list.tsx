@@ -1,5 +1,5 @@
 import { Card, EmptyState, Group, Skeleton, Stack } from '@mantine/core';
-import { RectangleEllipsisIcon } from 'lucide-react';
+import { PackageOpenIcon } from 'lucide-react';
 import React from "react";
 import { withErrorCatcher } from "../../error/with-error-catcher";
 import { useStaticData } from "../../hooks/use-static-data";
@@ -33,7 +33,7 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
     <UIPokedexMain mah='100%'>
       {!isPending && speciesItemsByGenerationList.length === 0 && <EmptyState
         size='sm'
-        icon={<RectangleEllipsisIcon />}
+        icon={<PackageOpenIcon />}
         title={t('dex.list.empty')}
       />}
 

@@ -62,3 +62,12 @@
 [data-mantine-color-scheme='dark'] .segmented-control {
     background-color: var(--mantine-color-dark-9);
 }
+
+.empty-state {
+    opacity: 0.75;
+    color: var(--mantine-color-dimmed);
+}
+
+.empty-state-title {
+    color: inherit;
+}

@@ -1,5 +1,5 @@
 import { EmptyState, Group } from '@mantine/core';
-import { RectangleEllipsisIcon } from 'lucide-react';
+import { PackageOpenIcon } from 'lucide-react';
 import React from 'react';
 import { usePkmIndex } from '../../../data/hooks/use-pkm-index';
 import { useTranslate } from '../../../translate/i18n';
@@ -97,11 +97,11 @@ export const StoragePanelItems: React.FC = () => {
         wrap='wrap'
         mx='auto'
         pos='relative'
+        w='fit-content'
         style={cols
             ? {
                 display: 'grid',
                 gridTemplateColumns: `repeat(${cols}, 1fr)`,
-                width: 'fit-content',
             }
             : undefined}
     >
@@ -109,9 +109,8 @@ export const StoragePanelItems: React.FC = () => {
 
         {!isPending && emptyBox && <EmptyState
             size='sm'
-            icon={<RectangleEllipsisIcon />}
+            icon={<PackageOpenIcon />}
             title={t('storage.box.empty')}
-            opacity={0.75}
             style={{
                 position: 'absolute',
                 left: '50%',

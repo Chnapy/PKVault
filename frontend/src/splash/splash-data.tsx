@@ -48,5 +48,7 @@ export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number
         return children;
     }
 
-    return <UISplash>{error && <Fallback.default error={error} resetErrorBoundary={() => null} />}</UISplash>;
+    return <UISplash loading={isLoading}>
+        {error && <Fallback.default error={error} resetErrorBoundary={() => null} />}
+    </UISplash>;
 };

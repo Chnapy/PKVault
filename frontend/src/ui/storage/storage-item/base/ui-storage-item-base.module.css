@@ -15,3 +15,10 @@
 .ui-storage-item-base[data-selected="true"] {
   outline: 4px solid var(--focus-color-1);
 }
+
+.ui-storage-item-base[data-selected="true"]:not([data-disabled="true"]),
+.ui-storage-item-base[data-focused="true"]:not([data-disabled="true"]),
+.ui-storage-item-base:not([data-disabled="true"]):hover {
+  transform: scale(1.02);
+  z-index: 1;
+}

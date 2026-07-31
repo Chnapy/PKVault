@@ -21,7 +21,7 @@ Similar to Pokémon Home, offline as online.
 
 This tool can be used as:
 
-- 📥 Desktop app
+- 💻 Desktop app
   - Windows -> [PKVault.exe](https://github.com/Chnapy/PKVault/releases/latest)
   - Linux -> [pkvault.AppImage](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault.deb](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault.flatpak](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault](https://github.com/Chnapy/PKVault/releases/latest)
 
@@ -46,19 +46,19 @@ This tool can be used as:
 
 - Storage & save manipulation
   - compatible with all pokémon games, from first generation to **Pokémon Legends: Z-A**
-  - move pokémons between saves
-  - convert pokémon to any generation (ex. G7 to G2)
-  - store pokémons outside saves using banks & boxes
-  - allow use of multiple "variants" for stored pokémons
+  - **move** pokémons between saves
+  - **convert** pokémon to any generation (ex. G7 to G2)
+  - **store** pokémons outside saves using banks & boxes
+  - allow use of multiple **"variants"** for stored pokémons
   - move/delete actions
-  - edit pokémon moves, EVs & nickname
-  - evolve pokémons requiring trade or trade + held-item (ex. Kadabra -> Alakazam)
-  - link a save pokémon with all his variants, sharing data like exp & EVs
-  - use of external PKM files, outside PKVault environment
-  - backup all saves & storage before any save action
+  - **edit** pokémon moves, EVs & nickname
+  - **evolve** pokémons requiring trade or trade + held-item (ex. Kadabra -> Alakazam)
+  - **link** a save pokémon with all his variants, sharing data like exp & EVs
+  - use of **external PKM files**, outside PKVault environment
+  - **backup** all saves & storage before any save action
     - backups listing
     - backups restore always possible
-- Centralized Pokédex based on all listed saves
+- Centralized **Pokédex** based on all listed saves
   - views with forms & genders
   - multiple filters: species name, seen/caught/owned/shiny/alpha, types, ...
     - possible living dex
@@ -131,7 +131,7 @@ Your can use this app for your own projects following license restrictions.
 
 - Frontend
   - Font "Pixel Operator" - from [onlinewebfonts](http://www.onlinewebfonts.com) - License CC BY 4.0
-  - Font "Pokemon Emerald" - from [fontstruct](https://fontstruct.com/fontstructions/show/1975556) by "aztecwarrior28" - License CC BY-SA 3.0
+  - Icons "Input prompts" - from [Kenney](www.kenney.nl) - License CC0
   - Versions & all others dependencies can be found into [frontend/package.json](./frontend/package.json).
 
 All image contents of game-icons, pokémons, types, items, move-categories are Copyright The Pokémon Company.

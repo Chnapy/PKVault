@@ -1,7 +1,12 @@
-import { Card, Stack } from '@mantine/core';
+import { Stack } from '@mantine/core';
+import { clsx } from 'clsx';
 import type React from 'react';
+import classes from './ui-splash.module.css';
 
-export const UISplash: React.FC<React.PropsWithChildren> = ({ children }) => <Stack
+export const UISplash: React.FC<{
+    loading?: boolean;
+    children?: React.ReactNode;
+}> = ({ loading, children }) => <Stack
     bg='primary'
     h='100vh'
     align='center'
@@ -10,6 +15,7 @@ export const UISplash: React.FC<React.PropsWithChildren> = ({ children }) => <St
     p='lg'
 >
     <img
+        className={clsx(loading && classes.uiSplashLoader)}
         src='/logo.svg'
         style={{
             width: 128,
@@ -17,7 +23,5 @@ export const UISplash: React.FC<React.PropsWithChildren> = ({ children }) => <St
         }}
     />
 
-    {children && <Card p='lg'>
-        {children}
-    </Card>}
+    {children}
 </Stack>;

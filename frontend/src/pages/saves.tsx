@@ -1,5 +1,5 @@
 import { Badge, Button, Card, Divider, EmptyState, Group, Tooltip } from '@mantine/core';
-import { CirclePlusIcon, DownloadIcon, FolderIcon, RectangleEllipsisIcon } from 'lucide-react';
+import { CirclePlusIcon, DownloadIcon, FolderIcon, PackageOpenIcon } from 'lucide-react';
 import type React from "react";
 import { HistoryContext } from '../context/history-context';
 import { getApiFullUrl } from '../data/mutator/custom-instance';
@@ -41,7 +41,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
     <Card pr={0} style={{ overflowY: 'scroll' }}>
       {!isLoading && saveInfos.length === 0 && <EmptyState
         size='sm'
-        icon={<RectangleEllipsisIcon />}
+        icon={<PackageOpenIcon />}
         title={t('settings.form.saves.empty')}
       />}
 

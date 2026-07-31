@@ -30,6 +30,7 @@ export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header
             flexGrow: 1,
             flexShrink: 999,
             overflowY: 'scroll',
+            overflowX: 'hidden',
             paddingRight: 0,
             backgroundImage: backgroundImageUrl && `url("${backgroundImageUrl}")`,
         }}>

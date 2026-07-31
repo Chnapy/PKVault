@@ -1,5 +1,5 @@
 import { EmptyState } from '@mantine/core';
-import { RectangleEllipsisIcon } from 'lucide-react';
+import { PackageOpenIcon } from 'lucide-react';
 import React from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 import { useTranslate } from '../../translate/i18n';
@@ -101,7 +101,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
 
         {splittedValue.length === 0 && <EmptyState
             size='sm'
-            icon={<RectangleEllipsisIcon />}
+            icon={<PackageOpenIcon />}
             title={t('settings.form.saves.empty')}
         />}
     </UIGlobsInputList>;

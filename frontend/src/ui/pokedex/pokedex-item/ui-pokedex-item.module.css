@@ -30,3 +30,10 @@
 .ui-pokedex-item .button[data-selected="true"] {
     outline: 4px solid var(--focus-color-1);
 }
+
+.ui-pokedex-item .button[data-selected="true"]:not([data-disabled="true"]),
+.ui-pokedex-item .button[data-focused="true"]:not([data-disabled="true"]),
+.ui-pokedex-item .button:not([data-disabled="true"]):hover {
+  transform: scale(1.02);
+  z-index: 1;
+}

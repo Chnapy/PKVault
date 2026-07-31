@@ -92,7 +92,7 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
                                     ref={textInputRef}
                                     value={value}
                                     onChange={({ currentTarget }) => onEdit(currentTarget.value)}
-                                    size='xs'
+                                    size='sm'
                                     style={{ flexGrow: 1 }}
                                     {...controlProps('open')}
                                 />
