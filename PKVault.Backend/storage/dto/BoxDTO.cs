@@ -1,3 +1,5 @@
+using PKHeX.Core;
+
 public record BoxDTO(
     string Id,
     BoxType Type,
@@ -5,14 +7,15 @@ public record BoxDTO(
     int SlotCount,
     int Order,
     string? BankId,
-    string? WallpaperName = null
+    string? WallpaperName = null,
+    GameVersion? version = null
 ) : IWithId
 {
     public int IdInt => int.Parse(Id);
 
     public bool CanSaveWrite => Type == BoxType.Box;
 
-    public bool CanSaveReceivePkm => Type == BoxType.Party || Type == BoxType.Box;
+    public bool CanSaveReceivePkm => BoxLoader.CanIdReceivePkm((int)Type, version ?? GameVersion.Any);
 }
 
 public enum BoxType : int

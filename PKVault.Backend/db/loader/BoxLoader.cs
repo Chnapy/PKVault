@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 public interface IBoxLoader : IEntityLoader<BoxDTO, BoxEntity>
 {
-    public BoxDTO CreateDTO(BoxEntity entity, string? WallpaperName = null);
+    public BoxDTO CreateDTO(BoxEntity entity, string? WallpaperName = null, GameVersion? Version = null);
     public Task<Dictionary<string, BoxEntity>> GetEntitiesByBank(string bankId);
     public Task<int> GetMaxId();
     public Task NormalizeOrders();
@@ -13,13 +13,16 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
 {
     public static readonly int OrderGap = 10;
 
-    public static bool CanIdReceivePkm(int boxId) => boxId == (int)BoxType.Party || boxId >= (int)BoxType.Box;
+    public static bool CanIdReceivePkm(int boxId, GameVersion version) => 
+        // ZA party is unstable, moving should be disabled
+        (version != GameVersion.ZA && boxId == (int)BoxType.Party)
+        || boxId >= (int)BoxType.Box;
 
     /**
      * Scoped box cannot interact with non-scoped boxes.
      * This allows duplicates between scoped and non-scoped, since there is strong delimitation between them.
      */
-    public static bool IsScopedBox(int boxId) => !CanIdReceivePkm(boxId) && boxId != (int)BoxType.Daycare;
+    public static bool IsScopedBox(int boxId) => !CanIdReceivePkm(boxId, GameVersion.Any) && boxId != (int)BoxType.Daycare;
 
     public static BoxType GetTypeFromStorageSlotType(StorageSlotType slotType) => slotType switch
     {
@@ -58,7 +61,7 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         pkmVariantLoader = _pkmVariantLoader;
     }
 
-    public BoxDTO CreateDTO(BoxEntity entity, string? WallpaperName = null)
+    public BoxDTO CreateDTO(BoxEntity entity, string? WallpaperName = null, GameVersion? Version = null)
     {
         return new(
             Id: entity.Id,
@@ -67,7 +70,8 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
             SlotCount: entity.SlotCount,
             Order: entity.Order,
             BankId: entity.BankId,
-            WallpaperName
+            WallpaperName,
+            Version
         );
     }
 
