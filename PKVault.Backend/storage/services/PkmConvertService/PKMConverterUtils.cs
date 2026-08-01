@@ -296,7 +296,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         pkm.SetNickname(pkmSrc.IsNicknamed ? pkmSrc.Nickname : "");
 
         pkm.Nature = pkmSrc.Nature;
-        pkm.StatNature = pkmSrc.StatNature;
+        pkm.StatAlignment = pkmSrc.StatAlignment;
 
         pkm.PID = rndValues?.PID ?? pkmSrc.PID;
         pkm.EncryptionConstant = rndValues?.EncryptionConstant ?? Util.Rand.Rand32();

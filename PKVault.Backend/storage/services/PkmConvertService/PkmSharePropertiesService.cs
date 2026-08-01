@@ -58,7 +58,7 @@ public class PkmSharePropertiesService(ILogger<PkmSharePropertiesService> log, I
         if (sourcePkm is not GBPKM)
         {
             targetPkm.Nature = resultPkm.Nature;
-            targetPkm.StatNature = resultPkm.StatNature;
+            targetPkm.StatAlignment = resultPkm.StatAlignment;
             targetPkm.PID = resultPkm.PID;
 
             if (targetPkm.Format >= 6 && (targetPkm.Gen3 || targetPkm.Gen4 || targetPkm.Gen5))
