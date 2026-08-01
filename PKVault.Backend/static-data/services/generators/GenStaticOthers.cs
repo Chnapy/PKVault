@@ -181,14 +181,16 @@ public class GenStaticOthers(
 
                 GameVersion[] extraValidVersions = [
                     GameVersion.Stadium, GameVersion.StadiumJ, GameVersion.Stadium2,
-                    GameVersion.COLO, GameVersion.XD,
+                    GameVersion.COLO, GameVersion.XD, GameVersion.RSBOX,
                 ];
                     
                 bool isGameVersion(GameVersion v) => v.IsValidSavedVersion()
                     || extraValidVersions.Contains(v);
 
-                var versionChildren = Enum.GetValues<GameVersion>()
-                    .Where(v => isGameVersion(v) && version.ContainsFromLumped(v));
+                var versionChildren = isGameVersion(version)
+                    ? []
+                    : Enum.GetValues<GameVersion>()
+                        .Where(v => isGameVersion(v) && version.ContainsFromLumped(v));
 
                 return new StaticVersion(
                     Id: (byte)version,
@@ -844,6 +846,7 @@ public class GenStaticOthers(
                     Names = [
                         new() { Name1 = "Box Ruby & Sapphire", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } },
                         new() { Name1 = "Box Rubis & Saphir", Language = new() { Name = "fr", Url = "https://pokeapi.co/api/v2/language/5/" } },
+                        new() { Name1 = "Box: Rubin und Saphir", Language = new() { Name = "fr", Url = "https://pokeapi.co/api/v2/language/6/" } },
                     ]
                 })
             ],
@@ -872,16 +875,16 @@ public class GenStaticOthers(
             GameVersion.BDSP => [.. GetPokeApiVersion(GameVersion.BD), .. GetPokeApiVersion(GameVersion.SP)],
             GameVersion.SV => [.. GetPokeApiVersion(GameVersion.SL), .. GetPokeApiVersion(GameVersion.VL)],
 
-            GameVersion.Gen1 => [.. GetPokeApiVersion(GameVersion.RBY)],
-            GameVersion.Gen2 => [.. GetPokeApiVersion(GameVersion.GSC)],
-            GameVersion.Gen3 => [.. GetPokeApiVersion(GameVersion.RSE), .. GetPokeApiVersion(GameVersion.FRLG)],
-            GameVersion.Gen4 => [.. GetPokeApiVersion(GameVersion.DPPt), .. GetPokeApiVersion(GameVersion.HGSS)],
+            GameVersion.Gen1 => [.. GetPokeApiVersion(GameVersion.RBY), .. GetPokeApiVersion(GameVersion.Stadium)],
+            GameVersion.Gen2 => [.. GetPokeApiVersion(GameVersion.GSC), .. GetPokeApiVersion(GameVersion.Stadium2)],
+            GameVersion.Gen3 => [.. GetPokeApiVersion(GameVersion.RSE), .. GetPokeApiVersion(GameVersion.FRLG), .. GetPokeApiVersion(GameVersion.CXD), .. GetPokeApiVersion(GameVersion.RSBOX)],
+            GameVersion.Gen4 => [.. GetPokeApiVersion(GameVersion.DPPt), .. GetPokeApiVersion(GameVersion.HGSS), .. GetPokeApiVersion(GameVersion.BATREV)],
             GameVersion.Gen5 => [.. GetPokeApiVersion(GameVersion.BW), .. GetPokeApiVersion(GameVersion.B2W2)],
             GameVersion.Gen6 => [.. GetPokeApiVersion(GameVersion.XY), .. GetPokeApiVersion(GameVersion.ORAS)],
             GameVersion.Gen7 => [.. GetPokeApiVersion(GameVersion.SM), .. GetPokeApiVersion(GameVersion.USUM)],
             GameVersion.Gen7b => [.. GetPokeApiVersion(GameVersion.GG), .. GetPokeApiVersion(GameVersion.GO)],
             GameVersion.Gen8 => [.. GetPokeApiVersion(GameVersion.SWSH), .. GetPokeApiVersion(GameVersion.BDSP), .. GetPokeApiVersion(GameVersion.PLA)],
-            GameVersion.Gen9 => [.. GetPokeApiVersion(GameVersion.SV)],
+            GameVersion.Gen9 => [.. GetPokeApiVersion(GameVersion.SV), .. GetPokeApiVersion(GameVersion.ZA), .. GetPokeApiVersion(GameVersion.CP)],
 
             GameVersion.StadiumJ => [
                 Task.FromResult<PokeApi.Models.Version?>(new() {

@@ -2,422 +2,150 @@
 
 --- pokeapi\generated\diff-data\StaticOthers_de.diff
 +++ pokeapi\generated\diff-data\StaticOthers_de.diff
-@@ -46838,8 +46838,7 @@
-         "717": 229,
-         "718": 230,
-         "719": 231,
--        "150": 232,
--        "461": 461
-+        "150": 232
-       }
+@@ -968,14 +968,8 @@
+       "id": 61,
+       "name": "Box Ruby & Sapphire",
+       "context": 3,
+-      "isGameVersion": false,
+-      "children": [
+-        1,
+-        2,
+-        3,
+-        4,
+-        5
+-      ],
++      "isGameVersion": true,
++      "children": [],
+       "generation": 3,
+       "region": [],
+       "pokedexes": [
+@@ -990,9 +984,7 @@
+       "name": "Colosseum",
+       "context": 0,
+       "isGameVersion": true,
+-      "children": [
+-        15
+-      ],
++      "children": [],
+       "generation": 0,
+       "region": [],
+       "pokedexes": [
+@@ -1007,9 +999,7 @@
+       "name": "XD",
+       "context": 0,
+       "isGameVersion": true,
+-      "children": [
+-        15
+-      ],
++      "children": [],
+       "generation": 0,
+       "region": [],
+       "pokedexes": [
+@@ -1329,7 +1319,7 @@
      },
-     "hyperspace": {
-@@ -46996,6 +46995,8 @@
-         "26": 26,
-         "36": 36,
-         "38": 38,
-+        "45": 45,
-+        "59": 59,
-         "65": 65,
-         "68": 68,
-         "71": 71,
-@@ -47025,14 +47026,19 @@
-         "199": 199,
-         "205": 205,
-         "208": 208,
-+        "211": 211,
-         "212": 212,
-         "214": 214,
-         "227": 227,
-         "229": 229,
-         "248": 248,
-+        "254": 254,
-+        "257": 257,
-+        "260": 260,
-         "279": 279,
-         "282": 282,
-         "302": 302,
-+        "303": 303,
-         "306": 306,
-         "308": 308,
-         "310": 310,
-@@ -47046,19 +47052,23 @@
-         "358": 358,
-         "359": 359,
-         "362": 362,
-+        "376": 376,
-         "389": 389,
-         "392": 392,
-         "395": 395,
-+        "398": 398,
-         "405": 405,
-         "407": 407,
-         "409": 409,
-         "411": 411,
-+        "428": 428,
-         "442": 442,
-         "445": 445,
-         "448": 448,
-         "450": 450,
-         "454": 454,
-         "460": 460,
-+        "461": 461,
-         "464": 464,
-         "470": 470,
-         "471": 471,
-@@ -47075,17 +47085,21 @@
-         "512": 512,
-         "514": 514,
-         "516": 516,
-+        "518": 518,
-         "530": 530,
-         "531": 531,
-         "534": 534,
-+        "545": 545,
-         "547": 547,
-         "553": 553,
-+        "560": 560,
-         "563": 563,
-         "569": 569,
-         "571": 571,
-         "579": 579,
-         "584": 584,
-         "587": 587,
-+        "604": 604,
-         "609": 609,
-         "614": 614,
-         "618": 618,
-@@ -47098,6 +47112,7 @@
-         "660": 660,
-         "663": 663,
-         "666": 666,
-+        "668": 668,
-         "670": 670,
-         "671": 671,
-         "675": 675,
-@@ -47106,6 +47121,9 @@
-         "681": 681,
-         "683": 683,
-         "685": 685,
-+        "687": 687,
-+        "689": 689,
-+        "691": 691,
-         "693": 693,
-         "695": 695,
-         "697": 697,
-@@ -47141,15 +47159,18 @@
-         "844": 844,
-         "855": 855,
-         "858": 858,
-+        "861": 861,
-         "866": 866,
-         "867": 867,
-         "869": 869,
-+        "870": 870,
-         "877": 877,
-         "887": 887,
-         "899": 899,
-         "900": 900,
-         "902": 902,
-         "903": 903,
-+        "904": 904,
-         "908": 908,
-         "911": 911,
-         "914": 914,
-@@ -47164,8 +47185,11 @@
-         "964": 964,
-         "968": 968,
-         "970": 970,
-+        "972": 972,
-+        "979": 979,
-         "981": 981,
-         "983": 983,
-+        "1000": 1000,
-         "1013": 1013,
-         "1018": 1018,
-         "1019": 1019
-@@ -47211,42 +47235,42 @@
-     "RibbonArtist": {
-       "key": "RibbonArtist",
-       "spriteKey": "ribbonartist",
--      "name": "Künstler"
-+      "name": "Künstlers"
+     "78": {
+       "id": 78,
+-      "name": "Rot/Blau/Blau (J)/Gelb",
++      "name": "Rot/Blau/Blau (J)/Gelb/Stadium",
+       "context": 1,
+       "isGameVersion": false,
+       "children": [
+@@ -1353,7 +1343,7 @@
      },
-     "RibbonBattlerExpert": {
-       "key": "RibbonBattlerExpert",
-       "spriteKey": "ribbonbattlerexpert",
--      "name": "Experten Kämpfer"
-+      "name": "Meisterkampf"
+     "79": {
+       "id": 79,
+-      "name": "Gold/Silber/Kristall",
++      "name": "Gold/Silber/Kristall/Stadium 2",
+       "context": 2,
+       "isGameVersion": false,
+       "children": [
+@@ -1377,7 +1367,7 @@
      },
-     "RibbonBattleRoyale": {
-       "key": "RibbonBattleRoyale",
-       "spriteKey": "ribbonbattleroyale",
--      "name": "Battle Royal Champion"
-+      "name": "Battle-Royale-Meister"
+     "80": {
+       "id": 80,
+-      "name": "Rubin/Saphir/Smaragd/Feuerrot/Blattgrün",
++      "name": "Rubin/Saphir/Smaragd/Feuerrot/Blattgrün/Colosseum/XD/Box Ruby & Sapphire",
+       "context": 3,
+       "isGameVersion": false,
+       "children": [
+@@ -1386,7 +1376,8 @@
+         3,
+         4,
+         5,
+-        15
++        15,
++        61
+       ],
+       "generation": 3,
+       "region": [
+@@ -1404,7 +1395,7 @@
      },
-     "RibbonBattlerSkillful": {
-       "key": "RibbonBattlerSkillful",
-       "spriteKey": "ribbonbattlerskillful",
--      "name": "Erfahrener Kämpfer"
-+      "name": "Profikampf"
+     "81": {
+       "id": 81,
+-      "name": "Diamant/Perl/Platin/HeartGold/SoulSilver",
++      "name": "Diamant/Perl/Platin/HeartGold/SoulSilver/Battle Revolution",
+       "context": 4,
+       "isGameVersion": false,
+       "children": [
+@@ -1568,7 +1559,7 @@
      },
-     "RibbonBattleTreeGreat": {
-       "key": "RibbonBattleTreeGreat",
-       "spriteKey": "ribbonbattletreegreat",
--      "name": "Battle Tree Great"
-+      "name": "Profibaum"
-     },
-     "RibbonBattleTreeMaster": {
-       "key": "RibbonBattleTreeMaster",
-       "spriteKey": "ribbonbattletreemaster",
--      "name": "Battle Tree Master"
-+      "name": "Meisterbaum"
-     },
-     "RibbonBestFriends": {
-       "key": "RibbonBestFriends",
-       "spriteKey": "ribbonbestfriends",
--      "name": "Beste Freunde"
-+      "name": "Zutraulichkeits"
-     },
-     "RibbonBirthday": {
-       "key": "RibbonBirthday",
-       "spriteKey": "ribbonbirthday",
--      "name": "Geburtstag"
-+      "name": "Geburtstags"
-     },
-     "RibbonCareless": {
-       "key": "RibbonCareless",
-@@ -47256,22 +47280,22 @@
-     "RibbonChampionAlola": {
-       "key": "RibbonChampionAlola",
-       "spriteKey": "ribbonchampionalola",
--      "name": "Alola Champion"
-+      "name": "Alola-Champs"
-     },
-     "RibbonChampionBattle": {
-       "key": "RibbonChampionBattle",
-       "spriteKey": "ribbonchampionbattle",
--      "name": "Kampfchampion"
-+      "name": "Kampfmeister"
-     },
-     "RibbonChampionG3": {
-       "key": "RibbonChampionG3",
-       "spriteKey": "ribbonchampiong3",
--      "name": "Champion (Gen3)"
-+      "name": "Champs (Gen3)"
-     },
-     "RibbonChampionG6Hoenn": {
-       "key": "RibbonChampionG6Hoenn",
-       "spriteKey": "ribbonchampiong6hoenn",
--      "name": "Hoenn Champion (ORAS)"
-+      "name": "Hoenn-Champs (ORAS)"
-     },
-     "RibbonChampionGalar": {
-       "key": "RibbonChampionGalar",
-@@ -47281,12 +47305,12 @@
-     "RibbonChampionKalos": {
-       "key": "RibbonChampionKalos",
-       "spriteKey": "ribbonchampionkalos",
--      "name": "Kalos Champion"
-+      "name": "Kalos-Champs"
-     },
-     "RibbonChampionNational": {
-       "key": "RibbonChampionNational",
-       "spriteKey": "ribbonchampionnational",
--      "name": "Nationaler Champion"
-+      "name": "Nationalmeister"
-     },
-     "RibbonChampionPaldea": {
-       "key": "RibbonChampionPaldea",
-@@ -47296,27 +47320,27 @@
-     "RibbonChampionRegional": {
-       "key": "RibbonChampionRegional",
-       "spriteKey": "ribbonchampionregional",
--      "name": "Regionaler Champion"
-+      "name": "Regionalmeister"
-     },
-     "RibbonChampionSinnoh": {
-       "key": "RibbonChampionSinnoh",
-       "spriteKey": "ribbonchampionsinnoh",
--      "name": "Sinnoh Champion"
-+      "name": "Sinnoh-Champs"
-     },
-     "RibbonChampionWorld": {
-       "key": "RibbonChampionWorld",
-       "spriteKey": "ribbonchampionworld",
--      "name": "Weltchampion"
-+      "name": "Weltmeister"
-     },
-     "RibbonClassic": {
-       "key": "RibbonClassic",
-       "spriteKey": "ribbonclassic",
--      "name": "Klassisch"
-+      "name": "Klassisches"
-     },
-     "RibbonContestStar": {
-       "key": "RibbonContestStar",
-       "spriteKey": "ribbonconteststar",
--      "name": "Wettbewerbs-Star"
-+      "name": "Wettbewerbsstars"
-     },
-     "RibbonCountG3Beauty": {
-       "key": "RibbonCountG3Beauty",
-@@ -47346,22 +47370,22 @@
-     "RibbonCountMemoryBattle": {
-       "key": "RibbonCountMemoryBattle",
-       "spriteKey": "ribboncountmemorybattle",
--      "name": "Verg. Kampfb."
-+      "name": "Kampfgedenk"
-     },
-     "RibbonCountMemoryContest": {
-       "key": "RibbonCountMemoryContest",
-       "spriteKey": "ribboncountmemorycontest",
--      "name": "Verg. Wettbewerbsb."
-+      "name": "Wettbewerbsgedenk"
-     },
-     "RibbonCountry": {
-       "key": "RibbonCountry",
-       "spriteKey": "ribboncountry",
--      "name": "Land"
-+      "name": "Landes"
-     },
-     "RibbonDowncast": {
-       "key": "RibbonDowncast",
-       "spriteKey": "ribbondowncast",
--      "name": "Niederschlag"
-+      "name": "Traurigkeit"
-     },
-     "RibbonEarth": {
-       "key": "RibbonEarth",
-@@ -47376,7 +47400,7 @@
-     "RibbonEvent": {
-       "key": "RibbonEvent",
-       "spriteKey": "ribbonevent",
--      "name": "Geschichte"
-+      "name": "Veranstaltungs"
-     },
-     "RibbonFootprint": {
-       "key": "RibbonFootprint",
-@@ -47586,12 +47610,12 @@
-     "RibbonGorgeous": {
-       "key": "RibbonGorgeous",
-       "spriteKey": "ribbongorgeous",
--      "name": "Hinreißend"
-+      "name": "Hinreißendes"
-     },
-     "RibbonGorgeousRoyal": {
-       "key": "RibbonGorgeousRoyal",
-       "spriteKey": "ribbongorgeousroyal",
--      "name": "Hinreißend Königl."
-+      "name": "Hinreißendes Königliches"
-     },
-     "RibbonHisui": {
-       "key": "RibbonHisui",
-@@ -47871,22 +47895,22 @@
-     "RibbonMasterBeauty": {
-       "key": "RibbonMasterBeauty",
-       "spriteKey": "ribbonmasterbeauty",
--      "name": "Schönheit Meister"
-+      "name": "Schönheit Master"
-     },
-     "RibbonMasterCleverness": {
-       "key": "RibbonMasterCleverness",
-       "spriteKey": "ribbonmastercleverness",
--      "name": "Klugheit Meister"
-+      "name": "Klugheit Master"
-     },
-     "RibbonMasterCoolness": {
-       "key": "RibbonMasterCoolness",
-       "spriteKey": "ribbonmastercoolness",
--      "name": "Coolness Meister"
-+      "name": "Coolness Master"
-     },
-     "RibbonMasterCuteness": {
-       "key": "RibbonMasterCuteness",
-       "spriteKey": "ribbonmastercuteness",
--      "name": "Putzigkeit Meister"
-+      "name": "Anmut Master"
-     },
-     "RibbonMasterRank": {
-       "key": "RibbonMasterRank",
-@@ -47896,7 +47920,7 @@
-     "RibbonMasterToughness": {
-       "key": "RibbonMasterToughness",
-       "spriteKey": "ribbonmastertoughness",
--      "name": "Stärke Meister"
-+      "name": "Stärke Master"
-     },
-     "RibbonNational": {
-       "key": "RibbonNational",
-@@ -47911,7 +47935,7 @@
-     "RibbonPartner": {
-       "key": "RibbonPartner",
-       "spriteKey": "ribbonpartner",
--      "name": "Partnerband"
-+      "name": "Partner"
-     },
-     "RibbonPremier": {
-       "key": "RibbonPremier",
-@@ -47931,22 +47955,22 @@
-     "RibbonRoyal": {
-       "key": "RibbonRoyal",
-       "spriteKey": "ribbonroyal",
--      "name": "Königlich"
-+      "name": "Königliches"
-     },
-     "RibbonShock": {
-       "key": "RibbonShock",
-       "spriteKey": "ribbonshock",
--      "name": "Schock"
-+      "name": "Schocks"
-     },
-     "RibbonSmile": {
-       "key": "RibbonSmile",
-       "spriteKey": "ribbonsmile",
--      "name": "Lächeln"
-+      "name": "Lächelns"
-     },
-     "RibbonSnooze": {
-       "key": "RibbonSnooze",
-       "spriteKey": "ribbonsnooze",
--      "name": "Schlafen"
-+      "name": "Schlafens"
-     },
-     "RibbonSouvenir": {
-       "key": "RibbonSouvenir",
-@@ -47956,17 +47980,17 @@
-     "RibbonSpecial": {
-       "key": "RibbonSpecial",
-       "spriteKey": "ribbonspecial",
--      "name": "Spezial"
-+      "name": "Sonder"
-     },
-     "RibbonTowerMaster": {
-       "key": "RibbonTowerMaster",
-       "spriteKey": "ribbontowermaster",
--      "name": "Turmmeister"
-+      "name": "Meisterturm"
-     },
-     "RibbonTraining": {
-       "key": "RibbonTraining",
-       "spriteKey": "ribbontraining",
--      "name": "Training"
-+      "name": "Trainings"
-     },
-     "RibbonTwinklingStar": {
-       "key": "RibbonTwinklingStar",
-@@ -47976,12 +48000,12 @@
-     "RibbonVictory": {
-       "key": "RibbonVictory",
-       "spriteKey": "ribbonvictory",
--      "name": "Sieger"
-+      "name": "Sieges"
-     },
-     "RibbonWinning": {
-       "key": "RibbonWinning",
-       "spriteKey": "ribbonwinning",
--      "name": "Gewinner"
-+      "name": "Gewinners"
-     },
-     "RibbonWishing": {
-       "key": "RibbonWishing",
+     "87": {
+       "id": 87,
+-      "name": "Karmesin/Purpur",
++      "name": "Karmesin/Purpur/Legenden: Z-A/Champions",
+       "context": 0,
+       "isGameVersion": false,
+       "children": [
+@@ -1585,7 +1576,10 @@
+         "national",
+         "paldea",
+         "kitakami",
+-        "blueberry"
++        "blueberry",
++        "lumiose-city",
++        "hyperspace",
++        "champions"
+       ],
+       "maxSpeciesId": 1000,
+       "maxIV": 31,
+@@ -1596,12 +1590,7 @@
+       "name": "Stadium (J)",
+       "context": 0,
+       "isGameVersion": true,
+-      "children": [
+-        35,
+-        36,
+-        37,
+-        38
+-      ],
++      "children": [],
+       "generation": 0,
+       "region": [],
+       "pokedexes": [
+@@ -1616,12 +1605,7 @@
+       "name": "Stadium",
+       "context": 1,
+       "isGameVersion": true,
+-      "children": [
+-        35,
+-        36,
+-        37,
+-        38
+-      ],
++      "children": [],
+       "generation": 1,
+       "region": [],
+       "pokedexes": [
+@@ -1636,11 +1620,7 @@
+       "name": "Stadium 2",
+       "context": 2,
+       "isGameVersion": true,
+-      "children": [
+-        39,
+-        40,
+-        41
+-      ],
++      "children": [],
+       "generation": 2,
+       "region": [],
+       "pokedexes": [

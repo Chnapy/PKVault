@@ -2,224 +2,150 @@
 
 --- pokeapi\generated\diff-data\StaticOthers_fr.diff
 +++ pokeapi\generated\diff-data\StaticOthers_fr.diff
-@@ -46604,7 +46604,7 @@
+@@ -968,14 +968,8 @@
+       "id": 61,
+       "name": "Box Rubis & Saphir",
+       "context": 3,
+-      "isGameVersion": false,
+-      "children": [
+-        1,
+-        2,
+-        3,
+-        4,
+-        5
+-      ],
++      "isGameVersion": true,
++      "children": [],
+       "generation": 3,
+       "region": [],
+       "pokedexes": [
+@@ -990,9 +984,7 @@
+       "name": "Colosseum",
+       "context": 0,
+       "isGameVersion": true,
+-      "children": [
+-        15
+-      ],
++      "children": [],
+       "generation": 0,
+       "region": [],
+       "pokedexes": [
+@@ -1007,9 +999,7 @@
+       "name": "XD",
+       "context": 0,
+       "isGameVersion": true,
+-      "children": [
+-        15
+-      ],
++      "children": [],
+       "generation": 0,
+       "region": [],
+       "pokedexes": [
+@@ -1329,7 +1319,7 @@
      },
-     "lumiose-city": {
-       "key": "lumiose-city",
--      "name": "Lumiose",
-+      "name": "Illumis",
-       "order": 33,
-       "pokemonIndexes": {
-         "152": 1,
-@@ -46838,13 +46838,12 @@
-         "717": 229,
-         "718": 230,
-         "719": 231,
--        "150": 232,
--        "461": 461
-+        "150": 232
-       }
+     "78": {
+       "id": 78,
+-      "name": "Rouge/Bleu/Bleu (J)/Jaune",
++      "name": "Rouge/Bleu/Bleu (J)/Jaune/Stadium",
+       "context": 1,
+       "isGameVersion": false,
+       "children": [
+@@ -1353,7 +1343,7 @@
      },
-     "hyperspace": {
-       "key": "hyperspace",
--      "name": "Hyperspace",
-+      "name": "Extra Illumis",
-       "order": 34,
-       "pokemonIndexes": {
-         "56": 1,
-@@ -46996,6 +46995,8 @@
-         "26": 26,
-         "36": 36,
-         "38": 38,
-+        "45": 45,
-+        "59": 59,
-         "65": 65,
-         "68": 68,
-         "71": 71,
-@@ -47025,14 +47026,19 @@
-         "199": 199,
-         "205": 205,
-         "208": 208,
-+        "211": 211,
-         "212": 212,
-         "214": 214,
-         "227": 227,
-         "229": 229,
-         "248": 248,
-+        "254": 254,
-+        "257": 257,
-+        "260": 260,
-         "279": 279,
-         "282": 282,
-         "302": 302,
-+        "303": 303,
-         "306": 306,
-         "308": 308,
-         "310": 310,
-@@ -47046,19 +47052,23 @@
-         "358": 358,
-         "359": 359,
-         "362": 362,
-+        "376": 376,
-         "389": 389,
-         "392": 392,
-         "395": 395,
-+        "398": 398,
-         "405": 405,
-         "407": 407,
-         "409": 409,
-         "411": 411,
-+        "428": 428,
-         "442": 442,
-         "445": 445,
-         "448": 448,
-         "450": 450,
-         "454": 454,
-         "460": 460,
-+        "461": 461,
-         "464": 464,
-         "470": 470,
-         "471": 471,
-@@ -47075,17 +47085,21 @@
-         "512": 512,
-         "514": 514,
-         "516": 516,
-+        "518": 518,
-         "530": 530,
-         "531": 531,
-         "534": 534,
-+        "545": 545,
-         "547": 547,
-         "553": 553,
-+        "560": 560,
-         "563": 563,
-         "569": 569,
-         "571": 571,
-         "579": 579,
-         "584": 584,
-         "587": 587,
-+        "604": 604,
-         "609": 609,
-         "614": 614,
-         "618": 618,
-@@ -47098,6 +47112,7 @@
-         "660": 660,
-         "663": 663,
-         "666": 666,
-+        "668": 668,
-         "670": 670,
-         "671": 671,
-         "675": 675,
-@@ -47106,6 +47121,9 @@
-         "681": 681,
-         "683": 683,
-         "685": 685,
-+        "687": 687,
-+        "689": 689,
-+        "691": 691,
-         "693": 693,
-         "695": 695,
-         "697": 697,
-@@ -47141,15 +47159,18 @@
-         "844": 844,
-         "855": 855,
-         "858": 858,
-+        "861": 861,
-         "866": 866,
-         "867": 867,
-         "869": 869,
-+        "870": 870,
-         "877": 877,
-         "887": 887,
-         "899": 899,
-         "900": 900,
-         "902": 902,
-         "903": 903,
-+        "904": 904,
-         "908": 908,
-         "911": 911,
-         "914": 914,
-@@ -47164,8 +47185,11 @@
-         "964": 964,
-         "968": 968,
-         "970": 970,
-+        "972": 972,
-+        "979": 979,
-         "981": 981,
-         "983": 983,
-+        "1000": 1000,
-         "1013": 1013,
-         "1018": 1018,
-         "1019": 1019
-@@ -47216,7 +47240,7 @@
-     "RibbonBattlerExpert": {
-       "key": "RibbonBattlerExpert",
-       "spriteKey": "ribbonbattlerexpert",
--      "name": "Génie"
-+      "name": "Génie du Combat"
+     "79": {
+       "id": 79,
+-      "name": "Or/Argent/Cristal",
++      "name": "Or/Argent/Cristal/Stadium 2",
+       "context": 2,
+       "isGameVersion": false,
+       "children": [
+@@ -1377,7 +1367,7 @@
      },
-     "RibbonBattleRoyale": {
-       "key": "RibbonBattleRoyale",
-@@ -47226,7 +47250,7 @@
-     "RibbonBattlerSkillful": {
-       "key": "RibbonBattlerSkillful",
-       "spriteKey": "ribbonbattlerskillful",
--      "name": "Élite"
-+      "name": "Élite du Combat"
+     "80": {
+       "id": 80,
+-      "name": "Rubis/Saphir/Émeraude/Rouge Feu/Vert Feuille",
++      "name": "Rubis/Saphir/Émeraude/Rouge Feu/Vert Feuille/Colosseum/XD/Box Rubis & Saphir",
+       "context": 3,
+       "isGameVersion": false,
+       "children": [
+@@ -1386,7 +1376,8 @@
+         3,
+         4,
+         5,
+-        15
++        15,
++        61
+       ],
+       "generation": 3,
+       "region": [
+@@ -1404,7 +1395,7 @@
      },
-     "RibbonBattleTreeGreat": {
-       "key": "RibbonBattleTreeGreat",
-@@ -47271,7 +47295,7 @@
-     "RibbonChampionG6Hoenn": {
-       "key": "RibbonChampionG6Hoenn",
-       "spriteKey": "ribbonchampiong6hoenn",
--      "name": "Maître de Hoenn (ORAS)"
-+      "name": "Maître de Hoenn (ROSA)"
+     "81": {
+       "id": 81,
+-      "name": "Diamant/Perle/Platine/Or HeartGold/Argent SoulSilver",
++      "name": "Diamant/Perle/Platine/Or HeartGold/Argent SoulSilver/Battle Revolution",
+       "context": 4,
+       "isGameVersion": false,
+       "children": [
+@@ -1568,7 +1559,7 @@
      },
-     "RibbonChampionGalar": {
-       "key": "RibbonChampionGalar",
-@@ -47281,7 +47305,7 @@
-     "RibbonChampionKalos": {
-       "key": "RibbonChampionKalos",
-       "spriteKey": "ribbonchampionkalos",
--      "name": "Maître Kalos"
-+      "name": "Maître de Kalos"
-     },
-     "RibbonChampionNational": {
-       "key": "RibbonChampionNational",
-@@ -47301,7 +47325,7 @@
-     "RibbonChampionSinnoh": {
-       "key": "RibbonChampionSinnoh",
-       "spriteKey": "ribbonchampionsinnoh",
--      "name": "Maître Sinnoh"
-+      "name": "Maître de Sinnoh"
-     },
-     "RibbonChampionWorld": {
-       "key": "RibbonChampionWorld",
-@@ -47546,7 +47570,7 @@
-     "RibbonG4Smart": {
-       "key": "RibbonG4Smart",
-       "spriteKey": "ribbong4smart",
--      "name": "Smart (G4)"
-+      "name": "Intelligence (G4)"
-     },
-     "RibbonG4SmartGreat": {
-       "key": "RibbonG4SmartGreat",
-@@ -47566,7 +47590,7 @@
-     "RibbonG4Tough": {
-       "key": "RibbonG4Tough",
-       "spriteKey": "ribbong4tough",
--      "name": "Tough (G4)"
-+      "name": "Robustesse (G4)"
-     },
-     "RibbonG4ToughGreat": {
-       "key": "RibbonG4ToughGreat",
-@@ -47911,7 +47935,7 @@
-     "RibbonPartner": {
-       "key": "RibbonPartner",
-       "spriteKey": "ribbonpartner",
--      "name": "Partner Ribbon"
-+      "name": "Partenaire"
-     },
-     "RibbonPremier": {
-       "key": "RibbonPremier",
+     "87": {
+       "id": 87,
+-      "name": "Écarlate/Violet",
++      "name": "Écarlate/Violet/Légendes : Z-A/Champions",
+       "context": 0,
+       "isGameVersion": false,
+       "children": [
+@@ -1585,7 +1576,10 @@
+         "national",
+         "paldea",
+         "kitakami",
+-        "blueberry"
++        "blueberry",
++        "lumiose-city",
++        "hyperspace",
++        "champions"
+       ],
+       "maxSpeciesId": 1000,
+       "maxIV": 31,
+@@ -1596,12 +1590,7 @@
+       "name": "Stadium (J)",
+       "context": 0,
+       "isGameVersion": true,
+-      "children": [
+-        35,
+-        36,
+-        37,
+-        38
+-      ],
++      "children": [],
+       "generation": 0,
+       "region": [],
+       "pokedexes": [
+@@ -1616,12 +1605,7 @@
+       "name": "Stadium",
+       "context": 1,
+       "isGameVersion": true,
+-      "children": [
+-        35,
+-        36,
+-        37,
+-        38
+-      ],
++      "children": [],
+       "generation": 1,
+       "region": [],
+       "pokedexes": [
+@@ -1636,11 +1620,7 @@
+       "name": "Stadium 2",
+       "context": 2,
+       "isGameVersion": true,
+-      "children": [
+-        39,
+-        40,
+-        41
+-      ],
++      "children": [],
+       "generation": 2,
+       "region": [],
+       "pokedexes": [
