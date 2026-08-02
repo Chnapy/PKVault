@@ -1,24 +1,25 @@
 import i18n from "i18next";
 import { initReactI18next, useTranslation } from "react-i18next";
-import en from './locales/en.json' with { type: "json" };
-import fr from './locales/fr.json' with { type: "json" };
-import de from './locales/de.json' with { type: "json" };
+import en from './locales/en.json';
+import fr from './locales/fr.json';
+import de from './locales/de.json';
+import pt-br from './locales/pt-br.json'; // 1. Importe o novo arquivo br.json
 
-const _assertFrIsEn: typeof en = fr, _assertEnIsFr: typeof fr = en;
-const _assertDeIsEn: typeof en = de, _assertEnIsDe: typeof de = en;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const assertFrIsEn: typeof en = fr, assertEnIsFr: typeof fr = en;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const assertDeIsEn: typeof en = de, assertEnIsDe: typeof de = en;
+// 2. Adicione a verificação de tipos para o PT-BR para garantir que nenhuma chave fique de fora
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const assertBrIsEn: typeof en = br, assertEnIsBr: typeof br = en; 
 
 export const defaultNS = "ns";
 export const resources = {
     en: { ns: en },
     fr: { ns: fr },
     de: { ns: de },
+    pt-br: { ns: pt-br }, // 3. Adicione o idioma "br" nos resources
 } as const;
-
-export const languages: Record<keyof typeof resources, string> = {
-    en: 'English',
-    fr: 'Français',
-    de: 'Deutsch',
-};
 
 i18n.use(initReactI18next).init({
     lng: "en",
