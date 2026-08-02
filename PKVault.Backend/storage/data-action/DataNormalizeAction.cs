@@ -6,6 +6,8 @@ public record DataNormalizeActionInput(
 )
 {
     public bool ShouldRun => SetupInitialData || UpdateVersion;
+
+    public Dictionary<string, string>? Migrate200Ids;
 }
 
 public class DataNormalizeAction(
@@ -42,7 +44,7 @@ public class DataNormalizeAction(
     {
         if (input.UpdateVersion)
         {
-            await UpdateVersion();
+            await UpdateVersion(input);
         }
 
         if (input.SetupInitialData)
@@ -87,7 +89,7 @@ public class DataNormalizeAction(
         }
     }
 
-    private async Task UpdateVersion()
+    private async Task UpdateVersion(DataNormalizeActionInput input)
     {
         var currentVersion = await metaLoader.GetEntity(MetaKey.APP_VERSION);
 
@@ -100,6 +102,11 @@ public class DataNormalizeAction(
         {
             await MigrateJSONLegacyData();
             await MigrateVariantsFrom161();
+        }
+        // <= 2.0.0
+        else if (GetVersionValue(currentVersion.Value) <= GetVersionValue("2.0.0"))
+        {
+            await MigrateVariantsFrom200(input);
         }
 
         // --- Update version
@@ -118,6 +125,21 @@ public class DataNormalizeAction(
 
             await metaLoader.UpdateEntity(currentVersion);
         }
+    }
+
+    private static int GetVersionValue(string version)
+    {
+        var value = 0;
+
+        var i = 0;
+        foreach(var str in version.Split('.').Reverse())
+        {
+            var v = int.Parse(str);
+            value += v * (int)Math.Pow(10, i);
+            i += 3;
+        }
+        
+        return value;
     }
 
     private async Task<bool> MigrateJSONLegacyData()
@@ -227,7 +249,7 @@ public class DataNormalizeAction(
                     Pkm: legacyPkmVersionLoader.pkmFileLoader.CreatePKM(e.Id, e.Filepath, e.Generation),
 
                     // disabled pkms are allowed here to avoid data loss
-                    Id: e.Id,
+                    Hash: e.Id,
                     Filepath: e.Filepath,
                     Updated: false,
                     CheckPkm: false
@@ -294,8 +316,8 @@ public class DataNormalizeAction(
                 shouldUpdate = true;
             }
 
-            // wrong variant ID
-            if (pkmId != variant.Id)
+            // wrong variant hash
+            if (pkmId != variant.Hash)
             {
                 if (!allVariants.ContainsKey(pkmId))
                     variant = PkmVariantEntity.CreateFrom(oldVariant, pkmId);
@@ -342,5 +364,31 @@ public class DataNormalizeAction(
                 await pkmVariantLoader.UpdateEntity(variant);
             }
         }
+    }
+
+    // migrate variants from <=2.0.0, checking:
+    // - new ID format: GUID
+    // - empty hash: use old ID
+    private async Task MigrateVariantsFrom200(DataNormalizeActionInput input)
+    {
+        var allVariants = await pkmVariantLoader.GetAllEntities();
+        if (allVariants.Count == 0)
+            return;
+
+        input.Migrate200Ids ??= [];
+
+        db.PkmVersions.RemoveRange(allVariants.Values);
+        await db.PkmVersions.AddRangeAsync(allVariants.Values.Select(oldVariant =>
+        {
+            input.Migrate200Ids.TryGetValue(oldVariant.Id, out var inputId);
+
+            var variant = PkmVariantEntity.CreateFrom(oldVariant, inputId ?? Guid.NewGuid().ToString());
+            variant.Hash = oldVariant.Id;
+
+            input.Migrate200Ids[oldVariant.Id] = variant.Id;
+
+            return variant;
+        }));
+        await db.SaveChangesAsync();
     }
 }

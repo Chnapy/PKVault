@@ -13,7 +13,8 @@ public record PkmVariantLoaderAddPayload(
     byte Generation,
     ImmutablePKM Pkm,
 
-    string? Id = null,    // override Pkm Id, useful with disabled Pkm
+    string? Id = null,    // override Pkm ID
+    string? Hash = null,    // override Pkm hash, useful with disabled Pkm
     string? Filepath = null,    // override Pkm filepath, useful with disabled Pkm
     bool Updated = true,
     bool CheckPkm = true    // check if Pkm is disabled
@@ -343,13 +344,16 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
         var evolves = await staticDataService.GetStaticEvolves();
 
         var id = payload.Id
+            ?? Guid.NewGuid().ToString();
+        var hash = payload.Hash
             ?? payload.Pkm.GetPKMIdBase(evolves);
         var filepath = payload.Filepath
-            ?? pkmFileLoader.GetPKMFilepath(payload.Pkm, evolves);
+            ?? pkmFileLoader.GetPKMFilepath(payload.Pkm, id);
 
         return new PkmVariantEntity()
         {
             Id = id,
+            Hash = hash,
             BoxId = box.Id,
             BoxSlot = payload.BoxSlot,
             IsMain = payload.IsMain,
@@ -387,10 +391,10 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     {
         if (pkm.IsEnabled)
         {
-            var evolves = await staticDataService.GetStaticEvolves();
-            var filepath = pkmFileLoader.GetPKMFilepath(pkm, evolves);
+            var filepath = pkmFileLoader.GetPKMFilepath(pkm, entity.Id);
+            var oldFormatFilepath = pkmFileLoader.GetPKMFilepath(pkm, entity.Hash);
 
-            if (filepath != entity.Filepath || entity.PkmFile == null)
+            if ((filepath != entity.Filepath && oldFormatFilepath != entity.Filepath) || entity.PkmFile == null)
             {
                 entity.Filepath = filepath;
                 entity.PkmFile = await pkmFileLoader.PrepareEntity(pkm, entity.Filepath);

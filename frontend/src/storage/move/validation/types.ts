@@ -27,7 +27,6 @@ export type DropRefusalReason =
     | 'save-egg-to-main'
     | 'save-shadow-to-main'
     | 'save-cannot-move-main-to-main'
-    | 'save-to-main-variant-already-exist'
     | 'pkm-cannot-move'
     | 'main-to-same-bank'
     | 'same-pkm-id'

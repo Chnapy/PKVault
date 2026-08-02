@@ -1,10 +1,11 @@
 using PKHeX.Core;
 
-public class PkmVariantEntity : IEntity
+public class PkmVariantEntity: IEntity
 {
     public static PkmVariantEntity CreateFrom(PkmVariantEntity entity, string id) => new()
     {
         Id = id,
+        Hash = entity.Hash,
         BoxId = entity.BoxId,
         BoxSlot = entity.BoxSlot,
         IsMain = entity.IsMain,
@@ -23,6 +24,7 @@ public class PkmVariantEntity : IEntity
     };
 
     public override required string Id { get; init; }
+    public required string Hash { get; set; }
     public required string BoxId { get; set; }
     public required int BoxSlot { get; set; }
     public required bool IsMain { get; set; }

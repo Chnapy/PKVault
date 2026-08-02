@@ -282,7 +282,6 @@
   "storage.move.pkm-cannot-attached-already": "Pokémon {{name}} cannot be moved, he's already attached !",
   "storage.move.pkm-cannot-create-variant": "Pokémon {{name}} should target empty slot",
   "storage.move.save-egg": "Eggs cannot be moved outside save",
-  "storage.move.save-main-duplicate": "Pokémon {{name}} cannot be moved to main storage, a duplicate already exists",
   "storage.move.save-same-gen": "Move should target saves with same generation ({{generation}})",
   "storage.move.save-shadow": "Shadow pokémon cannot be moved outside save",
   "storage.save-actions.actions.controls-label-details": "See all actions",

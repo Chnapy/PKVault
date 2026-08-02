@@ -149,10 +149,11 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var evolves = await GenStaticEvolves.LoadData();
 
         var idBase = pkm.GetPKMIdBase(evolves);
-        var filepath = $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3";
+        var filepath = $"mock-storage/3/0025 - PIKACHU - {result.Id}.pk3";
         var expectedEntity = new PkmVariantEntity()
         {
-            Id = idBase,
+            Id = result.Id,
+            Hash = idBase,
             Context = EntityContext.Gen3,
             Generation = 3,
             Filepath = filepath,
@@ -185,7 +186,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         Assert.Equivalent(
             expectedEntity,
-            await loader.GetEntity(idBase)
+            await loader.GetEntity(result.Id)
         );
     }
 
@@ -237,6 +238,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             .AddAsync(new()
             {
                 Id = idBase,
+                Hash = idBase,
                 Context = EntityContext.Gen3,
                 Generation = 3,
                 Filepath = filepath,
@@ -353,6 +355,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase1,
+                    Hash = idBase1,
                     Context = EntityContext.Gen3,
                     Generation = 3,
                     Filepath = filepath1,
@@ -374,6 +377,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase2,
+                    Hash = idBase2,
                 Context = EntityContext.Gen4,
                     Generation = 4,
                     Filepath = filepath2,
@@ -395,6 +399,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase3,
+                    Hash = idBase3,
                     Context = EntityContext.Gen5,
                     Generation = 5,
                     Filepath = filepath3,
@@ -502,6 +507,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase1,
+                    Hash = idBase1,
                     Context = EntityContext.Gen3,
                     Generation = 3,
                     Filepath = filepath1,
@@ -523,6 +529,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase2,
+                    Hash = idBase2,
                     Context = EntityContext.Gen4,
                     Generation = 4,
                     Filepath = filepath2,
@@ -580,6 +587,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var entity = new PkmVariantEntity()
         {
             Id = idBase,
+            Hash = idBase,
             Context = EntityContext.Gen3,
             Generation = 3,
             Filepath = filepath,
@@ -637,6 +645,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var entity = new PkmVariantEntity()
         {
             Id = idBase,
+            Hash = idBase,
             Context = EntityContext.Gen3,
             Generation = 3,
             Filepath = filepath,
@@ -685,6 +694,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         var entity = new PkmVariantEntity()
         {
             Id = idBase,
+            Hash = idBase,
             Context = EntityContext.Gen3,
             Generation = 3,
             Filepath = filepath,
@@ -809,6 +819,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase1,
+                    Hash = idBase1,
                     Context = EntityContext.Gen3,
                     Generation = 3,
                     Filepath = filepath1,
@@ -830,6 +841,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase2,
+                    Hash = idBase2,
                     Context = EntityContext.Gen4,
                     Generation = 4,
                     Filepath = filepath2,
@@ -851,6 +863,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
                 new()
                 {
                     Id = idBase3,
+                    Hash = idBase3,
                     Context = EntityContext.Gen5,
                     Generation = 5,
                     Filepath = filepath3,
@@ -943,7 +956,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         var pkm = CreateTestPkm(species: 25, generation: 3);
 
-        await loader.AddEntity(new(
+        var variant = await loader.AddEntity(new(
             Box: new(
                 Id: "1",
                 Name: "Box 1",
@@ -964,10 +977,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var evolves = await GenStaticEvolves.LoadData();
-
-        var idBase = pkm.GetPKMIdBase(evolves);
-        var filepath = Path.Combine(PathUtils.GetExpectedAppDirectory(), $"mock-storage/3/0025 - PIKACHU - {idBase}.pk3");
+        var filepath = Path.Combine(PathUtils.GetExpectedAppDirectory(), $"mock-storage/3/0025 - PIKACHU - {variant.Id}.pk3");
 
         Assert.False(mockFileSystem.FileExists(filepath));
 

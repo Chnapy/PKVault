@@ -8,6 +8,8 @@ public class MainCreatePkmVariantActionInput(string pkmVariantId, EntityContext 
     // required to keep same generated PKM between memory => file loaders
     // because PID, stats etc are randomly generated
     public ImmutablePKM? CreatedPKM = null;
+    // same as CreatedPKM for GUID
+    public string? CreatedID = null;
 }
 
 public class MainCreatePkmVariantAction(
@@ -48,7 +50,8 @@ public class MainCreatePkmVariantAction(
 
         var box = await boxLoader.GetDto(pkmVariantOrigin.BoxId);
 
-        await pkmVariantLoader.AddEntity(new(
+        var variant = await pkmVariantLoader.AddEntity(new(
+            Id: input.CreatedID,
             Box: box,
             BoxSlot: pkmVariantOrigin.BoxSlot,
             IsMain: false,
@@ -59,6 +62,7 @@ public class MainCreatePkmVariantAction(
             Generation: input.Context.Generation,
             Pkm: pkmConverted
         ));
+        input.CreatedID = variant.Id;
 
         return new(
             type: DataActionType.MAIN_CREATE_PKM_VERSION,

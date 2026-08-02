@@ -66,9 +66,6 @@ export const getHelpText = (reason: DropRefusalReason, info: SlotInfos | undefin
             : t('storage.move.pkm-cannot', {
                 name: sourcePkm?.nickname,
             });
-        case 'save-to-main-variant-already-exist': return t('storage.move.save-main-duplicate', {
-            name: sourcePkm?.nickname,
-        });
         case 'main-to-same-bank': return undefined;
         case 'same-pkm-id': return undefined;
         case 'bank-external': return t('storage.move.bank-external');
