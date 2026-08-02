@@ -120,13 +120,11 @@ export const usePokedexItems = (): PokedexItems => {
                 const formValue = Math.min(oldGroup?.form ?? 99, form.form);
 
                 const getContext = (): EntityContext => {
-                    const forms = staticData.species[species]?.forms ?? {};
-
                     const initialContext = Math.max(oldGroup?.context ?? -1, form.context) as EntityContext;
-                    if (forms[initialContext]?.[formValue])
+                    if (staticForms[initialContext]?.[formValue])
                         return initialContext;
 
-                    return (Object.keys(forms).reverse().find(val => forms[val]?.[formValue]) ?? initialContext) as EntityContext;
+                    return (Object.keys(staticForms).reverse().find(val => staticForms[val]?.[formValue]) ?? initialContext) as EntityContext;
                 };
 
                 const group: SpeciesFormItem = {

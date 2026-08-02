@@ -217,12 +217,12 @@ public class GenStaticSpecies(
                         pkm.RefreshChecksum();
                     });
 
-                    var legality = LegalityAnalysisService.GetLegalitySafeRaw(pkm);
-                    var battleOnly = legality.Results.Any(result =>
-                        result.Identifier == CheckIdentifier.Form
-                        && result.Result == LegalityCheckResultCode.FormBattle
-                        && !result.Valid
-                    );
+                    var battleOnly = formObj.IsMega
+                        || LegalityAnalysisService.GetLegalitySafeRaw(pkm).Results.Any(result =>
+                            result.Identifier == CheckIdentifier.Form
+                            && result.Result == LegalityCheckResultCode.FormBattle
+                            && !result.Valid
+                        );
 
                     return new StaticSpeciesForm(
                         Id: formObj.Id,

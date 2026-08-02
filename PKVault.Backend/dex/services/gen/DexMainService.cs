@@ -54,7 +54,8 @@ public class DexMainService(
                         isOwnedShiny,
                         isOwnedAlpha,
                         form.Form,
-                        form.Gender
+                        form.Gender,
+                        staticSpecies
                     );
 
                     return dexLoader.CreateDTO(form, commonForm);

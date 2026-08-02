@@ -70,7 +70,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         // var formList = FormConverter.GetFormList(species, strings.types, strings.forms, GameInfo.GenderSymbolUnicode, save.Context);
 
         var speciesData = staticSpecies[species];
-        var staticForms = speciesData.Forms[save.Generation];
+        var staticForms = speciesData.Forms[(byte)save.Context];
 
         for (byte form = 0; form < staticForms.Length; form++)
         {
@@ -111,7 +111,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
                 var isOwnedShiny = ownedPkms.Any(pkm => pkm.IsShiny);
                 var isOwnedAlpha = ownedPkms.Any(pkm => pkm.IsAlpha);
 
-                var itemForm = GetDexItemFormComplete(species, isOwned, isOwnedShiny, isOwnedAlpha, form, gender);
+                var itemForm = GetDexItemFormComplete(species, isOwned, isOwnedShiny, isOwnedAlpha, form, gender, staticSpecies);
                 forms.Add(itemForm);
             });
         }
@@ -185,9 +185,22 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         ];
     }
 
-    public DexItemForm GetDexItemFormComplete(ushort species, bool isOwned, bool isOwnedShiny, bool isOwnedAlpha, byte form, Gender gender)
+    public DexItemForm GetDexItemFormComplete(ushort species, bool isOwned, bool isOwnedShiny, bool isOwnedAlpha, byte form, Gender gender, StaticSpeciesData staticSpecies)
     {
         var value = GetDexItemForm(species, isOwned, isOwnedShiny, form, gender);
+
+        var speciesData = staticSpecies[species];
+        var staticForms = speciesData.Forms[(byte)save.Context];
+        var isBattleOnly = staticForms[form]?.IsBattleOnly ?? false;
+
+        if (isBattleOnly)
+            value = value with
+            {
+                IsCaught = false,
+                IsOwned = false,
+                IsOwnedShiny = false,
+                IsSeenAlpha = false,
+            };
 
         return value with
         {
