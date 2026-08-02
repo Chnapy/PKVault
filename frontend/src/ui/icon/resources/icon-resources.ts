@@ -29,6 +29,7 @@ import water from '../../../assets/type_icons/water.png';
 import pokerusCured from '../../../assets/misc_icons/cured.png';
 import pokerusInfected from '../../../assets/misc_icons/infected.png';
 import teraMask from '../../../assets/misc_icons/tera_mask.svg';
+import mega from '../../../assets/misc_icons/mega.svg';
 
 /**
  * Centralize icon img imports.
@@ -69,5 +70,6 @@ export const iconResources = {
         pokerusInfected,
         pokerusCured,
         teraMask,
+        mega,
     }
 } satisfies Record<string, Record<string, string>>;

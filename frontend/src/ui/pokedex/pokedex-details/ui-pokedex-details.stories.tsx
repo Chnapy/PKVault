@@ -125,7 +125,6 @@ export const Primary: Story = {
         main: <UIPokedexDetailsMain
             species={68}
             speciesName={'Machamp'}
-            form='Alola'
             gender={Gender.Male}
             isShiny
             isAlpha

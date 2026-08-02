@@ -2,6 +2,7 @@ import { ThemeIcon, type ThemeIconProps } from '@mantine/core';
 import { CopyIcon, EyeIcon, FolderIcon, LinkIcon, SparklesIcon, TriangleAlertIcon } from 'lucide-react';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
 import { UIBallIcon } from '../../icon/ui-ball-icon';
+import { UIMegaIcon } from '../../icon/ui-mega-icon';
 import { UIShinyIcon } from '../../icon/ui-shiny-icon';
 
 export const UIPokedexIcons = {
@@ -21,6 +22,9 @@ export const UIPokedexIcons = {
     </ThemeIcon>,
     Alpha: ({ children, ...rest }: ThemeIconProps) => <ThemeIcon component='span' variant='transparent' {...rest}>
         {children ?? <UIAlphaIcon />}
+    </ThemeIcon>,
+    Mega: ({ children, ...rest }: ThemeIconProps) => <ThemeIcon component='span' variant='transparent' {...rest}>
+        {children ?? <UIMegaIcon size='big' />}
     </ThemeIcon>,
     Warn: ({ children, ...rest }: ThemeIconProps) => <ThemeIcon component='span' variant='transparent' color='yellow' {...rest}>
         <TriangleAlertIcon />

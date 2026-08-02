@@ -21,7 +21,8 @@ public record StaticSpeciesForm(
     string? SpriteShinyFemale,
     string? SpriteShadow,
     bool HasGenderDifferences,
-    bool IsBattleOnly
+    bool IsBattleOnly,
+    bool IsMega
 );
 
 public class GenStaticSpecies(
@@ -216,12 +217,12 @@ public class GenStaticSpecies(
                         pkm.RefreshChecksum();
                     });
 
-                    var legality = LegalityAnalysisService.GetLegalitySafeRaw(pkm);
-                    var battleOnly = legality.Results.Any(result =>
-                        result.Identifier == CheckIdentifier.Form
-                        && result.Result == LegalityCheckResultCode.FormBattle
-                        && !result.Valid
-                    );
+                    var battleOnly = formObj.IsMega
+                        || LegalityAnalysisService.GetLegalitySafeRaw(pkm).Results.Any(result =>
+                            result.Identifier == CheckIdentifier.Form
+                            && result.Result == LegalityCheckResultCode.FormBattle
+                            && !result.Valid
+                        );
 
                     return new StaticSpeciesForm(
                         Id: formObj.Id,
@@ -234,7 +235,8 @@ public class GenStaticSpecies(
                             ? GetLugiaShadowSprite()
                             : null,
                         HasGenderDifferences: hasGenderDifferences,
-                        IsBattleOnly: battleOnly
+                        IsBattleOnly: battleOnly,
+                        IsMega: formObj.IsMega
                     );
                 }
 

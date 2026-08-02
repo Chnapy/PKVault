@@ -117,12 +117,22 @@ export const usePokedexItems = (): PokedexItems => {
 
                 const oldGroup = acc[ key ];
 
+                const formValue = Math.min(oldGroup?.form ?? 99, form.form);
+
+                const getContext = (): EntityContext => {
+                    const initialContext = Math.max(oldGroup?.context ?? -1, form.context) as EntityContext;
+                    if (staticForms[initialContext]?.[formValue])
+                        return initialContext;
+
+                    return (Object.keys(staticForms).reverse().find(val => staticForms[val]?.[formValue]) ?? initialContext) as EntityContext;
+                };
+
                 const group: SpeciesFormItem = {
                     ...oldGroup,
                     id: key,
-                    context: Math.max(oldGroup?.context ?? -1, form.context) as EntityContext,
+                    context: getContext(),
                     species,
-                    form: Math.min(oldGroup?.form ?? 99, form.form),
+                    form: formValue,
                     genders: [ ...new Set([ form.gender, ...oldGroup?.genders ?? [] ]) ].sort(),
                     isSeen: oldGroup?.isSeen || form.isSeen,
                     isSeenShiny: oldGroup?.isSeenShiny || form.isSeenShiny,
