@@ -59,6 +59,8 @@ export const PokedexDetails: React.FC = () => {
 
   const speciesName = staticFormsFiltered[ 0 ]?.name ?? '';
 
+  const isMega = !!staticData.species[ selectedSpecies ]?.forms[ selectedSave.context ]?.[ selectedStaticFormWithIndex.index ]?.isMega;
+
   const baseStats = selectedForm.baseStats;
   const totalBaseStats = baseStats.reduce((acc, stat) => acc + stat, 0);
 
@@ -147,12 +149,10 @@ export const PokedexDetails: React.FC = () => {
     main={<UIPokedexDetailsMain
       species={selectedSpecies}
       speciesName={speciesName}
-      form={selectedStaticFormWithIndex.name.toLowerCase() === speciesName.toLowerCase()
-        ? undefined
-        : selectedStaticFormWithIndex.name}
       gender={selectedForm.gender}
       isShiny={selectedForm.isSeenShiny}
       isAlpha={selectedForm.isSeenAlpha}
+      isMega={isMega}
       isSeen={selectedForm.isSeen}
       isCaught={selectedForm.isCaught}
       isOwned={selectedForm.isOwned}

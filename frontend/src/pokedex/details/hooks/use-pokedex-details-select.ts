@@ -64,8 +64,7 @@ export const usePokedexDetailsSelect = () => {
 
     const staticForms = selectedSpecies && selectedSave ? staticData.species[ selectedSpecies ]?.forms[ selectedSave.context ] ?? [] : [];
     const staticFormsFiltered = staticForms
-        .map((staticForm, index) => ({ ...staticForm, index }))
-        .filter(staticForm => !staticForm.isBattleOnly);
+        .map((staticForm, index) => ({ ...staticForm, index }));
 
     const getFormWeight = (f: DexItemForm) =>
         (f.isOwned ? 100000 : 0)

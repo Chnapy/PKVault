@@ -11,6 +11,7 @@ type UIPokedexFormItemProps = {
   isCaught?: boolean;
   isOwned?: boolean;
   isOwnedShiny?: boolean;
+  isMega?: boolean;
   children: React.ReactNode;
 };
 
@@ -21,6 +22,7 @@ export const UIPokedexFormItem: React.FC<UIPokedexFormItemProps> = ({
   isCaught,
   isOwned,
   isOwnedShiny,
+  isMega,
   children
 }) => {
 
@@ -41,6 +43,8 @@ export const UIPokedexFormItem: React.FC<UIPokedexFormItemProps> = ({
       {isCaught && <UIPokedexIcons.Caught size='xs' />}
     </Group>
     <Stack pos='absolute' bottom={0} right={0} align='flex-end' gap='sm' p='sm'>
+      {isMega && <UIPokedexIcons.Mega size='xs' />}
+
       {isSeenAlpha && <UIPokedexIcons.Alpha size='xs' />}
 
       {isOwnedShiny && <UIPokedexIcons.Shiny size='xs' />}

@@ -21,7 +21,8 @@ public record StaticSpeciesForm(
     string? SpriteShinyFemale,
     string? SpriteShadow,
     bool HasGenderDifferences,
-    bool IsBattleOnly
+    bool IsBattleOnly,
+    bool IsMega
 );
 
 public class GenStaticSpecies(
@@ -234,7 +235,8 @@ public class GenStaticSpecies(
                             ? GetLugiaShadowSprite()
                             : null,
                         HasGenderDifferences: hasGenderDifferences,
-                        IsBattleOnly: battleOnly
+                        IsBattleOnly: battleOnly,
+                        IsMega: formObj.IsMega
                     );
                 }
 
