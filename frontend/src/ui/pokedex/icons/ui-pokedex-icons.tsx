@@ -3,6 +3,7 @@ import { CopyIcon, EyeIcon, FolderIcon, LinkIcon, SparklesIcon, TriangleAlertIco
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
 import { UIBallIcon } from '../../icon/ui-ball-icon';
 import { UIMegaIcon } from '../../icon/ui-mega-icon';
+import { UINIcon } from '../../icon/ui-n-icon';
 import { UIShinyIcon } from '../../icon/ui-shiny-icon';
 
 export const UIPokedexIcons = {
@@ -25,6 +26,9 @@ export const UIPokedexIcons = {
     </ThemeIcon>,
     Mega: ({ children, ...rest }: ThemeIconProps) => <ThemeIcon component='span' variant='transparent' {...rest}>
         {children ?? <UIMegaIcon size='big' />}
+    </ThemeIcon>,
+    N: ({ children, ...rest }: ThemeIconProps) => <ThemeIcon component='span' variant='transparent' {...rest}>
+        {children ?? <UINIcon />}
     </ThemeIcon>,
     Warn: ({ children, ...rest }: ThemeIconProps) => <ThemeIcon component='span' variant='transparent' color='yellow' {...rest}>
         <TriangleAlertIcon />

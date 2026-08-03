@@ -32,6 +32,7 @@ public abstract record PkmBaseDTO(
     public bool IsShiny => Pkm.IsShiny;
     public bool IsAlpha => Pkm.IsAlpha;
     public bool IsNoble => Pkm.IsNoble;
+    public bool NSparkle => Pkm.NSparkle;
     public bool CanGigantamax => Pkm.CanGigantamax;
 
     public int Ball => StaticDataService.GetBallPokeApiId((Ball)Pkm.Ball);

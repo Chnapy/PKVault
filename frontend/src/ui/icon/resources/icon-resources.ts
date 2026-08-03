@@ -30,6 +30,7 @@ import pokerusCured from '../../../assets/misc_icons/cured.png';
 import pokerusInfected from '../../../assets/misc_icons/infected.png';
 import teraMask from '../../../assets/misc_icons/tera_mask.svg';
 import mega from '../../../assets/misc_icons/mega.svg';
+import n from '../../../assets/misc_icons/n.png';
 
 /**
  * Centralize icon img imports.
@@ -71,5 +72,6 @@ export const iconResources = {
         pokerusCured,
         teraMask,
         mega,
+        n,
     }
 } satisfies Record<string, Record<string, string>>;
