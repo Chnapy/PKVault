@@ -1,6 +1,9 @@
 using PKHeX.Core;
 
-public record MovePkmBankActionInput(string[] pkmIds, uint? sourceSaveId, string bankId, bool attached);
+public record MovePkmBankActionInput(string[] pkmIds, uint? sourceSaveId, string bankId, bool attached)
+{
+    public Dictionary<string, string> CreatedVariantIds = [];
+};
 
 public class MovePkmBankAction(
     IServiceProvider sp,
@@ -151,13 +154,6 @@ public class MovePkmBankAction(
             }
         }
 
-        var pkmVariant = await pkmVariantLoader.GetEntity(savePkm.IdBase);
-
-        if (pkmVariant != null && pkmVariant.AttachedSaveId != input.sourceSaveId)
-        {
-            throw new ArgumentException($"Pkm with same ID already exists, id={savePkm.IdBase}");
-        }
-
         var existingSlots = await pkmVariantLoader.GetEntitiesByBox(targetBox.Id, targetBoxSlot);
         if (existingSlots.Count > 0)
         {
@@ -202,7 +198,10 @@ public class MovePkmBankAction(
         var mainPkmAlreadyExists = pkmVariantEntity != null;
 
         // create pkm-version
+        var inputKey = $"{targetBox}.{targetBoxSlot}";
+        input.CreatedVariantIds.TryGetValue(inputKey, out var createdVariantId);
         pkmVariantEntity ??= await pkmVariantLoader.AddEntity(new(
+            Id: createdVariantId,
             Box: targetBox,
             BoxSlot: targetBoxSlot,
             IsMain: true,
@@ -213,6 +212,7 @@ public class MovePkmBankAction(
             Generation: savePkm.Generation,
             Pkm: savePkm.Pkm
         ));
+        input.CreatedVariantIds[inputKey] = pkmVariantEntity.Id;
 
         // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmVariantEntity.AttachedSaveId != null)

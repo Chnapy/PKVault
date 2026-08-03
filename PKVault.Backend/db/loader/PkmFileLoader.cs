@@ -10,16 +10,15 @@ public interface IPkmFileLoader
     public Task WriteToFiles();
     public ImmutablePKM CreatePKM(PkmFileEntity entity, EntityContext context);
     public byte[] GetPKMBytes(ImmutablePKM pkm);
-    public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves);
+    public string GetPKMFilepath(ImmutablePKM pkm, string id);
 }
 
 public class PkmFileLoader : IPkmFileLoader
 {
-    private static string GetPKMFilename(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves)
+    private static string GetPKMFilename(ImmutablePKM pkm, string id)
     {
         var star = pkm.IsShiny ? " ★" : string.Empty;
         var speciesName = GameInfo.Strings.Species[pkm.Species].ToUpperInvariant().Replace(":", "");
-        var id = pkm.GetPKMIdBase(evolves);
         return $"{pkm.Species:0000}{star} - {speciesName} - {id}.{pkm.Extension}";
     }
 
@@ -253,7 +252,7 @@ public class PkmFileLoader : IPkmFileLoader
         _ => PKMLoadError.UNKNOWN
     };
 
-    public string GetPKMFilepath(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves)
+    public string GetPKMFilepath(ImmutablePKM pkm, string id)
     {
         if (!pkm.IsEnabled)
         {
@@ -265,7 +264,7 @@ public class PkmFileLoader : IPkmFileLoader
         return MatcherUtil.NormalizePath(Path.Combine(
             storagePath,
             generationName,
-            GetPKMFilename(pkm, evolves)
+            GetPKMFilename(pkm, id)
         ));
     }
 

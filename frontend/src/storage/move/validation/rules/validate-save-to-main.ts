@@ -25,7 +25,6 @@ export type ValidateSaveToMainBank = ValidateRootSlot
 export const validateSaveToMain = (
   slotInfos: ValidateSaveToMainSlot | ValidateSaveToMainBank,
   attached: boolean,
-  existingVariant: PkmVariantDTO | undefined,
 ): DropValidationResult => {
   if (slotInfos.sourcePkm.isEgg) {
     return { canDrop: false, reason: 'save-egg-to-main', slotInfos };
@@ -39,14 +38,6 @@ export const validateSaveToMain = (
     return {
       canDrop: false,
       reason: 'save-cannot-move-main-to-main',
-      slotInfos,
-    };
-  }
-
-  if (existingVariant && existingVariant.attachedSaveId !== slotInfos.sourcePkm.saveId) {
-    return {
-      canDrop: false,
-      reason: 'save-to-main-variant-already-exist',
       slotInfos,
     };
   }

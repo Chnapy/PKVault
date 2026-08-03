@@ -282,7 +282,6 @@
   "storage.move.pkm-cannot-attached-already": "Le pokémon {{name}} ne peut pas être déplacé rattaché, il est déjà attaché !",
   "storage.move.pkm-cannot-create-variant": "Le pokémon {{name}} doit cibler un emplacement vide",
   "storage.move.save-egg": "Les oeufs ne peuvent pas être déplacé à l'exterieur d'une sauvegarde",
-  "storage.move.save-main-duplicate": "Le pokémon {{name}} ne peut pas être déplacé vers le stockage principal, une copie y est déjà présente",
   "storage.move.save-same-gen": "Le déplacement doit cibler des sauvegardes de même génération ({{generation}})",
   "storage.move.save-shadow": "Les pokémon obscurs ne peuvent pas être déplacé à l'exterieur d'une sauvegarde",
   "storage.save-actions.actions.controls-label-details": "Voir toutes les actions",

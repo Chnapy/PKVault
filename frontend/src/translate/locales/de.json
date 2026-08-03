@@ -282,7 +282,6 @@
   "storage.move.pkm-cannot-attached-already": "Pokemon {{name}} kann nicht verschoben werden, es ist bereits verknüpft!",
   "storage.move.pkm-cannot-create-variant": "Pokemon {{name}} benötigt einen freien Slot",
   "storage.move.save-egg": "Eier können nicht aus dem Spielstand verschoben werden",
-  "storage.move.save-main-duplicate": "Pokemon {{name}} kann nicht ins Hauptlager verschoben werden, da bereits eine Kopie existiert",
   "storage.move.save-same-gen": "Verschieben nur zwischen Spielständen derselben Generation ({{generation}})",
   "storage.move.save-shadow": "Crypto-Pokemon können nicht aus dem Spielstand verschoben werden",
   "storage.save-actions.actions.controls-label-details": "Alle Aktionen anzeigen",

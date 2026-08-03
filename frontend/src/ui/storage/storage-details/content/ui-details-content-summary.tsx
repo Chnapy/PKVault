@@ -1,4 +1,4 @@
-import { Grid } from '@mantine/core';
+import { Box, Grid } from '@mantine/core';
 import type React from 'react';
 import { UISpriteSizeWrapper } from '../../../sprite-img/ui-sprite-size-wrapper';
 import { useTranslate } from '../../../../translate/i18n';
@@ -64,7 +64,13 @@ export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = (
             {t('details.id')}
         </Grid.Col>
         <Grid.Col span={8}>
-            {id}
+            <Box style={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+            }}>
+                {id}
+            </Box>
         </Grid.Col>
     </Grid>;
 };

@@ -190,34 +190,6 @@ describe('use-move-droppable-bank', () => {
         expect(result.current.dragMoveAttached.startDragByClick).toBeUndefined();
     });
 
-    test('should not be droppable to main if variant with same ID already exists', async () => {
-        const { result, waitForQueries } = await renderDroppable({
-            source: {
-                container: {
-                    type: 'save-item',
-                    saveId: 123,
-                    boxId: '1',
-                },
-                ids: [ 'existID' ],
-            },
-            target: {
-                container: {
-                    type: 'bank',
-                    bankId: '1',
-                },
-                slot: -1,
-            },
-        });
-
-        result.current.dragMove.startDragByClick!();
-
-        await waitForQueries();
-
-        expect(result.current.onClick).toBeUndefined();
-        expect(result.current.onPointerUp).toBeUndefined();
-        expect(result.current._disabledReason).toBe<DropRefusalReason>('save-to-main-variant-already-exist');
-    });
-
     test('should be droppable', async () => {
         const { result, waitForQueries } = await renderDroppable({
             source: {

@@ -6,6 +6,8 @@ public record UpdateExternalPkmActionInput(
 )
 {
     public bool ShouldRun => ExternalPkmsToAdd.Length > 0 || ExternalPkmsToRemove.Length > 0;
+
+    public Dictionary<string, string> CreatedVariantIds = [];
 }
 
 public record UpdateExternalPkmData(PkmFileEntity PkmFileEntity, ImmutablePKM Pkm);
@@ -62,7 +64,7 @@ public class UpdateExternalPkmAction(
                 try
                 {
                     return await PkmFileLoader.LoadPkmFile(
-                        fileIOService, 
+                        fileIOService,
                         new()
                         {
                             Filepath = filepath,
@@ -116,7 +118,7 @@ public class UpdateExternalPkmAction(
 
         await RemoveDisabledPkms(input.ExternalPkmsToRemove, flags);
 
-        await AddExternalPkms(input.ExternalPkmsToAdd, flags);
+        await AddExternalPkms(input.ExternalPkmsToAdd, flags, input);
 
         return new(
             DataActionType.UPDATE_EXTERNAL_PKM,
@@ -124,7 +126,7 @@ public class UpdateExternalPkmAction(
         );
     }
 
-    private async Task AddExternalPkms(UpdateExternalPkmData[] externalPkmsToAdd, DataUpdateFlags flags)
+    private async Task AddExternalPkms(UpdateExternalPkmData[] externalPkmsToAdd, DataUpdateFlags flags, UpdateExternalPkmActionInput input)
     {
         // log.LogInformation($"Update external pkms ({externalPkmsToAdd.Length})");
 
@@ -235,7 +237,11 @@ public class UpdateExternalPkmAction(
 
                 foreach (var boxPkm in boxPkmsToAdd)
                 {
+                    var inputKey = $"{boxDto.IdInt}.{boxSlot}";
+                    input.CreatedVariantIds.TryGetValue(inputKey, out var createdVariantId);
+                    var id = createdVariantId ?? Guid.NewGuid().ToString();
                     pkmVariantsToAdd.Add(new(
+                        Id: id,
                         Box: boxDto,
                         BoxSlot: boxSlot,
                         IsMain: true,
@@ -248,6 +254,7 @@ public class UpdateExternalPkmAction(
                         Filepath: boxPkm.PkmFileEntity.Filepath,
                         Updated: false
                     ));
+                    input.CreatedVariantIds[inputKey] = id;
 
                     boxSlot++;
                 }

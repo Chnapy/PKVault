@@ -848,34 +848,6 @@ describe('use-move-droppable', () => {
             expect(result.current.dragMoveAttached.enabled).toBeFalsy();
         });
 
-        test('should not be droppable to main if variant with same ID already exists', async () => {
-            const { result, waitForQueries } = await renderDroppable({
-                source: {
-                    container: {
-                        type: 'save-item',
-                        saveId: 123,
-                        boxId: '1',
-                    },
-                    ids: [ 'existID' ],
-                },
-                target: {
-                    container: {
-                        type: 'main-item',
-                        boxId: '0',
-                    },
-                    slot: 10,
-                },
-            });
-
-            result.current.dragMove.startDragByClick!();
-
-            await waitForQueries();
-
-            expect(result.current.onClick).toBeUndefined();
-            expect(result.current.onPointerUp).toBeUndefined();
-            expect(result.current._disabledReason).toBe<DropRefusalReason>('save-to-main-variant-already-exist');
-        });
-
         test('should not be droppable to main occupied by not movable pkm', async () => {
             const { result, waitForQueries } = await renderDroppable({
                 source: {
