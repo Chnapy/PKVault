@@ -5,14 +5,14 @@ A página de configurações e backups permite definir certos parâmetros globai
 Você pode indicar a localização dos seus arquivos de save, seja especificando diretamente os caminhos dos arquivos ou fornecendo os caminhos das pastas.
 Os arquivos de save serão lidos diretamente pelo PKVault, sem necessidade de copiá-los ou movê-los.
 
-Uma vez validada a sessão, as ações que afetam os saves modificam diretamente os arquivos correspondentes. Assim, a manipulação dos saves pode ser realizada sem a necessidade de mover seus arquivos.
+Uma vez validada a sessão, as ações que afetam os saves modificam diretamente os arquivos correspondentes. Assim, a manipulação dos saves pode ser realizada sem mover seus arquivos.
 
-A alteração do idioma afeta tanto a interface quanto o idioma utilizado para exibir dados estáticos dos Pokémon (nome da espécie, tipos, golpes, etc.).
+A alteração do idioma afeta tanto a interface quanto o idioma utilizado para exibir dados estáticos de Pokémon (nome da espécie, tipos, golpes, etc.).
 A alteração do idioma não afeta o idioma dos seus arquivos de save.
 
 Arquivos externos de Pokémon (`.pk3`, `.pa9`, etc.) podem ser utilizados a partir de fora do ambiente do PKVault.
 Você pode fornecer múltiplos caminhos de arquivos e pastas que os contenham.
-O PKVault fará a leitura desses arquivos a cada inicialização e criará variantes de Pokémon, bancos e caixas que reflitam a estrutura desses arquivos externos.
+O PKVault os lerá a cada inicialização e criará variantes de Pokémon, bancos e caixas que reflitam a estrutura desses arquivos externos.
 
 Parâmetros avançados: você pode alterar diversos caminhos utilizados por padrão, definidos em [Considerações Técnicas](./0-technical.md#files-manipulated).
 
@@ -27,4 +27,4 @@ Cada backup contém os seguintes dados:
 
 Os backups seguem o formato `.zip` e, portanto, podem ser abertos mesmo fora do PKVault.
 
-A partir do PKVault, cada backup pode ser restaurado, substituindo os arquivos atuais pelo conteúdo do backup. Um backup é criado antes da restauração.
+No PKVault, cada backup pode ser restaurado, substituindo os arquivos atuais pelo conteúdo do backup. Um backup é criado antes da restauração.

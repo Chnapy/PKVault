@@ -1,26 +1,23 @@
 # 3 - Armazenamento
 
-A página principal do PKVault gerencia o armazenamento no nível do PKVault e/ou os backups.
+A página principal do PKVault gerencia o armazenamento no nível do PKVault e/ou backups.
 
-Os Pokémon podem ser visualizados em detalhes, movidos ou modificados.
+Pokémons podem ser visualizados em detalhes, movidos ou modificados.
+Bancos e boxes também podem ser criados, modificados ou excluídos.
 
-Bancos e caixas também podem ser criados, modificados ou excluídos.
+## Bancos e boxes
 
-## Bancos e caixas
+Os bancos são exibidos no topo da página.
 
-Os bancos são exibidos na parte superior da página.
-
-Eles representam um contêiner para caixas, com finalidade de organização.
-
-Eles também permitem definir "visualizações", de modo que, ao selecionar diretamente um banco, um conjunto de caixas e saves seja exibido na tela.
+Eles representam um contêiner para as boxes, para fins de organização.
+Eles também permitem definir "visualizações", de modo que selecionar o banco exibe diretamente um conjunto de boxes e saves na tela.
 
 O banco padrão é selecionado quando o aplicativo é iniciado.
 
-Os bancos podem ser dedicados a Pokémon externos. Esses bancos específicos não podem ser editados manualmente.
+Bancos podem ser dedicados a pokémons externos. Esses bancos específicos não podem ser editados manualmente.
+Eles são gerenciados pela estrutura de pastas e arquivos de pokémons externos.
 
-Eles são gerenciados pela estrutura de arquivos e pastas dos Pokémon externos.
-
-Possíveis ações relacionadas aos bancos:
+Ações possíveis relacionadas aos bancos:
 
 <details> 
 <summary>Criar um banco</summary>
@@ -32,173 +29,162 @@ Cria um novo banco vazio.
 <details> 
 <summary>Modificar um banco</summary>
 
-Modifica as propriedades de um banco: nome, padrão, ordem e visualização salva.
+Modifica as propriedades de um banco: nome, padrão, ordem, visualização salva.
 
 </details>
 
 <details> 
 <summary>Excluir um banco</summary>
 
-Exclui um banco e todas as suas caixas (e os Pokémon contidos nelas).
+Exclui um banco e todas as suas boxes (e seus pokémons).
 
 </details>
 
-As caixas são exibidas no nível de cada armazenamento (PKVault e saves).
+As boxes são exibidas no nível de cada armazenamento (PKVault e saves).
 
-Elas representam um contêiner para Pokémon, assim como nos jogos Pokémon.
+Elas representam um contêiner para os pokémons, como nos jogos Pokémon.
 
-Possíveis ações relacionadas às caixas:
-
-<details> 
-<summary>Criar uma caixa</summary>
-
-Cria uma nova caixa vazia vinculada ao banco selecionado.
-
-</details>
+Ações possíveis relacionadas às boxes:
 
 <details> 
-<summary>Modificar uma caixa</summary>
+<summary>Criar uma box</summary>
 
-Modifica as propriedades de uma caixa: nome, tipo, quantidade de espaços, ordem e banco vinculado.
-
-O tipo da caixa é apenas informativo.
+Cria uma nova box vazia vinculada ao banco selecionado.
 
 </details>
 
 <details> 
-<summary>Excluir uma caixa</summary>
+<summary>Modificar uma box</summary>
 
-Exclui a caixa e todos os Pokémon contidos nela.
+Modifica as propriedades de uma box: nome, tipo, quantidade de slots, ordem, banco vinculado.
+
+O tipo da box é apenas indicativo.
 
 </details>
 
-## Armazenamento do PKVault e variantes dos Pokémon
+<details> 
+<summary>Excluir uma box</summary>
 
-O armazenamento do PKVault (também chamado de armazenamento principal) guarda um conjunto de Pokémon.
+Exclui a box e todos os seus pokémons.
 
-Para permitir o uso de um Pokémon em uma geração diferente daquela em que ele foi originalmente obtido, é utilizado um sistema de variantes por geração.
+</details>
 
-Assim, cada Pokémon armazenado pode possuir várias variantes.
+## Armazenamento do PKVault e variantes de pokémons
 
-Por exemplo, um Pikachu da Geração 3 pode possuir uma variante da Geração 1 para ser utilizado em um save de Pokémon Blue.
+O armazenamento do PKVault (também chamado de armazenamento principal) armazena um conjunto de pokémons.
+
+Para poder usar um pokémon em uma geração diferente da qual ele veio, é utilizado um sistema de variantes por geração.
+
+Assim, cada pokémon no armazenamento pode ter múltiplas variantes.
+Por exemplo, um Pikachu da Geração 3 pode ter uma variante da Geração 1 para ser usada em um save de Pokémon Blue.
 
 Cada variante pode ser modificada ou excluída.
 
-Cada Pokémon pode possuir entre 1 e 9 variantes (uma para cada geração).
+Cada pokémon pode ter entre 1 e 9 variantes (uma para cada geração).
+As variantes compartilham a maior parte de suas características entre si, assim como as modificações aplicadas.
 
-As variantes compartilham a maior parte de suas características, assim como as alterações aplicadas.
+## Armazenamento de saves
 
-## Armazenamento dos saves
+Cada save pode ser selecionado para exibir seu armazenamento, incluindo: equipe, boxes, daycare, etc.
 
-Cada save pode ser selecionado e seu armazenamento pode ser exibido, incluindo: equipe, caixas, creche etc.
+Os pokémons exibidos podem ser movidos, modificados ou excluídos.
 
-Os Pokémon exibidos podem ser movidos, modificados ou excluídos.
+## Pokémons anexados
 
-## Pokémon vinculados
+É possível mover um pokémon de forma anexada (PKVault -> save, ou vice-versa).
+Assim, um clone anexado ao pokémon é criado no armazenamento de destino.
 
-É possível mover um Pokémon de maneira vinculada (PKVault -> save ou vice-versa).
+O objetivo por trás disso é sincronizar o pokémon com seu clone anexado. Alguns exemplos:
 
-Dessa forma, um clone vinculado ao Pokémon é criado no armazenamento de destino.
+- save->PKVault: o pokémon no save ganhou um nível => sincroniza com a variante anexada
+- PKVault->save: a variante evolui => sincroniza com o pokémon no save
 
-O objetivo é sincronizar o Pokémon com seu clone vinculado. Alguns exemplos:
+Esse sistema é útil com o uso de variantes: quando a sincronização ocorre, todas as variantes recebem as alterações.
 
-* save -> PKVault: o Pokémon do save ganhou um nível => sincroniza com a variante vinculada;
-* PKVault -> save: a variante evoluiu => sincroniza o Pokémon no save.
+Portanto, é possível usar o mesmo pokémon em múltiplos jogos e observar seu progresso através das gerações.
 
-Esse sistema é útil em conjunto com o uso de variantes: quando ocorre uma sincronização, todas as variantes recebem as alterações.
+Um pokémon pode estar anexado a apenas um único save por vez.
 
-Assim, é possível utilizar o mesmo Pokémon em vários jogos e acompanhar sua progressão através das gerações.
+## Pokémons externos
 
-Um Pokémon pode estar vinculado a apenas um save por vez.
-
-## Pokémon externos
-
-Arquivos externos de Pokémon (`.pk3`, `.pa9` etc.) podem ser utilizados fora do ambiente do PKVault.
+Arquivos de pokémons externos (`.pk3`, `.pa9`, etc.) podem ser usados a partir de fora do ambiente do PKVault.
 
 Essas variantes específicas não podem ser editadas ou excluídas pelo PKVault, e as ações disponíveis são bastante limitadas.
 
-## Ações sobre os Pokémon
+## Ações em pokémons
 
 <details> 
-<summary>Criar uma variante de Pokémon</summary>
+<summary>Criar uma variante de pokémon</summary>
 
-No armazenamento do PKVault, cria uma variante para um determinado Pokémon e geração.
+No armazenamento do PKVault, cria uma variante para um determinado pokémon e geração.
+As características do pokémon base são copiadas e convertidas para a geração de destino.
 
-As características do Pokémon base são utilizadas e convertidas para a geração de destino.
-
-A conversão do Pokémon criado pode ser imperfeita e, involuntariamente, criar um Pokémon ilegal.
-
-Se necessário, você pode abrir o Pokémon (seu arquivo PK) pelo PKHeX e corrigir diretamente os problemas de legalidade.
+A conversão do pokémon criado pode ser imperfeita e, involuntariamente, gerar um pokémon ilegal.
+Se necessário, você pode abrir o pokémon (seu arquivo PK) via PKHeX e corrigir problemas de legalidade diretamente.
 
 </details>
 
 <details> 
-<summary>Modificar um Pokémon</summary>
+<summary>Modificar um pokémon</summary>
 
-Modifica um Pokémon em um ou mais aspectos: apelido, golpes, EVs.
-
-Se for uma variante, as modificações serão propagadas para as outras variantes.
-
-</details>
-
-<details> 
-<summary>Excluir um Pokémon</summary>
-
-Exclui um Pokémon.
-
-Se ele for uma variante, apenas a variante selecionada será excluída.
+Modifica um pokémon em um ou mais aspectos: apelido, movimentos, EVs.
+Se for uma variante, as modificações são propagadas para as outras variantes.
 
 </details>
 
 <details> 
-<summary>Desvincular um Pokémon</summary>
+<summary>Excluir um pokémon</summary>
 
-Desvincula um Pokémon vinculado.
-
-Isso pode ser feito tanto para uma variante em relação ao Pokémon presente no save quanto no sentido inverso.
-
-</details>
-
-<details> 
-<summary>Evoluir um Pokémon</summary>
-
-Evolui um Pokémon.
-
-Isso só é possível com Pokémon que evoluem por troca.
-
-Caso seja necessário um item segurado, ele deverá estar presente.
+Exclui um pokémon.
+Se for uma variante, exclui apenas a variante alvo.
 
 </details>
 
 <details> 
-<summary>Mover um Pokémon</summary>
+<summary>Desanexar um pokémon</summary>
 
-Move um Pokémon, com várias possibilidades:
+Desanexa um pokémon que estava anexado.
+Seja ele uma variante vinculada ao pokémon em seu save, ou vice-versa.
 
-* dentro da caixa atual;
-* de uma caixa para outra;
-* do armazenamento do PKVault para um save;
-* de um save para o armazenamento do PKVault;
-* de um save para outro save.
+</details>
 
-Mover uma variante para um save pode criar uma variante da geração correta, caso seja necessário. Nesse caso, a movimentação será feita de maneira vinculada.
+<details> 
+<summary>Evoluir um pokémon</summary>
 
-A movimentação também pode ser feita de maneira vinculada; nesse caso, o Pokémon é efetivamente clonado (consulte [Pokémon vinculados](#pokemon-vinculados)).
+Evolui um pokémon.
+Possível apenas com pokémons que evoluem por troca.
+Se for necessário um item segurado, ele deve estar presente.
 
-Se o Pokémon não estiver vinculado, a movimentação pode ter como destino um espaço já ocupado. Nesse caso, os Pokémon trocarão de lugar.
+</details>
+
+<details> 
+<summary>Mover um pokémon</summary>
+
+Mova um pokémon, com diversos casos possíveis:
+
+- dentro da box atual
+- de uma box para outra
+- do armazenamento do PKVault para um save
+- de um save para o armazenamento do PKVault
+- de um save para outro save
+
+Mover uma variante para um save pode criar uma variante da geração correspondente, se necessário. Nesse caso, o movimento será feito de forma anexada.
+
+O movimento pode ser feito de forma anexada, caso em que o pokémon é efetivamente clonado (veja [Pokémons anexados](#pokémons-anexados)).
+
+Se o pokémon não estiver anexado, o movimento pode ter como alvo um slot já ocupado, fazendo com que os pokémons troquem de lugar.
 
 </details>
 
 Ações avançadas:
 
 <details> 
-<summary>Ordenar Pokémon</summary>
+<summary>Ordenar pokémons</summary>
 
-Organiza os Pokémon em uma ou mais caixas utilizando a Pokédex Nacional como referência.
+Ordena os pokémons em uma ou mais boxes, usando a Pokédex nacional como referência.
 
-É possível deixar espaços vazios para espécies ausentes.
-
-Se não houver espaço suficiente, a ação poderá criar novas caixas.
+Há a possibilidade de deixar espaços vazios para as espécies ausentes.
+Se não houver espaço suficiente, a ação pode criar novas boxes.
 
 </details>
 
@@ -206,13 +192,10 @@ Se não houver espaço suficiente, a ação poderá criar novas caixas.
 <summary>Sincronizar Pokédex</summary>
 
 Sincroniza a Pokédex de todos os armazenamentos selecionados.
-
-Os Pokémon vistos ou capturados são propagados entre todas as Pokédex, levando em consideração formas, gêneros e Pokémon shiny.
+Pokémons vistos ou capturados são propagados para todas as Pokédex, levando em consideração formas, gêneros e versões shiny.
 
 </details>
 
 ## Seleção múltipla
 
-É possível selecionar vários Pokémon para executar uma ação em grupo, como mover todos ou parte dos Pokémon de uma caixa para outra.
-
-A seleção pode ser facilitada mantendo a tecla Shift pressionada.
+Múltiplos pokémons podem ser selecionados para realizar uma ação em grupo, por exemplo, mover toda ou parte de uma box para outra box.

@@ -1,11 +1,9 @@
 # 4 - Pokédex
 
-A página da Pokédex centraliza a Pokédex de todos os saves, assim como a Pokédex do PKVault.
+A página da Pokédex centraliza as informações da Pokédex de todos os seus arquivos de salvamento, bem como da Pokédex do armazenamento (PKVault).
+A exibição leva em conta espécies, formas, gêneros e variações *shiny*.
 
-A exibição leva em consideração espécies, formas, gêneros e Pokémon shiny.
+Diversos filtros permitem obter informações consolidadas sobre seus arquivos de salvamento e o armazenamento.
+Você pode, por exemplo, exibir uma *living-dex* personalizada, uma *shiny-dex*, etc.
 
-Vários filtros permitem obter informações agregadas sobre seus saves e armazenamento.
-
-Por exemplo, você pode exibir uma living-dex personalizada, uma shiny-dex etc.
-
-A sincronização da Pokédex entre seus saves e o armazenamento é possível a partir da página de armazenamento (consulte [Ações sobre os Pokémon](./3-storage.md#acoes-sobre-os-pokemon)).
+É possível sincronizar a Pokédex entre seus arquivos de salvamento e o armazenamento a partir da página de armazenamento (veja [Ações em Pokémon](./3-storage.md#actions-on-pokémons)).

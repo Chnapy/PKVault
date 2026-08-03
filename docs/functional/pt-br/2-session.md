@@ -1,12 +1,10 @@
 # 2 - Sessão
 
-Todas as ações realizadas ficam limitadas à sessão atual.
+Todas as ações realizadas restringem-se à sessão atual.
 
 Nenhuma alteração é salva enquanto a sessão não for salva.
-Os saves e arquivos não são modificados.
+Os arquivos de salvamento e os arquivos originais não são modificados.
 
 As ações podem ser desfeitas antes de salvar.
 
-Depois que a sessão é salva, as ações realizadas são aplicadas aos arquivos (armazenamento e saves) e a sessão é recriada.
-
-Um backup é sempre criado antes disso, portanto, é sempre possível voltar ao estado anterior.
+Uma vez salva, as ações da sessão são aplicadas aos arquivos (armazenamento, arquivos de salvamento) e a sessão é então recriada. Um backup é sempre criado previamente, permitindo assim reverter as alterações a qualquer momento.
