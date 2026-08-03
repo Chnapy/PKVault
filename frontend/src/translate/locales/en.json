@@ -4,6 +4,7 @@
   "action.close": "Close",
   "action.confirm": "Confirm",
   "action.delete": "Delete",
+  "action.edit-not-possible": "Edit not possible with waiting storage actions, you should save them",
   "action.focus": "Focus",
   "action.navigate": "Navigate",
   "action.not-possible": "Action not possible with waiting storage actions",

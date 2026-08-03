@@ -1,4 +1,5 @@
-import { Accordion, Group, InputWrapper, Stack } from '@mantine/core';
+import { Accordion, Alert, Group, InputWrapper, Stack } from '@mantine/core';
+import { PenOffIcon } from 'lucide-react';
 import React from 'react';
 import { useTranslate } from '../../../translate/i18n';
 import { UIGlobsInputAdd, type UIGlobsInputAddProps } from './ui-globs-input-add';
@@ -27,6 +28,10 @@ export const UIGlobsInputList: React.FC<UIGlobsInputListProps> = ({
             label={labelList}
             description={t('settings.form.globs.help')}
         />
+
+        {disabled && <Alert variant='outline' color='blue' icon={<PenOffIcon />}>
+            {t('action.edit-not-possible')}
+        </Alert>}
 
         <Accordion variant='contained'>
             {children}

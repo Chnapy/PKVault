@@ -1,5 +1,5 @@
-import { Alert, Card, Center, Group, Stack } from '@mantine/core';
-import { CornerRightDownIcon, InfoIcon, SaveIcon } from 'lucide-react';
+import { Card, Center, Group, Stack } from '@mantine/core';
+import { SaveIcon } from 'lucide-react';
 import React from "react";
 import { FormProvider, useForm } from 'react-hook-form';
 import type { SettingsMutableDTO } from '../data/sdk/model';
@@ -105,7 +105,7 @@ export const SettingsPage: React.FC = withErrorCatcher('default', () => {
                 name='cancel'
                 controlLabel={t('action.cancel')}
                 onClick={() => form.reset(defaultValue)}
-                disabled={!settings.canUpdateSettings || !form.formState.isDirty}
+                disabled={!form.formState.isDirty}
               >
                 {t('action.cancel')}
               </UIButton>
@@ -118,16 +118,11 @@ export const SettingsPage: React.FC = withErrorCatcher('default', () => {
                 color='blue'
                 leftSection={<SaveIcon />}
                 loading={settingsMutation.isPending}
-                disabled={!settings.canUpdateSettings || !form.formState.isDirty}
+                disabled={!form.formState.isDirty}
               >
                 {t('action.submit')}
               </UIButton>
             </Group>
-            {!settings.canUpdateSettings && <Alert variant='outline' color='blue' icon={<InfoIcon />}>
-              <Group>
-                {t('action.not-possible')} <CornerRightDownIcon style={{ alignSelf: 'flex-end' }} />
-              </Group>
-            </Alert>}
           </Stack>
         </Card>
       </Center>}
