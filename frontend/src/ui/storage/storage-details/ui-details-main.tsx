@@ -22,6 +22,7 @@ export type UIDetailsMainProps = {
     isEnabled: boolean;
     isShiny?: boolean;
     isAlpha?: boolean;
+    isN?: boolean;
     types: React.ReactNode;
     markings: React.ReactNode;
     teraType?: React.ReactNode;
@@ -41,7 +42,7 @@ export type UIDetailsMainProps = {
 
 export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
     saveId,
-    ball, nickname, gender, isEnabled, isShiny, isAlpha,
+    ball, nickname, gender, isEnabled, isShiny, isAlpha, isN,
     species, speciesName, level, pokerusDays = 0, isPokerusCured,
     canEvolve, isDuplicate, warning,
     types, teraType, heldItem, markings, attachedBtn,
@@ -97,6 +98,9 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
 
                 {isAlpha && <UIAlphaIcon size='big' />}
                 {isShiny && <UIShinyIcon size='big' />}
+                {isN && <Tooltip label={t('details.n.description')}>
+                    <UIPokedexIcons.N />
+                </Tooltip>}
             </Group>
         </>}
 

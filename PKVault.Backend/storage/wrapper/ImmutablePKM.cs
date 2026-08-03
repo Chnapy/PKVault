@@ -206,6 +206,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public bool IsShadow => Pkm is IShadowCapture pkmShadow && pkmShadow.IsShadow;
     public bool IsAlpha => Pkm is IAlpha pka && pka.IsAlpha;
     public bool IsNoble => Pkm is INoble pkn && pkn.IsNoble;
+    public bool NSparkle => Pkm is PK5 pk5 && pk5.NSparkle;
     public bool CanGigantamax => Pkm is IGigantamaxReadOnly pkg && pkg.CanGigantamax;
     public List<byte> Types => DexGenService.GetTypes(Format, Pkm.PersonalInfo);
     public byte? TeraType => Pkm is ITeraTypeReadOnly pkmTera

@@ -52,7 +52,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
                     ),
                     mainVariant: mainVariant && pick(mainVariant, [
                         'id', 'species', 'nickname', 'level', 'boxId', 'boxSlot', 'contextVersion', 'context',
-                        'form', 'gender', 'isEgg', 'isAlpha', 'isShiny', 'isShadow', 'isExternal', 'heldItem',
+                        'form', 'gender', 'isEgg', 'isAlpha', 'isShiny', 'nSparkle', 'isShadow', 'isExternal', 'heldItem',
                     ]),
                     attachedVariant: attachedVariant && pick(attachedVariant, [ 'attachedSaveId', 'attachedSavePkmIdBase', 'dynamicChecksum' ]),
                     canEvolve,
@@ -93,7 +93,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
 
         const { mainVariant, variants, attachedVariant, hasDisabledVariant, canEvolve } = variantInfos;
 
-        const { id, species, nickname, level, boxSlot, contextVersion, context, form, gender, isEgg, isAlpha, isShiny, isShadow, isExternal, heldItem } = mainVariant;
+        const { id, species, nickname, level, boxSlot, contextVersion, context, form, gender, isEgg, isAlpha, isShiny, nSparkle, isShadow, isExternal, heldItem } = mainVariant;
 
         return <StorageItem
             id={id}
@@ -113,6 +113,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
             icons={<UIStorageItemIcons
                 isAlpha={isAlpha}
                 isShiny={isShiny}
+                isN={nSparkle}
                 isExternal={isExternal}
                 warning={pkmLegalityMap.some(value => !value.isValid)}
                 nbrVariants={variants.length}

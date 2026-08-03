@@ -40,7 +40,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
                 return pick(pkm, [
                     'id', 'idBase', 'saveId', 'context', 'species', 'nickname', 'level', 'boxId', 'boxSlot',
                     'dynamicChecksum', 'form', 'gender', 'contextVersion', 'heldItem',
-                    'isAlpha', 'isShiny', 'isEgg', 'isShadow', 'isStarter', 'isDuplicate', 'party',
+                    'isAlpha', 'isShiny', 'nSparkle', 'isEgg', 'isShadow', 'isStarter', 'isDuplicate', 'party',
                     'canEvolve',
                 ]);
             }, [ pkmId ])
@@ -79,7 +79,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
             return null;
         }
 
-        const { id, species, nickname, level, boxSlot, form, gender, contextVersion, isAlpha, isShiny, isEgg, isShadow, canEvolve } = savePkm;
+        const { id, species, nickname, level, boxSlot, form, gender, contextVersion, isAlpha, isShiny, nSparkle, isEgg, isShadow, canEvolve } = savePkm;
 
         return <StorageItem
             id={id}
@@ -117,6 +117,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
             icons={<UIStorageItemIcons
                 isAlpha={isAlpha}
                 isShiny={isShiny}
+                isN={nSparkle}
                 isStarter={savePkm.isStarter}
                 isDuplicate={savePkm.isDuplicate}
                 heldItem={savePkm.heldItem > 0 && <ItemImg
