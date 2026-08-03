@@ -24,6 +24,13 @@ export function UISpriteSizeWrapper<T extends ReactTag>({ component: Component, 
         ? 'auto'
         : undefined;
 
+    const getSizeNumberValue = (size: number): React.CSSProperties[ 'imageRendering' ] => {
+        if (size >= 1)
+            return irregularPixelRatioRendering;
+
+        return 'auto';
+    };
+
     return <Component
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         {...rest as any}
@@ -35,7 +42,7 @@ export function UISpriteSizeWrapper<T extends ReactTag>({ component: Component, 
                 lg: 2,
             }),
             '--sprite-species-rendering': typeof speciesSize === 'number'
-                ? (speciesSize.toString().includes('.') ? 'auto' : irregularPixelRatioRendering)
+                ? getSizeNumberValue(speciesSize)
                 : typeof speciesSize === 'string'
                     ? switchUtil(speciesSize, {
                         xs: 'auto',
@@ -51,7 +58,7 @@ export function UISpriteSizeWrapper<T extends ReactTag>({ component: Component, 
                 lg: 2,
             }),
             '--sprite-item-rendering': typeof itemSize === 'number'
-                ? (itemSize.toString().includes('.') ? 'auto' : irregularPixelRatioRendering)
+                ? getSizeNumberValue(itemSize)
                 : typeof itemSize === 'string'
                     ? switchIfEnum(itemSize, {
                         '1lh': 'auto',
