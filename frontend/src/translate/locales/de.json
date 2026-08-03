@@ -4,6 +4,7 @@
   "action.close": "Schließen",
   "action.confirm": "Bestätigen ?",
   "action.delete": "Löschen",
+  "action.edit-not-possible": "Eine Bearbeitung ist nicht möglich, solange ausstehende Aktionen vorhanden sind; Sie sollten diese speichern",
   "action.focus": "Fokus",
   "action.navigate": "Navigieren",
   "action.not-possible": "Aktion bei ausstehenden Aktionen nicht möglich",

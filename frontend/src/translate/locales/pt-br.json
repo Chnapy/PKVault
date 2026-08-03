@@ -4,6 +4,7 @@
   "action.close": "Fechar",
   "action.confirm": "Confirmar?",
   "action.delete": "Excluir",
+  "action.edit-not-possible": "Não é possível editar enquanto houver ações de armazenamento pendentes; você deve salvá-las",
   "action.focus": "Focar",
   "action.navigate": "Navegar",
   "action.not-possible": "Ação não é possível enquanto houver ações de armazenamento pendentes",

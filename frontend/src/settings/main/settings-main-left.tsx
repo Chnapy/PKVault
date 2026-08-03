@@ -49,7 +49,6 @@ export const SettingsMainLeft: React.FC = () => {
                     controlLabel={t('settings.form.language')}
                     data={Object.entries(languages)
                         .map(([ value, label ]) => ({ value, label }))}
-                    disabled={!settings?.canUpdateSettings}
                 />
             </SimpleGrid>
         </Card>
@@ -64,7 +63,6 @@ export const SettingsMainLeft: React.FC = () => {
                     {...form.register('hidE_CHEATS')}
                     defaultChecked={form.getValues('hidE_CHEATS')}
                     controlLabel={t('settings.form.hide-cheats')}
-                    disabled={!settings?.canUpdateSettings}
                     ml='auto'
                     my='sm'
                 />
@@ -77,7 +75,6 @@ export const SettingsMainLeft: React.FC = () => {
                     {...form.register('skiP_LEGALITY_CHECKS')}
                     defaultChecked={form.getValues('skiP_LEGALITY_CHECKS')}
                     controlLabel={t('settings.form.skip-legality')}
-                    disabled={!settings?.canUpdateSettings}
                     ml='auto'
                     mt='sm'
                 />

@@ -4,6 +4,7 @@
   "action.close": "Fermer",
   "action.confirm": "Confirmer ?",
   "action.delete": "Supprimer",
+  "action.edit-not-possible": "Modification impossible avec des actions de stockage non sauvegardées",
   "action.focus": "Focus",
   "action.navigate": "Naviguer",
   "action.not-possible": "Action impossible avec des actions de stockage non sauvegardées",
