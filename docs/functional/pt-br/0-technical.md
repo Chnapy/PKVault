@@ -1,6 +1,6 @@
 # 0 - Considerações técnicas
 
-O PKVault funciona no Windows em sua versão para desktop. Uma versão dedicada para Linux/Steam Deck está planejada.
+O PKVault roda no Windows e no Linux em sua versão para desktop. Existe uma versão para SteamDeck (Flatpak).
 
 Assim como o PKHeX, o PKVault depende do .NET 10 para funcionar. Como o aplicativo é multiplataforma e baseado em tecnologias web, o PKVault também depende de controles web de acordo com o sistema operacional atual:
 
@@ -8,7 +8,7 @@ Assim como o PKHeX, o PKVault depende do .NET 10 para funcionar. Como o aplicati
 * WebKitGTK+2 para Linux;
 * WKWebView para Mac.
 
-Atualmente, a interface foi projetada para uso em telas grandes, utilizando apenas teclado e mouse.
+O aplicativo foi projetado para ser utilizado em telas com resolução mínima de 1280x800 (a resolução do SteamDeck), com suporte para o uso de mouse/teclado ou controle.
 
 ## Arquivos manipulados
 
