@@ -39,7 +39,7 @@ public class PkmLegalityService(ISettingsService settingsService, ILegalityAnaly
         try
         {
             ValidityReport = la.Report(
-                settingsService.GetSettings().GetSafeLanguage()
+                settingsService.GetSettings().GetLanguageForPKHeX()
             );
         }
         catch (Exception ex)

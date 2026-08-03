@@ -123,13 +123,25 @@ public class GenStaticOthers(
     {
         var client = new AssemblyClient();
 
-        var data = await client.GetAsyncJsonGz(
-            [.. GetDataPathParts(GetFilename(lang))],
-            StaticDataJsonContext.Default.StaticOthersData
-        );
-        ArgumentNullException.ThrowIfNull(data);
+        try
+        {
+            var data = await client.GetAsyncJsonGz(
+                [.. GetDataPathParts(GetFilename(lang))],
+                StaticDataJsonContext.Default.StaticOthersData
+            );
+            ArgumentNullException.ThrowIfNull(data);
 
-        return data;
+            return data;
+        }
+        catch (KeyNotFoundException)
+        {
+            if (lang != SettingsService.DefaultLanguage)
+            {
+                return await LoadData(SettingsService.DefaultLanguage);
+            }
+
+            throw;
+        }
     }
 
     protected override async Task<StaticOthersData> GetData()

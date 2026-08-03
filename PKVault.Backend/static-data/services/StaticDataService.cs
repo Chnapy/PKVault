@@ -14,7 +14,7 @@ public class StaticDataService(ILogger<StaticDataService> log, ISettingsService 
 
     public async Task<StaticDataDTO> GetStaticDataDTO(string? lang = null)
     {
-        lang ??= settingsService.GetSettings().GetSafeLanguage();
+        lang ??= settingsService.GetSettings().GetLanguageOrDefault();
 
         var spritesheets = GetStaticSpritesheets();
         var evolves = GetStaticEvolves();
@@ -60,7 +60,7 @@ public class StaticDataService(ILogger<StaticDataService> log, ISettingsService 
     {
         return await GetCacheValue(
             "species",
-            lang ?? settingsService.GetSettings().GetSafeLanguage(),
+            lang ?? settingsService.GetSettings().GetLanguageOrDefault(),
             GenStaticSpecies.LoadData
         );
     }
@@ -69,7 +69,7 @@ public class StaticDataService(ILogger<StaticDataService> log, ISettingsService 
     {
         return await GetCacheValue(
             "others",
-            lang ?? settingsService.GetSettings().GetSafeLanguage(),
+            lang ?? settingsService.GetSettings().GetLanguageOrDefault(),
             GenStaticOthers.LoadData
         );
     }

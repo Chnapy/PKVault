@@ -243,7 +243,7 @@ public class SavesLoadersService(
         }
         paths.Add(path);
 
-        var language = settingsService.GetSettings().GetSafeLanguage();
+        var language = settingsService.GetSettings().GetLanguageForPKHeX();
 
         var boxLoader = new SaveBoxLoader(save, sp);
         var pkmLoader = new SavePkmLoader(log, pkmConvertService, language, evolves, save);

@@ -83,7 +83,8 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
             order={5}
             lh={1}
             w='min-content'
-            miw={i18n.language === 'de' ? 94 : undefined}
+            miw={i18n.language === 'de' || i18n.language === 'pt-br'
+                ? 94 : undefined}
             ta='center'
         >{t('storage.save-actions.title')}</Title>
 

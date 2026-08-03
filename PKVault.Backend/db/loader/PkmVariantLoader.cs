@@ -75,7 +75,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
         var settings = settingsService.GetSettings();
 
         appPath = settings.AppDirectory;
-        language = settings.GetSafeLanguage();
+        language = settings.GetLanguageForPKHeX();
     }
 
     public async Task<PkmVariantDTO> CreateDTO(PkmVariantEntity entity)
