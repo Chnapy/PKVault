@@ -22,12 +22,22 @@ public record SettingsDTO(
 
     public LanguageID GetSafeLanguageID()
     {
-        return GameLanguage.GetLanguage(GetSafeLanguage());
+        return GameLanguage.GetLanguage(GetLanguageForPKHeX());
     }
 
-    public string GetSafeLanguage()
+    public string GetLanguageOrDefault()
     {
         return SettingsMutable.LANGUAGE ?? SettingsService.DefaultLanguage;
+    }
+
+    public string GetLanguageForPKHeX()
+    {
+        var lang = GetLanguageOrDefault();
+
+        if (!GameLanguage.AllSupportedLanguages.Contains(lang))
+            return SettingsService.DefaultLanguage;
+
+        return lang;
     }
 
     private static string NormalizeSafePath(string path) => MatcherUtil.NormalizePath(Path.Combine(

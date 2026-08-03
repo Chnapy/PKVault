@@ -439,7 +439,7 @@ public class ActionService(
         moveSource.ChangeMoveSource(filteredSources.Moves);
         moveSource.ReloadMoves(legality);
 
-        var movesStr = GameInfo.GetStrings(settingsService.GetSettings().GetSafeLanguage()).movelist;
+        var movesStr = GameInfo.GetStrings(settingsService.GetSettings().GetLanguageForPKHeX()).movelist;
 
         var availableMoves = new List<MoveItem>();
 
