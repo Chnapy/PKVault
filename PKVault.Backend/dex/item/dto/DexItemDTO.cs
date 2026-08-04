@@ -16,6 +16,7 @@ public record DexItemForm(
     Gender Gender,
     List<byte> Types,
     int[] Abilities,
+    int AbilityHidden,
     int[] BaseStats,
     bool IsSeen,
     bool IsSeenShiny,

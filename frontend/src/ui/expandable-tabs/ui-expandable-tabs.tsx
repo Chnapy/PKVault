@@ -47,11 +47,12 @@ export type UIExpandableTabsProps<D extends UIExpandableTabsData> =
         controlsDetailsLabel?: string;
         expanded?: boolean;
         scoped?: boolean;
+        autoScrollValue?: string;
     };
 
 export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTabsData>({
     id, level, controlsEnabled, controlsLabel, controlsDetailsLabel, expanded: forcedExpanded,
-    value, data, onChange, renderTab, renderExpanded, scoped = true,
+    value, data, onChange, renderTab, renderExpanded, scoped = true, autoScrollValue = value,
     left, right, grow = true,
     ...tabsProps
 }: UIExpandableTabsProps<D>) {
@@ -127,7 +128,7 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
             block: 'center',
             inline: 'center',
         });
-    }, [ value ]);
+    }, [ autoScrollValue ]);
 
     const renderScopedExpanded = (expandedContent: React.ReactNode) => {
         if (!scoped)

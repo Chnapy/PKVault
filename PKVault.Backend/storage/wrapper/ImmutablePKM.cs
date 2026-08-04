@@ -177,6 +177,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public byte CurrentHandler => Pkm.CurrentHandler;
     public bool IsCurrentHandler => CurrentHandler == 1;
     public int AbilityNumber => Pkm.AbilityNumber;
+    public bool IsAbilityHidden => AbilityNumber > 2;
 
     public int HPPower => Pkm.HPPower;
     public int HPType => Pkm.HPType;

@@ -29,6 +29,7 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
             Gender: gender,
             Types: GetTypes(pi),
             Abilities: GetAbilities(pi),
+            AbilityHidden: GetAbilityHidden(pi),
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
             IsSeenShiny: isSeenShiny,

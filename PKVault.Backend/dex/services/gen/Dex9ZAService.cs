@@ -30,6 +30,7 @@ public class Dex9ZAService(SAV9ZA save) : DexGenService(save)
             Gender: gender,
             Types: GetTypes(pi),
             Abilities: GetAbilities(pi),
+            AbilityHidden: GetAbilityHidden(pi),
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
             IsSeenShiny: isSeenShiny,

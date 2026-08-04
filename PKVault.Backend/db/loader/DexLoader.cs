@@ -29,6 +29,7 @@ public class DexLoader : EntityLoader<DexItemForm, DexFormEntity>, IDexLoader
         Generation: dynamicInfos?.Generation ?? entity.Context.Generation,
         Types: dynamicInfos?.Types ?? [],
         Abilities: dynamicInfos?.Abilities ?? [],
+        AbilityHidden: dynamicInfos?.AbilityHidden ?? 0,
         BaseStats: dynamicInfos?.BaseStats ?? [],
         IsSeen: entity.IsCaught,
         IsSeenShiny: entity.IsCaughtShiny,
