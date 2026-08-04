@@ -9,11 +9,12 @@ export type UIDetailsContentSummaryProps = {
     nature?: string;
     ability?: string;
     specialAbility?: boolean;
+    isAbilityHidden?: boolean;
     pid?: number;
 };
 
 export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = ({
-    id, heldItem, nature, ability, specialAbility, pid = 0
+    id, heldItem, nature, ability, specialAbility, isAbilityHidden, pid = 0
 }) => {
     const { t } = useTranslate();
 
@@ -47,7 +48,7 @@ export const UIDetailsContentSummary: React.FC<UIDetailsContentSummaryProps> = (
                     : t('details.ability')}
             </Grid.Col>
             <Grid.Col span={8}>
-                {ability}
+                {ability} {isAbilityHidden && `(${t('details.ability.hidden')})`}
             </Grid.Col>
         </>}
 

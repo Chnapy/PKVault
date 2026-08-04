@@ -18,6 +18,7 @@
   "details.abilities": "Abilities",
   "details.ability": "Ability",
   "details.ability.old": "Special ability",
+  "details.ability.hidden": "hidden",
   "details.attached-pkm-not-found.1": "Pokémon not found in attached save.",
   "details.attached-pkm-not-found.2": "If expected consider detach from save.\nOtherwise check the save integrity.",
   "details.contest": "Contest",

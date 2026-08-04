@@ -18,6 +18,7 @@
   "details.abilities": "Talents",
   "details.ability": "Talent",
   "details.ability.old": "Capacité spéciale",
+  "details.ability.hidden": "caché",
   "details.attached-pkm-not-found.1": "Pokémon introuvable dans sa sauvegarde rattachée.",
   "details.attached-pkm-not-found.2": "Si attendu, considérez detacher le pokémon de sa sauvegarde.\nSinon, vérifier l'intégrité de la sauvegarde.",
   "details.contest": "Concours",

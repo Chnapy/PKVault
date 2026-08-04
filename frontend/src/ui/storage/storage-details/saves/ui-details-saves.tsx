@@ -4,7 +4,7 @@ import { useTranslate } from '../../../../translate/i18n';
 import { UIExpandableTabs, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
 import { UIDetailsSaveExpanded, type UIDetailsSaveData } from './ui-details-save-expanded';
 
-export type UIDetailsSavesProps = Pick<UIExpandableTabsProps<UIDetailsSaveData>, 'value' | 'data' | 'renderTab' | 'renderExpanded'> & {
+export type UIDetailsSavesProps = Pick<UIExpandableTabsProps<UIDetailsSaveData>, 'value' | 'data' | 'renderTab' | 'renderExpanded' | 'autoScrollValue'> & {
     onSelect: (id: string) => void;
     actions: React.ReactNode;
 };

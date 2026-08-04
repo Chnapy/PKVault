@@ -18,6 +18,7 @@
   "details.abilities": "Habilidades",
   "details.ability": "Habilidade",
   "details.ability.old": "Habilidade anterior",
+  "details.ability.hidden": "escondida",
   "details.attached-pkm-not-found.1": "Pokémon não encontrado no save anexado.",
   "details.attached-pkm-not-found.2": "Se for esperado, considere desanexar do save.\nCaso contrário, verifique a integridade do save.",
   "details.contest": "Torneio",

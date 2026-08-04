@@ -76,7 +76,7 @@ export const PokedexDetails: React.FC = () => {
           <Group gap='sm'>
             {selectedForm.abilities.length > 0
               ? selectedForm.abilities.map(ability => <Text key={ability} w='100%'>
-                {staticData.abilities[ ability ]?.name}
+                {staticData.abilities[ ability ]?.name} {ability === selectedForm.abilityHidden && `(${t('details.ability.hidden')})`}
               </Text>)
               : '-'}
           </Group>
@@ -130,6 +130,7 @@ export const PokedexDetails: React.FC = () => {
         label: save.trainerName,
       }))}
       onSelect={(id) => setSelectedSaveId(+id)}
+      autoScrollValue={`${selectedSpecies}-${selectedSave.id}`}
       actions={closeBtn}
       renderTab={({ item, selected }) => {
         const save = gameSaves.find(s => s.id === +item.id);

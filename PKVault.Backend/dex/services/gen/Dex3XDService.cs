@@ -32,6 +32,7 @@ public class Dex3XDService(SAV3XD save) : DexGenService(save)
             Gender: gender,
             Types: GetTypes(pi),
             Abilities: GetAbilities(pi),
+            AbilityHidden: GetAbilityHidden(pi),
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
             IsSeenShiny: isOwnedShiny,

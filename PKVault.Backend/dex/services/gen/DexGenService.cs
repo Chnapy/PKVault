@@ -173,6 +173,13 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         return [.. abilities.ToArray().Distinct()];
     }
 
+    protected int GetAbilityHidden(PersonalInfo pi)
+    {
+        if (pi is IPersonalAbility12H pih && pih.AbilityH != pih.Ability1)
+            return pih.AbilityH;
+        return 0;
+    }
+
     protected int[] GetBaseStats(PersonalInfo pi)
     {
         return [

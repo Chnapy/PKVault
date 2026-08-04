@@ -153,6 +153,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
                 nature={pkm.generation > 2 ? staticData.natures[ pkm.nature ]?.name : undefined}
                 ability={pkm.ability > 0 ? staticData.abilities[ pkm.ability ]?.name : undefined}
                 specialAbility={pkm.generation === 3}
+                isAbilityHidden={pkm.isAbilityHidden}
                 pid={pkm.pid}
             />,
         },

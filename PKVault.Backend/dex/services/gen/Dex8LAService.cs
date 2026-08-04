@@ -35,6 +35,7 @@ public class Dex8LAService(SAV8LA save) : DexGenService(save)
             Gender: gender,
             Types: GetTypes(pi),
             Abilities: GetAbilities(pi),
+            AbilityHidden: GetAbilityHidden(pi),
             BaseStats: GetBaseStats(pi),
             IsSeen: isSeen,
             IsSeenShiny: isSeenShiny,

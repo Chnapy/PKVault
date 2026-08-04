@@ -18,6 +18,7 @@
   "details.abilities": "Fähigkeiten",
   "details.ability": "Fähigkeit",
   "details.ability.old": "Fähigkeit",
+  "details.ability.hidden": "versteckt",
   "details.attached-pkm-not-found.1": "Pokemon wurde im verknüpften Spielstand nicht gefunden.",
   "details.attached-pkm-not-found.2": "Falls erwartet, bitte die Verknüpfung lösen.\nAndernfalls prüfe die Integrität des Spielstands.",
   "details.contest": "Wettbewerbswerte",
