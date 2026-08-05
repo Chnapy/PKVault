@@ -252,6 +252,7 @@ public class Program
         services.AddSingleton<ActionService>();
         // services.AddSingleton<MaintenanceService>();
         services.AddSingleton<DexService>();
+        services.AddSingleton<DexDataService>();
         services.AddSingleton<WarningsService>();
         services.AddSingleton<BackupService>();
         services.AddSingleton<ISettingsService, SettingsService>();

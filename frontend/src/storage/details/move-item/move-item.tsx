@@ -3,13 +3,15 @@ import { UIDetailsMoveRow, type UIDetailsMoveRowProps } from '../../../ui/storag
 import { useStaticMove } from './hooks/use-static-move';
 
 export type MoveItemProps = Pick<UIDetailsMoveRowProps, 'nameWidth' | 'onClick' | 'isAlpha' | 'isValid'> & {
-    pkmId: string;
+    pkmId?: string;
     saveId: number | null;
+    generation?: number;
     move: number;
+    level?: number;
 };
 
-export const MoveItem: React.FC<MoveItemProps> = ({ pkmId, saveId, move, isAlpha, isValid, ...rest }) => {
-    const getStaticMove = useStaticMove(saveId, pkmId);
+export const MoveItem: React.FC<MoveItemProps> = ({ pkmId, saveId, generation, move, level, isAlpha, isValid, ...rest }) => {
+    const getStaticMove = useStaticMove(saveId, pkmId, generation);
 
     const { staticMove, forGen } = React.useMemo(() => getStaticMove(move), [ getStaticMove, move ]);
 
@@ -22,6 +24,7 @@ export const MoveItem: React.FC<MoveItemProps> = ({ pkmId, saveId, move, isAlpha
         name={staticMove.name}
         power={forGen.power}
         accuracy={forGen.accuracy}
+        level={level}
         isAlpha={isAlpha}
         isValid={isValid}
         {...rest}

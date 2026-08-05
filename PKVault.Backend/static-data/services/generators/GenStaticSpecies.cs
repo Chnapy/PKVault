@@ -100,8 +100,9 @@ public class GenStaticSpecies(
                     return (pkmObj, apiForms);
                 }
 
-                StaticSpeciesForm getVarietyForm(byte generation, Pokemon pkmObj, PokemonForm[] formObjs, int formIndex, StaticSpeciesForm? defaultForm)
+                StaticSpeciesForm getVarietyForm(EntityContext context, Pokemon pkmObj, PokemonForm[] formObjs, int formIndex, StaticSpeciesForm? defaultForm)
                 {
+                    var generation = context.Generation;
                     var name = speciesName;
 
                     var formObj = formObjs.Length > 0
@@ -222,15 +223,17 @@ public class GenStaticSpecies(
                         // && formObj.FormName == "" && pkmSpeciesObj.HasGenderDifferences;
                         && spriteDefault != spriteFemale && spriteFemale != null;
 
-                    var pkm = new ImmutablePKM(EntityBlank.GetBlank(generation)).Update(pkm =>
+                    var pkm = new ImmutablePKM(EntityBlank.GetBlank(context)).Update(pkm =>
                     {
                         pkm.Species = species;
                         pkm.Form = (byte)formIndex;
                         pkm.RefreshChecksum();
                     });
 
+                    var legality = LegalityAnalysisService.GetLegalitySafeRaw(pkm);
+
                     var battleOnly = formObj.IsMega
-                        || LegalityAnalysisService.GetLegalitySafeRaw(pkm).Results.Any(result =>
+                        || legality.Results.Any(result =>
                             result.Identifier == CheckIdentifier.Form
                             && result.Result == LegalityCheckResultCode.FormBattle
                             && !result.Valid
@@ -263,7 +266,7 @@ public class GenStaticSpecies(
                 List<(Pokemon, PokemonForm[])> allDatas = [defaultData, .. otherDatas];
 
                 var defaultForm = getVarietyForm(
-                    LAST_ENTITY_CONTEXT.Generation,
+                    LAST_ENTITY_CONTEXT,
                     defaultData.Item1,
                     [.. defaultData.Item2.Where(form => !form.IsBattleOnly)],
                     0,
@@ -428,7 +431,7 @@ public class GenStaticSpecies(
 
                     var varietyForms = formListData.ToList()
                         .OfType<(Pokemon, PokemonForm?, int)>()
-                        .Select((data) => getVarietyForm(context.Generation, data.Item1, data.Item2 == null ? [] : [data.Item2], data.Item3, defaultForm));
+                        .Select((data) => getVarietyForm(context, data.Item1, data.Item2 == null ? [] : [data.Item2], data.Item3, defaultForm));
 
                     // if (!varietyForms.Any())
                     // {

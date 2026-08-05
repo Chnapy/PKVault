@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using PKHeX.Core;
 
 namespace PKVault.Backend.dex.routes;
 
 [ApiController]
 [Route("api/[controller]")]
-public class DexController(DexService dexService) : ControllerBase
+public class DexController(DexService dexService, DexDataService dexDataService) : ControllerBase
 {
     [HttpGet()]
     public async Task<ActionResult<Dictionary<ushort, Dictionary<uint, DexItemDTO>>>> GetAll()
@@ -12,5 +14,13 @@ public class DexController(DexService dexService) : ControllerBase
         var record = await dexService.GetDex(null);
 
         return record;
+    }
+
+    [HttpGet("moves")]
+    public async Task<ActionResult<DexMoveDTO>> GetMoves(
+        [BindRequired] EntityContext context, [BindRequired] ushort species, [BindRequired] byte form
+    )
+    {
+        return dexDataService.GetMoves(context, species, form);
     }
 }
