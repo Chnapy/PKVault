@@ -1,7 +1,8 @@
-import { Loader, Table, Text, Title } from '@mantine/core';
+import { Badge, Group, Loader, Table, Text, Title } from '@mantine/core';
 import type React from 'react';
 import { useDexGetMoves } from '../../../data/sdk/dex/dex.gen';
 import type { EntityContext } from '../../../data/sdk/model';
+import { useStaticData } from '../../../hooks/use-static-data';
 import { MoveItem } from '../../../storage/details/move-item/move-item';
 import { useTranslate } from '../../../translate/i18n';
 import { UIDetailsContentMoveTable } from '../../../ui/storage/storage-details/content/moves/ui-details-content-moves-table';
@@ -16,6 +17,8 @@ type PokedexDetailsMovesProps = {
 export const PokedexDetailsMoves: React.FC<PokedexDetailsMovesProps> = ({ context, generation, species, formIndex }) => {
     const { t } = useTranslate();
 
+    const staticData = useStaticData();
+
     const dexMoves = useDexGetMoves({ context, species, form: formIndex });
 
     if (dexMoves.isPending)
@@ -24,10 +27,20 @@ export const PokedexDetailsMoves: React.FC<PokedexDetailsMovesProps> = ({ contex
     if (!dexMoves.data)
         return null;
 
-    const { learnMoves, eggMoves, inheritMoves, tmhmMoves, tutorMoves } = dexMoves.data.data;
+    const { context: finalContext, learnMoves, eggMoves, inheritMoves, tmhmMoves, tutorMoves } = dexMoves.data.data;
     const learnableMoves = Object.entries(learnMoves).sort((m1, m2) => m1[ 1 ] - m2[ 1 ]);
 
+    const versionsForContext = Object.values(staticData.versions)
+        .filter(v => v.context == finalContext)
+        .sort((v1, v2) => v2.children.length - v1.children.length);
+    const version = versionsForContext.find(v => !v.isGameVersion) ?? versionsForContext[ 0 ];
+    const versionNames = version?.name.split('/');
+
     return <>
+        <Group justify='center' gap='sm' mt='sm' mb='md'>
+            {versionNames?.map((name, i) => <Badge key={i} variant='default' px='sm'>{name}</Badge>)}
+        </Group>
+
         <Title order={5} ta='center'>{t('details.moves.learnable')}</Title>
         {learnableMoves.length > 0
             ? <UIDetailsContentMoveTable

@@ -202,12 +202,17 @@ public class GenStaticOthers(
                 var versionChildren = isGameVersion(version)
                     ? []
                     : Enum.GetValues<GameVersion>()
-                        .Where(v => isGameVersion(v) && version.ContainsFromLumped(v));
+                        .Where(v => isGameVersion(v) && version.ContainsFromLumped(v)).ToArray();
+
+                // version.Context is not fully reliable for non-game version
+                var context = versionChildren.Length > 0
+                    ? versionChildren.Max(v => v.Context)
+                    : version.Context;
 
                 return new StaticVersion(
                     Id: (byte)version,
                     Name: await versionName,
-                    Context: version.Context,
+                    Context: context,
                     IsGameVersion: isGameVersion(version),
                     Children: versionChildren,
                     Generation: version.Generation,

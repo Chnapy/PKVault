@@ -1,2 +1,40 @@
 --- This file displays changes of StaticOthers_en compressed file from previous changes
 
+--- pokeapi\generated\diff-data\StaticOthers_en.diff
++++ pokeapi\generated\diff-data\StaticOthers_en.diff
+@@ -1276,7 +1276,7 @@
+     "76": {
+       "id": 76,
+       "name": "Brilliant Diamond/Shining Pearl",
+-      "context": 8,
++      "context": 13,
+       "isGameVersion": false,
+       "children": [
+         48,
+@@ -1530,7 +1530,7 @@
+     "86": {
+       "id": 86,
+       "name": "Sword/Shield/Brilliant Diamond/Shining Pearl/Legends: Arceus",
+-      "context": 0,
++      "context": 13,
+       "isGameVersion": false,
+       "children": [
+         44,
+@@ -1560,7 +1560,7 @@
+     "87": {
+       "id": 87,
+       "name": "Scarlet/Violet/Legends: Z-A/Champions",
+-      "context": 0,
++      "context": 14,
+       "isGameVersion": false,
+       "children": [
+         50,
+@@ -1633,7 +1633,7 @@
+     "91": {
+       "id": 91,
+       "name": "Emerald/FireRed/LeafGreen",
+-      "context": 0,
++      "context": 3,
+       "isGameVersion": false,
+       "children": [
+         3,
