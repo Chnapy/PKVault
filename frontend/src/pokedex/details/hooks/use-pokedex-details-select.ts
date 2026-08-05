@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
-import { EntityContext, type DexItemForm } from '../../../data/sdk/model';
+import { EntityContext, type DexItemForm, type SaveInfosDTO } from '../../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from '../../../routes/pokedex';
@@ -30,13 +30,18 @@ export const usePokedexDetailsSelect = () => {
     const savesRecord = saveInfosMainQuery.data?.data ?? {};
     const speciesValues = Object.values(speciesValuesQuery.data ?? {});
 
-    const gameSaves = speciesValues
+    type GameSave = Pick<SaveInfosDTO, 'id' | 'context' | 'generation' | 'trainerName'> & {
+        displayedVersion: SaveInfosDTO['displayedVersion'] | null;
+    };
+
+    const gameSaves: GameSave[] = speciesValues
         .filter((spec) => spec.forms.some(form => form.isSeen))
         .map((spec) => spec.saveId === 0
             // pkvault storage
             ? {
                 id: 0,
                 context: EntityContext.Gen9a,
+                generation: 9,
                 displayedVersion: null,
                 trainerName: ''
             }

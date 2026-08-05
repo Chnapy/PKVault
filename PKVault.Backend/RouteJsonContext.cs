@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 [JsonSerializable(typeof(List<PkmSaveDTO>))]
 [JsonSerializable(typeof(List<MoveItem>))]
 [JsonSerializable(typeof(List<BackupDTO>))]
+[JsonSerializable(typeof(DexMoveDTO))]
 [JsonSerializable(typeof(DataDTO))]
 [JsonSerializable(typeof(SettingsDTO))]
 [JsonSerializable(typeof(StaticDataDTO))]

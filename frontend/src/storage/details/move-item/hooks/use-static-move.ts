@@ -1,10 +1,11 @@
 import React from 'react';
 import { usePkmIndex } from '../../../../data/hooks/use-pkm-index';
+import { MoveCategory, type StaticMove } from '../../../../data/sdk/model';
 import { useStaticData } from '../../../../hooks/use-static-data';
 import { pick } from '../../../../util/pick';
 import { useSelectCallback } from '../../../../util/use-select-callback';
 
-export const useStaticMove = (saveId: number | null, pkmId: string | undefined) => {
+export const useStaticMove = (saveId: number | null, pkmId: string | undefined, generation?: number) => {
     const staticData = useStaticData();
 
     const pkmIndexQuery = usePkmIndex(saveId,
@@ -21,26 +22,24 @@ export const useStaticMove = (saveId: number | null, pkmId: string | undefined) 
 
     const pkm = pkmIndexQuery.data;
 
-    const getInnerStaticMove = React.useCallback((move: number) => {
+    const getInnerStaticMove = React.useCallback((move: number): StaticMove | undefined => {
         const staticMove = staticData.moves[ move ];
-
-        if (!pkm) return;
 
         // hidden power
         if (move === 237) {
-            return staticMove && pkm && {
+            return staticMove && {
                 ...staticMove,
                 dataUntilGeneration: [ {
                     untilGeneration: 99,
-                    type: pkm.hiddenPowerType,
-                    power: pkm.hiddenPowerPower,
-                    category: pkm.hiddenPowerCategory,
+                    type: pkm?.hiddenPowerType ?? 1,
+                    power: pkm?.hiddenPowerPower,
+                    category: pkm?.hiddenPowerCategory ?? MoveCategory.SPECIAL,
                 } ]
             };
         }
         // return
         else if (move === 216) {
-            const returnPower = Number.parseInt((pkm.friendship / 2.5).toString());
+            const returnPower = pkm ? Number.parseInt((pkm.friendship / 2.5).toString()) : undefined;
             return staticMove && {
                 ...staticMove,
                 dataUntilGeneration: [ {
@@ -52,7 +51,7 @@ export const useStaticMove = (saveId: number | null, pkmId: string | undefined) 
         }
         // frustration
         else if (move === 218) {
-            const frustrationPower = Number.parseInt(((255 - pkm.friendship) / 2.5).toString());
+            const frustrationPower = pkm ? Number.parseInt(((255 - pkm.friendship) / 2.5).toString()) : undefined;
             return staticMove && {
                 ...staticMove,
                 dataUntilGeneration: [ {
@@ -66,10 +65,12 @@ export const useStaticMove = (saveId: number | null, pkmId: string | undefined) 
         return staticMove;
     }, [ pkm, staticData.moves ]);
 
+    const gen = generation ?? pkm?.generation;
+
     return React.useCallback((move: number) => {
         const staticMove = getInnerStaticMove(move);
-        const forGen = pkm && staticMove?.dataUntilGeneration.find(gen => gen.untilGeneration >= pkm.generation);
+        const forGen = gen !== undefined ? staticMove?.dataUntilGeneration.find(g => g.untilGeneration >= gen) : undefined;
 
         return { staticMove, forGen };
-    }, [ getInnerStaticMove, pkm ]);
+    }, [ getInnerStaticMove, gen ]);
 };

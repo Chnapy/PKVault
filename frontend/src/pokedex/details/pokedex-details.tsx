@@ -2,7 +2,9 @@ import { Grid, Group, Text } from '@mantine/core';
 import React from "react";
 import { Gender as GenderType } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
+import { SpeciesImg } from '../../img/species-img';
 import { Route } from "../../routes/pokedex";
+import { TypeItem } from '../../storage/details/type-item/type-item';
 import { useTranslate } from '../../translate/i18n';
 import { UIButton } from '../../ui/form/button/ui-button';
 import { UISegmentedControl } from '../../ui/form/select/ui-segmented-control';
@@ -18,8 +20,7 @@ import { UIDetailsContentExpanded } from '../../ui/storage/storage-details/conte
 import type { UIDetailsSaveData } from '../../ui/storage/storage-details/saves/ui-details-save-expanded';
 import { UIDetailsSaveTab } from '../../ui/storage/storage-details/saves/ui-details-save-tab';
 import { UIDetailsSaves } from '../../ui/storage/storage-details/saves/ui-details-saves';
-import { SpeciesImg } from '../../img/species-img';
-import { TypeItem } from '../../storage/details/type-item/type-item';
+import { PokedexDetailsMoves } from './content/pokedex-details-moves';
 import { usePokedexDetailsSelect } from './hooks/use-pokedex-details-select';
 import { usePokedexSelectExpanded } from './hooks/use-pokedex-select-expanded';
 import { PokedexDetailsOwned } from './pokedex-details-owned';
@@ -100,7 +101,12 @@ export const PokedexDetails: React.FC = () => {
     {
       name: 'moves',
       label: t('details.moves.title'),
-      content: 'WIP',
+      content: <PokedexDetailsMoves
+        context={selectedSave.context}
+        generation={selectedSave.generation}
+        species={selectedSpecies}
+        formIndex={selectedStaticFormWithIndex.index}
+      />,
     },
     {
       name: 'evolutions',

@@ -1,0 +1,163 @@
+
+using System.Buffers;
+using PKHeX.Core;
+
+public class DexDataService(
+// IServiceProvider sp, ILogger<DexService> log,
+// StaticDataService staticDataService, ISavesLoadersService savesLoadersService
+)
+{
+    private static Func<PKM, PersonalInfo, EvoCriteria, ushort, MoveSourceType, LearnOption, MoveLearnInfo> CreateGetCanLearn(ILearnSource learnSource, PersonalInfo pi)
+    {
+        var piType = pi.GetType();
+        var learnSourceType = typeof(ILearnSource<>).MakeGenericType(piType);
+        var getCanLearn = learnSourceType.GetMethod("GetCanLearn");
+        if (!learnSourceType.IsInstanceOfType(learnSource) || getCanLearn == null)
+        {
+            throw new Exception("learnSource is expected to be type ILearnSource<pkm.PersonalType>");
+        }
+
+        /// GetCanLearn(PKM pk, T pi, EvoCriteria evo, ushort move, MoveSourceType types = MoveSourceType.All, LearnOption option = LearnOption.Current)
+        /// <see cref="ILearnSource<T>"/>
+        return (pk, pi, evo, move, types, option) =>
+            (MoveLearnInfo)getCanLearn.Invoke(learnSource, [pk, pi, evo, move, types, option])!;
+    }
+
+    public DexMoveDTO GetMoves(EntityContext context, ushort species, byte form)
+    {
+        var pkm = new ImmutablePKM(EntityBlank.GetBlank(context)).Update(pkm =>
+        {
+            pkm.Species = species;
+            pkm.Form = form;
+            pkm.RefreshChecksum();
+        });
+
+        SaveWrapper save = new(BlankSaveFile.Get(context, pkm.OriginalTrainerName));
+        var version = save.Version;
+        var pi = pkm.PersonalInfo;
+
+        if (!save.IsSpeciesAllowed(species))
+        {
+            throw new ArgumentException($"Species {species} not allowed in save {context}");
+        }
+
+        var legality = LegalityAnalysisService.GetLegalitySafeRaw(pkm);
+
+        var learnSource = GameData.GetLearnSource(version);
+        var getCanLearn = CreateGetCanLearn(learnSource, pi);
+
+        var bufferLength = pkm.MaxMoveID + 1;
+
+        var learnset = learnSource.GetLearnset(species, form);
+        var eggMoves = learnSource.GetEggMoves(species, form);
+
+        HashSet<ushort> GetEncounterMoves()
+        {
+            bool[] bufferRent = ArrayPool<bool>.Shared.Rent(bufferLength);
+            var encounterMovesSpan = bufferRent.AsSpan(0, bufferLength);
+
+            LearnPossible.Get(pkm.GetMutablePkm(), legality.Info.EncounterOriginal, legality.Info.EvoChainsAllGens, encounterMovesSpan, MoveSourceType.Encounter);
+
+            HashSet<ushort> values = [];
+
+            for (ushort move = 1; move < bufferLength; move++)
+            {
+                if (encounterMovesSpan[move])
+                    values.Add(move);
+            }
+
+            encounterMovesSpan.Clear();
+            ArrayPool<bool>.Shared.Return(bufferRent);
+
+            return values;
+        }
+
+        Dictionary<ushort, byte> learnableMoves = GetEncounterMoves().Select(move => (move, (byte)1)).ToDictionary();
+        // HashSet<ushort> encounterMoves = GetEncounterMoves();
+        HashSet<ushort> TMHMMoves = [];
+        HashSet<ushort> tutorMoves = [];
+
+        // learnset.GetAllMoves().ToArray()
+        //     .Select((Move, i) => (
+        //         Move,
+        //         Level: learnset.GetAllLevels()[i]
+        //     ))
+        //     .OrderBy(moveLevel => moveLevel.Level)
+        //     .ToDictionary();
+
+        var evos = legality.Info.EvoChainsAllGens.Get(context).ToArray();
+        var evo = evos.FirstOrDefault(e => e.Species == species && e.Form == form, new()
+        {
+            Species = species,
+            Form = form,
+        }) with
+        {
+            LevelMax = 100
+        };
+
+        MoveSourceType[] sourceTypes = [
+            MoveSourceType.LevelUp,
+            MoveSourceType.Evolve,
+            MoveSourceType.AllMachines,
+            MoveSourceType.AllTutors,
+        ];
+
+        for (ushort move = 1; move < bufferLength; move++)
+        {
+            foreach (var sourceType in sourceTypes)
+            {
+                var moveInfos = getCanLearn(
+                    pkm.GetMutablePkm(),
+                    pkm.PersonalInfo,
+                    evo,
+                    move,
+                    sourceType,
+                    LearnOption.AtAnyTime
+                );
+
+                if (!moveInfos.Method.IsValid)
+                    continue;
+
+                switch (moveInfos.Method)
+                {
+                    case LearnMethod.LevelUp:
+                    case LearnMethod.Evolution:
+                        {
+                            learnableMoves.TryAdd(move, moveInfos.Argument);
+                            break;
+                        }
+                    case LearnMethod.TMHM:
+                        {
+                            TMHMMoves.Add(move);
+                            break;
+                        }
+                    case LearnMethod.Tutor:
+                        {
+                            tutorMoves.Add(move);
+                            break;
+                        }
+                }
+
+                // if (generation == 1)
+                // Console.WriteLine(move + " - " + foo.Method);
+            }
+        }
+
+        learnableMoves = learnableMoves.OrderBy(l => l.Value).ToDictionary();
+
+        if (learnableMoves.Count == 0)
+            Console.WriteLine("NO LEARNABLE FOR " + save.Context + " " + evo);
+
+        var inheritMoves = learnSource.GetInheritMoves(species, form).ToArray()
+            .Where(move => !learnableMoves.ContainsKey(move));
+
+        return new(
+                LearnMoves: learnableMoves,
+                EggMoves: eggMoves.ToArray(),
+                // EncounterMoves: encounterMoves,
+                InheritMoves: inheritMoves,
+                TMHMMoves: TMHMMoves,
+                TutorMoves: tutorMoves
+            );
+    }
+}

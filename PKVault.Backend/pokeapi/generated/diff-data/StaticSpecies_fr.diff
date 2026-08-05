@@ -2,408 +2,507 @@
 
 --- pokeapi\generated\diff-data\StaticSpecies_fr.diff
 +++ pokeapi\generated\diff-data\StaticSpecies_fr.diff
-@@ -6667,7 +6667,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10304.png",
+@@ -77304,7 +77304,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10013.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
 -          "isBattleOnly": false,
 +          "isBattleOnly": true,
-           "isMega": true
+           "isMega": false
          },
          {
-@@ -6679,7 +6679,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10305.png",
+@@ -77316,7 +77316,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10014.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
 -          "isBattleOnly": false,
 +          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -8906,7 +8906,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10278.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -17003,7 +17003,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10279.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -19289,7 +19289,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10071.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
+           "isMega": false
          },
          {
-@@ -19391,7 +19391,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10071.png",
+@@ -77328,7 +77328,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10015.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
 -          "isBattleOnly": false,
 +          "isBattleOnly": true,
-           "isMega": true
+           "isMega": false
+         }
+       ],
+@@ -77354,7 +77354,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10013.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": false,
++          "isBattleOnly": true,
+           "isMega": false
          },
          {
-@@ -19429,7 +19429,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10071.png",
+@@ -77366,7 +77366,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10014.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
 -          "isBattleOnly": false,
 +          "isBattleOnly": true,
-           "isMega": true
+           "isMega": false
          },
          {
-@@ -28664,7 +28664,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10280.png",
+@@ -77378,7 +77378,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10015.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
 -          "isBattleOnly": false,
 +          "isBattleOnly": true,
-           "isMega": true
+           "isMega": false
+         }
+       ],
+@@ -77404,7 +77404,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10013.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -77416,7 +77416,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10014.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -77428,7 +77428,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10015.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -34976,7 +34976,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10281.png",
+@@ -90840,7 +90840,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/421-sunshine.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -36048,7 +36048,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10282.png",
+@@ -115565,7 +115565,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10017.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -115589,7 +115589,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10178.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         }
+       ],
+@@ -115615,7 +115615,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10017.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -115639,7 +115639,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10178.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -37232,7 +37232,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10283.png",
+@@ -130867,7 +130867,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10018.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
 -          "isBattleOnly": false,
 +          "isBattleOnly": true,
-           "isMega": true
+           "isMega": false
+         }
+       ],
+@@ -130919,7 +130919,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10018.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -54333,7 +54333,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10284.png",
+@@ -132814,7 +132814,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10116.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -143551,7 +143551,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10026.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         }
+       ],
+@@ -143577,7 +143577,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10026.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -78713,7 +78713,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10306.png",
+@@ -149069,7 +149069,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/716.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         }
+       ],
+@@ -149657,7 +149657,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10120.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         }
+       ],
+@@ -149719,7 +149719,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10120.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -153915,7 +153915,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10127.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         }
+       ],
+@@ -153941,7 +153941,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10127.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -78950,7 +78950,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10307.png",
+@@ -159328,7 +159328,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/774.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
 -          "isBattleOnly": false,
 +          "isBattleOnly": true,
-           "isMega": true
+           "isMega": false
+         },
+         {
+@@ -159340,7 +159340,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10130.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": false,
++          "isBattleOnly": true,
+           "isMega": false
+         },
+         {
+@@ -159352,7 +159352,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10131.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": false,
++          "isBattleOnly": true,
+           "isMega": false
+         },
+         {
+@@ -159364,7 +159364,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10132.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": false,
++          "isBattleOnly": true,
+           "isMega": false
+         },
+         {
+@@ -159376,7 +159376,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10133.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": false,
++          "isBattleOnly": true,
+           "isMega": false
+         },
+         {
+@@ -159388,7 +159388,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10134.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": false,
++          "isBattleOnly": true,
+           "isMega": false
+         },
+         {
+@@ -159400,7 +159400,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10135.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": false,
++          "isBattleOnly": true,
+           "isMega": false
+         },
+         {
+@@ -159668,7 +159668,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/774.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -159680,7 +159680,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10130.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -159692,7 +159692,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10131.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -159704,7 +159704,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10132.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -159716,7 +159716,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10133.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -159728,7 +159728,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10134.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -159740,7 +159740,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10135.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -160370,7 +160370,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10143.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         }
+       ],
+@@ -160396,7 +160396,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10143.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -86330,7 +86330,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10308.png",
+@@ -167377,7 +167377,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10182.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -167389,7 +167389,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10183.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         }
+       ],
+@@ -167415,7 +167415,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10182.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -167427,7 +167427,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10183.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -95066,7 +95066,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10309.png",
+@@ -173950,7 +173950,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10185.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         }
+       ],
+@@ -173976,7 +173976,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10185.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -95626,7 +95626,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10310.png",
+@@ -174244,7 +174244,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10187.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         }
+       ],
+@@ -174270,7 +174270,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10187.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -100608,7 +100608,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10285.png",
+@@ -175240,7 +175240,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10188.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         }
+       ],
+@@ -175266,7 +175266,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10188.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -102443,7 +102443,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10311.png",
+@@ -175383,7 +175383,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10189.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         }
+       ],
+@@ -175409,7 +175409,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10189.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -103497,7 +103497,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10312.png",
+@@ -175514,7 +175514,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10190.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         }
+       ],
+@@ -179876,7 +179876,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10256.png",
+           "spriteShadow": null,
+           "hasGenderDifferences": false,
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]
-@@ -106963,7 +106963,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10286.png",
+@@ -182862,7 +182862,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10276.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -111381,7 +111381,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10287.png",
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
+         },
+         {
+@@ -182874,7 +182874,7 @@
+           "spriteShinyFemale": "sprites/pokemon/shiny/10277.png",
            "spriteShadow": null,
            "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -113603,7 +113603,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10288.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -116374,7 +116374,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10289.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -123622,7 +123622,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10290.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -124362,7 +124362,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10291.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -126478,7 +126478,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10313.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -131888,7 +131888,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10292.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -132285,7 +132285,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10293.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -132826,7 +132826,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10294.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -139615,7 +139615,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10295.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -140705,7 +140705,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10296.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -144365,7 +144365,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10297.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -144639,7 +144639,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10298.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -144911,7 +144911,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10299.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -146233,7 +146233,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10300.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -149731,7 +149731,7 @@
-           "spriteShinyFemale": null,
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -152609,7 +152609,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10315.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -156607,7 +156607,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10316.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -160646,7 +160646,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10302.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -163992,7 +163992,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10319.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -173484,7 +173484,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10303.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -179341,7 +179341,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10320.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -180146,7 +180146,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10321.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
-         }
-       ]
-@@ -181413,7 +181413,7 @@
-           "spriteShinyFemale": "sprites/pokemon/shiny/10325.png",
-           "spriteShadow": null,
-           "hasGenderDifferences": false,
--          "isBattleOnly": false,
-+          "isBattleOnly": true,
-           "isMega": true
+-          "isBattleOnly": true,
++          "isBattleOnly": false,
+           "isMega": false
          }
        ]

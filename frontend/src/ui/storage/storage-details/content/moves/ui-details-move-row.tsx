@@ -14,15 +14,20 @@ export type UIDetailsMoveRowProps = Pick<Table.Tr.Props, 'onClick'> & {
     category: MoveCategory;
     power?: number;
     accuracy?: number;
+    level?: number;
     isAlpha?: boolean;
     isValid?: boolean;
 };
 
 export const UIDetailsMoveRow: React.FC<UIDetailsMoveRowProps> = ({
-    type, name, nameWidth, category, power, accuracy, onClick, isAlpha, isValid = true
+    type, name, nameWidth, category, power, accuracy, level, onClick, isAlpha, isValid = true
 }) => {
 
     return <Table.Tr className={classes.uiDetailsMoveRow} onClick={onClick} data-clickable={!!onClick || undefined}>
+        {level !== undefined && <Table.Td ta='center'>
+            {level}
+        </Table.Td>}
+
         <Table.Td>
             <UITypeItem type={type} />
         </Table.Td>
@@ -62,8 +67,8 @@ export const UIDetailsMoveRow: React.FC<UIDetailsMoveRowProps> = ({
             {power ?? '-'}
         </Table.Td>
 
-        <Table.Td miw='2rem'>
+        {level === undefined && <Table.Td miw='2rem'>
             {accuracy ? `${accuracy}%` : '-'}
-        </Table.Td>
+        </Table.Td>}
     </Table.Tr>;
 };
