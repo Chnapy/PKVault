@@ -25,6 +25,12 @@ public class DexDataService(
 
     public DexMoveDTO GetMoves(EntityContext context, ushort species, byte form)
     {
+        if (context == EntityContext.SplitInvalid)
+            context--;
+
+        if (!context.IsValid)
+            throw new ArgumentException($"Invalid context = {context}");
+
         var pkm = new ImmutablePKM(EntityBlank.GetBlank(context)).Update(pkm =>
         {
             pkm.Species = species;
@@ -38,7 +44,7 @@ public class DexDataService(
 
         if (!save.IsSpeciesAllowed(species))
         {
-            throw new ArgumentException($"Species {species} not allowed in save {context}");
+            return GetMoves(context - 1, species, form);
         }
 
         var legality = LegalityAnalysisService.GetLegalitySafeRaw(pkm);
@@ -152,6 +158,7 @@ public class DexDataService(
             .Where(move => !learnableMoves.ContainsKey(move));
 
         return new(
+                Context: context,
                 LearnMoves: learnableMoves,
                 EggMoves: eggMoves.ToArray(),
                 // EncounterMoves: encounterMoves,

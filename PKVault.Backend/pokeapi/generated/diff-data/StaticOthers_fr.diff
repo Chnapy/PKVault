@@ -1,2 +1,40 @@
 --- This file displays changes of StaticOthers_fr compressed file from previous changes
 
+--- pokeapi\generated\diff-data\StaticOthers_fr.diff
++++ pokeapi\generated\diff-data\StaticOthers_fr.diff
+@@ -1276,7 +1276,7 @@
+     "76": {
+       "id": 76,
+       "name": "Diamant Étincelant/Perle Scintillante",
+-      "context": 8,
++      "context": 13,
+       "isGameVersion": false,
+       "children": [
+         48,
+@@ -1530,7 +1530,7 @@
+     "86": {
+       "id": 86,
+       "name": "Épée/Bouclier/Diamant Étincelant/Perle Scintillante/Légendes : Arceus",
+-      "context": 0,
++      "context": 13,
+       "isGameVersion": false,
+       "children": [
+         44,
+@@ -1560,7 +1560,7 @@
+     "87": {
+       "id": 87,
+       "name": "Écarlate/Violet/Légendes : Z-A/Champions",
+-      "context": 0,
++      "context": 14,
+       "isGameVersion": false,
+       "children": [
+         50,
+@@ -1633,7 +1633,7 @@
+     "91": {
+       "id": 91,
+       "name": "Émeraude/Rouge Feu/Vert Feuille",
+-      "context": 0,
++      "context": 3,
+       "isGameVersion": false,
+       "children": [
+         3,
