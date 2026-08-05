@@ -58,12 +58,20 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
             for (const control of getSortedFilteredControls()) {
                 const listeners = control.triggers.keyboard?.listeners ?? [ 'onKeyDown' ];
-                const keys = control.triggers.keyboard?.values ?? [];
+                const codes = control.triggers.keyboard?.values ?? [];
 
                 if (listeners.includes('onKeyDown')) {
-                    for (const key of keys) {
-                        if (e.key === key) {
-                            control.action?.(e as never, getState().currentType, key);
+                    for (const code of codes) {
+                        if (e.code === code) {
+                            const triggerClick = !!control.ref?.current && !!control.triggers.mouse?.values.includes('left-click');
+
+                            if (triggerClick) {
+                                control.ref?.current.click();
+                                if (control.ref?.current instanceof HTMLElement)
+                                    control.ref.current.focus();
+                            } else {
+                                control.action?.(e as never, getState().currentType, code);
+                            }
                         }
                     }
                 }
