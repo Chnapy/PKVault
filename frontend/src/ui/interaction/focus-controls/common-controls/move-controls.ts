@@ -3,6 +3,8 @@ import type { Vector2 } from '@use-gesture/react';
 import type { GamepadMappingsAllButton } from '../../controls/gamepad/gamepad-mapper';
 import type { ControlActionInput } from '../../controls/provider/controls-context';
 
+const keyboardValues = [ 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown' ] as const;
+
 export const getMoveControl = (partial: Omit<ControlActionInput, 'name' | 'triggers' | 'action' | 'spread'>) => ({
     ...partial,
     name: 'move' as const,
@@ -13,7 +15,7 @@ export const getMoveControl = (partial: Omit<ControlActionInput, 'name' | 'trigg
         },
         keyboard: {
             type: 'keyboard',
-            values: [ 'move' ],
+            values: [...keyboardValues],
             allowPressedSuite: 1,
         },
         gamepad: {
@@ -25,27 +27,32 @@ export const getMoveControl = (partial: Omit<ControlActionInput, 'name' | 'trigg
     spread: true,
     action: function (e, state, value) {
         switch (state) {
+            case 'keyboard':
             case 'gamepad': {
                 const currentKey = getCurrentFocusKey();
                 const failDelta = 2;
                 const failTransformPos: Vector2 = [ 0, 0 ];
 
-                switch (value as GamepadMappingsAllButton) {
+                switch (value as GamepadMappingsAllButton | typeof keyboardValues[number]) {
+                    case 'ArrowDown':
                     case 'DPadDown':
                     case 'LStickDown':
                         navigateByDirection('down');
                         failTransformPos[ 1 ] = failDelta;
                         break;
+                    case 'ArrowUp':
                     case 'DPadUp':
                     case 'LStickUp':
                         navigateByDirection('up');
                         failTransformPos[ 1 ] = -failDelta;
                         break;
+                    case 'ArrowLeft':
                     case 'DPadLeft':
                     case 'LStickLeft':
                         navigateByDirection('left');
                         failTransformPos[ 0 ] = -failDelta;
                         break;
+                    case 'ArrowRight':
                     case 'DPadRight':
                     case 'LStickRight':
                         navigateByDirection('right');
@@ -66,8 +73,6 @@ export const getMoveControl = (partial: Omit<ControlActionInput, 'name' | 'trigg
                 }
                 break;
             }
-            // note: keyboard is handled by default by norigin-spatial-navigation
-            // TODO handle keyboard manually for full control concerns (move-fail & icons)
         }
     },
 } satisfies ControlActionInput);

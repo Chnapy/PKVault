@@ -30,7 +30,7 @@ export const useDragControls = ({ dragging, draggingMove, draggingMoveAttached, 
                 },
                 keyboard: {
                     type: 'keyboard',
-                    values: [ 'x' ],
+                    values: [ 'KeyX' ],
                 },
                 gamepad: {
                     type: 'gamepad',
@@ -53,7 +53,7 @@ export const useDragControls = ({ dragging, draggingMove, draggingMoveAttached, 
                 },
                 keyboard: {
                     type: 'keyboard',
-                    values: [ 'x' ],
+                    values: [ 'KeyX' ],
                 },
                 gamepad: {
                     type: 'gamepad',
@@ -85,7 +85,7 @@ export const useDragControls = ({ dragging, draggingMove, draggingMoveAttached, 
                 // },
                 // keyboard: {
                 //     type: 'keyboard',
-                //     values: [ 'x' ],
+                //     values: [ 'KeyX' ],
                 // },
                 gamepad: {
                     type: 'gamepad',

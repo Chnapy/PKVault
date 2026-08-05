@@ -22,15 +22,34 @@ export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values:
                     case 'scroll': return inputIcon(inputIconResources.mouse.scroll, i);
                 }
             }).filter(Boolean);
-        case 'keyboard':
-            return (values).map((value, i) => {
+        case 'keyboard': {
+            const kbValues = new Set([ ...values ] as string[]);
+            const kbIcons = [];
+
+            const arrows = kbValues.has('ArrowDown')
+                && kbValues.has('ArrowUp')
+                && kbValues.has('ArrowLeft')
+                && kbValues.has('ArrowRight');
+
+            if (arrows) {
+                kbValues.delete('ArrowDown');
+                kbValues.delete('ArrowUp');
+                kbValues.delete('ArrowLeft');
+                kbValues.delete('ArrowRight');
+                kbIcons.push(inputIconResources.keyboard.arrows);
+            }
+
+            [ ...kbValues ].map(value => {
                 switch (value) {
-                    case 'Escape': return inputIcon(inputIconResources.keyboard.escape, i);
-                    case 'Space': return inputIcon(inputIconResources.keyboard.space, i);
-                    case 'move': return inputIcon(inputIconResources.keyboard.arrows, i);
-                    case 'x': return inputIcon(inputIconResources.keyboard.x, i);
+                    case 'Escape': return inputIconResources.keyboard.escape;
+                    case 'Space': return inputIconResources.keyboard.space;
+                    case 'KeyX': return inputIconResources.keyboard.x;
                 }
-            }).filter(Boolean);
+            })
+                .forEach(icon => icon && kbIcons.push(icon));
+
+            return [ ...kbIcons ].map((icon, i) => inputIcon(icon, i));
+        }
         case 'gamepad': {
             const gpValues = new Set([ ...values ] as GamepadMappingsAllButton[]);
             const gpIcons = [];
@@ -78,7 +97,7 @@ export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values:
                         }
                     })}
                 </div>
-                : icon).filter(Boolean)
+                : icon).filter(Boolean);
         }
     }
 };
