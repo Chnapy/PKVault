@@ -2,6 +2,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using DiffPlex.Renderer;
 using PKHeX.Core;
@@ -18,6 +19,7 @@ public abstract class StaticDataGenerator<D>(
     protected static JsonSerializerOptions JsonIndentedOptions => new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
         WriteIndented = true,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };

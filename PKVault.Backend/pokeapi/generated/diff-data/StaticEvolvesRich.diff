@@ -1,0 +1,14 @@
+--- This file displays changes of StaticEvolvesRich compressed file from previous changes
+
+--- pokeapi\generated\diff-data\StaticEvolvesRich.diff
++++ pokeapi\generated\diff-data\StaticEvolvesRich.diff
+@@ -9527,7 +9527,8 @@
+           "triggers": [
+             {
+               "level": 30,
+-              "turnUpsideDown": true
++              "turnUpsideDown": true,
++              "evolutionIsPossible": true
+             }
+           ]
+         }

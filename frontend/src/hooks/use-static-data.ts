@@ -17,8 +17,8 @@ export const useStaticData = () => {
     return {
         ...rest,
 
-        itemUnknown: items.items[ 'Mega Pendant' ]!,
-        itemPokeball: items.items[ 'Poké Ball' ]!,
+        itemUnknown: items.items[ 'mega-pendant' ]!,
+        itemPokeball: items.items[ 'poke-ball' ]!,
         getItem: (version: GameVersion, itemValue: number | string) => {
             const key = typeof itemValue === 'string'
                 ? itemValue

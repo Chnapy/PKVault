@@ -73,6 +73,13 @@ public class PokeApiService(IFileIOService fileIOService)
     //     );
     // }
 
+    public async Task<Pokemon?> GetPokemon(ushort species)
+    {
+        return await client.GetAsync(species,
+            PokeApiJsonContext.Default.Pokemon
+        );
+    }
+
     public async Task<Pokemon?> GetPokemon(NamedApiResource namedPokemon)
     {
         return await client.GetAsync(namedPokemon,

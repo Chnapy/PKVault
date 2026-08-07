@@ -1,0 +1,17 @@
+
+.evolutions-label {
+    display: flex;
+    padding-top: var(--mantine-spacing-md);
+}
+
+.evolutions-node {
+    cursor: default;
+}
+
+.evolutions-node:not([data-level='1'])::before {
+    top: calc(0.75rem + var(--mantine-spacing-md));
+}
+
+.evolutions-subtree > .evolutions-node:last-child::after {
+    height: calc(0.75rem + var(--mantine-spacing-md));
+}

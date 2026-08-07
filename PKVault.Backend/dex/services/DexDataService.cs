@@ -2,10 +2,7 @@
 using System.Buffers;
 using PKHeX.Core;
 
-public class DexDataService(
-// IServiceProvider sp, ILogger<DexService> log,
-// StaticDataService staticDataService, ISavesLoadersService savesLoadersService
-)
+public class DexDataService(StaticDataService staticDataService)
 {
     private static Func<PKM, PersonalInfo, EvoCriteria, ushort, MoveSourceType, LearnOption, MoveLearnInfo> CreateGetCanLearn(ILearnSource learnSource, PersonalInfo pi)
     {
@@ -166,5 +163,39 @@ public class DexDataService(
                 TMHMMoves: TMHMMoves,
                 TutorMoves: tutorMoves
             );
+    }
+
+    public async Task<StaticEvolvesRichData> GetEvolutionChain(ushort species)
+    {
+        var staticEvolvesRich = await staticDataService.GetStaticEvolvesRich();
+
+        ushort GetPreviousSpecies(ushort species)
+        {
+            if (staticEvolvesRich.TryGetValue(species, out var speciesEvolveByForm)
+                && speciesEvolveByForm.Values.First().PreviousSpecies != null)
+                return GetPreviousSpecies((ushort)speciesEvolveByForm.Values.First().PreviousSpecies!);
+            return species;
+        }
+
+        HashSet<ushort> GetNextSpecies(ushort species)
+        {
+            var evolvesValues = staticEvolvesRich.TryGetValue(species, out var speciesEvolveByForm)
+                ? speciesEvolveByForm.Values.SelectMany(f => f.Evolves.SelectMany(e => GetNextSpecies(e.EvolveSpecies)))
+                : [];
+            return [
+                species,
+                ..evolvesValues
+            ];
+        }
+
+        var firstSpecies = GetPreviousSpecies(species);
+        HashSet<ushort> allSpecies = GetNextSpecies(firstSpecies);
+
+        var results = new StaticEvolvesRichData();
+        foreach(var s in allSpecies)
+        {
+            results.Add(s, staticEvolvesRich[s]);
+        }
+        return results;
     }
 }

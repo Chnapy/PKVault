@@ -39,12 +39,12 @@ export type SpeciesFormItem = {
     species: number;
     form: number;
     genders: Gender[];
-    isSeen: boolean;
-    isSeenShiny: boolean;
-    isSeenAlpha: boolean;
-    isCaught: boolean;
-    isOwned: boolean;
-    isOwnedShiny: boolean;
+    isSeen?: boolean;
+    isSeenShiny?: boolean;
+    isSeenAlpha?: boolean;
+    isCaught?: boolean;
+    isOwned?: boolean;
+    isOwnedShiny?: boolean;
 };
 
 /**

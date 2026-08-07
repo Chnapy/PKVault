@@ -11,6 +11,8 @@ public class GenStaticDataService(ILogger<GenStaticDataService> log, PokeApiServ
 
         var evolves = new GenStaticEvolves(log, pokeApiService, fileIOService).GenerateFiles();
 
+        var evolvesRich = new GenStaticEvolvesRich(log, pokeApiService, fileIOService).GenerateFiles();
+
         var bulbasaurSpeciesObj = await pokeApiService.GetPokemonSpecies(1);
         var filteredLanguages = SettingsService.AllowedLanguages.Where(lang =>
         {
@@ -35,6 +37,7 @@ public class GenStaticDataService(ILogger<GenStaticDataService> log, PokeApiServ
 
         await Task.WhenAll([
             evolves,
+            evolvesRich,
             species,
             others,
             spritesheets,
