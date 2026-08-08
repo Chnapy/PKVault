@@ -92,4 +92,6 @@ For the following parts, we'll call it `xx`.
   - Then you just have to add your translations values, based on other translation files (`en.json`, `fr.json`, ...).
   Use `c:translate` at any moment to see if there is missing values.
 
+- (Optional) You can also translate functional documentation in `docs/functional`. These files are used in "Help" modal in-app.
+
 - Publish your changes and open a PR ! 
