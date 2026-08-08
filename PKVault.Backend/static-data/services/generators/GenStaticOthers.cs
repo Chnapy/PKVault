@@ -556,8 +556,8 @@ public class GenStaticOthers(
                 // if (itemNameEn.ToLower().Contains("belt"))
                 // log.LogInformation($"Error with item {itemId} - {itemNameEn} / {PokeApiFileClient.PokeApiNameFromPKHexName(itemNameEn)} / {itemName}");
 
-                Items[itemEn.Text] = new StaticItem(
-                    Id: itemEn.Text,
+                Items[itemNamePokeapi] = new StaticItem(
+                    Id: itemNamePokeapi,
                     Name: item.Text,
                     Sprite: GetPokeapiRelativePath(sprite)
                 );

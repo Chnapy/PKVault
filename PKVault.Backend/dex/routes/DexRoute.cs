@@ -23,4 +23,10 @@ public class DexController(DexService dexService, DexDataService dexDataService)
     {
         return dexDataService.GetMoves(context, species, form);
     }
+
+    [HttpGet("evolves")]
+    public async Task<ActionResult<StaticEvolvesRichData>> GetEvolves([BindRequired] ushort species)
+    {
+        return await dexDataService.GetEvolutionChain(species);
+    }
 }

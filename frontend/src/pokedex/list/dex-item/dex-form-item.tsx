@@ -13,6 +13,7 @@ export const DexFormItem: React.FC<Omit<SpeciesFormItem, "id">> = withErrorCatch
   genders,
   isSeen,
   isSeenAlpha,
+  isSeenShiny,
   isCaught,
   isOwned,
   isOwnedShiny,
@@ -27,7 +28,7 @@ export const DexFormItem: React.FC<Omit<SpeciesFormItem, "id">> = withErrorCatch
     isSeenAlpha={isSeenAlpha}
     isCaught={isCaught}
     isOwned={isOwned}
-    isOwnedShiny={isOwnedShiny}
+    isOwnedShiny={isOwnedShiny || isSeenShiny}
     isMega={isMega}
   >
     <SpeciesImg

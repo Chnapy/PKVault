@@ -23,8 +23,9 @@ import { UIDetailsSaves } from '../../ui/storage/storage-details/saves/ui-detail
 import { PokedexDetailsMoves } from './content/pokedex-details-moves';
 import { usePokedexDetailsSelect } from './hooks/use-pokedex-details-select';
 import { usePokedexSelectExpanded } from './hooks/use-pokedex-select-expanded';
-import { PokedexDetailsOwned } from './pokedex-details-owned';
+import { PokedexDetailsOwned } from './content/pokedex-details-owned';
 import { getGameInfos } from './util/get-game-infos';
+import { PokedexDetailsEvolutions } from './content/evolutions/pokedex-details-evolutions';
 
 export const PokedexDetails: React.FC = () => {
   const { t } = useTranslate();
@@ -110,8 +111,25 @@ export const PokedexDetails: React.FC = () => {
     },
     {
       name: 'evolutions',
-      label: t('details.evolutions.title'),
-      content: 'WIP',
+      label: t('details.evo.title'),
+      content: <PokedexDetailsEvolutions
+        saveId={selectedSave.id}
+        context={selectedSave.context}
+        onSelect={(species, formIndex) => {
+          if (species === selectedSpecies) {
+            selectedByFormIndex(formIndex);
+          } else {
+            navigate({
+              search: search => ({
+                ...search,
+                selected: species,
+              }),
+            });
+          }
+        }}
+        species={selectedSpecies}
+        formIndex={selectedStaticFormWithIndex.index}
+      />,
     },
     {
       name: 'locations',

@@ -74,6 +74,15 @@ public class StaticDataService(ILogger<StaticDataService> log, ISettingsService 
         );
     }
 
+    public async Task<StaticEvolvesRichData> GetStaticEvolvesRich()
+    {
+        return await GetCacheValue(
+            "evolves-rich",
+            "",
+            _ => GenStaticEvolvesRich.LoadData()
+        );
+    }
+
     public async Task<Stream> GetSpritesheetStream(string sheetName)
     {
         return await spritesheetFileClient.GetAsyncString(sheetName);

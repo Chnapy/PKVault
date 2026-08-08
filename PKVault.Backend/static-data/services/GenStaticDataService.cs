@@ -9,7 +9,7 @@ public class GenStaticDataService(ILogger<GenStaticDataService> log, PokeApiServ
     {
         using var _ = log.Time("-- Generate PokeApi static-data & spritesheets");
 
-        var evolves = new GenStaticEvolves(log, pokeApiService, fileIOService).GenerateFiles();
+        var evolvesRich = new GenStaticEvolvesRich(log, pokeApiService, fileIOService).GenerateFiles();
 
         var bulbasaurSpeciesObj = await pokeApiService.GetPokemonSpecies(1);
         var filteredLanguages = SettingsService.AllowedLanguages.Where(lang =>
@@ -34,7 +34,7 @@ public class GenStaticDataService(ILogger<GenStaticDataService> log, PokeApiServ
         ).GenerateFiles();
 
         await Task.WhenAll([
-            evolves,
+            evolvesRich,
             species,
             others,
             spritesheets,
