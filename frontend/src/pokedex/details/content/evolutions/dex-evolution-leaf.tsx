@@ -2,7 +2,6 @@ import { Box, Divider, Stack, type RenderTreeNodePayload, type TreeNodeData } fr
 import React from 'react';
 import { useDexGetAll } from '../../../../data/sdk/dex/dex.gen';
 import type { EntityContext, TriggerData } from '../../../../data/sdk/model';
-import { Route } from '../../../../routes/pokedex';
 import { useTranslate } from '../../../../translate/i18n';
 import { UIButton } from '../../../../ui/form/button/ui-button';
 import { DexFormItem } from '../../../list/dex-item/dex-form-item';
@@ -16,19 +15,17 @@ export type TreeNodeDataRich = TreeNodeData & {
     };
 };
 
-type DexEvolutionLeafProps = TreeNodeDataRich & {
-    selected: boolean;
+export type DexEvolutionLeafProps = TreeNodeDataRich & {
+    saveId: number;
     context: EntityContext;
+    selected: boolean;
+    onSelect: (species: number, formIndex: number) => void;
 } & RenderTreeNodePayload[ 'elementProps' ];
 
-export const DexEvolutionLeaf: React.FC<DexEvolutionLeafProps> = ({ value, label, nodeProps, selected, context, hasChildren, ...elementProps }) => {
+export const DexEvolutionLeaf: React.FC<DexEvolutionLeafProps> = ({ value, label, nodeProps, selected, onSelect, saveId, context, hasChildren, ...elementProps }) => {
     const { species, formIndex, triggers = [] } = nodeProps;
 
     const { t } = useTranslate();
-
-    const saveId = Route.useSearch({ select: (search) => search.selectedSaveId ?? 0 });
-
-    const navigate = Route.useNavigate();
 
     const dex = useDexGetAll();
 
@@ -39,18 +36,14 @@ export const DexEvolutionLeaf: React.FC<DexEvolutionLeafProps> = ({ value, label
             <UIButton
                 name={value}
                 controlLabel={t('action.select')}
-                onClick={() => navigate({
-                    search: search => ({
-                        ...search,
-                        selected: species,
-                    })
-                })}
+                onClick={() => onSelect(species, formIndex)}
                 disabled={!dexData?.isSeen}
                 variant='default'
                 justify='flex-start'
                 bd='none'
                 w='100%'
                 h='auto'
+                px='sm'
                 styles={{
                     root: {
                         outline: selected ? '2px solid var(--focus-color-1)' : undefined,
@@ -76,15 +69,13 @@ export const DexEvolutionLeaf: React.FC<DexEvolutionLeafProps> = ({ value, label
                 <Stack align='flex-start' gap='sm' py='sm' style={{ flexGrow: 1 }}>
                     <span>{label}</span>
 
-                    {triggers.length > 0 && <>
-                        {triggers.map((triggerData, i) => {
-                            return <React.Fragment key={i}>
-                                {i > 0 && <Divider w='100%' />}
+                    {triggers.map((triggerData, i) => {
+                        return <React.Fragment key={i}>
+                            {i > 0 && <Divider w='100%' />}
 
-                                <DexEvolutionTriggerLine context={context} {...triggerData} />
-                            </React.Fragment>;
-                        })}
-                    </>}
+                            <DexEvolutionTriggerLine {...triggerData} context={context} showContexts={triggers.length > 1} />
+                        </React.Fragment>;
+                    })}
                 </Stack>
             </UIButton>
         </Box>

@@ -113,7 +113,20 @@ export const PokedexDetails: React.FC = () => {
       name: 'evolutions',
       label: t('details.evo.title'),
       content: <PokedexDetailsEvolutions
+        saveId={selectedSave.id}
         context={selectedSave.context}
+        onSelect={(species, formIndex) => {
+          if (species === selectedSpecies) {
+            selectedByFormIndex(formIndex);
+          } else {
+            navigate({
+              search: search => ({
+                ...search,
+                selected: species,
+              }),
+            });
+          }
+        }}
         species={selectedSpecies}
         formIndex={selectedStaticFormWithIndex.index}
       />,

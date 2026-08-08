@@ -1,19 +1,18 @@
 import { getTreeExpandedState, Loader, Tree, useTree } from '@mantine/core';
 import React from 'react';
 import { useDexGetEvolves } from '../../../../data/sdk/dex/dex.gen';
-import { type EntityContext, type StaticEvolveRichItem } from '../../../../data/sdk/model';
+import { type StaticEvolveRichItem } from '../../../../data/sdk/model';
 import { useStaticData } from '../../../../hooks/use-static-data';
 import { UISpriteSizeWrapper } from '../../../../ui/sprite-img/ui-sprite-size-wrapper';
-import { DexEvolutionLeaf, type TreeNodeDataRich } from './dex-evolution-leaf';
+import { DexEvolutionLeaf, type DexEvolutionLeafProps, type TreeNodeDataRich } from './dex-evolution-leaf';
 import classes from './pokedex-details-evolutions.module.css';
 
-type PokedexDetailsEvolutionsProps = {
-    context: EntityContext;
+type PokedexDetailsEvolutionsProps = Pick<DexEvolutionLeafProps, 'saveId' | 'context' | 'onSelect'> & {
     species: number;
     formIndex: number;
 };
 
-export const PokedexDetailsEvolutions: React.FC<PokedexDetailsEvolutionsProps> = ({ context, species, formIndex }) => {
+export const PokedexDetailsEvolutions: React.FC<PokedexDetailsEvolutionsProps> = ({ saveId, context, species, formIndex, onSelect }) => {
     const staticData = useStaticData();
 
     const getBaseSpecies = (species: number) => {
@@ -81,11 +80,11 @@ export const PokedexDetailsEvolutions: React.FC<PokedexDetailsEvolutionsProps> =
     if (dexEvolves.isPending)
         return <Loader />;
 
-    if (treeData.length === 0)
-        console.log('EMPTY', species, staticData.species[ species ]);
+    // if (treeData.length === 0)
+    //     console.log('EMPTY', species, staticData.species[ species ]);
 
-    if (new Set(treeData.map(d => d.value)).size !== treeData.length)
-        console.log('DUPLICATES', treeData, staticData.species[ species ]);
+    // if (new Set(treeData.map(d => d.value)).size !== treeData.length)
+    //     console.log('DUPLICATES', treeData, staticData.species[ species ]);
 
     return <>
         <UISpriteSizeWrapper
@@ -104,8 +103,10 @@ export const PokedexDetailsEvolutions: React.FC<PokedexDetailsEvolutionsProps> =
                     const richNode = node as TreeNodeDataRich;
 
                     return <DexEvolutionLeaf
-                        selected={richNode.nodeProps.species === species && richNode.nodeProps.formIndex === formIndex}
+                        saveId={saveId}
                         context={context}
+                        onSelect={onSelect}
+                        selected={richNode.nodeProps.species === species && richNode.nodeProps.formIndex === formIndex}
                         {...richNode}
                         {...elementProps}
                     />;

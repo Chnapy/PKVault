@@ -43,12 +43,16 @@ public record StaticEvolveRich(
         bool TurnUpsideDown,
         bool ThreeDefeatedBisharp,
         bool GimmighoulCoins,
-        TimeOfDay? TimeOfDay
+        TimeOfDay? TimeOfDay,
+        // GameVersion? Version,
+        List<EntityContext> Contexts
     )
     {
-        // TODO Meltan#808
-        // || (Trigger = UseItem? && Version == GO)
-        public bool EvolutionIsPossible => Trigger == Trigger.Trade || NeedsMultiplayer || TurnUpsideDown;
+        public bool EvolutionIsPossible => Trigger == Trigger.Trade
+            || NeedsMultiplayer
+            || TurnUpsideDown
+            // Meltan#808
+            || MinItemCount != null;
     };
 
     public enum Trigger
@@ -273,6 +277,9 @@ public class GenStaticEvolvesRich(
                         ));
                     }
 
+                    var version = VersionGroupToVersion.GetVersion(details.VersionGroup);
+                    var context = version?.Context;
+
                     var triggerObj = new StaticEvolveRich.TriggerData(
                         Trigger: StaticEvolveRich.Trigger.LevelUp,
                         Level: (byte?)details.MinLevel,
@@ -299,7 +306,9 @@ public class GenStaticEvolvesRich(
                         TurnUpsideDown: details.TurnUpsideDown,
                         ThreeDefeatedBisharp: false,
                         GimmighoulCoins: false,
-                        TimeOfDay: GetTimeOfDay(details.TimeOfDay)
+                        TimeOfDay: GetTimeOfDay(details.TimeOfDay),
+                        // Version: version,
+                        Contexts: context == null ? [] : [(EntityContext)context]
                     );
 
                     triggerObj = details.Trigger.Name switch
@@ -379,8 +388,22 @@ public class GenStaticEvolvesRich(
                         _ => throw new Exception($"Evolution trigger name not handled: {details.Trigger.Name}"),
                     };
 
-                    if (evolve.Triggers.Any(t => JsonSerializer.Serialize(t) == JsonSerializer.Serialize(triggerObj)))
+                    var existingTriggerObj = evolve.Triggers.FirstOrDefault(t =>
+                        JsonSerializer.Serialize(t with { Contexts = [] })
+                        == JsonSerializer.Serialize(triggerObj with { Contexts = [] }));
+
+                    if (existingTriggerObj != null)
+                    {
+                        if (context != null && !existingTriggerObj.Contexts.Contains((EntityContext)context))
+                        {
+                            EntityContext[] newContexts = [..existingTriggerObj.Contexts, (EntityContext)context];
+
+                            existingTriggerObj.Contexts.Clear();
+                            existingTriggerObj.Contexts.AddRange(newContexts.Order());
+                        }
+
                         continue;
+                    }
 
                     evolve.Triggers.Add(triggerObj);
                 }

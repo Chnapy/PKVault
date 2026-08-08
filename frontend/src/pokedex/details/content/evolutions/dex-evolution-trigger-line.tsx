@@ -2,6 +2,7 @@ import { Badge, Group, Image, Tooltip } from '@mantine/core';
 import { FootprintsIcon, GlobeIcon, HeartIcon } from 'lucide-react';
 import React, { type JSX } from 'react';
 import { GameVersion, RelativePhysicalStats, StyleMove, TimeOfDay, Trigger, type EntityContext, type TriggerData } from '../../../../data/sdk/model';
+import { getEntityContextGenerationName } from '../../../../data/util/get-entity-context-generation-name';
 import { useStaticData } from '../../../../hooks/use-static-data';
 import { ItemImg } from '../../../../img/item-img';
 import { SpeciesImg } from '../../../../img/species-img';
@@ -14,10 +15,13 @@ import { switchUtil } from '../../../../util/switch-util';
 
 type DexEvolutionTriggerLineProps = TriggerData & {
     context: EntityContext;
+    showContexts?: boolean;
 };
 
 export const DexEvolutionTriggerLine: React.FC<DexEvolutionTriggerLineProps> = ({
     context,
+    showContexts,
+    contexts,
     trigger,
     level,
     item,
@@ -89,6 +93,8 @@ export const DexEvolutionTriggerLine: React.FC<DexEvolutionTriggerLineProps> = (
         w='100%'
         gap='sm'
     >
+        {showContexts && contexts.map(c => getEntityContextGenerationName(c, true)).join('/')}
+
         {renderBadge(switchUtil(trigger, {
             [ Trigger.LevelUp ]: level
                 ? t('details.evo.level', { level })
@@ -154,12 +160,12 @@ export const DexEvolutionTriggerLine: React.FC<DexEvolutionTriggerLineProps> = (
         {renderBadge(<>
             {move !== undefined && <>{moveAction} {renderMove(move)}</>}
 
-            {minMoveCount !== undefined && t('details.evo.move-times', { count: minMoveCount })}
+            {minMoveCount !== undefined && `x${minMoveCount}`}
 
-            {styleMove !== undefined && switchUtil(styleMove, {
+            {styleMove !== undefined && ` ${switchUtil(styleMove, {
                 [ StyleMove.Strong ]: t('details.evo.strong-style'),
                 [ StyleMove.Agile ]: t('details.evo.agile-style'),
-            })}
+            })}`}
         </>)}
 
         {moveType !== undefined && renderBadge(<>
@@ -202,8 +208,8 @@ const renderBadge = (children: React.ReactNode) => {
     if (!hasAnyChild(children))
         return null;
 
-    return <Badge variant='default' fz='xs' tt='none' px='sm' py={0}>
-        <Group wrap='nowrap' gap='sm'>
+    return <Badge variant='default' h='auto' fz='xs' tt='none' px='sm' py={0}>
+        <Group gap='sm' style={{ rowGap: 0 }}>
             {children}
         </Group>
     </Badge>;
