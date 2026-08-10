@@ -10,6 +10,7 @@ using System.Text.Json.Serialization;
 [JsonSerializable(typeof(List<MoveItem>))]
 [JsonSerializable(typeof(List<BackupDTO>))]
 [JsonSerializable(typeof(DexMoveDTO))]
+[JsonSerializable(typeof(DexLocationDTO))]
 [JsonSerializable(typeof(StaticEvolvesRichData))]
 [JsonSerializable(typeof(DataDTO))]
 [JsonSerializable(typeof(SettingsDTO))]

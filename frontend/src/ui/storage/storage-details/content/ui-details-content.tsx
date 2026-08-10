@@ -48,7 +48,7 @@ export const UIDetailsContent: React.FC<UIDetailsContentProps> = ({ content }) =
             </ScrollerControlled>
         </Tabs.List>
 
-        <Box p='md' style={{ overflow: 'auto' }}>
+        <Box p='md' pr={0} style={{ overflowY: 'scroll' }}>
             {content.map(item => <Tabs.Panel key={item.name} value={item.name}>
                 {item.content}
             </Tabs.Panel>)}

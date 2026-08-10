@@ -29,4 +29,10 @@ public class DexController(DexService dexService, DexDataService dexDataService)
     {
         return await dexDataService.GetEvolutionChain(species);
     }
+
+    [HttpGet("locations")]
+    public async Task<ActionResult<DexLocationDTO>> GetLocations([BindRequired] GameVersion version, [BindRequired] ushort species)
+    {
+        return await dexDataService.GetLocations(version, species);
+    }
 }
