@@ -63,6 +63,8 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, 
     const sheetUrl = getApiFullUrl(sheetRelativeUrl ?? '');
 
     return spriteInfos && <UISpeciesImg
+        data-form-index={form}
+        data-form-id={staticForm.id}
         sheetUrl={sheetUrl}
         spriteInfos={spriteInfos}
         species={species}

@@ -1,8 +1,9 @@
 
 using System.Buffers;
+using System.Text.Json;
 using PKHeX.Core;
 
-public class DexDataService(StaticDataService staticDataService)
+public class DexDataService(StaticDataService staticDataService, ISettingsService settingsService)
 {
     private static Func<PKM, PersonalInfo, EvoCriteria, ushort, MoveSourceType, LearnOption, MoveLearnInfo> CreateGetCanLearn(ILearnSource learnSource, PersonalInfo pi)
     {
@@ -192,10 +193,163 @@ public class DexDataService(StaticDataService staticDataService)
         HashSet<ushort> allSpecies = GetNextSpecies(firstSpecies);
 
         var results = new StaticEvolvesRichData();
-        foreach(var s in allSpecies)
+        foreach (var s in allSpecies)
         {
             results.Add(s, staticEvolvesRich[s]);
         }
         return results;
+    }
+
+    public async Task<DexLocationDTO> GetLocations(GameVersion version, ushort species)
+    {
+        var lang = settingsService.GetSettings().GetLanguageForPKHeX();
+        var strings = GameInfo.GetStrings(lang);
+
+        var context = version.Context;
+
+        SaveWrapper save = new(BlankSaveFile.Get(version));
+
+        var pkm = new ImmutablePKM(EntityBlank.GetBlank(context));
+
+        var staticSpecies = await staticDataService.GetStaticSpecies();
+
+        var speciesData = staticSpecies[species];
+        var staticForms = speciesData.Forms[(byte)context];
+
+        var fc = staticForms.Length;
+
+        DexLocationDTO dto = new(
+            Species: species,
+            Context: context,
+            Version: version,
+            Locations: []
+        );
+
+        EncounterMovesetGenerator.PriorityList = [
+            EncounterTypeGroup.Static,
+            EncounterTypeGroup.Trade,
+            EncounterTypeGroup.Slot,
+            // EncounterTypeGroup.Egg,
+            // EncounterTypeGroup.Mystery,
+        ];
+
+        for (byte formIndex = 0; formIndex < fc; formIndex++)
+        {
+            byte GetRealForm(byte form, int index)
+            {
+                if (form == EncounterUtil.FormRandom)
+                {
+                    return (byte)index;
+                }
+
+                if (form == EncounterUtil.FormVivillon)
+                {
+                    return formIndex;
+                }
+
+                if (form >= EncounterUtil.FormDynamic)
+                {
+                    return 0;
+                }
+
+                return form;
+            }
+
+            pkm = pkm.Update(pkm =>
+            {
+                pkm.Species = species;
+                pkm.Form = formIndex;
+                pkm.SetGender(pkm.GetSaneGender());
+                EncounterMovesetGenerator.OptimizeCriteria(pkm, save.GetSave());
+                pkm.RefreshChecksum();
+            });
+
+            if (FormInfo.IsBattleOnlyForm(species, formIndex, pkm.Format))
+                continue;
+
+            var encounters = EncounterMovesetGenerator.GenerateEncounters(pkm.GetMutablePkm(), new ReadOnlyMemory<ushort>(), [version]).ToArray();
+
+            var encountersFiltered = encounters
+                .Where(e => e.Species == species)
+                .Where((e, i) => GetRealForm(e.Form, i) == formIndex);
+
+            foreach (var e in encountersFiltered)
+            {
+                string? location = null;
+                if (e.Location > 0)
+                {
+                    pkm.GetMutablePkm().MetLocation = e.Location;
+                    location = pkm.GetOriginMetLocation(lang);
+                }
+
+                // string? eggLocation = null;
+                // if (e.EggLocation > 0)
+                // {
+                //     pkm.GetMutablePkm().MetLocation = e.EggLocation;
+                //     eggLocation = pkm.GetOriginMetLocation(lang);
+                // }
+
+                // int? fixedBall = null;
+                // if (e.FixedBall > 0)
+                // {
+                //     var ballName = strings.balllist[(byte)e.FixedBall];
+                //     fixedBall = strings.itemlist.IndexOf(ballName);
+                // }
+
+                var encounterType = e.Name;
+                var encounterWithMethod = e.LongName;
+
+                var isShiny = (e.IsShiny || e.Shiny == Shiny.Always || e.Shiny == Shiny.AlwaysSquare || e.Shiny == Shiny.AlwaysStar)
+                    && (e.Shiny != Shiny.Never);
+
+                DexLocationItem newItem = new(
+                    Forms: [],
+                    EncounterType: encounterType,
+                    EncounterWithMethod: encounterWithMethod,
+                    IsEgg: e.IsEgg,
+                    IsShiny: isShiny,
+                    Location: location,
+                    // EggLocation: eggLocation,
+                    Levels: [],
+                    AbilitiesAllowed: e.Ability
+                // FixedBall: fixedBall,
+                // ShinyProbability: e.Shiny
+                );
+
+                var newItemJson = JsonSerializer.Serialize(newItem);
+                var newItemFormJson = JsonSerializer.Serialize(newItem with { Forms = [formIndex] });
+
+                if (!dto.Locations.TryGetValue(location, out var locationsByMethod))
+                {
+                    locationsByMethod = [];
+                    dto.Locations.Add(location, locationsByMethod);
+                }
+
+                if (!locationsByMethod.TryGetValue(encounterWithMethod, out var locationItems))
+                {
+                    locationItems = [];
+                    locationsByMethod.Add(encounterWithMethod, locationItems);
+                }
+
+                var existingItem = locationItems.FirstOrDefault(
+                    i => (JsonSerializer.Serialize(i! with { Forms = [], Levels = [] }) == newItemJson
+                        && i.Levels.Any(l => l.LevelMin == e.LevelMin && l.LevelMax == e.LevelMax))
+                        || (JsonSerializer.Serialize(i! with { Levels = [] }) == newItemFormJson),
+                    null
+                );
+
+                var item = existingItem ?? newItem;
+
+                item.Forms.Add(formIndex);
+                item.Levels.Add(new(e.LevelMin, e.LevelMax));
+
+                if (existingItem == null)
+                {
+                    locationItems.Add(newItem);
+                }
+            }
+        }
+
+        return dto;
     }
 }

@@ -26,6 +26,7 @@ import { usePokedexSelectExpanded } from './hooks/use-pokedex-select-expanded';
 import { PokedexDetailsOwned } from './content/pokedex-details-owned';
 import { getGameInfos } from './util/get-game-infos';
 import { PokedexDetailsEvolutions } from './content/evolutions/pokedex-details-evolutions';
+import { PokedexDetailsLocations } from './content/pokedex-details-locations';
 
 export const PokedexDetails: React.FC = () => {
   const { t } = useTranslate();
@@ -99,7 +100,7 @@ export const PokedexDetails: React.FC = () => {
         <UIDetailsStatsTotalRow total={totalBaseStats} level={50} />
       </UIDetailsContentStats>,
     },
-    {
+    selectedSave.id !== 0 && {
       name: 'moves',
       label: t('details.moves.title'),
       content: <PokedexDetailsMoves
@@ -109,7 +110,7 @@ export const PokedexDetails: React.FC = () => {
         formIndex={selectedStaticFormWithIndex.index}
       />,
     },
-    {
+    selectedSave.id !== 0 && {
       name: 'evolutions',
       label: t('details.evo.title'),
       content: <PokedexDetailsEvolutions
@@ -131,10 +132,15 @@ export const PokedexDetails: React.FC = () => {
         formIndex={selectedStaticFormWithIndex.index}
       />,
     },
-    {
+    selectedSave.displayedVersion !== null && {
       name: 'locations',
       label: t('details.locations.title'),
-      content: 'WIP',
+      content: <PokedexDetailsLocations
+        saveId={selectedSave.id}
+        context={selectedSave.context}
+        version={selectedSave.displayedVersion}
+        species={selectedSpecies}
+      />,
     },
     {
       name: 'misc',

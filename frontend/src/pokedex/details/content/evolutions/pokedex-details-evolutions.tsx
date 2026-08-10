@@ -116,6 +116,7 @@ export const PokedexDetailsEvolutions: React.FC<PokedexDetailsEvolutionsProps> =
                     label: classes.evolutionsLabel,
                     node: classes.evolutionsNode,
                 }}
+                pr={2}
             />
         </UISpriteSizeWrapper>
     </>;
