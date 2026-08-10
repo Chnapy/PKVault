@@ -1,11 +1,12 @@
 import { Card } from '@mantine/core';
 import type React from 'react';
+import { useTranslate } from '../../../translate/i18n';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
+import { useControlsCurrentType } from '../../interaction/controls/use-controls-current-type';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 import { Focus } from '../../interaction/focus/provider/use-focus-context';
 import { FocusScope } from '../../interaction/focus/scope/focus-scope';
-import { useTranslate } from '../../../translate/i18n';
 
 type UIPokedexMainProps = {
     children: React.ReactNode;
@@ -32,7 +33,14 @@ export const UIPokedexMain: React.FC<UIPokedexMainProps> = ({ children, ...rest 
         ],
     });
 
-    return <FocusScope id={name} parentNodeId={nodeId}>
+    const isMouseControls = useControlsCurrentType() === 'mouse';
+
+    return <FocusScope
+        id={name}
+        parentNodeId={nodeId}
+        // fix scroll issue with mouse controls: scroll reset on click when no item selected
+        restoreMode={isMouseControls ? 'none' : undefined}
+    >
         <WithControlsIcons placement='out' icons={controlIcons('open')}
             {...rest}
         >
