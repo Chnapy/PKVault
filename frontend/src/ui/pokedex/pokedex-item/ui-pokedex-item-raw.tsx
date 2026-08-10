@@ -51,6 +51,7 @@ export const UIPokedexItemRaw: React.FC<UIPokedexItemRawProps> = ({
                 {...focusProps}
                 {...controlProps('open')}
                 ref={ref}
+                data-dex-item
                 data-selected={selected || undefined}
                 variant='default'
                 className={classes.button}

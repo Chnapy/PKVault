@@ -4,7 +4,7 @@ import { create } from 'zustand';
 export type FocusScopeId = string;
 export type FocusNodeId = string;
 
-export type RestoreMode = 'last-focused' | 'first-child';
+export type RestoreMode = 'last-focused' | 'first-child' | 'none';
 
 export type FocusNodeData = {
   id: FocusNodeId;

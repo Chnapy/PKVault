@@ -271,6 +271,10 @@ const useRestoreScopeFocus = () => {
         getFirstScopeNode(scopeId)?.focusSelf();
         return;
       }
+
+      case 'none': {
+        return;
+      }
     }
   }, [ getFirstScopeNode, useFocusStore ]);
 };

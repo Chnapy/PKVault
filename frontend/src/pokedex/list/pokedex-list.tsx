@@ -1,4 +1,6 @@
 import { Card, EmptyState, Group, Skeleton, Stack } from '@mantine/core';
+import { useMergedRef } from '@mantine/hooks';
+import { setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import { PackageOpenIcon } from 'lucide-react';
 import React from "react";
 import { withErrorCatcher } from "../../error/with-error-catcher";
@@ -17,6 +19,8 @@ import { PokedexItem } from "./pokedex-item";
 export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("default", React.memo((popoverProps) => {
   const { t } = useTranslate();
 
+  const itemsRef = React.useRef<HTMLElement>(null);
+
   const staticData = useStaticData();
 
   const {
@@ -29,7 +33,25 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
     // totalCount,
   } = usePokedexItems();
 
-  return <Stack h='100%' style={{ flexGrow: 1 }} {...popoverProps}>
+  const ref = useMergedRef(
+    popoverProps.ref,
+    itemsRef,
+  );
+
+  React.useEffect(() => {
+    if (!itemsRef.current)
+      return;
+
+    const selectedItem = itemsRef.current.querySelector<HTMLElement>('[data-dex-item][data-selected="true"]');
+    if (selectedItem) {
+      // apply focus is required to set scope last-node and avoid scroll inconsistencies
+      // no need to scroll manually, already done by focus
+      if (selectedItem.dataset.focusKey)
+        setFocus(selectedItem.dataset.focusKey);
+    }
+  }, []);
+
+  return <Stack h='100%' style={{ flexGrow: 1 }} {...popoverProps} ref={ref}>
     <UIPokedexMain mah='100%'>
       {!isPending && speciesItemsByGenerationList.length === 0 && <EmptyState
         size='sm'
