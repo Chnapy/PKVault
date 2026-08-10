@@ -275,12 +275,11 @@ public class DexDataService(StaticDataService staticDataService, ISettingsServic
 
             foreach (var e in encountersFiltered)
             {
-                string? location = null;
-                if (e.Location > 0)
-                {
-                    pkm.GetMutablePkm().MetLocation = e.Location;
-                    location = pkm.GetOriginMetLocation(lang);
-                }
+                if (e.Location == 0)
+                    continue;
+
+                pkm.GetMutablePkm().MetLocation = e.Location;
+                string location = pkm.GetOriginMetLocation(lang);
 
                 // string? eggLocation = null;
                 // if (e.EggLocation > 0)
@@ -316,9 +315,6 @@ public class DexDataService(StaticDataService staticDataService, ISettingsServic
                 // ShinyProbability: e.Shiny
                 );
 
-                var newItemJson = JsonSerializer.Serialize(newItem);
-                var newItemFormJson = JsonSerializer.Serialize(newItem with { Forms = [formIndex] });
-
                 if (!dto.Locations.TryGetValue(location, out var locationsByMethod))
                 {
                     locationsByMethod = [];
@@ -331,10 +327,11 @@ public class DexDataService(StaticDataService staticDataService, ISettingsServic
                     locationsByMethod.Add(encounterWithMethod, locationItems);
                 }
 
+                var newItemForm = newItem with { Forms = [formIndex] };
                 var existingItem = locationItems.FirstOrDefault(
-                    i => (JsonSerializer.Serialize(i! with { Forms = [], Levels = [] }) == newItemJson
+                    i => (i! with { Forms = [], Levels = [] } == newItem
                         && i.Levels.Any(l => l.LevelMin == e.LevelMin && l.LevelMax == e.LevelMax))
-                        || (JsonSerializer.Serialize(i! with { Levels = [] }) == newItemFormJson),
+                        || (i! with { Levels = [] } == newItemForm),
                     null
                 );
 
