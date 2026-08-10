@@ -54,7 +54,10 @@ public class DataNormalizeAction(
 
         return new(
             DataActionType.DATA_NORMALIZE,
-            []
+            [
+                input.UpdateVersion ? settingsService.GetSettings().Version : null,
+                input.SetupInitialData,
+            ]
         );
     }
 
