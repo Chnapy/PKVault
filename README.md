@@ -22,7 +22,7 @@ Similar to Pokémon Home, offline as online.
 <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/microsoft-windows.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/linux.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/steam-deck-light.png" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/docker.png" width="100" /> |
 |:---:|:---:|:---:|:---:|
 | [![Download for Windows](https://img.shields.io/badge/Windows-Download-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Download for Linux](https://img.shields.io/badge/Linux-Download-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Download for SteamDeck](https://img.shields.io/badge/SteamDeck-Download-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Docker usage](https://img.shields.io/badge/Docker-Setup-purple)](#docker-usage) |
-| PKVault.exe | pkvault.flatpak<br/>pkvault.AppImage<br/>pkvault.deb<br/>pkvault | pkvault.flatpak | `ghcr.io/chnapy/pkvault` |
+| PKVault.exe | pkvault.flatpak<br/>pkvault.AppImage<br/>pkvault.deb<br/>pkvault.linux | pkvault.flatpak | `ghcr.io/chnapy/pkvault` |
 
 ![License](https://img.shields.io/badge/License-GPLv3-green.svg)
 

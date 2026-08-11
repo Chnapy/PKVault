@@ -201,8 +201,8 @@ jobs:
           docker build . --target desktop-linux --build-arg RID=linux-x64 --build-arg VERSION=${{ env.VERSION }} --build-arg BUILD_DATE=${{ env.BUILD_DATE }} -t tmp-desktop-linux64
           docker create --name tmp-desktop-linux64 tmp-desktop-linux64
 
-          docker cp tmp-desktop-linux64:/app/PKVault pkvault-${{ env.VERSION }}
-          chmod +x pkvault-${{ env.VERSION }}
+          docker cp tmp-desktop-linux64:/app/PKVault pkvault-${{ env.VERSION }}.linux
+          chmod +x pkvault-${{ env.VERSION }}.linux
 
           docker cp tmp-desktop-linux64:/app/PKVault.AppImage pkvault-${{ env.VERSION }}.AppImage
           chmod +x pkvault-${{ env.VERSION }}.AppImage
@@ -233,7 +233,7 @@ jobs:
           generate_release_notes: true
           files: |
             PKVault-${{ env.VERSION }}.exe
-            pkvault-${{ env.VERSION }}
+            pkvault-${{ env.VERSION }}.linux
             pkvault-${{ env.VERSION }}.AppImage
             pkvault-${{ env.VERSION }}.flatpak
             pkvault-${{ env.VERSION }}.deb
