@@ -23,6 +23,8 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
     public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr", "de", "pt-br"]; //GameLanguage.AllSupportedLanguages.ToArray();
     private static readonly SemaphoreSlim semaphore = new(1);
 
+    public static string[] ProgramArgs = [];
+
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
     private ISessionService sessionService => sp.GetRequiredService<ISessionService>();
 
@@ -229,6 +231,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         return new(
             BuildID,
             RuntimeSystem: GetRuntimeSystem(),
+            SourceProvider: GetSourceProvider(),
             Version,
             PkhexVersion: Assembly.GetAssembly(typeof(PKHeX.Core.PKM))?.GetName().Version?.ToString(3) ?? "",
             AppDirectory: MatcherUtil.NormalizePath(GetAppDirectory()),
@@ -311,6 +314,21 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             return RuntimeSystem.STEAMDECK;
 
         return RuntimeSystem.LINUX;
+    }
+
+    private static SourceProvider GetSourceProvider()
+    {
+        var provider = ProgramArgs.FirstOrDefault(
+            arg => arg?.StartsWith("PROVIDER=") ?? false,
+            null
+        );
+        var providerName = provider?.Split('=').LastOrDefault() ?? "";
+
+        return providerName switch
+        {
+            "flathub" => SourceProvider.Flathub,
+            _ => SourceProvider.GithubRelease,
+        };
     }
 
     public static readonly string DefaultSavePath = "./pokemon-emerald-sample.sav";

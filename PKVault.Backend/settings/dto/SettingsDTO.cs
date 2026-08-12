@@ -3,6 +3,7 @@ using PKHeX.Core;
 public record SettingsDTO(
     Guid BuildID,
     RuntimeSystem RuntimeSystem,
+    SourceProvider SourceProvider,
     string Version,
     string PkhexVersion,
     string AppDirectory,
@@ -68,4 +69,10 @@ public enum RuntimeSystem
     WINDOWS,
     LINUX,
     STEAMDECK,
+}
+
+public enum SourceProvider
+{
+    GithubRelease,
+    Flathub,
 }

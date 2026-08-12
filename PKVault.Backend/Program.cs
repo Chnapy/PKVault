@@ -23,6 +23,10 @@ public class Program
     {
         LogUtil.Initialize();
 
+        Log.Logger.Debug($"ARGS: {string.Join(' ', args)}");
+
+        SettingsService.ProgramArgs = args;
+
         try {
             Copyright();
 
