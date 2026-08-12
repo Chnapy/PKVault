@@ -4,6 +4,7 @@ public record SettingsDTO(
     Guid BuildID,
     RuntimeSystem RuntimeSystem,
     SourceProvider SourceProvider,
+    bool FlatpakMigrated,
     string Version,
     string PkhexVersion,
     string AppDirectory,

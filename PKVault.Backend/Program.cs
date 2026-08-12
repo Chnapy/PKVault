@@ -25,7 +25,7 @@ public class Program
 
         Log.Logger.Debug($"ARGS: {string.Join(' ', args)}");
 
-        SettingsService.ProgramArgs = args;
+        // SettingsService.ProgramArgs = args;
 
         try {
             Copyright();

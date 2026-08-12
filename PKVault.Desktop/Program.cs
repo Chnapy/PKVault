@@ -48,7 +48,7 @@ class Program
         Log.Logger.Debug($"LinuxOS : {LinuxOS}");
         Log.Logger.Debug($"WindowsOS : {WindowsOS}");
 
-        SettingsService.ProgramArgs = args;
+        // SettingsService.ProgramArgs = args;
 
         if (LinuxOS)
         {
@@ -58,6 +58,8 @@ class Program
         try
         {
             Backend.Program.Copyright();
+
+            SettingsService.FlatpakMigrateIfAny();
 
             var window = new PhotinoWindow();
 

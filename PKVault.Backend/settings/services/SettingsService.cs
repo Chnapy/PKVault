@@ -23,7 +23,8 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
     public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr", "de", "pt-br"]; //GameLanguage.AllSupportedLanguages.ToArray();
     private static readonly SemaphoreSlim semaphore = new(1);
 
-    public static string[] ProgramArgs = [];
+    // public static string[] ProgramArgs = [];
+    public static bool FlatpakMigrated = false;
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
     private ISessionService sessionService => sp.GetRequiredService<ISessionService>();
@@ -232,6 +233,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             BuildID,
             RuntimeSystem: GetRuntimeSystem(),
             SourceProvider: GetSourceProvider(),
+            FlatpakMigrated: FlatpakMigrated,
             Version,
             PkhexVersion: Assembly.GetAssembly(typeof(PKHeX.Core.PKM))?.GetName().Version?.ToString(3) ?? "",
             AppDirectory: MatcherUtil.NormalizePath(GetAppDirectory()),
@@ -318,17 +320,75 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private static SourceProvider GetSourceProvider()
     {
-        var provider = ProgramArgs.FirstOrDefault(
-            arg => arg?.StartsWith("PROVIDER=") ?? false,
-            null
-        );
-        var providerName = provider?.Split('=').LastOrDefault() ?? "";
-
-        return providerName switch
+        if (IsFlatpak() && File.Exists("/app/manifest.json"))
         {
-            "flathub" => SourceProvider.Flathub,
-            _ => SourceProvider.GithubRelease,
-        };
+            return SourceProvider.Flathub;
+        }
+
+        return SourceProvider.GithubRelease;
+    }
+
+    // Migrate Flatpak org.chnapy.pkvault -> io.github.chnapy.pkvault, if relevant
+    public static void FlatpakMigrateIfAny()
+    {
+        var dataToMigrate = GetFlatpakDataToMigrate();
+        if (dataToMigrate.Length == 0)
+            return;
+            
+        foreach(var (_, SrcPath, DestPath) in dataToMigrate)
+        {
+            CopyDirectory.CopyDirectoryRecursive(SrcPath, DestPath);
+        }
+        Log.Logger.Debug("Flatpak migration complete");
+
+        FlatpakMigrated = true;
+    }
+
+    private static (string Folder, string SrcPath, string DestPath)[] GetFlatpakDataToMigrate()
+    {
+        if (!IsFlatpak()) {
+            return [];
+        }
+
+        var dbAlreadyExists = File.Exists(
+            MatcherUtil.NormalizePath(Path.Combine(
+                GetAppDirectory(),
+                GetDefaultSettingsMutable().DB_PATH,
+                "pkvault.db"
+            ))
+        );
+        if (dbAlreadyExists) {
+            return [];
+        }
+        
+        var dataPath = Path.Combine(MatcherUtil.NormalizePath(GetAppDirectory()), "../../org.chnapy.pkvault/data");
+        if (!Directory.Exists(dataPath)) {
+            return [];
+        }
+
+        var data = Directory.EnumerateDirectories(dataPath).Select(sourceDir =>
+        {
+            var folder = Path.GetFileName(sourceDir);
+
+            return (
+                Folder: folder, 
+                SrcPath: sourceDir,
+                DestPath: MatcherUtil.NormalizePath(Path.Combine(GetAppDirectory(), folder))
+            );
+        }).ToArray();
+
+        Log.Debug($"Flatpak migrate from org.chnapy.pkvault - {data.Length} folders to migrate:\n{
+            string.Join('\n', data
+                .Select(f => $"{f.Folder} -- {f.SrcPath} -> {f.DestPath}")
+            )
+        }");
+
+        return data;
+    }
+
+    private static bool IsFlatpak()
+    {
+        return !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FLATPAK_ID"));
     }
 
     public static readonly string DefaultSavePath = "./pokemon-emerald-sample.sav";
