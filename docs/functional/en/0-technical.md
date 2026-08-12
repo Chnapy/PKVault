@@ -18,7 +18,7 @@ It is recommended to place the PKVault.exe executable in a dedicated folder.
 On Linux, folder used is one of:
 
 - `/home/$USER/Documents/pkvault`
-- `/home/$USER/.var/app/org.chnapy.pkvault/data` - expected with flatpak file
+- `/home/$USER/.var/app/io.github.chnapy.pkvault/data` - expected with flatpak file
 
 You will find the following files:
 

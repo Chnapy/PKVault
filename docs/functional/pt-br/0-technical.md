@@ -18,7 +18,7 @@ Recomenda-se colocar o executável `PKVault.exe` em uma pasta dedicada.
 No Linux, a pasta utilizada é uma das seguintes:
 
 - `/home/$USER/Documents/pkvault`
-- `/home/$USER/.var/app/org.chnapy.pkvault/data` - esperado ao usar a versão Flatpak
+- `/home/$USER/.var/app/io.github.chnapy.pkvault/data` - esperado ao usar a versão Flatpak
 
 Você encontrará os seguintes arquivos:
 
