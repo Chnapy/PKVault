@@ -117,6 +117,16 @@ public class Program
 
         return async () =>
         {
+#if DEBUG && MODE_DEFAULT
+            Log.Logger.Debug("Generate Swagger file");
+
+            var swaggerHref = $"http://localhost:5000/swagger/v1/swagger.json";
+            using HttpClient http = new();
+            using var response = await http.GetAsync(swaggerHref);
+            var json = await response.Content.ReadAsStringAsync();
+            await File.WriteAllTextAsync("swagger.json", json);
+#endif
+
             await host.Services.GetRequiredService<ISessionServiceMinimal>().EnsureSessionCreated();
         };
 #else

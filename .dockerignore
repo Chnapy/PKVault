@@ -15,4 +15,3 @@ coverage/
 .env
 .env.local
 *.log
-swagger.json
