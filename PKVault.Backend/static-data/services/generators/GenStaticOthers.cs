@@ -502,16 +502,17 @@ public class GenStaticOthers(
                 Dictionary<int, string> comboItems = [];
                 foreach (var item in itemlist)
                 {
-                    if (comboItems.TryGetValue(item.Value, out var text))
+                    var itemNamePokeapi = GetPokeapiItemName(item.Text);
+                    if (comboItems.TryGetValue(item.Value, out var textPokeapi))
                     {
-                        if (text == item.Text)
+                        if (textPokeapi == itemNamePokeapi)
                         {
                             continue;
                         }
 
-                        throw new Exception($"Key exists, key={item.Value} existingText={text} tryText={item.Text}");
+                        throw new Exception($"Key exists, key={item.Value} existingText={textPokeapi} tryText={itemNamePokeapi}");
                     }
-                    comboItems.Add(item.Value, item.Text);
+                    comboItems.Add(item.Value, itemNamePokeapi);
                 }
 
                 versionItem = new(
