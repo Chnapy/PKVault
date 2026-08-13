@@ -29,7 +29,7 @@ class Program
     private static IFileChooser fileChooser = new DefaultFileChooser();
 
     [STAThread]
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         LogUtil.Initialize();
 
@@ -49,6 +49,25 @@ class Program
         Log.Logger.Debug($"WindowsOS : {WindowsOS}");
 
         // SettingsService.ProgramArgs = args;
+
+        var genSwaggerPath = Environment.GetEnvironmentVariable("GENSWAGGER");
+        if (!string.IsNullOrWhiteSpace(genSwaggerPath))
+        {
+            Log.Logger.Debug("GENERATE SWAGGER MODE");
+            Log.Logger.Debug($"DEST: {genSwaggerPath}");
+
+            var server = new LocalWebServer();
+
+            var backendServerPostRun = await SetupBackendServer(server, args);
+
+            var swaggerHref = $"{LocalWebServer.HOST_URL}/swagger/v1/swagger.json";
+            using HttpClient http = new();
+            using var response = await http.GetAsync(swaggerHref);
+            var json = await response.Content.ReadAsStringAsync();
+            await File.WriteAllTextAsync(genSwaggerPath, json);
+
+            return;
+        }
 
         if (LinuxOS)
         {
