@@ -1,11 +1,9 @@
 
 .ui-pokedex-item {
-    touch-action: none;
     position: relative;
 }
 
 .ui-pokedex-item .button {
-    touch-action: none;
     position: relative;
     height: auto;
     padding: 0;

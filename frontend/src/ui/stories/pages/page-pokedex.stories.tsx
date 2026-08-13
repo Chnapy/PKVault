@@ -94,7 +94,7 @@ export const Primary: Story = {
                                 />
                             </Card.Section>
                             <Card.Section inheritPadding withBorder>
-                                <UIPokedexMainSection>
+                                <UIPokedexMainSection isFirstSection minSpecies={1} maxSpecies={151}>
                                     {new Array(30).fill(0).map((_, i) => <UIPokedexItem
                                         key={i}
                                         {...UIPokedexItemStory.args}
@@ -116,7 +116,7 @@ export const Primary: Story = {
                                 />
                             </Card.Section>
                             <Card.Section inheritPadding withBorder>
-                                <UIPokedexMainSection>
+                                <UIPokedexMainSection isFirstSection={false} minSpecies={152} maxSpecies={251}>
                                     {new Array(30).fill(0).map((_, i) => <UIPokedexItem
                                         key={i}
                                         {...UIPokedexItemStory.args}
@@ -138,7 +138,7 @@ export const Primary: Story = {
                                 />
                             </Card.Section>
                             <Card.Section inheritPadding withBorder>
-                                <UIPokedexMainSection>
+                                <UIPokedexMainSection isFirstSection={false} minSpecies={252} maxSpecies={386}>
                                     {new Array(30).fill(0).map((_, i) => <UIPokedexItem
                                         key={i}
                                         {...UIPokedexItemStory.args}
