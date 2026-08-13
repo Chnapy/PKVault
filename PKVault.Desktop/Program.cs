@@ -16,7 +16,7 @@ class Program
 {
     private static readonly bool WindowsOS = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
     private static readonly bool LinuxOS = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-    private static readonly bool MacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+    // private static readonly bool MacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
     private static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
     private static readonly string AssemblyStaticPrefix = "PKVault.Desktop.Resources.wwwroot.";
@@ -26,14 +26,40 @@ class Program
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     });
 
+    private static IFileChooser fileChooser = new DefaultFileChooser();
+
     [STAThread]
     static void Main(string[] args)
     {
         LogUtil.Initialize();
 
+        Log.Logger.Debug($"ARGS: {string.Join(' ', args)}");
+
+        // "Microsoft Windows 10.0.123"
+        // "GNOME 50 (Flatpak runtime)"
+        // "Linux Mint 22.1"
+        Log.Logger.Debug($"OS : {RuntimeInformation.OSDescription}");
+
+        // "win-x64"
+        // "linux-x64"
+        // "linux-arm64"
+        Log.Logger.Debug($"RID runtime : {RuntimeInformation.RuntimeIdentifier}");
+
+        Log.Logger.Debug($"LinuxOS : {LinuxOS}");
+        Log.Logger.Debug($"WindowsOS : {WindowsOS}");
+
+        // SettingsService.ProgramArgs = args;
+
+        if (LinuxOS)
+        {
+            fileChooser = new LinuxFileChooser();
+        }
+
         try
         {
             Backend.Program.Copyright();
+
+            SettingsService.FlatpakMigrateIfAny();
 
             var window = new PhotinoWindow();
 
@@ -239,44 +265,18 @@ class Program
 
                             async Task<FileExploreResponseMessage> GetDialogResponse()
                             {
-                                if (fileExploreRequest.directoryOnly)
-                                {
-                                    Log.Logger.Debug($"Directory only");
-                                    var dirResults = await window.ShowOpenFolderAsync(
-                                        // title: "TEST TITLE",
-                                        defaultPath: GetDefaultPath(),
-                                        multiSelect: fileExploreRequest.multiselect
-                                    );
-
-                                    return new(
-                                        type: fileExploreRequest.type,
-                                        id: fileExploreRequest.id,
-                                        directoryOnly: true,
-                                        values: [.. dirResults.Select(ToRelative)]
-                                    );
-                                }
-
-                                Log.Logger.Debug($"File only");
-                                var fileResults = await window.ShowOpenFileAsync(
-                                    // title: "TEST TITLE",
-                                    defaultPath: GetDefaultPath(),
-                                    multiSelect: fileExploreRequest.multiselect
+                                var results = await fileChooser.ShowChooserAsync(
+                                    window,
+                                    directoryOnly: fileExploreRequest.directoryOnly,
+                                    multiSelect: fileExploreRequest.multiselect,
+                                    defaultPath: GetDefaultPath()
                                 );
-
-                                // using var dialogFile = new OpenFileDialog();
-
-                                // dialogFile.Title = fileExploreRequest.title;
-                                // dialogFile.Multiselect = fileExploreRequest.multiselect;
-                                // if (fileExploreRequest.basePath != default)
-                                //     dialogFile.InitialDirectory = fileExploreRequest.basePath;
-
-                                // var dialogResult = dialogFile.ShowDialog();
 
                                 return new(
                                     type: fileExploreRequest.type,
                                     id: fileExploreRequest.id,
-                                    directoryOnly: true,
-                                    values: [.. fileResults.Select(ToRelative)]
+                                    directoryOnly: fileExploreRequest.directoryOnly,
+                                    values: [.. results.Select(ToRelative)]
                                 );
                             }
 

@@ -18,7 +18,7 @@ Il est d'ailleurs recommandé de placer l'executable PKVault.exe dans un dossier
 Sur Linux, le dossier utilisé est l'un d'eux:
 
 - `/home/$USER/Documents/pkvault`
-- `/home/$USER/.var/app/org.chnapy.pkvault/data` - pour le fichier flatpak
+- `/home/$USER/.var/app/io.github.chnapy.pkvault/data` - pour le fichier flatpak
 
 Vous trouverez les fichiers suivant:
 
