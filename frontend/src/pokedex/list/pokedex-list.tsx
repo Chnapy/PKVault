@@ -61,7 +61,7 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
 
       {isPending && <>
         <Skeleton h={24} />
-        <UIPokedexMainSection>
+        <UIPokedexMainSection isFirstSection minSpecies={0} maxSpecies={Infinity}>
           {new Array(54).fill(0).map((_, i) => <Skeleton key={i} w='fit-content' h='fit-content'>
             <UISpeciesImgSkeleton />
           </Skeleton>)}
@@ -72,6 +72,8 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
         generation,
         versionsForImgs,
         speciesInfos,
+        minSpecies,
+        maxSpecies,
         seenCount,
         caughtCount,
         ownedCount,
@@ -98,7 +100,7 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
             />
           </Card.Section>,
           <Card.Section key={i + 100} inheritPadding withBorder>
-            <UIPokedexMainSection>
+            <UIPokedexMainSection isFirstSection={i === 0} minSpecies={minSpecies} maxSpecies={maxSpecies}>
               {speciesInfos.map(({ species, speciesName, isSeen, itemsToRender }, i) => (
                 <PokedexItem
                   key={species}

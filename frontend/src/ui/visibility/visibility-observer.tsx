@@ -5,11 +5,12 @@ type VisibilityObserverProps = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ref: React.RefObject<any>;
     margin?: string;
+    initialValue?: boolean;
     children: React.ReactNode;
 };
 
-export const VisibilityObserver: React.FC<VisibilityObserverProps> = ({ ref, margin, children }) => {
-    const [ visible, setVisible ] = React.useState(false);
+export const VisibilityObserver: React.FC<VisibilityObserverProps> = ({ ref, margin, initialValue = false, children }) => {
+    const [ visible, setVisible ] = React.useState(initialValue);
 
     React.useEffect(() => {
         const el = ref.current;
