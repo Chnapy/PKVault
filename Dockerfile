@@ -163,7 +163,7 @@ RUN chmod +x build-deb.sh && \
   sh build-deb.sh
 
 # desktop linux - flatpak
-FROM ghcr.io/flathub-infra/flatpak-github-actions:gnome-48 AS desktop-publish-linux-flatpak
+FROM ghcr.io/flathub-infra/flatpak-github-actions:gnome-50 AS desktop-publish-linux-flatpak
 
 COPY ./PKVault.Desktop/publishers/flatpak .
 COPY ./PKVault.Desktop/publishers/common ../common

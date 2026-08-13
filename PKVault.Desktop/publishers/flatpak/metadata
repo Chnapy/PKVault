@@ -1,8 +1,8 @@
 [Application]
-name=io.github.chnapy.pkvault;
-runtime=org.gnome.Platform/x86_64/50;
-sdk=org.gnome.Sdk/x86_64/50;
-command=PKVault;
+name=io.github.chnapy.pkvault
+runtime=org.gnome.Platform/x86_64/50
+sdk=org.gnome.Sdk/x86_64/50
+command=PKVault
 
 [Context]
 shared=ipc;network;
