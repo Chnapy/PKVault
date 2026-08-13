@@ -204,7 +204,7 @@ export const usePokedexItems = (): PokedexItems => {
         const isOwnedShiny = itemsToRender.some(item => item.isOwnedShiny);
 
         const minSpecies = Math.min(acc[generation]?.minSpecies ?? Infinity, species);
-        const maxSpecies = Math.max(acc[generation]?.minSpecies ?? 0, species);
+        const maxSpecies = Math.max(acc[generation]?.maxSpecies ?? 0, species);
 
         const seenCount = acc[ generation ]?.seenCount ?? 0;
         const caughtCount = acc[ generation ]?.caughtCount ?? 0;
