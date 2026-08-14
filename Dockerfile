@@ -15,11 +15,7 @@ COPY ./PKVault.Backend ./PKVault.Backend
 
 RUN dotnet build "PKVault.Backend/PKVault.Backend.csproj"
 
-RUN dotnet run --project "PKVault.Backend/PKVault.Backend.csproj" --no-build & \
-  until curl -f -s http://localhost:5000/swagger/v1/swagger.json -o /swagger.json; do \
-  sleep 1; \
-  done && \
-  pkill dotnet
+COPY "PKVault.Backend/swagger.json" /swagger.json
 
 # backend test
 FROM backend-builder AS backend-test

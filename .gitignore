@@ -407,6 +407,7 @@ plugins/
 
 temp/
 temp_*/
+tmp/
 
 TODO.md
 Toto/
