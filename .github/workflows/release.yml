@@ -7,7 +7,6 @@ on:
         type: boolean
         required: false
         default: false
-        description: 'Run all release process without pushing to ghcr & releases'
 
 permissions:
   contents: write # releases
