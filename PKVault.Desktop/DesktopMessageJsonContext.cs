@@ -5,6 +5,8 @@ using System.Text.Json.Serialization;
 [JsonSerializable(typeof(FileExploreResponseMessage))]
 [JsonSerializable(typeof(OpenFolderRequestMessage))]
 [JsonSerializable(typeof(StartFinishRequestMessage))]
+[JsonSerializable(typeof(ToggleFullscreenRequestMessage))]
+[JsonSerializable(typeof(ToggleFullscreenResponseMessage))]
 public partial class DesktopMessageJsonContext : JsonSerializerContext
 {
 }

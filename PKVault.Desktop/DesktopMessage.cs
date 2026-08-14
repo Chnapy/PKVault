@@ -46,3 +46,23 @@ public record StartFinishRequestMessage
 {
     public const string TYPE = "start-finish";
 }
+
+public record ToggleFullscreenRequestMessage
+(
+    string type, //'toggle-fullscreen';
+    int id,
+    bool fullscreen
+)
+{
+    public const string TYPE = "toggle-fullscreen";
+}
+
+public record ToggleFullscreenResponseMessage
+(
+    string type, //'toggle-fullscreen';
+    int id,
+    bool fullscreen
+)
+{
+    public const string TYPE = "toggle-fullscreen";
+};

@@ -27,7 +27,19 @@ type StartFinishRequest = {
     hasError: boolean;
 };
 
-type Response = | FileExploreResponse;
+type ToggleFullscreenRequest = {
+    type: 'toggle-fullscreen';
+    id: number;
+    fullscreen: boolean;
+};
+
+type ToggleFullscreenResponse = {
+    type: 'toggle-fullscreen';
+    id: number;
+    fullscreen: boolean;
+};
+
+type Response = | FileExploreResponse | ToggleFullscreenResponse;
 
 declare global {
     interface External {
@@ -97,5 +109,6 @@ export const useDesktopMessage = () => {
             hasError,
         } as StartFinishRequest),
 
+        toggleFullscreen: (request: ToggleFullscreenRequest) => requestDesktop<ToggleFullscreenResponse>(request),
     };
 };

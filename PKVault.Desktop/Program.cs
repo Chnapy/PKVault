@@ -354,6 +354,20 @@ class Program
 
                             break;
                         }
+                    case ToggleFullscreenRequestMessage.TYPE:
+                        {
+                            var toggleFullscreenRequest = JsonSerializer.Deserialize(message, messageJsonContext.ToggleFullscreenRequestMessage);
+
+                            window.SetFullScreen(toggleFullscreenRequest.fullscreen);
+
+                            var response = new ToggleFullscreenResponseMessage(
+                                type: ToggleFullscreenResponseMessage.TYPE,
+                                id: toggleFullscreenRequest.id,
+                                fullscreen: toggleFullscreenRequest.fullscreen
+                            );
+                            responseSerialized = JsonSerializer.Serialize(response, messageJsonContext.ToggleFullscreenResponseMessage);
+                            break;
+                        }
                 }
 
                 if (responseSerialized == "")

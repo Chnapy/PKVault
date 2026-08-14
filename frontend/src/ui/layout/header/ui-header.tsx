@@ -8,6 +8,7 @@ import { CurrentPanelProvider } from '../../storage/storage-content/context/ui-c
 import { PanelProvider } from '../../storage/storage-content/context/ui-panel-context';
 import { usePanelControls } from '../hooks/use-panel-controls';
 import { UIToggleColorScheme } from './sub-header/ui-toggle-color-scheme';
+import { UIToggleFullscreen } from './sub-header/ui-toggle-fullscreen';
 import classes from './ui-header.module.css';
 
 export const UIHeader: React.FC<{
@@ -90,9 +91,14 @@ export const UIHeader: React.FC<{
                             >
                                 {sub}
 
-                                <UIToggleColorScheme
+                                <Group
+                                    gap='sm'
                                     ml='auto'
-                                />
+                                >
+                                    <UIToggleFullscreen />
+
+                                    <UIToggleColorScheme />
+                                </Group>
                             </Group>
                         </Stack>
                     </FocusScope>
