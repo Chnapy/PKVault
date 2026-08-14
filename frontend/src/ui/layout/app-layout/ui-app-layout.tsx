@@ -34,7 +34,7 @@ export const UIAppLayout: React.FC<UIAppLayoutProps> = ({ header, bottom, footer
                 <Stack h='100%'>
                     {children}
 
-                    <Grid grow>
+                    <Grid grow mt='auto'>
                         <Grid.Col span='auto'>
                             {bottom}
                         </Grid.Col>
