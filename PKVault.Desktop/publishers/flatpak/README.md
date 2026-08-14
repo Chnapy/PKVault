@@ -30,3 +30,21 @@ flatpak-node-generator npm frontend/package-lock.json -o frontend-npm-sources.js
 ```
 
 Tools from https://github.com/flatpak/flatpak-builder-tools.
+
+---
+
+Build flatpak from manifest:
+
+```sh
+flatpak run --command=flathub-build org.flatpak.Builder --install ./io.github.chnapy.pkvault.yml
+```
+
+Run linter:
+
+```sh
+flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest ./io.github.chnapy.pkvault.yml
+
+flatpak run --command=flatpak-builder-lint org.flatpak.Builder repo ./repo
+```
+
+Commands from https://docs.flathub.org/docs/for-app-authors/submission.
