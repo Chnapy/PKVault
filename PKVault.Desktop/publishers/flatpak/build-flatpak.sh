@@ -53,7 +53,8 @@ mkdir -p ./build/files/share/app-info
 mkdir -p ./build/files/usr
 ln -sf "$(pwd)/build/files/share" "./build/files/usr/share"
 
-appstreamcli validate "./build/files/share/metainfo/io.github.chnapy.pkvault.metainfo.xml"
+# do not validate since some links depends of future release
+# appstreamcli validate "./build/files/share/metainfo/io.github.chnapy.pkvault.metainfo.xml"
 
 appstreamcli compose --no-net --prefix=/ --origin=local \
     --components=io.github.chnapy.pkvault \
