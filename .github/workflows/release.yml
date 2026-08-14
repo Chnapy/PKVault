@@ -2,6 +2,11 @@ name: Release
 
 on:
   workflow_dispatch: # manual trigger
+    inputs:
+      dry-run:
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write # releases
@@ -30,6 +35,7 @@ jobs:
           file: "./PKVault.Backend/PKVault.Backend.csproj"
 
       - name: Check if version already exist
+        if: ${{ !inputs.dry-run }}
         env:
           VERSION: v${{ steps.get-version.outputs.version }}
         run: |
@@ -80,6 +86,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GHCR
+        if: ${{ !inputs.dry-run }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -99,19 +106,21 @@ jobs:
             VERSION=${{ env.VERSION }}
             VCS_REF=${{ env.VCS_REF }}
             BUILD_DATE=${{ env.BUILD_DATE }}
-          push: false
+          push: ${{ !inputs.dry-run }}
           provenance: false # avoid "unknown/unknown" platform in ghcr
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,push-by-digest=${{ !inputs.dry-run }},name-canonical=true,push=${{ !inputs.dry-run }}
 
       - name: Export digest
+        if: ${{ !inputs.dry-run }}
         run: |
           mkdir -p ${{ runner.temp }}/digests
           digest="${{ steps.build.outputs.digest }}"
           touch "${{ runner.temp }}/digests/${digest#sha256:}"
 
       - name: Upload digest
+        if: ${{ !inputs.dry-run }}
         uses: actions/upload-artifact@v4
         with:
           name: digests-${{ env.PLATFORM_PAIR }}
@@ -121,6 +130,7 @@ jobs:
 
   docker-manifest:
     name: Push monolith Docker image with manifest
+    if: ${{ !inputs.dry-run }}
     runs-on: ubuntu-latest
     needs:
       - version
@@ -172,7 +182,7 @@ jobs:
 
   release:
     name: Create GitHub release
-    needs: [version, docker-manifest]
+    needs: [version, docker]
     runs-on: ubuntu-latest
 
     steps:
@@ -219,6 +229,7 @@ jobs:
           ls -la .
 
       - name: Create tag
+        if: ${{ !inputs.dry-run }}
         env:
           VERSION: v${{ env.VERSION }}
         run: |
@@ -226,6 +237,7 @@ jobs:
           git push origin $VERSION
 
       - name: Create release
+        if: ${{ !inputs.dry-run }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.VERSION }}
