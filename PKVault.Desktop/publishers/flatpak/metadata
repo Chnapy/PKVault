@@ -7,5 +7,5 @@ command=PKVault
 [Context]
 shared=ipc;network;
 sockets=fallback-x11;wayland;
-devices=dri;
+devices=all;
 filesystems=~/.var/app/org.chnapy.pkvault:ro;

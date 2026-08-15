@@ -66,7 +66,7 @@ appstreamcli compose --no-net --prefix=/ --origin=local \
 
 flatpak build-finish \
     --socket=fallback-x11 --socket=wayland --share=ipc \
-    --share=network --device=dri \
+    --share=network --device=all \
 	--filesystem=~/.var/app/org.chnapy.pkvault:ro --command=PKVault ./build
 
 cp ./build/files/share/app-info/xmls/local.xml.gz ./build/files/share/app-info/xmls/io.github.chnapy.pkvault.xml.gz
