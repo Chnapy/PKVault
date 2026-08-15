@@ -1,0 +1,55 @@
+name: Generate Flatpak sources files
+
+on:
+  workflow_dispatch: # manual trigger
+
+jobs:
+  gen-flatpak-sources:
+    name: Generate Flatpak sources files
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+      tag: ${{ steps.compute.outputs.tag }}
+      major_minor: ${{ steps.compute.outputs.major_minor }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate desktop sources
+        run: |
+          curl https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/refs/heads/master/dotnet/flatpak-dotnet-generator.py -o flatpak-dotnet-generator.py
+
+          python3 flatpak-dotnet-generator.py --dotnet 10 -f 25.08 -r ${{ matrix.platform }} desktop-nuget-sources.json PKVault.Desktop/PKVault.Desktop.csproj
+
+          cat desktop-nuget-sources.json
+
+          echo "## [${{ matrix.platform }}] Generated desktop sources" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "```json" >> $GITHUB_STEP_SUMMARY
+          cat desktop-nuget-sources.json >> $GITHUB_STEP_SUMMARY
+          echo "```" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Generate frontend sources
+        run: |
+          pipx install git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=node
+
+          flatpak-node-generator npm frontend/package-lock.json -o frontend-npm-sources.json
+
+          cat frontend-npm-sources.json
+
+          echo "## [${{ matrix.platform }}] Generated frontend sources" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "```json" >> $GITHUB_STEP_SUMMARY
+          cat frontend-npm-sources.json >> $GITHUB_STEP_SUMMARY
+          echo "```" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
