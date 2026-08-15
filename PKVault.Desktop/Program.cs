@@ -54,9 +54,9 @@ class Program
 
         if (SettingsService.IsFlatpak())
         {
-            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+            Directory.SetCurrentDirectory(SettingsService.GetAppDirectory());
 
-            Log.Logger.Debug($"Current directory (fixed) : {AppDomain.CurrentDomain.BaseDirectory} {AppContext.BaseDirectory}");
+            Log.Logger.Debug($"Current directory (fixed) : {Directory.GetCurrentDirectory()}");
         }
 
         if (LinuxOS)
