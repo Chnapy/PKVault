@@ -2,6 +2,9 @@ name: Generate Flatpak sources files
 
 on:
   workflow_dispatch: # manual trigger
+  pull_request:
+    branches:
+      - main
 
 jobs:
   gen-flatpak-sources:
@@ -10,9 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: linux/amd64
+          - platform: linux-x64
             runner: ubuntu-latest
-          - platform: linux/arm64
+          - platform: linux-arm64
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     outputs:
@@ -24,32 +27,68 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Generate desktop sources
+      - name: Install Flatpak
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak
+          flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+      - name: Install Freedesktop SDK and .NET extension
+        run: |
+          flatpak install -y flathub org.freedesktop.Platform//25.08
+          flatpak install -y flathub org.freedesktop.Sdk//25.08
+          flatpak install -y flathub org.freedesktop.Sdk.Extension.dotnet10//25.08
+
+      - name: Get flatpak-dotnet-generator
         run: |
           curl https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/refs/heads/master/dotnet/flatpak-dotnet-generator.py -o flatpak-dotnet-generator.py
 
-          python3 flatpak-dotnet-generator.py --dotnet 10 -f 25.08 -r ${{ matrix.platform }} desktop-nuget-sources.json PKVault.Desktop/PKVault.Desktop.csproj
-
-          cat desktop-nuget-sources.json
-
-          echo "## [${{ matrix.platform }}] Generated desktop sources" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "```json" >> $GITHUB_STEP_SUMMARY
-          cat desktop-nuget-sources.json >> $GITHUB_STEP_SUMMARY
-          echo "```" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-      - name: Generate frontend sources
+      - name: Get flatpak-node-generator
         run: |
           pipx install git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=node
 
+      - name: Generate desktop sources
+        run: |
+          python3 flatpak-dotnet-generator.py --dotnet 10 -f 25.08 --destdir nuget-sources-${{ matrix.platform }} desktop-nuget-sources.json PKVault.Desktop/PKVault.Desktop.csproj -r ${{ matrix.platform }}
+
+          cat desktop-nuget-sources.json > json1
+
+          echo $json1
+
+          if ! grep -q '{' json1 ; then
+              echo "Generated JSON is empty" >&2
+              exit 1
+          fi
+
+          mv desktop-nuget-sources.json desktop-nuget-sources-${{ matrix.platform }}.json
+
+      - name: Upload desktop sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-nuget-sources-${{ matrix.platform }}.json
+          path: desktop-nuget-sources-${{ matrix.platform }}.json
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Generate frontend sources
+        run: |
           flatpak-node-generator npm frontend/package-lock.json -o frontend-npm-sources.json
 
-          cat frontend-npm-sources.json
+          cat frontend-npm-sources.json > json2
 
-          echo "## [${{ matrix.platform }}] Generated frontend sources" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "```json" >> $GITHUB_STEP_SUMMARY
-          cat frontend-npm-sources.json >> $GITHUB_STEP_SUMMARY
-          echo "```" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo $json2
+
+          if ! grep -q '{' json2 ; then
+              echo "Generated JSON is empty" >&2
+              exit 1
+          fi
+
+          mv frontend-npm-sources.json frontend-npm-sources-${{ matrix.platform }}.json
+
+      - name: Upload frontend sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-npm-sources-${{ matrix.platform }}.json
+          path: frontend-npm-sources-${{ matrix.platform }}.json
+          if-no-files-found: error
+          retention-days: 1
