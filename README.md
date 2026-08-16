@@ -21,7 +21,7 @@ Similar to Pokémon Home, offline as online.
 
 <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/microsoft-windows.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/linux.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/steam-deck-light.png" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/docker.png" width="100" /> |
 |:---:|:---:|:---:|:---:|
-| [![Download for Windows](https://img.shields.io/badge/Windows-Download-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Download for Linux](https://img.shields.io/badge/Linux-Download-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Download for SteamDeck](https://img.shields.io/badge/SteamDeck-Download-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Docker usage](https://img.shields.io/badge/Docker-Setup-purple)](#docker-usage) |
+| [![Download for Windows](https://img.shields.io/badge/Windows-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | <a href='https://flathub.org/apps/details/io.github.chnapy.pkvault'><img width='110' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en' /></a><br/>[![Download for Linux](https://img.shields.io/badge/Linux-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | <a href='https://flathub.org/apps/details/io.github.chnapy.pkvault'><img width='110' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en' /></a><br/>[![Download for SteamDeck](https://img.shields.io/badge/SteamDeck-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Docker usage](https://img.shields.io/badge/Docker-Setup-purple)](#docker-usage) |
 | PKVault.exe | pkvault.flatpak<br/>pkvault.AppImage<br/>pkvault.deb<br/>pkvault.linux | pkvault.flatpak | `ghcr.io/chnapy/pkvault` |
 
 ![License](https://img.shields.io/badge/License-GPLv3-green.svg)
@@ -57,6 +57,39 @@ Similar to Pokémon Home, offline as online.
     - possible shiny dex
 - Dynamic saves listing based on paths & globs
 - Dark mode & sprite sizing
+
+## Desktop/SteamDeck usage
+
+You can find all executables in [releases](https://github.com/Chnapy/PKVault/releases/latest) page.
+
+On Windows, just use `PKVault.exe`.
+
+On Linux & SteamDeck, it's recommanded to get PKVault from Flathub: <a href='https://flathub.org/apps/details/io.github.chnapy.pkvault'><img width='110' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en' /></a><br/>
+Otherwise there is plenty of Linux executables in [releases](https://github.com/Chnapy/PKVault/releases/latest) page.
+
+### Steam-based usage
+
+PKVault can be added to Steam as a non-steam game.
+This is especially useful for SteamDeck, allowing to run the app in gaming mode.
+
+Here are the steps to add the app in Steam, and customize with icons, covers etc:
+
+- SteamDeck only: first ensure to be in desktop mode
+- [Add PKVault as non-Steam game](https://help.steampowered.com/en/faqs/view/4B8B-9697-2338-40EC)
+- Add icon, logo, covers, background:
+  - Download & extract [steam-customize.zip](./steam-customize.zip)
+  - Find PKVault in your library, right-click -> "Properties"
+  - In "Shortcut" tab:
+    - Click on empty icon at the very start, then select `steam-customize/icon.png`
+  - In "Customization" tab, select for each form step:
+    - Cover -> `steam-customize/cover.png`
+    - Background -> `steam-customize/background.png`
+    - Logo -> `steam-customize/logo.png`
+    - Wide cover -> `steam-customize/cover-big.png`
+
+### Data synchronization
+
+Check [below](#online-data-synchronization).
 
 ## Docker usage
 
@@ -103,6 +136,16 @@ docker run \
   -v ./path/to/saves:/data/saves \
   ghcr.io/chnapy/pkvault:latest
 ```
+
+## Online data synchronization
+
+You may want to synchronize PKVault data between your devices, keeping your saves up-to-date everywhere, avoiding need of copy/paste and others manual actions.
+
+PKVault is made to work 100% offline, and online features are considered out of project scope.
+It is recommanded to use instead third-party solutions.
+
+[syncthing](https://syncthing.net) works really well, whether for desktop or Docker.
+Other known solutions may be adapted too, like Dropbox, Onedrive, etc. Choose following your needs.
 
 ## [Functional documentation](./docs/functional/en/README.md)
 
