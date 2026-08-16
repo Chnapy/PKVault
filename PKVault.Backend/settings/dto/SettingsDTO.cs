@@ -60,7 +60,7 @@ public record SettingsMutableDTO(
     bool? HTTPS_NOCERT = null,
     string? HTTPS_CERT_PEM_PATH = null,
     string? HTTPS_KEY_PEM_PATH = null,
-    string? LANGUAGE = null
+    string LANGUAGE = "en"
 );
 
 public enum RuntimeSystem

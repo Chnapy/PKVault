@@ -4055,7 +4055,8 @@
         "storagE_PATH",
         "backuP_PATH",
         "hidE_CHEATS",
-        "skiP_LEGALITY_CHECKS"
+        "skiP_LEGALITY_CHECKS",
+        "language"
       ],
       "properties": {
         "dB_PATH": {

@@ -39,6 +39,7 @@ class Program
         // "GNOME 50 (Flatpak runtime)"
         // "Linux Mint 22.1"
         Log.Logger.Debug($"OS : {RuntimeInformation.OSDescription}");
+        Log.Logger.Debug($"OS LANGUAGE {System.Globalization.CultureInfo.CurrentUICulture.Name}");
 
         // "win-x64"
         // "linux-x64"

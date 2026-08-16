@@ -1,9 +1,7 @@
 import React from 'react';
-import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
-import { languages, useTranslate } from '../translate/i18n';
-import { UIButton } from '../ui/form/button/ui-button';
+import { useSettingsGet } from '../data/sdk/settings/settings.gen';
+import { useTranslate } from '../translate/i18n';
 import { UISplash } from '../ui/splash/ui-splash';
-import { UISplashMain } from '../ui/splash/ui-splash-main';
 import { SplashData } from './splash-data';
 
 /**
@@ -14,7 +12,6 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [ appStartTime ] = React.useState(() => Date.now());
 
     const settingsQuery = useSettingsGet();
-    const settingsEditMutation = useSettingsEdit();
 
     const settingsMutable = settingsQuery.data?.data.settingsMutable;
     const language = settingsMutable?.language;
@@ -33,23 +30,5 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
         return <UISplash loading />;
     }
 
-    if (language) {
-        return <SplashData appStartTime={appStartTime}>{children}</SplashData>;
-    }
-
-    return <UISplash>
-        <UISplashMain>
-            {Object.entries(languages).map(([ language, name ]) => <UIButton
-                key={language}
-                name={language}
-                controlLabel={name}
-                onClick={() => settingsEditMutation.mutateAsync({
-                    data: {
-                        ...settingsMutable,
-                        language,
-                    }
-                })}
-            >{name}</UIButton>)}
-        </UISplashMain>
-    </UISplash>;
+    return <SplashData appStartTime={appStartTime}>{children}</SplashData>;
 };

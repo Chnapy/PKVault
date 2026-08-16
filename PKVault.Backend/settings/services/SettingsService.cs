@@ -395,10 +395,28 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private static SettingsMutableDTO GetDefaultSettingsMutable()
     {
+        static string GetLanguage()
+        {
+            var uiCulture = System.Globalization.CultureInfo.CurrentUICulture;
+
+            var langWithCountry = uiCulture.Name.ToLower();
+            if (AllowedLanguages.Contains(langWithCountry))
+                return langWithCountry;
+            
+            var langOnly = uiCulture.TwoLetterISOLanguageName;
+            if (AllowedLanguages.Contains(langOnly))
+                return langOnly;
+            
+            return DefaultLanguage;
+        }
+
+        var language = GetLanguage();
+
         SettingsMutableDTO settings;
 
 #if DEBUG
         settings = new(
+            LANGUAGE: language,
             DB_PATH: "./tmp/db",
             SAVE_GLOBS: [DefaultSavePath],
             PKM_EXTERNAL_GLOBS: [],
@@ -410,6 +428,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         );
 #else
         settings = new(
+            LANGUAGE: language,
             DB_PATH: "./db",
             SAVE_GLOBS: [DefaultSavePath],
             PKM_EXTERNAL_GLOBS: [],
