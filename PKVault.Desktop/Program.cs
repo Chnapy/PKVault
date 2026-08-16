@@ -39,7 +39,7 @@ class Program
         // "GNOME 50 (Flatpak runtime)"
         // "Linux Mint 22.1"
         Log.Logger.Debug($"OS : {RuntimeInformation.OSDescription}");
-        Log.Logger.Debug($"OS LANGUAGE {System.Globalization.CultureInfo.CurrentUICulture.Name}");
+        Log.Logger.Debug($"OS LANGUAGE : {System.Globalization.CultureInfo.CurrentUICulture.Name}");
 
         // "win-x64"
         // "linux-x64"
@@ -53,12 +53,11 @@ class Program
 
         // SettingsService.ProgramArgs = args;
 
-        if (SettingsService.IsFlatpak())
-        {
-            Directory.SetCurrentDirectory(SettingsService.GetAppDirectory());
+        // Required to ensure photino directory wwwroot being created in app directory
+        // since app directory can be different than executable one (flatpak ran by steam)
+        Directory.SetCurrentDirectory(SettingsService.GetAppDirectory());
 
-            Log.Logger.Debug($"Current directory (fixed) : {Directory.GetCurrentDirectory()}");
-        }
+        Log.Logger.Debug($"Current directory (fixed) : {Directory.GetCurrentDirectory()}");
 
         if (LinuxOS)
         {

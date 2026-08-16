@@ -2,6 +2,7 @@
 using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -26,6 +27,26 @@ public class Program
         Log.Logger.Debug($"ARGS: {string.Join(' ', args)}");
 
         // SettingsService.ProgramArgs = args;
+
+        // "Microsoft Windows 10.0.123"
+        // "GNOME 50 (Flatpak runtime)"
+        // "Linux Mint 22.1"
+        Log.Logger.Debug($"OS : {RuntimeInformation.OSDescription}");
+        Log.Logger.Debug($"OS LANGUAGE : {System.Globalization.CultureInfo.CurrentUICulture.Name}");
+
+        // "win-x64"
+        // "linux-x64"
+        // "linux-arm64"
+        Log.Logger.Debug($"RID runtime : {RuntimeInformation.RuntimeIdentifier}");
+
+        Log.Logger.Debug($"Current directory : {Directory.GetCurrentDirectory()}");
+
+        // SettingsService.ProgramArgs = args;
+
+        // Ensure behavior consistency between backend & desktop
+        Directory.SetCurrentDirectory(SettingsService.GetAppDirectory());
+
+        Log.Logger.Debug($"Current directory (fixed) : {Directory.GetCurrentDirectory()}");
 
         try {
             Copyright();
