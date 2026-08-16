@@ -69,6 +69,8 @@ Otherwise there is plenty of Linux executables in [releases](https://github.com/
 
 ### Steam-based usage
 
+<img src="img/steam_1.png" alt="Steam cover" align="right" />
+
 PKVault can be added to Steam as a non-steam game.
 This is especially useful for SteamDeck, allowing to run the app in gaming mode.
 
@@ -86,6 +88,8 @@ Here are the steps to add the app in Steam, and customize with icons, covers etc
     - Background -> `steam-customize/background.png`
     - Logo -> `steam-customize/logo.png`
     - Wide cover -> `steam-customize/cover-big.png`
+
+<img src="img/steam_2.png" alt="Steam cover" align="center" />
 
 ### Data synchronization
 
