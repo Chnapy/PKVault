@@ -48,7 +48,16 @@ class Program
         Log.Logger.Debug($"LinuxOS : {LinuxOS}");
         Log.Logger.Debug($"WindowsOS : {WindowsOS}");
 
+        Log.Logger.Debug($"Current directory : {Directory.GetCurrentDirectory()}");
+
         // SettingsService.ProgramArgs = args;
+
+        if (SettingsService.IsFlatpak())
+        {
+            Directory.SetCurrentDirectory(SettingsService.GetAppDirectory());
+
+            Log.Logger.Debug($"Current directory (fixed) : {Directory.GetCurrentDirectory()}");
+        }
 
         if (LinuxOS)
         {

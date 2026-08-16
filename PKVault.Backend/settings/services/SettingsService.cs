@@ -386,7 +386,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         return data;
     }
 
-    private static bool IsFlatpak()
+    public static bool IsFlatpak()
     {
         return !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FLATPAK_ID"));
     }
