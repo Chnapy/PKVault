@@ -31,6 +31,10 @@ export const Fallback = {
             <Alert variant='filled' color='red' icon={<AlertTriangleIcon />} title='An error happened !'>
                 Please report these next logs to <Anchor
                     c='blue.2'
+                    href="https://github.com/Chnapy/PKVault/issues"
+                    target="_blank"
+                >GitHub</Anchor> or <Anchor
+                    c='blue.2'
                     href="https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app"
                     target="_blank"
                 >Project Pokémon discussion</Anchor>.<br />

@@ -17,30 +17,50 @@
   <name>PKVault</name>
   <name xml:lang="fr">PKVault</name>
   <name xml:lang="de">PKVault</name>
-  <name xml:lang="pt_BR">PKVault</name>
 
-  <summary>Pokemon storage and save manipulation tool based on PKHeX</summary>
-  <summary xml:lang="fr">Outil de stockage et de manipulation de sauvegardes Pokémon basé sur PKHeX</summary>
-  <summary xml:lang="de">Pokémon-Aufbewahrungs- und Speicherbearbeitungswerkzeug basierend auf PKHeX</summary>
-  <summary xml:lang="pt_BR">Ferramenta de armazenamento e manipulação de saves de Pokémon baseada em PKHeX</summary>
+  <summary>Pokémon hub for your games</summary>
+  <summary xml:lang="fr">Hub Pokémon pour vos jeux</summary>
+  <summary xml:lang="de">Pokémon-Zentrale für deine Spiele</summary>
 
   <description>
     <p>
-      PKVault is a Pokemon storage and save manipulation tool based on PKHeX.
-      Edit your save files, manage your collection, transfer Pokémon between games and more.
+      Centralize all your Pokémon games in one place.
+      Manage storages between your saves, and group all Pokédex data.
     </p>
+    <ul>
+      <li>Compatible with all generations, from first one to Pokémon Legends: Z-A</li>
+      <li>Safely convert pokémons to any generation</li>
+      <li>Edit pokémons nickname, moves and EVs</li>
+      <li>Evolve pokémons requiring trade</li>
+      <li>Backup before any action - your data is safe</li>
+      <li>Legality auto-check</li>
+    </ul>
+
     <p xml:lang="fr">
-      PKVault est un outil de stockage et de manipulation de sauvegardes Pokémon basé sur PKHeX.
-      Modifiez vos fichiers de sauvegarde, gérez votre collection, transférez des Pokémon entre les jeux, etc.
+      Regroupez tous vos jeux Pokémon au même endroit.
+      Gérez les stockages entre vos sauvegardes, et centralisez les données Pokédex.
     </p>
+    <ul xml:lang="fr">
+      <li>Compatible avec toutes les générations, de la première à Pokémon Legends: Z-A</li>
+      <li>Convertissez les pokémons vers n'importe quelle génération, sans perte de donnée</li>
+      <li>Modifiez les pokémons: surnom, capacités et EVs</li>
+      <li>Evoluez les pokémons exigeant un échange</li>
+      <li>Backup avant la moindre action - vos données sont sécurisées</li>
+      <li>Vérifications de légalité</li>
+    </ul>
+
     <p xml:lang="de">
-      PKVault ist ein Pokémon-Aufbewahrungs- und Speicherbearbeitungswerkzeug basierend auf PKHeX.
-      Bearbeiten Sie Ihre Speicherdateien, verwalten Sie Ihre Sammlung, übertragen Sie Pokémon zwischen Spielen und mehr.
+      Führe all deine Pokémon-Spiele an einem Ort zusammen.
+      Verwalte deine Speicherstände und führe alle Pokédex-Daten zusammen.
     </p>
-    <p xml:lang="pt_BR">
-      PKVault é uma ferramenta de armazenamento e manipulação de saves de Pokémon baseada em PKHeX.
-      Edite seus arquivos de save, gerencie sua coleção, transfira Pokémon entre jogos e muito mais.
-    </p>
+    <ul xml:lang="de">
+      <li>Kompatibel mit allen Generationen, von der ersten bis zu Pokémon-Legenden: Z-A</li>
+      <li>Sichere Übertragung von Pokémon in jede beliebige Generation</li>
+      <li>Bearbeitung von Spitznamen, Attacken und EVs</li>
+      <li>Entwicklung von Pokémon, die normalerweise einen Tausch erfordern</li>
+      <li>Automatische Sicherung vor jeder Aktion - deine Daten sind geschützt</li>
+      <li>Automatische Überprüfung der Legalität</li>
+    </ul>
   </description>
 
   <categories>
@@ -72,8 +92,8 @@
   <icon type="stock">io.github.chnapy.pkvault</icon>
 
   <branding>
-    <color type="primary" scheme_preference="light">#934e3d</color>
-    <color type="primary" scheme_preference="dark">#934e3d</color>
+    <color type="primary" scheme_preference="light">#C6836E</color>
+    <color type="primary" scheme_preference="dark">#713425</color>
   </branding>
 
   <languages>
@@ -84,24 +104,24 @@
   </languages>
 
   <screenshots>
-    <screenshot type="default" width="1216" height="760">
-      <image width="1216" height="760">https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/img/snap_storage.png</image>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/PKVault.Desktop/publishers/flatpak/snaps/snap_storage.png</image>
       <caption>Collection view</caption>
     </screenshot>
-    <screenshot width="1216" height="760">
-      <image width="1216" height="760">https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/img/snap_storage_dark.png</image>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_dark.png</image>
       <caption>Dark mode</caption>
     </screenshot>
-    <screenshot width="1216" height="760">
-      <image width="1216" height="760">https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/img/snap_storage_details.png</image>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_details.png</image>
       <caption>Pokémon edit</caption>
     </screenshot>
-    <screenshot width="1216" height="760">
-      <image width="1216" height="760">https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/img/snap_dex.png</image>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/PKVault.Desktop/publishers/flatpak/snaps/snap_dex.png</image>
       <caption>Pokédex</caption>
     </screenshot>
-    <screenshot width="1216" height="760">
-      <image width="1216" height="760">https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/img/snap_saves.png</image>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/PKVault.Desktop/publishers/flatpak/snaps/snap_saves.png</image>
       <caption>Saves view</caption>
     </screenshot>
   </screenshots>

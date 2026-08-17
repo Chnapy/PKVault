@@ -1,5 +1,4 @@
-import { Stack } from '@mantine/core';
-import { clsx } from 'clsx';
+import { Loader, Stack } from '@mantine/core';
 import type React from 'react';
 import classes from './ui-splash.module.css';
 
@@ -15,13 +14,15 @@ export const UISplash: React.FC<{
     p='lg'
 >
     <img
-        className={clsx(loading && classes.uiSplashLoader)}
+        className={classes.uiSplashLogo}
         src='/logo.svg'
         style={{
             width: 128,
             height: 128,
         }}
     />
+
+    {loading && <Loader type='dots' color='white' />}
 
     {children}
 </Stack>;
