@@ -27,39 +27,39 @@
       Centralize all your Pokémon games in one place.
       Manage storages between your saves, and group all Pokédex data.
     </p>
-    <ul>
-      <li>Compatible with all generations, from first one to Pokémon Legends: Z-A</li>
-      <li>Safely convert pokémons to any generation</li>
-      <li>Edit pokémons nickname, moves and EVs</li>
-      <li>Evolve pokémons requiring trade</li>
-      <li>Backup before any action - your data is safe</li>
-      <li>Legality auto-check</li>
-    </ul>
-
     <p xml:lang="fr">
       Regroupez tous vos jeux Pokémon au même endroit.
       Gérez les stockages entre vos sauvegardes, et centralisez les données Pokédex.
     </p>
-    <ul xml:lang="fr">
-      <li>Compatible avec toutes les générations, de la première à Pokémon Legends: Z-A</li>
-      <li>Convertissez les pokémons vers n'importe quelle génération, sans perte de donnée</li>
-      <li>Modifiez les pokémons: surnom, capacités et EVs</li>
-      <li>Evoluez les pokémons exigeant un échange</li>
-      <li>Backup avant la moindre action - vos données sont sécurisées</li>
-      <li>Vérifications de légalité</li>
-    </ul>
-
     <p xml:lang="de">
       Führe all deine Pokémon-Spiele an einem Ort zusammen.
       Verwalte deine Speicherstände und führe alle Pokédex-Daten zusammen.
     </p>
-    <ul xml:lang="de">
-      <li>Kompatibel mit allen Generationen, von der ersten bis zu Pokémon-Legenden: Z-A</li>
-      <li>Sichere Übertragung von Pokémon in jede beliebige Generation</li>
-      <li>Bearbeitung von Spitznamen, Attacken und EVs</li>
-      <li>Entwicklung von Pokémon, die normalerweise einen Tausch erfordern</li>
-      <li>Automatische Sicherung vor jeder Aktion - deine Daten sind geschützt</li>
-      <li>Automatische Überprüfung der Legalität</li>
+  
+    <ul>
+      <li>Compatible with all generations, from first one to Pokémon Legends: Z-A</li>
+      <li xml:lang="fr">Compatible avec toutes les générations, de la première à Pokémon Legends: Z-A</li>
+      <li xml:lang="de">Kompatibel mit allen Generationen, von der ersten bis zu Pokémon-Legenden: Z-A</li>
+
+      <li>Safely convert pokémons to any generation</li>
+      <li xml:lang="fr">Convertissez les pokémons vers n'importe quelle génération, sans perte de donnée</li>
+      <li xml:lang="de">Sichere Übertragung von Pokémon in jede beliebige Generation</li>
+
+      <li>Edit pokémons nickname, moves and EVs</li>
+      <li xml:lang="fr">Modifiez les pokémons: surnom, capacités et EVs</li>
+      <li xml:lang="de">Bearbeitung von Spitznamen, Attacken und EVs</li>
+
+      <li>Evolve pokémons requiring trade</li>
+      <li xml:lang="fr">Evoluez les pokémons exigeant un échange</li>
+      <li xml:lang="de">Entwicklung von Pokémon, die normalerweise einen Tausch erfordern</li>
+
+      <li>Backup before any action - your data is safe</li>
+      <li xml:lang="fr">Backup avant la moindre action - vos données sont sécurisées</li>
+      <li xml:lang="de">Automatische Sicherung vor jeder Aktion - deine Daten sind geschützt</li>
+
+      <li>Legality auto-check</li>
+      <li xml:lang="fr">Vérifications de légalité</li>
+      <li xml:lang="de">Automatische Überprüfung der Legalität</li>
     </ul>
   </description>
 
