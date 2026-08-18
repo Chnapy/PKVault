@@ -715,16 +715,8 @@ public class GenStaticOthers(
 
         return string.Join('/', pokeapiVersions
             .OfType<PokeApi.Models.Version>()
-            .Select(ver =>
-            {
-                var name = PokeApiService.GetNameForLang(ver.Names, lang);
-                // blue-japan, duplicate name with blue
-                if (ver.Id == 46)
-                {
-                    return $"{name} (J)";
-                }
-                return name;
-            }).Distinct());
+            .Select(ver => PokeApiService.GetNameForLang(ver.Names, lang))
+            .Distinct());
     }
 
     private async Task<string[]> GetVersionRegionName(GameVersion version, string lang)
@@ -777,6 +769,18 @@ public class GenStaticOthers(
 
     private Task<PokeApi.Models.Version?>[] GetPokeApiVersion(GameVersion version)
     {
+        static async Task<PokeApi.Models.Version?> FixJapVersionNames(Task<PokeApi.Models.Version?> versionTask)
+        {
+            var version = await versionTask;
+            version.Names = [.. version.Names.Select(n =>
+            {
+                if (!n.Name1.EndsWith("(J)"))
+                    n.Name1 = $"{n.Name1} (J)";
+                return n;
+            })];
+            return version;
+        }
+
         return version switch
         {
             GameVersion.Any => [],
@@ -824,7 +828,11 @@ public class GenStaticOthers(
             #region Virtual Console (3DS) Gen1
             GameVersion.RD => [pokeApiService.GetVersion(1)],
             GameVersion.GN => [pokeApiService.GetVersion(2)],
-            GameVersion.BU => [pokeApiService.GetVersion(46)],
+            GameVersion.BU => [
+                FixJapVersionNames(pokeApiService.GetVersion(44)),
+                FixJapVersionNames(pokeApiService.GetVersion(45)),
+                FixJapVersionNames(pokeApiService.GetVersion(46))
+            ],
             GameVersion.YW => [pokeApiService.GetVersion(3)],
             #endregion
 
@@ -853,7 +861,7 @@ public class GenStaticOthers(
 
             #region Game Groupings (SaveFile type, roughly)
             GameVersion.RB => [.. GetPokeApiVersion(GameVersion.RD), .. GetPokeApiVersion(GameVersion.GN), .. GetPokeApiVersion(GameVersion.BU)],
-            GameVersion.RBY => [.. GetPokeApiVersion(GameVersion.RB), .. GetPokeApiVersion(GameVersion.YW)],
+            GameVersion.RBY => [.. GetPokeApiVersion(GameVersion.RD), .. GetPokeApiVersion(GameVersion.GN), .. GetPokeApiVersion(GameVersion.YW), .. GetPokeApiVersion(GameVersion.BU)],
             GameVersion.GS => [.. GetPokeApiVersion(GameVersion.GD), .. GetPokeApiVersion(GameVersion.SI)],
             GameVersion.GSC => [.. GetPokeApiVersion(GameVersion.GS), .. GetPokeApiVersion(GameVersion.C)],
             GameVersion.RS => [.. GetPokeApiVersion(GameVersion.R), .. GetPokeApiVersion(GameVersion.S)],
@@ -864,7 +872,7 @@ public class GenStaticOthers(
                     Names = [
                         new() { Name1 = "Box Ruby & Sapphire", Language = new() { Name = "en", Url = "https://pokeapi.co/api/v2/language/9/" } },
                         new() { Name1 = "Box Rubis & Saphir", Language = new() { Name = "fr", Url = "https://pokeapi.co/api/v2/language/5/" } },
-                        new() { Name1 = "Box: Rubin und Saphir", Language = new() { Name = "fr", Url = "https://pokeapi.co/api/v2/language/6/" } },
+                        new() { Name1 = "Box: Rubin und Saphir", Language = new() { Name = "de", Url = "https://pokeapi.co/api/v2/language/6/" } },
                     ]
                 })
             ],
