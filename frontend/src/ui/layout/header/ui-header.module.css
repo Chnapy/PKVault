@@ -24,6 +24,9 @@
 .ui-header .logo {
     height: 48px;
     width: 48px;
+    border-radius: 99px;
+    padding: 2px;
+    background-color: var(--mantine-color-primary-7);
 }
 
 .ui-header .bubble {
