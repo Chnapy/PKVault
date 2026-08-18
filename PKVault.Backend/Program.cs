@@ -43,8 +43,10 @@ public class Program
 
         // SettingsService.ProgramArgs = args;
 
+#if MODE_DEFAULT
         // Ensure behavior consistency between backend & desktop
         Directory.SetCurrentDirectory(SettingsService.GetAppDirectory());
+#endif
 
         Log.Logger.Debug($"Current directory (fixed) : {Directory.GetCurrentDirectory()}");
 
