@@ -12,11 +12,6 @@ public class DexService(
     {
         var saveLoaders = savesLoadersService.GetAllLoaders();
 
-        if (saveLoaders.Length == 0)
-        {
-            return [];
-        }
-
         return await GetDex([FakeSaveFile.Default.ID32, .. saveLoaders.Select(sl => sl.Save.Id)], speciesSet);
     }
 
