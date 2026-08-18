@@ -48,7 +48,8 @@ public class Program
 
         Log.Logger.Debug($"Current directory (fixed) : {Directory.GetCurrentDirectory()}");
 
-        try {
+        try
+        {
             Copyright();
 
             var time = Log.Logger.Time($"Setup backend load");
@@ -141,11 +142,18 @@ public class Program
 #if DEBUG && MODE_DEFAULT
             Log.Logger.Debug("Generate Swagger file");
 
-            var swaggerHref = $"http://localhost:5000/swagger/v1/swagger.json";
-            using HttpClient http = new();
-            using var response = await http.GetAsync(swaggerHref);
-            var json = await response.Content.ReadAsStringAsync();
-            await File.WriteAllTextAsync("swagger.json", json);
+            try
+            {
+                var swaggerHref = $"http://localhost:5000/swagger/v1/swagger.json";
+                using HttpClient http = new();
+                using var response = await http.GetAsync(swaggerHref);
+                var json = await response.Content.ReadAsStringAsync();
+                await File.WriteAllTextAsync("swagger.json", json);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, $"Generate Swagger file failed.");
+            }
 #endif
 
             await host.Services.GetRequiredService<ISessionServiceMinimal>().EnsureSessionCreated();
