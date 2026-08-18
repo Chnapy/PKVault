@@ -199,8 +199,8 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
         color: baseTheme.other.game.blue,
       }),
       [ GameVersion.BU ]: () => ({
-        img: blueImg,
-        color: baseTheme.other.game.blue,
+        img: defaultImg,
+        color: 'grey',
       }),
       [ GameVersion.YW ]: () => ({
         img: yellowImg,
