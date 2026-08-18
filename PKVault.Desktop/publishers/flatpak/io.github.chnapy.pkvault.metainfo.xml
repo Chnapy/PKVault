@@ -105,23 +105,23 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/PKVault.Desktop/publishers/flatpak/snaps/snap_storage.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage.png</image>
       <caption>Collection view</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_dark.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_dark.png</image>
       <caption>Dark mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_details.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_details.png</image>
       <caption>Pokémon edit</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/PKVault.Desktop/publishers/flatpak/snaps/snap_dex.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.2/PKVault.Desktop/publishers/flatpak/snaps/snap_dex.png</image>
       <caption>Pokédex</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.1/PKVault.Desktop/publishers/flatpak/snaps/snap_saves.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.2/PKVault.Desktop/publishers/flatpak/snaps/snap_saves.png</image>
       <caption>Saves view</caption>
     </screenshot>
   </screenshots>
@@ -131,16 +131,28 @@
   <url type="homepage">https://github.com/Chnapy/PKVault</url>
   <url type="vcs-browser">https://github.com/Chnapy/PKVault</url>
   <url type="bugtracker">https://github.com/Chnapy/PKVault/issues</url>
-  <url type="contribute">https://github.com/Chnapy/PKVault/blob/v2.1.1/.github/CONTRIBUTING.md</url>
+  <url type="contribute">https://github.com/Chnapy/PKVault/blob/main/.github/CONTRIBUTING.md</url>
   <url type="donation">https://github.com/sponsors/Chnapy</url>
   
-  <developer id="ui.github.chnapy">
+  <developer id="io.github.chnapy">
     <name>Richard Haddad</name>
     <url>https://github.com/Chnapy</url>
   </developer>
 
   <releases>
-    <release version="2.1.1" date="2026-08-14T21:28:13Z">
+    <release version="2.1.2" date="2026-08-18">
+      <url type="details">https://github.com/Chnapy/PKVault/releases/tag/v2.1.2</url>
+      <description>
+        <ul>
+          <li>Update app logo.</li>
+          <li>Fix crash when run from Steam as non-Steam game.</li>
+          <li>Detect language on first launch.</li>
+          <li>Fix empty Pokédex when no save.</li>
+          <li>Fix Japanese G1 games being not available.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="2.1.1" date="2026-08-14">
       <url type="details">https://github.com/Chnapy/PKVault/releases/tag/v2.1.1</url>
       <description>
         <p>First release on Flathub.</p>
