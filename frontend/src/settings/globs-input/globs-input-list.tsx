@@ -4,7 +4,7 @@ import React from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 import { useTranslate } from '../../translate/i18n';
 import { UIGlobsInputList, type UIGlobsInputListProps } from '../../ui/form/globs-input/ui-globs-input-list';
-import { getDesktopFileTypeInfos } from '../../ui/form/globs-input/util/get-path-infos';
+import { getDesktopFileTypeInfos } from '../../ui/form/globs-input/util/get-desktop-file-type-infos';
 import { GlobsInputItem } from './globs-input-item';
 import { GlobsInputResults } from './globs-input-results';
 import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';

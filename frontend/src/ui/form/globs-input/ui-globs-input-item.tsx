@@ -5,8 +5,9 @@ import { useTranslate } from '../../../translate/i18n';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
-import type { UIPathButtonProps } from './ui-path-button';
 import { UIGlobsFileList } from './ui-globs-file-list';
+import type { UIPathButtonProps } from './ui-path-button';
+import { PathUtil } from './util/path-util';
 
 export type UIGlobsInputItemProps = {
     name: string;
@@ -26,9 +27,9 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
 }) => {
     const { t } = useTranslate();
 
-    const isGlob = value.includes('*');
-    const isDirectory = isGlob || value.endsWith('/');
-    const isExclude = value.startsWith('!');
+    const isGlob = PathUtil.isGlob(value);
+    const isDirectory = isGlob || PathUtil.isDirectory(value);
+    const isExclude = PathUtil.isExclude(value);
 
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: name,

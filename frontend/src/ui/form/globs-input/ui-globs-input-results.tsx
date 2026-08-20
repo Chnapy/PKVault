@@ -6,6 +6,7 @@ import { WithControlsIcons } from '../../interaction/controls/icons/with-control
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 import { UIPathLine } from '../../path/ui-path-line';
+import { getPathIcon } from './util/get-path-icon';
 
 export type UIGlobsInputResultsProps = {
     name: string;
@@ -68,7 +69,8 @@ export const UIGlobsInputResults: React.FC<UIGlobsInputResultsProps> = ({ name, 
                     padding: 4,
                     margin: 0,
                 }}>
-                    {!isLoading && data.map(path => <Group key={path}>
+                    {!isLoading && data.map(path => <Group key={path} wrap='nowrap'>
+                        {getPathIcon(path)}
                         <UIPathLine>{path}</UIPathLine>
                     </Group>)}
                 </pre>

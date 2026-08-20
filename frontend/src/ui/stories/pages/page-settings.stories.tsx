@@ -149,6 +149,7 @@ export const Primary: Story = {
                                 // loading
                                 dataDirectoryPaths={[ './foo', './bar' ]}
                                 dataFilePaths={[ './toto.txt', './tata.sav' ]}
+                                pkvaultPath=''
                                 setDropdownOpened={console.log}
                             >
                                 {otherProps => <UIPathButton
@@ -178,6 +179,7 @@ export const Primary: Story = {
                                 // loading
                                 dataDirectoryPaths={[ './foo', './bar' ]}
                                 dataFilePaths={[ './toto.txt', './tata.sav' ]}
+                                pkvaultPath=''
                                 setDropdownOpened={console.log}
                             >
                                 {otherProps => <UIPathButton
@@ -207,6 +209,7 @@ export const Primary: Story = {
                                 // loading
                                 dataDirectoryPaths={[ './foo', './bar' ]}
                                 dataFilePaths={[ './toto.txt', './tata.sav' ]}
+                                pkvaultPath=''
                                 setDropdownOpened={console.log}
                             >
                                 {otherProps => <UIPathButton

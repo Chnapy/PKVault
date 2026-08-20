@@ -2,7 +2,7 @@ import { FilePlusIcon, FolderPlusIcon } from 'lucide-react';
 import React from 'react';
 import { switchUtil } from '../../../util/switch-util';
 import { UIButton, type UIButtonProps } from '../button/ui-button';
-import type { UIGlobType } from './util/get-path-infos';
+import type { UIGlobType } from './util/get-desktop-file-type-infos';
 
 export type UIGlobsInputAddProps = Pick<UIButtonProps, 'name'> & {
     label: string;

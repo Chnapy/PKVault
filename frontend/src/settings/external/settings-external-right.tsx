@@ -29,7 +29,7 @@ export const SettingsExternalRight: React.FC = () => {
             value={pkmExternalGlobs}
             onChange={(value) => form.setValue('pkM_EXTERNAL_GLOBS', value, { shouldDirty: true })}
             disabled={!settings?.canUpdateSettings}
-            limit={8000}
+            limit={1200}
         />
     </Card>;
 };

@@ -1,9 +1,9 @@
-import { Box, Button, Combobox, Group, Loader, useCombobox, type ElementProps } from '@mantine/core';
+import { Button, Combobox, Group, Loader, useCombobox, type ElementProps } from '@mantine/core';
 import { AlertTriangleIcon, ChevronDownIcon, FileIcon, SearchIcon } from 'lucide-react';
 import React from 'react';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { UIPathLine } from '../../path/ui-path-line';
-import { getPathInfos } from './util/get-path-infos';
+import { getPathIcon } from './util/get-path-icon';
 import { PathUtil } from './util/path-util';
 
 type UIGlobsFileListProps = {
@@ -68,7 +68,7 @@ export const UIGlobsFileList: React.FC<UIGlobsFileListProps> = ({
                     : results
                         .filter(path => path.toLowerCase().includes(PathUtil.normalizePath(search.toLowerCase())))
                         .map(path => {
-                            const infos = getPathInfos(path);
+                            const icon = getPathIcon(path);
 
                             return <Combobox.Option key={path} value={path} style={{ cursor: 'default' }}>
                                 <Group
@@ -76,9 +76,7 @@ export const UIGlobsFileList: React.FC<UIGlobsFileListProps> = ({
                                     align='center'
                                     wrap='nowrap'
                                 >
-                                    <Box display='inline-flex' c={infos.color}>
-                                        <infos.Icon />
-                                    </Box>
+                                    {icon}
                                     <UIPathLine>{path}</UIPathLine>
                                 </Group>
                             </Combobox.Option>;

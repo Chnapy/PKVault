@@ -1,4 +1,4 @@
-import { ActionIcon, Alert, Badge, Button, Card, createTheme, EmptyState, Menu, mergeThemeOverrides, NumberFormatter, Paper, Popover, Scroller, SegmentedControl, Tabs, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Alert, Badge, Button, Card, Combobox, createTheme, EmptyState, Menu, mergeThemeOverrides, NumberFormatter, Paper, Popover, Scroller, SegmentedControl, Tabs, Text, Tooltip } from '@mantine/core';
 import { clsx } from 'clsx';
 import { baseTheme, cssVariablesResolver } from './base-theme';
 import classes from './theme.module.css';
@@ -80,6 +80,12 @@ export const theme = mergeThemeOverrides(
       PopoverDropdown: Popover.Dropdown.extend({
         defaultProps: {
           bg: 'light-dark(var(--mantine-color-white-3), var(--mantine-color-dark-6))',
+        },
+      }),
+      ComboboxOption: Combobox.Option.extend({
+        defaultProps: {
+          fz: 'md',
+          py: 'sm',
         },
       }),
       Menu: Menu.extend({

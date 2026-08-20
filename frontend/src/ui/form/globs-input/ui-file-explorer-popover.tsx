@@ -1,10 +1,10 @@
 import { Button, Combobox, type ComboboxItem, Group, Text, useCombobox } from '@mantine/core';
-import { FileIcon, FolderIcon, FolderRootIcon, FolderUpIcon, Loader, MoveLeftIcon, PackageOpenIcon, RefreshCwIcon, SearchIcon } from 'lucide-react';
+import { FolderRootIcon, FolderUpIcon, Loader, MoveLeftIcon, PackageOpenIcon, RefreshCwIcon, SearchIcon } from 'lucide-react';
 import React from 'react';
 import { useTranslate } from '../../../translate/i18n';
-import { UIBallIcon } from '../../icon/ui-ball-icon';
 import { UIActionIcon } from '../button/ui-action-icon';
 import { UIButton } from '../button/ui-button';
+import { getPathIcon } from './util/get-path-icon';
 import { PathUtil } from './util/path-util';
 
 export type UIFileExplorerPopoverProps = {
@@ -14,13 +14,14 @@ export type UIFileExplorerPopoverProps = {
     loading?: boolean;
     dataDirectoryPaths: string[];
     dataFilePaths: string[];
+    pkvaultPath: string;
     reloadData: () => unknown;
     setDropdownOpened: (opened: boolean) => void;
     children: (props: React.ComponentProps<typeof Button<'button'>>) => React.ReactNode;
 };
 
 export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
-    name, value, onChange, loading, dataDirectoryPaths, dataFilePaths, reloadData, setDropdownOpened, children
+    name, value, onChange, loading, dataDirectoryPaths, dataFilePaths, pkvaultPath, reloadData, setDropdownOpened, children
 }) => {
     const { t } = useTranslate();
 
@@ -29,10 +30,13 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
     const searchLower = searchNormalized.toLowerCase();
     const isSearchPath = searchNormalized.includes('/');
 
+    const directoryName = PathUtil.asDirectory(PathUtil.getDirectoryName(value));
+    const directoryPath = PathUtil.getValueDirectoryPath(value);
+
     const getData = (): ComboboxItem[] => {
         const directories = dataDirectoryPaths.map((path): ComboboxItem => ({
-            value: PathUtil.withSeparatorEnd(path),
-            label: PathUtil.withSeparatorEnd(path.split('/').pop()!),
+            value: PathUtil.asDirectory(path),
+            label: PathUtil.asDirectory(path.split('/').pop()!),
             disabled: false,
         }));
 
@@ -110,6 +114,7 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
                             setSearch('');
                             console.log('CHANGE', nextValue)
                         }}
+                        disabled={value === '/'}
                         size='compact-sm'
                         leftSection={<FolderUpIcon />}
                     >
@@ -126,6 +131,15 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
                         <RefreshCwIcon />
                     </UIActionIcon>
 
+                    <Option
+                        value={directoryPath}
+                        label={directoryName}
+                        active={directoryPath === value}
+                        pkvaultPath={pkvaultPath}
+                        py={0.5}
+                        style={{ flexGrow: 1 }}
+                    />
+
                     <UIButton
                         name={`${name}-pkvault`}
                         controlLabel={t('action.select')}
@@ -133,8 +147,9 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
                             onChange('./');
                             setSearch('');
                         }}
+                        disabled={value === './'}
                         size='compact-sm'
-                        leftSection={<UIBallIcon />}
+                        leftSection={<img src='/logo.svg' height={16} />}
                         ml='auto'
                     >
                         PKVault
@@ -147,6 +162,7 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
                             onChange('/');
                             setSearch('');
                         }}
+                        disabled={value === '/'}
                         size='compact-sm'
                         leftSection={<FolderRootIcon />}
                     >
@@ -161,26 +177,13 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
                         </Combobox.Empty>
                         : <>
                             {data.map(({ value: v, label }) => (
-                                <Combobox.Option
+                                <Option
                                     key={v}
                                     value={v}
-                                    {...v === value
-                                        ? {
-                                            bg: 'primary',
-                                            c: 'white',
-                                            style: { cursor: 'default' },
-                                        }
-                                        : {}
-                                    }
-                                >
-                                    <Group fz='md'>
-                                        {v.endsWith('/')
-                                            ? <FolderIcon color='var(--mantine-color-yellow-9)' />
-                                            : <FileIcon />}
-
-                                        {label}
-                                    </Group>
-                                </Combobox.Option>
+                                    label={label}
+                                    active={v === value}
+                                    pkvaultPath={pkvaultPath}
+                                />
                             ))}
 
                             {data.length === 0 && <>
@@ -199,4 +202,31 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
             </Combobox.Dropdown>
         </Combobox>
     );
+};
+
+type OptionProps = Combobox.Option.Props & {
+    label: string;
+    active?: boolean;
+    pkvaultPath: string;
+};
+
+const Option: React.FC<OptionProps> = ({ active = false, value, label, pkvaultPath, ...rest }) => {
+    return <Combobox.Option
+        {...rest}
+        value={value}
+        {...active
+            ? {
+                bg: 'primary',
+                c: 'white',
+                style: { cursor: 'default', ...rest.style },
+            }
+            : undefined
+        }
+    >
+        <Group>
+            {getPathIcon(value as string, active, pkvaultPath)}
+
+            {label}
+        </Group>
+    </Combobox.Option>;
 };

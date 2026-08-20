@@ -1,6 +1,10 @@
 
 export const PathUtil = {
-    withSeparatorEnd: (value: string) => value.endsWith('/')
+    isDirectory: (path: string) => path.endsWith('/'),
+    isGlob: (path: string) => path.includes('*'),
+    isExclude: (path: string) => path[0] === '!',
+
+    asDirectory: (value: string) => PathUtil.isDirectory(value)
         ? value
         : value + '/',
 
@@ -27,8 +31,49 @@ export const PathUtil = {
         return nextValue;
     },
 
+    getDirectoryName: (path: string) => {
+        const pathParts = path.split('/');
+        return pathParts[ pathParts.length - 2 ] ?? '';
+    },
+
+    getFileName: (path: string) => {
+        const pathParts = path.split('/');
+        return pathParts.pop() ?? '';
+    },
+
+    getFileExt: (path: string) => {
+        const nameParts = PathUtil.getFileName(path).split('.');
+        if (nameParts.length < 2)
+            return '';
+        return nameParts.pop()!;
+    },
+
+    combine: (from: string, to: string) => {
+        if (to[ 0 ] === '/' || to[ 1 ] === ':')
+            return to;
+
+        const fromParts = from.split('/');
+        const toParts = to.split('/');
+
+        for (const toEl of toParts) {
+            switch (toEl) {
+                case '.': break;
+                case '..':
+                    if (fromParts.pop() === '')
+                        fromParts.pop();
+                    break;
+                default:
+                    if (toEl !== '' || fromParts[ fromParts.length - 1 ] !== '')
+                        fromParts.push(toEl);
+                    break;
+            }
+        }
+
+        return fromParts.join('/');
+    },
+
     getValueDirectoryPath: (value: string) => {
-        let valueParts = value.split('/');
+        let valueParts = PathUtil.normalizePath(value).split('/');
 
         const asteriskIndex = valueParts.findIndex(p => p.includes('*'));
         if (asteriskIndex > -1) {

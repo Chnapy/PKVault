@@ -2,7 +2,8 @@ import React from 'react';
 import { useSettingsGetSaveGlobsResults } from '../../data/sdk/settings/settings.gen';
 import { UIGlobsInputItem, type UIGlobsInputItemProps } from '../../ui/form/globs-input/ui-globs-input-item';
 import { UIPathButton } from '../../ui/form/globs-input/ui-path-button';
-import { getDesktopFileTypeInfos, getPathInfos } from '../../ui/form/globs-input/util/get-path-infos';
+import { getDesktopFileTypeInfos } from '../../ui/form/globs-input/util/get-desktop-file-type-infos';
+import { PathUtil } from '../../ui/form/globs-input/util/path-util';
 import { FileExplorerPopover, type FileExplorerPopoverProps } from './file-explorer-popover';
 import { useDesktopMessage } from './hooks/use-desktop-message';
 
@@ -16,9 +17,9 @@ export type GlobsInputItemProps = Pick<UIGlobsInputItemProps, 'name' | 'value' |
 export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onChange, onRemove, limit, disabled, ...rest }) => {
     const desktopMessage = useDesktopMessage();
 
-    const isGlob = value.includes('*');
-    const isDirectory = isGlob || value.endsWith('/');
-    const isExclude = value.startsWith('!');
+    const isGlob = PathUtil.isGlob(value);
+    const isDirectory = isGlob || PathUtil.isDirectory(value);
+    const isExclude = PathUtil.isExclude(value);
 
     const globResultsQuery = useSettingsGetSaveGlobsResults({
         globs: [ value ],
@@ -57,18 +58,17 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
                 onClick={async e => {
                     props.onClick?.(e);
 
-                    const typeInfos = getPathInfos(value);
-                    if (typeInfos.type === 'exclude')
+                    if (isExclude)
                         return;
 
                     let basePath = value;
-                    if (typeInfos.type === 'file') {
+                    if (!isDirectory) {
                         const pathParts = value.split('/');
                         pathParts.pop();
                         basePath = pathParts.join('/');
                     }
 
-                    const desktopInfos = getDesktopFileTypeInfos(typeInfos.type);
+                    const desktopInfos = getDesktopFileTypeInfos(isExclude ? 'exclude' : isDirectory ? 'folder' : 'file');
 
                     const response = await desktopMessage.fileExplore({
                         type: 'file-explore',
