@@ -36,13 +36,13 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
     const getData = (): ComboboxItem[] => {
         const directories = dataDirectoryPaths.map((path): ComboboxItem => ({
             value: PathUtil.asDirectory(path),
-            label: PathUtil.asDirectory(path.split('/').pop()!),
+            label: PathUtil.getDirectoryName(PathUtil.asDirectory(path)),
             disabled: false,
         }));
 
         const files = dataFilePaths.map((path): ComboboxItem => ({
             value: path,
-            label: path.split('/').pop()!,
+            label: PathUtil.getFileName(path),
             disabled: false,
         }));
 
@@ -114,7 +114,7 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
                             setSearch('');
                             console.log('CHANGE', nextValue)
                         }}
-                        disabled={value === '/'}
+                        disabled={PathUtil.isRoot(value)}
                         size='compact-sm'
                         leftSection={<FolderUpIcon />}
                     >
@@ -147,7 +147,7 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
                             onChange('./');
                             setSearch('');
                         }}
-                        disabled={value === './'}
+                        disabled={PathUtil.combine(pkvaultPath, value) === pkvaultPath}
                         size='compact-sm'
                         leftSection={<img src='/logo.svg' height={16} />}
                         ml='auto'
@@ -162,7 +162,7 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
                             onChange('/');
                             setSearch('');
                         }}
-                        disabled={value === '/'}
+                        disabled={PathUtil.isRoot(value)}
                         size='compact-sm'
                         leftSection={<FolderRootIcon />}
                     >
@@ -188,7 +188,7 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
 
                             {data.length === 0 && <>
                                 {isSearchPath && value !== searchNormalized
-                                    ? <Combobox.Option value={searchNormalized}>
+                                    ? <Combobox.Option value={searchNormalized} onClick={() => setSearch('')}>
                                         {t('action.select')} {searchNormalized}
                                     </Combobox.Option>
                                     : <Combobox.Empty>

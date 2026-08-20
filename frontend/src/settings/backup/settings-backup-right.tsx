@@ -3,6 +3,7 @@ import { PackageOpenIcon } from 'lucide-react';
 import React from "react";
 import { useBackupDelete, useBackupGetAll, useBackupRestore } from '../../data/sdk/backup/backup.gen';
 import { useTranslate } from '../../translate/i18n';
+import { PathUtil } from '../../ui/form/globs-input/util/path-util';
 import { UIBackupItem } from '../../ui/settings/backups/ui-backup-item';
 import { UIBackupList } from '../../ui/settings/backups/ui-backup-list';
 import { UIBackupsTabList } from '../../ui/settings/backups/ui-backups-tab-list';
@@ -62,7 +63,7 @@ export const SettingsBackupRight: React.FC = () => {
                 key={backup.filepath}
                 order={i}
                 createdAt={backup.createdAt}
-                filename={backup.filepath.split('/').pop() ?? ''}
+                filename={PathUtil.getFileName(backup.filepath)}
                 path={backup.filepath}
                 onRestore={() => backupRestoreMutation.mutateAsync({ params: { createdAt: backup.createdAt } })}
                 onDelete={() => backupDeleteMutation.mutateAsync({ params: { createdAt: backup.createdAt } })}

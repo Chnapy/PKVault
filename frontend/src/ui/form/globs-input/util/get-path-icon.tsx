@@ -1,4 +1,4 @@
-import { AsteriskIcon, FileIcon, FolderIcon, FolderRootIcon, SaveIcon } from 'lucide-react';
+import { AsteriskIcon, FileIcon, FolderIcon, FolderRootIcon, NetworkIcon, SaveIcon } from 'lucide-react';
 import { UIBallIcon } from '../../../icon/ui-ball-icon';
 import { PathUtil } from './path-util';
 
@@ -15,8 +15,11 @@ export const getPathIcon = (path: string, active?: boolean, pkvaultPath?: string
     if (PathUtil.isGlob(path))
         return <AsteriskIcon color={defaultColor} />;
 
-    if (path === '/')
+    if (PathUtil.isRoot(path))
         return <FolderRootIcon color={defaultColor} />;
+
+    if (PathUtil.isLAN(path))
+        return <NetworkIcon color={defaultColor} />;
 
     if (pkvaultPath && PathUtil.combine(pkvaultPath, path) === pkvaultPath)
         return <img src='/logo.svg' height={16} color={defaultColor} />

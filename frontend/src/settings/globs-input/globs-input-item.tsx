@@ -61,12 +61,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
                     if (isExclude)
                         return;
 
-                    let basePath = value;
-                    if (!isDirectory) {
-                        const pathParts = value.split('/');
-                        pathParts.pop();
-                        basePath = pathParts.join('/');
-                    }
+                    const basePath = isDirectory ? value : PathUtil.getValueDirectoryPath(value);
 
                     const desktopInfos = getDesktopFileTypeInfos(isExclude ? 'exclude' : isDirectory ? 'folder' : 'file');
 
@@ -84,6 +79,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
 
                     onChange(newValue);
                 }}
+                disabled={isExclude}
             />
             : <FileExplorerPopover
                 {...props}

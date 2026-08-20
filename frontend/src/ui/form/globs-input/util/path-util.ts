@@ -3,12 +3,18 @@ export const PathUtil = {
     isDirectory: (path: string) => path.endsWith('/'),
     isGlob: (path: string) => path.includes('*'),
     isExclude: (path: string) => path[0] === '!',
+    isAbsolute: (path: string) => path[0] === '/' || path[1] === ':',
+    isRoot: (path: string) => path === '/' || (path.length === 3 && path[1] === ':'),
+    isLAN: (path: string) => path.startsWith('\\\\'),
 
     asDirectory: (value: string) => PathUtil.isDirectory(value)
         ? value
         : value + '/',
 
-    normalizePath: (path: string) => path.trim().replaceAll('\\', '/'),
+    normalizePath: (path: string) => path.trim()
+        .replaceAll('\\', '/')
+        .replaceAll("//", "\\\\")
+        .replaceAll("/./", "/"),
 
     // /toto/tata/ -> /toto/
     // /toto/tata -> /toto/
@@ -49,7 +55,7 @@ export const PathUtil = {
     },
 
     combine: (from: string, to: string) => {
-        if (to[ 0 ] === '/' || to[ 1 ] === ':')
+        if (PathUtil.isAbsolute(to))
             return to;
 
         const fromParts = from.split('/');
