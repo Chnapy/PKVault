@@ -1,7 +1,36 @@
 using Serilog;
 
-public class CopyDirectory
+public record DirectoryContent(
+    string SourcePath,
+    IEnumerable<string> DirectoryPaths,
+    IEnumerable<string> FilePaths
+);
+
+public class DirectoryUtil
 {
+    public static DirectoryContent Ls(string sourcePath)
+    {
+        try
+        {
+            var dirPaths = Directory.EnumerateDirectories(sourcePath).Select(MatcherUtil.NormalizePath).Order();
+            var filePaths = Directory.EnumerateFiles(sourcePath).Select(MatcherUtil.NormalizePath).Order();
+
+            return new(
+                SourcePath: sourcePath,
+                DirectoryPaths: dirPaths,
+                FilePaths: filePaths
+            );
+        }
+        catch (IOException)
+        {
+            return new(
+                SourcePath: sourcePath,
+                DirectoryPaths: [],
+                FilePaths: []
+            );
+        }
+    }
+
     public static void CopyDirectoryRecursive(string sourceDir, string destDir)
     {
         try

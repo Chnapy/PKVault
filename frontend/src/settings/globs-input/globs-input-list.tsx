@@ -3,8 +3,8 @@ import { PackageOpenIcon } from 'lucide-react';
 import React from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 import { useTranslate } from '../../translate/i18n';
-import type { UIGlobType } from '../../ui/form/globs-input/ui-globs-input-add';
 import { UIGlobsInputList, type UIGlobsInputListProps } from '../../ui/form/globs-input/ui-globs-input-list';
+import { getDesktopFileTypeInfos } from '../../ui/form/globs-input/util/get-desktop-file-type-infos';
 import { GlobsInputItem } from './globs-input-item';
 import { GlobsInputResults } from './globs-input-results';
 import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
@@ -25,36 +25,17 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
 
     const splittedValue = value.split('\n').map(value => value.trim()).filter(Boolean);
 
-    const getTypeInfos = (type: UIGlobType) => {
-        if (type === 'file')
-            return {
-                id: -1,
-                directoryOnly: false,
-                getFinalPaths: (values: string[]) => values,
-            };
-
-        if (type === 'folder')
-            return {
-                id: -2,
-                directoryOnly: true,
-                getFinalPaths: (values: string[]) => values.map(path => path.endsWith('/') ? path : path + '/'),
-            };
-
-        return {
-            id: -3,
-            directoryOnly: false,
-            getFinalPaths: (values: string[]) => values,
-        };
-    };
+    const id = 'globs-list-' + name;
 
     return <UIGlobsInputList
+        id={id}
         labelList={labelList}
         labelAddFile={labelAddFile}
         labelAddFolder={labelAddFolder}
         onAdd={async (type, newValue) => {
 
             if (desktopMessage) {
-                const typeInfos = getTypeInfos(type);
+                const typeInfos = getDesktopFileTypeInfos(type);
 
                 const response = await desktopMessage.fileExplore({
                     type: 'file-explore',
@@ -73,6 +54,14 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
 
             const newValues = [ ...splittedValue, ...newValue ];
             onChange(newValues.join('\n'));
+
+            if (!desktopMessage) {
+                setTimeout(() => {
+                    const el = document.getElementById(id)?.querySelector('[data-item-last]');
+                    if (el)
+                        (el as HTMLElement).click();
+                }, 200);
+            }
         }}
         disabled={disabled}
         isDesktop={isDesktop}
@@ -85,7 +74,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
         {splittedValue.map((value, i) => <GlobsInputItem key={i}
             name={`${name}-${i}`}
             value={value}
-            onEdit={newValue => {
+            onChange={newValue => {
                 const newValues = [ ...splittedValue ];
                 newValues[ i ] = newValue;
                 onChange(newValues.join('\n'));
@@ -97,6 +86,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
             }}
             disabled={disabled}
             limit={limit}
+            data-item-last={(i === splittedValue.length - 1) || undefined}
         />)}
 
         {splittedValue.length === 0 && <EmptyState

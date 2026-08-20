@@ -337,7 +337,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             
         foreach(var (_, SrcPath, DestPath) in dataToMigrate)
         {
-            CopyDirectory.CopyDirectoryRecursive(SrcPath, DestPath);
+            DirectoryUtil.CopyDirectoryRecursive(SrcPath, DestPath);
         }
         Log.Logger.Debug("Flatpak migration complete");
 

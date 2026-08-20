@@ -1244,6 +1244,36 @@
         }
       }
     },
+    "/api/settings/directory-ls": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "operationId": "Settings_GetDirectoryLs",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "name": "directoryPath",
+            "in": "query",
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/DirectoryContent"
+            }
+          }
+        }
+      }
+    },
     "/api/save-infos": {
       "get": {
         "tags": [
@@ -4151,6 +4181,31 @@
         "id": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "DirectoryContent": {
+      "type": "object",
+      "required": [
+        "sourcePath",
+        "directoryPaths",
+        "filePaths"
+      ],
+      "properties": {
+        "sourcePath": {
+          "type": "string"
+        },
+        "directoryPaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "filePaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

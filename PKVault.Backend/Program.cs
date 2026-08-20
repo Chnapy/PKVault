@@ -19,6 +19,8 @@ public class Program
         => Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(
                 webBuilder => webBuilder.UseStartup<Startup>());
+    
+    private static readonly string InitialCurrentDirectory = Directory.GetCurrentDirectory();
 
     public static async Task Main(string[] args)
     {
@@ -39,7 +41,7 @@ public class Program
         // "linux-arm64"
         Log.Logger.Debug($"RID runtime : {RuntimeInformation.RuntimeIdentifier}");
 
-        Log.Logger.Debug($"Current directory : {Directory.GetCurrentDirectory()}");
+        Log.Logger.Debug($"Current directory : {InitialCurrentDirectory}");
 
         // SettingsService.ProgramArgs = args;
 
@@ -142,7 +144,9 @@ public class Program
         return async () =>
         {
 #if DEBUG && MODE_DEFAULT
-            Log.Logger.Debug("Generate Swagger file");
+
+            var swaggerPath = MatcherUtil.NormalizePath(Path.Combine(InitialCurrentDirectory, "swagger.json"));
+            Log.Logger.Debug($"Generate Swagger file to {swaggerPath}");
 
             try
             {
@@ -150,7 +154,19 @@ public class Program
                 using HttpClient http = new();
                 using var response = await http.GetAsync(swaggerHref);
                 var json = await response.Content.ReadAsStringAsync();
-                await File.WriteAllTextAsync("swagger.json", json);
+
+                var oldJson = await File.ReadAllTextAsync(swaggerPath);
+
+                if (json != oldJson)
+                {
+                    Log.Logger.Debug($"Swagger content changed.");
+                    await File.WriteAllTextAsync(swaggerPath, json);
+                    Log.Logger.Debug($"Swagger file generated: {swaggerPath}");
+                }
+                else
+                {
+                    Log.Logger.Debug($"Swagger didn't change, generation aborted.");
+                }
             }
             catch (Exception ex)
             {

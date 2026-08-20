@@ -1,22 +1,21 @@
-import { FilePlusIcon, FolderPlusIcon, MinusCircleIcon } from 'lucide-react';
+import { FilePlusIcon, FolderPlusIcon } from 'lucide-react';
 import React from 'react';
 import { switchUtil } from '../../../util/switch-util';
 import { UIButton, type UIButtonProps } from '../button/ui-button';
-
-export type UIGlobType = 'file' | 'folder' | 'exclude';
+import type { UIGlobType } from './util/get-desktop-file-type-infos';
 
 export type UIGlobsInputAddProps = Pick<UIButtonProps, 'name'> & {
     label: string;
-    type: UIGlobType;
+    type: Exclude<UIGlobType, 'exclude'>;
     onAdd: (type: UIGlobType, paths: string[]) => void;
     disabled?: boolean;
 };
 
 export const UIGlobsInputAdd: React.FC<UIGlobsInputAddProps> = ({ name, label, type, onAdd, disabled }) => {
     const placeholder = switchUtil(type, {
-        file: './path/to/file',
-        folder: './path/to/folder',
-        exclude: '!**/files-to-exclude',
+        file: './file',
+        folder: './',
+        'file-folder': './file-or-folder',
     });
 
     const onAddFn = () => onAdd(type, [ placeholder ]);
@@ -25,18 +24,14 @@ export const UIGlobsInputAdd: React.FC<UIGlobsInputAddProps> = ({ name, label, t
         name={name}
         controlLabel={label}
         variant='filled'
-        color={type === 'exclude' ? 'red' : 'blue'}
+        color={'blue'}
         onClick={onAddFn}
         size='compact-sm'
         style={{ flexGrow: 1 }}
         disabled={disabled}
-        leftSection={type === 'exclude'
-            ? <MinusCircleIcon />
-            : (type === 'folder'
-                ? <FolderPlusIcon />
-                : <FilePlusIcon />
-            )
-        }
+        leftSection={type === 'folder'
+            ? <FolderPlusIcon />
+            : <FilePlusIcon />}
     >
         {label}
     </UIButton>;

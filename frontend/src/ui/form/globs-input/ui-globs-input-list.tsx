@@ -1,10 +1,11 @@
-import { Accordion, Alert, Group, InputWrapper, Stack } from '@mantine/core';
+import { Alert, Card, Group, InputWrapper, Stack } from '@mantine/core';
 import { PenOffIcon } from 'lucide-react';
 import React from 'react';
 import { useTranslate } from '../../../translate/i18n';
 import { UIGlobsInputAdd, type UIGlobsInputAddProps } from './ui-globs-input-add';
 
 export type UIGlobsInputListProps = Pick<UIGlobsInputAddProps, 'onAdd' | 'disabled'> & {
+    id: string;
     labelList: React.ReactNode;
     labelAddFile: string;
     labelAddFolder: string;
@@ -14,7 +15,7 @@ export type UIGlobsInputListProps = Pick<UIGlobsInputAddProps, 'onAdd' | 'disabl
 };
 
 export const UIGlobsInputList: React.FC<UIGlobsInputListProps> = ({
-    labelList, labelAddFile, labelAddFolder, onAdd, disabled, isDesktop, results, children, ...rest
+    id, labelList, labelAddFile, labelAddFolder, onAdd, disabled, isDesktop, results, children
 }) => {
     const { t } = useTranslate();
 
@@ -23,7 +24,7 @@ export const UIGlobsInputList: React.FC<UIGlobsInputListProps> = ({
         disabled,
     };
 
-    return <Stack {...rest}>
+    return <Stack id={id}>
         <InputWrapper
             label={labelList}
             description={t('settings.form.globs.help')}
@@ -33,48 +34,36 @@ export const UIGlobsInputList: React.FC<UIGlobsInputListProps> = ({
             {t('action.edit-not-possible')}
         </Alert>}
 
-        <Accordion variant='contained'>
-            {children}
+        <Card withBorder>
+            {React.Children.map(children, (c, i) => c && <Card.Section key={i} withBorder inheritPadding py='md'>{c}</Card.Section>)}
+        </Card>
 
-            <Group my='md'>
-                {isDesktop
-                    ? <>
-                        <UIGlobsInputAdd
-                            name='add-file'
-                            label={labelAddFile}
-                            type='file'
-                            {...addCommonProps}
-                        />
-                        <UIGlobsInputAdd
-                            name='add-folder'
-                            label={labelAddFolder}
-                            type='folder'
-                            {...addCommonProps}
-                        />
-                        <UIGlobsInputAdd
-                            name='add-exclude'
-                            label={t('settings.form.globs.add-exclude')}
-                            type='exclude'
-                            {...addCommonProps}
-                        />
-                    </>
-                    : <>
-                        <UIGlobsInputAdd
-                            name='add-file'
-                            label={labelAddFile}
-                            type='file'
-                            {...addCommonProps}
-                        />
-                        <UIGlobsInputAdd
-                            name='add-exclude'
-                            label={t('settings.form.globs.add-exclude')}
-                            type='exclude'
-                            {...addCommonProps}
-                        />
-                    </>}
-            </Group>
+        <Group my='md'>
+            {isDesktop
+                ? <>
+                    <UIGlobsInputAdd
+                        name='add-file'
+                        label={labelAddFile}
+                        type='file'
+                        {...addCommonProps}
+                    />
+                    <UIGlobsInputAdd
+                        name='add-folder'
+                        label={labelAddFolder}
+                        type='folder'
+                        {...addCommonProps}
+                    />
+                </>
+                : <>
+                    <UIGlobsInputAdd
+                        name='add-file-or-folder'
+                        label={labelAddFile}
+                        type='file-folder'
+                        {...addCommonProps}
+                    />
+                </>}
+        </Group>
 
-            {results}
-        </Accordion>
+        {results}
     </Stack>;
 };

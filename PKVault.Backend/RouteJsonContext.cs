@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 
 [JsonSerializable(typeof(SettingsDTO))]
+[JsonSerializable(typeof(DirectoryContent))]
 [JsonSerializable(typeof(WarningsDTO))]
 [JsonSerializable(typeof(List<BankDTO>))]
 [JsonSerializable(typeof(List<BoxDTO>))]
