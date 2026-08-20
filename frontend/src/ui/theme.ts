@@ -74,6 +74,12 @@ export const theme = mergeThemeOverrides(
         defaultProps: {
           // default value 'mousedown' doesn't work with disabled buttons
           clickOutsideEvents: defaultClickOutsideEvents,
+          shadow: 'md',
+        },
+      }),
+      PopoverDropdown: Popover.Dropdown.extend({
+        defaultProps: {
+          bg: 'light-dark(var(--mantine-color-white-3), var(--mantine-color-dark-6))',
         },
       }),
       Menu: Menu.extend({

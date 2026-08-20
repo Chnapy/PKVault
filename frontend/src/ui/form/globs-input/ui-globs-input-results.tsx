@@ -1,5 +1,5 @@
 import { Accordion, Group } from '@mantine/core';
-import { AlertCircleIcon, ListIcon } from 'lucide-react';
+import { AlertCircleIcon, FileIcon, ListIcon } from 'lucide-react';
 import React from 'react';
 import { useTranslate } from '../../../translate/i18n';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
@@ -28,43 +28,51 @@ export const UIGlobsInputResults: React.FC<UIGlobsInputResultsProps> = ({ name, 
         ],
     });
 
-    return <Accordion.Item {...focusProps} value='results'>
-        <WithControlsIcons placement='out' icons={controlIcons('open')}
-            as={Accordion.Control} {...controlProps('open')}>
-            <Group wrap='nowrap' pr='md'>
-                <ListIcon />
+    return <Accordion variant='contained'>
+        <Accordion.Item {...focusProps} value='results'>
+            <WithControlsIcons placement='out' icons={controlIcons('open')}
+                as={Accordion.Control} {...controlProps('open')}>
+                <Group wrap='nowrap' pr='md'>
+                    <ListIcon />
 
-                <div style={{ flexGrow: 1, lineBreak: 'anywhere' }}>
-                    {t('settings.form.globs.results')}
-                </div>
+                    <div style={{ flexGrow: 1, lineBreak: 'anywhere' }}>
+                        {t('settings.form.globs.results')}
+                    </div>
 
-                <Group
-                    c={hasError ? 'red' : undefined}
-                    wrap='nowrap'
-                    ml='auto'
-                >
-                    {hasError && <AlertCircleIcon />}
-                    {isLoading
-                        ? '...'
-                        : hasError
-                            ? 'error'
-                            : t('settings.form.saves.test.title', { count: data.length })}
+                    <Group
+                        c={hasError ? 'red' : undefined}
+                        wrap='nowrap'
+                        ml='auto'
+                    >
+                        <Group
+                            c={hasError ? 'red' : undefined}
+                            wrap='nowrap'
+                            gap='sm'
+                        >
+                            <FileIcon />
+                            {hasError
+                                ? '-'
+                                : data.length}
+                        </Group>
+
+                        {hasError && <AlertCircleIcon />}
+                    </Group>
                 </Group>
-            </Group>
-        </WithControlsIcons>
+            </WithControlsIcons>
 
-        {showFiles && data.length > 0 && <Accordion.Panel>
-            <pre style={{
-                fontFamily: 'inherit',
-                maxHeight: 200,
-                overflow: 'auto',
-                padding: 4,
-                margin: 0,
-            }}>
-                {!isLoading && data.map(path => <Group key={path}>
-                    <UIPathLine>{path}</UIPathLine>
-                </Group>)}
-            </pre>
-        </Accordion.Panel>}
-    </Accordion.Item>;
+            {showFiles && data.length > 0 && <Accordion.Panel>
+                <pre style={{
+                    fontFamily: 'inherit',
+                    maxHeight: 200,
+                    overflow: 'auto',
+                    padding: 4,
+                    margin: 0,
+                }}>
+                    {!isLoading && data.map(path => <Group key={path}>
+                        <UIPathLine>{path}</UIPathLine>
+                    </Group>)}
+                </pre>
+            </Accordion.Panel>}
+        </Accordion.Item>
+    </Accordion>;
 };

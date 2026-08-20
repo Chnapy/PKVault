@@ -26,6 +26,12 @@ public class SettingsController(DataService dataService, ISettingsService settin
         return results;
     }
 
+    [HttpGet("directory-ls")]
+    public ActionResult<DirectoryContent> GetDirectoryLs([FromQuery] string directoryPath)
+    {
+        return DirectoryUtil.Ls(directoryPath);
+    }
+
     [HttpPost]
     public async Task<ActionResult<DataDTO>> Edit([BindRequired] SettingsMutableDTO settingsMutable)
     {

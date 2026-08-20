@@ -1,13 +1,19 @@
 import React from 'react';
 import { useSettingsGetSaveGlobsResults } from '../../data/sdk/settings/settings.gen';
 import { UIGlobsInputItem, type UIGlobsInputItemProps } from '../../ui/form/globs-input/ui-globs-input-item';
+import { UIPathButton } from '../../ui/form/globs-input/ui-path-button';
+import { getDesktopFileTypeInfos, getPathInfos } from '../../ui/form/globs-input/util/get-path-infos';
+import { FileExplorerPopover, type FileExplorerPopoverProps } from './file-explorer-popover';
 import { useDesktopMessage } from './hooks/use-desktop-message';
 
-export type GlobsInputItemProps = Pick<UIGlobsInputItemProps, 'name' | 'value' | 'onEdit' | 'onRemove' | 'disabled'> & {
-    limit: number;
-};
+export type GlobsInputItemProps = Pick<UIGlobsInputItemProps, 'name' | 'value' | 'onRemove' | 'disabled'>
+    & Pick<FileExplorerPopoverProps, 'onChange'>
+    & {
+        limit: number;
+        'data-item-last'?: boolean;
+    };
 
-export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onEdit, onRemove, limit, disabled }) => {
+export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onChange, onRemove, limit, disabled, ...rest }) => {
     const desktopMessage = useDesktopMessage();
 
     const isGlob = value.includes('*');
@@ -32,11 +38,9 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onE
     return <UIGlobsInputItem
         name={name}
         value={value}
-        onEdit={onEdit}
         onRemove={onRemove}
         disabled={disabled}
         results={data}
-        isDesktop={!!desktopMessage}
         hasError={hasError}
         hasWarning={hasWarning}
         isLoading={isLoading}
@@ -45,5 +49,48 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onE
             isDirectory,
             path: value,
         }))}
-    />;
+    >
+        {props => desktopMessage
+            ? <UIPathButton
+                {...props}
+                value={value}
+                onClick={async e => {
+                    props.onClick?.(e);
+
+                    const typeInfos = getPathInfos(value);
+                    if (typeInfos.type === 'exclude')
+                        return;
+
+                    let basePath = value;
+                    if (typeInfos.type === 'file') {
+                        const pathParts = value.split('/');
+                        pathParts.pop();
+                        basePath = pathParts.join('/');
+                    }
+
+                    const desktopInfos = getDesktopFileTypeInfos(typeInfos.type);
+
+                    const response = await desktopMessage.fileExplore({
+                        type: 'file-explore',
+                        id: desktopInfos.id,
+                        directoryOnly: desktopInfos.directoryOnly,
+                        basePath,
+                        multiselect: false,
+                    });
+
+                    const newValue = desktopInfos.getFinalPaths(response.values)[ 0 ];
+                    if (!newValue)
+                        return;
+
+                    onChange(newValue);
+                }}
+            />
+            : <FileExplorerPopover
+                {...props}
+                name={`${name}-file-explore`}
+                value={value}
+                onChange={onChange}
+                {...rest}
+            />}
+    </UIGlobsInputItem>;
 };

@@ -19,6 +19,8 @@ import { UIBackupItem } from '../../settings/backups/ui-backup-item';
 import { UIBackupList } from '../../settings/backups/ui-backup-list';
 import { UIBackupsTabList } from '../../settings/backups/ui-backups-tab-list';
 import { UISettingsContent } from '../../settings/ui-settings-content';
+import { UIPathButton } from '../../form/globs-input/ui-path-button';
+import { UIFileExplorerPopover } from '../../form/globs-input/ui-file-explorer-popover';
 
 const meta = {
     title: 'Pages/Settings',
@@ -120,6 +122,7 @@ export const Primary: Story = {
             right={<>
                 <Card>
                     <UIGlobsInputList
+                        id='saves'
                         labelList='Saves files locations'
                         labelAddFile='Add a save'
                         labelAddFolder='Add a save directory'
@@ -134,30 +137,89 @@ export const Primary: Story = {
                         <UIGlobsInputItem
                             name='1'
                             value={'./**/*.sav'}
-                            onEdit={console.log}
-                            onRemove={console.log}
+                            onRemove={() => console.log('remove')}
                             // disabled={disabled}
-                            results={generatePaths('c:/abc/zoo/', 100)}
-                            isDesktop//={false}
-                        />
+                            results={generatePaths('c:/abc/zoo', 100)}
+                        >
+                            {props => <UIFileExplorerPopover
+                                name='1-explorer'
+                                value={'./**/*.sav'}
+                                onChange={console.log}
+                                reloadData={console.log}
+                                // loading
+                                dataDirectoryPaths={[ './foo', './bar' ]}
+                                dataFilePaths={[ './toto.txt', './tata.sav' ]}
+                                setDropdownOpened={console.log}
+                            >
+                                {otherProps => <UIPathButton
+                                    {...props}
+                                    {...otherProps}
+                                    value={'./**/*.sav'}
+                                    onClick={e => {
+                                        props.onClick?.(e);
+                                        otherProps.onClick?.(e);
+                                    }}
+                                />}
+                            </UIFileExplorerPopover>}
+                        </UIGlobsInputItem>
+
                         <UIGlobsInputItem
                             name='2'
                             value={'./foo/bar.bin'}
-                            onEdit={console.log}
-                            onRemove={console.log}
+                            onRemove={() => console.log('remove')}
                             // disabled={disabled}
-                            results={generatePaths('c:/abc/foo/', 100)}
-                            isDesktop//={false}
-                        />
+                            results={generatePaths('c:/abc/foo', 100)}
+                        >
+                            {props => <UIFileExplorerPopover
+                                name='2-explorer'
+                                value={'./**/*.sav'}
+                                onChange={console.log}
+                                reloadData={console.log}
+                                // loading
+                                dataDirectoryPaths={[ './foo', './bar' ]}
+                                dataFilePaths={[ './toto.txt', './tata.sav' ]}
+                                setDropdownOpened={console.log}
+                            >
+                                {otherProps => <UIPathButton
+                                    {...props}
+                                    {...otherProps}
+                                    value={'./**/*.sav'}
+                                    onClick={e => {
+                                        props.onClick?.(e);
+                                        otherProps.onClick?.(e);
+                                    }}
+                                />}
+                            </UIFileExplorerPopover>}
+                        </UIGlobsInputItem>
+
                         <UIGlobsInputItem
                             name='3'
                             value={'!./**/*.bin'}
-                            onEdit={console.log}
-                            onRemove={console.log}
+                            onRemove={() => console.log('remove')}
                             // disabled={disabled}
-                            results={generatePaths('c:/abc/foo/', 100)}
-                            isDesktop//={false}
-                        />
+                            results={generatePaths('c:/abc/foo', 100)}
+                        >
+                            {props => <UIFileExplorerPopover
+                                name='3-explorer'
+                                value={'./**/*.sav'}
+                                onChange={console.log}
+                                reloadData={console.log}
+                                // loading
+                                dataDirectoryPaths={[ './foo', './bar' ]}
+                                dataFilePaths={[ './toto.txt', './tata.sav' ]}
+                                setDropdownOpened={console.log}
+                            >
+                                {otherProps => <UIPathButton
+                                    {...props}
+                                    {...otherProps}
+                                    value={'./**/*.sav'}
+                                    onClick={e => {
+                                        props.onClick?.(e);
+                                        otherProps.onClick?.(e);
+                                    }}
+                                />}
+                            </UIFileExplorerPopover>}
+                        </UIGlobsInputItem>
                     </UIGlobsInputList>
                 </Card>
             </>}
