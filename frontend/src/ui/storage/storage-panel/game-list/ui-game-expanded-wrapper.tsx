@@ -1,6 +1,6 @@
 import { Button, Divider, Group, Image, Stack, Text } from '@mantine/core';
 import { clsx } from 'clsx';
-import { CopyIcon, PenIcon } from 'lucide-react';
+import { CopyIcon, FileXIcon, PenIcon } from 'lucide-react';
 import React from 'react';
 import { useTranslate } from '../../../../translate/i18n';
 import { useClickLoading } from '../../../form/button/hooks/use-click-loading';
@@ -12,10 +12,12 @@ import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
 import { UIPopover } from '../../../popover/ui-popover';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
 import classes from './ui-game-expanded-wrapper.module.css';
+import { UIIconWrapper } from '../../../icon/ui-icon-wrapper';
 
 export type UIGameExpandedWrapperProps = {
     selected?: boolean;
     loading?: boolean;
+    disabled?: boolean;
     onSelect?: () => unknown;
     editDropdown?: React.ReactNode;
     hasDuplicates?: boolean;
@@ -28,11 +30,12 @@ export type UIGameExpandedWrapperProps = {
     tertiaryLine: React.ReactNode;
     fourthLine?: React.ReactNode;
     path: string;
+    missingFile?: boolean;
 };
 
 export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
-    id, label, imgSrc, secondaryLine, tertiaryLine, fourthLine, path,
-    selected, loading: loadingInner, onSelect: onSelectInner, editDropdown, hasDuplicates, actions,
+    id, label, imgSrc, secondaryLine, tertiaryLine, fourthLine, path, missingFile,
+    selected, loading: loadingInner, disabled, onSelect: onSelectInner, editDropdown, hasDuplicates, actions,
 }) => {
     const { t } = useTranslate();
 
@@ -47,7 +50,7 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
             panel.normalizeCurrentPanel();
         },
         controls: [
-            !selected && onSelect && getSelectControl({
+            !disabled && onSelect && getSelectControl({
                 label: t('action.select'),
                 action: () => {
                     return onSelect();
@@ -124,11 +127,11 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
 
                     <Divider my='xs' />
 
-                    <Text>
+                    {secondaryLine && <Text>
                         {secondaryLine}
-                    </Text>
+                    </Text>}
 
-                    <Group
+                    {tertiaryLine && <Group
                         component={Text}
                         wrap='nowrap'
                         mx='auto'
@@ -138,7 +141,7 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
                         }}
                     >
                         {tertiaryLine}
-                    </Group>
+                    </Group>}
 
                     {fourthLine && <Group
                         component={Text}
@@ -151,6 +154,22 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
                         }}
                     >
                         {fourthLine}
+                    </Group>}
+
+                    {missingFile && <Group
+                        component={Text}
+                        gap='sm'
+                        wrap='nowrap'
+                        mx='auto'
+                        style={{
+                            textWrap: 'nowrap',
+                            textOverflow: 'ellipsis',
+                        }}
+                    >
+                        <UIIconWrapper variant='transparent' color='red'>
+                            <FileXIcon />
+                        </UIIconWrapper>
+                        File is missing
                     </Group>}
 
                     <Divider my='xs' />

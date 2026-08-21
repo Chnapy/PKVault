@@ -109,6 +109,7 @@ export const StoragePanelGameList: React.FC = () => {
                     key={item.id}
                     {...item}
                     selected={selected}
+                    disabled={item.disabled}
                     onSelect={item.disabled
                         ? undefined
                         : (() => {

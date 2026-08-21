@@ -1,7 +1,7 @@
 import { Alert, Divider, Group, InputWrapper, Stack } from '@mantine/core';
 import { PencilIcon, PenOffIcon } from 'lucide-react';
 import React from 'react';
-import type { GameVersion } from '../../data/sdk/model';
+import { type GameVersion } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useSettingsEdit, useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { getEntityContextGenerationName } from '../../data/util/get-entity-context-generation-name';
@@ -36,6 +36,7 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
     const versions = [ ...new Set([ save.version, ...versionObj?.children ?? [] ]) ];
 
     const pathOverride = settingsMutable.savE_PATH_OVERRIDES?.[ save.id ];
+    const pathNotPresent = !!pathOverride && !savesByPlayTime.some(s => s.path === pathOverride);
 
     return <UIPopoverCard
         icon={<PencilIcon />}
@@ -76,13 +77,26 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
                         {t('save.edit.duplicate.default')}
                     </UIButton>
 
+                    {pathNotPresent && <UIGameExpanded
+                        generation={getEntityContextGenerationName(save.context, true)}
+                        label={staticData.versions[ save.displayedVersion ]?.name}
+                        imgSrc={getGameInfos(save.displayedVersion).img}
+                        selected
+                        disabled
+                        path={pathOverride}
+                        missingFile
+                        editDropdown={null}
+                        actions={null}
+                    />}
+
                     {savesByPlayTime.map(s => <React.Fragment key={s.path}>
                         <UIGameExpanded
                             id={s.id.toString()}
                             generation={getEntityContextGenerationName(s.context, true)}
                             label={staticData.versions[ s.displayedVersion ]?.name}
                             imgSrc={getGameInfos(s.displayedVersion).img}
-                            selected={pathOverride === s.path}
+                            selected={save === s}
+                            disabled={pathOverride === s.path}
                             onSelect={settings?.canUpdateSettings
                                 ? (async () => {
                                     const savePathOverrides = { ...settingsMutable.savE_PATH_OVERRIDES };

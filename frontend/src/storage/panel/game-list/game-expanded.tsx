@@ -8,9 +8,12 @@ import { useStaticData } from '../../../hooks/use-static-data';
 import { SaveItemEdit } from '../../../saves/save-item/save-item-edit';
 import { UIGameExpanded, type UIGameExpandedProps } from '../../../ui/storage/storage-panel/game-list/ui-game-expanded';
 
-export type GameExpandedProps = Pick<UIGameExpandedProps, 'id' | 'label' | 'imgSrc' | 'selected' | 'onSelect' | 'actions'>;
+export type GameExpandedProps = Pick<UIGameExpandedProps, 'label' | 'imgSrc' | 'selected' | 'disabled' | 'onSelect' | 'actions'>
+    & {
+        id: string;
+    };
 
-export const GameExpanded: React.FC<GameExpandedProps> = ({ id, label, imgSrc, onSelect, selected, actions }) => {
+export const GameExpanded: React.FC<GameExpandedProps> = ({ id, label, imgSrc, onSelect, selected, disabled, actions }) => {
     const staticData = useStaticData();
 
     const saveInfosQuery = useSaveInfosGetAll();
@@ -62,6 +65,7 @@ export const GameExpanded: React.FC<GameExpandedProps> = ({ id, label, imgSrc, o
         imgSrc={imgSrc}
         selected={selected}
         loading={loading}
+        disabled={disabled}
         onSelect={onSelect}
         ot={trainerName ?? ''}
         otGender={trainerGender ?? Gender.Genderless}
