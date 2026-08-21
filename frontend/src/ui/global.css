@@ -6,6 +6,10 @@
   scrollbar-width: thin;
 }
 
+html {
+  overflow: hidden;
+}
+
 :root,
 button {
   text-shadow: 1px 1px 0 light-dark(#0002, #fff2);

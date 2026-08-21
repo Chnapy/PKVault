@@ -1,6 +1,7 @@
 import { PencilIcon } from 'lucide-react';
 import React from 'react';
 import { useTranslate } from '../../../translate/i18n';
+import { useClickLoading } from '../../form/button/hooks/use-click-loading';
 import { UIButton } from '../../form/button/ui-button';
 import { UIPopoverCard, type UIPopoverCardProps } from './ui-popover-card';
 
@@ -9,19 +10,11 @@ type UIFormCardProps = Omit<UIPopoverCardProps<'form'>, 'footer'> & {
 };
 
 export const UIFormCard: React.FC<UIFormCardProps> = ({ icon, disabled, ...cardProps }) => {
-    const [ loading, setLoading ] = React.useState(false);
+    const { onClick: onSubmit, loading } = useClickLoading(cardProps.onSubmit);
 
     const { t } = useTranslate();
 
     icon ??= <PencilIcon />;
-
-    const onSubmit: UIFormCardProps[ 'onSubmit' ] = cardProps.onSubmit && (e => {
-        const result: unknown = cardProps.onSubmit?.(e);
-        if (result instanceof Promise) {
-            setLoading(true);
-            result.finally(() => setLoading(false));
-        }
-    });
 
     return <UIPopoverCard<'form'>
         {...cardProps}

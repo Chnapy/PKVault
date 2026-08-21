@@ -17,6 +17,7 @@ export const setupTestDataServer = () => {
         sid: 0,
         language: 2,
         playTime: '',
+        playTimeInSeconds: 0,
         trainerGender: 0,
         trainerName: '',
         dexSeenCount: 0,
@@ -28,6 +29,7 @@ export const setupTestDataServer = () => {
         boxCount: 5,
         boxSlotCount: 30,
         path: '',
+        duplicates: [],
         ...data,
     });
 

@@ -49,6 +49,12 @@ export const GameExpanded: React.FC<GameExpandedProps> = ({ id, label, imgSrc, o
 
     const versionObj = staticData.versions[ version ?? '' ];
 
+    const hasDuplicates = !!save && save.duplicates.length > 0;
+    const hasEdit = !!save && (
+        (versionObj && !versionObj.isGameVersion)
+        || hasDuplicates
+    );
+
     return <UIGameExpanded
         id={id}
         generation={getEntityContextGenerationName(context ?? EntityContext.None, true)}
@@ -66,7 +72,8 @@ export const GameExpanded: React.FC<GameExpandedProps> = ({ id, label, imgSrc, o
         playTime={playTime ?? ''}
         language={staticData.languages[ language ?? '' ] ?? ''}
         path={path ?? ''}
-        editDropdown={versionObj && !versionObj.isGameVersion && save && <SaveItemEdit saveId={save.id} />}
+        hasDuplicates={hasDuplicates}
+        editDropdown={hasEdit && <SaveItemEdit saveId={save.id} />}
         actions={actions}
     />;
 };

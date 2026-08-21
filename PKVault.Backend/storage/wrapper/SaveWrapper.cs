@@ -33,6 +33,7 @@ public class SaveWrapper(SaveFile Save)
     public string Extension => Save.Extension;
 
     public string PlayTimeString => Save.PlayTimeString;
+    public int PlayTimeInSeconds => PlayedSeconds + PlayedMinutes * 60 + PlayedHours * 3600;
 
     #region Metadata & Limits
     public GameVersion Version => Save.Version;

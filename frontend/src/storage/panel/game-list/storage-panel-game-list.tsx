@@ -66,10 +66,11 @@ export const StoragePanelGameList: React.FC = () => {
                 label: 'PKVault',
                 disabled: disabledPkvault,
             },
-            ...saveInfos.map(({ id, displayedVersion }): UIGameData => ({
+            ...saveInfos.map(({ id, displayedVersion, duplicates }): UIGameData => ({
                 id: id.toString(),
                 imgSrc: getGameInfos(displayedVersion).img,
                 label: staticData.versions[ displayedVersion ]?.name ?? '',
+                hasDuplicates: duplicates.length > 0,
             })),
         ]}
         onChange={onChange}

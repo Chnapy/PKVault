@@ -46,7 +46,9 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
       />}
 
       {generations.map(generation => {
-        const saves = saveInfos.filter(save => save.generation === generation);
+        const saves = saveInfos
+          .filter(save => save.generation === generation)
+          .sort((s1, s2) => s1.displayedVersion - s2.displayedVersion);
         if (saves.length === 0) {
           return null;
         }

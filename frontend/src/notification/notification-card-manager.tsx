@@ -8,7 +8,6 @@ import { useCheckUpdate } from './hooks/use-check-update';
 import { HasUpdateWarning } from './warnings/has-update-warning';
 import { PkmVariantWarning } from './warnings/pkm-variant-warning';
 import { SaveChangedWarning } from './warnings/save-changed-warning';
-import { SaveDuplicateWarning } from './warnings/save-duplicate-warning';
 
 export const NotificationCardManager: React.FC = () => {
     const { errors, removeIndex } = BackendErrorsContext.useValue();
@@ -20,7 +19,6 @@ export const NotificationCardManager: React.FC = () => {
         warningsCount={warnings?.warningsCount ?? 0}
         errorsCount={errors.length}
         update={hasUpdate && <HasUpdateWarning />}
-        saveDuplicateWarnings={warnings?.saveDuplicateWarnings.map((warn, i) => <SaveDuplicateWarning key={i} {...warn} />)}
         pkmVariantWarnings={warnings?.pkmVariantWarnings.map((warn, i) => <PkmVariantWarning key={i} {...warn} />)}
         saveChangedWarnings={warnings?.saveChangedWarnings.map((warn, i) => <SaveChangedWarning key={i} {...warn} />)}
         errors={errors.map((error, i) => {

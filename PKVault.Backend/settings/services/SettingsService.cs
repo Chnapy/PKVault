@@ -6,11 +6,11 @@ using Serilog;
 
 public interface ISettingsService
 {
-    public Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool persistSession, DataUpdateFlags flags);
+    public Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool persistSession, bool scanSaves, DataUpdateFlags flags);
     public Task<SettingsDTO> GetSettingsWithUserId();
     public SettingsDTO GetSettings();
     public SettingsDTO RefreshSettings(DataUpdateFlags flags);
-    public (bool RestartSession, bool PersistSession) GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags);
+    public (bool RestartSession, bool PersistSession, bool ScanSaves) GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags);
 }
 
 /**
@@ -28,10 +28,11 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
     private ISessionService sessionService => sp.GetRequiredService<ISessionService>();
+    private ISavesLoadersService savesLoadersService => sp.GetRequiredService<ISavesLoadersService>();
 
     private SettingsDTO? BaseSettings;
 
-    public async Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool persistSession, DataUpdateFlags flags)
+    public async Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool persistSession, bool scanSaves, DataUpdateFlags flags)
     {
         await fileIOService.WriteJSONFile(
             FilePath,
@@ -67,6 +68,10 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
                 await sessionService.StartNewSession(checkInitialActions: false, flags);
             }
         }
+        else if (scanSaves)
+        {
+            await savesLoadersService.Setup(flags);
+        }
     }
 
     /**
@@ -75,7 +80,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
      * 
      * Returns if session should be restarted or persisted.
      */
-    public (bool RestartSession, bool PersistSession) GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags)
+    public (bool RestartSession, bool PersistSession, bool ScanSaves) GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags)
     {
         var currentSettingsMutable = ReadBaseSettings().SettingsMutable;
 
@@ -86,8 +91,14 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             ..saveVersionOverrides?.Values.Order().Select(v => ((byte)v).ToString()) ?? [],
         ]);
 
+        static string GetSavePathOverridesChecksum(IDictionary<uint, string>? savePathOverrides) => GetArrayChecksum([
+            ..savePathOverrides?.Keys.Order().Select(k => k.ToString()) ?? [],
+            ..savePathOverrides?.Values.Order().ToArray() ?? [],
+        ]);
+
         bool restartSession = false;
         bool persistSession = false;
+        bool scanSaves = false;
 
         var hasPathChanges = currentSettingsMutable.DB_PATH != updatedSettingsMutable.DB_PATH
             || currentSettingsMutable.STORAGE_PATH != updatedSettingsMutable.STORAGE_PATH
@@ -131,7 +142,15 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             flags.SaveInfos = true;
         }
 
-        return (restartSession, persistSession);
+        var hasSavePathOverridesChange = GetSavePathOverridesChecksum(currentSettingsMutable.SAVE_PATH_OVERRIDES)
+            != GetSavePathOverridesChecksum(updatedSettingsMutable.SAVE_PATH_OVERRIDES);
+
+        if (hasSavePathOverridesChange)
+        {
+            scanSaves = true;
+        }
+
+        return (restartSession, persistSession, scanSaves);
     }
 
     public async Task<SettingsDTO> GetSettingsWithUserId()
@@ -334,8 +353,8 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         var dataToMigrate = GetFlatpakDataToMigrate();
         if (dataToMigrate.Length == 0)
             return;
-            
-        foreach(var (_, SrcPath, DestPath) in dataToMigrate)
+
+        foreach (var (_, SrcPath, DestPath) in dataToMigrate)
         {
             DirectoryUtil.CopyDirectoryRecursive(SrcPath, DestPath);
         }
@@ -346,7 +365,8 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private static (string Folder, string SrcPath, string DestPath)[] GetFlatpakDataToMigrate()
     {
-        if (!IsFlatpak()) {
+        if (!IsFlatpak())
+        {
             return [];
         }
 
@@ -357,12 +377,14 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
                 "pkvault.db"
             ))
         );
-        if (dbAlreadyExists) {
+        if (dbAlreadyExists)
+        {
             return [];
         }
-        
+
         var dataPath = Path.Combine(MatcherUtil.NormalizePath(GetAppDirectory()), "../../org.chnapy.pkvault/data");
-        if (!Directory.Exists(dataPath)) {
+        if (!Directory.Exists(dataPath))
+        {
             return [];
         }
 
@@ -371,17 +393,15 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             var folder = Path.GetFileName(sourceDir);
 
             return (
-                Folder: folder, 
+                Folder: folder,
                 SrcPath: sourceDir,
                 DestPath: MatcherUtil.NormalizePath(Path.Combine(GetAppDirectory(), folder))
             );
         }).ToArray();
 
-        Log.Debug($"Flatpak migrate from org.chnapy.pkvault - {data.Length} folders to migrate:\n{
-            string.Join('\n', data
+        Log.Debug($"Flatpak migrate from org.chnapy.pkvault - {data.Length} folders to migrate:\n{string.Join('\n', data
                 .Select(f => $"{f.Folder} -- {f.SrcPath} -> {f.DestPath}")
-            )
-        }");
+            )}");
 
         return data;
     }
@@ -402,11 +422,11 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             var langWithCountry = uiCulture.Name.ToLower();
             if (AllowedLanguages.Contains(langWithCountry))
                 return langWithCountry;
-            
+
             var langOnly = uiCulture.TwoLetterISOLanguageName;
             if (AllowedLanguages.Contains(langOnly))
                 return langOnly;
-            
+
             return DefaultLanguage;
         }
 

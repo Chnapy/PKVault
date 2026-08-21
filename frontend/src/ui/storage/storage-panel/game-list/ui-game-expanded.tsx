@@ -7,7 +7,7 @@ import { UIGender } from '../../../icon/ui-gender';
 import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
 import { UIGameExpandedWrapper, type UIGameExpandedWrapperProps } from './ui-game-expanded-wrapper';
 
-export type UIGameExpandedProps = Pick<UIGameExpandedWrapperProps, 'selected' | 'loading' | 'onSelect' | 'editDropdown' | 'actions' | 'label' | 'imgSrc' | 'path'>
+export type UIGameExpandedProps = Pick<UIGameExpandedWrapperProps, 'selected' | 'loading' | 'onSelect' | 'editDropdown' | 'hasDuplicates' | 'actions' | 'label' | 'imgSrc' | 'path'>
     & {
         id: string;
         generation: string;
@@ -15,7 +15,7 @@ export type UIGameExpandedProps = Pick<UIGameExpandedWrapperProps, 'selected' | 
         otGender: Gender;
         tid: number;
         caughtCount?: number;
-        ownedCount: number;
+        ownedCount?: number;
         shinyCount?: number;
         playTime: string;
         language: string;
@@ -33,9 +33,9 @@ export const UIGameExpanded: React.FC<UIGameExpandedProps> = ({
 
     return <UIGameExpandedWrapper
         {...rest}
-        title={id}
+        id={id}
         label={<>
-            <Box component='span' c='blue'>{generation}</Box> - {label}
+            <Box component='span' c='blue' mr='md'>{generation}</Box>{label}
         </>}
         secondaryLine={<>
             {t('save.ot')} {ot} <UIGender gender={otGender} /> - {t('details.tid')} {tid}

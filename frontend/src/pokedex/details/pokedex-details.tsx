@@ -223,6 +223,7 @@ export const PokedexDetails: React.FC = () => {
               controlLabel={t('details.form.change')}
               size='xs'
               onClick={() => setSelectedFormId(form.id)}
+              selected={selectedForm.id === form.id}
               disabled={selectedForm.id === form.id}
             >
               <Group wrap='nowrap' gap='sm'>
