@@ -1,34 +1,28 @@
 import { Button, type ElementProps, type PolymorphicComponentProps } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
+import { clsx } from 'clsx';
 import React from 'react';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
+import { useClickLoading } from './hooks/use-click-loading';
+import classes from './ui-button.module.css';
 
 export type UIButtonProps<C = 'button'> = {
     name: string;
     controlLabel: string;
     controlIcons?: React.ReactNode[];
     focusOnMount?: boolean;
+    selected?: boolean;
 }
     & Pick<ElementProps<'button'>, 'onClick' | 'ref'>
     & PolymorphicComponentProps<C, Button.Props>;
 
 export const UIButton = function <C = 'button'>({
-    name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner,
+    name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, selected, onClick: onClickInner,
     component, w, miw, mx, ml, mt, style, ...rest
 }: UIButtonProps<C>) {
-    const [ loadingInner, setLoading ] = React.useState(false);
-
-    const loading = loadingInner || rest.loading;
-
-    const onClick: typeof onClickInner = onClickInner && (e => {
-        const result: unknown = onClickInner(e);
-        if (result instanceof Promise) {
-            setLoading(true);
-            result.finally(() => setLoading(false));
-        }
-    });
+    const { onClick, loading } = useClickLoading(onClickInner, rest.loading);
 
     if (!controlLabel)
         console.warn('controlLabel is empty', { name })
@@ -55,10 +49,14 @@ export const UIButton = function <C = 'button'>({
             {...focusProps}
             {...controlProps('open')}
             {...rest}
+            className={clsx(
+                classes.uiButton,
+                selected && classes.selected,
+                rest.className,
+            )}
             onClick={onClick}
             ref={ref}
             loading={loading}
-            w='100%'
         />
     </WithControlsIcons>;
 };

@@ -43,9 +43,9 @@ public class SettingsController(DataService dataService, ISettingsService settin
 
         DataUpdateFlags flags = new();
 
-        var (RestartSession, PersistSession) = settingsService.GetUpdateDiff(settingsMutable, flags);
+        var (RestartSession, PersistSession, ScanSaves) = settingsService.GetUpdateDiff(settingsMutable, flags);
 
-        if (RestartSession && !sessionService.HasEmptyActionList())
+        if ((RestartSession || ScanSaves) && !sessionService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }
@@ -55,7 +55,7 @@ public class SettingsController(DataService dataService, ISettingsService settin
             throw new ArgumentException($"Language value not allowed: {settingsMutable.LANGUAGE}");
         }
 
-        await settingsService.UpdateSettings(settingsMutable, RestartSession, PersistSession, flags);
+        await settingsService.UpdateSettings(settingsMutable, RestartSession, PersistSession, ScanSaves, flags);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }

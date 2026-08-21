@@ -7,7 +7,6 @@ public interface ISavesLoadersService
     public SaveLoadersRecord? GetLoaders(uint saveId);
 
     public IDictionary<uint, SaveWrapper> GetSaveById();
-    public IDictionary<uint, HashSet<string>> GetSavePaths();
     public IDictionary<uint, SaveInfosDTO> GetAllSaveInfos();
 
     public void SetFlags(DataUpdateFlags flags);
@@ -27,7 +26,6 @@ public class SavesLoadersService(
 ) : ISavesLoadersService
 {
     private IDictionary<uint, SaveLoadersRecord> Loaders = new Dictionary<uint, SaveLoadersRecord>();
-    private IDictionary<uint, HashSet<string>> SavePaths = new Dictionary<uint, HashSet<string>>();
     private bool Initialized = false;
 
     public SaveLoadersRecord[] GetAllLoaders()
@@ -67,16 +65,6 @@ public class SavesLoadersService(
         );
     }
 
-    public IDictionary<uint, HashSet<string>> GetSavePaths()
-    {
-        if (!Initialized)
-        {
-            throw new Exception("Save loaders not initialized");
-        }
-
-        return SavePaths.ToDictionary();
-    }
-
     public IDictionary<uint, SaveInfosDTO> GetAllSaveInfos()
     {
         if (!Initialized)
@@ -84,21 +72,19 @@ public class SavesLoadersService(
             throw new Exception("Save loaders not initialized");
         }
 
-        var settings = settingsService.GetSettings().SettingsMutable.SAVE_VERSION_OVERRIDES;
+        var saveVersionOverrides = settingsService.GetSettings().SettingsMutable.SAVE_VERSION_OVERRIDES ?? [];
 
         var record = new Dictionary<uint, SaveInfosDTO>();
 
-        foreach(var loader in Loaders.Values)
+        foreach (var loader in Loaders.Values)
         {
             var mainSave = loader.Save;
             ArgumentException.ThrowIfNullOrWhiteSpace(mainSave.Metadata.FilePath);
             var mainSaveLastWriteTime = fileIOService.GetLastWriteTime(mainSave.Metadata.FilePath);
 
-            GameVersion? displayedVersion = settings != null && settings.TryGetValue(mainSave.Id, out var v)
-                ? v
-                : null;
+            GameVersion? displayedVersion = saveVersionOverrides.TryGetValue(mainSave.Id, out var v) ? v : null;
 
-            record.TryAdd(mainSave.Id, SaveInfosDTO.FromSave(mainSave, displayedVersion, mainSaveLastWriteTime));
+            record.TryAdd(mainSave.Id, SaveInfosDTO.FromSave(mainSave, displayedVersion, mainSaveLastWriteTime, loader.Duplicates));
         }
 
         return record;
@@ -144,7 +130,7 @@ public class SavesLoadersService(
 
         var evolves = await staticDataService.GetStaticEvolves();
 
-        UpdateGlobalsWithSave(Loaders, SavePaths, save, path, evolves);
+        SimpleUpdateLoadersWithSave(Loaders, save, evolves);
 
         log.LogInformation($"Writed save {save.Id} to {path}");
     }
@@ -153,17 +139,13 @@ public class SavesLoadersService(
     {
         Initialized = false;
         Loaders.Clear();
-        SavePaths.Clear();
     }
 
     public async Task Setup(DataUpdateFlags flags)
     {
         Clear();
 
-        var (loaders, savePaths) = await ReadSaveFiles();
-
-        Loaders = loaders;
-        SavePaths = savePaths;
+        Loaders = await ReadSaveFiles();
         Initialized = true;
 
         flags.SaveInfos = true;
@@ -174,44 +156,49 @@ public class SavesLoadersService(
         log.LogDebug($"(timed check done - memory used: {memoryUsedMB} MB)");
     }
 
-    private async Task<(
-        IDictionary<uint, SaveLoadersRecord> loaders,
-        IDictionary<uint, HashSet<string>> savePaths
-    )> ReadSaveFiles()
+    private async Task<IDictionary<uint, SaveLoadersRecord>> ReadSaveFiles()
     {
         ConcurrentDictionary<uint, SaveLoadersRecord> loaders = [];
-        ConcurrentDictionary<uint, HashSet<string>> savePaths = [];
 
         var globs = settingsService.GetSettings().SettingsMutable.SAVE_GLOBS;
         var searchPaths = fileIOService.Matcher.SearchPaths(globs);
 
         var evolves = await staticDataService.GetStaticEvolves();
 
-        await Task.WhenAll(
-            searchPaths.Select(path => UpdateSaveFromPath(loaders, savePaths, path, evolves))
+        var pathsSaves = await Task.WhenAll(
+            searchPaths.Select(async path => (Path: path, Save: await LoadSaveFromPath(path)))
         );
 
-        return (loaders, savePaths);
+        var settings = settingsService.GetSettings();
+
+        // remove non-existing paths from path-overrides to simplify next steps
+        // no persistence here
+        var savePathOverrides = settings.SettingsMutable.SAVE_PATH_OVERRIDES?.Where(saveFile =>
+            pathsSaves.Any(ps => ps.Save?.Id == saveFile.Key && ps.Save.Metadata.FilePath == saveFile.Value)
+        ).ToDictionary() ?? [];
+
+        foreach (var (Path, Save) in pathsSaves)
+        {
+            if (Save != null)
+                UpdateGlobalsWithSave(loaders, Save, evolves, savePathOverrides);
+        }
+
+        return loaders;
     }
 
-    private async Task UpdateSaveFromPath(
-        IDictionary<uint, SaveLoadersRecord> loaders,
-        IDictionary<uint, HashSet<string>> savePaths,
-        string path, StaticEvolvesData evolves)
+    private async Task<SaveWrapper?> LoadSaveFromPath(string path)
     {
-        // log.LogInformation($"UPDATE SAVE {path}");
-
         try
         {
             var (TooSmall, TooBig) = fileIOService.CheckGameFile(path);
             if (TooSmall || TooBig)
             {
-                return;
+                return null;
             }
 
             var data = await fileIOService.ReadBytes(path);
             if (!SaveUtil.TryGetSaveFile(data, out var saveRaw, path))
-                return;
+                return null;
 
             saveRaw.Metadata.SetExtraInfo(path);
             if (saveRaw.Generation <= 3)
@@ -220,40 +207,85 @@ public class SavesLoadersService(
             SaveWrapper save = new(saveRaw);
             ArgumentException.ThrowIfNullOrWhiteSpace(save.Metadata.FilePath);
 
-            UpdateGlobalsWithSave(loaders, savePaths, save, path, evolves);
+            log.LogDebug($"Save {save.Id} - G{save.Generation} - Version {save.Version} - play-time {save.PlayTimeString}");
 
-            log.LogDebug($"Save {save.Id} {save.Id} {save.Id} - G{save.Generation} - Version {save.Version} - play-time {save.PlayTimeString}");
+            return save;
         }
         catch (Exception ex)
         {
             log.LogError(ex.ToString());
+            return null;
         }
     }
 
     private void UpdateGlobalsWithSave(
         IDictionary<uint, SaveLoadersRecord> loaders,
-        IDictionary<uint, HashSet<string>> savePaths,
-        SaveWrapper save, string path, StaticEvolvesData evolves
+        SaveWrapper save, StaticEvolvesData evolves, Dictionary<uint, string> savePathOverrides
     )
     {
-        if (!savePaths.TryGetValue(save.Id, out var paths))
-        {
-            paths = [];
-            savePaths.Add(save.Id, paths);
-        }
-        paths.Add(path);
+        var settings = settingsService.GetSettings();
 
-        var language = settingsService.GetSettings().GetLanguageForPKHeX();
+        var saveVersionOverrides = settings.SettingsMutable.SAVE_VERSION_OVERRIDES ?? [];
+        GameVersion? displayedVersion = saveVersionOverrides.TryGetValue(save.Id, out var v) ? v : null;
+
+        // add save if one with same ID not already present
+        if (!loaders.TryGetValue(save.Id, out var existingSaveRecord))
+        {
+            SimpleUpdateLoadersWithSave(loaders, save, evolves, []);
+        }
+        // replace existing if has bigger PlayTime OR if has path selected by user
+        else if (savePathOverrides.TryGetValue(save.Id, out var pathOverride)
+            ? pathOverride == save.Metadata.FilePath
+            : save.PlayTimeInSeconds > existingSaveRecord.Save.PlayTimeInSeconds
+        )
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(existingSaveRecord.Save.Metadata.FilePath);
+            var existingSaveLastWriteTime = fileIOService.GetLastWriteTime(existingSaveRecord.Save.Metadata.FilePath);
+
+            SimpleUpdateLoadersWithSave(loaders, save, evolves, [
+                ..existingSaveRecord.Duplicates,
+                SaveInfosDTO.FromSave(existingSaveRecord.Save, displayedVersion, existingSaveLastWriteTime, []),
+            ]);
+        }
+        // ignore save, add it to duplicates
+        else
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(save.Metadata.FilePath);
+            var saveLastWriteTime = fileIOService.GetLastWriteTime(save.Metadata.FilePath);
+
+            loaders[save.Id] = existingSaveRecord with
+            {
+                Duplicates = [
+                    ..existingSaveRecord?.Duplicates ?? [],
+                    SaveInfosDTO.FromSave(save, displayedVersion, saveLastWriteTime, []),
+                ],
+            };
+        }
+    }
+
+    private void SimpleUpdateLoadersWithSave(
+        IDictionary<uint, SaveLoadersRecord> loaders,
+        SaveWrapper save, StaticEvolvesData evolves,
+        SaveInfosDTO[]? duplicates = null
+    )
+    {
+        var settings = settingsService.GetSettings();
+        var language = settings.GetLanguageForPKHeX();
 
         var boxLoader = new SaveBoxLoader(save, sp);
         var pkmLoader = new SavePkmLoader(log, pkmConvertService, language, evolves, save);
 
-        loaders[save.Id] = new(save, boxLoader, pkmLoader);
+        duplicates ??= loaders.TryGetValue(save.Id, out var existingSave)
+            ? existingSave.Duplicates
+            : [];
+
+        loaders[save.Id] = new(save, boxLoader, pkmLoader, duplicates);
     }
 }
 
 public record SaveLoadersRecord(
     SaveWrapper Save,
     ISaveBoxLoader Boxes,
-    ISavePkmLoader Pkms
+    ISavePkmLoader Pkms,
+    SaveInfosDTO[] Duplicates
 );

@@ -1728,7 +1728,6 @@
       "required": [
         "saveChangedWarnings",
         "pkmVariantWarnings",
-        "saveDuplicateWarnings",
         "warningsCount"
       ],
       "properties": {
@@ -1742,12 +1741,6 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/PkmVariantWarning"
-          }
-        },
-        "saveDuplicateWarnings": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/SaveDuplicateWarning"
           }
         },
         "warningsCount": {
@@ -1775,24 +1768,6 @@
       "properties": {
         "pkmVariantId": {
           "type": "string"
-        }
-      }
-    },
-    "SaveDuplicateWarning": {
-      "type": "object",
-      "required": [
-        "saveId",
-        "paths"
-      ],
-      "properties": {
-        "saveId": {
-          "type": "integer"
-        },
-        "paths": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },
@@ -3883,6 +3858,7 @@
         "tid",
         "language",
         "playTime",
+        "playTimeInSeconds",
         "trainerGender",
         "trainerName",
         "dexSeenCount",
@@ -3893,7 +3869,8 @@
         "daycareCount",
         "boxCount",
         "boxSlotCount",
-        "path"
+        "path",
+        "duplicates"
       ],
       "properties": {
         "id": {
@@ -3927,6 +3904,10 @@
         },
         "playTime": {
           "type": "string"
+        },
+        "playTimeInSeconds": {
+          "type": "integer",
+          "format": "int32"
         },
         "trainerGender": {
           "$ref": "#/definitions/Gender"
@@ -3968,6 +3949,12 @@
         },
         "path": {
           "type": "string"
+        },
+        "duplicates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SaveInfosDTO"
+          }
         }
       }
     },
@@ -4120,6 +4107,12 @@
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/GameVersion"
+          }
+        },
+        "savE_PATH_OVERRIDES": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
           }
         },
         "httpS_NOCERT": {

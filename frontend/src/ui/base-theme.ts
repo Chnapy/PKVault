@@ -172,7 +172,9 @@ export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
   },
   light: {
     '--button-hover': 'var(--mantine-color-gray-0)',
+    '--mantine-color-disabled': 'var(--mantine-color-white-5)',
   },
   dark: {
+    '--mantine-color-disabled-color': 'var(--mantine-color-dark-1)',
   },
 });

@@ -4,6 +4,7 @@ import React from 'react';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
+import { useClickLoading } from './hooks/use-click-loading';
 
 export type UIActionIconProps = {
     name: string;
@@ -16,17 +17,7 @@ export const UIActionIcon: React.FC<UIActionIconProps> = ({
     name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, onClick: onClickInner,
     w, mt, ml, style, ...rest
 }) => {
-    const [ loadingInner, setLoading ] = React.useState(false);
-
-    const loading = loadingInner || rest.loading;
-
-    const onClick: typeof onClickInner = onClickInner && (e => {
-        const result: unknown = onClickInner(e);
-        if (result instanceof Promise) {
-            setLoading(true);
-            result.finally(() => setLoading(false));
-        }
-    });
+    const { onClick, loading } = useClickLoading(onClickInner, rest.loading);
 
     if (!controlLabel)
         console.warn('controlLabel is empty', { name })

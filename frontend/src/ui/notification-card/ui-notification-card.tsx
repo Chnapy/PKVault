@@ -8,14 +8,13 @@ export type UINotificationCardProps = {
     warningsCount: number;
     errorsCount: number;
     update: React.ReactNode;
-    saveDuplicateWarnings: React.ReactNode;
     pkmVariantWarnings: React.ReactNode;
     saveChangedWarnings: React.ReactNode;
     errors: React.ReactNode;
 };
 
 export const UINotificationCard: React.FC<UINotificationCardProps> = ({
-    warningsCount, errorsCount, update, saveDuplicateWarnings, pkmVariantWarnings, saveChangedWarnings, errors
+    warningsCount, errorsCount, update, pkmVariantWarnings, saveChangedWarnings, errors
 }) => {
     const { t } = useTranslate();
 
@@ -41,7 +40,6 @@ export const UINotificationCard: React.FC<UINotificationCardProps> = ({
             <Table.Tbody>
                 {update}
 
-                {saveDuplicateWarnings}
                 {pkmVariantWarnings}
                 {saveChangedWarnings}
 

@@ -24,12 +24,10 @@ public class WarningsService(
 
         var saveChangedWarnings = CheckSaveChangedWarnings();
         var pkmVariantWarnings = CheckPkmVariantWarnings();
-        var saveDuplicateWarnings = CheckSaveDuplicates();
 
         WarningsDTO = new(
             SaveChangedWarnings: await saveChangedWarnings,
-            PkmVariantWarnings: await pkmVariantWarnings,
-            SaveDuplicateWarnings: await saveDuplicateWarnings
+            PkmVariantWarnings: await pkmVariantWarnings
         );
 
         return WarningsDTO;
@@ -97,27 +95,5 @@ public class WarningsService(
         return [.. tasks
             .Where(value => value != null)
             .OfType<PkmVariantWarning>()];
-    }
-
-    private async Task<SaveDuplicateWarning[]> CheckSaveDuplicates()
-    {
-        var savesLoaders = savesLoadersService.GetAllLoaders();
-
-        if (savesLoaders.Length == 0)
-        {
-            return [];
-        }
-
-        var savePaths = savesLoadersService.GetSavePaths();
-
-        return [.. savePaths
-            .Where(entry => entry.Value.Count > 1)
-            .Select(entry =>
-            {
-                return new SaveDuplicateWarning(
-                    SaveId: entry.Key,
-                    Paths: [.. entry.Value]
-                );
-            })];
     }
 }

@@ -1,0 +1,8 @@
+
+.ui-button {
+    width: 100%;
+}
+
+.selected {
+    outline: 2px solid var(--focus-color-1);
+}

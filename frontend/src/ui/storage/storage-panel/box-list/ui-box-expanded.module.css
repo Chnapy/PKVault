@@ -1,3 +1,23 @@
+
+.ui-box-expanded {
+    align-self: flex-start;
+}
+
+.selected {
+    outline: 2px solid var(--focus-color-1);
+    outline-offset: 1px;
+    border-radius: 6px;
+}
+
+.button {
+    height: auto;
+    gap: 4px;
+}
+
+.with-color {
+    border: 1px solid currentcolor;
+}
+
 .slots-container {
     justify-self: center;
     background-color: #0002;

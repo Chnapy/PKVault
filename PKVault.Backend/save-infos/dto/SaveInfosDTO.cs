@@ -12,6 +12,7 @@ public record SaveInfosDTO(
     uint? SID,
     LanguageID Language,
     string PlayTime,
+    int PlayTimeInSeconds,
     Gender TrainerGender,
     string TrainerName,
     int DexSeenCount,
@@ -22,10 +23,11 @@ public record SaveInfosDTO(
     int DaycareCount,
     int BoxCount,
     int BoxSlotCount,
-    string Path
+    string Path,
+    SaveInfosDTO[] Duplicates
 )
 {
-    public static SaveInfosDTO FromSave(SaveWrapper save, GameVersion? displayedVersion, DateTime lastWriteTime)
+    public static SaveInfosDTO FromSave(SaveWrapper save, GameVersion? displayedVersion, DateTime lastWriteTime, SaveInfosDTO[] duplicates)
     {
         var seenCount = save.SeenCount;
         var caughtCount = save.CaughtCount;
@@ -59,6 +61,7 @@ public record SaveInfosDTO(
             SID: save.SID,
             Language: save.GetSafeLanguage(),
             PlayTime: save.PlayTimeString,
+            PlayTimeInSeconds: save.PlayTimeInSeconds,
             TrainerGender: (Gender)save.Gender,
             TrainerName: save.OT,
             DexSeenCount: seenCount,
@@ -69,9 +72,8 @@ public record SaveInfosDTO(
             DaycareCount: DaycareCount,
             BoxCount: save.BoxCount,
             BoxSlotCount: save.BoxSlotCount,
-            //:anDelete = true,
-            //:ownloadUrl = $"{serverUrl}/api/save-infos/{save.ID32}/download",
-            Path: save.Metadata.FilePath!
+            Path: save.Metadata.FilePath!,
+            Duplicates: duplicates
         );
     }
 }

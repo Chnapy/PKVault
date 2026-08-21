@@ -1,15 +1,17 @@
 import { Group, Tabs, Text, Tooltip } from '@mantine/core';
 import { CirclePlusIcon } from 'lucide-react';
 import type React from 'react';
+import { useTranslate } from '../../../../translate/i18n';
 import { UIExpandableTabs, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
 import { UIActionIcon } from '../../../form/button/ui-action-icon';
+import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
-import { useTranslate } from '../../../../translate/i18n';
 
 export type UIGameData = {
     id: string;
     label: string;
     imgSrc: string;
+    hasDuplicates?: boolean;
     disabled?: boolean;
 };
 
@@ -37,7 +39,9 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
         renderTab={(params, opt) => <Tooltip key={params.item.id} label={renderHoverCard(params, opt)} color='transparent'>
             <Tabs.Tab
                 value={params.item.id} onClick={opt.reduce} disabled={params.item.disabled}
-                leftSection={<img src={params.item.imgSrc} height={16} />} py={4}
+                leftSection={<img src={params.item.imgSrc} height={16} />}
+                rightSection={params.item.hasDuplicates && <UIPokedexIcons.Duplicate />}
+                py={4}
             >
                 <Text component={params.selected ? 'b' : undefined} textWrap='nowrap'>{params.item.label}</Text>
             </Tabs.Tab>

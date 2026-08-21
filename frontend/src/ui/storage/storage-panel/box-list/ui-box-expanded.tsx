@@ -11,6 +11,7 @@ import { useCurrentPanel } from '../../storage-content/context/ui-panel-context'
 import { getBoxColumns } from '../get-box-columns';
 import classes from './ui-box-expanded.module.css';
 import { useTranslate } from '../../../../translate/i18n';
+import { clsx } from 'clsx';
 
 export type UIBoxExpandedProps = UIExpandableTabsData & {
     slotsStates: boolean[];
@@ -80,18 +81,22 @@ export const UIBoxExpanded: React.FC<UIBoxExpandedProps> = ({
         ],
     });
 
-    return <Group gap='xs' align='stretch' style={{ alignSelf: 'flex-start' }}>
+    return <Group className={clsx(
+        classes.uiBoxExpanded,
+        selected && classes.selected
+    )} gap='xs' align='stretch'>
         <WithControlsIcons placement='out' icons={controlIcons('open')}>
             <Button
+                className={clsx(
+                    classes.button,
+                    color && classes.withColor,
+                )}
                 variant='default'
                 c={color}
-                bd={color && '1px solid currentcolor'}
                 {...focusProps}
                 {...controlProps('open')}
-                h='auto'
                 p='md'
                 pt={0}
-                style={{ gap: 4 }}
             >
                 <Stack gap='xs' style={{ alignSelf: 'flex-start' }}>
                     <Text component={selected ? 'b' : undefined}>{label}</Text>
