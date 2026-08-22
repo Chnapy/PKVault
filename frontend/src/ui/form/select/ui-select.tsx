@@ -1,21 +1,29 @@
-import { NativeSelect } from '@mantine/core';
+import { Group, Select, type ComboboxItem, type Primitive } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
+import { CheckIcon } from 'lucide-react';
 import type React from 'react';
 import type { GamepadMappingsAllButton } from '../../interaction/controls/gamepad/gamepad-mapper';
 import { getControlIcon } from '../../interaction/controls/icons/get-control-icon';
 import { useControlsCurrentType } from '../../interaction/controls/use-controls-current-type';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 
-type UISelectProps = {
+export type UISelectItem<V extends Primitive> = ComboboxItem<V> & {
+    icon?: React.ReactNode;
+};
+
+type UISelectProps<V extends Primitive> = {
     name: string;
     controlLabel: string;
-} & NativeSelect.Props;
+    value: V;
+    data: UISelectItem<V>[];
+    onChange: (value: V | null, option: UISelectItem<V>) => void;
+} & Omit<Select.Props<V>, 'value' | 'data' | 'onChange'>;
 
-export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ...rest }) => {
+export function UISelect<V extends Primitive>({ name, controlLabel, value, data, onChange, ...rest }: UISelectProps<V>) {
 
     const isGamepad = useControlsCurrentType() === 'gamepad';
 
-    const { focusProps, focused, controlProps } = useFocusControls<HTMLSelectElement, 'change'>({
+    const { focusProps, focused, controlProps } = useFocusControls<HTMLInputElement, 'change'>({
         scopeNodeId: name,
         // focusOnMount: true,
         controls: [
@@ -30,27 +38,26 @@ export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ..
                     }
                 },
                 spread: false,
-                action: (e, trigger, value) => {
-                    const options = focusProps.ref.current.options;
-                    const selectedIndex = options.selectedIndex;
+                action: (e, trigger, val) => {
+                    const selectedIndex = data.findIndex(d => d.value === value);
                     let nextIndex = -1;
-                    switch (value as GamepadMappingsAllButton) {
+                    switch (val as GamepadMappingsAllButton) {
                         case 'LB':
                             nextIndex = selectedIndex - 1;
                             if (nextIndex < 0)
-                                nextIndex = options.length - 1;
+                                nextIndex = data.length - 1;
                             break;
                         case 'RB':
                             nextIndex = selectedIndex + 1;
-                            if (nextIndex > options.length - 1)
+                            if (nextIndex > data.length - 1)
                                 nextIndex = 0;
                             break;
                     }
-                    options.selectedIndex = nextIndex;
-                    rest.onChange?.({
-                        currentTarget: focusProps.ref.current,
-                        target: focusProps.ref.current,
-                    } as never);
+                    const next = data[ nextIndex ]!;
+                    onChange(
+                        next.value,
+                        next,
+                    );
                 },
             },
         ],
@@ -61,23 +68,33 @@ export const UISelect: React.FC<UISelectProps> = ({ name, controlLabel, data, ..
         rest.ref,
     );
 
-    return <NativeSelect
+    const leftSection = rest.leftSection ?? data.find(d => d.value === value)?.icon;
+
+    return <Select
         name={name}
+        value={value}
         data={data}
         {...focusProps}
         {...controlProps('change')}
-        leftSection={isGamepad && !rest.disabled
-            ? focused && getControlIcon('gamepad', [ 'LB' ]) || <span />
-            : undefined}
-        rightSection={isGamepad && !rest.disabled
-            ? focused && getControlIcon('gamepad', [ 'RB' ]) || <span />
-            : undefined}
+        {...rest}
+        onChange={onChange}
+        ref={ref}
         styles={{
             input: isGamepad ? {
                 textAlign: 'center',
             } : undefined,
+            ...rest.styles,
         }}
-        {...rest}
-        ref={ref}
+        leftSection={isGamepad && !rest.disabled
+            ? focused && getControlIcon('gamepad', [ 'LB' ]) || (leftSection ?? <span />)
+            : leftSection}
+        rightSection={isGamepad && !rest.disabled
+            ? focused && getControlIcon('gamepad', [ 'RB' ]) || (rest.rightSection ?? <span />)
+            : rest.rightSection}
+        renderOption={({ option, checked }) => <Group style={{ flexGrow: 1 }}>
+            {data.find(d => d.value === option.value)?.icon}
+            {option.label}
+            {checked && <CheckIcon style={{ marginLeft: 'auto' }} />}
+        </Group>}
     />;
 };

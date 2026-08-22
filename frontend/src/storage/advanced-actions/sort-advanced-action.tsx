@@ -1,4 +1,3 @@
-import { type ComboboxItem } from '@mantine/core';
 import { SortDescIcon } from 'lucide-react';
 import type React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -55,7 +54,7 @@ export const SortAdvancedAction: React.FC<{
 
     const sortPkmsMutation = useStorageSortPkms();
 
-    const { register, handleSubmit, formState, setValue, control } = useForm<Omit<StorageSortPkmsParams, 'saveId'>>({
+    const { handleSubmit, formState, setValue, control } = useForm<Omit<StorageSortPkmsParams, 'saveId'>>({
         defaultValues: {
             fromBoxId: boxId,
             toBoxId: boxId,
@@ -97,49 +96,46 @@ export const SortAdvancedAction: React.FC<{
         miw={350}
     >
         <UISelect
-            {...register('pokedexName')}
+            name='pokedexName'
             controlLabel={t('storage.sort.pokedex')}
             label={t('storage.sort.pokedex')}
-            data={
-                pokedexKeys.map((key): ComboboxItem => ({
-                    value: key,
-                    label: staticData.pokedexes[ key ]!.name,
-                    disabled: key === pokedexName,
-                })) ?? []
-            }
-            // value={pokedexName}
-            // onChange={value => setValue('pokedexName', value)}
+            data={pokedexKeys.map((key) => ({
+                value: key,
+                label: staticData.pokedexes[ key ]!.name,
+                disabled: key === pokedexName,
+            }))}
+            value={pokedexName}
+            onChange={value => value && setValue('pokedexName', value)}
             disabled={pokedexKeys.length === 1}
+            comboboxProps={{ withinPortal: false }}
         />
 
         <UISelect
-            {...register('fromBoxId')}
+            name='fromBoxId'
             controlLabel={t('storage.sort.from-box')}
             label={t('storage.sort.from-box')}
-            data={
-                filteredBoxes.map((box): ComboboxItem => ({
-                    value: box.id,
-                    label: box.name,
-                    disabled: box.idInt === fromBoxId,
-                })) ?? []
-            }
-            value={fromBoxId.toString()}
-            onChange={e => setValue('fromBoxId', +e.currentTarget.value)}
+            data={filteredBoxes.map((box) => ({
+                value: box.idInt,
+                label: box.name,
+                disabled: box.idInt === fromBoxId,
+            }))}
+            value={fromBoxId}
+            onChange={value => value !== null && setValue('fromBoxId', value)}
+            comboboxProps={{ withinPortal: false }}
         />
 
         <UISelect
-            {...register('toBoxId')}
+            name='toBoxId'
             controlLabel={t('storage.sort.to-box')}
             label={t('storage.sort.to-box')}
-            data={
-                filteredBoxes.map((box): ComboboxItem => ({
-                    value: box.id,
-                    label: box.name,
-                    disabled: box.idInt === toBoxId,
-                })) ?? []
-            }
-            value={toBoxId.toString()}
-            onChange={e => setValue('toBoxId', +e.currentTarget.value)}
+            data={filteredBoxes.map((box) => ({
+                value: box.idInt,
+                label: box.name,
+                disabled: box.idInt === toBoxId,
+            }))}
+            value={toBoxId}
+            onChange={value => value !== null && setValue('toBoxId', value)}
+            comboboxProps={{ withinPortal: false }}
         />
 
         <UISwitch

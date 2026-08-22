@@ -1,8 +1,13 @@
+import { useLocalStorage } from '@mantine/hooks';
+import { ArrowDown01Icon, SortDescIcon } from 'lucide-react';
 import type React from 'react';
+import type { SaveInfosDTO } from '../../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { getGameInfos } from '../../../pokedex/details/util/get-game-infos';
 import { Route } from '../../../routes/storage';
+import { useTranslate } from '../../../translate/i18n';
+import type { UISelectItem } from '../../../ui/form/select/ui-select';
 import { UIStoragePanelGameList, type UIGameData } from '../../../ui/storage/storage-panel/game-list/ui-storage-panel-game-list';
 import { filterIsDefined } from '../../../util/filter-is-defined';
 import { useFilteredBoxes } from '../hooks/use-filtered-boxes';
@@ -10,10 +15,23 @@ import { useCurrentStorage, useOtherStorage } from '../storage-panel-context';
 import { GameExpanded } from './game-expanded';
 import { GamePkvaultExpanded } from './game-pkvault-expanded';
 
+type SavesSort = 'last-modified' | 'generation' | 'play-time';
+
 const pkvaultStorageId = 'pkvault';
 
+const sortFns: Record<SavesSort, (a: SaveInfosDTO, b: SaveInfosDTO) => number> = {
+    'last-modified': (a, b) => a.lastWriteTime > b.lastWriteTime ? -1 : 1,
+    'generation': (a, b) => {
+        if (a.generation !== b.generation)
+            return a.generation - b.generation;
+
+        return a.displayedVersion - b.displayedVersion;
+    },
+    'play-time': (a, b) => b.playTimeInSeconds - a.playTimeInSeconds,
+};
+
 export const StoragePanelGameList: React.FC = () => {
-    //   const { t } = useTranslate();
+    const { t } = useTranslate();
 
     const staticData = useStaticData();
 
@@ -32,13 +50,36 @@ export const StoragePanelGameList: React.FC = () => {
         }
     });
 
+    const sortData: UISelectItem<SavesSort>[] = [
+        {
+            value: 'last-modified',
+            label: t('storage.games.sort.last-modified'),
+            icon: <SortDescIcon />,
+        },
+        {
+            value: 'generation',
+            label: t('storage.games.sort.generation'),
+            icon: <ArrowDown01Icon />,
+        },
+        {
+            value: 'play-time',
+            label: t('storage.games.sort.play-time'),
+            icon: <SortDescIcon />,
+        },
+    ];
+
+    const [ savesSort, setSavesSort ] = useLocalStorage<SavesSort>({
+        key: 'saves-sort',
+        defaultValue: 'last-modified',
+    });
+
     if (!saveInfosQuery.data) {
         return null;
     }
 
     const saveInfos = Object.values(saveInfosQuery.data.data)
         .filter(filterIsDefined)
-        .sort((a, b) => a.lastWriteTime > b.lastWriteTime ? -1 : 1);
+        .sort(sortFns[ savesSort ]);
 
     const value = saveId !== undefined
         ? saveId?.toString() ?? pkvaultStorageId
@@ -75,6 +116,9 @@ export const StoragePanelGameList: React.FC = () => {
         ]}
         onChange={onChange}
         expanded={value === '' ? true : undefined}
+        sortValue={savesSort}
+        sortData={sortData}
+        onSortChange={(v: SavesSort) => setSavesSort(v)}
         renderHoverCard={({ item, selected }, { reduce }) => item.id === pkvaultStorageId
             ? <GamePkvaultExpanded
                 {...item}

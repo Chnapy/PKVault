@@ -111,6 +111,22 @@ export const Primary: Story = {
             ]}
             onChange={console.log}
             onCreate={console.log}
+            sortValue='1'
+            sortData={[
+                {
+                    value: '1',
+                    label: '1',
+                },
+                {
+                    value: '2',
+                    label: '2',
+                },
+                {
+                    value: '3',
+                    label: '3',
+                },
+            ]}
+            onSortChange={console.log}
             renderExpanded={(data, { reduce }) => data.map(({ item, selected }) =>
                 <UIGameExpanded
                     key={item.id}
@@ -205,6 +221,22 @@ export const EmptyData: Story = {
             ]}
             onChange={console.log}
             onCreate={console.log}
+            sortValue='1'
+            sortData={[
+                {
+                    value: '1',
+                    label: '1',
+                },
+                {
+                    value: '2',
+                    label: '2',
+                },
+                {
+                    value: '3',
+                    label: '3',
+                },
+            ]}
+            onSortChange={console.log}
             renderExpanded={(data, { reduce }) => data.map(({ item, selected }) =>
                 <UIGameExpanded
                     key={item.id}

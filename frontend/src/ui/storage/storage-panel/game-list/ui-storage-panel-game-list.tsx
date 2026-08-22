@@ -1,9 +1,11 @@
-import { Group, Tabs, Text, Tooltip } from '@mantine/core';
+import { Card, Group, Tabs, Text, Tooltip } from '@mantine/core';
 import { CirclePlusIcon } from 'lucide-react';
 import type React from 'react';
 import { useTranslate } from '../../../../translate/i18n';
 import { UIExpandableTabs, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
 import { UIActionIcon } from '../../../form/button/ui-action-icon';
+import { UISelect, type UISelectItem } from '../../../form/select/ui-select';
+import { UIBallIcon } from '../../../icon/ui-ball-icon';
 import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
 
@@ -18,9 +20,15 @@ export type UIGameData = {
 export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>, 'value' | 'data' | 'onChange' | 'renderExpanded' | 'expanded'> & {
     onCreate: () => unknown;
     renderHoverCard: UIExpandableTabsProps<UIGameData>[ 'renderTab' ];
+    sortValue: string;
+    sortData: UISelectItem<string>[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSortChange: (value: any) => void;
 };
 
-export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ value, data, onChange, renderExpanded, renderHoverCard, expanded, onCreate }) => {
+export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({
+    value, data, onChange, renderExpanded, renderHoverCard, expanded, onCreate, sortValue, sortData, onSortChange
+}) => {
     const { t } = useTranslate();
 
     const { isInCurrentPanel } = useCurrentPanel();
@@ -46,25 +54,49 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({ 
                 <Text component={params.selected ? 'b' : undefined} textWrap='nowrap'>{params.item.label}</Text>
             </Tabs.Tab>
         </Tooltip>}
-        renderExpanded={(data, opt) => <Group
-            align='flex-start'
-            p='md'
-            bg='var(--mantine-color-body-default)'
-        >
-            {renderExpanded?.(data, opt)}
+        renderExpanded={(data, opt) => <Card withBorder={false} bdrs={0}>
+            <Card.Section withBorder inheritPadding h={33} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+            }}>
+                <UIBallIcon />
+                <Text>
+                    {t('storage.games.title')}
+                </Text>
 
-            <Tooltip label='Add saves in settings'>
-                <UIActionIcon
-                    name='add-game'
-                    controlLabel={t('save.add')}
-                    variant='default'
-                    size='xl'
-                    w='100%'
-                    onClick={onCreate}
-                >
-                    <CirclePlusIcon />
-                </UIActionIcon>
-            </Tooltip>
-        </Group>}
+                <UISelect
+                    name='saves-sort'
+                    controlLabel={t('action.select')}
+                    value={sortValue}
+                    data={sortData}
+                    onChange={onSortChange}
+                    __vars={() => ({
+                        '--input-height': '25px',
+                        '--input-size': '25px',
+                    })}
+                    ml='auto'
+                />
+            </Card.Section>
+
+            <Card.Section withBorder inheritPadding py='inherit'>
+                <Group align='flex-start'>
+                    {renderExpanded?.(data, opt)}
+
+                    <Tooltip label='Add saves in settings'>
+                        <UIActionIcon
+                            name='add-game'
+                            controlLabel={t('save.add')}
+                            variant='default'
+                            size='xl'
+                            w='100%'
+                            onClick={onCreate}
+                        >
+                            <CirclePlusIcon />
+                        </UIActionIcon>
+                    </Tooltip>
+                </Group>
+            </Card.Section>
+        </Card>}
     />;
 };

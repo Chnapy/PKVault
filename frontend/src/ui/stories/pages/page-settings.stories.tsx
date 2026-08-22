@@ -94,9 +94,22 @@ export const Primary: Story = {
                         <UISelect
                             name='language'
                             controlLabel='Change language'
+                            value='english'
                             data={[
-                                'English', 'Français', 'Deutsch'
+                                {
+                                    value: 'english',
+                                    label: 'English',
+                                },
+                                {
+                                    value: 'francais',
+                                    label: 'Français',
+                                },
+                                {
+                                    value: 'foobar',
+                                    label: 'Foobar',
+                                },
                             ]}
+                            onChange={console.log}
                         />
                     </SimpleGrid>
                 </Card>

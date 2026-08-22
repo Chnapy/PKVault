@@ -24,7 +24,22 @@ export const Primary: Story = {
         <UISelect
             controlLabel='Select'
             name='select'
-            data={[ 'english', 'francais', 'foobar' ]}
+            value='english'
+            data={[
+                {
+                    value: 'english',
+                    label: 'English',
+                },
+                {
+                    value: 'francais',
+                    label: 'Français',
+                },
+                {
+                    value: 'foobar',
+                    label: 'Foobar',
+                },
+            ]}
+            onChange={console.log}
         />
 
         <UITextInput
