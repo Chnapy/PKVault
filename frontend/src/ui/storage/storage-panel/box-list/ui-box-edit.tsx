@@ -64,11 +64,11 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
         />
 
         <UISelect
-            {...register('type')}
+            name='type'
             controlLabel={t('storage.box.edit.type')}
             label={t('storage.box.edit.type')}
             data={Object.entries(BoxType).map(([ key, value ]) => ({
-                value: value.toString(),
+                value,
                 label: switchUtil(key as keyof typeof BoxType, {
                     Box: t('storage.box.edit.type.box'),
                     SurpriseTrade: t('storage.box.edit.type.surprisetrade'),
@@ -88,7 +88,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
                 }),
             })) ?? []}
             value={watchType}
-            onChange={(e) => setValue('type', Number(e.target.value) as BoxType)}
+            onChange={(value) => value !== null && setValue('type', value)}
         />
 
         <NumberInput
@@ -124,7 +124,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
         </Group>
 
         <UISelect
-            {...register('bankId')}
+            name='bankId'
             label={t('storage.box.edit.bank')}
             controlLabel={t('storage.box.edit.bank')}
             data={bankList.map(bank => ({
@@ -132,7 +132,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
                 label: bank.name,
             }))}
             value={watchBankId}
-            onChange={e => setValue('bankId', e.target.value)}
+            onChange={value => value && setValue('bankId', value)}
             disabled={boxes.length <= 1}
         />
     </UIFormCard>;

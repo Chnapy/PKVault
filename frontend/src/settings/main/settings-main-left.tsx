@@ -1,7 +1,7 @@
 import { Card, SimpleGrid } from '@mantine/core';
 import { FileIcon, FolderIcon, GlobeIcon, PenOffIcon, ShieldOff } from 'lucide-react';
 import type React from "react";
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { RuntimeSystem } from '../../data/sdk/model';
 import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import type { SettingsFormData } from '../../pages/settings';
@@ -20,6 +20,8 @@ export const SettingsMainLeft: React.FC = () => {
     const settings = settingsQuery.data?.data;
 
     const form = useFormContext<SettingsFormData>();
+
+    const [ language ] = useWatch({ control: form.control, name: [ 'language' ] });
 
     return <>
         <Card>
@@ -45,10 +47,12 @@ export const SettingsMainLeft: React.FC = () => {
             <SimpleGrid cols={2}>
                 <UIInputLabel leftSection={<GlobeIcon />} forInput='language' label={t('settings.form.language')} />
                 <UISelect
-                    {...form.register('language')}
+                    name='language'
                     controlLabel={t('settings.form.language')}
+                    value={language}
                     data={Object.entries(languages)
                         .map(([ value, label ]) => ({ value, label }))}
+                    onChange={value => value && form.setValue('language', value, { shouldDirty: true })}
                 />
             </SimpleGrid>
         </Card>
