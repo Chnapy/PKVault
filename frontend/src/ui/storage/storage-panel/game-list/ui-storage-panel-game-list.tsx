@@ -62,7 +62,7 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({
             }}>
                 <UIBallIcon />
                 <Text>
-                    Choose a storage
+                    {t('storage.games.title')}
                 </Text>
 
                 <UISelect
