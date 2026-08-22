@@ -12,23 +12,21 @@ public class GenStaticDataService(ILogger<GenStaticDataService> log, PokeApiServ
         var evolvesRich = new GenStaticEvolvesRich(log, pokeApiService, fileIOService).GenerateFiles();
 
         var bulbasaurSpeciesObj = await pokeApiService.GetPokemonSpecies(1);
-        var filteredLanguages = SettingsService.AllowedLanguages
-            .Select(lang => lang.ToLower())
-            .Where(lang =>
+        var filteredLanguages = SettingsService.AllowedLanguages.Where(lang =>
+        {
+            var hasBulbasaurNameForLang = bulbasaurSpeciesObj.Names.Any(n => n.Language.Name == lang);
+            if (!hasBulbasaurNameForLang)
             {
-                var hasBulbasaurNameForLang = bulbasaurSpeciesObj.Names.Any(n => n.Language.Name == lang);
-                if (!hasBulbasaurNameForLang)
-                {
-                    log.LogWarning($"Language {lang} not available in PokeApi, generation aborted for this language.");
-                }
-                return hasBulbasaurNameForLang;
-            });
+                log.LogWarning($"Language {lang} not available in PokeApi, generation aborted for this language.");
+            }
+            return hasBulbasaurNameForLang;
+        });
 
         var species = Task.WhenAll(filteredLanguages.Select(lang =>
-            new GenStaticSpecies(log, lang, pokeApiService, fileIOService).GenerateFiles()));
+            new GenStaticSpecies(log, lang, SettingsDTO.GetLanguageForPKHeX(lang), pokeApiService, fileIOService).GenerateFiles()));
 
         var others = Task.WhenAll(filteredLanguages.Select(lang =>
-            new GenStaticOthers(log, lang, pokeApiService, fileIOService).GenerateFiles()));
+            new GenStaticOthers(log, lang, SettingsDTO.GetLanguageForPKHeX(lang), pokeApiService, fileIOService).GenerateFiles()));
 
         var spritesheets = new GenStaticSpritesheets(log, fileIOService,
             (await species)[0],

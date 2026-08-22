@@ -110,6 +110,7 @@ public record StaticOthersData(
 public class GenStaticOthers(
     ILogger log,
     string lang,
+    string pkhexLang,
     PokeApiService pokeApiService, IFileIOService fileIOService
     ) : StaticDataGenerator<StaticOthersData>(
     log,
@@ -146,15 +147,15 @@ public class GenStaticOthers(
 
     protected override async Task<StaticOthersData> GetData()
     {
-        var versions = GetStaticVersions(lang);
-        var stats = GetStaticStats(lang);
-        var types = GetStaticTypes(lang);
-        var moves = GetStaticMoves(lang);
-        var natures = GetStaticNatures(lang);
-        var abilities = GetStaticAbilities(lang);
-        var items = GetStaticItems(lang);
-        var generations = GetStaticGenerations(lang);
-        var pokedexes = GetStaticPokedexes(lang);
+        var versions = GetStaticVersions();
+        var stats = GetStaticStats();
+        var types = GetStaticTypes();
+        var moves = GetStaticMoves();
+        var natures = GetStaticNatures();
+        var abilities = GetStaticAbilities();
+        var items = GetStaticItems();
+        var generations = GetStaticGenerations();
+        var pokedexes = GetStaticPokedexes();
 
         return new StaticOthersData(
             Versions: await versions,
@@ -166,13 +167,13 @@ public class GenStaticOthers(
             Items: await items,
             Generations: await generations,
             Pokedexes: await pokedexes,
-            Ribbons: GetStaticRibbons(lang),
-            Languages: GetStaticLanguages(lang),
+            Ribbons: GetStaticRibbons(),
+            Languages: GetStaticLanguages(),
             EggSprite: GetEggSprite()
         );
     }
 
-    public async Task<Dictionary<byte, StaticVersion>> GetStaticVersions(string lang)
+    public async Task<Dictionary<byte, StaticVersion>> GetStaticVersions()
     {
         using var _ = log.Time("static-data process versions");
         List<Task<StaticVersion>> tasks = [];
@@ -187,8 +188,8 @@ public class GenStaticOthers(
                     ? null
                     : BlankSaveFile.Get(saveVersion);
 
-                var versionName = GetVersionName(version, lang);
-                var versionRegion = GetVersionRegionName(version, lang);
+                var versionName = GetVersionName(version);
+                var versionRegion = GetVersionRegionName(version);
                 var versionPokedexes = GetVersionPokedexes(version);
 
                 GameVersion[] extraValidVersions = [
@@ -234,7 +235,7 @@ public class GenStaticOthers(
         return dict;
     }
 
-    public async Task<Dictionary<int, StaticStat>> GetStaticStats(string lang)
+    public async Task<Dictionary<int, StaticStat>> GetStaticStats()
     {
         using var _ = log.Time("static-data process stats");
         List<Task<StaticStat>> tasks = [];
@@ -262,9 +263,9 @@ public class GenStaticOthers(
         return dict;
     }
 
-    public Dictionary<int, StaticType> GetStaticTypes(string lang)
+    public Dictionary<int, StaticType> GetStaticTypes()
     {
-        var typeNames = GameInfo.GetStrings(lang).Types;
+        var typeNames = GameInfo.GetStrings(pkhexLang).Types;
         var dict = new Dictionary<int, StaticType>();
 
         for (var i = 0; i < typeNames.Count; i++)
@@ -280,10 +281,10 @@ public class GenStaticOthers(
         return dict;
     }
 
-    public async Task<Dictionary<int, StaticMove>> GetStaticMoves(string lang)
+    public async Task<Dictionary<int, StaticMove>> GetStaticMoves()
     {
         using var _ = log.Time($"static-data {lang} process moves");
-        var moveNames = GameInfo.GetStrings(lang).Move;
+        var moveNames = GameInfo.GetStrings(pkhexLang).Move;
         List<Task<StaticMove>> tasks = [];
 
         for (var i = 0; i < moveNames.Count; i++)
@@ -402,10 +403,10 @@ public class GenStaticOthers(
         return dict;
     }
 
-    public async Task<Dictionary<int, StaticNature>> GetStaticNatures(string lang)
+    public async Task<Dictionary<int, StaticNature>> GetStaticNatures()
     {
         using var _ = log.Time($"static-data {lang} process natures");
-        var naturesNames = GameInfo.GetStrings(lang).Natures;
+        var naturesNames = GameInfo.GetStrings(pkhexLang).Natures;
         List<Task<StaticNature>> tasks = [];
 
         for (var i = 0; i < naturesNames.Count; i++)
@@ -439,9 +440,9 @@ public class GenStaticOthers(
         return dict;
     }
 
-    public Dictionary<int, StaticAbility> GetStaticAbilities(string lang)
+    public Dictionary<int, StaticAbility> GetStaticAbilities()
     {
-        var abilitiesNames = GameInfo.GetStrings(lang).abilitylist;
+        var abilitiesNames = GameInfo.GetStrings(pkhexLang).abilitylist;
         var dict = new Dictionary<int, StaticAbility>();
 
         for (var i = 0; i < abilitiesNames.Length; i++)
@@ -457,7 +458,7 @@ public class GenStaticOthers(
         return dict;
     }
 
-    public async Task<StaticItemsData> GetStaticItems(string lang)
+    public async Task<StaticItemsData> GetStaticItems()
     {
         using var _ = log.Time($"static-data {lang} process items");
 
@@ -528,7 +529,7 @@ public class GenStaticOthers(
         {
             var version = (GameVersion)Versions.First();
             var itemsEn = getItemStrings(version, GameInfo.Strings);
-            var items = getItemStrings(version, GameInfo.GetStrings(lang));
+            var items = getItemStrings(version, GameInfo.GetStrings(pkhexLang));
 
             for (var i = 0; i < items.Count; i++)
             {
@@ -571,7 +572,7 @@ public class GenStaticOthers(
         );
     }
 
-    public async Task<Dictionary<byte, StaticGeneration>> GetStaticGenerations(string lang)
+    public async Task<Dictionary<byte, StaticGeneration>> GetStaticGenerations()
     {
         var staticGenerations = new Dictionary<byte, StaticGeneration>();
 
@@ -608,7 +609,7 @@ public class GenStaticOthers(
         return staticGenerations;
     }
 
-    public async Task<Dictionary<string, StaticPokedex>> GetStaticPokedexes(string lang)
+    public async Task<Dictionary<string, StaticPokedex>> GetStaticPokedexes()
     {
         var pokedexes = await pokeApiService.GetPokedexList();
 
@@ -628,9 +629,9 @@ public class GenStaticOthers(
         );
     }
 
-    public Dictionary<string, StaticRibbon> GetStaticRibbons(string lang)
+    public Dictionary<string, StaticRibbon> GetStaticRibbons()
     {
-        var ribbonsTxt = GameInfo.GetStrings(lang).Ribbons;
+        var ribbonsTxt = GameInfo.GetStrings(pkhexLang).Ribbons;
 
         return Enum.GetValues<EntityContext>()
             .Where(e => e.IsValid)
@@ -647,9 +648,9 @@ public class GenStaticOthers(
             .ToDictionary(p => p.Key);
     }
 
-    public Dictionary<byte, string> GetStaticLanguages(string lang)
+    public Dictionary<byte, string> GetStaticLanguages()
     {
-        var languageNames = GameInfo.GetStrings(lang).languageNames;
+        var languageNames = GameInfo.GetStrings(pkhexLang).languageNames;
 
         return Enum.GetValues<LanguageID>()
             .Select((languageId, i) => ((byte)languageId, languageNames[i]))
@@ -709,7 +710,7 @@ public class GenStaticOthers(
         };
     }
 
-    private async Task<string> GetVersionName(GameVersion version, string lang)
+    private async Task<string> GetVersionName(GameVersion version)
     {
         var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
 
@@ -719,7 +720,7 @@ public class GenStaticOthers(
             .Distinct());
     }
 
-    private async Task<string[]> GetVersionRegionName(GameVersion version, string lang)
+    private async Task<string[]> GetVersionRegionName(GameVersion version)
     {
         var pokeapiVersions = await Task.WhenAll(GetPokeApiVersion(version));
 

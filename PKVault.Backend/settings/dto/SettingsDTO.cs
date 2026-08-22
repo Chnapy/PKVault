@@ -34,12 +34,19 @@ public record SettingsDTO(
 
     public string GetLanguageForPKHeX()
     {
-        var lang = GetLanguageOrDefault();
+        return GetLanguageForPKHeX(GetLanguageOrDefault());
+    }
 
-        if (!GameLanguage.AllSupportedLanguages.Contains(lang))
+    public static string GetLanguageForPKHeX(string lang)
+    {
+        var index = GameLanguage.AllSupportedLanguages.ToArray()
+            .Select(lang => lang.ToLower()).ToArray()
+            .IndexOf(lang);
+
+        if (index == -1)
             return SettingsService.DefaultLanguage;
 
-        return lang;
+        return GameLanguage.AllSupportedLanguages[index];
     }
 
     private static string NormalizeSafePath(string path) => MatcherUtil.NormalizePath(Path.Combine(

@@ -28,6 +28,7 @@ public record StaticSpeciesForm(
 public class GenStaticSpecies(
     ILogger log,
     string lang,
+    string pkhexLang,
     PokeApiService pokeApiService, IFileIOService fileIOService
     ) : StaticDataGenerator<StaticSpeciesData>(
     log,
@@ -64,7 +65,7 @@ public class GenStaticSpecies(
 
     protected override async Task<StaticSpeciesData> GetData()
     {
-        var speciesNames = GameInfo.GetStrings(lang).Species;
+        var speciesNames = GameInfo.GetStrings(pkhexLang).Species;
         List<Task<StaticSpecies>> tasks = [];
 
         // List<string> notFound = [];
