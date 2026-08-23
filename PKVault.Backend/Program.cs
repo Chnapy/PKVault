@@ -286,6 +286,7 @@ public class Program
             // required by PublishedTrimmed
             .AddJsonOptions(options =>
             {
+                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
                 options.JsonSerializerOptions.TypeInfoResolver = RouteJsonContext.Default;
             });
 
