@@ -193,6 +193,8 @@
   "saves.action.add.controls-label": "Ajouter des sauvegardes",
   "saves.action.download": "Télécharger le fichier de sauvegarde",
   "saves.action.open": "Ouvrir le dossier de sauvegarde",
+  "saves.action.upload": "Téléverser un fichier de sauvegarde",
+  "saves.action.upload.controls-label": "Téléverser",
   "saves.title": "Génération {{generation}}",
   "saves.title.species": "{{maxSpecies}} espèces",
   "settings.about.1.description": "Dépôt GitHub",

@@ -193,6 +193,8 @@
   "saves.action.add.controls-label": "Add saves",
   "saves.action.download": "Download save file",
   "saves.action.open": "Open save folder",
+  "saves.action.upload": "Upload a save file",
+  "saves.action.upload.controls-label": "Upload save",
   "saves.title": "Generation {{generation}}",
   "saves.title.species": "{{maxSpecies}} species",
   "settings.about.1.description": "GitHub repository",

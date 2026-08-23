@@ -1319,6 +1319,40 @@
         }
       }
     },
+    "/api/save-infos/upload": {
+      "post": {
+        "tags": [
+          "SaveInfos"
+        ],
+        "operationId": "SaveInfos_Upload",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "required": true,
+            "type": "file",
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/DataDTO"
+            }
+          }
+        }
+      }
+    },
     "/api/save-infos/{saveId}/download": {
       "get": {
         "tags": [

@@ -193,6 +193,8 @@
   "saves.action.add.controls-label": "Speicherstände hinzufügen",
   "saves.action.download": "Speicherdatei herunterladen",
   "saves.action.open": "Ordner mit Speicherständen öffnen",
+  "saves.action.upload": "Speicherdatei hochladen",
+  "saves.action.upload.controls-label": "Hochladen",
   "saves.title": "Generation {{generation}}",
   "saves.title.species": "{{maxSpecies}} Arten",
   "settings.about.1.description": "GitHub repository",

@@ -1,9 +1,11 @@
 import { Badge, Button, Card, Divider, EmptyState, Group, Tooltip } from '@mantine/core';
-import { CirclePlusIcon, DownloadIcon, FolderIcon, PackageOpenIcon } from 'lucide-react';
+import { CirclePlusIcon, DownloadIcon, FolderIcon, PackageOpenIcon, UploadIcon } from 'lucide-react';
 import type React from "react";
+import { useRef } from "react";
 import { HistoryContext } from '../context/history-context';
 import { getApiFullUrl } from '../data/mutator/custom-instance';
-import { getSaveInfosDownloadUrl, useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
+import { getSaveInfosDownloadUrl, useSaveInfosGetAll, useSaveInfosUpload } from '../data/sdk/save-infos/save-infos.gen';
+import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { useStaticData } from '../hooks/use-static-data';
 import { getGameInfos } from '../pokedex/details/util/get-game-infos';
@@ -26,6 +28,10 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
 
   const staticData = useStaticData();
   const saveInfosQuery = useSaveInfosGetAll();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadMutation = useSaveInfosUpload();
+  const settings = useSettingsGet().data?.data;
 
   const isLoading = saveInfosQuery.isPending || saveInfosQuery.isEnabled;
 
@@ -125,20 +131,55 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
       })}
 
       <Card.Section inheritPadding withBorder py='inherit'>
-        <Tooltip label={t('saves.action.add')}>
-          <UIActionIcon
-            name='add-game'
-            controlLabel={t('saves.action.add.controls-label')}
-            onClick={() => navigate({
-              to: '/settings'
-            })}
-            variant='default'
-            size='xl'
-            w='100%'
+        <input
+          ref={fileInputRef}
+          type='file'
+          accept='.sav,.dsv,.srm,.dat,.bin,.gci,.raw,.dsb,.sa2,.gsc,.st,.dst'
+          style={{ display: 'none' }}
+          onChange={(event) => {
+            const file = event.target.files?.[ 0 ];
+            if (file) {
+              uploadMutation.mutate({ data: { file } });
+            }
+            event.target.value = '';
+          }}
+        />
+        <Group grow>
+          <Tooltip
+            multiline
+            label={[
+              t('saves.action.upload'),
+              !settings?.canScanSaves && t('action.not-possible'),
+            ].filter(Boolean).join('\n')}
           >
-            <CirclePlusIcon />
-          </UIActionIcon>
-        </Tooltip>
+            <UIActionIcon
+              name='upload-save'
+              controlLabel={t('saves.action.upload.controls-label')}
+              onClick={() => fileInputRef.current?.click()}
+              loading={uploadMutation.isPending}
+              disabled={!settings?.canScanSaves}
+              variant='default'
+              size='xl'
+              w='100%'
+            >
+              <UploadIcon />
+            </UIActionIcon>
+          </Tooltip>
+          <Tooltip label={t('saves.action.add')}>
+            <UIActionIcon
+              name='add-game'
+              controlLabel={t('saves.action.add.controls-label')}
+              onClick={() => navigate({
+                to: '/settings'
+              })}
+              variant='default'
+              size='xl'
+              w='100%'
+            >
+              <CirclePlusIcon />
+            </UIActionIcon>
+          </Tooltip>
+        </Group>
       </Card.Section>
     </Card>
   </UISavesContent>;

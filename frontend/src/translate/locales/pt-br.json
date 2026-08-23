@@ -193,6 +193,8 @@
   "saves.action.add.controls-label": "Adicionar novo save",
   "saves.action.download": "Baixar",
   "saves.action.open": "Abrir",
+  "saves.action.upload": "Enviar arquivo de save",
+  "saves.action.upload.controls-label": "Enviar",
   "saves.title": "Geração {{generation}}",
   "saves.title.species": "{{maxSpecies}} espécies",
   "settings.about.1.description": "O PKVault é um aplicativo moderno para gerenciamento de saves e Pokédex.",
