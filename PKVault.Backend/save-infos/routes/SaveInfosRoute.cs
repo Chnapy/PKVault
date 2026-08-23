@@ -89,7 +89,10 @@ public class SaveInfosController(
             data = ms.ToArray();
         }
 
-        if (!SaveUtil.TryGetSaveFile(data, out var save, file.FileName) || save == null)
+        // PKHeX may decrypt/mutate the buffer in place while detecting the save
+        // (SwishCrypto games: SwSh/BDSP/LA/SV), so detect on a copy and persist
+        // the untouched original bytes.
+        if (!SaveUtil.TryGetSaveFile((byte[])data.Clone(), out var save, file.FileName) || save == null)
         {
             return BadRequest("File is not a recognized save file");
         }
