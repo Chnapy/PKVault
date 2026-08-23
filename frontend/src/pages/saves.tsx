@@ -134,7 +134,6 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
         <input
           ref={fileInputRef}
           type='file'
-          accept='.sav,.dsv,.srm,.dat,.bin,.gci,.raw,.dsb,.sa2,.gsc,.st,.dst'
           style={{ display: 'none' }}
           onChange={(event) => {
             const file = event.target.files?.[ 0 ];
