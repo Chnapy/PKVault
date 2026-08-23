@@ -19,7 +19,7 @@ public class Program
         => Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(
                 webBuilder => webBuilder.UseStartup<Startup>());
-    
+
     private static readonly string InitialCurrentDirectory = Directory.GetCurrentDirectory();
 
     public static async Task Main(string[] args)
@@ -357,22 +357,17 @@ public class Program
 
 #if DEBUG && MODE_DEFAULT
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerDocument(document =>
+        services.AddOpenApiDocument(document =>
         {
+            document.RequireParametersWithoutDefault = true;
+            document.SchemaSettings.DefaultReferenceTypeNullHandling = NJsonSchema.Generation.ReferenceTypeNullHandling.NotNull;
+
+            document.SchemaSettings.SchemaProcessors.Add(new AutoRequiredSchemaProcessor());
+            // Required for PKHeX.Core.Gender which has duplicates
+            document.SchemaSettings.SchemaProcessors.Add(new EnumDuplicatesSchemaProcessor());
             document.PostProcess = doc =>
             {
                 doc.Info.Title = "PKVault API";
-
-                // Required for PKHeX.Core.Gender which has duplicates
-                foreach (var enumSchema in doc.Definitions.Values.Where(s => s.IsEnumeration))
-                {
-                    var distinctValues = enumSchema.Enumeration.Distinct().ToList();
-                    enumSchema.Enumeration.Clear();
-                    foreach (var value in distinctValues)
-                    {
-                        enumSchema.Enumeration.Add(value);
-                    }
-                }
             };
         });
 #endif

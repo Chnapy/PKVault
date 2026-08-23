@@ -13,7 +13,7 @@ public class StaticDataController(StaticDataService staticDataService) : Control
     }
 
     [HttpGet("spritesheet/{sheetName}")]
-    public async Task<IActionResult> GetSpritesheetImg(string sheetName, [FromQuery] Guid buildID)
+    public async Task<IActionResult> GetSpritesheetImg(string sheetName, [FromQuery] Guid buildID = default)
     {
         using var stream = await staticDataService.GetSpritesheetStream(sheetName);
 

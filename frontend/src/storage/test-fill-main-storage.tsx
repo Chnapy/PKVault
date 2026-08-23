@@ -69,6 +69,7 @@ export const TestFillMainStorage: React.FC = () => {
                                 pkmIds: saveBoxPkms.map(pkm => pkm.id),
                                 targetBoxId: boxId,
                                 targetBoxSlots: saveBoxPkms.map(pkm => pkm.boxSlot),
+                                targetSaveId: null,
                             });
                             console.log('Fill main box', boxName);
                         } catch (error) {

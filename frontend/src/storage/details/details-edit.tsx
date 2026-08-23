@@ -20,7 +20,7 @@ export const DetailsEdit: React.FC<{ pkmId: string; saveId: number | null }> = (
     const settingsMutable = settingsQuery.data?.data.settingsMutable;
 
     const availableMovesQuery = useStorageGetPkmAvailableMoves({
-        saveId: saveId ?? undefined,
+        saveId,
         pkmId,
     });
 
