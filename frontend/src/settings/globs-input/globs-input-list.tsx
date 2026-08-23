@@ -2,6 +2,7 @@ import { EmptyState } from '@mantine/core';
 import { PackageOpenIcon } from 'lucide-react';
 import React from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
+import { SavesUploadButton } from '../../saves/saves-upload-popover/saves-upload-button';
 import { useTranslate } from '../../translate/i18n';
 import { UIGlobsInputList, type UIGlobsInputListProps } from '../../ui/form/globs-input/ui-globs-input-list';
 import { getDesktopFileTypeInfos } from '../../ui/form/globs-input/util/get-desktop-file-type-infos';
@@ -10,15 +11,16 @@ import { GlobsInputResults } from './globs-input-results';
 import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
 
 export type GlobsInputListProps = Partial<Omit<UseFormRegisterReturn, 'onChange'>>
-    & Pick<UIGlobsInputListProps, 'labelList' | 'labelAddFile' | 'labelAddFolder'>
+    & Pick<UIGlobsInputListProps, 'labelList' | 'labelAddFile' | 'labelAddFolder' | 'labelAddPath'>
     & {
         name: string;
         value: string;
         onChange: (value: string) => void;
         limit: number;
+        children?: React.ReactNode;
     };
 
-export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, labelAddFile, labelAddFolder, name, value, onChange, limit, disabled, ...rest }) => {
+export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onChange, limit, disabled, children, ...rest }) => {
     const { t } = useTranslate();
 
     const desktopMessage = useDesktopMessage();
@@ -29,9 +31,6 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
 
     return <UIGlobsInputList
         id={id}
-        labelList={labelList}
-        labelAddFile={labelAddFile}
-        labelAddFolder={labelAddFolder}
         onAdd={async (type, newValue) => {
 
             if (desktopMessage) {
@@ -65,12 +64,18 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
         }}
         disabled={disabled}
         isDesktop={isDesktop}
+        uploadAbbButton={<SavesUploadButton
+            disabled={disabled}
+            size='compact-sm'
+            style={{ flexGrow: 1, maxWidth: '49%' }}
+        />}
         results={<GlobsInputResults
             values={splittedValue}
             limit={limit * 2}
         />}
         {...rest}
     >
+        {children}
         {splittedValue.map((value, i) => <GlobsInputItem key={i}
             name={`${name}-${i}`}
             value={value}
@@ -89,7 +94,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, label
             data-item-last={(i === splittedValue.length - 1) || undefined}
         />)}
 
-        {splittedValue.length === 0 && <EmptyState
+        {splittedValue.length === 0 && !children && <EmptyState
             size='sm'
             icon={<PackageOpenIcon />}
             title={t('settings.form.saves.empty')}

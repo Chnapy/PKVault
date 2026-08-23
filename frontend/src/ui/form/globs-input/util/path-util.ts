@@ -59,6 +59,8 @@ export const PathUtil = {
             return to;
 
         const fromParts = from.split('/');
+        if (fromParts[fromParts.length - 1] === '')
+            fromParts.pop();
         const toParts = to.split('/');
 
         for (const toEl of toParts) {

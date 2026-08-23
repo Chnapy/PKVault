@@ -5,12 +5,14 @@ import { getPathIcon } from './util/get-path-icon';
 
 export type UIPathButtonProps = {
     value: string;
+    pkvaultPath: string;
+    uploadPath: string;
 }
     & Pick<WithControlsIconsProps, 'icons'>
     & Omit<React.ComponentProps<typeof Button<'button'>>, 'value'>;
 
-export const UIPathButton: React.FC<UIPathButtonProps> = ({ value, icons, ...btnProps }) => {
-    const icon = getPathIcon(value);
+export const UIPathButton: React.FC<UIPathButtonProps> = ({ value, pkvaultPath, uploadPath, icons, ...btnProps }) => {
+    const icon = getPathIcon(value, false, pkvaultPath, uploadPath);
 
     return <WithControlsIcons placement='out' icons={icons} style={{ flexGrow: 1, lineBreak: 'anywhere' }}>
         <Button

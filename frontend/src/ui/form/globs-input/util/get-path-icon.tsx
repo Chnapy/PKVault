@@ -1,11 +1,11 @@
-import { AsteriskIcon, FileIcon, FolderIcon, FolderRootIcon, NetworkIcon, SaveIcon } from 'lucide-react';
+import { AsteriskIcon, FileIcon, FolderIcon, FolderRootIcon, NetworkIcon, SaveIcon, UploadIcon } from 'lucide-react';
 import { UIBallIcon } from '../../../icon/ui-ball-icon';
 import { PathUtil } from './path-util';
 
 const saveExts = new Set([ 'sav', 'dsv', 'dat', 'gci', 'srm', 'fla', 'bin' ]);
 const pkmExts = new Set([ 'pk', 'ck3', 'xk3', 'pb7', 'sk2', 'bk4', 'rk4', 'pa8', 'pb8', 'pa9' ]);
 
-export const getPathIcon = (path: string, active?: boolean, pkvaultPath?: string) => {
+export const getPathIcon = (path: string, active?: boolean, pkvaultPath?: string, uploadPath?: string) => {
     const defaultColor = PathUtil.isExclude(path) ? 'var(--mantine-color-red-6)' : undefined;
     // if (PathUtil.isExclude(path))
     //     return PathUtil.isDirectory(path)
@@ -23,6 +23,9 @@ export const getPathIcon = (path: string, active?: boolean, pkvaultPath?: string
 
     if (pkvaultPath && PathUtil.combine(pkvaultPath, path) === pkvaultPath)
         return <img src='/logo.svg' height={16} color={defaultColor} />
+
+    if (uploadPath && path === uploadPath)
+        return <UploadIcon color={defaultColor} />
 
     // console.log(path, pkvaultPath, PathUtil.combine(pkvaultPath, path));
 

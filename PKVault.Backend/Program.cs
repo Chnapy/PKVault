@@ -148,29 +148,27 @@ public class Program
             var swaggerPath = MatcherUtil.NormalizePath(Path.Combine(InitialCurrentDirectory, "swagger.json"));
             Log.Logger.Debug($"Generate Swagger file to {swaggerPath}");
 
-            try
+            var swaggerHref = $"http://localhost:5000/swagger/v1/swagger.json";
+            using HttpClient http = new();
+            using var response = await http.GetAsync(swaggerHref);
+            var json = await response.Content.ReadAsStringAsync();
+
+            if ((int)response.StatusCode >= 400 || string.IsNullOrWhiteSpace(json))
             {
-                var swaggerHref = $"http://localhost:5000/swagger/v1/swagger.json";
-                using HttpClient http = new();
-                using var response = await http.GetAsync(swaggerHref);
-                var json = await response.Content.ReadAsStringAsync();
-
-                var oldJson = await File.ReadAllTextAsync(swaggerPath);
-
-                if (json != oldJson)
-                {
-                    Log.Logger.Debug($"Swagger content changed.");
-                    await File.WriteAllTextAsync(swaggerPath, json);
-                    Log.Logger.Debug($"Swagger file generated: {swaggerPath}");
-                }
-                else
-                {
-                    Log.Logger.Debug($"Swagger didn't change, generation aborted.");
-                }
+                throw new Exception($"Wrong swagger response (code={response.StatusCode})");
             }
-            catch (Exception ex)
+
+            var oldJson = await File.ReadAllTextAsync(swaggerPath);
+
+            if (json != oldJson)
             {
-                Log.Logger.Error(ex, $"Generate Swagger file failed.");
+                Log.Logger.Debug($"Swagger content changed.");
+                await File.WriteAllTextAsync(swaggerPath, json);
+                Log.Logger.Debug($"Swagger file generated: {swaggerPath}");
+            }
+            else
+            {
+                Log.Logger.Debug($"Swagger didn't change, generation aborted.");
             }
 #endif
 

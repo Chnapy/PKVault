@@ -15,13 +15,14 @@ export type UIFileExplorerPopoverProps = {
     dataDirectoryPaths: string[];
     dataFilePaths: string[];
     pkvaultPath: string;
+    uploadPath: string;
     reloadData: () => unknown;
     setDropdownOpened: (opened: boolean) => void;
     children: (props: React.ComponentProps<typeof Button<'button'>>) => React.ReactNode;
 };
 
 export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
-    name, value, onChange, loading, dataDirectoryPaths, dataFilePaths, pkvaultPath, reloadData, setDropdownOpened, children
+    name, value, onChange, loading, dataDirectoryPaths, dataFilePaths, pkvaultPath, uploadPath, reloadData, setDropdownOpened, children
 }) => {
     const { t } = useTranslate();
 
@@ -136,6 +137,7 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
                         label={directoryName}
                         active={directoryPath === value}
                         pkvaultPath={pkvaultPath}
+                        uploadPath={uploadPath}
                         py={0.5}
                         style={{ flexGrow: 1 }}
                     />
@@ -183,6 +185,7 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
                                     label={label}
                                     active={v === value}
                                     pkvaultPath={pkvaultPath}
+                                    uploadPath={uploadPath}
                                 />
                             ))}
 
@@ -208,9 +211,10 @@ type OptionProps = Combobox.Option.Props & {
     label: string;
     active?: boolean;
     pkvaultPath: string;
+    uploadPath: string;
 };
 
-const Option: React.FC<OptionProps> = ({ active = false, value, label, pkvaultPath, ...rest }) => {
+const Option: React.FC<OptionProps> = ({ active = false, value, label, pkvaultPath, uploadPath, ...rest }) => {
     return <Combobox.Option
         {...rest}
         value={value}
@@ -224,7 +228,7 @@ const Option: React.FC<OptionProps> = ({ active = false, value, label, pkvaultPa
         }
     >
         <Group>
-            {getPathIcon(value as string, active, pkvaultPath)}
+            {getPathIcon(value as string, active, pkvaultPath, uploadPath)}
 
             {label}
         </Group>

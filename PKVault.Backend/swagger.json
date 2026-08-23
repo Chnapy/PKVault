@@ -1348,6 +1348,96 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "SaveInfos"
+        ],
+        "operationId": "SaveInfos_Upload",
+        "parameters": [
+          {
+            "name": "saveFilesNames",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "x-position": 1
+          },
+          {
+            "name": "overwrite",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "saveFiles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "SaveInfos"
+        ],
+        "operationId": "SaveInfos_Delete",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataDTO"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/save-infos/{saveId}/download": {

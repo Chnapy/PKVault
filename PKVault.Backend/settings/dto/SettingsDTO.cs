@@ -15,6 +15,8 @@ public record SettingsDTO(
     SettingsMutableDTO SettingsMutable
 )
 {
+    public string SavesUploadsPath => "./saves-uploads/";
+
     public string GetStoragePath() => NormalizeSafePath(SettingsMutable.STORAGE_PATH);
     public string GetDbPath() => NormalizeSafePath(SettingsMutable.DB_PATH);
     public string GetBackupPath() => NormalizeSafePath(SettingsMutable.BACKUP_PATH);
