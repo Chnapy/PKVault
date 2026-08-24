@@ -361,12 +361,62 @@ public class Program
             document.RequireParametersWithoutDefault = true;
             document.SchemaSettings.DefaultReferenceTypeNullHandling = NJsonSchema.Generation.ReferenceTypeNullHandling.NotNull;
 
-            document.SchemaSettings.SchemaProcessors.Add(new AutoRequiredSchemaProcessor());
-            // Required for PKHeX.Core.Gender which has duplicates
-            document.SchemaSettings.SchemaProcessors.Add(new EnumDuplicatesSchemaProcessor());
+            // document.SchemaSettings.SchemaProcessors.Add(new AutoRequiredSchemaProcessor());
+            // document.SchemaSettings.SchemaProcessors.Add(new EnumDuplicatesSchemaProcessor());
             document.PostProcess = doc =>
             {
+                // Add required: [], with values
+                // Remove nullable: true, nullable values being now optional (undefined in frontend)
+                static void AddRequiredArrayAndRemoveNullable(NJsonSchema.JsonSchema schema)
+                {
+                    if (schema.Properties != null && schema.Properties.Count > 0)
+                    {
+                        var nonNullableProperties = schema.Properties
+                            .Where(pair => !pair.Value.IsNullable(NJsonSchema.SchemaType.OpenApi3))
+                            .Select(pair => pair.Key);
+
+                        var nullableProperties = schema.Properties
+                            .Where(pair => pair.Value.IsNullable(NJsonSchema.SchemaType.OpenApi3));
+
+                        foreach (var p in nonNullableProperties)
+                        {
+                            if (!schema.RequiredProperties.Contains(p))
+                                schema.RequiredProperties.Add(p);
+                        }
+
+                        foreach (var p in nullableProperties)
+                        {
+                            p.Value.IsNullableRaw = null;
+                        }
+                    }
+
+                    foreach (var s in schema.AllOf)
+                    {
+                        AddRequiredArrayAndRemoveNullable(s);
+                    }
+                }
+
                 doc.Info.Title = "PKVault API";
+
+                foreach (var schema in doc.Definitions.Values)
+                {
+                    AddRequiredArrayAndRemoveNullable(schema);
+
+                    // Dedupe enum values
+                    // Required for PKHeX.Core.Gender which has duplicates
+                    if (schema.IsEnumeration)
+                    {
+                        var distinctValues = schema.Enumeration.Distinct().ToArray();
+                        if (distinctValues.Length == schema.Enumeration.Count)
+                            continue;
+
+                        schema.Enumeration.Clear();
+                        foreach (var value in distinctValues)
+                        {
+                            schema.Enumeration.Add(value);
+                        }
+                    }
+                }
             };
         });
 #endif
