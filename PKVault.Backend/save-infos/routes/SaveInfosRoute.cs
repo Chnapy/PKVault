@@ -56,6 +56,7 @@ public class SaveInfosController(
 
     [HttpPost()]
     [Consumes("multipart/form-data")]
+    [RequestSizeLimit(1024 * 1024 * 60)]
     public async Task<ActionResult<DataDTO>> Upload([BindRequired] List<IFormFile> saveFiles, [FromQuery] string[] saveFilesNames, [FromQuery] bool overwrite = false)
     {
         if (!sessionService.HasEmptyActionList())

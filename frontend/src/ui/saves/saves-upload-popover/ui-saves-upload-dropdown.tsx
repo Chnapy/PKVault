@@ -77,7 +77,7 @@ export const UISavesUploadDropdown: React.FC<UISavesUploadDropdownProps> = ({ gl
                 ...files.map((file): FileCustomName => ({ file, customName: file.name }))
             ], { shouldDirty: true })}
             onReject={(files) => console.log('rejected files', files)}
-            maxSize={1024 ** 2}
+            maxSize={1024 ** 2 * 10}    // 10MB by file
             maxFiles={maxFiles}
             disabled={disabled}
         >
