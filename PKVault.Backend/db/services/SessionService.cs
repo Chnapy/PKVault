@@ -65,7 +65,7 @@ public class SessionService(
     {
         StartTime = timeProvider.GetUtcNow().DateTime;
 
-        using var _ = log.Time("Starting new session");
+        using var _ = log.Time($"Starting new session, checkInitialActions={checkInitialActions}");
 
         Actions.Clear();
 
@@ -87,6 +87,7 @@ public class SessionService(
                     .ContextId.InstanceId;
 
                 var hadDataToNormalize = await CheckDataToNormalize(scope, flags);
+                log.LogDebug($"Session - hadDataToNormalize={hadDataToNormalize}");
 
                 await CheckSaveToSynchronize(scope, flags);
 
@@ -110,12 +111,16 @@ public class SessionService(
         var dataNormalizeAction = scope.ServiceProvider.GetRequiredService<DataNormalizeAction>();
         var updateExternalPkmAction = scope.ServiceProvider.GetRequiredService<UpdateExternalPkmAction>();
 
+        var hadDataToNormalize = false;
+
         var dataToNormalizeInput = await dataNormalizeAction.HasDataToNormalize();
 
         if (dataToNormalizeInput.ShouldRun)
         {
             await actionService.DataNormalize(dataToNormalizeInput, scope, flags);
         }
+
+        hadDataToNormalize |= dataToNormalizeInput.ShouldRun;
 
         try
         {
@@ -126,13 +131,14 @@ public class SessionService(
                 await actionService.UpdateExternalPkm(externalPkmsToUpdateInput, scope, flags);
             }
 
-            return externalPkmsToUpdateInput.ShouldRun;
+            hadDataToNormalize |= externalPkmsToUpdateInput.ShouldRun;
         }
         catch (Exception ex)
         {
             log.LogError(ex, "Exception during external-pkms check/update");
         }
-        return false;
+
+        return hadDataToNormalize;
     }
 
     private async Task CheckSaveToSynchronize(IServiceScope scope, DataUpdateFlags flags)
@@ -158,15 +164,12 @@ public class SessionService(
      */
     private async Task CheckFirstRunAutoSave(IServiceScope scope, DataUpdateFlags flags)
     {
-        var savesLoaders = scope.ServiceProvider.GetRequiredService<ISavesLoadersService>();
-        var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
-
-        var hasAnyData = savesLoaders.GetAllLoaders().Length > 0
-            || await pkmVariantLoader.Any();
+        var hasAnyData = HasMainDb();
+        log.LogDebug($"Check fresh start auto-save, hasAnyData={hasAnyData}");
 
         if (!hasAnyData)
         {
-            log.LogInformation($"Fresh start detected - Session persisting & retarting");
+            log.LogInformation($"Fresh start detected - Session persisting & restart");
             await PersistSession(scope);
             await StartNewSession(checkInitialActions: false, flags);
         }

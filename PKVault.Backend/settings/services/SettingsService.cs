@@ -6,11 +6,11 @@ using Serilog;
 
 public interface ISettingsService
 {
-    public Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool persistSession, bool scanSaves, DataUpdateFlags flags);
+    public Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool scanSaves, DataUpdateFlags flags);
     public Task<SettingsDTO> GetSettingsWithUserId();
     public SettingsDTO GetSettings();
     public SettingsDTO RefreshSettings(DataUpdateFlags flags);
-    public (bool RestartSession, bool PersistSession, bool ScanSaves) GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags);
+    public (bool RestartSession, bool ScanSaves) GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags);
 }
 
 /**
@@ -32,7 +32,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private SettingsDTO? BaseSettings;
 
-    public async Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool persistSession, bool scanSaves, DataUpdateFlags flags)
+    public async Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool scanSaves, DataUpdateFlags flags)
     {
         await fileIOService.WriteJSONFile(
             FilePath,
@@ -51,12 +51,6 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         {
             UserId = userId
         };
-
-        if (persistSession && !sessionService.HasEmptyActionList())
-        {
-            await sessionService.PersistSession(scope);
-            await sessionService.StartNewSession(checkInitialActions: false, flags);
-        }
 
         if (restartSession)
         {
@@ -80,7 +74,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
      * 
      * Returns if session should be restarted or persisted.
      */
-    public (bool RestartSession, bool PersistSession, bool ScanSaves) GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags)
+    public (bool RestartSession, bool ScanSaves) GetUpdateDiff(SettingsMutableDTO updatedSettingsMutable, DataUpdateFlags flags)
     {
         var currentSettingsMutable = ReadBaseSettings().SettingsMutable;
 
@@ -97,7 +91,6 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         ]);
 
         bool restartSession = false;
-        bool persistSession = false;
         bool scanSaves = false;
 
         var hasPathChanges = currentSettingsMutable.DB_PATH != updatedSettingsMutable.DB_PATH
@@ -105,12 +98,6 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             || currentSettingsMutable.BACKUP_PATH != updatedSettingsMutable.BACKUP_PATH
             || GetArrayChecksum(currentSettingsMutable.SAVE_GLOBS) != GetArrayChecksum(updatedSettingsMutable.SAVE_GLOBS)
             || GetArrayChecksum(currentSettingsMutable.PKM_EXTERNAL_GLOBS) != GetArrayChecksum(updatedSettingsMutable.PKM_EXTERNAL_GLOBS);
-
-        var hasFirstLanguageChange = currentSettingsMutable.LANGUAGE == null && updatedSettingsMutable.LANGUAGE != null;
-        if (hasFirstLanguageChange)
-        {
-            persistSession = true;
-        }
 
         if (hasPathChanges)
         {
@@ -150,7 +137,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             scanSaves = true;
         }
 
-        return (restartSession, persistSession, scanSaves);
+        return (restartSession, scanSaves);
     }
 
     public async Task<SettingsDTO> GetSettingsWithUserId()
