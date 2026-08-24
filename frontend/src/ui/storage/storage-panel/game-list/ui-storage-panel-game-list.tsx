@@ -1,9 +1,7 @@
 import { Card, Group, Tabs, Text, Tooltip } from '@mantine/core';
-import { CirclePlusIcon } from 'lucide-react';
 import type React from 'react';
 import { useTranslate } from '../../../../translate/i18n';
 import { UIExpandableTabs, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
-import { UIActionIcon } from '../../../form/button/ui-action-icon';
 import { UISelect, type UISelectItem } from '../../../form/select/ui-select';
 import { UIBallIcon } from '../../../icon/ui-ball-icon';
 import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
@@ -18,7 +16,7 @@ export type UIGameData = {
 };
 
 export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>, 'value' | 'data' | 'onChange' | 'renderExpanded' | 'expanded'> & {
-    onCreate: () => unknown;
+    createActions: React.ReactNode;
     renderHoverCard: UIExpandableTabsProps<UIGameData>[ 'renderTab' ];
     sortValue: string;
     sortData: UISelectItem<string>[];
@@ -27,7 +25,7 @@ export type UIStoragePanelGameListProps = Pick<UIExpandableTabsProps<UIGameData>
 };
 
 export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({
-    value, data, onChange, renderExpanded, renderHoverCard, expanded, onCreate, sortValue, sortData, onSortChange
+    value, data, onChange, renderExpanded, renderHoverCard, expanded, createActions, sortValue, sortData, onSortChange
 }) => {
     const { t } = useTranslate();
 
@@ -83,18 +81,7 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({
                 <Group align='flex-start'>
                     {renderExpanded?.(data, opt)}
 
-                    <Tooltip label='Add saves in settings'>
-                        <UIActionIcon
-                            name='add-game'
-                            controlLabel={t('save.add')}
-                            variant='default'
-                            size='xl'
-                            w='100%'
-                            onClick={onCreate}
-                        >
-                            <CirclePlusIcon />
-                        </UIActionIcon>
-                    </Tooltip>
+                    {createActions}
                 </Group>
             </Card.Section>
         </Card>}

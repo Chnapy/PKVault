@@ -6,6 +6,7 @@ import type { SettingsFormData } from '../../pages/settings';
 import { useTranslate } from '../../translate/i18n';
 import { GlobsInputItem } from '../globs-input/globs-input-item';
 import { GlobsInputList } from '../globs-input/globs-input-list';
+import { isDesktop } from '../globs-input/hooks/use-desktop-message';
 
 export const SettingsMainRight: React.FC = () => {
     const { t } = useTranslate();
@@ -30,7 +31,7 @@ export const SettingsMainRight: React.FC = () => {
             disabled={!settings?.canUpdateSettings}
             limit={200}
         >
-            {settings && <GlobsInputItem
+            {!isDesktop && settings && <GlobsInputItem
                 name='uploads-path'
                 value={settings.savesUploadsPath}
                 disabled

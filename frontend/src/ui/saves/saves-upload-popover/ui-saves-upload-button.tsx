@@ -18,23 +18,27 @@ export const UISavesUploadButton: React.FC<UISavesUploadButtonProps> = ({ dropdo
     const settings = settingsQuery.data?.data;
     const disabled = !!settings && !settings.canScanSaves;
 
-    return <Tooltip label={disabledLabel} disabled={!disabledLabel || !disabled}>
-        <UIPopover
-            dropdown={dropdown}
-            position='bottom-end'
-            width='target'
-            keepMounted
-        >
-            <UIButton
-                name='add-upload'
-                controlLabel={t('saves.upload.button')}
-                variant='filled'
-                leftSection={<UploadIcon />}
-                {...btnProps}
-                disabled={disabled || btnProps.disabled}
-            >
-                {t('saves.upload.button')}
-            </UIButton>
-        </UIPopover>
-    </Tooltip>
+    const button = <UIButton
+        name='add-upload'
+        controlLabel={t('saves.upload.button')}
+        variant='filled'
+        leftSection={<UploadIcon />}
+        {...btnProps}
+        disabled={disabled || btnProps.disabled}
+    >
+        {t('saves.upload.button')}
+    </UIButton>;
+
+    if (disabledLabel && disabled)
+        return <Tooltip label={disabledLabel} disabled={!disabledLabel || !disabled}>
+            {button}
+        </Tooltip>;
+
+    return <UIPopover
+        dropdown={dropdown}
+        position='bottom-end'
+        keepMounted
+    >
+        {button}
+    </UIPopover>;
 };

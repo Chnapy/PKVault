@@ -1,9 +1,10 @@
 import { Badge, Button, Card, Divider, EmptyState, Group, Tooltip } from '@mantine/core';
-import { DownloadIcon, FolderIcon, FolderSearchIcon, PackageOpenIcon } from 'lucide-react';
+import { DownloadIcon, FolderIcon, FolderSearchIcon, PackageOpenIcon, TrashIcon, TriangleAlertIcon } from 'lucide-react';
 import type React from "react";
 import { HistoryContext } from '../context/history-context';
 import { getApiFullUrl } from '../data/mutator/custom-instance';
-import { getSaveInfosDownloadUrl, useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
+import { getSaveInfosDownloadUrl, useSaveInfosDelete, useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
+import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { useStaticData } from '../hooks/use-static-data';
 import { getGameInfos } from '../pokedex/details/util/get-game-infos';
@@ -13,6 +14,7 @@ import { useDesktopMessage } from '../settings/globs-input/hooks/use-desktop-mes
 import { GameExpanded } from '../storage/panel/game-list/game-expanded';
 import { useTranslate } from '../translate/i18n';
 import { UIButton } from '../ui/form/button/ui-button';
+import { UIConfirmPopover } from '../ui/popover/ui-confirm-popover';
 import { UISavesContent } from '../ui/saves/ui-saves-content';
 import { filterIsDefined } from '../util/filter-is-defined';
 
@@ -27,6 +29,10 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
 
   const staticData = useStaticData();
   const saveInfosQuery = useSaveInfosGetAll();
+  const saveDeleteMutation = useSaveInfosDelete();
+
+  const settingsQuery = useSettingsGet();
+  const settings = settingsQuery.data?.data;
 
   const isLoading = saveInfosQuery.isPending && saveInfosQuery.isEnabled;
 
@@ -106,19 +112,40 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
                         <FolderIcon />
                       </Button>
                     </Tooltip>
-                    : <Tooltip label={t('saves.action.download')}>
-                      <Button
-                        variant='default'
-                        size='compact-xs'
-                        fullWidth
-                        component='a'
-                        target='__blank'
-                        type='button'
-                        href={getApiFullUrl(getSaveInfosDownloadUrl(save.id))}
+                    : <>
+                      <UIConfirmPopover
+                        label={t('saves.action.delete')}
+                        icon={<TriangleAlertIcon />}
+                        color='red'
+                        action={() => saveDeleteMutation.mutateAsync({
+                          params: { path: save.path },
+                        })}
                       >
-                        <DownloadIcon />
-                      </Button>
-                    </Tooltip>}
+                        <Button
+                          disabled={!settings?.canUpdateSettings}
+                          variant='filled'
+                          color='red'
+                          size='compact-xs'
+                          fullWidth
+                        >
+                          <TrashIcon />
+                        </Button>
+                      </UIConfirmPopover>
+
+                      <Tooltip label={t('saves.action.download')}>
+                        <Button
+                          variant='default'
+                          size='compact-xs'
+                          fullWidth
+                          component='a'
+                          target='__blank'
+                          type='button'
+                          href={getApiFullUrl(getSaveInfosDownloadUrl(save.id))}
+                        >
+                          <DownloadIcon />
+                        </Button>
+                      </Tooltip>
+                    </>}
                 </>}
               />)}
             </Group>
