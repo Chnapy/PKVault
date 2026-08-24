@@ -21,20 +21,22 @@ export const SettingsAboutRight: React.FC = () => {
     const releasesQuery = useQuery({
         queryKey: [ 'release-list' ],
         queryFn: () => fetch('https://api.github.com/repos/chnapy/PKVault/releases')
-            .then<{
-                url: string;
+            .then<Partial<{
+                // url: string;
                 html_url: string;
                 id: number;
                 name: string;
-                draft: boolean;
-                prerelease: boolean;
-                created_at: string;
-                updated_at: string;
+                // draft: boolean;
+                // prerelease: boolean;
+                // created_at: string;
+                // updated_at: string;
                 published_at: string;
                 body: string;
-            }[]>(res => res.json())
-            .then(data => data.sort((r1, r2) => {
-                const state = getReleaseVersionState(r1.name.substring(1), r2.name.substring(1));
+            }>[] | undefined>(res => res.json())
+            .then(data => (data ?? []).sort((r1, r2) => {
+                const state = r1.name && r2.name
+                    ? getReleaseVersionState(r1.name.substring(1), r2.name.substring(1))
+                    : 'same';
                 return switchUtil(state, {
                     new: -1,
                     old: 1,
@@ -61,7 +63,9 @@ export const SettingsAboutRight: React.FC = () => {
         {isPending && <Skeleton h='100vh' mt='md' />}
 
         {!isPending && releasesQuery.data?.map(r => {
-            const releaseState = getReleaseVersionState(r.name.substring(1), settingsVersion ?? '');
+            const releaseState = r.name
+                ? getReleaseVersionState(r.name.substring(1), settingsVersion ?? '')
+                : 'same';
 
             return <CardSection key={r.id} withBorder inheritPadding py='inherit'
                 style={{
@@ -89,7 +93,7 @@ export const SettingsAboutRight: React.FC = () => {
                             {r.name}
                         </UIButton>
                         <Badge variant='light' size='lg'>
-                            {renderDate(new Date(r.published_at))}
+                            {r.published_at && renderDate(new Date(r.published_at))}
                         </Badge>
 
                         {releaseState === 'same' && <Badge variant='filled' size='lg' ml='auto'>
@@ -105,7 +109,7 @@ export const SettingsAboutRight: React.FC = () => {
                     <UIMarkdownRenderer
                         titleReduce={3}
                     >
-                        {r.body
+                        {(r.body ?? '')
                             .replaceAll(/@(\w+)/g, (match, name) => {
                                 return `[@${name}](https://github.com/${name})`;
                             })

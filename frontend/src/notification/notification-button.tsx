@@ -3,6 +3,7 @@ import { BellIcon } from 'lucide-react';
 import React from 'react';
 import { BackendErrorsContext } from '../data/backend-errors-context';
 import { useWarningsGetWarnings } from '../data/sdk/warnings/warnings.gen';
+import { withErrorCatcher } from '../error/with-error-catcher';
 import { useTranslate } from '../translate/i18n';
 import { UIActionIcon } from '../ui/form/button/ui-action-icon';
 import type { PopoverContext } from '../ui/interaction/focus-controls/components/popover/context/popover-context';
@@ -40,7 +41,7 @@ const useOpened = () => {
     };
 };
 
-export const NotificationButton: React.FC = () => {
+export const NotificationButton: React.FC = withErrorCatcher('item', () => {
     const { t } = useTranslate();
 
     const { hasAlerts, opened, setOpened } = useOpened();
@@ -75,4 +76,4 @@ export const NotificationButton: React.FC = () => {
             }}
         />
     );
-};
+});
