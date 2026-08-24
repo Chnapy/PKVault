@@ -33,6 +33,7 @@ export const SettingsMainLeft: React.FC = () => {
                     [ RuntimeSystem.WINDOWS ]: t('settings.system.windows'),
                     [ RuntimeSystem.LINUX ]: t('settings.system.linux'),
                     [ RuntimeSystem.STEAMDECK ]: t('settings.system.steamdeck'),
+                    [ RuntimeSystem.MACOS ]: t('settings.system.macos'),
                 })}</div>
                 <UIInputLabel leftSection={<img src="https://projectpokemon.org/favicon.ico" />} label='PKHeX' />
                 <div>{settings?.pkhexVersion}</div>

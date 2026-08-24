@@ -255,6 +255,7 @@
   "settings.sub.external": "External pkms",
   "settings.sub.main": "Main",
   "settings.system.linux": "Linux desktop",
+  "settings.system.macos": "macOS desktop",
   "settings.system.steamdeck": "SteamDeck",
   "settings.system.unknown": "System unknown",
   "settings.system.windows": "Windows desktop",
