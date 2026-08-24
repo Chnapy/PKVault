@@ -57,7 +57,7 @@ public class PkmFileLoader : IPkmFileLoader
         }
         catch (Exception ex)
         {
-            Log.Warning(ex.ToString());
+            Log.Warning(ex, "Exception during PKM file load");
 
             pkmFile.Data = [];
             pkmFile.Error = GetPKMLoadError(ex);
@@ -216,8 +216,7 @@ public class PkmFileLoader : IPkmFileLoader
         }
         catch (Exception ex)
         {
-            Log.Error($"PKM file load failure with PkmFileEntity.Filepath=${filepath}");
-            Log.Error(ex.ToString());
+            Log.Error(ex, $"PKM file load failure with PkmFileEntity.Filepath=${filepath}");
 
             pkm = GetPlaceholderPKM();
             loadError = GetPKMLoadError(ex);

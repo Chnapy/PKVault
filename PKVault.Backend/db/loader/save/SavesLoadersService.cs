@@ -213,7 +213,7 @@ public class SavesLoadersService(
         }
         catch (Exception ex)
         {
-            log.LogError(ex.ToString());
+            log.LogError(ex, $"Exception during save load, path={path}");
             return null;
         }
     }

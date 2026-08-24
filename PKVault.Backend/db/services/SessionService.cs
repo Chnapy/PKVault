@@ -130,7 +130,7 @@ public class SessionService(
         }
         catch (Exception ex)
         {
-            log.LogError(ex.ToString());
+            log.LogError(ex, "Exception during external-pkms check/update");
         }
         return false;
     }

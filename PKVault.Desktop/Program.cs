@@ -81,8 +81,16 @@ class Program
             {
                 Log.Logger.Debug("CREATED");
 
-                var backendServerPostRun = await SetupBackendServer(server, args);
-                await backendServerPostRun();
+                try
+                {
+                    var backendServerPostRun = await SetupBackendServer(server, args);
+                    await backendServerPostRun();
+                }
+                catch (Exception ex)
+                {
+                    Log.Fatal(ex, "An unhandled exception occurred post window created");
+                    throw;
+                }
 
             });
             window.RegisterWindowClosingHandler((sender, e) =>
@@ -140,40 +148,47 @@ class Program
 
         server.Map("{**catchAll}", async context =>
         {
-            // log.LogInformation("GET => " + context.Request.Path.Value);
-            // log.LogInformation(context.Request.GetDisplayUrl());
-            // log.LogInformation(context.Request.GetEncodedUrl());
-
-            // http://localhost:8000/api/storage/main/pkm-version
-            // http://localhost:8000/index.html?server=http://localhost:57471
-            var uri = context.Request.GetDisplayUrl();
-            // log.LogInformation($"DEBUG {uri}");
-
-            var uriParts = uri.Split('?')[0].Split('/');
-
-            var uriActionAndRest = uriParts.Skip(3);
-            var uriAction = uriActionAndRest.First();
-            var uriDirectories = uriActionAndRest.SkipLast(1);
-            var uriFilename = uriActionAndRest.Last();
-            var uriFilenameExt = Path.GetExtension(uriFilename);
-            var assemblyActionAndRest = string.Join('.', [
-                ..uriDirectories.Select(part => part.Replace('-', '_')),
-                uriFilename
-            ]);
-
-            var streamKey = $"{AssemblyStaticPrefix}{assemblyActionAndRest}";
-            var stream = Assembly.GetManifestResourceStream(streamKey);
-            if (stream == null)
+            try
             {
-                Log.Error($"Stream not found for key {streamKey}");
-                // args.Response = webView.CoreWebView2.Environment.CreateWebResourceResponse(stream, 404, "Not Found", "");
-                return;
+                // log.LogInformation("GET => " + context.Request.Path.Value);
+                // log.LogInformation(context.Request.GetDisplayUrl());
+                // log.LogInformation(context.Request.GetEncodedUrl());
+
+                // http://localhost:8000/api/storage/main/pkm-version
+                // http://localhost:8000/index.html?server=http://localhost:57471
+                var uri = context.Request.GetDisplayUrl();
+                // log.LogInformation($"DEBUG {uri}");
+
+                if (uri.EndsWith("/.well-known/appspecific/com.chrome.devtools.json"))
+                {
+                    context.Response.StatusCode = Microsoft.AspNetCore.Http.StatusCodes.Status404NotFound;
+                    return;
+                }
+
+                var uriParts = uri.Split('?')[0].Split('/');
+
+                var uriActionAndRest = uriParts.Skip(3);
+                var uriAction = uriActionAndRest.First();
+                var uriDirectories = uriActionAndRest.SkipLast(1);
+                var uriFilename = uriActionAndRest.Last();
+                var uriFilenameExt = Path.GetExtension(uriFilename);
+                var assemblyActionAndRest = string.Join('.', [
+                    ..uriDirectories.Select(part => part.Replace('-', '_')),
+                    uriFilename
+                ]);
+
+                var streamKey = $"{AssemblyStaticPrefix}{assemblyActionAndRest}";
+                var stream = Assembly.GetManifestResourceStream(streamKey)
+                    ?? throw new ArgumentException($"Stream not found for key {streamKey}, uri {uri}");
+                contentTypeProvider.Mappings.TryGetValue(uriFilenameExt, out var contentType);
+
+                context.Response.ContentType = contentType;
+                await stream.CopyToAsync(context.Response.Body);
             }
-
-            contentTypeProvider.Mappings.TryGetValue(uriFilenameExt, out var contentType);
-
-            context.Response.ContentType = contentType;
-            await stream.CopyToAsync(context.Response.Body);
+            catch (Exception ex)
+            {
+                await ExceptionHandlingMiddleware.WriteExceptionResponse(context, ex);
+            }
         });
 
         return () => server.RunAsync();
@@ -383,7 +398,7 @@ class Program
             }
             catch (JsonException ex)
             {
-                Log.Error(ex.ToString());
+                Log.Error(ex, "JsonException during frontend message recept");
             }
         });
     }

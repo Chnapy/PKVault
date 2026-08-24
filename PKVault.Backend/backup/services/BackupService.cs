@@ -414,7 +414,7 @@ public class BackupService(
         }
         catch (Exception ex)
         {
-            log.LogError(ex.ToString());
+            log.LogError(ex, "Exception during action run");
 
             await RestoreBackup(bkpDateTime, withSafeBackup: false, flags);
 

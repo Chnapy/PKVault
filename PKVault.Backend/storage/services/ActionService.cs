@@ -323,7 +323,7 @@ public class ActionService(
         }
         catch (Exception ex)
         {
-            log.LogError(ex.ToString());
+            log.LogError(ex, "Exception during action add");
 
             await RemoveDataActionsAndReset(sessionService.Actions.Count);
 

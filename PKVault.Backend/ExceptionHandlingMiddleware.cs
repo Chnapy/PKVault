@@ -17,9 +17,9 @@ public partial class ExceptionHandlingMiddleware(RequestDelegate next)
         }
     }
 
-    private static async Task WriteExceptionResponse(HttpContext context, Exception ex)
+    public static async Task WriteExceptionResponse(HttpContext context, Exception ex)
     {
-        Log.Error(ex.ToString());
+        Log.Error(ex, "Exception during web request");
         var response = context.Response;
         if (response.HasStarted)
         {
