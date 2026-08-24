@@ -5,7 +5,7 @@ import { getStorageGetPkmsLegalityQueryKey, storageGetPkmsLegality } from '../sd
 
 const batchers: Record<number, ReturnType<typeof createBatcher>> = {};
 
-const createBatcher = (saveId?: number) => batshit.create({
+const createBatcher = (saveId: number | null) => batshit.create({
     name: 'pkm-legality',
     fetcher: async (pkmIds: string[]) => {
         const response = await storageGetPkmsLegality({ saveId, pkmIds });
@@ -19,7 +19,7 @@ const createBatcher = (saveId?: number) => batshit.create({
 });
 
 const getBatcherBySave = (saveId?: number) => {
-    const batcher = batchers[ saveId ?? 0 ] ?? createBatcher(saveId);
+    const batcher = batchers[ saveId ?? 0 ] ?? createBatcher(saveId ?? null);
     batchers[ saveId ?? 0 ] = batcher;
     return batcher;
 };

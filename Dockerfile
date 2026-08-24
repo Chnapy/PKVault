@@ -15,8 +15,6 @@ COPY ./PKVault.Backend ./PKVault.Backend
 
 RUN dotnet build "PKVault.Backend/PKVault.Backend.csproj"
 
-COPY "PKVault.Backend/swagger.json" /swagger.json
-
 # backend test
 FROM backend-builder AS backend-test
 
@@ -37,10 +35,6 @@ FROM backend-builder AS backend-publish
 
 RUN dotnet publish "PKVault.Backend/PKVault.Backend.csproj" -c Release -o /app/publish
 
-# extract swagger from backend
-FROM alpine:latest AS swagger-extractor
-COPY --from=backend-builder /swagger.json /swagger.json
-
 # frontend builder
 FROM node:22-alpine AS frontend-builder
 
@@ -58,7 +52,7 @@ COPY frontend .
 
 RUN npm run gen:routes
 
-COPY --from=swagger-extractor /swagger.json ./
+COPY PKVault.Backend/swagger.json .
 
 # generate SDK
 ARG VITE_OPENAPI_PATH=swagger.json

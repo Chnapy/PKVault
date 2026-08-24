@@ -72,7 +72,7 @@ export const SortAdvancedAction: React.FC<{
     const onSubmit = handleSubmit(async ({ fromBoxId, toBoxId, pokedexName, leaveEmptySlot }) => {
         const result = await sortPkmsMutation.mutateAsync({
             params: {
-                saveId: saveId ?? undefined,
+                saveId,
                 fromBoxId,
                 toBoxId,
                 pokedexName,

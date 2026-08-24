@@ -14,7 +14,10 @@ export const FileExplorerPopover: React.FC<FileExplorerPopoverProps> = ({ name, 
     const [ dropdownOpened, setDropdownOpened ] = React.useState(false);
 
     const settingsQuery = useSettingsGet();
-    const pkvaultPath = settingsQuery.data && PathUtil.asDirectory(settingsQuery.data.data.appDirectory);
+    const settings = settingsQuery.data?.data;
+
+    const pkvaultPath = settings && PathUtil.asDirectory(settings.appDirectory);
+    const uploadPath = settings && PathUtil.asDirectory(settings.savesUploadsPath);
 
     const directoryPath = PathUtil.getValueDirectoryPath(value);
     const directoryLsQuery = useSettingsGetDirectoryLs({ directoryPath }, { query: { enabled: dropdownOpened } });
@@ -31,6 +34,7 @@ export const FileExplorerPopover: React.FC<FileExplorerPopoverProps> = ({ name, 
         dataDirectoryPaths={data?.directoryPaths ?? []}
         dataFilePaths={data?.filePaths ?? []}
         pkvaultPath={pkvaultPath ?? ''}
+        uploadPath={uploadPath ?? ''}
         reloadData={directoryLsQuery.refetch}
         setDropdownOpened={setDropdownOpened}
     >
@@ -42,6 +46,8 @@ export const FileExplorerPopover: React.FC<FileExplorerPopoverProps> = ({ name, 
                 props.onClick?.(e);
                 btnProps.onClick?.(e);
             }}
+            pkvaultPath={pkvaultPath ?? ''}
+            uploadPath={uploadPath ?? ''}
             style={{
                 ...props.style,
                 ...btnProps.style,

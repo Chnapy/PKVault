@@ -1,17 +1,20 @@
-import { Alert, Divider, Group, InputWrapper, Stack } from '@mantine/core';
-import { PencilIcon, PenOffIcon } from 'lucide-react';
+import { Alert, Button, Divider, Group, InputWrapper, Stack } from '@mantine/core';
+import { PencilIcon, PenOffIcon, TrashIcon, TriangleAlertIcon } from 'lucide-react';
 import React from 'react';
 import { type GameVersion } from '../../data/sdk/model';
-import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import { useSaveInfosDelete, useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useSettingsEdit, useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { getEntityContextGenerationName } from '../../data/util/get-entity-context-generation-name';
 import { useStaticData } from '../../hooks/use-static-data';
 import { getGameInfos } from '../../pokedex/details/util/get-game-infos';
+import { isDesktop } from '../../settings/globs-input/hooks/use-desktop-message';
 import { useTranslate } from '../../translate/i18n';
 import { UIButton } from '../../ui/form/button/ui-button';
 import { UIPopoverCard } from '../../ui/popover/popover-card/ui-popover-card';
+import { UIConfirmPopover } from '../../ui/popover/ui-confirm-popover';
 import { UIGameImg } from '../../ui/sprite-img/ui-game-img';
 import { UIGameExpanded } from '../../ui/storage/storage-panel/game-list/ui-game-expanded';
+import { gameExpandedConstants } from '../../ui/storage/storage-panel/game-list/util/game-expanded-constants';
 
 export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
     const { t } = useTranslate();
@@ -23,6 +26,7 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
     const settings = settingsQuery.data?.data;
 
     const settingsEdit = useSettingsEdit();
+    const saveDeleteMutation = useSaveInfosDelete();
 
     const settingsMutable = settingsQuery.data?.data.settingsMutable;
 
@@ -50,7 +54,7 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
                     size='md'
                 />
 
-                {!settings?.canUpdateSettings && <Alert variant='outline' color='blue' icon={<PenOffIcon />} maw={288} py='sm'>
+                {!settings?.canUpdateSettings && <Alert variant='outline' color='blue' icon={<PenOffIcon />} maw={gameExpandedConstants.width} py='sm'>
                     {t('action.edit-not-possible')}
                 </Alert>}
 
@@ -121,7 +125,27 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
                             language={staticData.languages[ s.language ] ?? ''}
                             path={s.path}
                             editDropdown={null}
-                            actions={null}
+                            actions={!isDesktop && <>
+                                <UIConfirmPopover
+                                    label={t('saves.action.delete')}
+                                    icon={<TriangleAlertIcon />}
+                                    color='red'
+                                    action={() => saveDeleteMutation.mutateAsync({
+                                        params: { path: s.path },
+                                    })}
+                                    nested
+                                >
+                                    <Button
+                                        disabled={!settings?.canUpdateSettings}
+                                        variant='filled'
+                                        color='red'
+                                        size='compact-xs'
+                                        fullWidth
+                                    >
+                                        <TrashIcon />
+                                    </Button>
+                                </UIConfirmPopover>
+                            </>}
                         />
                     </React.Fragment>)}
                 </Stack>

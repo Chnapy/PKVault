@@ -1,4 +1,5 @@
 import '@mantine/core/styles.css';
+import '@mantine/dropzone/styles.css';
 import './global.css';
 
 import { ColorSchemeScript, MantineProvider, type MantineProviderProps } from '@mantine/core';

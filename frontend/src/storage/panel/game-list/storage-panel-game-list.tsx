@@ -1,14 +1,19 @@
+import { Group } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
-import { ArrowDown01Icon, SortDescIcon } from 'lucide-react';
+import { ArrowDown01Icon, FolderSearchIcon, SortDescIcon } from 'lucide-react';
 import type React from 'react';
 import type { SaveInfosDTO } from '../../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { getGameInfos } from '../../../pokedex/details/util/get-game-infos';
 import { Route } from '../../../routes/storage';
+import { SavesUploadButton } from '../../../saves/saves-upload-popover/saves-upload-button';
+import { isDesktop } from '../../../settings/globs-input/hooks/use-desktop-message';
 import { useTranslate } from '../../../translate/i18n';
+import { UIButton } from '../../../ui/form/button/ui-button';
 import type { UISelectItem } from '../../../ui/form/select/ui-select';
 import { UIStoragePanelGameList, type UIGameData } from '../../../ui/storage/storage-panel/game-list/ui-storage-panel-game-list';
+import { gameExpandedConstants } from '../../../ui/storage/storage-panel/game-list/util/game-expanded-constants';
 import { filterIsDefined } from '../../../util/filter-is-defined';
 import { useFilteredBoxes } from '../hooks/use-filtered-boxes';
 import { useCurrentStorage, useOtherStorage } from '../storage-panel-context';
@@ -161,8 +166,77 @@ export const StoragePanelGameList: React.FC = () => {
                             reduce();
                         })}
                 />)}
-        onCreate={() => navigate({
-            to: '/settings'
-        })}
+        createActions={<Group justify='center' wrap='nowrap'>
+            {isDesktop
+                ? <>
+                    <UIButton
+                        name='add-game-path'
+                        controlLabel={t('settings.form.saves.add-path')}
+                        onClick={() => navigate({
+                            to: '/settings'
+                        })}
+                        leftSection={<FolderSearchIcon />}
+                        p='sm'
+                        w={gameExpandedConstants.width}
+                        fullWidth
+                        mih={100}
+                        variant='filled'
+                        color='blue'
+                        styles={{
+                            inner: {
+                                flexDirection: 'column',
+                                gap: 10,
+                            },
+                            label: {
+                                height: 'auto',
+                            },
+                        }}
+                    >
+                        {t('settings.form.saves.add-path')}
+                    </UIButton>
+                </>
+                : <>
+                    <UIButton
+                        name='add-game-path'
+                        controlLabel={t('saves.action.add-path')}
+                        onClick={() => navigate({
+                            to: '/settings'
+                        })}
+                        leftSection={<FolderSearchIcon />}
+                        p='sm'
+                        w={gameExpandedConstants.width}
+                        mih={100}
+                        variant='filled'
+                        color='blue'
+                        styles={{
+                            inner: {
+                                flexDirection: 'column',
+                                gap: 10,
+                            },
+                            label: {
+                                height: 'auto',
+                            },
+                        }}
+                    >
+                        {t('saves.action.add-path')}
+                    </UIButton>
+
+                    <SavesUploadButton
+                        disabledLabel={t('action.not-possible')}
+                        p='sm'
+                        w={gameExpandedConstants.width}
+                        mih={100}
+                        styles={{
+                            inner: {
+                                flexDirection: 'column',
+                                gap: 10,
+                            },
+                            label: {
+                                height: 'auto',
+                            },
+                        }}
+                    />
+                </>}
+        </Group>}
     />;
 };

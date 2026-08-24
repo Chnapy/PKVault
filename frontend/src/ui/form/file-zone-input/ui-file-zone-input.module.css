@@ -1,0 +1,17 @@
+
+/* .ui-file-zone-input {
+
+} */
+
+.disabled {
+    border-color: transparent;
+    cursor: not-allowed;
+}
+
+.disabled, .disabled:hover {
+    background-color: var(--mantine-color-disabled);
+}
+
+.disabled * {
+    color: var(--mantine-color-disabled-color);
+}

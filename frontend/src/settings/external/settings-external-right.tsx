@@ -25,6 +25,7 @@ export const SettingsExternalRight: React.FC = () => {
             </Group>}
             labelAddFile={t('settings.form.pkms-external.add-file')}
             labelAddFolder={t('settings.form.pkms-external.add-folder')}
+            labelAddPath={t('settings.form.pkms-external.add-path')}
             {...form.register('pkM_EXTERNAL_GLOBS')}
             value={pkmExternalGlobs}
             onChange={(value) => form.setValue('pkM_EXTERNAL_GLOBS', value, { shouldDirty: true })}

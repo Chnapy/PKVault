@@ -9,25 +9,26 @@ import { useTranslate } from '../../translate/i18n';
 
 type UIConfirmPopoverProps = Pick<UIPopoverProps, 'popoverRef' | 'nested' | 'children'> & {
     label: string;
+    icon?: React.ReactNode;
     description?: string;
     color?: Button.Props[ 'color' ];
     action?: () => unknown;
 };
 
-export const UIConfirmPopover: React.FC<UIConfirmPopoverProps> = ({ label, description, color, action, ...rest }) => {
+export const UIConfirmPopover: React.FC<UIConfirmPopoverProps> = ({ label, icon, description, color, action, ...rest }) => {
     return <UIPopover
-        dropdown={<Dropdown label={label} description={description} color={color} action={action} />}
+        dropdown={<Dropdown label={label} icon={icon} description={description} color={color} action={action} />}
         {...rest}
     />;
 };
 
-const Dropdown: React.FC<Pick<UIConfirmPopoverProps, 'label' | 'description' | 'color' | 'action'>> = ({ label, description, color, action }) => {
+const Dropdown: React.FC<Pick<UIConfirmPopoverProps, 'label' | 'icon' | 'description' | 'color' | 'action'>> = ({ label, icon, description, color, action }) => {
     const { t } = useTranslate();
 
     const popover = usePopover()!;
 
     return <UIPopoverCard
-        icon={<CircleQuestionMarkIcon />}
+        icon={icon ?? <CircleQuestionMarkIcon />}
         title={label}
         description={description}
     >

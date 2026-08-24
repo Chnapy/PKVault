@@ -14,6 +14,10 @@ public interface ISavesLoadersService
 
     public void Clear();
     public Task Setup(DataUpdateFlags flags);
+
+    public Task<SaveWrapper> CheckSaveData(byte[] fileBytes, string filename, bool overwrite);
+    public Task UploadSaveWithoutCheck(string savePath, byte[] fileBytes);
+    public bool DeleteSave(string path, DataUpdateFlags flags);
 }
 
 public class SavesLoadersService(
@@ -160,7 +164,12 @@ public class SavesLoadersService(
     {
         ConcurrentDictionary<uint, SaveLoadersRecord> loaders = [];
 
-        var globs = settingsService.GetSettings().SettingsMutable.SAVE_GLOBS;
+        var settings = settingsService.GetSettings();
+
+        string[] globs = [
+            settings.SavesUploadsPath,
+            ..settings.SettingsMutable.SAVE_GLOBS
+        ];
         var searchPaths = fileIOService.Matcher.SearchPaths(globs);
 
         var evolves = await staticDataService.GetStaticEvolves();
@@ -168,8 +177,6 @@ public class SavesLoadersService(
         var pathsSaves = await Task.WhenAll(
             searchPaths.Select(async path => (Path: path, Save: await LoadSaveFromPath(path)))
         );
-
-        var settings = settingsService.GetSettings();
 
         // remove non-existing paths from path-overrides to simplify next steps
         // no persistence here
@@ -197,7 +204,26 @@ public class SavesLoadersService(
             }
 
             var data = await fileIOService.ReadBytes(path);
-            if (!SaveUtil.TryGetSaveFile(data, out var saveRaw, path))
+            return await GetSaveFile(data, path);
+        }
+        catch (Exception ex)
+        {
+            log.LogError(ex, $"Exception during save load by path, path={path}");
+            return null;
+        }
+    }
+
+    private async Task<SaveWrapper?> GetSaveFile(byte[] data, string path)
+    {
+        try
+        {
+            var (TooSmall, TooBig) = fileIOService.CheckGameFile(data.Length);
+            if (TooSmall || TooBig)
+            {
+                return null;
+            }
+
+            if (!SaveUtil.TryGetSaveFile((byte[])data.Clone(), out var saveRaw))
                 return null;
 
             saveRaw.Metadata.SetExtraInfo(path);
@@ -280,6 +306,51 @@ public class SavesLoadersService(
             : [];
 
         loaders[save.Id] = new(save, boxLoader, pkmLoader, duplicates);
+    }
+
+    public async Task<SaveWrapper> CheckSaveData(byte[] fileBytes, string filename, bool overwrite)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(filename);
+
+        var savesUploadsPath = settingsService.GetSettings().SavesUploadsPath;
+
+        var savePath = Path.Combine(savesUploadsPath, filename);
+
+        if (!overwrite && fileIOService.Exists(savePath))
+        {
+            throw new ArgumentException($"File already exists: {savePath}");
+        }
+
+        var save = await GetSaveFile(fileBytes, savePath);
+        ArgumentNullException.ThrowIfNull(save, $"Cannot create save from given file: {filename}");
+
+        return save;
+    }
+
+    public async Task UploadSaveWithoutCheck(string savePath, byte[] fileBytes)
+    {
+        await fileIOService.WriteBytes(savePath, fileBytes);
+    }
+
+    public bool DeleteSave(string path, DataUpdateFlags flags)
+    {
+        var allSaveInfos = GetAllSaveInfos().Values.SelectMany<SaveInfosDTO, SaveInfosDTO>(dto => [dto, .. dto.Duplicates]);
+        var saveInfos = allSaveInfos.FirstOrDefault(
+            s => s?.Path == path,
+            null
+        );
+        if (saveInfos == null)
+            return false;
+
+        if (!fileIOService.Delete(saveInfos.Path))
+            return false;
+
+        flags.SaveInfos = true;
+        flags.Saves.UseSave(saveInfos.Id).SavePkms.All = true;
+        flags.Saves.UseSave(saveInfos.Id).SaveBoxes = true;
+        flags.Dex.All = true;
+
+        return true;
     }
 }
 

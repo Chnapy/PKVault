@@ -190,7 +190,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
 
                 await evolvePkmsMutation.mutateAsync({
                     params: {
-                        saveId: saveId ?? undefined,
+                        saveId,
                         ids: canEvolveList.map(pkm => pkm.id),
                     },
                 });

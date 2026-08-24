@@ -12,14 +12,14 @@ import { PathUtil } from './util/path-util';
 export type UIGlobsInputItemProps = {
     name: string;
     value: string;
-    onRemove: () => void;
+    onRemove?: () => void;
     disabled?: boolean;
     results: string[];
     isLoading?: boolean;
     hasWarning?: boolean;
     hasError?: boolean;
     openFolder?: (path: string, isDirectory: boolean) => void;
-    children: (props: Omit<UIPathButtonProps, 'value'>) => React.ReactNode;
+    children: (props: Omit<UIPathButtonProps, 'value' | 'pkvaultPath' | 'uploadPath'>) => React.ReactNode;
 };
 
 export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
@@ -38,7 +38,7 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
                 main: false,
                 label: t('action.select'),
             }),
-            !disabled && !isLoading && !hasError && !hasWarning && !isExclude && {
+            !isLoading && !hasError && !hasWarning && !isExclude && {
                 name: 'list-files' as const,
                 label: '',
                 triggers: {
@@ -53,7 +53,7 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
                 },
                 spread: false,
             },
-            !disabled && {
+            !disabled && onRemove && {
                 name: 'delete' as const,
                 label: t('action.delete'),
                 triggers: {

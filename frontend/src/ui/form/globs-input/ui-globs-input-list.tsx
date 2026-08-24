@@ -9,13 +9,15 @@ export type UIGlobsInputListProps = Pick<UIGlobsInputAddProps, 'onAdd' | 'disabl
     labelList: React.ReactNode;
     labelAddFile: string;
     labelAddFolder: string;
+    labelAddPath: string;
     isDesktop: boolean;
     results: React.ReactNode;
+    uploadAbbButton?: React.ReactNode;
     children: React.ReactNode;
 };
 
 export const UIGlobsInputList: React.FC<UIGlobsInputListProps> = ({
-    id, labelList, labelAddFile, labelAddFolder, onAdd, disabled, isDesktop, results, children
+    id, labelList, labelAddFile, labelAddFolder, labelAddPath, onAdd, disabled, isDesktop, results, uploadAbbButton, children
 }) => {
     const { t } = useTranslate();
 
@@ -57,10 +59,11 @@ export const UIGlobsInputList: React.FC<UIGlobsInputListProps> = ({
                 : <>
                     <UIGlobsInputAdd
                         name='add-file-or-folder'
-                        label={labelAddFile}
+                        label={labelAddPath}
                         type='file-folder'
                         {...addCommonProps}
                     />
+                    {uploadAbbButton}
                 </>}
         </Group>
 

@@ -4,6 +4,7 @@ import { CopyIcon, FileXIcon, PenIcon } from 'lucide-react';
 import React from 'react';
 import { useTranslate } from '../../../../translate/i18n';
 import { useClickLoading } from '../../../form/button/hooks/use-click-loading';
+import { UIIconWrapper } from '../../../icon/ui-icon-wrapper';
 import { WithControlsIcons } from '../../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../../interaction/focus-controls/use-focus-controls';
@@ -12,7 +13,7 @@ import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
 import { UIPopover } from '../../../popover/ui-popover';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
 import classes from './ui-game-expanded-wrapper.module.css';
-import { UIIconWrapper } from '../../../icon/ui-icon-wrapper';
+import { gameExpandedConstants } from './util/game-expanded-constants';
 
 export type UIGameExpandedWrapperProps = {
     selected?: boolean;
@@ -76,7 +77,7 @@ export const UIGameExpandedWrapper: React.FC<UIGameExpandedWrapperProps> = ({
 
     const title = [ id, path ].filter(Boolean).join('\n');
 
-    return <Group className={classes.uiGameExpandedWrapper} gap='xs' align='flex-start' wrap='nowrap'>
+    return <Group w={gameExpandedConstants.width} gap='xs' align='flex-start' wrap='nowrap'>
 
         <Stack gap='xs'>
             <Image

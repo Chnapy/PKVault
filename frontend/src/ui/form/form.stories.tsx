@@ -56,6 +56,7 @@ export const Primary: Story = {
             labelList='Saves files locations'
             labelAddFile='Add a save'
             labelAddFolder='Add a save directory'
+            labelAddPath='Add saves location'
             onAdd={async (...params) => console.log(...params)}
             isDesktop//={false}
             results={<UIGlobsInputResults
@@ -80,6 +81,7 @@ export const Primary: Story = {
                     dataDirectoryPaths={[ './foo', './bar' ]}
                     dataFilePaths={[ './toto.txt', './tata.sav' ]}
                     pkvaultPath=''
+                    uploadPath=''
                     setDropdownOpened={console.log}
                 >
                     {otherProps => <UIPathButton
@@ -90,6 +92,8 @@ export const Primary: Story = {
                             props.onClick?.(e);
                             otherProps.onClick?.(e);
                         }}
+                        pkvaultPath=''
+                        uploadPath=''
                     />}
                 </UIFileExplorerPopover>}
             </UIGlobsInputItem>
@@ -110,6 +114,7 @@ export const Primary: Story = {
                     dataDirectoryPaths={[ './foo', './bar' ]}
                     dataFilePaths={[ './toto.txt', './tata.sav' ]}
                     pkvaultPath=''
+                    uploadPath=''
                     setDropdownOpened={console.log}
                 >
                     {otherProps => <UIPathButton
@@ -120,6 +125,8 @@ export const Primary: Story = {
                             props.onClick?.(e);
                             otherProps.onClick?.(e);
                         }}
+                        pkvaultPath=''
+                        uploadPath=''
                     />}
                 </UIFileExplorerPopover>}
             </UIGlobsInputItem>
@@ -140,6 +147,7 @@ export const Primary: Story = {
                     dataDirectoryPaths={[ './foo', './bar' ]}
                     dataFilePaths={[ './toto.txt', './tata.sav' ]}
                     pkvaultPath=''
+                    uploadPath=''
                     setDropdownOpened={console.log}
                 >
                     {otherProps => <UIPathButton
@@ -150,6 +158,8 @@ export const Primary: Story = {
                             props.onClick?.(e);
                             otherProps.onClick?.(e);
                         }}
+                        pkvaultPath=''
+                        uploadPath=''
                     />}
                 </UIFileExplorerPopover>}
             </UIGlobsInputItem>

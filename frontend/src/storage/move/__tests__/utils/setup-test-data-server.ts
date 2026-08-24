@@ -2,8 +2,8 @@ import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll } from 'vitest';
 import { BoxType, type BankDTO, type BoxDTO, type PkmSaveDTO, type PkmVariantDTO, type SaveInfosDTO } from '../../../../data/sdk/model';
-import { getSaveInfosGetAllUrl, type saveInfosGetAllResponse200ApplicationJson } from '../../../../data/sdk/save-infos/save-infos.gen';
-import { getStorageGetBoxesUrl, getStorageGetMainBanksUrl, getStorageGetMainPkmVariantsUrl, getStorageGetSavePkmsUrl, getStorageMovePkmBankUrl, getStorageMovePkmUrl, type storageGetBoxesResponse200ApplicationJson, type storageGetMainBanksResponse200ApplicationJson, type storageGetMainPkmVariantsResponse200ApplicationJson, type storageGetSavePkmsResponse200ApplicationJson } from '../../../../data/sdk/storage/storage.gen';
+import { getSaveInfosGetAllUrl, type saveInfosGetAllResponse200 } from '../../../../data/sdk/save-infos/save-infos.gen';
+import { getStorageGetBoxesUrl, getStorageGetMainBanksUrl, getStorageGetMainPkmVariantsUrl, getStorageGetSavePkmsUrl, getStorageMovePkmBankUrl, getStorageMovePkmUrl, type storageGetBoxesResponse200, type storageGetMainBanksResponse200, type storageGetMainPkmVariantsResponse200, type storageGetSavePkmsResponse200 } from '../../../../data/sdk/storage/storage.gen';
 
 export const setupTestDataServer = () => {
     const createSaveInfos = (data: Partial<SaveInfosDTO>): SaveInfosDTO => ({
@@ -220,7 +220,7 @@ export const setupTestDataServer = () => {
 
     const server = setupServer(
         http.get(getSaveInfosGetAllUrl(), () => {
-            return HttpResponse.json<saveInfosGetAllResponse200ApplicationJson[ 'data' ]>({
+            return HttpResponse.json<saveInfosGetAllResponse200['data']>({
                 123: createSaveInfos({
                     id: 123,
                     generation: 3,
@@ -242,7 +242,7 @@ export const setupTestDataServer = () => {
             });
         }),
         http.get(getStorageGetMainBanksUrl(), () => {
-            return HttpResponse.json<storageGetMainBanksResponse200ApplicationJson[ 'data' ]>([
+            return HttpResponse.json<storageGetMainBanksResponse200[ 'data' ]>([
                 createBank({
                     id: '0',
                     idInt: 0,
@@ -263,7 +263,7 @@ export const setupTestDataServer = () => {
             const saveId = Number(url.searchParams.get('saveId') ?? '0');
             switch (saveId) {
                 case 0:
-                    return HttpResponse.json<storageGetBoxesResponse200ApplicationJson[ 'data' ]>([
+                    return HttpResponse.json<storageGetBoxesResponse200[ 'data' ]>([
                         createBox({
                             id: '0',
                             idInt: 0,
@@ -288,7 +288,7 @@ export const setupTestDataServer = () => {
                         })
                     ]);
                 case 123:
-                    return HttpResponse.json<storageGetBoxesResponse200ApplicationJson[ 'data' ]>([
+                    return HttpResponse.json<storageGetBoxesResponse200[ 'data' ]>([
                         createBox({
                             id: '0',
                             idInt: 0,
@@ -312,7 +312,7 @@ export const setupTestDataServer = () => {
                         }),
                     ]);
                 case 456:
-                    return HttpResponse.json<storageGetBoxesResponse200ApplicationJson[ 'data' ]>([
+                    return HttpResponse.json<storageGetBoxesResponse200[ 'data' ]>([
                         createBox({
                             id: '0',
                             idInt: 0,
@@ -322,7 +322,7 @@ export const setupTestDataServer = () => {
                         }),
                     ]);
                 case 789:
-                    return HttpResponse.json<storageGetBoxesResponse200ApplicationJson[ 'data' ]>([
+                    return HttpResponse.json<storageGetBoxesResponse200[ 'data' ]>([
                         createBox({
                             id: '0',
                             idInt: 0,
@@ -334,7 +334,7 @@ export const setupTestDataServer = () => {
             }
         }),
         http.get(getStorageGetMainPkmVariantsUrl(), () => {
-            return HttpResponse.json<storageGetMainPkmVariantsResponse200ApplicationJson[ 'data' ]>([
+            return HttpResponse.json<storageGetMainPkmVariantsResponse200[ 'data' ]>([
                 createPkmVariant({
                     id: 'canMove',
                     boxId: 0,
@@ -458,7 +458,7 @@ export const setupTestDataServer = () => {
             ]);
         }),
         http.get(getStorageGetSavePkmsUrl(123), () => {
-            return HttpResponse.json<storageGetSavePkmsResponse200ApplicationJson[ 'data' ]>([
+            return HttpResponse.json<storageGetSavePkmsResponse200[ 'data' ]>([
                 createPkmSave({
                     id: 'canMove',
                     saveId: 123,
@@ -606,7 +606,7 @@ export const setupTestDataServer = () => {
             ]);
         }),
         http.get(getStorageGetSavePkmsUrl(456), () => {
-            return HttpResponse.json<storageGetSavePkmsResponse200ApplicationJson[ 'data' ]>([
+            return HttpResponse.json<storageGetSavePkmsResponse200[ 'data' ]>([
                 createPkmSave({
                     id: 'canMove',
                     saveId: 456,
@@ -624,7 +624,7 @@ export const setupTestDataServer = () => {
             ]);
         }),
         http.get(getStorageGetSavePkmsUrl(789), () => {
-            return HttpResponse.json<storageGetSavePkmsResponse200ApplicationJson[ 'data' ]>([
+            return HttpResponse.json<storageGetSavePkmsResponse200[ 'data' ]>([
                 createPkmSave({
                     id: 'canMove',
                     saveId: 789,
@@ -656,11 +656,21 @@ export const setupTestDataServer = () => {
             ]);
         }),
         http.put(getStorageMovePkmUrl({
-            targetBoxId: undefined!
+            targetBoxId: '',
+            attached: false,
+            pkmIds: [],
+            sourceSaveId: null,
+            targetBoxSlots: [],
+            targetSaveId: null,
         }), () => {
             return HttpResponse.json({});
         }),
-        http.put(getStorageMovePkmBankUrl(), () => {
+        http.put(getStorageMovePkmBankUrl({
+            bankId: '',
+            attached: false,
+            pkmIds: [],
+            sourceSaveId: null,
+        }), () => {
             return HttpResponse.json({});
         }),
     );

@@ -72,8 +72,8 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
                     const response = await storageMovePkmBank({
                         pkmIds,
                         bankId: target.targetContainer.bankId,
-                        sourceSaveId: sourceContainer.saveId ?? undefined,
-                        attached: source.params?.attached,
+                        sourceSaveId: sourceContainer.saveId ?? null,
+                        attached: source.params?.attached ?? false,
                     });
                     updateCacheMutationResponse(queryClient, response);
                 } catch (err) {
@@ -94,11 +94,11 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
                 try {
                     const response = await storageMovePkm({
                         pkmIds,
-                        sourceSaveId: sourceContainer.saveId ?? undefined,
-                        targetSaveId: target.targetContainer.saveId ?? undefined,
+                        sourceSaveId: sourceContainer.saveId ?? null,
+                        targetSaveId: target.targetContainer.saveId ?? null,
                         targetBoxId: target.targetContainer.boxId,
                         targetBoxSlots,
-                        attached: source.params?.attached,
+                        attached: source.params?.attached ?? false,
                     });
                     updateCacheMutationResponse(queryClient, response);
                 } catch (err) {

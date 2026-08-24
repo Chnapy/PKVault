@@ -1,17 +1,20 @@
 import { Badge, Button, Card, Divider, EmptyState, Group, Tooltip } from '@mantine/core';
-import { CirclePlusIcon, DownloadIcon, FolderIcon, PackageOpenIcon } from 'lucide-react';
+import { DownloadIcon, FolderIcon, FolderSearchIcon, PackageOpenIcon, TrashIcon, TriangleAlertIcon } from 'lucide-react';
 import type React from "react";
 import { HistoryContext } from '../context/history-context';
 import { getApiFullUrl } from '../data/mutator/custom-instance';
-import { getSaveInfosDownloadUrl, useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
+import { getSaveInfosDownloadUrl, useSaveInfosDelete, useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
+import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
 import { useStaticData } from '../hooks/use-static-data';
 import { getGameInfos } from '../pokedex/details/util/get-game-infos';
 import { Route } from '../routes/saves';
-import { useDesktopMessage } from '../settings/globs-input/hooks/use-desktop-message';
+import { SavesUploadButton } from '../saves/saves-upload-popover/saves-upload-button';
+import { isDesktop, useDesktopMessage } from '../settings/globs-input/hooks/use-desktop-message';
 import { GameExpanded } from '../storage/panel/game-list/game-expanded';
 import { useTranslate } from '../translate/i18n';
-import { UIActionIcon } from '../ui/form/button/ui-action-icon';
+import { UIButton } from '../ui/form/button/ui-button';
+import { UIConfirmPopover } from '../ui/popover/ui-confirm-popover';
 import { UISavesContent } from '../ui/saves/ui-saves-content';
 import { filterIsDefined } from '../util/filter-is-defined';
 
@@ -26,8 +29,12 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
 
   const staticData = useStaticData();
   const saveInfosQuery = useSaveInfosGetAll();
+  const saveDeleteMutation = useSaveInfosDelete();
 
-  const isLoading = saveInfosQuery.isPending || saveInfosQuery.isEnabled;
+  const settingsQuery = useSettingsGet();
+  const settings = settingsQuery.data?.data;
+
+  const isLoading = saveInfosQuery.isPending && saveInfosQuery.isEnabled;
 
   const generations = [ ...new Set(Object.values(staticData.versions).map(version => version.generation)) ].sort();
 
@@ -41,6 +48,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
     <Card pr={0} style={{ overflowY: 'scroll' }}>
       {!isLoading && saveInfos.length === 0 && <EmptyState
         size='sm'
+        py='md'
         icon={<PackageOpenIcon />}
         title={t('settings.form.saves.empty')}
       />}
@@ -104,19 +112,40 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
                         <FolderIcon />
                       </Button>
                     </Tooltip>
-                    : <Tooltip label={t('saves.action.download')}>
-                      <Button
-                        variant='default'
-                        size='compact-xs'
-                        fullWidth
-                        component='a'
-                        target='__blank'
-                        type='button'
-                        href={getApiFullUrl(getSaveInfosDownloadUrl(save.id))}
+                    : <>
+                      <UIConfirmPopover
+                        label={t('saves.action.delete')}
+                        icon={<TriangleAlertIcon />}
+                        color='red'
+                        action={() => saveDeleteMutation.mutateAsync({
+                          params: { path: save.path },
+                        })}
                       >
-                        <DownloadIcon />
-                      </Button>
-                    </Tooltip>}
+                        <Button
+                          disabled={!settings?.canUpdateSettings}
+                          variant='filled'
+                          color='red'
+                          size='compact-xs'
+                          fullWidth
+                        >
+                          <TrashIcon />
+                        </Button>
+                      </UIConfirmPopover>
+
+                      <Tooltip label={t('saves.action.download')}>
+                        <Button
+                          variant='default'
+                          size='compact-xs'
+                          fullWidth
+                          component='a'
+                          target='__blank'
+                          type='button'
+                          href={getApiFullUrl(getSaveInfosDownloadUrl(save.id))}
+                        >
+                          <DownloadIcon />
+                        </Button>
+                      </Tooltip>
+                    </>}
                 </>}
               />)}
             </Group>
@@ -125,20 +154,47 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
       })}
 
       <Card.Section inheritPadding withBorder py='inherit'>
-        <Tooltip label={t('saves.action.add')}>
-          <UIActionIcon
-            name='add-game'
-            controlLabel={t('saves.action.add.controls-label')}
-            onClick={() => navigate({
-              to: '/settings'
-            })}
-            variant='default'
-            size='xl'
-            w='100%'
-          >
-            <CirclePlusIcon />
-          </UIActionIcon>
-        </Tooltip>
+        <Group justify='center' wrap='nowrap'>
+          {isDesktop
+            ? <>
+              <UIButton
+                name='add-game-path'
+                controlLabel={t('settings.form.saves.add-path')}
+                onClick={() => navigate({
+                  to: '/settings'
+                })}
+                leftSection={<FolderSearchIcon />}
+                variant='filled'
+                color='blue'
+                p='lg'
+                h='auto'
+              >
+                {t('settings.form.saves.add-path')}
+              </UIButton>
+            </>
+            : <>
+              <UIButton
+                name='add-game-path'
+                controlLabel={t('saves.action.add-path')}
+                onClick={() => navigate({
+                  to: '/settings'
+                })}
+                leftSection={<FolderSearchIcon />}
+                variant='filled'
+                color='blue'
+                p='lg'
+                h='auto'
+              >
+                {t('saves.action.add-path')}
+              </UIButton>
+
+              <SavesUploadButton
+                disabledLabel={t('action.not-possible')}
+                p='lg'
+                h='auto'
+              />
+            </>}
+        </Group>
       </Card.Section>
     </Card>
   </UISavesContent>;

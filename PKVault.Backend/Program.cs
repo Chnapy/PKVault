@@ -19,7 +19,7 @@ public class Program
         => Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(
                 webBuilder => webBuilder.UseStartup<Startup>());
-    
+
     private static readonly string InitialCurrentDirectory = Directory.GetCurrentDirectory();
 
     public static async Task Main(string[] args)
@@ -148,29 +148,27 @@ public class Program
             var swaggerPath = MatcherUtil.NormalizePath(Path.Combine(InitialCurrentDirectory, "swagger.json"));
             Log.Logger.Debug($"Generate Swagger file to {swaggerPath}");
 
-            try
+            var swaggerHref = $"http://localhost:5000/swagger/v1/swagger.json";
+            using HttpClient http = new();
+            using var response = await http.GetAsync(swaggerHref);
+            var json = await response.Content.ReadAsStringAsync();
+
+            if ((int)response.StatusCode >= 400 || string.IsNullOrWhiteSpace(json))
             {
-                var swaggerHref = $"http://localhost:5000/swagger/v1/swagger.json";
-                using HttpClient http = new();
-                using var response = await http.GetAsync(swaggerHref);
-                var json = await response.Content.ReadAsStringAsync();
-
-                var oldJson = await File.ReadAllTextAsync(swaggerPath);
-
-                if (json != oldJson)
-                {
-                    Log.Logger.Debug($"Swagger content changed.");
-                    await File.WriteAllTextAsync(swaggerPath, json);
-                    Log.Logger.Debug($"Swagger file generated: {swaggerPath}");
-                }
-                else
-                {
-                    Log.Logger.Debug($"Swagger didn't change, generation aborted.");
-                }
+                throw new Exception($"Wrong swagger response (code={response.StatusCode})");
             }
-            catch (Exception ex)
+
+            var oldJson = await File.ReadAllTextAsync(swaggerPath);
+
+            if (json != oldJson)
             {
-                Log.Logger.Error(ex, $"Generate Swagger file failed.");
+                Log.Logger.Debug($"Swagger content changed.");
+                await File.WriteAllTextAsync(swaggerPath, json);
+                Log.Logger.Debug($"Swagger file generated: {swaggerPath}");
+            }
+            else
+            {
+                Log.Logger.Debug($"Swagger didn't change, generation aborted.");
             }
 #endif
 
@@ -286,6 +284,7 @@ public class Program
             // required by PublishedTrimmed
             .AddJsonOptions(options =>
             {
+                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
                 options.JsonSerializerOptions.TypeInfoResolver = RouteJsonContext.Default;
             });
 
@@ -357,20 +356,65 @@ public class Program
 
 #if DEBUG && MODE_DEFAULT
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerDocument(document =>
+        services.AddOpenApiDocument(document =>
         {
+            document.RequireParametersWithoutDefault = true;
+            document.SchemaSettings.DefaultReferenceTypeNullHandling = NJsonSchema.Generation.ReferenceTypeNullHandling.NotNull;
+
+            // document.SchemaSettings.SchemaProcessors.Add(new AutoRequiredSchemaProcessor());
+            // document.SchemaSettings.SchemaProcessors.Add(new EnumDuplicatesSchemaProcessor());
             document.PostProcess = doc =>
             {
+                // Add required: [], with values
+                // Remove nullable: true, nullable values being now optional (undefined in frontend)
+                static void AddRequiredArrayAndRemoveNullable(NJsonSchema.JsonSchema schema)
+                {
+                    if (schema.Properties != null && schema.Properties.Count > 0)
+                    {
+                        var nonNullableProperties = schema.Properties
+                            .Where(pair => !pair.Value.IsNullable(NJsonSchema.SchemaType.OpenApi3))
+                            .Select(pair => pair.Key);
+
+                        var nullableProperties = schema.Properties
+                            .Where(pair => pair.Value.IsNullable(NJsonSchema.SchemaType.OpenApi3));
+
+                        foreach (var p in nonNullableProperties)
+                        {
+                            if (!schema.RequiredProperties.Contains(p))
+                                schema.RequiredProperties.Add(p);
+                        }
+
+                        foreach (var p in nullableProperties)
+                        {
+                            p.Value.IsNullableRaw = null;
+                        }
+                    }
+
+                    foreach (var s in schema.AllOf)
+                    {
+                        AddRequiredArrayAndRemoveNullable(s);
+                    }
+                }
+
                 doc.Info.Title = "PKVault API";
 
-                // Required for PKHeX.Core.Gender which has duplicates
-                foreach (var enumSchema in doc.Definitions.Values.Where(s => s.IsEnumeration))
+                foreach (var schema in doc.Definitions.Values)
                 {
-                    var distinctValues = enumSchema.Enumeration.Distinct().ToList();
-                    enumSchema.Enumeration.Clear();
-                    foreach (var value in distinctValues)
+                    AddRequiredArrayAndRemoveNullable(schema);
+
+                    // Dedupe enum values
+                    // Required for PKHeX.Core.Gender which has duplicates
+                    if (schema.IsEnumeration)
                     {
-                        enumSchema.Enumeration.Add(value);
+                        var distinctValues = schema.Enumeration.Distinct().ToArray();
+                        if (distinctValues.Length == schema.Enumeration.Count)
+                            continue;
+
+                        schema.Enumeration.Clear();
+                        foreach (var value in distinctValues)
+                        {
+                            schema.Enumeration.Add(value);
+                        }
                     }
                 }
             };

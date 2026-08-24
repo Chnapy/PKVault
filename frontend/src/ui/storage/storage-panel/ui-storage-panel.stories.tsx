@@ -110,7 +110,7 @@ export const Primary: Story = {
                 { id: 'x3', imgSrc: gameXImg, label: 'Pokemon X' },
             ]}
             onChange={console.log}
-            onCreate={console.log}
+            createActions={null}
             sortValue='1'
             sortData={[
                 {
@@ -220,7 +220,7 @@ export const EmptyData: Story = {
                 { id: 'pkvault', imgSrc: '/logo.svg', label: 'PKVault' },
             ]}
             onChange={console.log}
-            onCreate={console.log}
+            createActions={null}
             sortValue='1'
             sortData={[
                 {
