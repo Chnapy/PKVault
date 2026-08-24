@@ -1,6 +1,6 @@
 # 0 - Technical considerations
 
-PKVault runs on Windows & Linux for its desktop version. A Steamdeck version exists (flatpak).
+PKVault runs on Windows, Linux & macOS for its desktop version. A Steamdeck version exists (flatpak).
 
 Like PKHeX, PKVault depends on .NET 10 to run. Since the application is multi-platform and based on web technologies, PKVault also depends on web controls depending on current OS:
 
@@ -19,6 +19,8 @@ On Linux, folder used is one of:
 
 - `/home/$USER/Documents/pkvault`
 - `/home/$USER/.var/app/io.github.chnapy.pkvault/data` - expected with flatpak file
+
+On macOS, folder used is `/Users/$USER/Documents/pkvault`.
 
 You will find the following files:
 
