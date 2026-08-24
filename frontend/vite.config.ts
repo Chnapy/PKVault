@@ -5,6 +5,7 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { defineConfig } from "vite";
 import { patchCssModules } from 'vite-css-modules';
+import devtoolsJson from 'vite-plugin-devtools-json';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import svgr from "vite-plugin-svgr";
 import { prepareDocs } from './src/help/prepare-docs';
@@ -25,6 +26,7 @@ export default defineConfig({
       generateSourceTypes: true,
       declarationMap: true
     }),
+    devtoolsJson(),
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,

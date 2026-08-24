@@ -29,14 +29,14 @@ export const useCheckUpdate = (): string | undefined => {
     const updateQuery = useQuery({
         queryKey: [ 'check-update' ],
         queryFn: () => fetch('https://api.github.com/repos/chnapy/PKVault/releases/latest')
-            .then<{
+            .then<Partial<{
                 name: string;
                 draft: boolean;
                 prerelease: boolean;
-            }>(res => res.json()),
+            }> | undefined>(res => res.json()),
     });
 
-    if (!updateQuery.data || !settingsQuery.data) {
+    if (!updateQuery.data?.name || !settingsQuery.data) {
         return;
     }
 

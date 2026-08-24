@@ -314,7 +314,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             }
             catch (Exception ex)
             {
-                Log.Error(ex.ToString());
+                Log.Error(ex, "Exception during is-steamdeck check");
             }
 
             try
@@ -325,7 +325,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             }
             catch (Exception ex)
             {
-                Log.Error(ex.ToString());
+                Log.Error(ex, "Exception during is-steamdeck hostname check");
             }
 
             return false;

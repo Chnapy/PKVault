@@ -44,8 +44,7 @@ public class PkmLegalityService(ISettingsService settingsService, ILegalityAnaly
         }
         catch (Exception ex)
         {
-            Log.Error($"ValidityReport exception, id={id}");
-            Log.Error(ex.ToString());
+            Log.Error(ex, $"Exception during ValidityReport, id={id}");
             ValidityReport = ex.ToString();
         }
 
