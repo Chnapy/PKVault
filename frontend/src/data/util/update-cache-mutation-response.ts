@@ -222,10 +222,12 @@ const applyDex = function (client: QueryClient, responseData: DataDTOState) {
 
         const oldData = oldResponse?.data ?? {};
 
-        return Object.values({
-            ...oldData,
-            ...responseData.data,
-        }).filter(filterIsDefined);
+        return Object.fromEntries(
+            Object.entries({
+                ...oldData,
+                ...responseData.data,
+            }).filter(([ species ]) => filterIsDefined(species))
+        );
     };
 
     client.setQueryData(queryKey, {
