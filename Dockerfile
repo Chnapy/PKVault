@@ -114,6 +114,46 @@ RUN if [ "$(echo $RID | grep -o 'win-x64')" ]; then \
   echo "=== Skip AppImage (non-linux-x64: $RID) ==="; \
   fi
 
+# desktop macOS - .app bundle (dotnet cross-compiles, no real Mac required)
+FROM desktop-publish AS desktop-publish-macos-app
+
+ARG VERSION
+ENV VERSION=${VERSION}
+
+COPY ./PKVault.Desktop/publishers/common ./PKVault.Desktop/publishers/common
+COPY ./PKVault.Desktop/publishers/macos ./PKVault.Desktop/publishers/macos
+
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends \
+  python3 python3-pip zip curl && \
+  pip3 install --break-system-packages icnsutil && \
+  apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+
+# rcodesign: cross-platform codesign, required for ad-hoc signing on Apple Silicon
+# https://github.com/indygreg/apple-platform-rs
+ARG APPLE_CODESIGN_VERSION=0.29.0
+RUN ARCH=$(dpkg --print-architecture) && \
+  case "$ARCH" in \
+  amd64) RCODESIGN_TARGET=x86_64-unknown-linux-musl ;; \
+  arm64) RCODESIGN_TARGET=aarch64-unknown-linux-musl ;; \
+  *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
+  esac && \
+  curl -sL -o /tmp/apple-codesign.tar.gz \
+  https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign/${APPLE_CODESIGN_VERSION}/apple-codesign-${APPLE_CODESIGN_VERSION}-${RCODESIGN_TARGET}.tar.gz && \
+  tar -xzf /tmp/apple-codesign.tar.gz -C /tmp && \
+  mv /tmp/apple-codesign-${APPLE_CODESIGN_VERSION}-${RCODESIGN_TARGET}/rcodesign /usr/local/bin/rcodesign && \
+  rm -rf /tmp/apple-codesign.tar.gz /tmp/apple-codesign-${APPLE_CODESIGN_VERSION}-${RCODESIGN_TARGET} && \
+  rcodesign --version
+
+RUN mkdir -p /app/publish-final
+
+WORKDIR /src/PKVault.Desktop/publishers/macos
+
+RUN chmod +x build-app.sh && \
+  ./build-app.sh ${RID} ${VERSION} /app/publish /app/publish-final-app && \
+  cd /app/publish-final-app && \
+  zip -r -y /app/publish-final/pkvault-${VERSION}-${RID}.app.zip PKVault.app
+
 FROM desktop-publish AS desktop-publish-linux-base
 
 COPY ./PKVault.Desktop/publishers/common ./PKVault.Desktop/publishers/common
@@ -171,6 +211,12 @@ RUN chmod +x build-flatpak.sh && \
 FROM alpine:latest AS desktop
 
 COPY --from=desktop-publish /app/publish-final /app
+
+RUN ls -la /app
+
+FROM alpine:latest AS desktop-macos
+
+COPY --from=desktop-publish-macos-app /app/publish-final /app
 
 RUN ls -la /app
 
