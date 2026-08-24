@@ -20,7 +20,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 {
     public static readonly string FilePath = MatcherUtil.NormalizePath(Path.Combine(GetAppDirectory(), "./config/pkvault.json"));
     public static readonly string DefaultLanguage = "en";
-    public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr", "de", "pt-br"]; //GameLanguage.AllSupportedLanguages.ToArray();
+    public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr", "de", "pt-br", "zh-hant"]; //GameLanguage.AllSupportedLanguages.ToArray();
     private static readonly SemaphoreSlim semaphore = new(1);
 
     // public static string[] ProgramArgs = [];
