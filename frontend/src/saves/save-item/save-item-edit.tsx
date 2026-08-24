@@ -14,6 +14,7 @@ import { UIPopoverCard } from '../../ui/popover/popover-card/ui-popover-card';
 import { UIConfirmPopover } from '../../ui/popover/ui-confirm-popover';
 import { UIGameImg } from '../../ui/sprite-img/ui-game-img';
 import { UIGameExpanded } from '../../ui/storage/storage-panel/game-list/ui-game-expanded';
+import { gameExpandedConstants } from '../../ui/storage/storage-panel/game-list/util/game-expanded-constants';
 
 export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
     const { t } = useTranslate();
@@ -53,7 +54,7 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
                     size='md'
                 />
 
-                {!settings?.canUpdateSettings && <Alert variant='outline' color='blue' icon={<PenOffIcon />} maw={288} py='sm'>
+                {!settings?.canUpdateSettings && <Alert variant='outline' color='blue' icon={<PenOffIcon />} maw={gameExpandedConstants.width} py='sm'>
                     {t('action.edit-not-possible')}
                 </Alert>}
 

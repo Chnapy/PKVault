@@ -10,7 +10,7 @@ import { useStaticData } from '../hooks/use-static-data';
 import { getGameInfos } from '../pokedex/details/util/get-game-infos';
 import { Route } from '../routes/saves';
 import { SavesUploadButton } from '../saves/saves-upload-popover/saves-upload-button';
-import { useDesktopMessage } from '../settings/globs-input/hooks/use-desktop-message';
+import { isDesktop, useDesktopMessage } from '../settings/globs-input/hooks/use-desktop-message';
 import { GameExpanded } from '../storage/panel/game-list/game-expanded';
 import { useTranslate } from '../translate/i18n';
 import { UIButton } from '../ui/form/button/ui-button';
@@ -155,21 +155,45 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
 
       <Card.Section inheritPadding withBorder py='inherit'>
         <Group justify='center' wrap='nowrap'>
-          <UIButton
-            name='add-game-path'
-            controlLabel={t('saves.action.add-path')}
-            onClick={() => navigate({
-              to: '/settings'
-            })}
-            // size='xl'
-            leftSection={<FolderSearchIcon />}
-            variant='filled'
-            color='blue'
-          >
-            {t('saves.action.add-path')}
-          </UIButton>
+          {isDesktop
+            ? <>
+              <UIButton
+                name='add-game-path'
+                controlLabel={t('settings.form.saves.add-path')}
+                onClick={() => navigate({
+                  to: '/settings'
+                })}
+                leftSection={<FolderSearchIcon />}
+                variant='filled'
+                color='blue'
+                p='lg'
+                h='auto'
+              >
+                {t('settings.form.saves.add-path')}
+              </UIButton>
+            </>
+            : <>
+              <UIButton
+                name='add-game-path'
+                controlLabel={t('saves.action.add-path')}
+                onClick={() => navigate({
+                  to: '/settings'
+                })}
+                leftSection={<FolderSearchIcon />}
+                variant='filled'
+                color='blue'
+                p='lg'
+                h='auto'
+              >
+                {t('saves.action.add-path')}
+              </UIButton>
 
-          <SavesUploadButton disabledLabel={t('action.not-possible')} />
+              <SavesUploadButton
+                disabledLabel={t('action.not-possible')}
+                p='lg'
+                h='auto'
+              />
+            </>}
         </Group>
       </Card.Section>
     </Card>
