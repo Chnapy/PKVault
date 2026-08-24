@@ -1,4 +1,8 @@
 
+const invalidFilenameChars = new Set([
+    '"', '<', '>', '|', '\0', ':', '*', '?', '\\', '/'
+]);
+
 export const PathUtil = {
     isDirectory: (path: string) => path.endsWith('/'),
     isGlob: (path: string) => path.includes('*'),
@@ -15,6 +19,8 @@ export const PathUtil = {
         .replaceAll('\\', '/')
         .replaceAll("//", "\\\\")
         .replaceAll("/./", "/"),
+
+    filterFilenameValidChars: (filename: string) => filename.trim().split('').filter(char => !invalidFilenameChars.has(char)).join(''),
 
     // /toto/tata/ -> /toto/
     // /toto/tata -> /toto/

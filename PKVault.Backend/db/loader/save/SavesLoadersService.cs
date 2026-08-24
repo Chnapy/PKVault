@@ -223,7 +223,7 @@ public class SavesLoadersService(
                 return null;
             }
 
-            if (!SaveUtil.TryGetSaveFile(data, out var saveRaw))
+            if (!SaveUtil.TryGetSaveFile((byte[])data.Clone(), out var saveRaw))
                 return null;
 
             saveRaw.Metadata.SetExtraInfo(path);

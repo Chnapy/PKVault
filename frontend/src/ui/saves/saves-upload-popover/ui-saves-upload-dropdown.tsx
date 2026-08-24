@@ -185,6 +185,10 @@ const InnerFileItem: React.FC<{
                 name={name}
                 {...controlProps('open')}
                 {...inputProps}
+                onChange={(e) => {
+                    e.target.value = PathUtil.filterFilenameValidChars(e.target.value);
+                    inputProps.onChange?.(e);
+                }}
                 size='md'
                 w='100%'
                 lh={1}

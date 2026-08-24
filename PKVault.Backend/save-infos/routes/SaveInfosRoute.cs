@@ -78,7 +78,12 @@ public class SaveInfosController(
         {
             var saveFile = saveFiles[i];
             var filename = saveFilesNames[i];
-            ArgumentException.ThrowIfNullOrWhiteSpace(filename);
+
+            if (string.IsNullOrEmpty(filename)
+                || filename.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+            {
+                throw new ArgumentException($"Filename invalid: {filename}");
+            }
 
             byte[] fileBytes;
             using (var ms = new MemoryStream())
