@@ -283,11 +283,6 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 
     public void CopyCommonPropertiesFrom(PKM pkm, PKM pkmSrc, byte generation, PKMRndValues? rndValues)
     {
-        if (pkmSrc.Species > pkm.MaxSpeciesID)
-        {
-            throw new InvalidOperationException($"Species incompatible: {pkmSrc.Species} > {pkm.MaxSpeciesID}");
-        }
-
         pkm.Species = pkmSrc.Species;
         pkm.Gender = pkmSrc.Gender;
         pkm.Form = pkmSrc.Form;

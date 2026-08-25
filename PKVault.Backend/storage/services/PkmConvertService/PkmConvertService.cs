@@ -57,6 +57,11 @@ public class PkmConvertService(ILogger<PkmConvertService> log, ISettingsService 
             throw new Exception($"Convert failed, Species=0");
         }
 
+        if (sourcePkm.Species > result.MaxSpeciesID)
+        {
+            throw new InvalidOperationException($"Species incompatible: {sourcePkm.Species} > {result.MaxSpeciesID}");
+        }
+
         return new(result);
     }
 

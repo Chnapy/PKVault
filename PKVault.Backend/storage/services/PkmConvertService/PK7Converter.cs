@@ -197,6 +197,24 @@ public class PK7Converter(PKMConverterUtils utils)
     {
         byte convertAVToEV(float value) => (byte)(value * EffortValues.Max252 / 200);
 
+        byte[] evs = [
+            convertAVToEV(pb7.AV_HP),
+            convertAVToEV(pb7.AV_ATK),
+            convertAVToEV(pb7.AV_DEF),
+            convertAVToEV(pb7.AV_SPA),
+            convertAVToEV(pb7.AV_SPD),
+            convertAVToEV(pb7.AV_SPE),
+        ];
+
+        var ratio = (float)EffortValues.Max510 / evs.Sum(q => q);
+        if (ratio < 1)
+        {
+            for(var i = 0; i < evs.Length; i++)
+            {
+                evs[i] = (byte)(evs[i] * ratio);
+            }
+        }
+
         var pk7 = new PK7()
         {
             Version = GameVersion.SN,
@@ -207,12 +225,12 @@ public class PK7Converter(PKMConverterUtils utils)
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
 
-            EV_HP = convertAVToEV(pb7.AV_HP),
-            EV_ATK = convertAVToEV(pb7.AV_ATK),
-            EV_DEF = convertAVToEV(pb7.AV_DEF),
-            EV_SPA = convertAVToEV(pb7.AV_SPA),
-            EV_SPD = convertAVToEV(pb7.AV_SPD),
-            EV_SPE = convertAVToEV(pb7.AV_SPE),
+            EV_HP = evs[0],
+            EV_ATK = evs[1],
+            EV_DEF = evs[2],
+            EV_SPA = evs[3],
+            EV_SPD = evs[4],
+            EV_SPE = evs[5],
 
             PokerusState = pb7.PokerusState,
         };
