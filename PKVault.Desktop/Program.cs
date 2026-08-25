@@ -16,7 +16,7 @@ class Program
 {
     private static readonly bool WindowsOS = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
     private static readonly bool LinuxOS = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-    // private static readonly bool MacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+    private static readonly bool MacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
     private static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
     private static readonly string AssemblyStaticPrefix = "PKVault.Desktop.Resources.wwwroot.";
@@ -312,8 +312,9 @@ class Program
                         {
                             var openFolderRequest = JsonSerializer.Deserialize(message, messageJsonContext.OpenFolderRequestMessage);
 
-                            var path = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), openFolderRequest.path))
-                                .Replace('/', '\\');
+                            var normalizedPath = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), openFolderRequest.path));
+
+                            var path = normalizedPath.Replace('/', '\\');
 
                             if (WindowsOS)
                             {
@@ -364,6 +365,21 @@ class Program
                                     };
                                     Process.Start(fallback);
                                 }
+                            }
+                            else if (MacOS)
+                            {
+                                // `open -R` reveals and selects a file/folder in Finder
+                                var arg = $"-R \"{MatcherUtil.NormalizePath(normalizedPath)}\"";
+
+                                var psi = new ProcessStartInfo
+                                {
+                                    FileName = "open",
+                                    Arguments = arg,
+                                    UseShellExecute = false
+                                };
+
+                                Log.Logger.Debug($"RUN open {arg}");
+                                Process.Start(psi);
                             }
                             else
                             {
