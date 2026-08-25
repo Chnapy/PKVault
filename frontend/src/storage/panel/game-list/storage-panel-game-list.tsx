@@ -179,7 +179,7 @@ export const StoragePanelGameList: React.FC = () => {
                         p='sm'
                         w={gameExpandedConstants.width}
                         fullWidth
-                        mih={100}
+                        mih={60}
                         variant='filled'
                         color='blue'
                         styles={{
@@ -205,7 +205,7 @@ export const StoragePanelGameList: React.FC = () => {
                         leftSection={<FolderSearchIcon />}
                         p='sm'
                         w={gameExpandedConstants.width}
-                        mih={100}
+                        mih={60}
                         variant='filled'
                         color='blue'
                         styles={{
@@ -225,7 +225,7 @@ export const StoragePanelGameList: React.FC = () => {
                         disabledLabel={t('action.not-possible')}
                         p='sm'
                         w={gameExpandedConstants.width}
-                        mih={100}
+                        mih={60}
                         styles={{
                             inner: {
                                 flexDirection: 'column',

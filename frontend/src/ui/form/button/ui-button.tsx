@@ -42,7 +42,7 @@ export const UIButton = function <C = 'button'>({
         rest.ref,
     );
 
-    return <WithControlsIcons placement='out' icons={[ controlIcons('open'), ...extraControlIcons ]} display='inline-flex' h='fit-content'
+    return <WithControlsIcons placement='out' icons={[ controlIcons('open'), ...extraControlIcons ]} className={classes.uiButton} display='inline-flex' h='fit-content'
         w={w} miw={miw} mx={mx} ml={ml} mt={mt} style={style}>
         <Button
             component={component as never}
@@ -50,7 +50,7 @@ export const UIButton = function <C = 'button'>({
             {...controlProps('open')}
             {...rest}
             className={clsx(
-                classes.uiButton,
+                classes.button,
                 selected && classes.selected,
                 rest.className,
             )}
