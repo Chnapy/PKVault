@@ -62,6 +62,10 @@ class Program
         if (LinuxOS)
         {
             fileChooser = new LinuxFileChooser();
+
+            // Fix https://github.com/Chnapy/PKVault/issues/190
+            // This variable affects only nvidia-based systems, with small perf impact
+            Environment.SetEnvironmentVariable("__NV_DISABLE_EXPLICIT_SYNC", "1");
         }
 
         try
