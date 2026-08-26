@@ -198,7 +198,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
 
         var speciesData = staticSpecies[species];
         var staticForms = speciesData.Forms[(byte)save.Context];
-        var isBattleOnly = staticForms[form]?.IsBattleOnly ?? false;
+        var isBattleOnly = form < staticForms.Length && staticForms[form].IsBattleOnly;
 
         if (isBattleOnly)
             value = value with

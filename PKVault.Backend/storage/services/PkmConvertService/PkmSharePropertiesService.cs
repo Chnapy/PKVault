@@ -350,6 +350,14 @@ public class PkmSharePropertiesService(ILogger<PkmSharePropertiesService> log, I
             targetPb7b.Stat_CP = targetPb7b.CalcCP;
         }
 
+        var legality = legalityAnalysisService.GetLegalitySafe(new(targetPkm));
+        var args = new RibbonVerifierArguments(
+            legality.la.Info.Entity,
+            legality.la.EncounterMatch,
+            legality.la.Info.EvoChainsAllGens
+        );
+        RibbonApplicator.FixInvalidRibbons(args);
+
         targetPkm.Heal();
         targetPkm.ResetPartyStats();
         targetPkm.RefreshChecksum();

@@ -62,7 +62,7 @@ public class PK4Converter(PKMConverterUtils utils)
     {
         var pk3 = new PK3()
         {
-            Version = GameVersion.S,
+            Version = pk4.Version.Generation <= 3 ? pk4.Version : GameVersion.E,
             MetLocation = 30001,
             MetDate = pk4.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk4.MetLevel,
