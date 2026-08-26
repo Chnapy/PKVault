@@ -105,23 +105,23 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.0/PKVault.Desktop/publishers/flatpak/snaps/snap_storage.png</image>
       <caption>Collection view</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_dark.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.0/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_dark.png</image>
       <caption>Dark mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_details.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.0/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_details.png</image>
       <caption>Pokémon edit</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.2/PKVault.Desktop/publishers/flatpak/snaps/snap_dex.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.0/PKVault.Desktop/publishers/flatpak/snaps/snap_dex.png</image>
       <caption>Pokédex</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.1.2/PKVault.Desktop/publishers/flatpak/snaps/snap_saves.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.0/PKVault.Desktop/publishers/flatpak/snaps/snap_saves.png</image>
       <caption>Saves view</caption>
     </screenshot>
   </screenshots>
@@ -141,6 +141,25 @@
   </developer>
 
   <releases>
+    <release version="2.2.0" date="2026-08-26">
+      <url type="details">https://github.com/Chnapy/PKVault/releases/tag/v2.2.0</url>
+      <description>
+        <ul>
+          <li>Add Traditional Chinese translations.</li>
+          <li>Add saves files duplicates edit panel in saves page.</li>
+          <li>Add saves sort option in saves-select panel.</li>
+          <li>Redesign parts of settings page.</li>
+          <li>Fix crash on some systems with Nvidia GPU.</li>
+          <li>Fix crash because of github timeouts.</li>
+          <li>Fix unselect after multiple releases.</li>
+          <li>Fix multiple variants release.</li>
+          <li>Fix some illegalities post-convert (version, ribbons, EVs).</li>
+          <li>Fix "Species incompatible" error after move action to some saves.</li>
+          <li>Fix Pokédex visual glitch after move action.</li>
+          <li>Fix in fresh-start action to save, appeared on 2.1.2.</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.1.2" date="2026-08-18">
       <url type="details">https://github.com/Chnapy/PKVault/releases/tag/v2.1.2</url>
       <description>
