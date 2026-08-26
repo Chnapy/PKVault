@@ -121,7 +121,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -161,7 +161,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -201,7 +201,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -241,7 +241,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -281,7 +281,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -321,7 +321,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -363,7 +363,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -403,7 +403,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -443,7 +443,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -527,7 +527,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -569,7 +569,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -611,7 +611,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -651,16 +651,17 @@
         ],
         "metLocation": 30001,
         "illegalities": [
+            "PID-PIDTypeMismatch",
             "Encounter-TransferTrackerMissing",
-            "Move-129",
-            "Move-209"
+            "Move-231",
+            "Move-87"
         ]
     },
     "PK9": {
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 1,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -707,7 +708,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 52,
+        "version": 5,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -740,6 +741,6 @@
             23
         ],
         "language": 3,
-        "metLocation": 194
+        "metLocation": 30001
     }
 }

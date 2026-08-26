@@ -108,7 +108,7 @@ public class PK9Converter(PKMConverterUtils utils)
     {
         var pk9 = new PK9()
         {
-            Version = pa9.Version,
+            Version = pa9.Version.Context != EntityContext.Gen9a && pa9.Version.Generation <= 9 ? pa9.Version : GameVersion.VL,
             MetLocation = pa9.MetLocation,
             MetDate = pa9.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pa9.MetLevel,
