@@ -9,6 +9,7 @@ import { useTranslate } from '../../translate/i18n';
 import { UIButton, type UIButtonProps } from '../../ui/form/button/ui-button';
 import { useControlsCurrentType } from '../../ui/interaction/controls/use-controls-current-type';
 import { useDragging } from '../../ui/interaction/move/hooks/use-dragging';
+import { useSelectContextNullable } from '../../ui/interaction/select/context/use-select-context';
 import { UIPokedexIcons } from '../../ui/pokedex/icons/ui-pokedex-icons';
 import { UIConfirmPopover } from '../../ui/popover/ui-confirm-popover';
 import { UIPopover } from '../../ui/popover/ui-popover';
@@ -21,9 +22,10 @@ import { DetailsEdit } from './details-edit';
 type DetailsActionsProps = Pick<UIButtonProps, 'focusOnMount'> & {
     pkmIds: string[];
     saveId: number | null;
+    deleteAllRelatedVariants: boolean;
 };
 
-export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pkmIds, saveId }) => {
+export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pkmIds, saveId, deleteAllRelatedVariants }) => {
     const { t } = useTranslate();
 
     const pkmIndexQuery = usePkmIndex(saveId ?? null,
@@ -75,6 +77,8 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
     const draggingMove = dragging.useDrag();
     // eslint-disable-next-line react-hooks/refs
     const draggingMoveAttached = dragging.useDrag<MoveParams>({ attached: true });
+
+    const selectCtx = useSelectContextNullable();
 
     const attachedVariantIds = attachedVariantIdsQuery.data ?? [];
     const canEditList = pkms.filter(pkm => pkm.canEdit);
@@ -243,10 +247,27 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
                     await mainPkmVariantDeleteMutation.mutateAsync({
                         params: {
                             pkmVariantIds: canReleaseList.map(pkm => pkm.id),
+                            deleteAllRelatedVariants,
                         },
                     });
                 }
-                // unselect();
+
+                if (selectCtx) {
+                    const selectState = selectCtx.useSelectStore.getState();
+
+                    if (selectState.container === selectCtx.getContainerHash(container)) {
+                        const ids = new Set(selectState.ids);
+                        canReleaseList.forEach(pkm => {
+                            ids.delete(pkm.id);
+                        });
+
+                        if (ids.size !== selectState.ids.size)
+                            selectCtx?.useSelectStore.setState({
+                                container: ids.size === 0 ? '' : selectState.container,
+                                ids,
+                            });
+                    }
+                }
             }}
         >
             <UIButton

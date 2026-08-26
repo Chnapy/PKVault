@@ -212,6 +212,15 @@
               }
             },
             "x-position": 1
+          },
+          {
+            "name": "deleteAllRelatedVariants",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            },
+            "x-position": 2
           }
         ],
         "responses": {

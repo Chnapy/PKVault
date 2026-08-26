@@ -152,9 +152,9 @@ public class StorageController(DataService dataService, StorageQueryService stor
     }
 
     [HttpDelete("main/pkm-version")]
-    public async Task<ActionResult<DataDTO>> MainDeletePkmVariant([FromQuery] string[] pkmVariantIds)
+    public async Task<ActionResult<DataDTO>> MainDeletePkmVariant([FromQuery] string[] pkmVariantIds, bool deleteAllRelatedVariants)
     {
-        var flags = await actionService.MainPkmVariantsDelete(pkmVariantIds);
+        var flags = await actionService.MainPkmVariantsDelete(pkmVariantIds, deleteAllRelatedVariants);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
