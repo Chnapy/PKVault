@@ -6,6 +6,8 @@ public class PK4Converter(PKMConverterUtils utils)
     public PK5 ConvertToPK5Fixed(PK4 pk4, PKMRndValues? rndValues)
     {
         var pk5 = pk4.ConvertToPK5();
+        if (rndValues != null)
+            pk5.PID = rndValues.PID;
 
         utils.FixMetLocation(pk5, [
             GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
