@@ -44,6 +44,7 @@ export const StorageDetails: React.FC = withErrorCatcher('default', () => {
       focusOnMount
       pkmIds={[ selectedId ]}
       saveId={selectedSaveId ?? null}
+      deleteAllRelatedVariants={false}
     />}
     onExpand={toggleExpanded}
     onClose={unselect}

@@ -1,4 +1,4 @@
-public record DeletePkmVariantActionInput(string[] pkmVariantIds);
+public record DeletePkmVariantActionInput(string[] pkmVariantIds, bool deleteAllRelatedVariants);
 
 public class DeletePkmVariantAction(
     IPkmVariantLoader pkmVariantLoader
@@ -13,32 +13,43 @@ public class DeletePkmVariantAction(
 
         async Task<DataActionPayload> act(string pkmVariantId)
         {
-            var pkmVariant = await pkmVariantLoader.GetEntity(pkmVariantId);
-            var dto = await pkmVariantLoader.CreateDTO(pkmVariant);
+            var defaultPkmVariant = await pkmVariantLoader.GetEntity(pkmVariantId);
+            PkmVariantEntity[] pkmVariantList = input.deleteAllRelatedVariants
+                ? (await pkmVariantLoader.GetEntitiesByBox(defaultPkmVariant.BoxId)).TryGetValue(defaultPkmVariant.BoxSlot, out var dict) ? [.. dict.Values] : []
+                : [defaultPkmVariant];
 
-            if (!dto.CanDelete)
+            var cannotDeleteIds = (await Task.WhenAll(pkmVariantList.Select(pkmVariantLoader.CreateDTO)))
+                .Where(variant => !variant.CanDelete)
+                .Select(variant => variant.Id);
+
+            if (cannotDeleteIds.Any())
             {
-                throw new ArgumentException($"PkmVariant cannot be released: {pkmVariant.Id}");
+                throw new ArgumentException($"PkmVariants cannot be released: {string.Join(',', cannotDeleteIds)}");
             }
 
-            var pkm = await pkmVariantLoader.GetPKM(pkmVariant);
+            var defaultPkm = await pkmVariantLoader.GetPKM(defaultPkmVariant);
 
-            await pkmVariantLoader.DeleteEntity(pkmVariant);
-
-            if (pkmVariant.IsMain)
+            foreach (var variant in pkmVariantList)
             {
-                var versions = await pkmVariantLoader.GetEntitiesByBox(pkmVariant.BoxId, pkmVariant.BoxSlot);
-                if (versions.Count > 0)
+                var pkm = await pkmVariantLoader.GetPKM(variant);
+
+                await pkmVariantLoader.DeleteEntity(variant);
+
+                if (variant.IsMain)
                 {
-                    var newMainVersion = versions.First().Value;
-                    newMainVersion.IsMain = true;
-                    await pkmVariantLoader.UpdateEntity(newMainVersion);
+                    var versions = await pkmVariantLoader.GetEntitiesByBox(variant.BoxId, variant.BoxSlot);
+                    if (versions.Count > 0)
+                    {
+                        var newMainVersion = versions.First().Value;
+                        newMainVersion.IsMain = true;
+                        await pkmVariantLoader.UpdateEntity(newMainVersion);
+                    }
                 }
             }
 
             return new(
                 type: DataActionType.DELETE_PKM_VERSION,
-                parameters: [pkm.Nickname, pkmVariant.Context, pkm.Species]
+                parameters: [defaultPkm.Nickname, defaultPkmVariant.Context, defaultPkm.Species]
             );
         }
 

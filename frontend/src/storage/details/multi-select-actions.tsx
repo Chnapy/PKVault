@@ -109,6 +109,7 @@ export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) 
                 <DetailsActions
                     pkmIds={[ ...multiSelectIds ]}
                     saveId={saveId ?? null}
+                    deleteAllRelatedVariants
                 />
             </Card.Section>}
         </Card>

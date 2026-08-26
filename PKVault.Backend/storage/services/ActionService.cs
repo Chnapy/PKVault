@@ -179,14 +179,14 @@ public class ActionService(
         );
     }
 
-    public async Task<DataUpdateFlags> MainPkmVariantsDelete(string[] pkmVariantIds)
+    public async Task<DataUpdateFlags> MainPkmVariantsDelete(string[] pkmVariantIds, bool deleteAllRelatedVariants)
     {
         using var scope = sp.CreateScope();
 
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<DeletePkmVariantAction>(),
-            new(pkmVariantIds)
+            new(pkmVariantIds, deleteAllRelatedVariants)
         );
     }
 
