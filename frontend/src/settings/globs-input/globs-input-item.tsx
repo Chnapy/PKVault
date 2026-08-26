@@ -95,7 +95,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
 
                         onChange(newValue);
                     }}
-                    disabled={isExclude}
+                    disabled={isExclude || disabled}
                     pkvaultPath={pkvaultPath ?? ''}
                     uploadPath={uploadPath ?? ''}
                 />;
