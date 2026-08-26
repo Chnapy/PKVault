@@ -8,9 +8,10 @@ public class PK7Converter(PKMConverterUtils utils)
         var pk8 = new PK8()
         {
             Version = pk7.Version,
-            MetLocation = 30001,
+            MetLocation = pk7.MetLocation,
             MetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk7.MetLevel,
+            Ability = pk7.Ability,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
@@ -77,6 +78,7 @@ public class PK7Converter(PKMConverterUtils utils)
             MetLocation = Locations.GO7,
             MetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk7.CurrentLevel,
+            Ability = pk7.Ability,
 
             ReceivedDate = EncounterDate.GetDateSwitch(),
 
@@ -151,9 +153,10 @@ public class PK7Converter(PKMConverterUtils utils)
         var pk6 = new PK6()
         {
             Version = pk7.Version.Generation <= 6 ? pk7.Version : GameVersion.X,
-            MetLocation = 30001,
+            MetLocation = pk7.Version.Generation <= 6 ? pk7.MetLocation : (ushort)30001,
             MetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk7.MetLevel,
+            Ability = pk7.Ability,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
@@ -221,6 +224,7 @@ public class PK7Converter(PKMConverterUtils utils)
             MetLocation = 30001,
             MetDate = pb7.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pb7.MetLevel,
+            Ability = pb7.Ability,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),

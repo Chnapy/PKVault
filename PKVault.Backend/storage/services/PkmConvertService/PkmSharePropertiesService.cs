@@ -67,7 +67,6 @@ public class PkmSharePropertiesService(ILogger<PkmSharePropertiesService> log, I
             }
 
             targetPkm.Ability = resultPkm.Ability;
-            targetPkm.AbilityNumber = resultPkm.AbilityNumber;
         }
 
         targetPkm.Language = resultPkm.Language;

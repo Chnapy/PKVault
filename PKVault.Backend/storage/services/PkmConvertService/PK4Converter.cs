@@ -63,9 +63,10 @@ public class PK4Converter(PKMConverterUtils utils)
         var pk3 = new PK3()
         {
             Version = pk4.Version.Generation <= 3 ? pk4.Version : GameVersion.E,
-            MetLocation = 30001,
+            MetLocation = pk4.Version.Generation <= 3 ? pk4.MetLocation : (ushort)30001,
             MetDate = pk4.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk4.MetLevel,
+            Ability = pk4.Ability,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),

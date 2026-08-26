@@ -2,6 +2,6 @@
 
 HERE="$(dirname "$(readlink -f "$0")")"
 
-__NV_DISABLE_EXPLICIT_SYNC=1
+export __NV_DISABLE_EXPLICIT_SYNC=1
 
 exec "$HERE/usr/bin/pkvault" "$@"
