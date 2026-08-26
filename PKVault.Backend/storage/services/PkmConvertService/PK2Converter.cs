@@ -28,7 +28,7 @@ public class PK2Converter(PKMConverterUtils utils)
             MetDate = pk2.MetDate,
             MetLevel = 0,
 
-            Version = GameVersion.S,
+            Version = GameVersion.LG,
             Gender = pk2.Gender,
             Form = pk2.Form,
 

@@ -73,7 +73,7 @@ public class PK7Converter(PKMConverterUtils utils)
             DirtType = 0, // Clears old FormArgumentRemain byte
             DirtLocation = 0, // Clears old FormArgumentElapsed byte
 
-            Version = GameVersion.GO,
+            Version = pk7.Version.Context == EntityContext.Gen7b ? pk7.Version : GameVersion.GO,
             MetLocation = Locations.GO7,
             MetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk7.CurrentLevel,
@@ -150,7 +150,7 @@ public class PK7Converter(PKMConverterUtils utils)
     {
         var pk6 = new PK6()
         {
-            Version = GameVersion.X,
+            Version = pk7.Version.Generation <= 6 ? pk7.Version : GameVersion.X,
             MetLocation = 30001,
             MetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk7.MetLevel,
@@ -209,7 +209,7 @@ public class PK7Converter(PKMConverterUtils utils)
         var ratio = (float)EffortValues.Max510 / evs.Sum(q => q);
         if (ratio < 1)
         {
-            for(var i = 0; i < evs.Length; i++)
+            for (var i = 0; i < evs.Length; i++)
             {
                 evs[i] = (byte)(evs[i] * ratio);
             }
@@ -217,7 +217,7 @@ public class PK7Converter(PKMConverterUtils utils)
 
         var pk7 = new PK7()
         {
-            Version = GameVersion.SN,
+            Version = pb7.Version.Context != EntityContext.Gen7b && pb7.Version.Generation <= 7 ? pb7.Version : GameVersion.SN,
             MetLocation = 30001,
             MetDate = pb7.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pb7.MetLevel,

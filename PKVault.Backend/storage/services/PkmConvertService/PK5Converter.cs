@@ -31,7 +31,7 @@ public class PK5Converter(PKMConverterUtils utils)
     {
         var pk4 = new PK4()
         {
-            Version = GameVersion.D,
+            Version = pk5.Version.Generation <= 4 ? pk5.Version : GameVersion.D,
             MetLocation = 30001,
             MetDate = pk5.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk5.MetLevel,

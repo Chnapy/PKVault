@@ -61,7 +61,7 @@ public class PK3Converter(PKMConverterUtils utils)
     {
         var pk2 = new PK2()
         {
-            Version = GameVersion.C,
+            Version = pk3.Version.Generation <= 2 ? pk3.Version : GameVersion.C,
             EncryptionConstant = rndValues?.EncryptionConstant ?? Util.Rand.Rand32(),
             Species = pk3.Species,
             TID16 = pk3.TID16,

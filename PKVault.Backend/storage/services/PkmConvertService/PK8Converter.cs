@@ -181,7 +181,7 @@ public class PK8Converter(PKMConverterUtils utils)
     {
         var pk7 = new PK7()
         {
-            Version = GameVersion.SN,
+            Version = pk8.Version.Generation <= 7 ? pk8.Version : GameVersion.SN,
             MetLocation = 30001,
             MetDate = pk8.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk8.MetLevel,
@@ -229,7 +229,7 @@ public class PK8Converter(PKMConverterUtils utils)
     {
         var pk8 = new PK8()
         {
-            Version = GameVersion.SW,
+            Version = pb8.Version,
             MetLocation = 30001,
             MetDate = pb8.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pb8.MetLevel,
@@ -279,7 +279,7 @@ public class PK8Converter(PKMConverterUtils utils)
     {
         var pk8 = new PK8()
         {
-            Version = GameVersion.SW,
+            Version = pa8.Version,
             MetLocation = 30001,
             MetDate = pa8.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pa8.MetLevel,

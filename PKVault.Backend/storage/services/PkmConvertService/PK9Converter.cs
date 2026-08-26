@@ -7,7 +7,7 @@ public class PK9Converter(PKMConverterUtils utils)
     {
         var pa9 = new PA9()
         {
-            Version = GameVersion.ZA,
+            Version = pk9.Version,
             // MetLocation = pk9.MetLocation,
             MetDate = pk9.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk9.MetLevel,
@@ -58,7 +58,7 @@ public class PK9Converter(PKMConverterUtils utils)
     {
         var pk8 = new PK8()
         {
-            Version = GameVersion.SW,
+            Version = pk9.Version.Generation <= 8 ? pk9.Version : GameVersion.SW,
             MetLocation = 30001,
             MetDate = pk9.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk9.MetLevel,
@@ -108,7 +108,7 @@ public class PK9Converter(PKMConverterUtils utils)
     {
         var pk9 = new PK9()
         {
-            Version = GameVersion.SL,
+            Version = pa9.Version.Context != EntityContext.Gen9a && pa9.Version.Generation <= 9 ? pa9.Version : GameVersion.VL,
             MetLocation = pa9.MetLocation,
             MetDate = pa9.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pa9.MetLevel,
