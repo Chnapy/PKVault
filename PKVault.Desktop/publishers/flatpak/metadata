@@ -9,3 +9,4 @@ shared=ipc;network;
 sockets=fallback-x11;wayland;
 devices=all;
 filesystems=~/.var/app/org.chnapy.pkvault:ro;
+env=__NV_DISABLE_EXPLICIT_SYNC=1;
