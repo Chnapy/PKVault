@@ -1,8 +1,8 @@
 @font-face {
   font-family: "Pixel Operator";
   src:
-    url("regular/pixel-operator-regular.woff") format("woff"),
-    url("regular/pixel-operator-regular.woff2") format("woff2");
+    url("regular/pixel-operator-regular.woff2") format("woff2"),
+    url("regular/pixel-operator-regular.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -12,8 +12,8 @@
 @font-face {
   font-family: "Pixel Operator";
   src:
-    url("bold/pixel-operator-bold.woff") format("woff"),
-    url("bold/pixel-operator-bold.woff2") format("woff2");
+    url("bold/pixel-operator-bold.woff2") format("woff2"),
+    url("bold/pixel-operator-bold.woff") format("woff");
   font-weight: bold;
   font-style: normal;
   font-display: swap;
@@ -23,8 +23,8 @@
 @font-face {
   font-family: "Pixel Operator";
   src:
-    url("half-bold/pixel-operator-hb.woff") format("woff"),
-    url("half-bold/pixel-operator-hb.woff2") format("woff2");
+    url("half-bold/pixel-operator-hb.woff2") format("woff2"),
+    url("half-bold/pixel-operator-hb.woff") format("woff");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
