@@ -145,31 +145,39 @@ public class Program
         {
 #if DEBUG && MODE_DEFAULT
 
-            var swaggerPath = MatcherUtil.NormalizePath(Path.Combine(InitialCurrentDirectory, "swagger.json"));
-            Log.Logger.Debug($"Generate Swagger file to {swaggerPath}");
-
-            var swaggerHref = $"http://localhost:5000/swagger/v1/swagger.json";
-            using HttpClient http = new();
-            using var response = await http.GetAsync(swaggerHref);
-            var json = await response.Content.ReadAsStringAsync();
-
-            if ((int)response.StatusCode >= 400 || string.IsNullOrWhiteSpace(json))
+            try
             {
-                throw new Exception($"Wrong swagger response (code={response.StatusCode})");
+                var swaggerPath = MatcherUtil.NormalizePath(Path.Combine(InitialCurrentDirectory, "swagger.json"));
+                Log.Logger.Debug($"Generate Swagger file to {swaggerPath}");
+
+                var swaggerHref = $"http://localhost:5000/swagger/v1/swagger.json";
+                using HttpClient http = new();
+                using var response = await http.GetAsync(swaggerHref);
+                var json = await response.Content.ReadAsStringAsync();
+
+                if ((int)response.StatusCode >= 400 || string.IsNullOrWhiteSpace(json))
+                {
+                    throw new Exception($"Wrong swagger response (code={response.StatusCode})");
+                }
+
+                var oldJson = await File.ReadAllTextAsync(swaggerPath);
+
+                if (json != oldJson)
+                {
+                    Log.Logger.Debug($"Swagger content changed.");
+                    await File.WriteAllTextAsync(swaggerPath, json);
+                    Log.Logger.Debug($"Swagger file generated: {swaggerPath}");
+                }
+                else
+                {
+                    Log.Logger.Debug($"Swagger didn't change, generation aborted.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, $"Error during swagger generation (non-blocking)");
             }
 
-            var oldJson = await File.ReadAllTextAsync(swaggerPath);
-
-            if (json != oldJson)
-            {
-                Log.Logger.Debug($"Swagger content changed.");
-                await File.WriteAllTextAsync(swaggerPath, json);
-                Log.Logger.Debug($"Swagger file generated: {swaggerPath}");
-            }
-            else
-            {
-                Log.Logger.Debug($"Swagger didn't change, generation aborted.");
-            }
 #endif
 
             await host.Services.GetRequiredService<ISessionServiceMinimal>().EnsureSessionCreated();
