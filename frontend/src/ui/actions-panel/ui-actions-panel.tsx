@@ -172,6 +172,7 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
                 leftSection={<SaveIcon />}
                 onClick={onSaveAndClose}
                 disabled={!onSaveAndClose || !hasActions}
+                noLabelMobileScreen
             >
                 {t('action.save')}
             </UIButton>

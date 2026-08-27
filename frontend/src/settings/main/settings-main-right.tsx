@@ -18,7 +18,7 @@ export const SettingsMainRight: React.FC = () => {
 
     const [ saveGlobs ] = useWatch({ control: form.control, name: [ 'savE_GLOBS' ] });
 
-    return <Card style={{ overflow: 'auto' }}>
+    return <Card>
         <GlobsInputList
             labelList={t('settings.form.saves')}
             labelAddFile={t('settings.form.saves.add-file')}

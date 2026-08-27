@@ -154,7 +154,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
       })}
 
       <Card.Section inheritPadding withBorder py='inherit'>
-        <Group justify='center' wrap='nowrap'>
+        <Group justify='center'>
           {isDesktop
             ? <>
               <UIButton

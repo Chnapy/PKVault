@@ -1,3 +1,4 @@
+import { useMatches } from '@mantine/core';
 import type React from 'react';
 import { PopoverWithControls, type PopoverWithControlsProps } from '../../interaction/focus-controls/components/popover/popover-with-controls';
 
@@ -8,13 +9,25 @@ export type UIStoragePanelWrapperDetailsProps = Pick<PopoverWithControlsProps, '
     children: React.ReactElement;
 };
 
+const detailsWidth = 300;
+
 export const UIStoragePanelWrapperDetails: React.FC<UIStoragePanelWrapperDetailsProps> = ({ opened, setOpened, position, expanded, seeThrough = false, details, children }) => {
+
+    const responsiveProps = useMatches<Pick<PopoverWithControlsProps, 'offset' | 'middlewares'>>({
+        base: {
+            offset: -detailsWidth,
+            middlewares: { flip: false, shift: false },
+        },
+        sm: {},
+    });
+
     return <PopoverWithControls
+        {...responsiveProps}
         opened={opened}
         setOpened={setOpened}
         target={children}
         dropdown={details}
-        width={expanded ? 'target' : 300}
+        width={expanded ? 'target' : detailsWidth}
         dropdownProps={{
             style: seeThrough
                 ? {

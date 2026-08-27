@@ -75,6 +75,7 @@ export const Header: React.FC = () => {
                     onClick={() => savesScanMutation.mutateAsync()}
                     loading={savesScanMutation.isPending}
                     disabled={!settings?.canScanSaves}
+                    noLabelTabletScreen
                     leftSection={<RefreshCwIcon />}
                     size='compact-xs'
                     fz='sm'
@@ -111,7 +112,7 @@ export const Header: React.FC = () => {
             <NotificationButton />
         </>}
         sub={switchUtil(value, {
-            'storage': () => <Group wrap='nowrap' align='flex-start' gap='sm' style={{ flexGrow: 1 }}>
+            'storage': () => <Group wrap='nowrap' align='flex-start' gap='sm' style={{ flexGrow: 1, overflow: 'hidden' }}>
                 <BankList />
                 <UISpriteSizingButton
                     localStorageKey='storage-sprite-size'

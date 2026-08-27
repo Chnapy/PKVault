@@ -58,7 +58,9 @@
 .ui-header .main {
     flex-grow: 1;
     padding-left: 150px;
-    box-shadow: 0 2px 0 rgb(0 0 0 / 20%), inset rgb(0 0 0 / 20%) -2px 2px 0;
+    box-shadow:
+        0 2px 0 rgb(0 0 0 / 20%),
+        inset rgb(0 0 0 / 20%) -2px 2px 0;
 }
 
 .ui-header .first-line {
@@ -69,8 +71,51 @@
     box-shadow: 0 2px 0 rgb(0 0 0 / 20%);
     white-space: nowrap;
     z-index: 1;
+    overflow-x: auto;
+}
+
+.ui-header .second-line {
+    padding: var(--mantine-spacing-sm);
+    padding-left: em(30px);
+    margin-left: var(--mantine-spacing-md);
+    overflow: hidden;
 }
 
 .ui-header [data-variant="pills"] {
     --tab-hover-color: var(--mantine-color-primary-8);
+}
+
+@media only screen and (max-width: em(1024px)) {
+    .ui-header .left {
+        padding-bottom: 5px;
+        padding-top: 2px;
+        padding-left: var(--mantine-spacing-sm);
+        padding-right: 0;
+    }
+
+    .ui-header .logo {
+        height: 24px;
+        width: 24px;
+    }
+
+    .ui-header .logo-details {
+        display: none;
+    }
+
+    .ui-header .artifact-wrapper {
+        height: auto;
+    }
+
+    .ui-header .main {
+        padding-left: 0;
+    }
+
+    .ui-header .first-line {
+        padding-left: 48px;
+    }
+
+    .ui-header .second-line {
+        padding-left: 0;
+        margin-left: var(--mantine-spacing-sm);
+    }
 }

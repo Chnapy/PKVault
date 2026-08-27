@@ -1,12 +1,12 @@
-import { Card, Group, Slider, Stack, Text, Tooltip } from '@mantine/core';
+import { Card, Group, Slider, Stack, Text, Tooltip, useMatches } from '@mantine/core';
 import { ScalingIcon } from 'lucide-react';
 import React from 'react';
+import { useTranslate } from '../../../../translate/i18n';
 import { switchUtil } from '../../../../util/switch-util';
 import { UIButton, type UIButtonProps } from '../../../form/button/ui-button';
 import { useSpriteSizeLocalStorage, type SpriteSizeLocalStorageKey } from '../../../local-storage/use-storage-size-local-storage';
 import { UIPopover } from '../../../popover/ui-popover';
 import { UICardSectionControl } from '../../../storage/storage-panel/card-section-control/ui-card-section-control';
-import { useTranslate } from '../../../../translate/i18n';
 
 type UISpriteSizingButtonProps = {
     localStorageKey: SpriteSizeLocalStorageKey;
@@ -15,6 +15,11 @@ type UISpriteSizingButtonProps = {
 export const UISpriteSizingButton: React.FC<UISpriteSizingButtonProps> = ({ localStorageKey, ...rest }) => {
     const { t } = useTranslate();
 
+    const hidden = useMatches({
+        base: true,
+        lg: false,
+    });
+
     const [ rawValue ] = useSpriteSizeLocalStorage(localStorageKey);
     const value = rawValue * 100;
 
@@ -22,6 +27,9 @@ export const UISpriteSizingButton: React.FC<UISpriteSizingButtonProps> = ({ loca
         'storage-sprite-size': t('header.sub.sprite-sizing.storage'),
         'pokedex-sprite-size': t('header.sub.sprite-sizing.dex'),
     });
+
+    if (hidden)
+        return null;
 
     return <UIPopover
         dropdown={<DropdownContent
@@ -53,9 +61,9 @@ const DropdownContent: React.FC<Pick<UISpriteSizingButtonProps, 'localStorageKey
     const setValue = (value: number) => React.startTransition(() => setRawValue(value / 100));
 
     const marks = [
-        25,
-        50,
-        75,
+        // 25,
+        // 50,
+        // 75,
         100,
         125,
         150,
@@ -64,7 +72,7 @@ const DropdownContent: React.FC<Pick<UISpriteSizingButtonProps, 'localStorageKey
     ];
 
     return <Card
-        miw={400}
+        miw={300}
         style={{
             position: 'initial',
             overflow: 'initial',
@@ -87,8 +95,8 @@ const DropdownContent: React.FC<Pick<UISpriteSizingButtonProps, 'localStorageKey
                     color="blue"
                     value={value}
                     onChange={setValue}
-                    min={25}
-                    max={200}
+                    min={marks[ 0 ]}
+                    max={marks[ marks.length - 1 ]}
                     marks={marks.map(value => ({
                         value,
                         label: `${value}%`,

@@ -91,7 +91,7 @@ export function UISelect<V extends Primitive>({ name, controlLabel, value, data,
         rightSection={isGamepad && !rest.disabled
             ? focused && getControlIcon('gamepad', [ 'RB' ]) || (rest.rightSection ?? <span />)
             : rest.rightSection}
-        renderOption={({ option, checked }) => <Group style={{ flexGrow: 1 }}>
+        renderOption={({ option, checked }) => <Group wrap='nowrap' style={{ flexGrow: 1 }}>
             {data.find(d => d.value === option.value)?.icon}
             {option.label}
             {checked && <CheckIcon style={{ marginLeft: 'auto' }} />}

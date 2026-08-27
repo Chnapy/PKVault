@@ -46,7 +46,7 @@ export const UIHeader: React.FC<{
                                     className={classes.logo}
                                 />
 
-                                <div>
+                                <div className={classes.logoDetails}>
                                     <Flex gap={12}>
                                         <div className={classes.bubble} style={{ backgroundColor: baseTheme.other.game.red }} />
                                         <div className={classes.bubble} style={{ backgroundColor: baseTheme.other.game.yellow }} />
@@ -74,7 +74,7 @@ export const UIHeader: React.FC<{
                         </Flex>
 
                         <Stack className={classes.main} gap={0} maw='100%'>
-                            <Group className={classes.firstLine} gap='sm' pr='sm'>
+                            <Group className={classes.firstLine} gap='sm' wrap='nowrap' pr='sm'>
                                 {left}
 
                                 <Box ml='auto' />
@@ -83,13 +83,12 @@ export const UIHeader: React.FC<{
                             </Group>
 
                             <Group
-                                ml='md'
-                                p='sm'
-                                pl={30}
+                                className={classes.secondLine}
                                 bg='primary.7'
                                 c='inherit'
                                 miw={0}
                                 align='flex-start'
+                                wrap='nowrap'
                                 gap='sm'
                             >
                                 {sub}

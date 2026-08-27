@@ -47,7 +47,7 @@ export const SettingsAboutRight: React.FC = () => {
 
     const isPending = [ settingsQuery, releasesQuery ].some(q => q.isPending && q.isEnabled);
 
-    return <Card style={{ overflowY: 'scroll' }}>
+    return <Card>
         <Card.Section component={UICardSectionControl} inheritPadding withBorder py='sm'>
             <Group gap='sm'>
                 <ScrollTextIcon />

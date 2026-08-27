@@ -21,15 +21,15 @@ export const UIPokedexMainSectionHeader: React.FC<UIPokedexMainSectionHeaderProp
         {count}
     </Badge>;
 
-    return <Group justify='space-between' py='sm'>
-        <Group>
+    return <Group justify='space-between' py='sm' wrap='nowrap'>
+        <Group wrap='nowrap' style={{ whiteSpace: 'nowrap' }}>
             {generation}
-            {regions.map(region => <Badge key={region} variant='default'>{region}</Badge>)}
+            {regions.map(region => <Badge key={region} variant='default' visibleFrom='sm'>{region}</Badge>)}
             <Divider orientation='vertical' />
             {games}
         </Group>
 
-        <Group pr='md'>
+        <Group pr='md' wrap='nowrap'>
             {renderCount(<UIPokedexIcons.Seen size='sm' />, seenCount)}
             {renderCount(<UIPokedexIcons.Caught size='sm' />, caughtCount)}
             {renderCount(<UIPokedexIcons.Owned size='sm' />, ownedCount)}

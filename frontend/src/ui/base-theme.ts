@@ -164,6 +164,13 @@ export const baseTheme = {
     lg: rem(10),
     xl: rem(20),
   },
+  breakpoints: {
+    xs: '36rem', // rem(576),
+    sm: '48rem', // rem(768),
+    md: '64rem', // rem(1024),
+    lg: '80rem', // rem(1280),
+    xl: '93rem', // rem(1488),
+  },
   other: customTheme,
 } satisfies MantineThemeOverride;
 

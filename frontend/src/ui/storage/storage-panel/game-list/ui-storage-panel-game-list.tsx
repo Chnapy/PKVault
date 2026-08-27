@@ -59,7 +59,7 @@ export const UIStoragePanelGameList: React.FC<UIStoragePanelGameListProps> = ({
                 gap: 10,
             }}>
                 <UIBallIcon />
-                <Text>
+                <Text textWrap='nowrap'>
                     {t('storage.games.title')}
                 </Text>
 

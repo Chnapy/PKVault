@@ -85,7 +85,7 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
             <UIPokedexMainSectionHeader
               generation={t('dex.list.title', { generation })}
               regions={staticData.generations[ generation ]?.regions ?? []}
-              games={versionsForImgs.map((versions, i) => <Group key={i} gap='xs'>
+              games={versionsForImgs.map((versions, i) => <Group key={i} gap='xs' visibleFrom='md'>
                 {versions.map(version => <UIGameImg
                   key={version}
                   version={version}
