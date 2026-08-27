@@ -13,9 +13,11 @@ const detailsWidth = 300;
 
 export const UIStoragePanelWrapperDetails: React.FC<UIStoragePanelWrapperDetailsProps> = ({ opened, setOpened, position, expanded, seeThrough = false, details, children }) => {
 
+    const getPageContentWidth = () => window.innerWidth - 14 * 2;
+
     const responsiveProps = useMatches<Pick<PopoverWithControlsProps, 'offset' | 'middlewares'>>({
         base: {
-            offset: -detailsWidth,
+            offset: expanded ? -getPageContentWidth() : -detailsWidth,
             middlewares: { flip: false, shift: false },
         },
         sm: {},
