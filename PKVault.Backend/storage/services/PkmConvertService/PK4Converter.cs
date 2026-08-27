@@ -6,6 +6,8 @@ public class PK4Converter(PKMConverterUtils utils)
     public PK5 ConvertToPK5Fixed(PK4 pk4, PKMRndValues? rndValues)
     {
         var pk5 = pk4.ConvertToPK5();
+        if (rndValues != null)
+            pk5.PID = rndValues.PID;
 
         utils.FixMetLocation(pk5, [
             GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
@@ -63,9 +65,10 @@ public class PK4Converter(PKMConverterUtils utils)
         var pk3 = new PK3()
         {
             Version = pk4.Version.Generation <= 3 ? pk4.Version : GameVersion.E,
-            MetLocation = 30001,
+            MetLocation = pk4.Version.Generation <= 3 ? pk4.MetLocation : (ushort)30001,
             MetDate = pk4.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk4.MetLevel,
+            Ability = pk4.Ability,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),

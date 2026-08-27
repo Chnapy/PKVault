@@ -11,6 +11,7 @@ public class PK9Converter(PKMConverterUtils utils)
             // MetLocation = pk9.MetLocation,
             MetDate = pk9.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk9.MetLevel,
+            Ability = pk9.Ability,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
@@ -59,9 +60,10 @@ public class PK9Converter(PKMConverterUtils utils)
         var pk8 = new PK8()
         {
             Version = pk9.Version.Generation <= 8 ? pk9.Version : GameVersion.SW,
-            MetLocation = 30001,
+            MetLocation = pk9.Version.Generation <= 8 ? pk9.MetLocation : (ushort)30001,
             MetDate = pk9.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk9.MetLevel,
+            Ability = pk9.Ability,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
@@ -112,6 +114,7 @@ public class PK9Converter(PKMConverterUtils utils)
             MetLocation = pa9.MetLocation,
             MetDate = pa9.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pa9.MetLevel,
+            Ability = pa9.Ability,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),

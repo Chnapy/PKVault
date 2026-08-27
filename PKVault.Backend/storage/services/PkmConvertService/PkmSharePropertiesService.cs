@@ -67,7 +67,6 @@ public class PkmSharePropertiesService(ILogger<PkmSharePropertiesService> log, I
             }
 
             targetPkm.Ability = resultPkm.Ability;
-            targetPkm.AbilityNumber = resultPkm.AbilityNumber;
         }
 
         targetPkm.Language = resultPkm.Language;
@@ -89,8 +88,9 @@ public class PkmSharePropertiesService(ILogger<PkmSharePropertiesService> log, I
         }
 
         targetPkm.IsNicknamed = resultPkm.IsNicknamed;
-        if (!targetPkm.IsNicknamed
-            || targetPkm.MaxStringLengthNickname <= sourcePkm.MaxStringLengthNickname
+        if (!targetPkm.IsNicknamed)
+            targetPkm.ClearNickname();
+        else if (targetPkm.MaxStringLengthNickname <= sourcePkm.MaxStringLengthNickname
             || !targetPkm.Nickname.StartsWith(resultPkm.Nickname))
         {
             targetPkm.Nickname = resultPkm.Nickname;

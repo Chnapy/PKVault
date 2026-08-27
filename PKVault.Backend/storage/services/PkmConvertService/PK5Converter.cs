@@ -32,9 +32,10 @@ public class PK5Converter(PKMConverterUtils utils)
         var pk4 = new PK4()
         {
             Version = pk5.Version.Generation <= 4 ? pk5.Version : GameVersion.D,
-            MetLocation = 30001,
+            MetLocation = pk5.Version.Generation <= 4 ? pk5.MetLocation : (ushort)30001,
             MetDate = pk5.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk5.MetLevel,
+            Ability = pk5.Ability,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
