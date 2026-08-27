@@ -12,6 +12,7 @@ public record SettingsDTO(
     string UserId,
     bool CanUpdateSettings,
     bool CanScanSaves,
+    bool DemoMode,
     SettingsMutableDTO SettingsMutable
 )
 {

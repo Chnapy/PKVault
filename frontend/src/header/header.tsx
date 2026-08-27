@@ -33,6 +33,7 @@ export const Header: React.FC = () => {
     type HeaderValue = typeof value;
 
     return <UIHeader
+        demoMode={settings?.demoMode}
         left={<>
             <UIHeaderItem
                 id={'saves' satisfies HeaderValue}

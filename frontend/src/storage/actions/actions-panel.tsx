@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { useStorageDeleteActions, useStorageGetActions, useStorageSave } from '../../data/sdk/storage/storage.gen';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { UIActionsPanel } from '../../ui/actions-panel/ui-actions-panel';
@@ -9,6 +10,7 @@ import { useActionDescription } from './hooks/use-action-description';
  * Display current session actions, and save button.
  */
 export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
+    const settingsQuery = useSettingsGet();
     const actionsQuery = useStorageGetActions();
     const deleteActionsMutation = useStorageDeleteActions();
     const saveMutation = useStorageSave();
@@ -31,6 +33,8 @@ export const ActionsPanel: React.FC = withErrorCatcher('default', () => {
                 actionIndexToRemoveFrom: index,
             },
         })}
-        onSave={() => saveMutation.mutateAsync()}
+        onSave={settingsQuery.data?.data.demoMode
+            ? undefined
+            : () => saveMutation.mutateAsync()}
     />;
 });

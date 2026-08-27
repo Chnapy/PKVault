@@ -17,10 +17,11 @@ type UIBackupItemProps = {
     filename: string;
     onRestore: () => void;
     onDelete: () => void;
+    disabled?: boolean;
     children: React.ReactNode;
 };
 
-export const UIBackupItem: React.FC<UIBackupItemProps> = ({ order, createdAt, path, filename, onRestore, onDelete, children }) => {
+export const UIBackupItem: React.FC<UIBackupItemProps> = ({ order, createdAt, path, filename, onRestore, onDelete, disabled, children }) => {
     const { t } = useTranslate();
 
     const splitBy_ = filename.split('_');
@@ -36,14 +37,14 @@ export const UIBackupItem: React.FC<UIBackupItemProps> = ({ order, createdAt, pa
         scopeNodeId: `bkp-${order}`,
         order,
         controls: [
-            getSelectControl({
+            !disabled && getSelectControl({
                 label: t('settings.backups.name.edit'),
                 action: () => {
                     if (focused)
                         pushScope(inputScopeId);
                 },
             }),
-            {
+            !disabled && {
                 name: 'restore' as const,
                 label: t('settings.backups.restore'),
                 triggers: {
@@ -58,7 +59,7 @@ export const UIBackupItem: React.FC<UIBackupItemProps> = ({ order, createdAt, pa
                 },
                 spread: false,
             },
-            {
+            !disabled && {
                 name: 'delete' as const,
                 label: t('action.delete'),
                 triggers: {

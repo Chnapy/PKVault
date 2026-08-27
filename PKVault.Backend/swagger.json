@@ -4125,6 +4125,7 @@
           "userId",
           "canUpdateSettings",
           "canScanSaves",
+          "demoMode",
           "settingsMutable",
           "savesUploadsPath"
         ],
@@ -4161,6 +4162,9 @@
             "type": "boolean"
           },
           "canScanSaves": {
+            "type": "boolean"
+          },
+          "demoMode": {
             "type": "boolean"
           },
           "settingsMutable": {

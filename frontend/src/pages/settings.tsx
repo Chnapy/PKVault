@@ -118,7 +118,7 @@ export const SettingsPage: React.FC = withErrorCatcher('default', () => {
                 color='blue'
                 leftSection={<SaveIcon />}
                 loading={settingsMutation.isPending}
-                disabled={!form.formState.isDirty}
+                disabled={settings?.demoMode || !form.formState.isDirty}
               >
                 {t('action.submit')}
               </UIButton>

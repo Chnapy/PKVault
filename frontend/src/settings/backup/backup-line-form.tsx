@@ -5,9 +5,11 @@ import type { BackupDTO } from '../../data/sdk/model';
 import { PathUtil } from '../../ui/form/globs-input/util/path-util';
 import { UITextInput } from '../../ui/form/text-input/ui-text-input';
 
-type BackupLineFormProps = Pick<BackupDTO, 'createdAt' | 'name'>;
+type BackupLineFormProps = Pick<BackupDTO, 'createdAt' | 'name'> & {
+    disabled?: boolean;
+};
 
-export const BackupLineForm: React.FC<BackupLineFormProps> = ({ createdAt, name }) => {
+export const BackupLineForm: React.FC<BackupLineFormProps> = ({ createdAt, name, disabled }) => {
     const backupEditMutation = useBackupEdit();
 
     const { handleSubmit, setValue, formState, control } = useForm<{ name: string }>({
@@ -44,7 +46,7 @@ export const BackupLineForm: React.FC<BackupLineFormProps> = ({ createdAt, name 
         }}
         onSubmit={formState.isDirty ? submit : undefined}
         onCancel={formState.isDirty ? (() => setValue('name', name)) : undefined}
-        disabled={formState.isSubmitting}
+        disabled={disabled || formState.isSubmitting}
         cancelDisabled={formState.isSubmitting}
         submitLoading={formState.isSubmitting}
         submitDisabled={!formState.isValid || !nameValue}

@@ -1,4 +1,4 @@
-import { Box, Flex, Group, Paper, Stack, Title } from '@mantine/core';
+import { Badge, Box, Flex, Group, Paper, Stack, Title } from '@mantine/core';
 import { clsx } from 'clsx';
 import React from 'react';
 import { baseTheme } from '../../base-theme';
@@ -14,7 +14,8 @@ export const UIHeader: React.FC<{
     left: React.ReactNode;
     right: React.ReactNode;
     sub?: React.ReactNode;
-}> = ({ left, right, sub }) => {
+    demoMode?: boolean;
+}> = ({ left, right, sub, demoMode }) => {
 
     const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('header');
 
@@ -51,9 +52,12 @@ export const UIHeader: React.FC<{
                                         <div className={classes.bubble} style={{ backgroundColor: baseTheme.other.game.yellow }} />
                                         <div className={classes.bubble} style={{ backgroundColor: baseTheme.other.game.emerald }} />
                                     </Flex>
-                                    <Title order={2}>
+                                    <Title order={2} lh={1} mt='sm'>
                                         PKVault
                                     </Title>
+                                    {demoMode && <Group justify='center' h={0}>
+                                        <Badge mx='auto' mt={-5}>DEMO</Badge>
+                                    </Group>}
                                 </div>
                             </Paper>
 

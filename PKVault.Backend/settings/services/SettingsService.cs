@@ -247,6 +247,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             UserId: "", // should be defined later
             CanUpdateSettings: false,
             CanScanSaves: false,
+            DemoMode: EnvUtil.DEMO_MODE,
             SettingsMutable: mutableDto
         );
     }
