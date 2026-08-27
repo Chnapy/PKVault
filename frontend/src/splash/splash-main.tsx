@@ -1,8 +1,19 @@
 import React from 'react';
+import { GameVersion } from '../data/sdk/model';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
+import { getGameInfos } from '../pokedex/details/util/get-game-infos';
 import { useTranslate } from '../translate/i18n';
+import { iconResources } from '../ui/icon/resources/icon-resources';
+import { ImgPrefetch } from '../ui/icon/resources/img-prefetch';
 import { UISplash } from '../ui/splash/ui-splash';
 import { SplashData } from './splash-data';
+
+const versionsImgs = [ ...new Set(Object.values(GameVersion).map(version => getGameInfos(version).img)) ].filter(Boolean);
+
+const imgsToPrefetch = [
+    ...Object.values(iconResources).flatMap(v => Object.values(v)),
+    ...versionsImgs,
+];
 
 /**
  * Display splash screen until whole data is loaded without error.
@@ -26,9 +37,22 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
         }
     }, [ shouldUpdateLanguage, i18n, language ]);
 
+    const prefetchNode = <div aria-description='prefetch' style={{ width: 0, height: 0 }}>
+        {imgsToPrefetch.map(url => <ImgPrefetch
+            key={url}
+            src={url}
+        />)}
+    </div>;
+
     if ((settingsQuery.isPending && settingsQuery.isEnabled) || !settingsMutable) {
-        return <UISplash loading />;
+        return <UISplash loading>
+            {prefetchNode}
+        </UISplash>;
     }
 
-    return <SplashData appStartTime={appStartTime}>{children}</SplashData>;
+    return <SplashData appStartTime={appStartTime}>
+        {children}
+
+        {prefetchNode}
+    </SplashData>;
 };

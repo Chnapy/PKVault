@@ -49,9 +49,17 @@ export const StoragePanelGameList: React.FC = () => {
 
     const pkvaultBoxesQuery = useFilteredBoxes(null);
 
+    const value = saveId !== undefined
+        ? saveId?.toString() ?? pkvaultStorageId
+        : '';
+
     const disabledPkvault = Route.useSearch({
         select: (search) => {
-            return otherStorage.getStorage(search.storages)?.saveId === null && pkvaultBoxesQuery.data?.data.length === 1;
+            if (value === pkvaultStorageId)
+                return false;
+
+            return pkvaultBoxesQuery.isPending
+                || (otherStorage.getStorage(search.storages)?.saveId === null && pkvaultBoxesQuery.data?.data.length === 1);
         }
     });
 
@@ -85,10 +93,6 @@ export const StoragePanelGameList: React.FC = () => {
     const saveInfos = Object.values(saveInfosQuery.data.data)
         .filter(filterIsDefined)
         .sort(sortFns[ savesSort ]);
-
-    const value = saveId !== undefined
-        ? saveId?.toString() ?? pkvaultStorageId
-        : '';
 
     const onChange = (id: string) => {
         const saveId = id === pkvaultStorageId ? null : Number(id);
