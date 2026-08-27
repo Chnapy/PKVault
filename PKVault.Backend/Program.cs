@@ -354,6 +354,9 @@ public class Program
         services.AddScoped<IDexLoader, DexLoader>();
         services.AddSingleton<ISavesLoadersService, SavesLoadersService>();   // singleton for perf reasons
 
+        if (EnvUtil.DEMO_MODE)
+            services.AddHostedService<DemoCleanupService>();
+
 #if DEBUG && MODE_DEFAULT
         services.AddEndpointsApiExplorer();
         services.AddOpenApiDocument(document =>

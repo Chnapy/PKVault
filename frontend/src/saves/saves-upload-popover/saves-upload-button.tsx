@@ -7,9 +7,13 @@ import { UISavesUploadButton, type UISavesUploadButtonProps } from '../../ui/sav
 type SavesUploadButtonProps = Omit<UISavesUploadButtonProps, 'dropdown'>;
 
 export const SavesUploadButton: React.FC<SavesUploadButtonProps> = (props) => {
+    const settingsQuery = useSettingsGet();
+    const settings = settingsQuery.data?.data;
+
     return <UISavesUploadButton
         {...props}
         dropdown={<SavesUploadDropdown />}
+        disabled={props.disabled || settings?.demoMode}
     />;
 };
 

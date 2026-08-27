@@ -52,6 +52,7 @@ export const UIActionsDrawerContent: React.FC<UIActionsDrawerContentProps> = ({ 
             fullWidth
             leftSection={<SaveIcon />}
             onClick={onSave}
+            disabled={!onSave}
         >
             {t('action.save')}
         </UIButton>

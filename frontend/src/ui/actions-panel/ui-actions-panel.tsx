@@ -171,7 +171,7 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
                 pr='lg'
                 leftSection={<SaveIcon />}
                 onClick={onSaveAndClose}
-                disabled={!hasActions}
+                disabled={!onSaveAndClose || !hasActions}
             >
                 {t('action.save')}
             </UIButton>

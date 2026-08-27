@@ -122,7 +122,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
                         })}
                       >
                         <Button
-                          disabled={!settings?.canUpdateSettings}
+                          disabled={settings?.demoMode || !settings?.canUpdateSettings}
                           variant='filled'
                           color='red'
                           size='compact-xs'

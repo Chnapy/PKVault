@@ -2,6 +2,7 @@ import { EmptyState, Tabs } from '@mantine/core';
 import { PackageOpenIcon } from 'lucide-react';
 import React from "react";
 import { useBackupDelete, useBackupGetAll, useBackupRestore } from '../../data/sdk/backup/backup.gen';
+import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { useTranslate } from '../../translate/i18n';
 import { PathUtil } from '../../ui/form/globs-input/util/path-util';
 import { UIBackupItem } from '../../ui/settings/backups/ui-backup-item';
@@ -12,6 +13,9 @@ import { BackupLineForm } from './backup-line-form';
 
 export const SettingsBackupRight: React.FC = () => {
     const { t } = useTranslate();
+
+    const settingsQuery = useSettingsGet();
+    const settings = settingsQuery.data?.data;
 
     const backupQuery = useBackupGetAll();
 
@@ -67,10 +71,12 @@ export const SettingsBackupRight: React.FC = () => {
                 path={backup.filepath}
                 onRestore={() => backupRestoreMutation.mutateAsync({ params: { createdAt: backup.createdAt } })}
                 onDelete={() => backupDeleteMutation.mutateAsync({ params: { createdAt: backup.createdAt } })}
+                disabled={settings?.demoMode}
             >
                 <BackupLineForm
                     createdAt={backup.createdAt}
                     name={backup.name}
+                    disabled={settings?.demoMode}
                 />
             </UIBackupItem>)}
     </UIBackupList>;
