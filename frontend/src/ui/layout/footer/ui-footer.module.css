@@ -4,6 +4,7 @@
     z-index: 10;
     box-shadow: 0 -2px 0 rgb(0 0 0 / 20%);
     overflow: hidden;
+    min-height: var(--frame-border-width);
 }
 
 .controls {

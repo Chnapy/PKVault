@@ -1,4 +1,4 @@
-import { Group, useMatches } from '@mantine/core';
+import { Group } from '@mantine/core';
 import React from 'react';
 import { inputIconResources } from '../../icon/resources/input-icon-resources';
 import { getControlIcon, inputIcon } from '../../interaction/controls/icons/get-control-icon';
@@ -7,17 +7,29 @@ import { useControlsCurrentType } from '../../interaction/controls/use-controls-
 import classes from './ui-footer.module.css';
 
 export const UIFooter: React.FC = () => {
+    const displayContent = useControlsCurrentType() !== 'mouse';
+
+    return <Group
+        className={classes.uiFooter}
+        data-mantine-color-scheme="light"
+        c='white'
+        bg='primary.6'
+        px='md'
+        py='xs'
+        gap='lg'
+        wrap='nowrap'
+    >
+        {displayContent && <UIFooterContent />}
+    </Group>;
+};
+
+const UIFooterContent: React.FC = () => {
     // TODO perf issues (re-renders)
     const allControls = useAllCurrentControls();
 
     const controlsType = useControlsCurrentType();
 
     // console.log({ allControls: JSON.parse(JSON.stringify(allControls)) })
-
-    const hidden = useMatches({
-        base: controlsType === 'mouse',
-        sm: false,
-    });
 
     const controlsCount = Object.values(allControls).flatMap(controls => controls).length;
 
@@ -44,19 +56,7 @@ export const UIFooter: React.FC = () => {
 
     }, [ controlsCount ]);
 
-    if (hidden)
-        return null;
-
-    return <Group
-        className={classes.uiFooter}
-        data-mantine-color-scheme="light"
-        c='white'
-        bg='primary.6'
-        px='md'
-        py='xs'
-        gap='lg'
-        wrap='nowrap'
-    >
+    return <>
         {inputIcon(inputIconResources.type[ controlsType ])}
 
         <Group
@@ -88,5 +88,5 @@ export const UIFooter: React.FC = () => {
                 </Group>)}
             </Group>
         </Group>
-    </Group>;
+    </>;
 };
