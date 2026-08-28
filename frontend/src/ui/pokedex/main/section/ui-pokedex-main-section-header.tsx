@@ -21,8 +21,8 @@ export const UIPokedexMainSectionHeader: React.FC<UIPokedexMainSectionHeaderProp
         {count}
     </Badge>;
 
-    return <Group justify='space-between' py='sm' wrap='nowrap'>
-        <Group wrap='nowrap' style={{ whiteSpace: 'nowrap' }}>
+    return <Group justify='space-between' py='sm' wrap='nowrap' style={{ overflow: 'hidden' }}>
+        <Group wrap='nowrap' style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
             {generation}
             {regions.map(region => <Badge key={region} variant='default' visibleFrom='sm'>{region}</Badge>)}
             <Divider orientation='vertical' />

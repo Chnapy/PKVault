@@ -51,7 +51,7 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
     }
   }, []);
 
-  return <Stack h='100%' style={{ flexGrow: 1 }} {...popoverProps} ref={ref}>
+  return <Stack h='100%' style={{ flexGrow: 1, overflow: 'hidden' }} {...popoverProps} ref={ref}>
     <UIPokedexMain mah='100%'>
       {!isPending && speciesItemsByGenerationList.length === 0 && <EmptyState
         size='sm'
@@ -85,7 +85,7 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
             <UIPokedexMainSectionHeader
               generation={t('dex.list.title', { generation })}
               regions={staticData.generations[ generation ]?.regions ?? []}
-              games={versionsForImgs.map((versions, i) => <Group key={i} gap='xs' visibleFrom='md'>
+              games={versionsForImgs.map((versions, i) => <Group key={i} gap='xs' wrap='nowrap' visibleFrom='md'>
                 {versions.map(version => <UIGameImg
                   key={version}
                   version={version}
