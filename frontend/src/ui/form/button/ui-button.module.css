@@ -1,8 +1,35 @@
-
 .ui-button .button {
     width: 100%;
 }
 
 .selected {
     outline: 2px solid var(--focus-color-1);
+}
+
+@media only screen and (max-width: em(1024px)) {
+    .ui-button .no-label-tablet-screen {
+        padding-inline: var(--button-padding-x) !important;
+    }
+
+    .ui-button .no-label-tablet-screen :global(.mantine-Button-label) {
+        display: none;
+    }
+
+    .ui-button .no-label-tablet-screen :global(.mantine-Button-section) {
+        margin: 0;
+    }
+}
+
+@media only screen and (max-width: em(768px)) {
+    .ui-button .no-label-mobile-screen {
+        padding-inline: var(--button-padding-x) !important;
+    }
+
+    .ui-button .no-label-mobile-screen :global(.mantine-Button-label) {
+        display: none;
+    }
+
+    .ui-button .no-label-mobile-screen :global(.mantine-Button-section) {
+        margin: 0;
+    }
 }

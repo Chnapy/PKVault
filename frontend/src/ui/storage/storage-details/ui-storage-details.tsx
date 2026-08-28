@@ -1,6 +1,7 @@
 import { ActionIcon, Card, CloseButton, Group } from '@mantine/core';
 import { Maximize2Icon, Minimize2Icon } from 'lucide-react';
 import React from 'react';
+import { getScrollPadding } from '../../scrollbar-width/util/get-scroll-padding';
 import { UICardSectionControl } from '../storage-panel/card-section-control/ui-card-section-control';
 
 export type UIStorageDetailsProps = {
@@ -41,7 +42,7 @@ export const UIStorageDetails: React.FC<UIStorageDetailsProps> = ({
             {content}
         </Card.Section>}
 
-        {expanded && <Card.Section inheritPadding py='inherit' withBorder style={{ overflow: 'auto' }}>
+        {expanded && <Card.Section inheritPadding py='inherit' pr={getScrollPadding('md')} withBorder style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
             <Group align='stretch'>
                 {main}
                 {content}

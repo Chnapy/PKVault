@@ -51,6 +51,10 @@
     flex-shrink: 0;
 }
 
+.badge {
+    flex-shrink: 0;
+}
+
 .text:not(strong, b, th):is([data-size='lg'], [data-size='xl']) {
     text-shadow: 2px 2px 0 light-dark(#0002, #FFF2);
 }

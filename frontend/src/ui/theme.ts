@@ -53,6 +53,9 @@ export const theme = mergeThemeOverrides(
         defaultProps: {
           bdrs: 'md',
         },
+        classNames: (theme, props) => ({
+          root: classes.badge,
+        }),
       }),
       Text: Text.extend({
         classNames: (theme, props) => ({

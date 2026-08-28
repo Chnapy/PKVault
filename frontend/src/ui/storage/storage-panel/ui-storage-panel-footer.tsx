@@ -13,11 +13,11 @@ export const UIStoragePanelFooter: React.FC<UIStoragePanelFooterProps> = ({ boxS
 
     return <Text component="div" size='sm'>
         <Group justify='space-between'>
-            <div />
+            <Box miw={100} />
             <Box>
                 <NumberFormatter value={pkmCount} />/<NumberFormatter value={boxSize} />
             </Box>
-            <Box>
+            <Box miw={100} ta='right'>
                 {t('total')} <NumberFormatter value={pkmTotalCount} />
             </Box>
         </Group>

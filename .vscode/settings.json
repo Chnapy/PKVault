@@ -25,5 +25,8 @@
     "frontend/node_modules/@mantine/core/styles.css",
     "frontend/variables.gen.css"
   ],
-  "cssVariables.languages": ["css"]
+  "cssVariables.languages": ["css"],
+  "[css]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
+  }
 }

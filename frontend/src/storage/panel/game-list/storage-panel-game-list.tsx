@@ -170,7 +170,7 @@ export const StoragePanelGameList: React.FC = () => {
                             reduce();
                         })}
                 />)}
-        createActions={<Group justify='center' wrap='nowrap'>
+        createActions={<Group justify='center'>
             {isDesktop
                 ? <>
                     <UIButton

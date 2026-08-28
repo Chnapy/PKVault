@@ -16,6 +16,7 @@ import { useTranslate } from '../translate/i18n';
 import { UIButton } from '../ui/form/button/ui-button';
 import { UIConfirmPopover } from '../ui/popover/ui-confirm-popover';
 import { UISavesContent } from '../ui/saves/ui-saves-content';
+import { getScrollPadding } from '../ui/scrollbar-width/util/get-scroll-padding';
 import { filterIsDefined } from '../util/filter-is-defined';
 
 export const SavesPage: React.FC = withErrorCatcher('default', () => {
@@ -45,7 +46,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
     });
 
   return <UISavesContent>
-    <Card pr={0} style={{ overflowY: 'scroll' }}>
+    <Card pr={getScrollPadding('md')} style={{ overflowY: 'auto', scrollbarGutter: 'stable' }}>
       {!isLoading && saveInfos.length === 0 && <EmptyState
         size='sm'
         py='md'
@@ -154,7 +155,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
       })}
 
       <Card.Section inheritPadding withBorder py='inherit'>
-        <Group justify='center' wrap='nowrap'>
+        <Group justify='center'>
           {isDesktop
             ? <>
               <UIButton

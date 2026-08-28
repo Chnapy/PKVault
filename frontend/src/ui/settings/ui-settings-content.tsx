@@ -32,23 +32,17 @@ export const UISettingsContent: React.FC<UISettingsContentProps> = ({ left, righ
         >
             <Grid
                 mah='100%'
-                overflow='hidden'
+                overflow='auto'
                 style={{ flexGrow: 1 }}
                 bdrs='md'
-                styles={{
-                    inner: {
-                        maxHeight: '100%',
-                        flexWrap: 'nowrap',
-                    },
-                }}
             >
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, md: 4 }}>
                     <Stack mah='100%'>
                         {left}
                     </Stack>
                 </Grid.Col>
 
-                <Grid.Col span={8}>
+                <Grid.Col span={{ base: 12, md: 8 }}>
                     <Stack mah='100%'>
                         {right}
                     </Stack>

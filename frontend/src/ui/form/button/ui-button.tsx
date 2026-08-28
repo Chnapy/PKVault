@@ -14,12 +14,14 @@ export type UIButtonProps<C = 'button'> = {
     controlIcons?: React.ReactNode[];
     focusOnMount?: boolean;
     selected?: boolean;
+    noLabelTabletScreen?: boolean;
+    noLabelMobileScreen?: boolean;
 }
     & Pick<ElementProps<'button'>, 'onClick' | 'ref'>
     & PolymorphicComponentProps<C, Button.Props>;
 
 export const UIButton = function <C = 'button'>({
-    name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, selected, onClick: onClickInner,
+    name, controlLabel, controlIcons: extraControlIcons = [], focusOnMount, selected, onClick: onClickInner, noLabelTabletScreen, noLabelMobileScreen,
     component, w, miw, mx, ml, mt, style, ...rest
 }: UIButtonProps<C>) {
     const { onClick, loading } = useClickLoading(onClickInner, rest.loading);
@@ -52,6 +54,8 @@ export const UIButton = function <C = 'button'>({
             className={clsx(
                 classes.button,
                 selected && classes.selected,
+                noLabelTabletScreen && classes.noLabelTabletScreen,
+                noLabelMobileScreen && classes.noLabelMobileScreen,
                 rest.className,
             )}
             onClick={onClick}

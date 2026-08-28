@@ -7,6 +7,23 @@ import { useControlsCurrentType } from '../../interaction/controls/use-controls-
 import classes from './ui-footer.module.css';
 
 export const UIFooter: React.FC = () => {
+    const displayContent = useControlsCurrentType() !== 'mouse';
+
+    return <Group
+        className={classes.uiFooter}
+        data-mantine-color-scheme="light"
+        c='white'
+        bg='primary.6'
+        px='md'
+        py='xs'
+        gap='lg'
+        wrap='nowrap'
+    >
+        {displayContent && <UIFooterContent />}
+    </Group>;
+};
+
+const UIFooterContent: React.FC = () => {
     // TODO perf issues (re-renders)
     const allControls = useAllCurrentControls();
 
@@ -39,16 +56,7 @@ export const UIFooter: React.FC = () => {
 
     }, [ controlsCount ]);
 
-    return <Group
-        className={classes.uiFooter}
-        data-mantine-color-scheme="light"
-        c='white'
-        bg='primary.6'
-        px='md'
-        py='xs'
-        gap='lg'
-        wrap='nowrap'
-    >
+    return <>
         {inputIcon(inputIconResources.type[ controlsType ])}
 
         <Group
@@ -80,5 +88,5 @@ export const UIFooter: React.FC = () => {
                 </Group>)}
             </Group>
         </Group>
-    </Group>;
+    </>;
 };

@@ -212,7 +212,7 @@ class Program
             // Windows only: resize to a percentage of the main monitor work area
             .SetUseOsDefaultSize(WindowsOS)
             // Linux only: static initial size
-            .SetSize(1280, 785)
+            .SetSize(1280, 755)
             .Center()
             .SetResizable(true)
             .SetIconFile(tmpIconFilepath)

@@ -67,7 +67,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onC
         uploadAbbButton={<SavesUploadButton
             disabled={disabled}
             size='compact-sm'
-            style={{ flexGrow: 1, maxWidth: '49%' }}
+            style={{ flexGrow: 1 }}
         />}
         results={<GlobsInputResults
             values={splittedValue}
