@@ -2,6 +2,7 @@ import { Box, Group, Tabs, Text } from '@mantine/core';
 import React from 'react';
 import { Focus } from '../../../interaction/focus/provider/use-focus-context';
 import { useFocusScopeContext } from '../../../interaction/focus/scope/use-focus-scope-context';
+import { getScrollPadding } from '../../../scrollbar-width/util/get-scroll-padding';
 import { ScrollerControlled } from '../../../scroller-controlled/scroller-controlled';
 
 type DetailsContentItem = {
@@ -48,7 +49,7 @@ export const UIDetailsContent: React.FC<UIDetailsContentProps> = ({ content }) =
             </ScrollerControlled>
         </Tabs.List>
 
-        <Box p='md' pr={0} style={{ overflowY: 'scroll' }}>
+        <Box p='md' pr={getScrollPadding('md')} style={{ overflowY: 'auto', scrollbarGutter: 'stable' }}>
             {content.map(item => <Tabs.Panel key={item.name} value={item.name}>
                 {item.content}
             </Tabs.Panel>)}

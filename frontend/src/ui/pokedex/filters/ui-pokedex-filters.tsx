@@ -1,11 +1,12 @@
 import { Card, Stack, Title } from '@mantine/core';
 import type React from 'react';
+import { useTranslate } from '../../../translate/i18n';
 import { WithControlsIcons, type WithControlsIconsExtraProps } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 import { Focus } from '../../interaction/focus/provider/use-focus-context';
 import { FocusScope } from '../../interaction/focus/scope/focus-scope';
-import { useTranslate } from '../../../translate/i18n';
+import { getScrollPadding } from '../../scrollbar-width/util/get-scroll-padding';
 
 type UIPokedexFiltersProps = {
     views: React.ReactNode;
@@ -35,7 +36,7 @@ export const UIPokedexFilters: React.FC<UIPokedexFiltersProps> = ({ views, child
 
     return <FocusScope id={name} parentNodeId={nodeId}>
         <WithControlsIcons placement='out' icons={controlIcons('open')} {...rest}>
-            <Card {...focusProps} {...controlProps('open')} w='100%' mah='100%' pr={0} style={{ overflowY: 'scroll' }}>
+            <Card {...focusProps} {...controlProps('open')} w='100%' mah='100%' pr={getScrollPadding('md')} style={{ overflowY: 'auto', scrollbarGutter: 'stable' }}>
                 <Card.Section withBorder inheritPadding pt='sm' pb='inherit'>
                     <Stack>
                         <Title order={5} ta='center'>{t('dex.filters.views')}</Title>

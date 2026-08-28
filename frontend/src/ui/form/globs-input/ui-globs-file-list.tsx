@@ -60,7 +60,7 @@ export const UIGlobsFileList: React.FC<UIGlobsFileListProps> = ({
                 leftSection={<SearchIcon />}
             />
 
-            <Combobox.Options mah="var(--combobox-floating-options-max-height)" style={{ overflowY: 'scroll' }}>
+            <Combobox.Options mah="var(--combobox-floating-options-max-height)" style={{ overflowY: 'auto' }}>
                 {isLoading
                     ? <Combobox.Empty>
                         <Loader type='dots' />

@@ -172,7 +172,7 @@ export const UIFileExplorerPopover: React.FC<UIFileExplorerPopoverProps> = ({
                     </UIButton>
                 </Group>
 
-                <Combobox.Options mah="var(--combobox-floating-options-max-height)" style={{ overflowY: 'scroll' }}>
+                <Combobox.Options mah="var(--combobox-floating-options-max-height)" style={{ overflowY: 'auto' }}>
                     {loading
                         ? <Combobox.Empty>
                             <Loader type='dots' />

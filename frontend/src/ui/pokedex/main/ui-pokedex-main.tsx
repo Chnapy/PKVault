@@ -7,6 +7,7 @@ import { getSelectControl } from '../../interaction/focus-controls/common-contro
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 import { Focus } from '../../interaction/focus/provider/use-focus-context';
 import { FocusScope } from '../../interaction/focus/scope/focus-scope';
+import { getScrollPadding } from '../../scrollbar-width/util/get-scroll-padding';
 
 type UIPokedexMainProps = {
     children: React.ReactNode;
@@ -44,9 +45,10 @@ export const UIPokedexMain: React.FC<UIPokedexMainProps> = ({ children, ...rest 
         <WithControlsIcons placement='out' icons={controlIcons('open')}
             {...rest}
         >
-            <Card mah='100%' pr={0} style={{
+            <Card mah='100%' pr={getScrollPadding('md')} style={{
                 flexGrow: 1,
-                overflowY: 'scroll',
+                overflowY: 'auto',
+                scrollbarGutter: 'stable',
             }}
                 {...focusProps}
                 {...controlProps('open')}>

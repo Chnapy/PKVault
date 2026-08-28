@@ -10,5 +10,6 @@
   position: relative;
   flex-grow: 1;
   padding-right: 0;
-  overflow-y: scroll;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
 }

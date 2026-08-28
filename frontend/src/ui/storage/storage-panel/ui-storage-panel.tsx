@@ -1,5 +1,6 @@
 import { Box, Card, type CardProps } from '@mantine/core';
 import React from 'react';
+import { getScrollPadding } from '../../scrollbar-width/util/get-scroll-padding';
 import { UICardSectionControl } from './card-section-control/ui-card-section-control';
 
 export type UIStoragePanelProps = {
@@ -29,9 +30,10 @@ export const UIStoragePanel: React.FC<UIStoragePanelProps> = ({ gameTabs, header
         {children && <Card.Section inheritPadding py='md' withBorder style={{
             flexGrow: 1,
             flexShrink: 999,
-            overflowY: 'scroll',
+            overflowY: 'auto',
             overflowX: 'hidden',
-            paddingRight: 0,
+            scrollbarGutter: 'stable',
+            paddingRight: getScrollPadding('md'),
             backgroundImage: backgroundImageUrl && `url("${backgroundImageUrl}")`,
         }}>
             {children}
