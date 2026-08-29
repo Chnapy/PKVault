@@ -490,6 +490,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
                 !r.Valid
                 && (
                     r.Identifier == CheckIdentifier.Ability
+                    && r.Result != LegalityCheckResultCode.AbilityMismatchPID
                 )
             );
         }
