@@ -2,30 +2,57 @@
 
 --- pokeapi\generated\diff-data\StaticOthers_es.diff
 +++ pokeapi\generated\diff-data\StaticOthers_es.diff
-@@ -1716,7 +1716,7 @@
-   },
-   "moves": {
-     "0": {
--      "name": "(Ningún objeto)",
-+      "name": "(Ningún)",
-       "dataUntilGeneration": [
-         {
-           "untilGeneration": 99,
-@@ -14377,7 +14377,7 @@
-   },
-   "abilities": {
-     "0": {
--      "name": "(Ningún objeto)"
-+      "name": "(Ningún)"
+@@ -490,7 +490,7 @@
      },
-     "1": {
-       "id": 1,
-@@ -24126,7 +24126,7 @@
-     "items": {
-       "(none)": {
-         "id": "(none)",
--        "name": "(Ningún objeto)",
-+        "name": "(Ningún)",
-         "sprite": ""
-       },
-       "abomasite": {
+     "36": {
+       "id": 36,
+-      "name": "Azul",
++      "name": "Azul/Verde (J)",
+       "context": 1,
+       "isGameVersion": true,
+       "children": [],
+@@ -804,7 +804,7 @@
+     },
+     "54": {
+       "id": 54,
+-      "name": "Rojo/Azul/Rojo (J)/Verde (J)/Azul (J)",
++      "name": "Rojo/Azul/Verde (J)/Rojo (J)/Azul (J)",
+       "context": 1,
+       "children": [
+         35,
+@@ -825,7 +825,7 @@
+     },
+     "55": {
+       "id": 55,
+-      "name": "Rojo/Azul/Amarillo/Rojo (J)/Verde (J)/Azul (J)",
++      "name": "Amarillo/Rojo/Azul/Verde (J)/Rojo (J)/Azul (J)",
+       "context": 1,
+       "children": [
+         35,
+@@ -951,7 +951,7 @@
+     },
+     "61": {
+       "id": 61,
+-      "name": "Box Ruby & Sapphire",
++      "name": "Box: Rubí y Zafiro",
+       "context": 3,
+       "isGameVersion": true,
+       "children": [],
+@@ -1281,7 +1281,7 @@
+     },
+     "78": {
+       "id": 78,
+-      "name": "Rojo/Azul/Amarillo/Rojo (J)/Verde (J)/Azul (J)/Stadium",
++      "name": "Amarillo/Rojo/Azul/Verde (J)/Rojo (J)/Azul (J)/Stadium",
+       "context": 1,
+       "children": [
+         35,
+@@ -1327,7 +1327,7 @@
+     },
+     "80": {
+       "id": 80,
+-      "name": "Rubí/Zafiro/Esmeralda/Rojo Fuego/Verde Hoja/Colosseum/XD/Box Ruby & Sapphire",
++      "name": "Rubí/Zafiro/Esmeralda/Rojo Fuego/Verde Hoja/Colosseum/XD/Box: Rubí y Zafiro",
+       "context": 3,
+       "children": [
+         1,

@@ -1,2 +1,40 @@
 --- This file displays changes of StaticOthers_zh-hant compressed file from previous changes
 
+--- pokeapi\generated\diff-data\StaticOthers_zh-hant.diff
++++ pokeapi\generated\diff-data\StaticOthers_zh-hant.diff
+@@ -490,7 +490,7 @@
+     },
+     "36": {
+       "id": 36,
+-      "name": "藍",
++      "name": "藍/Green (J)",
+       "context": 1,
+       "isGameVersion": true,
+       "children": [],
+@@ -804,7 +804,7 @@
+     },
+     "54": {
+       "id": 54,
+-      "name": "紅/藍/Red (J)/Green (J)/Blue (J)",
++      "name": "紅/藍/Green (J)/Red (J)/Blue (J)",
+       "context": 1,
+       "children": [
+         35,
+@@ -825,7 +825,7 @@
+     },
+     "55": {
+       "id": 55,
+-      "name": "紅/藍/皮卡丘/Red (J)/Green (J)/Blue (J)",
++      "name": "皮卡丘/紅/藍/Green (J)/Red (J)/Blue (J)",
+       "context": 1,
+       "children": [
+         35,
+@@ -1281,7 +1281,7 @@
+     },
+     "78": {
+       "id": 78,
+-      "name": "紅/藍/皮卡丘/Red (J)/Green (J)/Blue (J)/Stadium",
++      "name": "皮卡丘/紅/藍/Green (J)/Red (J)/Blue (J)/Stadium",
+       "context": 1,
+       "children": [
+         35,
