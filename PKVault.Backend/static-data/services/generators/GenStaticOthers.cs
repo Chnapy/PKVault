@@ -196,7 +196,7 @@ public class GenStaticOthers(
                     GameVersion.Stadium, GameVersion.StadiumJ, GameVersion.Stadium2,
                     GameVersion.COLO, GameVersion.XD, GameVersion.RSBOX,
                 ];
-                    
+
                 bool isGameVersion(GameVersion v) => v.IsValidSavedVersion()
                     || extraValidVersions.Contains(v);
 
@@ -535,7 +535,13 @@ public class GenStaticOthers(
             {
                 var item = items[i];
 
-                var itemEn = itemsEn.First(it => it.Value == item.Value);
+                var itemEn = itemsEn.FirstOrDefault(it => it.Value == item.Value);
+                if (itemEn == default)
+                {
+                    Serilog.Log.Error($"Item value not found in default items list, lang={lang} version={version} item={item.Value}/{item.Text}");
+                    continue;
+                }
+
                 if (Items.ContainsKey(itemEn.Text))
                 {
                     continue;
