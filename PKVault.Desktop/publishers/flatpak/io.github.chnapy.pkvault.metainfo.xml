@@ -85,8 +85,8 @@
   </supports>
 
   <requires>
-    <!-- only desktop/tablet supported -->
-    <display_length compare="ge">1279</display_length>
+    <!-- mobile/tablet and desktop supported -->
+    <display_length compare="ge">360</display_length>
   </requires>
 
   <icon type="stock">io.github.chnapy.pkvault</icon>
