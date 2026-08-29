@@ -25,12 +25,13 @@ export type UIStorageItemProps<C = unknown> =
         name: string;
         selected?: boolean;
         level: number;
+        selectFromPreviousSelected: (id: string) => void;
         icons?: React.ReactNode;
     };
 
 export const UIStorageItem: React.FC<UIStorageItemProps> = ({
     ref: refRoot, id, nodeId, slot, globalOrder, icons,
-    container, selected,
+    container, selected, selectFromPreviousSelected,
     name, level, label,
     loading, disabled, onClick,
     children, ...buttonProps
@@ -97,7 +98,18 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
                     },
                 },
                 spread: true,
-                action: () => checked ? removeId([ id ]) : addId(container, [ id ]),
+                action: (e) => {
+                    if (checked) {
+                        removeId([ id ]);
+                    } else {
+                        const shiftKey = typeof e === 'object' && !!e && (e as React.MouseEvent).shiftKey;
+                        if (shiftKey) {
+                            selectFromPreviousSelected(id);
+                        } else {
+                            addId(container, [ id ]);
+                        }
+                    }
+                },
             },
         ],
     });
