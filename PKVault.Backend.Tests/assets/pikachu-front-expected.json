@@ -355,9 +355,7 @@
         ],
         "language": 3,
         "metLocation": 55,
-        "illegalities": [
-            "Misc-Error"
-        ]
+        "illegalities": []
     },
     "PK5": {
         "species": 25,
