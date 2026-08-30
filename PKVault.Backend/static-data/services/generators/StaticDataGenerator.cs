@@ -95,10 +95,10 @@ public abstract class StaticDataGenerator<D>(
     }
 
     protected static string[] GetDataPathParts(string filename) => [
-        ..GetGeneratedPathParts(), "api-data", $"{filename}.json.gz"
+        ..GetGeneratedPathParts(), "api-data", $"{AssemblyClient.FormatResourcePart(filename)}.json.gz"
     ];
 
     protected static string[] GetDataDiffPathParts(string filename) => [
-        ..GetGeneratedPathParts(), "diff-data", $"{filename}.diff"
+        ..GetGeneratedPathParts(), "diff-data", $"{AssemblyClient.FormatResourcePart(filename)}.diff"
     ];
 }

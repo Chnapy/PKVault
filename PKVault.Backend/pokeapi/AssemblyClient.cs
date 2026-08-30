@@ -72,20 +72,22 @@ public partial class AssemblyClient
             ..fileParts
         ];
 
-        var assemblyName = string.Join('.', assemblyParts.Select(part =>
-        {
-            part = part.Replace('-', '_');
-
-            var isInt = int.TryParse(part, out _);
-            if (isInt)
-            {
-                part = $"_{part}";
-            }
-
-            return part;
-        }));
+        var assemblyName = string.Join('.', assemblyParts.Select(FormatResourcePart));
 
         return assembly.GetManifestResourceStream(assemblyName)
             ?? throw new KeyNotFoundException($"RESOURCE NOT FOUND: {assemblyName}\n{string.Join('\n', assembly.GetManifestResourceNames())}");
+    }
+
+    public static string FormatResourcePart(string part)
+    {
+        part = part.Replace('-', '_');
+
+        var isInt = int.TryParse(part, out _);
+        if (isInt)
+        {
+            part = $"_{part}";
+        }
+
+        return part;
     }
 }

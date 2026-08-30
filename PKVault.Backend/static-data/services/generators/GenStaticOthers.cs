@@ -134,8 +134,10 @@ public class GenStaticOthers(
 
             return data;
         }
-        catch (KeyNotFoundException)
+        catch (KeyNotFoundException ex)
         {
+            Serilog.Log.Error(ex, $"StaticOthers file not found for lang={lang}");
+
             if (lang != SettingsService.DefaultLanguage)
             {
                 return await LoadData(SettingsService.DefaultLanguage);
