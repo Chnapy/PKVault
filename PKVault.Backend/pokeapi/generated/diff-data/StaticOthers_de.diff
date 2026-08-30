@@ -1,2 +1,40 @@
 --- This file displays changes of StaticOthers_de compressed file from previous changes
 
+--- pokeapi\generated\diff-data\StaticOthers_de.diff
++++ pokeapi\generated\diff-data\StaticOthers_de.diff
+@@ -490,7 +490,7 @@
+     },
+     "36": {
+       "id": 36,
+-      "name": "Blau",
++      "name": "Blau/Grüne (J)",
+       "context": 1,
+       "isGameVersion": true,
+       "children": [],
+@@ -804,7 +804,7 @@
+     },
+     "54": {
+       "id": 54,
+-      "name": "Rot/Blau/Rot (J)/Grüne (J)/Blau (J)",
++      "name": "Rot/Blau/Grüne (J)/Rot (J)/Blau (J)",
+       "context": 1,
+       "children": [
+         35,
+@@ -825,7 +825,7 @@
+     },
+     "55": {
+       "id": 55,
+-      "name": "Rot/Blau/Gelb/Rot (J)/Grüne (J)/Blau (J)",
++      "name": "Gelb/Rot/Blau/Grüne (J)/Rot (J)/Blau (J)",
+       "context": 1,
+       "children": [
+         35,
+@@ -1281,7 +1281,7 @@
+     },
+     "78": {
+       "id": 78,
+-      "name": "Rot/Blau/Gelb/Rot (J)/Grüne (J)/Blau (J)/Stadium",
++      "name": "Gelb/Rot/Blau/Grüne (J)/Rot (J)/Blau (J)/Stadium",
+       "context": 1,
+       "children": [
+         35,
