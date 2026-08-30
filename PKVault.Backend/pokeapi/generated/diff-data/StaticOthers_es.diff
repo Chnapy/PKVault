@@ -2,57 +2,15 @@
 
 --- pokeapi\generated\diff-data\StaticOthers_es.diff
 +++ pokeapi\generated\diff-data\StaticOthers_es.diff
-@@ -490,7 +490,7 @@
+@@ -40735,7 +40735,10 @@
+         "169": 147,
+         "610": 148,
+         "611": 149,
+-        "612": 150
++        "612": 150,
++        "719": 151,
++        "720": 152,
++        "721": 153
+       }
      },
-     "36": {
-       "id": 36,
--      "name": "Azul",
-+      "name": "Azul/Verde (J)",
-       "context": 1,
-       "isGameVersion": true,
-       "children": [],
-@@ -804,7 +804,7 @@
-     },
-     "54": {
-       "id": 54,
--      "name": "Rojo/Azul/Rojo (J)/Verde (J)/Azul (J)",
-+      "name": "Rojo/Azul/Verde (J)/Rojo (J)/Azul (J)",
-       "context": 1,
-       "children": [
-         35,
-@@ -825,7 +825,7 @@
-     },
-     "55": {
-       "id": 55,
--      "name": "Rojo/Azul/Amarillo/Rojo (J)/Verde (J)/Azul (J)",
-+      "name": "Amarillo/Rojo/Azul/Verde (J)/Rojo (J)/Azul (J)",
-       "context": 1,
-       "children": [
-         35,
-@@ -951,7 +951,7 @@
-     },
-     "61": {
-       "id": 61,
--      "name": "Box Ruby & Sapphire",
-+      "name": "Box: Rubí y Zafiro",
-       "context": 3,
-       "isGameVersion": true,
-       "children": [],
-@@ -1281,7 +1281,7 @@
-     },
-     "78": {
-       "id": 78,
--      "name": "Rojo/Azul/Amarillo/Rojo (J)/Verde (J)/Azul (J)/Stadium",
-+      "name": "Amarillo/Rojo/Azul/Verde (J)/Rojo (J)/Azul (J)/Stadium",
-       "context": 1,
-       "children": [
-         35,
-@@ -1327,7 +1327,7 @@
-     },
-     "80": {
-       "id": 80,
--      "name": "Rubí/Zafiro/Esmeralda/Rojo Fuego/Verde Hoja/Colosseum/XD/Box Ruby & Sapphire",
-+      "name": "Rubí/Zafiro/Esmeralda/Rojo Fuego/Verde Hoja/Colosseum/XD/Box: Rubí y Zafiro",
-       "context": 3,
-       "children": [
-         1,
+     "kalos-coastal": {

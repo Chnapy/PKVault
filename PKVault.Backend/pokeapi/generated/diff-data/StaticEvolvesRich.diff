@@ -1,2 +1,92 @@
 --- This file displays changes of StaticEvolvesRich compressed file from previous changes
 
+--- pokeapi\generated\diff-data\StaticEvolvesRich.diff
++++ pokeapi\generated\diff-data\StaticEvolvesRich.diff
+@@ -11076,12 +11076,87 @@
+           ]
+         }
+       ]
++    },
++    "10126": {
++      "species": 710,
++      "form": 10126,
++      "evolves": [
++        {
++          "evolveSpecies": 711,
++          "evolveForm": 10129,
++          "triggers": [
++            {
++              "trigger": 1,
++              "contexts": [
++                6
++              ],
++              "evolutionIsPossible": true
+     }
++          ]
++        }
++      ]
++    },
++    "10127": {
++      "species": 710,
++      "form": 10127,
++      "evolves": [
++        {
++          "evolveSpecies": 711,
++          "evolveForm": 10130,
++          "triggers": [
++            {
++              "trigger": 1,
++              "contexts": [
++                6
++              ],
++              "evolutionIsPossible": true
++            }
++          ]
++        }
++      ]
+   },
++    "10128": {
++      "species": 710,
++      "form": 10128,
++      "evolves": [
++        {
++          "evolveSpecies": 711,
++          "evolveForm": 10131,
++          "triggers": [
++            {
++              "trigger": 1,
++              "contexts": [
++                6
++              ],
++              "evolutionIsPossible": true
++            }
++          ]
++        }
++      ]
++    }
++  },
+   "711": {
+     "711": {
+       "species": 711,
+       "form": 711,
++      "evolves": [],
++      "previousSpecies": 710
++    },
++    "10129": {
++      "species": 711,
++      "form": 10129,
++      "evolves": [],
++      "previousSpecies": 710
++    },
++    "10130": {
++      "species": 711,
++      "form": 10130,
++      "evolves": [],
++      "previousSpecies": 710
++    },
++    "10131": {
++      "species": 711,
++      "form": 10131,
+       "evolves": [],
+       "previousSpecies": 710
+     }
