@@ -1,16 +1,237 @@
 --- This file displays changes of StaticOthers_en compressed file from previous changes
 
---- pokeapi\generated\diff-data\StaticOthers_en.diff
-+++ pokeapi\generated\diff-data\StaticOthers_en.diff
-@@ -40735,7 +40735,10 @@
-         "169": 147,
-         "610": 148,
-         "611": 149,
--        "612": 150
-+        "612": 150,
-+        "719": 151,
-+        "720": 152,
-+        "721": 153
-       }
-     },
-     "kalos-coastal": {
+--- pokeapi/generated/diff-data/StaticOthers_en.diff
++++ pokeapi/generated/diff-data/StaticOthers_en.diff
+@@ -18446,7 +18446,7 @@
+           "71": "pp-max",
+           "69": "pp-up",
+           "164": "pamtre-berry",
+-          "18": "parlyz-heal",
++          "18": "paralyze-heal",
+           "106": "pearl",
+           "135": "pecha-berry",
+           "140": "persim-berry",
+@@ -18570,8 +18570,8 @@
+           "125": "wood-mail",
+           "78": "x-accuracy",
+           "75": "x-attack",
+-          "76": "x-defend",
+-          "79": "x-special",
++          "76": "x-defense",
++          "79": "x-sp-atk",
+           "77": "x-speed",
+           "40": "yellow-flute",
+           "258": "yellow-scarf",
+@@ -21677,12 +21677,12 @@
+           "91": "amulet-coin",
+           "9": "antidote",
+           "12": "awakening",
+-          "173": "berry",
++          "173": "oran-berry",
+           "139": "berry-juice",
+           "152": "berserk-gene",
+           "87": "big-mushroom",
+           "111": "big-pearl",
+-          "83": "bitter-berry",
++          "83": "persim-berry",
+           "98": "black-belt",
+           "102": "black-glasses",
+           "99": "blk-apricorn",
+@@ -21691,7 +21691,7 @@
+           "180": "brick-piece",
+           "3": "bright-powder",
+           "10": "burn-heal",
+-          "79": "burnt-berry",
++          "79": "rawst-berry",
+           "31": "calcium",
+           "29": "carbos",
+           "138": "charcoal",
+@@ -21715,7 +21715,7 @@
+           "164": "friend-ball",
+           "38": "full-heal",
+           "14": "full-restore",
+-          "174": "gold-berry",
++          "174": "sitrus-berry",
+           "75": "gold-leaf",
+           "168": "gorgeous-box",
+           "4": "great-ball",
+@@ -21726,7 +21726,7 @@
+           "123": "heal-powder",
+           "157": "heavy-ball",
+           "16": "hyper-potion",
+-          "80": "ice-berry",
++          "80": "aspear-berry",
+           "11": "ice-heal",
+           "28": "iron",
+           "82": "kings-rock",
+@@ -21750,24 +21750,24 @@
+           "40": "max-revive",
+           "143": "metal-coat",
+           "35": "metal-powder",
+-          "84": "mint-berry",
++          "84": "chesto-berry",
+           "117": "miracle-seed",
+-          "109": "miracle-berry",
++          "109": "lum-berry",
+           "189": "mirage-mail",
+           "72": "moomoo-milk",
+           "165": "moon-ball",
+           "8": "moon-stone",
+           "186": "morph-mail",
+           "188": "music-mail",
+-          "150": "mystery-berry",
++          "150": "leppa-berry",
+           "95": "mystic-water",
+           "107": "never-melt-ice",
+           "167": "normal-box",
+           "36": "nugget",
+           "62": "pp-up",
+-          "78": "przcure-berry",
+-          "74": "psncure-berry",
+-          "13": "parlyz-heal",
++          "78": "cheri-berry",
++          "74": "pecha-berry",
++          "13": "paralyze-heal",
+           "110": "pearl",
+           "104": "pink-bow",
+           "101": "pnk-apricorn",
+@@ -21862,8 +21862,8 @@
+           "97": "wht-apricorn",
+           "33": "x-accuracy",
+           "49": "x-attack",
+-          "51": "x-defend",
+-          "53": "x-special",
++          "51": "x-defense",
++          "53": "x-sp-atk",
+           "52": "x-speed",
+           "92": "ylw-apricorn"
+         }
+@@ -36784,11 +36784,6 @@
+         "name": "Orange Mail",
+         "sprite": "sprites/items/orange-mail.png"
+       },
+-      "parlyz-heal": {
+-        "id": "parlyz-heal",
+-        "name": "Parlyz Heal",
+-        "sprite": ""
+-      },
+       "retro-mail": {
+         "id": "retro-mail",
+         "name": "Retro Mail",
+@@ -36814,16 +36809,6 @@
+         "name": "Wood Mail",
+         "sprite": "sprites/items/wood-mail.png"
+       },
+-      "x-defend": {
+-        "id": "x-defend",
+-        "name": "X Defend",
+-        "sprite": ""
+-      },
+-      "x-special": {
+-        "id": "x-special",
+-        "name": "X Special",
+-        "sprite": ""
+-      },
+       "air-mail": {
+         "id": "air-mail",
+         "name": "Air Mail",
+@@ -36884,19 +36869,9 @@
+         "name": "Tunnel Mail",
+         "sprite": "sprites/items/tunnel-mail.png"
+       },
+-      "berry": {
+-        "id": "berry",
+-        "name": "Berry",
+-        "sprite": ""
+-      },
+       "berserk-gene": {
+         "id": "berserk-gene",
+         "name": "Berserk Gene",
+-        "sprite": ""
+-      },
+-      "bitter-berry": {
+-        "id": "bitter-berry",
+-        "name": "Bitter Berry",
+         "sprite": ""
+       },
+       "blk-apricorn": {
+@@ -36917,11 +36892,6 @@
+       "brick-piece": {
+         "id": "brick-piece",
+         "name": "Brick Piece",
+-        "sprite": ""
+-      },
+-      "burnt-berry": {
+-        "id": "burnt-berry",
+-        "name": "Burnt Berry",
+         "sprite": ""
+       },
+       "elixer": {
+@@ -36939,11 +36909,6 @@
+         "name": "Flower Mail",
+         "sprite": ""
+       },
+-      "gold-berry": {
+-        "id": "gold-berry",
+-        "name": "Gold Berry",
+-        "sprite": ""
+-      },
+       "gorgeous-box": {
+         "id": "gorgeous-box",
+         "name": "Gorgeous Box",
+@@ -36954,11 +36919,6 @@
+         "name": "Grn Apricorn",
+         "sprite": ""
+       },
+-      "ice-berry": {
+-        "id": "ice-berry",
+-        "name": "Ice Berry",
+-        "sprite": ""
+-      },
+       "litebluemail": {
+         "id": "litebluemail",
+         "name": "Litebluemail",
+@@ -36972,18 +36932,8 @@
+       "max-elixer": {
+         "id": "max-elixer",
+         "name": "Max Elixer",
+-        "sprite": ""
+-      },
+-      "mint-berry": {
+-        "id": "mint-berry",
+-        "name": "Mint Berry",
+         "sprite": ""
+       },
+-      "miracle-berry": {
+-        "id": "miracle-berry",
+-        "name": "MiracleBerry",
+-        "sprite": ""
+-      },
+       "mirage-mail": {
+         "id": "mirage-mail",
+         "name": "Mirage Mail",
+@@ -36999,24 +36949,9 @@
+         "name": "Music Mail",
+         "sprite": ""
+       },
+-      "mystery-berry": {
+-        "id": "mystery-berry",
+-        "name": "MysteryBerry",
+-        "sprite": ""
+-      },
+       "normal-box": {
+         "id": "normal-box",
+         "name": "Normal Box",
+-        "sprite": ""
+-      },
+-      "przcure-berry": {
+-        "id": "przcure-berry",
+-        "name": "PRZCureBerry",
+-        "sprite": ""
+-      },
+-      "psncure-berry": {
+-        "id": "psncure-berry",
+-        "name": "PSNCureBerry",
+         "sprite": ""
+       },
+       "pink-bow": {
