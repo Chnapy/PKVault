@@ -4,6 +4,7 @@ import en from './locales/en.json' with { type: "json" };
 import fr from './locales/fr.json' with { type: "json" };
 import de from './locales/de.json' with { type: "json" };
 import es from './locales/es.json' with { type: "json" };
+import esLa from './locales/es-419.json' with { type: "json" };
 import ptBr from './locales/pt-br.json' with { type: "json" };
 import zhHant from './locales/zh-hant.json' with { type: "json" };
 
@@ -19,6 +20,7 @@ export const resources = {
     fr: { ns: fr },
     de: { ns: de },
     es: { ns: es },
+    'es-419': { ns: esLa },
     'pt-br': { ns: ptBr },
     'zh-hant': { ns: zhHant },
 } as const;
@@ -28,6 +30,7 @@ export const languages: Record<keyof typeof resources, string> = {
     fr: 'Français',
     de: 'Deutsch',
     es: 'Español',
+    'es-419': 'Español (LATAM)',
     'pt-br': 'Português brasileiro',
     'zh-hant': '繁體中文',
 };
