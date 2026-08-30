@@ -2,39 +2,15 @@
 
 --- pokeapi\generated\diff-data\StaticOthers_fr.diff
 +++ pokeapi\generated\diff-data\StaticOthers_fr.diff
-@@ -490,7 +490,7 @@
+@@ -40735,7 +40735,10 @@
+         "169": 147,
+         "610": 148,
+         "611": 149,
+-        "612": 150
++        "612": 150,
++        "719": 151,
++        "720": 152,
++        "721": 153
+       }
      },
-     "36": {
-       "id": 36,
--      "name": "Bleu",
-+      "name": "Bleu/Vert (J)",
-       "context": 1,
-       "isGameVersion": true,
-       "children": [],
-@@ -804,7 +804,7 @@
-     },
-     "54": {
-       "id": 54,
--      "name": "Rouge/Bleu/Rouge (J)/Vert (J)/Bleu (J)",
-+      "name": "Rouge/Bleu/Vert (J)/Rouge (J)/Bleu (J)",
-       "context": 1,
-       "children": [
-         35,
-@@ -825,7 +825,7 @@
-     },
-     "55": {
-       "id": 55,
--      "name": "Rouge/Bleu/Jaune/Rouge (J)/Vert (J)/Bleu (J)",
-+      "name": "Jaune/Rouge/Bleu/Vert (J)/Rouge (J)/Bleu (J)",
-       "context": 1,
-       "children": [
-         35,
-@@ -1281,7 +1281,7 @@
-     },
-     "78": {
-       "id": 78,
--      "name": "Rouge/Bleu/Jaune/Rouge (J)/Vert (J)/Bleu (J)/Stadium",
-+      "name": "Jaune/Rouge/Bleu/Vert (J)/Rouge (J)/Bleu (J)/Stadium",
-       "context": 1,
-       "children": [
-         35,
+     "kalos-coastal": {

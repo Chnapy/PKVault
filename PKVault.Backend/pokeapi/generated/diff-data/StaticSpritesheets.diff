@@ -1,2 +1,617 @@
 --- This file displays changes of StaticSpritesheets compressed file from previous changes
 
+--- pokeapi\generated\diff-data\StaticSpritesheets.diff
++++ pokeapi\generated\diff-data\StaticSpritesheets.diff
+@@ -3789,530 +3789,537 @@
+       "width": 96,
+       "height": 96
+     },
+-    "sprites/pokemon/173.png": {
++    "sprites/pokemon/shiny/172-spiky-eared.png": {
+       "sheetName": "spritesheet_species_1.webp",
+       "x": 1248,
+       "y": 960,
+       "width": 96,
+       "height": 96
+     },
+-    "sprites/pokemon/shiny/173.png": {
++    "sprites/pokemon/173.png": {
+       "sheetName": "spritesheet_species_1.webp",
+       "x": 1344,
+       "y": 960,
+       "width": 96,
+       "height": 96
+     },
+-    "sprites/pokemon/174.png": {
++    "sprites/pokemon/shiny/173.png": {
+       "sheetName": "spritesheet_species_1.webp",
+       "x": 1440,
+       "y": 960,
+       "width": 96,
+       "height": 96
+     },
+-    "sprites/pokemon/shiny/174.png": {
++    "sprites/pokemon/174.png": {
+       "sheetName": "spritesheet_species_1.webp",
+       "x": 1536,
+       "y": 960,
+       "width": 96,
+       "height": 96
+     },
+-    "sprites/pokemon/175.png": {
++    "sprites/pokemon/shiny/174.png": {
+       "sheetName": "spritesheet_species_1.webp",
+       "x": 1632,
+       "y": 960,
+       "width": 96,
+       "height": 96
+     },
+-    "sprites/pokemon/shiny/175.png": {
++    "sprites/pokemon/175.png": {
+       "sheetName": "spritesheet_species_1.webp",
+       "x": 1728,
+       "y": 960,
+       "width": 96,
+       "height": 96
+     },
+-    "sprites/pokemon/176.png": {
++    "sprites/pokemon/shiny/175.png": {
+       "sheetName": "spritesheet_species_1.webp",
+       "x": 1824,
+       "y": 960,
+       "width": 96,
+       "height": 96
+     },
++    "sprites/pokemon/176.png": {
++      "sheetName": "spritesheet_species_1.webp",
++      "y": 1056,
++      "width": 96,
++      "height": 96
++    },
+     "sprites/pokemon/shiny/176.png": {
+       "sheetName": "spritesheet_species_1.webp",
++      "x": 96,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/177.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 96,
++      "x": 192,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/177.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 192,
++      "x": 288,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/178.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 288,
++      "x": 384,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/female/178.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 384,
++      "x": 480,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/178.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 480,
++      "x": 576,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/female/178.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 576,
++      "x": 672,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/179.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 672,
++      "x": 768,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/179.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 768,
++      "x": 864,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/180.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 864,
++      "x": 960,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/180.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 960,
++      "x": 1056,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/181.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1056,
++      "x": 1152,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/181.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1152,
++      "x": 1248,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/10045.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1248,
++      "x": 1344,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/10045.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1344,
++      "x": 1440,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/182.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1440,
++      "x": 1536,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/182.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1536,
++      "x": 1632,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/183.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1632,
++      "x": 1728,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/183.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1728,
++      "x": 1824,
+       "y": 1056,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/184.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1824,
+-      "y": 1056,
++      "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/184.png": {
+       "sheetName": "spritesheet_species_1.webp",
++      "x": 96,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/185.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 96,
++      "x": 192,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/female/185.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 192,
++      "x": 288,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/185.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 288,
++      "x": 384,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/female/185.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 384,
++      "x": 480,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/186.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 480,
++      "x": 576,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/female/186.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 576,
++      "x": 672,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/186.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 672,
++      "x": 768,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/female/186.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 768,
++      "x": 864,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/187.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 864,
++      "x": 960,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/187.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 960,
++      "x": 1056,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/188.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1056,
++      "x": 1152,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/188.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1152,
++      "x": 1248,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/189.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1248,
++      "x": 1344,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/189.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1344,
++      "x": 1440,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/190.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1440,
++      "x": 1536,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/female/190.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1536,
++      "x": 1632,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/190.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1632,
++      "x": 1728,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/female/190.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1728,
++      "x": 1824,
+       "y": 1152,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/191.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1824,
+-      "y": 1152,
++      "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/191.png": {
+       "sheetName": "spritesheet_species_1.webp",
++      "x": 96,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/192.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 96,
++      "x": 192,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/192.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 192,
++      "x": 288,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/193.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 288,
++      "x": 384,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/193.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 384,
++      "x": 480,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/194.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 480,
++      "x": 576,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/female/194.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 576,
++      "x": 672,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/194.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 672,
++      "x": 768,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/female/194.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 768,
++      "x": 864,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/10253.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 864,
++      "x": 960,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/10253.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 960,
++      "x": 1056,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/195.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1056,
++      "x": 1152,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/female/195.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1152,
++      "x": 1248,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/195.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1248,
++      "x": 1344,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/female/195.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1344,
++      "x": 1440,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/196.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1440,
++      "x": 1536,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/196.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1536,
++      "x": 1632,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/197.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1632,
++      "x": 1728,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/197.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1728,
++      "x": 1824,
+       "y": 1248,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/198.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 1824,
+-      "y": 1248,
++      "y": 1344,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/female/198.png": {
+       "sheetName": "spritesheet_species_1.webp",
++      "x": 96,
+       "y": 1344,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/198.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 96,
++      "x": 192,
+       "y": 1344,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/female/198.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 192,
++      "x": 288,
+       "y": 1344,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/199.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 288,
++      "x": 384,
+       "y": 1344,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/199.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 384,
++      "x": 480,
+       "y": 1344,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/10172.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 480,
++      "x": 576,
+       "y": 1344,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/10172.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 576,
++      "x": 672,
+       "y": 1344,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/200.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 672,
++      "x": 768,
+       "y": 1344,
+       "width": 96,
+       "height": 96
+     },
+     "sprites/pokemon/shiny/200.png": {
+       "sheetName": "spritesheet_species_1.webp",
+-      "x": 768,
++      "x": 864,
+       "y": 1344,
+       "width": 96,
+       "height": 96
