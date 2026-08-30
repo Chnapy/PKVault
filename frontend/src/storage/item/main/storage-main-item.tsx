@@ -13,13 +13,13 @@ import { useSelectCallback } from '../../../util/use-select-callback';
 import type { MoveContainerValue } from '../../move/move-container-fns';
 import { useCurrentStorage } from '../../panel/storage-panel-context';
 
-type StorageMainItemProps = Pick<StorageItemProps, 'nodeId'> & {
+type StorageMainItemProps = Pick<StorageItemProps, 'nodeId' | 'selectFromPreviousSelected'> & {
     pkmId: string;
 };
 
 export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
     'item',
-    React.memo(({ nodeId, pkmId }) => {
+    React.memo(({ pkmId, ...rest }) => {
         const { storageIndex, getSelected } = useCurrentStorage();
         const navigate = Route.useNavigate();
 
@@ -97,7 +97,6 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
 
         return <StorageItem
             id={id}
-            nodeId={nodeId}
             selected={selected}
             container={container}
             species={species}
@@ -110,6 +109,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
             isShadow={isShadow}
             name={nickname}
             level={level}
+            {...rest}
             icons={<UIStorageItemIcons
                 isAlpha={isAlpha}
                 isShiny={isShiny}

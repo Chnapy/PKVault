@@ -1,4 +1,4 @@
-import { Card, Group, Text } from '@mantine/core';
+import { Card, CloseButton, Group, Text } from '@mantine/core';
 import { SquareCheckIcon } from 'lucide-react';
 import type React from 'react';
 import { useTranslate } from '../../translate/i18n';
@@ -7,7 +7,7 @@ import { useControls } from '../../ui/interaction/controls/use-controls';
 import { getBackControl } from '../../ui/interaction/focus-controls/common-controls/back-controls';
 import { Focus } from '../../ui/interaction/focus/provider/use-focus-context';
 import { useFocusScopeContext } from '../../ui/interaction/focus/scope/use-focus-scope-context';
-import { useSelectContextNullable } from '../../ui/interaction/select/context/use-select-context';
+import { useSelectContext, useSelectContextActions } from '../../ui/interaction/select/context/use-select-context';
 import { UICardSectionControl } from '../../ui/storage/storage-panel/card-section-control/ui-card-section-control';
 import type { MoveContainerValue } from '../move/move-container-fns';
 import { useCurrentStorageWithFallback } from '../panel/hooks/use-current-storage-with-fallback';
@@ -21,13 +21,14 @@ export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) 
     const parentScope = useFocusScopeContext();
     const order = parentScope.parentsIds.length;
 
-    const selectCtx = useSelectContextNullable<MoveContainerValue>();
-    const multiSelectIds = selectCtx?.useSelectStore(s => {
+    const selectCtx = useSelectContext<MoveContainerValue>();
+    const selectCtxActions = useSelectContextActions();
+    const multiSelectIds = selectCtx.useSelectStore(s => {
         if (s.ids.size === 0)
             return;
 
         if (!box)
-            return false;
+            return;
 
         const currentContainer = selectCtx.getContainerHash(saveId
             ? {
@@ -97,12 +98,13 @@ export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) 
             position: 'initial',
             overflow: 'initial',
         }}>
-            <Card.Section inheritPadding withBorder>
+            <Card.Section inheritPadding pr='xs' withBorder>
                 <Group gap='sm'>
                     <SquareCheckIcon />
                     <Text>
                         {t('storage.actions.select-title', { count: multiSelectIds.size })}
                     </Text>
+                    <CloseButton onClick={selectCtxActions.clear} size='sm' ml='auto' />
                 </Group>
             </Card.Section>
             {enabled && <Card.Section component={UICardSectionControl} inheritPadding py='inherit' withBorder>

@@ -44,6 +44,7 @@ export const Primary: Story = {
         name: 'Machamp',
         slot: 1,
         globalOrder: 0,
+        selectFromPreviousSelected: () => null,
         icons: <UIStorageItemIcons
             heldItem={null}
             isStarter
