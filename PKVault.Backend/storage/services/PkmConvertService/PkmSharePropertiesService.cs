@@ -93,7 +93,11 @@ public class PkmSharePropertiesService(ILogger<PkmSharePropertiesService> log, I
         else if (targetPkm.MaxStringLengthNickname <= sourcePkm.MaxStringLengthNickname
             || !targetPkm.Nickname.StartsWith(resultPkm.Nickname))
         {
-            targetPkm.Nickname = resultPkm.Nickname;
+            // some characters may change over generations
+            // eg: G5/CH'DING G6/CH’DING
+            // https://github.com/Chnapy/PKVault/issues/205
+            if (targetPkm.Nickname.Replace('’', '\'') != resultPkm.Nickname.Replace('’', '\''))
+                targetPkm.Nickname = resultPkm.Nickname;
         }
 
         targetPkm.CurrentLevel = resultPkm.CurrentLevel;
