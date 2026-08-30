@@ -1,16 +1,194 @@
 --- This file displays changes of StaticOthers_es compressed file from previous changes
 
---- pokeapi\generated\diff-data\StaticOthers_es.diff
-+++ pokeapi\generated\diff-data\StaticOthers_es.diff
-@@ -40735,7 +40735,10 @@
-         "169": 147,
-         "610": 148,
-         "611": 149,
--        "612": 150
-+        "612": 150,
-+        "719": 151,
-+        "720": 152,
-+        "721": 153
-       }
-     },
-     "kalos-coastal": {
+--- pokeapi/generated/diff-data/StaticOthers_es.diff
++++ pokeapi/generated/diff-data/StaticOthers_es.diff
+@@ -18446,7 +18446,7 @@
+           "71": "pp-max",
+           "69": "pp-up",
+           "164": "pamtre-berry",
+-          "18": "parlyz-heal",
++          "18": "paralyze-heal",
+           "106": "pearl",
+           "135": "pecha-berry",
+           "140": "persim-berry",
+@@ -18570,8 +18570,8 @@
+           "125": "wood-mail",
+           "78": "x-accuracy",
+           "75": "x-attack",
+-          "76": "x-defend",
+-          "79": "x-special",
++          "76": "x-defense",
++          "79": "x-sp-atk",
+           "77": "x-speed",
+           "40": "yellow-flute",
+           "258": "yellow-scarf",
+@@ -21677,12 +21677,12 @@
+           "91": "amulet-coin",
+           "9": "antidote",
+           "12": "awakening",
+-          "173": "berry",
++          "173": "oran-berry",
+           "139": "berry-juice",
+           "152": "berserk-gene",
+           "87": "big-mushroom",
+           "111": "big-pearl",
+-          "83": "bitter-berry",
++          "83": "persim-berry",
+           "98": "black-belt",
+           "102": "black-glasses",
+           "99": "blk-apricorn",
+@@ -21691,7 +21691,7 @@
+           "180": "brick-piece",
+           "3": "bright-powder",
+           "10": "burn-heal",
+-          "79": "burnt-berry",
++          "79": "rawst-berry",
+           "31": "calcium",
+           "29": "carbos",
+           "138": "charcoal",
+@@ -21715,7 +21715,7 @@
+           "164": "friend-ball",
+           "38": "full-heal",
+           "14": "full-restore",
+-          "174": "gold-berry",
++          "174": "sitrus-berry",
+           "75": "gold-leaf",
+           "168": "gorgeous-box",
+           "4": "great-ball",
+@@ -21726,7 +21726,7 @@
+           "123": "heal-powder",
+           "157": "heavy-ball",
+           "16": "hyper-potion",
+-          "80": "ice-berry",
++          "80": "aspear-berry",
+           "11": "ice-heal",
+           "28": "iron",
+           "82": "kings-rock",
+@@ -21750,24 +21750,24 @@
+           "40": "max-revive",
+           "143": "metal-coat",
+           "35": "metal-powder",
+-          "84": "mint-berry",
++          "84": "chesto-berry",
+           "117": "miracle-seed",
+-          "109": "miracle-berry",
++          "109": "lum-berry",
+           "189": "mirage-mail",
+           "72": "moomoo-milk",
+           "165": "moon-ball",
+           "8": "moon-stone",
+           "186": "morph-mail",
+           "188": "music-mail",
+-          "150": "mystery-berry",
++          "150": "leppa-berry",
+           "95": "mystic-water",
+           "107": "never-melt-ice",
+           "167": "normal-box",
+           "36": "nugget",
+           "62": "pp-up",
+-          "78": "przcure-berry",
+-          "74": "psncure-berry",
+-          "13": "parlyz-heal",
++          "78": "cheri-berry",
++          "74": "pecha-berry",
++          "13": "paralyze-heal",
+           "110": "pearl",
+           "104": "pink-bow",
+           "101": "pnk-apricorn",
+@@ -21862,8 +21862,8 @@
+           "97": "wht-apricorn",
+           "33": "x-accuracy",
+           "49": "x-attack",
+-          "51": "x-defend",
+-          "53": "x-special",
++          "51": "x-defense",
++          "53": "x-sp-atk",
+           "52": "x-speed",
+           "92": "ylw-apricorn"
+         }
+@@ -36749,11 +36749,6 @@
+         "name": "★Vul7405",
+         "sprite": ""
+       },
+-      "parlyz-heal": {
+-        "id": "parlyz-heal",
+-        "name": "Antiparalizador",
+-        "sprite": ""
+-      },
+       "glitter-mail": {
+         "id": "glitter-mail",
+         "name": "Carta Brillo",
+@@ -36814,16 +36809,6 @@
+         "name": "Carta Tropical",
+         "sprite": "sprites/items/tropic-mail.png"
+       },
+-      "x-defend": {
+-        "id": "x-defend",
+-        "name": "Defensa X",
+-        "sprite": ""
+-      },
+-      "x-special": {
+-        "id": "x-special",
+-        "name": "Especial X",
+-        "sprite": ""
+-      },
+       "steel-mail": {
+         "id": "steel-mail",
+         "name": "Carta Acero",
+@@ -36883,56 +36868,6 @@
+         "id": "space-mail",
+         "name": "Carta Sideral",
+         "sprite": "sprites/items/space-mail.png"
+-      },
+-      "przcure-berry": {
+-        "id": "przcure-berry",
+-        "name": "Antiparabaya",
+-        "sprite": ""
+-      },
+-      "burnt-berry": {
+-        "id": "burnt-berry",
+-        "name": "Antiquembaya",
+-        "sprite": ""
+-      },
+-      "berry": {
+-        "id": "berry",
+-        "name": "Baya",
+-        "sprite": ""
+-      },
+-      "gold-berry": {
+-        "id": "gold-berry",
+-        "name": "Baya Dorada",
+-        "sprite": ""
+-      },
+-      "ice-berry": {
+-        "id": "ice-berry",
+-        "name": "Baya Hielo",
+-        "sprite": ""
+-      },
+-      "mint-berry": {
+-        "id": "mint-berry",
+-        "name": "Baya Menta",
+-        "sprite": ""
+-      },
+-      "miracle-berry": {
+-        "id": "miracle-berry",
+-        "name": "Baya Milagro",
+-        "sprite": ""
+-      },
+-      "mystery-berry": {
+-        "id": "mystery-berry",
+-        "name": "Baya Misterio",
+-        "sprite": ""
+-      },
+-      "bitter-berry": {
+-        "id": "bitter-berry",
+-        "name": "Bayamarga",
+-        "sprite": ""
+-      },
+-      "psncure-berry": {
+-        "id": "psncure-berry",
+-        "name": "Bayantídoto",
+-        "sprite": ""
+       },
+       "ylw-apricorn": {
+         "id": "ylw-apricorn",
