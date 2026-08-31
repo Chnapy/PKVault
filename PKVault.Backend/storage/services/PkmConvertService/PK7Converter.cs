@@ -198,7 +198,7 @@ public class PK7Converter(PKMConverterUtils utils)
 
     public PK7 ConvertToPK7(PB7 pb7, PKMRndValues? rndValues)
     {
-        byte convertAVToEV(float value) => (byte)(value * EffortValues.Max252 / 200);
+        byte convertAVToEV(float value) => (byte)(byte.Max(0, (byte)(value - 2)) * EffortValues.Max252 / 198);
 
         byte[] evs = [
             convertAVToEV(pb7.AV_HP),

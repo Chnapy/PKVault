@@ -71,20 +71,23 @@ public class PkmSharePropertiesService(ILogger<PkmSharePropertiesService> log, I
 
         targetPkm.Language = resultPkm.Language;
 
-        var resultIVs = utils.GetAllIVs(resultPkm);
-        var targetIVs = utils.GetAllIVs(targetPkm);
-        var passIVs = true;
-        for (var i = 0; i < resultIVs.Length; i++)
+        if (sourcePkm is not PB7)
         {
-            if (resultIVs[i] < targetIVs[i])
+            var resultIVs = utils.GetAllIVs(resultPkm);
+            var targetIVs = utils.GetAllIVs(targetPkm);
+            var passIVs = true;
+            for (var i = 0; i < resultIVs.Length; i++)
             {
-                passIVs = false;
-                break;
+                if (resultIVs[i] < targetIVs[i])
+                {
+                    passIVs = false;
+                    break;
+                }
             }
-        }
-        if (passIVs)
-        {
-            utils.CopyIVsFrom(targetPkm, resultPkm);
+            if (passIVs)
+            {
+                utils.CopyIVsFrom(targetPkm, resultPkm);
+            }
         }
 
         targetPkm.IsNicknamed = resultPkm.IsNicknamed;
@@ -94,9 +97,9 @@ public class PkmSharePropertiesService(ILogger<PkmSharePropertiesService> log, I
             || !targetPkm.Nickname.StartsWith(resultPkm.Nickname))
         {
             // some characters may change over generations
-            // eg: G5/CH'DING G6/CH’DING
+            // eg: G5/CH'DING G6/CH’DING G1/CH DING
             // https://github.com/Chnapy/PKVault/issues/205
-            if (targetPkm.Nickname.Replace('’', '\'') != resultPkm.Nickname.Replace('’', '\''))
+            if (targetPkm.Nickname.Replace('’', '\'').Replace(' ', '\'') != resultPkm.Nickname.Replace('’', '\'').Replace(' ', '\''))
                 targetPkm.Nickname = resultPkm.Nickname;
         }
 
