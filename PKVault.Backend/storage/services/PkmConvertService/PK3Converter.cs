@@ -92,6 +92,15 @@ public class PK3Converter(PKMConverterUtils utils)
         };
 
         pk2.SetNickname(pk3.IsNicknamed ? pk3.Nickname : "");
+        if (pk3.IsNicknamed)
+        {
+            char[] baseNickname = [.. pk3.Nickname];
+            while (pk2.Nickname.Length < pk3.Nickname.Length)
+            {
+                baseNickname[pk2.Nickname.Length] = ' ';
+                pk2.SetNickname(new string(baseNickname));
+            }
+        }
 
         utils.CopyHeldItemByStringFrom(pk2, pk3.HeldItem, pk3.Context, pk3.Version);
 

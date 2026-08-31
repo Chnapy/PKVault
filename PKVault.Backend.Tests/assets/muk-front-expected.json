@@ -725,9 +725,9 @@
         "exp": 55237,
         "moves": [
             1,
-            0,
-            0,
-            0
+            151,
+            103,
+            124
         ],
         "shiny": false,
         "nicknamed": false,
@@ -925,8 +925,8 @@
         "exp": 55237,
         "moves": [
             1,
-            0,
-            0,
+            103,
+            124,
             0
         ],
         "shiny": false,
@@ -975,6 +975,8 @@
         "illegalities": [
             "Encounter-EncInvalid",
             "Encounter-TransferBad",
+            "Move-0",
+            "Move-0",
             "Move-0"
         ]
     }

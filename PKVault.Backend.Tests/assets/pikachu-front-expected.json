@@ -615,8 +615,8 @@
         "moves": [
             87,
             98,
-            0,
-            0
+            231,
+            84
         ],
         "shiny": false,
         "nicknamed": false,
@@ -650,9 +650,7 @@
         "metLocation": 30001,
         "illegalities": [
             "PID-PIDTypeMismatch",
-            "Encounter-TransferTrackerMissing",
-            "Move-231",
-            "Move-87"
+            "Encounter-TransferTrackerMissing"
         ]
     },
     "PK9": {

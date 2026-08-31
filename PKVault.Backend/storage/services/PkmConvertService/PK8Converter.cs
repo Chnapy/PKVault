@@ -128,7 +128,9 @@ public class PK8Converter(PKMConverterUtils utils)
         var pa8 = new PA8()
         {
             Version = pk8.Version,
-            MetLocation = pk8.MetLocation,
+            MetLocation = pk8.Version.Generation <= 3
+                ? Locations.Transfer3
+                : pk8.Version.Generation == 4 ? Locations.Transfer4 : pk8.MetLocation,
             MetDate = pk8.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk8.MetLevel,
             Ability = pk8.Ability,

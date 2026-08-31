@@ -55,28 +55,7 @@ public class DexDataService(StaticDataService staticDataService, ISettingsServic
         var learnset = learnSource.GetLearnset(species, form);
         var eggMoves = learnSource.GetEggMoves(species, form);
 
-        HashSet<ushort> GetEncounterMoves()
-        {
-            bool[] bufferRent = ArrayPool<bool>.Shared.Rent(bufferLength);
-            var encounterMovesSpan = bufferRent.AsSpan(0, bufferLength);
-
-            LearnPossible.Get(pkm.GetMutablePkm(), legality.Info.EncounterOriginal, legality.Info.EvoChainsAllGens, encounterMovesSpan, MoveSourceType.Encounter);
-
-            HashSet<ushort> values = [];
-
-            for (ushort move = 1; move < bufferLength; move++)
-            {
-                if (encounterMovesSpan[move])
-                    values.Add(move);
-            }
-
-            encounterMovesSpan.Clear();
-            ArrayPool<bool>.Shared.Return(bufferRent);
-
-            return values;
-        }
-
-        Dictionary<ushort, byte> learnableMoves = GetEncounterMoves().Select(move => (move, (byte)1)).ToDictionary();
+        Dictionary<ushort, byte> learnableMoves = GetEncounterMoves(legality.Info).Select(move => (move, (byte)1)).ToDictionary();
         // HashSet<ushort> encounterMoves = GetEncounterMoves();
         HashSet<ushort> TMHMMoves = [];
         HashSet<ushort> tutorMoves = [];
@@ -164,6 +143,21 @@ public class DexDataService(StaticDataService staticDataService, ISettingsServic
                 TMHMMoves: TMHMMoves,
                 TutorMoves: tutorMoves
             );
+    }
+
+    public static IOrderedEnumerable<ushort> GetEncounterMoves(LegalInfo legalityInfo)
+    {
+        var encounterMoves = LearnPossible.Get(legalityInfo.Entity, legalityInfo.EncounterOriginal, legalityInfo.EvoChainsAllGens, MoveSourceType.Encounter);
+
+        HashSet<ushort> values = [];
+
+        for (ushort move = 1; move < legalityInfo.Entity.MaxMoveID + 1; move++)
+        {
+            if (encounterMoves[move])
+                values.Add(move);
+        }
+
+        return values.Order();
     }
 
     public async Task<StaticEvolvesRichData> GetEvolutionChain(ushort species)

@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Security.Cryptography;
 using System.Text;
 using PKHeX.Core;
@@ -14,6 +15,63 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         FixRibbonLegality(pkm, save);
         FixContestLegality(pkm, save);
         FixPokerusLegality(pkm, save);
+        FixMovesLegality(pkm, save);
+    }
+
+    // Fix each move legality ONLY if an expected one is present
+    public void FixMovesLegality(PKM pkm, SaveWrapper? save = null)
+    {
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+        if (legality.la == null || legality.MovesValid.All(r => r))
+        {
+            return;
+        }
+
+        ushort[] moves = [
+            pkm.Move1,
+            pkm.Move2,
+            pkm.Move3,
+            pkm.Move4,
+        ];
+
+        for (var i = 0; i < legality.la.Info.Moves.Length; i++)
+        {
+            var r = legality.la.Info.Moves[i];
+            if (r.Valid)
+                continue;
+
+            pkm.SetMove(i, 0);
+        }
+
+        legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+
+        List<ushort> newMoves = [];
+        IEnumerable<ushort> encounterMoves = [];
+
+        for (var i = 0; i < legality.la!.Info.Moves.Length; i++)
+        {
+            var r = legality.la.Info.Moves[i];
+
+            var move = r.Expect > 0
+                ? r.Expect
+                : moves[i];
+
+            // if duplicate
+            // replace it by first valid one
+            if (newMoves.Contains(move))
+            {
+                if (!encounterMoves.Any())
+                    encounterMoves = DexDataService.GetEncounterMoves(legality.la.Info);
+
+                move = encounterMoves.FirstOrDefault(m => m > 0 && !newMoves.Contains(m));
+            }
+
+            pkm.SetMove(i, move);
+            if (move > 0)
+                newMoves.Add(move);
+        }
+
+        pkm.FixMoves();
     }
 
     public bool FixPokerusLegality(PKM pkm, SaveWrapper? save = null, int recursive = 0)
@@ -249,7 +307,14 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         // log.LogInformation($"MOVES = {pkm.Move1}/{pkm.Move2}/{pkm.Move3}/{pkm.Move4}");
 
         var legality = legalityAnalysisService.GetLegalitySafe(new(pkm));
-        if (legality.la == null || legality.MovesValid.All(r => r))
+        if (legality.la == null
+            || legality.MovesValid.All(r => r)
+            // all moves are wrong, or empty
+            || legality.la.Info.Moves.All(r =>
+                r.Info.Method == LearnMethod.Empty
+                || r.Info.Method == LearnMethod.Unobtainable
+                || r.Info.Method == LearnMethod.UnobtainableExpect)
+        )
         {
             return;
         }
@@ -490,6 +555,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
                 !r.Valid
                 && (
                     r.Identifier == CheckIdentifier.Ability
+                    && r.Result != LegalityCheckResultCode.AbilityMismatchPID
                 )
             );
         }
