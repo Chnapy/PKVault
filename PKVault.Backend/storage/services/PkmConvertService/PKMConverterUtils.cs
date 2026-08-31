@@ -45,33 +45,10 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 
         legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
 
-        ushort[] GetEncounterMoves()
-        {
-            var bufferLength = pkm.MaxMoveID + 1;
-
-            bool[] bufferRent = ArrayPool<bool>.Shared.Rent(bufferLength);
-            var encounterMovesSpan = bufferRent.AsSpan(0, bufferLength);
-
-            LearnPossible.Get(pkm, legality.la.Info.EncounterOriginal, legality.la.Info.EvoChainsAllGens, encounterMovesSpan, MoveSourceType.Encounter);
-
-            HashSet<ushort> values = [];
-
-            for (ushort move = 1; move < bufferLength; move++)
-            {
-                if (encounterMovesSpan[move])
-                    values.Add(move);
-            }
-
-            encounterMovesSpan.Clear();
-            ArrayPool<bool>.Shared.Return(bufferRent);
-
-            return values.Order().ToArray();
-        }
-
         List<ushort> newMoves = [];
-        ushort[] encounterMoves = [];
+        IEnumerable<ushort> encounterMoves = [];
 
-        for (var i = 0; i < legality.la.Info.Moves.Length; i++)
+        for (var i = 0; i < legality.la!.Info.Moves.Length; i++)
         {
             var r = legality.la.Info.Moves[i];
 
@@ -83,8 +60,8 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
             // replace it by first valid one
             if (newMoves.Contains(move))
             {
-                if (encounterMoves.Length == 0)
-                    encounterMoves = GetEncounterMoves();
+                if (!encounterMoves.Any())
+                    encounterMoves = DexDataService.GetEncounterMoves(legality.la.Info);
 
                 move = encounterMoves.FirstOrDefault(m => m > 0 && !newMoves.Contains(m));
             }
