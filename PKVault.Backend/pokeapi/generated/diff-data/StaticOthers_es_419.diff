@@ -1,2 +1,91 @@
 --- This file displays changes of StaticOthers_es-419 compressed file from previous changes
 
+--- pokeapi/generated/diff-data/StaticOthers_es_419.diff
++++ pokeapi/generated/diff-data/StaticOthers_es_419.diff
+@@ -36752,7 +36752,7 @@
+       "parlyz-heal": {
+         "id": "parlyz-heal",
+         "name": "Antiparalizador",
+-        "sprite": ""
++        "sprite": "sprites/items/paralyze-heal.png"
+       },
+       "glitter-mail": {
+         "id": "glitter-mail",
+@@ -36817,12 +36817,12 @@
+       "x-defend": {
+         "id": "x-defend",
+         "name": "Defensa X",
+-        "sprite": ""
++        "sprite": "sprites/items/x-defense.png"
+       },
+       "x-special": {
+         "id": "x-special",
+         "name": "Especial X",
+-        "sprite": ""
++        "sprite": "sprites/items/x-sp-atk.png"
+       },
+       "steel-mail": {
+         "id": "steel-mail",
+@@ -36887,52 +36887,52 @@
+       "przcure-berry": {
+         "id": "przcure-berry",
+         "name": "Antiparabaya",
+-        "sprite": ""
++        "sprite": "sprites/items/cheri-berry.png"
+       },
+       "burnt-berry": {
+         "id": "burnt-berry",
+         "name": "Antiquembaya",
+-        "sprite": ""
++        "sprite": "sprites/items/rawst-berry.png"
+       },
+       "berry": {
+         "id": "berry",
+         "name": "Baya",
+-        "sprite": ""
++        "sprite": "sprites/items/oran-berry.png"
+       },
+       "gold-berry": {
+         "id": "gold-berry",
+         "name": "Baya Dorada",
+-        "sprite": ""
++        "sprite": "sprites/items/sitrus-berry.png"
+       },
+       "ice-berry": {
+         "id": "ice-berry",
+         "name": "Baya Hielo",
+-        "sprite": ""
++        "sprite": "sprites/items/aspear-berry.png"
+       },
+       "mint-berry": {
+         "id": "mint-berry",
+         "name": "Baya Menta",
+-        "sprite": ""
++        "sprite": "sprites/items/chesto-berry.png"
+       },
+       "miracle-berry": {
+         "id": "miracle-berry",
+         "name": "Baya Milagro",
+-        "sprite": ""
++        "sprite": "sprites/items/lum-berry.png"
+       },
+       "mystery-berry": {
+         "id": "mystery-berry",
+         "name": "Baya Misterio",
+-        "sprite": ""
++        "sprite": "sprites/items/leppa-berry.png"
+       },
+       "bitter-berry": {
+         "id": "bitter-berry",
+         "name": "Bayamarga",
+-        "sprite": ""
++        "sprite": "sprites/items/persim-berry.png"
+       },
+       "psncure-berry": {
+         "id": "psncure-berry",
+         "name": "Bayantídoto",
+-        "sprite": ""
++        "sprite": "sprites/items/pecha-berry.png"
+       },
+       "ylw-apricorn": {
+         "id": "ylw-apricorn",

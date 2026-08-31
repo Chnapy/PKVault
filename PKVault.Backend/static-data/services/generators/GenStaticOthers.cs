@@ -555,7 +555,7 @@ public class GenStaticOthers(
                     continue;
                 }
 
-                var itemObj = await pokeApiService.GetItem(itemNamePokeapi);
+                var itemObj = await pokeApiService.GetItem(GetPokeapiSpriteName(itemNamePokeapi));
                 var sprite = itemObj?.Sprites.Default ?? "";
 
                 // if (itemObj == null)
@@ -706,6 +706,25 @@ public class GenStaticOthers(
             _ => pokeapiName
         };
     }
+
+    // Some older items have no PokéAPI sprite of their own; use a stand-in sprite without renaming the item itself.
+    private static string GetPokeapiSpriteName(string pokeapiName) => pokeapiName switch
+    {
+        "berry" => "oran-berry",
+        "gold-berry" => "sitrus-berry",
+        "bitter-berry" => "persim-berry",
+        "burnt-berry" => "rawst-berry",
+        "ice-berry" => "aspear-berry",
+        "mint-berry" => "chesto-berry",
+        "miracle-berry" => "lum-berry",
+        "mystery-berry" => "leppa-berry",
+        "psncure-berry" => "pecha-berry",
+        "przcure-berry" => "cheri-berry",
+        "parlyz-heal" => "paralyze-heal",
+        "x-defend" => "x-defense",
+        "x-special" => "x-sp-atk",
+        _ => pokeapiName
+    };
 
     private static MoveCategory GetMoveCategory(string damageClassName)
     {
