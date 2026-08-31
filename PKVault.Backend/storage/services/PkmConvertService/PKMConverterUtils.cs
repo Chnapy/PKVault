@@ -45,7 +45,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 
         legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
 
-        HashSet<ushort> GetEncounterMoves()
+        ushort[] GetEncounterMoves()
         {
             var bufferLength = pkm.MaxMoveID + 1;
 
@@ -65,7 +65,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
             encounterMovesSpan.Clear();
             ArrayPool<bool>.Shared.Return(bufferRent);
 
-            return values;
+            return values.Order().ToArray();
         }
 
         List<ushort> newMoves = [];
@@ -84,7 +84,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
             if (newMoves.Contains(move))
             {
                 if (encounterMoves.Length == 0)
-                    encounterMoves = GetEncounterMoves().ToArray();
+                    encounterMoves = GetEncounterMoves();
 
                 move = encounterMoves.FirstOrDefault(m => m > 0 && !newMoves.Contains(m));
             }
