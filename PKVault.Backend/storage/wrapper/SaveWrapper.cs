@@ -23,7 +23,13 @@ public class SaveWrapper(SaveFile Save)
                 byte[] hash = SHA1.HashData(bytes);
                 return BitConverter.ToUInt32(hash, 0);
             }
-            return Save.ID32;
+
+            string rawKey = $"{Save.Version}-{Save.Language}-{Save.ID32}-{Save.OT}-{Save.Gender}";
+
+            byte[] inputBytes = Encoding.UTF8.GetBytes(rawKey);
+            byte[] hashBytes = SHA256.HashData(inputBytes);
+
+            return BitConverter.ToUInt32(hashBytes, 0);
         }
     }
 
