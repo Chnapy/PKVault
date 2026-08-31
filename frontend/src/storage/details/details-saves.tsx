@@ -45,7 +45,7 @@ export const DetailsSaves: React.FC<DetailsSavesProps> = ({ actions }) => {
                     return;
 
                 const attachedVariant = variants.find(v => v.attachedSaveId);
-                if (attachedVariant)
+                if (attachedVariant?.context == otherStorageSave.context)
                     return;
 
                 const hasPkmForPageSaveContext = variants.some(variant => variant.context === otherStorageSave.context);

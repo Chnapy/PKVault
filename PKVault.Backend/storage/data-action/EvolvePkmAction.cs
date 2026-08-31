@@ -64,7 +64,7 @@ public class EvolvePkmAction(
         var pkmVariant = await pkmVariantLoader.GetEntityBySave(dto.SaveId, dto.IdBase);
         if (pkmVariant != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariant.Id, dto.IdBase)], forceHeldItem: evolveByItem));
+            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariant.Id, dto.IdBase)]));
         }
 
         return new(
@@ -132,7 +132,7 @@ public class EvolvePkmAction(
 
         if (attachedEntity != null)
         {
-            await synchronizePkmAction.SynchronizePkmVariantToSave(new([(attachedEntity.Id, attachedEntity.AttachedSavePkmIdBase!)], forceHeldItem: evolveByItem));
+            await synchronizePkmAction.SynchronizePkmVariantToSave(new([(attachedEntity.Id, attachedEntity.AttachedSavePkmIdBase!)]));
         }
 
         await new DexMainService(sp).EnablePKM(entityPkm);

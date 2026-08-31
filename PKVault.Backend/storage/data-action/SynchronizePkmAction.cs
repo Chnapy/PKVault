@@ -1,8 +1,7 @@
 using PKHeX.Core;
 
 public record SynchronizePkmActionInput(
-    (string PkmVariantId, string SavePkmIdBase)[] pkmVariantAndPkmSaveIds,
-    bool forceHeldItem = false
+    (string PkmVariantId, string SavePkmIdBase)[] pkmVariantAndPkmSaveIds
 );
 
 public class SynchronizePkmAction(
@@ -125,7 +124,7 @@ public class SynchronizePkmAction(
 
                 variantPkm = variantPkm.Update(pkm =>
                 {
-                    pkmSharePropertiesService.SharePropertiesTo(savePkm.Pkm, pkm, savePkm.Save.GetSave(), input.forceHeldItem);
+                    pkmSharePropertiesService.SharePropertiesTo(savePkm.Pkm, pkm, savePkm.Save.GetSave());
                 });
 
                 var variantEntity = await pkmVariantLoader.GetEntity(variant.Id);
@@ -196,7 +195,7 @@ public class SynchronizePkmAction(
             {
                 Pkm = savePkm.Pkm.Update(pkm =>
                 {
-                    pkmSharePropertiesService.SharePropertiesTo(variantPkm, pkm, savePkm.Save.GetSave(), input.forceHeldItem);
+                    pkmSharePropertiesService.SharePropertiesTo(variantPkm, pkm, savePkm.Save.GetSave());
                 })
             };
 
