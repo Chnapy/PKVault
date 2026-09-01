@@ -109,9 +109,9 @@ RUN dotnet publish "PKVault.Desktop/PKVault.Desktop.csproj" -c Release -o /app/p
 
 RUN ls -la /app/publish
 
-RUN if [ "$(echo $RID | grep -o 'win-x64')" ]; then \
+RUN if [ "$(echo $RID | grep -o 'win-')" ]; then \
   cp -r /app/publish /app/publish-final && \
-  echo "=== Skip AppImage (non-linux-x64: $RID) ==="; \
+  echo "=== Skip AppImage (non-linux: $RID) ==="; \
   fi
 
 # desktop macOS - .app bundle (dotnet cross-compiles, no real Mac required)

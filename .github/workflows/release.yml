@@ -135,6 +135,7 @@ jobs:
     needs:
       - version
       - docker
+      - desktop
     steps:
       - name: Set env variables
         run: |
@@ -180,10 +181,18 @@ jobs:
         run: |
           docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}
 
-  release:
-    name: Create GitHub release
-    needs: [version, docker]
-    runs-on: ubuntu-latest
+  desktop:
+    name: Build Desktop apps
+    needs: version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
 
     steps:
       - uses: actions/checkout@v4
@@ -194,66 +203,91 @@ jobs:
           echo "VERSION=${{ needs.version.outputs.version }}" >> $GITHUB_ENV
           echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
 
-      - name: Build Win64 desktop image & extract executable
+      - name: Build Windows desktop image & extract executable
         run: |
-          docker build . --target desktop --build-arg RID=win-x64 --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-win64
-          docker create --name tmp-desktop-win64 tmp-desktop-win64
+          docker build . --target desktop --build-arg RID=win-${{ matrix.arch }} --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-win
+          docker create --name tmp-desktop-win tmp-desktop-win
 
-          docker cp tmp-desktop-win64:/app/PKVault.exe PKVault-${{ env.VERSION }}.exe
+          docker cp tmp-desktop-win:/app/PKVault.exe PKVault-${{ env.VERSION }}.exe
 
-          docker rm tmp-desktop-win64
-          docker rmi tmp-desktop-win64
+          docker rm tmp-desktop-win
+          docker rmi tmp-desktop-win
 
           ls -la .
 
-      - name: Build Linux64 desktop image & extract executable
+      - name: Build Linux desktop image & extract executable
         run: |
-          docker build . --target desktop-linux --build-arg RID=linux-x64 --build-arg VERSION=${{ env.VERSION }} --build-arg BUILD_DATE=${{ env.BUILD_DATE }} -t tmp-desktop-linux64
-          docker create --name tmp-desktop-linux64 tmp-desktop-linux64
+          docker build . --target desktop-linux --build-arg RID=linux-${{ matrix.arch }} --build-arg VERSION=${{ env.VERSION }} --build-arg BUILD_DATE=${{ env.BUILD_DATE }} -t tmp-desktop-linux
+          docker create --name tmp-desktop-linux tmp-desktop-linux
 
-          docker cp tmp-desktop-linux64:/app/PKVault pkvault-${{ env.VERSION }}.linux
-          chmod +x pkvault-${{ env.VERSION }}.linux
+          docker cp tmp-desktop-linux:/app/PKVault pkvault-${{ env.VERSION }}-${{ matrix.arch }}.linux
+          chmod +x pkvault-${{ env.VERSION }}-${{ matrix.arch }}.linux
 
-          docker cp tmp-desktop-linux64:/app/PKVault.AppImage pkvault-${{ env.VERSION }}.AppImage
-          chmod +x pkvault-${{ env.VERSION }}.AppImage
+          docker cp tmp-desktop-linux:/app/PKVault.AppImage pkvault-${{ env.VERSION }}-${{ matrix.arch }}.AppImage
+          chmod +x pkvault-${{ env.VERSION }}-${{ matrix.arch }}.AppImage
 
-          docker cp tmp-desktop-linux64:/app/PKVault.deb pkvault-${{ env.VERSION }}.deb
-          chmod +x pkvault-${{ env.VERSION }}.deb
+          docker cp tmp-desktop-linux:/app/PKVault.deb pkvault-${{ env.VERSION }}-${{ matrix.arch }}.deb
+          chmod +x pkvault-${{ env.VERSION }}-${{ matrix.arch }}.deb
 
-          docker cp tmp-desktop-linux64:/app/PKVault.flatpak pkvault-${{ env.VERSION }}.flatpak
-          chmod +x pkvault-${{ env.VERSION }}.flatpak
+          docker cp tmp-desktop-linux:/app/PKVault.flatpak pkvault-${{ env.VERSION }}-${{ matrix.arch }}.flatpak
+          chmod +x pkvault-${{ env.VERSION }}-${{ matrix.arch }}.flatpak
 
-          docker rm tmp-desktop-linux64
-          docker rmi tmp-desktop-linux64
+          docker rm tmp-desktop-linux
+          docker rmi tmp-desktop-linux
 
           ls -la .
 
-      - name: Build macOS arm64 desktop image & extract app bundle
+      - name: Build macOS desktop image & extract app bundle
         run: |
-          docker build . --target desktop-macos --build-arg RID=osx-arm64 --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-macos-arm64
-          docker create --name tmp-desktop-macos-arm64 tmp-desktop-macos-arm64
+          docker build . --target desktop-macos --build-arg RID=osx-${{ matrix.arch }} --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-macos
+          docker create --name tmp-desktop-macos tmp-desktop-macos
 
-          docker cp tmp-desktop-macos-arm64:/app/pkvault-${{ env.VERSION }}-osx-arm64.app.zip pkvault-${{ env.VERSION }}-osx-arm64.app.zip
+          docker cp tmp-desktop-macos:/app/pkvault-${{ env.VERSION }}-osx-${{ matrix.arch }}.app.zip pkvault-${{ env.VERSION }}-osx-${{ matrix.arch }}.app.zip
 
-          docker rm tmp-desktop-macos-arm64
-          docker rmi tmp-desktop-macos-arm64
+          docker rm tmp-desktop-macos
+          docker rmi tmp-desktop-macos
 
           ls -la .
 
-      - name: Build macOS x64 desktop image & extract app bundle
+      - name: Upload desktop executables
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-${{ matrix.arch }}
+          path: |
+            PKVault-${{ env.VERSION }}-${{ matrix.arch }}.exe
+            pkvault-${{ env.VERSION }}-${{ matrix.arch }}.linux
+            pkvault-${{ env.VERSION }}-${{ matrix.arch }}.AppImage
+            pkvault-${{ env.VERSION }}-${{ matrix.arch }}.flatpak
+            pkvault-${{ env.VERSION }}-${{ matrix.arch }}.deb
+            pkvault-${{ env.VERSION }}-osx-${{ matrix.arch }}.app.zip
+          if-no-files-found: error
+          retention-days: 1
+
+  release:
+    name: Create GitHub release
+    if: ${{ !inputs.dry-run }}
+    needs:
+      - version
+      - desktop
+      - docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set env variables
         run: |
-          docker build . --target desktop-macos --build-arg RID=osx-x64 --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-macos-x64
-          docker create --name tmp-desktop-macos-x64 tmp-desktop-macos-x64
+          echo "TAG=${{ needs.version.outputs.tag }}" >> $GITHUB_ENV
+          echo "VERSION=${{ needs.version.outputs.version }}" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
 
-          docker cp tmp-desktop-macos-x64:/app/pkvault-${{ env.VERSION }}-osx-x64.app.zip pkvault-${{ env.VERSION }}-osx-x64.app.zip
-
-          docker rm tmp-desktop-macos-x64
-          docker rmi tmp-desktop-macos-x64
-
-          ls -la .
+      - name: Download desktop files
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/files
+          pattern: desktop-*
+          merge-multiple: true
 
       - name: Create tag
-        if: ${{ !inputs.dry-run }}
         env:
           VERSION: v${{ env.VERSION }}
         run: |
@@ -261,17 +295,11 @@ jobs:
           git push origin $VERSION
 
       - name: Create release
-        if: ${{ !inputs.dry-run }}
         uses: softprops/action-gh-release@v2
         with:
+          working_directory: ${{ runner.temp }}/files
           tag_name: v${{ env.VERSION }}
           name: v${{ env.VERSION }}
           generate_release_notes: true
           files: |
-            PKVault-${{ env.VERSION }}.exe
-            pkvault-${{ env.VERSION }}.linux
-            pkvault-${{ env.VERSION }}.AppImage
-            pkvault-${{ env.VERSION }}.flatpak
-            pkvault-${{ env.VERSION }}.deb
-            pkvault-${{ env.VERSION }}-osx-arm64.app.zip
-            pkvault-${{ env.VERSION }}-osx-x64.app.zip
+            *

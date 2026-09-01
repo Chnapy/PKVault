@@ -4,7 +4,7 @@ set -e
 
 # Build PKVault.deb in Linux context
 
-echo "=== Building .deb for Linux x86_64 ==="
+echo "=== Building .deb for Linux ==="
 
 ls .
 
