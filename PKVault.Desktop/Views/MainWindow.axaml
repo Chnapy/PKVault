@@ -1,0 +1,16 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="PKVault.Desktop.Views.MainWindow"
+    Title="PKVault"
+    Width="1280" Height="755"
+    WindowStartupLocation="CenterScreen"
+    CanResize="True"
+    Background="#B6634E"
+    >
+    <NativeWebView x:Name="WebView"
+        NavigationCompleted="WebView_OnNavigationCompleted"
+        WebMessageReceived="WebView_OnWebMessageReceived"
+        Background="#B6634E"
+        />
+</Window>

@@ -1,4 +1,6 @@
 import z from 'zod';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type * as webviewTypes from 'webview2-types';
 
 type FileExploreRequest = {
     type: 'file-explore';
@@ -29,16 +31,9 @@ type StartFinishRequest = {
 
 type Response = | FileExploreResponse;
 
-declare global {
-    interface External {
-        sendMessage?: (message: string) => void;
-        receiveMessage?: (callback: (data: string) => void) => void;
-    }
-}
+const webview = window.chrome?.webview;
 
-const external = window.external as External | undefined;
-
-export const isDesktop = external?.sendMessage !== undefined;
+export const isDesktop = webview?.postMessage !== undefined;
 
 const desktopResponseSchema = z.object({
     detail: z.object({
@@ -53,17 +48,16 @@ const requestDesktop = <R extends Response>(request: { type: string; id?: string
 
     console.log('send to desktop:', request);
 
-    external?.sendMessage?.(JSON.stringify(request));
+    webview?.postMessage?.(JSON.stringify(request));
 
     if (request.id !== undefined) {
-        external?.receiveMessage?.(message => {
-            if (resolved) {
+        webview?.addEventListener('desktop', e => {
+            if (resolved || !(e instanceof CustomEvent)) {
                 return;
             }
+            const data = e.detail;
 
-            console.log('received from desktop:', message);
-
-            const data = JSON.parse(message);
+            console.log('received from desktop:', data);
 
             if (!isDesktopMessageResponse(data) || data.detail.type !== request.type || data.detail.id !== request.id) {
                 return;

@@ -11,6 +11,8 @@
     <SelfContained>true</SelfContained>
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- <InvariantGlobalization>true</InvariantGlobalization>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages> -->
     
     <PublishTrimmed>true</PublishTrimmed>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
@@ -36,6 +38,7 @@
     <ApplicationDisplayVersion>2.2.1</ApplicationDisplayVersion>
     <ApplicationVersion>2.2.1</ApplicationVersion>
     <ApplicationIcon>Resources/wwwroot/icon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <NeutralLanguage>en</NeutralLanguage>
     <Product>PKVault</Product>
     <Description>PKVault is a Pokemon storage and save manipulation tool based on PKHeX.</Description>
@@ -59,11 +62,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Photino.NET" Version="4.0.16" />
-    <PackageReference Include="Photino.NET.Server" Version="4.0.12" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.11" />
-    <PackageReference Include="GtkSharp" Version="3.24.24.95" />
+    <PackageReference Include="Avalonia" Version="12.1.1" />
+    <PackageReference Include="Avalonia.Controls.WebView" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.1" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="12.1.1" />
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
+
+  <!-- <Target Name="RemoveAngleNativeLib" AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(FileName)%(Extension)' == 'av_libglesv2.dll'" />
+    </ItemGroup>
+  </Target> -->
 
   <ItemGroup>
     <ProjectReference Include="..\PKVault.Backend\PKVault.Backend.csproj" />
