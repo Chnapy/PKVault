@@ -146,7 +146,8 @@ class Program
 
     private static Func<Task> SetupStaticAssetsServer(out string baseUrl)
     {
-        var server = PhotinoServer.CreateStaticFileServer([], out baseUrl);
+        // IANA (RFC 6335) less-used ports
+        var server = PhotinoServer.CreateStaticFileServer([], 49152, 16000, "wwwroot", out baseUrl);
 
         var contentTypeProvider = new FileExtensionContentTypeProvider();
 
