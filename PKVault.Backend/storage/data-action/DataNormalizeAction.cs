@@ -111,6 +111,10 @@ public class DataNormalizeAction(
         {
             await MigrateVariantsFrom200(input);
         }
+        else if (GetVersionValue(currentVersion.Value) <= GetVersionValue("2.2.1"))
+        {
+            await MigrateIdsTo221();
+        }
 
         // --- Update version
 
@@ -392,6 +396,93 @@ public class DataNormalizeAction(
 
             return variant;
         }));
+        await db.SaveChangesAsync();
+    }
+
+    private async Task MigrateIdsTo221()
+    {
+        var allLoaders = savesLoadersService.GetAllLoaders();
+        var allVariants = await pkmVariantLoader.GetAllEntities();
+        var allBanks = await bankLoader.GetAllEntities();
+
+        if (allBanks.Count > 0)
+        {
+            foreach (var bank_entity in allBanks.Values)
+            {
+                var boxes = bank_entity.View.MainBoxIds;
+                var oldSaves = bank_entity.View.Saves;
+
+                if (oldSaves.Length == 0)
+                    continue;
+
+                var updatedSaves = new BankEntity.BankViewSave[oldSaves.Length];
+
+                for (int i = 0; i < oldSaves.Length; i++)
+                {
+                    var oldSave = oldSaves[i];
+                    SaveLoadersRecord? matchLoaderBank = null;
+
+                    foreach (var loader in allLoaders)
+                    {
+                        if (loader.Save.ID32 == oldSave.SaveId)
+                        {
+                            matchLoaderBank = loader;
+                            break;
+                        }
+                    }
+
+                    uint SaveId = 0;
+                    if (matchLoaderBank != null)
+                    {
+                        SaveId = matchLoaderBank.Save.Id;
+                    }
+
+                    updatedSaves[i] = new BankEntity.BankViewSave(
+                        SaveId,
+                        oldSave.SaveBoxIds,
+                        oldSave.Order
+                    );
+                }
+
+                bank_entity.View = new(boxes, updatedSaves);
+
+                await bankLoader.UpdateEntity(bank_entity);
+            }
+        }
+        
+        if (allVariants.Count > 0)
+        {
+
+            foreach (var variant in allVariants.Values)
+            {
+                if (variant.AttachedSaveId == null)
+                    continue;
+
+                SaveLoadersRecord? matchLoaderVariants = null;
+
+                foreach (var loader in allLoaders)
+                {
+                    if (loader.Save.ID32 == variant.AttachedSaveId)
+                    {
+                        matchLoaderVariants = loader;
+                        break;
+                    }
+                }
+
+                if (matchLoaderVariants != null)
+                {
+                    variant.AttachedSaveId = matchLoaderVariants.Save.Id;
+                }
+                else
+                {
+                    variant.AttachedSaveId = null;
+                }
+
+                await pkmVariantLoader.UpdateEntity(variant);
+            }
+            
+        }
+
         await db.SaveChangesAsync();
     }
 }

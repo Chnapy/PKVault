@@ -24,7 +24,7 @@ public class SaveWrapper(SaveFile Save)
                 return BitConverter.ToUInt32(hash, 0);
             }
 
-            string rawKey = $"{Save.Version}-{Save.Language}-{Save.ID32}-{Save.OT}-{Save.Gender}";
+            string rawKey = $"{(byte)Save.Version}-{Save.Language}-{Save.ID32}-{Save.OT}-{(byte)Save.Gender}";
 
             byte[] inputBytes = Encoding.UTF8.GetBytes(rawKey);
             byte[] hashBytes = SHA256.HashData(inputBytes);
@@ -32,6 +32,8 @@ public class SaveWrapper(SaveFile Save)
             return BitConverter.ToUInt32(hashBytes, 0);
         }
     }
+
+    public uint ID32 => Save.ID32;
 
     public SaveFileState State => Save.State;
     public SaveFileMetadata Metadata => Save.Metadata;
