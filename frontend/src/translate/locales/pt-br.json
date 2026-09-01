@@ -255,6 +255,7 @@
   "settings.sub.external": "Externos",
   "settings.sub.main": "Principal",
   "settings.system.linux": "Linux",
+  "settings.system.macos": "macOS",
   "settings.system.steamdeck": "Steam Deck",
   "settings.system.unknown": "Desconhecido",
   "settings.system.windows": "Windows",

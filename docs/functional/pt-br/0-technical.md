@@ -1,6 +1,6 @@
 # 0 - Considerações técnicas
 
-O PKVault roda no Windows e no Linux em sua versão para desktop. Existe também uma versão para Steam Deck (flatpak).
+O PKVault roda no Windows, Linux e macOS em sua versão para desktop. Existe também uma versão para Steam Deck (flatpak).
 
 Assim como o PKHeX, o PKVault depende do .NET 10 para funcionar. Como o aplicativo é multiplataforma e baseado em tecnologias web, o PKVault também depende de componentes de visualização web específicos para o sistema operacional em uso:
 
@@ -19,6 +19,8 @@ No Linux, a pasta utilizada é uma das seguintes:
 
 - `/home/$USER/Documents/pkvault`
 - `/home/$USER/.var/app/io.github.chnapy.pkvault/data` - esperado ao usar a versão Flatpak
+
+No macOS, a pasta utilizada é `/Users/$USER/Documents/pkvault`.
 
 Você encontrará os seguintes arquivos:
 

@@ -19,10 +19,10 @@
 PKVault is a Pokémon storage & save manipulation tool based on [PKHeX](https://github.com/kwsch/PKHeX).
 Similar to Pokémon Home, offline as online.
 
-<img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/microsoft-windows.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/linux.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/steam-deck-light.png" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/docker.png" width="100" /> |
-|:---:|:---:|:---:|:---:|
-| [![Download for Windows](https://img.shields.io/badge/Windows-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | <a href='https://flathub.org/apps/details/io.github.chnapy.pkvault'><img width='110' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en' /></a><br/>[![Download for Linux](https://img.shields.io/badge/Linux-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | <a href='https://flathub.org/apps/details/io.github.chnapy.pkvault'><img width='110' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en' /></a><br/>[![Download for SteamDeck](https://img.shields.io/badge/SteamDeck-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Docker usage](https://img.shields.io/badge/Docker-Setup-purple)](#docker-usage) |
-| PKVault.exe | pkvault.flatpak<br/>pkvault.AppImage<br/>pkvault.deb<br/>pkvault.linux | pkvault.flatpak | `ghcr.io/chnapy/pkvault` |
+<img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/microsoft-windows.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/linux.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/apple-light.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/steam-deck-light.png" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/docker.png" width="100" /> |
+|:---:|:---:|:---:|:---:|:---:|
+| [![Download for Windows](https://img.shields.io/badge/Windows-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | <a href='https://flathub.org/apps/details/io.github.chnapy.pkvault'><img width='110' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en' /></a><br/>[![Download for Linux](https://img.shields.io/badge/Linux-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Download for macOS](https://img.shields.io/badge/macOS-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | <a href='https://flathub.org/apps/details/io.github.chnapy.pkvault'><img width='110' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en' /></a><br/>[![Download for SteamDeck](https://img.shields.io/badge/SteamDeck-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Docker usage](https://img.shields.io/badge/Docker-Setup-purple)](#docker-usage) |
+| PKVault.exe | pkvault.flatpak<br/>pkvault.AppImage<br/>pkvault.deb<br/>pkvault.linux | pkvault-osx-arm64.app.zip<br/>pkvault-osx-x64.app.zip | pkvault.flatpak | `ghcr.io/chnapy/pkvault` |
 
 ![License](https://img.shields.io/badge/License-GPLv3-green.svg)
 
@@ -66,6 +66,8 @@ On Windows, just use `PKVault.exe`.
 
 On Linux & SteamDeck, it's recommanded to get PKVault from Flathub: <a href='https://flathub.org/apps/details/io.github.chnapy.pkvault'><img width='110' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en' /></a><br/>
 Otherwise there is plenty of Linux executables in [releases](https://github.com/Chnapy/PKVault/releases/latest) page.
+
+On macOS, download `pkvault-osx-arm64.app.zip` (Apple Silicon) or `pkvault-osx-x64.app.zip` (Intel), unzip it, then open `PKVault.app`. Since the app isn't notarized, macOS will show "Apple could not verify 'PKVault' is free of malware that may harm your Mac or compromise your privacy." Go to **System Settings > Privacy & Security**, scroll down to find PKVault, and click "Open Anyway", then confirm in the dialog that appears.
 
 ### Steam-based usage
 

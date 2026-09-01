@@ -255,6 +255,7 @@
   "settings.sub.external": "外部 PKM",
   "settings.sub.main": "主要設定",
   "settings.system.linux": "Linux 桌面版",
+  "settings.system.macos": "macOS 桌面版",
   "settings.system.steamdeck": "Steam Deck",
   "settings.system.unknown": "未知系統",
   "settings.system.windows": "Windows 桌面版",

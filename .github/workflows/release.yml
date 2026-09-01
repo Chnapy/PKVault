@@ -228,6 +228,30 @@ jobs:
 
           ls -la .
 
+      - name: Build macOS arm64 desktop image & extract app bundle
+        run: |
+          docker build . --target desktop-macos --build-arg RID=osx-arm64 --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-macos-arm64
+          docker create --name tmp-desktop-macos-arm64 tmp-desktop-macos-arm64
+
+          docker cp tmp-desktop-macos-arm64:/app/pkvault-${{ env.VERSION }}-osx-arm64.app.zip pkvault-${{ env.VERSION }}-osx-arm64.app.zip
+
+          docker rm tmp-desktop-macos-arm64
+          docker rmi tmp-desktop-macos-arm64
+
+          ls -la .
+
+      - name: Build macOS x64 desktop image & extract app bundle
+        run: |
+          docker build . --target desktop-macos --build-arg RID=osx-x64 --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-macos-x64
+          docker create --name tmp-desktop-macos-x64 tmp-desktop-macos-x64
+
+          docker cp tmp-desktop-macos-x64:/app/pkvault-${{ env.VERSION }}-osx-x64.app.zip pkvault-${{ env.VERSION }}-osx-x64.app.zip
+
+          docker rm tmp-desktop-macos-x64
+          docker rmi tmp-desktop-macos-x64
+
+          ls -la .
+
       - name: Create tag
         if: ${{ !inputs.dry-run }}
         env:
@@ -249,3 +273,5 @@ jobs:
             pkvault-${{ env.VERSION }}.AppImage
             pkvault-${{ env.VERSION }}.flatpak
             pkvault-${{ env.VERSION }}.deb
+            pkvault-${{ env.VERSION }}-osx-arm64.app.zip
+            pkvault-${{ env.VERSION }}-osx-x64.app.zip

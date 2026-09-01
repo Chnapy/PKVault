@@ -207,6 +207,17 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             );
         }
 
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            return Path.GetFullPath(
+                Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                    ?? "~/",
+                    "pkvault"
+                )
+            );
+        }
+
         var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
         var exeDirectory = exePath != null ? Path.GetDirectoryName(exePath) : null;
 
@@ -259,6 +270,9 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             return RuntimeSystem.WINDOWS;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            return RuntimeSystem.MACOS;
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             return RuntimeSystem.UNKNOWN;
