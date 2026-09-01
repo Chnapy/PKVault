@@ -255,6 +255,7 @@
   "settings.sub.external": "PKMs externos",
   "settings.sub.main": "General",
   "settings.system.linux": "Linux",
+  "settings.system.macos": "macOS",
   "settings.system.steamdeck": "SteamDeck",
   "settings.system.unknown": "Sistema operativo desconocido",
   "settings.system.windows": "Windows",
