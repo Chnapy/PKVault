@@ -14,7 +14,7 @@ static class StaticAssetsServer
     private const string AssemblyStaticPrefix = "PKVault.Desktop.Resources.wwwroot.";
     private static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
 
-    public static async Task<string> StartAsync()
+    public static async Task<string> Start()
     {
         var builder = WebApplication.CreateBuilder();
         builder.WebHost.UseUrls("http://127.0.0.1:0");

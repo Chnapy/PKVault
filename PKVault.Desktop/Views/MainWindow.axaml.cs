@@ -13,6 +13,8 @@ public partial class MainWindow : Window
     private readonly LocalWebServer server = new();
     // private readonly IFileChooser _fileChooser = Program.LinuxOS ? new LinuxFileChooser() : new DefaultFileChooser();
 
+    private Task? foo;
+
     private static readonly DesktopMessageJsonContext messageJsonContext = new(new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
@@ -23,8 +25,12 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         Closing += MainWindow_OnClosing;
-        Opened += async (_, _) => await InitializeAsync();
+        Opened += (_, _) =>
+        {
+            foo = InitializeAsync();
+        };
 
+        WebView.IsVisible = false;
         WebView.EnvironmentRequested += (sender, args) =>
         {
             #if DEBUG
@@ -52,13 +58,14 @@ public partial class MainWindow : Window
     {
         try
         {
-            var staticBaseUrl = await StaticAssetsServer.StartAsync();
+            var staticBaseUrl = await StaticAssetsServer.Start();
+
+            WebView.Source = new Uri($"{staticBaseUrl}/index.html?server={LocalWebServer.HOST_URL}");
+            WebView.IsVisible = true;
 
             var backendPostRun = await server.Start(Program.Args);
             if (backendPostRun != null)
                 await backendPostRun();
-
-            WebView.Source = new Uri($"{staticBaseUrl}/index.html?server={LocalWebServer.HOST_URL}");
         }
         catch (Exception ex)
         {
