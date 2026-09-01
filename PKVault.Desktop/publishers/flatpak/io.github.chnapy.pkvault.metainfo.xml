@@ -105,23 +105,23 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.1/PKVault.Desktop/publishers/flatpak/snaps/snap_storage.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage.png</image>
       <caption>Collection view</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.1/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_dark.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_dark.png</image>
       <caption>Dark mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.1/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_details.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_details.png</image>
       <caption>Pokémon edit</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.1/PKVault.Desktop/publishers/flatpak/snaps/snap_dex.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.2/PKVault.Desktop/publishers/flatpak/snaps/snap_dex.png</image>
       <caption>Pokédex</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.1/PKVault.Desktop/publishers/flatpak/snaps/snap_saves.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.2/PKVault.Desktop/publishers/flatpak/snaps/snap_saves.png</image>
       <caption>Saves view</caption>
     </screenshot>
   </screenshots>
@@ -141,6 +141,21 @@
   </developer>
 
   <releases>
+    <release version="2.2.2" date="2026-09-01">
+      <url type="details">https://github.com/Chnapy/PKVault/releases/tag/v2.2.2</url>
+      <description>
+        <ul>
+          <li>Update PKHeX to 26.08.26.</li>
+          <li>Update PokéAPI data and sprites.</li>
+          <li>Add storage multi-select with Shift+Click.</li>
+          <li>Add translations: Spanish and LATAM Spanish.</li>
+          <li>Fix legality issues after move action: ability, origin, nickname, IVs, moves.</li>
+          <li>Fix attached pkm-variant held-item not being updated correctly.</li>
+          <li>Fix G1 japanese games naming.</li>
+          <li>Fix missing G2 items sprites.</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.2.1" date="2026-08-28">
       <url type="details">https://github.com/Chnapy/PKVault/releases/tag/v2.2.1</url>
       <description>

@@ -32,9 +32,9 @@
     <AssemblyName>PKVault</AssemblyName>
     <ApplicationTitle>PKVault</ApplicationTitle>
     <ApplicationId>com.chnapy.pkvault</ApplicationId>
-    <Version>2.2.1</Version>
-    <ApplicationDisplayVersion>2.2.1</ApplicationDisplayVersion>
-    <ApplicationVersion>2.2.1</ApplicationVersion>
+    <Version>2.2.2</Version>
+    <ApplicationDisplayVersion>2.2.2</ApplicationDisplayVersion>
+    <ApplicationVersion>2.2.2</ApplicationVersion>
     <ApplicationIcon>Resources/wwwroot/icon.ico</ApplicationIcon>
     <NeutralLanguage>en</NeutralLanguage>
     <Product>PKVault</Product>
