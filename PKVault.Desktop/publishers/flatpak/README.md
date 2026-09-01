@@ -9,7 +9,7 @@ Flatpak published as:
 
 https://flathub.org
 
-Related PR: https://github.com/flathub/flathub/pull/9743
+Related repo: https://github.com/flathub/io.github.chnapy.pkvault
 
 ---
 

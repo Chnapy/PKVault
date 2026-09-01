@@ -135,6 +135,7 @@ jobs:
     needs:
       - version
       - docker
+      - desktop
     steps:
       - name: Set env variables
         run: |
@@ -181,8 +182,8 @@ jobs:
           docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}
 
   desktop:
-    name: Create GitHub release
-    needs: [version, docker]
+    name: Build Desktop apps
+    needs: version
     strategy:
       fail-fast: false
       matrix:
@@ -264,7 +265,11 @@ jobs:
 
   release:
     name: Create GitHub release
-    needs: [desktop]
+    if: ${{ !inputs.dry-run }}
+    needs:
+      - version
+      - desktop
+      - docker
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -283,7 +288,6 @@ jobs:
           merge-multiple: true
 
       - name: Create tag
-        if: ${{ !inputs.dry-run }}
         env:
           VERSION: v${{ env.VERSION }}
         run: |
@@ -291,7 +295,6 @@ jobs:
           git push origin $VERSION
 
       - name: Create release
-        if: ${{ !inputs.dry-run }}
         uses: softprops/action-gh-release@v2
         with:
           working_directory: ${{ runner.temp }}/files
