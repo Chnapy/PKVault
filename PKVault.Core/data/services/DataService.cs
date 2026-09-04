@@ -1,6 +1,8 @@
 
 using Serilog;
 
+namespace PKVault.Core;
+
 /**
  * Data response after action, providing only data mutated.
  */

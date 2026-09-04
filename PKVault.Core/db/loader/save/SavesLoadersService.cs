@@ -2,6 +2,8 @@ using System.Collections.Concurrent;
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public interface ISavesLoadersService
 {
     public SaveLoadersRecord[] GetAllLoaders();

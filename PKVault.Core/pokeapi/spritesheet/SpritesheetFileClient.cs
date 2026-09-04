@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 /**
  * Gives spritesheets content.
  */

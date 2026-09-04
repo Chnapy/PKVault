@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public class LegacyDexNormalize(LegacyDexLoader loader)
 {
     public void MigrateGlobalEntities()

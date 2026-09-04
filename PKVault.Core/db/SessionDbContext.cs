@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Serilog;
 
+namespace PKVault.Core;
+
 public class SessionDbContext(
     ISessionServiceMinimal sessionService, IDbSeedingService dbSeedingService
 ) : DbContext

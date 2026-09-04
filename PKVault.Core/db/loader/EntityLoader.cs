@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
+namespace PKVault.Core;
+
 public abstract class EntityLoader<
     DTO,
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] E

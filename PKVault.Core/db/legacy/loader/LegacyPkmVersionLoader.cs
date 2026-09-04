@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
 
+namespace PKVault.Core;
+
 public class LegacyPkmVersionLoader : LegacyEntityLoader<LegacyPkmVersionEntity>
 {
     public static string GetFilepath(string dbPath) => MatcherUtil.NormalizePath(Path.Combine(dbPath, "pkm-version.json"));

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
+namespace PKVault.Core;
+
 public interface ISessionService : ISessionServiceMinimal
 {
     public DateTime? StartTime { get; }

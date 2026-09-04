@@ -5,6 +5,8 @@ using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
 using PokeApi.Models;
 
+namespace PKVault.Core;
+
 public partial class PokeApiFileClient(IFileIOService fileIOService)
 {
     public async Task<T?> GetAsync<T>(NamedApiResource urlResource, JsonTypeInfo<T> jsonContext)

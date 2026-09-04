@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public record MainCreateBankActionInput();
 
 public class MainCreateBankAction(

@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public class Dex8LAService(SAV8LA save) : DexGenService(save)
 {
     protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)

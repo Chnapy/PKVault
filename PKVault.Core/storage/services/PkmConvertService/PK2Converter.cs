@@ -1,6 +1,8 @@
 
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public class PK2Converter(PKMConverterUtils utils)
 {
     public PK3 ConvertToPK3(PK2 pk2, LanguageID fallbackLang, PKMRndValues? rndValues)

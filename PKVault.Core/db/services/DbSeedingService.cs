@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
+namespace PKVault.Core;
+
 public interface IDbSeedingService
 {
     public Task Seed(DbContext db, bool _, CancellationToken cancelToken);

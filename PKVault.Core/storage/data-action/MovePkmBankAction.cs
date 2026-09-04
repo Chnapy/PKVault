@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public record MovePkmBankActionInput(string[] pkmIds, uint? sourceSaveId, string bankId, bool attached)
 {
     public Dictionary<string, string> CreatedVariantIds = [];

@@ -6,6 +6,8 @@ using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
+namespace PKVault.Core;
+
 public record StaticSpritesheetsData(
     Dictionary<string, SpriteInfo> Species,
     Dictionary<string, SpriteInfo> Items

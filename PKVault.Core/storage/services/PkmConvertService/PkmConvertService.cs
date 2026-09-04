@@ -1,6 +1,8 @@
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public interface IPkmConvertService
 {
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, EntityContext context);

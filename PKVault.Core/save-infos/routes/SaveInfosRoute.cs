@@ -60,14 +60,16 @@ public class SaveInfosController(
     }
 
     [HttpPost()]
-    // [Consumes("multipart/form-data")]
-    // [RequestSizeLimit(1024 * 1024 * 60)]
     public async Task<DataDTO> Upload(CoreFile[] saveFiles, string[] saveFilesNames, bool overwrite = false)
     {
         if (!sessionService.HasEmptyActionList())
         {
             throw new InvalidOperationException($"Empty action list is required");
         }
+
+        var sizeSum = saveFiles.Sum(s => s.Stream.Length);
+        if (sizeSum > 1024 * 1024 * 60)
+            throw new ArgumentException($"All files size should be <60MB");
 
         if (saveFiles.Length == 0 || saveFiles.Length > 5)
             throw new ArgumentException($"Save files upload allowed 1-5 files, received {saveFiles.Length}");

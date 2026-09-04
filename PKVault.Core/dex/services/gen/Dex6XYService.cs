@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public class Dex6XYService(SAV6XY save) : DexGenService(save)
 {
     private readonly LanguageID[] AllLanguages = [LanguageID.Japanese, LanguageID.English, LanguageID.French, LanguageID.Italian, LanguageID.German, LanguageID.Spanish, LanguageID.Korean];

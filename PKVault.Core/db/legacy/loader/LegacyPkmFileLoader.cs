@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public interface ILegacyPkmFileLoader
 {
     public (byte[] Data, PKMLoadError? Error) GetEntity(string filepath);

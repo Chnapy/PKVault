@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using System.Text;
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public record PKMRndValues(uint PID, uint EncryptionConstant);
 
 public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)

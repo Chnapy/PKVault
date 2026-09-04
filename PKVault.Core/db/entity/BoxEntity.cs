@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public class BoxEntity : IEntity
 {
     public override required string Id { get; init; }

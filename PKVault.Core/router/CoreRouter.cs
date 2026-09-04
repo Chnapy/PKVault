@@ -1,10 +1,12 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using HttpMultipartParser;
 using Microsoft.Extensions.DependencyInjection;
-using NJsonSchema;
+using Microsoft.Extensions.Primitives;
 using NSwag;
 using PKVault.Core.backup.routes;
 using PKVault.Core.dex.routes;
@@ -12,10 +14,14 @@ using PKVault.Core.saveinfos.routes;
 using PKVault.Core.settings.routes;
 using PKVault.Core.storage.routes;
 using PKVault.Core.warnings.routes;
+using Serilog;
+using Serilog.Events;
+using System.Web;
+using System.Collections.Specialized;
 
 namespace PKVault.Core;
 
-public class CoreRouter(IServiceProvider sp)
+public partial class CoreRouter
 {
     private static readonly Type[] ControllersTypes = [
         typeof(BackupController),
@@ -40,65 +46,132 @@ public class CoreRouter(IServiceProvider sp)
     public readonly IEnumerable<CoreRoute> Routes = GetAllRoutes();
 
     // Return JSON string, only if data is serializable (not file)
-    public async Task<string?> DispatchToJSON(string httpMethod, string httpPath, string queriesJson, Stream bodyStream)
+    public async Task<string?> DispatchToJSON(
+        IServiceProvider sp,
+        string httpMethod, string httpPath,
+        string queriesString, Stream bodyStream)
     {
-        var result = await Dispatch(httpMethod, httpPath, queriesJson, bodyStream);
+        var result = await Dispatch(sp, httpMethod, httpPath, queriesString, bodyStream);
 
-        if (result is not CoreJSONResponse response || response.Data == null)
+        if (result is not CoreJSONResponse response)
             return null;
+
+        if (response.Data == null)
+            return JsonSerializer.Serialize(response.Header, new RouteJsonContext(new()
+            {
+                WriteIndented = true
+            }).DictionaryStringStringValues);
 
         var resultValue = response.Data;
 
-        var typeInfo = RouteJsonContext.Default.GetTypeInfo(resultValue.GetType())!;
+        var typeInfo = RouteJsonContext.Default.GetTypeInfo(resultValue.GetType())
+            ?? throw new Exception($"Missing TypeInfo for type {resultValue.GetType()}");
         return JsonSerializer.Serialize(resultValue, typeInfo);
     }
 
-    public async Task<object?> Dispatch(string httpMethod, string httpPath, string queriesJson, Stream bodyStream)
+    public async Task<ICoreResponse> Dispatch(
+        IServiceProvider sp,
+        string httpMethod, string httpPath,
+        string queriesString, Stream bodyStream
+    )
     {
-        var queries = JsonNode.Parse(queriesJson)?.AsObject() ?? [];
+        var sw = Stopwatch.StartNew();
+        int statusCode = default;
+        Exception? exception = null;
 
-        var match = Match(httpMethod, httpPath);
-        if (!match.HasValue)
+        httpMethod = httpMethod.ToUpper();
+        var queries = HttpUtility.ParseQueryString(queriesString);
+
+        try
         {
-            throw new KeyNotFoundException($"No route found for {httpMethod} /{httpPath} routes.length={Routes.Count()}");
-        }
-        var (Route, PathVariables) = match.Value;
-
-        List<object?> parameters = [];
-        foreach (var (Param, _) in Route.Parameters)
-        {
-            parameters.Add(await BindParameter(Param, PathVariables, queries, bodyStream));
-        }
-
-        var controllerType = Route.MethodInfo.DeclaringType!;
-        using var scope = sp.CreateScope();
-        object controller = scope.ServiceProvider.GetRequiredService(controllerType);
-
-        var result = Route.MethodInfo.Invoke(controller, parameters.ToArray());
-        object? resultValue = await UnwrapResultAsync(result);
-
-        if (result == null
-            // void detection may be dirty, but this way is reliable
-            // use of typeof(void) doesn't work
-            || result.GetType().ToString() == "System.Threading.Tasks.VoidTaskResult"
-        )
-            return null;
-
-        if (resultValue is not ICoreResponse)
-            return new CoreJSONResponse(
-                Data: resultValue
-            );
-
-        if (resultValue is CoreFileResponse fileResponse)
-        {
-            resultValue = fileResponse with
+            var match = Match(httpMethod, httpPath);
+            if (!match.HasValue)
             {
-                ContentType = fileResponse.ContentType ?? fileResponse.File.ContentType,
-            };
-        }
+                throw new KeyNotFoundException($"No route found for {httpMethod} {httpPath} routes.length={Routes.Count()}");
+            }
+            var (Route, PathVariables) = match.Value;
 
-        return resultValue;
+            List<object?> parameters = [];
+            foreach (var (Param, Kind) in Route.Parameters)
+            {
+                parameters.Add(await BindParameter(Param, Kind, PathVariables, queries, bodyStream));
+            }
+
+            var controllerType = Route.MethodInfo.DeclaringType!;
+            object controller = sp.GetRequiredService(controllerType);
+
+            var result = Route.MethodInfo.Invoke(controller, parameters.ToArray());
+            object? resultValue = await UnwrapResultAsync(result);
+
+            if (resultValue is not ICoreResponse response)
+                response = new CoreJSONResponse(
+                    Data: resultValue
+                );
+
+            if (response is CoreFileResponse fileResponse)
+                response = fileResponse with
+                {
+                    ContentType = fileResponse.ContentType ?? fileResponse.File.ContentType,
+                };
+
+            statusCode = response is CoreJSONResponse jsonResponse && jsonResponse.Data == null
+                ? 204
+                : 200;
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            if (ex is TargetInvocationException tex)
+                ex = tex.GetBaseException();
+
+            statusCode = GetStatusCode(ex);
+            exception = ex;
+
+            return new CoreJSONResponse(
+                Data: null,
+                StatusCode: statusCode,
+                ContentType: "text/plain",
+                Header: new()
+                {
+                    ["access-control-expose-headers"] = new StringValues(["error-message", "error-stack"]),
+                    ["error-message"] = JsonSerializer.Serialize(
+                        InvalidCharacterRegex().Replace(ex.Message, "\n").Replace("\n\n", "\n"),
+                        RouteJsonContext.Default.String
+                    ),
+                    ["error-stack"] = JsonSerializer.Serialize(
+                        InvalidCharacterRegex().Replace(ex.ToString(), "\n").Replace("\n\n", "\n"),
+                        RouteJsonContext.Default.String
+                    )
+                }
+            );
+        }
+        finally
+        {
+            sw.Stop();
+            Log.Write(
+                statusCode >= 500 ? LogEventLevel.Error :
+                    statusCode >= 400 ? LogEventLevel.Warning
+                        : LogEventLevel.Information,
+                exception,
+                $"HTTP {httpMethod} {httpPath} responded {statusCode} in {sw.ElapsedMilliseconds} ms"
+            );
+        }
     }
+
+    private static int GetStatusCode(Exception ex)
+    {
+        return ex switch
+        {
+            KeyNotFoundException => 404,
+            InvalidOperationException => 403,
+            ArgumentException => 400,
+            _ => 500,
+        };
+    }
+
+    [GeneratedRegex(@"[^\x20-\x7E]")]
+    private static partial Regex InvalidCharacterRegex();
 
     private (CoreRoute Route, Dictionary<string, string> PathVariables)? Match(string httpMethod, string httpPath)
     {
@@ -137,7 +210,9 @@ public class CoreRouter(IServiceProvider sp)
         return null;
     }
 
-    private static async Task<object?> BindParameter(ParameterInfo p, Dictionary<string, string> routeValues, JsonObject queries, Stream bodyStream)
+    private static async Task<object?> BindParameter(
+        ParameterInfo p, OpenApiParameterKind kind,
+        Dictionary<string, string> routeValues, NameValueCollection queries, Stream bodyStream)
     {
         if (p.ParameterType == typeof(CoreFile[]))
         {
@@ -147,7 +222,7 @@ public class CoreRouter(IServiceProvider sp)
                 ContentType: file.ContentType,
                 FileName: file.FileName,
                 Name: file.Name
-            ));
+            )).ToArray();
         }
 
         if (p.ParameterType == typeof(CoreFile))
@@ -162,15 +237,41 @@ public class CoreRouter(IServiceProvider sp)
             );
         }
 
-        if (routeValues.TryGetValue(p.Name!, out var raw))
+        if (kind == OpenApiParameterKind.Path && routeValues.TryGetValue(p.Name!, out var raw))
             return ParsePrimitive(raw, p.ParameterType);
 
-        if (queries[p.Name!] is JsonNode qNode)
-            return qNode.Deserialize(p.ParameterType, RouteJsonContext.Default);
+        if (kind == OpenApiParameterKind.Query)
+        {
+            if (p.ParameterType.IsArray)
+            {
+                var values = queries.GetValues(p.Name!) ?? [];
+                Console.WriteLine($"Arr {p.Name}={values}");
 
-        using var reader = new StreamReader(bodyStream);
-        var body = JsonNode.Parse(reader.ReadToEnd())?.AsObject() ?? [];
-        return body?.Deserialize(p.ParameterType, RouteJsonContext.Default);
+                var arr = Array.CreateInstanceFromArrayType(p.ParameterType, values.Length);
+                for (var i = 0; i < values.Length; i++)
+                {
+                    arr.SetValue(
+                        ParsePrimitive(values[i], p.ParameterType.GetElementType()!),
+                        i
+                    );
+                }
+                return arr;
+            }
+
+            var value = queries.Get(p.Name!);
+            Console.WriteLine($"Item {p.Name}={value}");
+
+            return value == null ? null : ParsePrimitive(value, p.ParameterType);
+        }
+
+        if (kind == OpenApiParameterKind.Body)
+        {
+            using var reader = new StreamReader(bodyStream);
+            var body = JsonNode.Parse(reader.ReadToEnd())?.AsObject() ?? [];
+            return body?.Deserialize(p.ParameterType, RouteJsonContext.Default);
+        }
+
+        throw new ArgumentException($"A {kind} parameter is missing: {p.Name} of type {p.ParameterType} {queries[p.Name!]?.GetType()}");
     }
 
     private static object? ParsePrimitive(string raw, Type targetType)
@@ -196,15 +297,18 @@ public class CoreRouter(IServiceProvider sp)
             _ when type == typeof(TimeSpan) => TimeSpan.Parse(raw, CultureInfo.InvariantCulture),
             _ when type == typeof(bool) => bool.Parse(raw),
             _ when type == typeof(int) => int.Parse(raw, CultureInfo.InvariantCulture),
+            _ when type == typeof(uint) => uint.Parse(raw, CultureInfo.InvariantCulture),
             _ when type == typeof(long) => long.Parse(raw, CultureInfo.InvariantCulture),
+            _ when type == typeof(ulong) => ulong.Parse(raw, CultureInfo.InvariantCulture),
             _ when type == typeof(short) => short.Parse(raw, CultureInfo.InvariantCulture),
+            _ when type == typeof(ushort) => ushort.Parse(raw, CultureInfo.InvariantCulture),
             _ when type == typeof(byte) => byte.Parse(raw, CultureInfo.InvariantCulture),
             _ when type == typeof(double) => double.Parse(raw, CultureInfo.InvariantCulture),
             _ when type == typeof(float) => float.Parse(raw, CultureInfo.InvariantCulture),
             _ when type == typeof(decimal) => decimal.Parse(raw, CultureInfo.InvariantCulture),
             _ when type.IsEnum => Enum.Parse(type, raw, ignoreCase: true),
 
-            _ => throw new Exception()
+            _ => throw new Exception($"Primitive type not handled: {type}")
         };
     }
 
@@ -216,7 +320,7 @@ public class CoreRouter(IServiceProvider sp)
         await task.ConfigureAwait(false);
 
         var resultProperty = task.GetType().GetProperty("Result");
-        if (resultProperty is null)
+        if (resultProperty is null || IsTypeVoidLike(resultProperty.GetType()))
             return null;
 
         return resultProperty.GetValue(task);
@@ -233,7 +337,7 @@ public class CoreRouter(IServiceProvider sp)
                 continue;
 
             var routeName = controllerType.Name.Replace("Controller", "");
-            var routeTransformedName = SlugifyParameterTransformer.TransformOutbound(routeName);
+            var routeTransformedName = SlugifyTransformer.TransformOutbound(routeName);
             var routeBase = routeAttribute.Template.Replace("[controller]", routeTransformedName);
 
             // Console.WriteLine($"Controller = {controllerType.Name} {routeAttribute.Template}");
@@ -252,6 +356,8 @@ public class CoreRouter(IServiceProvider sp)
 
                 foreach (var p in parametersInfos)
                 {
+                    AssertIsTypeJSONParsable(p.ParameterType);
+
                     OpenApiParameterKind Kind = OpenApiParameterKind.Body;
                     if (http.Template.Contains($"{{{p.Name}}}"))
                         Kind = OpenApiParameterKind.Path;
@@ -260,6 +366,8 @@ public class CoreRouter(IServiceProvider sp)
 
                     parameters.Add((Param: p, Kind));
                 }
+
+                AssertIsTypeJSONParsable(methodInfo.ReturnType);
 
                 // Console.WriteLine($"\tRoute = {methodInfo.Name} {http.Method} {fullTemplate} [{string.Join(',', parametersInfos.Select(p => $"{p.Name}"))}]");
 
@@ -292,20 +400,44 @@ public class CoreRouter(IServiceProvider sp)
             typeof(TimeSpan),
         ];
 
-        if (primitiveTypes.Contains(type))
+        if (type.IsEnum || primitiveTypes.Contains(type))
             return true;
 
-        var elementType = type.GetElementType();
-        if (elementType != null && IsQueryCompatible(elementType))
-            return true;
-
-        var nullableType = Nullable.GetUnderlyingType(type);
-        if (nullableType != null && IsQueryCompatible(nullableType))
-            return true;
-
-        if (type.BaseType != null && type.BaseType != typeof(object) && IsQueryCompatible(type.BaseType))
+        var finalType = GetFinalType(type);
+        if (finalType != type && IsQueryCompatible(finalType))
             return true;
 
         return false;
     }
+
+    private static void AssertIsTypeJSONParsable(Type type)
+    {
+        var finalType = GetFinalType(type);
+        if (IsTypeVoidLike(finalType)
+            || finalType == typeof(CoreFile)
+            || typeof(ICoreResponse).IsAssignableFrom(finalType)
+        )
+            return;
+
+        if (RouteJsonContext.Default.GetTypeInfo(finalType) is null)
+            throw new Exception($"Missing TypeInfo for type {finalType}");
+    }
+
+    private static Type GetFinalType(Type type)
+    {
+        type = OpenApiGenerator.UnwrapTaskType(type);
+
+        var innerType = type.GetElementType()
+            ?? Nullable.GetUnderlyingType(type);
+
+        if (innerType != null)
+            return GetFinalType(innerType);
+
+        return type;
+    }
+
+    private static bool IsTypeVoidLike(Type type) => type == typeof(void)
+        // void detection may be dirty, but this way is reliable
+        // use of typeof(void) doesn't work
+        || type.GetType().ToString() == "System.Threading.Tasks.VoidTaskResult";
 }

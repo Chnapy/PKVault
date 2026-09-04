@@ -2,6 +2,8 @@
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 /**
  * Pass (copy) properties from a PKM to another one.
  * Apply properties to a PKM.

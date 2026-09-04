@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
+namespace PKVault.Core;
+
 /**
  * Warnings checks in current session data.
  */

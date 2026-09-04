@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
+namespace PKVault.Core;
+
 public interface IMetaLoader
 {
     public Task<MetaEntity?> GetEntity(MetaKey key);

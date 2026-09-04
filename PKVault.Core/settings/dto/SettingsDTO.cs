@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public record SettingsDTO(
     Guid BuildID,
     RuntimeSystem RuntimeSystem,

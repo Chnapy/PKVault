@@ -1,6 +1,8 @@
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 /**
  * Gives Pokedex data for PKVault and saves.
  */

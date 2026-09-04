@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public record SortPkmActionInput(uint? saveId, int fromBoxId, int toBoxId, string pokedexName, bool leaveEmptySlot);
 
 public class SortPkmAction(

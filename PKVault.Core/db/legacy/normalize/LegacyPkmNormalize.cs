@@ -1,6 +1,8 @@
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public class LegacyPkmNormalize(
     LegacyPkmLoader loader, Dictionary<ushort, StaticEvolve> evolves
 )

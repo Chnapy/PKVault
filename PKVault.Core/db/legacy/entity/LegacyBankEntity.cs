@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+namespace PKVault.Core;
+
 public record LegacyBankEntity(
     string Id,
     string Name,

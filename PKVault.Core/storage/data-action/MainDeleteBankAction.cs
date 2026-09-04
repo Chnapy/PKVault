@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public record MainDeleteBankActionInput(string bankId);
 
 public class MainDeleteBankAction(

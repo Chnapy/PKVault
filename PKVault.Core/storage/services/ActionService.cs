@@ -2,6 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 /**
  * Action mutation for current session.
  */

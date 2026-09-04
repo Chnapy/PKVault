@@ -1,6 +1,8 @@
 
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public record DexItemDTO(
     string Id,
     ushort Species,

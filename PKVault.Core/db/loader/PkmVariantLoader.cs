@@ -2,6 +2,8 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public record PkmVariantLoaderAddPayload(
     BoxDTO Box,
     int BoxSlot,

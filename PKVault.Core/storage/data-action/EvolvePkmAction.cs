@@ -1,6 +1,8 @@
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public record EvolvePkmActionInput(uint? saveId, string[] ids);
 
 public class EvolvePkmAction(

@@ -1,6 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
+namespace PKVault.Core;
+
 public abstract class LegacyEntityLoader<E> where E : ILegacyEntity
 {
     protected IFileIOService fileIOService;

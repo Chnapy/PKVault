@@ -1,5 +1,7 @@
 using PokeApi.Models;
 
+namespace PKVault.Core;
+
 /**
  * Data fetcher not used during classic run.
  * 

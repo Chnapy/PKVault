@@ -1,3 +1,5 @@
+namespace PKVault.Core;
+
 public record StaticDataDTO(
     Dictionary<byte, StaticVersion> Versions,
     StaticSpeciesData Species,

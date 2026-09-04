@@ -1,6 +1,8 @@
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
+namespace PKVault.Core;
+
 // TODO complete refacto for testability
 public class MatcherUtil
 {

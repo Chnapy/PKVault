@@ -1,6 +1,8 @@
 
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public class PK6Converter(PKMConverterUtils utils)
 {
     public PK7 ConvertToPK7Fixed(PK6 pk6, PKMRndValues? rndValues)

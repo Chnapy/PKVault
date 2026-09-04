@@ -1,6 +1,8 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
+namespace PKVault.Core;
+
 /**
  * Data queries related to storage.
  */

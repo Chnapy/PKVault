@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public record MainCreateBoxActionInput(
     string bankId, int? slotCount
 );

@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public record MainUpdateBoxActionInput(string boxId, string boxName, int order, string bankId, int slotCount, BoxType type);
 
 public class MainUpdateBoxAction(

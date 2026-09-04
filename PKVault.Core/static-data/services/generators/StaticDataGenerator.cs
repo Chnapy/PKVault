@@ -8,6 +8,8 @@ using DiffPlex.Renderer;
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public abstract class StaticDataGenerator<D>(
     JsonTypeInfo<D> jsonTypeInfo, JsonTypeInfo<D> jsonTypeInfoIndented, IFileIOService fileIOService
 )

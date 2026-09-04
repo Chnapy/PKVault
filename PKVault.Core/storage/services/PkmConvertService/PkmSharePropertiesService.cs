@@ -1,6 +1,8 @@
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public interface IPkmSharePropertiesService
 {
     public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm, SaveFile? save);

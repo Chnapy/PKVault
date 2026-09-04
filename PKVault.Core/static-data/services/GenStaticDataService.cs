@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Serilog;
 
+namespace PKVault.Core;
+
 /**
  * Generator not used during classic run.
  * 

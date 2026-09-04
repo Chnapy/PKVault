@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public class LegacyPkmLoader : LegacyEntityLoader<LegacyPkmEntity>
 {
     public static string GetFilepath(string dbPath) => MatcherUtil.NormalizePath(Path.Combine(dbPath, "pkm.json"));

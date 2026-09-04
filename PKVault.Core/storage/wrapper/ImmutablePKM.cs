@@ -1,6 +1,8 @@
 using PKHeX.Core;
 using PKHeX.Core.Searching;
 
+namespace PKVault.Core;
+
 /**
  * Immutable PKM wrapper, giving control and limit side-effects.
  */

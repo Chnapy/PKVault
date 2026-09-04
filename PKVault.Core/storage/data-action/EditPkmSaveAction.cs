@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public record EditPkmSaveActionInput(uint saveId, string pkmSaveId, EditPkmVariantPayload editPayload);
 
 public class EditPkmSaveAction(

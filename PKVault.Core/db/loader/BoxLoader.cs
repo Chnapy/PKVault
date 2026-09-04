@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public interface IBoxLoader : IEntityLoader<BoxDTO, BoxEntity>
 {
     public BoxDTO CreateDTO(BoxEntity entity, string? WallpaperName = null, GameVersion? Version = null);

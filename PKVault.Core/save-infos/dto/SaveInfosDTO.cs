@@ -1,6 +1,8 @@
 
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public record SaveInfosDTO(
     uint Id,
     DateTime LastWriteTime,

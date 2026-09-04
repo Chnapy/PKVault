@@ -1,61 +1,23 @@
-﻿using System.IO.Abstractions;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.Extensions.Primitives;
 using Serilog;
 
 namespace PKVault.Backend;
 
 public class Program
 {
-    // For migration file generation
-    // EF Core uses this method at design time to access the DbContext
-    public static IHostBuilder CreateHostBuilder(string[] args)
-        => Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(
-                webBuilder => webBuilder.UseStartup<Startup>());
-
-    private static readonly string InitialCurrentDirectory = Directory.GetCurrentDirectory();
-
     public static async Task Main(string[] args)
     {
-        LogUtil.Initialize();
-
-        Log.Logger.Debug($"ARGS: {string.Join(' ', args)}");
-
-        // SettingsService.ProgramArgs = args;
-
-        // "Microsoft Windows 10.0.123"
-        // "GNOME 50 (Flatpak runtime)"
-        // "Linux Mint 22.1"
-        Log.Logger.Debug($"OS : {RuntimeInformation.OSDescription}");
-        Log.Logger.Debug($"OS LANGUAGE : {System.Globalization.CultureInfo.CurrentUICulture.Name}");
-
-        // "win-x64"
-        // "linux-x64"
-        // "linux-arm64"
-        Log.Logger.Debug($"RID runtime : {RuntimeInformation.RuntimeIdentifier}");
-
-        Log.Logger.Debug($"Current directory : {InitialCurrentDirectory}");
-
-        // SettingsService.ProgramArgs = args;
-
-#if MODE_DEFAULT
-        // Ensure behavior consistency between backend & desktop
-        Directory.SetCurrentDirectory(SettingsService.GetAppDirectory());
-#endif
-
-        Log.Logger.Debug($"Current directory (fixed) : {Directory.GetCurrentDirectory()}");
+        PKVault.Core.Program.Initialize();
 
         try
         {
-            Copyright();
-
             var time = Log.Logger.Time($"Setup backend load");
 
             var app = await PrepareWebApp(5000);
@@ -81,110 +43,13 @@ public class Program
         }
         finally
         {
-            LogUtil.Dispose();
+            PKVault.Core.Program.Dispose();
         }
-    }
-
-    public static void Copyright()
-    {
-        var (BuildID, Version) = SettingsService.GetBuildInfo();
-        Log.Information("PKVault Copyright (C) 2026  Richard Haddad"
-        + "\nThis program comes with ABSOLUTELY NO WARRANTY."
-        + "\nThis is free software, and you are welcome to redistribute it under certain conditions."
-        + "\nFull license can be accessed here: https://github.com/Chnapy/PKVault/blob/main/LICENSE"
-        + $"\nPKVault v{Version} BuildID = {BuildID}"
-        + $"\nCurrent time UTC = {DateTime.UtcNow}\n");
     }
 
     public static async Task<Func<Task>?> SetupData(IHost host, string[] args)
     {
-        var initialMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
-
-#if MODE_GEN_POKEAPI
-        await host.Services.GetRequiredService<GenStaticDataService>().GenerateFiles();
-        return null;
-#elif MODE_DEFAULT
-
-        var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
-
-        Log.Information($"Memory checks: initial={initialMemoryUsedMB} MB setuped={setupedMemoryUsedMB} MB diff={setupedMemoryUsedMB - initialMemoryUsedMB} MB");
-
-        // if (args.Length > 0 && args[0] == "clean")
-        // {
-        //     await host.Services.GetRequiredService<MaintenanceService>().CleanMainStorageFiles();
-        //     return null;
-        // }
-
-        // if (args.Length > 0 && args[0] == "test-bkp")
-        // {
-        //     await host.Services.GetRequiredService<BackupService>().CreateBackup();
-        //     return null;
-        // }
-
-        var settingsService = host.Services.GetRequiredService<ISettingsService>();
-        var fileSystem = host.Services.GetRequiredService<IFileSystem>();
-
-        var saveGlobs = settingsService.GetSettings().SettingsMutable.SAVE_GLOBS;
-
-        var defaultSavePath = FileIOService.NormalizePath(SettingsService.DefaultSavePath);
-
-        if (saveGlobs.Contains(SettingsService.DefaultSavePath) && !fileSystem.File.Exists(defaultSavePath))
-        {
-            using var _ = Log.Logger.Time($"Default save file in save globs and is missing. Writing file to {SettingsService.DefaultSavePath}");
-
-            var assembly = new AssemblyClient();
-            using var defaultSaveStream = await assembly.GetAsync([
-                "default_files",
-                "pokemon_emerald_sample.sav",
-            ]);
-            using var fileStream = fileSystem.File.Create(defaultSavePath);
-            defaultSaveStream.CopyTo(fileStream);
-        }
-
-        return async () =>
-        {
-#if DEBUG && MODE_DEFAULT
-
-            try
-            {
-                var swaggerPath = MatcherUtil.NormalizePath(Path.Combine(InitialCurrentDirectory, "swagger.json"));
-                Log.Logger.Debug($"Generate Swagger file to {swaggerPath}");
-
-                var swaggerHref = $"http://localhost:5000/swagger/v1/swagger.json";
-                using HttpClient http = new();
-                using var response = await http.GetAsync(swaggerHref);
-                var json = await response.Content.ReadAsStringAsync();
-
-                if ((int)response.StatusCode >= 400 || string.IsNullOrWhiteSpace(json))
-                {
-                    throw new Exception($"Wrong swagger response (code={response.StatusCode})");
-                }
-
-                var oldJson = await File.ReadAllTextAsync(swaggerPath);
-
-                if (json != oldJson)
-                {
-                    Log.Logger.Debug($"Swagger content changed.");
-                    await File.WriteAllTextAsync(swaggerPath, json);
-                    Log.Logger.Debug($"Swagger file generated: {swaggerPath}");
-                }
-                else
-                {
-                    Log.Logger.Debug($"Swagger didn't change, generation aborted.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Error(ex, $"Error during swagger generation (non-blocking)");
-            }
-
-#endif
-
-            await host.Services.GetRequiredService<ISessionServiceMinimal>().EnsureSessionCreated();
-        };
-#else
-        throw new Exception("Mode not defined");
-#endif
+        return await PKVault.Core.Program.SetupData(host.Services);
     }
 
     public static async Task<WebApplication> PrepareWebApp(int port)
@@ -194,8 +59,8 @@ public class Program
         ConfigureServices(builder.Services);
 
         var sp = builder.Services.BuildServiceProvider();
-        var fileIOService = sp.GetRequiredService<IFileIOService>();
-        var settings = sp.GetRequiredService<ISettingsService>()
+        var fileIOService = sp.GetRequiredService<PKVault.Core.IFileIOService>();
+        var settings = sp.GetRequiredService<PKVault.Core.ISettingsService>()
             .GetSettings();
 
         X509Certificate2? GetCertificate()
@@ -227,6 +92,76 @@ public class Program
         });
 
         var app = builder.Build();
+
+        app.Map("{*path}", async (HttpContext context) =>
+        {
+            string queryString = "";
+
+            // Extrait les paramètres de QueryString si présents (ex: GET /api/backup?createdAt=2026-01-01)
+            if (context.Request.QueryString.HasValue)
+            {
+                // Console.WriteLine($"QUERIES = {context.Request.QueryString.Value} - {context.Request.QueryString.ToUriComponent()}");
+                queryString = context.Request.QueryString.Value;
+            }
+
+            using var scope = app.Services.CreateScope();
+
+            var coreRouter = scope.ServiceProvider.GetRequiredService<PKVault.Core.CoreRouter>();
+
+            var result = await coreRouter.Dispatch(scope.ServiceProvider, context.Request.Method, context.Request.Path, queryString, context.Request.Body);
+
+            // Console.WriteLine($"METHOD={context.Request.Method} PATH={context.Request.Path} QUERY={
+            //     string.Join(',',context.Request.Query.Select(q => $"{q.Key}:{JsonSerializer.Serialize(q.Value)}"))
+            // } BODY={body}");
+
+            context.Response.StatusCode = result.StatusCode ?? 200;
+
+            if (result.Header is not null)
+                foreach (var (key, values) in result.Header)
+                    context.Response.Headers[key] = values;
+
+            if (result is PKVault.Core.CoreFileResponse fileResponse)
+            {
+                context.Response.ContentType = fileResponse.ContentType ?? "application/octet-stream";
+
+                var contentDispositionHeader = new System.Net.Mime.ContentDisposition()
+                {
+                    FileName = fileResponse.File.FileName,
+                    DispositionType = "attachment"
+                };
+                context.Response.Headers.Append("Content-Disposition", contentDispositionHeader.ToString());
+
+                if (fileResponse.LastModified is not null)
+                    context.Response.GetTypedHeaders().LastModified = fileResponse.LastModified;
+
+                await using var stream = fileResponse.File.Stream;
+                await stream.CopyToAsync(context.Response.Body);
+            }
+
+            else if (result is PKVault.Core.CoreJSONResponse jsonResponse)
+            {
+                context.Response.ContentType = jsonResponse.ContentType ?? "application/json";
+                if (jsonResponse.Data is not null)
+                {
+                    var ctx = new PKVault.Core.RouteJsonContext(new()
+                    {
+                        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                        TypeInfoResolver = PKVault.Core.RouteJsonContext.Default
+                    });
+
+                    var typeInfo = ctx.GetTypeInfo(jsonResponse.Data.GetType())
+                        ?? throw new InvalidOperationException(
+                            $"Type {jsonResponse.Data.GetType()} non enregistré dans RouteJsonContext.");
+
+                    await JsonSerializer.SerializeAsync(
+                        context.Response.Body,
+                        jsonResponse.Data,
+                        typeInfo
+                    );
+                }
+            }
+        });
 
         ConfigureAppBuilder(app, certificate != default || settings.SettingsMutable.HTTPS_NOCERT == true);
 
@@ -284,153 +219,10 @@ public class Program
             options.Level = CompressionLevel.Optimal;
         });
 
-        services
-            .AddControllers(options =>
-            {
-                options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
-            })
-            // required by PublishedTrimmed
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-                options.JsonSerializerOptions.TypeInfoResolver = RouteJsonContext.Default;
-            });
-
-        services.AddSerilog();
-
-#if MODE_GEN_POKEAPI
-        services.AddSingleton<PokeApiService>();
-        services.AddSingleton<GenStaticDataService>();
-#endif
-
-        services.AddSingleton(TimeProvider.System);
-
-        Log.Information($"Setup services - DB");
-        services.AddDbContext<SessionDbContext>();
-
-        services.AddSingleton<ISessionService, SessionService>();
-        services.AddSingleton<ISessionServiceMinimal, ISessionService>(sp => sp.GetRequiredService<ISessionService>());   // use same instance as ISessionService
-        services.AddSingleton<IDbSeedingService, DbSeedingService>();
-
-        Log.Information($"Setup services - Main");
-        services.AddSingleton<IFileSystem>(new FileSystem());
-        services.AddSingleton<IFileIOService, FileIOService>();
-        services.AddSingleton<StaticDataService>();
-        services.AddSingleton<StorageQueryService>();
-        services.AddSingleton<ActionService>();
-        // services.AddSingleton<MaintenanceService>();
-        services.AddSingleton<DexService>();
-        services.AddSingleton<DexDataService>();
-        services.AddSingleton<WarningsService>();
-        services.AddSingleton<BackupService>();
-        services.AddSingleton<ISettingsService, SettingsService>();
-        services.AddSingleton<ILegalityAnalysisService, LegalityAnalysisService>();
-        services.AddSingleton<DataService>();
-        services.AddSingleton<IPkmConvertService, PkmConvertService>();
-        services.AddSingleton<IPkmSharePropertiesService, PkmSharePropertiesService>();
-        services.AddSingleton<PkmUpdateService>();
-        services.AddSingleton<PkmLegalityService>();
-
-        Log.Information($"Setup services - Actions");
-        services.AddScoped<DataNormalizeAction>();
-        services.AddScoped<UpdateExternalPkmAction>();
-        services.AddScoped<SynchronizePkmAction>();
-        services.AddScoped<MainCreateBoxAction>();
-        services.AddScoped<MainUpdateBoxAction>();
-        services.AddScoped<MainDeleteBoxAction>();
-        services.AddScoped<MainCreateBankAction>();
-        services.AddScoped<MainUpdateBankAction>();
-        services.AddScoped<MainDeleteBankAction>();
-        services.AddScoped<MovePkmAction>();
-        services.AddScoped<MovePkmBankAction>();
-        services.AddScoped<MainCreatePkmVariantAction>();
-        services.AddScoped<EditPkmVariantAction>();
-        services.AddScoped<EditPkmSaveAction>();
-        services.AddScoped<DetachPkmSaveAction>();
-        services.AddScoped<DeletePkmVariantAction>();
-        services.AddScoped<SaveDeletePkmAction>();
-        services.AddScoped<EvolvePkmAction>();
-        services.AddScoped<SortPkmAction>();
-        services.AddScoped<DexSyncAction>();
-
-        Log.Information($"Setup services - Loaders");
-        services.AddScoped<IMetaLoader, MetaLoader>();
-        services.AddScoped<IBankLoader, BankLoader>();
-        services.AddScoped<IBoxLoader, BoxLoader>();
-        services.AddScoped<IPkmVariantLoader, PkmVariantLoader>();
-        services.AddScoped<IPkmFileLoader, PkmFileLoader>();
-        services.AddScoped<IDexLoader, DexLoader>();
-        services.AddSingleton<ISavesLoadersService, SavesLoadersService>();   // singleton for perf reasons
+        PKVault.Core.Program.ConfigureServices(services);
 
         if (EnvUtil.DEMO_MODE)
             services.AddHostedService<DemoCleanupService>();
-
-#if DEBUG && MODE_DEFAULT
-        services.AddEndpointsApiExplorer();
-        services.AddOpenApiDocument(document =>
-        {
-            document.RequireParametersWithoutDefault = true;
-            document.SchemaSettings.DefaultReferenceTypeNullHandling = NJsonSchema.Generation.ReferenceTypeNullHandling.NotNull;
-
-            // document.SchemaSettings.SchemaProcessors.Add(new AutoRequiredSchemaProcessor());
-            // document.SchemaSettings.SchemaProcessors.Add(new EnumDuplicatesSchemaProcessor());
-            document.PostProcess = doc =>
-            {
-                // Add required: [], with values
-                // Remove nullable: true, nullable values being now optional (undefined in frontend)
-                static void AddRequiredArrayAndRemoveNullable(NJsonSchema.JsonSchema schema)
-                {
-                    if (schema.Properties != null && schema.Properties.Count > 0)
-                    {
-                        var nonNullableProperties = schema.Properties
-                            .Where(pair => !pair.Value.IsNullable(NJsonSchema.SchemaType.OpenApi3))
-                            .Select(pair => pair.Key);
-
-                        var nullableProperties = schema.Properties
-                            .Where(pair => pair.Value.IsNullable(NJsonSchema.SchemaType.OpenApi3));
-
-                        foreach (var p in nonNullableProperties)
-                        {
-                            if (!schema.RequiredProperties.Contains(p))
-                                schema.RequiredProperties.Add(p);
-                        }
-
-                        foreach (var p in nullableProperties)
-                        {
-                            p.Value.IsNullableRaw = null;
-                        }
-                    }
-
-                    foreach (var s in schema.AllOf)
-                    {
-                        AddRequiredArrayAndRemoveNullable(s);
-                    }
-                }
-
-                doc.Info.Title = "PKVault API";
-
-                foreach (var schema in doc.Definitions.Values)
-                {
-                    AddRequiredArrayAndRemoveNullable(schema);
-
-                    // Dedupe enum values
-                    // Required for PKHeX.Core.Gender which has duplicates
-                    if (schema.IsEnumeration)
-                    {
-                        var distinctValues = schema.Enumeration.Distinct().ToArray();
-                        if (distinctValues.Length == schema.Enumeration.Count)
-                            continue;
-
-                        schema.Enumeration.Clear();
-                        foreach (var value in distinctValues)
-                        {
-                            schema.Enumeration.Add(value);
-                        }
-                    }
-                }
-            };
-        });
-#endif
 
         Log.Information($"Setup services - Finished");
     }
@@ -439,31 +231,12 @@ public class Program
     {
         app.UseRateLimiter();
 
-        app.UseSerilogRequestLogging();
-
         app.UseResponseCompression();
 
         if (useHttps)
         {
             app.UseHttpsRedirection();
         }
-
-        app.UseRouting();
-        app.UseCors(policy => policy
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
-
-        app.UseMiddleware<ExceptionHandlingMiddleware>();
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
-
-#if DEBUG && MODE_DEFAULT
-        app.UseOpenApi();
-        app.UseSwaggerUi();
-#endif
     }
 
     public static int GetAvailablePort()

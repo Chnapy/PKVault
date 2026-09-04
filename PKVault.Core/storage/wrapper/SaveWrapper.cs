@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using System.Text;
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 /**
  * SaveFile wrapper for control & conveniance.
  * Not immutable for clone performance constraints.

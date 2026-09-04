@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 /**
  * Gives static-data, including pokeapi data and spritesheets.
  */
