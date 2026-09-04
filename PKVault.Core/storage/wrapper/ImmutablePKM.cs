@@ -1,0 +1,494 @@
+using PKHeX.Core;
+using PKHeX.Core.Searching;
+
+/**
+ * Immutable PKM wrapper, giving control and limit side-effects.
+ */
+public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
+{
+    public static byte GetForm(PKM pkm)
+    {
+        if (pkm.Species == (ushort)PKHeX.Core.Species.Alcremie)
+        {
+            if (pkm is PK8 pk8)
+            {
+                return (byte)(pkm.Form * 7 + pk8.FormArgument);
+            }
+            else if (pkm is PK9 pk9)
+            {
+                return (byte)(pkm.Form * 7 + pk9.FormArgument);
+            }
+        }
+        return pkm.Form;
+    }
+
+    public static MoveCategory GetMoveCategoryG123(int type, MoveCategory? initialCategory = null)
+    {
+        return initialCategory == MoveCategory.STATUS
+            ? (MoveCategory)initialCategory
+            : (
+                type < 10 ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL
+            );
+    }
+
+    public string Extension => Pkm.Extension;
+    public PersonalInfo PersonalInfo => Pkm.PersonalInfo;
+
+    // public ReadOnlySpan<byte> Data => Pkm.Data;
+
+    public byte[] GetDecryptedDataParty()
+    {
+        Span<byte> data = stackalloc byte[Pkm.SIZE_PARTY];
+        Pkm.WriteDecryptedDataParty(data);
+        return data.ToArray();
+    }
+
+    // Trash Bytes
+    // public ReadOnlySpan<byte> NicknameTrash => Pkm.NicknameTrash;
+    // public ReadOnlySpan<byte> OriginalTrainerTrash => Pkm.OriginalTrainerTrash;
+    // public ReadOnlySpan<byte> HandlingTrainerTrash => Pkm.HandlingTrainerTrash;
+
+    public EntityContext Context => Pkm.Context;
+    public byte Format => Pkm.Format;
+
+    // Surface Properties
+    public ushort Species => Pkm.Species;
+    public string Nickname => Pkm.Nickname;
+    // public int HeldItem => Pkm.HeldItem;
+    public Gender Gender => (Gender)Pkm.Gender;
+    // public Nature Nature => Pkm.Nature;
+    public Nature StatAlignment => Pkm.StatAlignment;
+    // public int Ability => Pkm.Ability;
+    public byte CurrentFriendship => Pkm.CurrentFriendship;
+    public byte Form => GetForm(Pkm);
+    public bool IsEgg => Pkm.IsEgg;
+    public bool IsNicknamed => Pkm.IsNicknamed;
+    public uint EXP => Pkm.EXP;
+    public ushort TID16 => Pkm.TID16;
+    public ushort SID16 => Pkm.SID16;
+    public string OriginalTrainerName => Pkm.OriginalTrainerName;
+    public byte OriginalTrainerGender => Pkm.OriginalTrainerGender;
+    public byte Ball => Pkm.Ball;
+    public byte MetLevel => Pkm.MetLevel;
+
+    // Aliases of ID32
+    public uint TrainerTID7 => Pkm.TrainerTID7;
+    public uint TrainerSID7 => Pkm.TrainerSID7;
+    public uint DisplayTID => Pkm.DisplayTID;
+    public uint DisplaySID => Pkm.DisplaySID;
+
+    // Battle
+    public ushort Move1 => Pkm.Move1;
+    public ushort Move2 => Pkm.Move2;
+    public ushort Move3 => Pkm.Move3;
+    public ushort Move4 => Pkm.Move4;
+    public int Move1_PP => Pkm.Move1_PP;
+    public int Move2_PP => Pkm.Move2_PP;
+    public int Move3_PP => Pkm.Move3_PP;
+    public int Move4_PP => Pkm.Move4_PP;
+    public int Move1_PPUps => Pkm.Move1_PPUps;
+    public int Move2_PPUps => Pkm.Move2_PPUps;
+    public int Move3_PPUps => Pkm.Move3_PPUps;
+    public int Move4_PPUps => Pkm.Move4_PPUps;
+    public int EV_HP => Pkm.EV_HP;
+    public int EV_ATK => Pkm.EV_ATK;
+    public int EV_DEF => Pkm.EV_DEF;
+    public int EV_SPE => Pkm.EV_SPE;
+    public int EV_SPA => Pkm.EV_SPA;
+    public int EV_SPD => Pkm.EV_SPD;
+    public int IV_HP => Pkm.IV_HP;
+    public int IV_ATK => Pkm.IV_ATK;
+    public int IV_DEF => Pkm.IV_DEF;
+    public int IV_SPE => Pkm.IV_SPE;
+    public int IV_SPA => Pkm.IV_SPA;
+    public int IV_SPD => Pkm.IV_SPD;
+    public int Status_Condition => Pkm.Status_Condition;
+    public byte Stat_Level => Pkm.Stat_Level;
+    public int Stat_HPMax => Pkm.Stat_HPMax;
+    public int Stat_HPCurrent => Pkm.Stat_HPCurrent;
+    public int Stat_ATK => Pkm.Stat_ATK;
+    public int Stat_DEF => Pkm.Stat_DEF;
+    public int Stat_SPE => Pkm.Stat_SPE;
+    public int Stat_SPA => Pkm.Stat_SPA;
+    public int Stat_SPD => Pkm.Stat_SPD;
+
+    // Hidden Properties
+    public GameVersion Version => Pkm.Version;
+    public uint ID32 => Pkm.ID32;
+    public int PokerusStrain => Pkm.PokerusStrain;
+    public int PokerusDays => Pkm.PokerusDays;
+    public bool IsPokerusInfected => Pkm.IsPokerusInfected;
+    public bool IsPokerusCured => Pkm.IsPokerusCured;
+
+    public uint EncryptionConstant => Pkm.EncryptionConstant;
+    public uint PID => Pkm.PID;
+
+    // Misc Properties
+    public LanguageID LanguageID
+    {
+        get
+        {
+            if (Pkm.Japanese) return LanguageID.Japanese;
+            if (Pkm.Korean) return LanguageID.Korean;
+            return (LanguageID)Pkm.Language;
+        }
+    }
+    public int Language => Pkm.Language;
+    public bool FatefulEncounter => Pkm.FatefulEncounter;
+    public uint TSV => Pkm.TSV;
+    public uint PSV => Pkm.PSV;
+    public int Characteristic => Pkm.Characteristic;
+    public ushort MetLocation => Pkm.MetLocation;
+    public ushort EggLocation => Pkm.EggLocation;
+    public byte OriginalTrainerFriendship => Pkm.OriginalTrainerFriendship;
+    public bool Japanese => Pkm.Japanese;
+    public bool Korean => Pkm.Korean;
+    public ulong? HomeTracker => Pkm is IHomeTrack pkmHT ? pkmHT.Tracker : null;
+    public MarkingColorUniversal[]? Markings => GetMarkings();
+    public int[]? Contest => Pkm is IContestStatsReadOnly pkmContest
+        ? [
+            pkmContest.ContestCool,
+            pkmContest.ContestBeauty,
+            pkmContest.ContestCute,
+            pkmContest.ContestSmart,
+            pkmContest.ContestTough,
+            pkmContest.ContestSheen,
+        ]
+        : null;
+    public Dictionary<string, byte>? Ribbons => Format > 2 && Pkm is not PB7
+        ? RibbonInfo.GetRibbonInfo(Pkm)
+            .Where(ribbon => ribbon.HasRibbon)
+            .ToDictionary(
+                p => p.Name,
+                p => p.Type == RibbonValueType.Byte
+                    ? p.RibbonCount
+                    : (byte)1
+            )
+        : null;
+
+    // Future Properties
+    public DateOnly? MetDate => Pkm.MetDate;
+    public byte MetYear => Pkm.MetYear;
+    public byte MetMonth => Pkm.MetMonth;
+    public byte MetDay => Pkm.MetDay;
+    public string HandlingTrainerName => Pkm.HandlingTrainerName;
+    public Gender HandlingTrainerGender => (Gender)Pkm.HandlingTrainerGender;
+    public byte HandlingTrainerFriendship => Pkm.HandlingTrainerFriendship;
+    public byte CurrentHandler => Pkm.CurrentHandler;
+    public bool IsCurrentHandler => CurrentHandler == 1;
+    public int AbilityNumber => Pkm.AbilityNumber;
+    public bool IsAbilityHidden => AbilityNumber > 2;
+
+    public int HPPower => Pkm.HPPower;
+    public int HPType => Pkm.HPType;
+
+    // Misc Egg Facts
+    public bool WasEgg => Pkm.WasEgg;
+
+    // Maximums
+    public ushort MaxMoveID => Pkm.MaxMoveID;
+    public ushort MaxSpeciesID => Pkm.MaxSpeciesID;
+    public int MaxItemID => Pkm.MaxItemID;
+    public int MaxAbilityID => Pkm.MaxAbilityID;
+    public int MaxBallID => Pkm.MaxBallID;
+    public GameVersion MaxGameID => Pkm.MaxGameID;
+    public GameVersion MinGameID => Pkm.MinGameID;
+    public int MaxIV => Pkm.MaxIV;
+    public int MaxEV => Pkm.MaxEV;
+
+    public int MaxStringLengthNickname => Pkm.MaxStringLengthNickname;
+
+    public bool IsShiny => Pkm.IsShiny;
+
+    public byte Generation => Pkm.Generation;
+
+    public byte CurrentLevel => Pkm.CurrentLevel;
+
+    public bool IsShadow => Pkm is IShadowCapture pkmShadow && pkmShadow.IsShadow;
+    public bool IsAlpha => Pkm is IAlpha pka && pka.IsAlpha;
+    public bool IsNoble => Pkm is INoble pkn && pkn.IsNoble;
+    public bool NSparkle => Pkm is PK5 pk5 && pk5.NSparkle;
+    public bool CanGigantamax => Pkm is IGigantamaxReadOnly pkg && pkg.CanGigantamax;
+    public List<byte> Types => DexGenService.GetTypes(Format, Pkm.PersonalInfo);
+    public byte? TeraType => Pkm is ITeraTypeReadOnly pkmTera
+        ? DexGenService.GetType((byte)pkmTera.TeraType)
+        : null;
+    public uint ExpToLevelUp => Experience.GetEXPToLevelUp(Pkm.CurrentLevel, Pkm.PersonalInfo.EXPGrowth);
+    public double LevelUpPercent => Experience.GetEXPToLevelUpPercentage(Pkm.CurrentLevel, Pkm.EXP, Pkm.PersonalInfo.EXPGrowth);
+    public byte Friendship => Pkm.IsEgg ? (byte)0 : Pkm.CurrentFriendship;
+    public byte EggHatchCount => Pkm.IsEgg ? Pkm.CurrentFriendship : (byte)0;
+
+    public int[] IVs => GetIVs();
+    public int[] EVs => GetEVs();
+    public int[] Stats => GetStats();
+    public int[] BaseStats => GetBaseStats();
+
+    public byte HiddenPowerType => HiddenPower.TryGetTypeIndex(Pkm.HPType, out var hptype)
+        ? (byte)(hptype + 1)
+        : (byte)0;
+
+    public int HiddenPowerPower => Pkm.HPPower;
+
+    public MoveCategory HiddenPowerCategory => Generation <= 3
+        ? GetMoveCategoryG123(HiddenPowerType)
+        : MoveCategory.SPECIAL;
+
+    public Nature Nature => GetNature();
+
+    public int Ability => Pkm.Ability == -1
+        ? 0
+        : Pkm.Ability;
+
+    public List<ushort> Moves => [.. GetMoves()];
+    public List<ushort>? RelearnMoves => GetRelearnMoves();
+    public ushort? AlphaMove => IsAlpha
+        ? Pkm switch
+        {
+            PA8 pa8 => pa8.AlphaMove,
+            PA9 pa9 => pa9.PersonalInfo.AlphaMove,
+            _ => null,
+        }
+        : null;
+
+    public uint TID => Pkm.DisplayTID;
+    public uint? SID => Pkm.DisplaySID > 0 ? Pkm.DisplaySID : null;
+
+    public string OriginTrainerName => Pkm.OriginalTrainerName;
+    public Gender OriginTrainerGender => (Gender)Pkm.OriginalTrainerGender;
+    public DateOnly? OriginMetDate => Pkm.MetDate;
+    public byte? OriginMetLevel => Pkm.MetLevel == 0 ? null : Pkm.MetLevel;
+
+    public string GetOriginMetLocation(string language) => GameInfo.GetStrings(language)
+        .GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version);
+
+    public int HeldItem => Pkm.HeldItem;
+
+    public int GetConvertedHeldItem() => ItemConverter.GetItemForFormat(HeldItem, Context, StaticDataService.LAST_ENTITY_CONTEXT);
+
+    public string GetHeldItemPokeapiName()
+    {
+        var convertedHeldItem = GetConvertedHeldItem();
+        return convertedHeldItem > 0 && convertedHeldItem < GameInfo.Strings.Item.Count
+            ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[convertedHeldItem])
+            : "";
+    }
+
+    // Data used here is considered to be mutable over pkm lifetime
+    public string DynamicChecksum => $"{Species}.{Form}.{Nickname}.{CurrentLevel}.{EXP}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}";
+
+    public bool IsSpeciesValid => Species > 0 && Species < GameInfo.Strings.Species.Count;
+
+    public PKMLoadError? LoadError => loadError;
+
+    public bool HasLoadError => loadError != null;
+
+    public bool IsEnabled => !HasLoadError && IsSpeciesValid;
+
+    public static string GetPKMIdPrefix(EntityContext context) => $"G{context.ToString()[3..]}";
+
+    /**
+     * Generate ID similar to PKHeX one.
+     * Note that Species & Form can change over time (evolve),
+     * so only first species of evolution group is used.
+     */
+    public string GetPKMIdBase(Dictionary<ushort, StaticEvolve> evolves, int boxId = (int)BoxType.Box)
+    {
+        ushort GetBaseSpecies(ushort species)
+        {
+            if (species == 0
+                // specific case with Shedinja which is created with Ninjask exact same data
+                || species == (ushort)PKHeX.Core.Species.Shedinja
+            )
+            {
+                return species;
+            }
+
+            var previousSpecies = evolves[species].PreviousSpecies;
+            if (previousSpecies != null)
+            {
+                return GetBaseSpecies((ushort)previousSpecies);
+            }
+            return species;
+        }
+
+        var clone = Update(clone =>
+        {
+            clone.Species = GetBaseSpecies(Pkm.Species);
+            clone.Form = 0;
+            if (GetMutablePkm() is GBPKM gbpkm && clone is GBPKM gbclone)
+            {
+                gbclone.DV16 = gbpkm.DV16;
+            }
+            else
+            {
+                clone.PID = Pkm.PID;
+                Span<int> ivs = [
+                    Pkm.IV_HP,
+                    Pkm.IV_ATK,
+                    Pkm.IV_DEF,
+                    Pkm.IV_SPE,
+                    Pkm.IV_SPA,
+                    Pkm.IV_SPD,
+                ];
+                clone.SetIVs(ivs);
+            }
+        });
+
+        var hash = SearchUtil.HashByDetails(clone.GetMutablePkm());
+
+        var scopedBox = BoxLoader.IsScopedBox(boxId)
+            ? $"_{boxId}"
+            : "";
+
+        var id = $"{GetPKMIdPrefix(clone.Context)}_{hash}_{clone.TID16}{scopedBox}";   // note: SID not stored by pk files
+
+        return id;
+    }
+
+    public Span<ushort> GetMoves()
+    {
+        Span<ushort> moves = new ushort[4];
+        Pkm.GetMoves(moves);
+        return moves;
+    }
+
+    public List<ushort>? GetRelearnMoves()
+    {
+        if (Format >= 6)
+        {
+            Span<ushort> relearnMoves = new ushort[4];
+            Pkm.GetRelearnMoves(relearnMoves);
+            return [.. relearnMoves];
+        }
+        return null;
+    }
+
+    public int[] GetBaseStats()
+    {
+        return [
+            Pkm.PersonalInfo.GetBaseStatValue(0),
+            Pkm.PersonalInfo.GetBaseStatValue(1),
+            Pkm.PersonalInfo.GetBaseStatValue(2),
+            Pkm.PersonalInfo.GetBaseStatValue(4),
+            Pkm.PersonalInfo.GetBaseStatValue(5),
+            Pkm.PersonalInfo.GetBaseStatValue(3),
+        ];
+    }
+
+    public int[] GetStats()
+    {
+        Pkm.SetStats(Pkm.GetStats(Pkm.PersonalInfo));
+        return [
+            Pkm.Stat_HPMax,
+            Pkm.Stat_ATK,
+            Pkm.Stat_DEF,
+            Pkm.Stat_SPA,
+            Pkm.Stat_SPD,
+            Pkm.Stat_SPE,
+        ];
+    }
+
+    public int[] GetIVs()
+    {
+        return [
+            Pkm.IV_HP,
+            Pkm.IV_ATK,
+            Pkm.IV_DEF,
+            Pkm.IV_SPA,
+            Pkm.IV_SPD,
+            Pkm.IV_SPE,
+        ];
+    }
+
+    public int[] GetEVs()
+    {
+        if (Pkm is PB7 pb7)
+        {
+            return [
+                pb7.AV_HP,
+                pb7.AV_ATK,
+                pb7.AV_DEF,
+                pb7.AV_SPA,
+                pb7.AV_SPD,
+                pb7.AV_SPE,
+            ];
+        }
+
+        return [
+            Pkm.EV_HP,
+                Pkm.EV_ATK,
+                Pkm.EV_DEF,
+                Pkm.EV_SPA,
+                Pkm.EV_SPD,
+                Pkm.EV_SPE,
+            ];
+    }
+
+    public Nature GetNature() => Pkm is GBPKM gbpkm ? Experience.GetNatureVC(gbpkm.EXP) : Pkm.Nature;
+
+    public MarkingColorUniversal[]? GetMarkings()
+    {
+        if (Pkm is IAppliedMarkings<bool> pkmMarking)
+        {
+            List<MarkingColorUniversal> markings = [];
+            for (var i = 0; i < pkmMarking.MarkingCount; i++)
+            {
+                markings.Add(pkmMarking.GetMarking(i)
+                    ? MarkingColorUniversal.Marked
+                    : MarkingColorUniversal.NotMarked);
+            }
+            return [.. markings];
+        }
+
+        if (Pkm is IAppliedMarkings<MarkingColor> pkmMarkingColors)
+        {
+            List<MarkingColorUniversal> markings = [];
+            for (var i = 0; i < pkmMarkingColors.MarkingCount; i++)
+            {
+                markings.Add(pkmMarkingColors.GetMarking(i) switch
+                {
+                    MarkingColor.None => MarkingColorUniversal.NotMarked,
+                    MarkingColor.Blue => MarkingColorUniversal.MarkedBlue,
+                    MarkingColor.Pink => MarkingColorUniversal.MarkedPink,
+                    _ => throw new NotImplementedException(),
+                });
+            }
+            return [.. markings];
+        }
+
+        return null;
+    }
+
+    public PKM GetMutablePkm() => Pkm;
+
+    /**
+     * Create a PKM clone and mutate it with given mutator function.
+     * Return new ImmutablePKM.
+     */
+    public ImmutablePKM Update(Action<PKM> mutator)
+    {
+        var clone = Pkm.Clone();
+
+        mutator(clone);
+
+        return new(clone, LoadError);
+    }
+}
+
+public enum PKMLoadError
+{
+    UNKNOWN,
+    NOT_LOADED,
+    NOT_FOUND,
+    TOO_SMALL,
+    TOO_BIG,
+    UNAUTHORIZED
+}
+
+public enum MarkingColorUniversal : byte
+{
+    NotMarked = 0,
+    Marked = 1,
+    MarkedBlue = 2,
+    MarkedPink = 3,
+}

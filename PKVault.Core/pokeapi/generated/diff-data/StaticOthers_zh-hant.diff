@@ -1,0 +1,16 @@
+--- This file displays changes of StaticOthers_zh-hant compressed file from previous changes
+
+--- pokeapi\generated\diff-data\StaticOthers_zh-hant.diff
++++ pokeapi\generated\diff-data\StaticOthers_zh-hant.diff
+@@ -40735,7 +40735,10 @@
+         "169": 147,
+         "610": 148,
+         "611": 149,
+-        "612": 150
++        "612": 150,
++        "719": 151,
++        "720": 152,
++        "721": 153
+       }
+     },
+     "kalos-coastal": {

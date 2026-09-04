@@ -1,0 +1,115 @@
+--- This file displays changes of StaticOthers_de compressed file from previous changes
+
+--- pokeapi/generated/diff-data/StaticOthers_de.diff
++++ pokeapi/generated/diff-data/StaticOthers_de.diff
+@@ -36777,7 +36777,7 @@
+       "parlyz-heal": {
+         "id": "parlyz-heal",
+         "name": "Para-Heiler",
+-        "sprite": ""
++        "sprite": "sprites/items/paralyze-heal.png"
+       },
+       "bead-mail": {
+         "id": "bead-mail",
+@@ -36812,12 +36812,12 @@
+       "x-defend": {
+         "id": "x-defend",
+         "name": "X-Abwehr",
+-        "sprite": ""
++        "sprite": "sprites/items/x-defense.png"
+       },
+       "x-special": {
+         "id": "x-special",
+         "name": "X-Spezial",
+-        "sprite": ""
++        "sprite": "sprites/items/x-sp-atk.png"
+       },
+       "orange-mail": {
+         "id": "orange-mail",
+@@ -36897,7 +36897,7 @@
+       "przcure-berry": {
+         "id": "przcure-berry",
+         "name": "Antiparbeere",
+-        "sprite": ""
++        "sprite": "sprites/items/cheri-berry.png"
+       },
+       "blu-apricorn": {
+         "id": "blu-apricorn",
+@@ -36932,7 +36932,7 @@
+       "berry": {
+         "id": "berry",
+         "name": "Beere",
+-        "sprite": ""
++        "sprite": "sprites/items/oran-berry.png"
+       },
+       "berserk-gene": {
+         "id": "berserk-gene",
+@@ -36942,7 +36942,7 @@
+       "bitter-berry": {
+         "id": "bitter-berry",
+         "name": "Bitterbeere",
+-        "sprite": ""
++        "sprite": "sprites/items/persim-berry.png"
+       },
+       "flower-mail": {
+         "id": "flower-mail",
+@@ -36952,7 +36952,7 @@
+       "burnt-berry": {
+         "id": "burnt-berry",
+         "name": "Brandbeere",
+-        "sprite": ""
++        "sprite": "sprites/items/rawst-berry.png"
+       },
+       "litebluemail": {
+         "id": "litebluemail",
+@@ -36962,7 +36962,7 @@
+       "ice-berry": {
+         "id": "ice-berry",
+         "name": "Eisbeere",
+-        "sprite": ""
++        "sprite": "sprites/items/aspear-berry.png"
+       },
+       "elixer": {
+         "id": "elixer",
+@@ -36972,12 +36972,12 @@
+       "psncure-berry": {
+         "id": "psncure-berry",
+         "name": "Gegengiftbeere",
+-        "sprite": ""
++        "sprite": "sprites/items/pecha-berry.png"
+       },
+       "gold-berry": {
+         "id": "gold-berry",
+         "name": "Goldbeere",
+-        "sprite": ""
++        "sprite": "sprites/items/sitrus-berry.png"
+       },
+       "lovely-mail": {
+         "id": "lovely-mail",
+@@ -36997,7 +36997,7 @@
+       "mint-berry": {
+         "id": "mint-berry",
+         "name": "Minzbeere",
+-        "sprite": ""
++        "sprite": "sprites/items/chesto-berry.png"
+       },
+       "morph-mail": {
+         "id": "morph-mail",
+@@ -37017,7 +37017,7 @@
+       "mystery-berry": {
+         "id": "mystery-berry",
+         "name": "Rätselbeere",
+-        "sprite": ""
++        "sprite": "sprites/items/leppa-berry.png"
+       },
+       "normal-box": {
+         "id": "normal-box",
+@@ -37047,7 +37047,7 @@
+       "miracle-berry": {
+         "id": "miracle-berry",
+         "name": "Wunderbeere",
+-        "sprite": ""
++        "sprite": "sprites/items/lum-berry.png"
+       },
+       "brick-piece": {
+         "id": "brick-piece",

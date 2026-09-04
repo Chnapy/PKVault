@@ -1,0 +1,10 @@
+<linker>
+  <!-- allow use of reflection when required -->
+  <assembly fullname="Microsoft.EntityFrameworkCore" preserve="all"/>
+  <assembly fullname="Microsoft.EntityFrameworkCore.Relational" preserve="all" />
+  <assembly fullname="Microsoft.EntityFrameworkCore.Sqlite" preserve="all" />
+  <assembly fullname="MediatR" preserve="all" />
+  <assembly fullname="PKVault.Core">
+    <type fullname="PKVault.Core.*" preserve="all"/>
+  </assembly>
+</linker>
