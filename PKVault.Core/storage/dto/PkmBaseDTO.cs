@@ -1,0 +1,138 @@
+using System.Text.Json.Serialization;
+using PKHeX.Core;
+
+public abstract record PkmBaseDTO(
+    string Id,
+    byte Generation,
+
+    int BoxId,
+    int BoxSlot,
+
+    bool IsDuplicate,
+
+    [property: JsonIgnore] string SettingsLanguage,
+    [property: JsonIgnore] ImmutablePKM Pkm,
+    [property: JsonIgnore] Dictionary<ushort, StaticEvolve> Evolves
+) : IWithId
+{
+    public virtual string IdBase => Pkm.GetPKMIdBase(Evolves);
+    public string BoxKey => BoxId + "." + BoxSlot;
+
+    public GameVersion Version => Pkm.Version;
+    public GameVersion ContextVersion => Version.Context == Context
+        ? Version
+        : Context.GetSingleGameVersion();
+    public EntityContext Context => Pkm.Context;
+    public uint PID => Pkm.PID;
+    public bool IsNicknamed => Pkm.IsNicknamed;
+    public string Nickname => Pkm.Nickname;
+    public ushort Species => Pkm.Species;
+    public byte Form => Pkm.Form;
+    public bool IsEgg => Pkm.IsEgg;
+    public bool IsShiny => Pkm.IsShiny;
+    public bool IsAlpha => Pkm.IsAlpha;
+    public bool IsNoble => Pkm.IsNoble;
+    public bool NSparkle => Pkm.NSparkle;
+    public bool CanGigantamax => Pkm.CanGigantamax;
+
+    public int Ball => StaticDataService.GetBallPokeApiId((Ball)Pkm.Ball);
+
+    public Gender Gender => Pkm.Gender;
+    public List<byte> Types => Pkm.Types;
+    public byte? TeraType => Pkm.TeraType;
+    public byte Level => Pkm.CurrentLevel;
+    public uint Exp => Pkm.EXP;
+    public uint ExpToLevelUp => Pkm.ExpToLevelUp;
+    public double LevelUpPercent => Pkm.LevelUpPercent;
+    public byte Friendship => Pkm.Friendship;
+    public byte EggHatchCount => Pkm.EggHatchCount;
+    public int[] IVs => Pkm.IVs;
+    public int[] EVs => Pkm.EVs;
+    public int[] Stats => Pkm.Stats;
+    public int[] BaseStats => Pkm.BaseStats;
+    public byte HiddenPowerType => Pkm.HiddenPowerType;
+    public int HiddenPowerPower => Pkm.HiddenPowerPower;
+    public MoveCategory HiddenPowerCategory => Pkm.HiddenPowerCategory;
+    public Nature Nature => Pkm.Nature;
+    public int Ability => Pkm.Ability;
+    public bool IsAbilityHidden => Pkm.IsAbilityHidden;
+
+    public List<ushort> Moves => Pkm.Moves;
+    public List<ushort>? RelearnMoves => Pkm.RelearnMoves;
+    public ushort? AlphaMove => Pkm.AlphaMove;
+
+    public uint TID => Pkm.TID;
+    public uint? SID => Pkm.SID;
+    public string OriginTrainerName => Pkm.OriginTrainerName;
+    public Gender OriginTrainerGender => Pkm.OriginTrainerGender;
+    public string HandlingTrainerName => Pkm.HandlingTrainerName;
+    public Gender HandlingTrainerGender => Pkm.HandlingTrainerGender;
+    public byte HandlingTrainerFriendship => Pkm.HandlingTrainerFriendship;
+    public bool IsCurrentHandler => Pkm.IsCurrentHandler;
+
+    public DateOnly? OriginMetDate => Pkm.OriginMetDate;
+    public string OriginMetLocation => Pkm.GetOriginMetLocation(SettingsLanguage);
+    public byte? OriginMetLevel => Pkm.OriginMetLevel;
+    public bool FatefulEncounter => Pkm.FatefulEncounter;
+
+    public int HeldItem => Pkm.HeldItem;
+    public string DynamicChecksum => Pkm.DynamicChecksum;
+    public int NicknameMaxLength => Pkm.MaxStringLengthNickname;
+    public LanguageID LanguageID => Pkm.LanguageID;
+    public ulong? HomeTracker => Pkm.HomeTracker;
+
+    public MarkingColorUniversal[]? Markings => Pkm.Markings;
+    public int[]? Contest => Pkm.Contest;
+    public Dictionary<string, byte>? Ribbons => Pkm.Ribbons;
+
+    public int PokerusStrain => Pkm.PokerusStrain;
+    public int PokerusDays => Pkm.PokerusDays;
+    public bool IsPokerusInfected => Pkm.IsPokerusInfected;
+    public bool IsPokerusCured => Pkm.IsPokerusCured;
+
+    public bool IsShadow => Pkm.IsShadow;
+
+    public virtual bool CanMove => true;
+    public virtual bool CanDelete => true;
+    public virtual bool CanMoveToSave => IsEnabled && Pkm.Version > 0 && Pkm.Generation > 0 && CanMove;
+
+    public virtual bool CanEdit => IsEnabled && !IsEgg;
+    public virtual bool CanEvolve
+    {
+        get
+        {
+            if (!CanEdit || IsShadow)
+                return false;
+
+            if (!Evolves.TryGetValue(Species, out var staticEvolves))
+            {
+                return false;
+            }
+
+            if (staticEvolves.Trade.TryGetValue((byte)Version, out var tradeEvolveSpecies))
+            {
+                return Level >= tradeEvolveSpecies.MinLevel;
+            }
+
+            var heldItemPokeapiName = Pkm.GetHeldItemPokeapiName();
+
+            if (!staticEvolves.TradeWithItem.TryGetValue(heldItemPokeapiName, out var tradeWithItemEvolveSpecies))
+            {
+                return false;
+            }
+
+            if (!tradeWithItemEvolveSpecies.TryGetValue((byte)Version, out var evolveSpecies))
+            {
+                return false;
+            }
+
+            return Level >= evolveSpecies.MinLevel;
+        }
+    }
+
+    public PKMLoadError? LoadError => Pkm.LoadError;
+    public bool HasLoadError => Pkm.HasLoadError;
+    public bool IsEnabled => Pkm.IsEnabled;
+};
+
+public record MoveItem(int Id);

@@ -1,0 +1,397 @@
+using PKHeX.Core;
+using Serilog;
+
+public record DataNormalizeActionInput(
+    bool SetupInitialData,
+    bool UpdateVersion
+)
+{
+    public bool ShouldRun => SetupInitialData || UpdateVersion;
+
+    public Dictionary<string, string>? Migrate200Ids;
+}
+
+public class DataNormalizeAction(
+    SessionDbContext db,
+    IBankLoader bankLoader, IBoxLoader boxLoader, IPkmVariantLoader pkmVariantLoader, IDexLoader dexLoader,
+    ISavesLoadersService savesLoadersService, IMetaLoader metaLoader,
+    ISessionService sessionService, IFileIOService fileIOService, ISettingsService settingsService,
+    StaticDataService staticDataService
+) : DataAction<DataNormalizeActionInput>
+{
+    public static List<string> GetLegacyFilepaths(string dbPath) => [
+        LegacyBankLoader.GetFilepath(dbPath),
+        LegacyBoxLoader.GetFilepath(dbPath),
+        LegacyPkmLoader.GetFilepath(dbPath),
+        LegacyPkmVersionLoader.GetFilepath(dbPath),
+        LegacyDexLoader.GetFilepath(dbPath)
+    ];
+
+    public async Task<DataNormalizeActionInput> HasDataToNormalize()
+    {
+        var currentVersion = await metaLoader.GetEntity(MetaKey.APP_VERSION);
+        var updateVersion = currentVersion?.Value != settingsService.GetSettings().Version;
+
+        var setupInitialData = !await bankLoader.Any() || !await boxLoader.Any();
+
+        return new(
+            SetupInitialData: setupInitialData,
+            UpdateVersion: updateVersion
+        );
+    }
+
+    protected override async Task<DataActionPayload> Execute(DataNormalizeActionInput input, DataUpdateFlags flags)
+    {
+        if (input.UpdateVersion)
+        {
+            await UpdateVersion(input);
+        }
+
+        if (input.SetupInitialData)
+        {
+            await SetupInitialData();
+        }
+
+        return new(
+            DataActionType.DATA_NORMALIZE,
+            [
+                input.UpdateVersion ? settingsService.GetSettings().Version : null,
+                input.SetupInitialData,
+            ]
+        );
+    }
+
+    private async Task SetupInitialData()
+    {
+        if (!await bankLoader.Any())
+        {
+            await bankLoader.AddEntity(new()
+            {
+                Id = "0",
+                IdInt = 0,
+                Name = "Bank 1",
+                IsDefault = true,
+                IsExternal = false,
+                Order = 0,
+                View = new([], [])
+            });
+        }
+
+        if (!await boxLoader.Any())
+        {
+            await boxLoader.AddEntity(new()
+            {
+                Id = "0",
+                IdInt = 0,
+                Name = "Box 1",
+                Type = BoxType.Box,
+                SlotCount = 30,
+                Order = 0,
+                BankId = "0"
+            });
+        }
+    }
+
+    private async Task UpdateVersion(DataNormalizeActionInput input)
+    {
+        var currentVersion = await metaLoader.GetEntity(MetaKey.APP_VERSION);
+
+        var newVersion = settingsService.GetSettings().Version;
+
+        // --- Data migration
+
+        // <= 1.6.1
+        if (currentVersion == null)
+        {
+            await MigrateJSONLegacyData();
+            await MigrateVariantsFrom161();
+        }
+        // <= 2.0.0
+        else if (GetVersionValue(currentVersion.Value) <= GetVersionValue("2.0.0"))
+        {
+            await MigrateVariantsFrom200(input);
+        }
+
+        // --- Update version
+
+        if (currentVersion == null)
+        {
+            await metaLoader.AddEntity(new()
+            {
+                Key = MetaKey.APP_VERSION,
+                Value = newVersion
+            });
+        }
+        else
+        {
+            currentVersion.Value = newVersion;
+
+            await metaLoader.UpdateEntity(currentVersion);
+        }
+    }
+
+    private static int GetVersionValue(string version)
+    {
+        var value = 0;
+
+        var i = 0;
+        foreach(var str in version.Split('.').Reverse())
+        {
+            var v = int.Parse(str);
+            value += v * (int)Math.Pow(10, i);
+            i += 3;
+        }
+        
+        return value;
+    }
+
+    private async Task<bool> MigrateJSONLegacyData()
+    {
+        var isAlreadyUsingSqlite = sessionService.HasMainDb();
+        if (isAlreadyUsingSqlite)
+        {
+            Log.Logger.Information("Already on sqlite, no json migration");
+            return false;
+        }
+
+        var settings = settingsService.GetSettings();
+        var dbPath = settings.GetDbPath();
+        var storagePath = settings.GetStoragePath();
+        var languageId = settings.GetSafeLanguageID();
+
+        var hasLegacy = GetLegacyFilepaths(dbPath).Any(fileIOService.Exists);
+        if (!hasLegacy)
+        {
+            return false;
+        }
+
+        var evolves = await staticDataService.GetStaticEvolves();
+
+        var legacyBankLoader = new LegacyBankLoader(fileIOService, dbPath);
+        var legacyBoxLoader = new LegacyBoxLoader(fileIOService, dbPath);
+        var legacyPkmLoader = new LegacyPkmLoader(fileIOService, dbPath);
+        var legacyPkmVersionLoader = new LegacyPkmVersionLoader(
+            fileIOService,
+            dbPath,
+            storagePath,
+            evolves
+        );
+        var legacyDexLoader = new LegacyDexLoader(fileIOService, dbPath);
+
+        using var _ = Log.Logger.Time("Data normalize - json legacy migration");
+
+        var saveById = savesLoadersService.GetSaveById().ToDictionary();
+
+        var legacyBankNormalize = new LegacyBankNormalize(legacyBankLoader);
+        var legacyBoxNormalize = new LegacyBoxNormalize(legacyBoxLoader);
+        var legacyPkmNormalize = new LegacyPkmNormalize(legacyPkmLoader, evolves);
+        var legacyPkmVersionNormalize = new LegacyPkmVersionNormalize(legacyPkmVersionLoader, evolves);
+        var legacyDexNormalize = new LegacyDexNormalize(legacyDexLoader);
+
+        legacyPkmNormalize.CleanData(legacyPkmVersionLoader);
+        legacyPkmVersionNormalize.CleanData();
+
+        legacyBankNormalize.MigrateGlobalEntities();
+        legacyBoxNormalize.MigrateGlobalEntities(legacyBankLoader);
+        legacyPkmNormalize.MigrateGlobalEntities(legacyPkmVersionLoader, saveById);
+        legacyPkmVersionNormalize.MigrateGlobalEntities();
+        legacyDexNormalize.MigrateGlobalEntities();
+
+        Log.Information("Json migration inserts:");
+        Log.Information($"- {legacyBankLoader.GetAllEntities().Count} banks");
+        Log.Information($"- {legacyBoxLoader.GetAllEntities().Count} boxes");
+        Log.Information($"- {legacyPkmVersionLoader.GetAllEntities().Count} pkmVersions");
+        Log.Information($"- {legacyDexLoader.GetAllEntities().Count} dex");
+
+        await using var transaction = await db.Database.BeginTransactionAsync();
+
+        try
+        {
+            await bankLoader.AddEntities(
+                legacyBankLoader.GetAllEntities().Values.Select(e => new BankEntity()
+                {
+                    Id = e.Id,
+                    IdInt = e.IdInt,
+                    Name = e.Name,
+                    IsDefault = e.IsDefault,
+                    IsExternal = false,
+                    Order = e.Order,
+                    View = new(e.View.MainBoxIds, [..e.View.Saves.Select(s => new BankEntity.BankViewSave(
+                        SaveId: s.SaveId,
+                        SaveBoxIds: s.SaveBoxIds,
+                        Order: s.Order
+                    ))])
+                })
+            );
+
+            await boxLoader.AddEntities(
+                legacyBoxLoader.GetAllEntities().Values.Select(e => new BoxEntity()
+                {
+                    Id = e.Id,
+                    IdInt = e.IdInt,
+                    Name = e.Name,
+                    Order = e.Order,
+                    Type = e.Type,
+                    SlotCount = e.SlotCount,
+                    BankId = e.BankId
+                })
+            );
+
+            var boxes = await boxLoader.GetAllDtos();
+
+            await pkmVariantLoader.AddEntities(
+                legacyPkmVersionLoader.GetAllEntities().Values.Select(e => new PkmVariantLoaderAddPayload(
+                    Box: boxes.Find(box => box.IdInt == e.BoxId)!,
+                    BoxSlot: e.BoxSlot,
+                    IsMain: e.IsMain,
+                    IsExternal: false,
+                    AttachedSaveId: e.AttachedSaveId,
+                    AttachedSavePkmIdBase: e.AttachedSavePkmIdBase,
+                    Context: (EntityContext)e.Generation,
+                    Generation: e.Generation,
+                    Pkm: legacyPkmVersionLoader.pkmFileLoader.CreatePKM(e.Id, e.Filepath, e.Generation),
+
+                    // disabled pkms are allowed here to avoid data loss
+                    Hash: e.Id,
+                    Filepath: e.Filepath,
+                    Updated: false,
+                    CheckPkm: false
+                ))
+            );
+
+            await dexLoader.AddEntities(
+                legacyDexLoader.GetAllEntities().Values
+                    .SelectMany(e => e.Forms.Select(f => new DexFormEntity()
+                    {
+                        Id = DexLoader.GetId(e.Species, f.Form, f.Gender),
+                        Species = e.Species,
+                        Form = f.Form,
+                        Gender = f.Gender,
+                        Context = f.Version.Context,
+                        Version = f.Version,
+                        IsCaught = f.IsCaught,
+                        IsCaughtShiny = f.IsCaughtShiny,
+                        IsCaughtAlpha = false,
+                        Languages = [languageId]    // pkm language is lost here, so we use app language as fallback
+                    }))
+            );
+
+            await db.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+
+        return true;
+    }
+
+    // migrate variants from <=1.6.1, checking:
+    // - wrong context: entity vs PKM
+    // - wrong variant ID
+    // - wrong attached save pkm ID
+    private async Task MigrateVariantsFrom161()
+    {
+        var evolves = await staticDataService.GetStaticEvolves();
+
+        var allVariants = await pkmVariantLoader.GetAllEntities();
+
+        foreach (var oldVariant in allVariants.Values)
+        {
+            var variant = oldVariant;
+            bool shouldUpdate = false;
+
+            var pkm = await pkmVariantLoader.GetPKM(variant);
+            if (!pkm.IsEnabled)
+            {
+                continue;
+            }
+
+            var pkmId = pkm.GetPKMIdBase(evolves);
+
+            // wrong context
+            if (pkm.Context != variant.Context)
+            {
+                variant.Context = pkm.Context;
+                shouldUpdate = true;
+            }
+
+            // wrong variant hash
+            if (pkmId != variant.Hash)
+            {
+                if (!allVariants.ContainsKey(pkmId))
+                    variant = PkmVariantEntity.CreateFrom(oldVariant, pkmId);
+            }
+
+            if (variant.AttachedSaveId != null && variant.AttachedSavePkmIdBase != null)
+            {
+                var saveLoaders = savesLoadersService.GetLoaders((uint)variant.AttachedSaveId);
+
+                // ignore main games
+                if (saveLoaders != null && (byte)saveLoaders.Save.Context > (byte)EntityContext.SplitInvalid)
+                {
+                    var idPrefix = ImmutablePKM.GetPKMIdPrefix(saveLoaders.Save.Context);
+
+                    var attachedId = variant.AttachedSavePkmIdBase;
+
+                    // wrong attached save pkm ID
+                    if (!attachedId.StartsWith(idPrefix))
+                    {
+                        // if same context, id can be fixed
+                        if (variant.Context == saveLoaders.Save.Context)
+                        {
+                            var idSuffix = attachedId[2..];
+                            variant.AttachedSavePkmIdBase = $"{idPrefix}{idSuffix}";
+                        }
+                        // otherwise detach variant from save
+                        else
+                        {
+                            variant.AttachedSaveId = null;
+                            variant.AttachedSavePkmIdBase = null;
+                        }
+                        shouldUpdate = true;
+                    }
+                }
+            }
+
+            if (variant != oldVariant)
+            {
+                await pkmVariantLoader.DeleteEntityDBOnly(oldVariant);
+                await pkmVariantLoader.AddEntity(variant);
+            }
+            else if (shouldUpdate)
+            {
+                await pkmVariantLoader.UpdateEntity(variant);
+            }
+        }
+    }
+
+    // migrate variants from <=2.0.0, checking:
+    // - new ID format: GUID
+    // - empty hash: use old ID
+    private async Task MigrateVariantsFrom200(DataNormalizeActionInput input)
+    {
+        var allVariants = await pkmVariantLoader.GetAllEntities();
+        if (allVariants.Count == 0)
+            return;
+
+        input.Migrate200Ids ??= [];
+
+        db.PkmVersions.RemoveRange(allVariants.Values);
+        await db.PkmVersions.AddRangeAsync(allVariants.Values.Select(oldVariant =>
+        {
+            input.Migrate200Ids.TryGetValue(oldVariant.Id, out var inputId);
+
+            var variant = PkmVariantEntity.CreateFrom(oldVariant, inputId ?? Guid.NewGuid().ToString());
+            variant.Hash = oldVariant.Id;
+
+            input.Migrate200Ids[oldVariant.Id] = variant.Id;
+
+            return variant;
+        }));
+        await db.SaveChangesAsync();
+    }
+}

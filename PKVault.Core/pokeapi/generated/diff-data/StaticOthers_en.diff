@@ -1,0 +1,112 @@
+--- This file displays changes of StaticOthers_en compressed file from previous changes
+
+--- pokeapi/generated/diff-data/StaticOthers_en.diff
++++ pokeapi/generated/diff-data/StaticOthers_en.diff
+@@ -36787,7 +36787,7 @@
+       "parlyz-heal": {
+         "id": "parlyz-heal",
+         "name": "Parlyz Heal",
+-        "sprite": ""
++        "sprite": "sprites/items/paralyze-heal.png"
+       },
+       "retro-mail": {
+         "id": "retro-mail",
+@@ -36817,12 +36817,12 @@
+       "x-defend": {
+         "id": "x-defend",
+         "name": "X Defend",
+-        "sprite": ""
++        "sprite": "sprites/items/x-defense.png"
+       },
+       "x-special": {
+         "id": "x-special",
+         "name": "X Special",
+-        "sprite": ""
++        "sprite": "sprites/items/x-sp-atk.png"
+       },
+       "air-mail": {
+         "id": "air-mail",
+@@ -36887,7 +36887,7 @@
+       "berry": {
+         "id": "berry",
+         "name": "Berry",
+-        "sprite": ""
++        "sprite": "sprites/items/oran-berry.png"
+       },
+       "berserk-gene": {
+         "id": "berserk-gene",
+@@ -36897,7 +36897,7 @@
+       "bitter-berry": {
+         "id": "bitter-berry",
+         "name": "Bitter Berry",
+-        "sprite": ""
++        "sprite": "sprites/items/persim-berry.png"
+       },
+       "blk-apricorn": {
+         "id": "blk-apricorn",
+@@ -36922,7 +36922,7 @@
+       "burnt-berry": {
+         "id": "burnt-berry",
+         "name": "Burnt Berry",
+-        "sprite": ""
++        "sprite": "sprites/items/rawst-berry.png"
+       },
+       "elixer": {
+         "id": "elixer",
+@@ -36942,7 +36942,7 @@
+       "gold-berry": {
+         "id": "gold-berry",
+         "name": "Gold Berry",
+-        "sprite": ""
++        "sprite": "sprites/items/sitrus-berry.png"
+       },
+       "gorgeous-box": {
+         "id": "gorgeous-box",
+@@ -36957,7 +36957,7 @@
+       "ice-berry": {
+         "id": "ice-berry",
+         "name": "Ice Berry",
+-        "sprite": ""
++        "sprite": "sprites/items/aspear-berry.png"
+       },
+       "litebluemail": {
+         "id": "litebluemail",
+@@ -36977,12 +36977,12 @@
+       "mint-berry": {
+         "id": "mint-berry",
+         "name": "Mint Berry",
+-        "sprite": ""
++        "sprite": "sprites/items/chesto-berry.png"
+       },
+       "miracle-berry": {
+         "id": "miracle-berry",
+         "name": "MiracleBerry",
+-        "sprite": ""
++        "sprite": "sprites/items/lum-berry.png"
+       },
+       "mirage-mail": {
+         "id": "mirage-mail",
+@@ -37002,7 +37002,7 @@
+       "mystery-berry": {
+         "id": "mystery-berry",
+         "name": "MysteryBerry",
+-        "sprite": ""
++        "sprite": "sprites/items/leppa-berry.png"
+       },
+       "normal-box": {
+         "id": "normal-box",
+@@ -37012,12 +37012,12 @@
+       "przcure-berry": {
+         "id": "przcure-berry",
+         "name": "PRZCureBerry",
+-        "sprite": ""
++        "sprite": "sprites/items/cheri-berry.png"
+       },
+       "psncure-berry": {
+         "id": "psncure-berry",
+         "name": "PSNCureBerry",
+-        "sprite": ""
++        "sprite": "sprites/items/pecha-berry.png"
+       },
+       "pink-bow": {
+         "id": "pink-bow",

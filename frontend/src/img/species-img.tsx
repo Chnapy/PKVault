@@ -58,7 +58,7 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, 
         console.log('No sprite -', staticForm.name, species, context, form, staticForms);
 
     const sheetRelativeUrl = spriteInfos && getStaticDataGetSpritesheetImgUrl(spriteInfos.sheetName, {
-        buildID: settings.data?.data.buildID,
+        buildID: settings.data?.data.buildID ?? null,
     });
     const sheetUrl = getApiFullUrl(sheetRelativeUrl ?? '');
 

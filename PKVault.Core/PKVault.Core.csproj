@@ -1,0 +1,79 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>PKVault.Core</RootNamespace>
+    <!-- <PublishAot>true</PublishAot> -->
+    <!-- <IsAotCompatible>true</IsAotCompatible> -->
+    
+    <!-- <PublishSingleFile>true</PublishSingleFile> -->
+    <!-- <SelfContained>true</SelfContained> -->
+
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    
+    <PublishTrimmed>true</PublishTrimmed>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+
+    <NeutralLanguage>en</NeutralLanguage>
+    <Authors>Richard Haddad</Authors>
+    <Copyright>Richard Haddad</Copyright>
+    <SourceRevisionId>$([System.DateTime]::UtcNow.ToString("yyMMddHHmmss"))</SourceRevisionId>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Chnapy/PKVault</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Chnapy/PKVault</PackageProjectUrl>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <EffectiveMode>$([MSBuild]::ValueOrDefault('$(Mode)', 'default'))</EffectiveMode>
+
+    <ModeDefine Condition=" '$(EffectiveMode)' == 'gen-pokeapi' ">MODE_GEN_POKEAPI</ModeDefine>
+    <ModeDefine Condition=" '$(EffectiveMode)' == 'default' ">MODE_DEFAULT</ModeDefine>
+
+    <DefineConstants>$(DefineConstants);$(ModeDefine)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HttpMultipartParser" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.11" />
+    <PackageReference Include="NSwag.Core" Version="14.7.1" />
+    <PackageReference Include="PokeApi.Models" Version="[1.0.147]" />
+    <PackageReference Include="Serilog" Version="4.3.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageReference Include="System.IO.Abstractions" Version="22.1.0" />
+    <PackageReference Include="DiffPlex" Version="1.9.0" />
+
+    <Reference Include="./PKHeX.Core.dll" />
+
+    <TrimmerRootDescriptor Include="linker.xml" />
+    <!-- <TrimmerRootAssembly Include="PKVault.Core" /> -->
+  </ItemGroup>
+
+  <Choose>
+    <!-- <When Condition=" '$(EffectiveMode)' == 'gen-pokeapi' ">
+      <ItemGroup>
+      </ItemGroup>
+    </When> -->
+
+    <When Condition=" '$(EffectiveMode)' == 'default' ">
+      <ItemGroup>
+        <EmbeddedResource Include="pokeapi/generated/api-data/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+        <EmbeddedResource Include="pokeapi/generated/sheets/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+        <EmbeddedResource Include="default-files/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+        
+        <Content Remove="pokeapi/generated/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+      </ItemGroup>
+    </When>
+  </Choose>
+</Project>
