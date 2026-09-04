@@ -1,5 +1,7 @@
 using Serilog;
 
+namespace PKVault.Core;
+
 public class LegacyPkmVersionNormalize(
     LegacyPkmVersionLoader loader, Dictionary<ushort, StaticEvolve> evolves
 )

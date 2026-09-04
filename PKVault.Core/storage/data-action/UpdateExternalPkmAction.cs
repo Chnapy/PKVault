@@ -1,6 +1,8 @@
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public record UpdateExternalPkmActionInput(
     UpdateExternalPkmData[] ExternalPkmsToAdd,
     PkmVariantEntity[] ExternalPkmsToRemove

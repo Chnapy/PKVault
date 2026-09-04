@@ -1,5 +1,7 @@
 using Serilog;
 
+namespace PKVault.Core;
+
 public record DirectoryContent(
     string SourcePath,
     IEnumerable<string> DirectoryPaths,

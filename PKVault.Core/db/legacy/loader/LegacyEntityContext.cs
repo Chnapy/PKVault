@@ -1,6 +1,8 @@
 
 using System.Text.Json.Serialization;
 
+namespace PKVault.Core;
+
 [JsonSerializable(typeof(Dictionary<string, LegacyBankEntity>))]
 [JsonSerializable(typeof(Dictionary<string, LegacyBoxEntity>))]
 [JsonSerializable(typeof(Dictionary<string, LegacyPkmEntity>))]

@@ -1,6 +1,8 @@
 using System.Text.RegularExpressions;
 
-public partial class SlugifyParameterTransformer
+namespace PKVault.Core;
+
+public partial class SlugifyTransformer
 {
     public static string? TransformOutbound(object? value)
     {

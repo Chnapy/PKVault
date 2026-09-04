@@ -1,5 +1,6 @@
 
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Primitives;
 
 namespace PKVault.Core;
 
@@ -16,7 +17,6 @@ namespace PKVault.Core;
 [JsonSerializable(typeof(DexLocationDTO))]
 [JsonSerializable(typeof(StaticEvolvesRichData))]
 [JsonSerializable(typeof(DataDTO))]
-[JsonSerializable(typeof(SettingsDTO))]
 [JsonSerializable(typeof(StaticDataDTO))]
 [JsonSerializable(typeof(Dictionary<uint, SaveInfosDTO>))]
 [JsonSerializable(typeof(Dictionary<string, PkmLegalityDTO>))]
@@ -28,6 +28,7 @@ namespace PKVault.Core;
 [JsonSerializable(typeof(string))]
 
 [JsonSerializable(typeof(Dictionary<string, object?>))]
+[JsonSerializable(typeof(Dictionary<string,StringValues>))]
 public partial class RouteJsonContext : JsonSerializerContext
 {
 }

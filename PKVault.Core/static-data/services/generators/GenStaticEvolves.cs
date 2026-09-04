@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public class StaticEvolvesData : Dictionary<ushort, StaticEvolve>;
 
 public record StaticEvolve(

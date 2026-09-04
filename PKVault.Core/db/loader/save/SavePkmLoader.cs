@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public interface ISavePkmLoader
 {
     public bool HasWritten { get; set; }

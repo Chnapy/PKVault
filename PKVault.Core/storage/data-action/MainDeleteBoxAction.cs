@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public record MainDeleteBoxActionInput(string boxId);
 
 public class MainDeleteBoxAction(IBoxLoader boxLoader, IBankLoader bankLoader) : DataAction<MainDeleteBoxActionInput>

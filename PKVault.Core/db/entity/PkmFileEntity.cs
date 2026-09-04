@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public class PkmFileEntity
 {
     public required string Filepath { get; init; }    // PK

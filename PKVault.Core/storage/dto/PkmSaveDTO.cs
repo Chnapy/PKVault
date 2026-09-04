@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public record PkmSaveDTO(
     string SettingsLanguage,
     ImmutablePKM Pkm,

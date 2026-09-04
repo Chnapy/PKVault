@@ -2,6 +2,8 @@
 using PKHeX.Core;
 using PokeApi.Models;
 
+namespace PKVault.Core;
+
 public class VersionGroupToVersion
 {
     public static GameVersion? GetVersion(NamedApiResource? group) => group?.Name switch

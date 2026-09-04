@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public abstract record PkmBaseDTO(
     string Id,
     byte Generation,

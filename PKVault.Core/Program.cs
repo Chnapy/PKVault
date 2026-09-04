@@ -27,19 +27,28 @@ public class Program
         var sp = services.BuildServiceProvider();
 
         var router = sp.GetRequiredService<CoreRouter>();
-        var openApiJson = OpenApiGenerator.GetOpenApiDocument(router.Routes);
-        
-        File.WriteAllText(Path.Combine(InitialCurrentDirectory, "swagger.json"), openApiJson);
 
-        var str = await router.DispatchToJSON("GET", "api/backup", "{}", new MemoryStream(Encoding.Default.GetBytes("{}")));
-        Console.WriteLine(str);
+        OpenApiGenerator.GenerateOpenApiFile(
+            Path.Combine(InitialCurrentDirectory, "swagger.json"),
+            router.Routes
+        );
+
+        using var scope = sp.CreateScope();
+
+        // var str = await router.DispatchToJSON(scope.ServiceProvider, "GET", "api/backup", "{}", new MemoryStream(Encoding.Default.GetBytes("{}")));
+        // Console.WriteLine(str);
 
         // test
         var testMethod = "GET";
         var testPath = "/api/static-data/spritesheet/spritesheet_species_0.webp";
+
+        // Dictionary<string, string?[]> testQuery = new()
+        // {
+        //    ["buildId"] = ["null"]
+        // };
         var testQuery = """
         {
-          "buildID":"99856fa5-e002-4a59-904b-f8087476108b"
+          "buildId": null
         }
         """;
         var testBody = new MemoryStream(Encoding.Default.GetBytes("""
@@ -48,8 +57,35 @@ public class Program
         }
         """));
         
-        var foo2 = await router.DispatchToJSON(testMethod, testPath, testQuery, testBody);
-        Console.WriteLine(foo2);
+        // var foo2 = await router.DispatchToJSON(scope.ServiceProvider, testMethod, testPath, testQuery, testBody);
+        // Console.WriteLine(foo2);
+
+        var foo3 = await router.DispatchToJSON(scope.ServiceProvider,
+            "GET", "/api/settings/test-save-globs", 
+            "?globs=.%2Ftmp%2Fsaves%2F&limit=200",
+            // """
+            // {
+            //     "globs": ["./tmp/saves/"],
+            //     "limit": "200"
+            // }
+            // """,
+            testBody
+        );
+        Console.WriteLine(foo3);
+
+        var foo4 = await router.DispatchToJSON(scope.ServiceProvider,
+            "GET", "/api/dex/moves",
+            "?context=2&species=12&form=0",
+            // """
+            // {
+            //     "context": 2,
+            //     "species": 12,
+            //     "form": 0
+            // }
+            // """,
+            testBody
+        );
+        Console.WriteLine(foo4);
 
         Dispose();
     }
@@ -203,18 +239,20 @@ public class Program
         Dispose();
     }
 
-    public static async Task SetupData(IServiceScope scope)
+    public static async Task<Func<Task>> SetupData(IServiceProvider sp)
     {
-        await SetupSampleSaveFile(scope);
+        await SetupSampleSaveFile(sp);
 
-        var sessionService = scope.ServiceProvider.GetRequiredService<ISessionServiceMinimal>();
-        await sessionService.EnsureSessionCreated();
+        return async () => {
+            var sessionService = sp.GetRequiredService<ISessionServiceMinimal>();
+            await sessionService.EnsureSessionCreated();
+        };
     }
 
-    private static async Task SetupSampleSaveFile(IServiceScope scope)
+    private static async Task SetupSampleSaveFile(IServiceProvider sp)
     {
-        var settingsService = scope.ServiceProvider.GetRequiredService<ISettingsService>();
-        var fileSystem = scope.ServiceProvider.GetRequiredService<IFileSystem>();
+        var settingsService = sp.GetRequiredService<ISettingsService>();
+        var fileSystem = sp.GetRequiredService<IFileSystem>();
 
         var saveGlobs = settingsService.GetSettings().SettingsMutable.SAVE_GLOBS;
 

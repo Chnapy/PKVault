@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public record SaveDeletePkmActionInput(uint saveId, string[] pkmIds);
 
 public class SaveDeletePkmAction(

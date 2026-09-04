@@ -2,6 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public class DexMainService(
     IServiceProvider sp
 ) : DexGenService(FakeSaveFile.Default)

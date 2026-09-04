@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public interface IDexLoader : IEntityLoader<DexItemForm, DexFormEntity>
 {
     public DexItemForm CreateDTO(DexFormEntity entity, DexItemForm? dynamicInfos);

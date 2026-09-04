@@ -8,6 +8,8 @@ using PKHeX.Core;
 using System.Collections.ObjectModel;
 using System.IO.Abstractions;
 
+namespace PKVault.Core;
+
 public interface IFileIOService
 {
     public MatcherUtil Matcher { get; }

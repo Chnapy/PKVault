@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public record DexMoveDTO(
     EntityContext Context,
     Dictionary<ushort, byte> LearnMoves,

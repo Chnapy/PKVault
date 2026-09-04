@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public class LegacyBoxLoader : LegacyEntityLoader<LegacyBoxEntity>
 {
     public static readonly int OrderGap = 10;

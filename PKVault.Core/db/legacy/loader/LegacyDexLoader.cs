@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public class LegacyDexLoader : LegacyEntityLoader<LegacyDexEntity>
 {
     public static string GetFilepath(string dbPath) => MatcherUtil.NormalizePath(Path.Combine(dbPath, "dex.json"));

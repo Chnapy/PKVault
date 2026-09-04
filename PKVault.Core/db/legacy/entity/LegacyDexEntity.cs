@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public record LegacyDexEntity(
     string Id,
     ushort Species,

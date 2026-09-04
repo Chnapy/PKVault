@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public record DeletePkmVariantActionInput(string[] pkmVariantIds, bool deleteAllRelatedVariants);
 
 public class DeletePkmVariantAction(

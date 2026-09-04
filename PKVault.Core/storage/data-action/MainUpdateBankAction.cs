@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public record MainUpdateBankActionInput(string bankId, string bankName, bool isDefault, int order, BankEntity.BankView view);
 
 public class MainUpdateBankAction(

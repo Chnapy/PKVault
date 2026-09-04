@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public record EditPkmVariantActionInput(string pkmVariantId, EditPkmVariantPayload editPayload);
 
 public class EditPkmVariantAction(

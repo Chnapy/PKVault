@@ -2,6 +2,8 @@ using Microsoft.Extensions.Logging;
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public record StaticVersion(
     byte Id,
     string Name,

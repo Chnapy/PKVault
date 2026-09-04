@@ -1,6 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+namespace PKVault.Core;
+
+
 [JsonSerializable(typeof(StaticSpritesheetsData))]
 [JsonSerializable(typeof(StaticOthersData))]
 [JsonSerializable(typeof(StaticEvolvesData))]

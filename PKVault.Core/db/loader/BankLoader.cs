@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
+namespace PKVault.Core;
+
 public interface IBankLoader : IEntityLoader<BankDTO, BankEntity>
 {
     public BankDTO CreateDTO(BankEntity entity);

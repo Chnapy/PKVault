@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
+namespace PKVault.Core;
+
 public partial class AssemblyClient
 {
     private static readonly Assembly assembly = Assembly.GetExecutingAssembly();

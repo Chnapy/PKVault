@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public record LegacyBoxEntity(
     string Id,
     string Name,

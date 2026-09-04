@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public record MovePkmActionInput(string[] pkmIds, uint? sourceSaveId,
     uint? targetSaveId, string targetBoxId, int[] targetBoxSlots,
     bool attached)

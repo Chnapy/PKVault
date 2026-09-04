@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public class PkmVariantEntity: IEntity
 {
     public static PkmVariantEntity CreateFrom(PkmVariantEntity entity, string id) => new()

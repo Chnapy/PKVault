@@ -1,6 +1,8 @@
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public class MainCreatePkmVariantActionInput(string pkmVariantId, EntityContext context)
 {
     public string PkmVariantId => pkmVariantId;

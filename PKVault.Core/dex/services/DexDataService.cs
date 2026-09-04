@@ -3,6 +3,8 @@ using System.Buffers;
 using System.Text.Json;
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public class DexDataService(StaticDataService staticDataService, ISettingsService settingsService)
 {
     private static Func<PKM, PersonalInfo, EvoCriteria, ushort, MoveSourceType, LearnOption, MoveLearnInfo> CreateGetCanLearn(ILearnSource learnSource, PersonalInfo pi)

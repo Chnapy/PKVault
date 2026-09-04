@@ -1,6 +1,8 @@
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public class PkmLegalityService(ISettingsService settingsService, ILegalityAnalysisService legalityAnalysisService)
 {
     public async Task<PkmLegalityDTO> CreateDTO(PkmVariantEntity pkmVariant, ImmutablePKM pkm, SaveWrapper? attachedSave)

@@ -3,6 +3,8 @@ using PKHeX.Core;
 using PokeApi.Models;
 using Serilog;
 
+namespace PKVault.Core;
+
 public class StaticSpeciesData : Dictionary<ushort, StaticSpecies>;
 
 public record StaticSpecies(

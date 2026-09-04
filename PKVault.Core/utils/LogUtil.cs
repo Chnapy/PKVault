@@ -6,6 +6,8 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
 
+namespace PKVault.Core;
+
 public class LogUtil
 {
     public static readonly LogLevel DBLogLevel = LogLevel.Warning;

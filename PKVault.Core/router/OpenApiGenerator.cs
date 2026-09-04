@@ -3,12 +3,24 @@ using Namotion.Reflection;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using NSwag;
+using Serilog;
 
 namespace PKVault.Core;
 
 public class OpenApiGenerator
 {
-    public static string GetOpenApiDocument(IEnumerable<CoreRouter.CoreRoute> routes)
+    public static void GenerateOpenApiFile(string path, IEnumerable<CoreRouter.CoreRoute> routes)
+    {
+#if DEBUG
+        using var _ = Log.Logger.Time($"Generate OpenAPI file to {path}");
+        var openApiJson = GetOpenApiDocument(routes);
+        File.WriteAllText(path, openApiJson);
+#else
+        Log.Information("OpenAPI file generation disabled in release");
+#endif
+    }
+
+    private static string GetOpenApiDocument(IEnumerable<CoreRouter.CoreRoute> routes)
     {
         var document = new OpenApiDocument
         {
@@ -171,12 +183,12 @@ public class OpenApiGenerator
                 }
             }
 
-            var responseType = UnwrapReturnType(route.MethodInfo.ReturnType);
+            var responseType = UnwrapTaskType(route.MethodInfo.ReturnType);
 
             if (responseType == typeof(void))
             {
                 operation.Responses["204"] = new OpenApiResponse
-                {};
+                { };
             }
             else if (responseType == typeof(CoreFileResponse))
             {
@@ -348,9 +360,10 @@ public class OpenApiGenerator
         }
     }
 
-    private static Type UnwrapReturnType(Type returnType)
+    public static Type UnwrapTaskType(Type returnType)
     {
-        if (returnType == typeof(Task)) return typeof(void);
+        if (returnType == typeof(Task))
+            return typeof(void);
         if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
             return returnType.GetGenericArguments()[0];
         return returnType;

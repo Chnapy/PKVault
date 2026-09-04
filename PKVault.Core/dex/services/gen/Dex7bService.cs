@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public class Dex7bService(SAV7b save) : DexGenService(save)
 {
     private readonly LanguageID[] AllLanguages = [

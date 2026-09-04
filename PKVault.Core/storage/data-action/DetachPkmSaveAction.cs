@@ -1,4 +1,6 @@
 
+namespace PKVault.Core;
+
 public record DetachPkmSaveActionInput(string[] pkmVariantIds);
 
 public class DetachPkmSaveAction(

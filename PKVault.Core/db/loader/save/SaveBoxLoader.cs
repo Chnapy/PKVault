@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public interface ISaveBoxLoader
 {
     public bool HasWritten { get; set; }

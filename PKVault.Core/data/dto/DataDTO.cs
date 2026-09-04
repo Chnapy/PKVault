@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public record DataDTO(
     StaticDataDTO? StaticData,
     DataDTOState<Dictionary<string, BankDTO?>>? MainBanks,

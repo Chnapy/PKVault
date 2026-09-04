@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public interface IPkmFileLoader
 {
     public Task<PkmFileEntity> PrepareEntity(ImmutablePKM pkm, string filepath, bool updated = true, bool checkPkm = true);

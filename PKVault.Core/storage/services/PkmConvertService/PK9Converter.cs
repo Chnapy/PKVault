@@ -1,6 +1,8 @@
 
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public class PK9Converter(PKMConverterUtils utils)
 {
     public PA9 ConvertToPA9(PK9 pk9, PKMRndValues? rndValues)

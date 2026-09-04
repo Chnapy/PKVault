@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public class DexFormEntity : IEntity
 {
     public override required string Id { get; init; }

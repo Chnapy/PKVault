@@ -1,5 +1,7 @@
 using PKHeX.Core;
 
+namespace PKVault.Core;
+
 public class Dex9ZAService(SAV9ZA save) : DexGenService(save)
 {
     private readonly LanguageID[] AllLanguages = [

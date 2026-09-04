@@ -1,3 +1,6 @@
+
+namespace PKVault.Core;
+
 public class LegacyBoxNormalize(LegacyBoxLoader loader)
 {
     public void MigrateGlobalEntities(LegacyBankLoader bankLoader)

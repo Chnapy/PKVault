@@ -4,6 +4,8 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
+namespace PKVault.Core;
+
 /**
  * Backups creation, restore, remove and listing.
  */

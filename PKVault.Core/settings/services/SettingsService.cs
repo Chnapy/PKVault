@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using PKHeX.Core;
 using Serilog;
 
+namespace PKVault.Core;
+
 public interface ISettingsService
 {
     public Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool scanSaves, DataUpdateFlags flags);

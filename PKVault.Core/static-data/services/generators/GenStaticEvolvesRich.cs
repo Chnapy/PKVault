@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using PKHeX.Core;
 using PokeApi.Models;
 
+namespace PKVault.Core;
+
 public class StaticEvolvesRichData : Dictionary<ushort, Dictionary<int, StaticEvolveRich>>;
 
 public record StaticEvolveRich(
