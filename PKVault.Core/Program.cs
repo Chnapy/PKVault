@@ -20,11 +20,6 @@ public class Program
 
     public static async Task Main(string[] args)
     {
-        #if MODE_GEN_POKEAPI
-        await GenPokeApi.GeneratePokeAPIFiles();
-        return;
-        #endif
-
         Initialize();
 
         var services = new ServiceCollection();
@@ -61,12 +56,12 @@ public class Program
           "toto": "azerty"
         }
         """));
-        
+
         // var foo2 = await router.DispatchToJSON(scope.ServiceProvider, testMethod, testPath, testQuery, testBody);
         // Console.WriteLine(foo2);
 
         var foo3 = await router.DispatchToJSON(scope.ServiceProvider,
-            "GET", "/api/settings/test-save-globs", 
+            "GET", "/api/settings/test-save-globs",
             "?globs=.%2Ftmp%2Fsaves%2F&limit=200",
             // """
             // {
@@ -116,14 +111,14 @@ public class Program
 
         // SettingsService.ProgramArgs = args;
 
-#if MODE_DEFAULT
-        // Ensure behavior consistency between backend & desktop
-        // Required to ensure photino directory wwwroot being created in app directory
-        // since app directory can be different than executable one (flatpak ran by steam)
-        Directory.SetCurrentDirectory(SettingsService.GetAppDirectory());
-#endif
-
-        Log.Logger.Debug($"Current directory (fixed) : {Directory.GetCurrentDirectory()}");
+        if (!FileIOService.IsScriptsContext)
+        {
+            // Ensure behavior consistency between backend & desktop
+            // Required to ensure photino directory wwwroot being created in app directory
+            // since app directory can be different than executable one (flatpak ran by steam)
+            Directory.SetCurrentDirectory(SettingsService.GetAppDirectory());
+            Log.Logger.Debug($"Current directory (fixed) : {Directory.GetCurrentDirectory()}");
+        }
 
         var (BuildID, Version) = SettingsService.GetBuildInfo();
         Log.Information("PKVault Copyright (C) 2026  Richard Haddad"
@@ -220,15 +215,12 @@ public class Program
         LogUtil.Dispose();
     }
 
-    public static async Task<Func<Task>> SetupData(IServiceProvider sp)
+    public static async Task SetupData(IServiceProvider sp)
     {
         await SetupSampleSaveFile(sp);
 
-        // TODO is this required ?
-        return async () => {
-            // var sessionService = sp.GetRequiredService<ISessionServiceMinimal>();
-            // await sessionService.EnsureSessionCreated();
-        };
+        // var sessionService = sp.GetRequiredService<ISessionServiceMinimal>();
+        // await sessionService.EnsureSessionCreated();
     }
 
     private static async Task SetupSampleSaveFile(IServiceProvider sp)

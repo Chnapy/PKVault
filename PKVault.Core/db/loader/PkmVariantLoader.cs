@@ -57,7 +57,7 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
     private readonly string appPath;
     private readonly string language;
 
-    private readonly VersionChecker versionChecker = new();
+    private readonly GameVersionUtil.VersionChecker versionChecker = new();
 
     public PkmVariantLoader(
         IFileIOService _fileIOService,

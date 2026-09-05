@@ -271,7 +271,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     {
         var convertedHeldItem = GetConvertedHeldItem();
         return convertedHeldItem > 0 && convertedHeldItem < GameInfo.Strings.Item.Count
-            ? StaticDataService.GetPokeapiItemName(GameInfo.Strings.Item[convertedHeldItem])
+            ? PokeApiFromPKHeX.GetPokeapiItemName(GameInfo.Strings.Item[convertedHeldItem])
             : "";
     }
 

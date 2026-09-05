@@ -20,7 +20,7 @@ public record PkmVariantDTO(
     string Filepath,
     string FilepathAbsolute,
 
-    [property: JsonIgnore] VersionChecker VersionChecker,
+    [property: JsonIgnore] GameVersionUtil.VersionChecker VersionChecker,
     Dictionary<ushort, StaticEvolve> Evolves
 ) : PkmBaseDTO(
     Id,

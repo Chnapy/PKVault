@@ -20,7 +20,7 @@ public class SavePkmLoaderTests : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        evolves = await GenStaticEvolves.LoadData();
+        evolves = await StaticEvolvesLoader.LoadData();
     }
 
     public async ValueTask DisposeAsync()

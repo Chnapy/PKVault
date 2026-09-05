@@ -28,11 +28,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract version from backend .csproj
+      - name: Extract version from directory props
         id: get-version
         uses: KageKirin/get-csproj-version@v0
         with:
-          file: "./PKVault.Backend/PKVault.Backend.csproj"
+          file: "./Directory.Build.props"
 
       - name: Check if version already exist
         if: ${{ !inputs.dry-run }}

@@ -65,8 +65,6 @@ class Program
             window.RegisterWindowCreatedHandler(async (sender, e) =>
             {
                 Log.Logger.Debug("CREATED");
-
-                SetupTask = SetupCore();
             });
             window.RegisterWindowClosingHandler((sender, e) =>
             {
@@ -93,6 +91,8 @@ class Program
             // });
 
             SetupWindow(window, baseUrl);
+
+            SetupTask = SetupCore();
 
             InjectIntoFrontend(window);
 
