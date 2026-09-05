@@ -42,10 +42,10 @@ desktop-prepare:
 # frontend
 
 front-dev:
-    npm run dev
+	npm run dev
 
 front-build:
-    npm run build
+	npm run build
 
 # Scripts
 
