@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PokeApi.Models" Version="[1.0.147]" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageReference Include="DiffPlex" Version="1.9.0" />
+
+    <ProjectReference Include="..\PKVault.Core\PKVault.Core.csproj" />
+    <Reference Include="../PKVault.Core/PKHeX.Core.dll" />
+  </ItemGroup>
+</Project>

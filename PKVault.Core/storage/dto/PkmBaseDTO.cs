@@ -37,7 +37,7 @@ public abstract record PkmBaseDTO(
     public bool NSparkle => Pkm.NSparkle;
     public bool CanGigantamax => Pkm.CanGigantamax;
 
-    public int Ball => StaticDataService.GetBallPokeApiId((Ball)Pkm.Ball);
+    public int Ball => PokeApiFromPKHeX.GetBallPokeApiId((Ball)Pkm.Ball);
 
     public Gender Gender => Pkm.Gender;
     public List<byte> Types => Pkm.Types;

@@ -1,12 +1,29 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# backend builder
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend-builder
+# core builder
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS core-builder
 
 WORKDIR /src
 
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
+COPY ["Directory.Build.props", "."]
+COPY ["PKVault.Core/PKVault.Core.csproj", "PKVault.Core/"]
+
+RUN dotnet restore "PKVault.Core/PKVault.Core.csproj"
+
+COPY ./PKVault.Core ./PKVault.Core
+
+RUN dotnet build "PKVault.Core/PKVault.Core.csproj"
+
+# backend builder
+FROM core-builder AS backend-builder
+
+WORKDIR /src
+
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+COPY ["Directory.Build.props", "."]
 COPY ["PKVault.Backend/PKVault.Backend.csproj", "PKVault.Backend/"]
 
 RUN dotnet restore "PKVault.Backend/PKVault.Backend.csproj"
@@ -15,20 +32,21 @@ COPY ./PKVault.Backend ./PKVault.Backend
 
 RUN dotnet build "PKVault.Backend/PKVault.Backend.csproj"
 
-# backend test
-FROM backend-builder AS backend-test
+# core test
+FROM core-builder AS core-test
 
-COPY ["PKVault.Backend.Tests/PKVault.Backend.Tests.csproj", "PKVault.Backend.Tests/"]
+COPY ["Directory.Build.props", "."]
+COPY ["PKVault.Core.Tests/PKVault.Core.Tests.csproj", "PKVault.Core.Tests/"]
 
-RUN dotnet restore "PKVault.Backend.Tests/PKVault.Backend.Tests.csproj"
+RUN dotnet restore "PKVault.Core.Tests/PKVault.Core.Tests.csproj"
 
 COPY ./global.json ./global.json
-COPY ./PKVault.Backend.Tests ./PKVault.Backend.Tests
+COPY ./PKVault.Core.Tests ./PKVault.Core.Tests
 
-RUN dotnet build "PKVault.Backend.Tests/PKVault.Backend.Tests.csproj"
+RUN dotnet build "PKVault.Core.Tests/PKVault.Core.Tests.csproj"
 
 # tests
-RUN dotnet test --project "./PKVault.Backend.Tests/PKVault.Backend.Tests.csproj" --no-restore --no-build
+RUN dotnet test --project "./PKVault.Core.Tests/PKVault.Core.Tests.csproj" --no-restore --no-build
 
 # backend publish
 FROM backend-builder AS backend-publish
@@ -52,7 +70,7 @@ COPY frontend .
 
 RUN npm run gen:routes
 
-COPY PKVault.Backend/swagger.json .
+COPY PKVault.Core/swagger.json .
 
 # generate SDK
 ARG VITE_OPENAPI_PATH=swagger.json
@@ -86,7 +104,7 @@ FROM frontend-builder AS frontend-publish
 RUN npm run build
 
 # desktop builder
-FROM backend-builder AS desktop-builder
+FROM core-builder AS desktop-builder
 
 WORKDIR /src
 

@@ -1,7 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using System.IO.Compression;
 using System.Text;
 using PKHeX.Core;
@@ -24,7 +22,6 @@ public interface IFileIOService
     public Task WriteBytes(string path, byte[] value);
     public Task WriteJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value);
     public Task WriteJSONGZipFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value);
-    public Task<Image<Rgba32>> ReadImage(string path);
     public (bool TooSmall, bool TooBig) CheckGameFile(string path);
     public (bool TooSmall, bool TooBig) CheckGameFile(long length);
     public bool Exists(string path);
@@ -41,6 +38,8 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
 {
     private readonly MatcherUtil _matcher = new();
     public MatcherUtil Matcher => _matcher;
+
+    public static bool IsScriptsContext { get; set; }
 
     public TValue ReadJSONFileSync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue)
     {
@@ -143,14 +142,6 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
         await originalFileStream.CopyToAsync(compressionStream);
     }
 
-    public async Task<Image<Rgba32>> ReadImage(string path)
-    {
-        path = NormalizePath(path);
-
-        using var fileStream = fileSystem.File.OpenRead(path);
-        return await Image.LoadAsync<Rgba32>(fileStream);
-    }
-
     public (bool TooSmall, bool TooBig) CheckGameFile(string path)
     {
         path = NormalizePath(path);
@@ -244,9 +235,8 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
 
     public static string NormalizePath(string path)
     {
-#if MODE_GEN_POKEAPI
-        return path;
-#endif
+        if (IsScriptsContext)
+            return path;
 
         var prefix = SettingsService.GetAppDirectory();
 
