@@ -28,5 +28,8 @@
   "cssVariables.languages": ["css"],
   "[css]": {
     "editor.defaultFormatter": "vscode.css-language-features"
+  },
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
   }
 }

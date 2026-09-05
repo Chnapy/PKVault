@@ -46,30 +46,6 @@ public partial class CoreRouter
 
     public readonly IEnumerable<CoreRoute> Routes = GetAllRoutes();
 
-    // Return JSON string, only if data is serializable (not file)
-    public async Task<string?> DispatchToJSON(
-        IServiceProvider sp,
-        string httpMethod, string httpPath,
-        string queriesString, Stream bodyStream)
-    {
-        var result = await Dispatch(sp, httpMethod, httpPath, queriesString, bodyStream);
-
-        if (result is not CoreJSONResponse response)
-            return null;
-
-        if (response.Data == null)
-            return JsonSerializer.Serialize(response.Header, new RouteJsonContext(new()
-            {
-                WriteIndented = true
-            }).DictionaryStringStringValues);
-
-        var resultValue = response.Data;
-
-        var typeInfo = RouteJsonContext.Default.GetTypeInfo(resultValue.GetType())
-            ?? throw new Exception($"Missing TypeInfo for type {resultValue.GetType()}");
-        return JsonSerializer.Serialize(resultValue, typeInfo);
-    }
-
     public async Task<ICoreResponse> Dispatch(
         IServiceProvider sp,
         string httpMethod, string httpPath,
@@ -243,7 +219,7 @@ public partial class CoreRouter
 
         if (kind == OpenApiParameterKind.Query)
         {
-            HashSet<string> queryKeys = [..queries.Keys.OfType<string>()];
+            HashSet<string> queryKeys = [.. queries.Keys.OfType<string>()];
 
             if (!queryKeys.Contains(p.Name!))
             {
@@ -368,8 +344,6 @@ public partial class CoreRouter
 
                 foreach (var p in parametersInfos)
                 {
-                    AssertIsTypeJSONParsable(p.ParameterType);
-
                     OpenApiParameterKind Kind = OpenApiParameterKind.Body;
                     if (http.Template.Contains($"{{{p.Name}}}"))
                         Kind = OpenApiParameterKind.Path;
@@ -378,8 +352,6 @@ public partial class CoreRouter
 
                     parameters.Add((Param: p, Kind));
                 }
-
-                AssertIsTypeJSONParsable(methodInfo.ReturnType);
 
                 // Console.WriteLine($"\tRoute = {methodInfo.Name} {http.Method} {fullTemplate} [{string.Join(',', parametersInfos.Select(p => $"{p.Name}"))}]");
 
@@ -422,20 +394,7 @@ public partial class CoreRouter
         return false;
     }
 
-    private static void AssertIsTypeJSONParsable(Type type)
-    {
-        var finalType = GetFinalType(type);
-        if (IsTypeVoidLike(finalType)
-            || finalType == typeof(CoreFile)
-            || typeof(ICoreResponse).IsAssignableFrom(finalType)
-        )
-            return;
-
-        if (RouteJsonContext.Default.GetTypeInfo(finalType) is null)
-            throw new InvalidOperationException($"Missing TypeInfo for type {finalType}");
-    }
-
-    private static Type GetFinalType(Type type)
+    public static Type GetFinalType(Type type)
     {
         type = OpenApiGenerator.UnwrapTaskType(type);
 
@@ -448,7 +407,7 @@ public partial class CoreRouter
         return type;
     }
 
-    private static bool IsTypeVoidLike(Type type) => type == typeof(void)
+    public static bool IsTypeVoidLike(Type type) => type == typeof(void)
         // void detection may be dirty, but this way is reliable
         // use of typeof(void) doesn't work
         || type.GetType().ToString() == "System.Threading.Tasks.VoidTaskResult";

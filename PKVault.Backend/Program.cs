@@ -54,7 +54,7 @@ public class Program
 
     public static async Task<WebApplication> PrepareWebApp(int port)
     {
-        var builder = WebApplication.CreateBuilder([]);
+        var builder = WebApplication.CreateSlimBuilder([]);
         ConfigureServices(builder.Services);
 
         builder.WebHost.ConfigureKestrel(serverOptions =>
