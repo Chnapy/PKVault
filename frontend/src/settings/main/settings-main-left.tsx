@@ -54,6 +54,7 @@ export const SettingsMainLeft: React.FC = () => {
                     data={Object.entries(languages)
                         .map(([ value, label ]) => ({ value, label }))}
                     onChange={value => value && form.setValue('language', value, { shouldDirty: true })}
+                    scrollAreaProps={{ type: 'always' }}
                 />
             </SimpleGrid>
         </Card>

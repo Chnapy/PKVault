@@ -17,7 +17,7 @@ export default defineConfig({
     ignorePaths: [
         'package.json', '**/node_modules', '**/dist/', '**/storybook-static/', '**/assets/', '**/sdk/', '**/public/', '**/tmp/',
         '*.stories.*', '*.gen.*', '*-lock.json', '*.log', '*.test.*', '**/__tests__/',
-        'fr.json', 'de.json', 'es.json', 'es-419.json', 'pt-br.json', '**/fr/', '**/de/', '**/es/', '**/es-419/', '**/pt-br/',
+        'fr.json', 'de.json', 'es.json', 'es-419.json', 'pt-br.json', 'it.json', '**/fr/', '**/de/', '**/es/', '**/es-419/', '**/pt-br/', '**/it/',
 
         '/project-words.txt', 
     ],
