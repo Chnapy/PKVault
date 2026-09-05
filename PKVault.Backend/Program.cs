@@ -1,11 +1,10 @@
 ﻿using System.IO.Compression;
-using System.Net;
-using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Primitives;
+using PKVault.Core;
 using Serilog;
 
 namespace PKVault.Backend;
@@ -237,22 +236,5 @@ public class Program
         {
             app.UseHttpsRedirection();
         }
-    }
-
-    public static int GetAvailablePort()
-    {
-        var listener = new TcpListener(IPAddress.Loopback, 0);
-        listener.Start();
-
-        int port = ((IPEndPoint)listener.LocalEndpoint).Port;
-
-        listener.Stop();
-
-        return port;
-    }
-
-    public static bool HasEmptyActionList(IHost host)
-    {
-        return host.Services.GetRequiredService<ISessionService>().HasEmptyActionList();
     }
 }

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <!-- <OutputType>Exe</OutputType> -->
+    <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -11,14 +11,6 @@
     <!-- <PublishSingleFile>true</PublishSingleFile> -->
     <!-- <SelfContained>true</SelfContained> -->
 
-    <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>true</SelfContained>
-    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
-    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-    
-    <PublishTrimmed>true</PublishTrimmed>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-
     <Version>2.2.2</Version>
     <NeutralLanguage>en</NeutralLanguage>
     <Authors>Richard Haddad</Authors>
@@ -28,6 +20,20 @@
     <RepositoryUrl>https://github.com/Chnapy/PKVault</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Chnapy/PKVault</PackageProjectUrl>
   </PropertyGroup>
+  
+  <Choose>
+    <When Condition=" '$(EffectiveMode)' == 'default' ">
+      <PropertyGroup>
+        <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>true</SelfContained>
+        <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+        
+        <PublishTrimmed>true</PublishTrimmed>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+      </PropertyGroup>
+    </When>
+  </Choose>
 
   <PropertyGroup>
     <EffectiveMode>$([MSBuild]::ValueOrDefault('$(Mode)', 'default'))</EffectiveMode>
@@ -44,7 +50,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
+    <!-- <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" /> -->
     <PackageReference Include="HttpMultipartParser" Version="10.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

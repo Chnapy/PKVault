@@ -1,3 +1,4 @@
+using PKVault.Core;
 using Serilog;
 
 public class DemoCleanupService(ISessionService sessionService) : BackgroundService

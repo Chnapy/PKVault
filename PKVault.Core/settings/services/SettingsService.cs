@@ -10,6 +10,7 @@ namespace PKVault.Core;
 public interface ISettingsService
 {
     public Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool scanSaves, DataUpdateFlags flags);
+    public Task UpdateSettingsSimple(SettingsMutableDTO settingsMutable, string userId);
     public Task<SettingsDTO> GetSettingsWithUserId();
     public SettingsDTO GetSettings();
     public SettingsDTO RefreshSettings(DataUpdateFlags flags);
@@ -23,7 +24,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 {
     public static readonly string FilePath = MatcherUtil.NormalizePath(Path.Combine(GetAppDirectory(), "./config/pkvault.json"));
     public static readonly string DefaultLanguage = "en";
-    public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr", "de", "es", "es-419", "pt-br", "zh-hant"]; //GameLanguage.AllSupportedLanguages.ToArray();
+    public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr", "de", "es", "es-419", "pt-br", "zh-hant", "it"]; //GameLanguage.AllSupportedLanguages.ToArray();
     private static readonly SemaphoreSlim semaphore = new(1);
 
     // public static string[] ProgramArgs = [];
@@ -37,23 +38,14 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     public async Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool scanSaves, DataUpdateFlags flags)
     {
-        await fileIOService.WriteJSONFile(
-            FilePath,
-            SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
-            settingsMutable
-        );
-        flags.Settings = true;
-
         using var scope = sp.CreateScope();
 
         var userId = string.IsNullOrEmpty(BaseSettings?.UserId)
             ? await scope.ServiceProvider.GetRequiredService<IMetaLoader>().GetUserId()
             : BaseSettings.UserId;
 
-        BaseSettings = ReadBaseSettings() with
-        {
-            UserId = userId
-        };
+        await UpdateSettingsSimple(settingsMutable, userId);
+        flags.Settings = true;
 
         if (restartSession)
         {
@@ -69,6 +61,20 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         {
             await savesLoadersService.Setup(flags);
         }
+    }
+
+    public async Task UpdateSettingsSimple(SettingsMutableDTO settingsMutable, string userId)
+    {
+        await fileIOService.WriteJSONFile(
+            FilePath,
+            SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
+            settingsMutable
+        );
+
+        BaseSettings = ReadBaseSettings() with
+        {
+            UserId = userId
+        };
     }
 
     /**

@@ -20,6 +20,11 @@ public class Program
 
     public static async Task Main(string[] args)
     {
+        #if MODE_GEN_POKEAPI
+        await GenPokeApi.GeneratePokeAPIFiles();
+        return;
+        #endif
+
         Initialize();
 
         var services = new ServiceCollection();
@@ -199,16 +204,7 @@ public class Program
         Log.Information($"Setup services - Finished");
     }
 
-    private static void ConfigurePokeApiServices(IServiceCollection services)
-    {
-        ConfigureMinimalServices(services);
-
-        Log.Information($"Setup services - Static data");
-        services.AddSingleton<PokeApiService>();
-        services.AddSingleton<GenStaticDataService>();
-    }
-
-    private static void ConfigureMinimalServices(IServiceCollection services)
+    public static void ConfigureMinimalServices(IServiceCollection services)
     {
         Log.Information($"Setup services - Minimal");
         services.AddSingleton(TimeProvider.System);
@@ -220,23 +216,6 @@ public class Program
     public static void Dispose()
     {
         LogUtil.Dispose();
-    }
-
-    public static async Task GeneratePokeAPIFiles()
-    {
-        Initialize();
-
-        var serviceCollection = new ServiceCollection();
-
-        ConfigurePokeApiServices(serviceCollection);
-
-        using var scope = serviceCollection.BuildServiceProvider().CreateScope();
-
-        var genStaticDataService = scope.ServiceProvider.GetRequiredService<GenStaticDataService>();
-
-        await genStaticDataService.GenerateFiles();
-
-        Dispose();
     }
 
     public static async Task<Func<Task>> SetupData(IServiceProvider sp)

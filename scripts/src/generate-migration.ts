@@ -18,7 +18,7 @@ const addMigrationTrimmedCompatible = async (filename: string) => {
         "dotnet",
         `ef migrations add ${filename} --json`.split(' '),
         {
-            cwd: '../PKVault.Backend',
+            cwd: '../PKVault.Core',
         }
     );
 
