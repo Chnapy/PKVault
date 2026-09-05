@@ -19,11 +19,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Core - Build
+        run: docker build . --target core-builder
+
+      - name: Core - Test
+        run: docker build . --target core-test
+
       - name: Backend - Build
         run: docker build . --target backend-builder
-
-      - name: Backend - Test
-        run: docker build . --target backend-test
 
       - name: Frontend - Prepare
         run: docker build . --target frontend-builder

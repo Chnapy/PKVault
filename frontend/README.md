@@ -11,7 +11,7 @@ PKVault frontend is based on recent Typescript and React 19+.
 Data state management is using @tanstack/react-query.
 Others state management cases are using basic React contexts.
 
-Data fetching types, hooks and functions are generated from backend using Orval.
+Data fetching types, hooks and functions are generated from Core package using Orval.
 
 PKVault frontend is using common code conventions for this stack:
 type safety, immutability, React principles, ...
@@ -24,9 +24,7 @@ Basic dependencies install.
 npm install
 ```
 
-Generate backend SDK.
-
-> Backend should be running !
+Generate backend SDK from PKVault.Core.
 
 ```
 npm run gen:sdk
