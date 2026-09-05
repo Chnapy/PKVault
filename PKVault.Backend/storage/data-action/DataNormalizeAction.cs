@@ -111,7 +111,7 @@ public class DataNormalizeAction(
         {
             await MigrateVariantsFrom200(input);
         }
-        else if (GetVersionValue(currentVersion.Value) <= GetVersionValue("2.2.1"))
+        else if (GetVersionValue(currentVersion.Value) <= GetVersionValue("2.3.0"))
         {
             await MigrateIdsTo221();
         }
@@ -476,6 +476,7 @@ public class DataNormalizeAction(
                 else
                 {
                     variant.AttachedSaveId = null;
+                    variant.AttachedSavePkmIdBase = null;
                 }
 
                 await pkmVariantLoader.UpdateEntity(variant);
@@ -484,5 +485,50 @@ public class DataNormalizeAction(
         }
 
         await db.SaveChangesAsync();
+
+        var settings = settingsService.GetSettings();
+        var settingsMutable = settings.SettingsMutable;
+        var settingsChanged = false;
+
+        if (settingsMutable.SAVE_PATH_OVERRIDES != null && settingsMutable.SAVE_PATH_OVERRIDES.Count > 0)
+        {
+            var savePathOverridesCopy = settingsMutable.SAVE_PATH_OVERRIDES.ToDictionary();
+            foreach (var entry in settingsMutable.SAVE_PATH_OVERRIDES)
+            {
+                var loader = allLoaders.FirstOrDefault(l => l?.Save.ID32 == entry.Key, null);
+                if (loader == null)
+                    continue;
+
+                savePathOverridesCopy.Remove(entry.Key);
+                savePathOverridesCopy.TryAdd(loader.Save.Id, entry.Value);
+                settingsChanged = true;
+            }
+
+            settingsMutable = settingsMutable with {
+                SAVE_PATH_OVERRIDES = savePathOverridesCopy
+            };
+        }
+
+        if (settingsMutable.SAVE_VERSION_OVERRIDES != null && settingsMutable.SAVE_VERSION_OVERRIDES.Count > 0)
+        {
+            var saveVersionOverridesCopy = settingsMutable.SAVE_VERSION_OVERRIDES.ToDictionary();
+            foreach (var entry in settingsMutable.SAVE_VERSION_OVERRIDES)
+            {
+                var loader = allLoaders.FirstOrDefault(l => l?.Save.ID32 == entry.Key, null);
+                if (loader == null)
+                    continue;
+
+                saveVersionOverridesCopy.Remove(entry.Key);
+                saveVersionOverridesCopy.TryAdd(loader.Save.Id, entry.Value);
+                settingsChanged = true;
+            }
+
+            settingsMutable = settingsMutable with {
+                SAVE_VERSION_OVERRIDES = saveVersionOverridesCopy
+            };
+        }
+
+        if (settingsChanged)
+            await settingsService.UpdateSettingsSimple(settingsMutable, settings.UserId);
     }
 }

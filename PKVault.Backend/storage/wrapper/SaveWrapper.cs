@@ -13,6 +13,22 @@ public class SaveWrapper(SaveFile Save)
     {
         get
         {
+            string rawKey = $"{(byte)Save.Version}-{Save.Language}-{ID32}-{Save.OT}-{(byte)Save.Gender}";
+
+            byte[] inputBytes = Encoding.UTF8.GetBytes(rawKey);
+            byte[] hashBytes = SHA256.HashData(inputBytes);
+
+            return BitConverter.ToUInt32(hashBytes, 0);
+        }
+    }
+
+    public uint ID32
+    {
+        get
+        {
+            if (Save == FakeSaveFile.Default)
+                return FakeSaveFile.Default.ID32;
+
             if (Save.ID32 == default)
             {
                 // var encodeBase = $"{(byte)Save.Version}-{Save.Generation}-{Save.TID16}-{Save.Metadata.FilePath}";
@@ -23,17 +39,9 @@ public class SaveWrapper(SaveFile Save)
                 byte[] hash = SHA1.HashData(bytes);
                 return BitConverter.ToUInt32(hash, 0);
             }
-
-            string rawKey = $"{(byte)Save.Version}-{Save.Language}-{Save.ID32}-{Save.OT}-{(byte)Save.Gender}";
-
-            byte[] inputBytes = Encoding.UTF8.GetBytes(rawKey);
-            byte[] hashBytes = SHA256.HashData(inputBytes);
-
-            return BitConverter.ToUInt32(hashBytes, 0);
+            return Save.ID32;
         }
     }
-
-    public uint ID32 => Save.ID32;
 
     public SaveFileState State => Save.State;
     public SaveFileMetadata Metadata => Save.Metadata;
