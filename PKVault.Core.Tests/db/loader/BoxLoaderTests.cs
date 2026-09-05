@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using PKHeX.Core;
+using PKVault.Core;
 
 public class BoxLoaderTests : IAsyncDisposable
 {
@@ -18,7 +19,7 @@ public class BoxLoaderTests : IAsyncDisposable
         dbSeedingService = new();
 
         sessionService.Setup(s => s.SessionDbPath).Returns(dbPath);
-        _db = new(LoggerUtils.GetLogger<SessionDbContext>(), sessionService.Object, dbSeedingService.Object);
+        _db = new(sessionService.Object, dbSeedingService.Object);
     }
 
     public async ValueTask DisposeAsync()

@@ -1,4 +1,5 @@
 
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Primitives;
 
@@ -31,4 +32,12 @@ namespace PKVault.Core;
 [JsonSerializable(typeof(Dictionary<string,StringValues>))]
 public partial class RouteJsonContext : JsonSerializerContext
 {
+    public static readonly RouteJsonContext DefaultWithOptions = new(
+        new()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            TypeInfoResolver = RouteJsonContext.Default
+        }
+    );
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using PKVault.Core;
 
 public class BankLoaderTests : IAsyncDisposable
 {
@@ -17,7 +18,7 @@ public class BankLoaderTests : IAsyncDisposable
         dbSeedingService = new();
 
         sessionService.Setup(s => s.SessionDbPath).Returns(dbPath);
-        _db = new(LoggerUtils.GetLogger<SessionDbContext>(), sessionService.Object, dbSeedingService.Object);
+        _db = new(sessionService.Object, dbSeedingService.Object);
     }
 
     public async ValueTask DisposeAsync()
