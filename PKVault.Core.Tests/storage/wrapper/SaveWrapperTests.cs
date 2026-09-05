@@ -1,6 +1,7 @@
 
 using Moq;
 using PKHeX.Core;
+using PKVault.Core;
 
 public class SaveWrapperTests
 {

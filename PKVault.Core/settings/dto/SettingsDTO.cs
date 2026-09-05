@@ -24,9 +24,6 @@ public record SettingsDTO(
     public string GetDbPath() => NormalizeSafePath(SettingsMutable.DB_PATH);
     public string GetBackupPath() => NormalizeSafePath(SettingsMutable.BACKUP_PATH);
 
-    public string? GetHttpsCertPemPathPath() => string.IsNullOrEmpty(SettingsMutable.HTTPS_CERT_PEM_PATH) ? null : NormalizeSafePath(SettingsMutable.HTTPS_CERT_PEM_PATH);
-    public string? GetHttpsKeyPemPathPath() => string.IsNullOrEmpty(SettingsMutable.HTTPS_KEY_PEM_PATH) ? null : NormalizeSafePath(SettingsMutable.HTTPS_KEY_PEM_PATH);
-
     public LanguageID GetSafeLanguageID()
     {
         return GameLanguage.GetLanguage(GetLanguageForPKHeX());
@@ -70,9 +67,6 @@ public record SettingsMutableDTO(
     bool SKIP_LEGALITY_CHECKS,
     Dictionary<uint, GameVersion>? SAVE_VERSION_OVERRIDES = null,
     Dictionary<uint, string>? SAVE_PATH_OVERRIDES = null,
-    bool? HTTPS_NOCERT = null,
-    string? HTTPS_CERT_PEM_PATH = null,
-    string? HTTPS_KEY_PEM_PATH = null,
     string LANGUAGE = "en"
 );
 

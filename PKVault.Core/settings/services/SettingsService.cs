@@ -448,8 +448,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             STORAGE_PATH: "./tmp/storage",
             BACKUP_PATH: "./tmp/backup",
             HIDE_CHEATS: false,
-            SKIP_LEGALITY_CHECKS: false,
-            HTTPS_NOCERT: false
+            SKIP_LEGALITY_CHECKS: false
         );
 #else
         settings = new(

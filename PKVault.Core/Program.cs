@@ -118,6 +118,8 @@ public class Program
 
 #if MODE_DEFAULT
         // Ensure behavior consistency between backend & desktop
+        // Required to ensure photino directory wwwroot being created in app directory
+        // since app directory can be different than executable one (flatpak ran by steam)
         Directory.SetCurrentDirectory(SettingsService.GetAppDirectory());
 #endif
 
@@ -222,9 +224,10 @@ public class Program
     {
         await SetupSampleSaveFile(sp);
 
+        // TODO is this required ?
         return async () => {
-            var sessionService = sp.GetRequiredService<ISessionServiceMinimal>();
-            await sessionService.EnsureSessionCreated();
+            // var sessionService = sp.GetRequiredService<ISessionServiceMinimal>();
+            // await sessionService.EnsureSessionCreated();
         };
     }
 
@@ -261,5 +264,10 @@ public class Program
         listener.Stop();
 
         return port;
+    }
+
+    public static bool HasEmptyActionList(IServiceProvider sp)
+    {
+        return sp.GetRequiredService<ISessionService>().HasEmptyActionList();
     }
 }

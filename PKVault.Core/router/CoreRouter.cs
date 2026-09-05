@@ -242,10 +242,21 @@ public partial class CoreRouter
 
         if (kind == OpenApiParameterKind.Query)
         {
+            HashSet<string> queryKeys = [..queries.Keys.OfType<string>()];
+
+            if (!queryKeys.Contains(p.Name!))
+            {
+                if (p.HasDefaultValue)
+                    return p.DefaultValue;
+                if (Nullable.GetUnderlyingType(p.ParameterType) != null)
+                    return null;
+                throw new ArgumentException($"Missing required parameter: {p.Name}");
+            }
+
             if (p.ParameterType.IsArray)
             {
-                var values = queries.GetValues(p.Name!) ?? [];
-                Console.WriteLine($"Arr {p.Name}={values}");
+                var values = queries.GetValues(p.Name!)!;
+                // Console.WriteLine($"Arr {p.Name}={values}");
 
                 var arr = Array.CreateInstanceFromArrayType(p.ParameterType, values.Length);
                 for (var i = 0; i < values.Length; i++)
@@ -258,10 +269,10 @@ public partial class CoreRouter
                 return arr;
             }
 
-            var value = queries.Get(p.Name!);
-            Console.WriteLine($"Item {p.Name}={value}");
+            var value = queries.Get(p.Name!)!;
+            // Console.WriteLine($"Item {p.Name}={value}");
 
-            return value == null ? null : ParsePrimitive(value, p.ParameterType);
+            return ParsePrimitive(value, p.ParameterType);
         }
 
         if (kind == OpenApiParameterKind.Body)
@@ -420,7 +431,7 @@ public partial class CoreRouter
             return;
 
         if (RouteJsonContext.Default.GetTypeInfo(finalType) is null)
-            throw new Exception($"Missing TypeInfo for type {finalType}");
+            throw new InvalidOperationException($"Missing TypeInfo for type {finalType}");
     }
 
     private static Type GetFinalType(Type type)

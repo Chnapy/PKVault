@@ -1,4 +1,5 @@
 using PKHeX.Core;
+using PKVault.Core;
 
 public class ImmutablePKMTests : IAsyncLifetime
 {

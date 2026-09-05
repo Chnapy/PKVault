@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Platforms>AnyCPU</Platforms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <Version>2.2.2</Version>
+    <ApplicationDisplayVersion>2.2.2</ApplicationDisplayVersion>
+    <ApplicationVersion>2.2.2</ApplicationVersion>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Authors>Richard Haddad</Authors>
+    <Copyright>Richard Haddad</Copyright>
+    <SourceRevisionId>$([System.DateTime]::UtcNow.ToString("yyMMddHHmmss"))</SourceRevisionId>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Chnapy/PKVault</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Chnapy/PKVault</PackageProjectUrl>
+  </PropertyGroup>
+</Project>

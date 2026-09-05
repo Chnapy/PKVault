@@ -1,11 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
-    <RootNamespace>PKVault.Backend.Tests</RootNamespace>
-    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>PKVault.Core.Tests</RootNamespace>
 
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
   </PropertyGroup>
@@ -29,11 +26,11 @@
     <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="22.1.0" />
     <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
 
-    <Reference Include="../PKVault.Backend/PKHeX.Core.dll" />
+    <Reference Include="../PKVault.Core/PKHeX.Core.dll" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PKVault.Backend\PKVault.Backend.csproj" />
+    <ProjectReference Include="..\PKVault.Core\PKVault.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,7 @@ using System.IO.Abstractions.TestingHelpers;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using PKHeX.Core;
+using PKVault.Core;
 
 public class PkmVariantLoaderTests : IAsyncDisposable
 {
@@ -25,9 +26,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllPaths];
 
         sessionService = new();
-        dbSeedingService = new(LoggerUtils.GetLogger<DbSeedingService>(), fileIOService);
+        dbSeedingService = new(fileIOService);
 
-        _db = new(LoggerUtils.GetLogger<SessionDbContext>(), sessionService.Object, dbSeedingService.Object);
+        _db = new(sessionService.Object, dbSeedingService.Object);
 
         mockSettings = new();
         mockSettings.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
@@ -39,11 +40,11 @@ public class PkmVariantLoaderTests : IAsyncDisposable
             )
         ));
 
-        staticDataService = new(LoggerUtils.GetLogger<StaticDataService>(), mockSettings.Object);
+        staticDataService = new(mockSettings.Object);
 
         sessionService.Setup(s => s.SessionDbPath).Returns(dbPath);
 
-        pkmFileLoader = new PkmFileLoader(LoggerUtils.GetLogger<PkmFileLoader>(), fileIOService, sessionService.Object, mockSettings.Object, _db);
+        pkmFileLoader = new PkmFileLoader(fileIOService, sessionService.Object, mockSettings.Object, _db);
     }
 
     public async ValueTask DisposeAsync()

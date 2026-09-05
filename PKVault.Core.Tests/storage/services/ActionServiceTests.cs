@@ -2,6 +2,7 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using PKVault.Core;
 
 public class ActionServiceTests
 {
@@ -61,10 +62,8 @@ public class ActionServiceTests
 
         return new(
             sp: sp,
-            log: LoggerUtils.GetLogger<ActionService>(),
-            pkmUpdateService: new(LoggerUtils.GetLogger<PkmUpdateService>(), legalityAnalysisService),
+            pkmUpdateService: new(legalityAnalysisService),
             backupService: new(
-                log: LoggerUtils.GetLogger<BackupService>(),
                 sp: sp,
                 mockTimeProvider.Object,
                 fileIOService,

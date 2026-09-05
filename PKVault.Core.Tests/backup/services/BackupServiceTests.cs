@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text;
 using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.DependencyInjection;
+using PKVault.Core;
 
 public class BackupServiceTests
 {
@@ -77,7 +78,6 @@ public class BackupServiceTests
 
         BackupService backupService = new(
             sp: sp,
-            log: LoggerUtils.GetLogger<BackupService>(),
             timeProvider: mockTimeProvider.Object,
             fileIOService: fileIOService,
             savesLoadersService: mockSaveService.Object,
