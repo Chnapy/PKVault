@@ -6,8 +6,8 @@ import { spawnSync } from 'child_process';
 
 const releaseListUrl = 'https://api.github.com/repos/kwsch/PKHeX/releases';
 
-const pkhexVersionFilepath = '../PKVault.Backend/PKHeX.version';
-const pkhexOutputPath = '../PKVault.Backend';
+const pkhexVersionFilepath = '../PKVault.Core/PKHeX.version';
+const pkhexOutputPath = '../PKVault.Core';
 
 const pkhexRepoFolder = '../tmp-pkhex';
 
