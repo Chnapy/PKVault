@@ -1,4 +1,4 @@
-# Backend - Architecture
+# PKVault.Core - Architecture
 
 ```mermaid
 

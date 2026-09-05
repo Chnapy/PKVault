@@ -5,7 +5,7 @@ using NJsonSchema.Generation;
 using NSwag;
 using Serilog;
 
-namespace PKVault.Core;
+namespace PKVault.Core.OpenApi;
 
 public class OpenApiGenerator
 {
