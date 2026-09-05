@@ -4214,15 +4214,6 @@
               "type": "string"
             }
           },
-          "httpS_NOCERT": {
-            "type": "boolean"
-          },
-          "httpS_CERT_PEM_PATH": {
-            "type": "string"
-          },
-          "httpS_KEY_PEM_PATH": {
-            "type": "string"
-          },
           "language": {
             "type": "string"
           }

@@ -1,8 +1,5 @@
 ﻿using System.IO.Abstractions;
-using System.Net;
-using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using PKVault.Core.backup.routes;
 using PKVault.Core.dex.routes;
@@ -18,77 +15,77 @@ public class Program
 {
     public static readonly string InitialCurrentDirectory = Directory.GetCurrentDirectory();
 
-    public static async Task Main(string[] args)
-    {
-        Initialize();
+    // public static async Task Main(string[] args)
+    // {
+    //     Initialize();
 
-        var services = new ServiceCollection();
-        ConfigureServices(services);
-        var sp = services.BuildServiceProvider();
+    //     var services = new ServiceCollection();
+    //     ConfigureServices(services);
+    //     var sp = services.BuildServiceProvider();
 
-        var router = sp.GetRequiredService<CoreRouter>();
+    //     var router = sp.GetRequiredService<CoreRouter>();
 
-        OpenApiGenerator.GenerateOpenApiFile(
-            Path.Combine(InitialCurrentDirectory, "swagger.json"),
-            router.Routes
-        );
+    //     OpenApi.OpenApiGenerator.GenerateOpenApiFile(
+    //         Path.Combine(InitialCurrentDirectory, "swagger.json"),
+    //         router.Routes
+    //     );
 
-        using var scope = sp.CreateScope();
+    //     using var scope = sp.CreateScope();
 
-        // var str = await router.DispatchToJSON(scope.ServiceProvider, "GET", "api/backup", "{}", new MemoryStream(Encoding.Default.GetBytes("{}")));
-        // Console.WriteLine(str);
+    //     // var str = await router.DispatchToJSON(scope.ServiceProvider, "GET", "api/backup", "{}", new MemoryStream(Encoding.Default.GetBytes("{}")));
+    //     // Console.WriteLine(str);
 
-        // test
-        var testMethod = "GET";
-        var testPath = "/api/static-data/spritesheet/spritesheet_species_0.webp";
+    //     // test
+    //     var testMethod = "GET";
+    //     var testPath = "/api/static-data/spritesheet/spritesheet_species_0.webp";
 
-        // Dictionary<string, string?[]> testQuery = new()
-        // {
-        //    ["buildId"] = ["null"]
-        // };
-        var testQuery = """
-        {
-          "buildId": null
-        }
-        """;
-        var testBody = new MemoryStream(Encoding.Default.GetBytes("""
-        {
-          "toto": "azerty"
-        }
-        """));
+    //     // Dictionary<string, string?[]> testQuery = new()
+    //     // {
+    //     //    ["buildId"] = ["null"]
+    //     // };
+    //     var testQuery = """
+    //     {
+    //       "buildId": null
+    //     }
+    //     """;
+    //     var testBody = new MemoryStream(Encoding.Default.GetBytes("""
+    //     {
+    //       "toto": "azerty"
+    //     }
+    //     """));
 
-        // var foo2 = await router.DispatchToJSON(scope.ServiceProvider, testMethod, testPath, testQuery, testBody);
-        // Console.WriteLine(foo2);
+    //     // var foo2 = await router.DispatchToJSON(scope.ServiceProvider, testMethod, testPath, testQuery, testBody);
+    //     // Console.WriteLine(foo2);
 
-        var foo3 = await router.DispatchToJSON(scope.ServiceProvider,
-            "GET", "/api/settings/test-save-globs",
-            "?globs=.%2Ftmp%2Fsaves%2F&limit=200",
-            // """
-            // {
-            //     "globs": ["./tmp/saves/"],
-            //     "limit": "200"
-            // }
-            // """,
-            testBody
-        );
-        Console.WriteLine(foo3);
+    //     var foo3 = await router.DispatchToJSON(scope.ServiceProvider,
+    //         "GET", "/api/settings/test-save-globs",
+    //         "?globs=.%2Ftmp%2Fsaves%2F&limit=200",
+    //         // """
+    //         // {
+    //         //     "globs": ["./tmp/saves/"],
+    //         //     "limit": "200"
+    //         // }
+    //         // """,
+    //         testBody
+    //     );
+    //     Console.WriteLine(foo3);
 
-        var foo4 = await router.DispatchToJSON(scope.ServiceProvider,
-            "GET", "/api/dex/moves",
-            "?context=2&species=12&form=0",
-            // """
-            // {
-            //     "context": 2,
-            //     "species": 12,
-            //     "form": 0
-            // }
-            // """,
-            testBody
-        );
-        Console.WriteLine(foo4);
+    //     var foo4 = await router.DispatchToJSON(scope.ServiceProvider,
+    //         "GET", "/api/dex/moves",
+    //         "?context=2&species=12&form=0",
+    //         // """
+    //         // {
+    //         //     "context": 2,
+    //         //     "species": 12,
+    //         //     "form": 0
+    //         // }
+    //         // """,
+    //         testBody
+    //     );
+    //     Console.WriteLine(foo4);
 
-        Dispose();
-    }
+    //     Dispose();
+    // }
 
     public static void Initialize()
     {
@@ -244,18 +241,6 @@ public class Program
             using var fileStream = fileSystem.File.Create(defaultSavePath);
             defaultSaveStream.CopyTo(fileStream);
         }
-    }
-
-    public static int GetAvailablePort()
-    {
-        var listener = new TcpListener(IPAddress.Loopback, 0);
-        listener.Start();
-
-        int port = ((IPEndPoint)listener.LocalEndpoint).Port;
-
-        listener.Stop();
-
-        return port;
     }
 
     public static bool HasEmptyActionList(IServiceProvider sp)

@@ -18,6 +18,7 @@ using Serilog;
 using Serilog.Events;
 using System.Web;
 using System.Collections.Specialized;
+using PKVault.Core.OpenApi;
 
 namespace PKVault.Core;
 

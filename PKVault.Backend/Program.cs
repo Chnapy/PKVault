@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -25,7 +24,23 @@ public class Program
             SetupTask = Core.Program.SetupData(app.Services);
             time.Dispose();
 
-            await app.RunAsync();
+            var appTask = app.RunAsync();
+
+            #if DEBUG
+            
+            var coreRouter = app.Services.GetRequiredService<CoreRouter>();
+            Core.OpenApi.OpenApiGenerator.GenerateOpenApiFile(
+                Path.Combine(
+                    Core.Program.InitialCurrentDirectory,
+                    "../PKVault.Core",
+                    "swagger.json"
+                ),
+                coreRouter.Routes
+            );
+
+            #endif
+
+            await appTask;
         }
         catch (Exception ex)
         {

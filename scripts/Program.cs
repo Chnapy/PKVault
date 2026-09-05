@@ -4,6 +4,13 @@ using Serilog;
 
 FileIOService.IsScriptsContext = true;
 
+// Scripts\
+Directory.SetCurrentDirectory(Path.Combine(
+    // Scripts\bin\Debug\net10.0\
+    AppDomain.CurrentDomain.BaseDirectory,
+    "../../.."
+));
+
 PKVault.Core.Program.Initialize();
 
 var services = new ServiceCollection();

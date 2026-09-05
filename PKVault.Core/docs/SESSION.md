@@ -1,4 +1,4 @@
-# Backend - Session lifecycle
+# PKVault.Core - Session lifecycle
 
 ```mermaid
 
