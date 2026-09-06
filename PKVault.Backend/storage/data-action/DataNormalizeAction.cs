@@ -113,7 +113,7 @@ public class DataNormalizeAction(
         }
         else if (GetVersionValue(currentVersion.Value) <= GetVersionValue("2.3.0"))
         {
-            await MigrateIdsTo221();
+            await MigrateIdsTo230();
         }
 
         // --- Update version
@@ -399,7 +399,7 @@ public class DataNormalizeAction(
         await db.SaveChangesAsync();
     }
 
-    private async Task MigrateIdsTo221()
+    private async Task MigrateIdsTo230()
     {
         var allLoaders = savesLoadersService.GetAllLoaders();
         var allVariants = await pkmVariantLoader.GetAllEntities();
