@@ -78,6 +78,7 @@ public enum RuntimeSystem
     LINUX,
     STEAMDECK,
     MACOS,
+    ANDROID,
 }
 
 public enum SourceProvider

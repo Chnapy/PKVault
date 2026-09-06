@@ -87,9 +87,9 @@ public class Program
     //     Dispose();
     // }
 
-    public static void Initialize()
+    public static void Initialize(LoggerConfiguration? config = null)
     {
-        LogUtil.Initialize();
+        LogUtil.Initialize(config);
 
         // SettingsService.ProgramArgs = args;
 

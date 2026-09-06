@@ -26,8 +26,8 @@ public class Program
 
             var appTask = app.RunAsync();
 
-            #if DEBUG
-            
+#if DEBUG
+
             var coreRouter = app.Services.GetRequiredService<CoreRouter>();
             Core.OpenApi.OpenApiGenerator.GenerateOpenApiFile(
                 Path.Combine(
@@ -38,7 +38,7 @@ public class Program
                 coreRouter.Routes
             );
 
-            #endif
+#endif
 
             await appTask;
         }
