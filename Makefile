@@ -32,12 +32,25 @@ desktop-run:
 desktop-publish:
 	dotnet publish PKVault.Desktop
 
-desktop-prepare:
-	cd frontend && \
-	npm run build && \
-	cd .. && \
+# PKVault.Mobile
+
+mobile-build:
+	dotnet build PKVault.Mobile
+
+mobile-run:
+	dotnet run --project PKVault.Mobile
+
+mobile-publish:
+	dotnet publish PKVault.Mobile
+
+# PKVault.Desktop & PKVault.Mobile
+
+apps-prepare:
+	npm run --prefix frontend build && \
 	rm -rf PKVault.Desktop/Resources/wwwroot && \
-	cp -r frontend/dist PKVault.Desktop/Resources/wwwroot
+	cp -r frontend/dist PKVault.Desktop/Resources/wwwroot && \
+	rm -rf PKVault.Mobile/Resources/Raw/wwwroot && \
+	cp -r frontend/dist PKVault.Mobile/Resources/Raw/wwwroot
 
 # frontend
 

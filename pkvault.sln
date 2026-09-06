@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripts", "Scripts\Scripts.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKVault.Core.Tests", "PKVault.Core.Tests\PKVault.Core.Tests.csproj", "{4CA1F6D1-6CA0-494C-AF9E-5DBDB0945607}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKVault.Mobile", "PKVault.Mobile\PKVault.Mobile.csproj", "{E211B307-566C-41DF-99F9-6603E9134946}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKVault.Mobile", "PKVault.Mobile\PKVault.Mobile.csproj", "{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +85,18 @@ Global
 		{4CA1F6D1-6CA0-494C-AF9E-5DBDB0945607}.Release|x64.Build.0 = Release|Any CPU
 		{4CA1F6D1-6CA0-494C-AF9E-5DBDB0945607}.Release|x86.ActiveCfg = Release|Any CPU
 		{4CA1F6D1-6CA0-494C-AF9E-5DBDB0945607}.Release|x86.Build.0 = Release|Any CPU
+		{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}.Debug|x64.Build.0 = Debug|Any CPU
+		{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}.Debug|x86.Build.0 = Debug|Any CPU
+		{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}.Release|x64.ActiveCfg = Release|Any CPU
+		{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}.Release|x64.Build.0 = Release|Any CPU
+		{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}.Release|x86.ActiveCfg = Release|Any CPU
+		{30D6227A-FB6E-4D7A-B9D6-ACA2D3ACF6AF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

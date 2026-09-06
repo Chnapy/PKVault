@@ -59,7 +59,7 @@ Checkout [Makefile](../../Makefile) for all quick commands !
 
 ### 2b - Desktop app
 
-- From project root, run `make prepare-desktop` (needs tool `make`)
+- From project root, run `make apps-prepare` (needs tool `make`)
 - Run the setup & dev parts in [PKVault.Desktop](../../PKVault.Desktop/README.md)
 
 ## Add new language translations
