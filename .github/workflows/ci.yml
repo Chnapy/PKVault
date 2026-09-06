@@ -1,4 +1,4 @@
-name: CI
+name: Build PKVault Desktop
 
 on:
   push:
@@ -6,36 +6,52 @@ on:
       - main
     paths-ignore:
       - "**/*.md"
-  pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - "**/*.md"
+
+permissions:
+  contents: read
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
+  build-desktop:
+    name: Build PKVault Desktop
+    runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Core - Build
-        run: docker build . --target core-builder
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
 
-      - name: Core - Test
-        run: docker build . --target core-test
+      - name: Restore dependencies
+        run: dotnet restore PKVault.Desktop/PKVault.Desktop.csproj
 
-      - name: Backend - Build
-        run: docker build . --target backend-builder
+      - name: Build Release configuration
+        run: >
+          dotnet build PKVault.Desktop/PKVault.Desktop.csproj
+          --configuration Release
+          --no-restore
 
-      - name: Frontend - Prepare
-        run: docker build . --target frontend-builder
+      - name: Publish self-contained Windows application
+        run: >
+          dotnet publish PKVault.Desktop/PKVault.Desktop.csproj
+          --configuration Release
+          --no-build
+          --runtime win-x64
+          --self-contained true
+          --output ./artifact/PKVault
 
-      - name: Frontend - Checks
-        run: docker build . --target frontend-check
+      - name: Display published files
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "./artifact/PKVault" -Recurse -File |
+            Select-Object FullName, Length
 
-      - name: Frontend - Build
-        run: docker build . --target frontend-publish
-
-      - name: Desktop - Build
-        run: docker build . --target desktop-builder
+      - name: Upload PKVault desktop artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PKVault-Windows-x64-${{ github.sha }}
+          path: ./artifact/PKVault
+          if-no-files-found: error
+          retention-days: 30
