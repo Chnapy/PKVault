@@ -50,7 +50,7 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
                 arr = [];
                 dex.Add(species, arr);
             }
-            arr[save.ID32] = item;
+            arr[new SaveWrapper(save).Id] = item;
         }
 
         // logtime();
@@ -125,13 +125,13 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
         return new DexItemDTO(
             Id: GetDexItemID(species),
             Species: species,
-            SaveId: save.ID32,
+            SaveId: new SaveWrapper(save).Id,
             Forms: forms,
             Languages: [.. languages]
         );
     }
 
-    protected string GetDexItemID(ushort species) => $"{species}_{save.ID32}";
+    protected string GetDexItemID(ushort species) => $"{species}_{new SaveWrapper(save).Id}";
 
     public List<byte> GetTypes(PersonalInfo pi) => GetTypes(save.Generation, pi);
 

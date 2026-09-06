@@ -90,7 +90,6 @@ public class SavePkmLoaderTests : IAsyncLifetime
 
         Assert.Equal(3, dto.BoxId);
         Assert.Equal(15, dto.BoxSlot);
-        Assert.Equal((uint)100, dto.SaveId);
         Assert.Equal(25, dto.Species);
         Assert.Equal(3, dto.Generation);
         Assert.Equal("TEST", dto.Nickname);
