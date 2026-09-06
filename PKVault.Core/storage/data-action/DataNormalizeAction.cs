@@ -114,7 +114,7 @@ public class DataNormalizeAction(
             await MigrateVariantsFrom200(input);
         }
         // <= 2.2.2
-        if (GetVersionValue(currentVersion.Value) <= GetVersionValue("2.2.2"))
+        if (currentVersion != null && GetVersionValue(currentVersion.Value) <= GetVersionValue("2.2.2"))
         {
             await MigrateIdsFrom222();
         }
@@ -142,13 +142,13 @@ public class DataNormalizeAction(
         var value = 0;
 
         var i = 0;
-        foreach(var str in version.Split('.').Reverse())
+        foreach (var str in version.Split('.').Reverse())
         {
             var v = int.Parse(str);
             value += v * (int)Math.Pow(10, i);
             i += 3;
         }
-        
+
         return value;
     }
 
@@ -434,17 +434,13 @@ public class DataNormalizeAction(
                         }
                     }
 
-                    uint SaveId = 0;
-                    if (matchLoaderBank != null)
-                    {
-                        SaveId = matchLoaderBank.Save.Id;
-                    }
+                    if (matchLoaderBank == null)
+                        continue;
 
-                    updatedSaves[i] = new BankEntity.BankViewSave(
-                        SaveId,
-                        oldSave.SaveBoxIds,
-                        oldSave.Order
-                    );
+                    updatedSaves[i] = oldSave with
+                    {
+                        SaveId = matchLoaderBank.Save.Id
+                    };
                 }
 
                 bank_entity.View = new(boxes, updatedSaves);
@@ -452,7 +448,7 @@ public class DataNormalizeAction(
                 await bankLoader.UpdateEntity(bank_entity);
             }
         }
-        
+
         if (allVariants.Count > 0)
         {
 
@@ -484,7 +480,7 @@ public class DataNormalizeAction(
 
                 await pkmVariantLoader.UpdateEntity(variant);
             }
-            
+
         }
 
         await db.SaveChangesAsync();
@@ -507,7 +503,8 @@ public class DataNormalizeAction(
                 settingsChanged = true;
             }
 
-            settingsMutable = settingsMutable with {
+            settingsMutable = settingsMutable with
+            {
                 SAVE_PATH_OVERRIDES = savePathOverridesCopy
             };
         }
@@ -526,7 +523,8 @@ public class DataNormalizeAction(
                 settingsChanged = true;
             }
 
-            settingsMutable = settingsMutable with {
+            settingsMutable = settingsMutable with
+            {
                 SAVE_VERSION_OVERRIDES = saveVersionOverridesCopy
             };
         }
