@@ -1,4 +1,4 @@
-import { QueryClient, useQuery } from '@tanstack/react-query';
+import { QueryClient, queryOptions, useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import type { DataDTOStateOfDictionaryOfStringAndPkmVariantDTO, PkmVariantDTO } from '../sdk/model';
 import { getStorageGetMainPkmVariantsQueryKey, storageGetMainPkmVariants } from '../sdk/storage/storage.gen';
@@ -41,19 +41,16 @@ const buildIndexes = (data: PkmVariantDTO[]) => {
     return indexes;
 };
 
-type QueryData = {
+export type PkmVariantIndexQueryData = {
     data: PkmVariantIndexes;
     status: 200;
     headers: Headers;
 };
 
-/**
- * Fetch save pkms with caching & indexing.
- */
-export const usePkmVariantIndex = () => {
+export const getPkmVariantIndexOptions = <D = PkmVariantIndexQueryData>(options?: Omit<UseQueryOptions<PkmVariantIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>) => {
     const queryKey = getStorageGetMainPkmVariantsQueryKey();
 
-    return useQuery({
+    return queryOptions({
         queryKey,
         queryFn: async ({ signal }) => {
             const response = await storageGetMainPkmVariants({ signal });
@@ -61,16 +58,34 @@ export const usePkmVariantIndex = () => {
             return {
                 ...response,
                 data: buildIndexes(response.data),
-            } satisfies QueryData;
+            } satisfies PkmVariantIndexQueryData;
         },
+        ...options,
     });
+};
+
+/**
+ * Fetch save pkms with caching & indexing.
+ */
+export const usePkmVariantIndex = <D = PkmVariantIndexQueryData>(
+    selectFn?: (data: PkmVariantIndexQueryData) => D,
+    options?: Omit<UseQueryOptions<PkmVariantIndexQueryData, Error, D>, 'queryKey' | 'queryFn'>
+) => {
+    return useQuery({
+        select: selectFn,
+        ...getPkmVariantIndexOptions(options),
+    });
+};
+
+export const getCachedPkmVariantIndex = (client: QueryClient) => {
+    return client.getQueryData<Partial<PkmVariantIndexQueryData>>(getStorageGetMainPkmVariantsQueryKey());
 };
 
 /**
  * Update react-query cache with given data, after formatting.
  */
 export const updatePkmVariantCache = (client: QueryClient, pkmVariants: DataDTOStateOfDictionaryOfStringAndPkmVariantDTO) => {
-    const cachedResponse: Partial<QueryData> | undefined = client.getQueryData(getStorageGetMainPkmVariantsQueryKey());
+    const cachedResponse = getCachedPkmVariantIndex(client);
     if (!pkmVariants.all && !cachedResponse) {
         return;
     }
@@ -92,7 +107,7 @@ export const updatePkmVariantCache = (client: QueryClient, pkmVariants: DataDTOS
 
     const data = buildIndexes(rawData);
 
-    const buildData: QueryData = {
+    const buildData: PkmVariantIndexQueryData = {
         status: 200,
         headers: new Headers(),
         ...cachedResponse,

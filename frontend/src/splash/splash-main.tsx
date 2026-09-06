@@ -1,10 +1,19 @@
 import React from 'react';
-import { useSettingsEdit, useSettingsGet } from '../data/sdk/settings/settings.gen';
+import { GameVersion } from '../data/sdk/model';
+import { useSettingsGet } from '../data/sdk/settings/settings.gen';
+import { getGameInfos } from '../pokedex/details/util/get-game-infos';
 import { useTranslate } from '../translate/i18n';
-import { Button } from '../ui/button/button';
-import { Splash } from '../ui/splash/splash';
+import { iconResources } from '../ui/icon/resources/icon-resources';
+import { ImgPrefetch } from '../ui/icon/resources/img-prefetch';
+import { UISplash } from '../ui/splash/ui-splash';
 import { SplashData } from './splash-data';
-import { css } from '@emotion/css';
+
+const versionsImgs = [ ...new Set(Object.values(GameVersion).map(version => getGameInfos(version).img)) ].filter(Boolean);
+
+const imgsToPrefetch = [
+    ...Object.values(iconResources).flatMap(v => Object.values(v)),
+    ...versionsImgs,
+];
 
 /**
  * Display splash screen until whole data is loaded without error.
@@ -14,7 +23,6 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [ appStartTime ] = React.useState(() => Date.now());
 
     const settingsQuery = useSettingsGet();
-    const settingsEditMutation = useSettingsEdit();
 
     const settingsMutable = settingsQuery.data?.data.settingsMutable;
     const language = settingsMutable?.language;
@@ -29,46 +37,22 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
         }
     }, [ shouldUpdateLanguage, i18n, language ]);
 
-    if (settingsQuery.isLoading || !settingsMutable) {
-        return <Splash />;
+    const prefetchNode = <div aria-description='prefetch' style={{ width: 0, height: 0 }}>
+        {imgsToPrefetch.map(url => <ImgPrefetch
+            key={url}
+            src={url}
+        />)}
+    </div>;
+
+    if ((settingsQuery.isPending && settingsQuery.isEnabled) || !settingsMutable) {
+        return <UISplash loading>
+            {prefetchNode}
+        </UISplash>;
     }
 
-    if (language) {
-        return <SplashData appStartTime={appStartTime}>{children}</SplashData>;
-    }
+    return <SplashData appStartTime={appStartTime}>
+        {children}
 
-    return <Splash>
-        <div
-            className={css({
-                textAlign: 'center',
-            })}
-        >Choose prefered language</div>
-        <div
-            className={css({
-                marginTop: 8,
-                display: 'flex',
-                justifyContent: 'center',
-                gap: 8,
-            })}
-        >
-            <Button big onClick={() => settingsEditMutation.mutateAsync({
-                data: {
-                    ...settingsMutable,
-                    language: 'en',
-                }
-            })}>English</Button>
-            <Button big onClick={() => settingsEditMutation.mutateAsync({
-                data: {
-                    ...settingsMutable,
-                    language: 'fr',
-                }
-            })}>Français</Button>
-            <Button big onClick={() => settingsEditMutation.mutateAsync({
-                data: {
-                    ...settingsMutable,
-                    language: 'de',
-                }
-            })}>Deutsch</Button>
-        </div>
-    </Splash>;
+        {prefetchNode}
+    </SplashData>;
 };

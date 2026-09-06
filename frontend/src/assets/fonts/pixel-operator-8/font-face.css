@@ -1,0 +1,31 @@
+@font-face {
+  font-family: "Pixel Operator 8";
+  src:
+    url("regular/pixel-operator-8.woff") format("woff"),
+    url("regular/pixel-operator-8.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* bold */
+@font-face {
+  font-family: "Pixel Operator 8";
+  src:
+    url("bold/pixel-operator-8-bold.woff") format("woff"),
+    url("bold/pixel-operator-8-bold.woff2") format("woff2");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* half-bold */
+@font-face {
+  font-family: "Pixel Operator 8";
+  src:
+    url("half-bold/pixel-operator-8-hb.woff") format("woff"),
+    url("half-bold/pixel-operator-8-hb.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}

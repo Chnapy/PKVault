@@ -1,10 +1,11 @@
 import React from 'react';
 import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
-import { EntityContext, type DexItemForm } from '../../../data/sdk/model';
+import { EntityContext, type DexItemForm, type SaveInfosDTO } from '../../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from '../../../routes/pokedex';
 import { filterIsDefined } from '../../../util/filter-is-defined';
+import { useSelectCallback } from '../../../util/use-select-callback';
 
 export const usePokedexDetailsSelect = () => {
     const selectedSpecies = Route.useSearch({ select: search => search.selected });
@@ -14,26 +15,34 @@ export const usePokedexDetailsSelect = () => {
 
     const staticData = useStaticData();
 
-    const dexGetAllQuery = useDexGetAll();
+    const speciesValuesQuery = useDexGetAll({
+        query: {
+            select: useSelectCallback(
+                data => data.data[ selectedSpecies + "" ],
+                [ selectedSpecies ]
+            ),
+        },
+    });
     const saveInfosMainQuery = useSaveInfosGetAll();
 
     const [ selectedFormId, setSelectedFormId ] = React.useState('');
 
     const savesRecord = saveInfosMainQuery.data?.data ?? {};
-    const speciesRecord = dexGetAllQuery.data?.data ?? {};
+    const speciesValues = Object.values(speciesValuesQuery.data ?? {});
 
-    const speciesValues = Object.values(
-        speciesRecord[ selectedSpecies + "" ] ?? {}
-    );
+    type GameSave = Pick<SaveInfosDTO, 'id' | 'context' | 'generation' | 'trainerName'> & {
+        displayedVersion: SaveInfosDTO['displayedVersion'] | null;
+    };
 
-    const gameSaves = speciesValues
+    const gameSaves: GameSave[] = speciesValues
         .filter((spec) => spec.forms.some(form => form.isSeen))
         .map((spec) => spec.saveId === 0
             // pkvault storage
             ? {
                 id: 0,
                 context: EntityContext.Gen9a,
-                version: null,
+                generation: 9,
+                displayedVersion: null,
                 trainerName: ''
             }
             : savesRecord[ spec.saveId ])
@@ -60,8 +69,7 @@ export const usePokedexDetailsSelect = () => {
 
     const staticForms = selectedSpecies && selectedSave ? staticData.species[ selectedSpecies ]?.forms[ selectedSave.context ] ?? [] : [];
     const staticFormsFiltered = staticForms
-        .map((staticForm, index) => ({ ...staticForm, index }))
-        .filter(staticForm => !staticForm.isBattleOnly);
+        .map((staticForm, index) => ({ ...staticForm, index }));
 
     const getFormWeight = (f: DexItemForm) =>
         (f.isOwned ? 100000 : 0)
@@ -79,8 +87,8 @@ export const usePokedexDetailsSelect = () => {
     };
 
     const selectedForm = selectedFormId
-        ? seenForms.find(form => form.id === selectedFormId) ?? getDefaultForm(seenForms?.[0]?.form ?? 0)
-        : getDefaultForm(seenForms?.[0]?.form ?? 0);
+        ? seenForms.find(form => form.id === selectedFormId) ?? getDefaultForm(seenForms?.[ 0 ]?.form ?? 0)
+        : getDefaultForm(seenForms?.[ 0 ]?.form ?? 0);
 
     const selectedFormIndexForms = (seenForms ?? [])
         .filter(form => form.form === selectedForm?.form)

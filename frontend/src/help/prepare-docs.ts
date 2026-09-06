@@ -27,6 +27,7 @@ export const prepareDocs = (sourcePath: string) => {
     fs.cpSync(paths.sourceDocs, paths.targetDocs, { recursive: true });
 
     const menu = fs.readdirSync(paths.targetDocs, 'utf8')
+        .filter(language => language !== 'img')
         .flatMap(language => {
             // console.log('lang', language);
 

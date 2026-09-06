@@ -1,57 +1,20 @@
-import { css } from '@emotion/css';
 import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
-import { fallback, zodValidator } from "@tanstack/zod-adapter";
-import React from "react";
+import { fallback } from "@tanstack/zod-adapter";
 import z from "zod";
-import { withErrorCatcher } from '../error/with-error-catcher';
-import { PokedexDetails } from "../pokedex/details/pokedex-details";
-import { FiltersCard } from "../pokedex/filters/filters-card";
-import { PokedexList } from "../pokedex/list/pokedex-list";
-import { type DetailsExpandedState } from '../ui/details-card/details-card-container';
-import { DetailsCardWrapper } from '../ui/details-card/details-card-wrapper';
-
-export const PokedexPage: React.FC = withErrorCatcher('default', () => {
-  const navigate = Route.useNavigate();
-
-  return (
-    <div>
-      <div>
-        <div
-          className={css({
-            display: "flex",
-            justifyContent: "center",
-            paddingBottom: 8,
-          })}
-        >
-          <FiltersCard />
-        </div>
-
-        <PokedexList />
-      </div>
-
-      <DetailsCardWrapper
-        onClose={() => navigate({
-          search: {
-            selected: undefined,
-          }
-        })}
-      >
-        <PokedexDetails />
-      </DetailsCardWrapper>
-    </div>
-  );
-});
+import { PokedexPage } from '../pages/pokedex';
+import type { DetailsExpandedState } from './storage';
 
 const searchSchema = z.object({
   selected: z.number().optional(),
   selectedSaveId: z.number().optional(),
-  selectExpanded: z.enum([ 'none', 'expanded', 'expanded-max' ] as const satisfies DetailsExpandedState[]).optional(),
+  selectExpanded: z.enum([ 'none', 'expanded' ] as const satisfies DetailsExpandedState[]).optional(),
   filterSpeciesName: z.string().optional(),
   filterTypes: z.array(z.number()).optional(),
   filterSeen: z.boolean().optional(),
   filterCaught: z.boolean().optional(),
   filterOwned: z.boolean().optional(),
   filterOwnedShiny: z.boolean().optional(),
+  filterAlpha: z.boolean().optional(),
   filterFromGames: z.array(z.number()).optional(), // saveIDs
   filterGenerations: z.array(z.number()).optional(), // generation.name
   showForms: z.boolean().optional(),
@@ -60,7 +23,22 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/pokedex")({
   component: PokedexPage,
-  validateSearch: zodValidator(fallback(searchSchema, {})),
+  validateSearch: fallback(searchSchema, {
+    selected: undefined,
+    selectedSaveId: undefined,
+    selectExpanded: undefined,
+    filterSpeciesName: undefined,
+    filterTypes: undefined,
+    filterSeen: undefined,
+    filterCaught: undefined,
+    filterOwned: undefined,
+    filterOwnedShiny: undefined,
+    filterAlpha: undefined,
+    filterFromGames: undefined,
+    filterGenerations: undefined,
+    showForms: undefined,
+    showGenders: undefined,
+  }),
   search: {
     middlewares: [ retainSearchParams(true) ],
   }

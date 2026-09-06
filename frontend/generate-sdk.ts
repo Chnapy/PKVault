@@ -51,7 +51,7 @@ const patchFS = (memfs: MemFS) => {
   return savedFs;
 };
 
-const passToChangedFiles = async (memfs: MemFS, memchanges: MemFS) => {
+const passToChangedFiles = async (memfs: MemFS, memChanges: MemFS) => {
   for (const [ filepath, writeContent ] of memfs) {
     let changed = false;
 
@@ -63,7 +63,7 @@ const passToChangedFiles = async (memfs: MemFS, memchanges: MemFS) => {
     }
 
     if (changed) {
-      memchanges.set(filepath, writeContent);
+      memChanges.set(filepath, writeContent);
     }
     memfs.delete(filepath);
   }
@@ -80,15 +80,15 @@ for (const [ filepath, content ] of memfs) {
   memfs.set(filepath, formattedContent);
 }
 
-const memchanges: MemFS = new Map();
-await passToChangedFiles(memfs, memchanges);
+const memChanges: MemFS = new Map();
+await passToChangedFiles(memfs, memChanges);
 
-console.log(memchanges.size, 'changed files to write');
+console.log(memChanges.size, 'changed files to write');
 
-for (const [ filepath, content ] of memchanges) {
+for (const [ filepath, content ] of memChanges) {
   console.log('writing', filepath);
   await savedFs.outputFile(filepath, content, 'utf8');
 }
 
-console.log(memchanges.size, 'changed files written');
+console.log(memChanges.size, 'changed files written');
 console.log('- SDK generation finished -');

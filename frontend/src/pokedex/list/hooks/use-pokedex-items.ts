@@ -7,7 +7,7 @@ import { getGameInfos } from '../../details/util/get-game-infos';
 import { usePokedexFilters } from './use-pokedex-filters';
 
 type PokedexItems = Counts & {
-    isLoading: boolean;
+    isPending: boolean;
     speciesItemsByGenerationList: SpeciesItemsByGeneration[];
 };
 
@@ -15,6 +15,8 @@ type SpeciesItemsByGeneration = Counts & {
     generation: number;
     versionsForImgs: GameVersion[][];
     speciesInfos: SpeciesInfos[];
+    minSpecies: number;
+    maxSpecies: number;
 };
 
 type Counts = {
@@ -28,6 +30,7 @@ type Counts = {
 
 type SpeciesInfos = {
     species: number;
+    speciesName: string;
     itemsToRender: SpeciesFormItem[];
     isSeen: boolean;
 };
@@ -38,12 +41,12 @@ export type SpeciesFormItem = {
     species: number;
     form: number;
     genders: Gender[];
-    isSeen: boolean;
-    isSeenShiny: boolean;
-    isSeenAlpha: boolean;
-    isCaught: boolean;
-    isOwned: boolean;
-    isOwnedShiny: boolean;
+    isSeen?: boolean;
+    isSeenShiny?: boolean;
+    isSeenAlpha?: boolean;
+    isCaught?: boolean;
+    isOwned?: boolean;
+    isOwnedShiny?: boolean;
 };
 
 /**
@@ -56,7 +59,7 @@ export const usePokedexItems = (): PokedexItems => {
     const showForms = Route.useSearch({ select: (search) => search.showForms ?? false });
     const showGendersRaw = Route.useSearch({ select: (search) => search.showGenders ?? false });
 
-    const { data, isLoading } = useDexGetAll();
+    const { data, isPending } = useDexGetAll();
 
     const { isPkmFiltered, filterSpeciesValues } = usePokedexFilters();
 
@@ -86,6 +89,8 @@ export const usePokedexItems = (): PokedexItems => {
 
         const staticForms = staticData.species[ species ]?.forms ?? {};
 
+        const speciesName = Object.values(staticForms)[ 0 ]?.[ 0 ]?.name ?? '';
+
         const allForms = dexItems.flatMap(value => value.forms);
 
         const differentForms = [ ...new Set(allForms.map(form => form.form)) ];
@@ -114,12 +119,22 @@ export const usePokedexItems = (): PokedexItems => {
 
                 const oldGroup = acc[ key ];
 
+                const formValue = Math.min(oldGroup?.form ?? 99, form.form);
+
+                const getContext = (): EntityContext => {
+                    const initialContext = Math.max(oldGroup?.context ?? -1, form.context) as EntityContext;
+                    if (staticForms[initialContext]?.[formValue])
+                        return initialContext;
+
+                    return (Object.keys(staticForms).reverse().find(val => staticForms[val]?.[formValue]) ?? initialContext) as EntityContext;
+                };
+
                 const group: SpeciesFormItem = {
                     ...oldGroup,
                     id: key,
-                    context: Math.max(oldGroup?.context ?? -1, form.context) as EntityContext,
+                    context: getContext(),
                     species,
-                    form: Math.min(oldGroup?.form ?? 99, form.form),
+                    form: formValue,
                     genders: [ ...new Set([ form.gender, ...oldGroup?.genders ?? [] ]) ].sort(),
                     isSeen: oldGroup?.isSeen || form.isSeen,
                     isSeenShiny: oldGroup?.isSeenShiny || form.isSeenShiny,
@@ -188,6 +203,9 @@ export const usePokedexItems = (): PokedexItems => {
         const isOwned = itemsToRender.some(item => item.isOwned);
         const isOwnedShiny = itemsToRender.some(item => item.isOwnedShiny);
 
+        const minSpecies = Math.min(acc[generation]?.minSpecies ?? Infinity, species);
+        const maxSpecies = Math.max(acc[generation]?.maxSpecies ?? 0, species);
+
         const seenCount = acc[ generation ]?.seenCount ?? 0;
         const caughtCount = acc[ generation ]?.caughtCount ?? 0;
         const ownedCount = acc[ generation ]?.ownedCount ?? 0;
@@ -238,10 +256,13 @@ export const usePokedexItems = (): PokedexItems => {
                 ...acc[ generation ]?.speciesInfos ?? [],
                 {
                     species,
+                    speciesName,
                     itemsToRender,
                     isSeen,
                 },
             ],
+            minSpecies,
+            maxSpecies,
             seenCount: seenCount + (isSeen ? 1 : 0),
             caughtCount: caughtCount + (isCaught ? 1 : 0),
             ownedCount: ownedCount + (isOwned ? 1 : 0),
@@ -266,7 +287,7 @@ export const usePokedexItems = (): PokedexItems => {
     const itemsCount = speciesItemsByGenerationList.reduce((acc, item) => acc + item.itemsCount, 0);
 
     return {
-        isLoading,
+        isPending,
         speciesItemsByGenerationList,
         seenCount,
         caughtCount,

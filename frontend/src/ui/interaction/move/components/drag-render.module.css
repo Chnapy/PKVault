@@ -1,0 +1,8 @@
+
+.drag-render {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    z-index: 4;
+}

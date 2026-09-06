@@ -6,21 +6,19 @@ export const swapSlotInfos = (slotInfos: SlotInfosSlot): SlotInfosSlot => {
         case 'main-to-main': {
             return {
                 direction: 'main-to-main',
-                sourceType: 'main',
-                sourcePkm: slotInfos.targetPkm!,
                 sourceBox: slotInfos.targetBox,
+                sourcePkm: slotInfos.targetPkm!,
+                targetBox: slotInfos.targetBox,
                 targetPkm: slotInfos.sourcePkm,
-                targetBox: slotInfos.sourceBox,
                 targetSlot: slotInfos.sourcePkm.boxSlot,
             };
         };
         case 'main-to-save': {
             return {
                 direction: 'save-to-main',
-                sourceType: 'save',
-                sourcePkm: slotInfos.targetPkm!,
-                sourceBox: slotInfos.targetBox,
                 sourceSave: slotInfos.targetSave,
+                sourcePkm: slotInfos.targetPkm!,
+                sourceBox: slotInfos.targetBox!,
                 targetPkm: slotInfos.sourcePkm,
                 targetBox: slotInfos.sourceBox,
                 targetSlot: slotInfos.sourcePkm.boxSlot,
@@ -29,9 +27,8 @@ export const swapSlotInfos = (slotInfos: SlotInfosSlot): SlotInfosSlot => {
         case 'save-to-main': {
             return {
                 direction: 'main-to-save',
-                sourceType: 'main',
                 sourcePkm: slotInfos.targetPkm!,
-                sourceBox: slotInfos.targetBox,
+                sourceBox: slotInfos.targetBox!,
                 targetPkm: slotInfos.sourcePkm,
                 targetBox: slotInfos.sourceBox,
                 targetSlot: slotInfos.sourcePkm.boxSlot,
@@ -41,14 +38,13 @@ export const swapSlotInfos = (slotInfos: SlotInfosSlot): SlotInfosSlot => {
         case 'save-to-save': {
             return {
                 direction: 'save-to-save',
-                sourceType: 'save',
                 sourcePkm: slotInfos.targetPkm!,
                 sourceBox: slotInfos.targetBox,
                 sourceSave: slotInfos.targetSave,
                 targetPkm: slotInfos.sourcePkm,
                 targetBox: slotInfos.sourceBox,
-                targetSlot: slotInfos.sourcePkm.boxSlot,
                 targetSave: slotInfos.sourceSave,
+                targetSlot: slotInfos.sourcePkm.boxSlot,
             };
         };
     }

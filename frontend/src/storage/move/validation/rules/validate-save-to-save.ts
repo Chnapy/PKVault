@@ -1,8 +1,24 @@
-import type { SlotInfosSlot } from '../slot-infos/build-slot-infos-slot';
+import type { BoxDTO, PkmSaveDTO, SaveInfosDTO } from '../../../../data/sdk/model';
 import type { DropValidationResult } from '../types';
+import type { ValidateRootSlot } from './validate-root';
+
+type Save = Pick<SaveInfosDTO, 'id' | 'context'>;
+type Box = Pick<BoxDTO, 'canSaveReceivePkm'>;
+type Pkm = Pick<PkmSaveDTO, 'id' | 'canMove' | 'canMoveToSave'>;
+
+export type ValidateSaveToSaveSlot = ValidateRootSlot & {
+  direction: 'save-to-save';
+  // sourceType: 'save';
+  sourceSave: Save;
+  sourceBox: Box;
+  sourcePkm: Pkm;
+  targetSave: Save;
+  targetBox: Box;
+  targetPkm?: Pkm;
+};
 
 export const validateSaveToSave = (
-  slotInfos: Extract<SlotInfosSlot, { direction: 'save-to-save' }>,
+  slotInfos: ValidateSaveToSaveSlot,
   attached: boolean,
 ): DropValidationResult => {
   if (slotInfos.sourcePkm.id === slotInfos.targetPkm?.id) {

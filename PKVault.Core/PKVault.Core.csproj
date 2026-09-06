@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- <OutputType>Exe</OutputType> -->
+    <RootNamespace>PKVault.Core</RootNamespace>
+    <!-- <PublishAot>true</PublishAot> -->
+    <!-- <IsAotCompatible>true</IsAotCompatible> -->
+    
+    <!-- <PublishSingleFile>true</PublishSingleFile> -->
+    <!-- <SelfContained>true</SelfContained> -->
+  </PropertyGroup>
+
+  <!-- <PropertyGroup>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    
+    <PublishTrimmed>true</PublishTrimmed>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+  </PropertyGroup> -->
+
+  <ItemGroup>
+    <PackageReference Include="NSwag.Core" Version="14.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HttpMultipartParser" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.11" />
+    <PackageReference Include="Serilog" Version="4.3.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="System.IO.Abstractions" Version="22.1.0" />
+
+    <Reference Include="./PKHeX.Core.dll" />
+
+    <TrimmerRootDescriptor Include="linker.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="static-data/generated/api-data/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+    <EmbeddedResource Include="static-data/generated/sheets/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+    <EmbeddedResource Include="default-files/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+    
+    <Content Remove="static-data/generated/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+</Project>

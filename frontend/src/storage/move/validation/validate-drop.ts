@@ -1,12 +1,12 @@
 import type { PkmVariantIndexes } from '../../../data/hooks/use-pkm-variant-index';
-import type { MoveState } from '../state/move-state';
+import type { MoveParams } from '../move-container-fns';
 import { validateRoot } from './rules/validate-root';
 import { swapSlotInfos } from './slot-infos/swap-slot-infos';
 import type { DropValidationResult, SlotInfos } from './types';
 import { validateSlotPair } from './validate-slot-pair';
 
 export const validateDrop = (
-    moveState: Extract<MoveState, { status: 'dragging' }>,
+    params: MoveParams | undefined,
     slotInfosList: SlotInfos[],
     pkmVariantIndexes: PkmVariantIndexes,
 ): DropValidationResult => {
@@ -17,7 +17,7 @@ export const validateDrop = (
     for (const info of slotInfosList) {
         const result = validateSlotPair(
             info,
-            moveState.source.attached ?? false,
+            params?.attached ?? false,
             pkmVariantIndexes,
         );
         if (!result.canDrop) return result;
@@ -28,7 +28,7 @@ export const validateDrop = (
 
             const swapResult = validateSlotPair(
                 swapInfo,
-                moveState.source.attached ?? false,
+                params?.attached ?? false,
                 pkmVariantIndexes,
             );
             if (!swapResult.canDrop) return swapResult;

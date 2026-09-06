@@ -1,0 +1,4 @@
+.ui-item-img {
+    --sprite-size-multiplier: var(--sprite-item-size-multiplier);
+    --sprite-rendering: var(--sprite-item-rendering);
+}

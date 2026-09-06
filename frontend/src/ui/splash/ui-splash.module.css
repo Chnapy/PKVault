@@ -1,0 +1,6 @@
+
+.ui-splash-logo {
+    border-radius: 99px;
+    padding: 1px;
+    background-color: var(--mantine-color-primary-7);
+}

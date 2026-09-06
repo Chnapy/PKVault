@@ -1,10 +1,8 @@
-import React from "react";
-import { useDexGetAll } from '../../../data/sdk/dex/dex.gen';
+import React, { startTransition } from "react";
 import { useStaticData } from '../../../hooks/use-static-data';
 import { Route } from "../../../routes/pokedex";
 import { useTranslate } from '../../../translate/i18n';
-import { FilterSelect } from "../../../ui/filter/filter-select/filter-select";
-import { filterIsDefined } from '../../../util/filter-is-defined';
+import { UIMultiSelect } from '../../../ui/form/select/ui-multi-select';
 
 export const FilterGeneration: React.FC = () => {
   const { t } = useTranslate();
@@ -15,31 +13,27 @@ export const FilterGeneration: React.FC = () => {
 
   const staticData = useStaticData();
 
-  const dexAll = useDexGetAll().data?.data ?? {};
-  const allGenerations = [ ...new Set(
-    Object.values(dexAll).flatMap(value => Object.values(value)).flatMap(value => staticData.species[ value.species ]?.generation)
-  ) ].filter(filterIsDefined);
+  const allGenerations = Object.values(staticData.generations).map(g => g.id);
 
   const options = allGenerations.map((generation) => ({
     value: generation.toString(),
     label: t('dex.filters.generations.option', { generation, regions: staticData.generations[ generation ]?.regions.join(', ') }),
   }));
 
-  return (
-    <FilterSelect
-      enabled={searchValue.length > 0}
-      multiple
-      value={searchValue.map(String)}
-      onChange={(values) => {
-        navigate({
-          search: {
-            filterGenerations: values.map(Number),
-          },
-        });
-      }}
-      options={options}
-    >
-      {t('dex.filters.generations')}
-    </FilterSelect>
-  );
+  return <UIMultiSelect
+    name='filter-generation'
+    controlLabel={t('dex.filters.generations.controls-label')}
+    label={t('dex.filters.generations')}
+    data={options}
+    value={searchValue.map(String)}
+    onChange={(values) => startTransition(() => navigate({
+      search: {
+        filterGenerations: values.map(Number),
+      },
+    }))}
+    pillsNoWrap
+    renderPill={({ value = '' }) => <span>G{value}</span>}
+  // size='xs'
+  // w={140}
+  />;
 };

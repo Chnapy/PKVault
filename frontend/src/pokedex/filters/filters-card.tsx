@@ -1,8 +1,9 @@
-import { css } from "@emotion/css";
+import { InputWrapper, Stack } from '@mantine/core';
 import type React from "react";
 import { withErrorCatcher } from '../../error/with-error-catcher';
-import { HelpButton } from '../../help/help-button';
-import { Container } from "../../ui/container/container";
+import type { WithControlsIconsExtraProps } from '../../ui/interaction/controls/icons/with-controls-icons';
+import { UIPokedexFilters } from '../../ui/pokedex/filters/ui-pokedex-filters';
+import { FilterAlpha } from './components/filter-alpha';
 import { FilterCaught } from "./components/filter-caught";
 import { FilterFromGames } from "./components/filter-from-games";
 import { FilterGeneration } from "./components/filter-generation";
@@ -11,76 +12,30 @@ import { FilterOwnedShiny } from './components/filter-owned-shiny';
 import { FilterSeen } from "./components/filter-seen";
 import { FilterSpecies } from "./components/filter-species";
 import { FilterTypes } from "./components/filter-types";
-import { ShowForms } from './components/show-forms';
-import { ShowGenders } from './components/show-genders';
+import { FilterViews } from './components/filter-views';
 
-export const FiltersCard: React.FC = withErrorCatcher('default', () => {
-  return (
-    <Container
-      className={css({
-        display: "flex",
-        alignItems: "flex-start",
-        gap: 8,
-        padding: 8,
-      })}
-      padding="big"
-      borderRadius="big"
-    >
-      <FilterSpecies />
+export const FiltersCard: React.FC<WithControlsIconsExtraProps> = withErrorCatcher('default', (extraProps) => {
 
-      <div
-        className={css({
-          display: "flex",
-          flexDirection: "column",
-          gap: 4,
-        })}
-      >
-        <div
-          className={css({
-            display: "flex",
-            alignItems: "flex-start",
-            gap: 8,
-          })}
-        >
-          <FilterSeen />
+  return <UIPokedexFilters
+    views={<FilterViews />}
+    {...extraProps}
+  >
+    <FilterSpecies />
 
-          <FilterCaught />
+    <InputWrapper label='Status'>
+      <Stack gap='xs'>
+        <FilterSeen />
+        <FilterCaught />
+        <FilterOwned />
+        <FilterOwnedShiny />
+        <FilterAlpha />
+      </Stack>
+    </InputWrapper>
 
-          <FilterOwned />
-
-          <FilterOwnedShiny />
-
-          <FilterTypes />
-        </div>
-
-        <div
-          className={css({
-            display: "flex",
-            alignItems: "flex-start",
-            gap: 8,
-          })}
-        >
-          <FilterFromGames />
-
-          <FilterGeneration />
-        </div>
-      </div>
-
-      <div
-        className={css({
-          display: "flex",
-          flexDirection: "column",
-          gap: 4,
-        })}
-      >
-
-        <ShowForms />
-
-        <ShowGenders />
-
-      </div>
-
-      <HelpButton slug='4-pokedex.md' />
-    </Container>
-  );
+    <Stack gap='sm'>
+      <FilterTypes />
+      <FilterFromGames />
+      <FilterGeneration />
+    </Stack>
+  </UIPokedexFilters>;
 });

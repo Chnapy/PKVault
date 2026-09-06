@@ -1,0 +1,20 @@
+.ui-gender {
+    display: inline-flex;
+    vertical-align: middle;
+    font-family: var(--mantine-font-family-monospace);
+}
+
+.ui-gender.small {
+    font-size: 16px;
+    line-height: 12px;
+}
+
+.ui-gender.medium {
+    font-size: 20px;
+    line-height: 16px;
+}
+
+.ui-gender.big {
+    font-size: 22px;
+    line-height: 20px;
+}

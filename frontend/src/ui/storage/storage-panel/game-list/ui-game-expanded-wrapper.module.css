@@ -1,0 +1,14 @@
+
+.icon {
+    width: 44px;
+}
+
+.button {
+    height: auto;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.selected {
+    outline: 2px solid var(--focus-color-1);
+}

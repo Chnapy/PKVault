@@ -1,6 +1,6 @@
-import { css } from '@emotion/css';
+import { Stack } from '@mantine/core';
 import type React from 'react';
-import { ButtonLink } from '../ui/button/button';
+import { HelpDialogMenuItem } from './help-dialog-menu-item';
 import { useHelpMenuItems } from './hooks/use-help-menu-items';
 
 type HelpDialogMenuProps = {
@@ -8,28 +8,16 @@ type HelpDialogMenuProps = {
 };
 
 export const HelpDialogMenu: React.FC<HelpDialogMenuProps> = ({ finalSelectedPath }) => {
-
     const { menuItems } = useHelpMenuItems();
 
-    return <div
-        className={css({
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 4,
-        })}
-    >
+    return <Stack gap={0}>
         {menuItems.map(menuItem => {
-            const selected = menuItem.path === finalSelectedPath;
-
-            return <ButtonLink
+            return <HelpDialogMenuItem
                 key={menuItem.id}
-                to={'.'}
-                search={{ help: menuItem.endPath }}
-                selected={selected}
-                disabled={selected}
-            >
-                {menuItem.title}
-            </ButtonLink>;
+                endPath={menuItem.endPath}
+                selected={menuItem.path === finalSelectedPath}
+                title={menuItem.title}
+            />;
         })}
-    </div>;
+    </Stack>;
 };

@@ -1,31 +1,31 @@
 import React from 'react';
-import { useSettingsGetSaveGlobsResults } from '../../data/sdk/settings/settings.gen';
-import { useTranslate } from '../../translate/i18n';
-import { Button } from '../../ui/button/button';
-import { Container } from '../../ui/container/container';
-import { Icon } from '../../ui/icon/icon';
-import { TextInput } from '../../ui/input/text-input';
-import { theme } from '../../ui/theme';
-import { PathLine } from '../path-line';
-import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
-import { css } from '@emotion/css';
+import { useSettingsGet, useSettingsGetSaveGlobsResults } from '../../data/sdk/settings/settings.gen';
+import { UIGlobsInputItem, type UIGlobsInputItemProps } from '../../ui/form/globs-input/ui-globs-input-item';
+import { UIPathButton } from '../../ui/form/globs-input/ui-path-button';
+import { getDesktopFileTypeInfos } from '../../ui/form/globs-input/util/get-desktop-file-type-infos';
+import { PathUtil } from '../../ui/form/globs-input/util/path-util';
+import { FileExplorerPopover, type FileExplorerPopoverProps } from './file-explorer-popover';
+import { useDesktopMessage } from './hooks/use-desktop-message';
 
-export type GlobsInputItemProps = {
-    value: string;
-    onEdit: (value: string) => void;
-    onRemove: () => void;
-    limit: number;
-    disabled?: boolean;
-};
+export type GlobsInputItemProps = Pick<UIGlobsInputItemProps, 'name' | 'value' | 'onRemove' | 'disabled'>
+    & Partial<Pick<FileExplorerPopoverProps, 'onChange'>>
+    & {
+        limit: number;
+        'data-item-last'?: boolean;
+    };
 
-export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ value, onEdit, onRemove, limit, disabled }) => {
-    const { t } = useTranslate();
-
+export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onChange, onRemove, limit, disabled, ...rest }) => {
     const desktopMessage = useDesktopMessage();
 
-    const isGlob = value.includes('*');
-    const isDirectory = isGlob || value.endsWith('/');
-    const isExclude = value.startsWith('!');
+    const isGlob = PathUtil.isGlob(value);
+    const isDirectory = isGlob || PathUtil.isDirectory(value);
+    const isExclude = PathUtil.isExclude(value);
+
+    const settingsQuery = useSettingsGet();
+    const settings = settingsQuery.data?.data;
+
+    const pkvaultPath = settings && PathUtil.asDirectory(settings.appDirectory);
+    const uploadPath = settings && PathUtil.asDirectory(settings.savesUploadsPath);
 
     const globResultsQuery = useSettingsGetSaveGlobsResults({
         globs: [ value ],
@@ -36,126 +36,79 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ value, onEdit, o
         },
     });
 
-    const { isLoading } = globResultsQuery;
     const data = globResultsQuery.data?.data ?? [];
 
-    const showFiles = !isExclude && (isDirectory || data.length !== 1);
+    const isLoading = globResultsQuery.isPending && globResultsQuery.isEnabled;
+    const hasError = !!onChange && !isLoading && globResultsQuery.isError;
+    const hasWarning = !!onChange && !isLoading && (hasError || data.length === 0);
 
-    const hasHttpError = globResultsQuery.isError;
-    const hasError = !globResultsQuery.isLoading && globResultsQuery.isError;
-    const hasWarning = !globResultsQuery.isLoading && (hasError || data.length === 0);
-
-    const symbol = isExclude
-        ? <span className={css({ color: theme.text.red, fontSize: '120%' })}>-</span>
-        : <span className={css({ color: theme.text.primary, fontSize: '120%' })}>+</span>;
-
-    const getIcon = () => {
-        if (isExclude) {
-            return 'exclaimation';
-        }
-
-        if (isDirectory) {
-            return 'folder';
-        }
-
-        return 'file-import';
-    };
-
-    return <Container
-        className={css({
-            display: 'flex',
-            flexDirection: 'column',
-            flexWrap: 'nowrap',
-            padding: 0,
-            backgroundColor: theme.bg.light,
-        })}
+    return <UIGlobsInputItem
+        name={name}
+        value={value}
+        onRemove={onRemove}
+        disabled={disabled}
+        results={data}
+        hasError={hasError}
+        hasWarning={hasWarning}
+        isLoading={isLoading}
+        openFolder={desktopMessage && (() => desktopMessage.openFile({
+            type: 'open-folder',
+            isDirectory,
+            path: value,
+        }))}
     >
-        <details
-            className={css({
-                display: 'flex',
-                flexDirection: 'column',
-                flexWrap: 'nowrap',
-            })}
-        >
-            <summary
-                className={css({
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexWrap: 'nowrap',
-                    gap: 8,
-                    padding: 4,
-                    paddingLeft: 8,
-                    cursor: showFiles && data.length > 0 ? 'pointer' : undefined,
-                })}
-            >
-                <Icon name={getIcon()} solid forButton />
+        {props => {
+            if (!onChange)
+                return <UIPathButton
+                    {...props}
+                    value={value}
+                    disabled
+                    pkvaultPath={pkvaultPath ?? ''}
+                    uploadPath={uploadPath ?? ''}
+                />;
 
-                {symbol}
+            if (desktopMessage)
+                return <UIPathButton
+                    {...props}
+                    value={value}
+                    onClick={async e => {
+                        props.onClick?.(e);
 
-                <div className={css({ flexGrow: 1, lineBreak: 'anywhere' })}>
-                    {isDesktop && !isExclude
-                        ? value
-                        : <TextInput
-                            value={value}
-                            onChange={({ currentTarget }) => onEdit(currentTarget.value)}
-                            className={css({ width: '100%' })}
-                            disabled={disabled}
-                        />}
-                </div>
+                        if (isExclude)
+                            return;
 
-                {!isExclude && (showFiles || isLoading || globResultsQuery.isError) && <div
-                    className={css({
-                        display: 'flex',
-                        gap: 4,
-                        color: hasError ? theme.text.red : undefined,
-                        whiteSpace: 'nowrap',
-                    })}
-                >
-                    {hasWarning && <Icon name='exclamation-triangle' solid forButton />}
-                    {isLoading
-                        ? '...'
-                        : hasHttpError
-                            ? 'error'
-                            : t('settings.form.saves.test.title', { count: data.length })}
-                </div>}
+                        const basePath = isDirectory ? value : PathUtil.getValueDirectoryPath(value);
 
-                {desktopMessage && !isExclude && !isGlob && <Button
-                    onClick={() => desktopMessage.openFile({
-                        type: 'open-folder',
-                        isDirectory,
-                        path: value,
-                    })}
-                >
-                    <Icon name='folder' solid forButton />
-                </Button>}
+                        const desktopInfos = getDesktopFileTypeInfos(isExclude ? 'exclude' : isDirectory ? 'folder' : 'file');
 
-                <Button
-                    bgColor={theme.bg.red}
-                    onClick={onRemove}
-                    disabled={disabled}
-                >
-                    <Icon name='trash' solid forButton />
-                </Button>
-            </summary>
+                        const response = await desktopMessage.fileExplore({
+                            type: 'file-explore',
+                            id: desktopInfos.id,
+                            directoryOnly: desktopInfos.directoryOnly,
+                            basePath,
+                            multiselect: false,
+                        });
 
-            {showFiles && data.length > 0 && <pre className={css({
-                fontFamily: 'inherit',
-                backgroundColor: theme.bg.panel,
-                maxHeight: 200,
-                overflow: 'auto',
-                padding: 4,
-                margin: 0,
-            })}>
-                {!isLoading && data.map(path => <div
-                    key={path}
-                    className={css({
-                        display: 'flex',
-                    })}
-                >
-                    {symbol}
-                    <PathLine>{path}</PathLine>
-                </div>)}
-            </pre>}
-        </details>
-    </Container>;
+                        const newValue = desktopInfos.getFinalPaths(response.values)[ 0 ];
+                        if (!newValue)
+                            return;
+
+                        onChange(newValue);
+                    }}
+                    disabled={isExclude || disabled}
+                    pkvaultPath={pkvaultPath ?? ''}
+                    uploadPath={uploadPath ?? ''}
+                />;
+
+            return <FileExplorerPopover
+                {...props}
+                name={`${name}-file-explore`}
+                value={value}
+                onChange={onChange}
+                pkvaultPath={pkvaultPath ?? ''}
+                uploadPath={uploadPath ?? ''}
+                {...rest}
+            />;
+        }}
+    </UIGlobsInputItem>;
 };

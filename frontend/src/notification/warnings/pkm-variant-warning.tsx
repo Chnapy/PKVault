@@ -1,25 +1,28 @@
+import { ActionIcon, Table } from '@mantine/core';
+import { EyeIcon } from 'lucide-react';
 import type React from 'react';
-import { HistoryContext } from '../../context/history-context';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
 import type { PkmVariantWarning as PkmVariantWarningModel } from '../../data/sdk/model';
 import { useStaticData } from '../../hooks/use-static-data';
 import { Route } from '../../routes/storage';
-import { getSaveOrder } from '../../storage/util/get-save-order';
 import { useTranslate } from '../../translate/i18n';
-import { Button } from '../../ui/button/button';
-import { Icon } from '../../ui/icon/icon';
-import { css } from '@emotion/css';
+import { pick } from '../../util/pick';
+import { useSelectCallback } from '../../util/use-select-callback';
 
 export const PkmVariantWarning: React.FC<PkmVariantWarningModel> = ({ pkmVariantId }) => {
     const { t } = useTranslate();
     const navigate = Route.useNavigate();
-    const storageHistoryValue = HistoryContext.useValue()[ '/storage' ];
 
     const staticData = useStaticData();
 
-    const pkmVariantsQuery = usePkmVariantIndex();
+    const pkmVariantQuery = usePkmVariantIndex(
+        useSelectCallback(data => {
+            const pkmVariant = data.data.byId[ pkmVariantId ];
+            return pkmVariant && pick(pkmVariant, [ 'id', 'species', 'form', 'context', 'boxId', 'boxSlot', 'attachedSaveId' ]);
+        }, [ pkmVariantId ])
+    );
 
-    const pkmVariant = pkmVariantsQuery.data?.data.byId[ pkmVariantId ];
+    const pkmVariant = pkmVariantQuery.data;
     if (!pkmVariant) {
         return null;
     }
@@ -31,45 +34,47 @@ export const PkmVariantWarning: React.FC<PkmVariantWarningModel> = ({ pkmVariant
     const speciesName = formObj?.name;
 
     return (
-        <tr>
-            <td>
+        <Table.Tr>
+            <Table.Td>
                 {t('notifications.warnings.pkm-variant', {
                     speciesName,
                     boxId: pkmVariant.boxId,
                     boxSlot: pkmVariant.boxSlot,
                 })}
-            </td>
-            <td className={css({ verticalAlign: 'top' })}>
-                <Button
+            </Table.Td>
+            <Table.Td valign='top'>
+                <ActionIcon
+                    variant='default'
                     onClick={() =>
                         navigate({
                             to: '/storage',
                             search: search => {
-                                const saves = storageHistoryValue?.search.saves ?? search.saves;
+                                if (!pkmVariant.attachedSaveId)
+                                    return search;
 
                                 return {
-                                    mainBoxIds: [ pkmVariant.boxId ],
+                                    storages: [
+                                        {
+                                            saveId: null,
+                                            boxId: pkmVariant.boxId,
+                                        },
+                                        {
+                                            saveId: pkmVariant.attachedSaveId,
+                                            boxId: 0,
+                                        },
+                                    ],
                                     selected: {
+                                        storage: 0,
                                         id: pkmVariant.id,
                                     },
-                                    saves: pkmVariant.attachedSaveId
-                                        ? {
-                                            ...saves,
-                                            [ pkmVariant.attachedSaveId ]: saves?.[ pkmVariant.attachedSaveId ] ?? {
-                                                saveId: pkmVariant.attachedSaveId,
-                                                saveBoxIds: [ 0 ],
-                                                order: getSaveOrder(saves, pkmVariant.attachedSaveId),
-                                            },
-                                        }
-                                        : saves,
                                 };
                             },
                         })
                     }
                 >
-                    <Icon name='eye' forButton />
-                </Button>
-            </td>
-        </tr>
+                    <EyeIcon fontSize='1lh' />
+                </ActionIcon>
+            </Table.Td>
+        </Table.Tr>
     );
 };

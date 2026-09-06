@@ -1,7 +1,25 @@
-import type { DropValidationResult, SlotInfos } from '../types';
+import type { BankDTO, BoxDTO, PkmVariantDTO } from '../../../../data/sdk/model';
+import type { DropValidationResult } from '../types';
+import type { ValidateRootSlot } from './validate-root';
+
+type Pkm = Pick<PkmVariantDTO, 'id'>;
+
+export type ValidateMainToMainSlot = ValidateRootSlot & {
+    direction: 'main-to-main';
+    sourcePkm: Pkm;
+    targetPkm?: Pkm;
+};
+
+export type ValidateMainToMainBank = ValidateRootSlot & {
+    direction: 'main-to-bank';
+    sourceBox: Pick<BoxDTO, 'bankId'>;
+    sourcePkm: Pkm;
+    targetBank: Pick<BankDTO, 'id' | 'isExternal'>;
+    targetPkm?: undefined;
+};
 
 export const validateMainToMain = (
-    slotInfos: Extract<SlotInfos, { sourceType: 'main' }>,
+    slotInfos: ValidateMainToMainSlot | ValidateMainToMainBank,
     attached: boolean,
 ): DropValidationResult => {
     if (attached) {
@@ -11,7 +29,8 @@ export const validateMainToMain = (
             slotInfos,
         };
     }
-
+    // if (slotInfos.targetSlot === 0 && slotInfos.sourcePkm.id === 'canMove')
+    //     console.log(slotInfos.sourcePkm, slotInfos.targetPkm)
     if (slotInfos.sourcePkm.id === slotInfos.targetPkm?.id) {
         return {
             canDrop: false,

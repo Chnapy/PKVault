@@ -1,9 +1,6 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { IndexPage } from '../pages';
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  component: IndexPage,
 });
-
-function Index() {
-  return <Navigate to="/storage" />;
-}

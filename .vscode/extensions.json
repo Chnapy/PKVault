@@ -1,3 +1,8 @@
 {
-  "recommendations": ["qwtel.sqlite-viewer", "typescriptteam.native-preview"]
+  "recommendations": [
+    "qwtel.sqlite-viewer",
+    "typescriptteam.native-preview",
+    "vunguyentuan.vscode-css-variables",
+    "stylelint.vscode-stylelint"
+  ]
 }

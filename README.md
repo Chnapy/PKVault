@@ -16,51 +16,86 @@
     <a href="https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app"><b>PROJECT POKEMON DISCUSSION PAGE</b></a>
 </h6>
 
-PKVault is a Pokemon storage & save manipulation tool based on [PKHeX](https://github.com/kwsch/PKHeX).
-Similar to Pokemon Home, offline as online.
+PKVault is a Pokémon storage & save manipulation tool based on [PKHeX](https://github.com/kwsch/PKHeX).
+Similar to Pokémon Home, offline as online.
 
-This tool can be used as:
+<img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/microsoft-windows.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/linux.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/apple-light.svg" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/steam-deck-light.png" width="100" /> | <img src="https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/docker.png" width="100" /> |
+|:---:|:---:|:---:|:---:|:---:|
+| [![Download for Windows](https://img.shields.io/badge/Windows-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | <a href='https://flathub.org/apps/details/io.github.chnapy.pkvault'><img width='110' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en' /></a><br/>[![Download for Linux](https://img.shields.io/badge/Linux-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Download for macOS](https://img.shields.io/badge/macOS-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | <a href='https://flathub.org/apps/details/io.github.chnapy.pkvault'><img width='110' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en' /></a><br/>[![Download for SteamDeck](https://img.shields.io/badge/SteamDeck-Release-blue)](https://github.com/Chnapy/PKVault/releases/latest) | [![Docker usage](https://img.shields.io/badge/Docker-Setup-purple)](#docker-usage) |
+| PKVault.exe | pkvault.flatpak<br/>pkvault.AppImage<br/>pkvault.deb<br/>pkvault.linux | pkvault-osx-arm64.app.zip<br/>pkvault-osx-x64.app.zip | pkvault.flatpak | `ghcr.io/chnapy/pkvault` |
 
-- 📥 Desktop app
-  - Windows -> [PKVault.exe](https://github.com/Chnapy/PKVault/releases/latest)
-  - Linux & SteamDeck -> [pkvault.AppImage](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault.deb](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault.flatpak](https://github.com/Chnapy/PKVault/releases/latest) / [pkvault](https://github.com/Chnapy/PKVault/releases/latest)
-
-- 🐳 Docker web-app
-  - `image: ghcr.io/chnapy/pkvault` -> check [below for usage](#docker-usage)
-
-![Platforms](https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20SteamDeck%20|%20Docker-informational)
-![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
+![License](https://img.shields.io/badge/License-GPLv3-green.svg)
 
 <p align="center">
-    <img src="img/snap_1.png" alt="PKVault snapshot 1" />
-    <img src="img/snap_2.png" alt="PKVault snapshot 2" style="display: inline-block; width: 24%" />
-    <img src="img/snap_3.png" alt="PKVault snapshot 3" style="display: inline-block; width: 24%" />
-    <img src="img/snap_4.png" alt="PKVault snapshot 4" style="display: inline-block; width: 24%" />
-    <img src="img/snap_5.png" alt="PKVault snapshot 5" style="display: inline-block; width: 24%" />
+    <img src="img/snap_storage.png" alt="PKVault snapshot 1" />
+    <img src="img/snap_storage_dark.png" alt="PKVault snapshot 2" style="display: inline-block; width: 24%" />
+    <img src="img/snap_storage_details.png" alt="PKVault snapshot 3" style="display: inline-block; width: 24%" />
+    <img src="img/snap_dex.png" alt="PKVault snapshot 4" style="display: inline-block; width: 24%" />
+    <img src="img/snap_saves.png" alt="PKVault snapshot 5" style="display: inline-block; width: 24%" />
 </p>
 
 ## Bulk features
 
 - Storage & save manipulation
-  - compatible with all pokemon games, from first generation to **Pokemon Legends: Z-A**
-  - move pokemons between saves
-  - convert pokemon to any generation (ex. G7 to G2)
-  - store pokemons outside saves using banks & boxes
-  - allow use of multiple "variants" for stored pokemons
+  - compatible with all pokémon games, from first generation to **Pokémon Legends: Z-A**
+  - **move** pokémons between saves
+  - **convert** pokémon to any generation (ex. G7 to G2)
+  - **store** pokémons outside saves using banks & boxes
+  - allow use of multiple **"variants"** for stored pokémons
   - move/delete actions
-  - edit pokemon moves, EVs & nickname
-  - evolve pokemons requiring trade or trade + held-item (ex. Kadabra -> Alakazam)
-  - link a save pokemon with all his variants, sharing data like exp & EVs
-  - use of external PKM files, outside PKVault environment
-  - backup all saves & storage before any save action
+  - **edit** pokémon moves, EVs & nickname
+  - **evolve** pokémons requiring trade or trade + held-item (ex. Kadabra -> Alakazam)
+  - **link** a save pokémon with all his variants, sharing data like exp & EVs
+  - use of **external PKM files**, outside PKVault environment
+  - **backup** all saves & storage before any save action
     - backups listing
     - backups restore always possible
-- Centralized Pokedex based on all listed saves
+- Centralized **Pokédex** based on all listed saves
   - views with forms & genders
-  - multiple filters: species name, seen/caught/owned, types, ...
+  - multiple filters: species name, seen/caught/owned/shiny/alpha, types, ...
     - possible living dex
     - possible shiny dex
 - Dynamic saves listing based on paths & globs
+- Dark mode & sprite sizing
+
+## Desktop/SteamDeck usage
+
+You can find all executables in [releases](https://github.com/Chnapy/PKVault/releases/latest) page.
+
+On Windows, just use `PKVault.exe`.
+
+On Linux & SteamDeck, it's recommanded to get PKVault from Flathub: <a href='https://flathub.org/apps/details/io.github.chnapy.pkvault'><img width='110' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en' /></a><br/>
+Otherwise there is plenty of Linux executables in [releases](https://github.com/Chnapy/PKVault/releases/latest) page.
+
+On macOS, download `pkvault-osx-arm64.app.zip` (Apple Silicon) or `pkvault-osx-x64.app.zip` (Intel), unzip it, then open `PKVault.app`. Since the app isn't notarized, macOS will show "Apple could not verify 'PKVault' is free of malware that may harm your Mac or compromise your privacy." Go to **System Settings > Privacy & Security**, scroll down to find PKVault, and click "Open Anyway", then confirm in the dialog that appears.
+
+### Steam-based usage
+
+<img src="img/steam_1.png" alt="Steam cover" align="right" />
+
+PKVault can be added to Steam as a non-steam game.
+This is especially useful for SteamDeck, allowing to run the app in gaming mode.
+
+Here are the steps to add the app in Steam, and customize with icons, covers etc:
+
+- SteamDeck only: first ensure to be in desktop mode
+- [Add PKVault as non-Steam game](https://help.steampowered.com/en/faqs/view/4B8B-9697-2338-40EC)
+- Add icon, logo, covers, background:
+  - Download & extract [steam-customize.zip](./steam-customize.zip)
+  - Find PKVault in your library, right-click -> "Properties"
+  - In "Shortcut" tab:
+    - Click on empty icon at the very start, then select `steam-customize/icon.png`
+  - In "Customization" tab, select for each form step:
+    - Cover -> `steam-customize/cover.png`
+    - Background -> `steam-customize/background.png`
+    - Logo -> `steam-customize/logo.png`
+    - Wide cover -> `steam-customize/cover-big.png`
+
+<img src="img/steam_2.png" alt="Steam cover" align="center" />
+
+### Data synchronization
+
+Check [below](#online-data-synchronization).
 
 ## Docker usage
 
@@ -108,6 +143,16 @@ docker run \
   ghcr.io/chnapy/pkvault:latest
 ```
 
+## Online data synchronization
+
+You may want to synchronize PKVault data between your devices, keeping your saves up-to-date everywhere, avoiding need of copy/paste and others manual actions.
+
+PKVault is made to work 100% offline, and online features are considered out of project scope.
+It is recommanded to use instead third-party solutions.
+
+[syncthing](https://syncthing.net) works really well, whether for desktop or Docker.
+Other known solutions may be adapted too, like Dropbox, Onedrive, etc. Choose following your needs.
+
 ## [Functional documentation](./docs/functional/en/README.md)
 
 ## [Technical documentation](./docs/technical/README.md)
@@ -127,8 +172,7 @@ Your can use this app for your own projects following license restrictions.
 
 - Frontend
   - Font "Pixel Operator" - from [onlinewebfonts](http://www.onlinewebfonts.com) - License CC BY 4.0
-  - Font "Pokemon Emerald" - from [fontstruct](https://fontstruct.com/fontstructions/show/1975556) by "aztecwarrior28" - License CC BY-SA 3.0
-  - [HackerNoon's Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) - License MIT
+  - Icons "Input prompts" - from [Kenney](www.kenney.nl) - License CC0
   - Versions & all others dependencies can be found into [frontend/package.json](./frontend/package.json).
 
-All image contents of game-icons, pokemons, types, items, move-categories are Copyright The Pokémon Company.
+All image contents of game-icons, pokémons, types, items, move-categories are Copyright The Pokémon Company.

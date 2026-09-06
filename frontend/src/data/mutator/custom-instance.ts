@@ -25,41 +25,7 @@ export const customInstance = async <T extends ResponseBack>(url: string, init?:
     const body = [ 204, 205, 304 ].includes(res.status) ? null : await res.text();
     const data = body ? JSON.parse(body) : {};
 
-    cleanNullValues(data);
-
     return { data, status: res.status, headers: res.headers } satisfies ResponseBack as T;
-};
-
-/**
- * Replace null values by undefined.
- */
-const cleanNullValues = (obj: object) => {
-    if (!obj || typeof obj !== 'object') {
-        return;
-    }
-
-    if (Array.isArray(obj)) {
-        const firstValue = obj[ 0 ];
-        if (!firstValue || typeof firstValue != 'object') {
-            return;
-        }
-
-        obj.forEach(value => {
-            if (typeof value === 'object') {
-                cleanNullValues(value);
-            }
-        });
-        return;
-    }
-
-    Object.keys(obj).forEach(key => {
-        const value = obj[ key as never ];
-        if (value === null) {
-            obj[ key as never ] = undefined as never;
-        } else if (typeof value === 'object') {
-            cleanNullValues(value);
-        }
-    });
 };
 
 /**
@@ -112,7 +78,6 @@ export class QueryError extends Error {
     private static getHeaderContent(value: string | null): string | null {
         try {
             return JSON.parse(value!);
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (_) {
             return value;
         }
@@ -120,7 +85,6 @@ export class QueryError extends Error {
 }
 
 // override the return error type
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type ErrorType<_> = QueryError;
 
 // // In case you want to wrap the body type (optional)

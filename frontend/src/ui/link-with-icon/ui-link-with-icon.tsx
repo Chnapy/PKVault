@@ -1,0 +1,31 @@
+import { Anchor } from '@mantine/core';
+import type { JSX } from 'react';
+
+export const UILinkWithIcon: React.FC<JSX.IntrinsicElements[ 'a' ]> = ({ children, ...props }) => {
+    const getOrigin = () => {
+        try {
+            return new URL(props.href ?? '').origin;
+        } catch {
+            return;
+        }
+    };
+
+    const origin = getOrigin();
+
+    const icon = <img
+        style={{
+            verticalAlign: 'text-bottom',
+            marginRight: 4,
+            width: 16,
+            height: 16,
+        }}
+        src={origin && `${origin}/favicon.ico`}
+    />;
+
+    return <Anchor
+        {...props}
+    >
+        {icon}
+        {children ?? props.href}
+    </Anchor>;
+};

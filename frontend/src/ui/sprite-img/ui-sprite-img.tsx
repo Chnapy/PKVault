@@ -1,0 +1,40 @@
+import { clsx } from 'clsx';
+import type React from 'react';
+import type { SpriteInfo } from '../../data/sdk/model';
+import classes from './ui-sprite-img.module.css';
+
+export type UISpriteImgProps = {
+    sheetUrl: string;
+    spriteInfos: Pick<SpriteInfo, 'x' | 'y' | 'width' | 'height'>;
+    sourceRealHeight?: number;
+    disabled?: boolean;
+    dropShadow?: boolean;
+} & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+
+export const UISpriteImg: React.FC<UISpriteImgProps> = ({ sheetUrl, spriteInfos, sourceRealHeight, disabled, dropShadow, className, style, ...rest }) => {
+    return <div
+        {...rest}
+        data-disabled={disabled || undefined}
+        className={clsx(
+            classes.uiSpriteImg,
+            dropShadow && classes.dropShadow,
+            className,
+        )}
+        style={{
+            '--sprite-infos-x-px': spriteInfos.x + 'px',
+            '--sprite-infos-y-px': spriteInfos.y + 'px',
+            '--sprite-infos-height': spriteInfos.height,
+            '--sprite-infos-width-px': spriteInfos.width + 'px',
+            '--source-real-height-px': sourceRealHeight && (sourceRealHeight + 'px'),
+
+            // should be done in JS because of firefox not compatible with css compute (unit not supported)
+            '--source-real-size-ratio-px': (sourceRealHeight || spriteInfos.height) / spriteInfos.height,
+            ...style,
+        } as React.CSSProperties}
+    >
+        {sheetUrl && <img
+            src={sheetUrl}
+            alt={`sprite`}
+        />}
+    </div>;
+};

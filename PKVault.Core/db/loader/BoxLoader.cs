@@ -1,0 +1,149 @@
+using Microsoft.EntityFrameworkCore;
+using PKHeX.Core;
+
+namespace PKVault.Core;
+
+public interface IBoxLoader : IEntityLoader<BoxDTO, BoxEntity>
+{
+    public BoxDTO CreateDTO(BoxEntity entity, string? WallpaperName = null, GameVersion? Version = null);
+    public Task<Dictionary<string, BoxEntity>> GetEntitiesByBank(string bankId);
+    public Task<int> GetMaxId();
+    public Task NormalizeOrders();
+}
+
+public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
+{
+    public static readonly int OrderGap = 10;
+
+    public static bool CanIdReceivePkm(int boxId, GameVersion version) => 
+        // ZA party is unstable, moving should be disabled
+        (version != GameVersion.ZA && boxId == (int)BoxType.Party)
+        || boxId >= (int)BoxType.Box;
+
+    /**
+     * Scoped box cannot interact with non-scoped boxes.
+     * This allows duplicates between scoped and non-scoped, since there is strong delimitation between them.
+     */
+    public static bool IsScopedBox(int boxId) => !CanIdReceivePkm(boxId, GameVersion.Any) && boxId != (int)BoxType.Daycare;
+
+    public static BoxType GetTypeFromStorageSlotType(StorageSlotType slotType) => slotType switch
+    {
+        StorageSlotType.Box => BoxType.Box,
+        StorageSlotType.Party => BoxType.Party,
+        StorageSlotType.BattleBox => BoxType.BattleBox,
+        StorageSlotType.Daycare => BoxType.Daycare,
+        StorageSlotType.Scripted => BoxType.Scripted,
+        StorageSlotType.GTS => BoxType.GTS,
+        StorageSlotType.PGL => BoxType.PGL,
+        StorageSlotType.SurpriseTrade => BoxType.SurpriseTrade,
+        StorageSlotType.Fused => BoxType.Fused,
+        StorageSlotType.FusedKyurem => BoxType.Fused,
+        StorageSlotType.FusedNecrozmaS => BoxType.Fused,
+        StorageSlotType.FusedNecrozmaM => BoxType.Fused,
+        StorageSlotType.FusedCalyrex => BoxType.Fused,
+        StorageSlotType.Underground => BoxType.Underground,
+        StorageSlotType.Resort => BoxType.Resort,
+        StorageSlotType.Ride => BoxType.Ride,
+        StorageSlotType.Shiny => BoxType.Shiny,
+        StorageSlotType.BattleAgency => BoxType.BattleAgency,
+        StorageSlotType.Pokéwalker => BoxType.Pokéwalker,
+        _ => throw new NotImplementedException(slotType.ToString()),
+    };
+
+    private readonly IPkmVariantLoader pkmVariantLoader;
+
+    public BoxLoader(
+        ISessionServiceMinimal sessionService,
+        SessionDbContext db,
+        IPkmVariantLoader _pkmVariantLoader
+    ) : base(
+        sessionService, db
+    )
+    {
+        pkmVariantLoader = _pkmVariantLoader;
+    }
+
+    public BoxDTO CreateDTO(BoxEntity entity, string? WallpaperName = null, GameVersion? Version = null)
+    {
+        return new(
+            Id: entity.Id,
+            Type: entity.Type,
+            Name: entity.Name,
+            SlotCount: entity.SlotCount,
+            Order: entity.Order,
+            BankId: entity.BankId,
+            WallpaperName,
+            Version
+        );
+    }
+
+    protected override async Task<BoxDTO> GetDTOFromEntity(BoxEntity entity)
+    {
+        return CreateDTO(entity);
+    }
+
+    public override async Task DeleteEntity(BoxEntity entity)
+    {
+        var pkmsToRemove = await pkmVariantLoader.GetEntitiesByBox(entity.Id);
+        foreach (var pkm in pkmsToRemove.Values.SelectMany(entry => entry.Values))
+        {
+            var dto = await pkmVariantLoader.CreateDTO(pkm);
+            if (!dto.CanDelete)
+            {
+                throw new ArgumentException($"PkmVariant cannot be deleted: {dto.Id}");
+            }
+
+            await pkmVariantLoader.DeleteEntity(pkm);
+        }
+
+        await base.DeleteEntity(entity);
+    }
+
+    public async Task<Dictionary<string, BoxEntity>> GetEntitiesByBank(string bankId)
+    {
+        var dbSet = await GetDbSet();
+
+        return await dbSet.Where(p => p.BankId == bankId)
+            .ToDictionaryAsync(p => p.Id);
+    }
+
+    public async Task<int> GetMaxId()
+    {
+        var dbSet = await GetDbSet();
+
+        return await dbSet.MaxAsync(p => p.IdInt);
+    }
+
+    public async Task NormalizeOrders()
+    {
+        var dbSet = await GetDbSet();
+
+        var entities = await dbSet
+            .OrderBy(box => box.BankId)
+            .ThenBy(box => box.Order)
+            .ToArrayAsync();
+
+        var currentOrder = 0;
+        string? bankId = null;
+
+        foreach (var box in entities)
+        {
+            if (bankId != box.BankId)
+            {
+                bankId = box.BankId;
+                currentOrder = 0;
+            }
+
+            if (box.Order != currentOrder)
+            {
+                box.Order = currentOrder;
+                await UpdateEntity(box);
+            }
+            currentOrder += OrderGap;
+        }
+
+        await db.SaveChangesAsync();
+    }
+
+    protected override DbSet<BoxEntity> GetDbSetRaw() => db.Boxes;
+}

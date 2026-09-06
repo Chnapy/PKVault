@@ -79,6 +79,9 @@ export const updateCacheMutationResponse = (client: QueryClient, data: unknown) 
 
     if (mainBoxes) {
         applyResponseData(client, mainBoxes, getStorageGetBoxesQueryKey());
+
+        // TODO required when saveId is specified as variable
+        applyResponseData(client, mainBoxes, getStorageGetBoxesQueryKey({ saveId: undefined }));
     }
 
     if (mainPkmVariants) {
@@ -219,10 +222,12 @@ const applyDex = function (client: QueryClient, responseData: DataDTOState) {
 
         const oldData = oldResponse?.data ?? {};
 
-        return Object.values({
-            ...oldData,
-            ...responseData.data,
-        }).filter(filterIsDefined);
+        return Object.fromEntries(
+            Object.entries({
+                ...oldData,
+                ...responseData.data,
+            }).filter(([ species ]) => filterIsDefined(species))
+        );
     };
 
     client.setQueryData(queryKey, {

@@ -1,153 +1,103 @@
-import { css } from '@emotion/css';
+import { EmptyState } from '@mantine/core';
+import { PackageOpenIcon } from 'lucide-react';
 import React from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
+import { SavesUploadButton } from '../../saves/saves-upload-popover/saves-upload-button';
 import { useTranslate } from '../../translate/i18n';
-import { theme } from '../../ui/theme';
-import { GlobsInputAdd } from './globs-input-add';
+import { UIGlobsInputList, type UIGlobsInputListProps } from '../../ui/form/globs-input/ui-globs-input-list';
+import { getDesktopFileTypeInfos } from '../../ui/form/globs-input/util/get-desktop-file-type-infos';
 import { GlobsInputItem } from './globs-input-item';
 import { GlobsInputResults } from './globs-input-results';
-import { isDesktop } from './hooks/use-desktop-message';
+import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
 
-export type GlobsInputListProps = Omit<UseFormRegisterReturn, 'onChange'> & {
-    labelList: React.ReactNode;
-    labelAddFile: React.ReactNode;
-    labelAddFolder: React.ReactNode;
-    value: string;
-    onChange: (value: string) => void;
-    limit: number;
-};
-
-export const GlobsInputList: React.FC<GlobsInputListProps> = ({ labelList, labelAddFile, labelAddFolder, value, onChange, limit, disabled }) => {
-    const { t } = useTranslate();
-
-    const splitedValue = value.split('\n').map(value => value.trim()).filter(Boolean);
-
-    const addCommonProps = {
-        onAdd: (newValue: string[]) => {
-            const newValues = [ ...splitedValue, ...newValue ];
-            onChange(newValues.join('\n'));
-        },
-        disabled,
+export type GlobsInputListProps = Partial<Omit<UseFormRegisterReturn, 'onChange'>>
+    & Pick<UIGlobsInputListProps, 'labelList' | 'labelAddFile' | 'labelAddFolder' | 'labelAddPath'>
+    & {
+        name: string;
+        value: string;
+        onChange: (value: string) => void;
+        limit: number;
+        children?: React.ReactNode;
     };
 
-    return <div
-        className={css({
-            display: 'inline-flex',
-            flexDirection: 'column',
-            backgroundColor: theme.bg.darker,
-            borderRadius: 4,
-            filter: theme.shadow.filter,
-            overflow: 'hidden',
-            verticalAlign: 'middle',
-        })}
+export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onChange, limit, disabled, children, ...rest }) => {
+    const { t } = useTranslate();
+
+    const desktopMessage = useDesktopMessage();
+
+    const splittedValue = value.split('\n').map(value => value.trim()).filter(Boolean);
+
+    const id = 'globs-list-' + name;
+
+    return <UIGlobsInputList
+        id={id}
+        onAdd={async (type, newValue) => {
+
+            if (desktopMessage) {
+                const typeInfos = getDesktopFileTypeInfos(type);
+
+                const response = await desktopMessage.fileExplore({
+                    type: 'file-explore',
+                    id: typeInfos.id,
+                    directoryOnly: typeInfos.directoryOnly,
+                    basePath: '',
+                    multiselect: false,
+                });
+
+                if (!response.values[ 0 ]) {
+                    return;
+                }
+
+                newValue = typeInfos.getFinalPaths(response.values);
+            }
+
+            const newValues = [ ...splittedValue, ...newValue ];
+            onChange(newValues.join('\n'));
+
+            if (!desktopMessage) {
+                setTimeout(() => {
+                    const el = document.getElementById(id)?.querySelector('[data-item-last]');
+                    if (el)
+                        (el as HTMLElement).click();
+                }, 200);
+            }
+        }}
+        disabled={disabled}
+        isDesktop={isDesktop}
+        uploadAbbButton={<SavesUploadButton
+            disabled={disabled}
+            size='compact-sm'
+            style={{ flexGrow: 1 }}
+        />}
+        results={<GlobsInputResults
+            values={splittedValue}
+            limit={limit * 2}
+        />}
+        {...rest}
     >
-        <div
-            className={css({
-                padding: 4,
-                cursor: 'pointer',
-                color: theme.text.light,
-                textShadow: theme.shadow.textlight,
-            })}
-        >
-            {labelList}
-        </div>
+        {children}
+        {splittedValue.map((value, i) => <GlobsInputItem key={i}
+            name={`${name}-${i}`}
+            value={value}
+            onChange={newValue => {
+                const newValues = [ ...splittedValue ];
+                newValues[ i ] = newValue;
+                onChange(newValues.join('\n'));
+            }}
+            onRemove={() => {
+                const newValues = [ ...splittedValue ];
+                delete newValues[ i ];
+                onChange(newValues.join('\n'));
+            }}
+            disabled={disabled}
+            limit={limit}
+            data-item-last={(i === splittedValue.length - 1) || undefined}
+        />)}
 
-        <div
-            className={css({
-                margin: 1,
-                backgroundColor: theme.bg.default,
-                borderRadius: 4,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 4,
-            })}
-        >
-            <div
-                className={css({
-                    width: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 4,
-                    padding: 4,
-                    minHeight: 47,
-                    maxHeight: 600,
-                    overflow: 'auto',
-                })}
-            >
-                {splitedValue.map((value, i) => <GlobsInputItem key={i}
-                    value={value}
-                    onEdit={newValue => {
-                        const newValues = [ ...splitedValue ];
-                        newValues[ i ] = newValue;
-                        onChange(newValues.join('\n'));
-                    }}
-                    onRemove={() => {
-                        const newValues = [ ...splitedValue ];
-                        delete newValues[ i ];
-                        onChange(newValues.join('\n'));
-                    }}
-                    disabled={disabled}
-                    limit={limit}
-                />)}
-            </div>
-
-            <div
-                className={css({
-                    display: 'flex',
-                    gap: 4,
-                    padding: 4,
-                    paddingTop: 0,
-                })}
-            >
-                {isDesktop
-                    ? <>
-                        <GlobsInputAdd
-                            label={labelAddFile}
-                            type='file'
-                            {...addCommonProps}
-                        />
-                        <GlobsInputAdd
-                            label={labelAddFolder}
-                            type='folder'
-                            {...addCommonProps}
-                        />
-                        <GlobsInputAdd
-                            label={t('settings.form.globs.add-exclude')}
-                            type='exclude'
-                            {...addCommonProps}
-                        />
-                    </>
-                    : <>
-                        <GlobsInputAdd
-                            label={labelAddFile}
-                            type='file'
-                            {...addCommonProps}
-                        />
-                        <GlobsInputAdd
-                            label={t('settings.form.globs.add-exclude')}
-                            type='exclude'
-                            {...addCommonProps}
-                        />
-                    </>}
-            </div>
-
-            <div
-                className={css({
-                    width: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 4,
-                    padding: 4,
-                    paddingTop: 0,
-                    maxHeight: 340,
-                    overflow: 'auto',
-                })}
-            >
-                <GlobsInputResults
-                    values={splitedValue}
-                    limit={limit * 2}
-                />
-            </div>
-        </div>
-    </div>;
+        {splittedValue.length === 0 && !children && <EmptyState
+            size='sm'
+            icon={<PackageOpenIcon />}
+            title={t('settings.form.saves.empty')}
+        />}
+    </UIGlobsInputList>;
 };

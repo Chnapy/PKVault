@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>PKVault.Core.Tests</RootNamespace>
+
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="coverlet.runsettings.xml" CopyToOutputDirectory="PreserveNewest" />
+    <!-- <Content Include="testconfig.json" CopyToOutputDirectory="PreserveNewest" /> -->
+    
+    <Content Include="assets/**/*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.3.2" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="System.IO.Abstractions" Version="22.1.0" />
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="22.1.0" />
+    <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
+
+    <Reference Include="../PKVault.Core/PKHeX.Core.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PKVault.Core\PKVault.Core.csproj" />
+  </ItemGroup>
+
+</Project>

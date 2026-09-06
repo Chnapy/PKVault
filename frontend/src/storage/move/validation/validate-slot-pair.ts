@@ -45,12 +45,7 @@ export const validateSlotPair = (
 
         case 'save-to-bank':
         case 'save-to-main': {
-            const existingPkmVariant = pkmVariantIndexes.byId[ info.sourcePkm.idBase ];
-            return validateSaveToMain(
-                info,
-                attached,
-                existingPkmVariant,
-            );
+            return validateSaveToMain(info, attached);
         }
     }
 };

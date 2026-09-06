@@ -1,0 +1,4 @@
+
+[data-show-focus] .panel-controlled:not([data-focus-in-scope="true"], [data-focused="true"]) {
+    opacity: 0.75;
+}

@@ -36,7 +36,9 @@ declare global {
     }
 }
 
-export const isDesktop = window.external.sendMessage !== undefined;
+const external = window.external as External | undefined;
+
+export const isDesktop = external?.sendMessage !== undefined;
 
 const desktopResponseSchema = z.object({
     detail: z.object({
@@ -51,10 +53,10 @@ const requestDesktop = <R extends Response>(request: { type: string; id?: string
 
     console.log('send to desktop:', request);
 
-    window.external.sendMessage?.(JSON.stringify(request));
+    external?.sendMessage?.(JSON.stringify(request));
 
     if (request.id !== undefined) {
-        window.external.receiveMessage?.(message => {
+        external?.receiveMessage?.(message => {
             if (resolved) {
                 return;
             }

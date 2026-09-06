@@ -1,0 +1,16 @@
+.ui-species-img {
+    --sprite-size-multiplier: var(--sprite-species-size-multiplier);
+    --sprite-rendering: var(--sprite-species-rendering);
+
+    /* override sprite final size to ensure it follows 96px sizing, some sprites being 128px */
+    --sprite-size: calc(var(--sprite-size-multiplier, 1) * 96);
+}
+
+.ui-species-img.shadow img {
+    filter: drop-shadow(#704 0 0 6px);
+}
+
+.ui-species-img-skeleton {
+    height: calc(var(--sprite-size) * 1px);
+    width: calc(var(--sprite-size) * 1px);
+}

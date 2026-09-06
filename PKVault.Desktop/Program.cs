@@ -4,10 +4,13 @@ using System.Runtime.InteropServices;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.DependencyInjection;
 using Photino.NET;
 using Photino.NET.Server;
+using PKVault.Core;
 using Serilog;
 
 namespace PKVault.Desktop;
@@ -26,32 +29,49 @@ class Program
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     });
 
+    private static IFileChooser fileChooser = new DefaultFileChooser();
+
+    private static Task<IServiceProvider>? SetupTask = null;
+
+    [DllImport("kernel32.dll")]
+    static extern bool AttachConsole(uint dwProcessId);
+
+    const uint ATTACH_PARENT_PROCESS = 0x0ffffffff;
+
     [STAThread]
     static void Main(string[] args)
     {
-        LogUtil.Initialize();
+        AttachConsole(ATTACH_PARENT_PROCESS);
+        Core.Program.Initialize();
 
-        try {
-            Backend.Program.Copyright();
+        if (LinuxOS)
+        {
+            fileChooser = new LinuxFileChooser();
+
+            // Fix https://github.com/Chnapy/PKVault/issues/190
+            // This variable affects only nvidia-based systems, with small perf impact
+            Environment.SetEnvironmentVariable("__NV_DISABLE_EXPLICIT_SYNC", "1");
+        }
+
+        try
+        {
+            SettingsService.FlatpakMigrateIfAny();
 
             var window = new PhotinoWindow();
 
-            var staticServerRun = SetupStaticAssetsServer(out var baseUrl);
+            var staticServerRun = SetupServer(out var baseUrl);
             _ = staticServerRun();
-
-            var server = new LocalWebServer();
 
             window.RegisterWindowCreatedHandler(async (sender, e) =>
             {
                 Log.Logger.Debug("CREATED");
-
-                var backendServerPostRun = await SetupBackendServer(server, args);
-                await backendServerPostRun();
-
             });
             window.RegisterWindowClosingHandler((sender, e) =>
             {
-                var emptyActionList = server.HasEmptyActionList();
+                if (SetupTask == null || !SetupTask.IsCompletedSuccessfully)
+                    return false;
+
+                var emptyActionList = Core.Program.HasEmptyActionList(SetupTask.Result);
 
                 if (!emptyActionList)
                 {
@@ -62,8 +82,6 @@ class Program
                     }
                 }
 
-                _ = server.Stop();
-
                 return false;
             });
             // window.RegisterWindowCreatingHandler((sender, e) =>
@@ -73,6 +91,8 @@ class Program
             // });
 
             SetupWindow(window, baseUrl);
+
+            SetupTask = SetupCore();
 
             InjectIntoFrontend(window);
 
@@ -88,56 +108,125 @@ class Program
         }
     }
 
-    private static async Task<Func<Task>> SetupBackendServer(LocalWebServer server, string[] args)
+    private static async Task<IServiceProvider> SetupCore()
     {
-        var setupPostRun = await server.Start(args);
+        var services = new ServiceCollection();
+        Core.Program.ConfigureServices(services);
+        var sp = services.BuildServiceProvider();
 
-        return setupPostRun
-            ?? (async () => { });
+        await Core.Program.SetupData(sp);
+
+        return sp;
     }
 
-    private static Func<Task> SetupStaticAssetsServer(out string baseUrl)
+    private static Func<Task> SetupServer(out string baseUrl)
     {
-        var server = PhotinoServer.CreateStaticFileServer([], out baseUrl);
+        // IANA (RFC 6335) less-used ports
+        var server = PhotinoServer.CreateStaticFileServer([], 49152, 16000, "wwwroot", out baseUrl);
 
         var contentTypeProvider = new FileExtensionContentTypeProvider();
 
         server.Map("{**catchAll}", async context =>
         {
-            // log.LogInformation("GET => " + context.Request.Path.Value);
-            // log.LogInformation(context.Request.GetDisplayUrl());
-            // log.LogInformation(context.Request.GetEncodedUrl());
+            var path = context.Request.Path.Value ?? "";
+            // Log.Debug($"PATH {path}");
 
-            // http://localhost:8000/api/storage/main/pkm-version
-            // http://localhost:8000/index.html?server=http://localhost:57471
-            var uri = context.Request.GetDisplayUrl();
-            // log.LogInformation($"DEBUG {uri}");
-
-            var uriParts = uri.Split('?')[0].Split('/');
-
-            var uriActionAndRest = uriParts.Skip(3);
-            var uriAction = uriActionAndRest.First();
-            var uriDirectories = uriActionAndRest.SkipLast(1);
-            var uriFilename = uriActionAndRest.Last();
-            var uriFilenameExt = Path.GetExtension(uriFilename);
-            var assemblyActionAndRest = string.Join('.', [
-                ..uriDirectories.Select(part => part.Replace('-', '_')),
-                uriFilename
-            ]);
-
-            var streamKey = $"{AssemblyStaticPrefix}{assemblyActionAndRest}";
-            var stream = Assembly.GetManifestResourceStream(streamKey);
-            if (stream == null)
+            try
             {
-                Log.Error($"Stream not found for key {streamKey}");
-                // args.Response = webView.CoreWebView2.Environment.CreateWebResourceResponse(stream, 404, "Not Found", "");
-                return;
+                if (path.StartsWith("/api/"))
+                {
+                    var sp = await SetupTask!;
+                    using var scope = sp.CreateScope();
+                    var coreRouter = scope.ServiceProvider.GetRequiredService<CoreRouter>();
+
+                    var req = context.Request;
+                    var res = context.Response;
+
+                    string queryString = context.Request.QueryString.HasValue
+                        ? context.Request.QueryString.Value
+                        : "";
+
+                    var result = await coreRouter.Dispatch(scope.ServiceProvider, req.Method, req.Path, queryString, req.Body);
+
+                    res.StatusCode = result.StatusCode ?? 200;
+
+                    if (result.Header is not null)
+                        foreach (var (key, values) in result.Header)
+                            res.Headers[key] = values;
+
+                    if (result is CoreFileResponse fileResponse)
+                    {
+                        res.ContentType = fileResponse.ContentType ?? "application/octet-stream";
+
+                        var contentDispositionHeader = new System.Net.Mime.ContentDisposition()
+                        {
+                            FileName = fileResponse.File.FileName,
+                            DispositionType = "attachment"
+                        };
+                        res.Headers.Append("Content-Disposition", contentDispositionHeader.ToString());
+
+                        if (fileResponse.LastModified is not null)
+                            res.GetTypedHeaders().LastModified = fileResponse.LastModified;
+
+                        await using var stream = fileResponse.File.Stream;
+                        await stream.CopyToAsync(res.Body);
+                    }
+
+                    else if (result is CoreJSONResponse jsonResponse)
+                    {
+                        res.ContentType = jsonResponse.ContentType ?? "application/json";
+                        if (jsonResponse.Data is not null)
+                        {
+                            var typeInfo = RouteJsonContext.DefaultWithOptions.GetTypeInfo(jsonResponse.Data.GetType())
+                                ?? throw new InvalidOperationException($"Missing TypeInfo for type {jsonResponse.Data.GetType()}");
+
+                            await JsonSerializer.SerializeAsync(
+                                res.Body,
+                                jsonResponse.Data,
+                                typeInfo
+                            );
+                        }
+                    }
+                }
+                else
+                {
+                    // http://localhost:8000/api/storage/main/pkm-version
+                    // http://localhost:8000/index.html?server=http://localhost:57471
+                    var uri = context.Request.GetDisplayUrl();
+                    // log.LogInformation($"DEBUG {uri}");
+
+                    if (uri.EndsWith("/.well-known/appspecific/com.chrome.devtools.json"))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status404NotFound;
+                        return;
+                    }
+
+                    var uriParts = uri.Split('?')[0].Split('/');
+
+                    var uriActionAndRest = uriParts.Skip(3);
+                    var uriAction = uriActionAndRest.First();
+                    var uriDirectories = uriActionAndRest.SkipLast(1);
+                    var uriFilename = uriActionAndRest.Last();
+                    var uriFilenameExt = Path.GetExtension(uriFilename);
+                    var assemblyActionAndRest = string.Join('.', [
+                        ..uriDirectories.Select(part => part.Replace('-', '_')),
+                        uriFilename
+                    ]);
+
+                    var streamKey = $"{AssemblyStaticPrefix}{assemblyActionAndRest}";
+                    var stream = Assembly.GetManifestResourceStream(streamKey)
+                        ?? throw new ArgumentException($"Stream not found for key {streamKey}, uri {uri}");
+                    contentTypeProvider.Mappings.TryGetValue(uriFilenameExt, out var contentType);
+
+                    context.Response.ContentType = contentType;
+                    await stream.CopyToAsync(context.Response.Body);
+                }
             }
-
-            contentTypeProvider.Mappings.TryGetValue(uriFilenameExt, out var contentType);
-
-            context.Response.ContentType = contentType;
-            await stream.CopyToAsync(context.Response.Body);
+            catch
+            {
+                // await ExceptionHandlingMiddleware.WriteExceptionResponse(context, ex);
+                throw;
+            }
         });
 
         return () => server.RunAsync();
@@ -157,7 +246,7 @@ class Program
             // Windows only: resize to a percentage of the main monitor work area
             .SetUseOsDefaultSize(WindowsOS)
             // Linux only: static initial size
-            .SetSize(1360, 800)
+            .SetSize(1280, 755)
             .Center()
             .SetResizable(true)
             .SetIconFile(tmpIconFilepath)
@@ -174,7 +263,7 @@ class Program
                 if (File.Exists(tmpIconFilepath))
                     File.Delete(tmpIconFilepath);
             })
-            .Load(baseUrl + $"/index.html?server={LocalWebServer.HOST_URL}");
+            .Load(baseUrl + $"/index.html");
     }
 
     private static void InjectIntoFrontend(PhotinoWindow window)
@@ -238,44 +327,18 @@ class Program
 
                             async Task<FileExploreResponseMessage> GetDialogResponse()
                             {
-                                if (fileExploreRequest.directoryOnly)
-                                {
-                                    Log.Logger.Debug($"Directory only");
-                                    var dirResults = await window.ShowOpenFolderAsync(
-                                        // title: "TEST TITLE",
-                                        defaultPath: GetDefaultPath(),
-                                        multiSelect: fileExploreRequest.multiselect
-                                    );
-
-                                    return new(
-                                        type: fileExploreRequest.type,
-                                        id: fileExploreRequest.id,
-                                        directoryOnly: true,
-                                        values: [.. dirResults.Select(ToRelative)]
-                                    );
-                                }
-
-                                Log.Logger.Debug($"File only");
-                                var fileResults = await window.ShowOpenFileAsync(
-                                    // title: "TEST TITLE",
-                                    defaultPath: GetDefaultPath(),
-                                    multiSelect: fileExploreRequest.multiselect
+                                var results = await fileChooser.ShowChooserAsync(
+                                    window,
+                                    directoryOnly: fileExploreRequest.directoryOnly,
+                                    multiSelect: fileExploreRequest.multiselect,
+                                    defaultPath: GetDefaultPath()
                                 );
-
-                                // using var dialogFile = new OpenFileDialog();
-
-                                // dialogFile.Title = fileExploreRequest.title;
-                                // dialogFile.Multiselect = fileExploreRequest.multiselect;
-                                // if (fileExploreRequest.basePath != default)
-                                //     dialogFile.InitialDirectory = fileExploreRequest.basePath;
-
-                                // var dialogResult = dialogFile.ShowDialog();
 
                                 return new(
                                     type: fileExploreRequest.type,
                                     id: fileExploreRequest.id,
-                                    directoryOnly: true,
-                                    values: [.. fileResults.Select(ToRelative)]
+                                    directoryOnly: fileExploreRequest.directoryOnly,
+                                    values: [.. results.Select(ToRelative)]
                                 );
                             }
 
@@ -287,8 +350,9 @@ class Program
                         {
                             var openFolderRequest = JsonSerializer.Deserialize(message, messageJsonContext.OpenFolderRequestMessage);
 
-                            var path = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), openFolderRequest.path))
-                                .Replace('/', '\\');
+                            var normalizedPath = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), openFolderRequest.path));
+
+                            var path = normalizedPath.Replace('/', '\\');
 
                             if (WindowsOS)
                             {
@@ -340,6 +404,21 @@ class Program
                                     Process.Start(fallback);
                                 }
                             }
+                            else if (MacOS)
+                            {
+                                // `open -R` reveals and selects a file/folder in Finder
+                                var arg = $"-R \"{MatcherUtil.NormalizePath(normalizedPath)}\"";
+
+                                var psi = new ProcessStartInfo
+                                {
+                                    FileName = "open",
+                                    Arguments = arg,
+                                    UseShellExecute = false
+                                };
+
+                                Log.Logger.Debug($"RUN open {arg}");
+                                Process.Start(psi);
+                            }
                             else
                             {
                                 throw new PlatformNotSupportedException($"OS not supported: {RuntimeInformation.OSDescription}");
@@ -373,7 +452,7 @@ class Program
             }
             catch (JsonException ex)
             {
-                Log.Error(ex.ToString());
+                Log.Error(ex, "JsonException during frontend message recept");
             }
         });
     }

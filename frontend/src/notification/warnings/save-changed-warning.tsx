@@ -1,3 +1,4 @@
+import { Table } from '@mantine/core';
 import type React from 'react';
 import type { SaveChangedWarning as SaveChangedWarningModel } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
@@ -17,12 +18,12 @@ export const SaveChangedWarning: React.FC<SaveChangedWarningModel> = ({ saveId }
         return null;
     }
 
-    return <tr>
-        <td>
+    return <Table.Tr>
+        <Table.Td>
             {t('notifications.warnings.save-changed', {
                 saveName: staticData.versions[ save.version ]?.name,
                 path: save.path,
             })}
-        </td>
-    </tr>;
+        </Table.Td>
+    </Table.Tr>;
 };
