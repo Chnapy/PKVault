@@ -27,7 +27,7 @@ export const ItemImg: React.FC<ItemImgProps> = ({ item, version, ...imgProps }) 
     const spriteInfos = staticData.spritesheets.items[ spriteKey ];
 
     const sheetRelativeUrl = spriteInfos && getStaticDataGetSpritesheetImgUrl(spriteInfos.sheetName, {
-        buildID: settings.data?.data.buildID,
+        buildID: settings.data?.data.buildID ?? null,
     });
     const sheetUrl = getApiFullUrl(sheetRelativeUrl ?? '');
 
