@@ -4139,7 +4139,8 @@
           "WINDOWS",
           "LINUX",
           "STEAMDECK",
-          "MACOS"
+          "MACOS",
+          "ANDROID"
         ],
         "enum": [
           0,
@@ -4147,7 +4148,8 @@
           2,
           3,
           4,
-          5
+          5,
+          6
         ]
       },
       "SourceProvider": {

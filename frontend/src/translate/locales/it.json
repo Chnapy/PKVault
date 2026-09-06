@@ -254,6 +254,7 @@
   "settings.sub.controls-label": "Cambia categoria",
   "settings.sub.external": "Pkm esterni",
   "settings.sub.main": "Principale",
+  "settings.system.android": "Android",
   "settings.system.linux": "Desktop Linux",
   "settings.system.macos": "macOS",
   "settings.system.steamdeck": "SteamDeck",

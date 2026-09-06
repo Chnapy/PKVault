@@ -227,6 +227,9 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             );
         }
 
+        if (GetRuntimeSystem() == RuntimeSystem.ANDROID)
+            return Directory.GetCurrentDirectory();
+
         var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
         var exeDirectory = exePath != null ? Path.GetDirectoryName(exePath) : null;
 
@@ -282,6 +285,9 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             return RuntimeSystem.MACOS;
+
+        if (RuntimeInformation.OSDescription.Contains("android", StringComparison.CurrentCultureIgnoreCase))
+            return RuntimeSystem.ANDROID;
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             return RuntimeSystem.UNKNOWN;
