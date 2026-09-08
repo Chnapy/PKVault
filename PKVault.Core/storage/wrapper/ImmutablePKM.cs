@@ -157,16 +157,47 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
             pkmContest.ContestSheen,
         ]
         : null;
+    private static readonly string[] G3ContestRibbonCountNames =
+    [
+        "RibbonCountG3Cool",
+        "RibbonCountG3Beauty",
+        "RibbonCountG3Cute",
+        "RibbonCountG3Smart",
+        "RibbonCountG3Tough",
+    ];
+    private static readonly string[] RibbonTierSuffixes = ["", "Super", "Hyper", "Master"];
+
+    /**
+     * Gen 3 contest ribbons are a tier count (0-4); expand them into per-tier ribbons. See #239.
+     */
     public Dictionary<string, byte>? Ribbons => Format > 2 && Pkm is not PB7
         ? RibbonInfo.GetRibbonInfo(Pkm)
-            .Where(ribbon => ribbon.HasRibbon)
-            .ToDictionary(
-                p => p.Name,
-                p => p.Type == RibbonValueType.Byte
-                    ? p.RibbonCount
-                    : (byte)1
-            )
+            .SelectMany(GetRibbonEntries)
+            .ToDictionary(p => p.Name, p => p.Value)
         : null;
+
+    private static IEnumerable<(string Name, byte Value)> GetRibbonEntries(RibbonInfo ribbon)
+    {
+        if (ribbon.Type == RibbonValueType.Boolean)
+        {
+            if (ribbon.HasRibbon)
+                yield return (ribbon.Name, 1);
+            yield break;
+        }
+
+        if (G3ContestRibbonCountNames.Contains(ribbon.Name))
+        {
+            var baseName = ribbon.Name.Replace("Count", "");
+            for (var i = 0; i < ribbon.RibbonCount && i < RibbonTierSuffixes.Length; i++)
+            {
+                yield return (baseName + RibbonTierSuffixes[i], 1);
+            }
+            yield break;
+        }
+
+        if (ribbon.RibbonCount > 0)
+            yield return (ribbon.Name, ribbon.RibbonCount);
+    }
 
     // Future Properties
     public DateOnly? MetDate => Pkm.MetDate;

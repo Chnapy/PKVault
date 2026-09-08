@@ -240,6 +240,70 @@ public class ImmutablePKMTests : IAsyncLifetime
 
     #endregion
 
+    #region 8. Ribbons (#239)
+
+    [Fact]
+    public void Ribbons_ExpandsG3ContestCount_IntoTiers()
+    {
+        var pk = new PK3
+        {
+            Species = 25,
+            RibbonCountG3Cool = 3,
+        };
+        var pkm = new ImmutablePKM(pk);
+
+        Assert.Equal(
+            new Dictionary<string, byte>
+            {
+                ["RibbonG3Cool"] = 1,
+                ["RibbonG3CoolSuper"] = 1,
+                ["RibbonG3CoolHyper"] = 1,
+            },
+            pkm.Ribbons
+        );
+    }
+
+    [Fact]
+    public void Ribbons_G3ContestCountZero_YieldsNoTiers()
+    {
+        var pk = new PK3
+        {
+            Species = 25,
+            RibbonCountG3Cool = 0,
+        };
+        var pkm = new ImmutablePKM(pk);
+
+        Assert.Empty(pkm.Ribbons!);
+    }
+
+    [Fact]
+    public void Ribbons_IncludesBooleanRibbon()
+    {
+        var pk = new PK3
+        {
+            Species = 25,
+            RibbonArtist = true,
+        };
+        var pkm = new ImmutablePKM(pk);
+
+        Assert.Equal(1, pkm.Ribbons!["RibbonArtist"]);
+    }
+
+    [Fact]
+    public void Ribbons_KeepsMemoryRibbonAsCount()
+    {
+        var pk = new PK6
+        {
+            Species = 25,
+            RibbonCountMemoryContest = 5,
+        };
+        var pkm = new ImmutablePKM(pk);
+
+        Assert.Equal(5, pkm.Ribbons!["RibbonCountMemoryContest"]);
+    }
+
+    #endregion
+
     #region 9. Edge Cases
 
     [Fact]
